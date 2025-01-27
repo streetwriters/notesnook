@@ -325,6 +325,7 @@ function TabStrip() {
             onClick={() => useEditorStore.getState().goBack()}
             variant="secondary"
             sx={{ p: 1, bg: "transparent" }}
+            data-test-id="go-back"
           >
             <ArrowLeft size={15} />
           </Button>
@@ -333,6 +334,7 @@ function TabStrip() {
             onClick={() => useEditorStore.getState().goForward()}
             variant="secondary"
             sx={{ p: 1, bg: "transparent" }}
+            data-test-id="go-forward"
           >
             <ArrowRight size={15} />
           </Button>
@@ -610,6 +612,7 @@ function Tab(props: TabProps) {
           }
         />
         <Text
+          data-test-id="tab-title"
           variant="body"
           sx={{
             whiteSpace: "nowrap",

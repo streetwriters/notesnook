@@ -39,10 +39,12 @@ export class BaseItemModel {
     return await this.locator.evaluate((el) => el === document.activeElement);
   }
 
-  async click() {
+  async click(options?: { middleClick?: boolean }) {
     if (!(await this.locator.isVisible()))
       await this.locator.scrollIntoViewIfNeeded();
-    await this.locator.click();
+    await this.locator.click({
+      button: options?.middleClick ? "middle" : "left"
+    });
   }
 
   async getId() {

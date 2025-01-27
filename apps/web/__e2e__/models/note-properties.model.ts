@@ -211,6 +211,11 @@ export class NoteContextMenuModel extends BaseProperties {
     this.menu = new ContextMenuModel(page);
   }
 
+  async openInNewTab() {
+    await this.open();
+    await this.menu.clickOnItem("openinnewtab");
+  }
+
   async isColored(color: string): Promise<boolean> {
     await this.open();
     await this.menu.clickOnItem("colors");

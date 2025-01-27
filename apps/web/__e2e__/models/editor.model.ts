@@ -36,6 +36,8 @@ export class EditorModel {
   private readonly dateEditedText: Locator;
   private readonly searchButton: Locator;
   private readonly tabsList: Locator;
+  private readonly goBackButton: Locator;
+  private readonly goForwardButton: Locator;
   readonly savedIcon: Locator;
   readonly notSavedIcon: Locator;
 
@@ -59,6 +61,8 @@ export class EditorModel {
     this.savedIcon = page.locator(getTestId("editor-save-state-saved"));
     this.notSavedIcon = page.locator(getTestId("editor-save-state-notsaved"));
     this.tabsList = page.locator(getTestId("tabs"));
+    this.goBackButton = page.locator(getTestId("go-back"));
+    this.goForwardButton = page.locator(getTestId("go-forward"));
   }
 
   async waitForLoading(title?: string, content?: string) {
@@ -241,6 +245,22 @@ export class EditorModel {
       const tabModel = new TabItemModel(item, this.page);
       if ((await tabModel.getId()) === id) return tabModel;
     }
+  }
+
+  async getTabs() {
+    const tabs: TabItemModel[] = [];
+    for await (const item of iterateList(this.tabsList.locator(".tab"))) {
+      tabs.push(new TabItemModel(item, this.page));
+    }
+    return tabs;
+  }
+
+  async goBack() {
+    await this.goBackButton.click();
+  }
+
+  async goForward() {
+    await this.goForwardButton.click();
   }
 
   async attachImage() {
