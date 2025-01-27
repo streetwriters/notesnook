@@ -443,6 +443,7 @@ function TabStrip() {
           variant="secondary"
           sx={{ p: 1, bg: "transparent", alignSelf: "center", ml: 1 }}
           onClick={() => useEditorStore.getState().addTab()}
+          data-test-id="new-tab"
         >
           <Plus size={18} />
         </Button>

@@ -111,3 +111,16 @@ test("go forward should open next note", async ({ page }) => {
   await notes.editor.goForward();
   expect(await tabs[0].title()).toBe("Note 3");
 });
+
+test("new tab button should open a new tab", async ({ page }) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  await notes.createNote({ title: "Note 1" });
+
+  await notes.editor.newTab();
+
+  const tabs = await notes.editor.getTabs();
+  expect(await tabs[0].title()).toBe("Note 1");
+  expect(await tabs[1].title()).toBe("Untitled");
+});
