@@ -19,7 +19,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { match } from "fuzzyjs";
 import Database from "./index.js";
-import { Item, Note, SortOptions, TrashItem } from "../types.js";
+import {
+  Item,
+  Note,
+  Notebook,
+  Reminder,
+  SortOptions,
+  TrashItem
+} from "../types.js";
 import { DatabaseSchema, RawDatabaseSchema } from "../database/index.js";
 import { AnyColumnWithTable, Kysely, sql } from "@streetwriters/kysely";
 import { FilteredSelector } from "../database/sql-collection.js";
@@ -107,15 +114,17 @@ export default class Lookup {
   }
 
   notebooks(query: string, opts: { titleOnly?: boolean } = {}) {
-    return this.search(this.db.notebooks.all, query, [
+    const fields: FuzzySearchField<Notebook>[] = [
       { name: "id", column: "notebooks.id", weight: -100 },
-      { name: "title", column: "notebooks.title", weight: 10 },
-      {
+      { name: "title", column: "notebooks.title", weight: 10 }
+    ];
+    if (!opts.titleOnly) {
+      fields.push({
         name: "description",
-        column: "notebooks.description",
-        weight: opts?.titleOnly ? -100 : undefined
-      }
-    ]);
+        column: "notebooks.description"
+      });
+    }
+    return this.search(this.db.notebooks.all, query, fields);
   }
 
   tags(query: string) {
@@ -126,15 +135,17 @@ export default class Lookup {
   }
 
   reminders(query: string, opts: { titleOnly?: boolean } = {}) {
-    return this.search(this.db.reminders.all, query, [
+    const fields: FuzzySearchField<Reminder>[] = [
       { name: "id", column: "reminders.id", weight: -100 },
-      { name: "title", column: "reminders.title", weight: 10 },
-      {
+      { name: "title", column: "reminders.title", weight: 10 }
+    ];
+    if (!opts.titleOnly) {
+      fields.push({
         name: "description",
-        column: "reminders.description",
-        weight: opts?.titleOnly ? -100 : undefined
-      }
-    ]);
+        column: "reminders.description"
+      });
+    }
+    return this.search(this.db.reminders.all, query, fields);
   }
 
   trash(query: string): SearchResults<TrashItem> {

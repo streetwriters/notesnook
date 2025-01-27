@@ -81,11 +81,49 @@ test("search notes with an empty note", () =>
     expect(filtered).toHaveLength(1);
   }));
 
+test("search noteTitles should search in titles", () =>
+  noteTest({
+    content: content
+  }).then(async ({ db }) => {
+    await db.notes.add({
+      title: "hello there",
+      content: { type: "tiptap", data: "<p>note of the world<br></p>" }
+    });
+    let filtered = await db.lookup.noteTitles("ho te").ids();
+    expect(filtered).toHaveLength(1);
+  }));
+
+test("search noteTitles should not search in descriptions", () =>
+  noteTest({
+    content: content
+  }).then(async ({ db }) => {
+    let filtered = await db.lookup.noteTitles("note of the world").ids();
+    expect(filtered).toHaveLength(0);
+  }));
+
 test("search notebooks", () =>
   notebookTest().then(async ({ db }) => {
     await db.notebooks.add(TEST_NOTEBOOK2);
     let filtered = await db.lookup.notebooks("Description").ids();
     expect(filtered.length).toBeGreaterThan(0);
+  }));
+
+test("search notebook with titleOnly option should search in titles", () =>
+  notebookTest().then(async ({ db }) => {
+    await db.notebooks.add(TEST_NOTEBOOK2);
+    let filtered = await db.lookup
+      .notebooks("Notebook", { titleOnly: true })
+      .ids();
+    expect(filtered.length).toBeGreaterThan(0);
+  }));
+
+test("search notebook with titleOnly option should not search in descriptions", () =>
+  notebookTest().then(async ({ db }) => {
+    await db.notebooks.add(TEST_NOTEBOOK2);
+    let filtered = await db.lookup
+      .notebooks("Description", { titleOnly: true })
+      .ids();
+    expect(filtered).toHaveLength(0);
   }));
 
 test("search should not return trashed notes", () =>
@@ -111,4 +149,46 @@ test("search should return restored notes", () =>
     const filtered = await db.lookup.notes("heavy tune").ids();
 
     expect(filtered).toHaveLength(1);
+  }));
+
+test("search reminders", () =>
+  databaseTest().then(async (db) => {
+    await db.reminders.add({
+      title: "remind me",
+      description: "please do",
+      date: Date.now()
+    });
+
+    const titleSearch = await db.lookup.reminders("remind me").ids();
+    expect(titleSearch).toHaveLength(1);
+    const descriptionSearch = await db.lookup.reminders("please do").ids();
+    expect(descriptionSearch).toHaveLength(1);
+  }));
+
+test("search reminders with titleOnly option should search in titles", () =>
+  databaseTest().then(async (db) => {
+    await db.reminders.add({
+      title: "remind me very important",
+      description: "hmm",
+      date: Date.now()
+    });
+
+    const filtered = await db.lookup
+      .reminders("important", { titleOnly: true })
+      .ids();
+    expect(filtered).toHaveLength(1);
+  }));
+
+test("search reminders with titleOnly option should not search in descriptions", () =>
+  databaseTest().then(async (db) => {
+    await db.reminders.add({
+      title: "remind me",
+      description: "idc",
+      date: Date.now()
+    });
+
+    const filtered = await db.lookup
+      .reminders("idc", { titleOnly: true })
+      .ids();
+    expect(filtered).toHaveLength(0);
   }));
