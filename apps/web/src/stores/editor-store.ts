@@ -481,25 +481,25 @@ class EditorStore extends BaseStore<EditorStore> {
       }
     );
 
-    const {
-      openSession,
-      openDiffSession,
-      activateSession,
-      activeTabId,
-      getSession,
-      newSession
-    } = this.get();
+    const { rehydrateTab, activeTabId, newSession } = this.get();
     if (activeTabId) {
-      const tab = this.get().tabs.find((t) => t.id === activeTabId);
-      if (!tab) return;
-      const session = getSession(tab.sessionId);
-      if (!session) return;
-
-      if (session.type === "diff" || session.type === "conflicted")
-        openDiffSession(session.note.id, session.id);
-      else if (session.type === "new") activateSession(session.id);
-      else openSession(session.note);
+      rehydrateTab(activeTabId);
     } else newSession();
+  };
+
+  private rehydrateTab = (tabId: string) => {
+    const { openSession, openDiffSession, activateSession, getSession } =
+      this.get();
+
+    const tab = this.get().tabs.find((t) => t.id === tabId);
+    if (!tab) return;
+    const session = getSession(tab.sessionId);
+    if (!session || !session.needsHydration) return;
+
+    if (session.type === "diff" || session.type === "conflicted")
+      openDiffSession(session.note.id, session.id);
+    else if (session.type === "new") activateSession(session.id);
+    else openSession(session.note);
   };
 
   updateSession = <T extends SessionType[] = SessionType[]>(
@@ -1156,6 +1156,8 @@ class EditorStore extends BaseStore<EditorStore> {
       canGoBack: tabSessionHistory.canGoBack(id),
       canGoForward: tabSessionHistory.canGoForward(id)
     });
+
+    this.rehydrateTab(id);
   };
 }
 
