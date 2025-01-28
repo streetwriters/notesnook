@@ -49,6 +49,13 @@ jobs:
         run: |
           npm ci --ignore-scripts --prefer-offline --no-audit
           npm run bootstrap -- --scope=web
+          npm run bootstrap -- --scope=desktop
+
+      - name: Install sqlite-better-trigram for all arch
+        run: |
+          npm i --cpu arm64 sqlite-better-trigram
+          npm i --cpu x64 sqlite-better-trigram
+        working-directory: ./apps/desktop
 
       - name: Setup environment
         run: |
@@ -56,6 +63,10 @@ jobs:
 
       - name: Generate desktop build
         run: npx nx build:desktop @notesnook/web
+
+      - name: Build desktop bundle
+        working-directory: ./apps/desktop
+        run: npm run bundle
 
       - name: Archive build artifact
         uses: actions/upload-artifact@v4
@@ -71,7 +82,8 @@ jobs:
 
       - name: Package desktop build
         run: |
-          zip -r ./notesnook_build_v${{ steps.app_metadata.outputs.app_version }}.zip ./apps/web/build/
+          cp -r ./apps/web/build ./apps/desktop/
+          zip -r ./notesnook_build_v${{ steps.app_metadata.outputs.app_version }}.zip ./apps/desktop/build/
           echo "Build folder archived to ./notesnook_build_v${{ steps.app_metadata.outputs.app_version }}.zip"
 
       - name: Upload desktop build
