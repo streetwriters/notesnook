@@ -103,6 +103,7 @@ import { getGithubVersion } from "../utils/github-version";
 import { tabBarRef } from "../utils/global-refs";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { sleep } from "../utils/time";
+import ReminderSheet from "../components/sheets/reminder";
 
 const onCheckSyncStatus = async (type: SyncStatusEvent) => {
   const { disableSync, disableAutoSync } = SettingsService.get();
@@ -157,6 +158,8 @@ const onUserSessionExpired = async () => {
 
 const onAppOpenedFromURL = async (event: { url: string }) => {
   const url = event.url;
+
+  console.log("URL", url);
   try {
     if (url.startsWith("https://app.notesnook.com/account/verified")) {
       await onUserEmailVerified();
@@ -166,6 +169,25 @@ const onAppOpenedFromURL = async (event: { url: string }) => {
       eSendEvent(eOnLoadNote, { newNote: true });
       tabBarRef.current?.goToPage(1, false);
       return;
+    } else if (url.startsWith("https://notesnook.com/open_note")) {
+      const id = new URL(url).searchParams.get("id");
+      if (id) {
+        const note = await db.notes.note(id);
+        if (note) {
+          eSendEvent(eOnLoadNote, {
+            item: note
+          });
+          tabBarRef.current?.goToPage(1, false);
+        }
+      }
+    } else if (url.startsWith("https://notesnook.com/open_reminder")) {
+      const id = new URL(url).searchParams.get("id");
+      if (id) {
+        const reminder = await db.reminders.reminder(id);
+        if (reminder) ReminderSheet.present(reminder);
+      }
+    } else if (url.startsWith("https://notesnook.com/new_reminder")) {
+      ReminderSheet.present();
     }
   } catch (e) {
     console.error(e);
@@ -695,10 +717,6 @@ export const useAppEvents = () => {
           // Reset the editor if the app has been in background for more than 10 minutes.
           eSendEvent(eEditorReset);
         }
-
-        setTimeout(async () => {
-          IntentService.onAppStateChanged();
-        }, 100);
       } else {
         await saveEditorState();
         if (
