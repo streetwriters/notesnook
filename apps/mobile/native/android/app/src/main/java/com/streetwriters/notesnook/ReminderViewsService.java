@@ -4,6 +4,7 @@ import android.app.ActivityOptions;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -45,6 +46,7 @@ class ReminderRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactor
         SharedPreferences preferences = context.getSharedPreferences("appPreview", Context.MODE_PRIVATE);
         Gson gson = new Gson();
         reminders = gson.fromJson(preferences.getString("remindersList","[]"), new TypeToken<List<Reminder>>(){}.getType());
+
     }
 
     @Override
@@ -64,14 +66,16 @@ class ReminderRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactor
         boolean useMiniLayout = reminder.getDescription() == null || reminder.getDescription().isEmpty();
 
         RemoteViews views = new RemoteViews(context.getPackageName(), useMiniLayout ? R.layout.widget_reminder_layout_small :  R.layout.widget_reminder_layout);
+
         views.setTextViewText(R.id.reminder_title, reminder.getTitle());
-           if (!useMiniLayout) {
+        if (!useMiniLayout) {
                views.setTextViewText(R.id.reminder_description, reminder.getDescription());
-           }
+        }
         views.setTextViewText(R.id.reminder_time, reminder.getFormattedTime());
         final Intent fillInIntent = new Intent();
         final Bundle extras = new Bundle();
         extras.putString(ReminderViewsService.OpenReminderId, reminder.getId());
+        fillInIntent.setData(Uri.parse("https://notesnook.com/open_reminder?id=" + reminder.getId()));
         fillInIntent.putExtra(RCTNNativeModule.IntentType, "OpenReminder");
         fillInIntent.putExtras(extras);
         views.setOnClickFillInIntent(R.id.reminder_item_btn, fillInIntent);
@@ -86,11 +90,12 @@ class ReminderRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactor
 
     @Override
     public int getViewTypeCount() {
-        return 1;
+        return 2;
     }
 
     @Override
     public long getItemId(int position) {
+
         return position;
     }
 

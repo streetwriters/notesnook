@@ -31,12 +31,18 @@ public class NotePreviewWidget extends AppWidgetProvider {
 
         Intent intent = new Intent(context, MainActivity.class);
         intent.putExtra(OpenNoteId, note.getId());
+        intent.setAction(Intent.ACTION_VIEW);
         intent.putExtra(RCTNNativeModule.IntentType, "OpenNote");
-        intent.setData(Uri.parse("https://notesnook.com/open_note"));
+        intent.setData(Uri.parse("https://notesnook.com/open_note?id=" + note.getId()));
         PendingIntent pendingIntent = PendingIntent.getActivity(context, appWidgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE, getActivityOptionsBundle());
         views.setOnClickPendingIntent(R.id.open_note, pendingIntent);
 
         appWidgetManager.updateAppWidget(appWidgetId, views);
+    }
+
+    @Override
+    public void onAppWidgetOptionsChanged(Context context, AppWidgetManager appWidgetManager, int appWidgetId, Bundle newOptions) {
+        super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions);
     }
 
     private static Bundle getActivityOptionsBundle() {

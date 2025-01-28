@@ -34,12 +34,13 @@ public class ReminderWidgetProvider extends AppWidgetProvider {
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId, RemoteViews views) {
         Intent listview_intent_template = new Intent(context, MainActivity.class);
-        listview_intent_template.setData(Uri.parse("https://notesnook.com/open_reminder"));
+        listview_intent_template.setAction(Intent.ACTION_VIEW);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, appWidgetId, listview_intent_template, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_MUTABLE, getActivityOptionsBundle());
         views.setPendingIntentTemplate(R.id.widget_list_view, pendingIntent);
 
         Intent new_reminder_intent = new Intent(context, MainActivity.class);
         new_reminder_intent.putExtra(NewReminder, NewReminder);
+        new_reminder_intent.setAction(Intent.ACTION_VIEW);
         new_reminder_intent.putExtra(RCTNNativeModule.IntentType, "NewReminder");
         new_reminder_intent.setData(Uri.parse("https://notesnook.com/new_reminder"));
         PendingIntent pendingIntent2 = PendingIntent.getActivity(context, appWidgetId, new_reminder_intent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE, getActivityOptionsBundle());
