@@ -104,6 +104,10 @@ const lockfiles = [
     path: path.join(TEMP_FOLDER, "apps", "desktop", "package-lock.json")
   },
   {
+    name: "intl",
+    path: path.join(TEMP_FOLDER, "packages", "intl", "package-lock.json")
+  },
+  {
     name: "sodium",
     path: path.join(TEMP_FOLDER, "packages", "sodium", "package-lock.json")
   },
