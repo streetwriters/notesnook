@@ -44,7 +44,6 @@ import { useTabStore } from "./use-tab-store";
 import { editorController, editorState } from "./utils";
 import { strings } from "@notesnook/intl";
 import { useUserStore } from "../../../stores/use-user-store";
-import { sleep } from "../../../utils/time";
 
 const showEncryptionSheet = (file: DocumentPickerResponse) => {
   presentSheet({
@@ -133,7 +132,6 @@ const file = async (fileOptions: PickerOptions) => {
 
     if (
       fileOptions.tabId !== undefined &&
-      fileOptions.noteId &&
       useTabStore.getState().getNoteIdForTab(fileOptions.tabId) ===
         fileOptions.noteId
     ) {
