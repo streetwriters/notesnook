@@ -16,7 +16,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { TabSessionHistory } from "@notesnook/common";
+import {
+  TabHistory as TabHistoryType,
+  TabSessionHistory
+} from "@notesnook/common";
+import { getId } from "@notesnook/core";
 import { MMKVLoader } from "react-native-mmkv-storage";
 import create from "zustand";
 import { persist, StateStorage } from "zustand/middleware";
@@ -27,12 +31,12 @@ import { eOnLoadNote } from "../../../utils/events";
 import { editorController } from "./utils";
 
 class TabHistory {
-  history: number[];
+  history: string[];
   constructor() {
-    this.history = [0];
+    this.history = [];
   }
 
-  add(item: number) {
+  add(item: string) {
     const index = this.history.findIndex((id) => item === id);
     if (index !== -1) {
       // Item already exists, move it to the top
@@ -41,19 +45,19 @@ class TabHistory {
     this.history.unshift(item); // Add item to the beginning of the array
 
     useTabStore.setState({
-      history: this.history.slice()
+      historyNew: this.history.slice()
     });
     return true; // Item added successfully
   }
 
-  remove(id: number) {
+  remove(id: string) {
     const index = this.history.findIndex((item) => item === id);
     if (index >= -1 && index < this.history.length) {
       const removedItem = this.history.splice(index, 1)[0];
       return removedItem;
     }
     useTabStore.setState({
-      history: this.history.slice()
+      historyNew: this.history.slice()
     });
     return null; // Invalid index
   }
@@ -64,7 +68,7 @@ class TabHistory {
       return restoredItem;
     }
     useTabStore.setState({
-      history: this.history.slice()
+      historyNew: this.history.slice()
     });
     return null; // History is empty
   }
@@ -115,14 +119,6 @@ class TabSessionStorage {
   }
 }
 
-function getId(id: number, tabs: TabItem[]): number {
-  const exists = tabs.find((t) => t.id === id);
-  if (exists) {
-    return getId(id + 1, tabs);
-  }
-  return id;
-}
-
 export function syncTabs(
   type: "tabs" | "history" | "biometry" | "all" = "all"
 ) {
@@ -152,15 +148,15 @@ export const tabSessionHistory = new TabSessionHistory({
     return useTabStore.getState();
   },
   set(state) {
+    console.log("Set state", state.canGoBack, state.canGoForward);
     useTabStore.setState({
       ...state
     });
-  },
-  getCurrentTab: () => useTabStore.getState().currentTab
+  }
 });
 
 export type TabItem = {
-  id: number;
+  id: string;
   pinned?: boolean;
   needsRefresh?: boolean;
   session?: Partial<TabSessionItem>;
@@ -170,35 +166,32 @@ const history = new TabHistory();
 
 export type TabStore = {
   tabs: TabItem[];
-  currentTab: number;
-  updateTab: (id: number, options: Omit<Partial<TabItem>, "id">) => void;
+  currentTab?: string;
+  updateTab: (id: string, options: Omit<Partial<TabItem>, "id">) => void;
   focusPreviewTab: (
     noteId: string,
     options: Omit<Partial<TabItem>, "id">
   ) => void;
-  removeTab: (index: number) => void;
+  removeTab: (index: string) => void;
   moveTab: (index: number, toIndex: number) => void;
-  newTab: (options?: Omit<Partial<TabItem>, "id">) => number;
-  focusTab: (id: number) => void;
-  getNoteIdForTab: (id: number) => string | undefined;
-  getTabForNote: (noteId: string) => number | undefined;
+  newTab: (options?: Omit<Partial<TabItem>, "id">) => string;
+  focusTab: (id: string) => void;
+  getNoteIdForTab: (id: string) => string | undefined;
+  getTabForNote: (noteId: string) => string | undefined;
   getTabsForNote: (noteId: string) => TabItem[];
   forEachNoteTab: (noteId: string, cb: (tab: TabItem) => void) => void;
   hasTabForNote: (noteId: string) => boolean;
   focusEmptyTab: () => void;
   getCurrentNoteId: () => string | undefined;
-  getTab: (tabId: number) => TabItem | undefined;
+  getTab: (tabId: string) => TabItem | undefined;
   newTabSession: (
-    id: number,
-    options: Omit<Partial<TabSessionItem>, "id">
+    id: string,
+    options?: Omit<Partial<TabSessionItem>, "id">
   ) => void;
-  history: number[];
+  historyNew: string[];
   biometryAvailable?: boolean;
   biometryEnrolled?: boolean;
-  tabSessionHistory: Record<
-    number,
-    { back_stack: string[]; forward_stack: string[] }
-  >;
+  tabSessionHistory: TabHistoryType;
   goBack(): void;
   goForward(): void;
   loadSession: (id: string) => Promise<boolean>;
@@ -210,21 +203,27 @@ export type TabStore = {
 export const useTabStore = create<TabStore>(
   persist(
     (set, get) => ({
-      tabs: [],
+      tabs: [
+        {
+          id: "0"
+        }
+      ],
       tabSessionHistory: {},
-      history: [0],
-      currentTab: 0,
+      historyNew: ["0"],
+      currentTab: "0",
       newTabSession: (
-        id: number,
-        options: Omit<Partial<TabSessionItem>, "id">
+        _id?: string,
+        options?: Omit<Partial<TabSessionItem>, "id">
       ) => {
-        const sessionId = tabSessionHistory.add();
+        const tabId = _id || (get().currentTab as string);
+
+        const sessionId = tabSessionHistory.add(tabId);
         const session = {
           id: sessionId,
           ...options
         };
         TabSessionStorage.set(sessionId, session);
-        const index = get().tabs.findIndex((t) => t.id === id);
+        const index = get().tabs.findIndex((t) => t.id === tabId);
         if (index == -1) return;
         const tabs = [...get().tabs];
         tabs[index] = {
@@ -238,7 +237,7 @@ export const useTabStore = create<TabStore>(
         });
         syncTabs();
       },
-      updateTab: (id: number, options: Omit<Partial<TabItem>, "id">) => {
+      updateTab: (id: string, options: Omit<Partial<TabItem>, "id">) => {
         if (!options) return;
         const index = get().tabs.findIndex((t) => t.id === id);
         if (index == -1) return;
@@ -262,14 +261,16 @@ export const useTabStore = create<TabStore>(
         syncTabs();
       },
       goBack: async () => {
-        if (!tabSessionHistory.canGoBack()) return;
-        const id = tabSessionHistory.back() as string;
+        const currentTab = get().currentTab;
+        if (!currentTab) return;
+        if (!tabSessionHistory.canGoBack(currentTab)) return;
+        const id = tabSessionHistory.back(currentTab) as string;
         const sessionLoaded = await get().loadSession(id);
         if (!sessionLoaded) {
-          tabSessionHistory.remove(id);
+          tabSessionHistory.remove(currentTab, id);
           TabSessionStorage.remove(id);
-          if (!tabSessionHistory.canGoBack()) {
-            tabSessionHistory.forward();
+          if (!tabSessionHistory.canGoBack(currentTab)) {
+            tabSessionHistory.forward(currentTab);
             syncTabs();
           } else {
             return get().goBack();
@@ -279,13 +280,16 @@ export const useTabStore = create<TabStore>(
         }
       },
       goForward: async () => {
-        if (!tabSessionHistory.canGoForward()) return;
-        const id = tabSessionHistory.forward() as string;
+        const currentTab = get().currentTab;
+        if (!currentTab) return;
+
+        if (!tabSessionHistory.canGoForward(currentTab)) return;
+        const id = tabSessionHistory.forward(currentTab) as string;
         if (!(await get().loadSession(id))) {
-          tabSessionHistory.remove(id);
+          tabSessionHistory.remove(currentTab, id);
           TabSessionStorage.remove(id);
-          if (!tabSessionHistory.canGoForward()) {
-            tabSessionHistory.back();
+          if (!tabSessionHistory.canGoForward(currentTab)) {
+            tabSessionHistory.back(currentTab);
             syncTabs();
           } else {
             return get().goForward();
@@ -314,9 +318,13 @@ export const useTabStore = create<TabStore>(
           return false;
         }
 
-        get().updateTab(get().currentTab, {
-          session: session
-        });
+        const currentTab = get().currentTab;
+        if (currentTab) {
+          get().updateTab(currentTab, {
+            session: session
+          });
+        }
+
         console.log("Loading session", session);
         eSendEvent(eOnLoadNote, {
           item: note,
@@ -332,7 +340,7 @@ export const useTabStore = create<TabStore>(
         options: Omit<Partial<TabItem>, "id" | "noteId">
       ) => {},
 
-      removeTab: (id: number) => {
+      removeTab: (id: string) => {
         const index = get().tabs.findIndex((t) => t.id === id);
         if (index > -1) {
           const isFocused = id === get().currentTab;
@@ -340,30 +348,32 @@ export const useTabStore = create<TabStore>(
           nextTabs.splice(index, 1);
           history.remove(id);
 
-          const tabSessions = tabSessionHistory.getHistory();
+          const tabSessions = tabSessionHistory.getTabHistory(id);
           tabSessions.back.forEach((id) => TabSessionStorage.remove(id));
           tabSessions.forward.forEach((id) => TabSessionStorage.remove(id));
           tabSessionHistory.clearStackForTab(id);
 
           if (nextTabs.length === 0) {
+            const id = getId();
             set({
-              tabs: [{ id: 0 }]
+              tabs: [{ id: id }]
             });
-            get().newTabSession(0, {});
-            get().focusTab(0);
+            get().newTabSession(id, {});
+            get().focusTab(id);
           } else {
             set({
               tabs: nextTabs
             });
             if (isFocused) {
-              get().focusTab(history.restoreLast() || 0);
+              const lastTab = history.restoreLast();
+              if (lastTab) get().focusTab(lastTab);
             }
           }
           syncTabs();
         }
       },
       newTab: (options) => {
-        const id = getId(get().tabs.length, get().tabs);
+        const id = getId();
         set({
           tabs: [
             ...get().tabs,
@@ -392,19 +402,19 @@ export const useTabStore = create<TabStore>(
         syncTabs();
       },
 
-      focusTab: (id: number) => {
+      focusTab: (id: string) => {
         history.add(id);
         set({
           currentTab: id
         });
         set({
-          canGoBack: tabSessionHistory.canGoBack(),
-          canGoForward: tabSessionHistory.canGoForward(),
-          sessionId: tabSessionHistory.currentSessionId()
+          canGoBack: tabSessionHistory.canGoBack(id),
+          canGoForward: tabSessionHistory.canGoForward(id),
+          sessionId: tabSessionHistory.currentSessionId(id)
         });
         syncTabs();
       },
-      getNoteIdForTab: (id: number) => {
+      getNoteIdForTab: (id: string) => {
         return get().tabs.find((t) => t.id === id)?.session?.noteId;
       },
       hasTabForNote: (noteId: string) => {
@@ -436,7 +446,7 @@ export const useTabStore = create<TabStore>(
       getStorage: () => MMKV as unknown as StateStorage,
       onRehydrateStorage: () => {
         return (state) => {
-          history.history = state?.history || [];
+          history.history = state?.historyNew || [];
         };
       }
     }

@@ -291,9 +291,10 @@ const Tiptap = ({
     const updateFocusedTab = () => {
       if (isFocusedRef.current) return;
       isFocusedRef.current = true;
-      const noteId =
-        useTabStore.getState().tabs[useTabStore.getState().currentTab]?.session
-          ?.noteId;
+      const noteId = useTabStore
+        .getState()
+        .tabs.find((tab) => tab.id === useTabStore.getState().currentTab)
+        ?.session?.noteId;
       post(
         EditorEvents.tabFocused,
         undefined,

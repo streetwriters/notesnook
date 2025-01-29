@@ -74,7 +74,7 @@ export type EditorMessage<T> = {
   value: T;
   type: string;
   noteId: string;
-  tabId: number;
+  tabId: string;
   resolverId?: string;
   hasTimeout?: boolean;
 };
@@ -86,7 +86,7 @@ export type SavePayload = {
   type?: "tiptap";
   sessionHistoryId?: number;
   ignoreEdit: boolean;
-  tabId: number;
+  tabId: string;
   pendingChanges?: boolean;
 };
 

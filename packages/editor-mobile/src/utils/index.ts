@@ -64,7 +64,7 @@ declare global {
 
   var readonlyEditor: boolean;
   var statusBars: Record<
-    number,
+    string,
     | React.MutableRefObject<{
         set: React.Dispatch<
           React.SetStateAction<{
@@ -92,11 +92,11 @@ declare global {
   /**
    * Current tiptap editors
    */
-  var editors: Record<number, Editor | null>;
+  var editors: Record<string, Editor | null>;
   /**
    * Current editor controllers
    */
-  var editorControllers: Record<number, EditorController | undefined>;
+  var editorControllers: Record<string, EditorController | undefined>;
 
   var settingsController: {
     update: (settings: Settings) => void;
@@ -124,12 +124,12 @@ declare global {
     >;
   };
 
-  var editorTitles: Record<number, RefObject<HTMLTextAreaElement> | undefined>;
+  var editorTitles: Record<string, RefObject<HTMLTextAreaElement> | undefined>;
   /**
    * Global ref to manage tags in editor.
    */
   var editorTags: Record<
-    number,
+    string,
     | MutableRefObject<{
         setTags: React.Dispatch<
           React.SetStateAction<
@@ -155,7 +155,7 @@ declare global {
   function post<T extends keyof typeof EditorEvents>(
     type: (typeof EditorEvents)[T],
     value?: unknown,
-    tabId?: number,
+    tabId?: string,
     noteId?: string,
     sessionId?: string
   ): void;
@@ -227,7 +227,7 @@ export function dbLogger(type: "error" | "log", ...logs: unknown[]): void {
 export function post(
   type: string,
   value?: unknown,
-  tabId?: number,
+  tabId?: string,
   noteId?: string,
   sessionId?: string,
   hasTimeout?: boolean
@@ -254,7 +254,7 @@ export function post(
 export async function postAsyncWithTimeout<R = any>(
   type: string,
   value?: unknown,
-  tabId?: number,
+  tabId?: string,
   noteId?: string,
   sessionId?: string,
   waitFor?: number

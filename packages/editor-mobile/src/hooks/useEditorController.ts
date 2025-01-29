@@ -185,10 +185,11 @@ export function useEditorController({
       },
       tabRef.current.id,
       tabRef.current.session?.noteId,
-      currentSessionId
+      currentSessionId,
+      1000
     ];
     const pendingTitleIds = await pendingSaveRequests.getPendingTitleIds();
-    postAsyncWithTimeout(EditorEvents.title, ...params, 1000)
+    postAsyncWithTimeout(EditorEvents.title, ...params)
       .then(() => {
         if (pendingTitleIds.length) {
           dbLogger(
@@ -256,12 +257,13 @@ export function useEditorController({
           },
           tabRef.current.id,
           tabRef.current.session?.noteId,
-          currentSessionId
+          currentSessionId,
+          5000
         ];
 
         const pendingContentIds =
           await pendingSaveRequests.getPendingContentIds();
-        postAsyncWithTimeout(EditorEvents.content, ...params, 5000)
+        postAsyncWithTimeout(EditorEvents.content, ...params)
           .then(() => {
             if (pendingContentIds.length) {
               dbLogger(

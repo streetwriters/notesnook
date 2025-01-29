@@ -102,7 +102,7 @@ const publishNote = async () => {
   }
   const noteId = useTabStore
     .getState()
-    .getNoteIdForTab(useTabStore.getState().currentTab);
+    .getNoteIdForTab(useTabStore.getState().currentTab!);
 
   if (noteId) {
     const note = await db.notes?.note(noteId);
@@ -125,7 +125,7 @@ const publishNote = async () => {
 const showActionsheet = async () => {
   const noteId = useTabStore
     .getState()
-    .getNoteIdForTab(useTabStore.getState().currentTab);
+    .getNoteIdForTab(useTabStore.getState().currentTab!);
   if (noteId) {
     const note = await db.notes?.note(noteId);
     if (editorState().isFocused || editorState().isFocused) {
@@ -248,7 +248,7 @@ export const useEditorEvents = (
     }
     editorState().currentlyEditing = false;
     // editor.reset(); Notes remain open.
-    editor.commands?.blur(useTabStore.getState().currentTab);
+    editor.commands?.blur(useTabStore.getState().currentTab!);
     setTimeout(async () => {
       if (deviceMode !== "mobile" && fullscreen) {
         if (fullscreen) {
@@ -684,7 +684,7 @@ export const useEditorEvents = (
             editor.note.current[noteId] = await db.notes?.note(noteId);
             useTabStore
               .getState()
-              .updateTab(useTabStore.getState().currentTab, {
+              .updateTab(useTabStore.getState().currentTab!, {
                 session: {
                   readonly: false
                 }

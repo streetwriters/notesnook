@@ -119,7 +119,7 @@ class PendingSaveRequests {
       this.remove(PendingSaveRequests.TITLES);
       for (const pending of pendingTitles) {
         if (pending.params[0]) pending.params[0].pendingChanges = true;
-        await postAsyncWithTimeout(EditorEvents.title, ...pending.params, 5000);
+        await postAsyncWithTimeout(EditorEvents.title, ...pending.params);
       }
     };
 
@@ -128,11 +128,7 @@ class PendingSaveRequests {
       this.remove(PendingSaveRequests.CONTENT);
       for (const pending of pendingContents) {
         if (pending.params[0]) pending.params[0].pendingChanges = true;
-        await postAsyncWithTimeout(
-          EditorEvents.content,
-          ...pending.params,
-          5000
-        );
+        await postAsyncWithTimeout(EditorEvents.content, ...pending.params);
       }
     };
 
