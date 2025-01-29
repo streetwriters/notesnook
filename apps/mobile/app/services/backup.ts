@@ -35,6 +35,7 @@ import { eCloseSheet } from "../utils/events";
 import { sleep } from "../utils/time";
 import { ToastManager, eSendEvent, presentSheet } from "./event-manager";
 import SettingsService from "./settings";
+import { e } from "@lingui/react/dist/shared/react.b2b749a9";
 
 const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
@@ -217,6 +218,7 @@ async function run(
 
   try {
     const user = await db.user.getUser();
+    DatabaseLogger.info(`Backup started: ${backupType}`);
     for await (const file of db.backup.export({
       type: "mobile",
       encrypt: SettingsService.get().encryptedBackup && !!user,
@@ -244,11 +246,15 @@ async function run(
       }
     }
 
+    DatabaseLogger.info(`Backup complete: ${backupType}. Creating zip file...`);
+
     updateProgress({
       progress: "Creating backup zip file..."
     });
 
     await zip(zipSourceFolder, zipOutputFile);
+
+    DatabaseLogger.info(`Backup zip file created: ${zipOutputFile}`);
 
     if (Platform.OS === "android") {
       // Move the zip to user selected directory.
@@ -258,7 +264,10 @@ async function run(
         "application/nnbackupz"
       );
 
+      DatabaseLogger.info("Copying backup file to user selected directory...");
+
       await copyFileAsync(`file://${zipOutputFile}`, file.uri);
+      DatabaseLogger.info("Backup saved to user selected directory.");
 
       path = file.uri;
     } else {
@@ -293,6 +302,8 @@ async function run(
 
     if (canShowCompletionStatus) {
       presentBackupCompleteSheet(path);
+    } else {
+      eSendEvent(eCloseSheet);
     }
 
     ToastManager.show({
