@@ -45,7 +45,17 @@ function resetSettings() {
     ...defaultSettings,
     introCompleted: true,
     serverUrls: get().serverUrls,
-    backupDirectoryAndroid: undefined
+    backupDirectoryAndroid: get().backupDirectoryAndroid,
+    darkTheme: get().darkTheme,
+    lighTheme: get().lighTheme,
+    useSystemTheme: get().useSystemTheme,
+    colorScheme: get().colorScheme,
+    defaultSnoozeTime: get().defaultSnoozeTime,
+    defaultFontFamily: get().defaultFontFamily,
+    defaultFontSize: get().defaultFontSize,
+    privacyScreen: get().privacyScreen,
+    corsProxy: get().corsProxy,
+    showBackupCompleteSheet: get().showBackupCompleteSheet
   };
 
   MMKV.setString("appSettings", JSON.stringify(settings));
