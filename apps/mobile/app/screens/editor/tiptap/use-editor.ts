@@ -84,6 +84,62 @@ type NoteWithContent = Note & {
   content?: NoteContent<false>;
 };
 
+type LocalTabStateT = {
+  editedAt: number;
+  lastFocusedAt: number;
+};
+
+class LocalTabState {
+  state: Record<string, LocalTabStateT> = {};
+  noteEditedTime: Record<string, number> = {};
+
+  setEditTime(noteId: string, time: number) {
+    this.noteEditedTime[noteId] = time;
+  }
+
+  get(tabId: string) {
+    return this.state[tabId] || {};
+  }
+
+  set(tabId: string, state: Partial<LocalTabStateT>) {
+    this.state[tabId] = {
+      ...this.state[tabId],
+      ...state
+    };
+  }
+
+  clear(tabId: string) {
+    delete this.state[tabId];
+  }
+
+  reset() {
+    this.state = {};
+  }
+
+  needsRefresh(tabId: string, locked: boolean, readonly: boolean) {
+    const state = this.get(tabId);
+    const tabSession = useTabStore.getState().getTab(tabId)?.session;
+    const noteId = useTabStore.getState().getNoteIdForTab(tabId);
+
+    if (
+      tabSession?.locked !== locked ||
+      tabSession?.readonly !== readonly ||
+      !noteId
+    ) {
+      console.log("tab is refreshing...");
+      return true;
+    }
+    console.log(
+      "Tab refreshing...",
+      state.editedAt < this.noteEditedTime[noteId]
+    );
+
+    console.log(state.editedAt, this.noteEditedTime[noteId]);
+
+    return !state.editedAt || state.editedAt < this.noteEditedTime[noteId];
+  }
+}
+
 export const useEditor = (
   editorId = "",
   readonly?: boolean,
@@ -121,14 +177,17 @@ export const useEditor = (
   const lastContentChangeTime = useRef<Record<string, number>>({});
   const lock = useRef(false);
   const currentLoadingNoteId = useRef<string>();
-  const lastTabFocused = useRef(0);
+  const lastTabFocused = useRef<string>();
+
+  const localTabState = useRef<LocalTabState>(new LocalTabState());
+
   const blockIdRef = useRef<string>();
   const postMessage = useCallback(
-    async <T>(type: string, data: T, tabId?: number, waitFor = 300) =>
+    async <T>(type: string, data: T, tabId?: string, waitFor = 300) =>
       await post(
         editorRef,
         sessionIdRef.current,
-        typeof tabId !== "number" ? useTabStore.getState().currentTab : tabId,
+        tabId || useTabStore.getState().currentTab!,
         type,
         data,
         waitFor
@@ -153,9 +212,9 @@ export const useEditor = (
   }, [commands, tags]);
 
   useEffect(() => {
-    const event = eSubscribeEvent(eEditorTabFocused, (tabId) => {
+    const event = eSubscribeEvent(eEditorTabFocused, (tabId: string) => {
       if (lastTabFocused.current !== tabId) lock.current = false;
-      lastTabFocused.current = tabId as number;
+      lastTabFocused.current = tabId;
     });
     return () => {
       event?.unsubscribe();
@@ -189,7 +248,7 @@ export const useEditor = (
   );
 
   const reset = useCallback(
-    async (tabId: number, resetState = true, resetContent = true) => {
+    async (tabId: string, resetState = true, resetContent = true) => {
       const noteId = useTabStore.getState().getNoteIdForTab(tabId);
       if (noteId) {
         currentNotes.current?.id && db.fs().cancel(noteId);
@@ -437,9 +496,10 @@ export const useEditor = (
     (event: {
       item?: Note;
       newNote?: boolean;
-      tabId?: number;
+      tabId?: string;
       blockId?: string;
       session?: TabSessionItem;
+      newTab?: boolean;
     }) => {
       loadNoteMutex.runExclusive(async () => {
         if (!event) return;
@@ -453,7 +513,7 @@ export const useEditor = (
           (await isEditorLoaded(
             editorRef,
             sessionIdRef.current,
-            useTabStore.getState().currentTab
+            useTabStore.getState().currentTab!
           ))
         ) {
           state.current.ready = true;
@@ -464,37 +524,72 @@ export const useEditor = (
             tabId = useTabStore.getState().newTab();
           } else {
             tabId = useTabStore.getState().currentTab;
-            await reset(tabId, true, true);
+            await reset(tabId!, true, true);
             if (
               event.session?.noteId ||
-              useTabStore.getState().getTab(tabId)?.session?.noteId
+              useTabStore.getState().getTab(tabId!)?.session?.noteId
             ) {
-              useTabStore.getState().newTabSession(tabId, {});
+              useTabStore.getState().newTabSession(tabId!, {});
             }
           }
 
           setTimeout(() => {
             if (state.current?.ready && !state.current.movedAway)
-              commands.focus(tabId);
+              commands.focus(tabId!);
           });
         } else {
           if (!event.item) {
             overlay(false);
             return;
           }
+
           const item = event.item;
           currentLoadingNoteId.current = item.id;
 
           const isLockedNote = await db.vaults.itemExists(
             event.item as ItemReference
           );
+
           const tabLocked =
             isLockedNote && !(event.item as NoteWithContent).content;
 
           let tabId = event.tabId;
           if (tabId === undefined) tabId = useTabStore.getState().currentTab;
 
-          await commands.setLoading(true, tabId);
+          if (
+            tabId &&
+            !localTabState.current?.needsRefresh(
+              tabId,
+              isLockedNote,
+              item.readonly
+            )
+          ) {
+            console.log(
+              "Note is already updated, skipping refresh request on focus"
+            );
+            currentLoadingNoteId.current = undefined;
+
+            return;
+          } else {
+            console.log("updating the tab in focus...");
+            localTabState.current?.setEditTime(
+              item.id,
+              localTabState.current?.noteEditedTime[item.id] || item.dateEdited
+            );
+            localTabState.current?.set(tabId!, {
+              editedAt:
+                localTabState.current?.noteEditedTime[item.id] ||
+                item.dateEdited
+            });
+          }
+
+          if (
+            tabId &&
+            (event.item?.id !== useTabStore.getState().getNoteIdForTab(tabId) ||
+              !currentContents.current[event.item.id]?.data)
+          ) {
+            await commands.setLoading(true, tabId);
+          }
 
           const session: Partial<TabSessionItem> = event.session || {
             readonly: event.item.readonly,
@@ -503,9 +598,9 @@ export const useEditor = (
             noteId: event.item.id
           };
 
-          const tab = useTabStore.getState().getTab(tabId);
+          const tab = useTabStore.getState().getTab(tabId!);
 
-          if (useTabStore.getState().tabs.length === 0) {
+          if (useTabStore.getState().tabs.length === 0 || event.newTab) {
             useTabStore.getState().newTab({
               session: session
             });
@@ -515,11 +610,11 @@ export const useEditor = (
               event.item.id !== tab?.session?.noteId &&
               tab?.session?.noteId
             ) {
-              useTabStore.getState().newTabSession(tabId, session);
+              useTabStore.getState().newTabSession(tabId!, session);
               console.log("Creating a new tab session");
             } else {
               console.log("Updating tab session");
-              useTabStore.getState().updateTab(tabId, {
+              useTabStore.getState().updateTab(tabId!, {
                 session: session
               });
             }
@@ -538,7 +633,7 @@ export const useEditor = (
           if (!tabLocked) {
             await loadContent(item);
           } else {
-            commands.focus(tabId);
+            commands.focus(tabId!);
           }
 
           lastContentChangeTime.current[item.id] = item.dateEdited;
@@ -551,7 +646,7 @@ export const useEditor = (
           await commands.setStatus(
             getFormattedDate(item.dateEdited, "date-time"),
             "Saved",
-            tabId
+            tabId!
           );
           await postMessage(NativeEvents.title, item.title, tabId);
           overlay(false);
@@ -593,7 +688,6 @@ export const useEditor = (
       loadContent,
       overlay,
       postMessage,
-      readonly,
       reset,
       theme
     ]
@@ -624,7 +718,7 @@ export const useEditor = (
               : data.id;
 
           if (!useTabStore.getState().hasTabForNote(noteId)) return;
-          const tabId = useTabStore.getState().getTabForNote(noteId) as number;
+          const tabId = useTabStore.getState().getTabForNote(noteId) as string;
 
           const tab = useTabStore.getState().getTab(tabId);
 
@@ -679,7 +773,7 @@ export const useEditor = (
               commands.setStatus(
                 getFormattedDate(note.dateEdited, "date-time"),
                 strings.saved(),
-                tabId as number
+                tabId as string
               );
             }
 
@@ -765,7 +859,7 @@ export const useEditor = (
       content?: string;
       type: string;
       ignoreEdit: boolean;
-      tabId: number;
+      tabId: string;
       pendingChanges?: boolean;
     }) => {
       DatabaseLogger.log(
@@ -794,6 +888,10 @@ export const useEditor = (
 
       if (noteId) {
         lastContentChangeTime.current[noteId] = Date.now();
+        localTabState.current?.setEditTime(noteId, Date.now());
+        localTabState?.current?.set(tabId, {
+          editedAt: Date.now()
+        });
       }
 
       if (type === EditorEvents.content && noteId) {
@@ -879,7 +977,7 @@ export const useEditor = (
       !(await isEditorLoaded(
         editorRef,
         sessionIdRef.current,
-        useTabStore.getState().currentTab
+        useTabStore.getState().currentTab!
       ))
     ) {
       eSendEvent(eEditorReset, "onReady");

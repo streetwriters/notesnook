@@ -30,7 +30,6 @@ import { sleep } from "../../../utils/time";
 import { Settings } from "./types";
 import { useTabStore } from "./use-tab-store";
 import { getResponse, randId, textInput } from "./utils";
-import { EditorSessionItem } from "@notesnook/common";
 
 type Action = { job: string; id: string };
 
@@ -76,7 +75,7 @@ class Commands {
     return call(this.ref, fn(job, name)) as Promise<T>;
   }
 
-  focus = async (tabId: number) => {
+  focus = async (tabId: string) => {
     if (!this.ref.current) return;
 
     const locked = useTabStore.getState().getTab(tabId)?.session?.locked;
@@ -87,8 +86,8 @@ class Commands {
         textInput.current?.focus();
         await this.doAsync(
           locked
-            ? `editorControllers[${tabId}]?.focusPassInput();`
-            : `editors[${tabId}]?.commands.focus()`,
+            ? `editorControllers["${tabId}"]?.focusPassInput();`
+            : `editors["${tabId}"]?.commands.focus()`,
           "focus"
         );
 
@@ -98,35 +97,35 @@ class Commands {
       await sleep(400);
       await this.doAsync(
         locked
-          ? `editorControllers[${tabId}]?.focusPassInput();`
-          : `editors[${tabId}]?.commands.focus()`,
+          ? `editorControllers["${tabId}"]?.focusPassInput();`
+          : `editors["${tabId}"]?.commands.focus()`,
         "focus"
       );
     }
   };
 
-  blur = async (tabId: number) =>
+  blur = async (tabId: string) =>
     await this.doAsync(
       `
-    const editor = editors[${tabId}];
-    const editorTitle = editorTitles[${tabId}];
+    const editor = editors["${tabId}"];
+    const editorTitle = editorTitles["${tabId}"];
     typeof editor !== "undefined" && editor.commands.blur();
     typeof editorTitle !== "undefined" && editorTitle.current && editorTitle.current.blur();
     
-    editorControllers[${tabId}]?.blurPassInput();
+    editorControllers["${tabId}"]?.blurPassInput();
 
   `,
       "blur"
     );
 
-  clearContent = async (tabId: number) => {
+  clearContent = async (tabId: string) => {
     this.previousSettings = null;
     await this.doAsync(
       `
-const editor = editors[${tabId}];
-const editorController = editorControllers[${tabId}];
-const editorTitle = editorTitles[${tabId}];
-const statusBar = statusBars[${tabId}];
+const editor = editors["${tabId}"];
+const editorController = editorControllers["${tabId}"];
+const editorTitle = editorTitles["${tabId}"];
+const statusBar = statusBars["${tabId}"];
 
 if (typeof editor !== "undefined") {
   editor.commands.blur();
@@ -151,11 +150,11 @@ if (typeof statusBar !== "undefined") {
   setStatus = async (
     date: string | undefined,
     saved: string,
-    tabId: number
+    tabId: string
   ) => {
     await this.doAsync(
       `
-      const statusBar = statusBars[${tabId}];
+      const statusBar = statusBars["${tabId}"];
       typeof statusBar !== "undefined" && statusBar.current.set({date:"${date}",saved:"${saved}"})`,
       "setStatus"
     );
@@ -170,11 +169,11 @@ if (typeof statusBar !== "undefined") {
     // `);
   };
 
-  setLoading = async (loading?: boolean, tabId?: number) => {
+  setLoading = async (loading?: boolean, tabId?: string) => {
     await this.doAsync(`
-    const editorController = editorControllers[${
+    const editorController = editorControllers["${
       tabId === undefined ? useTabStore.getState().currentTab : tabId
-    }];
+    }"];
     editorController.setLoading(${loading})
     logger("info", editorController.setLoading);
     `);
@@ -227,7 +226,7 @@ if (typeof statusBar !== "undefined") {
       const tags = await db.relations.to(note, "tag").resolve();
       await this.doAsync(
         `
-    const tags = editorTags[${tabId}];
+    const tags = editorTags["${tabId}"];
     if (tags && tags.current) {
       tags.current.setTags(${JSON.stringify(
         tags.map((tag) => ({
@@ -244,10 +243,10 @@ if (typeof statusBar !== "undefined") {
     });
   };
 
-  clearTags = async (tabId: number) => {
+  clearTags = async (tabId: string) => {
     await this.doAsync(
       `
-    const tags = editorTags[${tabId}];
+    const tags = editorTags["${tabId}"];
     logger("info", Object.keys(editorTags), typeof editorTags[0]);
     if (tags && tags.current) {
       tags.current.setTags([]);
@@ -259,7 +258,7 @@ if (typeof statusBar !== "undefined") {
 
   insertAttachment = async (attachment: Attachment, tabId: number) => {
     await this.doAsync(
-      `const editor = editors[${tabId}];
+      `const editor = editors["${tabId}"];
 editor && editor.commands.insertAttachment(${JSON.stringify(attachment)})`
     );
   };
@@ -269,7 +268,7 @@ editor && editor.commands.insertAttachment(${JSON.stringify(attachment)})`
     tabId: number
   ) => {
     await this.doAsync(
-      `const editor = editors[${tabId}];
+      `const editor = editors["${tabId}"];
 editor && editor.commands.updateAttachment(${JSON.stringify(
         attachmentProgress
       )}, {
@@ -288,7 +287,7 @@ editor && editor.commands.updateAttachment(${JSON.stringify(
     tabId: number
   ) => {
     await this.doAsync(
-      `const editor = editors[${tabId}];
+      `const editor = editors["${tabId}"];
 
 const image = toBlobURL("${image.dataurl}", "${image.hash}");
 
@@ -315,21 +314,21 @@ editor && editor.commands.insertImage({
   getTableOfContents = async () => {
     const tabId = useTabStore.getState().currentTab;
     return this.doAsync(`
-      response = editorControllers[${tabId}]?.getTableOfContents() || [];
+      response = editorControllers["${tabId}"]?.getTableOfContents() || [];
     `);
   };
 
   focusPassInput = async () => {
     const tabId = useTabStore.getState().currentTab;
     return this.doAsync(`
-      response = editorControllers[${tabId}]?.focusPassInput() || [];
+      response = editorControllers["${tabId}"]?.focusPassInput() || [];
     `);
   };
 
   blurPassInput = async () => {
     const tabId = useTabStore.getState().currentTab;
     return this.doAsync(`
-      response = editorControllers[${tabId}]?.blurPassInput() || [];
+      response = editorControllers["${tabId}"]?.blurPassInput() || [];
     `);
   };
 
@@ -358,47 +357,7 @@ editor && editor.commands.insertImage({
   scrollIntoViewById = async (id: string) => {
     const tabId = useTabStore.getState().currentTab;
     return this.doAsync(`
-      response = editorControllers[${tabId}]?.scrollIntoView("${id}") || [];
-    `);
-  };
-
-  newSession = async (sessionId: string, tabId: number, noteId: string) => {
-    return this.doAsync(`
-      globalThis.sessions.newSession("${sessionId}", ${tabId}, "${noteId}");
-    `);
-  };
-
-  getSession = async (id: string): Promise<EditorSessionItem | false> => {
-    return this.doAsync(`
-      response = globalThis.sessions.get("${id}");
-    `);
-  };
-
-  deleteSession = async (id: string) => {
-    return this.doAsync(`
-      globalThis.sessions.delete("${id}");
-    `);
-  };
-
-  deleteSessionsForTabId = async (tabId: number) => {
-    return this.doAsync(`
-      globalThis.sessions.deleteForTabId(${tabId});
-    `);
-  };
-
-  updateSession = async (
-    id: string,
-    session: {
-      tabId: number;
-      noteId: string;
-      scrollTop: number;
-      from: number;
-      to: number;
-      sessionId: string;
-    }
-  ) => {
-    return this.doAsync(`
-      globalThis.sessions.updateSession("${id}", ${JSON.stringify(session)});
+      response = editorControllers["${tabId}"]?.scrollIntoView("${id}") || [];
     `);
   };
 }

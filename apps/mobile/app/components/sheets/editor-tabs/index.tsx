@@ -25,7 +25,10 @@ import { FlatList } from "react-native-actions-sheet";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../../common/database";
 import { useDBItem } from "../../../hooks/use-db-item";
-import { useTabStore } from "../../../screens/editor/tiptap/use-tab-store";
+import {
+  TabItem,
+  useTabStore
+} from "../../../screens/editor/tiptap/use-tab-store";
 import { editorController } from "../../../screens/editor/tiptap/utils";
 import { eSendEvent, presentSheet } from "../../../services/event-manager";
 import { eUnlockNote } from "../../../utils/events";
@@ -37,23 +40,13 @@ import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
 
-type TabItem = {
-  id: number;
-  noteId?: string;
-  previewTab?: boolean;
-  locked?: boolean;
-  noteLocked?: boolean;
-  readonly?: boolean;
-  pinned?: boolean;
-};
-
 const TabItemComponent = (props: {
   tab: TabItem;
   isFocused: boolean;
   close?: (ctx?: string | undefined) => void;
 }) => {
   const { colors } = useThemeColors();
-  const [item, update] = useDBItem(props.tab.noteId, "note");
+  const [item, update] = useDBItem(props.tab.session?.noteId, "note");
 
   useEffect(() => {
     const syncCompletedSubscription = db.eventManager?.subscribe(
@@ -85,11 +78,11 @@ const TabItemComponent = (props: {
       onPress={() => {
         if (!props.isFocused) {
           useTabStore.getState().focusTab(props.tab.id);
-          if (props.tab.locked) {
+          if (props.tab.session?.locked) {
             eSendEvent(eUnlockNote);
           }
 
-          if (!props.tab.noteId) {
+          if (!props.tab.session?.noteId) {
             setTimeout(() => {
               editorController?.current?.commands?.focus(props.tab.id);
             }, 300);
@@ -107,9 +100,9 @@ const TabItemComponent = (props: {
           flexShrink: 1
         }}
       >
-        {props.tab.noteLocked ? (
+        {props.tab.session?.noteLocked ? (
           <>
-            {props.tab.locked ? (
+            {props.tab.session?.locked ? (
               <Icon size={SIZE.md} name="lock" />
             ) : (
               <Icon size={SIZE.md} name="lock-open-outline" />
@@ -117,7 +110,9 @@ const TabItemComponent = (props: {
           </>
         ) : null}
 
-        {props.tab.readonly ? <Icon size={SIZE.md} name="pencil-lock" /> : null}
+        {props.tab.session?.readonly ? (
+          <Icon size={SIZE.md} name="pencil-lock" />
+        ) : null}
 
         <Paragraph
           color={
@@ -125,15 +120,10 @@ const TabItemComponent = (props: {
               ? colors.selected.paragraph
               : colors.primary.paragraph
           }
-          style={{
-            fontFamily: props.tab.previewTab
-              ? "OpenSans-Italic"
-              : "OpenSans-Regular"
-          }}
           numberOfLines={1}
           size={SIZE.md}
         >
-          {props.tab.noteId
+          {props.tab.session?.noteId
             ? item?.title || strings.untitledNote()
             : strings.newNote()}
         </Paragraph>
@@ -230,11 +220,6 @@ export default function EditorTabs({
         <Button
           onPress={() => {
             useTabStore.getState().newTab();
-            setTimeout(() => {
-              editorController?.current?.commands?.focus(
-                useTabStore.getState().currentTab
-              );
-            }, 500);
             close?.();
           }}
           title={strings.newTab()}

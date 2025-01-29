@@ -61,7 +61,7 @@ export function makeSessionId(id?: string) {
 export async function isEditorLoaded(
   ref: RefObject<WebView>,
   sessionId: string,
-  tabId: number
+  tabId: string
 ) {
   return await post(ref, sessionId, tabId, NativeEvents.status);
 }
@@ -69,7 +69,7 @@ export async function isEditorLoaded(
 export async function post<T>(
   ref: RefObject<WebView>,
   sessionId: string,
-  tabId: number,
+  tabId: string,
   type: string,
   value: T | null = null,
   waitFor = 300
@@ -174,7 +174,7 @@ export async function openInternalLink(url: string) {
   if (!data?.id) return false;
   if (
     data.id ===
-    useTabStore.getState().getNoteIdForTab(useTabStore.getState().currentTab)
+    useTabStore.getState().getNoteIdForTab(useTabStore.getState().currentTab!)
   ) {
     if (data.params?.blockId) {
       setTimeout(() => {

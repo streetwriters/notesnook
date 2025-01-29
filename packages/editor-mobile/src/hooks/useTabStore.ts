@@ -27,7 +27,7 @@ globalThis.editorTitles = {};
 globalThis.statusBars = {};
 
 export type TabItem = {
-  id: number;
+  id: string;
   session?: {
     noteId?: string;
     readonly?: boolean;
@@ -42,7 +42,7 @@ export type TabItem = {
 
 export type TabStore = {
   tabs: TabItem[];
-  currentTab: number;
+  currentTab?: string;
   scrollPosition: Record<number, number>;
   biometryAvailable?: boolean;
   biometryEnrolled?: boolean;
@@ -57,10 +57,10 @@ export const useTabStore = create(
     (set, get) => ({
       tabs: [
         {
-          id: 0
+          id: "0"
         }
       ],
-      currentTab: 0,
+      currentTab: "0",
       scrollPosition: {},
       getCurrentNoteId: () => {
         return get().tabs.find((t) => t.id === get().currentTab)?.session
@@ -76,9 +76,7 @@ export const useTabStore = create(
 
 globalThis.tabStore = useTabStore;
 
-export const TabContext = createContext<TabItem>({
-  id: 0
-});
+export const TabContext = createContext<TabItem>({} as TabItem);
 
 export const useTabContext = () => {
   const tab = useContext(TabContext);
