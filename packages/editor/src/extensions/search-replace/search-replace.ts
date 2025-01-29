@@ -262,6 +262,9 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
       endSearch:
         () =>
         ({ state, dispatch }) => {
+          this.storage.results = [];
+          this.storage.selectedIndex = 0;
+          state.tr.setMeta("selectedIndex", 0);
           state.tr.setMeta("isSearching", false);
           if (dispatch) updateView(state, dispatch);
           return this.options.onEndSearch();
