@@ -17,7 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react";
 import { Input } from "@theme-ui/components";
 import { useEditorStore } from "../../stores/editor-store";
 import { debounceWithId } from "@notesnook/common";
@@ -40,7 +47,7 @@ function TitleBox(props: TitleBoxProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const pendingChanges = useRef(false);
   // const id = useStore((store) => store.session.id);
-  const sessionType = useEditorStore((store) => store.getActiveSession()?.type);
+  const sessionType = useEditorStore((store) => store.getSession(id)?.type);
   const isMobile = useMobile();
   const isTablet = useTablet();
   const { editorConfig } = useEditorConfig();
@@ -64,13 +71,15 @@ function TitleBox(props: TitleBoxProps) {
     [isMobile, isTablet]
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const session = useEditorStore.getState().getSession(id);
     if (!session || !("note" in session) || !session.note || !inputRef.current)
       return;
     if (pendingChanges.current) return;
 
     const { title } = session.note;
+    if (inputRef.current.value === title) return;
+
     withSelectionPersist(
       inputRef.current,
       (input) => (input.value = title || "")
@@ -86,24 +95,24 @@ function TitleBox(props: TitleBoxProps) {
   useEffect(() => {
     const { unsubscribe } = AppEventManager.subscribe(
       AppEvents.changeNoteTitle,
-      ({ preventSave, title }: { title: string; preventSave: boolean }) => {
-        if (!inputRef.current) return;
+      ({
+        preventSave,
+        title,
+        sessionId
+      }: {
+        title: string;
+        preventSave: boolean;
+        sessionId: string;
+      }) => {
+        if (!inputRef.current || sessionId !== id) return;
         withSelectionPersist(
           inputRef.current,
           (input) => (input.value = title)
         );
         updateFontSize(title.length);
         if (!preventSave) {
-          const { getActiveTab } = useEditorStore.getState();
-          const activeTab = getActiveTab();
-          if (!activeTab) return;
           pendingChanges.current = true;
-          debouncedOnTitleChange(
-            activeTab.sessionId,
-            activeTab.sessionId,
-            title,
-            pendingChanges
-          );
+          debouncedOnTitleChange(sessionId, sessionId, title, pendingChanges);
         }
       }
     );
@@ -111,7 +120,7 @@ function TitleBox(props: TitleBoxProps) {
     return () => {
       unsubscribe();
     };
-  }, [updateFontSize]);
+  }, [updateFontSize, id]);
 
   return (
     <Input

@@ -38,8 +38,8 @@ export class NoteItemModel extends BaseItemModel {
     this.editor = new EditorModel(this.page);
   }
 
-  async openNote() {
-    await this.click();
+  async openNote(openInNewTab?: boolean) {
+    await this.click({ middleClick: openInNewTab });
     const title = await this.getTitle();
     await this.editor.waitForLoading(title);
   }

@@ -302,6 +302,7 @@ function EditorView({
           editor.updateContent(result.data);
         } else if (isNote && session.note.title !== item.title) {
           AppEventManager.publish(AppEvents.changeNoteTitle, {
+            sessionId: session.id,
             title: item.title,
             preventSave: true
           });
