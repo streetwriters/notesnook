@@ -137,7 +137,7 @@ export function ColorTool(props: ColorToolProps) {
         mr: 0,
         bg: activeColor || "transparent",
         ":hover:not(:disabled):not(:active)": {
-          bg: tColor ? tColor.darken(5).toRgbString() : "transparent"
+          bg: tColor ? tColor.darken().toRgbString() : "transparent"
         }
       }}
       onOpen={toggle}
