@@ -284,7 +284,7 @@ function PaletteButton(props: PaletteButtonProps) {
         ml: [2, 2, 1],
         bg,
         ":hover:not(:disabled):not(:active)": {
-          bg: bg?.startsWith("#") ? colord(bg).darken(5).toRgbString() : "hover"
+          bg: bg?.startsWith("#") ? colord(bg).darken().toRgbString() : "hover"
         },
         ...sx
       }}
