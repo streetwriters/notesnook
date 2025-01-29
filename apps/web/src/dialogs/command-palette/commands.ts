@@ -21,6 +21,7 @@ import { ArrowTopRight, Plus, Radar } from "../../components/icons";
 import { hashNavigate, navigate } from "../../navigation";
 import { useEditorStore } from "../../stores/editor-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
+import { AttachmentsDialog } from "../attachments-dialog";
 import { CreateColorDialog } from "../create-color-dialog";
 
 export const commands = [
@@ -99,6 +100,13 @@ export const commands = [
     title: "Help",
     icon: ArrowTopRight,
     action: () => (window.location.href = "https://help.notesnook.com"),
+    group: "Navigate"
+  },
+  {
+    id: "attachment-manager",
+    title: "Attachment manager",
+    icon: ArrowTopRight,
+    action: () => AttachmentsDialog.show({}),
     group: "Navigate"
   },
   {
