@@ -133,7 +133,7 @@ export default function TabsView() {
         event.key === "ArrowRight"
       ) {
         event.preventDefault();
-        useEditorStore.getState().openNextSession();
+        useEditorStore.getState().focusNextTab();
       }
       if (
         (event.ctrlKey || event.metaKey) &&
@@ -141,7 +141,7 @@ export default function TabsView() {
         event.key === "ArrowLeft"
       ) {
         event.preventDefault();
-        useEditorStore.getState().openPreviousSession();
+        useEditorStore.getState().focusPreviousTab();
       }
     };
     document.body.addEventListener("keydown", onKeyDown);
@@ -180,6 +180,7 @@ export default function TabsView() {
               const session = useEditorStore
                 .getState()
                 .getSession(tab.sessionId);
+              console.log("rendering tab", tab, session);
               if (!session) return null;
               return (
                 <Freeze key={session.id} freeze={tab.id !== activeTab?.id}>

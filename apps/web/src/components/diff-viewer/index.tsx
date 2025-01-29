@@ -17,7 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState
+} from "react";
 import { Flex, Text, Button } from "@theme-ui/components";
 import { Copy, Restore } from "../icons";
 import ContentToggle from "./content-toggle";
@@ -25,6 +31,7 @@ import { store as notesStore } from "../../stores/note-store";
 import { db } from "../../common/db";
 import {
   ConflictedEditorSession,
+  DiffEditorSession,
   useEditorStore
 } from "../../stores/editor-store";
 import { ScrollSync, ScrollSyncPane } from "react-scroll-sync";
@@ -35,7 +42,7 @@ import { getFormattedDate } from "@notesnook/common";
 import { diff } from "diffblazer";
 import { strings } from "@notesnook/intl";
 
-type DiffViewerProps = { session: ConflictedEditorSession };
+type DiffViewerProps = { session: ConflictedEditorSession | DiffEditorSession };
 function DiffViewer(props: DiffViewerProps) {
   const { session } = props;
 
@@ -45,6 +52,11 @@ function DiffViewer(props: DiffViewerProps) {
     content?.conflicted
   );
   const root = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setContent(session.content);
+    setConflictedContent(session.content?.conflicted);
+  }, [session.content]);
 
   const onResolveContent = useCallback(
     (saveCopy: boolean) => {
@@ -79,6 +91,7 @@ function DiffViewer(props: DiffViewerProps) {
     };
   }, []);
 
+  console.log({ conflictedContent, content, session });
   if (!conflictedContent || !content) return null;
 
   return (

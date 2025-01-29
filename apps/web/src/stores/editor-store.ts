@@ -127,9 +127,16 @@ export type NewEditorSession = BaseEditorSession & {
 };
 
 export type ConflictedEditorSession = BaseEditorSession & {
-  type: "conflicted" | "diff";
+  type: "conflicted";
   note: Note;
   content?: ContentItem;
+};
+
+export type DiffEditorSession = BaseEditorSession & {
+  type: "diff";
+  note: Note;
+  content: ContentItem;
+  historySessionId: string;
 };
 
 export type EditorSession =
@@ -137,6 +144,7 @@ export type EditorSession =
   | LockedEditorSession
   | NewEditorSession
   | ConflictedEditorSession
+  | DiffEditorSession
   | ReadonlyEditorSession
   | DeletedEditorSession;
 
@@ -146,7 +154,7 @@ type SessionTypeMap = {
   locked: LockedEditorSession;
   new: NewEditorSession;
   conflicted: ConflictedEditorSession;
-  diff: ConflictedEditorSession;
+  diff: DiffEditorSession;
   readonly: ReadonlyEditorSession;
   deleted: DeletedEditorSession;
 };
@@ -470,7 +478,6 @@ class EditorStore extends BaseStore<EditorStore> {
                 session.tags?.every((t) => !event.ids.includes(t.id))
               )
                 continue;
-              console.log("UDPATE");
               updateSession(session.id, undefined, {
                 tags: await db.notes.tags(session.note.id)
               });
@@ -481,25 +488,26 @@ class EditorStore extends BaseStore<EditorStore> {
       }
     );
 
-    const { rehydrateTab, activeTabId, newSession } = this.get();
+    const { rehydrateSession, activeTabId, newSession } = this.get();
     if (activeTabId) {
-      rehydrateTab(activeTabId);
+      const tab = this.get().tabs.find((t) => t.id === activeTabId);
+      if (!tab) return;
+      rehydrateSession(tab.sessionId);
     } else newSession();
   };
 
-  private rehydrateTab = (tabId: string) => {
-    const { openSession, openDiffSession, activateSession, getSession } =
-      this.get();
+  private rehydrateSession = (sessionId: string) => {
+    const { openSession, openDiffSession, getSession } = this.get();
 
-    const tab = this.get().tabs.find((t) => t.id === tabId);
-    if (!tab) return;
-    const session = getSession(tab.sessionId);
+    const session = getSession(sessionId);
     if (!session || !session.needsHydration) return;
 
-    if (session.type === "diff" || session.type === "conflicted")
-      openDiffSession(session.note.id, session.id);
-    else if (session.type === "new") activateSession(session.id);
-    else openSession(session.note);
+    if (session.type === "diff")
+      openDiffSession(session.note.id, session.historySessionId);
+    else if (session.type !== "new")
+      openSession(session.note.id, {
+        force: true
+      });
   };
 
   updateSession = <T extends SessionType[] = SessionType[]>(
@@ -558,12 +566,12 @@ class EditorStore extends BaseStore<EditorStore> {
       });
 
     if (session?.tabId) {
-      this.focusTab(session.tabId);
       this.set((state) => {
         const index = state.tabs.findIndex((t) => t.id === session.tabId);
         if (index === -1) return;
         state.tabs[index].sessionId = session.id;
       });
+      this.focusTab(session.tabId, session.id);
     }
   };
 
@@ -577,15 +585,23 @@ class EditorStore extends BaseStore<EditorStore> {
 
     if (!oldContent || !currentContent) return;
 
+    const { getSession, addSession } = this.get();
+
     const label = getFormattedHistorySessionDate(session);
     const tabId = this.get().activeTabId ?? this.addTab();
-    const tabSessionId = tabSessionHistory.add(tabId);
-    this.get().addSession({
+    const tab = this.get().tabs.find((t) => t.id === tabId);
+    const tabSession = tab && getSession(tab.sessionId);
+    const tabSessionId =
+      tabSession?.needsHydration || tabSession?.type === "new"
+        ? session.id
+        : tabSessionHistory.add(tabId);
+    addSession({
       type: "diff",
       id: tabSessionId,
       note,
       tabId,
       title: label,
+      historySessionId: session.id,
       content: {
         type: oldContent.type,
         dateCreated: session.dateCreated,
@@ -614,7 +630,7 @@ class EditorStore extends BaseStore<EditorStore> {
     const tabId = options.openInNewTab
       ? this.addTab()
       : this.get().activeTabId ?? this.addTab();
-    const { getSession, openDiffSession } = this.get();
+    const { getSession, activateSession, rehydrateSession } = this.get();
     const noteId = typeof noteOrId === "string" ? noteOrId : noteOrId.id;
 
     const tab = this.get().tabs.find((t) => t.id === tabId);
@@ -625,11 +641,9 @@ class EditorStore extends BaseStore<EditorStore> {
       session.note.id === noteId &&
       !options.force
     ) {
-      if (!session.needsHydration)
-        return this.activateSession(noteId, options.activeBlockId);
-      if (session.type === "diff" || session.type === "conflicted") {
-        return openDiffSession(session.note.id, session.id);
-      }
+      return session.needsHydration
+        ? rehydrateSession(session.id)
+        : activateSession(noteId, options.activeBlockId);
     }
 
     if (session && session.id) await db.fs().cancel(session.id);
@@ -644,7 +658,6 @@ class EditorStore extends BaseStore<EditorStore> {
       session?.needsHydration || session?.type === "new"
         ? session.id
         : tabSessionHistory.add(tabId);
-    console.log("opening session", session);
     const isLocked = await db.vaults.itemExists(note);
 
     if (note.conflicted) {
@@ -755,7 +768,7 @@ class EditorStore extends BaseStore<EditorStore> {
     }
   };
 
-  openNextSession = () => {
+  focusNextTab = () => {
     const { tabs, activeTabId } = this.get();
     if (tabs.length <= 1) return;
 
@@ -768,7 +781,7 @@ class EditorStore extends BaseStore<EditorStore> {
     return this.focusTab(tabs[index + 1].id);
   };
 
-  openPreviousSession = () => {
+  focusPreviousTab = () => {
     const { tabs, activeTabId } = this.get();
     if (tabs.length <= 1) return;
 
@@ -782,34 +795,12 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   goBack = async () => {
-    console.log("GO BACK!");
     const activeTabId = this.get().activeTabId;
     if (!activeTabId || !tabSessionHistory.canGoBack(activeTabId)) return;
     const sessionId = tabSessionHistory.back(activeTabId);
     if (!sessionId) return;
-    const session = this.get().getSession(sessionId);
-    if (!session) {
-      tabSessionHistory.remove(activeTabId, sessionId);
+    if (!(await this.goToSession(activeTabId, sessionId))) {
       await this.goBack();
-      return;
-    }
-    // we must rehydrate the session as the note's content can be stale
-    this.updateSession(sessionId, undefined, {
-      needsHydration: true
-    });
-    this.activateSession(sessionId);
-    if ("note" in session) {
-      const note = await db.notes.note(session.note.id);
-      if (!note) {
-        tabSessionHistory.remove(activeTabId, sessionId);
-        this.set((state) => {
-          const index = state.sessions.findIndex((s) => s.id === session.id);
-          state.sessions.splice(index, 1);
-        });
-        await this.goBack();
-        return;
-      }
-      await this.openSession(note);
     }
   };
 
@@ -818,33 +809,44 @@ class EditorStore extends BaseStore<EditorStore> {
     if (!activeTabId || !tabSessionHistory.canGoForward(activeTabId)) return;
     const sessionId = tabSessionHistory.forward(activeTabId);
     if (!sessionId) return;
+    if (!(await this.goToSession(activeTabId, sessionId))) {
+      await this.goForward();
+    }
+  };
+
+  goToSession = async (tabId: string, sessionId: string) => {
     const session = this.get().getSession(sessionId);
     if (!session) {
-      tabSessionHistory.remove(activeTabId, sessionId);
-      await this.goForward();
-      return;
+      tabSessionHistory.remove(tabId, sessionId);
+      return false;
     }
-    this.activateSession(sessionId);
+
     if ("note" in session) {
-      const note = await db.notes.note(session.note.id);
-      if (!note) {
-        tabSessionHistory.remove(activeTabId, sessionId);
+      if (!(await db.notes.exists(session.note.id))) {
+        tabSessionHistory.remove(tabId, session.id);
         this.set((state) => {
           const index = state.sessions.findIndex((s) => s.id === session.id);
           state.sessions.splice(index, 1);
         });
-        await this.goForward();
-        return;
+        return false;
       }
-      await this.openSession(note);
+
+      // we must rehydrate the session as the note's content can be stale
+      this.updateSession(session.id, undefined, {
+        needsHydration: true
+      });
+      this.activateSession(session.id);
+      return true;
     }
+    return false;
   };
 
   addSession = (session: EditorSession, activate = true) => {
     this.set((state) => {
       const index = state.sessions.findIndex((s) => s.id === session.id);
-      if (index > -1) state.sessions[index] = session;
-      else state.sessions.push(session);
+      if (index > -1) {
+        state.sessions[index] = session;
+      } else state.sessions.push(session);
     });
 
     if (activate) this.activateSession(session.id);
@@ -1144,20 +1146,22 @@ class EditorStore extends BaseStore<EditorStore> {
     return id;
   };
 
-  focusTab = (id: string | undefined) => {
-    if (id === undefined) return;
+  focusTab = (tabId: string | undefined, sessionId?: string) => {
+    if (!tabId) return;
 
     const { history } = this.get();
-    if (history.includes(id)) history.splice(history.indexOf(id), 1);
-    history.push(id);
+    if (history.includes(tabId)) history.splice(history.indexOf(tabId), 1);
+    history.push(tabId);
 
     this.set({
-      activeTabId: id,
-      canGoBack: tabSessionHistory.canGoBack(id),
-      canGoForward: tabSessionHistory.canGoForward(id)
+      activeTabId: tabId,
+      canGoBack: tabSessionHistory.canGoBack(tabId),
+      canGoForward: tabSessionHistory.canGoForward(tabId)
     });
 
-    this.rehydrateTab(id);
+    sessionId =
+      sessionId || this.get().tabs.find((t) => t.id === tabId)?.sessionId;
+    if (sessionId) this.rehydrateSession(sessionId);
   };
 }
 
@@ -1178,6 +1182,9 @@ const useEditorStore = createPersistedStore(EditorStore, {
         type: isLockedSession(session) ? "locked" : session.type,
         needsHydration: session.type === "new" ? false : true,
         title: session.title,
+        historySessionId:
+          session.type === "diff" ? session.historySessionId : undefined,
+        tabId: session.tabId,
         note:
           "note" in session
             ? {

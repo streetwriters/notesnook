@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { test, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
+import { createHistorySession } from "./utils";
 
 test("notes should open in the same tab", async ({ page }) => {
   const app = new AppModel(page);
@@ -58,6 +59,7 @@ test("open note in new tab (using context menu)", async ({ page }) => {
 
   const note = await notes.findNote({ title: "Note 2" });
   await note?.contextMenu.openInNewTab();
+  await notes.editor.waitForLoading();
 
   const tabs = await notes.editor.getTabs();
   expect(tabs.length).toBe(2);
@@ -74,6 +76,7 @@ test("open note in new tab (using middle click)", async ({ page }) => {
 
   const note = await notes.findNote({ title: "Note 2" });
   await note?.click({ middleClick: true });
+  await notes.editor.waitForLoading();
 
   const tabs = await notes.editor.getTabs();
   expect(tabs.length).toBe(2);
@@ -163,4 +166,44 @@ test("open same note in 2 tabs and refresh page", async ({ page }) => {
   await tabs[0].click();
   await notes.editor.waitForLoading();
   expect(await notes.editor.getContent("text")).toBe("Some edits.");
+});
+
+test("reloading with a note diff open in a tab", async ({ page }) => {
+  const { note, contents } = await createHistorySession(page);
+  const history = await note?.properties.getSessionHistory();
+  const preview = await history?.[0].open();
+  await preview!.firstEditor.waitFor({ state: "visible" });
+
+  await page.reload();
+
+  await expect(preview!.firstEditor.locator(".ProseMirror")).toHaveText(
+    contents[0]
+  );
+  await expect(preview!.secondEditor.locator(".ProseMirror")).toHaveText(
+    contents[0]
+  );
+});
+
+test("navigate back and forth between normal and diff session", async ({
+  page
+}) => {
+  const { note, contents, notes } = await createHistorySession(page);
+  const history = await note?.properties.getSessionHistory();
+  const preview = await history?.[0].open();
+  await preview!.firstEditor.waitFor({ state: "visible" });
+
+  await notes.editor.goBack();
+  await preview!.firstEditor.waitFor({ state: "hidden" });
+
+  expect(await notes.editor.getContent("text")).toBe(contents[0]);
+
+  await notes.editor.goForward();
+  await preview!.firstEditor.waitFor({ state: "visible" });
+
+  await expect(preview!.firstEditor.locator(".ProseMirror")).toHaveText(
+    contents[0]
+  );
+  await expect(preview!.secondEditor.locator(".ProseMirror")).toHaveText(
+    contents[0]
+  );
 });

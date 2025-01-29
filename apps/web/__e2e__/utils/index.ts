@@ -28,6 +28,7 @@ import {
   SortByOptions
 } from "../models/types";
 import { tmpdir } from "os";
+import { AppModel } from "../models/app.model";
 
 type Note = {
   title: string;
@@ -74,7 +75,10 @@ const PASSWORD = "123abc123abc";
 
 const APP_LOCK_PASSWORD = "lockapporelse🔪";
 
-function getTestId(id: string, variant: "data-test-id" | "data-testid" = "data-test-id") {
+function getTestId(
+  id: string,
+  variant: "data-test-id" | "data-testid" = "data-test-id"
+) {
   return `[${variant}="${id}"]`;
 }
 
@@ -152,6 +156,41 @@ const groupByOptions: GroupByOptions[] = [
   "month",
   "week"
 ];
+
+export async function createHistorySession(page: Page, locked = false) {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  let note = await notes.createNote(NOTE);
+
+  if (locked) {
+    await note?.contextMenu.lock(PASSWORD);
+    await note?.openLockedNote(PASSWORD);
+  }
+
+  const edits = ["Some edited text.", "Some more edited text."];
+  for (const edit of edits) {
+    await notes.editor.setContent(edit);
+
+    await page.waitForTimeout(600);
+
+    await page.reload().catch(console.error);
+    await notes.waitForItem(NOTE.title);
+    note = await notes.findNote(NOTE);
+    locked ? await note?.openLockedNote(PASSWORD) : await note?.openNote();
+  }
+  const contents = [
+    `${NOTE.content}${edits[0]}${edits[1]}`,
+    `${NOTE.content}${edits[0]}`
+  ];
+
+  return {
+    note,
+    notes,
+    app,
+    contents
+  };
+}
 
 export {
   USER,
