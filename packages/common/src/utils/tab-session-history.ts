@@ -77,8 +77,8 @@ export class TabSessionHistory {
     });
   }
 
-  add(id: string) {
-    const sessionId = getId();
+  add(id: string, sessionId?: string) {
+    sessionId = sessionId || getId();
     const back_stack = this.getBackStack(id);
     back_stack.push(sessionId);
     this.setBackStack(id, back_stack);
