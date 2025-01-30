@@ -96,14 +96,15 @@ export const SplitPane = React.forwardRef<
   const wrapSize = useRef(0);
   const childrenLength = childrenToArray(children).length;
   const autoSaveKey = autoSaveId ? `csp:${autoSaveId}` : undefined;
+  const lastCollapsedPaneSize = useRef(0);
 
   const { sizeName, splitPos, splitAxis } = useMemo(
     () =>
-    ({
-      sizeName: direction === "vertical" ? "width" : "height",
-      splitPos: direction === "vertical" ? "left" : "top",
-      splitAxis: direction === "vertical" ? "x" : "y"
-    } as const),
+      ({
+        sizeName: direction === "vertical" ? "width" : "height",
+        splitPos: direction === "vertical" ? "left" : "top",
+        splitAxis: direction === "vertical" ? "x" : "y"
+      } as const),
     [direction]
   );
 
@@ -256,10 +257,14 @@ export const SplitPane = React.forwardRef<
       return {
         collapse: (index: number) => {
           paneSizes.current[index].collapsed = true;
+          lastCollapsedPaneSize.current = paneSizes.current[index].size;
           setSizes(paneSizes.current, wrapSize.current);
         },
         expand: (index: number) => {
           paneSizes.current[index].collapsed = false;
+          paneSizes.current[index].size = lastCollapsedPaneSize.current
+            ? lastCollapsedPaneSize.current
+            : paneSizes.current[index].initialSize;
           setSizes(paneSizes.current, wrapSize.current);
         }
       };
