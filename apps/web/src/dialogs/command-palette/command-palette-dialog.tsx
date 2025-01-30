@@ -25,8 +25,25 @@ import { db } from "../../common/db";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import Dialog from "../../components/dialog";
 import Field from "../../components/field";
-import { Cross, Icon } from "../../components/icons";
-import { type Command, CommandPaletteUtils } from "./command-palette-utils";
+import {
+  Cross,
+  Icon,
+  Note as NoteIcon,
+  Notebook as NotebookIcon,
+  Reminder as ReminderIcon,
+  Tag as TagIcon
+} from "../../components/icons";
+import { hashNavigate, navigate } from "../../navigation";
+import { useEditorStore } from "../../stores/editor-store";
+import Config from "../../utils/config";
+import { commands as COMMANDS } from "./commands";
+
+interface Command {
+  id: string;
+  title: string;
+  type: "command" | "note" | "notebook" | "tag" | "reminder";
+  group: string;
+}
 
 type GroupedCommands = Record<
   string,
@@ -35,9 +52,7 @@ type GroupedCommands = Record<
 
 export const CommandPaletteDialog = DialogManager.register(
   function CommandPaletteDialog(props: BaseDialogProps<boolean>) {
-    const [commands, setCommands] = useState<Command[]>(
-      CommandPaletteUtils.defaultCommands()
-    );
+    const [commands, setCommands] = useState<Command[]>(getDefaultCommands());
     const [selected, setSelected] = useState(0);
     const [query, setQuery] = useState(">");
     const selectedRef = useRef<HTMLButtonElement>(null);
@@ -48,29 +63,10 @@ export const CommandPaletteDialog = DialogManager.register(
       });
     }, [selected]);
 
-    function searchWithoutDebounce(query: string) {
-      const res = CommandPaletteUtils.search(query);
-      if (res instanceof Promise) {
-      } else {
-        setCommands(res ?? []);
-      }
-    }
-
-    async function searchWithDebounce(query: string) {
-      const res = CommandPaletteUtils.search(query);
-      if (res instanceof Promise) {
-        const commands = await res;
-        setCommands(commands ?? []);
-        return;
-      } else {
-        setCommands(res ?? []);
-      }
-    }
-
     function reset() {
       setSelected(0);
       setQuery(">");
-      setCommands(CommandPaletteUtils.defaultCommands());
+      setCommands(getDefaultCommands());
     }
 
     const grouped = commands.reduce((acc, command, index) => {
@@ -79,7 +75,7 @@ export const CommandPaletteDialog = DialogManager.register(
       }
       acc[command.group].push({
         ...command,
-        icon: CommandPaletteUtils.getCommandIcon(command),
+        icon: getCommandIcon(command),
         index
       });
       return acc;
@@ -106,13 +102,13 @@ export const CommandPaletteDialog = DialogManager.register(
               e.preventDefault();
               const command = commands[selected];
               if (!command) return;
-              const action = CommandPaletteUtils.getCommandAction({
+              const action = getCommandAction({
                 id: command.id,
                 type: command.type
               });
               if (action) {
                 action(command.id);
-                CommandPaletteUtils.addRecentCommand(command);
+                addRecentCommand(command);
                 reset();
                 props.onClose(false);
               }
@@ -135,18 +131,31 @@ export const CommandPaletteDialog = DialogManager.register(
               sx={{ mx: 0, my: 2 }}
               defaultValue={query}
               onChange={
-                query.startsWith(">") || query.trim().length < 1
+                isCommandMode(query) || query.trim().length < 1
                   ? (e) => {
                       setSelected(0);
                       const query = e.target.value;
                       setQuery(query);
-                      searchWithoutDebounce(query);
+
+                      const res = search(query);
+                      if (res instanceof Promise) {
+                      } else {
+                        setCommands(res ?? []);
+                      }
                     }
-                  : debounce((e) => {
+                  : debounce(async (e) => {
                       setSelected(0);
                       const query = e.target.value;
                       setQuery(query);
-                      searchWithDebounce(query);
+
+                      const res = search(query);
+                      if (res instanceof Promise) {
+                        const commands = await res;
+                        setCommands(commands ?? []);
+                        return;
+                      } else {
+                        setCommands(res ?? []);
+                      }
                     }, 500)
               }
             />
@@ -186,14 +195,13 @@ export const CommandPaletteDialog = DialogManager.register(
                             }
                             key={index}
                             onClick={() => {
-                              const action =
-                                CommandPaletteUtils.getCommandAction({
-                                  id: command.id,
-                                  type: command.type
-                                });
+                              const action = getCommandAction({
+                                id: command.id,
+                                type: command.type
+                              });
                               if (action) {
                                 action(command.id);
-                                CommandPaletteUtils.addRecentCommand(command);
+                                addRecentCommand(command);
                                 reset();
                                 props.onClose(false);
                               }
@@ -256,11 +264,9 @@ export const CommandPaletteDialog = DialogManager.register(
                               title="Remove from recent"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                CommandPaletteUtils.removeRecentCommand(
-                                  command.id
-                                );
-                                setCommands(
-                                  CommandPaletteUtils.defaultCommands()
+                                removeRecentCommand(command.id);
+                                setCommands((commands) =>
+                                  commands.filter((c) => c.id !== command.id)
                                 );
                               }}
                               variant="icon"
@@ -296,7 +302,7 @@ export const CommandPaletteDialog = DialogManager.register(
 );
 
 function Highlighter({ text, query }: { text: string; query: string }) {
-  const queryClean = query.startsWith(">")
+  const queryClean = isCommandMode(query)
     ? query.slice(1).trim()
     : query.trim();
   const result =
@@ -314,4 +320,160 @@ function Highlighter({ text, query }: { text: string; query: string }) {
       }}
     />
   );
+}
+
+const CommandIconMap = COMMANDS.reduce((acc, command) => {
+  acc.set(command.id, command.icon);
+  return acc;
+}, new Map<string, Icon>());
+
+const CommandActionMap = COMMANDS.reduce((acc, command) => {
+  acc.set(command.id, command.action);
+  return acc;
+}, new Map<string, (arg?: any) => void>());
+
+const CommandTypeItems = COMMANDS.map((c) => ({
+  id: c.id,
+  title: c.title,
+  group: c.group,
+  type: "command" as const
+}));
+
+function getDefaultCommands() {
+  return getRecentCommands().concat(CommandTypeItems);
+}
+
+function addRecentCommand(command: Command) {
+  let commands = getRecentCommands();
+  const index = commands.findIndex((c) => c.id === command.id);
+  if (index > -1) {
+    commands.splice(index, 1);
+  }
+  commands.unshift({
+    ...command,
+    group: "recent"
+  });
+  if (commands.length > 3) {
+    commands = commands.slice(0, 3);
+  }
+  Config.set("commandPalette:recent", commands);
+}
+
+function removeRecentCommand(id: Command["id"]) {
+  let commands = getRecentCommands();
+  const index = commands.findIndex((c) => c.id === id);
+  if (index > -1) {
+    commands.splice(index, 1);
+    Config.set("commandPalette:recent", commands);
+  }
+}
+
+function getCommandAction({
+  id,
+  type
+}: {
+  id: Command["id"];
+  type: Command["type"];
+}) {
+  switch (type) {
+    case "command":
+      return CommandActionMap.get(id);
+    case "note":
+      return (noteId: string) => useEditorStore.getState().openSession(noteId);
+    case "notebook":
+      return (notebookId: string) => navigate(`/notebooks/${notebookId}`);
+    case "tag":
+      return (tagId: string) => navigate(`/tags/${tagId}`);
+    case "reminder":
+      return (reminderId: string) =>
+        hashNavigate(`/reminders/${reminderId}/edit`);
+    default:
+      return undefined;
+  }
+}
+
+function getCommandIcon({
+  id,
+  type
+}: {
+  id: Command["id"];
+  type: Command["type"];
+}) {
+  switch (type) {
+    case "command":
+      return CommandIconMap.get(id);
+    case "note":
+      return NoteIcon;
+    case "notebook":
+      return NotebookIcon;
+    case "tag":
+      return TagIcon;
+    case "reminder":
+      return ReminderIcon;
+    default:
+      return undefined;
+  }
+}
+
+function search(query: string) {
+  if (isCommandMode(query)) {
+    return commandSearch(query);
+  }
+  if (query.length < 1) {
+    const sessions = useEditorStore.getState().get().sessions;
+    return sessions
+      .filter((s) => s.type !== "new")
+      .map((session) => {
+        return {
+          id: session.id,
+          title: session.note.title,
+          group: "note",
+          type: "note" as const
+        };
+      });
+  }
+  return dbSearch(query);
+}
+
+function commandSearch(query: string) {
+  const commands = getDefaultCommands();
+  const str = query.substring(1).trim();
+  if (str === "") return commands;
+  return commands.filter((c) => db.lookup.fuzzy(str, c.title).match);
+}
+
+async function dbSearch(query: string) {
+  const notes = db.lookup.noteTitles(query);
+  const notebooks = db.lookup.notebooks(query, {
+    titleOnly: true
+  });
+  const tags = db.lookup.tags(query);
+  const reminders = db.lookup.reminders(query, {
+    titleOnly: true
+  });
+  const list = (
+    await Promise.all([
+      notes.items(),
+      notebooks.items(),
+      tags.items(),
+      reminders.items()
+    ])
+  ).flat();
+  const commands = list.map((item) => {
+    return {
+      id: item.id,
+      title: item.title,
+      group: item.type,
+      type: item.type
+    };
+  });
+  return commands;
+}
+
+function getRecentCommands() {
+  return Config.get<Command[]>("commandPalette:recent", []);
+}
+
+function isCommandMode(query: string) {
+  return query.startsWith(">");
 }
