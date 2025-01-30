@@ -273,7 +273,7 @@ msgstr ""
 #: generated/actions.ts:137
 #: generated/actions.ts:150
 msgid "{count, plural, one {Item restored} other {# items restored}}"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: generated/actions.ts:121
 msgid "{count, plural, one {Item unpublished} other {# items unpublished}}"
@@ -722,7 +722,7 @@ msgstr ""
 
 #: src/strings.ts:91
 msgid "All attachments are end-to-end encrypted."
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2384
 msgid "All cached attachments have been cleared."
@@ -909,7 +909,7 @@ msgstr ""
 
 #: src/strings.ts:1916
 msgid "Attachment preview failed"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2377
 msgid "Attachment recheck cancelled"
@@ -930,7 +930,7 @@ msgstr ""
 
 #: src/strings.ts:1865
 msgid "Attachments cache cleared!"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2379
 msgid "Attachments recheck complete"
@@ -1147,7 +1147,7 @@ msgstr ""
 
 #: src/strings.ts:2235
 msgid "Bold"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2389
 msgid "Boost your productivity with Notebooks and organize your notes."
@@ -1308,7 +1308,7 @@ msgstr ""
 
 #: src/strings.ts:673
 msgid "Check your spam folder if you haven't received an email yet."
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2381
 msgid "Checking all attachments"
@@ -1320,7 +1320,7 @@ msgstr ""
 
 #: src/strings.ts:1686
 msgid "Checking for updates"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2380
 msgid "Checking note attachments"
@@ -1455,7 +1455,7 @@ msgstr ""
 
 #: src/strings.ts:1753
 msgid "Click to remove"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2372
 msgid "Click to reset {title}"
@@ -1556,7 +1556,7 @@ msgstr ""
 
 #: src/strings.ts:2230
 msgid "Configure"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2386
 msgid "Configure server URLs for Notesnook"
@@ -1879,7 +1879,7 @@ msgstr ""
 
 #: src/strings.ts:1252
 msgid "Debugging"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2374
 msgid "Decrease {title}"
@@ -2177,7 +2177,7 @@ msgstr ""
 
 #: src/strings.ts:636
 msgid "Earliest first"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2398
 msgid "Easy access"
@@ -2211,7 +2211,7 @@ msgstr ""
 
 #: src/strings.ts:1464
 msgid "Email"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2411
 msgid "Email copied"
@@ -2399,7 +2399,7 @@ msgstr ""
 
 #: src/strings.ts:2070
 msgid "Enter your username"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2405
 msgid "Error"
@@ -2439,7 +2439,7 @@ msgstr ""
 
 #: src/strings.ts:1609
 msgid "Events server"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2391
 msgid "Every Notebook can have notes and sub notebooks."
@@ -2504,7 +2504,7 @@ msgstr ""
 
 #: src/strings.ts:1245
 msgid "Faced an issue or have a suggestion? Click here to create a bug report"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2383
 msgid "Failed"
@@ -2589,7 +2589,7 @@ msgstr ""
 #: src/strings.ts:321
 #: src/strings.ts:1503
 msgid "Favorites"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2395
 msgid "February 2022 Week 2"
@@ -2764,7 +2764,7 @@ msgstr ""
 
 #: src/strings.ts:1350
 msgid "Get Notesnook Pro to enable automatic backups"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2387
 msgid "Get Priority support"
@@ -2936,7 +2936,7 @@ msgstr ""
 
 #: src/strings.ts:1867
 msgid "I have saved my key"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2404
 msgid "I love cooking and collecting recipes."
@@ -3042,7 +3042,7 @@ msgstr ""
 
 #: src/strings.ts:773
 msgid "Incorrect {type}"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2373
 msgid "Increase {title}"
@@ -3050,7 +3050,7 @@ msgstr ""
 
 #: src/strings.ts:2216
 msgid "Insert"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2370
 msgid "Insert a {rows}x{columns} table"
@@ -3505,7 +3505,7 @@ msgstr ""
 
 #: src/strings.ts:2051
 msgid "Meet other privacy-minded people & talk to us directly about your concerns, issues and suggestions."
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2397
 msgid "Meetings"
@@ -4086,7 +4086,7 @@ msgstr ""
 
 #: src/strings.ts:44
 msgid "Partially refunded"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2382
 msgid "Passed"
@@ -4280,7 +4280,7 @@ msgstr ""
 
 #: src/strings.ts:1379
 msgid "please send us an email from your registered email address"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2371
 msgid "Please set a table size"
@@ -4574,7 +4574,7 @@ msgstr ""
 
 #: src/strings.ts:1592
 msgid "RECENT BACKUPS"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2378
 msgid "Recheck all"
@@ -4582,7 +4582,7 @@ msgstr ""
 
 #: src/strings.ts:1982
 msgid "Rechecking failed"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2403
 msgid "Recipes"
@@ -4885,7 +4885,7 @@ msgstr ""
 
 #: src/strings.ts:1221
 msgid "Restore backup"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2385
 msgid "Restore backup?"
@@ -5045,7 +5045,7 @@ msgstr ""
 
 #: src/strings.ts:491
 msgid "Save your recovery codes in a safe place. You will need them to recover your account in case you lose access to your two-factor authentication methods."
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2375
 msgid "Saved"
@@ -5069,7 +5069,7 @@ msgstr ""
 
 #: src/strings.ts:1703
 msgid "Scan the QR code with your authenticator app"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2401
 msgid "School work"
@@ -5821,7 +5821,7 @@ msgstr ""
 
 #: src/strings.ts:2324
 msgid "Task list"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2394
 msgid "Tasks"
@@ -6279,7 +6279,7 @@ msgstr ""
 
 #: src/strings.ts:51
 msgid "Urgent"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2367
 msgid "URL"
@@ -6548,7 +6548,7 @@ msgstr ""
 
 #: src/strings.ts:2363
 msgid "Width"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2392
 msgid "Work & Office"
@@ -6613,7 +6613,7 @@ msgstr ""
 
 #: src/strings.ts:2045
 msgid "You can change the theme at any time from Settings or the side menu."
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2400
 msgid "You can create shortcuts of frequently accessed notebooks in the side menu"
