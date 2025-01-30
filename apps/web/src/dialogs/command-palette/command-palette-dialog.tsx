@@ -21,12 +21,12 @@ import { debounce, toTitleCase } from "@notesnook/common";
 import { ScrollContainer } from "@notesnook/ui";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { useEffect, useRef, useState } from "react";
+import { db } from "../../common/db";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import Dialog from "../../components/dialog";
 import Field from "../../components/field";
-import { Icon } from "../../components/icons";
+import { Cross, Icon } from "../../components/icons";
 import { type Command, CommandPaletteUtils } from "./command-palette-utils";
-import { db } from "../../common/db";
 
 type GroupedCommands = Record<
   string,
@@ -36,7 +36,7 @@ type GroupedCommands = Record<
 export const CommandPaletteDialog = DialogManager.register(
   function CommandPaletteDialog(props: BaseDialogProps<boolean>) {
     const [commands, setCommands] = useState<Command[]>(
-      CommandPaletteUtils.defaultCommands
+      CommandPaletteUtils.defaultCommands()
     );
     const [selected, setSelected] = useState(0);
     const [query, setQuery] = useState(">");
@@ -70,7 +70,7 @@ export const CommandPaletteDialog = DialogManager.register(
     function reset() {
       setSelected(0);
       setQuery(">");
-      setCommands(CommandPaletteUtils.defaultCommands);
+      setCommands(CommandPaletteUtils.defaultCommands());
     }
 
     const grouped = commands.reduce((acc, command, index) => {
@@ -112,7 +112,7 @@ export const CommandPaletteDialog = DialogManager.register(
               });
               if (action) {
                 action(command.id);
-                reset();
+                CommandPaletteUtils.addRecentCommand(command);
                 reset();
                 props.onClose(false);
               }
@@ -172,71 +172,107 @@ export const CommandPaletteDialog = DialogManager.register(
                       }}
                     >
                       {commands.map((command, index) => (
-                        <Button
-                          ref={command.index === selected ? selectedRef : null}
-                          key={index}
-                          onClick={() => {
-                            const action = CommandPaletteUtils.getCommandAction(
-                              {
-                                id: command.id,
-                                type: command.type
-                              }
-                            );
-                            if (action) {
-                              action(command.id);
-                              reset();
-                              props.onClose(false);
-                            }
-                          }}
+                        <Flex
                           sx={{
-                            display: "flex",
                             flexDirection: "row",
-                            alignItems: "center",
-                            gap: 2,
-                            py: 1,
-                            bg:
-                              command.index === selected
-                                ? "hover"
-                                : "transparent",
-                            ".chip": {
-                              bg:
-                                command.index === selected
-                                  ? "color-mix(in srgb, var(--accent) 20%, transparent)"
-                                  : "var(--background-secondary)"
-                            },
-                            ":hover:not(:disabled):not(:active)": {
-                              bg: "hover"
-                            }
+                            gap: 1,
+                            alignItems: "center"
                           }}
                         >
-                          {command.icon && (
-                            <command.icon
-                              size={18}
-                              color={
-                                command.index === selected
-                                  ? "icon-selected"
-                                  : "icon"
+                          <Button
+                            title={command.title}
+                            ref={
+                              command.index === selected ? selectedRef : null
+                            }
+                            key={index}
+                            onClick={() => {
+                              const action =
+                                CommandPaletteUtils.getCommandAction({
+                                  id: command.id,
+                                  type: command.type
+                                });
+                              if (action) {
+                                action(command.id);
+                                CommandPaletteUtils.addRecentCommand(command);
+                                reset();
+                                props.onClose(false);
                               }
-                            />
-                          )}
-                          {["note", "notebook", "reminder", "tag"].includes(
-                            command.type
-                          ) ? (
-                            <Text
-                              className="chip"
+                            }}
+                            sx={{
+                              display: "flex",
+                              flexDirection: "row",
+                              alignItems: "center",
+                              width: "100%",
+                              gap: 2,
+                              py: 1,
+                              bg:
+                                command.index === selected
+                                  ? "hover"
+                                  : "transparent",
+                              ".chip": {
+                                bg:
+                                  command.index === selected
+                                    ? "color-mix(in srgb, var(--accent) 20%, transparent)"
+                                    : "var(--background-secondary)"
+                              },
+                              ":hover:not(:disabled):not(:active)": {
+                                bg: "hover"
+                              }
+                            }}
+                          >
+                            {command.icon && (
+                              <command.icon
+                                size={18}
+                                color={
+                                  command.index === selected
+                                    ? "icon-selected"
+                                    : "icon"
+                                }
+                              />
+                            )}
+                            {["note", "notebook", "reminder", "tag"].includes(
+                              command.type
+                            ) ? (
+                              <Text
+                                className="chip"
+                                sx={{
+                                  px: 1,
+                                  borderRadius: "4px",
+                                  border: "1px solid",
+                                  borderColor: "border"
+                                }}
+                              >
+                                <Highlighter
+                                  text={command.title}
+                                  query={query}
+                                />
+                              </Text>
+                            ) : (
+                              <Highlighter text={command.title} query={query} />
+                            )}
+                          </Button>
+                          {command.group === "recent" && (
+                            <Button
+                              title="Remove from recent"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                CommandPaletteUtils.removeRecentCommand(
+                                  command.id
+                                );
+                                setCommands(
+                                  CommandPaletteUtils.defaultCommands()
+                                );
+                              }}
+                              variant="icon"
                               sx={{
-                                px: 1,
-                                borderRadius: "4px",
-                                border: "1px solid",
-                                borderColor: "border"
+                                p: 1,
+                                mr: 1
                               }}
                             >
-                              <Highlighter text={command.title} query={query} />
-                            </Text>
-                          ) : (
-                            <Highlighter text={command.title} query={query} />
+                              <Cross size={14} />
+                            </Button>
                           )}
-                        </Button>
+                        </Flex>
                       ))}
                     </Flex>
                   </Flex>

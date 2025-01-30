@@ -27,6 +27,7 @@ import {
 } from "../../components/icons";
 import { hashNavigate, navigate } from "../../navigation";
 import { useEditorStore } from "../../stores/editor-store";
+import Config from "../../utils/config";
 import { commands as COMMANDS } from "./commands";
 
 export interface Command {
@@ -54,7 +55,34 @@ const CommandTypeItems = COMMANDS.map((c) => ({
 }));
 
 export class CommandPaletteUtils {
-  static defaultCommands = CommandTypeItems;
+  static defaultCommands() {
+    return CommandPaletteUtils.recentCommands().concat(CommandTypeItems);
+  }
+
+  static addRecentCommand(command: Command) {
+    let recentCommands = CommandPaletteUtils.recentCommands();
+    const index = recentCommands.findIndex((c) => c.id === command.id);
+    if (index > -1) {
+      recentCommands.splice(index, 1);
+    }
+    recentCommands.unshift({
+      ...command,
+      group: "recent"
+    });
+    if (recentCommands.length > 3) {
+      recentCommands = recentCommands.slice(0, 3);
+    }
+    Config.set("commandPalette:recent", recentCommands);
+  }
+
+  static removeRecentCommand(id: Command["id"]) {
+    let recentCommands = CommandPaletteUtils.recentCommands();
+    const index = recentCommands.findIndex((c) => c.id === id);
+    if (index > -1) {
+      recentCommands.splice(index, 1);
+      Config.set("commandPalette:recent", recentCommands);
+    }
+  }
 
   static getCommandAction({
     id,
@@ -125,7 +153,7 @@ export class CommandPaletteUtils {
   }
 
   private static commandSearch(query: string) {
-    const commands = CommandPaletteUtils.defaultCommands;
+    const commands = CommandPaletteUtils.defaultCommands();
     const str = query.substring(1).trim();
     if (str === "") return commands;
     return commands.filter((c) => db.lookup.fuzzy(str, c.title).match);
@@ -157,6 +185,10 @@ export class CommandPaletteUtils {
       };
     });
     return commands;
+  }
+
+  private static recentCommands() {
+    return Config.get<Command[]>("commandPalette:recent", []);
   }
 
   private static isCommandMode = (query: string) => {
