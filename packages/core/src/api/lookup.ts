@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { match } from "fuzzyjs";
+import { match, surround } from "fuzzyjs";
 import Database from "./index.js";
 import {
   Item,
@@ -189,13 +189,20 @@ export default class Lookup {
     ]);
   }
 
-  fuzzy(query: string, items: string[]) {
-    const matches = [];
-    for (const item of items) {
-      const result = match(query, item);
-      if (result.match) matches.push(item);
+  fuzzy(
+    query: string,
+    text: string,
+    opts?: { prefix?: string; suffix?: string }
+  ) {
+    const result = match(query, text);
+    if (result.match && (opts?.prefix || opts?.suffix)) {
+      return surround(text, {
+        result: result,
+        prefix: opts.prefix,
+        suffix: opts.suffix
+      });
     }
-    return matches;
+    return result;
   }
 
   private search<T extends Item>(

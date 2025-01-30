@@ -128,12 +128,7 @@ export class CommandPaletteUtils {
     const commands = CommandPaletteUtils.defaultCommands;
     const str = query.substring(1).trim();
     if (str === "") return commands;
-    const matches = db.lookup.fuzzy(
-      str,
-      commands.map((c) => c.title)
-    );
-    const matchedCommands = commands.filter((c) => matches.includes(c.title));
-    return matchedCommands;
+    return commands.filter((c) => db.lookup.fuzzy(str, c.title).match);
   }
 
   private static async dbSearch(query: string) {

@@ -20,13 +20,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { debounce, toTitleCase } from "@notesnook/common";
 import { ScrollContainer } from "@notesnook/ui";
 import { Button, Flex, Text } from "@theme-ui/components";
-import { match, surround } from "fuzzyjs";
 import { useEffect, useRef, useState } from "react";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import Dialog from "../../components/dialog";
 import Field from "../../components/field";
 import { Icon } from "../../components/icons";
 import { type Command, CommandPaletteUtils } from "./command-palette-utils";
+import { db } from "../../common/db";
 
 type GroupedCommands = Record<
   string,
@@ -263,20 +263,19 @@ function Highlighter({ text, query }: { text: string; query: string }) {
   const queryClean = query.startsWith(">")
     ? query.slice(1).trim()
     : query.trim();
-  const result = queryClean.length > 0 ? match(queryClean, text) : false;
+  const result =
+    queryClean.length > 0
+      ? db.lookup.fuzzy(queryClean, text, {
+          prefix: "<b style='color: var(--accent-foreground)'>",
+          suffix: "</b>"
+        })
+      : text;
 
   return (
     <span
       dangerouslySetInnerHTML={{
-        __html:
-          result && result.match
-            ? surround(text, {
-                result: result,
-                prefix: "<b style='color: var(--accent-foreground)'>",
-                suffix: "</b>"
-              })
-            : text
+        __html: typeof result === "string" ? result : text
       }}
-    ></span>
+    />
   );
 }
