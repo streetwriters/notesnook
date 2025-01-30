@@ -17,21 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { debounce, toTitleCase } from "@notesnook/common";
 import { ScrollContainer } from "@notesnook/ui";
 import { Button, Flex, Text } from "@theme-ui/components";
-import { Fragment, useEffect, useRef } from "react";
+import { match, surround } from "fuzzyjs";
+import { useEffect, useRef, useState } from "react";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import Dialog from "../../components/dialog";
 import Field from "../../components/field";
-import {
-  type Command,
-  useCommandPaletteStore,
-  getCommandAction,
-  getCommandIcon
-} from "../../stores/command-palette-store";
 import { Icon } from "../../components/icons";
-import { toTitleCase } from "@notesnook/common";
-import { match, surround } from "fuzzyjs";
+import { type Command, CommandPaletteUtils } from "./command-palette-utils";
 
 type GroupedCommands = Record<
   string,
@@ -40,16 +35,11 @@ type GroupedCommands = Record<
 
 export const CommandPaletteDialog = DialogManager.register(
   function CommandPaletteDialog(props: BaseDialogProps<boolean>) {
-    const {
-      selected,
-      setSelected,
-      query,
-      setQuery,
-      commands,
-      search,
-      setCommands,
-      reset
-    } = useCommandPaletteStore();
+    const [commands, setCommands] = useState<Command[]>(
+      CommandPaletteUtils.defaultCommands
+    );
+    const [selected, setSelected] = useState(0);
+    const [query, setQuery] = useState(">");
     const selectedRef = useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
@@ -58,32 +48,30 @@ export const CommandPaletteDialog = DialogManager.register(
       });
     }, [selected]);
 
-    useEffect(() => {
-      const searchWithoutDebounce =
-        query.startsWith(">") || query.trim().length < 1;
-      if (searchWithoutDebounce) {
-        const res = search(query);
-        if (res instanceof Promise) {
-        } else {
-          setCommands(res ?? []);
-        }
+    function searchWithoutDebounce(query: string) {
+      const res = CommandPaletteUtils.search(query);
+      if (res instanceof Promise) {
+      } else {
+        setCommands(res ?? []);
       }
+    }
 
-      const timeoutId = setTimeout(async () => {
-        const res = search(query);
-        if (res instanceof Promise) {
-          const commands = await res;
-          setCommands(commands ?? []);
-          return;
-        } else {
-          setCommands(res ?? []);
-        }
-      }, 500);
+    async function searchWithDebounce(query: string) {
+      const res = CommandPaletteUtils.search(query);
+      if (res instanceof Promise) {
+        const commands = await res;
+        setCommands(commands ?? []);
+        return;
+      } else {
+        setCommands(res ?? []);
+      }
+    }
 
-      return () => {
-        clearTimeout(timeoutId);
-      };
-    }, [query]);
+    function reset() {
+      setSelected(0);
+      setQuery(">");
+      setCommands(CommandPaletteUtils.defaultCommands);
+    }
 
     const grouped = commands.reduce((acc, command, index) => {
       if (!acc[command.group]) {
@@ -91,7 +79,7 @@ export const CommandPaletteDialog = DialogManager.register(
       }
       acc[command.group].push({
         ...command,
-        icon: getCommandIcon(command),
+        icon: CommandPaletteUtils.getCommandIcon(command),
         index
       });
       return acc;
@@ -118,14 +106,15 @@ export const CommandPaletteDialog = DialogManager.register(
               e.preventDefault();
               const command = commands[selected];
               if (!command) return;
-              const action = getCommandAction({
+              const action = CommandPaletteUtils.getCommandAction({
                 id: command.id,
                 type: command.type
               });
               if (action) {
                 action(command.id);
                 reset();
-                props.onClose(true);
+                reset();
+                props.onClose(false);
               }
               setSelected(0);
             }
@@ -144,11 +133,22 @@ export const CommandPaletteDialog = DialogManager.register(
               autoFocus
               placeholder={"Search in notes, notebooks, and tags"}
               sx={{ mx: 0, my: 2 }}
-              value={query}
-              onChange={(e) => {
-                setSelected(0);
-                setQuery(e.target.value);
-              }}
+              defaultValue={query}
+              onChange={
+                query.startsWith(">") || query.trim().length < 1
+                  ? (e) => {
+                      setSelected(0);
+                      const query = e.target.value;
+                      setQuery(query);
+                      searchWithoutDebounce(query);
+                    }
+                  : debounce((e) => {
+                      setSelected(0);
+                      const query = e.target.value;
+                      setQuery(query);
+                      searchWithDebounce(query);
+                    }, 500)
+              }
             />
             <ScrollContainer>
               <Flex
@@ -160,7 +160,10 @@ export const CommandPaletteDialog = DialogManager.register(
                 }}
               >
                 {Object.entries(grouped).map(([group, commands]) => (
-                  <Flex sx={{ flexDirection: "column", gap: 1, mx: 1 }}>
+                  <Flex
+                    key={group}
+                    sx={{ flexDirection: "column", gap: 1, mx: 1 }}
+                  >
                     <Text variant="subBody">{toTitleCase(group)}</Text>
                     <Flex
                       sx={{
@@ -173,14 +176,16 @@ export const CommandPaletteDialog = DialogManager.register(
                           ref={command.index === selected ? selectedRef : null}
                           key={index}
                           onClick={() => {
-                            const action = getCommandAction({
-                              id: command.id,
-                              type: command.type
-                            });
+                            const action = CommandPaletteUtils.getCommandAction(
+                              {
+                                id: command.id,
+                                type: command.type
+                              }
+                            );
                             if (action) {
                               action(command.id);
                               reset();
-                              props.onClose(true);
+                              props.onClose(false);
                             }
                           }}
                           sx={{
