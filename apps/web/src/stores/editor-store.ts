@@ -771,11 +771,7 @@ class EditorStore extends BaseStore<EditorStore> {
 
     const index = tabs.findIndex((s) => s.id === activeTabId);
     if (index === -1) return;
-
-    if (index === tabs.length - 1) {
-      return this.focusTab(tabs[0].id);
-    }
-    return this.focusTab(tabs[index + 1].id);
+    return this.focusTab(tabs[index === tabs.length - 1 ? 0 : index + 1].id);
   };
 
   focusPreviousTab = () => {
@@ -784,11 +780,7 @@ class EditorStore extends BaseStore<EditorStore> {
 
     const index = tabs.findIndex((s) => s.id === activeTabId);
     if (index === -1) return;
-
-    if (index === 0) {
-      return this.openSession(tabs[tabs.length - 1].id);
-    }
-    return this.openSession(tabs[index - 1].id);
+    return this.focusTab(tabs[index === 0 ? tabs.length - 1 : index - 1].id);
   };
 
   goBack = async () => {
