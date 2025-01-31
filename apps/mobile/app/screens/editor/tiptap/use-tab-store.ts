@@ -148,7 +148,6 @@ export const tabSessionHistory = new TabSessionHistory({
     return useTabStore.getState();
   },
   set(state) {
-    console.log("Set state", state.canGoBack, state.canGoForward);
     useTabStore.setState({
       ...state
     });
@@ -217,12 +216,37 @@ export const useTabStore = create<TabStore>(
       ) => {
         const tabId = _id || (get().currentTab as string);
 
-        const sessionId = tabSessionHistory.add(tabId);
-        const session = {
-          id: sessionId,
-          ...options
-        };
-        TabSessionStorage.set(sessionId, session);
+        const sessionHistory = get().tabSessionHistory[tabId];
+
+        let oldSessionId: string | undefined = undefined;
+        if (sessionHistory) {
+          const allSessions = sessionHistory.backStack.concat(
+            sessionHistory.forwardStack
+          );
+          allSessions.forEach((id) => {
+            if (TabSessionStorage.get(id)?.noteId === options?.noteId) {
+              oldSessionId = id;
+            }
+          });
+        }
+
+        const sessionId = tabSessionHistory.add(tabId, oldSessionId);
+
+        let session: Partial<TabSessionItem>;
+
+        if (!oldSessionId) {
+          session = {
+            id: sessionId,
+            ...options
+          };
+          TabSessionStorage.set(sessionId, session as TabSessionItem);
+        } else {
+          session = {
+            ...TabSessionStorage.get(oldSessionId),
+            ...options
+          };
+        }
+
         const index = get().tabs.findIndex((t) => t.id === tabId);
         if (index == -1) return;
         const tabs = [...get().tabs];
@@ -308,10 +332,9 @@ export const useTabStore = create<TabStore>(
 
         if (note) {
           const isLocked = await db.vaults.itemExists(note);
-          if (isLocked && !session?.noteLocked) {
-            session.locked = true;
-            session.noteLocked = true;
-          }
+          session.locked = isLocked;
+          session.noteLocked = isLocked && !session?.noteLocked;
+
           session.readonly = note.readonly;
         } else if (session.noteId) {
           console.log("Failed to load session...");
@@ -325,12 +348,12 @@ export const useTabStore = create<TabStore>(
           });
         }
 
-        console.log("Loading session", session);
         eSendEvent(eOnLoadNote, {
           item: note,
           newNote: !note,
           tabId: get().currentTab,
-          session: session
+          session: session,
+          resetTabState: true
         });
 
         return true;
@@ -418,10 +441,7 @@ export const useTabStore = create<TabStore>(
         return get().tabs.find((t) => t.id === id)?.session?.noteId;
       },
       hasTabForNote: (noteId: string) => {
-        return (
-          typeof get().tabs.find((t) => t.session?.noteId === noteId)?.id ===
-          "number"
-        );
+        return !!get().tabs.find((t) => t.session?.noteId === noteId);
       },
       getTabForNote: (noteId: string) => {
         return get().tabs.find((t) => t.session?.noteId === noteId)?.id;
@@ -442,7 +462,7 @@ export const useTabStore = create<TabStore>(
       }
     }),
     {
-      name: "tabs-storage",
+      name: "tabs-storage-v1",
       getStorage: () => MMKV as unknown as StateStorage,
       onRehydrateStorage: () => {
         return (state) => {

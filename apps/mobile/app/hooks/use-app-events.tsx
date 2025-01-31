@@ -627,17 +627,10 @@ export const useAppEvents = () => {
           if (locked) {
             useTabStore.getState().updateTab(tab.id, {
               session: {
-                locked: true
+                locked: true,
+                noteLocked: true
               }
             });
-            if (
-              tab.id === useTabStore.getState().currentTab &&
-              locked &&
-              !editorState().movedAway
-            ) {
-              // Show unlock note screen.
-              eSendEvent(eUnlockNote);
-            }
           }
         }
       }),
