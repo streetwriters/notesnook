@@ -83,10 +83,12 @@ declare global {
   var noHeader: boolean;
   function toBlobURL(dataurl: string, id?: string): string | undefined;
   var pendingResolvers: { [name: string]: (value: any) => void };
+
+  var commands: any;
   /**
    * Id of current session
    */
-  var sessionId: string;
+  var sessionId: string | undefined;
 
   var tabStore: any;
   /**

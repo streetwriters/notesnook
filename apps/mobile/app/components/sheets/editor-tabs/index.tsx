@@ -16,8 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { Note } from "@notesnook/core";
-import { EVENTS } from "@notesnook/core";
+import { EVENTS, Note } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect } from "react";
 import { View } from "react-native";
@@ -33,12 +33,10 @@ import { editorController } from "../../../screens/editor/tiptap/utils";
 import { eSendEvent, presentSheet } from "../../../services/event-manager";
 import { eUnlockNote } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
-import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
 import { Pressable } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import { strings } from "@notesnook/intl";
 
 const TabItemComponent = (props: {
   tab: TabItem;
