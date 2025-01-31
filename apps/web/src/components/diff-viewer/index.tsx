@@ -51,7 +51,6 @@ function DiffViewer(props: DiffViewerProps) {
   const [conflictedContent, setConflictedContent] = useState(
     content?.conflicted
   );
-  const root = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setContent(session.content);
@@ -83,20 +82,13 @@ function DiffViewer(props: DiffViewerProps) {
     });
   }, [session]);
 
-  useLayoutEffect(() => {
-    const element = root.current;
-    element?.classList.add("active");
-    return () => {
-      element?.classList.remove("active");
-    };
-  }, []);
-
-  console.log({ conflictedContent, content, session });
   if (!conflictedContent || !content) return null;
 
   return (
     <Flex
-      ref={root}
+      ref={(el) => {
+        if (el) el.classList.add("active");
+      }}
       className="diffviewer"
       data-test-id="diff-viewer"
       sx={{
@@ -125,12 +117,15 @@ function DiffViewer(props: DiffViewerProps) {
               variant="secondary"
               data-test-id="restore-session"
               onClick={async () => {
-                const { closeSessions, openSession } =
+                const { closeTabs, openSession, getSessionsForNote } =
                   useEditorStore.getState();
 
-                await db.noteHistory.restore(session.id);
+                await db.noteHistory.restore(session.historySessionId);
 
-                closeSessions(session.id, session.note.id);
+                closeTabs(
+                  session.id,
+                  ...getSessionsForNote(session.note.id).map((s) => s.id)
+                );
 
                 await notesStore.refresh();
                 await openSession(session.note.id, { force: true });
@@ -148,12 +143,11 @@ function DiffViewer(props: DiffViewerProps) {
             <Button
               variant="secondary"
               onClick={async () => {
-                const { closeSessions, openSession } =
-                  useEditorStore.getState();
+                const { closeTabs, openSession } = useEditorStore.getState();
 
                 const noteId = await createCopy(session.note, content);
 
-                closeSessions(session.id);
+                closeTabs(session.id);
 
                 await notesStore.refresh();
                 await openSession(noteId);
