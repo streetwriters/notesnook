@@ -202,14 +202,10 @@ export type TabStore = {
 export const useTabStore = create<TabStore>(
   persist(
     (set, get) => ({
-      tabs: [
-        {
-          id: "0"
-        }
-      ],
+      tabs: [],
       tabSessionHistory: {},
-      historyNew: ["0"],
-      currentTab: "0",
+      historyNew: [],
+      currentTab: undefined,
       newTabSession: (
         _id?: string,
         options?: Omit<Partial<TabSessionItem>, "id">
