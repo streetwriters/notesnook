@@ -140,7 +140,7 @@ function Header(props: RouteContainerProps) {
         {buttons?.back ? (
           <Button
             {...buttons.back}
-            data-test-id="go-back"
+            data-test-id="route-go-back"
             sx={{ p: 0, flexShrink: 0 }}
           >
             <ArrowLeft size={20} />

@@ -175,6 +175,7 @@ test("reloading with a note diff open in a tab", async ({ page }) => {
   await preview!.firstEditor.waitFor({ state: "visible" });
 
   await page.reload();
+  await preview!.firstEditor.waitFor({ state: "visible" });
 
   await expect(preview!.firstEditor.locator(".ProseMirror")).toHaveText(
     contents[0]
@@ -207,3 +208,6 @@ test("navigate back and forth between normal and diff session", async ({
     contents[0]
   );
 });
+
+test.skip("TODO: open a locked note, switch to another note and navigate back", () => {});
+test.skip("TODO: open a locked note, switch to another note, unlock the note and navigate back", () => {});

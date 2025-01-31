@@ -55,7 +55,7 @@ export class AppModel {
   }
 
   goBack() {
-    const goBackButton = this.page.locator(getTestId("go-back"));
+    const goBackButton = this.page.locator(getTestId("route-go-back"));
     return goBackButton.click();
   }
 
