@@ -321,6 +321,7 @@ function TabStrip() {
             borderRight: "1px solid var(--border)",
             alignItems: "center"
           }}
+          onDoubleClick={(e) => e.stopPropagation()}
         >
           <Button
             disabled={!canGoBack}
