@@ -232,8 +232,7 @@ class EditorStore extends BaseStore<EditorStore> {
             if (
               session.type === "diff" ||
               session.type === "deleted" ||
-              // TODO: what's this?
-              !("note" in session)
+              session.type === "new"
             )
               return session;
 
@@ -264,8 +263,7 @@ class EditorStore extends BaseStore<EditorStore> {
             : item.type === "tiptap"
             ? item.noteId
             : null;
-          if (noteId && session.id !== noteId && session.note.id !== noteId)
-            continue;
+          if (noteId && session.note.id !== noteId) continue;
           if (isDeleted(item) || isTrashItem(item))
             clearIds.push(session.tabId);
           // if a note becomes conflicted, reopen the session
@@ -335,8 +333,7 @@ class EditorStore extends BaseStore<EditorStore> {
               ...sessions
                 .filter(
                   (session) =>
-                    event.ids.includes(session.id) ||
-                    ("note" in session && event.ids.includes(session.note.id))
+                    "note" in session && event.ids.includes(session.note.id)
                 )
                 .map((s) => s.tabId)
             );
@@ -344,8 +341,7 @@ class EditorStore extends BaseStore<EditorStore> {
             for (const session of sessions) {
               if (
                 session.type === "new" ||
-                (!event.ids.includes(session.id) &&
-                  !event.ids.includes(session.note.id))
+                !event.ids.includes(session.note.id)
               )
                 continue;
 
@@ -356,7 +352,7 @@ class EditorStore extends BaseStore<EditorStore> {
                 // when a note is restored from trash
                 (session.type === "deleted" && event.item.type !== "trash")
               ) {
-                openSession(session.id, { force: true, silent: true });
+                openSession(session.note.id, { force: true, silent: true });
               } else if (
                 // when a note is moved to trash
                 session.type !== "deleted" &&
@@ -397,7 +393,7 @@ class EditorStore extends BaseStore<EditorStore> {
                   (session.type === "default" && session.locked)) &&
                   !event.item.locked)
               ) {
-                openSession(session.id, { force: true, silent: true });
+                openSession(session.note.id, { force: true, silent: true });
               }
             }
           }
@@ -426,7 +422,6 @@ class EditorStore extends BaseStore<EditorStore> {
                   : event.reference.ids;
               if (!("color" in session) || !session.color) continue;
               if (
-                !ids.includes(session.id) &&
                 !ids.includes(session.note.id) &&
                 !ids.includes(session.color)
               )
@@ -447,7 +442,6 @@ class EditorStore extends BaseStore<EditorStore> {
                   : event.reference.ids;
               if (!("tags" in session) || !session.tags) continue;
               if (
-                !ids.includes(session.id) &&
                 !ids.includes(session.note.id) &&
                 session.tags.every((t) => !ids.includes(t.id))
               )
