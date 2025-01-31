@@ -55,6 +55,7 @@ for (const type of sessionTypes) {
       contents[1]
     );
     await note?.click();
+    if (type === "locked") await note?.openLockedNote(PASSWORD);
     await note?.properties.close();
     preview = await history?.at(0)?.open();
     if (type === "locked") await preview?.unlock(PASSWORD);
