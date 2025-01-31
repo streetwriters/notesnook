@@ -39,7 +39,6 @@ import {
   isTrashItem,
   NoteContent
 } from "@notesnook/core";
-import { Context } from "../components/list-container/types";
 import { showToast } from "../utils/toast";
 import { getId } from "@notesnook/core";
 import { PersistStorage } from "zustand/middleware";
@@ -121,7 +120,6 @@ export type DefaultEditorSession = BaseEditorSession & {
 
 export type NewEditorSession = BaseEditorSession & {
   type: "new";
-  context?: Context;
   saveState: SaveState;
   content?: NoteContent<false>;
 };
@@ -908,13 +906,14 @@ class EditorStore extends BaseStore<EditorStore> {
         if (!note) throw new Error("Note not saved.");
 
         if (currentSession.type === "new") {
-          if (currentSession.context) {
-            const { type } = currentSession.context;
+          const context = useNoteStore.getState().context;
+          if (context) {
+            const { type } = context;
             if (type === "notebook")
-              await db.notes.addToNotebook(currentSession.context.id, noteId);
+              await db.notes.addToNotebook(context.id, noteId);
             else if (type === "color" || type === "tag")
               await db.relations.add(
-                { type, id: currentSession.context.id },
+                { type, id: context.id },
                 { id, type: "note" }
               );
           } else {
@@ -1015,7 +1014,6 @@ class EditorStore extends BaseStore<EditorStore> {
       type: "new",
       id: sessionId,
       tabId: activeTabId,
-      context: useNoteStore.getState().context,
       saveState: SaveState.NotSaved
     });
   };
