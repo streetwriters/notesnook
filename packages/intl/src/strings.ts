@@ -2364,6 +2364,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   height: () => t`Height`,
   pasteImageURL: () => t`Paste image URL here`,
   linkText: () => t`Link text`,
+  url: () => t`URL`,
 
   insertTableOfSize: (rows: number, columns: number) =>
     t`Insert a ${rows}x${columns} table`,

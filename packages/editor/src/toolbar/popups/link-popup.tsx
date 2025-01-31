@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Input } from "@theme-ui/components";
+import { Input, Text } from "@theme-ui/components";
 import { Flex } from "@theme-ui/components";
 import { useRefValue } from "../../hooks/use-ref-value.js";
 import { Popup } from "../components/popup.js";
@@ -64,19 +64,41 @@ export function LinkPopup(props: LinkPopupProps) {
         }}
       >
         {!isImageActive && (
-          <Input
-            type="text"
-            placeholder={strings.linkText()}
-            defaultValue={link.current?.title}
-            sx={{ mb: 1 }}
-            onChange={(e) =>
-              (link.current = {
-                ...link.current,
-                title: e.target.value
-              })
-            }
-          />
+          <>
+            <Text
+              sx={{
+                mb: 1,
+                ml: 1,
+                fontSize: "body",
+                color: "paragraph"
+              }}
+            >
+              {strings.linkText()}
+            </Text>
+            <Input
+              type="text"
+              placeholder={strings.linkText()}
+              defaultValue={link.current?.title}
+              sx={{ mb: 2 }}
+              onChange={(e) =>
+                (link.current = {
+                  ...link.current,
+                  title: e.target.value
+                })
+              }
+            />
+          </>
         )}
+        <Text
+          sx={{
+            mb: 1,
+            ml: 1,
+            fontSize: "body",
+            color: "paragraph"
+          }}
+        >
+          {strings.url()}
+        </Text>
         <Input
           type="url"
           autoFocus
