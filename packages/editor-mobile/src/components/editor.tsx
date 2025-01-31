@@ -243,8 +243,10 @@ const Tiptap = ({
       );
       setTimeout(() => {
         editorControllers[tabRef.current.id]?.setLoading(false);
-        restoreNoteSelection(scrollTop, selection);
-      }, 300);
+        setTimeout(() => {
+          restoreNoteSelection(scrollTop, selection);
+        }, 300);
+      }, 1);
     },
     [restoreNoteSelection]
   );

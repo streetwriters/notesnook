@@ -32,9 +32,9 @@ import {
   isEncryptedContent,
   isTrashItem
 } from "@notesnook/core";
-import { strings } from "@notesnook/intl";
 import { EditorEvents } from "@notesnook/editor-mobile/src/utils/editor-events";
 import { NativeEvents } from "@notesnook/editor-mobile/src/utils/native-events";
+import { strings } from "@notesnook/intl";
 import { useThemeEngineStore } from "@notesnook/theme";
 import { Mutex } from "async-mutex";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -500,6 +500,7 @@ export const useEditor = (
       blockId?: string;
       session?: TabSessionItem;
       newTab?: boolean;
+      resetTabState?: boolean;
     }) => {
       loadNoteMutex.runExclusive(async () => {
         if (!event) return;
@@ -544,7 +545,15 @@ export const useEditor = (
           }
 
           const item = event.item;
-          currentLoadingNoteId.current = item.id;
+
+          // If note is already open in a tab, focus that tab.
+          if (useTabStore.getState().hasTabForNote(item.id)) {
+            const tabId = useTabStore.getState().getTabForNote(item.id);
+            if (tabId !== useTabStore.getState().currentTab) {
+              useTabStore.getState().focusTab(tabId as string);
+              return;
+            }
+          }
 
           const isLockedNote = await db.vaults.itemExists(
             event.item as ItemReference
@@ -553,25 +562,24 @@ export const useEditor = (
           const tabLocked =
             isLockedNote && !(event.item as NoteWithContent).content;
 
-          let tabId = event.tabId;
-          if (tabId === undefined) tabId = useTabStore.getState().currentTab;
+          const tabId = event.tabId
+            ? event.tabId
+            : useTabStore.getState().currentTab;
 
+          // Check if tab needs to be refreshed.
           if (
+            !event.resetTabState &&
             tabId &&
+            event.item.id === useTabStore.getState().getNoteIdForTab(tabId) &&
             !localTabState.current?.needsRefresh(
               tabId,
               isLockedNote,
               item.readonly
             )
           ) {
-            console.log(
-              "Note is already updated, skipping refresh request on focus"
-            );
-            currentLoadingNoteId.current = undefined;
-
+            commands.setLoading(false, tabId);
             return;
           } else {
-            console.log("updating the tab in focus...");
             localTabState.current?.setEditTime(
               item.id,
               localTabState.current?.noteEditedTime[item.id] || item.dateEdited
@@ -583,6 +591,9 @@ export const useEditor = (
             });
           }
 
+          currentLoadingNoteId.current = item.id;
+
+          // Show loading overlay if note is not already loaded.
           if (
             tabId &&
             (event.item?.id !== useTabStore.getState().getNoteIdForTab(tabId) ||
@@ -592,11 +603,12 @@ export const useEditor = (
           }
 
           const session: Partial<TabSessionItem> = event.session || {
-            readonly: event.item.readonly,
-            locked: tabLocked,
-            noteLocked: isLockedNote,
             noteId: event.item.id
           };
+
+          session.noteLocked = isLockedNote;
+          session.locked = tabLocked;
+          session.readonly = item.readonly;
 
           const tab = useTabStore.getState().getTab(tabId!);
 
@@ -604,26 +616,22 @@ export const useEditor = (
             useTabStore.getState().newTab({
               session: session
             });
-            console.log("Creating a new tab...");
           } else {
+            // A new session is created if the note is changed.
+            // If the note is already opened, the session is updated.
             if (
-              event.item.id !== tab?.session?.noteId &&
-              tab?.session?.noteId
+              !tab?.session ||
+              (event.item.id !== tab?.session?.noteId && tab?.session?.noteId)
             ) {
               useTabStore.getState().newTabSession(tabId!, session);
-              console.log("Creating a new tab session");
             } else {
-              console.log("Updating tab session");
               useTabStore.getState().updateTab(tabId!, {
                 session: session
               });
             }
           }
 
-          if (lastTabFocused.current !== tabId) {
-            console.log("Waiting for tab to get focus");
-            return;
-          }
+          if (lastTabFocused.current !== tabId) return;
 
           if (tabBarRef.current?.page() === 2) {
             state.current.movedAway = false;
@@ -650,8 +658,6 @@ export const useEditor = (
           );
           await postMessage(NativeEvents.title, item.title, tabId);
           overlay(false);
-
-          console.log("LOADING NOTE....", item.id, item.title);
 
           await postMessage(
             NativeEvents.html,
@@ -699,38 +705,34 @@ export const useEditor = (
       isLocal?: boolean
     ) => {
       try {
-        await (async () => {
-          if (SettingsService.get().disableRealtimeSync && !isLocal) return;
-          if (!data) return;
+        if (SettingsService.get().disableRealtimeSync && !isLocal) return;
+        if (!data) return;
 
-          if (isDeleted(data) || isTrashItem(data)) {
-            const tabId = useTabStore.getState().getTabForNote(data.id);
-            if (tabId !== undefined) {
-              await commands.clearContent(tabId);
-              useTabStore.getState().removeTab(tabId);
-            }
-            return;
+        if (isDeleted(data) || isTrashItem(data)) {
+          const tabId = useTabStore.getState().getTabForNote(data.id);
+          if (tabId !== undefined) {
+            await commands.clearContent(tabId);
+            useTabStore.getState().removeTab(tabId);
           }
+          return;
+        }
 
-          const noteId =
-            (data as ContentItem).type === "tiptap"
-              ? (data as ContentItem).noteId
-              : data.id;
+        const noteId =
+          (data as ContentItem).type === "tiptap"
+            ? (data as ContentItem).noteId
+            : data.id;
 
-          if (!useTabStore.getState().hasTabForNote(noteId)) return;
-          const tabId = useTabStore.getState().getTabForNote(noteId) as string;
+        const note = data.type === "note" ? data : await db.notes?.note(noteId);
 
-          const tab = useTabStore.getState().getTab(tabId);
+        lock.current = true;
 
-          const note =
-            data.type === "note" ? data : await db.notes?.note(noteId);
+        // Handle this case where note was locked on another device and synced.
+        const locked = note
+          ? await db.vaults.itemExists(note as ItemReference)
+          : false;
 
-          lock.current = true;
-
-          // Handle this case where note was locked on another device and synced.
-          const locked = note
-            ? await db.vaults.itemExists(note as ItemReference)
-            : false;
+        useTabStore.getState().forEachNoteTab(noteId, async (tab) => {
+          const tabId = tab.id;
 
           if (note) {
             if (!locked && tab?.session?.noteLocked) {
@@ -738,8 +740,7 @@ export const useEditor = (
               if (tab.session?.locked) {
                 if (useTabStore.getState().currentTab === tabId) {
                   eSendEvent(eOnLoadNote, {
-                    item: note,
-                    forced: true
+                    item: note
                   });
                 } else {
                   useTabStore.getState().updateTab(tabId, {
@@ -748,7 +749,9 @@ export const useEditor = (
                       noteLocked: false
                     }
                   });
-                  commands.setLoading(true, tabId);
+                  localTabState.current?.set(tabId, {
+                    editedAt: 0
+                  });
                 }
               }
             } else if (!tab?.session?.noteLocked && locked) {
@@ -759,10 +762,13 @@ export const useEditor = (
                   noteLocked: true
                 }
               });
+              commands.clearContent(tabId);
               if (useTabStore.getState().currentTab !== tabId) {
-                commands.clearContent(tabId);
                 commands.setLoading(true, tabId);
               }
+              localTabState.current?.set(tabId, {
+                editedAt: 0
+              });
             }
 
             if (currentNotes.current[noteId]?.title !== note.title) {
@@ -776,12 +782,13 @@ export const useEditor = (
                 tabId as string
               );
             }
-
-            useTabStore.getState().updateTab(tabId, {
-              session: {
-                readonly: note.readonly
-              }
-            });
+            if (tab.session?.readonly !== note.readonly) {
+              useTabStore.getState().updateTab(tabId, {
+                session: {
+                  readonly: note.readonly
+                }
+              });
+            }
           }
 
           if (data.type === "tiptap" && note && !isLocal) {
@@ -792,7 +799,7 @@ export const useEditor = (
             if (locked && isEncryptedContent(data)) {
               const decryptedContent = await db.vault?.decryptContent(data);
               if (!decryptedContent) {
-                useTabStore.getState().updateTab(tabId, {
+                useTabStore.getState().updateTab(tab.id, {
                   session: {
                     locked: true,
                     noteLocked: true
@@ -823,7 +830,7 @@ export const useEditor = (
               }
             }
           }
-        })();
+        });
       } catch (e) {
         DatabaseLogger.error(e as Error, "Error when applying sync changes");
       } finally {
@@ -980,6 +987,9 @@ export const useEditor = (
         useTabStore.getState().currentTab!
       ))
     ) {
+      localTabState.current?.set(useTabStore.getState().currentTab!, {
+        editedAt: 0
+      });
       eSendEvent(eEditorReset, "onReady");
       return false;
     } else {
@@ -997,6 +1007,10 @@ export const useEditor = (
       isDefaultEditor ? insets : { top: 0, left: 0, right: 0, bottom: 0 }
     );
     await commands.setSettings();
+
+    localTabState.current?.set(useTabStore.getState().currentTab!, {
+      editedAt: 0
+    });
 
     if (!state.current.ready) {
       state.current.ready = true;

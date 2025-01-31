@@ -612,14 +612,6 @@ export const useEditorEvents = (
           break;
         }
         case EditorEvents.tabFocused: {
-          console.log(
-            "Focused tab",
-            editorMessage.tabId,
-            editorMessage.noteId,
-            "Content:",
-            editorMessage.value
-          );
-
           eSendEvent(eEditorTabFocused, editorMessage.tabId);
 
           if (editorMessage.noteId) {
