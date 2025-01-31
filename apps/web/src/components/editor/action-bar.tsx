@@ -100,7 +100,9 @@ export function EditorActionBar() {
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
   const monographs = useMonographStore((store) => store.monographs);
   const isNotePublished =
-    activeSession && db.monographs.isPublished(activeSession.id);
+    activeSession &&
+    "note" in activeSession &&
+    db.monographs.isPublished(activeSession.note.id);
   const isMobile = useMobile();
   const isTablet = useTablet();
 
@@ -419,12 +421,15 @@ function TabStrip() {
                         .map((s) => s.id)
                     )
                 }
-                onRevealInList={() =>
-                  AppEventManager.publish(
-                    AppEvents.revealItemInList,
-                    "note" in session ? session.note.id : session.id,
-                    true
-                  )
+                onRevealInList={
+                  "note" in session
+                    ? () =>
+                        AppEventManager.publish(
+                          AppEvents.revealItemInList,
+                          session.note.id,
+                          true
+                        )
+                    : undefined
                 }
                 onPin={() => {
                   useEditorStore.setState((state) => {
@@ -466,8 +471,8 @@ type TabProps = {
   onCloseToTheRight: () => void;
   onCloseToTheLeft: () => void;
   onCloseAll: () => void;
-  onRevealInList: () => void;
   onPin: () => void;
+  onRevealInList?: () => void;
 };
 function Tab(props: TabProps) {
   const {
@@ -580,7 +585,8 @@ function Tab(props: TabProps) {
             type: "button",
             title: strings.revealInList(),
             key: "reveal-in-list",
-            onClick: onRevealInList
+            onClick: onRevealInList,
+            isHidden: !onRevealInList
           },
           { type: "separator", key: "sep" },
           {
