@@ -18,10 +18,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import hotkeys from "hotkeys-js";
-import { GlobalKeyboard } from "../utils/keyboard";
 import { useEditorStore } from "../stores/editor-store";
 import { useStore as useSearchStore } from "../stores/search-store";
 import { useEditorManager } from "../components/editor/manager";
+
+function isInEditor(e: KeyboardEvent) {
+  return (
+    e.target instanceof HTMLElement && !!e.target?.closest(".editor-container")
+  );
+}
 
 const KEYMAP = [
   // {
@@ -55,14 +60,33 @@ const KEYMAP = [
   //   },
   // },
   {
+    keys: [
+      "command+option+right",
+      "ctrl+alt+right",
+      "command+option+shift+right",
+      "ctrl+alt+shift+right"
+    ],
+    description: "Go to next tab",
+    global: false,
+    action: () => useEditorStore.getState().focusNextTab()
+  },
+  {
+    keys: [
+      "command+option+left",
+      "ctrl+alt+left",
+      "command+option+shift+left",
+      "ctrl+alt+shift+left"
+    ],
+    description: "Go to next tab",
+    global: false,
+    action: () => useEditorStore.getState().focusPreviousTab()
+  },
+  {
     keys: ["command+f", "ctrl+f"],
     description: "Search all notes",
     global: false,
     action: (e: KeyboardEvent) => {
-      const isInEditor =
-        e.target instanceof HTMLElement &&
-        !!e.target?.closest(".editor-container");
-      if (isInEditor) {
+      if (isInEditor(e)) {
         const activeSession = useEditorStore.getState().getActiveSession();
         if (activeSession?.type === "readonly") {
           e.preventDefault();
@@ -149,14 +173,9 @@ export function registerKeyMap() {
   };
 
   KEYMAP.forEach((key) => {
-    hotkeys(
-      key.keys.join(","),
-      {
-        element: key.global
-          ? (GlobalKeyboard as unknown as HTMLElement)
-          : document.body
-      },
-      key.action
-    );
+    hotkeys(key.keys.join(","), (e) => {
+      e.preventDefault();
+      key.action?.(e);
+    });
   });
 }

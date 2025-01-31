@@ -125,31 +125,6 @@ export default function TabsView() {
   const isTOCVisible = useEditorStore((store) => store.isTOCVisible);
   const [dropRef, overlayRef] = useDragOverlay();
 
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (
-        (event.ctrlKey || event.metaKey) &&
-        event.altKey &&
-        event.key === "ArrowRight"
-      ) {
-        event.preventDefault();
-        useEditorStore.getState().focusNextTab();
-      }
-      if (
-        (event.ctrlKey || event.metaKey) &&
-        event.altKey &&
-        event.key === "ArrowLeft"
-      ) {
-        event.preventDefault();
-        useEditorStore.getState().focusPreviousTab();
-      }
-    };
-    document.body.addEventListener("keydown", onKeyDown);
-    return () => {
-      document.body.removeEventListener("keydown", onKeyDown);
-    };
-  }, []);
-
   return (
     <>
       <Flex
