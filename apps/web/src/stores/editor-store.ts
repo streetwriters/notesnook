@@ -495,14 +495,19 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   private rehydrateSession = (sessionId: string) => {
-    const { openSession, openDiffSession, getSession } = this.get();
+    const { openSession, openDiffSession, getSession, activateSession } =
+      this.get();
 
     const session = getSession(sessionId);
+    if (session?.type === "new") {
+      activateSession(session.id);
+      return;
+    }
     if (!session || !session.needsHydration) return;
 
     if (session.type === "diff")
       openDiffSession(session.note.id, session.historySessionId);
-    else if (session.type !== "new")
+    else
       openSession(session.note.id, {
         force: true
       });
