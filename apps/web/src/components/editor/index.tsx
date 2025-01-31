@@ -888,7 +888,7 @@ function UnlockNoteView(props: UnlockNoteViewProps) {
         subtitle={strings.enterPasswordToUnlockNote()}
         title={session.note.title}
         unlock={async (password) => {
-          const note = await db.vault.open(session.id, password);
+          const note = await db.vault.open(session.note.id, password);
           if (!note || !note.content)
             throw new Error("note with this id does not exist.");
 
