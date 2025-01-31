@@ -28,12 +28,12 @@ import { TaskItemNode } from "../task-item/index.js";
 export function countCheckedItems(node: ProsemirrorNode) {
   let checked = 0;
   let total = 0;
-  let content = node.content;
-
-  for (let i = 0; i < content.childCount; i++) {
-    if (content.child(i).attrs.checked) checked++;
-    total++;
-  }
+  node.descendants((node) => {
+    if (node.type.name === TaskItem.name) {
+      if (node.attrs.checked) checked++;
+      total++;
+    }
+  });
   return { checked, total };
 }
 

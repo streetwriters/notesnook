@@ -61,10 +61,10 @@ export const TaskListNode = TaskList.extend({
             return { checked: 0, total: 0 };
 
           const total = element.querySelectorAll(
-            ":scope > li.checklist--item"
+            "li.checklist--item"
           ).length;
           const checked = element.querySelectorAll(
-            ":scope > li.checklist--item.checked"
+            "li.checklist--item.checked"
           ).length;
 
           return { checked, total };
