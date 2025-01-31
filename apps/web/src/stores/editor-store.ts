@@ -529,7 +529,7 @@ class EditorStore extends BaseStore<EditorStore> {
     });
   };
 
-  activateSession = (id?: string, activeBlockId?: string) => {
+  activateSession = (id?: string, activeBlockId?: string, silent?: boolean) => {
     if (!id) hashNavigate(`/`, { replace: true, notify: false });
 
     const session = this.get().sessions.find((s) => s.id === id);
@@ -563,12 +563,12 @@ class EditorStore extends BaseStore<EditorStore> {
       });
 
     if (session?.tabId) {
-      this.set((state) => {
-        const index = state.tabs.findIndex((t) => t.id === session.tabId);
-        if (index === -1) return;
-        state.tabs[index].sessionId = session.id;
-      });
-      this.focusTab(session.tabId, session.id);
+      const { tabs } = this.get();
+      const index = tabs.findIndex((t) => t.id === session.tabId);
+      // no need to focus tab if the same session is already open
+      if (index === -1 || tabs[index].sessionId === session.id) return;
+      this.set((state) => (state.tabs[index].sessionId = session.id));
+      if (!silent) this.focusTab(session.tabId, session.id);
     }
   };
 
@@ -688,7 +688,7 @@ class EditorStore extends BaseStore<EditorStore> {
           activeBlockId: options.activeBlockId,
           tabId
         },
-        !options.silent
+        options.silent
       );
     } else if (isLocked && note.type !== "trash") {
       this.addSession(
@@ -699,7 +699,7 @@ class EditorStore extends BaseStore<EditorStore> {
           activeBlockId: options.activeBlockId,
           tabId
         },
-        !options.silent
+        options.silent
       );
     } else {
       const content = note.contentId
@@ -721,7 +721,7 @@ class EditorStore extends BaseStore<EditorStore> {
             activeBlockId: options.activeBlockId,
             tabId
           },
-          !options.silent
+          options.silent
         );
       } else {
         const attachmentsLength = await db.attachments
@@ -741,7 +741,7 @@ class EditorStore extends BaseStore<EditorStore> {
               activeBlockId: options.activeBlockId,
               tabId
             },
-            !options.silent
+            options.silent
           );
         } else {
           this.addSession(
@@ -758,7 +758,7 @@ class EditorStore extends BaseStore<EditorStore> {
               activeBlockId: options.activeBlockId,
               tabId
             },
-            !options.silent
+            options.silent
           );
         }
       }
@@ -830,7 +830,7 @@ class EditorStore extends BaseStore<EditorStore> {
     return false;
   };
 
-  addSession = (session: EditorSession, activate = true) => {
+  addSession = (session: EditorSession, silent = false) => {
     this.set((state) => {
       const index = state.sessions.findIndex((s) => s.id === session.id);
       if (index > -1) {
@@ -838,7 +838,7 @@ class EditorStore extends BaseStore<EditorStore> {
       } else state.sessions.push(session);
     });
 
-    if (activate) this.activateSession(session.id);
+    this.activateSession(session.id, undefined, silent);
   };
 
   saveSession = async (
