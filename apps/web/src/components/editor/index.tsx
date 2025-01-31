@@ -155,7 +155,6 @@ export default function TabsView() {
               const session = useEditorStore
                 .getState()
                 .getSession(tab.sessionId);
-              console.log("rendering tab", tab, session);
               if (!session) return null;
               return (
                 <Freeze key={session.id} freeze={tab.id !== activeTab?.id}>
@@ -496,6 +495,14 @@ export function Editor(props: EditorProps) {
     });
     return () => unsub();
   }, []);
+
+  useEffect(() => {
+    return () => {
+      const editor = useEditorManager.getState().getEditor(id)?.editor;
+      const selection = editor?.getSelection();
+      if (selection) Config.set(`${id}:selection`, selection);
+    };
+  }, [id]);
 
   return (
     <EditorChrome {...props}>
