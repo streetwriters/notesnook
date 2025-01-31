@@ -1192,7 +1192,7 @@ class EditorStore extends BaseStore<EditorStore> {
 }
 
 const useEditorStore = createPersistedStore(EditorStore, {
-  name: "editor-sessions",
+  name: "editor-sessions-v2",
   partialize: (state) => ({
     history: state.history,
     arePropertiesVisible: state.arePropertiesVisible,
