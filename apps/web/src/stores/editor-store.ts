@@ -810,7 +810,10 @@ class EditorStore extends BaseStore<EditorStore> {
       return false;
     }
 
-    if ("note" in session) {
+    if (session.type === "new") {
+      this.activateSession(session.id);
+      return true;
+    } else {
       if (!(await db.notes.exists(session.note.id))) {
         tabSessionHistory.remove(tabId, session.id);
         this.set((state) => {
@@ -827,7 +830,6 @@ class EditorStore extends BaseStore<EditorStore> {
       this.activateSession(session.id);
       return true;
     }
-    return false;
   };
 
   addSession = (session: EditorSession, silent = false) => {
