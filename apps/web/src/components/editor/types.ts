@@ -40,4 +40,5 @@ export interface IEditor {
   sendAttachmentProgress: (hash: string, progress: number) => void;
   startSearch: () => void;
   getContent: () => string;
+  getSelection: () => { from: number; to: number };
 }

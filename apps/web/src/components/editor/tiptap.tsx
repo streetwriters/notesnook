@@ -604,7 +604,11 @@ function toIEditor(editor: Editor): IEditor {
       ),
     startSearch: () => editor.commands.startSearch(),
     getContent: () =>
-      getHTMLFromFragment(editor.state.doc.content, editor.schema)
+      getHTMLFromFragment(editor.state.doc.content, editor.schema),
+    getSelection: () => {
+      const { from, to } = editor.state.selection;
+      return { from, to };
+    }
   };
 }
 
