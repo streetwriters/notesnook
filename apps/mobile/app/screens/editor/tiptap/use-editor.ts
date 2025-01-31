@@ -547,7 +547,7 @@ export const useEditor = (
           const item = event.item;
 
           // If note is already open in a tab, focus that tab.
-          if (useTabStore.getState().hasTabForNote(item.id)) {
+          if (useTabStore.getState().hasTabForNote(item.id) && !event.newTab) {
             const tabId = useTabStore.getState().getTabForNote(item.id);
             if (tabId !== useTabStore.getState().currentTab) {
               useTabStore.getState().focusTab(tabId as string);
@@ -567,28 +567,31 @@ export const useEditor = (
             : useTabStore.getState().currentTab;
 
           // Check if tab needs to be refreshed.
-          if (
-            !event.resetTabState &&
-            tabId &&
-            event.item.id === useTabStore.getState().getNoteIdForTab(tabId) &&
-            !localTabState.current?.needsRefresh(
-              tabId,
-              isLockedNote,
-              item.readonly
-            )
-          ) {
-            commands.setLoading(false, tabId);
-            return;
-          } else {
-            localTabState.current?.setEditTime(
-              item.id,
-              localTabState.current?.noteEditedTime[item.id] || item.dateEdited
-            );
-            localTabState.current?.set(tabId!, {
-              editedAt:
+          if (!event.newTab) {
+            if (
+              !event.resetTabState &&
+              tabId &&
+              event.item.id === useTabStore.getState().getNoteIdForTab(tabId) &&
+              !localTabState.current?.needsRefresh(
+                tabId,
+                isLockedNote,
+                item.readonly
+              )
+            ) {
+              commands.setLoading(false, tabId);
+              return;
+            } else {
+              localTabState.current?.setEditTime(
+                item.id,
                 localTabState.current?.noteEditedTime[item.id] ||
-                item.dateEdited
-            });
+                  item.dateEdited
+              );
+              localTabState.current?.set(tabId!, {
+                editedAt:
+                  localTabState.current?.noteEditedTime[item.id] ||
+                  item.dateEdited
+              });
+            }
           }
 
           currentLoadingNoteId.current = item.id;
