@@ -181,6 +181,7 @@ export default function EditorTabs({
 }: {
   close?: (ctx?: string | undefined) => void;
 }) {
+  const { colors } = useThemeColors();
   const [tabs, currentTab] = useTabStore((state) => [
     state.tabs,
     state.currentTab
@@ -217,20 +218,13 @@ export default function EditorTabs({
         }}
       >
         <Heading size={SIZE.lg}>{strings.tabs()}</Heading>
-        <Button
+        <IconButton
           onPress={() => {
             useTabStore.getState().newTab();
             close?.();
           }}
-          title={strings.newTab()}
-          icon="plus"
-          style={{
-            flexDirection: "row",
-            justifyContent: "flex-start",
-            borderRadius: 100,
-            height: 35
-          }}
-          iconSize={SIZE.lg}
+          name="plus"
+          color={colors.primary.accent}
         />
       </View>
 
