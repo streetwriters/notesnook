@@ -219,6 +219,15 @@ class EditorStore extends BaseStore<EditorStore> {
     );
   };
 
+  getTabsForNote = (noteId: string) => {
+    const { tabs, sessions } = this.get();
+    return tabs.filter((t) =>
+      sessions.some(
+        (s) => t.sessionId === s.id && "note" in s && s.note.id === noteId
+      )
+    );
+  };
+
   init = () => {
     EV.subscribe(EVENTS.userLoggedOut, () => {
       const { closeTabs, tabs } = this.get();
@@ -582,16 +591,23 @@ class EditorStore extends BaseStore<EditorStore> {
 
     if (!oldContent || !currentContent) return;
 
-    const { getSession, addSession } = this.get();
+    const { getSession, addSession, sessions, activeTabId, tabs } = this.get();
+
+    const tabId = activeTabId ?? this.addTab();
+    const tab = tabs.find((t) => t.id === tabId);
+    const activeSession = tab && getSession(tab.sessionId);
+    const oldSession = sessions.find(
+      (s) =>
+        s.type === "diff" &&
+        s.historySessionId === session.id &&
+        s.tabId === tabId
+    );
+    const tabSessionId =
+      activeSession?.needsHydration || activeSession?.type === "new"
+        ? activeSession.id
+        : tabSessionHistory.add(tabId, oldSession?.id);
 
     const label = getFormattedHistorySessionDate(session);
-    const tabId = this.get().activeTabId ?? this.addTab();
-    const tab = this.get().tabs.find((t) => t.id === tabId);
-    const tabSession = tab && getSession(tab.sessionId);
-    const tabSessionId =
-      tabSession?.needsHydration || tabSession?.type === "new"
-        ? session.id
-        : tabSessionHistory.add(tabId);
     addSession({
       type: "diff",
       id: tabSessionId,
@@ -624,37 +640,56 @@ class EditorStore extends BaseStore<EditorStore> {
       openInNewTab?: boolean;
     } = {}
   ): Promise<void> => {
-    const tabId = options.openInNewTab
-      ? this.addTab()
-      : this.get().activeTabId ?? this.addTab();
-    const { getSession, activateSession, rehydrateSession } = this.get();
+    const {
+      getSession,
+      sessions,
+      tabs,
+      activateSession,
+      activeTabId,
+      rehydrateSession,
+      getTabsForNote,
+      addTab
+    } = this.get();
     const noteId = typeof noteOrId === "string" ? noteOrId : noteOrId.id;
+    const oldTabForNote = getTabsForNote(noteId).at(0);
+    const tabId = options.openInNewTab
+      ? addTab()
+      : oldTabForNote?.id || activeTabId || addTab();
 
-    const tab = this.get().tabs.find((t) => t.id === tabId);
-    const session = tab && getSession(tab.sessionId);
-    if (
-      session &&
-      "note" in session &&
-      session.note.id === noteId &&
-      !options.force
-    ) {
-      return session.needsHydration
-        ? rehydrateSession(session.id)
-        : activateSession(noteId, options.activeBlockId);
+    const tab = tabs.find((t) => t.id === tabId);
+    const activeSession = tab && getSession(tab.sessionId);
+    const noteAlreadyOpened =
+      activeSession &&
+      "note" in activeSession &&
+      activeSession.note.id === noteId &&
+      // we should allow opening the same note again if a diff session of a note
+      // is opened in the same tab. This allows for cases where a user opens a diff
+      // and then wants to open the note in the same tab again.
+      activeSession.type !== "diff";
+    if (noteAlreadyOpened && !options.force) {
+      return activeSession.needsHydration
+        ? rehydrateSession(activeSession.id)
+        : activateSession(activeSession.id, options.activeBlockId);
     }
 
-    if (session && session.id) await db.fs().cancel(session.id);
+    if (activeSession && "note" in activeSession)
+      await db.fs().cancel(activeSession.note.id);
 
     const note =
-      typeof noteOrId === "object" && !session?.needsHydration
+      typeof noteOrId === "object" && !activeSession?.needsHydration
         ? noteOrId
         : (await db.notes.note(noteId)) || (await db.notes.trashed(noteId));
     if (!note) return;
 
+    const oldSessionOfNote = sessions.find(
+      (s) => "note" in s && s.note.id === noteId && s.tabId === tabId
+    );
     const sessionId =
-      session?.needsHydration || session?.type === "new"
-        ? session.id
-        : tabSessionHistory.add(tabId);
+      activeSession?.needsHydration ||
+      activeSession?.type === "new" ||
+      noteAlreadyOpened
+        ? activeSession.id
+        : tabSessionHistory.add(tabId, oldSessionOfNote?.id);
     const isLocked = await db.vaults.itemExists(note);
 
     if (note.conflicted) {
