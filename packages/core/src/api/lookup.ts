@@ -203,25 +203,30 @@ export default class Lookup {
     }
   ): T[] {
     if (query === "") return items;
-    return items
-      .map((item) => {
-        const result = match(query, `${item[key]}`);
-        if (result.match) {
-          if (opts?.prefix || opts?.suffix) {
-            return {
-              ...item,
-              [key]: surround(`${item[key]}`, {
-                result: result,
-                prefix: opts?.prefix,
-                suffix: opts?.suffix
-              })
-            };
-          }
-          return item;
-        }
-        return opts?.matchOnly ? undefined : item;
-      })
-      .filter((i) => i !== undefined);
+
+    const fuzzied: (T | undefined)[] = [];
+
+    for (const item of items) {
+      const result = match(query, `${item[key]}`);
+      if (!result.match) {
+        fuzzied.push(opts?.matchOnly ? undefined : item);
+        continue;
+      }
+      if (opts?.prefix || opts?.suffix) {
+        fuzzied.push({
+          ...item,
+          [key]: surround(`${item[key]}`, {
+            result: result,
+            prefix: opts?.prefix,
+            suffix: opts?.suffix
+          })
+        });
+        continue;
+      }
+      fuzzied.push(item);
+    }
+
+    return fuzzied.filter((f) => f !== undefined);
   }
 
   private search<T extends Item>(

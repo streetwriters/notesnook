@@ -24,7 +24,7 @@ import {
   TEST_NOTEBOOK2,
   databaseTest
 } from "./utils/index.ts";
-import { test, expect } from "vitest";
+import { test, expect, describe } from "vitest";
 
 const content = {
   ...TEST_NOTE.content,
@@ -192,3 +192,88 @@ test("search reminders with titleOnly option should not search in descriptions",
       .ids();
     expect(filtered).toHaveLength(0);
   }));
+
+describe("lookup.fuzzy", () => {
+  describe("opts.matchOnly", () => {
+    test("should return all items when matchOnly is false", () => {
+      databaseTest().then((db) => {
+        const items = [
+          {
+            title: "hello"
+          },
+          {
+            title: "world"
+          }
+        ];
+        const successQuery = "o";
+        const failureQuery = "i";
+        expect(db.lookup.fuzzy(successQuery, items, "title")).toStrictEqual(
+          items
+        );
+        expect(db.lookup.fuzzy(failureQuery, items, "title")).toStrictEqual(
+          items
+        );
+      });
+    });
+    test("should return only matching items when matchOnly is true", () => {
+      databaseTest().then((db) => {
+        const items = [
+          {
+            title: "hello"
+          },
+          {
+            title: "world"
+          }
+        ];
+        const successQuery = "or";
+        const failureQuery = "i";
+        expect(
+          db.lookup.fuzzy(successQuery, items, "title", { matchOnly: true })
+        ).toStrictEqual([items[1]]);
+        expect(
+          db.lookup.fuzzy(failureQuery, items, "title", { matchOnly: true })
+        ).toStrictEqual([]);
+      });
+    });
+  });
+  describe("opts.prefix", () => {
+    test("should prefix matched field with provided value when given", () => {
+      databaseTest().then((db) => {
+        const items = [
+          {
+            title: "hello"
+          },
+          {
+            title: "world"
+          }
+        ];
+        const query = "d";
+        expect(
+          db.lookup.fuzzy(query, items, "title", {
+            prefix: "prefix-"
+          })
+        ).toStrictEqual([items[0], { title: "worlprefix-d" }]);
+      });
+    });
+  });
+  describe("opt.suffix", () => {
+    test("should suffix matched field with provided value when given", () => {
+      databaseTest().then((db) => {
+        const items = [
+          {
+            title: "hello"
+          },
+          {
+            title: "world"
+          }
+        ];
+        const query = "llo";
+        expect(
+          db.lookup.fuzzy(query, items, "title", {
+            suffix: "-suffix"
+          })
+        ).toStrictEqual([{ title: "hello-suffix" }, items[1]]);
+      });
+    });
+  });
+});

@@ -46,7 +46,7 @@ interface Command {
 }
 
 type GroupedCommands = Record<
-  string,
+  Command["group"],
   (Command & { index: number; icon: Icon | undefined })[]
 >;
 
@@ -63,10 +63,12 @@ export const CommandPaletteDialog = DialogManager.register(
       });
     }, [selected]);
 
-    function reset() {
+    async function onChange(e: React.ChangeEvent<HTMLInputElement>) {
       setSelected(0);
-      setQuery(">");
-      setCommands(getDefaultCommands());
+      const query = e.target.value;
+      setQuery(query);
+      const res = await search(query);
+      setCommands(res ?? []);
     }
 
     const highlighted = db.lookup.fuzzy(
@@ -95,7 +97,6 @@ export const CommandPaletteDialog = DialogManager.register(
         isOpen={true}
         width={650}
         onClose={() => {
-          reset();
           props.onClose(false);
         }}
         noScroll
@@ -118,7 +119,6 @@ export const CommandPaletteDialog = DialogManager.register(
               if (action) {
                 action(command.id);
                 addRecentCommand(command);
-                reset();
                 props.onClose(false);
               }
               setSelected(0);
@@ -140,32 +140,7 @@ export const CommandPaletteDialog = DialogManager.register(
               sx={{ mx: 0, my: 2 }}
               defaultValue={query}
               onChange={
-                isCommandMode(query) || query.trim().length < 1
-                  ? (e) => {
-                      setSelected(0);
-                      const query = e.target.value;
-                      setQuery(query);
-
-                      const res = search(query);
-                      if (res instanceof Promise) {
-                      } else {
-                        setCommands(res ?? []);
-                      }
-                    }
-                  : debounce(async (e) => {
-                      setSelected(0);
-                      const query = e.target.value;
-                      setQuery(query);
-
-                      const res = search(query);
-                      if (res instanceof Promise) {
-                        const commands = await res;
-                        setCommands(commands ?? []);
-                        return;
-                      } else {
-                        setCommands(res ?? []);
-                      }
-                    }, 500)
+                isCommandMode(query) ? onChange : debounce(onChange, 500)
               }
             />
             <ScrollContainer>
@@ -211,7 +186,6 @@ export const CommandPaletteDialog = DialogManager.register(
                               if (action) {
                                 action(command.id);
                                 addRecentCommand(command);
-                                reset();
                                 props.onClose(false);
                               }
                             }}
@@ -331,6 +305,10 @@ const CommandTypeItems = COMMANDS.map((c) => ({
 
 function getDefaultCommands() {
   return getRecentCommands().concat(CommandTypeItems);
+}
+
+function getRecentCommands() {
+  return Config.get<Command[]>("commandPalette:recent", []);
 }
 
 function addRecentCommand(command: Command) {
@@ -457,10 +435,6 @@ async function dbSearch(query: string) {
     };
   });
   return commands;
-}
-
-function getRecentCommands() {
-  return Config.get<Command[]>("commandPalette:recent", []);
 }
 
 function isCommandMode(query: string) {
