@@ -1000,14 +1000,14 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   newSession = () => {
-    const { activeTabId } = this.get();
+    const { activeTabId, activateSession } = this.get();
     if (!activeTabId) {
       this.addTab();
       return;
     }
 
     const session = this.getActiveSession();
-    if (session?.type === "new") return;
+    if (session?.type === "new") return activateSession(session.id);
 
     const sessionId = tabSessionHistory.add(activeTabId);
     this.addSession({
