@@ -69,7 +69,16 @@ export const CommandPaletteDialog = DialogManager.register(
       setCommands(getDefaultCommands());
     }
 
-    const grouped = commands.reduce((acc, command, index) => {
+    const highlighted = db.lookup.fuzzy(
+      prepareQuery(query),
+      commands,
+      "title",
+      {
+        prefix: "<b style='color: var(--accent-foreground)'>",
+        suffix: "</b>"
+      }
+    );
+    const grouped = highlighted.reduce((acc, command, index) => {
       if (!acc[command.group]) {
         acc[command.group] = [];
       }
@@ -249,14 +258,16 @@ export const CommandPaletteDialog = DialogManager.register(
                                   border: "1px solid",
                                   borderColor: "border"
                                 }}
-                              >
-                                <Highlighter
-                                  text={command.title}
-                                  query={query}
-                                />
-                              </Text>
+                                dangerouslySetInnerHTML={{
+                                  __html: command.title
+                                }}
+                              />
                             ) : (
-                              <Highlighter text={command.title} query={query} />
+                              <Text
+                                dangerouslySetInnerHTML={{
+                                  __html: command.title
+                                }}
+                              />
                             )}
                           </Button>
                           {command.group === "recent" && (
@@ -300,27 +311,6 @@ export const CommandPaletteDialog = DialogManager.register(
     );
   }
 );
-
-function Highlighter({ text, query }: { text: string; query: string }) {
-  const queryClean = isCommandMode(query)
-    ? query.slice(1).trim()
-    : query.trim();
-  const result =
-    queryClean.length > 0
-      ? db.lookup.fuzzy(queryClean, text, {
-          prefix: "<b style='color: var(--accent-foreground)'>",
-          suffix: "</b>"
-        })
-      : text;
-
-  return (
-    <span
-      dangerouslySetInnerHTML={{
-        __html: typeof result === "string" ? result : text
-      }}
-    />
-  );
-}
 
 const CommandIconMap = COMMANDS.reduce((acc, command) => {
   acc.set(command.id, command.icon);
@@ -416,10 +406,11 @@ function getCommandIcon({
 }
 
 function search(query: string) {
+  const prepared = prepareQuery(query);
   if (isCommandMode(query)) {
-    return commandSearch(query);
+    return commandSearch(prepared);
   }
-  if (query.length < 1) {
+  if (prepared.length < 1) {
     const sessions = useEditorStore.getState().get().sessions;
     return sessions
       .filter((s) => s.type !== "new")
@@ -432,14 +423,12 @@ function search(query: string) {
         };
       });
   }
-  return dbSearch(query);
+  return dbSearch(prepared);
 }
 
 function commandSearch(query: string) {
   const commands = getDefaultCommands();
-  const str = query.substring(1).trim();
-  if (str === "") return commands;
-  return commands.filter((c) => db.lookup.fuzzy(str, c.title).match);
+  return db.lookup.fuzzy(query, commands, "title", { matchOnly: true });
 }
 
 async function dbSearch(query: string) {
@@ -476,4 +465,8 @@ function getRecentCommands() {
 
 function isCommandMode(query: string) {
   return query.startsWith(">");
+}
+
+function prepareQuery(query: string) {
+  return isCommandMode(query) ? query.substring(1).trim() : query.trim();
 }

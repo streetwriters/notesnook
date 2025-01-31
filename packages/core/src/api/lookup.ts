@@ -189,20 +189,39 @@ export default class Lookup {
     ]);
   }
 
-  fuzzy(
+  fuzzy<T>(
     query: string,
-    text: string,
-    opts?: { prefix?: string; suffix?: string }
-  ) {
-    const result = match(query, text);
-    if (result.match && (opts?.prefix || opts?.suffix)) {
-      return surround(text, {
-        result: result,
-        prefix: opts.prefix,
-        suffix: opts.suffix
-      });
+    items: T[],
+    key: keyof T,
+    opts?: {
+      prefix?: string;
+      suffix?: string;
+      /**
+       * If true, only items that match the query will be returned
+       */
+      matchOnly?: boolean;
     }
-    return result;
+  ): T[] {
+    if (query === "") return items;
+    return items
+      .map((item) => {
+        const result = match(query, `${item[key]}`);
+        if (result.match) {
+          if (opts?.prefix || opts?.suffix) {
+            return {
+              ...item,
+              [key]: surround(`${item[key]}`, {
+                result: result,
+                prefix: opts?.prefix,
+                suffix: opts?.suffix
+              })
+            };
+          }
+          return item;
+        }
+        return opts?.matchOnly ? undefined : item;
+      })
+      .filter((i) => i !== undefined);
   }
 
   private search<T extends Item>(
