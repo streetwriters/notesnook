@@ -655,7 +655,7 @@ class EditorStore extends BaseStore<EditorStore> {
       addTab
     } = this.get();
     const noteId = typeof noteOrId === "string" ? noteOrId : noteOrId.id;
-    const oldTabForNote = getTabsForNote(noteId).at(0);
+    const oldTabForNote = options.force ? null : getTabsForNote(noteId).at(0);
     const tabId = options.openInNewTab
       ? addTab(getId())
       : oldTabForNote?.id || activeTabId || addTab(getId());

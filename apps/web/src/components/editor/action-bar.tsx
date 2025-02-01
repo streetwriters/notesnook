@@ -359,7 +359,7 @@ function TabStrip() {
                   type={session.type}
                   onFocus={() => {
                     if (tab.id !== currentTab) {
-                      useEditorStore.getState().focusTab(tab.id);
+                      useEditorStore.getState().activateSession(tab.sessionId);
                     }
                   }}
                   onClose={() => useEditorStore.getState().closeTabs(tab.id)}

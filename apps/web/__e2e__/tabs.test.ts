@@ -230,5 +230,27 @@ test("clicking on a note that's already opened in another tab should focus the t
   expect(await tabs[0].isActive()).toBe(true);
 });
 
+test("open a note in 2 tabs then open another note and navigate back", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note = await notes.createNote({
+    title: "Note 1"
+  });
+  await note?.contextMenu.openInNewTab();
+  await notes.editor.waitForLoading();
+  await notes.createNote({
+    title: "Note 2"
+  });
+
+  await notes.editor.goBack();
+
+  const tabs = await notes.editor.getTabs();
+  expect(await tabs[1].isActive()).toBe(true);
+  expect(await tabs[1].title()).toBe("Note 1");
+});
+
 test.skip("TODO: open a locked note, switch to another note and navigate back", () => {});
 test.skip("TODO: open a locked note, switch to another note, unlock the note and navigate back", () => {});
