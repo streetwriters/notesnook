@@ -123,7 +123,6 @@ export function syncTabs(
   type: "tabs" | "history" | "biometry" | "all" = "all"
 ) {
   const data: Partial<TabStore> = {};
-
   if (type === "tabs" || type === "all") {
     data.tabs = useTabStore.getState().tabs;
     data.currentTab = useTabStore.getState().currentTab;
@@ -199,13 +198,36 @@ export type TabStore = {
   sessionId?: string;
 };
 
+const DEFAULT_TABS = {
+  tabs: [
+    {
+      id: "679da59a3924d4bd56d16d3f",
+      session: {
+        id: "679da5a5667a16db2353a062"
+      }
+    }
+  ],
+  tabSessionHistory: {
+    "679da59a3924d4bd56d16d3f": {
+      backStack: ["679da5a5667a16db2353a062"],
+      forwardStack: [] as string[]
+    }
+  } as TabHistoryType,
+  historyNew: ["679da59a3924d4bd56d16d3f"],
+  currentTab: "679da59a3924d4bd56d16d3f"
+} as TabStore;
+
+export function resetTabStore() {
+  useTabStore.setState({
+    ...DEFAULT_TABS
+  });
+  TabSessionStorage.storage.clearStore();
+}
+
 export const useTabStore = create<TabStore>(
   persist(
     (set, get) => ({
-      tabs: [],
-      tabSessionHistory: {},
-      historyNew: [],
-      currentTab: undefined,
+      ...DEFAULT_TABS,
       newTabSession: (
         _id?: string,
         options?: Omit<Partial<TabSessionItem>, "id">
@@ -226,7 +248,11 @@ export const useTabStore = create<TabStore>(
           });
         }
 
-        const sessionId = tabSessionHistory.add(tabId, oldSessionId);
+        const sessionId =
+          oldSessionId &&
+          tabSessionHistory.currentSessionId(tabId) === oldSessionId
+            ? oldSessionId
+            : tabSessionHistory.add(tabId, oldSessionId);
 
         let session: Partial<TabSessionItem>;
 
@@ -248,7 +274,6 @@ export const useTabStore = create<TabStore>(
         const tabs = [...get().tabs];
         tabs[index] = {
           ...tabs[index],
-          ...options,
           session: session
         } as TabItem;
 
@@ -262,7 +287,6 @@ export const useTabStore = create<TabStore>(
         const index = get().tabs.findIndex((t) => t.id === id);
         if (index == -1) return;
         const tabs = [...get().tabs];
-
         const sessionId =
           options.session?.id || (tabs[index].session?.id as string);
         const updatedSession = !options.session
@@ -284,8 +308,10 @@ export const useTabStore = create<TabStore>(
         const currentTab = get().currentTab;
         if (!currentTab) return;
         if (!tabSessionHistory.canGoBack(currentTab)) return;
+
         const id = tabSessionHistory.back(currentTab) as string;
         const sessionLoaded = await get().loadSession(id);
+
         if (!sessionLoaded) {
           tabSessionHistory.remove(currentTab, id);
           TabSessionStorage.remove(id);
@@ -337,19 +363,11 @@ export const useTabStore = create<TabStore>(
           return false;
         }
 
-        const currentTab = get().currentTab;
-        if (currentTab) {
-          get().updateTab(currentTab, {
-            session: session
-          });
-        }
-
         eSendEvent(eOnLoadNote, {
           item: note,
           newNote: !note,
           tabId: get().currentTab,
-          session: session,
-          resetTabState: true
+          session: session
         });
 
         return true;
@@ -424,9 +442,7 @@ export const useTabStore = create<TabStore>(
       focusTab: (id: string) => {
         history.add(id);
         set({
-          currentTab: id
-        });
-        set({
+          currentTab: id,
           canGoBack: tabSessionHistory.canGoBack(id),
           canGoForward: tabSessionHistory.canGoForward(id),
           sessionId: tabSessionHistory.currentSessionId(id)
@@ -458,7 +474,7 @@ export const useTabStore = create<TabStore>(
       }
     }),
     {
-      name: "tabs-storage-v1",
+      name: "tabs-storage-v3",
       getStorage: () => MMKV as unknown as StateStorage,
       onRehydrateStorage: () => {
         return (state) => {

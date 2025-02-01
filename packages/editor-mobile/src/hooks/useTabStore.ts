@@ -57,10 +57,13 @@ export const useTabStore = create(
     (set, get) => ({
       tabs: [
         {
-          id: "0"
+          id: "679da59a3924d4bd56d16d3f",
+          session: {
+            id: "679da5a5667a16db2353a062"
+          }
         }
       ],
-      currentTab: "0",
+      currentTab: "679da59a3924d4bd56d16d3f",
       scrollPosition: {},
       getCurrentNoteId: () => {
         return get().tabs.find((t) => t.id === get().currentTab)?.session
@@ -68,7 +71,7 @@ export const useTabStore = create(
       }
     }),
     {
-      name: "tab-storage",
+      name: "tab-storage-v3",
       storage: createJSONStorage(() => localStorage)
     }
   )

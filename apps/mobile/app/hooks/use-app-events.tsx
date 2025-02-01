@@ -51,7 +51,10 @@ import { endProgress, startProgress } from "../components/dialogs/progress";
 import Migrate from "../components/sheets/migrate";
 import NewFeature from "../components/sheets/new-feature";
 import { Walkthrough } from "../components/walkthroughs";
-import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
+import {
+  resetTabStore,
+  useTabStore
+} from "../screens/editor/tiptap/use-tab-store";
 import {
   clearAppState,
   editorController,
@@ -222,6 +225,7 @@ const onLogout = async (reason: string) => {
   await PremiumService.setPremiumStatus();
   await BiometricService.resetCredentials();
   MMKV.clearStore();
+  resetTabStore();
   clearAllStores();
   setImmediate(() => {
     refreshAllStores();

@@ -500,7 +500,6 @@ export const useEditor = (
       blockId?: string;
       session?: TabSessionItem;
       newTab?: boolean;
-      resetTabState?: boolean;
     }) => {
       loadNoteMutex.runExclusive(async () => {
         if (!event) return;
@@ -549,7 +548,15 @@ export const useEditor = (
           // If note is already open in a tab, focus that tab.
           if (useTabStore.getState().hasTabForNote(item.id) && !event.newTab) {
             const tabId = useTabStore.getState().getTabForNote(item.id);
-            if (tabId !== useTabStore.getState().currentTab) {
+
+            const currentTab = useTabStore
+              .getState()
+              .getTab(useTabStore.getState().currentTab as string);
+
+            if (
+              currentTab?.session?.noteId !== item.id &&
+              tabId !== useTabStore.getState().currentTab
+            ) {
               useTabStore.getState().focusTab(tabId as string);
               return;
             }
@@ -566,10 +573,11 @@ export const useEditor = (
             ? event.tabId
             : useTabStore.getState().currentTab;
 
+          console.log(tabId === useTabStore.getState().currentTab);
+
           // Check if tab needs to be refreshed.
           if (!event.newTab) {
             if (
-              !event.resetTabState &&
               tabId &&
               event.item.id === useTabStore.getState().getNoteIdForTab(tabId) &&
               !localTabState.current?.needsRefresh(
@@ -628,6 +636,7 @@ export const useEditor = (
             ) {
               useTabStore.getState().newTabSession(tabId!, session);
             } else {
+              console.log("UPDATING TAB SESSION", session);
               useTabStore.getState().updateTab(tabId!, {
                 session: session
               });
