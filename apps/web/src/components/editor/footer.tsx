@@ -19,12 +19,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Button, Flex, Text } from "@theme-ui/components";
 import { SaveState, useEditorStore } from "../../stores/editor-store";
-import { Loading, Saved, NotSaved } from "../icons";
-import { useEditorConfig, useNoteStatistics } from "./manager";
+import { useStore as useAppStore } from "../../stores/app-store";
+import {
+  Loading,
+  Saved,
+  NotSaved,
+  FocusMode,
+  Plus,
+  Minus,
+  EditorNormalWidth,
+  TableOfContents,
+  ExitFullscreen,
+  Fullscreen,
+  EditorFullWidth,
+  NormalMode
+} from "../icons";
+import {
+  useEditorConfig,
+  useNoteStatistics,
+  useEditorManager
+} from "./manager";
 import { getFormattedDate } from "@notesnook/common";
 import { MAX_AUTO_SAVEABLE_WORDS } from "./types";
 import { strings } from "@notesnook/intl";
 import { EDITOR_ZOOM } from "./common";
+import { useWindowControls } from "../../hooks/use-window-controls";
 
 const SAVE_STATE_ICON_MAP = {
   "-1": NotSaved,
@@ -33,15 +52,59 @@ const SAVE_STATE_ICON_MAP = {
 };
 
 function EditorFooter() {
+  const { isFullscreen } = useWindowControls();
   const { words } = useNoteStatistics();
   const session = useEditorStore((store) => store.getActiveSession());
   const { editorConfig, setEditorConfig } = useEditorConfig();
+  const editorMargins = useEditorStore((store) => store.editorMargins);
+  const isFocusMode = useAppStore((store) => store.isFocusMode);
+
   if (!session) return null;
 
   const saveState =
     session.type === "default" ? session.saveState : SaveState.NotSaved;
   const dateEdited = "note" in session ? session.note.dateEdited : 0;
   const SaveStateIcon = SAVE_STATE_ICON_MAP[saveState];
+  const tools = [
+    {
+      title: editorMargins
+        ? strings.disableEditorMargins()
+        : strings.enableEditorMargins(),
+      icon: editorMargins ? EditorNormalWidth : EditorFullWidth,
+      enabled: true,
+      hideOnMobile: true,
+      onClick: () => useEditorStore.getState().toggleEditorMargins()
+    },
+    {
+      title: isFullscreen
+        ? strings.exitFullScreen()
+        : strings.enterFullScreen(),
+      icon: isFullscreen ? ExitFullscreen : Fullscreen,
+      enabled: true,
+      hidden: !isFocusMode,
+      hideOnMobile: true,
+      onClick: () => {
+        if (isFullscreen) {
+          exitFullscreen();
+        } else {
+          enterFullscreen(document.documentElement);
+        }
+      }
+    },
+    {
+      title: isFocusMode ? strings.normalMode() : strings.focusMode(),
+      icon: isFocusMode ? FocusMode : NormalMode,
+      enabled: true,
+      hideOnMobile: true,
+      onClick: () => {
+        useAppStore.getState().toggleFocusMode();
+        if (document.fullscreenElement) exitFullscreen();
+        const editor =
+          session && useEditorManager.getState().getEditor(session.id);
+        if (editor) editor.editor?.focus();
+      }
+    }
+  ];
 
   return (
     <Flex sx={{ alignItems: "center", justifyContent: "center", gap: 2 }}>
@@ -53,6 +116,24 @@ function EditorFooter() {
           height: "100%"
         }}
       >
+        {tools.map((tool) => (
+          <Button
+            data-test-id={tool.title}
+            disabled={!tool.enabled}
+            title={tool.title}
+            key={tool.title}
+            onClick={tool.onClick}
+            sx={{
+              py: 0,
+              px: 1,
+              height: "100%",
+              display: tool.hidden ? "none" : "block"
+            }}
+            variant="icon"
+          >
+            <tool.icon size={13} />
+          </Button>
+        ))}
         <Button
           variant="icon"
           onClick={() =>
@@ -64,9 +145,9 @@ function EditorFooter() {
             })
           }
           disabled={editorConfig.zoom <= EDITOR_ZOOM.MIN}
-          sx={{ py: 0, height: "100%" }}
+          sx={{ py: 0, px: 1, height: "100%" }}
         >
-          <b>-</b>
+          <Minus size={13} />
         </Button>
         <Text variant="subBody" sx={{ color: "paragraph" }}>
           {editorConfig.zoom}%
@@ -82,9 +163,9 @@ function EditorFooter() {
             })
           }
           disabled={editorConfig.zoom >= EDITOR_ZOOM.MAX}
-          sx={{ py: 0, height: "100%" }}
+          sx={{ py: 0, px: 1, height: "100%" }}
         >
-          <b>+</b>
+          <Plus size={13} />
         </Button>
       </Flex>
       {words.total > MAX_AUTO_SAVEABLE_WORDS ? (
@@ -139,3 +220,12 @@ function EditorFooter() {
   );
 }
 export default EditorFooter;
+
+function enterFullscreen(elem: HTMLElement) {
+  elem.requestFullscreen();
+}
+
+function exitFullscreen() {
+  if (!document.fullscreenElement) return;
+  document.exitFullscreen();
+}

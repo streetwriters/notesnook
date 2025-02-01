@@ -140,45 +140,45 @@ export function EditorActionBar() {
           activeSession.type === "readonly") &&
         showPublishView(activeSession.note, "top")
     },
-    {
-      title: editorMargins
-        ? strings.disableEditorMargins()
-        : strings.enableEditorMargins(),
-      icon: editorMargins ? EditorNormalWidth : EditorFullWidth,
-      enabled: true,
-      hideOnMobile: true,
-      onClick: () => useEditorStore.getState().toggleEditorMargins()
-    },
-    {
-      title: isFullscreen
-        ? strings.exitFullScreen()
-        : strings.enterFullScreen(),
-      icon: isFullscreen ? ExitFullscreen : Fullscreen,
-      enabled: true,
-      hidden: !isFocusMode,
-      hideOnMobile: true,
-      onClick: () => {
-        if (isFullscreen) {
-          exitFullscreen();
-        } else {
-          enterFullscreen(document.documentElement);
-        }
-      }
-    },
-    {
-      title: isFocusMode ? strings.normalMode() : strings.focusMode(),
-      icon: isFocusMode ? FocusMode : NormalMode,
-      enabled: true,
-      hideOnMobile: true,
-      onClick: () => {
-        useAppStore.getState().toggleFocusMode();
-        if (document.fullscreenElement) exitFullscreen();
-        const editor =
-          activeSession &&
-          useEditorManager.getState().getEditor(activeSession.id);
-        if (editor) editor.editor?.focus();
-      }
-    },
+    // {
+    //   title: editorMargins
+    //     ? strings.disableEditorMargins()
+    //     : strings.enableEditorMargins(),
+    //   icon: editorMargins ? EditorNormalWidth : EditorFullWidth,
+    //   enabled: true,
+    //   hideOnMobile: true,
+    //   onClick: () => useEditorStore.getState().toggleEditorMargins()
+    // },
+    // {
+    //   title: isFullscreen
+    //     ? strings.exitFullScreen()
+    //     : strings.enterFullScreen(),
+    //   icon: isFullscreen ? ExitFullscreen : Fullscreen,
+    //   enabled: true,
+    //   hidden: !isFocusMode,
+    //   hideOnMobile: true,
+    //   onClick: () => {
+    //     if (isFullscreen) {
+    //       exitFullscreen();
+    //     } else {
+    //       enterFullscreen(document.documentElement);
+    //     }
+    //   }
+    // },
+    // {
+    //   title: isFocusMode ? strings.normalMode() : strings.focusMode(),
+    //   icon: isFocusMode ? FocusMode : NormalMode,
+    //   enabled: true,
+    //   hideOnMobile: true,
+    //   onClick: () => {
+    //     useAppStore.getState().toggleFocusMode();
+    //     if (document.fullscreenElement) exitFullscreen();
+    //     const editor =
+    //       activeSession &&
+    //       useEditorManager.getState().getEditor(activeSession.id);
+    //     if (editor) editor.editor?.focus();
+    //   }
+    // },
     {
       title: strings.toc(),
       icon: TableOfContents,
