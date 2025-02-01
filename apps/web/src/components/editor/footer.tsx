@@ -49,7 +49,8 @@ function EditorFooter() {
         sx={{
           alignItems: "center",
           justifyContent: "center",
-          flex: 1
+          flex: 1,
+          height: "100%"
         }}
       >
         <Button
@@ -67,11 +68,7 @@ function EditorFooter() {
         >
           <b>-</b>
         </Button>
-        <Text
-          className="selectable"
-          variant="subBody"
-          sx={{ color: "paragraph" }}
-        >
+        <Text variant="subBody" sx={{ color: "paragraph" }}>
           {editorConfig.zoom}%
         </Text>
         <Button
