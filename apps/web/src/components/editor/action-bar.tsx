@@ -89,7 +89,6 @@ import { isMac } from "../../utils/platform";
 export function EditorActionBar() {
   const { isMaximized, isFullscreen, hasNativeWindowControls } =
     useWindowControls();
-  const editorMargins = useEditorStore((store) => store.editorMargins);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const activeTab = useEditorStore((store) => store.getActiveTab());
   const activeSession = useEditorStore((store) =>
@@ -140,45 +139,6 @@ export function EditorActionBar() {
           activeSession.type === "readonly") &&
         showPublishView(activeSession.note, "top")
     },
-    // {
-    //   title: editorMargins
-    //     ? strings.disableEditorMargins()
-    //     : strings.enableEditorMargins(),
-    //   icon: editorMargins ? EditorNormalWidth : EditorFullWidth,
-    //   enabled: true,
-    //   hideOnMobile: true,
-    //   onClick: () => useEditorStore.getState().toggleEditorMargins()
-    // },
-    // {
-    //   title: isFullscreen
-    //     ? strings.exitFullScreen()
-    //     : strings.enterFullScreen(),
-    //   icon: isFullscreen ? ExitFullscreen : Fullscreen,
-    //   enabled: true,
-    //   hidden: !isFocusMode,
-    //   hideOnMobile: true,
-    //   onClick: () => {
-    //     if (isFullscreen) {
-    //       exitFullscreen();
-    //     } else {
-    //       enterFullscreen(document.documentElement);
-    //     }
-    //   }
-    // },
-    // {
-    //   title: isFocusMode ? strings.normalMode() : strings.focusMode(),
-    //   icon: isFocusMode ? FocusMode : NormalMode,
-    //   enabled: true,
-    //   hideOnMobile: true,
-    //   onClick: () => {
-    //     useAppStore.getState().toggleFocusMode();
-    //     if (document.fullscreenElement) exitFullscreen();
-    //     const editor =
-    //       activeSession &&
-    //       useEditorManager.getState().getEditor(activeSession.id);
-    //     if (editor) editor.editor?.focus();
-    //   }
-    // },
     {
       title: strings.toc(),
       icon: TableOfContents,
@@ -748,13 +708,4 @@ function ReorderableList<T extends { id: string }>(
       </SortableContext>
     </DndContext>
   );
-}
-
-function enterFullscreen(elem: HTMLElement) {
-  elem.requestFullscreen();
-}
-
-function exitFullscreen() {
-  if (!document.fullscreenElement) return;
-  document.exitFullscreen();
 }
