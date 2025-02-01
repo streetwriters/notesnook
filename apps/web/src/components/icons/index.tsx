@@ -219,7 +219,8 @@ import {
   mdiOpenInNew,
   mdiTagOutline,
   mdiChatQuestionOutline,
-  mdiNoteRemoveOutline
+  mdiNoteRemoveOutline,
+  mdiTabPlus
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
@@ -273,7 +274,8 @@ const MDIIconWrapper = memo(
   (prev, next) =>
     prev.rotate === next.rotate &&
     prev.color === next.color &&
-    prev.title === next.title
+    prev.title === next.title &&
+    prev.size === next.size
 );
 
 export type IconProps = FlexProps & Omit<MDIIconWrapperProps, "path">;
@@ -560,3 +562,4 @@ export const ClearCache = createIcon(mdiBroom);
 export const OpenInNew = createIcon(mdiOpenInNew);
 export const Coupon = createIcon(mdiTagOutline);
 export const Support = createIcon(mdiChatQuestionOutline);
+export const NewTab = createIcon(mdiTabPlus);

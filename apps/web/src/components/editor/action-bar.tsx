@@ -29,6 +29,7 @@ import {
   FocusMode,
   Fullscreen,
   Lock,
+  NewTab,
   NormalMode,
   Note,
   NoteRemove,
@@ -107,6 +108,12 @@ export function EditorActionBar() {
   const isTablet = useTablet();
 
   const tools = [
+    {
+      title: strings.newTab(),
+      icon: NewTab,
+      enabled: true,
+      onClick: () => useEditorStore.getState().addTab()
+    },
     {
       title: strings.undo(),
       icon: Undo,
@@ -244,7 +251,10 @@ export function EditorActionBar() {
           mr:
             hasNativeWindowControls && !isMac() && !isMobile && !isTablet
               ? `calc(100vw - env(titlebar-area-width))`
-              : 0
+              : 1,
+          pl: 1,
+          borderLeft: "1px solid var(--border)",
+          flexShrink: 0
         }}
       >
         {tools.map((tool) => (
@@ -255,14 +265,13 @@ export function EditorActionBar() {
             title={tool.title}
             key={tool.title}
             sx={{
-              height: "100%",
+              p: 1,
               alignItems: "center",
               bg: "transparent",
               display: [
                 "hideOnMobile" in tool && tool.hideOnMobile ? "none" : "flex",
                 tool.hidden ? "none" : "flex"
               ],
-              borderRadius: 0,
               flexShrink: 0,
               "&:hover svg path": {
                 fill:
@@ -273,7 +282,7 @@ export function EditorActionBar() {
             }}
             onClick={tool.onClick}
           >
-            <tool.icon size={18} />
+            <tool.icon size={16} />
           </Button>
         ))}
       </Flex>
@@ -288,173 +297,172 @@ function TabStrip() {
   const canGoForward = useEditorStore((store) => store.canGoForward);
 
   return (
-    <ScrollContainer
-      className="tabsScroll"
-      suppressScrollY
-      style={{ flex: 1, height: TITLE_BAR_HEIGHT }}
-      trackStyle={() => ({
-        backgroundColor: "transparent",
-        "--ms-track-size": "6px"
-      })}
-      thumbStyle={() => ({ height: 3 })}
-      onWheel={(e) => {
-        const scrollcontainer = document.querySelector(".tabsScroll");
-        if (!scrollcontainer) return;
-        if (e.deltaY > 0) scrollcontainer.scrollLeft += 100;
-        else if (e.deltaY < 0) scrollcontainer.scrollLeft -= 100;
-      }}
-    >
+    <Flex sx={{ flex: 1 }}>
       <Flex
         sx={{
-          flex: 1,
-          height: "100%"
+          px: 1,
+          borderRight: "1px solid var(--border)",
+          alignItems: "center",
+          flexShrink: 0
         }}
-        onDoubleClick={async (e) => {
-          e.stopPropagation();
-          useEditorStore.getState().addTab();
+        onDoubleClick={(e) => e.stopPropagation()}
+      >
+        <Button
+          disabled={!canGoBack}
+          onClick={() => useEditorStore.getState().goBack()}
+          variant="secondary"
+          sx={{ p: 1, bg: "transparent" }}
+          data-test-id="go-back"
+        >
+          <ArrowLeft size={16} />
+        </Button>
+        <Button
+          disabled={!canGoForward}
+          onClick={() => useEditorStore.getState().goForward()}
+          variant="secondary"
+          sx={{ p: 1, bg: "transparent" }}
+          data-test-id="go-forward"
+        >
+          <ArrowRight size={16} />
+        </Button>
+      </Flex>
+      <ScrollContainer
+        className="tabsScroll"
+        suppressScrollY
+        style={{ flex: 1, height: TITLE_BAR_HEIGHT }}
+        trackStyle={() => ({
+          backgroundColor: "transparent",
+          "--ms-track-size": "6px"
+        })}
+        thumbStyle={() => ({ height: 3 })}
+        onWheel={(e) => {
+          const scrollcontainer = document.querySelector(".tabsScroll");
+          if (!scrollcontainer) return;
+          if (e.deltaY > 0) scrollcontainer.scrollLeft += 100;
+          else if (e.deltaY < 0) scrollcontainer.scrollLeft -= 100;
         }}
-        data-test-id="tabs"
       >
         <Flex
           sx={{
-            px: 1,
-            borderRight: "1px solid var(--border)",
-            alignItems: "center"
+            flex: 1,
+            height: "100%"
           }}
-          onDoubleClick={(e) => e.stopPropagation()}
+          onDoubleClick={async (e) => {
+            e.stopPropagation();
+            useEditorStore.getState().addTab();
+          }}
+          data-test-id="tabs"
         >
-          <Button
-            disabled={!canGoBack}
-            onClick={() => useEditorStore.getState().goBack()}
-            variant="secondary"
-            sx={{ p: 1, bg: "transparent" }}
-            data-test-id="go-back"
-          >
-            <ArrowLeft size={15} />
-          </Button>
-          <Button
-            disabled={!canGoForward}
-            onClick={() => useEditorStore.getState().goForward()}
-            variant="secondary"
-            sx={{ p: 1, bg: "transparent" }}
-            data-test-id="go-forward"
-          >
-            <ArrowRight size={15} />
-          </Button>
-        </Flex>
-        <ReorderableList
-          items={tabs}
-          moveItem={(from, to) => {
-            if (from === to) return;
-            const tabs = useEditorStore.getState().tabs.slice();
-            const isToPinned = tabs[to].pinned;
-            const [fromTab] = tabs.splice(from, 1);
+          <ReorderableList
+            items={tabs}
+            moveItem={(from, to) => {
+              if (from === to) return;
+              const tabs = useEditorStore.getState().tabs.slice();
+              const isToPinned = tabs[to].pinned;
+              const [fromTab] = tabs.splice(from, 1);
 
-            // if the tab where this tab is being dropped is pinned,
-            // let's pin our tab too.
-            if (isToPinned) {
-              fromTab.pinned = true;
-            }
-            // unpin the tab if it is moved.
-            else if (fromTab.pinned) fromTab.pinned = false;
+              // if the tab where this tab is being dropped is pinned,
+              // let's pin our tab too.
+              if (isToPinned) {
+                fromTab.pinned = true;
+              }
+              // unpin the tab if it is moved.
+              else if (fromTab.pinned) fromTab.pinned = false;
 
-            tabs.splice(to, 0, fromTab);
-            useEditorStore.setState({ tabs });
-          }}
-          renderItem={({ item: tab, index: i }) => {
-            const session = useEditorStore.getState().getSession(tab.sessionId);
-            if (!session) return null;
+              tabs.splice(to, 0, fromTab);
+              useEditorStore.setState({ tabs });
+            }}
+            renderItem={({ item: tab, index: i }) => {
+              const session = useEditorStore
+                .getState()
+                .getSession(tab.sessionId);
+              if (!session) return null;
 
-            const isUnsaved =
-              session.type === "default" &&
-              session.saveState === SaveState.NotSaved;
+              const isUnsaved =
+                session.type === "default" &&
+                session.saveState === SaveState.NotSaved;
 
-            return (
-              <Tab
-                id={tab.sessionId}
-                key={tab.sessionId}
-                title={
-                  session.title ||
-                  ("note" in session ? session.note.title : "Untitled")
-                }
-                isUnsaved={isUnsaved}
-                isActive={tab.id === currentTab}
-                isPinned={!!tab.pinned}
-                isLocked={isLockedSession(session)}
-                type={session.type}
-                onFocus={() => {
-                  if (tab.id !== currentTab) {
-                    useEditorStore.getState().focusTab(tab.id);
+              return (
+                <Tab
+                  id={tab.sessionId}
+                  key={tab.sessionId}
+                  title={
+                    session.title ||
+                    ("note" in session
+                      ? session.note.title
+                      : strings.untitled())
                   }
-                }}
-                onClose={() => useEditorStore.getState().closeTabs(tab.id)}
-                onCloseAll={() =>
-                  useEditorStore
-                    .getState()
-                    .closeTabs(
-                      ...tabs.filter((s) => !s.pinned).map((s) => s.id)
-                    )
-                }
-                onCloseOthers={() =>
-                  useEditorStore
-                    .getState()
-                    .closeTabs(
-                      ...tabs
-                        .filter((s) => s.id !== tab.id && !s.pinned)
-                        .map((s) => s.id)
-                    )
-                }
-                onCloseToTheRight={() =>
-                  useEditorStore
-                    .getState()
-                    .closeTabs(
-                      ...tabs
-                        .filter((s, index) => index > i && !s.pinned)
-                        .map((s) => s.id)
-                    )
-                }
-                onCloseToTheLeft={() =>
-                  useEditorStore
-                    .getState()
-                    .closeTabs(
-                      ...tabs
-                        .filter((s, index) => index < i && !s.pinned)
-                        .map((s) => s.id)
-                    )
-                }
-                onRevealInList={
-                  "note" in session
-                    ? () =>
-                        AppEventManager.publish(
-                          AppEvents.revealItemInList,
-                          session.note.id,
-                          true
-                        )
-                    : undefined
-                }
-                onPin={() => {
-                  useEditorStore.setState((state) => {
-                    // preview tabs can never be pinned.
-                    state.tabs[i].pinned = !tab.pinned;
-                    state.tabs.sort((a, b) =>
-                      a.pinned === b.pinned ? 0 : a.pinned ? -1 : 1
-                    );
-                  });
-                }}
-              />
-            );
-          }}
-        />
-        <Button
-          variant="secondary"
-          sx={{ p: 1, bg: "transparent", alignSelf: "center", ml: 1 }}
-          onClick={() => useEditorStore.getState().addTab()}
-          data-test-id="new-tab"
-        >
-          <Plus size={18} />
-        </Button>
-      </Flex>
-    </ScrollContainer>
+                  isUnsaved={isUnsaved}
+                  isActive={tab.id === currentTab}
+                  isPinned={!!tab.pinned}
+                  isLocked={isLockedSession(session)}
+                  type={session.type}
+                  onFocus={() => {
+                    if (tab.id !== currentTab) {
+                      useEditorStore.getState().focusTab(tab.id);
+                    }
+                  }}
+                  onClose={() => useEditorStore.getState().closeTabs(tab.id)}
+                  onCloseAll={() =>
+                    useEditorStore
+                      .getState()
+                      .closeTabs(
+                        ...tabs.filter((s) => !s.pinned).map((s) => s.id)
+                      )
+                  }
+                  onCloseOthers={() =>
+                    useEditorStore
+                      .getState()
+                      .closeTabs(
+                        ...tabs
+                          .filter((s) => s.id !== tab.id && !s.pinned)
+                          .map((s) => s.id)
+                      )
+                  }
+                  onCloseToTheRight={() =>
+                    useEditorStore
+                      .getState()
+                      .closeTabs(
+                        ...tabs
+                          .filter((s, index) => index > i && !s.pinned)
+                          .map((s) => s.id)
+                      )
+                  }
+                  onCloseToTheLeft={() =>
+                    useEditorStore
+                      .getState()
+                      .closeTabs(
+                        ...tabs
+                          .filter((s, index) => index < i && !s.pinned)
+                          .map((s) => s.id)
+                      )
+                  }
+                  onRevealInList={
+                    "note" in session
+                      ? () =>
+                          AppEventManager.publish(
+                            AppEvents.revealItemInList,
+                            session.note.id,
+                            true
+                          )
+                      : undefined
+                  }
+                  onPin={() => {
+                    useEditorStore.setState((state) => {
+                      // preview tabs can never be pinned.
+                      state.tabs[i].pinned = !tab.pinned;
+                      state.tabs.sort((a, b) =>
+                        a.pinned === b.pinned ? 0 : a.pinned ? -1 : 1
+                      );
+                    });
+                  }}
+                />
+              );
+            }}
+          />
+        </Flex>
+      </ScrollContainer>
+    </Flex>
   );
 }
 
@@ -530,8 +538,9 @@ function Tab(props: TabProps) {
       sx={{
         height: "100%",
         cursor: "pointer",
-        px: 2,
+        pl: 2,
         borderRight: "1px solid var(--border)",
+        ":last-of-type": { borderRight: 0 },
 
         transform: CSS.Transform.toString(transform),
         transition,
@@ -543,7 +552,7 @@ function Tab(props: TabProps) {
         flexShrink: 0,
         ":hover": {
           "& .closeTabButton": {
-            visibility: "visible"
+            opacity: 1
           },
           bg: isActive ? "hover-selected" : "hover"
         }
@@ -607,14 +616,13 @@ function Tab(props: TabProps) {
       {...attributes}
     >
       <Flex
-        mr={1}
         onMouseUp={(e) => {
           if (e.button == 0) onFocus();
         }}
       >
         <Icon
           data-test-id={`tab-icon${isUnsaved ? "-unsaved" : ""}`}
-          size={16}
+          size={14}
           color={
             isUnsaved ? "accent-error" : isActive ? "accent-selected" : "icon"
           }
@@ -640,7 +648,8 @@ function Tab(props: TabProps) {
           sx={{
             ":hover": { bg: "border" },
             borderRadius: "default",
-            flexShrink: 0
+            flexShrink: 0,
+            ml: 1
           }}
           size={14}
           onMouseUp={(e) => {
@@ -653,10 +662,14 @@ function Tab(props: TabProps) {
       ) : (
         <Cross
           sx={{
-            visibility: isActive && active?.id !== id ? "visible" : "hidden",
-            ":hover": { bg: "border" },
             borderRadius: "default",
-            flexShrink: 0
+            flexShrink: 0,
+            opacity: isActive || active?.id === id ? 1 : 0,
+            ml: "small",
+            mr: 1,
+            "&:hover": {
+              bg: "hover-secondary"
+            }
           }}
           onMouseUp={(e) => {
             if (e.button == 0) {
@@ -665,7 +678,7 @@ function Tab(props: TabProps) {
           }}
           className="closeTabButton"
           data-test-id={"tab-close-button"}
-          size={16}
+          size={14}
         />
       )}
     </Flex>
