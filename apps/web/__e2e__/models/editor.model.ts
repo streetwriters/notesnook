@@ -64,7 +64,7 @@ export class EditorModel {
     this.tabsList = page.locator(getTestId("tabs"));
     this.goBackButton = page.locator(getTestId("go-back"));
     this.goForwardButton = page.locator(getTestId("go-forward"));
-    this.newTabButton = page.locator(getTestId("new-tab"));
+    this.newTabButton = page.locator(getTestId("New tab"));
   }
 
   async waitForLoading(title?: string, content?: string) {

@@ -657,8 +657,8 @@ class EditorStore extends BaseStore<EditorStore> {
     const noteId = typeof noteOrId === "string" ? noteOrId : noteOrId.id;
     const oldTabForNote = getTabsForNote(noteId).at(0);
     const tabId = options.openInNewTab
-      ? addTab()
-      : oldTabForNote?.id || activeTabId || addTab();
+      ? addTab(getId())
+      : oldTabForNote?.id || activeTabId || addTab(getId());
 
     const tab = tabs.find((t) => t.id === tabId);
     const activeSession = tab && getSession(tab.sessionId);
@@ -1157,21 +1157,22 @@ class EditorStore extends BaseStore<EditorStore> {
       return session as SessionTypeMap[T[number]];
   };
 
-  addTab = () => {
+  addTab = (sessionId?: string) => {
     const id = getId();
-    const sessionId = tabSessionHistory.add(id);
+    const newSessionId = sessionId || tabSessionHistory.add(id);
     this.set((state) => {
       state.tabs.push({
         id,
-        sessionId
+        sessionId: newSessionId
       });
     });
-    this.addSession({
-      type: "new",
-      tabId: id,
-      id: sessionId,
-      saveState: SaveState.NotSaved
-    });
+    if (!sessionId)
+      this.addSession({
+        type: "new",
+        tabId: id,
+        id: newSessionId,
+        saveState: SaveState.NotSaved
+      });
     this.focusTab(id);
     return id;
   };
