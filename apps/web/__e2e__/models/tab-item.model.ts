@@ -39,6 +39,11 @@ export class TabItemModel {
     return this.locator.locator(getTestId("tab-title")).textContent();
   }
 
+  async isActive() {
+    const classList = await this.locator.getAttribute("class");
+    return !!classList?.includes("active");
+  }
+
   close() {
     return this.closeButton.click();
   }

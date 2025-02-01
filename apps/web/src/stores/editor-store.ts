@@ -572,10 +572,14 @@ class EditorStore extends BaseStore<EditorStore> {
       });
 
     if (session?.tabId) {
-      const { tabs } = this.get();
+      const { tabs, activeTabId } = this.get();
       const index = tabs.findIndex((t) => t.id === session.tabId);
       // no need to focus tab if the same session is already open
-      if (index === -1 || tabs[index].sessionId === session.id) return;
+      if (
+        index === -1 ||
+        (activeTabId === session.tabId && tabs[index].sessionId === session.id)
+      )
+        return;
       this.set((state) => (state.tabs[index].sessionId = session.id));
       if (!silent) this.focusTab(session.tabId, session.id);
     }

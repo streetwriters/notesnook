@@ -209,5 +209,26 @@ test("navigate back and forth between normal and diff session", async ({
   );
 });
 
+test("clicking on a note that's already opened in another tab should focus the tab", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note = await notes.createNote({
+    title: "Note 1"
+  });
+  await note?.contextMenu.openInNewTab();
+  await notes.editor.waitForLoading();
+  await notes.createNote({
+    title: "Note 2"
+  });
+
+  await note?.openNote();
+
+  const tabs = await notes.editor.getTabs();
+  expect(await tabs[0].isActive()).toBe(true);
+});
+
 test.skip("TODO: open a locked note, switch to another note and navigate back", () => {});
 test.skip("TODO: open a locked note, switch to another note, unlock the note and navigate back", () => {});

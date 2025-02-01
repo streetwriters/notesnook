@@ -493,7 +493,7 @@ function Tab(props: TabProps) {
         setNodeRef(el);
         activeTabRef.current = el;
       }}
-      className="tab"
+      className={`tab${isActive || active?.id === id ? " active" : ""}`}
       data-test-id={`tab-${id}`}
       sx={{
         height: "100%",
