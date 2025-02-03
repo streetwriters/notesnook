@@ -148,7 +148,7 @@ const restoreBackup = async (options: {
 
       let count = 0;
       await db.transaction(async () => {
-        let passwordOrKey: PasswordOrKey;
+        let passwordOrKey: PasswordOrKey | undefined = undefined;
         for (const path of extractedBackupFiles) {
           if (path === ".nnbackup" || path === "attachments") continue;
 
@@ -166,7 +166,7 @@ const restoreBackup = async (options: {
 
           passwordOrKey = !isEncryptedBackup
             ? ({} as PasswordOrKey)
-            : await withPassword();
+            : passwordOrKey || (await withPassword());
 
           if (
             isEncryptedBackup &&
