@@ -93,14 +93,9 @@ const features: Record<FeatureKeys, Feature> = {
         ]
       : [
           {
-            title: "Notesnook Gift Cards",
+            title: "Better tabs",
             subtitle:
-              "You can now gift Notesnook Pro to your friends and family. Gift cards are available in 1, 3, and 5-year plans at https://notesnook.com/giftcards."
-          },
-          {
-            title: "Sorted search results",
-            subtitle:
-              "Search results are now sorted by date created by default."
+              "Tabs have been overhauled to be more predictable and easier to use. Give it a try! We are sure you'll love it."
           }
         ],
     cta: {
