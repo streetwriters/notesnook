@@ -251,6 +251,7 @@ export function EditorActionBar() {
 }
 
 const TabStrip = React.memo(function TabStrip() {
+  useEditorStore((store) => store.getActiveSession()); // otherwise the tab title won't update on opening a note
   const tabs = useEditorStore((store) => store.tabs);
   const currentTab = useEditorStore((store) => store.activeTabId);
   const canGoBack = useEditorStore((store) => store.canGoBack);
@@ -345,7 +346,7 @@ const TabStrip = React.memo(function TabStrip() {
               return (
                 <Tab
                   id={tab.id}
-                  key={tab.id}
+                  key={tab.sessionId}
                   title={
                     session.title ||
                     ("note" in session
@@ -408,13 +409,13 @@ const TabStrip = React.memo(function TabStrip() {
                       : undefined
                   }
                   onPin={() => {
-                    useEditorStore.setState((state) => {
-                      // preview tabs can never be pinned.
-                      state.tabs[i].pinned = !tab.pinned;
-                      state.tabs.sort((a, b) =>
-                        a.pinned === b.pinned ? 0 : a.pinned ? -1 : 1
-                      );
-                    });
+                    const tabs = useEditorStore.getState().tabs.slice();
+                    const index = tabs.findIndex((t) => t.id === tab.id);
+                    tabs[index].pinned = !tabs[index].pinned;
+                    tabs.sort((a, b) =>
+                      a.pinned === b.pinned ? 0 : a.pinned ? -1 : 1
+                    );
+                    useEditorStore.setState({ tabs });
                   }}
                 />
               );
@@ -558,7 +559,7 @@ function Tab(props: TabProps) {
             onClick: onRevealInList,
             isHidden: !onRevealInList
           },
-          { type: "separator", key: "sep" },
+          { type: "separator", key: "sep2" },
           {
             type: "button",
             key: "pin",
@@ -606,18 +607,16 @@ function Tab(props: TabProps) {
       {isPinned ? (
         <Pin
           sx={{
-            ":hover": { bg: "border" },
             borderRadius: "default",
             flexShrink: 0,
-            ml: 1
-          }}
-          size={14}
-          onMouseUp={(e) => {
-            if (e.button == 0) {
-              e.stopPropagation();
-              onPin();
+            ml: "small",
+            mr: 1,
+            "&:hover": {
+              bg: "hover-secondary"
             }
           }}
+          size={14}
+          onClick={onPin}
         />
       ) : (
         <Cross
@@ -631,11 +630,7 @@ function Tab(props: TabProps) {
               bg: "hover-secondary"
             }
           }}
-          onMouseUp={(e) => {
-            if (e.button == 0) {
-              onClose();
-            }
-          }}
+          onClick={onClose}
           className="closeTabButton"
           data-test-id={"tab-close-button"}
           size={14}
