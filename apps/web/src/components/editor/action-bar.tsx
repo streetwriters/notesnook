@@ -573,14 +573,11 @@ function Tab(props: TabProps) {
       onAuxClick={(e) => {
         if (e.button == 1) onClose();
       }}
+      onClick={() => onFocus()}
       {...listeners}
       {...attributes}
     >
-      <Flex
-        onMouseUp={(e) => {
-          if (e.button == 0) onFocus();
-        }}
-      >
+      <Flex>
         <Icon
           data-test-id={`tab-icon${isUnsaved ? "-unsaved" : ""}`}
           size={14}

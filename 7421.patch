@@ -1,0 +1,37 @@
+From af88ee05e1620afb65c76148d347cb7efc32bded Mon Sep 17 00:00:00 2001
+From: 01zulfi <85733202+01zulfi@users.noreply.github.com>
+Date: Wed, 29 Jan 2025 12:22:32 +0500
+Subject: [PATCH] editor: fix hover styling in toolbar color buttons
+ Signed-off-by: 01zulfi <85733202+01zulfi@users.noreply.github.com>
+
+---
+ packages/editor/src/toolbar/popups/color-picker.tsx | 2 +-
+ packages/editor/src/toolbar/tools/colors.tsx        | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/packages/editor/src/toolbar/popups/color-picker.tsx b/packages/editor/src/toolbar/popups/color-picker.tsx
+index 0abca19268..34209bd550 100644
+--- a/packages/editor/src/toolbar/popups/color-picker.tsx
++++ b/packages/editor/src/toolbar/popups/color-picker.tsx
+@@ -284,7 +284,7 @@ function PaletteButton(props: PaletteButtonProps) {
+         ml: [2, 2, 1],
+         bg,
+         ":hover:not(:disabled):not(:active)": {
+-          bg: bg?.startsWith("#") ? colord(bg).darken(5).toRgbString() : "hover"
++          bg: bg?.startsWith("#") ? colord(bg).darken().toRgbString() : "hover"
+         },
+         ...sx
+       }}
+diff --git a/packages/editor/src/toolbar/tools/colors.tsx b/packages/editor/src/toolbar/tools/colors.tsx
+index 08c6b41d8a..77ea660e75 100644
+--- a/packages/editor/src/toolbar/tools/colors.tsx
++++ b/packages/editor/src/toolbar/tools/colors.tsx
+@@ -137,7 +137,7 @@ export function ColorTool(props: ColorToolProps) {
+         mr: 0,
+         bg: activeColor || "transparent",
+         ":hover:not(:disabled):not(:active)": {
+-          bg: tColor ? tColor.darken(5).toRgbString() : "transparent"
++          bg: tColor ? tColor.darken().toRgbString() : "transparent"
+         }
+       }}
+       onOpen={toggle}
