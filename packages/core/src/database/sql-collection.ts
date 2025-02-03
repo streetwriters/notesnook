@@ -476,7 +476,7 @@ export class FilteredSelector<T extends Item> {
   async *map<TReturnType>(
     fn: (item: T) => TReturnType
   ): AsyncIterableIterator<TReturnType> {
-    for await (const item of this) {
+    for await (const item of this.iterate()) {
       yield fn(item);
     }
   }
@@ -567,37 +567,43 @@ export class FilteredSelector<T extends Item> {
     );
   }
 
-  async *[Symbol.asyncIterator]() {
-    let lastRow: any | null = null;
-    const fields = this._fields.slice();
-    if (fields.length > 0) {
-      if (!fields.find((f) => f.includes(".dateCreated")))
-        fields.push("dateCreated");
-      if (!fields.find((f) => f.includes(".id"))) fields.push("id");
-    }
+  iterate() {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const thisArg = this;
+    return {
+      async *[Symbol.asyncIterator]() {
+        let lastRow: any | null = null;
+        const fields = thisArg._fields.slice();
+        if (fields.length > 0) {
+          if (!fields.find((f) => f.includes(".dateCreated")))
+            fields.push("dateCreated");
+          if (!fields.find((f) => f.includes(".id"))) fields.push("id");
+        }
 
-    while (true) {
-      const rows = await this.filter
-        .orderBy("dateCreated asc")
-        .orderBy("id asc")
-        .$if(lastRow !== null, (qb) =>
-          qb.where(
-            (eb) => eb.refTuple("dateCreated", "id"),
-            ">",
-            (eb) => eb.tuple(lastRow.dateCreated, lastRow.id)
-          )
-        )
-        .limit(this.batchSize)
-        .$if(fields.length === 0, (eb) => eb.selectAll())
-        .$if(fields.length > 0, (eb) => eb.select(fields))
-        .execute();
-      if (rows.length === 0) break;
-      for (const row of rows) {
-        yield row as T;
+        while (true) {
+          const rows = await thisArg.filter
+            .orderBy("dateCreated asc")
+            .orderBy("id asc")
+            .$if(lastRow !== null, (qb) =>
+              qb.where(
+                (eb) => eb.refTuple("dateCreated", "id"),
+                ">",
+                (eb) => eb.tuple(lastRow.dateCreated, lastRow.id)
+              )
+            )
+            .limit(thisArg.batchSize)
+            .$if(fields.length === 0, (eb) => eb.selectAll())
+            .$if(fields.length > 0, (eb) => eb.select(fields))
+            .execute();
+          if (rows.length === 0) break;
+          for (const row of rows) {
+            yield row as T;
+          }
+
+          lastRow = rows[rows.length - 1];
+        }
       }
-
-      lastRow = rows[rows.length - 1];
-    }
+    };
   }
 
   private buildSortExpression(options: GroupOptions, hasDueDate?: boolean) {

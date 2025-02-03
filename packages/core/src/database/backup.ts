@@ -361,7 +361,7 @@ export default class Backup {
       };
 
       let current = 0;
-      for await (const attachment of this.db.attachments.all) {
+      for await (const attachment of this.db.attachments.all.iterate()) {
         current++;
         if (
           !(await this.db
