@@ -205,9 +205,18 @@ const Tiptap = ({
         if (tabRef.current.session?.noteId) {
           clearTimeout(noteStateUpdateTimer.current);
           noteStateUpdateTimer.current = setTimeout(() => {
-            const { to, from } =
-              editors[tabRef.current?.id]?.state.selection || {};
-          }, 500);
+            post(
+              EditorEvents.saveScroll,
+              {
+                selection: {
+                  to: editors[tabRef.current.id]?.state.selection.to,
+                  from: editors[tabRef.current.id]?.state.selection.from
+                }
+              },
+              tabRef.current.id,
+              tabRef.current.session?.noteId
+            );
+          }, 300);
         }
       },
       onCreate() {
@@ -547,7 +556,7 @@ const Tiptap = ({
             </>
           )}
 
-          {controller.loading || tab.session?.locked ? (
+          {controller.loading || tab.session?.noteLocked ? (
             <div
               style={{
                 width: "100%",
@@ -559,13 +568,15 @@ const Tiptap = ({
                 paddingLeft: 12,
                 display: "flex",
                 flexDirection: "column",
-                alignItems: tab.session?.locked ? "center" : "flex-start",
-                justifyContent: tab.session?.locked ? "center" : "flex-start",
+                alignItems: tab.session?.noteLocked ? "center" : "flex-start",
+                justifyContent: tab.session?.noteLocked
+                  ? "center"
+                  : "flex-start",
                 boxSizing: "border-box",
                 rowGap: 10
               }}
             >
-              {tab.session?.locked ? (
+              {tab.session?.noteLocked ? (
                 <>
                   <p
                     style={{
@@ -605,7 +616,9 @@ const Tiptap = ({
                     style={{
                       display: "flex",
                       flexDirection: "column",
-                      rowGap: 10
+                      rowGap: 10,
+                      justifyContent: "center",
+                      alignItems: "center"
                     }}
                   >
                     <input

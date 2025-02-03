@@ -738,35 +738,37 @@ export const useEditor = (
         lock.current = true;
 
         // Handle this case where note was locked on another device and synced.
-        const locked = note
+        let locked = note
           ? await db.vaults.itemExists(note as ItemReference)
           : false;
+
+        if (data.type === "tiptap") {
+          locked = data.locked;
+        }
 
         useTabStore.getState().forEachNoteTab(noteId, async (tab) => {
           const tabId = tab.id;
 
+          let didUnlock = false;
+
           if (note) {
             if (!locked && tab?.session?.noteLocked) {
-              // Note lock removed.
-              if (tab.session?.locked) {
-                if (useTabStore.getState().currentTab === tabId) {
-                  eSendEvent(eOnLoadNote, {
-                    item: note
-                  });
-                } else {
-                  useTabStore.getState().updateTab(tabId, {
-                    session: {
-                      locked: false,
-                      noteLocked: false
-                    }
-                  });
+              if (tab?.session?.noteLocked || tab?.session?.locked) {
+                if (useTabStore.getState().currentTab !== tabId) {
                   localTabState.current?.set(tabId, {
                     editedAt: 0
                   });
                 }
+
+                didUnlock = true;
+                useTabStore.getState().updateTab(tabId, {
+                  session: {
+                    locked: false,
+                    noteLocked: false
+                  }
+                });
               }
             } else if (!tab?.session?.noteLocked && locked) {
-              // Note lock added.
               useTabStore.getState().updateTab(tabId, {
                 session: {
                   locked: true,
@@ -782,18 +784,24 @@ export const useEditor = (
               });
             }
 
-            if (currentNotes.current[noteId]?.title !== note.title) {
+            if (
+              currentNotes.current[noteId]?.title !== note.title ||
+              didUnlock
+            ) {
               postMessage(NativeEvents.title, note.title, tabId);
             }
             commands.setTags(note);
-            if (currentNotes.current[noteId]?.dateEdited !== note.dateEdited) {
+            if (
+              currentNotes.current[noteId]?.dateEdited !== note.dateEdited ||
+              didUnlock
+            ) {
               commands.setStatus(
                 getFormattedDate(note.dateEdited, "date-time"),
                 strings.saved(),
                 tabId as string
               );
             }
-            if (tab.session?.readonly !== note.readonly) {
+            if (tab.session?.readonly !== note.readonly || didUnlock) {
               useTabStore.getState().updateTab(tabId, {
                 session: {
                   readonly: note.readonly
@@ -803,7 +811,10 @@ export const useEditor = (
           }
 
           if (data.type === "tiptap" && note && !isLocal) {
-            if (lastContentChangeTime.current[noteId] >= data.dateModified) {
+            if (
+              lastContentChangeTime.current[noteId] >= data.dateModified &&
+              !didUnlock
+            ) {
               return;
             }
 
@@ -823,18 +834,35 @@ export const useEditor = (
               } else {
                 await postMessage(
                   NativeEvents.updatehtml,
-                  decryptedContent.data,
+                  {
+                    data: decryptedContent.data,
+                    selection: tab.session?.selection,
+                    scrollTop: tab.session?.scrollTop
+                  },
                   tabId
                 );
                 currentContents.current[note.id] = decryptedContent;
               }
             } else {
               const _nextContent = data.data;
-              if (_nextContent === currentContents.current[note.id]?.data) {
+              if (
+                _nextContent === currentContents.current[note.id]?.data &&
+                !didUnlock
+              ) {
                 return;
               }
+
               lastContentChangeTime.current[note.id] = note.dateEdited;
-              await postMessage(NativeEvents.updatehtml, _nextContent, tabId);
+              console.log(tab.session?.selection);
+              await postMessage(
+                NativeEvents.updatehtml,
+                {
+                  data: _nextContent,
+                  selection: tab.session?.selection,
+                  scrollTop: tab.session?.scrollTop
+                },
+                tabId
+              );
               if (!isEncryptedContent(data)) {
                 currentContents.current[note.id] =
                   data as UnencryptedContentItem;
