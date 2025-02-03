@@ -344,8 +344,8 @@ function TabStrip() {
 
               return (
                 <Tab
-                  id={tab.sessionId}
-                  key={tab.sessionId}
+                  id={tab.id}
+                  key={tab.id}
                   title={
                     session.title ||
                     ("note" in session
