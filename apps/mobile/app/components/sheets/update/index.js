@@ -43,7 +43,7 @@ export const Update = ({ version: appVersion, fwdRef }) => {
   let notes = version?.notes
     ? version.notes.replace("Thank you for using Notesnook!", "").split("- ")
     : ["Bug fixes and performance improvements"];
-  notes = notes?.map((n) => n.replace(/\n/g, ""));
+  notes = notes?.map((n) => n.replace(/\n|<br>/g, ""));
   const isGithubRelease = Config.GITHUB_RELEASE === "true";
 
   const getSupportedAbi = () => {
@@ -178,18 +178,20 @@ export const Update = ({ version: appVersion, fwdRef }) => {
                 {version.body}
               </Paragraph>
             ) : null}
-            {notes.map((item) => (
-              <Paragraph
-                key={item}
-                color={colors.secondary.paragraph}
-                style={{
-                  marginBottom: 5
-                }}
-                selectable
-              >
-                • {item}
-              </Paragraph>
-            ))}
+            {notes.map((item) =>
+              item && item !== "" ? (
+                <Paragraph
+                  key={item}
+                  color={colors.secondary.paragraph}
+                  style={{
+                    marginBottom: 5
+                  }}
+                  selectable
+                >
+                  • {item}
+                </Paragraph>
+              ) : null
+            )}
           </ScrollView>
           <Seperator />
           <Button
