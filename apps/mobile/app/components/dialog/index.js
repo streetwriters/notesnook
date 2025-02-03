@@ -110,6 +110,7 @@ export const Dialog = ({ context = "global" }) => {
     setChecked(false);
     values.current.inputValue = undefined;
     setVisible(false);
+    dialogInfo.onClose();
   };
 
   const onNegativePress = async () => {
