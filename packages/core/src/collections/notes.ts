@@ -285,31 +285,32 @@ export class Notes implements ICollection {
     const { format, rawContent } = options;
 
     const contentString =
-      rawContent ||
-      (await (async () => {
-        let contentItem = options.contentItem;
-        if (!contentItem) {
-          const rawContent = await this.db.content.findByNoteId(note.id);
-          if (rawContent && rawContent.locked) return false;
-          contentItem = rawContent || EMPTY_CONTENT(note.id);
-        }
+      rawContent === undefined
+        ? await (async () => {
+            let contentItem = options.contentItem;
+            if (!contentItem) {
+              const rawContent = await this.db.content.findByNoteId(note.id);
+              if (rawContent && rawContent.locked) return false;
+              contentItem = rawContent || EMPTY_CONTENT(note.id);
+            }
 
-        const { data, type } =
-          options?.embedMedia && format !== "txt"
-            ? await this.db.content.downloadMedia(
-                `export-${note.id}`,
-                contentItem,
-                false
-              )
-            : contentItem;
-        const content = await getContentFromData(type, data);
-        return format === "html"
-          ? content.toHTML()
-          : format === "md"
-          ? content.toMD()
-          : content.toTXT();
-      })());
-    if (!contentString) return false;
+            const { data, type } =
+              options?.embedMedia && format !== "txt"
+                ? await this.db.content.downloadMedia(
+                    `export-${note.id}`,
+                    contentItem,
+                    false
+                  )
+                : contentItem;
+            const content = await getContentFromData(type, data);
+            return format === "html"
+              ? content.toHTML()
+              : format === "md"
+              ? content.toMD()
+              : content.toTXT();
+          })()
+        : rawContent;
+    if (contentString === false) return false;
 
     const tags = (await this.db.relations.to(note, "tag").resolve()).map(
       (tag) => tag.title
