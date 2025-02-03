@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Button, Flex, Text } from "@theme-ui/components";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -250,7 +250,7 @@ export function EditorActionBar() {
   );
 }
 
-function TabStrip() {
+const TabStrip = React.memo(function TabStrip() {
   const tabs = useEditorStore((store) => store.tabs);
   const currentTab = useEditorStore((store) => store.activeTabId);
   const canGoBack = useEditorStore((store) => store.canGoBack);
@@ -424,7 +424,7 @@ function TabStrip() {
       </ScrollContainer>
     </Flex>
   );
-}
+});
 
 type TabProps = {
   id: string;
