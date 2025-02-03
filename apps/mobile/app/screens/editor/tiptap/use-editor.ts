@@ -636,7 +636,6 @@ export const useEditor = (
             ) {
               useTabStore.getState().newTabSession(tabId!, session);
             } else {
-              console.log("UPDATING TAB SESSION", session);
               useTabStore.getState().updateTab(tabId!, {
                 session: session
               });
