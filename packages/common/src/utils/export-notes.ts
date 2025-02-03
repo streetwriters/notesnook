@@ -72,7 +72,9 @@ export async function* exportNotes(
   const pathTree = new PathTree();
   const notePathMap: Map<string, string[]> = new Map();
 
-  for await (const note of notes.fields(["notes.id", "notes.title"])) {
+  for await (const note of notes
+    .fields(["notes.id", "notes.title"])
+    .iterate()) {
     const filename = `${sanitizeFilename(note.title || "Untitled", {
       replacement: "-"
     })}.${FORMAT_TO_EXT[format]}`;

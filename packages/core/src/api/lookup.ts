@@ -184,7 +184,7 @@ export default class Lookup {
   ) {
     const results: Map<string, number> = new Map();
     const columns = fields.map((f) => f.column);
-    for await (const item of selector.fields(columns)) {
+    for await (const item of selector.fields(columns).iterate()) {
       if (limit && results.size >= limit) break;
 
       for (const field of fields) {
