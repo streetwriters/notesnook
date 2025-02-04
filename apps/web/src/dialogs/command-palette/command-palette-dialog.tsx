@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { debounce, toTitleCase } from "@notesnook/common";
 import { Box, Button, Flex, Text } from "@theme-ui/components";
 import React, { useEffect, useRef, useState } from "react";
+import Skeleton from "react-loading-skeleton";
 import { GroupedVirtuoso, GroupedVirtuosoHandle } from "react-virtuoso";
 import { db } from "../../common/db";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
@@ -42,6 +43,7 @@ import { commands as COMMANDS } from "./commands";
 interface Command {
   id: string;
   title: string;
+  highlightedTitle?: string;
   type: "command" | "note" | "notebook" | "tag" | "reminder";
   group: string;
 }
@@ -53,6 +55,7 @@ export const CommandPaletteDialog = DialogManager.register(
     const [commands, setCommands] = useState<Command[]>(getDefaultCommands());
     const [selected, setSelected] = useState(0);
     const [query, setQuery] = useState(">");
+    const [loading, setLoading] = useState(false);
     const virtuosoRef = useRef<GroupedVirtuosoHandle>(null);
 
     useEffect(() => {
@@ -67,17 +70,22 @@ export const CommandPaletteDialog = DialogManager.register(
       setSelected(0);
       const query = e.target.value;
       setQuery(query);
+      !isCommandMode(query) && setLoading(true);
       const res = await search(query);
       const highlighted = db.lookup.fuzzy(
         prepareQuery(query),
-        res ?? [],
-        "title",
+        res.map((r) => ({
+          ...r,
+          highlightedTitle: r.title
+        })) ?? [],
+        "highlightedTitle",
         {
           prefix: "<b style='color: var(--accent-foreground)'>",
           suffix: "</b>"
         }
       );
       setCommands(highlighted ?? []);
+      setLoading(false);
     }
 
     const grouped = commands.reduce((acc, command) => {
@@ -144,130 +152,136 @@ export const CommandPaletteDialog = DialogManager.register(
             </Box>
           )}
           <Box sx={{ marginY: "10px", height: "100%" }}>
-            <GroupedVirtuoso
-              ref={virtuosoRef}
-              style={{ overflow: "hidden" }}
-              components={{
-                Scroller: CustomScrollbarsVirtualList
-              }}
-              groupCounts={grouped.map((g) => g.count)}
-              groupContent={(groupIndex) => (
-                <Box
-                  sx={{
-                    width: "100%",
-                    py: 0.5,
-                    bg: "background",
-                    px: 1,
-                    borderRadius: "2px"
-                  }}
-                >
-                  <Text variant="subBody" bg="">
-                    {toTitleCase(grouped[groupIndex].group)}
-                  </Text>
-                </Box>
-              )}
-              itemContent={(index) => {
-                const command = commands[index];
-                if (!command) return null;
-
-                const Icon = getCommandIcon({
-                  id: command.id,
-                  type: command.type
-                });
-
-                return (
-                  <Flex
+            {loading ? (
+              <Skeleton height={20} count={10} />
+            ) : (
+              <GroupedVirtuoso
+                ref={virtuosoRef}
+                style={{ overflow: "hidden" }}
+                components={{
+                  Scroller: CustomScrollbarsVirtualList
+                }}
+                groupCounts={grouped.map((g) => g.count)}
+                groupContent={(groupIndex) => (
+                  <Box
                     sx={{
-                      flexDirection: "row",
-                      gap: 1,
-                      alignItems: "center"
+                      width: "100%",
+                      py: 0.5,
+                      bg: "background",
+                      px: 1,
+                      borderRadius: "2px"
                     }}
                   >
-                    <Button
-                      title={command.title}
-                      key={index}
-                      onClick={() => {
-                        const action = getCommandAction({
-                          id: command.id,
-                          type: command.type
-                        });
-                        if (action) {
-                          action(command.id);
-                          addRecentCommand(command);
-                          props.onClose(false);
-                        }
-                      }}
+                    <Text variant="subBody" bg="">
+                      {toTitleCase(grouped[groupIndex].group)}
+                    </Text>
+                  </Box>
+                )}
+                itemContent={(index) => {
+                  const command = commands[index];
+                  if (!command) return null;
+
+                  const Icon = getCommandIcon({
+                    id: command.id,
+                    type: command.type
+                  });
+
+                  return (
+                    <Flex
                       sx={{
-                        display: "flex",
                         flexDirection: "row",
-                        alignItems: "center",
-                        width: "100%",
-                        gap: 2,
-                        py: 1,
-                        bg: index === selected ? "hover" : "transparent",
-                        ".chip": {
-                          bg:
-                            index === selected
-                              ? "color-mix(in srgb, var(--accent) 20%, transparent)"
-                              : "var(--background-secondary)"
-                        },
-                        ":hover:not(:disabled):not(:active)": {
-                          bg: "hover"
-                        }
+                        gap: 1,
+                        alignItems: "center"
                       }}
                     >
-                      {Icon && (
-                        <Icon
-                          size={18}
-                          color={index === selected ? "icon-selected" : "icon"}
-                        />
-                      )}
-                      {["note", "notebook", "reminder", "tag"].includes(
-                        command.type
-                      ) ? (
-                        <Text
-                          className="chip"
-                          sx={{
-                            px: 1,
-                            borderRadius: "4px",
-                            border: "1px solid",
-                            borderColor: "border"
-                          }}
-                          dangerouslySetInnerHTML={{
-                            __html: command.title
-                          }}
-                        />
-                      ) : (
-                        <Text
-                          dangerouslySetInnerHTML={{
-                            __html: command.title
-                          }}
-                        />
-                      )}
-                    </Button>
-                    {command.group === "recent" && (
                       <Button
-                        title="Remove from recent"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeRecentCommand(command.id);
-                          setCommands((commands) =>
-                            commands.filter((c) => c.id !== command.id)
-                          );
+                        title={command.title}
+                        key={index}
+                        onClick={() => {
+                          const action = getCommandAction({
+                            id: command.id,
+                            type: command.type
+                          });
+                          if (action) {
+                            action(command.id);
+                            addRecentCommand(command);
+                            props.onClose(false);
+                          }
                         }}
-                        variant="icon"
                         sx={{
-                          p: 1,
-                          mr: 1
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center",
+                          width: "100%",
+                          gap: 2,
+                          py: 1,
+                          bg: index === selected ? "hover" : "transparent",
+                          ".chip": {
+                            bg:
+                              index === selected
+                                ? "color-mix(in srgb, var(--accent) 20%, transparent)"
+                                : "var(--background-secondary)"
+                          },
+                          ":hover:not(:disabled):not(:active)": {
+                            bg: "hover"
+                          }
                         }}
                       >
-                        <Cross size={14} />
+                        {Icon && (
+                          <Icon
+                            size={18}
+                            color={
+                              index === selected ? "icon-selected" : "icon"
+                            }
+                          />
+                        )}
+                        {["note", "notebook", "reminder", "tag"].includes(
+                          command.type
+                        ) ? (
+                          <Text
+                            className="chip"
+                            sx={{
+                              px: 1,
+                              borderRadius: "4px",
+                              border: "1px solid",
+                              borderColor: "border"
+                            }}
+                            dangerouslySetInnerHTML={{
+                              __html: command?.highlightedTitle ?? command.title
+                            }}
+                          />
+                        ) : (
+                          <Text
+                            dangerouslySetInnerHTML={{
+                              __html: command?.highlightedTitle ?? command.title
+                            }}
+                          />
+                        )}
                       </Button>
-                    )}
-                  </Flex>
-                );
-              }}
-            />
+                      {command.group === "recent" && (
+                        <Button
+                          title="Remove from recent"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeRecentCommand(command.id);
+                            setCommands((commands) =>
+                              commands.filter((c) => c.id !== command.id)
+                            );
+                          }}
+                          variant="icon"
+                          sx={{
+                            p: 1,
+                            mr: 1
+                          }}
+                        >
+                          <Cross size={14} />
+                        </Button>
+                      )}
+                    </Flex>
+                  );
+                }}
+              />
+            )}
           </Box>
         </Flex>
         <Flex
@@ -317,6 +331,7 @@ function addRecentCommand(command: Command) {
   }
   commands.unshift({
     ...command,
+    highlightedTitle: undefined,
     group: "recent"
   });
   if (commands.length > 3) {
