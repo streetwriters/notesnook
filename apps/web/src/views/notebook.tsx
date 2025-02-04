@@ -148,7 +148,10 @@ function SubNotebooks({ rootId, isCollapsed, onClick }: SubNotebooksProps) {
   const toggleSelection = useSelectionStore(
     (store) => store.toggleSelectionMode
   );
-  const rootNotebook = usePromise(() => db.notebooks.notebook(rootId));
+  const rootNotebook = usePromise(
+    () => db.notebooks.notebook(rootId),
+    [rootId]
+  );
   const notebooks = useNotebookStore((store) => store.notebooks);
 
   useEffect(() => {
