@@ -148,7 +148,6 @@ export const CommandPaletteDialog = DialogManager.register(
               ref={virtuosoRef}
               style={{ overflow: "hidden" }}
               components={{
-                // @ts-expect-error - fix ts error
                 Scroller: CustomScrollbarsVirtualList
               }}
               groupCounts={grouped.map((g) => g.count)}
@@ -156,9 +155,10 @@ export const CommandPaletteDialog = DialogManager.register(
                 <Box
                   sx={{
                     width: "100%",
-                    bg: "var(--background-secondary)",
-                    p: 1,
-                    borderRadius: "4px"
+                    py: 0.5,
+                    bg: "background",
+                    px: 1,
+                    borderRadius: "2px"
                   }}
                 >
                   <Text variant="subBody" bg="">
