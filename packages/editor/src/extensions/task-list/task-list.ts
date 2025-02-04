@@ -57,7 +57,8 @@ export const TaskListNode = TaskList.extend({
         rendered: false,
         parseHTML: (element) => {
           // do not update stats for nested task lists
-          if (!!element.closest("ul")) return { checked: 0, total: 0 };
+          if (element.parentElement?.closest("ul"))
+            return { checked: 0, total: 0 };
           const total = element.querySelectorAll("li.checklist--item").length;
           const checked = element.querySelectorAll(
             "li.checklist--item.checked"
