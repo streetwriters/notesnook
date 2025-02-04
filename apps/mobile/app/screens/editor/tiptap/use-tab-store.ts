@@ -358,8 +358,8 @@ export const useTabStore = create<TabStore>(
 
         if (note) {
           const isLocked = await db.vaults.itemExists(note);
+          session.noteLocked = isLocked;
           session.locked = isLocked;
-          session.noteLocked = isLocked && !session?.noteLocked;
 
           session.readonly = note.readonly;
         } else if (session.noteId) {
