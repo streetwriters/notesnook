@@ -112,14 +112,19 @@ const AppLockedOverlay = () => {
     if (
       !biometricsAuthEnabled ||
       !(await BiometricService.isBiometryAvailable())
-    )
+    ) {
       return;
+    }
 
     biometricUnlockAwaitingUserInput.current = true;
 
     if (Platform.OS === "android") {
       const activityName = await NotesnookModule.getActivityName();
-      if (activityName !== "MainActivity") return;
+      if (
+        activityName !== "MainActivity" &&
+        activityName !== "NotePreviewConfigureActivity"
+      )
+        return;
     }
     useSettingStore.getState().setRequestBiometrics(true);
 
@@ -180,7 +185,6 @@ const AppLockedOverlay = () => {
         DatabaseLogger.info("Locking app on entering foreground");
         useUserStore.getState().lockApp(true);
       }
-
       if (
         !(
           biometricUnlockAwaitingUserInput.current ||
