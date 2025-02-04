@@ -650,15 +650,19 @@ class EditorStore extends BaseStore<EditorStore> {
       tabs,
       activateSession,
       activeTabId,
+      getActiveTab,
       rehydrateSession,
       getTabsForNote,
       addTab
     } = this.get();
     const noteId = typeof noteOrId === "string" ? noteOrId : noteOrId.id;
     const oldTabForNote = options.force ? null : getTabsForNote(noteId).at(0);
-    const tabId = options.openInNewTab
-      ? addTab(getId())
-      : oldTabForNote?.id || activeTabId || addTab(getId());
+    const activeTab = getActiveTab();
+    const tabId =
+      // if a tab is pinned then always open a new tab.
+      options.openInNewTab || activeTab?.pinned
+        ? addTab(getId())
+        : oldTabForNote?.id || activeTabId || addTab(getId());
 
     const tab = tabs.find((t) => t.id === tabId);
     const activeSession = tab && getSession(tab.sessionId);
@@ -1188,6 +1192,26 @@ class EditorStore extends BaseStore<EditorStore> {
     return id;
   };
 
+  pinTab = (tabId: string) => {
+    const { tabs: _tabs, activeTabId } = this.get();
+    const tabs = _tabs.slice();
+    const index = tabs.findIndex((t) => t.id === tabId);
+    if (index === -1) return;
+
+    tabs[index].pinned = !tabs[index].pinned;
+    const disableNavigation = activeTabId === tabId && tabs[index].pinned;
+
+    useEditorStore.setState({
+      tabs: tabs.sort((a, b) =>
+        a.pinned === b.pinned ? 0 : a.pinned ? -1 : 1
+      ),
+      canGoBack: disableNavigation ? false : tabSessionHistory.canGoBack(tabId),
+      canGoForward: disableNavigation
+        ? false
+        : tabSessionHistory.canGoForward(tabId)
+    });
+  };
+
   focusTab = (tabId: string | undefined, sessionId?: string) => {
     if (!tabId) return;
 
@@ -1195,14 +1219,14 @@ class EditorStore extends BaseStore<EditorStore> {
     if (history.includes(tabId)) history.splice(history.indexOf(tabId), 1);
     history.push(tabId);
 
+    const tab = this.get().tabs.find((t) => t.id === tabId);
     this.set({
       activeTabId: tabId,
-      canGoBack: tabSessionHistory.canGoBack(tabId),
-      canGoForward: tabSessionHistory.canGoForward(tabId)
+      canGoBack: !tab?.pinned && tabSessionHistory.canGoBack(tabId),
+      canGoForward: !tab?.pinned && tabSessionHistory.canGoForward(tabId)
     });
 
-    sessionId =
-      sessionId || this.get().tabs.find((t) => t.id === tabId)?.sessionId;
+    sessionId = sessionId || tab?.sessionId;
     if (sessionId) this.rehydrateSession(sessionId);
   };
 }
