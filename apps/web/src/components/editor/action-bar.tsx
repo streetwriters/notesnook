@@ -408,15 +408,7 @@ const TabStrip = React.memo(function TabStrip() {
                           )
                       : undefined
                   }
-                  onPin={() => {
-                    const tabs = useEditorStore.getState().tabs.slice();
-                    const index = tabs.findIndex((t) => t.id === tab.id);
-                    tabs[index].pinned = !tabs[index].pinned;
-                    tabs.sort((a, b) =>
-                      a.pinned === b.pinned ? 0 : a.pinned ? -1 : 1
-                    );
-                    useEditorStore.setState({ tabs });
-                  }}
+                  onPin={() => useEditorStore.getState().pinTab(tab.id)}
                 />
               );
             }}
