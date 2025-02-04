@@ -50,6 +50,7 @@ import { MMKV } from "../common/database/mmkv";
 import { endProgress, startProgress } from "../components/dialogs/progress";
 import Migrate from "../components/sheets/migrate";
 import NewFeature from "../components/sheets/new-feature";
+import ReminderSheet from "../components/sheets/reminder";
 import { Walkthrough } from "../components/walkthroughs";
 import {
   resetTabStore,
@@ -58,7 +59,8 @@ import {
 import {
   clearAppState,
   editorController,
-  editorState
+  editorState,
+  setAppState
 } from "../screens/editor/tiptap/utils";
 import { useDragState } from "../screens/settings/editor/state";
 import BackupService from "../services/backup";
@@ -69,7 +71,6 @@ import {
   eSubscribeEvent,
   presentSheet
 } from "../services/event-manager";
-import { IntentService } from "../services/intent";
 import {
   clearMessage,
   setEmailVerifyMessage,
@@ -98,7 +99,6 @@ import {
   eLoginSessionExpired,
   eOnLoadNote,
   eOpenAnnouncementDialog,
-  eUnlockNote,
   eUserLoggedIn,
   refreshNotesPage
 } from "../utils/events";
@@ -106,7 +106,6 @@ import { getGithubVersion } from "../utils/github-version";
 import { tabBarRef } from "../utils/global-refs";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { sleep } from "../utils/time";
-import ReminderSheet from "../components/sheets/reminder";
 
 const onCheckSyncStatus = async (type: SyncStatusEvent) => {
   const { disableSync, disableAutoSync } = SettingsService.get();
@@ -162,7 +161,6 @@ const onUserSessionExpired = async () => {
 const onAppOpenedFromURL = async (event: { url: string }) => {
   const url = event.url;
 
-  console.log("URL", url);
   try {
     if (url.startsWith("https://app.notesnook.com/account/verified")) {
       await onUserEmailVerified();
@@ -751,13 +749,15 @@ export const useAppEvents = () => {
       setTimeout(() => {
         sub = AppState.addEventListener("change", onAppStateChanged);
         if (
-          refValues.current.initialUrl?.startsWith(
-            "https://app.notesnook.com/account/verified"
-          )
+          refValues.current.initialUrl &&
+          !refValues.current.initialUrl?.includes("open_note")
         ) {
-          onUserEmailVerified();
+          onAppOpenedFromURL({
+            url: refValues.current.initialUrl!
+          });
         }
       }, 1000);
+
       refValues.current.removeInternetStateListener = NetInfo.addEventListener(
         onInternetStateChanged
       );

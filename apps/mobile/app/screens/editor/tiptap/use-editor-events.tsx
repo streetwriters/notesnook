@@ -613,7 +613,7 @@ export const useEditorEvents = (
         }
         case EditorEvents.tabFocused: {
           eSendEvent(eEditorTabFocused, editorMessage.tabId);
-
+          if (!editor.state.current.initialLoadCalled) break;
           if (editorMessage.noteId) {
             if (!useSettingStore.getState().isAppLoading) {
               const note = await db.notes.note(editorMessage.noteId);

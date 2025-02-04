@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -44,10 +45,6 @@ import useNavigationStore from "../stores/use-navigation-store";
 import { useSelectionStore } from "../stores/use-selection-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { rootNavigatorRef } from "../utils/global-refs";
-import { strings } from "@notesnook/intl";
-import { IntentService } from "../services/intent";
-import ReminderSheet from "../components/sheets/reminder";
-import { db } from "../common/database";
 
 const NativeStack = createNativeStackNavigator();
 const IntroStack = createNativeStackNavigator();
@@ -86,17 +83,6 @@ const _Tabs = () => {
   React.useEffect(() => {
     setTimeout(async () => {
       useNavigationStore.getState().update(homepage);
-      const intent = IntentService.getLaunchIntent();
-      if (intent && intent["com.streetwriters.notesnook.OpenReminderId"]) {
-        const reminder = await db.reminders.reminder(
-          intent["com.streetwriters.notesnook.OpenReminderId"]
-        );
-        if (reminder) {
-          ReminderSheet.present(reminder);
-        }
-      } else if (intent["com.streetwriters.notesnook.NewReminder"]) {
-        ReminderSheet.present();
-      }
     }, 1000);
   }, [homepage]);
 

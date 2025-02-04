@@ -39,7 +39,6 @@ import SettingsService from "./services/settings";
 import { TipManager } from "./services/tip-manager";
 import { useThemeStore } from "./stores/use-theme-store";
 import { useUserStore } from "./stores/use-user-store";
-import { IntentService } from "./services/intent";
 
 I18nManager.allowRTL(false);
 I18nManager.forceRTL(false);
@@ -49,7 +48,6 @@ if (appLockEnabled || appLockMode !== "none") {
   useUserStore.getState().lockApp(true);
 }
 
-IntentService.onLaunch();
 const App = (props: { configureMode: "note-preview" }) => {
   useAppEvents();
   //@ts-ignore
