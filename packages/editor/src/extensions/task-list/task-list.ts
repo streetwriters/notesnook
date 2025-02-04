@@ -63,7 +63,6 @@ export const TaskListNode = TaskList.extend({
           const checked = element.querySelectorAll(
             "li.checklist--item.checked"
           ).length;
-
           return { checked, total };
         }
       },
