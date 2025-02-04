@@ -29,14 +29,14 @@ export const commands = [
     id: "next-tab",
     title: "Next tab",
     icon: ArrowTopRight,
-    action: () => useEditorStore.getState().openNextSession(),
+    action: () => useEditorStore.getState().focusNextTab(),
     group: "Navigate"
   },
   {
     id: "previous-tab",
     title: "Previous tab",
     icon: ArrowTopRight,
-    action: () => useEditorStore.getState().openPreviousSession(),
+    action: () => useEditorStore.getState().focusPreviousTab(),
     group: "Navigate"
   },
   {
@@ -149,11 +149,9 @@ export const commands = [
     title: "Close current tab",
     icon: Radar,
     action: () =>
-      useEditorStore.getState().activeSessionId
-        ? useEditorStore
-            .getState()
-            .closeSessions(useEditorStore.getState().activeSessionId!)
-        : () => {},
+      useEditorStore
+        .getState()
+        .closeTabs(useEditorStore.getState().activeTabId ?? ""),
     group: "General"
   },
   {
