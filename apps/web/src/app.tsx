@@ -64,8 +64,8 @@ function App() {
       {isFocused ? null : (
         <Global
           styles={`
-          body {
-            filter:  brightness(0.95) grayscale(1);
+          .nav-pane {
+            opacity: 0.7;
           }
           .titlebar {
             background: var(--background-secondary) !important;
