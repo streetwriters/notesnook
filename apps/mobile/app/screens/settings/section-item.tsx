@@ -23,7 +23,7 @@ import {
   StackActions,
   useNavigation
 } from "@react-navigation/native";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, TextInput, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import ToggleSwitch from "toggle-switch-react-native";
@@ -102,6 +102,11 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
       });
     }
   };
+
+  useEffect(() => {
+    setIsHidden(item.hidden && item.hidden(item.property || current));
+    setIsDisabled(item.disabled && item.disabled(item.property || current));
+  }, [current, item]);
 
   return isHidden ? null : (
     <Pressable

@@ -451,7 +451,7 @@ export const settingsGroups: SettingSection[] = [
                             "local",
                             "partial"
                           );
-                          if (result.error) throw result.error as Error;
+                          if (result?.error) throw result.error as Error;
                         } catch (e) {
                           DatabaseLogger.error(e);
                           const error = e;
