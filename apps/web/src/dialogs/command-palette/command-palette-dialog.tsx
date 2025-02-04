@@ -18,9 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { debounce, toTitleCase } from "@notesnook/common";
-import { ScrollContainer } from "@notesnook/ui";
 import { Box, Button, Flex, Text } from "@theme-ui/components";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { GroupedVirtuoso, GroupedVirtuosoHandle } from "react-virtuoso";
 import { db } from "../../common/db";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import Dialog from "../../components/dialog";
@@ -33,7 +33,7 @@ import {
   Reminder as ReminderIcon,
   Tag as TagIcon
 } from "../../components/icons";
-import { VirtualizedList } from "../../components/virtualized-list";
+import { CustomScrollbarsVirtualList } from "../../components/list-container";
 import { hashNavigate, navigate } from "../../navigation";
 import { useEditorStore } from "../../stores/editor-store";
 import Config from "../../utils/config";
@@ -46,21 +46,20 @@ interface Command {
   group: string;
 }
 
-type GroupedCommands = Record<
-  Command["group"],
-  (Command & { index: number; icon: Icon | undefined })[]
->;
+type GroupedCommands = { group: Command["group"]; count: number }[];
 
 export const CommandPaletteDialog = DialogManager.register(
   function CommandPaletteDialog(props: BaseDialogProps<boolean>) {
     const [commands, setCommands] = useState<Command[]>(getDefaultCommands());
     const [selected, setSelected] = useState(0);
     const [query, setQuery] = useState(">");
-    const selectedRef = useRef<HTMLButtonElement>(null);
+    const virtuosoRef = useRef<GroupedVirtuosoHandle>(null);
 
     useEffect(() => {
-      selectedRef.current?.scrollIntoView({
-        block: "nearest"
+      virtuosoRef.current?.scrollToIndex({
+        index: selected,
+        align: "end",
+        behavior: "auto"
       });
     }, [selected]);
 
@@ -69,29 +68,27 @@ export const CommandPaletteDialog = DialogManager.register(
       const query = e.target.value;
       setQuery(query);
       const res = await search(query);
-      setCommands(res ?? []);
+      const highlighted = db.lookup.fuzzy(
+        prepareQuery(query),
+        res ?? [],
+        "title",
+        {
+          prefix: "<b style='color: var(--accent-foreground)'>",
+          suffix: "</b>"
+        }
+      );
+      setCommands(highlighted ?? []);
     }
 
-    const highlighted = db.lookup.fuzzy(
-      prepareQuery(query),
-      commands,
-      "title",
-      {
-        prefix: "<b style='color: var(--accent-foreground)'>",
-        suffix: "</b>"
+    const grouped = commands.reduce((acc, command) => {
+      const item = acc.find((c) => c.group === command.group);
+      if (item) {
+        item.count++;
+      } else {
+        acc.push({ group: command.group, count: 1 });
       }
-    );
-    const grouped = highlighted.reduce((acc, command, index) => {
-      if (!acc[command.group]) {
-        acc[command.group] = [];
-      }
-      acc[command.group].push({
-        ...command,
-        icon: getCommandIcon(command),
-        index
-      });
       return acc;
-    }, {} as GroupedCommands);
+    }, [] as GroupedCommands);
 
     return (
       <Dialog
@@ -107,7 +104,7 @@ export const CommandPaletteDialog = DialogManager.register(
       >
         <Flex
           variant="columnFill"
-          sx={{ mx: 3, overflow: "hidden", height: 350 }}
+          sx={{ mx: 3, overflow: "hidden", height: 400 }}
           onKeyDown={(e) => {
             if (e.key == "Enter") {
               e.preventDefault();
@@ -134,156 +131,144 @@ export const CommandPaletteDialog = DialogManager.register(
             }
           }}
         >
-          <>
-            <Field
-              autoFocus
-              placeholder={"Search in notes, notebooks, and tags"}
-              sx={{ mx: 0, my: 2 }}
-              defaultValue={query}
-              onChange={
-                isCommandMode(query) ? onChange : debounce(onChange, 500)
-              }
-            />
-            <ScrollContainer>
-              <Flex
-                sx={{
-                  flexDirection: "column",
-                  gap: 1,
-                  mt: 2,
-                  mb: 4
-                }}
-              >
-                {commands.length === 0 && (
-                  <Box>
-                    <Text variant="subBody">No results found</Text>
-                  </Box>
-                )}
-                {Object.entries(grouped).map(([group, commands]) => (
+          <Field
+            autoFocus
+            placeholder={"Search in notes, notebooks, and tags"}
+            sx={{ mx: 0, my: 2 }}
+            defaultValue={query}
+            onChange={isCommandMode(query) ? onChange : debounce(onChange, 500)}
+          />
+          {commands.length === 0 && (
+            <Box>
+              <Text variant="subBody">No results found</Text>
+            </Box>
+          )}
+          <Box sx={{ marginY: "10px", height: "100%" }}>
+            <GroupedVirtuoso
+              ref={virtuosoRef}
+              style={{ overflow: "hidden" }}
+              components={{
+                // @ts-expect-error - fix ts error
+                Scroller: CustomScrollbarsVirtualList
+              }}
+              groupCounts={grouped.map((g) => g.count)}
+              groupContent={(groupIndex) => (
+                <Box
+                  sx={{
+                    width: "100%",
+                    bg: "var(--background-secondary)",
+                    p: 1,
+                    borderRadius: "4px"
+                  }}
+                >
+                  <Text variant="subBody" bg="">
+                    {toTitleCase(grouped[groupIndex].group)}
+                  </Text>
+                </Box>
+              )}
+              itemContent={(index) => {
+                const command = commands[index];
+                if (!command) return null;
+
+                const Icon = getCommandIcon({
+                  id: command.id,
+                  type: command.type
+                });
+
+                return (
                   <Flex
-                    key={group}
-                    sx={{ flexDirection: "column", gap: 1, mx: 1 }}
+                    sx={{
+                      flexDirection: "row",
+                      gap: 1,
+                      alignItems: "center"
+                    }}
                   >
-                    <Text variant="subBody">{toTitleCase(group)}</Text>
-                    <Flex
+                    <Button
+                      title={command.title}
+                      key={index}
+                      onClick={() => {
+                        const action = getCommandAction({
+                          id: command.id,
+                          type: command.type
+                        });
+                        if (action) {
+                          action(command.id);
+                          addRecentCommand(command);
+                          props.onClose(false);
+                        }
+                      }}
                       sx={{
-                        flexDirection: "column",
-                        gap: 1
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        width: "100%",
+                        gap: 2,
+                        py: 1,
+                        bg: index === selected ? "hover" : "transparent",
+                        ".chip": {
+                          bg:
+                            index === selected
+                              ? "color-mix(in srgb, var(--accent) 20%, transparent)"
+                              : "var(--background-secondary)"
+                        },
+                        ":hover:not(:disabled):not(:active)": {
+                          bg: "hover"
+                        }
                       }}
                     >
-                      <VirtualizedList
-                        items={commands}
-                        estimatedSize={20}
-                        mode="dynamic"
-                        itemGap={10}
-                        getItemKey={(i) => commands[i].id}
-                        renderItem={({ item: command, index }) => (
-                          <Flex
-                            sx={{
-                              flexDirection: "row",
-                              gap: 1,
-                              alignItems: "center"
-                            }}
-                          >
-                            <Button
-                              title={command.title}
-                              ref={
-                                command.index === selected ? selectedRef : null
-                              }
-                              key={index}
-                              onClick={() => {
-                                const action = getCommandAction({
-                                  id: command.id,
-                                  type: command.type
-                                });
-                                if (action) {
-                                  action(command.id);
-                                  addRecentCommand(command);
-                                  props.onClose(false);
-                                }
-                              }}
-                              sx={{
-                                display: "flex",
-                                flexDirection: "row",
-                                alignItems: "center",
-                                width: "100%",
-                                gap: 2,
-                                py: 1,
-                                bg:
-                                  command.index === selected
-                                    ? "hover"
-                                    : "transparent",
-                                ".chip": {
-                                  bg:
-                                    command.index === selected
-                                      ? "color-mix(in srgb, var(--accent) 20%, transparent)"
-                                      : "var(--background-secondary)"
-                                },
-                                ":hover:not(:disabled):not(:active)": {
-                                  bg: "hover"
-                                }
-                              }}
-                            >
-                              {command.icon && (
-                                <command.icon
-                                  size={18}
-                                  color={
-                                    command.index === selected
-                                      ? "icon-selected"
-                                      : "icon"
-                                  }
-                                />
-                              )}
-                              {["note", "notebook", "reminder", "tag"].includes(
-                                command.type
-                              ) ? (
-                                <Text
-                                  className="chip"
-                                  sx={{
-                                    px: 1,
-                                    borderRadius: "4px",
-                                    border: "1px solid",
-                                    borderColor: "border"
-                                  }}
-                                  dangerouslySetInnerHTML={{
-                                    __html: command.title
-                                  }}
-                                />
-                              ) : (
-                                <Text
-                                  dangerouslySetInnerHTML={{
-                                    __html: command.title
-                                  }}
-                                />
-                              )}
-                            </Button>
-                            {command.group === "recent" && (
-                              <Button
-                                title="Remove from recent"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  removeRecentCommand(command.id);
-                                  setCommands((commands) =>
-                                    commands.filter((c) => c.id !== command.id)
-                                  );
-                                }}
-                                variant="icon"
-                                sx={{
-                                  p: 1,
-                                  mr: 1
-                                }}
-                              >
-                                <Cross size={14} />
-                              </Button>
-                            )}
-                          </Flex>
-                        )}
-                      />
-                    </Flex>
+                      {Icon && (
+                        <Icon
+                          size={18}
+                          color={index === selected ? "icon-selected" : "icon"}
+                        />
+                      )}
+                      {["note", "notebook", "reminder", "tag"].includes(
+                        command.type
+                      ) ? (
+                        <Text
+                          className="chip"
+                          sx={{
+                            px: 1,
+                            borderRadius: "4px",
+                            border: "1px solid",
+                            borderColor: "border"
+                          }}
+                          dangerouslySetInnerHTML={{
+                            __html: command.title
+                          }}
+                        />
+                      ) : (
+                        <Text
+                          dangerouslySetInnerHTML={{
+                            __html: command.title
+                          }}
+                        />
+                      )}
+                    </Button>
+                    {command.group === "recent" && (
+                      <Button
+                        title="Remove from recent"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeRecentCommand(command.id);
+                          setCommands((commands) =>
+                            commands.filter((c) => c.id !== command.id)
+                          );
+                        }}
+                        variant="icon"
+                        sx={{
+                          p: 1,
+                          mr: 1
+                        }}
+                      >
+                        <Cross size={14} />
+                      </Button>
+                    )}
                   </Flex>
-                ))}
-              </Flex>
-            </ScrollContainer>
-          </>
+                );
+              }}
+            />
+          </Box>
         </Flex>
         <Flex
           sx={{ flexDirection: "row", bg: "hover", justifyContent: "center" }}
