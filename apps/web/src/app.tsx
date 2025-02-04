@@ -150,23 +150,9 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
 
   useEffect(() => {
     if (isTablet) navPane.current?.collapse(0);
-    else navPane.current?.expand(0);
+    else if (navPane.current?.isCollapsed(0)) navPane.current?.expand(0);
   }, [isTablet]);
 
-  // useEffect(() => {
-  //   if (show) middlePane.current?.expand();
-  //   else middlePane.current?.collapse();
-  // }, [show]);
-
-  // useEffect(() => {
-  //   if (isFocusMode) {
-  //     const middlePaneSize = middlePane.current?.getSize() || 20;
-  //     navPane.current?.collapse();
-  //     // the middle pane has to be resized because collapsing the nav
-  //     // pane increases the middle pane's size every time.
-  //     middlePane.current?.resize(middlePaneSize);
-  //   } else navPane.current?.expand();
-  // }, [isFocusMode]);
   return (
     <>
       <Flex
