@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { debounce, toTitleCase } from "@notesnook/common";
 import { ScrollContainer } from "@notesnook/ui";
-import { Button, Flex, Text } from "@theme-ui/components";
+import { Box, Button, Flex, Text } from "@theme-ui/components";
 import { useEffect, useRef, useState } from "react";
 import { db } from "../../common/db";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
@@ -153,6 +153,11 @@ export const CommandPaletteDialog = DialogManager.register(
                   mb: 4
                 }}
               >
+                {commands.length === 0 && (
+                  <Box>
+                    <Text variant="subBody">No results found</Text>
+                  </Box>
+                )}
                 {Object.entries(grouped).map(([group, commands]) => (
                   <Flex
                     key={group}
