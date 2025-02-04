@@ -71,7 +71,7 @@ export const useTabStore = create(
       }
     }),
     {
-      name: "tab-storage-v3",
+      name: "tab-storage-v5",
       storage: createJSONStorage(() => localStorage)
     }
   )
