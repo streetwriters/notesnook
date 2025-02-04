@@ -115,7 +115,7 @@ export const FileSizeResult = {
   Error: -1
 };
 
-export async function getUploadedFileSize(hash: string) {
+export async function getUploadedFileSize(hash: string, retry = 0) {
   try {
     const url = `${hosts.API_HOST}/s3?name=${hash}`;
     const token = await db.tokenManager.getAccessToken();
@@ -123,8 +123,24 @@ export async function getUploadedFileSize(hash: string) {
       method: "HEAD",
       headers: { Authorization: `Bearer ${token}` }
     });
+
+    if (
+      !attachmentInfo.ok ||
+      attachmentInfo.headers?.get("content-length") === null
+    ) {
+      if (retry < 3) {
+        DatabaseLogger.log(`Retrying file size check: ${hash}, ${retry}`);
+        return getUploadedFileSize(hash, retry + 1);
+      }
+      throw new Error(
+        `File size check failed: ${hash}, ${
+          attachmentInfo.status
+        }, ${attachmentInfo.headers?.get("content-length")}`
+      );
+    }
+
     const contentLength = parseInt(
-      attachmentInfo.headers?.get("content-length") || "0"
+      attachmentInfo.headers?.get("content-length") as string
     );
     return isNaN(contentLength) ? FileSizeResult.Empty : contentLength;
   } catch (e) {
