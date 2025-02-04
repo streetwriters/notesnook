@@ -248,14 +248,13 @@ const useLockedNoteHandler = () => {
           );
 
           eSendEvent(eOnLoadNote, {
-            item: note
+            item: note,
+            refresh: true
           });
-
-          useTabStore.getState().updateTab(tabRef.current.id, {
-            session: {
-              locked: false
-            }
-          });
+        } else {
+          if (tabRef.current && tabRef.current.session?.locked) {
+            editorController.current?.commands.focusPassInput();
+          }
         }
       } catch (e) {
         console.error(e);
@@ -310,12 +309,8 @@ const useLockedNoteHandler = () => {
           }
         }
         eSendEvent(eOnLoadNote, {
-          item: note
-        });
-        useTabStore.getState().updateTab(tabRef.current.id, {
-          session: {
-            locked: false
-          }
+          item: note,
+          refresh: true
         });
       } catch (e) {
         ToastManager.show({

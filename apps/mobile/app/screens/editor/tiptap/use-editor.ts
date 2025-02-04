@@ -501,6 +501,7 @@ export const useEditor = (
       blockId?: string;
       session?: TabSessionItem;
       newTab?: boolean;
+      refresh?: boolean;
     }) => {
       loadNoteMutex.runExclusive(async () => {
         if (!event) return;
@@ -574,11 +575,10 @@ export const useEditor = (
             ? event.tabId
             : useTabStore.getState().currentTab;
 
-          console.log(tabId === useTabStore.getState().currentTab);
-
           // Check if tab needs to be refreshed.
           if (!event.newTab) {
             if (
+              !event.refresh &&
               tabId &&
               event.item.id === useTabStore.getState().getNoteIdForTab(tabId) &&
               !localTabState.current?.needsRefresh(

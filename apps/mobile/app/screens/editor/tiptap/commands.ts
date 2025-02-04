@@ -90,8 +90,14 @@ class Commands {
 
     const locked = useTabStore.getState().getTab(tabId)?.session?.locked;
     if (Platform.OS === "android") {
-      //this.ref.current?.requestFocus();
       setTimeout(async () => {
+        if (
+          locked &&
+          useTabStore.getState().biometryAvailable &&
+          useTabStore.getState().biometryEnrolled
+        )
+          return;
+
         if (!this.ref) return;
         textInput.current?.focus();
         await this.sendCommand("focus", tabId, locked);

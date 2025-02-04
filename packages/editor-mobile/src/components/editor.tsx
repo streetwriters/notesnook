@@ -556,7 +556,7 @@ const Tiptap = ({
             </>
           )}
 
-          {controller.loading || tab.session?.noteLocked ? (
+          {controller.loading || tab.session?.locked ? (
             <div
               style={{
                 width: "100%",
@@ -568,10 +568,8 @@ const Tiptap = ({
                 paddingLeft: 12,
                 display: "flex",
                 flexDirection: "column",
-                alignItems: tab.session?.noteLocked ? "center" : "flex-start",
-                justifyContent: tab.session?.noteLocked
-                  ? "center"
-                  : "flex-start",
+                alignItems: "center",
+                justifyContent: "center",
                 boxSizing: "border-box",
                 rowGap: 10
               }}
