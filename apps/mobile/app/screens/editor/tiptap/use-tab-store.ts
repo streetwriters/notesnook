@@ -105,11 +105,14 @@ class TabSessionStorage {
   }
 
   static update(id: string, session: Partial<TabSessionItem>) {
+    if (!id) throw new Error("Session ID is required");
     const currentSession = TabSessionStorage.get(id);
     const newSession = {
       ...currentSession,
-      ...session
+      ...session,
+      id: currentSession?.id || session.id || id
     };
+
     TabSessionStorage.set(id, newSession as TabSessionItem);
     return newSession;
   }
@@ -164,7 +167,7 @@ const history = new TabHistory();
 
 export type TabStore = {
   tabs: TabItem[];
-  currentTab?: string;
+  currentTab: string;
   updateTab: (id: string, options: Omit<Partial<TabItem>, "id">) => void;
   focusPreviewTab: (
     noteId: string,
@@ -289,6 +292,7 @@ export const useTabStore = create<TabStore>(
         const tabs = [...get().tabs];
         const sessionId =
           options.session?.id || (tabs[index].session?.id as string);
+
         const updatedSession = !options.session
           ? tabs[index].session
           : TabSessionStorage.update(sessionId, options.session);
@@ -474,7 +478,7 @@ export const useTabStore = create<TabStore>(
       }
     }),
     {
-      name: "tabs-storage-v3",
+      name: "tabs-storage-v5",
       getStorage: () => MMKV as unknown as StateStorage,
       onRehydrateStorage: () => {
         return (state) => {
