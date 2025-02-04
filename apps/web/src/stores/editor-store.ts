@@ -595,9 +595,18 @@ class EditorStore extends BaseStore<EditorStore> {
 
     if (!oldContent || !currentContent) return;
 
-    const { getSession, addSession, sessions, activeTabId, tabs } = this.get();
+    const {
+      getSession,
+      addSession,
+      sessions,
+      activeTabId,
+      getActiveTab,
+      tabs
+    } = this.get();
 
-    const tabId = activeTabId ?? this.addTab();
+    const tabId = getActiveTab()?.pinned
+      ? this.addTab(getId())
+      : activeTabId || this.addTab(getId());
     const tab = tabs.find((t) => t.id === tabId);
     const activeSession = tab && getSession(tab.sessionId);
     const oldSession = sessions.find(
