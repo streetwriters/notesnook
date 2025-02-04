@@ -77,6 +77,7 @@ import {
   isEditorLoaded,
   post
 } from "./utils";
+import { Linking } from "react-native";
 
 const loadNoteMutex = new Mutex();
 
@@ -1055,30 +1056,33 @@ export const useEditor = (
       state.current.ready = true;
     }
 
-    const appState = getAppState();
-    if (appState?.noteId) {
-      const note = await db.notes?.note(appState.noteId);
-      if (note) {
-        loadNote({
-          item: note
-        });
-      }
-    } else {
-      const noteId = useTabStore.getState().getCurrentNoteId();
-      if (!noteId) {
-        loadNote({ newNote: true });
-        if (tabBarRef.current?.page() === 1) {
-          state.current.currentlyEditing = false;
-        }
-      } else if (state.current?.initialLoadCalled) {
-        const note = currentNotes.current[noteId];
+    if (!state.current?.initialLoadCalled) {
+      const url = await Linking.getInitialURL();
+      let noteId = url && new URL(url).searchParams.get("id");
+      if (noteId) {
+        const note = await db.notes?.note(noteId);
         if (note) {
           loadNote({
             item: note
           });
         }
-      }
-      if (!state.current?.initialLoadCalled) {
+        tabBarRef.current?.goToPage(1);
+      } else {
+        noteId = useTabStore.getState().getCurrentNoteId() || null;
+        if (!noteId) {
+          loadNote({ newNote: true });
+          if (tabBarRef.current?.page() === 1) {
+            state.current.currentlyEditing = false;
+          }
+        } else {
+          const note = await db.notes.note(noteId);
+          if (note) {
+            loadNote({
+              item: note
+            });
+          }
+        }
+
         state.current.initialLoadCalled = true;
       }
       overlay(false);
