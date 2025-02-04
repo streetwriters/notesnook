@@ -30,12 +30,15 @@ import { DatabaseLogger, db } from "../common/database";
 import filesystem, { FileStorage } from "../common/filesystem";
 import { cacheDir, copyFileAsync } from "../common/filesystem/utils";
 import { presentDialog } from "../components/dialog/functions";
-import { endProgress, updateProgress } from "../components/dialogs/progress";
+import {
+  endProgress,
+  startProgress,
+  updateProgress
+} from "../components/dialogs/progress";
 import { eCloseSheet } from "../utils/events";
 import { sleep } from "../utils/time";
 import { ToastManager, eSendEvent, presentSheet } from "./event-manager";
 import SettingsService from "./settings";
-import { e } from "@lingui/react/dist/shared/react.b2b749a9";
 
 const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
@@ -156,6 +159,7 @@ async function updateNextBackupTime(type: "full" | "partial") {
     [type === "full" ? "lastFullBackupDate" : "lastBackupDate"]: Date.now()
   });
 }
+let backupRunning = false;
 /**
  * @param {boolean=} progress
  * @param {string=} context
@@ -166,6 +170,18 @@ async function run(
   context?: string,
   backupType: "full" | "partial" = "partial"
 ) {
+  if (backupRunning) {
+    if (progress) {
+      startProgress({
+        title: strings.backingUpData(backupType),
+        paragraph: strings.backupDataDesc(),
+        progress: "Backup in progress...",
+        canHideProgress: true
+      });
+    }
+    return;
+  }
+  backupRunning = true;
   const androidBackupDirectory = (await checkBackupDirExists(
     false,
     context
@@ -193,10 +209,11 @@ async function run(
   );
 
   if (progress) {
-    presentSheet({
+    startProgress({
       title: strings.backingUpData(backupType),
       paragraph: strings.backupDataDesc(),
-      progress: true
+      progress: "Preparing backup...",
+      canHideProgress: true
     });
   }
 
@@ -274,14 +291,7 @@ async function run(
       path = zipOutputFile;
     }
 
-    RNFetchBlob.fs.unlink(zipSourceFolder).catch(() => {
-      /* empty */
-    });
-    if (Platform.OS === "android") {
-      RNFetchBlob.fs.unlink(zipOutputFile).catch(() => {
-        /* empty */
-      });
-    }
+    cleanupAfterBackup(zipSourceFolder, zipOutputFile);
 
     updateNextBackupTime(backupType || "partial");
 
@@ -291,6 +301,8 @@ async function run(
 
     const canShowCompletionStatus =
       progress && SettingsService.get().showBackupCompleteSheet;
+
+    backupRunning = false;
 
     if (context) {
       return {
@@ -302,8 +314,6 @@ async function run(
 
     if (canShowCompletionStatus) {
       presentBackupCompleteSheet(path);
-    } else {
-      eSendEvent(eCloseSheet);
     }
 
     ToastManager.show({
@@ -311,11 +321,11 @@ async function run(
       type: "success",
       context: "global"
     });
-
     return {
       path: path
     };
   } catch (e) {
+    backupRunning = false;
     ToastManager.error(e as Error, strings.backupFailed(), context || "global");
 
     if (
@@ -326,17 +336,9 @@ async function run(
       return run(progress, context, backupType);
     }
 
-    RNFetchBlob.fs.unlink(zipSourceFolder).catch(() => {
-      /* empty */
-    });
-    if (Platform.OS === "android") {
-      RNFetchBlob.fs.unlink(zipOutputFile).catch(() => {
-        /* empty */
-      });
-    }
+    cleanupAfterBackup(zipSourceFolder, zipOutputFile);
 
     DatabaseLogger.error(e);
-    await sleep(300);
     if (progress) {
       endProgress();
     }
@@ -344,6 +346,17 @@ async function run(
       error: e,
       report: true
     };
+  }
+}
+
+function cleanupAfterBackup(zipSourceFolder: string, zipOutputFile: string) {
+  RNFetchBlob.fs.unlink(zipSourceFolder).catch(() => {
+    /* empty */
+  });
+  if (Platform.OS === "android") {
+    RNFetchBlob.fs.unlink(zipOutputFile).catch(() => {
+      /* empty */
+    });
   }
 }
 
