@@ -28,11 +28,12 @@ import Field from "../../components/field";
 import {
   Cross,
   Icon,
-  Note as NoteIcon,
   Notebook as NotebookIcon,
+  Note as NoteIcon,
   Reminder as ReminderIcon,
   Tag as TagIcon
 } from "../../components/icons";
+import { VirtualizedList } from "../../components/virtualized-list";
 import { hashNavigate, navigate } from "../../navigation";
 import { useEditorStore } from "../../stores/editor-store";
 import Config from "../../utils/config";
@@ -164,107 +165,114 @@ export const CommandPaletteDialog = DialogManager.register(
                         gap: 1
                       }}
                     >
-                      {commands.map((command, index) => (
-                        <Flex
-                          sx={{
-                            flexDirection: "row",
-                            gap: 1,
-                            alignItems: "center"
-                          }}
-                        >
-                          <Button
-                            title={command.title}
-                            ref={
-                              command.index === selected ? selectedRef : null
-                            }
-                            key={index}
-                            onClick={() => {
-                              const action = getCommandAction({
-                                id: command.id,
-                                type: command.type
-                              });
-                              if (action) {
-                                action(command.id);
-                                addRecentCommand(command);
-                                props.onClose(false);
-                              }
-                            }}
+                      <VirtualizedList
+                        items={commands}
+                        estimatedSize={20}
+                        mode="dynamic"
+                        itemGap={10}
+                        getItemKey={(i) => commands[i].id}
+                        renderItem={({ item: command, index }) => (
+                          <Flex
                             sx={{
-                              display: "flex",
                               flexDirection: "row",
-                              alignItems: "center",
-                              width: "100%",
-                              gap: 2,
-                              py: 1,
-                              bg:
-                                command.index === selected
-                                  ? "hover"
-                                  : "transparent",
-                              ".chip": {
-                                bg:
-                                  command.index === selected
-                                    ? "color-mix(in srgb, var(--accent) 20%, transparent)"
-                                    : "var(--background-secondary)"
-                              },
-                              ":hover:not(:disabled):not(:active)": {
-                                bg: "hover"
-                              }
+                              gap: 1,
+                              alignItems: "center"
                             }}
                           >
-                            {command.icon && (
-                              <command.icon
-                                size={18}
-                                color={
-                                  command.index === selected
-                                    ? "icon-selected"
-                                    : "icon"
-                                }
-                              />
-                            )}
-                            {["note", "notebook", "reminder", "tag"].includes(
-                              command.type
-                            ) ? (
-                              <Text
-                                className="chip"
-                                sx={{
-                                  px: 1,
-                                  borderRadius: "4px",
-                                  border: "1px solid",
-                                  borderColor: "border"
-                                }}
-                                dangerouslySetInnerHTML={{
-                                  __html: command.title
-                                }}
-                              />
-                            ) : (
-                              <Text
-                                dangerouslySetInnerHTML={{
-                                  __html: command.title
-                                }}
-                              />
-                            )}
-                          </Button>
-                          {command.group === "recent" && (
                             <Button
-                              title="Remove from recent"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                removeRecentCommand(command.id);
-                                setCommands((commands) =>
-                                  commands.filter((c) => c.id !== command.id)
-                                );
+                              title={command.title}
+                              ref={
+                                command.index === selected ? selectedRef : null
+                              }
+                              key={index}
+                              onClick={() => {
+                                const action = getCommandAction({
+                                  id: command.id,
+                                  type: command.type
+                                });
+                                if (action) {
+                                  action(command.id);
+                                  addRecentCommand(command);
+                                  props.onClose(false);
+                                }
                               }}
-                              variant="icon"
                               sx={{
-                                p: 1,
-                                mr: 1
+                                display: "flex",
+                                flexDirection: "row",
+                                alignItems: "center",
+                                width: "100%",
+                                gap: 2,
+                                py: 1,
+                                bg:
+                                  command.index === selected
+                                    ? "hover"
+                                    : "transparent",
+                                ".chip": {
+                                  bg:
+                                    command.index === selected
+                                      ? "color-mix(in srgb, var(--accent) 20%, transparent)"
+                                      : "var(--background-secondary)"
+                                },
+                                ":hover:not(:disabled):not(:active)": {
+                                  bg: "hover"
+                                }
                               }}
                             >
-                              <Cross size={14} />
+                              {command.icon && (
+                                <command.icon
+                                  size={18}
+                                  color={
+                                    command.index === selected
+                                      ? "icon-selected"
+                                      : "icon"
+                                  }
+                                />
+                              )}
+                              {["note", "notebook", "reminder", "tag"].includes(
+                                command.type
+                              ) ? (
+                                <Text
+                                  className="chip"
+                                  sx={{
+                                    px: 1,
+                                    borderRadius: "4px",
+                                    border: "1px solid",
+                                    borderColor: "border"
+                                  }}
+                                  dangerouslySetInnerHTML={{
+                                    __html: command.title
+                                  }}
+                                />
+                              ) : (
+                                <Text
+                                  dangerouslySetInnerHTML={{
+                                    __html: command.title
+                                  }}
+                                />
+                              )}
                             </Button>
-                          )}
-                        </Flex>
-                      ))}
+                            {command.group === "recent" && (
+                              <Button
+                                title="Remove from recent"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  removeRecentCommand(command.id);
+                                  setCommands((commands) =>
+                                    commands.filter((c) => c.id !== command.id)
+                                  );
+                                }}
+                                variant="icon"
+                                sx={{
+                                  p: 1,
+                                  mr: 1
+                                }}
+                              >
+                                <Cross size={14} />
+                              </Button>
+                            )}
+                          </Flex>
+                        )}
+                      />
                     </Flex>
                   </Flex>
                 ))}
