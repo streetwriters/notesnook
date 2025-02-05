@@ -1045,8 +1045,8 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   newSession = () => {
-    const { activeTabId, activateSession } = this.get();
-    if (!activeTabId) {
+    const { activeTabId, activateSession, getActiveTab } = this.get();
+    if (!activeTabId || getActiveTab()?.pinned) {
       this.addTab();
       return;
     }
@@ -1208,16 +1208,9 @@ class EditorStore extends BaseStore<EditorStore> {
     if (index === -1) return;
 
     tabs[index].pinned = !tabs[index].pinned;
-    const disableNavigation = activeTabId === tabId && tabs[index].pinned;
-
+    tabs.sort((a, b) => (a.pinned === b.pinned ? 0 : a.pinned ? -1 : 1));
     useEditorStore.setState({
-      tabs: tabs.sort((a, b) =>
-        a.pinned === b.pinned ? 0 : a.pinned ? -1 : 1
-      ),
-      canGoBack: disableNavigation ? false : tabSessionHistory.canGoBack(tabId),
-      canGoForward: disableNavigation
-        ? false
-        : tabSessionHistory.canGoForward(tabId)
+      tabs
     });
   };
 
