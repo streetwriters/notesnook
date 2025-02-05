@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { debounce, toTitleCase } from "@notesnook/common";
 import { Box, Button, Flex, Text } from "@theme-ui/components";
 import React, { useEffect, useRef, useState } from "react";
-import Skeleton from "react-loading-skeleton";
 import { GroupedVirtuoso, GroupedVirtuosoHandle } from "react-virtuoso";
 import { db } from "../../common/db";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
