@@ -252,5 +252,48 @@ test("open a note in 2 tabs then open another note and navigate back", async ({
   expect(await tabs[1].title()).toBe("Note 1");
 });
 
+test("shouldn't be possible to open a note in a pinned tab", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note = await notes.createNote({
+    title: "Note 1"
+  });
+  await notes.createNote({
+    title: "Note 2"
+  });
+  let tabs = await notes.editor.getTabs();
+  await tabs[0].contextMenu.pin();
+
+  await note?.click();
+  await notes.editor.waitForLoading();
+
+  tabs = await notes.editor.getTabs();
+  expect(tabs.length).toBe(2);
+  expect(await tabs[1].isActive()).toBe(true);
+  expect(await tabs[1].title()).toBe("Note 1");
+});
+
+test("shouldn't be possible to create a new note in a pinned tab", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  await notes.createNote({
+    title: "Note 1"
+  });
+  let tabs = await notes.editor.getTabs();
+  await tabs[0].contextMenu.pin();
+
+  await notes.newNote();
+
+  tabs = await notes.editor.getTabs();
+  expect(tabs.length).toBe(2);
+  expect(await tabs[1].isActive()).toBe(true);
+});
+
 test.skip("TODO: open a locked note, switch to another note and navigate back", () => {});
 test.skip("TODO: open a locked note, switch to another note, unlock the note and navigate back", () => {});
