@@ -94,6 +94,11 @@ export const CommandPaletteDialog = DialogManager.register(
             ...r,
             highlightedTitle: r.title
           })) ?? [],
+          /**
+           * we use a separate key for highlighted title
+           * so that when we save recent commands to local storage
+           * we can save the original title instad of the highlighted one
+           */
           "highlightedTitle",
           {
             prefix: "<b style='color: var(--accent-foreground)'>",
