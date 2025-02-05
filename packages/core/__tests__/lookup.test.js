@@ -81,7 +81,7 @@ test("search notes with an empty note", () =>
     expect(filtered).toHaveLength(1);
   }));
 
-test("search noteTitles should search in titles", () =>
+test("search notes with opts.titleOnly should search in titles", () =>
   noteTest({
     content: content
   }).then(async ({ db }) => {
@@ -89,15 +89,21 @@ test("search noteTitles should search in titles", () =>
       title: "hello there",
       content: { type: "tiptap", data: "<p>note of the world<br></p>" }
     });
-    let filtered = await db.lookup.noteTitles("ho te").ids();
+    let filtered = await db.lookup
+      .notes("hello there", undefined, { titleOnly: true })
+      .ids();
     expect(filtered).toHaveLength(1);
   }));
 
-test("search noteTitles should not search in descriptions", () =>
+test("search notes with opts.titleOnly should not search in descriptions", () =>
   noteTest({
     content: content
   }).then(async ({ db }) => {
-    let filtered = await db.lookup.noteTitles("note of the world").ids();
+    let filtered = await db.lookup
+      .notes("note of the world", undefined, {
+        titleOnly: true
+      })
+      .ids();
     expect(filtered).toHaveLength(0);
   }));
 

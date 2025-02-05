@@ -50,7 +50,11 @@ type FuzzySearchField<T> = {
 export default class Lookup {
   constructor(private readonly db: Database) {}
 
-  notes(query: string, notes?: FilteredSelector<Note>): SearchResults<Note> {
+  notes(
+    query: string,
+    notes?: FilteredSelector<Note>,
+    opts?: { titleOnly?: boolean }
+  ): SearchResults<Note> {
     return this.toSearchResults(async (limit, sortOptions) => {
       const db = this.db.sql() as unknown as Kysely<RawDatabaseSchema>;
       const excludedIds = this.db.trash.cache.notes;
@@ -68,21 +72,23 @@ export default class Lookup {
             )
             .where("title", "match", query)
             .select(["id", sql<number>`rank * 10`.as("rank")])
-            .unionAll((eb) =>
-              eb
-                .selectFrom("content_fts")
-                .$if(!!notes, (eb) =>
-                  eb.where("noteId", "in", notes!.filter.select("id"))
-                )
-                .$if(excludedIds.length > 0, (eb) =>
-                  eb.where("id", "not in", excludedIds)
-                )
-                .where("data", "match", query)
-                .select(["noteId as id", "rank"])
-                .$castTo<{
-                  id: string;
-                  rank: number;
-                }>()
+            .$if(!opts?.titleOnly, (eb) =>
+              eb.unionAll((eb) =>
+                eb
+                  .selectFrom("content_fts")
+                  .$if(!!notes, (eb) =>
+                    eb.where("noteId", "in", notes!.filter.select("id"))
+                  )
+                  .$if(excludedIds.length > 0, (eb) =>
+                    eb.where("id", "not in", excludedIds)
+                  )
+                  .where("data", "match", query)
+                  .select(["noteId as id", "rank"])
+                  .$castTo<{
+                    id: string;
+                    rank: number;
+                  }>()
+              )
             )
             .as("results")
         )
@@ -104,13 +110,6 @@ export default class Lookup {
         });
       return results.map((r) => r.id);
     }, notes || this.db.notes.all);
-  }
-
-  noteTitles(query: string) {
-    return this.search(this.db.notes.all, query, [
-      { name: "id", column: "notes.id", weight: -100 },
-      { name: "title", column: "notes.title", weight: 10 }
-    ]);
   }
 
   notebooks(query: string, opts: { titleOnly?: boolean } = {}) {

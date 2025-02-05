@@ -436,7 +436,9 @@ function commandSearch(query: string) {
 }
 
 async function dbSearch(query: string) {
-  const notes = db.lookup.noteTitles(query);
+  const notes = db.lookup.notes(query, undefined, {
+    titleOnly: true
+  });
   const notebooks = db.lookup.notebooks(query, {
     titleOnly: true
   });
