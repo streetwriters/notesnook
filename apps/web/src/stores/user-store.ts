@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import createStore from "../common/store";
 import { db } from "../common/db";
 import BaseStore from "./index";
-import config from "../utils/config";
 import { EV, EVENTS } from "@notesnook/core";
 import Config from "../utils/config";
 import { hashNavigate } from "../navigation";
@@ -81,7 +80,7 @@ class UserStore extends BaseStore<UserStore> {
         state.user = undefined;
         state.isLoggedIn = false;
       });
-      config.clear();
+      Config.logout();
       if (reason) {
         await ConfirmDialog.show({
           title: strings.loggedOut(),
