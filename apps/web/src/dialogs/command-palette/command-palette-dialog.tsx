@@ -55,11 +55,17 @@ interface Command {
 
 type GroupedCommands = { group: Command["group"]; count: number }[];
 
+type CommandPaletteDialogProps = BaseDialogProps<boolean> & {
+  isCommandMode: boolean;
+};
+
 export const CommandPaletteDialog = DialogManager.register(
-  function CommandPaletteDialog(props: BaseDialogProps<boolean>) {
-    const [commands, setCommands] = useState<Command[]>(getDefaultCommands());
+  function CommandPaletteDialog(props: CommandPaletteDialogProps) {
+    const [commands, setCommands] = useState<Command[]>(
+      props.isCommandMode ? getDefaultCommands() : getSessionsAsCommands()
+    );
     const [selected, setSelected] = useState(0);
-    const [query, setQuery] = useState(">");
+    const [query, setQuery] = useState(props.isCommandMode ? ">" : "");
     const [loading, setLoading] = useState(false);
     const virtuosoRef = useRef<GroupedVirtuosoHandle>(null);
 
@@ -409,23 +415,27 @@ function getCommandIcon({
   }
 }
 
+function getSessionsAsCommands() {
+  const sessions = useEditorStore.getState().get().sessions;
+  return sessions
+    .filter((s) => s.type !== "new")
+    .map((session) => {
+      return {
+        id: session.id,
+        title: session.note.title,
+        group: "note",
+        type: "note" as const
+      };
+    });
+}
+
 function search(query: string) {
   const prepared = prepareQuery(query);
   if (isCommandMode(query)) {
     return commandSearch(prepared);
   }
   if (prepared.length < 1) {
-    const sessions = useEditorStore.getState().get().sessions;
-    return sessions
-      .filter((s) => s.type !== "new")
-      .map((session) => {
-        return {
-          id: session.id,
-          title: session.note.title,
-          group: "note",
-          type: "note" as const
-        };
-      });
+    return getSessionsAsCommands();
   }
   return dbSearch(prepared);
 }

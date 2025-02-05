@@ -189,11 +189,13 @@ const KEYMAP = [
   //   },
   // },
   {
-    keys: ["ctrl+k", "cmd+k"],
+    keys: ["ctrl+k", "cmd+k", "ctrl+p", "cmd+p"],
     description: "Open command palette",
     action: (e: KeyboardEvent) => {
       e.preventDefault();
-      CommandPaletteDialog.show(true);
+      CommandPaletteDialog.show({
+        isCommandMode: e.key === "k"
+      });
     }
   }
 ];
