@@ -127,15 +127,8 @@ class LocalTabState {
       tabSession?.readonly !== readonly ||
       !noteId
     ) {
-      console.log("tab is refreshing...");
       return true;
     }
-    console.log(
-      "Tab refreshing...",
-      state.editedAt < this.noteEditedTime[noteId]
-    );
-
-    console.log(state.editedAt, this.noteEditedTime[noteId]);
 
     return !state.editedAt || state.editedAt < this.noteEditedTime[noteId];
   }
@@ -522,7 +515,12 @@ export const useEditor = (
         }
         if (event.newNote && !currentLoadingNoteId.current) {
           let tabId;
-          if (useTabStore.getState().tabs.length === 0) {
+
+          const currentTab = useTabStore
+            .getState()
+            .getTab(useTabStore.getState().currentTab as string);
+
+          if (useTabStore.getState().tabs.length === 0 || currentTab?.pinned) {
             tabId = useTabStore.getState().newTab();
           } else {
             tabId = useTabStore.getState().currentTab;
@@ -547,13 +545,13 @@ export const useEditor = (
 
           const item = event.item;
 
+          const currentTab = useTabStore
+            .getState()
+            .getTab(useTabStore.getState().currentTab as string);
+
           // If note is already open in a tab, focus that tab.
           if (useTabStore.getState().hasTabForNote(item.id) && !event.newTab) {
             const tabId = useTabStore.getState().getTabForNote(item.id);
-
-            const currentTab = useTabStore
-              .getState()
-              .getTab(useTabStore.getState().currentTab as string);
 
             if (
               currentTab?.session?.noteId !== item.id &&
@@ -624,10 +622,16 @@ export const useEditor = (
 
           const tab = useTabStore.getState().getTab(tabId!);
 
-          if (useTabStore.getState().tabs.length === 0 || event.newTab) {
+          if (
+            useTabStore.getState().tabs.length === 0 ||
+            event.newTab ||
+            (currentTab?.pinned &&
+              event.item.id !== currentTab?.session?.noteId)
+          ) {
             useTabStore.getState().newTab({
               session: session
             });
+            return;
           } else {
             // A new session is created if the note is changed.
             // If the note is already opened, the session is updated.
