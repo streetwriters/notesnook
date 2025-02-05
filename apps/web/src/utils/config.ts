@@ -57,5 +57,30 @@ function has(predicate: (key: string) => boolean) {
   return false;
 }
 
-const Config = { set, get, clear, all, has, remove };
+function logout() {
+  const toKeep = [
+    "editorConfig",
+    "backupStorageLocation",
+    "serverUrls",
+    "corsProxy",
+    "theme:light",
+    "theme:dark",
+    "colorScheme",
+    "followSystemTheme"
+  ];
+  const vals = {} as Record<string, any>;
+
+  for (const keep of toKeep) {
+    const val = get(keep);
+    if (val !== undefined) vals[keep] = val;
+  }
+
+  clear();
+
+  for (const key in vals) {
+    set(key, vals[key]);
+  }
+}
+
+const Config = { set, get, clear, all, has, remove, logout };
 export default Config;
