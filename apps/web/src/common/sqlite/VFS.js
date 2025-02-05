@@ -165,7 +165,7 @@ export class Base {
   }
 
   /**
-   * Handle asynchronous operation. This implementation will be overriden on
+   * Handle asynchronous operation. This implementation will be overridden on
    * registration by an Asyncify build.
    * @param {function(): Promise<number>} f
    * @returns {number}

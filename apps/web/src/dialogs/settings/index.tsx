@@ -187,7 +187,7 @@ const SettingsGroups = [
 // 2. Settings will be synced so their state must be serializable
 // 3. Settings will be grouped
 //    - Where group header is customizable
-// 4. Sections/groups must be able to accomodate tips & tutorials for future.
+// 4. Sections/groups must be able to accommodate tips & tutorials for future.
 // 5. Settings will be stateful but independent such that any one setting
 // can appear independent of others (e.g. as a search result)
 

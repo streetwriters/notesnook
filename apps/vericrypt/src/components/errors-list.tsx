@@ -26,7 +26,7 @@ type ErrorsListProps = {
 export function ErrorsList(props: ErrorsListProps) {
   return (
     <Accordion
-      title={`${props.errors.length} errors occured`}
+      title={`${props.errors.length} errors occurred`}
       sx={{ bg: "errorBg", borderRadius: "default", mt: 2 }}
       color="#E53935"
     >
