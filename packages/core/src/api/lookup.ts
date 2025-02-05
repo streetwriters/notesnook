@@ -204,12 +204,13 @@ export default class Lookup {
   ): T[] {
     if (query === "") return items;
 
-    const fuzzied: (T | undefined)[] = [];
+    const fuzzied: T[] = [];
 
     for (const item of items) {
       const result = match(query, `${item[key]}`);
       if (!result.match) {
-        fuzzied.push(opts?.matchOnly ? undefined : item);
+        if (opts?.matchOnly) continue;
+        fuzzied.push(item);
         continue;
       }
       if (opts?.prefix || opts?.suffix) {
@@ -226,7 +227,7 @@ export default class Lookup {
       fuzzied.push(item);
     }
 
-    return fuzzied.filter((f) => f !== undefined);
+    return fuzzied;
   }
 
   private search<T extends Item>(

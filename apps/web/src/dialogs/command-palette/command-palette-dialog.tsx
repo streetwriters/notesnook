@@ -19,7 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { debounce, toTitleCase } from "@notesnook/common";
 import { Box, Button, Flex, Text } from "@theme-ui/components";
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react";
 import { GroupedVirtuoso, GroupedVirtuosoHandle } from "react-virtuoso";
 import { db } from "../../common/db";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
@@ -65,37 +71,49 @@ export const CommandPaletteDialog = DialogManager.register(
       });
     }, [selected]);
 
-    async function onChange(e: React.ChangeEvent<HTMLInputElement>) {
-      setSelected(0);
-      const query = e.target.value;
-      setQuery(query);
-      !isCommandMode(query) && setLoading(true);
-      const res = await search(query);
-      const highlighted = db.lookup.fuzzy(
-        prepareQuery(query),
-        res.map((r) => ({
-          ...r,
-          highlightedTitle: r.title
-        })) ?? [],
-        "highlightedTitle",
-        {
-          prefix: "<b style='color: var(--accent-foreground)'>",
-          suffix: "</b>"
+    const onChange = useCallback(async function onChange(
+      e: React.ChangeEvent<HTMLInputElement>
+    ) {
+      try {
+        setSelected(0);
+        const query = e.target.value;
+        setQuery(query);
+        if (!isCommandMode(query)) {
+          setLoading(true);
         }
-      );
-      setCommands(highlighted ?? []);
-      setLoading(false);
-    }
-
-    const grouped = commands.reduce((acc, command) => {
-      const item = acc.find((c) => c.group === command.group);
-      if (item) {
-        item.count++;
-      } else {
-        acc.push({ group: command.group, count: 1 });
+        const res = await search(query);
+        const highlighted = db.lookup.fuzzy(
+          prepareQuery(query),
+          res.map((r) => ({
+            ...r,
+            highlightedTitle: r.title
+          })) ?? [],
+          "highlightedTitle",
+          {
+            prefix: "<b style='color: var(--accent-foreground)'>",
+            suffix: "</b>"
+          }
+        );
+        setCommands(highlighted ?? []);
+      } finally {
+        setLoading(false);
       }
-      return acc;
-    }, [] as GroupedCommands);
+    },
+    []);
+
+    const grouped = useMemo(
+      () =>
+        commands.reduce((acc, command) => {
+          const item = acc.find((c) => c.group === command.group);
+          if (item) {
+            item.count++;
+          } else {
+            acc.push({ group: command.group, count: 1 });
+          }
+          return acc;
+        }, [] as GroupedCommands),
+      [commands]
+    );
 
     return (
       <Dialog
@@ -129,11 +147,9 @@ export const CommandPaletteDialog = DialogManager.register(
                 id: command.id,
                 type: command.type
               });
-              if (action) {
-                action(command.id);
-                addRecentCommand(command);
-                props.onClose(false);
-              }
+              action?.(command.id);
+              addRecentCommand(command);
+              props.onClose(false);
               setSelected(0);
             }
             if (e.key === "ArrowDown") {
@@ -153,7 +169,7 @@ export const CommandPaletteDialog = DialogManager.register(
             defaultValue={query}
             onChange={isCommandMode(query) ? onChange : debounce(onChange, 500)}
           />
-          {commands.length === 0 && (
+          {query && commands.length === 0 && (
             <Box>
               <Text variant="subBody">No results found</Text>
             </Box>
@@ -206,11 +222,9 @@ export const CommandPaletteDialog = DialogManager.register(
                           id: command.id,
                           type: command.type
                         });
-                        if (action) {
-                          action(command.id);
-                          addRecentCommand(command);
-                          props.onClose(false);
-                        }
+                        action?.(command.id);
+                        addRecentCommand(command);
+                        props.onClose(false);
                       }}
                       sx={{
                         display: "flex",
@@ -369,8 +383,6 @@ function getCommandAction({
     case "reminder":
       return (reminderId: string) =>
         hashNavigate(`/reminders/${reminderId}/edit`);
-    default:
-      return undefined;
   }
 }
 
