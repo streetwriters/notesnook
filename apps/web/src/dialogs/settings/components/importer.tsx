@@ -18,7 +18,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { strings } from "@notesnook/intl";
-import { Button, Flex, Input, Link, Text, Box } from "@theme-ui/components";
+import {
+  Button,
+  Flex,
+  Input,
+  Link,
+  Text,
+  Box,
+  Select
+} from "@theme-ui/components";
 import { useCallback, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { db } from "../../../common/db";
@@ -26,6 +34,7 @@ import { CheckCircleOutline } from "../../../components/icons";
 import Accordion from "../../../components/accordion";
 import { importFiles } from "../../../utils/importer";
 import { useStore as useAppStore } from "../../../stores/app-store";
+import { ProviderFactory, Providers } from "@notesnook-importer/core";
 
 type Provider = { title: string; link: string };
 const POPULAR_PROVIDERS: Provider[] = [
@@ -89,7 +98,48 @@ export function Importer() {
         overflow: "hidden"
       }}
     >
-      {isImporting ? (
+      <Flex
+        sx={{
+          justifyContent: ["stretch", "space-between"],
+          flexDirection: ["column", "row"]
+        }}
+      >
+        <Text variant="title">Select a notes app to import from</Text>
+        <Select
+          sx={{
+            m: 0,
+            px: 2,
+            border: "1px solid var(--theme-ui-colors-border)",
+            outline: "none",
+            ":hover": {
+              bg: "hover"
+            },
+            ":active": {
+              bg: "background"
+            },
+            fontFamily: "body",
+            fontSize: "body",
+            width: ["100%", 150],
+            mt: [2, 0],
+            p: [2, 0],
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer"
+          }}
+          onChange={(e) => {
+            // const providerName: Providers = e.target.value as Providers;
+            //props.onProviderChanged(ProviderFactory.getProvider(providerName));
+          }}
+        >
+          <option value="">Select notes app</option>
+          {ProviderFactory.getAvailableProviders().map((provider) => (
+            <option key={provider} value={provider}>
+              {ProviderFactory.getProvider(provider as Providers).name}
+            </option>
+          ))}
+        </Select>
+      </Flex>
+      {/* {isImporting ? (
         <>
           <Text variant="title" sx={{ textAlign: "center", mb: 4, mt: 150 }}>
             <span ref={notesCounter}>0</span> {strings.notesImported()}.
@@ -268,8 +318,8 @@ export function Importer() {
             </Box>
           </Flex>
           {/* <Flex my={1} sx={{ flexDirection: "column" }}>
-            
-          </Flex> */}
+
+          </Flex>
           <Button
             variant="accent"
             sx={{ alignSelf: "end", mt: 1 }}
@@ -312,7 +362,7 @@ export function Importer() {
               : "Select files to start importing"}
           </Button>
         </>
-      )}
+      )} */}
     </Flex>
   );
 }
