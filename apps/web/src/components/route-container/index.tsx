@@ -69,6 +69,7 @@ function Header(props: RouteContainerProps) {
   const isMobile = useMobile();
   const isSearching = useSearchStore((store) => store.isSearching);
   const query = useSearchStore((store) => store.query);
+
   if (isSearching)
     return (
       <Flex
@@ -93,10 +94,7 @@ function Header(props: RouteContainerProps) {
           defaultValue={query}
           placeholder={strings.typeAKeyword()}
           onChange={debounce(
-            (e) =>
-              useSearchStore.setState({
-                query: e.target.value
-              }),
+            (e) => useSearchStore.setState({ query: e.target.value }),
             250
           )}
           onKeyUp={(e) => {
