@@ -66,7 +66,7 @@ export const openNote = async (
       item: note
     });
     if (!DDS.isTab) {
-      fluidTabsRef.current?.goToPage(1);
+      fluidTabsRef.current?.goToPage("editor");
     }
   }
 };

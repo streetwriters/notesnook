@@ -167,7 +167,7 @@ const onAppOpenedFromURL = async (event: { url: string }) => {
       clearAppState();
       editorState().movedAway = false;
       eSendEvent(eOnLoadNote, { newNote: true });
-      fluidTabsRef.current?.goToPage(1, false);
+      fluidTabsRef.current?.goToPage("editor", false);
       return;
     } else if (url.startsWith("https://notesnook.com/open_note")) {
       const id = new URL(url).searchParams.get("id");
@@ -177,7 +177,7 @@ const onAppOpenedFromURL = async (event: { url: string }) => {
           eSendEvent(eOnLoadNote, {
             item: note
           });
-          fluidTabsRef.current?.goToPage(1, false);
+          fluidTabsRef.current?.goToPage("editor", false);
         }
       }
     } else if (url.startsWith("https://notesnook.com/open_reminder")) {

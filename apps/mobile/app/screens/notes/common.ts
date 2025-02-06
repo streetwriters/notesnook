@@ -58,7 +58,7 @@ export function openEditor() {
     eSendEvent(eOnLoadNote, { newNote: true });
     editorState().currentlyEditing = true;
     editorState().movedAway = false;
-    fluidTabsRef.current?.goToPage(1);
+    fluidTabsRef.current?.goToPage("editor");
   } else {
     eSendEvent(eOnLoadNote, { newNote: true });
   }
