@@ -59,7 +59,7 @@ export const IntentService = {
           eSendEvent(eOnLoadNote, {
             item: note
           });
-          fluidTabsRef.current?.goToPage(1, false);
+          fluidTabsRef.current?.goToPage("editor", false);
         }
       } else if (intent["com.streetwriters.notesnook.OpenReminderId"]) {
         const reminder = await db.reminders.reminder(

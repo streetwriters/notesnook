@@ -143,7 +143,7 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
                       newTab: true
                     });
                     if (!DDS.isTab) {
-                      fluidTabsRef.current?.goToPage(1);
+                      fluidTabsRef.current?.goToPage("editor");
                     }
                   }}
                 />

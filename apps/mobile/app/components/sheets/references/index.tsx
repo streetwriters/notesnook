@@ -423,7 +423,7 @@ export const ReferencesList = ({ item, close }: ReferencesListProps) => {
             item: note,
             blockId: blockId
           });
-          fluidTabsRef.current?.goToPage(1);
+          fluidTabsRef.current?.goToPage("editor");
           close?.();
         }}
         reference={item as Note}

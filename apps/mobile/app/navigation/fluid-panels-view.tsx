@@ -104,7 +104,7 @@ export const FluidPanelsView = React.memo(
       onShortcutPressed: async (item) => {
         if (!item && getAppState()) {
           editorState().movedAway = false;
-          fluidTabsRef.current?.goToPage(1, false);
+          fluidTabsRef.current?.goToPage("editor", false);
           return;
         }
         if (item?.type === "notesnook.action.newnote") {
@@ -113,13 +113,13 @@ export const FluidPanelsView = React.memo(
             setTimeout(() => {
               eSendEvent(eOnLoadNote, { newNote: true });
               editorState().movedAway = false;
-              fluidTabsRef.current?.goToPage(1, false);
+              fluidTabsRef.current?.goToPage("editor", false);
             }, 3000);
             return;
           }
           eSendEvent(eOnLoadNote, { newNote: true });
           editorState().movedAway = false;
-          fluidTabsRef.current?.goToPage(1, false);
+          fluidTabsRef.current?.goToPage("editor", false);
         }
       }
     });

@@ -553,7 +553,7 @@ export class VaultDialog extends Component {
         item: note
       });
       if (!DDS.isTab) {
-        fluidTabsRef.current?.goToPage(1);
+        fluidTabsRef.current?.goToPage("editor");
       }
     });
   }

@@ -53,14 +53,16 @@ interface TabProps extends ViewProps {
   onDrawerStateChange: (state: boolean) => void;
 }
 
+type FluidTabPage = "home" | "editor";
+
 export interface TabsRef {
-  goToPage: (page: number, animated?: boolean) => void;
+  goToPage: (page: FluidTabPage, animated?: boolean) => void;
   goToIndex: (index: number, animated?: boolean) => 0 | undefined;
   unlock: () => boolean;
   lock: () => boolean;
   openDrawer: (animated?: boolean) => void;
   closeDrawer: (animated?: boolean) => void;
-  page: () => number;
+  page: () => FluidTabPage;
   setScrollEnabled: () => true;
   isDrawerOpen: () => boolean;
   node: RefObject<Animated.View>;
@@ -164,19 +166,18 @@ export const FluidPanels = forwardRef<TabsRef, TabProps>(function FluidTabs(
   useImperativeHandle(
     ref,
     (): TabsRef => ({
-      goToPage: (page: number, animated = true) => {
+      goToPage: (page: FluidTabPage, animated = true) => {
         if (deviceMode === "tablet") {
           translateX.value = animated ? withTiming(0) : 0;
           return;
         }
-        page = page + 1;
-        if (page === 1) {
+        if (page === "home") {
           onDrawerStateChange(false);
           translateX.value = !animated
             ? homePosition
             : withTiming(homePosition);
           currentTab.value = 1;
-        } else if (page === 2) {
+        } else if (page === "editor") {
           onDrawerStateChange(false);
           translateX.value = !animated
             ? editorPosition
@@ -242,7 +243,7 @@ export const FluidPanels = forwardRef<TabsRef, TabProps>(function FluidTabs(
         onDrawerStateChange(false);
         isDrawerOpen.value = false;
       },
-      page: () => currentTab.value,
+      page: () => (currentTab.value === 1 ? "home" : "editor"),
       setScrollEnabled: () => true,
       node: node
     }),
