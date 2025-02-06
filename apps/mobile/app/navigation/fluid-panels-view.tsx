@@ -37,6 +37,7 @@ import {
   getSpecificOrientation,
   removeOrientationListener,
   removeSpecificOrientationListener
+  //@ts-ignore
 } from "react-native-orientation";
 import Animated, {
   useAnimatedStyle,

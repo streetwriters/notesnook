@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { Image, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   NavigationState,
   Route,
@@ -33,10 +34,10 @@ import { db } from "../../common/database";
 import Navigation from "../../services/navigation";
 import { useUserStore } from "../../stores/use-user-store";
 import { deleteItems } from "../../utils/functions";
+import { rootNavigatorRef } from "../../utils/global-refs";
 import { SIZE } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { MoveNotebookSheet } from "../sheets/move-notebook";
-import { UserSheet } from "../sheets/user";
 import { Pressable } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
 import { SideMenuHome } from "./side-menu-home";
@@ -46,8 +47,6 @@ import {
   useSideMenuNotebookSelectionStore,
   useSideMenuTagsSelectionStore
 } from "./stores";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { rootNavigatorRef } from "../../utils/global-refs";
 const renderScene = SceneMap({
   home: SideMenuHome,
   notebooks: SideMenuNotebooks,
@@ -248,12 +247,12 @@ const TabBar = (
                         const ids = useSideMenuNotebookSelectionStore
                           .getState()
                           .getSelectedItemIds();
-                        deleteItems(ids, "notebook");
+                        deleteItems("notebook", ids);
                       } else {
                         const ids = useSideMenuTagsSelectionStore
                           .getState()
                           .getSelectedItemIds();
-                        deleteItems(ids, "tag");
+                        deleteItems("tag", ids);
                       }
                       break;
                     }

@@ -252,9 +252,10 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
           loading={loading}
           CustomLisHeader={
             <NotebookHeader
-              onEditNotebook={() => {
-                AddNotebookSheet.present(params.current.item);
-              }}
+              // TODO
+              // onEditNotebook={() => {
+              //   AddNotebookSheet.present(params.current.item);
+              // }}
               notebook={params.current.item}
               totalNotes={notes?.placeholders.length || 0}
             />
