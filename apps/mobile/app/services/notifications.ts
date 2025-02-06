@@ -440,7 +440,7 @@ async function loadNote(id: string, jump: boolean) {
   const note = await db.notes.note(id);
   if (!note) return;
   if (!DDS.isTab && jump) {
-    fluidTabsRef.current?.goToPage(1);
+    fluidTabsRef.current?.goToPage("editor");
   }
   NotesnookModule.setAppState(
     JSON.stringify({

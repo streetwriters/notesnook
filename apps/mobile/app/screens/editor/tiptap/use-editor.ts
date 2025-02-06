@@ -995,14 +995,14 @@ export const useEditor = (
     if (!appState) return;
     state.current.isRestoringState = true;
     state.current.currentlyEditing = true;
-    if (fluidTabsRef.current?.page() === 2) {
+    if (fluidTabsRef.current?.page() === "editor") {
       state.current.movedAway = false;
     }
 
     if (!state.current.editorStateRestored) {
       state.current.isRestoringState = true;
       if (!DDS.isTab) {
-        fluidTabsRef.current?.goToPage(1, false);
+        fluidTabsRef.current?.goToPage("editor", false);
       }
     }
 
@@ -1081,12 +1081,12 @@ export const useEditor = (
             item: note
           });
         }
-        fluidTabsRef.current?.goToPage(1);
+        fluidTabsRef.current?.goToPage("editor");
       } else {
         noteId = useTabStore.getState().getCurrentNoteId() || null;
         if (!noteId) {
           loadNote({ newNote: true });
-          if (fluidTabsRef.current?.page() === 1) {
+          if (fluidTabsRef.current?.page() === "editor") {
             state.current.currentlyEditing = false;
           }
         } else {
