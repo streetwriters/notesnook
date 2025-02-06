@@ -30,6 +30,7 @@ import { Button } from "../ui/button";
 import Seperator from "../ui/seperator";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { RouteParams } from "../../stores/use-navigation-store";
 
 export type PlaceholderData = {
   title: string;
@@ -46,7 +47,7 @@ type EmptyListProps = {
   title?: string;
   color?: string;
   dataType: string;
-  screen?: string;
+  screen?: keyof RouteParams;
 };
 
 export const Empty = React.memo(function Empty({

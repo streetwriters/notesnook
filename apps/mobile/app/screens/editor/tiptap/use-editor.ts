@@ -649,7 +649,7 @@ export const useEditor = (
 
           if (lastTabFocused.current !== tabId) return;
 
-          if (tabBarRef.current?.page() === 2) {
+          if (fluidTabsRef.current?.page() === 2) {
             state.current.movedAway = false;
           }
 

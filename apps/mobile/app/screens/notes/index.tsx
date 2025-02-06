@@ -216,9 +216,9 @@ const NotesPage = ({
             items: selector
           });
         }}
-        accentColor={accentColor}
+        // accentColor={accentColor}
         onPressDefaultRightButton={onPressFloatingButton}
-        headerRightButtons={rightButtons?.(params?.current)}
+        // rightButtons={rightButtons?.(params?.current)}
       />
 
       <DelayLayout color={accentColor} wait={loadingNotes}>

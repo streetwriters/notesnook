@@ -27,7 +27,7 @@ export const POSITIONS = {
 let RNTooltips: any;
 let prevTarget: any = null;
 function show(event: any, text: string, position = 2) {
-  const tabBarRef = require("./global-refs").tabBarRef;
+  const fluidTabsRef = require("./global-refs").fluidTabsRef;
   if (!RNTooltips) {
     RNTooltips = require("react-native-tooltips").default;
   }
@@ -35,7 +35,7 @@ function show(event: any, text: string, position = 2) {
   prevTarget && RNTooltips.Dismiss(prevTarget);
   prevTarget = null;
   prevTarget = event._targetInst.ref.current;
-  RNTooltips.Show(prevTarget, tabBarRef.current?.node?.current, {
+  RNTooltips.Show(prevTarget, fluidTabsRef.current?.node?.current, {
     text: text,
     tintColor: "#000000",
     corner: Platform.OS === "ios" ? 5 : 40,

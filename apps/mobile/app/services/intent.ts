@@ -21,9 +21,9 @@ import { db } from "../common/database";
 import ReminderSheet from "../components/sheets/reminder";
 import { setAppState } from "../screens/editor/tiptap/utils";
 import { eOnLoadNote } from "../utils/events";
-import { tabBarRef } from "../utils/global-refs";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { eSendEvent } from "./event-manager";
+import { fluidTabsRef } from "../utils/global-refs";
 
 const launchIntent = Platform.OS === "ios" ? {} : NotesnookModule.getIntent();
 let used = false;
@@ -59,7 +59,7 @@ export const IntentService = {
           eSendEvent(eOnLoadNote, {
             item: note
           });
-          tabBarRef.current?.goToPage(1, false);
+          fluidTabsRef.current?.goToPage(1, false);
         }
       } else if (intent["com.streetwriters.notesnook.OpenReminderId"]) {
         const reminder = await db.reminders.reminder(
