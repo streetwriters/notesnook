@@ -259,7 +259,7 @@ export const useEditorEvents = (
 
       if (deviceMode === "mobile") {
         editorState().movedAway = true;
-        fluidTabsRef.current?.goToPage(0);
+        fluidTabsRef.current?.goToPage("home");
       }
 
       setTimeout(() => {
@@ -269,7 +269,7 @@ export const useEditorEvents = (
   }, [editor, deviceMode, fullscreen]);
 
   const onHardwareBackPress = useCallback(() => {
-    if (fluidTabsRef.current?.page() === 2) {
+    if (fluidTabsRef.current?.page() === "editor") {
       onBackPress();
       return true;
     }
