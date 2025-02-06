@@ -95,7 +95,7 @@ function Header(props: RouteContainerProps) {
           onChange={debounce(
             (e) =>
               useSearchStore.setState({
-                query: `"${e.target.value.replace(/"/g, '""')}"`
+                query: e.target.value
               }),
             250
           )}
