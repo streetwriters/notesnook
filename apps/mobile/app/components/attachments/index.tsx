@@ -325,30 +325,31 @@ export const AttachmentDialog = ({
           title={strings.manageAttachments()}
           renderedInRoute="SettingsGroup"
           canGoBack
-          headerRightButtons={[
-            {
-              onPress() {
-                onCheck();
-              },
-              title: strings.recheckAll()
-            },
-            {
-              onPress() {
-                if (!attachments) return;
-                presentDialog({
-                  title: strings.doActions.download.attachment(
-                    attachments.placeholders.length
-                  ),
-                  positiveText: strings.network.download(),
-                  positivePress: async () => {
-                    downloadAttachments(await attachments.ids());
-                  },
-                  negativeText: strings.cancel()
-                });
-              },
-              title: strings.downloadAllAttachments()
-            }
-          ]}
+          // TODO: Add headerRightButtons
+          // headerRightButtons={[
+          //   {
+          //     onPress() {
+          //       onCheck();
+          //     },
+          //     title: strings.recheckAll()
+          //   },
+          //   {
+          //     onPress() {
+          //       if (!attachments) return;
+          //       presentDialog({
+          //         title: strings.doActions.download.attachment(
+          //           attachments.placeholders.length
+          //         ),
+          //         positiveText: strings.network.download(),
+          //         positivePress: async () => {
+          //           downloadAttachments(await attachments.ids());
+          //         },
+          //         negativeText: strings.cancel()
+          //       });
+          //     },
+          //     title: strings.downloadAllAttachments()
+          //   }
+          // ]}
         />
       ) : (
         <View

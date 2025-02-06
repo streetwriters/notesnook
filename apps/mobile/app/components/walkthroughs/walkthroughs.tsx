@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Notebook } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
@@ -35,7 +34,6 @@ import { getContainerBorder } from "../../utils/colors";
 import { getElevationStyle } from "../../utils/elevation";
 import { eOpenAddNotebookDialog } from "../../utils/events";
 import { SIZE } from "../../utils/size";
-import { PinItem } from "../side-menu/pinned-section";
 import { Button } from "../ui/button";
 import Seperator from "../ui/seperator";
 import { SvgView } from "../ui/svg";
@@ -254,7 +252,7 @@ const notebooks: { id: string; steps: TStep[] } = {
             paddingVertical: 12
           }}
         >
-          <PinItem
+          {/* <PinItem
             isPlaceholder={true}
             item={
               {
@@ -274,7 +272,7 @@ const notebooks: { id: string; steps: TStep[] } = {
               } as Notebook
             }
             onPress={() => {}}
-          />
+          /> */}
         </View>
       ),
       button: {
