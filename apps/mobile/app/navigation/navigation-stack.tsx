@@ -81,14 +81,14 @@ const AppNavigation = React.memo(
           }
         }}
       >
-        <AppStack.Screen name="Notes" component={Home} />
-        <AppStack.Screen name="Notebooks" component={Notebooks} />
-        <AppStack.Screen name="Favorites" component={Favorites} />
-        <AppStack.Screen name="Trash" component={Trash} />
-        <AppStack.Screen name="Tags" component={Tags} />
-        <AppStack.Screen name="TaggedNotes" component={TaggedNotes} />
-        <AppStack.Screen name="ColoredNotes" component={ColoredNotes} />
-        <AppStack.Screen name="Reminders" component={Reminders} />
+        <AppStack.Screen name="Notes" component={Home as any} />
+        <AppStack.Screen name="Notebooks" component={Notebooks as any} />
+        <AppStack.Screen name="Favorites" component={Favorites as any} />
+        <AppStack.Screen name="Trash" component={Trash as any} />
+        <AppStack.Screen name="Tags" component={Tags as any} />
+        <AppStack.Screen name="TaggedNotes" component={TaggedNotes as any} />
+        <AppStack.Screen name="ColoredNotes" component={ColoredNotes as any} />
+        <AppStack.Screen name="Reminders" component={Reminders as any} />
         <AppStack.Screen
           name="Monographs"
           initialParams={{
@@ -96,10 +96,10 @@ const AppNavigation = React.memo(
             canGoBack: false,
             title: strings.monographs()
           }}
-          component={Monographs}
+          component={Monographs as any}
         />
-        <AppStack.Screen name="Notebook" component={NotebookScreen} />
-        <AppStack.Screen name="Search" component={Search} />
+        <AppStack.Screen name="Notebook" component={NotebookScreen as any} />
+        <AppStack.Screen name="Search" component={Search as any} />
       </AppStack.Navigator>
     );
   },

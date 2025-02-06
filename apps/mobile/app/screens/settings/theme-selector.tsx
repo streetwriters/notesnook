@@ -163,7 +163,7 @@ function ThemeSelector() {
             >
               {MenuItemsList.map((item, index) => (
                 <View
-                  key={item.name}
+                  key={item.id}
                   style={{
                     height: 12,
                     width: "100%",
@@ -606,7 +606,7 @@ const ThemeSetter = ({
               >
                 {MenuItemsList.map((item, index) => (
                   <View
-                    key={item.name}
+                    key={item.id}
                     style={{
                       height: 12,
                       width: "100%",
