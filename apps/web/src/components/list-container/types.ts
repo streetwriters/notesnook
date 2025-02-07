@@ -28,6 +28,7 @@ export type Context =
   | {
       type: "tag" | "color";
       id: string;
+      item?: Tag;
     }
   | NotebookContext
   | {

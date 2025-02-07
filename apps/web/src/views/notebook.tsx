@@ -81,12 +81,17 @@ function Notebook(props: NotebookProps) {
     Promise.all([
       !!notebookId && db.notebooks.exists(notebookId),
       db.notebooks.exists(rootId)
-    ]).then((exists) => {
+    ]).then(async (exists) => {
       if (exists.every((e) => !e)) {
         navigate(`/notebooks`, { replace: true });
         return;
       }
-      setContext({ type: "notebook", id: notebookId || rootId });
+      const notebook = await db.notebooks.notebook(notebookId || rootId);
+      setContext({
+        type: "notebook",
+        id: notebookId || rootId,
+        item: notebook
+      });
     });
   }, [rootId, notebookId]);
 

@@ -49,11 +49,17 @@ interface Command {
   id: string;
   title: string;
   highlightedTitle?: string;
-  type: "command" | "note" | "notebook" | "tag" | "reminder";
+  type:
+    | "command"
+    | "command-dynamic"
+    | "note"
+    | "notebook"
+    | "tag"
+    | "reminder";
   group: string;
 }
 
-type GroupedCommands = { group: Command["group"]; count: number }[];
+type GroupedCommands = { group: string; count: number }[];
 
 type CommandPaletteDialogProps = BaseDialogProps<boolean> & {
   isCommandMode: boolean;
@@ -97,7 +103,7 @@ export const CommandPaletteDialog = DialogManager.register(
           /**
            * we use a separate key for highlighted title
            * so that when we save recent commands to local storage
-           * we can save the original title instad of the highlighted one
+           * we can save the original title instead of the highlighted one
            */
           "highlightedTitle",
           {
@@ -193,21 +199,23 @@ export const CommandPaletteDialog = DialogManager.register(
                 Scroller: CustomScrollbarsVirtualList
               }}
               groupCounts={grouped.map((g) => g.count)}
-              groupContent={(groupIndex) => (
-                <Box
-                  sx={{
-                    width: "100%",
-                    py: 0.5,
-                    bg: "background",
-                    px: 1,
-                    borderRadius: "2px"
-                  }}
-                >
-                  <Text variant="subBody" bg="">
-                    {toTitleCase(grouped[groupIndex].group)}
-                  </Text>
-                </Box>
-              )}
+              groupContent={(groupIndex) => {
+                return (
+                  <Box
+                    sx={{
+                      width: "100%",
+                      py: 0.5,
+                      bg: "background",
+                      px: 1,
+                      borderRadius: "2px"
+                    }}
+                  >
+                    <Text variant="subBody" bg="">
+                      {toTitleCase(grouped[groupIndex].group)}
+                    </Text>
+                  </Box>
+                );
+              }}
               itemContent={(index) => {
                 const command = commands[index];
                 if (!command) return null;
@@ -334,15 +342,27 @@ const CommandActionMap = COMMANDS.reduce((acc, command) => {
   return acc;
 }, new Map<string, (arg?: any) => void>());
 
-const CommandTypeItems = COMMANDS.map((c) => ({
-  id: c.id,
-  title: c.title,
-  group: c.group,
-  type: "command" as const
-}));
+function resolveCommands(): Command[] {
+  return COMMANDS.reduce((acc, command) => {
+    const hidden = command.hidden ? command.hidden() : false;
+    const group =
+      typeof command.group === "function" ? command.group() : command.group;
+    const title =
+      typeof command.title === "function" ? command.title() : command.title;
+    if (hidden || group === undefined || title === undefined) return acc;
+    return acc.concat({
+      id: command.id,
+      title: title,
+      type: command.dynamic
+        ? ("command-dynamic" as const)
+        : ("command" as const),
+      group: group
+    });
+  }, [] as Command[]);
+}
 
 function getDefaultCommands() {
-  return getRecentCommands().concat(CommandTypeItems);
+  return getRecentCommands().concat(resolveCommands());
 }
 
 function getRecentCommands() {
@@ -350,6 +370,7 @@ function getRecentCommands() {
 }
 
 function addRecentCommand(command: Command) {
+  if (command.type === "command-dynamic") return;
   let commands = getRecentCommands();
   const index = commands.findIndex((c) => c.id === command.id);
   if (index > -1) {
@@ -385,6 +406,8 @@ function getCommandAction({
   switch (type) {
     case "command":
       return CommandActionMap.get(id);
+    case "command-dynamic":
+      return CommandActionMap.get(id);
     case "note":
       return (noteId: string) => useEditorStore.getState().openSession(noteId);
     case "notebook":
@@ -406,6 +429,8 @@ function getCommandIcon({
 }) {
   switch (type) {
     case "command":
+      return CommandIconMap.get(id);
+    case "command-dynamic":
       return CommandIconMap.get(id);
     case "note":
       return NoteIcon;
