@@ -64,10 +64,11 @@ const KEYMAP = [
       "command+option+right",
       "ctrl+alt+right",
       "command+option+shift+right",
-      "ctrl+alt+shift+right"
+      "ctrl+alt+shift+right",
+      "ctrl+tab",
+      "command+tab"
     ],
     description: "Go to next tab",
-    global: false,
     action: () => useEditorStore.getState().focusNextTab()
   },
   {
@@ -75,11 +76,32 @@ const KEYMAP = [
       "command+option+left",
       "ctrl+alt+left",
       "command+option+shift+left",
-      "ctrl+alt+shift+left"
+      "ctrl+alt+shift+left",
+      "ctrl+shift+tab",
+      "command+shift+tab"
     ],
     description: "Go to next tab",
-    global: false,
     action: () => useEditorStore.getState().focusPreviousTab()
+  },
+  {
+    keys: ["ctrl+t", "command+t"],
+    description: "Create a new tab",
+    action: () => useEditorStore.getState().addTab()
+  },
+  {
+    keys: ["ctrl+n", "command+n"],
+    description: "Create a new note",
+    action: () => useEditorStore.getState().newSession()
+  },
+  {
+    keys: ["ctrl+w", "command+w"],
+    description: "Close active tab",
+    action: () => useEditorStore.getState().closeActiveTab()
+  },
+  {
+    keys: ["ctrl+shift+w", "command+shift+w"],
+    description: "Close all tabs",
+    action: () => useEditorStore.getState().closeAllTabs()
   },
   {
     keys: ["command+f", "ctrl+f"],
