@@ -1050,6 +1050,17 @@ class EditorStore extends BaseStore<EditorStore> {
     });
   };
 
+  closeActiveTab = () => {
+    const { activeTabId } = this.get();
+    if (!activeTabId) return;
+    this.closeTabs(activeTabId);
+  };
+
+  closeAllTabs = () => {
+    const { tabs } = this.get();
+    this.closeTabs(...tabs.map((t) => t.id));
+  };
+
   closeTabs = (...ids: string[]) => {
     this.set((state) => {
       const tabs: TabItem[] = [];
