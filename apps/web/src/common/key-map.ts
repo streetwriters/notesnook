@@ -80,7 +80,7 @@ const KEYMAP = [
       "ctrl+shift+tab",
       "command+shift+tab"
     ],
-    description: "Go to next tab",
+    description: "Go to previous tab",
     action: () => useEditorStore.getState().focusPreviousTab()
   },
   {
