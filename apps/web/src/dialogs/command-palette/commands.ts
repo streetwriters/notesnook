@@ -548,7 +548,16 @@ export const commands = [
       if (!session) return;
       useEditorManager.getState().editors[session.id].editor?.undo();
     },
-    group: "Editor"
+    group: "Editor",
+    hidden: () => {
+      const session = useEditorStore.getState().getActiveSession();
+      return (
+        !session ||
+        !useEditorManager.getState().editors[session.id].canUndo ||
+        session.type === "readonly"
+      );
+    },
+    dynamic: true
   },
   {
     id: "redo",
@@ -559,7 +568,16 @@ export const commands = [
       if (!session) return;
       useEditorManager.getState().editors[session.id].editor?.redo();
     },
-    group: "Editor"
+    group: "Editor",
+    hidden: () => {
+      const session = useEditorStore.getState().getActiveSession();
+      return (
+        !session ||
+        !useEditorManager.getState().editors[session.id].canRedo ||
+        session.type === "readonly"
+      );
+    },
+    dynamic: true
   },
   {
     id: "toggle-bold",
@@ -568,12 +586,7 @@ export const commands = [
     action: () => {
       const session = useEditorStore.getState().getActiveSession();
       if (!session) return;
-      useEditorManager
-        .getState()
-        .editors[session.id].editor?.editor.chain()
-        .focus()
-        .toggleBold()
-        .run();
+      useEditorManager.getState().editors[session.id].editor?.toggleBold();
     },
     group: "Editor"
   },
@@ -584,12 +597,7 @@ export const commands = [
     action: () => {
       const session = useEditorStore.getState().getActiveSession();
       if (!session) return;
-      useEditorManager
-        .getState()
-        .editors[session.id].editor?.editor.chain()
-        .focus()
-        .toggleItalic()
-        .run();
+      useEditorManager.getState().editors[session.id].editor?.toggleItalic();
     },
     group: "Editor"
   },
@@ -600,12 +608,7 @@ export const commands = [
     action: () => {
       const session = useEditorStore.getState().getActiveSession();
       if (!session) return;
-      useEditorManager
-        .getState()
-        .editors[session.id].editor?.editor.chain()
-        .focus()
-        .toggleUnderline()
-        .run();
+      useEditorManager.getState().editors[session.id].editor?.toggleUnderline();
     },
     group: "Editor"
   },
@@ -616,12 +619,7 @@ export const commands = [
     action: () => {
       const session = useEditorStore.getState().getActiveSession();
       if (!session) return;
-      useEditorManager
-        .getState()
-        .editors[session.id].editor?.editor.chain()
-        .focus()
-        .toggleStrike()
-        .run();
+      useEditorManager.getState().editors[session.id].editor?.toggleStrike();
     },
     group: "Editor"
   },
@@ -632,12 +630,7 @@ export const commands = [
     action: () => {
       const session = useEditorStore.getState().getActiveSession();
       if (!session) return;
-      useEditorManager
-        .getState()
-        .editors[session.id].editor?.editor.chain()
-        .focus()
-        .toggleCode()
-        .run();
+      useEditorManager.getState().editors[session.id].editor?.toggleCode();
     },
     group: "Editor"
   },
@@ -648,12 +641,7 @@ export const commands = [
     action: () => {
       const session = useEditorStore.getState().getActiveSession();
       if (!session) return;
-      useEditorManager
-        .getState()
-        .editors[session.id].editor?.editor.chain()
-        .focus()
-        .toggleSubscript()
-        .run();
+      useEditorManager.getState().editors[session.id].editor?.toggleSubscript();
     },
     group: "Editor"
   },
@@ -666,10 +654,33 @@ export const commands = [
       if (!session) return;
       useEditorManager
         .getState()
-        .editors[session.id].editor?.editor.chain()
-        .focus()
-        .toggleSuperscript()
-        .run();
+        .editors[session.id].editor?.toggleSuperscript();
+    },
+    group: "Editor"
+  },
+  {
+    id: "toggle-bullet-list",
+    title: "Toggle bullet list",
+    icon: Editor,
+    action: () => {
+      const session = useEditorStore.getState().getActiveSession();
+      if (!session) return;
+      useEditorManager
+        .getState()
+        .editors[session.id].editor?.toggleBulletList();
+    },
+    group: "Editor"
+  },
+  {
+    id: "toggle-ordered-list",
+    title: "Toggle ordered list",
+    icon: Editor,
+    action: () => {
+      const session = useEditorStore.getState().getActiveSession();
+      if (!session) return;
+      useEditorManager
+        .getState()
+        .editors[session.id].editor?.toggleOrderedList();
     },
     group: "Editor"
   },
@@ -680,12 +691,7 @@ export const commands = [
     action: () => {
       const session = useEditorStore.getState().getActiveSession();
       if (!session) return;
-      useEditorManager
-        .getState()
-        .editors[session.id].editor?.editor.chain()
-        .focus()
-        .toggleTaskList()
-        .run();
+      useEditorManager.getState().editors[session.id].editor?.toggleTaskList();
     },
     group: "Editor"
   },
@@ -698,10 +704,7 @@ export const commands = [
       if (!session) return;
       useEditorManager
         .getState()
-        .editors[session.id].editor?.editor.chain()
-        .focus()
-        .toggleOutlineList()
-        .run();
+        .editors[session.id].editor?.toggleOutlineList();
     },
     group: "Editor"
   },
@@ -714,10 +717,7 @@ export const commands = [
       if (!session) return;
       useEditorManager
         .getState()
-        .editors[session.id].editor?.editor.chain()
-        .focus()
-        .setHorizontalRule()
-        .run();
+        .editors[session.id].editor?.insertHorizontalRule();
     },
     group: "Editor"
   },
@@ -728,12 +728,7 @@ export const commands = [
     action: () => {
       const session = useEditorStore.getState().getActiveSession();
       if (!session) return;
-      useEditorManager
-        .getState()
-        .editors[session.id].editor?.editor.chain()
-        .focus()
-        .toggleCodeBlock()
-        .run();
+      useEditorManager.getState().editors[session.id].editor?.toggleCodeBlock();
     },
     group: "Editor"
   },
@@ -744,29 +739,20 @@ export const commands = [
     action: () => {
       const session = useEditorStore.getState().getActiveSession();
       if (!session) return;
-      useEditorManager
-        .getState()
-        .editors[session.id].editor?.editor.chain()
-        .focus()
-        // todo: figure out this typescript error
-        .insertMathBlock()
-        .run();
+      useEditorManager.getState().editors[session.id].editor?.insertMathBlock();
     },
     group: "Editor"
   },
   {
-    id: "toggle-quote-block",
-    title: "Toggle quote block",
+    id: "insert-quote-block",
+    title: "Insert quote block",
     icon: Editor,
     action: () => {
       const session = useEditorStore.getState().getActiveSession();
       if (!session) return;
       useEditorManager
         .getState()
-        .editors[session.id].editor?.editor.chain()
-        .focus()
-        .toggleBlockquote()
-        .run();
+        .editors[session.id].editor?.toggleQuoteBlock();
     },
     group: "Editor"
   },
@@ -777,11 +763,7 @@ export const commands = [
     action: () => {
       const session = useEditorStore.getState().getActiveSession();
       if (!session) return;
-      useEditorManager
-        .getState()
-        .editors[session.id].editor?.editor.storage.openAttachmentPicker?.(
-          "file"
-        );
+      useEditorManager.getState().editors[session.id].editor?.addAttachment();
     },
     group: "Editor"
   },

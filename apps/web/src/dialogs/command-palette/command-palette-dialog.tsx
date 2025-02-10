@@ -553,19 +553,7 @@ function search(query: string) {
 
 function commandSearch(query: string) {
   const commands = getDefaultCommands();
-  return db.lookup
-    .fuzzy(query, commands, "title", { matchOnly: true })
-    .concat(
-      query.length > 3
-        ? commands.filter((command) =>
-            command.group.toLowerCase().includes(query.toLowerCase())
-          )
-        : []
-    )
-    .reduce((acc, command) => {
-      if (acc.find((c) => c.id === command.id)) return acc;
-      return acc.concat(command);
-    }, [] as Command[]);
+  return db.lookup.fuzzy(query, commands, "title", { matchOnly: true });
 }
 
 async function dbSearch(query: string) {
