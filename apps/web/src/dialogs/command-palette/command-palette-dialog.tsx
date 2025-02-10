@@ -70,14 +70,14 @@ export const CommandPaletteDialog = DialogManager.register(
     const [commands, setCommands] = useState<Command[]>(
       props.isCommandMode ? getDefaultCommands() : getSessionsAsCommands()
     );
-    const [selected, setSelected] = useState(0);
+    const [selected, setSelected] = useState({ x: 0, y: 0 });
     const [query, setQuery] = useState(props.isCommandMode ? ">" : "");
     const [loading, setLoading] = useState(false);
     const virtuosoRef = useRef<GroupedVirtuosoHandle>(null);
 
     useEffect(() => {
       virtuosoRef.current?.scrollToIndex({
-        index: selected,
+        index: selected.y,
         align: "end",
         behavior: "auto"
       });
@@ -87,7 +87,7 @@ export const CommandPaletteDialog = DialogManager.register(
       e: React.ChangeEvent<HTMLInputElement>
     ) {
       try {
-        setSelected(0);
+        setSelected({ x: 0, y: 0 });
         const query = e.target.value;
         setQuery(query);
         if (!isCommandMode(query)) {
@@ -158,8 +158,16 @@ export const CommandPaletteDialog = DialogManager.register(
           onKeyDown={(e) => {
             if (e.key == "Enter") {
               e.preventDefault();
-              const command = commands[selected];
+              const command = commands[selected.y];
               if (!command) return;
+              if (selected.x === 1) {
+                setSelected({ x: 0, y: 0 });
+                removeRecentCommand(command.id);
+                setCommands((commands) =>
+                  commands.filter((c) => c.id !== command.id)
+                );
+                return;
+              }
               const action = getCommandAction({
                 id: command.id,
                 type: command.type
@@ -167,15 +175,23 @@ export const CommandPaletteDialog = DialogManager.register(
               action?.(command.id);
               addRecentCommand(command);
               props.onClose(false);
-              setSelected(0);
+              setSelected({ x: 0, y: 0 });
             }
             if (e.key === "ArrowDown") {
               e.preventDefault();
-              setSelected((selected + 1) % commands.length);
+              setSelected(arrowNavigate.down(selected, commands));
             }
             if (e.key === "ArrowUp") {
               e.preventDefault();
-              setSelected((selected - 1 + commands.length) % commands.length);
+              setSelected(arrowNavigate.up(selected, commands));
+            }
+            if (e.key === "ArrowRight") {
+              e.preventDefault();
+              setSelected(arrowNavigate.right(selected, commands));
+            }
+            if (e.key === "ArrowLeft") {
+              e.preventDefault();
+              setSelected(arrowNavigate.left(selected, commands));
             }
           }}
         >
@@ -252,10 +268,13 @@ export const CommandPaletteDialog = DialogManager.register(
                         width: "100%",
                         gap: 2,
                         py: 1,
-                        bg: index === selected ? "hover" : "transparent",
+                        bg:
+                          selected.x === 0 && index === selected.y
+                            ? "hover"
+                            : "transparent",
                         ".chip": {
                           bg:
-                            index === selected
+                            selected.x === 0 && index === selected.y
                               ? "color-mix(in srgb, var(--accent) 20%, transparent)"
                               : "var(--background-secondary)"
                         },
@@ -267,7 +286,11 @@ export const CommandPaletteDialog = DialogManager.register(
                       {Icon && (
                         <Icon
                           size={18}
-                          color={index === selected ? "icon-selected" : "icon"}
+                          color={
+                            selected.x === 0 && index === selected.y
+                              ? "icon-selected"
+                              : "icon"
+                          }
                         />
                       )}
                       {["note", "notebook", "reminder", "tag"].includes(
@@ -311,8 +334,15 @@ export const CommandPaletteDialog = DialogManager.register(
                         }}
                         variant="icon"
                         sx={{
+                          bg:
+                            selected.x === 1 && index === selected.y
+                              ? "hover"
+                              : "transparent",
                           p: 1,
-                          mr: 1
+                          mr: 1,
+                          ":hover:not(:disabled):not(:active)": {
+                            bg: "hover"
+                          }
                         }}
                       >
                         <Cross size={14} />
@@ -337,6 +367,45 @@ export const CommandPaletteDialog = DialogManager.register(
     );
   }
 );
+
+const arrowNavigate: Record<
+  "down" | "up" | "right" | "left",
+  (
+    current: Record<"x" | "y", number>,
+    commands: Command[]
+  ) => Record<"x" | "y", number>
+> = {
+  down: (current, commands) => {
+    const currentCommand = commands[current.y];
+    const nextIndex = (current.y + 1) % commands.length;
+    const nextCommand = commands[nextIndex];
+    if (currentCommand.group === "recent" && nextCommand.group === "recent") {
+      return { x: current.x, y: nextIndex };
+    }
+    return { x: 0, y: nextIndex };
+  },
+  up: (current, commands) => {
+    const currentCommand = commands[current.y];
+    const nextIndex = (current.y - 1 + commands.length) % commands.length;
+    const nextCommand = commands[nextIndex];
+    if (currentCommand.group === "recent" && nextCommand.group === "recent") {
+      return { x: current.x, y: nextIndex };
+    }
+    return { x: 0, y: nextIndex };
+  },
+  right: (current, commands) => {
+    const currentCommand = commands[current.y];
+    if (currentCommand.group !== "recent") return current;
+    const nextIndex = (current.x + 1) % 2;
+    return { x: nextIndex, y: current.y };
+  },
+  left: (current, commands) => {
+    const currentCommand = commands[current.y];
+    if (currentCommand.group !== "recent") return current;
+    const nextIndex = (current.x - 1 + 2) % 2;
+    return { x: nextIndex, y: current.y };
+  }
+};
 
 const CommandIconMap = COMMANDS.reduce((acc, command) => {
   acc.set(command.id, command.icon);
