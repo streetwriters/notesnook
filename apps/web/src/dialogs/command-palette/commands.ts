@@ -29,6 +29,7 @@ import {
   Copy,
   DeleteForver,
   Duplicate,
+  Edit,
   Editor,
   InternalLink,
   Notebook,
@@ -40,8 +41,8 @@ import {
   Radar,
   Readonly,
   Reminder,
-  Rename,
   Restore,
+  Shortcut,
   Star,
   Sync,
   Tag,
@@ -50,6 +51,7 @@ import {
 import { showPublishView } from "../../components/publish-view";
 import { deleteTrash } from "../../components/trash-item";
 import { hashNavigate, navigate } from "../../navigation";
+import { store as appStore } from "../../stores/app-store";
 import { useEditorStore } from "../../stores/editor-store";
 import { store as monographStore } from "../../stores/monograph-store";
 import { store as noteStore } from "../../stores/note-store";
@@ -499,6 +501,29 @@ export const commands = [
     dynamic: true
   },
   {
+    id: "add-shortcut-active-notebook",
+    title: () => {
+      const context = noteStore.get().context;
+      return context?.type === "notebook" && context.item
+        ? db.shortcuts.exists(context.item.id)
+          ? "Remove shortcut"
+          : "Add shortcut"
+        : undefined;
+    },
+    icon: Shortcut,
+    action: () => {
+      const context = noteStore.get().context;
+      if (context?.type !== "notebook" || !context.item) return;
+      appStore.addToShortcuts(context.item);
+    },
+    group: getLabelForActiveNotebookGroup,
+    hidden: () => {
+      const context = noteStore.get().context;
+      return context?.type !== "notebook";
+    },
+    dynamic: true
+  },
+  {
     id: "move-to-trash-active-notebook",
     title: () => {
       const context = noteStore.get().context;
@@ -525,12 +550,54 @@ export const commands = [
       const context = noteStore.get().context;
       return context?.type === "tag" ? "Rename" : undefined;
     },
-    icon: Rename,
+    icon: Edit,
     action: () => {
       const context = noteStore.get().context;
       if (context?.type === "tag" && context.item) {
         EditTagDialog.show(context.item);
       }
+    },
+    group: getLabelForActiveTagGroup,
+    hidden: () => {
+      const context = noteStore.get().context;
+      return context?.type !== "tag";
+    },
+    dynamic: true
+  },
+  {
+    id: "add-shortcut-active-tag",
+    title: () => {
+      const context = noteStore.get().context;
+      return context?.type === "tag" && context.item
+        ? db.shortcuts.exists(context.item.id)
+          ? "Remove shortcut"
+          : "Add shortcut"
+        : undefined;
+    },
+    icon: Shortcut,
+    action: () => {
+      const context = noteStore.get().context;
+      if (context?.type !== "tag" || !context.item) return;
+      appStore.addToShortcuts(context.item);
+    },
+    group: getLabelForActiveTagGroup,
+    hidden: () => {
+      const context = noteStore.get().context;
+      return context?.type !== "tag";
+    },
+    dynamic: true
+  },
+  {
+    id: "delete-active-tag",
+    title: () => {
+      const context = noteStore.get().context;
+      return context?.type === "tag" ? "Delete" : undefined;
+    },
+    icon: DeleteForver,
+    action: () => {
+      const context = noteStore.get().context;
+      if (!context || context.type !== "tag" || !context.item) return;
+      Multiselect.deleteTags([context.item.id]);
     },
     group: getLabelForActiveTagGroup,
     hidden: () => {
