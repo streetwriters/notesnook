@@ -608,7 +608,11 @@ function toIEditor(editor: Editor): IEditor {
     getSelection: () => {
       const { from, to } = editor.state.selection;
       return { from, to };
-    }
+    },
+    /**
+     * todo: only extract what we need instead of the whole object
+     */
+    editor: editor
   };
 }
 

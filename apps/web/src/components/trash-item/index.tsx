@@ -100,7 +100,7 @@ const menuItems: (item: TrashItemType, ids?: string[]) => MenuItem[] = (
   ];
 };
 
-async function deleteTrash(ids: string[]) {
+export async function deleteTrash(ids: string[]) {
   if (!(await showMultiPermanentDeleteConfirmation(ids.length))) return;
   await store.delete(...ids);
   showToast("success", `${pluralize(ids.length, "item")} permanently deleted`);

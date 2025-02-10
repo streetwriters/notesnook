@@ -17,39 +17,57 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { createInternalLink, hosts } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
+import { db } from "../../common/db";
+import { Multiselect } from "../../common/multi-select";
+import { useEditorManager } from "../../components/editor/manager";
 import {
   ArrowTopRight,
+  Copy,
+  DeleteForver,
   Duplicate,
+  Editor,
   InternalLink,
   Notebook,
   NotebookEdit,
+  OpenInNew,
   Pin,
   Plus,
+  Publish,
   Radar,
   Readonly,
   Reminder,
   Rename,
+  Restore,
   Star,
-  Tag
+  Sync,
+  Tag,
+  Trash
 } from "../../components/icons";
+import { showPublishView } from "../../components/publish-view";
+import { deleteTrash } from "../../components/trash-item";
 import { hashNavigate, navigate } from "../../navigation";
 import { useEditorStore } from "../../stores/editor-store";
-import { useStore as useThemeStore } from "../../stores/theme-store";
-import { AttachmentsDialog } from "../attachments-dialog";
-import { CreateColorDialog } from "../create-color-dialog";
+import { store as monographStore } from "../../stores/monograph-store";
 import { store as noteStore } from "../../stores/note-store";
 import { store as notebookStore } from "../../stores/notebook-store";
-import { AddReminderDialog } from "../add-reminder-dialog";
-import { MoveNoteDialog } from "../move-note-dialog";
-import { AddTagsDialog } from "../add-tags-dialog";
-import { createInternalLink } from "@notesnook/core";
+import { useStore as useThemeStore } from "../../stores/theme-store";
+import { store as trashStore } from "../../stores/trash-store";
 import { writeToClipboard } from "../../utils/clipboard";
+import { AddReminderDialog } from "../add-reminder-dialog";
+import { AddTagsDialog } from "../add-tags-dialog";
+import { AttachmentsDialog } from "../attachments-dialog";
+import { ConfirmDialog } from "../confirm";
+import { CreateColorDialog } from "../create-color-dialog";
 import { EditTagDialog } from "../item-dialog";
+import { MoveNoteDialog } from "../move-note-dialog";
+import { AddNotebookDialog } from "../add-notebook-dialog";
 
 function getLabelForActiveNoteGroup() {
   const text = "Actions for ";
-  const currentNote = useEditorStore.getState().getActiveNote();
-  return currentNote ? `${text} note: ${currentNote.title}` : undefined;
+  const note = useEditorStore.getState().getActiveNote();
+  return note ? `${text} note: ${note.title}` : undefined;
 }
 
 function getLabelForActiveNotebookGroup() {
@@ -70,148 +88,368 @@ function getLabelForActiveTagGroup() {
 
 export const commands = [
   {
-    id: "duplicate-active-note",
-    title: () => "Duplicate",
-    icon: Duplicate,
-    action: () => {
-      const currentNote = useEditorStore.getState().getActiveNote();
-      if (currentNote) {
-        noteStore.get().duplicate(currentNote.id);
-      }
-    },
-    group: getLabelForActiveNoteGroup,
-    hidden: () => !useEditorStore.getState().getActiveNote(),
-    dynamic: true
-  },
-  {
     id: "pin-active-note",
     title: () => {
-      const currentNote = useEditorStore.getState().getActiveNote();
-      return currentNote ? (currentNote.pinned ? "Unpin" : "Pin") : undefined;
+      const note = useEditorStore.getState().getActiveNote();
+      return note ? (note.pinned ? "Unpin" : "Pin") : undefined;
     },
     icon: Pin,
     action: () => {
-      const currentNote = useEditorStore.getState().getActiveNote();
-      if (currentNote) {
-        noteStore.get().pin(!currentNote.pinned, currentNote.id);
-      }
+      const note = useEditorStore.getState().getActiveNote();
+      if (!note) return;
+      noteStore.get().pin(!note.pinned, note.id);
     },
     group: getLabelForActiveNoteGroup,
-    hidden: () => !useEditorStore.getState().getActiveNote(),
+    hidden: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      return !note || note.type === "trash";
+    },
     dynamic: true
   },
   {
     id: "readonly-active-note",
     title: () => {
-      const currentNote = useEditorStore.getState().getActiveNote();
-      return currentNote ? "Toggle readonly" : undefined;
+      const note = useEditorStore.getState().getActiveNote();
+      return note ? "Toggle readonly" : undefined;
     },
     icon: Readonly,
     action: () => {
-      const currentNote = useEditorStore.getState().getActiveNote();
-      if (currentNote) {
-        noteStore.get().readonly(!currentNote.readonly, currentNote.id);
-      }
+      const note = useEditorStore.getState().getActiveNote();
+      if (!note) return;
+      noteStore.get().readonly(!note.readonly, note.id);
     },
     group: getLabelForActiveNoteGroup,
-    hidden: () => !useEditorStore.getState().getActiveNote(),
+    hidden: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      return !note || note.type === "trash";
+    },
     dynamic: true
   },
   {
     id: "favorite-active-note",
     title: () => {
-      const currentNote = useEditorStore.getState().getActiveNote();
-      return currentNote
-        ? currentNote.favorite
-          ? "Unfavorite"
-          : "Favorite"
-        : undefined;
+      const note = useEditorStore.getState().getActiveNote();
+      return note ? (note.favorite ? "Unfavorite" : "Favorite") : undefined;
     },
     icon: Star,
     action: () => {
-      const currentNote = useEditorStore.getState().getActiveNote();
-      if (currentNote) {
-        noteStore.get().favorite(!currentNote.favorite, currentNote.id);
-      }
+      const note = useEditorStore.getState().getActiveNote();
+      if (!note) return;
+      noteStore.get().favorite(!note.favorite, note.id);
     },
     group: getLabelForActiveNoteGroup,
-    hidden: () => !useEditorStore.getState().getActiveNote(),
+    hidden: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      return !note || note.type === "trash";
+    },
     dynamic: true
   },
   {
     id: "remind-me-active-note",
     title: () => {
-      const currentNote = useEditorStore.getState().getActiveNote();
-      if (currentNote) {
-        return "Remind me";
-      }
-      return "n/a";
+      const note = useEditorStore.getState().getActiveNote();
+      return note ? "Remind me" : undefined;
     },
     icon: Reminder,
     action: () => {
-      const currentNote = useEditorStore.getState().getActiveNote();
-      if (!currentNote) return;
-      if (currentNote.type === "trash") return;
-      AddReminderDialog.show({ note: currentNote });
+      const note = useEditorStore.getState().getActiveNote();
+      if (!note) return;
+      if (note.type === "trash") return;
+      AddReminderDialog.show({ note: note });
     },
     group: getLabelForActiveNoteGroup,
-    hidden: () => !useEditorStore.getState().getActiveNote(),
+    hidden: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      return !note || note.type === "trash";
+    },
     dynamic: true
   },
   {
     id: "link-notebooks-active-note",
     title: () => {
-      const currentNote = useEditorStore.getState().getActiveNote();
-      return currentNote ? "Link notebooks" : undefined;
+      const note = useEditorStore.getState().getActiveNote();
+      return note ? "Link notebooks" : undefined;
     },
     icon: Notebook,
     action: () => {
-      const currentNote = useEditorStore.getState().getActiveNote();
-      if (currentNote) {
-        MoveNoteDialog.show({ noteIds: [currentNote.id] });
-      }
+      const note = useEditorStore.getState().getActiveNote();
+      if (!note) return;
+      MoveNoteDialog.show({ noteIds: [note.id] });
     },
     group: getLabelForActiveNoteGroup,
-    hidden: () => !useEditorStore.getState().getActiveNote(),
+    hidden: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      return !note || note.type === "trash";
+    },
     dynamic: true
   },
   {
     id: "add-tags-active-note",
     title: () => {
-      const currentNote = useEditorStore.getState().getActiveNote();
-      return currentNote ? "Add tags" : undefined;
+      const note = useEditorStore.getState().getActiveNote();
+      return note ? "Add tags" : undefined;
     },
     icon: Tag,
     action: () => {
-      const currentNote = useEditorStore.getState().getActiveNote();
-      if (currentNote) {
-        AddTagsDialog.show({ noteIds: [currentNote.id] });
+      const note = useEditorStore.getState().getActiveNote();
+      if (!note) return;
+      AddTagsDialog.show({ noteIds: [note.id] });
+    },
+    group: getLabelForActiveNoteGroup,
+    hidden: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      return !note || note.type === "trash";
+    },
+    dynamic: true
+  },
+  {
+    id: "publish-on-monograph-active-note",
+    title: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      return note ? "Publish on monograph" : undefined;
+    },
+    icon: Publish,
+    action: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      if (!note || note.type === "trash") return;
+      const isPublished = db.monographs.isPublished(note.id);
+      if (isPublished) return;
+      showPublishView(note);
+    },
+    group: getLabelForActiveNoteGroup,
+    hidden: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      return (
+        !note || note.type === "trash" || db.monographs.isPublished(note.id)
+      );
+    },
+    dynamic: true
+  },
+  {
+    id: "open-in-monograph-active-note",
+    title: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      return note ? "Open in monograph" : undefined;
+    },
+    icon: OpenInNew,
+    action: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      if (!note || note.type === "trash") return;
+      const isPublished = db.monographs.isPublished(note.id);
+      if (!isPublished) return;
+      const url = `${hosts.MONOGRAPH_HOST}/${note.id}`;
+      window.open(url, "_blank");
+    },
+    group: getLabelForActiveNoteGroup,
+    hidden: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      return (
+        !note || note.type === "trash" || !db.monographs.isPublished(note.id)
+      );
+    },
+    dynamic: true
+  },
+  {
+    id: "copy-monograph-link-active-note",
+    title: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      return note ? "Copy monograph link" : undefined;
+    },
+    icon: Copy,
+    action: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      if (!note || note.type === "trash") return;
+      const isPublished = db.monographs.isPublished(note.id);
+      if (!isPublished) return;
+      const url = `${hosts.MONOGRAPH_HOST}/${note.id}`;
+      writeToClipboard({
+        "text/plain": url,
+        "text/html": `<a href="${url}">${note.title}</a>`,
+        "text/markdown": `[${note.title}](${url})`
+      });
+    },
+    group: getLabelForActiveNoteGroup,
+    hidden: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      return (
+        !note || note.type === "trash" || !db.monographs.isPublished(note.id)
+      );
+    },
+    dynamic: true
+  },
+  {
+    id: "toggle-sync-active-note",
+    title: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      return note
+        ? note?.localOnly
+          ? "Turn sync on"
+          : "Turn sync off"
+        : undefined;
+    },
+    icon: Sync,
+    action: async () => {
+      const note = useEditorStore.getState().getActiveNote();
+      if (!note || note.type === "trash") return;
+      if (
+        note.localOnly ||
+        (await ConfirmDialog.show({
+          title: strings.syncOffConfirm(1),
+          message: strings.syncOffDesc(1),
+          positiveButtonText: strings.yes(),
+          negativeButtonText: strings.no()
+        }))
+      ) {
+        await noteStore.localOnly(!note.localOnly, note.id);
       }
     },
     group: getLabelForActiveNoteGroup,
-    hidden: () => !useEditorStore.getState().getActiveNote(),
+    hidden: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      return !note || note.type === "trash";
+    },
+    dynamic: true
+  },
+  {
+    id: "unpublish-on-monograph-active-note",
+    title: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      return note ? "Unpublish on monograph" : undefined;
+    },
+    icon: Publish,
+    action: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      if (!note || note.type === "trash") return;
+      monographStore.get().unpublish(note.id);
+    },
+    group: getLabelForActiveNoteGroup,
+    hidden: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      return (
+        !note || note.type === "trash" || !db.monographs.isPublished(note.id)
+      );
+    },
     dynamic: true
   },
   {
     id: "copy-link-active-note",
     title: () => {
-      const currentNote = useEditorStore.getState().getActiveNote();
-      return currentNote ? "Copy link" : undefined;
+      const note = useEditorStore.getState().getActiveNote();
+      return note ? "Copy link" : undefined;
     },
     icon: InternalLink,
     action: () => {
-      const currentNote = useEditorStore.getState().getActiveNote();
-      if (currentNote) {
-        const link = createInternalLink("note", currentNote.id);
+      const note = useEditorStore.getState().getActiveNote();
+      if (note) {
+        const link = createInternalLink("note", note.id);
         writeToClipboard({
           "text/plain": link,
-          "text/html": `<a href="${link}">${currentNote.title}</a>`,
-          "text/markdown": `[${currentNote.title}](${link})`
+          "text/html": `<a href="${link}">${note.title}</a>`,
+          "text/markdown": `[${note.title}](${link})`
         });
       }
     },
     group: getLabelForActiveNoteGroup,
-    hidden: () => !useEditorStore.getState().getActiveNote(),
+    hidden: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      return !note || note.type === "trash";
+    },
+    dynamic: true
+  },
+  {
+    id: "duplicate-active-note",
+    title: () => "Duplicate",
+    icon: Duplicate,
+    action: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      if (!note) return;
+      noteStore.get().duplicate(note.id);
+    },
+    group: getLabelForActiveNoteGroup,
+    hidden: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      return !note || note.type === "trash";
+    },
+    dynamic: true
+  },
+  {
+    id: "move-to-trash-active-note",
+    title: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      return note ? "Move to trash" : undefined;
+    },
+    icon: Trash,
+    action: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      if (!note || db.monographs.isPublished(note.id)) return;
+      Multiselect.moveNotesToTrash([note.id], false);
+    },
+    group: getLabelForActiveNoteGroup,
+    hidden: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      return (
+        !note || note.type === "trash" || db.monographs.isPublished(note.id)
+      );
+    },
+    dynamic: true
+  },
+  {
+    id: "restore-active-note",
+    title: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      return note ? "Restore" : undefined;
+    },
+    icon: Restore,
+    action: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      if (!note) return;
+      trashStore.restore(note.id);
+    },
+    group: getLabelForActiveNoteGroup,
+    hidden: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      return !note || note.type !== "trash";
+    },
+    dynamic: true
+  },
+  {
+    id: "delete-active-note",
+    title: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      return note ? "Delete" : undefined;
+    },
+    icon: DeleteForver,
+    action: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      if (!note) return;
+      deleteTrash([note.id]);
+    },
+    group: getLabelForActiveNoteGroup,
+    hidden: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      return !note || note.type !== "trash";
+    },
+    dynamic: true
+  },
+  {
+    id: "add-subnotebook-active-notebook",
+    title: () => {
+      const context = noteStore.get().context;
+      return context?.type === "notebook" ? "Add subnotebook" : undefined;
+    },
+    icon: Plus,
+    action: () => {
+      const context = noteStore.get().context;
+      if (context?.type !== "notebook") return;
+      AddNotebookDialog.show({ parentId: context.id });
+    },
+    group: getLabelForActiveNotebookGroup,
+    hidden: () => {
+      const context = noteStore.get().context;
+      return (
+        context?.type !== "notebook" || !context.item || context.item.deleted
+      );
+    },
     dynamic: true
   },
   {
@@ -223,14 +461,15 @@ export const commands = [
     icon: NotebookEdit,
     action: () => {
       const context = noteStore.get().context;
-      if (context?.type === "notebook") {
-        hashNavigate(`/notebooks/${context.id}/edit`);
-      }
+      if (context?.type !== "notebook") return;
+      hashNavigate(`/notebooks/${context.id}/edit`);
     },
     group: getLabelForActiveNotebookGroup,
     hidden: () => {
       const context = noteStore.get().context;
-      return context?.type !== "notebook";
+      return (
+        context?.type !== "notebook" || !context.item || context.item.deleted
+      );
     },
     dynamic: true
   },
@@ -247,9 +486,29 @@ export const commands = [
     icon: Pin,
     action: () => {
       const context = noteStore.get().context;
-      if (context?.type === "notebook") {
-        notebookStore.pin(!context.item?.pinned, context.id);
-      }
+      if (context?.type !== "notebook") return;
+      notebookStore.pin(!context.item?.pinned, context.id);
+    },
+    group: getLabelForActiveNotebookGroup,
+    hidden: () => {
+      const context = noteStore.get().context;
+      return context?.type !== "notebook";
+    },
+    dynamic: true
+  },
+  {
+    id: "move-to-trash-active-notebook",
+    title: () => {
+      const context = noteStore.get().context;
+      return context?.type === "notebook" ? "Move to trash" : undefined;
+    },
+    icon: Trash,
+    action: () => {
+      const context = noteStore.get().context;
+      if (context?.type !== "notebook") return;
+      Multiselect.moveNotebooksToTrash([context.id]).then(() => {
+        navigate("/notebooks");
+      });
     },
     group: getLabelForActiveNotebookGroup,
     hidden: () => {
@@ -277,6 +536,252 @@ export const commands = [
       return context?.type !== "tag";
     },
     dynamic: true
+  },
+  {
+    id: "undo",
+    title: "Undo",
+    icon: Editor,
+    action: () => {
+      const session = useEditorStore.getState().getActiveSession();
+      if (!session) return;
+      useEditorManager.getState().editors[session.id].editor?.undo();
+    },
+    group: "Editor"
+  },
+  {
+    id: "redo",
+    title: "Redo",
+    icon: Editor,
+    action: () => {
+      const session = useEditorStore.getState().getActiveSession();
+      if (!session) return;
+      useEditorManager.getState().editors[session.id].editor?.redo();
+    },
+    group: "Editor"
+  },
+  {
+    id: "toggle-bold",
+    title: "Toggle bold",
+    icon: Editor,
+    action: () => {
+      const session = useEditorStore.getState().getActiveSession();
+      if (!session) return;
+      useEditorManager
+        .getState()
+        .editors[session.id].editor?.editor.chain()
+        .focus()
+        .toggleBold()
+        .run();
+    },
+    group: "Editor"
+  },
+  {
+    id: "toggle-italic",
+    title: "Toggle italic",
+    icon: Editor,
+    action: () => {
+      const session = useEditorStore.getState().getActiveSession();
+      if (!session) return;
+      useEditorManager
+        .getState()
+        .editors[session.id].editor?.editor.chain()
+        .focus()
+        .toggleItalic()
+        .run();
+    },
+    group: "Editor"
+  },
+  {
+    id: "toggle-underline",
+    title: "Toggle underline",
+    icon: Editor,
+    action: () => {
+      const session = useEditorStore.getState().getActiveSession();
+      if (!session) return;
+      useEditorManager
+        .getState()
+        .editors[session.id].editor?.editor.chain()
+        .focus()
+        .toggleUnderline()
+        .run();
+    },
+    group: "Editor"
+  },
+  {
+    id: "toggle-strike",
+    title: "Toggle strike",
+    icon: Editor,
+    action: () => {
+      const session = useEditorStore.getState().getActiveSession();
+      if (!session) return;
+      useEditorManager
+        .getState()
+        .editors[session.id].editor?.editor.chain()
+        .focus()
+        .toggleStrike()
+        .run();
+    },
+    group: "Editor"
+  },
+  {
+    id: "toggle-code",
+    title: "Toggle code",
+    icon: Editor,
+    action: () => {
+      const session = useEditorStore.getState().getActiveSession();
+      if (!session) return;
+      useEditorManager
+        .getState()
+        .editors[session.id].editor?.editor.chain()
+        .focus()
+        .toggleCode()
+        .run();
+    },
+    group: "Editor"
+  },
+  {
+    id: "toggle-subscript",
+    title: "Toggle subscript",
+    icon: Editor,
+    action: () => {
+      const session = useEditorStore.getState().getActiveSession();
+      if (!session) return;
+      useEditorManager
+        .getState()
+        .editors[session.id].editor?.editor.chain()
+        .focus()
+        .toggleSubscript()
+        .run();
+    },
+    group: "Editor"
+  },
+  {
+    id: "toggle-superscript",
+    title: "Toggle superscript",
+    icon: Editor,
+    action: () => {
+      const session = useEditorStore.getState().getActiveSession();
+      if (!session) return;
+      useEditorManager
+        .getState()
+        .editors[session.id].editor?.editor.chain()
+        .focus()
+        .toggleSuperscript()
+        .run();
+    },
+    group: "Editor"
+  },
+  {
+    id: "toggle-task-list",
+    title: "Toggle task list",
+    icon: Editor,
+    action: () => {
+      const session = useEditorStore.getState().getActiveSession();
+      if (!session) return;
+      useEditorManager
+        .getState()
+        .editors[session.id].editor?.editor.chain()
+        .focus()
+        .toggleTaskList()
+        .run();
+    },
+    group: "Editor"
+  },
+  {
+    id: "toggle-outline-list",
+    title: "Toggle outline list",
+    icon: Editor,
+    action: () => {
+      const session = useEditorStore.getState().getActiveSession();
+      if (!session) return;
+      useEditorManager
+        .getState()
+        .editors[session.id].editor?.editor.chain()
+        .focus()
+        .toggleOutlineList()
+        .run();
+    },
+    group: "Editor"
+  },
+  {
+    id: "insert-horizontal-rule",
+    title: "Insert horizontal rule",
+    icon: Editor,
+    action: () => {
+      const session = useEditorStore.getState().getActiveSession();
+      if (!session) return;
+      useEditorManager
+        .getState()
+        .editors[session.id].editor?.editor.chain()
+        .focus()
+        .setHorizontalRule()
+        .run();
+    },
+    group: "Editor"
+  },
+  {
+    id: "toggle-code-block",
+    title: "Toggle code block",
+    icon: Editor,
+    action: () => {
+      const session = useEditorStore.getState().getActiveSession();
+      if (!session) return;
+      useEditorManager
+        .getState()
+        .editors[session.id].editor?.editor.chain()
+        .focus()
+        .toggleCodeBlock()
+        .run();
+    },
+    group: "Editor"
+  },
+  {
+    id: "toggle-math-block",
+    title: "Toggle math block",
+    icon: Editor,
+    action: () => {
+      const session = useEditorStore.getState().getActiveSession();
+      if (!session) return;
+      useEditorManager
+        .getState()
+        .editors[session.id].editor?.editor.chain()
+        .focus()
+        // todo: figure out this typescript error
+        .insertMathBlock()
+        .run();
+    },
+    group: "Editor"
+  },
+  {
+    id: "toggle-quote-block",
+    title: "Toggle quote block",
+    icon: Editor,
+    action: () => {
+      const session = useEditorStore.getState().getActiveSession();
+      if (!session) return;
+      useEditorManager
+        .getState()
+        .editors[session.id].editor?.editor.chain()
+        .focus()
+        .toggleBlockquote()
+        .run();
+    },
+    group: "Editor"
+  },
+  {
+    id: "add-attachment",
+    title: "Add attachment",
+    icon: Editor,
+    action: () => {
+      const session = useEditorStore.getState().getActiveSession();
+      if (!session) return;
+      useEditorManager
+        .getState()
+        .editors[session.id].editor?.editor.storage.openAttachmentPicker?.(
+          "file"
+        );
+    },
+    group: "Editor"
   },
   {
     id: "next-tab",

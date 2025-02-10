@@ -279,7 +279,9 @@ export const CommandPaletteDialog = DialogManager.register(
                             px: 1,
                             borderRadius: "4px",
                             border: "1px solid",
-                            borderColor: "border"
+                            borderColor: "border",
+                            textOverflow: "ellipsis",
+                            overflow: "hidden"
                           }}
                           dangerouslySetInnerHTML={{
                             __html: command?.highlightedTitle ?? command.title
@@ -287,6 +289,10 @@ export const CommandPaletteDialog = DialogManager.register(
                         />
                       ) : (
                         <Text
+                          sx={{
+                            textOverflow: "ellipsis",
+                            overflow: "hidden"
+                          }}
                           dangerouslySetInnerHTML={{
                             __html: command?.highlightedTitle ?? command.title
                           }}
@@ -342,8 +348,14 @@ const CommandActionMap = COMMANDS.reduce((acc, command) => {
   return acc;
 }, new Map<string, (arg?: any) => void>());
 
-function resolveCommands(): Command[] {
+function resolveCommands() {
   return COMMANDS.reduce((acc, command) => {
+    // sanity check
+    // command id should not be duplicated
+    // need to double check the COMMANDS list
+    // then remove this condition
+    if (acc.find((c) => c.id === command.id)) return acc;
+
     const hidden = command.hidden ? command.hidden() : false;
     const group =
       typeof command.group === "function" ? command.group() : command.group;
@@ -472,7 +484,19 @@ function search(query: string) {
 
 function commandSearch(query: string) {
   const commands = getDefaultCommands();
-  return db.lookup.fuzzy(query, commands, "title", { matchOnly: true });
+  return db.lookup
+    .fuzzy(query, commands, "title", { matchOnly: true })
+    .concat(
+      query.length > 3
+        ? commands.filter((command) =>
+            command.group.toLowerCase().includes(query.toLowerCase())
+          )
+        : []
+    )
+    .reduce((acc, command) => {
+      if (acc.find((c) => c.id === command.id)) return acc;
+      return acc.concat(command);
+    }, [] as Command[]);
 }
 
 async function dbSearch(query: string) {
