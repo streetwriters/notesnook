@@ -23,6 +23,8 @@ import { db } from "../../common/db";
 import { Multiselect } from "../../common/multi-select";
 import { useEditorManager } from "../../components/editor/manager";
 import {
+  ArrowLeft,
+  ArrowRight,
   ArrowTopRight,
   Copy,
   DeleteForver,
@@ -55,6 +57,7 @@ import { store as notebookStore } from "../../stores/notebook-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { store as trashStore } from "../../stores/trash-store";
 import { writeToClipboard } from "../../utils/clipboard";
+import { AddNotebookDialog } from "../add-notebook-dialog";
 import { AddReminderDialog } from "../add-reminder-dialog";
 import { AddTagsDialog } from "../add-tags-dialog";
 import { AttachmentsDialog } from "../attachments-dialog";
@@ -62,7 +65,6 @@ import { ConfirmDialog } from "../confirm";
 import { CreateColorDialog } from "../create-color-dialog";
 import { EditTagDialog } from "../item-dialog";
 import { MoveNoteDialog } from "../move-note-dialog";
-import { AddNotebookDialog } from "../add-notebook-dialog";
 
 function getLabelForActiveNoteGroup() {
   const text = "Actions for ";
@@ -798,6 +800,20 @@ export const commands = [
     group: "Navigate"
   },
   {
+    id: "go-forward-in-tab",
+    title: "Go forward in tab",
+    icon: ArrowRight,
+    action: () => useEditorStore.getState().goForward(),
+    group: "Navigate"
+  },
+  {
+    id: "go-back-in-tab",
+    title: "Go back in tab",
+    icon: ArrowLeft,
+    action: () => useEditorStore.getState().goBack(),
+    group: "Navigate"
+  },
+  {
     id: "notes",
     title: "Notes",
     icon: ArrowTopRight,
@@ -868,6 +884,13 @@ export const commands = [
     group: "Navigate"
   },
   {
+    id: "new-tab",
+    title: "New tab",
+    icon: Plus,
+    action: () => useEditorStore.getState().addTab(),
+    group: "Create"
+  },
+  {
     id: "new-note",
     title: "New note",
     icon: Plus,
@@ -906,10 +929,14 @@ export const commands = [
     id: "close-tab",
     title: "Close current tab",
     icon: Radar,
-    action: () =>
-      useEditorStore
-        .getState()
-        .closeTabs(useEditorStore.getState().activeTabId ?? ""),
+    action: () => useEditorStore.getState().closeActiveTab(),
+    group: "General"
+  },
+  {
+    id: "close-all-tabs",
+    title: "Close all tabs",
+    icon: Radar,
+    action: () => useEditorStore.getState().closeAllTabs(),
     group: "General"
   },
   {
