@@ -97,15 +97,16 @@ class TabSessionStorage {
   static storage: typeof TabSessionStorageKV = TabSessionStorageKV;
 
   static get(id: string): TabSessionItem | null {
+    if (!id) return null;
     return TabSessionStorage.storage.getMap(id);
   }
 
   static set(id: string, session: TabSessionItem): void {
+    if (!id) return;
     TabSessionStorage.storage.setMap(id, session);
   }
 
   static update(id: string, session: Partial<TabSessionItem>) {
-    if (!id) return;
     const currentSession = TabSessionStorage.get(id);
     const newSession = {
       ...currentSession,
@@ -118,6 +119,7 @@ class TabSessionStorage {
   }
 
   static remove(id: string) {
+    if (!id) return;
     TabSessionStorageKV.removeItem(id);
   }
 }
@@ -318,13 +320,15 @@ export const useTabStore = create<TabStore>(
         const sessionLoaded = await get().loadSession(id);
 
         if (!sessionLoaded) {
-          tabSessionHistory.remove(currentTab, id);
-          TabSessionStorage.remove(id);
-          if (!tabSessionHistory.canGoBack(currentTab)) {
+          const canGoBack = tabSessionHistory.canGoBack(currentTab);
+          if (!canGoBack) {
             tabSessionHistory.forward(currentTab);
             syncTabs();
           } else {
-            return get().goBack();
+            get().goBack();
+            tabSessionHistory.remove(currentTab, id);
+            TabSessionStorage.remove(id);
+            return;
           }
         } else {
           syncTabs();
@@ -337,13 +341,15 @@ export const useTabStore = create<TabStore>(
         if (!tabSessionHistory.canGoForward(currentTab)) return;
         const id = tabSessionHistory.forward(currentTab) as string;
         if (!(await get().loadSession(id))) {
-          tabSessionHistory.remove(currentTab, id);
-          TabSessionStorage.remove(id);
-          if (!tabSessionHistory.canGoForward(currentTab)) {
+          const canGoForward = tabSessionHistory.canGoForward(currentTab);
+          if (!canGoForward) {
             tabSessionHistory.back(currentTab);
             syncTabs();
           } else {
-            return get().goForward();
+            get().goForward();
+            tabSessionHistory.remove(currentTab, id);
+            TabSessionStorage.remove(id);
+            return;
           }
         } else {
           syncTabs();
@@ -400,7 +406,7 @@ export const useTabStore = create<TabStore>(
             set({
               tabs: [{ id: id }]
             });
-            get().newTabSession(id, {});
+            get().newTabSession(id);
             get().focusTab(id);
           } else {
             set({

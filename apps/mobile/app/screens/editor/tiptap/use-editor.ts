@@ -1040,6 +1040,17 @@ export const useEditor = (
   }, [isDefaultEditor, restoreEditorState]);
 
   const onLoad = useCallback(async () => {
+    const isAppLoading = useSettingStore.getState().isAppLoading;
+    if (isAppLoading) {
+      const sub = useSettingStore.subscribe((state) => {
+        if (!state.isAppLoading) {
+          sub();
+          onLoad();
+        }
+      });
+      return;
+    }
+
     setTimeout(() => {
       postMessage(NativeEvents.theme, theme);
     });
@@ -1082,9 +1093,8 @@ export const useEditor = (
             });
           }
         }
-
-        state.current.initialLoadCalled = true;
       }
+      state.current.initialLoadCalled = true;
       overlay(false);
     }
   }, [
