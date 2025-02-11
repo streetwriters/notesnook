@@ -176,13 +176,13 @@ class Commands {
     await this.sendCommand("clearTags", tabId);
   };
 
-  insertAttachment = async (attachment: Attachment, tabId: number) => {
+  insertAttachment = async (attachment: Attachment, tabId: string) => {
     await this.sendCommand("insertAttachment", attachment, tabId);
   };
 
   setAttachmentProgress = async (
     attachmentProgress: Partial<Attachment>,
-    tabId: number
+    tabId: string
   ) => {
     await this.sendCommand("setAttachmentProgress", attachmentProgress, tabId);
   };
@@ -191,7 +191,7 @@ class Commands {
     image: Omit<ImageAttributes, "bloburl"> & {
       dataurl: string;
     },
-    tabId: number
+    tabId: string
   ) => {
     await this.sendCommand("insertImage", image, tabId);
   };

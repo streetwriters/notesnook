@@ -28,7 +28,8 @@ export const Filler = ({ item, color }: { item: Item; color?: string }) => {
   const { colors } = useThemeColors();
   const isEditingNote = useTabStore(
     (state) =>
-      state.tabs.find((t) => t.id === state.currentTab)?.noteId === item.id
+      state.tabs.find((t) => t.id === state.currentTab)?.session?.noteId ===
+      item.id
   );
 
   const [selected] = useIsSelected(item);

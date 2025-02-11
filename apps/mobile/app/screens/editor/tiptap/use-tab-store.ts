@@ -269,6 +269,7 @@ export const useTabStore = create<TabStore>(
           TabSessionStorage.set(sessionId, session as TabSessionItem);
         } else {
           session = {
+            id: sessionId,
             ...TabSessionStorage.get(oldSessionId),
             ...options
           };
