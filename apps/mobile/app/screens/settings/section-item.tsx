@@ -41,7 +41,10 @@ import { RouteParams, SettingSection } from "./types";
 
 const _SectionItem = ({ item }: { item: SettingSection }) => {
   const { colors } = useThemeColors();
-  const settings = useSettingStore((state) => state.settings);
+  const [settings, itemProperty] = useSettingStore((state) => [
+    state.settings,
+    item.property ? state.settings[item.property] : null
+  ]);
   const navigation = useNavigation<NavigationProp<RouteParams>>();
   const current = item.useHook && item.useHook(item);
   const [isHidden, setIsHidden] = useState(
@@ -106,7 +109,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
   useEffect(() => {
     setIsHidden(item.hidden && item.hidden(item.property || current));
     setIsDisabled(item.disabled && item.disabled(item.property || current));
-  }, [current, item]);
+  }, [current, item, itemProperty]);
 
   return isHidden ? null : (
     <Pressable
