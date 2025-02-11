@@ -76,7 +76,8 @@ const NoteItem = ({
 }: NoteItemProps) => {
   const isEditingNote = useTabStore(
     (state) =>
-      state.tabs.find((t) => t.id === state.currentTab)?.noteId === item.id
+      state.tabs.find((t) => t.id === state.currentTab)?.session?.noteId ===
+      item.id
   );
   const { colors } = useThemeColors();
   const compactMode = useIsCompactModeEnabled(

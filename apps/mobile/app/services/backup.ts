@@ -169,7 +169,11 @@ async function run(
   progress = false,
   context?: string,
   backupType: "full" | "partial" = "partial"
-) {
+): Promise<{
+  path?: string;
+  error?: Error;
+  report?: boolean;
+}> {
   if (backupRunning) {
     if (progress) {
       startProgress({
@@ -179,7 +183,7 @@ async function run(
         canHideProgress: true
       });
     }
-    return;
+    return {};
   }
   backupRunning = true;
   const androidBackupDirectory = (await checkBackupDirExists(
@@ -343,7 +347,7 @@ async function run(
       endProgress();
     }
     return {
-      error: e,
+      error: e as Error,
       report: true
     };
   }

@@ -61,7 +61,7 @@ const santizeUri = (uri: string) => {
 
 type PickerOptions = {
   noteId?: string;
-  tabId?: number;
+  tabId?: string;
   type: "image" | "camera" | "file";
   reupload: boolean;
   hash?: string;
