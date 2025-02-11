@@ -568,8 +568,10 @@ const Tiptap = ({
                 paddingLeft: 12,
                 display: "flex",
                 flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
+                alignItems: tab.session?.noteLocked ? "center" : "flex-start",
+                justifyContent: tab.session?.noteLocked
+                  ? "center"
+                  : "flex-start",
                 boxSizing: "border-box",
                 rowGap: 10
               }}
