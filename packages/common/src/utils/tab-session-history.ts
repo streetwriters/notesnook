@@ -117,10 +117,10 @@ export class TabSessionHistory {
 
   remove(tabId: string, sessionId: string) {
     const backStack = this.getBackStack(tabId);
-    let index = backStack.findIndex((item) => item === sessionId);
+    let index = backStack.lastIndexOf(sessionId);
     if (index === -1) {
       const forwardStack = this.getForwardStack(tabId);
-      index = forwardStack.findIndex((item) => item === sessionId);
+      index = forwardStack.lastIndexOf(sessionId);
       forwardStack.splice(index, 1);
       this.setForwardStack(tabId, forwardStack);
     } else {
