@@ -39,11 +39,7 @@ function escapeSQLString(str: string): string {
     return `"${innerStr}"`;
   }
 
-  const maybeColspec =
-    str.includes(":") ||
-    str.includes(">") ||
-    str.includes("<") ||
-    str.includes("-");
+  const maybeColspec = /[:<>./\\()$&=#!\-\+\~§@^?,;'"\[\]{}|]/.test(str);
   const isWildcard =
     str.startsWith("*") ||
     str.endsWith("*") ||
