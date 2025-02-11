@@ -250,6 +250,7 @@ img.ProseMirror-separator {
 }
 
 .ProseMirror table th {
+  background-color: var(--background-secondary);
   font-weight: bold;
   text-align: left;
 }
