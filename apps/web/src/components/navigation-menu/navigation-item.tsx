@@ -32,7 +32,7 @@ type NavigationItemProps = {
   icon?: Icon;
   image?: string;
   color?: SchemeColors;
-  title: string;
+  title?: string;
   isTablet?: boolean;
   isLoading?: boolean;
   isShortcut?: boolean;
@@ -130,7 +130,7 @@ function NavigationItem(
           />
         ) : Icon ? (
           <Icon
-            size={isTablet ? 16 : 15}
+            size={isTablet ? 16 : 20}
             color={color || (selected ? "icon-selected" : "icon")}
             rotate={isLoading}
           />
@@ -152,7 +152,6 @@ function NavigationItem(
             textOverflow: "ellipsis",
             fontWeight: selected ? "bold" : "normal",
             color: selected ? "paragraph-selected" : "paragraph",
-            fontSize: "subtitle",
             display: isTablet ? "none" : "block"
           }}
           ml={1}
