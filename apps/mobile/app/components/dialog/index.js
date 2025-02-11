@@ -80,8 +80,9 @@ export const Dialog = ({ context = "global" }) => {
         return;
       }
     }
-
-    hide();
+    setChecked(false);
+    values.current.inputValue = undefined;
+    setVisible(false);
   };
 
   const show = useCallback(
@@ -104,14 +105,14 @@ export const Dialog = ({ context = "global" }) => {
       eUnSubscribeEvent(eOpenSimpleDialog, show);
       eUnSubscribeEvent(eCloseSimpleDialog, hide);
     };
-  }, [show]);
+  }, [hide, show]);
 
-  const hide = () => {
+  const hide = React.useCallback(() => {
     setChecked(false);
     values.current.inputValue = undefined;
     setVisible(false);
-    dialogInfo.onClose();
-  };
+    dialogInfo.onClose?.();
+  }, [dialogInfo]);
 
   const onNegativePress = async () => {
     if (dialogInfo.onClose) {
