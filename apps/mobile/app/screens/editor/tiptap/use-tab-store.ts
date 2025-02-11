@@ -105,7 +105,7 @@ class TabSessionStorage {
   }
 
   static update(id: string, session: Partial<TabSessionItem>) {
-    if (!id) throw new Error("Session ID is required");
+    if (!id) return;
     const currentSession = TabSessionStorage.get(id);
     const newSession = {
       ...currentSession,
@@ -267,6 +267,7 @@ export const useTabStore = create<TabStore>(
           TabSessionStorage.set(sessionId, session as TabSessionItem);
         } else {
           session = {
+            id: sessionId,
             ...TabSessionStorage.get(oldSessionId),
             ...options
           };

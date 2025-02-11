@@ -509,7 +509,8 @@ const onChangeTab = async (event) => {
       });
     } else {
       if (
-        useTabStore.getState().getTab(useTabStore.getState().currentTab).locked
+        useTabStore.getState().getTab(useTabStore.getState().currentTab).session
+          ?.locked
       ) {
         eSendEvent(eUnlockNote);
       }
@@ -523,7 +524,7 @@ const onChangeTab = async (event) => {
 
       // Lock all tabs with locked notes...
       for (const tab of useTabStore.getState().tabs) {
-        const noteId = useTabStore.getState().getTab(tab.id)?.noteId;
+        const noteId = useTabStore.getState().getTab(tab.id)?.session?.noteId;
         if (!noteId) continue;
         const note = await db.notes.note(noteId);
         const locked = note && (await db.vaults.itemExists(note));
