@@ -65,12 +65,14 @@ type CommandPaletteDialogProps = BaseDialogProps<boolean> & {
   isCommandMode: boolean;
 };
 
+type Coords = Record<"x" | "y", number>;
+
 export const CommandPaletteDialog = DialogManager.register(
   function CommandPaletteDialog(props: CommandPaletteDialogProps) {
     const [commands, setCommands] = useState<Command[]>(
       props.isCommandMode ? getDefaultCommands() : getSessionsAsCommands()
     );
-    const [selected, setSelected] = useState({ x: 0, y: 0 });
+    const [selected, setSelected] = useState<Coords>({ x: 0, y: 0 });
     const [query, setQuery] = useState(props.isCommandMode ? ">" : "");
     const [loading, setLoading] = useState(false);
     const virtuosoRef = useRef<GroupedVirtuosoHandle>(null);
@@ -179,19 +181,19 @@ export const CommandPaletteDialog = DialogManager.register(
             }
             if (e.key === "ArrowDown") {
               e.preventDefault();
-              setSelected(arrowNavigate.down(selected, commands));
+              setSelected(moveSelectionDown(selected, commands));
             }
             if (e.key === "ArrowUp") {
               e.preventDefault();
-              setSelected(arrowNavigate.up(selected, commands));
+              setSelected(moveSelectionUp(selected, commands));
             }
             if (e.key === "ArrowRight") {
               e.preventDefault();
-              setSelected(arrowNavigate.right(selected, commands));
+              setSelected(moveSelectionRight(selected, commands));
             }
             if (e.key === "ArrowLeft") {
               e.preventDefault();
-              setSelected(arrowNavigate.left(selected, commands));
+              setSelected(moveSelectionLeft(selected, commands));
             }
           }}
         >
@@ -368,44 +370,39 @@ export const CommandPaletteDialog = DialogManager.register(
   }
 );
 
-const arrowNavigate: Record<
-  "down" | "up" | "right" | "left",
-  (
-    current: Record<"x" | "y", number>,
-    commands: Command[]
-  ) => Record<"x" | "y", number>
-> = {
-  down: (current, commands) => {
-    const currentCommand = commands[current.y];
-    const nextIndex = (current.y + 1) % commands.length;
-    const nextCommand = commands[nextIndex];
-    if (currentCommand.group === "recent" && nextCommand.group === "recent") {
-      return { x: current.x, y: nextIndex };
-    }
-    return { x: 0, y: nextIndex };
-  },
-  up: (current, commands) => {
-    const currentCommand = commands[current.y];
-    const nextIndex = (current.y - 1 + commands.length) % commands.length;
-    const nextCommand = commands[nextIndex];
-    if (currentCommand.group === "recent" && nextCommand.group === "recent") {
-      return { x: current.x, y: nextIndex };
-    }
-    return { x: 0, y: nextIndex };
-  },
-  right: (current, commands) => {
-    const currentCommand = commands[current.y];
-    if (currentCommand.group !== "recent") return current;
-    const nextIndex = (current.x + 1) % 2;
-    return { x: nextIndex, y: current.y };
-  },
-  left: (current, commands) => {
-    const currentCommand = commands[current.y];
-    if (currentCommand.group !== "recent") return current;
-    const nextIndex = (current.x - 1 + 2) % 2;
-    return { x: nextIndex, y: current.y };
+function moveSelectionDown(selected: Coords, commands: Command[]) {
+  const currentCommand = commands[selected.y];
+  const nextIndex = (selected.y + 1) % commands.length;
+  const nextCommand = commands[nextIndex];
+  if (currentCommand.group === "recent" && nextCommand.group === "recent") {
+    return { x: selected.x, y: nextIndex };
   }
-};
+  return { x: 0, y: nextIndex };
+}
+
+function moveSelectionUp(selected: Coords, commands: Command[]) {
+  const currentCommand = commands[selected.y];
+  const nextIndex = (selected.y - 1 + commands.length) % commands.length;
+  const nextCommand = commands[nextIndex];
+  if (currentCommand.group === "recent" && nextCommand.group === "recent") {
+    return { x: selected.x, y: nextIndex };
+  }
+  return { x: 0, y: nextIndex };
+}
+
+function moveSelectionRight(selected: Coords, commands: Command[]) {
+  const currentCommand = commands[selected.y];
+  if (currentCommand.group !== "recent") return selected;
+  const nextIndex = (selected.x + 1) % 2;
+  return { x: nextIndex, y: selected.y };
+}
+
+function moveSelectionLeft(selected: Coords, commands: Command[]) {
+  const currentCommand = commands[selected.y];
+  if (currentCommand.group !== "recent") return selected;
+  const nextIndex = (selected.x - 1 + 2) % 2;
+  return { x: nextIndex, y: selected.y };
+}
 
 const CommandIconMap = COMMANDS.reduce((acc, command) => {
   acc.set(command.id, command.icon);
