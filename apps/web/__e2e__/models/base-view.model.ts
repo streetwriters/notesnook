@@ -51,7 +51,11 @@ export class BaseViewModel {
       .locator(getTestId("group-header"));
 
     for await (const item of iterateList(locator)) {
-      if ((await item.locator(getTestId("title")).textContent()) === groupName)
+      if (
+        (
+          await item.locator(getTestId("title")).textContent()
+        )?.toLowerCase() === groupName.toLowerCase()
+      )
         return item;
     }
     return undefined;
@@ -95,7 +99,9 @@ export class BaseViewModel {
   // }
 
   async press(key: string) {
-    const itemList = this.list.locator(getTestId(`virtuoso-item-list`, "data-testid"));
+    const itemList = this.list.locator(
+      getTestId(`virtuoso-item-list`, "data-testid")
+    );
     await itemList.press(key);
     await this.page.waitForTimeout(300);
   }

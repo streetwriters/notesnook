@@ -56,8 +56,8 @@ export class SettingsViewModel {
     await confirmDialog(this.page.locator(getTestId("confirm-dialog")));
 
     await this.page
-      .locator(getTestId("not-logged-in"))
-      .waitFor({ state: "visible" });
+      .locator(getTestId("logged-in"))
+      .waitFor({ state: "hidden" });
   }
 
   async getRecoveryKey(password: string) {

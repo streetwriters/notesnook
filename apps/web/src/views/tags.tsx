@@ -39,8 +39,9 @@ function Tags() {
 
   if (!items) return <ListLoader />;
   return (
-    <Flex variant="columnFill">
+    <Flex variant="columnFill" id="tags">
       <ListContainer
+        type="tags"
         sx={{ mx: 1 }}
         refresh={refresh}
         items={items}
