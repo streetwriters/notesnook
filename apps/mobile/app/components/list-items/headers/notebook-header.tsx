@@ -23,7 +23,7 @@ import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { View } from "react-native";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { DefaultAppStyles } from "../../../utils/styles";
 import AppIcon from "../../ui/AppIcon";
 import Heading from "../../ui/typography/heading";
@@ -41,7 +41,7 @@ export const NotebookHeader = ({
     <View
       style={{
         paddingHorizontal: DefaultAppStyles.GAP,
-        marginVertical: DefaultAppStyles.GAP,
+        marginTop: DefaultAppStyles.GAP,
         backgroundColor: colors.secondary.background
       }}
     >
@@ -52,14 +52,16 @@ export const NotebookHeader = ({
           paddingVertical: 25
         }}
       >
-        <AppIcon name="notebook" size={SIZE.xxl} />
-        <Heading size={SIZE.lg}>{notebook.title}</Heading>
+        <AppIcon name="notebook" size={AppFontSize.xxl} />
 
-        {notebook.description ? (
-          <Paragraph size={SIZE.sm} color={colors.primary.paragraph}>
-            {notebook.description}
-          </Paragraph>
-        ) : null}
+        <View>
+          <Heading size={AppFontSize.lg}>{notebook.title}</Heading>
+          {notebook.description ? (
+            <Paragraph size={AppFontSize.sm} color={colors.primary.paragraph}>
+              {notebook.description}
+            </Paragraph>
+          ) : null}
+        </View>
 
         <View
           style={{
@@ -67,11 +69,11 @@ export const NotebookHeader = ({
             gap: DefaultAppStyles.GAP_SMALL
           }}
         >
-          <Paragraph size={SIZE.xxs} color={colors.secondary.paragraph}>
+          <Paragraph size={AppFontSize.xxs} color={colors.secondary.paragraph}>
             {strings.notes(totalNotes || 0)}
           </Paragraph>
 
-          <Paragraph color={colors.secondary.paragraph} size={SIZE.xxs}>
+          <Paragraph color={colors.secondary.paragraph} size={AppFontSize.xxs}>
             {getFormattedDate(notebook.dateModified, "date-time")}
           </Paragraph>
         </View>

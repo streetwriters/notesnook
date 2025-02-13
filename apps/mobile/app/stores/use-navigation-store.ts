@@ -52,8 +52,6 @@ export type AppLockRouteParams = {
 
 export type AuthParams = {
   mode: number;
-  title: string;
-  canGoBack?: boolean;
 };
 
 export interface RouteParams extends ParamListBase {
@@ -73,14 +71,16 @@ export interface RouteParams extends ParamListBase {
     route: RouteName;
     items?: FilteredSelector<Item>;
   };
-  Settings: GenericRouteParam;
   TaggedNotes: NotesScreenParams;
   ColoredNotes: NotesScreenParams;
   TopicNotes: NotesScreenParams;
   Monographs: NotesScreenParams;
-  AppLock: AppLockRouteParams;
   Reminders: GenericRouteParam;
   SettingsGroup: GenericRouteParam;
+  FluidPanelsView: GenericRouteParam;
+  AppLock: GenericRouteParam;
+  Settings: GenericRouteParam;
+  Auth: AuthParams;
 }
 
 export type RouteName = keyof RouteParams;

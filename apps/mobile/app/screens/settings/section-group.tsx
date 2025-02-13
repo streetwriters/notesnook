@@ -21,7 +21,7 @@ import React from "react";
 import { View } from "react-native";
 import Heading from "../../components/ui/typography/heading";
 import { useThemeColors } from "@notesnook/theme";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { SectionItem } from "./section-item";
 import { SettingSection } from "./types";
 export const SectionGroup = ({ item }: { item: SettingSection }) => {
@@ -40,7 +40,7 @@ export const SectionGroup = ({ item }: { item: SettingSection }) => {
             paddingHorizontal: 12
           }}
           color={colors.primary.accent}
-          size={SIZE.xs}
+          size={AppFontSize.xs}
         >
           {(item.name as string).toUpperCase()}
         </Heading>

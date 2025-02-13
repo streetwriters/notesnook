@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
+import { useThemeColors } from "@notesnook/theme";
 import React, { useRef, useState } from "react";
 import { TouchableOpacity, View, useWindowDimensions } from "react-native";
 import { db } from "../../common/database";
@@ -24,19 +26,16 @@ import { DDS } from "../../services/device-detection";
 import { ToastManager } from "../../services/event-manager";
 import { clearMessage, setEmailVerifyMessage } from "../../services/message";
 import PremiumService from "../../services/premium";
-import { useThemeColors } from "@notesnook/theme";
+import SettingsService from "../../services/settings";
 import { useUserStore } from "../../stores/use-user-store";
 import { openLinkInBrowser } from "../../utils/functions";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
 import Input from "../ui/input";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { hideAuth } from "./common";
-import { useSettingStore } from "../../stores/use-setting-store";
-import SettingsService from "../../services/settings";
-import { strings } from "@notesnook/intl";
 
 export const Signup = ({ changeMode, trial }) => {
   const { colors } = useThemeColors();
@@ -50,7 +49,8 @@ export const Signup = ({ changeMode, trial }) => {
   const [loading, setLoading] = useState(false);
   const setUser = useUserStore((state) => state.setUser);
   const setLastSynced = useUserStore((state) => state.setLastSynced);
-  const deviceMode = useSettingStore((state) => state.deviceMode);
+  const isTablet = width > 600;
+
   const { width, height } = useWindowDimensions();
   const validateInfo = () => {
     if (!password.current || !email.current || !confirmPassword.current) {
@@ -103,9 +103,8 @@ export const Signup = ({ changeMode, trial }) => {
         style={{
           borderRadius: DDS.isTab ? 5 : 0,
           backgroundColor: colors.primary.background,
-          zIndex: 10,
           width: "100%",
-          alignSelf: "center"
+          height: "100%"
         }}
       >
         <View
@@ -116,12 +115,12 @@ export const Signup = ({ changeMode, trial }) => {
             marginBottom: 20,
             borderBottomWidth: 0.8,
             borderBottomColor: colors.primary.border,
-            alignSelf: deviceMode !== "mobile" ? "center" : undefined,
-            borderWidth: deviceMode !== "mobile" ? 1 : null,
-            borderColor: deviceMode !== "mobile" ? colors.primary.border : null,
-            borderRadius: deviceMode !== "mobile" ? 20 : null,
-            marginTop: deviceMode !== "mobile" ? 50 : null,
-            width: deviceMode === "mobile" ? null : "50%",
+            alignSelf: isTablet ? "center" : undefined,
+            borderWidth: isTablet ? 1 : null,
+            borderColor: isTablet ? colors.primary.border : null,
+            borderRadius: isTablet ? 20 : null,
+            marginTop: isTablet ? 50 : null,
+            width: !isTablet ? null : "50%",
             minHeight: height * 0.4
           }}
         >
@@ -155,7 +154,7 @@ export const Signup = ({ changeMode, trial }) => {
               marginBottom: 25,
               marginTop: 10
             }}
-            size={SIZE.xxl}
+            size={AppFontSize.xxl}
           >
             {strings.createYourAccount()}
           </Heading>
@@ -233,12 +232,12 @@ export const Signup = ({ changeMode, trial }) => {
             style={{
               marginBottom: 25
             }}
-            size={SIZE.xs}
+            size={AppFontSize.xs}
             color={colors.secondary.paragraph}
           >
             {strings.signupAgreement[0]()}
             <Paragraph
-              size={SIZE.xs}
+              size={AppFontSize.xs}
               onPress={() => {
                 openLinkInBrowser("https://notesnook.com/tos", colors);
               }}
@@ -247,11 +246,12 @@ export const Signup = ({ changeMode, trial }) => {
               }}
               color={colors.primary.accent}
             >
+              {" "}
               {strings.signupAgreement[1]()}
-            </Paragraph>
+            </Paragraph>{" "}
             {strings.signupAgreement[2]()}
             <Paragraph
-              size={SIZE.xs}
+              size={AppFontSize.xs}
               onPress={() => {
                 openLinkInBrowser("https://notesnook.com/privacy", colors);
               }}
@@ -260,8 +260,9 @@ export const Signup = ({ changeMode, trial }) => {
               }}
               color={colors.primary.accent}
             >
+              {" "}
               {strings.signupAgreement[3]()}
-            </Paragraph>
+            </Paragraph>{" "}
             {strings.signupAgreement[4]()}
           </Paragraph>
 
@@ -270,11 +271,9 @@ export const Signup = ({ changeMode, trial }) => {
             type="accent"
             loading={loading}
             onPress={signup}
-            fontSize={SIZE.md}
+            fontSize={AppFontSize.md}
             style={{
-              marginRight: 12,
-              width: 250,
-              borderRadius: 100
+              width: 250
             }}
           />
 
@@ -290,10 +289,13 @@ export const Signup = ({ changeMode, trial }) => {
               paddingVertical: 12
             }}
           >
-            <Paragraph size={SIZE.xs + 1} color={colors.secondary.paragraph}>
+            <Paragraph
+              size={AppFontSize.xs + 1}
+              color={colors.secondary.paragraph}
+            >
               {strings.alreadyHaveAccount()}{" "}
               <Paragraph
-                size={SIZE.xs + 1}
+                size={AppFontSize.xs + 1}
                 style={{ color: colors.primary.accent }}
               >
                 {strings.login()}

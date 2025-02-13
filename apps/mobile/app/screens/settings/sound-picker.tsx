@@ -31,7 +31,7 @@ import Notifications from "../../services/notifications";
 import SettingsService from "../../services/settings";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeColors } from "@notesnook/theme";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { strings } from "@notesnook/intl";
 
 const SoundItem = ({
@@ -90,7 +90,7 @@ const SoundItem = ({
               : "radiobox-blank"
           }
         />
-        <Paragraph style={{ marginLeft: 10 }} size={SIZE.md}>
+        <Paragraph style={{ marginLeft: 10 }} size={AppFontSize.md}>
           {item?.title}
         </Paragraph>
       </View>

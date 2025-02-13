@@ -36,7 +36,7 @@ import {
 import { clearMessage } from "../../../services/message";
 import SettingsService from "../../../services/settings";
 import { eOpenRecoveryKeyDialog } from "../../../utils/events";
-import { SIZE } from "../../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 import DialogHeader from "../../dialog/dialog-header";
 import { Button } from "../../ui/button";
@@ -235,14 +235,14 @@ class RecoveryKeySheet extends React.Component {
 
           <View
             style={{
-              borderRadius: 5,
+              borderRadius: defaultBorderRadius,
               padding: 12,
               marginTop: 10
             }}
           >
             <Paragraph
               color={colors.primary.paragraph}
-              size={SIZE.sm}
+              size={AppFontSize.sm}
               numberOfLines={2}
               selectable
               style={{
@@ -294,7 +294,7 @@ class RecoveryKeySheet extends React.Component {
             title={strings.copyToClipboard()}
             width="100%"
             type="secondaryAccented"
-            fontSize={SIZE.md}
+            fontSize={AppFontSize.md}
           />
           <Seperator />
           <Button
@@ -302,7 +302,7 @@ class RecoveryKeySheet extends React.Component {
             onPress={this.saveQRCODE}
             width="100%"
             type="secondaryAccented"
-            fontSize={SIZE.md}
+            fontSize={AppFontSize.md}
             icon="qrcode"
           />
           <Seperator />
@@ -312,7 +312,7 @@ class RecoveryKeySheet extends React.Component {
             width="100%"
             type="secondaryAccented"
             icon="text"
-            fontSize={SIZE.md}
+            fontSize={AppFontSize.md}
           />
           <Seperator />
 
@@ -322,13 +322,13 @@ class RecoveryKeySheet extends React.Component {
             width="100%"
             type="secondaryAccented"
             icon="cloud"
-            fontSize={SIZE.md}
+            fontSize={AppFontSize.md}
           />
           <Seperator />
 
           <Paragraph
             color={colors.secondary.paragraph}
-            size={SIZE.sm}
+            size={AppFontSize.sm}
             numberOfLines={2}
             style={{
               width: "100%",
@@ -343,7 +343,7 @@ class RecoveryKeySheet extends React.Component {
             title={strings.done()}
             width="100%"
             type="error"
-            fontSize={SIZE.md}
+            fontSize={AppFontSize.md}
             onPress={this.close}
           />
         </View>

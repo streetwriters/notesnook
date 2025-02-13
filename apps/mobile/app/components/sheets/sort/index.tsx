@@ -31,16 +31,26 @@ import { db } from "../../../common/database";
 import { eSendEvent } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { RouteName } from "../../../stores/use-navigation-store";
+import { useNotebookStore } from "../../../stores/use-notebook-store";
+import { useTagStore } from "../../../stores/use-tag-store";
 import { GROUP, SORT } from "../../../utils/constants";
 import { eGroupOptionsUpdated, refreshNotesPage } from "../../../utils/events";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { DefaultAppStyles } from "../../../utils/styles";
 import AppIcon from "../../ui/AppIcon";
 import { Button } from "../../ui/button";
 import { Pressable } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-const Sort = ({ type, screen }: { type: ItemType; screen: RouteName }) => {
+const Sort = ({
+  type,
+  screen,
+  hideGroupOptions
+}: {
+  type: ItemType;
+  screen?: RouteName;
+  hideGroupOptions?: boolean;
+}) => {
   const { colors } = useThemeColors();
   const [groupOptions, setGroupOptions] = useState(
     db.settings.getGroupOptions(
@@ -54,7 +64,12 @@ const Sort = ({ type, screen }: { type: ItemType; screen: RouteName }) => {
     await db.settings.setGroupOptions(groupType, _groupOptions);
     setGroupOptions(_groupOptions);
     setTimeout(() => {
-      Navigation.queueRoutesForUpdate(screen);
+      if (screen) Navigation.queueRoutesForUpdate(screen);
+      if (type === "notebook") {
+        useNotebookStore.getState().refresh();
+      } else if (type === "tag") {
+        useTagStore.getState().refresh();
+      }
       eSendEvent(eGroupOptionsUpdated, groupType);
       eSendEvent(refreshNotesPage);
     }, 1);
@@ -88,7 +103,7 @@ const Sort = ({ type, screen }: { type: ItemType; screen: RouteName }) => {
         }}
       >
         <Heading
-          size={SIZE.md}
+          size={AppFontSize.md}
           style={{
             alignSelf: "center"
           }}
@@ -119,7 +134,7 @@ const Sort = ({ type, screen }: { type: ItemType; screen: RouteName }) => {
           }
           height={30}
           iconPosition="right"
-          fontSize={SIZE.sm}
+          fontSize={AppFontSize.sm}
           type="plain"
           style={{
             paddingHorizontal: DefaultAppStyles.GAP_SMALL
@@ -135,95 +150,16 @@ const Sort = ({ type, screen }: { type: ItemType; screen: RouteName }) => {
           borderBottomColor: colors.primary.border
         }}
       >
-        {groupOptions?.groupBy === "abc" ? (
-          <Button
-            type="secondary"
-            title={strings.title()}
-            height={40}
-            iconPosition="left"
-            icon={"check"}
-            buttonType={{ text: colors.primary.accent }}
-            fontSize={SIZE.sm}
-            iconSize={SIZE.md}
-          />
-        ) : (
-          Object.keys(SORT).map((item) =>
-            (item === "dueDate" && screen !== "Reminders") ||
-            (screen !== "Tags" &&
-              screen !== "Reminders" &&
-              item === "dateModified") ||
-            ((screen === "Tags" || screen === "Reminders") &&
-              item === "dateEdited") ? null : (
-              <Pressable
-                key={item}
-                type={groupOptions?.sortBy === item ? "selected" : "plain"}
-                noborder
-                style={{
-                  width: "100%",
-                  justifyContent: "space-between",
-                  height: 40,
-                  flexDirection: "row",
-                  borderRadius: 0,
-                  paddingHorizontal: DefaultAppStyles.GAP
-                }}
-                onPress={async () => {
-                  const _groupOptions: GroupOptions = {
-                    ...groupOptions,
-                    sortBy:
-                      type === "trash"
-                        ? "dateDeleted"
-                        : (item as SortOptions["sortBy"])
-                  };
-                  await updateGroupOptions(_groupOptions);
-                }}
-              >
-                <Paragraph>
-                  {strings.sortByStrings[
-                    item as keyof typeof strings.sortByStrings
-                  ]()}
-                </Paragraph>
-
-                {groupOptions.sortBy === item ? (
-                  <AppIcon
-                    size={SIZE.lg}
-                    name="check"
-                    color={colors.selected.accent}
-                  />
-                ) : null}
-              </Pressable>
-            )
-          )
-        )}
-      </View>
-
-      <>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-            paddingHorizontal: DefaultAppStyles.GAP,
-            paddingVertical: DefaultAppStyles.GAP_VERTICAL
-          }}
-        >
-          <Heading size={SIZE.md}>{strings.groupBy()}</Heading>
-        </View>
-
-        <View
-          style={{
-            borderRadius: 0,
-            flexDirection: "row",
-            flexWrap: "wrap"
-          }}
-        >
-          {Object.keys(GROUP).map((item) => (
+        {Object.keys(SORT).map((item) =>
+          (item === "dueDate" && screen !== "Reminders") ||
+          (screen !== "Tags" &&
+            screen !== "Reminders" &&
+            item === "dateModified") ||
+          ((screen === "Tags" || screen === "Reminders") &&
+            item === "dateEdited") ? null : (
             <Pressable
               key={item}
-              type={
-                groupOptions?.groupBy === GROUP[item as keyof typeof GROUP]
-                  ? "selected"
-                  : "plain"
-              }
+              type={groupOptions?.sortBy === item ? "selected" : "plain"}
               noborder
               style={{
                 width: "100%",
@@ -245,22 +181,87 @@ const Sort = ({ type, screen }: { type: ItemType; screen: RouteName }) => {
               }}
             >
               <Paragraph>
-                {strings.groupByStrings[
-                  item as keyof typeof strings.groupByStrings
+                {strings.sortByStrings[
+                  item as keyof typeof strings.sortByStrings
                 ]()}
               </Paragraph>
 
-              {groupOptions.groupBy === item ? (
+              {groupOptions.sortBy === item ? (
                 <AppIcon
-                  size={SIZE.lg}
+                  size={AppFontSize.lg}
                   name="check"
                   color={colors.selected.accent}
                 />
               ) : null}
             </Pressable>
-          ))}
-        </View>
-      </>
+          )
+        )}
+      </View>
+
+      {!hideGroupOptions ? (
+        <>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              paddingHorizontal: DefaultAppStyles.GAP,
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL
+            }}
+          >
+            <Heading size={AppFontSize.md}>{strings.groupBy()}</Heading>
+          </View>
+
+          <View
+            style={{
+              borderRadius: 0,
+              flexDirection: "row",
+              flexWrap: "wrap"
+            }}
+          >
+            {Object.keys(GROUP).map((item) => (
+              <Pressable
+                key={item}
+                type={
+                  groupOptions?.groupBy === GROUP[item as keyof typeof GROUP]
+                    ? "selected"
+                    : "plain"
+                }
+                noborder
+                style={{
+                  width: "100%",
+                  justifyContent: "space-between",
+                  height: 40,
+                  flexDirection: "row",
+                  borderRadius: 0,
+                  paddingHorizontal: DefaultAppStyles.GAP
+                }}
+                onPress={async () => {
+                  const _groupOptions: GroupOptions = {
+                    ...groupOptions,
+                    groupBy: item as GroupOptions["groupBy"]
+                  };
+                  await updateGroupOptions(_groupOptions);
+                }}
+              >
+                <Paragraph>
+                  {strings.groupByStrings[
+                    item as keyof typeof strings.groupByStrings
+                  ]()}
+                </Paragraph>
+
+                {groupOptions.groupBy === item ? (
+                  <AppIcon
+                    size={AppFontSize.lg}
+                    name="check"
+                    color={colors.selected.accent}
+                  />
+                ) : null}
+              </Pressable>
+            ))}
+          </View>
+        </>
+      ) : null}
     </View>
   );
 };

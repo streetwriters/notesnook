@@ -30,7 +30,7 @@ import {
   presentSheet
 } from "../../../services/event-manager";
 import { useRelationStore } from "../../../stores/use-relation-store";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import DialogHeader from "../../dialog/dialog-header";
 import List from "../../list";
 import SheetProvider from "../../sheet-provider";
@@ -119,7 +119,7 @@ export const RelationsList = ({
             onPress={() => {
               onAdd?.();
             }}
-            fontSize={SIZE.sm}
+            fontSize={AppFontSize.sm}
             //  width="100%"
             type="inverted"
             icon="plus"

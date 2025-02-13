@@ -22,7 +22,7 @@ import { View } from "react-native";
 import { db } from "../../common/database";
 import { TaggedNotes } from "../../screens/notes/tagged";
 import { useThemeColors } from "@notesnook/theme";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import ManageTagsSheet from "../sheets/manage-tags";
 import { Button } from "../ui/button";
@@ -57,7 +57,7 @@ export const Tags = ({ item, close }) => {
         icon="plus"
         iconPosition="right"
         height={30}
-        fontSize={SIZE.sm - 1}
+        fontSize={AppFontSize.sm - 1}
         style={{
           height: 35,
           borderRadius: 100
@@ -117,7 +117,7 @@ const TagItem = ({ tag, close }) => {
       title={"#" + tag.title}
       type="plain"
       height={20}
-      fontSize={SIZE.xs}
+      fontSize={AppFontSize.xs}
       style={style}
       textStyle={{
         color: colors.secondary.paragraph

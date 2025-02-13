@@ -27,7 +27,7 @@ import Navigation from "../../../services/navigation";
 import { useAttachmentStore } from "../../../stores/use-attachment-store";
 import { useThemeColors } from "@notesnook/theme";
 import { openLinkInBrowser } from "../../../utils/functions";
-import { SIZE } from "../../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import DialogHeader from "../../dialog/dialog-header";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
@@ -158,7 +158,7 @@ const PublishNoteSheet = ({
                 marginTop: 10,
                 backgroundColor: colors.secondary.background,
                 padding: 12,
-                borderRadius: 5
+                borderRadius: defaultBorderRadius
               }}
             >
               <View
@@ -167,8 +167,10 @@ const PublishNoteSheet = ({
                   flexShrink: 1
                 }}
               >
-                <Heading size={SIZE.md}>{strings.publishedAt()}:</Heading>
-                <Paragraph size={SIZE.sm} numberOfLines={1}>
+                <Heading size={AppFontSize.md}>
+                  {strings.publishedAt()}:
+                </Heading>
+                <Paragraph size={AppFontSize.sm} numberOfLines={1}>
                   {publishUrl}
                 </Paragraph>
                 <Paragraph
@@ -179,7 +181,7 @@ const PublishNoteSheet = ({
                       console.error(e);
                     }
                   }}
-                  size={SIZE.xs}
+                  size={AppFontSize.xs}
                   style={{
                     marginTop: 5,
                     color: colors.primary.paragraph
@@ -200,7 +202,7 @@ const PublishNoteSheet = ({
                   });
                 }}
                 color={colors.primary.accent}
-                size={SIZE.lg}
+                size={AppFontSize.lg}
                 name="content-copy"
               />
             </View>
@@ -218,7 +220,7 @@ const PublishNoteSheet = ({
               marginBottom: 10,
               backgroundColor: colors.secondary.background,
               paddingVertical: 12,
-              borderRadius: 5,
+              borderRadius: defaultBorderRadius,
               marginTop: 10
             }}
           >
@@ -228,7 +230,7 @@ const PublishNoteSheet = ({
                 setIsLocked(!isLocked);
               }}
               color={isLocked ? colors.selected.icon : colors.primary.icon}
-              size={SIZE.xl}
+              size={AppFontSize.xl}
               name={
                 isLocked
                   ? "check-circle-outline"
@@ -242,7 +244,9 @@ const PublishNoteSheet = ({
                 flexShrink: 1
               }}
             >
-              <Heading size={SIZE.md}>{strings.monographPassHeading()}</Heading>
+              <Heading size={AppFontSize.md}>
+                {strings.monographPassHeading()}
+              </Heading>
               <Paragraph>{strings.monographPassDesc()}</Paragraph>
             </View>
           </TouchableOpacity>
@@ -257,7 +261,7 @@ const PublishNoteSheet = ({
               alignItems: "center",
               backgroundColor: colors.secondary.background,
               paddingVertical: 12,
-              borderRadius: 5
+              borderRadius: defaultBorderRadius
             }}
           >
             <IconButton
@@ -265,7 +269,7 @@ const PublishNoteSheet = ({
                 setSelfDestruct(!selfDestruct);
               }}
               color={selfDestruct ? colors.selected.icon : colors.primary.icon}
-              size={SIZE.xl}
+              size={AppFontSize.xl}
               name={
                 selfDestruct
                   ? "check-circle-outline"
@@ -279,7 +283,7 @@ const PublishNoteSheet = ({
                 flexShrink: 1
               }}
             >
-              <Heading size={SIZE.md}>
+              <Heading size={AppFontSize.md}>
                 {strings.monographSelfDestructHeading()}
               </Heading>
               <Paragraph>{strings.monographSelfDestructDesc()}</Paragraph>
@@ -318,7 +322,7 @@ const PublishNoteSheet = ({
                 <>
                   <Button
                     onPress={deletePublishedNote}
-                    fontSize={SIZE.md}
+                    fontSize={AppFontSize.md}
                     type="error"
                     title={strings.unpublish()}
                     style={{
@@ -330,7 +334,7 @@ const PublishNoteSheet = ({
               <Seperator half />
               <Button
                 onPress={publishNote}
-                fontSize={SIZE.md}
+                fontSize={AppFontSize.md}
                 style={{
                   width: isPublished ? "49%" : 250,
                   borderRadius: isPublished ? 5 : 100
@@ -345,7 +349,7 @@ const PublishNoteSheet = ({
 
       <Paragraph
         color={colors.secondary.paragraph}
-        size={SIZE.xs}
+        size={AppFontSize.xs}
         style={{
           textAlign: "center",
           marginTop: 10,

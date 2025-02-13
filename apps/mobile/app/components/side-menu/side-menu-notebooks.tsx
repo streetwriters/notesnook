@@ -18,32 +18,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Notebook } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect } from "react";
-import { FlatList, ListRenderItemInfo, View } from "react-native";
+import { FlatList, TextInput, View } from "react-native";
 import { UseBoundStore } from "zustand";
 import { db } from "../../common/database";
 import { useTotalNotes } from "../../hooks/use-db-item";
-import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import NotebookScreen from "../../screens/notebook";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
+import Navigation from "../../services/navigation";
 import { TreeItem } from "../../stores/create-notebook-tree-stores";
 import { SelectionStore } from "../../stores/item-selection-store";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useNotebooks } from "../../stores/use-notebook-store";
 import { eOnNotebookUpdated } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize, defaultBorderRadius } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { Properties } from "../properties";
-import { AddNotebookSheet } from "../sheets/add-notebook";
 import AppIcon from "../ui/AppIcon";
 import { IconButton } from "../ui/icon-button";
 import { Pressable } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
 import { SideMenuHeader } from "./side-menu-header";
+import { SideMenuListEmpty } from "./side-menu-list-empty";
 import {
   useSideMenuNotebookExpandedStore,
   useSideMenuNotebookSelectionStore,
@@ -229,7 +230,7 @@ const NotebookItem = ({
           width: "100%",
           alignItems: "center",
           flexDirection: "row",
-          borderRadius: 5,
+          borderRadius: defaultBorderRadius,
           paddingRight: DefaultAppStyles.GAP_SMALL
         }}
       >
@@ -240,10 +241,12 @@ const NotebookItem = ({
           }}
         >
           <IconButton
-            size={SIZE.md}
+            size={AppFontSize.md}
             color={selected ? colors.selected.icon : colors.primary.icon}
             onPress={() => {
-              onToggleExpanded?.();
+              if (item.hasChildren) {
+                onToggleExpanded?.();
+              }
             }}
             top={0}
             left={0}
@@ -252,16 +255,22 @@ const NotebookItem = ({
             style={{
               width: 32,
               height: 32,
-              borderRadius: 5
+              borderRadius: defaultBorderRadius
             }}
-            name={expanded ? "chevron-down" : "chevron-right"}
+            name={
+              !item.hasChildren
+                ? "book-outline"
+                : expanded
+                ? "chevron-down"
+                : "chevron-right"
+            }
           />
 
           <Paragraph
             color={
               isFocused ? colors.selected.paragraph : colors.secondary.paragraph
             }
-            size={SIZE.xs}
+            size={AppFontSize.sm}
           >
             {notebook?.title}
           </Paragraph>
@@ -290,7 +299,10 @@ const NotebookItem = ({
         ) : (
           <>
             {totalNotes(notebook?.id) ? (
-              <Paragraph size={SIZE.xxs} color={colors.secondary.paragraph}>
+              <Paragraph
+                size={AppFontSize.xxs}
+                color={colors.secondary.paragraph}
+              >
                 {totalNotes?.(notebook?.id)}
               </Paragraph>
             ) : null}
@@ -304,16 +316,35 @@ const NotebookItem = ({
 export const SideMenuNotebooks = () => {
   const tree = useSideMenuNotebookTreeStore((state) => state.tree);
   const [notebooks, loading] = useNotebooks();
-  const insets = useGlobalSafeAreaInsets();
-
+  const { colors } = useThemeColors();
+  const [filteredNotebooks, setFilteredNotebooks] = React.useState(notebooks);
+  const searchTimer = React.useRef<NodeJS.Timeout>();
+  const lastQuery = React.useRef<string>();
   const loadRootNotebooks = React.useCallback(async () => {
-    if (!notebooks) return;
+    if (!filteredNotebooks) return;
     const _notebooks: Notebook[] = [];
-    for (let i = 0; i < notebooks.placeholders.length; i++) {
-      _notebooks[i] = (await notebooks?.item(i))?.item as Notebook;
+    for (let i = 0; i < filteredNotebooks.placeholders.length; i++) {
+      _notebooks[i] = (await filteredNotebooks?.item(i))?.item as Notebook;
     }
     useSideMenuNotebookTreeStore.getState().addNotebooks("root", _notebooks, 0);
+  }, [filteredNotebooks]);
+
+  const updateNotebooks = React.useCallback(() => {
+    if (lastQuery.current) {
+      db.lookup
+        .notebooks(lastQuery.current)
+        .sorted()
+        .then((filtered) => {
+          setFilteredNotebooks(filtered);
+        });
+    } else {
+      setFilteredNotebooks(notebooks);
+    }
   }, [notebooks]);
+
+  useEffect(() => {
+    updateNotebooks();
+  }, [updateNotebooks]);
 
   useEffect(() => {
     (async () => {
@@ -352,34 +383,71 @@ export const SideMenuNotebooks = () => {
     });
   }, []);
 
-  const renderItem = React.useCallback((info: ListRenderItemInfo<TreeItem>) => {
-    return <NotebookItemWrapper index={info.index} item={info.item} />;
-  }, []);
+  const renderItem = React.useCallback(
+    (info: { item: TreeItem; index: number }) => {
+      return <NotebookItemWrapper index={info.index} item={info.item} />;
+    },
+    []
+  );
 
   return (
-    <FlatList
+    <View
       style={{
-        paddingHorizontal: DefaultAppStyles.GAP,
-        paddingTop: DefaultAppStyles.GAP_SMALL
+        height: "100%"
       }}
-      data={tree}
-      keyExtractor={(item) => item.notebook.id}
-      windowSize={3}
-      ListHeaderComponent={
-        <SideMenuHeader
-          rightButtons={[
-            {
-              name: "plus",
-              onPress: () => {
-                AddNotebookSheet.present();
-              }
-            }
-          ]}
+    >
+      {!notebooks || notebooks.placeholders.length === 0 ? (
+        <SideMenuListEmpty
+          placeholder={strings.emptyPlaceholders("notebook")}
         />
-      }
-      stickyHeaderIndices={[0]}
-      renderItem={renderItem}
-    />
+      ) : (
+        <>
+          <FlatList
+            data={tree}
+            bounces={false}
+            bouncesZoom={false}
+            overScrollMode="never"
+            ListHeaderComponent={
+              <View
+                style={{
+                  backgroundColor: colors.primary.background,
+                  paddingTop: DefaultAppStyles.GAP_SMALL
+                }}
+              >
+                <SideMenuHeader />
+              </View>
+            }
+            renderItem={renderItem}
+          />
+          <View
+            style={{
+              width: "100%",
+              paddingHorizontal: DefaultAppStyles.GAP,
+              backgroundColor: colors.primary.background,
+              borderTopColor: colors.primary.border,
+              borderTopWidth: 1
+            }}
+          >
+            <TextInput
+              placeholder="Filter notebooks..."
+              style={{
+                fontFamily: "Inter-Regular",
+                fontSize: AppFontSize.xs
+              }}
+              cursorColor={colors.primary.accent}
+              onChangeText={async (value) => {
+                searchTimer.current && clearTimeout(searchTimer.current);
+                searchTimer.current = setTimeout(async () => {
+                  lastQuery.current = value;
+                  updateNotebooks();
+                }, 500);
+              }}
+              placeholderTextColor={colors.primary.placeholder}
+            />
+          </View>
+        </>
+      )}
+    </View>
   );
 };
 
@@ -390,6 +458,7 @@ const NotebookItemWrapper = ({
   item: TreeItem;
   index: number;
 }) => {
+  const { colors } = useThemeColors();
   const expanded = useSideMenuNotebookExpandedStore(
     (state) => state.expanded[item.notebook.id]
   );
@@ -425,26 +494,34 @@ const NotebookItemWrapper = ({
   }, [item.notebook.id]);
 
   return (
-    <NotebookItem
-      item={item}
-      index={index}
-      expanded={expanded}
-      onToggleExpanded={() => {
-        useSideMenuNotebookExpandedStore
-          .getState()
-          .setExpanded(item.notebook.id);
+    <View
+      style={{
+        paddingHorizontal: DefaultAppStyles.GAP,
+        marginTop: index === 0 ? DefaultAppStyles.GAP : 0
       }}
-      selected={selected}
-      selectionEnabled={selectionEnabled}
-      selectionStore={useSideMenuNotebookSelectionStore}
-      onItemUpdate={onItemUpdate}
-      focused={focused}
-      onPress={() => {
-        NotebookScreen.navigate(item.notebook, false);
-      }}
-      onLongPress={() => {
-        Properties.present(item.notebook, false);
-      }}
-    />
+    >
+      <NotebookItem
+        item={item}
+        index={index}
+        expanded={expanded}
+        onToggleExpanded={() => {
+          useSideMenuNotebookExpandedStore
+            .getState()
+            .setExpanded(item.notebook.id);
+        }}
+        selected={selected}
+        selectionEnabled={selectionEnabled}
+        selectionStore={useSideMenuNotebookSelectionStore}
+        onItemUpdate={onItemUpdate}
+        focused={focused}
+        onPress={() => {
+          NotebookScreen.navigate(item.notebook, false);
+          Navigation.closeDrawer();
+        }}
+        onLongPress={() => {
+          Properties.present(item.notebook, false);
+        }}
+      />
+    </View>
   );
 };

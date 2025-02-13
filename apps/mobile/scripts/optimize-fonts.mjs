@@ -92,7 +92,8 @@ const EXTRA_ICON_NAMES = [
   "home-outline",
   "checkbox-blank-outline",
   "checkbox-outline",
-  "checkbox-intermediate"
+  "checkbox-intermediate",
+  "dots-vertical"
 ];
 
 const __filename = fileURLToPath(import.meta.url);

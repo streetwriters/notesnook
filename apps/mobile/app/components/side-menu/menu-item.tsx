@@ -31,7 +31,7 @@ import useNavigationStore, {
 import { useNoteStore } from "../../stores/use-notes-store";
 import { useTrashStore } from "../../stores/use-trash-store";
 import { SideMenuItem } from "../../utils/menu-items";
-import { SIZE } from "../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { Pressable } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
@@ -138,12 +138,15 @@ function _MenuItem({
       style={{
         width: "100%",
         alignSelf: "center",
-        borderRadius: 5,
+        borderRadius: defaultBorderRadius,
         flexDirection: "row",
         paddingHorizontal: DefaultAppStyles.GAP_SMALL,
         justifyContent: "space-between",
         alignItems: "center",
         paddingVertical: DefaultAppStyles.GAP_VERTICAL
+      }}
+      onLayout={(e) => {
+        console.log(e.nativeEvent.layout);
       }}
     >
       <View
@@ -154,7 +157,7 @@ function _MenuItem({
         }}
       >
         {renderIcon ? (
-          renderIcon(item, SIZE.md)
+          renderIcon(item, AppFontSize.md)
         ) : (
           <Icon
             style={{
@@ -170,7 +173,7 @@ function _MenuItem({
                 ? colors.selected.paragraph
                 : colors.secondary.icon
             }
-            size={SIZE.md}
+            size={AppFontSize.md}
           />
         )}
 
@@ -178,7 +181,7 @@ function _MenuItem({
           color={
             isFocused ? colors.primary.paragraph : colors.secondary.paragraph
           }
-          size={SIZE.sm}
+          size={AppFontSize.sm}
         >
           {item.title}
         </Paragraph>
@@ -186,7 +189,7 @@ function _MenuItem({
 
       {menuItemCount > 0 ? (
         <Paragraph
-          size={SIZE.xxs}
+          size={AppFontSize.xxs}
           color={
             isFocused ? colors.primary.paragraph : colors.secondary.paragraph
           }

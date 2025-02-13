@@ -33,7 +33,7 @@ import Paragraph from "../../components/ui/typography/paragraph";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SyncStatus, useUserStore } from "../../stores/use-user-store";
 import { SUBSCRIPTION_STATUS_STRINGS } from "../../utils/constants";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { SectionItem } from "./section-item";
 import { strings } from "@notesnook/intl";
 
@@ -174,7 +174,10 @@ const SettingsUserSection = ({ item }) => {
                   }}
                 >
                   {premium ? (
-                    <Heading color={colors.primary.accent} size={SIZE.sm}>
+                    <Heading
+                      color={colors.primary.accent}
+                      size={AppFontSize.sm}
+                    >
                       {SUBSCRIPTION_STATUS_STRINGS[
                         user.subscription?.type
                       ]?.toUpperCase() || strings.basic()}
@@ -204,15 +207,18 @@ const SettingsUserSection = ({ item }) => {
                       });
                     }}
                     color={colors.primary.heading}
-                    size={SIZE.lg}
+                    size={AppFontSize.lg}
                   >
                     {userProfile?.fullName
                       ? userProfile.fullName + " "
                       : strings.setYourName() + " "}
-                    <AppIcon name="pencil" size={SIZE.lg} />
+                    <AppIcon name="pencil" size={AppFontSize.lg} />
                   </Paragraph>
 
-                  <Paragraph color={colors.primary.heading} size={SIZE.xs}>
+                  <Paragraph
+                    color={colors.primary.heading}
+                    size={AppFontSize.xs}
+                  >
                     {user?.email}
                   </Paragraph>
 
@@ -221,7 +227,7 @@ const SettingsUserSection = ({ item }) => {
                       flexWrap: "wrap",
                       marginTop: 5
                     }}
-                    size={SIZE.xs}
+                    size={AppFontSize.xs}
                     color={colors.secondary.heading}
                   >
                     {!user ? (
@@ -233,7 +239,7 @@ const SettingsUserSection = ({ item }) => {
                           : strings.synced()}{" "}
                         <TimeSince
                           style={{
-                            fontSize: SIZE.xs,
+                            fontSize: AppFontSize.xs,
                             color: colors.secondary.paragraph
                           }}
                           time={lastSynced}

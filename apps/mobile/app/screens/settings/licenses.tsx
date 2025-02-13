@@ -21,7 +21,7 @@ import { LICENSES } from "./license-data";
 import { FlatList, Linking, Platform } from "react-native";
 import { Pressable } from "../../components/ui/pressable";
 import Heading from "../../components/ui/typography/heading";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { useThemeColors } from "@notesnook/theme";
 import Paragraph from "../../components/ui/typography/paragraph";
 
@@ -59,7 +59,7 @@ export const Licenses = () => {
           });
         }}
       >
-        <Heading size={SIZE.sm}>{item.name}</Heading>
+        <Heading size={AppFontSize.sm}>{item.name}</Heading>
         <Paragraph>
           {item.licenseType} | {item.author?.split("<")[0]}
         </Paragraph>

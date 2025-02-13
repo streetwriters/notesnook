@@ -39,7 +39,7 @@ import {
   eOpenJumpToDialog,
   eScrollEvent
 } from "../../../utils/events";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import BaseDialog from "../../dialog/base-dialog";
 import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
@@ -158,7 +158,7 @@ const JumpToSectionDialog = () => {
       >
         {loading ? (
           <ActivityIndicator
-            size={SIZE.lg}
+            size={AppFontSize.lg}
             color={colors.primary.accent}
             style={{
               marginBottom: 20
@@ -196,7 +196,7 @@ const JumpToSectionDialog = () => {
                     }}
                   >
                     <Paragraph
-                      size={SIZE.sm}
+                      size={AppFontSize.sm}
                       color={
                         currentIndex === index
                           ? colors.static.white

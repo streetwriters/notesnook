@@ -24,7 +24,7 @@ import { notesnook } from "../../../../e2e/test.ids";
 import { useTotalNotes } from "../../../hooks/use-db-item";
 import { useNotebook } from "../../../hooks/use-notebook";
 import useNavigationStore from "../../../stores/use-navigation-store";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { IconButton } from "../../ui/icon-button";
 import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
@@ -147,7 +147,7 @@ export const NotebookItem = ({
         >
           {nestedNotebooks?.placeholders.length ? (
             <IconButton
-              size={SIZE.xl}
+              size={AppFontSize.xl}
               color={isSelected ? colors.selected.icon : colors.primary.icon}
               onPress={() => {
                 if (!item?.id) return;
@@ -166,7 +166,7 @@ export const NotebookItem = ({
           ) : null}
 
           <IconButton
-            size={SIZE.xl}
+            size={AppFontSize.xl}
             color={
               isSelected
                 ? colors.selected.icon
@@ -198,7 +198,7 @@ export const NotebookItem = ({
             color={
               isFocused ? colors.selected.paragraph : colors.secondary.paragraph
             }
-            size={SIZE.sm}
+            size={AppFontSize.sm}
           >
             {item?.title}
           </Paragraph>
@@ -212,7 +212,7 @@ export const NotebookItem = ({
           }}
         >
           {item?.id && totalNotes?.(item?.id) ? (
-            <Paragraph size={SIZE.sm} color={colors.secondary.paragraph}>
+            <Paragraph size={AppFontSize.sm} color={colors.secondary.paragraph}>
               {totalNotes(item?.id)}
             </Paragraph>
           ) : null}
@@ -238,7 +238,7 @@ export const NotebookItem = ({
             bottom={0}
             top={0}
             color={colors.primary.icon}
-            size={SIZE.xl}
+            size={AppFontSize.xl}
           />
         </View>
       </Pressable>

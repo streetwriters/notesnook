@@ -34,7 +34,7 @@ import {
   eUnSubscribeEvent
 } from "../../../services/event-manager";
 import { useThemeColors } from "@notesnook/theme";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { Dialog } from "../../dialog";
 import BaseDialog from "../../dialog/base-dialog";
 import { presentDialog } from "../../dialog/functions";
@@ -216,7 +216,7 @@ const PDFPreview = () => {
                     style={{
                       marginRight: 12
                     }}
-                    size={SIZE.xxl}
+                    size={AppFontSize.xxl}
                   />
                 </View>
 

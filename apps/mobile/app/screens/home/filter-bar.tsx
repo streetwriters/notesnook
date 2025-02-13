@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import { View } from "react-native";
 import { Button } from "../../components/ui/button";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 
 export const FilterBar = () => {
@@ -56,7 +56,7 @@ export const FilterBar = () => {
         key="add"
         icon="plus"
         type="secondary"
-        iconSize={SIZE.md}
+        iconSize={AppFontSize.md}
         style={{
           height: 25
         }}

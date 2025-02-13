@@ -39,7 +39,7 @@ import {
   eCloseAppLocKPasswordDailog,
   eOpenAppLockPasswordDialog
 } from "../../../utils/events";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 import BaseDialog from "../../dialog/base-dialog";
 import DialogButtons from "../../dialog/dialog-buttons";
@@ -192,7 +192,7 @@ export const AppLockPassword = () => {
                     height: 25,
                     marginRight: 5
                   }}
-                  size={SIZE.lg}
+                  size={AppFontSize.lg}
                 />
               )
             }
@@ -248,7 +248,7 @@ export const AppLockPassword = () => {
                     setSecureTextEntry(true);
                   });
                 }}
-                iconSize={SIZE.lg}
+                iconSize={AppFontSize.lg}
                 type="plain"
                 iconColor={
                   accountPass ? colors.primary.accent : colors.primary.icon

@@ -28,7 +28,7 @@ import { ToastManager } from "../../../services/event-manager";
 import PremiumService from "../../../services/premium";
 import { useUserStore } from "../../../stores/use-user-store";
 import { openLinkInBrowser } from "../../../utils/functions";
-import { SIZE } from "../../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import DialogHeader from "../../dialog/dialog-header";
 import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
@@ -147,11 +147,11 @@ Logged in: ${user ? "yes" : "no"}`,
             style={{
               borderWidth: 1,
               borderColor: colors.primary.border,
-              borderRadius: 5,
+              borderRadius: defaultBorderRadius,
               padding: 12,
               fontFamily: "OpenSans-Regular",
               marginBottom: 10,
-              fontSize: SIZE.md,
+              fontSize: AppFontSize.md,
               color: colors.primary.heading
             }}
             placeholderTextColor={colors.primary.placeholder}
@@ -180,18 +180,18 @@ Logged in: ${user ? "yes" : "no"}`,
             style={{
               borderWidth: 1,
               borderColor: colors.primary.border,
-              borderRadius: 5,
+              borderRadius: defaultBorderRadius,
               padding: 12,
               fontFamily: "OpenSans-Regular",
               maxHeight: 200,
-              fontSize: SIZE.sm,
+              fontSize: AppFontSize.sm,
               marginBottom: 2.5,
               color: colors.primary.paragraph
             }}
             placeholderTextColor={colors.primary.placeholder}
           />
           <Paragraph
-            size={SIZE.xs}
+            size={AppFontSize.xs}
             color={colors.secondary.paragraph}
           >{`App version: ${getVersion()} Platform: ${
             Platform.OS
@@ -208,7 +208,7 @@ Logged in: ${user ? "yes" : "no"}`,
 
           <Paragraph
             color={colors.secondary.paragraph}
-            size={SIZE.xs}
+            size={AppFontSize.xs}
             style={{
               marginTop: 10,
               textAlign: "center"
@@ -217,7 +217,9 @@ Logged in: ${user ? "yes" : "no"}`,
             {strings.issueNotice[0]()}{" "}
             <Text
               onPress={() => {
-                Linking.openURL("https://github.com/streetwriters/notesnook/issues");
+                Linking.openURL(
+                  "https://github.com/streetwriters/notesnook/issues"
+                );
               }}
               style={{
                 textDecorationLine: "underline",

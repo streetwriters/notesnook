@@ -27,7 +27,7 @@ import { eSendEvent, presentSheet } from "../../services/event-manager";
 import { ColorValues } from "../../utils/colors";
 import { eOnLoadNote } from "../../utils/events";
 import { fluidTabsRef } from "../../utils/global-refs";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import SheetProvider from "../sheet-provider";
 import { IconButton } from "../ui/icon-button";
 import { Pressable } from "../ui/pressable";
@@ -39,6 +39,7 @@ import { Items } from "./items";
 import Notebooks from "./notebooks";
 import { TagStrip, Tags } from "./tags";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { DefaultAppStyles } from "../../utils/styles";
 
 const Line = ({ top = 6, bottom = 6 }) => {
   const { colors } = useThemeColors();
@@ -81,13 +82,14 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
       data={[0]}
       keyExtractor={() => "properties-scroll-item"}
       renderItem={() => (
-        <View>
+        <View
+          style={{
+            gap: DefaultAppStyles.GAP_VERTICAL
+          }}
+        >
           <View
             style={{
-              paddingHorizontal: 12,
-              marginTop: 5,
-              zIndex: 10,
-              marginBottom: 5
+              paddingHorizontal: DefaultAppStyles.GAP
             }}
           >
             <View
@@ -119,12 +121,12 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
                 ) : item.type === "tag" ? (
                   <Icon
                     name="pound"
-                    size={SIZE.lg}
+                    size={AppFontSize.lg}
                     color={colors.primary.icon}
                   />
                 ) : null}
 
-                <Heading size={SIZE.lg}>{item.title}</Heading>
+                <Heading size={AppFontSize.lg}>{item.title}</Heading>
               </View>
 
               {item.type === "note" ? (
@@ -132,7 +134,7 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
                   name="open-in-new"
                   type="plain"
                   color={colors.primary.icon}
-                  size={SIZE.lg}
+                  size={AppFontSize.lg}
                   style={{
                     alignSelf: "flex-start"
                   }}
@@ -169,7 +171,7 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
                   backgroundColor: "transparent",
                   paddingHorizontal: 0
                 }}
-                fontSize={SIZE.xs}
+                fontSize={AppFontSize.xs}
               />
             ) : null}
           </View>
@@ -184,15 +186,8 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
             </>
           ) : null}
           {item.type === "note" ? (
-            <View
-              style={{
-                paddingHorizontal: 12
-              }}
-            >
-              <Notebooks note={item} close={close} />
-            </View>
+            <Notebooks note={item} close={close} />
           ) : null}
-
           <Items
             item={item}
             buttons={buttons}

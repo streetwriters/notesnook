@@ -37,7 +37,7 @@ import {
 } from "../../../services/validation";
 import { useThemeColors } from "@notesnook/theme";
 import { getElevationStyle } from "../../../utils/elevation";
-import { SIZE } from "../../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import { IconButton } from "../icon-button";
 import Paragraph from "../typography/paragraph";
 import phone from "phone";
@@ -97,7 +97,7 @@ const Input = ({
   onBlurInput,
   onPress,
   height = 45,
-  fontSize = SIZE.md,
+  fontSize = AppFontSize.md,
   onFocusInput,
   buttons,
   marginRight,
@@ -216,7 +216,7 @@ const Input = ({
 
   const style: ViewStyle = {
     borderWidth: 1,
-    borderRadius: 5,
+    borderRadius: defaultBorderRadius,
     borderColor: color,
     flexDirection: "row",
     justifyContent: "space-between",
@@ -318,7 +318,7 @@ const Input = ({
               <IconButton
                 testID={button.testID}
                 name={button.icon}
-                size={SIZE.xl}
+                size={AppFontSize.xl}
                 top={10}
                 bottom={10}
                 onPress={button.onPress}
@@ -357,7 +357,7 @@ const Input = ({
               }}
             >
               <Paragraph
-                size={SIZE.xs}
+                size={AppFontSize.xs}
                 style={{
                   textAlign: "right",
                   textAlignVertical: "bottom"
@@ -365,7 +365,7 @@ const Input = ({
               >
                 <Icon
                   name="alert-circle-outline"
-                  size={SIZE.xs}
+                  size={AppFontSize.xs}
                   color={colors.error.icon}
                 />{" "}
                 {errorMessage}
@@ -398,7 +398,7 @@ const Input = ({
                     color={errorList[error as ErrorKey] ? "red" : "green"}
                   />
 
-                  <Paragraph style={{ marginLeft: 5 }} size={SIZE.xs}>
+                  <Paragraph style={{ marginLeft: 5 }} size={AppFontSize.xs}>
                     {ERRORS_LIST[error as ErrorKey]}
                   </Paragraph>
                 </View>
