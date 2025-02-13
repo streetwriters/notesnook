@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { forwardRef, useEffect, useRef, useState } from "react";
 import { Flex, Button } from "@theme-ui/components";
+import { SxProp } from "@theme-ui/core";
 import { Plus } from "../icons";
 import {
   useStore as useSelectionStore,
@@ -74,9 +75,9 @@ type ListContainerProps = {
   button?: {
     onClick: () => void;
   };
-};
+} & SxProp;
 function ListContainer(props: ListContainerProps) {
-  const { group, items, context, refresh, header, button, compact } = props;
+  const { group, items, context, refresh, header, button, compact, sx } = props;
 
   const [focusedGroupIndex, setFocusedGroupIndex] = useState(-1);
 
@@ -180,7 +181,7 @@ function ListContainer(props: ListContainerProps) {
   return (
     <Flex
       variant="columnFill"
-      sx={{ overflow: "hidden" }}
+      sx={{ overflow: "hidden", ...sx }}
       onDragOver={(e) => e.preventDefault()}
       onDrop={props.onDrop}
     >

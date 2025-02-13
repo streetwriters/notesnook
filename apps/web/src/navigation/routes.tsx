@@ -19,11 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { db } from "../common/db";
 import AllNotes from "../views/all-notes";
-import Notebooks from "../views/notebooks";
 import Notes from "../views/notes";
-import Tags from "../views/tags";
-import Notebook from "../views/notebook";
-import { navigate } from ".";
+import { NotebookHeader } from "../components/notebook-header";
 import Trash from "../views/trash";
 import { store as notestore } from "../stores/note-store";
 import Reminders from "../views/reminders";
@@ -35,9 +32,15 @@ function defineRoute(route: RouteResult): RouteResult {
   return route;
 }
 
+const NOT_FOUND_ROUTE = defineRoute({
+  key: "notFound",
+  type: "notFound",
+  component: () => <div>Not found</div>
+});
 const routes = defineRoutes({
-  "/notes": () =>
-    defineRoute({
+  "/notes": () => {
+    notestore.setContext();
+    return defineRoute({
       key: "home",
       type: "notes",
       title: strings.routes.Notes(),
@@ -48,155 +51,79 @@ const routes = defineRoutes({
           title: strings.searchANote()
         }
       }
-    }),
-  "/notebooks": () =>
-    defineRoute({
-      key: "notebooks",
-      type: "notebooks",
-      title: strings.routes.Notebooks(),
-      component: Notebooks,
-      buttons: {
-        create: CREATE_BUTTON_MAP.notebooks,
-        search: {
-          title: strings.searchNotebooks()
-        }
-      }
-    }),
-  "/notebooks/:rootId/:notebookId?": ({ rootId, notebookId }) => {
+    });
+  },
+  "/notebooks/:notebookId": async ({ notebookId }) => {
+    const notebook = await db.notebooks.notebook(notebookId);
+    if (!notebook) return NOT_FOUND_ROUTE;
+    const totalNotes = await db.relations.from(notebook, "note").count();
+    notestore.setContext({
+      type: "notebook",
+      id: notebookId,
+      item: notebook,
+      totalNotes
+    });
+
     return defineRoute({
       key: "notebook",
-      type: "notes",
-      noCache: true,
-      component: Notebook,
+      type: "notebook",
+      component: Notes,
+      title: notebook.title,
       props: {
-        rootId,
-        notebookId
-      },
-      //  () => (
-      //   <Notebook key={rootId} rootId={rootId} notebookId={notebookId} />
-      // ),
-      buttons: {
-        create: CREATE_BUTTON_MAP.notes,
-        search: {
-          title: strings.searchANote()
-        }
+        header: <NotebookHeader notebook={notebook} totalNotes={totalNotes} />
       }
     });
   },
-  // "/notebooks/:rootId/:notebookId": ({ notebookId, rootId }) => {
-  //   return defineRoute({
-  //     key: "notebook",
-  //     type: "notes",
-  //     // title: topic.title,
-  //     component: () => (
-  //       <Notebook key={rootId} rootId={rootId} notebookId={notebookId} />
-  //     ),
-  //     buttons: {
-  //       create: CREATE_BUTTON_MAP.notes,
-  //       back: {
-  //         title: `Go back to notebooks`, // ${notebook.title}`,
-  //         onClick: () => navigate(`/notebooks/${rootId}`)
-  //       },
-  //       search: {
-  //         title: `Search notes`
-  //       }
-  //     }
-  //   });
-  // },
   "/favorites": () => {
     notestore.setContext({ type: "favorite" });
     return defineRoute({
       key: "notes",
       title: strings.routes.Favorites(),
       type: "notes",
-      component: Notes,
-      buttons: {
-        search: {
-          title: strings.searchANote()
-        }
-      }
+      component: Notes
     });
   },
   "/reminders": () => {
+    notestore.setContext();
     return defineRoute({
       key: "reminders",
       title: strings.routes.Reminders(),
       type: "reminders",
       component: Reminders,
       buttons: {
-        create: CREATE_BUTTON_MAP.reminders,
-        search: {
-          title: strings.searchInRoute("Reminders")
-        }
+        create: CREATE_BUTTON_MAP.reminders
       }
     });
   },
-  "/trash": () =>
-    defineRoute({
+  "/trash": () => {
+    notestore.setContext();
+    return defineRoute({
       key: "trash",
       type: "trash",
       title: strings.routes.Trash(),
-      component: Trash,
-      buttons: {
-        search: {
-          title: strings.searchInRoute("Trash")
-        }
-      }
-    }),
-  "/tags": () =>
-    defineRoute({
-      key: "tags",
-      title: strings.routes.Tags(),
-      type: "tags",
-      component: Tags,
-      buttons: {
-        create: CREATE_BUTTON_MAP.tags,
-        search: {
-          title: strings.searchInRoute("Tags")
-        }
-      }
-    }),
-  "/tags/:tagId": ({ tagId }) => {
+      component: Trash
+    });
+  },
+  "/tags/:tagId": async ({ tagId }) => {
+    const tag = await db.tags.tag(tagId);
+    if (!tag) return NOT_FOUND_ROUTE;
     notestore.setContext({ type: "tag", id: tagId });
     return defineRoute({
       key: "notes",
       type: "notes",
-      title: async () => {
-        const tag = await db.tags.tag(tagId);
-        if (!tag) return;
-        notestore.setContext({
-          type: "tag",
-          id: tagId,
-          item: tag
-        });
-        return `#${tag.title}`;
-      },
-      component: Notes,
-      buttons: {
-        create: CREATE_BUTTON_MAP.notes,
-        search: {
-          title: strings.searchANote()
-        }
-      }
+      title: `#${tag.title}`,
+      component: Notes
     });
   },
-  "/colors/:colorId": ({ colorId }) => {
+  "/colors/:colorId": async ({ colorId }) => {
+    const color = await db.colors.color(colorId);
+    if (!color) return NOT_FOUND_ROUTE;
     notestore.setContext({ type: "color", id: colorId });
     return defineRoute({
       key: "notes",
       type: "notes",
-      title: async () => {
-        const color = await db.colors.color(colorId);
-        if (!color) return;
-        return `${color.title}`;
-      },
-      component: Notes,
-      buttons: {
-        create: CREATE_BUTTON_MAP.notes,
-        search: {
-          title: strings.searchANote()
-        }
-      }
+      title: color.title,
+      component: Notes
     });
   },
   "/monographs": () => {
@@ -205,12 +132,7 @@ const routes = defineRoutes({
       key: "notes",
       title: strings.routes.Monographs(),
       type: "notes",
-      component: Notes,
-      buttons: {
-        search: {
-          title: strings.searchInRoute("Monographs")
-        }
-      }
+      component: Notes
     });
   }
 });

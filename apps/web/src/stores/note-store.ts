@@ -52,7 +52,7 @@ class NoteStore extends BaseStore<NoteStore> {
   refreshContext = async () => {
     const context = this.get().context;
     if (!context) return;
-    await this.setContext(context);
+    await this.setContext({ ...context });
   };
 
   setContext = async (context?: Context) => {
