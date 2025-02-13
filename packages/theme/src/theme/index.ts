@@ -27,12 +27,13 @@ export { createButtonVariant } from "./variants/button.js";
 export { getFontConfig } from "./font/index.js";
 export type Theme = {
   breakpoints: string[];
-  space: number[] & { small?: number | string };
+  space: (number | string)[] & { small?: number | string };
   sizes: { full: "100%"; half: "50%" };
   radii: {
     none: number;
     default: number;
     dialog: number;
+    large: number;
     small: number;
   };
   shadows: { menu: string };
@@ -50,10 +51,10 @@ export class ThemeFactory {
   static construct(config: ThemeConfig): Theme {
     const theme: Theme = {
       breakpoints: ["480px", "1000px", "1000px"],
-      space: [0, 5, 10, 15, 20, 25, 30, 35],
+      space: [0, "6px", 10, 15, 20, 25, 30, 35],
       sizes: { full: "100%", half: "50%" },
-      radii: { none: 0, default: 5, dialog: 10, small: 2.5 },
-      iconSizes: { big: 18, medium: 16, small: 14 },
+      radii: { none: 0, default: 5, large: 7, dialog: 10, small: 2.5 },
+      iconSizes: { big: 16, medium: 14, small: 12 },
       colors: flattenVariants(config.scope),
       shadows:
         config.colorScheme === "dark"

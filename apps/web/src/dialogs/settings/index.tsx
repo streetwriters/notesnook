@@ -269,7 +269,8 @@ function SettingsSideBar(props: SettingsSideBarProps) {
           sx={{
             flexDirection: "column",
             display: "flex",
-            overflow: "hidden"
+            overflow: "hidden",
+            gap: 2
           }}
         >
           <Input
@@ -279,8 +280,7 @@ function SettingsSideBar(props: SettingsSideBarProps) {
             placeholder={strings.search()}
             data-test-id="settings-search"
             sx={{
-              m: 2,
-              mb: 2,
+              m: 1,
               width: "auto",
               bg: "background",
               py: "7px"
@@ -326,14 +326,17 @@ function SettingsSideBar(props: SettingsSideBarProps) {
             }}
           />
           {sectionGroups.map((group) => (
-            <Flex key={group.key} sx={{ flexDirection: "column", mb: 2 }}>
+            <Flex
+              key={group.key}
+              sx={{ flexDirection: "column", mx: 1, gap: "small" }}
+            >
               <Text
                 variant={"subBody"}
                 sx={{
                   fontWeight: "bold",
-                  color: "paragraph",
-                  mx: 3,
+                  color: "paragraph-secondary",
                   mb: 1,
+                  ml: 1,
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   wordSpacing: "nowrap"
@@ -469,7 +472,12 @@ function SettingItem(props: { item: Setting }) {
         }}
       >
         <Flex sx={{ flexDirection: "column", flex: 1 }}>
-          <Text variant={"subtitle"}>{item.title}</Text>
+          <Text
+            variant={"body"}
+            sx={{ fontWeight: "medium", color: "heading" }}
+          >
+            {item.title}
+          </Text>
           {item.description && (
             <Text
               as={"div"}

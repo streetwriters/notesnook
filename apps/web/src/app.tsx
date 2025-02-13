@@ -52,7 +52,6 @@ new WebExtensionRelay();
 
 function App() {
   const isMobile = useMobile();
-  const [show, setShow] = useState(true);
   const isFocusMode = useStore((store) => store.isFocusMode);
   const { isFocused } = useWindowFocus();
   const { isFullscreen } = useWindowControls();
@@ -68,9 +67,6 @@ function App() {
           .nav-pane {
             opacity: 0.7;
           }
-          .titlebar {
-            background: var(--background-secondary) !important;
-          }
         `}
         />
       )}
@@ -78,15 +74,9 @@ function App() {
         <Global
           // These styles to make sure the app content doesn't overlap with the traffic lights.
           styles={`
-            .nav-pane,
-            .mobile-nav-pane {
-              margin-top: env(titlebar-area-height) !important;
-              height: calc(100% - env(titlebar-area-height)) !important;
-            }
-            .nav-pane.collapsed + .list-pane .route-container-header,
-            .nav-pane.collapsed + .list-pane.collapsed + .editor-pane .editor-action-bar,
-            .nav-pane.collapsed + .editor-pane .editor-action-bar {
-                padding-left: 25px;
+            .nav-pane .theme-scope-navigationMenu,
+            .mobile-nav-pane .theme-scope-navigationMenu {
+              padding-top: env(titlebar-area-height) !important;
             }
             .editor-pane:first-of-type .editor-action-bar,
             .mobile-editor-pane.pane-active .editor-action-bar,
@@ -102,9 +92,9 @@ function App() {
             .route-container-header .routeHeader {
               font-size: ${getFontSizes().title};
             }
-            .global-split-pane .react-split__sash {
-              height: calc(100% - ${TITLE_BAR_HEIGHT}px);
-            }
+            // .global-split-pane .react-split__sash {
+            //   height: calc(100% - ${TITLE_BAR_HEIGHT}px);
+            // }
           `}
         />
       ) : null}
@@ -114,7 +104,7 @@ function App() {
           <GlobalMenuWrapper />
         </div>
       </Suspense>
-      <AppEffects setShow={setShow} />
+      <AppEffects />
 
       <Flex
         id="app"
@@ -126,11 +116,7 @@ function App() {
           height: "100%"
         }}
       >
-        {isMobile ? (
-          <MobileAppContents />
-        ) : (
-          <DesktopAppContents setShow={setShow} show={show} />
-        )}
+        {isMobile ? <MobileAppContents /> : <DesktopAppContents />}
         <Toaster
           containerClassName="toasts-container"
           containerStyle={{ bottom: STATUS_BAR_HEIGHT + 10 }}
@@ -142,28 +128,12 @@ function App() {
 
 export default App;
 
-type DesktopAppContentsProps = {
-  show: boolean;
-  setShow: (show: boolean) => void;
-};
-function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
+function DesktopAppContents() {
   const isFocusMode = useStore((store) => store.isFocusMode);
+  const isListPaneVisible = useStore((store) => store.isListPaneVisible);
   const isTablet = useTablet();
-  const [isNarrow, setIsNarrow] = useState(isTablet || false);
+  // const [isNarrow, setIsNarrow] = useState(isTablet || false);
   const navPane = useRef<SplitPaneImperativeHandle>(null);
-  const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const { unsubscribe } = AppEventManager.subscribe(
-      AppEvents.toggleSideMenu,
-      (state) => {
-        setIsSideMenuOpen(Boolean(state));
-      }
-    );
-    return () => {
-      unsubscribe();
-    };
-  }, []);
 
   useEffect(() => {
     if (isTablet) navPane.current?.collapse(0);
@@ -178,50 +148,13 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
           overflow: "hidden"
         }}
       >
-        {isTablet && (
-          <Flex
-            sx={{
-              position: "absolute",
-              left: 0,
-              right: 0,
-              zIndex: 1000,
-              width: isSideMenuOpen ? "100%" : 0,
-              height: "100%",
-              background: "transparent",
-              transition: "0.15s width ease-out"
-            }}
-          >
-            <Box
-              sx={{
-                position: "absolute",
-                width: "100%",
-                height: "100%",
-                top: 0,
-                left: 0,
-                background: "rgba(0,0,0,0.5)"
-              }}
-              onClick={() => {
-                AppEventManager.publish(
-                  AppEvents.toggleSideMenu,
-                  !isSideMenuOpen
-                );
-              }}
-            />
-            <Flex sx={{ width: 300 }}>
-              <NavigationMenu
-                toggleNavigationContainer={() => {}}
-                isTablet={false}
-              />
-            </Flex>
-          </Flex>
-        )}
         <SplitPane
           className="global-split-pane"
           ref={navPane}
           autoSaveId="global-panel-group"
           direction="vertical"
           onChange={(sizes) => {
-            setIsNarrow(sizes[0] <= 70);
+            useStore.setState({ isNavPaneCollapsed: sizes[0] <= 70 });
           }}
         >
           {isFocusMode ? null : (
@@ -229,19 +162,18 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
               id="nav-pane"
               initialSize={isTablet ? 0 : 250}
               className={`nav-pane`}
-              minSize={isTablet ? 0 : 200}
-              // snapSize={200}
-              maxSize={isTablet ? 0 : 300}
+              snapSize={200}
+              minSize={40}
+              maxSize={isTablet ? 0 : 500}
+              style={{
+                overflow: "initial",
+                zIndex: 3
+              }}
             >
-              <NavigationMenu
-                toggleNavigationContainer={(state) => {
-                  setShow(state || !show);
-                }}
-                isTablet={false}
-              />
+              <NavigationMenu onExpand={() => navPane.current?.expand(0)} />
             </Pane>
           )}
-          {!isFocusMode && show ? (
+          {!isFocusMode && isListPaneVisible ? (
             <Pane
               id="list-pane"
               initialSize={380}
@@ -351,7 +283,7 @@ function MobileAppContents() {
           flexShrink: 0
         }}
       >
-        <NavigationMenu toggleNavigationContainer={() => {}} isTablet={false} />
+        <NavigationMenu />
       </Flex>
       <Flex
         className="mobile-list-pane"
