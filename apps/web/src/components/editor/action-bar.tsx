@@ -23,18 +23,11 @@ import {
   ArrowLeft,
   ArrowRight,
   Cross,
-  EditorFullWidth,
-  EditorNormalWidth,
-  ExitFullscreen,
-  FocusMode,
-  Fullscreen,
   Lock,
   NewTab,
-  NormalMode,
   Note,
   NoteRemove,
   Pin,
-  Plus,
   Properties,
   Publish,
   Published,
@@ -82,7 +75,7 @@ import { showPublishView } from "../publish-view";
 import { restrictToHorizontalAxis } from "@dnd-kit/modifiers";
 import useMobile from "../../hooks/use-mobile";
 import { strings } from "@notesnook/intl";
-import { TITLE_BAR_HEIGHT, getWindowControls } from "../title-bar";
+import { getWindowControls } from "../title-bar";
 import useTablet from "../../hooks/use-tablet";
 import { isMac } from "../../utils/platform";
 
@@ -216,6 +209,7 @@ export function EditorActionBar() {
               : 1,
           pl: 1,
           borderLeft: "1px solid var(--border)",
+          borderBottom: "1px solid var(--border)",
           flexShrink: 0
         }}
       >
@@ -265,6 +259,7 @@ const TabStrip = React.memo(function TabStrip() {
         sx={{
           px: 1,
           borderRight: "1px solid var(--border)",
+          borderBottom: "1px solid var(--border)",
           alignItems: "center",
           flexShrink: 0
         }}
@@ -292,7 +287,7 @@ const TabStrip = React.memo(function TabStrip() {
       <ScrollContainer
         className="tabsScroll"
         suppressScrollY
-        style={{ flex: 1, height: TITLE_BAR_HEIGHT }}
+        style={{ flex: 1, height: "100%" }}
         trackStyle={() => ({
           backgroundColor: "transparent",
           "--ms-track-size": "6px"
@@ -415,6 +410,9 @@ const TabStrip = React.memo(function TabStrip() {
               );
             }}
           />
+          <div
+            style={{ width: "100%", borderBottom: "1px solid var(--border)" }}
+          />
         </Flex>
       </ScrollContainer>
     </Flex>
@@ -495,6 +493,9 @@ function Tab(props: TabProps) {
         cursor: "pointer",
         pl: 2,
         borderRight: "1px solid var(--border)",
+        borderBottom: isActive
+          ? "1px solid transparent"
+          : "1px solid var(--border)",
         ":last-of-type": { borderRight: 0 },
 
         transform: CSS.Transform.toString(transform),
@@ -509,7 +510,7 @@ function Tab(props: TabProps) {
           "& .closeTabButton": {
             opacity: 1
           },
-          bg: isActive ? "hover-selected" : "hover"
+          bg: isActive ? "background-selected" : "hover"
         }
       }}
       onContextMenu={(e) => {
@@ -553,14 +554,13 @@ function Tab(props: TabProps) {
             onClick: onRevealInList,
             isHidden: !onRevealInList
           },
-          { type: "separator", key: "sep2" },
+          { type: "separator", key: "sep2", isHidden: !onRevealInList },
           {
             type: "button",
             key: "pin",
             title: strings.pin(),
             onClick: onPin,
-            isChecked: isPinned,
-            icon: Pin.path
+            isChecked: isPinned
           }
         ]);
       }}
@@ -576,7 +576,11 @@ function Tab(props: TabProps) {
           data-test-id={`tab-icon${isUnsaved ? "-unsaved" : ""}`}
           size={14}
           color={
-            isUnsaved ? "accent-error" : isActive ? "accent-selected" : "icon"
+            isUnsaved
+              ? "icon-error"
+              : isActive
+              ? "icon-selected"
+              : "icon-secondary"
           }
         />
         <Text
@@ -588,7 +592,7 @@ function Tab(props: TabProps) {
             overflowX: "hidden",
             pointerEvents: "none",
             maxWidth: 120,
-            color: isActive ? "paragraph-selected" : "paragraph"
+            color: isActive ? "paragraph-selected" : "paragraph-secondary"
           }}
           ml={1}
         >

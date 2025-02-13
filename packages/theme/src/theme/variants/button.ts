@@ -42,7 +42,7 @@ export const createButtonVariant = (
 
   height: "min-content",
   px: 2,
-  py: "7.5px",
+  py: 1,
 
   overflow: "hidden",
   textOverflow: "ellipsis",
@@ -124,6 +124,7 @@ const menuItem: ThemeUIStyleObject = {
   ...createButtonVariant("transparent", "paragraph", {
     hover: { bg: "hover" }
   }),
+  px: 1,
   borderRadius: 0
 };
 
