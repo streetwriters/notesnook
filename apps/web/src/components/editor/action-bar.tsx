@@ -117,13 +117,15 @@ export function EditorActionBar() {
       title: strings.undo(),
       icon: Undo,
       enabled: editorManager?.canUndo,
-      onClick: () => editorManager?.editor?.undo()
+      onClick: () => editorManager?.editor?.undo(),
+      hidden: activeSession?.type === "readonly"
     },
     {
       title: strings.redo(),
       icon: Redo,
       enabled: editorManager?.canRedo,
-      onClick: () => editorManager?.editor?.redo()
+      onClick: () => editorManager?.editor?.redo(),
+      hidden: activeSession?.type === "readonly"
     },
     {
       title: isNotePublished ? strings.published() : strings.publish(),

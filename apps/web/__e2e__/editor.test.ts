@@ -258,6 +258,21 @@ test("creating a new note and toggling read-only mode should not empty editor co
   expect(await notes.editor.getContent("text")).toBe(NOTE.content);
 });
 
+test("toggling read-only should hide undo & redo buttons", async ({ page }) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note = await notes.createNote(NOTE);
+
+  await notes.editor.undoButton.waitFor({ state: "visible" });
+  await notes.editor.redoButton.waitFor({ state: "visible" });
+  await note?.properties.readonly();
+
+  expect(await note?.properties.isReadonly()).toBeTruthy();
+  expect(notes.editor.undoButton).not.toBeVisible();
+  expect(notes.editor.redoButton).not.toBeVisible();
+});
+
 test("#1468 count words separated by newlines", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
