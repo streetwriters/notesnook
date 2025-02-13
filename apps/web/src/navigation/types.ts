@@ -21,7 +21,14 @@ import { RouteContainerButtons } from "../components/route-container";
 
 export type RouteResult = {
   key: string;
-  type: "notes" | "notebooks" | "reminders" | "trash" | "tags";
+  type:
+    | "notes"
+    | "notebook"
+    | "notebooks"
+    | "reminders"
+    | "trash"
+    | "tags"
+    | "notFound";
   title?: string | (() => Promise<string | undefined>);
   component:
     | ((props?: any) => JSX.Element | null)
@@ -64,11 +71,19 @@ export type Params<Path> = {
 };
 
 export type Routes<T extends string> = {
-  [Path in T]: (
-    params: Params<Path>
-  ) => boolean | React.ReactNode | RouteResult | void;
+  [Path in T]: (params: Params<Path>) => Promise<RouteResult> | RouteResult;
+};
+
+export type HashRoutes<T extends string> = {
+  [Path in T]: (params: Params<Path>) => void;
 };
 
 export function defineRoutes<T extends string>(routes: Routes<T>): Routes<T> {
+  return routes;
+}
+
+export function defineHashRoutes<T extends string>(
+  routes: HashRoutes<T>
+): HashRoutes<T> {
   return routes;
 }

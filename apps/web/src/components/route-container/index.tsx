@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { PropsWithChildren } from "react";
-import { Button, Flex, Text } from "@theme-ui/components";
+import { PropsWithChildren, useRef } from "react";
+import { Box, Button, Flex, Text } from "@theme-ui/components";
 import { ArrowLeft, Menu, Search, Plus, Close } from "../icons";
 import { useStore } from "../../stores/app-store";
 import { useStore as useSearchStore } from "../../stores/search-store";
@@ -28,6 +28,7 @@ import Field from "../field";
 import { strings } from "@notesnook/intl";
 import { TITLE_BAR_HEIGHT } from "../title-bar";
 import { AppEventManager, AppEvents } from "../../common/app-events";
+import { RouteResult } from "../../navigation/types";
 
 export type RouteContainerButtons = {
   search?: {
@@ -43,16 +44,12 @@ export type RouteContainerButtons = {
   };
 };
 
-export type RouteContainerProps = {
-  type: string;
-  title?: string | (() => Promise<string | undefined>);
-  buttons?: RouteContainerButtons;
-};
+export type RouteContainerProps = RouteResult;
 function RouteContainer(props: PropsWithChildren<RouteContainerProps>) {
-  const { type, title, buttons, children } = props;
+  const { children } = props;
   return (
     <>
-      <Header type={type} title={title} buttons={buttons} />
+      <Header {...props} />
       {children}
     </>
   );
@@ -61,154 +58,230 @@ function RouteContainer(props: PropsWithChildren<RouteContainerProps>) {
 export default RouteContainer;
 
 function Header(props: RouteContainerProps) {
-  const { buttons, type } = props;
+  const { type } = props;
   const titlePromise = usePromise<string | undefined>(
     () => (typeof props.title === "string" ? props.title : props.title?.()),
     [props.title]
   );
   const isMobile = useMobile();
-  const isSearching = useSearchStore((store) => store.isSearching);
+  // const isSearching = useSearchStore((store) => store.isSearching);
   const query = useSearchStore((store) => store.query);
-
-  if (isSearching)
-    return (
-      <Flex
-        sx={{
-          alignItems: "center",
-          justifyContent: "center",
-          height: TITLE_BAR_HEIGHT,
-          zIndex: 2,
-          px: 1
-        }}
-        className="route-container-header search-container"
-      >
-        <Field
-          data-test-id="search-input"
-          autoFocus
-          id="search"
-          name="search"
-          variant="borderless"
-          type="text"
-          sx={{ m: 0, flex: 1, gap: 0 }}
-          styles={{ input: { p: "5px", m: 0 } }}
-          defaultValue={query}
-          placeholder={strings.typeAKeyword()}
-          onChange={debounce(
-            (e) => useSearchStore.setState({ query: e.target.value }),
-            250
-          )}
-          onKeyUp={(e) => {
-            if (e.key === "Escape")
-              useSearchStore.setState({
-                isSearching: false,
-                searchType: undefined
-              });
-          }}
-          action={{
-            icon: Close,
-            testId: "search-button",
-            onClick: () =>
-              useSearchStore.setState({
-                isSearching: false,
-                searchType: undefined
-              })
-          }}
-        />
-      </Flex>
-    );
+  const inputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <Flex
-      className="route-container-header"
+    <Box
       sx={{
-        px: 1,
-        alignItems: "center",
-        justifyContent: "space-between",
-        height: TITLE_BAR_HEIGHT,
-        zIndex: 2
+        bg: type === "notebook" ? "background-secondary" : "transparent",
+        zIndex: 2,
+        p: 1
       }}
+      className="route-container-header search-container"
     >
-      <Flex
-        py={1}
+      <Field
+        inputRef={inputRef}
+        data-test-id="search-input"
+        autoFocus
+        id="search"
+        name="search"
+        variant="clean"
+        type="text"
         sx={{
-          alignItems: "center",
-          justifyContent: "center",
-          overflow: "hidden",
-          gap: 1
+          bg: "background",
+          m: 0,
+          mr: 0,
+
+          border: "1px solid var(--border)",
+          borderRadius: "large",
+          gap: 0
         }}
-      >
-        {buttons?.back ? (
-          <Button
-            {...buttons.back}
-            data-test-id="route-go-back"
-            sx={{ p: 0, flexShrink: 0 }}
-          >
-            <ArrowLeft size={20} />
-          </Button>
-        ) : (
-          <Button
-            onClick={() =>
-              AppEventManager.publish(AppEvents.toggleSideMenu, true)
+        styles={{
+          input: {
+            m: 0,
+            p: "7.5px",
+            fontSize: "body",
+            "::placeholder": {
+              textAlign: "center"
+            },
+            "& + .rightActions": {
+              opacity: 0
+            },
+            "&:focus + .rightActions": {
+              opacity: 1
             }
-            sx={{ p: 0, flexShrink: 0 }}
-          >
-            <Menu
-              sx={{
-                display: ["block", "block", "none"],
-                size: 23
-              }}
-              size={24}
-            />
-          </Button>
+          }
+        }}
+        defaultValue={query}
+        placeholder={strings.searchInRoute(
+          titlePromise.status === "fulfilled"
+            ? titlePromise.value || type
+            : type
         )}
-        {titlePromise.status === "fulfilled" && titlePromise.value && (
-          <Text
-            className="routeHeader"
-            variant="heading"
-            data-test-id="routeHeader"
-            color="heading"
-          >
-            {titlePromise.value}
-          </Text>
+        onChange={debounce(
+          (e) => useSearchStore.setState({ query: e.target.value }),
+          250
         )}
-      </Flex>
-      <Flex sx={{ flexShrink: 0, gap: 2 }}>
-        {buttons?.search && (
-          <Button
-            title={buttons.search.title}
-            onClick={() =>
-              useSearchStore.setState({ isSearching: true, searchType: type })
-            }
-            data-test-id={"open-search"}
-            sx={{ p: 0 }}
-          >
-            <Search
-              size={24}
-              sx={{
-                size: 24
-              }}
-            />
-          </Button>
-        )}
-        {!isMobile && buttons?.create && (
-          <Button
-            {...buttons.create}
-            data-test-id={`${type}-action-button`}
-            sx={{ p: 0 }}
-          >
-            <Plus
-              color="accentForeground"
-              size={18}
-              sx={{
-                height: 24,
-                width: 24,
-                bg: "accent",
-                borderRadius: 100
-              }}
-            />
-          </Button>
-        )}
-      </Flex>
-    </Flex>
+        onKeyUp={(e) => {
+          if (e.key === "Escape")
+            useSearchStore.setState({
+              isSearching: false,
+              searchType: undefined
+            });
+          else useSearchStore.setState({ isSearching: true, searchType: type });
+        }}
+        action={{
+          icon: Close,
+          testId: "search-button",
+          onClick: () => {
+            if (inputRef.current) inputRef.current.value = "";
+            useSearchStore.setState({
+              isSearching: false,
+              query: undefined,
+              searchType: undefined
+            });
+          }
+        }}
+      />
+    </Box>
   );
+  // if (isSearching)
+  //   return (
+  //     <Flex
+  //       sx={{
+  //         alignItems: "center",
+  //         justifyContent: "center",
+  //         height: TITLE_BAR_HEIGHT,
+  //         zIndex: 2,
+  //         px: 1
+  //       }}
+  //       className="route-container-header search-container"
+  //     >
+  // <Field
+  //   data-test-id="search-input"
+  //   autoFocus
+  //   id="search"
+  //   name="search"
+  //   variant="borderless"
+  //   type="text"
+  //   sx={{ m: 0, flex: 1, gap: 0 }}
+  //   styles={{ input: { p: "5px", m: 0 } }}
+  //   defaultValue={query}
+  //   placeholder={strings.typeAKeyword()}
+  //   onChange={debounce(
+  //     (e) => useSearchStore.setState({ query: e.target.value }),
+  //     250
+  //   )}
+  //   onKeyUp={(e) => {
+  //     if (e.key === "Escape")
+  //       useSearchStore.setState({
+  //         isSearching: false,
+  //         searchType: undefined
+  //       });
+  //   }}
+  //   action={{
+  //     icon: Close,
+  //     testId: "search-button",
+  //     onClick: () =>
+  //       useSearchStore.setState({
+  //         isSearching: false,
+  //         searchType: undefined
+  //       })
+  //   }}
+  // />
+  //     </Flex>
+  //   );
+
+  // return (
+  //   <Flex
+  //     className="route-container-header"
+  //     sx={{
+  //       px: 1,
+  //       alignItems: "center",
+  //       justifyContent: "space-between",
+  //       height: TITLE_BAR_HEIGHT,
+  //       zIndex: 2
+  //     }}
+  //   >
+  //     <Flex
+  //       py={1}
+  //       sx={{
+  //         alignItems: "center",
+  //         justifyContent: "center",
+  //         overflow: "hidden",
+  //         gap: 1
+  //       }}
+  //     >
+  //       {buttons?.back ? (
+  //         <Button
+  //           {...buttons.back}
+  //           data-test-id="route-go-back"
+  //           sx={{ p: 0, flexShrink: 0 }}
+  //         >
+  //           <ArrowLeft size={20} />
+  //         </Button>
+  //       ) : (
+  //         <Button
+  //           onClick={() =>
+  //             AppEventManager.publish(AppEvents.toggleSideMenu, true)
+  //           }
+  //           sx={{ p: 0, flexShrink: 0 }}
+  //         >
+  //           <Menu
+  //             sx={{
+  //               display: ["block", "block", "none"],
+  //               size: 23
+  //             }}
+  //             size={24}
+  //           />
+  //         </Button>
+  //       )}
+  //       {titlePromise.status === "fulfilled" && titlePromise.value && (
+  //         <Text
+  //           className="routeHeader"
+  //           variant="heading"
+  //           data-test-id="routeHeader"
+  //           color="heading"
+  //         >
+  //           {titlePromise.value}
+  //         </Text>
+  //       )}
+  //     </Flex>
+  //     <Flex sx={{ flexShrink: 0, gap: 2 }}>
+  //       {buttons?.search && (
+  //         <Button
+  //           title={buttons.search.title}
+  //           onClick={() =>
+  //             useSearchStore.setState({ isSearching: true, searchType: type })
+  //           }
+  //           data-test-id={"open-search"}
+  //           sx={{ p: 0 }}
+  //         >
+  //           <Search
+  //             size={24}
+  //             sx={{
+  //               size: 24
+  //             }}
+  //           />
+  //         </Button>
+  //       )}
+  //       {!isMobile && buttons?.create && (
+  //         <Button
+  //           {...buttons.create}
+  //           data-test-id={`${type}-action-button`}
+  //           sx={{ p: 0 }}
+  //         >
+  //           <Plus
+  //             color="accentForeground"
+  //             size={18}
+  //             sx={{
+  //               height: 24,
+  //               width: 24,
+  //               bg: "accent",
+  //               borderRadius: 100
+  //             }}
+  //           />
+  //         </Button>
+  //       )}
+  //     </Flex>
+  //   </Flex>
+  // );
 }

@@ -128,17 +128,6 @@ export default function TabsView() {
 
   return (
     <>
-      <Flex
-        className="editor-action-bar"
-        sx={{
-          zIndex: 2,
-          height: TITLE_BAR_HEIGHT,
-          borderBottom: "1px solid var(--border)"
-        }}
-      >
-        <EditorActionBar />
-      </Flex>
-
       <ScopedThemeProvider
         scope="editor"
         ref={dropRef}
@@ -147,9 +136,21 @@ export default function TabsView() {
           flex: 1,
           overflow: "hidden",
           display: "flex",
-          flexDirection: "column"
+          flexDirection: "column",
+          position: "relative"
         }}
       >
+        <Flex
+          className="editor-action-bar"
+          sx={{
+            zIndex: 2,
+            height: TITLE_BAR_HEIGHT,
+            bg: "background-secondary"
+            // borderBottom: "1px solid var(--border)"
+          }}
+        >
+          <EditorActionBar />
+        </Flex>
         <SplitPane direction="vertical" autoSaveId={"editor-panels"}>
           <Pane id="editor-panel" className="editor-pane">
             {tabs.map((tab) => {
