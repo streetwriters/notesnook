@@ -26,8 +26,10 @@ import {
   Lock,
   NewTab,
   Note,
+  NoteAdd,
   NoteRemove,
   Pin,
+  Plus,
   Properties,
   Publish,
   Published,
@@ -78,6 +80,7 @@ import { strings } from "@notesnook/intl";
 import { getWindowControls } from "../title-bar";
 import useTablet from "../../hooks/use-tablet";
 import { isMac } from "../../utils/platform";
+import { CREATE_BUTTON_MAP } from "../../common";
 
 export function EditorActionBar() {
   const { isMaximized, isFullscreen, hasNativeWindowControls } =
@@ -265,6 +268,14 @@ const TabStrip = React.memo(function TabStrip() {
         }}
         onDoubleClick={(e) => e.stopPropagation()}
       >
+        <Button
+          variant="secondary"
+          {...CREATE_BUTTON_MAP.notes}
+          data-test-id={`create-new-note`}
+          sx={{ p: 1, bg: "transparent" }}
+        >
+          <NoteAdd size={16} />
+        </Button>
         <Button
           disabled={!canGoBack}
           onClick={() => useEditorStore.getState().goBack()}

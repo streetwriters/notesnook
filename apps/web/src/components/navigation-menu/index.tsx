@@ -149,18 +149,18 @@ const tabs = [
     actions: []
   },
   {
-    id: "notebook",
+    id: "notebooks",
     icon: NotebookIcon,
     title: strings.routes.Notebooks(),
     actions: [
       {
-        id: "add",
+        id: "create-notebook-button",
         title: CREATE_BUTTON_MAP.notebooks.title,
         icon: Plus,
         onClick: CREATE_BUTTON_MAP.notebooks.onClick
       },
       {
-        id: "sort-by",
+        id: "notebooks-sort-button",
         title: strings.sortBy(),
         icon: SortBy,
         onClick: () =>
@@ -169,18 +169,18 @@ const tabs = [
     ]
   },
   {
-    id: "tag",
+    id: "tags",
     icon: TagIcon,
     title: strings.routes.Tags(),
     actions: [
       {
-        id: "add",
+        id: "create-tag-button",
         title: CREATE_BUTTON_MAP.tags.title,
         icon: Plus,
         onClick: CREATE_BUTTON_MAP.tags.onClick
       },
       {
-        id: "sort-by",
+        id: "tags-sort-button",
         title: strings.sortBy(),
         icon: SortBy,
         onClick: () =>
@@ -318,12 +318,12 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
           {tabs.map((tab) => (
             <TabItem
               key={tab.id}
-              id={tab.id}
+              data-test-id={`tab-${tab.id}`}
               title={tab.title}
               icon={tab.icon}
               selected={currentTab.id === tab.id}
               onClick={() => {
-                setExpanded(true);
+                if (isNavPaneCollapsed) setExpanded(true);
                 setCurrentTab(tab);
               }}
             />
@@ -338,6 +338,7 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
                 sx={{ p: 1, bg: "transparent" }}
                 onClick={action.onClick}
                 title={action.title}
+                data-test-id={action.id}
               >
                 <action.icon size={13} color="icon" />
               </Button>
@@ -360,10 +361,10 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
           Menu.openMenu(await getSidebarItemsAsMenuItems());
         }}
       >
-        <Freeze freeze={isCollapsed || currentTab.id !== "notebook"}>
+        <Freeze freeze={isCollapsed || currentTab.id !== "notebooks"}>
           <Notebooks />
         </Freeze>
-        <Freeze freeze={isCollapsed || currentTab.id !== "tag"}>
+        <Freeze freeze={isCollapsed || currentTab.id !== "tags"}>
           <Tags />
         </Freeze>
         <Freeze freeze={currentTab.id !== "home" && !isCollapsed}>
@@ -720,6 +721,7 @@ function NavigationDropdown() {
           );
         }}
         variant="columnCenter"
+        data-test-id="profile-dropdown"
         sx={{
           bg: "background-secondary",
           size: 30,

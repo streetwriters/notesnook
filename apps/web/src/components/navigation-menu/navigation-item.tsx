@@ -88,10 +88,10 @@ function NavigationItem(
         AppEventManager.publish(AppEvents.toggleSideMenu, false);
         if (onClick) onClick();
       }}
+      data-test-id={`navigation-item`}
       title={title}
     >
       <Button
-        data-test-id={`navigation-item`}
         sx={{
           p: 0,
           flex: 1,

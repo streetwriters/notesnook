@@ -28,25 +28,22 @@ export class ItemsViewModel extends BaseViewModel {
   private readonly createButton: Locator;
   constructor(page: Page) {
     super(page, "tags", "tags");
-    this.createButton = page.locator(getTestId(`tags-action-button`));
+    this.createButton = page.locator(getTestId(`create-tag-button`));
   }
 
   async createItem(item: Item) {
-    const titleToCompare = `#${item.title}`;
-
     await this.createButton.first().click();
     await fillItemDialog(this.page, item);
 
-    await this.waitForItem(titleToCompare);
+    await this.waitForItem(item.title);
     return await this.findItem(item);
   }
 
   async findItem(item: Item) {
-    const titleToCompare = `#${item.title}`;
     for await (const _item of this.iterateItems()) {
       const itemModel = new ItemModel(_item, "tag");
       const title = await itemModel.getTitle();
-      if (title === titleToCompare) return itemModel;
+      if (title === item.title) return itemModel;
     }
     return undefined;
   }
