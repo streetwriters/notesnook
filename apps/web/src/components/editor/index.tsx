@@ -119,7 +119,8 @@ const deferredSave = debounceWithId(saveContent, 100);
 export default function TabsView() {
   const tabs = useEditorStore((store) => store.tabs);
   const documentPreview = useEditorStore((store) => store.documentPreview);
-  const activeTab = useEditorStore((store) => store.getActiveTab());
+  const activeTabId = useEditorStore((store) => store.activeTabId);
+  const activeSession = useEditorStore((store) => store.getActiveSession());
   const arePropertiesVisible = useEditorStore(
     (store) => store.arePropertiesVisible
   );
@@ -128,6 +129,17 @@ export default function TabsView() {
 
   return (
     <>
+      <Flex
+        className="editor-action-bar"
+        sx={{
+          zIndex: 2,
+          height: TITLE_BAR_HEIGHT,
+          bg: "background-secondary"
+          // borderBottom: "1px solid var(--border)"
+        }}
+      >
+        <EditorActionBar />
+      </Flex>
       <ScopedThemeProvider
         scope="editor"
         ref={dropRef}
@@ -140,17 +152,6 @@ export default function TabsView() {
           position: "relative"
         }}
       >
-        <Flex
-          className="editor-action-bar"
-          sx={{
-            zIndex: 2,
-            height: TITLE_BAR_HEIGHT,
-            bg: "background-secondary"
-            // borderBottom: "1px solid var(--border)"
-          }}
-        >
-          <EditorActionBar />
-        </Flex>
         <SplitPane direction="vertical" autoSaveId={"editor-panels"}>
           <Pane id="editor-panel" className="editor-pane">
             {tabs.map((tab) => {
@@ -159,7 +160,7 @@ export default function TabsView() {
                 .getSession(tab.sessionId);
               if (!session) return null;
               return (
-                <Freeze key={session.id} freeze={tab.id !== activeTab?.id}>
+                <Freeze key={session.id} freeze={tab.id !== activeTabId}>
                   {session.type === "locked" ? (
                     <UnlockNoteView session={session} />
                   ) : session.type === "conflicted" ||
@@ -210,15 +211,15 @@ export default function TabsView() {
             </Pane>
           ) : null}
 
-          {isTOCVisible && activeTab ? (
+          {isTOCVisible && activeSession ? (
             <Pane id="table-of-contents-pane" initialSize={300} minSize={300}>
-              <TableOfContents sessionId={activeTab.sessionId} />
+              <TableOfContents sessionId={activeSession.id} />
             </Pane>
           ) : null}
         </SplitPane>
         <DropZone overlayRef={overlayRef} />
-        {arePropertiesVisible && activeTab && (
-          <Properties sessionId={activeTab.sessionId} />
+        {arePropertiesVisible && activeSession && (
+          <Properties sessionId={activeSession.id} />
         )}
       </ScopedThemeProvider>
     </>
