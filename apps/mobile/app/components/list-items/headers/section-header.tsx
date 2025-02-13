@@ -21,12 +21,12 @@ import { GroupHeader, GroupOptions, ItemType } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
-import { useWindowDimensions, View } from "react-native";
+import { View } from "react-native";
 import { useIsCompactModeEnabled } from "../../../hooks/use-is-compact-mode-enabled";
 import { presentSheet } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
 import { RouteName } from "../../../stores/use-navigation-store";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { DefaultAppStyles } from "../../../utils/styles";
 import Sort from "../../sheets/sort";
 import { IconButton } from "../../ui/icon-button";
@@ -56,8 +56,6 @@ export const SectionHeader = React.memo<
     onOpenJumpToDialog
   }: SectionHeaderProps) {
     const { colors } = useThemeColors();
-    const { fontScale } = useWindowDimensions();
-    const groupBy = strings.groupByStrings[groupOptions.groupBy]();
     const isCompactModeEnabled = useIsCompactModeEnabled(
       dataType as "note" | "notebook"
     );
@@ -66,8 +64,7 @@ export const SectionHeader = React.memo<
       <View
         style={{
           width: "100%",
-          paddingHorizontal: DefaultAppStyles.GAP,
-          marginVertical: DefaultAppStyles.GAP
+          paddingHorizontal: DefaultAppStyles.GAP
         }}
       >
         <View
@@ -79,7 +76,7 @@ export const SectionHeader = React.memo<
             justifyContent: "space-between",
             borderBottomWidth: 1,
             borderColor: colors.primary.border,
-            paddingBottom: DefaultAppStyles.GAP_VERTICAL
+            paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
           }}
         >
           <Pressable
@@ -94,14 +91,16 @@ export const SectionHeader = React.memo<
             }}
           >
             <Heading
-              size={SIZE.sm}
+              size={AppFontSize.xxs}
               style={{
                 alignSelf: "center",
                 textAlignVertical: "center"
               }}
               color={colors.primary.accent}
             >
-              {!item.title || item.title === "" ? strings.pinned() : item.title}
+              {!item.title || item.title === ""
+                ? strings.pinned().toUpperCase()
+                : item.title.toUpperCase()}
             </Heading>
           </Pressable>
 
@@ -120,6 +119,7 @@ export const SectionHeader = React.memo<
                       ? "sort-ascending"
                       : "sort-descending"
                   }
+                  color={colors.secondary.icon}
                   onPress={() => {
                     if (!screen) return;
                     presentSheet({
@@ -130,7 +130,7 @@ export const SectionHeader = React.memo<
                     width: 25,
                     height: 25
                   }}
-                  size={SIZE.lg - 2}
+                  size={AppFontSize.lg - 2}
                 />
                 <IconButton
                   hidden={
@@ -156,19 +156,20 @@ export const SectionHeader = React.memo<
                         : "normal"
                     });
                   }}
-                  size={SIZE.lg - 2}
+                  size={AppFontSize.lg - 2}
                 />
               </>
             ) : null}
 
-            <IconButton
+            {/* <IconButton
               style={{
                 width: 25,
                 height: 25
               }}
+              color={colors.secondary.icon}
               name={"chevron-down"}
               size={SIZE.lg - 2}
-            />
+            /> */}
           </View>
         </View>
       </View>

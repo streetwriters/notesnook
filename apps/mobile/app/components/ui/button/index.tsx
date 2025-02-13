@@ -30,7 +30,7 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useUserStore } from "../../../stores/use-user-store";
-import { SIZE } from "../../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import NativeTooltip from "../../../utils/tooltip";
 import { ProTag } from "../../premium/pro-tag";
 import { Pressable, PressableProps, useButton } from "../pressable";
@@ -66,9 +66,9 @@ export const Button = ({
   loading = false,
   title = null,
   icon,
-  fontSize = SIZE.sm,
+  fontSize = AppFontSize.sm,
   type = "transparent",
-  iconSize = SIZE.md,
+  iconSize = AppFontSize.md,
   style = {},
   accentColor,
   accentText = "#ffffff",
@@ -127,7 +127,7 @@ export const Button = ({
             ? width * growFactor
             : (width as DimensionValue) || undefined,
         paddingHorizontal: 12,
-        borderRadius: 5,
+        borderRadius: defaultBorderRadius,
         alignSelf: "center",
         justifyContent: "center",
         alignItems: "center",

@@ -24,7 +24,7 @@ import { MMKV } from "../../common/database/mmkv";
 import { eSendEvent, presentSheet } from "../../services/event-manager";
 import { TTip } from "../../services/tip-manager";
 import { eCloseSheet } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { Button } from "../ui/button";
 import Seperator from "../ui/seperator";
 import Paragraph from "../ui/typography/paragraph";
@@ -70,8 +70,8 @@ export const Tip = ({
         <Button
           title={strings.tip()}
           icon="information"
-          fontSize={SIZE.xs}
-          iconSize={SIZE.xs}
+          fontSize={AppFontSize.xs}
+          iconSize={AppFontSize.xs}
           style={{
             width: undefined,
             height: 22,
@@ -91,8 +91,8 @@ export const Tip = ({
             title={strings.neverShowAgain()}
             type="secondary"
             icon="close"
-            fontSize={SIZE.xs}
-            iconSize={SIZE.xs}
+            fontSize={AppFontSize.xs}
+            iconSize={AppFontSize.xs}
             onPress={() => {
               MMKV.setItem("neverShowSheetTips", "true");
               eSendEvent(eCloseSheet);
@@ -114,7 +114,7 @@ export const Tip = ({
       <Paragraph
         style={textStyle}
         color={colors.primary.paragraph}
-        size={SIZE.md}
+        size={AppFontSize.md}
       >
         {tip.text()}
       </Paragraph>

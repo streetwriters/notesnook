@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React, { useState } from "react";
 import { ActivityIndicator, Platform, ScrollView, View } from "react-native";
 import { LAUNCH_ROCKET } from "../../assets/images/assets";
@@ -24,17 +25,13 @@ import { db } from "../../common/database";
 import { usePricing } from "../../hooks/use-pricing";
 import { DDS } from "../../services/device-detection";
 import { eSendEvent, presentSheet } from "../../services/event-manager";
-import { useThemeColors } from "@notesnook/theme";
+import Navigation from "../../services/navigation";
 import { useUserStore } from "../../stores/use-user-store";
 import { getElevationStyle } from "../../utils/elevation";
-import {
-  eClosePremiumDialog,
-  eCloseSheet,
-  eOpenLoginDialog
-} from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { eClosePremiumDialog, eCloseSheet } from "../../utils/events";
+import { AppFontSize } from "../../utils/size";
 import { sleep } from "../../utils/time";
-import { AuthMode } from "../auth";
+import { AuthMode } from "../auth/common";
 import SheetProvider from "../sheet-provider";
 import { Toast } from "../toast";
 import { Button } from "../ui/button";
@@ -66,9 +63,9 @@ export const Component = ({ close, promo }) => {
       });
     } else {
       close();
-      setTimeout(() => {
-        eSendEvent(eOpenLoginDialog, AuthMode.trialSignup);
-      }, 400);
+      Navigation.navigate("Auth", {
+        mode: AuthMode.trialSignup
+      });
     }
   };
 
@@ -137,14 +134,14 @@ export const Component = ({ close, promo }) => {
 
         <Heading
           key="heading"
-          size={SIZE.lg}
+          size={AppFontSize.lg}
           style={{
             alignSelf: "center",
             paddingTop: 20
           }}
         >
           Notesnook{" "}
-          <Heading size={SIZE.lg} color={colors.primary.accent}>
+          <Heading size={AppFontSize.lg} color={colors.primary.accent}>
             Pro
           </Heading>
         </Heading>
@@ -154,7 +151,7 @@ export const Component = ({ close, promo }) => {
             style={{
               marginBottom: 20
             }}
-            size={SIZE.md}
+            size={AppFontSize.md}
             color={colors.primary.accent}
           />
         ) : (
@@ -163,7 +160,7 @@ export const Component = ({ close, promo }) => {
               alignSelf: "center",
               marginBottom: 20
             }}
-            size={SIZE.md}
+            size={AppFontSize.md}
           >
             (
             {Platform.OS === "android"
@@ -176,7 +173,7 @@ export const Component = ({ close, promo }) => {
 
         <Paragraph
           key="description"
-          size={SIZE.md}
+          size={AppFontSize.md}
           style={{
             paddingHorizontal: 12,
             textAlign: "center",
@@ -231,7 +228,7 @@ export const Component = ({ close, promo }) => {
         {!user || userCanRequestTrial ? (
           <Paragraph
             color={colors.secondary.paragraph}
-            size={SIZE.xs}
+            size={AppFontSize.xs}
             style={{
               alignSelf: "center",
               textAlign: "center",
@@ -242,7 +239,7 @@ export const Component = ({ close, promo }) => {
             {user
               ? 'On clicking "Try free for 14 days", your free trial will be activated.'
               : "After sign up you will be asked to activate your free trial."}{" "}
-            <Paragraph size={SIZE.xs} style={{ fontWeight: "bold" }}>
+            <Paragraph size={AppFontSize.xs} style={{ fontWeight: "bold" }}>
               No credit card is required.
             </Paragraph>
           </Paragraph>

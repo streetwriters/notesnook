@@ -33,7 +33,7 @@ import { db } from "../../../common/database";
 import { useDBItem } from "../../../hooks/use-db-item";
 import { editorController } from "../../../screens/editor/tiptap/utils";
 import { presentSheet } from "../../../services/event-manager";
-import { SIZE } from "../../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import Input from "../../ui/input";
 import { Pressable } from "../../ui/pressable";
@@ -122,7 +122,7 @@ const ListBlockItem = ({
 
         <View
           style={{
-            borderRadius: 5,
+            borderRadius: defaultBorderRadius,
             backgroundColor: colors.secondary.background,
             height: 25,
             minWidth: 25,
@@ -130,7 +130,7 @@ const ListBlockItem = ({
             justifyContent: "center"
           }}
         >
-          <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
+          <Paragraph color={colors.secondary.paragraph} size={AppFontSize.xs}>
             {item.type.toUpperCase()}
           </Paragraph>
         </View>
@@ -254,7 +254,7 @@ export default function LinkNote(props: {
               gap: 10
             }}
           >
-            <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
+            <Paragraph color={colors.secondary.paragraph} size={AppFontSize.xs}>
               {strings.linkNoteSelectedNote()}
             </Paragraph>
             <Pressable
@@ -284,7 +284,10 @@ export default function LinkNote(props: {
               >
                 <Paragraph numberOfLines={1}>{selectedNote?.title}</Paragraph>
 
-                <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
+                <Paragraph
+                  color={colors.secondary.paragraph}
+                  size={AppFontSize.xs}
+                >
                   {strings.tapToDeselect()}
                 </Paragraph>
               </View>
@@ -296,7 +299,7 @@ export default function LinkNote(props: {
                   marginBottom: 12
                 }}
                 color={colors.secondary.paragraph}
-                size={SIZE.xs}
+                size={AppFontSize.xs}
               >
                 {strings.linkNoteToSection()}
               </Paragraph>

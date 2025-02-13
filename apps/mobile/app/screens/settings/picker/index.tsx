@@ -27,7 +27,7 @@ import { Pressable } from "../../../components/ui/pressable";
 import Paragraph from "../../../components/ui/typography/paragraph";
 import PremiumService from "../../../services/premium";
 import { getColorLinearShade } from "../../../utils/colors";
-import { SIZE } from "../../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 import { verifyUser } from "../functions";
 
@@ -96,7 +96,7 @@ export function SettingsPicker<T>({
         ref={menuRef}
         animationDuration={200}
         style={{
-          borderRadius: 5,
+          borderRadius: defaultBorderRadius,
           backgroundColor: colors.primary.background,
           width: width,
           marginTop: 60,
@@ -128,7 +128,11 @@ export function SettingsPicker<T>({
             }}
           >
             <Paragraph>{formatValue(currentValue)}</Paragraph>
-            <Icon color={colors.primary.icon} name="menu-down" size={SIZE.md} />
+            <Icon
+              color={colors.primary.icon}
+              name="menu-down"
+              size={AppFontSize.md}
+            />
           </Pressable>
         }
       >
@@ -155,7 +159,7 @@ export function SettingsPicker<T>({
               maxWidth: width
             }}
             textStyle={{
-              fontSize: SIZE.md,
+              fontSize: AppFontSize.md,
               color: compareValue(currentValue, item)
                 ? colors.primary.accent
                 : colors.primary.paragraph

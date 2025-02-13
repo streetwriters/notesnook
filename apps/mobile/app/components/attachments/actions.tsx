@@ -45,7 +45,7 @@ import {
   eDBItemUpdate,
   eOnLoadNote
 } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { Dialog } from "../dialog";
 import { presentDialog } from "../dialog/functions";
@@ -233,7 +233,7 @@ const Actions = ({
           style={{
             paddingHorizontal: 12
           }}
-          size={SIZE.lg}
+          size={AppFontSize.lg}
         >
           {filename}
         </Heading>
@@ -247,15 +247,15 @@ const Actions = ({
             gap: 10
           }}
         >
-          <Paragraph size={SIZE.xs} color={colors.secondary.paragraph}>
+          <Paragraph size={AppFontSize.xs} color={colors.secondary.paragraph}>
             {attachment.mimeType}
           </Paragraph>
-          <Paragraph size={SIZE.xs} color={colors.secondary.paragraph}>
+          <Paragraph size={AppFontSize.xs} color={colors.secondary.paragraph}>
             {formatBytes(attachment.size)}
           </Paragraph>
 
           {notes.length ? (
-            <Paragraph size={SIZE.xs} color={colors.secondary.paragraph}>
+            <Paragraph size={AppFontSize.xs} color={colors.secondary.paragraph}>
               {strings.notes(notes.length)}
             </Paragraph>
           ) : null}
@@ -268,7 +268,7 @@ const Actions = ({
                 context: "local"
               });
             }}
-            size={SIZE.xs}
+            size={AppFontSize.xs}
             color={colors.secondary.paragraph}
           >
             {attachment.hash}
@@ -292,7 +292,7 @@ const Actions = ({
               style={{
                 paddingHorizontal: 12
               }}
-              size={SIZE.sm}
+              size={AppFontSize.sm}
             >
               {strings.listOf()} {strings.dataTypesPlural.note()}:
             </Heading>
@@ -314,7 +314,7 @@ const Actions = ({
                 }}
                 key={item.id}
               >
-                <Paragraph size={SIZE.xs}>{item.title}</Paragraph>
+                <Paragraph size={AppFontSize.xs}>{item.title}</Paragraph>
               </Pressable>
             ))}
           </>
@@ -335,7 +335,7 @@ const Actions = ({
           icon={item.icon}
           loading={loading?.name === item.name}
           type="plain"
-          fontSize={SIZE.sm}
+          fontSize={AppFontSize.sm}
           style={{
             borderRadius: 0,
             justifyContent: "flex-start",

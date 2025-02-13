@@ -44,7 +44,7 @@ import { useRelationStore } from "../../../stores/use-relation-store";
 import { useSelectionStore } from "../../../stores/use-selection-store";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { updateNotebook } from "../../../utils/notebooks";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
 import SheetProvider from "../../sheet-provider";
@@ -314,7 +314,7 @@ const MoveNoteSheet = ({
               >
                 {loading ? (
                   <ActivityIndicator
-                    size={SIZE.lg}
+                    size={AppFontSize.lg}
                     color={colors.primary.accent}
                   />
                 ) : (

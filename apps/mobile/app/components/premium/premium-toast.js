@@ -35,7 +35,7 @@ import {
   eOpenPremiumDialog,
   eShowGetPremium
 } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
@@ -120,7 +120,7 @@ export const PremiumToast = ({ context = "global", offset = 0 }) => {
               flexWrap: "wrap"
             }}
             color={colors.primary.accent}
-            size={SIZE.md}
+            size={AppFontSize.md}
           >
             {msg.title}
           </Heading>
@@ -129,7 +129,7 @@ export const PremiumToast = ({ context = "global", offset = 0 }) => {
             style={{
               flexWrap: "wrap"
             }}
-            size={SIZE.sm}
+            size={AppFontSize.sm}
             color={colors.primary.paragraph}
           >
             {msg.desc}

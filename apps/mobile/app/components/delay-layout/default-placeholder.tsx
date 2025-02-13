@@ -23,6 +23,7 @@ import { useMessageStore } from "../../stores/use-message-store";
 import { useThemeColors } from "@notesnook/theme";
 import { ColorValues } from "../../utils/colors";
 import { hexToRGBA } from "../../utils/colors";
+import { defaultBorderRadius } from "../../utils/size";
 
 export const DefaultPlaceholder = ({ color }: { color: string }) => {
   const { colors } = useThemeColors();
@@ -59,7 +60,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
               width: 150,
               height: 20,
               backgroundColor: colors.primary.hover,
-              borderRadius: 5,
+              borderRadius: defaultBorderRadius,
               marginBottom: 10
             }}
           />
@@ -68,7 +69,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
               width: 250,
               height: 14,
               backgroundColor: colors.primary.hover,
-              borderRadius: 5
+              borderRadius: defaultBorderRadius
             }}
           />
 
@@ -111,7 +112,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
                 width: 150,
                 height: 12,
                 backgroundColor: colors.secondary.background,
-                borderRadius: 5,
+                borderRadius: defaultBorderRadius,
                 marginBottom: 10
               }}
             />
@@ -120,7 +121,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
                 width: 250,
                 height: 16,
                 backgroundColor: colors.secondary.background,
-                borderRadius: 5
+                borderRadius: defaultBorderRadius
               }}
             />
           </View>
@@ -179,7 +180,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
           width: 200,
           height: 16,
           backgroundColor: colors.secondary.background,
-          borderRadius: 5
+          borderRadius: defaultBorderRadius
         }}
       />
       <View
@@ -187,7 +188,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
           width: "85%",
           height: 13,
           backgroundColor: colors.secondary.background,
-          borderRadius: 5,
+          borderRadius: defaultBorderRadius,
           marginTop: 10
         }}
       />
@@ -203,7 +204,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
             width: 50,
             height: 10,
             backgroundColor: colors.secondary.background,
-            borderRadius: 5
+            borderRadius: defaultBorderRadius
           }}
         />
         <View
@@ -211,7 +212,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
             width: 60,
             height: 10,
             backgroundColor: colors.secondary.background,
-            borderRadius: 5,
+            borderRadius: defaultBorderRadius,
             marginLeft: 10
           }}
         />

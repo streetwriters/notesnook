@@ -26,7 +26,7 @@ import { features } from "../../../features";
 import { eSendEvent, presentSheet } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
 import { eCloseSheet } from "../../../utils/events";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
@@ -56,7 +56,7 @@ const NewFeature = ({
         maxHeight: "100%"
       }}
     >
-      <Heading color={colors.secondary.heading} size={SIZE.md}>
+      <Heading color={colors.secondary.heading} size={AppFontSize.md}>
         {strings.newVersionHighlights(version)}
       </Heading>
 
@@ -74,7 +74,7 @@ const NewFeature = ({
               marginBottom: 10
             }}
           >
-            <Heading size={SIZE.lg - 2}>{item.title}</Heading>
+            <Heading size={AppFontSize.lg - 2}>{item.title}</Heading>
             <Paragraph selectable>{item.body}</Paragraph>
           </View>
         ))}

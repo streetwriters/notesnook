@@ -22,7 +22,7 @@ import { View } from "react-native";
 import useSyncProgress from "../../../hooks/use-sync-progress";
 import { presentSheet } from "../../../services/event-manager";
 import { useThemeColors } from "@notesnook/theme";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import Seperator from "../../ui/seperator";
 import { ProgressBarComponent } from "../../ui/svg/lazy";
 import Heading from "../../ui/typography/heading";
@@ -52,7 +52,7 @@ export const Progress = () => {
         paddingBottom: 15
       }}
     >
-      <Heading size={SIZE.lg}>{strings.syncingHeading()}</Heading>
+      <Heading size={AppFontSize.lg}>{strings.syncingHeading()}</Heading>
       <Paragraph>{strings.syncingDesc()}</Paragraph>
       <Seperator />
       <View

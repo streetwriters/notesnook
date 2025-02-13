@@ -24,7 +24,7 @@ import { notesnook } from "../../../e2e/test.ids";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { TTip, useTip } from "../../services/tip-manager";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { SIZE } from "../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../utils/size";
 import { Tip } from "../tip";
 import { Button } from "../ui/button";
 import Seperator from "../ui/seperator";
@@ -109,7 +109,7 @@ export const Empty = React.memo(function Empty({
               }}
               style={{
                 alignSelf: "flex-start",
-                borderRadius: 5,
+                borderRadius: defaultBorderRadius,
                 height: 40
               }}
             />
@@ -125,12 +125,12 @@ export const Empty = React.memo(function Empty({
             }}
           >
             <Heading>{placeholder?.title}</Heading>
-            <Paragraph size={SIZE.sm} textBreakStrategy="balanced">
+            <Paragraph size={AppFontSize.sm} textBreakStrategy="balanced">
               {placeholder?.loading}
             </Paragraph>
             <Seperator />
             <ActivityIndicator
-              size={SIZE.lg}
+              size={AppFontSize.lg}
               color={color || colors.primary.accent}
             />
           </View>

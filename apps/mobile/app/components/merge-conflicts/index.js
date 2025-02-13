@@ -38,7 +38,7 @@ import Navigation from "../../services/navigation";
 import Sync from "../../services/sync";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { eOnLoadNote, eShowMergeDialog } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import BaseDialog from "../dialog/base-dialog";
 import DialogButtons from "../dialog/dialog-buttons";
 import DialogContainer from "../dialog/dialog-container";
@@ -164,7 +164,7 @@ const MergeConflicts = () => {
           <Paragraph
             style={{ flexWrap: "wrap" }}
             color={colors.secondary.paragraph}
-            size={SIZE.xs}
+            size={AppFontSize.xs}
           >
             <Text
               style={{
@@ -203,7 +203,7 @@ const MergeConflicts = () => {
                 borderRadius: 100,
                 paddingHorizontal: 12
               }}
-              fontSize={SIZE.xs}
+              fontSize={AppFontSize.xs}
             />
           ) : null}
           <View style={{ width: 10 }} />
@@ -220,7 +220,7 @@ const MergeConflicts = () => {
                 borderRadius: 100,
                 paddingHorizontal: 12
               }}
-              fontSize={SIZE.xs}
+              fontSize={AppFontSize.xs}
               color={colors.error.paragraph}
               onPress={() => {
                 setDialogVisible(true);
@@ -238,7 +238,7 @@ const MergeConflicts = () => {
                   marginLeft: 10
                 }}
                 type="accent"
-                fontSize={SIZE.xs}
+                fontSize={AppFontSize.xs}
                 title={
                   keeping && !isDiscarded ? strings.undo() : strings.keep()
                 }

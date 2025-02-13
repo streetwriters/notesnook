@@ -33,7 +33,7 @@ import { editorState } from "../../screens/editor/tiptap/utils";
 import { useSelectionStore } from "../../stores/use-selection-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { getElevationStyle } from "../../utils/elevation";
-import { SIZE, normalize } from "../../utils/size";
+import { AppFontSize, normalize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 
 interface FloatingButtonProps {
@@ -148,7 +148,7 @@ const FloatingButton = ({
                 : "plus"
             }
             color={colors.primary.accent}
-            size={SIZE.xxxl}
+            size={AppFontSize.xxxl}
           />
         </View>
       </TouchableOpacity>

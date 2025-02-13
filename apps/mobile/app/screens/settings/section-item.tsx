@@ -35,7 +35,7 @@ import Paragraph from "../../components/ui/typography/paragraph";
 import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { SettingStore, useSettingStore } from "../../stores/use-setting-store";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { components } from "./components";
 import { RouteParams, SettingSection } from "./types";
 
@@ -194,7 +194,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                 ? colors.error.paragraph
                 : colors.primary.heading
             }
-            size={SIZE.md + 1}
+            size={AppFontSize.md + 1}
           >
             {typeof item.name === "function" ? item.name(current) : item.name}
           </Paragraph>
@@ -205,7 +205,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                   ? colors.error.paragraph
                   : colors.primary.paragraph
               }
-              size={SIZE.sm}
+              size={AppFontSize.sm}
             >
               {typeof item.description === "function"
                 ? item.description(current)
@@ -277,7 +277,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                     updateInput(nextValue);
                   }
                 }}
-                size={SIZE.xl}
+                size={AppFontSize.xl}
               />
               <Input
                 {...item.inputProperties}
@@ -326,7 +326,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                     updateInput(nextValue);
                   }
                 }}
-                size={SIZE.xl}
+                size={AppFontSize.xl}
               />
             </View>
           )}
@@ -349,7 +349,10 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
       )}
 
       {loading ? (
-        <ActivityIndicator size={SIZE.xxl} color={colors.primary.accent} />
+        <ActivityIndicator
+          size={AppFontSize.xxl}
+          color={colors.primary.accent}
+        />
       ) : null}
     </Pressable>
   );

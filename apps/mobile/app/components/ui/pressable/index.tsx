@@ -33,7 +33,7 @@ import {
   getColorLinearShade,
   hexToRGBA
 } from "../../../utils/colors";
-import { br } from "../../../utils/size";
+import { defaultBorderRadius } from "../../../utils/size";
 export interface PressableProps extends RNPressableProps {
   style?: ViewStyle;
   noborder?: boolean;
@@ -234,7 +234,8 @@ export const Pressable = ({
   customAlpha,
   customOpacity,
   fwdRef,
-  hidden
+  hidden,
+  ...props
 }: PressableProps) => {
   const { isDark } = useThemeColors();
   const {
@@ -269,7 +270,7 @@ export const Pressable = ({
             : hexToRGBA(primaryColor, opacity || 1),
         width: "100%",
         alignSelf: "center",
-        borderRadius: noborder ? 0 : br,
+        borderRadius: noborder ? 0 : defaultBorderRadius,
         justifyContent: "center",
         alignItems: "center",
         marginBottom: 0,
@@ -306,6 +307,7 @@ export const Pressable = ({
 
   return hidden ? null : (
     <RNPressable
+      {...props}
       testID={testID}
       ref={fwdRef}
       disabled={disabled}

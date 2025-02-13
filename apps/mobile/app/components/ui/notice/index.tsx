@@ -21,7 +21,7 @@ import React from "react";
 import { getContainerBorder } from "../../../utils/colors";
 import { View, ViewStyle } from "react-native";
 import { useThemeColors } from "@notesnook/theme";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { IconButton } from "../icon-button";
 import Paragraph from "../typography/paragraph";
 
@@ -56,7 +56,7 @@ export const Notice = ({
       }}
     >
       <IconButton
-        size={isSmall ? SIZE.lg + 1 : SIZE.xxl}
+        size={isSmall ? AppFontSize.lg + 1 : AppFontSize.xxl}
         name={type}
         style={{
           width: isSmall ? undefined : 40,
@@ -71,7 +71,7 @@ export const Notice = ({
           flexShrink: 1
         }}
         selectable={selectable}
-        size={isSmall ? SIZE.xs : SIZE.sm}
+        size={isSmall ? AppFontSize.xs : AppFontSize.sm}
       >
         {text}
       </Paragraph>

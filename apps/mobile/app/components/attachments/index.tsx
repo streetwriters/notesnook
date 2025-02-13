@@ -38,7 +38,7 @@ import { downloadAttachments } from "../../common/filesystem/download-attachment
 import { AttachmentGroupProgress } from "../../screens/settings/attachment-group-progress";
 import { presentSheet, ToastManager } from "../../services/event-manager";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { Dialog } from "../dialog";
 import { presentDialog } from "../dialog/functions";
 import { Header } from "../header";
@@ -375,7 +375,7 @@ export const AttachmentDialog = ({
                 marginRight: 10
               }}
               color={colors.primary.paragraph}
-              size={SIZE.lg}
+              size={AppFontSize.lg}
               onPress={onCheck}
             />
 
@@ -399,7 +399,7 @@ export const AttachmentDialog = ({
                   negativeText: strings.cancel()
                 });
               }}
-              size={SIZE.lg}
+              size={AppFontSize.lg}
             />
           </View>
         </View>
@@ -474,7 +474,7 @@ export const AttachmentDialog = ({
             <IconButton
               type={rechecker.isWorking ? "errorShade" : "plain"}
               name={rechecker.isWorking ? "close" : "check"}
-              size={SIZE.lg}
+              size={AppFontSize.lg}
               color={
                 rechecker.isWorking ? colors.error.icon : colors.primary.accent
               }
@@ -512,7 +512,7 @@ export const AttachmentDialog = ({
                   }
                   key={item.title}
                   title={item.title}
-                  fontSize={SIZE.sm}
+                  fontSize={AppFontSize.sm}
                   style={{
                     borderRadius: 100,
                     paddingHorizontal: 12,

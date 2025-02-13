@@ -31,6 +31,18 @@ import { useTagStore } from "../stores/use-tag-store";
 import { eOnNotebookUpdated, eUpdateNoteInEditor } from "./events";
 import { getParentNotebookId } from "./notebooks";
 
+export function getObfuscatedEmail(email: string) {
+  if (!email) return "";
+  const [username, provider] = email.split("@");
+  if (username.length === 1) return `****@${provider}`;
+  return email.replace(/(.{3})(.*)(?=@)/, function (gp1, gp2, gp3) {
+    for (let i = 0; i < gp3.length; i++) {
+      gp2 += "*";
+    }
+    return gp2;
+  });
+}
+
 function confirmDeleteAllNotes(
   items: string[],
   type: "notebook",

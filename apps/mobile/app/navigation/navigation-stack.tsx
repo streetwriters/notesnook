@@ -23,7 +23,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as React from "react";
 import AppLockedScreen from "../components/app-lock-overlay";
-import useGlobalSafeAreaInsets from "../hooks/use-global-safe-area-insets";
+import Auth from "../components/auth";
+import Intro from "../components/intro";
 import { hideAllTooltips } from "../hooks/use-tooltip";
 import Favorites from "../screens/favorites";
 import Home from "../screens/home";
@@ -43,11 +44,7 @@ import useNavigationStore, {
 } from "../stores/use-navigation-store";
 import { useSelectionStore } from "../stores/use-selection-store";
 import { useSettingStore } from "../stores/use-setting-store";
-import {
-  appNavigatorRef,
-  fluidTabsRef,
-  rootNavigatorRef
-} from "../utils/global-refs";
+import { fluidTabsRef, rootNavigatorRef } from "../utils/global-refs";
 import { FluidPanelsView } from "./fluid-panels-view";
 
 const RootStack = createNativeStackNavigator();
@@ -57,12 +54,6 @@ const AppNavigation = React.memo(
   () => {
     const { colors } = useThemeColors();
     const homepage = SettingsService.get().homepage;
-    const introCompleted = useSettingStore(
-      (state) => state.settings.introCompleted
-    );
-    const height = useSettingStore((state) => state.dimensions.height);
-    const insets = useGlobalSafeAreaInsets();
-    const screenHeight = height - (50 + insets.top + insets.bottom);
     React.useEffect(() => {
       setTimeout(() => {
         useNavigationStore.getState().update(homepage as keyof RouteParams);
@@ -71,13 +62,12 @@ const AppNavigation = React.memo(
 
     return (
       <AppStack.Navigator
-        initialRouteName={!introCompleted ? "Welcome" : homepage}
+        initialRouteName={homepage}
         screenOptions={{
           headerShown: false,
           animation: "none",
           contentStyle: {
-            backgroundColor: colors.primary.background,
-            minHeight: !introCompleted ? undefined : screenHeight
+            backgroundColor: colors.primary.background
           }
         }}
       >
@@ -108,8 +98,19 @@ const AppNavigation = React.memo(
 AppNavigation.displayName = "AppNavigation";
 
 export const RootNavigation = () => {
+  const introCompleted = useSettingStore(
+    (state) => state.settings.introCompleted
+  );
+  const clearSelection = useSelectionStore((state) => state.clearSelection);
+  const onStateChange = React.useCallback(() => {
+    if (useSelectionStore.getState().selectionMode) {
+      clearSelection();
+    }
+    hideAllTooltips();
+  }, [clearSelection]);
+
   return (
-    <NavigationContainer ref={rootNavigatorRef} independent>
+    <NavigationContainer onStateChange={onStateChange} ref={rootNavigatorRef}>
       <RootStack.Navigator
         screenOptions={{
           headerShown: false
@@ -123,8 +124,10 @@ export const RootNavigation = () => {
             }
           }
         }}
-        initialRouteName="FluidPanelsView"
+        initialRouteName={introCompleted ? "FluidPanelsView" : "Welcome"}
       >
+        <RootStack.Screen name="Welcome" component={Intro as any} />
+        <RootStack.Screen name="Auth" component={Auth as any} />
         <RootStack.Screen name="FluidPanelsView" component={FluidPanelsView} />
         <RootStack.Screen name="AppLock" component={AppLockedScreen} />
         <AppStack.Screen name="Settings" component={Settings} />
@@ -135,23 +138,7 @@ export const RootNavigation = () => {
 
 export const AppNavigationStack = React.memo(
   () => {
-    const clearSelection = useSelectionStore((state) => state.clearSelection);
-    const onStateChange = React.useCallback(() => {
-      if (useSelectionStore.getState().selectionMode) {
-        clearSelection();
-      }
-      hideAllTooltips();
-    }, [clearSelection]);
-
-    return (
-      <NavigationContainer
-        independent
-        onStateChange={onStateChange}
-        ref={appNavigatorRef}
-      >
-        <AppNavigation />
-      </NavigationContainer>
-    );
+    return <AppNavigation />;
   },
   () => true
 );

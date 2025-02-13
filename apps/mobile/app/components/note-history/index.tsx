@@ -30,7 +30,7 @@ import { db } from "../../common/database";
 import { useDBItem } from "../../hooks/use-db-item";
 import { presentSheet } from "../../services/event-manager";
 import { openLinkInBrowser } from "../../utils/functions";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import DialogHeader from "../dialog/dialog-header";
 import SheetProvider from "../sheet-provider";
 import { Pressable } from "../ui/pressable";
@@ -97,7 +97,7 @@ const HistoryItem = ({
       {!item ? null : (
         <>
           <Paragraph>{getDate(item.dateCreated, item.dateModified)}</Paragraph>
-          <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
+          <Paragraph color={colors.secondary.paragraph} size={AppFontSize.xs}>
             {getTimeAgo(item.dateModified)}
           </Paragraph>
         </>
@@ -170,7 +170,7 @@ export default function NoteHistory({
             >
               {_loading ? (
                 <ActivityIndicator
-                  size={SIZE.xl}
+                  size={AppFontSize.xl}
                   color={colors.primary.accent}
                 />
               ) : (
@@ -187,7 +187,7 @@ export default function NoteHistory({
         />
       </View>
       <Paragraph
-        size={SIZE.xs}
+        size={AppFontSize.xs}
         color={colors.secondary.paragraph}
         style={{
           alignSelf: "center"

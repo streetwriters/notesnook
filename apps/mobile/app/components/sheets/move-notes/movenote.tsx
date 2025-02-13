@@ -30,7 +30,7 @@ import { presentSheet } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { createItemSelectionStore } from "../../../stores/item-selection-store";
 import { updateNotebook } from "../../../utils/notebooks";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
 import { Button } from "../../ui/button";
@@ -131,7 +131,7 @@ export const MoveNotes = ({
         button={{
           icon: "magnify",
           color: colors.primary.accent,
-          size: SIZE.lg,
+          size: AppFontSize.lg,
           onPress: () => {}
         }}
         testID="search-input"
@@ -270,7 +270,7 @@ const SelectableNoteItem = React.memo(
                 <Paragraph
                   numberOfLines={1}
                   color={colors?.secondary.paragraph}
-                  size={SIZE.xs}
+                  size={AppFontSize.xs}
                 >
                   {item.headline}
                 </Paragraph>

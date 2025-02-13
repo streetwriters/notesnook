@@ -32,7 +32,7 @@ import {
 import { editorController } from "../../../screens/editor/tiptap/utils";
 import { eSendEvent, presentSheet } from "../../../services/event-manager";
 import { eUnlockNote } from "../../../utils/events";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { IconButton } from "../../ui/icon-button";
 import { Pressable } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
@@ -101,15 +101,15 @@ const TabItemComponent = (props: {
         {props.tab.session?.noteLocked ? (
           <>
             {props.tab.session?.locked ? (
-              <Icon size={SIZE.md} name="lock" />
+              <Icon size={AppFontSize.md} name="lock" />
             ) : (
-              <Icon size={SIZE.md} name="lock-open-outline" />
+              <Icon size={AppFontSize.md} name="lock-open-outline" />
             )}
           </>
         ) : null}
 
         {props.tab.session?.readonly ? (
-          <Icon size={SIZE.md} name="pencil-lock" />
+          <Icon size={AppFontSize.md} name="pencil-lock" />
         ) : null}
 
         <Paragraph
@@ -119,7 +119,7 @@ const TabItemComponent = (props: {
               : colors.primary.paragraph
           }
           numberOfLines={1}
-          size={SIZE.md}
+          size={AppFontSize.md}
         >
           {props.tab.session?.noteId
             ? item?.title || strings.untitledNote()
@@ -136,7 +136,7 @@ const TabItemComponent = (props: {
       >
         <IconButton
           name="pin"
-          size={SIZE.lg}
+          size={AppFontSize.lg}
           color={props.tab.pinned ? colors.primary.accent : colors.primary.icon}
           onPress={() => {
             useTabStore.getState().updateTab(props.tab.id, {
@@ -152,7 +152,7 @@ const TabItemComponent = (props: {
         {!props.tab?.pinned ? (
           <IconButton
             name="close"
-            size={SIZE.lg}
+            size={AppFontSize.lg}
             color={colors.primary.icon}
             onPress={() => {
               const isLastTab = useTabStore.getState().tabs.length === 1;
@@ -215,7 +215,7 @@ export default function EditorTabs({
           alignItems: "center"
         }}
       >
-        <Heading size={SIZE.lg}>{strings.tabs()}</Heading>
+        <Heading size={AppFontSize.lg}>{strings.tabs()}</Heading>
         <IconButton
           onPress={() => {
             useTabStore.getState().newTab();

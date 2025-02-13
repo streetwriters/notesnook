@@ -22,7 +22,7 @@ import React from "react";
 import { ColorValue, GestureResponderEvent, TextStyle } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { RGB_Linear_Shade, hexToRGBA } from "../../../utils/colors";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import NativeTooltip from "../../../utils/tooltip";
 import { Pressable, PressableProps } from "../pressable";
 export interface IconButtonProps extends PressableProps {
@@ -44,7 +44,7 @@ export const IconButton = ({
   name,
   color,
   style,
-  size = SIZE.xxl,
+  size = AppFontSize.xxl,
   iconStyle = {},
   left = 10,
   right = 10,

@@ -20,13 +20,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Item } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
-import { Dimensions, ScrollView, View } from "react-native";
+import { Dimensions, View } from "react-native";
+import SwiperFlatList from "react-native-swiper-flatlist";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { Action, ActionId, useActions } from "../../hooks/use-actions";
 import { useStoredRef } from "../../hooks/use-stored-ref";
 import { DDS } from "../../services/device-detection";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { Button } from "../ui/button";
 import { Pressable } from "../ui/pressable";
@@ -66,6 +67,9 @@ const COLUMN_BAR_ITEMS: ActionId[] = [
   "pin",
   "default-notebook",
   "add-shortcut",
+  "reorder",
+  "rename-color",
+  "rename-tag",
   "trash"
 ];
 
@@ -89,8 +93,8 @@ export const Items = ({ item, close }: { item: Item; close: () => void }) => {
 
   const columnItemWidth =
     deviceMode !== "mobile"
-      ? (width - 16) / columnItemsCount
-      : (width - 16) / columnItemsCount;
+      ? (width - DefaultAppStyles.GAP) / columnItemsCount
+      : (width - DefaultAppStyles.GAP) / columnItemsCount;
 
   const topBarItems = selectedActions
     .filter((item) => TOP_BAR_ITEMS.indexOf(item.id) > -1)
@@ -134,7 +138,7 @@ export const Items = ({ item, close }: { item: Item; close: () => void }) => {
           onPress={item.onPress}
           type={item.checked ? "shade" : "secondary"}
           style={{
-            height: columnItemWidth - 8,
+            height: columnItemWidth / 1.5,
             width: columnItemWidth - 8,
             borderRadius: 10,
             justifyContent: "center",
@@ -145,7 +149,13 @@ export const Items = ({ item, close }: { item: Item; close: () => void }) => {
           <Icon
             allowFontScaling
             name={item.icon}
-            size={DDS.isTab ? SIZE.xxl : shouldShrink ? SIZE.xxl : SIZE.lg}
+            size={
+              DDS.isTab
+                ? AppFontSize.xxl
+                : shouldShrink
+                ? AppFontSize.xxl
+                : AppFontSize.lg
+            }
             color={
               item.checked
                 ? item.activeColor || colors.primary.accent
@@ -157,7 +167,7 @@ export const Items = ({ item, close }: { item: Item; close: () => void }) => {
         </Pressable>
 
         <Paragraph
-          size={SIZE.xxs}
+          size={AppFontSize.xxs}
           textBreakStrategy="simple"
           style={{ textAlign: "center" }}
         >
@@ -189,7 +199,7 @@ export const Items = ({ item, close }: { item: Item; close: () => void }) => {
         title={item.title}
         icon={item.icon}
         type={item.checked ? "inverted" : "plain"}
-        fontSize={SIZE.sm}
+        fontSize={AppFontSize.sm}
         style={{
           borderRadius: 0,
           justifyContent: "flex-start",
@@ -218,24 +228,21 @@ export const Items = ({ item, close }: { item: Item; close: () => void }) => {
           key={item.id}
           testID={"icon-" + item.id}
           style={{
-            alignSelf: "flex-start",
-            paddingHorizontal: 0,
-            flex: 1
+            width: columnItemWidth - 8
           }}
         >
           <View
             style={{
-              height: topBarItemHeight,
+              height: columnItemWidth / 2,
+              width: columnItemWidth - DefaultAppStyles.GAP_SMALL,
               justifyContent: "center",
-              alignItems: "center",
-              marginBottom: DDS.isTab ? 7 : 3.5,
-              borderRadius: 100
+              alignItems: "center"
             }}
           >
             <Icon
               name={item.icon}
               allowFontScaling
-              size={DDS.isTab ? SIZE.xxl : SIZE.md + 4}
+              size={DDS.isTab ? AppFontSize.xxl : AppFontSize.md + 4}
               color={
                 item.checked
                   ? item.activeColor || colors.primary.accent
@@ -248,7 +255,7 @@ export const Items = ({ item, close }: { item: Item; close: () => void }) => {
 
           <Paragraph
             textBreakStrategy="simple"
-            size={SIZE.xxs}
+            size={AppFontSize.xxs}
             style={{ textAlign: "center" }}
           >
             {item.title}
@@ -260,42 +267,79 @@ export const Items = ({ item, close }: { item: Item; close: () => void }) => {
       colors.error.icon,
       colors.primary.accent,
       colors.secondary.icon,
-      topBarItemHeight,
+      columnItemWidth,
       topBarSorting
     ]
   );
 
-  return item.type === "note" ? (
-    <>
-      <ScrollView
-        horizontal
-        style={{
-          paddingHorizontal: 16,
-          marginTop: 6,
-          marginBottom: 6
-        }}
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingRight: 25,
-          gap: 15
-        }}
-      >
-        {topBarItems.map(renderTopBarItem)}
-      </ScrollView>
+  const getTopBarItemChunksOfFour = () => {
+    const chunks = [];
+    for (let i = 0; i < topBarItems.length; i += 5) {
+      chunks.push(topBarItems.slice(i, i + 5));
+    }
+    return chunks;
+  };
 
-      <View
-        style={{
-          flexDirection: "row",
-          flexWrap: "wrap",
-          marginTop: 10,
-          gap: 5,
-          paddingHorizontal: DefaultAppStyles.GAP
-        }}
-      >
-        {bottomGridItems.map((item) => renderRowItem({ item }))}
-      </View>
-    </>
-  ) : (
-    <View>{columnItems.map(renderColumnItem)}</View>
+  return (
+    <View
+      style={{
+        gap: DefaultAppStyles.GAP
+      }}
+    >
+      {item.type === "note" ? (
+        <>
+          <View>
+            <SwiperFlatList
+              data={getTopBarItemChunksOfFour()}
+              autoplay={false}
+              showPagination
+              paginationStyleItemActive={{
+                borderRadius: 2,
+                backgroundColor: colors.selected.background,
+                height: 6,
+                marginHorizontal: 2
+              }}
+              paginationStyleItemInactive={{
+                borderRadius: 2,
+                backgroundColor: colors.secondary.background,
+                height: 6,
+                marginHorizontal: 2
+              }}
+              paginationStyle={{
+                position: "relative",
+                marginHorizontal: 2,
+                marginBottom: 0,
+                marginTop: DefaultAppStyles.GAP
+              }}
+              renderItem={({ item, index }) => (
+                <View
+                  style={{
+                    flexDirection: "row",
+                    paddingHorizontal: DefaultAppStyles.GAP,
+                    gap: 5,
+                    width: width
+                  }}
+                >
+                  {item.map(renderTopBarItem)}
+                </View>
+              )}
+            />
+          </View>
+
+          <View
+            style={{
+              flexDirection: "row",
+              flexWrap: "wrap",
+              gap: 5,
+              paddingHorizontal: DefaultAppStyles.GAP
+            }}
+          >
+            {bottomGridItems.map((item) => renderRowItem({ item }))}
+          </View>
+        </>
+      ) : (
+        <View>{columnItems.map(renderColumnItem)}</View>
+      )}
+    </View>
   );
 };

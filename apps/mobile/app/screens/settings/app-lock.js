@@ -31,7 +31,7 @@ import { ToastManager, presentSheet } from "../../services/event-manager";
 import SettingsService from "../../services/settings";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useUserStore } from "../../stores/use-user-store";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { strings } from "@notesnook/intl";
 const AppLock = () => {
   const { colors } = useThemeColors();
@@ -99,7 +99,9 @@ const AppLock = () => {
               }}
             >
               <Heading>{strings.protectNotes()}</Heading>
-              <Paragraph size={SIZE.md}>{strings.protectNotesDesc()}</Paragraph>
+              <Paragraph size={AppFontSize.md}>
+                {strings.protectNotesDesc()}
+              </Paragraph>
             </View>
           </View>
 
@@ -174,7 +176,7 @@ const AppLock = () => {
                       : colors.primary.heading
                   }
                   style={{ maxWidth: "95%" }}
-                  size={SIZE.md}
+                  size={AppFontSize.md}
                 >
                   {item.title}
                 </Heading>
@@ -185,7 +187,7 @@ const AppLock = () => {
                       : colors.secondary.paragraph
                   }
                   style={{ maxWidth: "95%" }}
-                  size={SIZE.sm}
+                  size={AppFontSize.sm}
                 >
                   {item.desc}
                 </Paragraph>

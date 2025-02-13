@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import { View } from "react-native";
 import { useThemeColors } from "@notesnook/theme";
+import { defaultBorderRadius } from "../../utils/size";
 
 export const SettingsPlaceholder = () => {
   const { colors } = useThemeColors();
@@ -31,7 +32,7 @@ export const SettingsPlaceholder = () => {
           width: 100,
           height: 12,
           backgroundColor: colors.primary.shade,
-          borderRadius: 5,
+          borderRadius: defaultBorderRadius,
           marginLeft: 12,
           marginBottom: 12
         }}
@@ -62,7 +63,7 @@ export const SettingsPlaceholder = () => {
               width: 150,
               height: 12,
               backgroundColor: colors.secondary.background,
-              borderRadius: 5,
+              borderRadius: defaultBorderRadius,
               marginBottom: 10
             }}
           />
@@ -71,7 +72,7 @@ export const SettingsPlaceholder = () => {
               width: 250,
               height: 16,
               backgroundColor: colors.secondary.background,
-              borderRadius: 5
+              borderRadius: defaultBorderRadius
             }}
           />
         </View>
@@ -104,7 +105,7 @@ export const SettingsPlaceholder = () => {
               width: 150,
               height: 12,
               backgroundColor: colors.secondary.background,
-              borderRadius: 5,
+              borderRadius: defaultBorderRadius,
               marginBottom: 10
             }}
           />
@@ -113,7 +114,7 @@ export const SettingsPlaceholder = () => {
               width: 250,
               height: 16,
               backgroundColor: colors.secondary.background,
-              borderRadius: 5
+              borderRadius: defaultBorderRadius
             }}
           />
         </View>

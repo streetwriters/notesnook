@@ -33,7 +33,7 @@ import { eSendEvent } from "../../services/event-manager";
 import { getContainerBorder } from "../../utils/colors";
 import { getElevationStyle } from "../../utils/elevation";
 import { eOpenAddNotebookDialog } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../utils/size";
 import { Button } from "../ui/button";
 import Seperator from "../ui/seperator";
 import { SvgView } from "../ui/svg";
@@ -95,7 +95,7 @@ const NotebookWelcome = () => {
           marginVertical: 12
         }}
       >
-        <Heading size={SIZE.md} color={colors.primary.heading}>
+        <Heading size={AppFontSize.md} color={colors.primary.heading}>
           {data?.title}
         </Heading>
         <Paragraph>{data?.description}</Paragraph>
@@ -104,7 +104,7 @@ const NotebookWelcome = () => {
           style={{
             marginTop: 5
           }}
-          size={SIZE.xs}
+          size={AppFontSize.xs}
           color={colors.secondary.paragraph}
         >
           {strings.dataTypesCamelCase.notebook()} - {data?.count}{" "}
@@ -150,7 +150,7 @@ const notebooks: { id: string; steps: TStep[] } = {
               marginVertical: 12
             }}
           >
-            <Heading size={SIZE.md} color={colors.primary.heading}>
+            <Heading size={AppFontSize.md} color={colors.primary.heading}>
               {strings.workAndOffice()}
             </Heading>
             <Paragraph>{strings.workAndOfficeDesc()}</Paragraph>
@@ -159,7 +159,7 @@ const notebooks: { id: string; steps: TStep[] } = {
               style={{
                 marginTop: 5
               }}
-              size={SIZE.xs}
+              size={AppFontSize.xs}
               color={colors.secondary.paragraph}
             >
               {strings.notes(2)}
@@ -178,7 +178,7 @@ const notebooks: { id: string; steps: TStep[] } = {
             <Paragraph color={colors.primary.accent}>
               <Icon
                 color={colors.primary.accent}
-                size={SIZE.sm}
+                size={AppFontSize.sm}
                 name="bookmark"
               />{" "}
               {strings.tasks()}
@@ -190,13 +190,17 @@ const notebooks: { id: string; steps: TStep[] } = {
               paddingVertical: 12,
               width: "80%",
               backgroundColor: colors.primary.background,
-              borderRadius: 5,
+              borderRadius: defaultBorderRadius,
               alignSelf: "flex-end",
               marginBottom: 10
             }}
           >
-            <Paragraph size={SIZE.xs}>
-              <Icon color={colors.primary.icon} size={SIZE.sm} name="note" />{" "}
+            <Paragraph size={AppFontSize.xs}>
+              <Icon
+                color={colors.primary.icon}
+                size={AppFontSize.sm}
+                name="note"
+              />{" "}
               {strings.taskAValue()}
             </Paragraph>
           </View>
@@ -205,14 +209,18 @@ const notebooks: { id: string; steps: TStep[] } = {
               padding: 12,
               width: "80%",
               backgroundColor: colors.primary.background,
-              borderRadius: 5,
+              borderRadius: defaultBorderRadius,
               paddingVertical: 12,
               alignSelf: "flex-end",
               marginBottom: 10
             }}
           >
-            <Paragraph size={SIZE.xs}>
-              <Icon color={colors.primary.icon} size={SIZE.sm} name="note" />{" "}
+            <Paragraph size={AppFontSize.xs}>
+              <Icon
+                color={colors.primary.icon}
+                size={AppFontSize.sm}
+                name="note"
+              />{" "}
               {strings.taskBValue()}
             </Paragraph>
           </View>
@@ -229,7 +237,7 @@ const notebooks: { id: string; steps: TStep[] } = {
             <Paragraph color={colors.primary.accent}>
               <Icon
                 color={colors.primary.accent}
-                size={SIZE.sm}
+                size={AppFontSize.sm}
                 name="bookmark"
               />{" "}
               {strings.meetings()}
@@ -353,7 +361,7 @@ const Support = () => {
         style={{
           textAlign: "center"
         }}
-        size={SIZE.md}
+        size={AppFontSize.md}
       >
         {strings.weAreAlwaysListening()}
       </Paragraph>

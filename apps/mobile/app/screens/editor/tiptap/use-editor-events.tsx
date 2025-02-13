@@ -37,6 +37,7 @@ import {
 import { WebViewMessageEvent } from "react-native-webview";
 import { DatabaseLogger, db } from "../../../common/database";
 import downloadAttachment from "../../../common/filesystem/download-attachment";
+import { AuthMode } from "../../../components/auth/common";
 import EditorTabs from "../../../components/sheets/editor-tabs";
 import { Issue } from "../../../components/sheets/github/issue";
 import LinkNote from "../../../components/sheets/link-note";
@@ -66,7 +67,6 @@ import {
   eOnExitEditor,
   eOnLoadNote,
   eOpenFullscreenEditor,
-  eOpenLoginDialog,
   eOpenPremiumDialog,
   eOpenPublishNoteDialog,
   eUnlockWithBiometrics,
@@ -86,7 +86,9 @@ const publishNote = async () => {
       heading: strings.loginRequired(),
       context: "global",
       func: () => {
-        eSendEvent(eOpenLoginDialog);
+        Navigation.navigate("Auth", {
+          mode: AuthMode.login
+        });
       },
       actionText: "Login"
     });

@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { Platform, Text, TextProps, ViewStyle } from "react-native";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 interface HeadingProps extends TextProps {
   color?: string;
   size?: number;
@@ -28,17 +28,17 @@ interface HeadingProps extends TextProps {
 }
 
 const extraBoldStyle = {
-  fontFamily: Platform.OS === "android" ? "OpenSans-Bold" : undefined,
+  fontFamily: Platform.OS === "android" ? "Inter-Bold" : undefined,
   fontWeight: Platform.OS === "ios" ? "800" : undefined
 };
 const boldStyle = {
-  fontFamily: Platform.OS === "android" ? "OpenSans-SemiBold" : undefined,
+  fontFamily: Platform.OS === "android" ? "Inter-SemiBold" : undefined,
   fontWeight: Platform.OS === "ios" ? "600" : undefined
 };
 
 const Heading = ({
   color,
-  size = SIZE.xl,
+  size = AppFontSize.xl,
   style,
   extraBold,
   ...restProps
@@ -51,7 +51,7 @@ const Heading = ({
       {...restProps}
       style={[
         {
-          fontSize: size || SIZE.xl,
+          fontSize: size || AppFontSize.xl,
           color: color || colors.primary.heading
         },
         extraBold ? (extraBoldStyle as ViewStyle) : (boldStyle as ViewStyle),

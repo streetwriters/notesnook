@@ -28,7 +28,7 @@ import {
 import { RouteName } from "../../stores/use-navigation-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
 import { eScrollEvent } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { IconButtonProps } from "../ui/icon-button";
 import { Pressable } from "../ui/pressable";
@@ -121,7 +121,7 @@ export const Header = ({
               : strings.searchInRoute(title)}
           </Paragraph>
         ) : (
-          <Heading size={SIZE.lg}>{title}</Heading>
+          <Heading size={AppFontSize.lg}>{title}</Heading>
         )}
 
         <RightMenus rightButton={rightButton} />

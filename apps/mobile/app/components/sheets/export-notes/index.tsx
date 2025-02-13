@@ -41,7 +41,7 @@ import Exporter from "../../../services/exporter";
 import PremiumService from "../../../services/premium";
 import { useUserStore } from "../../../stores/use-user-store";
 import { getElevationStyle } from "../../../utils/elevation";
-import { SIZE, ph, pv } from "../../../utils/size";
+import { AppFontSize, defaultBorderRadius, ph, pv } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
@@ -203,7 +203,7 @@ const ExportNotesSheet = ({
                 <View
                   style={{
                     backgroundColor: colors.primary.shade,
-                    borderRadius: 5,
+                    borderRadius: defaultBorderRadius,
                     height: 60,
                     width: 60,
                     justifyContent: "center",
@@ -215,7 +215,7 @@ const ExportNotesSheet = ({
                     color={
                       item.pro ? colors.primary.accent : colors.primary.icon
                     }
-                    size={SIZE.xxxl + 10}
+                    size={AppFontSize.xxxl + 10}
                   />
                 </View>
                 <View
@@ -224,7 +224,7 @@ const ExportNotesSheet = ({
                   }}
                 >
                   {!item.pro ? <ProTag size={12} /> : null}
-                  <Heading style={{ marginLeft: 10 }} size={SIZE.md}>
+                  <Heading style={{ marginLeft: 10 }} size={AppFontSize.md}>
                     {item.title}
                   </Heading>
                   {/* <Paragraph
@@ -294,7 +294,7 @@ const ExportNotesSheet = ({
                   }
                   type="accent"
                   width={250}
-                  fontSize={SIZE.md}
+                  fontSize={AppFontSize.md}
                   style={{
                     marginTop: 10,
                     borderRadius: 100
@@ -323,7 +323,7 @@ const ExportNotesSheet = ({
                   title={strings.share()}
                   type="secondaryAccented"
                   width={250}
-                  fontSize={SIZE.md}
+                  fontSize={AppFontSize.md}
                   style={{
                     marginTop: 10,
                     borderRadius: 100
@@ -351,7 +351,7 @@ const ExportNotesSheet = ({
                   title={strings.exportAgain()}
                   type="inverted"
                   width={250}
-                  fontSize={SIZE.md}
+                  fontSize={AppFontSize.md}
                   style={{
                     marginTop: 10,
                     borderRadius: 100
@@ -384,7 +384,7 @@ ExportNotesSheet.present = async (ids?: string[], allNotes?: boolean) => {
 const styles = StyleSheet.create({
   container: {
     ...getElevationStyle(5),
-    borderRadius: 5,
+    borderRadius: defaultBorderRadius,
     paddingVertical: pv
   },
   buttonContainer: {
@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
     paddingVertical: pv,
     paddingHorizontal: ph,
     marginTop: 10,
-    borderRadius: 5,
+    borderRadius: defaultBorderRadius,
     width: "100%",
     justifyContent: "center",
     alignItems: "center",
@@ -405,7 +405,7 @@ const styles = StyleSheet.create({
   buttonText: {
     //fontFamily: "sans-serif",
     color: "white",
-    fontSize: SIZE.sm,
+    fontSize: AppFontSize.sm,
     marginLeft: 5
   },
   overlay: {

@@ -49,7 +49,7 @@ import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
 import { ToastManager, presentSheet } from "../../services/event-manager";
 import { useThemeStore } from "../../stores/use-theme-store";
-import { SIZE } from "../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../utils/size";
 import { getElevationStyle } from "../../utils/elevation";
 import { MenuItemsList } from "../../utils/menu-items";
 import { IconButton } from "../../components/ui/icon-button";
@@ -158,7 +158,7 @@ function ThemeSelector() {
                 backgroundColor: colors.navigationMenu.background,
                 padding: 5,
                 paddingVertical: 3,
-                borderRadius: 5
+                borderRadius: defaultBorderRadius
               }}
             >
               {MenuItemsList.map((item, index) => (
@@ -209,7 +209,7 @@ function ThemeSelector() {
                 height: "100%",
                 width: "49.5%",
                 backgroundColor: colors.list.background,
-                borderRadius: 5,
+                borderRadius: defaultBorderRadius,
                 paddingHorizontal: 2,
                 paddingRight: 6
               }}
@@ -294,15 +294,18 @@ function ThemeSelector() {
                       ? getColorLinearShade("#000000", 0.1, true)
                       : getColorLinearShade("#f0f0f0", 0.1, true)
                 }}
-                fontSize={SIZE.xxs}
+                fontSize={AppFontSize.xxs}
               />
             </View>
           </View>
 
-          <Heading size={SIZE.sm} color={themeColors.primary.heading}>
+          <Heading size={AppFontSize.sm} color={themeColors.primary.heading}>
             {item.name}
           </Heading>
-          <Paragraph size={SIZE.xs} color={themeColors.secondary?.paragraph}>
+          <Paragraph
+            size={AppFontSize.xs}
+            color={themeColors.secondary?.paragraph}
+          >
             {strings.by()} {item.authors?.[0].name}
           </Paragraph>
         </TouchableOpacity>
@@ -369,7 +372,7 @@ function ThemeSelector() {
                   colorScheme === "" || !colorScheme ? "accent" : "secondary"
                 }
                 title={strings.all()}
-                fontSize={SIZE.xs}
+                fontSize={AppFontSize.xs}
                 onPress={() => {
                   setColorScheme("");
                 }}
@@ -379,7 +382,7 @@ function ThemeSelector() {
                 height={30}
                 type={colorScheme === "dark" ? "accent" : "secondary"}
                 title={strings.dark()}
-                fontSize={SIZE.xs}
+                fontSize={AppFontSize.xs}
                 onPress={() => {
                   setColorScheme("dark");
                 }}
@@ -387,7 +390,7 @@ function ThemeSelector() {
               <Button
                 style={{ borderRadius: 100, minWidth: 60 }}
                 height={30}
-                fontSize={SIZE.xs}
+                fontSize={AppFontSize.xs}
                 type={colorScheme === "light" ? "accent" : "secondary"}
                 title={strings.light()}
                 onPress={() => {
@@ -402,7 +405,7 @@ function ThemeSelector() {
               height={30}
               type={"secondaryAccented"}
               icon="folder"
-              fontSize={SIZE.xs}
+              fontSize={AppFontSize.xs}
               onPress={() => {
                 DocumentPicker.pickSingle({
                   allowMultiSelection: false
@@ -601,7 +604,7 @@ const ThemeSetter = ({
                   backgroundColor: colors?.navigationMenu.background,
                   padding: 5,
                   paddingVertical: 3,
-                  borderRadius: 5
+                  borderRadius: defaultBorderRadius
                 }}
               >
                 {MenuItemsList.map((item, index) => (
@@ -653,7 +656,7 @@ const ThemeSetter = ({
                   height: "100%",
                   width: "49.5%",
                   backgroundColor: colors?.list.background,
-                  borderRadius: 5,
+                  borderRadius: defaultBorderRadius,
                   paddingHorizontal: 2,
                   paddingRight: 6
                 }}
@@ -692,7 +695,10 @@ const ThemeSetter = ({
             </View>
           </View>
 
-          <Heading size={SIZE.md} color={themeColors.colors.primary.heading}>
+          <Heading
+            size={AppFontSize.md}
+            color={themeColors.colors.primary.heading}
+          >
             {theme.name}
           </Heading>
           <Paragraph color={themeColors.colors.primary.paragraph}>
@@ -700,7 +706,7 @@ const ThemeSetter = ({
           </Paragraph>
 
           <Paragraph
-            size={SIZE.xs}
+            size={AppFontSize.xs}
             color={themeColors.colors.secondary.paragraph}
           >
             {strings.by()} {theme.authors?.[0]?.name}
@@ -713,14 +719,14 @@ const ThemeSetter = ({
             }}
           >
             <Paragraph
-              size={SIZE.xs}
+              size={AppFontSize.xs}
               color={themeColors.colors.secondary.paragraph}
             >
               ${strings.version()} {theme.version}
             </Paragraph>
 
             <Paragraph
-              size={SIZE.xs}
+              size={AppFontSize.xs}
               color={themeColors.colors.secondary.paragraph}
             >
               {theme.license}
@@ -733,7 +739,7 @@ const ThemeSetter = ({
                 }}
               >
                 <Paragraph
-                  size={SIZE.xs}
+                  size={AppFontSize.xs}
                   color={themeColors.colors.secondary.accent}
                   onPress={() => {
                     Linking.openURL(theme.homepage as string);
@@ -754,12 +760,14 @@ const ThemeSetter = ({
               paddingVertical: 12
             }}
           >
-            <Heading color={colors.accentForeground} size={SIZE.md}>
+            <Heading color={colors.accentForeground} size={AppFontSize.md}>
               {darkTheme.id === theme.id
                 ? strings.appliedDark()
                 : strings.appliedLight()}
             </Heading>
-            <Paragraph size={SIZE.xs}>({strings.tapToApplyAgain()})</Paragraph>
+            <Paragraph size={AppFontSize.xs}>
+              ({strings.tapToApplyAgain()})
+            </Paragraph>
           </Pressable>
         ) : (
           <Button

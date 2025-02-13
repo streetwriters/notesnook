@@ -35,7 +35,7 @@ import { eSendEvent, presentSheet } from "../../../services/event-manager";
 import { useRelationStore } from "../../../stores/use-relation-store";
 import { eOnLoadNote } from "../../../utils/events";
 import { fluidTabsRef } from "../../../utils/global-refs";
-import { SIZE } from "../../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import SheetProvider from "../../sheet-provider";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
@@ -106,7 +106,7 @@ const ListBlockItem = ({
 
         <View
           style={{
-            borderRadius: 5,
+            borderRadius: defaultBorderRadius,
             backgroundColor: colors.secondary.background,
             width: 25,
             height: 25,
@@ -114,7 +114,7 @@ const ListBlockItem = ({
             justifyContent: "center"
           }}
         >
-          <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
+          <Paragraph color={colors.secondary.paragraph} size={AppFontSize.xs}>
             {item.type.toUpperCase()}
           </Paragraph>
         </View>
@@ -327,7 +327,7 @@ const ListNoteItem = ({
         }}
       >
         <IconButton
-          size={SIZE.xl}
+          size={AppFontSize.xl}
           onPress={() => {
             if (!item?.id) return;
             useExpandedStore.getState().setExpanded(item?.id);
@@ -354,7 +354,10 @@ const ListNoteItem = ({
           }}
         >
           {loading ? (
-            <ActivityIndicator color={colors.primary.accent} size={SIZE.lg} />
+            <ActivityIndicator
+              color={colors.primary.accent}
+              size={AppFontSize.lg}
+            />
           ) : (
             <>
               {listType === "linkedNotes" ? (
