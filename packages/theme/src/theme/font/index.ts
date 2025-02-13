@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { FontSizes, getFontSizes } from "./fontsize.js";
 
 const SANS_FONT_STACK = [
-  `"Open Sans"`,
+  `"Inter"`,
   `"Noto Sans"`,
   "Frutiger",
   "Calibri",
@@ -50,6 +50,7 @@ export type FontConfig = {
     body: number;
     heading: number;
     bold: number;
+    medium: number;
   };
   fonts: { body: string; monospace: string; heading: string };
 };
@@ -60,7 +61,8 @@ export function getFontConfig(): FontConfig {
       normal: 400,
       body: 400,
       heading: 600,
-      bold: 600
+      bold: 600,
+      medium: 500
     },
     fonts: {
       body: SANS_FONT_STACK.join(","),

@@ -241,6 +241,10 @@ export default class Trash {
     ] as TrashItem[];
   }
 
+  count() {
+    return this.cache.notes.length + this.cache.notebooks.length;
+  }
+
   private async trashedNotes(
     ids: string[],
     deletedBy?: TrashItem["deletedBy"]

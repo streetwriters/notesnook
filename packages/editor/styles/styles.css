@@ -17,6 +17,7 @@
 
 .ProseMirror {
   font-family: inherit;
+  line-height: 20px;
 }
 
 .ProseMirror p.is-editor-empty::before {

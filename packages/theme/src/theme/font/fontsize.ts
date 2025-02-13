@@ -19,15 +19,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 export function getFontSizes(): FontSizes {
   return {
-    heading: "1.5rem",
-    subheading: "1.2rem",
-    input: "0.875rem",
-    title: "0.95rem",
-    subtitle: "0.85rem",
-    body: "0.8rem",
-    menu: "0.8rem",
-    subBody: "0.750rem",
-    code: "0.9rem"
+    heading: "24px",
+    subheading: "20px",
+    input: "12px",
+    title: "16px",
+    subtitle: "14px",
+    body: "12px",
+    subBody: "10px",
+    menu: "12px",
+    code: "14px"
   };
 }
 
