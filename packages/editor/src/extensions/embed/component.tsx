@@ -115,9 +115,10 @@ export function EmbedComponent(
         </Box>
         <Embed
           ref={embedRef}
-          src={src}
+          src={src.startsWith("javascript:") ? "about:blank" : src}
           width={"100%"}
           height={"100%"}
+          sandbox="allow-scripts"
           sx={{
             bg: "var(--background-secondary)",
             border: selected

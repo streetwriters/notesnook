@@ -101,6 +101,9 @@ export function EmbedPopup(props: EmbedPopupProps) {
           }
           const convertedUrl = convertUrlToEmbedUrl(_src);
           if (convertedUrl) _src = convertedUrl;
+          if (_src.startsWith("javascript:")) {
+            return setError("Embedding javascript code is not supported.");
+          }
           onClose({
             height: _height,
             width: _width,
