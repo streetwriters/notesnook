@@ -40,7 +40,7 @@ class EditorManager extends BaseStore<EditorManager> {
   toolbarConfig?: ToolbarDefinition;
   editorConfig: EditorConfig = Config.get("editorConfig", {
     fontFamily: "sans-serif",
-    fontSize: 16,
+    fontSize: 14,
     zoom: EDITOR_ZOOM.DEFAULT
   });
   editors: Record<string, EditorContext> = {};

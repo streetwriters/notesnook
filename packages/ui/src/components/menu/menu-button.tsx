@@ -77,7 +77,7 @@ export function MenuButton(props: MenuButtonProps) {
             <Icon
               path={icon}
               size={"medium"}
-              sx={{ mr: 2 }}
+              sx={{ mr: 1 }}
               color={
                 (styles?.icon?.color as string) ||
                 (variant === "dangerous" ? "icon-error" : "icon")
