@@ -70,12 +70,12 @@ export const MenuItemsList: SideMenuItem[] = [
       Monographs.navigate();
     }
   },
-  {
-    dataType: "note",
-    id: "Archive",
-    title: "Archive",
-    icon: "archive"
-  },
+  // {
+  //   dataType: "note",
+  //   id: "Archive",
+  //   title: "Archive",
+  //   icon: "archive"
+  // },
   {
     dataType: "note",
     id: "Trash",
