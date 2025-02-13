@@ -27,7 +27,7 @@ import { clearMessage } from "../../../services/message";
 import SettingsService from "../../../services/settings";
 import { STORE_LINK } from "../../../utils/constants";
 import { eCloseRateDialog, eOpenRateDialog } from "../../../utils/events";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
 import SheetWrapper from "../../ui/sheet";
@@ -87,12 +87,12 @@ const RateAppSheet = () => {
         }}
       >
         <Heading>{strings.rateAppHeading()}</Heading>
-        <Paragraph size={SIZE.md}>{strings.rateAppDesc()}</Paragraph>
+        <Paragraph size={AppFontSize.md}>{strings.rateAppDesc()}</Paragraph>
 
         <Seperator half />
         <Button
           onPress={rateApp}
-          fontSize={SIZE.md}
+          fontSize={AppFontSize.md}
           width="100%"
           type="accent"
           title={strings.rateApp()}
@@ -115,14 +115,14 @@ const RateAppSheet = () => {
               setVisible(false);
               clearMessage();
             }}
-            fontSize={SIZE.md}
+            fontSize={AppFontSize.md}
             type="error"
             width="48%"
             title={strings.never()}
           />
           <Button
             onPress={onClose}
-            fontSize={SIZE.md}
+            fontSize={AppFontSize.md}
             width="48%"
             type="secondary"
             title={strings.later()}

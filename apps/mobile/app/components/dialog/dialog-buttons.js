@@ -22,7 +22,7 @@ import { ActivityIndicator, StyleSheet, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../e2e/test.ids";
 import { useThemeColors } from "@notesnook/theme";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { Button } from "../ui/button";
 import Paragraph from "../ui/typography/paragraph";
 import { getColorLinearShade } from "../../utils/colors";
@@ -57,7 +57,10 @@ const DialogButtons = ({
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={colors.primary.accent} size={SIZE.lg} />
+        <ActivityIndicator
+          color={colors.primary.accent}
+          size={AppFontSize.lg}
+        />
       ) : doneText ? (
         <View
           style={{
@@ -68,7 +71,7 @@ const DialogButtons = ({
           <Icon
             color={colors.primary.accent}
             name="check-circle-outline"
-            size={SIZE.md}
+            size={AppFontSize.md}
           />
           <Paragraph color={colors.primary.accent}>{" " + doneText}</Paragraph>
         </View>
@@ -84,7 +87,7 @@ const DialogButtons = ({
       >
         <Button
           onPress={onPressNegative}
-          fontSize={SIZE.md}
+          fontSize={AppFontSize.md}
           testID={notesnook.ids.default.dialog.no}
           type="plain"
           bold
@@ -93,7 +96,7 @@ const DialogButtons = ({
         {onPressPositive ? (
           <Button
             onPress={onPressPositive}
-            fontSize={SIZE.md}
+            fontSize={AppFontSize.md}
             testID={notesnook.ids.default.dialog.yes}
             style={{
               marginLeft: 10

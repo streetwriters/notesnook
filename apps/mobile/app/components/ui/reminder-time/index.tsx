@@ -21,7 +21,7 @@ import React from "react";
 import { ViewStyle } from "react-native";
 
 import { useThemeColors } from "@notesnook/theme";
-import { SIZE } from "../../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import { Button, ButtonProps } from "../button";
 import { getFormattedReminderTime } from "@notesnook/common";
 import { Reminder } from "@notesnook/core";
@@ -52,8 +52,8 @@ export const ReminderTime = ({
       title={time}
       key={reminder.id}
       icon="bell"
-      fontSize={SIZE.xs}
-      iconSize={SIZE.sm}
+      fontSize={AppFontSize.xs}
+      iconSize={AppFontSize.sm}
       type="secondary"
       buttonType={
         isTodayOrTomorrow
@@ -67,7 +67,7 @@ export const ReminderTime = ({
       }}
       style={{
         height: "auto",
-        borderRadius: 5,
+        borderRadius: defaultBorderRadius,
         borderColor: colors.primary.border,
         paddingHorizontal: 6,
         ...(style as ViewStyle)

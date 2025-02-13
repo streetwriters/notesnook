@@ -22,7 +22,7 @@ import React from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../../e2e/test.ids";
-import { SIZE } from "../../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import { Properties } from "../../properties";
 import ReminderSheet from "../../sheets/reminder";
 import { IconButton } from "../../ui/icon-button";
@@ -62,7 +62,7 @@ const ReminderItem = React.memo(
             style={{
               flexWrap: "wrap"
             }}
-            size={SIZE.md}
+            size={AppFontSize.md}
           >
             {item.title}
           </Heading>
@@ -89,7 +89,7 @@ const ReminderItem = React.memo(
               <View
                 style={{
                   backgroundColor: colors.secondary.background,
-                  borderRadius: 5,
+                  borderRadius: defaultBorderRadius,
                   flexDirection: "row",
                   paddingHorizontal: 6,
                   alignItems: "center",
@@ -102,11 +102,11 @@ const ReminderItem = React.memo(
               >
                 <Icon
                   name="bell-off-outline"
-                  size={SIZE.md}
+                  size={AppFontSize.md}
                   color={colors.error.icon}
                 />
                 <Paragraph
-                  size={SIZE.xs}
+                  size={AppFontSize.xs}
                   color={colors.secondary.paragraph}
                   style={{ marginLeft: 5 }}
                 >
@@ -118,7 +118,7 @@ const ReminderItem = React.memo(
               <View
                 style={{
                   backgroundColor: colors.secondary.background,
-                  borderRadius: 5,
+                  borderRadius: defaultBorderRadius,
                   flexDirection: "row",
                   paddingHorizontal: 6,
                   alignItems: "center",
@@ -131,11 +131,11 @@ const ReminderItem = React.memo(
               >
                 <Icon
                   name="reload"
-                  size={SIZE.md}
+                  size={AppFontSize.md}
                   color={colors.primary.accent}
                 />
                 <Paragraph
-                  size={SIZE.xs}
+                  size={AppFontSize.xs}
                   color={colors.secondary.paragraph}
                   style={{ marginLeft: 5 }}
                 >
@@ -147,7 +147,7 @@ const ReminderItem = React.memo(
             <ReminderTime
               reminder={item}
               checkIsActive={false}
-              fontSize={SIZE.xs}
+              fontSize={AppFontSize.xs}
               style={{
                 justifyContent: "flex-start",
                 height: 25,
@@ -160,7 +160,7 @@ const ReminderItem = React.memo(
           testID={notesnook.listitem.menu}
           color={colors.primary.paragraph}
           name="dots-horizontal"
-          size={SIZE.xl}
+          size={AppFontSize.xl}
           onPress={() => Properties.present(item, isSheet)}
           style={{
             justifyContent: "center",

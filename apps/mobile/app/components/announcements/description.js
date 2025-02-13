@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import Paragraph from "../ui/typography/paragraph";
 import { getStyle } from "./functions";
 
@@ -30,7 +30,7 @@ export const Description = ({ text, style = {}, inline }) => {
         ...getStyle(style),
         textAlign: inline ? "left" : style?.textAlign
       }}
-      size={inline ? SIZE.sm : SIZE.md}
+      size={inline ? AppFontSize.sm : AppFontSize.md}
     >
       {text}
     </Paragraph>

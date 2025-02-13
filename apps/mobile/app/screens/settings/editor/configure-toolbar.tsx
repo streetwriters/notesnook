@@ -26,7 +26,7 @@ import { Notice } from "../../../components/ui/notice";
 import Paragraph from "../../../components/ui/typography/paragraph";
 import PremiumService from "../../../services/premium";
 import { useThemeColors } from "@notesnook/theme";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { Group } from "./group";
 import { DragState, useDragState } from "./state";
 import { strings } from "@notesnook/intl";
@@ -59,7 +59,7 @@ export const ConfigureToolbar = () => {
             style={{
               marginTop: 10
             }}
-            size={SIZE.xs}
+            size={AppFontSize.xs}
             color={colors.secondary.paragraph}
           >
             {strings.presets()}
@@ -105,7 +105,7 @@ export const ConfigureToolbar = () => {
                     .getState()
                     .setPreset(item.id as DragState["preset"]);
                 }}
-                fontSize={SIZE.sm - 1}
+                fontSize={AppFontSize.sm - 1}
                 key={item.name}
                 title={item.name}
               />

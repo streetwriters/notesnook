@@ -27,7 +27,7 @@ import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import Navigation from "../../services/navigation";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 export const SearchBar = ({
   onChangeText,
@@ -51,12 +51,12 @@ export const SearchBar = ({
     <View
       style={{
         width: "100%",
-        paddingHorizontal: DefaultAppStyles.GAP,
-        paddingTop: Platform.OS === "ios" ? 0 : insets.top + 5
+        paddingHorizontal: DefaultAppStyles.GAP
       }}
     >
       <View
         style={{
+          marginTop: DefaultAppStyles.GAP_SMALL,
           flexDirection: "row",
           alignItems: "center",
           width: "100%",
@@ -69,7 +69,7 @@ export const SearchBar = ({
       >
         <IconButton
           name="arrow-left"
-          size={SIZE.xxl}
+          size={AppFontSize.xxl}
           top={10}
           bottom={10}
           onPress={() => {
@@ -83,7 +83,7 @@ export const SearchBar = ({
           ref={inputRef}
           testID="search-input"
           style={{
-            fontSize: SIZE.sm,
+            fontSize: AppFontSize.sm,
             fontFamily: "OpenSans-Regular",
             flexGrow: 1,
             color: colors.primary.paragraph,

@@ -26,7 +26,7 @@ import { IconButton } from "../../../components/ui/icon-button";
 import Paragraph from "../../../components/ui/typography/paragraph";
 import { useThemeColors } from "@notesnook/theme";
 import { getElevationStyle } from "../../../utils/elevation";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { renderTool } from "./common";
 import { DraggableItem, useDragState } from "./state";
 import ToolSheet from "./tool-sheet";
@@ -196,13 +196,17 @@ export const Group = ({
                 alignItems: "center"
               }}
             >
-              <Icon size={SIZE.md} name="drag" color={colors.primary.icon} />
+              <Icon
+                size={AppFontSize.md}
+                name="drag"
+                color={colors.primary.icon}
+              />
               <Paragraph
                 style={{
                   marginLeft: 5
                 }}
                 color={colors.secondary.paragraph}
-                size={SIZE.xs}
+                size={AppFontSize.xs}
               >
                 {strings.group()}
               </Paragraph>
@@ -227,7 +231,7 @@ export const Group = ({
                   onPress={item.onPress}
                   name={item.name}
                   color={colors.primary.icon}
-                  size={SIZE.lg}
+                  size={AppFontSize.lg}
                 />
               ))}
             </View>

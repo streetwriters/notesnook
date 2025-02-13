@@ -20,22 +20,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Tag, VirtualizedGrouping } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect } from "react";
-import { View } from "react-native";
-import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
-import { db } from "../../common/database";
+import { TextInput, View } from "react-native";
+import { FlashList } from "@shopify/flash-list";
+import { DatabaseLogger, db } from "../../common/database";
 import { useDBItem, useTotalNotes } from "../../hooks/use-db-item";
-import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { TaggedNotes } from "../../screens/notes/tagged";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useTags } from "../../stores/use-tag-store";
-import { SIZE } from "../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { Properties } from "../properties";
 import AppIcon from "../ui/AppIcon";
 import { Pressable } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
 import { SideMenuHeader } from "./side-menu-header";
+import { SideMenuListEmpty } from "./side-menu-list-empty";
 import { useSideMenuTagsSelectionStore } from "./stores";
+import { strings } from "@notesnook/intl";
+import Navigation from "../../services/navigation";
 
 const TagItem = (props: {
   tags: VirtualizedGrouping<Tag>;
@@ -60,100 +62,120 @@ const TagItem = (props: {
     }
   }, [item]);
 
-  return item ? (
-    <Pressable
-      type={isSelected || isFocused ? "selected" : "transparent"}
-      onLongPress={() => {
-        Properties.present(item);
-      }}
-      testID={`tag-item-${props.id}`}
-      onPress={() => {
-        if (enabled) {
-          useSideMenuTagsSelectionStore
-            .getState()
-            .markAs(item, isSelected ? "deselected" : "selected");
-          if (
-            useSideMenuTagsSelectionStore.getState().getSelectedItemIds()
-              .length === 0
-          ) {
-            useSideMenuTagsSelectionStore.setState({
-              enabled: false
-            });
-          }
-        } else {
-          TaggedNotes.navigate(item, false);
-        }
-      }}
+  return (
+    <View
       style={{
-        justifyContent: "space-between",
-        width: "100%",
-        alignItems: "center",
-        flexDirection: "row",
-        borderRadius: 5,
-        paddingRight: DefaultAppStyles.GAP_SMALL
+        paddingHorizontal: DefaultAppStyles.GAP,
+        marginTop: (props.id as number) === 0 ? DefaultAppStyles.GAP : 0
       }}
     >
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center"
-        }}
-      >
-        <View
+      {item ? (
+        <Pressable
+          type={isSelected || isFocused ? "selected" : "transparent"}
+          onLongPress={() => {
+            Properties.present(item);
+          }}
+          testID={`tag-item-${props.id}`}
+          onPress={() => {
+            if (enabled) {
+              useSideMenuTagsSelectionStore
+                .getState()
+                .markAs(item, isSelected ? "deselected" : "selected");
+              if (
+                useSideMenuTagsSelectionStore.getState().getSelectedItemIds()
+                  .length === 0
+              ) {
+                useSideMenuTagsSelectionStore.setState({
+                  enabled: false
+                });
+              }
+            } else {
+              TaggedNotes.navigate(item, false);
+              Navigation.closeDrawer();
+            }
+          }}
           style={{
-            width: 32,
-            height: 32,
-            justifyContent: "center",
-            alignItems: "center"
+            justifyContent: "space-between",
+            width: "100%",
+            alignItems: "center",
+            flexDirection: "row",
+            borderRadius: defaultBorderRadius,
+            paddingRight: DefaultAppStyles.GAP_SMALL
           }}
         >
-          <AppIcon
-            size={SIZE.md}
-            color={isFocused ? colors.selected.icon : colors.secondary.icon}
-            name="pound"
-          />
-        </View>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center"
+            }}
+          >
+            <View
+              style={{
+                width: 32,
+                height: 32,
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              <AppIcon
+                size={AppFontSize.md}
+                color={isFocused ? colors.selected.icon : colors.secondary.icon}
+                name="pound"
+              />
+            </View>
 
-        <Paragraph
-          color={
-            isFocused ? colors.selected.paragraph : colors.secondary.paragraph
-          }
-          size={SIZE.xs}
-        >
-          {item?.title}
-        </Paragraph>
-      </View>
-
-      {enabled ? (
-        <View
-          style={{
-            width: 22,
-            height: 22,
-            justifyContent: "center",
-            alignItems: "center"
-          }}
-        >
-          <AppIcon
-            name={isSelected ? "checkbox-outline" : "checkbox-blank-outline"}
-            color={isSelected ? colors.selected.icon : colors.primary.icon}
-          />
-        </View>
-      ) : (
-        <>
-          {item?.id && totalNotes.totalNotes?.(item?.id) ? (
-            <Paragraph size={SIZE.xxs} color={colors.secondary.paragraph}>
-              {totalNotes.totalNotes(item?.id)}
+            <Paragraph
+              color={
+                isFocused
+                  ? colors.selected.paragraph
+                  : colors.secondary.paragraph
+              }
+              size={AppFontSize.sm}
+            >
+              {item?.title}
             </Paragraph>
-          ) : null}
-        </>
-      )}
-    </Pressable>
-  ) : null;
+          </View>
+
+          {enabled ? (
+            <View
+              style={{
+                width: 22,
+                height: 22,
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              <AppIcon
+                name={
+                  isSelected ? "checkbox-outline" : "checkbox-blank-outline"
+                }
+                color={isSelected ? colors.selected.icon : colors.primary.icon}
+              />
+            </View>
+          ) : (
+            <>
+              {item?.id && totalNotes.totalNotes?.(item?.id) ? (
+                <Paragraph
+                  size={AppFontSize.xxs}
+                  color={colors.secondary.paragraph}
+                >
+                  {totalNotes.totalNotes(item?.id)}
+                </Paragraph>
+              ) : null}
+            </>
+          )}
+        </Pressable>
+      ) : null}
+    </View>
+  );
 };
 
 export const SideMenuTags = () => {
   const [tags] = useTags();
-  const insets = useGlobalSafeAreaInsets();
+  const { colors } = useThemeColors();
+  const [filteredTags, setFilteredTags] = React.useState(tags);
+  const searchTimer = React.useRef<NodeJS.Timeout>();
+  const lastQuery = React.useRef<string>();
 
   useEffect(() => {
     useSideMenuTagsSelectionStore.setState({
@@ -180,28 +202,91 @@ export const SideMenuTags = () => {
     });
   }, []);
 
+  const updateTags = React.useCallback(() => {
+    if (lastQuery.current) {
+      console.log("Looking up...", lastQuery.current);
+      db.lookup
+        .tags(lastQuery.current.trim())
+        .sorted()
+        .then(async (filtered) => {
+          setFilteredTags(filtered);
+        });
+    } else {
+      setFilteredTags(tags);
+    }
+  }, [tags]);
+
+  useEffect(() => {
+    updateTags();
+  }, [updateTags]);
+
   const renderItem = React.useCallback(
     (info: { index: number }) => {
-      return <TagItem id={info.index} tags={tags!} />;
+      return <TagItem id={info.index} tags={filteredTags!} />;
     },
-    [tags]
+    [filteredTags]
   );
-
   return (
     <View
       style={{
-        paddingHorizontal: DefaultAppStyles.GAP,
         paddingTop: DefaultAppStyles.GAP_SMALL,
         width: "100%",
         height: "100%"
       }}
     >
-      <SideMenuHeader />
-      <FlashList
-        data={tags?.placeholders}
-        estimatedItemSize={32}
-        renderItem={renderItem}
-      />
+      {!tags || tags?.placeholders.length === 0 ? (
+        <SideMenuListEmpty placeholder={strings.emptyPlaceholders("tag")} />
+      ) : (
+        <>
+          <FlashList
+            data={filteredTags?.placeholders}
+            bounces={false}
+            estimatedItemSize={35}
+            bouncesZoom={false}
+            overScrollMode="never"
+            ListHeaderComponent={
+              <View
+                style={{
+                  backgroundColor: colors.primary.background
+                }}
+              >
+                <SideMenuHeader />
+              </View>
+            }
+            renderItem={renderItem}
+          />
+          <View
+            style={{
+              width: "100%",
+              paddingHorizontal: DefaultAppStyles.GAP,
+              backgroundColor: colors.primary.background,
+              borderTopColor: colors.primary.border,
+              borderTopWidth: 1
+            }}
+          >
+            <TextInput
+              placeholder="Filter tags..."
+              style={{
+                fontFamily: "Inter-Regular",
+                fontSize: AppFontSize.xs
+              }}
+              cursorColor={colors.primary.accent}
+              onChangeText={async (value) => {
+                searchTimer.current && clearTimeout(searchTimer.current);
+                searchTimer.current = setTimeout(async () => {
+                  try {
+                    lastQuery.current = value;
+                    updateTags();
+                  } catch (e) {
+                    DatabaseLogger.error(e);
+                  }
+                }, 500);
+              }}
+              placeholderTextColor={colors.primary.placeholder}
+            />
+          </View>
+        </>
+      )}
     </View>
   );
 };

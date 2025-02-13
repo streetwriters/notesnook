@@ -25,6 +25,7 @@ export type TreeItem = {
   parentId: string;
   notebook: Notebook;
   depth: number;
+  hasChildren: boolean;
 };
 
 function removeTreeItem(tree: TreeItem[], id: string) {
@@ -71,10 +72,24 @@ export function createNotebookTreeStores(
         tree: newTree
       });
     },
-    addNotebooks: (parentId: string, notebooks: Notebook[], depth: number) => {
+    addNotebooks: async (
+      parentId: string,
+      notebooks: Notebook[],
+      depth: number
+    ) => {
       const parentIndex = get().tree.findIndex(
         (item) => item.notebook.id === parentId
       );
+
+      const items = await db.relations
+        .from(
+          {
+            type: "notebook",
+            ids: notebooks.map((item) => item.id)
+          },
+          "notebook"
+        )
+        .get();
 
       let newTree = get().tree.slice();
       for (const item of newTree) {
@@ -89,7 +104,10 @@ export function createNotebookTreeStores(
           return {
             parentId,
             notebook,
-            depth: depth
+            depth: depth,
+            hasChildren: items.some((item) => {
+              return item.fromId === notebook.id;
+            })
           };
         })
       );
@@ -111,6 +129,7 @@ export function createNotebookTreeStores(
         },
         "notebook"
       ).selector;
+
       const grouped = await selector.sorted(
         db.settings.getGroupOptions("notebooks")
       );

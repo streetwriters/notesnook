@@ -37,7 +37,7 @@ import { useSelectionStore } from "../../stores/use-selection-store";
 import { deleteItems } from "../../utils/functions";
 import { fluidTabsRef } from "../../utils/global-refs";
 import { updateNotebook } from "../../utils/notebooks";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { sleep } from "../../utils/time";
 import { presentDialog } from "../dialog/functions";
@@ -164,7 +164,7 @@ export const SelectionHeader = React.memo(
                 .getState()
                 .setAll(allSelected ? [] : [...((await items?.ids()) || [])]);
             }}
-            size={SIZE.lg}
+            size={AppFontSize.lg}
             color={allSelected ? colors.primary.accent : colors.primary.icon}
             name="select-all"
           />
@@ -276,7 +276,7 @@ export const SelectionHeader = React.memo(
               ].map((item) =>
                 !item.visible ? null : (
                   <IconButton
-                    size={SIZE.lg}
+                    size={AppFontSize.lg}
                     type="plain"
                     name={item.icon}
                     key={item.title}
@@ -293,7 +293,7 @@ export const SelectionHeader = React.memo(
         </View>
 
         <IconButton
-          size={SIZE.lg}
+          size={AppFontSize.lg}
           onPress={() => {
             clearSelection();
           }}

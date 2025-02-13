@@ -31,7 +31,7 @@ import { useMenuStore } from "../../stores/use-menu-store";
 import { useRelationStore } from "../../stores/use-relation-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { refreshNotesPage } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import ColorPicker from "../dialogs/color-picker";
 import { Button } from "../ui/button";
 import NativeTooltip from "../../utils/tooltip";
@@ -85,7 +85,12 @@ const ColorItem = ({ item, note }: { item: Color; note: Note }) => {
       }}
     >
       {isLinked ? (
-        <Icon testID="icon-check" name="check" color="white" size={SIZE.lg} />
+        <Icon
+          testID="icon-check"
+          name="check"
+          color="white"
+          size={AppFontSize.lg}
+        />
       ) : null}
     </Pressable>
   );
@@ -151,7 +156,7 @@ export const ColorTags = ({ item }: { item: Note }) => {
                 icon="plus"
                 iconPosition="right"
                 height={30}
-                fontSize={SIZE.xs}
+                fontSize={AppFontSize.xs}
                 style={{
                   marginRight: 5,
                   borderRadius: 100,
@@ -178,7 +183,7 @@ export const ColorTags = ({ item }: { item: Note }) => {
                   testID="icon-plus"
                   name="plus"
                   color={colors.primary.icon}
-                  size={SIZE.lg}
+                  size={AppFontSize.lg}
                 />
               </Pressable>
             )

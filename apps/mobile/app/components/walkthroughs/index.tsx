@@ -23,7 +23,7 @@ import { MMKV } from "../../common/database/mmkv";
 import { eSendEvent, presentSheet } from "../../services/event-manager";
 import { useThemeColors } from "@notesnook/theme";
 import { eCloseSheet } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
@@ -65,7 +65,7 @@ export const Walkthrough = ({
             alignSelf: "center",
             maxWidth: "80%"
           }}
-          size={SIZE.md}
+          size={AppFontSize.md}
         >
           {step.text}
         </Paragraph>

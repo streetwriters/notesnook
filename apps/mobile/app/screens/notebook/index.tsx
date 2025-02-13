@@ -29,7 +29,6 @@ import List from "../../components/list";
 import { NotebookHeader } from "../../components/list-items/headers/notebook-header";
 import { Properties } from "../../components/properties";
 import SelectionHeader from "../../components/selection-header";
-import { AddNotebookSheet } from "../../components/sheets/add-notebook";
 import { IconButton } from "../../components/ui/icon-button";
 import { Pressable } from "../../components/ui/pressable";
 import Paragraph from "../../components/ui/typography/paragraph";
@@ -41,7 +40,7 @@ import useNavigationStore, {
 } from "../../stores/use-navigation-store";
 import { eUpdateNotebookRoute } from "../../utils/events";
 import { findRootNotebookId } from "../../utils/notebooks";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { openEditor, setOnFirstSave } from "../notes/common";
 
@@ -233,7 +232,7 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
                 bottom={0}
                 style={{ width: 20, height: 25 }}
               />
-              <Paragraph size={SIZE.xs + 1}>{item.title}</Paragraph>
+              <Paragraph size={AppFontSize.xs + 1}>{item.title}</Paragraph>
             </Pressable>
           ))}
         </View>

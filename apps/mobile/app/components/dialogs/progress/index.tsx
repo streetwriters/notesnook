@@ -21,7 +21,7 @@ import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect } from "react";
 import { View } from "react-native";
 import { eSendEvent, eSubscribeEvent } from "../../../services/event-manager";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { Dialog } from "../../dialog";
 import BaseDialog from "../../dialog/base-dialog";
 import DialogContainer from "../../dialog/dialog-container";
@@ -131,7 +131,7 @@ export default function Progress() {
               textAlign: "center"
             }}
             color={colors.primary.paragraph}
-            size={SIZE.lg}
+            size={AppFontSize.lg}
           >
             {data?.title}
           </Heading>

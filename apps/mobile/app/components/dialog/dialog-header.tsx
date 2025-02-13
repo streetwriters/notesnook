@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import { Text, View, ViewStyle } from "react-native";
 import { useThemeColors } from "@notesnook/theme";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { Button } from "../ui/button";
 import { PressableProps } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
@@ -82,7 +82,7 @@ const DialogHeader = ({
           >
             <Heading
               style={{ textAlign: centered ? "center" : "left" }}
-              size={SIZE.lg}
+              size={AppFontSize.lg}
             >
               {title}{" "}
               {titlePart ? (

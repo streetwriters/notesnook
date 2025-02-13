@@ -29,7 +29,7 @@ import {
 } from "../../../services/event-manager";
 import Notifications from "../../../services/notifications";
 import { useThemeColors } from "@notesnook/theme";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import List from "../../list";
 import { Button } from "../../ui/button";
 import Heading from "../../ui/typography/heading";
@@ -135,7 +135,7 @@ export default function ReminderNotify({
           marginTop: 10
         }}
       >
-        <Paragraph size={SIZE.xs}>{strings.remindMeIn()}:</Paragraph>
+        <Paragraph size={AppFontSize.xs}>{strings.remindMeIn()}:</Paragraph>
         {QuickActions.map((item) => {
           return (
             <Button
@@ -143,7 +143,7 @@ export default function ReminderNotify({
               key={item.title}
               title={item.title}
               height={30}
-              fontSize={SIZE.xs}
+              fontSize={AppFontSize.xs}
               style={{ marginLeft: 10, borderRadius: 100 }}
               onPress={() => onSnooze(item.time)}
             />
@@ -168,7 +168,7 @@ export default function ReminderNotify({
           <Paragraph
             style={{
               color: colors.secondary.paragraph,
-              fontSize: SIZE.xs,
+              fontSize: AppFontSize.xs,
               marginBottom: 10
             }}
           >

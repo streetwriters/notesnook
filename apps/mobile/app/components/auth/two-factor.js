@@ -30,7 +30,7 @@ import {
   ToastManager
 } from "../../services/event-manager";
 import { eCloseSheet } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
 import Input from "../ui/input";
@@ -205,7 +205,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
               onSubmitEditing={onNext}
               caretHidden
               inputStyle={{
-                fontSize: SIZE.lg,
+                fontSize: AppFontSize.lg,
                 height: 60,
                 textAlign: "center",
                 letterSpacing: 10,
@@ -288,7 +288,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
                     flexShrink: 1
                   }}
                 >
-                  <Paragraph size={SIZE.md}>{item.title}</Paragraph>
+                  <Paragraph size={AppFontSize.md}>{item.title}</Paragraph>
                 </View>
               </Pressable>
             ))}

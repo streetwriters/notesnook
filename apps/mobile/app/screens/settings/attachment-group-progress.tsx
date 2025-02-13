@@ -28,7 +28,7 @@ import Paragraph from "../../components/ui/typography/paragraph";
 import { useAttachmentProgress } from "../../hooks/use-attachment-progress";
 import { useDBItem } from "../../hooks/use-db-item";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { strings } from "@notesnook/intl";
 
 export const AttachmentGroupProgress = (props: { groupId?: string }) => {
@@ -52,7 +52,7 @@ export const AttachmentGroupProgress = (props: { groupId?: string }) => {
         gap: 10
       }}
     >
-      <Icon name="download" size={SIZE.xxxl} />
+      <Icon name="download" size={AppFontSize.xxxl} />
       <View
         style={{
           gap: 5,

@@ -31,7 +31,11 @@ import { useReminderStore } from "../stores/use-reminder-store";
 import { useTagStore } from "../stores/use-tag-store";
 import { useTrashStore } from "../stores/use-trash-store";
 import { eOnRefreshSearch, eUpdateNotebookRoute } from "../utils/events";
-import { appNavigatorRef, fluidTabsRef } from "../utils/global-refs";
+import {
+  appNavigatorRef,
+  fluidTabsRef,
+  rootNavigatorRef
+} from "../utils/global-refs";
 import { eSendEvent } from "./event-manager";
 
 /**
@@ -123,21 +127,21 @@ function queueRoutesForUpdate(...routesToUpdate: RouteName[]) {
 
 function navigate<T extends RouteName>(screen: T, params?: RouteParams[T]) {
   console.log(`Navigation.navigate ${screen} route`);
-  appNavigatorRef.current?.navigate(screen as any, params);
+  rootNavigatorRef.current?.navigate(screen as any, params);
 }
 
 function goBack() {
-  appNavigatorRef.current?.goBack();
+  rootNavigatorRef.current?.goBack();
 }
 
 function push<T extends RouteName>(screen: T, params: RouteParams[T]) {
   console.log(`Navigation.push ${screen} route`);
-  appNavigatorRef.current?.dispatch(StackActions.push(screen as any, params));
+  rootNavigatorRef.current?.dispatch(StackActions.push(screen as any, params));
 }
 
 function replace<T extends RouteName>(screen: T, params: RouteParams[T]) {
   console.log(`Navigation.replace ${screen} route`);
-  appNavigatorRef.current?.dispatch(
+  rootNavigatorRef.current?.dispatch(
     StackActions.replace(screen as string, params)
   );
 }

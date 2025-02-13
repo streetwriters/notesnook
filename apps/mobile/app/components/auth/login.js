@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useState } from "react";
 import { TouchableOpacity, View, useWindowDimensions } from "react-native";
@@ -24,10 +25,9 @@ import { SheetManager } from "react-native-actions-sheet";
 import { DDS } from "../../services/device-detection";
 import { eSendEvent } from "../../services/event-manager";
 import Sync from "../../services/sync";
-import { useSettingStore } from "../../stores/use-setting-store";
 import { useUserStore } from "../../stores/use-user-store";
 import { eUserLoggedIn } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import SheetProvider from "../sheet-provider";
 import { Progress } from "../sheets/progress";
@@ -38,7 +38,6 @@ import Paragraph from "../ui/typography/paragraph";
 import { hideAuth } from "./common";
 import { ForgotPassword } from "./forgot-password";
 import { useLogin } from "./use-login";
-import { strings } from "@notesnook/intl";
 
 const LoginSteps = {
   emailAuth: 1,
@@ -71,8 +70,8 @@ export const Login = ({ changeMode }) => {
       }
     }, 5000);
   });
-  const deviceMode = useSettingStore((state) => state.deviceMode);
   const { width, height } = useWindowDimensions();
+  const isTablet = width > 600;
   useEffect(() => {
     async () => {
       setStep(LoginSteps.emailAuth);
@@ -96,6 +95,7 @@ export const Login = ({ changeMode }) => {
           backgroundColor: colors.primary.background,
           zIndex: 10,
           width: "100%",
+          height: "100%",
           alignSelf: "center"
         }}
       >
@@ -107,12 +107,12 @@ export const Login = ({ changeMode }) => {
             borderBottomWidth: 0.8,
             marginBottom: 12,
             borderBottomColor: colors.primary.border,
-            alignSelf: deviceMode !== "mobile" ? "center" : undefined,
-            borderWidth: deviceMode !== "mobile" ? 1 : null,
-            borderColor: deviceMode !== "mobile" ? colors.primary.border : null,
-            borderRadius: deviceMode !== "mobile" ? 20 : null,
-            marginTop: deviceMode !== "mobile" ? 50 : null,
-            width: deviceMode === "mobile" ? null : "50%",
+            alignSelf: isTablet ? "center" : undefined,
+            borderWidth: isTablet ? 1 : null,
+            borderColor: isTablet ? colors.primary.border : null,
+            borderRadius: isTablet ? 20 : null,
+            marginTop: isTablet ? 50 : null,
+            width: !isTablet ? null : "50%",
             minHeight: height * 0.4
           }}
         >
@@ -146,7 +146,7 @@ export const Login = ({ changeMode }) => {
               marginTop: 10
             }}
             extraBold
-            size={SIZE.xxl}
+            size={AppFontSize.xxl}
           >
             {strings.loginToYourAccount()}
           </Heading>
@@ -226,7 +226,7 @@ export const Login = ({ changeMode }) => {
                 textStyle={{
                   textDecorationLine: "underline"
                 }}
-                fontSize={SIZE.xs}
+                fontSize={AppFontSize.xs}
                 type="plain"
               />
             </>
@@ -244,11 +244,10 @@ export const Login = ({ changeMode }) => {
                 login();
               }}
               style={{
-                width: 250,
-                borderRadius: 100
+                width: 250
               }}
               height={50}
-              fontSize={SIZE.md}
+              fontSize={AppFontSize.md}
               type="accent"
               title={!loading ? strings.continue() : null}
             />
@@ -269,7 +268,7 @@ export const Login = ({ changeMode }) => {
                 textStyle={{
                   textDecorationLine: "underline"
                 }}
-                fontSize={SIZE.xs}
+                fontSize={AppFontSize.xs}
                 type="errorShade"
               />
             )}
@@ -288,12 +287,12 @@ export const Login = ({ changeMode }) => {
                 }}
               >
                 <Paragraph
-                  size={SIZE.xs + 1}
+                  size={AppFontSize.xs + 1}
                   color={colors.secondary.paragraph}
                 >
                   {strings.dontHaveAccount()}{" "}
                   <Paragraph
-                    size={SIZE.xs + 1}
+                    size={AppFontSize.xs + 1}
                     style={{ color: colors.primary.accent }}
                   >
                     {strings.signUp()}

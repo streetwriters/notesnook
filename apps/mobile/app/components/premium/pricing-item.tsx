@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react";
 import { Platform, View } from "react-native";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { Pressable } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
@@ -59,13 +59,13 @@ export const PricingItem = ({
     >
       {!compact && (
         <View>
-          <Heading size={SIZE.lg - 2}>
+          <Heading size={AppFontSize.lg - 2}>
             {product?.type === "yearly" || product?.offerType === "yearly"
               ? "Yearly"
               : "Monthly"}
           </Heading>
           {product?.info && (
-            <Paragraph size={SIZE.xs}>{product.info}</Paragraph>
+            <Paragraph size={AppFontSize.xs}>{product.info}</Paragraph>
           )}
         </View>
       )}
@@ -75,13 +75,13 @@ export const PricingItem = ({
           style={{
             textDecorationLine: strikethrough ? "line-through" : undefined
           }}
-          size={SIZE.sm}
+          size={AppFontSize.sm}
         >
           <Heading
             style={{
               textDecorationLine: strikethrough ? "line-through" : undefined
             }}
-            size={SIZE.lg - 2}
+            size={AppFontSize.lg - 2}
           >
             {Platform.OS === "android"
               ? (product.data as RNIap.SubscriptionAndroid | undefined)

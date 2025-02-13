@@ -23,31 +23,27 @@ import React from "react";
 import { Linking, ScrollView, useWindowDimensions, View } from "react-native";
 import { SwiperFlatList } from "react-native-swiper-flatlist";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
-import { eSendEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
-import SettingsService from "../../services/settings";
-import { useSettingStore } from "../../stores/use-setting-store";
-import { getElevationStyle } from "../../utils/elevation";
-import { eOpenLoginDialog } from "../../utils/events";
-import { SIZE } from "../../utils/size";
-import { AuthMode } from "../auth";
+import { AppFontSize } from "../../utils/size";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import SettingsService from "../../services/settings";
+import { AuthMode } from "../auth/common";
 
-const Intro = ({ navigation }) => {
+const Intro = () => {
   const { colors } = useThemeColors();
   const { width, height } = useWindowDimensions();
-  const deviceMode = useSettingStore((state) => state.deviceMode);
   const insets = useGlobalSafeAreaInsets();
+  const isTablet = width > 600;
+
   const renderItem = React.useCallback(
-    ({ item }) => (
+    ({ item }: { item: (typeof strings.introData)[0] }) => (
       <View
         style={{
           justifyContent: "center",
-          width: deviceMode !== "mobile" ? width / 2 : width,
-          paddingHorizontal:
-            deviceMode !== "mobile" ? (width / 2) * 0.05 : width * 0.05
+          width: isTablet ? width / 2 : width,
+          paddingHorizontal: isTablet ? (width / 2) * 0.05 : width * 0.05
         }}
       >
         <View
@@ -88,21 +84,21 @@ const Intro = ({ navigation }) => {
                 marginBottom: 5
               }}
               extraBold
-              size={SIZE.xxl}
+              size={AppFontSize.xxl}
             >
               {heading()}
             </Heading>
           ))}
 
           {item.body ? (
-            <Paragraph size={SIZE.sm}>{item.body()}</Paragraph>
+            <Paragraph size={AppFontSize.sm}>{item.body()}</Paragraph>
           ) : null}
 
           {item.tesimonial ? (
             <Paragraph
               style={{
                 fontStyle: "italic",
-                fontSize: SIZE.lg
+                fontSize: AppFontSize.lg
               }}
               onPress={() => {
                 Linking.openURL(item.link);
@@ -114,31 +110,37 @@ const Intro = ({ navigation }) => {
         </View>
       </View>
     ),
-    [colors.primary.accent, colors.secondary.background, deviceMode, width]
+    [colors.primary.accent, colors.secondary.background, isTablet, width]
   );
 
   return (
     <ScrollView
       testID="notesnook.splashscreen"
       style={{
-        width: "100%"
+        width: "100%",
+        backgroundColor: colors.primary.background
       }}
     >
       <View
-        style={{
-          width: deviceMode !== "mobile" ? width / 2 : "100%",
-          backgroundColor: colors.secondary.background,
-          borderBottomWidth: 1,
-          borderBottomColor: colors.primary.border,
-          alignSelf: deviceMode !== "mobile" ? "center" : undefined,
-          borderWidth: deviceMode !== "mobile" ? 1 : null,
-          borderColor: deviceMode !== "mobile" ? colors.primary.border : null,
-          borderRadius: deviceMode !== "mobile" ? 20 : null,
-          marginTop: deviceMode !== "mobile" ? 50 : null,
-          paddingTop: insets.top + 10,
-          paddingBottom: insets.top + 10,
-          minHeight: height * 0.7 - (insets.top + insets.bottom)
-        }}
+        style={[
+          {
+            width: "100%",
+            backgroundColor: colors.secondary.background,
+            borderBottomWidth: 1,
+            borderBottomColor: colors.primary.border,
+            paddingTop: insets.top + 10,
+            paddingBottom: insets.top + 10,
+            minHeight: height * 0.7 - (insets.top + insets.bottom)
+          },
+          isTablet && {
+            width: width / 2,
+            alignSelf: "center",
+            borderWidth: 1,
+            borderColor: colors.primary.border,
+            borderRadius: 20,
+            marginTop: 50
+          }
+        ]}
       >
         <SwiperFlatList
           autoplay
@@ -170,23 +172,12 @@ const Intro = ({ navigation }) => {
         <Button
           width={250}
           onPress={async () => {
-            eSendEvent(eOpenLoginDialog, AuthMode.welcomeSignup);
-            setTimeout(() => {
-              SettingsService.set({
-                introCompleted: true
-              });
-              Navigation.replace("Notes", {
-                canGoBack: false
-              });
-            }, 1000);
+            SettingsService.set({ introCompleted: true });
+            Navigation.push("Auth", {
+              mode: AuthMode.welcomeSignup
+            });
           }}
-          style={{
-            paddingHorizontal: 24,
-            alignSelf: "center",
-            ...getElevationStyle(5),
-            borderRadius: 100
-          }}
-          fontSize={SIZE.md}
+          fontSize={AppFontSize.md}
           type="accent"
           title={strings.getStarted()}
         />

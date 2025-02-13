@@ -39,7 +39,7 @@ import { Button } from "../ui/button";
 import { getContainerBorder } from "../../utils/colors";
 import { Notice } from "../ui/notice";
 import { strings } from "@notesnook/intl";
-import { br } from "../../utils/size";
+import { defaultBorderRadius } from "../../utils/size";
 
 export const Dialog = ({ context = "global" }) => {
   const { colors } = useThemeColors();
@@ -126,7 +126,7 @@ export const Dialog = ({ context = "global" }) => {
     ...getElevationStyle(5),
     width: DDS.isTab ? 400 : "85%",
     maxHeight: 450,
-    borderRadius: br,
+    borderRadius: defaultBorderRadius,
     backgroundColor: colors.primary.background,
     paddingTop: 12,
     ...getContainerBorder(colors.primary.border, 0.5),

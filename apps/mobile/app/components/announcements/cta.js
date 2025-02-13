@@ -23,7 +23,7 @@ import { Linking, View } from "react-native";
 import { useThemeColors } from "@notesnook/theme";
 import { eSendEvent, presentSheet } from "../../services/event-manager";
 import { eCloseAnnouncementDialog } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { PricingPlans } from "../premium/pricing-plans";
 import SheetProvider from "../sheet-provider";
@@ -75,7 +75,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
               <Button
                 key={item.title}
                 title={item.title}
-                fontSize={SIZE.sm}
+                fontSize={AppFontSize.sm}
                 type="transparent"
                 textStyle={{
                   textDecorationLine: "underline"
@@ -95,7 +95,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
               <Button
                 key={item.title}
                 title={item.title}
-                fontSize={SIZE.sm}
+                fontSize={AppFontSize.sm}
                 type="plain"
                 onPress={() => onPress(item)}
                 width={null}
@@ -118,7 +118,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
               <Button
                 key={item.title}
                 title={item.title}
-                fontSize={SIZE.md}
+                fontSize={AppFontSize.md}
                 buttonType={{
                   color: color ? color : colors.primary.accent,
                   text: color
@@ -141,7 +141,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
               <Button
                 key={item.title}
                 title={item.title}
-                fontSize={SIZE.xs}
+                fontSize={AppFontSize.xs}
                 type="plain"
                 onPress={() => onPress(item)}
                 width={null}

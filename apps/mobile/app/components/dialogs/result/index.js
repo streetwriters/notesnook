@@ -27,7 +27,7 @@ import {
 import { useThemeColors } from "@notesnook/theme";
 import { getElevationStyle } from "../../../utils/elevation";
 import { eCloseResultDialog, eOpenResultDialog } from "../../../utils/events";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import BaseDialog from "../../dialog/base-dialog";
 import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
@@ -78,7 +78,7 @@ const ResultDialog = () => {
         }}
       >
         <Heading
-          size={SIZE.lg}
+          size={AppFontSize.lg}
           textBreakStrategy="balanced"
           style={{
             alignSelf: "center",
@@ -94,12 +94,12 @@ const ResultDialog = () => {
 
         <Paragraph
           color={colors.secondary.paragraph}
-          size={SIZE.md}
+          size={AppFontSize.md}
           style={{
             alignSelf: "center",
             textAlign: "center",
             maxWidth: "80%",
-            lineHeight: SIZE.sm + 5
+            lineHeight: AppFontSize.sm + 5
           }}
         >
           {dialogData.paragraph}
@@ -134,7 +134,7 @@ const ResultDialog = () => {
               paddingHorizontal: 12
             }}
             onPress={close}
-            fontSize={SIZE.md + 2}
+            fontSize={AppFontSize.md + 2}
           />
         </View>
       </View>

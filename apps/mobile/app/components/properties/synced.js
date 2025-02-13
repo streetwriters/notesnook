@@ -21,7 +21,7 @@ import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { useUserStore } from "../../stores/use-user-store";
 import { openLinkInBrowser } from "../../utils/functions";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
@@ -40,8 +40,8 @@ export const Synced = ({ item, close }) => {
         padding: DefaultAppStyles.GAP_VERTICAL_SMALL,
         paddingHorizontal: DefaultAppStyles.GAP_SMALL
       }}
-      fontSize={SIZE.xxxs}
-      iconSize={SIZE.xs}
+      fontSize={AppFontSize.xxxs}
+      iconSize={AppFontSize.xs}
       icon="shield-key-outline"
       type="shade"
       title="Encrypted and synced"

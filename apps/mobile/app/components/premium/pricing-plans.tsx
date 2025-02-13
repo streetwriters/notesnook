@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
+import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Platform, Text, View } from "react-native";
 import * as RNIap from "react-native-iap";
@@ -27,18 +29,19 @@ import {
   presentSheet,
   ToastManager
 } from "../../services/event-manager";
+import Navigation from "../../services/navigation";
 import PremiumService from "../../services/premium";
-import { useThemeColors } from "@notesnook/theme";
+import { useSettingStore } from "../../stores/use-setting-store";
 import { useUserStore } from "../../stores/use-user-store";
 import {
   eClosePremiumDialog,
   eCloseSheet,
-  eCloseSimpleDialog,
-  eOpenLoginDialog
+  eCloseSimpleDialog
 } from "../../utils/events";
 import { openLinkInBrowser } from "../../utils/functions";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { sleep } from "../../utils/time";
+import { AuthMode } from "../auth/common";
 import { Dialog } from "../dialog";
 import BaseDialog from "../dialog/base-dialog";
 import { presentDialog } from "../dialog/functions";
@@ -47,8 +50,6 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { Walkthrough } from "../walkthroughs";
 import { PricingItem } from "./pricing-item";
-import { useSettingStore } from "../../stores/use-setting-store";
-import { strings } from "@notesnook/intl";
 
 const UUID_PREFIX = "0bdaea";
 const UUID_VERSION = "4";
@@ -290,7 +291,7 @@ export const PricingPlans = ({
             style={{
               alignSelf: "center"
             }}
-            size={SIZE.lg}
+            size={AppFontSize.lg}
           >
             {(Platform.OS === "android"
               ? (monthlyPlan?.product as RNIap.SubscriptionAndroid | undefined)
@@ -373,7 +374,7 @@ export const PricingPlans = ({
               <Heading
                 style={{
                   paddingTop: 15,
-                  fontSize: SIZE.lg
+                  fontSize: AppFontSize.lg
                 }}
               >
                 Special offer for you
@@ -390,7 +391,7 @@ export const PricingPlans = ({
                     alignSelf: "center",
                     textAlign: "center"
                   }}
-                  size={SIZE.xxl}
+                  size={AppFontSize.xxl}
                 >
                   {Platform.OS === "android"
                     ? (product.data as RNIap.SubscriptionAndroid)
@@ -411,7 +412,7 @@ export const PricingPlans = ({
                       alignSelf: "center",
                       textAlign: "center"
                     }}
-                    size={SIZE.md}
+                    size={AppFontSize.md}
                   >
                     then {getStandardPrice()} {product?.offerType}.
                   </Paragraph>
@@ -557,9 +558,9 @@ export const PricingPlans = ({
                     onPress={() => {
                       eSendEvent(eClosePremiumDialog);
                       eSendEvent(eCloseSheet);
-                      setTimeout(() => {
-                        eSendEvent(eOpenLoginDialog, 1);
-                      }, 400);
+                      Navigation.navigate("Auth", {
+                        mode: AuthMode.login
+                      });
                     }}
                     title={"Sign up for free"}
                     type="accent"
@@ -574,7 +575,7 @@ export const PricingPlans = ({
                   promo &&
                   !promo.promoCode.startsWith("com.streetwriters.notesnook") ? (
                     <Paragraph
-                      size={SIZE.md}
+                      size={AppFontSize.md}
                       textBreakStrategy="balanced"
                       style={{
                         alignSelf: "center",
@@ -629,7 +630,7 @@ export const PricingPlans = ({
       {!user || !upgrade ? (
         <Paragraph
           color={colors.secondary.paragraph}
-          size={SIZE.xs}
+          size={AppFontSize.xs}
           style={{
             alignSelf: "center",
             textAlign: "center",
@@ -640,7 +641,7 @@ export const PricingPlans = ({
           {user
             ? 'On clicking "Try free for 14 days", your free trial will be activated.'
             : "After sign up you will be asked to activate your free trial."}{" "}
-          <Paragraph size={SIZE.xs} style={{ fontWeight: "bold" }}>
+          <Paragraph size={AppFontSize.xs} style={{ fontWeight: "bold" }}>
             No credit card is required.
           </Paragraph>
         </Paragraph>
@@ -651,7 +652,7 @@ export const PricingPlans = ({
           {Platform.OS === "ios" ? (
             <Paragraph
               textBreakStrategy="balanced"
-              size={SIZE.xs}
+              size={AppFontSize.xs}
               color={colors.secondary.paragraph}
               style={{
                 alignSelf: "center",
@@ -665,7 +666,7 @@ export const PricingPlans = ({
             </Paragraph>
           ) : (
             <Paragraph
-              size={SIZE.xs}
+              size={AppFontSize.xs}
               color={colors.secondary.paragraph}
               style={{
                 alignSelf: "center",
@@ -685,7 +686,7 @@ export const PricingPlans = ({
             }}
           >
             <Paragraph
-              size={SIZE.xs}
+              size={AppFontSize.xs}
               color={colors.secondary.paragraph}
               style={{
                 maxWidth: "100%",
@@ -694,7 +695,7 @@ export const PricingPlans = ({
             >
               By subscribing, you agree to our{" "}
               <Paragraph
-                size={SIZE.xs}
+                size={AppFontSize.xs}
                 onPress={() => {
                   openLinkInBrowser("https://notesnook.com/tos")
                     .catch(() => {})
@@ -709,7 +710,7 @@ export const PricingPlans = ({
               </Paragraph>
               and{" "}
               <Paragraph
-                size={SIZE.xs}
+                size={AppFontSize.xs}
                 onPress={() => {
                   openLinkInBrowser("https://notesnook.com/privacy")
                     .catch(() => {})

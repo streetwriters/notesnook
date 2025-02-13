@@ -44,7 +44,7 @@ import SettingsService from "../../services/settings";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useUserStore } from "../../stores/use-user-store";
 import { NotesnookModule } from "../../utils/notesnook-module";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { Toast } from "../toast";
 import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
@@ -313,7 +313,7 @@ const AppLockedScreen = () => {
                     borderRadius: 150,
                     marginBottom: 10
                   }}
-                  fontSize={SIZE.md}
+                  fontSize={AppFontSize.md}
                 />
               </>
             ) : null}

@@ -96,18 +96,18 @@ function getSize() {
   };
 }
 
-export const SIZE = getSize();
+export const AppFontSize = getSize();
 
 export function updateSize() {
   const newSize = getSize();
-  for (const key in SIZE) {
-    SIZE[key] = newSize[key];
+  for (const key in AppFontSize) {
+    AppFontSize[key] = newSize[key];
   }
   ph = normalize(10) * scale.fontScale;
   pv = normalize(10) * scale.fontScale;
 }
 
-export const br = 8; // border radius
+export const defaultBorderRadius = 8; // border radius
 export var ph = normalize(10); // padding horizontal
 export var pv = normalize(10); // padding vertical
 export const opacity = 0.5; // active opacity
