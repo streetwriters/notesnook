@@ -95,7 +95,6 @@ export const SideMenu = React.memo(
           onIndexChange={setIndex}
           swipeEnabled={false}
           animationEnabled={false}
-          lazy={true}
         />
       </SafeAreaView>
     );
@@ -255,6 +254,7 @@ const TabBar = (
               return (
                 <Pressable
                   key={route.key}
+                  testID={`tab-${route.key}`}
                   onPress={() => {
                     props.jumpTo(route.key);
                     switch (route.key) {
@@ -306,6 +306,7 @@ const TabBar = (
               <>
                 <IconButton
                   name="plus"
+                  testID="sidebar-add-button"
                   size={AppFontSize.lg - 2}
                   onPress={() => {
                     if (props.navigationState.index === 1) {
@@ -346,6 +347,7 @@ const TabBar = (
                       ? "sort-ascending"
                       : "sort-descending"
                   }
+                  testID="sidebar-sort-button"
                   color={colors.secondary.icon}
                   onPress={() => {
                     presentSheet({
@@ -367,17 +369,6 @@ const TabBar = (
                   }}
                   size={AppFontSize.lg - 2}
                 />
-
-                {/* <IconButton
-                  name="magnify"
-                  color={colors.secondary.icon}
-                  onPress={() => {}}
-                  style={{
-                    width: 35,
-                    height: 35
-                  }}
-                  size={SIZE.lg - 2}
-                /> */}
               </>
             ) : null}
 
@@ -390,6 +381,7 @@ const TabBar = (
                   width: 28,
                   height: 28
                 }}
+                testID="sidebar-theme-button"
                 color={colors.primary.icon}
                 name={isDark ? "weather-night" : "weather-sunny"}
                 size={AppFontSize.lg - 2}
