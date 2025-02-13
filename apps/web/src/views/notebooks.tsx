@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Notebook as NotebookType, VirtualizedGrouping } from "@notesnook/core";
-import { Box, Flex, Input } from "@theme-ui/components";
+import { Box, Flex, Input, Text } from "@theme-ui/components";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { db } from "../common/db";
 import { store, useStore } from "../stores/notebook-store";
@@ -32,6 +32,7 @@ import {
 } from "../components/virtualized-tree";
 import { ListLoader } from "../components/loaders/list-loader";
 import { debounce } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
 
 export function Notebooks() {
   const roots = useStore((store) => store.notebooks);
@@ -60,22 +61,29 @@ export function Notebooks() {
 
   if (!notebooks)
     return (
-      <Flex sx={{ flexDirection: "column" }}>
+      <Flex id="notebooks" sx={{ flexDirection: "column" }}>
         <ListLoader />
       </Flex>
     );
   if (notebooks.length === 0) {
     return (
-      <Flex variant="columnCenterFill" data-test-id="list-placeholder">
-        <Placeholder context="notebooks" />
+      <Flex id="notebooks" sx={{ mx: 1, flex: 1 }}>
+        <Text
+          variant="body"
+          sx={{ color: "paragraph-secondary" }}
+          data-test-id="list-placeholder"
+        >
+          {strings.notebooksEmpty()}
+        </Text>
       </Flex>
     );
   }
 
   return (
     <>
-      <Box sx={{ mx: 1, flex: 1 }}>
+      <Box id="notebooks" sx={{ mx: 1, flex: 1 }}>
         <VirtualizedTree
+          testId="notebooks-list"
           rootId={"root"}
           itemHeight={26}
           treeRef={treeRef}

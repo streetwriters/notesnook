@@ -99,8 +99,8 @@ test("create shortcut of a tag", async ({ page }) => {
   await tag?.createShortcut();
 
   expect(await tag?.isShortcut()).toBe(true);
-  const allShortcuts = await app.navigation.getShortcuts();
-  expect(allShortcuts.includes("hello-world")).toBeTruthy();
+  await app.goToHome();
+  expect(await app.navigation.findItem("hello-world")).toBeDefined();
 });
 
 test("remove shortcut of a tag", async ({ page }) => {
@@ -204,20 +204,17 @@ test(`sort tags`, async ({ page }, info) => {
     if (!tag) continue;
   }
 
-  for (const groupBy of groupByOptions) {
-    for (const sortBy of sortByOptions) {
-      for (const orderBy of orderByOptions) {
-        await test.step(`group by ${groupBy}, sort by ${sortBy}, order by ${orderBy}`, async () => {
-          const sortResult = await tags?.sort({
-            groupBy,
-            orderBy,
-            sortBy
-          });
-          if (!sortResult) return;
-
-          await expect(tags.items).toHaveCount(titles.length);
+  for (const sortBy of sortByOptions) {
+    for (const orderBy of orderByOptions) {
+      await test.step(`sort by ${sortBy}, order by ${orderBy}`, async () => {
+        const sortResult = await tags?.sort({
+          orderBy,
+          sortBy
         });
-      }
+        if (!sortResult) return;
+
+        await expect(tags.items).toHaveCount(titles.length);
+      });
     }
   }
 });

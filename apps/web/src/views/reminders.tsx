@@ -38,6 +38,7 @@ function Reminders() {
   return (
     <>
       <ListContainer
+        type="reminders"
         group="reminders"
         refresh={refresh}
         items={filteredItems || reminders}

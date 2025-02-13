@@ -63,6 +63,7 @@ function Home() {
   if (!notes) return <ListLoader />;
   return (
     <ListContainer
+      type="home"
       group="home"
       compact={isCompact}
       refresh={refresh}

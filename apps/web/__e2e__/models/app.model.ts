@@ -30,6 +30,7 @@ import { SearchViewModel } from "./search-view-model";
 import { SettingsViewModel } from "./settings-view.model";
 import { ToastsModel } from "./toasts.model";
 import { TrashViewModel } from "./trash-view.model";
+import { ContextMenuModel } from "./context-menu.model";
 
 export class AppModel {
   readonly page: Page;
@@ -38,6 +39,7 @@ export class AppModel {
   readonly auth: AuthModel;
   readonly checkout: CheckoutModel;
   readonly routeHeader: Locator;
+  private readonly profileDropdown: ContextMenuModel;
 
   constructor(page: Page) {
     this.page = page;
@@ -46,56 +48,72 @@ export class AppModel {
     this.auth = new AuthModel(page);
     this.checkout = new CheckoutModel(page);
     this.routeHeader = this.page.locator(getTestId("routeHeader"));
+    this.profileDropdown = new ContextMenuModel(this.page);
   }
 
   async goto(isLoggedIn = false) {
     await this.page.goto("/");
     await this.routeHeader.waitFor({ state: "visible" });
-    if (!isLoggedIn) await this.navigation.waitForItem("Login");
-  }
-
-  goBack() {
-    const goBackButton = this.page.locator(getTestId("route-go-back"));
-    return goBackButton.click();
+    if (!isLoggedIn)
+      await this.page
+        .locator(getTestId("logged-in"))
+        .waitFor({ state: "hidden" });
   }
 
   async goToNotes() {
+    await this.page.locator(getTestId("tab-home")).click();
     await this.navigateTo("Notes");
     return new NotesViewModel(this.page, "home", "home");
   }
 
   async goToNotebooks() {
-    await this.navigateTo("Notebooks");
-    return new NotebooksViewModel(this.page);
+    await this.page.locator(getTestId("tab-notebooks")).click();
+    const model = new NotebooksViewModel(this.page);
+    await model.waitForList();
+    return model;
   }
 
   async goToFavorites() {
+    await this.page.locator(getTestId("tab-home")).click();
     await this.navigateTo("Favorites");
     return new NotesViewModel(this.page, "notes", "favorites");
   }
 
   async goToReminders() {
+    await this.page.locator(getTestId("tab-home")).click();
     await this.navigateTo("Reminders");
     return new RemindersViewModel(this.page);
   }
 
   async goToTags() {
-    await this.navigateTo("Tags");
-    return new ItemsViewModel(this.page);
+    await this.page.locator(getTestId("tab-tags")).click();
+    const model = new ItemsViewModel(this.page);
+    await model.waitForList();
+    return model;
+  }
+
+  async goToHome() {
+    await this.page.locator(getTestId("tab-home")).click();
   }
 
   async goToColor(color: string) {
+    await this.page.locator(getTestId("tab-home")).click();
     await this.navigateTo(color);
     return new NotesViewModel(this.page, "notes", "notes");
   }
 
   async goToTrash() {
+    await this.page.locator(getTestId("tab-home")).click();
     await this.navigateTo("Trash");
     return new TrashViewModel(this.page);
   }
 
   async goToSettings() {
-    await this.navigateTo("Settings");
+    await this.profileDropdown.open(
+      this.page.locator(getTestId("profile-dropdown")),
+      "left"
+    );
+    await this.profileDropdown.clickOnItem("settings");
     return new SettingsViewModel(this.page);
   }
 
@@ -111,7 +129,7 @@ export class AppModel {
   async getRouteHeader() {
     if (!(await this.routeHeader.isVisible())) return;
 
-    return await this.routeHeader.innerText();
+    return await this.routeHeader.getAttribute("data-header");
   }
 
   async isSynced() {

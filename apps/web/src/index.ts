@@ -44,7 +44,7 @@ if (theme) {
   if (stylesheet) stylesheet.innerHTML = css;
 } else stylesheet?.remove();
 
-const locale = !import.meta.env.DEV
+const locale = import.meta.env.DEV
   ? import("@notesnook/intl/locales/$pseudo-LOCALE.json")
   : import("@notesnook/intl/locales/$en.json");
 locale.then(({ default: locale }) => {

@@ -89,7 +89,6 @@ export class EditorModel {
   }
 
   async waitForUnloading() {
-    await this.page.waitForURL(/#\/notes\/?.+\/create/gm);
     await this.searchButton.isDisabled();
     await this.page
       .locator(".active")
@@ -101,7 +100,6 @@ export class EditorModel {
   }
 
   async waitForSaving() {
-    await this.page.waitForURL(/#\/notes\/?.+\/edit/gm);
     await this.page.locator(".active").locator(getTestId("tags")).waitFor();
     await this.searchButton.waitFor();
     await this.wordCountText.waitFor();

@@ -38,10 +38,7 @@ export class NotesViewModel extends BaseViewModel {
     listType: string
   ) {
     super(page, pageId, listType);
-    this.createButton = page.locator(
-      // TODO:
-      getTestId(`notes-action-button`)
-    );
+    this.createButton = page.locator(getTestId(`create-new-note`));
     this.editor = new EditorModel(page);
   }
 

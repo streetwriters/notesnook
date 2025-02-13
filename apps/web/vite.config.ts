@@ -152,7 +152,7 @@ export default defineConfig({
             mode: "production",
             workbox: { mode: "production" },
             injectManifest: {
-              globPatterns: ["**/*.{js,css,html,wasm}", "**/open-sans-*.woff2"],
+              globPatterns: ["**/*.{js,css,html,wasm}", "**/Inter-*.woff2"],
               globIgnores: [
                 "**/node_modules/**/*",
                 "**/code-lang-*.js",

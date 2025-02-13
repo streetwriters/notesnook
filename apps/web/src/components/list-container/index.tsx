@@ -63,6 +63,7 @@ export const CustomScrollbarsVirtualList = forwardRef<
 });
 
 type ListContainerProps = {
+  type: GroupingKey;
   group?: GroupingKey;
   items: VirtualizedGrouping<Item>;
   compact?: boolean;
@@ -77,7 +78,8 @@ type ListContainerProps = {
   };
 } & SxProp;
 function ListContainer(props: ListContainerProps) {
-  const { group, items, context, refresh, header, button, compact, sx } = props;
+  const { type, group, items, context, refresh, header, button, compact, sx } =
+    props;
 
   const [focusedGroupIndex, setFocusedGroupIndex] = useState(-1);
 
@@ -201,7 +203,7 @@ function ListContainer(props: ListContainerProps) {
           <Flex
             ref={listContainerRef}
             variant="columnFill"
-            data-test-id={`${group}-list`}
+            data-test-id={`${type}-list`}
           >
             <Virtuoso
               ref={listRef}

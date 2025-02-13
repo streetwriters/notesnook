@@ -134,14 +134,14 @@ abstract class BaseProperties {
 
 export class NotePropertiesModel extends BaseProperties {
   private readonly propertiesButton: Locator;
-  private readonly propertiesCloseButton: Locator;
+  private readonly generalSection: Locator;
   private readonly readonlyToggle: ToggleModel;
   private readonly sessionItems: Locator;
 
   constructor(page: Page, noteLocator: Locator) {
     super(page, noteLocator, "properties");
     this.propertiesButton = page.locator(getTestId("Properties"));
-    this.propertiesCloseButton = page.locator(getTestId("properties-close"));
+    this.generalSection = page.locator(getTestId("general-section"));
     this.readonlyToggle = new ToggleModel(page, `properties-readonly`);
     this.sessionItems = page.locator(getTestId("session-item"));
   }
@@ -183,12 +183,11 @@ export class NotePropertiesModel extends BaseProperties {
 
   async open() {
     await this.propertiesButton.click();
-    await this.propertiesCloseButton.waitFor();
-    await this.page.waitForTimeout(1000);
+    await this.generalSection.waitFor();
   }
 
   async close() {
-    await this.propertiesCloseButton.click();
+    await this.propertiesButton.click();
   }
 
   async getSessionHistory() {

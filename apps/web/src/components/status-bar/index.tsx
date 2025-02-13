@@ -79,6 +79,7 @@ function StatusBar() {
                   size={7}
                   color={"var(--icon-success)"}
                   sx={{ p: "small" }}
+                  data-test-id="logged-in"
                 />
               ) : (
                 <Button
@@ -91,7 +92,11 @@ function StatusBar() {
                     height: "100%"
                   }}
                 >
-                  <Circle size={7} color={"var(--icon-error)"} />
+                  <Circle
+                    size={7}
+                    color={"var(--icon-error)"}
+                    data-test-id="logged-in"
+                  />
                   <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
                     {strings.emailNotConfirmed()}
                   </Text>

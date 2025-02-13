@@ -169,7 +169,10 @@ function EditorProperties(props: EditorPropertiesProps) {
             />
             <Text variant="subtitle">{strings.properties()}</Text>
           </Flex> */}
-          <Flex sx={{ flexDirection: "column", gap: 1 }}>
+          <Flex
+            data-test-id="general-section"
+            sx={{ flexDirection: "column", gap: 1 }}
+          >
             <Section title="Properties">
               <Flex sx={{ flexDirection: "column", gap: 1, px: 2, pt: 1 }}>
                 {session.type === "deleted" ? null : (

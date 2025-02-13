@@ -40,6 +40,7 @@ function Trash() {
   if (!items) return <ListLoader />;
   return (
     <ListContainer
+      type="trash"
       group="trash"
       refresh={refresh}
       placeholder={<Placeholder context="trash" />}
