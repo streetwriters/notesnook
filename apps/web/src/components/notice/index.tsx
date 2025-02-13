@@ -39,36 +39,24 @@ function Notice() {
     <Flex
       sx={{
         cursor: "pointer",
-        borderRadius: "default",
+        borderRadius: "large",
         ":hover": { bg: "hover" },
-        alignItems: "center"
-        // minWidth: 250
+        alignItems: "center",
+        bg: "background-secondary",
+        border: "1px solid var(--border)",
+        mx: 1,
+        mb: 1,
+        p: 1,
+        gap: 1
       }}
-      p={1}
       onClick={() => NoticeData.action()}
-      mx={1}
     >
-      <Flex sx={{ flex: 1, alignItems: "center" }}>
-        <NoticeData.icon
-          size={18}
-          color="accent"
-          sx={{ bg: "shade", mr: 2, p: 2, borderRadius: 80 }}
-        />
+      <Flex sx={{ flex: 1, alignItems: "center", gap: 2 }}>
+        <NoticeData.icon size={20} color="accent" sx={{ ml: 1 }} />
         <Flex
           variant="columnCenter"
           sx={{ alignItems: "flex-start", overflow: "hidden" }}
         >
-          <Text
-            variant="body"
-            sx={{
-              fontSize: "body",
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis"
-            }}
-          >
-            {NoticeData.title}
-          </Text>
           <Text
             variant="subBody"
             sx={{
@@ -79,6 +67,17 @@ function Notice() {
             }}
           >
             {NoticeData.subtitle}
+          </Text>
+          <Text
+            variant="body"
+            sx={{
+              color: "heading-secondary",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis"
+            }}
+          >
+            {NoticeData.title}
           </Text>
         </Flex>
       </Flex>
@@ -97,12 +96,11 @@ function Notice() {
           sx={{
             borderRadius: 50,
             p: 1,
-            mr: 1,
             bg: "transparent"
           }}
-          variant="accentSecondary"
+          variant="secondary"
         >
-          <Dismiss size={20} color="accent" />
+          <Dismiss size={20} color="icon" />
         </Button>
       )}
     </Flex>

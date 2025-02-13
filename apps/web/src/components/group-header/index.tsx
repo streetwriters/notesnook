@@ -309,21 +309,20 @@ function GroupHeader(props: GroupHeaderProps) {
           }
         });
       }}
-      mx={1}
-      my={1}
-      py={1}
-      pl={1}
-      pr={0}
-      bg="var(--background-secondary)"
+      // mx={1}
+      // my={1}
+      // py={1}
+      // pl={1}
+      // pr={0}
       sx={{
-        borderRadius: "default",
         cursor: "pointer",
-        border: isMenuTarget ? "1px solid" : "none",
-        borderColor: isMenuTarget ? "accent" : "transparent",
+        px: 1,
+        py: 1,
+        borderBottom: "1px solid var(--border)",
+        // border: isMenuTarget ? "1px solid" : "none",
+        // borderColor: isMenuTarget ? "accent" : "transparent",
         ":focus": {
-          border: "1px solid",
-          borderColor: "accent",
-          outline: "none"
+          borderColor: "accent"
         },
         alignItems: "center",
         justifyContent: "space-between"
@@ -335,15 +334,16 @@ function GroupHeader(props: GroupHeaderProps) {
         data-test-id="title"
         variant="subtitle"
         sx={{
-          fontSize: "body",
+          fontSize: "subBody",
+          fontWeight: "medium",
           color: title === "Conflicted" ? "error" : "accent"
         }}
       >
-        {title}
+        {title.toUpperCase()}
       </Text>
 
       {index === 0 && (
-        <Flex mr={1}>
+        <Flex>
           {groupingKey && (
             <IconButton
               testId={`${groupingKey}-sort-button`}
