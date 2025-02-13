@@ -46,6 +46,7 @@ import { strings } from "@notesnook/intl";
 import { ABYTES, streamablefs } from "../interfaces/fs";
 import { type ZipEntry } from "../utils/streams/unzip-stream";
 import { ZipFile } from "../utils/streams/zip-stream";
+import { ConfirmDialog, showLogoutConfirmation } from "../dialogs/confirm";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
@@ -420,4 +421,34 @@ async function restore(
       `${strings.backupFailed()}: ${(e as Error).message || e}`
     );
   }
+}
+
+export async function logout() {
+  const result = await showLogoutConfirmation();
+  if (!result) return;
+
+  if (result.backup) {
+    try {
+      await createBackup({ mode: "partial" });
+    } catch (e) {
+      logger.error(e, "Failed to take backup before logout");
+      if (
+        !(await ConfirmDialog.show({
+          title: strings.failedToTakeBackup(),
+          message: strings.failedToTakeBackupMessage(),
+          negativeButtonText: strings.no(),
+          positiveButtonText: strings.yes()
+        }))
+      )
+        return;
+    }
+  }
+
+  await TaskManager.startTask({
+    type: "modal",
+    title: strings.loggingOut(),
+    subtitle: strings.pleaseWait(),
+    action: () => db.user.logout(true)
+  });
+  showToast("success", strings.loggedOut());
 }

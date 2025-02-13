@@ -146,7 +146,7 @@ function Field(props: FieldProps) {
           </Flex>
         )}
 
-        {rightActions.length > 0 ? (
+        {leftActions.length > 0 ? (
           <Flex
             sx={{
               position: "absolute",
@@ -189,6 +189,7 @@ function Field(props: FieldProps) {
         ) : null}
         {rightActions.length > 0 ? (
           <Flex
+            className="rightActions"
             sx={{
               position: "absolute",
               top: 0,
@@ -222,7 +223,7 @@ function Field(props: FieldProps) {
                 {action.component ? (
                   action.component
                 ) : action.icon ? (
-                  <action.icon size={20} />
+                  <action.icon size={16} />
                 ) : null}
               </Button>
             ))}

@@ -98,7 +98,7 @@ export const useToolbarStore = create<ToolbarState>((set, get) => ({
     }),
   fontFamily: "sans-serif",
   setFontFamily: (fontFamily) => set({ fontFamily }),
-  fontSize: 16,
+  fontSize: 14,
   setFontSize: (fontSize) => set({ fontSize })
 }));
 
