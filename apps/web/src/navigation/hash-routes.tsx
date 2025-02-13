@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { hashNavigate } from ".";
-import { defineRoutes } from "./types";
+import { defineHashRoutes } from "./types";
 import { useEditorStore } from "../stores/editor-store";
 import {
   AddNotebookDialog,
@@ -35,7 +35,7 @@ import { FeatureDialog } from "../dialogs/feature-dialog";
 import { CreateTagDialog } from "../dialogs/item-dialog";
 import { OnboardingDialog } from "../dialogs/onboarding-dialog";
 
-const hashroutes = defineRoutes({
+const hashroutes = defineHashRoutes({
   "/": () => {},
   "/email/verify": () => {
     EmailVerificationDialog.show({}).then(afterAction);
@@ -54,12 +54,6 @@ const hashroutes = defineRoutes({
   },
   "/tags/create": () => {
     CreateTagDialog.show().then(afterAction);
-  },
-  "/notes/:noteId/create": ({ noteId }) => {
-    useEditorStore.getState().openSession(noteId);
-  },
-  "/notes/:noteId/edit": ({ noteId }) => {
-    useEditorStore.getState().openSession(noteId);
   },
   "/buy": () => {
     BuyDialog.show({}).then(afterAction);

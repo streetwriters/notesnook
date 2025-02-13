@@ -19,22 +19,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { createButtonVariant } from "@notesnook/theme";
 import { Button, Flex, FlexProps } from "@theme-ui/components";
-import { PropsWithChildren } from "react";
 import { Icon } from "../icons";
 
 type TabItemProps = {
-  icon?: Icon;
+  icon: Icon;
   title?: string;
   selected?: boolean;
   onClick?: () => void;
 };
 
-export function TabItem(props: PropsWithChildren<TabItemProps & FlexProps>) {
+export function TabItem(props: TabItemProps & FlexProps) {
   const {
     icon: Icon,
     color,
     title,
-    children,
     selected,
     onClick,
     sx,
@@ -55,13 +53,9 @@ export function TabItem(props: PropsWithChildren<TabItemProps & FlexProps>) {
           }
         ),
         borderRadius: "default",
-        mx: 1,
         p: 0,
-        mt: "3px",
         alignItems: "center",
         position: "relative",
-        ":first-of-type": { mt: 1 },
-        ":last-of-type": { mb: 1 },
         ":focus": { bg: selected ? "hover-selected" : "hover" },
         ...sx
       }}
@@ -69,7 +63,7 @@ export function TabItem(props: PropsWithChildren<TabItemProps & FlexProps>) {
       <Button
         data-test-id={`tab-item`}
         sx={{
-          px: 2,
+          p: 1,
           flex: 1,
           alignItems: "center",
           justifyContent: "flex-start",
@@ -80,12 +74,10 @@ export function TabItem(props: PropsWithChildren<TabItemProps & FlexProps>) {
           if (onClick) onClick();
         }}
       >
-        {Icon ? (
-          <Icon
-            size={20}
-            color={color || (selected ? "icon-selected" : "icon")}
-          />
-        ) : null}
+        <Icon
+          size={16}
+          color={color || (selected ? "icon-selected" : "icon")}
+        />
       </Button>
     </Flex>
   );

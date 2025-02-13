@@ -135,7 +135,7 @@ class AttachmentStore extends BaseStore<AttachmentStore> {
       if (await db.attachments.remove(attachment.hash, false)) {
         await this.get().refresh();
         await useNoteStore.getState().refresh();
-        useEditorStore.getState().closeSessions(...linkedNotes);
+        useEditorStore.getState().closeNotes(...linkedNotes);
       }
     } catch (e) {
       console.error(e);

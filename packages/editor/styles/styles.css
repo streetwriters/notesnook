@@ -12,11 +12,12 @@
 }
 
 .ProseMirror span.math-inline {
-  font-family: KaTeX_Main, Times New Roman, serif; 
+  font-family: KaTeX_Main, Times New Roman, serif;
 }
 
 .ProseMirror {
   font-family: inherit;
+  line-height: 20px;
 }
 
 .ProseMirror p.is-editor-empty::before {
@@ -677,7 +678,7 @@ p > *::selection {
     height: 21px;
     width: 21px;
   }
-  
+
   .ProseMirror ul.simple-checklist > li > div {
     margin-top: 2px;
   }

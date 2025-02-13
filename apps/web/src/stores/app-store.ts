@@ -62,6 +62,8 @@ let pendingSync: SyncOptions | undefined = undefined;
 
 class AppStore extends BaseStore<AppStore> {
   isFocusMode = false;
+  isListPaneVisible = true;
+  isNavPaneCollapsed = false;
   isVaultCreated = false;
   isAutoSyncEnabled = Config.get("autoSyncEnabled", true);
   isSyncEnabled = Config.get("syncEnabled", true);
@@ -71,7 +73,9 @@ class AppStore extends BaseStore<AppStore> {
     progress: null,
     type: undefined
   };
-  colors: (Color & { count: number })[] = [];
+  colors: Color[] = [];
+  hiddenColors: string[] = Config.get("sidebarHiddenItems:colors", []);
+  hiddenRoutes: string[] = Config.get("sidebarHiddenItems:routes", []);
   notices: Notice[] = [];
   shortcuts: (Notebook | Tag)[] = [];
   lastSynced = 0;
@@ -81,6 +85,10 @@ class AppStore extends BaseStore<AppStore> {
     // this needs to happen here so reminders can be set on app load.
     reminderStore.refresh();
     announcementStore.refresh();
+    this.set({
+      hiddenColors: db.settings.getSideBarHiddenItems("colors"),
+      hiddenRoutes: db.settings.getSideBarHiddenItems("routes")
+    });
     this.get().sync({ type: "full" });
 
     EV.subscribe(EVENTS.appRefreshRequested, () => this.refresh());
@@ -141,6 +149,25 @@ class AppStore extends BaseStore<AppStore> {
     });
   };
 
+  setHiddenColors = (ids: string[]) => {
+    Config.set("sidebarHiddenItems:colors", ids);
+    db.settings.setSideBarHiddenItems("colors", ids);
+    this.set({ hiddenColors: ids });
+  };
+
+  setHiddenRoutes = (ids: string[]) => {
+    Config.set("sidebarHiddenItems:routes", ids);
+    db.settings.setSideBarHiddenItems("routes", ids);
+    this.set({ hiddenRoutes: ids });
+  };
+
+  toggleListPane = (booleanState?: boolean) => {
+    this.set(
+      (state) =>
+        (state.isListPaneVisible = booleanState ?? !state.isListPaneVisible)
+    );
+  };
+
   refresh = async () => {
     logger.measure("refreshing app");
 
@@ -163,16 +190,9 @@ class AppStore extends BaseStore<AppStore> {
   refreshNavItems = async () => {
     const shortcuts = await db.shortcuts.resolved();
     const colors = await db.colors.all.items();
-
-    let newColors: (Color & { count: number })[] = [];
-    for (const color of colors) {
-      const count = await db.colors.count(color.id);
-      newColors.push({ ...color, count: count ?? 0 });
-    }
-
     this.set((state) => {
       state.shortcuts = shortcuts;
-      state.colors = newColors;
+      state.colors = colors;
     });
   };
 

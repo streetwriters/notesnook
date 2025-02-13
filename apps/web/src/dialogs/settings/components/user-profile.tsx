@@ -70,23 +70,25 @@ export function UserProfile({ minimal }: Props) {
           borderRadius: "default",
           alignItems: "center",
           bg: "var(--background-secondary)",
-          p: 2,
-          mb: minimal ? 0 : 4
+          p: 1,
+          mb: minimal ? 0 : 4,
+          gap: 1
         }}
       >
         <Flex
           variant="columnCenter"
           sx={{
             bg: "shade",
-            mr: 2,
-            size: 60,
+            size: minimal ? 30 : 40,
             borderRadius: 80
           }}
         >
-          <User size={30} />
+          <User size={minimal ? 15 : 20} />
         </Flex>
         <Flex sx={{ flexDirection: "column" }}>
-          <Text variant={"title"}>{strings.loginMessage()}</Text>
+          <Text variant={minimal ? "body" : "subtitle"}>
+            {strings.loginMessage()}
+          </Text>
           <Text variant={"subBody"}>{strings.loginMessageActionText()}</Text>
         </Flex>
       </Flex>
@@ -99,7 +101,7 @@ export function UserProfile({ minimal }: Props) {
         alignItems: "center",
         justifyContent: "space-between",
         bg: "var(--background-secondary)",
-        p: 2,
+        p: 1,
         mb: minimal ? 0 : 4
       }}
     >
@@ -109,7 +111,7 @@ export function UserProfile({ minimal }: Props) {
           sx={{
             bg: "shade",
             mr: 2,
-            size: 60,
+            size: minimal ? 40 : 50,
             borderRadius: 80,
             overflow: "hidden",
             position: "relative",
@@ -124,7 +126,7 @@ export function UserProfile({ minimal }: Props) {
               src={profile.profilePicture}
             />
           ) : (
-            <User size={30} />
+            <User size={minimal ? 20 : 24} />
           )}
           <Flex
             id="profile-picture-edit"
@@ -146,7 +148,7 @@ export function UserProfile({ minimal }: Props) {
               await EditProfilePictureDialog.show({ profile });
             }}
           >
-            <Text variant="body" sx={{ color: "white" }}>
+            <Text variant="subBody" sx={{ color: "white" }}>
               {strings.edit()}
             </Text>
           </Flex>
@@ -167,7 +169,7 @@ export function UserProfile({ minimal }: Props) {
               : "BASIC"}
           </Text>
 
-          <Text variant={"title"}>
+          <Text variant={minimal ? "body" : "subtitle"}>
             {profile?.fullName || strings.yourFullName()}{" "}
             {minimal ? null : (
               <Edit

@@ -55,5 +55,5 @@ body.react-split--disabled {
 }
 
 .split-sash-content.split-sash-content-active {
-  background-color: var(--accent);
+  background-color: transparent;
 }

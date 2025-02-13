@@ -17,7 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react";
 import { Box, Button, Flex, Image, Text } from "@theme-ui/components";
 import {
   Note,
@@ -40,16 +46,29 @@ import {
   Home,
   Pro,
   Documentation,
-  Logout
+  Logout,
+  Plus,
+  SortBy,
+  Reset,
+  Rename,
+  ColorRemove,
+  ExpandSidebar,
+  HamburgerMenu
 } from "../icons";
-import NavigationItem, { SortableNavigationItem } from "./navigation-item";
+import { SortableNavigationItem } from "./navigation-item";
 import { hardNavigate, hashNavigate, navigate } from "../../navigation";
 import { db } from "../../common/db";
-import useMobile from "../../hooks/use-mobile";
+import { isMobile } from "../../hooks/use-mobile";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { useStore as useSettingStore } from "../../stores/setting-store";
+import { useStore as useNoteStore } from "../../stores/note-store";
+import { useStore as useReminderStore } from "../../stores/reminder-store";
+import { useStore as useMonographStore } from "../../stores/monograph-store";
+import { useStore as useTrashStore } from "../../stores/trash-store";
+import { useStore as useNotebookStore } from "../../stores/notebook-store";
+import { useStore as useTagStore } from "../../stores/tag-store";
 import useLocation from "../../hooks/use-location";
 import { FlexScrollContainer } from "../scroll-container";
 import { ScopedThemeProvider } from "../theme-provider";
@@ -71,36 +90,35 @@ import {
 } from "@dnd-kit/sortable";
 import { usePersistentState } from "../../hooks/use-persistent-state";
 import { MenuItem } from "@notesnook/ui";
-import { Notebook, Tag } from "@notesnook/core";
+import { Color, Notebook, Tag } from "@notesnook/core";
 import { handleDrop } from "../../common/drop-handler";
 import { Menu } from "../../hooks/use-menu";
 import { RenameColorDialog } from "../../dialogs/item-dialog";
 import { strings } from "@notesnook/intl";
 import Tags from "../../views/tags";
-import NotebookTree from "./notebook-tree";
+import { Notebooks } from "../../views/notebooks";
 import { UserProfile } from "../../dialogs/settings/components/user-profile";
 import { SUBSCRIPTION_STATUS } from "../../common/constants";
 import { ConfirmDialog, showLogoutConfirmation } from "../../dialogs/confirm";
-import { CREATE_BUTTON_MAP, createBackup } from "../../common";
+import { CREATE_BUTTON_MAP, createBackup, logout } from "../../common";
 import { TaskManager } from "../../common/task-manager";
 import { showToast } from "../../utils/toast";
-import { useStore } from "../../stores/note-store";
 import { TabItem } from "./tab-item";
+import Notice from "../notice";
+import { usePromise } from "@notesnook/common";
+import { showSortMenu } from "../group-header";
+import { Freeze } from "react-freeze";
+import { logger } from "../../utils/logger";
 
 type Route = {
-  id: string;
+  id: "notes" | "favorites" | "reminders" | "monographs" | "trash";
   title: string;
   path: string;
   icon: Icon;
   tag?: string;
-  count?: number;
 };
 
-function shouldSelectNavItem(route: string, pin: Notebook | Tag) {
-  return route.endsWith(pin.id);
-}
-
-const routesInit: Route[] = [
+const routes: Route[] = [
   { id: "notes", title: strings.routes.Notes(), path: "/notes", icon: Note },
   {
     id: "favorites",
@@ -127,14 +145,49 @@ const tabs = [
   {
     id: "home",
     icon: Home,
-    title: strings.routes.Home()
+    title: strings.routes.Home(),
+    actions: []
   },
   {
     id: "notebook",
     icon: NotebookIcon,
-    title: strings.routes.Notebooks()
+    title: strings.routes.Notebooks(),
+    actions: [
+      {
+        id: "add",
+        title: CREATE_BUTTON_MAP.notebooks.title,
+        icon: Plus,
+        onClick: CREATE_BUTTON_MAP.notebooks.onClick
+      },
+      {
+        id: "sort-by",
+        title: strings.sortBy(),
+        icon: SortBy,
+        onClick: () =>
+          showSortMenu("notebooks", () => useNotebookStore.getState().refresh())
+      }
+    ]
   },
-  { id: "tag", icon: TagIcon, title: strings.routes.Tags() }
+  {
+    id: "tag",
+    icon: TagIcon,
+    title: strings.routes.Tags(),
+    actions: [
+      {
+        id: "add",
+        title: CREATE_BUTTON_MAP.tags.title,
+        icon: Plus,
+        onClick: CREATE_BUTTON_MAP.tags.onClick
+      },
+      {
+        id: "sort-by",
+        title: strings.sortBy(),
+        icon: SortBy,
+        onClick: () =>
+          showSortMenu("tags", () => useTagStore.getState().refresh())
+      }
+    ]
+  }
 ] as const;
 
 const settings = {
@@ -144,119 +197,24 @@ const settings = {
   icon: Settings
 } as const;
 
-type NavigationMenuProps = {
-  toggleNavigationContainer: (toggleState?: boolean) => void;
-  isTablet: boolean;
-};
-
-function NavigationMenu(props: NavigationMenuProps) {
-  const { toggleNavigationContainer, isTablet } = props;
-  const [routes, setRoutes] = useState(routesInit);
-  const [location] = useLocation();
+function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
   const isFocusMode = useAppStore((store) => store.isFocusMode);
-  const colors = useAppStore((store) => store.colors);
-  const shortcuts = useAppStore((store) => store.shortcuts);
-  const refreshNavItems = useAppStore((store) => store.refreshNavItems);
-  const isMobile = useMobile();
-  const [hiddenRoutes, setHiddenRoutes] = usePersistentState(
-    "sidebarHiddenItems:routes",
-    db.settings.getSideBarHiddenItems("routes")
-  );
-  const [hiddenColors, setHiddenColors] = usePersistentState(
-    "sidebarHiddenItems:colors",
-    db.settings.getSideBarHiddenItems("colors")
-  );
-  const [currentTab, setCurrentTab] = useState<(typeof tabs)[number]["id"]>(
-    tabs.find((tab) => location.includes(tab.id))?.id || "home"
-  );
-  const notes = useStore((store) => store.notes);
+  const [currentTab, setCurrentTab] = useState<(typeof tabs)[number]>(tabs[0]);
+  const isNavPaneCollapsed = useAppStore((store) => store.isNavPaneCollapsed);
+  const [expanded, setExpanded] = useState(false);
+  const isCollapsed = isNavPaneCollapsed && !expanded;
+  const mouseHoverTimeout = useRef(0);
 
   useEffect(() => {
-    const setCounts = async () => {
-      const totalNotes = await db.notes.all.count();
-      const totalFavorites = await db.notes.favorites.count();
-      const totalReminders = await db.reminders.all.count();
-      const totalTrash = (await db.trash.all()).length;
-      const totalMonographs = await db.monographs.all.count();
-
-      setRoutes((routes) => {
-        return routes.map((route) => {
-          switch (route.id) {
-            case "notes":
-              return { ...route, count: totalNotes };
-            case "favorites":
-              return { ...route, count: totalFavorites };
-            case "reminders":
-              return { ...route, count: totalReminders };
-            case "trash":
-              return { ...route, count: totalTrash };
-            case "monographs":
-              return { ...route, count: totalMonographs };
-            default:
-              return route;
-          }
-        });
-      });
-    };
-
-    setCounts();
-  }, [notes]);
-
-  const dragTimeout = useRef(0);
-
-  const _navigate = useCallback(
-    (path: string) => {
-      toggleNavigationContainer(true);
-      navigate(path);
-    },
-    [location, toggleNavigationContainer]
-  );
-
-  const getSidebarItems = useCallback(async () => {
-    return [
-      {
-        key: "reset-sidebar",
-        type: "button",
-        title: strings.resetSidebar(),
-        onClick: () => {
-          db.settings
-            .setSideBarHiddenItems("routes", [])
-            .then(() => db.settings.setSideBarHiddenItems("colors", []))
-            .then(() => db.settings.setSideBarOrder("colors", []))
-            .then(() => db.settings.setSideBarOrder("routes", []))
-            .then(() => db.settings.setSideBarOrder("shortcuts", []))
-            .then(() => {
-              setHiddenRoutes([]);
-              setHiddenColors([]);
-            });
-        }
-      },
-      { type: "separator", key: "sep" },
-      ...toMenuItems(
-        orderItems(routes, db.settings.getSideBarOrder("routes")),
-        hiddenRoutes,
-        (ids) =>
-          db.settings
-            .setSideBarHiddenItems("routes", ids)
-            .then(() => setHiddenRoutes(ids))
-      ),
-      { type: "separator", key: "sep", isHidden: colors.length <= 0 },
-      ...toMenuItems(
-        orderItems(colors, db.settings.getSideBarOrder("colors")),
-        hiddenColors,
-        (ids) =>
-          db.settings
-            .setSideBarHiddenItems("colors", ids)
-            .then(() => setHiddenColors(ids))
-      )
-    ] as MenuItem[];
-  }, [colors, hiddenColors, hiddenRoutes]);
+    if (isNavPaneCollapsed) setExpanded(false);
+  }, [isNavPaneCollapsed]);
 
   return (
     <ScopedThemeProvider
       scope="navigationMenu"
+      id="navigation-menu"
       sx={{
-        display: "flex",
+        display: isFocusMode ? "none" : "flex",
         zIndex: 1,
         position: "relative",
         flex: 1,
@@ -264,103 +222,151 @@ function NavigationMenu(props: NavigationMenuProps) {
         height: "100%",
         overflow: "hidden",
         bg: "background",
-        borderRight: "1px solid var(--separator)"
+        borderRight: "1px solid var(--separator)",
+        pt: 1,
+        transition: "width 0.1s ease-in",
+        width: isNavPaneCollapsed ? (expanded ? 250 : 40) : "100%"
+      }}
+      onMouseEnter={() => {
+        clearTimeout(mouseHoverTimeout.current);
+      }}
+      onMouseLeave={() => {
+        clearTimeout(mouseHoverTimeout.current);
+        if (!isNavPaneCollapsed) return;
+        mouseHoverTimeout.current = setTimeout(() => {
+          setExpanded(false);
+        }, 500) as unknown as number;
       }}
     >
+      {isCollapsed ? (
+        <Button
+          variant="secondary"
+          sx={{ p: 1, px: "small", bg: "transparent", mx: 1 }}
+          onClick={() => setExpanded(true)}
+        >
+          <HamburgerMenu size={16} color="icon" />
+        </Button>
+      ) : (
+        <Flex
+          sx={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            mx: 1
+          }}
+        >
+          <Flex
+            sx={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 2
+            }}
+          >
+            <svg
+              style={{
+                width: 25,
+                height: 25
+              }}
+            >
+              <use href="#full-logo" />
+            </svg>
+
+            <Text
+              variant="heading"
+              sx={{
+                fontSize: 18,
+                fontWeight: "medium",
+                display: "block"
+              }}
+            >
+              Notesnook
+            </Text>
+          </Flex>
+          <Flex sx={{ gap: "small", alignItems: "center" }}>
+            {isNavPaneCollapsed ? (
+              <Button
+                variant="secondary"
+                sx={{ p: 1, bg: "transparent" }}
+                onClick={onExpand}
+              >
+                <ExpandSidebar size={13} color="icon" />
+              </Button>
+            ) : null}
+            <NavigationDropdown />
+          </Flex>
+        </Flex>
+      )}
       <Flex
         sx={{
-          flexDirection: isTablet ? "column" : "row",
+          justifyContent: isCollapsed ? "center" : "space-between",
           alignItems: "center",
-          justifyContent: isTablet ? "center" : "space-between"
+          borderTop: "1px solid var(--border)",
+          borderBottom: "1px solid var(--border)",
+          mt: 1,
+          mb: 1,
+          px: 1,
+          py: 1
         }}
       >
         <Flex
           sx={{
-            flexDirection: isTablet ? "column" : "row",
+            flexDirection: isCollapsed ? "column" : "row",
             alignItems: "center",
-            padding: 20,
-            gap: 2
+            gap: "small"
           }}
         >
-          <svg
-            style={{
-              width: isTablet ? 20 : isMobile ? 30 : 30,
-              height: isTablet ? 20 : isMobile ? 30 : 30
-            }}
-          >
-            <use href="#full-logo" />
-          </svg>
-          <Text
-            variant="heading"
-            sx={{
-              fontSize: 16,
-              display: isTablet ? "none" : "block"
-            }}
-          >
-            <b>Notesnook</b>
-          </Text>
+          {tabs.map((tab) => (
+            <TabItem
+              key={tab.id}
+              id={tab.id}
+              title={tab.title}
+              icon={tab.icon}
+              selected={currentTab.id === tab.id}
+              onClick={() => {
+                setExpanded(true);
+                setCurrentTab(tab);
+              }}
+            />
+          ))}
         </Flex>
-        <NavigationDropdown
-          toggleNavigationContainer={toggleNavigationContainer}
-        />
+        {!isCollapsed && currentTab.actions.length > 0 ? (
+          <Flex sx={{ alignItems: "center" }}>
+            {currentTab.actions.map((action) => (
+              <Button
+                key={action.id}
+                variant="secondary"
+                sx={{ p: 1, bg: "transparent" }}
+                onClick={action.onClick}
+                title={action.title}
+              >
+                <action.icon size={13} color="icon" />
+              </Button>
+            ))}
+          </Flex>
+        ) : null}
       </Flex>
-      <Flex
-        sx={{
-          flexDirection: isTablet ? "column" : "row",
-          justifyContent: "center"
-        }}
-      >
-        {tabs.map((tab) => (
-          <TabItem
-            key={tab.id}
-            id={tab.id}
-            title={tab.title}
-            icon={tab.icon}
-            selected={currentTab === tab.id}
-            onClick={() => setCurrentTab(tab.id)}
-          />
-        ))}
-      </Flex>
-      {isTablet && (
-        <Box
-          bg="separator"
-          my={1}
-          sx={{ width: "85%", height: "0.8px", alignSelf: "center" }}
-        />
-      )}
+
       <Flex
         id="navigation-menu"
         data-test-id="navigation-menu"
         sx={{
-          display: isFocusMode ? "none" : "flex",
           flex: 1,
           overflow: "hidden",
           flexDirection: "column",
-          justifyContent: "space-between",
-          paddingLeft: isTablet ? 0 : 20,
-          paddingRight: isTablet ? 0 : 20
+          justifyContent: "space-between"
         }}
-        px={0}
         onContextMenu={async (e) => {
           e.preventDefault();
-          Menu.openMenu(await getSidebarItems());
+          Menu.openMenu(await getSidebarItemsAsMenuItems());
         }}
       >
-        {currentTab === "notebook" ? (
-          <NotebookTree />
-        ) : currentTab === "tag" ? (
-          <Flex
-            sx={{ height: "100vh", gap: 2, my: 1, flexDirection: "column" }}
-          >
-            <Button
-              onClick={CREATE_BUTTON_MAP.tags.onClick}
-              variant="secondary"
-            >
-              {CREATE_BUTTON_MAP.tags.title}
-            </Button>
-            <Tags isSidebar />
-          </Flex>
-        ) : (
+        <Freeze freeze={isCollapsed || currentTab.id !== "notebook"}>
+          <Notebooks />
+        </Freeze>
+        <Freeze freeze={isCollapsed || currentTab.id !== "tag"}>
+          <Tags />
+        </Freeze>
+        <Freeze freeze={currentTab.id !== "home" && !isCollapsed}>
           <FlexScrollContainer
             style={{
               flexDirection: "column",
@@ -372,231 +378,246 @@ function NavigationMenu(props: NavigationMenuProps) {
             thumbStyle={() => ({ width: 3 })}
             suppressScrollX={true}
           >
-            <Flex sx={{ flexDirection: "column" }}>
-              <ReorderableList
-                items={routes.filter((r) => !hiddenRoutes.includes(r.id))}
-                orderKey={`sidebarOrder:routes`}
-                order={() => db.settings.getSideBarOrder("routes")}
-                onOrderChanged={(order) =>
-                  db.settings.setSideBarOrder("routes", order)
-                }
-                renderOverlay={({ item }) => (
-                  <NavigationItem
-                    count={item.count}
-                    id={item.id}
-                    isTablet={isTablet}
-                    title={item.title}
-                    icon={item.icon}
-                    tag={item.tag}
-                    selected={
-                      item.path === "/"
-                        ? location === item.path
-                        : location.startsWith(item.path)
-                    }
-                  />
-                )}
-                renderItem={({ item }) => (
-                  <SortableNavigationItem
-                    key={item.id}
-                    id={item.id}
-                    isTablet={isTablet}
-                    title={item.title}
-                    icon={item.icon}
-                    tag={item.tag}
-                    count={item.count}
-                    onDragEnter={() => {
-                      if (["/notebooks", "/tags"].includes(item.path))
-                        dragTimeout.current = setTimeout(
-                          () => _navigate(item.path),
-                          1000
-                        ) as unknown as number;
-                    }}
-                    onDragLeave={() => clearTimeout(dragTimeout.current)}
-                    onDrop={async (e) => {
-                      clearTimeout(dragTimeout.current);
-
-                      await handleDrop(e.dataTransfer, {
-                        type:
-                          item.path === "/trash"
-                            ? "trash"
-                            : item.path === "/favorites"
-                            ? "favorites"
-                            : item.path === "/notebooks"
-                            ? "notebooks"
-                            : undefined
-                      });
-                    }}
-                    selected={
-                      item.path === "/"
-                        ? location === item.path
-                        : location.startsWith(item.path)
-                    }
-                    onClick={() => {
-                      if (!isMobile && location === item.path)
-                        return toggleNavigationContainer();
-                      _navigate(item.path);
-                    }}
-                    menuItems={[
-                      {
-                        type: "lazy-loader",
-                        key: "sidebar-items-loader",
-                        items: getSidebarItems
-                      }
-                    ]}
-                  />
-                )}
-              />
-
-              <ReorderableList
-                items={colors.filter((c) => !hiddenColors.includes(c.id))}
-                orderKey={`sidebarOrder:colors`}
-                order={() => db.settings.getSideBarOrder("colors")}
-                onOrderChanged={(order) =>
-                  db.settings.setSideBarOrder("colors", order)
-                }
-                renderOverlay={({ item }) => (
-                  <NavigationItem
-                    id={item.id}
-                    isTablet={isTablet}
-                    title={item.title}
-                    icon={Circle}
-                    color={item.colorCode}
-                    count={item.count}
-                    selected={location === `/colors/${item.id}`}
-                  />
-                )}
-                renderItem={({ item: color }) => (
-                  <SortableNavigationItem
-                    id={color.id}
-                    isTablet={isTablet}
-                    key={color.id}
-                    title={color.title}
-                    count={color.count}
-                    icon={Circle}
-                    selected={location === `/colors/${color.id}`}
-                    color={color.colorCode}
-                    onClick={() => {
-                      _navigate(`/colors/${color.id}`);
-                    }}
-                    onDrop={(e) => handleDrop(e.dataTransfer, color)}
-                    menuItems={[
-                      {
-                        type: "button",
-                        key: "rename-color",
-                        title: strings.renameColor(),
-                        onClick: () => RenameColorDialog.show(color)
-                      },
-                      {
-                        type: "button",
-                        key: "remove-color",
-                        title: strings.removeColor(),
-                        onClick: async () => {
-                          await db.colors.remove(color.id);
-                          await refreshNavItems();
-                        }
-                      },
-                      {
-                        type: "separator",
-                        key: "sep"
-                      },
-                      {
-                        type: "lazy-loader",
-                        key: "sidebar-items-loader",
-                        items: getSidebarItems
-                      }
-                    ]}
-                  />
-                )}
-              />
+            <Flex sx={{ flexDirection: "column", px: 1, gap: [1, 1, "small"] }}>
+              <Routes isCollapsed={isCollapsed} />
+              <Colors isCollapsed={isCollapsed} />
               <Box
                 bg="separator"
                 my={1}
-                sx={{ width: "85%", height: "0.8px", alignSelf: "center" }}
+                sx={{ width: "100%", height: "0.8px", alignSelf: "center" }}
               />
-              <ReorderableList
-                items={shortcuts}
-                orderKey={`sidebarOrder:shortcuts`}
-                order={() => db.settings.getSideBarOrder("shortcuts")}
-                onOrderChanged={(order) =>
-                  db.settings.setSideBarOrder("shortcuts", order)
-                }
-                renderOverlay={({ item }) => (
-                  <NavigationItem
-                    id={item.id}
-                    isTablet={isTablet}
-                    key={item.id}
-                    title={item.title}
-                    icon={
-                      item.type === "notebook"
-                        ? Notebook2
-                        : item.type === "tag"
-                        ? Tag2
-                        : Topic
-                    }
-                    isShortcut
-                    selected={shouldSelectNavItem(location, item)}
-                  />
-                )}
-                renderItem={({ item }) => (
-                  <SortableNavigationItem
-                    id={item.id}
-                    isTablet={isTablet}
-                    key={item.id}
-                    title={item.title}
-                    menuItems={[
-                      {
-                        type: "button",
-                        key: "removeshortcut",
-                        title: strings.doActions.remove.shortcut(1),
-                        onClick: async () => {
-                          await db.shortcuts.remove(item.id);
-                          refreshNavItems();
-                        }
-                      }
-                    ]}
-                    icon={
-                      item.type === "notebook"
-                        ? Notebook2
-                        : item.type === "tag"
-                        ? Tag2
-                        : Topic
-                    }
-                    isShortcut
-                    selected={shouldSelectNavItem(location, item)}
-                    onDrop={(e) => handleDrop(e.dataTransfer, item)}
-                    onClick={async () => {
-                      if (item.type === "notebook") {
-                        const root = (
-                          await db.notebooks.breadcrumbs(item.id)
-                        ).at(0);
-                        if (root && root.id !== item.id)
-                          _navigate(`/notebooks/${root.id}/${item.id}`);
-                        else _navigate(`/notebooks/${item.id}`);
-                      } else if (item.type === "tag") {
-                        _navigate(`/tags/${item.id}`);
-                      }
-                    }}
-                  />
-                )}
-              />
+              <Shortcuts isCollapsed={isCollapsed} />
             </Flex>
           </FlexScrollContainer>
-        )}
+        </Freeze>
       </Flex>
+      {currentTab.id === "home" && !isCollapsed ? <Notice /> : null}
     </ScopedThemeProvider>
   );
 }
-export default NavigationMenu;
+export default React.memo(NavigationMenu);
 
-type NavigationDropdownProps = {
-  toggleNavigationContainer: NavigationMenuProps["toggleNavigationContainer"];
-};
+function Routes({ isCollapsed }: { isCollapsed?: boolean }) {
+  const hiddenRoutes = useAppStore((store) => store.hiddenRoutes);
+  return (
+    <ReorderableList
+      items={routes.filter((r) => !hiddenRoutes.includes(r.id))}
+      orderKey={`sidebarOrder:routes`}
+      order={() => db.settings.getSideBarOrder("routes")}
+      onOrderChanged={(order) => db.settings.setSideBarOrder("routes", order)}
+      context={{ isCollapsed }}
+      renderItem={RouteItem}
+    />
+  );
+}
 
-function NavigationDropdown({
-  toggleNavigationContainer
-}: NavigationDropdownProps) {
-  const isMobile = useMobile();
+function RouteItem({
+  item,
+  context
+}: {
+  item: Route;
+  context?: { isCollapsed: boolean };
+}) {
   const [location] = useLocation();
+
+  return (
+    <SortableNavigationItem
+      key={item.id}
+      id={item.id}
+      title={item.title}
+      icon={item.icon}
+      isCollapsed={context?.isCollapsed}
+      onDrop={async (e) => {
+        await handleDrop(e.dataTransfer, {
+          type:
+            item.path === "/trash"
+              ? "trash"
+              : item.path === "/favorites"
+              ? "favorites"
+              : undefined
+        });
+      }}
+      selected={
+        item.path === "/"
+          ? location === item.path
+          : location.startsWith(item.path)
+      }
+      onClick={() => {
+        if (!isMobile() && location === item.path)
+          return useAppStore.getState().toggleListPane();
+        navigateToRoute(item.path);
+      }}
+      menuItems={[
+        {
+          type: "lazy-loader",
+          key: "sidebar-items-loader",
+          items: getSidebarItemsAsMenuItems
+        }
+      ]}
+    >
+      <ItemCount item={item} />
+    </SortableNavigationItem>
+  );
+}
+
+function Colors({ isCollapsed }: { isCollapsed?: boolean }) {
+  const colors = useAppStore((store) => store.colors);
+  const refreshNavItems = useAppStore((store) => store.refreshNavItems);
+  const context = useNoteStore((store) =>
+    store.context?.type === "color" ? store.context : null
+  );
+  const hiddenColors = useAppStore((store) => store.hiddenColors);
+
+  return (
+    <ReorderableList
+      items={colors.filter((c) => !hiddenColors.includes(c.id))}
+      orderKey={`sidebarOrder:colors`}
+      order={() => db.settings.getSideBarOrder("colors")}
+      onOrderChanged={(order) => db.settings.setSideBarOrder("colors", order)}
+      renderItem={({ item: color }) => (
+        <SortableNavigationItem
+          id={color.id}
+          key={color.id}
+          title={color.title}
+          isCollapsed={isCollapsed}
+          icon={Circle}
+          selected={context?.id === color.id}
+          color={color.colorCode}
+          onClick={() => {
+            navigateToRoute(`/colors/${color.id}`);
+          }}
+          onDrop={(e) => handleDrop(e.dataTransfer, color)}
+          menuItems={[
+            {
+              type: "button",
+              key: "rename-color",
+              title: strings.renameColor(),
+              onClick: () => RenameColorDialog.show(color),
+              icon: Rename.path
+            },
+            {
+              type: "button",
+              key: "remove-color",
+              title: strings.removeColor(),
+              onClick: async () => {
+                await db.colors.remove(color.id);
+                await refreshNavItems();
+              },
+              icon: ColorRemove.path
+            },
+            {
+              type: "separator",
+              key: "sep"
+            },
+            {
+              type: "lazy-loader",
+              key: "sidebar-items-loader",
+              items: getSidebarItemsAsMenuItems
+            }
+          ]}
+        >
+          <ItemCount item={color} />
+        </SortableNavigationItem>
+      )}
+    />
+  );
+}
+
+function Shortcuts({ isCollapsed }: { isCollapsed?: boolean }) {
+  const shortcuts = useAppStore((store) => store.shortcuts);
+  const refreshNavItems = useAppStore((store) => store.refreshNavItems);
+  const context = useNoteStore((store) =>
+    store.context?.type === "tag" || store.context?.type === "notebook"
+      ? store.context
+      : null
+  );
+
+  return (
+    <ReorderableList
+      items={shortcuts}
+      orderKey={`sidebarOrder:shortcuts`}
+      order={() => db.settings.getSideBarOrder("shortcuts")}
+      onOrderChanged={(order) =>
+        db.settings.setSideBarOrder("shortcuts", order)
+      }
+      renderItem={({ item }) => (
+        <SortableNavigationItem
+          id={item.id}
+          key={item.id}
+          title={item.title}
+          isCollapsed={isCollapsed}
+          menuItems={[
+            {
+              type: "button",
+              key: "removeshortcut",
+              title: strings.doActions.remove.shortcut(1),
+              onClick: async () => {
+                await db.shortcuts.remove(item.id);
+                refreshNavItems();
+              }
+            }
+          ]}
+          icon={
+            item.type === "notebook"
+              ? Notebook2
+              : item.type === "tag"
+              ? Tag2
+              : Topic
+          }
+          selected={context?.id === item.id}
+          onDrop={(e) => handleDrop(e.dataTransfer, item)}
+          onClick={async () => {
+            if (item.type === "notebook") {
+              navigateToRoute(`/notebooks/${item.id}`);
+            } else if (item.type === "tag") {
+              navigateToRoute(`/tags/${item.id}`);
+            }
+          }}
+        >
+          <ItemCount item={item} />
+        </SortableNavigationItem>
+      )}
+    />
+  );
+}
+
+function ItemCount({ item }: { item: Route | Color | Notebook | Tag }) {
+  const notes = useNoteStore((store) => store.notes?.length || 0);
+  const reminders = useReminderStore((store) => store.reminders?.length || 0);
+  const trash = useTrashStore((store) => store.trash?.length || 0);
+  const monographs = useMonographStore(
+    (store) => store.monographs?.length || 0
+  );
+  const count = usePromise(() => {
+    if ("type" in item) {
+      if (item.type === "color") return db.colors.count(item.id);
+      else if (item.type === "notebook" || item.type === "tag")
+        return db.relations.from(item, "note").count();
+    } else {
+      switch (item.id) {
+        case "notes":
+          return notes;
+        case "favorites":
+          return db.notes.favorites.count();
+        case "reminders":
+          return reminders;
+        case "trash":
+          return trash;
+        case "monographs":
+          return monographs;
+        default:
+          return 0;
+      }
+    }
+  }, [notes, trash, monographs, reminders]);
+  return (
+    <Text variant="subBody">
+      {count.status === "fulfilled" ? count.value : ""}
+    </Text>
+  );
+}
+
+function NavigationDropdown() {
   const user = useUserStore((store) => store.user);
   const profile = useSettingStore((store) => store.profile);
   const theme = useThemeStore((store) => store.colorScheme);
@@ -639,14 +660,6 @@ function NavigationDropdown({
               },
               {
                 type: "button",
-                title: strings.login(),
-                icon: Login.path,
-                key: "login",
-                isHidden: !notLoggedIn,
-                onClick: () => hardNavigate("/login")
-              },
-              {
-                type: "button",
                 title: strings.toggleDarkLightMode(),
                 key: "toggle-theme-mode",
                 icon: theme === "dark" ? LightMode.path : DarkMode.path,
@@ -668,9 +681,6 @@ function NavigationDropdown({
                 key: settings.id,
                 icon: settings.icon.path,
                 onClick: () => {
-                  if (!isMobile && location === settings.path) {
-                    return toggleNavigationContainer();
-                  }
                   hashNavigate(settings.path);
                 }
               },
@@ -685,39 +695,19 @@ function NavigationDropdown({
               },
               {
                 type: "button",
+                title: strings.login(),
+                icon: Login.path,
+                key: "login",
+                isHidden: !notLoggedIn,
+                onClick: () => hardNavigate("/login")
+              },
+              {
+                type: "button",
                 title: strings.logout(),
                 icon: Logout.path,
                 key: "logout",
                 isHidden: notLoggedIn,
-                onClick: async () => {
-                  const result = await showLogoutConfirmation();
-                  if (!result) return;
-
-                  if (result.backup) {
-                    try {
-                      await createBackup({ mode: "partial" });
-                    } catch (e) {
-                      logger.error(e, "Failed to take backup before logout");
-                      if (
-                        !(await ConfirmDialog.show({
-                          title: strings.failedToTakeBackup(),
-                          message: strings.failedToTakeBackupMessage(),
-                          negativeButtonText: strings.no(),
-                          positiveButtonText: strings.yes()
-                        }))
-                      )
-                        return;
-                    }
-                  }
-
-                  await TaskManager.startTask({
-                    type: "modal",
-                    title: strings.loggingOut(),
-                    subtitle: strings.pleaseWait(),
-                    action: () => db.user.logout(true)
-                  });
-                  showToast("success", strings.loggedOut());
-                }
+                onClick: () => logout()
               }
             ],
             {
@@ -731,20 +721,17 @@ function NavigationDropdown({
         }}
         variant="columnCenter"
         sx={{
-          bg: "shade",
-          mr: 2,
-          size: 35,
+          bg: "background-secondary",
+          size: 30,
           borderRadius: 80,
           cursor: "pointer",
           position: "relative",
-          outline: "1px solid var(--accent)",
-          ":hover": {
-            outline: "2px solid var(--accent)"
-          }
+          border: "1px solid var(--border)",
+          alignItems: "center"
         }}
       >
         {!user || !user.id || !profile?.profilePicture ? (
-          <User size={30} />
+          <User size={16} color="icon" />
         ) : (
           <Image
             sx={{
@@ -764,8 +751,8 @@ function NavigationDropdown({
 type ReorderableListProps<T> = {
   orderKey: string;
   items: T[];
-  renderItem: (props: { item: T }) => JSX.Element;
-  renderOverlay: (props: { item: T }) => JSX.Element;
+  context?: any;
+  renderItem: (props: { item: T; context?: any }) => JSX.Element;
   onOrderChanged: (newOrder: string[]) => void;
   order: () => string[];
 };
@@ -777,8 +764,8 @@ function ReorderableList<T extends { id: string }>(
     orderKey,
     items,
     renderItem: Item,
-    renderOverlay: Overlay,
     onOrderChanged,
+    context,
     order: _order
   } = props;
   const sensors = useSensors(
@@ -839,7 +826,7 @@ function ReorderableList<T extends { id: string }>(
         strategy={verticalListSortingStrategy}
       >
         {orderedItems.map((item) => (
-          <Item key={item.id} item={item} />
+          <Item key={item.id} item={item} context={context} />
         ))}
 
         <DragOverlay
@@ -848,7 +835,7 @@ function ReorderableList<T extends { id: string }>(
             easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)"
           }}
         >
-          {activeItem && <Overlay item={activeItem} />}
+          {activeItem && <Item item={activeItem} context={context} />}
         </DragOverlay>
       </SortableContext>
     </DndContext>
@@ -869,9 +856,11 @@ function orderItems<T extends { id: string }>(items: T[], order: string[]) {
 function toMenuItems<T extends { id: string; title: string }>(
   items: T[],
   hiddenIds: string[],
-  onHiddenIdsUpdated: (ids: string[]) => void
+  onHiddenIdsUpdated: (ids: string[]) => void,
+  extraProps?: (item: T) => Partial<MenuItem>
 ): MenuItem[] {
   return items.map((item) => ({
+    ...extraProps?.(item),
     type: "button",
     key: item.id,
     title: item.title,
@@ -884,4 +873,58 @@ function toMenuItems<T extends { id: string; title: string }>(
       onHiddenIdsUpdated(copy);
     }
   }));
+}
+
+async function getSidebarItemsAsMenuItems(): Promise<MenuItem[]> {
+  const colors = useAppStore.getState().colors;
+  const hiddenColors = useAppStore.getState().hiddenColors;
+  const hiddenRoutes = useAppStore.getState().hiddenRoutes;
+  return [
+    {
+      key: "reset-sidebar",
+      type: "button",
+      title: strings.resetSidebar(),
+      onClick: () => {
+        db.settings
+          .setSideBarHiddenItems("routes", [])
+          .then(() => db.settings.setSideBarHiddenItems("colors", []))
+          .then(() => db.settings.setSideBarOrder("colors", []))
+          .then(() => db.settings.setSideBarOrder("routes", []))
+          .then(() => db.settings.setSideBarOrder("shortcuts", []))
+          .then(() => {
+            useAppStore.getState().setHiddenRoutes([]);
+            useAppStore.getState().setHiddenColors([]);
+          });
+      },
+      icon: Reset.path
+    },
+    { type: "separator", key: "sep" },
+    ...toMenuItems(
+      orderItems(routes, db.settings.getSideBarOrder("routes")),
+      hiddenRoutes,
+      (ids) =>
+        db.settings
+          .setSideBarHiddenItems("routes", ids)
+          .then(() => useAppStore.getState().setHiddenRoutes(ids)),
+      (item) => ({ icon: item.icon.path })
+    ),
+    { type: "separator", key: "sep", isHidden: colors.length <= 0 },
+    ...toMenuItems(
+      orderItems(colors, db.settings.getSideBarOrder("colors")),
+      hiddenColors,
+      (ids) =>
+        db.settings
+          .setSideBarHiddenItems("colors", ids)
+          .then(() => useAppStore.getState().setHiddenColors(ids)),
+      (item) => ({
+        icon: Circle.path,
+        styles: { icon: { color: item.colorCode } }
+      })
+    )
+  ] as MenuItem[];
+}
+
+function navigateToRoute(path: string) {
+  useAppStore.getState().toggleListPane(true);
+  navigate(path);
 }

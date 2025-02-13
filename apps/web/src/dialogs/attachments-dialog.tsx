@@ -457,12 +457,12 @@ const Sidebar = memo(
             backgroundColor: "background"
           }}
         >
-          <Flex sx={{ flexDirection: "column" }}>
+          <Flex sx={{ flexDirection: "column", gap: "small", mx: 2, mt: 2 }}>
             <Input
               id="search"
               name="search"
               placeholder={strings.search()}
-              sx={{ m: 2, mb: 0, width: "auto", bg: "background", py: "7px" }}
+              sx={{ mb: 2, width: "auto", bg: "background", py: "7px" }}
               onChange={(e) => {
                 setRoute(e.target.value ? "none" : "all");
                 if (e.target.value) filter(e.target.value);
@@ -473,13 +473,14 @@ const Sidebar = memo(
                 key={item.id}
                 icon={item.icon}
                 title={item.title}
-                count={counts[item.id]}
                 onClick={() => {
                   onRouteChange(item.id);
                   setRoute(item.id);
                 }}
                 selected={route === item.id}
-              />
+              >
+                <Text variant="subBody">{counts[item.id]}</Text>
+              </NavigationItem>
             ))}
           </Flex>
           <Flex sx={{ flexDirection: "column" }}>

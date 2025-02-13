@@ -61,29 +61,32 @@ export function usePromise<T>(
 ): PromiseResult<T> {
   const [result, setResult] = useState<PromiseResult<T>>({ status: "pending" });
 
-  useEffect(function effect() {
-    if (result.status !== "pending") {
-      setResult((s) => ({
-        ...s,
-        status: "pending"
-      }));
-    }
-
-    const controller = new AbortController();
-    const { signal } = controller;
-
-    async function handlePromise() {
-      const [promiseResult] = await Promise.allSettled([factory(signal)]);
-
-      if (!signal.aborted) {
-        setResult({ ...promiseResult, refresh: effect });
+  useEffect(
+    function effect() {
+      if (result.status !== "pending") {
+        setResult((s) => ({
+          ...s,
+          status: "pending"
+        }));
       }
-    }
 
-    handlePromise();
+      const controller = new AbortController();
+      const { signal } = controller;
 
-    return () => controller.abort();
-  }, deps);
+      async function handlePromise() {
+        const [promiseResult] = await Promise.allSettled([factory(signal)]);
+
+        if (!signal.aborted) {
+          setResult({ ...promiseResult, refresh: effect });
+        }
+      }
+
+      handlePromise();
+
+      return () => controller.abort();
+    },
+    [...deps]
+  );
 
   return result;
 }

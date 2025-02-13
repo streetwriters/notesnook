@@ -71,9 +71,9 @@ function Reminder(props: ReminderProps) {
     <ListItem
       item={item}
       title={reminder.title}
-      body={reminder.description}
+      body={compact ? undefined : reminder.description}
       isDisabled={reminder.disabled}
-      isCompact={compact}
+      isCompact={false}
       onClick={() => EditReminderDialog.show({ reminderId: reminder.id })}
       onKeyPress={async (e) => {
         if (e.key === "Delete") {
@@ -82,11 +82,19 @@ function Reminder(props: ReminderProps) {
           );
         }
       }}
+      sx={
+        compact
+          ? {
+              borderRadius: "default"
+            }
+          : {}
+      }
       footer={
         <Flex
           sx={{
             alignItems: "center",
-            gap: 1
+            gap: 1,
+            mt: 1
           }}
         >
           {reminder.disabled ? null : <PriorityIcon size={14} />}

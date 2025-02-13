@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { strings } from "@notesnook/intl";
-import { createBackup, verifyAccount } from "../../common";
+import { createBackup, logout, verifyAccount } from "../../common";
 import { db } from "../../common/db";
 import { TaskManager } from "../../common/task-manager";
 import { showPasswordDialog } from "../../dialogs/password-dialog";
@@ -141,35 +141,7 @@ export const ProfileSettings: SettingsGroup[] = [
             type: "button",
             variant: "errorSecondary",
             title: strings.logout(),
-            action: async () => {
-              const result = await showLogoutConfirmation();
-              if (!result) return;
-
-              if (result.backup) {
-                try {
-                  await createBackup({ mode: "partial" });
-                } catch (e) {
-                  logger.error(e, "Failed to take backup before logout");
-                  if (
-                    !(await ConfirmDialog.show({
-                      title: strings.failedToTakeBackup(),
-                      message: strings.failedToTakeBackupMessage(),
-                      negativeButtonText: strings.no(),
-                      positiveButtonText: strings.yes()
-                    }))
-                  )
-                    return;
-                }
-              }
-
-              await TaskManager.startTask({
-                type: "modal",
-                title: strings.loggingOut(),
-                subtitle: strings.pleaseWait(),
-                action: () => db.user.logout(true)
-              });
-              showToast("success", strings.loggedOut());
-            }
+            action: () => logout()
           }
         ]
       },

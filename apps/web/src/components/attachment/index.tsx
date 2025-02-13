@@ -130,7 +130,7 @@ export function Attachment({
   return (
     <Box
       as="tr"
-      sx={{ height: 30, ":hover": { bg: "hover" } }}
+      sx={{ height: 25, ":hover": { bg: "hover" } }}
       onContextMenu={(e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -165,7 +165,8 @@ export function Attachment({
       <td>
         <Flex
           sx={{
-            alignItems: "center"
+            alignItems: "center",
+            ml: 2
           }}
         >
           {status ? (

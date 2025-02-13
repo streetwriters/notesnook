@@ -110,6 +110,6 @@ function getFontSize(editor: Editor) {
   const defaultFontSize = useToolbarStore.getState().fontSize;
   const { fontSize } = editor.getAttributes("textStyle");
   return fontSize
-    ? parseInt(fontSize.replace("px", "")) || 16
+    ? parseInt(fontSize.replace("px", "")) || 14
     : defaultFontSize;
 }

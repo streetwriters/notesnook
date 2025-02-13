@@ -86,7 +86,7 @@ export function TitleBar({ isUnderlay = isMac() }: { isUnderlay?: boolean }) {
       scope="titleBar"
       className="titlebar"
       sx={{
-        background: "background",
+        // background: "background",
         height: TITLE_BAR_HEIGHT,
         minHeight: TITLE_BAR_HEIGHT,
         maxHeight: TITLE_BAR_HEIGHT,
@@ -95,7 +95,7 @@ export function TitleBar({ isUnderlay = isMac() }: { isUnderlay?: boolean }) {
         flexShrink: 0,
         width: "100%",
         zIndex: 1,
-        borderBottom: "1px solid var(--border)",
+        //borderBottom: "1px solid var(--border)",
         ...(isUnderlay
           ? {
               position: "absolute",

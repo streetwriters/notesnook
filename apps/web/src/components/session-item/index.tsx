@@ -40,6 +40,7 @@ export function SessionItem(props: SessionItemProps) {
       py={1}
       px={1}
       sx={{
+        borderRadius: "default",
         cursor: "pointer",
         bg: "transparent",
         ":hover": {

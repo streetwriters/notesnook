@@ -56,6 +56,7 @@ type TreeViewProps<T> = {
   bulkSelect?: (ids: string[]) => void;
   deselectAll?: () => void;
   isSelected?: (id: string) => boolean;
+  style?: React.CSSProperties;
 };
 export function VirtualizedTree<T>(props: TreeViewProps<T>) {
   const {
@@ -72,7 +73,8 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
     onSelect,
     deselectAll,
     bulkSelect,
-    testId
+    testId,
+    style
   } = props;
   const [nodes, setNodes] = useState<TreeNode<T>[]>([]);
   const [expandedIds, setExpandedIds] = usePersistentState<ExpandedIds>(
@@ -85,8 +87,7 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
     treeRef,
     () => ({
       async refresh() {
-        // const children = await getChildNodes(rootId, -1);
-        // setNodes(children);
+        setNodes([]);
         const nodes = await fetchChildren(
           rootId,
           -1,
@@ -181,14 +182,15 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
 
   useEffect(() => {
     fetchChildren(rootId, -1, expandedIds, getChildNodes).then(setNodes);
+    console.log("fetching");
   }, [rootId]);
-  console.log(expandedIds);
+
   return (
     <Virtuoso
       data-test-id={testId}
       ref={list}
-      data={nodes}
-      computeItemKey={(i, item) => item.id}
+      totalCount={nodes.length}
+      computeItemKey={(i) => nodes[i].id}
       fixedItemHeight={itemHeight}
       onKeyDown={(e) => onKeyDown(e.nativeEvent)}
       context={{
@@ -199,49 +201,52 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
         Item: VirtuosoItem,
         EmptyPlaceholder: Placeholder
       }}
-      itemContent={(index, node) => (
-        <Node
-          item={node}
-          index={index}
-          expanded={expandedIds[node.id]}
-          collapse={() => {
-            if (!expandedIds[node.id]) return;
+      itemContent={(index) => {
+        const node = nodes[index];
+        return (
+          <Node
+            item={node}
+            index={index}
+            expanded={expandedIds[node.id]}
+            collapse={() => {
+              if (!expandedIds[node.id]) return;
 
-            const expanded = { ...expandedIds, [node.id]: false };
-            setNodes((tree) => {
-              const removeIds: string[] = [];
-              for (const treeNode of tree) {
-                if (
-                  treeNode.parentId === node.id ||
-                  removeIds.includes(treeNode.parentId)
-                ) {
-                  expanded[treeNode.id] = false;
-                  removeIds.push(treeNode.id);
+              const expanded = { ...expandedIds, [node.id]: false };
+              setNodes((tree) => {
+                const removeIds: string[] = [];
+                for (const treeNode of tree) {
+                  if (
+                    treeNode.parentId === node.id ||
+                    removeIds.includes(treeNode.parentId)
+                  ) {
+                    expanded[treeNode.id] = false;
+                    removeIds.push(treeNode.id);
+                  }
                 }
-              }
-              return tree.filter((n) => !removeIds.includes(n.id));
-            });
-            setExpandedIds(expanded);
-          }}
-          expand={async () => {
-            if (expandedIds[node.id]) return;
+                return tree.filter((n) => !removeIds.includes(n.id));
+              });
+              setExpandedIds(expanded);
+            }}
+            expand={async () => {
+              if (expandedIds[node.id]) return;
 
-            setExpandedIds({ ...expandedIds, [node.id]: true });
+              setExpandedIds({ ...expandedIds, [node.id]: true });
 
-            const children = await fetchChildren(
-              node.id,
-              node.depth,
-              expandedIds,
-              getChildNodes
-            );
-            setNodes((tree) => {
-              const copy = tree.slice();
-              copy.splice(index + 1, 0, ...children);
-              return copy;
-            });
-          }}
-        />
-      )}
+              const children = await fetchChildren(
+                node.id,
+                node.depth,
+                expandedIds,
+                getChildNodes
+              );
+              setNodes((tree) => {
+                const copy = tree.slice();
+                copy.splice(index + 1, 0, ...children);
+                return copy;
+              });
+            }}
+          />
+        );
+      }}
     />
   );
 }

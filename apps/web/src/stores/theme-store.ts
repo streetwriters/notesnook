@@ -32,8 +32,8 @@ import { ThemesRouter } from "../common/themes-router";
 type ColorScheme = "dark" | "light";
 class ThemeStore extends BaseStore<ThemeStore> {
   colorScheme: "dark" | "light" = Config.get("colorScheme", "light");
-  darkTheme = getTheme("dark");
-  lightTheme = getTheme("light");
+  darkTheme = ThemeDark; // getTheme("dark");
+  lightTheme = ThemeLight; // getTheme("light");
   followSystemTheme = Config.get("followSystemTheme", false);
 
   init = async () => {
@@ -42,10 +42,11 @@ class ThemeStore extends BaseStore<ThemeStore> {
       colorScheme === "dark" ? darkTheme : lightTheme,
       this.get().followSystemTheme
     );
-    this.set({
-      darkTheme: await updateTheme(darkTheme),
-      lightTheme: await updateTheme(lightTheme)
-    });
+    // this.set({
+    //   darkTheme: await updateTheme(darkTheme),
+    //   lightTheme: await updateTheme(lightTheme)
+    // });
+    console.log(darkTheme, lightTheme);
   };
 
   setTheme = (theme: ThemeDefinition) => {
