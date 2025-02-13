@@ -27,7 +27,7 @@ import { SvgView } from "../../../components/ui/svg";
 import Paragraph from "../../../components/ui/typography/paragraph";
 import { useThemeColors } from "@notesnook/theme";
 import { getElevationStyle } from "../../../utils/elevation";
-import { SIZE } from "../../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import { renderGroup } from "./common";
 import { DraggableItem, useDragState } from "./state";
 import { findToolById, getToolIcon } from "./toolbar-definition";
@@ -185,7 +185,7 @@ export const Tool = ({
             height: 40,
             paddingHorizontal: isSubgroup ? 0 : 12,
             paddingRight: 0,
-            borderRadius: 5,
+            borderRadius: defaultBorderRadius,
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
@@ -205,7 +205,7 @@ export const Tool = ({
             {isSubgroup && (
               <Icon
                 style={{ marginRight: 5 }}
-                size={SIZE.md}
+                size={AppFontSize.md}
                 name="drag"
                 color={colors.primary.icon}
               />
@@ -219,7 +219,7 @@ export const Tool = ({
                   ? colors.secondary.paragraph
                   : colors.primary.paragraph
               }
-              size={isSubgroup ? SIZE.xs : SIZE.sm - 1}
+              size={isSubgroup ? AppFontSize.xs : AppFontSize.sm - 1}
             >
               {isSubgroup ? strings.collapsed() : tool?.title}
             </Paragraph>
@@ -244,7 +244,7 @@ export const Tool = ({
                 }}
                 name={btn.name}
                 color={colors.primary.icon}
-                size={SIZE.lg}
+                size={AppFontSize.lg}
               />
             ))}
           </View>

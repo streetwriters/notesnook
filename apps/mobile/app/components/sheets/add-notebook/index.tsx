@@ -35,7 +35,7 @@ import { useNotebookStore } from "../../../stores/use-notebook-store";
 import { useRelationStore } from "../../../stores/use-relation-store";
 import { eOnNotebookUpdated } from "../../../utils/events";
 import { getParentNotebookId } from "../../../utils/notebooks";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import Input from "../../ui/input";
 import Seperator from "../../ui/seperator";
@@ -118,7 +118,7 @@ export const AddNotebookSheet = ({
         paddingHorizontal: 12
       }}
     >
-      <Heading size={SIZE.lg}>
+      <Heading size={AppFontSize.lg}>
         {notebook ? strings.editNotebook() : strings.newNotebook()}
       </Heading>
 
@@ -160,7 +160,7 @@ export const AddNotebookSheet = ({
         title={notebook ? strings.save() : strings.add()}
         type="accent"
         height={45}
-        fontSize={SIZE.md}
+        fontSize={AppFontSize.md}
         style={{
           paddingHorizontal: 24,
           width: "100%"

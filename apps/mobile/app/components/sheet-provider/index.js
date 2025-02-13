@@ -27,7 +27,7 @@ import {
 } from "../../services/event-manager";
 import { useThemeColors } from "@notesnook/theme";
 import { eCloseSheet, eOpenSheet } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
 import SheetWrapper from "../ui/sheet";
@@ -180,7 +180,7 @@ const SheetProvider = ({ context = "global" }) => {
               type="plain"
               key={v}
               textStyle={{ fontWeight: "normal" }}
-              fontSize={SIZE.sm}
+              fontSize={AppFontSize.sm}
               icon="check"
               width="100%"
               style={{
@@ -223,7 +223,7 @@ const SheetProvider = ({ context = "global" }) => {
                 marginBottom: 10
               }}
               width="100%"
-              fontSize={SIZE.md}
+              fontSize={AppFontSize.md}
             />
           ))}
 
@@ -234,14 +234,14 @@ const SheetProvider = ({ context = "global" }) => {
               marginTop: 10,
               textDecorationLine: "underline"
             }}
-            size={SIZE.xs}
+            size={AppFontSize.xs}
             onPress={data.learnMorePress}
             color={colors.secondary.paragraph}
           >
             <Icon
               color={colors.primary.icon}
               name="information-outline"
-              size={SIZE.xs}
+              size={AppFontSize.xs}
             />{" "}
             {data.learnMore}
           </Paragraph>

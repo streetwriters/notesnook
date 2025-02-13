@@ -21,16 +21,24 @@ import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { Dimensions, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { useMessageStore } from "../../stores/use-message-store";
-import { SIZE } from "../../utils/size";
+import { Message, useMessageStore } from "../../stores/use-message-store";
+import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { Pressable } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
 
-export const Card = ({ color }: { color?: string }) => {
+export const Card = ({
+  color,
+  customMessage
+}: {
+  color?: string;
+  customMessage?: Omit<Message, "data">;
+}) => {
   const { colors } = useThemeColors();
   color = color ? color : colors.primary.accent;
-  const messageBoardState = useMessageStore((state) => state.message);
+  const messageBoardState = useMessageStore(
+    (state) => customMessage || state.message
+  );
   const announcements = useMessageStore((state) => state.announcements);
   const fontScale = Dimensions.get("window").fontScale;
 
@@ -40,7 +48,7 @@ export const Card = ({ color }: { color?: string }) => {
       style={{
         width: "100%",
         paddingHorizontal: DefaultAppStyles.GAP,
-        marginTop: DefaultAppStyles.GAP
+        paddingVertical: DefaultAppStyles.GAP_VERTICAL
       }}
     >
       <Pressable
@@ -51,11 +59,7 @@ export const Card = ({ color }: { color?: string }) => {
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
-          paddingHorizontal: DefaultAppStyles.GAP_SMALL,
-          width: "100%",
-          backgroundColor: colors.secondary.background,
-          borderWidth: 1,
-          borderColor: colors.primary.border
+          width: "100%"
         }}
       >
         <View
@@ -75,7 +79,7 @@ export const Card = ({ color }: { color?: string }) => {
             }}
           >
             <Icon
-              size={SIZE.xxxl}
+              size={AppFontSize.xxxl}
               color={
                 messageBoardState.type === "error" ? colors.error.icon : color
               }
@@ -95,11 +99,15 @@ export const Card = ({ color }: { color?: string }) => {
                 flexWrap: "nowrap",
                 flexShrink: 1
               }}
+              size={AppFontSize.xs}
               color={colors.primary.heading}
             >
               {messageBoardState.actionText}
             </Paragraph>
-            <Paragraph color={colors.secondary.paragraph} size={SIZE.xxs}>
+            <Paragraph
+              color={colors.secondary.paragraph}
+              size={AppFontSize.xxs}
+            >
               {messageBoardState.message}
             </Paragraph>
           </View>
@@ -119,7 +127,7 @@ export const Card = ({ color }: { color?: string }) => {
               color={
                 messageBoardState.type === "error" ? colors.error.icon : color
               }
-              size={SIZE.lg}
+              size={AppFontSize.lg}
             />
           </View>
         )}

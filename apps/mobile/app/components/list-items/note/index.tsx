@@ -32,9 +32,13 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useIsCompactModeEnabled } from "../../../hooks/use-is-compact-mode-enabled";
 import useNavigationStore from "../../../stores/use-navigation-store";
 import { useRelationStore } from "../../../stores/use-relation-store";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 
-import { NotebooksWithDateEdited, TagsWithDateEdited } from "@notesnook/common";
+import {
+  getFormattedDate,
+  NotebooksWithDateEdited,
+  TagsWithDateEdited
+} from "@notesnook/common";
 import { strings } from "@notesnook/intl";
 import { notesnook } from "../../../../e2e/test.ids";
 import useIsSelected from "../../../hooks/use-selected";
@@ -48,6 +52,7 @@ import { ReminderTime } from "../../ui/reminder-time";
 import { TimeSince } from "../../ui/time-since";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import dayjs from "dayjs";
 
 type NoteItemProps = {
   item: Note | BaseTrashItem<Note>;
@@ -97,11 +102,27 @@ const NoteItem = ({
           flexShrink: 1
         }}
       >
+        {compactMode ? null : (
+          <Paragraph
+            style={{
+              fontSize: AppFontSize.xxs,
+              color: colors.secondary.paragraph
+            }}
+          >
+            {getFormattedDate(
+              date,
+              dayjs(date).isBefore(dayjs().subtract(1, "day").hour(23))
+                ? "date"
+                : "time"
+            )}
+          </Paragraph>
+        )}
+
         {compactMode ? (
           <Paragraph
             numberOfLines={1}
             color={color?.colorCode || primaryColors.heading}
-            size={SIZE.sm}
+            size={AppFontSize.sm}
             style={{
               paddingRight: 10
             }}
@@ -112,7 +133,7 @@ const NoteItem = ({
           <Heading
             numberOfLines={1}
             color={color?.colorCode || primaryColors.heading}
-            size={SIZE.sm}
+            size={AppFontSize.sm}
             style={{
               paddingRight: 10
             }}
@@ -142,7 +163,7 @@ const NoteItem = ({
               justifyContent: "flex-start",
               alignItems: "center",
               width: "100%",
-              marginTop: 5,
+              marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL,
               columnGap: 8,
               rowGap: 4,
               flexWrap: "wrap"
@@ -153,7 +174,7 @@ const NoteItem = ({
                 {item.conflicted ? (
                   <Icon
                     name="alert-circle"
-                    size={SIZE.sm}
+                    size={AppFontSize.sm}
                     color={colors.error.accent}
                   />
                 ) : null}
@@ -162,7 +183,7 @@ const NoteItem = ({
                   <Icon
                     testID="sync-off"
                     name="sync-off"
-                    size={SIZE.sm}
+                    size={AppFontSize.sm}
                     color={primaryColors.icon}
                   />
                 ) : null}
@@ -171,19 +192,10 @@ const NoteItem = ({
                   <Icon
                     testID="pencil-lock"
                     name="pencil-lock"
-                    size={SIZE.sm}
+                    size={AppFontSize.sm}
                     color={primaryColors.icon}
                   />
                 ) : null}
-
-                <TimeSince
-                  style={{
-                    fontSize: SIZE.xxs,
-                    color: colors.secondary.paragraph
-                  }}
-                  time={date}
-                  updateFrequency={Date.now() - date < 60000 ? 2000 : 60000}
-                />
 
                 {attachmentsCount > 0 ? (
                   <View
@@ -195,12 +207,12 @@ const NoteItem = ({
                   >
                     <Icon
                       name="attachment"
-                      size={SIZE.sm}
+                      size={AppFontSize.sm}
                       color={primaryColors.icon}
                     />
                     <Paragraph
                       color={colors.secondary.paragraph}
-                      size={SIZE.xxs}
+                      size={AppFontSize.xxs}
                     >
                       {attachmentsCount}
                     </Paragraph>
@@ -211,7 +223,7 @@ const NoteItem = ({
                   <Icon
                     testID="icon-pinned"
                     name="pin-outline"
-                    size={SIZE.xs}
+                    size={AppFontSize.xs}
                     color={color?.colorCode || primaryColors.accent}
                   />
                 ) : null}
@@ -220,7 +232,7 @@ const NoteItem = ({
                   <Icon
                     name="lock"
                     testID="note-locked-icon"
-                    size={SIZE.sm}
+                    size={AppFontSize.sm}
                     color={primaryColors.icon}
                   />
                 ) : null}
@@ -229,7 +241,7 @@ const NoteItem = ({
                   <Icon
                     testID="icon-star"
                     name="star-outline"
-                    size={SIZE.sm}
+                    size={AppFontSize.sm}
                     color="orange"
                   />
                 ) : null}
@@ -240,9 +252,9 @@ const NoteItem = ({
                     disabled
                     color={color?.colorCode}
                     textStyle={{
-                      fontSize: SIZE.xxxs
+                      fontSize: AppFontSize.xxxs
                     }}
-                    iconSize={SIZE.xxxs}
+                    iconSize={AppFontSize.xxxs}
                     style={{
                       height: "auto"
                     }}
@@ -271,11 +283,11 @@ const NoteItem = ({
                     >
                       <AppIcon
                         name="book-outline"
-                        size={SIZE.xxxs}
+                        size={AppFontSize.xxxs}
                         color={colors.secondary.icon}
                       />
                       <Paragraph
-                        size={SIZE.xxxs}
+                        size={AppFontSize.xxxs}
                         color={colors.secondary.paragraph}
                       >
                         {item.title}
@@ -298,7 +310,7 @@ const NoteItem = ({
                           }}
                         >
                           <Paragraph
-                            size={SIZE.xxxs}
+                            size={AppFontSize.xxxs}
                             color={colors.secondary.paragraph}
                           >
                             #{item.title}
@@ -312,7 +324,7 @@ const NoteItem = ({
               <>
                 <Paragraph
                   color={colors.secondary.paragraph}
-                  size={SIZE.xxs}
+                  size={AppFontSize.xxs}
                   style={{
                     marginRight: 6
                   }}
@@ -326,7 +338,7 @@ const NoteItem = ({
 
                 <Paragraph
                   color={primaryColors.accent}
-                  size={SIZE.xxs}
+                  size={AppFontSize.xxs}
                   style={{
                     marginRight: 6
                   }}
@@ -352,7 +364,7 @@ const NoteItem = ({
                 style={{
                   marginRight: 6
                 }}
-                size={SIZE.sm}
+                size={AppFontSize.sm}
                 color={colors.error.accent}
               />
             ) : null}
@@ -361,7 +373,7 @@ const NoteItem = ({
               <Icon
                 name="lock"
                 testID="note-locked-icon"
-                size={SIZE.sm}
+                size={AppFontSize.sm}
                 style={{
                   marginRight: 6
                 }}
@@ -373,7 +385,7 @@ const NoteItem = ({
               <Icon
                 testID="icon-star"
                 name="star-outline"
-                size={SIZE.sm}
+                size={AppFontSize.sm}
                 style={{
                   marginRight: 6
                 }}
@@ -383,7 +395,7 @@ const NoteItem = ({
 
             <TimeSince
               style={{
-                fontSize: SIZE.xxs,
+                fontSize: AppFontSize.xxs,
                 color: colors.secondary.paragraph,
                 marginRight: 6
               }}
@@ -398,7 +410,7 @@ const NoteItem = ({
             <AppIcon
               name={selected ? "checkbox-outline" : "checkbox-blank-outline"}
               color={selected ? colors.selected.icon : colors.primary.icon}
-              size={SIZE.lg}
+              size={AppFontSize.lg}
             />
           </>
         ) : (
@@ -406,7 +418,7 @@ const NoteItem = ({
             testID={notesnook.listitem.menu}
             color={colors.secondary.icon}
             name="dots-horizontal"
-            size={SIZE.lg}
+            size={AppFontSize.lg}
             onPress={() => !noOpen && Properties.present(item)}
             style={{
               justifyContent: "center",

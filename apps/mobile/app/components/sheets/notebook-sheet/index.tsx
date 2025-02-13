@@ -43,7 +43,7 @@ import { useSelectionStore } from "../../../stores/use-selection-store";
 import { eOnNotebookUpdated } from "../../../utils/events";
 import { deleteItems } from "../../../utils/functions";
 import { findRootNotebookId } from "../../../utils/notebooks";
-import { SIZE, normalize } from "../../../utils/size";
+import { AppFontSize, normalize } from "../../../utils/size";
 import { Properties } from "../../properties";
 import { IconButton } from "../../ui/icon-button";
 import { Pressable } from "../../ui/pressable";
@@ -264,7 +264,7 @@ export const NotebookSheet = () => {
               width: normalize(50)
             }}
           >
-            <Icon name="plus" color="white" size={SIZE.xxl} />
+            <Icon name="plus" color="white" size={AppFontSize.xxl} />
           </View>
         </Pressable>
       </View>
@@ -283,7 +283,7 @@ export const NotebookSheet = () => {
             alignItems: "center"
           }}
         >
-          <Paragraph size={SIZE.xs} color={colors.primary.icon}>
+          <Paragraph size={AppFontSize.xs} color={colors.primary.icon}>
             {strings.notebooks()}
           </Paragraph>
           <View
@@ -539,7 +539,7 @@ const NotebookItem = ({
         >
           {nestedNotebooks?.placeholders.length ? (
             <IconButton
-              size={SIZE.lg}
+              size={AppFontSize.lg}
               color={isSelected ? colors.selected.icon : colors.primary.icon}
               onPress={() => {
                 if (!item?.id) return;
@@ -566,7 +566,7 @@ const NotebookItem = ({
 
           {enabled ? (
             <IconButton
-              size={SIZE.lg}
+              size={AppFontSize.lg}
               color={isSelected ? colors.selected.icon : colors.primary.icon}
               top={0}
               left={0}
@@ -589,7 +589,7 @@ const NotebookItem = ({
             color={
               isFocused ? colors.selected.paragraph : colors.secondary.paragraph
             }
-            size={SIZE.sm}
+            size={AppFontSize.sm}
           >
             {item?.title}
           </Paragraph>
@@ -603,7 +603,7 @@ const NotebookItem = ({
           }}
         >
           {item?.id && totalNotes?.(item?.id) ? (
-            <Paragraph size={SIZE.sm} color={colors.secondary.paragraph}>
+            <Paragraph size={AppFontSize.sm} color={colors.secondary.paragraph}>
               {totalNotes(item?.id)}
             </Paragraph>
           ) : null}
@@ -622,7 +622,7 @@ const NotebookItem = ({
             bottom={0}
             top={0}
             color={colors.primary.icon}
-            size={SIZE.xl}
+            size={AppFontSize.xl}
           />
         </View>
       </Pressable>

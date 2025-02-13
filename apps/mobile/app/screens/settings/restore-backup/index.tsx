@@ -46,7 +46,7 @@ import Navigation from "../../../services/navigation";
 import SettingsService from "../../../services/settings";
 import { refreshAllStores } from "../../../stores/create-db-collection-store";
 import { useUserStore } from "../../../stores/use-user-store";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 
 type PasswordOrKey = { password?: string; encryptionKey?: string };
 
@@ -415,7 +415,10 @@ export const RestoreBackup = () => {
                       marginBottom: 10
                     }}
                   >
-                    <Heading color={colors.primary.accent} size={SIZE.xs}>
+                    <Heading
+                      color={colors.primary.accent}
+                      size={AppFontSize.xs}
+                    >
                       {strings.recentBackups()}
                     </Heading>
                   </View>
@@ -433,7 +436,7 @@ export const RestoreBackup = () => {
                     >
                       <ActivityIndicator
                         color={colors.primary.accent}
-                        size={SIZE.lg}
+                        size={AppFontSize.lg}
                       />
                     </View>
                   ) : (
@@ -516,9 +519,9 @@ const BackupItem = ({
       }}
     >
       <View>
-        <Paragraph size={SIZE.sm}>{itemName}</Paragraph>
+        <Paragraph size={AppFontSize.sm}>{itemName}</Paragraph>
         <Paragraph
-          size={SIZE.xs}
+          size={AppFontSize.xs}
           color={colors.secondary.paragraph}
           style={{ width: "100%", maxWidth: "100%" }}
         >

@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import { Text } from "react-native";
 import { useThemeColors } from "@notesnook/theme";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import Paragraph from "../ui/typography/paragraph";
 
 export const Offer = ({
@@ -36,7 +36,7 @@ export const Offer = ({
         textAlign: "center",
         paddingVertical: padding
       }}
-      size={SIZE.xxxl}
+      size={AppFontSize.xxxl}
     >
       GET {off}
       <Text style={{ color: colors.primary.accent }}>%</Text> OFF!{"\n"}

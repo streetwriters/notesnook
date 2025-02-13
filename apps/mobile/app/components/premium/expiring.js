@@ -32,7 +32,7 @@ import {
   eOpenResultDialog,
   eOpenTrialEndingDialog
 } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import BaseDialog from "../dialog/base-dialog";
 import DialogContainer from "../dialog/dialog-container";
@@ -127,7 +127,7 @@ export const Expiring = () => {
                         paddingTop: 0,
                         paddingBottom: 20
                       }}
-                      size={SIZE.md + 2}
+                      size={AppFontSize.md + 2}
                     >
                       Upgrade now to continue using all the pro features after
                       your trial ends
@@ -143,7 +143,7 @@ export const Expiring = () => {
                     await sleep(300);
                     eSendEvent(eOpenPremiumDialog, promo);
                   }}
-                  size={SIZE.xs}
+                  size={AppFontSize.xs}
                   style={{
                     textDecorationLine: "underline",
                     color: colors.secondary.paragraph,
@@ -176,7 +176,7 @@ export const Expiring = () => {
                     promo?.discount > 30 ? null : promo
                   );
                 }}
-                fontSize={SIZE.md + 2}
+                fontSize={AppFontSize.md + 2}
                 style={{
                   marginBottom: status.extend ? 0 : 10,
                   marginTop: 10,
@@ -201,7 +201,7 @@ export const Expiring = () => {
                       button: "Continue"
                     });
                   }}
-                  fontSize={SIZE.xs}
+                  fontSize={AppFontSize.xs}
                   height={30}
                   style={{
                     marginBottom: 10

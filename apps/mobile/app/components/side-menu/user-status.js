@@ -25,14 +25,13 @@ import { ActivityIndicator, Image, Platform, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import useSyncProgress from "../../hooks/use-sync-progress";
-import { eSendEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import Sync from "../../services/sync";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SyncStatus, useUserStore } from "../../stores/use-user-store";
-import { eOpenLoginDialog } from "../../utils/events";
 import { fluidTabsRef } from "../../utils/global-refs";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
+import { AuthMode } from "../auth/common";
 import { IconButton } from "../ui/icon-button";
 import { Pressable } from "../ui/pressable";
 import { TimeSince } from "../ui/time-since";
@@ -97,7 +96,7 @@ export const UserStatus = () => {
           ) : (
             <Icon
               name="cog-outline"
-              size={SIZE.lg - 2}
+              size={AppFontSize.lg - 2}
               color={colors.secondary.icon}
               style={{
                 paddingLeft: 8
@@ -113,7 +112,7 @@ export const UserStatus = () => {
           >
             <Paragraph
               numberOfLines={1}
-              size={SIZE.sm}
+              size={AppFontSize.sm}
               color={colors.primary.heading}
             >
               {!user || !userProfile?.fullName
@@ -125,7 +124,7 @@ export const UserStatus = () => {
               style={{
                 flexWrap: "wrap"
               }}
-              size={SIZE.xs}
+              size={AppFontSize.xs}
               color={colors.secondary.heading}
             >
               {!user ? (
@@ -142,7 +141,7 @@ export const UserStatus = () => {
                   {!syncing ? (
                     <TimeSince
                       style={{
-                        fontSize: SIZE.xs,
+                        fontSize: AppFontSize.xs,
                         color: colors.secondary.paragraph
                       }}
                       time={lastSynced}
@@ -184,7 +183,7 @@ export const UserStatus = () => {
               }}
               name="theme-light-dark"
               color={isDark ? colors.primary.accent : colors.primary.icon}
-              size={SIZE.lg}
+              size={AppFontSize.lg}
               style={{
                 borderRadius: 100,
                 width: 40,
@@ -207,7 +206,9 @@ export const UserStatus = () => {
                   Sync.run();
                 } else {
                   fluidTabsRef.current?.closeDrawer();
-                  eSendEvent(eOpenLoginDialog);
+                  Navigation.navigate("Auth", {
+                    mode: AuthMode.login
+                  });
                 }
               }}
             >
@@ -215,13 +216,13 @@ export const UserStatus = () => {
                 syncing ? (
                   <ActivityIndicator
                     color={colors.primary.accent}
-                    size={SIZE.xl}
+                    size={AppFontSize.xl}
                   />
                 ) : lastSyncStatus === SyncStatus.Failed ? (
                   <Icon
                     color={colors.error.icon}
                     name="sync-alert"
-                    size={SIZE.lg}
+                    size={AppFontSize.lg}
                     allowFontScaling
                   />
                 ) : (
@@ -229,14 +230,14 @@ export const UserStatus = () => {
                     allowFontScaling
                     color={colors.primary.icon}
                     name="sync"
-                    size={SIZE.lg}
+                    size={AppFontSize.lg}
                   />
                 )
               ) : (
                 <Icon
                   allowFontScaling
                   color={colors.primary.accent}
-                  size={SIZE.lg}
+                  size={AppFontSize.lg}
                   name="login"
                 />
               )}

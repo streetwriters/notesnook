@@ -21,7 +21,7 @@ import React from "react";
 import { Text, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useThemeColors } from "@notesnook/theme";
-import { SIZE } from "../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../utils/size";
 import Paragraph from "../ui/typography/paragraph";
 import { ProTag } from "./pro-tag";
 
@@ -53,7 +53,7 @@ export const FeatureBlock = ({
           marginLeft: 5,
           flexShrink: 1
         }}
-        size={SIZE.sm}
+        size={AppFontSize.sm}
       >
         {content}
       </Paragraph>
@@ -65,12 +65,12 @@ export const FeatureBlock = ({
         justifyContent: "center",
         padding: 10,
         marginRight: 10,
-        borderRadius: 5,
+        borderRadius: defaultBorderRadius,
         minWidth: 100
       }}
     >
-      <Icon color={colors.primary.icon} name={icon} size={SIZE.xl} />
-      <Paragraph size={SIZE.md}>
+      <Icon color={colors.primary.icon} name={icon} size={AppFontSize.xl} />
+      <Paragraph size={AppFontSize.md}>
         <Text style={{ color: colors.primary.accent }}>{highlight}</Text>
         {content ? "\n" + content : null}
       </Paragraph>
@@ -78,7 +78,7 @@ export const FeatureBlock = ({
       {pro ? (
         <>
           <View style={{ height: 5 }} />
-          <ProTag width={50} size={SIZE.xs} background={proTagBg} />
+          <ProTag width={50} size={AppFontSize.xs} background={proTagBg} />
         </>
       ) : (
         <View

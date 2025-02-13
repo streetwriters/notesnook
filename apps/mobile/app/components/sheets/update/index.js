@@ -25,7 +25,7 @@ import Config from "react-native-config";
 import deviceInfoModule from "react-native-device-info";
 import { useThemeColors } from "@notesnook/theme";
 import { STORE_LINK } from "../../../utils/constants";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
 import { SvgView } from "../../ui/svg";
@@ -102,7 +102,7 @@ export const Update = ({ version: appVersion, fwdRef }) => {
             {!version ? (
               <>
                 <ProgressBarComponent
-                  size={SIZE.xxl}
+                  size={AppFontSize.xxl}
                   indeterminate={true}
                   color={colors.primary.accent}
                   borderWidth={0}
@@ -113,13 +113,13 @@ export const Update = ({ version: appVersion, fwdRef }) => {
                   style={{
                     marginTop: 5
                   }}
-                  size={SIZE.md}
+                  size={AppFontSize.md}
                 >
                   {strings.checkNewVersion()}
                 </Paragraph>
               </>
             ) : (
-              <Paragraph size={SIZE.md}>{strings.noUpdates()}</Paragraph>
+              <Paragraph size={AppFontSize.md}>{strings.noUpdates()}</Paragraph>
             )}
           </View>
         </>
@@ -161,7 +161,7 @@ export const Update = ({ version: appVersion, fwdRef }) => {
               width: "100%"
             }}
           >
-            <Heading size={SIZE.md}>{strings.releaseNotes()}:</Heading>
+            <Heading size={AppFontSize.md}>{strings.releaseNotes()}:</Heading>
 
             {version.body ? (
               <Paragraph

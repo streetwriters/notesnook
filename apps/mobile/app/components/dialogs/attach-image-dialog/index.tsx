@@ -27,7 +27,7 @@ import {
 import { Image as ImageType } from "react-native-image-crop-picker";
 import { useThemeColors } from "@notesnook/theme";
 import { presentSheet } from "../../../services/event-manager";
-import { SIZE } from "../../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
 import { Notice } from "../../ui/notice";
@@ -80,7 +80,7 @@ export default function AttachImage({
                 style={{
                   width: 100,
                   height: 100,
-                  borderRadius: 5,
+                  borderRadius: defaultBorderRadius,
                   backgroundColor: "black",
                   marginRight: 6
                 }}
@@ -105,7 +105,7 @@ export default function AttachImage({
         }}
       >
         <IconButton
-          size={SIZE.lg}
+          size={AppFontSize.lg}
           name={compress ? "checkbox-marked" : "checkbox-blank-outline"}
           color={compress ? colors.primary.accent : colors.primary.icon}
           style={{
@@ -122,7 +122,7 @@ export default function AttachImage({
             flexShrink: 1,
             marginLeft: 3
           }}
-          size={SIZE.sm}
+          size={AppFontSize.sm}
         >
           {strings.compress()} ({strings.recommended().toLowerCase()})
         </Paragraph>

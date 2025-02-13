@@ -27,14 +27,16 @@ import useSyncProgress from "../../../hooks/use-sync-progress";
 import { presentSheet } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { SyncStatus, useUserStore } from "../../../stores/use-user-store";
-import { SIZE } from "../../../utils/size";
+import { getObfuscatedEmail } from "../../../utils/functions";
+import { AppFontSize } from "../../../utils/size";
 import { DefaultAppStyles } from "../../../utils/styles";
+import { AuthMode } from "../../auth/common";
 import { Card } from "../../list/card";
 import AppIcon from "../../ui/AppIcon";
-import { Button } from "../../ui/button";
 import { Pressable } from "../../ui/pressable";
 import { TimeSince } from "../../ui/time-since";
 import Paragraph from "../../ui/typography/paragraph";
+import Sync from "../../../services/sync";
 
 export const UserSheet = () => {
   const ref = useSheetRef();
@@ -58,7 +60,6 @@ export const UserSheet = () => {
       style={{
         width: "100%",
         justifyContent: "center",
-        paddingHorizontal: DefaultAppStyles.GAP,
         gap: DefaultAppStyles.GAP
       }}
     >
@@ -66,19 +67,23 @@ export const UserSheet = () => {
         <View
           style={{
             flexDirection: "row",
-            alignItems: "center"
+            alignItems: "center",
+            paddingHorizontal: DefaultAppStyles.GAP,
+            gap: DefaultAppStyles.GAP_SMALL
           }}
         >
-          <Image
-            source={{
-              uri: userProfile?.profilePicture
-            }}
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 10
-            }}
-          />
+          {userProfile?.profilePicture ? (
+            <Image
+              source={{
+                uri: userProfile?.profilePicture
+              }}
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 10
+              }}
+            />
+          ) : null}
 
           <View
             style={{
@@ -87,27 +92,17 @@ export const UserSheet = () => {
               justifyContent: "space-between"
             }}
           >
-            <View style={{ marginLeft: 10 }}>
-              <Paragraph size={SIZE.xs}>{userProfile?.fullName}</Paragraph>
+            <View>
+              <Paragraph size={AppFontSize.xs}>
+                {userProfile?.fullName || getObfuscatedEmail(user.email)}
+              </Paragraph>
               <Paragraph
                 style={{
                   flexWrap: "wrap"
                 }}
-                size={SIZE.xxs}
+                size={AppFontSize.xxs}
                 color={colors.secondary.heading}
               >
-                <AppIcon
-                  name="checkbox-blank-circle"
-                  size={10}
-                  allowFontScaling
-                  color={
-                    !user || lastSyncStatus === SyncStatus.Failed
-                      ? colors.error.icon
-                      : isOffline
-                      ? colors.static.orange
-                      : colors.success.icon
-                  }
-                />{" "}
                 {!user ? (
                   strings.notLoggedIn()
                 ) : lastSynced && lastSynced !== "Never" ? (
@@ -122,7 +117,7 @@ export const UserSheet = () => {
                     {!syncing ? (
                       <TimeSince
                         style={{
-                          fontSize: SIZE.xxs,
+                          fontSize: AppFontSize.xxs,
                           color: colors.secondary.paragraph
                         }}
                         updateFrequency={30 * 1000}
@@ -133,13 +128,25 @@ export const UserSheet = () => {
                   </>
                 ) : (
                   strings.never()
-                )}
+                )}{" "}
+                <AppIcon
+                  name="checkbox-blank-circle"
+                  size={10}
+                  allowFontScaling
+                  color={
+                    !user || lastSyncStatus === SyncStatus.Failed
+                      ? colors.error.icon
+                      : isOffline
+                      ? colors.static.orange
+                      : colors.success.icon
+                  }
+                />
               </Paragraph>
             </View>
             {syncing ? (
               <ActivityIndicator
                 color={colors.primary.accent}
-                size={SIZE.xxl}
+                size={AppFontSize.xxl}
               />
             ) : null}
           </View>
@@ -150,11 +157,24 @@ export const UserSheet = () => {
             width: "100%"
           }}
         >
-          <Card />
+          <Card
+            customMessage={{
+              visible: true,
+              message: strings.notLoggedIn(),
+              actionText: strings.loginMessageActionText(),
+              icon: "account-outline",
+              onPress: () => {
+                ref.current?.hide();
+                Navigation.navigate("Auth", {
+                  mode: AuthMode.login
+                });
+              }
+            }}
+          />
         </View>
       )}
 
-      {user ? (
+      {/* {user ? (
         <View
           style={{
             paddingVertical: DefaultAppStyles.GAP_SMALL,
@@ -176,8 +196,10 @@ export const UserSheet = () => {
                 justifyContent: "space-between"
               }}
             >
-              <Paragraph size={SIZE.xxs}>{strings.storage()}</Paragraph>
-              <Paragraph size={SIZE.xxs}>50/100MB {strings.used()}</Paragraph>
+              <Paragraph size={AppFontSize.xxs}>{strings.storage()}</Paragraph>
+              <Paragraph size={AppFontSize.xxs}>
+                50/100MB {strings.used()}
+              </Paragraph>
             </View>
             <View
               style={{
@@ -209,10 +231,13 @@ export const UserSheet = () => {
             }}
           >
             <View>
-              <Paragraph size={SIZE.sm}>{strings.freePlan()}</Paragraph>
-              <Paragraph color={colors.secondary.paragraph} size={SIZE.xxxs}>
+              <Paragraph size={AppFontSize.sm}>{strings.freePlan()}</Paragraph>
+              <Paragraph
+                color={colors.secondary.paragraph}
+                size={AppFontSize.xxxs}
+              >
                 {strings.viewAllLimits()}
-                <AppIcon name="information" size={SIZE.xxxs} />
+                <AppIcon name="information" size={AppFontSize.xxxs} />
               </Paragraph>
             </View>
 
@@ -220,7 +245,7 @@ export const UserSheet = () => {
               title={strings.upgradeNow()}
               onPress={() => {}}
               type="accent"
-              fontSize={SIZE.xs}
+              fontSize={AppFontSize.xs}
               style={{
                 paddingHorizontal: DefaultAppStyles.GAP_SMALL,
                 height: "auto",
@@ -229,7 +254,8 @@ export const UserSheet = () => {
             />
           </View>
         </View>
-      ) : null}
+      ) : null} */}
+
       <View
         style={{
           borderBottomWidth: 1,
@@ -245,9 +271,11 @@ export const UserSheet = () => {
       >
         {[
           {
-            icon: "account-outline",
-            title: strings.editProfile(),
-            onPress: () => {},
+            icon: "reload",
+            title: strings.syncNow(),
+            onPress: () => {
+              Sync.run();
+            },
             hidden: !user
           },
           {
@@ -255,7 +283,6 @@ export const UserSheet = () => {
             title: strings.settings(),
             onPress: () => {
               ref.current?.hide();
-              Navigation.closeDrawer();
               Navigation.navigate("Settings");
             }
           },
@@ -277,7 +304,7 @@ export const UserSheet = () => {
                 flexDirection: "row",
                 justifyContent: "flex-start",
                 gap: DefaultAppStyles.GAP_SMALL,
-                paddingHorizontal: DefaultAppStyles.GAP_SMALL
+                paddingHorizontal: DefaultAppStyles.GAP
               }}
               onPress={() => {
                 item.onPress();
@@ -286,7 +313,7 @@ export const UserSheet = () => {
               <AppIcon
                 color={colors.secondary.icon}
                 name={item.icon}
-                size={SIZE.xl}
+                size={AppFontSize.xl}
               />
               <Paragraph>{item.title}</Paragraph>
             </Pressable>

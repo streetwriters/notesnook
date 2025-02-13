@@ -20,14 +20,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { Text, TextProps } from "react-native";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 interface ParagraphProps extends TextProps {
   color?: string;
   size?: number;
 }
 const Paragraph = ({
   color,
-  size = SIZE.sm,
+  size = AppFontSize.sm,
   style,
   ...restProps
 }: ParagraphProps) => {
@@ -38,10 +38,10 @@ const Paragraph = ({
       {...restProps}
       style={[
         {
-          fontSize: size || SIZE.sm,
+          fontSize: size || AppFontSize.sm,
           color: color || colors.primary.paragraph,
           fontWeight: "400",
-          fontFamily: "OpenSans-Regular"
+          fontFamily: "Inter-Regular"
         },
         style
       ]}

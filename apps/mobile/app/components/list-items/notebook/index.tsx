@@ -25,7 +25,7 @@ import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../../e2e/test.ids";
 import { useIsCompactModeEnabled } from "../../../hooks/use-is-compact-mode-enabled";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { Properties } from "../../properties";
 import { IconButton } from "../../ui/icon-button";
 import Heading from "../../ui/typography/heading";
@@ -61,7 +61,7 @@ export const NotebookItem = ({
       >
         {compactMode ? (
           <Paragraph
-            size={SIZE.sm}
+            size={AppFontSize.sm}
             numberOfLines={1}
             style={{
               flexWrap: "wrap"
@@ -71,7 +71,7 @@ export const NotebookItem = ({
           </Paragraph>
         ) : (
           <Heading
-            size={SIZE.md}
+            size={AppFontSize.md}
             numberOfLines={1}
             style={{
               flexWrap: "wrap"
@@ -83,7 +83,7 @@ export const NotebookItem = ({
 
         {!item.description || compactMode ? null : (
           <Paragraph
-            size={SIZE.sm}
+            size={AppFontSize.sm}
             numberOfLines={2}
             style={{
               flexWrap: "wrap"
@@ -100,14 +100,14 @@ export const NotebookItem = ({
               justifyContent: "flex-start",
               alignItems: "center",
               marginTop: 5,
-              height: SIZE.md + 2
+              height: AppFontSize.md + 2
             }}
           >
             {isTrash ? (
               <>
                 <Paragraph
                   color={colors.secondary.paragraph}
-                  size={SIZE.xs}
+                  size={AppFontSize.xs}
                   style={{
                     textAlignVertical: "center",
                     marginRight: 6
@@ -121,7 +121,7 @@ export const NotebookItem = ({
                 </Paragraph>
                 <Paragraph
                   color={colors.primary.accent}
-                  size={SIZE.xs}
+                  size={AppFontSize.xs}
                   style={{
                     textAlignVertical: "center",
                     marginRight: 6
@@ -134,7 +134,7 @@ export const NotebookItem = ({
             ) : (
               <Paragraph
                 color={colors.secondary.paragraph}
-                size={SIZE.xs}
+                size={AppFontSize.xs}
                 style={{
                   marginRight: 6
                 }}
@@ -144,7 +144,7 @@ export const NotebookItem = ({
             )}
             <Paragraph
               color={colors.secondary.paragraph}
-              size={SIZE.xs}
+              size={AppFontSize.xs}
               style={{
                 marginRight: 6
               }}
@@ -155,7 +155,7 @@ export const NotebookItem = ({
             {item.pinned ? (
               <Icon
                 name="pin-outline"
-                size={SIZE.sm}
+                size={AppFontSize.sm}
                 style={{
                   marginRight: 10,
                   marginTop: 2
@@ -176,7 +176,7 @@ export const NotebookItem = ({
           <>
             <Paragraph
               color={colors.primary.icon}
-              size={SIZE.xs}
+              size={AppFontSize.xs}
               style={{
                 marginRight: 6
               }}
@@ -190,7 +190,7 @@ export const NotebookItem = ({
           color={colors.primary.heading}
           name="dots-horizontal"
           testID={notesnook.ids.notebook.menu}
-          size={SIZE.xl}
+          size={AppFontSize.xl}
           onPress={() => Properties.present(item)}
           style={{
             justifyContent: "center",

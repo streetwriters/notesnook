@@ -36,7 +36,7 @@ import {
 } from "../../services/event-manager";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { eClearEditor } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../utils/size";
 import { useEditor } from "./tiptap/use-editor";
 import { editorState } from "./tiptap/utils";
 import { strings } from "@notesnook/intl";
@@ -150,7 +150,7 @@ const EditorOverlay = ({
         style={{
           width: "100%",
           backgroundColor: colors.primary.background,
-          borderRadius: 5,
+          borderRadius: defaultBorderRadius,
           height: "100%",
           alignItems: "flex-start",
           paddingTop: insets.top
@@ -240,7 +240,7 @@ const EditorOverlay = ({
               height: 25,
               width: "100%",
               backgroundColor: colors.secondary.background,
-              borderRadius: 5
+              borderRadius: defaultBorderRadius
             }}
           />
 
@@ -257,7 +257,7 @@ const EditorOverlay = ({
                 height: 12,
                 width: 60,
                 backgroundColor: colors.secondary.background,
-                borderRadius: 5,
+                borderRadius: defaultBorderRadius,
                 marginRight: 10
               }}
             />
@@ -266,7 +266,7 @@ const EditorOverlay = ({
                 height: 12,
                 width: 60,
                 backgroundColor: colors.secondary.background,
-                borderRadius: 5,
+                borderRadius: defaultBorderRadius,
                 marginRight: 10
               }}
             />
@@ -275,7 +275,7 @@ const EditorOverlay = ({
                 height: 12,
                 width: 60,
                 backgroundColor: colors.secondary.background,
-                borderRadius: 5,
+                borderRadius: defaultBorderRadius,
                 marginRight: 10
               }}
             />
@@ -286,7 +286,7 @@ const EditorOverlay = ({
               height: 16,
               width: "100%",
               backgroundColor: colors.secondary.background,
-              borderRadius: 5,
+              borderRadius: defaultBorderRadius,
               marginTop: 10
             }}
           />
@@ -296,7 +296,7 @@ const EditorOverlay = ({
               height: 16,
               width: "100%",
               backgroundColor: colors.secondary.background,
-              borderRadius: 5,
+              borderRadius: defaultBorderRadius,
               marginTop: 10
             }}
           />
@@ -306,7 +306,7 @@ const EditorOverlay = ({
               height: 16,
               width: 200,
               backgroundColor: colors.secondary.background,
-              borderRadius: 5,
+              borderRadius: defaultBorderRadius,
               marginTop: 10
             }}
           />
@@ -330,7 +330,7 @@ const EditorOverlay = ({
               />
               <Paragraph
                 textBreakStrategy="balanced"
-                size={SIZE.xs}
+                size={AppFontSize.xs}
                 color={colors.secondary.paragraph}
                 style={{
                   maxWidth: "100%",

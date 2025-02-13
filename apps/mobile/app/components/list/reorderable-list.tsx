@@ -27,7 +27,7 @@ import {
 } from "react-native-drax";
 
 import { fluidTabsRef } from "../../utils/global-refs";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { useSideBarDraggingStore } from "../side-menu/dragging-store";
 import { IconButton } from "../ui/icon-button";
 
@@ -78,13 +78,15 @@ function ReorderableList<T extends { id: string }>({
       return isHidden && !dragging ? null : (
         <View
           style={{
-            flexDirection: "row"
+            flexDirection: "row",
+            width: "100%"
           }}
         >
           <View
             style={{
+              opacity: isHidden ? 0.4 : 1,
               flexGrow: 1,
-              opacity: isHidden ? 0.4 : 1
+              flexShrink: 1
             }}
           >
             {renderDraggableItem(info, props)}
@@ -93,13 +95,12 @@ function ReorderableList<T extends { id: string }>({
             <IconButton
               name={!isHidden ? "minus" : "plus"}
               color={colors.primary.icon}
-              size={SIZE.lg}
+              size={AppFontSize.lg}
               top={0}
               bottom={0}
               onPress={() => {
                 const _hiddenItems = hiddenItemsState.slice();
                 const index = _hiddenItems.indexOf(info.item.id);
-
                 if (index === -1) {
                   _hiddenItems.push(info.item?.id);
                 } else {

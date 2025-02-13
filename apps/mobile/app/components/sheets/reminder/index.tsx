@@ -31,7 +31,7 @@ import {
   ToastManager,
   presentSheet
 } from "../../../services/event-manager";
-import { SIZE } from "../../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import Input from "../../ui/input";
 
@@ -228,7 +228,7 @@ export default function ReminderSheet({
         maxHeight: "100%"
       }}
     >
-      <Heading size={SIZE.lg}>
+      <Heading size={AppFontSize.lg}>
         {reminder ? strings.editReminder() : strings.newReminder()}
       </Heading>
 
@@ -324,7 +324,7 @@ export default function ReminderSheet({
             style={{
               backgroundColor: colors.secondary.background,
               padding: 12,
-              borderRadius: 5,
+              borderRadius: defaultBorderRadius,
               marginBottom: 12
             }}
           >
@@ -382,7 +382,7 @@ export default function ReminderSheet({
                       type={
                         selectedDays.indexOf(index) > -1 ? "selected" : "plain"
                       }
-                      fontSize={SIZE.sm - 1}
+                      fontSize={AppFontSize.sm - 1}
                       style={{
                         width: 40,
                         height: 40,
@@ -410,7 +410,7 @@ export default function ReminderSheet({
                           ? "selected"
                           : "plain"
                       }
-                      fontSize={SIZE.sm - 1}
+                      fontSize={AppFontSize.sm - 1}
                       style={{
                         width: 40,
                         height: 40,
@@ -480,7 +480,7 @@ export default function ReminderSheet({
                 title={date ? date.toLocaleDateString() : strings.selectDate()}
                 type={date ? "secondaryAccented" : "secondary"}
                 icon="calendar"
-                fontSize={SIZE.md}
+                fontSize={AppFontSize.md}
                 onPress={() => {
                   showDatePicker();
                 }}
@@ -493,7 +493,7 @@ export default function ReminderSheet({
         reminderMode === ReminderModes.Permanent ? null : (
           <View
             style={{
-              borderRadius: 5,
+              borderRadius: defaultBorderRadius,
               flexDirection: "row",
               paddingVertical: 6,
               paddingHorizontal: 12,
@@ -504,7 +504,10 @@ export default function ReminderSheet({
             }}
           >
             <>
-              <Paragraph size={SIZE.xs} color={colors.secondary.paragraph}>
+              <Paragraph
+                size={AppFontSize.xs}
+                color={colors.secondary.paragraph}
+              >
                 {recurringMode === RecurringModes.Daily
                   ? strings.reminderRepeatStrings.day(
                       dayjs(date).format("hh:mm A")
@@ -598,7 +601,7 @@ export default function ReminderSheet({
         title={strings.save()}
         type="accent"
         height={45}
-        fontSize={SIZE.md}
+        fontSize={AppFontSize.md}
         style={{
           paddingHorizontal: 24,
           marginTop: 10,

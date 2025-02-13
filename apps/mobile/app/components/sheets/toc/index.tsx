@@ -21,7 +21,7 @@ import React from "react";
 import { View } from "react-native";
 import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { presentSheet } from "../../../services/event-manager";
 import Heading from "../../ui/typography/heading";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -86,7 +86,7 @@ const TableOfContentsItem: React.FC<{
               ? colors.selected.paragraph
               : colors.primary.paragraph
           }
-          size={SIZE.md}
+          size={AppFontSize.md}
         >
           {item?.title || strings.newNote()}
         </Paragraph>
@@ -112,7 +112,7 @@ const TableOfContents = ({ toc, close }: TableOfContentsProps) => {
           alignItems: "center"
         }}
       >
-        <Heading size={SIZE.lg}>{strings.toc()}</Heading>
+        <Heading size={AppFontSize.lg}>{strings.toc()}</Heading>
       </View>
 
       <FlatList

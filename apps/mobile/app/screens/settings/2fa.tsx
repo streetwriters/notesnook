@@ -51,7 +51,7 @@ import {
 } from "../../services/event-manager";
 import { useUserStore } from "../../stores/use-user-store";
 import { eCloseSheet } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { sleep } from "../../utils/time";
 const mfaMethods: MFAMethod[] = [
   {
@@ -147,8 +147,8 @@ export const MFAMethodsPickerStep = ({ recovery, onSuccess }: MFAStepProps) => {
               flexShrink: 1
             }}
           >
-            <Heading size={SIZE.md}>{item.title}</Heading>
-            <Paragraph size={SIZE.sm}>{item.body}</Paragraph>
+            <Heading size={AppFontSize.md}>{item.title}</Heading>
+            <Paragraph size={AppFontSize.sm}>{item.body}</Paragraph>
           </View>
         </Pressable>
       ))}
@@ -349,7 +349,9 @@ export const MFASetup = ({
               }
             />
 
-            <Heading size={SIZE.md}>{strings.enterSixDigitCode()}</Heading>
+            <Heading size={AppFontSize.md}>
+              {strings.enterSixDigitCode()}
+            </Heading>
             <Paragraph>{codeHelpText[method?.id]}</Paragraph>
             <Seperator />
             <Input
@@ -360,7 +362,7 @@ export const MFASetup = ({
               keyboardType="numeric"
               onChangeText={(value) => (code.current = value)}
               inputStyle={{
-                fontSize: SIZE.lg,
+                fontSize: AppFontSize.lg,
                 height: 60,
                 textAlign: "center",
                 letterSpacing: 10,
@@ -473,7 +475,7 @@ export const MFARecoveryCodes = ({
                   marginVertical: 5,
                   fontFamily: "monospace"
                 }}
-                size={SIZE.lg}
+                size={AppFontSize.lg}
               >
                 {item}
               </Heading>
@@ -490,7 +492,7 @@ export const MFARecoveryCodes = ({
           >
             <Button
               title={strings.copyCodes()}
-              fontSize={SIZE.md}
+              fontSize={AppFontSize.md}
               onPress={() => {
                 const codeString = codes.join("\n");
                 Clipboard.setString(codeString);
@@ -507,7 +509,7 @@ export const MFARecoveryCodes = ({
 
             <Button
               title={strings.saveToFile()}
-              fontSize={SIZE.md}
+              fontSize={AppFontSize.md}
               onPress={async () => {
                 try {
                   let path;

@@ -18,11 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 /* eslint-disable no-inner-declarations */
 import {
+  createInternalLink,
   Item,
   ItemReference,
   Note,
-  VAULT_ERRORS,
-  createInternalLink
+  VAULT_ERRORS
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
@@ -33,6 +33,7 @@ import { InteractionManager, Platform } from "react-native";
 import Share from "react-native-share";
 import { DatabaseLogger, db } from "../common/database";
 import { AttachmentDialog } from "../components/attachments";
+import { AuthMode } from "../components/auth/common";
 import { presentDialog } from "../components/dialog/functions";
 import NoteHistory from "../components/note-history";
 import { AddNotebookSheet } from "../components/sheets/add-notebook";
@@ -66,7 +67,7 @@ import { useRelationStore } from "../stores/use-relation-store";
 import { useSelectionStore } from "../stores/use-selection-store";
 import { useTagStore } from "../stores/use-tag-store";
 import { useUserStore } from "../stores/use-user-store";
-import { eOpenLoginDialog, eUpdateNoteInEditor } from "../utils/events";
+import { eUpdateNoteInEditor } from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { convertNoteToText } from "../utils/note-to-text";
 import { sleep } from "../utils/time";
@@ -664,7 +665,9 @@ export const useActions = ({
           heading: strings.loginRequired(),
           context: "local",
           func: () => {
-            eSendEvent(eOpenLoginDialog);
+            Navigation.navigate("Auth", {
+              mode: AuthMode.login
+            });
           },
           actionText: "Login"
         });

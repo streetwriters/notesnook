@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { ViewStyle } from "react-native";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import Paragraph from "../typography/paragraph";
 
 export default function Tag({
@@ -51,7 +51,7 @@ export default function Tag({
         ...style
       }}
       color={textColor || colors.primary.accentForeground}
-      size={SIZE.xxs}
+      size={AppFontSize.xxs}
     >
       {text}
     </Paragraph>

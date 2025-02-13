@@ -37,7 +37,7 @@ import {
 } from "../../services/event-manager";
 import { getElevationStyle } from "../../utils/elevation";
 import { eHideToast, eShowToast } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
@@ -162,7 +162,7 @@ export const Toast = ({ context = "global" }) => {
                 ? "information"
                 : "close"
             }
-            size={isFullToastMessage ? SIZE.xxxl : SIZE.xl}
+            size={isFullToastMessage ? AppFontSize.xxxl : AppFontSize.xl}
             color={
               toastOptions?.icon
                 ? toastOptions?.icon
@@ -185,7 +185,7 @@ export const Toast = ({ context = "global" }) => {
             {isFullToastMessage ? (
               <Heading
                 color={!isDark ? colors.static.black : colors.static.white}
-                size={SIZE.sm}
+                size={AppFontSize.sm}
               >
                 {toastOptions.heading}
               </Heading>
@@ -194,7 +194,7 @@ export const Toast = ({ context = "global" }) => {
             {toastOptions.message || toastOptions.heading ? (
               <Paragraph
                 color={!isDark ? colors.static.black : colors.static.white}
-                size={SIZE.xs}
+                size={AppFontSize.xs}
               >
                 {toastOptions.message || toastOptions.heading}
               </Paragraph>
@@ -205,7 +205,7 @@ export const Toast = ({ context = "global" }) => {
         {toastOptions.func ? (
           <Button
             testID={notesnook.toast.button}
-            fontSize={SIZE.md}
+            fontSize={AppFontSize.md}
             type={toastOptions.type === "error" ? "errorShade" : "transparent"}
             onPress={toastOptions.func}
             title={toastOptions.actionText}

@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import { View } from "react-native";
 import { useMessageStore } from "../../stores/use-message-store";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import { getStyle } from "./functions";
@@ -48,7 +48,7 @@ export const Title = ({ text, style = {}, inline }) => {
           flexShrink: 1
         }}
         numberOfLines={1}
-        size={inline ? SIZE.md : SIZE.xl}
+        size={inline ? AppFontSize.md : AppFontSize.xl}
       >
         {inline ? text?.toUpperCase() : text}
       </Heading>
@@ -67,7 +67,7 @@ export const Title = ({ text, style = {}, inline }) => {
           right: 0
         }}
         iconSize={24}
-        fontSize={SIZE.xs}
+        fontSize={AppFontSize.xs}
         style={{
           borderRadius: 100,
           paddingVertical: 0,

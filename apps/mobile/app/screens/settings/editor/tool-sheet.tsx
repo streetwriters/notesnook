@@ -25,7 +25,7 @@ import { SvgView } from "../../../components/ui/svg";
 import Paragraph from "../../../components/ui/typography/paragraph";
 import { presentSheet } from "../../../services/event-manager";
 import { useThemeColors } from "@notesnook/theme";
-import { SIZE } from "../../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import { DraggableItem, useDragState } from "./state";
 import {
   findToolById,
@@ -74,7 +74,7 @@ export default function ToolSheet({
             height: 50,
             paddingHorizontal: 12,
             paddingRight: 0,
-            borderRadius: 5,
+            borderRadius: defaultBorderRadius,
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "flex-start"
@@ -94,7 +94,7 @@ export default function ToolSheet({
                 marginLeft: iconSvgString ? 10 : 0
               }}
               color={colors.primary.paragraph}
-              size={SIZE.sm}
+              size={AppFontSize.sm}
             >
               {tool?.title}
             </Paragraph>

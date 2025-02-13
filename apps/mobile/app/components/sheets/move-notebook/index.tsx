@@ -35,7 +35,7 @@ import {
   findRootNotebookId,
   getParentNotebookId
 } from "../../../utils/notebooks";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
 import { presentDialog } from "../../dialog/functions";
@@ -322,7 +322,7 @@ const NotebookItem = ({
                 false
               );
             }}
-            size={SIZE.lg}
+            size={AppFontSize.lg}
           />
         </View>
       </Pressable>

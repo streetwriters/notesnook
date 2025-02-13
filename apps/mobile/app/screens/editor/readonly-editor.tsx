@@ -35,6 +35,7 @@ import { useThemeColors } from "@notesnook/theme";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { db } from "../../common/database";
 import { i18n } from "@lingui/core";
+import { defaultBorderRadius } from "../../utils/size";
 
 const onShouldStartLoadWithRequest = (request: ShouldStartLoadRequest) => {
   if (request.url.includes("https")) {
@@ -197,7 +198,7 @@ export function ReadonlyEditor(props: {
             style={{
               width: "100%",
               backgroundColor: colors.primary.background,
-              borderRadius: 5,
+              borderRadius: defaultBorderRadius,
               height: "100%",
               alignItems: "flex-start",
               paddingTop: insets.top
@@ -215,7 +216,7 @@ export function ReadonlyEditor(props: {
                   height: 25,
                   width: "100%",
                   backgroundColor: colors.secondary.background,
-                  borderRadius: 5
+                  borderRadius: defaultBorderRadius
                 }}
               />
 
@@ -232,7 +233,7 @@ export function ReadonlyEditor(props: {
                     height: 12,
                     width: 60,
                     backgroundColor: colors.secondary.background,
-                    borderRadius: 5,
+                    borderRadius: defaultBorderRadius,
                     marginRight: 10
                   }}
                 />
@@ -241,7 +242,7 @@ export function ReadonlyEditor(props: {
                     height: 12,
                     width: 60,
                     backgroundColor: colors.secondary.background,
-                    borderRadius: 5,
+                    borderRadius: defaultBorderRadius,
                     marginRight: 10
                   }}
                 />
@@ -250,7 +251,7 @@ export function ReadonlyEditor(props: {
                     height: 12,
                     width: 60,
                     backgroundColor: colors.secondary.background,
-                    borderRadius: 5,
+                    borderRadius: defaultBorderRadius,
                     marginRight: 10
                   }}
                 />
@@ -261,7 +262,7 @@ export function ReadonlyEditor(props: {
                   height: 16,
                   width: "100%",
                   backgroundColor: colors.secondary.background,
-                  borderRadius: 5,
+                  borderRadius: defaultBorderRadius,
                   marginTop: 10
                 }}
               />
@@ -271,7 +272,7 @@ export function ReadonlyEditor(props: {
                   height: 16,
                   width: "100%",
                   backgroundColor: colors.secondary.background,
-                  borderRadius: 5,
+                  borderRadius: defaultBorderRadius,
                   marginTop: 10
                 }}
               />
@@ -281,7 +282,7 @@ export function ReadonlyEditor(props: {
                   height: 16,
                   width: 200,
                   backgroundColor: colors.secondary.background,
-                  borderRadius: 5,
+                  borderRadius: defaultBorderRadius,
                   marginTop: 10
                 }}
               />

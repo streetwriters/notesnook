@@ -22,7 +22,6 @@ import React from "react";
 import { View } from "react-native";
 import { DraxProvider, DraxScrollView } from "react-native-drax";
 import { db } from "../../common/database";
-import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { useMenuStore } from "../../stores/use-menu-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { MenuItemsList } from "../../utils/menu-items";
@@ -51,15 +50,19 @@ export function SideMenuHome() {
         width: "100%",
         paddingTop: DefaultAppStyles.GAP_SMALL,
         backgroundColor: colors.primary.background,
-        gap: DefaultAppStyles.GAP,
-        paddingHorizontal: DefaultAppStyles.GAP
+        gap: DefaultAppStyles.GAP
       }}
     >
       <SideMenuHeader />
 
       {!isAppLoading && introCompleted ? (
         <DraxProvider>
-          <DraxScrollView nestedScrollEnabled={false}>
+          <DraxScrollView
+            nestedScrollEnabled={false}
+            style={{
+              paddingHorizontal: DefaultAppStyles.GAP
+            }}
+          >
             <ReorderableList
               onListOrderChanged={(data) => {
                 db.settings.setSideBarOrder("routes", data);
