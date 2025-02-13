@@ -202,10 +202,8 @@ const NotebookItem = ({
     >
       <Pressable
         type={isFocused ? "selected" : "transparent"}
-        onLongPress={() => {
-          onLongPress?.();
-        }}
-        testID={`notebook-sheet-item-${item.depth}-${index}`}
+        onLongPress={onLongPress}
+        testID={`notebook-item-${item.depth}-${index}`}
         onPress={async () => {
           if (selectionEnabled) {
             if (selected && !nestedNotebooksSelected) {
@@ -243,6 +241,9 @@ const NotebookItem = ({
           <IconButton
             size={AppFontSize.md}
             color={selected ? colors.selected.icon : colors.primary.icon}
+            testID={
+              item.hasChildren ? `expand-notebook-${item.notebook.id}` : ""
+            }
             onPress={() => {
               if (item.hasChildren) {
                 onToggleExpanded?.();
@@ -279,8 +280,8 @@ const NotebookItem = ({
         {selectionEnabled ? (
           <View
             style={{
-              width: 22,
-              height: 22,
+              width: 25,
+              height: 25,
               justifyContent: "center",
               alignItems: "center"
             }}
@@ -293,6 +294,7 @@ const NotebookItem = ({
                     : "checkbox-outline"
                   : "checkbox-blank-outline"
               }
+              size={AppFontSize.md}
               color={selected ? colors.selected.icon : colors.primary.icon}
             />
           </View>
@@ -458,7 +460,6 @@ const NotebookItemWrapper = ({
   item: TreeItem;
   index: number;
 }) => {
-  const { colors } = useThemeColors();
   const expanded = useSideMenuNotebookExpandedStore(
     (state) => state.expanded[item.notebook.id]
   );
