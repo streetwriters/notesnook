@@ -50,6 +50,7 @@ function Notes(props: NotesProps) {
   if (!context || !contextNotes) return <ListLoader />;
   return (
     <ListContainer
+      type={type}
       group={type}
       refresh={refreshContext}
       compact={isCompact}

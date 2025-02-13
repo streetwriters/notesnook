@@ -207,15 +207,6 @@ const notebookMenuItems: (
     },
     {
       type: "button",
-      key: "pin",
-      icon: Pin.path,
-      title: strings.pin(),
-      isChecked: notebook.pinned,
-      onClick: () => store.pin(!notebook.pinned, ...ids),
-      multiSelect: true
-    },
-    {
-      type: "button",
       key: "shortcut",
       icon: db.shortcuts.exists(notebook.id)
         ? RemoveShortcutLink.path

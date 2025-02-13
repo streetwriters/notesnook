@@ -25,6 +25,7 @@ import { PasswordVisible, PasswordInvisible, Icon } from "../icons";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 
 type Action = {
+  id?: string;
   testId?: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   disabled?: boolean;
@@ -160,6 +161,7 @@ function Field(props: FieldProps) {
           >
             {leftActions.map((action) => (
               <Button
+                id={action.id}
                 key={action.testId}
                 type="button"
                 variant={"secondary"}
@@ -202,6 +204,7 @@ function Field(props: FieldProps) {
           >
             {rightActions.map((action) => (
               <Button
+                id={action.id}
                 key={action.testId}
                 type="button"
                 variant={"secondary"}

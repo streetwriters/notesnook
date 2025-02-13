@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { PropsWithChildren, useRef } from "react";
 import { Box, Button, Flex, Text } from "@theme-ui/components";
-import { ArrowLeft, Menu, Search, Plus, Close } from "../icons";
+import { ArrowLeft, Menu, Search, Plus, Close, AddReminder } from "../icons";
 import { useStore } from "../../stores/app-store";
 import { useStore as useSearchStore } from "../../stores/search-store";
 import useMobile from "../../hooks/use-mobile";
@@ -29,6 +29,7 @@ import { strings } from "@notesnook/intl";
 import { TITLE_BAR_HEIGHT } from "../title-bar";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { RouteResult } from "../../navigation/types";
+import { CREATE_BUTTON_MAP } from "../../common";
 
 export type RouteContainerButtons = {
   search?: {
@@ -76,6 +77,10 @@ function Header(props: RouteContainerProps) {
         p: 1
       }}
       className="route-container-header search-container"
+      data-test-id="routeHeader"
+      data-header={
+        titlePromise.status === "fulfilled" ? titlePromise.value || type : type
+      }
     >
       <Field
         inputRef={inputRef}
@@ -102,10 +107,10 @@ function Header(props: RouteContainerProps) {
             "::placeholder": {
               textAlign: "center"
             },
-            "& + .rightActions": {
+            "& + .rightActions #search-action-button": {
               opacity: 0
             },
-            "&:focus + .rightActions": {
+            "&:focus + .rightActions #search-action-button": {
               opacity: 1
             }
           }
@@ -128,18 +133,30 @@ function Header(props: RouteContainerProps) {
             });
           else useSearchStore.setState({ isSearching: true, searchType: type });
         }}
-        action={{
-          icon: Close,
-          testId: "search-button",
-          onClick: () => {
-            if (inputRef.current) inputRef.current.value = "";
-            useSearchStore.setState({
-              isSearching: false,
-              query: undefined,
-              searchType: undefined
-            });
-          }
-        }}
+        rightActions={[
+          {
+            icon: Close,
+            id: "search-action-button",
+            testId: "search-button",
+            onClick: () => {
+              if (inputRef.current) inputRef.current.value = "";
+              useSearchStore.setState({
+                isSearching: false,
+                query: undefined,
+                searchType: undefined
+              });
+            }
+          },
+          ...(type === "reminders"
+            ? [
+                {
+                  icon: AddReminder,
+                  testId: "create-reminder-button",
+                  ...CREATE_BUTTON_MAP.reminders
+                }
+              ]
+            : [])
+        ]}
       />
     </Box>
   );
@@ -235,14 +252,14 @@ function Header(props: RouteContainerProps) {
   //         </Button>
   //       )}
   //       {titlePromise.status === "fulfilled" && titlePromise.value && (
-  //         <Text
-  //           className="routeHeader"
-  //           variant="heading"
-  //           data-test-id="routeHeader"
-  //           color="heading"
-  //         >
-  //           {titlePromise.value}
-  //         </Text>
+  // <Text
+  //   className="routeHeader"
+  //   variant="heading"
+  //   data-test-id="routeHeader"
+  //   color="heading"
+  // >
+  //   {titlePromise.value}
+  // </Text>
   //       )}
   //     </Flex>
   //     <Flex sx={{ flexShrink: 0, gap: 2 }}>
@@ -264,22 +281,22 @@ function Header(props: RouteContainerProps) {
   //         </Button>
   //       )}
   //       {!isMobile && buttons?.create && (
-  //         <Button
-  //           {...buttons.create}
-  //           data-test-id={`${type}-action-button`}
-  //           sx={{ p: 0 }}
-  //         >
-  //           <Plus
-  //             color="accentForeground"
-  //             size={18}
-  //             sx={{
-  //               height: 24,
-  //               width: 24,
-  //               bg: "accent",
-  //               borderRadius: 100
-  //             }}
-  //           />
-  //         </Button>
+  // <Button
+  //   {...buttons.create}
+  //   data-test-id={`${type}-action-button`}
+  //   sx={{ p: 0 }}
+  // >
+  //   <Plus
+  //     color="accentForeground"
+  //     size={18}
+  //     sx={{
+  //       height: 24,
+  //       width: 24,
+  //       bg: "accent",
+  //       borderRadius: 100
+  //     }}
+  //   />
+  // </Button>
   //       )}
   //     </Flex>
   //   </Flex>
