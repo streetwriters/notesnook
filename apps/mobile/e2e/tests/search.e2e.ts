@@ -23,7 +23,7 @@ describe("Search", () => {
   it("Search for a note", async () => {
     await Tests.prepare();
     let note = await Tests.createNote();
-    await Tests.fromId("icon-search").waitAndTap();
+    await Tests.fromId("search-header").waitAndTap();
     await Tests.fromId("search-input").element.typeText("Test");
     await Tests.fromText(note.body).waitAndTap();
     await device.pressBack();

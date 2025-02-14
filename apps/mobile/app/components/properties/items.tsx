@@ -70,6 +70,7 @@ const COLUMN_BAR_ITEMS: ActionId[] = [
   "reorder",
   "rename-color",
   "rename-tag",
+  "restore",
   "trash"
 ];
 
@@ -128,7 +129,6 @@ export const Items = ({ item, close }: { item: Item; close: () => void }) => {
     ({ item }: { item: Action }) => (
       <View
         key={item.id}
-        testID={"icon-" + item.id}
         style={{
           alignItems: "center",
           width: columnItemWidth - 8
@@ -137,6 +137,7 @@ export const Items = ({ item, close }: { item: Item; close: () => void }) => {
         <Pressable
           onPress={item.onPress}
           type={item.checked ? "shade" : "secondary"}
+          testID={"icon-" + item.id}
           style={{
             height: columnItemWidth / 1.5,
             width: columnItemWidth - 8,
@@ -195,6 +196,7 @@ export const Items = ({ item, close }: { item: Item; close: () => void }) => {
             ? colors.error.paragraph
             : colors.primary.paragraph
         }}
+        testID={"icon-" + item.id}
         onPress={item.onPress}
         title={item.title}
         icon={item.icon}

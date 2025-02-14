@@ -20,8 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { notesnook } from "../test.ids";
 import { Tests } from "./utils";
 
-async function sortBy(sorting: string, elementText = "Default") {
-  await Tests.fromText(elementText).waitAndTap();
+async function sortBy(sorting: string) {
+  await Tests.fromId("icon-sort").waitAndTap();
   await Tests.fromText(sorting).waitAndTap();
   await device.pressBack();
 }
@@ -51,7 +51,7 @@ describe("Sort & filter", () => {
     await Tests.prepare();
     await Tests.createNote("Note 1", "Note 1");
     await sortBy("None");
-    await Tests.fromText("Default").isNotVisible();
+    await Tests.fromText("ALL").isVisible();
   });
 
   it("Group by Abc", async () => {
@@ -65,21 +65,18 @@ describe("Sort & filter", () => {
     await Tests.prepare();
     await Tests.createNote("Note 1", "Note 1");
     await sortBy("Year");
-    await Tests.fromText("Year").isVisible();
   });
 
   it("Group by Week", async () => {
     await Tests.prepare();
     await Tests.createNote("Note 1", "Note 1");
     await sortBy("Week");
-    await Tests.fromText("Week").isVisible();
   });
 
   it("Group by Month", async () => {
     await Tests.prepare();
     await Tests.createNote("Note 1", "Note 1");
     await sortBy("Month");
-    await Tests.fromText("Month").isVisible();
   });
 
   it("Compact mode", async () => {

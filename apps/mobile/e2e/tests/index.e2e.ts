@@ -26,13 +26,28 @@ describe("APP LAUNCH AND NAVIGATION", () => {
 
   it("Basic navigation should work", async () => {
     await Tests.prepare();
-    await Tests.navigate("Notebooks");
     await Tests.navigate("Favorites");
-    await Tests.navigate("Trash");
-    await Tests.navigate("Tags");
-    await Tests.navigate("Settings");
-    await Tests.navigate("Monographs");
     await Tests.navigate("Reminders");
-    await Tests.navigate("Notes");
+    await Tests.navigate("Monographs");
+    await Tests.navigate("Trash");
+    await Tests.openSideMenu();
+    await Tests.fromId("sidemenu-settings-icon").waitAndTap();
+    await Tests.fromText("Settings").waitAndTap();
+    await Tests.fromText("Settings").isVisible();
+    await device.pressBack();
+
+    await Tests.fromId("tab-notebooks").tap();
+    await Tests.fromText("No notebooks").isVisible();
+    await Tests.fromId("tab-tags").tap();
+    await Tests.fromText("No tags").isVisible();
+    await Tests.fromId("tab-home").tap();
+
+    await Tests.fromText("Notes").tap();
+    await Tests.fromText("Search in Notes").isVisible();
+
+    // await Tests.navigate("Tags");
+    // await Tests.navigate("Settings");
+
+    // await Tests.navigate("Notebooks");
   });
 });

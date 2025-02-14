@@ -105,7 +105,7 @@ const Tests = {
   async navigate(screen: RouteName | ({} & string)) {
     let menu = Tests.fromId(notesnook.ids.default.header.buttons.left);
     await menu.waitAndTap();
-    await Tests.fromText(screen).waitAndTap();
+    await Tests.fromText(screen as string).waitAndTap();
   },
   async openSideMenu() {
     await Tests.fromId(notesnook.ids.default.header.buttons.left).waitAndTap();
