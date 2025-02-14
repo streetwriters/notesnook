@@ -223,7 +223,7 @@ const NoteItem = ({
                   <Icon
                     testID="icon-pinned"
                     name="pin-outline"
-                    size={AppFontSize.xs}
+                    size={AppFontSize.sm}
                     color={color?.colorCode || primaryColors.accent}
                   />
                 ) : null}

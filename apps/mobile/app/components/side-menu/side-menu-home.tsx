@@ -48,7 +48,6 @@ export function SideMenuHome() {
       style={{
         height: "100%",
         width: "100%",
-        paddingTop: DefaultAppStyles.GAP_SMALL,
         backgroundColor: colors.primary.background,
         gap: DefaultAppStyles.GAP
       }}

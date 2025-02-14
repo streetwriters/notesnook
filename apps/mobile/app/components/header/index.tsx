@@ -105,6 +105,7 @@ export const Header = ({
           paddingHorizontal: !hasSearch ? 0 : DefaultAppStyles.GAP_SMALL,
           alignItems: "center"
         }}
+        testID="search-header"
         onPress={() => {
           onSearch?.();
         }}

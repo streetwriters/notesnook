@@ -241,9 +241,7 @@ const NotebookItem = ({
           <IconButton
             size={AppFontSize.md}
             color={selected ? colors.selected.icon : colors.primary.icon}
-            testID={
-              item.hasChildren ? `expand-notebook-${item.notebook.id}` : ""
-            }
+            testID={item.hasChildren ? `expand-notebook-${index}` : ""}
             onPress={() => {
               if (item.hasChildren) {
                 onToggleExpanded?.();
