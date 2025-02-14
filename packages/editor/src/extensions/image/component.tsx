@@ -251,15 +251,16 @@ export function ImageComponent(
             </Flex>
           )}
           <Image
-            as={isSVG ? "object" : "img"}
+            as={isSVG ? "iframe" : "img"}
             data-drag-image
             ref={imageRef}
             alt={alt}
             crossOrigin="anonymous"
             {...(isSVG
               ? {
-                  data: bloburl || corsify(src, downloadOptions?.corsHost),
-                  type: mime
+                  src: bloburl || corsify(src, downloadOptions?.corsHost),
+                  type: mime,
+                  sandbox: ""
                 }
               : {
                   src: bloburl || corsify(src, downloadOptions?.corsHost)
@@ -273,7 +274,8 @@ export function ImageComponent(
               border: selected
                 ? "2px solid var(--accent) !important"
                 : "2px solid transparent !important",
-              borderRadius: "default"
+              borderRadius: "default",
+              ...(isSVG ? { bg: "transparent" } : {})
             }}
             onDoubleClick={() => {
               const { hash, filename, mime, size } = node.attrs;
