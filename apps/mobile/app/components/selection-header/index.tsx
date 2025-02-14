@@ -278,6 +278,7 @@ export const SelectionHeader = React.memo(
                   <IconButton
                     size={AppFontSize.lg}
                     type="plain"
+                    testID={`select-${item.icon}`}
                     name={item.icon}
                     key={item.title}
                     color={colors.primary.icon}

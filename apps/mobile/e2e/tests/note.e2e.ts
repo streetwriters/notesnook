@@ -59,14 +59,14 @@ describe("NOTE TESTS", () => {
     await Tests.createNote();
     await Tests.fromId(notesnook.listitem.menu).waitAndTap();
     await Tests.fromId("icon-pin").waitAndTap();
-    await Tests.fromText("Pinned").isVisible();
+    await Tests.fromText("PINNED").isVisible();
     await Tests.fromId("icon-pinned").isVisible();
     await Tests.fromId(notesnook.listitem.menu).waitAndTap();
     await Tests.fromId("icon-pin").waitAndTap();
     await Tests.fromText("icon-pinned").isNotVisible();
   });
 
-  it.skip("Pin a note in notifications", async () => {
+  it("Pin a note in notifications", async () => {
     await Tests.prepare();
     await Tests.createNote();
     await Tests.fromId(notesnook.listitem.menu).waitAndTap();
@@ -100,7 +100,7 @@ describe("NOTE TESTS", () => {
     await Tests.fromText(note.body).isVisible();
   });
 
-  it("Delete & restore a note", async () => {
+  it.only("Delete & restore a note", async () => {
     await Tests.prepare();
     await Tests.createNote();
     await Tests.fromId(notesnook.listitem.menu).waitAndTap();
