@@ -546,7 +546,7 @@ const ShareView = () => {
                     </Paragraph>
                     <ScrollView horizontal>
                       {rawFiles.map((item) =>
-                        isImage(item.type) ? (
+                        isImage(item.type) || item.value?.endsWith(".png") ? (
                           <TouchableOpacity
                             onPress={() => onRemoveFile(item)}
                             key={item.name}
