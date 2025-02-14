@@ -16,13 +16,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { View } from "react-native";
-import { SideMenuHeader } from "./side-menu-header";
-import Paragraph from "../ui/typography/paragraph";
 import { AppFontSize } from "../../utils/size";
-import { useThemeColors } from "@notesnook/theme";
-import { DefaultAppStyles } from "../../utils/styles";
+import Paragraph from "../ui/typography/paragraph";
+import { SideMenuHeader } from "./side-menu-header";
 
 type SideMenuListEmptyProps = {
   placeholder: string;
@@ -39,8 +38,7 @@ export const SideMenuListEmpty = (props: SideMenuListEmptyProps) => {
     >
       <View
         style={{
-          backgroundColor: colors.primary.background,
-          paddingTop: DefaultAppStyles.GAP_SMALL
+          backgroundColor: colors.primary.background
         }}
       >
         <SideMenuHeader />

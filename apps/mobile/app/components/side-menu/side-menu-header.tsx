@@ -39,6 +39,7 @@ const SettingsIcon = () => {
       onPress={() => {
         UserSheet.present();
       }}
+      testID="sidemenu-settings-icon"
       style={{
         width: 40,
         height: 40
@@ -62,18 +63,6 @@ const SettingsIcon = () => {
           size={AppFontSize.lg}
         />
       )}
-
-      {/* <Paragraph
-        color={colors.secondary.paragraph}
-        style={{
-          opacity: 1
-        }}
-        size={SIZE.xxxs - 1}
-      >
-        {userProfile?.fullName
-          ? userProfile.fullName.split(" ")[0]
-          : strings.settings()}
-      </Paragraph> */}
     </Pressable>
   );
 };

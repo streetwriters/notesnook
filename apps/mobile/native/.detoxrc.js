@@ -22,7 +22,7 @@ module.exports = {
     },
     'android.debug': {
       type: 'android.apk',
-      "binaryPath": "android/app/build/outputs/apk/debug/app-x86_64-debug.apk",
+      "binaryPath": "android/app/build/outputs/apk/debug/app-arm64-v8a-debug.apk",
       "testBinaryPath": "android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk",
       "build": "cd android ; ENVFILE=.env.test ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
       reversePorts: [
@@ -31,7 +31,7 @@ module.exports = {
     },
     'android.release': {
       type: 'android.apk',
-      "binaryPath": "android/app/build/outputs/apk/release/app-x86_64-release.apk",
+      "binaryPath": "android/app/build/outputs/apk/release/app-arm64-v8a-release.apk",
       "testBinaryPath": "android/app/build/outputs/apk/androidTest/release/app-release-androidTest.apk",
       "build": "cd android ; ENVFILE=.env.test ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release ; cd .."
     }

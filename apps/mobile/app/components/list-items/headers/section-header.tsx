@@ -120,6 +120,8 @@ export const SectionHeader = React.memo<
                       : "sort-descending"
                   }
                   color={colors.secondary.icon}
+                  t
+                  testID="icon-sort"
                   onPress={() => {
                     if (!screen) return;
                     presentSheet({
