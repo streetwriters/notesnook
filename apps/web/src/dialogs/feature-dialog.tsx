@@ -93,9 +93,15 @@ const features: Record<FeatureKeys, Feature> = {
         ]
       : [
           {
-            title: "Better tabs",
-            subtitle:
-              "Tabs have been overhauled to be more predictable and easier to use. Give it a try! We are sure you'll love it."
+            title: "Keyboard shortcuts for tabs",
+            subtitle: (
+              <>
+                <Code text="Ctrl/Cmd+t" /> to open new tab,{" "}
+                <Code text="Ctrl/Cmd+n" /> to create a new note,{" "}
+                <Code text="Ctrl/Cmd+w" /> to close the active tab and
+                <Code text="Ctrl/Cmd+Shift+W" /> to close all tabs
+              </>
+            )
           }
         ],
     cta: {
