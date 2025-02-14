@@ -1,5 +1,5 @@
 
-FROM --platform=$BUILDPLATFORM oven/bun:1.1.36-alpine
+FROM --platform=$BUILDPLATFORM oven/bun:1.2.2-alpine
 
 RUN mkdir -p /home/bun/app && chown -R bun:bun /home/bun/app
 

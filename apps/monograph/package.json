@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/monograph",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "private": true,
   "sideEffects": false,
   "type": "module",
@@ -64,8 +64,5 @@
     "vite-plugin-static-copy": "^2.1.0",
     "vite-tsconfig-paths": "^5.0.1",
     "wrangler": "3.78.11"
-  },
-  "engines": {
-    "node": ">=20.0.0"
   }
 }
