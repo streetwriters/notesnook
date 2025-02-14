@@ -608,24 +608,7 @@ function toIEditor(editor: Editor): IEditor {
     getSelection: () => {
       const { from, to } = editor.state.selection;
       return { from, to };
-    },
-    toggleBold: () => editor.commands.toggleBold(),
-    toggleItalic: () => editor.commands.toggleItalic(),
-    toggleUnderline: () => editor.commands.toggleUnderline(),
-    toggleStrike: () => editor.commands.toggleStrike(),
-    toggleCode: () => editor.commands.toggleCode(),
-    toggleSubscript: () => editor.commands.toggleSubscript(),
-    toggleSuperscript: () => editor.commands.toggleSuperscript(),
-    toggleBulletList: () => editor.commands.toggleBulletList(),
-    toggleOrderedList: () => editor.commands.toggleOrderedList(),
-    toggleTaskList: () => editor.commands.toggleTaskList(),
-    toggleOutlineList: () => editor.commands.toggleOutlineList(),
-    insertHorizontalRule: () => editor.commands.setHorizontalRule(),
-    toggleCodeBlock: () => editor.commands.toggleCodeBlock(),
-    // todo: figure out following typescript error
-    insertMathBlock: () => editor.chain().focus().insertMathBlock().run(),
-    toggleQuoteBlock: () => editor.commands.toggleBlockquote(),
-    addAttachment: () => editor.storage.openAttachmentPicker?.("file")
+    }
   };
 }
 

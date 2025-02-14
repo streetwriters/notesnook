@@ -41,20 +41,4 @@ export interface IEditor {
   startSearch: () => void;
   getContent: () => string;
   getSelection: () => { from: number; to: number };
-  toggleBold: () => void;
-  toggleItalic: () => void;
-  toggleUnderline: () => void;
-  toggleStrike: () => void;
-  toggleCode: () => void;
-  toggleSubscript: () => void;
-  toggleSuperscript: () => void;
-  toggleBulletList: () => void;
-  toggleOrderedList: () => void;
-  toggleTaskList: () => void;
-  toggleOutlineList: () => void;
-  insertHorizontalRule: () => void;
-  toggleCodeBlock: () => void;
-  insertMathBlock: () => void;
-  toggleQuoteBlock: () => void;
-  addAttachment: () => void;
 }
