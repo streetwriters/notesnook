@@ -20,6 +20,8 @@ import { Notebook } from "@notesnook/core";
 import create from "zustand";
 import { db } from "../common/database";
 import { createItemSelectionStore } from "./item-selection-store";
+import { persist, StateStorage } from "zustand/middleware";
+import { MMKV } from "../common/database/mmkv";
 
 export type TreeItem = {
   parentId: string;
@@ -164,17 +166,25 @@ export function createNotebookTreeStores(
       [id: string]: boolean;
     };
     setExpanded: (id: string) => void;
-  }>((set, get) => ({
-    expanded: {},
-    setExpanded(id: string) {
-      set({
-        expanded: {
-          ...get().expanded,
-          [id]: !get().expanded[id]
+  }>(
+    persist(
+      (set, get) => ({
+        expanded: {},
+        setExpanded(id: string) {
+          set({
+            expanded: {
+              ...get().expanded,
+              [id]: !get().expanded[id]
+            }
+          });
         }
-      });
-    }
-  }));
+      }),
+      {
+        name: "side-menu-notebook-expanded",
+        getStorage: () => MMKV as unknown as StateStorage
+      }
+    )
+  );
 
   return {
     useSideMenuNotebookTreeStore,

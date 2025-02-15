@@ -36,14 +36,15 @@ import {
   getParentNotebookId
 } from "../../../utils/notebooks";
 import { AppFontSize } from "../../../utils/size";
+import { DefaultAppStyles } from "../../../utils/styles";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
 import { presentDialog } from "../../dialog/functions";
 import SheetProvider from "../../sheet-provider";
+import AppIcon from "../../ui/AppIcon";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
 import { Pressable } from "../../ui/pressable";
-import Seperator from "../../ui/seperator";
 import Paragraph from "../../ui/typography/paragraph";
 import { AddNotebookSheet } from "../add-notebook";
 
@@ -125,13 +126,8 @@ export const MoveNotebookSheet = ({
                     eSendEvent(eOnNotebookUpdated, parent);
                   }
                 }
-
-                if (!parent) {
-                  useNotebookStore.getState().refresh();
-                } else {
-                  eSendEvent(eOnNotebookUpdated, selectedNotebook.id);
-                }
-
+                useNotebookStore.getState().refresh();
+                eSendEvent(eOnNotebookUpdated, selectedNotebook.id);
                 close?.();
               }
             });
@@ -149,7 +145,7 @@ export const MoveNotebookSheet = ({
 
       <View
         style={{
-          paddingHorizontal: 12
+          paddingHorizontal: DefaultAppStyles.GAP
         }}
       >
         <DialogHeader
@@ -159,7 +155,6 @@ export const MoveNotebookSheet = ({
           )}
         />
       </View>
-      <Seperator />
 
       <FlatList
         data={notebooks?.placeholders}
@@ -168,7 +163,7 @@ export const MoveNotebookSheet = ({
         ListHeaderComponent={
           <View
             style={{
-              paddingHorizontal: 12
+              paddingHorizontal: DefaultAppStyles.GAP
             }}
           >
             {moveToTop ? (
@@ -248,104 +243,102 @@ const NotebookItem = ({
   );
   const { colors } = useThemeColors();
 
-  return selectedNotebooks.find(
-    (n) => n.id === notebook?.id
-  ) ? null : !notebook ? (
+  return selectedNotebooks.find((n) => n.id === notebook?.id) ? null : (
     <View
       style={{
         height: 45
       }}
-    />
-  ) : (
-    <View
-      style={{
-        minHeight: 45,
-        borderRadius: 0
-      }}
     >
-      <Pressable
-        onPress={() => onPress(notebook)}
+      <View
         style={{
-          flexDirection: "row",
-          paddingHorizontal: 12,
-          height: 45
+          minHeight: 45
         }}
       >
-        {nestedNotebooks?.placeholders.length ? (
-          <IconButton
-            name={isExpanded ? "chevron-down" : "chevron-right"}
-            color={colors.primary.icon}
-            size={20}
-            onPress={() => {
-              if (!notebook) return;
-              useNotebookExpandedStore.getState().setExpanded(notebook.id);
-            }}
-          />
-        ) : (
-          <View
-            style={{
-              width: 35,
-              height: 30,
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          />
+        {!notebook ? null : (
+          <>
+            <Pressable
+              onPress={() => onPress(notebook)}
+              style={{
+                flexDirection: "row",
+                paddingHorizontal: DefaultAppStyles.GAP,
+                height: 45,
+                gap: DefaultAppStyles.GAP_SMALL,
+                borderRadius: 0
+              }}
+            >
+              <AppIcon
+                name={
+                  nestedNotebooks?.placeholders.length
+                    ? isExpanded
+                      ? "chevron-down"
+                      : "chevron-right"
+                    : "book-outline"
+                }
+                color={colors.primary.icon}
+                size={20}
+                onPress={() => {
+                  if (!notebook) return;
+                  useNotebookExpandedStore.getState().setExpanded(notebook.id);
+                }}
+              />
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  flexGrow: 1,
+                  alignItems: "center"
+                }}
+              >
+                <Paragraph
+                  numberOfLines={1}
+                  style={{
+                    color: colors.primary.paragraph,
+                    fontSize: 15
+                  }}
+                >
+                  {notebook.title}
+                </Paragraph>
+
+                <IconButton
+                  name="plus"
+                  onPress={() => {
+                    if (!notebook) return;
+                    AddNotebookSheet.present(
+                      undefined,
+                      notebook,
+                      "move-notebooks",
+                      undefined,
+                      false
+                    );
+                  }}
+                  size={AppFontSize.lg}
+                />
+              </View>
+            </Pressable>
+
+            {nestedNotebooks?.placeholders?.length && isExpanded ? (
+              <View
+                style={{
+                  paddingLeft: level + 1 > 0 && level + 1 < 5 ? 15 : 0,
+                  marginTop: 5
+                }}
+              >
+                {nestedNotebooks.placeholders.map((item, index) => (
+                  <NotebookItem
+                    key={notebook?.id + index}
+                    id={index}
+                    onPress={onPress}
+                    level={level + 1}
+                    items={nestedNotebooks}
+                    selectedNotebooks={selectedNotebooks}
+                  />
+                ))}
+              </View>
+            ) : null}
+          </>
         )}
-
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            flexGrow: 1,
-            alignItems: "center"
-          }}
-        >
-          <Paragraph
-            numberOfLines={1}
-            style={{
-              color: colors.primary.paragraph,
-              fontSize: 15
-            }}
-          >
-            {notebook.title}
-          </Paragraph>
-
-          <IconButton
-            name="plus"
-            onPress={() => {
-              if (!notebook) return;
-              AddNotebookSheet.present(
-                undefined,
-                notebook,
-                "move-notebooks",
-                undefined,
-                false
-              );
-            }}
-            size={AppFontSize.lg}
-          />
-        </View>
-      </Pressable>
-
-      {nestedNotebooks?.placeholders?.length && isExpanded ? (
-        <View
-          style={{
-            paddingLeft: level + 1 > 0 && level + 1 < 5 ? 15 : 0,
-            marginTop: 5
-          }}
-        >
-          {nestedNotebooks.placeholders.map((item, index) => (
-            <NotebookItem
-              key={notebook?.id + index}
-              id={index}
-              onPress={onPress}
-              level={level + 1}
-              items={nestedNotebooks}
-              selectedNotebooks={selectedNotebooks}
-            />
-          ))}
-        </View>
-      ) : null}
+      </View>
     </View>
   );
 };
