@@ -204,7 +204,6 @@ export const SideMenuTags = () => {
 
   const updateTags = React.useCallback(() => {
     if (lastQuery.current) {
-      console.log("Looking up...", lastQuery.current);
       db.lookup
         .tags(lastQuery.current.trim())
         .sorted()
