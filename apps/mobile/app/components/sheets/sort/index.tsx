@@ -103,7 +103,7 @@ const Sort = ({
         }}
       >
         <Heading
-          size={AppFontSize.md}
+          size={AppFontSize.lg}
           style={{
             alignSelf: "center"
           }}
@@ -209,7 +209,7 @@ const Sort = ({
               paddingVertical: DefaultAppStyles.GAP_VERTICAL
             }}
           >
-            <Heading size={AppFontSize.md}>{strings.groupBy()}</Heading>
+            <Heading size={AppFontSize.lg}>{strings.groupBy()}</Heading>
           </View>
 
           <View

@@ -22,6 +22,10 @@ import { strings } from "@notesnook/intl";
 import { Linking } from "react-native";
 import { db } from "../common/database";
 import { presentDialog } from "../components/dialog/functions";
+import {
+  useSideMenuNotebookSelectionStore,
+  useSideMenuTagsSelectionStore
+} from "../components/side-menu/stores";
 import { eSendEvent, ToastManager } from "../services/event-manager";
 import Navigation from "../services/navigation";
 import { useMenuStore } from "../stores/use-menu-store";
@@ -129,6 +133,10 @@ export const deleteItems = async (
     for (const id of itemIds) {
       await deleteNotebook(id, result.deleteNotes);
     }
+    useSideMenuNotebookSelectionStore.setState({
+      enabled: false,
+      selection: {}
+    });
   } else if (type === "tag") {
     presentDialog({
       title: strings.doActions.delete.tag(itemIds.length),
@@ -139,6 +147,10 @@ export const deleteItems = async (
         await db.tags.remove(...itemIds);
         useTagStore.getState().refresh();
         useRelationStore.getState().update();
+        useSideMenuTagsSelectionStore.setState({
+          enabled: false,
+          selection: {}
+        });
       },
       context: context
     });

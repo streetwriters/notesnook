@@ -160,85 +160,90 @@ const TabBar = (
             {
               title: "Move",
               icon: "arrow-right-bold-box-outline",
-              hidden: !notebookSelectionEnabled
+              hidden:
+                !notebookSelectionEnabled || props.navigationState.index !== 1
             },
             {
               title: "Close",
               icon: "close"
             }
-          ].map((item) => (
-            <>
-              <Pressable
-                key={item.title}
-                onPress={async () => {
-                  switch (item.title) {
-                    case "Select all": {
-                      if (notebookSelectionEnabled) {
-                        useSideMenuNotebookSelectionStore
-                          .getState()
-                          .selectAll?.();
-                      } else {
-                        useSideMenuTagsSelectionStore.getState().selectAll?.();
-                      }
+          ].map((item) =>
+            item.hidden ? null : (
+              <>
+                <Pressable
+                  key={item.title}
+                  onPress={async () => {
+                    switch (item.title) {
+                      case "Select all": {
+                        if (notebookSelectionEnabled) {
+                          useSideMenuNotebookSelectionStore
+                            .getState()
+                            .selectAll?.();
+                        } else {
+                          useSideMenuTagsSelectionStore
+                            .getState()
+                            .selectAll?.();
+                        }
 
-                      break;
-                    }
-                    case "Delete": {
-                      if (notebookSelectionEnabled) {
+                        break;
+                      }
+                      case "Delete": {
+                        if (notebookSelectionEnabled) {
+                          const ids = useSideMenuNotebookSelectionStore
+                            .getState()
+                            .getSelectedItemIds();
+                          deleteItems("notebook", ids);
+                        } else {
+                          const ids = useSideMenuTagsSelectionStore
+                            .getState()
+                            .getSelectedItemIds();
+                          await deleteItems("tag", ids);
+                        }
+                        break;
+                      }
+                      case "Move": {
                         const ids = useSideMenuNotebookSelectionStore
                           .getState()
                           .getSelectedItemIds();
-                        deleteItems("notebook", ids);
-                      } else {
-                        const ids = useSideMenuTagsSelectionStore
-                          .getState()
-                          .getSelectedItemIds();
-                        deleteItems("tag", ids);
+                        const notebooks = await db.notebooks.all.items(ids);
+                        MoveNotebookSheet.present(notebooks);
+                        break;
                       }
-                      break;
+                      case "Close": {
+                        useSideMenuNotebookSelectionStore.setState({
+                          enabled: false,
+                          selection: {}
+                        });
+                        useSideMenuTagsSelectionStore.setState({
+                          enabled: false,
+                          selection: {}
+                        });
+                        break;
+                      }
                     }
-                    case "Move": {
-                      const ids = useSideMenuNotebookSelectionStore
-                        .getState()
-                        .getSelectedItemIds();
-                      const notebooks = await db.notebooks.all.items(ids);
-                      MoveNotebookSheet.present(notebooks);
-                      break;
-                    }
-                    case "Close": {
-                      useSideMenuNotebookSelectionStore.setState({
-                        enabled: false,
-                        selection: {}
-                      });
-                      useSideMenuTagsSelectionStore.setState({
-                        enabled: false,
-                        selection: {}
-                      });
-                      break;
-                    }
-                  }
-                }}
-                style={{
-                  borderRadius: 10,
-                  paddingVertical: 2,
-                  width: "25%"
-                }}
-                type="plain"
-              >
-                <Icon
-                  name={item.icon}
-                  color={colors.primary.icon}
-                  size={AppFontSize.lg}
-                />
-                <Paragraph
-                  color={colors.secondary.paragraph}
-                  size={AppFontSize.xxxs - 1}
+                  }}
+                  style={{
+                    borderRadius: 10,
+                    paddingVertical: 2,
+                    width: "25%"
+                  }}
+                  type="plain"
                 >
-                  {item.title}
-                </Paragraph>
-              </Pressable>
-            </>
-          ))}
+                  <Icon
+                    name={item.icon}
+                    color={colors.primary.icon}
+                    size={AppFontSize.lg}
+                  />
+                  <Paragraph
+                    color={colors.secondary.paragraph}
+                    size={AppFontSize.xxxs - 1}
+                  >
+                    {item.title}
+                  </Paragraph>
+                </Pressable>
+              </>
+            )
+          )}
         </>
       ) : (
         <>
