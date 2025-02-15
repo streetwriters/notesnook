@@ -195,7 +195,8 @@ const NotebookItem = ({
   return (
     <View
       style={{
-        paddingLeft: item.depth > 0 && item.depth < 6 ? 15 : undefined,
+        paddingLeft:
+          item.depth > 0 && item.depth < 6 ? 15 * item.depth : undefined,
         width: "100%",
         marginTop: 2
       }}
@@ -248,9 +249,9 @@ const NotebookItem = ({
               }
             }}
             top={0}
-            left={0}
+            left={20}
             bottom={0}
-            right={0}
+            right={20}
             style={{
               width: 32,
               height: 32,
@@ -451,76 +452,82 @@ export const SideMenuNotebooks = () => {
   );
 };
 
-const NotebookItemWrapper = ({
-  item,
-  index
-}: {
-  item: TreeItem;
-  index: number;
-}) => {
-  const expanded = useSideMenuNotebookExpandedStore(
-    (state) => state.expanded[item.notebook.id]
-  );
-  const selectionEnabled = useSideMenuNotebookSelectionStore(
-    (state) => state.enabled
-  );
-  const selected = useSideMenuNotebookSelectionStore(
-    (state) => state.selection[item.notebook.id] === "selected"
-  );
-  const focused = useNavigationStore(
-    (state) => state.focusedRouteId === item.notebook.id
-  );
+const NotebookItemWrapper = React.memo(
+  ({ item, index }: { item: TreeItem; index: number }) => {
+    const expanded = useSideMenuNotebookExpandedStore(
+      (state) => state.expanded[item.notebook.id]
+    );
+    const selectionEnabled = useSideMenuNotebookSelectionStore(
+      (state) => state.enabled
+    );
+    const selected = useSideMenuNotebookSelectionStore(
+      (state) => state.selection[item.notebook.id] === "selected"
+    );
+    const focused = useNavigationStore(
+      (state) => state.focusedRouteId === item.notebook.id
+    );
 
-  useEffect(() => {
-    if (expanded) {
-      useSideMenuNotebookTreeStore
-        .getState()
-        .fetchAndAdd(item.notebook.id, item.depth + 1);
-    } else {
-      useSideMenuNotebookTreeStore.getState().removeChildren(item.notebook.id);
-    }
-  }, [expanded, item.depth, item.notebook]);
+    useEffect(() => {
+      if (expanded) {
+        useSideMenuNotebookTreeStore
+          .getState()
+          .fetchAndAdd(item.notebook.id, item.depth + 1);
+      } else {
+        useSideMenuNotebookTreeStore
+          .getState()
+          .removeChildren(item.notebook.id);
+      }
+    }, [expanded, item.depth, item.notebook]);
 
-  const onItemUpdate = React.useCallback(async () => {
-    const notebook = await db.notebooks.notebook(item.notebook.id);
-    if (notebook) {
-      useSideMenuNotebookTreeStore
-        .getState()
-        .updateItem(item.notebook.id, notebook);
-    } else {
-      useSideMenuNotebookTreeStore.getState().removeItem(item.notebook.id);
-    }
-  }, [item.notebook.id]);
+    const onItemUpdate = React.useCallback(async () => {
+      const notebook = await db.notebooks.notebook(item.notebook.id);
+      if (notebook) {
+        useSideMenuNotebookTreeStore
+          .getState()
+          .updateItem(item.notebook.id, notebook);
+      } else {
+        useSideMenuNotebookTreeStore.getState().removeItem(item.notebook.id);
+      }
+    }, [item.notebook.id]);
 
-  return (
-    <View
-      style={{
-        paddingHorizontal: DefaultAppStyles.GAP,
-        marginTop: index === 0 ? DefaultAppStyles.GAP : 0
-      }}
-    >
-      <NotebookItem
-        item={item}
-        index={index}
-        expanded={expanded}
-        onToggleExpanded={() => {
-          useSideMenuNotebookExpandedStore
-            .getState()
-            .setExpanded(item.notebook.id);
+    return (
+      <View
+        style={{
+          paddingHorizontal: DefaultAppStyles.GAP,
+          marginTop: index === 0 ? DefaultAppStyles.GAP : 0
         }}
-        selected={selected}
-        selectionEnabled={selectionEnabled}
-        selectionStore={useSideMenuNotebookSelectionStore}
-        onItemUpdate={onItemUpdate}
-        focused={focused}
-        onPress={() => {
-          NotebookScreen.navigate(item.notebook, false);
-          Navigation.closeDrawer();
-        }}
-        onLongPress={() => {
-          Properties.present(item.notebook, false);
-        }}
-      />
-    </View>
-  );
-};
+      >
+        <NotebookItem
+          item={item}
+          index={index}
+          expanded={expanded}
+          onToggleExpanded={() => {
+            useSideMenuNotebookExpandedStore
+              .getState()
+              .setExpanded(item.notebook.id);
+          }}
+          selected={selected}
+          selectionEnabled={selectionEnabled}
+          selectionStore={useSideMenuNotebookSelectionStore}
+          onItemUpdate={onItemUpdate}
+          focused={focused}
+          onPress={() => {
+            NotebookScreen.navigate(item.notebook, false);
+            Navigation.closeDrawer();
+          }}
+          onLongPress={() => {
+            Properties.present(item.notebook, false);
+          }}
+        />
+      </View>
+    );
+  },
+  (prev, next) => {
+    return (
+      prev.item.notebook.id === next.item.notebook.id &&
+      prev.item.notebook.dateModified === next.item.notebook.dateModified &&
+      prev.item.notebook.dateEdited === next.item.notebook.dateEdited
+    );
+  }
+);
+NotebookItemWrapper.displayName = "NotebookItemWrapper";
