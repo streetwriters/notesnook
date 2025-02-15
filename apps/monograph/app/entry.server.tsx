@@ -62,8 +62,42 @@ export default function handleRequest(
 
   responseHeaders.set("Content-Type", "text/html; charset=utf-8");
 
+  const nonce =
+    remixContext.staticHandlerContext?.loaderData?.root?.cspScriptNonce;
+  if (nonce)
+    responseHeaders.set(
+      "Content-Security-Policy",
+      getContentSecurityPolicy(nonce)
+    );
+
   return new Response(html, {
     status: responseStatusCode,
     headers: responseHeaders
   });
+}
+
+function getContentSecurityPolicy(nonce?: string) {
+  let script_src: string;
+  if (typeof nonce === "string") {
+    script_src = `'self' 'report-sample' 'nonce-${nonce}'`;
+  } else if (process.env.NODE_ENV === "development") {
+    // Allow the <LiveReload /> component to load without a nonce in the error pages
+    script_src = "'self' 'report-sample'";
+  } else {
+    script_src = "'self' 'report-sample'";
+  }
+
+  const connect_src =
+    process.env.NODE_ENV === "development"
+      ? "'self' ws://localhost:*"
+      : "'self'";
+
+  return (
+    `script-src ${script_src} 'strict-dynamic'; ` +
+    `connect-src ${connect_src}; ` +
+    "form-action 'self'; " +
+    "object-src 'none'; " +
+    "block-all-mixed-content; " +
+    "base-uri 'self'; manifest-src 'self'"
+  );
 }
