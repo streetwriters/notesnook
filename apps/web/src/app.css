@@ -253,6 +253,7 @@ textarea,
 kbd {
   background: var(--background);
   border-radius: 3px;
+  padding: 2px 5px;
   color: var(--paragraph-secondary);
 }
 

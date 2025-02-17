@@ -360,7 +360,7 @@ export const CommandPaletteDialog = DialogManager.register(
         <Flex
           sx={{ flexDirection: "row", bg: "hover", justifyContent: "center" }}
         >
-          <Text variant="subBody" sx={{ m: 0.5 }}>
+          <Text variant="subBody" sx={{ m: 1 }}>
             <kbd>{">"}</kbd> for command mode · remove <kbd>{">"}</kbd> for
             search mode · <kbd>⏎</kbd> to select · <kbd>↑</kbd>
             <kbd>↓</kbd> to navigate
