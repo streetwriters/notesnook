@@ -115,10 +115,10 @@ export function EmbedComponent(
         </Box>
         <Embed
           ref={embedRef}
-          src={src.startsWith("javascript:") ? "about:blank" : src}
+          src={src}
           width={"100%"}
           height={"100%"}
-          sandbox="allow-scripts"
+          sandbox={getSandboxFeatures(src)}
           sx={{
             bg: "var(--background-secondary)",
             border: selected
@@ -146,4 +146,16 @@ export function EmbedComponent(
       </Resizer>
     </Flex>
   );
+}
+
+function getSandboxFeatures(src: string) {
+  const features = [];
+  try {
+    const url = new URL(src);
+    if (url.protocol === "http:" || url.protocol === "https:")
+      features.push("allow-scripts", "allow-same-origin");
+  } catch {
+    // ignore
+  }
+  return features.join(" ");
 }
