@@ -127,13 +127,15 @@ export const withTheme = (Element: (props: any) => JSX.Element) => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const nextTheme = colorScheme === "dark" ? darkTheme : lightTheme;
-    if (JSON.stringify(nextTheme) !== JSON.stringify(currTheme)) {
-      useThemeEngineStore
-        .getState()
-        .setTheme(colorScheme === "dark" ? darkTheme : lightTheme);
-      currTheme = nextTheme;
-    }
+    useEffect(() => {
+      const nextTheme = colorScheme === "dark" ? darkTheme : lightTheme;
+      if (JSON.stringify(nextTheme) !== JSON.stringify(currTheme)) {
+        useThemeEngineStore
+          .getState()
+          .setTheme(colorScheme === "dark" ? darkTheme : lightTheme);
+        currTheme = nextTheme;
+      }
+    }, [colorScheme, darkTheme, lightTheme]);
 
     return (
       <I18nProvider i18n={i18n}>
