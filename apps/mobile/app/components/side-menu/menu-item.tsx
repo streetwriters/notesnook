@@ -145,9 +145,6 @@ function _MenuItem({
         alignItems: "center",
         paddingVertical: DefaultAppStyles.GAP_VERTICAL
       }}
-      onLayout={(e) => {
-        console.log(e.nativeEvent.layout);
-      }}
     >
       <View
         style={{
