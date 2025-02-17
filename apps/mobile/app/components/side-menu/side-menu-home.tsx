@@ -31,6 +31,20 @@ import { ColorSection } from "./color-section";
 import { MenuItem } from "./menu-item";
 import { PinnedSection } from "./pinned-section";
 import { SideMenuHeader } from "./side-menu-header";
+import { SUBSCRIPTION_STATUS } from "../../utils/constants";
+import { eSendEvent } from "../../services/event-manager";
+import { eOpenPremiumDialog } from "../../utils/events";
+import { useUserStore } from "../../stores/use-user-store";
+import { Button } from "../ui/button";
+
+const pro = {
+  title: strings.getNotesnookPro(),
+  icon: "crown",
+  id: "pro",
+  onPress: () => {
+    eSendEvent(eOpenPremiumDialog);
+  }
+};
 
 export function SideMenuHome() {
   const { colors } = useThemeColors();
@@ -42,6 +56,9 @@ export function SideMenuHome() {
     state.order["routes"],
     state.hiddenItems["routes"]
   ]);
+  const subscriptionType = useUserStore(
+    (state) => state.user?.subscription?.type
+  );
 
   return (
     <View
@@ -103,6 +120,29 @@ export function SideMenuHome() {
           </DraxScrollView>
         </DraxProvider>
       ) : null}
+
+      <View
+        style={{
+          paddingHorizontal: DefaultAppStyles.GAP,
+          paddingVertical: DefaultAppStyles.GAP_VERTICAL
+        }}
+      >
+        {subscriptionType === SUBSCRIPTION_STATUS.TRIAL ||
+        subscriptionType === SUBSCRIPTION_STATUS.BASIC ? (
+          <Button
+            title={pro.title}
+            iconColor={colors.static.yellow}
+            textStyle={{
+              color: colors.static.white
+            }}
+            icon={pro.icon}
+            style={{
+              backgroundColor: colors.static.black,
+              width: "100%"
+            }}
+          />
+        ) : null}
+      </View>
     </View>
   );
 }
