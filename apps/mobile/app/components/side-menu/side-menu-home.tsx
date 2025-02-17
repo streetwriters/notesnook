@@ -140,6 +140,7 @@ export function SideMenuHome() {
               backgroundColor: colors.static.black,
               width: "100%"
             }}
+            onPress={pro.onPress}
           />
         ) : null}
       </View>
