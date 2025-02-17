@@ -40,20 +40,13 @@
   background-color: transparent;
   border-width: 0px;
   margin-block: 0px;
-  padding-top: 10px;
-  padding-bottom: 10px;
   cursor: pointer;
   position: relative;
-  margin-top: 4px;
-  margin-bottom: -10px;
-}
-
-.ProseMirror hr::after {
-  content: "";
-  position: absolute;
-  width: 99%;
-  height: 5px;
   background-color: var(--border);
+  width: 100%;
+  height: 5px;
+  margin-top: 4px;
+  margin-bottom: 4px;
 }
 
 .ProseMirror hr.ProseMirror-selectednode::after {
@@ -125,10 +118,12 @@
 
 .ProseMirror > p[data-spacing="double"] {
   margin-top: 1em;
+  margin-bottom: 1em;
 }
 
 .ProseMirror > p[data-spacing="single"] {
   margin-top: 0px;
+  margin-bottom: 0px;
 }
 
 .ProseMirror > div.codeblock-view-content-wrap,
