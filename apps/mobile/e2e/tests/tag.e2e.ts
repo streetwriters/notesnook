@@ -21,6 +21,20 @@ import { notesnook } from "../test.ids";
 import { Tests } from "./utils";
 
 describe("Tags", () => {
+  it("Create a tag", async () => {
+    await Tests.prepare();
+    await Tests.openSideMenu();
+    await Tests.fromId("tab-tags").waitAndTap();
+
+    await Tests.fromText("No tags").isVisible();
+    await Tests.fromId("sidebar-add-button").waitAndTap();
+
+    await Tests.fromId("input-value").element.typeText("testtag");
+
+    await Tests.fromText("Add").waitAndTap();
+    await Tests.fromText("testtag").isVisible();
+  });
+
   it("Tag a note", async () => {
     await Tests.prepare();
     let note = await Tests.createNote();
