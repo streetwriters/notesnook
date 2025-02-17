@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { match, surround } from "fuzzyjs";
+import { match } from "fuzzyjs";
 import Database from "./index.js";
 import {
   Item,
@@ -186,47 +186,6 @@ export default class Lookup {
       { name: "mimeType", column: "attachments.mimeType" },
       { name: "hash", column: "attachments.hash" }
     ]);
-  }
-
-  fuzzy<T>(
-    query: string,
-    items: T[],
-    key: keyof T,
-    opts?: {
-      prefix?: string;
-      suffix?: string;
-      /**
-       * If true, only items that match the query will be returned
-       */
-      matchOnly?: boolean;
-    }
-  ): T[] {
-    if (query === "") return items;
-
-    const fuzzied: T[] = [];
-
-    for (const item of items) {
-      const result = match(query, `${item[key]}`);
-      if (!result.match) {
-        if (opts?.matchOnly) continue;
-        fuzzied.push(item);
-        continue;
-      }
-      if (opts?.prefix || opts?.suffix) {
-        fuzzied.push({
-          ...item,
-          [key]: surround(`${item[key]}`, {
-            result: result,
-            prefix: opts?.prefix,
-            suffix: opts?.suffix
-          })
-        });
-        continue;
-      }
-      fuzzied.push(item);
-    }
-
-    return fuzzied;
   }
 
   private search<T extends Item>(

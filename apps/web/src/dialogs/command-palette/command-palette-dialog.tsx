@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { debounce, toTitleCase } from "@notesnook/common";
+import { fuzzy } from "@notesnook/core";
 import { Box, Button, Flex, Text } from "@theme-ui/components";
 import React, {
   useCallback,
@@ -96,7 +97,7 @@ export const CommandPaletteDialog = DialogManager.register(
           setLoading(true);
         }
         const res = await search(query);
-        const highlighted = db.lookup.fuzzy(
+        const highlighted = fuzzy(
           prepareQuery(query),
           res.map((r) => ({
             ...r,
@@ -113,7 +114,7 @@ export const CommandPaletteDialog = DialogManager.register(
             suffix: "</b>"
           }
         );
-        setCommands(highlighted ?? []);
+        setCommands(highlighted);
       } finally {
         setLoading(false);
       }
@@ -416,10 +417,6 @@ const CommandActionMap = COMMANDS.reduce((acc, command) => {
 
 function resolveCommands() {
   return COMMANDS.reduce((acc, command) => {
-    // sanity check
-    // command id should not be duplicated
-    // need to double check the COMMANDS list
-    // then remove this condition
     if (acc.find((c) => c.id === command.id)) return acc;
 
     const hidden = command.hidden ? command.hidden() : false;
@@ -550,7 +547,30 @@ function search(query: string) {
 
 function commandSearch(query: string) {
   const commands = getDefaultCommands();
-  return db.lookup.fuzzy(query, commands, "title", { matchOnly: true });
+  const result = fuzzy(query, commands, "title", {
+    matchOnly: true,
+    sort: true
+  });
+  /**
+   * result is sorted based on query match score
+   * we also make sure that commands are sorted wrt groups
+   */
+  const recent: Command[] = [];
+  const sortedWrtGroups: Command[][] = [];
+  for (const command of result) {
+    const group = command.group;
+    if (group === "recent") {
+      recent.push(command);
+      continue;
+    }
+    const index = sortedWrtGroups.findIndex((c) => c[0].group === group);
+    if (index === -1) {
+      sortedWrtGroups.push([command]);
+    } else {
+      sortedWrtGroups[index].push(command);
+    }
+  }
+  return recent.concat(sortedWrtGroups.flat());
 }
 
 async function dbSearch(query: string) {
