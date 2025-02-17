@@ -245,7 +245,8 @@ export const SideMenuTags = () => {
             ListHeaderComponent={
               <View
                 style={{
-                  backgroundColor: colors.primary.background
+                  backgroundColor: colors.primary.background,
+                  paddingTop: DefaultAppStyles.GAP_SMALL
                 }}
               >
                 <SideMenuHeader />
