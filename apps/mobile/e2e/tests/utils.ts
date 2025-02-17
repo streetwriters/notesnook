@@ -74,7 +74,8 @@ const Tests = {
   awaitLaunch: async () => {
     await waitFor(element(by.id(notesnook.ids.default.root)))
       .toBeVisible()
-      .withTimeout(500);
+      //@ts-ignore
+      .withTimeout(globalThis["DEBUG_MODE"] ? 4000 : 500);
   },
   sleep: (duration: number) => {
     return new Promise((resolve) =>
