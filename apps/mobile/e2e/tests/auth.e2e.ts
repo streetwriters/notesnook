@@ -18,14 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { authenticator } from "otplib";
-import {
-  elementById,
-  openSideMenu,
-  prepare,
-  sleep,
-  tapByText,
-  visibleByText
-} from "./utils";
+import { Tests } from "./utils";
 
 import dotenv from "dotenv";
 import path from "path";
@@ -42,16 +35,17 @@ const USER = {
 };
 
 async function login() {
-  await tapByText("Login to sync your notes.");
-  await elementById("input.email").typeText(USER.login.email);
-  await tapByText("Login");
-  await sleep(3000);
-  await elementById("input.totp").typeText(
-    authenticator.generate(USER.login.totpSecret)
+  await Tests.fromText("Login to encrypt and sync notes").tap();
+  await Tests.fromId("input.email").element.typeText(USER.login.email!);
+  await Tests.fromText("Continue").tap();
+  await Tests.sleep(3000);
+  await Tests.fromId("input.totp").element.typeText(
+    authenticator.generate(USER.login.totpSecret!)
   );
-  await sleep(3000);
-  await elementById("input.password").typeText(USER.login.password);
-  await elementById("input.password").tapReturnKey();
+  await Tests.fromText("Next").tap();
+  await Tests.sleep(3000);
+  await Tests.fromId("input.password").element.typeText(USER.login.password!);
+  await Tests.fromId("input.password").element.tapReturnKey();
 }
 
 // async function deleteAccount() {
@@ -74,12 +68,10 @@ async function login() {
 // }
 
 describe("AUTH", () => {
-  it.skip("Login", async () => {
-    await prepare();
-    await openSideMenu();
+  it("Login", async () => {
+    await Tests.prepare();
     await login();
-    await sleep(10000);
-    await openSideMenu();
-    await visibleByText("Tap here to sync your notes.");
+    await Tests.sleep(10000);
+    await Tests.fromText("Login to encrypt and sync notes").isNotVisible();
   });
 });
