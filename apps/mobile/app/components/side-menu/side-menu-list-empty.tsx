@@ -22,6 +22,7 @@ import { View } from "react-native";
 import { AppFontSize } from "../../utils/size";
 import Paragraph from "../ui/typography/paragraph";
 import { SideMenuHeader } from "./side-menu-header";
+import { DefaultAppStyles } from "../../utils/styles";
 
 type SideMenuListEmptyProps = {
   placeholder: string;
@@ -38,7 +39,8 @@ export const SideMenuListEmpty = (props: SideMenuListEmptyProps) => {
     >
       <View
         style={{
-          backgroundColor: colors.primary.background
+          backgroundColor: colors.primary.background,
+          paddingTop: DefaultAppStyles.GAP_SMALL
         }}
       >
         <SideMenuHeader />
