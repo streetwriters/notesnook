@@ -25,7 +25,7 @@ import {
 import Config from "react-native-config";
 
 i18n.load({
-  en: __DEV__ && Config.isTesting !== "true"  ? $pseudo : $en
+  en: !__DEV__ && Config.isTesting !== "true"  ? $pseudo : $en
 });
 setI18nGlobal(i18n);
 i18n.activate("en");
