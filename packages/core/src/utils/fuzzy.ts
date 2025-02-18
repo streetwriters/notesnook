@@ -30,7 +30,6 @@ export function fuzzy<T>(
      * If true, only items that match the query will be returned
      */
     matchOnly?: boolean;
-    sort?: boolean;
   }
 ): T[] {
   if (query === "") return items;
@@ -61,7 +60,5 @@ export function fuzzy<T>(
     fuzzied.push([item, result.score]);
   }
 
-  return opts?.sort
-    ? fuzzied.sort((a, b) => b[1] - a[1]).map((f) => f[0])
-    : fuzzied.map((f) => f[0]);
+  return fuzzied.sort((a, b) => b[1] - a[1]).map((f) => f[0]);
 }

@@ -21,42 +21,24 @@ import { fuzzy } from "../fuzzy";
 import { test, expect, describe } from "vitest";
 
 describe("lookup.fuzzy", () => {
-  describe("opts.sort", () => {
-    test("should sort items by score when sort is true", () => {
-      const items = [
-        {
-          title: "system"
-        },
-        {
-          title: "hello"
-        },
-        {
-          title: "items"
-        }
-      ];
-      const query = "ems";
-      expect(
-        fuzzy(query, items, "title", {
-          sort: true
-        })
-      ).toStrictEqual([items[2], items[0], items[1]]);
-    });
-    test("should not sort items by score when sort is false", () => {
-      const items = [
-        {
-          title: "system"
-        },
-        {
-          title: "items"
-        }
-      ];
-      const query = "lo";
-      expect(
-        fuzzy(query, items, "title", {
-          sort: false
-        })
-      ).toStrictEqual([items[0], items[1]]);
-    });
+  test("should sort items by score when sort", () => {
+    const items = [
+      {
+        title: "system"
+      },
+      {
+        title: "hello"
+      },
+      {
+        title: "items"
+      }
+    ];
+    const query = "ems";
+    expect(fuzzy(query, items, "title")).toStrictEqual([
+      items[2],
+      items[0],
+      items[1]
+    ]);
   });
   describe("opts.matchOnly", () => {
     test("should return all items when matchOnly is false", () => {

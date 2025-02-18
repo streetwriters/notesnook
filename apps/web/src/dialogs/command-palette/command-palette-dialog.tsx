@@ -114,7 +114,7 @@ export const CommandPaletteDialog = DialogManager.register(
             suffix: "</b>"
           }
         );
-        setCommands(highlighted);
+        setCommands(sortCommands(highlighted));
       } finally {
         setLoading(false);
       }
@@ -534,6 +534,30 @@ function getSessionsAsCommands() {
     });
 }
 
+/**
+ * commands need to be sorted wrt groups,
+ * meaning commands of same group should be next to each other,
+ * and recent commands should be at the top
+ */
+function sortCommands(commands: Command[]) {
+  const recent: Command[] = [];
+  const sortedWrtGroups: Command[][] = [];
+  for (const command of commands) {
+    const group = command.group;
+    if (group === "recent") {
+      recent.push(command);
+      continue;
+    }
+    const index = sortedWrtGroups.findIndex((c) => c[0].group === group);
+    if (index === -1) {
+      sortedWrtGroups.push([command]);
+    } else {
+      sortedWrtGroups[index].push(command);
+    }
+  }
+  return recent.concat(sortedWrtGroups.flat());
+}
+
 function search(query: string) {
   const prepared = prepareQuery(query);
   if (isCommandMode(query)) {
@@ -548,29 +572,9 @@ function search(query: string) {
 function commandSearch(query: string) {
   const commands = getDefaultCommands();
   const result = fuzzy(query, commands, "title", {
-    matchOnly: true,
-    sort: true
+    matchOnly: true
   });
-  /**
-   * result is sorted based on query match score
-   * we also make sure that commands are sorted wrt groups
-   */
-  const recent: Command[] = [];
-  const sortedWrtGroups: Command[][] = [];
-  for (const command of result) {
-    const group = command.group;
-    if (group === "recent") {
-      recent.push(command);
-      continue;
-    }
-    const index = sortedWrtGroups.findIndex((c) => c[0].group === group);
-    if (index === -1) {
-      sortedWrtGroups.push([command]);
-    } else {
-      sortedWrtGroups[index].push(command);
-    }
-  }
-  return recent.concat(sortedWrtGroups.flat());
+  return result;
 }
 
 async function dbSearch(query: string) {
