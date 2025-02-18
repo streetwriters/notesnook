@@ -19,21 +19,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { getFormattedDate } from "@notesnook/common";
 import { BaseTrashItem, Notebook, TrashItem } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../../e2e/test.ids";
 import { useIsCompactModeEnabled } from "../../../hooks/use-is-compact-mode-enabled";
+import useIsSelected from "../../../hooks/use-selected";
+import { useSelectionStore } from "../../../stores/use-selection-store";
 import { AppFontSize } from "../../../utils/size";
 import { Properties } from "../../properties";
+import AppIcon from "../../ui/AppIcon";
 import { IconButton } from "../../ui/icon-button";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import { strings } from "@notesnook/intl";
-import { useSelectionStore } from "../../../stores/use-selection-store";
-import useIsSelected from "../../../hooks/use-selected";
-import AppIcon from "../../ui/AppIcon";
 
 type NotebookItemProps = {
   item: Notebook | BaseTrashItem<Notebook>;
@@ -192,11 +192,20 @@ export const NotebookItem = ({
         ) : null}
         {selectionMode === "notebook" || selectionMode === "trash" ? (
           <>
-            <AppIcon
-              name={selected ? "checkbox-outline" : "checkbox-blank-outline"}
-              color={selected ? colors.selected.icon : colors.primary.icon}
-              size={AppFontSize.lg}
-            />
+            <View
+              style={{
+                height: 35,
+                width: 35,
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              <AppIcon
+                name={selected ? "checkbox-outline" : "checkbox-blank-outline"}
+                color={selected ? colors.selected.icon : colors.primary.icon}
+                size={AppFontSize.lg}
+              />
+            </View>
           </>
         ) : (
           <IconButton
