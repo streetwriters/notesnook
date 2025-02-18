@@ -179,7 +179,9 @@ const useTiptap = (
     () => ({
       enableCoreExtensions: false,
       editorProps: {
-        ...editorProps
+        ...editorProps,
+        scrollMargin: 50,
+        scrollThreshold: 50
       },
       extensions: [
         ...CoreExtensions,
