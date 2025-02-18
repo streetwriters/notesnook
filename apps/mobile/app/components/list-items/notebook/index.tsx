@@ -31,6 +31,9 @@ import { IconButton } from "../../ui/icon-button";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
+import { useSelectionStore } from "../../../stores/use-selection-store";
+import useIsSelected from "../../../hooks/use-selected";
+import AppIcon from "../../ui/AppIcon";
 
 type NotebookItemProps = {
   item: Notebook | BaseTrashItem<Notebook>;
@@ -50,6 +53,8 @@ export const NotebookItem = ({
   const compactMode = useIsCompactModeEnabled(
     (item as TrashItem).itemType || item.type
   );
+  const selectionMode = useSelectionStore((state) => state.selectionMode);
+  const [selected] = useIsSelected(item);
 
   return (
     <>
@@ -185,21 +190,30 @@ export const NotebookItem = ({
             </Paragraph>
           </>
         ) : null}
-
-        <IconButton
-          color={colors.primary.heading}
-          name="dots-horizontal"
-          testID={notesnook.ids.notebook.menu}
-          size={AppFontSize.xl}
-          onPress={() => Properties.present(item)}
-          style={{
-            justifyContent: "center",
-            height: 35,
-            width: 35,
-            borderRadius: 100,
-            alignItems: "center"
-          }}
-        />
+        {selectionMode === "notebook" || selectionMode === "trash" ? (
+          <>
+            <AppIcon
+              name={selected ? "checkbox-outline" : "checkbox-blank-outline"}
+              color={selected ? colors.selected.icon : colors.primary.icon}
+              size={AppFontSize.lg}
+            />
+          </>
+        ) : (
+          <IconButton
+            color={colors.primary.heading}
+            name="dots-horizontal"
+            testID={notesnook.ids.notebook.menu}
+            size={AppFontSize.xl}
+            onPress={() => Properties.present(item)}
+            style={{
+              justifyContent: "center",
+              height: 35,
+              width: 35,
+              borderRadius: 100,
+              alignItems: "center"
+            }}
+          />
+        )}
       </View>
     </>
   );
