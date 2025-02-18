@@ -83,7 +83,11 @@ const Auth = ({ navigation, route }) => {
             <Button
               title={strings.skip()}
               onPress={() => {
-                Navigation.goBack();
+                if (initialAuthMode.current === 2) {
+                  Navigation.replace("FluidPanelsView");
+                } else {
+                  Navigation.goBack();
+                }
               }}
               iconSize={16}
               type="plain"
