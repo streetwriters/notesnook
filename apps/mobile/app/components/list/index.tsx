@@ -26,7 +26,7 @@ import {
   NativeSyntheticEvent,
   RefreshControl
 } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 import { notesnook } from "../../../e2e/test.ids";
 import { useGroupOptions } from "../../hooks/use-group-options";
 import { eSendEvent } from "../../services/event-manager";
@@ -149,7 +149,7 @@ export default function List(props: ListProps) {
         style={{
           flex: 1
         }}
-        entering={props.renderedInRoute === "Search" ? undefined : FadeInDown}
+        entering={props.renderedInRoute === "Search" ? undefined : FadeIn}
       >
         <ListView
           style={styles}

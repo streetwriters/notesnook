@@ -29,14 +29,12 @@ import { hideAllTooltips } from "../hooks/use-tooltip";
 import Favorites from "../screens/favorites";
 import Home from "../screens/home";
 import NotebookScreen from "../screens/notebook";
-import Notebooks from "../screens/notebooks";
 import { ColoredNotes } from "../screens/notes/colored";
 import { Monographs } from "../screens/notes/monographs";
 import { TaggedNotes } from "../screens/notes/tagged";
 import Reminders from "../screens/reminders";
 import { Search } from "../screens/search";
 import Settings from "../screens/settings";
-import Tags from "../screens/tags";
 import Trash from "../screens/trash";
 import SettingsService from "../services/settings";
 import useNavigationStore, {
@@ -72,10 +70,8 @@ const AppNavigation = React.memo(
         }}
       >
         <AppStack.Screen name="Notes" component={Home as any} />
-        <AppStack.Screen name="Notebooks" component={Notebooks as any} />
         <AppStack.Screen name="Favorites" component={Favorites as any} />
         <AppStack.Screen name="Trash" component={Trash as any} />
-        <AppStack.Screen name="Tags" component={Tags as any} />
         <AppStack.Screen name="TaggedNotes" component={TaggedNotes as any} />
         <AppStack.Screen name="ColoredNotes" component={ColoredNotes as any} />
         <AppStack.Screen name="Reminders" component={Reminders as any} />
