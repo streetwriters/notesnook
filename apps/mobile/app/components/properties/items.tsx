@@ -71,7 +71,8 @@ const COLUMN_BAR_ITEMS: ActionId[] = [
   "rename-color",
   "rename-tag",
   "restore",
-  "trash"
+  "trash",
+  "delete"
 ];
 
 export const Items = ({ item, close }: { item: Item; close: () => void }) => {
