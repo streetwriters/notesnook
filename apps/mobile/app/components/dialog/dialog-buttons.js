@@ -56,12 +56,7 @@ const DialogButtons = ({
         }
       ]}
     >
-      {loading ? (
-        <ActivityIndicator
-          color={colors.primary.accent}
-          size={AppFontSize.lg}
-        />
-      ) : doneText ? (
+      {doneText ? (
         <View
           style={{
             flexDirection: "row",
@@ -101,6 +96,7 @@ const DialogButtons = ({
             style={{
               marginLeft: 10
             }}
+            loading={loading}
             bold
             type={positiveType || "transparent"}
             title={positiveTitle}

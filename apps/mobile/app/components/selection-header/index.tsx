@@ -46,6 +46,7 @@ import ExportNotesSheet from "../sheets/export-notes";
 import ManageTagsSheet from "../sheets/manage-tags";
 import { MoveNotebookSheet } from "../sheets/move-notebook";
 import { IconButton } from "../ui/icon-button";
+import NativeTooltip from "../../utils/tooltip";
 
 export const SelectionHeader = React.memo(
   ({
@@ -69,7 +70,7 @@ export const SelectionHeader = React.memo(
     const allSelected =
       items?.placeholders?.length === selectedItemsList.length;
     const focusedRouteId = useNavigationStore((state) => state.focusedRouteId);
-
+    console.log(focusedRouteId, "focusedRouteId");
     useEffect(() => {
       if (selectionMode) {
         fluidTabsRef.current?.lock();
@@ -169,116 +170,148 @@ export const SelectionHeader = React.memo(
             color={allSelected ? colors.primary.accent : colors.primary.icon}
             name="select-all"
           />
-
           {!selectedItemsList.length
             ? null
-            : [
-                {
-                  title: strings.move(),
-                  onPress: async () => {
-                    const ids = selectedItemsList;
-                    const notebooks = await db.notebooks.all.items(ids);
-                    MoveNotebookSheet.present(notebooks);
-                  },
-                  visible: renderedInRoute === "Notebooks",
-                  icon: "arrow-right-bold-box-outline"
-                },
-                {
-                  title: strings.manageTags(),
-                  onPress: async () => {
-                    await sleep(100);
-                    ManageTagsSheet.present(selectedItemsList);
-                  },
-                  visible: type === "note",
-                  icon: "pound"
-                },
-                {
-                  title: strings.export(),
-                  onPress: async () => {
-                    await sleep(100);
-                    ExportNotesSheet.present(selectedItemsList);
-                  },
-                  visible: type === "note",
-                  icon: "export"
-                },
-                {
-                  title: strings.linkNotebook(),
-                  onPress: async () => {
-                    await sleep(100);
-                    MoveNoteSheet.present();
-                  },
-                  visible: type === "note",
-                  icon: "plus"
-                },
-                {
-                  title: strings.unlinkNotebook(),
-                  onPress: async () => {
-                    if (!id) return;
-                    await db.notes.removeFromNotebook(id, ...selectedItemsList);
-                    updateNotebook(id);
-                    Navigation.queueRoutesForUpdate();
-                    clearSelection();
-                  },
-                  visible: renderedInRoute === "Notebook",
-                  icon: "minus"
-                },
-                {
-                  title: strings.unfavorite(),
-                  onPress: addToFavorite,
-                  visible: focusedRouteId === "Favorites",
-                  icon: "star-off"
-                },
-                {
-                  title: strings.moveToTrash(),
-                  onPress: async () => {
-                    const selection = useSelectionStore.getState();
-                    if (!selection.selectionMode) return;
-                    await deleteItems(
-                      selection.selectionMode as ItemType,
-                      selection.selectedItemsList
-                    );
-                    selection.clearSelection();
-                    selection.setSelectionMode(undefined);
-                  },
-                  visible: type === "note" || type === "notebook",
-                  icon: "delete"
-                },
-                {
-                  title: strings.doActions.delete.unknown(
-                    type!,
-                    selectedItemsList.length
-                  ),
-                  onPress: async () => {
-                    const selection = useSelectionStore.getState();
-                    if (!selection.selectionMode) return;
-                    await deleteItems(
-                      selection.selectionMode as ItemType,
-                      selection.selectedItemsList
-                    );
-                    selection.clearSelection();
-                    selection.setSelectionMode(undefined);
-                  },
-                  visible:
-                    type !== "trash" && type !== "note" && type !== "notebook",
-                  icon: "delete"
-                },
-                {
-                  title: strings.restore(),
-                  onPress: restoreItem,
-                  visible: type === "trash",
-                  icon: "delete-restore"
-                },
-                {
-                  title: strings.delete(),
-                  onPress: deleteItem,
-                  visible: type === "trash",
-                  icon: "delete"
-                }
-              ].map((item) =>
+            : (focusedRouteId === "Monographs"
+                ? [
+                    {
+                      title: strings.unpublish(),
+                      onPress: () => {
+                        presentDialog({
+                          title: strings.doActions.unpublish.note(
+                            selectedItemsList.length
+                          ),
+                          positiveText: strings.unpublish(),
+                          negativeText: strings.cancel(),
+                          positivePress: async () => {
+                            for (const id of selectedItemsList) {
+                              await db.monographs.unpublish(id);
+                            }
+                            Navigation.queueRoutesForUpdate();
+                            clearSelection();
+                          },
+                          positiveType: "errorShade"
+                        });
+                      },
+                      visible: true,
+                      icon: "delete"
+                    }
+                  ]
+                : [
+                    {
+                      title: strings.move(),
+                      onPress: async () => {
+                        const ids = selectedItemsList;
+                        const notebooks = await db.notebooks.all.items(ids);
+                        MoveNotebookSheet.present(notebooks);
+                      },
+                      visible: renderedInRoute === "Notebooks",
+                      icon: "arrow-right-bold-box-outline"
+                    },
+                    {
+                      title: strings.manageTags(),
+                      onPress: async () => {
+                        await sleep(100);
+                        ManageTagsSheet.present(selectedItemsList);
+                      },
+                      visible: type === "note",
+                      icon: "pound"
+                    },
+                    {
+                      title: strings.export(),
+                      onPress: async () => {
+                        await sleep(100);
+                        ExportNotesSheet.present(selectedItemsList);
+                      },
+                      visible: type === "note",
+                      icon: "export"
+                    },
+                    {
+                      title: strings.linkNotebook(),
+                      onPress: async () => {
+                        await sleep(100);
+                        MoveNoteSheet.present();
+                      },
+                      visible: type === "note",
+                      icon: "plus"
+                    },
+                    {
+                      title: strings.unlinkNotebook(),
+                      onPress: async () => {
+                        if (!id) return;
+                        await db.notes.removeFromNotebook(
+                          id,
+                          ...selectedItemsList
+                        );
+                        updateNotebook(id);
+                        Navigation.queueRoutesForUpdate();
+                        clearSelection();
+                      },
+                      visible: renderedInRoute === "Notebook",
+                      icon: "minus"
+                    },
+                    {
+                      title: strings.unfavorite(),
+                      onPress: addToFavorite,
+                      visible: focusedRouteId === "Favorites",
+                      icon: "star-off"
+                    },
+                    {
+                      title: strings.moveToTrash(),
+                      onPress: async () => {
+                        const selection = useSelectionStore.getState();
+                        if (!selection.selectionMode) return;
+                        await deleteItems(
+                          selection.selectionMode as ItemType,
+                          selection.selectedItemsList
+                        );
+                        selection.clearSelection();
+                        selection.setSelectionMode(undefined);
+                      },
+                      visible: type === "note" || type === "notebook",
+                      icon: "delete"
+                    },
+                    {
+                      title: strings.doActions.delete.unknown(
+                        type!,
+                        selectedItemsList.length
+                      ),
+                      onPress: async () => {
+                        const selection = useSelectionStore.getState();
+                        if (!selection.selectionMode) return;
+                        await deleteItems(
+                          selection.selectionMode as ItemType,
+                          selection.selectedItemsList
+                        );
+                        selection.clearSelection();
+                        selection.setSelectionMode(undefined);
+                      },
+                      visible:
+                        type !== "trash" &&
+                        type !== "note" &&
+                        type !== "notebook",
+                      icon: "delete"
+                    },
+                    {
+                      title: strings.restore(),
+                      onPress: restoreItem,
+                      visible: type === "trash",
+                      icon: "delete-restore"
+                    },
+                    {
+                      title: strings.delete(),
+                      onPress: deleteItem,
+                      visible: type === "trash",
+                      icon: "delete"
+                    }
+                  ]
+              ).map((item) =>
                 !item.visible ? null : (
                   <IconButton
                     size={AppFontSize.lg}
                     type="plain"
+                    tooltipText={item.title}
+                    tooltipPosition={NativeTooltip.POSITIONS.TOP}
                     testID={`select-${item.icon}`}
                     name={item.icon}
                     key={item.title}

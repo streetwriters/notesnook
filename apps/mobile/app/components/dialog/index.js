@@ -45,6 +45,7 @@ export const Dialog = ({ context = "global" }) => {
   const { colors } = useThemeColors();
   const [visible, setVisible] = useState(false);
   const [checked, setChecked] = useState(false);
+  const [loading, setLoading] = useState(false);
   const values = useRef({
     inputValue: undefined
   });
@@ -73,14 +74,23 @@ export const Dialog = ({ context = "global" }) => {
   const onPressPositive = async () => {
     if (dialogInfo.positivePress) {
       inputRef.current?.blur();
-      let result = await dialogInfo.positivePress(
-        values.current.inputValue || dialogInfo.defaultValue,
-        checked
-      );
+      setLoading(true);
+      let result;
+      try {
+        result = await dialogInfo.positivePress(
+          values.current.inputValue || dialogInfo.defaultValue,
+          checked
+        );
+      } catch (e) {
+        /** Empty */
+      }
+      setLoading(false);
+
       if (result === false) {
         return;
       }
     }
+
     setChecked(false);
     values.current.inputValue = undefined;
     setVisible(false);
@@ -226,6 +236,7 @@ export const Dialog = ({ context = "global" }) => {
         <DialogButtons
           onPressNegative={onNegativePress}
           onPressPositive={dialogInfo.positivePress && onPressPositive}
+          loading={loading}
           positiveTitle={dialogInfo.positiveText}
           negativeTitle={dialogInfo.negativeText}
           positiveType={dialogInfo.positiveType}
