@@ -105,7 +105,7 @@ const NoteItem = ({
         {compactMode ? null : (
           <Paragraph
             style={{
-              fontSize: AppFontSize.xxs,
+              fontSize: AppFontSize.xxxs,
               color: colors.secondary.paragraph
             }}
           >

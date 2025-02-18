@@ -99,15 +99,12 @@ export const Card = ({
                 flexWrap: "nowrap",
                 flexShrink: 1
               }}
-              size={AppFontSize.xs}
+              size={AppFontSize.sm}
               color={colors.primary.heading}
             >
               {messageBoardState.actionText}
             </Paragraph>
-            <Paragraph
-              color={colors.secondary.paragraph}
-              size={AppFontSize.xxs}
-            >
+            <Paragraph color={colors.secondary.paragraph} size={AppFontSize.xs}>
               {messageBoardState.message}
             </Paragraph>
           </View>

@@ -70,7 +70,7 @@ export const Tip = ({
         <Button
           title={strings.tip()}
           icon="information"
-          fontSize={AppFontSize.xs}
+          fontSize={AppFontSize.xxxs}
           iconSize={AppFontSize.xs}
           style={{
             width: undefined,
@@ -79,11 +79,13 @@ export const Tip = ({
             alignSelf: "flex-start",
             borderRadius: 100,
             borderWidth: 1,
-            borderColor: color ? color : colors.primary.accent
+            borderColor: colors.secondary.border
           }}
-          buttonType={{
-            text: color
+          textStyle={{
+            color: colors.secondary.paragraph
           }}
+          iconColor={colors.secondary.icon}
+          type="plain"
         />
 
         {neverShowAgain && (
@@ -114,7 +116,7 @@ export const Tip = ({
       <Paragraph
         style={textStyle}
         color={colors.primary.paragraph}
-        size={AppFontSize.md}
+        size={AppFontSize.sm}
       >
         {tip.text()}
       </Paragraph>

@@ -53,10 +53,15 @@ export function createNotebookTreeStores(
     addNotebooks: (
       parentId: string,
       notebooks: Notebook[],
-      depth: number
-    ) => void;
+      depth: number,
+      tree?: TreeItem[]
+    ) => Promise<TreeItem[]>;
     updateItem: (id: string, notebook: Notebook) => void;
-    fetchAndAdd: (parentId: string, depth: number) => Promise<void>;
+    fetchAndAdd: (
+      parentId: string,
+      depth: number,
+      tree?: TreeItem[]
+    ) => Promise<TreeItem[]>;
     removeChildren: (id: string) => void;
   }>((set, get) => ({
     tree: [],
@@ -77,12 +82,9 @@ export function createNotebookTreeStores(
     addNotebooks: async (
       parentId: string,
       notebooks: Notebook[],
-      depth: number
+      depth: number,
+      tree?: TreeItem[]
     ) => {
-      const parentIndex = get().tree.findIndex(
-        (item) => item.notebook.id === parentId
-      );
-
       const items = await db.relations
         .from(
           {
@@ -93,29 +95,46 @@ export function createNotebookTreeStores(
         )
         .get();
 
-      let newTree = get().tree.slice();
+      let newTree = tree || get().tree.slice();
+
+      const parentIndex = newTree.findIndex(
+        (item) => item.notebook.id === parentId
+      );
+
       for (const item of newTree) {
         if (item.parentId === parentId) {
           newTree = removeTreeItem(newTree, item.notebook.id);
         }
       }
-      newTree.splice(
-        parentIndex + 1,
-        0,
-        ...notebooks.map((notebook) => {
-          return {
-            parentId,
-            notebook,
-            depth: depth,
-            hasChildren: items.some((item) => {
-              return item.fromId === notebook.id;
-            })
-          };
-        })
-      );
-      set({
-        tree: newTree
+
+      const newTreeItems = notebooks.map((notebook) => {
+        return {
+          parentId,
+          notebook,
+          depth: depth,
+          hasChildren: items.some((item) => {
+            return item.fromId === notebook.id;
+          })
+        };
       });
+
+      newTree.splice(parentIndex + 1, 0, ...newTreeItems);
+
+      for (const item of newTreeItems) {
+        const expanded =
+          useSideMenuNotebookExpandedStore.getState().expanded[
+            item.notebook.id
+          ] && item.hasChildren;
+        if (expanded) {
+          newTree = await get().fetchAndAdd(
+            item.notebook.id,
+            depth + 1,
+            newTree
+          );
+        }
+      }
+
+      return newTree;
     },
 
     removeItem(id) {
@@ -123,7 +142,7 @@ export function createNotebookTreeStores(
         tree: removeTreeItem(get().tree, id).slice()
       });
     },
-    fetchAndAdd: async (parentId: string, depth: number) => {
+    fetchAndAdd: async (parentId: string, depth: number, tree?: TreeItem[]) => {
       const selector = db.relations.from(
         {
           type: "notebook",
@@ -135,13 +154,15 @@ export function createNotebookTreeStores(
       const grouped = await selector.sorted(
         db.settings.getGroupOptions("notebooks")
       );
-
       const notebooks: Notebook[] = [];
       for (let index = 0; index < grouped.placeholders.length; index++) {
         const notebook = (await grouped.item(index)).item;
         if (notebook) notebooks.push(notebook);
       }
-      get().addNotebooks(parentId, notebooks, depth);
+
+      tree = await get().addNotebooks(parentId, notebooks, depth, tree);
+
+      return tree;
     },
     removeChildren(id: string) {
       let newTree = get().tree.slice();
@@ -169,7 +190,9 @@ export function createNotebookTreeStores(
   }>(
     persist(
       (set, get) => ({
-        expanded: {},
+        expanded: {
+          root: true
+        },
         setExpanded(id: string) {
           set({
             expanded: {
@@ -180,7 +203,7 @@ export function createNotebookTreeStores(
         }
       }),
       {
-        name: "side-menu-notebook-expanded",
+        name: "side-menu-notebook-expanded-v1",
         getStorage: () => MMKV as unknown as StateStorage
       }
     )
