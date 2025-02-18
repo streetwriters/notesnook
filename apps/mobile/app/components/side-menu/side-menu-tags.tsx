@@ -66,7 +66,7 @@ const TagItem = (props: {
     <View
       style={{
         paddingHorizontal: DefaultAppStyles.GAP,
-        marginTop: (props.id as number) === 0 ? DefaultAppStyles.GAP : 0
+        marginTop: (props.id as number) === 0 ? DefaultAppStyles.GAP : 2
       }}
     >
       {item ? (

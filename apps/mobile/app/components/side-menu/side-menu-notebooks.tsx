@@ -202,7 +202,7 @@ const NotebookItem = ({
       }}
     >
       <Pressable
-        type={isFocused ? "selected" : "transparent"}
+        type={isFocused || selected ? "selected" : "transparent"}
         onLongPress={onLongPress}
         testID={`notebook-item-${item.depth}-${index}`}
         onPress={async () => {
@@ -246,12 +246,14 @@ const NotebookItem = ({
             onPress={() => {
               if (item.hasChildren) {
                 onToggleExpanded?.();
+              } else {
+                onPress?.();
               }
             }}
             top={0}
-            left={20}
+            left={50}
             bottom={0}
-            right={20}
+            right={40}
             style={{
               width: 32,
               height: 32,
@@ -299,14 +301,12 @@ const NotebookItem = ({
           </View>
         ) : (
           <>
-            {totalNotes(notebook?.id) ? (
-              <Paragraph
-                size={AppFontSize.xxs}
-                color={colors.secondary.paragraph}
-              >
-                {totalNotes?.(notebook?.id)}
-              </Paragraph>
-            ) : null}
+            <Paragraph
+              size={AppFontSize.xxs}
+              color={colors.secondary.paragraph}
+            >
+              {totalNotes?.(notebook?.id) || 0}
+            </Paragraph>
           </>
         )}
       </Pressable>
@@ -327,7 +327,10 @@ export const SideMenuNotebooks = () => {
     for (let i = 0; i < filteredNotebooks.placeholders.length; i++) {
       _notebooks[i] = (await filteredNotebooks?.item(i))?.item as Notebook;
     }
-    useSideMenuNotebookTreeStore.getState().addNotebooks("root", _notebooks, 0);
+    const items = await useSideMenuNotebookTreeStore
+      .getState()
+      .addNotebooks("root", _notebooks, 0);
+    useSideMenuNotebookTreeStore.getState().setTree(items);
   }, [filteredNotebooks]);
 
   const updateNotebooks = React.useCallback(() => {
@@ -391,6 +394,8 @@ export const SideMenuNotebooks = () => {
     []
   );
 
+  console.log("RENDERING ROOT");
+
   return (
     <View
       style={{
@@ -408,6 +413,8 @@ export const SideMenuNotebooks = () => {
             bounces={false}
             bouncesZoom={false}
             overScrollMode="never"
+            keyExtractor={(item) => item.notebook.id}
+            windowSize={3}
             ListHeaderComponent={
               <View
                 style={{
@@ -457,6 +464,7 @@ const NotebookItemWrapper = React.memo(
     const expanded = useSideMenuNotebookExpandedStore(
       (state) => state.expanded[item.notebook.id]
     );
+
     const selectionEnabled = useSideMenuNotebookSelectionStore(
       (state) => state.enabled
     );
@@ -466,18 +474,6 @@ const NotebookItemWrapper = React.memo(
     const focused = useNavigationStore(
       (state) => state.focusedRouteId === item.notebook.id
     );
-
-    useEffect(() => {
-      if (expanded) {
-        useSideMenuNotebookTreeStore
-          .getState()
-          .fetchAndAdd(item.notebook.id, item.depth + 1);
-      } else {
-        useSideMenuNotebookTreeStore
-          .getState()
-          .removeChildren(item.notebook.id);
-      }
-    }, [expanded, item.depth, item.notebook]);
 
     const onItemUpdate = React.useCallback(async () => {
       const notebook = await db.notebooks.notebook(item.notebook.id);
@@ -490,6 +486,8 @@ const NotebookItemWrapper = React.memo(
       }
     }, [item.notebook.id]);
 
+    console.log("RENDERING", item?.notebook?.title, item.parentId);
+
     return (
       <View
         style={{
@@ -501,10 +499,23 @@ const NotebookItemWrapper = React.memo(
           item={item}
           index={index}
           expanded={expanded}
-          onToggleExpanded={() => {
+          onToggleExpanded={async () => {
             useSideMenuNotebookExpandedStore
               .getState()
               .setExpanded(item.notebook.id);
+            if (!expanded) {
+              useSideMenuNotebookTreeStore
+                .getState()
+                .setTree(
+                  await useSideMenuNotebookTreeStore
+                    .getState()
+                    .fetchAndAdd(item.notebook.id, item.depth + 1)
+                );
+            } else {
+              useSideMenuNotebookTreeStore
+                .getState()
+                .removeChildren(item.notebook.id);
+            }
           }}
           selected={selected}
           selectionEnabled={selectionEnabled}
