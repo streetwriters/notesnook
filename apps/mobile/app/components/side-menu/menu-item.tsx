@@ -21,8 +21,8 @@ import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { db } from "../../common/database";
 import { useTotalNotes } from "../../hooks/use-db-item";
+
 import Navigation from "../../services/navigation";
 import { useFavoriteStore } from "../../stores/use-favorite-store";
 import useNavigationStore, {
@@ -35,6 +35,7 @@ import { defaultBorderRadius, AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { Pressable } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
+import { useMonographStore } from "../../stores/use-monograph-store";
 
 function _MenuItem({
   item,
@@ -93,10 +94,12 @@ function _MenuItem({
           );
           break;
         case "Monographs":
-          db.monographs.all.count().then((count) => {
-            setItemCount(count);
+          unsub = useMonographStore.subscribe((state) => {
+            setItemCount(state.items?.placeholders.length || 0);
           });
-          // TODO make it reactive?
+          setItemCount(
+            useMonographStore.getState().items?.placeholders?.length || 0
+          );
           break;
         case "Trash":
           unsub = useTrashStore.subscribe((state) => {
@@ -184,16 +187,14 @@ function _MenuItem({
         </Paragraph>
       </View>
 
-      {menuItemCount > 0 ? (
-        <Paragraph
-          size={AppFontSize.xxs}
-          color={
-            isFocused ? colors.primary.paragraph : colors.secondary.paragraph
-          }
-        >
-          {menuItemCount}
-        </Paragraph>
-      ) : null}
+      <Paragraph
+        size={AppFontSize.xxs}
+        color={
+          isFocused ? colors.primary.paragraph : colors.secondary.paragraph
+        }
+      >
+        {menuItemCount}
+      </Paragraph>
     </Pressable>
   );
 }

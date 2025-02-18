@@ -19,18 +19,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
-import { ActivityIndicator, useWindowDimensions, View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 import { notesnook } from "../../../e2e/test.ids";
-import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { TTip, useTip } from "../../services/tip-manager";
+import { RouteParams } from "../../stores/use-navigation-store";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { defaultBorderRadius, AppFontSize } from "../../utils/size";
+import { AppFontSize, defaultBorderRadius } from "../../utils/size";
 import { Tip } from "../tip";
 import { Button } from "../ui/button";
 import Seperator from "../ui/seperator";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { RouteParams } from "../../stores/use-navigation-store";
 
 export type PlaceholderData = {
   title: string;
@@ -59,8 +58,6 @@ export const Empty = React.memo(function Empty({
   screen
 }: EmptyListProps) {
   const { colors } = useThemeColors();
-  const insets = useGlobalSafeAreaInsets();
-  const { height } = useWindowDimensions();
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
   );
@@ -75,7 +72,7 @@ export const Empty = React.memo(function Empty({
     <View
       style={[
         {
-          height: height - (140 + insets.top),
+          flex: 1,
           width: "80%",
           justifyContent: "center",
           alignSelf: "center"
@@ -99,14 +96,11 @@ export const Empty = React.memo(function Empty({
           {placeholder?.button && (
             <Button
               testID={notesnook.buttons.add}
-              type="accent"
+              type="secondaryAccented"
               title={placeholder?.button}
               iconPosition="right"
               icon="arrow-right"
               onPress={placeholder?.action}
-              buttonType={{
-                text: "white"
-              }}
               style={{
                 alignSelf: "flex-start",
                 borderRadius: defaultBorderRadius,

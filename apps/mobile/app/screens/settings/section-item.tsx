@@ -38,6 +38,8 @@ import { SettingStore, useSettingStore } from "../../stores/use-setting-store";
 import { AppFontSize } from "../../utils/size";
 import { components } from "./components";
 import { RouteParams, SettingSection } from "./types";
+import Heading from "../../components/ui/typography/heading";
+import { DefaultAppStyles } from "../../utils/styles";
 
 const _SectionItem = ({ item }: { item: SettingSection }) => {
   const { colors } = useThemeColors();
@@ -117,10 +119,10 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
       style={{
         width: "100%",
         alignItems: "center",
-        padding: 12,
+        padding: DefaultAppStyles.GAP,
         flexDirection: "row",
         justifyContent: "space-between",
-        paddingVertical: 20,
+        paddingVertical: DefaultAppStyles.GAP,
         opacity: isDisabled ? 0.5 : 1,
         borderRadius: 0,
         ...styles
@@ -188,16 +190,17 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
             paddingRight: item.type === "switch" ? 10 : 0
           }}
         >
-          <Paragraph
+          <Heading
             color={
               item.type === "danger"
                 ? colors.error.paragraph
                 : colors.primary.heading
             }
-            size={AppFontSize.md + 1}
+            size={AppFontSize.sm}
           >
             {typeof item.name === "function" ? item.name(current) : item.name}
-          </Paragraph>
+          </Heading>
+
           {!!item.description && (
             <Paragraph
               color={

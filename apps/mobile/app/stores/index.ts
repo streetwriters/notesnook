@@ -23,6 +23,7 @@ import { NotePreviewWidget } from "../services/note-preview-widget";
 import Notifications from "../services/notifications";
 import { useFavoriteStore } from "./use-favorite-store";
 import { useMenuStore } from "./use-menu-store";
+import { useMonographStore } from "./use-monograph-store";
 import { useNotebookStore } from "./use-notebook-store";
 import { useNoteStore } from "./use-notes-store";
 import { useRelationStore } from "./use-relation-store";
@@ -39,6 +40,7 @@ export function initAfterSync() {
   useRelationStore.getState().update();
   useMenuStore.getState().setColorNotes();
   useMenuStore.getState().setMenuPins();
+  useMonographStore.getState().refresh();
   useUserStore.setState({
     profile: db.settings.getProfile()
   });
@@ -57,4 +59,5 @@ export function clearAllStores() {
   useMenuStore.getState().clearAll();
   useTrashStore.getState().clear();
   useReminderStore.getState().clear();
+  useMonographStore.getState().clear();
 }

@@ -151,60 +151,69 @@ export default function List(props: ListProps) {
         }}
         entering={props.renderedInRoute === "Search" ? undefined : FadeIn}
       >
-        <ListView
-          style={styles}
-          ref={scrollRef}
-          testID={notesnook.list.id}
-          data={props.data?.placeholders || []}
-          renderItem={renderItem}
-          onScroll={onListScroll}
-          nestedScrollEnabled={true}
-          onMomentumScrollEnd={() => {
-            fluidTabsRef.current?.unlock();
-          }}
-          getItemType={(item: number, index: number) => {
-            return props.data?.type(index);
-          }}
-          estimatedItemSize={isCompactModeEnabled ? 60 : 120}
-          directionalLockEnabled={true}
-          keyboardShouldPersistTaps="always"
-          keyboardDismissMode="interactive"
-          refreshControl={
-            props.isRenderedInActionSheet ? null : (
-              <RefreshControl
-                tintColor={colors.primary.accent}
-                colors={[colors.primary.accent]}
-                progressBackgroundColor={colors.secondary.background}
-                onRefresh={_onRefresh}
-                refreshing={false}
-              />
-            )
-          }
-          ListEmptyComponent={
-            props.placeholder ? (
-              <Empty
-                loading={props.loading}
-                title={props.headerTitle}
-                dataType={props.dataType}
+        {props.data?.placeholders?.length === 0 ? (
+          <>
+            {props.CustomLisHeader ? (
+              props.CustomLisHeader
+            ) : !props.headerTitle ? null : (
+              <Header
                 color={props.customAccentColor}
-                placeholder={props.placeholder}
                 screen={props.renderedInRoute}
               />
-            ) : null
-          }
-          ListHeaderComponent={
-            <>
-              {props.CustomLisHeader ? (
-                props.CustomLisHeader
-              ) : !props.headerTitle ? null : (
-                <Header
-                  color={props.customAccentColor}
-                  screen={props.renderedInRoute}
+            )}
+            <Empty
+              loading={props.loading}
+              title={props.headerTitle}
+              dataType={props.dataType}
+              color={props.customAccentColor}
+              placeholder={props.placeholder}
+              screen={props.renderedInRoute}
+            />
+          </>
+        ) : (
+          <ListView
+            style={styles}
+            ref={scrollRef}
+            testID={notesnook.list.id}
+            data={props.data?.placeholders || []}
+            renderItem={renderItem}
+            onScroll={onListScroll}
+            nestedScrollEnabled={true}
+            onMomentumScrollEnd={() => {
+              fluidTabsRef.current?.unlock();
+            }}
+            getItemType={(item: number, index: number) => {
+              return props.data?.type(index);
+            }}
+            estimatedItemSize={isCompactModeEnabled ? 60 : 120}
+            directionalLockEnabled={true}
+            keyboardShouldPersistTaps="always"
+            keyboardDismissMode="interactive"
+            refreshControl={
+              props.isRenderedInActionSheet ? null : (
+                <RefreshControl
+                  tintColor={colors.primary.accent}
+                  colors={[colors.primary.accent]}
+                  progressBackgroundColor={colors.secondary.background}
+                  onRefresh={_onRefresh}
+                  refreshing={false}
                 />
-              )}
-            </>
-          }
-        />
+              )
+            }
+            ListHeaderComponent={
+              <>
+                {props.CustomLisHeader ? (
+                  props.CustomLisHeader
+                ) : !props.headerTitle ? null : (
+                  <Header
+                    color={props.customAccentColor}
+                    screen={props.renderedInRoute}
+                  />
+                )}
+              </>
+            }
+          />
+        )}
       </Animated.View>
     </>
   );

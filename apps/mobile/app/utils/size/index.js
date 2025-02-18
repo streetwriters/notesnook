@@ -84,10 +84,10 @@ export const normalize = (size) => {
 
 function getSize() {
   return {
-    xxxs: normalize(11) * scale.fontScale,
+    xxxs: normalize(11.5) * scale.fontScale,
     xxs: normalize(12.5) * scale.fontScale,
-    xs: normalize(14) * scale.fontScale,
-    sm: normalize(15) * scale.fontScale,
+    xs: normalize(13.5) * scale.fontScale,
+    sm: normalize(14.5) * scale.fontScale,
     md: normalize(16.5) * scale.fontScale,
     lg: normalize(22) * scale.fontScale,
     xl: normalize(24) * scale.fontScale,
