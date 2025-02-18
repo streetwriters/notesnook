@@ -69,24 +69,21 @@ import { EditTagDialog } from "../item-dialog";
 import { MoveNoteDialog } from "../move-note-dialog";
 
 function getLabelForActiveNoteGroup() {
-  const text = "Actions for ";
   const note = useEditorStore.getState().getActiveNote();
-  return note ? `${text} note: ${note.title}` : undefined;
+  return note ? strings.actionsForNote(note.title) : undefined;
 }
 
 function getLabelForActiveNotebookGroup() {
-  const text = "Actions for ";
   const context = noteStore.get().context;
   return context?.type === "notebook" && context.item?.title
-    ? `${text} notebook: ${context.item.title}`
+    ? strings.actionsForNotebook(context.item.title)
     : undefined;
 }
 
 function getLabelForActiveTagGroup() {
-  const text = "Actions for ";
   const context = noteStore.get().context;
   return context?.type === "tag" && context.item?.title
-    ? `${text} tag: ${context.item.title}`
+    ? strings.actionsForTag(context.item.title)
     : undefined;
 }
 
@@ -95,7 +92,7 @@ export const commands = [
     id: "pin-active-note",
     title: () => {
       const note = useEditorStore.getState().getActiveNote();
-      return note ? (note.pinned ? "Unpin" : "Pin") : undefined;
+      return note ? (note.pinned ? strings.unpin() : strings.pin()) : undefined;
     },
     icon: Pin,
     action: () => {
@@ -114,7 +111,7 @@ export const commands = [
     id: "readonly-active-note",
     title: () => {
       const note = useEditorStore.getState().getActiveNote();
-      return note ? "Toggle readonly" : undefined;
+      return note ? strings.toggleReadonly() : undefined;
     },
     icon: Readonly,
     action: () => {
@@ -133,7 +130,11 @@ export const commands = [
     id: "favorite-active-note",
     title: () => {
       const note = useEditorStore.getState().getActiveNote();
-      return note ? (note.favorite ? "Unfavorite" : "Favorite") : undefined;
+      return note
+        ? note.favorite
+          ? strings.unfavorite()
+          : strings.favorite()
+        : undefined;
     },
     icon: Star,
     action: () => {
@@ -152,7 +153,7 @@ export const commands = [
     id: "remind-me-active-note",
     title: () => {
       const note = useEditorStore.getState().getActiveNote();
-      return note ? "Remind me" : undefined;
+      return note ? strings.remindMe() : undefined;
     },
     icon: Reminder,
     action: () => {
@@ -172,7 +173,7 @@ export const commands = [
     id: "link-notebooks-active-note",
     title: () => {
       const note = useEditorStore.getState().getActiveNote();
-      return note ? "Link notebooks" : undefined;
+      return note ? strings.linkNotebooks() : undefined;
     },
     icon: Notebook,
     action: () => {
@@ -191,7 +192,7 @@ export const commands = [
     id: "add-tags-active-note",
     title: () => {
       const note = useEditorStore.getState().getActiveNote();
-      return note ? "Add tags" : undefined;
+      return note ? strings.addTags() : undefined;
     },
     icon: Tag,
     action: () => {
@@ -210,7 +211,7 @@ export const commands = [
     id: "publish-on-monograph-active-note",
     title: () => {
       const note = useEditorStore.getState().getActiveNote();
-      return note ? "Publish on monograph" : undefined;
+      return note ? strings.publishOnMonograph() : undefined;
     },
     icon: Publish,
     action: () => {
@@ -233,7 +234,7 @@ export const commands = [
     id: "open-in-monograph-active-note",
     title: () => {
       const note = useEditorStore.getState().getActiveNote();
-      return note ? "Open in monograph" : undefined;
+      return note ? strings.openInMonograph() : undefined;
     },
     icon: OpenInNew,
     action: () => {
@@ -257,7 +258,7 @@ export const commands = [
     id: "copy-monograph-link-active-note",
     title: () => {
       const note = useEditorStore.getState().getActiveNote();
-      return note ? "Copy monograph link" : undefined;
+      return note ? strings.copyMonographLink() : undefined;
     },
     icon: Copy,
     action: () => {
@@ -287,8 +288,8 @@ export const commands = [
       const note = useEditorStore.getState().getActiveNote();
       return note
         ? note?.localOnly
-          ? "Turn sync on"
-          : "Turn sync off"
+          ? strings.turnSyncOn()
+          : strings.turnSyncOff()
         : undefined;
     },
     icon: Sync,
@@ -318,7 +319,7 @@ export const commands = [
     id: "unpublish-on-monograph-active-note",
     title: () => {
       const note = useEditorStore.getState().getActiveNote();
-      return note ? "Unpublish on monograph" : undefined;
+      return note ? strings.unpublishOnMonograph() : undefined;
     },
     icon: Publish,
     action: () => {
@@ -339,7 +340,7 @@ export const commands = [
     id: "copy-link-active-note",
     title: () => {
       const note = useEditorStore.getState().getActiveNote();
-      return note ? "Copy link" : undefined;
+      return note ? strings.copyLink() : undefined;
     },
     icon: InternalLink,
     action: () => {
@@ -362,7 +363,10 @@ export const commands = [
   },
   {
     id: "duplicate-active-note",
-    title: () => "Duplicate",
+    title: () => {
+      const note = useEditorStore.getState().getActiveNote();
+      return note ? strings.duplicate() : undefined;
+    },
     icon: Duplicate,
     action: () => {
       const note = useEditorStore.getState().getActiveNote();
@@ -380,7 +384,7 @@ export const commands = [
     id: "move-to-trash-active-note",
     title: () => {
       const note = useEditorStore.getState().getActiveNote();
-      return note ? "Move to trash" : undefined;
+      return note ? strings.moveToTrash() : undefined;
     },
     icon: Trash,
     action: () => {
@@ -401,7 +405,7 @@ export const commands = [
     id: "restore-active-note",
     title: () => {
       const note = useEditorStore.getState().getActiveNote();
-      return note ? "Restore" : undefined;
+      return note ? strings.restore() : undefined;
     },
     icon: Restore,
     action: () => {
@@ -420,7 +424,7 @@ export const commands = [
     id: "delete-active-note",
     title: () => {
       const note = useEditorStore.getState().getActiveNote();
-      return note ? "Delete" : undefined;
+      return note ? strings.delete() : undefined;
     },
     icon: DeleteForver,
     action: () => {
@@ -439,7 +443,9 @@ export const commands = [
     id: "add-subnotebook-active-notebook",
     title: () => {
       const context = noteStore.get().context;
-      return context?.type === "notebook" ? "Add subnotebook" : undefined;
+      return context?.type === "notebook"
+        ? strings.addSubnotebook()
+        : undefined;
     },
     icon: Plus,
     action: () => {
@@ -460,7 +466,7 @@ export const commands = [
     id: "edit-active-notebook",
     title: () => {
       const context = noteStore.get().context;
-      return context?.type === "notebook" ? "Edit" : undefined;
+      return context?.type === "notebook" ? strings.edit() : undefined;
     },
     icon: NotebookEdit,
     action: () => {
@@ -483,8 +489,8 @@ export const commands = [
       const context = noteStore.get().context;
       return context?.type === "notebook"
         ? context.item?.pinned
-          ? "Unpin"
-          : "Pin"
+          ? strings.unpin()
+          : strings.pin()
         : undefined;
     },
     icon: Pin,
@@ -506,8 +512,8 @@ export const commands = [
       const context = noteStore.get().context;
       return context?.type === "notebook" && context.item
         ? db.shortcuts.exists(context.item.id)
-          ? "Remove shortcut"
-          : "Add shortcut"
+          ? strings.removeShortcut()
+          : strings.addShortcut()
         : undefined;
     },
     icon: Shortcut,
@@ -527,7 +533,7 @@ export const commands = [
     id: "move-to-trash-active-notebook",
     title: () => {
       const context = noteStore.get().context;
-      return context?.type === "notebook" ? "Move to trash" : undefined;
+      return context?.type === "notebook" ? strings.moveToTrash() : undefined;
     },
     icon: Trash,
     action: () => {
@@ -548,7 +554,7 @@ export const commands = [
     id: "rename-active-tag",
     title: () => {
       const context = noteStore.get().context;
-      return context?.type === "tag" ? "Rename" : undefined;
+      return context?.type === "tag" ? strings.rename() : undefined;
     },
     icon: Edit,
     action: () => {
@@ -570,8 +576,8 @@ export const commands = [
       const context = noteStore.get().context;
       return context?.type === "tag" && context.item
         ? db.shortcuts.exists(context.item.id)
-          ? "Remove shortcut"
-          : "Add shortcut"
+          ? strings.removeShortcut()
+          : strings.addShortcut()
         : undefined;
     },
     icon: Shortcut,
@@ -591,7 +597,7 @@ export const commands = [
     id: "delete-active-tag",
     title: () => {
       const context = noteStore.get().context;
-      return context?.type === "tag" ? "Delete" : undefined;
+      return context?.type === "tag" ? strings.delete() : undefined;
     },
     icon: DeleteForver,
     action: () => {
@@ -608,14 +614,14 @@ export const commands = [
   },
   {
     id: "undo",
-    title: "Undo",
+    title: strings.undo(),
     icon: Editor,
     action: () => {
       const session = useEditorStore.getState().getActiveSession();
       if (!session) return;
       useEditorManager.getState().editors[session.id].editor?.undo();
     },
-    group: "Editor",
+    group: strings.editor(),
     hidden: () => {
       const session = useEditorStore.getState().getActiveSession();
       return (
@@ -628,14 +634,14 @@ export const commands = [
   },
   {
     id: "redo",
-    title: "Redo",
+    title: strings.redo(),
     icon: Editor,
     action: () => {
       const session = useEditorStore.getState().getActiveSession();
       if (!session) return;
       useEditorManager.getState().editors[session.id].editor?.redo();
     },
-    group: "Editor",
+    group: strings.editor(),
     hidden: () => {
       const session = useEditorStore.getState().getActiveSession();
       return (
@@ -648,163 +654,163 @@ export const commands = [
   },
   {
     id: "next-tab",
-    title: "Next tab",
+    title: strings.nextTab(),
     icon: ArrowTopRight,
     action: () => useEditorStore.getState().focusNextTab(),
-    group: "Navigate"
+    group: strings.navigate()
   },
   {
     id: "previous-tab",
-    title: "Previous tab",
+    title: strings.previousTab(),
     icon: ArrowTopRight,
     action: () => useEditorStore.getState().focusPreviousTab(),
-    group: "Navigate"
+    group: strings.navigate()
   },
   {
     id: "go-forward-in-tab",
-    title: "Go forward in tab",
+    title: strings.goForwardInTab(),
     icon: ArrowRight,
     action: () => useEditorStore.getState().goForward(),
-    group: "Navigate"
+    group: strings.navigate()
   },
   {
     id: "go-back-in-tab",
-    title: "Go back in tab",
+    title: strings.goBackInTab(),
     icon: ArrowLeft,
     action: () => useEditorStore.getState().goBack(),
-    group: "Navigate"
+    group: strings.navigate()
   },
   {
     id: "notes",
-    title: "Notes",
+    title: strings.dataTypesPluralCamelCase.note(),
     icon: ArrowTopRight,
     action: () => navigate("/"),
-    group: "Navigate"
+    group: strings.navigate()
   },
   {
     id: "notebooks",
-    title: "Notebooks",
+    title: strings.dataTypesPluralCamelCase.notebook(),
     icon: ArrowTopRight,
     action: () => navigate("/notebooks"),
-    group: "Navigate"
+    group: strings.navigate()
   },
   {
     id: "tags",
-    title: "Tags",
+    title: strings.dataTypesPluralCamelCase.tag(),
     icon: ArrowTopRight,
     action: () => navigate("/tags"),
-    group: "Navigate"
+    group: strings.navigate()
   },
   {
     id: "favorites",
-    title: "Favorites",
+    title: strings.dataTypesPluralCamelCase.favorite(),
     icon: ArrowTopRight,
     action: () => navigate("/favorites"),
-    group: "Navigate"
+    group: strings.navigate()
   },
   {
     id: "reminders",
-    title: "Reminders",
+    title: strings.dataTypesPluralCamelCase.reminder(),
     icon: ArrowTopRight,
     action: () => navigate("/reminders"),
-    group: "Navigate"
+    group: strings.navigate()
   },
   {
     id: "monographs",
-    title: "Monographs",
+    title: strings.dataTypesPluralCamelCase.monograph(),
     icon: ArrowTopRight,
     action: () => navigate("/monographs"),
-    group: "Navigate"
+    group: strings.navigate()
   },
   {
     id: "trash",
-    title: "Trash",
+    title: strings.trash(),
     icon: ArrowTopRight,
     action: () => navigate("/trash"),
-    group: "Navigate"
+    group: strings.navigate()
   },
   {
     id: "settings",
-    title: "Settings",
+    title: strings.settings(),
     icon: ArrowTopRight,
     action: () => hashNavigate("/settings", { replace: true }),
-    group: "Navigate"
+    group: strings.navigate()
   },
   {
     id: "help",
-    title: "Help",
+    title: strings.helpAndSupport(),
     icon: ArrowTopRight,
     action: () => (window.location.href = "https://help.notesnook.com"),
-    group: "Navigate"
+    group: strings.navigate()
   },
   {
     id: "attachment-manager",
-    title: "Attachment manager",
+    title: strings.attachmentManager(),
     icon: ArrowTopRight,
     action: () => AttachmentsDialog.show({}),
-    group: "Navigate"
+    group: strings.navigate()
   },
   {
     id: "new-tab",
-    title: "New tab",
+    title: strings.newTab(),
     icon: Plus,
     action: () => useEditorStore.getState().addTab(),
-    group: "Create"
+    group: strings.create()
   },
   {
     id: "new-note",
-    title: "New note",
+    title: strings.newNote(),
     icon: Plus,
     action: () => useEditorStore.getState().newSession(),
-    group: "Create"
+    group: strings.create()
   },
   {
     id: "new-notebook",
-    title: "New notebook",
+    title: strings.newNotebook(),
     icon: Plus,
     action: () => hashNavigate("/notebooks/create", { replace: true }),
-    group: "Create"
+    group: strings.create()
   },
   {
     id: "new-tag",
-    title: "New tag",
+    title: strings.newTag(),
     icon: Plus,
     action: () => hashNavigate("/tags/create", { replace: true }),
-    group: "Create"
+    group: strings.create()
   },
   {
     id: "new-reminder",
-    title: "New reminder",
+    title: strings.newReminder(),
     icon: Plus,
     action: () => hashNavigate(`/reminders/create`, { replace: true }),
-    group: "Create"
+    group: strings.create()
   },
   {
     id: "new-color",
-    title: "New color",
+    title: strings.newColor(),
     icon: Plus,
     action: () => CreateColorDialog.show(true),
-    group: "Create"
+    group: strings.create()
   },
   {
     id: "close-tab",
-    title: "Close current tab",
+    title: strings.closeCurrentTab(),
     icon: Radar,
     action: () => useEditorStore.getState().closeActiveTab(),
-    group: "General"
+    group: strings.general()
   },
   {
     id: "close-all-tabs",
-    title: "Close all tabs",
+    title: strings.closeAllTabs(),
     icon: Radar,
     action: () => useEditorStore.getState().closeAllTabs(),
-    group: "General"
+    group: strings.general()
   },
   {
     id: "toggle-theme",
-    title: "Toggle theme",
+    title: strings.toggleTheme(),
     icon: Radar,
     action: () => useThemeStore.getState().toggleColorScheme(),
-    group: "General"
+    group: strings.general()
   }
 ];

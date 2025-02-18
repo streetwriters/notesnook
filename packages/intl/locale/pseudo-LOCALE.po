@@ -580,6 +580,10 @@ msgstr ""
 msgid "#notesnook"
 msgstr ""
 
+#: src/strings.ts:2417
+msgid "<kbd>{\">\"}</kbd> for command mode · remove <kbd>{\">\"}</kbd> for search mode · <kbd>⏎</kbd> to select · <kbd>↑</kbd> <kbd>↓</kbd> to navigate"
+msgstr ""
+
 #: src/strings.ts:1564
 msgid "12-hour"
 msgstr ""
@@ -628,6 +632,18 @@ msgstr ""
 msgid "Account password"
 msgstr ""
 
+#: src/strings.ts:2437
+msgid "Actions for note: {title}"
+msgstr ""
+
+#: src/strings.ts:2438
+msgid "Actions for notebook: {title}"
+msgstr ""
+
+#: src/strings.ts:2439
+msgid "Actions for tag: {title}"
+msgstr ""
+
 #: src/strings.ts:2018
 msgid "Activate"
 msgstr ""
@@ -670,6 +686,10 @@ msgstr ""
 
 #: src/strings.ts:726
 msgid "Add shortcuts for notebooks and tags here."
+msgstr ""
+
+#: src/strings.ts:2426
+msgid "Add subnotebook"
 msgstr ""
 
 #: src/strings.ts:564
@@ -905,6 +925,10 @@ msgstr ""
 #: src/strings.ts:300
 #: src/strings.ts:2323
 msgid "Attachment"
+msgstr ""
+
+#: src/strings.ts:2432
+msgid "Attachment manager"
 msgstr ""
 
 #: src/strings.ts:1916
@@ -1469,6 +1493,14 @@ msgstr ""
 msgid "Close all"
 msgstr ""
 
+#: src/strings.ts:2435
+msgid "Close all tabs"
+msgstr ""
+
+#: src/strings.ts:2434
+msgid "Close current tab"
+msgstr ""
+
 #: src/strings.ts:1997
 msgid "Close others"
 msgstr ""
@@ -1637,6 +1669,10 @@ msgstr ""
 
 #: src/strings.ts:2227
 msgid "Copy link text"
+msgstr ""
+
+#: src/strings.ts:2422
+msgid "Copy monograph link"
 msgstr ""
 
 #: src/strings.ts:447
@@ -2794,12 +2830,20 @@ msgstr ""
 msgid "GNU GENERAL PUBLIC LICENSE Version 3"
 msgstr ""
 
+#: src/strings.ts:2431
+msgid "Go back in tab"
+msgstr ""
+
 #: src/strings.ts:2206
 msgid "Go back to notebooks"
 msgstr ""
 
 #: src/strings.ts:2207
 msgid "Go back to tags"
+msgstr ""
+
+#: src/strings.ts:2430
+msgid "Go forward in tab"
 msgstr ""
 
 #: src/strings.ts:1794
@@ -3652,6 +3696,10 @@ msgstr ""
 msgid "Native high-performance encryption"
 msgstr ""
 
+#: src/strings.ts:2427
+msgid "Navigate"
+msgstr ""
+
 #: src/strings.ts:390
 msgid "Never"
 msgstr ""
@@ -3708,6 +3756,10 @@ msgstr ""
 msgid "New tab"
 msgstr ""
 
+#: src/strings.ts:2433
+msgid "New tag"
+msgstr ""
+
 #: src/strings.ts:1351
 msgid "New update available"
 msgstr ""
@@ -3730,6 +3782,10 @@ msgstr ""
 
 #: src/strings.ts:2358
 msgid "Next match"
+msgstr ""
+
+#: src/strings.ts:2428
+msgid "Next tab"
 msgstr ""
 
 #: src/strings.ts:539
@@ -4005,6 +4061,10 @@ msgstr ""
 
 #: src/strings.ts:1289
 msgid "Open in browser to manage subscription"
+msgstr ""
+
+#: src/strings.ts:2421
+msgid "Open in monograph"
 msgstr ""
 
 #: src/strings.ts:2304
@@ -4404,6 +4464,10 @@ msgstr ""
 msgid "Previous match"
 msgstr ""
 
+#: src/strings.ts:2429
+msgid "Previous tab"
+msgstr ""
+
 #: src/strings.ts:2015
 msgid "Print"
 msgstr ""
@@ -4492,6 +4556,10 @@ msgstr ""
 msgid "Publish note"
 msgstr ""
 
+#: src/strings.ts:2420
+msgid "Publish on monograph"
+msgstr ""
+
 #: src/strings.ts:481
 msgid "Publish your note to share it with others. You can set a password to protect it."
 msgstr ""
@@ -4570,6 +4638,10 @@ msgstr ""
 
 #: src/strings.ts:2204
 msgid "Receipt"
+msgstr ""
+
+#: src/strings.ts:2440
+msgid "Recent"
 msgstr ""
 
 #: src/strings.ts:1592
@@ -4760,6 +4832,10 @@ msgstr ""
 
 #: src/strings.ts:895
 msgid "Remove from notebook"
+msgstr ""
+
+#: src/strings.ts:2441
+msgid "Remove from recent"
 msgstr ""
 
 #: src/strings.ts:1030
@@ -5118,6 +5194,10 @@ msgstr ""
 
 #: src/strings.ts:27
 msgid "Search in Notes"
+msgstr ""
+
+#: src/strings.ts:2418
+msgid "Search in notes, notebooks, and tags"
 msgstr ""
 
 #: src/strings.ts:31
@@ -6044,8 +6124,16 @@ msgstr ""
 msgid "Toggle indentation mode"
 msgstr ""
 
+#: src/strings.ts:2419
+msgid "Toggle readonly"
+msgstr ""
+
 #: src/strings.ts:2360
 msgid "Toggle replace"
+msgstr ""
+
+#: src/strings.ts:2436
+msgid "Toggle theme"
 msgstr ""
 
 #: src/strings.ts:2113
@@ -6099,6 +6187,14 @@ msgstr ""
 
 #: src/strings.ts:882
 msgid "Turn on reminder"
+msgstr ""
+
+#: src/strings.ts:2424
+msgid "Turn sync off"
+msgstr ""
+
+#: src/strings.ts:2423
+msgid "Turn sync on"
 msgstr ""
 
 #: src/strings.ts:1078
@@ -6212,6 +6308,10 @@ msgstr ""
 
 #: src/strings.ts:1460
 msgid "Unpublish notes to delete them"
+msgstr ""
+
+#: src/strings.ts:2425
+msgid "Unpublish on monograph"
 msgstr ""
 
 #: src/strings.ts:2067

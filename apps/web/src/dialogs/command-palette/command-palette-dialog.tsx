@@ -45,6 +45,7 @@ import { hashNavigate, navigate } from "../../navigation";
 import { useEditorStore } from "../../stores/editor-store";
 import Config from "../../utils/config";
 import { commands as COMMANDS } from "./commands";
+import { strings } from "@notesnook/intl";
 
 interface Command {
   id: string;
@@ -200,14 +201,16 @@ export const CommandPaletteDialog = DialogManager.register(
         >
           <Field
             autoFocus
-            placeholder={"Search in notes, notebooks, and tags"}
+            placeholder={strings.searchInNotesNotebooksAndTags()}
             sx={{ mx: 0, my: 2 }}
             defaultValue={query}
             onChange={isCommandMode(query) ? onChange : debounce(onChange, 500)}
           />
           {query && commands.length === 0 && (
             <Box>
-              <Text variant="subBody">No results found</Text>
+              <Text variant="subBody">
+                {strings.noResultsFound(prepareQuery(query))}
+              </Text>
             </Box>
           )}
           <Box sx={{ marginY: "10px", height: "100%" }}>
@@ -219,6 +222,10 @@ export const CommandPaletteDialog = DialogManager.register(
               }}
               groupCounts={grouped.map((g) => g.count)}
               groupContent={(groupIndex) => {
+                const label =
+                  grouped[groupIndex].group === "recent"
+                    ? strings.recent()
+                    : grouped[groupIndex].group;
                 return (
                   <Box
                     sx={{
@@ -230,7 +237,7 @@ export const CommandPaletteDialog = DialogManager.register(
                     }}
                   >
                     <Text variant="subBody" bg="">
-                      {toTitleCase(grouped[groupIndex].group)}
+                      {toTitleCase(label)}
                     </Text>
                   </Box>
                 );
@@ -327,7 +334,7 @@ export const CommandPaletteDialog = DialogManager.register(
                     </Button>
                     {command.group === "recent" && (
                       <Button
-                        title="Remove from recent"
+                        title={strings.removeFromRecent()}
                         onClick={(e) => {
                           e.stopPropagation();
                           removeRecentCommand(command.id);
@@ -360,11 +367,13 @@ export const CommandPaletteDialog = DialogManager.register(
         <Flex
           sx={{ flexDirection: "row", bg: "hover", justifyContent: "center" }}
         >
-          <Text variant="subBody" sx={{ m: 1 }}>
-            <kbd>{">"}</kbd> for command mode · remove <kbd>{">"}</kbd> for
-            search mode · <kbd>⏎</kbd> to select · <kbd>↑</kbd>
-            <kbd>↓</kbd> to navigate
-          </Text>
+          <Text
+            variant="subBody"
+            sx={{ m: 1 }}
+            dangerouslySetInnerHTML={{
+              __html: strings.commandPaletteDescription()
+            }}
+          />
         </Flex>
       </Dialog>
     );
@@ -528,7 +537,7 @@ function getSessionsAsCommands() {
       return {
         id: session.id,
         title: session.note.title,
-        group: "note",
+        group: strings.dataTypesCamelCase.note(),
         type: "note" as const
       };
     });
@@ -600,7 +609,7 @@ async function dbSearch(query: string) {
     return {
       id: item.id,
       title: item.title,
-      group: item.type,
+      group: strings.dataTypesCamelCase[item.type](),
       type: item.type
     };
   });
