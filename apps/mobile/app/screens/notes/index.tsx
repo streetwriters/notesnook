@@ -119,6 +119,7 @@ const NotesPage = ({
   const onRequestUpdate = React.useCallback(
     async (data?: NotesScreenParams) => {
       if (
+        params.current.item.id &&
         useNavigationStore.getState().focusedRouteId !==
           params.current.item.id &&
         !data
@@ -187,7 +188,7 @@ const NotesPage = ({
   return (
     <>
       <SelectionHeader
-        id={route.params?.item?.id}
+        id={route.params?.item?.id || route.name}
         items={notes}
         type="note"
         renderedInRoute={route.name}
@@ -216,9 +217,7 @@ const NotesPage = ({
             items: selector
           });
         }}
-        // accentColor={accentColor}
         onPressDefaultRightButton={onPressFloatingButton}
-        // rightButtons={rightButtons?.(params?.current)}
       />
 
       <DelayLayout color={accentColor} wait={loadingNotes}>
