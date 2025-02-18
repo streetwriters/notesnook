@@ -489,7 +489,6 @@ function getCommandAction({
 }) {
   switch (type) {
     case "command":
-      return CommandActionMap.get(id);
     case "command-dynamic":
       return CommandActionMap.get(id);
     case "note":
@@ -513,7 +512,6 @@ function getCommandIcon({
 }) {
   switch (type) {
     case "command":
-      return CommandIconMap.get(id);
     case "command-dynamic":
       return CommandIconMap.get(id);
     case "note":
