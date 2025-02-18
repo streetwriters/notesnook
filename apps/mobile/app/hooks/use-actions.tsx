@@ -977,19 +977,18 @@ export const useActions = ({
     }
   }
 
-  actions.push({
-    id: "trash",
-    title:
-      item.type !== "notebook" && item.type !== "note"
-        ? strings.doActions.delete.unknown(
-            item.type === "trash" ? item.itemType : item.type,
-            1
-          )
-        : strings.moveToTrash(),
-    icon: "delete-outline",
-    type: "error",
-    onPress: deleteItem
-  });
+  if (item.type != "trash") {
+    actions.push({
+      id: "trash",
+      title:
+        item.type !== "notebook" && item.type !== "note"
+          ? strings.doActions.delete.unknown(item.type, 1)
+          : strings.moveToTrash(),
+      icon: "delete-outline",
+      type: "error",
+      onPress: deleteItem
+    });
+  }
 
   return actions;
 };
