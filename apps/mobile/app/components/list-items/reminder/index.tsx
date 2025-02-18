@@ -164,11 +164,20 @@ const ReminderItem = React.memo(
 
         {selectionMode === "note" || selectionMode === "trash" ? (
           <>
-            <AppIcon
-              name={selected ? "checkbox-outline" : "checkbox-blank-outline"}
-              color={selected ? colors.selected.icon : colors.primary.icon}
-              size={AppFontSize.lg}
-            />
+            <View
+              style={{
+                height: 35,
+                width: 35,
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              <AppIcon
+                name={selected ? "checkbox-outline" : "checkbox-blank-outline"}
+                color={selected ? colors.selected.icon : colors.primary.icon}
+                size={AppFontSize.lg}
+              />
+            </View>
           </>
         ) : (
           <IconButton
