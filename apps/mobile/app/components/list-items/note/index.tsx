@@ -405,7 +405,7 @@ const NoteItem = ({
           </>
         ) : null}
 
-        {selectionMode ? (
+        {selectionMode === "note" || selectionMode === "trash" ? (
           <>
             <AppIcon
               name={selected ? "checkbox-outline" : "checkbox-blank-outline"}

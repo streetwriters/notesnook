@@ -31,6 +31,9 @@ import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import SelectionWrapper, { selectItem } from "../selection-wrapper";
 import { strings } from "@notesnook/intl";
+import { useSelectionStore } from "../../../stores/use-selection-store";
+import useIsSelected from "../../../hooks/use-selected";
+import AppIcon from "../../ui/AppIcon";
 
 const ReminderItem = React.memo(
   ({
@@ -48,6 +51,8 @@ const ReminderItem = React.memo(
 
       ReminderSheet.present(item, undefined, isSheet);
     };
+    const selectionMode = useSelectionStore((state) => state.selectionMode);
+    const [selected] = useIsSelected(item);
     return (
       <SelectionWrapper onPress={openReminder} item={item} isSheet={isSheet}>
         <View
@@ -156,20 +161,31 @@ const ReminderItem = React.memo(
             />
           </View>
         </View>
-        <IconButton
-          testID={notesnook.listitem.menu}
-          color={colors.primary.paragraph}
-          name="dots-horizontal"
-          size={AppFontSize.xl}
-          onPress={() => Properties.present(item, isSheet)}
-          style={{
-            justifyContent: "center",
-            height: 35,
-            width: 35,
-            borderRadius: 100,
-            alignItems: "center"
-          }}
-        />
+
+        {selectionMode === "note" || selectionMode === "trash" ? (
+          <>
+            <AppIcon
+              name={selected ? "checkbox-outline" : "checkbox-blank-outline"}
+              color={selected ? colors.selected.icon : colors.primary.icon}
+              size={AppFontSize.lg}
+            />
+          </>
+        ) : (
+          <IconButton
+            testID={notesnook.listitem.menu}
+            color={colors.primary.paragraph}
+            name="dots-horizontal"
+            size={AppFontSize.xl}
+            onPress={() => Properties.present(item, isSheet)}
+            style={{
+              justifyContent: "center",
+              height: 35,
+              width: 35,
+              borderRadius: 100,
+              alignItems: "center"
+            }}
+          />
+        )}
       </SelectionWrapper>
     );
   },

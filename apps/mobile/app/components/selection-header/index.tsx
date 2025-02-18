@@ -29,11 +29,11 @@ import {
 } from "react-native";
 import { Menu } from "react-native-material-menu";
 import { db } from "../../common/database";
-import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { ToastManager } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
+import { useTrashStore } from "../../stores/use-trash-store";
 import { deleteItems } from "../../utils/functions";
 import { fluidTabsRef } from "../../utils/global-refs";
 import { updateNotebook } from "../../utils/notebooks";
@@ -60,14 +60,12 @@ export const SelectionHeader = React.memo(
     renderedInRoute?: string;
   }) => {
     const menuRef = useRef<Menu>(null);
-    const { colors: contextMenuColors } = useThemeColors("contextMenu");
     const { colors } = useThemeColors();
     const selectionMode = useSelectionStore((state) => state.selectionMode);
     const selectedItemsList = useSelectionStore(
       (state) => state.selectedItemsList
     );
     const clearSelection = useSelectionStore((state) => state.clearSelection);
-    const insets = useGlobalSafeAreaInsets();
     const allSelected =
       items?.placeholders?.length === selectedItemsList.length;
     const focusedRouteId = useNavigationStore((state) => state.focusedRouteId);
@@ -102,8 +100,11 @@ export const SelectionHeader = React.memo(
     const deleteItem = async () => {
       if (!type) return;
       presentDialog({
-        title: strings.doActions.delete.unknown(type, selectedItemsList.length),
-        paragraph: strings.actionConfirmations.delete.unknown(
+        title: strings.doActions.permanentlyDelete.unknown(
+          type,
+          selectedItemsList.length
+        ),
+        paragraph: strings.actionConfirmations.permanentlyDelete.unknown(
           type,
           selectedItemsList.length
         ),
@@ -112,7 +113,7 @@ export const SelectionHeader = React.memo(
         positivePress: async () => {
           if (!selectedItemsList.length) return;
           await db.trash.delete(...selectedItemsList);
-          Navigation.queueRoutesForUpdate();
+          useTrashStore.getState().refresh();
           clearSelection();
         },
         positiveType: "errorShade"

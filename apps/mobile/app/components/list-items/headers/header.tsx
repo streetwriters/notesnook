@@ -51,19 +51,11 @@ export const Header = React.memo(
         {announcements.length !== 0 && !noAnnouncement ? (
           <Announcement color={color || colors.primary.accent} />
         ) : (screen as any) === "Search" ? null : !shouldShow ? (
-          <View
-            style={{
-              marginBottom: 5,
-              padding: 0,
-              width: "100%",
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
+          <>
             {messageCard ? (
               <Card color={color || colors.primary.accent} />
             ) : null}
-          </View>
+          </>
         ) : null}
       </>
     );
