@@ -39,7 +39,7 @@ import useNavigationStore, {
   NotebookScreenParams
 } from "../../stores/use-navigation-store";
 import { eUpdateNotebookRoute } from "../../utils/events";
-import { findRootNotebookId } from "../../utils/notebooks";
+import { findSelectedParent } from "../../utils/notebooks";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { openEditor, setOnFirstSave } from "../notes/common";
@@ -94,8 +94,8 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
       }
 
       if (data?.item?.id && params.current.item?.id !== data?.item?.id) {
-        const nextRootNotebookId = await findRootNotebookId(data?.item?.id);
-        const currentNotebookRoot = await findRootNotebookId(
+        const nextRootNotebookId = await findSelectedParent(data?.item?.id);
+        const currentNotebookRoot = await findSelectedParent(
           params.current.item.id
         );
 
@@ -284,8 +284,8 @@ NotebookScreen.navigate = async (item: Notebook, canGoBack?: boolean) => {
     });
   } else if (currentRoute === "Notebook") {
     if (!focusedRouteId) return;
-    const rootNotebookId = await findRootNotebookId(focusedRouteId);
-    const currentNotebookRoot = await findRootNotebookId(item?.id);
+    const rootNotebookId = await findSelectedParent(focusedRouteId);
+    const currentNotebookRoot = await findSelectedParent(item?.id);
 
     if (
       (rootNotebookId === currentNotebookRoot &&

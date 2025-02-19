@@ -18,10 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { Notebook } from "@notesnook/core";
 import create from "zustand";
-import { db } from "../common/database";
-import { createItemSelectionStore } from "./item-selection-store";
 import { persist, StateStorage } from "zustand/middleware";
+import { db } from "../common/database";
 import { MMKV } from "../common/database/mmkv";
+import { createItemSelectionStore } from "./item-selection-store";
 
 export type TreeItem = {
   parentId: string;
@@ -68,13 +68,18 @@ export function createNotebookTreeStores(
     setTree(tree) {
       set({ tree });
     },
-    updateItem: (id, notebook) => {
-      const newTree = [...get().tree];
+    updateItem: async (id, notebook) => {
+      const newTree = get().tree.slice();
       const index = newTree.findIndex((item) => item.notebook.id === id);
+      const childernCount = await db.relations
+        .from(notebook, "notebook")
+        .count();
       newTree[index] = {
         ...newTree[index],
-        notebook
+        notebook,
+        hasChildren: childernCount > 0
       };
+
       set({
         tree: newTree
       });
