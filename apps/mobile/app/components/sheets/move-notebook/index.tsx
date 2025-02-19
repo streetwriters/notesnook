@@ -33,7 +33,6 @@ import {
 import {
   checkParentSelected,
   findRootNotebookId,
-  findSelectedParent,
   getParentNotebookId
 } from "../../../utils/notebooks";
 import { AppFontSize } from "../../../utils/size";
@@ -84,7 +83,7 @@ export const MoveNotebookSheet = ({
   useEffect(() => {
     (async () => {
       for (const notebook of selectedNotebooks) {
-        const root = await findSelectedParent(notebook.id);
+        const root = await findRootNotebookId(notebook.id);
         if (root !== notebook.id) {
           setMoveToTop(true);
           return;
@@ -203,7 +202,7 @@ export const MoveNotebookSheet = ({
                     )
                       continue;
                     const parent = await getParentNotebookId(notebook.id);
-                    const root = await findSelectedParent(notebook.id);
+                    const root = await findRootNotebookId(notebook.id);
                     if (root !== notebook.id) {
                       await db.relations.unlink(
                         {
@@ -271,7 +270,7 @@ const NotebookItem = ({
   return selectedNotebooks.find((n) => n.id === notebook?.id) ? null : (
     <View
       style={{
-        height: 45
+        minHeight: 45
       }}
     >
       <View
