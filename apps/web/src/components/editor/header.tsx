@@ -31,7 +31,6 @@ import { MenuItem } from "@notesnook/ui";
 import { navigate } from "../../navigation";
 import { Tag } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { showToast } from "../../utils/toast";
 
 type HeaderProps = { readonly: boolean; id: string };
 function Header(props: HeaderProps) {
