@@ -33,6 +33,7 @@ export type TreeNode<T = any> = {
   depth: number;
   hasChildren: boolean;
   data: T;
+  expanded?: boolean;
 };
 type ExpandedIds = Record<string, boolean>;
 type TreeViewProps<T> = {
@@ -88,13 +89,14 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
     () => ({
       async refresh() {
         setNodes([]);
-        const nodes = await fetchChildren(
+        const { children } = await fetchChildren(
           rootId,
           -1,
           expandedIds,
           getChildNodes
         );
-        setNodes(nodes);
+        setNodes(children);
+        setExpandedIds(expandedIds);
       },
       async refreshItem(index, item) {
         const node = nodes[index];
@@ -116,7 +118,7 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
           expandedIds[node.id] = true;
         }
 
-        const children = await fetchChildren(
+        const { children } = await fetchChildren(
           node.id,
           node.depth,
           expandedIds,
@@ -134,6 +136,7 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
           },
           ...children
         );
+        setExpandedIds(expandedIds);
         setNodes(filtered);
       }
     }),
@@ -181,7 +184,12 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
   });
 
   useEffect(() => {
-    fetchChildren(rootId, -1, expandedIds, getChildNodes).then(setNodes);
+    fetchChildren(rootId, -1, expandedIds, getChildNodes).then(
+      ({ children, expandedIds }) => {
+        setNodes(children);
+        setExpandedIds(expandedIds);
+      }
+    );
     console.log("fetching");
   }, [rootId]);
 
@@ -229,14 +237,13 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
             expand={async () => {
               if (expandedIds[node.id]) return;
 
-              setExpandedIds({ ...expandedIds, [node.id]: true });
-
-              const children = await fetchChildren(
+              const { children } = await fetchChildren(
                 node.id,
                 node.depth,
                 expandedIds,
                 getChildNodes
               );
+              setExpandedIds({ ...expandedIds, [node.id]: true });
               setNodes((tree) => {
                 const copy = tree.slice();
                 copy.splice(index + 1, 0, ...children);
@@ -281,8 +288,14 @@ async function fetchChildren<T>(
   const children = await getChildNodes(id, depth);
   for (let i = 0; i < children.length; i++) {
     const childNode = children[i];
-    if (expandedIds[childNode.id]) {
-      const nodes = await fetchChildren(
+    if (
+      expandedIds[childNode.id] ||
+      (expandedIds[childNode.id] === undefined &&
+        childNode.expanded &&
+        childNode.hasChildren)
+    ) {
+      expandedIds[childNode.id] = true;
+      const { children: nodes } = await fetchChildren(
         childNode.id,
         childNode.depth,
         expandedIds,
@@ -292,5 +305,5 @@ async function fetchChildren<T>(
       i += nodes.length;
     }
   }
-  return children;
+  return { children, expandedIds };
 }
