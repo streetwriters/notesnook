@@ -25,14 +25,15 @@ import { FlatList } from "react-native-actions-sheet";
 import create from "zustand";
 import { db } from "../../../common/database";
 import { useNotebook } from "../../../hooks/use-notebook";
-import { eSendEvent, presentSheet } from "../../../services/event-manager";
+import { presentSheet } from "../../../services/event-manager";
 import {
   useNotebookStore,
   useNotebooks
 } from "../../../stores/use-notebook-store";
-import { eOnNotebookUpdated } from "../../../utils/events";
 import {
+  checkParentSelected,
   findRootNotebookId,
+  findSelectedParent,
   getParentNotebookId
 } from "../../../utils/notebooks";
 import { AppFontSize } from "../../../utils/size";
@@ -47,6 +48,10 @@ import { IconButton } from "../../ui/icon-button";
 import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
 import { AddNotebookSheet } from "../add-notebook";
+import {
+  useSideMenuNotebookExpandedStore,
+  useSideMenuNotebookSelectionStore
+} from "../../side-menu/stores";
 
 const useNotebookExpandedStore = create<{
   expanded: {
@@ -79,7 +84,7 @@ export const MoveNotebookSheet = ({
   useEffect(() => {
     (async () => {
       for (const notebook of selectedNotebooks) {
-        const root = await findRootNotebookId(notebook.id);
+        const root = await findSelectedParent(notebook.id);
         if (root !== notebook.id) {
           setMoveToTop(true);
           return;
@@ -107,6 +112,9 @@ export const MoveNotebookSheet = ({
               context: "move-notebook",
               positivePress: async () => {
                 for (const notebook of selectedNotebooks) {
+                  if (await checkParentSelected(notebook.id, selectedNotebooks))
+                    continue;
+
                   const parent = await getParentNotebookId(notebook.id);
                   const root = await findRootNotebookId(notebook.id);
 
@@ -122,12 +130,23 @@ export const MoveNotebookSheet = ({
                     );
                   }
                   await db.relations.add(selectedNotebook, notebook);
-                  if (parent) {
-                    eSendEvent(eOnNotebookUpdated, parent);
-                  }
                 }
                 useNotebookStore.getState().refresh();
-                eSendEvent(eOnNotebookUpdated, selectedNotebook.id);
+
+                if (
+                  !useSideMenuNotebookExpandedStore.getState().expanded[
+                    selectedNotebook.id
+                  ]
+                ) {
+                  useSideMenuNotebookExpandedStore
+                    .getState()
+                    .setExpanded(selectedNotebook.id);
+                }
+
+                useSideMenuNotebookSelectionStore.setState({
+                  enabled: false,
+                  selection: {}
+                });
                 close?.();
               }
             });
@@ -179,8 +198,12 @@ export const MoveNotebookSheet = ({
                 type="secondaryAccented"
                 onPress={async () => {
                   for (const notebook of selectedNotebooks) {
+                    if (
+                      await checkParentSelected(notebook.id, selectedNotebooks)
+                    )
+                      continue;
                     const parent = await getParentNotebookId(notebook.id);
-                    const root = await findRootNotebookId(notebook.id);
+                    const root = await findSelectedParent(notebook.id);
                     if (root !== notebook.id) {
                       await db.relations.unlink(
                         {
@@ -189,11 +212,13 @@ export const MoveNotebookSheet = ({
                         },
                         notebook
                       );
-                      eSendEvent(eOnNotebookUpdated, parent);
-                      eSendEvent(eOnNotebookUpdated, notebook.id);
                     }
                   }
                   useNotebookStore.getState().refresh();
+                  useSideMenuNotebookSelectionStore.setState({
+                    enabled: false,
+                    selection: {}
+                  });
                   close?.();
                 }}
               />
