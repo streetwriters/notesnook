@@ -27,6 +27,7 @@ import { replaceDateTime } from "@notesnook/editor";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { strings } from "@notesnook/intl";
+import { NEWLINE_STRIP_REGEX } from "@notesnook/core";
 
 type TitleBoxProps = {
   id: string;
@@ -137,7 +138,7 @@ function TitleBox(props: TitleBoxProps) {
           e.target.value,
           dateFormat,
           timeFormat
-        );
+        ).replace(NEWLINE_STRIP_REGEX, " ");
         debouncedOnTitleChange(id, id, e.target.value, pendingChanges);
       }}
     />
