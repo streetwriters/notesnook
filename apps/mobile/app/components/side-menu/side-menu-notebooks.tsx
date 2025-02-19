@@ -77,8 +77,6 @@ const NotebookItem = ({
   onLongPress?: () => void;
 }) => {
   const notebook = item.notebook;
-  const [nestedNotebooksSelected, setNestedNotebooksSelected] =
-    React.useState(false);
   const isFocused = focused;
   const { totalNotes, getTotalNotes } = useTotalNotes("notebook");
   const getTotalNotesRef = React.useRef(getTotalNotes);
@@ -88,97 +86,6 @@ const NotebookItem = ({
   useEffect(() => {
     getTotalNotesRef.current([item.notebook.id]);
   }, [item.notebook]);
-
-  useEffect(() => {
-    if (selectionEnabled) {
-      const selector = db.relations.from(
-        {
-          type: "notebook",
-          id: item.notebook.id
-        },
-        "notebook"
-      ).selector;
-      selector.ids().then((ids) => {
-        setNestedNotebooksSelected(
-          ids.length === 0
-            ? true
-            : ids.every(
-                (id) => selectionStore.getState().selection[id] === "selected"
-              )
-        );
-      });
-    }
-  }, [selected, item.notebook.id, selectionEnabled, selectionStore]);
-
-  async function selectAll() {
-    const selector = db.relations.from(
-      {
-        type: "notebook",
-        id: item.notebook.id
-      },
-      "notebook"
-    ).selector;
-    const ids = await selector.ids();
-    selectionStore.setState({
-      selection: {
-        ...selectionStore.getState().selection,
-        ...ids.reduce((acc: any, id) => {
-          acc[id] = "selected";
-          return acc;
-        }, {})
-      }
-    });
-    setNestedNotebooksSelected(true);
-  }
-
-  async function deselectAll() {
-    const selector = db.relations.from(
-      {
-        type: "notebook",
-        id: item.notebook.id
-      },
-      "notebook"
-    ).selector;
-    const ids = await selector.ids();
-    useSideMenuNotebookSelectionStore.setState({
-      selection: {
-        ...selectionStore.getState().selection,
-        ...ids.reduce((acc: any, id) => {
-          acc[id] = "deselected";
-          return acc;
-        }, {})
-      }
-    });
-    setNestedNotebooksSelected(false);
-  }
-
-  useEffect(() => {
-    const unsub = selectionStore.subscribe((state) => {
-      if (state.enabled) {
-        const selector = db.relations.from(
-          {
-            type: "notebook",
-            id: item.notebook.id
-          },
-          "notebook"
-        ).selector;
-        selector.ids().then((ids) => {
-          if (!ids.length) return;
-          setNestedNotebooksSelected(
-            ids.length === 0
-              ? true
-              : ids.every(
-                  (id) => selectionStore.getState().selection[id] === "selected"
-                )
-          );
-        });
-      }
-    });
-
-    return () => {
-      unsub();
-    };
-  }, [item.notebook.id, selectionStore]);
 
   useEffect(() => {
     const onNotebookUpdate = (id?: string) => {
@@ -207,11 +114,6 @@ const NotebookItem = ({
         testID={`notebook-item-${item.depth}-${index}`}
         onPress={async () => {
           if (selectionEnabled) {
-            if (selected && !nestedNotebooksSelected) {
-              console.log("Select all...");
-              return selectAll();
-            }
-            await deselectAll();
             selectionStore
               .getState()
               .markAs(item.notebook, selected ? "deselected" : "selected");
@@ -288,13 +190,7 @@ const NotebookItem = ({
             }}
           >
             <AppIcon
-              name={
-                selected
-                  ? !nestedNotebooksSelected
-                    ? "checkbox-intermediate"
-                    : "checkbox-outline"
-                  : "checkbox-blank-outline"
-              }
+              name={selected ? "checkbox-outline" : "checkbox-blank-outline"}
               size={AppFontSize.md}
               color={selected ? colors.selected.icon : colors.primary.icon}
             />
@@ -394,8 +290,6 @@ export const SideMenuNotebooks = () => {
     []
   );
 
-  console.log("RENDERING ROOT");
-
   return (
     <View
       style={{
@@ -481,12 +375,19 @@ const NotebookItemWrapper = React.memo(
         useSideMenuNotebookTreeStore
           .getState()
           .updateItem(item.notebook.id, notebook);
+        if (expanded) {
+          useSideMenuNotebookTreeStore
+            .getState()
+            .setTree(
+              await useSideMenuNotebookTreeStore
+                .getState()
+                .fetchAndAdd(item.notebook.id, item.depth + 1)
+            );
+        }
       } else {
         useSideMenuNotebookTreeStore.getState().removeItem(item.notebook.id);
       }
-    }, [item.notebook.id]);
-
-    console.log("RENDERING", item?.notebook?.title, item.parentId);
+    }, [expanded, item.depth, item.notebook.id]);
 
     return (
       <View
@@ -537,7 +438,10 @@ const NotebookItemWrapper = React.memo(
     return (
       prev.item.notebook.id === next.item.notebook.id &&
       prev.item.notebook.dateModified === next.item.notebook.dateModified &&
-      prev.item.notebook.dateEdited === next.item.notebook.dateEdited
+      prev.item.notebook.dateEdited === next.item.notebook.dateEdited &&
+      prev.item.hasChildren === next.item.hasChildren &&
+      prev.index === next.index &&
+      prev.item.parentId === next.item.parentId
     );
   }
 );
