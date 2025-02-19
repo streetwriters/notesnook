@@ -1007,7 +1007,7 @@ $headline$: Use starting line of the note as title.`,
     t`Please enter your app lock password to continue`,
   enterApplockPin: () => t`Enter app lock pin`,
   enterApplockPinDesc: () => t`Please enter your app lock pin to continue`,
-  account: () => t`account`,
+  account: () => t`Account`,
   subscribeToPro: () => t`Subscribe to Pro`,
   trialStarted: () => t`Your free trial has started`,
   trialStartedDesc: () =>

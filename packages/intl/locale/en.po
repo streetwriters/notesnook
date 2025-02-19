@@ -621,8 +621,8 @@ msgid "About"
 msgstr "About"
 
 #: src/strings.ts:1010
-msgid "account"
-msgstr "account"
+msgid "Account"
+msgstr "Account"
 
 #: src/strings.ts:1828
 msgid "Account password"
