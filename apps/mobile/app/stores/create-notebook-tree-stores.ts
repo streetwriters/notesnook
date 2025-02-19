@@ -46,7 +46,7 @@ export function createNotebookTreeStores(
   multiSelect: boolean,
   selectionEnabled: boolean
 ) {
-  const useSideMenuNotebookTreeStore = create<{
+  const useNotebookTreeStore = create<{
     tree: TreeItem[];
     setTree: (tree: TreeItem[]) => void;
     removeItem: (id: string) => void;
@@ -127,9 +127,8 @@ export function createNotebookTreeStores(
 
       for (const item of newTreeItems) {
         const expanded =
-          useSideMenuNotebookExpandedStore.getState().expanded[
-            item.notebook.id
-          ] && item.hasChildren;
+          useNotebookExpandedStore.getState().expanded[item.notebook.id] &&
+          item.hasChildren;
         if (expanded) {
           newTree = await get().fetchAndAdd(
             item.notebook.id,
@@ -182,12 +181,12 @@ export function createNotebookTreeStores(
     }
   }));
 
-  const useSideMenuNotebookSelectionStore = createItemSelectionStore(
+  const useNotebookSelectionStore = createItemSelectionStore(
     multiSelect,
     selectionEnabled
   );
 
-  const useSideMenuNotebookExpandedStore = create<{
+  const useNotebookExpandedStore = create<{
     expanded: {
       [id: string]: boolean;
     };
@@ -215,8 +214,8 @@ export function createNotebookTreeStores(
   );
 
   return {
-    useSideMenuNotebookTreeStore,
-    useSideMenuNotebookSelectionStore,
-    useSideMenuNotebookExpandedStore
+    useNotebookTreeStore,
+    useNotebookSelectionStore,
+    useNotebookExpandedStore
   };
 }
