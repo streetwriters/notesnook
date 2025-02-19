@@ -260,10 +260,14 @@ async function run(
           progress: `Saving attachments in backup... ${file.hash}`
         });
         if (await FileStorage.exists(file.hash)) {
-          await RNFetchBlob.fs.cp(
-            await getCachePathForFile(file.hash),
-            `${attachmentsDir}/${file.hash}`
-          );
+          await RNFetchBlob.fs
+            .cp(
+              await getCachePathForFile(file.hash),
+              `${attachmentsDir}/${file.hash}`
+            )
+            .catch((e) =>
+              DatabaseLogger.error(e, "Error saving attachment to backup file")
+            );
         }
       }
     }
