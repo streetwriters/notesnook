@@ -249,3 +249,26 @@ textarea,
     background-color: color-mix(in srgb, var(--accent) 5%, transparent);
   }
 }
+
+kbd {
+  background: var(--background);
+  border-radius: 3px;
+  padding: 2px 5px;
+  color: var(--paragraph-secondary);
+}
+
+.ping {
+  animation: ping 1s infinite;
+}
+
+@keyframes ping {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}

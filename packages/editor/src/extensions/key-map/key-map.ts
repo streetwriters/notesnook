@@ -67,7 +67,7 @@ export const KeyMap = Extension.create({
         });
         return true;
       },
-      "Mod-k": ({ editor }) => {
+      "Shift-Mod-k": ({ editor }) => {
         showLinkPopup(editor);
         return true;
       }

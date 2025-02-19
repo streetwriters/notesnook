@@ -580,6 +580,10 @@ msgstr "{words, plural, other {# selected}}"
 msgid "#notesnook"
 msgstr "#notesnook"
 
+#: src/strings.ts:2417
+msgid "<kbd>{\">\"}</kbd> for command mode · remove <kbd>{\">\"}</kbd> for search mode · <kbd>⏎</kbd> to select · <kbd>↑</kbd> <kbd>↓</kbd> to navigate"
+msgstr "<kbd>{\">\"}</kbd> for command mode · remove <kbd>{\">\"}</kbd> for search mode · <kbd>⏎</kbd> to select · <kbd>↑</kbd> <kbd>↓</kbd> to navigate"
+
 #: src/strings.ts:1564
 msgid "12-hour"
 msgstr "12-hour"
@@ -628,6 +632,18 @@ msgstr "Account"
 msgid "Account password"
 msgstr "Account password"
 
+#: src/strings.ts:2437
+msgid "Actions for note: {title}"
+msgstr "Actions for note: {title}"
+
+#: src/strings.ts:2438
+msgid "Actions for notebook: {title}"
+msgstr "Actions for notebook: {title}"
+
+#: src/strings.ts:2439
+msgid "Actions for tag: {title}"
+msgstr "Actions for tag: {title}"
+
 #: src/strings.ts:2018
 msgid "Activate"
 msgstr "Activate"
@@ -671,6 +687,10 @@ msgstr "Add shortcut"
 #: src/strings.ts:726
 msgid "Add shortcuts for notebooks and tags here."
 msgstr "Add shortcuts for notebooks and tags here."
+
+#: src/strings.ts:2426
+msgid "Add subnotebook"
+msgstr "Add subnotebook"
 
 #: src/strings.ts:564
 msgid "Add tag"
@@ -906,6 +926,10 @@ msgstr "attachment"
 #: src/strings.ts:2323
 msgid "Attachment"
 msgstr "Attachment"
+
+#: src/strings.ts:2432
+msgid "Attachment manager"
+msgstr "Attachment manager"
 
 #: src/strings.ts:1916
 msgid "Attachment preview failed"
@@ -1480,6 +1504,14 @@ msgstr "Close"
 msgid "Close all"
 msgstr "Close all"
 
+#: src/strings.ts:2435
+msgid "Close all tabs"
+msgstr "Close all tabs"
+
+#: src/strings.ts:2434
+msgid "Close current tab"
+msgstr "Close current tab"
+
 #: src/strings.ts:1997
 msgid "Close others"
 msgstr "Close others"
@@ -1649,6 +1681,10 @@ msgstr "Copy link"
 #: src/strings.ts:2227
 msgid "Copy link text"
 msgstr "Copy link text"
+
+#: src/strings.ts:2422
+msgid "Copy monograph link"
+msgstr "Copy monograph link"
 
 #: src/strings.ts:447
 msgid "Copy note"
@@ -2812,6 +2848,10 @@ msgstr "Getting recovery codes"
 msgid "GNU GENERAL PUBLIC LICENSE Version 3"
 msgstr "GNU GENERAL PUBLIC LICENSE Version 3"
 
+#: src/strings.ts:2431
+msgid "Go back in tab"
+msgstr "Go back in tab"
+
 #: src/strings.ts:2206
 msgid "Go back to notebooks"
 msgstr "Go back to notebooks"
@@ -2819,6 +2859,10 @@ msgstr "Go back to notebooks"
 #: src/strings.ts:2207
 msgid "Go back to tags"
 msgstr "Go back to tags"
+
+#: src/strings.ts:2430
+msgid "Go forward in tab"
+msgstr "Go forward in tab"
 
 #: src/strings.ts:1794
 msgid "Go to"
@@ -3672,6 +3716,10 @@ msgstr "Name"
 msgid "Native high-performance encryption"
 msgstr "Native high-performance encryption"
 
+#: src/strings.ts:2427
+msgid "Navigate"
+msgstr "Navigate"
+
 #: src/strings.ts:390
 msgid "Never"
 msgstr "Never"
@@ -3728,6 +3776,10 @@ msgstr "New reminder"
 msgid "New tab"
 msgstr "New tab"
 
+#: src/strings.ts:2433
+msgid "New tag"
+msgstr "New tag"
+
 #: src/strings.ts:1351
 msgid "New update available"
 msgstr "New update available"
@@ -3751,6 +3803,10 @@ msgstr "Next"
 #: src/strings.ts:2358
 msgid "Next match"
 msgstr "Next match"
+
+#: src/strings.ts:2428
+msgid "Next tab"
+msgstr "Next tab"
 
 #: src/strings.ts:539
 msgid "No"
@@ -4032,6 +4088,10 @@ msgstr "Open in browser"
 #: src/strings.ts:1289
 msgid "Open in browser to manage subscription"
 msgstr "Open in browser to manage subscription"
+
+#: src/strings.ts:2421
+msgid "Open in monograph"
+msgstr "Open in monograph"
 
 #: src/strings.ts:2304
 msgid "Open in new tab"
@@ -4430,6 +4490,10 @@ msgstr "Preview not available, content is encrypted."
 msgid "Previous match"
 msgstr "Previous match"
 
+#: src/strings.ts:2429
+msgid "Previous tab"
+msgstr "Previous tab"
+
 #: src/strings.ts:2015
 msgid "Print"
 msgstr "Print"
@@ -4518,6 +4582,10 @@ msgstr "Publish"
 msgid "Publish note"
 msgstr "Publish note"
 
+#: src/strings.ts:2420
+msgid "Publish on monograph"
+msgstr "Publish on monograph"
+
 #: src/strings.ts:481
 msgid "Publish your note to share it with others. You can set a password to protect it."
 msgstr "Publish your note to share it with others. You can set a password to protect it."
@@ -4597,6 +4665,10 @@ msgstr "Reading backup file..."
 #: src/strings.ts:2204
 msgid "Receipt"
 msgstr "Receipt"
+
+#: src/strings.ts:2440
+msgid "Recent"
+msgstr "Recent"
 
 #: src/strings.ts:1592
 msgid "RECENT BACKUPS"
@@ -4787,6 +4859,10 @@ msgstr "Remove from all"
 #: src/strings.ts:895
 msgid "Remove from notebook"
 msgstr "Remove from notebook"
+
+#: src/strings.ts:2441
+msgid "Remove from recent"
+msgstr "Remove from recent"
 
 #: src/strings.ts:1030
 msgid "Remove full name"
@@ -5145,6 +5221,10 @@ msgstr "Search in Notebooks"
 #: src/strings.ts:27
 msgid "Search in Notes"
 msgstr "Search in Notes"
+
+#: src/strings.ts:2418
+msgid "Search in notes, notebooks, and tags"
+msgstr "Search in notes, notebooks, and tags"
 
 #: src/strings.ts:31
 msgid "Search in Reminders"
@@ -6085,9 +6165,17 @@ msgstr "Toggle dark/light mode"
 msgid "Toggle indentation mode"
 msgstr "Toggle indentation mode"
 
+#: src/strings.ts:2419
+msgid "Toggle readonly"
+msgstr "Toggle readonly"
+
 #: src/strings.ts:2360
 msgid "Toggle replace"
 msgstr "Toggle replace"
+
+#: src/strings.ts:2436
+msgid "Toggle theme"
+msgstr "Toggle theme"
 
 #: src/strings.ts:2113
 msgid "Toolbar"
@@ -6141,6 +6229,14 @@ msgstr "Turn off reminder"
 #: src/strings.ts:882
 msgid "Turn on reminder"
 msgstr "Turn on reminder"
+
+#: src/strings.ts:2424
+msgid "Turn sync off"
+msgstr "Turn sync off"
+
+#: src/strings.ts:2423
+msgid "Turn sync on"
+msgstr "Turn sync on"
 
 #: src/strings.ts:1078
 msgid "Turns off syncing completely on this device. Any changes made will remain local only and new changes from your other devices won't sync to this device."
@@ -6254,6 +6350,10 @@ msgstr "Unpublish"
 #: src/strings.ts:1460
 msgid "Unpublish notes to delete them"
 msgstr "Unpublish notes to delete them"
+
+#: src/strings.ts:2425
+msgid "Unpublish on monograph"
+msgstr "Unpublish on monograph"
 
 #: src/strings.ts:2067
 msgid "Unregister"

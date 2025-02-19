@@ -168,6 +168,11 @@ const routes = defineRoutes({
       title: async () => {
         const tag = await db.tags.tag(tagId);
         if (!tag) return;
+        notestore.setContext({
+          type: "tag",
+          id: tagId,
+          item: tag
+        });
         return `#${tag.title}`;
       },
       component: Notes,

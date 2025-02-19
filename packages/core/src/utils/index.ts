@@ -41,3 +41,4 @@ export * from "./set.js";
 export * from "./title-format.js";
 export * from "./virtualized-grouping.js";
 export * from "./crypto.js";
+export * from "./fuzzy";

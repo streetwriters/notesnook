@@ -19,7 +19,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { match } from "fuzzyjs";
 import Database from "./index.js";
-import { Item, Note, SortOptions, TrashItem } from "../types.js";
+import {
+  Item,
+  Note,
+  Notebook,
+  Reminder,
+  SortOptions,
+  TrashItem
+} from "../types.js";
 import { DatabaseSchema, RawDatabaseSchema } from "../database/index.js";
 import { AnyColumnWithTable, Kysely, sql } from "@streetwriters/kysely";
 import { FilteredSelector } from "../database/sql-collection.js";
@@ -43,7 +50,11 @@ type FuzzySearchField<T> = {
 export default class Lookup {
   constructor(private readonly db: Database) {}
 
-  notes(query: string, notes?: FilteredSelector<Note>): SearchResults<Note> {
+  notes(
+    query: string,
+    notes?: FilteredSelector<Note>,
+    opts?: { titleOnly?: boolean }
+  ): SearchResults<Note> {
     return this.toSearchResults(async (limit, sortOptions) => {
       const db = this.db.sql() as unknown as Kysely<RawDatabaseSchema>;
       const excludedIds = this.db.trash.cache.notes;
@@ -61,21 +72,23 @@ export default class Lookup {
             )
             .where("title", "match", query)
             .select(["id", sql<number>`rank * 10`.as("rank")])
-            .unionAll((eb) =>
-              eb
-                .selectFrom("content_fts")
-                .$if(!!notes, (eb) =>
-                  eb.where("noteId", "in", notes!.filter.select("id"))
-                )
-                .$if(excludedIds.length > 0, (eb) =>
-                  eb.where("id", "not in", excludedIds)
-                )
-                .where("data", "match", query)
-                .select(["noteId as id", "rank"])
-                .$castTo<{
-                  id: string;
-                  rank: number;
-                }>()
+            .$if(!opts?.titleOnly, (eb) =>
+              eb.unionAll((eb) =>
+                eb
+                  .selectFrom("content_fts")
+                  .$if(!!notes, (eb) =>
+                    eb.where("noteId", "in", notes!.filter.select("id"))
+                  )
+                  .$if(excludedIds.length > 0, (eb) =>
+                    eb.where("id", "not in", excludedIds)
+                  )
+                  .where("data", "match", query)
+                  .select(["noteId as id", "rank"])
+                  .$castTo<{
+                    id: string;
+                    rank: number;
+                  }>()
+              )
             )
             .as("results")
         )
@@ -99,12 +112,18 @@ export default class Lookup {
     }, notes || this.db.notes.all);
   }
 
-  notebooks(query: string) {
-    return this.search(this.db.notebooks.all, query, [
+  notebooks(query: string, opts: { titleOnly?: boolean } = {}) {
+    const fields: FuzzySearchField<Notebook>[] = [
       { name: "id", column: "notebooks.id", weight: -100 },
-      { name: "title", column: "notebooks.title", weight: 10 },
-      { name: "description", column: "notebooks.description" }
-    ]);
+      { name: "title", column: "notebooks.title", weight: 10 }
+    ];
+    if (!opts.titleOnly) {
+      fields.push({
+        name: "description",
+        column: "notebooks.description"
+      });
+    }
+    return this.search(this.db.notebooks.all, query, fields);
   }
 
   tags(query: string) {
@@ -114,12 +133,18 @@ export default class Lookup {
     ]);
   }
 
-  reminders(query: string) {
-    return this.search(this.db.reminders.all, query, [
+  reminders(query: string, opts: { titleOnly?: boolean } = {}) {
+    const fields: FuzzySearchField<Reminder>[] = [
       { name: "id", column: "reminders.id", weight: -100 },
-      { name: "title", column: "reminders.title", weight: 10 },
-      { name: "description", column: "reminders.description" }
-    ]);
+      { name: "title", column: "reminders.title", weight: 10 }
+    ];
+    if (!opts.titleOnly) {
+      fields.push({
+        name: "description",
+        column: "reminders.description"
+      });
+    }
+    return this.search(this.db.reminders.all, query, fields);
   }
 
   trash(query: string): SearchResults<TrashItem> {

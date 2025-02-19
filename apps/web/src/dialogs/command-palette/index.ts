@@ -17,28 +17,4 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Notebook, Tag } from "@notesnook/core";
-export type NotebookContext = {
-  type: "notebook";
-  id: string;
-  item?: Notebook;
-  totalNotes?: number;
-};
-export type Context =
-  | {
-      type: "tag";
-      id: string;
-      item?: Tag;
-    }
-  | {
-      type: "color";
-      id: string;
-    }
-  | NotebookContext
-  | {
-      type: "favorite" | "monographs";
-    };
-
-export type WithDateEdited<T> = { items: T[]; dateEdited: number };
-export type NotebooksWithDateEdited = WithDateEdited<Notebook>;
-export type TagsWithDateEdited = WithDateEdited<Tag>;
+export * from "./command-palette-dialog";
