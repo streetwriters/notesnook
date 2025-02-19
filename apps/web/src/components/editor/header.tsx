@@ -35,9 +35,11 @@ import { strings } from "@notesnook/intl";
 type HeaderProps = { readonly: boolean; id: string };
 function Header(props: HeaderProps) {
   const { readonly, id } = props;
-  const tags = useEditorStore(
-    (store) => store.getActiveSession(["default", "readonly"])?.tags
+  const activeSession = useEditorStore((store) =>
+    store.getActiveSession(["default", "readonly"])
   );
+  const tags = activeSession?.tags;
+  const noteId = activeSession?.note.id;
 
   const setTag = useCallback(async function (
     noteId: string,
@@ -59,6 +61,8 @@ function Header(props: HeaderProps) {
   },
   []);
 
+  if (!noteId) return null;
+
   return (
     <>
       <Flex
@@ -72,7 +76,9 @@ function Header(props: HeaderProps) {
             text={tag.title}
             icon={TagIcon}
             onClick={() => navigate(`/tags/${tag.id}`)}
-            onDismiss={readonly ? undefined : () => setTag(id, tags, tag.title)}
+            onDismiss={
+              readonly ? undefined : () => setTag(noteId, tags, tag.title)
+            }
             styles={{ container: { mr: 1 }, text: { fontSize: "body" } }}
           />
         ))}
@@ -90,7 +96,7 @@ function Header(props: HeaderProps) {
                   key: "new",
                   title: `Create "${query}" tag`,
                   icon: Plus.path,
-                  onClick: () => setTag(id, tags, query).finally(reset)
+                  onClick: () => setTag(noteId, tags, query).finally(reset)
                 });
               }
 
@@ -101,17 +107,18 @@ function Header(props: HeaderProps) {
                     key: item.id,
                     title: item.title,
                     icon: TagIcon.path,
-                    onClick: () => setTag(id, tags, item.title).finally(reset)
+                    onClick: () =>
+                      setTag(noteId, tags, item.title).finally(reset)
                   }))
                 );
               }
 
               return items;
             }}
-            onAdd={(value) => setTag(id, tags, value)}
+            onAdd={(value) => setTag(noteId, tags, value)}
             onRemove={() => {
               if (tags.length <= 0) return;
-              setTag(id, tags, tags[tags.length - 1].title);
+              setTag(noteId, tags, tags[tags.length - 1].title);
             }}
             defaultItems={() =>
               db.tags.all.limit(10).items(undefined, {
