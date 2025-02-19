@@ -39,6 +39,7 @@ import { eCloseSheet } from "../utils/events";
 import { sleep } from "../utils/time";
 import { ToastManager, eSendEvent, presentSheet } from "./event-manager";
 import SettingsService from "./settings";
+import { getCachePathForFile } from "../common/filesystem/io";
 
 const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
@@ -260,7 +261,7 @@ async function run(
         });
         if (await FileStorage.exists(file.hash)) {
           await RNFetchBlob.fs.cp(
-            `${cacheDir}/${file.hash}`,
+            await getCachePathForFile(file.hash),
             `${attachmentsDir}/${file.hash}`
           );
         }
