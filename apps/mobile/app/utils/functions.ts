@@ -32,8 +32,7 @@ import { useMenuStore } from "../stores/use-menu-store";
 import { useNotebookStore } from "../stores/use-notebook-store";
 import { useRelationStore } from "../stores/use-relation-store";
 import { useTagStore } from "../stores/use-tag-store";
-import { eOnNotebookUpdated, eUpdateNoteInEditor } from "./events";
-import { getParentNotebookId } from "./notebooks";
+import { eUpdateNoteInEditor } from "./events";
 
 export function getObfuscatedEmail(email: string) {
   if (!email) return "";
@@ -79,7 +78,6 @@ function confirmDeleteAllNotes(
 async function deleteNotebook(id: string, deleteNotes: boolean) {
   const notebook = await db.notebooks.notebook(id);
   if (!notebook) return;
-  const parentId = getParentNotebookId(id);
   if (deleteNotes) {
     const noteRelations = await db.relations.from(notebook, "note").get();
     if (noteRelations?.length) {
@@ -89,11 +87,6 @@ async function deleteNotebook(id: string, deleteNotes: boolean) {
     }
   }
   await db.notebooks.moveToTrash(id);
-
-  eSendEvent(eOnNotebookUpdated, parentId);
-  if (!parentId) {
-    useNotebookStore.getState().refresh();
-  }
 }
 
 export const deleteItems = async (
@@ -170,9 +163,7 @@ export const deleteItems = async (
         useMenuStore.getState().setColorNotes();
         ToastManager.hide();
         if (type === "notebook") {
-          deletedIds.forEach(async (id) => {
-            eSendEvent(eOnNotebookUpdated, await getParentNotebookId(id));
-          });
+          useNotebookStore.getState().refresh();
         }
       },
       actionText: "Undo"
@@ -187,11 +178,9 @@ export const deleteItems = async (
   Navigation.queueRoutesForUpdate();
   useMenuStore.getState().setColorNotes();
   if (type === "notebook") {
-    itemIds.forEach(async (id) => {
-      eSendEvent(eOnNotebookUpdated, await getParentNotebookId(id));
-    });
-    useMenuStore.getState().setMenuPins();
+    useNotebookStore.getState().refresh();
   }
+  useMenuStore.getState().setMenuPins();
 };
 
 export const openLinkInBrowser = async (link: string) => {
