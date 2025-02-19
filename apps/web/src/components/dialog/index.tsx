@@ -113,6 +113,13 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
 
           ...props.sx
         }}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") {
+            e.preventDefault();
+            e.stopPropagation();
+            props.onClose?.();
+          }
+        }}
       >
         {props.showCloseButton && (
           <Close
