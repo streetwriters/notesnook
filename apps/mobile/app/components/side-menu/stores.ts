@@ -21,9 +21,9 @@ import { createNotebookTreeStores } from "../../stores/create-notebook-tree-stor
 import { createItemSelectionStore } from "../../stores/item-selection-store";
 
 export const {
-  useSideMenuNotebookExpandedStore,
-  useSideMenuNotebookSelectionStore,
-  useSideMenuNotebookTreeStore
+  useNotebookExpandedStore: useSideMenuNotebookExpandedStore,
+  useNotebookSelectionStore: useSideMenuNotebookSelectionStore,
+  useNotebookTreeStore: useSideMenuNotebookTreeStore
 } = createNotebookTreeStores(true, false);
 
 export const useSideMenuTagsSelectionStore = createItemSelectionStore(

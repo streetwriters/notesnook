@@ -16,58 +16,45 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { Notebook, VirtualizedGrouping } from "@notesnook/core";
+import { Notebook } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { FlatList } from "react-native-actions-sheet";
-import create from "zustand";
 import { db } from "../../../common/database";
-import { useNotebook } from "../../../hooks/use-notebook";
 import { presentSheet } from "../../../services/event-manager";
 import {
-  useNotebookStore,
-  useNotebooks
+  createNotebookTreeStores,
+  TreeItem
+} from "../../../stores/create-notebook-tree-stores";
+import {
+  useNotebooks,
+  useNotebookStore
 } from "../../../stores/use-notebook-store";
 import {
   checkParentSelected,
   findRootNotebookId,
   getParentNotebookId
 } from "../../../utils/notebooks";
-import { AppFontSize } from "../../../utils/size";
 import { DefaultAppStyles } from "../../../utils/styles";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
 import { presentDialog } from "../../dialog/functions";
 import SheetProvider from "../../sheet-provider";
-import AppIcon from "../../ui/AppIcon";
-import { Button } from "../../ui/button";
-import { IconButton } from "../../ui/icon-button";
-import { Pressable } from "../../ui/pressable";
-import Paragraph from "../../ui/typography/paragraph";
-import { AddNotebookSheet } from "../add-notebook";
+import { NotebookItem } from "../../side-menu/notebook-item";
 import {
   useSideMenuNotebookExpandedStore,
   useSideMenuNotebookSelectionStore
 } from "../../side-menu/stores";
+import { Button } from "../../ui/button";
+import { AddNotebookSheet } from "../add-notebook";
 
-const useNotebookExpandedStore = create<{
-  expanded: {
-    [id: string]: boolean;
-  };
-  setExpanded: (id: string) => void;
-}>((set, get) => ({
-  expanded: {},
-  setExpanded(id: string) {
-    set({
-      expanded: {
-        ...get().expanded,
-        [id]: !get().expanded[id]
-      }
-    });
-  }
-}));
+const {
+  useNotebookExpandedStore,
+  useNotebookTreeStore,
+  useNotebookSelectionStore
+} = createNotebookTreeStores(false, false);
 
 export const MoveNotebookSheet = ({
   selectedNotebooks,
@@ -76,16 +63,55 @@ export const MoveNotebookSheet = ({
   selectedNotebooks: Notebook[];
   close?: () => void;
 }) => {
-  const [notebooks] = useNotebooks();
+  const tree = useNotebookTreeStore((state) => state.tree);
+  const [notebooks, loading] = useNotebooks();
   const { colors } = useThemeColors();
-  const [moveToTop, setMoveToTop] = useState(false);
+  const lastQuery = React.useRef<string>();
+  const [filteredNotebooks, setFilteredNotebooks] = React.useState(notebooks);
+  const [moveToTopEnabled, setMoveToTopEnabled] = useState(false);
+  const loadRootNotebooks = React.useCallback(async () => {
+    if (!filteredNotebooks) return;
+    const _notebooks: Notebook[] = [];
+    for (let i = 0; i < filteredNotebooks.placeholders.length; i++) {
+      _notebooks[i] = (await filteredNotebooks?.item(i))?.item as Notebook;
+    }
+    const items = await useNotebookTreeStore
+      .getState()
+      .addNotebooks("root", _notebooks, 0);
+    useNotebookTreeStore.getState().setTree(items);
+  }, [filteredNotebooks]);
+
+  const updateNotebooks = React.useCallback(() => {
+    if (lastQuery.current) {
+      db.lookup
+        .notebooks(lastQuery.current)
+        .sorted()
+        .then((filtered) => {
+          setFilteredNotebooks(filtered);
+        });
+    } else {
+      setFilteredNotebooks(notebooks);
+    }
+  }, [notebooks]);
+
+  useEffect(() => {
+    updateNotebooks();
+  }, [updateNotebooks]);
+
+  useEffect(() => {
+    (async () => {
+      if (!loading) {
+        loadRootNotebooks();
+      }
+    })();
+  }, [loadRootNotebooks, loading]);
 
   useEffect(() => {
     (async () => {
       for (const notebook of selectedNotebooks) {
         const root = await findRootNotebookId(notebook.id);
         if (root !== notebook.id) {
-          setMoveToTop(true);
+          setMoveToTopEnabled(true);
           return;
         }
       }
@@ -93,14 +119,14 @@ export const MoveNotebookSheet = ({
   }, [selectedNotebooks]);
 
   const renderItem = useCallback(
-    ({ index }: { index: number }) => {
+    ({ item, index }: { item: TreeItem; index: number }) => {
       return (
-        <NotebookItem
-          id={index}
-          items={notebooks}
-          level={0}
+        <NotebookItemWrapper
           selectedNotebooks={selectedNotebooks}
-          onPress={async (selectedNotebook) => {
+          index={index}
+          item={item}
+          onPress={async () => {
+            const selectedNotebook = item.notebook;
             presentDialog({
               title: strings.moveNotebooks(selectedNotebooks.length),
               paragraph: strings.moveNotebooksConfirm(
@@ -153,7 +179,7 @@ export const MoveNotebookSheet = ({
         />
       );
     },
-    [selectedNotebooks, notebooks, close]
+    [selectedNotebooks, close]
   );
 
   return (
@@ -163,7 +189,9 @@ export const MoveNotebookSheet = ({
 
       <View
         style={{
-          paddingHorizontal: DefaultAppStyles.GAP
+          paddingHorizontal: DefaultAppStyles.GAP,
+          borderBottomWidth: 1,
+          borderBottomColor: colors.primary.border
         }}
       >
         <DialogHeader
@@ -175,16 +203,17 @@ export const MoveNotebookSheet = ({
       </View>
 
       <FlatList
-        data={notebooks?.placeholders}
+        data={tree}
         renderItem={renderItem}
-        windowSize={1}
+        keyExtractor={(item) => item.notebook.id}
+        windowSize={3}
         ListHeaderComponent={
           <View
             style={{
               paddingHorizontal: DefaultAppStyles.GAP
             }}
           >
-            {moveToTop ? (
+            {moveToTopEnabled ? (
               <Button
                 title={strings.moveToTop()}
                 style={{
@@ -247,125 +276,104 @@ export const MoveNotebookSheet = ({
   );
 };
 
-const NotebookItem = ({
-  id,
-  onPress,
-  items,
-  level = 0,
-  selectedNotebooks
-}: {
-  id: string | number;
-  level?: number;
-  items?: VirtualizedGrouping<Notebook>;
-  onPress: (item: Notebook) => void;
-  selectedNotebooks: Notebook[];
-}) => {
-  const { nestedNotebooks, notebook } = useNotebook(id, items, true);
+const NotebookItemWrapper = React.memo(
+  ({
+    item,
+    index,
+    onPress,
+    selectedNotebooks
+  }: {
+    item: TreeItem;
+    index: number;
+    selectedNotebooks: Notebook[];
+    onPress: () => void;
+  }) => {
+    const expanded = useSideMenuNotebookExpandedStore(
+      (state) => state.expanded[item.notebook.id]
+    );
+    const selectionEnabled = useSideMenuNotebookSelectionStore(
+      (state) => state.enabled
+    );
+    const selected = useSideMenuNotebookSelectionStore(
+      (state) => state.selection[item.notebook.id] === "selected"
+    );
 
-  const isExpanded = useNotebookExpandedStore((state) =>
-    !notebook ? false : state.expanded[notebook.id]
-  );
-  const { colors } = useThemeColors();
+    const onItemUpdate = React.useCallback(async () => {
+      const notebook = await db.notebooks.notebook(item.notebook.id);
+      if (notebook) {
+        useNotebookTreeStore.getState().updateItem(item.notebook.id, notebook);
+        if (expanded) {
+          useNotebookTreeStore
+            .getState()
+            .setTree(
+              await useNotebookTreeStore
+                .getState()
+                .fetchAndAdd(item.notebook.id, item.depth + 1)
+            );
+        }
+      } else {
+        useNotebookTreeStore.getState().removeItem(item.notebook.id);
+      }
+    }, [expanded, item.depth, item.notebook.id]);
 
-  return selectedNotebooks.find((n) => n.id === notebook?.id) ? null : (
-    <View
-      style={{
-        minHeight: 45
-      }}
-    >
+    return selectedNotebooks.find((n) => n.id === item.notebook?.id) ? null : (
       <View
         style={{
-          minHeight: 45
+          paddingHorizontal: DefaultAppStyles.GAP,
+          marginTop: index === 0 ? DefaultAppStyles.GAP : 0
         }}
       >
-        {!notebook ? null : (
-          <>
-            <Pressable
-              onPress={() => onPress(notebook)}
-              style={{
-                flexDirection: "row",
-                paddingHorizontal: DefaultAppStyles.GAP,
-                height: 45,
-                gap: DefaultAppStyles.GAP_SMALL,
-                borderRadius: 0
-              }}
-            >
-              <AppIcon
-                name={
-                  nestedNotebooks?.placeholders.length
-                    ? isExpanded
-                      ? "chevron-down"
-                      : "chevron-right"
-                    : "book-outline"
-                }
-                color={colors.primary.icon}
-                size={20}
-                onPress={() => {
-                  if (!notebook) return;
-                  useNotebookExpandedStore.getState().setExpanded(notebook.id);
-                }}
-              />
-
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  flexGrow: 1,
-                  alignItems: "center"
-                }}
-              >
-                <Paragraph
-                  numberOfLines={1}
-                  style={{
-                    color: colors.primary.paragraph,
-                    fontSize: 15
-                  }}
-                >
-                  {notebook.title}
-                </Paragraph>
-
-                <IconButton
-                  name="plus"
-                  onPress={() => {
-                    if (!notebook) return;
-                    AddNotebookSheet.present(
-                      undefined,
-                      notebook,
-                      "move-notebooks",
-                      undefined,
-                      false
-                    );
-                  }}
-                  size={AppFontSize.lg}
-                />
-              </View>
-            </Pressable>
-
-            {nestedNotebooks?.placeholders?.length && isExpanded ? (
-              <View
-                style={{
-                  paddingLeft: level + 1 > 0 && level + 1 < 5 ? 15 : 0,
-                  marginTop: 5
-                }}
-              >
-                {nestedNotebooks.placeholders.map((item, index) => (
-                  <NotebookItem
-                    key={notebook?.id + index}
-                    id={index}
-                    onPress={onPress}
-                    level={level + 1}
-                    items={nestedNotebooks}
-                    selectedNotebooks={selectedNotebooks}
-                  />
-                ))}
-              </View>
-            ) : null}
-          </>
-        )}
+        <NotebookItem
+          item={item}
+          index={index}
+          expanded={expanded}
+          onToggleExpanded={async () => {
+            useSideMenuNotebookExpandedStore
+              .getState()
+              .setExpanded(item.notebook.id);
+            if (!expanded) {
+              useNotebookTreeStore
+                .getState()
+                .setTree(
+                  await useNotebookTreeStore
+                    .getState()
+                    .fetchAndAdd(item.notebook.id, item.depth + 1)
+                );
+            } else {
+              useNotebookTreeStore.getState().removeChildren(item.notebook.id);
+            }
+          }}
+          selected={selected}
+          selectionEnabled={selectionEnabled}
+          selectionStore={useNotebookSelectionStore}
+          onItemUpdate={onItemUpdate}
+          focused={false}
+          onPress={onPress}
+          onAddNotebook={() => {
+            AddNotebookSheet.present(
+              undefined,
+              item.notebook,
+              "move-notebook",
+              undefined,
+              false
+            );
+          }}
+        />
       </View>
-    </View>
-  );
-};
+    );
+  },
+  (prev, next) => {
+    return (
+      prev.item.notebook.id === next.item.notebook.id &&
+      prev.item.notebook.dateModified === next.item.notebook.dateModified &&
+      prev.item.notebook.dateEdited === next.item.notebook.dateEdited &&
+      prev.item.hasChildren === next.item.hasChildren &&
+      prev.index === next.index &&
+      prev.item.parentId === next.item.parentId
+    );
+  }
+);
+NotebookItemWrapper.displayName = "NotebookItemWrapper";
 
 MoveNotebookSheet.present = async (notebooks: Notebook[]) => {
   presentSheet({

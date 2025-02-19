@@ -47,7 +47,8 @@ export const NotebookItem = ({
   selectionStore,
   onItemUpdate,
   onPress,
-  onLongPress
+  onLongPress,
+  onAddNotebook
 }: {
   index: number;
   item: TreeItem;
@@ -60,6 +61,7 @@ export const NotebookItem = ({
   onItemUpdate: (id?: string) => void;
   onPress?: () => void;
   onLongPress?: () => void;
+  onAddNotebook?: () => void;
 }) => {
   const notebook = item.notebook;
   const isFocused = focused;
@@ -180,6 +182,23 @@ export const NotebookItem = ({
               color={selected ? colors.selected.icon : colors.primary.icon}
             />
           </View>
+        ) : onAddNotebook ? (
+          <IconButton
+            name="plus"
+            size={AppFontSize.md}
+            top={0}
+            left={50}
+            bottom={0}
+            right={40}
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: defaultBorderRadius
+            }}
+            onPress={() => {
+              onAddNotebook();
+            }}
+          />
         ) : (
           <>
             <Paragraph
