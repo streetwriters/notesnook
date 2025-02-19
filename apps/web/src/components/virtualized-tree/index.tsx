@@ -219,7 +219,6 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
                     treeNode.parentId === node.id ||
                     removeIds.includes(treeNode.parentId)
                   ) {
-                    expanded[treeNode.id] = false;
                     removeIds.push(treeNode.id);
                   }
                 }
