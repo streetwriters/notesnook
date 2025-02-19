@@ -74,7 +74,11 @@ export class WebExtensionServer implements Server {
   async saveClip(clip: Clip) {
     let clipContent = "";
 
-    if (clip.mode === "simplified" || clip.mode === "screenshot") {
+    if (
+      clip.mode === "simplified" ||
+      clip.mode === "screenshot" ||
+      clip.mode === "bookmark"
+    ) {
       clipContent += clip.data;
     } else {
       const clippedFile = new File(
@@ -106,11 +110,17 @@ export class WebExtensionServer implements Server {
     if (isCipher(content)) return;
 
     content += clipContent;
-    content += h("div", [
-      h("hr"),
-      h("p", ["Clipped from ", h("a", [clip.title], { href: clip.url })]),
-      h("p", [`Date clipped: ${getFormattedDate(Date.now())}`])
-    ]).innerHTML;
+    content +=
+      clip.mode === "bookmark"
+        ? h("div", [
+            h("hr"),
+            h("p", [`Date bookmarked: ${getFormattedDate(Date.now())}`])
+          ]).innerHTML
+        : h("div", [
+            h("hr"),
+            h("p", ["Clipped from ", h("a", [clip.title], { href: clip.url })]),
+            h("p", [`Date clipped: ${getFormattedDate(Date.now())}`])
+          ]).innerHTML;
 
     const id = await db.notes.add({
       id: note?.id,
