@@ -467,9 +467,13 @@ class EditorStore extends BaseStore<EditorStore> {
             event.item.fromType === "tag" &&
             event.item.toType === "note"
           ) {
-            updateSession(session.id, undefined, {
-              tags: await db.notes.tags(event.item.toId)
-            });
+            for (const session of sessions) {
+              if ("note" in session && session.note.id === event.item.toId) {
+                updateSession(session.id, undefined, {
+                  tags: await db.notes.tags(event.item.toId)
+                });
+              }
+            }
           }
         } else if (event.collection === "tags") {
           if (event.type === "update") {
