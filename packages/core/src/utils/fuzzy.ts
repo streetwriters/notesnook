@@ -26,10 +26,6 @@ export function fuzzy<T>(
   opts?: {
     prefix?: string;
     suffix?: string;
-    /**
-     * If true, only items that match the query will be returned
-     */
-    matchOnly?: boolean;
   }
 ): T[] {
   if (query === "") return items;
@@ -38,11 +34,8 @@ export function fuzzy<T>(
 
   for (const item of items) {
     const result = match(query, `${item[key]}`);
-    if (!result.match) {
-      if (opts?.matchOnly) continue;
-      fuzzied.push([item, result.score]);
-      continue;
-    }
+    if (!result.match) continue;
+
     if (opts?.prefix || opts?.suffix) {
       fuzzied.push([
         {
@@ -55,9 +48,7 @@ export function fuzzy<T>(
         },
         result.score
       ]);
-      continue;
-    }
-    fuzzied.push([item, result.score]);
+    } else fuzzied.push([item, result.score]);
   }
 
   return fuzzied.sort((a, b) => b[1] - a[1]).map((f) => f[0]);

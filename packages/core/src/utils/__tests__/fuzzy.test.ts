@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { fuzzy } from "../fuzzy";
+import { fuzzy } from "../fuzzy.js";
 import { test, expect, describe } from "vitest";
 
 describe("lookup.fuzzy", () => {
-  test("should sort items by score when sort", () => {
+  test("should sort items by score", () => {
     const items = [
       {
         title: "system"
@@ -34,45 +34,7 @@ describe("lookup.fuzzy", () => {
       }
     ];
     const query = "ems";
-    expect(fuzzy(query, items, "title")).toStrictEqual([
-      items[2],
-      items[0],
-      items[1]
-    ]);
-  });
-  describe("opts.matchOnly", () => {
-    test("should return all items when matchOnly is false", () => {
-      const items = [
-        {
-          title: "hello"
-        },
-        {
-          title: "world"
-        }
-      ];
-      const successQuery = "o";
-      const failureQuery = "i";
-      expect(fuzzy(successQuery, items, "title")).toStrictEqual(items);
-      expect(fuzzy(failureQuery, items, "title")).toStrictEqual(items);
-    });
-    test("should return only matching items when matchOnly is true", () => {
-      const items = [
-        {
-          title: "hello"
-        },
-        {
-          title: "world"
-        }
-      ];
-      const successQuery = "or";
-      const failureQuery = "i";
-      expect(
-        fuzzy(successQuery, items, "title", { matchOnly: true })
-      ).toStrictEqual([items[1]]);
-      expect(
-        fuzzy(failureQuery, items, "title", { matchOnly: true })
-      ).toStrictEqual([]);
-    });
+    expect(fuzzy(query, items, "title")).toStrictEqual([items[2]]);
   });
   describe("opts.prefix", () => {
     test("should prefix matched field with provided value when given", () => {
@@ -89,7 +51,7 @@ describe("lookup.fuzzy", () => {
         fuzzy(query, items, "title", {
           prefix: "prefix-"
         })
-      ).toStrictEqual([items[0], { title: "worlprefix-d" }]);
+      ).toStrictEqual([{ title: "worlprefix-d" }]);
     });
   });
   describe("opt.suffix", () => {
@@ -107,7 +69,7 @@ describe("lookup.fuzzy", () => {
         fuzzy(query, items, "title", {
           suffix: "-suffix"
         })
-      ).toStrictEqual([{ title: "hello-suffix" }, items[1]]);
+      ).toStrictEqual([{ title: "hello-suffix" }]);
     });
   });
 });
