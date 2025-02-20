@@ -54,7 +54,7 @@ const {
   useNotebookExpandedStore,
   useNotebookTreeStore,
   useNotebookSelectionStore
-} = createNotebookTreeStores(false, false);
+} = createNotebookTreeStores(false, false, "move-notebook-tree-expanded");
 
 export const MoveNotebookSheet = ({
   selectedNotebooks,
@@ -293,13 +293,13 @@ const NotebookItemWrapper = React.memo(
     index: number;
     onPress: () => void;
   }) => {
-    const expanded = useSideMenuNotebookExpandedStore(
+    const expanded = useNotebookExpandedStore(
       (state) => state.expanded[item.notebook.id]
     );
-    const selectionEnabled = useSideMenuNotebookSelectionStore(
+    const selectionEnabled = useNotebookSelectionStore(
       (state) => state.enabled
     );
-    const selected = useSideMenuNotebookSelectionStore(
+    const selected = useNotebookSelectionStore(
       (state) => state.selection[item.notebook.id] === "selected"
     );
 
@@ -333,9 +333,7 @@ const NotebookItemWrapper = React.memo(
           index={index}
           expanded={expanded}
           onToggleExpanded={async () => {
-            useSideMenuNotebookExpandedStore
-              .getState()
-              .setExpanded(item.notebook.id);
+            useNotebookExpandedStore.getState().setExpanded(item.notebook.id);
             if (!expanded) {
               useNotebookTreeStore
                 .getState()

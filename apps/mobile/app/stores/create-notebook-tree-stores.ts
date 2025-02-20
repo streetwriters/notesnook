@@ -44,7 +44,8 @@ function removeTreeItem(tree: TreeItem[], id: string) {
 
 export function createNotebookTreeStores(
   multiSelect: boolean,
-  selectionEnabled: boolean
+  selectionEnabled: boolean,
+  persistKey?: string
 ) {
   const useNotebookTreeStore = create<{
     tree: TreeItem[];
@@ -207,7 +208,7 @@ export function createNotebookTreeStores(
         }
       }),
       {
-        name: "side-menu-notebook-expanded-v1",
+        name: persistKey || "side-menu-notebook-expanded",
         getStorage: () => MMKV as unknown as StateStorage
       }
     )
