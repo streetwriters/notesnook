@@ -200,6 +200,16 @@ export class EditorModel {
     return tags;
   }
 
+  async removeTags(tags: string[]) {
+    for (const tag of tags) {
+      const item = this.tags
+        .filter({ hasText: tag })
+        .getByTitle("Remove")
+        .first();
+      await item.click();
+    }
+  }
+
   async getTitle() {
     return this.title.inputValue();
   }
