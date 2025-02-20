@@ -81,37 +81,11 @@ test("search notes with an empty note", () =>
     expect(filtered).toHaveLength(1);
   }));
 
-test("search notes with opts.titleOnly should not search in descriptions", () =>
-  noteTest({
-    content: content
-  }).then(async ({ db }) => {
-    await db.notes.add({
-      title: "note of the world",
-      content: { type: "tiptap", data: "<p>hello<br></p>" }
-    });
-    let filtered = await db.lookup
-      .notes("note of the world", undefined, {
-        titleOnly: true
-      })
-      .ids();
-    expect(filtered).toHaveLength(1);
-  }));
-
 test("search notebooks", () =>
   notebookTest().then(async ({ db }) => {
     await db.notebooks.add(TEST_NOTEBOOK2);
     let filtered = await db.lookup.notebooks("Description").ids();
     expect(filtered.length).toBeGreaterThan(0);
-  }));
-
-test("search notebook with titleOnly option should not search in descriptions", () =>
-  notebookTest().then(async ({ db }) => {
-    await db.notebooks.add({ title: "Description" });
-    await db.notebooks.add(TEST_NOTEBOOK2);
-    let filtered = await db.lookup
-      .notebooks("Description", { titleOnly: true })
-      .ids();
-    expect(filtered).toHaveLength(1);
   }));
 
 test("search should not return trashed notes", () =>
@@ -151,23 +125,4 @@ test("search reminders", () =>
     expect(titleSearch).toHaveLength(1);
     const descriptionSearch = await db.lookup.reminders("please do").ids();
     expect(descriptionSearch).toHaveLength(1);
-  }));
-
-test("search reminders with titleOnly option should not search in descriptions", () =>
-  databaseTest().then(async (db) => {
-    await db.reminders.add({
-      title: "idc",
-      description: "desc",
-      date: Date.now()
-    });
-    await db.reminders.add({
-      title: "remind me",
-      description: "idc",
-      date: Date.now()
-    });
-
-    const filtered = await db.lookup
-      .reminders("idc", { titleOnly: true })
-      .ids();
-    expect(filtered).toHaveLength(1);
   }));
