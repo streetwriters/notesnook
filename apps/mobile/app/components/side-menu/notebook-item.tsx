@@ -48,7 +48,8 @@ export const NotebookItem = ({
   onItemUpdate,
   onPress,
   onLongPress,
-  onAddNotebook
+  onAddNotebook,
+  canDisableSelectionMode
 }: {
   index: number;
   item: TreeItem;
@@ -62,6 +63,7 @@ export const NotebookItem = ({
   onPress?: () => void;
   onLongPress?: () => void;
   onAddNotebook?: () => void;
+  canDisableSelectionMode?: boolean;
 }) => {
   const notebook = item.notebook;
   const isFocused = focused;
@@ -101,10 +103,34 @@ export const NotebookItem = ({
         testID={`notebook-item-${item.depth}-${index}`}
         onPress={async () => {
           if (selectionEnabled) {
-            selectionStore
-              .getState()
-              .markAs(item.notebook, selected ? "deselected" : "selected");
-            if (selectionStore.getState().getSelectedItemIds().length === 0) {
+            const state = selectionStore.getState();
+
+            if (selected) {
+              state.markAs(item.notebook, "deselected");
+              return;
+            }
+
+            if (!state.multiSelect) {
+              const keys = Object.keys(state.selection);
+              const nextState: any = {};
+              for (const key in keys) {
+                nextState[key] = !state.initialState[key]
+                  ? undefined
+                  : "deselected";
+              }
+
+              state.setSelection({
+                [item.notebook.id]: "selected",
+                ...nextState
+              });
+            } else {
+              state.markAs(item.notebook, "selected");
+            }
+
+            if (
+              selectionStore.getState().getSelectedItemIds().length === 0 &&
+              canDisableSelectionMode
+            ) {
               selectionStore.setState({
                 enabled: false
               });
@@ -167,48 +193,59 @@ export const NotebookItem = ({
           </Paragraph>
         </View>
 
-        {selectionEnabled ? (
-          <View
-            style={{
-              width: 25,
-              height: 25,
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
-            <AppIcon
-              name={selected ? "checkbox-outline" : "checkbox-blank-outline"}
-              size={AppFontSize.md}
-              color={selected ? colors.selected.icon : colors.primary.icon}
-            />
-          </View>
-        ) : onAddNotebook ? (
-          <IconButton
-            name="plus"
-            size={AppFontSize.md}
-            top={0}
-            left={50}
-            bottom={0}
-            right={40}
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: defaultBorderRadius
-            }}
-            onPress={() => {
-              onAddNotebook();
-            }}
-          />
-        ) : (
-          <>
-            <Paragraph
-              size={AppFontSize.xxs}
-              color={colors.secondary.paragraph}
+        <View
+          style={{
+            gap: DefaultAppStyles.GAP_SMALL,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center"
+          }}
+        >
+          {selectionEnabled ? (
+            <View
+              style={{
+                width: 25,
+                height: 25,
+                justifyContent: "center",
+                alignItems: "center"
+              }}
             >
-              {totalNotes?.(notebook?.id) || 0}
-            </Paragraph>
-          </>
-        )}
+              <AppIcon
+                name={selected ? "checkbox-outline" : "checkbox-blank-outline"}
+                size={AppFontSize.md}
+                color={selected ? colors.selected.icon : colors.primary.icon}
+              />
+            </View>
+          ) : (
+            <>
+              <Paragraph
+                size={AppFontSize.xxs}
+                color={colors.secondary.paragraph}
+              >
+                {totalNotes?.(notebook?.id) || 0}
+              </Paragraph>
+            </>
+          )}
+
+          {onAddNotebook ? (
+            <IconButton
+              name="plus"
+              size={AppFontSize.md}
+              top={0}
+              left={50}
+              bottom={0}
+              right={40}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: defaultBorderRadius
+              }}
+              onPress={() => {
+                onAddNotebook();
+              }}
+            />
+          ) : null}
+        </View>
       </Pressable>
     </View>
   );
