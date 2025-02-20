@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { match } from "fuzzyjs";
+import { match, surround } from "fuzzyjs";
 import Database from "./index.js";
 import {
   Item,
@@ -46,6 +46,7 @@ type FuzzySearchField<T> = {
   weight?: number;
   name: keyof T;
   column: AnyColumnWithTable<DatabaseSchema, keyof DatabaseSchema>;
+  ignore?: boolean;
 };
 export default class Lookup {
   constructor(private readonly db: Database) {}
@@ -112,38 +113,34 @@ export default class Lookup {
     }, notes || this.db.notes.all);
   }
 
-  notebooks(query: string, opts: { titleOnly?: boolean } = {}) {
+  notebooks(query: string) {
     const fields: FuzzySearchField<Notebook>[] = [
-      { name: "id", column: "notebooks.id", weight: -100 },
-      { name: "title", column: "notebooks.title", weight: 10 }
-    ];
-    if (!opts.titleOnly) {
-      fields.push({
+      { name: "id", column: "notebooks.id", weight: -100, ignore: true },
+      { name: "title", column: "notebooks.title", weight: 10 },
+      {
         name: "description",
         column: "notebooks.description"
-      });
-    }
+      }
+    ];
     return this.search(this.db.notebooks.all, query, fields);
   }
 
   tags(query: string) {
     return this.search(this.db.tags.all, query, [
-      { name: "id", column: "tags.id", weight: -100 },
+      { name: "id", column: "tags.id", weight: -100, ignore: true },
       { name: "title", column: "tags.title" }
     ]);
   }
 
-  reminders(query: string, opts: { titleOnly?: boolean } = {}) {
+  reminders(query: string) {
     const fields: FuzzySearchField<Reminder>[] = [
-      { name: "id", column: "reminders.id", weight: -100 },
-      { name: "title", column: "reminders.title", weight: 10 }
-    ];
-    if (!opts.titleOnly) {
-      fields.push({
+      { name: "id", column: "reminders.id", weight: -100, ignore: true },
+      { name: "title", column: "reminders.title", weight: 10 },
+      {
         name: "description",
         column: "reminders.description"
-      });
-    }
+      }
+    ];
     return this.search(this.db.reminders.all, query, fields);
   }
 
@@ -193,47 +190,83 @@ export default class Lookup {
     query: string,
     fields: FuzzySearchField<T>[]
   ) {
-    return this.toSearchResults(
-      (limit, sortOptions) =>
-        this.filter(selector, query, fields, limit, sortOptions),
-      selector
-    );
+    return this.toSearchResults(async (limit, sortOptions) => {
+      const results = await this.filter(selector, query, fields, {
+        limit,
+        sortOptions
+      });
+      return results.map((item) => item.id);
+    }, selector);
   }
 
   private async filter<T extends Item>(
     selector: FilteredSelector<T>,
     query: string,
-    fields: FuzzySearchField<T>[],
-    limit?: number,
-    sortOptions?: SortOptions
+    fields: readonly FuzzySearchField<T>[],
+    options: {
+      limit?: number;
+      sortOptions?: SortOptions;
+      prefix?: string;
+      suffix?: string;
+    } = {}
   ) {
-    const results: Map<string, number> = new Map();
+    const results: Map<
+      string,
+      {
+        item: T;
+        score: number;
+      }
+    > = new Map();
     const columns = fields.map((f) => f.column);
-    for await (const item of selector.fields(columns).iterate()) {
-      if (limit && results.size >= limit) break;
+    const items = await selector.fields(columns).items();
+
+    for (const item of items) {
+      if (options.limit && results.size >= options.limit) break;
 
       for (const field of fields) {
+        if (field.ignore) continue;
+
         const result = match(query, `${item[field.name]}`);
-        if (result.match) {
-          const oldScore = results.get(item.id) || 0;
-          results.set(item.id, oldScore + result.score * (field.weight || 1));
+        if (!result.match) continue;
+
+        const oldMatch = results.get(item.id);
+        if (options.suffix && options.prefix) {
+          item[field.name] = surround(`${item[field.name]}`, {
+            suffix: options.suffix,
+            prefix: options.prefix,
+            result
+          }) as T[keyof T];
+        }
+        if (oldMatch) {
+          oldMatch.score += result.score * (field.weight || 1);
+        } else {
+          results.set(item.id, {
+            item,
+            score: result.score * (field.weight || 1)
+          });
         }
       }
     }
     selector.fields([]);
 
+    if (results.size === 0) return [];
+
     const sorted = Array.from(results.entries());
 
-    if (!sortOptions)
+    if (!options.sortOptions)
       // || sortOptions.sortBy === "relevance")
       sorted.sort(
         // sortOptions?.sortDirection === "desc"
         // ? (a, b) => a[1] - b[1]
         // :
-        (a, b) => b[1] - a[1]
+        (a, b) => b[1].score - a[1].score
       );
 
-    return sorted.map((a) => a[0]);
+    return sorted.map((item) => ({
+      id: item[0],
+      score: item[1].score,
+      item: item[1].item
+    }));
   }
 
   private toSearchResults<T extends Item>(
