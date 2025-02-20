@@ -33,19 +33,20 @@ type OperatorNode = {
   type: "AND" | "OR" | "NOT";
 };
 
+const INVALID_CHARS = /[:<>./\\()$&=#!\-+~§@^?,;'"[\]{}|]/;
 function escapeSQLString(str: string): string {
   if (str.startsWith('"') && str.endsWith('"')) {
     const innerStr = str.slice(1, -1).replace(/"/g, '""');
     return `"${innerStr}"`;
   }
 
-  const maybeColspec = /[:<>./\\()$&=#!\-\+\~§@^?,;'"\[\]{}|]/.test(str);
+  const isInvalidChar = INVALID_CHARS.test(str);
   const isWildcard =
     str.startsWith("*") ||
     str.endsWith("*") ||
     str.startsWith("%") ||
     str.endsWith("%");
-  if (maybeColspec || isWildcard) {
+  if (isInvalidChar || isWildcard) {
     return `"${str}"`;
   }
 
@@ -153,6 +154,21 @@ function generateSQL(ast: QueryNode): string {
         for (const value of child.value) {
           if (value.length === 1 || value.length === 2) {
             result.push(`(">${value}"`, "OR", value, "OR", `"${value}<")`);
+            result.push("AND");
+            continue;
+          } else if (
+            value.length === 3 &&
+            value[0] === '"' &&
+            value[2] === '"' &&
+            !["<", ">"].includes(value[1])
+          ) {
+            result.push(
+              `(">${value[1]}"`,
+              "OR",
+              value,
+              "OR",
+              `"${value[1]}<")`
+            );
             result.push("AND");
             continue;
           }

@@ -21,7 +21,7 @@ import { expect, test } from "vitest";
 import { transformQuery } from "../query-transformer.js";
 
 function lt2(str: string) {
-  return `(">${str}" OR ${str} OR "${str}<")`;
+  return `(">${str}" OR "${str}" OR "${str}<")`;
 }
 
 const TRANSFORM_QUERY_TESTS = [
@@ -65,14 +65,14 @@ const TRANSFORM_QUERY_TESTS = [
   ["foo + OR", `foo AND ${lt2("+")}`],
   ['"special -phrase*"', '"special -phrase*"'],
   ["foo* + bar*", `"foo*" AND ${lt2("+")} AND "bar*"`],
-  ["(foo + bar) -baz", `(foo AND ${lt2("+")} AND bar) AND "-baz"`],
+  ["(foo + bar) -baz", `"(foo" AND ${lt2("+")} AND "bar)" AND "-baz"`],
   ['"phrase with "quotes""', '"phrase with ""quotes"""'],
   [
     'foo + "bar -baz" OR "qux*"',
     `foo AND ${lt2("+")} AND "bar -baz" OR "qux*"`
   ],
   ["foo + bar + ", `foo AND ${lt2("+")} AND bar AND ${lt2("+")}`],
-  ["+foo bar", `+foo AND bar`],
+  ["+foo bar", `"+foo" AND bar`],
   ["foo*bar*", `"foo*bar*"`],
   ['"escaped "quotes""', '"escaped ""quotes"""'],
   ["-hello-world", `"-hello-world"`],
