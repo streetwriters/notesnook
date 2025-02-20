@@ -25,7 +25,8 @@ export interface BaseDialogProps<T = unknown> {
 }
 
 class _DialogManager {
-  private openedDialogs: Set<React.JSXElementConstructor<any>> = new Set();
+  private openedDialogs: Map<React.JSXElementConstructor<any>, () => void> =
+    new Map();
 
   open<
     Props extends BaseDialogProps<any>,
@@ -39,19 +40,21 @@ class _DialogManager {
     const container = document.createElement("div");
     const root = createRoot(container);
 
-    const close = () => {
-      this.openedDialogs.delete(component);
-      root.unmount();
-      container.remove();
-    };
-
     const Dialog = component as React.FunctionComponent<
       Omit<Props, "onClose"> & {
         onClose: (result: any) => void;
       }
     >;
-    this.openedDialogs.add(component);
-    return new Promise<Result>((resolve, reject) =>
+    return new Promise<Result>((resolve, reject) => {
+      const close = () => {
+        this.openedDialogs.delete(component);
+        root.unmount();
+        container.remove();
+      };
+      this.openedDialogs.set(component, () => {
+        close();
+        reject(new Error("Dialog force closed."));
+      });
       root.render(
         <Dialog
           {...props}
@@ -64,8 +67,8 @@ class _DialogManager {
             }
           }}
         />
-      )
-    );
+      );
+    });
   }
 
   closeAll() {
@@ -80,7 +83,12 @@ class _DialogManager {
     component: React.ComponentType<Props>
   ) {
     return {
-      show: (props: Omit<Props, "onClose">) => this.open(component, props)
+      show: (props: Omit<Props, "onClose">) => this.open(component, props),
+      close: () => {
+        const dialog = this.openedDialogs.get(component);
+        if (!dialog) return;
+        dialog();
+      }
     };
   }
 }
