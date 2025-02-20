@@ -231,6 +231,7 @@ export const NotebookItem = ({
             <IconButton
               name="plus"
               size={AppFontSize.md}
+              testID={`add-notebook-${index}`}
               top={0}
               left={50}
               bottom={0}
