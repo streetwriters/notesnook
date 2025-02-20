@@ -122,7 +122,6 @@ export const MoveNotebookSheet = ({
     ({ item, index }: { item: TreeItem; index: number }) => {
       return (
         <NotebookItemWrapper
-          selectedNotebooks={selectedNotebooks}
           index={index}
           item={item}
           onPress={async () => {
@@ -179,7 +178,15 @@ export const MoveNotebookSheet = ({
         />
       );
     },
-    [selectedNotebooks, close]
+    [close, selectedNotebooks]
+  );
+  const filteredTree = React.useMemo(
+    () =>
+      tree.filter(
+        (treeItem) =>
+          !selectedNotebooks.find((n) => n.id === treeItem.notebook?.id)
+      ),
+    [selectedNotebooks, tree]
   );
 
   return (
@@ -203,7 +210,7 @@ export const MoveNotebookSheet = ({
       </View>
 
       <FlatList
-        data={tree}
+        data={filteredTree}
         renderItem={renderItem}
         keyExtractor={(item) => item.notebook.id}
         windowSize={3}
@@ -280,12 +287,10 @@ const NotebookItemWrapper = React.memo(
   ({
     item,
     index,
-    onPress,
-    selectedNotebooks
+    onPress
   }: {
     item: TreeItem;
     index: number;
-    selectedNotebooks: Notebook[];
     onPress: () => void;
   }) => {
     const expanded = useSideMenuNotebookExpandedStore(
@@ -316,7 +321,7 @@ const NotebookItemWrapper = React.memo(
       }
     }, [expanded, item.depth, item.notebook.id]);
 
-    return selectedNotebooks.find((n) => n.id === item.notebook?.id) ? null : (
+    return (
       <View
         style={{
           paddingHorizontal: DefaultAppStyles.GAP,
