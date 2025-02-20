@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { test, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
-import { createHistorySession } from "./utils";
+import { createHistorySession, NOTE } from "./utils";
 
 test("notes should open in the same tab", async ({ page }) => {
   const app = new AppModel(page);
@@ -293,6 +293,47 @@ test("shouldn't be possible to create a new note in a pinned tab", async ({
   tabs = await notes.editor.getTabs();
   expect(tabs.length).toBe(2);
   expect(await tabs[1].isActive()).toBe(true);
+});
+
+test("notes open in multiple tabs should sync tags when tags are added", async ({
+  page
+}) => {
+  const tags = ["toAdd", "todo"];
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note = await notes.createNote(NOTE);
+  await note?.contextMenu.openInNewTab();
+
+  await notes.editor.setTags(tags);
+  const tabs = await notes.editor.getTabs();
+  await tabs[0].click();
+
+  const noteTags = await notes.editor.getTags();
+  expect(noteTags).toHaveLength(tags.length);
+  expect(noteTags.every((t, i) => t === tags[i])).toBe(true);
+});
+
+test("notes open in multiple tabs should sync tags when tags are removed", async ({
+  page
+}) => {
+  const tags = ["removeme", "dontremoveme", "removemex2", "todo"];
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note = await notes.createNote(NOTE);
+  await notes.editor.setTags(tags);
+  await note?.contextMenu.openInNewTab();
+
+  await notes.editor.removeTags(["removeme", "removemex2"]);
+  const tabs = await notes.editor.getTabs();
+  await tabs[0].click();
+
+  const noteTags = await notes.editor.getTags();
+  expect(noteTags).toHaveLength(2);
+  expect(noteTags.every((t, i) => t === ["dontremoveme", "todo"][i])).toBe(
+    true
+  );
 });
 
 test.skip("TODO: open a locked note, switch to another note and navigate back", () => {});
