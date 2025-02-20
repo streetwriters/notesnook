@@ -92,7 +92,10 @@ export function getPosition(
   } else if (location === "left") position.left -= elementWidth;
 
   if (actualY + elementHeight > windowHeight) {
-    position.top = windowHeight - elementHeight;
+    position.top =
+      target === "mouse"
+        ? windowHeight - elementHeight
+        : windowHeight - elementHeight - actualY + y;
   } else {
     position.top = y;
   }
