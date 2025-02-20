@@ -193,9 +193,10 @@ const KEYMAP = [
     description: "Open command palette",
     action: (e: KeyboardEvent) => {
       e.preventDefault();
+      CommandPaletteDialog.close();
       CommandPaletteDialog.show({
         isCommandMode: e.key === "k"
-      });
+      }).catch(() => {});
     }
   }
 ];
