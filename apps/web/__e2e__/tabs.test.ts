@@ -336,5 +336,28 @@ test("notes open in multiple tabs should sync tags when tags are removed", async
   );
 });
 
+test("notes open in multiple tabs should sync color in note properties when color is changed", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note = await notes.createNote(NOTE);
+  await note?.contextMenu.newColor({ title: "red", color: "#ff0000" });
+  await note?.contextMenu.newColor({ title: "blue", color: "#0000ff" });
+  await note?.contextMenu.openInNewTab();
+
+  await notes.editor.waitForLoading();
+  const tabs = await notes.editor.getTabs();
+  await tabs[0].click();
+
+  expect(await note?.properties.isColored("blue")).toBe(true);
+
+  await note?.properties.color("red");
+  await tabs[1].click();
+
+  expect(await note?.properties.isColored("red")).toBe(true);
+});
+
 test.skip("TODO: open a locked note, switch to another note and navigate back", () => {});
 test.skip("TODO: open a locked note, switch to another note, unlock the note and navigate back", () => {});

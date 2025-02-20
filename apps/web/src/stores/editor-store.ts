@@ -414,9 +414,13 @@ class EditorStore extends BaseStore<EditorStore> {
             event.item.fromType === "color" &&
             event.item.toType === "note"
           ) {
-            updateSession(event.item.toId, undefined, {
-              color: event.item.fromId
-            });
+            for (const session of sessions) {
+              if ("color" in session && session.note.id === event.item.toId) {
+                updateSession(session.id, undefined, {
+                  color: event.item.fromId
+                });
+              }
+            }
           } else if (
             event.type === "unlink" &&
             ((event.reference.type === "color" &&
