@@ -64,7 +64,8 @@ export const SectionHeader = React.memo<
       <View
         style={{
           width: "100%",
-          paddingHorizontal: DefaultAppStyles.GAP
+          paddingHorizontal: DefaultAppStyles.GAP,
+          marginBottom: DefaultAppStyles.GAP_VERTICAL
         }}
       >
         <View
