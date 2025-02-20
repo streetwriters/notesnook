@@ -39,7 +39,9 @@ import {
   useSideMenuNotebookSelectionStore,
   useSideMenuNotebookTreeStore
 } from "./stores";
-
+useSideMenuNotebookSelectionStore.setState({
+  multiSelect: true
+});
 export const SideMenuNotebooks = () => {
   const tree = useSideMenuNotebookTreeStore((state) => state.tree);
   const [notebooks, loading] = useNotebooks();

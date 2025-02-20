@@ -63,9 +63,9 @@ export const MoveNotebookSheet = ({
   selectedNotebooks: Notebook[];
   close?: () => void;
 }) => {
-  const tree = useNotebookTreeStore((state) => state.tree);
   const [notebooks, loading] = useNotebooks();
   const { colors } = useThemeColors();
+  const tree = useNotebookTreeStore((state) => state.tree);
   const lastQuery = React.useRef<string>();
   const [filteredNotebooks, setFilteredNotebooks] = React.useState(notebooks);
   const [moveToTopEnabled, setMoveToTopEnabled] = useState(false);
