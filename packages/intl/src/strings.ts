@@ -1495,7 +1495,8 @@ For example:
   enterValidEmail: () => t`Please enter a valid email address`,
   enterValidPhone: () => t`Please enter a valid phone number with country code`,
   errorGettingCodes: () => t`Error getting codes`,
-  noResultsFound: (query: string) => t`No results found for ${query}`,
+  noResultsFound: (query?: string) =>
+    query ? t`No results found for ${query}` : t`No results found`,
   routes: {
     Notes: () => t`Notes`,
     Notebooks: () => t`Notebooks`,
@@ -2413,17 +2414,12 @@ Use this if changes from other devices are not appearing on this device. This wi
   redeemGiftCodeDesc: () => t`Enter the gift code to redeem your subscription.`,
   redeemingGiftCode: () => t`Redeeming gift code`,
   redeem: () => t`Redeem`,
-  commandPaletteDescription: () =>
-    t`<kbd>{">"}</kbd> for command mode · remove <kbd>{">"}</kbd> for search mode · <kbd>⏎</kbd> to select · <kbd>↑</kbd> <kbd>↓</kbd> to navigate`,
-  searchInNotesNotebooksAndTags: () => t`Search in notes, notebooks, and tags`,
-  toggleReadonly: () => t`Toggle readonly`,
-  publishOnMonograph: () => t`Publish on monograph`,
-  openInMonograph: () => t`Open in monograph`,
-  copyMonographLink: () => t`Copy monograph link`,
-  turnSyncOn: () => t`Turn sync on`,
-  turnSyncOff: () => t`Turn sync off`,
-  unpublishOnMonograph: () => t`Unpublish on monograph`,
-  addSubnotebook: () => t`Add subnotebook`,
+  searchForNotesNotebooksAndTags: () =>
+    t`Search for notes, notebooks, and tags...`,
+  executeACommand: () => t`Execute a command...`,
+  execute: () => t`Execute`,
+  quickOpen: () => t`Quick open`,
+  commandPalette: () => t`Command palette`,
   navigate: () => t`Navigate`,
   nextTab: () => t`Next tab`,
   previousTab: () => t`Previous tab`,
@@ -2437,6 +2433,6 @@ Use this if changes from other devices are not appearing on this device. This wi
   actionsForNote: (title: string) => t`Actions for note: ${title}`,
   actionsForNotebook: (title: string) => t`Actions for notebook: ${title}`,
   actionsForTag: (title: string) => t`Actions for tag: ${title}`,
-  recent: () => t`Recent`,
-  removeFromRecent: () => t`Remove from recent`
+  recents: () => t`Recents`,
+  removeFromRecents: () => t`Remove from recents`
 };

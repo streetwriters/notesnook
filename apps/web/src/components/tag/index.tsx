@@ -60,7 +60,7 @@ function Tag(props: TagProps) {
           );
         }
       }}
-      menuItems={menuItems}
+      menuItems={tagMenuItems}
       onClick={() => {
         navigate(`/tags/${id}`);
       }}
@@ -73,7 +73,7 @@ function Tag(props: TagProps) {
 }
 export default Tag;
 
-const menuItems: (tag: TagType, ids?: string[]) => MenuItem[] = (
+export const tagMenuItems: (tag: TagType, ids?: string[]) => MenuItem[] = (
   tag,
   ids = []
 ) => {

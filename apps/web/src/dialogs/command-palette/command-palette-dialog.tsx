@@ -17,124 +17,81 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { debounce, toTitleCase } from "@notesnook/common";
-import { fuzzy } from "@notesnook/core";
-import { Box, Button, Flex, Text } from "@theme-ui/components";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from "react";
-import { GroupedVirtuoso, GroupedVirtuosoHandle } from "react-virtuoso";
+import { debounce, usePromise } from "@notesnook/common";
+import { EVENTS, fuzzy, Note, Notebook, Reminder, Tag } from "@notesnook/core";
+import { Box, Button, Flex, Input, Text } from "@theme-ui/components";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  GroupedVirtuoso,
+  GroupedVirtuosoHandle,
+  CalculateViewLocation
+} from "react-virtuoso";
 import { db } from "../../common/db";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import Dialog from "../../components/dialog";
-import Field from "../../components/field";
-import {
-  Cross,
-  Icon,
-  Notebook as NotebookIcon,
-  Note as NoteIcon,
-  Reminder as ReminderIcon,
-  Tag as TagIcon
-} from "../../components/icons";
+import { Cross } from "../../components/icons";
 import { CustomScrollbarsVirtualList } from "../../components/list-container";
-import { hashNavigate, navigate } from "../../navigation";
 import { useEditorStore } from "../../stores/editor-store";
-import Config from "../../utils/config";
-import { commands as COMMANDS } from "./commands";
 import { strings } from "@notesnook/intl";
-
-interface Command {
-  id: string;
-  title: string;
-  highlightedTitle?: string;
-  type:
-    | "command"
-    | "command-dynamic"
-    | "note"
-    | "notebook"
-    | "tag"
-    | "reminder";
-  group: string;
-}
-
-type GroupedCommands = { group: string; count: number }[];
+import { isMac } from "../../utils/platform";
+import {
+  getDefaultCommands,
+  Command,
+  getRecentCommands,
+  resolveRecentCommand,
+  commandActions,
+  commandIcons,
+  removeRecentCommand,
+  addRecentCommand
+} from "./commands";
 
 type CommandPaletteDialogProps = BaseDialogProps<boolean> & {
   isCommandMode: boolean;
 };
 
-type Coords = Record<"x" | "y", number>;
+const COMMAND_PALETTE_STICKY_HEADER_HEIGHT = 32;
 
 export const CommandPaletteDialog = DialogManager.register(
   function CommandPaletteDialog(props: CommandPaletteDialogProps) {
-    const [commands, setCommands] = useState<Command[]>(
-      props.isCommandMode ? getDefaultCommands() : getSessionsAsCommands()
-    );
-    const [selected, setSelected] = useState<Coords>({ x: 0, y: 0 });
-    const [query, setQuery] = useState(props.isCommandMode ? ">" : "");
-    const [loading, setLoading] = useState(false);
+    const [selected, setSelected] = useState<number>(0);
+    const [query, setQuery] = useState<string>("");
     const virtuosoRef = useRef<GroupedVirtuosoHandle>(null);
+    const { search: dbSearch } = useDatabaseFuzzySearch();
+    const defaultCommands = useRef<Command[]>();
 
-    useEffect(() => {
-      virtuosoRef.current?.scrollToIndex({
-        index: selected.y,
-        align: "end",
-        behavior: "auto"
+    const select = useCallback((index: number) => {
+      setSelected(index);
+      virtuosoRef.current?.scrollIntoView({
+        index: index,
+        calculateViewLocation: calculateCommandItemLocation
       });
-    }, [selected]);
+    }, []);
 
-    const onChange = useCallback(async function onChange(
-      e: React.ChangeEvent<HTMLInputElement>
-    ) {
-      try {
-        setSelected({ x: 0, y: 0 });
-        const query = e.target.value;
-        setQuery(query);
-        if (!isCommandMode(query)) {
-          setLoading(true);
-        }
-        const res = await search(query);
-        const highlighted = fuzzy(
-          prepareQuery(query),
-          res.map((r) => ({
-            ...r,
-            highlightedTitle: r.title
-          })) ?? [],
-          /**
-           * we use a separate key for highlighted title
-           * so that when we save recent commands to local storage
-           * we can save the original title instead of the highlighted one
-           */
-          "highlightedTitle",
-          {
-            prefix: "<b style='color: var(--accent-foreground)'>",
-            suffix: "</b>"
-          }
-        );
-        setCommands(sortCommands(highlighted));
-      } finally {
-        setLoading(false);
-      }
-    },
-    []);
-
-    const grouped = useMemo(
-      () =>
-        commands.reduce((acc, command) => {
-          const item = acc.find((c) => c.group === command.group);
-          if (item) {
-            item.count++;
+    const commands = usePromise(async () => {
+      select(0);
+      if (!defaultCommands.current)
+        defaultCommands.current = await getDefaultCommands();
+      const commands = props.isCommandMode
+        ? commandSearch(query, defaultCommands.current)
+        : await dbSearch(query);
+      const groups = commands.reduce(
+        (acc, command) => {
+          const index = acc.keys.indexOf(command.group);
+          if (index === -1) {
+            acc.keys.push(command.group);
+            acc.counts.push(1);
           } else {
-            acc.push({ group: command.group, count: 1 });
+            acc.counts[index]++;
           }
           return acc;
-        }, [] as GroupedCommands),
-      [commands]
-    );
+        },
+        { counts: [], keys: [] } as {
+          counts: number[];
+          keys: string[];
+        }
+      );
+      return { commands, groups };
+    }, [dbSearch, query]);
 
     return (
       <Dialog
@@ -148,476 +105,427 @@ export const CommandPaletteDialog = DialogManager.register(
           fontFamily: "body"
         }}
       >
-        <Box
-          className="ping"
-          sx={{
-            height: 4,
-            bg: loading ? "accent" : "background",
-            transition: "background 0.2s"
-          }}
-        />
         <Flex
           variant="columnFill"
-          sx={{ mx: 3, overflow: "hidden", height: 400 }}
+          sx={{
+            overflow: "hidden",
+            height: 400,
+            '[data-viewport-type="element"]': {
+              width: "calc(100% - 10px) !important",
+              px: 1
+            }
+          }}
           onKeyDown={(e) => {
+            if (commands.status !== "fulfilled") return;
             if (e.key == "Enter") {
               e.preventDefault();
-              const command = commands[selected.y];
-              if (!command) return;
-              if (selected.x === 1) {
-                setSelected({ x: 0, y: 0 });
-                removeRecentCommand(command.id);
-                setCommands((commands) =>
-                  commands.filter((c) => c.id !== command.id)
-                );
-                return;
-              }
-              const action = getCommandAction({
-                id: command.id,
-                type: command.type
+              const command = commands.value.commands[selected];
+              command.action?.(command, {
+                openInNewTab: e.ctrlKey || e.metaKey
               });
-              action?.(command.id);
               addRecentCommand(command);
               props.onClose(false);
-              setSelected({ x: 0, y: 0 });
             }
             if (e.key === "ArrowDown") {
               e.preventDefault();
-              setSelected(moveSelectionDown(selected, commands));
+              select(getNextCommandIndex(selected, commands.value.commands));
             }
             if (e.key === "ArrowUp") {
               e.preventDefault();
-              setSelected(moveSelectionUp(selected, commands));
-            }
-            if (e.key === "ArrowRight") {
-              e.preventDefault();
-              setSelected(moveSelectionRight(selected, commands));
-            }
-            if (e.key === "ArrowLeft") {
-              e.preventDefault();
-              setSelected(moveSelectionLeft(selected, commands));
+              select(
+                getPreviousCommandIndex(selected, commands.value.commands)
+              );
             }
           }}
         >
-          <Field
+          <Input
             autoFocus
-            placeholder={strings.searchInNotesNotebooksAndTags()}
-            sx={{ mx: 0, my: 2 }}
-            defaultValue={query}
-            onChange={isCommandMode(query) ? onChange : debounce(onChange, 500)}
+            variant="clean"
+            placeholder={
+              props.isCommandMode
+                ? strings.executeACommand()
+                : strings.searchForNotesNotebooksAndTags()
+            }
+            sx={{
+              m: 0,
+              marginTop: 0,
+              mr: 0,
+              px: 2,
+              borderRadius: 0,
+              borderBottom: "1px solid var(--border)"
+            }}
+            onChange={debounce((e) => {
+              setQuery(e.target.value);
+            }, 100)}
           />
-          {query && commands.length === 0 && (
-            <Box>
-              <Text variant="subBody">
-                {strings.noResultsFound(prepareQuery(query))}
-              </Text>
-            </Box>
-          )}
-          <Box sx={{ marginY: "10px", height: "100%" }}>
-            <GroupedVirtuoso
-              ref={virtuosoRef}
-              style={{ overflow: "hidden" }}
-              components={{
-                Scroller: CustomScrollbarsVirtualList
-              }}
-              groupCounts={grouped.map((g) => g.count)}
-              groupContent={(groupIndex) => {
-                const label =
-                  grouped[groupIndex].group === "recent"
-                    ? strings.recent()
-                    : grouped[groupIndex].group;
-                return (
-                  <Box
-                    sx={{
-                      width: "100%",
-                      py: 0.5,
-                      bg: "background",
-                      px: 1,
-                      borderRadius: "2px"
-                    }}
-                  >
-                    <Text variant="subBody" bg="">
-                      {toTitleCase(label)}
-                    </Text>
-                  </Box>
-                );
-              }}
-              itemContent={(index) => {
-                const command = commands[index];
-                if (!command) return null;
+          <GroupedVirtuoso
+            ref={virtuosoRef}
+            style={{ overflow: "hidden" }}
+            components={{
+              Scroller: CustomScrollbarsVirtualList,
+              Footer: () => (
+                <div
+                  className="footer"
+                  style={{
+                    height: "5px"
+                  }}
+                />
+              ),
+              EmptyPlaceholder: () => (
+                <Text
+                  sx={{
+                    px: 1
+                  }}
+                  variant="subBody"
+                >
+                  {query ? strings.noResultsFound(query) : ""}
+                </Text>
+              ),
+              TopItemList: ({ style, ...props }) => (
+                <div
+                  className="top-item-list"
+                  {...props}
+                  style={{
+                    ...style,
+                    width: "calc(100% - 10px) !important",
+                    padding: "0px 5px"
+                  }}
+                />
+              )
+            }}
+            groupCounts={
+              commands.status === "fulfilled"
+                ? commands.value.groups.counts
+                : []
+            }
+            groupContent={(groupIndex) => {
+              if (commands.status !== "fulfilled") return null;
+              const label =
+                commands.value.groups.keys[groupIndex] === "recent"
+                  ? strings.recents()
+                  : commands.value.groups.keys[groupIndex];
 
-                const Icon = getCommandIcon({
-                  id: command.id,
-                  type: command.type
-                });
+              return (
+                <Box
+                  sx={{
+                    width: "100%",
+                    py: 1,
+                    bg: "background",
+                    px: 1
+                  }}
+                >
+                  <Text
+                    variant="subBody"
+                    dangerouslySetInnerHTML={{ __html: label }}
+                  />
+                </Box>
+              );
+            }}
+            itemContent={(index) => {
+              if (commands.status !== "fulfilled") return null;
 
-                return (
+              const command = commands.value.commands[index];
+              if (!command) return null;
+
+              return (
+                <Flex
+                  key={index}
+                  onClick={(e) => {
+                    command.action?.(command, {
+                      openInNewTab: e.ctrlKey || e.metaKey
+                    });
+                    addRecentCommand(command);
+                    props.onClose(false);
+                  }}
+                  sx={{
+                    cursor: "pointer",
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    py: 1,
+                    px: 1,
+                    borderRadius: "default",
+                    bg:
+                      index === selected
+                        ? "background-selected"
+                        : "transparent",
+                    ":hover:not(:disabled):not(:active)": {
+                      bg: index === selected ? "hover-selected" : "hover"
+                    }
+                  }}
+                >
                   <Flex
                     sx={{
-                      flexDirection: "row",
-                      gap: 1,
-                      alignItems: "center"
+                      gap: 1
                     }}
                   >
-                    <Button
-                      title={command.title}
-                      key={index}
-                      onClick={() => {
-                        const action = getCommandAction({
-                          id: command.id,
-                          type: command.type
-                        });
-                        action?.(command.id);
-                        addRecentCommand(command);
-                        props.onClose(false);
-                      }}
+                    {command.icon && (
+                      <command.icon
+                        size={14}
+                        color={index === selected ? "icon-selected" : "icon"}
+                      />
+                    )}
+                    <Text
+                      variant="body"
                       sx={{
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "center",
-                        width: "100%",
-                        gap: 2,
-                        py: 1,
-                        bg:
-                          selected.x === 0 && index === selected.y
-                            ? "hover"
-                            : "transparent",
-                        ".chip": {
-                          bg:
-                            selected.x === 0 && index === selected.y
-                              ? "color-mix(in srgb, var(--accent) 20%, transparent)"
-                              : "var(--background-secondary)"
-                        },
-                        ":hover:not(:disabled):not(:active)": {
-                          bg: "hover"
-                        }
+                        textOverflow: "ellipsis",
+                        overflow: "hidden"
+                      }}
+                      dangerouslySetInnerHTML={{
+                        __html: command.title
+                      }}
+                    />
+                  </Flex>
+                  {command.group === "recent" && (
+                    <Button
+                      title={strings.removeFromRecents()}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeRecentCommand(command.id);
+                        commands.refresh();
+                      }}
+                      variant="secondary"
+                      sx={{
+                        bg: "transparent",
+                        p: "small",
+                        borderRadius: 100
                       }}
                     >
-                      {Icon && (
-                        <Icon
-                          size={18}
-                          color={
-                            selected.x === 0 && index === selected.y
-                              ? "icon-selected"
-                              : "icon"
-                          }
-                        />
-                      )}
-                      {["note", "notebook", "reminder", "tag"].includes(
-                        command.type
-                      ) ? (
-                        <Text
-                          className="chip"
-                          sx={{
-                            px: 1,
-                            borderRadius: "4px",
-                            border: "1px solid",
-                            borderColor: "border",
-                            textOverflow: "ellipsis",
-                            overflow: "hidden"
-                          }}
-                          dangerouslySetInnerHTML={{
-                            __html: command?.highlightedTitle ?? command.title
-                          }}
-                        />
-                      ) : (
-                        <Text
-                          sx={{
-                            textOverflow: "ellipsis",
-                            overflow: "hidden"
-                          }}
-                          dangerouslySetInnerHTML={{
-                            __html: command?.highlightedTitle ?? command.title
-                          }}
-                        />
-                      )}
+                      <Cross size={12} />
                     </Button>
-                    {command.group === "recent" && (
-                      <Button
-                        title={strings.removeFromRecent()}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeRecentCommand(command.id);
-                          setCommands((commands) =>
-                            commands.filter((c) => c.id !== command.id)
-                          );
-                        }}
-                        variant="icon"
-                        sx={{
-                          bg:
-                            selected.x === 1 && index === selected.y
-                              ? "hover"
-                              : "transparent",
-                          p: 1,
-                          mr: 1,
-                          ":hover:not(:disabled):not(:active)": {
-                            bg: "hover"
-                          }
-                        }}
-                      >
-                        <Cross size={14} />
-                      </Button>
-                    )}
-                  </Flex>
-                );
-              }}
-            />
-          </Box>
-        </Flex>
-        <Flex
-          sx={{ flexDirection: "row", bg: "hover", justifyContent: "center" }}
-        >
-          <Text
-            variant="subBody"
-            sx={{ m: 1 }}
-            dangerouslySetInnerHTML={{
-              __html: strings.commandPaletteDescription()
+                  )}
+                </Flex>
+              );
             }}
           />
+        </Flex>
+        <Flex
+          sx={{
+            flexDirection: "row",
+            bg: "background-secondary",
+            px: 2,
+            py: 2,
+            gap: 3,
+            borderTop: "1px solid var(--border)",
+            justifyContent: "end",
+            alignItems: "center"
+          }}
+        >
+          {getCommandPaletteHelp(props.isCommandMode).map((key) => {
+            return (
+              <Flex
+                key={key.key}
+                sx={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 1
+                }}
+              >
+                <Text variant="body">{key.description}</Text>
+                <Text variant="subBody">{key.key}</Text>
+              </Flex>
+            );
+          })}
         </Flex>
       </Dialog>
     );
   }
 );
 
-function moveSelectionDown(selected: Coords, commands: Command[]) {
-  const currentCommand = commands[selected.y];
-  const nextIndex = (selected.y + 1) % commands.length;
-  const nextCommand = commands[nextIndex];
-  if (currentCommand.group === "recent" && nextCommand.group === "recent") {
-    return { x: selected.x, y: nextIndex };
-  }
-  return { x: 0, y: nextIndex };
+function getNextCommandIndex(selected: number, commands: Command[]) {
+  return (selected + 1) % commands.length;
 }
 
-function moveSelectionUp(selected: Coords, commands: Command[]) {
-  const currentCommand = commands[selected.y];
-  const nextIndex = (selected.y - 1 + commands.length) % commands.length;
-  const nextCommand = commands[nextIndex];
-  if (currentCommand.group === "recent" && nextCommand.group === "recent") {
-    return { x: selected.x, y: nextIndex };
-  }
-  return { x: 0, y: nextIndex };
+function getPreviousCommandIndex(selected: number, commands: Command[]) {
+  return (selected - 1 + commands.length) % commands.length;
 }
 
-function moveSelectionRight(selected: Coords, commands: Command[]) {
-  const currentCommand = commands[selected.y];
-  if (currentCommand.group !== "recent") return selected;
-  const nextIndex = (selected.x + 1) % 2;
-  return { x: nextIndex, y: selected.y };
+const RESULT_PREFIX_SUFFIX = {
+  prefix: "<b style='color: var(--accent-foreground)'>",
+  suffix: "</b>"
+};
+function commandSearch(query: string, commands: Command[]) {
+  if (!query) return commands;
+  return fuzzy(
+    query,
+    commands,
+    {
+      title: 10,
+      group: 5
+    },
+    RESULT_PREFIX_SUFFIX
+  );
 }
 
-function moveSelectionLeft(selected: Coords, commands: Command[]) {
-  const currentCommand = commands[selected.y];
-  if (currentCommand.group !== "recent") return selected;
-  const nextIndex = (selected.x - 1 + 2) % 2;
-  return { x: nextIndex, y: selected.y };
-}
+function useDatabaseFuzzySearch() {
+  const notes = useRef<Note[]>();
+  const notebooks = useRef<Notebook[]>();
+  const tags = useRef<Tag[]>();
+  const reminders = useRef<Reminder[]>();
 
-const CommandIconMap = COMMANDS.reduce((acc, command) => {
-  acc.set(command.id, command.icon);
-  return acc;
-}, new Map<string, Icon>());
+  const updateCollections = useCallback(async (force = false) => {
+    if (force || !notes.current)
+      notes.current = await db.notes.all
+        .fields(["notes.id", "notes.title"])
+        .items();
+    if (force || !notebooks.current)
+      notebooks.current = await db.notebooks.all
+        .fields(["notebooks.id", "notebooks.title"])
+        .items();
+    if (force || !tags.current)
+      tags.current = await db.tags.all
+        .fields(["tags.id", "tags.title"])
+        .items();
+    if (force || !reminders.current)
+      reminders.current = await db.reminders.all
+        .fields(["reminders.id", "reminders.title"])
+        .items();
+  }, []);
 
-const CommandActionMap = COMMANDS.reduce((acc, command) => {
-  acc.set(command.id, command.action);
-  return acc;
-}, new Map<string, (arg?: any) => void>());
-
-function resolveCommands() {
-  return COMMANDS.reduce((acc, command) => {
-    if (acc.find((c) => c.id === command.id)) return acc;
-
-    const hidden = command.hidden ? command.hidden() : false;
-    const group =
-      typeof command.group === "function" ? command.group() : command.group;
-    const title =
-      typeof command.title === "function" ? command.title() : command.title;
-    if (hidden || group === undefined || title === undefined) return acc;
-    return acc.concat({
-      id: command.id,
-      title: title,
-      type: command.dynamic
-        ? ("command-dynamic" as const)
-        : ("command" as const),
-      group: group
+  useEffect(() => {
+    const event = db.eventManager.subscribe(EVENTS.syncCompleted, async () => {
+      await updateCollections(true);
     });
-  }, [] as Command[]);
-}
-
-function getDefaultCommands() {
-  return getRecentCommands().concat(resolveCommands());
-}
-
-function getRecentCommands() {
-  return Config.get<Command[]>("commandPalette:recent", []);
-}
-
-function addRecentCommand(command: Command) {
-  if (command.type === "command-dynamic") return;
-  let commands = getRecentCommands();
-  const index = commands.findIndex((c) => c.id === command.id);
-  if (index > -1) {
-    commands.splice(index, 1);
-  }
-  commands.unshift({
-    ...command,
-    highlightedTitle: undefined,
-    group: "recent"
-  });
-  if (commands.length > 3) {
-    commands = commands.slice(0, 3);
-  }
-  Config.set("commandPalette:recent", commands);
-}
-
-function removeRecentCommand(id: Command["id"]) {
-  let commands = getRecentCommands();
-  const index = commands.findIndex((c) => c.id === id);
-  if (index > -1) {
-    commands.splice(index, 1);
-    Config.set("commandPalette:recent", commands);
-  }
-}
-
-function getCommandAction({
-  id,
-  type
-}: {
-  id: Command["id"];
-  type: Command["type"];
-}) {
-  switch (type) {
-    case "command":
-    case "command-dynamic":
-      return CommandActionMap.get(id);
-    case "note":
-      return (noteId: string) => useEditorStore.getState().openSession(noteId);
-    case "notebook":
-      return (notebookId: string) => navigate(`/notebooks/${notebookId}`);
-    case "tag":
-      return (tagId: string) => navigate(`/tags/${tagId}`);
-    case "reminder":
-      return (reminderId: string) =>
-        hashNavigate(`/reminders/${reminderId}/edit`);
-  }
-}
-
-function getCommandIcon({
-  id,
-  type
-}: {
-  id: Command["id"];
-  type: Command["type"];
-}) {
-  switch (type) {
-    case "command":
-    case "command-dynamic":
-      return CommandIconMap.get(id);
-    case "note":
-      return NoteIcon;
-    case "notebook":
-      return NotebookIcon;
-    case "tag":
-      return TagIcon;
-    case "reminder":
-      return ReminderIcon;
-    default:
-      return undefined;
-  }
-}
-
-function getSessionsAsCommands() {
-  const sessions = useEditorStore.getState().get().sessions;
-  return sessions
-    .filter((s) => s.type !== "new")
-    .map((session) => {
-      return {
-        id: session.id,
-        title: session.note.title,
-        group: strings.dataTypesCamelCase.note(),
-        type: "note" as const
-      };
-    });
-}
-
-/**
- * commands need to be sorted wrt groups,
- * meaning commands of same group should be next to each other,
- * and recent commands should be at the top
- */
-function sortCommands(commands: Command[]) {
-  const recent: Command[] = [];
-  const sortedWrtGroups: Command[][] = [];
-  for (const command of commands) {
-    const group = command.group;
-    if (group === "recent") {
-      recent.push(command);
-      continue;
-    }
-    const index = sortedWrtGroups.findIndex((c) => c[0].group === group);
-    if (index === -1) {
-      sortedWrtGroups.push([command]);
-    } else {
-      sortedWrtGroups[index].push(command);
-    }
-  }
-  return recent.concat(sortedWrtGroups.flat());
-}
-
-function search(query: string) {
-  const prepared = prepareQuery(query);
-  if (isCommandMode(query)) {
-    return commandSearch(prepared);
-  }
-  if (prepared.length < 1) {
-    return getSessionsAsCommands();
-  }
-  return dbSearch(prepared);
-}
-
-function commandSearch(query: string) {
-  const commands = getDefaultCommands();
-  const result = fuzzy(query, commands, "title", {
-    matchOnly: true
-  });
-  return result;
-}
-
-async function dbSearch(query: string) {
-  const notes = db.lookup.notes(query, undefined, {
-    titleOnly: true
-  });
-  const notebooks = db.lookup.notebooks(query, {
-    titleOnly: true
-  });
-  const tags = db.lookup.tags(query);
-  const reminders = db.lookup.reminders(query, {
-    titleOnly: true
-  });
-  const list = (
-    await Promise.all([
-      notes.items(),
-      notebooks.items(),
-      tags.items(),
-      reminders.items()
-    ])
-  ).flat();
-  const commands = list.map((item) => {
-    return {
-      id: item.id,
-      title: item.title,
-      group: strings.dataTypesCamelCase[item.type](),
-      type: item.type
+    return () => {
+      event.unsubscribe();
+      reminders.current = undefined;
+      notebooks.current = undefined;
+      tags.current = undefined;
+      notes.current = undefined;
     };
-  });
+  }, [updateCollections]);
+
+  const search = useCallback(
+    async (query: string) => {
+      if (!query) return await getSessionsAsCommands();
+
+      await updateCollections();
+
+      const list: Command[] = [];
+      const collections: Record<
+        "note" | "notebook" | "tag" | "reminder",
+        { id: string; title: string }[] | undefined
+      > = {
+        note: notes.current,
+        notebook: notebooks.current,
+        tag: tags.current,
+        reminder: reminders.current
+      };
+      for (const _type in collections) {
+        const type = _type as keyof typeof collections;
+        const items = collections[type];
+        if (!items) continue;
+        for (const item of fuzzy(
+          query,
+          items,
+          {
+            title: 10
+          },
+          RESULT_PREFIX_SUFFIX
+        )) {
+          list.push({
+            id: item.id,
+            title: item.title,
+            group: strings.dataTypesPluralCamelCase[type](),
+            type: type,
+            action: commandActions[type],
+            icon: commandIcons[type]
+          });
+        }
+      }
+      return list;
+    },
+    [updateCollections]
+  );
+
+  return { search };
+}
+
+async function getSessionsAsCommands() {
+  const commands: Command[] = [];
+  for (const recentCommand of getRecentCommands()) {
+    if (recentCommand.type === "command") continue;
+
+    const resolvedCommand = await resolveRecentCommand(recentCommand);
+    if (resolvedCommand) commands.push(resolvedCommand);
+  }
+
+  const sessions = useEditorStore.getState().get().sessions;
+  for (const session of sessions) {
+    if (
+      session.type === "new" ||
+      commands.find((c) => c.id === session.note.id)
+    )
+      continue;
+
+    commands.push({
+      id: session.note.id,
+      title: session.note.title,
+      group: strings.dataTypesPluralCamelCase.note(),
+      type: "note" as const,
+      action: commandActions.note,
+      icon: commandIcons.note
+    });
+  }
+
   return commands;
 }
 
-function isCommandMode(query: string) {
-  return query.startsWith(">");
-}
+/**
+ * This override is required to ensure smooth scrolling when moving between
+ * command palette items using the keyboard. Without this the selected item
+ * is not visible when moving up/down in the command palette.
+ */
+const calculateCommandItemLocation: CalculateViewLocation = ({
+  itemTop,
+  itemBottom,
+  viewportTop,
+  viewportBottom,
+  locationParams: { behavior, align, ...rest }
+}) => {
+  const topOffset = viewportTop + COMMAND_PALETTE_STICKY_HEADER_HEIGHT;
+  const itemInView = itemTop >= topOffset && itemBottom <= viewportBottom;
+  if (itemInView) return null;
+  return {
+    ...rest,
+    offset:
+      itemBottom > viewportBottom
+        ? itemBottom - viewportBottom
+        : itemTop - topOffset,
+    behavior,
+    align:
+      align ??
+      (itemBottom > viewportBottom
+        ? "end"
+        : itemTop < topOffset
+        ? "start"
+        : "center")
+  };
+};
 
-function prepareQuery(query: string) {
-  return isCommandMode(query) ? query.substring(1).trim() : query.trim();
+function getCommandPaletteHelp(isCommandMode: boolean) {
+  return [
+    {
+      key: "⏎",
+      description: isCommandMode ? strings.execute() : strings.open()
+    },
+    ...(isCommandMode
+      ? [
+          {
+            key: isMac() ? "⌘P" : "Ctrl+P",
+            description: strings.quickOpen()
+          }
+        ]
+      : [
+          {
+            key: isMac() ? "⌘⏎" : "Ctrl+⏎",
+            description: strings.openInNewTab()
+          },
+          {
+            key: isMac() ? "⌘K" : "Ctrl+K",
+            description: strings.commandPalette()
+          }
+        ])
+  ];
 }

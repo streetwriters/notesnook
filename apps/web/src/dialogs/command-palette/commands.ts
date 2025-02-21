@@ -17,800 +17,497 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { createInternalLink, hosts } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { db } from "../../common/db";
-import { Multiselect } from "../../common/multi-select";
-import { useEditorManager } from "../../components/editor/manager";
 import {
   ArrowLeft,
   ArrowRight,
   ArrowTopRight,
-  Copy,
-  DeleteForver,
-  Duplicate,
-  Edit,
-  Editor,
-  InternalLink,
-  Notebook,
-  NotebookEdit,
-  OpenInNew,
-  Pin,
+  createIcon,
+  Icon,
   Plus,
-  Publish,
   Radar,
-  Readonly,
-  Reminder,
-  Restore,
-  Shortcut,
-  Star,
-  Sync,
-  Tag,
-  Trash
+  Redo,
+  Undo,
+  Notebook as NotebookIcon,
+  Note as NoteIcon,
+  Reminder as ReminderIcon,
+  Tag as TagIcon
 } from "../../components/icons";
-import { showPublishView } from "../../components/publish-view";
-import { deleteTrash } from "../../components/trash-item";
+import { trashMenuItems } from "../../components/trash-item";
 import { hashNavigate, navigate } from "../../navigation";
-import { store as appStore } from "../../stores/app-store";
 import { useEditorStore } from "../../stores/editor-store";
-import { store as monographStore } from "../../stores/monograph-store";
-import { store as noteStore } from "../../stores/note-store";
-import { store as notebookStore } from "../../stores/notebook-store";
+import { useStore as useNoteStore } from "../../stores/note-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
-import { store as trashStore } from "../../stores/trash-store";
-import { writeToClipboard } from "../../utils/clipboard";
-import { AddNotebookDialog } from "../add-notebook-dialog";
-import { AddReminderDialog } from "../add-reminder-dialog";
-import { AddTagsDialog } from "../add-tags-dialog";
 import { AttachmentsDialog } from "../attachments-dialog";
-import { ConfirmDialog } from "../confirm";
 import { CreateColorDialog } from "../create-color-dialog";
-import { EditTagDialog } from "../item-dialog";
-import { MoveNoteDialog } from "../move-note-dialog";
+import { noteMenuItems } from "../../components/note";
+import { MenuItem } from "@notesnook/ui";
+import { notebookMenuItems } from "../../components/notebook";
+import { tagMenuItems } from "../../components/tag";
+import { useEditorManager } from "../../components/editor/manager";
+import Config from "../../utils/config";
 
-function getLabelForActiveNoteGroup() {
-  const note = useEditorStore.getState().getActiveNote();
-  return note ? strings.actionsForNote(note.title) : undefined;
+export interface BaseCommand {
+  id: string;
+  type: "command" | "note" | "notebook" | "tag" | "reminder";
+}
+export interface Command extends BaseCommand {
+  title: string;
+  group: string;
+  icon?: Icon;
+  action: (command: Command, options?: { openInNewTab?: boolean }) => void;
+  excludeFromRecents?: boolean;
 }
 
-function getLabelForActiveNotebookGroup() {
-  const context = noteStore.get().context;
-  return context?.type === "notebook" && context.item?.title
-    ? strings.actionsForNotebook(context.item.title)
-    : undefined;
+export interface RecentCommand extends BaseCommand {
+  id: string;
+  group: "recent";
 }
 
-function getLabelForActiveTagGroup() {
-  const context = noteStore.get().context;
-  return context?.type === "tag" && context.item?.title
-    ? strings.actionsForTag(context.item.title)
-    : undefined;
-}
+export const commandActions = {
+  command: (command: Command) => getCommandById(command.id)?.action,
+  note: (command: Command, options?: { openInNewTab?: boolean }) =>
+    useEditorStore.getState().openSession(command.id, options),
+  notebook: (command: Command) => navigate(`/notebooks/${command.id}`),
+  tag: (command: Command) => navigate(`/tags/${command.id}`),
+  reminder: (command: Command) => hashNavigate(`/reminders/${command.id}/edit`)
+};
 
-export const commands = [
-  {
-    id: "pin-active-note",
-    title: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return note ? (note.pinned ? strings.unpin() : strings.pin()) : undefined;
-    },
-    icon: Pin,
-    action: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      if (!note) return;
-      noteStore.get().pin(!note.pinned, note.id);
-    },
-    group: getLabelForActiveNoteGroup,
-    hidden: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return !note || note.type === "trash";
-    },
-    dynamic: true
-  },
-  {
-    id: "readonly-active-note",
-    title: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return note ? strings.toggleReadonly() : undefined;
-    },
-    icon: Readonly,
-    action: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      if (!note) return;
-      noteStore.get().readonly(!note.readonly, note.id);
-    },
-    group: getLabelForActiveNoteGroup,
-    hidden: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return !note || note.type === "trash";
-    },
-    dynamic: true
-  },
-  {
-    id: "favorite-active-note",
-    title: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return note
-        ? note.favorite
-          ? strings.unfavorite()
-          : strings.favorite()
-        : undefined;
-    },
-    icon: Star,
-    action: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      if (!note) return;
-      noteStore.get().favorite(!note.favorite, note.id);
-    },
-    group: getLabelForActiveNoteGroup,
-    hidden: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return !note || note.type === "trash";
-    },
-    dynamic: true
-  },
-  {
-    id: "remind-me-active-note",
-    title: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return note ? strings.remindMe() : undefined;
-    },
-    icon: Reminder,
-    action: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      if (!note) return;
-      if (note.type === "trash") return;
-      AddReminderDialog.show({ note: note });
-    },
-    group: getLabelForActiveNoteGroup,
-    hidden: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return !note || note.type === "trash";
-    },
-    dynamic: true
-  },
-  {
-    id: "link-notebooks-active-note",
-    title: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return note ? strings.linkNotebooks() : undefined;
-    },
-    icon: Notebook,
-    action: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      if (!note) return;
-      MoveNoteDialog.show({ noteIds: [note.id] });
-    },
-    group: getLabelForActiveNoteGroup,
-    hidden: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return !note || note.type === "trash";
-    },
-    dynamic: true
-  },
-  {
-    id: "add-tags-active-note",
-    title: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return note ? strings.addTags() : undefined;
-    },
-    icon: Tag,
-    action: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      if (!note) return;
-      AddTagsDialog.show({ noteIds: [note.id] });
-    },
-    group: getLabelForActiveNoteGroup,
-    hidden: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return !note || note.type === "trash";
-    },
-    dynamic: true
-  },
-  {
-    id: "publish-on-monograph-active-note",
-    title: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return note ? strings.publishOnMonograph() : undefined;
-    },
-    icon: Publish,
-    action: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      if (!note || note.type === "trash") return;
-      const isPublished = db.monographs.isPublished(note.id);
-      if (isPublished) return;
-      showPublishView(note);
-    },
-    group: getLabelForActiveNoteGroup,
-    hidden: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return (
-        !note || note.type === "trash" || db.monographs.isPublished(note.id)
-      );
-    },
-    dynamic: true
-  },
-  {
-    id: "open-in-monograph-active-note",
-    title: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return note ? strings.openInMonograph() : undefined;
-    },
-    icon: OpenInNew,
-    action: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      if (!note || note.type === "trash") return;
-      const isPublished = db.monographs.isPublished(note.id);
-      if (!isPublished) return;
-      const url = `${hosts.MONOGRAPH_HOST}/${note.id}`;
-      window.open(url, "_blank");
-    },
-    group: getLabelForActiveNoteGroup,
-    hidden: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return (
-        !note || note.type === "trash" || !db.monographs.isPublished(note.id)
-      );
-    },
-    dynamic: true
-  },
-  {
-    id: "copy-monograph-link-active-note",
-    title: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return note ? strings.copyMonographLink() : undefined;
-    },
-    icon: Copy,
-    action: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      if (!note || note.type === "trash") return;
-      const isPublished = db.monographs.isPublished(note.id);
-      if (!isPublished) return;
-      const url = `${hosts.MONOGRAPH_HOST}/${note.id}`;
-      writeToClipboard({
-        "text/plain": url,
-        "text/html": `<a href="${url}">${note.title}</a>`,
-        "text/markdown": `[${note.title}](${url})`
-      });
-    },
-    group: getLabelForActiveNoteGroup,
-    hidden: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return (
-        !note || note.type === "trash" || !db.monographs.isPublished(note.id)
-      );
-    },
-    dynamic: true
-  },
-  {
-    id: "toggle-sync-active-note",
-    title: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return note
-        ? note?.localOnly
-          ? strings.turnSyncOn()
-          : strings.turnSyncOff()
-        : undefined;
-    },
-    icon: Sync,
-    action: async () => {
-      const note = useEditorStore.getState().getActiveNote();
-      if (!note || note.type === "trash") return;
-      if (
-        note.localOnly ||
-        (await ConfirmDialog.show({
-          title: strings.syncOffConfirm(1),
-          message: strings.syncOffDesc(1),
-          positiveButtonText: strings.yes(),
-          negativeButtonText: strings.no()
-        }))
-      ) {
-        await noteStore.localOnly(!note.localOnly, note.id);
-      }
-    },
-    group: getLabelForActiveNoteGroup,
-    hidden: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return !note || note.type === "trash";
-    },
-    dynamic: true
-  },
-  {
-    id: "unpublish-on-monograph-active-note",
-    title: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return note ? strings.unpublishOnMonograph() : undefined;
-    },
-    icon: Publish,
-    action: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      if (!note || note.type === "trash") return;
-      monographStore.get().unpublish(note.id);
-    },
-    group: getLabelForActiveNoteGroup,
-    hidden: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return (
-        !note || note.type === "trash" || !db.monographs.isPublished(note.id)
-      );
-    },
-    dynamic: true
-  },
-  {
-    id: "copy-link-active-note",
-    title: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return note ? strings.copyLink() : undefined;
-    },
-    icon: InternalLink,
-    action: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      if (note) {
-        const link = createInternalLink("note", note.id);
-        writeToClipboard({
-          "text/plain": link,
-          "text/html": `<a href="${link}">${note.title}</a>`,
-          "text/markdown": `[${note.title}](${link})`
-        });
-      }
-    },
-    group: getLabelForActiveNoteGroup,
-    hidden: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return !note || note.type === "trash";
-    },
-    dynamic: true
-  },
-  {
-    id: "duplicate-active-note",
-    title: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return note ? strings.duplicate() : undefined;
-    },
-    icon: Duplicate,
-    action: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      if (!note) return;
-      noteStore.get().duplicate(note.id);
-    },
-    group: getLabelForActiveNoteGroup,
-    hidden: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return !note || note.type === "trash";
-    },
-    dynamic: true
-  },
-  {
-    id: "move-to-trash-active-note",
-    title: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return note ? strings.moveToTrash() : undefined;
-    },
-    icon: Trash,
-    action: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      if (!note || db.monographs.isPublished(note.id)) return;
-      Multiselect.moveNotesToTrash([note.id], false);
-    },
-    group: getLabelForActiveNoteGroup,
-    hidden: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return (
-        !note || note.type === "trash" || db.monographs.isPublished(note.id)
-      );
-    },
-    dynamic: true
-  },
-  {
-    id: "restore-active-note",
-    title: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return note ? strings.restore() : undefined;
-    },
-    icon: Restore,
-    action: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      if (!note) return;
-      trashStore.restore(note.id);
-    },
-    group: getLabelForActiveNoteGroup,
-    hidden: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return !note || note.type !== "trash";
-    },
-    dynamic: true
-  },
-  {
-    id: "delete-active-note",
-    title: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return note ? strings.delete() : undefined;
-    },
-    icon: DeleteForver,
-    action: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      if (!note) return;
-      deleteTrash([note.id]);
-    },
-    group: getLabelForActiveNoteGroup,
-    hidden: () => {
-      const note = useEditorStore.getState().getActiveNote();
-      return !note || note.type !== "trash";
-    },
-    dynamic: true
-  },
-  {
-    id: "add-subnotebook-active-notebook",
-    title: () => {
-      const context = noteStore.get().context;
-      return context?.type === "notebook"
-        ? strings.addSubnotebook()
-        : undefined;
-    },
-    icon: Plus,
-    action: () => {
-      const context = noteStore.get().context;
-      if (context?.type !== "notebook") return;
-      AddNotebookDialog.show({ parentId: context.id });
-    },
-    group: getLabelForActiveNotebookGroup,
-    hidden: () => {
-      const context = noteStore.get().context;
-      return (
-        context?.type !== "notebook" || !context.item || context.item.deleted
-      );
-    },
-    dynamic: true
-  },
-  {
-    id: "edit-active-notebook",
-    title: () => {
-      const context = noteStore.get().context;
-      return context?.type === "notebook" ? strings.edit() : undefined;
-    },
-    icon: NotebookEdit,
-    action: () => {
-      const context = noteStore.get().context;
-      if (context?.type !== "notebook") return;
-      hashNavigate(`/notebooks/${context.id}/edit`);
-    },
-    group: getLabelForActiveNotebookGroup,
-    hidden: () => {
-      const context = noteStore.get().context;
-      return (
-        context?.type !== "notebook" || !context.item || context.item.deleted
-      );
-    },
-    dynamic: true
-  },
-  {
-    id: "pin-active-notebook",
-    title: () => {
-      const context = noteStore.get().context;
-      return context?.type === "notebook"
-        ? context.item?.pinned
-          ? strings.unpin()
-          : strings.pin()
-        : undefined;
-    },
-    icon: Pin,
-    action: () => {
-      const context = noteStore.get().context;
-      if (context?.type !== "notebook") return;
-      notebookStore.pin(!context.item?.pinned, context.id);
-    },
-    group: getLabelForActiveNotebookGroup,
-    hidden: () => {
-      const context = noteStore.get().context;
-      return context?.type !== "notebook";
-    },
-    dynamic: true
-  },
-  {
-    id: "add-shortcut-active-notebook",
-    title: () => {
-      const context = noteStore.get().context;
-      return context?.type === "notebook" && context.item
-        ? db.shortcuts.exists(context.item.id)
-          ? strings.removeShortcut()
-          : strings.addShortcut()
-        : undefined;
-    },
-    icon: Shortcut,
-    action: () => {
-      const context = noteStore.get().context;
-      if (context?.type !== "notebook" || !context.item) return;
-      appStore.addToShortcuts(context.item);
-    },
-    group: getLabelForActiveNotebookGroup,
-    hidden: () => {
-      const context = noteStore.get().context;
-      return context?.type !== "notebook";
-    },
-    dynamic: true
-  },
-  {
-    id: "move-to-trash-active-notebook",
-    title: () => {
-      const context = noteStore.get().context;
-      return context?.type === "notebook" ? strings.moveToTrash() : undefined;
-    },
-    icon: Trash,
-    action: () => {
-      const context = noteStore.get().context;
-      if (context?.type !== "notebook") return;
-      Multiselect.moveNotebooksToTrash([context.id]).then(() => {
-        navigate("/notebooks");
-      });
-    },
-    group: getLabelForActiveNotebookGroup,
-    hidden: () => {
-      const context = noteStore.get().context;
-      return context?.type !== "notebook";
-    },
-    dynamic: true
-  },
-  {
-    id: "rename-active-tag",
-    title: () => {
-      const context = noteStore.get().context;
-      return context?.type === "tag" ? strings.rename() : undefined;
-    },
-    icon: Edit,
-    action: () => {
-      const context = noteStore.get().context;
-      if (context?.type === "tag" && context.item) {
-        EditTagDialog.show(context.item);
-      }
-    },
-    group: getLabelForActiveTagGroup,
-    hidden: () => {
-      const context = noteStore.get().context;
-      return context?.type !== "tag";
-    },
-    dynamic: true
-  },
-  {
-    id: "add-shortcut-active-tag",
-    title: () => {
-      const context = noteStore.get().context;
-      return context?.type === "tag" && context.item
-        ? db.shortcuts.exists(context.item.id)
-          ? strings.removeShortcut()
-          : strings.addShortcut()
-        : undefined;
-    },
-    icon: Shortcut,
-    action: () => {
-      const context = noteStore.get().context;
-      if (context?.type !== "tag" || !context.item) return;
-      appStore.addToShortcuts(context.item);
-    },
-    group: getLabelForActiveTagGroup,
-    hidden: () => {
-      const context = noteStore.get().context;
-      return context?.type !== "tag";
-    },
-    dynamic: true
-  },
-  {
-    id: "delete-active-tag",
-    title: () => {
-      const context = noteStore.get().context;
-      return context?.type === "tag" ? strings.delete() : undefined;
-    },
-    icon: DeleteForver,
-    action: () => {
-      const context = noteStore.get().context;
-      if (!context || context.type !== "tag" || !context.item) return;
-      Multiselect.deleteTags([context.item.id]);
-    },
-    group: getLabelForActiveTagGroup,
-    hidden: () => {
-      const context = noteStore.get().context;
-      return context?.type !== "tag";
-    },
-    dynamic: true
-  },
-  {
-    id: "undo",
-    title: strings.undo(),
-    icon: Editor,
-    action: () => {
-      const session = useEditorStore.getState().getActiveSession();
-      if (!session) return;
-      useEditorManager.getState().editors[session.id].editor?.undo();
-    },
-    group: strings.editor(),
-    hidden: () => {
-      const session = useEditorStore.getState().getActiveSession();
-      return (
-        !session ||
-        !useEditorManager.getState().editors[session.id].canUndo ||
-        session.type === "readonly"
-      );
-    },
-    dynamic: true
-  },
-  {
-    id: "redo",
-    title: strings.redo(),
-    icon: Editor,
-    action: () => {
-      const session = useEditorStore.getState().getActiveSession();
-      if (!session) return;
-      useEditorManager.getState().editors[session.id].editor?.redo();
-    },
-    group: strings.editor(),
-    hidden: () => {
-      const session = useEditorStore.getState().getActiveSession();
-      return (
-        !session ||
-        !useEditorManager.getState().editors[session.id].canRedo ||
-        session.type === "readonly"
-      );
-    },
-    dynamic: true
-  },
-  {
-    id: "next-tab",
-    title: strings.nextTab(),
-    icon: ArrowTopRight,
-    action: () => useEditorStore.getState().focusNextTab(),
-    group: strings.navigate()
-  },
-  {
-    id: "previous-tab",
-    title: strings.previousTab(),
-    icon: ArrowTopRight,
-    action: () => useEditorStore.getState().focusPreviousTab(),
-    group: strings.navigate()
-  },
-  {
-    id: "go-forward-in-tab",
-    title: strings.goForwardInTab(),
-    icon: ArrowRight,
-    action: () => useEditorStore.getState().goForward(),
-    group: strings.navigate()
-  },
-  {
-    id: "go-back-in-tab",
-    title: strings.goBackInTab(),
-    icon: ArrowLeft,
-    action: () => useEditorStore.getState().goBack(),
-    group: strings.navigate()
-  },
+export const commandIcons = {
+  command: (command: BaseCommand) => getCommandById(command.id)?.icon,
+  note: NoteIcon,
+  notebook: NotebookIcon,
+  tag: TagIcon,
+  reminder: ReminderIcon
+};
+
+const RECENT_COMMANDS_SAVE_KEY = "commandPalette:recent";
+
+const staticCommands: Command[] = [
   {
     id: "notes",
     title: strings.dataTypesPluralCamelCase.note(),
     icon: ArrowTopRight,
     action: () => navigate("/"),
-    group: strings.navigate()
+    group: strings.navigate(),
+    type: "command"
   },
   {
     id: "notebooks",
     title: strings.dataTypesPluralCamelCase.notebook(),
     icon: ArrowTopRight,
     action: () => navigate("/notebooks"),
-    group: strings.navigate()
+    group: strings.navigate(),
+    type: "command"
   },
   {
     id: "tags",
     title: strings.dataTypesPluralCamelCase.tag(),
     icon: ArrowTopRight,
     action: () => navigate("/tags"),
-    group: strings.navigate()
+    group: strings.navigate(),
+    type: "command"
   },
   {
     id: "favorites",
     title: strings.dataTypesPluralCamelCase.favorite(),
     icon: ArrowTopRight,
     action: () => navigate("/favorites"),
-    group: strings.navigate()
+    group: strings.navigate(),
+    type: "command"
   },
   {
     id: "reminders",
     title: strings.dataTypesPluralCamelCase.reminder(),
     icon: ArrowTopRight,
     action: () => navigate("/reminders"),
-    group: strings.navigate()
+    group: strings.navigate(),
+    type: "command"
   },
   {
     id: "monographs",
     title: strings.dataTypesPluralCamelCase.monograph(),
     icon: ArrowTopRight,
     action: () => navigate("/monographs"),
-    group: strings.navigate()
+    group: strings.navigate(),
+    type: "command"
   },
   {
     id: "trash",
     title: strings.trash(),
     icon: ArrowTopRight,
     action: () => navigate("/trash"),
-    group: strings.navigate()
+    group: strings.navigate(),
+    type: "command"
   },
   {
     id: "settings",
     title: strings.settings(),
     icon: ArrowTopRight,
     action: () => hashNavigate("/settings", { replace: true }),
-    group: strings.navigate()
+    group: strings.navigate(),
+    type: "command"
   },
   {
     id: "help",
     title: strings.helpAndSupport(),
     icon: ArrowTopRight,
     action: () => (window.location.href = "https://help.notesnook.com"),
-    group: strings.navigate()
+    group: strings.navigate(),
+    type: "command"
   },
   {
     id: "attachment-manager",
     title: strings.attachmentManager(),
     icon: ArrowTopRight,
     action: () => AttachmentsDialog.show({}),
-    group: strings.navigate()
-  },
-  {
-    id: "new-tab",
-    title: strings.newTab(),
-    icon: Plus,
-    action: () => useEditorStore.getState().addTab(),
-    group: strings.create()
+    group: strings.navigate(),
+    type: "command"
   },
   {
     id: "new-note",
     title: strings.newNote(),
     icon: Plus,
     action: () => useEditorStore.getState().newSession(),
-    group: strings.create()
+    group: strings.create(),
+    type: "command"
   },
   {
     id: "new-notebook",
     title: strings.newNotebook(),
     icon: Plus,
     action: () => hashNavigate("/notebooks/create", { replace: true }),
-    group: strings.create()
+    group: strings.create(),
+    type: "command"
   },
   {
     id: "new-tag",
     title: strings.newTag(),
     icon: Plus,
     action: () => hashNavigate("/tags/create", { replace: true }),
-    group: strings.create()
+    group: strings.create(),
+    type: "command"
   },
   {
     id: "new-reminder",
     title: strings.newReminder(),
     icon: Plus,
     action: () => hashNavigate(`/reminders/create`, { replace: true }),
-    group: strings.create()
+    group: strings.create(),
+    type: "command"
   },
   {
     id: "new-color",
     title: strings.newColor(),
     icon: Plus,
     action: () => CreateColorDialog.show(true),
-    group: strings.create()
-  },
-  {
-    id: "close-tab",
-    title: strings.closeCurrentTab(),
-    icon: Radar,
-    action: () => useEditorStore.getState().closeActiveTab(),
-    group: strings.general()
-  },
-  {
-    id: "close-all-tabs",
-    title: strings.closeAllTabs(),
-    icon: Radar,
-    action: () => useEditorStore.getState().closeAllTabs(),
-    group: strings.general()
+    group: strings.create(),
+    type: "command"
   },
   {
     id: "toggle-theme",
     title: strings.toggleTheme(),
     icon: Radar,
     action: () => useThemeStore.getState().toggleColorScheme(),
-    group: strings.general()
+    group: strings.general(),
+    type: "command"
   }
 ];
+
+export async function getDefaultCommands(): Promise<Command[]> {
+  const recentCommands: Command[] = [];
+  for (const recentCommand of getRecentCommands()) {
+    if (recentCommand.type !== "command") continue;
+    const resolvedCommand = await resolveRecentCommand(recentCommand);
+    if (resolvedCommand) recentCommands.push(resolvedCommand);
+  }
+
+  return [
+    ...recentCommands,
+    ...(await getActiveNoteCommands()),
+    ...(await getActiveNotebookCommands()),
+    ...(await getActiveTagCommands()),
+    ...getEditorCommands(),
+    ...staticCommands
+  ];
+}
+
+export function getCommandById(id: string): Command | undefined {
+  return staticCommands.find((command) => command.id === id);
+}
+
+export async function resolveRecentCommand(
+  recentCommand: RecentCommand
+): Promise<Command | undefined> {
+  const title = await getCommandTitle(recentCommand);
+  const action = commandActions[recentCommand.type];
+  if (!title || !action) return;
+
+  return {
+    id: recentCommand.id,
+    group: "recent",
+    title: title,
+    type: recentCommand.type,
+    icon:
+      recentCommand.type === "command"
+        ? commandIcons.command(recentCommand)
+        : commandIcons[recentCommand.type],
+    action: action
+  };
+}
+
+export function getRecentCommands() {
+  return Config.get<RecentCommand[]>(RECENT_COMMANDS_SAVE_KEY, []);
+}
+
+export function addRecentCommand(command: Command) {
+  if (command.excludeFromRecents) return;
+  const commands = getRecentCommands();
+  const index = commands.findIndex((c) => c.id === command.id);
+  if (index > -1) commands.splice(index, 1);
+  commands.unshift({
+    group: "recent",
+    id: command.id,
+    type: command.type
+  });
+  Config.set(RECENT_COMMANDS_SAVE_KEY, commands);
+}
+
+export function removeRecentCommand(id: string) {
+  const commands = getRecentCommands();
+  const index = commands.findIndex((c) => c.id === id);
+  if (index > -1) {
+    commands.splice(index, 1);
+    Config.set(RECENT_COMMANDS_SAVE_KEY, commands);
+  }
+}
+
+async function getActiveNoteCommands(): Promise<Command[]> {
+  const note = useEditorStore.getState().getActiveNote();
+  if (!note) return [];
+  const group = strings.actionsForNote(note.title);
+
+  const commands: Command[] = [];
+
+  const menuItems =
+    note.type !== "trash"
+      ? noteMenuItems(note, [note.id], {
+          locked: !!(
+            await db
+              .sql()
+              .selectFrom("content")
+              .where("noteId", "in", [note.id])
+              .select(["noteId", "locked"])
+              .executeTakeFirst()
+          )?.locked
+        })
+      : trashMenuItems(note);
+
+  for (const menuItem of menuItems) {
+    commands.push(...menuItemToCommands(menuItem, group, "active-note"));
+  }
+
+  return commands;
+}
+
+async function getActiveNotebookCommands() {
+  const context = useNoteStore.getState().context;
+  if (context?.type !== "notebook") return [];
+  const notebook = await db.notebooks.notebook(context.id);
+  if (!notebook) return [];
+  const group = strings.actionsForNotebook(notebook.title);
+
+  const commands: Command[] = [];
+
+  const menuItems = notebookMenuItems(notebook, [notebook.id]);
+  for (const menuItem of menuItems) {
+    commands.push(...menuItemToCommands(menuItem, group, "active-notebook"));
+  }
+
+  return commands;
+}
+
+async function getActiveTagCommands() {
+  const context = useNoteStore.getState().context;
+  if (context?.type !== "tag") return [];
+  const tag = await db.tags.tag(context.id);
+  if (!tag) return [];
+  const group = strings.actionsForTag(tag.title);
+  const commands: Command[] = [];
+
+  const menuItems = tagMenuItems(tag, [tag.id]);
+  for (const menuItem of menuItems) {
+    commands.push(...menuItemToCommands(menuItem, group, "active-tag"));
+  }
+
+  return commands;
+}
+
+function getEditorCommands(): Command[] {
+  const session = useEditorStore.getState().getActiveSession();
+  if (!session) return [];
+  const editor = useEditorManager.getState().editors[session.id];
+
+  const commands: Command[] = [
+    {
+      id: "new-tab",
+      title: strings.newTab(),
+      icon: Plus,
+      action: () => useEditorStore.getState().addTab(),
+      group: strings.editor(),
+      type: "command"
+    },
+    {
+      id: "next-tab",
+      title: strings.nextTab(),
+      icon: ArrowTopRight,
+      action: () => useEditorStore.getState().focusNextTab(),
+      group: strings.editor(),
+      type: "command"
+    },
+    {
+      id: "previous-tab",
+      title: strings.previousTab(),
+      icon: ArrowTopRight,
+      action: () => useEditorStore.getState().focusPreviousTab(),
+      group: strings.editor(),
+      type: "command"
+    },
+    {
+      id: "close-tab",
+      title: strings.closeCurrentTab(),
+      icon: Radar,
+      action: () => useEditorStore.getState().closeActiveTab(),
+      group: strings.editor(),
+      type: "command"
+    },
+    {
+      id: "close-all-tabs",
+      title: strings.closeAllTabs(),
+      icon: Radar,
+      action: () => useEditorStore.getState().closeAllTabs(),
+      group: strings.editor(),
+      type: "command"
+    }
+  ];
+
+  if (session.type !== "readonly" && (editor.canUndo || editor.canRedo)) {
+    commands.push(
+      {
+        id: "undo",
+        title: strings.undo(),
+        icon: Undo,
+        action: () => editor.editor?.undo(),
+        group: strings.editor(),
+        type: "command",
+        excludeFromRecents: true
+      },
+      {
+        id: "redo",
+        title: strings.redo(),
+        icon: Redo,
+        action: () => editor.editor?.redo(),
+        group: strings.editor(),
+        type: "command",
+        excludeFromRecents: true
+      }
+    );
+  }
+
+  if (useEditorStore.getState().canGoBack) {
+    commands.push({
+      id: "go-back-in-tab",
+      title: strings.goBackInTab(),
+      icon: ArrowLeft,
+      action: () => useEditorStore.getState().goBack(),
+      group: strings.editor(),
+      type: "command"
+    });
+  }
+
+  if (useEditorStore.getState().canGoForward) {
+    commands.push({
+      id: "go-forward-in-tab",
+      title: strings.goForwardInTab(),
+      icon: ArrowRight,
+      action: () => useEditorStore.getState().goForward(),
+      group: strings.editor(),
+      type: "command"
+    });
+  }
+
+  return commands;
+}
+
+function menuItemToCommands(
+  menuItem: MenuItem,
+  group: string,
+  idSuffix?: string
+): Command[] {
+  if (menuItem.type !== "button" || menuItem.isHidden || menuItem.isDisabled)
+    return [];
+
+  const commands: Command[] = [];
+  if (menuItem.menu) {
+    for (const item of menuItem.menu.items) {
+      commands.push(
+        ...menuItemToCommands(item, group, idSuffix).map((c) => {
+          c.title = `${menuItem.title}: ${c.title}`;
+          c.id = `${menuItem.key}-${c.id}`;
+          return c;
+        })
+      );
+    }
+    return commands;
+  }
+
+  if (!menuItem.onClick) return commands;
+  const _Icon = menuItem.icon ? createIcon(menuItem.icon) : undefined;
+  commands.push({
+    id: idSuffix ? `${menuItem.key}-${idSuffix}` : menuItem.key,
+    title: menuItem.title,
+    action: menuItem.onClick,
+    group,
+    type: "command",
+    icon: _Icon,
+    excludeFromRecents: true
+  });
+  return commands;
+}
+
+async function getCommandTitle({ id, type }: RecentCommand) {
+  switch (type) {
+    case "command": {
+      const command = getCommandById(id);
+      if (!command || typeof command.title !== "string") return;
+      return command.title;
+    }
+    case "note": {
+      const note = (await db.notes.all.fields(["notes.title"]).items([id])).at(
+        0
+      );
+      if (!note) return;
+      return note.title;
+    }
+    case "notebook": {
+      const notebook = (
+        await db.notebooks.all.fields(["notebooks.title"]).items([id])
+      ).at(0);
+      if (!notebook) return;
+      return notebook.title;
+    }
+    case "tag": {
+      const tag = (await db.tags.all.fields(["tags.title"]).items([id])).at(0);
+      if (!tag) return;
+      return tag.title;
+    }
+    case "reminder": {
+      const reminder = (
+        await db.reminders.all.fields(["reminders.title"]).items([id])
+      ).at(0);
+      if (!reminder) return;
+      return reminder.title;
+    }
+  }
+}

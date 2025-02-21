@@ -61,7 +61,7 @@ function TrashItem(props: TrashItemProps) {
           </Text>
         </Flex>
       }
-      menuItems={menuItems}
+      menuItems={trashMenuItems}
       onClick={async () => {
         if (item.itemType === "note")
           useEditorStore.getState().openSession(item);
@@ -71,10 +71,10 @@ function TrashItem(props: TrashItemProps) {
 }
 export default TrashItem;
 
-const menuItems: (item: TrashItemType, ids?: string[]) => MenuItem[] = (
-  item,
-  ids = []
-) => {
+export const trashMenuItems: (
+  item: TrashItemType,
+  ids?: string[]
+) => MenuItem[] = (item, ids = []) => {
   return [
     {
       type: "button",

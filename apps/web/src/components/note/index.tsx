@@ -143,7 +143,7 @@ function Note(props: NoteProps) {
         background: "background"
       }}
       context={{ color, locked }}
-      menuItems={menuItems}
+      menuItems={noteMenuItems}
       onClick={() => useEditorStore.getState().openSession(note)}
       onMiddleClick={() =>
         useEditorStore.getState().openSession(note, { openInNewTab: true })
@@ -320,9 +320,7 @@ const formats = [
   }
 ] as const;
 
-const notFullySyncedText =
-  "Cannot perform this action because note is not fully synced.";
-const menuItems: (
+export const noteMenuItems: (
   note: NoteType,
   ids?: string[],
   context?: { color?: Color; locked?: boolean }

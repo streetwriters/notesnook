@@ -287,7 +287,7 @@ export type Icon = {
   path: string;
 };
 
-function createIcon(path: string, rotate = false) {
+export function createIcon(path: string, rotate = false) {
   const NNIcon: Icon = function Icon(props) {
     const { sx, rotate: _rotate = rotate, size, ...restProps } = props;
     return (
