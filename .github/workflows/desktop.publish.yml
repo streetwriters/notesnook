@@ -99,7 +99,7 @@ jobs:
       - name: Generate flatpak sources
         if: inputs.publish-github && inputs.build-linux
         run: |
-          sudo apt-get install -y flatpak flatpak-builder pipx
+          sudo apt-get install -y --quiet flatpak flatpak-builder pipx
           git clone https://github.com/flatpak/flatpak-builder-tools.git /tmp/flatpak-builder-tools
           cd /tmp/flatpak-builder-tools/node
           pipx install .
