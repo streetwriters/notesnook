@@ -400,7 +400,7 @@ test("control + alt + right arrow should go to next note", async ({ page }) => {
   });
 
   await note1?.openNote();
-  await note2?.openNote();
+  await note2?.openNote(true);
   await page.keyboard.press("Control+Alt+ArrowRight");
 
   expect(await notes.editor.getTitle()).toBe("Note 1");
@@ -428,7 +428,7 @@ test("control + alt + left arrow should go to previous note", async ({
   });
 
   await note1?.openNote();
-  await note2?.openNote();
+  await note2?.openNote(true);
   await page.keyboard.press("Control+Alt+ArrowLeft");
 
   expect(await notes.editor.getTitle()).toBe("Note 1");
