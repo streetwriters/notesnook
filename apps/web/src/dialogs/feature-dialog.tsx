@@ -93,13 +93,26 @@ const features: Record<FeatureKeys, Feature> = {
         ]
       : [
           {
-            title: "Keyboard shortcuts for tabs",
+            title: "Command palette",
             subtitle: (
               <>
-                <Code text="Ctrl/Cmd+t" /> to open new tab,{" "}
-                <Code text="Ctrl/Cmd+n" /> to create a new note,{" "}
-                <Code text="Ctrl/Cmd+w" /> to close the active tab and
-                <Code text="Ctrl/Cmd+Shift+W" /> to close all tabs
+                You can now quickly execute commands like navigation, actions on
+                notes, notebooks etc. just by pressing{" "}
+                <Code text="Ctrl/Cmd+K" />. This will open a command palette
+                where you can fuzzy search for commands and execute them.
+              </>
+            )
+          },
+          {
+            title: "Quick open",
+            subtitle: (
+              <>
+                You can also open the command palette in quick open mode by
+                pressing <Code text="Ctrl/Cmd+P" />. This will open a command
+                palette where you can fuzzy search for your notes, notebooks,
+                tags, etc. and quickly open them by pressing{" "}
+                <Code text="Enter" />. Try it out and let us know what you
+                think!
               </>
             )
           }
