@@ -1012,6 +1012,19 @@ class EditorStore extends BaseStore<EditorStore> {
             sessionId
           });
         }
+
+        if (partial.note?.title !== undefined) {
+          const { sessions } = this.get();
+          for (const session of sessions) {
+            if ("note" in session && session.note.id === note.id) {
+              this.updateSession(session.id, undefined, {
+                note,
+                title: note.title
+              });
+            }
+          }
+        }
+
         setDocumentTitle(
           settingStore.get().hideNoteTitle ? undefined : note.title
         );

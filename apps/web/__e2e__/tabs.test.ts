@@ -128,7 +128,7 @@ test("new tab button should open a new tab", async ({ page }) => {
   expect(await tabs[1].title()).toBe("Untitled");
 });
 
-test("changes in a note opened in multiple tabs should sync", async ({
+test("content changes in a note opened in multiple tabs should sync", async ({
   page
 }) => {
   const app = new AppModel(page);
@@ -357,6 +357,25 @@ test("notes open in multiple tabs should sync color in note properties when colo
   await tabs[1].click();
 
   expect(await note?.properties.isColored("red")).toBe(true);
+});
+
+test("notes open in multiple tabs should sync title when title is changed", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note = await notes.createNote(NOTE);
+  await notes.editor.setTitle("Todo");
+  await note?.contextMenu.openInNewTab();
+
+  expect(await notes.editor.getTitle()).toBe("Todo");
+
+  await notes.editor.setTitle("Todo - Today");
+  const tabs = await notes.editor.getTabs();
+  await tabs[0].click();
+
+  expect(await notes.editor.getTitle()).toBe("Todo - Today");
 });
 
 test.skip("TODO: open a locked note, switch to another note and navigate back", () => {});
