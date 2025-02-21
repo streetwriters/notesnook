@@ -1,0 +1,13 @@
+#root > .theme-scope-base {
+  display: flex;
+  height: 100%;
+}
+
+#app {
+  flex: 1;
+  height: unset;
+}
+
+#root > .theme-scope-base > :first-child:not(#menu-wrapper) {
+  flex: 1;
+}

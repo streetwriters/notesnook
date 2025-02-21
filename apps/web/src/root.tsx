@@ -36,7 +36,7 @@ import { Text } from "@theme-ui/components";
 import { EV, EVENTS } from "@notesnook/core";
 import { useEffect, useState } from "react";
 
-export async function startApp() {
+export async function startApp(children?: React.ReactNode) {
   const rootElement = document.getElementById("root");
   if (!rootElement) return;
   const root = createRoot(rootElement);
@@ -72,6 +72,7 @@ export async function startApp() {
                   routeProps={props}
                 />
               </AppLock>
+              {children}
             </BaseThemeProvider>
           </GlobalErrorHandler>
         </ErrorBoundary>
