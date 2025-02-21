@@ -18,38 +18,58 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { match, surround } from "fuzzyjs";
+import { clone } from "./clone";
 
-export function fuzzy<T>(
+export function fuzzy<T extends { id: string }>(
   query: string,
   items: T[],
-  key: keyof T,
-  opts?: {
+  fields: Partial<Record<keyof T, number>>,
+  options: {
+    limit?: number;
     prefix?: string;
     suffix?: string;
-  }
+  } = {}
 ): T[] {
-  if (query === "") return items;
-
-  const fuzzied: [T, number][] = [];
+  const results: Map<
+    string,
+    {
+      item: T;
+      score: number;
+    }
+  > = new Map();
 
   for (const item of items) {
-    const result = match(query, `${item[key]}`);
-    if (!result.match) continue;
+    if (options.limit && results.size >= options.limit) break;
 
-    if (opts?.prefix || opts?.suffix) {
-      fuzzied.push([
-        {
-          ...item,
-          [key]: surround(`${item[key]}`, {
-            result: result,
-            prefix: opts?.prefix,
-            suffix: opts?.suffix
-          })
-        },
-        result.score
-      ]);
-    } else fuzzied.push([item, result.score]);
+    for (const field in fields) {
+      const result = match(query, `${item[field]}`);
+      if (!result.match) continue;
+
+      const oldMatch = results.get(item.id);
+      const clonedItem = oldMatch?.item || clone(item);
+
+      if (options.suffix || options.prefix) {
+        clonedItem[field] = surround(`${clonedItem[field]}`, {
+          suffix: options.suffix,
+          prefix: options.prefix,
+          result
+        }) as T[Extract<keyof T, string>];
+      }
+      if (oldMatch) {
+        oldMatch.score += result.score * (fields[field] || 1);
+      } else {
+        results.set(item.id, {
+          item: clonedItem,
+          score: result.score * (fields[field] || 1)
+        });
+      }
+    }
   }
 
-  return fuzzied.sort((a, b) => b[1] - a[1]).map((f) => f[0]);
+  if (results.size === 0) return [];
+
+  const sorted = Array.from(results.entries());
+  sorted.sort((a, b) => b[1].score - a[1].score);
+
+  return sorted.map((item) => item[1].item);
 }

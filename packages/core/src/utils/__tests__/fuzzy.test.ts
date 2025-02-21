@@ -24,52 +24,69 @@ describe("lookup.fuzzy", () => {
   test("should sort items by score", () => {
     const items = [
       {
+        id: "1",
         title: "system"
       },
       {
+        id: "2",
         title: "hello"
       },
       {
+        id: "3",
         title: "items"
       }
     ];
     const query = "ems";
-    expect(fuzzy(query, items, "title")).toStrictEqual([items[2]]);
+    expect(fuzzy(query, items, { title: 1 })).toStrictEqual([items[2]]);
   });
   describe("opts.prefix", () => {
     test("should prefix matched field with provided value when given", () => {
       const items = [
         {
+          id: "1",
           title: "hello"
         },
         {
+          id: "2",
           title: "world"
         }
       ];
       const query = "d";
       expect(
-        fuzzy(query, items, "title", {
-          prefix: "prefix-"
-        })
-      ).toStrictEqual([{ title: "worlprefix-d" }]);
+        fuzzy(
+          query,
+          items,
+          { title: 1 },
+          {
+            prefix: "prefix-"
+          }
+        )
+      ).toStrictEqual([{ id: "2", title: "worlprefix-d" }]);
     });
   });
   describe("opt.suffix", () => {
     test("should suffix matched field with provided value when given", () => {
       const items = [
         {
+          id: "1",
           title: "hello"
         },
         {
+          id: "2",
           title: "world"
         }
       ];
       const query = "llo";
       expect(
-        fuzzy(query, items, "title", {
-          suffix: "-suffix"
-        })
-      ).toStrictEqual([{ title: "hello-suffix" }]);
+        fuzzy(
+          query,
+          items,
+          { title: 1 },
+          {
+            suffix: "-suffix"
+          }
+        )
+      ).toStrictEqual([{ id: "1", title: "hello-suffix" }]);
     });
   });
 });

@@ -35,6 +35,7 @@ import { logger } from "../logger.js";
 import { rebuildSearchIndex } from "../database/fts.js";
 import { transformQuery } from "../utils/query-transformer.js";
 import { getSortSelectors } from "../utils/grouping.js";
+import { fuzzy } from "../utils/fuzzy.js";
 
 type SearchResults<T> = {
   sorted: (limit?: number) => Promise<VirtualizedGrouping<T>>;
@@ -210,63 +211,17 @@ export default class Lookup {
       suffix?: string;
     } = {}
   ) {
-    const results: Map<
-      string,
-      {
-        item: T;
-        score: number;
-      }
-    > = new Map();
     const columns = fields.map((f) => f.column);
     const items = await selector.fields(columns).items();
 
-    for (const item of items) {
-      if (options.limit && results.size >= options.limit) break;
-
-      for (const field of fields) {
-        if (field.ignore) continue;
-
-        const result = match(query, `${item[field.name]}`);
-        if (!result.match) continue;
-
-        const oldMatch = results.get(item.id);
-        if (options.suffix && options.prefix) {
-          item[field.name] = surround(`${item[field.name]}`, {
-            suffix: options.suffix,
-            prefix: options.prefix,
-            result
-          }) as T[keyof T];
-        }
-        if (oldMatch) {
-          oldMatch.score += result.score * (field.weight || 1);
-        } else {
-          results.set(item.id, {
-            item,
-            score: result.score * (field.weight || 1)
-          });
-        }
-      }
-    }
-    selector.fields([]);
-
-    if (results.size === 0) return [];
-
-    const sorted = Array.from(results.entries());
-
-    if (!options.sortOptions)
-      // || sortOptions.sortBy === "relevance")
-      sorted.sort(
-        // sortOptions?.sortDirection === "desc"
-        // ? (a, b) => a[1] - b[1]
-        // :
-        (a, b) => b[1].score - a[1].score
-      );
-
-    return sorted.map((item) => ({
-      id: item[0],
-      score: item[1].score,
-      item: item[1].item
-    }));
+    return fuzzy(
+      query,
+      items,
+      Object.fromEntries(
+        fields.filter((f) => !f.ignore).map((f) => [f.name, f.weight || 1])
+      ) as Record<keyof T, number>,
+      options
+    );
   }
 
   private toSearchResults<T extends Item>(
