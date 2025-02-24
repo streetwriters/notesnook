@@ -44,6 +44,9 @@ import { useSelectionStore } from "../stores/use-selection-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { fluidTabsRef, rootNavigatorRef } from "../utils/global-refs";
 import { FluidPanelsView } from "./fluid-panels-view";
+import LinkNotebooks from "../screens/link-notebooks";
+import { MoveNotebook } from "../screens/move-notebook";
+import { MoveNotes } from "../screens/move-notes";
 
 const RootStack = createNativeStackNavigator();
 const AppStack = createNativeStackNavigator();
@@ -126,6 +129,12 @@ export const RootNavigation = () => {
         <RootStack.Screen name="Auth" component={Auth as any} />
         <RootStack.Screen name="FluidPanelsView" component={FluidPanelsView} />
         <RootStack.Screen name="AppLock" component={AppLockedScreen} />
+        <RootStack.Screen
+          name="LinkNotebooks"
+          component={LinkNotebooks as any}
+        />
+        <RootStack.Screen name="MoveNotebook" component={MoveNotebook as any} />
+        <RootStack.Screen name="MoveNotes" component={MoveNotes as any} />
         <AppStack.Screen name="Settings" component={Settings} />
       </RootStack.Navigator>
     </NavigationContainer>

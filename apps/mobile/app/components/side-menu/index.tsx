@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { View } from "react-native";
@@ -34,12 +35,13 @@ import { db } from "../../common/database";
 import { useGroupOptions } from "../../hooks/use-group-options";
 import { presentSheet, ToastManager } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
+import { useTagStore } from "../../stores/use-tag-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { deleteItems } from "../../utils/functions";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
+import { presentDialog } from "../dialog/functions";
 import { AddNotebookSheet } from "../sheets/add-notebook";
-import { MoveNotebookSheet } from "../sheets/move-notebook";
 import Sort from "../sheets/sort";
 import { IconButton } from "../ui/icon-button";
 import { Pressable } from "../ui/pressable";
@@ -51,9 +53,6 @@ import {
   useSideMenuNotebookSelectionStore,
   useSideMenuTagsSelectionStore
 } from "./stores";
-import { presentDialog } from "../dialog/functions";
-import { strings } from "@notesnook/intl";
-import { useTagStore } from "../../stores/use-tag-store";
 const renderScene = SceneMap({
   home: SideMenuHome,
   notebooks: SideMenuNotebooks,
@@ -206,7 +205,9 @@ const TabBar = (
                           .getState()
                           .getSelectedItemIds();
                         const notebooks = await db.notebooks.all.items(ids);
-                        MoveNotebookSheet.present(notebooks);
+                        Navigation.navigate("MoveNotebook", {
+                          selectedNotebooks: notebooks
+                        });
                         break;
                       }
                       case "Close": {
