@@ -920,15 +920,14 @@ class EditorStore extends BaseStore<EditorStore> {
       this.setSaveState(id, 0);
       try {
         const sessionId = getSessionId(currentSession);
-        const noteId =
-          ("note" in currentSession
-            ? currentSession.note.id
-            : partial.note?.id) || id;
+        let noteId =
+          "note" in currentSession ? currentSession.note.id : partial.note?.id;
 
         if (isLockedSession(currentSession) && partial.content) {
-          logger.debug("Saving locked content", { id });
+          if (!noteId) return;
+          logger.debug("Saving locked content", { noteId });
 
-          await db.vault.save({
+          noteId = await db.vault.save({
             content: partial.content,
             sessionId,
             id: noteId
@@ -936,10 +935,10 @@ class EditorStore extends BaseStore<EditorStore> {
         } else {
           if (partial.content)
             logger.debug("Saving content", {
-              id,
+              noteId,
               length: partial.content.data.length
             });
-          await db.notes.add({
+          noteId = await db.notes.add({
             ...partial.note,
             dateEdited:
               partial.ignoreEdit && currentSession.type === "default"
@@ -955,7 +954,7 @@ class EditorStore extends BaseStore<EditorStore> {
           });
         }
 
-        const note = await db.notes.note(noteId);
+        const note = noteId && (await db.notes.note(noteId));
         if (!note) throw new Error("Note not saved.");
 
         if (currentSession.type === "new") {
@@ -963,16 +962,16 @@ class EditorStore extends BaseStore<EditorStore> {
           if (context) {
             const { type } = context;
             if (type === "notebook")
-              await db.notes.addToNotebook(context.id, noteId);
+              await db.notes.addToNotebook(context.id, note.id);
             else if (type === "color" || type === "tag")
               await db.relations.add(
                 { type, id: context.id },
-                { id, type: "note" }
+                { id: note.id, type: "note" }
               );
           } else {
             const defaultNotebook = db.settings.getDefaultNotebook();
             if (defaultNotebook)
-              await db.notes.addToNotebook(defaultNotebook, noteId);
+              await db.notes.addToNotebook(defaultNotebook, note.id);
           }
         }
 
