@@ -63,7 +63,10 @@ const routeNames = {
   AppLock: "AppLock",
   Login: "Login",
   Signup: "Signup",
-  Reminders: "Reminders"
+  Reminders: "Reminders",
+  MoveNotebook: "MoveNotebook",
+  LinkNotebooks: "LinkNotebooks",
+  MoveNotes: "MoveNotes"
 };
 
 export type NavigationProps<T extends RouteName> = NativeStackScreenProps<
