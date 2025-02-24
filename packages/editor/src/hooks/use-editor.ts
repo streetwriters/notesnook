@@ -17,15 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  EditorOptions,
-  Editor as TiptapEditor,
-  createDocument,
-  resolveFocusPosition
-} from "@tiptap/core";
+import { EditorOptions, Editor as TiptapEditor } from "@tiptap/core";
 import { DependencyList, useEffect, useMemo, useRef, useState } from "react";
 import { Editor } from "../types.js";
-import { EditorState } from "@tiptap/pm/state";
 import { useToolbarStore } from "../toolbar/stores/toolbar-store.js";
 
 function useForceUpdate() {
@@ -49,39 +43,16 @@ export const useEditor = (
       let isMounted = true;
       let updateTimeout: number;
 
-      const oldContent = editor.options.content;
       editor.options = { ...editor.options, ...options };
       options.onBeforeCreate?.({ editor });
-      // we try very hard not to create a new editor, instead
-      // we just update the props & other things. This is dangerous but faster
-      // than creating a new editor
-      // This part below is copied from @tiptap/core
-      if (options.editorProps) editor.view.setProps(options.editorProps);
-      if (options.content !== undefined && options.content !== oldContent) {
-        const doc = createDocument(
-          options.content,
-          editor.schema,
-          options.parseOptions
-        );
-        const selection =
-          editor.state.selection ||
-          resolveFocusPosition(doc, options.autofocus);
-        const oldIsFocused = editor.isFocused;
-        editor.view.updateState(
-          EditorState.create({
-            doc,
-            plugins: editor.extensionManager.plugins,
-            selection:
-              selection.from > 0 &&
-              selection.from <= doc.content.size &&
-              selection.to > 0 &&
-              selection.to <= doc.content.size
-                ? selection
-                : undefined
-          })
-        );
-        if (oldIsFocused && !editor.isFocused) editor.commands.focus();
-      }
+      const oldIsFocused = editor.isFocused;
+      editor.view.destroy();
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore instead of creating a new editor, we just create
+      // a new view. Due to some reason this is faster than resetting
+      // the state of the same view.
+      editor.createView();
+      if (oldIsFocused && !editor.isFocused) editor.commands.focus();
       options.onCreate?.({ editor: editor });
 
       function onTransaction({ editor }: { editor: TiptapEditor }) {
