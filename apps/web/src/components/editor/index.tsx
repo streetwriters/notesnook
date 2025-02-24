@@ -23,7 +23,8 @@ import React, {
   useRef,
   PropsWithChildren,
   Suspense,
-  useLayoutEffect
+  useLayoutEffect,
+  useCallback
 } from "react";
 import ReactDOM from "react-dom";
 import { Box, Button, Flex, Progress, Text } from "@theme-ui/components";
@@ -298,11 +299,11 @@ function EditorView({
     };
   }, [editor]);
 
-  useEffect(() => {
-    if (!session.needsHydration && session.content) {
-      editor?.updateContent(session.content.data);
-    }
-  }, [editor, session]);
+  const getContent = useCallback(() => {
+    return session.content?.data;
+  }, [session.content?.data]);
+
+  if (session.needsHydration) return null;
 
   return (
     <Flex
@@ -321,7 +322,7 @@ function EditorView({
       <Editor
         id={session.id}
         nonce={1}
-        content={() => session.content?.data}
+        content={getContent}
         session={session}
         onPreviewDocument={(preview) =>
           useEditorStore.setState({ documentPreview: preview })
@@ -665,10 +666,12 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
         parent.left - child.left - CONTAINER_MARGIN
       );
 
-      editor.style.marginLeft = `-${negativeSpace}px`;
-      editor.style.marginRight = `-${negativeSpace}px`;
-      editor.style.paddingLeft = `${negativeSpace}px`;
-      editor.style.paddingRight = `${negativeSpace}px`;
+      requestAnimationFrame(() => {
+        editor.style.marginLeft = `-${negativeSpace}px`;
+        editor.style.marginRight = `-${negativeSpace}px`;
+        editor.style.paddingLeft = `${negativeSpace}px`;
+        editor.style.paddingRight = `${negativeSpace}px`;
+      });
     }
     const observer = new ResizeObserver(debounce(onResize, 500));
     observer.observe(editorScrollRef.current);

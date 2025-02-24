@@ -307,8 +307,8 @@ function TipTap(props: TipTapProps) {
       }
     };
   }, [
+    content,
     readonly,
-    nonce,
     doubleSpacedLines,
     dateFormat,
     timeFormat,
