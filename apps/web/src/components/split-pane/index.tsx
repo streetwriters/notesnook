@@ -54,6 +54,7 @@ type PaneOptions = {
   nextSize?: number;
   initialSize: number;
   collapsed: boolean;
+  expandedSize?: number;
 };
 
 export type SplitPaneImperativeHandle = {
@@ -97,7 +98,6 @@ export const SplitPane = React.forwardRef<
   const wrapSize = useRef(0);
   const childrenLength = childrenToArray(children).length;
   const autoSaveKey = autoSaveId ? `csp:${autoSaveId}` : undefined;
-  const lastCollapsedPaneSize = useRef(0);
 
   const { sizeName, splitPos, splitAxis } = useMemo(
     () =>
@@ -149,6 +149,19 @@ export const SplitPane = React.forwardRef<
                 if (v === null || v === undefined || v === Infinity)
                   Config.remove(`${autoSaveKey}-${id}`);
                 else Config.set(`${autoSaveKey}-${id}`, v);
+              }
+            });
+            Object.defineProperty(limits, "expandedSize", {
+              get() {
+                return Config.get(
+                  `${autoSaveKey}-${id}:expandedSize`,
+                  assertsSize(initialSize, wrapSize.current)
+                );
+              },
+              set(v) {
+                if (v === null || v === undefined || v === Infinity)
+                  Config.remove(`${autoSaveKey}-${id}:expandedSize`);
+                else Config.set(`${autoSaveKey}-${id}:expandedSize`, v);
               }
             });
           }
@@ -257,15 +270,19 @@ export const SplitPane = React.forwardRef<
     () => {
       return {
         collapse: (index: number) => {
-          paneSizes.current[index].collapsed = true;
-          lastCollapsedPaneSize.current = paneSizes.current[index].size;
+          const currentPane = paneSizes.current[index];
+          if (currentPane.collapsed) return;
+          currentPane.collapsed = true;
+          currentPane.expandedSize = paneSizes.current[index].size;
           setSizes(paneSizes.current, wrapSize.current);
         },
         expand: (index: number) => {
-          paneSizes.current[index].collapsed = false;
-          paneSizes.current[index].size = lastCollapsedPaneSize.current
-            ? lastCollapsedPaneSize.current
-            : paneSizes.current[index].initialSize;
+          const currentPane = paneSizes.current[index];
+          if (!currentPane.collapsed) return;
+          currentPane.collapsed = false;
+          currentPane.size =
+            currentPane.expandedSize ?? currentPane.initialSize;
+          currentPane.expandedSize = undefined;
           setSizes(paneSizes.current, wrapSize.current);
         },
         isCollapsed: (index: number) => {
