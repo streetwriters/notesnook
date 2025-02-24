@@ -17,35 +17,34 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Note, Notebook } from "@notesnook/core";
+import { Notebook } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import React, { RefObject, useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { ActivityIndicator, View } from "react-native";
-import { ActionSheetRef, FlatList } from "react-native-actions-sheet";
-import { db } from "../../../common/database";
-import { presentSheet } from "../../../services/event-manager";
-import Navigation from "../../../services/navigation";
+import { FlatList } from "react-native-actions-sheet";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { db } from "../../common/database";
+import Navigation, { NavigationProps } from "../../services/navigation";
 import {
   createNotebookTreeStores,
   TreeItem
-} from "../../../stores/create-notebook-tree-stores";
-import { ItemSelection } from "../../../stores/item-selection-store";
-import { useNotebooks } from "../../../stores/use-notebook-store";
-import { useRelationStore } from "../../../stores/use-relation-store";
-import { useSelectionStore } from "../../../stores/use-selection-store";
-import { updateNotebook } from "../../../utils/notebooks";
-import { AppFontSize } from "../../../utils/size";
-import { DefaultAppStyles } from "../../../utils/styles";
-import { Dialog } from "../../dialog";
-import DialogHeader from "../../dialog/dialog-header";
-import SheetProvider from "../../sheet-provider";
-import { NotebookItem } from "../../side-menu/notebook-item";
-import { Button } from "../../ui/button";
-import { IconButton } from "../../ui/icon-button";
-import Input from "../../ui/input";
-import Paragraph from "../../ui/typography/paragraph";
-import { AddNotebookSheet } from "../add-notebook";
+} from "../../stores/create-notebook-tree-stores";
+import { ItemSelection } from "../../stores/item-selection-store";
+import { useNotebooks } from "../../stores/use-notebook-store";
+import { useRelationStore } from "../../stores/use-relation-store";
+import { useSelectionStore } from "../../stores/use-selection-store";
+import { updateNotebook } from "../../utils/notebooks";
+import { AppFontSize } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
+import { FloatingButton } from "../../components/container/floating-button";
+import { Header } from "../../components/header";
+import { NotebookItem } from "../../components/side-menu/notebook-item";
+import Input from "../../components/ui/input";
+import Paragraph from "../../components/ui/typography/paragraph";
+import { AddNotebookSheet } from "../../components/sheets/add-notebook";
+import { Notice } from "../../components/ui/notice";
+import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 
 const {
   useNotebookExpandedStore,
@@ -90,19 +89,15 @@ async function updateInitialSelectionState(items: string[]) {
   });
 }
 
-const MoveNoteSheet = ({
-  note,
-  actionSheetRef
-}: {
-  note: Note | undefined;
-  actionSheetRef: RefObject<ActionSheetRef>;
-}) => {
+const LinkNotebooks = (props: NavigationProps<"LinkNotebooks">) => {
   const { colors } = useThemeColors();
   const [notebooks, loading] = useNotebooks();
   const tree = useNotebookTreeStore((state) => state.tree);
   const searchQuery = useRef("");
   const searchTimer = useRef<NodeJS.Timeout>();
   const [filteredNotebooks, setFilteredNotebooks] = React.useState(notebooks);
+
+  useNavigationFocus(props.navigation, { focusOnInit: true });
   const loadRootNotebooks = React.useCallback(async () => {
     if (!filteredNotebooks) return;
     const _notebooks: Notebook[] = [];
@@ -145,8 +140,17 @@ const MoveNoteSheet = ({
   );
   const multiSelect = useNotebookSelectionStore((state) => state.multiSelect);
 
+  const hasSelection = useNotebookSelectionStore((state) =>
+    Object.keys(state.selection).some(
+      (key) =>
+        state.selection[key] && state.selection[key] !== state.initialState[key]
+    )
+  );
+
   useEffect(() => {
-    const items = note ? [note.id] : selectedItemsList;
+    const items = props.route.params.note
+      ? [props.route.params.note.id]
+      : selectedItemsList;
     updateInitialSelectionState(items);
     return () => {
       useNotebookSelectionStore.setState({
@@ -156,10 +160,12 @@ const MoveNoteSheet = ({
         canEnableMultiSelectMode: true
       });
     };
-  }, [note, selectedItemsList]);
+  }, [props.route.params.note, selectedItemsList]);
 
   const onSave = async () => {
-    const noteIds = note ? [note.id] : selectedItemsList;
+    const noteIds = props.route.params.note
+      ? [props.route.params.note.id]
+      : selectedItemsList;
 
     const changedNotebooks = useNotebookSelectionStore.getState().selection;
 
@@ -181,12 +187,7 @@ const MoveNoteSheet = ({
 
     Navigation.queueRoutesForUpdate();
     useRelationStore.getState().update();
-    actionSheetRef.current?.hide();
-  };
-
-  const hasSelected = () => {
-    const selection = useNotebookSelectionStore.getState().selection;
-    return Object.keys(selection).some((key) => selection[key] === "selected");
+    Navigation.goBack();
   };
 
   const renderNotebook = useCallback(
@@ -197,136 +198,106 @@ const MoveNoteSheet = ({
   );
 
   return (
-    <>
-      <Dialog context="move_note" />
-      <SheetProvider context="link-notebooks" />
-      <View
+    <SafeAreaView
+      style={{
+        gap: DefaultAppStyles.GAP_VERTICAL,
+        flex: 1,
+        backgroundColor: colors.primary.background
+      }}
+    >
+      <Header
+        title="Link Notebooks"
+        canGoBack
+        rightButton={
+          hasSelection
+            ? {
+                name: "restore",
+                onPress: () => {
+                  const items = props.route.params.note
+                    ? [props.route.params.note.id]
+                    : selectedItemsList;
+                  updateInitialSelectionState(items);
+                }
+              }
+            : undefined
+        }
+      />
+      <FlatList
+        data={tree}
+        windowSize={3}
         style={{
-          gap: DefaultAppStyles.GAP_VERTICAL
+          width: "100%"
         }}
-      >
-        <View
-          style={{
-            paddingHorizontal: DefaultAppStyles.GAP,
-            justifyContent: "space-between",
-            flexDirection: "row",
-            alignItems: "center",
-            borderBottomWidth: 1,
-            borderBottomColor: colors.primary.border,
-            paddingBottom: DefaultAppStyles.GAP_VERTICAL
-          }}
-        >
-          <DialogHeader
-            style={{
-              flexShrink: 1
-            }}
-            title={strings.selectNotebooks()}
-            paragraph={
-              !multiSelect
-                ? strings.enableMultiSelect()
-                : strings.selectNotebooksDesc()
-            }
-          />
-
+        keyboardShouldPersistTaps="handled"
+        ListHeaderComponent={
           <View
             style={{
-              flexDirection: "row",
-              columnGap: DefaultAppStyles.GAP_SMALL
+              paddingHorizontal: DefaultAppStyles.GAP,
+              width: "100%",
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL
             }}
           >
-            {hasSelected() ? (
-              <IconButton
-                name="restore"
-                color={colors.primary.icon}
-                onPress={() => {
-                  const items = note ? [note.id] : selectedItemsList;
-                  updateInitialSelectionState(items);
-                }}
-                style={{
-                  width: 40,
-                  height: 40
-                }}
+            <Input
+              placeholder={strings.searchNotebooks()}
+              onChangeText={(value) => {
+                searchQuery.current = value;
+                searchTimer.current = setTimeout(() => {
+                  updateNotebooks();
+                }, 300);
+              }}
+              button={{
+                icon: "plus",
+                onPress: () => {
+                  AddNotebookSheet.present(
+                    undefined,
+                    undefined,
+                    "link-notebooks",
+                    undefined,
+                    false,
+                    searchQuery.current
+                  );
+                },
+                color: colors.primary.icon
+              }}
+            />
+
+            {!multiSelect ? (
+              <Notice
+                text={strings.enableMultiSelect()}
+                type="information"
+                size="small"
               />
             ) : null}
-
-            <Button
-              height={40}
-              style={{
-                paddingHorizontal: 24,
-                alignSelf: "flex-start"
-              }}
-              title={strings.save()}
-              type="accent"
-              onPress={onSave}
-            />
           </View>
-        </View>
-
-        <FlatList
-          data={tree}
-          windowSize={3}
-          style={{
-            width: "100%"
-          }}
-          keyboardShouldPersistTaps="handled"
-          ListHeaderComponent={
-            <View
-              style={{
-                paddingHorizontal: DefaultAppStyles.GAP,
-                width: "100%",
-                paddingTop: DefaultAppStyles.GAP_VERTICAL
-              }}
-            >
-              <Input
-                placeholder={strings.searchNotebooks()}
-                button={{
-                  icon: "plus",
-                  onPress: () => {
-                    AddNotebookSheet.present(
-                      undefined,
-                      undefined,
-                      "link-notebooks",
-                      undefined,
-                      false,
-                      searchQuery.current
-                    );
-                  },
-                  color: colors.primary.icon
-                }}
-                onChangeText={(value) => {
-                  searchQuery.current = value;
-                  searchTimer.current = setTimeout(() => {
-                    updateNotebooks();
-                  }, 300);
-                }}
+        }
+        renderItem={renderNotebook}
+        ListEmptyComponent={
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              height: 200
+            }}
+          >
+            {loading ? (
+              <ActivityIndicator
+                size={AppFontSize.lg}
+                color={colors.primary.accent}
               />
-            </View>
-          }
-          renderItem={renderNotebook}
-          ListEmptyComponent={
-            <View
-              style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-                height: 200
-              }}
-            >
-              {loading ? (
-                <ActivityIndicator
-                  size={AppFontSize.lg}
-                  color={colors.primary.accent}
-                />
-              ) : (
-                <Paragraph color={colors.primary.icon}>
-                  {strings.emptyPlaceholders("notebook")}
-                </Paragraph>
-              )}
-            </View>
-          }
-        />
-      </View>
-    </>
+            ) : (
+              <Paragraph color={colors.primary.icon}>
+                {strings.emptyPlaceholders("notebook")}
+              </Paragraph>
+            )}
+          </View>
+        }
+      />
+
+      {hasSelection ? (
+        <FloatingButton icon="check" onPress={() => onSave()} />
+      ) : null}
+    </SafeAreaView>
   );
 };
 
@@ -420,7 +391,7 @@ const NotebookItemWrapper = React.memo(
             AddNotebookSheet.present(
               undefined,
               item.notebook,
-              "link-notebooks",
+              "global",
               undefined,
               false
             );
@@ -441,10 +412,4 @@ const NotebookItemWrapper = React.memo(
   }
 );
 NotebookItemWrapper.displayName = "NotebookItemWrapper";
-
-MoveNoteSheet.present = (note?: Note) => {
-  presentSheet({
-    component: (ref) => <MoveNoteSheet actionSheetRef={ref} note={note} />
-  });
-};
-export default MoveNoteSheet;
+export default LinkNotebooks;

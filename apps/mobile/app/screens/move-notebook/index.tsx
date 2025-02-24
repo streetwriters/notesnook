@@ -19,36 +19,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Notebook } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Text, View } from "react-native";
 import { FlatList } from "react-native-actions-sheet";
-import { db } from "../../../common/database";
-import { presentSheet } from "../../../services/event-manager";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { db } from "../../common/database";
+import { presentDialog } from "../../components/dialog/functions";
+import { Header } from "../../components/header";
+import { AddNotebookSheet } from "../../components/sheets/add-notebook";
+import { NotebookItem } from "../../components/side-menu/notebook-item";
+import {
+  useSideMenuNotebookExpandedStore,
+  useSideMenuNotebookSelectionStore
+} from "../../components/side-menu/stores";
+import { Button } from "../../components/ui/button";
+import Input from "../../components/ui/input";
+import Navigation, { NavigationProps } from "../../services/navigation";
 import {
   createNotebookTreeStores,
   TreeItem
-} from "../../../stores/create-notebook-tree-stores";
+} from "../../stores/create-notebook-tree-stores";
 import {
   useNotebooks,
   useNotebookStore
-} from "../../../stores/use-notebook-store";
+} from "../../stores/use-notebook-store";
 import {
   checkParentSelected,
   findRootNotebookId,
   getParentNotebookId
-} from "../../../utils/notebooks";
-import { DefaultAppStyles } from "../../../utils/styles";
-import { Dialog } from "../../dialog";
-import DialogHeader from "../../dialog/dialog-header";
-import { presentDialog } from "../../dialog/functions";
-import SheetProvider from "../../sheet-provider";
-import { NotebookItem } from "../../side-menu/notebook-item";
-import {
-  useSideMenuNotebookExpandedStore,
-  useSideMenuNotebookSelectionStore
-} from "../../side-menu/stores";
-import { Button } from "../../ui/button";
-import { AddNotebookSheet } from "../add-notebook";
+} from "../../utils/notebooks";
+import { DefaultAppStyles } from "../../utils/styles";
+import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 
 const {
   useNotebookExpandedStore,
@@ -56,15 +57,12 @@ const {
   useNotebookSelectionStore
 } = createNotebookTreeStores(false, false, "move-notebook-tree-expanded");
 
-export const MoveNotebookSheet = ({
-  selectedNotebooks,
-  close
-}: {
-  selectedNotebooks: Notebook[];
-  close?: () => void;
-}) => {
+export const MoveNotebook = (props: NavigationProps<"MoveNotebook">) => {
+  const selectedNotebooks = props.route.params.selectedNotebooks;
+  const searchTimer = useRef<NodeJS.Timeout>();
   const [notebooks, loading] = useNotebooks();
   const { colors } = useThemeColors();
+  useNavigationFocus(props.navigation, { focusOnInit: true });
   const tree = useNotebookTreeStore((state) => state.tree);
   const lastQuery = React.useRef<string>();
   const [filteredNotebooks, setFilteredNotebooks] = React.useState(notebooks);
@@ -171,14 +169,14 @@ export const MoveNotebookSheet = ({
                   enabled: false,
                   selection: {}
                 });
-                close?.();
+                Navigation.goBack();
               }
             });
           }}
         />
       );
     },
-    [close, selectedNotebooks]
+    [selectedNotebooks]
   );
   const filteredTree = React.useMemo(
     () =>
@@ -190,24 +188,20 @@ export const MoveNotebookSheet = ({
   );
 
   return (
-    <View>
-      <SheetProvider context="move-notebook" />
-      <Dialog context="move-notebook" />
-
-      <View
-        style={{
-          paddingHorizontal: DefaultAppStyles.GAP,
-          borderBottomWidth: 1,
-          borderBottomColor: colors.primary.border
-        }}
-      >
-        <DialogHeader
-          title={strings.moveNotebook(
-            selectedNotebooks.length,
-            selectedNotebooks[0].title
-          )}
-        />
-      </View>
+    <SafeAreaView
+      style={{
+        gap: DefaultAppStyles.GAP_VERTICAL,
+        flex: 1,
+        backgroundColor: colors.primary.background
+      }}
+    >
+      <Header
+        title={strings.moveNotebook(
+          selectedNotebooks.length,
+          selectedNotebooks[0].title
+        )}
+        canGoBack
+      />
 
       <FlatList
         data={filteredTree}
@@ -220,7 +214,30 @@ export const MoveNotebookSheet = ({
               paddingHorizontal: DefaultAppStyles.GAP
             }}
           >
-            {moveToTopEnabled ? (
+            <Input
+              placeholder={strings.searchNotebooks()}
+              onChangeText={(value) => {
+                lastQuery.current = value;
+                searchTimer.current = setTimeout(() => {
+                  updateNotebooks();
+                }, 300);
+              }}
+              button={{
+                icon: "plus",
+                onPress: () => {
+                  AddNotebookSheet.present(
+                    undefined,
+                    undefined,
+                    "global",
+                    undefined,
+                    false,
+                    lastQuery.current
+                  );
+                },
+                color: colors.primary.icon
+              }}
+            />
+            {moveToTopEnabled && tree.length > 0 ? (
               <Button
                 title={strings.moveToTop()}
                 style={{
@@ -254,7 +271,7 @@ export const MoveNotebookSheet = ({
                     enabled: false,
                     selection: {}
                   });
-                  close?.();
+                  Navigation.goBack();
                 }}
               />
             ) : null}
@@ -279,7 +296,7 @@ export const MoveNotebookSheet = ({
           </View>
         }
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -378,11 +395,4 @@ const NotebookItemWrapper = React.memo(
 );
 NotebookItemWrapper.displayName = "NotebookItemWrapper";
 
-MoveNotebookSheet.present = async (notebooks: Notebook[]) => {
-  presentSheet({
-    component: (ref, close) => (
-      <MoveNotebookSheet selectedNotebooks={notebooks} close={close} />
-    ),
-    keyboardHandlerDisabled: true
-  });
-};
+MoveNotebook.present = async (notebooks: Notebook[]) => {};

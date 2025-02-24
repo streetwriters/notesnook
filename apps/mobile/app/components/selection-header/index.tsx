@@ -41,10 +41,9 @@ import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { sleep } from "../../utils/time";
 import { presentDialog } from "../dialog/functions";
-import MoveNoteSheet from "../sheets/add-to";
 import ExportNotesSheet from "../sheets/export-notes";
 import ManageTagsSheet from "../sheets/manage-tags";
-import { MoveNotebookSheet } from "../sheets/move-notebook";
+import { MoveNotebook } from "../../screens/move-notebook";
 import { IconButton } from "../ui/icon-button";
 import NativeTooltip from "../../utils/tooltip";
 
@@ -203,7 +202,7 @@ export const SelectionHeader = React.memo(
                       onPress: async () => {
                         const ids = selectedItemsList;
                         const notebooks = await db.notebooks.all.items(ids);
-                        MoveNotebookSheet.present(notebooks);
+                        MoveNotebook.present(notebooks);
                       },
                       visible: renderedInRoute === "Notebooks",
                       icon: "arrow-right-bold-box-outline"
@@ -230,7 +229,7 @@ export const SelectionHeader = React.memo(
                       title: strings.linkNotebook(),
                       onPress: async () => {
                         await sleep(100);
-                        MoveNoteSheet.present();
+                        // MoveNoteSheet.present();
                       },
                       visible: type === "note",
                       icon: "plus"

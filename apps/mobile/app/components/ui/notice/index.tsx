@@ -17,12 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React from "react";
-import { getContainerBorder } from "../../../utils/colors";
-import { View, ViewStyle } from "react-native";
 import { useThemeColors } from "@notesnook/theme";
+import React from "react";
+import { View, ViewStyle } from "react-native";
+import { getContainerBorder } from "../../../utils/colors";
 import { AppFontSize } from "../../../utils/size";
-import { IconButton } from "../icon-button";
+import { DefaultAppStyles } from "../../../utils/styles";
+import AppIcon from "../AppIcon";
 import Paragraph from "../typography/paragraph";
 
 export interface NoticeProps {
@@ -46,28 +47,25 @@ export const Notice = ({
   return (
     <View
       style={{
-        padding: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
+        paddingLeft: 5,
+        paddingVertical: DefaultAppStyles.GAP_VERTICAL,
         flexDirection: "row",
         backgroundColor: colors.secondary.background,
         borderRadius: isSmall ? 5 : 10,
         alignItems: "flex-start",
+        gap: 5,
         ...getContainerBorder(colors.secondary.background),
         ...style
       }}
     >
-      <IconButton
-        size={isSmall ? AppFontSize.lg + 1 : AppFontSize.xxl}
+      <AppIcon
+        size={isSmall ? AppFontSize.md + 2 : AppFontSize.xxl}
         name={type}
-        style={{
-          width: isSmall ? undefined : 40,
-          height: isSmall ? undefined : 40,
-          alignSelf: "flex-start"
-        }}
         color={type === "alert" ? colors.error.icon : colors.primary.accent}
       />
       <Paragraph
         style={{
-          marginLeft: 10,
           flexShrink: 1
         }}
         selectable={selectable}
