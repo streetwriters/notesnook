@@ -66,7 +66,7 @@ export interface RecentCommand extends BaseCommand {
 }
 
 export const commandActions = {
-  command: (command: Command) => getCommandById(command.id)?.action,
+  command: (command: Command) => getCommandById(command.id)?.action(command),
   note: (command: Command, options?: { openInNewTab?: boolean }) =>
     useEditorStore.getState().openSession(command.id, options),
   notebook: (command: Command) => navigate(`/notebooks/${command.id}`),
