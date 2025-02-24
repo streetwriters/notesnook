@@ -454,7 +454,8 @@ $headline$: Use starting line of the note as title.`,
   selectNotebooksDesc: () => t`Select notebooks you want to add note(s) to.`,
   selectNotebooksDesktopDesc: (keyboardShortcut: string) =>
     t`Use ${keyboardShortcut}+click to select multiple notebooks`,
-  enableMultiSelect: () => t`Tap and hold to enable multi-select.`,
+  enableMultiSelect: () =>
+    t`You can also link a note to multiple Notebooks. Tap and hold any notebook to enable multi-select.`,
   changeEmail: () => t`Change email address`,
   changeEmailDesc: () =>
     t`Your account email will be changed without affecting your subscription or any other settings.`,
@@ -2453,5 +2454,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   believerPlan: () => t`Believer plan`,
   storage: () => t`Storage`,
   used: () => t`used`,
-  editProfile: () => t`Edit profile`
+  editProfile: () => t`Edit profile`,
+  linkNotes: () => t`Link notes`,
+  linkingNotesTo: (title: string) => t`Select notes to link to "${title}"`
 };
