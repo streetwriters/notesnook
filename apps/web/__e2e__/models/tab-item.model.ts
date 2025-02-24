@@ -24,10 +24,12 @@ import { ContextMenuModel } from "./context-menu.model";
 export class TabItemModel {
   private readonly closeButton: Locator;
   readonly contextMenu: TabContextMenuModel;
+  readonly titleElement: Locator;
 
-  constructor(private readonly locator: Locator, page: Page) {
+  constructor(readonly locator: Locator, page: Page) {
     this.closeButton = locator.locator(getTestId("tab-close-button"));
     this.contextMenu = new TabContextMenuModel(page, locator);
+    this.titleElement = locator.locator(getTestId("tab-title"));
   }
 
   async getId() {
@@ -40,7 +42,7 @@ export class TabItemModel {
   }
 
   async title() {
-    return this.locator.locator(getTestId("tab-title")).textContent();
+    return this.titleElement.textContent();
   }
 
   async isActive() {

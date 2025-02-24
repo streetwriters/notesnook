@@ -63,7 +63,7 @@ test("open note in new tab (using context menu)", async ({ page }) => {
 
   const tabs = await notes.editor.getTabs();
   expect(tabs.length).toBe(2);
-  expect(await tabs[1].title()).toBe("Note 2");
+  await expect(tabs[1].titleElement).toHaveText("Note 2");
 });
 
 test("open note in new tab (using middle click)", async ({ page }) => {
@@ -80,7 +80,7 @@ test("open note in new tab (using middle click)", async ({ page }) => {
 
   const tabs = await notes.editor.getTabs();
   expect(tabs.length).toBe(2);
-  expect(await tabs[1].title()).toBe("Note 2");
+  await expect(tabs[1].titleElement).toHaveText("Note 2");
 });
 
 test("go back should open previous note", async ({ page }) => {
@@ -93,9 +93,9 @@ test("go back should open previous note", async ({ page }) => {
   await notes.createNote({ title: "Note 3" });
 
   await notes.editor.goBack();
-  expect(await tabs[0].title()).toBe("Note 2");
+  await expect(tabs[0].titleElement).toHaveText("Note 2");
   await notes.editor.goBack();
-  expect(await tabs[0].title()).toBe("Note 1");
+  await expect(tabs[0].titleElement).toHaveText("Note 1");
 });
 
 test("go forward should open next note", async ({ page }) => {
@@ -110,9 +110,9 @@ test("go forward should open next note", async ({ page }) => {
   await notes.editor.goBack();
   await notes.editor.goBack();
   await notes.editor.goForward();
-  expect(await tabs[0].title()).toBe("Note 2");
+  await expect(tabs[0].titleElement).toHaveText("Note 2");
   await notes.editor.goForward();
-  expect(await tabs[0].title()).toBe("Note 3");
+  await expect(tabs[0].titleElement).toHaveText("Note 3");
 });
 
 test("new tab button should open a new tab", async ({ page }) => {
@@ -124,8 +124,8 @@ test("new tab button should open a new tab", async ({ page }) => {
   await notes.editor.newTab();
 
   const tabs = await notes.editor.getTabs();
-  expect(await tabs[0].title()).toBe("Note 1");
-  expect(await tabs[1].title()).toBe("Untitled");
+  await expect(tabs[0].titleElement).toHaveText("Note 1");
+  await expect(tabs[1].titleElement).toHaveText("Untitled");
 });
 
 test("content changes in a note opened in multiple tabs should sync", async ({
@@ -173,6 +173,7 @@ test("reloading with a note diff open in a tab", async ({ page }) => {
   const history = await note?.properties.getSessionHistory();
   const preview = await history?.[0].open();
   await preview!.firstEditor.waitFor({ state: "visible" });
+  await page.waitForTimeout(1000);
 
   await page.reload();
   await preview!.firstEditor.waitFor({ state: "visible" });
@@ -227,7 +228,7 @@ test("clicking on a note that's already opened in another tab should focus the t
   await note?.openNote();
 
   const tabs = await notes.editor.getTabs();
-  expect(await tabs[0].isActive()).toBe(true);
+  await expect(tabs[0].locator).toHaveClass(/active/);
 });
 
 test("open a note in 2 tabs then open another note and navigate back", async ({
@@ -248,8 +249,8 @@ test("open a note in 2 tabs then open another note and navigate back", async ({
   await notes.editor.goBack();
 
   const tabs = await notes.editor.getTabs();
-  expect(await tabs[1].isActive()).toBe(true);
-  expect(await tabs[1].title()).toBe("Note 1");
+  await expect(tabs[1].locator).toHaveClass(/active/);
+  await expect(tabs[1].titleElement).toHaveText("Note 1");
 });
 
 test("shouldn't be possible to open a note in a pinned tab", async ({
@@ -272,8 +273,8 @@ test("shouldn't be possible to open a note in a pinned tab", async ({
 
   tabs = await notes.editor.getTabs();
   expect(tabs.length).toBe(2);
-  expect(await tabs[1].isActive()).toBe(true);
-  expect(await tabs[1].title()).toBe("Note 1");
+  await expect(tabs[1].locator).toHaveClass(/active/);
+  await expect(tabs[1].titleElement).toHaveText("Note 1");
 });
 
 test("shouldn't be possible to create a new note in a pinned tab", async ({
@@ -292,7 +293,7 @@ test("shouldn't be possible to create a new note in a pinned tab", async ({
 
   tabs = await notes.editor.getTabs();
   expect(tabs.length).toBe(2);
-  expect(await tabs[1].isActive()).toBe(true);
+  await expect(tabs[1].locator).toHaveClass(/active/);
 });
 
 test("notes open in multiple tabs should sync tags when tags are added", async ({
