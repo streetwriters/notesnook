@@ -22,6 +22,7 @@ import { isInTable } from "@tiptap/pm/tables";
 import { CodeBlock } from "../code-block/index.js";
 import { showLinkPopup } from "../../toolbar/popups/link-popup.js";
 import { isListActive } from "../../utils/list.js";
+import { tiptapKeys } from "@notesnook/common";
 
 export const KeyMap = Extension.create({
   name: "key-map",
@@ -42,7 +43,7 @@ export const KeyMap = Extension.create({
         if (isListActive(editor)) return false;
         return true;
       },
-      "Mod-\\": ({ editor }) => {
+      [tiptapKeys.removeFormattingInSelection.keys]: ({ editor }) => {
         editor
           .chain()
           .focus()
@@ -52,7 +53,7 @@ export const KeyMap = Extension.create({
           .run();
         return true;
       },
-      "Shift-Mod-L": ({ editor }) => {
+      [tiptapKeys.insertInternalLink.keys]: ({ editor }) => {
         editor.storage.createInternalLink?.().then((link) => {
           if (!link) return;
 
@@ -67,7 +68,7 @@ export const KeyMap = Extension.create({
         });
         return true;
       },
-      "Shift-Mod-k": ({ editor }) => {
+      [tiptapKeys.insertLink.keys]: ({ editor }) => {
         showLinkPopup(editor);
         return true;
       }

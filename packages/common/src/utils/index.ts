@@ -28,3 +28,4 @@ export * from "./migrate-toolbar.js";
 export * from "./export-notes.js";
 export * from "./dataurl.js";
 export * from "./tab-session-history.js";
+export * from "./keybindings.js";
