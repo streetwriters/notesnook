@@ -40,7 +40,6 @@ import { Button } from "../../ui/button";
 import Input from "../../ui/input";
 import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
-import { MoveNotes } from "../move-notes/movenote";
 
 export const AddNotebookSheet = ({
   notebook,
@@ -103,11 +102,22 @@ export const AddNotebookSheet = ({
       useNotebookStore.getState().refresh();
     }
 
-    if (!notebook && showMoveNotesOnComplete && id) {
-      MoveNotes.present(await db.notebooks.notebook(id));
-    } else {
-      close?.(true);
+    if (showMoveNotesOnComplete && id) {
+      ToastManager.show({
+        heading: "Notebook added",
+        type: "success",
+        context: "global",
+        actionText: "Link notes",
+        duration: 8000,
+        func: async () => {
+          Navigation.navigate("MoveNotes", {
+            notebook: (await db.notebooks.notebook(id)) as Notebook
+          });
+          ToastManager.hide();
+        }
+      });
     }
+    close?.(true);
   };
 
   return (

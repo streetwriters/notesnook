@@ -41,12 +41,16 @@ interface FloatingButtonProps {
   color?: string;
   shouldShow?: boolean;
   alwaysVisible?: boolean;
+  icon?: string;
+  testID?: string;
 }
 
 const FloatingButton = ({
   onPress,
   color,
-  alwaysVisible = false
+  alwaysVisible = false,
+  icon,
+  testID
 }: FloatingButtonProps) => {
   const { colors } = useThemeColors();
   const deviceMode = useSettingStore((state) => state.deviceMode);
@@ -116,7 +120,7 @@ const FloatingButton = ({
       ]}
     >
       <TouchableOpacity
-        testID={notesnook.buttons.add}
+        testID={testID || notesnook.buttons.add}
         activeOpacity={0.95}
         style={{
           ...getElevationStyle(10),
@@ -141,7 +145,9 @@ const FloatingButton = ({
         >
           <Icon
             name={
-              route.name === "Notebooks"
+              icon
+                ? icon
+                : route.name === "Notebooks"
                 ? "notebook-plus"
                 : route.name === "Trash"
                 ? "delete"

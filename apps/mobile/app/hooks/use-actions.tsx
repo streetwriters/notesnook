@@ -37,10 +37,7 @@ import { AuthMode } from "../components/auth/common";
 import { presentDialog } from "../components/dialog/functions";
 import NoteHistory from "../components/note-history";
 import { AddNotebookSheet } from "../components/sheets/add-notebook";
-import MoveNoteSheet from "../components/sheets/add-to";
 import ExportNotesSheet from "../components/sheets/export-notes";
-import { MoveNotebookSheet } from "../components/sheets/move-notebook";
-import { MoveNotes } from "../components/sheets/move-notes/movenote";
 import PublishNoteSheet from "../components/sheets/publish-note";
 import { ReferencesList } from "../components/sheets/references";
 import { RelationsList } from "../components/sheets/relations-list/index";
@@ -536,11 +533,14 @@ export const useActions = ({
       },
       {
         id: "move-notes",
-        title: strings.moveNotes(),
+        title: strings.linkNotes(),
         hidden: item.type !== "notebook",
         icon: "text",
         onPress: () => {
-          MoveNotes.present(item);
+          close();
+          Navigation.navigate("MoveNotes", {
+            notebook: item
+          });
         }
       },
       {
@@ -548,7 +548,10 @@ export const useActions = ({
         title: strings.moveNotebookFix(),
         icon: "arrow-right-bold-box-outline",
         onPress: () => {
-          MoveNotebookSheet.present([item]);
+          close();
+          Navigation.navigate("MoveNotebook", {
+            selectedNotebooks: [item]
+          });
         }
       }
     );
@@ -619,7 +622,11 @@ export const useActions = ({
     }
 
     function addTo() {
-      MoveNoteSheet.present(item as Note);
+      Navigation.navigate("LinkNotebooks", {
+        note: item as Note
+      });
+      close();
+      //MoveNoteSheet.present(item as Note);
     }
 
     async function addToFavorites() {
