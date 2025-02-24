@@ -100,6 +100,11 @@ def getNpmVersion() {
 def isBuildingAAB = gradle.startParameter.getTaskNames().any { it.contains("bundleRelease") }
 
 android {
+
+    androidResources {
+        noCompress += ["bundle"]
+    }
+
     compileSdkVersion rootProject.ext.compileSdkVersion
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
