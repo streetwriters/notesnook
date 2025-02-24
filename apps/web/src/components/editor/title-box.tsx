@@ -58,10 +58,10 @@ function TitleBox(props: TitleBoxProps) {
     const { title } = session.note;
     if (inputRef.current.value === title) return;
 
-    withSelectionPersist(
-      inputRef.current,
-      (input) => (input.value = title || "")
-    );
+    withSelectionPersist(inputRef.current, (input) => {
+      input.value = title || "";
+      resizeTextarea(input);
+    });
   }, [sessionType, id]);
 
   useEffect(() => {
@@ -77,10 +77,10 @@ function TitleBox(props: TitleBoxProps) {
         sessionId: string;
       }) => {
         if (!inputRef.current || sessionId !== id) return;
-        withSelectionPersist(
-          inputRef.current,
-          (input) => (input.value = title)
-        );
+        withSelectionPersist(inputRef.current, (input) => {
+          input.value = title;
+          resizeTextarea(input);
+        });
         if (!preventSave) {
           pendingChanges.current = true;
           debouncedOnTitleChange(sessionId, sessionId, title, pendingChanges);
@@ -133,6 +133,7 @@ function TitleBox(props: TitleBoxProps) {
         }
       }}
       onChange={(e) => {
+        if (!(e.target instanceof HTMLTextAreaElement)) return;
         pendingChanges.current = true;
         e.target.value = replaceDateTime(
           e.target.value,
@@ -140,6 +141,7 @@ function TitleBox(props: TitleBoxProps) {
           timeFormat
         ).replace(NEWLINE_STRIP_REGEX, " ");
         debouncedOnTitleChange(id, id, e.target.value, pendingChanges);
+        resizeTextarea(e.target);
       }}
     />
   );
@@ -148,6 +150,11 @@ function TitleBox(props: TitleBoxProps) {
 export default React.memo(TitleBox, (prevProps, nextProps) => {
   return prevProps.readonly === nextProps.readonly;
 });
+
+function resizeTextarea(input: HTMLTextAreaElement) {
+  input.style.height = "auto";
+  input.style.height = input.scrollHeight + "px";
+}
 
 function onTitleChange(
   noteId: string,
