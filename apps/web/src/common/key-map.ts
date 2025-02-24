@@ -23,6 +23,8 @@ import { useStore as useSearchStore } from "../stores/search-store";
 import { useEditorManager } from "../components/editor/manager";
 import { CommandPaletteDialog } from "../dialogs/command-palette";
 import { hashNavigate } from "../navigation";
+import { keybindings } from "@notesnook/common";
+import { KeyboardShortcutsDialog } from "../dialogs/keyboard-shortcuts-dialog";
 
 function isInEditor(e: KeyboardEvent) {
   return (
@@ -62,43 +64,32 @@ const KEYMAP = [
   //   },
   // },
   {
-    keys: [
-      "command+option+right",
-      "ctrl+alt+right",
-      "command+option+shift+right",
-      "ctrl+alt+shift+right",
-      "ctrl+tab",
-      "command+tab"
-    ],
-    description: "Go to next tab",
+    keys: IS_DESKTOP_APP
+      ? keybindings.nextTab.keys.desktop
+      : keybindings.nextTab.keys.web,
+    description: keybindings.nextTab.description,
     action: () => useEditorStore.getState().focusNextTab()
   },
   {
-    keys: [
-      "command+option+left",
-      "ctrl+alt+left",
-      "command+option+shift+left",
-      "ctrl+alt+shift+left",
-      "ctrl+shift+tab",
-      "command+shift+tab"
-    ],
-    description: "Go to previous tab",
+    keys: IS_DESKTOP_APP
+      ? keybindings.previousTab.keys.desktop
+      : keybindings.previousTab.keys.web,
+    description: keybindings.previousTab.description,
     action: () => useEditorStore.getState().focusPreviousTab()
   },
   {
-    keys: ["ctrl+t", "command+t"],
-    description: "Create a new tab",
+    keys: IS_DESKTOP_APP ? keybindings.newTab.keys.desktop : undefined,
+    description: keybindings.newTab.description,
     action: () => useEditorStore.getState().addTab()
   },
   {
-    keys: ["ctrl+n", "command+n"],
-    description: "Create a new note",
+    keys: IS_DESKTOP_APP ? keybindings.newNote.keys.desktop : undefined,
+    description: keybindings.newNote.description,
     action: () => useEditorStore.getState().newSession()
   },
   {
-    keys: ["ctrl+w", "command+w"],
-    description:
-      "Close active tab or focus previously activated tab if active tab pinned",
+    keys: IS_DESKTOP_APP ? keybindings.closeActiveTab.keys.desktop : undefined,
+    description: keybindings.closeActiveTab.description,
     action: () => {
       const activeTab = useEditorStore.getState().getActiveTab();
       if (activeTab?.pinned) {
@@ -109,13 +100,13 @@ const KEYMAP = [
     }
   },
   {
-    keys: ["ctrl+shift+w", "command+shift+w"],
-    description: "Close all tabs",
+    keys: IS_DESKTOP_APP ? keybindings.closeAllTabs.keys.desktop : undefined,
+    description: keybindings.closeAllTabs.description,
     action: () => useEditorStore.getState().closeAllTabs()
   },
   {
-    keys: ["command+f", "ctrl+f"],
-    description: "Search all notes",
+    keys: keybindings.searchInNotes.keys,
+    description: keybindings.searchInNotes.description,
     global: false,
     action: (e: KeyboardEvent) => {
       if (isInEditor(e)) {
@@ -212,6 +203,11 @@ const KEYMAP = [
     keys: ["ctrl+,", "command+,"],
     description: "Open settings",
     action: () => hashNavigate("/settings", { replace: true })
+  },
+  {
+    keys: keybindings.openKeyboardShortcuts.keys,
+    description: keybindings.openKeyboardShortcuts.description,
+    action: () => KeyboardShortcutsDialog.show({})
   }
 ];
 
@@ -221,6 +217,7 @@ export function registerKeyMap() {
   };
 
   KEYMAP.forEach((key) => {
+    if (key.keys === undefined) return;
     hotkeys(key.keys.join(","), (e) => {
       e.preventDefault();
       key.action?.(e);

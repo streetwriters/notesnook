@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Node, mergeAttributes } from "@tiptap/core";
 import { insertMathNode } from "./plugin/index.js";
 import { NodeSelection } from "prosemirror-state";
+import { tiptapKeys } from "@notesnook/common";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -66,7 +67,8 @@ export const MathBlock = Node.create({
 
   addKeyboardShortcuts() {
     return {
-      "Mod-Shift-M": () => this.editor.commands.insertMathBlock()
+      [tiptapKeys.insertMathBlock.keys]: () =>
+        this.editor.commands.insertMathBlock()
     };
   },
 

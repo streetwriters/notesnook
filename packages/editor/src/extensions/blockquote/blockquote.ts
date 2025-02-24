@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { tiptapKeys } from "@notesnook/common";
 import { getParentAttributes } from "../../utils/prosemirror.js";
 import { wrappingInputRule } from "@tiptap/core";
 import TiptapBlockquote, { inputRegex } from "@tiptap/extension-blockquote";
@@ -47,5 +48,13 @@ export const Blockquote = TiptapBlockquote.extend({
         getAttributes: () => getParentAttributes(this.editor)
       })
     ];
+  },
+
+  addKeyboardShortcuts() {
+    return {
+      ...this.parent?.(),
+      [tiptapKeys.insertBlockquote.keys]: () =>
+        this.editor.commands.toggleBlockquote()
+    };
   }
 });
