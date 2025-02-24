@@ -308,6 +308,8 @@ export const SplitPane = React.forwardRef<
       const nextPane = paneSizes.current[i + 1];
       const rightBorder = sashPosSizes.current[i + 2];
 
+      if (currentPane.collapsed) currentPane.collapsed = false;
+
       if (currentPane.size + distanceX >= rightBorder)
         distanceX = rightBorder - currentPane.size;
 
