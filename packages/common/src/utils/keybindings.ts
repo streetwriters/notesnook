@@ -1,0 +1,367 @@
+interface Hotkeys {
+  keys:
+    | string[]
+    | {
+        web?: string[];
+        desktop?: string[];
+      };
+  description: string;
+  category: string;
+  type: "hotkeys";
+}
+
+interface TipTapKey {
+  keys: string | string[];
+  description: string;
+  category: string;
+  type: "tiptap";
+}
+
+/**
+ * consumed by hotkeys-js
+ */
+export const hotkeys = {
+  nextTab: {
+    keys: {
+      web: ["ctrl+alt+right", "ctrl+alt+shift+right"],
+      desktop: ["ctrl+tab", "command+tab"]
+    },
+    description: "Next tab",
+    category: "Navigation",
+    type: "hotkeys"
+  },
+  previousTab: {
+    keys: {
+      web: ["ctrl+alt+left", "ctrl+alt+shift+left"],
+      desktop: ["ctrl+shift+tab", "command+shift+tab"]
+    },
+    description: "Previous tab",
+    category: "Navigation",
+    type: "hotkeys"
+  },
+  newTab: {
+    keys: {
+      desktop: ["ctrl+t", "command+t"]
+    },
+    description: "New tab",
+    category: "Navigation",
+    type: "hotkeys"
+  },
+  closeActiveTab: {
+    keys: {
+      desktop: ["ctrl+w", "command+w"]
+    },
+    description: "Close active tab",
+    category: "Navigation",
+    type: "hotkeys"
+  },
+  closeAllTabs: {
+    keys: {
+      desktop: ["ctrl+shift+w", "command+shift+w"]
+    },
+    description: "Close all tabs",
+    category: "Navigation",
+    type: "hotkeys"
+  },
+  newNote: {
+    keys: {
+      desktop: ["ctrl+n", "command+n"]
+    },
+    description: "New note",
+    category: "Note",
+    type: "hotkeys"
+  },
+  searchInNotes: {
+    keys: ["ctrl+f", "command+f"],
+    description: "Search in notes list view if editor is not focused",
+    category: "Navigation",
+    type: "hotkeys"
+  },
+  openCommandPalette: {
+    keys: ["ctrl+k", "command+k"],
+    description: "Command palette",
+    category: "Navigation",
+    type: "hotkeys"
+  },
+  openCommandPaletteInSearchMode: {
+    keys: ["ctrl+p", "ctrl+p"],
+    description: "Quick open",
+    category: "Navigation",
+    type: "hotkeys"
+  },
+  openKeyboardShortcuts: {
+    keys: ["ctrl+/"],
+    description: "Keyboard shortcuts",
+    category: "General",
+    type: "hotkeys"
+  }
+} satisfies Record<string, Hotkeys>;
+
+/**
+ * consumed by tiptap
+ */
+export const tiptapKeys = {
+  addAttachment: {
+    keys: "Mod-Shift-A",
+    description: "Add attachment",
+    category: "Editor",
+    type: "tiptap"
+  },
+  insertBlockquote: {
+    keys: "Mod-Shift-B",
+    description: "Insert blockquote",
+    category: "Editor",
+    type: "tiptap"
+  },
+  toggleBold: {
+    keys: "Mod-b",
+    description: "Toggle bold",
+    category: "Editor",
+    type: "tiptap"
+  },
+  toggleBulletList: {
+    keys: "Mod-Shift-8",
+    description: "Toggle bullet list",
+    category: "Editor",
+    type: "tiptap"
+  },
+  toggleCheckList: {
+    keys: "Mod-Shift-9",
+    description: "Toggle check list",
+    category: "Editor",
+    type: "tiptap"
+  },
+  splitListItem: {
+    keys: "Enter",
+    description: "Split list item",
+    category: "Editor",
+    type: "tiptap"
+  },
+  liftListItem: {
+    keys: "Shift-Tab",
+    description: "Lift list item",
+    category: "Editor",
+    type: "tiptap"
+  },
+  sinkListItem: {
+    keys: "Mod-Shift-Down",
+    description: "Sink list item",
+    category: "Editor",
+    type: "tiptap"
+  },
+  toggleCode: {
+    keys: "Mod-e",
+    description: "Toggle code",
+    category: "Editor",
+    type: "tiptap"
+  },
+  toggleCodeBlock: {
+    keys: "Mod-Shift-C",
+    description: "Toggle code block",
+    category: "Editor",
+    type: "tiptap"
+  },
+  insertDate: {
+    keys: "Alt-d",
+    description: "Insert date",
+    category: "Editor",
+    type: "tiptap"
+  },
+  insertTime: {
+    keys: "Alt-t",
+    description: "Insert time",
+    category: "Editor",
+    type: "tiptap"
+  },
+  insertDateTime: {
+    keys: "Mod-Alt-d",
+    description: "Insert date and time",
+    category: "Editor",
+    type: "tiptap"
+  },
+  insertDateTimeWithTimezone: {
+    keys: "Mod-Alt-z",
+    description: "Insert date and time with timezone",
+    category: "Editor",
+    type: "tiptap"
+  },
+  increaseFontSize: {
+    keys: "Ctrl-[",
+    description: "Increase font size",
+    category: "Editor",
+    type: "tiptap"
+  },
+  decreaseFontSize: {
+    keys: "Ctrl-]",
+    description: "Decrease font size",
+    category: "Editor",
+    type: "tiptap"
+  },
+  insertHeading1: {
+    keys: "Mod-Alt-1",
+    description: "Insert heading 1",
+    category: "Editor",
+    type: "tiptap"
+  },
+  insertHeading2: {
+    keys: "Mod-Alt-2",
+    description: "Insert heading 2",
+    category: "Editor",
+    type: "tiptap"
+  },
+  insertHeading3: {
+    keys: "Mod-Alt-3",
+    description: "Insert heading 3",
+    category: "Editor",
+    type: "tiptap"
+  },
+  insertHeading4: {
+    keys: "Mod-Alt-4",
+    description: "Insert heading 4",
+    category: "Editor",
+    type: "tiptap"
+  },
+  insertHeading5: {
+    keys: "Mod-Alt-5",
+    description: "Insert heading 5",
+    category: "Editor",
+    type: "tiptap"
+  },
+  insertHeading6: {
+    keys: "Mod-Alt-6",
+    description: "Insert heading 6",
+    category: "Editor",
+    type: "tiptap"
+  },
+  undo: {
+    keys: "Mod-z",
+    description: "Undo",
+    category: "Editor",
+    type: "tiptap"
+  },
+  redo: {
+    keys: ["Mod-Shift-z", "Mod-y"],
+    description: "Redo",
+    category: "Editor",
+    type: "tiptap"
+  },
+  addImage: {
+    keys: "Mod-Shift-I",
+    description: "Add image",
+    category: "Editor",
+    type: "tiptap"
+  },
+  toggleItalic: {
+    keys: "Mod-i",
+    description: "Toggle italic",
+    category: "Editor",
+    type: "tiptap"
+  },
+  removeFormattingInSelection: {
+    keys: "Mod-\\",
+    description: "Remove formatting in selection",
+    category: "Editor",
+    type: "tiptap"
+  },
+  insertInternalLink: {
+    keys: "Mod-Shift-L",
+    description: "Insert internal link",
+    category: "Editor",
+    type: "tiptap"
+  },
+  insertLink: {
+    keys: "Mod-Shift-K",
+    description: "Insert link",
+    category: "Editor",
+    type: "tiptap"
+  },
+  insertMathBlock: {
+    keys: "Mod-Shift-M",
+    description: "Insert math block",
+    category: "Editor",
+    type: "tiptap"
+  },
+  toggleOrderedList: {
+    keys: "Mod-Shift-7",
+    description: "Toggle ordered list",
+    category: "Editor",
+    type: "tiptap"
+  },
+  toggleOutlineList: {
+    keys: "Mod-Shift-O",
+    description: "Toggle outline list",
+    category: "Editor",
+    type: "tiptap"
+  },
+  toggleOutlineListExpand: {
+    keys: "Mod-Space",
+    description: "Toggle outline list expand",
+    category: "Editor",
+    type: "tiptap"
+  },
+  openSearch: {
+    keys: "Mod-F",
+    description: "Open search",
+    category: "Editor",
+    type: "tiptap"
+  },
+  toggleStrike: {
+    keys: "Mod-Shift-S",
+    description: "Toggle strike",
+    category: "Editor",
+    type: "tiptap"
+  },
+  toggleSubscript: {
+    keys: "Mod-,",
+    description: "Toggle subscript",
+    category: "Editor",
+    type: "tiptap"
+  },
+  toggleSuperscript: {
+    keys: "Mod-.",
+    description: "Toggle superscript",
+    category: "Editor",
+    type: "tiptap"
+  },
+  toggleTaskList: {
+    keys: "Mod-Shift-T",
+    description: "Toggle task list",
+    category: "Editor",
+    type: "tiptap"
+  },
+  textAlignCenter: {
+    keys: "Mod-Shift-E",
+    description: "Text align center",
+    category: "Editor",
+    type: "tiptap"
+  },
+  textAlignJustify: {
+    keys: "Mod-Shift-J",
+    description: "Text align justify",
+    category: "Editor",
+    type: "tiptap"
+  },
+  textAlignLeft: {
+    keys: "Mod-Shift-L",
+    description: "Text align left",
+    category: "Editor",
+    type: "tiptap"
+  },
+  textAlignRight: {
+    keys: "Mod-Shift-R",
+    description: "Text align right",
+    category: "Editor",
+    type: "tiptap"
+  },
+  underline: {
+    keys: "Mod-u",
+    description: "Underline",
+    category: "Editor",
+    type: "tiptap"
+  }
+} satisfies Record<string, TipTapKey>;
+
+export const keybindings = {
+  ...hotkeys,
+  ...tiptapKeys
+};
