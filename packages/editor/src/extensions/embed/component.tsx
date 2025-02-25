@@ -153,7 +153,16 @@ function getSandboxFeatures(src: string) {
   try {
     const url = new URL(src);
     if (url.protocol === "http:" || url.protocol === "https:")
-      features.push("allow-scripts", "allow-same-origin");
+      features.push(
+        "allow-scripts",
+        "allow-same-origin",
+        "allow-popups",
+        "allow-popups-to-escape-sandbox",
+        "allow-forms",
+        "allow-modals",
+        "allow-downloads",
+        "allow-presentation"
+      );
   } catch {
     // ignore
   }
