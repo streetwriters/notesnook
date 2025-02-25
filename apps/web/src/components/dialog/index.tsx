@@ -232,6 +232,7 @@ function onAfterOpen(
   e: ReactModal.OnAfterOpenCallbackOptions | undefined,
   props: DialogProps
 ) {
+  if (props.onOpen) props.onOpen();
   if (!props.onClose || !e) return;
   // we need this work around because ReactModal content spreads over the overlay
   const child = e.contentEl.firstElementChild as HTMLElement;
@@ -248,5 +249,4 @@ function onAfterOpen(
       if (props.onClose) props.onClose();
     }
   };
-  if (props.onOpen) props.onOpen();
 }

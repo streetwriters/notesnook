@@ -147,12 +147,7 @@ export const FeatureDialog = DialogManager.register(function FeatureDialog(
 ) {
   const { featureName, onClose } = props;
   const feature = features[featureName];
-
-  useEffect(() => {
-    if (!feature || (feature.shouldShow && !feature.shouldShow())) {
-      onClose(false);
-    }
-  }, [feature, onClose]);
+  const isShown = feature && feature.shouldShow && feature.shouldShow();
 
   return (
     <Dialog
@@ -160,6 +155,9 @@ export const FeatureDialog = DialogManager.register(function FeatureDialog(
       title={feature.title}
       description={feature.subtitle}
       textAlignment="center"
+      onOpen={() => {
+        if (!isShown) onClose(false);
+      }}
       positiveButton={{
         text: (
           <Flex>
