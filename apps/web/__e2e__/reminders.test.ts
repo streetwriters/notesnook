@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Reminder } from "@notesnook/core";
 import { test, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
+import { getTestId } from "./utils";
 
 const ONE_TIME_REMINDER: Partial<Reminder> = {
   title: "Test reminder 1",
@@ -190,4 +191,27 @@ test("editing a weekly recurring reminder should not revert it to daily", async 
   expect(await reminder?.isPresent()).toBe(true);
   expect(await reminder?.getRecurringMode()).toBe("Weekly");
   expect(await reminder?.getDescription()).toBe("An edited reminder");
+});
+
+test("adding a reminder via note context menu should show reference in edit dialog", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note = await notes.createNote({
+    title: "Test note",
+    content: "I am a note"
+  });
+
+  await note?.contextMenu.addReminder(ONE_TIME_REMINDER);
+  const reminders = await app.goToReminders();
+  const reminder = await reminders.findReminder({
+    title: ONE_TIME_REMINDER.title
+  });
+  await reminder?.open();
+
+  const noteReferences = page.locator(getTestId("reminder-note-references"));
+  await noteReferences.waitFor({ state: "visible" });
+  expect(noteReferences.getByText("Test note")).toBeVisible();
 });
