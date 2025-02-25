@@ -21,6 +21,7 @@ import { EditorOptions, Editor as TiptapEditor } from "@tiptap/core";
 import { DependencyList, useEffect, useMemo, useRef, useState } from "react";
 import { Editor } from "../types.js";
 import { useToolbarStore } from "../toolbar/stores/toolbar-store.js";
+import { EditorView } from "@tiptap/pm/view";
 
 function useForceUpdate() {
   const [, setValue] = useState(0);
@@ -46,7 +47,8 @@ export const useEditor = (
       editor.options = { ...editor.options, ...options };
       options.onBeforeCreate?.({ editor });
       const oldIsFocused = editor.isFocused;
-      editor.view.destroy();
+
+      destroyView(editor.view);
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore instead of creating a new editor, we just create
       // a new view. Due to some reason this is faster than resetting
@@ -78,7 +80,7 @@ export const useEditor = (
 
   useEffect(() => {
     return () => {
-      editor.view.destroy();
+      destroyView(editor.view);
       editor.destroy();
     };
   }, [editor]);
@@ -107,3 +109,15 @@ export const useEditor = (
 
   return editor;
 };
+
+function destroyView(view: EditorView) {
+  // we override all the methods to prevent any further interaction with the
+  // editor, otherwise we'll get errors.
+  view.dispatch = () => {};
+  view.update = () => {};
+  view.updateState = () => {};
+  view.updateRoot = () => {};
+  view.dispatchEvent = () => {};
+  view.setProps = () => {};
+  view.destroy();
+}
