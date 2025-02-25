@@ -189,7 +189,7 @@ export const AttachmentsDialog = DialogManager.register(
               overflow: "hidden"
             }}
           >
-            <FlexScrollContainer>
+            <FlexScrollContainer style={{ minHeight: 300 }}>
               <Flex sx={{ justifyContent: "space-between" }}>
                 <Flex sx={{ gap: 1 }}>
                   {TOOLBAR_ACTIONS.map((tool) => (
