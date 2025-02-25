@@ -44,6 +44,7 @@ import { showUpdateAvailableNotice } from "../../dialogs/confirm";
 import { strings } from "@notesnook/intl";
 import { useVault } from "../../hooks/use-vault";
 import { useKeyStore } from "../../interfaces/key-store";
+import { STATUS_BAR_HEIGHT } from "../../common/constants";
 
 function StatusBar() {
   const user = useUserStore((state) => state.user);
@@ -64,7 +65,7 @@ function StatusBar() {
         justifyContent: "space-between",
         display: ["none", "flex", "flex"],
         flexShrink: 0,
-        height: 24
+        height: STATUS_BAR_HEIGHT
       }}
       px={2}
     >

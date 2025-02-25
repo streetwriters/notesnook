@@ -46,6 +46,7 @@ import { AppEventManager, AppEvents } from "./common/app-events";
 import { TITLE_BAR_HEIGHT } from "./components/title-bar";
 import { getFontSizes } from "@notesnook/theme/theme/font/fontsize.js";
 import { useWindowControls } from "./hooks/use-window-controls";
+import { STATUS_BAR_HEIGHT } from "./common/constants";
 
 new WebExtensionRelay();
 
@@ -130,7 +131,10 @@ function App() {
         ) : (
           <DesktopAppContents setShow={setShow} show={show} />
         )}
-        <Toaster containerClassName="toasts-container" />
+        <Toaster
+          containerClassName="toasts-container"
+          containerStyle={{ bottom: STATUS_BAR_HEIGHT + 10 }}
+        />
       </Flex>
     </>
   );
