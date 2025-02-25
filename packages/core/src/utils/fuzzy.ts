@@ -20,9 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { match, surround } from "fuzzyjs";
 import { clone } from "./clone";
 
-export function fuzzy<T extends { id: string }>(
+export function fuzzy<T>(
   query: string,
   items: T[],
+  getIdentifier: (item: T) => string,
   fields: Partial<Record<keyof T, number>>,
   options: {
     limit?: number;
@@ -41,11 +42,13 @@ export function fuzzy<T extends { id: string }>(
   for (const item of items) {
     if (options.limit && results.size >= options.limit) break;
 
+    const identifier = getIdentifier(item);
+
     for (const field in fields) {
       const result = match(query, `${item[field]}`);
       if (!result.match) continue;
 
-      const oldMatch = results.get(item.id);
+      const oldMatch = results.get(identifier);
       const clonedItem = oldMatch?.item || clone(item);
 
       if (options.suffix || options.prefix) {
@@ -58,7 +61,7 @@ export function fuzzy<T extends { id: string }>(
       if (oldMatch) {
         oldMatch.score += result.score * (fields[field] || 1);
       } else {
-        results.set(item.id, {
+        results.set(identifier, {
           item: clonedItem,
           score: result.score * (fields[field] || 1)
         });
