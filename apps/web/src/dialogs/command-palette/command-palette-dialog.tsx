@@ -69,10 +69,9 @@ export const CommandPaletteDialog = DialogManager.register(
 
     const commands = usePromise(async () => {
       select(0);
-      if (!defaultCommands.current)
-        defaultCommands.current = await getDefaultCommands();
+      defaultCommands.current = await getDefaultCommands();
       const commands = props.isCommandMode
-        ? commandSearch(query, defaultCommands.current)
+        ? sortCommands(commandSearch(query, defaultCommands.current))
         : await dbSearch(query);
       const groups = commands.reduce(
         (acc, command) => {
@@ -120,6 +119,7 @@ export const CommandPaletteDialog = DialogManager.register(
             if (e.key == "Enter") {
               e.preventDefault();
               const command = commands.value.commands[selected];
+              if (!command) return;
               command.action?.(command, {
                 openInNewTab: e.ctrlKey || e.metaKey
               });
@@ -350,6 +350,7 @@ function commandSearch(query: string, commands: Command[]) {
   return fuzzy(
     query,
     commands,
+    (command) => command.id + command.group,
     {
       title: 10,
       group: 5
@@ -419,6 +420,7 @@ function useDatabaseFuzzySearch() {
         for (const item of fuzzy(
           query,
           items,
+          (item) => item.id,
           {
             title: 10
           },
@@ -528,4 +530,28 @@ function getCommandPaletteHelp(isCommandMode: boolean) {
           }
         ])
   ];
+}
+
+/**
+ * commands need to be sorted wrt groups,
+ * meaning commands of same group should be next to each other,
+ * and recent commands should be at the top
+ */
+function sortCommands(commands: Command[]) {
+  const recent: Command[] = [];
+  const sortedWrtGroups: Command[][] = [];
+  for (const command of commands) {
+    const group = command.group;
+    if (group === "recent") {
+      recent.push(command);
+      continue;
+    }
+    const index = sortedWrtGroups.findIndex((c) => c[0].group === group);
+    if (index === -1) {
+      sortedWrtGroups.push([command]);
+    } else {
+      sortedWrtGroups[index].push(command);
+    }
+  }
+  return recent.concat(sortedWrtGroups.flat());
 }
