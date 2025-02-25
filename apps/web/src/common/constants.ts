@@ -25,3 +25,5 @@ export const SUBSCRIPTION_STATUS = {
   PREMIUM_EXPIRED: 6,
   PREMIUM_CANCELED: 7
 } as const;
+
+export const STATUS_BAR_HEIGHT = 24 as const;
