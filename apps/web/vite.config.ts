@@ -38,7 +38,7 @@ const gitHash = (() => {
   }
 })();
 const appVersion = version.replaceAll(".", "").replace("-beta", "");
-const isBeta = version.endsWith("-beta");
+const isBeta = process.env.BETA === "true";
 const isTesting =
   process.env.TEST === "true" || process.env.NODE_ENV === "development";
 const isDesktop = process.env.PLATFORM === "desktop";

@@ -384,7 +384,6 @@ export const strings = {
       other: `v${version} has been released`
     }),
   readReleaseNotes: () => t`Read full release notes on Github`,
-  beta: () => t`BETA`,
   settings: () => t`Settings`,
   notLoggedIn: () => t`Not logged in`,
   never: () => t`Never`,
@@ -2434,5 +2433,9 @@ Use this if changes from other devices are not appearing on this device. This wi
   actionsForNotebook: (title: string) => t`Actions for notebook: ${title}`,
   actionsForTag: (title: string) => t`Actions for tag: ${title}`,
   recents: () => t`Recents`,
-  removeFromRecents: () => t`Remove from recents`
+  removeFromRecents: () => t`Remove from recents`,
+  releaseTrack: () => t`Release track`,
+  releaseTrackDesc: () => t`Select the release track for Notesnook.`,
+  stable: () => t`Stable`,
+  beta: () => t`Beta`
 };
