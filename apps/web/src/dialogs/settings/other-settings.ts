@@ -74,6 +74,43 @@ export const AboutSettings: SettingsGroup[] = [
         }
       },
       {
+        key: "release-track",
+        title: strings.releaseTrack(),
+        description: strings.releaseTrackDesc(),
+        components: [
+          {
+            type: "dropdown",
+            options: [
+              {
+                title: strings.stable(),
+                value: "stable"
+              },
+              {
+                title: strings.beta(),
+                value: "beta"
+              }
+            ],
+            selectedOption: () => {
+              return (
+                document.cookie
+                  .split("; ")
+                  .find((row) => row.startsWith("release-track="))
+                  ?.split("=")[1] || "stable"
+              );
+            },
+            async onSelectionChanged(value) {
+              document.cookie = `release-track=${value}; Secure`;
+              const registrations =
+                (await navigator.serviceWorker?.getRegistrations()) || [];
+              for (const registration of registrations) {
+                await registration.unregister();
+              }
+              window.location.reload();
+            }
+          }
+        ]
+      },
+      {
         key: "source-code",
         title: strings.sourceCode(),
         description: strings.sourceCodeDescription(),
