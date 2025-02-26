@@ -73,6 +73,9 @@ const ProfilePicPlaceholder = (props) => {
 };
 
 const onChangePicture = () => {
+  useUserStore.setState({
+    disableAppLockRequests: true
+  });
   const theme =
     useThemeStore.getState().colorScheme === "dark"
       ? useThemeStore.getState().darkTheme
@@ -93,15 +96,23 @@ const onChangePicture = () => {
     cropperToolbarTitle: strings.editProfilePicture(),
     cropperActiveWidgetColor: theme.scopes.base.primary.accent,
     cropperToolbarWidgetColor: theme.scopes.base.primary.icon
-  }).then(async (image) => {
-    if (!image.data) return;
-    await db.settings.setProfile({
-      profilePicture: "data:image/jpeg;base64," + image.data
+  })
+    .then(async (image) => {
+      if (!image.data) return;
+      await db.settings.setProfile({
+        profilePicture: "data:image/jpeg;base64," + image.data
+      });
+      useUserStore.setState({
+        profile: db.settings.getProfile()
+      });
+    })
+    .finally(() => {
+      setTimeout(() => {
+        useUserStore.setState({
+          disableAppLockRequests: false
+        });
+      }, 1000);
     });
-    useUserStore.setState({
-      profile: db.settings.getProfile()
-    });
-  });
 };
 
 const SettingsUserSection = ({ item }) => {

@@ -210,7 +210,6 @@ export const SelectionHeader = React.memo(
                     {
                       title: strings.manageTags(),
                       onPress: async () => {
-                        await sleep(100);
                         ManageTagsSheet.present(selectedItemsList);
                       },
                       visible: type === "note",
@@ -219,17 +218,17 @@ export const SelectionHeader = React.memo(
                     {
                       title: strings.export(),
                       onPress: async () => {
-                        await sleep(100);
                         ExportNotesSheet.present(selectedItemsList);
                       },
                       visible: type === "note",
                       icon: "export"
                     },
                     {
-                      title: strings.linkNotebook(),
+                      title: strings.addToNotebook(),
                       onPress: async () => {
-                        await sleep(100);
-                        // MoveNoteSheet.present();
+                        Navigation.navigate("LinkNotebooks", {
+                          noteIds: selectedItemsList
+                        });
                       },
                       visible: type === "note",
                       icon: "plus"

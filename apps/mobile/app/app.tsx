@@ -42,6 +42,7 @@ import { TipManager } from "./services/tip-manager";
 import { changeSystemBarColors, useThemeStore } from "./stores/use-theme-store";
 import { useUserStore } from "./stores/use-user-store";
 import RNBootSplash from "react-native-bootsplash";
+import AppLocked from "./components/app-lock";
 
 I18nManager.allowRTL(false);
 I18nManager.forceRTL(false);
@@ -88,6 +89,7 @@ const App = (props: { configureMode: "note-preview" }) => {
           <Toast />
         </ScopedThemeProvider>
         <DialogProvider />
+        <AppLocked />
       </GestureHandlerRootView>
     </SafeAreaProvider>
   );

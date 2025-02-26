@@ -2456,5 +2456,8 @@ Use this if changes from other devices are not appearing on this device. This wi
   used: () => t`used`,
   editProfile: () => t`Edit profile`,
   linkNotes: () => t`Link notes`,
-  linkingNotesTo: (title: string) => t`Select notes to link to "${title}"`
+  linkingNotesTo: (title: string) => t`Select notes to link to "${title}"`,
+  addToNotebook: () => t`Add to notebook`,
+  notebookAdded: () => t`Notebook added`,
+  addNotes: () => t`Add notes`
 };

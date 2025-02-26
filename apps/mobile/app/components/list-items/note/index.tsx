@@ -53,6 +53,7 @@ import { TimeSince } from "../../ui/time-since";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import dayjs from "dayjs";
+import { useRoute } from "@react-navigation/native";
 
 type NoteItemProps = {
   item: Note | BaseTrashItem<Note>;
@@ -80,6 +81,7 @@ const NoteItem = ({
   locked,
   noOpen = false
 }: NoteItemProps) => {
+  const route = useRoute();
   const isEditingNote = useTabStore(
     (state) =>
       state.tabs.find((t) => t.id === state.currentTab)?.session?.noteId ===
@@ -93,7 +95,6 @@ const NoteItem = ({
   const primaryColors = isEditingNote ? colors.selected : colors.primary;
   const selectionMode = useSelectionStore((state) => state.selectionMode);
   const [selected] = useIsSelected(item);
-
   return (
     <>
       <View
@@ -264,6 +265,7 @@ const NoteItem = ({
                 {notebooks?.items
                   ?.filter(
                     (item) =>
+                      route.name !== "Notebook" ||
                       item.id !== useNavigationStore.getState().focusedRouteId
                   )
                   .map((item) => (
