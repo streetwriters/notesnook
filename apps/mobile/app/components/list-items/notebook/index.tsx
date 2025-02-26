@@ -34,6 +34,7 @@ import AppIcon from "../../ui/AppIcon";
 import { IconButton } from "../../ui/icon-button";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 type NotebookItemProps = {
   item: Notebook | BaseTrashItem<Notebook>;
@@ -104,7 +105,7 @@ export const NotebookItem = ({
               flexDirection: "row",
               justifyContent: "flex-start",
               alignItems: "center",
-              marginTop: 5,
+              marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL,
               height: AppFontSize.md + 2
             }}
           >

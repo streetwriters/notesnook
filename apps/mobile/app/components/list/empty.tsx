@@ -24,7 +24,7 @@ import { notesnook } from "../../../e2e/test.ids";
 import { TTip, useTip } from "../../services/tip-manager";
 import { RouteParams } from "../../stores/use-navigation-store";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { AppFontSize, defaultBorderRadius } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { Tip } from "../tip";
 import { Button } from "../ui/button";
 import Seperator from "../ui/seperator";
@@ -102,9 +102,7 @@ export const Empty = React.memo(function Empty({
               icon="arrow-right"
               onPress={placeholder?.action}
               style={{
-                alignSelf: "flex-start",
-                borderRadius: defaultBorderRadius,
-                height: 40
+                alignSelf: "flex-start"
               }}
             />
           )}

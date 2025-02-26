@@ -38,6 +38,7 @@ import Seperator from "../ui/seperator";
 import Paragraph from "../ui/typography/paragraph";
 import NotePreview from "./preview";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 
 const HistoryItem = ({
   index,
@@ -88,9 +89,9 @@ const HistoryItem = ({
       style={{
         justifyContent: "space-between",
         alignItems: "center",
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         height: 45,
-        marginBottom: 10,
+        marginBottom: DefaultAppStyles.GAP_VERTICAL,
         flexDirection: "row"
       }}
     >
@@ -148,7 +149,7 @@ export default function NoteHistory({
 
       <View
         style={{
-          paddingHorizontal: 12,
+          paddingHorizontal: DefaultAppStyles.GAP,
           height: !history?.placeholders.length
             ? 300
             : (history.placeholders.length + 1) * 55,

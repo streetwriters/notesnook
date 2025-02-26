@@ -146,7 +146,7 @@ function _MenuItem({
         paddingHorizontal: DefaultAppStyles.GAP_SMALL,
         justifyContent: "space-between",
         alignItems: "center",
-        paddingVertical: DefaultAppStyles.GAP_VERTICAL
+        paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
       }}
     >
       <View

@@ -49,6 +49,7 @@ import { Pressable } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 async function updateInitialSelectionState(items: string[]) {
   const relations = await db.relations
@@ -242,7 +243,7 @@ const ManageTagsSheet = (props: {
       style={{
         width: "100%",
         alignSelf: "center",
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         maxHeight: dimensions.height * 0.85
       }}
     >
@@ -279,7 +280,7 @@ const ManageTagsSheet = (props: {
             flexDirection: "row",
             marginVertical: 5,
             justifyContent: "space-between",
-            padding: 12
+            padding: DefaultAppStyles.GAP
           }}
           onPress={onSubmit}
           type="selected"

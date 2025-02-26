@@ -41,6 +41,7 @@ import {
   Note
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 type ReminderSheetProps = {
   actionSheetRef: RefObject<ActionSheetRef>;
@@ -102,7 +103,7 @@ export default function ReminderNotify({
       style={{
         justifyContent: "center",
         alignItems: "center",
-        paddingHorizontal: 12
+        paddingHorizontal: DefaultAppStyles.GAP
       }}
     >
       <Heading>{reminder?.title}</Heading>
@@ -112,7 +113,7 @@ export default function ReminderNotify({
         style={{
           height: 40,
           borderRadius: 100,
-          paddingHorizontal: 12,
+          paddingHorizontal: DefaultAppStyles.GAP,
           flexDirection: "row",
           alignItems: "center"
         }}
@@ -128,11 +129,11 @@ export default function ReminderNotify({
         horizontal={true}
         contentContainerStyle={{
           alignItems: "center",
-          paddingVertical: 10
+          paddingVertical: DefaultAppStyles.GAP_VERTICAL
         }}
         showsHorizontalScrollIndicator={false}
         style={{
-          marginTop: 10
+          marginTop: DefaultAppStyles.GAP_VERTICAL
         }}
       >
         <Paragraph size={AppFontSize.xs}>{strings.remindMeIn()}:</Paragraph>
@@ -161,15 +162,15 @@ export default function ReminderNotify({
                 : 500,
             borderTopWidth: 1,
             borderTopColor: colors.primary.border,
-            marginTop: 5,
-            paddingTop: 5
+            marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL,
+            paddingTop: DefaultAppStyles.GAP_VERTICAL_SMALL
           }}
         >
           <Paragraph
             style={{
               color: colors.secondary.paragraph,
               fontSize: AppFontSize.xs,
-              marginBottom: 10
+              marginBottom: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             {strings.referencedIn()}

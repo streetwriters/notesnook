@@ -42,6 +42,7 @@ import { IconButton } from "../icon-button";
 import Paragraph from "../typography/paragraph";
 import phone from "phone";
 import isURL from "validator/lib/isURL";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 interface InputProps extends TextInputProps {
   fwdRef?: RefObject<TextInput>;
@@ -97,7 +98,7 @@ const Input = ({
   onBlurInput,
   onPress,
   height = 45,
-  fontSize = AppFontSize.md,
+  fontSize = AppFontSize.sm,
   onFocusInput,
   buttons,
   marginRight,
@@ -222,9 +223,11 @@ const Input = ({
     justifyContent: "space-between",
     alignItems: "center",
     flexGrow: 1,
-    height: height || 50,
-    paddingHorizontal: 12,
-    paddingRight: buttons || button || secureTextEntry || error ? 6 : 12,
+    paddingHorizontal: DefaultAppStyles.GAP,
+    paddingRight:
+      buttons || button || secureTextEntry || error
+        ? DefaultAppStyles.GAP
+        : DefaultAppStyles.GAP,
     ...containerStyle
   };
 
@@ -233,11 +236,10 @@ const Input = ({
     fontSize: fontSize,
     color:
       onPress && loading ? colors.primary.accent : colors.primary.paragraph,
-    paddingVertical: 0,
-    paddingBottom: 2.5,
     flexGrow: 1,
-    height: height || 50,
     flexShrink: 1,
+    paddingBottom: DefaultAppStyles.GAP_VERTICAL - 2,
+    paddingTop: DefaultAppStyles.GAP_VERTICAL - 2,
     fontFamily: "OpenSans-Regular",
     ...(inputStyle as ViewStyle)
   };
@@ -247,10 +249,8 @@ const Input = ({
       <View
         importantForAccessibility="yes"
         style={{
-          height: height,
           marginBottom: marginBottom,
           flexGrow: flexGrow,
-          maxHeight: height,
           marginRight: marginRight,
           ...wrapperStyle
         }}
@@ -307,7 +307,7 @@ const Input = ({
                   marginLeft: 5
                 }}
                 color={
-                  secureEntry ? colors.primary.icon : colors.primary.accent
+                  secureEntry ? colors.secondary.icon : colors.primary.accent
                 }
               />
             )}
@@ -350,7 +350,7 @@ const Input = ({
                 position: "absolute",
                 backgroundColor: colors.secondary.background,
                 paddingVertical: 3,
-                paddingHorizontal: 5,
+                paddingHorizontal: DefaultAppStyles.GAP_SMALL / 2,
                 borderRadius: 2.5,
                 ...getElevationStyle(2),
                 top: 0

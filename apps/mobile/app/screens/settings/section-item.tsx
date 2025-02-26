@@ -26,6 +26,7 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, TextInput, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+//@ts-ignore
 import ToggleSwitch from "toggle-switch-react-native";
 import { IconButton } from "../../components/ui/icon-button";
 import Input from "../../components/ui/input";
@@ -239,7 +240,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                 });
                 item.inputProperties?.onSubmitEditing?.(text as any);
               }}
-              containerStyle={{ marginTop: 12 }}
+              containerStyle={{ marginTop: DefaultAppStyles.GAP_VERTICAL }}
               fwdRef={inputRef}
               onLayout={() => {
                 inputRef?.current?.setNativeProps({
@@ -258,7 +259,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                marginTop: 12
+                marginTop: DefaultAppStyles.GAP_VERTICAL
               }}
             >
               <IconButton
@@ -295,12 +296,17 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                 }}
                 keyboardType="decimal-pad"
                 containerStyle={{
-                  width: 65
+                  width: 60
+                }}
+                inputStyle={{
+                  width: 60,
+                  textAlign: "center"
                 }}
                 wrapperStyle={{
-                  maxWidth: 65,
+                  maxWidth: 60,
+                  flexGrow: 0,
                   marginBottom: 0,
-                  marginHorizontal: 6
+                  marginHorizontal: DefaultAppStyles.GAP_SMALL
                 }}
                 fwdRef={inputRef}
                 onLayout={() => {

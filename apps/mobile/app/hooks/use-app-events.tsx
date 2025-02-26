@@ -40,7 +40,6 @@ import {
   NativeModules,
   Platform
 } from "react-native";
-import RNBootSplash from "react-native-bootsplash";
 import { checkVersion } from "react-native-check-version";
 import Config from "react-native-config";
 import * as RNIap from "react-native-iap";
@@ -88,7 +87,6 @@ import { refreshAllStores } from "../stores/create-db-collection-store";
 import { useAttachmentStore } from "../stores/use-attachment-store";
 import { useMessageStore } from "../stores/use-message-store";
 import { useSettingStore } from "../stores/use-setting-store";
-import { changeSystemBarColors } from "../stores/use-theme-store";
 import { SyncStatus, useUserStore } from "../stores/use-user-store";
 import { updateStatusBarColor } from "../utils/colors";
 import { BETA } from "../utils/constants";
@@ -391,9 +389,6 @@ const IsDatabaseMigrationRequired = () => {
 const initializeDatabase = async (password?: string) => {
   if (useUserStore.getState().appLocked) return;
   if (!db.isInitialized) {
-    RNBootSplash.hide({ fade: false });
-    changeSystemBarColors();
-
     DatabaseLogger.info("Initializing database");
     try {
       await setupDatabase(password);
@@ -408,11 +403,11 @@ const initializeDatabase = async (password?: string) => {
   if (IsDatabaseMigrationRequired()) return;
 
   if (db.isInitialized) {
+    useSettingStore.getState().setAppLoading(false);
     Notifications.setupReminders(true);
     if (SettingsService.get().notifNotes) {
       Notifications.pinQuickNote(false);
     }
-    useSettingStore.getState().setAppLoading(false);
     DatabaseLogger.info("Database initialized");
   }
   Walkthrough.init();

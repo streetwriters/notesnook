@@ -166,10 +166,10 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
                 style={{
                   justifyContent: "flex-start",
                   borderWidth: 0,
-                  height: 30,
                   alignSelf: "flex-start",
                   backgroundColor: "transparent",
-                  paddingHorizontal: 0
+                  paddingHorizontal: 0,
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
                 }}
                 fontSize={AppFontSize.xs}
               />
@@ -177,12 +177,12 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
           </View>
 
           <DateMeta item={item} />
-          <Line bottom={0} />
+          <Line bottom={0} top={0} />
 
           {item.type === "note" ? (
             <>
               <Tags close={close} item={item} />
-              <Line bottom={0} />
+              <Line bottom={0} top={0} />
             </>
           ) : null}
           {item.type === "note" ? (

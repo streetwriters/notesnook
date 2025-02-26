@@ -30,6 +30,7 @@ import { AuthMode, initialAuthMode } from "./common";
 import { Login } from "./login";
 import { Signup } from "./signup";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
+import { DefaultAppStyles } from "../../utils/styles";
 
 const Auth = ({ navigation, route }) => {
   const [currentAuthMode, setCurrentAuthMode] = useState(
@@ -56,7 +57,7 @@ const Auth = ({ navigation, route }) => {
           style={{
             flexDirection: "row",
             alignItems: "center",
-            paddingHorizontal: 12,
+            paddingHorizontal: DefaultAppStyles.GAP,
             width: "100%",
             height: 50,
             justifyContent:
@@ -98,7 +99,7 @@ const Auth = ({ navigation, route }) => {
                 marginTop: 2
               }}
               style={{
-                paddingHorizontal: 6
+                paddingHorizontal: DefaultAppStyles.GAP_SMALL
               }}
             />
           )}

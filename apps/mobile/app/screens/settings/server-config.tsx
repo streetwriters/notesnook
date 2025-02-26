@@ -31,6 +31,7 @@ import { ToastManager } from "../../services/event-manager";
 import SettingsService from "../../services/settings";
 import { HostId, HostIds } from "../../stores/use-setting-store";
 import { useUserStore } from "../../stores/use-user-store";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const ServerIds = [
   "notesnook-sync",
@@ -98,9 +99,9 @@ export function ServersConfiguration() {
   return (
     <View
       style={{
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         gap: 12,
-        marginTop: 12
+        marginTop: DefaultAppStyles.GAP_VERTICAL
       }}
     >
       {isLoggedIn ? (
@@ -128,7 +129,7 @@ export function ServersConfiguration() {
         {error ? (
           <Paragraph
             style={{
-              paddingVertical: 12
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL
             }}
             color={colors.error.paragraph}
           >
@@ -139,14 +140,20 @@ export function ServersConfiguration() {
         {success === true ? (
           <Paragraph
             style={{
-              paddingVertical: 12
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL
             }}
             color={colors.success.paragraph}
           >
             {strings.connectedToServer()}
           </Paragraph>
         ) : null}
-        <View style={{ marginTop: 1, justifyContent: "flex-end", gap: 12 }}>
+        <View
+          style={{
+            marginTop: 1,
+            justifyContent: "flex-end",
+            gap: DefaultAppStyles.GAP_VERTICAL
+          }}
+        >
           <Button
             disabled={isLoggedIn}
             type="secondary"

@@ -50,6 +50,7 @@ import { IconButton } from "../../ui/icon-button";
 import Input from "../../ui/input";
 import Seperator from "../../ui/seperator";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 export const AppLockPassword = () => {
   const { colors } = useThemeColors();
@@ -128,7 +129,7 @@ export const AppLockPassword = () => {
 
         <View
           style={{
-            paddingHorizontal: 12
+            paddingHorizontal: DefaultAppStyles.GAP
           }}
         >
           {mode === "change" ? (

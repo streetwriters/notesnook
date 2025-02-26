@@ -94,6 +94,7 @@ export const SideMenu = React.memo(
           onIndexChange={setIndex}
           swipeEnabled={false}
           animationEnabled={false}
+          lazy
         />
       </SafeAreaView>
     );
@@ -399,3 +400,5 @@ const TabBar = (
     </View>
   );
 };
+
+export default SideMenu;

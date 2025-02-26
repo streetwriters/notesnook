@@ -1,11 +1,8 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import "@azure/core-asynciterator-polyfill";
-import '@formatjs/intl-locale/polyfill'
-import '@formatjs/intl-pluralrules/polyfill'
-
+import '@formatjs/intl-locale/polyfill-force'
+import '@formatjs/intl-pluralrules/polyfill-force'
 import '@formatjs/intl-pluralrules/locale-data/en'
-import '@formatjs/intl-pluralrules/locale-data/cs'
-import '@formatjs/intl-pluralrules/locale-data/fr'
 
 import 'react-native-url-polyfill/auto';
 import "./polyfills/console-time.js"

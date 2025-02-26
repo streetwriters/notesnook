@@ -299,11 +299,12 @@ export const UserSheet = () => {
             <Pressable
               key={item.title}
               style={{
-                paddingVertical: DefaultAppStyles.GAP_SMALL,
+                paddingVertical: DefaultAppStyles.GAP_VERTICAL,
                 alignItems: "center",
                 flexDirection: "row",
                 justifyContent: "flex-start",
                 gap: DefaultAppStyles.GAP_SMALL,
+                borderRadius: 0,
                 paddingHorizontal: DefaultAppStyles.GAP
               }}
               onPress={() => {

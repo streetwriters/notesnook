@@ -37,6 +37,7 @@ import Input from "../ui/input";
 import { Pressable } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { DefaultAppStyles } from "../../utils/styles";
 
 const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
   const { colors } = useThemeColors();
@@ -204,9 +205,9 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
               }}
               onSubmitEditing={onNext}
               caretHidden
+              height={60}
               inputStyle={{
                 fontSize: AppFontSize.lg,
-                height: 60,
                 textAlign: "center",
                 letterSpacing: 10,
                 width: 250
@@ -216,10 +217,12 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
               }
               enablesReturnKeyAutomatically
               containerStyle={{
-                height: 60,
                 borderWidth: 0,
                 width: undefined,
                 minWidth: "50%"
+              }}
+              wrapperStyle={{
+                height: 60
               }}
             />
 
@@ -229,9 +232,12 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
               width={250}
               loading={loading}
               onPress={onNext}
-              style={{
-                borderRadius: 100
-              }}
+            />
+            <Button
+              title={strings.cancel()}
+              type="secondaryAccented"
+              onPress={onCancel}
+              width={250}
             />
 
             <Button
@@ -240,13 +246,6 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
               ]()}
               type="plain"
               onPress={onRequestSecondaryMethod}
-              height={30}
-            />
-
-            <Button
-              title={strings.cancel()}
-              type="plain"
-              onPress={onCancel}
               height={30}
             />
           </>
@@ -262,8 +261,8 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
                   });
                 }}
                 style={{
-                  paddingHorizontal: 12,
-                  paddingVertical: 12,
+                  paddingHorizontal: DefaultAppStyles.GAP,
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL,
                   marginTop: 0,
                   flexDirection: "row",
                   borderRadius: 0,
@@ -275,8 +274,6 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
                 <IconButton
                   type="secondaryAccented"
                   style={{
-                    width: 40,
-                    height: 40,
                     marginRight: 10
                   }}
                   size={15}

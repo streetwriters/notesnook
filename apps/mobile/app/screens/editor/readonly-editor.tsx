@@ -36,6 +36,7 @@ import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { db } from "../../common/database";
 import { i18n } from "@lingui/core";
 import { defaultBorderRadius } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 
 const onShouldStartLoadWithRequest = (request: ShouldStartLoadRequest) => {
   if (request.url.includes("https")) {
@@ -206,7 +207,7 @@ export function ReadonlyEditor(props: {
           >
             <View
               style={{
-                paddingHorizontal: 12,
+                paddingHorizontal: DefaultAppStyles.GAP,
                 width: "100%",
                 alignItems: "flex-start"
               }}
@@ -224,7 +225,7 @@ export function ReadonlyEditor(props: {
                 style={{
                   height: 12,
                   width: "100%",
-                  marginTop: 10,
+                  marginTop: DefaultAppStyles.GAP_VERTICAL,
                   flexDirection: "row"
                 }}
               >
@@ -263,7 +264,7 @@ export function ReadonlyEditor(props: {
                   width: "100%",
                   backgroundColor: colors.secondary.background,
                   borderRadius: defaultBorderRadius,
-                  marginTop: 10
+                  marginTop: DefaultAppStyles.GAP_VERTICAL
                 }}
               />
 
@@ -273,7 +274,7 @@ export function ReadonlyEditor(props: {
                   width: "100%",
                   backgroundColor: colors.secondary.background,
                   borderRadius: defaultBorderRadius,
-                  marginTop: 10
+                  marginTop: DefaultAppStyles.GAP_VERTICAL
                 }}
               />
 
@@ -283,7 +284,7 @@ export function ReadonlyEditor(props: {
                   width: 200,
                   backgroundColor: colors.secondary.background,
                   borderRadius: defaultBorderRadius,
-                  marginTop: 10
+                  marginTop: DefaultAppStyles.GAP_VERTICAL
                 }}
               />
             </View>

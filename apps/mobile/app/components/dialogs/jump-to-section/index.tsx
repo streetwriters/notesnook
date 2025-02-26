@@ -43,6 +43,7 @@ import { AppFontSize } from "../../../utils/size";
 import BaseDialog from "../../dialog/base-dialog";
 import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 const JumpToSectionDialog = () => {
   const scrollRef = useRef<RefObject<FlatList>>();
@@ -152,7 +153,7 @@ const JumpToSectionDialog = () => {
           maxHeight: "65%",
           borderRadius: 10,
           alignSelf: "center",
-          padding: 10,
+          padding: DefaultAppStyles.GAP_SMALL,
           paddingTop: 30
         }}
       >
@@ -188,7 +189,7 @@ const JumpToSectionDialog = () => {
                     style={{
                       minWidth: "20%",
                       width: null,
-                      paddingHorizontal: 12,
+                      paddingHorizontal: DefaultAppStyles.GAP,
                       margin: 5,
                       borderRadius: 100,
                       height: 30,

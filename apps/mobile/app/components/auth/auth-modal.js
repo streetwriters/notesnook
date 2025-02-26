@@ -37,6 +37,7 @@ import { hideAuth, initialAuthMode } from "./common";
 import { Login } from "./login";
 import { Signup } from "./signup";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const AuthMode = {
   login: 0,
@@ -133,7 +134,7 @@ const AuthModal = () => {
           style={{
             flexDirection: "row",
             alignItems: "center",
-            paddingHorizontal: 12,
+            paddingHorizontal: DefaultAppStyles.GAP,
             width: "100%",
             height: 50,
             justifyContent:
@@ -167,7 +168,7 @@ const AuthModal = () => {
                 marginTop: 2
               }}
               style={{
-                paddingHorizontal: 6
+                paddingHorizontal: DefaultAppStyles.GAP_SMALL
               }}
             />
           )}

@@ -30,6 +30,7 @@ import { useDBItem } from "../../hooks/use-db-item";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { AppFontSize } from "../../utils/size";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const AttachmentGroupProgress = (props: { groupId?: string }) => {
   const { colors } = useThemeColors();
@@ -47,7 +48,7 @@ export const AttachmentGroupProgress = (props: { groupId?: string }) => {
         borderWidth: 1,
         borderColor: colors.primary.border,
         borderRadius: 10,
-        padding: 12,
+        padding: DefaultAppStyles.GAP,
         flexDirection: "row",
         gap: 10
       }}
@@ -55,7 +56,7 @@ export const AttachmentGroupProgress = (props: { groupId?: string }) => {
       <Icon name="download" size={AppFontSize.xxxl} />
       <View
         style={{
-          gap: 5,
+          gap: DefaultAppStyles.GAP_VERTICAL_SMALL,
           flex: 1
         }}
       >
@@ -68,7 +69,7 @@ export const AttachmentGroupProgress = (props: { groupId?: string }) => {
           <View
             style={{
               width: "100%",
-              marginTop: 10
+              marginTop: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             <ProgressBarComponent

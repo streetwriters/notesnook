@@ -109,7 +109,7 @@ const SelectionWrapper = ({
         paddingHorizontal: DefaultAppStyles.GAP,
         paddingVertical: compactMode ? 4 : DefaultAppStyles.GAP_VERTICAL,
         borderRadius: isSheet ? 10 : 0,
-        marginBottom: isSheet ? 12 : undefined
+        marginBottom: isSheet ? DefaultAppStyles.GAP_VERTICAL : undefined
       }}
     >
       {children}

@@ -37,6 +37,7 @@ import SheetProvider from "../../sheet-provider";
 import { Button } from "../../ui/button";
 import { PressableProps } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 type RelationsListProps = {
   actionSheetRef: RefObject<ActionSheetRef>;
@@ -95,7 +96,7 @@ export const RelationsList = ({
   }, [relationType, referenceType, item?.id, item?.type, updater]);
 
   return (
-    <View style={{ paddingHorizontal: 12, height: "100%" }}>
+    <View style={{ paddingHorizontal: DefaultAppStyles.GAP, height: "100%" }}>
       <SheetProvider context="local" />
       <DialogHeader
         title={title}

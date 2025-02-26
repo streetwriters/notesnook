@@ -56,6 +56,7 @@ import { IconButton } from "../../components/ui/icon-button";
 import { Pressable } from "../../components/ui/pressable";
 import { getColorLinearShade } from "../../utils/colors";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 
 const THEME_SERVER_URL = "https://themes-api.notesnook.com";
 //@ts-ignore
@@ -131,8 +132,8 @@ function ThemeSelector() {
           activeOpacity={0.9}
           style={{
             borderRadius: 10,
-            padding: 6,
-            marginBottom: 10,
+            padding: DefaultAppStyles.GAP_SMALL,
+            marginBottom: DefaultAppStyles.GAP_VERTICAL,
             flexShrink: 1,
             marginHorizontal: 10
           }}
@@ -144,7 +145,7 @@ function ThemeSelector() {
               height: 200,
               width: "100%",
               borderRadius: 10,
-              marginBottom: 10,
+              marginBottom: DefaultAppStyles.GAP_VERTICAL,
               overflow: "hidden",
               flexDirection: "row",
               justifyContent: "space-between",
@@ -156,7 +157,7 @@ function ThemeSelector() {
                 height: "100%",
                 width: "49.5%",
                 backgroundColor: colors.navigationMenu.background,
-                padding: 5,
+                padding: DefaultAppStyles.GAP_SMALL,
                 paddingVertical: 3,
                 borderRadius: defaultBorderRadius
               }}
@@ -251,7 +252,7 @@ function ThemeSelector() {
                 width: "100%",
                 alignItems: "flex-end",
                 justifyContent: "flex-end",
-                marginTop: 6,
+                marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL,
                 position: "absolute",
                 bottom: 6,
                 right: 6,
@@ -287,7 +288,7 @@ function ThemeSelector() {
                 }}
                 style={{
                   borderRadius: 100,
-                  paddingHorizontal: 12,
+                  paddingHorizontal: DefaultAppStyles.GAP,
                   alignSelf: "flex-end",
                   borderColor:
                     item.colorScheme === "dark"
@@ -346,9 +347,9 @@ function ThemeSelector() {
       >
         <View
           style={{
-            paddingHorizontal: 12,
-            marginBottom: 12,
-            paddingTop: 12
+            paddingHorizontal: DefaultAppStyles.GAP,
+            marginBottom: DefaultAppStyles.GAP_VERTICAL,
+            paddingTop: DefaultAppStyles.GAP_VERTICAL
           }}
         >
           <Input onChangeText={onSearch} placeholder={strings.searchThemes()} />
@@ -367,7 +368,11 @@ function ThemeSelector() {
             >
               <Button
                 height={30}
-                style={{ borderRadius: 100, minWidth: 60 }}
+                style={{
+                  borderRadius: 100,
+                  minWidth: 60,
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
+                }}
                 type={
                   colorScheme === "" || !colorScheme ? "accent" : "secondary"
                 }
@@ -378,7 +383,11 @@ function ThemeSelector() {
                 }}
               />
               <Button
-                style={{ borderRadius: 100, minWidth: 60 }}
+                style={{
+                  borderRadius: 100,
+                  minWidth: 60,
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
+                }}
                 height={30}
                 type={colorScheme === "dark" ? "accent" : "secondary"}
                 title={strings.dark()}
@@ -388,7 +397,11 @@ function ThemeSelector() {
                 }}
               />
               <Button
-                style={{ borderRadius: 100, minWidth: 60 }}
+                style={{
+                  borderRadius: 100,
+                  minWidth: 60,
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
+                }}
                 height={30}
                 fontSize={AppFontSize.xs}
                 type={colorScheme === "light" ? "accent" : "secondary"}
@@ -401,7 +414,11 @@ function ThemeSelector() {
 
             <Button
               title={strings.loadFromFile()}
-              style={{ borderRadius: 100, minWidth: 60 }}
+              style={{
+                borderRadius: 100,
+                minWidth: 60,
+                paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
+              }}
               height={30}
               type={"secondaryAccented"}
               icon="folder"
@@ -560,14 +577,15 @@ const ThemeSetter = ({
     <>
       <View
         style={{
-          paddingHorizontal: 12
+          paddingHorizontal: DefaultAppStyles.GAP
         }}
       >
         <View
           style={{
             borderRadius: 10,
-            marginBottom: 12,
-            padding: 12
+            marginBottom: DefaultAppStyles.GAP_VERTICAL,
+            paddingHorizontal: DefaultAppStyles.GAP,
+            paddingVertical: DefaultAppStyles.GAP_VERTICAL
           }}
         >
           <View
@@ -576,9 +594,9 @@ const ThemeSetter = ({
               justifyContent: "center",
               alignItems: "center",
               backgroundColor: colors?.accent + "20",
-              padding: 12,
+              padding: DefaultAppStyles.GAP,
               borderRadius: 15,
-              marginBottom: 12
+              marginBottom: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             <View
@@ -589,7 +607,7 @@ const ThemeSetter = ({
                 height: 200,
                 width: "100%",
                 borderRadius: 10,
-                marginBottom: 10,
+                marginBottom: DefaultAppStyles.GAP_VERTICAL,
                 overflow: "hidden",
                 flexDirection: "row",
                 justifyContent: "space-between",
@@ -602,7 +620,7 @@ const ThemeSetter = ({
                   height: "100%",
                   width: "49.5%",
                   backgroundColor: colors?.navigationMenu.background,
-                  padding: 5,
+                  padding: DefaultAppStyles.GAP_SMALL,
                   paddingVertical: 3,
                   borderRadius: defaultBorderRadius
                 }}
@@ -713,7 +731,7 @@ const ThemeSetter = ({
           </Paragraph>
           <View
             style={{
-              marginTop: 5,
+              marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL,
               flexDirection: "column",
               rowGap: 3
             }}
@@ -755,9 +773,9 @@ const ThemeSetter = ({
         {darkTheme.id === theme.id || lightTheme.id === theme.id ? (
           <Pressable
             onPress={applyTheme}
-            type="secondaryAccented"
+            type="accent"
             style={{
-              paddingVertical: 12
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             <Heading color={colors.accentForeground} size={AppFontSize.md}>
@@ -765,7 +783,7 @@ const ThemeSetter = ({
                 ? strings.appliedDark()
                 : strings.appliedLight()}
             </Heading>
-            <Paragraph size={AppFontSize.xs}>
+            <Paragraph color={colors.accentForeground} size={AppFontSize.xs}>
               ({strings.tapToApplyAgain()})
             </Paragraph>
           </Pressable>
@@ -773,7 +791,7 @@ const ThemeSetter = ({
           <Button
             style={{
               width: "100%",
-              marginBottom: 10
+              marginBottom: DefaultAppStyles.GAP_VERTICAL
             }}
             onPress={applyTheme}
             title={

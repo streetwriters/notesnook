@@ -348,7 +348,10 @@ const useLockedNoteHandler = () => {
       }),
       eSubscribeEvent(eUnlockWithPassword, onSubmit)
     ];
-    if (tabRef.current?.session?.locked && fluidTabsRef.current?.page() === 2) {
+    if (
+      tabRef.current?.session?.locked &&
+      fluidTabsRef.current?.page() === "editor"
+    ) {
       unlock();
     }
     return () => {

@@ -40,6 +40,7 @@ import { defaultBorderRadius, AppFontSize } from "../../utils/size";
 import { useEditor } from "./tiptap/use-editor";
 import { editorState } from "./tiptap/utils";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 
 const EditorOverlay = ({
   editorId = "",
@@ -199,7 +200,7 @@ const EditorOverlay = ({
 
         <View
           style={{
-            paddingHorizontal: 12,
+            paddingHorizontal: DefaultAppStyles.GAP,
             width: "100%",
             alignItems: "flex-start"
           }}
@@ -210,12 +211,12 @@ const EditorOverlay = ({
                 height: 30,
                 backgroundColor: colors.secondary.background,
                 borderRadius: 100,
-                marginBottom: 10,
+                marginBottom: DefaultAppStyles.GAP_VERTICAL,
                 justifyContent: "flex-start",
                 alignItems: "center",
                 flexDirection: "row",
-                paddingHorizontal: 10,
-                marginTop: 5,
+                paddingHorizontal: DefaultAppStyles.GAP,
+                marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL,
                 borderWidth: 1,
                 borderColor: colors.primary.border
               }}
@@ -248,7 +249,7 @@ const EditorOverlay = ({
             style={{
               height: 12,
               width: "100%",
-              marginTop: 10,
+              marginTop: DefaultAppStyles.GAP_VERTICAL,
               flexDirection: "row"
             }}
           >
@@ -287,7 +288,7 @@ const EditorOverlay = ({
               width: "100%",
               backgroundColor: colors.secondary.background,
               borderRadius: defaultBorderRadius,
-              marginTop: 10
+              marginTop: DefaultAppStyles.GAP_VERTICAL
             }}
           />
 
@@ -297,7 +298,7 @@ const EditorOverlay = ({
               width: "100%",
               backgroundColor: colors.secondary.background,
               borderRadius: defaultBorderRadius,
-              marginTop: 10
+              marginTop: DefaultAppStyles.GAP_VERTICAL
             }}
           />
 
@@ -307,7 +308,7 @@ const EditorOverlay = ({
               width: 200,
               backgroundColor: colors.secondary.background,
               borderRadius: defaultBorderRadius,
-              marginTop: 10
+              marginTop: DefaultAppStyles.GAP_VERTICAL
             }}
           />
 
@@ -316,7 +317,7 @@ const EditorOverlay = ({
               <Button
                 type="error"
                 style={{
-                  marginTop: 20,
+                  marginTop: DefaultAppStyles.GAP,
                   alignSelf: "flex-start",
                   borderRadius: 100,
                   height: 40
@@ -334,7 +335,7 @@ const EditorOverlay = ({
                 color={colors.secondary.paragraph}
                 style={{
                   maxWidth: "100%",
-                  marginTop: 5
+                  marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL
                 }}
               >
                 {strings.editorFailedToLoad()}

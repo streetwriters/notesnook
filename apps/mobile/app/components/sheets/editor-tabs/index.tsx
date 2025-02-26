@@ -37,6 +37,7 @@ import { IconButton } from "../../ui/icon-button";
 import { Pressable } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 const TabItemComponent = (props: {
   tab: TabItem;
@@ -202,7 +203,7 @@ export default function EditorTabs({
   return (
     <View
       style={{
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         gap: 12,
         maxHeight: "100%"
       }}

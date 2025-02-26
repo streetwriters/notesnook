@@ -31,6 +31,7 @@ import {
 } from "../../../screens/editor/tiptap/utils";
 import { FlatList } from "react-native-actions-sheet";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 type TableOfContentsItem = {
   level: number;
@@ -99,9 +100,9 @@ const TableOfContents = ({ toc, close }: TableOfContentsProps) => {
   return (
     <View
       style={{
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         gap: 12,
-        paddingTop: 12
+        paddingTop: DefaultAppStyles.GAP_VERTICAL
       }}
     >
       <View

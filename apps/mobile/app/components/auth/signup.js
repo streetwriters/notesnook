@@ -36,6 +36,7 @@ import Input from "../ui/input";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { hideAuth } from "./common";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const Signup = ({ changeMode, trial }) => {
   const { colors } = useThemeColors();
@@ -110,7 +111,7 @@ export const Signup = ({ changeMode, trial }) => {
         <View
           style={{
             justifyContent: "flex-end",
-            paddingHorizontal: 20,
+            paddingHorizontal: DefaultAppStyles.GAP,
             backgroundColor: colors.secondary.background,
             marginBottom: 20,
             borderBottomWidth: 0.8,
@@ -152,7 +153,7 @@ export const Signup = ({ changeMode, trial }) => {
             extraBold
             style={{
               marginBottom: 25,
-              marginTop: 10
+              marginTop: DefaultAppStyles.GAP_VERTICAL
             }}
             size={AppFontSize.xxl}
           >
@@ -163,7 +164,7 @@ export const Signup = ({ changeMode, trial }) => {
         <View
           style={{
             width: DDS.isTab ? "50%" : "100%",
-            paddingHorizontal: 20,
+            paddingHorizontal: DefaultAppStyles.GAP,
             backgroundColor: colors.primary.background,
             alignSelf: "center"
           }}
@@ -232,12 +233,12 @@ export const Signup = ({ changeMode, trial }) => {
             style={{
               marginBottom: 25
             }}
-            size={AppFontSize.xs}
+            size={AppFontSize.xxs}
             color={colors.secondary.paragraph}
           >
             {strings.signupAgreement[0]()}
             <Paragraph
-              size={AppFontSize.xs}
+              size={AppFontSize.xxs}
               onPress={() => {
                 openLinkInBrowser("https://notesnook.com/tos", colors);
               }}
@@ -251,7 +252,7 @@ export const Signup = ({ changeMode, trial }) => {
             </Paragraph>{" "}
             {strings.signupAgreement[2]()}
             <Paragraph
-              size={AppFontSize.xs}
+              size={AppFontSize.xxs}
               onPress={() => {
                 openLinkInBrowser("https://notesnook.com/privacy", colors);
               }}
@@ -271,7 +272,6 @@ export const Signup = ({ changeMode, trial }) => {
             type="accent"
             loading={loading}
             onPress={signup}
-            fontSize={AppFontSize.md}
             style={{
               width: 250
             }}
@@ -285,17 +285,14 @@ export const Signup = ({ changeMode, trial }) => {
             activeOpacity={0.8}
             style={{
               alignSelf: "center",
-              marginTop: 12,
-              paddingVertical: 12
+              marginTop: DefaultAppStyles.GAP_VERTICAL,
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL
             }}
           >
-            <Paragraph
-              size={AppFontSize.xs + 1}
-              color={colors.secondary.paragraph}
-            >
+            <Paragraph size={AppFontSize.xs} color={colors.secondary.paragraph}>
               {strings.alreadyHaveAccount()}{" "}
               <Paragraph
-                size={AppFontSize.xs + 1}
+                size={AppFontSize.xs}
                 style={{ color: colors.primary.accent }}
               >
                 {strings.login()}

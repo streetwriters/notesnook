@@ -33,6 +33,7 @@ import { IconButton } from "../../ui/icon-button";
 import { Notice } from "../../ui/notice";
 import Paragraph from "../../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 export default function AttachImage({
   response,
@@ -50,21 +51,26 @@ export default function AttachImage({
     <View
       style={{
         alignItems: "center",
-        paddingHorizontal: 12
+        paddingHorizontal: DefaultAppStyles.GAP
       }}
     >
       <View
         style={{
           backgroundColor: colors.secondary.background,
-          marginBottom: 12,
+          marginBottom: DefaultAppStyles.GAP_VERTICAL,
           height: 140,
           width: "100%",
           borderRadius: 10,
-          padding: 5,
-          paddingHorizontal: 12
+          padding: DefaultAppStyles.GAP_SMALL,
+          paddingHorizontal: DefaultAppStyles.GAP_SMALL
         }}
       >
-        <Paragraph style={{ color: colors.primary.paragraph, marginBottom: 6 }}>
+        <Paragraph
+          style={{
+            color: colors.primary.paragraph,
+            marginBottom: DefaultAppStyles.GAP_VERTICAL_SMALL
+          }}
+        >
           {strings.attachImageHeading(response?.length || 1)}
         </Paragraph>
         <ScrollView horizontal>
@@ -96,7 +102,7 @@ export default function AttachImage({
         style={{
           flexDirection: "row",
           alignSelf: "center",
-          marginBottom: 12,
+          marginBottom: DefaultAppStyles.GAP_VERTICAL,
           alignItems: "center",
           width: "100%"
         }}
@@ -135,7 +141,7 @@ export default function AttachImage({
           size="small"
           style={{
             width: "100%",
-            marginBottom: 12
+            marginBottom: DefaultAppStyles.GAP_VERTICAL
           }}
         />
       ) : (
@@ -145,7 +151,7 @@ export default function AttachImage({
           size="small"
           style={{
             width: "100%",
-            marginBottom: 12
+            marginBottom: DefaultAppStyles.GAP_VERTICAL
           }}
         />
       )}

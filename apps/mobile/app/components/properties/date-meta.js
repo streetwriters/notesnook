@@ -24,6 +24,7 @@ import { AppFontSize } from "../../utils/size";
 import Paragraph from "../ui/typography/paragraph";
 import { getFormattedDate } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 export const DateMeta = ({ item }) => {
   const { colors } = useThemeColors();
 
@@ -44,7 +45,7 @@ export const DateMeta = ({ item }) => {
         style={{
           flexDirection: "row",
           justifyContent: "space-between",
-          paddingVertical: 3
+          paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL / 2
         }}
       >
         <Paragraph size={AppFontSize.xs} color={colors.secondary.paragraph}>
@@ -59,11 +60,10 @@ export const DateMeta = ({ item }) => {
   return (
     <View
       style={{
-        paddingVertical: 5,
-        marginTop: 5,
         borderTopWidth: 1,
         borderTopColor: colors.primary.border,
-        paddingHorizontal: 12
+        paddingHorizontal: DefaultAppStyles.GAP,
+        paddingTop: DefaultAppStyles.GAP_VERTICAL_SMALL
       }}
     >
       {getDateMeta().map(renderItem)}

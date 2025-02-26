@@ -21,6 +21,7 @@ import React from "react";
 import { View } from "react-native";
 import { useThemeColors } from "@notesnook/theme";
 import { defaultBorderRadius } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const SettingsPlaceholder = () => {
   const { colors } = useThemeColors();
@@ -45,7 +46,7 @@ export const SettingsPlaceholder = () => {
           marginBottom: 20,
           flexDirection: "row",
           alignItems: "center",
-          paddingHorizontal: 16
+          paddingHorizontal: DefaultAppStyles.GAP
         }}
       >
         <View
@@ -86,7 +87,7 @@ export const SettingsPlaceholder = () => {
           marginBottom: 20,
           flexDirection: "row",
           alignItems: "center",
-          paddingHorizontal: 16,
+          paddingHorizontal: DefaultAppStyles.GAP,
           justifyContent: "space-between"
         }}
       >

@@ -25,6 +25,7 @@ import Paragraph from "../../components/ui/typography/paragraph";
 import { useThemeColors } from "@notesnook/theme";
 import { AppFontSize } from "../../utils/size";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const TitleFormat = () => {
   const [titleFormat] = useState(db.settings.getTitleFormat());
@@ -40,7 +41,7 @@ export const TitleFormat = () => {
         onChangeText={(text) => {
           db.settings.setTitleFormat(text);
         }}
-        containerStyle={{ marginTop: 6 }}
+        containerStyle={{ marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL }}
         onLayout={() => {
           inputRef?.current?.setNativeProps({
             text: titleFormat

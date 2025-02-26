@@ -40,6 +40,7 @@ import { Button } from "../../ui/button";
 import Input from "../../ui/input";
 import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 export const AddNotebookSheet = ({
   notebook,
@@ -125,7 +126,7 @@ export const AddNotebookSheet = ({
       style={{
         maxHeight: DDS.isTab ? "90%" : "97%",
         borderRadius: DDS.isTab ? 5 : 0,
-        paddingHorizontal: 12
+        paddingHorizontal: DefaultAppStyles.GAP
       }}
     >
       <Heading size={AppFontSize.lg}>
@@ -172,7 +173,7 @@ export const AddNotebookSheet = ({
         height={45}
         fontSize={AppFontSize.md}
         style={{
-          paddingHorizontal: 24,
+          paddingHorizontal: DefaultAppStyles.GAP * 2,
           width: "100%"
         }}
         onPress={onSaveChanges}

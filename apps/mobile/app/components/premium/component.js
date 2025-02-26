@@ -44,6 +44,7 @@ import { Walkthrough } from "../walkthroughs";
 import { features } from "./features";
 import { Group } from "./group";
 import { PricingPlans } from "./pricing-plans";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const Component = ({ close, promo }) => {
   const { colors } = useThemeColors();
@@ -175,7 +176,7 @@ export const Component = ({ close, promo }) => {
           key="description"
           size={AppFontSize.md}
           style={{
-            paddingHorizontal: 12,
+            paddingHorizontal: DefaultAppStyles.GAP,
             textAlign: "center",
             alignSelf: "center",
             paddingBottom: 20,
@@ -203,7 +204,7 @@ export const Component = ({ close, promo }) => {
             type="accent"
             width={250}
             style={{
-              paddingHorizontal: 12,
+              paddingHorizontal: DefaultAppStyles.GAP,
               marginBottom: 15,
               borderRadius: 100
             }}
@@ -219,7 +220,7 @@ export const Component = ({ close, promo }) => {
           type={userCanRequestTrial ? "secondaryAccented" : "accent"}
           width={250}
           style={{
-            paddingHorizontal: 12,
+            paddingHorizontal: DefaultAppStyles.GAP,
             marginBottom: 15,
             borderRadius: 100
           }}
@@ -232,7 +233,7 @@ export const Component = ({ close, promo }) => {
             style={{
               alignSelf: "center",
               textAlign: "center",
-              marginTop: 10,
+              marginTop: DefaultAppStyles.GAP_VERTICAL,
               maxWidth: "80%"
             }}
           >
@@ -254,7 +255,7 @@ export const Component = ({ close, promo }) => {
         <View
           key="plans"
           style={{
-            paddingHorizontal: 12
+            paddingHorizontal: DefaultAppStyles.GAP
           }}
         >
           <PricingPlans showTrialOption={false} promo={promo} />
@@ -269,7 +270,7 @@ export const Component = ({ close, promo }) => {
           }
           type="accent"
           style={{
-            paddingHorizontal: 24,
+            paddingHorizontal: DefaultAppStyles.GAP * 2,
             position: "absolute",
             borderRadius: 100,
             bottom: 30,
