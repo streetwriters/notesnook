@@ -19,7 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useThemeColors } from "@notesnook/theme";
 import React, { useRef } from "react";
-import { ColorValue, GestureResponderEvent, TextStyle } from "react-native";
+import {
+  ColorValue,
+  GestureResponderEvent,
+  TextStyle,
+  useWindowDimensions
+} from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { hexToRGBA, RGB_Linear_Shade } from "../../../utils/colors";
 import { AppFontSize } from "../../../utils/size";
@@ -59,6 +64,8 @@ export const IconButton = ({
 }: IconButtonProps) => {
   const { colors } = useThemeColors();
   const localRef = useRef(null);
+  const { fontScale } = useWindowDimensions();
+  const growFactor = 1 + (fontScale - 1) / 10;
 
   const _onLongPress = (event: GestureResponderEvent) => {
     if (onLongPress) {
@@ -85,11 +92,11 @@ export const IconButton = ({
       onLongPress={_onLongPress}
       type={type}
       style={{
-        width: 40,
-        height: 40,
         justifyContent: "center",
         alignItems: "center",
         borderRadius: 100,
+        width: 40 * growFactor,
+        height: 40 * growFactor,
         ...style
       }}
     >

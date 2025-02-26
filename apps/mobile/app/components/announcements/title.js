@@ -24,6 +24,7 @@ import { AppFontSize } from "../../utils/size";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import { getStyle } from "./functions";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const Title = ({ text, style = {}, inline }) => {
   const announcements = useMessageStore((state) => state.announcements);
@@ -36,13 +37,13 @@ export const Title = ({ text, style = {}, inline }) => {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        marginBottom: inline ? 5 : 0
+        marginBottom: inline ? DefaultAppStyles.GAP_VERTICAL_SMALL : 0
       }}
     >
       <Heading
         style={{
-          marginHorizontal: 12,
-          marginTop: 12,
+          marginHorizontal: DefaultAppStyles.GAP,
+          marginTop: DefaultAppStyles.GAP_VERTICAL,
           ...getStyle(style),
           textAlign: inline ? "left" : style?.textAlign,
           flexShrink: 1
@@ -80,9 +81,9 @@ export const Title = ({ text, style = {}, inline }) => {
   ) : (
     <Heading
       style={{
-        marginHorizontal: 12,
+        marginHorizontal: DefaultAppStyles.GAP,
         ...getStyle(style),
-        marginTop: style?.marginTop || 12
+        marginTop: style?.marginTop || DefaultAppStyles.GAP_VERTICAL
       }}
     >
       {text}

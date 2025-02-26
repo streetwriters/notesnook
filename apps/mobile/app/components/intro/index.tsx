@@ -30,6 +30,7 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import SettingsService from "../../services/settings";
 import { AuthMode } from "../auth/common";
+import { DefaultAppStyles } from "../../utils/styles";
 
 const Intro = () => {
   const { colors } = useThemeColors();
@@ -72,7 +73,7 @@ const Intro = () => {
         </View>
         <View
           style={{
-            marginTop: 10,
+            marginTop: DefaultAppStyles.GAP_VERTICAL,
             maxWidth: "90%",
             width: "100%"
           }}

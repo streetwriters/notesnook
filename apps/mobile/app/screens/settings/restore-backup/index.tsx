@@ -47,6 +47,7 @@ import SettingsService from "../../../services/settings";
 import { refreshAllStores } from "../../../stores/create-db-collection-store";
 import { useUserStore } from "../../../stores/use-user-store";
 import { AppFontSize } from "../../../utils/size";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 type PasswordOrKey = { password?: string; encryptionKey?: string };
 
@@ -412,7 +413,7 @@ export const RestoreBackup = () => {
                   <View
                     style={{
                       backgroundColor: colors.primary.background,
-                      marginBottom: 10
+                      marginBottom: DefaultAppStyles.GAP_VERTICAL
                     }}
                   >
                     <Heading
@@ -466,7 +467,7 @@ export const RestoreBackup = () => {
                   (item as ReactNativeBlobUtilStat).filename
                 }
                 style={{
-                  paddingHorizontal: 12
+                  paddingHorizontal: DefaultAppStyles.GAP
                 }}
                 ListFooterComponent={
                   <View
@@ -515,7 +516,7 @@ const BackupItem = ({
         flexDirection: "row",
         borderBottomWidth: 0.5,
         borderBottomColor: colors.primary.border,
-        paddingVertical: 12
+        paddingVertical: DefaultAppStyles.GAP_VERTICAL
       }}
     >
       <View>
@@ -534,7 +535,7 @@ const BackupItem = ({
         title="Restore"
         type="secondaryAccented"
         style={{
-          paddingHorizontal: 12,
+          paddingHorizontal: DefaultAppStyles.GAP,
           height: 35
         }}
         onPress={() => {

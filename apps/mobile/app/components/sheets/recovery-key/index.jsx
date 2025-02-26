@@ -44,6 +44,7 @@ import Seperator from "../../ui/seperator";
 import SheetWrapper from "../../ui/sheet";
 import { QRCode } from "../../ui/svg/lazy";
 import Paragraph from "../../ui/typography/paragraph";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 class RecoveryKeySheet extends React.Component {
   constructor(props) {
@@ -223,7 +224,7 @@ class RecoveryKeySheet extends React.Component {
             width: "100%",
             backgroundColor: colors.primary.background,
             justifyContent: "space-between",
-            paddingHorizontal: 12,
+            paddingHorizontal: DefaultAppStyles.GAP,
             borderRadius: 10,
             paddingTop: 10
           }}
@@ -236,8 +237,8 @@ class RecoveryKeySheet extends React.Component {
           <View
             style={{
               borderRadius: defaultBorderRadius,
-              padding: 12,
-              marginTop: 10
+              padding: DefaultAppStyles.GAP,
+              marginTop: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             <Paragraph

@@ -17,25 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as React from "react";
-import AppLockedScreen from "../components/app-lock-overlay";
-import Auth from "../components/auth";
-import Intro from "../components/intro";
 import { hideAllTooltips } from "../hooks/use-tooltip";
-import Favorites from "../screens/favorites";
-import Home from "../screens/home";
-import NotebookScreen from "../screens/notebook";
-import { ColoredNotes } from "../screens/notes/colored";
-import { Monographs } from "../screens/notes/monographs";
-import { TaggedNotes } from "../screens/notes/tagged";
-import Reminders from "../screens/reminders";
-import { Search } from "../screens/search";
-import Settings from "../screens/settings";
-import Trash from "../screens/trash";
 import SettingsService from "../services/settings";
 import useNavigationStore, {
   RouteParams
@@ -43,13 +29,19 @@ import useNavigationStore, {
 import { useSelectionStore } from "../stores/use-selection-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { fluidTabsRef, rootNavigatorRef } from "../utils/global-refs";
-import { FluidPanelsView } from "./fluid-panels-view";
-import LinkNotebooks from "../screens/link-notebooks";
-import { MoveNotebook } from "../screens/move-notebook";
-import { MoveNotes } from "../screens/move-notes";
 
 const RootStack = createNativeStackNavigator();
 const AppStack = createNativeStackNavigator();
+
+let Notes: any = null;
+let Notebook: any = null;
+let Search: any = null;
+let Favorites: any = null;
+let Trash: any = null;
+let Reminders: any = null;
+let Monographs: any = null;
+let TaggedNotes: any = null;
+let ColoredNotes: any = null;
 
 const AppNavigation = React.memo(
   () => {
@@ -72,29 +64,95 @@ const AppNavigation = React.memo(
           }
         }}
       >
-        <AppStack.Screen name="Notes" component={Home as any} />
-        <AppStack.Screen name="Favorites" component={Favorites as any} />
-        <AppStack.Screen name="Trash" component={Trash as any} />
-        <AppStack.Screen name="TaggedNotes" component={TaggedNotes as any} />
-        <AppStack.Screen name="ColoredNotes" component={ColoredNotes as any} />
-        <AppStack.Screen name="Reminders" component={Reminders as any} />
+        <AppStack.Screen
+          name="Notes"
+          getComponent={() => {
+            Notes = Notes || require("../screens/home").default;
+            return Notes;
+          }}
+        />
+
+        <AppStack.Screen
+          name="Favorites"
+          getComponent={() => {
+            Favorites = Favorites || require("../screens/favorites").default;
+            return Favorites;
+          }}
+        />
+
+        <AppStack.Screen
+          name="Trash"
+          getComponent={() => {
+            Trash = Trash || require("../screens/trash").default;
+            return Trash;
+          }}
+        />
+
+        <AppStack.Screen
+          name="TaggedNotes"
+          getComponent={() => {
+            TaggedNotes =
+              TaggedNotes || require("../screens/notes/tagged").default;
+            return TaggedNotes;
+          }}
+        />
+
+        <AppStack.Screen
+          name="ColoredNotes"
+          getComponent={() => {
+            ColoredNotes =
+              ColoredNotes || require("../screens/notes/colored").default;
+            return ColoredNotes;
+          }}
+        />
+
+        <AppStack.Screen
+          name="Reminders"
+          getComponent={() => {
+            Reminders = Reminders || require("../screens/reminders").default;
+            return Reminders;
+          }}
+        />
+
         <AppStack.Screen
           name="Monographs"
-          initialParams={{
-            item: { type: "monograph" },
-            canGoBack: false,
-            title: strings.monographs()
+          getComponent={() => {
+            Monographs =
+              Monographs || require("../screens/notes/monographs").default;
+            return Monographs;
           }}
-          component={Monographs as any}
         />
-        <AppStack.Screen name="Notebook" component={NotebookScreen as any} />
-        <AppStack.Screen name="Search" component={Search as any} />
+
+        <AppStack.Screen
+          name="Notebook"
+          getComponent={() => {
+            Notebook = Notebook || require("../screens/notebook").default;
+            return Notebook;
+          }}
+        />
+
+        <AppStack.Screen
+          name="Search"
+          getComponent={() => {
+            Search = Search || require("../screens/search").default;
+            return Search;
+          }}
+        />
       </AppStack.Navigator>
     );
   },
   () => true
 );
 AppNavigation.displayName = "AppNavigation";
+
+let Intro: any = null;
+let Auth: any = null;
+let FluidPanelsView: any = null;
+let AppLock: any = null;
+let LinkNotebooks: any = null;
+let MoveNotebook: any = null;
+let MoveNotes: any = null;
+let Settings: any = null;
 
 export const RootNavigation = () => {
   const introCompleted = useSettingStore(
@@ -125,17 +183,72 @@ export const RootNavigation = () => {
         }}
         initialRouteName={introCompleted ? "FluidPanelsView" : "Welcome"}
       >
-        <RootStack.Screen name="Welcome" component={Intro as any} />
-        <RootStack.Screen name="Auth" component={Auth as any} />
-        <RootStack.Screen name="FluidPanelsView" component={FluidPanelsView} />
-        <RootStack.Screen name="AppLock" component={AppLockedScreen} />
+        <RootStack.Screen
+          name="Welcome"
+          getComponent={() => {
+            Intro = Intro || require("../components/intro").default;
+            return Intro;
+          }}
+        />
+        <RootStack.Screen
+          name="Auth"
+          getComponent={() => {
+            Auth = Auth || require("../components/auth").default;
+            return Auth;
+          }}
+        />
+
+        <RootStack.Screen
+          name="FluidPanelsView"
+          getComponent={() => {
+            FluidPanelsView =
+              FluidPanelsView ||
+              require("../navigation/fluid-panels-view").default;
+            return FluidPanelsView;
+          }}
+        />
+
+        <RootStack.Screen
+          name="AppLock"
+          getComponent={() => {
+            AppLock = AppLock || require("../screens/app-lock").default;
+            return AppLock;
+          }}
+        />
+
         <RootStack.Screen
           name="LinkNotebooks"
-          component={LinkNotebooks as any}
+          getComponent={() => {
+            LinkNotebooks =
+              LinkNotebooks || require("../screens/link-notebooks").default;
+            return LinkNotebooks;
+          }}
         />
-        <RootStack.Screen name="MoveNotebook" component={MoveNotebook as any} />
-        <RootStack.Screen name="MoveNotes" component={MoveNotes as any} />
-        <AppStack.Screen name="Settings" component={Settings} />
+
+        <RootStack.Screen
+          name="MoveNotebook"
+          getComponent={() => {
+            MoveNotebook =
+              MoveNotebook || require("../screens/move-notebook").default;
+            return MoveNotebook;
+          }}
+        />
+
+        <RootStack.Screen
+          name="MoveNotes"
+          getComponent={() => {
+            MoveNotes = MoveNotes || require("../screens/move-notes").default;
+            return MoveNotes;
+          }}
+        />
+
+        <RootStack.Screen
+          name="Settings"
+          getComponent={() => {
+            Settings = Settings || require("../screens/settings").default;
+            return Settings;
+          }}
+        />
       </RootStack.Navigator>
     </NavigationContainer>
   );

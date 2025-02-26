@@ -34,6 +34,7 @@ import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { ProFeatures } from "./pro-features";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 const ResultDialog = () => {
   const { colors } = useThemeColors();
@@ -83,10 +84,10 @@ const ResultDialog = () => {
           style={{
             alignSelf: "center",
             textAlign: "center",
-            marginTop: 10,
+            marginTop: DefaultAppStyles.GAP_VERTICAL,
             maxWidth: "100%",
-            marginBottom: 10,
-            paddingHorizontal: 12
+            marginBottom: DefaultAppStyles.GAP_VERTICAL,
+            paddingHorizontal: DefaultAppStyles.GAP
           }}
         >
           {dialogData.title}
@@ -109,7 +110,7 @@ const ResultDialog = () => {
 
         <View
           style={{
-            paddingHorizontal: 12,
+            paddingHorizontal: DefaultAppStyles.GAP,
             alignItems: "center",
             width: "100%"
           }}
@@ -124,14 +125,14 @@ const ResultDialog = () => {
             width: "100%",
             borderBottomRightRadius: 10,
             borderBottomLeftRadius: 10,
-            paddingVertical: 10
+            paddingVertical: DefaultAppStyles.GAP_VERTICAL
           }}
         >
           <Button
             title={dialogData.button}
             width={null}
             style={{
-              paddingHorizontal: 12
+              paddingHorizontal: DefaultAppStyles.GAP
             }}
             onPress={close}
             fontSize={AppFontSize.md + 2}

@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { NativeModules, Platform } from "react-native";
+//@ts-ignore
 import { enabled } from "react-native-privacy-snapshot";
 import { MMKV } from "../common/database/mmkv";
 import {

@@ -50,6 +50,7 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { Walkthrough } from "../walkthroughs";
 import { PricingItem } from "./pricing-item";
+import { DefaultAppStyles } from "../../utils/styles";
 
 const UUID_PREFIX = "0bdaea";
 const UUID_VERSION = "4";
@@ -265,7 +266,7 @@ export const PricingPlans = ({
   return loading ? (
     <View
       style={{
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         justifyContent: "center",
         alignItems: "center",
         height: 100
@@ -276,7 +277,7 @@ export const PricingPlans = ({
   ) : (
     <View
       style={{
-        paddingHorizontal: 12
+        paddingHorizontal: DefaultAppStyles.GAP
       }}
     >
       {buying ? (
@@ -310,9 +311,9 @@ export const PricingPlans = ({
             type="accent"
             width={250}
             style={{
-              paddingHorizontal: 12,
-              marginBottom: 15,
-              marginTop: 15,
+              paddingHorizontal: DefaultAppStyles.GAP,
+              marginBottom: DefaultAppStyles.GAP,
+              marginTop: DefaultAppStyles.GAP,
               borderRadius: 100
             }}
           />
@@ -333,7 +334,7 @@ export const PricingPlans = ({
             type="secondaryAccented"
             width={250}
             style={{
-              paddingHorizontal: 12,
+              paddingHorizontal: DefaultAppStyles.GAP,
               marginBottom: 15
             }}
           />
@@ -504,7 +505,7 @@ export const PricingPlans = ({
                 <Button
                   height={35}
                   style={{
-                    marginTop: 10
+                    marginTop: DefaultAppStyles.GAP_VERTICAL
                   }}
                   onPress={() => {
                     presentDialog({
@@ -566,9 +567,9 @@ export const PricingPlans = ({
                     type="accent"
                     width={250}
                     style={{
-                      paddingHorizontal: 12,
+                      paddingHorizontal: DefaultAppStyles.GAP,
                       marginTop: product?.type === "promo" ? 0 : 30,
-                      marginBottom: 10
+                      marginBottom: DefaultAppStyles.GAP_VERTICAL
                     }}
                   />
                   {Platform.OS !== "ios" &&
@@ -613,7 +614,7 @@ export const PricingPlans = ({
                       setProduct(undefined);
                     }}
                     style={{
-                      marginTop: 5
+                      marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL
                     }}
                     height={30}
                     fontSize={13}
@@ -634,7 +635,7 @@ export const PricingPlans = ({
           style={{
             alignSelf: "center",
             textAlign: "center",
-            marginTop: 10,
+            marginTop: DefaultAppStyles.GAP_VERTICAL,
             maxWidth: "80%"
           }}
         >
@@ -656,7 +657,7 @@ export const PricingPlans = ({
               color={colors.secondary.paragraph}
               style={{
                 alignSelf: "center",
-                marginTop: 10,
+                marginTop: DefaultAppStyles.GAP_VERTICAL,
                 textAlign: "center"
               }}
             >
@@ -670,7 +671,7 @@ export const PricingPlans = ({
               color={colors.secondary.paragraph}
               style={{
                 alignSelf: "center",
-                marginTop: 10,
+                marginTop: DefaultAppStyles.GAP_VERTICAL,
                 textAlign: "center"
               }}
             >

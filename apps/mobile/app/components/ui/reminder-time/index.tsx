@@ -25,6 +25,7 @@ import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import { Button, ButtonProps } from "../button";
 import { getFormattedReminderTime } from "@notesnook/common";
 import { Reminder } from "@notesnook/core";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 export const ReminderTime = ({
   checkIsActive = true,
@@ -69,7 +70,7 @@ export const ReminderTime = ({
         height: "auto",
         borderRadius: defaultBorderRadius,
         borderColor: colors.primary.border,
-        paddingHorizontal: 6,
+        paddingHorizontal: DefaultAppStyles.GAP_SMALL,
         ...(style as ViewStyle)
       }}
       {...props}

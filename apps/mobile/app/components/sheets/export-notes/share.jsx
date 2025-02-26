@@ -24,6 +24,7 @@ import { ToastManager } from "../../../services/event-manager";
 import { AppFontSize } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 export const ShareComponent = ({ uri, name, padding }) => {
   return (
     <View
@@ -55,7 +56,7 @@ export const ShareComponent = ({ uri, name, padding }) => {
         width="100%"
         fontSize={AppFontSize.md}
         style={{
-          marginTop: 10
+          marginTop: DefaultAppStyles.GAP_VERTICAL
         }}
         onPress={async () => {
           FileViewer.open(uri, {

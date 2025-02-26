@@ -17,29 +17,29 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useRef, useState } from "react";
+import { strings } from "@notesnook/intl";
+import { useThemeColors } from "@notesnook/theme";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { DDS } from "../../services/device-detection";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
-import { useThemeColors } from "@notesnook/theme";
+import { getContainerBorder } from "../../utils/colors";
 import { getElevationStyle } from "../../utils/elevation";
 import { eCloseSimpleDialog, eOpenSimpleDialog } from "../../utils/events";
+import { defaultBorderRadius } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 import { sleep } from "../../utils/time";
 import { Toast } from "../toast";
+import { Button } from "../ui/button";
 import Input from "../ui/input";
+import { Notice } from "../ui/notice";
 import Seperator from "../ui/seperator";
 import BaseDialog from "./base-dialog";
 import DialogButtons from "./dialog-buttons";
 import DialogHeader from "./dialog-header";
-import { useCallback } from "react";
-import { Button } from "../ui/button";
-import { getContainerBorder } from "../../utils/colors";
-import { Notice } from "../ui/notice";
-import { strings } from "@notesnook/intl";
-import { defaultBorderRadius } from "../../utils/size";
 
 export const Dialog = ({ context = "global" }) => {
   const { colors } = useThemeColors();
@@ -176,7 +176,7 @@ export const Dialog = ({ context = "global" }) => {
         {dialogInfo.input ? (
           <View
             style={{
-              paddingHorizontal: 12
+              paddingHorizontal: DefaultAppStyles.GAP
             }}
           >
             <Input
@@ -200,7 +200,7 @@ export const Dialog = ({ context = "global" }) => {
         {dialogInfo?.notice ? (
           <View
             style={{
-              paddingHorizontal: 12
+              paddingHorizontal: DefaultAppStyles.GAP
             }}
           >
             <Notice

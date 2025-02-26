@@ -30,6 +30,7 @@ import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import { Pressable } from "../ui/pressable";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export default function Notebooks({ note, close, full }) {
   const { colors } = useThemeColors();
@@ -59,12 +60,12 @@ export default function Notebooks({ note, close, full }) {
       type={full ? "transparent" : "secondary"}
       style={{
         justifyContent: "flex-start",
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         flexDirection: "row",
         alignItems: "center",
         flexShrink: 1,
         flexGrow: 1,
-        padding: 6,
+        padding: DefaultAppStyles.GAP_SMALL,
         borderRadius: 10,
         minHeight: 42
       }}
@@ -92,14 +93,14 @@ export default function Notebooks({ note, close, full }) {
   return noteNotebooks.length === 0 ? null : (
     <View
       style={{
-        paddingHorizontal: 12
+        paddingHorizontal: DefaultAppStyles.GAP
       }}
     >
       <View
         style={{
           width: "100%",
           borderRadius: 10,
-          marginTop: 6
+          marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL
         }}
       >
         {full

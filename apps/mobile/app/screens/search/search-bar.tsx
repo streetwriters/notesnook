@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useRef } from "react";
-import { Platform, View } from "react-native";
+import { View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { IconButton } from "../../components/ui/icon-button";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
@@ -61,7 +61,6 @@ export const SearchBar = ({
           alignItems: "center",
           width: "100%",
           paddingHorizontal: DefaultAppStyles.GAP_SMALL,
-          paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
           borderRadius: 10,
           borderColor: colors.primary.border,
           borderWidth: 1
@@ -87,7 +86,8 @@ export const SearchBar = ({
             fontFamily: "OpenSans-Regular",
             flexGrow: 1,
             color: colors.primary.paragraph,
-            height: 40
+            paddingTop: DefaultAppStyles.GAP_VERTICAL,
+            paddingBottom: DefaultAppStyles.GAP_VERTICAL
           }}
           autoFocus
           onChangeText={_onChangeText}

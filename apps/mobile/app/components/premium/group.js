@@ -25,6 +25,7 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { FeatureBlock } from "./feature";
 import { ProTag } from "./pro-tag";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const Group = ({ item, index }) => {
   const { colors } = useThemeColors();
@@ -32,7 +33,7 @@ export const Group = ({ item, index }) => {
   return (
     <View
       style={{
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         backgroundColor:
           index % 2 !== 0
             ? colors.primary.background
@@ -56,7 +57,7 @@ export const Group = ({ item, index }) => {
       {item.features && (
         <ScrollView
           style={{
-            marginTop: 20
+            marginTop: DefaultAppStyles.GAP
           }}
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -79,7 +80,7 @@ export const Group = ({ item, index }) => {
       {item.info ? (
         <Paragraph
           style={{
-            marginTop: 10
+            marginTop: DefaultAppStyles.GAP_VERTICAL
           }}
           size={AppFontSize.xs}
           color={colors.secondary.paragraph}

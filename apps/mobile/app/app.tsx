@@ -39,8 +39,9 @@ import { themeTrpcClient } from "./screens/settings/theme-selector";
 import Notifications from "./services/notifications";
 import SettingsService from "./services/settings";
 import { TipManager } from "./services/tip-manager";
-import { useThemeStore } from "./stores/use-theme-store";
+import { changeSystemBarColors, useThemeStore } from "./stores/use-theme-store";
 import { useUserStore } from "./stores/use-user-store";
+import RNBootSplash from "react-native-bootsplash";
 
 I18nManager.allowRTL(false);
 I18nManager.forceRTL(false);
@@ -49,6 +50,9 @@ const { appLockEnabled, appLockMode } = SettingsService.get();
 if (appLockEnabled || appLockMode !== "none") {
   useUserStore.getState().lockApp(true);
 }
+
+RNBootSplash.hide({ fade: true });
+changeSystemBarColors();
 
 const App = (props: { configureMode: "note-preview" }) => {
   useAppEvents();

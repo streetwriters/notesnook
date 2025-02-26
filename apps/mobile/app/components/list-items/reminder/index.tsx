@@ -34,6 +34,7 @@ import { strings } from "@notesnook/intl";
 import { useSelectionStore } from "../../../stores/use-selection-store";
 import useIsSelected from "../../../hooks/use-selected";
 import AppIcon from "../../ui/AppIcon";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 const ReminderItem = React.memo(
   ({
@@ -87,7 +88,7 @@ const ReminderItem = React.memo(
             style={{
               flexDirection: "row",
               flexWrap: "wrap",
-              marginTop: 5
+              marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL
             }}
           >
             {item.disabled ? (
@@ -96,9 +97,9 @@ const ReminderItem = React.memo(
                   backgroundColor: colors.secondary.background,
                   borderRadius: defaultBorderRadius,
                   flexDirection: "row",
-                  paddingHorizontal: 6,
+                  paddingHorizontal: DefaultAppStyles.GAP_SMALL,
                   alignItems: "center",
-                  marginTop: 5,
+                  marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL,
                   justifyContent: "flex-start",
                   alignSelf: "flex-start",
                   marginRight: 10,
@@ -125,12 +126,12 @@ const ReminderItem = React.memo(
                   backgroundColor: colors.secondary.background,
                   borderRadius: defaultBorderRadius,
                   flexDirection: "row",
-                  paddingHorizontal: 6,
+                  paddingHorizontal: DefaultAppStyles.GAP_SMALL,
                   alignItems: "center",
-                  marginTop: 5,
+                  marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL,
                   justifyContent: "flex-start",
                   alignSelf: "flex-start",
-                  marginRight: 10,
+                  marginRight: DefaultAppStyles.GAP_SMALL,
                   height: 30
                 }}
               >
@@ -152,10 +153,10 @@ const ReminderItem = React.memo(
             <ReminderTime
               reminder={item}
               checkIsActive={false}
-              fontSize={AppFontSize.xs}
+              fontSize={AppFontSize.xxs}
               style={{
                 justifyContent: "flex-start",
-                height: 25,
+                paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL / 2,
                 alignSelf: "flex-start"
               }}
             />

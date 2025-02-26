@@ -32,6 +32,7 @@ import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 export type FeatureType = {
   title: string;
   body: string;
@@ -51,7 +52,7 @@ const NewFeature = ({
     <View
       style={{
         alignItems: "center",
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         paddingTop: 12,
         maxHeight: "100%"
       }}
@@ -68,10 +69,10 @@ const NewFeature = ({
             key={item.title}
             style={{
               backgroundColor: colors.secondary.background,
-              padding: 12,
+              padding: DefaultAppStyles.GAP,
               borderRadius: 10,
               width: "100%",
-              marginBottom: 10
+              marginBottom: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             <Heading size={AppFontSize.lg - 2}>{item.title}</Heading>

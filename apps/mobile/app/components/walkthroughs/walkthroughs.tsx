@@ -39,6 +39,7 @@ import Seperator from "../ui/seperator";
 import { SvgView } from "../ui/svg";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export type TStep = {
   text?: string;
@@ -79,7 +80,7 @@ const NotebookWelcome = () => {
     <View
       style={{
         width: "100%",
-        padding: 12,
+        padding: DefaultAppStyles.GAP,
         backgroundColor: colors.secondary.background,
         borderRadius: 10,
         ...getContainerBorder(colors.secondary.background)
@@ -87,12 +88,12 @@ const NotebookWelcome = () => {
     >
       <View
         style={{
-          padding: 12,
+          padding: DefaultAppStyles.GAP,
           width: "100%",
           backgroundColor: colors.primary.background,
           ...getElevationStyle(3),
           borderRadius: 10,
-          marginVertical: 12
+          marginVertical: DefaultAppStyles.GAP
         }}
       >
         <Heading size={AppFontSize.md} color={colors.primary.heading}>
@@ -102,7 +103,7 @@ const NotebookWelcome = () => {
 
         <Paragraph
           style={{
-            marginTop: 5
+            marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL
           }}
           size={AppFontSize.xs}
           color={colors.secondary.paragraph}
@@ -134,7 +135,7 @@ const notebooks: { id: string; steps: TStep[] } = {
         <View
           style={{
             width: "100%",
-            padding: 12,
+            padding: DefaultAppStyles.GAP,
             backgroundColor: colors.secondary.background,
             borderRadius: 10,
             ...getContainerBorder(colors.secondary.background)
@@ -142,7 +143,7 @@ const notebooks: { id: string; steps: TStep[] } = {
         >
           <View
             style={{
-              padding: 12,
+              padding: DefaultAppStyles.GAP,
               width: "100%",
               backgroundColor: colors.primary.background,
               ...getElevationStyle(3),
@@ -157,7 +158,7 @@ const notebooks: { id: string; steps: TStep[] } = {
 
             <Paragraph
               style={{
-                marginTop: 5
+                marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL
               }}
               size={AppFontSize.xs}
               color={colors.secondary.paragraph}
@@ -167,12 +168,12 @@ const notebooks: { id: string; steps: TStep[] } = {
           </View>
           <View
             style={{
-              padding: 12,
+              padding: DefaultAppStyles.GAP,
               width: "90%",
               backgroundColor: colors.primary.background,
               borderRadius: 10,
               alignSelf: "flex-end",
-              marginBottom: 10
+              marginBottom: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             <Paragraph color={colors.primary.accent}>
@@ -186,13 +187,13 @@ const notebooks: { id: string; steps: TStep[] } = {
           </View>
           <View
             style={{
-              padding: 12,
-              paddingVertical: 12,
+              padding: DefaultAppStyles.GAP,
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL,
               width: "80%",
               backgroundColor: colors.primary.background,
               borderRadius: defaultBorderRadius,
               alignSelf: "flex-end",
-              marginBottom: 10
+              marginBottom: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             <Paragraph size={AppFontSize.xs}>
@@ -206,13 +207,13 @@ const notebooks: { id: string; steps: TStep[] } = {
           </View>
           <View
             style={{
-              padding: 12,
+              padding: DefaultAppStyles.GAP,
               width: "80%",
               backgroundColor: colors.primary.background,
               borderRadius: defaultBorderRadius,
-              paddingVertical: 12,
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL,
               alignSelf: "flex-end",
-              marginBottom: 10
+              marginBottom: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             <Paragraph size={AppFontSize.xs}>
@@ -226,12 +227,12 @@ const notebooks: { id: string; steps: TStep[] } = {
           </View>
           <View
             style={{
-              padding: 12,
+              padding: DefaultAppStyles.GAP,
               width: "90%",
               backgroundColor: colors.primary.background,
               borderRadius: 10,
               alignSelf: "flex-end",
-              marginBottom: 10
+              marginBottom: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             <Paragraph color={colors.primary.accent}>
@@ -257,7 +258,7 @@ const notebooks: { id: string; steps: TStep[] } = {
         <View
           style={{
             paddingHorizontal: 20,
-            paddingVertical: 12
+            paddingVertical: DefaultAppStyles.GAP_VERTICAL
           }}
         >
           {/* <PinItem
@@ -370,7 +371,7 @@ const Support = () => {
       <Button
         style={{
           justifyContent: "flex-start",
-          marginBottom: 10,
+          marginBottom: DefaultAppStyles.GAP_VERTICAL,
           width: "90%"
         }}
         onPress={() => {
@@ -386,7 +387,7 @@ const Support = () => {
       <Button
         style={{
           justifyContent: "flex-start",
-          marginBottom: 10,
+          marginBottom: DefaultAppStyles.GAP_VERTICAL,
           width: "90%"
         }}
         onPress={() => {
@@ -401,7 +402,7 @@ const Support = () => {
       <Button
         style={{
           justifyContent: "flex-start",
-          marginBottom: 10,
+          marginBottom: DefaultAppStyles.GAP_VERTICAL,
           width: "90%"
         }}
         icon="bug"
@@ -411,7 +412,7 @@ const Support = () => {
       <Button
         style={{
           justifyContent: "flex-start",
-          marginBottom: 10,
+          marginBottom: DefaultAppStyles.GAP_VERTICAL,
           width: "90%"
         }}
         icon="mail"

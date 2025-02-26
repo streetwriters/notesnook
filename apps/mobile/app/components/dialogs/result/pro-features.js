@@ -30,6 +30,7 @@ import {
 import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 import Paragraph from "../../ui/typography/paragraph";
+import { DefaultAppStyles } from "../../../utils/styles";
 export const ProFeatures = ({ count = 6 }) => {
   const { colors } = useThemeColors();
 
@@ -67,7 +68,7 @@ export const ProFeatures = ({ count = 6 }) => {
               width: "100%",
               height: 40,
               paddingHorizontal: 0,
-              marginBottom: 10,
+              marginBottom: DefaultAppStyles.GAP_VERTICAL,
               alignItems: "center",
               borderRadius: defaultBorderRadius,
               justifyContent: "flex-start"

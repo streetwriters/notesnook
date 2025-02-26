@@ -36,6 +36,7 @@ import { IconButton } from "../ui/icon-button";
 import { Pressable } from "../ui/pressable";
 import { TimeSince } from "../ui/time-since";
 import Paragraph from "../ui/typography/paragraph";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const UserStatus = () => {
   const { colors, isDark } = useThemeColors();
@@ -76,7 +77,7 @@ export const UserStatus = () => {
           style={{
             flexDirection: "row",
             justifyContent: "flex-start",
-            padding: 12,
+            padding: DefaultAppStyles.GAP,
             borderRadius: 0,
             alignItems: "center",
             gap: 10

@@ -19,13 +19,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { View } from "react-native";
-import { AppFontSize } from "../../utils/size";
+import { AppFontSize, defaultBorderRadius } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 import Paragraph from "../ui/typography/paragraph";
 import { SideMenuHeader } from "./side-menu-header";
-import { DefaultAppStyles } from "../../utils/styles";
 
 type SideMenuListEmptyProps = {
   placeholder: string;
+  isLoading?: boolean;
 };
 
 export const SideMenuListEmpty = (props: SideMenuListEmptyProps) => {
@@ -40,7 +41,7 @@ export const SideMenuListEmpty = (props: SideMenuListEmptyProps) => {
       <View
         style={{
           backgroundColor: colors.primary.background,
-          paddingTop: DefaultAppStyles.GAP_SMALL
+          paddingTop: DefaultAppStyles.GAP_VERTICAL
         }}
       >
         <SideMenuHeader />
@@ -52,9 +53,33 @@ export const SideMenuListEmpty = (props: SideMenuListEmptyProps) => {
           flexGrow: 1
         }}
       >
-        <Paragraph size={AppFontSize.xs} color={colors.secondary.paragraph}>
-          {props.placeholder}
-        </Paragraph>
+        {props.isLoading ? (
+          <View
+            style={{
+              flex: 1,
+              width: "100%",
+              paddingHorizontal: DefaultAppStyles.GAP
+            }}
+          >
+            {[0, 1, 2, 3, 4].map((i) => (
+              <View
+                key={"placeholder" + i}
+                style={{
+                  paddingVertical: DefaultAppStyles.GAP - 1,
+                  width: i === 4 ? "80%" : "100%",
+                  borderRadius: defaultBorderRadius,
+                  backgroundColor: colors.secondary.background,
+                  marginTop: DefaultAppStyles.GAP_VERTICAL,
+                  opacity: 0.5
+                }}
+              />
+            ))}
+          </View>
+        ) : (
+          <Paragraph size={AppFontSize.xs} color={colors.secondary.paragraph}>
+            {props.placeholder}
+          </Paragraph>
+        )}
       </View>
     </View>
   );

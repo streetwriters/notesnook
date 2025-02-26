@@ -36,6 +36,7 @@ import { ProTag } from "../../premium/pro-tag";
 import { Pressable, PressableProps, useButton } from "../pressable";
 import Heading from "../typography/heading";
 import Paragraph from "../typography/paragraph";
+import { DefaultAppStyles } from "../../../utils/styles";
 export interface ButtonProps extends PressableProps {
   height?: number;
   icon?: string;
@@ -121,12 +122,13 @@ export const Button = ({
       customOpacity={buttonType?.opacity}
       customAlpha={buttonType?.alpha}
       style={{
-        height: typeof height === "number" ? height * growFactor : height,
+        // height: typeof height === "number" ? height * growFactor : height,
         width:
           typeof width === "number"
             ? width * growFactor
             : (width as DimensionValue) || undefined,
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
+        paddingVertical: DefaultAppStyles.GAP_VERTICAL,
         borderRadius: defaultBorderRadius,
         alignSelf: "center",
         justifyContent: "center",

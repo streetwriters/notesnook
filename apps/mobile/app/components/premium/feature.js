@@ -24,6 +24,7 @@ import { useThemeColors } from "@notesnook/theme";
 import { defaultBorderRadius, AppFontSize } from "../../utils/size";
 import Paragraph from "../ui/typography/paragraph";
 import { ProTag } from "./pro-tag";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const FeatureBlock = ({
   vertical,
@@ -40,11 +41,11 @@ export const FeatureBlock = ({
       style={{
         flexDirection: "row",
         alignItems: "center",
-        paddingHorizontal: 12,
-        marginBottom: 10,
+        paddingHorizontal: DefaultAppStyles.GAP,
+        marginBottom: DefaultAppStyles.GAP_VERTICAL,
         backgroundColor: colors.secondary.background,
         borderRadius: 10,
-        paddingVertical: 12
+        paddingVertical: DefaultAppStyles.GAP_VERTICAL
       }}
     >
       <Paragraph
@@ -63,7 +64,7 @@ export const FeatureBlock = ({
       style={{
         height: 100,
         justifyContent: "center",
-        padding: 10,
+        padding: DefaultAppStyles.GAP_SMALL,
         marginRight: 10,
         borderRadius: defaultBorderRadius,
         minWidth: 100
@@ -85,7 +86,7 @@ export const FeatureBlock = ({
           style={{
             width: 30,
             height: 3,
-            marginTop: 10,
+            marginTop: DefaultAppStyles.GAP_VERTICAL,
             borderRadius: 100,
             backgroundColor: colors.primary.accent
           }}

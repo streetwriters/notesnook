@@ -19,6 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 export const DefaultAppStyles = {
   GAP: 16,
   GAP_SMALL: 8,
-  GAP_VERTICAL: 6,
-  GAP_VERTICAL_SMALL: 4
+  GAP_VERTICAL: 10,
+  GAP_VERTICAL_SMALL: 6
 };

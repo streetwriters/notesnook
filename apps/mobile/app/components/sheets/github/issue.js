@@ -35,6 +35,7 @@ import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 export const Issue = ({ defaultTitle, defaultBody, issueTitle }) => {
   const { colors } = useThemeColors();
@@ -85,7 +86,7 @@ Logged in: ${user ? "yes" : "no"}`,
   return (
     <View
       style={{
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         width: "100%"
       }}
     >
@@ -148,9 +149,9 @@ Logged in: ${user ? "yes" : "no"}`,
               borderWidth: 1,
               borderColor: colors.primary.border,
               borderRadius: defaultBorderRadius,
-              padding: 12,
+              padding: DefaultAppStyles.GAP,
               fontFamily: "OpenSans-Regular",
-              marginBottom: 10,
+              marginBottom: DefaultAppStyles.GAP_VERTICAL,
               fontSize: AppFontSize.md,
               color: colors.primary.heading
             }}
@@ -181,7 +182,7 @@ Logged in: ${user ? "yes" : "no"}`,
               borderWidth: 1,
               borderColor: colors.primary.border,
               borderRadius: defaultBorderRadius,
-              padding: 12,
+              padding: DefaultAppStyles.GAP,
               fontFamily: "OpenSans-Regular",
               maxHeight: 200,
               fontSize: AppFontSize.sm,
@@ -210,7 +211,7 @@ Logged in: ${user ? "yes" : "no"}`,
             color={colors.secondary.paragraph}
             size={AppFontSize.xs}
             style={{
-              marginTop: 10,
+              marginTop: DefaultAppStyles.GAP_VERTICAL,
               textAlign: "center"
             }}
           >
