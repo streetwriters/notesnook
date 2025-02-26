@@ -103,12 +103,12 @@ export const AddNotebookSheet = ({
       useNotebookStore.getState().refresh();
     }
 
-    if (showMoveNotesOnComplete && id) {
+    if (showMoveNotesOnComplete && id && !notebook?.id) {
       ToastManager.show({
-        heading: "Notebook added",
+        heading: strings.notebookAdded(),
         type: "success",
         context: "global",
-        actionText: "Link notes",
+        actionText: strings.addNotes(),
         duration: 8000,
         func: async () => {
           Navigation.navigate("MoveNotes", {

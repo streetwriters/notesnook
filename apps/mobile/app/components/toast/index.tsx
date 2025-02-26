@@ -210,7 +210,7 @@ export const Toast = ({ context = "global" }) => {
               toastOptions.type === "error" ? "errorShade" : "secondaryAccented"
             }
             onPress={toastOptions.func}
-            title={"Link notes"}
+            title={toastOptions.actionText}
             height={35}
             style={{
               zIndex: 10
