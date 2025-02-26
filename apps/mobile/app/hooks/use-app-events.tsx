@@ -714,7 +714,8 @@ export const useAppEvents = () => {
           SettingsService.canLockAppInBackground() &&
           !useSettingStore.getState().requestBiometrics &&
           !useUserStore.getState().appLocked &&
-          !useUserStore.getState().disableAppLockRequests
+          !useUserStore.getState().disableAppLockRequests &&
+          !useSettingStore.getState().appDidEnterBackgroundForAction
         ) {
           if (SettingsService.shouldLockAppOnEnterForeground()) {
             DatabaseLogger.log(`AppEvents: Locking app on enter background`);

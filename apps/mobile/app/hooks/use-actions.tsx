@@ -623,7 +623,7 @@ export const useActions = ({
 
     function addTo() {
       Navigation.navigate("LinkNotebooks", {
-        note: item as Note
+        noteIds: [item.id]
       });
       close();
       //MoveNoteSheet.present(item as Note);
@@ -949,7 +949,7 @@ export const useActions = ({
 
       {
         id: "notebooks",
-        title: strings.linkNotebooks(),
+        title: strings.addToNotebook(),
         icon: "book-outline",
         onPress: addTo
       },

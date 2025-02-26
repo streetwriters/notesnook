@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { Fragment, useState } from "react";
 import {
@@ -39,9 +40,11 @@ import {
 } from "../../../services/event-manager";
 import Exporter from "../../../services/exporter";
 import PremiumService from "../../../services/premium";
+import { useSettingStore } from "../../../stores/use-setting-store";
 import { useUserStore } from "../../../stores/use-user-store";
 import { getElevationStyle } from "../../../utils/elevation";
-import { AppFontSize, defaultBorderRadius, ph, pv } from "../../../utils/size";
+import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
+import { DefaultAppStyles } from "../../../utils/styles";
 import { sleep } from "../../../utils/time";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
@@ -52,15 +55,15 @@ import { Pressable } from "../../ui/pressable";
 import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import { strings } from "@notesnook/intl";
-import { DefaultAppStyles } from "../../../utils/styles";
 
 const ExportNotesSheet = ({
   ids,
-  update
+  update,
+  close
 }: {
   ids: string[];
   update: ((props: PresentSheetOptions) => void) | undefined;
+  close: ((ctx?: string) => void) | undefined;
 }) => {
   const { colors } = useThemeColors();
   const [exporting, setExporting] = useState(false);
@@ -297,11 +300,11 @@ const ExportNotesSheet = ({
                   width={250}
                   fontSize={AppFontSize.md}
                   style={{
-                    marginTop: DefaultAppStyles.GAP_VERTICAL,
-                    borderRadius: 100
+                    marginTop: DefaultAppStyles.GAP_VERTICAL
                   }}
                   onPress={async () => {
                     if (!result?.filePath) return;
+                    close?.();
                     if (Platform.OS === "android") {
                       Linking.openURL(result.fileDir).catch((e) => {
                         ToastManager.error(e as Error);
@@ -326,11 +329,14 @@ const ExportNotesSheet = ({
                   width={250}
                   fontSize={AppFontSize.md}
                   style={{
-                    marginTop: DefaultAppStyles.GAP_VERTICAL,
-                    borderRadius: 100
+                    marginTop: DefaultAppStyles.GAP_VERTICAL
                   }}
                   onPress={async () => {
                     if (!result) return;
+                    close?.();
+                    useSettingStore
+                      .getState()
+                      .setAppDidEnterBackgroundForAction(true);
                     if (Platform.OS === "ios") {
                       Share.open({
                         url: result?.fileDir + result.fileName
@@ -350,12 +356,11 @@ const ExportNotesSheet = ({
                 />
                 <Button
                   title={strings.exportAgain()}
-                  type="inverted"
+                  type="secondaryAccented"
                   width={250}
                   fontSize={AppFontSize.md}
                   style={{
-                    marginTop: DefaultAppStyles.GAP_VERTICAL,
-                    borderRadius: 100
+                    marginTop: DefaultAppStyles.GAP_VERTICAL
                   }}
                   onPress={async () => {
                     setComplete(false);
@@ -376,7 +381,7 @@ ExportNotesSheet.present = async (ids?: string[], allNotes?: boolean) => {
   const exportNoteIds = allNotes ? await db.notes.all?.ids() : ids || [];
   presentSheet({
     component: (ref, close, update) => (
-      <ExportNotesSheet ids={exportNoteIds} update={update} />
+      <ExportNotesSheet ids={exportNoteIds} update={update} close={close} />
     ),
     keyboardHandlerDisabled: true
   });
