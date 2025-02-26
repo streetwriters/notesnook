@@ -373,7 +373,7 @@ const NotebookItemWrapper = React.memo(
             AddNotebookSheet.present(
               undefined,
               item.notebook,
-              "move-notebook",
+              "global",
               undefined,
               false
             );
@@ -396,3 +396,5 @@ const NotebookItemWrapper = React.memo(
 NotebookItemWrapper.displayName = "NotebookItemWrapper";
 
 MoveNotebook.present = async (notebooks: Notebook[]) => {};
+
+export default MoveNotebook;

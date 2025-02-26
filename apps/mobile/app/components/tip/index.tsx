@@ -29,6 +29,7 @@ import { Button } from "../ui/button";
 import Seperator from "../ui/seperator";
 import Paragraph from "../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const Tip = ({
   tip,
@@ -52,10 +53,10 @@ export const Tip = ({
       style={[
         {
           borderRadius: 10,
-          padding: 12,
+          paddingHorizontal: DefaultAppStyles.GAP,
           width: "100%",
           alignSelf: "center",
-          paddingVertical: 12,
+          paddingVertical: DefaultAppStyles.GAP_VERTICAL,
           backgroundColor: colors.secondary.background
         },
         style
@@ -73,9 +74,8 @@ export const Tip = ({
           fontSize={AppFontSize.xxxs}
           iconSize={AppFontSize.xs}
           style={{
-            width: undefined,
-            height: 22,
-            paddingHorizontal: 4,
+            paddingHorizontal: DefaultAppStyles.GAP_SMALL / 2,
+            paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL / 2,
             alignSelf: "flex-start",
             borderRadius: 100,
             borderWidth: 1,
@@ -102,7 +102,7 @@ export const Tip = ({
             style={{
               width: undefined,
               height: 25,
-              paddingHorizontal: 4,
+              paddingHorizontal: DefaultAppStyles.GAP_SMALL / 2,
               alignSelf: "flex-start",
               borderRadius: 100,
               borderWidth: 1,
@@ -125,7 +125,7 @@ export const Tip = ({
           style={{
             borderRadius: 10,
             overflow: "hidden",
-            marginTop: 10
+            marginTop: DefaultAppStyles.GAP_VERTICAL
           }}
         >
           <Image
@@ -149,7 +149,7 @@ export const Tip = ({
             text: colors.primary.accentForeground
           }}
           style={{
-            marginTop: 10
+            marginTop: DefaultAppStyles.GAP_VERTICAL
           }}
           onPress={() => {
             switch (tip.button?.action) {
@@ -174,7 +174,7 @@ Tip.present = async (tip: TTip) => {
         neverShowAgain={true}
         style={{
           backgroundColor: "transparent",
-          paddingHorizontal: 12
+          paddingHorizontal: DefaultAppStyles.GAP
         }}
       />
     )

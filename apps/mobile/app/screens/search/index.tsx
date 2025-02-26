@@ -155,3 +155,5 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
     </>
   );
 };
+
+export default Search;

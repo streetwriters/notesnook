@@ -67,7 +67,7 @@ export function SideMenuHome() {
         width: "100%",
         backgroundColor: colors.primary.background,
         gap: DefaultAppStyles.GAP,
-        paddingTop: DefaultAppStyles.GAP_SMALL
+        paddingTop: DefaultAppStyles.GAP_VERTICAL
       }}
     >
       <SideMenuHeader />

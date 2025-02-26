@@ -53,6 +53,7 @@ import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 const ExportNotesSheet = ({
   ids,
@@ -166,7 +167,7 @@ const ExportNotesSheet = ({
         <>
           <View
             style={{
-              paddingHorizontal: 12
+              paddingHorizontal: DefaultAppStyles.GAP
             }}
           >
             <DialogHeader
@@ -193,10 +194,10 @@ const ExportNotesSheet = ({
                   alignItems: "center",
                   flexDirection: "row",
                   paddingRight: 12,
-                  paddingVertical: 10,
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL,
                   justifyContent: "flex-start",
                   borderRadius: 0,
-                  paddingHorizontal: 12,
+                  paddingHorizontal: DefaultAppStyles.GAP,
                   opacity: item.pro ? 1 : 0.5
                 }}
               >
@@ -245,8 +246,8 @@ const ExportNotesSheet = ({
               justifyContent: "center",
               alignItems: "center",
               width: "100%",
-              paddingHorizontal: 12,
-              paddingVertical: 20
+              paddingHorizontal: DefaultAppStyles.GAP,
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             {!complete ? (
@@ -273,7 +274,7 @@ const ExportNotesSheet = ({
                 <Heading
                   style={{
                     textAlign: "center",
-                    marginTop: 10
+                    marginTop: DefaultAppStyles.GAP_VERTICAL
                   }}
                   color={colors.secondary.heading}
                 >
@@ -296,7 +297,7 @@ const ExportNotesSheet = ({
                   width={250}
                   fontSize={AppFontSize.md}
                   style={{
-                    marginTop: 10,
+                    marginTop: DefaultAppStyles.GAP_VERTICAL,
                     borderRadius: 100
                   }}
                   onPress={async () => {
@@ -325,7 +326,7 @@ const ExportNotesSheet = ({
                   width={250}
                   fontSize={AppFontSize.md}
                   style={{
-                    marginTop: 10,
+                    marginTop: DefaultAppStyles.GAP_VERTICAL,
                     borderRadius: 100
                   }}
                   onPress={async () => {
@@ -353,7 +354,7 @@ const ExportNotesSheet = ({
                   width={250}
                   fontSize={AppFontSize.md}
                   style={{
-                    marginTop: 10,
+                    marginTop: DefaultAppStyles.GAP_VERTICAL,
                     borderRadius: 100
                   }}
                   onPress={async () => {
@@ -385,16 +386,16 @@ const styles = StyleSheet.create({
   container: {
     ...getElevationStyle(5),
     borderRadius: defaultBorderRadius,
-    paddingVertical: pv
+    paddingVertical: DefaultAppStyles.GAP_VERTICAL
   },
   buttonContainer: {
     justifyContent: "space-between",
     alignItems: "center"
   },
   button: {
-    paddingVertical: pv,
-    paddingHorizontal: ph,
-    marginTop: 10,
+    paddingVertical: DefaultAppStyles.GAP_VERTICAL,
+    paddingHorizontal: DefaultAppStyles.GAP,
+    marginTop: DefaultAppStyles.GAP_VERTICAL,
     borderRadius: defaultBorderRadius,
     width: "100%",
     justifyContent: "center",

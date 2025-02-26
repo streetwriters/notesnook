@@ -251,7 +251,7 @@ const LinkNotebooks = (props: NavigationProps<"LinkNotebooks">) => {
                   AddNotebookSheet.present(
                     undefined,
                     undefined,
-                    "link-notebooks",
+                    "global",
                     undefined,
                     false,
                     searchQuery.current

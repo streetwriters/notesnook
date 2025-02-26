@@ -49,6 +49,7 @@ import Seperator from "../ui/seperator";
 import Paragraph from "../ui/typography/paragraph";
 import { diff } from "diffblazer";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 
 const MergeConflicts = () => {
   const { colors } = useThemeColors();
@@ -142,7 +143,7 @@ const MergeConflicts = () => {
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          paddingHorizontal: 12,
+          paddingHorizontal: DefaultAppStyles.GAP,
           paddingLeft: 6
         }}
       >
@@ -201,7 +202,7 @@ const MergeConflicts = () => {
               height={30}
               style={{
                 borderRadius: 100,
-                paddingHorizontal: 12
+                paddingHorizontal: DefaultAppStyles.GAP
               }}
               fontSize={AppFontSize.xs}
             />
@@ -218,7 +219,7 @@ const MergeConflicts = () => {
               height={30}
               style={{
                 borderRadius: 100,
-                paddingHorizontal: 12
+                paddingHorizontal: DefaultAppStyles.GAP
               }}
               fontSize={AppFontSize.xs}
               color={colors.error.paragraph}
@@ -233,7 +234,7 @@ const MergeConflicts = () => {
                 height={30}
                 style={{
                   borderRadius: 100,
-                  paddingHorizontal: 12,
+                  paddingHorizontal: DefaultAppStyles.GAP,
                   minWidth: 60,
                   marginLeft: 10
                 }}

@@ -30,6 +30,7 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import walkthroughs, { TStep } from "./walkthroughs";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 export const Walkthrough = ({
   steps,
   canSkip = true
@@ -51,7 +52,7 @@ export const Walkthrough = ({
       style={{
         justifyContent: "center",
         alignItems: "center",
-        padding: 12,
+        padding: DefaultAppStyles.GAP,
         paddingBottom: 0
       }}
     >
@@ -74,7 +75,7 @@ export const Walkthrough = ({
         <Button
           style={{
             height: 30,
-            marginTop: 10
+            marginTop: DefaultAppStyles.GAP_VERTICAL
           }}
           textStyle={{
             textDecorationLine: "underline"
@@ -91,7 +92,7 @@ export const Walkthrough = ({
         style={{
           borderRadius: 100,
           height: 40,
-          marginTop: 20
+          marginTop: DefaultAppStyles.GAP
         }}
         onPress={async () => {
           switch (step.button?.type) {
@@ -114,7 +115,7 @@ export const Walkthrough = ({
         <Button
           style={{
             height: 30,
-            marginTop: 10
+            marginTop: DefaultAppStyles.GAP
           }}
           textStyle={{
             textDecorationLine: "underline"

@@ -46,6 +46,7 @@ import { sleep } from "../../../utils/time";
 import { MMKV } from "../../../common/database/mmkv";
 import { deleteCacheFileByPath } from "../../../common/filesystem/io";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 const WIN_WIDTH = Dimensions.get("window").width;
 const WIN_HEIGHT = Dimensions.get("window").height;
@@ -184,7 +185,7 @@ const PDFPreview = () => {
               />
               <Paragraph
                 style={{
-                  marginTop: 10
+                  marginTop: DefaultAppStyles.GAP_VERTICAL
                 }}
                 color={colors.static.white}
               >
@@ -200,7 +201,7 @@ const PDFPreview = () => {
                   marginTop: insets.top,
                   flexDirection: "row",
                   justifyContent: "space-between",
-                  paddingHorizontal: 12,
+                  paddingHorizontal: DefaultAppStyles.GAP,
                   paddingLeft: 6
                 }}
               >

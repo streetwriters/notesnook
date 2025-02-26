@@ -272,7 +272,7 @@ const NoteItem = ({
                       style={{
                         borderRadius: 4,
                         backgroundColor: colors.secondary.background,
-                        paddingHorizontal: 4,
+                        paddingHorizontal: DefaultAppStyles.GAP_SMALL / 2,
                         borderWidth: 0.5,
                         borderColor: primaryColors.border,
                         paddingVertical: 1,
@@ -303,7 +303,7 @@ const NoteItem = ({
                           style={{
                             borderRadius: 4,
                             backgroundColor: colors.secondary.background,
-                            paddingHorizontal: 4,
+                            paddingHorizontal: DefaultAppStyles.GAP_SMALL / 2,
                             borderWidth: 0.5,
                             borderColor: primaryColors.border,
                             paddingVertical: 1

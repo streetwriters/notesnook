@@ -28,6 +28,7 @@ import { useDBItem } from "../../hooks/use-db-item";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { NotesnookModule } from "../../utils/notesnook-module";
+import { DefaultAppStyles } from "../../utils/styles";
 
 const NoteItem = (props: {
   id: string | number;
@@ -55,7 +56,7 @@ const NoteItem = (props: {
         borderBottomWidth: 1,
         borderBottomColor: colors.primary.border,
         justifyContent: "center",
-        paddingVertical: 12,
+        paddingVertical: DefaultAppStyles.GAP_VERTICAL,
         minHeight: 45
       }}
     >
@@ -63,7 +64,7 @@ const NoteItem = (props: {
         <View
           style={{
             flexDirection: "row",
-            paddingHorizontal: 12
+            paddingHorizontal: DefaultAppStyles.GAP
           }}
         >
           <View
@@ -126,7 +127,7 @@ export const NotePreviewConfigure = () => {
 
       <View
         style={{
-          paddingHorizontal: 12,
+          paddingHorizontal: DefaultAppStyles.GAP,
           paddingTop: 6
         }}
       >

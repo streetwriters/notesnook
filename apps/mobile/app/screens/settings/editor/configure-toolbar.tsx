@@ -30,6 +30,7 @@ import { AppFontSize } from "../../../utils/size";
 import { Group } from "./group";
 import { DragState, useDragState } from "./state";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 export const ConfigureToolbar = () => {
   const data = useDragState((state) => state.data);
   const preset = useDragState((state) => state.preset);
@@ -50,14 +51,14 @@ export const ConfigureToolbar = () => {
       >
         <View
           style={{
-            paddingVertical: 12
+            paddingVertical: DefaultAppStyles.GAP_VERTICAL
           }}
         >
           <Notice text={strings.configureToolbarNotice()} type="information" />
 
           <Paragraph
             style={{
-              marginTop: 10
+              marginTop: DefaultAppStyles.GAP_VERTICAL
             }}
             size={AppFontSize.xs}
             color={colors.secondary.paragraph}
@@ -70,7 +71,7 @@ export const ConfigureToolbar = () => {
               flexDirection: "row",
               flexWrap: "wrap",
               width: "100%",
-              marginTop: 10
+              marginTop: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             {[
@@ -92,8 +93,8 @@ export const ConfigureToolbar = () => {
                 type={preset === item.id ? "accent" : "secondaryAccented"}
                 style={{
                   borderRadius: 100,
-                  height: 35,
-                  marginRight: 10
+                  marginRight: 10,
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
                 }}
                 proTag={item.pro}
                 onPress={() => {
@@ -148,7 +149,7 @@ export const ConfigureToolbar = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 12,
+    paddingHorizontal: DefaultAppStyles.GAP,
     width: "100%"
   }
 });

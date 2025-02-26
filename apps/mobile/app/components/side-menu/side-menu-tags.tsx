@@ -18,16 +18,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Tag, VirtualizedGrouping } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
+import { FlashList } from "@shopify/flash-list";
 import React, { useEffect } from "react";
 import { TextInput, View } from "react-native";
-import { FlashList } from "@shopify/flash-list";
 import { DatabaseLogger, db } from "../../common/database";
 import { useDBItem, useTotalNotes } from "../../hooks/use-db-item";
 import { TaggedNotes } from "../../screens/notes/tagged";
+import Navigation from "../../services/navigation";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useTags } from "../../stores/use-tag-store";
-import { defaultBorderRadius, AppFontSize } from "../../utils/size";
+import { AppFontSize, defaultBorderRadius } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { Properties } from "../properties";
 import AppIcon from "../ui/AppIcon";
@@ -36,8 +38,6 @@ import Paragraph from "../ui/typography/paragraph";
 import { SideMenuHeader } from "./side-menu-header";
 import { SideMenuListEmpty } from "./side-menu-list-empty";
 import { useSideMenuTagsSelectionStore } from "./stores";
-import { strings } from "@notesnook/intl";
-import Navigation from "../../services/navigation";
 
 const TagItem = (props: {
   tags: VirtualizedGrouping<Tag>;
@@ -66,7 +66,8 @@ const TagItem = (props: {
     <View
       style={{
         paddingHorizontal: DefaultAppStyles.GAP,
-        marginTop: (props.id as number) === 0 ? DefaultAppStyles.GAP : 2
+        marginTop:
+          (props.id as number) === 0 ? DefaultAppStyles.GAP_VERTICAL : 2
       }}
     >
       {item ? (
@@ -171,9 +172,10 @@ const TagItem = (props: {
 };
 
 export const SideMenuTags = () => {
-  const [tags] = useTags();
+  const [tags, isLoading] = useTags();
   const { colors } = useThemeColors();
   const [filteredTags, setFilteredTags] = React.useState(tags);
+  const [loading, setLoading] = React.useState(true);
   const searchTimer = React.useRef<NodeJS.Timeout>();
   const lastQuery = React.useRef<string>();
 
@@ -213,11 +215,14 @@ export const SideMenuTags = () => {
     } else {
       setFilteredTags(tags);
     }
+    setLoading(false);
   }, [tags]);
 
   useEffect(() => {
-    updateTags();
-  }, [updateTags]);
+    if (!isLoading) {
+      updateTags();
+    }
+  }, [updateTags, isLoading]);
 
   const renderItem = React.useCallback(
     (info: { index: number }) => {
@@ -233,7 +238,10 @@ export const SideMenuTags = () => {
       }}
     >
       {!tags || tags?.placeholders.length === 0 ? (
-        <SideMenuListEmpty placeholder={strings.emptyPlaceholders("tag")} />
+        <SideMenuListEmpty
+          placeholder={strings.emptyPlaceholders("tag")}
+          isLoading={loading}
+        />
       ) : (
         <>
           <FlashList
@@ -246,7 +254,7 @@ export const SideMenuTags = () => {
               <View
                 style={{
                   backgroundColor: colors.primary.background,
-                  paddingTop: DefaultAppStyles.GAP_SMALL
+                  paddingTop: DefaultAppStyles.GAP_VERTICAL
                 }}
               >
                 <SideMenuHeader />

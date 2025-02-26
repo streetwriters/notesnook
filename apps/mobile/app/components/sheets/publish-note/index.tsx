@@ -38,6 +38,7 @@ import Paragraph from "../../ui/typography/paragraph";
 import { requestInAppReview } from "../../../services/app-review";
 import { hosts, Note } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 const PublishNoteSheet = ({
   note: item
@@ -117,7 +118,7 @@ const PublishNoteSheet = ({
       style={{
         width: "100%",
         alignSelf: "center",
-        paddingHorizontal: 12
+        paddingHorizontal: DefaultAppStyles.GAP
       }}
     >
       <DialogHeader
@@ -155,9 +156,9 @@ const PublishNoteSheet = ({
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                marginTop: 10,
+                marginTop: DefaultAppStyles.GAP_VERTICAL,
                 backgroundColor: colors.secondary.background,
-                padding: 12,
+                padding: DefaultAppStyles.GAP,
                 borderRadius: defaultBorderRadius
               }}
             >
@@ -183,7 +184,7 @@ const PublishNoteSheet = ({
                   }}
                   size={AppFontSize.xs}
                   style={{
-                    marginTop: 5,
+                    marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL,
                     color: colors.primary.paragraph
                   }}
                 >
@@ -217,11 +218,11 @@ const PublishNoteSheet = ({
             style={{
               flexDirection: "row",
               alignItems: "center",
-              marginBottom: 10,
+              marginBottom: DefaultAppStyles.GAP_VERTICAL,
               backgroundColor: colors.secondary.background,
-              paddingVertical: 12,
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL,
               borderRadius: defaultBorderRadius,
-              marginTop: 10
+              marginTop: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             <IconButton
@@ -260,7 +261,7 @@ const PublishNoteSheet = ({
               flexDirection: "row",
               alignItems: "center",
               backgroundColor: colors.secondary.background,
-              paddingVertical: 12,
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL,
               borderRadius: defaultBorderRadius
             }}
           >
@@ -294,7 +295,7 @@ const PublishNoteSheet = ({
             style={{
               width: "100%",
               alignSelf: "center",
-              marginTop: 10
+              marginTop: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             {isLocked ? (
@@ -352,7 +353,7 @@ const PublishNoteSheet = ({
         size={AppFontSize.xs}
         style={{
           textAlign: "center",
-          marginTop: 10,
+          marginTop: DefaultAppStyles.GAP_VERTICAL,
           textDecorationLine: "underline"
         }}
         onPress={async () => {

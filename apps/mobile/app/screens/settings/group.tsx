@@ -59,7 +59,7 @@ const Group = ({
           id="Settings"
         />
       )}
-      <DelayLayout type="settings" delay={1}>
+      <DelayLayout type="settings" delay={0}>
         <View
           style={{
             flex: 1
@@ -68,7 +68,6 @@ const Group = ({
           {route.params.component ? components[route.params.component] : null}
           {route.params.sections ? (
             <AnimatedKeyboardAvoidingFlatList
-              entering={FadeInDown}
               data={route.params.sections}
               keyExtractor={keyExtractor}
               renderItem={renderItem}

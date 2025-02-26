@@ -24,6 +24,7 @@ import { useThemeColors } from "@notesnook/theme";
 import { ColorValues } from "../../utils/colors";
 import { hexToRGBA } from "../../utils/colors";
 import { defaultBorderRadius } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const DefaultPlaceholder = ({ color }: { color: string }) => {
   const { colors } = useThemeColors();
@@ -41,7 +42,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
     <View
       style={{
         width: "100%",
-        paddingHorizontal: 12
+        paddingHorizontal: DefaultAppStyles.GAP
       }}
     >
       {hasAnnoucements ? (
@@ -52,7 +53,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
             borderRadius: 10,
             marginBottom: 20,
             backgroundColor: colors.secondary.background,
-            padding: 12
+            padding: DefaultAppStyles.GAP
           }}
         >
           <View
@@ -79,7 +80,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
               height: 15,
               backgroundColor: shadeColor,
               borderRadius: 3,
-              marginTop: 10
+              marginTop: DefaultAppStyles.GAP_VERTICAL
             }}
           />
         </View>
@@ -94,7 +95,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
             marginBottom: 20,
             flexDirection: "row",
             alignItems: "center",
-            paddingHorizontal: 20
+            paddingHorizontal: DefaultAppStyles.GAP
           }}
         >
           <View
@@ -135,7 +136,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
           backgroundColor: colors.secondary.background,
           borderRadius: 10,
           marginBottom: 20,
-          padding: 5,
+          padding: DefaultAppStyles.GAP_SMALL,
           justifyContent: "space-between",
           flexDirection: "row",
           alignItems: "center"
@@ -189,14 +190,14 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
           height: 13,
           backgroundColor: colors.secondary.background,
           borderRadius: defaultBorderRadius,
-          marginTop: 10
+          marginTop: DefaultAppStyles.GAP_VERTICAL
         }}
       />
 
       <View
         style={{
           flexDirection: "row",
-          marginTop: 10
+          marginTop: DefaultAppStyles.GAP_VERTICAL
         }}
       >
         <View

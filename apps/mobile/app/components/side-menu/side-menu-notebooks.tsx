@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Notebook } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { FlatList, TextInput, View } from "react-native";
 import { db } from "../../common/database";
 import NotebookScreen from "../../screens/notebook";
@@ -45,6 +45,7 @@ useSideMenuNotebookSelectionStore.setState({
 export const SideMenuNotebooks = () => {
   const tree = useSideMenuNotebookTreeStore((state) => state.tree);
   const [notebooks, loading] = useNotebooks();
+  const [isLoading, setIsLoading] = useState(true);
   const { colors } = useThemeColors();
   const [filteredNotebooks, setFilteredNotebooks] = React.useState(notebooks);
   const searchTimer = React.useRef<NodeJS.Timeout>();
@@ -82,6 +83,7 @@ export const SideMenuNotebooks = () => {
     (async () => {
       if (!loading) {
         loadRootNotebooks();
+        setIsLoading(false);
       }
     })();
   }, [loadRootNotebooks, loading]);
@@ -131,6 +133,7 @@ export const SideMenuNotebooks = () => {
       {!notebooks || notebooks.placeholders.length === 0 ? (
         <SideMenuListEmpty
           placeholder={strings.emptyPlaceholders("notebook")}
+          isLoading={isLoading}
         />
       ) : (
         <>
@@ -145,7 +148,7 @@ export const SideMenuNotebooks = () => {
               <View
                 style={{
                   backgroundColor: colors.primary.background,
-                  paddingTop: DefaultAppStyles.GAP_SMALL
+                  paddingTop: DefaultAppStyles.GAP_VERTICAL
                 }}
               >
                 <SideMenuHeader />
@@ -225,7 +228,7 @@ const NotebookItemWrapper = React.memo(
       <View
         style={{
           paddingHorizontal: DefaultAppStyles.GAP,
-          marginTop: index === 0 ? DefaultAppStyles.GAP : 0
+          marginTop: index === 0 ? DefaultAppStyles.GAP_VERTICAL : 0
         }}
       >
         <NotebookItem

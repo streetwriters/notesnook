@@ -25,6 +25,7 @@ import { Button } from "../ui/button";
 import { PressableProps } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { DefaultAppStyles } from "../../utils/styles";
 
 type DialogHeaderProps = {
   icon?: string;
@@ -97,7 +98,7 @@ const DialogHeader = ({
                 onPress={button.onPress}
                 style={{
                   borderRadius: 100,
-                  paddingHorizontal: 12
+                  paddingHorizontal: DefaultAppStyles.GAP
                 }}
                 loading={button.loading}
                 fontSize={13}

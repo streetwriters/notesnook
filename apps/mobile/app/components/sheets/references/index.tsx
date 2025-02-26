@@ -42,6 +42,7 @@ import { IconButton } from "../../ui/icon-button";
 import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 export const useExpandedStore = create<{
   expanded: {
@@ -80,7 +81,7 @@ const ListBlockItem = ({
         paddingLeft: 35,
         justifyContent: "flex-start",
         minHeight: 45,
-        paddingHorizontal: 12
+        paddingHorizontal: DefaultAppStyles.GAP
       }}
     >
       <View
@@ -495,9 +496,9 @@ export const ReferencesList = ({ item, close }: ReferencesListProps) => {
       ) : (
         <View
           style={{
-            paddingHorizontal: 12,
+            paddingHorizontal: DefaultAppStyles.GAP,
             flex: 1,
-            marginTop: 10
+            marginTop: DefaultAppStyles.GAP_VERTICAL
           }}
         >
           <FlashList

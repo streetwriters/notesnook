@@ -58,6 +58,7 @@ import { Pressable } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 
 const Actions = ({
   attachment,
@@ -226,12 +227,13 @@ const Actions = ({
         style={{
           borderBottomWidth: 1,
           borderBottomColor: colors.primary.border,
-          marginBottom: notes && notes.length > 0 ? 0 : 12
+          marginBottom:
+            notes && notes.length > 0 ? 0 : DefaultAppStyles.GAP_VERTICAL
         }}
       >
         <Heading
           style={{
-            paddingHorizontal: 12
+            paddingHorizontal: DefaultAppStyles.GAP
           }}
           size={AppFontSize.lg}
         >
@@ -241,9 +243,9 @@ const Actions = ({
         <View
           style={{
             flexDirection: "row",
-            marginBottom: 10,
-            paddingHorizontal: 12,
-            marginTop: 6,
+            marginBottom: DefaultAppStyles.GAP_VERTICAL,
+            paddingHorizontal: DefaultAppStyles.GAP,
+            marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL,
             gap: 10
           }}
         >
@@ -283,14 +285,14 @@ const Actions = ({
           style={{
             borderBottomWidth: 1,
             borderBottomColor: colors.primary.border,
-            marginBottom: 12,
-            paddingVertical: 12
+            marginBottom: DefaultAppStyles.GAP_VERTICAL,
+            paddingVertical: DefaultAppStyles.GAP_VERTICAL
           }}
         >
           <>
             <Heading
               style={{
-                paddingHorizontal: 12
+                paddingHorizontal: DefaultAppStyles.GAP
               }}
               size={AppFontSize.sm}
             >
@@ -307,10 +309,10 @@ const Actions = ({
                   openNote(item, (item as any).type === "trash");
                 }}
                 style={{
-                  paddingVertical: 12,
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL,
                   alignItems: "flex-start",
 
-                  paddingHorizontal: 12
+                  paddingHorizontal: DefaultAppStyles.GAP
                 }}
                 key={item.id}
               >
@@ -347,7 +349,7 @@ const Actions = ({
 
       <View
         style={{
-          paddingHorizontal: 12
+          paddingHorizontal: DefaultAppStyles.GAP
         }}
       >
         {failed ? (

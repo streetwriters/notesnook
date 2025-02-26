@@ -24,9 +24,9 @@ import React, { useEffect, useRef } from "react";
 import {
   NativeScrollEvent,
   NativeSyntheticEvent,
-  RefreshControl
+  RefreshControl,
+  View
 } from "react-native";
-import Animated, { FadeIn } from "react-native-reanimated";
 import { notesnook } from "../../../e2e/test.ids";
 import { useGroupOptions } from "../../hooks/use-group-options";
 import { eSendEvent } from "../../services/event-manager";
@@ -145,11 +145,10 @@ export default function List(props: ListProps) {
 
   return (
     <>
-      <Animated.View
+      <View
         style={{
           flex: 1
         }}
-        entering={props.renderedInRoute === "Search" ? undefined : FadeIn}
       >
         {props.data?.placeholders?.length === 0 ? (
           <>
@@ -214,7 +213,7 @@ export default function List(props: ListProps) {
             }
           />
         )}
-      </Animated.View>
+      </View>
     </>
   );
 }

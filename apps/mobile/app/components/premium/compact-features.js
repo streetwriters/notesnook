@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import { FeatureBlock } from "./feature";
 import { ScrollView } from "react-native-actions-sheet";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const CompactFeatures = ({
   vertical,
@@ -84,7 +85,7 @@ export const CompactFeatures = ({
       style={{
         width: "100%",
         maxHeight: maxHeight,
-        paddingHorizontal: 12
+        paddingHorizontal: DefaultAppStyles.GAP
       }}
     >
       {data.map((item) => (

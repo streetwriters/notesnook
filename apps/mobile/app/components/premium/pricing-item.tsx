@@ -24,6 +24,7 @@ import { Pressable } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import RNIap from "react-native-iap";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const PricingItem = ({
   product,
@@ -49,7 +50,7 @@ export const PricingItem = ({
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         paddingVertical: compact ? 15 : 10,
         width: compact ? null : "100%",
         minWidth: 150,
