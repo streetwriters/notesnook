@@ -35,6 +35,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import type { ToolId } from "@notesnook/editor";
 import PremiumService from "../../../services/premium";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 export const Group = ({
   item,
@@ -176,7 +177,7 @@ export const Group = ({
             backgroundColor: colors.primary.background,
             borderRadius: 10,
             ...getElevationStyle(hover ? 5 : 0),
-            marginTop: isSubgroup ? 0 : 10
+            marginTop: isSubgroup ? 0 : DefaultAppStyles.GAP_VERTICAL
           }
         ]}
       >
@@ -294,8 +295,10 @@ export const Group = ({
             dragged.type === "subgroup"
               ? colors.secondary.background
               : undefined,
-          marginTop: recievePosition === "above" ? 10 : 0,
-          marginBottom: recievePosition === "below" ? 10 : 0,
+          marginTop:
+            recievePosition === "above" ? DefaultAppStyles.GAP_VERTICAL : 0,
+          marginBottom:
+            recievePosition === "below" ? DefaultAppStyles.GAP_VERTICAL : 0,
           borderRadius: 10
         }}
         renderHoverContent={() => renderGroup(true)}

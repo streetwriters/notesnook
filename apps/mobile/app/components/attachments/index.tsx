@@ -50,6 +50,7 @@ import Seperator from "../ui/seperator";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { AttachmentItem } from "./attachment-item";
+import { DefaultAppStyles } from "../../utils/styles";
 
 const DEFAULT_SORTING: SortOptions = {
   sortBy: "dateEdited",
@@ -357,7 +358,7 @@ export const AttachmentDialog = ({
             flexDirection: "row",
             justifyContent: "space-between",
             alignItems: "center",
-            paddingHorizontal: 12
+            paddingHorizontal: DefaultAppStyles.GAP
           }}
         >
           <Heading>{strings.dataTypesPluralCamelCase.attachment()}</Heading>
@@ -370,8 +371,6 @@ export const AttachmentDialog = ({
             <IconButton
               name="check-all"
               style={{
-                height: 40,
-                width: 40,
                 marginRight: 10
               }}
               color={colors.primary.paragraph}
@@ -381,10 +380,6 @@ export const AttachmentDialog = ({
 
             <IconButton
               name="download"
-              style={{
-                height: 40,
-                width: 40
-              }}
               color={colors.primary.paragraph}
               onPress={() => {
                 if (!attachments) return;
@@ -409,7 +404,7 @@ export const AttachmentDialog = ({
         style={{
           width: "100%",
           alignSelf: "center",
-          paddingHorizontal: 12,
+          paddingHorizontal: DefaultAppStyles.GAP,
           height: "100%"
         }}
       >
@@ -429,7 +424,7 @@ export const AttachmentDialog = ({
               alignItems: "center",
               width: "100%",
               borderRadius: 10,
-              padding: 10,
+              padding: DefaultAppStyles.GAP_SMALL,
               borderWidth: 1,
               borderColor: colors.primary.border,
               gap: 12,
@@ -495,7 +490,7 @@ export const AttachmentDialog = ({
               backgroundColor: colors.primary.background,
               flexWrap: "wrap",
               flexDirection: "row",
-              paddingVertical: 12
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL
             }}
             contentContainerStyle={{
               alignItems: "center"
@@ -515,7 +510,7 @@ export const AttachmentDialog = ({
                   fontSize={AppFontSize.sm}
                   style={{
                     borderRadius: 100,
-                    paddingHorizontal: 12,
+                    paddingHorizontal: DefaultAppStyles.GAP,
                     height: 40,
                     minWidth: 80
                   }}

@@ -18,20 +18,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useState } from "react";
-import { InteractionManager } from "react-native";
 
 export const useDelayLayout = (delay: number) => {
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
-    let cancel: () => void;
     const timeout = setTimeout(() => {
-      cancel = InteractionManager.runAfterInteractions(() => {
-        setLoading(false);
-      }).cancel;
+      setLoading(false);
     }, delay);
     return () => {
-      cancel && cancel();
       clearTimeout(timeout);
     };
   }, [delay]);

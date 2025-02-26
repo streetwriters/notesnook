@@ -53,6 +53,7 @@ import { useUserStore } from "../../stores/use-user-store";
 import { eCloseSheet } from "../../utils/events";
 import { AppFontSize } from "../../utils/size";
 import { sleep } from "../../utils/time";
+import { DefaultAppStyles } from "../../utils/styles";
 const mfaMethods: MFAMethod[] = [
   {
     id: "app",
@@ -118,10 +119,10 @@ export const MFAMethodsPickerStep = ({ recovery, onSuccess }: MFAStepProps) => {
             onSuccess && onSuccess(item);
           }}
           style={{
-            paddingHorizontal: 12,
-            paddingVertical: 12,
+            paddingHorizontal: DefaultAppStyles.GAP,
+            paddingVertical: DefaultAppStyles.GAP_VERTICAL,
             marginTop: 0,
-            marginBottom: 12,
+            marginBottom: DefaultAppStyles.GAP_VERTICAL,
             flexDirection: "row",
             borderRadius: 0,
             alignItems: "flex-start"
@@ -273,7 +274,7 @@ export const MFASetup = ({
 
       <View
         style={{
-          paddingHorizontal: 12
+          paddingHorizontal: DefaultAppStyles.GAP
         }}
       >
         {loading ? (
@@ -383,7 +384,7 @@ export const MFASetup = ({
               loading={enabling}
               style={{
                 borderRadius: 100,
-                marginBottom: 10
+                marginBottom: DefaultAppStyles.GAP_VERTICAL
               }}
             />
 
@@ -487,7 +488,7 @@ export const MFARecoveryCodes = ({
             style={{
               flexDirection: "row",
               justifyContent: "center",
-              marginBottom: 10
+              marginBottom: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             <Button
@@ -562,7 +563,7 @@ export const MFARecoveryCodes = ({
             }}
             style={{
               borderRadius: 100,
-              marginBottom: 10
+              marginBottom: DefaultAppStyles.GAP_VERTICAL
             }}
           />
         </>
@@ -618,7 +619,7 @@ const MFASuccess = ({ recovery }: MFAStepProps) => {
         }}
         style={{
           borderRadius: 100,
-          marginBottom: 10
+          marginBottom: DefaultAppStyles.GAP_VERTICAL
         }}
       />
 

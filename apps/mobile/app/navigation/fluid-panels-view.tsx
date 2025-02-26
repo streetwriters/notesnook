@@ -48,7 +48,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { notesnook } from "../../e2e/test.ids";
 import { db } from "../common/database";
 import { FluidPanels } from "../components/fluid-panels";
-import { SideMenu } from "../components/side-menu";
 import { useSideBarDraggingStore } from "../components/side-menu/dragging-store";
 import useGlobalSafeAreaInsets from "../hooks/use-global-safe-area-insets";
 import { useShortcutManager } from "../hooks/use-shortcut-manager";
@@ -60,7 +59,6 @@ import {
   editorState,
   getAppState
 } from "../screens/editor/tiptap/utils";
-import { EditorWrapper } from "../screens/editor/wrapper";
 import { DDS } from "../services/device-detection";
 import {
   eSendEvent,
@@ -85,6 +83,9 @@ const valueLimiter = (value: number, min: number, max: number) => {
   return value < min ? min : value > max ? max : value;
 };
 
+let SideMenu: any = null;
+let EditorWrapper: any = null;
+
 export const FluidPanelsView = React.memo(
   () => {
     const { colors } = useThemeColors();
@@ -99,6 +100,16 @@ export const FluidPanelsView = React.memo(
     const animatedTranslateY = useSharedValue(-9999);
     const overlayRef = useRef<Animated.View>(null);
     const [orientation, setOrientation] = useState(getInitialOrientation());
+    const appLoading = useSettingStore((state) => state.isAppLoading);
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+      if (!appLoading) {
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 1000);
+      }
+    }, [appLoading]);
 
     useShortcutManager({
       onShortcutPressed: async (item) => {
@@ -407,6 +418,11 @@ export const FluidPanelsView = React.memo(
       };
     }, []);
 
+    if (!isLoading) {
+      SideMenu = require("../components/side-menu").SideMenu;
+      EditorWrapper = require("../screens/editor/wrapper").EditorWrapper;
+    }
+
     return (
       <View
         onLayout={_onLayout}
@@ -452,7 +468,7 @@ export const FluidPanelsView = React.memo(
               }}
             >
               <ScopedThemeProvider value="navigationMenu">
-                <SideMenu />
+                {isLoading ? null : <SideMenu />}
               </ScopedThemeProvider>
             </View>
 
@@ -504,7 +520,7 @@ export const FluidPanelsView = React.memo(
             </View>
 
             <ScopedThemeProvider value="editor">
-              <EditorWrapper key="3" widths={PANE_WIDTHS} />
+              {isLoading ? null : <EditorWrapper widths={PANE_WIDTHS} />}
             </ScopedThemeProvider>
           </FluidPanels>
         ) : null}
@@ -514,6 +530,8 @@ export const FluidPanelsView = React.memo(
   () => true
 );
 FluidPanelsView.displayName = "FluidPanelsView";
+
+export default FluidPanelsView;
 
 const onChangeTab = async (event: { i: number; from: number }) => {
   if (event.i === 2) {

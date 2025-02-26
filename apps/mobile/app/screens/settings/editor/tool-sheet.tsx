@@ -34,6 +34,7 @@ import {
 } from "./toolbar-definition";
 import { ActionSheetRef, ScrollView } from "react-native-actions-sheet";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 export default function ToolSheet({
   group,
@@ -69,10 +70,10 @@ export default function ToolSheet({
             useDragState.getState().setData(_data);
           }}
           style={{
-            marginBottom: 10,
+            marginBottom: DefaultAppStyles.GAP_VERTICAL,
             width: "100%",
             height: 50,
-            paddingHorizontal: 12,
+            paddingHorizontal: DefaultAppStyles.GAP,
             paddingRight: 0,
             borderRadius: defaultBorderRadius,
             flexDirection: "row",
@@ -114,7 +115,7 @@ export default function ToolSheet({
     <View
       style={{
         maxHeight: "100%",
-        padding: 12
+        padding: DefaultAppStyles.GAP
       }}
     >
       <ScrollView nestedScrollEnabled={true}>

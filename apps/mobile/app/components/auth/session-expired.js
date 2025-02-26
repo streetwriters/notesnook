@@ -49,6 +49,7 @@ import Paragraph from "../ui/typography/paragraph";
 import { LoginSteps, useLogin } from "./use-login";
 import { strings } from "@notesnook/intl";
 import { getObfuscatedEmail } from "../../utils/functions";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const SessionExpired = () => {
   const { colors } = useThemeColors();
@@ -157,7 +158,7 @@ export const SessionExpired = () => {
         <View
           style={{
             width: focused ? "100%" : "99.9%",
-            padding: 12,
+            padding: DefaultAppStyles.GAP,
             justifyContent: "center",
             flex: 1,
             backgroundColor: colors.primary.background
@@ -213,7 +214,7 @@ export const SessionExpired = () => {
 
           <Button
             style={{
-              marginTop: 10,
+              marginTop: DefaultAppStyles.GAP_VERTICAL,
               width: 250,
               borderRadius: 100
             }}
@@ -225,7 +226,7 @@ export const SessionExpired = () => {
 
           <Button
             style={{
-              marginTop: 10,
+              marginTop: DefaultAppStyles.GAP_VERTICAL,
               width: "100%"
             }}
             onPress={() => {

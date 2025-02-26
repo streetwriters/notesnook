@@ -17,16 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
+import { useThemeColors } from "@notesnook/theme";
 import React from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../e2e/test.ids";
-import { useThemeColors } from "@notesnook/theme";
+import { getColorLinearShade } from "../../utils/colors";
 import { AppFontSize } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 import { Button } from "../ui/button";
 import Paragraph from "../ui/typography/paragraph";
-import { getColorLinearShade } from "../../utils/colors";
-import { strings } from "@notesnook/intl";
 
 const DialogButtons = ({
   onPressPositive,
@@ -46,7 +47,7 @@ const DialogButtons = ({
         {
           backgroundColor: colors.secondary.background,
           height: 60,
-          paddingHorizontal: 12,
+          paddingHorizontal: DefaultAppStyles.GAP,
           borderTopWidth: 0.7,
           borderTopColor: getColorLinearShade(
             colors.secondary.background,
@@ -82,7 +83,7 @@ const DialogButtons = ({
       >
         <Button
           onPress={onPressNegative}
-          fontSize={AppFontSize.md}
+          fontSize={AppFontSize.sm}
           testID={notesnook.ids.default.dialog.no}
           type="plain"
           bold
@@ -91,7 +92,7 @@ const DialogButtons = ({
         {onPressPositive ? (
           <Button
             onPress={onPressPositive}
-            fontSize={AppFontSize.md}
+            fontSize={AppFontSize.sm}
             testID={notesnook.ids.default.dialog.yes}
             style={{
               marginLeft: 10
@@ -114,6 +115,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     flexDirection: "row",
-    marginTop: 10
+    marginTop: DefaultAppStyles.GAP_VERTICAL
   }
 });

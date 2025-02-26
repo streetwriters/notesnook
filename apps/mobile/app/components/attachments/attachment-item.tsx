@@ -32,6 +32,7 @@ import Paragraph from "../ui/typography/paragraph";
 import Actions from "./actions";
 import { strings } from "@notesnook/intl";
 import { Pressable } from "../ui/pressable";
+import { DefaultAppStyles } from "../../utils/styles";
 
 function getFileExtension(filename: string) {
   const ext = /^.+\.([^.]+)$/.exec(filename);
@@ -76,8 +77,8 @@ export const AttachmentItem = ({
         flexDirection: "row",
         marginVertical: 5,
         justifyContent: "space-between",
-        padding: 12,
-        paddingVertical: 6,
+        padding: DefaultAppStyles.GAP,
+        paddingVertical: DefaultAppStyles.GAP_VERTICAL,
         minHeight: 45
       }}
     >

@@ -30,6 +30,7 @@ import { getColorLinearShade } from "../../../utils/colors";
 import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 import { verifyUser } from "../functions";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 interface PickerOptions<T> {
   getValue: () => T;
@@ -121,10 +122,10 @@ export function SettingsPicker<T>({
             style={{
               flexDirection: "row",
               alignItems: "center",
-              marginTop: 10,
               width: "100%",
               justifyContent: "space-between",
-              padding: 12
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL,
+              paddingHorizontal: DefaultAppStyles.GAP
             }}
           >
             <Paragraph>{formatValue(currentValue)}</Paragraph>
@@ -159,7 +160,8 @@ export function SettingsPicker<T>({
               maxWidth: width
             }}
             textStyle={{
-              fontSize: AppFontSize.md,
+              fontSize: AppFontSize.sm,
+              fontFamily: "Inter-Regular",
               color: compareValue(currentValue, item)
                 ? colors.primary.accent
                 : colors.primary.paragraph

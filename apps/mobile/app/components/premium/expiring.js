@@ -42,6 +42,7 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { CompactFeatures } from "./compact-features";
 import { Offer } from "./offer";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const Expiring = () => {
   const { colors } = useThemeColors();
@@ -94,7 +95,7 @@ export const Expiring = () => {
           >
             <View
               style={{
-                paddingHorizontal: 12,
+                paddingHorizontal: DefaultAppStyles.GAP,
                 width: "100%"
               }}
             >
@@ -147,7 +148,7 @@ export const Expiring = () => {
                   style={{
                     textDecorationLine: "underline",
                     color: colors.secondary.paragraph,
-                    marginTop: 10
+                    marginTop: DefaultAppStyles.GAP_VERTICAL
                   }}
                 >
                   {"See what's included in Basic & Pro plans"}
@@ -179,8 +180,8 @@ export const Expiring = () => {
                 fontSize={AppFontSize.md + 2}
                 style={{
                   marginBottom: status.extend ? 0 : 10,
-                  marginTop: 10,
-                  paddingHorizontal: 24
+                  marginTop: DefaultAppStyles.GAP_VERTICAL,
+                  paddingHorizontal: DefaultAppStyles.GAP * 2
                 }}
               />
 
@@ -204,7 +205,7 @@ export const Expiring = () => {
                   fontSize={AppFontSize.xs}
                   height={30}
                   style={{
-                    marginBottom: 10
+                    marginBottom: DefaultAppStyles.GAP_VERTICAL
                   }}
                 />
               )}

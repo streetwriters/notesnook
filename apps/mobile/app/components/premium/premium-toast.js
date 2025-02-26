@@ -40,6 +40,7 @@ import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const PremiumToast = ({ context = "global", offset = 0 }) => {
   const { colors } = useThemeColors();
@@ -95,7 +96,7 @@ export const PremiumToast = ({ context = "global", offset = 0 }) => {
           backgroundColor: colors.secondary.background,
           zIndex: 999,
           ...getElevationStyle(20),
-          padding: 12,
+          padding: DefaultAppStyles.GAP,
           borderRadius: 10,
           flexDirection: "row",
           alignSelf: "center",

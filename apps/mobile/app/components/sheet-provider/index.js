@@ -33,6 +33,7 @@ import { Button } from "../ui/button";
 import SheetWrapper from "../ui/sheet";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { DefaultAppStyles } from "../../utils/styles";
 const SheetProvider = ({ context = "global" }) => {
   const { colors } = useThemeColors();
   const [visible, setVisible] = useState(false);
@@ -120,13 +121,13 @@ const SheetProvider = ({ context = "global" }) => {
             !data.progress && !data.icon && !data.title && !data.paragraph
               ? 0
               : 10,
-          paddingHorizontal: 12
+          paddingHorizontal: DefaultAppStyles.GAP
         }}
       >
         {data?.progress ? (
           <ActivityIndicator
             style={{
-              marginTop: 15
+              marginTop: DefaultAppStyles.GAP
             }}
             size={50}
             color={colors.primary.accent}
@@ -169,7 +170,7 @@ const SheetProvider = ({ context = "global" }) => {
 
       <View
         style={{
-          paddingHorizontal: 12,
+          paddingHorizontal: DefaultAppStyles.GAP,
           marginBottom: data.valueArray ? 12 : 0
         }}
       >
@@ -193,7 +194,7 @@ const SheetProvider = ({ context = "global" }) => {
 
       <View
         style={{
-          paddingHorizontal: 12
+          paddingHorizontal: DefaultAppStyles.GAP
         }}
       >
         {data?.action ? (
@@ -220,7 +221,7 @@ const SheetProvider = ({ context = "global" }) => {
               icon={item.icon && item.icon}
               type={item.type || "accent"}
               style={{
-                marginBottom: 10
+                marginBottom: DefaultAppStyles.GAP_VERTICAL
               }}
               width="100%"
               fontSize={AppFontSize.md}
@@ -231,7 +232,7 @@ const SheetProvider = ({ context = "global" }) => {
           <Paragraph
             style={{
               alignSelf: "center",
-              marginTop: 10,
+              marginTop: DefaultAppStyles.GAP_VERTICAL,
               textDecorationLine: "underline"
             }}
             size={AppFontSize.xs}

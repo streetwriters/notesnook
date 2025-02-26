@@ -24,6 +24,7 @@ import Heading from "../../components/ui/typography/heading";
 import { AppFontSize } from "../../utils/size";
 import { useThemeColors } from "@notesnook/theme";
 import Paragraph from "../../components/ui/typography/paragraph";
+import { DefaultAppStyles } from "../../utils/styles";
 
 type LicenseEntry = {
   name: string;
@@ -47,7 +48,7 @@ export const Licenses = () => {
           alignItems: "flex-start",
           justifyContent: "flex-start",
           alignSelf: "flex-start",
-          padding: 12,
+          padding: DefaultAppStyles.GAP,
           borderBottomWidth: 1,
           borderBottomColor: colors.primary.border,
           borderRadius: 0

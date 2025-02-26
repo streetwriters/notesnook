@@ -22,6 +22,7 @@ import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useThemeColors } from "@notesnook/theme";
 import Paragraph from "../ui/typography/paragraph";
+import { DefaultAppStyles } from "../../utils/styles";
 
 /**
  *
@@ -39,7 +40,7 @@ export const ProTag = ({ width, size, background }) => {
         width: width || 60,
         justifyContent: "center",
         alignItems: "center",
-        paddingVertical: 2.5,
+        paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL / 2,
         flexDirection: "row"
       }}
     >

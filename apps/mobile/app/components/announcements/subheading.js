@@ -21,14 +21,15 @@ import React from "react";
 import { AppFontSize } from "../../utils/size";
 import Heading from "../ui/typography/heading";
 import { getStyle } from "./functions";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const SubHeading = ({ text, style = {} }) => {
   return (
     <Heading
       size={AppFontSize.md + 2}
       style={{
-        marginHorizontal: 12,
-        marginTop: 12,
+        marginHorizontal: DefaultAppStyles.GAP,
+        marginTop: DefaultAppStyles.GAP_VERTICAL,
         ...getStyle(style)
       }}
     >

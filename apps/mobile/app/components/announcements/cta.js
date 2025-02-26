@@ -29,6 +29,7 @@ import { PricingPlans } from "../premium/pricing-plans";
 import SheetProvider from "../sheet-provider";
 import { Button } from "../ui/button";
 import { allowedOnPlatform, getStyle } from "./functions";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const Cta = ({ actions, style = {}, color, inline }) => {
   const { colors } = useThemeColors();
@@ -61,7 +62,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
   return (
     <View
       style={{
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         ...getStyle(style),
         flexDirection: inline ? "row" : "column"
       }}
@@ -130,7 +131,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
                 onPress={() => onPress(item)}
                 width={250}
                 style={{
-                  marginBottom: 5,
+                  marginBottom: DefaultAppStyles.GAP_VERTICAL,
                   borderRadius: 100
                 }}
               />
@@ -148,7 +149,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
                 height={30}
                 style={{
                   minWidth: "50%",
-                  marginTop: 5
+                  marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL
                 }}
                 textStyle={{
                   textDecorationLine: "underline"

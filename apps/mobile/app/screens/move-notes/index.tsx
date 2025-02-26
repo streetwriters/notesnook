@@ -282,3 +282,5 @@ const SelectableNoteItem = React.memo(
 SelectableNoteItem.displayName = "SelectableNoteItem";
 
 MoveNotes.present = (notebook?: Notebook) => {};
+
+export default MoveNotes;

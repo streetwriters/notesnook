@@ -33,6 +33,7 @@ import { useSettingStore } from "../../stores/use-setting-store";
 import { useUserStore } from "../../stores/use-user-store";
 import { AppFontSize } from "../../utils/size";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 const AppLock = () => {
   const { colors } = useThemeColors();
   const appLockMode = useSettingStore((state) => state.settings.appLockMode);
@@ -73,7 +74,7 @@ const AppLock = () => {
               alignItems: "flex-end",
               justifyContent: "space-between",
               width: "95%",
-              paddingVertical: 12,
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL,
               paddingHorizontal: 0,
               alignSelf: "center",
               minHeight: 125,
@@ -108,7 +109,7 @@ const AppLock = () => {
           <Seperator />
           <ScrollView
             style={{
-              paddingHorizontal: 12,
+              paddingHorizontal: DefaultAppStyles.GAP,
               width: "100%",
               alignSelf: "center",
               flexGrow: 1
@@ -158,10 +159,10 @@ const AppLock = () => {
                 style={{
                   justifyContent: "flex-start",
                   alignItems: "flex-start",
-                  paddingHorizontal: 12,
-                  paddingVertical: 12,
+                  paddingHorizontal: DefaultAppStyles.GAP,
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL,
                   marginTop: 0,
-                  marginBottom: 12,
+                  marginBottom: DefaultAppStyles.GAP_VERTICAL,
                   borderWidth: 1,
                   borderColor:
                     appLockMode === item.value

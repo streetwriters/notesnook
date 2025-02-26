@@ -30,6 +30,7 @@ import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import SelectionWrapper, { selectItem } from "../selection-wrapper";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 const TagItem = React.memo(
   ({
@@ -75,7 +76,7 @@ const TagItem = React.memo(
             color={colors.secondary.paragraph}
             size={AppFontSize.xs}
             style={{
-              marginTop: 5
+              marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL
             }}
           >
             {strings.notes(totalNotes)}

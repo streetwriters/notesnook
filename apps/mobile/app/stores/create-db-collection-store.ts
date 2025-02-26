@@ -59,7 +59,11 @@ export default function createDBCollectionStore<Type extends Item>({
     refresh: async () => {
       try {
         const items = await getCollection();
-        if (get().loading && eagerlyFetchFirstBatch) {
+        if (
+          get().loading &&
+          eagerlyFetchFirstBatch &&
+          items.placeholders.length
+        ) {
           await items.item(0, resolveItems);
         }
         set({

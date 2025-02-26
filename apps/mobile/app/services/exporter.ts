@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
+//@ts-ignore
 import RNHTMLtoPDF from "react-native-html-to-pdf-lite";
 import * as ScopedStorage from "react-native-scoped-storage";
 import { zip } from "react-native-zip-archive";

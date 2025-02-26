@@ -50,6 +50,7 @@ import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { ItemReference, Note, Reminder } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 type ReminderSheetProps = {
   actionSheetRef: RefObject<ActionSheetRef>;
@@ -224,7 +225,7 @@ export default function ReminderSheet({
   return (
     <View
       style={{
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         maxHeight: "100%"
       }}
     >
@@ -245,7 +246,7 @@ export default function ReminderSheet({
           placeholder={strings.remindeMeOf()}
           onChangeText={(text) => (title.current = text)}
           wrapperStyle={{
-            marginTop: 10
+            marginTop: DefaultAppStyles.GAP_VERTICAL
           }}
         />
 
@@ -262,18 +263,18 @@ export default function ReminderSheet({
           textAlignVertical="top"
           inputStyle={{
             minHeight: 80,
-            paddingVertical: 12
+            paddingVertical: DefaultAppStyles.GAP_VERTICAL
           }}
           height={80}
           wrapperStyle={{
-            marginBottom: 12
+            marginBottom: DefaultAppStyles.GAP_VERTICAL
           }}
         />
 
         <ScrollView
           style={{
             flexDirection: "row",
-            marginBottom: 12,
+            marginBottom: DefaultAppStyles.GAP_VERTICAL,
             height: 50
           }}
           horizontal
@@ -323,9 +324,9 @@ export default function ReminderSheet({
           <View
             style={{
               backgroundColor: colors.secondary.background,
-              padding: 12,
+              padding: DefaultAppStyles.GAP,
               borderRadius: defaultBorderRadius,
-              marginBottom: 12
+              marginBottom: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             <View
@@ -439,7 +440,7 @@ export default function ReminderSheet({
               width: "100%",
               flexDirection: "column",
               justifyContent: "center",
-              marginBottom: 12,
+              marginBottom: DefaultAppStyles.GAP_VERTICAL,
               alignItems: "center"
             }}
           >
@@ -495,11 +496,11 @@ export default function ReminderSheet({
             style={{
               borderRadius: defaultBorderRadius,
               flexDirection: "row",
-              paddingVertical: 6,
-              paddingHorizontal: 12,
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
+              paddingHorizontal: DefaultAppStyles.GAP,
               alignItems: "center",
               justifyContent: "flex-start",
-              marginBottom: 10,
+              marginBottom: DefaultAppStyles.GAP_VERTICAL,
               backgroundColor: colors.secondary.background
             }}
           >
@@ -551,7 +552,7 @@ export default function ReminderSheet({
           <RNScrollView
             style={{
               flexDirection: "row",
-              marginTop: 12,
+              marginTop: DefaultAppStyles.GAP_VERTICAL,
               height: 50
             }}
             horizontal
@@ -603,8 +604,8 @@ export default function ReminderSheet({
         height={45}
         fontSize={AppFontSize.md}
         style={{
-          paddingHorizontal: 24,
-          marginTop: 10,
+          paddingHorizontal: DefaultAppStyles.GAP * 2,
+          marginTop: DefaultAppStyles.GAP_VERTICAL,
           width: "100%"
         }}
         onPress={saveReminder}

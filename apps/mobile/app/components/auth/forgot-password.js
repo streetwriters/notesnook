@@ -33,6 +33,7 @@ import Seperator from "../ui/seperator";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const ForgotPassword = () => {
   const { colors } = useThemeColors("sheet");
@@ -107,7 +108,7 @@ export const ForgotPassword = () => {
         {sent ? (
           <View
             style={{
-              padding: 12,
+              padding: DefaultAppStyles.GAP,
               justifyContent: "center",
               alignItems: "center",
               paddingBottom: 50
@@ -138,7 +139,7 @@ export const ForgotPassword = () => {
               backgroundColor: colors.primary.background,
               zIndex: 10,
               width: "100%",
-              padding: 12
+              padding: DefaultAppStyles.GAP
             }}
           >
             <DialogHeader title={strings.accountRecovery()} />
@@ -164,7 +165,7 @@ export const ForgotPassword = () => {
 
             <Button
               style={{
-                marginTop: 10,
+                marginTop: DefaultAppStyles.GAP_VERTICAL,
                 width: "100%"
               }}
               loading={loading}

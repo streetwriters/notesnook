@@ -38,6 +38,7 @@ import Paragraph from "../ui/typography/paragraph";
 import { hideAuth } from "./common";
 import { ForgotPassword } from "./forgot-password";
 import { useLogin } from "./use-login";
+import { DefaultAppStyles } from "../../utils/styles";
 
 const LoginSteps = {
   emailAuth: 1,
@@ -102,10 +103,10 @@ export const Login = ({ changeMode }) => {
         <View
           style={{
             justifyContent: "flex-end",
-            paddingHorizontal: 20,
+            paddingHorizontal: DefaultAppStyles.GAP,
             backgroundColor: colors.secondary.background,
             borderBottomWidth: 0.8,
-            marginBottom: 12,
+            marginBottom: DefaultAppStyles.GAP_VERTICAL,
             borderBottomColor: colors.primary.border,
             alignSelf: isTablet ? "center" : undefined,
             borderWidth: isTablet ? 1 : null,
@@ -143,7 +144,7 @@ export const Login = ({ changeMode }) => {
           <Heading
             style={{
               marginBottom: 25,
-              marginTop: 10
+              marginTop: DefaultAppStyles.GAP_VERTICAL
             }}
             extraBold
             size={AppFontSize.xxl}
@@ -163,7 +164,7 @@ export const Login = ({ changeMode }) => {
               : "99.9%",
             backgroundColor: colors.primary.background,
             alignSelf: "center",
-            paddingHorizontal: 20
+            paddingHorizontal: DefaultAppStyles.GAP
           }}
         >
           <Input
@@ -247,7 +248,6 @@ export const Login = ({ changeMode }) => {
                 width: 250
               }}
               height={50}
-              fontSize={AppFontSize.md}
               type="accent"
               title={!loading ? strings.continue() : null}
             />
@@ -258,7 +258,7 @@ export const Login = ({ changeMode }) => {
                 style={{
                   alignSelf: "center",
                   height: 30,
-                  marginTop: 10
+                  marginTop: DefaultAppStyles.GAP_VERTICAL
                 }}
                 onPress={() => {
                   if (loading) return;
@@ -282,17 +282,17 @@ export const Login = ({ changeMode }) => {
                 activeOpacity={0.8}
                 style={{
                   alignSelf: "center",
-                  marginTop: 12,
-                  paddingVertical: 12
+                  marginTop: DefaultAppStyles.GAP_VERTICAL,
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL
                 }}
               >
                 <Paragraph
-                  size={AppFontSize.xs + 1}
+                  size={AppFontSize.xs}
                   color={colors.secondary.paragraph}
                 >
                   {strings.dontHaveAccount()}{" "}
                   <Paragraph
-                    size={AppFontSize.xs + 1}
+                    size={AppFontSize.xs}
                     style={{ color: colors.primary.accent }}
                   >
                     {strings.signUp()}

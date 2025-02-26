@@ -28,6 +28,7 @@ import ManageTagsSheet from "../sheets/manage-tags";
 import { Button } from "../ui/button";
 import { ColorTags } from "./color-tags";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const Tags = ({ item, close }) => {
   const { colors } = useThemeColors();
@@ -35,11 +36,10 @@ export const Tags = ({ item, close }) => {
   return item.id ? (
     <View
       style={{
-        marginTop: 5,
         flexDirection: "row",
         flexWrap: "wrap",
         alignItems: "center",
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         alignSelf: "center",
         justifyContent: "space-between",
         width: "100%"
@@ -56,11 +56,10 @@ export const Tags = ({ item, close }) => {
         type="secondary"
         icon="plus"
         iconPosition="right"
-        height={30}
-        fontSize={AppFontSize.sm - 1}
+        fontSize={AppFontSize.xs}
         style={{
-          height: 35,
-          borderRadius: 100
+          paddingHorizontal: DefaultAppStyles.GAP_SMALL,
+          paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
         }}
       />
       <ColorTags item={item} />
@@ -86,7 +85,7 @@ export const TagStrip = ({ item, close }) => {
         flexDirection: "row",
         flexWrap: "wrap",
         alignItems: "center",
-        marginTop: 10,
+        marginTop: DefaultAppStyles.GAP_VERTICAL,
         gap: 5
       }}
     >

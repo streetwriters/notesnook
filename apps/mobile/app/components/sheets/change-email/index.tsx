@@ -31,6 +31,7 @@ import { Button } from "../../ui/button";
 import Input from "../../ui/input";
 import { eUserLoggedIn } from "../../../utils/events";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 type ChangeEmailProps = {
   actionSheetRef: RefObject<ActionSheetRef>;
@@ -101,14 +102,14 @@ export const ChangeEmail = ({ close }: ChangeEmailProps) => {
   };
 
   return (
-    <View style={{ paddingHorizontal: 12 }}>
+    <View style={{ paddingHorizontal: DefaultAppStyles.GAP }}>
       <DialogHeader
         title={strings.changeEmail()}
         paragraph={strings.changeEmailDesc()}
       />
       <View
         style={{
-          marginTop: 12
+          marginTop: DefaultAppStyles.GAP_VERTICAL
         }}
       >
         {step === EmailChangeSteps.verify ? (

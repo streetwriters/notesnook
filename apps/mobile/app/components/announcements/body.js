@@ -20,12 +20,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import Paragraph from "../ui/typography/paragraph";
 import { getStyle } from "./functions";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const Body = ({ text, style = {} }) => {
   return (
     <Paragraph
       style={{
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         ...getStyle(style)
       }}
     >

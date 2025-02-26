@@ -33,6 +33,7 @@ import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeColors } from "@notesnook/theme";
 import { AppFontSize } from "../../utils/size";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 
 const SoundItem = ({
   playingSoundId,
@@ -59,7 +60,7 @@ const SoundItem = ({
         borderBottomWidth: 1,
         borderRadius: 0,
         borderBottomColor: colors.primary.border,
-        paddingHorizontal: 12
+        paddingHorizontal: DefaultAppStyles.GAP
       }}
       onPress={async () => {
         SettingsService.set({

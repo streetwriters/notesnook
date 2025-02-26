@@ -36,6 +36,7 @@ import { SUBSCRIPTION_STATUS_STRINGS } from "../../utils/constants";
 import { AppFontSize } from "../../utils/size";
 import { SectionItem } from "./section-item";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const getTimeLeft = (t2) => {
   let daysRemaining = dayjs(t2).diff(dayjs(), "days");
@@ -118,7 +119,7 @@ const SettingsUserSection = ({ item }) => {
         <>
           <View
             style={{
-              paddingHorizontal: 12,
+              paddingHorizontal: DefaultAppStyles.GAP,
               paddingTop: 50,
               borderBottomWidth: 1,
               paddingBottom: 20,
@@ -143,7 +144,7 @@ const SettingsUserSection = ({ item }) => {
                   style={{
                     borderWidth: 2,
                     borderRadius: 100,
-                    marginBottom: 10,
+                    marginBottom: DefaultAppStyles.GAP_VERTICAL,
                     borderColor: colors.primary.accent
                   }}
                 >
@@ -225,7 +226,7 @@ const SettingsUserSection = ({ item }) => {
                   <Paragraph
                     style={{
                       flexWrap: "wrap",
-                      marginTop: 5
+                      marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL
                     }}
                     size={AppFontSize.xs}
                     color={colors.secondary.heading}
