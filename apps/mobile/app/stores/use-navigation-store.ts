@@ -82,7 +82,7 @@ export interface RouteParams extends ParamListBase {
   Settings: GenericRouteParam;
   Auth: AuthParams;
   LinkNotebooks: {
-    note?: Note;
+    noteIds: string[];
   };
   MoveNotebook: {
     selectedNotebooks: Notebook[];

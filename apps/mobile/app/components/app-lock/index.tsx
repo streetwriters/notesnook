@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { useCallback, useEffect, useRef } from "react";
 import {
   AppStateStatus,
-  BackHandler,
   Platform,
   TextInput,
   useWindowDimensions,
@@ -45,17 +44,16 @@ import SettingsService from "../../services/settings";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useUserStore } from "../../stores/use-user-store";
 import { NotesnookModule } from "../../utils/notesnook-module";
-import { AppFontSize } from "../../utils/size";
-import { Toast } from "../../components/toast";
-import { Button } from "../../components/ui/button";
-import { IconButton } from "../../components/ui/icon-button";
-import Input from "../../components/ui/input";
-import Seperator from "../../components/ui/seperator";
-import Heading from "../../components/ui/typography/heading";
-import Paragraph from "../../components/ui/typography/paragraph";
+import { Toast } from "../toast";
+import { Button } from "../ui/button";
+import { IconButton } from "../ui/icon-button";
+import Input from "../ui/input";
+import Seperator from "../ui/seperator";
+import Heading from "../ui/typography/heading";
+import Paragraph from "../ui/typography/paragraph";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { strings } from "@notesnook/intl";
-import { DefaultAppStyles } from "../../utils/styles";
+import { AppFontSize } from "../../utils/size";
 
 const getUser = () => {
   const user = MMKV.getString("user");
@@ -84,7 +82,7 @@ const verifyUserPassword = async (password: string) => {
   }
 };
 
-const AppLockedScreen = () => {
+const AppLocked = () => {
   const initialLaunchBiometricRequest = useRef(true);
   const { colors } = useThemeColors();
   const user = getUser();
@@ -184,7 +182,13 @@ const AppLockedScreen = () => {
       (prevState === "background" || initialLaunchBiometricRequest.current)
     ) {
       if (SettingsService.shouldLockAppOnEnterForeground()) {
+        if (useSettingStore.getState().appDidEnterBackgroundForAction) {
+          useSettingStore.getState().setAppDidEnterBackgroundForAction(false);
+          return;
+        }
+
         DatabaseLogger.info("Locking app on entering foreground");
+
         useUserStore.getState().lockApp(true);
       }
       if (
@@ -205,24 +209,14 @@ const AppLockedScreen = () => {
     }
   }, [appState, onUnlockAppRequested, appLocked]);
 
-  useEffect(() => {
-    let handler: any;
-    if (appLocked) {
-      handler = BackHandler.addEventListener("hardwareBackPress", () => {
-        return true;
-      });
-    }
-    return () => {
-      handler?.remove();
-    };
-  }, [appLocked]);
-
-  return (
+  return appLocked ? (
     <KeyboardAwareScrollView
       style={{
         backgroundColor: colors.primary.background,
         width: "100%",
-        height: "100%"
+        height: "100%",
+        position: "absolute",
+        zIndex: 999
       }}
       contentContainerStyle={{
         justifyContent: "center",
@@ -242,9 +236,9 @@ const AppLockedScreen = () => {
               : Platform.OS == "ios"
               ? "95%"
               : "100%",
-          paddingHorizontal: DefaultAppStyles.GAP,
+          paddingHorizontal: 12,
           marginBottom: 30,
-          marginTop: DefaultAppStyles.GAP,
+          marginTop: 15,
           alignSelf: "center"
         }}
       >
@@ -283,7 +277,7 @@ const AppLockedScreen = () => {
         <View
           style={{
             width: "100%",
-            padding: DefaultAppStyles.GAP,
+            padding: 12,
             backgroundColor: colors.primary.background
           }}
         >
@@ -345,7 +339,7 @@ const AppLockedScreen = () => {
         </View>
       </View>
     </KeyboardAwareScrollView>
-  );
+  ) : null;
 };
 
-export default AppLockedScreen;
+export default AppLocked;

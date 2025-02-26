@@ -3984,6 +3984,10 @@ msgstr "notebook"
 msgid "Notebook"
 msgstr "Notebook"
 
+#: src/strings.ts:2452
+msgid "Notebook added"
+msgstr "Notebook added"
+
 #: src/strings.ts:306
 msgid "notebooks"
 msgstr "notebooks"

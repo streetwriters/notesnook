@@ -217,7 +217,7 @@ export const Login = ({ changeMode }) => {
                 title={strings.forgotPassword()}
                 style={{
                   alignSelf: "flex-end",
-                  height: 30,
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
                   paddingHorizontal: 0
                 }}
                 onPress={() => {
@@ -247,7 +247,6 @@ export const Login = ({ changeMode }) => {
               style={{
                 width: 250
               }}
-              height={50}
               type="accent"
               title={!loading ? strings.continue() : null}
             />
@@ -257,19 +256,16 @@ export const Login = ({ changeMode }) => {
                 title={strings.cancelLogin()}
                 style={{
                   alignSelf: "center",
-                  height: 30,
-                  marginTop: DefaultAppStyles.GAP_VERTICAL
+                  marginTop: DefaultAppStyles.GAP_VERTICAL,
+                  width: 250
                 }}
                 onPress={() => {
                   if (loading) return;
                   setStep(LoginSteps.emailAuth);
                   setLoading(false);
                 }}
-                textStyle={{
-                  textDecorationLine: "underline"
-                }}
                 fontSize={AppFontSize.xs}
-                type="errorShade"
+                type="secondaryAccented"
               />
             )}
 

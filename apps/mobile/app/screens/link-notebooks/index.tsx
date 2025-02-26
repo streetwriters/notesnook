@@ -90,6 +90,7 @@ async function updateInitialSelectionState(items: string[]) {
 }
 
 const LinkNotebooks = (props: NavigationProps<"LinkNotebooks">) => {
+  const noteIds = props.route.params?.noteIds;
   const { colors } = useThemeColors();
   const [notebooks, loading] = useNotebooks();
   const tree = useNotebookTreeStore((state) => state.tree);
@@ -148,10 +149,7 @@ const LinkNotebooks = (props: NavigationProps<"LinkNotebooks">) => {
   );
 
   useEffect(() => {
-    const items = props.route.params.note
-      ? [props.route.params.note.id]
-      : selectedItemsList;
-    updateInitialSelectionState(items);
+    updateInitialSelectionState(noteIds);
     return () => {
       useNotebookSelectionStore.setState({
         initialState: {},
@@ -160,15 +158,10 @@ const LinkNotebooks = (props: NavigationProps<"LinkNotebooks">) => {
         canEnableMultiSelectMode: true
       });
     };
-  }, [props.route.params.note, selectedItemsList]);
+  }, [noteIds]);
 
   const onSave = async () => {
-    const noteIds = props.route.params.note
-      ? [props.route.params.note.id]
-      : selectedItemsList;
-
     const changedNotebooks = useNotebookSelectionStore.getState().selection;
-
     for (const id in changedNotebooks) {
       const item = await db.notebooks.notebook(id);
       if (!item) continue;
@@ -206,17 +199,14 @@ const LinkNotebooks = (props: NavigationProps<"LinkNotebooks">) => {
       }}
     >
       <Header
-        title="Link Notebooks"
+        title={strings.addToNotebook()}
         canGoBack
         rightButton={
           hasSelection
             ? {
                 name: "restore",
                 onPress: () => {
-                  const items = props.route.params.note
-                    ? [props.route.params.note.id]
-                    : selectedItemsList;
-                  updateInitialSelectionState(items);
+                  updateInitialSelectionState(noteIds);
                 }
               }
             : undefined
