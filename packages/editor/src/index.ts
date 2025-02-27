@@ -89,7 +89,7 @@ import { InlineCode } from "./extensions/inline-code/inline-code.js";
 interface TiptapStorage {
   dateFormat?: DateTimeOptions["dateFormat"];
   timeFormat?: DateTimeOptions["timeFormat"];
-  openLink?: (url: string) => void;
+  openLink?: (url: string, openInNewTab?: boolean) => void;
   downloadAttachment?: (attachment: Attachment) => void;
   openAttachmentPicker?: (type: AttachmentType) => void;
   previewAttachment?: (attachment: Attachment) => void;
