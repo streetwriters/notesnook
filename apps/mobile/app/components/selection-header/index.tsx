@@ -69,7 +69,6 @@ export const SelectionHeader = React.memo(
     const allSelected =
       items?.placeholders?.length === selectedItemsList.length;
     const focusedRouteId = useNavigationStore((state) => state.focusedRouteId);
-    console.log(focusedRouteId, "focusedRouteId");
     useEffect(() => {
       if (selectionMode) {
         fluidTabsRef.current?.lock();
