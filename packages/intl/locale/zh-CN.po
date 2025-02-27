@@ -1175,7 +1175,7 @@ msgstr "浏览"
 
 #: src/strings.ts:2253
 msgid "Bullet list"
-msgstr "项目符号列表"
+msgstr "无序列表"
 
 #: src/strings.ts:404
 msgid "By"
@@ -3556,7 +3556,7 @@ msgstr "匹配整个单词"
 
 #: src/strings.ts:2263
 msgid "Math (inline)"
-msgstr "数学（行内）"
+msgstr "单行公式"
 
 #: src/strings.ts:2314
 msgid "Math & formulas"
@@ -4034,7 +4034,7 @@ msgstr "通知已禁用"
 
 #: src/strings.ts:2254
 msgid "Numbered list"
-msgstr "编号列表"
+msgstr "有序列表"
 
 #: src/strings.ts:1700
 msgid "of"
