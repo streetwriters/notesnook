@@ -365,3 +365,17 @@ export const keybindings = {
   ...hotkeys,
   ...tiptapKeys
 };
+
+export function formatKey(key: string) {
+  return key
+    .replaceAll("+", " ")
+    .replaceAll("command", "Command")
+    .replace("ctrl", "Ctrl")
+    .replace("shift", "Shift")
+    .replace("alt", "Alt")
+    .replace("Mod", "Ctrl");
+}
+
+export function macify(key: string) {
+  return key.replaceAll("Ctrl", "Command").replaceAll("Alt", "Option");
+}

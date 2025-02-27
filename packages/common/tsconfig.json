@@ -1,6 +1,7 @@
 {
   "extends": "../../tsconfig",
   "compilerOptions": {
+    "target": "ES2021",
     "outDir": "./dist",
     "jsx": "react-jsx"
   },
