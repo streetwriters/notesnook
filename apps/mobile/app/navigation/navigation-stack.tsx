@@ -28,7 +28,7 @@ import useNavigationStore, {
 } from "../stores/use-navigation-store";
 import { useSelectionStore } from "../stores/use-selection-store";
 import { useSettingStore } from "../stores/use-setting-store";
-import { fluidTabsRef, rootNavigatorRef } from "../utils/global-refs";
+import { rootNavigatorRef } from "../utils/global-refs";
 
 const RootStack = createNativeStackNavigator();
 const AppStack = createNativeStackNavigator();
@@ -50,7 +50,8 @@ const AppNavigation = React.memo(
     React.useEffect(() => {
       setTimeout(() => {
         useNavigationStore.getState().update(homepage as keyof RouteParams);
-      }, 1000);
+        useNavigationStore.getState().setFocusedRouteId(homepage);
+      }, 300);
     }, [homepage]);
 
     return (
@@ -170,15 +171,6 @@ export const RootNavigation = () => {
       <RootStack.Navigator
         screenOptions={{
           headerShown: false
-        }}
-        screenListeners={{
-          focus: (props) => {
-            if (props.target?.startsWith("FluidPanelsView")) {
-              fluidTabsRef.current?.unlock();
-            } else {
-              fluidTabsRef.current?.lock();
-            }
-          }
         }}
         initialRouteName={introCompleted ? "FluidPanelsView" : "Welcome"}
       >
