@@ -144,7 +144,9 @@ function Note(props: NoteProps) {
       }}
       context={{ color, locked }}
       menuItems={noteMenuItems}
-      onClick={() => useEditorStore.getState().openSession(note)}
+      onClick={() =>
+        useEditorStore.getState().openSession(note, { considerPinnedTab: true })
+      }
       onMiddleClick={() =>
         useEditorStore.getState().openSession(note, { openInNewTab: true })
       }
