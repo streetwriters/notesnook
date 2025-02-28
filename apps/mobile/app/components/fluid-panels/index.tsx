@@ -43,6 +43,7 @@ import { eSendEvent } from "../../services/event-manager";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { eClearEditor } from "../../utils/events";
 import { useSideBarDraggingStore } from "../side-menu/dragging-store";
+import { rootNavigatorRef } from "../../utils/global-refs";
 
 interface TabProps extends ViewProps {
   dimensions: { width: number; height: number };
@@ -145,6 +146,12 @@ export const FluidPanels = forwardRef<TabsRef, TabProps>(function FluidTabs(
   useEffect(() => {
     const sub = BackHandler.addEventListener("hardwareBackPress", () => {
       if (isDrawerOpen.value && !forcedLock.value) {
+        const routeNames = rootNavigatorRef.current?.getState().routes;
+        if (routeNames) {
+          const currentRoute = routeNames[routeNames.length - 1].name;
+          if (currentRoute !== "FluidPanelsView") return false;
+        }
+
         translateX.value = withTiming(homePosition);
         onDrawerStateChange(false);
         isDrawerOpen.value = false;
