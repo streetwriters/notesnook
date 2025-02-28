@@ -85,6 +85,8 @@ async function createWindow() {
   const mainWindowState = new WindowState({});
   const mainWindow = new BrowserWindow({
     show: !cliOptions.hidden,
+    paintWhenInitiallyHidden: cliOptions.hidden,
+    skipTaskbar: cliOptions.hidden,
     x: mainWindowState.x,
     y: mainWindowState.y,
     width: mainWindowState.width,
@@ -101,7 +103,10 @@ async function createWindow() {
     ...(config.desktopSettings.nativeTitlebar
       ? {}
       : {
-          titleBarStyle: process.platform === "win32" || process.platform === "darwin" ? "hidden" : "default",
+          titleBarStyle:
+            process.platform === "win32" || process.platform === "darwin"
+              ? "hidden"
+              : "default",
           frame: process.platform === "win32" || process.platform === "darwin",
           titleBarOverlay: {
             height: 37,

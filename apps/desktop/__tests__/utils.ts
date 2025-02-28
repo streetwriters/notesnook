@@ -19,12 +19,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { execSync } from "child_process";
 import { mkdir } from "fs/promises";
+import { fileURLToPath } from "node:url";
 import path from "path";
 import { _electron as electron } from "playwright";
 import slugify from "slugify";
 import { TaskContext } from "vitest";
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const IS_DEBUG = process.env.NN_DEBUG === "true" || process.env.CI === "true";
 
 interface AppContext {
