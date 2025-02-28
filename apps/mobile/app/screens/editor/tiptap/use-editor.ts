@@ -998,7 +998,6 @@ export const useEditor = (
     if (fluidTabsRef.current?.page() === "editor") {
       state.current.movedAway = false;
     }
-
     if (!state.current.editorStateRestored) {
       state.current.isRestoringState = true;
       if (!DDS.isTab) {
@@ -1076,12 +1075,12 @@ export const useEditor = (
       let noteId = url && new URL(url).searchParams.get("id");
       if (noteId) {
         const note = await db.notes?.note(noteId);
+        fluidTabsRef.current?.goToPage("editor");
         if (note) {
           loadNote({
             item: note
           });
         }
-        fluidTabsRef.current?.goToPage("editor");
       } else {
         noteId = useTabStore.getState().getCurrentNoteId() || null;
         if (!noteId) {
@@ -1091,6 +1090,7 @@ export const useEditor = (
           }
         } else {
           const note = await db.notes.note(noteId);
+          restoreEditorState();
           if (note) {
             loadNote({
               item: note
@@ -1102,13 +1102,14 @@ export const useEditor = (
       overlay(false);
     }
   }, [
-    postMessage,
-    theme,
     commands,
     isDefaultEditor,
     insets,
+    postMessage,
+    theme,
+    overlay,
     loadNote,
-    overlay
+    restoreEditorState
   ]);
 
   return {
