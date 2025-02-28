@@ -715,6 +715,7 @@ export const settingsGroups: SettingSection[] = [
       {
         id: "behaviour",
         type: "screen",
+        icon: "brain",
         name: strings.behavior(),
         description: strings.behaviorDesc(),
         sections: [
@@ -1299,6 +1300,7 @@ export const settingsGroups: SettingSection[] = [
         id: "restore-backup",
         name: strings.restoreBackup(),
         description: strings.restoreBackupDesc(),
+        icon: "restore",
         type: "screen",
         component: "backuprestore"
       },
@@ -1425,7 +1427,7 @@ export const settingsGroups: SettingSection[] = [
       {
         id: "email-support",
         name: strings.emailSupport(),
-        icon: "mail",
+        icon: "email",
         modifer: () => {
           Clipboard.setString("support@streetwriters.co");
           ToastManager.show({
@@ -1522,6 +1524,7 @@ export const settingsGroups: SettingSection[] = [
       {
         id: "tos",
         name: strings.tos(),
+        icon: "briefcase-outline",
         modifer: async () => {
           try {
             await Linking.openURL("https://notesnook.com/tos");
@@ -1534,6 +1537,7 @@ export const settingsGroups: SettingSection[] = [
       {
         id: "privacy-policy",
         name: strings.privacyPolicy(),
+        icon: "shield-outline",
         modifer: async () => {
           try {
             await Linking.openURL("https://notesnook.com/privacy");
