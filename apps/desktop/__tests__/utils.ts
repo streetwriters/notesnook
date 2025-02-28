@@ -25,6 +25,7 @@ import slugify from "slugify";
 import { TaskContext } from "vitest";
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const IS_DEBUG = process.env.NN_DEBUG === "true" || process.env.CI === "true";
 
 interface AppContext {
   app: import("playwright").ElectronApplication;
@@ -83,7 +84,7 @@ async function buildAndLaunchApp(options?: TestOptions): Promise<AppContext> {
 async function launchApp(executablePath: string) {
   const app = await electron.launch({
     executablePath,
-    args: process.env.NN_DEBUG ? [] : ["--hidden"]
+    args: IS_DEBUG ? [] : ["--hidden"]
   });
 
   const page = await app.firstWindow();
@@ -109,7 +110,7 @@ async function buildApp({
   const buildRoot = path.join("test-artifacts", `${productName}-build`);
   const output = path.join("test-artifacts", `${productName}-output`);
   execSync(`npm run release -- --root ${buildRoot}`, {
-    stdio: process.env.NN_DEBUG ? "inherit" : "ignore"
+    stdio: IS_DEBUG ? "inherit" : "ignore"
   });
 
   const args = [
@@ -119,7 +120,7 @@ async function buildApp({
   if (version) args.push(`--c.extraMetadata.version=${version}`);
 
   execSync(`npx electron-builder --dir --${process.arch} ${args.join(" ")}`, {
-    stdio: process.env.NN_DEBUG ? "inherit" : "ignore",
+    stdio: IS_DEBUG ? "inherit" : "ignore",
     env: {
       ...process.env,
       NN_BUILD_ROOT: buildRoot,
