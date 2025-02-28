@@ -84,7 +84,14 @@ async function buildAndLaunchApp(options?: TestOptions): Promise<AppContext> {
 async function launchApp(executablePath: string) {
   const app = await electron.launch({
     executablePath,
-    args: IS_DEBUG ? [] : ["--hidden"]
+    args: IS_DEBUG ? [] : ["--hidden"],
+    env:
+      process.platform === "linux"
+        ? {
+            ...(process.env as Record<string, string>),
+            APPIMAGE: "true"
+          }
+        : (process.env as Record<string, string>)
   });
 
   const page = await app.firstWindow();
