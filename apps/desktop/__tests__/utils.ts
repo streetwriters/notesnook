@@ -123,6 +123,7 @@ async function buildApp({
     stdio: IS_DEBUG ? "inherit" : "ignore",
     env: {
       ...process.env,
+      NOTESNOOK_STAGING: "true",
       NN_BUILD_ROOT: buildRoot,
       NN_PRODUCT_NAME: productName,
       NN_APP_ID: `com.notesnook.test.${productName}`,
@@ -135,7 +136,9 @@ async function buildApp({
     "..",
     output,
     process.platform === "linux"
-      ? "linux-unpacked"
+      ? process.arch === "arm64"
+        ? "linux-arm64-unpacked"
+        : "linux-unpacked"
       : process.platform === "darwin"
       ? process.arch === "arm64"
         ? `mac-arm64/${productName}.app/Contents/MacOS/`
@@ -155,5 +158,5 @@ function makeid(length: number) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
     counter += 1;
   }
-  return result;
+  return result.toLowerCase();
 }
