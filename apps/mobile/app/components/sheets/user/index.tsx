@@ -21,10 +21,10 @@ import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import { useNetInfo } from "@react-native-community/netinfo";
 import React from "react";
-import { ActivityIndicator, Image, View } from "react-native";
+import { ActivityIndicator, Image, Linking, View } from "react-native";
 import { useSheetRef } from "react-native-actions-sheet";
 import useSyncProgress from "../../../hooks/use-sync-progress";
-import { presentSheet } from "../../../services/event-manager";
+import { presentSheet, ToastManager } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { SyncStatus, useUserStore } from "../../../stores/use-user-store";
 import { getObfuscatedEmail } from "../../../utils/functions";
@@ -38,6 +38,7 @@ import { TimeSince } from "../../ui/time-since";
 import Paragraph from "../../ui/typography/paragraph";
 import Sync from "../../../services/sync";
 
+import Clipboard from "@react-native-clipboard/clipboard";
 export const UserSheet = () => {
   const ref = useSheetRef();
   const { colors } = useThemeColors();
@@ -285,6 +286,28 @@ export const UserSheet = () => {
               ref.current?.hide();
               Navigation.navigate("Settings");
             }
+          },
+          {
+            title: strings.emailSupport(),
+            icon: "email",
+            onPress: () => {
+              Clipboard.setString("support@streetwriters.co");
+              ToastManager.show({
+                heading: strings.emailCopied(),
+                type: "success",
+                icon: "content-copy"
+              });
+              setTimeout(() => {
+                Linking.openURL("mailto:support@streetwriters.co");
+              }, 1000);
+            }
+          },
+          {
+            title: strings.documentation(),
+            onPress: async () => {
+              Linking.openURL("https://docs.notesnook.com");
+            },
+            icon: "file-document"
           },
           {
             icon: "logout",
