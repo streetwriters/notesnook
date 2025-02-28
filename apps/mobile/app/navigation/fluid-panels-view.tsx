@@ -107,7 +107,7 @@ export const FluidPanelsView = React.memo(
       if (!appLoading) {
         setTimeout(() => {
           setIsLoading(false);
-        }, 1000);
+        }, 500);
       }
     }, [appLoading]);
 
