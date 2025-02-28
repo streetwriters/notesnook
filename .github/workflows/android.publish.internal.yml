@@ -4,7 +4,7 @@ on: workflow_dispatch
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 40
     env:
       CMAKE_C_COMPILER_LAUNCHER: ccache
@@ -22,7 +22,7 @@ jobs:
       - name: Use specific Java version for the builds
         uses: joschi/setup-jdk@v2
         with:
-          java-version: "11"
+          java-version: "17"
           architecture: "x64"
 
       - name: Install node modules
@@ -122,23 +122,23 @@ jobs:
         with:
           path: apps/mobile
 
-      - name: Publish to Playstore
-        id: deploy
-        uses: r0adkll/upload-google-play@v1.1.1
-        with:
-          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
-          packageName: com.streetwriters.notesnook
-          releaseFiles: ${{steps.sign_app.outputs.signedReleaseFile}}
-          track: alpha
-          status: completed
-          whatsNewDirectory: apps/mobile/native/android/releasenotes/
+      # - name: Publish to Playstore
+      #   id: deploy
+      #   uses: r0adkll/upload-google-play@v1.1.1
+      #   with:
+      #     serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+      #     packageName: com.streetwriters.notesnook
+      #     releaseFiles: ${{steps.sign_app.outputs.signedReleaseFile}}
+      #     track: production
+      #     status: completed
+      #     whatsNewDirectory: apps/mobile/native/android/releasenotes/
 
       - name: Create release draft on Github
         uses: softprops/action-gh-release@v1
         with:
           draft: true
           tag_name: ${{ steps.package-version.outputs.current-version}}-beta-android
-          name: Notesnook Android v${{ steps.package-version.outputs.current-version}} Beta
+          name: Notesnook Android v${{ steps.package-version.outputs.current-version}}
           repository: streetwriters/notesnook
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
@@ -146,6 +146,7 @@ jobs:
             apps/mobile/native/android/app/build/outputs/apk/release/notesnook-armeabi-v7a.apk
             apps/mobile/native/android/app/build/outputs/apk/release/notesnook-x86.apk
             apps/mobile/native/android/app/build/outputs/apk/release/notesnook-x86_64.apk
+            ${{steps.sign_app.outputs.signedReleaseFile}}
 
       - name: Upload sourcemaps
         uses: actions/upload-artifact@v4
