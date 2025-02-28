@@ -109,7 +109,7 @@ async function buildApp({
 }) {
   const buildRoot = path.join("test-artifacts", `${productName}-build`);
   const output = path.join("test-artifacts", `${productName}-output`);
-  execSync(`npm run release -- --root ${buildRoot}`, {
+  execSync(`npm run release -- --root ${buildRoot} --skip-tsc-build`, {
     stdio: IS_DEBUG ? "inherit" : "ignore"
   });
 
