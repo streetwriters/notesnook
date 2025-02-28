@@ -37,8 +37,8 @@ const gitHash = (() => {
     return process.env.GIT_HASH || "gitless";
   }
 })();
-const appVersion = version.replaceAll(".", "").replace("-beta", "");
-const isBeta = process.env.BETA === "true";
+// const appVersion = version.replaceAll(".", "").replace("-beta", "");
+const isBeta = version.includes("-beta");
 const isTesting =
   process.env.TEST === "true" || process.env.NODE_ENV === "development";
 const isDesktop = process.env.PLATFORM === "desktop";
@@ -76,7 +76,7 @@ export default defineConfig({
   define: {
     APP_TITLE: `"${isThemeBuilder ? "Notesnook Theme Builder" : "Notesnook"}"`,
     GIT_HASH: `"${gitHash}"`,
-    APP_VERSION: `"${appVersion}"`,
+    APP_VERSION: `"${version}"`,
     PUBLIC_URL: `"${process.env.PUBLIC_URL || ""}"`,
     IS_DESKTOP_APP: isDesktop,
     PLATFORM: `"${process.env.PLATFORM}"`,

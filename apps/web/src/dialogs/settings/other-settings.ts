@@ -27,6 +27,7 @@ import { clearLogs, downloadLogs } from "../../utils/logger";
 import { useAutoUpdateStore } from "../../hooks/use-auto-updater";
 import { IssueDialog } from "../issue-dialog";
 import { strings } from "@notesnook/intl";
+import { desktop } from "../../common/desktop-bridge";
 
 export const AboutSettings: SettingsGroup[] = [
   {
@@ -90,7 +91,12 @@ export const AboutSettings: SettingsGroup[] = [
                 value: "beta"
               }
             ],
-            selectedOption: () => {
+            selectedOption: async () => {
+              if (IS_DESKTOP_APP)
+                return (
+                  (await desktop?.updater.releaseTrack.query()) || "stable"
+                );
+
               return (
                 document.cookie
                   .split("; ")
@@ -99,7 +105,11 @@ export const AboutSettings: SettingsGroup[] = [
               );
             },
             async onSelectionChanged(value) {
-              document.cookie = `release-track=${value}; Secure`;
+              if (IS_DESKTOP_APP) {
+                return await desktop?.updater.changeReleaseTrack.mutate({
+                  track: value
+                });
+              }
               const registrations =
                 (await navigator.serviceWorker?.getRegistrations()) || [];
               for (const registration of registrations) {

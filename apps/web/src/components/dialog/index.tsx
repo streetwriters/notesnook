@@ -33,6 +33,7 @@ type DialogButtonProps = ButtonProps & {
   disabled?: boolean;
   text: JSX.Element | string;
   loading?: boolean;
+  role?: string;
 };
 
 type DialogProps = SxProp & {
@@ -190,6 +191,7 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
                 {...props.negativeButton}
                 color="paragraph"
                 data-test-id="dialog-no"
+                role="negative-button"
               />
             )}
             {props.positiveButton && (
@@ -197,6 +199,7 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
                 {...props.positiveButton}
                 color="accent"
                 data-test-id="dialog-yes"
+                role="positive-button"
               />
             )}
           </Flex>
@@ -209,13 +212,21 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
 
 export default BaseDialog;
 
-export function DialogButton(props: DialogButtonProps) {
+export function DialogButton({
+  disabled,
+  onClick,
+  loading,
+  text,
+  role,
+  ...props
+}: DialogButtonProps) {
   return (
     <Button
       {...props}
       variant="dialog"
-      disabled={props.disabled}
-      onClick={props.disabled ? undefined : props.onClick}
+      disabled={disabled}
+      onClick={disabled ? undefined : onClick}
+      data-role={role}
       sx={{
         maxWidth: "100%",
         textOverflow: "ellipsis",
@@ -223,7 +234,7 @@ export function DialogButton(props: DialogButtonProps) {
         whiteSpace: "nowrap"
       }}
     >
-      {props.loading ? <Loading size={16} color="accent" /> : props.text}
+      {loading ? <Loading size={16} color="accent" /> : text}
     </Button>
   );
 }

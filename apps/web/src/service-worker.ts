@@ -99,7 +99,8 @@ self.addEventListener("message", (event) => {
         event.source.postMessage({
           type: data.type,
           version: APP_VERSION,
-          hash: GIT_HASH
+          hash: GIT_HASH,
+          isBeta: IS_BETA
         });
       }
       break;

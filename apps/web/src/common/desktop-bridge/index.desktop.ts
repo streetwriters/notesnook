@@ -70,6 +70,7 @@ function attachListeners() {
 function attachListener(event: string) {
   return {
     onData(...args: any[]) {
+      console.log("Received data:", args);
       AppEventManager.publish(event, ...args);
     }
   };

@@ -20,26 +20,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 export type Platforms = "web" | "desktop";
 export type AppVersion = typeof appVersion;
 export const appVersion = {
-  formatted: format(APP_VERSION, GIT_HASH, PLATFORM, IS_BETA),
-  clean: formatVersion(APP_VERSION),
-  numerical: parseInt(APP_VERSION || "0"),
+  formatted: format(APP_VERSION, GIT_HASH, PLATFORM),
+  clean: APP_VERSION,
+  numerical: versionAsNumber(APP_VERSION),
   hash: GIT_HASH,
   isBeta: IS_BETA
 };
 
-function format(
-  version?: string,
-  hash?: string,
-  type?: "web" | "desktop",
-  beta?: boolean
-) {
-  return `${formatVersion(version)}-${hash}-${type}${beta ? "-beta" : ""}`;
+function format(version?: string, hash?: string, type?: "web" | "desktop") {
+  return `${version}-${hash}-${type}`;
 }
 
-function formatVersion(version?: string) {
-  if (!version) return "";
-  const [major, minor, bugfix0, bugfix1] = version.toString().split("");
-  return `${major}.${minor}.${bugfix0}${bugfix1 || ""}`;
+function versionAsNumber(version: string) {
+  return parseInt(version.replace(/\D/g, ""));
 }
 
 export function getServiceWorkerVersion(
@@ -55,13 +48,13 @@ export function getServiceWorkerVersion(
       if (type !== "GET_VERSION") return;
       clearTimeout(timeout);
 
-      const { version, hash } = ev.data;
+      const { version, hash, isBeta } = ev.data;
       resolve({
-        formatted: formatVersion(version),
-        numerical: parseInt(version),
-        clean: formatVersion(version),
+        formatted: format(version, hash, PLATFORM),
+        numerical: versionAsNumber(version),
+        clean: version,
         hash,
-        isBeta: appVersion.isBeta
+        isBeta
       });
     });
     serviceWorker.postMessage({ type: "GET_VERSION" });
