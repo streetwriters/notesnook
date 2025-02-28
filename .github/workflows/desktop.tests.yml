@@ -69,12 +69,11 @@ jobs:
 
       - name: Build app
         run: |
-          yarn electron-builder --mac --dir --x64
+          yarn electron-builder --config=electron-builder.config.js --mac --dir --x64
         working-directory: ./apps/desktop
 
       - name: Run tests x64
-        run: |
-          EXECUTABLE_PATH=output/mac/Notesnook.app/Contents/MacOS/Notesnook npm run test
+        run: npm run test
         working-directory: ./apps/desktop
 
       - name: Upload test results
@@ -114,12 +113,11 @@ jobs:
 
       - name: Build app
         run: |
-          yarn electron-builder --mac --dir --arm64
+          yarn electron-builder --config=electron-builder.config.js --mac --dir --arm64
         working-directory: ./apps/desktop
 
       - name: Run tests arm64
-        run: |
-          EXECUTABLE_PATH=output/mac-arm64/Notesnook.app/Contents/MacOS/Notesnook npm run test
+        run: npm run test
         working-directory: ./apps/desktop
 
       - name: Upload test results
@@ -165,12 +163,11 @@ jobs:
 
       - name: Build app
         run: |
-          yarn electron-builder --linux --dir --arm64 --x64
+          yarn electron-builder --config=electron-builder.config.js --linux --dir --arm64 --x64
         working-directory: ./apps/desktop
 
       - name: Run tests
-        run: |
-          EXECUTABLE_PATH=output/linux-unpacked/notesnook xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" -- npm run test
+        run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" -- npm run test
         working-directory: ./apps/desktop
 
       - name: Upload test results
@@ -216,12 +213,11 @@ jobs:
 
       - name: Build app
         run: |
-          npx cross-env NOTESNOOK_STAGING=true yarn electron-builder --win --dir --arm64 --x64
+          npx cross-env NOTESNOOK_STAGING=true yarn electron-builder --config=electron-builder.config.js --win --dir --arm64 --x64
         working-directory: ./apps/desktop
 
       - name: Run tests
-        run: |
-          npx cross-env EXECUTABLE_PATH=output/win-unpacked/Notesnook.exe npm run test
+        run: npm run test
         working-directory: ./apps/desktop
 
       - name: Upload test results

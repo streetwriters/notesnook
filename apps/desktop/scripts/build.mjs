@@ -59,7 +59,9 @@ if (args.variant === "mas") {
 await exec(`yarn run build`);
 
 if (args.run) {
-  await exec(`yarn electron-builder --dir --${process.arch}`);
+  await exec(
+    `yarn electron-builder --dir --${process.arch} --config=electron-builder.config.js`
+  );
   if (process.platform === "win32") {
     await exec(`.\\output\\win-unpacked\\Notesnook.exe`);
   } else if (process.platform === "darwin") {
