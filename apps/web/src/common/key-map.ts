@@ -22,6 +22,7 @@ import { useEditorStore } from "../stores/editor-store";
 import { useStore as useSearchStore } from "../stores/search-store";
 import { useEditorManager } from "../components/editor/manager";
 import { CommandPaletteDialog } from "../dialogs/command-palette";
+import { hashNavigate } from "../navigation";
 
 function isInEditor(e: KeyboardEvent) {
   return (
@@ -198,6 +199,11 @@ const KEYMAP = [
         isCommandMode: e.key === "k"
       }).catch(() => {});
     }
+  },
+  {
+    keys: ["ctrl+,", "command+,"],
+    description: "Open settings",
+    action: () => hashNavigate("/settings", { replace: true })
   }
 ];
 
