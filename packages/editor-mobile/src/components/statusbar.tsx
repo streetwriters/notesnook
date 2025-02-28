@@ -150,7 +150,7 @@ function StatusBar({
         position: sticky ? "sticky" : "relative",
         top: -3,
         backgroundColor: "var(--nn_primary_background)",
-        zIndex: 1,
+        zIndex: 999,
         justifyContent: sticky ? "center" : "flex-start",
         paddingTop: 4,
         paddingBottom: 2
