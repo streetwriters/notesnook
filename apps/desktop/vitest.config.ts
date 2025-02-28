@@ -17,22 +17,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { _electron as electron } from "playwright";
+import { defineConfig } from "vitest/config";
 
-const executablePath = process.env.EXECUTABLE_PATH;
-
-// process.platform === "linux"
-//   ? "output/linux-unpacked/Notesnook"
-//   : process.platform === "darwin"
-//   ? "output/mac/Notesnook.app/Contents/MacOS/Notesnook"
-//   : "output/win-unpacked/Notesnook.exe";
-
-export async function launchApp() {
-  const app = await electron.launch({
-    executablePath
-  });
-
-  const page = await app.firstWindow();
-
-  return { app, page };
-}
+export default defineConfig({
+  test: {
+    testTimeout: 30 * 1000,
+    sequence: {
+      concurrent: true,
+      shuffle: true
+    },
+    dir: "./__tests__/",
+    exclude: [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/cypress/**",
+      "**/.{idea,git,cache,output,temp}/**",
+      "**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build,eslint,prettier}.config.*",
+      "**/test-results/**",
+      "**/test-artifacts/**"
+    ]
+  }
+});
