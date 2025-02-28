@@ -30,6 +30,7 @@ const args = yargs(process.argv);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const root = args.root || path.join(__dirname, "..");
+const skipTscBuild = args.skipTscBuild || false;
 
 const webAppPath = path.resolve(path.join(__dirname, "..", "..", "web"));
 
@@ -56,7 +57,9 @@ if (args.variant === "mas") {
   await exec(`yarn run bundle --outdir=${path.join(root, "build")}`);
 }
 
-await exec(`yarn run build`);
+if (!skipTscBuild) {
+  await exec(`yarn run build`);
+}
 
 if (args.run) {
   await exec(
