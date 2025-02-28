@@ -115,7 +115,8 @@ async function buildApp({
 
   const args = [
     `--config electron-builder.config.js`,
-    `--c.extraMetadata.productName=${productName}`
+    `--c.extraMetadata.productName=${productName}`,
+    "--publish=never"
   ];
   if (version) args.push(`--c.extraMetadata.version=${version}`);
 

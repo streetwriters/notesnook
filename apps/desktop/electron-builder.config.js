@@ -31,6 +31,9 @@ const buildFiles = [
 const productName = process.env.NN_PRODUCT_NAME || "Notesnook";
 const appId = process.env.NN_APP_ID || "org.streetwriters.notesnook";
 const outputDir = process.env.NN_OUTPUT_DIR || "output";
+const linuxExecutableName = process.env.NN_PRODUCT_NAME
+  ? process.env.NN_PRODUCT_NAME.toLowerCase().replace(/\s+/g, "-")
+  : "notesnook";
 const year = new Date().getFullYear();
 
 module.exports = {
@@ -153,7 +156,7 @@ module.exports = {
     category: "Office",
     icon: "assets/icons/app.icns",
     description: "Your private note taking space",
-    executableName: "notesnook",
+    executableName: linuxExecutableName,
     desktop: {
       actions: [
         {
