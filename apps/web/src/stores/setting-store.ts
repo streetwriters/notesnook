@@ -74,6 +74,7 @@ class SettingStore extends BaseStore<SettingStore> {
   desktopIntegrationSettings?: DesktopIntegration;
   autoUpdates = true;
   isFlatpak = false;
+  isSnap = false;
   proxyRules?: string;
 
   refresh = async () => {
@@ -84,6 +85,7 @@ class SettingStore extends BaseStore<SettingStore> {
       trashCleanupInterval: db.settings.getTrashCleanupInterval(),
       profile: db.settings.getProfile(),
       isFlatpak: await desktop?.integration.isFlatpak.query(),
+      isSnap: await desktop?.integration.isSnap.query(),
       desktopIntegrationSettings:
         await desktop?.integration.desktopIntegration.query(),
       privacyMode: await desktop?.integration.privacyMode.query(),

@@ -29,6 +29,7 @@ import { IssueDialog } from "../issue-dialog";
 import { strings } from "@notesnook/intl";
 import { desktop } from "../../common/desktop-bridge";
 import { TaskManager } from "../../common/task-manager";
+import { useStore as useSettingStore } from "../../stores/setting-store";
 
 export const AboutSettings: SettingsGroup[] = [
   {
@@ -79,6 +80,9 @@ export const AboutSettings: SettingsGroup[] = [
         key: "release-track",
         title: strings.releaseTrack(),
         description: strings.releaseTrackDesc(),
+        isHidden: () =>
+          useSettingStore.getState().isFlatpak ||
+          useSettingStore.getState().isSnap,
         components: [
           {
             type: "dropdown",

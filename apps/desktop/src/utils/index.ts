@@ -29,3 +29,7 @@ export function isDevelopment() {
 export function isFlatpak() {
   return existsSync("/.flatpak-info");
 }
+
+export function isSnap() {
+  return process.env.SNAP !== undefined;
+}
