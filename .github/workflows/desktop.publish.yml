@@ -33,6 +33,14 @@ on:
         required: true
         default: true
         description: "Build for macOS?"
+      release-track:
+        type: choice
+        required: true
+        default: stable
+        description: "Select the release track"
+        options:
+          - stable
+          - beta
 
 jobs:
   build:
@@ -61,8 +69,13 @@ jobs:
         run: |
           echo "NX_CLOUD_ACCESS_TOKEN=${{ secrets.NX_CLOUD_ACCESS_TOKEN }}" >> $GITHUB_ENV
 
-      - name: Generate desktop build
+      - name: Generate desktop build (stable)
+        if: ${{ inputs.release-track == 'stable' }}
         run: npx nx build:desktop @notesnook/web
+
+      - name: Generate desktop build (beta)
+        if: ${{ inputs.release-track == 'beta' }}
+        run: BETA=true npx nx build:desktop @notesnook/web
 
       - name: Build desktop bundle
         working-directory: ./apps/desktop
