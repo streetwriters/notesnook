@@ -64,7 +64,8 @@ export default defineConfig({
         manualChunks: (id: string) => {
           if (
             (id.includes("/editor/languages/") ||
-              id.includes("/html/languages/")) &&
+              id.includes("/html/languages/") ||
+              id.includes("/refractor/lang/")) &&
             path.basename(id) !== "index.js"
           )
             return `code-lang-${path.basename(id, "js")}`;

@@ -39,7 +39,11 @@ export const onRequest: PagesFunction<Env> = async ({ request, env, next }) => {
         betaUrl.pathname = url.pathname;
         betaUrl.search = url.search;
         console.log("Fetching asset from beta URL:", betaUrl.toString());
-        const asset = await fetch(betaUrl);
+        const asset = await fetch(betaUrl, {
+          headers: request.headers,
+          method: request.method,
+          body: request.body
+        });
         return new Response(asset.body, asset);
       } else {
         return await next();
