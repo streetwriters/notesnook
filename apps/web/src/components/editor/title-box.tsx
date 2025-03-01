@@ -152,8 +152,12 @@ export default React.memo(TitleBox, (prevProps, nextProps) => {
 });
 
 function resizeTextarea(input: HTMLTextAreaElement) {
-  input.style.height = "auto";
-  input.style.height = input.scrollHeight + "px";
+  requestAnimationFrame(() => {
+    input.style.height = "auto";
+    requestAnimationFrame(() => {
+      input.style.height = input.scrollHeight + "px";
+    });
+  });
 }
 
 function onTitleChange(
