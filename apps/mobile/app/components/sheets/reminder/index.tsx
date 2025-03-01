@@ -349,7 +349,6 @@ export default function ReminderSheet({
                     borderRadius: 100,
                     paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
                   }}
-                  height={35}
                   type={
                     recurringMode ===
                     RecurringModes[mode as keyof typeof RecurringModes]
@@ -385,9 +384,8 @@ export default function ReminderSheet({
                       type={
                         selectedDays.indexOf(index) > -1 ? "selected" : "plain"
                       }
-                      fontSize={AppFontSize.sm - 1}
+                      fontSize={AppFontSize.xs}
                       style={{
-                        width: 40,
                         height: 40,
                         borderRadius: 100,
                         marginRight: 10
@@ -413,9 +411,8 @@ export default function ReminderSheet({
                           ? "selected"
                           : "plain"
                       }
-                      fontSize={AppFontSize.sm - 1}
+                      fontSize={AppFontSize.xs}
                       style={{
-                        width: 40,
                         height: 40,
                         borderRadius: 100,
                         marginRight: 10
@@ -499,16 +496,14 @@ export default function ReminderSheet({
               borderRadius: defaultBorderRadius,
               flexDirection: "row",
               paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
-              paddingHorizontal: DefaultAppStyles.GAP,
               alignItems: "center",
               justifyContent: "flex-start",
-              marginBottom: DefaultAppStyles.GAP_VERTICAL,
-              backgroundColor: colors.secondary.background
+              marginBottom: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             <>
               <Paragraph
-                size={AppFontSize.xs}
+                size={AppFontSize.xxs}
                 color={colors.secondary.paragraph}
               >
                 {recurringMode === RecurringModes.Daily
