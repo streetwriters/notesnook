@@ -297,11 +297,12 @@ function TipTap(props: TipTapProps) {
       previewAttachment: onPreviewAttachment,
       createInternalLink: onInsertInternalLink,
       getAttachmentData: onGetAttachmentData,
-      openLink: (url) => {
+      openLink: (url, openInNewTab) => {
         const link = parseInternalLink(url);
         if (link && link.type === "note") {
           useEditorStore.getState().openSession(link.id, {
-            activeBlockId: link.params?.blockId || undefined
+            activeBlockId: link.params?.blockId || undefined,
+            openInNewTab: openInNewTab
           });
         } else window.open(url, "_blank");
       }
