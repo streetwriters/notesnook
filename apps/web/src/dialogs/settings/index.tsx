@@ -275,6 +275,7 @@ function SettingsSideBar(props: SettingsSideBarProps) {
           <Input
             id="search"
             name="search"
+            autoFocus
             placeholder={strings.search()}
             data-test-id="settings-search"
             sx={{
