@@ -101,7 +101,7 @@ export const Tip = ({
             }}
             style={{
               width: undefined,
-              height: 25,
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
               paddingHorizontal: DefaultAppStyles.GAP_SMALL / 2,
               alignSelf: "flex-start",
               borderRadius: 100,

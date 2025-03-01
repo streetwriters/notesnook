@@ -48,7 +48,7 @@ export const FilterBar = () => {
           title={item.name}
           type="secondary"
           style={{
-            height: 25
+            paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
           }}
         />
       ))}
@@ -58,7 +58,7 @@ export const FilterBar = () => {
         type="secondary"
         iconSize={AppFontSize.md}
         style={{
-          height: 25
+          paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
         }}
       />
     </View>
