@@ -186,7 +186,9 @@ export const BehaviourSettings: SettingsGroup[] = [
         description: strings.automaticUpdatesDesc(),
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.autoUpdates, listener),
-        isHidden: () => useSettingStore.getState().isFlatpak,
+        isHidden: () =>
+          useSettingStore.getState().isFlatpak ||
+          useSettingStore.getState().isSnap,
         components: [
           {
             type: "toggle",
