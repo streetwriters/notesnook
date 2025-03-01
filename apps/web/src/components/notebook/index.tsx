@@ -166,7 +166,7 @@ export function Notebook(props: NotebookProps) {
   );
 }
 
-const notebookMenuItems: (
+export const notebookMenuItems: (
   notebook: NotebookType,
   ids?: string[],
   context?: { refresh?: () => void }
