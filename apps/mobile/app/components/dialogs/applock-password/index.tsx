@@ -260,7 +260,7 @@ export const AppLockPassword = () => {
                   alignSelf: "flex-start",
                   justifyContent: "flex-start",
                   paddingHorizontal: 0,
-                  height: 30
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
                 }}
               />
             </>

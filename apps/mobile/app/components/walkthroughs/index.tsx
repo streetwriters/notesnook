@@ -114,8 +114,8 @@ export const Walkthrough = ({
       {canSkip ? (
         <Button
           style={{
-            height: 30,
-            marginTop: DefaultAppStyles.GAP
+            marginTop: DefaultAppStyles.GAP,
+            paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
           }}
           textStyle={{
             textDecorationLine: "underline"

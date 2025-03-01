@@ -143,9 +143,12 @@ export default function ReminderNotify({
               type="secondaryAccented"
               key={item.title}
               title={item.title}
-              height={30}
               fontSize={AppFontSize.xs}
-              style={{ marginLeft: 10, borderRadius: 100 }}
+              style={{
+                marginLeft: 10,
+                borderRadius: 100,
+                paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
+              }}
               onPress={() => onSnooze(item.time)}
             />
           );

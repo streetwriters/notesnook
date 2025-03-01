@@ -84,7 +84,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
                 onPress={() => onPress(item)}
                 bold
                 style={{
-                  height: 30,
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
                   alignSelf: "flex-start",
                   paddingHorizontal: 0
                 }}
