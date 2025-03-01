@@ -49,6 +49,16 @@ export function HoverPopupHandler(props: FloatingMenuProps) {
 
   useEffect(
     () => {
+      function onContextMenu(e: MouseEvent) {
+        if (
+          !e.target ||
+          !(e.target instanceof HTMLElement) ||
+          e.target.classList.contains("ProseMirror")
+        )
+          return;
+
+        clearTimeout(hoverTimeoutId.current);
+      }
       function onMouseOver(e: MouseEvent) {
         if (
           !e.target ||
@@ -126,8 +136,10 @@ export function HoverPopupHandler(props: FloatingMenuProps) {
         );
       }
       window.addEventListener("mouseover", onMouseOver);
+      window.addEventListener("contextmenu", onContextMenu);
       return () => {
         window.removeEventListener("mouseover", onMouseOver);
+        window.removeEventListener("contextmenu", onContextMenu);
       };
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
