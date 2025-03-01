@@ -110,6 +110,7 @@ export const AboutSettings: SettingsGroup[] = [
                   track: value
                 });
               }
+              document.cookie = `release-track=${value}; Secure`;
               const registrations =
                 (await navigator.serviceWorker?.getRegistrations()) || [];
               for (const registration of registrations) {
