@@ -288,7 +288,8 @@ export default function ReminderSheet({
               style={{
                 marginRight: 12,
                 borderRadius: 100,
-                minWidth: 70
+                minWidth: 70,
+                paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
               }}
               proTag={mode === "Repeat"}
               height={35}
@@ -345,7 +346,8 @@ export default function ReminderSheet({
                   )}
                   style={{
                     marginRight: 6,
-                    borderRadius: 100
+                    borderRadius: 100,
+                    paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
                   }}
                   height={35}
                   type={
@@ -481,7 +483,7 @@ export default function ReminderSheet({
                 title={date ? date.toLocaleDateString() : strings.selectDate()}
                 type={date ? "secondaryAccented" : "secondary"}
                 icon="calendar"
-                fontSize={AppFontSize.md}
+                fontSize={AppFontSize.sm}
                 onPress={() => {
                   showDatePicker();
                 }}
@@ -543,7 +545,7 @@ export default function ReminderSheet({
             width: "100%",
             justifyContent: "flex-start",
             borderWidth: 0,
-            height: 30,
+            paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
             alignSelf: "flex-start"
           }}
         />
@@ -565,7 +567,8 @@ export default function ReminderSheet({
                 )}
                 style={{
                   marginRight: 12,
-                  borderRadius: 100
+                  borderRadius: 100,
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
                 }}
                 icon={
                   mode === "Silent"
@@ -601,8 +604,6 @@ export default function ReminderSheet({
       <Button
         title={strings.save()}
         type="accent"
-        height={45}
-        fontSize={AppFontSize.md}
         style={{
           paddingHorizontal: DefaultAppStyles.GAP * 2,
           marginTop: DefaultAppStyles.GAP_VERTICAL,

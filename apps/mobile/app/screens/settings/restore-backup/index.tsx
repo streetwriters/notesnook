@@ -536,7 +536,7 @@ const BackupItem = ({
         type="secondaryAccented"
         style={{
           paddingHorizontal: DefaultAppStyles.GAP,
-          height: 35
+          paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
         }}
         onPress={() => {
           presentDialog({
