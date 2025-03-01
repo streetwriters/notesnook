@@ -40,7 +40,8 @@ jobs:
 
       - name: Publish to Cloudflare Pages (stable)
         if: ${{ inputs.release-track == 'stable' }}
-        run: npx --yes wrangler pages deploy --project-name=notesnook-app ./apps/web/build/
+        working-directory: ./apps/web
+        run: npx --yes wrangler pages deploy --project-name=notesnook-app ./build/
 
       - name: Generate build (beta)
         if: ${{ inputs.release-track == 'beta' }}
@@ -48,4 +49,5 @@ jobs:
 
       - name: Publish to Cloudflare Pages (beta)
         if: ${{ inputs.release-track == 'beta' }}
-        run: npx --yes wrangler pages deploy --branch=beta --project-name=notesnook-app-beta ./apps/web/build/
+        working-directory: ./apps/web
+        run: npx --yes wrangler pages deploy --branch=beta --project-name=notesnook-app-beta ./build/
