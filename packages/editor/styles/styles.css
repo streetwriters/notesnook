@@ -12,7 +12,7 @@
 }
 
 .ProseMirror span.math-inline {
-  font-family: KaTeX_Main, Times New Roman, serif; 
+  font-family: KaTeX_Main, Times New Roman, serif;
 }
 
 .ProseMirror {
@@ -111,19 +111,23 @@
   filter: brightness(70%);
 }
 
-.ProseMirror p {
-  margin-bottom: 0px;
-  font-family: inherit;
+.ProseMirror p[data-spacing="double"] {
+ margin-top: 1em;
+ /* By default double spaced paragraphs have no bottom margin */
+ margin-bottom: 0px;
 }
 
-.ProseMirror > p[data-spacing="double"] {
-  margin-top: 1em;
-  margin-bottom: 1em;
+/* Add top & bottom margin for double spaced paragraphs & adjacent nodes
+except single spaced paragraphs. */
+.ProseMirror p[data-spacing="double"] + *:not(p[data-spacing="single"]) {
+ margin-top: 1em;
+ margin-bottom: 1em;
 }
 
-.ProseMirror > p[data-spacing="single"] {
-  margin-top: 0px;
-  margin-bottom: 0px;
+/* Remove all margins for single spaced paragraphs */
+.ProseMirror p[data-spacing="single"] {
+ margin-top: 0px;
+ margin-bottom: 0px;
 }
 
 .ProseMirror > div.codeblock-view-content-wrap,
@@ -672,7 +676,7 @@ p > *::selection {
     height: 21px;
     width: 21px;
   }
-  
+
   .ProseMirror ul.simple-checklist > li > div {
     margin-top: 2px;
   }
