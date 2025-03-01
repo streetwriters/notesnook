@@ -192,7 +192,7 @@ const JumpToSectionDialog = () => {
                       paddingHorizontal: DefaultAppStyles.GAP,
                       margin: 5,
                       borderRadius: 100,
-                      height: 30,
+                      paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
                       marginVertical: 10
                     }}
                   >
