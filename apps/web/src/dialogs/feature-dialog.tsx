@@ -93,26 +93,13 @@ const features: Record<FeatureKeys, Feature> = {
         ]
       : [
           {
-            title: "Command palette",
+            title: "Release tracks",
             subtitle: (
               <>
-                You can now quickly execute commands like navigation, actions on
-                notes, notebooks etc. just by pressing{" "}
-                <Code text="Ctrl/Cmd+K" />. This will open a command palette
-                where you can fuzzy search for commands and execute them.
-              </>
-            )
-          },
-          {
-            title: "Quick open",
-            subtitle: (
-              <>
-                You can also open the command palette in quick open mode by
-                pressing <Code text="Ctrl/Cmd+P" />. This will open a command
-                palette where you can fuzzy search for your notes, notebooks,
-                tags, etc. and quickly open them by pressing{" "}
-                <Code text="Enter" />. Try it out and let us know what you
-                think!
+                Switch to the beta version to try out upcoming new features and
+                provide us with feedback. Switch back to stable anytime without
+                losing any data. To change release tracks, go to Settings {">"}
+                About and select the desired release track.
               </>
             )
           }
