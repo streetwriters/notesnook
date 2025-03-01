@@ -213,7 +213,7 @@ export default class Lookup {
   ) {
     const columns = fields.map((f) => f.column);
     const items = await selector.fields(columns).items();
-
+    selector.fields([]);
     return fuzzy(
       query,
       items,
