@@ -237,7 +237,7 @@ const TabBar = (
                     size={AppFontSize.lg}
                   />
                   <Paragraph
-                    color={colors.secondary.paragraph}
+                    color={colors.primary.paragraph}
                     size={AppFontSize.xxxs - 1}
                   >
                     {item.title}
@@ -283,7 +283,6 @@ const TabBar = (
                   }}
                   style={{
                     borderRadius: 10,
-                    opacity: isFocused ? 1 : 0.6,
                     paddingVertical: 2,
                     width: 40,
                     height: 40
@@ -293,7 +292,7 @@ const TabBar = (
                   <Icon
                     name={getIcon(route.key)}
                     color={
-                      isFocused ? colors.primary.accent : colors.primary.icon
+                      isFocused ? colors.selected.icon : colors.primary.icon
                     }
                     size={AppFontSize.lg}
                   />
@@ -315,6 +314,7 @@ const TabBar = (
                   name="plus"
                   testID="sidebar-add-button"
                   size={AppFontSize.lg - 2}
+                  color={colors.primary.icon}
                   onPress={() => {
                     if (props.navigationState.index === 1) {
                       AddNotebookSheet.present();
@@ -355,7 +355,7 @@ const TabBar = (
                       : "sort-descending"
                   }
                   testID="sidebar-sort-button"
-                  color={colors.secondary.icon}
+                  color={colors.primary.icon}
                   onPress={() => {
                     presentSheet({
                       component: (
