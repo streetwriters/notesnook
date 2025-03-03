@@ -50,6 +50,8 @@ import {
 } from "../../utils/notebooks";
 import { DefaultAppStyles } from "../../utils/styles";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
+import { eSendEvent } from "../../services/event-manager";
+import { eUpdateNotebookRoute } from "../../utils/events";
 
 const {
   useNotebookExpandedStore,
@@ -66,6 +68,7 @@ export const MoveNotebook = (props: NavigationProps<"MoveNotebook">) => {
   const tree = useNotebookTreeStore((state) => state.tree);
   const lastQuery = React.useRef<string>();
   const [filteredNotebooks, setFilteredNotebooks] = React.useState(notebooks);
+  const [filteredTree, setFilteredTree] = React.useState<TreeItem[]>([]);
   const [moveToTopEnabled, setMoveToTopEnabled] = useState(false);
   const loadRootNotebooks = React.useCallback(async () => {
     if (!filteredNotebooks) return;
@@ -116,6 +119,27 @@ export const MoveNotebook = (props: NavigationProps<"MoveNotebook">) => {
     })();
   }, [selectedNotebooks]);
 
+  useEffect(() => {
+    async function filterNotebooks() {
+      const excludedItems: string[] = [];
+      for (const notebook of selectedNotebooks) {
+        const parent = await getParentNotebookId(notebook.id);
+        if (!excludedItems.includes(parent)) {
+          excludedItems.push(parent);
+        }
+        excludedItems.push(notebook.id);
+      }
+      const filtered = tree.filter(
+        (treeItem) => !excludedItems.includes(treeItem.notebook.id)
+      );
+
+      return filtered;
+    }
+    filterNotebooks().then((filtered) => {
+      setFilteredTree(filtered);
+    });
+  }, [filteredNotebooks, selectedNotebooks, tree]);
+
   const renderItem = useCallback(
     ({ item, index }: { item: TreeItem; index: number }) => {
       return (
@@ -130,8 +154,7 @@ export const MoveNotebook = (props: NavigationProps<"MoveNotebook">) => {
                 selectedNotebooks.length,
                 selectedNotebook.title
               ),
-              positiveText: strings.move(),
-              context: "move-notebook",
+              positiveText: strings.yes(),
               positivePress: async () => {
                 for (const notebook of selectedNotebooks) {
                   if (await checkParentSelected(notebook.id, selectedNotebooks))
@@ -164,7 +187,7 @@ export const MoveNotebook = (props: NavigationProps<"MoveNotebook">) => {
                     .getState()
                     .setExpanded(selectedNotebook.id);
                 }
-
+                eSendEvent(eUpdateNotebookRoute);
                 useSideMenuNotebookSelectionStore.setState({
                   enabled: false,
                   selection: {}
@@ -177,14 +200,6 @@ export const MoveNotebook = (props: NavigationProps<"MoveNotebook">) => {
       );
     },
     [selectedNotebooks]
-  );
-  const filteredTree = React.useMemo(
-    () =>
-      tree.filter(
-        (treeItem) =>
-          !selectedNotebooks.find((n) => n.id === treeItem.notebook?.id)
-      ),
-    [selectedNotebooks, tree]
   );
 
   return (
