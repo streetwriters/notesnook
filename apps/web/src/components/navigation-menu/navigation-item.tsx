@@ -78,7 +78,7 @@ function NavigationItem(
         ),
         borderRadius: "default",
         px: isCollapsed ? 1 : 2,
-        height: 25,
+        py: 1,
         alignItems: "center",
         position: "relative",
         ":focus": { bg: selected ? "hover-selected" : "hover" },
@@ -96,7 +96,7 @@ function NavigationItem(
           p: 0,
           flex: 1,
           alignItems: "center",
-          justifyContent: "flex-start",
+          justifyContent: isCollapsed ? "center" : "flex-start",
           display: "flex"
         }}
         onContextMenu={(e) => {
@@ -108,27 +108,28 @@ function NavigationItem(
       >
         {Icon ? (
           <Icon
-            size={14}
+            size={isCollapsed ? 16 : 14}
             color={color || (selected ? "icon-selected" : "icon")}
             rotate={isLoading}
           />
         ) : null}
 
-        <Text
-          variant="body"
-          sx={{
-            display: isCollapsed ? "none" : "block",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            fontWeight: "normal",
-            color: selected ? "paragraph-selected" : "paragraph"
-          }}
-          ml={1}
-          data-test-id="title"
-        >
-          {title}
-        </Text>
+        {isCollapsed ? null : (
+          <Text
+            variant="body"
+            sx={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              fontWeight: "normal",
+              color: selected ? "paragraph-selected" : "paragraph"
+            }}
+            ml={1}
+            data-test-id="title"
+          >
+            {title}
+          </Text>
+        )}
       </Button>
       {children && !isCollapsed ? children : null}
     </Flex>

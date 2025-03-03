@@ -66,7 +66,7 @@ export function TabItem(props: TabItemProps & FlexProps) {
           p: 1,
           flex: 1,
           alignItems: "center",
-          justifyContent: "flex-start",
+          justifyContent: "center",
           display: "flex"
         }}
         title={title}
