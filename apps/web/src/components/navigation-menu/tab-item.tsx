@@ -53,32 +53,20 @@ export function TabItem(props: TabItemProps & FlexProps) {
           }
         ),
         borderRadius: "default",
-        p: 0,
         alignItems: "center",
+        justifyContent: "center",
         position: "relative",
         ":focus": { bg: selected ? "hover-selected" : "hover" },
+        p: 1,
         ...sx
       }}
+      data-test-id={`tab-item`}
+      title={title}
+      onClick={() => {
+        if (onClick) onClick();
+      }}
     >
-      <Button
-        data-test-id={`tab-item`}
-        sx={{
-          p: 1,
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-          display: "flex"
-        }}
-        title={title}
-        onClick={() => {
-          if (onClick) onClick();
-        }}
-      >
-        <Icon
-          size={16}
-          color={color || (selected ? "icon-selected" : "icon")}
-        />
-      </Button>
+      <Icon size={16} color={color || (selected ? "icon-selected" : "icon")} />
     </Flex>
   );
 }
