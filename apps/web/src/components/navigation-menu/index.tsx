@@ -256,13 +256,13 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
             sx={{
               flexDirection: "row",
               alignItems: "center",
-              gap: 2
+              gap: 1
             }}
           >
             <svg
               style={{
-                width: 25,
-                height: 25
+                width: 20,
+                height: 20
               }}
             >
               <use href="#full-logo" />
@@ -271,7 +271,7 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
             <Text
               variant="heading"
               sx={{
-                fontSize: 18,
+                fontSize: 15,
                 fontWeight: "medium",
                 display: "block"
               }}
@@ -751,7 +751,7 @@ function NavigationDropdown() {
         data-test-id="profile-dropdown"
         sx={{
           bg: "background-secondary",
-          size: 30,
+          size: 25,
           borderRadius: 80,
           cursor: "pointer",
           position: "relative",
@@ -760,7 +760,7 @@ function NavigationDropdown() {
         }}
       >
         {!user || !user.id || !profile?.profilePicture ? (
-          <User size={16} color="icon" />
+          <User size={14} color="icon" />
         ) : (
           <Image
             sx={{
