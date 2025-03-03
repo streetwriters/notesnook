@@ -69,7 +69,8 @@ export const CommandPaletteDialog = DialogManager.register(
 
     const commands = usePromise(async () => {
       select(0);
-      defaultCommands.current = await getDefaultCommands();
+      if (!defaultCommands.current)
+        defaultCommands.current = await getDefaultCommands();
       const commands = props.isCommandMode
         ? sortCommands(commandSearch(query, defaultCommands.current))
         : await dbSearch(query);
@@ -280,9 +281,10 @@ export const CommandPaletteDialog = DialogManager.register(
                   {command.group === "recent" && (
                     <Button
                       title={strings.removeFromRecents()}
-                      onClick={(e) => {
+                      onClick={async (e) => {
                         e.stopPropagation();
                         removeRecentCommand(command.id);
+                        defaultCommands.current = await getDefaultCommands();
                         commands.refresh();
                       }}
                       variant="secondary"

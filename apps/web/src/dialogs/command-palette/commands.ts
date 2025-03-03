@@ -234,9 +234,10 @@ export async function getDefaultCommands(): Promise<Command[]> {
 }
 
 export function getCommandById(id: string): Command | undefined {
-  return staticCommands
-    .concat(getEditorCommands())
-    .find((command) => command.id === id);
+  return (
+    staticCommands.find((command) => command.id === id) ||
+    getEditorCommands().find((command) => command.id === id)
+  );
 }
 
 export async function resolveRecentCommand(
