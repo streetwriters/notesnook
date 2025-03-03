@@ -60,6 +60,7 @@ type PaneOptions = {
 export type SplitPaneImperativeHandle = {
   collapse: (index: number) => void;
   expand: (index: number) => void;
+  reset: (index: number) => void;
   isCollapsed: (index: number) => boolean;
 };
 export const SplitPane = React.forwardRef<
@@ -282,6 +283,13 @@ export const SplitPane = React.forwardRef<
           currentPane.collapsed = false;
           currentPane.size =
             currentPane.expandedSize ?? currentPane.initialSize;
+          currentPane.expandedSize = undefined;
+          setSizes(paneSizes.current, wrapSize.current);
+        },
+        reset: (index: number) => {
+          const currentPane = paneSizes.current[index];
+          currentPane.collapsed = false;
+          currentPane.size = currentPane.initialSize;
           currentPane.expandedSize = undefined;
           setSizes(paneSizes.current, wrapSize.current);
         },
