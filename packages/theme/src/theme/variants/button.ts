@@ -51,12 +51,12 @@ export const createButtonVariant = (
   transition: "transform 50ms ease-out",
   ":hover:not(:disabled):not(:active)": {
     bg: background,
-    filter: "brightness(90%)",
+    // filter: "brightness(90%)",
     ...states?.hover
   },
   ":active:not(:disabled)": {
     bg: background,
-    filter: "brightness(85%)",
+    // filter: "brightness(85%)",
     transform: "scale(0.98) !important",
     ...states?.hover,
     ...states?.active
@@ -70,11 +70,18 @@ export const createButtonVariant = (
   }
 });
 
-const primary = createButtonVariant();
+const primary = createButtonVariant("transparent", "paragraph", {
+  hover: { bg: "hover" },
+  active: { bg: "hover" }
+});
 
 const secondary: ThemeUIStyleObject = createButtonVariant(
   "background-secondary",
-  "paragraph"
+  "paragraph",
+  {
+    hover: { bg: "hover-secondary" },
+    active: { bg: "hover-secondary" }
+  }
 );
 
 const accent = createButtonVariant("accent", "accentForeground", {
