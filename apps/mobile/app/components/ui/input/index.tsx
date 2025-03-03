@@ -222,7 +222,6 @@ const Input = ({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    flexGrow: 1,
     paddingHorizontal: DefaultAppStyles.GAP,
     paddingRight:
       buttons || button || secureTextEntry || error
@@ -250,7 +249,6 @@ const Input = ({
         importantForAccessibility="yes"
         style={{
           marginBottom: marginBottom,
-          flexGrow: flexGrow,
           marginRight: marginRight,
           ...wrapperStyle
         }}
