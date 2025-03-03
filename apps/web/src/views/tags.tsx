@@ -23,9 +23,12 @@ import Placeholder from "../components/placeholders";
 import { db } from "../common/db";
 import { ListLoader } from "../components/loaders/list-loader";
 import { Flex, Input } from "@theme-ui/components";
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useState } from "react";
 import { debounce } from "@notesnook/common";
 import { Tag, VirtualizedGrouping } from "@notesnook/core";
+import ScrollContainer from "../components/scroll-container";
+import { ScrollerProps } from "react-virtuoso";
+import { SidebarScroller } from "../components/sidebar-scroller";
 
 function Tags() {
   const tags = useStore((store) => store.tags);
@@ -39,14 +42,24 @@ function Tags() {
 
   if (!items) return <ListLoader />;
   return (
-    <Flex variant="columnFill" id="tags">
+    <Flex
+      variant="columnFill"
+      id="tags"
+      sx={{
+        flex: 1,
+        '[data-viewport-type="element"]': {
+          px: 1,
+          width: `calc(100% - ${2 * 6}px) !important`
+        }
+      }}
+    >
       <ListContainer
         type="tags"
-        sx={{ mx: 1 }}
         refresh={refresh}
         items={items}
         placeholder={<Placeholder context="tags" />}
         header={<></>}
+        Scroller={SidebarScroller}
       />
       <Input
         variant="clean"
