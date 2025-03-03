@@ -50,7 +50,12 @@ import {
   HamburgerMenu
 } from "../icons";
 import { SortableNavigationItem } from "./navigation-item";
-import { hardNavigate, hashNavigate, navigate } from "../../navigation";
+import {
+  getCurrentPath,
+  hardNavigate,
+  hashNavigate,
+  navigate
+} from "../../navigation";
 import { db } from "../../common/db";
 import { isMobile } from "../../hooks/use-mobile";
 import { useStore as useAppStore } from "../../stores/app-store";
@@ -63,6 +68,7 @@ import { useStore as useMonographStore } from "../../stores/monograph-store";
 import { useStore as useTrashStore } from "../../stores/trash-store";
 import { useStore as useNotebookStore } from "../../stores/notebook-store";
 import { useStore as useTagStore } from "../../stores/tag-store";
+import { useStore as useSearchStore } from "../../stores/search-store";
 import useLocation from "../../hooks/use-location";
 import { FlexScrollContainer } from "../scroll-container";
 import { ScopedThemeProvider } from "../theme-provider";
@@ -435,8 +441,6 @@ function RouteItem({
           : location.startsWith(item.path)
       }
       onClick={() => {
-        if (!isMobile() && location === item.path)
-          return useAppStore.getState().toggleListPane();
         navigateToRoute(item.path);
       }}
       menuItems={[
@@ -918,6 +922,10 @@ async function getSidebarItemsAsMenuItems(): Promise<MenuItem[]> {
 }
 
 function navigateToRoute(path: string) {
-  useAppStore.getState().toggleListPane(true);
+  if (!isMobile() && getCurrentPath() === path) {
+    if (useSearchStore.getState().isSearching)
+      return useSearchStore.getState().resetSearch();
+    return useAppStore.getState().toggleListPane();
+  }
   navigate(path);
 }
