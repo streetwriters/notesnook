@@ -28,13 +28,19 @@ import { DefaultAppStyles } from "../../../utils/styles";
 import AppIcon from "../../ui/AppIcon";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { IconButton } from "../../ui/icon-button";
+import { Pressable } from "../../ui/pressable";
+import NotebookScreen from "../../../screens/notebook";
+import { db } from "../../../common/database";
 
 export const NotebookHeader = ({
   notebook,
-  totalNotes = 0
+  totalNotes = 0,
+  breadcrumbs
 }: {
   notebook: Notebook;
   totalNotes: number;
+  breadcrumbs: { id: string; title: string }[];
 }) => {
   const { colors } = useThemeColors();
   return (
@@ -49,9 +55,51 @@ export const NotebookHeader = ({
         style={{
           width: "100%",
           gap: DefaultAppStyles.GAP_VERTICAL,
-          paddingVertical: 25
+          paddingVertical: DefaultAppStyles.GAP
         }}
       >
+        {breadcrumbs && breadcrumbs.length > 0 ? (
+          <View
+            style={{
+              width: "100%",
+              flexDirection: "row",
+              alignItems: "center",
+              flexWrap: "wrap",
+              paddingBottom: DefaultAppStyles.GAP_VERTICAL_SMALL
+            }}
+          >
+            {breadcrumbs.map((item, index) => (
+              <Pressable
+                onPress={async () => {
+                  const notebook = await db.notebooks.notebook(item.id);
+                  if (!notebook) return;
+                  NotebookScreen.navigate(notebook, true);
+                }}
+                key={item.id}
+                style={{
+                  width: undefined,
+                  flexDirection: "row",
+                  paddingHorizontal: 0,
+                  alignItems: "center"
+                }}
+              >
+                {index === 0 ? null : (
+                  <IconButton
+                    name="chevron-right"
+                    size={16}
+                    top={0}
+                    left={0}
+                    right={0}
+                    bottom={0}
+                    style={{ width: 20, height: 25 }}
+                  />
+                )}
+                <Paragraph size={AppFontSize.xs}>{item.title}</Paragraph>
+              </Pressable>
+            ))}
+          </View>
+        ) : null}
+
         <AppIcon name="notebook" size={AppFontSize.xxl} />
 
         <View>
