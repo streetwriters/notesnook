@@ -350,7 +350,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
               : settings[item?.property as never]
           }
           onColor={colors.primary.accent}
-          offColor={colors.secondary.icon}
+          offColor={colors.primary.icon}
           size="small"
           animationSpeed={150}
           onToggle={onChangeSettings}
