@@ -186,58 +186,6 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
         id={params.current.item?.id}
       />
 
-      {breadcrumbs && breadcrumbs.length > 0 ? (
-        <View
-          style={{
-            width: "100%",
-            paddingHorizontal: DefaultAppStyles.GAP,
-            flexDirection: "row",
-            alignItems: "center",
-            flexWrap: "wrap",
-            marginTop: DefaultAppStyles.GAP_VERTICAL
-          }}
-        >
-          <IconButton
-            name="notebook-outline"
-            size={16}
-            style={{ width: 20, height: 25 }}
-            onPress={() => {
-              Navigation.push("Notebooks", {
-                canGoBack: true
-              });
-            }}
-          />
-
-          {breadcrumbs.map((item) => (
-            <Pressable
-              onPress={async () => {
-                const notebook = await db.notebooks.notebook(item.id);
-                if (!notebook) return;
-                NotebookScreen.navigate(notebook, true);
-              }}
-              key={item.id}
-              style={{
-                width: undefined,
-                flexDirection: "row",
-                paddingHorizontal: 0,
-                alignItems: "center"
-              }}
-            >
-              <IconButton
-                name="chevron-right"
-                size={16}
-                top={0}
-                left={0}
-                right={0}
-                bottom={0}
-                style={{ width: 20, height: 25 }}
-              />
-              <Paragraph size={AppFontSize.xs + 1}>{item.title}</Paragraph>
-            </Pressable>
-          ))}
-        </View>
-      ) : null}
-
       <DelayLayout wait={loading}>
         <List
           data={notes}
@@ -255,6 +203,7 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
               // onEditNotebook={() => {
               //   AddNotebookSheet.present(params.current.item);
               // }}
+              breadcrumbs={breadcrumbs}
               notebook={params.current.item}
               totalNotes={notes?.placeholders.length || 0}
             />
