@@ -90,20 +90,19 @@ function NavigationItem(
       }}
       data-test-id={`navigation-item`}
       title={title}
+      onContextMenu={(e) => {
+        if (!menuItems) return;
+        e.preventDefault();
+        e.stopPropagation();
+        Menu.openMenu(menuItems);
+      }}
     >
-      <Button
+      <Flex
         sx={{
           p: 0,
           flex: 1,
           alignItems: "center",
-          justifyContent: isCollapsed ? "center" : "flex-start",
-          display: "flex"
-        }}
-        onContextMenu={(e) => {
-          if (!menuItems) return;
-          e.preventDefault();
-          e.stopPropagation();
-          Menu.openMenu(menuItems);
+          justifyContent: isCollapsed ? "center" : "flex-start"
         }}
       >
         {Icon ? (
@@ -130,7 +129,7 @@ function NavigationItem(
             {title}
           </Text>
         )}
-      </Button>
+      </Flex>
       {children && !isCollapsed ? children : null}
     </Flex>
   );
