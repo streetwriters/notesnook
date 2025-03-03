@@ -120,16 +120,14 @@ const TagItem = (props: {
             >
               <AppIcon
                 size={AppFontSize.md}
-                color={isFocused ? colors.selected.icon : colors.secondary.icon}
+                color={isFocused ? colors.selected.icon : colors.primary.icon}
                 name="pound"
               />
             </View>
 
             <Paragraph
               color={
-                isFocused
-                  ? colors.selected.paragraph
-                  : colors.secondary.paragraph
+                isFocused ? colors.selected.paragraph : colors.primary.paragraph
               }
               size={AppFontSize.sm}
             >
