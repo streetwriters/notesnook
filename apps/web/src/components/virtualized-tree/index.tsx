@@ -19,7 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useEffect, useImperativeHandle, useRef, useState } from "react";
 import { usePersistentState } from "../../hooks/use-persistent-state";
-import { ItemProps, Virtuoso, VirtuosoHandle } from "react-virtuoso";
+import {
+  Components,
+  ItemProps,
+  Virtuoso,
+  VirtuosoHandle
+} from "react-virtuoso";
 import { useKeyboardListNavigation } from "../../hooks/use-keyboard-list-navigation";
 import { CustomScrollbarsVirtualList, waitForElement } from "../list-container";
 
@@ -58,6 +63,8 @@ type TreeViewProps<T> = {
   deselectAll?: () => void;
   isSelected?: (id: string) => boolean;
   style?: React.CSSProperties;
+
+  Scroller?: Components["Scroller"];
 };
 export function VirtualizedTree<T>(props: TreeViewProps<T>) {
   const {
@@ -75,7 +82,7 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
     deselectAll,
     bulkSelect,
     testId,
-    style
+    Scroller
   } = props;
   const [nodes, setNodes] = useState<TreeNode<T>[]>([]);
   const [expandedIds, setExpandedIds] = usePersistentState<ExpandedIds>(
@@ -205,7 +212,7 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
         onMouseUp
       }}
       components={{
-        Scroller: CustomScrollbarsVirtualList,
+        Scroller: (Scroller as any) || CustomScrollbarsVirtualList,
         Item: VirtuosoItem,
         EmptyPlaceholder: Placeholder
       }}

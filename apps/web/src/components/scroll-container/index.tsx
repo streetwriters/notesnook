@@ -21,28 +21,30 @@ import React, { PropsWithChildren, useLayoutEffect } from "react";
 import { MacScrollbar, MacScrollbarProps } from "mac-scrollbar";
 import "mac-scrollbar/dist/mac-scrollbar.css";
 
-type ScrollContainerProps = {
+export type ScrollContainerProps = {
   style?: React.CSSProperties;
   forwardedRef?: (ref: HTMLDivElement | null) => void;
-};
+} & MacScrollbarProps;
 
 const ScrollContainer = ({
   children,
   forwardedRef,
+  style,
   ...props
 }: PropsWithChildren<ScrollContainerProps>) => {
   return (
     <MacScrollbar
+      suppressScrollX
+      minThumbSize={40}
       {...props}
       ref={(div) => {
         forwardedRef && forwardedRef(div as HTMLDivElement);
       }}
       style={{
         position: "relative",
-        height: "100%"
+        height: "100%",
+        ...style
       }}
-      suppressScrollX
-      minThumbSize={40}
     >
       {children}
     </MacScrollbar>
