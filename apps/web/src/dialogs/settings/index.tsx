@@ -334,7 +334,7 @@ function SettingsSideBar(props: SettingsSideBarProps) {
                 variant={"subBody"}
                 sx={{
                   fontWeight: "bold",
-                  color: "paragraph-secondary",
+                  color: "heading",
                   mb: 1,
                   ml: 1,
                   overflow: "hidden",
