@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { useEffect, useRef } from "react";
 import { getHomeRoute, navigate, NavigationEvents } from "../../navigation";
 import { store as selectionStore } from "../../stores/selection-store";
+import { useStore as useSearchStore } from "../../stores/search-store";
 import useRoutes from "../../hooks/use-routes";
 import RouteContainer from "../route-container";
 import routes from "../../navigation/routes";
@@ -32,6 +33,7 @@ function CachedRouter() {
     hooks: {
       beforeNavigate: (location) => {
         selectionStore.toggleSelectionMode(false);
+        useSearchStore.getState().resetSearch();
         if (location === "/") {
           console.log("Redirecting to", getHomeRoute());
           navigate(getHomeRoute());

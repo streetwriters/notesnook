@@ -24,19 +24,10 @@ class SearchStore extends BaseStore<SearchStore> {
   isSearching = false;
   query?: string;
   searchType?: string;
-  // startSearch = () => {
-  //   this.set({ isSearching: true });
-  // };
 
-  // endSearch = () => {
-  //   this.set({ isSearching: false });
-  // };
-  // results = [];
-  // search = async (items, query) => {
-  //   const { type } = this.get();
-  //   const results = await db.lookup[type](items, query);
-  //   this.set((state) => (state.results = results));
-  // };
+  resetSearch = () => {
+    this.set({ isSearching: false, query: undefined, searchType: undefined });
+  };
 }
 
 const [useStore, store] = createStore<SearchStore>(
