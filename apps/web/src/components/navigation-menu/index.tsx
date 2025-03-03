@@ -671,109 +671,108 @@ function NavigationDropdown() {
   const notLoggedIn = Boolean(!user || !user.id);
 
   return (
-    <Flex sx={{ flexDirection: "row", alignItems: "center", gap: 1 }}>
-      <Flex
-        onClick={(e) => {
-          e.preventDefault();
-          Menu.openMenu(
-            [
-              {
-                type: "popup",
-                component: () => <UserProfile minimal />,
-                key: "profile"
-              },
-              {
-                type: "separator",
-                key: "sep"
-              },
-              {
-                type: "button",
-                title: strings.toggleDarkLightMode(),
-                key: "toggle-theme-mode",
-                icon: theme === "dark" ? LightMode.path : DarkMode.path,
-                onClick: () => {
-                  setFollowSystemTheme(false);
-                  toggleNightMode();
-                }
-              },
-              {
-                type: "button",
-                title: strings.upgradeToPro(),
-                icon: Pro.path,
-                key: "upgrade",
-                isHidden: notLoggedIn || isPro
-              },
-              {
-                type: "button",
-                title: settings.title,
-                key: settings.id,
-                icon: settings.icon.path,
-                onClick: () => {
-                  hashNavigate(settings.path);
-                }
-              },
-              {
-                type: "button",
-                title: strings.helpAndSupport(),
-                icon: Documentation.path,
-                key: "help-and-support",
-                onClick: () => {
-                  window.open("https://help.notesnook.com/", "_blank");
-                }
-              },
-              {
-                type: "button",
-                title: strings.login(),
-                icon: Login.path,
-                key: "login",
-                isHidden: !notLoggedIn,
-                onClick: () => hardNavigate("/login")
-              },
-              {
-                type: "button",
-                title: strings.logout(),
-                icon: Logout.path,
-                key: "logout",
-                isHidden: notLoggedIn,
-                onClick: () => logout()
-              }
-            ],
+    <Button
+      variant="secondary"
+      onClick={(e) => {
+        e.preventDefault();
+        Menu.openMenu(
+          [
             {
-              position: {
-                target: e.currentTarget,
-                location: "below",
-                yOffset: 5
+              type: "popup",
+              component: () => <UserProfile minimal />,
+              key: "profile"
+            },
+            {
+              type: "separator",
+              key: "sep"
+            },
+            {
+              type: "button",
+              title: strings.toggleDarkLightMode(),
+              key: "toggle-theme-mode",
+              icon: theme === "dark" ? LightMode.path : DarkMode.path,
+              onClick: () => {
+                setFollowSystemTheme(false);
+                toggleNightMode();
               }
+            },
+            {
+              type: "button",
+              title: strings.upgradeToPro(),
+              icon: Pro.path,
+              key: "upgrade",
+              isHidden: notLoggedIn || isPro
+            },
+            {
+              type: "button",
+              title: settings.title,
+              key: settings.id,
+              icon: settings.icon.path,
+              onClick: () => {
+                hashNavigate(settings.path);
+              }
+            },
+            {
+              type: "button",
+              title: strings.helpAndSupport(),
+              icon: Documentation.path,
+              key: "help-and-support",
+              onClick: () => {
+                window.open("https://help.notesnook.com/", "_blank");
+              }
+            },
+            {
+              type: "button",
+              title: strings.login(),
+              icon: Login.path,
+              key: "login",
+              isHidden: !notLoggedIn,
+              onClick: () => hardNavigate("/login")
+            },
+            {
+              type: "button",
+              title: strings.logout(),
+              icon: Logout.path,
+              key: "logout",
+              isHidden: notLoggedIn,
+              onClick: () => logout()
             }
-          );
-        }}
-        variant="columnCenter"
-        data-test-id="profile-dropdown"
-        sx={{
-          bg: "background-secondary",
-          size: 25,
-          borderRadius: 80,
-          cursor: "pointer",
-          position: "relative",
-          border: "1px solid var(--border)",
-          alignItems: "center"
-        }}
-      >
-        {!user || !user.id || !profile?.profilePicture ? (
-          <User size={14} color="icon" />
-        ) : (
-          <Image
-            sx={{
-              width: "100%",
-              height: "100%",
-              objectFit: "contain",
-              borderRadius: 80
-            }}
-            src={profile.profilePicture}
-          />
-        )}
-      </Flex>
-    </Flex>
+          ],
+          {
+            position: {
+              target: e.currentTarget,
+              location: "below",
+              yOffset: 5
+            }
+          }
+        );
+      }}
+      data-test-id="profile-dropdown"
+      sx={{
+        bg: "background-secondary",
+        size: 26,
+        borderRadius: 80,
+        cursor: "pointer",
+        position: "relative",
+        border: "1px solid var(--border)",
+        alignItems: "center",
+        p: 0
+      }}
+    >
+      {!user || !user.id || !profile?.profilePicture ? (
+        <User size={14} color="icon" />
+      ) : (
+        <Image
+          sx={{
+            width: "100%",
+            height: "100%",
+            objectFit: "contain",
+            borderRadius: 80
+          }}
+          src={profile.profilePicture}
+        />
+      )}
+    </Button>
   );
 }
 
