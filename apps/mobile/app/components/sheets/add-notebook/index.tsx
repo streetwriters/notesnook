@@ -170,8 +170,6 @@ export const AddNotebookSheet = ({
       <Button
         title={notebook ? strings.save() : strings.add()}
         type="accent"
-        height={45}
-        fontSize={AppFontSize.md}
         style={{
           paddingHorizontal: DefaultAppStyles.GAP * 2,
           width: "100%"
