@@ -38,6 +38,7 @@ import { fluidTabsRef } from "../../utils/global-refs";
 import { Header } from "../list-items/headers/header";
 import { Empty, PlaceholderData } from "./empty";
 import { ListItemWrapper } from "./list-item.wrapper";
+import { useSelectionStore } from "../../stores/use-selection-store";
 
 type ListProps = {
   data: VirtualizedGrouping<Item> | undefined;
@@ -188,6 +189,11 @@ export default function List(props: ListProps) {
             directionalLockEnabled={true}
             keyboardShouldPersistTaps="always"
             keyboardDismissMode="interactive"
+            ListFooterComponent={
+              <View
+                style={{ height: props.data?.placeholders?.length ? 100 : 0 }}
+              />
+            }
             refreshControl={
               props.isRenderedInActionSheet ? null : (
                 <RefreshControl
