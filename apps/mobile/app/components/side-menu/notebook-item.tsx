@@ -79,6 +79,7 @@ export const NotebookItem = ({
   useEffect(() => {
     const onNotebookUpdate = (id?: string) => {
       if (id && id !== notebook.id) return;
+      getTotalNotesRef.current([item.notebook.id]);
       onItemUpdate(id);
     };
 
@@ -86,7 +87,7 @@ export const NotebookItem = ({
     return () => {
       eUnSubscribeEvent(eOnNotebookUpdated, onNotebookUpdate);
     };
-  }, [notebook.id, onItemUpdate]);
+  }, [item.notebook.id, notebook.id, onItemUpdate]);
 
   return (
     <View

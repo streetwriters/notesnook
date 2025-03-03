@@ -533,7 +533,7 @@ export const useActions = ({
       },
       {
         id: "move-notes",
-        title: strings.linkNotes(),
+        title: strings.addNotes(),
         hidden: item.type !== "notebook",
         icon: "text",
         onPress: () => {
