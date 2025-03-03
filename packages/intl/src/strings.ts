@@ -2437,5 +2437,6 @@ Use this if changes from other devices are not appearing on this device. This wi
   releaseTrack: () => t`Release track`,
   releaseTrackDesc: () => t`Select the release track for Notesnook.`,
   stable: () => t`Stable`,
-  beta: () => t`Beta`
+  beta: () => t`Beta`,
+  expandSidebar: () => t`Expand sidebar`
 };
