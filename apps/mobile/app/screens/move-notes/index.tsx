@@ -21,8 +21,7 @@ import { Note, Notebook, VirtualizedGrouping } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, TextInput, View } from "react-native";
-import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
+import { ActivityIndicator, FlatList, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { db } from "../../common/database";
 import { FloatingButton } from "../../components/container/floating-button";
@@ -117,12 +116,12 @@ export const MoveNotes = (props: NavigationProps<"MoveNotes">) => {
         backgroundColor: colors.primary.background
       }}
     >
-      <Header title={strings.linkNotes()} canGoBack />
+      <Header title={strings.addNotes()} canGoBack />
 
       <View
         style={{
           paddingHorizontal: DefaultAppStyles.GAP,
-          flex: 1,
+          flexGrow: 1,
           gap: DefaultAppStyles.GAP_VERTICAL
         }}
       >
@@ -136,7 +135,12 @@ export const MoveNotes = (props: NavigationProps<"MoveNotes">) => {
           testID="search-input"
           fwdRef={inputRef}
           wrapperStyle={{
-            marginBottom: 0
+            marginBottom: 0,
+            flexShrink: 1
+          }}
+          flexGrow={0}
+          containerStyle={{
+            flexGrow: 0
           }}
           autoCapitalize="none"
           onChangeText={(v) => {
@@ -153,7 +157,7 @@ export const MoveNotes = (props: NavigationProps<"MoveNotes">) => {
           }}
         />
 
-        <FlashList
+        <FlatList
           ListEmptyComponent={
             <View
               style={{
@@ -171,7 +175,9 @@ export const MoveNotes = (props: NavigationProps<"MoveNotes">) => {
               )}
             </View>
           }
-          estimatedItemSize={50}
+          style={{
+            flexGrow: 1
+          }}
           data={loading ? [] : notes?.placeholders}
           renderItem={renderItem}
         />
