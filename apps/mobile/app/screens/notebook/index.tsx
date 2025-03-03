@@ -20,7 +20,6 @@ import { resolveItems } from "@notesnook/common";
 import { Note, Notebook, VirtualizedGrouping } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import React, { useEffect, useRef, useState } from "react";
-import { View } from "react-native";
 import { db } from "../../common/database";
 import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
@@ -29,9 +28,6 @@ import List from "../../components/list";
 import { NotebookHeader } from "../../components/list-items/headers/notebook-header";
 import { Properties } from "../../components/properties";
 import SelectionHeader from "../../components/selection-header";
-import { IconButton } from "../../components/ui/icon-button";
-import { Pressable } from "../../components/ui/pressable";
-import Paragraph from "../../components/ui/typography/paragraph";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import { eSendEvent, eSubscribeEvent } from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
@@ -39,10 +35,8 @@ import useNavigationStore, {
   NotebookScreenParams
 } from "../../stores/use-navigation-store";
 import { eUpdateNotebookRoute } from "../../utils/events";
-import { AppFontSize } from "../../utils/size";
-import { DefaultAppStyles } from "../../utils/styles";
-import { openEditor, setOnFirstSave } from "../notes/common";
 import { findRootNotebookId } from "../../utils/notebooks";
+import { openEditor, setOnFirstSave } from "../notes/common";
 
 const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
   const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
