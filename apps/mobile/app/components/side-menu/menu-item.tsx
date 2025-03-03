@@ -170,7 +170,7 @@ function _MenuItem({
               item.icon === "crown"
                 ? colors.static.yellow
                 : isFocused
-                ? colors.selected.paragraph
+                ? colors.selected.icon
                 : colors.secondary.icon
             }
             size={AppFontSize.md}
@@ -179,7 +179,7 @@ function _MenuItem({
 
         <Paragraph
           color={
-            isFocused ? colors.primary.paragraph : colors.secondary.paragraph
+            isFocused ? colors.selected.paragraph : colors.primary.paragraph
           }
           size={AppFontSize.sm}
         >
