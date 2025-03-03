@@ -94,14 +94,12 @@ function Header(props: RouteContainerProps) {
         data-test-id="search-input"
         id="search"
         name="search"
-        variant="clean"
         type="text"
         sx={{
           bg: "background",
           m: 0,
           mr: 0,
 
-          border: "1px solid var(--border)",
           borderRadius: "large",
           gap: 0
         }}
