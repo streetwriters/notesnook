@@ -221,7 +221,7 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
         borderRight: "1px solid var(--separator)",
         pt: 1,
         transition: "width 0.1s ease-in",
-        width: isNavPaneCollapsed ? (expanded ? 250 : 40) : "100%"
+        width: isNavPaneCollapsed ? (expanded ? 250 : 50) : "100%"
       }}
       onMouseEnter={() => {
         clearTimeout(mouseHoverTimeout.current);
@@ -298,8 +298,8 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
         sx={{
           justifyContent: isCollapsed ? "center" : "space-between",
           alignItems: "center",
-          borderTop: "1px solid var(--border)",
-          borderBottom: "1px solid var(--border)",
+          borderTop: "1px solid var(--separator)",
+          borderBottom: "1px solid var(--separator)",
           mt: 1,
           mb: 1,
           px: 1,
@@ -309,8 +309,9 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
         <Flex
           sx={{
             flexDirection: isCollapsed ? "column" : "row",
-            alignItems: "center",
-            gap: "small"
+            alignItems: isCollapsed ? "stretch" : "center",
+            gap: "small",
+            flex: 1
           }}
         >
           {tabs.map((tab) => (

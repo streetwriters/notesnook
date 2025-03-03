@@ -163,7 +163,7 @@ function DesktopAppContents() {
               initialSize={isTablet ? 0 : 250}
               className={`nav-pane`}
               snapSize={200}
-              minSize={40}
+              minSize={50}
               maxSize={isTablet ? 0 : 500}
               style={{
                 overflow: "initial",
