@@ -78,6 +78,7 @@ import { useDragState } from "../../settings/editor/state";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { useTabStore } from "./use-tab-store";
 import { editorState, openInternalLink } from "./utils";
+import { Properties } from "../../../components/properties";
 
 const publishNote = async () => {
   const user = useUserStore.getState().user;
@@ -129,12 +130,9 @@ const showActionsheet = async () => {
     .getState()
     .getNoteIdForTab(useTabStore.getState().currentTab!);
   if (noteId) {
+    console.log("OPEN NOTE");
     const note = await db.notes?.note(noteId);
-    if (editorState().isFocused || editorState().isFocused) {
-      editorState().isFocused = true;
-    }
-    const { Properties } = require("../../../components/properties/index.js");
-    Properties.present(note, ["Dark Mode"]);
+    Properties.present(note, false);
   } else {
     ToastManager.show({
       heading: strings.noNoteProperties(),
