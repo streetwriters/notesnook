@@ -77,7 +77,7 @@ export const SectionHeader = React.memo<
             justifyContent: "space-between",
             borderBottomWidth: 1,
             borderColor: colors.primary.border,
-            paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
+            paddingTop: DefaultAppStyles.GAP_VERTICAL_SMALL
           }}
         >
           <Pressable

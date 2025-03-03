@@ -379,7 +379,7 @@ const NoteItem = ({
                 style={{
                   marginRight: 6
                 }}
-                color={colors.secondary.background}
+                color={primaryColors.icon}
               />
             ) : null}
 
@@ -391,7 +391,7 @@ const NoteItem = ({
                 style={{
                   marginRight: 6
                 }}
-                color="orange"
+                color={colors.static.orange}
               />
             ) : null}
 

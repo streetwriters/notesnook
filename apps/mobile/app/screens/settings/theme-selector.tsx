@@ -357,20 +357,18 @@ function ThemeSelector() {
           <View
             style={{
               flexDirection: "row",
-              justifyContent: "space-between"
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+              gap: 10
             }}
           >
             <View
               style={{
-                flexDirection: "row",
-                columnGap: 10
+                flexDirection: "row"
               }}
             >
               <Button
-                height={30}
                 style={{
-                  borderRadius: 100,
-                  minWidth: 60,
                   paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
                 }}
                 type={
@@ -384,11 +382,8 @@ function ThemeSelector() {
               />
               <Button
                 style={{
-                  borderRadius: 100,
-                  minWidth: 60,
                   paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
                 }}
-                height={30}
                 type={colorScheme === "dark" ? "accent" : "secondary"}
                 title={strings.dark()}
                 fontSize={AppFontSize.xs}
@@ -398,11 +393,8 @@ function ThemeSelector() {
               />
               <Button
                 style={{
-                  borderRadius: 100,
-                  minWidth: 60,
                   paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
                 }}
-                height={30}
                 fontSize={AppFontSize.xs}
                 type={colorScheme === "light" ? "accent" : "secondary"}
                 title={strings.light()}
@@ -415,11 +407,8 @@ function ThemeSelector() {
             <Button
               title={strings.loadFromFile()}
               style={{
-                borderRadius: 100,
-                minWidth: 60,
                 paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
               }}
-              height={30}
               type={"secondaryAccented"}
               icon="folder"
               fontSize={AppFontSize.xs}
