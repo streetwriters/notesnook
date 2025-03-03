@@ -108,7 +108,7 @@ function Header(props: RouteContainerProps) {
               textAlign: "center"
             },
             "& + .rightActions #search-action-button": {
-              opacity: 0
+              opacity: query ? 1 : 0
             },
             "&:focus + .rightActions #search-action-button": {
               opacity: 1
