@@ -19,7 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Notebook as NotebookType, VirtualizedGrouping } from "@notesnook/core";
 import { Box, Flex, Input, Text } from "@theme-ui/components";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState
+} from "react";
 import { db } from "../common/db";
 import { store, useStore } from "../stores/notebook-store";
 import { useStore as useSelectionStore } from "../stores/selection-store";
@@ -33,6 +39,10 @@ import {
 import { ListLoader } from "../components/loaders/list-loader";
 import { debounce } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
+import { CustomScrollbarsVirtualList } from "../components/list-container";
+import { ScrollerProps } from "react-virtuoso";
+import ScrollContainer from "../components/scroll-container";
+import { SidebarScroller } from "../components/sidebar-scroller";
 
 export function Notebooks() {
   const roots = useStore((store) => store.notebooks);
@@ -81,7 +91,16 @@ export function Notebooks() {
 
   return (
     <>
-      <Box id="notebooks" sx={{ mx: 1, flex: 1 }}>
+      <Box
+        id="notebooks"
+        sx={{
+          flex: 1,
+          '[data-viewport-type="element"]': {
+            px: 1,
+            width: `calc(100% - ${2 * 6}px) !important`
+          }
+        }}
+      >
         <VirtualizedTree
           testId="notebooks-list"
           rootId={"root"}
@@ -153,6 +172,7 @@ export function Notebooks() {
               expand={expand}
             />
           )}
+          Scroller={SidebarScroller}
         />
       </Box>
       <Input

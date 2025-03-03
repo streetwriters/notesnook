@@ -33,10 +33,11 @@ import {
 } from "./list-profiles";
 import Announcements from "../announcements";
 import { ListLoader } from "../loaders/list-loader";
-import ScrollContainer from "../scroll-container";
+import ScrollContainer, { ScrollContainerProps } from "../scroll-container";
 import { useKeyboardListNavigation } from "../../hooks/use-keyboard-list-navigation";
 import { VirtualizedGrouping, GroupingKey, Item } from "@notesnook/core";
 import {
+  Components,
   FlatScrollIntoViewLocation,
   ItemProps,
   ScrollerProps,
@@ -49,8 +50,9 @@ import { AppEventManager, AppEvents } from "../../common/app-events";
 
 export const CustomScrollbarsVirtualList = forwardRef<
   HTMLDivElement,
-  ScrollerProps
+  ScrollerProps & ScrollContainerProps
 >(function CustomScrollbarsVirtualList(props, ref) {
+  console.log({ props, ref });
   return (
     <ScrollContainer
       {...props}
@@ -76,10 +78,21 @@ type ListContainerProps = {
   button?: {
     onClick: () => void;
   };
+  Scroller?: Components["Scroller"];
 } & SxProp;
 function ListContainer(props: ListContainerProps) {
-  const { type, group, items, context, refresh, header, button, compact, sx } =
-    props;
+  const {
+    type,
+    group,
+    items,
+    context,
+    refresh,
+    header,
+    button,
+    compact,
+    sx,
+    Scroller
+  } = props;
 
   const [focusedGroupIndex, setFocusedGroupIndex] = useState(-1);
 
@@ -213,7 +226,7 @@ function ListContainer(props: ListContainerProps) {
               onBlur={() => setFocusedGroupIndex(-1)}
               onKeyDown={(e) => onKeyDown(e.nativeEvent)}
               components={{
-                Scroller: CustomScrollbarsVirtualList,
+                Scroller: Scroller || CustomScrollbarsVirtualList,
                 Item: VirtuosoItem,
                 Header: ListHeader
               }}
