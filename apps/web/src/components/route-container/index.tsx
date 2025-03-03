@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { PropsWithChildren, useRef } from "react";
+import { PropsWithChildren, useEffect, useRef } from "react";
 import { Box } from "@theme-ui/components";
 import { Close, AddReminder } from "../icons";
 import { useStore as useSearchStore } from "../../stores/search-store";
@@ -62,9 +62,19 @@ function Header(props: RouteContainerProps) {
     [props.title]
   );
   const isMobile = useMobile();
-  // const isSearching = useSearchStore((store) => store.isSearching);
+  const isSearching = useSearchStore((store) => store.isSearching);
   const query = useSearchStore((store) => store.query);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (inputRef.current && inputRef.current.value !== query) {
+      inputRef.current.value = query || "";
+    }
+  }, [query]);
+
+  useEffect(() => {
+    if (isSearching) inputRef.current?.focus();
+  }, [isSearching]);
 
   return (
     <Box
@@ -82,7 +92,6 @@ function Header(props: RouteContainerProps) {
       <Field
         inputRef={inputRef}
         data-test-id="search-input"
-        autoFocus
         id="search"
         name="search"
         variant="clean"
@@ -123,11 +132,7 @@ function Header(props: RouteContainerProps) {
           250
         )}
         onKeyUp={(e) => {
-          if (e.key === "Escape")
-            useSearchStore.setState({
-              isSearching: false,
-              searchType: undefined
-            });
+          if (e.key === "Escape") useSearchStore.getState().resetSearch();
           else useSearchStore.setState({ isSearching: true, searchType: type });
         }}
         rightActions={[
@@ -137,11 +142,7 @@ function Header(props: RouteContainerProps) {
             testId: "search-button",
             onClick: () => {
               if (inputRef.current) inputRef.current.value = "";
-              useSearchStore.setState({
-                isSearching: false,
-                query: undefined,
-                searchType: undefined
-              });
+              useSearchStore.getState().resetSearch();
             }
           },
           ...(type === "reminders"
