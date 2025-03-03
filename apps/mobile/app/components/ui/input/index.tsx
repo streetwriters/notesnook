@@ -119,9 +119,9 @@ const Input = ({
   });
   type ErrorKey = keyof typeof errorList;
   const color = error
-    ? colors.error.paragraph
+    ? colors.error.border
     : focus
-    ? customColor || colors.primary.accent
+    ? customColor || colors.selected.border
     : colors.primary.border;
 
   const validate = async (value: string) => {
