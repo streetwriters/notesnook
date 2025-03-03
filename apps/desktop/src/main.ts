@@ -147,6 +147,11 @@ async function createWindow() {
   await AssetManager.loadIcons();
   setupDesktopIntegration(config.desktopSettings);
 
+  mainWindow.webContents.session.setPermissionRequestHandler(
+    (webContents, permission, callback) => {
+      callback(permission === "geolocation" ? false : true);
+    }
+  );
   mainWindow.webContents.session.setSpellCheckerDictionaryDownloadURL(
     "http://dictionaries.notesnook.com/"
   );
