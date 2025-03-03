@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 const path = require("path");
+const pkg = require("./package.json");
 
 const buildRoot = process.env.NN_BUILD_ROOT || ".";
 const buildFiles = [
@@ -35,6 +36,7 @@ const linuxExecutableName = process.env.NN_PRODUCT_NAME
   ? process.env.NN_PRODUCT_NAME.toLowerCase().replace(/\s+/g, "-")
   : "notesnook";
 const year = new Date().getFullYear();
+const isBeta = pkg.version.includes("-beta");
 
 module.exports = {
   appId: appId,
@@ -194,7 +196,8 @@ module.exports = {
     {
       provider: "github",
       repo: "notesnook",
-      owner: "streetwriters"
+      owner: "streetwriters",
+      channel: isBeta ? "beta" : "latest"
     }
   ]
 };
