@@ -230,6 +230,7 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
         clearTimeout(mouseHoverTimeout.current);
         if (!isNavPaneCollapsed) return;
         mouseHoverTimeout.current = setTimeout(() => {
+          if (!isNavPaneCollapsed) return;
           setExpanded(false);
         }, 500) as unknown as number;
       }}
@@ -377,14 +378,23 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
             suppressScrollX={true}
           >
             <Flex sx={{ flexDirection: "column", px: 1, gap: [1, 1, "small"] }}>
-              <Routes isCollapsed={isCollapsed} />
-              <Colors isCollapsed={isCollapsed} />
+              <Routes
+                isCollapsed={isCollapsed}
+                collapse={() => isNavPaneCollapsed && setExpanded(false)}
+              />
+              <Colors
+                isCollapsed={isCollapsed}
+                collapse={() => isNavPaneCollapsed && setExpanded(false)}
+              />
               <Box
                 bg="separator"
                 my={1}
                 sx={{ width: "100%", height: "0.8px", alignSelf: "center" }}
               />
-              <Shortcuts isCollapsed={isCollapsed} />
+              <Shortcuts
+                isCollapsed={isCollapsed}
+                collapse={() => isNavPaneCollapsed && setExpanded(false)}
+              />
             </Flex>
           </FlexScrollContainer>
         </Freeze>
@@ -395,7 +405,13 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
 }
 export default React.memo(NavigationMenu);
 
-function Routes({ isCollapsed }: { isCollapsed?: boolean }) {
+function Routes({
+  isCollapsed,
+  collapse
+}: {
+  isCollapsed: boolean;
+  collapse: () => void;
+}) {
   const hiddenRoutes = useAppStore((store) => store.hiddenRoutes);
   return (
     <ReorderableList
@@ -403,7 +419,7 @@ function Routes({ isCollapsed }: { isCollapsed?: boolean }) {
       orderKey={`sidebarOrder:routes`}
       order={() => db.settings.getSideBarOrder("routes")}
       onOrderChanged={(order) => db.settings.setSideBarOrder("routes", order)}
-      context={{ isCollapsed }}
+      context={{ isCollapsed, collapse }}
       renderItem={RouteItem}
     />
   );
@@ -414,7 +430,7 @@ function RouteItem({
   context
 }: {
   item: Route;
-  context?: { isCollapsed: boolean };
+  context?: { isCollapsed: boolean; collapse: () => void };
 }) {
   const [location] = useLocation();
 
@@ -441,7 +457,7 @@ function RouteItem({
           : location.startsWith(item.path)
       }
       onClick={() => {
-        navigateToRoute(item.path);
+        if (navigateToRoute(item.path)) context?.collapse();
       }}
       menuItems={[
         {
@@ -456,7 +472,13 @@ function RouteItem({
   );
 }
 
-function Colors({ isCollapsed }: { isCollapsed?: boolean }) {
+function Colors({
+  isCollapsed,
+  collapse
+}: {
+  isCollapsed: boolean;
+  collapse: () => void;
+}) {
   const colors = useAppStore((store) => store.colors);
   const refreshNavItems = useAppStore((store) => store.refreshNavItems);
   const context = useNoteStore((store) =>
@@ -480,7 +502,7 @@ function Colors({ isCollapsed }: { isCollapsed?: boolean }) {
           selected={context?.id === color.id}
           color={color.colorCode}
           onClick={() => {
-            navigateToRoute(`/colors/${color.id}`);
+            if (navigateToRoute(`/colors/${color.id}`)) collapse();
           }}
           onDrop={(e) => handleDrop(e.dataTransfer, color)}
           menuItems={[
@@ -519,7 +541,13 @@ function Colors({ isCollapsed }: { isCollapsed?: boolean }) {
   );
 }
 
-function Shortcuts({ isCollapsed }: { isCollapsed?: boolean }) {
+function Shortcuts({
+  isCollapsed,
+  collapse
+}: {
+  isCollapsed: boolean;
+  collapse: () => void;
+}) {
   const shortcuts = useAppStore((store) => store.shortcuts);
   const refreshNavItems = useAppStore((store) => store.refreshNavItems);
   const context = useNoteStore((store) =>
@@ -563,11 +591,14 @@ function Shortcuts({ isCollapsed }: { isCollapsed?: boolean }) {
           selected={context?.id === item.id}
           onDrop={(e) => handleDrop(e.dataTransfer, item)}
           onClick={async () => {
-            if (item.type === "notebook") {
-              navigateToRoute(`/notebooks/${item.id}`);
-            } else if (item.type === "tag") {
-              navigateToRoute(`/tags/${item.id}`);
-            }
+            if (
+              navigateToRoute(
+                item.type === "notebook"
+                  ? `/notebooks/${item.id}`
+                  : `/tags/${item.id}`
+              )
+            )
+              collapse();
           }}
         >
           <ItemCount item={item} />
@@ -928,4 +959,5 @@ function navigateToRoute(path: string) {
     return useAppStore.getState().toggleListPane();
   }
   navigate(path);
+  return true;
 }
