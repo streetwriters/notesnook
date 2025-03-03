@@ -269,12 +269,18 @@ const TabStrip = React.memo(function TabStrip() {
         onDoubleClick={(e) => e.stopPropagation()}
       >
         <Button
-          variant="secondary"
+          variant="accent"
           {...CREATE_BUTTON_MAP.notes}
           data-test-id={`create-new-note`}
-          sx={{ p: 1, bg: "accent" }}
+          sx={{
+            p: 0,
+            borderRadius: "100%",
+            mr: "small",
+            height: 28,
+            width: 28
+          }}
         >
-          <NoteAdd size={16} color="accentForeground" />
+          <Plus size={18} color="accentForeground" />
         </Button>
         <Button
           disabled={!canGoBack}
