@@ -70,7 +70,7 @@ export const NotebookItem = ({
   const { totalNotes, getTotalNotes } = useTotalNotes("notebook");
   const getTotalNotesRef = React.useRef(getTotalNotes);
   getTotalNotesRef.current = getTotalNotes;
-  const { colors } = useThemeColors("sheet");
+  const { colors } = useThemeColors();
 
   useEffect(() => {
     getTotalNotesRef.current([item.notebook.id]);
@@ -157,7 +157,9 @@ export const NotebookItem = ({
         >
           <IconButton
             size={AppFontSize.md}
-            color={selected ? colors.selected.icon : colors.primary.icon}
+            color={
+              selected || isFocused ? colors.selected.icon : colors.primary.icon
+            }
             testID={item.hasChildren ? `expand-notebook-${index}` : ""}
             onPress={() => {
               if (item.hasChildren) {
@@ -186,7 +188,7 @@ export const NotebookItem = ({
 
           <Paragraph
             color={
-              isFocused ? colors.selected.paragraph : colors.secondary.paragraph
+              isFocused ? colors.selected.paragraph : colors.primary.paragraph
             }
             size={AppFontSize.sm}
           >
