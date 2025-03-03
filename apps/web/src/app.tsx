@@ -162,7 +162,7 @@ function DesktopAppContents() {
               id="nav-pane"
               initialSize={isTablet ? 0 : 250}
               className={`nav-pane`}
-              snapSize={200}
+              snapSize={160}
               minSize={50}
               maxSize={isTablet ? 0 : 500}
               style={{
