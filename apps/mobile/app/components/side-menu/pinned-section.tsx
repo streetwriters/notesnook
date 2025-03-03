@@ -79,7 +79,7 @@ export const PinnedSection = React.memo(
         style={{
           flexGrow: 1,
           borderTopWidth: 1,
-          borderTopColor: colors.primary.border,
+          borderTopColor: colors.primary.separator,
           marginTop: DefaultAppStyles.GAP_SMALL,
           paddingTop: DefaultAppStyles.GAP_SMALL
         }}
