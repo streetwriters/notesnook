@@ -23,6 +23,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Cross,
+  Icon,
   Lock,
   NewTab,
   Note,
@@ -82,6 +83,16 @@ import useTablet from "../../hooks/use-tablet";
 import { isMac } from "../../utils/platform";
 import { CREATE_BUTTON_MAP } from "../../common";
 
+type ToolButton = {
+  title: string;
+  icon: Icon;
+  enabled?: boolean;
+  hidden?: boolean;
+  hideOnMobile?: boolean;
+  toggled?: boolean;
+  onClick: () => void;
+};
+
 export function EditorActionBar() {
   const { isMaximized, isFullscreen, hasNativeWindowControls } =
     useWindowControls();
@@ -94,6 +105,10 @@ export function EditorActionBar() {
     activeSession?.id ? store.editors[activeSession?.id] : undefined
   );
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
+  const arePropertiesVisible = useEditorStore(
+    (store) => store.arePropertiesVisible
+  );
+  const isTOCVisible = useEditorStore((store) => store.isTOCVisible);
   const monographs = useMonographStore((store) => store.monographs);
   const isNotePublished =
     activeSession &&
@@ -102,7 +117,7 @@ export function EditorActionBar() {
   const isMobile = useMobile();
   const isTablet = useTablet();
 
-  const tools = [
+  const tools: ToolButton[] = [
     {
       title: strings.newTab(),
       icon: NewTab,
@@ -146,7 +161,8 @@ export function EditorActionBar() {
         activeSession.type !== "locked" &&
         activeSession.type !== "diff" &&
         activeSession.type !== "conflicted",
-      onClick: () => useEditorStore.getState().toggleTableOfContents()
+      onClick: () => useEditorStore.getState().toggleTableOfContents(),
+      toggled: isTOCVisible
     },
     {
       title: strings.search(),
@@ -157,7 +173,7 @@ export function EditorActionBar() {
         activeSession.type !== "locked" &&
         activeSession.type !== "diff" &&
         activeSession.type !== "conflicted",
-      onClick: editorManager?.editor?.startSearch
+      onClick: () => editorManager?.editor?.startSearch()
     },
     {
       title: strings.properties(),
@@ -169,7 +185,8 @@ export function EditorActionBar() {
         activeSession.type !== "diff" &&
         activeSession.type !== "conflicted" &&
         !isFocusMode,
-      onClick: () => useEditorStore.getState().toggleProperties()
+      onClick: () => useEditorStore.getState().toggleProperties(),
+      toggled: arePropertiesVisible
     },
     ...getWindowControls(
       hasNativeWindowControls,
@@ -226,7 +243,7 @@ export function EditorActionBar() {
             sx={{
               p: 1,
               alignItems: "center",
-              bg: "transparent",
+              bg: tool.toggled ? "background-selected" : "transparent",
               display: [
                 "hideOnMobile" in tool && tool.hideOnMobile ? "none" : "flex",
                 tool.hidden ? "none" : "flex"
