@@ -1,11 +1,9 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require("path");
-const TerserPlugin = require("terser-webpack-plugin");
 const Repack = require("@callstack/repack");
-const { webpack, NormalModuleReplacementPlugin } = require("webpack");
-
-
-
+const { ReanimatedPlugin } = require('@callstack/repack-plugin-reanimated');
+const { NormalModuleReplacementPlugin, default: rspack } = require("@rspack/core");
+const { getModulePaths } = require('@callstack/repack');
 /**
  * More documentation, installation, usage, motivation and differences with Metro is available at:
  * https://github.com/callstack/repack/blob/main/README.md
@@ -20,6 +18,8 @@ const { webpack, NormalModuleReplacementPlugin } = require("webpack");
  *
  * @param env Environment options passed from either Webpack CLI or React Native CLI
  *            when running with `react-native start/bundle`.
+ * 
+ * @returns {import("@rspack/core").RspackOptions}
  */
 module.exports = (env) => {
   const {
@@ -28,10 +28,6 @@ module.exports = (env) => {
     entry = "./index.js",
     platform = process.env.PLATFORM,
     minimize = mode === "production",
-    devServer = undefined,
-    bundleFilename = undefined,
-    sourceMapFilename = undefined,
-    assetsPath = undefined,
     reactNativePath = path.join(__dirname, "../node_modules/react-native"),
   } = env;
 
@@ -51,23 +47,26 @@ module.exports = (env) => {
 
   return {
     mode,
+    cache: true,
+    experiments: {
+      parallelCodeSplitting: true,
+      cache: {
+        type: "persistent",
+        buildDependencies: [__filename]
+      },
+    },
     /**
      * This should be always `false`, since the Source Map configuration is done
      * by `SourceMapDevToolPlugin`.
      */
-    devtool: false,
+    devtool: 'source-map',
     context,
     /**
      * `getInitializationEntries` will return necessary entries with setup and initialization code.
      * If you don't want to use Hot Module Replacement, set `hmr` option to `false`. By default,
      * HMR will be enabled in development mode.
      */
-    entry: [
-      ...Repack.getInitializationEntries(reactNativePath, {
-        hmr: devServer && devServer.hmr,
-      }),
-      entry,
-    ],
+    entry: entry,
     resolve: {
       /**
        * `getResolveOptions` returns additional resolution configuration for React Native.
@@ -87,6 +86,7 @@ module.exports = (env) => {
         "react": path.join(__dirname, "../node_modules/react"),
         "react-dom": path.join(__dirname, "../node_modules/react-dom"),
         "@notesnook": path.join(__dirname, "../../../packages"),
+        "@notesnook/core": path.join(__dirname, "../../../packages/core"),
         "@streetwriters/showdown": path.join(__dirname, "../node_modules/@streetwriters/showdown"),
         "qclone": path.join(__dirname, "../node_modules/qclone"),
         "@notifee/react-native": path.join(__dirname, "../node_modules/@ammarahmed/notifee-react-native"),
@@ -103,12 +103,14 @@ module.exports = (env) => {
         "react-native-blob-util": path.join(__dirname, "../node_modules/react-native-blob-util"),
         "@mdi/js": path.join(__dirname, "../node_modules/@mdi/js/mdi.js"),
         "katex": path.join(__dirname, "../node_modules/katex"),
-        "tinycolor2":  path.join(__dirname, "../node_modules/tinycolor2"),
+        "tinycolor2": path.join(__dirname, "../node_modules/tinycolor2"),
         "@lingui/core": path.join(__dirname, "../node_modules/@lingui/core"),
+        "@swc/helpers": path.join(__dirname, "../node_modules/@swc/helpers"),
+        "@messageformat/parser": path.join(__dirname, "../node_modules/@messageformat/parser/lib/parser.js"),
       },
       fallback: {
         "crypto": false,
-      }
+      },
     },
     /**
      * Configures output.
@@ -123,33 +125,8 @@ module.exports = (env) => {
       path: path.join(__dirname, 'build/generated', platform),
       filename: "index.bundle",
       chunkFilename: "[name].chunk.bundle",
-      publicPath: Repack.getPublicPath({ platform, devServer }),
     },
-    /**
-     * Configures optimization of the built bundle.
-     */
-    optimization: {
-      /** Enables minification based on values passed from React Native CLI or from fallback. */
-      minimize,
-      /** Configure minimizer to process the bundle. */
-      minimizer: [
-        new TerserPlugin({
-          test: /\.(js)?bundle(\?.*)?$/i,
-          /**
-           * Prevents emitting text file with comments, licenses etc.
-           * If you want to gather in-file licenses, feel free to remove this line or configure it
-           * differently.
-           */
-          extractComments: false,
-          terserOptions: {
-            format: {
-              comments: false,
-            },
-          },
-        }),
-      ],
-      chunkIds: "named",
-    },
+
     module: {
       /**
        * This rule will process all React Native related dependencies with Babel.
@@ -160,129 +137,44 @@ module.exports = (env) => {
        * https://github.com/babel/babel-loader#options
        */
       rules: [
+        ...Repack.getJsTransformRules(),
+        ...Repack.getAssetTransformRules(),
         {
-          test: /\.mjs$|cjs$|js$|jsx$|ts$|tsx$/,
-          include: [
-            /node_modules(.*[/\\])+@streetwriters\/kysely/,
-          ],
+          test: /\.jsx?$/,
+          type: 'javascript/auto',
+          include: getModulePaths([
+            '@react-native-masked-view/masked-view',
+            "react-native-tooltips",
+            "react-native-keyboard-aware-scroll-view",
+            "react-native-keychain",
+            "react-native-datetime-picker",
+            "react-native-modal-datetime-picker"
+          ]),
           use: {
-            loader: "babel-loader",
-            options: {
-              configFile: false,
-              cacheDirectory: path.join(
-                __dirname,
-                "node_modules/.webpack-cache"
-              ),
-              babelrc: false,
-              presets: ["module:@react-native/babel-preset"],
-              plugins: [
-                "react-native-reanimated/plugin",
-                "@babel/plugin-transform-named-capturing-groups-regex",
-                ["@babel/plugin-transform-private-methods", { "loose": true }],
-              ]
-            },
+            loader: '@callstack/repack/flow-loader',
+            options: { all: true },
           },
         },
         {
           test: /\.mjs$|cjs$|js$|jsx$|ts$|tsx$/,
-          include: [
-            /node_modules(.*[/\\])+react-native/,
-            /node_modules(.*[/\\])+@react-native/,
-            /node_modules(.*[/\\])+@react-navigation/,
-            /node_modules(.*[/\\])+@react-native-community/,
-            /node_modules(.*[/\\])+@expo/,
-            /node_modules(.*[/\\])+pretty-format/,
-            /node_modules(.*[/\\])+metro/,
-            /node_modules(.*[/\\])+abort-controller/,
-            /node_modules(.*[/\\])+@callstack[/\\]repack/,
-            /node_modules(.*[/\\])+pretty-format/,
-            /node_modules(.*[/\\])+@react-native-masked-view\/masked-view/,
-            /node_modules(.*[/\\])+toggle-switch-react-native/,
-            /node_modules(.*[/\\])+rn-fetch-blob/,
-            /node_modules(.*[/\\])+@notesnook[/\\]core/,
-            /node_modules(.*[/\\])+@microsoft/,
-            /node_modules(.*[/\\])+@msgpack/,
-            /node_modules(.*[/\\])+liqe/,
-            /node_modules(.*[/\\])+leac/,
-            /node_modules(.*[/\\])+selderee/,
-            /node_modules(.*[/\\])+html-to-text/,
-            /node_modules(.*[/\\])+buffer/,
-            /node_modules(.*[/\\])+readable-stream/,
-            /node_modules(.*[/\\])+react-native-fingerprint-scanner/,
-            /node_modules(.*[/\\])+@notesnook[/\\]logger/,
-            /node_modules(.*[/\\])+@ammarahmed[/\\]notifee-react-native/,
-            /node_modules(.*[/\\])+@trpc[/\\]client/,
-            /node_modules(.*[/\\])+@trpc[/\\]server/,
-            /node_modules(.*[/\\])+@tanstack[/\\]query-core/,
-            /node_modules(.*[/\\])+@tanstack[/\\]react-query/,
-            /node_modules(.*[/\\])+@trpc[/\\]react-query/,
-            /node_modules(.*[/\\])+katex/,
-            /node_modules(.*[/\\])+react-native-material-menu/,
-            /node_modules(.*[/\\])+@notesnook[/\\]core/,
-            /node_modules(.*[/\\])+whatwg-url-without-unicode/,
-            /node_modules(.*[/\\])+whatwg-url/,
-            /node_modules(.*[/\\])+react-native-url-polyfill/,
-            /node_modules(.*[/\\])+diffblazer/,
-            /node_modules(.*[/\\])+react-freeze/,
-            /node_modules(.*[/\\])+@messageformat[/\\]parser/,
-            /node_modules(.*[/\\])+@lingui[/\\]core/,
-          ],
+          include: (value) => {
+            if (value.includes("packages/intl") || value.includes("messageformat")) {
+               return true;
+            }
+            return false;
+          },
           use: {
             loader: "babel-loader",
             options: {
               configFile: false,
-              cacheDirectory: path.join(
-                __dirname,
-                "node_modules/.webpack-cache"
-              ),
               babelrc: false,
-              presets: ["module:@react-native/babel-preset"],
               plugins: [
-                "react-native-reanimated/plugin",
-                "@babel/plugin-transform-named-capturing-groups-regex",
-                "macros",
-                ["@babel/plugin-transform-private-methods", { "loose": true }],
+                "@babel/plugin-transform-unicode-property-regex",
               ]
             },
           },
         },
-      
-        /**
-         * Here you can adjust loader that will process your files.
-         *
-         * You can also enable persistent caching with `cacheDirectory` - please refer to:
-         * https://github.com/babel/babel-loader#options
-         */
-        {
-          test: /\.[jt]sx?$/,
-          exclude: /node_modules/,
-          use: {
-            loader: "babel-loader",
-            options: {
-              /** Add React Refresh transform only when HMR is enabled. */
-              configFile: false,
-              cacheDirectory: path.join(
-                __dirname,
-                "node_modules/.webpack-cache"
-              ),
-              babelrc: false,
-              presets: [["module:@react-native/babel-preset"]],
-              plugins:
-                devServer && devServer.hmr
-                  ? [
-                      "module:react-refresh/babel",
-                      "react-native-reanimated/plugin",
-                      "macros"
-                    ]
-                  : [
-                      "react-native-reanimated/plugin",
-                      `@babel/plugin-transform-named-capturing-groups-regex`,
-                      "transform-remove-console",
-                      "macros"
-                    ],
-            },
-          },
-        },
+    
 
         /**
          * This loader handles all static assets (images, video, audio and others), so that you can
@@ -300,16 +192,6 @@ module.exports = (env) => {
           ),
           use: {
             loader: "@callstack/repack/assets-loader",
-            options: {
-              platform,
-              devServerEnabled: Boolean(devServer),
-              /**
-               * Defines which assets are scalable - which assets can have
-               * scale suffixes: `@1x`, `@2x` and so on.
-               * By default all images are scalable.
-               */
-              scalableAssetExtensions: Repack.SCALABLE_ASSETS,
-            },
           },
         },
         {
@@ -333,6 +215,7 @@ module.exports = (env) => {
           resource.request = resource.request.replace(/^node:/, '');
         }
       ),
+      new ReanimatedPlugin(),
       /**
        * Configure other required and additional plugins to make the bundle
        * work in React Native and provide good development experience with
@@ -343,14 +226,15 @@ module.exports = (env) => {
        * from `Repack.plugins`.
        */
       new Repack.RepackPlugin({
-        context,
-        mode,
-        platform,
-        devServer,
-        output: {
-          bundleFilename,
-          sourceMapFilename,
-          assetsPath,
+        logger: {
+          console: false,
+          listener: (e => {
+            if (e.message[0] === "Bundle built with warnings") {
+              console.warn(`ℹ ` + e.message[0] + " time: " + e.message[1].time);
+              return;
+            }
+          })
+          
         },
         extraChunks: [
           {
@@ -360,5 +244,5 @@ module.exports = (env) => {
         ],
       }),
     ],
-  };
-};
+  }
+}
