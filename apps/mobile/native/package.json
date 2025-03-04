@@ -78,7 +78,7 @@
     "react-native-tab-view": "^4.0.2"
   },
   "devDependencies": {
-    "@rspack/core": "^1.2.6",
+    "@rspack/core": "^1.2.7",
     "babel-loader": "^10.0.0",
     "@babel/plugin-transform-unicode-property-regex": "^7.25.9",
     "@callstack/repack-plugin-reanimated": "^5.0.0",
@@ -87,8 +87,6 @@
     "detox": "^20.27.6",
     "@babel/core": "^7.20.0",
     "@babel/eslint-parser": "^7.16.5",
-    "@babel/plugin-transform-named-capturing-groups-regex": "^7.16.5",
-    "@babel/plugin-transform-private-methods": "^7.22.5",
     "@babel/preset-env": "^7.20.0",
     "@babel/runtime": "^7.20.0",
     "@react-native/eslint-config": "0.74.86",
@@ -103,8 +101,6 @@
     "@typescript-eslint/eslint-plugin": "^5.14.0",
     "@typescript-eslint/parser": "^5.14.0",
     "babel-jest": "^29.6.3",
-    "babel-plugin-module-resolver": "^4.1.0",
-    "babel-plugin-transform-remove-console": "6.9.4",
     "eslint": "^8.19.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
