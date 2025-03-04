@@ -271,3 +271,86 @@ test(`sort notebooks`, async ({ page }, info) => {
     }
   }
 });
+
+test("when default notebook is set, created note in notes context should go to default notebook", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  let notebooks = await app.goToNotebooks();
+  let notebook = await notebooks.createNotebook(NOTEBOOK);
+  await notebook?.setAsDefault();
+
+  const notes = await app.goToNotes();
+  await notes?.createNote(NOTE);
+  notebooks = await app.goToNotebooks();
+  notebook = await notebooks.findNotebook(NOTEBOOK);
+  const openedNotebook = await notebook?.openNotebook();
+
+  expect(await openedNotebook?.notes.findNote(NOTE)).toBeDefined();
+});
+
+test("when default notebook is set, created note in other notebook's context should not go to default notebook", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  let notebooks = await app.goToNotebooks();
+  let notebook = await notebooks.createNotebook(NOTEBOOK);
+  await notebook?.setAsDefault();
+
+  const otherNotebook = await notebooks.createNotebook({
+    title: "Other Notebook"
+  });
+  const openedOtherNotebook = await otherNotebook?.openNotebook();
+  await openedOtherNotebook?.notes.createNote(NOTE);
+  notebooks = await app.goToNotebooks();
+  notebook = await notebooks.findNotebook(NOTEBOOK);
+  const openedNotebook = await notebook?.openNotebook();
+
+  expect(await openedNotebook?.notes.findNote(NOTE)).toBeUndefined();
+});
+
+test("when default notebook is set, created note in tags context should go to default notebook", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  let notebooks = await app.goToNotebooks();
+  let notebook = await notebooks.createNotebook(NOTEBOOK);
+  await notebook?.setAsDefault();
+
+  const tags = await app.goToTags();
+  const tag = await tags.createItem({ title: "TestTag" });
+  const openedTag = await tag?.open();
+  await openedTag?.createNote(NOTE);
+  notebooks = await app.goToNotebooks();
+  notebook = await notebooks.findNotebook(NOTEBOOK);
+  const openedNotebook = await notebook?.openNotebook();
+
+  expect(await openedNotebook?.notes.findNote(NOTE)).toBeDefined();
+});
+
+test("when default notebook is set, created note in colors context should go to default notebook", async ({
+  page
+}, info) => {
+  info.setTimeout(2 * 60 * 1000);
+
+  const coloredNote = { title: "Red note", content: NOTE.content };
+  const app = new AppModel(page);
+  await app.goto();
+  let notebooks = await app.goToNotebooks();
+  let notebook = await notebooks.createNotebook(NOTEBOOK);
+  await notebook?.setAsDefault();
+
+  const notes = await app.goToNotes();
+  const note = await notes.createNote(NOTE);
+  await note?.contextMenu.newColor(coloredNote);
+  const color = await app.goToColor("red");
+  await color?.createNote(coloredNote);
+  notebooks = await app.goToNotebooks();
+  notebook = await notebooks.findNotebook(NOTEBOOK);
+  const openedNotebook = await notebook?.openNotebook();
+
+  expect(await openedNotebook?.notes.findNote(coloredNote)).toBeDefined();
+});

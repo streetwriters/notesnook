@@ -959,17 +959,20 @@ class EditorStore extends BaseStore<EditorStore> {
 
         if (currentSession.type === "new") {
           const context = useNoteStore.getState().context;
+          const defaultNotebook = db.settings.getDefaultNotebook();
           if (context) {
             const { type } = context;
             if (type === "notebook")
               await db.notes.addToNotebook(context.id, note.id);
-            else if (type === "color" || type === "tag")
+            else if (type === "color" || type === "tag") {
               await db.relations.add(
                 { type, id: context.id },
                 { id: note.id, type: "note" }
               );
+              if (defaultNotebook)
+                await db.notes.addToNotebook(defaultNotebook, note.id);
+            }
           } else {
-            const defaultNotebook = db.settings.getDefaultNotebook();
             if (defaultNotebook)
               await db.notes.addToNotebook(defaultNotebook, note.id);
           }

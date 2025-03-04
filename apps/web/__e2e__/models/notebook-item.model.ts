@@ -98,4 +98,9 @@ export class NotebookItemModel extends BaseItemModel {
     await this.contextMenu.close();
     return state;
   }
+
+  async setAsDefault() {
+    await this.contextMenu.open(this.locator);
+    await new ToggleModel(this.page, "menu-button-set-as-default").on();
+  }
 }
