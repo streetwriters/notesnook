@@ -1094,7 +1094,7 @@ class EditorStore extends BaseStore<EditorStore> {
     const { tabs } = this.get();
     this.closeTabs(...tabs.map((t) => t.id));
   };
-  
+
   closeNotes = (...noteIds: string[]) => {
     const { getTabsForNote, closeTabs } = this.get();
     const tabs = noteIds
@@ -1164,18 +1164,21 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   toggleProperties = (toggleState?: boolean) => {
-    this.set(
-      (state) =>
-        (state.arePropertiesVisible =
-          toggleState !== undefined ? toggleState : !state.arePropertiesVisible)
-    );
+    this.set((state) => {
+      state.arePropertiesVisible =
+        toggleState !== undefined ? toggleState : !state.arePropertiesVisible;
+    });
+    this.toggleTableOfContents(false);
   };
 
   toggleTableOfContents = (toggleState?: boolean) => {
-    const { isTOCVisible } = this.get();
+    const { isTOCVisible, arePropertiesVisible } = this.get();
     const isTOCVisibleState =
       toggleState !== undefined ? toggleState : !isTOCVisible;
-    this.set({ isTOCVisible: isTOCVisibleState });
+    this.set({
+      isTOCVisible: isTOCVisibleState,
+      arePropertiesVisible: isTOCVisibleState ? false : arePropertiesVisible
+    });
     Config.set("editor:toc", isTOCVisibleState);
   };
 
