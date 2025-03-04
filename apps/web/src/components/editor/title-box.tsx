@@ -106,6 +106,7 @@ function TitleBox(props: TitleBoxProps) {
       wrap="soft"
       rows={1}
       sx={{
+        m: 0,
         p: 0,
         fontFamily,
         fontSize: ["1.625em", "1.625em", "2.625em"],
