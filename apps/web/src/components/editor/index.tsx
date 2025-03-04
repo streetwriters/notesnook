@@ -129,17 +129,6 @@ export default function TabsView() {
 
   return (
     <>
-      <Flex
-        className="editor-action-bar"
-        sx={{
-          zIndex: 2,
-          height: TITLE_BAR_HEIGHT,
-          bg: "background-secondary"
-          // borderBottom: "1px solid var(--border)"
-        }}
-      >
-        <EditorActionBar />
-      </Flex>
       <ScopedThemeProvider
         scope="editor"
         ref={dropRef}
@@ -148,11 +137,27 @@ export default function TabsView() {
           flex: 1,
           overflow: "hidden",
           display: "flex",
-          flexDirection: "column",
-          position: "relative"
+          flexDirection: "column"
         }}
       >
-        <SplitPane direction="vertical" autoSaveId={"editor-panels"}>
+        <Flex
+          className="editor-action-bar"
+          sx={{
+            zIndex: 2,
+            height: TITLE_BAR_HEIGHT,
+            bg: "background-secondary"
+            // borderBottom: "1px solid var(--border)"
+          }}
+        >
+          <EditorActionBar />
+        </Flex>
+        <SplitPane
+          style={{
+            position: "relative"
+          }}
+          direction="vertical"
+          autoSaveId={"editor-panels"}
+        >
           <Pane id="editor-panel" className="editor-pane">
             {tabs.map((tab) => {
               const session = useEditorStore
@@ -216,11 +221,13 @@ export default function TabsView() {
               <TableOfContents sessionId={activeSession.id} />
             </Pane>
           ) : null}
+          {arePropertiesVisible && activeSession && (
+            <Pane id="properties-pane" initialSize={250} minSize={250}>
+              <Properties sessionId={activeSession.id} />
+            </Pane>
+          )}
         </SplitPane>
         <DropZone overlayRef={overlayRef} />
-        {arePropertiesVisible && activeSession && (
-          <Properties sessionId={activeSession.id} />
-        )}
       </ScopedThemeProvider>
     </>
   );
