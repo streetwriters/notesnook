@@ -217,6 +217,7 @@ export default class Lookup {
     return fuzzy(
       query,
       items,
+      (item) => item.id,
       Object.fromEntries(
         fields.filter((f) => !f.ignore).map((f) => [f.name, f.weight || 1])
       ) as Record<keyof T, number>,
