@@ -122,23 +122,10 @@ function EditorProperties(props: EditorPropertiesProps) {
   if (isFocusMode || !session) return null;
   return (
     <Flex
-      css={`@keyframes slideIn {
-      from {
-        transform: translateX(600px);
-      }
-      to {
-        transform: translateX(0);
-      }`}
       sx={{
-        transform: "translateX(600)",
-        animation: "0.1s ease-out 0s 1 slideIn",
         display: "flex",
-        position: "absolute",
-        // top: TITLE_BAR_HEIGHT,
-        right: 0,
-        zIndex: 999,
         height: "100%",
-        width: "300px",
+        width: "100%",
         borderLeft: "1px solid",
         borderLeftColor: "border"
       }}
