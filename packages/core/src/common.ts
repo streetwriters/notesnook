@@ -111,6 +111,7 @@ export const EVENTS = {
   migrationStarted: "migration:start",
   migrationFinished: "migration:finished",
   noteRemoved: "note:removed",
+  noteGeneratedTitleChanged: "note:generatedTitleChanged",
   tokenRefreshed: "token:refreshed",
   userUnauthorized: "user:unauthorized",
   downloadCanceled: "file:downloadCanceled",

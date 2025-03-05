@@ -19,7 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { getId } from "../utils/id.js";
 import { getContentFromData } from "../content-types/index.js";
-import { NEWLINE_STRIP_REGEX, formatTitle } from "../utils/title-format.js";
+import {
+  HEADLINE_REGEX,
+  NEWLINE_STRIP_REGEX,
+  formatTitle
+} from "../utils/title-format.js";
 import { clone } from "../utils/clone.js";
 import { Tiptap } from "../content-types/tiptap.js";
 import { EMPTY_CONTENT } from "./content.js";
@@ -36,6 +40,7 @@ import { ICollection } from "./collection.js";
 import { SQLCollection } from "../database/sql-collection.js";
 import { isFalse } from "../database/index.js";
 import { logger } from "../logger.js";
+import { EV, EVENTS } from "../common.js";
 
 export type ExportOptions = {
   format: "html" | "md" | "txt" | "md-frontmatter";
@@ -121,9 +126,46 @@ export class Notes implements ICollection {
             this.db.settings.getTitleFormat(),
             this.db.settings.getDateFormat(),
             this.db.settings.getTimeFormat(),
-            headline?.split(" ").splice(0, 10).join(" ") || "",
+            headline ? headlineToTitle(headline) : "",
             this.totalNotes
           );
+        item.isGeneratedTitle = true;
+      }
+
+      if (isUpdating) {
+        const currentNote = await this.note(id);
+        const didTitleChange = Boolean(item.title);
+        item.isGeneratedTitle =
+          currentNote?.isGeneratedTitle === undefined ||
+          currentNote?.isGeneratedTitle === false
+            ? false
+            : didTitleChange
+            ? false
+            : true;
+        const titleFormat = this.db.settings.getTitleFormat();
+        if (
+          item.isGeneratedTitle &&
+          HEADLINE_REGEX.test(titleFormat) &&
+          headline &&
+          currentNote?.title !== headlineToTitle(headline)
+        ) {
+          console.log("headline: in item.isGeneratedTitle", item.title);
+          item.title =
+            item.title ||
+            titleFormat.replace(
+              HEADLINE_REGEX,
+              headline ? headlineToTitle(headline) : ""
+            );
+          EV.publish(EVENTS.noteGeneratedTitleChanged, {
+            title: item.title,
+            noteId: id
+          });
+        }
+        console.log("headline", {
+          didTitleChange,
+          item,
+          currentNote
+        });
       }
 
       if (isUpdating) {
@@ -138,7 +180,9 @@ export class Notes implements ICollection {
           conflicted: item.conflicted,
           readonly: item.readonly,
 
-          dateEdited: item.dateEdited || dateEdited
+          dateEdited: item.dateEdited || dateEdited,
+
+          isGeneratedTitle: item.isGeneratedTitle
         });
       } else {
         await this.collection.upsert({
@@ -156,7 +200,9 @@ export class Notes implements ICollection {
           readonly: item.readonly,
 
           dateCreated: item.dateCreated || Date.now(),
-          dateEdited: item.dateEdited || dateEdited || Date.now()
+          dateEdited: item.dateEdited || dateEdited || Date.now(),
+
+          isGeneratedTitle: item.isGeneratedTitle
         });
         this.totalNotes++;
       }
@@ -456,4 +502,8 @@ export class Notes implements ICollection {
 
 function getNoteHeadline(content: Tiptap) {
   return content.toHeadline();
+}
+
+function headlineToTitle(headline: string) {
+  return headline.split(" ").splice(0, 10).join(" ");
 }
