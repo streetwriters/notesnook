@@ -32,12 +32,15 @@ import {
   Notebook as NotebookIcon,
   Note as NoteIcon,
   Reminder as ReminderIcon,
-  Tag as TagIcon
+  Tag as TagIcon,
+  FocusMode,
+  NormalMode
 } from "../../components/icons";
 import { trashMenuItems } from "../../components/trash-item";
 import { hashNavigate, navigate } from "../../navigation";
 import { useEditorStore } from "../../stores/editor-store";
 import { useStore as useNoteStore } from "../../stores/note-store";
+import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { AttachmentsDialog } from "../attachments-dialog";
 import { CreateColorDialog } from "../create-color-dialog";
@@ -351,6 +354,7 @@ function getEditorCommands(): Command[] {
   const session = useEditorStore.getState().getActiveSession();
   if (!session) return [];
   const editor = useEditorManager.getState().editors[session.id];
+  const isFocusMode = useAppStore.getState().isFocusMode;
 
   const commands: Command[] = [
     {
@@ -439,6 +443,15 @@ function getEditorCommands(): Command[] {
       type: "command"
     });
   }
+
+  commands.push({
+    id: "toggle-focus-mode",
+    title: strings.toggleFocusMode(),
+    icon: isFocusMode ? FocusMode : NormalMode,
+    action: () => useAppStore.getState().toggleFocusMode(),
+    group: strings.editor(),
+    type: "command"
+  });
 
   return commands;
 }

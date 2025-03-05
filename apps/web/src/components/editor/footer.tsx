@@ -44,6 +44,7 @@ import { MAX_AUTO_SAVEABLE_WORDS } from "./types";
 import { strings } from "@notesnook/intl";
 import { EDITOR_ZOOM } from "./common";
 import { useWindowControls } from "../../hooks/use-window-controls";
+import { exitFullscreen } from "../../utils/fullscreen";
 
 const SAVE_STATE_ICON_MAP = {
   "-1": NotSaved,
@@ -96,13 +97,7 @@ function EditorFooter() {
       icon: isFocusMode ? FocusMode : NormalMode,
       enabled: true,
       hideOnMobile: true,
-      onClick: () => {
-        useAppStore.getState().toggleFocusMode();
-        if (document.fullscreenElement) exitFullscreen();
-        const editor =
-          session && useEditorManager.getState().getEditor(session.id);
-        if (editor) editor.editor?.focus();
-      }
+      onClick: () => useAppStore.getState().toggleFocusMode()
     }
   ];
 
@@ -229,9 +224,4 @@ export default EditorFooter;
 
 function enterFullscreen(elem: HTMLElement) {
   elem.requestFullscreen();
-}
-
-function exitFullscreen() {
-  if (!document.fullscreenElement) return;
-  document.exitFullscreen();
 }

@@ -6132,6 +6132,10 @@ msgstr ""
 msgid "Toggle dark/light mode"
 msgstr ""
 
+#: src/strings.ts:2441
+msgid "Toggle focus mode"
+msgstr ""
+
 #: src/strings.ts:2331
 msgid "Toggle indentation mode"
 msgstr ""
