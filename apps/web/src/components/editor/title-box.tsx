@@ -27,7 +27,7 @@ import { replaceDateTime } from "@notesnook/editor";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { strings } from "@notesnook/intl";
-import { NEWLINE_STRIP_REGEX } from "@notesnook/core";
+import { EV, EVENTS, NEWLINE_STRIP_REGEX } from "@notesnook/core";
 
 type TitleBoxProps = {
   id: string;
@@ -63,6 +63,26 @@ function TitleBox(props: TitleBoxProps) {
       resizeTextarea(input);
     });
   }, [sessionType, id]);
+
+  useEffect(() => {
+    const session = useEditorStore.getState().getSession(id);
+    if (!session || !("note" in session) || !session.note || !inputRef.current)
+      return;
+    const { unsubscribe } = EV.subscribe(
+      EVENTS.noteGeneratedTitleChanged,
+      ({ title, noteId }) => {
+        console.log("headline event called", title, noteId);
+        if (!inputRef.current || session.note.id !== noteId) return;
+        withSelectionPersist(inputRef.current, (input) => {
+          input.value = title;
+          resizeTextarea(input);
+        });
+      }
+    );
+    return () => {
+      unsubscribe();
+    };
+  });
 
   useEffect(() => {
     const { unsubscribe } = AppEventManager.subscribe(

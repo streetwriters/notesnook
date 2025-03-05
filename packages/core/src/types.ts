@@ -198,6 +198,8 @@ export interface Note extends BaseItem<"note"> {
   dateDeleted: null;
   itemType: null;
   deletedBy: null;
+
+  isGeneratedTitle?: boolean;
 }
 
 export interface Notebook extends BaseItem<"notebook"> {
