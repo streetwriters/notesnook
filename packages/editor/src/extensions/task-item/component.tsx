@@ -75,9 +75,9 @@ export function TaskItemComponent(
             opacity: [1, 1, 0],
             alignSelf: "start",
             bg: "transparent",
-            mt: isMobile ? "0.20ch" : "0.36ch",
+            mt: isMobile ? "0.20ch" : 0,
             cursor: "grab",
-            mx: 1,
+            mr: 1,
             fontFamily: "inherit"
           }}
           size={isMobile ? "2.46ch" : "2.22ch"}
@@ -94,7 +94,7 @@ export function TaskItemComponent(
           borderRadius: "default",
           alignSelf: "start",
           p: "1px",
-          mt: isMobile ? "0.20ch" : "0.36ch",
+          mt: isMobile ? "0.20ch" : 0,
           marginInlineEnd: 1,
           cursor: editor.isEditable ? "pointer" : "unset",
           ":hover": isMobile
