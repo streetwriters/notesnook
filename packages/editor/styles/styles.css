@@ -601,11 +601,11 @@ p > *::selection {
   pointer-events: none;
 }
 
-.ProseMirror > p[data-spacing="double"] .resizer {
+.ProseMirror > p[data-spacing="double"] .image-container {
   margin-bottom: 1em;
 }
 
-.ProseMirror > p[data-spacing="single"] .resizer {
+.ProseMirror > p[data-spacing="single"] .image-container {
   margin-top: 1em !important;
   margin-bottom: 1em;
 }
