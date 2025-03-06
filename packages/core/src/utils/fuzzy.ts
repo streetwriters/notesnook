@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { match, surround } from "fuzzyjs";
-import { clone } from "./clone";
+import { clone } from "./clone.js";
 
 export function fuzzy<T extends { id: string }>(
   query: string,

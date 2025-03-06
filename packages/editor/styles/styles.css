@@ -118,6 +118,11 @@
  margin-bottom: 0px;
 }
 
+.ProseMirror .taskitem-content-wrapper p {
+  margin-top: 0em !important;
+  margin-bottom: 0px !important;
+ }
+
 /* Add top & bottom margin for double spaced paragraphs & adjacent nodes
 except single spaced paragraphs. */
 .ProseMirror p[data-spacing="double"] + *:not(p[data-spacing="single"]) {
