@@ -105,6 +105,7 @@ export function ImageComponent(
   return (
     <>
       <Box
+        className="image-container"
         sx={{
           ...getAlignmentStyles(node.attrs),
           height: float ? size.height : "unset",
