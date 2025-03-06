@@ -30,15 +30,15 @@ Go to `Settings` > `Editor` > `Title format` to customize the title formatting.
 
 **$time$**: The current time
 
-**$headline$**: Upto first 10 words of of a note headline
-
 **$count$**: Current note count + 1
 
 **$timestamp$**: Full date & time without any spaces or symbols (e.g. 202305261253)
 
 **$timestampz$**: UTC offset added to _timestamp_
 
-You can use a combination of these templates in the note title. For example `$headline$ - $date$` will become `Your note headline - 06-22-2023`.
+You can use a combination of above templates in the note title. For example `Note $count$ - $date$` will become `Note 150 - 06-22-2023`.
+
+**$headline$**: Up to first 10 words of the note's headline. This will keep updating the title as headline of the note changes until you manually edit the title. Shouldn't be used in combination with other templates.
 
 ## Paragraph spacing
 

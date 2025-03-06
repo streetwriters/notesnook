@@ -231,7 +231,8 @@ const BooleanProperties: Set<BooleanFields> = new Set([
   "pinned",
   "readonly",
   "remote",
-  "synced"
+  "synced",
+  "isGeneratedTitle"
 ]);
 
 const DataMappers: Partial<Record<ItemType, (row: any) => void>> = {

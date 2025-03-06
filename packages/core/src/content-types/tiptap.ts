@@ -30,7 +30,7 @@ import { parseDocument } from "htmlparser2";
 import dataurl from "../utils/dataurl.js";
 import {
   HTMLParser,
-  extractFirstParagraph,
+  extractHeadline,
   getDummyDocument
 } from "../utils/html-parser.js";
 import { HTMLRewriter } from "../utils/html-rewriter.js";
@@ -89,7 +89,7 @@ export class Tiptap {
   }
 
   toHeadline() {
-    return extractFirstParagraph(this.data);
+    return extractHeadline(this.data);
   }
 
   // isEmpty() {
