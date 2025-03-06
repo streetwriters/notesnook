@@ -179,4 +179,14 @@ export class SettingsViewModel {
     await fillPasswordDialog(this.page, appLockPassword);
     await this.page.waitForTimeout(100);
   }
+
+  async setTitleFormat(format: string) {
+    const item = await this.navigation.findItem("Editor");
+    await item?.click();
+
+    const titleFormatInput = this.page
+      .locator(getTestId("setting-default-title"))
+      .locator("input");
+    await titleFormatInput.fill(format);
+  }
 }

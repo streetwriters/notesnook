@@ -131,6 +131,35 @@ test("focus should not jump to editor while typing in title input", async ({
   expect(await notes.editor.getContent("text")).toBe("");
 });
 
+test("when title format is set to headline, title should be generated from headline until user edits the title", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const settings = await app.goToSettings();
+  await settings.setTitleFormat("$headline$");
+  await settings.close();
+
+  const notes = await app.goToNotes();
+  await notes.createNote({ content: "my precious" });
+
+  expect(await notes.editor.getTitle()).toBe("my precious");
+
+  await notes.editor.setContent(", my precious note");
+  await notes.editor.waitForSaving();
+
+  expect(await notes.editor.getTitle()).toBe("my precious, my precious note");
+
+  await notes.editor.setTitle("not precious");
+
+  expect(await notes.editor.getTitle()).toBe("not precious");
+
+  await notes.editor.setContent(", but...");
+  await notes.editor.waitForSaving();
+
+  expect(await notes.editor.getTitle()).toBe("not precious");
+});
+
 test("select all & backspace should clear all content in editor", async ({
   page
 }) => {
