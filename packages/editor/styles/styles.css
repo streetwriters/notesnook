@@ -119,9 +119,12 @@
  /* By default double spaced paragraphs have no bottom margin */
  margin-bottom: 0px;
 }
+
 /* Add top & bottom margin for double spaced paragraphs & adjacent nodes
 except single spaced paragraphs. */
-.ProseMirror p[data-spacing="double"] + *:not(p[data-spacing="single"]) {
+.ProseMirror > p[data-spacing="double"] + *:not(p[data-spacing="single"]),
+.ProseMirror div.callout > p[data-spacing="double"] + *:not(div.callout > p[data-spacing="single"]),
+.ProseMirror blockquote > p[data-spacing="double"] + *:not(.ProseMirror blockquote p[data-spacing="single"]) {
  margin-top: 1em;
  margin-bottom: 1em;
 }
@@ -552,7 +555,7 @@ p > *::selection {
 
 .outline-list > li > :first-child::before {
   position: absolute;
-  top: 3px;
+  top: 0px;
   cursor: pointer;
   content: "";
   background-size: 18px;
