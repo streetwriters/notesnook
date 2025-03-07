@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React from "react";
 import useNavigationStore from "../../stores/use-navigation-store";
-import { useThemeColors } from "@notesnook/theme";
+import { ScopedThemeProvider, useThemeColors } from "@notesnook/theme";
 import Group from "./group";
 import Home from "./home";
 import { RouteParams } from "./types";
@@ -36,26 +36,28 @@ export const Settings = () => {
         backgroundColor: colors.primary.background
       }}
     >
-      <SettingsStack.Navigator
-        initialRouteName="SettingsHome"
-        screenListeners={{
-          focus: (e) => {
-            if (e.target?.startsWith("SettingsHome-")) {
-              useNavigationStore.getState().update("Settings");
+      <ScopedThemeProvider value="list">
+        <SettingsStack.Navigator
+          initialRouteName="SettingsHome"
+          screenListeners={{
+            focus: (e) => {
+              if (e.target?.startsWith("SettingsHome-")) {
+                useNavigationStore.getState().update("Settings");
+              }
             }
-          }
-        }}
-        screenOptions={{
-          animation: "none",
-          headerShown: false,
-          contentStyle: {
-            backgroundColor: colors.primary.background
-          }
-        }}
-      >
-        <SettingsStack.Screen name="SettingsHome" component={Home} />
-        <SettingsStack.Screen name="SettingsGroup" component={Group} />
-      </SettingsStack.Navigator>
+          }}
+          screenOptions={{
+            animation: "none",
+            headerShown: false,
+            contentStyle: {
+              backgroundColor: colors.primary.background
+            }
+          }}
+        >
+          <SettingsStack.Screen name="SettingsHome" component={Home} />
+          <SettingsStack.Screen name="SettingsGroup" component={Group} />
+        </SettingsStack.Navigator>
+      </ScopedThemeProvider>
     </SafeAreaView>
   );
 };
