@@ -19,6 +19,19 @@
   font-family: inherit;
 }
 
+.ProseMirror span.inline-tag {
+  background-color: var(--background-secondary);
+  border: 1px solid var(--accent);
+  padding: 0px 2px;
+  margin: 0px 3px;
+  border-radius: 4px;
+}
+
+.ProseMirror span.inline-tag.ProseMirror-selectednode {
+  filter: brightness(90%);
+  border: 2px solid var(--accent)
+}
+
 .ProseMirror p.is-editor-empty::before {
   color: var(--placeholder);
   content: attr(data-placeholder);
