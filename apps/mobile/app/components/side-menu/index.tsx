@@ -53,6 +53,7 @@ import {
   useSideMenuNotebookSelectionStore,
   useSideMenuTagsSelectionStore
 } from "./stores";
+import { useSideBarDraggingStore } from "./dragging-store";
 const renderScene = SceneMap({
   home: SideMenuHome,
   notebooks: SideMenuNotebooks,
@@ -108,6 +109,7 @@ const TabBar = (
     options: Record<string, TabDescriptor<Route>> | undefined;
   }
 ) => {
+  const dragging = useSideBarDraggingStore((state) => state.dragging);
   const { colors, isDark } = useThemeColors();
   const groupOptions = useGroupOptions(
     props.navigationState.index === 1 ? "notebook" : "tags"
@@ -380,19 +382,39 @@ const TabBar = (
             ) : null}
 
             {props.navigationState.index === 0 ? (
-              <IconButton
-                onPress={() => {
-                  useThemeStore.getState().setColorScheme();
-                }}
-                style={{
-                  width: 28,
-                  height: 28
-                }}
-                testID="sidebar-theme-button"
-                color={colors.primary.icon}
-                name={isDark ? "weather-night" : "weather-sunny"}
-                size={AppFontSize.lg - 2}
-              />
+              <>
+                <IconButton
+                  onPress={() => {
+                    useThemeStore.getState().setColorScheme();
+                  }}
+                  style={{
+                    width: 28,
+                    height: 28
+                  }}
+                  testID="sidebar-theme-button"
+                  color={colors.primary.icon}
+                  name={isDark ? "weather-night" : "weather-sunny"}
+                  size={AppFontSize.lg - 2}
+                />
+
+                {dragging ? (
+                  <IconButton
+                    onPress={() => {
+                      useSideBarDraggingStore.setState({
+                        dragging: false
+                      });
+                    }}
+                    style={{
+                      width: 28,
+                      height: 28
+                    }}
+                    testID="check"
+                    color={colors.primary.icon}
+                    name={"check"}
+                    size={AppFontSize.lg - 2}
+                  />
+                ) : null}
+              </>
             ) : null}
           </View>
         </>
