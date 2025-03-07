@@ -36,8 +36,6 @@ import Paragraph from "../ui/typography/paragraph";
 const TOP_BAR_ITEMS: ActionId[] = [
   "pin",
   "favorite",
-  "copy",
-  "share",
   "lock-unlock",
   "publish",
   "export",
@@ -55,6 +53,8 @@ const BOTTOM_BAR_ITEMS: ActionId[] = [
   "reminders",
   "attachments",
   "references",
+  "copy",
+  "share",
   "trash"
 ];
 

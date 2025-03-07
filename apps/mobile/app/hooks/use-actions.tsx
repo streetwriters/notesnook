@@ -138,13 +138,14 @@ function isNotePinnedInNotifications(item: Item) {
 
 export const useActions = ({
   close,
-  item,
+  item: propItem,
   customActionHandlers
 }: {
   item: Item;
   close: () => void;
   customActionHandlers?: Record<ActionId, () => void>;
 }) => {
+  const [item, setItem] = useState(propItem);
   const { colors } = useThemeColors();
   const setMenuPins = useMenuStore((state) => state.setMenuPins);
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(
@@ -223,8 +224,7 @@ export const useActions = ({
     } else if (item.type === "notebook") {
       await db.notebooks.pin(!item?.pinned, item.id);
     }
-
-    close();
+    setItem((await db.notes.note(item.id)) as Item);
     Navigation.queueRoutesForUpdate();
   }
 
@@ -588,8 +588,8 @@ export const useActions = ({
     async function toggleLocalOnly() {
       if (!user) return;
       await db.notes.localOnly(!(item as Note).localOnly, item?.id);
+      setItem((await db.notes.note(item.id)) as Item);
       Navigation.queueRoutesForUpdate();
-      close();
     }
 
     const toggleReadyOnlyMode = async () => {
@@ -602,8 +602,8 @@ export const useActions = ({
           }
         });
       });
+      setItem((await db.notes.note(item.id)) as Item);
       Navigation.queueRoutesForUpdate();
-      close();
     };
 
     const duplicateNote = async () => {
@@ -632,8 +632,8 @@ export const useActions = ({
     async function addToFavorites() {
       if (!item.id || item.type !== "note") return;
       await db.notes.favorite(!item.favorite, item.id);
+      setItem((await db.notes.note(item.id)) as Item);
       Navigation.queueRoutesForUpdate();
-      close();
     }
 
     async function pinToNotifications() {
@@ -839,7 +839,7 @@ export const useActions = ({
       },
       {
         id: "attachments",
-        title: strings.attachments(),
+        title: strings.attachedFiles(),
         icon: "attachment",
         onPress: showAttachments
       },
