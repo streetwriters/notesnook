@@ -7047,6 +7047,10 @@ msgstr "Z to A"
 msgid "Zipping"
 msgstr "Zipping"
 
+#: src/strings.ts:2441
+msgid "Zoom"
+msgstr "Zoom"
+
 #: src/strings.ts:2074
 msgid "Zoom factor"
 msgstr "Zoom factor"

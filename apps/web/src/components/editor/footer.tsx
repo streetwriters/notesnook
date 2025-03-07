@@ -149,9 +149,15 @@ function EditorFooter() {
         >
           <Minus size={13} />
         </Button>
-        <Text variant="subBody" sx={{ color: "paragraph" }}>
-          {editorConfig.zoom}%
-        </Text>
+        <Button
+          title={strings.clickToReset(strings.zoom().toLocaleLowerCase())}
+          variant="statusitem"
+          onClick={() => setEditorConfig({ zoom: EDITOR_ZOOM.DEFAULT })}
+        >
+          <Text variant="subBody" sx={{ color: "paragraph" }}>
+            {editorConfig.zoom}%{" "}
+          </Text>
+        </Button>
         <Button
           variant="icon"
           onClick={() =>

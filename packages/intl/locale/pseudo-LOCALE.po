@@ -6993,6 +6993,10 @@ msgstr ""
 msgid "Zipping"
 msgstr ""
 
+#: src/strings.ts:2441
+msgid "Zoom"
+msgstr ""
+
 #: src/strings.ts:2074
 msgid "Zoom factor"
 msgstr ""
