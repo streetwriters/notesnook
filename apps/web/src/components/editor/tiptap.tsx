@@ -51,6 +51,7 @@ import { IEditor, MAX_AUTO_SAVEABLE_WORDS } from "./types";
 import { useEditorConfig, useToolbarConfig, useEditorManager } from "./manager";
 import { useIsUserPremium } from "../../hooks/use-is-user-premium";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
+import { useStore as useTagStore } from "../../stores/tag-store";
 import { debounce } from "@notesnook/common";
 import { ScopedThemeProvider } from "../theme-provider";
 import { useStore as useThemeStore } from "../../stores/theme-store";
@@ -64,6 +65,8 @@ import { TimeFormat } from "@notesnook/core";
 import { BuyDialog } from "../../dialogs/buy-dialog";
 import { EDITOR_ZOOM } from "./common";
 import { ScrollContainer } from "@notesnook/ui";
+import { navigate } from "../../navigation";
+import { db } from "../../common/db";
 
 export type OnChangeHandler = (
   content: () => string,
@@ -305,6 +308,37 @@ function TipTap(props: TipTapProps) {
             openInNewTab: openInNewTab
           });
         } else window.open(url, "_blank");
+      },
+      openTag: async (tagTitle: string) => {
+        const tag = await db.tags.find(tagTitle);
+        if (tag) navigate(`/tags/${tag}`);
+      },
+      addTag: async (tagTitle: string) => {
+        if (!id) return;
+        const session = useEditorStore.getState().getSession(id);
+        if (!session || !("note" in session)) return;
+
+        const tagId =
+          (await db.tags.find(tagTitle))?.id ??
+          (await db.tags.add({ title: tagTitle }));
+        if (!tagId) return;
+        await db.relations.add(
+          { id: tagId, type: "tag" },
+          { type: "note", id: session.note.id }
+        );
+        await useTagStore.getState().refresh();
+      },
+      removeTag: async (tagTitle: string) => {
+        if (!id) return;
+        const session = useEditorStore.getState().getSession(id);
+        if (!session || !("note" in session)) return;
+
+        const tag = await db.tags.find(tagTitle);
+        if (!tag) return;
+        await db.relations.unlink(
+          { type: "tag", id: tag.id },
+          { type: "note", id: session.note.id }
+        );
       }
     };
   }, [
