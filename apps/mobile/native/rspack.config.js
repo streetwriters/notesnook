@@ -229,7 +229,7 @@ module.exports = (env) => {
         logger: {
           console: false,
           listener: (e => {
-            if (e.message[0] === "Bundle built with warnings") {
+            if (e.message[0].includes("Bundle built with warnings")) {
               console.warn(`ℹ ` + e.message[0] + " time: " + e.message[1].time);
               return;
             }
