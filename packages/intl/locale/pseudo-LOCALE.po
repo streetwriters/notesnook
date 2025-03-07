@@ -6,6 +6,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
 "Language: pseudo-LOCALE\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
 
 #: src/strings.ts:2393
 msgid " \"Notebook > Notes\""
@@ -902,6 +908,10 @@ msgstr ""
 
 #: src/strings.ts:2329
 msgid "Attach image from URL"
+msgstr ""
+
+#: src/strings.ts:900
+msgid "Attached files"
 msgstr ""
 
 #: src/strings.ts:290
@@ -3964,7 +3974,7 @@ msgstr ""
 msgid "Notebook"
 msgstr ""
 
-#: src/strings.ts:2452
+#: src/strings.ts:2453
 msgid "Notebook added"
 msgstr ""
 
