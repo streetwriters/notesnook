@@ -101,7 +101,7 @@ export const Header = ({
           borderRadius: 10,
           paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL - 2,
           borderWidth: hasSearch ? 1 : 0,
-          borderColor: colors.secondary.border,
+          borderColor: colors.primary.border,
           paddingHorizontal: !hasSearch ? 0 : DefaultAppStyles.GAP_SMALL,
           alignItems: "center"
         }}
