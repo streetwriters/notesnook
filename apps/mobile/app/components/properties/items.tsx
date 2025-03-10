@@ -38,23 +38,23 @@ const TOP_BAR_ITEMS: ActionId[] = [
   "favorite",
   "lock-unlock",
   "publish",
-  "export",
-  "copy-link",
-  "duplicate",
   "local-only",
-  "read-only"
+  "read-only",
+  "pin-to-notifications"
 ];
 
 const BOTTOM_BAR_ITEMS: ActionId[] = [
   "notebooks",
   "add-reminder",
-  "pin-to-notifications",
   "history",
   "reminders",
   "attachments",
   "references",
   "copy",
   "share",
+  "export",
+  "copy-link",
+  "duplicate",
   "trash"
 ];
 
