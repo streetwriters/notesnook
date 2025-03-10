@@ -77,7 +77,11 @@ export const SectionHeader = React.memo<
             justifyContent: "space-between",
             borderBottomWidth: 1,
             borderColor: colors.primary.border,
-            paddingTop: DefaultAppStyles.GAP_VERTICAL_SMALL
+            paddingBottom: 1,
+            paddingTop:
+              index === 0
+                ? DefaultAppStyles.GAP_VERTICAL
+                : DefaultAppStyles.GAP_VERTICAL_SMALL
           }}
         >
           <Pressable
@@ -125,7 +129,13 @@ export const SectionHeader = React.memo<
                   onPress={() => {
                     if (!screen) return;
                     presentSheet({
-                      component: <Sort screen={screen} type={dataType} />
+                      component: (
+                        <Sort
+                          screen={screen}
+                          type={dataType}
+                          hideGroupOptions={screen === "Reminders"}
+                        />
+                      )
                     });
                   }}
                   style={{
