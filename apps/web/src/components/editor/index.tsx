@@ -224,13 +224,14 @@ export default function TabsView() {
   );
 }
 
-const MemoizedEditorView = React.memo(
-  EditorView,
-  (prev, next) =>
+const MemoizedEditorView = React.memo(EditorView, (prev, next) => {
+  return (
     prev.session.id === next.session.id &&
-    prev.session.type === next.session.type &&
-    prev.session.needsHydration === next.session.needsHydration
-);
+    (prev.session.type === next.session.type ||
+      (prev.session.type === "new" && next.session.type === "default")) &&
+    !!prev.session.needsHydration === !!next.session.needsHydration
+  );
+});
 function EditorView({
   session
 }: {
@@ -251,10 +252,14 @@ function EditorView({
     const event = db.eventManager.subscribe(
       EVENTS.syncItemMerged,
       async (item?: MaybeDeletedItem<Item>) => {
+        const defaultSession = session as DefaultEditorSession;
+        const sessionType = useEditorStore
+          .getState()
+          .getSession(defaultSession.id)?.type;
         if (
-          session.type === "new" ||
+          sessionType === "new" ||
           !editor ||
-          !session.note ||
+          !defaultSession.note ||
           !item ||
           isDeleted(item) ||
           (item.type !== "tiptap" && item.type !== "note") ||
@@ -265,8 +270,9 @@ function EditorView({
         }
 
         const isContent =
-          item.type === "tiptap" && item.noteId === session.note.id;
-        const isNote = item.type === "note" && item.id === session.note.id;
+          item.type === "tiptap" && item.noteId === defaultSession.note.id;
+        const isNote =
+          item.type === "note" && item.id === defaultSession.note.id;
         if (isContent && lastChangedTime.current < item.dateModified) {
           if (!item.locked) return editor.updateContent(item.data);
 
@@ -275,7 +281,7 @@ function EditorView({
             .catch(() => EV.publish(EVENTS.vaultLocked));
           if (!result) return;
           editor.updateContent(result.data);
-        } else if (isNote && session.note.title !== item.title) {
+        } else if (isNote && defaultSession.note.title !== item.title) {
           AppEventManager.publish(AppEvents.changeNoteTitle, {
             sessionId: session.id,
             title: item.title,
