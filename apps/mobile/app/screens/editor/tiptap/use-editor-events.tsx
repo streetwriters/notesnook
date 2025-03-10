@@ -174,11 +174,10 @@ export const useEditorEvents = (
   );
 
   const tools = useDragState((state) => state.data);
-
   useEffect(() => {
     const handleKeyboardDidShow: KeyboardEventListener = () => {
       editor.commands.keyboardShown(true);
-      editor.postMessage(NativeEvents.keyboardShown, undefined);
+      //editor.postMessage(NativeEvents.keyboardShown, undefined);
     };
     const handleKeyboardDidHide: KeyboardEventListener = () => {
       editor.commands.keyboardShown(false);
@@ -191,7 +190,6 @@ export const useEditorEvents = (
       subscriptions.forEach((subscription) => subscription.remove());
     };
   }, [editor.commands, editor.postMessage]);
-
   useEffect(() => {
     if (loading) return;
     if (typeof defaultFontFamily === "object") {
