@@ -98,8 +98,7 @@ const Sort = ({
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
-          paddingHorizontal: DefaultAppStyles.GAP,
-          paddingVertical: DefaultAppStyles.GAP_VERTICAL
+          paddingHorizontal: DefaultAppStyles.GAP
         }}
       >
         <Heading
@@ -164,10 +163,10 @@ const Sort = ({
               style={{
                 width: "100%",
                 justifyContent: "space-between",
-                height: 40,
                 flexDirection: "row",
                 borderRadius: 0,
-                paddingHorizontal: DefaultAppStyles.GAP
+                paddingHorizontal: DefaultAppStyles.GAP,
+                paddingVertical: DefaultAppStyles.GAP_VERTICAL
               }}
               onPress={async () => {
                 const _groupOptions: GroupOptions = {
@@ -231,10 +230,10 @@ const Sort = ({
                 style={{
                   width: "100%",
                   justifyContent: "space-between",
-                  height: 40,
                   flexDirection: "row",
                   borderRadius: 0,
-                  paddingHorizontal: DefaultAppStyles.GAP
+                  paddingHorizontal: DefaultAppStyles.GAP,
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL
                 }}
                 onPress={async () => {
                   const _groupOptions: GroupOptions = {
