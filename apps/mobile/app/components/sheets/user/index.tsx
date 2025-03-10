@@ -39,6 +39,7 @@ import Paragraph from "../../ui/typography/paragraph";
 import Sync from "../../../services/sync";
 
 import Clipboard from "@react-native-clipboard/clipboard";
+import { logoutUser } from "../../../screens/settings/logout";
 export const UserSheet = () => {
   const ref = useSheetRef();
   const { colors } = useThemeColors();
@@ -313,6 +314,8 @@ export const UserSheet = () => {
             icon: "logout",
             title: strings.logout(),
             onPress: () => {
+              console.log("logout");
+              logoutUser();
               ref.current?.hide();
             },
             hidden: !user

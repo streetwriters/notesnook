@@ -76,6 +76,7 @@ import { useDragState } from "./editor/state";
 import { verifyUser, verifyUserWithApplock } from "./functions";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
+import { logoutUser } from "./logout";
 
 export const settingsGroups: SettingSection[] = [
   {
@@ -412,89 +413,7 @@ export const settingsGroups: SettingSection[] = [
             name: strings.logout(),
             description: strings.logoutWarnin(),
             icon: "logout",
-            modifer: async () => {
-              const hasUnsyncedChanges = await db.hasUnsyncedChanges();
-              presentDialog({
-                title: strings.logout(),
-                paragraph: strings.logoutConfirmation(),
-                positiveText: strings.logout(),
-                check: {
-                  info: strings.backupDataBeforeLogout(),
-                  defaultValue: true
-                },
-                notice: hasUnsyncedChanges
-                  ? {
-                      text: strings.unsyncedChangesWarning(),
-                      type: "alert"
-                    }
-                  : undefined,
-                positivePress: async (_, takeBackup) => {
-                  eSendEvent(eCloseSimpleDialog);
-                  setTimeout(async () => {
-                    try {
-                      startProgress({
-                        fillBackground: true,
-                        title: strings.loggingOut(),
-                        canHideProgress: true,
-                        paragraph: strings.loggingOutDesc()
-                      });
-
-                      Navigation.navigate("Notes");
-
-                      if (takeBackup) {
-                        updateProgress({
-                          progress: strings.backingUpData()
-                        });
-
-                        try {
-                          const result = await BackupService.run(
-                            false,
-                            "local",
-                            "partial"
-                          );
-                          if (result?.error) throw result.error as Error;
-                        } catch (e) {
-                          DatabaseLogger.error(e);
-                          const error = e;
-                          const canLogout = await new Promise((resolve) => {
-                            presentDialog({
-                              context: "local",
-                              title: strings.failedToTakeBackup(),
-                              paragraph: `${
-                                (error as Error).message
-                              }. ${strings.failedToTakeBackupMessage()}?`,
-                              positiveText: strings.yes(),
-                              negativeText: strings.no(),
-                              positivePress: () => {
-                                resolve(true);
-                              },
-                              onClose: () => {
-                                resolve(false);
-                              }
-                            });
-                          });
-                          if (!canLogout) {
-                            endProgress();
-                            return;
-                          }
-                        }
-                      }
-
-                      updateProgress({
-                        progress: strings.loggingOut()
-                      });
-
-                      await db.user?.logout();
-                      endProgress();
-                    } catch (e) {
-                      DatabaseLogger.error(e);
-                      ToastManager.error(e as Error, strings.logoutError());
-                      endProgress();
-                    }
-                  }, 300);
-                }
-              });
-            }
+            modifer: logoutUser
           },
           {
             id: "delete-account",
