@@ -221,6 +221,7 @@ export const Dialog = ({ context = "global" }) => {
                   ? "check-circle-outline"
                   : "checkbox-blank-circle-outline"
               }
+              iconColor={checked ? colors.secondary.icon : colors.primary.icon}
               style={{
                 justifyContent: "flex-start"
               }}
