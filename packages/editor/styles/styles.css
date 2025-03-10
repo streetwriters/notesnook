@@ -698,7 +698,7 @@ p > *::selection {
   margin-bottom: 1em;
 }
 
-.ProseMirror div.callout > :first-child + p {
+.ProseMirror div.callout > :first-child + * {
   margin-top: 1em !important;
 }
 
