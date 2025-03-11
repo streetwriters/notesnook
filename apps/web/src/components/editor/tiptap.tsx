@@ -311,7 +311,7 @@ function TipTap(props: TipTapProps) {
       },
       openTag: async (tagTitle: string) => {
         const tag = await db.tags.find(tagTitle);
-        if (tag) navigate(`/tags/${tag}`);
+        if (tag) navigate(`/tags/${tag.id}`);
       },
       addTag: async (tagTitle: string) => {
         if (!id) return;

@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Node, mergeAttributes } from "@tiptap/core";
 import { InputRule } from "@tiptap/core";
+import { Plugin, PluginKey } from "@tiptap/pm/state";
 
 const REGEX_INLINE_TAG = /#(\w+)\s$/;
 
@@ -65,13 +66,68 @@ export const InlineTag = Node.create({
 
           const success = chain()
             .deleteRange(range)
-            .insertContentAt(range.from, {
-              type: "inlineTag",
-              attrs: { tag: tagText }
-            })
+            .insertContentAt(range.from, [
+              {
+                type: "inlineTag",
+                attrs: { tag: tagText }
+              }
+            ])
             .focus()
             .run();
-          if (success) this.editor.storage.addTag?.(tagText);
+
+          if (success) {
+            this.editor.storage.addTag?.(tagText);
+          }
+        }
+      })
+    ];
+  },
+
+  addKeyboardShortcuts() {
+    return {
+      Backspace: () => {
+        const { selection } = this.editor.state;
+        const { empty, $anchor } = selection;
+
+        if (!empty) return false;
+
+        const nodeBefore = $anchor.nodeBefore;
+        if (nodeBefore && nodeBefore.type.name === "inlineTag") {
+          const tagText = nodeBefore.attrs.tag;
+
+          if (typeof tagText === "string") {
+            this.editor.storage.removeTag?.(tagText);
+            return false;
+          }
+        }
+
+        return false;
+      }
+    };
+  },
+
+  addProseMirrorPlugins() {
+    const openTag = this.editor.storage.openTag;
+
+    return [
+      new Plugin({
+        key: new PluginKey("handleClickInlineTag"),
+        props: {
+          handleClick(view, pos) {
+            const { doc } = view.state;
+            const node = doc.nodeAt(pos);
+
+            if (node && node.type.name === "inlineTag") {
+              const tagText = node.attrs.tag;
+
+              if (typeof tagText === "string") {
+                openTag?.(tagText);
+                return true;
+              }
+            }
+
+            return false;
+          }
         }
       })
     ];

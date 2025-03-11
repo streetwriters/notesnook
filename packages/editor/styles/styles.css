@@ -21,15 +21,20 @@
 
 .ProseMirror span.inline-tag {
   background-color: var(--background-secondary);
-  border: 1px solid var(--accent);
+  outline: 1px solid var(--border);
   padding: 0px 2px;
-  margin: 0px 3px;
-  border-radius: 4px;
+  margin: 0px 1px;
+  border-radius: 6px;
 }
 
 .ProseMirror span.inline-tag.ProseMirror-selectednode {
   filter: brightness(90%);
-  border: 2px solid var(--accent)
+  outline: 2px solid var(--accent)
+}
+
+.ProseMirror span.inline-tag:hover {
+  cursor: pointer;
+  filter: brightness(90%);
 }
 
 .ProseMirror p.is-editor-empty::before {
