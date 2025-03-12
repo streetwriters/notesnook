@@ -1,10 +1,5 @@
 interface Hotkeys {
-  keys:
-    | string[]
-    | {
-        web?: string[];
-        desktop?: string[];
-      };
+  keys: (isDesktop: boolean) => string[];
   description: string;
   category: string;
   type: "hotkeys";
@@ -22,75 +17,81 @@ interface TipTapKey {
  */
 export const hotkeys = {
   nextTab: {
-    keys: {
+    keys: normalizeKeys({
       web: ["ctrl+alt+right", "ctrl+alt+shift+right"],
-      desktop: ["ctrl+tab", "command+tab"]
-    },
+      desktop: ["ctrl+tab"]
+    }),
     description: "Next tab",
     category: "Navigation",
     type: "hotkeys"
   },
   previousTab: {
-    keys: {
+    keys: normalizeKeys({
       web: ["ctrl+alt+left", "ctrl+alt+shift+left"],
-      desktop: ["ctrl+shift+tab", "command+shift+tab"]
-    },
+      desktop: ["ctrl+shift+tab"]
+    }),
     description: "Previous tab",
     category: "Navigation",
     type: "hotkeys"
   },
   newTab: {
-    keys: {
-      desktop: ["ctrl+t", "command+t"]
-    },
+    keys: normalizeKeys({
+      desktop: ["ctrl+t"]
+    }),
     description: "New tab",
     category: "Navigation",
     type: "hotkeys"
   },
   closeActiveTab: {
-    keys: {
-      desktop: ["ctrl+w", "command+w"]
-    },
+    keys: normalizeKeys({
+      desktop: ["ctrl+w"]
+    }),
     description: "Close active tab",
     category: "Navigation",
     type: "hotkeys"
   },
   closeAllTabs: {
-    keys: {
-      desktop: ["ctrl+shift+w", "command+shift+w"]
-    },
+    keys: normalizeKeys({
+      desktop: ["ctrl+shift+w"]
+    }),
     description: "Close all tabs",
     category: "Navigation",
     type: "hotkeys"
   },
   newNote: {
-    keys: {
-      desktop: ["ctrl+n", "command+n"]
-    },
+    keys: normalizeKeys({
+      desktop: ["ctrl+n"]
+    }),
     description: "New note",
     category: "Note",
     type: "hotkeys"
   },
   searchInNotes: {
-    keys: ["ctrl+f", "command+f"],
+    keys: normalizeKeys(["ctrl+f"]),
     description: "Search in notes list view if editor is not focused",
     category: "Navigation",
     type: "hotkeys"
   },
   openCommandPalette: {
-    keys: ["ctrl+k", "command+k"],
+    keys: normalizeKeys(["ctrl+k"]),
     description: "Command palette",
     category: "Navigation",
     type: "hotkeys"
   },
-  openCommandPaletteInSearchMode: {
-    keys: ["ctrl+p", "ctrl+p"],
+  openQuickOpen: {
+    keys: normalizeKeys(["ctrl+p"]),
     description: "Quick open",
     category: "Navigation",
     type: "hotkeys"
   },
+  openSettings: {
+    keys: normalizeKeys(["ctrl+,"]),
+    description: "Settings",
+    category: "General",
+    type: "hotkeys"
+  },
   openKeyboardShortcuts: {
-    keys: ["ctrl+/"],
+    keys: normalizeKeys(["ctrl+/"]),
     description: "Keyboard shortcuts",
     category: "General",
     type: "hotkeys"
@@ -366,6 +367,27 @@ export const keybindings = {
   ...tiptapKeys
 };
 
+function normalizeKeys(
+  keys: string[] | { web?: string[]; desktop?: string[] }
+): (isDesktop?: boolean) => string[] {
+  return (isDesktop = false) => {
+    let keyList: string[] = [];
+    if (Array.isArray(keys)) {
+      keyList = keys;
+    } else {
+      keyList = isDesktop ? keys.desktop ?? [] : keys.web ?? [];
+    }
+    return keyList.concat(keyList.map(macify));
+  };
+}
+
+function macify(key: string) {
+  return key
+    .replace(/ctrl/gi, "Command")
+    .replace(/alt/gi, "Option")
+    .replace(/mod/gi, "Command");
+}
+
 export function formatKey(key: string) {
   return key
     .replaceAll("+", " ")
@@ -376,6 +398,27 @@ export function formatKey(key: string) {
     .replace("Mod", "Ctrl");
 }
 
-export function macify(key: string) {
-  return key.replaceAll("Ctrl", "Command").replaceAll("Alt", "Option");
+export function getGroupedKeybindings(isDesktop: boolean) {
+  const grouped: Record<string, { keys: string[]; description: string }[]> = {};
+
+  const allKeybindings = { ...hotkeys, ...tiptapKeys };
+
+  for (const key in allKeybindings) {
+    const binding = allKeybindings[key as keyof typeof allKeybindings];
+    const keys =
+      typeof binding.keys === "function"
+        ? binding.keys(isDesktop)
+        : binding.keys;
+
+    if (!grouped[binding.category]) {
+      grouped[binding.category] = [];
+    }
+
+    grouped[binding.category].push({
+      keys: Array.isArray(keys) ? keys : [keys],
+      description: binding.description
+    });
+  }
+
+  return grouped;
 }

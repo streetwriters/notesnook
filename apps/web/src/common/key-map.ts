@@ -64,31 +64,27 @@ const KEYMAP = [
   //   },
   // },
   {
-    keys: IS_DESKTOP_APP
-      ? keybindings.nextTab.keys.desktop
-      : keybindings.nextTab.keys.web,
+    keys: keybindings.nextTab.keys(IS_DESKTOP_APP),
     description: keybindings.nextTab.description,
     action: () => useEditorStore.getState().focusNextTab()
   },
   {
-    keys: IS_DESKTOP_APP
-      ? keybindings.previousTab.keys.desktop
-      : keybindings.previousTab.keys.web,
+    keys: keybindings.previousTab.keys(IS_DESKTOP_APP),
     description: keybindings.previousTab.description,
     action: () => useEditorStore.getState().focusPreviousTab()
   },
   {
-    keys: IS_DESKTOP_APP ? keybindings.newTab.keys.desktop : undefined,
+    keys: keybindings.newTab.keys(IS_DESKTOP_APP),
     description: keybindings.newTab.description,
     action: () => useEditorStore.getState().addTab()
   },
   {
-    keys: IS_DESKTOP_APP ? keybindings.newNote.keys.desktop : undefined,
+    keys: keybindings.newNote.keys(IS_DESKTOP_APP),
     description: keybindings.newNote.description,
     action: () => useEditorStore.getState().newSession()
   },
   {
-    keys: IS_DESKTOP_APP ? keybindings.closeActiveTab.keys.desktop : undefined,
+    keys: keybindings.closeActiveTab.keys(IS_DESKTOP_APP),
     description: keybindings.closeActiveTab.description,
     action: () => {
       const activeTab = useEditorStore.getState().getActiveTab();
@@ -100,12 +96,12 @@ const KEYMAP = [
     }
   },
   {
-    keys: IS_DESKTOP_APP ? keybindings.closeAllTabs.keys.desktop : undefined,
+    keys: keybindings.closeAllTabs.keys(IS_DESKTOP_APP),
     description: keybindings.closeAllTabs.description,
     action: () => useEditorStore.getState().closeAllTabs()
   },
   {
-    keys: keybindings.searchInNotes.keys,
+    keys: keybindings.searchInNotes.keys(IS_DESKTOP_APP),
     description: keybindings.searchInNotes.description,
     global: false,
     action: (e: KeyboardEvent) => {
@@ -189,8 +185,10 @@ const KEYMAP = [
   //   },
   // },
   {
-    keys: ["ctrl+k", "cmd+k", "ctrl+p", "cmd+p"],
-    description: "Open command palette",
+    keys: keybindings.openCommandPalette
+      .keys(IS_DESKTOP_APP)
+      .concat(keybindings.openQuickOpen.keys(IS_DESKTOP_APP)),
+    description: keybindings.openCommandPalette.description,
     action: (e: KeyboardEvent) => {
       e.preventDefault();
       CommandPaletteDialog.close();
@@ -200,12 +198,12 @@ const KEYMAP = [
     }
   },
   {
-    keys: ["ctrl+,", "command+,"],
-    description: "Open settings",
+    keys: keybindings.openSettings.keys(IS_DESKTOP_APP),
+    description: keybindings.openSettings.description,
     action: () => hashNavigate("/settings", { replace: true })
   },
   {
-    keys: keybindings.openKeyboardShortcuts.keys,
+    keys: keybindings.openKeyboardShortcuts.keys(IS_DESKTOP_APP),
     description: keybindings.openKeyboardShortcuts.description,
     action: () => KeyboardShortcutsDialog.show({})
   }
@@ -216,8 +214,9 @@ export function registerKeyMap() {
     return true;
   };
 
+  console.log("KEYMAP", KEYMAP);
   KEYMAP.forEach((key) => {
-    if (key.keys === undefined) return;
+    if (key.keys.length === 0) return;
     hotkeys(key.keys.join(","), (e) => {
       e.preventDefault();
       key.action?.(e);

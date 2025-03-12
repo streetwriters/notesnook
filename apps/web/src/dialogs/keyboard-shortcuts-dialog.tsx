@@ -17,57 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { keybindings } from "@notesnook/common";
+import { getGroupedKeybindings } from "@notesnook/common";
 import { Flex, Text } from "@theme-ui/components";
 import { DialogManager } from "../common/dialog-manager";
 import Dialog from "../components/dialog";
 
-const filtered = Object.values(keybindings).reduce(
-  (acc, shortcut) => {
-    if (shortcut.type === "tiptap") {
-      acc.push({
-        ...shortcut,
-        keys:
-          typeof shortcut.keys === "string" ? [shortcut.keys] : shortcut.keys
-      });
-      return acc;
-    }
-
-    if (Array.isArray(shortcut.keys)) {
-      acc.push({
-        ...shortcut,
-        keys: shortcut.keys
-      });
-      return acc;
-    }
-
-    if (IS_DESKTOP_APP) {
-      if (shortcut.keys.desktop) {
-        acc.push({
-          ...shortcut,
-          keys: shortcut.keys.desktop
-        });
-        return acc;
-      }
-    } else {
-      if ("web" in shortcut.keys && shortcut.keys.web) {
-        acc.push({
-          ...shortcut,
-          keys: shortcut.keys.web
-        });
-        return acc;
-      }
-    }
-
-    return acc;
-  },
-  [] as {
-    keys: string[];
-    description: string;
-    category: string;
-    type: "tiptap" | "hotkeys";
-  }[]
-);
+const groupedKeybindings = getGroupedKeybindings(IS_DESKTOP_APP);
 
 function formatKey(key: string) {
   return key
@@ -81,13 +36,6 @@ function formatKey(key: string) {
 
 export const KeyboardShortcutsDialog = DialogManager.register(
   function KeyboardShortcutsDialog(props) {
-    const grouped = filtered.reduce((acc, key) => {
-      if (!acc[key.category]) {
-        acc[key.category] = [];
-      }
-      acc[key.category].push(key);
-      return acc;
-    }, {} as { [key: string]: typeof filtered });
     return (
       <Dialog
         isOpen={true}
@@ -96,17 +44,15 @@ export const KeyboardShortcutsDialog = DialogManager.register(
         onClose={() => props.onClose(false)}
       >
         <Flex sx={{ flexDirection: "column", flexWrap: "nowrap", height: 650 }}>
-          {Object.entries(grouped).map(([group, shortcuts]) => {
+          {Object.entries(groupedKeybindings).map(([group, shortcuts]) => {
+            if (
+              shortcuts.length === 0 ||
+              shortcuts.every((s) => s.keys.length === 0)
+            )
+              return null;
             return (
               <Flex key={group} sx={{ flexDirection: "column", mb: 2 }}>
-                <Text
-                  sx={{
-                    mt: 1,
-                    fontWeight: "bold"
-                  }}
-                >
-                  {group}
-                </Text>
+                <Text sx={{ mt: 1, fontWeight: "bold" }}>{group}</Text>
                 <hr
                   style={{
                     width: "100%",
@@ -114,6 +60,7 @@ export const KeyboardShortcutsDialog = DialogManager.register(
                   }}
                 />
                 {shortcuts.map((shortcut) => {
+                  if (shortcut.keys.length === 0) return null;
                   return (
                     <Flex key={shortcut.description} sx={{ mb: 2 }}>
                       <Text
