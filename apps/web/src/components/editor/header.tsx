@@ -61,8 +61,6 @@ function Header(props: HeaderProps) {
   },
   []);
 
-  // if (!noteId) return null;
-
   return (
     <>
       <Flex
