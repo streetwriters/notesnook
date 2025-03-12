@@ -237,10 +237,7 @@ const SelectableNoteItem = React.memo(
         type={"transparent"}
         style={{
           flexDirection: "row",
-          width: "100%",
-          justifyContent: "flex-start",
-          height: 50,
-          paddingHorizontal: DefaultAppStyles.GAP_SMALL
+          paddingVertical: DefaultAppStyles.GAP_VERTICAL
         }}
       >
         {!item ? null : (
