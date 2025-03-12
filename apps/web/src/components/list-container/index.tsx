@@ -117,7 +117,7 @@ function ListContainer(props: ListContainerProps) {
     AppEventManager.subscribe(
       AppEvents.revealItemInList,
       async (id?: string) => {
-        toggleListPane(true);
+        toggleListPane();
         if (!id || !listRef.current) return;
 
         const ids = await items.ids();

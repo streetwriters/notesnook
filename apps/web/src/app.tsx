@@ -147,16 +147,14 @@ function DesktopAppContents() {
   useEffect(() => {
     if (isListPaneVisible) {
       navPane.current?.expand(1);
-    } else {
-      if (
-        listPaneSize.current !== null &&
-        listPaneSize.current < LIST_PANE_SNAP_SIZE
-      ) {
-        toggleListPane();
-        navPane.current?.reset(1);
-        return;
-      }
-      navPane.current?.collapse(1);
+      return;
+    }
+    if (
+      listPaneSize.current !== null &&
+      listPaneSize.current < LIST_PANE_SNAP_SIZE
+    ) {
+      toggleListPane();
+      navPane.current?.reset(1);
     }
   }, [isListPaneVisible]);
 

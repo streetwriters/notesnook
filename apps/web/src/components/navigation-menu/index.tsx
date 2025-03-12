@@ -958,7 +958,7 @@ function navigateToRoute(path: string) {
       return useSearchStore.getState().resetSearch();
     return useAppStore.getState().toggleListPane();
   }
-  useAppStore.getState().toggleListPane(true);
+  useAppStore.getState().toggleListPane();
   navigate(path);
   return true;
 }
