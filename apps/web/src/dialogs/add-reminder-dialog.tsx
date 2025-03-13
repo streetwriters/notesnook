@@ -156,6 +156,7 @@ export const AddReminderDialog = DialogManager.register(
         testId="add-reminder-dialog"
         onClose={() => props.onClose(false)}
         sx={{ fontFamily: "body" }}
+        width={600}
         positiveButton={{
           text: reminder ? strings.save() : strings.add(),
           disabled:
