@@ -31,11 +31,13 @@ import { Login } from "./login";
 import { Signup } from "./signup";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import { DefaultAppStyles } from "../../utils/styles";
+import { useSettingStore } from "../../stores/use-setting-store";
 
 const Auth = ({ navigation, route }) => {
   const [currentAuthMode, setCurrentAuthMode] = useState(
     route?.params?.mode || AuthMode.login
   );
+  const deviceMode = useSettingStore((state) => state.deviceMode);
   const { colors } = useThemeColors();
   const insets = useGlobalSafeAreaInsets();
   initialAuthMode.current = route?.params.mode || AuthMode.login;
@@ -49,7 +51,8 @@ const Auth = ({ navigation, route }) => {
           paddingTop: insets.top,
           top: 0,
           zIndex: 999,
-          backgroundColor: colors.secondary.background,
+          backgroundColor:
+            deviceMode === "mobile" ? colors.secondary.background : null,
           width: "100%"
         }}
       >
