@@ -50,9 +50,8 @@ export const Signup = ({ changeMode, trial }) => {
   const [loading, setLoading] = useState(false);
   const setUser = useUserStore((state) => state.setUser);
   const setLastSynced = useUserStore((state) => state.setLastSynced);
-  const isTablet = width > 600;
-
   const { width, height } = useWindowDimensions();
+  const isTablet = width > 600;
   const validateInfo = () => {
     if (!password.current || !email.current || !confirmPassword.current) {
       ToastManager.show({
@@ -104,8 +103,10 @@ export const Signup = ({ changeMode, trial }) => {
         style={{
           borderRadius: DDS.isTab ? 5 : 0,
           backgroundColor: colors.primary.background,
+          zIndex: 10,
           width: "100%",
-          height: "100%"
+          height: "100%",
+          alignSelf: "center"
         }}
       >
         <View
@@ -113,15 +114,15 @@ export const Signup = ({ changeMode, trial }) => {
             justifyContent: "flex-end",
             paddingHorizontal: DefaultAppStyles.GAP,
             backgroundColor: colors.secondary.background,
-            marginBottom: 20,
             borderBottomWidth: 0.8,
+            marginBottom: DefaultAppStyles.GAP_VERTICAL,
             borderBottomColor: colors.primary.border,
             alignSelf: isTablet ? "center" : undefined,
             borderWidth: isTablet ? 1 : null,
             borderColor: isTablet ? colors.primary.border : null,
             borderRadius: isTablet ? 20 : null,
             marginTop: isTablet ? 50 : null,
-            width: !isTablet ? null : "50%",
+            width: !isTablet ? null : "70%",
             minHeight: height * 0.4
           }}
         >
