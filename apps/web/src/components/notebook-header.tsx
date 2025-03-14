@@ -17,29 +17,35 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useStore as useAppStore } from "../stores/app-store";
-import { hashNavigate } from "../navigation";
+import { hashNavigate, navigate } from "../navigation";
 import { Button, Flex, Text } from "@theme-ui/components";
-import { Edit, RemoveShortcutLink, ShortcutLink } from "./icons";
+import {
+  ChevronRight,
+  Edit,
+  MoreHorizontal,
+  Notebook2,
+  RemoveShortcutLink,
+  ShortcutLink
+} from "./icons";
 import { useStore as useNotebookStore } from "../stores/notebook-store";
 import { db } from "../common/db";
 import { getFormattedDate } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
 import { Notebook } from "@notesnook/core";
 import { TITLE_BAR_HEIGHT } from "./title-bar";
+import { Menu } from "../hooks/use-menu";
 
 export function NotebookHeader(props: {
   notebook: Notebook;
   totalNotes?: number;
 }) {
-  // const moreCrumbsRef = useRef<HTMLButtonElement>(null);
   const notebooks = useNotebookStore((store) => store.notebooks);
   const [notebook, setNotebook] = useState<Notebook | undefined>(
     props.notebook
   );
   const [totalNotes, setTotalNotes] = useState(props.totalNotes);
-  // const [crumbs, setCrumbs] = useState<{ id: string; title: string }[]>([]);
   const [isShortcut, setIsShortcut] = useState(false);
   const shortcuts = useAppStore((store) => store.shortcuts);
   const addToShortcuts = useAppStore((store) => store.addToShortcuts);
@@ -63,12 +69,6 @@ export function NotebookHeader(props: {
     else setTotalNotes(props.totalNotes);
   }, [props.notebook, props.totalNotes]);
 
-  // useEffect(() => {
-  //   (async function () {
-  //     setCrumbs(await db.notebooks.breadcrumbs(context.id));
-  //   })();
-  // }, [context.id]);
-
   if (!notebook) return null;
   const { title, description, dateEdited } = notebook;
 
@@ -83,6 +83,7 @@ export function NotebookHeader(props: {
         borderBottom: "1px solid var(--border)"
       }}
     >
+      <NotebookCrumbs notebook={notebook} />
       <Flex sx={{ alignItems: "center", justifyContent: "space-between" }}>
         <Flex sx={{ alignItems: "center", gap: 2 }}>
           <Text variant="subBody">{getFormattedDate(dateEdited, "date")}</Text>
@@ -133,4 +134,113 @@ export function NotebookHeader(props: {
       )}
     </Flex>
   );
+}
+
+function NotebookCrumbs(props: { notebook: Notebook }) {
+  const moreCrumbsRef = useRef<HTMLButtonElement>(null);
+  const [crumbs, setCrumbs] = useState<{ id: string; title: string }[]>([]);
+
+  useEffect(() => {
+    (async function () {
+      setCrumbs(await db.notebooks.breadcrumbs(props.notebook.id));
+    })();
+  }, [props.notebook]);
+
+  if (crumbs.length < 2) {
+    return null;
+  }
+
+  return (
+    <Flex sx={{ alignItems: "center" }}>
+      <CrumbText
+        onClick={() => navigateCrumb(crumbs[0]?.id)}
+        text={crumbs[0]?.title}
+      />
+      <ChevronRight
+        as="span"
+        sx={{ display: "inline", verticalAlign: "bottom" }}
+        size={14}
+      />
+      {crumbs.length > 3 && (
+        <>
+          <Button
+            ref={moreCrumbsRef}
+            variant="icon"
+            sx={{ p: 0, flexShrink: 0 }}
+            onClick={() => {
+              if (!moreCrumbsRef.current) return;
+              Menu.openMenu(
+                crumbs
+                  .slice(1, -2)
+                  .reverse()
+                  .map((c) => ({
+                    type: "button",
+                    title: c.title,
+                    key: c.id,
+                    icon: Notebook2.path,
+                    onClick: () => navigateCrumb(c.id)
+                  })),
+                {
+                  position: {
+                    target: moreCrumbsRef.current,
+                    location: "below",
+                    isTargetAbsolute: true,
+                    align: "start",
+                    yOffset: 10
+                  }
+                }
+              );
+            }}
+          >
+            <MoreHorizontal size={14} />
+          </Button>
+          <ChevronRight
+            sx={{ display: "inline", verticalAlign: "bottom" }}
+            as="span"
+            size={14}
+          />
+        </>
+      )}
+      {crumbs.slice(crumbs.length > 2 ? -2 : -1).map((crumb, index, array) => (
+        <>
+          <CrumbText
+            onClick={() => navigateCrumb(crumb.id)}
+            text={crumb.title}
+          />
+          {index === array.length - 1 ? null : (
+            <ChevronRight
+              as="span"
+              sx={{ display: "inline", verticalAlign: "bottom" }}
+              size={14}
+            />
+          )}
+        </>
+      ))}
+    </Flex>
+  );
+}
+
+function CrumbText(props: { text: string; onClick: () => void }) {
+  return (
+    <Text
+      sx={{
+        fontSize: "subBody",
+        textDecoration: "none",
+        color: "var(--paragraph-secondary)",
+        whiteSpace: "nowrap",
+        textOverflow: "ellipsis",
+        overflow: "hidden",
+        cursor: "pointer",
+        paddingBottom: "2px",
+        ":hover": { color: "paragraph-hover" }
+      }}
+      onClick={props.onClick}
+    >
+      {props.text}
+    </Text>
+  );
+}
+
+function navigateCrumb(notebookId: string) {
+  navigate(`/notebooks/${notebookId}`);
 }
