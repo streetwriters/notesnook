@@ -910,8 +910,8 @@ class EditorStore extends BaseStore<EditorStore> {
       ignoreEdit?: boolean;
     }
   ) => {
-    const currentSession = this.getSession(id, ["new", "default"]);
-    if (!currentSession) return;
+    const session = this.getSession(id, ["new", "default"]);
+    if (!session) return;
 
     // do not allow saving of readonly session
     if (partial.note?.readonly) return;
@@ -919,6 +919,13 @@ class EditorStore extends BaseStore<EditorStore> {
     await saveMutex.runExclusive(async () => {
       this.setSaveState(id, 0);
       try {
+        // Get session again as it might have changed to default.
+        const currentSession =
+          session.type === "new"
+            ? this.getSession(id, ["new", "default"])
+            : session;
+
+        if (!currentSession) return;
         const sessionId = getSessionId(currentSession);
         let noteId =
           "note" in currentSession ? currentSession.note.id : partial.note?.id;
@@ -1041,8 +1048,8 @@ class EditorStore extends BaseStore<EditorStore> {
         this.setSaveState(id, SaveState.NotSaved);
         console.error(err);
         if (err instanceof Error) logger.error(err);
-        if (isLockedSession(currentSession) && "note" in currentSession) {
-          this.get().openSession(currentSession.note, { force: true });
+        if (isLockedSession(session) && "note" in session) {
+          this.get().openSession(session.note, { force: true });
         }
       }
     });
