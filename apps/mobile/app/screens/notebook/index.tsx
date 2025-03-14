@@ -37,6 +37,9 @@ import useNavigationStore, {
 import { eUpdateNotebookRoute } from "../../utils/events";
 import { findRootNotebookId } from "../../utils/notebooks";
 import { openEditor, setOnFirstSave } from "../notes/common";
+import { View } from "react-native";
+import { DefaultAppStyles } from "../../utils/styles";
+import { Notebooks } from "../../components/sheets/notebooks";
 
 const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
   const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
@@ -193,10 +196,6 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
           loading={loading}
           CustomLisHeader={
             <NotebookHeader
-              // TODO
-              // onEditNotebook={() => {
-              //   AddNotebookSheet.present(params.current.item);
-              // }}
               breadcrumbs={breadcrumbs}
               notebook={params.current.item}
               totalNotes={notes?.placeholders.length || 0}
@@ -211,7 +210,36 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
           }}
         />
       </DelayLayout>
-      <FloatingButton onPress={openEditor} />
+      <View
+        style={{
+          position: "absolute",
+          bottom: 20,
+          right: 20,
+          gap: DefaultAppStyles.GAP_VERTICAL,
+          alignItems: "center"
+        }}
+      >
+        <FloatingButton
+          icon="file-tree"
+          size="small"
+          onPress={() => {
+            Notebooks.present(params.current.item);
+          }}
+          style={{
+            position: "relative",
+            right: 0,
+            bottom: 5
+          }}
+        />
+        <FloatingButton
+          onPress={openEditor}
+          style={{
+            position: "relative",
+            right: 0,
+            bottom: 0
+          }}
+        />
+      </View>
     </>
   );
 };
