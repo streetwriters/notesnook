@@ -54,7 +54,11 @@ const Sort = ({
   const { colors } = useThemeColors();
   const [groupOptions, setGroupOptions] = useState(
     db.settings.getGroupOptions(
-      screen === "Notes" ? "home" : ((type + "s") as GroupingKey)
+      screen === "Notes"
+        ? "home"
+        : screen === "Trash"
+        ? "trash"
+        : ((type + "s") as GroupingKey)
     )
   );
   const updateGroupOptions = async (_groupOptions: GroupOptions) => {
@@ -185,7 +189,7 @@ const Sort = ({
                 ]()}
               </Paragraph>
 
-              {groupOptions.sortBy === item ? (
+              {groupOptions?.sortBy === item ? (
                 <AppIcon
                   size={AppFontSize.lg}
                   name="check"
