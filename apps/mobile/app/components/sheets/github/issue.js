@@ -70,6 +70,15 @@ Pro: ${PremiumService.get()}
 Logged in: ${user ? "yes" : "no"}`,
         userId: user?.id
       });
+      if (!issueUrl.current) {
+        setLoading(false);
+        ToastManager.show({
+          heading: "Failed to report issue on github",
+          type: "error",
+          context: "local"
+        });
+        return;
+      }
       setLoading(false);
       body.reset();
       title.reset();

@@ -185,6 +185,7 @@ export const MoveNotes = (props: NavigationProps<"MoveNotes">) => {
         {selectionCount ? (
           <FloatingButton
             icon="check"
+            alwaysVisible
             onPress={async () => {
               await db.notes?.addToNotebook(
                 currentNotebook.id,

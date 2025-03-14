@@ -136,9 +136,6 @@ const LinkNotebooks = (props: NavigationProps<"LinkNotebooks">) => {
     })();
   }, [loadRootNotebooks, loading]);
 
-  const selectedItemsList = useSelectionStore(
-    (state) => state.selectedItemsList
-  );
   const multiSelect = useNotebookSelectionStore((state) => state.multiSelect);
 
   const hasSelection = useNotebookSelectionStore((state) =>
@@ -285,7 +282,7 @@ const LinkNotebooks = (props: NavigationProps<"LinkNotebooks">) => {
       />
 
       {hasSelection ? (
-        <FloatingButton icon="check" onPress={() => onSave()} />
+        <FloatingButton icon="check" alwaysVisible onPress={() => onSave()} />
       ) : null}
     </SafeAreaView>
   );
