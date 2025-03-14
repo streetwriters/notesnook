@@ -52,7 +52,7 @@ module.exports = (env) => {
       parallelCodeSplitting: true,
       cache: {
         type: "persistent",
-        buildDependencies: [__filename]
+        buildDependencies: [__filename, path.join(__dirname, "..", "package-lock.json"), path.join(__dirname, "..", "scripts","optimize-fonts.mjs")],
       },
     },
     /**
