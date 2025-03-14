@@ -197,12 +197,17 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const [currentTab, setCurrentTab] = useState<(typeof tabs)[number]>(tabs[0]);
   const isNavPaneCollapsed = useAppStore((store) => store.isNavPaneCollapsed);
-  const [expanded, setExpanded] = useState(false);
-  const isCollapsed = isNavPaneCollapsed && !expanded;
+  const isCollapsedNavPaneHovered = useAppStore(
+    (store) => store.isCollapsedNavPaneHovered
+  );
+  const setCollapsedNavPaneHovered = useAppStore(
+    (store) => store.setCollapsedNavPaneHovered
+  );
+  const isCollapsed = isNavPaneCollapsed && !isCollapsedNavPaneHovered;
   const mouseHoverTimeout = useRef(0);
 
   useEffect(() => {
-    if (isNavPaneCollapsed) setExpanded(false);
+    if (isNavPaneCollapsed) setCollapsedNavPaneHovered(false);
   }, [isNavPaneCollapsed]);
 
   return (
@@ -221,7 +226,11 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
         borderRight: "1px solid var(--separator)",
         pt: 1,
         transition: "width 0.1s ease-in",
-        width: isNavPaneCollapsed ? (expanded ? 250 : 50) : "100%"
+        width: isNavPaneCollapsed
+          ? isCollapsedNavPaneHovered
+            ? 250
+            : 50
+          : "100%"
       }}
       onMouseEnter={() => {
         clearTimeout(mouseHoverTimeout.current);
@@ -231,7 +240,7 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
         if (!isNavPaneCollapsed) return;
         mouseHoverTimeout.current = setTimeout(() => {
           if (!isNavPaneCollapsed) return;
-          setExpanded(false);
+          setCollapsedNavPaneHovered(false);
         }, 500) as unknown as number;
       }}
     >
@@ -239,7 +248,7 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
         <Button
           variant="secondary"
           sx={{ p: 1, px: "small", bg: "transparent", mx: 1 }}
-          onClick={() => setExpanded(true)}
+          onClick={() => setCollapsedNavPaneHovered(true)}
         >
           <HamburgerMenu size={16} color="icon" />
         </Button>
@@ -322,7 +331,7 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
               icon={tab.icon}
               selected={currentTab.id === tab.id}
               onClick={() => {
-                if (isNavPaneCollapsed) setExpanded(true);
+                if (isNavPaneCollapsed) setCollapsedNavPaneHovered(true);
                 setCurrentTab(tab);
               }}
             />
@@ -381,11 +390,11 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
             <Flex sx={{ flexDirection: "column", px: 1, gap: [1, 1, "small"] }}>
               <Routes
                 isCollapsed={isCollapsed}
-                collapse={() => isNavPaneCollapsed && setExpanded(false)}
+                collapse={() => collapseNavPaneHoveredIfNavPaneCollapsed()}
               />
               <Colors
                 isCollapsed={isCollapsed}
-                collapse={() => isNavPaneCollapsed && setExpanded(false)}
+                collapse={() => collapseNavPaneHoveredIfNavPaneCollapsed()}
               />
               <Box
                 bg="separator"
@@ -394,7 +403,7 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
               />
               <Shortcuts
                 isCollapsed={isCollapsed}
-                collapse={() => isNavPaneCollapsed && setExpanded(false)}
+                collapse={() => collapseNavPaneHoveredIfNavPaneCollapsed()}
               />
             </Flex>
           </FlexScrollContainer>
@@ -958,6 +967,13 @@ function navigateToRoute(path: string) {
       return useSearchStore.getState().resetSearch();
     return useAppStore.getState().toggleListPane();
   }
+  useAppStore.getState().toggleListPane();
   navigate(path);
   return true;
+}
+
+export function collapseNavPaneHoveredIfNavPaneCollapsed() {
+  if (useAppStore.getState().isNavPaneCollapsed) {
+    useAppStore.getState().setCollapsedNavPaneHovered(false);
+  }
 }

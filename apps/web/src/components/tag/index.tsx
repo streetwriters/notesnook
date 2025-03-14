@@ -31,6 +31,7 @@ import { useStore as useSelectionStore } from "../../stores/selection-store";
 import { useStore as useNoteStore } from "../../stores/note-store";
 import { Multiselect } from "../../common/multi-select";
 import { strings } from "@notesnook/intl";
+import { collapseNavPaneHoveredIfNavPaneCollapsed } from "../navigation-menu";
 
 type TagProps = { item: TagType; totalNotes: number };
 function Tag(props: TagProps) {
@@ -87,6 +88,7 @@ function Tag(props: TagProps) {
       menuItems={tagMenuItems}
       onClick={() => {
         navigate(`/tags/${id}`);
+        collapseNavPaneHoveredIfNavPaneCollapsed();
       }}
       onDragEnter={(e) => {
         e?.currentTarget.focus();
