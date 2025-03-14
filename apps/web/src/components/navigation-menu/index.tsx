@@ -467,7 +467,8 @@ function RouteItem({
           : location.startsWith(item.path)
       }
       onClick={() => {
-        if (navigateToRoute(item.path)) context?.collapse();
+        navigateToRoute(item.path);
+        context?.collapse();
       }}
       menuItems={[
         {
@@ -512,7 +513,8 @@ function Colors({
           selected={context?.id === color.id}
           color={color.colorCode}
           onClick={() => {
-            if (navigateToRoute(`/colors/${color.id}`)) collapse();
+            navigateToRoute(`/colors/${color.id}`);
+            collapse();
           }}
           onDrop={(e) => handleDrop(e.dataTransfer, color)}
           menuItems={[
@@ -601,14 +603,12 @@ function Shortcuts({
           selected={context?.id === item.id}
           onDrop={(e) => handleDrop(e.dataTransfer, item)}
           onClick={async () => {
-            if (
-              navigateToRoute(
-                item.type === "notebook"
-                  ? `/notebooks/${item.id}`
-                  : `/tags/${item.id}`
-              )
-            )
-              collapse();
+            navigateToRoute(
+              item.type === "notebook"
+                ? `/notebooks/${item.id}`
+                : `/tags/${item.id}`
+            );
+            collapse();
           }}
         >
           <ItemCount item={item} />
@@ -969,7 +969,6 @@ function navigateToRoute(path: string) {
   }
   useAppStore.getState().toggleListPane();
   navigate(path);
-  return true;
 }
 
 export function collapseNavPaneHoveredIfNavPaneCollapsed() {
