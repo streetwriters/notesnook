@@ -33,7 +33,6 @@ import {
 import { ItemSelection } from "../../stores/item-selection-store";
 import { useNotebooks } from "../../stores/use-notebook-store";
 import { useRelationStore } from "../../stores/use-relation-store";
-import { useSelectionStore } from "../../stores/use-selection-store";
 import { updateNotebook } from "../../utils/notebooks";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
