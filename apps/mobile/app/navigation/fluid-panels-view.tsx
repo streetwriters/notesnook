@@ -267,29 +267,31 @@ export const FluidPanelsView = React.memo(
         }
 
         const state = getAppState();
-        switch (current) {
-          case "tablet":
-            fluidTabsRef.current?.goToIndex(0, false);
-            break;
-          case "smallTablet":
-            if (!fullscreen) {
-              fluidTabsRef.current?.closeDrawer(false);
-            } else {
-              fluidTabsRef.current?.openDrawer(false);
-            }
-            break;
-          case "mobile":
-            if (
-              state &&
-              editorState().movedAway === false &&
-              useTabStore.getState().getCurrentNoteId()
-            ) {
-              fluidTabsRef.current?.goToIndex(2, false);
-            } else {
-              fluidTabsRef.current?.goToIndex(1, false);
-            }
-            break;
-        }
+        setTimeout(() => {
+          switch (current) {
+            case "tablet":
+              fluidTabsRef.current?.goToIndex(0, false);
+              break;
+            case "smallTablet":
+              if (!fullscreen) {
+                fluidTabsRef.current?.closeDrawer(false);
+              } else {
+                fluidTabsRef.current?.openDrawer(false);
+              }
+              break;
+            case "mobile":
+              if (
+                state &&
+                editorState().movedAway === false &&
+                useTabStore.getState().getCurrentNoteId()
+              ) {
+                fluidTabsRef.current?.goToIndex(2, false);
+              } else {
+                fluidTabsRef.current?.goToIndex(1, false);
+              }
+              break;
+          }
+        }, 32);
       },
       [deviceMode, fullscreen, setDeviceModeState]
     );
