@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useThemeColors } from "@notesnook/theme";
 import { useRoute } from "@react-navigation/native";
 import React, { useCallback, useEffect } from "react";
-import { Keyboard, TouchableOpacity, View } from "react-native";
+import { Keyboard, TouchableOpacity, View, ViewStyle } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -43,6 +43,9 @@ interface FloatingButtonProps {
   alwaysVisible?: boolean;
   icon?: string;
   testID?: string;
+  position?: "left" | "right";
+  size?: "small" | "large";
+  style?: ViewStyle;
 }
 
 const FloatingButton = ({
@@ -50,7 +53,10 @@ const FloatingButton = ({
   color,
   alwaysVisible = false,
   icon,
-  testID
+  testID,
+  position = "right",
+  size = "large",
+  style
 }: FloatingButtonProps) => {
   const { colors } = useThemeColors();
   const deviceMode = useSettingStore((state) => state.deviceMode);
@@ -112,9 +118,11 @@ const FloatingButton = ({
       style={[
         {
           position: "absolute",
-          right: DefaultAppStyles.GAP,
+          right: position === "right" ? DefaultAppStyles.GAP : undefined,
+          left: position === "left" ? DefaultAppStyles.GAP : undefined,
           bottom: 20,
-          zIndex: 10
+          zIndex: 10,
+          ...style
         },
         animatedStyle
       ]}
@@ -123,8 +131,8 @@ const FloatingButton = ({
         testID={testID || notesnook.buttons.add}
         activeOpacity={0.95}
         style={{
-          ...getElevationStyle(10),
-          borderRadius: 20,
+          ...getElevationStyle(5),
+          borderRadius: size === "small" ? 15 : 20,
           borderTopWidth: 0,
           borderBottomWidth: 0,
           borderLeftWidth: 0,
@@ -137,10 +145,10 @@ const FloatingButton = ({
           style={{
             alignItems: "center",
             justifyContent: "center",
-            height: normalize(60),
-            width: normalize(60),
+            height: normalize(size === "small" ? 40 : 60),
+            width: normalize(size === "small" ? 40 : 60),
             backgroundColor: colors.primary.shade,
-            borderRadius: 20
+            borderRadius: size === "small" ? 15 : 20
           }}
         >
           <Icon
@@ -154,7 +162,7 @@ const FloatingButton = ({
                 : "plus"
             }
             color={colors.primary.accent}
-            size={AppFontSize.xxxl}
+            size={size === "small" ? AppFontSize.xl : AppFontSize.xxxl}
           />
         </View>
       </TouchableOpacity>

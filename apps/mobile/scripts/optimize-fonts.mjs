@@ -96,7 +96,10 @@ const EXTRA_ICON_NAMES = [
   "dots-vertical",
   "briefcase-outline",
   "shield-outline",
-  "brain"
+  "brain",
+  "file-tree-outline",
+  "format-list-bulleted",
+  "file-tree"
 ];
 
 const __filename = fileURLToPath(import.meta.url);
