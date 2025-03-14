@@ -36,22 +36,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useLayoutEffect, useState } from "react";
-import { ChevronDown, ChevronRight, Circle, Cross } from "../icons";
-import { useEditorStore } from "../../stores/editor-store";
-import ScrollContainer from "../scroll-container";
-import { ScopedThemeProvider } from "../theme-provider";
-import { Section } from "../properties";
 import { scrollIntoViewById, TOCItem } from "@notesnook/editor";
-import { Button, Flex, Text } from "@theme-ui/components";
-import { useEditorManager } from "./manager";
-import { TITLE_BAR_HEIGHT } from "../title-bar";
 import { strings } from "@notesnook/intl";
+import { Button, Flex, Text } from "@theme-ui/components";
+import React, { useLayoutEffect } from "react";
+import { ChevronDown, ChevronRight, Circle } from "../icons";
+import { Section } from "../properties";
+import { ScopedThemeProvider } from "../theme-provider";
+import { TITLE_BAR_HEIGHT } from "../title-bar";
 import {
   TreeNode,
   VirtualizedTree,
   VirtualizedTreeHandle
 } from "../virtualized-tree";
+import { useEditorManager } from "./manager";
 
 type TableOfContentsProps = {
   sessionId: string;
