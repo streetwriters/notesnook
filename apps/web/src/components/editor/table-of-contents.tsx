@@ -148,7 +148,9 @@ function TableOfContents(props: TableOfContentsProps) {
                         ? "accent-selected"
                         : "paragraph"
                     }}
-                    onClick={() => scrollIntoViewById(t.id)}
+                    onClick={() =>
+                      scrollIntoViewById(t.id, "scroll-margin-top: 35px;")
+                    }
                   >
                     {t.title}
                   </Button>

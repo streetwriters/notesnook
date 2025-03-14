@@ -46,7 +46,7 @@ export function getTableOfContents(content: HTMLElement) {
   return tableOfContents;
 }
 
-export function scrollIntoViewById(blockId: string) {
+export function scrollIntoViewById(blockId: string, optionalStyles = "") {
   const element = document.querySelector<HTMLElement>(
     `.active [data-block-id=${JSON.stringify(blockId)}]`
   );
@@ -54,6 +54,7 @@ export function scrollIntoViewById(blockId: string) {
   if (element) {
     const css = `.active [data-block-id=${JSON.stringify(blockId)}] {
     background-color: var(--shade) !important;
+    ${optionalStyles}
 }`;
     const stylesheet = document.createElement("style");
     stylesheet.innerText = css;
