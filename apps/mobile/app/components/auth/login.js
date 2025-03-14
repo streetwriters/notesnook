@@ -113,7 +113,7 @@ export const Login = ({ changeMode }) => {
             borderColor: isTablet ? colors.primary.border : null,
             borderRadius: isTablet ? 20 : null,
             marginTop: isTablet ? 50 : null,
-            width: !isTablet ? null : "50%",
+            width: !isTablet ? null : "70%",
             minHeight: height * 0.4
           }}
         >
