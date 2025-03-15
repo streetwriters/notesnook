@@ -233,6 +233,7 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
         />
         <FloatingButton
           onPress={openEditor}
+          alwaysVisible
           style={{
             position: "relative",
             right: 0,

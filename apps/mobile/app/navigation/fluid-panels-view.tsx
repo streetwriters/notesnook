@@ -30,15 +30,6 @@ import React, {
   useState
 } from "react";
 import { Dimensions, LayoutChangeEvent, Platform, View } from "react-native";
-import {
-  addOrientationListener,
-  addSpecificOrientationListener,
-  getInitialOrientation,
-  getSpecificOrientation,
-  removeOrientationListener,
-  removeSpecificOrientationListener
-  //@ts-ignore
-} from "react-native-orientation";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -76,6 +67,9 @@ import {
 } from "../utils/events";
 import { editorRef, fluidTabsRef } from "../utils/global-refs";
 import { AppNavigationStack } from "./navigation-stack";
+import Orientation, {
+  useDeviceOrientationChange
+} from "react-native-orientation-locker";
 
 const MOBILE_SIDEBAR_SIZE = 0.85;
 
@@ -99,9 +93,17 @@ export const FluidPanelsView = React.memo(
     const animatedOpacity = useSharedValue(0);
     const animatedTranslateY = useSharedValue(-9999);
     const overlayRef = useRef<Animated.View>(null);
-    const [orientation, setOrientation] = useState(getInitialOrientation());
+    const [orientation, setOrientation] = useState<"PORTRAIT" | "LANDSCAPE">(
+      Orientation.getInitialOrientation().includes("PORTRAIT")
+        ? "PORTRAIT"
+        : "LANDSCAPE"
+    );
     const appLoading = useSettingStore((state) => state.isAppLoading);
     const [isLoading, setIsLoading] = useState(false);
+
+    useDeviceOrientationChange((o) => {
+      setOrientation(o.includes("PORTRAIT") ? "PORTRAIT" : "LANDSCAPE");
+    });
 
     useEffect(() => {
       if (!appLoading) {
@@ -134,24 +136,6 @@ export const FluidPanelsView = React.memo(
         }
       }
     });
-
-    useEffect(() => {
-      const onOrientationChange = (o: string, o2: string) => {
-        setOrientation(o || o2);
-      };
-
-      if (Platform.OS === "ios") {
-        addSpecificOrientationListener(onOrientationChange);
-        getSpecificOrientation && getSpecificOrientation(onOrientationChange);
-      } else {
-        addOrientationListener(onOrientationChange);
-      }
-
-      return () => {
-        removeSpecificOrientationListener(onOrientationChange);
-        removeOrientationListener(onOrientationChange);
-      };
-    }, []);
 
     const showFullScreenEditor = useCallback(() => {
       setFullscreen(true);
