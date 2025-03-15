@@ -236,7 +236,11 @@ const NotesPage = ({
         {!isMonograph &&
         ((notes?.placeholders && (notes?.placeholders?.length || 0) > 0) ||
           isFocused) ? (
-          <FloatingButton color={accentColor} onPress={onPressFloatingButton} />
+          <FloatingButton
+            color={accentColor}
+            onPress={onPressFloatingButton}
+            alwaysVisible
+          />
         ) : null}
       </DelayLayout>
     </>

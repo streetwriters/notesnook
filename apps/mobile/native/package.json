@@ -69,13 +69,13 @@
     "react-native-mmkv-storage": "^0.10.2",
     "@react-native-community/datetimepicker": "^8.2.0",
     "react-native-exit-app": "github:ammarahm-ed/react-native-exit-app",
-    "react-native-orientation": "github:yamill/react-native-orientation",
     "react-native-begin-background-task": "github:blockfirm/react-native-begin-background-task",
     "react-native-privacy-snapshot": "github:standardnotes/react-native-privacy-snapshot",
     "@ammarahmed/react-native-fingerprint-scanner": "^5.0.0",
     "@ammarahmed/react-native-share-extension": "^2.9.0",
     "react-native-pager-view": "^6.5.1",
-    "react-native-tab-view": "^4.0.2"
+    "react-native-tab-view": "^4.0.2",
+    "react-native-orientation-locker": "^1.7.0"
   },
   "devDependencies": {
     "@rspack/core": "^1.2.7",
