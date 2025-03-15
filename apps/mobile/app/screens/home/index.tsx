@@ -83,7 +83,7 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
           }}
         />
         {!notes || !notes.placeholders?.length ? null : (
-          <FloatingButton onPress={openEditor} />
+          <FloatingButton onPress={openEditor} alwaysVisible />
         )}
       </DelayLayout>
     </>

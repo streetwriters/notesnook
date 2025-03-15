@@ -94,6 +94,7 @@ export const Reminders = ({
           onPress={() => {
             ReminderSheet.present();
           }}
+          alwaysVisible
         />
       </DelayLayout>
     </>

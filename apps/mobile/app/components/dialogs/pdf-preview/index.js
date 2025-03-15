@@ -19,10 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Dimensions, TextInput, View } from "react-native";
-import {
-  addOrientationListener,
-  removeOrientationListener
-} from "react-native-orientation";
+import Orientation from "react-native-orientation-locker";
 import Pdf from "react-native-pdf";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import downloadAttachment from "../../../common/filesystem/download-attachment";
@@ -99,9 +96,9 @@ const PDFPreview = () => {
   };
 
   useEffect(() => {
-    addOrientationListener(onOrientationChange);
+    Orientation.addDeviceOrientationListener(onOrientationChange);
     return () => {
-      removeOrientationListener(onOrientationChange);
+      Orientation.removeDeviceOrientationListener(onOrientationChange);
     };
   }, []);
 
