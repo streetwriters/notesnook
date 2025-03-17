@@ -52,14 +52,13 @@ if (appLockEnabled || appLockMode !== "none") {
   useUserStore.getState().lockApp(true);
 }
 
-RNBootSplash.hide({ fade: true });
-changeSystemBarColors();
-
+RNBootSplash.hide();
 const App = (props: { configureMode: "note-preview" }) => {
   useAppEvents();
   //@ts-ignore
   globalThis["IS_MAIN_APP_RUNNING"] = true;
   useEffect(() => {
+    changeSystemBarColors();
     SettingsService.onFirstLaunch();
     setTimeout(async () => {
       await Notifications.get();

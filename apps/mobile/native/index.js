@@ -29,8 +29,6 @@ const appName = appJson.name;
 if (Config.isTesting) {
   Date.prototype.toLocaleString = () => 'XX-XX-XX';
 }
-UIManager.setLayoutAnimationEnabledExperimental &&
-  UIManager.setLayoutAnimationEnabledExperimental(true);
 
 if (__DEV__) {
   console.warn = () => null;
