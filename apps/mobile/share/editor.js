@@ -21,13 +21,11 @@ import React, {
   useCallback,
   useEffect,
   useLayoutEffect,
-  useMemo,
   useRef,
   useState
 } from "react";
 import { Linking, Platform, TextInput, View } from "react-native";
 import { WebView } from "react-native-webview";
-import Commands from "../app/screens/editor/tiptap/commands";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent
@@ -57,7 +55,6 @@ export async function post(ref, type, value = null) {
 const useEditor = () => {
   const ref = useRef();
   const { colors } = useThemeColors("editor");
-  const commands = useMemo(() => new Commands(ref), [ref]);
   const currentNote = useRef();
 
   const postMessage = useCallback(
@@ -106,7 +103,7 @@ const useEditor = () => {
     }, 1);
   };
 
-  return { ref, onLoad, currentNote, commands };
+  return { ref, onLoad, currentNote };
 };
 
 const useEditorEvents = (editor, onChange) => {
