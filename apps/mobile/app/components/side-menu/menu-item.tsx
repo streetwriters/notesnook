@@ -36,6 +36,7 @@ import { DefaultAppStyles } from "../../utils/styles";
 import { Pressable } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
 import { useMonographStore } from "../../stores/use-monograph-store";
+import { useReminderStore } from "../../stores/use-reminder-store";
 
 function _MenuItem({
   item,
@@ -86,11 +87,11 @@ function _MenuItem({
           );
           break;
         case "Reminders":
-          unsub = useFavoriteStore.subscribe((state) => {
+          unsub = useReminderStore.subscribe((state) => {
             setItemCount(state.items?.placeholders.length || 0);
           });
           setItemCount(
-            useFavoriteStore.getState().items?.placeholders?.length || 0
+            useReminderStore.getState().items?.placeholders?.length || 0
           );
           break;
         case "Monographs":
