@@ -47,7 +47,7 @@ jobs:
           ccache -p
 
       - name: Cache Pods
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: pods-cache
         with:
           path: apps/mobile/native/ios/Pods
