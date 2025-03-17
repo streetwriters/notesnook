@@ -36,19 +36,26 @@ export function initAfterSync() {
   Navigation.queueRoutesForUpdate();
   // Whenever sync completes, try to reschedule
   // any new/updated reminders.
+  useUserStore.setState({
+    profile: db.settings.getProfile()
+  });
+  initialize();
+  NotePreviewWidget.updateNotes();
+}
+
+export async function initialize() {
   Notifications.setupReminders(true);
   useRelationStore.getState().update();
   useMenuStore.getState().setColorNotes();
   useMenuStore.getState().setMenuPins();
   useMonographStore.getState().refresh();
-  useUserStore.setState({
-    profile: db.settings.getProfile()
-  });
-
-  NotePreviewWidget.updateNotes();
+  useTrashStore.getState().refresh();
+  useNotebookStore.getState().refresh();
+  useNoteStore.getState().refresh();
+  useTagStore.getState().refresh();
+  useFavoriteStore.getState().refresh();
+  useReminderStore.getState().refresh();
 }
-
-export async function initialize() {}
 
 export function clearAllStores() {
   useNotebookStore.getState().clear();
