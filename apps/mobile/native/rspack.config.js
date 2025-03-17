@@ -47,7 +47,7 @@ module.exports = (env) => {
 
   return {
     mode,
-    cache: true,
+    cache: mode === "production" ? false : true,
     experiments: {
       parallelCodeSplitting: true,
       cache: {
@@ -138,7 +138,9 @@ module.exports = (env) => {
        */
       rules: [
         ...Repack.getJsTransformRules(),
-        ...Repack.getAssetTransformRules(),
+        ...Repack.getAssetTransformRules({
+          inline: true
+        }),
         {
           test: /\.jsx?$/,
           type: 'javascript/auto',
