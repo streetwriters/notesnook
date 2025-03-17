@@ -82,7 +82,7 @@ import Notifications from "../services/notifications";
 import PremiumService from "../services/premium";
 import SettingsService from "../services/settings";
 import Sync from "../services/sync";
-import { clearAllStores, initAfterSync } from "../stores";
+import { clearAllStores, initAfterSync, initialize } from "../stores";
 import { refreshAllStores } from "../stores/create-db-collection-store";
 import { useAttachmentStore } from "../stores/use-attachment-store";
 import { useMessageStore } from "../stores/use-message-store";
@@ -393,6 +393,7 @@ const initializeDatabase = async (password?: string) => {
     try {
       await setupDatabase(password);
       await db.init();
+      initialize();
       Sync.run();
     } catch (e) {
       DatabaseLogger.error(e as Error);
