@@ -39,6 +39,7 @@ import { eCloseSheet } from "../utils/events";
 import { sleep } from "../utils/time";
 import { ToastManager, eSendEvent, presentSheet } from "./event-manager";
 import SettingsService from "./settings";
+import { getCachePathForFile } from "../common/filesystem/io";
 
 const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
@@ -259,10 +260,14 @@ async function run(
           progress: `Saving attachments in backup... ${file.hash}`
         });
         if (await FileStorage.exists(file.hash)) {
-          await RNFetchBlob.fs.cp(
-            `${cacheDir}/${file.hash}`,
-            `${attachmentsDir}/${file.hash}`
-          );
+          await RNFetchBlob.fs
+            .cp(
+              await getCachePathForFile(file.hash),
+              `${attachmentsDir}/${file.hash}`
+            )
+            .catch((e) =>
+              DatabaseLogger.error(e, "Error saving attachment to backup file")
+            );
         }
       }
     }
