@@ -1163,12 +1163,17 @@ class EditorStore extends BaseStore<EditorStore> {
     this.updateSession(id, ["default", "new"], { saveState: saveState });
   };
 
-  toggleProperties = (toggleState?: boolean) => {
+  toggleProperties = (
+    toggleState?: boolean,
+    toggleTableOfContents?: boolean
+  ) => {
     this.set((state) => {
       state.arePropertiesVisible =
         toggleState !== undefined ? toggleState : !state.arePropertiesVisible;
     });
-    this.toggleTableOfContents(false);
+    if (toggleTableOfContents !== false) {
+      this.toggleTableOfContents(false);
+    }
   };
 
   toggleTableOfContents = (toggleState?: boolean) => {
