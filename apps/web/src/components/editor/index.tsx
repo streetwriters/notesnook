@@ -382,7 +382,9 @@ function EditorView({
         }}
         options={{
           readonly: session?.type === "readonly" || session?.type === "deleted",
-          onRequestFocus: () => toggleProperties(false),
+          onRequestFocus: () => {
+            toggleProperties(false, false);
+          },
           focusMode: isFocusMode
         }}
       />
