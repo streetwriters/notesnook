@@ -18,9 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { db } from "../common/database";
+import { eSendEvent } from "../services/event-manager";
 import Navigation from "../services/navigation";
 import { NotePreviewWidget } from "../services/note-preview-widget";
 import Notifications from "../services/notifications";
+import { eAfterSync } from "../utils/events";
 import { useFavoriteStore } from "./use-favorite-store";
 import { useMenuStore } from "./use-menu-store";
 import { useMonographStore } from "./use-monograph-store";
@@ -32,30 +34,25 @@ import { useTagStore } from "./use-tag-store";
 import { useTrashStore } from "./use-trash-store";
 import { useUserStore } from "./use-user-store";
 
-export function initAfterSync() {
-  Navigation.queueRoutesForUpdate();
-  // Whenever sync completes, try to reschedule
-  // any new/updated reminders.
-  useUserStore.setState({
-    profile: db.settings.getProfile()
-  });
-  initialize();
-  NotePreviewWidget.updateNotes();
+export function initAfterSync(type: "full" | "send" = "send") {
+  if (type === "full") {
+    Navigation.queueRoutesForUpdate();
+    // Whenever sync completes, try to reschedule
+    // any new/updated reminders.
+    Notifications.setupReminders(true);
+    useRelationStore.getState().update();
+    useMenuStore.getState().setColorNotes();
+    useMenuStore.getState().setMenuPins();
+    useUserStore.setState({
+      profile: db.settings.getProfile()
+    });
+
+    NotePreviewWidget.updateNotes();
+    eSendEvent(eAfterSync);
+  }
 }
 
-export async function initialize() {
-  Notifications.setupReminders(true);
-  useRelationStore.getState().update();
-  useMenuStore.getState().setColorNotes();
-  useMenuStore.getState().setMenuPins();
-  useMonographStore.getState().refresh();
-  useTrashStore.getState().refresh();
-  useNotebookStore.getState().refresh();
-  useNoteStore.getState().refresh();
-  useTagStore.getState().refresh();
-  useFavoriteStore.getState().refresh();
-  useReminderStore.getState().refresh();
-}
+export async function initialize() {}
 
 export function clearAllStores() {
   useNotebookStore.getState().clear();
