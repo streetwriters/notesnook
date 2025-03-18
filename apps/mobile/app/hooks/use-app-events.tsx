@@ -264,7 +264,7 @@ async function checkForShareExtensionLaunchedInBackground() {
       }
       eSendEvent(refreshNotesPage);
       MMKV.removeItem("notesAddedFromIntent");
-      initAfterSync();
+      initAfterSync("full");
       eSendEvent(refreshNotesPage);
     }
 
@@ -437,7 +437,7 @@ export const useAppEvents = () => {
   >({});
 
   const onSyncComplete = useCallback(async () => {
-    initAfterSync();
+    initAfterSync(Sync.getLastSyncType() as "full" | "send");
     setLastSynced(await db.lastSynced());
     eSendEvent(eCloseSheet, "sync_progress");
   }, [setLastSynced]);

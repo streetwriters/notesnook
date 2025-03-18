@@ -23,20 +23,18 @@ import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useTotalNotes } from "../../hooks/use-db-item";
 
+import { db } from "../../common/database";
+import { eSubscribeEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
-import { useFavoriteStore } from "../../stores/use-favorite-store";
 import useNavigationStore, {
   RouteParams
 } from "../../stores/use-navigation-store";
-import { useNoteStore } from "../../stores/use-notes-store";
-import { useTrashStore } from "../../stores/use-trash-store";
+import { eAfterSync } from "../../utils/events";
 import { SideMenuItem } from "../../utils/menu-items";
-import { defaultBorderRadius, AppFontSize } from "../../utils/size";
+import { AppFontSize, defaultBorderRadius } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { Pressable } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
-import { useMonographStore } from "../../stores/use-monograph-store";
-import { useReminderStore } from "../../stores/use-reminder-store";
 
 function _MenuItem({
   item,
@@ -65,57 +63,37 @@ function _MenuItem({
     : totalNotes.totalNotes(item.data.id);
 
   useEffect(() => {
-    let unsub: () => void;
-    if (!item.data) {
-      switch (item.id) {
-        case "Notes":
-          unsub = useNoteStore.subscribe((state) => {
-            setItemCount(
-              useNoteStore.getState().items?.placeholders?.length || 0
-            );
-          });
-          setItemCount(
-            useNoteStore.getState().items?.placeholders?.length || 0
-          );
-          break;
-        case "Favorites":
-          unsub = useFavoriteStore.subscribe((state) => {
-            setItemCount(state.items?.placeholders.length || 0);
-          });
-          setItemCount(
-            useFavoriteStore.getState().items?.placeholders?.length || 0
-          );
-          break;
-        case "Reminders":
-          unsub = useReminderStore.subscribe((state) => {
-            setItemCount(state.items?.placeholders.length || 0);
-          });
-          setItemCount(
-            useReminderStore.getState().items?.placeholders?.length || 0
-          );
-          break;
-        case "Monographs":
-          unsub = useMonographStore.subscribe((state) => {
-            setItemCount(state.items?.placeholders.length || 0);
-          });
-          setItemCount(
-            useMonographStore.getState().items?.placeholders?.length || 0
-          );
-          break;
-        case "Trash":
-          unsub = useTrashStore.subscribe((state) => {
-            setItemCount(state.items?.placeholders.length || 0);
-          });
-          setItemCount(
-            useTrashStore.getState().items?.placeholders?.length || 0
-          );
-          break;
+    const onSyncComplete = async () => {
+      try {
+        if (!item.data) {
+          switch (item.id) {
+            case "Notes":
+              setItemCount(await db.notes.all.count());
+              break;
+            case "Favorites":
+              setItemCount(await db.notes.favorites.count());
+              break;
+            case "Reminders":
+              setItemCount(await db.reminders.all.count());
+              break;
+            case "Monographs":
+              setItemCount(await db.monographs.all.count());
+              break;
+            case "Trash":
+              setItemCount((await db.trash.all()).length);
+              break;
+          }
+        } else {
+          getTotalNotesRef.current?.([item.data.id]);
+        }
+      } catch (e) {
+        /** Empty */
       }
-    } else {
-      getTotalNotesRef.current?.([item.data.id]);
-    }
+    };
+    const event = eSubscribeEvent(eAfterSync, onSyncComplete);
+    onSyncComplete();
     return () => {
-      unsub?.();
+      event?.unsubscribe();
     };
   }, [item.data, item.id]);
 
