@@ -904,7 +904,7 @@ msgstr "Atleast 8 characters required"
 msgid "Attach image from URL"
 msgstr "Attach image from URL"
 
-#: src/strings.ts:900
+#: src/strings.ts:899
 msgid "Attached files"
 msgstr "Attached files"
 
@@ -3988,7 +3988,7 @@ msgstr "notebook"
 msgid "Notebook"
 msgstr "Notebook"
 
-#: src/strings.ts:2453
+#: src/strings.ts:2456
 msgid "Notebook added"
 msgstr "Notebook added"
 
