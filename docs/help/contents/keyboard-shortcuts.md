@@ -2,72 +2,79 @@
 title: Keyboard Shortcuts
 description: Keyboard shortcuts for Notesnook
 ---
+
 The following keyboard shortcuts will help you navigate Notesnook faster.
+
 ### Navigation
-| Description | Shortcut |
-| --- | --- |
-| Next tab | {"web":["ctrl+alt+right","ctrl+alt+shift+right"],"desktop":["ctrl+tab","command+tab"]} |
-| Previous tab | {"web":["ctrl+alt+left","ctrl+alt+shift+left"],"desktop":["ctrl+shift+tab","command+shift+tab"]} |
-| New tab | {"desktop":["ctrl+t","command+t"]} |
-| Close active tab | {"desktop":["ctrl+w","command+w"]} |
-| Close all tabs | {"desktop":["ctrl+shift+w","command+shift+w"]} |
-| Search in notes list view if editor is not focused | ctrl+f, command+f |
-| Command palette | ctrl+k, command+k |
-| Quick open | ctrl+p, ctrl+p |
+
+| Description | Web | Windows/Linux | Mac |
+| --- | --- | --- | --- |
+| Next tab | Ctrl Alt right / Ctrl Alt Shift right | Ctrl tab | Command tab |
+| Previous tab | Ctrl Alt left / Ctrl Alt Shift left | Ctrl Shift tab | Command Shift tab |
+| New tab | - | Ctrl t | Command t |
+| Close active tab | - | Ctrl w | Command w |
+| Close all tabs | - | Ctrl Shift w | Command Shift w |
+| Search in notes list view if editor is not focused | Ctrl f | Ctrl f | Command f |
+| Command palette | Ctrl k | Ctrl k | Command k |
+| Quick open | Ctrl p | Ctrl p | Command p |
 
 ### Note
-| Description | Shortcut |
-| --- | --- |
-| New note | {"desktop":["ctrl+n","command+n"]} |
+
+| Description | Web | Windows/Linux | Mac |
+| --- | --- | --- | --- |
+| New note | - | Ctrl n | Command n |
 
 ### General
-| Description | Shortcut |
-| --- | --- |
-| Keyboard shortcuts | ctrl+/ |
+
+| Description | Web | Windows/Linux | Mac |
+| --- | --- | --- | --- |
+| Settings | Ctrl , | Ctrl , | Command , |
+| Keyboard shortcuts | Ctrl / | Ctrl / | Command / |
 
 ### Editor
-| Description | Shortcut |
-| --- | --- |
-| Add attachment | Mod-Shift-A |
-| Insert blockquote | Mod-Shift-B |
-| Toggle bold | Mod-b |
-| Toggle bullet list | Mod-Shift-8 |
-| Toggle check list | Mod-Shift-9 |
-| Split list item | Enter |
-| Lift list item | Shift-Tab |
-| Sink list item | Mod-Shift-Down |
-| Toggle code | Mod-e |
-| Toggle code block | Mod-Shift-C |
-| Insert date | Alt-d |
-| Insert time | Alt-t |
-| Insert date and time | Mod-Alt-d |
-| Insert date and time with timezone | Mod-Alt-z |
-| Increase font size | Ctrl-[ |
-| Decrease font size | Ctrl-] |
-| Insert heading 1 | Mod-Alt-1 |
-| Insert heading 2 | Mod-Alt-2 |
-| Insert heading 3 | Mod-Alt-3 |
-| Insert heading 4 | Mod-Alt-4 |
-| Insert heading 5 | Mod-Alt-5 |
-| Insert heading 6 | Mod-Alt-6 |
-| Undo | Mod-z |
-| Redo | Mod-Shift-z, Mod-y |
-| Add image | Mod-Shift-I |
-| Toggle italic | Mod-i |
-| Remove formatting in selection | Mod-\ |
-| Insert internal link | Mod-Shift-L |
-| Insert link | Mod-Shift-K |
-| Insert math block | Mod-Shift-M |
-| Toggle ordered list | Mod-Shift-7 |
-| Toggle outline list | Mod-Shift-O |
-| Toggle outline list expand | Mod-Space |
-| Open search | Mod-F |
-| Toggle strike | Mod-Shift-S |
-| Toggle subscript | Mod-, |
-| Toggle superscript | Mod-. |
-| Toggle task list | Mod-Shift-T |
-| Text align center | Mod-Shift-E |
-| Text align justify | Mod-Shift-J |
-| Text align left | Mod-Shift-L |
-| Text align right | Mod-Shift-R |
-| Underline | Mod-u |
+
+| Description | Web | Windows/Linux | Mac |
+| --- | --- | --- | --- |
+| Add attachment | Ctrl Shift A | Ctrl Shift A | Command Shift A |
+| Insert blockquote | Ctrl Shift B | Ctrl Shift B | Command Shift B |
+| Toggle bold | Ctrl b | Ctrl b | Command b |
+| Toggle bullet list | Ctrl Shift 8 | Ctrl Shift 8 | Command Shift 8 |
+| Toggle check list | Ctrl Shift 9 | Ctrl Shift 9 | Command Shift 9 |
+| Split list item | Enter | Enter | Enter |
+| Lift list item | Shift Tab | Shift Tab | Shift Tab |
+| Sink list item | Ctrl Shift Down | Ctrl Shift Down | Command Shift Down |
+| Toggle code | Ctrl e | Ctrl e | Command e |
+| Toggle code block | Ctrl Shift C | Ctrl Shift C | Command Shift C |
+| Insert date | Alt d | Alt d | Option d |
+| Insert time | Alt t | Alt t | Option t |
+| Insert date and time | Ctrl Alt d | Ctrl Alt d | Command Option d |
+| Insert date and time with timezone | Ctrl Alt z | Ctrl Alt z | Command Option z |
+| Increase font size | Ctrl [ | Ctrl [ | Command [ |
+| Decrease font size | Ctrl ] | Ctrl ] | Command ] |
+| Insert heading 1 | Ctrl Alt 1 | Ctrl Alt 1 | Command Option 1 |
+| Insert heading 2 | Ctrl Alt 2 | Ctrl Alt 2 | Command Option 2 |
+| Insert heading 3 | Ctrl Alt 3 | Ctrl Alt 3 | Command Option 3 |
+| Insert heading 4 | Ctrl Alt 4 | Ctrl Alt 4 | Command Option 4 |
+| Insert heading 5 | Ctrl Alt 5 | Ctrl Alt 5 | Command Option 5 |
+| Insert heading 6 | Ctrl Alt 6 | Ctrl Alt 6 | Command Option 6 |
+| Undo | Ctrl z | Ctrl z | Command z |
+| Redo | Ctrl Shift z / Ctrl y | Ctrl Shift z / Ctrl y | Command Shift z / Command y |
+| Add image | Ctrl Shift I | Ctrl Shift I | Command Shift I |
+| Toggle italic | Ctrl i | Ctrl i | Command i |
+| Remove formatting in selection | Ctrl \ | Ctrl \ | Command \ |
+| Insert internal link | Ctrl Shift L | Ctrl Shift L | Command Shift L |
+| Insert link | Ctrl Shift K | Ctrl Shift K | Command Shift K |
+| Insert math block | Ctrl Shift M | Ctrl Shift M | Command Shift M |
+| Toggle ordered list | Ctrl Shift 7 | Ctrl Shift 7 | Command Shift 7 |
+| Toggle outline list | Ctrl Shift O | Ctrl Shift O | Command Shift O |
+| Toggle outline list expand | Ctrl Space | Ctrl Space | Command Space |
+| Open search | Ctrl F | Ctrl F | Command F |
+| Toggle strike | Ctrl Shift S | Ctrl Shift S | Command Shift S |
+| Toggle subscript | Ctrl , | Ctrl , | Command , |
+| Toggle superscript | Ctrl . | Ctrl . | Command . |
+| Toggle task list | Ctrl Shift T | Ctrl Shift T | Command Shift T |
+| Text align center | Ctrl Shift E | Ctrl Shift E | Command Shift E |
+| Text align justify | Ctrl Shift J | Ctrl Shift J | Command Shift J |
+| Text align left | Ctrl Shift L | Ctrl Shift L | Command Shift L |
+| Text align right | Ctrl Shift R | Ctrl Shift R | Command Shift R |
+| Underline | Ctrl u | Ctrl u | Command u |

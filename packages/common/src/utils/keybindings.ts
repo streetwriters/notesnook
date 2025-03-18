@@ -388,14 +388,19 @@ function macify(key: string) {
     .replace(/mod/gi, "Command");
 }
 
+function isMacKey(key: string) {
+  return key.match(/Command|Option/gi);
+}
+
 export function formatKey(key: string) {
   return key
-    .replaceAll("+", " ")
-    .replaceAll("command", "Command")
-    .replace("ctrl", "Ctrl")
-    .replace("shift", "Shift")
-    .replace("alt", "Alt")
-    .replace("Mod", "Ctrl");
+    .replace(/\+|-/g, " ")
+    .replace(/\bcommand\b/gi, "Command")
+    .replace(/\bctrl\b/gi, "Ctrl")
+    .replace(/\bshift\b/gi, "Shift")
+    .replace(/\balt\b/gi, "Alt")
+    .replace(/\bmod\b/gi, "Ctrl")
+    .trim();
 }
 
 export function getGroupedKeybindings(isDesktop: boolean) {
@@ -421,4 +426,58 @@ export function getGroupedKeybindings(isDesktop: boolean) {
   }
 
   return grouped;
+}
+
+export function getGroupedTableKeybindingsMarkdown(): string {
+  const desktopKeybindings = getGroupedKeybindings(true);
+  const webKeybindings = getGroupedKeybindings(false);
+
+  const header = `| Description | Web | Windows/Linux | Mac |
+| --- | --- | --- | --- |`;
+
+  return Object.keys({ ...webKeybindings, ...desktopKeybindings })
+    .map((category) => {
+      const webShortcuts =
+        webKeybindings[category].map((s) => ({
+          ...s,
+          keys: s.keys.filter((k) => !isMacKey(k))
+        })) || [];
+      const desktopShortcuts =
+        desktopKeybindings[category].map((s) => ({
+          ...s,
+          keys: s.keys.filter((k) => !isMacKey(k))
+        })) || [];
+
+      const mergedShortcuts: Record<
+        string,
+        { web?: string[]; desktop?: string[] }
+      > = {};
+
+      webShortcuts.forEach(({ description, keys }) => {
+        if (!mergedShortcuts[description]) {
+          mergedShortcuts[description] = {};
+        }
+        mergedShortcuts[description].web = keys.map(formatKey);
+      });
+      desktopShortcuts.forEach(({ description, keys }) => {
+        if (!mergedShortcuts[description]) {
+          mergedShortcuts[description] = {};
+        }
+        mergedShortcuts[description].desktop = keys.map(formatKey);
+      });
+
+      const rows = Object.entries(mergedShortcuts)
+        .map(([description, { web, desktop }]) => {
+          const webKeys = web?.join(" / ") || "-";
+          const windowsLinuxKeys = desktop?.join(" / ") || "-";
+          const macKeys =
+            desktop?.map(macify).map(formatKey).join(" / ") || "-";
+
+          return `| ${description} | ${webKeys} | ${windowsLinuxKeys} | ${macKeys} |`;
+        })
+        .join("\n");
+
+      return `### ${category}\n\n${header}\n${rows}`;
+    })
+    .join("\n\n");
 }

@@ -17,22 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { getGroupedKeybindings } from "@notesnook/common";
+import { getGroupedKeybindings, formatKey } from "@notesnook/common";
 import { Flex, Text } from "@theme-ui/components";
 import { DialogManager } from "../common/dialog-manager";
 import Dialog from "../components/dialog";
 
 const groupedKeybindings = getGroupedKeybindings(IS_DESKTOP_APP);
-
-function formatKey(key: string) {
-  return key
-    .replaceAll("+", " ")
-    .replaceAll("command", "Command")
-    .replace("ctrl", "Ctrl")
-    .replace("shift", "Shift")
-    .replace("alt", "Alt")
-    .replace("Mod", "Ctrl");
-}
 
 export const KeyboardShortcutsDialog = DialogManager.register(
   function KeyboardShortcutsDialog(props) {
@@ -43,7 +33,13 @@ export const KeyboardShortcutsDialog = DialogManager.register(
         width={750}
         onClose={() => props.onClose(false)}
       >
-        <Flex sx={{ flexDirection: "column", flexWrap: "nowrap", height: 650 }}>
+        <Flex
+          sx={{
+            flexDirection: "column",
+            flexWrap: "nowrap",
+            height: 650
+          }}
+        >
           {Object.entries(groupedKeybindings).map(([group, shortcuts]) => {
             if (
               shortcuts.length === 0 ||
@@ -69,27 +65,18 @@ export const KeyboardShortcutsDialog = DialogManager.register(
                       >
                         {shortcut.description}
                       </Text>
-                      {shortcut.keys.map((k, i) => (
-                        <>
-                          {formatKey(k)
-                            .split(" ")
-                            .map((k) => (
-                              <kbd
-                                style={{
-                                  margin: "0 1px",
-                                  background: "var(--background-secondary)",
-                                  fontSize: "0.9em",
-                                  fontWeight: "bold"
-                                }}
-                              >
-                                {k}
-                              </kbd>
-                            ))}
-                          {shortcut.keys.length - 1 !== i && (
-                            <Text sx={{ mx: 1 }}>/</Text>
-                          )}
-                        </>
-                      ))}
+                      <Text as="p" sx={{ fontSize: "0.9em", maxWidth: 200 }}>
+                        {shortcut.keys.map((k, i) => (
+                          <>
+                            <Keys keys={formatKey(k)} />
+                            {shortcut.keys.length - 1 !== i && (
+                              <Text as="span" sx={{ mx: 1, fontSize: "0.8em" }}>
+                                /
+                              </Text>
+                            )}
+                          </>
+                        ))}
+                      </Text>
                     </Flex>
                   );
                 })}
@@ -101,3 +88,18 @@ export const KeyboardShortcutsDialog = DialogManager.register(
     );
   }
 );
+
+function Keys({ keys }: { keys: string }) {
+  return keys.split(" ").map((k) => (
+    <kbd
+      style={{
+        margin: "0 1px",
+        background: "var(--background-secondary)",
+        fontSize: "0.9em",
+        fontWeight: "bold"
+      }}
+    >
+      {k}
+    </kbd>
+  ));
+}
