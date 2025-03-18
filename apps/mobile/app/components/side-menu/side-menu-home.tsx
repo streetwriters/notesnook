@@ -18,8 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import React from "react";
-import { View } from "react-native";
+import React, { Fragment } from "react";
+import { FlatList, View } from "react-native";
 import { DraxProvider, DraxScrollView } from "react-native-drax";
 import { db } from "../../common/database";
 import { useMenuStore } from "../../stores/use-menu-store";
@@ -74,50 +74,55 @@ export function SideMenuHome() {
 
       {!isAppLoading && introCompleted ? (
         <DraxProvider>
-          <DraxScrollView
-            nestedScrollEnabled={false}
+          <FlatList
+            renderScrollComponent={(props) => <DraxScrollView {...props} />}
+            data={[0]}
+            keyboardDismissMode="interactive"
+            keyboardShouldPersistTaps="handled"
+            keyExtractor={() => "scroll-items"}
+            renderItem={() => (
+              <>
+                <ReorderableList
+                  onListOrderChanged={(data) => {
+                    db.settings.setSideBarOrder("routes", data);
+                  }}
+                  onHiddenItemsChanged={(data) => {
+                    db.settings.setSideBarHiddenItems("routes", data);
+                  }}
+                  itemOrder={order}
+                  hiddenItems={hiddensItems}
+                  alwaysBounceVertical={false}
+                  data={MenuItemsList}
+                  style={{
+                    width: "100%"
+                  }}
+                  showsVerticalScrollIndicator={false}
+                  renderDraggableItem={({ item, index }) => {
+                    return (
+                      <MenuItem
+                        key={item.title}
+                        item={{
+                          ...item,
+                          title:
+                            strings.routes[
+                              item.title as keyof typeof strings.routes
+                            ]?.() || item.title
+                        }}
+                        testID={item.title}
+                        index={index}
+                      />
+                    );
+                  }}
+                />
+                <ColorSection />
+                <PinnedSection />
+              </>
+            )}
             style={{
               paddingHorizontal: DefaultAppStyles.GAP
             }}
-          >
-            <ReorderableList
-              onListOrderChanged={(data) => {
-                db.settings.setSideBarOrder("routes", data);
-              }}
-              onHiddenItemsChanged={(data) => {
-                db.settings.setSideBarHiddenItems("routes", data);
-              }}
-              itemOrder={order}
-              hiddenItems={hiddensItems}
-              alwaysBounceVertical={false}
-              data={MenuItemsList}
-              style={{
-                width: "100%"
-              }}
-              contentContainerStyle={{
-                gap: 2
-              }}
-              showsVerticalScrollIndicator={false}
-              renderDraggableItem={({ item, index }) => {
-                return (
-                  <MenuItem
-                    key={item.title}
-                    item={{
-                      ...item,
-                      title:
-                        strings.routes[
-                          item.title as keyof typeof strings.routes
-                        ]?.() || item.title
-                    }}
-                    testID={item.title}
-                    index={index}
-                  />
-                );
-              }}
-            />
-            <ColorSection />
-            <PinnedSection />
-          </DraxScrollView>
+            nestedScrollEnabled={false}
+          />
         </DraxProvider>
       ) : null}
 
