@@ -27,6 +27,7 @@ import {
 import { createNodeView } from "../react/index.js";
 import { TextDirections } from "../text-direction/index.js";
 import { ImageComponent } from "./component.js";
+import { tiptapKeys } from "@notesnook/common";
 
 export interface ImageOptions {
   inline: boolean;
@@ -199,7 +200,7 @@ export const ImageNode = Node.create<ImageOptions>({
 
   addKeyboardShortcuts() {
     return {
-      "Mod-Shift-I": () =>
+      [tiptapKeys.addImage.keys]: () =>
         this.editor.storage.openAttachmentPicker?.("image") || true
     };
   }

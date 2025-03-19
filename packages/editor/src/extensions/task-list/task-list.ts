@@ -40,6 +40,7 @@ import {
 import { Node as ProsemirrorNode } from "@tiptap/pm/model";
 import { TaskItemNode } from "../task-item/index.js";
 import { ListItem } from "../list-item/list-item.js";
+import { tiptapKeys } from "@notesnook/common";
 
 type TaskListStats = { checked: number; total: number };
 export type TaskListAttributes = {
@@ -368,7 +369,8 @@ export const TaskListNode = TaskList.extend({
 
   addKeyboardShortcuts() {
     return {
-      "Mod-Shift-T": () => this.editor.commands.toggleTaskList()
+      [tiptapKeys.toggleTaskList.keys]: () =>
+        this.editor.commands.toggleTaskList()
     };
   }
 });

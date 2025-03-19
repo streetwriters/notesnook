@@ -23,7 +23,7 @@ import {
   InputRuleFinder,
   ExtendedRegExpMatchArray
 } from "@tiptap/core";
-import { formatDate } from "@notesnook/common";
+import { formatDate, tiptapKeys } from "@notesnook/common";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -67,10 +67,14 @@ export const DateTime = Extension.create<DateTimeOptions>({
 
   addKeyboardShortcuts() {
     return {
-      "Alt-t": ({ editor }) => editor.commands.insertTime(),
-      "Alt-d": ({ editor }) => editor.commands.insertDate(),
-      "Mod-Alt-d": ({ editor }) => editor.commands.insertDateTime(),
-      "Mod-Alt-z": ({ editor }) => editor.commands.insertDateTimeWithTimeZone()
+      [tiptapKeys.insertTime.keys]: ({ editor }) =>
+        editor.commands.insertTime(),
+      [tiptapKeys.insertDate.keys]: ({ editor }) =>
+        editor.commands.insertDate(),
+      [tiptapKeys.insertDateTime.keys]: ({ editor }) =>
+        editor.commands.insertDateTime(),
+      [tiptapKeys.insertDateTimeWithTimezone.keys]: ({ editor }) =>
+        editor.commands.insertDateTimeWithTimeZone()
     };
   },
 
