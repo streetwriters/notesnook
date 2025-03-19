@@ -27,6 +27,7 @@ import {
   TextSelection
 } from "prosemirror-state";
 import { SearchSettings } from "../../toolbar/stores/search-store.js";
+import { tiptapKeys } from "@notesnook/common";
 
 type DispatchFn = (tr: Transaction) => void;
 declare module "@tiptap/core" {
@@ -354,7 +355,8 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
 
   addKeyboardShortcuts() {
     return {
-      "Mod-f": ({ editor }) => editor.commands.startSearch(),
+      [tiptapKeys.openSearch.keys]: ({ editor }) =>
+        editor.commands.startSearch(),
       Escape: ({ editor }) => editor.commands.endSearch()
     };
   },

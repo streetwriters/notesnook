@@ -36,6 +36,7 @@ import stripIndent from "strip-indent";
 import { nanoid } from "nanoid";
 import Languages from "./languages.json";
 import { CaretPosition, CodeLine } from "./utils.js";
+import { tiptapKeys } from "@notesnook/common";
 
 interface Indent {
   type: "tab" | "space";
@@ -292,7 +293,8 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
 
   addKeyboardShortcuts() {
     return {
-      "Mod-Shift-C": () => this.editor.commands.toggleCodeBlock(),
+      [tiptapKeys.toggleCodeBlock.keys]: () =>
+        this.editor.commands.toggleCodeBlock(),
       "Mod-a": ({ editor }) => {
         const { $anchor } = this.editor.state.selection;
         if ($anchor.parent.type.name !== this.name) {
