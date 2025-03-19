@@ -17,12 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { getGroupedKeybindings, formatKey } from "@notesnook/common";
+import { formatKey, getGroupedKeybindings } from "@notesnook/common";
 import { Flex, Text } from "@theme-ui/components";
 import { DialogManager } from "../common/dialog-manager";
 import Dialog from "../components/dialog";
+import { isMac } from "../utils/platform";
 
-const groupedKeybindings = getGroupedKeybindings(IS_DESKTOP_APP);
+const groupedKeybindings = getGroupedKeybindings(IS_DESKTOP_APP, isMac());
 
 export const KeyboardShortcutsDialog = DialogManager.register(
   function KeyboardShortcutsDialog(props) {
@@ -44,8 +45,9 @@ export const KeyboardShortcutsDialog = DialogManager.register(
             if (
               shortcuts.length === 0 ||
               shortcuts.every((s) => s.keys.length === 0)
-            )
+            ) {
               return null;
+            }
             return (
               <Flex key={group} sx={{ flexDirection: "column", mb: 2 }}>
                 <Text sx={{ mt: 1, fontWeight: "bold" }}>{group}</Text>
@@ -58,14 +60,23 @@ export const KeyboardShortcutsDialog = DialogManager.register(
                 {shortcuts.map((shortcut) => {
                   if (shortcut.keys.length === 0) return null;
                   return (
-                    <Flex key={shortcut.description} sx={{ mb: 2 }}>
+                    <Flex
+                      key={shortcut.description}
+                      sx={{
+                        mb: 2,
+                        flexDirection: "row",
+                        justifyContent: "space-between"
+                      }}
+                    >
                       <Text
                         variant="subtitle"
-                        sx={{ flex: 1, fontWeight: "normal" }}
+                        sx={{
+                          fontWeight: "normal"
+                        }}
                       >
                         {shortcut.description}
                       </Text>
-                      <Text as="p" sx={{ fontSize: "0.9em", maxWidth: 200 }}>
+                      <Text as="p">
                         {shortcut.keys.map((k, i) => (
                           <>
                             <Keys keys={formatKey(k)} />
@@ -95,7 +106,7 @@ function Keys({ keys }: { keys: string }) {
       style={{
         margin: "0 1px",
         background: "var(--background-secondary)",
-        fontSize: "0.9em",
+        fontSize: "0.8em",
         fontWeight: "bold"
       }}
     >

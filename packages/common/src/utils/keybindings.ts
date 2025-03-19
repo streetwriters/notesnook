@@ -69,7 +69,7 @@ export const hotkeys = {
   searchInNotes: {
     keys: normalizeKeys(["ctrl+f"]),
     description: "Search in notes list view if editor is not focused",
-    category: "Navigation",
+    category: "General",
     type: "hotkeys"
   },
   openCommandPalette: {
@@ -377,7 +377,7 @@ function normalizeKeys(
     } else {
       keyList = isDesktop ? keys.desktop ?? [] : keys.web ?? [];
     }
-    return keyList.concat(keyList.map(macify));
+    return keyList;
   };
 }
 
@@ -386,10 +386,6 @@ function macify(key: string) {
     .replace(/ctrl/gi, "Command")
     .replace(/alt/gi, "Option")
     .replace(/mod/gi, "Command");
-}
-
-function isMacKey(key: string) {
-  return key.match(/Command|Option/gi);
 }
 
 export function formatKey(key: string) {
@@ -403,17 +399,20 @@ export function formatKey(key: string) {
     .trim();
 }
 
-export function getGroupedKeybindings(isDesktop: boolean) {
+export function getGroupedKeybindings(isDesktop: boolean, isMac: boolean) {
   const grouped: Record<string, { keys: string[]; description: string }[]> = {};
 
   const allKeybindings = { ...hotkeys, ...tiptapKeys };
 
   for (const key in allKeybindings) {
     const binding = allKeybindings[key as keyof typeof allKeybindings];
-    const keys =
+    let keys =
       typeof binding.keys === "function"
         ? binding.keys(isDesktop)
         : binding.keys;
+    if (isMac) {
+      keys = Array.isArray(keys) ? keys.map(macify) : macify(keys);
+    }
 
     if (!grouped[binding.category]) {
       grouped[binding.category] = [];
@@ -429,24 +428,16 @@ export function getGroupedKeybindings(isDesktop: boolean) {
 }
 
 export function getGroupedTableKeybindingsMarkdown(): string {
-  const desktopKeybindings = getGroupedKeybindings(true);
-  const webKeybindings = getGroupedKeybindings(false);
+  const desktopKeybindings = getGroupedKeybindings(true, false);
+  const webKeybindings = getGroupedKeybindings(false, false);
 
   const header = `| Description | Web | Windows/Linux | Mac |
 | --- | --- | --- | --- |`;
 
   return Object.keys({ ...webKeybindings, ...desktopKeybindings })
     .map((category) => {
-      const webShortcuts =
-        webKeybindings[category].map((s) => ({
-          ...s,
-          keys: s.keys.filter((k) => !isMacKey(k))
-        })) || [];
-      const desktopShortcuts =
-        desktopKeybindings[category].map((s) => ({
-          ...s,
-          keys: s.keys.filter((k) => !isMacKey(k))
-        })) || [];
+      const webShortcuts = webKeybindings[category] || [];
+      const desktopShortcuts = desktopKeybindings[category] || [];
 
       const mergedShortcuts: Record<
         string,
