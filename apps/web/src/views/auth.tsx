@@ -460,7 +460,7 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
       subtitle={
         <Flex bg="shade" p={1} sx={{ borderRadius: "default" }}>
           <Text as="span" sx={{ fontSize: "body", color: "accent" }}>
-            {strings.sessionExpiredDesc(user?.email as string)}
+            {strings.sessionExpiredDesc(user ? maskEmail(user.email) : "")}
           </Text>
         </Flex>
       }
