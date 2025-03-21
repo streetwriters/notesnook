@@ -87,17 +87,40 @@ export const InlineTag = Node.create({
     return {
       Backspace: () => {
         const { selection } = this.editor.state;
-        const { empty, $anchor } = selection;
+        const { $anchor, $from, empty } = selection;
 
-        if (!empty) return false;
-
+        // when cursor is right at the end of the inline tag
         const nodeBefore = $anchor.nodeBefore;
-        if (nodeBefore && nodeBefore.type.name === "inlineTag") {
+        if (empty && nodeBefore && nodeBefore.type.name === "inlineTag") {
           const tagText = nodeBefore.attrs.tag;
-
           if (typeof tagText === "string") {
             this.editor.storage.removeTag?.(tagText);
             return false;
+          }
+        }
+
+        // when the inline tag is selected/focused
+        const nodeAfter = $from.nodeAfter;
+        if (!empty && nodeAfter && nodeAfter.type.name === "inlineTag") {
+          const tagText = nodeAfter.attrs.tag;
+          if (typeof tagText === "string") {
+            this.editor.storage.removeTag?.(tagText);
+            return false;
+          }
+        }
+
+        return false;
+      },
+      Enter: () => {
+        const { selection } = this.editor.state;
+        const { $from } = selection;
+
+        const node = $from.nodeAfter;
+        if (node && node.type.name === "inlineTag") {
+          const tagText = node.attrs.tag;
+          if (typeof tagText === "string") {
+            this.editor.storage.openTag?.(tagText);
+            return true;
           }
         }
 
@@ -115,11 +138,10 @@ export const InlineTag = Node.create({
         props: {
           handleClick(view, pos) {
             const { doc } = view.state;
-            const node = doc.nodeAt(pos);
 
+            const node = doc.nodeAt(pos);
             if (node && node.type.name === "inlineTag") {
               const tagText = node.attrs.tag;
-
               if (typeof tagText === "string") {
                 openTag?.(tagText);
                 return true;

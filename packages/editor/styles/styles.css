@@ -24,7 +24,7 @@
   outline: 1px solid var(--border);
   padding: 0px 2px;
   margin: 0px 1px;
-  border-radius: 6px;
+  border-radius: 3px;
 }
 
 .ProseMirror span.inline-tag.ProseMirror-selectednode {
