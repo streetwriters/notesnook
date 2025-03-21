@@ -19,6 +19,24 @@
   font-family: inherit;
 }
 
+.ProseMirror span.inline-tag {
+  background-color: var(--background-secondary);
+  outline: 1px solid var(--border);
+  padding: 0px 2px;
+  margin: 0px 1px;
+  border-radius: 3px;
+}
+
+.ProseMirror span.inline-tag.ProseMirror-selectednode {
+  filter: brightness(90%);
+  outline: 2px solid var(--accent)
+}
+
+.ProseMirror span.inline-tag:hover {
+  cursor: pointer;
+  filter: brightness(90%);
+}
+
 .ProseMirror p.is-editor-empty::before {
   color: var(--placeholder);
   content: attr(data-placeholder);
