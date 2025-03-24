@@ -123,10 +123,10 @@ function init() {
     scale.fontScale = settings.fontScale;
   }
 
-  setTimeout(() => setPrivacyScreen(settings), 1);
   updateSize();
   useSettingStore.getState().setSettings({ ...settings });
   migrateAppLock();
+  setPrivacyScreen(settings);
 }
 
 function setPrivacyScreen(settings: SettingStore["settings"]) {
