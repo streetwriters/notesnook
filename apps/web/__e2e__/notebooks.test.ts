@@ -333,9 +333,7 @@ test("when default notebook is set, created note in tags context should go to de
 
 test("when default notebook is set, created note in colors context should go to default notebook", async ({
   page
-}, info) => {
-  info.setTimeout(2 * 60 * 1000);
-
+}) => {
   const coloredNote = { title: "Red note", content: NOTE.content };
   const app = new AppModel(page);
   await app.goto();
@@ -345,7 +343,7 @@ test("when default notebook is set, created note in colors context should go to 
 
   const notes = await app.goToNotes();
   const note = await notes.createNote(NOTE);
-  await note?.contextMenu.newColor(coloredNote);
+  await note?.contextMenu.newColor({ color: "#ff0000", title: "red" });
   const color = await app.goToColor("red");
   await color?.createNote(coloredNote);
   notebooks = await app.goToNotebooks();

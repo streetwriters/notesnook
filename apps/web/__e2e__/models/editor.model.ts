@@ -97,8 +97,8 @@ export class EditorModel {
     await this.searchButton.isDisabled();
     await this.page
       .locator(".active")
-      .locator(getTestId("tags"))
-      .waitFor({ state: "hidden" });
+      .locator(getTestId("editor-tag-input"))
+      .isDisabled();
     await this.dateEditedText.waitFor({ state: "hidden" });
     await this.wordCountText.waitFor();
     await this.waitForLoading("", "");
@@ -113,7 +113,7 @@ export class EditorModel {
 
   async isUnloaded() {
     return (
-      (await this.tagInput.isHidden()) &&
+      (await this.tagInput.isDisabled()) &&
       (await this.enterFullscreenButton.isHidden()) &&
       (await this.dateEditedText.isHidden())
     );
