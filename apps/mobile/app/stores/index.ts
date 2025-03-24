@@ -39,17 +39,16 @@ export function initAfterSync(type: "full" | "send" = "send") {
     Navigation.queueRoutesForUpdate();
     // Whenever sync completes, try to reschedule
     // any new/updated reminders.
-    Notifications.setupReminders(true);
     useRelationStore.getState().update();
     useMenuStore.getState().setColorNotes();
     useMenuStore.getState().setMenuPins();
     useUserStore.setState({
       profile: db.settings.getProfile()
     });
-
-    NotePreviewWidget.updateNotes();
     eSendEvent(eAfterSync);
   }
+  Notifications.setupReminders(true);
+  NotePreviewWidget.updateNotes();
 }
 
 export async function initialize() {}
