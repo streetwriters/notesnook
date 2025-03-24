@@ -141,6 +141,7 @@ const onBoot = async () => {
     if (SettingsService.get().notifNotes) {
       Notifications.pinQuickNote(false);
     }
+    Notifications.restorePinnedNotes();
     DatabaseLogger.info("BOOT TASK COMPLETE");
   } catch (e) {
     DatabaseLogger.error(e as Error);

@@ -651,17 +651,8 @@ export const useActions = ({
         });
         return;
       }
-      const text = await convertNoteToText(item as Note, true);
-      const html = (text || "").replace(/\n/g, "<br />");
-      await Notifications.displayNotification({
-        title: (item as Note).title,
-        message: (item as Note).headline || text || "",
-        subtitle: "",
-        bigText: html,
-        ongoing: true,
-        actions: ["UNPIN"],
-        id: item.id
-      });
+
+      Notifications.pinNote(item.id);
       await Notifications.get();
       setNotifPinned(isNotePinnedInNotifications(item));
     }
