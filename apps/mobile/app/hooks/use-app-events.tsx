@@ -410,6 +410,7 @@ const initializeDatabase = async (password?: string) => {
       Notifications.pinQuickNote(false);
     }
     DatabaseLogger.info("Database initialized");
+    Notifications.restorePinnedNotes();
   }
   Walkthrough.init();
 };
