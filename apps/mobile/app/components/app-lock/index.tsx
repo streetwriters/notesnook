@@ -289,6 +289,14 @@ const AppLocked = () => {
                 keyboardType={
                   appLockHasPasswordSecurity ? keyboardType : "default"
                 }
+                onLayout={async () => {
+                  if (
+                    !biometricsAuthEnabled ||
+                    !(await BiometricService.isBiometryAvailable())
+                  ) {
+                    passwordInputRef.current?.focus();
+                  }
+                }}
                 placeholder={
                   appLockHasPasswordSecurity
                     ? keyboardType === "numeric"
