@@ -41,6 +41,9 @@ import {
 import { NetworkCheck } from "../utils/network-check";
 import { Color, Notebook, Tag } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
+import { useEditorStore } from "./editor-store";
+import { useEditorManager } from "../components/editor/manager";
+import { exitFullscreen } from "../utils/fullscreen";
 
 type SyncState =
   | "synced"
@@ -171,6 +174,10 @@ class AppStore extends BaseStore<AppStore> {
 
   toggleFocusMode = () => {
     this.set((state) => (state.isFocusMode = !state.isFocusMode));
+    if (document.fullscreenElement) exitFullscreen();
+    const session = useEditorStore.getState().getActiveSession();
+    const editor = session && useEditorManager.getState().getEditor(session.id);
+    if (editor) editor.editor?.focus();
   };
 
   toggleAutoSync = () => {

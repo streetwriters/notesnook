@@ -6173,6 +6173,10 @@ msgstr "To use app lock, you must enable biometrics such as Fingerprint lock or 
 msgid "Toggle dark/light mode"
 msgstr "Toggle dark/light mode"
 
+#: src/strings.ts:2441
+msgid "Toggle focus mode"
+msgstr "Toggle focus mode"
+
 #: src/strings.ts:2331
 msgid "Toggle indentation mode"
 msgstr "Toggle indentation mode"

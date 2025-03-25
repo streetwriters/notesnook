@@ -2438,5 +2438,6 @@ Use this if changes from other devices are not appearing on this device. This wi
   releaseTrackDesc: () => t`Select the release track for Notesnook.`,
   stable: () => t`Stable`,
   beta: () => t`Beta`,
-  zoom: () => t`Zoom`
+  zoom: () => t`Zoom`,
+  toggleFocusMode: () => t`Toggle focus mode`
 };
