@@ -70,6 +70,10 @@ export const InlineTag = Node.create({
               {
                 type: "inlineTag",
                 attrs: { tag: tagText }
+              },
+              {
+                type: "text",
+                text: " "
               }
             ])
             .focus()
