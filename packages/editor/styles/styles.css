@@ -666,8 +666,8 @@ p > *::selection {
   flex: 0 0 auto;
   margin-right: 0.5rem;
   user-select: none;
-  height: 18px;
-  width: 18px;
+  height: 1rem;
+  width: 1rem;
   accent-color: var(--accent);
 }
 
