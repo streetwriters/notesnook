@@ -17,13 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Box, Button, Flex, Image, Text } from "@theme-ui/components";
 import {
   Note,
@@ -99,16 +93,12 @@ import Tags from "../../views/tags";
 import { Notebooks } from "../../views/notebooks";
 import { UserProfile } from "../../dialogs/settings/components/user-profile";
 import { SUBSCRIPTION_STATUS } from "../../common/constants";
-import { ConfirmDialog, showLogoutConfirmation } from "../../dialogs/confirm";
-import { CREATE_BUTTON_MAP, createBackup, logout } from "../../common";
-import { TaskManager } from "../../common/task-manager";
-import { showToast } from "../../utils/toast";
+import { CREATE_BUTTON_MAP, logout } from "../../common";
 import { TabItem } from "./tab-item";
 import Notice from "../notice";
 import { usePromise } from "@notesnook/common";
 import { showSortMenu } from "../group-header";
 import { Freeze } from "react-freeze";
-import { logger } from "../../utils/logger";
 
 type Route = {
   id: "notes" | "favorites" | "reminders" | "monographs" | "trash";
@@ -288,6 +278,7 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
                 variant="secondary"
                 sx={{ p: 1, bg: "transparent" }}
                 onClick={onExpand}
+                title={strings.expandSidebar()}
               >
                 <ExpandSidebar size={13} color="icon" />
               </Button>

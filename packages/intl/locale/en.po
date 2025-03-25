@@ -2508,6 +2508,10 @@ msgstr "Exit fullscreen"
 msgid "Expand"
 msgstr "Expand"
 
+#: src/strings.ts:2441
+msgid "Expand sidebar"
+msgstr "Expand sidebar"
+
 #: src/strings.ts:2053
 msgid "Experience the next level of private note taking\""
 msgstr "Experience the next level of private note taking\""

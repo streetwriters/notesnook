@@ -2439,5 +2439,6 @@ Use this if changes from other devices are not appearing on this device. This wi
   stable: () => t`Stable`,
   beta: () => t`Beta`,
   zoom: () => t`Zoom`,
-  toggleFocusMode: () => t`Toggle focus mode`
+  toggleFocusMode: () => t`Toggle focus mode`,
+  expandSidebar: () => t`Expand sidebar`
 };
