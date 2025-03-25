@@ -236,7 +236,8 @@ const useTiptap = (
             newGroupDelay: 1000
           },
           dropcursor: {
-            class: "drop-cursor"
+            class: "drop-cursor",
+            width: 3
           },
           horizontalRule: false
         }),
