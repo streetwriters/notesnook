@@ -2512,7 +2512,7 @@ msgstr "Exit fullscreen"
 msgid "Expand"
 msgstr "Expand"
 
-#: src/strings.ts:2441
+#: src/strings.ts:2443
 msgid "Expand sidebar"
 msgstr "Expand sidebar"
 

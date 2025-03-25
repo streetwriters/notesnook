@@ -2501,7 +2501,7 @@ msgstr ""
 msgid "Expand"
 msgstr ""
 
-#: src/strings.ts:2441
+#: src/strings.ts:2443
 msgid "Expand sidebar"
 msgstr ""
 
