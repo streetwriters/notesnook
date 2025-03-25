@@ -2501,6 +2501,10 @@ msgstr ""
 msgid "Expand"
 msgstr ""
 
+#: src/strings.ts:2441
+msgid "Expand sidebar"
+msgstr ""
+
 #: src/strings.ts:2053
 msgid "Experience the next level of private note taking\""
 msgstr ""
