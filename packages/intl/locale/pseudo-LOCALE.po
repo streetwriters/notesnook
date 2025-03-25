@@ -2497,7 +2497,7 @@ msgstr ""
 msgid "Expand"
 msgstr ""
 
-#: src/strings.ts:2441
+#: src/strings.ts:2443
 msgid "Expand sidebar"
 msgstr ""
 
@@ -6136,7 +6136,7 @@ msgstr ""
 msgid "Toggle dark/light mode"
 msgstr ""
 
-#: src/strings.ts:2441
+#: src/strings.ts:2442
 msgid "Toggle focus mode"
 msgstr ""
 
