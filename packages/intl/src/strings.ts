@@ -2441,5 +2441,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   zoom: () => t`Zoom`,
   toggleFocusMode: () => t`Toggle focus mode`,
   fontLigatures: () => t`Font ligatures`,
-  fontLigaturesDesc: () => t`Enable ligatures for common symbols like →, ←, etc`
+  fontLigaturesDesc: () =>
+    t`Enable ligatures for common symbols like →, ←, etc`,
+  expandSidebar: () => t`Expand sidebar`
 };

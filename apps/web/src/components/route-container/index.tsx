@@ -18,16 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { PropsWithChildren, useRef } from "react";
-import { Box, Button, Flex, Text } from "@theme-ui/components";
-import { ArrowLeft, Menu, Search, Plus, Close, AddReminder } from "../icons";
-import { useStore } from "../../stores/app-store";
+import { Box } from "@theme-ui/components";
+import { Close, AddReminder } from "../icons";
 import { useStore as useSearchStore } from "../../stores/search-store";
 import useMobile from "../../hooks/use-mobile";
 import { debounce, usePromise } from "@notesnook/common";
 import Field from "../field";
 import { strings } from "@notesnook/intl";
-import { TITLE_BAR_HEIGHT } from "../title-bar";
-import { AppEventManager, AppEvents } from "../../common/app-events";
 import { RouteResult } from "../../navigation/types";
 import { CREATE_BUTTON_MAP } from "../../common";
 
@@ -160,145 +157,4 @@ function Header(props: RouteContainerProps) {
       />
     </Box>
   );
-  // if (isSearching)
-  //   return (
-  //     <Flex
-  //       sx={{
-  //         alignItems: "center",
-  //         justifyContent: "center",
-  //         height: TITLE_BAR_HEIGHT,
-  //         zIndex: 2,
-  //         px: 1
-  //       }}
-  //       className="route-container-header search-container"
-  //     >
-  // <Field
-  //   data-test-id="search-input"
-  //   autoFocus
-  //   id="search"
-  //   name="search"
-  //   variant="borderless"
-  //   type="text"
-  //   sx={{ m: 0, flex: 1, gap: 0 }}
-  //   styles={{ input: { p: "5px", m: 0 } }}
-  //   defaultValue={query}
-  //   placeholder={strings.typeAKeyword()}
-  //   onChange={debounce(
-  //     (e) => useSearchStore.setState({ query: e.target.value }),
-  //     250
-  //   )}
-  //   onKeyUp={(e) => {
-  //     if (e.key === "Escape")
-  //       useSearchStore.setState({
-  //         isSearching: false,
-  //         searchType: undefined
-  //       });
-  //   }}
-  //   action={{
-  //     icon: Close,
-  //     testId: "search-button",
-  //     onClick: () =>
-  //       useSearchStore.setState({
-  //         isSearching: false,
-  //         searchType: undefined
-  //       })
-  //   }}
-  // />
-  //     </Flex>
-  //   );
-
-  // return (
-  //   <Flex
-  //     className="route-container-header"
-  //     sx={{
-  //       px: 1,
-  //       alignItems: "center",
-  //       justifyContent: "space-between",
-  //       height: TITLE_BAR_HEIGHT,
-  //       zIndex: 2
-  //     }}
-  //   >
-  //     <Flex
-  //       py={1}
-  //       sx={{
-  //         alignItems: "center",
-  //         justifyContent: "center",
-  //         overflow: "hidden",
-  //         gap: 1
-  //       }}
-  //     >
-  //       {buttons?.back ? (
-  //         <Button
-  //           {...buttons.back}
-  //           data-test-id="route-go-back"
-  //           sx={{ p: 0, flexShrink: 0 }}
-  //         >
-  //           <ArrowLeft size={20} />
-  //         </Button>
-  //       ) : (
-  //         <Button
-  //           onClick={() =>
-  //             AppEventManager.publish(AppEvents.toggleSideMenu, true)
-  //           }
-  //           sx={{ p: 0, flexShrink: 0 }}
-  //         >
-  //           <Menu
-  //             sx={{
-  //               display: ["block", "block", "none"],
-  //               size: 23
-  //             }}
-  //             size={24}
-  //           />
-  //         </Button>
-  //       )}
-  //       {titlePromise.status === "fulfilled" && titlePromise.value && (
-  // <Text
-  //   className="routeHeader"
-  //   variant="heading"
-  //   data-test-id="routeHeader"
-  //   color="heading"
-  // >
-  //   {titlePromise.value}
-  // </Text>
-  //       )}
-  //     </Flex>
-  //     <Flex sx={{ flexShrink: 0, gap: 2 }}>
-  //       {buttons?.search && (
-  //         <Button
-  //           title={buttons.search.title}
-  //           onClick={() =>
-  //             useSearchStore.setState({ isSearching: true, searchType: type })
-  //           }
-  //           data-test-id={"open-search"}
-  //           sx={{ p: 0 }}
-  //         >
-  //           <Search
-  //             size={24}
-  //             sx={{
-  //               size: 24
-  //             }}
-  //           />
-  //         </Button>
-  //       )}
-  //       {!isMobile && buttons?.create && (
-  // <Button
-  //   {...buttons.create}
-  //   data-test-id={`${type}-action-button`}
-  //   sx={{ p: 0 }}
-  // >
-  //   <Plus
-  //     color="accentForeground"
-  //     size={18}
-  //     sx={{
-  //       height: 24,
-  //       width: 24,
-  //       bg: "accent",
-  //       borderRadius: 100
-  //     }}
-  //   />
-  // </Button>
-  //       )}
-  //     </Flex>
-  //   </Flex>
-  // );
 }
