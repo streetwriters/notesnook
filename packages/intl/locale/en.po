@@ -2512,7 +2512,7 @@ msgstr "Exit fullscreen"
 msgid "Expand"
 msgstr "Expand"
 
-#: src/strings.ts:2441
+#: src/strings.ts:2443
 msgid "Expand sidebar"
 msgstr "Expand sidebar"
 
@@ -6185,7 +6185,7 @@ msgstr "To use app lock, you must enable biometrics such as Fingerprint lock or 
 msgid "Toggle dark/light mode"
 msgstr "Toggle dark/light mode"
 
-#: src/strings.ts:2441
+#: src/strings.ts:2442
 msgid "Toggle focus mode"
 msgstr "Toggle focus mode"
 
