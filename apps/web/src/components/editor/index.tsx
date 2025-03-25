@@ -252,7 +252,6 @@ function EditorView({
   const lastChangedTime = useRef<number>(0);
   const root = useRef<HTMLDivElement>(null);
 
-  const toggleProperties = useEditorStore((store) => store.toggleProperties);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const editor = useEditorManager((store) => store.editors[session.id]?.editor);
 
@@ -376,7 +375,6 @@ function EditorView({
         }}
         options={{
           readonly: session?.type === "readonly" || session?.type === "deleted",
-          onRequestFocus: () => toggleProperties(false),
           focusMode: isFocusMode
         }}
       />
