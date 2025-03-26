@@ -85,6 +85,7 @@ import { DiffHighlighter } from "./extensions/diff-highlighter/index.js";
 import { getChangedNodes } from "./utils/prosemirror.js";
 import { strings } from "@notesnook/intl";
 import { InlineCode } from "./extensions/inline-code/inline-code.js";
+import { FontLigature } from "./extensions/font-ligature/font-ligature.js";
 
 interface TiptapStorage {
   dateFormat?: DateTimeOptions["dateFormat"];
@@ -127,6 +128,7 @@ export type TiptapOptions = EditorOptions &
     downloadOptions?: DownloadOptions;
     isMobile?: boolean;
     doubleSpacedLines?: boolean;
+    enableFontLigatures?: boolean;
   } & {
     placeholder: string;
   };
@@ -151,6 +153,7 @@ const useTiptap = (
     isMobile,
     downloadOptions,
     editorProps,
+    enableFontLigatures,
     ...restOptions
   } = options;
 
@@ -355,7 +358,8 @@ const useTiptap = (
               wrapperNames: [CheckList.name]
             }
           ]
-        })
+        }),
+        FontLigature.configure({ enabled: enableFontLigatures })
       ],
       onBeforeCreate: ({ editor }) => {
         editor.storage.dateFormat = dateFormat;

@@ -104,6 +104,7 @@ type TipTapProps = {
   dateFormat: string;
   timeFormat: TimeFormat;
   markdownShortcuts: boolean;
+  fontLigatures: boolean;
 };
 
 function updateWordCount(id: string, content: () => Fragment) {
@@ -145,7 +146,8 @@ function TipTap(props: TipTapProps) {
     doubleSpacedLines,
     dateFormat,
     timeFormat,
-    markdownShortcuts
+    markdownShortcuts,
+    fontLigatures
   } = props;
 
   const isUserPremium = useIsUserPremium();
@@ -193,6 +195,7 @@ function TipTap(props: TipTapProps) {
         }
       },
       enableInputRules: markdownShortcuts,
+      enableFontLigatures: fontLigatures,
       downloadOptions,
       doubleSpacedLines,
       dateFormat,
@@ -313,7 +316,8 @@ function TipTap(props: TipTapProps) {
     doubleSpacedLines,
     dateFormat,
     timeFormat,
-    markdownShortcuts
+    markdownShortcuts,
+    fontLigatures
   ]);
 
   const editor = useTiptap(
@@ -435,6 +439,7 @@ function TiptapWrapper(
   const markdownShortcuts = useSettingsStore(
     (store) => store.markdownShortcuts
   );
+  const fontLigatures = useSettingsStore((store) => store.fontLigatures);
   const containerRef = useRef<HTMLDivElement>(null);
   const editorContainerRef = useRef<HTMLDivElement>();
   const { editorConfig, setEditorConfig } = useEditorConfig();
@@ -509,7 +514,7 @@ function TiptapWrapper(
       }}
     >
       <TipTap
-        key={`tiptap-${props.id}-${doubleSpacedLines}-${dateFormat}-${timeFormat}-${markdownShortcuts}`}
+        key={`tiptap-${props.id}-${doubleSpacedLines}-${dateFormat}-${timeFormat}-${markdownShortcuts}-${fontLigatures}`}
         {...props}
         isMobile={isMobile}
         isTablet={isTablet}
@@ -517,6 +522,7 @@ function TiptapWrapper(
         dateFormat={dateFormat}
         timeFormat={timeFormat}
         markdownShortcuts={markdownShortcuts}
+        fontLigatures={fontLigatures}
         onLoad={(editor) => {
           if (!isHydrating) {
             onLoad?.(editor);

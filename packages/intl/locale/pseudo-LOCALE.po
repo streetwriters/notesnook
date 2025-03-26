@@ -2293,6 +2293,10 @@ msgstr ""
 msgid "Enable editor margins"
 msgstr ""
 
+#: src/strings.ts:2443
+msgid "Enable ligatures for common symbols like →, ←, etc"
+msgstr ""
+
 #: src/strings.ts:2361
 msgid "Enable regex"
 msgstr ""
@@ -2705,6 +2709,10 @@ msgstr ""
 
 #: src/strings.ts:2255
 msgid "Font family"
+msgstr ""
+
+#: src/strings.ts:2442
+msgid "Font ligatures"
 msgstr ""
 
 #: src/strings.ts:2256
