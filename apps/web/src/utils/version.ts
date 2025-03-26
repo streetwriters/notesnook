@@ -38,16 +38,12 @@ function versionAsNumber(version: string) {
 export function getServiceWorkerVersion(
   serviceWorker: ServiceWorker
 ): Promise<AppVersion> {
-  return new Promise((resolve, reject) => {
-    const timeout = setTimeout(
-      () => reject("Service worker did not respond."),
-      10 * 1000
-    );
-    navigator.serviceWorker.addEventListener("message", (ev) => {
+  return new Promise((resolve) => {
+    function onMessage(ev: MessageEvent) {
       const { type } = ev.data;
       if (type !== "GET_VERSION") return;
-      clearTimeout(timeout);
 
+      navigator.serviceWorker.removeEventListener("message", onMessage);
       const { version, hash, isBeta } = ev.data;
       resolve({
         formatted: format(version, hash, PLATFORM),
@@ -56,7 +52,9 @@ export function getServiceWorkerVersion(
         hash,
         isBeta
       });
-    });
+    }
+
+    navigator.serviceWorker.addEventListener("message", onMessage);
     serviceWorker.postMessage({ type: "GET_VERSION" });
   });
 }
