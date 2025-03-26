@@ -124,9 +124,7 @@ export const AboutSettings: SettingsGroup[] = [
                 registration.installing;
               if (!worker) return;
               if (worker.state === "activated") {
-                await registration.unregister();
-                document.cookie = `release-track=${value}; Secure; Path=/`;
-                window.location.reload();
+                await switchReleaseTrack(value);
               } else {
                 await TaskManager.startTask({
                   type: "modal",
@@ -135,11 +133,10 @@ export const AboutSettings: SettingsGroup[] = [
                     "Please wait while we switch to the new release track...",
                   action: () =>
                     new Promise<void>((resolve) => {
-                      worker.onstatechange = function () {
+                      worker.onstatechange = async function () {
                         if (this.state === "activated") {
-                          document.cookie = `release-track=${value}; Secure; Path=/`;
+                          await switchReleaseTrack(value);
                           resolve();
-                          window.location.reload();
                         }
                       };
                     })
@@ -414,3 +411,12 @@ export const SupportSettings: SettingsGroup[] = [
     ]
   }
 ];
+
+async function switchReleaseTrack(track: string) {
+  const registration = await navigator.serviceWorker.getRegistration();
+  if (!registration) return;
+  await registration.unregister();
+  for (const key of await caches.keys()) await caches.delete(key);
+  document.cookie = `release-track=${track}; Secure; Path=/`;
+  window.location.reload();
+}
