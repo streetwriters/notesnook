@@ -85,6 +85,7 @@ import { DiffHighlighter } from "./extensions/diff-highlighter/index.js";
 import { getChangedNodes } from "./utils/prosemirror.js";
 import { strings } from "@notesnook/intl";
 import { InlineCode } from "./extensions/inline-code/inline-code.js";
+import { InlineTag } from "./extensions/inline-tag/inline-tag.js";
 
 interface TiptapStorage {
   dateFormat?: DateTimeOptions["dateFormat"];
@@ -102,6 +103,9 @@ interface TiptapStorage {
         attachment: Pick<Attachment, "hash" | "type">
       ) => Promise<string | undefined>)
     | undefined;
+  openTag?: (tag: string) => void;
+  addTag?: (tag: string) => void;
+  removeTag?: (tag: string) => void;
 }
 
 declare module "@tiptap/core" {
@@ -146,6 +150,9 @@ const useTiptap = (
     timeFormat,
     copyToClipboard,
     createInternalLink,
+    openTag,
+    addTag,
+    removeTag,
 
     doubleSpacedLines = true,
     isMobile,
@@ -355,7 +362,9 @@ const useTiptap = (
               wrapperNames: [CheckList.name]
             }
           ]
-        })
+        }),
+
+        InlineTag
       ],
       onBeforeCreate: ({ editor }) => {
         editor.storage.dateFormat = dateFormat;
@@ -368,6 +377,10 @@ const useTiptap = (
         editor.storage.copyToClipboard = copyToClipboard;
         editor.storage.createInternalLink = createInternalLink;
         editor.storage.getAttachmentData = getAttachmentData;
+
+        editor.storage.openTag = openTag;
+        editor.storage.addTag = addTag;
+        editor.storage.removeTag = removeTag;
 
         if (onBeforeCreate) onBeforeCreate({ editor });
       },
