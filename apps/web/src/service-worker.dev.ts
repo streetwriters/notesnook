@@ -19,8 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /// <reference lib="webworker" />
 /// <reference lib="es2015" />
-// just need this to satisfy TS
-import type {} from "workbox-core";
 
 declare const self: ServiceWorkerGlobalScope & typeof globalThis;
 
