@@ -534,7 +534,7 @@ function Tab(props: TabProps) {
         transition,
         visibility: active?.id === id ? "hidden" : "visible",
 
-        bg: isActive ? "background-selected" : "transparent",
+        bg: isActive ? "background" : "transparent",
         justifyContent: "space-between",
         alignItems: "center",
         flexShrink: 0,
@@ -542,7 +542,7 @@ function Tab(props: TabProps) {
           "& .closeTabButton": {
             opacity: 1
           },
-          bg: isActive ? "background-selected" : "hover"
+          bg: isActive ? "background" : "hover"
         }
       }}
       onContextMenu={(e) => {
