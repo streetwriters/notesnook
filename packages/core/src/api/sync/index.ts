@@ -286,7 +286,7 @@ class Sync {
     // refresh monographs
     await this.db.monographs.refresh().catch(this.logger.error);
     // update trash cache
-    await this.db.trash.buildCache();
+    await this.db.trash.cleanup();
 
     this.logger.info("Stopping sync");
     await this.db.setLastSynced(Date.now());

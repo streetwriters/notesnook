@@ -55,7 +55,6 @@ export default class Trash {
 
   async init() {
     await this.buildCache();
-    await this.cleanup();
   }
 
   async buildCache() {
@@ -92,7 +91,11 @@ export default class Trash {
     const duration = this.db.settings.getTrashCleanupInterval();
     if (duration === -1 || !duration) return;
 
-    const maxMs = dayjs().subtract(duration, "days").toDate().getTime();
+    const maxMs = dayjs()
+      .startOf("day")
+      .subtract(duration, "days")
+      .toDate()
+      .getTime();
     const expiredItems = await this.db
       .sql()
       .selectNoFrom((eb) => [
@@ -120,6 +123,7 @@ export default class Trash {
     );
 
     await this._delete(noteIds, notebookIds);
+    await this.buildCache();
   }
 
   async add(
