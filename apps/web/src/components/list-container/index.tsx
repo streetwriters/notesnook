@@ -112,7 +112,7 @@ function ListContainer(props: ListContainerProps) {
     let flashStartTimeout: NodeJS.Timeout;
     let flashEndTimeout: NodeJS.Timeout;
 
-    AppEventManager.subscribe(
+    const event = AppEventManager.subscribe(
       AppEvents.revealItemInList,
       async (id?: string) => {
         if (!id || !listRef.current) return;
@@ -133,16 +133,17 @@ function ListContainer(props: ListContainerProps) {
           noteItem.classList.add("flash");
           flashEndTimeout = setTimeout(() => {
             noteItem.classList.remove("flash");
-          }, 1000);
+          }, 2000);
         }, 500);
       }
     );
 
     return () => {
+      event.unsubscribe();
       clearTimeout(flashStartTimeout);
       clearTimeout(flashEndTimeout);
     };
-  }, []);
+  }, [items]);
 
   useEffect(() => {
     return () => {

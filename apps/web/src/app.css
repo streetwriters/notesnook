@@ -206,7 +206,7 @@ textarea,
 }
 
 .flash {
-  animation: flash 0.5s;
+  animation: flash 1s;
 }
 
 @keyframes flash {
