@@ -659,6 +659,10 @@ class EditorStore extends BaseStore<EditorStore> {
       activeBlockId?: string;
       silent?: boolean;
       openInNewTab?: boolean;
+      /**
+       * Should be true if we want to open a new tab when the active tab is pinned
+       */
+      considerPinnedTab?: boolean;
     } = {}
   ): Promise<void> => {
     const {
@@ -675,9 +679,12 @@ class EditorStore extends BaseStore<EditorStore> {
     const noteId = typeof noteOrId === "string" ? noteOrId : noteOrId.id;
     const oldTabForNote = options.force ? null : getTabsForNote(noteId).at(0);
     const activeTab = getActiveTab();
+    const isReactivatingTab =
+      options.force && getTabsForNote(noteId).some((t) => t.id === activeTabId);
     const tabId =
       // if a tab is pinned then always open a new tab.
-      options.openInNewTab || activeTab?.pinned
+      options.openInNewTab ||
+      (activeTab?.pinned && !oldTabForNote && !isReactivatingTab)
         ? addTab(getId())
         : oldTabForNote?.id || activeTabId || addTab(getId());
 
