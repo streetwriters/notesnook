@@ -408,7 +408,7 @@ test("when active tab is pinned, opening other notes should open existing note t
   await expect(tabs[0].titleElement).toHaveText("Note 2");
 });
 
-test("pinned tab should work as expected after page reload", async ({
+test("activating pinned tab after page reload should not open a duplicate tab", async ({
   page
 }) => {
   const app = new AppModel(page);

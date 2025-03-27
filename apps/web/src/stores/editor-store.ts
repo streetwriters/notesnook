@@ -679,10 +679,12 @@ class EditorStore extends BaseStore<EditorStore> {
     const noteId = typeof noteOrId === "string" ? noteOrId : noteOrId.id;
     const oldTabForNote = options.force ? null : getTabsForNote(noteId).at(0);
     const activeTab = getActiveTab();
+    const isReactivatingTab =
+      options.force && getTabsForNote(noteId).some((t) => t.id === activeTabId);
     const tabId =
+      // if a tab is pinned then always open a new tab.
       options.openInNewTab ||
-      // if a tab is pinned then always open a new tab, unless there's an existing tab for the note
-      (options.considerPinnedTab && activeTab?.pinned && !oldTabForNote)
+      (activeTab?.pinned && !oldTabForNote && !isReactivatingTab)
         ? addTab(getId())
         : oldTabForNote?.id || activeTabId || addTab(getId());
 
