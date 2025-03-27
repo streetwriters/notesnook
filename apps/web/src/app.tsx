@@ -132,13 +132,29 @@ function DesktopAppContents() {
   const isFocusMode = useStore((store) => store.isFocusMode);
   const isListPaneVisible = useStore((store) => store.isListPaneVisible);
   const isTablet = useTablet();
-  // const [isNarrow, setIsNarrow] = useState(isTablet || false);
   const navPane = useRef<SplitPaneImperativeHandle>(null);
 
   useEffect(() => {
     if (isTablet) navPane.current?.collapse(0);
     else if (navPane.current?.isCollapsed(0)) navPane.current?.expand(0);
   }, [isTablet]);
+
+  useEffect(() => {
+    const event = AppEventManager.subscribe(
+      AppEvents.revealItemInList,
+      async (id?: string) => {
+        if (!useStore.getState().isListPaneVisible) {
+          useStore.getState().toggleListPane(true);
+          setTimeout(() => {
+            AppEventManager.publish(AppEvents.revealItemInList, id);
+          }, 500);
+        }
+      }
+    );
+    return () => {
+      event.unsubscribe();
+    };
+  }, []);
 
   return (
     <>
