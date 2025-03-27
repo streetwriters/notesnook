@@ -54,7 +54,8 @@ import {
   getCurrentPath,
   hardNavigate,
   hashNavigate,
-  navigate
+  navigate,
+  NavigationEvents
 } from "../../navigation";
 import { db } from "../../common/db";
 import { isMobile } from "../../hooks/use-mobile";
@@ -205,10 +206,22 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
     if (isNavPaneCollapsed) setExpanded(false);
   }, [isNavPaneCollapsed]);
 
+  useEffect(() => {
+    // collapse navigation menu on navigate e.g. when navigating to a notebook
+    // or a tag
+    function onNavigate() {
+      if (!useAppStore.getState().isNavPaneCollapsed) return;
+      setExpanded(false);
+    }
+    const event = NavigationEvents.subscribe("onNavigate", onNavigate);
+    return () => {
+      event.unsubscribe();
+    };
+  }, []);
+
   return (
     <ScopedThemeProvider
       scope="navigationMenu"
-      id="navigation-menu"
       sx={{
         display: isFocusMode ? "none" : "flex",
         zIndex: 1,
@@ -958,5 +971,6 @@ function navigateToRoute(path: string) {
       return useSearchStore.getState().resetSearch();
     return useAppStore.getState().toggleListPane();
   }
+  useAppStore.getState().toggleListPane(true);
   navigate(path);
 }
