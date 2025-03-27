@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Suspense, useEffect, useRef } from "react";
+import { useState, Suspense, useEffect, useRef } from "react";
 import { Box, Flex } from "@theme-ui/components";
 import { ScopedThemeProvider } from "./components/theme-provider";
 import useMobile from "./hooks/use-mobile";
@@ -49,8 +49,6 @@ import { useWindowControls } from "./hooks/use-window-controls";
 import { STATUS_BAR_HEIGHT } from "./common/constants";
 
 new WebExtensionRelay();
-
-const LIST_PANE_SNAP_SIZE = 200;
 
 function App() {
   const isMobile = useMobile();
@@ -133,30 +131,14 @@ export default App;
 function DesktopAppContents() {
   const isFocusMode = useStore((store) => store.isFocusMode);
   const isListPaneVisible = useStore((store) => store.isListPaneVisible);
-  const toggleListPane = useStore((store) => store.toggleListPane);
   const isTablet = useTablet();
   // const [isNarrow, setIsNarrow] = useState(isTablet || false);
   const navPane = useRef<SplitPaneImperativeHandle>(null);
-  const listPaneSize = useRef<null | number>(null);
 
   useEffect(() => {
     if (isTablet) navPane.current?.collapse(0);
     else if (navPane.current?.isCollapsed(0)) navPane.current?.expand(0);
   }, [isTablet]);
-
-  useEffect(() => {
-    if (isListPaneVisible) {
-      navPane.current?.expand(1);
-      return;
-    }
-    if (
-      listPaneSize.current !== null &&
-      listPaneSize.current < LIST_PANE_SNAP_SIZE
-    ) {
-      toggleListPane();
-      navPane.current?.reset(1);
-    }
-  }, [isListPaneVisible]);
 
   return (
     <>
@@ -173,8 +155,6 @@ function DesktopAppContents() {
           direction="vertical"
           onChange={(sizes) => {
             useStore.setState({ isNavPaneCollapsed: sizes[0] <= 70 });
-
-            listPaneSize.current = sizes[1];
           }}
         >
           {isFocusMode ? null : (
@@ -193,12 +173,12 @@ function DesktopAppContents() {
               <NavigationMenu onExpand={() => navPane.current?.reset(0)} />
             </Pane>
           )}
-          {!isFocusMode ? (
+          {!isFocusMode && isListPaneVisible ? (
             <Pane
               id="list-pane"
               initialSize={380}
               style={{ flex: 1, display: "flex" }}
-              snapSize={LIST_PANE_SNAP_SIZE}
+              snapSize={200}
               maxSize={500}
               className="list-pane"
             >
