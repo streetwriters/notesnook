@@ -80,4 +80,4 @@ function CachedRouter() {
   );
 }
 
-export default React.memo(CachedRouter, () => true);
+export default React.memo(CachedRouter);
