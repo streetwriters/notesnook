@@ -43,7 +43,6 @@ import { store as appStore } from "../../stores/app-store";
 import { Multiselect } from "../../common/multi-select";
 import { strings } from "@notesnook/intl";
 import { db } from "../../common/db";
-import { collapseNavPaneHoveredIfNavPaneCollapsed } from "../navigation-menu";
 
 type NotebookProps = {
   item: NotebookType;
@@ -79,10 +78,7 @@ export function Notebook(props: NotebookProps) {
       isFocused={isOpened}
       isCompact
       item={item}
-      onClick={() => {
-        navigate(`/notebooks/${item.id}`);
-        collapseNavPaneHoveredIfNavPaneCollapsed();
-      }}
+      onClick={() => navigate(`/notebooks/${item.id}`)}
       onDragEnter={(e) => {
         if (!isDragEntering(e)) return;
         e.currentTarget.focus();

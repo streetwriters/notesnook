@@ -25,7 +25,6 @@ import {
   useStore as useSelectionStore,
   store as selectionStore
 } from "../../stores/selection-store";
-import { useStore as useAppStore } from "../../stores/app-store";
 import GroupHeader from "../group-header";
 import {
   ListItemWrapper,
@@ -104,7 +103,6 @@ function ListContainer(props: ListContainerProps) {
   const toggleSelection = useSelectionStore(
     (store) => store.toggleSelectionMode
   );
-  const toggleListPane = useAppStore((store) => store.toggleListPane);
 
   const listRef = useRef<VirtuosoHandle>(null);
   const listContainerRef = useRef(null);
@@ -117,7 +115,6 @@ function ListContainer(props: ListContainerProps) {
     AppEventManager.subscribe(
       AppEvents.revealItemInList,
       async (id?: string) => {
-        toggleListPane();
         if (!id || !listRef.current) return;
 
         const ids = await items.ids();

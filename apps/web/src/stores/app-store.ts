@@ -67,7 +67,6 @@ class AppStore extends BaseStore<AppStore> {
   isFocusMode = false;
   isListPaneVisible = true;
   isNavPaneCollapsed = false;
-  isCollapsedNavPaneHovered = false;
   isVaultCreated = false;
   isAutoSyncEnabled = Config.get("autoSyncEnabled", true);
   isSyncEnabled = Config.get("syncEnabled", true);
@@ -170,10 +169,6 @@ class AppStore extends BaseStore<AppStore> {
       (state) =>
         (state.isListPaneVisible = booleanState ?? !state.isListPaneVisible)
     );
-  };
-
-  setCollapsedNavPaneHovered = (state: boolean) => {
-    this.set({ isCollapsedNavPaneHovered: state });
   };
 
   refresh = async () => {
