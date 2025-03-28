@@ -46,7 +46,7 @@ const isLocalhost = Boolean(
 );
 
 export function register(config: ServiceWorkerRegistrationConfig) {
-  if ("serviceWorker" in navigator) {
+  if (import.meta.env.PROD && "serviceWorker" in navigator) {
     // The URL constructor is available in all browsers that support SW.
     const publicUrl = new URL(PUBLIC_URL, window.location.href);
     if (publicUrl.origin !== window.location.origin) {
@@ -55,11 +55,8 @@ export function register(config: ServiceWorkerRegistrationConfig) {
       // serve assets; see https://github.com/facebook/create-react-app/issues/2374
       return;
     }
-    console.log("registering service worker");
 
-    const swUrl = import.meta.env.PROD
-      ? `${PUBLIC_URL}/service-worker.js`
-      : "/dev-sw.js?dev-sw";
+    const swUrl = `${PUBLIC_URL}/service-worker.js`;
     if (isLocalhost) {
       // This is running on localhost. Let's check if a service worker still exists or not.
       checkValidServiceWorker(swUrl, config);

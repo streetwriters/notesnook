@@ -17,7 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import SharedWorker from "./shared-service.worker.ts?sharedworker";
 import { Mutex } from "async-mutex";
+
+const sharedWorker = globalThis.SharedWorker
+  ? new SharedWorker({
+      name: "SharedService"
+    })
+  : null;
 
 export class SharedService<T extends object> extends EventTarget {
   #clientId: Promise<string>;
@@ -152,7 +159,7 @@ export class SharedService<T extends object> extends EventTarget {
               }
 
               try {
-                thisArg.#sendPortToClient(data, requestedPort);
+                await thisArg.#sendPortToClient(data, requestedPort);
               } catch (e) {
                 console.error(e, providerId, data);
                 // retry if port has been neutered, this can happen when
@@ -202,47 +209,69 @@ export class SharedService<T extends object> extends EventTarget {
   }
 
   async #sendPortToClient(message: any, port: MessagePort) {
-    // if (!sharedWorker)
-    //   throw new Error("Shared worker is not supported in this environment.");
-    // sharedWorker.port.postMessage(message, [port]);
-
-    // Return the port to the client via the service worker.
-    const serviceWorker = await navigator.serviceWorker.ready;
-    serviceWorker.active?.postMessage(message, [port]);
+    if (!sharedWorker) {
+      // Return the port to the client via the service worker.
+      const serviceWorker = await navigator.serviceWorker.ready;
+      serviceWorker.active?.postMessage(message, [port]);
+    } else sharedWorker.port.postMessage(message, [port]);
   }
 
   async #getClientId() {
-    // Getting the clientId from the service worker accomplishes two things:
-    // 1. It gets the clientId for this context.
-    // 2. It ensures that the service worker is activated.
-    //
-    // It is possible to do this without polling but it requires about the
-    // same amount of code and using fetch makes 100% certain the service
-    // worker is handling requests.
-    let clientId: string | undefined;
-    while (!clientId) {
-      clientId = await fetch("/clientId").then((response) => {
-        if (response.ok && !!response.headers.get("x-client-id")) {
-          return response.text();
-        }
-        console.warn("service worker not ready, retrying...");
-        return new Promise((resolve) => setTimeout(resolve, 100));
+    if (sharedWorker) {
+      console.time("getting client id");
+      // Use a Web Lock to determine our clientId.
+      const nonce = Math.random().toString();
+      const clientId = await navigator.locks.request(nonce, async () => {
+        console.log("got clientid lock");
+        const { held } = await navigator.locks.query();
+        return held?.find((lock) => lock.name === nonce)?.clientId;
       });
+
+      // Acquire a Web Lock named after the clientId. This lets other contexts
+      // track this context's lifetime.
+      // TODO: It would be better to lock on the clientId+serviceName (passing
+      // that lock name in the service request). That would allow independent
+      // instance lifetime tracking.
+      await SharedService.#acquireContextLock(clientId);
+
+      // Configure message forwarding via the SharedWorker. This must be
+      // done after acquiring the clientId lock to avoid a race condition
+      // in the SharedWorker.
+      sharedWorker?.port.addEventListener("message", (event) => {
+        event.data.ports = event.ports;
+        this.dispatchEvent(new MessageEvent("message", { data: event.data }));
+      });
+      sharedWorker?.port.start();
+      sharedWorker?.port.postMessage({ clientId });
+
+      console.timeEnd("getting client id");
+      return clientId;
+    } else {
+      // Getting the clientId from the service worker accomplishes two things:
+      // 1. It gets the clientId for this context.
+      // 2. It ensures that the service worker is activated.
+      //
+      // It is possible to do this without polling but it requires about the
+      // same amount of code and using fetch makes 100% certain the service
+      // worker is handling requests.
+      let clientId: string | undefined;
+      while (!clientId) {
+        clientId = await fetch("/clientId").then((response) => {
+          if (response.ok && !!response.headers.get("x-client-id")) {
+            return response.text();
+          }
+          console.warn("service worker not ready, retrying...");
+          return new Promise((resolve) => setTimeout(resolve, 100));
+        });
+      }
+
+      navigator.serviceWorker.addEventListener("message", (event) => {
+        event.data.ports = event.ports;
+        this.dispatchEvent(new MessageEvent("message", { data: event.data }));
+      });
+
+      return clientId;
     }
-
-    navigator.serviceWorker.addEventListener("message", (event) => {
-      event.data.ports = event.ports;
-      this.dispatchEvent(new MessageEvent("message", { data: event.data }));
-    });
-
-    // Acquire a Web Lock named after the clientId. This lets other contexts
-    // track this context's lifetime.
-    // TODO: It would be better to lock on the clientId+serviceName (passing
-    // that lock name in the service request). That would allow independent
-    // instance lifetime tracking.
-    await SharedService.#acquireContextLock(clientId);
-
-    return clientId;
   }
 
   async #providerChange() {
