@@ -44,16 +44,16 @@ function wrapIntoHTMLDocument(input: string) {
   return `<!doctype html><html lang="en"><head><title>Document Fragment</title></head><body>${input}</body></html>`;
 }
 
-export function extractFirstParagraph(html: string) {
+export function extractHeadline(html: string) {
   let text = "";
   let start = false;
   const parser = new Parser(
     {
       onopentag: (name) => {
-        if (name === "p") start = true;
+        start = true;
       },
       onclosetag: (name) => {
-        if (name === "p") {
+        if (text !== "") {
           start = false;
           parser.pause();
           parser.reset();

@@ -21,11 +21,11 @@ import { TimeFormat } from "../types.js";
 import { formatDate } from "./date.js";
 
 export const NEWLINE_STRIP_REGEX = /[\r\n\t\v]+/gm;
+export const HEADLINE_REGEX = /\$headline\$/g;
 
 const DATE_REGEX = /\$date\$/g;
 const COUNT_REGEX = /\$count\$/g;
 const TIME_REGEX = /\$time\$/g;
-const HEADLINE_REGEX = /\$headline\$/g;
 const TIMESTAMP_REGEX = /\$timestamp\$/g;
 const TIMESTAMP_Z_REGEX = /\$timestampz\$/g;
 const DATE_TIME_STRIP_REGEX = /[\\\-:./, ]/g;

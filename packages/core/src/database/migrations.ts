@@ -383,6 +383,14 @@ export class NNMigrationProvider implements MigrationProvider {
           });
           await rebuildSearchIndex(db);
         }
+      },
+      "8": {
+        async up(db) {
+          await db.schema
+            .alterTable("notes")
+            .addColumn("isGeneratedTitle", "boolean")
+            .execute();
+        }
       }
     };
   }
