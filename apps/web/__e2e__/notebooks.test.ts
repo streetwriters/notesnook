@@ -259,7 +259,7 @@ test("when default notebook is set, created note in notes context should go to d
   notebook = await notebooks.findNotebook(NOTEBOOK);
   const openedNotebook = await notebook?.openNotebook();
 
-  expect(await openedNotebook?.notes.findNote(NOTE)).toBeDefined();
+  expect(await openedNotebook?.findNote(NOTE)).toBeDefined();
 });
 
 test("when default notebook is set, created note in other notebook's context should not go to default notebook", async ({
@@ -275,12 +275,12 @@ test("when default notebook is set, created note in other notebook's context sho
     title: "Other Notebook"
   });
   const openedOtherNotebook = await otherNotebook?.openNotebook();
-  await openedOtherNotebook?.notes.createNote(NOTE);
+  await openedOtherNotebook?.createNote(NOTE);
   notebooks = await app.goToNotebooks();
   notebook = await notebooks.findNotebook(NOTEBOOK);
   const openedNotebook = await notebook?.openNotebook();
 
-  expect(await openedNotebook?.notes.findNote(NOTE)).toBeUndefined();
+  expect(await openedNotebook?.findNote(NOTE)).toBeUndefined();
 });
 
 test("when default notebook is set, created note in tags context should go to default notebook", async ({
@@ -300,7 +300,7 @@ test("when default notebook is set, created note in tags context should go to de
   notebook = await notebooks.findNotebook(NOTEBOOK);
   const openedNotebook = await notebook?.openNotebook();
 
-  expect(await openedNotebook?.notes.findNote(NOTE)).toBeDefined();
+  expect(await openedNotebook?.findNote(NOTE)).toBeDefined();
 });
 
 test("when default notebook is set, created note in colors context should go to default notebook", async ({
@@ -322,5 +322,5 @@ test("when default notebook is set, created note in colors context should go to 
   notebook = await notebooks.findNotebook(NOTEBOOK);
   const openedNotebook = await notebook?.openNotebook();
 
-  expect(await openedNotebook?.notes.findNote(coloredNote)).toBeDefined();
+  expect(await openedNotebook?.findNote(coloredNote)).toBeDefined();
 });
