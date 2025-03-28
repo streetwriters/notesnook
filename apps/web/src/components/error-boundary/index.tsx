@@ -247,7 +247,7 @@ function errorToString(error: unknown) {
 }
 
 async function resetDatabase() {
-  const multiTab = !!globalThis.SharedWorker && isFeatureSupported("opfs");
+  const multiTab = isFeatureSupported("opfs");
   await useKeyStore.getState().clear();
   const dialect = createDialect({
     name: "notesnook",
