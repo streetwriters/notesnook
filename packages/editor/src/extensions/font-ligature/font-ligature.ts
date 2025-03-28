@@ -26,7 +26,8 @@ const ligatures = {
   ">=": "≥",
   "!=": "≠",
   "==>": "⟹",
-  "<==": "⟸"
+  "<==": "⟸",
+  "--": "—"
 };
 
 export const FontLigature = Extension.create({
