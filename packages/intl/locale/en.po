@@ -2304,6 +2304,10 @@ msgstr "Enable app lock"
 msgid "Enable editor margins"
 msgstr "Enable editor margins"
 
+#: src/strings.ts:2443
+msgid "Enable ligatures for common symbols like →, ←, etc"
+msgstr "Enable ligatures for common symbols like →, ←, etc"
+
 #: src/strings.ts:2361
 msgid "Enable regex"
 msgstr "Enable regex"
@@ -2717,6 +2721,10 @@ msgstr "Follow us on X for updates and news about Notesnook"
 #: src/strings.ts:2255
 msgid "Font family"
 msgstr "Font family"
+
+#: src/strings.ts:2442
+msgid "Font ligatures"
+msgstr "Font ligatures"
 
 #: src/strings.ts:2256
 msgid "Font size"

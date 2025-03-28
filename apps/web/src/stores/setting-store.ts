@@ -52,6 +52,7 @@ class SettingStore extends BaseStore<SettingStore> {
   );
   doubleSpacedParagraphs = Config.get("doubleSpacedLines", true);
   markdownShortcuts = Config.get("markdownShortcuts", true);
+  fontLigatures = Config.get("fontLigatures", false);
   notificationsSettings = Config.get("notifications", { reminder: true });
   isFullOfflineMode = Config.get("fullOfflineMode", false);
   serverUrls: Partial<Record<HostId, string>> = Config.get("serverUrls", {});
@@ -197,6 +198,12 @@ class SettingStore extends BaseStore<SettingStore> {
       state.markdownShortcuts = toggleState ?? !state.markdownShortcuts;
     });
     Config.set("markdownShortcuts", !markdownShortcuts);
+  };
+
+  toggleFontLigatures = () => {
+    const fontLigatures = this.get().fontLigatures;
+    this.set((state) => (state.fontLigatures = !fontLigatures));
+    Config.set("fontLigatures", !fontLigatures);
   };
 
   togglePrivacyMode = async () => {
