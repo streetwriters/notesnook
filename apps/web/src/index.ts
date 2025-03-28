@@ -61,7 +61,7 @@ locale.then(({ default: locale }) => {
 });
 setI18nGlobal(i18n);
 
-if (!IS_DESKTOP_APP && !IS_TESTING) {
+if (!IS_DESKTOP_APP) {
   //   logger.info("Initializing service worker...");
 
   // If you want your app to work offline and load faster, you can change
