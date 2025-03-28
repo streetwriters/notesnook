@@ -56,7 +56,7 @@ async function initializeDatabase(persistence: DatabasePersistence) {
   );
   await storage.migrate();
 
-  const multiTab = !!globalThis.SharedWorker && isFeatureSupported("opfs");
+  const multiTab = isFeatureSupported("opfs");
   database.setup({
     sqliteOptions: {
       dialect: (name, init) =>
