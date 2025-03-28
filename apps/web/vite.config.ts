@@ -147,15 +147,11 @@ export default defineConfig({
             strategies: "injectManifest",
             minify: true,
             manifest: WEB_MANIFEST,
-            injectRegister: false,
+            injectRegister: null,
             srcDir: "",
-            filename:
-              process.env.NODE_ENV === "production"
-                ? "service-worker.ts"
-                : "service-worker.dev.ts",
-            devOptions: {
-              enabled: true
-            },
+            filename: "service-worker.ts",
+            mode: "production",
+            workbox: { mode: "production" },
             injectManifest: {
               globPatterns: ["**/*.{js,css,html,wasm}", "**/Inter-*.woff2"],
               globIgnores: [
