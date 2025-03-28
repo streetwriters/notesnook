@@ -60,7 +60,6 @@ export function TabItem(props: TabItemProps & FlexProps) {
         p: 1,
         ...sx
       }}
-      data-test-id={`tab-item`}
       title={title}
       onClick={() => {
         if (onClick) onClick();
