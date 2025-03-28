@@ -199,7 +199,11 @@ export class Notes implements ICollection {
 
   get all() {
     return this.collection.createFilter<Note>(
-      (qb) => qb.where(isFalse("dateDeleted")).where(isFalse("deleted")),
+      (qb) =>
+        qb
+          .where(isFalse("dateDeleted"))
+          .where(isFalse("deleted"))
+          .where(isFalse("archived")),
       this.db.options?.batchSize
     );
   }
@@ -247,6 +251,17 @@ export class Notes implements ICollection {
     );
   }
 
+  get archives() {
+    return this.collection.createFilter<Note>(
+      (qb) =>
+        qb
+          .where(isFalse("dateDeleted"))
+          .where(isFalse("deleted"))
+          .where("archived", "==", true),
+      this.db.options?.batchSize
+    );
+  }
+
   exists(id: string) {
     return this.collection.exists(id);
   }
@@ -264,6 +279,9 @@ export class Notes implements ICollection {
   }
   favorite(state: boolean, ...ids: string[]) {
     return this.collection.update(ids, { favorite: state });
+  }
+  archive(state: boolean, ...ids: string[]) {
+    return this.collection.update(ids, { archived: state });
   }
   readonly(state: boolean, ...ids: string[]) {
     return this.collection.update(ids, { readonly: state });

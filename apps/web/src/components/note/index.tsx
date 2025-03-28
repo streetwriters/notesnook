@@ -62,6 +62,7 @@ import {
   AddReminder,
   AddToNotebook,
   Alert,
+  Archive,
   Attachment,
   AttachmentError,
   Circle,
@@ -387,6 +388,15 @@ export const noteMenuItems: (
       onClick: async () => {
         await AddReminderDialog.show({ note });
       }
+    },
+    {
+      type: "button",
+      key: "archive",
+      title: "Archive",
+      isChecked: note.archived,
+      icon: Archive.path,
+      onClick: () => store.archive(!note.archived, ...ids),
+      multiSelect: true
     },
     { key: "sep1", type: "separator" },
     {
