@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { tiptapKeys } from "@notesnook/common";
 import { useToolbarStore } from "../../toolbar/stores/toolbar-store.js";
 import { Editor, Extension } from "@tiptap/core";
 
@@ -86,7 +87,7 @@ export const FontSize = Extension.create<FontSizeOptions>({
   },
   addKeyboardShortcuts() {
     return {
-      "ctrl-]": ({ editor }) => {
+      [tiptapKeys.decreaseFontSize.keys]: ({ editor }) => {
         editor
           .chain()
           .focus()
@@ -94,7 +95,7 @@ export const FontSize = Extension.create<FontSizeOptions>({
           .run();
         return true;
       },
-      "Ctrl-[": ({ editor }) => {
+      [tiptapKeys.increaseFontSize.keys]: ({ editor }) => {
         editor
           .chain()
           .focus()
