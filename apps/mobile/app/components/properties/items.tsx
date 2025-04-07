@@ -75,7 +75,15 @@ const COLUMN_BAR_ITEMS: ActionId[] = [
   "delete"
 ];
 
-export const Items = ({ item, close }: { item: Item; close: () => void }) => {
+export const Items = ({
+  item,
+  close,
+  buttons
+}: {
+  item: Item;
+  close: () => void;
+  buttons: Action[];
+}) => {
   const { colors } = useThemeColors();
   const topBarSorting = useStoredRef<{ [name: string]: number }>(
     "topbar-sorting-ref",
@@ -341,7 +349,10 @@ export const Items = ({ item, close }: { item: Item; close: () => void }) => {
           </View>
         </>
       ) : (
-        <View>{columnItems.map(renderColumnItem)}</View>
+        <View>
+          {buttons.map(renderColumnItem)}
+          {columnItems.map(renderColumnItem)}
+        </View>
       )}
     </View>
   );

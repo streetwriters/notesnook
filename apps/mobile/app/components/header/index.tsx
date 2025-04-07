@@ -99,7 +99,7 @@ export const Header = ({
           justifyContent: "space-between",
           marginTop: DefaultAppStyles.GAP_SMALL,
           borderRadius: 10,
-          paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL - 2,
+          paddingVertical: 3,
           borderWidth: hasSearch ? 1 : 0,
           borderColor: colors.primary.border,
           paddingHorizontal: !hasSearch ? 0 : DefaultAppStyles.GAP_SMALL,
