@@ -266,14 +266,17 @@ export const SideMenuTags = () => {
               paddingHorizontal: DefaultAppStyles.GAP,
               backgroundColor: colors.primary.background,
               borderTopColor: colors.primary.border,
-              borderTopWidth: 1
+              borderTopWidth: 1,
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             <TextInput
               placeholder="Filter tags..."
               style={{
                 fontFamily: "Inter-Regular",
-                fontSize: AppFontSize.xs
+                fontSize: AppFontSize.xs,
+                paddingTop: 0,
+                paddingBottom: 0
               }}
               cursorColor={colors.primary.accent}
               onChangeText={async (value) => {
