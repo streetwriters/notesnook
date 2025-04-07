@@ -68,6 +68,7 @@ import {
 import { editorRef, fluidTabsRef } from "../utils/global-refs";
 import { AppNavigationStack } from "./navigation-stack";
 import Orientation, {
+  OrientationType,
   useDeviceOrientationChange
 } from "react-native-orientation-locker";
 
@@ -93,17 +94,17 @@ export const FluidPanelsView = React.memo(
     const animatedOpacity = useSharedValue(0);
     const animatedTranslateY = useSharedValue(-9999);
     const overlayRef = useRef<Animated.View>(null);
-    const [orientation, setOrientation] = useState<"PORTRAIT" | "LANDSCAPE">(
-      Orientation.getInitialOrientation().includes("PORTRAIT")
-        ? "PORTRAIT"
-        : "LANDSCAPE"
+    const [orientation, setOrientation] = useState<OrientationType>(
+      Orientation.getInitialOrientation()
     );
     const appLoading = useSettingStore((state) => state.isAppLoading);
     const [isLoading, setIsLoading] = useState(false);
 
     useDeviceOrientationChange((o) => {
-      setOrientation(o.includes("PORTRAIT") ? "PORTRAIT" : "LANDSCAPE");
+      setOrientation(o);
     });
+
+    const isLandscape = orientation.includes("LANDSCAPE");
 
     useEffect(() => {
       if (!appLoading) {
