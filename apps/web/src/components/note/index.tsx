@@ -89,7 +89,8 @@ import {
   SyncOff,
   Tag2,
   Tag as TagIcon,
-  Trash
+  Trash,
+  Update
 } from "../icons";
 import { Context } from "../list-container/types";
 import ListItem from "../list-item";
@@ -461,6 +462,15 @@ export const noteMenuItems: (
                     "text/html": `<a href="${url}">${note.title}</a>`,
                     "text/markdown": `[${note.title}](${url})`
                   });
+                }
+              },
+              {
+                type: "button",
+                key: "update",
+                title: strings.update(),
+                icon: Update.path,
+                onClick: () => {
+                  showPublishView(note, "bottom");
                 }
               },
               {
