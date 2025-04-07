@@ -210,7 +210,7 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
   );
 };
 
-Properties.present = async (item, isSheet) => {
+Properties.present = async (item, isSheet, buttons = []) => {
   if (!item) return;
   let type = item?.type;
   let dbItem;
@@ -239,7 +239,12 @@ Properties.present = async (item, isSheet) => {
   presentSheet({
     context: isSheet ? "local" : undefined,
     component: (ref, close) => (
-      <Properties close={close} actionSheetRef={ref} item={dbItem} />
+      <Properties
+        close={close}
+        actionSheetRef={ref}
+        item={dbItem}
+        buttons={buttons}
+      />
     )
   });
 };

@@ -74,7 +74,21 @@ const TagItem = (props: {
         <Pressable
           type={isSelected || isFocused ? "selected" : "transparent"}
           onLongPress={() => {
-            Properties.present(item);
+            Properties.present(item, false, [
+              {
+                id: "select",
+                title: strings.select() + " " + strings.dataTypes["tag"](),
+                icon: "checkbox-outline",
+                onPress: () => {
+                  const store = useSideMenuTagsSelectionStore;
+                  store.setState({
+                    enabled: true,
+                    selection: {}
+                  });
+                  store.getState().markAs(item, "selected");
+                }
+              }
+            ]);
           }}
           testID={`tag-item-${props.id}`}
           onPress={() => {

@@ -29,6 +29,7 @@ import { IconButton, IconButtonProps } from "../ui/icon-button";
 import { Pressable } from "../ui/pressable";
 import { SvgView } from "../ui/svg";
 import Heading from "../ui/typography/heading";
+import { useSideBarDraggingStore } from "./dragging-store";
 
 const SettingsIcon = () => {
   const { colors } = useThemeColors();
@@ -37,6 +38,7 @@ const SettingsIcon = () => {
   return (
     <Pressable
       onPress={() => {
+        if (useSideBarDraggingStore.getState().dragging) return;
         UserSheet.present();
       }}
       testID="sidemenu-settings-icon"

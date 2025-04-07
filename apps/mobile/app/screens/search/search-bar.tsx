@@ -63,7 +63,8 @@ export const SearchBar = ({
           paddingHorizontal: DefaultAppStyles.GAP_SMALL,
           borderRadius: 10,
           borderColor: colors.primary.border,
-          borderWidth: 1
+          borderWidth: 1,
+          paddingVertical: 3
         }}
       >
         <IconButton
@@ -86,8 +87,8 @@ export const SearchBar = ({
             fontFamily: "OpenSans-Regular",
             flexGrow: 1,
             color: colors.primary.paragraph,
-            paddingTop: DefaultAppStyles.GAP_VERTICAL,
-            paddingBottom: DefaultAppStyles.GAP_VERTICAL
+            paddingTop: 0,
+            paddingBottom: 0
           }}
           autoFocus
           onChangeText={_onChangeText}
