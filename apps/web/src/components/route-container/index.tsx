@@ -110,10 +110,29 @@ function Header(props: RouteContainerProps) {
             onClick: () =>
               useSearchStore.setState({
                 isSearching: false,
-                searchType: undefined
+                searchType: undefined,
+                query: undefined
               })
           }}
         />
+        {!isMobile && buttons?.create && (
+          <Button
+            {...buttons.create}
+            data-test-id={`${type}-action-button`}
+            sx={{ p: 0 }}
+          >
+            <Plus
+              color="accentForeground"
+              size={18}
+              sx={{
+                height: 24,
+                width: 24,
+                bg: "accent",
+                borderRadius: 100
+              }}
+            />
+          </Button>
+        )}
       </Flex>
     );
 
