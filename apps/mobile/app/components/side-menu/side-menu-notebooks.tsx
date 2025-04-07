@@ -266,7 +266,21 @@ const NotebookItemWrapper = React.memo(
             Navigation.closeDrawer();
           }}
           onLongPress={() => {
-            Properties.present(item.notebook, false);
+            Properties.present(item.notebook, false, [
+              {
+                id: "select",
+                title: strings.select() + " " + strings.dataTypes["notebook"](),
+                icon: "checkbox-outline",
+                onPress: () => {
+                  const store = useSideMenuNotebookSelectionStore;
+                  store.setState({
+                    enabled: true,
+                    selection: {}
+                  });
+                  store.getState().markAs(item.notebook, "selected");
+                }
+              }
+            ]);
           }}
         />
       </View>

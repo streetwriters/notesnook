@@ -54,6 +54,7 @@ import {
   useSideMenuTagsSelectionStore
 } from "./stores";
 import { useSideBarDraggingStore } from "./dragging-store";
+import { Button } from "../ui/button";
 const renderScene = SceneMap({
   home: SideMenuHome,
   notebooks: SideMenuNotebooks,
@@ -251,172 +252,174 @@ const TabBar = (
         </>
       ) : (
         <>
-          <View
-            style={{
-              flexDirection: "row",
-              gap: DefaultAppStyles.GAP_SMALL
-            }}
-          >
-            {props.navigationState.routes.map((route, index) => {
-              const isFocused = props.navigationState.index === index;
+          {dragging ? (
+            <Button
+              onPress={() => {
+                useSideBarDraggingStore.setState({
+                  dragging: false
+                });
+              }}
+              style={{
+                width: "100%"
+              }}
+              type="accent"
+              testID="check"
+              title={strings.done()}
+              icon={"check"}
+              iconSize={AppFontSize.lg - 2}
+            />
+          ) : (
+            <>
+              <View
+                style={{
+                  flexDirection: "row",
+                  gap: DefaultAppStyles.GAP_SMALL
+                }}
+              >
+                {props.navigationState.routes.map((route, index) => {
+                  const isFocused = props.navigationState.index === index;
 
-              return (
-                <Pressable
-                  key={route.key}
-                  testID={`tab-${route.key}`}
-                  onPress={() => {
-                    props.jumpTo(route.key);
-                    switch (route.key) {
-                      case "notebooks":
-                        Navigation.routeNeedsUpdate(
-                          "Notebooks",
-                          Navigation.routeUpdateFunctions.Notebooks
-                        );
-                        break;
-                      case "tags":
-                        Navigation.routeNeedsUpdate(
-                          "Tags",
-                          Navigation.routeUpdateFunctions.Tags
-                        );
-                        break;
-                      default:
-                        break;
-                    }
-                  }}
-                  style={{
-                    borderRadius: 10,
-                    paddingVertical: 2,
-                    width: 40,
-                    height: 40
-                  }}
-                  type={isFocused ? "selected" : "plain"}
-                >
-                  <Icon
-                    name={getIcon(route.key)}
-                    color={
-                      isFocused ? colors.selected.icon : colors.primary.icon
-                    }
-                    size={AppFontSize.lg}
-                  />
-                </Pressable>
-              );
-            })}
-          </View>
-
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: DefaultAppStyles.GAP_SMALL
-            }}
-          >
-            {props.navigationState.index > 0 ? (
-              <>
-                <IconButton
-                  name="plus"
-                  testID="sidebar-add-button"
-                  size={AppFontSize.lg - 2}
-                  color={colors.primary.icon}
-                  onPress={() => {
-                    if (props.navigationState.index === 1) {
-                      AddNotebookSheet.present();
-                    } else {
-                      presentDialog({
-                        title: strings.addTag(),
-                        paragraph: strings.addTagDesc(),
-                        input: true,
-                        positiveText: "Add",
-                        positivePress: async (tag) => {
-                          if (tag) {
-                            await db.tags.add({
-                              title: tag
-                            });
-                            useTagStore.getState().refresh();
-                            return true;
-                          }
-                          ToastManager.show({
-                            context: "local",
-                            type: "error",
-                            message: strings.allFieldsRequired()
-                          });
-                          return false;
+                  return (
+                    <Pressable
+                      key={route.key}
+                      testID={`tab-${route.key}`}
+                      onPress={() => {
+                        props.jumpTo(route.key);
+                        switch (route.key) {
+                          case "notebooks":
+                            Navigation.routeNeedsUpdate(
+                              "Notebooks",
+                              Navigation.routeUpdateFunctions.Notebooks
+                            );
+                            break;
+                          case "tags":
+                            Navigation.routeNeedsUpdate(
+                              "Tags",
+                              Navigation.routeUpdateFunctions.Tags
+                            );
+                            break;
+                          default:
+                            break;
                         }
-                      });
-                    }
-                  }}
-                  style={{
-                    width: 35,
-                    height: 35
-                  }}
-                />
+                      }}
+                      style={{
+                        borderRadius: 10,
+                        paddingVertical: 2,
+                        width: 40,
+                        height: 40
+                      }}
+                      type={isFocused ? "selected" : "plain"}
+                    >
+                      <Icon
+                        name={getIcon(route.key)}
+                        color={
+                          isFocused ? colors.selected.icon : colors.primary.icon
+                        }
+                        size={AppFontSize.lg}
+                      />
+                    </Pressable>
+                  );
+                })}
+              </View>
 
-                <IconButton
-                  name={
-                    groupOptions.sortDirection === "asc"
-                      ? "sort-ascending"
-                      : "sort-descending"
-                  }
-                  testID="sidebar-sort-button"
-                  color={colors.primary.icon}
-                  onPress={() => {
-                    presentSheet({
-                      component: (
-                        <Sort
-                          type={
-                            props.navigationState.index === 1
-                              ? "notebook"
-                              : "tag"
-                          }
-                          hideGroupOptions
-                        />
-                      )
-                    });
-                  }}
-                  style={{
-                    width: 35,
-                    height: 35
-                  }}
-                  size={AppFontSize.lg - 2}
-                />
-              </>
-            ) : null}
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: DefaultAppStyles.GAP_SMALL
+                }}
+              >
+                {props.navigationState.index > 0 ? (
+                  <>
+                    <IconButton
+                      name="plus"
+                      testID="sidebar-add-button"
+                      size={AppFontSize.lg - 2}
+                      color={colors.primary.icon}
+                      onPress={() => {
+                        if (props.navigationState.index === 1) {
+                          AddNotebookSheet.present();
+                        } else {
+                          presentDialog({
+                            title: strings.addTag(),
+                            paragraph: strings.addTagDesc(),
+                            input: true,
+                            positiveText: "Add",
+                            positivePress: async (tag) => {
+                              if (tag) {
+                                await db.tags.add({
+                                  title: tag
+                                });
+                                useTagStore.getState().refresh();
+                                return true;
+                              }
+                              ToastManager.show({
+                                context: "local",
+                                type: "error",
+                                message: strings.allFieldsRequired()
+                              });
+                              return false;
+                            }
+                          });
+                        }
+                      }}
+                      style={{
+                        width: 35,
+                        height: 35
+                      }}
+                    />
 
-            {props.navigationState.index === 0 ? (
-              <>
-                <IconButton
-                  onPress={() => {
-                    useThemeStore.getState().setColorScheme();
-                  }}
-                  style={{
-                    width: 28,
-                    height: 28
-                  }}
-                  testID="sidebar-theme-button"
-                  color={colors.primary.icon}
-                  name={isDark ? "weather-night" : "weather-sunny"}
-                  size={AppFontSize.lg - 2}
-                />
-
-                {dragging ? (
-                  <IconButton
-                    onPress={() => {
-                      useSideBarDraggingStore.setState({
-                        dragging: false
-                      });
-                    }}
-                    style={{
-                      width: 28,
-                      height: 28
-                    }}
-                    testID="check"
-                    color={colors.primary.icon}
-                    name={"check"}
-                    size={AppFontSize.lg - 2}
-                  />
+                    <IconButton
+                      name={
+                        groupOptions.sortDirection === "asc"
+                          ? "sort-ascending"
+                          : "sort-descending"
+                      }
+                      testID="sidebar-sort-button"
+                      color={colors.primary.icon}
+                      onPress={() => {
+                        presentSheet({
+                          component: (
+                            <Sort
+                              type={
+                                props.navigationState.index === 1
+                                  ? "notebook"
+                                  : "tag"
+                              }
+                              hideGroupOptions
+                            />
+                          )
+                        });
+                      }}
+                      style={{
+                        width: 35,
+                        height: 35
+                      }}
+                      size={AppFontSize.lg - 2}
+                    />
+                  </>
                 ) : null}
-              </>
-            ) : null}
-          </View>
+
+                {props.navigationState.index === 0 ? (
+                  <>
+                    <IconButton
+                      onPress={() => {
+                        useThemeStore.getState().setColorScheme();
+                      }}
+                      style={{
+                        width: 28,
+                        height: 28
+                      }}
+                      testID="sidebar-theme-button"
+                      color={colors.primary.icon}
+                      name={isDark ? "weather-night" : "weather-sunny"}
+                      size={AppFontSize.lg - 2}
+                    />
+                  </>
+                ) : null}
+              </View>
+            </>
+          )}
         </>
       )}
     </View>

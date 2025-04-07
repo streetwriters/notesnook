@@ -43,10 +43,6 @@ import { ReferencesList } from "../components/sheets/references";
 import { RelationsList } from "../components/sheets/relations-list/index";
 import ReminderSheet from "../components/sheets/reminder";
 import { useSideBarDraggingStore } from "../components/side-menu/dragging-store";
-import {
-  useSideMenuNotebookSelectionStore,
-  useSideMenuTagsSelectionStore
-} from "../components/side-menu/stores";
 import { ButtonProps } from "../components/ui/button";
 import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
 import {
@@ -221,10 +217,11 @@ export const useActions = ({
     if (!item.id) return;
     if (item.type === "note") {
       await db.notes.pin(!item?.pinned, item.id);
+      setItem((await db.notes.note(item.id)) as Item);
     } else if (item.type === "notebook") {
       await db.notebooks.pin(!item?.pinned, item.id);
+      setItem((await db.notebooks.notebook(item.id)) as Item);
     }
-    setItem((await db.notes.note(item.id)) as Item);
     Navigation.queueRoutesForUpdate();
   }
 
@@ -470,23 +467,6 @@ export const useActions = ({
       isToggle: true,
       checked: isPinnedToMenu,
       activeColor: colors.error.paragraph
-    });
-    actions.push({
-      id: "select",
-      title: strings.select() + " " + strings.dataTypes[item.type](),
-      icon: "checkbox-outline",
-      onPress: () => {
-        const store =
-          item.type === "tag"
-            ? useSideMenuTagsSelectionStore
-            : useSideMenuNotebookSelectionStore;
-        store.setState({
-          enabled: true,
-          selection: {}
-        });
-        store.getState().markAs(item, "selected");
-        close();
-      }
     });
   }
 

@@ -28,7 +28,7 @@ import { presentSheet, ToastManager } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { SyncStatus, useUserStore } from "../../../stores/use-user-store";
 import { getObfuscatedEmail } from "../../../utils/functions";
-import { AppFontSize } from "../../../utils/size";
+import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
 import { DefaultAppStyles } from "../../../utils/styles";
 import { AuthMode } from "../../auth/common";
 import { Card } from "../../list/card";
@@ -61,8 +61,7 @@ export const UserSheet = () => {
     <View
       style={{
         width: "100%",
-        justifyContent: "center",
-        gap: DefaultAppStyles.GAP
+        justifyContent: "center"
       }}
     >
       {user ? (
@@ -82,7 +81,7 @@ export const UserSheet = () => {
               style={{
                 width: 40,
                 height: 40,
-                borderRadius: 10
+                borderRadius: defaultBorderRadius
               }}
             />
           ) : null}
@@ -262,15 +261,13 @@ export const UserSheet = () => {
         style={{
           borderBottomWidth: 1,
           height: 1,
-          borderColor: colors.primary.border
+          width: "100%",
+          borderColor: colors.primary.border,
+          marginVertical: DefaultAppStyles.GAP_VERTICAL
         }}
-      ></View>
+      />
 
-      <View
-        style={{
-          gap: DefaultAppStyles.GAP_VERTICAL
-        }}
-      >
+      <View>
         {[
           {
             icon: "reload",

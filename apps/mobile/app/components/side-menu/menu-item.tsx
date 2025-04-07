@@ -35,6 +35,7 @@ import { AppFontSize, defaultBorderRadius } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { Pressable } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
+import { useSideBarDraggingStore } from "./dragging-store";
 
 function _MenuItem({
   item,
@@ -98,6 +99,7 @@ function _MenuItem({
   }, [item.data, item.id]);
 
   const _onPress = () => {
+    if (useSideBarDraggingStore.getState().dragging) return;
     if (item.onPress) return item.onPress(item);
 
     if (useNavigationStore.getState().currentRoute !== item.id) {
