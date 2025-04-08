@@ -73,17 +73,15 @@ export function MenuButton(props: MenuButtonProps) {
         <Flex
           sx={{ fontSize: "inherit", fontFamily: "inherit", flexShrink: 0 }}
         >
-          {icon && (
-            <Icon
-              path={icon}
-              size={"medium"}
-              sx={{ mr: 1 }}
-              color={
-                (styles?.icon?.color as string) ||
-                (variant === "dangerous" ? "icon-error" : "icon")
-              }
-            />
-          )}
+          <Icon
+            path={icon || ""}
+            size={"medium"}
+            sx={{ mr: 1 }}
+            color={
+              (styles?.icon?.color as string) ||
+              (variant === "dangerous" ? "icon-error" : "icon")
+            }
+          />
           <Text
             as="span"
             variant={"body"}
