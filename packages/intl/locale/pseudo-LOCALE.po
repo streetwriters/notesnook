@@ -1958,6 +1958,10 @@ msgstr ""
 msgid "Default screen to open on app launch"
 msgstr ""
 
+#: src/strings.ts:2465
+msgid "Default sidebar tab"
+msgstr ""
+
 #: src/strings.ts:1238
 msgid "Default snooze time"
 msgstr ""
@@ -5394,6 +5398,10 @@ msgstr ""
 
 #: src/strings.ts:1802
 msgid "Select profile picture"
+msgstr ""
+
+#: src/strings.ts:2466
+msgid "Select the default sidebar tab"
 msgstr ""
 
 #: src/strings.ts:374
