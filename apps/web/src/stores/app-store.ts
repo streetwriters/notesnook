@@ -84,10 +84,7 @@ class AppStore extends BaseStore<AppStore> {
   lastSynced = 0;
 
   init = () => {
-    settingStore.refresh();
-    // this needs to happen here so reminders can be set on app load.
-    reminderStore.refresh();
-    announcementStore.refresh();
+    this.refresh();
     this.set({
       hiddenColors: db.settings.getSideBarHiddenItems("colors"),
       hiddenRoutes: db.settings.getSideBarHiddenItems("routes")
