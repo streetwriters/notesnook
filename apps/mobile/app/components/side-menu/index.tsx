@@ -55,6 +55,7 @@ import {
 } from "./stores";
 import { useSideBarDraggingStore } from "./dragging-store";
 import { Button } from "../ui/button";
+import SettingsService from "../../services/settings";
 const renderScene = SceneMap({
   home: SideMenuHome,
   notebooks: SideMenuNotebooks,
@@ -65,7 +66,9 @@ const renderScene = SceneMap({
 export const SideMenu = React.memo(
   function SideMenu() {
     const { colors } = useThemeColors();
-    const [index, setIndex] = React.useState(0);
+    const [index, setIndex] = React.useState(
+      SettingsService.getProperty("defaultSidebarTab")
+    );
     const [routes] = React.useState<Route[]>([
       {
         key: "home",
@@ -113,7 +116,7 @@ const TabBar = (
   const dragging = useSideBarDraggingStore((state) => state.dragging);
   const { colors, isDark } = useThemeColors();
   const groupOptions = useGroupOptions(
-    props.navigationState.index === 1 ? "notebook" : "tags"
+    props.navigationState.index === 1 ? "notebooks" : "tags"
   );
   const notebookSelectionEnabled = useSideMenuNotebookSelectionStore(
     (state) => state.enabled
@@ -371,7 +374,7 @@ const TabBar = (
 
                     <IconButton
                       name={
-                        groupOptions.sortDirection === "asc"
+                        groupOptions?.sortDirection === "asc"
                           ? "sort-ascending"
                           : "sort-descending"
                       }

@@ -64,6 +64,25 @@ export const HomePicker = createSettingsPicker({
   premium: true
 });
 
+export const SidebarTabPicker = createSettingsPicker({
+  getValue: () => useSettingStore.getState().settings.defaultSidebarTab,
+  updateValue: (item) => {
+    SettingsService.set({ defaultSidebarTab: item });
+  },
+  formatValue: (item) => {
+    const SidebarTabs = [
+      strings.routes.Home(),
+      strings.routes.Notebooks(),
+      strings.routes.Tags()
+    ];
+    return SidebarTabs[item];
+  },
+  getItemKey: (item) => item,
+  options: [0, 1, 2],
+  compareValue: (current, item) => current === item,
+  premium: true
+});
+
 export const TrashIntervalPicker = createSettingsPicker({
   getValue: () => db.settings.getTrashCleanupInterval(),
   updateValue: (item) => {

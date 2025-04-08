@@ -29,6 +29,7 @@ import useNavigationStore, {
 import { useSelectionStore } from "../stores/use-selection-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { rootNavigatorRef } from "../utils/global-refs";
+import { db } from "../common/database";
 
 const RootStack = createNativeStackNavigator();
 const AppStack = createNativeStackNavigator();
@@ -46,17 +47,97 @@ let ColoredNotes: any = null;
 const AppNavigation = React.memo(
   () => {
     const { colors } = useThemeColors();
-    const homepage = SettingsService.get().homepage;
-    React.useEffect(() => {
-      setTimeout(() => {
-        useNavigationStore.getState().update(homepage as keyof RouteParams);
-        useNavigationStore.getState().setFocusedRouteId(homepage);
-      }, 300);
-    }, [homepage]);
+    const [home, setHome] = React.useState<{
+      name: string;
+      params: any;
+    }>();
+    const homepageV2 = SettingsService.get().homepageV2;
+    const loading = useSettingStore((state) => state.isAppLoading);
 
-    return (
+    React.useEffect(() => {
+      (async () => {
+        if (loading) return;
+        if (!homepageV2) {
+          setHome({
+            name: "Notes",
+            params: undefined
+          });
+          return;
+        }
+
+        switch (homepageV2.type) {
+          case "notebook": {
+            const notebook = await db.notebooks.notebook(homepageV2.id);
+            if (notebook) {
+              setHome({
+                name: "Notebook",
+                params: {
+                  item: notebook,
+                  id: notebook.id,
+                  title: notebook.title
+                }
+              });
+              return;
+            }
+          }
+
+          case "color": {
+            const color = await db.colors.color(homepageV2.id);
+            if (color) {
+              setHome({
+                name: "ColoredNotes",
+                params: {
+                  item: color,
+                  id: color.id,
+                  title: color.title
+                }
+              });
+              return;
+            }
+
+            break;
+          }
+          case "tag": {
+            const tag = await db.tags.tag(homepageV2.id);
+            if (tag) {
+              setHome({
+                name: "TaggedNotes",
+                params: {
+                  item: tag,
+                  id: tag.id,
+                  title: tag.title
+                }
+              });
+              return;
+            }
+
+            break;
+          }
+          case "default":
+            {
+              setHome({
+                name: homepageV2.id,
+                params: undefined
+              });
+            }
+            return;
+        }
+
+        setHome({
+          name: "Notes",
+          params: undefined
+        });
+      })();
+    }, [homepageV2, loading]);
+
+    React.useEffect(() => {
+      useNavigationStore.getState().update(home?.name as keyof RouteParams);
+      useNavigationStore.getState().setFocusedRouteId(home?.params?.id || home);
+    }, [home]);
+
+    return !home ? null : (
       <AppStack.Navigator
-        initialRouteName={homepage}
+        initialRouteName={home.name}
         screenOptions={{
           headerShown: false,
           animation: "none",
@@ -96,6 +177,7 @@ const AppNavigation = React.memo(
               TaggedNotes || require("../screens/notes/tagged").default;
             return TaggedNotes;
           }}
+          initialParams={home.name === "TaggedNotes" ? home.params : undefined}
         />
 
         <AppStack.Screen
@@ -105,6 +187,7 @@ const AppNavigation = React.memo(
               ColoredNotes || require("../screens/notes/colored").default;
             return ColoredNotes;
           }}
+          initialParams={home.name === "ColoredNotes" ? home.params : undefined}
         />
 
         <AppStack.Screen
@@ -130,6 +213,7 @@ const AppNavigation = React.memo(
             Notebook = Notebook || require("../screens/notebook").default;
             return Notebook;
           }}
+          initialParams={home.name === "Notebook" ? home.params : undefined}
         />
 
         <AppStack.Screen

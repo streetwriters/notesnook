@@ -4999,6 +4999,10 @@ msgstr "Reset"
 msgid "Reset account password"
 msgstr "Reset account password"
 
+#: src/strings.ts:2467
+msgid "Reset homepage"
+msgstr "Reset homepage"
+
 #: src/strings.ts:1806
 msgid "Reset selection"
 msgstr "Reset selection"

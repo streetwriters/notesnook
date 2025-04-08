@@ -30,16 +30,12 @@ import * as RNIap from "react-native-iap";
 //@ts-ignore
 import { enabled } from "react-native-privacy-snapshot";
 import ScreenGuardModule from "react-native-screenguard";
-import { DatabaseLogger, db } from "../../common/database";
+import { db } from "../../common/database";
 import filesystem from "../../common/filesystem";
 import { ChangePassword } from "../../components/auth/change-password";
 import { presentDialog } from "../../components/dialog/functions";
 import { AppLockPassword } from "../../components/dialogs/applock-password";
-import {
-  endProgress,
-  startProgress,
-  updateProgress
-} from "../../components/dialogs/progress";
+import { endProgress, startProgress } from "../../components/dialogs/progress";
 import { ChangeEmail } from "../../components/sheets/change-email";
 import ExportNotesSheet from "../../components/sheets/export-notes";
 import { Issue } from "../../components/sheets/github/issue";
@@ -64,19 +60,15 @@ import Sync from "../../services/sync";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
 import { SUBSCRIPTION_STATUS } from "../../utils/constants";
-import {
-  eCloseSheet,
-  eCloseSimpleDialog,
-  eOpenRecoveryKeyDialog
-} from "../../utils/events";
+import { eCloseSheet, eOpenRecoveryKeyDialog } from "../../utils/events";
 import { NotesnookModule } from "../../utils/notesnook-module";
 import { sleep } from "../../utils/time";
 import { MFARecoveryCodes, MFASheet } from "./2fa";
 import { useDragState } from "./editor/state";
 import { verifyUser, verifyUserWithApplock } from "./functions";
+import { logoutUser } from "./logout";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
-import { logoutUser } from "./logout";
 
 export const settingsGroups: SettingSection[] = [
   {
@@ -639,11 +631,11 @@ export const settingsGroups: SettingSection[] = [
         description: strings.behaviorDesc(),
         sections: [
           {
-            id: "default-home",
+            id: "default-sidebar-view",
             type: "component",
-            name: strings.homepage(),
-            description: strings.homepageDesc(),
-            component: "homeselector"
+            name: strings.defaultSidebarTab(),
+            description: strings.defaultSidebarTabDesc(),
+            component: "sidebar-tab-selector"
           },
           {
             id: "date-format",

@@ -64,6 +64,8 @@ import { eUpdateNoteInEditor } from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { convertNoteToText } from "../utils/note-to-text";
 import { sleep } from "../utils/time";
+import SettingsService from "../services/settings";
+import { useSettingStore } from "../stores/use-setting-store";
 
 export type ActionId =
   | "select"
@@ -105,7 +107,8 @@ export type ActionId =
   | "pin-to-notifications"
   | "favorite"
   | "remove-from-notebook"
-  | "trash";
+  | "trash"
+  | "default-homepage";
 
 export type Action = {
   id: ActionId;
@@ -155,6 +158,11 @@ export const useActions = ({
   );
   const [noteInCurrentNotebook, setNoteInCurrentNotebook] = useState(false);
   const [locked, setLocked] = useState(false);
+  const isHomepage = useSettingStore(
+    (state) =>
+      state.settings.homepageV2?.type === item.type &&
+      state.settings.homepageV2?.id === item.id
+  );
 
   const isPublished =
     item.type === "note" && db.monographs.isPublished(item.id);
@@ -546,6 +554,31 @@ export const useActions = ({
       isToggle: true,
       checked: item.pinned,
       pro: true
+    });
+  }
+
+  if (
+    item.type === "notebook" ||
+    item.type === "tag" ||
+    item.type === "color"
+  ) {
+    actions.push({
+      id: "default-homepage",
+      title: isHomepage ? strings.unsetAsHomepage() : strings.setAsHomepage(),
+      icon: "home-outline",
+      isToggle: true,
+      checked: isHomepage,
+      onPress: () => {
+        SettingsService.setProperty(
+          "homepageV2",
+          isHomepage
+            ? undefined
+            : {
+                id: item.id,
+                type: item.type
+              }
+        );
+      }
     });
   }
 
