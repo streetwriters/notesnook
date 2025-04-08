@@ -2460,5 +2460,6 @@ Use this if changes from other devices are not appearing on this device. This wi
   linkingNotesTo: (title: string) => t`Select notes to link to "${title}"`,
   addToNotebook: () => t`Add to notebook`,
   notebookAdded: () => t`Notebook added`,
-  addNotes: () => t`Add notes`
+  addNotes: () => t`Add notes`,
+  setAsHomepage: () => t`Set as homepage`
 };
