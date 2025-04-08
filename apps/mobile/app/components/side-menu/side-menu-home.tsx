@@ -36,6 +36,7 @@ import { eSendEvent } from "../../services/event-manager";
 import { eOpenPremiumDialog } from "../../utils/events";
 import { useUserStore } from "../../stores/use-user-store";
 import { Button } from "../ui/button";
+import { MenuItemProperties } from "../sheets/menu-item-properties";
 
 const pro = {
   title: strings.getNotesnookPro(),
@@ -96,6 +97,7 @@ export function SideMenuHome() {
                   style={{
                     width: "100%"
                   }}
+                  disableDefaultDrag
                   showsVerticalScrollIndicator={false}
                   renderDraggableItem={({ item, index }) => {
                     return (
@@ -106,7 +108,10 @@ export function SideMenuHome() {
                           title:
                             strings.routes[
                               item.title as keyof typeof strings.routes
-                            ]?.() || item.title
+                            ]?.() || item.title,
+                          onLongPress: () => {
+                            MenuItemProperties.present(item);
+                          }
                         }}
                         testID={item.title}
                         index={index}

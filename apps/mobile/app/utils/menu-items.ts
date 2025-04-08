@@ -29,6 +29,7 @@ export type SideMenuItem = {
   icon: string;
   onPress?: (item: SideMenuItem) => void;
   onLongPress?: (item: SideMenuItem) => void;
+  type: string;
 };
 
 export const MenuItemsList: SideMenuItem[] = [
@@ -36,7 +37,8 @@ export const MenuItemsList: SideMenuItem[] = [
     dataType: "note",
     id: "Notes",
     title: "Notes",
-    icon: "note-outline"
+    icon: "note-outline",
+    type: "side-menu-item"
   },
   // {
   //   dataType: "notebook",
@@ -48,7 +50,8 @@ export const MenuItemsList: SideMenuItem[] = [
     dataType: "note",
     id: "Favorites",
     title: "Favorites",
-    icon: "star-outline"
+    icon: "star-outline",
+    type: "side-menu-item"
   },
   // {
   //   dataType: "tag",
@@ -60,7 +63,8 @@ export const MenuItemsList: SideMenuItem[] = [
     dataType: "reminder",
     id: "Reminders",
     title: "Reminders",
-    icon: "bell"
+    icon: "bell",
+    type: "side-menu-item"
   },
   {
     dataType: "monograph",
@@ -70,7 +74,8 @@ export const MenuItemsList: SideMenuItem[] = [
     onPress: () => {
       Navigation.closeDrawer();
       Monographs.navigate();
-    }
+    },
+    type: "side-menu-item"
   },
   // {
   //   dataType: "note",
@@ -82,6 +87,7 @@ export const MenuItemsList: SideMenuItem[] = [
     dataType: "note",
     id: "Trash",
     title: "Trash",
-    icon: "delete-outline"
+    icon: "delete-outline",
+    type: "side-menu-item"
   }
 ];

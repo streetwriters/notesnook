@@ -31,6 +31,7 @@ import {
   DateFormatPicker,
   FontPicker,
   HomePicker,
+  SidebarTabPicker,
   TimeFormatPicker,
   TrashIntervalPicker
 } from "./picker/pickers";
@@ -67,5 +68,6 @@ export const components: { [name: string]: ReactElement } = {
     <View style={{ paddingHorizontal: DefaultAppStyles.GAP }}>
       <AttachmentGroupProgress groupId="offline-mode" />
     </View>
-  )
+  ),
+  "sidebar-tab-selector": <SidebarTabPicker />
 };

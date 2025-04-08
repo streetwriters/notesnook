@@ -2463,5 +2463,6 @@ Use this if changes from other devices are not appearing on this device. This wi
   addNotes: () => t`Add notes`,
   setAsHomepage: () => t`Set as homepage`,
   defaultSidebarTab: () => t`Default sidebar tab`,
-  defaultSidebarTabDesc: () => t`Select the default sidebar tab`
+  defaultSidebarTabDesc: () => t`Select the default sidebar tab`,
+  unsetAsHomepage: () => t`Reset homepage`
 };
