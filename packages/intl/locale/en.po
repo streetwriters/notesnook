@@ -1963,6 +1963,10 @@ msgstr "Default notebook cleared"
 msgid "Default screen to open on app launch"
 msgstr "Default screen to open on app launch"
 
+#: src/strings.ts:2465
+msgid "Default sidebar tab"
+msgstr "Default sidebar tab"
+
 #: src/strings.ts:1238
 msgid "Default snooze time"
 msgstr "Default snooze time"
@@ -5415,6 +5419,10 @@ msgstr "Select nth day of the month to repeat the reminder."
 #: src/strings.ts:1802
 msgid "Select profile picture"
 msgstr "Select profile picture"
+
+#: src/strings.ts:2466
+msgid "Select the default sidebar tab"
+msgstr "Select the default sidebar tab"
 
 #: src/strings.ts:374
 msgid "Select the folder that includes your backup files to list them here."

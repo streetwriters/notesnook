@@ -76,6 +76,10 @@ class SettingStore extends BaseStore<SettingStore> {
     type: "route",
     id: "notes"
   });
+  defaultSidebarTab = Config.get<"home" | "notebooks" | "tags">(
+    "sidebarTab",
+    "home"
+  );
   imageCompression = Config.get(
     "imageCompression",
     ImageCompressionOptions.ASK_EVERY_TIME
@@ -145,6 +149,11 @@ class SettingStore extends BaseStore<SettingStore> {
   setHomepage = (homepage: HomePage) => {
     this.set({ homepage });
     Config.set("homepage-v2", homepage);
+  };
+
+  setDefaultSidebarTab = (defaultSidebarTab: "home" | "notebooks" | "tags") => {
+    this.set({ defaultSidebarTab });
+    Config.set("sidebarTab", defaultSidebarTab);
   };
 
   setImageCompression = (imageCompression: ImageCompressionOptions) => {

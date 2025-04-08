@@ -37,6 +37,27 @@ export const BehaviourSettings: SettingsGroup[] = [
     isHidden: () => !isUserPremium(),
     settings: [
       {
+        key: "default-sidebar-tab",
+        title: strings.defaultSidebarTab(),
+        description: strings.defaultSidebarTabDesc(),
+        keywords: ["default sidebar tab"],
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => s.defaultSidebarTab, listener),
+        components: [
+          {
+            type: "dropdown",
+            onSelectionChanged: (value) =>
+              useSettingStore.getState().setDefaultSidebarTab(value as any),
+            selectedOption: () => useSettingStore.getState().defaultSidebarTab,
+            options: [
+              { value: "home", title: strings.routes.Notes() },
+              { value: "notebooks", title: strings.routes.Notebooks() },
+              { value: "tags", title: strings.routes.Tags() }
+            ]
+          }
+        ]
+      },
+      {
         key: "image-compression",
         title: strings.imageCompression(),
         description: strings.imageCompressionDesc(),
