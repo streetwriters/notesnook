@@ -69,26 +69,6 @@ export function Notebooks() {
     treeRef.current?.refresh();
   }, [notebooks]);
 
-  if (!notebooks)
-    return (
-      <Flex id="notebooks" sx={{ flexDirection: "column" }}>
-        <ListLoader />
-      </Flex>
-    );
-  if (notebooks.length === 0) {
-    return (
-      <Flex id="notebooks" sx={{ mx: 1, flex: 1 }}>
-        <Text
-          variant="body"
-          sx={{ color: "paragraph-secondary" }}
-          data-test-id="list-placeholder"
-        >
-          {strings.notebooksEmpty()}
-        </Text>
-      </Flex>
-    );
-  }
-
   return (
     <>
       <Box
@@ -101,79 +81,93 @@ export function Notebooks() {
           }
         }}
       >
-        <VirtualizedTree
-          testId="notebooks-list"
-          rootId={"root"}
-          itemHeight={26}
-          treeRef={treeRef}
-          deselectAll={() => toggleSelection(false)}
-          bulkSelect={setSelectedItems}
-          isSelected={isSelected}
-          onDeselect={deselectItem}
-          onSelect={selectItem}
-          saveKey="notebook-tree"
-          getChildNodes={async (parentId, depth) => {
-            const nodes: TreeNode<{
-              notebook: NotebookType;
-              totalNotes: number;
-            }>[] = [];
-            const grouping =
-              parentId === "root"
-                ? notebooks
-                : await db.relations
-                    .from({ type: "notebook", id: parentId }, "notebook")
-                    .selector.sorted(db.settings.getGroupOptions("notebooks"));
-            for (let i = 0; i < grouping.length; ++i) {
-              const notebook = await grouping.item(i);
-              if (!notebook.item) continue;
-              nodes.push({
-                data: { notebook: notebook.item, totalNotes: 0 },
-                depth: depth + 1,
-                hasChildren: false,
-                id: notebook.item.id,
-                parentId
-              });
-            }
-            const allRelations = await db.relations
-              .from({ type: "notebook", ids: nodes.map((n) => n.id) }, [
-                "notebook",
-                "note"
-              ])
-              .get();
-            for (const node of nodes) {
-              node.hasChildren = allRelations.some(
-                (nb) => nb.fromId === node.id && nb.toType === "notebook"
-              );
-              node.data.totalNotes = allRelations.filter(
-                (nb) => nb.fromId === node.id && nb.toType === "note"
-              ).length;
-            }
-            return nodes;
-          }}
-          renderItem={({ collapse, expand, expanded, index, item: node }) => (
-            <Notebook
-              key={node.id}
-              depth={node.depth}
-              isExpandable={node.hasChildren}
-              item={node.data.notebook}
-              isExpanded={expanded}
-              totalNotes={node.data.totalNotes}
-              refresh={async () => {
-                const notebook = await db.notebooks.notebook(node.id);
-                const totalNotes = await db.relations
-                  .from(node.data.notebook, "note")
-                  .count();
-                treeRef.current?.refreshItem(
-                  index,
-                  notebook ? { notebook, totalNotes } : undefined
+        {!notebooks ? (
+          <ListLoader />
+        ) : notebooks.length === 0 ? (
+          <Text
+            variant="body"
+            sx={{ color: "paragraph-secondary", mx: 1 }}
+            data-test-id="list-placeholder"
+          >
+            {strings.notebooksEmpty()}
+          </Text>
+        ) : (
+          <VirtualizedTree
+            testId="notebooks-list"
+            rootId={"root"}
+            itemHeight={26}
+            treeRef={treeRef}
+            deselectAll={() => toggleSelection(false)}
+            bulkSelect={setSelectedItems}
+            isSelected={isSelected}
+            onDeselect={deselectItem}
+            onSelect={selectItem}
+            saveKey="notebook-tree"
+            getChildNodes={async (parentId, depth) => {
+              const nodes: TreeNode<{
+                notebook: NotebookType;
+                totalNotes: number;
+              }>[] = [];
+              const grouping =
+                parentId === "root"
+                  ? notebooks
+                  : await db.relations
+                      .from({ type: "notebook", id: parentId }, "notebook")
+                      .selector.sorted(
+                        db.settings.getGroupOptions("notebooks")
+                      );
+              for (let i = 0; i < grouping.length; ++i) {
+                const notebook = await grouping.item(i);
+                if (!notebook.item) continue;
+                nodes.push({
+                  data: { notebook: notebook.item, totalNotes: 0 },
+                  depth: depth + 1,
+                  hasChildren: false,
+                  id: notebook.item.id,
+                  parentId
+                });
+              }
+              const allRelations = await db.relations
+                .from({ type: "notebook", ids: nodes.map((n) => n.id) }, [
+                  "notebook",
+                  "note"
+                ])
+                .get();
+              for (const node of nodes) {
+                node.hasChildren = allRelations.some(
+                  (nb) => nb.fromId === node.id && nb.toType === "notebook"
                 );
-              }}
-              collapse={collapse}
-              expand={expand}
-            />
-          )}
-          Scroller={SidebarScroller}
-        />
+                node.data.totalNotes = allRelations.filter(
+                  (nb) => nb.fromId === node.id && nb.toType === "note"
+                ).length;
+              }
+              return nodes;
+            }}
+            renderItem={({ collapse, expand, expanded, index, item: node }) => (
+              <Notebook
+                key={node.id}
+                depth={node.depth}
+                isExpandable={node.hasChildren}
+                item={node.data.notebook}
+                isExpanded={expanded}
+                totalNotes={node.data.totalNotes}
+                refresh={async () => {
+                  const notebook = await db.notebooks.notebook(node.id);
+                  const totalNotes = await db.relations
+                    .from(node.data.notebook, "note")
+                    .count();
+                  treeRef.current?.refreshItem(
+                    index,
+                    notebook ? { notebook, totalNotes } : undefined
+                  );
+                }}
+                collapse={collapse}
+                expand={expand}
+              />
+            )}
+            Scroller={SidebarScroller}
+          />
+        )}
       </Box>
       <Input
         variant="clean"
