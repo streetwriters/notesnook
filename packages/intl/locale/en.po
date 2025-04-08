@@ -5516,6 +5516,10 @@ msgstr "Set as dark theme"
 msgid "Set as default"
 msgstr "Set as default"
 
+#: src/strings.ts:2464
+msgid "Set as homepage"
+msgstr "Set as homepage"
+
 #: src/strings.ts:720
 msgid "Set as light theme"
 msgstr "Set as light theme"

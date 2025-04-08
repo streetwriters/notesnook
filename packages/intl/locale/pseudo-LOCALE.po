@@ -5490,6 +5490,10 @@ msgstr ""
 msgid "Set as default"
 msgstr ""
 
+#: src/strings.ts:2464
+msgid "Set as homepage"
+msgstr ""
+
 #: src/strings.ts:720
 msgid "Set as light theme"
 msgstr ""
