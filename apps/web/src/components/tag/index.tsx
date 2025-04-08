@@ -31,6 +31,7 @@ import { useStore as useSelectionStore } from "../../stores/selection-store";
 import { useStore as useNoteStore } from "../../stores/note-store";
 import { Multiselect } from "../../common/multi-select";
 import { strings } from "@notesnook/intl";
+import { createSetDefaultHomepageMenuItem } from "../../common";
 
 type TagProps = { item: TagType; totalNotes: number };
 function Tag(props: TagProps) {
@@ -111,6 +112,11 @@ export const tagMenuItems: (tag: TagType, ids?: string[]) => MenuItem[] = (
       title: strings.renameTag(),
       icon: Edit.path,
       onClick: () => EditTagDialog.show(tag)
+    },
+    {
+      type: "lazy-loader",
+      key: "sidebar-items-loader",
+      items: async () => [createSetDefaultHomepageMenuItem(tag.id, tag.type)]
     },
     {
       type: "button",

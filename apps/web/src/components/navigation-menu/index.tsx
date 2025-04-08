@@ -45,7 +45,6 @@ import {
   SortBy,
   Reset,
   Rename,
-  ColorRemove,
   ExpandSidebar,
   HamburgerMenu
 } from "../icons";
@@ -100,7 +99,11 @@ import Tags from "../../views/tags";
 import { Notebooks } from "../../views/notebooks";
 import { UserProfile } from "../../dialogs/settings/components/user-profile";
 import { SUBSCRIPTION_STATUS } from "../../common/constants";
-import { CREATE_BUTTON_MAP, logout } from "../../common";
+import {
+  CREATE_BUTTON_MAP,
+  createSetDefaultHomepageMenuItem,
+  logout
+} from "../../common";
 import { TabItem } from "./tab-item";
 import Notice from "../notice";
 import { usePromise } from "@notesnook/common";
@@ -478,6 +481,17 @@ function RouteItem({
         {
           type: "lazy-loader",
           key: "sidebar-items-loader",
+          items: async () => [
+            createSetDefaultHomepageMenuItem(item.id, "route")
+          ]
+        },
+        {
+          type: "separator",
+          key: "sep32"
+        },
+        {
+          type: "lazy-loader",
+          key: "sidebar-items-loader",
           items: getSidebarItemsAsMenuItems
         }
       ]}
@@ -549,11 +563,18 @@ function ColorItem({
             await db.colors.remove(color.id);
             await useAppStore.getState().refreshNavItems();
           },
-          icon: ColorRemove.path
+          icon: Trash.path
+        },
+        {
+          type: "lazy-loader",
+          key: "sidebar-items-loader",
+          items: async () => [
+            createSetDefaultHomepageMenuItem(color.id, color.type)
+          ]
         },
         {
           type: "separator",
-          key: "sep"
+          key: "sep32"
         },
         {
           type: "lazy-loader",
@@ -611,9 +632,21 @@ function ShortcutItem({
       isCollapsed={context?.isCollapsed}
       menuItems={[
         {
+          type: "lazy-loader",
+          key: "sidebar-items-loader",
+          items: async () => [
+            createSetDefaultHomepageMenuItem(item.id, item.type)
+          ]
+        },
+        {
+          type: "separator",
+          key: "sep32"
+        },
+        {
           type: "button",
           key: "removeshortcut",
           title: strings.doActions.remove.shortcut(1),
+          icon: Trash.path,
           onClick: async () => {
             await db.shortcuts.remove(item.id);
             useAppStore.getState().refreshNavItems();
