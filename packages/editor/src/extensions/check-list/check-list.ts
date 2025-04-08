@@ -20,6 +20,7 @@ import { mergeAttributes, Node, wrappingInputRule } from "@tiptap/core";
 import { inputRegex } from "@tiptap/extension-task-item";
 import { getParentAttributes } from "../../utils/prosemirror.js";
 import { ListItem } from "../list-item/index.js";
+import { tiptapKeys } from "@notesnook/common";
 
 export interface CheckListOptions {
   itemTypeName: string;
@@ -123,7 +124,8 @@ export const CheckList = Node.create<CheckListOptions>({
 
   addKeyboardShortcuts() {
     return {
-      "Mod-Shift-9": () => this.editor.commands.toggleCheckList()
+      [tiptapKeys.toggleCheckList.keys]: () =>
+        this.editor.commands.toggleCheckList()
     };
   }
 });

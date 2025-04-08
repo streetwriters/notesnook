@@ -24,6 +24,7 @@ import {
 } from "@tiptap/core";
 import { findParentNodeOfTypeClosestToPos } from "../../utils/prosemirror.js";
 import { OutlineList } from "../outline-list/outline-list.js";
+import { tiptapKeys } from "@notesnook/common";
 
 export interface ListItemOptions {
   HTMLAttributes: Record<string, unknown>;
@@ -75,7 +76,7 @@ export const OutlineListItem = Node.create<ListItemOptions>({
 
   addKeyboardShortcuts() {
     return {
-      "Mod-Space": ({ editor }) => {
+      [tiptapKeys.toggleOutlineListExpand.keys]: ({ editor }) => {
         const { selection } = editor.state;
         const { $from, empty } = selection;
 

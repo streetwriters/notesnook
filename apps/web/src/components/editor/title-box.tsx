@@ -25,6 +25,7 @@ import { useEditorConfig, useEditorManager } from "./manager";
 import { getFontById } from "@notesnook/editor";
 import { replaceDateTime } from "@notesnook/editor";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
+import { useStore as useAppStore } from "../../stores/app-store";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { strings } from "@notesnook/intl";
 import { NEWLINE_STRIP_REGEX } from "@notesnook/core";
@@ -43,6 +44,7 @@ function TitleBox(props: TitleBoxProps) {
   const { editorConfig } = useEditorConfig();
   const dateFormat = useSettingsStore((store) => store.dateFormat);
   const timeFormat = useSettingsStore((store) => store.timeFormat);
+  const focusMode = useAppStore((store) => store.isFocusMode);
 
   const fontFamily = useMemo(
     () => getFontById(editorConfig.fontFamily)?.font || "heading",
@@ -92,6 +94,15 @@ function TitleBox(props: TitleBoxProps) {
       unsubscribe();
     };
   }, [id]);
+
+  useEffect(() => {
+    if (!inputRef.current) return;
+    withSelectionPersist(inputRef.current, (input) => {
+      console.log("input focus mode changed", focusMode, input.value);
+      input.value = input.value;
+      resizeTextarea(input);
+    });
+  }, [focusMode]);
 
   return (
     <Textarea
