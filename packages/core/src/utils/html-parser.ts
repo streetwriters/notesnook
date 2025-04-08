@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { decodeHTML5 } from "entities";
 import { Parser } from "htmlparser2";
+import { HEADLINE_CHARACTER_LIMIT } from "./constants";
 
 export const parseHTML = (input: string) =>
   "DOMParser" in globalThis
@@ -46,21 +47,15 @@ function wrapIntoHTMLDocument(input: string) {
 
 export function extractHeadline(html: string) {
   let text = "";
-  let start = false;
   const parser = new Parser(
     {
-      onopentag: (name) => {
-        start = true;
-      },
-      onclosetag: (name) => {
-        if (text !== "") {
-          start = false;
-          parser.pause();
-          parser.reset();
-        }
-      },
       ontext: (data) => {
-        if (start) text += data;
+        text += data;
+        if (text.length > HEADLINE_CHARACTER_LIMIT) {
+          text = text.slice(0, HEADLINE_CHARACTER_LIMIT);
+          parser.pause();
+          parser.end();
+        }
       }
     },
     {

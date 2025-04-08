@@ -183,21 +183,24 @@ test("note title with headline format should keep generating headline until titl
   }));
 
 [
-  ["p tag", "<p>", "</p>"],
-  ["h1 tag", "<h1>", "</h1>"],
-  ["list item", "<ol><li>", "</li></ol>"],
-  ["not first html tag", "<p></p><p>", "</p>"]
-].forEach(([testCase, start, end]) => {
-  test(`note should get headline from first html tag with content - ${testCase}`, () =>
+  ["simple p tag", "<p>headline</p>", "headline"],
+  ["across multiple tags", "<h1>title<h1><ol><li>list</li></ol>", "titlelist"],
+  [
+    "content with exceeded HEADLINE_CHARACTER_LIMIT",
+    "<p><strong>head</strong><em>line</em></p><h1>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam rutrum ex ac eros egestas, ut rhoncus felis faucibus. Mauris tempor orci nisl, vitae pulvinar turpis convallis n</h1>",
+    "headlineLorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam rutrum ex ac eros egestas, ut rhoncus felis faucibus. Mauris tempor orci nisl,"
+  ]
+].forEach(([testCase, content, expectedHeadline]) => {
+  test(`note should generate headline up to HEADLINE_CHARACTER_LIMIT characters - ${testCase}`, () =>
     noteTest({
       ...TEST_NOTE,
       content: {
         type: TEST_NOTE.content.type,
-        data: `${start}This is a very colorful existence.${end}`
+        data: content
       }
     }).then(async ({ db, id }) => {
       const note = await db.notes.note(id);
-      expect(note?.headline).toBe("This is a very colorful existence.");
+      expect(note?.headline).toBe(expectedHeadline);
     }));
 });
 
