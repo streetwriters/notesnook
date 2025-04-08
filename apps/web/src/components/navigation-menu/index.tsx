@@ -495,10 +495,6 @@ function Colors({
   collapse: () => void;
 }) {
   const colors = useAppStore((store) => store.colors);
-  const refreshNavItems = useAppStore((store) => store.refreshNavItems);
-  const context = useNoteStore((store) =>
-    store.context?.type === "color" ? store.context : null
-  );
   const hiddenColors = useAppStore((store) => store.hiddenColors);
 
   return (
@@ -507,53 +503,67 @@ function Colors({
       orderKey={`sidebarOrder:colors`}
       order={() => db.settings.getSideBarOrder("colors")}
       onOrderChanged={(order) => db.settings.setSideBarOrder("colors", order)}
-      renderItem={({ item: color }) => (
-        <SortableNavigationItem
-          id={color.id}
-          key={color.id}
-          title={color.title}
-          isCollapsed={isCollapsed}
-          icon={Circle}
-          selected={context?.id === color.id}
-          color={color.colorCode}
-          onClick={() => {
-            navigateToRoute(`/colors/${color.id}`);
-            collapse();
-          }}
-          onDrop={(e) => handleDrop(e.dataTransfer, color)}
-          menuItems={[
-            {
-              type: "button",
-              key: "rename-color",
-              title: strings.renameColor(),
-              onClick: () => RenameColorDialog.show(color),
-              icon: Rename.path
-            },
-            {
-              type: "button",
-              key: "remove-color",
-              title: strings.removeColor(),
-              onClick: async () => {
-                await db.colors.remove(color.id);
-                await refreshNavItems();
-              },
-              icon: ColorRemove.path
-            },
-            {
-              type: "separator",
-              key: "sep"
-            },
-            {
-              type: "lazy-loader",
-              key: "sidebar-items-loader",
-              items: getSidebarItemsAsMenuItems
-            }
-          ]}
-        >
-          <ItemCount item={color} />
-        </SortableNavigationItem>
-      )}
+      renderItem={ColorItem}
+      context={{ collapse, isCollapsed }}
     />
+  );
+}
+
+function ColorItem({
+  item: color,
+  context
+}: {
+  item: Color;
+  context?: { isCollapsed: boolean; collapse: () => void };
+}) {
+  const currentContext = useNoteStore((store) =>
+    store.context?.type === "color" ? store.context : null
+  );
+  return (
+    <SortableNavigationItem
+      id={color.id}
+      key={color.id}
+      title={color.title}
+      isCollapsed={context?.isCollapsed}
+      icon={Circle}
+      selected={currentContext?.id === color.id}
+      color={color.colorCode}
+      onClick={() => {
+        navigateToRoute(`/colors/${color.id}`);
+        context?.collapse();
+      }}
+      onDrop={(e) => handleDrop(e.dataTransfer, color)}
+      menuItems={[
+        {
+          type: "button",
+          key: "rename-color",
+          title: strings.renameColor(),
+          onClick: () => RenameColorDialog.show(color),
+          icon: Rename.path
+        },
+        {
+          type: "button",
+          key: "remove-color",
+          title: strings.removeColor(),
+          onClick: async () => {
+            await db.colors.remove(color.id);
+            await useAppStore.getState().refreshNavItems();
+          },
+          icon: ColorRemove.path
+        },
+        {
+          type: "separator",
+          key: "sep"
+        },
+        {
+          type: "lazy-loader",
+          key: "sidebar-items-loader",
+          items: getSidebarItemsAsMenuItems
+        }
+      ]}
+    >
+      <ItemCount item={color} />
+    </SortableNavigationItem>
   );
 }
 
@@ -565,12 +575,6 @@ function Shortcuts({
   collapse: () => void;
 }) {
   const shortcuts = useAppStore((store) => store.shortcuts);
-  const refreshNavItems = useAppStore((store) => store.refreshNavItems);
-  const context = useNoteStore((store) =>
-    store.context?.type === "tag" || store.context?.type === "notebook"
-      ? store.context
-      : null
-  );
 
   return (
     <ReorderableList
@@ -580,82 +584,97 @@ function Shortcuts({
       onOrderChanged={(order) =>
         db.settings.setSideBarOrder("shortcuts", order)
       }
-      renderItem={({ item }) => (
-        <SortableNavigationItem
-          id={item.id}
-          key={item.id}
-          title={item.title}
-          isCollapsed={isCollapsed}
-          menuItems={[
-            {
-              type: "button",
-              key: "removeshortcut",
-              title: strings.doActions.remove.shortcut(1),
-              onClick: async () => {
-                await db.shortcuts.remove(item.id);
-                refreshNavItems();
-              }
-            }
-          ]}
-          icon={
-            item.type === "notebook"
-              ? Notebook2
-              : item.type === "tag"
-              ? Tag2
-              : Topic
-          }
-          selected={context?.id === item.id}
-          onDrop={(e) => handleDrop(e.dataTransfer, item)}
-          onClick={async () => {
-            navigateToRoute(
-              item.type === "notebook"
-                ? `/notebooks/${item.id}`
-                : `/tags/${item.id}`
-            );
-            collapse();
-          }}
-        >
-          <ItemCount item={item} />
-        </SortableNavigationItem>
-      )}
+      context={{ isCollapsed, collapse }}
+      renderItem={ShortcutItem}
     />
   );
 }
 
-function ItemCount({ item }: { item: Route | Color | Notebook | Tag }) {
-  const notes = useNoteStore((store) => store.notes?.length || 0);
-  const reminders = useReminderStore((store) => store.reminders?.length || 0);
-  const trash = useTrashStore((store) => store.trash?.length || 0);
-  const monographs = useMonographStore(
-    (store) => store.monographs?.length || 0
+function ShortcutItem({
+  item,
+  context
+}: {
+  item: Notebook | Tag;
+  context?: { isCollapsed: boolean; collapse: () => void };
+}) {
+  const currentContext = useNoteStore((store) =>
+    store.context?.type === "tag" || store.context?.type === "notebook"
+      ? store.context
+      : null
   );
-  const count = usePromise(() => {
-    if ("type" in item) {
-      if (item.type === "color") return db.colors.count(item.id);
-      else if (item.type === "notebook" || item.type === "tag")
-        return db.relations.from(item, "note").count();
-    } else {
-      switch (item.id) {
-        case "notes":
-          return notes;
-        case "favorites":
-          return db.notes.favorites.count();
-        case "reminders":
-          return reminders;
-        case "trash":
-          return trash;
-        case "monographs":
-          return monographs;
-        default:
-          return 0;
-      }
-    }
-  }, [notes, trash, monographs, reminders]);
+
   return (
-    <Text variant="subBody">
-      {count.status === "fulfilled" ? count.value : ""}
-    </Text>
+    <SortableNavigationItem
+      id={item.id}
+      key={item.id}
+      title={item.title}
+      isCollapsed={context?.isCollapsed}
+      menuItems={[
+        {
+          type: "button",
+          key: "removeshortcut",
+          title: strings.doActions.remove.shortcut(1),
+          onClick: async () => {
+            await db.shortcuts.remove(item.id);
+            useAppStore.getState().refreshNavItems();
+          }
+        }
+      ]}
+      icon={
+        item.type === "notebook"
+          ? Notebook2
+          : item.type === "tag"
+          ? Tag2
+          : Topic
+      }
+      selected={currentContext?.id === item.id}
+      onDrop={(e) => handleDrop(e.dataTransfer, item)}
+      onClick={async () => {
+        navigateToRoute(
+          item.type === "notebook"
+            ? `/notebooks/${item.id}`
+            : `/tags/${item.id}`
+        );
+        context?.collapse();
+      }}
+    >
+      <ItemCount item={item} />
+    </SortableNavigationItem>
   );
+}
+
+function ItemCount({ item }: { item: Route | Color | Notebook | Tag }) {
+  const notes = useNoteStore((store) => store.notes);
+  const reminders = useReminderStore((store) => store.reminders);
+  const trash = useTrashStore((store) => store.trash);
+  const monographs = useMonographStore((store) => store.monographs);
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    (async function () {
+      if ("type" in item) {
+        if (item.type === "color") return db.colors.count(item.id);
+        else if (item.type === "notebook" || item.type === "tag")
+          return db.relations.from(item, "note").count();
+      } else {
+        switch (item.id) {
+          case "notes":
+            return notes?.length || 0;
+          case "favorites":
+            return db.notes.favorites.count();
+          case "reminders":
+            return reminders?.length || 0;
+          case "trash":
+            return trash?.length || 0;
+          case "monographs":
+            return monographs?.length || 0;
+          default:
+            return 0;
+        }
+      }
+    })().then((c) => setCount(c || 0));
+  }, [item, notes, trash, monographs, reminders]);
+  return <Text variant="subBody">{count}</Text>;
 }
 
 function NavigationDropdown() {
