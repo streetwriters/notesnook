@@ -200,15 +200,8 @@ const settings = {
 function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const [currentTab, setCurrentTab] = useState<(typeof tabs)[number]>(() => {
-    switch (useSettingStore.getState().defaultSidebarTab) {
-      case "notebooks":
-        return tabs[1];
-      case "tags":
-        return tabs[2];
-      case "home":
-      default:
-        return tabs[0];
-    }
+    const defaultSidebarTab = useSettingStore.getState().defaultSidebarTab;
+    return tabs.find((tab) => tab.id === defaultSidebarTab) || tabs[0];
   });
   const isNavPaneCollapsed = useAppStore((store) => store.isNavPaneCollapsed);
   const [expanded, setExpanded] = useState(false);
