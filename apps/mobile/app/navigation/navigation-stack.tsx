@@ -66,21 +66,22 @@ const AppNavigation = React.memo(
         }
 
         switch (homepageV2.type) {
-          case "notebook": {
-            const notebook = await db.notebooks.notebook(homepageV2.id);
-            if (notebook) {
-              setHome({
-                name: "Notebook",
-                params: {
-                  item: notebook,
-                  id: notebook.id,
-                  title: notebook.title
-                }
-              });
-              return;
+          case "notebook":
+            {
+              const notebook = await db.notebooks.notebook(homepageV2.id);
+              if (notebook) {
+                setHome({
+                  name: "Notebook",
+                  params: {
+                    item: notebook,
+                    id: notebook.id,
+                    title: notebook.title
+                  }
+                });
+                return;
+              }
             }
-          }
-
+            break;
           case "color": {
             const color = await db.colors.color(homepageV2.id);
             if (color) {
@@ -110,7 +111,6 @@ const AppNavigation = React.memo(
               });
               return;
             }
-
             break;
           }
           case "default":
