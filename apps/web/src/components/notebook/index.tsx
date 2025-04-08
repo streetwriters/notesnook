@@ -65,10 +65,12 @@ export function Notebook(props: NotebookProps) {
     refresh = () => {},
     depth = 0
   } = props;
-  const isOpened = useNotesStore(
-    (store) =>
-      store.context?.type === "notebook" && store.context.id === item.id
+  const currentContext = useNotesStore((store) =>
+    store.context?.type === "notebook" && store.context.id === item.id
+      ? store.contextNotes
+      : null
   );
+  const isOpened = !!currentContext;
   const dragTimeout = useRef(0);
   const { isDragEntering, isDragLeaving } = useDragHandler(`id_${item.id}`);
 
@@ -154,7 +156,11 @@ export function Notebook(props: NotebookProps) {
           </Text>
         </Flex>
       }
-      footer={<Text variant="subBody">{totalNotes}</Text>}
+      footer={
+        <Text variant="subBody">
+          {currentContext ? currentContext?.length : totalNotes}
+        </Text>
+      }
       menuItems={notebookMenuItems}
       context={{ refresh }}
       sx={{
