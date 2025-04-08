@@ -36,9 +36,12 @@ type TagProps = { item: TagType; totalNotes: number };
 function Tag(props: TagProps) {
   const { item, totalNotes } = props;
   const { id } = item;
-  const isSelected = useNoteStore(
-    (store) => store.context?.type === "tag" && store.context.id === id
+  const currentContext = useNoteStore((store) =>
+    store.context?.type === "tag" && store.context.id === id
+      ? store.contextNotes
+      : null
   );
+  const isSelected = !!currentContext;
 
   return (
     <ListItem
@@ -72,7 +75,7 @@ function Tag(props: TagProps) {
       }
       footer={
         <Text mt={1} variant="subBody">
-          {totalNotes}
+          {currentContext?.length || totalNotes}
         </Text>
       }
       onKeyPress={async (e) => {
