@@ -43,6 +43,7 @@ import { store as appStore } from "../../stores/app-store";
 import { Multiselect } from "../../common/multi-select";
 import { strings } from "@notesnook/intl";
 import { db } from "../../common/db";
+import { createSetDefaultHomepageMenuItem } from "../../common";
 
 type NotebookProps = {
   item: NotebookType;
@@ -190,6 +191,7 @@ export const notebookMenuItems: (
         )
     },
     { type: "separator", key: "sepep2" },
+
     {
       type: "button",
       key: "edit",
@@ -210,6 +212,13 @@ export const notebookMenuItems: (
           isDefault ? undefined : notebook.id
         );
       }
+    },
+    {
+      type: "lazy-loader",
+      key: "sidebar-items-loader",
+      items: async () => [
+        createSetDefaultHomepageMenuItem(notebook.id, notebook.type)
+      ]
     },
     {
       type: "button",

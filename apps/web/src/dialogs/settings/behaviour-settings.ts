@@ -37,29 +37,6 @@ export const BehaviourSettings: SettingsGroup[] = [
     isHidden: () => !isUserPremium(),
     settings: [
       {
-        key: "default-homepage",
-        title: strings.homepage(),
-        description: strings.homepageDesc(),
-        keywords: ["welcome page", "default screen"],
-        onStateChange: (listener) =>
-          useSettingStore.subscribe((s) => s.homepage, listener),
-        components: [
-          {
-            type: "dropdown",
-            onSelectionChanged: (value) =>
-              useSettingStore.getState().setHomepage(parseInt(value)),
-            selectedOption: () =>
-              useSettingStore.getState().homepage.toString(),
-            options: [
-              { value: "0", title: strings.routes.Notes() },
-              { value: "1", title: strings.routes.Notebooks() },
-              { value: "2", title: strings.routes.Favorites() },
-              { value: "3", title: strings.routes.Tags() }
-            ]
-          }
-        ]
-      },
-      {
         key: "image-compression",
         title: strings.imageCompression(),
         description: strings.imageCompressionDesc(),

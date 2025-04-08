@@ -22,7 +22,7 @@ import { hashNavigate, getCurrentHash } from "../navigation";
 import { db } from "./db";
 import { sanitizeFilename } from "@notesnook/common";
 import { useStore as useUserStore } from "../stores/user-store";
-import { useStore as useSettingStore } from "../stores/setting-store";
+import { HomePage, useStore as useSettingStore } from "../stores/setting-store";
 import { showToast } from "../utils/toast";
 import { SUBSCRIPTION_STATUS } from "./constants";
 import { readFile, showFilePicker } from "../utils/file-picker";
@@ -47,6 +47,8 @@ import { ABYTES, streamablefs } from "../interfaces/fs";
 import { type ZipEntry } from "../utils/streams/unzip-stream";
 import { ZipFile } from "../utils/streams/zip-stream";
 import { ConfirmDialog, showLogoutConfirmation } from "../dialogs/confirm";
+import { Home } from "../components/icons";
+import { MenuItem } from "@notesnook/ui";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
@@ -451,4 +453,21 @@ export async function logout() {
     action: () => db.user.logout(true)
   });
   showToast("success", strings.loggedOut());
+}
+
+export function createSetDefaultHomepageMenuItem(
+  id: string,
+  type: HomePage["type"]
+) {
+  const homepage = useSettingStore.getState().homepage;
+  return {
+    key: "set-as-homepage",
+    type: "button",
+    title: strings.setAsHomepage(),
+    isChecked: homepage?.id === id && homepage?.type === type,
+    onClick: () => {
+      useSettingStore.getState().setHomepage({ id, type });
+    },
+    icon: Home.path
+  } as MenuItem;
 }
