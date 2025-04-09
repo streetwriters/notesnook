@@ -330,7 +330,9 @@ const useTiptap = (
           irremovableNodesOnBackspace: [
             CodeBlock.name,
             TaskListNode.name,
-            Table.name
+            Table.name,
+            CheckList.name,
+            AttachmentNode.name
           ],
           escapableNodesIfAtDocumentStart: [
             CodeBlock.name,
