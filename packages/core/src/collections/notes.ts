@@ -131,26 +131,29 @@ export class Notes implements ICollection {
         item.isGeneratedTitle = true;
       }
 
-      const currentNote = await this.note(id);
-      if (isUpdating && currentNote) {
+      const currentNoteTitleFields = await this.db
+        .sql()
+        .selectFrom("notes")
+        .select("isGeneratedTitle")
+        .select("title")
+        .where("id", "=", id)
+        .executeTakeFirst();
+      if (isUpdating) {
         const didUserEditTitle = Boolean(item.title);
         item.isGeneratedTitle =
-          currentNote.isGeneratedTitle === undefined ||
-          currentNote.isGeneratedTitle === false
-            ? false
-            : didUserEditTitle
-            ? false
-            : true;
+          Boolean(currentNoteTitleFields?.isGeneratedTitle) &&
+          !didUserEditTitle;
         const titleFormat = this.db.settings.getTitleFormat();
         if (
           item.isGeneratedTitle &&
           HEADLINE_REGEX.test(titleFormat) &&
           headline &&
-          currentNote.title !== headlineToTitle(headline)
+          currentNoteTitleFields?.title !== headlineToTitle(headline)
         ) {
-          item.title =
-            item.title ||
-            titleFormat.replace(HEADLINE_REGEX, headlineToTitle(headline));
+          item.title = titleFormat.replace(
+            HEADLINE_REGEX,
+            headlineToTitle(headline)
+          );
         }
       }
 
