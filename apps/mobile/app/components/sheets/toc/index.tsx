@@ -129,6 +129,7 @@ const TableOfContents = ({ toc, close }: TableOfContentsProps) => {
           <TableOfContentsItem item={item} close={close} />
         )}
         keyExtractor={(item) => item.id}
+        ListFooterComponent={<View style={{ height: 50 }} />}
       />
     </View>
   );
