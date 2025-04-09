@@ -149,7 +149,9 @@ export async function downloadFile(
       });
     }
 
-    await RNFetchBlob.fs.mv(tempFilePath, originalFilePath);
+    await RNFetchBlob.fs.mv(tempFilePath, originalFilePath).catch(() => {
+      /* empty */
+    });
 
     if (!(await exists(filename))) {
       throw new Error("File size mismatch");
