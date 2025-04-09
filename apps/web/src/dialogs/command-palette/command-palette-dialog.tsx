@@ -161,7 +161,6 @@ export const CommandPaletteDialog = DialogManager.register(
           />
           <GroupedVirtuoso
             ref={virtuosoRef}
-            style={{ overflow: "hidden" }}
             components={{
               Scroller: CustomScrollbarsVirtualList,
               Footer: () => (
