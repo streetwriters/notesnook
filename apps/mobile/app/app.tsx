@@ -24,7 +24,7 @@ import {
   useThemeEngineStore
 } from "@notesnook/theme";
 import React, { useEffect } from "react";
-import { I18nManager, StatusBar } from "react-native";
+import { Appearance, I18nManager, StatusBar } from "react-native";
 import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -129,6 +129,15 @@ export const withTheme = (Element: (props: any) => JSX.Element) => {
             /* empty */
           });
       }, 1000);
+
+      const listener = Appearance.addChangeListener(({ colorScheme }) => {
+        if (colorScheme && SettingsService.getProperty("useSystemTheme")) {
+          useThemeStore.getState().setColorScheme(colorScheme);
+        }
+      });
+      return () => {
+        listener.remove();
+      };
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
