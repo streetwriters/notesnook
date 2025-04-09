@@ -43,7 +43,6 @@ import {
 import { Element } from "domhandler";
 import { render } from "dom-serializer";
 import { logger } from "../logger.js";
-import { HEADLINE_CHARACTER_LIMIT } from "../utils/constants.js";
 
 export type ResolveHashes = (
   hashes: string[]
@@ -90,7 +89,7 @@ export class Tiptap {
   }
 
   toHeadline() {
-    return extractHeadline(this.data, HEADLINE_CHARACTER_LIMIT);
+    return extractHeadline(this.data, 150);
   }
 
   // isEmpty() {

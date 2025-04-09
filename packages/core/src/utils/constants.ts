@@ -65,5 +65,3 @@ const HOSTNAMES = {
 export const getServerNameFromHost = (host: string) => {
   return HOSTNAMES[host];
 };
-
-export const HEADLINE_CHARACTER_LIMIT = 150;
