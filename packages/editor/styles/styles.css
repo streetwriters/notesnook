@@ -17,7 +17,6 @@
 
 .ProseMirror {
   font-family: inherit;
-  line-height: 20px;
 }
 
 .ProseMirror p.is-editor-empty::before {
@@ -114,7 +113,7 @@
 
 .ProseMirror > p[data-spacing="double"],
 .ProseMirror div.callout > p[data-spacing="double"],
-.ProseMirror blockquote > p[data-spacing="double"] { 
+.ProseMirror blockquote > p[data-spacing="double"] {
  margin-top: 1em;
  /* By default double spaced paragraphs have no bottom margin */
  margin-bottom: 0px;
