@@ -38,8 +38,10 @@ function TitleBox(props: TitleBoxProps) {
   const { readonly, id } = props;
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const pendingChanges = useRef(false);
-  // const id = useStore((store) => store.session.id);
-  const session = useEditorStore((store) => store.getSession(id));
+  const sessionType = useEditorStore((store) => store.getSession(id)?.type);
+  const sessionTitle = useEditorStore(
+    (store) => store.getSession(id, ["default"])?.note.title
+  );
   const { editorConfig } = useEditorConfig();
   const dateFormat = useSettingsStore((store) => store.dateFormat);
   const timeFormat = useSettingsStore((store) => store.timeFormat);
@@ -50,16 +52,9 @@ function TitleBox(props: TitleBoxProps) {
   );
 
   useLayoutEffect(() => {
-    if (
-      !session ||
-      !("saveState" in session) ||
-      !("note" in session) ||
-      !session.note ||
-      !inputRef.current
-    ) {
+    const session = useEditorStore.getState().getSession(id);
+    if (!session || !("note" in session) || !session.note || !inputRef.current)
       return;
-    }
-    if (session.saveState !== SaveState.Saved) return;
     if (pendingChanges.current) return;
 
     const { title } = session.note;
@@ -69,7 +64,7 @@ function TitleBox(props: TitleBoxProps) {
       input.value = title || "";
       resizeTextarea(input);
     });
-  }, [session]);
+  }, [sessionType, id, sessionTitle]);
 
   useEffect(() => {
     const { unsubscribe } = AppEventManager.subscribe(
