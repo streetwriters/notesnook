@@ -513,7 +513,7 @@ export const useEditor = (
         ) {
           state.current.ready = true;
         }
-        if (event.newNote && !currentLoadingNoteId.current) {
+        if (event.newNote) {
           let tabId;
 
           const currentTab = useTabStore
@@ -739,9 +739,7 @@ export const useEditor = (
             : data.id;
 
         const note = data.type === "note" ? data : await db.notes?.note(noteId);
-
         lock.current = true;
-
         // Handle this case where note was locked on another device and synced.
         let locked = note
           ? await db.vaults.itemExists(note as ItemReference)
