@@ -101,7 +101,7 @@ export const SectionHeader = React.memo<
                 alignSelf: "center",
                 textAlignVertical: "center"
               }}
-              color={colors.primary.accent}
+              color={color || colors.primary.accent}
             >
               {!item.title || item.title === ""
                 ? strings.pinned().toUpperCase()
