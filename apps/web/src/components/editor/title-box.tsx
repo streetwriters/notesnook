@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { Textarea } from "@theme-ui/components";
-import { useEditorStore } from "../../stores/editor-store";
+import { SaveState, useEditorStore } from "../../stores/editor-store";
 import { debounceWithId } from "@notesnook/common";
 import { useEditorConfig, useEditorManager } from "./manager";
 import { getFontById } from "@notesnook/editor";
@@ -38,8 +38,10 @@ function TitleBox(props: TitleBoxProps) {
   const { readonly, id } = props;
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const pendingChanges = useRef(false);
-  // const id = useStore((store) => store.session.id);
   const sessionType = useEditorStore((store) => store.getSession(id)?.type);
+  const sessionTitle = useEditorStore(
+    (store) => store.getSession(id, ["default"])?.note.title
+  );
   const { editorConfig } = useEditorConfig();
   const dateFormat = useSettingsStore((store) => store.dateFormat);
   const timeFormat = useSettingsStore((store) => store.timeFormat);
@@ -62,7 +64,7 @@ function TitleBox(props: TitleBoxProps) {
       input.value = title || "";
       resizeTextarea(input);
     });
-  }, [sessionType, id]);
+  }, [sessionType, id, sessionTitle]);
 
   useEffect(() => {
     const { unsubscribe } = AppEventManager.subscribe(
@@ -161,12 +163,12 @@ function resizeTextarea(input: HTMLTextAreaElement) {
   });
 }
 
-function onTitleChange(
+async function onTitleChange(
   noteId: string,
   title: string,
   pendingChanges: React.MutableRefObject<boolean>
 ) {
-  useEditorStore.getState().setTitle(noteId, title);
+  await useEditorStore.getState().setTitle(noteId, title);
   pendingChanges.current = false;
 }
 

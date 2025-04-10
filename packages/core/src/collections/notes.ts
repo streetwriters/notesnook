@@ -19,7 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { getId } from "../utils/id.js";
 import { getContentFromData } from "../content-types/index.js";
-import { NEWLINE_STRIP_REGEX, formatTitle } from "../utils/title-format.js";
+import {
+  HEADLINE_REGEX,
+  NEWLINE_STRIP_REGEX,
+  formatTitle
+} from "../utils/title-format.js";
 import { clone } from "../utils/clone.js";
 import { Tiptap } from "../content-types/tiptap.js";
 import { EMPTY_CONTENT } from "./content.js";
@@ -121,9 +125,36 @@ export class Notes implements ICollection {
             this.db.settings.getTitleFormat(),
             this.db.settings.getDateFormat(),
             this.db.settings.getTimeFormat(),
-            headline?.split(" ").splice(0, 10).join(" ") || "",
+            headline ? headlineToTitle(headline) : "",
             this.totalNotes
           );
+        item.isGeneratedTitle = true;
+      }
+
+      const currentNoteTitleFields = await this.db
+        .sql()
+        .selectFrom("notes")
+        .select("isGeneratedTitle")
+        .select("title")
+        .where("id", "=", id)
+        .executeTakeFirst();
+      if (isUpdating) {
+        const didUserEditTitle = Boolean(item.title);
+        item.isGeneratedTitle =
+          Boolean(currentNoteTitleFields?.isGeneratedTitle) &&
+          !didUserEditTitle;
+        const titleFormat = this.db.settings.getTitleFormat();
+        if (
+          item.isGeneratedTitle &&
+          HEADLINE_REGEX.test(titleFormat) &&
+          headline &&
+          currentNoteTitleFields?.title !== headlineToTitle(headline)
+        ) {
+          item.title = titleFormat.replace(
+            HEADLINE_REGEX,
+            headlineToTitle(headline)
+          );
+        }
       }
 
       if (isUpdating) {
@@ -138,7 +169,9 @@ export class Notes implements ICollection {
           conflicted: item.conflicted,
           readonly: item.readonly,
 
-          dateEdited: item.dateEdited || dateEdited
+          dateEdited: item.dateEdited || dateEdited,
+
+          isGeneratedTitle: item.isGeneratedTitle
         });
       } else {
         await this.collection.upsert({
@@ -156,7 +189,9 @@ export class Notes implements ICollection {
           readonly: item.readonly,
 
           dateCreated: item.dateCreated || Date.now(),
-          dateEdited: item.dateEdited || dateEdited || Date.now()
+          dateEdited: item.dateEdited || dateEdited || Date.now(),
+
+          isGeneratedTitle: item.isGeneratedTitle
         });
         this.totalNotes++;
       }
@@ -456,4 +491,8 @@ export class Notes implements ICollection {
 
 function getNoteHeadline(content: Tiptap) {
   return content.toHeadline();
+}
+
+function headlineToTitle(headline: string) {
+  return headline.split(" ").splice(0, 10).join(" ");
 }

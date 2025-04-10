@@ -2293,7 +2293,7 @@ msgstr ""
 msgid "Enable editor margins"
 msgstr ""
 
-#: src/strings.ts:2443
+#: src/strings.ts:2444
 msgid "Enable ligatures for common symbols like →, ←, etc"
 msgstr ""
 
@@ -2711,7 +2711,7 @@ msgstr ""
 msgid "Font family"
 msgstr ""
 
-#: src/strings.ts:2442
+#: src/strings.ts:2443
 msgid "Font ligatures"
 msgstr ""
 
@@ -6140,7 +6140,7 @@ msgstr ""
 msgid "Toggle dark/light mode"
 msgstr ""
 
-#: src/strings.ts:2441
+#: src/strings.ts:2442
 msgid "Toggle focus mode"
 msgstr ""
 

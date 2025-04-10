@@ -44,23 +44,17 @@ function wrapIntoHTMLDocument(input: string) {
   return `<!doctype html><html lang="en"><head><title>Document Fragment</title></head><body>${input}</body></html>`;
 }
 
-export function extractFirstParagraph(html: string) {
+export function extractHeadline(html: string, headlineCharacterLimit: number) {
   let text = "";
-  let start = false;
   const parser = new Parser(
     {
-      onopentag: (name) => {
-        if (name === "p") start = true;
-      },
-      onclosetag: (name) => {
-        if (name === "p") {
-          start = false;
-          parser.pause();
-          parser.reset();
-        }
-      },
       ontext: (data) => {
-        if (start) text += data;
+        text += data;
+        if (text.length > headlineCharacterLimit) {
+          text = text.slice(0, headlineCharacterLimit);
+          parser.pause();
+          parser.end();
+        }
       }
     },
     {

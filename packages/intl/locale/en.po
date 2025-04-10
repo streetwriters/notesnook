@@ -2304,7 +2304,7 @@ msgstr "Enable app lock"
 msgid "Enable editor margins"
 msgstr "Enable editor margins"
 
-#: src/strings.ts:2443
+#: src/strings.ts:2444
 msgid "Enable ligatures for common symbols like →, ←, etc"
 msgstr "Enable ligatures for common symbols like →, ←, etc"
 
@@ -2722,7 +2722,7 @@ msgstr "Follow us on X for updates and news about Notesnook"
 msgid "Font family"
 msgstr "Font family"
 
-#: src/strings.ts:2442
+#: src/strings.ts:2443
 msgid "Font ligatures"
 msgstr "Font ligatures"
 
@@ -6181,7 +6181,7 @@ msgstr "To use app lock, you must enable biometrics such as Fingerprint lock or 
 msgid "Toggle dark/light mode"
 msgstr "Toggle dark/light mode"
 
-#: src/strings.ts:2441
+#: src/strings.ts:2442
 msgid "Toggle focus mode"
 msgstr "Toggle focus mode"
 
