@@ -97,8 +97,16 @@ const KEYMAP = [
   },
   {
     keys: ["ctrl+w", "command+w"],
-    description: "Close active tab",
-    action: () => useEditorStore.getState().closeActiveTab()
+    description:
+      "Close active tab or focus previously activated tab if active tab pinned",
+    action: () => {
+      const activeTab = useEditorStore.getState().getActiveTab();
+      if (activeTab?.pinned) {
+        useEditorStore.getState().focusLastActiveTab();
+        return;
+      }
+      useEditorStore.getState().closeActiveTab();
+    }
   },
   {
     keys: ["ctrl+shift+w", "command+shift+w"],

@@ -850,6 +850,16 @@ class EditorStore extends BaseStore<EditorStore> {
     return this.focusTab(tabs[index === 0 ? tabs.length - 1 : index - 1].id);
   };
 
+  focusLastActiveTab = () => {
+    const history = useEditorStore.getState().history;
+    if (history.length < 2) return;
+
+    const previousTab = history.at(-2);
+    if (!previousTab) return;
+
+    useEditorStore.getState().focusTab(previousTab);
+  };
+
   goBack = async () => {
     const activeTabId = this.get().activeTabId;
     if (!activeTabId || !tabSessionHistory.canGoBack(activeTabId)) return;
