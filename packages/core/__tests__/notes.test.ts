@@ -682,3 +682,54 @@ for (const group of groups) {
       }));
   }
 }
+
+test("get archived notes", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.notes.archive(true, id);
+    expect(await db.notes.archives.count()).toBeGreaterThan(0);
+  }));
+
+test("archive note", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.notes.archive(true, id);
+    const note = await db.notes.note(id);
+    expect(note?.archived).toBe(true);
+  }));
+
+test("unarchive note", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.notes.archive(true, id);
+    await db.notes.archive(false, id);
+    const note = await db.notes.note(id);
+    expect(note?.archived).toBe(false);
+  }));
+
+test("archiving note should update cache.archives", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.notes.archive(true, id);
+    const note = await db.notes.note(id);
+    expect(db.notes.cache.archives).toEqual([note?.id]);
+  }));
+
+test("un-archiving note should update cache.archives", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.notes.archive(true, id);
+    const note = await db.notes.note(id);
+    expect(db.notes.cache.archives).toEqual([note?.id]);
+
+    await db.notes.archive(false, id);
+    expect(db.notes.cache.archives).toEqual([]);
+  }));
+
+test("archived note shouldn't be in all notes", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.notes.archive(true, id);
+    expect(await db.notes.all.count()).toBe(0);
+  }));
+
+test("archived note shouldn't be in favorites", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.notes.favorite(true, id);
+    await db.notes.archive(true, id);
+    expect(await db.notes.favorites.count()).toBe(0);
+  }));

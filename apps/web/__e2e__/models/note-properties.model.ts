@@ -37,6 +37,7 @@ abstract class BaseProperties {
   private readonly pinToggle: ToggleModel;
   private readonly favoriteToggle: ToggleModel;
   private readonly lockToggle: ToggleModel;
+  private readonly archiveToggle: ToggleModel;
 
   constructor(
     page: Page,
@@ -47,6 +48,7 @@ abstract class BaseProperties {
     this.pinToggle = new ToggleModel(page, `${itemPrefix}-pin`);
     this.lockToggle = new ToggleModel(page, `${itemPrefix}-lock`);
     this.favoriteToggle = new ToggleModel(page, `${itemPrefix}-favorite`);
+    this.archiveToggle = new ToggleModel(page, `${itemPrefix}-archive`);
   }
 
   async isPinned() {
@@ -123,6 +125,25 @@ abstract class BaseProperties {
   async unfavorite() {
     await this.open();
     await this.favoriteToggle.off();
+    await this.close();
+  }
+
+  async isArchived() {
+    await this.open();
+    const state = await this.archiveToggle.isToggled();
+    await this.close();
+    return state;
+  }
+
+  async archive() {
+    await this.open();
+    await this.archiveToggle.on();
+    await this.close();
+  }
+
+  async unarchive() {
+    await this.open();
+    await this.archiveToggle.off();
     await this.close();
   }
 
