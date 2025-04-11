@@ -353,12 +353,12 @@ export const useEditor = (
 
           clearTimeout(saveTimer);
 
+          if (id) {
+            currentNotes.current[id] = await db.notes?.note(id);
+          }
+
           if (!note && id) {
             editorSessionHistory.newSession(id);
-            if (id) {
-              currentNotes.current[id] = await db.notes?.note(id);
-            }
-
             useTabStore.getState().updateTab(tabId, {
               session: {
                 noteId: id
@@ -374,15 +374,13 @@ export const useEditor = (
             } else {
               state.current?.onNoteCreated && state.current.onNoteCreated(id);
             }
-
-            if (!noteData.title) {
-              postMessage(
-                NativeEvents.title,
-                currentNotes.current[id]?.title,
-                tabId
-              );
-            }
           }
+
+          postMessage(
+            NativeEvents.title,
+            currentNotes.current[id]?.title,
+            tabId
+          );
 
           if (Notifications.isNotePinned(id as string)) {
             Notifications.pinNote(id as string);
