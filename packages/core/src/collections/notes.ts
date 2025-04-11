@@ -40,6 +40,7 @@ import { ICollection } from "./collection.js";
 import { SQLCollection } from "../database/sql-collection.js";
 import { isFalse } from "../database/index.js";
 import { logger } from "../logger.js";
+import { addItems, deleteItems } from "../utils/array.js";
 
 export type ExportOptions = {
   format: "html" | "md" | "txt" | "md-frontmatter";
@@ -51,6 +52,7 @@ export type ExportOptions = {
 
 export class Notes implements ICollection {
   name = "notes";
+  cache: { archives: string[] } = { archives: [] };
   /**
    * @internal
    */
@@ -69,6 +71,13 @@ export class Notes implements ICollection {
   async init() {
     await this.collection.init();
     this.totalNotes = await this.collection.count();
+    await this.buildCache();
+  }
+
+  async buildCache() {
+    this.cache.archives = [];
+    const archives = await this.archives.ids();
+    this.cache.archives = archives;
   }
 
   async add(
@@ -234,7 +243,11 @@ export class Notes implements ICollection {
 
   get all() {
     return this.collection.createFilter<Note>(
-      (qb) => qb.where(isFalse("dateDeleted")).where(isFalse("deleted")),
+      (qb) =>
+        qb
+          .where(isFalse("dateDeleted"))
+          .where(isFalse("deleted"))
+          .where(isFalse("archived")),
       this.db.options?.batchSize
     );
   }
@@ -277,7 +290,19 @@ export class Notes implements ICollection {
         qb
           .where(isFalse("dateDeleted"))
           .where(isFalse("deleted"))
+          .where(isFalse("archived"))
           .where("favorite", "==", true),
+      this.db.options?.batchSize
+    );
+  }
+
+  get archives() {
+    return this.collection.createFilter<Note>(
+      (qb) =>
+        qb
+          .where(isFalse("dateDeleted"))
+          .where(isFalse("deleted"))
+          .where("archived", "==", true),
       this.db.options?.batchSize
     );
   }
@@ -299,6 +324,14 @@ export class Notes implements ICollection {
   }
   favorite(state: boolean, ...ids: string[]) {
     return this.collection.update(ids, { favorite: state });
+  }
+  async archive(state: boolean, ...ids: string[]) {
+    await this.collection.update(ids, { archived: state });
+    if (state) {
+      addItems(this.cache.archives, ...ids);
+    } else {
+      deleteItems(this.cache.archives, ...ids);
+    }
   }
   readonly(state: boolean, ...ids: string[]) {
     return this.collection.update(ids, { readonly: state });

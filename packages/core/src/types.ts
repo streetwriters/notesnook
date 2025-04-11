@@ -49,7 +49,8 @@ export const GroupingKey = [
   "tags",
   "trash",
   "favorites",
-  "reminders"
+  "reminders",
+  "archives"
 ] as const;
 export type GroupingKey = (typeof GroupingKey)[number];
 
@@ -200,6 +201,7 @@ export interface Note extends BaseItem<"note"> {
   deletedBy: null;
 
   isGeneratedTitle?: boolean;
+  archived?: boolean;
 }
 
 export interface Notebook extends BaseItem<"notebook"> {

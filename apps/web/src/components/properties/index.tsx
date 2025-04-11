@@ -31,7 +31,8 @@ import {
   ChevronRight,
   LinkedTo,
   ReferencedIn as ReferencedInIcon,
-  Note as NoteIcon
+  Note as NoteIcon,
+  Archive
 } from "../icons";
 import { Box, Button, Flex, Text, FlexProps } from "@theme-ui/components";
 import {
@@ -82,6 +83,12 @@ const tools = [
     icon: Readonly,
     label: strings.readOnly(),
     property: "readonly"
+  },
+  {
+    key: "archive",
+    icon: Archive,
+    label: strings.archive(),
+    property: "archived"
   },
   {
     key: "local-only",
@@ -824,10 +831,17 @@ export function Section({
 }
 
 function changeToggleState(
-  prop: "lock" | "readonly" | "local-only" | "pin" | "favorite",
+  prop: "lock" | "readonly" | "local-only" | "pin" | "favorite" | "archive",
   session: ReadonlyEditorSession | DefaultEditorSession
 ) {
-  const { id: sessionId, readonly, localOnly, pinned, favorite } = session.note;
+  const {
+    id: sessionId,
+    readonly,
+    localOnly,
+    pinned,
+    favorite,
+    archived
+  } = session.note;
   if (!sessionId) return;
   switch (prop) {
     case "lock":
@@ -842,6 +856,8 @@ function changeToggleState(
       return noteStore.pin(!pinned, sessionId);
     case "favorite":
       return noteStore.favorite(!favorite, sessionId);
+    case "archive":
+      return noteStore.archive(!archived, sessionId);
     default:
       return;
   }

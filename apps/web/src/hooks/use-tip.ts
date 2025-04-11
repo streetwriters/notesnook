@@ -48,6 +48,7 @@ export type TipContext =
   | "reminders"
   | "monographs"
   | "trash"
+  | "archive"
   | "attachments";
 
 export type Tip = {
@@ -206,6 +207,9 @@ const DEFAULT_TIPS: Record<TipContext, Omit<Tip, "contexts">> = {
   },
   trash: {
     text: ""
+  },
+  archive: {
+    text: strings.yourArchiveIsEmpty()
   },
   search: { text: "" }
 };
