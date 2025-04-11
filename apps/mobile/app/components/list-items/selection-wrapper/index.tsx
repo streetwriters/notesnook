@@ -25,6 +25,7 @@ import { useTabStore } from "../../../screens/editor/tiptap/use-tab-store";
 import { useSelectionStore } from "../../../stores/use-selection-store";
 import { DefaultAppStyles } from "../../../utils/styles";
 import { Pressable } from "../../ui/pressable";
+import { View } from "react-native";
 
 export function selectItem(item: Item) {
   if (useSelectionStore.getState().selectionMode === item.type) {
@@ -112,6 +113,18 @@ const SelectionWrapper = ({
         marginBottom: isSheet ? DefaultAppStyles.GAP_VERTICAL : undefined
       }}
     >
+      {isEditingNote ? (
+        <View
+          style={{
+            height: 5,
+            backgroundColor: color || colors.primary.accent,
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0
+          }}
+        />
+      ) : null}
       {children}
     </Pressable>
   );

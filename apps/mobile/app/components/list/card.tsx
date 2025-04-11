@@ -66,7 +66,7 @@ export const Card = ({
           style={{
             flexDirection: "row",
             alignItems: "center",
-            flexShrink: 1
+            width: "100%"
           }}
         >
           <View
@@ -109,25 +109,6 @@ export const Card = ({
             </Paragraph>
           </View>
         </View>
-
-        {fontScale > 1 ? null : (
-          <View
-            style={{
-              width: 40,
-              height: 40,
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
-            <Icon
-              name="chevron-right"
-              color={
-                messageBoardState.type === "error" ? colors.error.icon : color
-              }
-              size={AppFontSize.lg}
-            />
-          </View>
-        )}
       </Pressable>
     </View>
   );
