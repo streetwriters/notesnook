@@ -140,6 +140,9 @@ export const Link = Mark.create<LinkOptions>({
 
   addAttributes() {
     return {
+      spellcheck: {
+        default: "false"
+      },
       href: {
         default: null
       },
