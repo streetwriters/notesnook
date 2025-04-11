@@ -117,7 +117,7 @@ const SelectionWrapper = ({
         <View
           style={{
             height: 5,
-            backgroundColor: color || colors.primary.accent,
+            backgroundColor: color || colors.selected.accent,
             position: "absolute",
             bottom: 0,
             left: 0,
