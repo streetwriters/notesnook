@@ -201,6 +201,37 @@ for (const actor of actors) {
     expect(await note?.getDescription()).toContain(NOTE.content);
     expect(await note?.contextMenu.isLocked()).toBe(false);
   });
+
+  test(`archive a note using ${actor}`, async ({ page }) => {
+    const app = new AppModel(page);
+    await app.goto();
+    const notes = await app.goToNotes();
+    const note = await notes.createNote(NOTE);
+
+    await note?.[actor].archive();
+
+    const archive = await app.goToArchive();
+    const archivedNote = await archive.findNote(NOTE);
+    expect(await archivedNote?.contextMenu.isArchived()).toBe(true);
+    expect(await archivedNote?.properties.isArchived()).toBe(true);
+  });
+
+  test(`unarchive a note using ${actor}`, async ({ page }) => {
+    const app = new AppModel(page);
+    await app.goto();
+    let notes = await app.goToNotes();
+    let note = await notes.createNote(NOTE);
+    await note?.contextMenu.archive();
+
+    const archive = await app.goToArchive();
+    const archivedNote = await archive.findNote(NOTE);
+    await archivedNote?.[actor].unarchive();
+
+    notes = await app.goToNotes();
+    note = await notes.findNote(NOTE);
+    expect(await note?.contextMenu.isArchived()).toBe(false);
+    expect(await note?.properties.isArchived()).toBe(false);
+  });
 }
 
 test("open a locked note", async ({ page }) => {
@@ -338,4 +369,49 @@ test(`sort notes`, async ({ page }, info) => {
       }
     }
   }
+});
+
+test("archived favorite note shouldn't be in favorites note list", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note = await notes.createNote(NOTE);
+
+  await note?.contextMenu.favorite();
+  await note?.contextMenu.archive();
+
+  const favorites = await app.goToFavorites();
+  expect(await favorites.findNote(NOTE)).toBeUndefined();
+});
+
+test("archived tag note shouldn't be in tags note list", async ({ page }) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const tags = await app.goToTags();
+  const tag = await tags.createItem({ title: "my-tag" });
+  const notes = await tag?.open();
+
+  const note = await notes?.createNote(NOTE);
+  expect(await notes?.findNote(NOTE)).toBeDefined();
+  await note?.contextMenu.archive();
+
+  expect(await notes?.findNote(NOTE)).toBeUndefined();
+});
+
+test("archived notebook note shouldn't be in notebooks note list", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notebooks = await app.goToNotebooks();
+  const notebook = await notebooks.createNotebook({ title: "my-notebook" });
+  const notes = await notebook?.openNotebook();
+
+  const note = await notes?.createNote(NOTE);
+  expect(await notes?.findNote(NOTE)).toBeDefined();
+  await note?.contextMenu.archive();
+
+  expect(await notes?.findNote(NOTE)).toBeUndefined();
 });

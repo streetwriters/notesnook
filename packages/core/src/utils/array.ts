@@ -31,6 +31,13 @@ export function addItem<T>(array: T[], item: T) {
   return true;
 }
 
+export function addItems<T>(array: T[], ...items: T[]) {
+  for (const item of items) {
+    addItem(array, item);
+  }
+  return array;
+}
+
 export function deleteItem<T>(array: T[], item: T) {
   return deleteAtIndex(array, array.indexOf(item));
 }
