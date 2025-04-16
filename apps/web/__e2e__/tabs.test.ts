@@ -428,5 +428,78 @@ test("activating pinned tab after page reload should not open a duplicate tab", 
   await expect(tabs[0].locator).toHaveClass(/active/);
 });
 
+test("if note is active in a tab, moving the note to trash should close the tab", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note = await notes.createNote({
+    title: "Note 1"
+  });
+
+  await note?.contextMenu.moveToTrash();
+
+  const tabs = await notes.editor.getTabs();
+  expect(tabs.length).toBe(1);
+  await expect(tabs[0].titleElement).toHaveText("Untitled");
+});
+
+test("if note is active in multiple tabs, moving the note to trash should close those tabs", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note = await notes.createNote({
+    title: "Note 1"
+  });
+  await note?.contextMenu.openInNewTab();
+
+  await note?.contextMenu.moveToTrash();
+
+  const tabs = await notes.editor.getTabs();
+  expect(tabs.length).toBe(1);
+  await expect(tabs[0].titleElement).toHaveText("Untitled");
+});
+
+test("if note is present in tab history, moving the note to trash shouldn't close the tab", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note = await notes.createNote({
+    title: "Note 1"
+  });
+  await notes.createNote({ title: "Note 2" });
+
+  await note?.contextMenu.moveToTrash();
+
+  const tabs = await notes.editor.getTabs();
+  expect(tabs.length).toBe(1);
+  await expect(tabs[0].titleElement).toHaveText("Note 2");
+});
+
+test("if note is active in a tab and present in other tab's history, moving the note to trash should only close the tab where note is active", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note = await notes.createNote({
+    title: "Note 1"
+  });
+  await note?.contextMenu.openInNewTab();
+  await notes.editor.waitForLoading();
+  await notes.createNote({ title: "Note 2" });
+
+  await note?.contextMenu.moveToTrash();
+
+  const tabs = await notes.editor.getTabs();
+  expect(tabs.length).toBe(1);
+  await expect(tabs[1].titleElement).toHaveText("Note 2");
+});
+
 test.skip("TODO: open a locked note, switch to another note and navigate back", () => {});
 test.skip("TODO: open a locked note, switch to another note, unlock the note and navigate back", () => {});
