@@ -74,6 +74,8 @@ import { strings } from "@notesnook/intl";
 import { onPageVisibilityChanged } from "../../utils/page-visibility";
 import { Pane, SplitPane } from "../split-pane";
 import { TITLE_BAR_HEIGHT } from "../title-bar";
+import { isMobile } from "../../hooks/use-mobile";
+import { isTablet } from "../../hooks/use-tablet";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
@@ -668,7 +670,7 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
       const child = editorContainerRef.current?.getBoundingClientRect();
       if (!parent || !child || !editor || entries.length <= 0) return;
 
-      const CONTAINER_MARGIN = 30;
+      const CONTAINER_MARGIN = isMobile() || isTablet() ? 10 : 30;
       const negativeSpace = Math.abs(
         parent.left - child.left - CONTAINER_MARGIN
       );
