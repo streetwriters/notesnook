@@ -166,7 +166,8 @@ function Note(props: NoteProps) {
             alignItems: "center",
             gap: 1,
             flexWrap: "wrap",
-            mt: "small"
+            mt: "small",
+            flexShrink: 0
           }}
         >
           {compact ? (
