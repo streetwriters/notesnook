@@ -127,9 +127,11 @@ export function SubscriptionStatus() {
           notebooks & tags.`
             : "Access only to basic features including unlimited notes & end-to-end encrypted syncing to unlimited devices."}
         </Text>
-        <Text sx={{ mt: 2 }} variant="subBody">
-          {subtitle}. {provider.desc()}
-        </Text>
+        {isPro && (
+          <Text sx={{ mt: 2 }} variant="subBody">
+            {subtitle}. {provider.desc()}
+          </Text>
+        )}
         <Flex sx={{ gap: 1, mt: 2 }}>
           {provider.type === "Web" && (isPro || isProCancelled) ? (
             <>
