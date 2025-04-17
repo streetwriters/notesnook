@@ -61,9 +61,7 @@ function Notice() {
             variant="subBody"
             sx={{
               display: "block",
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis"
+              textWrap: "wrap"
             }}
           >
             {NoticeData.subtitle}
@@ -72,9 +70,7 @@ function Notice() {
             variant="body"
             sx={{
               color: "heading-secondary",
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis"
+              textWrap: "wrap"
             }}
           >
             {NoticeData.title}
