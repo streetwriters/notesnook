@@ -117,7 +117,12 @@ function EditorProperties(props: EditorPropertiesProps) {
   const toggleProperties = useEditorStore((store) => store.toggleProperties);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const session = useEditorStore((store) =>
-    store.getSession(props.sessionId, ["default", "readonly", "deleted"])
+    store.getSession(props.sessionId, [
+      "default",
+      "readonly",
+      "deleted",
+      "diff"
+    ])
   );
   if (isFocusMode || !session) return null;
   return (
@@ -162,7 +167,8 @@ function EditorProperties(props: EditorPropertiesProps) {
           >
             <Section title="Properties">
               <Flex sx={{ flexDirection: "column", gap: 1, px: 2, pt: 1 }}>
-                {session.type === "deleted" ? null : (
+                {session.type === "deleted" ||
+                session.type === "diff" ? null : (
                   <>
                     {tools.map((tool) => (
                       <Toggle
@@ -207,18 +213,25 @@ function EditorProperties(props: EditorPropertiesProps) {
                     </Text>
                   </Flex>
                 ))}
-                {session.type === "deleted" ? null : (
+                {session.type === "deleted" ||
+                session.type === "diff" ? null : (
                   <Colors noteId={session.note.id} color={session.color} />
                 )}
               </Flex>
             </Section>
             {session.type === "deleted" ? null : (
               <>
-                <InternalLinks noteId={session.note.id} />
-                <Notebooks noteId={session.note.id} />
-                <Reminders noteId={session.note.id} />
-                <Attachments noteId={session.note.id} />
-                <SessionHistory noteId={session.note.id} />
+                {session.type === "diff" ? (
+                  <SessionHistory noteId={session.note.id} />
+                ) : (
+                  <>
+                    <InternalLinks noteId={session.note.id} />
+                    <Notebooks noteId={session.note.id} />
+                    <Reminders noteId={session.note.id} />
+                    <Attachments noteId={session.note.id} />
+                    <SessionHistory noteId={session.note.id} />
+                  </>
+                )}
               </>
             )}
           </Flex>
