@@ -333,7 +333,8 @@ class EditorStore extends BaseStore<EditorStore> {
     db.eventManager.subscribe(
       EVENTS.databaseUpdated,
       async (event: DatabaseUpdatedEvent) => {
-        const { sessions, openSession, closeTabs, updateSession } = this.get();
+        const { sessions, openSession, closeTabs, updateSession, tabs } =
+          this.get();
         const clearIds: string[] = [];
         if (event.collection === "notes") {
           // when a note is permanently deleted from trash
@@ -342,7 +343,9 @@ class EditorStore extends BaseStore<EditorStore> {
               ...sessions
                 .filter(
                   (session) =>
-                    "note" in session && event.ids.includes(session.note.id)
+                    "note" in session &&
+                    event.ids.includes(session.note.id) &&
+                    tabs.some((tab) => tab.sessionId === session.id)
                 )
                 .map((s) => s.tabId)
             );
@@ -367,7 +370,11 @@ class EditorStore extends BaseStore<EditorStore> {
                 session.type !== "deleted" &&
                 event.item.type === "trash"
               ) {
-                clearIds.push(session.tabId);
+                for (const tab of tabs) {
+                  if (tab.sessionId === session.id) {
+                    clearIds.push(session.tabId);
+                  }
+                }
               } else {
                 updateSession(session.id, [session.type], (session) => {
                   session.note.pinned =
