@@ -156,10 +156,6 @@ function ListItem<TItem extends Item, TContext>(
 
         opacity: isDisabled ? 0.7 : 1,
 
-        borderBottom: isFocused ? "5px solid" : "none",
-        pb: isFocused ? "2px" : "7px",
-        borderBottomColor: isFocused ? accent : "transparent",
-
         backgroundColor: selected ? "background-selected" : background,
 
         ":hover": {

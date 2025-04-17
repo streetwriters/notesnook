@@ -145,6 +145,11 @@ function Note(props: NoteProps) {
         heading: color ? primary : "heading",
         background: "background"
       }}
+      sx={{
+        borderLeft: isOpened ? "4px solid" : "none",
+        pl: isOpened ? "3px" : "7px",
+        borderLeftColor: isOpened ? primary : "transparent"
+      }}
       context={{ color, locked }}
       menuItems={noteMenuItems}
       onClick={() =>
