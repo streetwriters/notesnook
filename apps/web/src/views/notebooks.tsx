@@ -66,8 +66,12 @@ export function Notebooks() {
   }, []);
 
   useEffect(() => {
+    treeRef.current?.resetAndRefresh();
+  }, [filteredNotebooks]);
+
+  useEffect(() => {
     treeRef.current?.refresh();
-  }, [notebooks]);
+  }, [roots]);
 
   return (
     <>

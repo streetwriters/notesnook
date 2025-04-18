@@ -30,6 +30,7 @@ import { CustomScrollbarsVirtualList, waitForElement } from "../list-container";
 
 export type VirtualizedTreeHandle<T> = {
   refresh: () => void;
+  resetAndRefresh: () => void;
   refreshItem: (
     index: number,
     item?: T,
@@ -99,7 +100,6 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
     treeRef,
     () => ({
       async refresh() {
-        // setNodes([]);
         const { children } = await fetchChildren(
           rootId,
           -1,
@@ -108,6 +108,10 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
         );
         setNodes(children);
         setExpandedIds(expandedIds);
+      },
+      async resetAndRefresh() {
+        setNodes([]);
+        await this.refresh();
       },
       async refreshItem(index, item, itemOptions) {
         const node = nodes[index];
