@@ -58,7 +58,7 @@ export const strings = {
   note: () => t`Note`,
   notes: (count: number) =>
     plural(count, {
-      one: `note`,
+      one: `# note`,
       other: `# notes`
     }),
   downloading: () => t`Downloading`,
