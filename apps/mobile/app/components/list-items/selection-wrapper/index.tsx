@@ -116,12 +116,12 @@ const SelectionWrapper = ({
       {isEditingNote ? (
         <View
           style={{
-            height: 5,
             backgroundColor: color || colors.selected.accent,
             position: "absolute",
             bottom: 0,
+            top: 0,
             left: 0,
-            right: 0
+            width: 5
           }}
         />
       ) : null}
