@@ -62,7 +62,11 @@ class NoteStore extends BaseStore<NoteStore> {
       contextNotes: context
         ? await notesFromContext(context).grouped(
             db.settings.getGroupOptions(
-              context.type === "favorite" ? "favorites" : "notes"
+              context.type === "favorite"
+                ? "favorites"
+                : context.type === "archive"
+                ? "archives"
+                : "notes"
             )
           )
         : undefined
@@ -82,6 +86,11 @@ class NoteStore extends BaseStore<NoteStore> {
 
   favorite = async (state: boolean, ...ids: string[]) => {
     await db.notes.favorite(state, ...ids);
+    await this.refresh();
+  };
+
+  archive = async (state: boolean, ...ids: string[]) => {
+    await db.notes.archive(state, ...ids);
     await this.refresh();
   };
 
@@ -141,6 +150,8 @@ export function notesFromContext(context: Context) {
         .selector;
     case "favorite":
       return db.notes.favorites;
+    case "archive":
+      return db.notes.archives;
     case "monographs":
       return db.monographs.all;
   }
