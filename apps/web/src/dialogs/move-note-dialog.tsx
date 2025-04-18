@@ -264,7 +264,9 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
                   isExpanded={expanded}
                   toggle={expanded ? collapse : expand}
                   onCreateItem={() => {
-                    treeRef.current?.refreshItem(index, item.data);
+                    treeRef.current?.refreshItem(index, item.data, {
+                      expand: true
+                    });
                   }}
                 />
               )}
