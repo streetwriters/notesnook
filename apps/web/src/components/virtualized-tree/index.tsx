@@ -30,7 +30,11 @@ import { CustomScrollbarsVirtualList, waitForElement } from "../list-container";
 
 export type VirtualizedTreeHandle<T> = {
   refresh: () => void;
-  refreshItem: (index: number, item?: T) => void;
+  refreshItem: (
+    index: number,
+    item?: T,
+    itemOptions?: { expand?: boolean }
+  ) => void;
 };
 export type TreeNode<T = any> = {
   id: string;
@@ -95,7 +99,7 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
     treeRef,
     () => ({
       async refresh() {
-        setNodes([]);
+        // setNodes([]);
         const { children } = await fetchChildren(
           rootId,
           -1,
@@ -105,7 +109,7 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
         setNodes(children);
         setExpandedIds(expandedIds);
       },
-      async refreshItem(index, item) {
+      async refreshItem(index, item, itemOptions) {
         const node = nodes[index];
         const removeIds: string[] = [node.id];
         for (const treeNode of nodes) {
@@ -120,8 +124,7 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
           return;
         }
 
-        // TODO: double check
-        if (node.hasChildren) {
+        if (itemOptions?.expand) {
           expandedIds[node.id] = true;
         }
 
