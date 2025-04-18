@@ -74,6 +74,10 @@ msgstr "{count, plural, one {# file ready for import} other {# files ready for i
 msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {# file} other {# files}}"
 
+#: src/strings.ts:60
+msgid "{count, plural, one {# note} other {# notes}}"
+msgstr "{count, plural, one {# note} other {# notes}}"
+
 #: src/strings.ts:1563
 msgid "{count, plural, one {1 hour} other {# hours}}"
 msgstr "{count, plural, one {1 hour} other {# hours}}"
@@ -324,10 +328,6 @@ msgstr "{count, plural, one {Note unpublished} other {# notes unpublished}}"
 #: src/strings.ts:911
 msgid "{count, plural, one {Note will be automatically deleted from all other devices & any future changes won't get synced. Are you sure you want to continue?} other {# notes will be automatically deleted from all other devices & any future changes won't get synced. Are you sure you want to continue?}}"
 msgstr "{count, plural, one {Note will be automatically deleted from all other devices & any future changes won't get synced. Are you sure you want to continue?} other {# notes will be automatically deleted from all other devices & any future changes won't get synced. Are you sure you want to continue?}}"
-
-#: src/strings.ts:60
-msgid "{count, plural, one {note} other {# notes}}"
-msgstr "{count, plural, one {note} other {# notes}}"
 
 #: generated/actions.ts:181
 msgid "{count, plural, one {Notebook created} other {# notebooks created}}"
