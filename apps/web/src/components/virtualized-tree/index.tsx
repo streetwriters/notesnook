@@ -128,16 +128,18 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
           return;
         }
 
-        if (itemOptions?.expand) {
-          expandedIds[node.id] = true;
-        }
-
         const { children } = await fetchChildren(
           node.id,
           node.depth,
           expandedIds,
           getChildNodes
         );
+
+        const hasChildren = children.length > 0;
+        if (hasChildren && itemOptions?.expand) {
+          expandedIds[node.id] = true;
+        }
+
         filtered.splice(
           index,
           0,
@@ -145,7 +147,7 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
             id: node.id,
             data: item,
             depth: node.depth,
-            hasChildren: children.length > 0,
+            hasChildren: hasChildren,
             parentId: node.parentId
           },
           ...children
