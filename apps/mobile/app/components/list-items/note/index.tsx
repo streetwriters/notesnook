@@ -307,7 +307,8 @@ const NoteItem = ({
                             backgroundColor: colors.secondary.background,
                             paddingHorizontal: DefaultAppStyles.GAP_SMALL / 2,
                             borderWidth: 0.5,
-                            borderColor: primaryColors.border,
+                            borderColor:
+                              color?.colorCode || primaryColors.border,
                             paddingVertical: 1
                           }}
                         >
