@@ -128,12 +128,15 @@ export const FluidPanelsView = React.memo(
               eSendEvent(eOnLoadNote, { newNote: true });
               editorState().movedAway = false;
               fluidTabsRef.current?.goToPage("editor", false);
-            }, 3000);
+            }, 1000);
             return;
           }
           eSendEvent(eOnLoadNote, { newNote: true });
           editorState().movedAway = false;
-          fluidTabsRef.current?.goToPage("editor", false);
+          setTimeout(
+            () => fluidTabsRef.current?.goToPage("editor", false),
+            300
+          );
         }
       }
     });
