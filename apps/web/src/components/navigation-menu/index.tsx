@@ -213,9 +213,9 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
   }, [isNavPaneCollapsed]);
 
   useEffect(() => {
-    // collapse navigation menu on navigate e.g. when navigating to a notebook
-    // or a tag
     function onNavigate() {
+      // collapse navigation menu on navigate e.g. when navigating to a notebook
+      // or a tag
       if (!useAppStore.getState().isNavPaneCollapsed) return;
       setExpanded(false);
     }

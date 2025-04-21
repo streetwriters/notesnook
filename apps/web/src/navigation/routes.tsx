@@ -22,7 +22,8 @@ import AllNotes from "../views/all-notes";
 import Notes from "../views/notes";
 import { NotebookHeader } from "../components/notebook-header";
 import Trash from "../views/trash";
-import { store as notestore } from "../stores/note-store";
+import { useStore as useNoteStore } from "../stores/note-store";
+import { useStore as useAppStore } from "../stores/app-store";
 import Reminders from "../views/reminders";
 import { RouteResult, defineRoutes } from "./types";
 import { CREATE_BUTTON_MAP } from "../common";
@@ -39,7 +40,7 @@ const NOT_FOUND_ROUTE = defineRoute({
 });
 const routes = defineRoutes({
   "/notes": () => {
-    notestore.setContext();
+    useNoteStore.getState().setContext();
     return defineRoute({
       key: "home",
       type: "notes",
@@ -57,7 +58,7 @@ const routes = defineRoutes({
     const notebook = await db.notebooks.notebook(notebookId);
     if (!notebook) return NOT_FOUND_ROUTE;
     const totalNotes = await db.relations.from(notebook, "note").count();
-    notestore.setContext({
+    useNoteStore.getState().setContext({
       type: "notebook",
       id: notebookId,
       item: notebook,
@@ -75,7 +76,7 @@ const routes = defineRoutes({
     });
   },
   "/favorites": () => {
-    notestore.setContext({ type: "favorite" });
+    useNoteStore.getState().setContext({ type: "favorite" });
     return defineRoute({
       key: "notes",
       title: strings.routes.Favorites(),
@@ -84,7 +85,7 @@ const routes = defineRoutes({
     });
   },
   "/reminders": () => {
-    notestore.setContext();
+    useNoteStore.getState().setContext();
     return defineRoute({
       key: "reminders",
       title: strings.routes.Reminders(),
@@ -96,7 +97,7 @@ const routes = defineRoutes({
     });
   },
   "/trash": () => {
-    notestore.setContext();
+    useNoteStore.getState().setContext();
     return defineRoute({
       key: "trash",
       type: "trash",
@@ -107,7 +108,7 @@ const routes = defineRoutes({
   "/tags/:tagId": async ({ tagId }) => {
     const tag = await db.tags.tag(tagId);
     if (!tag) return NOT_FOUND_ROUTE;
-    notestore.setContext({ type: "tag", id: tagId });
+    useNoteStore.getState().setContext({ type: "tag", id: tagId });
     return defineRoute({
       key: "notes",
       type: "notes",
@@ -118,7 +119,7 @@ const routes = defineRoutes({
   "/colors/:colorId": async ({ colorId }) => {
     const color = await db.colors.color(colorId);
     if (!color) return NOT_FOUND_ROUTE;
-    notestore.setContext({ type: "color", id: colorId });
+    useNoteStore.getState().setContext({ type: "color", id: colorId });
     return defineRoute({
       key: "notes",
       type: "notes",
@@ -127,7 +128,7 @@ const routes = defineRoutes({
     });
   },
   "/monographs": () => {
-    notestore.setContext({ type: "monographs" });
+    useNoteStore.getState().setContext({ type: "monographs" });
     return defineRoute({
       key: "notes",
       title: strings.routes.Monographs(),
