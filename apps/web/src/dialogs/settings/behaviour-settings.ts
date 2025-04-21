@@ -28,6 +28,7 @@ import { isUserPremium } from "../../hooks/use-is-user-premium";
 import { TimeFormat } from "@notesnook/core";
 import { TrashCleanupInterval } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
+import { BuyDialog } from "../buy-dialog";
 
 export const BehaviourSettings: SettingsGroup[] = [
   {
@@ -46,8 +47,14 @@ export const BehaviourSettings: SettingsGroup[] = [
         components: [
           {
             type: "dropdown",
-            onSelectionChanged: (value) =>
-              useSettingStore.getState().setDefaultSidebarTab(value as any),
+            onSelectionChanged: (value) => {
+              if (!isUserPremium()) {
+                BuyDialog.show({});
+                return;
+              }
+
+              useSettingStore.getState().setDefaultSidebarTab(value as any);
+            },
             selectedOption: () => useSettingStore.getState().defaultSidebarTab,
             options: [
               { value: "home", title: strings.routes.Notes() },
@@ -152,12 +159,18 @@ export const BehaviourSettings: SettingsGroup[] = [
         components: [
           {
             type: "dropdown",
-            onSelectionChanged: (value) =>
+            onSelectionChanged: (value) => {
+              if (!isUserPremium()) {
+                BuyDialog.show({});
+                return;
+              }
+
               useSettingStore
                 .getState()
                 .setTrashCleanupInterval(
                   parseInt(value) as TrashCleanupInterval
-                ),
+                );
+            },
             selectedOption: () =>
               useSettingStore.getState().trashCleanupInterval.toString(),
             options: [
