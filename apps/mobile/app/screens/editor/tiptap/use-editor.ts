@@ -506,7 +506,7 @@ export const useEditor = (
           (await isEditorLoaded(
             editorRef,
             sessionIdRef.current,
-            useTabStore.getState().currentTab!
+            useTabStore.getState().currentTab
           ))
         ) {
           state.current.ready = true;
@@ -522,18 +522,18 @@ export const useEditor = (
             tabId = useTabStore.getState().newTab();
           } else {
             tabId = useTabStore.getState().currentTab;
-            await reset(tabId!, true, true);
+            await reset(tabId, true, true);
             if (
               event.session?.noteId ||
-              useTabStore.getState().getTab(tabId!)?.session?.noteId
+              useTabStore.getState().getTab(tabId)?.session?.noteId
             ) {
-              useTabStore.getState().newTabSession(tabId!, {});
+              useTabStore.getState().newTabSession(tabId, {});
             }
           }
 
           setTimeout(() => {
             if (state.current?.ready && !state.current.movedAway)
-              commands.focus(tabId!);
+              commands.focus(tabId);
           });
         } else {
           if (!event.item) {
@@ -572,32 +572,32 @@ export const useEditor = (
             : useTabStore.getState().currentTab;
 
           // Check if tab needs to be refreshed.
-          if (!event.newTab) {
-            if (
-              !event.refresh &&
-              tabId &&
-              event.item.id === useTabStore.getState().getNoteIdForTab(tabId) &&
-              !localTabState.current?.needsRefresh(
-                tabId,
-                isLockedNote,
-                item.readonly
-              )
-            ) {
-              commands.setLoading(false, tabId);
-              return;
-            } else {
-              localTabState.current?.setEditTime(
-                item.id,
-                localTabState.current?.noteEditedTime[item.id] ||
-                  item.dateEdited
-              );
-              localTabState.current?.set(tabId!, {
-                editedAt:
-                  localTabState.current?.noteEditedTime[item.id] ||
-                  item.dateEdited
-              });
-            }
-          }
+          // if (!event.newTab) {
+          //   if (
+          //     !event.refresh &&
+          //     tabId &&
+          //     event.item.id === useTabStore.getState().getNoteIdForTab(tabId) &&
+          //     !localTabState.current?.needsRefresh(
+          //       tabId,
+          //       isLockedNote,
+          //       item.readonly
+          //     )
+          //   ) {
+          //     commands.setLoading(false, tabId);
+          //     return;
+          //   } else {
+          //     localTabState.current?.setEditTime(
+          //       item.id,
+          //       localTabState.current?.noteEditedTime[item.id] ||
+          //         item.dateEdited
+          //     );
+          //     localTabState.current?.set(tabId!, {
+          //       editedAt:
+          //         localTabState.current?.noteEditedTime[item.id] ||
+          //         item.dateEdited
+          //     });
+          //   }
+          // }
 
           currentLoadingNoteId.current = item.id;
 
