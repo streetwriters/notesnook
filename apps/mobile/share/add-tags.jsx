@@ -27,7 +27,6 @@ import { defaultBorderRadius } from "../app/utils/size";
 export const AddTags = ({ onPress }) => {
   const { colors } = useThemeColors();
   const tagIds = useShareStore((state) => state.selectedTags);
-
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -123,7 +122,7 @@ const TagItem = ({ tagId }) => {
       }}
       onPress={() => {
         const index = tagIds.indexOf(tagId);
-        const selectedTags = [...tagId];
+        const selectedTags = tagIds.slice();
         selectedTags.splice(index, 1);
         useShareStore.getState().setSelectedTags(selectedTags);
       }}
