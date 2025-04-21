@@ -63,7 +63,11 @@ const Sort = ({
   );
   const updateGroupOptions = async (_groupOptions: GroupOptions) => {
     const groupType =
-      screen === "Notes" ? "home" : ((type + "s") as GroupingKey);
+      screen === "Notes"
+        ? "home"
+        : screen === "Trash"
+        ? "trash"
+        : ((type + "s") as GroupingKey);
     console.log("updateGroupOptions for group", groupType, "in", screen);
     await db.settings.setGroupOptions(groupType, _groupOptions);
     setGroupOptions(_groupOptions);
