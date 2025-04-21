@@ -102,7 +102,7 @@ export function NotebookHeader(props: {
             onClick={() => addToShortcuts(notebook)}
           >
             {isShortcut ? (
-              <RemoveShortcutLink size={16} />
+              <RemoveShortcutLink size={14} />
             ) : (
               <ShortcutLink size={14} />
             )}
