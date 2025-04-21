@@ -141,7 +141,8 @@ function Header(props: RouteContainerProps) {
             onClick: () => {
               if (inputRef.current) inputRef.current.value = "";
               useSearchStore.getState().resetSearch();
-            }
+            },
+            hidden: !Boolean(query)
           },
           ...(type === "reminders"
             ? [
