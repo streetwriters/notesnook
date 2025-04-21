@@ -24,32 +24,28 @@ import { getTestId } from "./utils";
 test("closing search via close button should clear query", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
-  let searchinput = page.locator(getTestId("search-input"));
+  const searchInput = page.locator(getTestId("search-input"));
   const searchButton = page.locator(getTestId("search-button"));
-  const openSearch = page.locator(getTestId("open-search"));
 
-  await openSearch.click();
+  await searchInput.focus();
   await page.keyboard.type("test");
   await page.waitForTimeout(500);
   await searchButton.click();
-  await openSearch.click();
 
-  expect(await searchinput.inputValue()).toBe("");
+  expect(await searchInput.inputValue()).toBe("");
 });
 
-test("closing search via keyboard escape button should not clear query", async ({
+test("closing search via keyboard escape button should clear query", async ({
   page
 }) => {
   const app = new AppModel(page);
   await app.goto();
-  const searchinput = page.locator(getTestId("search-input"));
-  const openSearch = page.locator(getTestId("open-search"));
+  const searchInput = page.locator(getTestId("search-input"));
 
-  await openSearch.click();
+  await searchInput.focus();
   await page.keyboard.type("test");
   await page.waitForTimeout(500);
   await page.keyboard.press("Escape");
-  await openSearch.click();
 
-  expect(await searchinput.inputValue()).toBe("test");
+  expect(await searchInput.inputValue()).toBe("");
 });
