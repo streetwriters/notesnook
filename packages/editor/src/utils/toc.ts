@@ -52,6 +52,7 @@ export function getTableOfContents(content: HTMLElement) {
         : prevHeading > currentHeading
         ? level - (prevHeading - currentHeading)
         : level;
+    level = Math.max(0, level);
     prevHeading = currentHeading;
 
     tableOfContents.push({
