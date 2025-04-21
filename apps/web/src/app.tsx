@@ -47,6 +47,7 @@ import { TITLE_BAR_HEIGHT } from "./components/title-bar";
 import { getFontSizes } from "@notesnook/theme/theme/font/fontsize.js";
 import { useWindowControls } from "./hooks/use-window-controls";
 import { STATUS_BAR_HEIGHT } from "./common/constants";
+import { NavigationEvents } from "./navigation";
 
 new WebExtensionRelay();
 
@@ -151,10 +152,24 @@ function DesktopAppContents() {
         }
       }
     );
+
+    const navEvent = NavigationEvents.subscribe("onNavigate", () => {
+      useStore.getState().toggleListPane(true);
+    });
     return () => {
+      navEvent.unsubscribe();
       event.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    if (isListPaneVisible) {
+      navPane.current?.expand(1);
+      navPane.current?.reset(1);
+    } else {
+      navPane.current?.collapse(1);
+    }
+  }, [isListPaneVisible]);
 
   return (
     <>
@@ -170,7 +185,10 @@ function DesktopAppContents() {
           autoSaveId="global-panel-group"
           direction="vertical"
           onChange={(sizes) => {
-            useStore.setState({ isNavPaneCollapsed: sizes[0] <= 70 });
+            useStore.setState({
+              isNavPaneCollapsed: sizes[0] <= 70,
+              isListPaneVisible: sizes[1] > 5 // we keep a 5px margin just to be safe
+            });
           }}
         >
           {isFocusMode ? null : (
@@ -189,7 +207,7 @@ function DesktopAppContents() {
               <NavigationMenu onExpand={() => navPane.current?.reset(0)} />
             </Pane>
           )}
-          {!isFocusMode && isListPaneVisible ? (
+          {isFocusMode ? null : (
             <Pane
               id="list-pane"
               initialSize={380}
@@ -212,8 +230,7 @@ function DesktopAppContents() {
                 <CachedRouter />
               </ScopedThemeProvider>
             </Pane>
-          ) : null}
-
+          )}
           <Pane
             id="editor-pane"
             className="editor-pane"
