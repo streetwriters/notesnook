@@ -132,7 +132,9 @@ const AppNavigation = React.memo(
 
     React.useEffect(() => {
       useNavigationStore.getState().update(home?.name as keyof RouteParams);
-      useNavigationStore.getState().setFocusedRouteId(home?.params?.id || home);
+      useNavigationStore
+        .getState()
+        .setFocusedRouteId(home?.params?.id || home?.name);
     }, [home]);
 
     return !home ? null : (
