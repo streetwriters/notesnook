@@ -272,14 +272,14 @@ export const SplitPane = React.forwardRef<
       return {
         collapse: (index: number) => {
           const currentPane = paneSizes.current[index];
-          if (currentPane.collapsed) return;
+          if (!currentPane || currentPane.collapsed) return;
           currentPane.collapsed = true;
           currentPane.expandedSize = paneSizes.current[index].size;
           setSizes(paneSizes.current, wrapSize.current);
         },
         expand: (index: number) => {
           const currentPane = paneSizes.current[index];
-          if (!currentPane.collapsed) return;
+          if (!currentPane || !currentPane.collapsed) return;
           currentPane.collapsed = false;
           currentPane.size =
             currentPane.expandedSize ?? currentPane.initialSize;
@@ -288,6 +288,7 @@ export const SplitPane = React.forwardRef<
         },
         reset: (index: number) => {
           const currentPane = paneSizes.current[index];
+          if (!currentPane) return;
           currentPane.collapsed = false;
           currentPane.size = currentPane.initialSize;
           currentPane.expandedSize = undefined;
