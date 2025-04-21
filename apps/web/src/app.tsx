@@ -196,7 +196,7 @@ function DesktopAppContents() {
               id="nav-pane"
               initialSize={isTablet ? 0 : 250}
               className={`nav-pane`}
-              snapSize={160}
+              snapSize={150}
               minSize={50}
               maxSize={isTablet ? 0 : 500}
               style={{
@@ -212,7 +212,7 @@ function DesktopAppContents() {
               id="list-pane"
               initialSize={380}
               style={{ flex: 1, display: "flex" }}
-              snapSize={200}
+              snapSize={120}
               maxSize={500}
               className="list-pane"
             >
