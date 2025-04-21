@@ -31,6 +31,7 @@ type Action = {
   disabled?: boolean;
   icon?: Icon;
   component?: JSX.Element;
+  hidden?: boolean;
 };
 export type FieldProps = InputProps & {
   label?: string;
@@ -65,8 +66,14 @@ function Field(props: FieldProps) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const colorScheme = useThemeStore((state) => state.colorScheme);
   const [isValid, setIsValid] = useState(true);
-  const rightActions = props.rightActions || (action ? [action] : []);
-  const leftActions = props.leftActions || [];
+  const rightActions = props.rightActions
+    ? props.rightActions.filter((a) => !a.hidden)
+    : action && !action.hidden
+    ? [action]
+    : [];
+  const leftActions = props.leftActions
+    ? props.leftActions.filter((a) => !a.hidden)
+    : [];
 
   return (
     <Flex
