@@ -30,7 +30,12 @@ import { CustomScrollbarsVirtualList, waitForElement } from "../list-container";
 
 export type VirtualizedTreeHandle<T> = {
   refresh: () => void;
-  refreshItem: (index: number, item?: T) => void;
+  resetAndRefresh: () => void;
+  refreshItem: (
+    index: number,
+    item?: T,
+    itemOptions?: { expand?: boolean }
+  ) => void;
 };
 export type TreeNode<T = any> = {
   id: string;
@@ -95,7 +100,6 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
     treeRef,
     () => ({
       async refresh() {
-        setNodes([]);
         const { children } = await fetchChildren(
           rootId,
           -1,
@@ -105,7 +109,11 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
         setNodes(children);
         setExpandedIds(expandedIds);
       },
-      async refreshItem(index, item) {
+      async resetAndRefresh() {
+        setNodes([]);
+        await this.refresh();
+      },
+      async refreshItem(index, item, itemOptions) {
         const node = nodes[index];
         const removeIds: string[] = [node.id];
         for (const treeNode of nodes) {
@@ -120,8 +128,8 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
           return;
         }
 
-        // TODO: double check
-        if (node.hasChildren) {
+        const childNodes = await getChildNodes(node.id, node.depth);
+        if (childNodes.length > 0 && itemOptions?.expand) {
           expandedIds[node.id] = true;
         }
 
@@ -131,6 +139,9 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
           expandedIds,
           getChildNodes
         );
+
+        const hasChildren = children.length > 0;
+
         filtered.splice(
           index,
           0,
@@ -138,7 +149,7 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
             id: node.id,
             data: item,
             depth: node.depth,
-            hasChildren: children.length > 0,
+            hasChildren: hasChildren,
             parentId: node.parentId
           },
           ...children

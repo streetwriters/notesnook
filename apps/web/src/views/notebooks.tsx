@@ -66,8 +66,12 @@ export function Notebooks() {
   }, []);
 
   useEffect(() => {
+    treeRef.current?.resetAndRefresh();
+  }, [filteredNotebooks]);
+
+  useEffect(() => {
     treeRef.current?.refresh();
-  }, [notebooks]);
+  }, [roots]);
 
   return (
     <>
@@ -158,7 +162,8 @@ export function Notebooks() {
                     .count();
                   treeRef.current?.refreshItem(
                     index,
-                    notebook ? { notebook, totalNotes } : undefined
+                    notebook ? { notebook, totalNotes } : undefined,
+                    { expand: true }
                   );
                 }}
                 collapse={collapse}
