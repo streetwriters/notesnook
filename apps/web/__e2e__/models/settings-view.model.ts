@@ -83,8 +83,8 @@ export class SettingsViewModel {
   }
 
   async isLoggedIn() {
-    const item = await this.navigation.findItem("Subscription details");
-    return !!(await item?.getTitle());
+    const loggedInButton = this.page.locator(getTestId("logged-in"));
+    return await loggedInButton.isVisible();
   }
 
   async isBackupEncryptionEnabled(state: boolean) {

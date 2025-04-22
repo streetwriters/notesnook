@@ -498,7 +498,7 @@ test("if note is active in a tab and present in other tab's history, moving the 
 
   const tabs = await notes.editor.getTabs();
   expect(tabs.length).toBe(1);
-  await expect(tabs[1].titleElement).toHaveText("Note 2");
+  await expect(tabs[0].locator).toHaveText("Note 2");
 });
 
 test.skip("TODO: open a locked note, switch to another note and navigate back", () => {});
