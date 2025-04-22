@@ -78,12 +78,26 @@ export function NotebookHeader(props: {
       sx={{
         flexDirection: "column",
         p: 1,
-        pb: 4,
+        gap: "7px",
         bg: "var(--background-secondary)",
         borderBottom: "1px solid var(--border)"
       }}
     >
       <NotebookCrumbs notebook={notebook} />
+      <Notebook2
+        size={24}
+        sx={{
+          alignSelf: "start"
+        }}
+      />
+      <Text
+        data-test-id="notebook-title"
+        variant="heading"
+        sx={{ fontSize: "title" }}
+      >
+        {title}
+      </Text>
+      {description && <Text variant="body">{description}</Text>}
       <Flex sx={{ alignItems: "center", justifyContent: "space-between" }}>
         <Flex sx={{ alignItems: "center", gap: 2 }}>
           <Text variant="subBody">{getFormattedDate(dateEdited, "date")}</Text>
@@ -120,18 +134,6 @@ export function NotebookHeader(props: {
           </Button>
         </Flex>
       </Flex>
-      <Text
-        data-test-id="notebook-title"
-        variant="heading"
-        sx={{ fontSize: "title", mt: 2 }}
-      >
-        {title}
-      </Text>
-      {description && (
-        <Text variant="body" sx={{ mt: 1 }}>
-          {description}
-        </Text>
-      )}
     </Flex>
   );
 }
