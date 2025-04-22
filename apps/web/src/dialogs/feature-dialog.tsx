@@ -100,6 +100,27 @@ const features: Record<FeatureKeys, Feature> = {
                 sidebar making organization &amp; navigation much easier.
               </>
             )
+          },
+          {
+            title: "Hierarchical tree view for notebooks",
+            subtitle: (
+              <>
+                Notebooks are now displayed in a hierarchical tree view so you
+                can jump back and forth between them easily.
+              </>
+            )
+          },
+          {
+            title: "Set any tag, color or notebook as homepage",
+            subtitle: (
+              <>You can now set any tag, color or notebook as your homepage.</>
+            )
+          },
+          {
+            title: "Set any tag, color or notebook as homepage",
+            subtitle: (
+              <>You can now set any tag, color or notebook as your homepage.</>
+            )
           }
         ],
     cta: {
