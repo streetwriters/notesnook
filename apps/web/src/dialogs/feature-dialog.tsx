@@ -93,13 +93,11 @@ const features: Record<FeatureKeys, Feature> = {
         ]
       : [
           {
-            title: "Release tracks",
+            title: "New sidebar UI/UX",
             subtitle: (
               <>
-                Switch to the beta version to try out upcoming new features and
-                provide us with feedback. Switch back to stable anytime without
-                losing any data. To change release tracks, go to Settings {">"}
-                About and select the desired release track.
+                Your notebooks &amp; tags are now displayed directly in the
+                sidebar making organization &amp; navigation much easier.
               </>
             )
           }
