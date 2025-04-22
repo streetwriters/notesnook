@@ -65,7 +65,7 @@ class NoteStore extends BaseStore<NoteStore> {
               context.type === "favorite"
                 ? "favorites"
                 : context.type === "archive"
-                ? "archives"
+                ? "archive"
                 : "notes"
             )
           )
@@ -151,7 +151,7 @@ export function notesFromContext(context: Context) {
     case "favorite":
       return db.notes.favorites;
     case "archive":
-      return db.notes.archives;
+      return db.notes.archived;
     case "monographs":
       return db.monographs.all;
   }

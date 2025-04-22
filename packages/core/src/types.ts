@@ -50,7 +50,7 @@ export const GroupingKey = [
   "trash",
   "favorites",
   "reminders",
-  "archives"
+  "archive"
 ] as const;
 export type GroupingKey = (typeof GroupingKey)[number];
 

@@ -39,7 +39,7 @@ function Notes(props: NotesProps) {
     context?.type === "favorite"
       ? "favorites"
       : context?.type === "archive"
-      ? "archives"
+      ? "archive"
       : "notes";
   const isCompact = useNotesStore((store) => store.viewMode === "compact");
   const filteredItems = useSearch(

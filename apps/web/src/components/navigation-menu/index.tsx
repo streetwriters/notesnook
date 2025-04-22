@@ -712,7 +712,7 @@ function ItemCount({ item }: { item: Route | Color | Notebook | Tag }) {
           case "monographs":
             return monographs?.length || 0;
           case "archive":
-            return db.notes.archives.count();
+            return db.notes.archived.count();
           default:
             return 0;
         }

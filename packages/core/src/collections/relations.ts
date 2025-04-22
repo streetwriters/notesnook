@@ -397,8 +397,8 @@ class RelationsArray<TType extends keyof RelatableTable> {
           )
           .$if(
             !!this.types?.includes("note" as TType) &&
-              this.db.notes.cache.archives.length > 0,
-            (b) => b.where("fromId", "not in", this.db.notes.cache.archives)
+              this.db.notes.cache.archived.length > 0,
+            (b) => b.where("fromId", "not in", this.db.notes.cache.archived)
           )
           .$if(
             !!this.types?.includes("notebook" as TType) &&
@@ -431,8 +431,8 @@ class RelationsArray<TType extends keyof RelatableTable> {
           )
           .$if(
             !!this.types?.includes("note" as TType) &&
-              this.db.notes.cache.archives.length > 0,
-            (b) => b.where("toId", "not in", this.db.notes.cache.archives)
+              this.db.notes.cache.archived.length > 0,
+            (b) => b.where("toId", "not in", this.db.notes.cache.archived)
           )
           .$if(
             !!this.types?.includes("notebook" as TType) &&

@@ -686,7 +686,7 @@ for (const group of groups) {
 test("get archived notes", () =>
   noteTest().then(async ({ db, id }) => {
     await db.notes.archive(true, id);
-    expect(await db.notes.archives.count()).toBeGreaterThan(0);
+    expect(await db.notes.archived.count()).toBeGreaterThan(0);
   }));
 
 test("archive note", () =>
@@ -704,21 +704,21 @@ test("unarchive note", () =>
     expect(note?.archived).toBe(false);
   }));
 
-test("archiving note should update cache.archives", () =>
+test("archiving note should update cache.archived", () =>
   noteTest().then(async ({ db, id }) => {
     await db.notes.archive(true, id);
     const note = await db.notes.note(id);
-    expect(db.notes.cache.archives).toEqual([note?.id]);
+    expect(db.notes.cache.archived).toEqual([note?.id]);
   }));
 
-test("un-archiving note should update cache.archives", () =>
+test("un-archiving note should update cache.archived", () =>
   noteTest().then(async ({ db, id }) => {
     await db.notes.archive(true, id);
     const note = await db.notes.note(id);
-    expect(db.notes.cache.archives).toEqual([note?.id]);
+    expect(db.notes.cache.archived).toEqual([note?.id]);
 
     await db.notes.archive(false, id);
-    expect(db.notes.cache.archives).toEqual([]);
+    expect(db.notes.cache.archived).toEqual([]);
   }));
 
 test("archived note shouldn't be in all notes", () =>

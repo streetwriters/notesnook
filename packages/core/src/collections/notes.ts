@@ -52,7 +52,7 @@ export type ExportOptions = {
 
 export class Notes implements ICollection {
   name = "notes";
-  cache: { archives: string[] } = { archives: [] };
+  cache: { archived: string[] } = { archived: [] };
   /**
    * @internal
    */
@@ -75,9 +75,9 @@ export class Notes implements ICollection {
   }
 
   async buildCache() {
-    this.cache.archives = [];
-    const archives = await this.archives.ids();
-    this.cache.archives = archives;
+    this.cache.archived = [];
+    const archived = await this.archived.ids();
+    this.cache.archived = archived;
   }
 
   async add(
@@ -296,7 +296,7 @@ export class Notes implements ICollection {
     );
   }
 
-  get archives() {
+  get archived() {
     return this.collection.createFilter<Note>(
       (qb) =>
         qb
@@ -328,9 +328,9 @@ export class Notes implements ICollection {
   async archive(state: boolean, ...ids: string[]) {
     await this.collection.update(ids, { archived: state });
     if (state) {
-      addItems(this.cache.archives, ...ids);
+      addItems(this.cache.archived, ...ids);
     } else {
-      deleteItems(this.cache.archives, ...ids);
+      deleteItems(this.cache.archived, ...ids);
     }
   }
   readonly(state: boolean, ...ids: string[]) {

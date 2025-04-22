@@ -111,7 +111,7 @@ export class AppModel {
   async goToArchive() {
     await this.page.locator(getTestId("tab-home")).click();
     await this.navigateTo("Archive");
-    return new NotesViewModel(this.page, "notes", "archives");
+    return new NotesViewModel(this.page, "notes", "archive");
   }
 
   async goToSettings() {
