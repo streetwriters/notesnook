@@ -31,7 +31,11 @@ import { useReminderStore } from "../stores/use-reminder-store";
 import { useTagStore } from "../stores/use-tag-store";
 import { useTrashStore } from "../stores/use-trash-store";
 import { eOnRefreshSearch, eUpdateNotebookRoute } from "../utils/events";
-import { rootNavigatorRef, tabBarRef } from "../utils/global-refs";
+import {
+  appNavigatorRef,
+  fluidTabsRef,
+  rootNavigatorRef
+} from "../utils/global-refs";
 import { eSendEvent } from "./event-manager";
 
 /**
@@ -59,7 +63,10 @@ const routeNames = {
   AppLock: "AppLock",
   Login: "Login",
   Signup: "Signup",
-  Reminders: "Reminders"
+  Reminders: "Reminders",
+  MoveNotebook: "MoveNotebook",
+  LinkNotebooks: "LinkNotebooks",
+  MoveNotes: "MoveNotes"
 };
 
 export type NavigationProps<T extends RouteName> = NativeStackScreenProps<
@@ -122,6 +129,7 @@ function queueRoutesForUpdate(...routesToUpdate: RouteName[]) {
 }
 
 function navigate<T extends RouteName>(screen: T, params?: RouteParams[T]) {
+  console.log(`Navigation.navigate ${screen} route`);
   rootNavigatorRef.current?.navigate(screen as any, params);
 }
 
@@ -130,22 +138,27 @@ function goBack() {
 }
 
 function push<T extends RouteName>(screen: T, params: RouteParams[T]) {
+  console.log(`Navigation.push ${screen} route`);
   rootNavigatorRef.current?.dispatch(StackActions.push(screen as any, params));
 }
 
 function replace<T extends RouteName>(screen: T, params: RouteParams[T]) {
-  rootNavigatorRef.current?.dispatch(StackActions.replace(screen, params));
+  console.log(`Navigation.replace ${screen} route`);
+  rootNavigatorRef.current?.dispatch(
+    StackActions.replace(screen as string, params)
+  );
 }
 
 function popToTop() {
-  rootNavigatorRef.current?.dispatch(StackActions.popToTop());
+  console.log(`Navigation.popToTop`);
+  appNavigatorRef.current?.dispatch(StackActions.popToTop());
 }
 
 function openDrawer() {
-  tabBarRef.current?.openDrawer();
+  fluidTabsRef.current?.openDrawer();
 }
 function closeDrawer() {
-  tabBarRef.current?.closeDrawer();
+  fluidTabsRef.current?.closeDrawer();
 }
 
 const Navigation = {

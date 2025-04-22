@@ -22,12 +22,13 @@ import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import Paragraph from "../ui/typography/paragraph";
 import { getStyle } from "./functions";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const List = ({ items, listType, style = {} }) => {
   return (
     <View
       style={{
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         paddingLeft: listType === "ordered" ? 25 : 25,
         ...getStyle(style)
       }}
@@ -36,7 +37,7 @@ export const List = ({ items, listType, style = {} }) => {
         <View
           key={item.text}
           style={{
-            paddingVertical: 6,
+            paddingVertical: DefaultAppStyles.GAP_VERTICAL,
             flexDirection: "row"
           }}
         >

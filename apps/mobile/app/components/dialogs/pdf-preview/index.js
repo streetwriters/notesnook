@@ -19,10 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Dimensions, TextInput, View } from "react-native";
-import {
-  addOrientationListener,
-  removeOrientationListener
-} from "react-native-orientation";
+import Orientation from "react-native-orientation-locker";
 import Pdf from "react-native-pdf";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import downloadAttachment from "../../../common/filesystem/download-attachment";
@@ -34,7 +31,7 @@ import {
   eUnSubscribeEvent
 } from "../../../services/event-manager";
 import { useThemeColors } from "@notesnook/theme";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { Dialog } from "../../dialog";
 import BaseDialog from "../../dialog/base-dialog";
 import { presentDialog } from "../../dialog/functions";
@@ -46,6 +43,7 @@ import { sleep } from "../../../utils/time";
 import { MMKV } from "../../../common/database/mmkv";
 import { deleteCacheFileByPath } from "../../../common/filesystem/io";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 const WIN_WIDTH = Dimensions.get("window").width;
 const WIN_HEIGHT = Dimensions.get("window").height;
@@ -98,9 +96,9 @@ const PDFPreview = () => {
   };
 
   useEffect(() => {
-    addOrientationListener(onOrientationChange);
+    Orientation.addDeviceOrientationListener(onOrientationChange);
     return () => {
-      removeOrientationListener(onOrientationChange);
+      Orientation.removeDeviceOrientationListener(onOrientationChange);
     };
   }, []);
 
@@ -184,7 +182,7 @@ const PDFPreview = () => {
               />
               <Paragraph
                 style={{
-                  marginTop: 10
+                  marginTop: DefaultAppStyles.GAP_VERTICAL
                 }}
                 color={colors.static.white}
               >
@@ -200,7 +198,7 @@ const PDFPreview = () => {
                   marginTop: insets.top,
                   flexDirection: "row",
                   justifyContent: "space-between",
-                  paddingHorizontal: 12,
+                  paddingHorizontal: DefaultAppStyles.GAP,
                   paddingLeft: 6
                 }}
               >
@@ -216,7 +214,7 @@ const PDFPreview = () => {
                     style={{
                       marginRight: 12
                     }}
-                    size={SIZE.xxl}
+                    size={AppFontSize.xxl}
                   />
                 </View>
 

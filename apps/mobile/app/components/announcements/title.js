@@ -20,10 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import { View } from "react-native";
 import { useMessageStore } from "../../stores/use-message-store";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import { getStyle } from "./functions";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const Title = ({ text, style = {}, inline }) => {
   const announcements = useMessageStore((state) => state.announcements);
@@ -36,19 +37,19 @@ export const Title = ({ text, style = {}, inline }) => {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        marginBottom: inline ? 5 : 0
+        marginBottom: inline ? DefaultAppStyles.GAP_VERTICAL_SMALL : 0
       }}
     >
       <Heading
         style={{
-          marginHorizontal: 12,
-          marginTop: 12,
+          marginHorizontal: DefaultAppStyles.GAP,
+          marginTop: DefaultAppStyles.GAP_VERTICAL,
           ...getStyle(style),
           textAlign: inline ? "left" : style?.textAlign,
           flexShrink: 1
         }}
         numberOfLines={1}
-        size={inline ? SIZE.md : SIZE.xl}
+        size={inline ? AppFontSize.md : AppFontSize.xl}
       >
         {inline ? text?.toUpperCase() : text}
       </Heading>
@@ -67,7 +68,7 @@ export const Title = ({ text, style = {}, inline }) => {
           right: 0
         }}
         iconSize={24}
-        fontSize={SIZE.xs}
+        fontSize={AppFontSize.xs}
         style={{
           borderRadius: 100,
           paddingVertical: 0,
@@ -80,9 +81,9 @@ export const Title = ({ text, style = {}, inline }) => {
   ) : (
     <Heading
       style={{
-        marginHorizontal: 12,
+        marginHorizontal: DefaultAppStyles.GAP,
         ...getStyle(style),
-        marginTop: style?.marginTop || 12
+        marginTop: style?.marginTop || DefaultAppStyles.GAP_VERTICAL
       }}
     >
       {text}

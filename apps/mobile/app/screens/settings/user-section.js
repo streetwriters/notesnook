@@ -33,9 +33,10 @@ import Paragraph from "../../components/ui/typography/paragraph";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SyncStatus, useUserStore } from "../../stores/use-user-store";
 import { SUBSCRIPTION_STATUS_STRINGS } from "../../utils/constants";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { SectionItem } from "./section-item";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const getTimeLeft = (t2) => {
   let daysRemaining = dayjs(t2).diff(dayjs(), "days");
@@ -72,6 +73,9 @@ const ProfilePicPlaceholder = (props) => {
 };
 
 const onChangePicture = () => {
+  useUserStore.setState({
+    disableAppLockRequests: true
+  });
   const theme =
     useThemeStore.getState().colorScheme === "dark"
       ? useThemeStore.getState().darkTheme
@@ -92,15 +96,23 @@ const onChangePicture = () => {
     cropperToolbarTitle: strings.editProfilePicture(),
     cropperActiveWidgetColor: theme.scopes.base.primary.accent,
     cropperToolbarWidgetColor: theme.scopes.base.primary.icon
-  }).then(async (image) => {
-    if (!image.data) return;
-    await db.settings.setProfile({
-      profilePicture: "data:image/jpeg;base64," + image.data
+  })
+    .then(async (image) => {
+      if (!image.data) return;
+      await db.settings.setProfile({
+        profilePicture: "data:image/jpeg;base64," + image.data
+      });
+      useUserStore.setState({
+        profile: db.settings.getProfile()
+      });
+    })
+    .finally(() => {
+      setTimeout(() => {
+        useUserStore.setState({
+          disableAppLockRequests: false
+        });
+      }, 1000);
     });
-    useUserStore.setState({
-      profile: db.settings.getProfile()
-    });
-  });
 };
 
 const SettingsUserSection = ({ item }) => {
@@ -118,7 +130,7 @@ const SettingsUserSection = ({ item }) => {
         <>
           <View
             style={{
-              paddingHorizontal: 12,
+              paddingHorizontal: DefaultAppStyles.GAP,
               paddingTop: 50,
               borderBottomWidth: 1,
               paddingBottom: 20,
@@ -143,7 +155,7 @@ const SettingsUserSection = ({ item }) => {
                   style={{
                     borderWidth: 2,
                     borderRadius: 100,
-                    marginBottom: 10,
+                    marginBottom: DefaultAppStyles.GAP_VERTICAL,
                     borderColor: colors.primary.accent
                   }}
                 >
@@ -174,7 +186,10 @@ const SettingsUserSection = ({ item }) => {
                   }}
                 >
                   {premium ? (
-                    <Heading color={colors.primary.accent} size={SIZE.sm}>
+                    <Heading
+                      color={colors.primary.accent}
+                      size={AppFontSize.sm}
+                    >
                       {SUBSCRIPTION_STATUS_STRINGS[
                         user.subscription?.type
                       ]?.toUpperCase() || strings.basic()}
@@ -204,24 +219,27 @@ const SettingsUserSection = ({ item }) => {
                       });
                     }}
                     color={colors.primary.heading}
-                    size={SIZE.lg}
+                    size={AppFontSize.lg}
                   >
                     {userProfile?.fullName
                       ? userProfile.fullName + " "
                       : strings.setYourName() + " "}
-                    <AppIcon name="pencil" size={SIZE.lg} />
+                    <AppIcon name="pencil" size={AppFontSize.lg} />
                   </Paragraph>
 
-                  <Paragraph color={colors.primary.heading} size={SIZE.xs}>
+                  <Paragraph
+                    color={colors.primary.heading}
+                    size={AppFontSize.xs}
+                  >
                     {user?.email}
                   </Paragraph>
 
                   <Paragraph
                     style={{
                       flexWrap: "wrap",
-                      marginTop: 5
+                      marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL
                     }}
-                    size={SIZE.xs}
+                    size={AppFontSize.xs}
                     color={colors.secondary.heading}
                   >
                     {!user ? (
@@ -233,7 +251,7 @@ const SettingsUserSection = ({ item }) => {
                           : strings.synced()}{" "}
                         <TimeSince
                           style={{
-                            fontSize: SIZE.xs,
+                            fontSize: AppFontSize.xs,
                             color: colors.secondary.paragraph
                           }}
                           time={lastSynced}

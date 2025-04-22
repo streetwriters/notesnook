@@ -19,10 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import makeMatcher from "wouter/matcher";
 import useHashLocation from "./use-hash-location";
-import { Params, Routes } from "../navigation/types";
+import { Params, HashRoutes } from "../navigation/types";
 import { useEffect } from "react";
 
-export default function useHashRoutes<T extends string>(routes: Routes<T>) {
+export default function useHashRoutes<T extends string>(routes: HashRoutes<T>) {
   const [{ location, update }] = useHashLocation();
 
   useEffect(() => {
@@ -32,8 +32,7 @@ export default function useHashRoutes<T extends string>(routes: Routes<T>) {
     for (const key in routes) {
       const [match, params] = matcher(key, location);
       if (match) {
-        const route = routes[key]((params as Params<typeof key>) || {});
-        if (!route) return;
+        routes[key]((params as Params<typeof key>) || {});
       }
     }
   }, [update, location, routes]);

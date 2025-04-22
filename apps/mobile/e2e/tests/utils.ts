@@ -74,7 +74,8 @@ const Tests = {
   awaitLaunch: async () => {
     await waitFor(element(by.id(notesnook.ids.default.root)))
       .toBeVisible()
-      .withTimeout(500);
+      //@ts-ignore
+      .withTimeout(globalThis["DEBUG_MODE"] ? 4000 : 500);
   },
   sleep: (duration: number) => {
     return new Promise((resolve) =>
@@ -105,7 +106,7 @@ const Tests = {
   async navigate(screen: RouteName | ({} & string)) {
     let menu = Tests.fromId(notesnook.ids.default.header.buttons.left);
     await menu.waitAndTap();
-    await Tests.fromText(screen).waitAndTap();
+    await Tests.fromText(screen as string).waitAndTap();
   },
   async openSideMenu() {
     await Tests.fromId(notesnook.ids.default.header.buttons.left).waitAndTap();

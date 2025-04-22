@@ -32,10 +32,14 @@ function Home() {
   const isCompact = useStore((store) => store.viewMode === "compact");
   const refresh = useStore((store) => store.refresh);
   const setContext = useStore((store) => store.setContext);
-  const filteredItems = useSearch("notes", (query) => {
-    if (useStore.getState().context) return;
-    return db.lookup.notes(query).sorted();
-  });
+  const filteredItems = useSearch(
+    "notes",
+    (query) => {
+      if (useStore.getState().context) return;
+      return db.lookup.notes(query).sorted();
+    },
+    [notes]
+  );
 
   useNavigate("home", setContext);
 
@@ -63,6 +67,7 @@ function Home() {
   if (!notes) return <ListLoader />;
   return (
     <ListContainer
+      type="home"
       group="home"
       compact={isCompact}
       refresh={refresh}

@@ -21,7 +21,7 @@ import React from "react";
 import { View } from "react-native";
 import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { presentSheet } from "../../../services/event-manager";
 import Heading from "../../ui/typography/heading";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -31,6 +31,7 @@ import {
 } from "../../../screens/editor/tiptap/utils";
 import { FlatList } from "react-native-actions-sheet";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 type TableOfContentsItem = {
   level: number;
@@ -86,7 +87,7 @@ const TableOfContentsItem: React.FC<{
               ? colors.selected.paragraph
               : colors.primary.paragraph
           }
-          size={SIZE.md}
+          size={AppFontSize.md}
         >
           {item?.title || strings.newNote()}
         </Paragraph>
@@ -99,9 +100,9 @@ const TableOfContents = ({ toc, close }: TableOfContentsProps) => {
   return (
     <View
       style={{
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         gap: 12,
-        paddingTop: 12
+        paddingTop: DefaultAppStyles.GAP_VERTICAL
       }}
     >
       <View
@@ -112,7 +113,7 @@ const TableOfContents = ({ toc, close }: TableOfContentsProps) => {
           alignItems: "center"
         }}
       >
-        <Heading size={SIZE.lg}>{strings.toc()}</Heading>
+        <Heading size={AppFontSize.lg}>{strings.toc()}</Heading>
       </View>
 
       <FlatList
@@ -128,6 +129,7 @@ const TableOfContents = ({ toc, close }: TableOfContentsProps) => {
           <TableOfContentsItem item={item} close={close} />
         )}
         keyExtractor={(item) => item.id}
+        ListFooterComponent={<View style={{ height: 50 }} />}
       />
     </View>
   );

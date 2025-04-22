@@ -21,6 +21,20 @@ import { notesnook } from "../test.ids";
 import { Tests } from "./utils";
 
 describe("Tags", () => {
+  it("Create a tag", async () => {
+    await Tests.prepare();
+    await Tests.openSideMenu();
+    await Tests.fromId("tab-tags").waitAndTap();
+
+    await Tests.fromText("No tags").isVisible();
+    await Tests.fromId("sidebar-add-button").waitAndTap();
+
+    await Tests.fromId("input-value").element.typeText("testtag");
+
+    await Tests.fromText("Add").waitAndTap();
+    await Tests.fromText("testtag").isVisible();
+  });
+
   it("Tag a note", async () => {
     await Tests.prepare();
     let note = await Tests.createNote();
@@ -32,7 +46,8 @@ describe("Tags", () => {
     await Tests.fromText("#testtag").isVisible();
     await device.pressBack();
     await device.pressBack();
-    await Tests.navigate("Tags");
+    await Tests.openSideMenu();
+    await Tests.fromId("tab-tags").waitAndTap();
     await Tests.fromText("#testtag").waitAndTap();
     await Tests.fromText(note.body).isVisible();
   });
@@ -63,11 +78,12 @@ describe("Tags", () => {
     await Tests.fromText("#testtag").isVisible();
     await device.pressBack();
     await device.pressBack();
-    await Tests.navigate("Tags");
-    await Tests.fromId(notesnook.ids.tag.menu).waitAndTap();
+    await Tests.openSideMenu();
+    await Tests.fromId("tab-tags").waitAndTap();
+    await Tests.fromText("testtag").element.longPress();
     await Tests.sleep(500);
     await Tests.fromText("Add shortcut").waitAndTap();
-    await Tests.fromId(notesnook.ids.default.header.buttons.left).waitAndTap();
+    await Tests.fromId("tab-home").waitAndTap();
     await Tests.fromText("testtag").isVisible();
   });
 
@@ -82,14 +98,15 @@ describe("Tags", () => {
     await Tests.fromText("#testtag").isVisible();
     await device.pressBack();
     await device.pressBack();
-    await Tests.navigate("Tags");
-    await Tests.fromId(notesnook.ids.tag.menu).waitAndTap();
+    await Tests.openSideMenu();
+    await Tests.fromId("tab-tags").waitAndTap();
+    await Tests.fromText("testtag").element.longPress();
     await Tests.sleep(500);
     await Tests.fromText("Rename").waitAndTap();
     await Tests.sleep(100);
     await Tests.fromId("input-value").element.clearText();
     await Tests.fromId("input-value").element.typeText("testtag_edited");
     await Tests.fromText("Save").waitAndTap();
-    await Tests.fromText("#testtag_edited").isVisible();
+    await Tests.fromText("testtag_edited").isVisible();
   });
 });

@@ -28,6 +28,7 @@ import { isUserPremium } from "../../hooks/use-is-user-premium";
 import { TimeFormat } from "@notesnook/core";
 import { TrashCleanupInterval } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
+import { BuyDialog } from "../buy-dialog";
 
 export const BehaviourSettings: SettingsGroup[] = [
   {
@@ -37,24 +38,28 @@ export const BehaviourSettings: SettingsGroup[] = [
     isHidden: () => !isUserPremium(),
     settings: [
       {
-        key: "default-homepage",
-        title: strings.homepage(),
-        description: strings.homepageDesc(),
-        keywords: ["welcome page", "default screen"],
+        key: "default-sidebar-tab",
+        title: strings.defaultSidebarTab(),
+        description: strings.defaultSidebarTabDesc(),
+        keywords: ["default sidebar tab"],
         onStateChange: (listener) =>
-          useSettingStore.subscribe((s) => s.homepage, listener),
+          useSettingStore.subscribe((s) => s.defaultSidebarTab, listener),
         components: [
           {
             type: "dropdown",
-            onSelectionChanged: (value) =>
-              useSettingStore.getState().setHomepage(parseInt(value)),
-            selectedOption: () =>
-              useSettingStore.getState().homepage.toString(),
+            onSelectionChanged: (value) => {
+              if (!isUserPremium()) {
+                BuyDialog.show({});
+                return;
+              }
+
+              useSettingStore.getState().setDefaultSidebarTab(value as any);
+            },
+            selectedOption: () => useSettingStore.getState().defaultSidebarTab,
             options: [
-              { value: "0", title: strings.routes.Notes() },
-              { value: "1", title: strings.routes.Notebooks() },
-              { value: "2", title: strings.routes.Favorites() },
-              { value: "3", title: strings.routes.Tags() }
+              { value: "home", title: strings.routes.Notes() },
+              { value: "notebooks", title: strings.routes.Notebooks() },
+              { value: "tags", title: strings.routes.Tags() }
             ]
           }
         ]
@@ -154,12 +159,18 @@ export const BehaviourSettings: SettingsGroup[] = [
         components: [
           {
             type: "dropdown",
-            onSelectionChanged: (value) =>
+            onSelectionChanged: (value) => {
+              if (!isUserPremium()) {
+                BuyDialog.show({});
+                return;
+              }
+
               useSettingStore
                 .getState()
                 .setTrashCleanupInterval(
                   parseInt(value) as TrashCleanupInterval
-                ),
+                );
+            },
             selectedOption: () =>
               useSettingStore.getState().trashCleanupInterval.toString(),
             options: [

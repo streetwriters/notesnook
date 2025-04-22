@@ -27,12 +27,13 @@ import {
 } from "../../services/event-manager";
 import { useThemeColors } from "@notesnook/theme";
 import { eCloseSheet, eOpenSheet } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
 import SheetWrapper from "../ui/sheet";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { DefaultAppStyles } from "../../utils/styles";
 const SheetProvider = ({ context = "global" }) => {
   const { colors } = useThemeColors();
   const [visible, setVisible] = useState(false);
@@ -94,6 +95,8 @@ const SheetProvider = ({ context = "global" }) => {
     [context]
   );
 
+  console.log(data?.keyboardHandlerDisabled);
+
   return !visible || !data ? null : (
     <SheetWrapper
       fwdRef={actionSheetRef}
@@ -120,13 +123,13 @@ const SheetProvider = ({ context = "global" }) => {
             !data.progress && !data.icon && !data.title && !data.paragraph
               ? 0
               : 10,
-          paddingHorizontal: 12
+          paddingHorizontal: DefaultAppStyles.GAP
         }}
       >
         {data?.progress ? (
           <ActivityIndicator
             style={{
-              marginTop: 15
+              marginTop: DefaultAppStyles.GAP
             }}
             size={50}
             color={colors.primary.accent}
@@ -169,7 +172,7 @@ const SheetProvider = ({ context = "global" }) => {
 
       <View
         style={{
-          paddingHorizontal: 12,
+          paddingHorizontal: DefaultAppStyles.GAP,
           marginBottom: data.valueArray ? 12 : 0
         }}
       >
@@ -180,7 +183,7 @@ const SheetProvider = ({ context = "global" }) => {
               type="plain"
               key={v}
               textStyle={{ fontWeight: "normal" }}
-              fontSize={SIZE.sm}
+              fontSize={AppFontSize.sm}
               icon="check"
               width="100%"
               style={{
@@ -193,7 +196,7 @@ const SheetProvider = ({ context = "global" }) => {
 
       <View
         style={{
-          paddingHorizontal: 12
+          paddingHorizontal: DefaultAppStyles.GAP
         }}
       >
         {data?.action ? (
@@ -220,10 +223,10 @@ const SheetProvider = ({ context = "global" }) => {
               icon={item.icon && item.icon}
               type={item.type || "accent"}
               style={{
-                marginBottom: 10
+                marginBottom: DefaultAppStyles.GAP_VERTICAL
               }}
               width="100%"
-              fontSize={SIZE.md}
+              fontSize={AppFontSize.md}
             />
           ))}
 
@@ -231,17 +234,17 @@ const SheetProvider = ({ context = "global" }) => {
           <Paragraph
             style={{
               alignSelf: "center",
-              marginTop: 10,
+              marginTop: DefaultAppStyles.GAP_VERTICAL,
               textDecorationLine: "underline"
             }}
-            size={SIZE.xs}
+            size={AppFontSize.xs}
             onPress={data.learnMorePress}
             color={colors.secondary.paragraph}
           >
             <Icon
               color={colors.primary.icon}
               name="information-outline"
-              size={SIZE.xs}
+              size={AppFontSize.xs}
             />{" "}
             {data.learnMore}
           </Paragraph>

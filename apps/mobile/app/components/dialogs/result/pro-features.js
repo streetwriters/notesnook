@@ -27,9 +27,10 @@ import {
   eCloseResultDialog,
   eOpenPremiumDialog
 } from "../../../utils/events";
-import { SIZE } from "../../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 import Paragraph from "../../ui/typography/paragraph";
+import { DefaultAppStyles } from "../../../utils/styles";
 export const ProFeatures = ({ count = 6 }) => {
   const { colors } = useThemeColors();
 
@@ -67,13 +68,17 @@ export const ProFeatures = ({ count = 6 }) => {
               width: "100%",
               height: 40,
               paddingHorizontal: 0,
-              marginBottom: 10,
+              marginBottom: DefaultAppStyles.GAP_VERTICAL,
               alignItems: "center",
-              borderRadius: 5,
+              borderRadius: defaultBorderRadius,
               justifyContent: "flex-start"
             }}
           >
-            <Icon size={SIZE.lg} color={colors.primary.accent} name="check" />
+            <Icon
+              size={AppFontSize.lg}
+              color={colors.primary.accent}
+              name="check"
+            />
             <Paragraph style={{ marginLeft: 5, flexShrink: 1 }}>
               {item.content}
             </Paragraph>
@@ -86,7 +91,7 @@ export const ProFeatures = ({ count = 6 }) => {
           await sleep(300);
           eSendEvent(eOpenPremiumDialog);
         }}
-        size={SIZE.xs}
+        size={AppFontSize.xs}
         style={{
           textDecorationLine: "underline",
           color: colors.secondary.paragraph

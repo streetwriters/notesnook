@@ -38,7 +38,7 @@ function Notes(props: NotesProps) {
   const type = context?.type === "favorite" ? "favorites" : "notes";
   const isCompact = useNotesStore((store) => store.viewMode === "compact");
   const filteredItems = useSearch(
-    "notes",
+    context?.type === "notebook" ? "notebook" : "notes",
     (query) => {
       if (!context || !contextNotes) return;
       const notes = notesFromContext(context);
@@ -50,6 +50,7 @@ function Notes(props: NotesProps) {
   if (!context || !contextNotes) return <ListLoader />;
   return (
     <ListContainer
+      type={type}
       group={type}
       refresh={refreshContext}
       compact={isCompact}

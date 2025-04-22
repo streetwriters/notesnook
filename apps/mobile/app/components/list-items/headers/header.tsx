@@ -24,12 +24,13 @@ import { useMessageStore } from "../../../stores/use-message-store";
 import { useSelectionStore } from "../../../stores/use-selection-store";
 import { Announcement } from "../../announcements/announcement";
 import { Card } from "../../list/card";
+import { RouteParams } from "../../../stores/use-navigation-store";
 
 export type ListHeaderProps = {
   noAnnouncement?: boolean;
   color?: string;
   messageCard?: boolean;
-  screen?: string;
+  screen?: keyof RouteParams;
   shouldShow?: boolean;
 };
 
@@ -50,19 +51,11 @@ export const Header = React.memo(
         {announcements.length !== 0 && !noAnnouncement ? (
           <Announcement color={color || colors.primary.accent} />
         ) : (screen as any) === "Search" ? null : !shouldShow ? (
-          <View
-            style={{
-              marginBottom: 5,
-              padding: 0,
-              width: "100%",
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
+          <>
             {messageCard ? (
               <Card color={color || colors.primary.accent} />
             ) : null}
-          </View>
+          </>
         ) : null}
       </>
     );

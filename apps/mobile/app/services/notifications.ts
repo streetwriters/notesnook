@@ -44,7 +44,7 @@ import { useReminderStore } from "../stores/use-reminder-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { useUserStore } from "../stores/use-user-store";
 import { eOnLoadNote } from "../utils/events";
-import { tabBarRef } from "../utils/global-refs";
+import { fluidTabsRef } from "../utils/global-refs";
 import { convertNoteToText } from "../utils/note-to-text";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { sleep } from "../utils/time";
@@ -53,6 +53,7 @@ import { eSendEvent } from "./event-manager";
 import Navigation from "./navigation";
 import SettingsService from "./settings";
 import { getFormattedReminderTime } from "@notesnook/common";
+import { MMKV } from "../common/database/mmkv";
 
 let pinned: DisplayedNotification[] = [];
 
@@ -440,7 +441,7 @@ async function loadNote(id: string, jump: boolean) {
   const note = await db.notes.note(id);
   if (!note) return;
   if (!DDS.isTab && jump) {
-    tabBarRef.current?.goToPage(1);
+    fluidTabsRef.current?.goToPage("editor");
   }
   NotesnookModule.setAppState(
     JSON.stringify({
@@ -883,13 +884,6 @@ function init() {
   notifee.onForegroundEvent(onEvent);
 }
 
-async function remove(id: string) {
-  await notifee.cancelNotification(id);
-  get().then(() => {
-    eSendEvent("onUpdate", "unpin");
-  });
-}
-
 async function pinQuickNote(launch: boolean) {
   useUserStore.setState({
     disableAppLockRequests: true
@@ -969,11 +963,49 @@ async function setupReminders(checkNeedsScheduling = false) {
   updateRemindersForWidget();
 }
 
+class PinnedNotesStorage {
+  static storageKey = "nn::pinnedNoteIds";
+  static get() {
+    const items = MMKV.getArray<string>(PinnedNotesStorage.storageKey);
+    if (!items) return [];
+    return items;
+  }
+
+  static add(id: string) {
+    const items = PinnedNotesStorage.get();
+    if (items.indexOf(id) === -1) {
+      items.push(id);
+      MMKV.setArray(PinnedNotesStorage.storageKey, items);
+    }
+  }
+
+  static remove(id: string) {
+    const items = PinnedNotesStorage.get();
+    const index = items.indexOf(id);
+    if (index > -1) {
+      items.splice(index, 1);
+      MMKV.setArray(PinnedNotesStorage.storageKey, items);
+    }
+  }
+
+  static clear() {
+    MMKV.removeItem(PinnedNotesStorage.storageKey);
+  }
+}
+
+async function remove(id: string) {
+  await notifee.cancelNotification(id);
+  PinnedNotesStorage.remove(id);
+  get().then(() => {
+    eSendEvent("onUpdate", "unpin");
+  });
+}
+
 async function pinNote(id: string) {
   try {
     const note = await db.notes.note(id as string);
     if (!note) return;
-
+    PinnedNotesStorage.add(id);
     let text = await convertNoteToText(note, true);
     if (!text) text = "";
     const html = text.replace(/\n/g, "<br />");
@@ -990,6 +1022,14 @@ async function pinNote(id: string) {
     /* empty */
   }
 }
+
+async function restorePinnedNotes() {
+  const pinnedNotes = PinnedNotesStorage.get();
+  for (const id of pinnedNotes) {
+    pinNote(id);
+  }
+}
+
 const Events = {
   onUpdate: "onUpdate"
 };
@@ -1013,7 +1053,8 @@ const Notifications = {
   isNotePinned,
   pinNote,
   Events,
-  updateRemindersForWidget
+  updateRemindersForWidget,
+  restorePinnedNotes
 };
 
 export default Notifications;

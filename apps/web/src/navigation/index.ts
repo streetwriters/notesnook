@@ -22,6 +22,7 @@ import { EventManager } from "@notesnook/core";
 import Config from "../utils/config";
 import type { HashRoute } from "./hash-routes";
 import type { ReplaceParametersInPath } from "./types";
+import { HomePage } from "../stores/setting-store";
 
 export function navigate(
   url: string,
@@ -93,14 +94,22 @@ export function getCurrentHash() {
 
 export const NavigationEvents = new EventManager();
 
-const HOMEPAGE_ROUTE = {
-  0: "/notes",
-  1: "/notebooks",
-  2: "/favorites",
-  3: "/tags"
-} as const;
 export function getHomeRoute() {
-  return HOMEPAGE_ROUTE[Config.get("homepage", 0)];
+  const homepage = Config.get<HomePage>("homepage-v2");
+  if (!homepage) return "/notes";
+
+  switch (homepage.type) {
+    case "route":
+      return `/${homepage.id}`;
+    case "notebook":
+      return `/notebooks/${homepage.id}`;
+    case "tag":
+      return `/tags/${homepage.id}`;
+    case "color":
+      return `/colors/${homepage.id}`;
+    default:
+      return "/notes";
+  }
 }
 
 export function extendHomeRoute(route: string) {

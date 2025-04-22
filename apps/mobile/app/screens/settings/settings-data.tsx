@@ -27,18 +27,15 @@ import React from "react";
 import { Appearance, Linking, Platform } from "react-native";
 import { getVersion } from "react-native-device-info";
 import * as RNIap from "react-native-iap";
+//@ts-ignore
 import { enabled } from "react-native-privacy-snapshot";
 import ScreenGuardModule from "react-native-screenguard";
-import { DatabaseLogger, db } from "../../common/database";
+import { db } from "../../common/database";
 import filesystem from "../../common/filesystem";
 import { ChangePassword } from "../../components/auth/change-password";
 import { presentDialog } from "../../components/dialog/functions";
 import { AppLockPassword } from "../../components/dialogs/applock-password";
-import {
-  endProgress,
-  startProgress,
-  updateProgress
-} from "../../components/dialogs/progress";
+import { endProgress, startProgress } from "../../components/dialogs/progress";
 import { ChangeEmail } from "../../components/sheets/change-email";
 import ExportNotesSheet from "../../components/sheets/export-notes";
 import { Issue } from "../../components/sheets/github/issue";
@@ -63,16 +60,13 @@ import Sync from "../../services/sync";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
 import { SUBSCRIPTION_STATUS } from "../../utils/constants";
-import {
-  eCloseSheet,
-  eCloseSimpleDialog,
-  eOpenRecoveryKeyDialog
-} from "../../utils/events";
+import { eCloseSheet, eOpenRecoveryKeyDialog } from "../../utils/events";
 import { NotesnookModule } from "../../utils/notesnook-module";
 import { sleep } from "../../utils/time";
 import { MFARecoveryCodes, MFASheet } from "./2fa";
 import { useDragState } from "./editor/state";
 import { verifyUser, verifyUserWithApplock } from "./functions";
+import { logoutUser } from "./logout";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
 
@@ -411,89 +405,7 @@ export const settingsGroups: SettingSection[] = [
             name: strings.logout(),
             description: strings.logoutWarnin(),
             icon: "logout",
-            modifer: async () => {
-              const hasUnsyncedChanges = await db.hasUnsyncedChanges();
-              presentDialog({
-                title: strings.logout(),
-                paragraph: strings.logoutConfirmation(),
-                positiveText: strings.logout(),
-                check: {
-                  info: strings.backupDataBeforeLogout(),
-                  defaultValue: true
-                },
-                notice: hasUnsyncedChanges
-                  ? {
-                      text: strings.unsyncedChangesWarning(),
-                      type: "alert"
-                    }
-                  : undefined,
-                positivePress: async (_, takeBackup) => {
-                  eSendEvent(eCloseSimpleDialog);
-                  setTimeout(async () => {
-                    try {
-                      startProgress({
-                        fillBackground: true,
-                        title: strings.loggingOut(),
-                        canHideProgress: true,
-                        paragraph: strings.loggingOutDesc()
-                      });
-
-                      Navigation.navigate("Notes");
-
-                      if (takeBackup) {
-                        updateProgress({
-                          progress: strings.backingUpData()
-                        });
-
-                        try {
-                          const result = await BackupService.run(
-                            false,
-                            "local",
-                            "partial"
-                          );
-                          if (result?.error) throw result.error as Error;
-                        } catch (e) {
-                          DatabaseLogger.error(e);
-                          const error = e;
-                          const canLogout = await new Promise((resolve) => {
-                            presentDialog({
-                              context: "local",
-                              title: strings.failedToTakeBackup(),
-                              paragraph: `${
-                                (error as Error).message
-                              }. ${strings.failedToTakeBackupMessage()}?`,
-                              positiveText: strings.yes(),
-                              negativeText: strings.no(),
-                              positivePress: () => {
-                                resolve(true);
-                              },
-                              onClose: () => {
-                                resolve(false);
-                              }
-                            });
-                          });
-                          if (!canLogout) {
-                            endProgress();
-                            return;
-                          }
-                        }
-                      }
-
-                      updateProgress({
-                        progress: strings.loggingOut()
-                      });
-
-                      await db.user?.logout();
-                      endProgress();
-                    } catch (e) {
-                      DatabaseLogger.error(e);
-                      ToastManager.error(e as Error, strings.logoutError());
-                      endProgress();
-                    }
-                  }, 300);
-                }
-              });
-            }
+            modifer: logoutUser
           },
           {
             id: "delete-account",
@@ -714,15 +626,16 @@ export const settingsGroups: SettingSection[] = [
       {
         id: "behaviour",
         type: "screen",
+        icon: "brain",
         name: strings.behavior(),
         description: strings.behaviorDesc(),
         sections: [
           {
-            id: "default-home",
+            id: "default-sidebar-view",
             type: "component",
-            name: strings.homepage(),
-            description: strings.homepageDesc(),
-            component: "homeselector"
+            name: strings.defaultSidebarTab(),
+            description: strings.defaultSidebarTabDesc(),
+            component: "sidebar-tab-selector"
           },
           {
             id: "date-format",
@@ -1298,6 +1211,7 @@ export const settingsGroups: SettingSection[] = [
         id: "restore-backup",
         name: strings.restoreBackup(),
         description: strings.restoreBackupDesc(),
+        icon: "restore",
         type: "screen",
         component: "backuprestore"
       },
@@ -1424,7 +1338,7 @@ export const settingsGroups: SettingSection[] = [
       {
         id: "email-support",
         name: strings.emailSupport(),
-        icon: "mail",
+        icon: "email",
         modifer: () => {
           Clipboard.setString("support@streetwriters.co");
           ToastManager.show({
@@ -1521,6 +1435,7 @@ export const settingsGroups: SettingSection[] = [
       {
         id: "tos",
         name: strings.tos(),
+        icon: "briefcase-outline",
         modifer: async () => {
           try {
             await Linking.openURL("https://notesnook.com/tos");
@@ -1533,6 +1448,7 @@ export const settingsGroups: SettingSection[] = [
       {
         id: "privacy-policy",
         name: strings.privacyPolicy(),
+        icon: "shield-outline",
         modifer: async () => {
           try {
             await Linking.openURL("https://notesnook.com/privacy");

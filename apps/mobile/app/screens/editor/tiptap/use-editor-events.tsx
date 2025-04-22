@@ -37,6 +37,7 @@ import {
 import { WebViewMessageEvent } from "react-native-webview";
 import { DatabaseLogger, db } from "../../../common/database";
 import downloadAttachment from "../../../common/filesystem/download-attachment";
+import { AuthMode } from "../../../components/auth/common";
 import EditorTabs from "../../../components/sheets/editor-tabs";
 import { Issue } from "../../../components/sheets/github/issue";
 import LinkNote from "../../../components/sheets/link-note";
@@ -66,18 +67,18 @@ import {
   eOnExitEditor,
   eOnLoadNote,
   eOpenFullscreenEditor,
-  eOpenLoginDialog,
   eOpenPremiumDialog,
   eOpenPublishNoteDialog,
   eUnlockWithBiometrics,
   eUnlockWithPassword
 } from "../../../utils/events";
 import { openLinkInBrowser } from "../../../utils/functions";
-import { tabBarRef } from "../../../utils/global-refs";
+import { fluidTabsRef } from "../../../utils/global-refs";
 import { useDragState } from "../../settings/editor/state";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { useTabStore } from "./use-tab-store";
 import { editorState, openInternalLink } from "./utils";
+import { Properties } from "../../../components/properties";
 
 const publishNote = async () => {
   const user = useUserStore.getState().user;
@@ -86,7 +87,9 @@ const publishNote = async () => {
       heading: strings.loginRequired(),
       context: "global",
       func: () => {
-        eSendEvent(eOpenLoginDialog);
+        Navigation.navigate("Auth", {
+          mode: AuthMode.login
+        });
       },
       actionText: "Login"
     });
@@ -127,12 +130,9 @@ const showActionsheet = async () => {
     .getState()
     .getNoteIdForTab(useTabStore.getState().currentTab!);
   if (noteId) {
+    console.log("OPEN NOTE");
     const note = await db.notes?.note(noteId);
-    if (editorState().isFocused || editorState().isFocused) {
-      editorState().isFocused = true;
-    }
-    const { Properties } = require("../../../components/properties/index.js");
-    Properties.present(note, ["Dark Mode"]);
+    Properties.present(note, false);
   } else {
     ToastManager.show({
       heading: strings.noNoteProperties(),
@@ -174,11 +174,10 @@ export const useEditorEvents = (
   );
 
   const tools = useDragState((state) => state.data);
-
   useEffect(() => {
     const handleKeyboardDidShow: KeyboardEventListener = () => {
       editor.commands.keyboardShown(true);
-      editor.postMessage(NativeEvents.keyboardShown, undefined);
+      //editor.postMessage(NativeEvents.keyboardShown, undefined);
     };
     const handleKeyboardDidHide: KeyboardEventListener = () => {
       editor.commands.keyboardShown(false);
@@ -191,7 +190,6 @@ export const useEditorEvents = (
       subscriptions.forEach((subscription) => subscription.remove());
     };
   }, [editor.commands, editor.postMessage]);
-
   useEffect(() => {
     if (loading) return;
     if (typeof defaultFontFamily === "object") {
@@ -259,7 +257,7 @@ export const useEditorEvents = (
 
       if (deviceMode === "mobile") {
         editorState().movedAway = true;
-        tabBarRef.current?.goToPage(0);
+        fluidTabsRef.current?.goToPage("home");
       }
 
       setTimeout(() => {
@@ -269,7 +267,7 @@ export const useEditorEvents = (
   }, [editor, deviceMode, fullscreen]);
 
   const onHardwareBackPress = useCallback(() => {
-    if (tabBarRef.current?.page() === 2) {
+    if (fluidTabsRef.current?.page() === "editor") {
       onBackPress();
       return true;
     }

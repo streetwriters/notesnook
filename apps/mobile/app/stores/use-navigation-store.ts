@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { FilteredSelector } from "@notesnook/core";
 import {
   Color,
+  FilteredSelector,
   Item,
   ItemType,
   Note,
@@ -28,6 +28,7 @@ import {
   Tag,
   TrashItem
 } from "@notesnook/core";
+import { ParamListBase } from "@react-navigation/core";
 import create, { State } from "zustand";
 
 export type GenericRouteParam = undefined;
@@ -51,11 +52,9 @@ export type AppLockRouteParams = {
 
 export type AuthParams = {
   mode: number;
-  title: string;
-  canGoBack?: boolean;
 };
 
-export type RouteParams = {
+export interface RouteParams extends ParamListBase {
   Notes: GenericRouteParam;
   Notebooks: {
     canGoBack?: boolean;
@@ -72,15 +71,26 @@ export type RouteParams = {
     route: RouteName;
     items?: FilteredSelector<Item>;
   };
-  Settings: GenericRouteParam;
   TaggedNotes: NotesScreenParams;
   ColoredNotes: NotesScreenParams;
   TopicNotes: NotesScreenParams;
   Monographs: NotesScreenParams;
-  AppLock: AppLockRouteParams;
   Reminders: GenericRouteParam;
   SettingsGroup: GenericRouteParam;
-};
+  FluidPanelsView: GenericRouteParam;
+  AppLock: GenericRouteParam;
+  Settings: GenericRouteParam;
+  Auth: AuthParams;
+  LinkNotebooks: {
+    noteIds: string[];
+  };
+  MoveNotebook: {
+    selectedNotebooks: Notebook[];
+  };
+  MoveNotes: {
+    notebook: Notebook;
+  };
+}
 
 export type RouteName = keyof RouteParams;
 

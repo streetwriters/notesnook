@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { forwardRef, useEffect, useRef, useState } from "react";
 import { Flex, Button } from "@theme-ui/components";
+import { SxProp } from "@theme-ui/core";
 import { Plus } from "../icons";
 import {
   useStore as useSelectionStore,
@@ -32,10 +33,11 @@ import {
 } from "./list-profiles";
 import Announcements from "../announcements";
 import { ListLoader } from "../loaders/list-loader";
-import ScrollContainer from "../scroll-container";
+import ScrollContainer, { ScrollContainerProps } from "../scroll-container";
 import { useKeyboardListNavigation } from "../../hooks/use-keyboard-list-navigation";
 import { VirtualizedGrouping, GroupingKey, Item } from "@notesnook/core";
 import {
+  Components,
   FlatScrollIntoViewLocation,
   ItemProps,
   ScrollerProps,
@@ -48,8 +50,9 @@ import { AppEventManager, AppEvents } from "../../common/app-events";
 
 export const CustomScrollbarsVirtualList = forwardRef<
   HTMLDivElement,
-  ScrollerProps
+  ScrollerProps & ScrollContainerProps
 >(function CustomScrollbarsVirtualList(props, ref) {
+  console.log({ props, ref });
   return (
     <ScrollContainer
       {...props}
@@ -62,6 +65,7 @@ export const CustomScrollbarsVirtualList = forwardRef<
 });
 
 type ListContainerProps = {
+  type: GroupingKey;
   group?: GroupingKey;
   items: VirtualizedGrouping<Item>;
   compact?: boolean;
@@ -74,9 +78,21 @@ type ListContainerProps = {
   button?: {
     onClick: () => void;
   };
-};
+  Scroller?: Components["Scroller"];
+} & SxProp;
 function ListContainer(props: ListContainerProps) {
-  const { group, items, context, refresh, header, button, compact } = props;
+  const {
+    type,
+    group,
+    items,
+    context,
+    refresh,
+    header,
+    button,
+    compact,
+    sx,
+    Scroller
+  } = props;
 
   const [focusedGroupIndex, setFocusedGroupIndex] = useState(-1);
 
@@ -96,7 +112,7 @@ function ListContainer(props: ListContainerProps) {
     let flashStartTimeout: NodeJS.Timeout;
     let flashEndTimeout: NodeJS.Timeout;
 
-    AppEventManager.subscribe(
+    const event = AppEventManager.subscribe(
       AppEvents.revealItemInList,
       async (id?: string) => {
         if (!id || !listRef.current) return;
@@ -117,16 +133,17 @@ function ListContainer(props: ListContainerProps) {
           noteItem.classList.add("flash");
           flashEndTimeout = setTimeout(() => {
             noteItem.classList.remove("flash");
-          }, 1000);
+          }, 2000);
         }, 500);
       }
     );
 
     return () => {
+      event.unsubscribe();
       clearTimeout(flashStartTimeout);
       clearTimeout(flashEndTimeout);
     };
-  }, []);
+  }, [items]);
 
   useEffect(() => {
     return () => {
@@ -180,7 +197,7 @@ function ListContainer(props: ListContainerProps) {
   return (
     <Flex
       variant="columnFill"
-      sx={{ overflow: "hidden" }}
+      sx={{ overflow: "hidden", ...sx }}
       onDragOver={(e) => e.preventDefault()}
       onDrop={props.onDrop}
     >
@@ -200,7 +217,7 @@ function ListContainer(props: ListContainerProps) {
           <Flex
             ref={listContainerRef}
             variant="columnFill"
-            data-test-id={`${group}-list`}
+            data-test-id={`${type}-list`}
           >
             <Virtuoso
               ref={listRef}
@@ -210,7 +227,7 @@ function ListContainer(props: ListContainerProps) {
               onBlur={() => setFocusedGroupIndex(-1)}
               onKeyDown={(e) => onKeyDown(e.nativeEvent)}
               components={{
-                Scroller: CustomScrollbarsVirtualList,
+                Scroller: Scroller || CustomScrollbarsVirtualList,
                 Item: VirtuosoItem,
                 Header: ListHeader
               }}

@@ -295,7 +295,7 @@ export default class Lookup {
       async (start, end) => {
         const items = await selector.items(ids.slice(start, end), sortOptions);
         return {
-          ids: ids.slice(start, end),
+          ids: items.map((i) => i.id),
           items
         };
       }

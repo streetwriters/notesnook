@@ -24,11 +24,12 @@ import { MMKV } from "../../common/database/mmkv";
 import { eSendEvent, presentSheet } from "../../services/event-manager";
 import { TTip } from "../../services/tip-manager";
 import { eCloseSheet } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { Button } from "../ui/button";
 import Seperator from "../ui/seperator";
 import Paragraph from "../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const Tip = ({
   tip,
@@ -52,10 +53,10 @@ export const Tip = ({
       style={[
         {
           borderRadius: 10,
-          padding: 12,
+          paddingHorizontal: DefaultAppStyles.GAP,
           width: "100%",
           alignSelf: "center",
-          paddingVertical: 12,
+          paddingVertical: DefaultAppStyles.GAP_VERTICAL,
           backgroundColor: colors.secondary.background
         },
         style
@@ -70,20 +71,21 @@ export const Tip = ({
         <Button
           title={strings.tip()}
           icon="information"
-          fontSize={SIZE.xs}
-          iconSize={SIZE.xs}
+          fontSize={AppFontSize.xxxs}
+          iconSize={AppFontSize.xs}
           style={{
-            width: undefined,
-            height: 22,
-            paddingHorizontal: 4,
+            paddingHorizontal: DefaultAppStyles.GAP_SMALL / 2,
+            paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL / 2,
             alignSelf: "flex-start",
             borderRadius: 100,
             borderWidth: 1,
-            borderColor: color ? color : colors.primary.accent
+            borderColor: colors.secondary.border
           }}
-          buttonType={{
-            text: color
+          textStyle={{
+            color: colors.secondary.paragraph
           }}
+          iconColor={colors.secondary.icon}
+          type="plain"
         />
 
         {neverShowAgain && (
@@ -91,16 +93,16 @@ export const Tip = ({
             title={strings.neverShowAgain()}
             type="secondary"
             icon="close"
-            fontSize={SIZE.xs}
-            iconSize={SIZE.xs}
+            fontSize={AppFontSize.xs}
+            iconSize={AppFontSize.xs}
             onPress={() => {
               MMKV.setItem("neverShowSheetTips", "true");
               eSendEvent(eCloseSheet);
             }}
             style={{
               width: undefined,
-              height: 25,
-              paddingHorizontal: 4,
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
+              paddingHorizontal: DefaultAppStyles.GAP_SMALL / 2,
               alignSelf: "flex-start",
               borderRadius: 100,
               borderWidth: 1,
@@ -114,7 +116,7 @@ export const Tip = ({
       <Paragraph
         style={textStyle}
         color={colors.primary.paragraph}
-        size={SIZE.md}
+        size={AppFontSize.sm}
       >
         {tip.text()}
       </Paragraph>
@@ -123,7 +125,7 @@ export const Tip = ({
           style={{
             borderRadius: 10,
             overflow: "hidden",
-            marginTop: 10
+            marginTop: DefaultAppStyles.GAP_VERTICAL
           }}
         >
           <Image
@@ -147,7 +149,7 @@ export const Tip = ({
             text: colors.primary.accentForeground
           }}
           style={{
-            marginTop: 10
+            marginTop: DefaultAppStyles.GAP_VERTICAL
           }}
           onPress={() => {
             switch (tip.button?.action) {
@@ -172,7 +174,7 @@ Tip.present = async (tip: TTip) => {
         neverShowAgain={true}
         style={{
           backgroundColor: "transparent",
-          paddingHorizontal: 12
+          paddingHorizontal: DefaultAppStyles.GAP
         }}
       />
     )

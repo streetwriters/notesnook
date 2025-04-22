@@ -33,6 +33,7 @@ export interface SelectionStore extends State {
   enabled?: boolean;
   getSelectedItemIds: () => string[];
   getDeselectedItemIds: () => string[];
+  selectAll?: () => void;
 }
 
 export function createItemSelectionStore(

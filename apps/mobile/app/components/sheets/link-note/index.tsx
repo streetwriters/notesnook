@@ -33,11 +33,12 @@ import { db } from "../../../common/database";
 import { useDBItem } from "../../../hooks/use-db-item";
 import { editorController } from "../../../screens/editor/tiptap/utils";
 import { presentSheet } from "../../../services/event-manager";
-import { SIZE } from "../../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import Input from "../../ui/input";
 import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 const ListNoteItem = ({
   id,
@@ -57,7 +58,7 @@ const ListNoteItem = ({
       }}
       type={"transparent"}
       style={{
-        paddingVertical: 12,
+        paddingVertical: DefaultAppStyles.GAP_VERTICAL,
         flexDirection: "row",
         width: "100%",
         justifyContent: "flex-start",
@@ -104,7 +105,7 @@ const ListBlockItem = ({
           alignItems: "flex-start",
           borderBottomWidth: 1,
           borderBottomColor: colors.primary.border,
-          paddingVertical: 5,
+          paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
           justifyContent: "space-between"
         }}
       >
@@ -122,7 +123,7 @@ const ListBlockItem = ({
 
         <View
           style={{
-            borderRadius: 5,
+            borderRadius: defaultBorderRadius,
             backgroundColor: colors.secondary.background,
             height: 25,
             minWidth: 25,
@@ -130,7 +131,7 @@ const ListBlockItem = ({
             justifyContent: "center"
           }}
         >
-          <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
+          <Paragraph color={colors.secondary.paragraph} size={AppFontSize.xs}>
             {item.type.toUpperCase()}
           </Paragraph>
         </View>
@@ -220,7 +221,7 @@ export default function LinkNote(props: {
   return (
     <View
       style={{
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         minHeight: "100%",
         maxHeight: "100%"
       }}
@@ -254,7 +255,7 @@ export default function LinkNote(props: {
               gap: 10
             }}
           >
-            <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
+            <Paragraph color={colors.secondary.paragraph} size={AppFontSize.xs}>
               {strings.linkNoteSelectedNote()}
             </Paragraph>
             <Pressable
@@ -270,7 +271,7 @@ export default function LinkNote(props: {
                 height: 45,
                 borderWidth: 1,
                 borderColor: colors.primary.accent,
-                paddingHorizontal: 12
+                paddingHorizontal: DefaultAppStyles.GAP
               }}
               type="secondaryAccented"
             >
@@ -284,7 +285,10 @@ export default function LinkNote(props: {
               >
                 <Paragraph numberOfLines={1}>{selectedNote?.title}</Paragraph>
 
-                <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
+                <Paragraph
+                  color={colors.secondary.paragraph}
+                  size={AppFontSize.xs}
+                >
                   {strings.tapToDeselect()}
                 </Paragraph>
               </View>
@@ -293,10 +297,10 @@ export default function LinkNote(props: {
             {nodes?.length > 0 ? (
               <Paragraph
                 style={{
-                  marginBottom: 12
+                  marginBottom: DefaultAppStyles.GAP_VERTICAL
                 }}
                 color={colors.secondary.paragraph}
-                size={SIZE.xs}
+                size={AppFontSize.xs}
               >
                 {strings.linkNoteToSection()}
               </Paragraph>
@@ -311,7 +315,7 @@ export default function LinkNote(props: {
             <ListBlockItem item={item} onSelectBlock={onSelectBlock} />
           )}
           style={{
-            marginTop: 10
+            marginTop: DefaultAppStyles.GAP_VERTICAL
           }}
           keyboardShouldPersistTaps="handled"
           windowSize={3}
@@ -329,7 +333,7 @@ export default function LinkNote(props: {
           )}
           keyboardShouldPersistTaps="handled"
           style={{
-            marginTop: 10
+            marginTop: DefaultAppStyles.GAP_VERTICAL
           }}
           windowSize={3}
           data={notes?.placeholders}
@@ -339,7 +343,7 @@ export default function LinkNote(props: {
       {selectedNote ? (
         <Button
           style={{
-            marginTop: 10
+            marginTop: DefaultAppStyles.GAP_VERTICAL
           }}
           title={strings.createLink()}
           type="accent"

@@ -200,6 +200,7 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
             isRenderedInActionSheet={isSheet}
             index={index}
             locked={locked.current}
+            renderedInRoute={props.renderedInRoute}
           />
         </>
       );

@@ -43,12 +43,13 @@ import {
 } from "../../../stores/item-selection-store";
 import { useRelationStore } from "../../../stores/use-relation-store";
 import { useTagStore } from "../../../stores/use-tag-store";
-import { SIZE } from "../../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import Input from "../../ui/input";
 import { Pressable } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 async function updateInitialSelectionState(items: string[]) {
   const relations = await db.relations
@@ -242,7 +243,7 @@ const ManageTagsSheet = (props: {
       style={{
         width: "100%",
         alignSelf: "center",
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         maxHeight: dimensions.height * 0.85
       }}
     >
@@ -250,7 +251,7 @@ const ManageTagsSheet = (props: {
         button={{
           icon: "magnify",
           color: colors.primary.accent,
-          size: SIZE.lg,
+          size: AppFontSize.lg,
           onPress: () => {}
         }}
         testID="tag-input"
@@ -279,15 +280,19 @@ const ManageTagsSheet = (props: {
             flexDirection: "row",
             marginVertical: 5,
             justifyContent: "space-between",
-            padding: 12
+            padding: DefaultAppStyles.GAP
           }}
           onPress={onSubmit}
           type="selected"
         >
-          <Heading size={SIZE.sm} color={colors.selected.heading}>
+          <Heading size={AppFontSize.sm} color={colors.selected.heading}>
             {strings.add()} {'"' + "#" + query + '"'}
           </Heading>
-          <Icon name="plus" color={colors.selected.icon} size={SIZE.lg} />
+          <Icon
+            name="plus"
+            color={colors.selected.icon}
+            size={AppFontSize.lg}
+          />
         </Pressable>
       ) : null}
 
@@ -403,13 +408,13 @@ const TagItem = ({
         />
       )}
       {tag ? (
-        <Paragraph size={SIZE.sm}>{"#" + tag?.title}</Paragraph>
+        <Paragraph size={AppFontSize.sm}>{"#" + tag?.title}</Paragraph>
       ) : (
         <View
           style={{
             width: 200,
             height: 30,
-            borderRadius: 5
+            borderRadius: defaultBorderRadius
           }}
         />
       )}

@@ -23,13 +23,14 @@ import React from "react";
 import { View } from "react-native";
 import { notesnook } from "../../../../e2e/test.ids";
 import { TaggedNotes } from "../../../screens/notes/tagged";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { Properties } from "../../properties";
 import { IconButton } from "../../ui/icon-button";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import SelectionWrapper, { selectItem } from "../selection-wrapper";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 const TagItem = React.memo(
   ({
@@ -60,9 +61,9 @@ const TagItem = React.memo(
             flexShrink: 1
           }}
         >
-          <Heading size={SIZE.md}>
+          <Heading size={AppFontSize.md}>
             <Heading
-              size={SIZE.md}
+              size={AppFontSize.md}
               style={{
                 color: colors.primary.accent
               }}
@@ -73,9 +74,9 @@ const TagItem = React.memo(
           </Heading>
           <Paragraph
             color={colors.secondary.paragraph}
-            size={SIZE.xs}
+            size={AppFontSize.xs}
             style={{
-              marginTop: 5
+              marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL
             }}
           >
             {strings.notes(totalNotes)}
@@ -85,7 +86,7 @@ const TagItem = React.memo(
         <IconButton
           color={colors.primary.heading}
           name="dots-horizontal"
-          size={SIZE.xl}
+          size={AppFontSize.xl}
           onPress={() => {
             Properties.present(item);
           }}

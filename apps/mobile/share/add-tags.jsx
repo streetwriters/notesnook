@@ -22,11 +22,11 @@ import { Text, TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useDBItem } from "../app/hooks/use-db-item";
 import { useShareStore } from "./store";
+import { defaultBorderRadius } from "../app/utils/size";
 
 export const AddTags = ({ onPress }) => {
   const { colors } = useThemeColors();
   const tagIds = useShareStore((state) => state.selectedTags);
-
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -39,7 +39,7 @@ export const AddTags = ({ onPress }) => {
         borderWidth: 1,
         borderColor: colors.secondary.background,
         justifyContent: "center",
-        borderRadius: 5,
+        borderRadius: defaultBorderRadius,
         marginBottom: 10
       }}
     >
@@ -122,7 +122,7 @@ const TagItem = ({ tagId }) => {
       }}
       onPress={() => {
         const index = tagIds.indexOf(tagId);
-        const selectedTags = [...tagId];
+        const selectedTags = tagIds.slice();
         selectedTags.splice(index, 1);
         useShareStore.getState().setSelectedTags(selectedTags);
       }}

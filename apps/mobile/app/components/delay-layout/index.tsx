@@ -17,11 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React from "react";
-import { ViewProps } from "react-native";
-import Animated, { FadeOutUp } from "react-native-reanimated";
-import { useDelayLayout } from "../../hooks/use-delay-layout";
 import { useThemeColors } from "@notesnook/theme";
+import React from "react";
+import { View, ViewProps } from "react-native";
+import { useDelayLayout } from "../../hooks/use-delay-layout";
 import { DefaultPlaceholder } from "./default-placeholder";
 import { SettingsPlaceholder } from "./settings-placeholder";
 
@@ -49,8 +48,7 @@ export default function DelayLayout({
   const Placeholder = placeholder[props.type || "default"];
 
   return loading || props.wait ? (
-    <Animated.View
-      exiting={animated ? FadeOutUp : undefined}
+    <View
       style={{
         backgroundColor: colors.primary.background,
         flex: 1,
@@ -58,7 +56,7 @@ export default function DelayLayout({
       }}
     >
       <Placeholder color={props.color || colors.primary.accent} />
-    </Animated.View>
+    </View>
   ) : (
     <>{props.children}</>
   );

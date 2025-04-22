@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { db } from "../common/db";
 import createStore from "../common/store";
 import { store as appStore } from "./app-store";
+import { store as trashStore } from "./trash-store";
 import Vault from "../common/vault";
 import BaseStore from ".";
 import Config from "../utils/config";
@@ -52,7 +53,7 @@ class NoteStore extends BaseStore<NoteStore> {
   refreshContext = async () => {
     const context = this.get().context;
     if (!context) return;
-    await this.setContext(context);
+    await this.setContext({ ...context });
   };
 
   setContext = async (context?: Context) => {
@@ -71,6 +72,7 @@ class NoteStore extends BaseStore<NoteStore> {
   delete = async (...ids: string[]) => {
     await db.notes.moveToTrash(...ids);
     await this.refresh();
+    await trashStore.refresh();
   };
 
   pin = async (state: boolean, ...ids: string[]) => {

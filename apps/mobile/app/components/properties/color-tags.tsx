@@ -31,12 +31,13 @@ import { useMenuStore } from "../../stores/use-menu-store";
 import { useRelationStore } from "../../stores/use-relation-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { refreshNotesPage } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import ColorPicker from "../dialogs/color-picker";
 import { Button } from "../ui/button";
 import NativeTooltip from "../../utils/tooltip";
 import { Pressable } from "../ui/pressable";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 
 const ColorItem = ({ item, note }: { item: Color; note: Note }) => {
   const { colors } = useThemeColors();
@@ -85,7 +86,12 @@ const ColorItem = ({ item, note }: { item: Color; note: Note }) => {
       }}
     >
       {isLinked ? (
-        <Icon testID="icon-check" name="check" color="white" size={SIZE.lg} />
+        <Icon
+          testID="icon-check"
+          name="check"
+          color="white"
+          size={AppFontSize.lg}
+        />
       ) : null}
     </Pressable>
   );
@@ -128,37 +134,37 @@ export const ColorTags = ({ item }: { item: Note }) => {
           flexShrink: 2
         }}
       >
-        <FlashList
-          data={colorNotes}
-          estimatedItemSize={30}
-          horizontal
-          extraData={updater}
-          bounces={false}
-          renderItem={renderItem}
-          showsHorizontalScrollIndicator={false}
-          ListFooterComponent={
-            !colorNotes || !colorNotes.length ? (
-              <Button
-                onPress={async () => {
-                  useSettingStore.getState().setSheetKeyboardHandler(false);
-                  setVisible(true);
-                }}
-                buttonType={{
-                  text: colors.primary.accent
-                }}
-                title={strings.addColor()}
-                type="secondary"
-                icon="plus"
-                iconPosition="right"
-                height={30}
-                fontSize={SIZE.xs}
-                style={{
-                  marginRight: 5,
-                  borderRadius: 100,
-                  paddingHorizontal: 8
-                }}
-              />
-            ) : (
+        {!colorNotes || !colorNotes.length ? (
+          <Button
+            onPress={async () => {
+              useSettingStore.getState().setSheetKeyboardHandler(false);
+              setVisible(true);
+            }}
+            buttonType={{
+              text: colors.primary.accent
+            }}
+            title={strings.addColor()}
+            type="secondary"
+            icon="plus"
+            iconPosition="right"
+            height={30}
+            fontSize={AppFontSize.xs}
+            style={{
+              marginRight: 5,
+              paddingHorizontal: DefaultAppStyles.GAP_SMALL,
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
+            }}
+          />
+        ) : (
+          <FlashList
+            data={colorNotes}
+            estimatedItemSize={30}
+            horizontal
+            extraData={updater}
+            bounces={false}
+            renderItem={renderItem}
+            showsHorizontalScrollIndicator={false}
+            ListFooterComponent={
               <Pressable
                 style={{
                   width: 35,
@@ -178,12 +184,12 @@ export const ColorTags = ({ item }: { item: Note }) => {
                   testID="icon-plus"
                   name="plus"
                   color={colors.primary.icon}
-                  size={SIZE.lg}
+                  size={AppFontSize.lg}
                 />
               </Pressable>
-            )
-          }
-        />
+            }
+          />
+        )}
       </View>
     </>
   );

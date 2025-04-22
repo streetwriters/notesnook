@@ -23,12 +23,13 @@ import { Linking, View } from "react-native";
 import { useThemeColors } from "@notesnook/theme";
 import { eSendEvent, presentSheet } from "../../services/event-manager";
 import { eCloseAnnouncementDialog } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { PricingPlans } from "../premium/pricing-plans";
 import SheetProvider from "../sheet-provider";
 import { Button } from "../ui/button";
 import { allowedOnPlatform, getStyle } from "./functions";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const Cta = ({ actions, style = {}, color, inline }) => {
   const { colors } = useThemeColors();
@@ -61,7 +62,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
   return (
     <View
       style={{
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         ...getStyle(style),
         flexDirection: inline ? "row" : "column"
       }}
@@ -75,7 +76,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
               <Button
                 key={item.title}
                 title={item.title}
-                fontSize={SIZE.sm}
+                fontSize={AppFontSize.sm}
                 type="transparent"
                 textStyle={{
                   textDecorationLine: "underline"
@@ -83,7 +84,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
                 onPress={() => onPress(item)}
                 bold
                 style={{
-                  height: 30,
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
                   alignSelf: "flex-start",
                   paddingHorizontal: 0
                 }}
@@ -95,7 +96,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
               <Button
                 key={item.title}
                 title={item.title}
-                fontSize={SIZE.sm}
+                fontSize={AppFontSize.sm}
                 type="plain"
                 onPress={() => onPress(item)}
                 width={null}
@@ -118,7 +119,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
               <Button
                 key={item.title}
                 title={item.title}
-                fontSize={SIZE.md}
+                fontSize={AppFontSize.md}
                 buttonType={{
                   color: color ? color : colors.primary.accent,
                   text: color
@@ -130,7 +131,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
                 onPress={() => onPress(item)}
                 width={250}
                 style={{
-                  marginBottom: 5,
+                  marginBottom: DefaultAppStyles.GAP_VERTICAL,
                   borderRadius: 100
                 }}
               />
@@ -141,14 +142,14 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
               <Button
                 key={item.title}
                 title={item.title}
-                fontSize={SIZE.xs}
+                fontSize={AppFontSize.xs}
                 type="plain"
                 onPress={() => onPress(item)}
                 width={null}
                 height={30}
                 style={{
                   minWidth: "50%",
-                  marginTop: 5
+                  marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL
                 }}
                 textStyle={{
                   textDecorationLine: "underline"

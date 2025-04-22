@@ -62,7 +62,7 @@ function TitleBox(props: TitleBoxProps) {
 
     withSelectionPersist(inputRef.current, (input) => {
       input.value = title || "";
-      resizeTextarea(input);
+      requestAnimationFrame(() => resizeTextarea(input));
     });
   }, [sessionType, id, sessionTitle]);
 
@@ -155,11 +155,9 @@ export default React.memo(TitleBox, (prevProps, nextProps) => {
 });
 
 function resizeTextarea(input: HTMLTextAreaElement) {
+  input.style.height = "auto";
   requestAnimationFrame(() => {
-    input.style.height = "auto";
-    requestAnimationFrame(() => {
-      input.style.height = input.scrollHeight + "px";
-    });
+    input.style.height = input.scrollHeight + "px";
   });
 }
 

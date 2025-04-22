@@ -43,6 +43,10 @@ export type Settings = {
   fullBackupReminder: "never" | "weekly" | "monthly";
   encryptedBackup?: boolean;
   homepage?: string;
+  homepageV2?: {
+    id: string;
+    type: "notebook" | "tag" | "color" | "default";
+  };
   sort?: string;
   sortOrder?: string;
   screenshotMode?: boolean;
@@ -93,6 +97,7 @@ export type Settings = {
   offlineMode?: boolean;
   lastFullBackupDate?: number;
   serverUrls?: Record<HostId, string>;
+  defaultSidebarTab: number;
 };
 
 type DimensionsType = {
@@ -114,7 +119,7 @@ export interface SettingStore extends State {
   dimensions: DimensionsType;
   setSettings: (settings: Settings) => void;
   setFullscreen: (fullscreen: boolean) => void;
-  setDeviceMode: (mode: string) => void;
+  setDeviceMode: (mode: string | null) => void;
   setDimensions: (dimensions: DimensionsType) => void;
   isAppLoading: boolean;
   setAppLoading: (isAppLoading: boolean) => void;
@@ -149,6 +154,7 @@ export const defaultSettings: SettingStore["settings"] = {
   forcePortraitOnTablet: false,
   useSystemTheme: true,
   reminder: "off",
+  defaultSidebarTab: 0,
   encryptedBackup: false,
   homepage: "Notes",
   sort: "default",

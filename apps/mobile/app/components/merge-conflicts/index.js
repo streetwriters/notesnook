@@ -38,7 +38,7 @@ import Navigation from "../../services/navigation";
 import Sync from "../../services/sync";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { eOnLoadNote, eShowMergeDialog } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import BaseDialog from "../dialog/base-dialog";
 import DialogButtons from "../dialog/dialog-buttons";
 import DialogContainer from "../dialog/dialog-container";
@@ -49,6 +49,7 @@ import Seperator from "../ui/seperator";
 import Paragraph from "../ui/typography/paragraph";
 import { diff } from "diffblazer";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 
 const MergeConflicts = () => {
   const { colors } = useThemeColors();
@@ -142,7 +143,7 @@ const MergeConflicts = () => {
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          paddingHorizontal: 12,
+          paddingHorizontal: DefaultAppStyles.GAP,
           paddingLeft: 6
         }}
       >
@@ -164,7 +165,7 @@ const MergeConflicts = () => {
           <Paragraph
             style={{ flexWrap: "wrap" }}
             color={colors.secondary.paragraph}
-            size={SIZE.xs}
+            size={AppFontSize.xs}
           >
             <Text
               style={{
@@ -201,9 +202,9 @@ const MergeConflicts = () => {
               height={30}
               style={{
                 borderRadius: 100,
-                paddingHorizontal: 12
+                paddingHorizontal: DefaultAppStyles.GAP
               }}
-              fontSize={SIZE.xs}
+              fontSize={AppFontSize.xs}
             />
           ) : null}
           <View style={{ width: 10 }} />
@@ -218,9 +219,9 @@ const MergeConflicts = () => {
               height={30}
               style={{
                 borderRadius: 100,
-                paddingHorizontal: 12
+                paddingHorizontal: DefaultAppStyles.GAP
               }}
-              fontSize={SIZE.xs}
+              fontSize={AppFontSize.xs}
               color={colors.error.paragraph}
               onPress={() => {
                 setDialogVisible(true);
@@ -233,12 +234,12 @@ const MergeConflicts = () => {
                 height={30}
                 style={{
                   borderRadius: 100,
-                  paddingHorizontal: 12,
+                  paddingHorizontal: DefaultAppStyles.GAP,
                   minWidth: 60,
                   marginLeft: 10
                 }}
                 type="accent"
-                fontSize={SIZE.xs}
+                fontSize={AppFontSize.xs}
                 title={
                   keeping && !isDiscarded ? strings.undo() : strings.keep()
                 }

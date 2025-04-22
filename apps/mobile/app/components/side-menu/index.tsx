@@ -17,163 +17,416 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useThemeColors } from "@notesnook/theme";
-import React, { useCallback } from "react";
-import { View } from "react-native";
-import { DraxProvider, DraxScrollView } from "react-native-drax";
-import { db } from "../../common/database";
-import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
-import { eSendEvent } from "../../services/event-manager";
-import { useMenuStore } from "../../stores/use-menu-store";
-import { useSettingStore } from "../../stores/use-setting-store";
-import { useUserStore } from "../../stores/use-user-store";
-import { SUBSCRIPTION_STATUS } from "../../utils/constants";
-import { eOpenPremiumDialog } from "../../utils/events";
-import { MenuItemsList } from "../../utils/menu-items";
-import ReorderableList from "../list/reorderable-list";
-import { Button } from "../ui/button";
-import { ColorSection } from "./color-section";
-import { useSideBarDraggingStore } from "./dragging-store";
-import { MenuItem } from "./menu-item";
-import { PinnedSection } from "./pinned-section";
-import { UserStatus } from "./user-status";
 import { strings } from "@notesnook/intl";
+import { useThemeColors } from "@notesnook/theme";
+import React from "react";
+import { View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  NavigationState,
+  Route,
+  SceneMap,
+  SceneRendererProps,
+  TabDescriptor,
+  TabView
+} from "react-native-tab-view";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { db } from "../../common/database";
+import { useGroupOptions } from "../../hooks/use-group-options";
+import { presentSheet, ToastManager } from "../../services/event-manager";
+import Navigation from "../../services/navigation";
+import { useTagStore } from "../../stores/use-tag-store";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { deleteItems } from "../../utils/functions";
+import { AppFontSize } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
+import { presentDialog } from "../dialog/functions";
+import { AddNotebookSheet } from "../sheets/add-notebook";
+import Sort from "../sheets/sort";
+import { IconButton } from "../ui/icon-button";
+import { Pressable } from "../ui/pressable";
+import Paragraph from "../ui/typography/paragraph";
+import { SideMenuHome } from "./side-menu-home";
+import { SideMenuNotebooks } from "./side-menu-notebooks";
+import { SideMenuTags } from "./side-menu-tags";
+import {
+  useSideMenuNotebookSelectionStore,
+  useSideMenuTagsSelectionStore
+} from "./stores";
+import { useSideBarDraggingStore } from "./dragging-store";
+import { Button } from "../ui/button";
+import SettingsService from "../../services/settings";
+const renderScene = SceneMap({
+  home: SideMenuHome,
+  notebooks: SideMenuNotebooks,
+  tags: SideMenuTags,
+  settings: () => null
+});
 
 export const SideMenu = React.memo(
   function SideMenu() {
-    const { colors, isDark } = useThemeColors();
-    const insets = useGlobalSafeAreaInsets();
-    const subscriptionType = useUserStore(
-      (state) => state.user?.subscription?.type
+    const { colors } = useThemeColors();
+    const [index, setIndex] = React.useState(
+      SettingsService.getProperty("defaultSidebarTab")
     );
-    const isAppLoading = useSettingStore((state) => state.isAppLoading);
-    const dragging = useSideBarDraggingStore((state) => state.dragging);
-    const [order, hiddensItems] = useMenuStore((state) => [
-      state.order["routes"],
-      state.hiddenItems["routes"]
+    const [routes] = React.useState<Route[]>([
+      {
+        key: "home",
+        title: "Home"
+      },
+      {
+        key: "notebooks",
+        title: "Notebooks"
+      },
+      {
+        key: "tags",
+        title: "Tags"
+      }
     ]);
 
-    const introCompleted = useSettingStore(
-      (state) => state.settings.introCompleted
-    );
-
-    const pro = {
-      name: "Notesnook Pro",
-      icon: "crown",
-      func: () => {
-        eSendEvent(eOpenPremiumDialog);
-      }
-    };
-
-    const renderItem = useCallback(
-      () => (
-        <>
-          <ReorderableList
-            onListOrderChanged={(data) => {
-              db.settings.setSideBarOrder("routes", data);
-            }}
-            onHiddenItemsChanged={(data) => {
-              db.settings.setSideBarHiddenItems("routes", data);
-            }}
-            itemOrder={order}
-            hiddenItems={hiddensItems}
-            alwaysBounceVertical={false}
-            data={MenuItemsList}
-            style={{
-              width: "100%"
-            }}
-            showsVerticalScrollIndicator={false}
-            renderDraggableItem={({ item, index }) => {
-              return (
-                <MenuItem
-                  key={item.name}
-                  item={{
-                    ...item,
-                    title:
-                      strings.routes[
-                        item.name as keyof typeof strings.routes
-                      ]?.() || item.name
-                  }}
-                  testID={item.name}
-                  index={index}
-                />
-              );
-            }}
-          />
-          <ColorSection />
-          <PinnedSection />
-        </>
-      ),
-      [order, hiddensItems]
-    );
-
-    return !isAppLoading && introCompleted ? (
-      <View
+    return (
+      <SafeAreaView
         style={{
-          height: "100%",
-          width: "100%",
+          flex: 1,
           backgroundColor: colors.primary.background
         }}
       >
-        <View
-          style={{
-            height: "100%",
-            width: "100%",
-            backgroundColor: colors.primary.background,
-            paddingTop: insets.top
-          }}
-        >
-          <DraxProvider>
-            <DraxScrollView nestedScrollEnabled={false}>
-              {renderItem()}
-            </DraxScrollView>
-          </DraxProvider>
-
-          <View
-            style={{
-              paddingHorizontal: 12
-            }}
-          >
-            {subscriptionType === SUBSCRIPTION_STATUS.TRIAL ||
-            subscriptionType === SUBSCRIPTION_STATUS.BASIC ? (
-              <MenuItem testID={pro.name} key={pro.name} item={pro} index={0} />
-            ) : null}
-          </View>
-
-          {dragging ? (
-            <View
-              style={{
-                paddingHorizontal: 12
-              }}
-            >
-              <Button
-                type="secondaryAccented"
-                style={{
-                  flexDirection: "row",
-                  borderRadius: 5,
-                  marginBottom: 12,
-                  justifyContent: "flex-start",
-                  alignItems: "center",
-                  paddingHorizontal: 12,
-                  marginTop: 5,
-                  paddingVertical: 6,
-                  width: "100%"
-                }}
-                icon="close"
-                title={strings.stopReordering()}
-                onPress={() => {
-                  useSideBarDraggingStore.setState({
-                    dragging: false
-                  });
-                }}
-              />
-            </View>
-          ) : (
-            <UserStatus />
-          )}
-        </View>
-      </View>
-    ) : null;
+        <TabView
+          navigationState={{ index, routes }}
+          renderTabBar={(props) => <TabBar {...props} />}
+          tabBarPosition="bottom"
+          renderScene={renderScene}
+          onIndexChange={setIndex}
+          swipeEnabled={false}
+          animationEnabled={false}
+          lazy
+        />
+      </SafeAreaView>
+    );
   },
   () => true
 );
+
+const TabBar = (
+  props: SceneRendererProps & {
+    navigationState: NavigationState<Route>;
+    options: Record<string, TabDescriptor<Route>> | undefined;
+  }
+) => {
+  const dragging = useSideBarDraggingStore((state) => state.dragging);
+  const { colors, isDark } = useThemeColors();
+  const groupOptions = useGroupOptions(
+    props.navigationState.index === 1 ? "notebooks" : "tags"
+  );
+  const notebookSelectionEnabled = useSideMenuNotebookSelectionStore(
+    (state) => state.enabled
+  );
+  const tagSelectionEnabled = useSideMenuTagsSelectionStore(
+    (state) => state.enabled
+  );
+  const isSelectionEnabled = notebookSelectionEnabled || tagSelectionEnabled;
+
+  const getIcon = (key: string) => {
+    switch (key) {
+      case "home":
+        return "home-outline";
+      case "notebooks":
+        return "book-outline";
+      case "tags":
+        return "pound";
+      default:
+        return "home-outline";
+    }
+  };
+
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        width: "100%",
+        justifyContent: "space-between",
+        backgroundColor: colors.primary.background,
+        paddingHorizontal: DefaultAppStyles.GAP,
+        paddingVertical: DefaultAppStyles.GAP_SMALL,
+        borderTopWidth: 1,
+        borderTopColor: colors.primary.border
+      }}
+    >
+      {isSelectionEnabled ? (
+        <>
+          {[
+            {
+              title: "Select all",
+              icon: "check-all"
+            },
+            {
+              title: "Delete",
+              icon: "delete"
+            },
+            {
+              title: "Move",
+              icon: "arrow-right-bold-box-outline",
+              hidden:
+                !notebookSelectionEnabled || props.navigationState.index !== 1
+            },
+            {
+              title: "Close",
+              icon: "close"
+            }
+          ].map((item) =>
+            item.hidden ? null : (
+              <>
+                <Pressable
+                  key={item.title}
+                  onPress={async () => {
+                    switch (item.title) {
+                      case "Select all": {
+                        if (notebookSelectionEnabled) {
+                          useSideMenuNotebookSelectionStore
+                            .getState()
+                            .selectAll?.();
+                        } else {
+                          useSideMenuTagsSelectionStore
+                            .getState()
+                            .selectAll?.();
+                        }
+
+                        break;
+                      }
+                      case "Delete": {
+                        if (notebookSelectionEnabled) {
+                          const ids = useSideMenuNotebookSelectionStore
+                            .getState()
+                            .getSelectedItemIds();
+                          deleteItems("notebook", ids);
+                        } else {
+                          const ids = useSideMenuTagsSelectionStore
+                            .getState()
+                            .getSelectedItemIds();
+                          await deleteItems("tag", ids);
+                        }
+                        break;
+                      }
+                      case "Move": {
+                        const ids = useSideMenuNotebookSelectionStore
+                          .getState()
+                          .getSelectedItemIds();
+                        const notebooks = await db.notebooks.all.items(ids);
+                        Navigation.navigate("MoveNotebook", {
+                          selectedNotebooks: notebooks
+                        });
+                        break;
+                      }
+                      case "Close": {
+                        useSideMenuNotebookSelectionStore.setState({
+                          enabled: false,
+                          selection: {}
+                        });
+                        useSideMenuTagsSelectionStore.setState({
+                          enabled: false,
+                          selection: {}
+                        });
+                        break;
+                      }
+                    }
+                  }}
+                  style={{
+                    borderRadius: 10,
+                    paddingVertical: 2,
+                    width: "25%"
+                  }}
+                  type="plain"
+                >
+                  <Icon
+                    name={item.icon}
+                    color={colors.primary.icon}
+                    size={AppFontSize.lg}
+                  />
+                  <Paragraph
+                    color={colors.primary.paragraph}
+                    size={AppFontSize.xxxs - 1}
+                  >
+                    {item.title}
+                  </Paragraph>
+                </Pressable>
+              </>
+            )
+          )}
+        </>
+      ) : (
+        <>
+          {dragging ? (
+            <Button
+              onPress={() => {
+                useSideBarDraggingStore.setState({
+                  dragging: false
+                });
+              }}
+              style={{
+                width: "100%"
+              }}
+              type="accent"
+              testID="check"
+              title={strings.done()}
+              icon={"check"}
+              iconSize={AppFontSize.lg - 2}
+            />
+          ) : (
+            <>
+              <View
+                style={{
+                  flexDirection: "row",
+                  gap: DefaultAppStyles.GAP_SMALL
+                }}
+              >
+                {props.navigationState.routes.map((route, index) => {
+                  const isFocused = props.navigationState.index === index;
+
+                  return (
+                    <Pressable
+                      key={route.key}
+                      testID={`tab-${route.key}`}
+                      onPress={() => {
+                        props.jumpTo(route.key);
+                        switch (route.key) {
+                          case "notebooks":
+                            Navigation.routeNeedsUpdate(
+                              "Notebooks",
+                              Navigation.routeUpdateFunctions.Notebooks
+                            );
+                            break;
+                          case "tags":
+                            Navigation.routeNeedsUpdate(
+                              "Tags",
+                              Navigation.routeUpdateFunctions.Tags
+                            );
+                            break;
+                          default:
+                            break;
+                        }
+                      }}
+                      style={{
+                        borderRadius: 10,
+                        paddingVertical: 2,
+                        width: 40,
+                        height: 40
+                      }}
+                      type={isFocused ? "selected" : "plain"}
+                    >
+                      <Icon
+                        name={getIcon(route.key)}
+                        color={
+                          isFocused ? colors.selected.icon : colors.primary.icon
+                        }
+                        size={AppFontSize.lg}
+                      />
+                    </Pressable>
+                  );
+                })}
+              </View>
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: DefaultAppStyles.GAP_SMALL
+                }}
+              >
+                {props.navigationState.index > 0 ? (
+                  <>
+                    <IconButton
+                      name="plus"
+                      testID="sidebar-add-button"
+                      size={AppFontSize.lg - 2}
+                      color={colors.primary.icon}
+                      onPress={() => {
+                        if (props.navigationState.index === 1) {
+                          AddNotebookSheet.present();
+                        } else {
+                          presentDialog({
+                            title: strings.addTag(),
+                            paragraph: strings.addTagDesc(),
+                            input: true,
+                            positiveText: "Add",
+                            positivePress: async (tag) => {
+                              if (tag) {
+                                await db.tags.add({
+                                  title: tag
+                                });
+                                useTagStore.getState().refresh();
+                                return true;
+                              }
+                              ToastManager.show({
+                                context: "local",
+                                type: "error",
+                                message: strings.allFieldsRequired()
+                              });
+                              return false;
+                            }
+                          });
+                        }
+                      }}
+                      style={{
+                        width: 35,
+                        height: 35
+                      }}
+                    />
+
+                    <IconButton
+                      name={
+                        groupOptions?.sortDirection === "asc"
+                          ? "sort-ascending"
+                          : "sort-descending"
+                      }
+                      testID="sidebar-sort-button"
+                      color={colors.primary.icon}
+                      onPress={() => {
+                        presentSheet({
+                          component: (
+                            <Sort
+                              type={
+                                props.navigationState.index === 1
+                                  ? "notebook"
+                                  : "tag"
+                              }
+                              hideGroupOptions
+                            />
+                          )
+                        });
+                      }}
+                      style={{
+                        width: 35,
+                        height: 35
+                      }}
+                      size={AppFontSize.lg - 2}
+                    />
+                  </>
+                ) : null}
+
+                {props.navigationState.index === 0 ? (
+                  <>
+                    <IconButton
+                      onPress={() => {
+                        useThemeStore.getState().setColorScheme();
+                      }}
+                      style={{
+                        width: 28,
+                        height: 28
+                      }}
+                      testID="sidebar-theme-button"
+                      color={colors.primary.icon}
+                      name={isDark ? "weather-night" : "weather-sunny"}
+                      size={AppFontSize.lg - 2}
+                    />
+                  </>
+                ) : null}
+              </View>
+            </>
+          )}
+        </>
+      )}
+    </View>
+  );
+};
+
+export default SideMenu;

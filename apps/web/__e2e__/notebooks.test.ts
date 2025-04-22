@@ -43,7 +43,8 @@ test("create a note inside a notebook", async ({ page }) => {
   await app.goto();
   const notebooks = await app.goToNotebooks();
   const notebook = await notebooks.createNotebook(NOTEBOOK);
-  const { notes } = (await notebook?.openNotebook()) || {};
+  const notes = await notebook?.openNotebook();
+  await notes?.waitForList();
 
   const note = await notes?.createNote(NOTE);
 
@@ -55,11 +56,10 @@ test("create a note inside a subnotebook", async ({ page }) => {
   await app.goto();
   const notebooks = await app.goToNotebooks();
   const notebook = await notebooks.createNotebook(NOTEBOOK);
-  const { subNotebooks } = (await notebook?.openNotebook()) || {};
-  const subNotebook = await subNotebooks?.createNotebook({
+  const subNotebook = await notebook?.createSubnotebook({
     title: "Subnotebook 1"
   });
-  const { notes } = (await subNotebook?.openNotebook()) || {};
+  const notes = await subNotebook?.openNotebook();
 
   const note = await notes?.createNote(NOTE);
 
@@ -80,7 +80,6 @@ test("edit a notebook", async ({ page }) => {
 
   const editedNotebook = await notebooks.findNotebook(item);
   expect(editedNotebook).toBeDefined();
-  expect(await editedNotebook?.getDescription()).toBe(item.description);
 });
 
 test("delete a notebook", async ({ page }) => {
@@ -129,29 +128,6 @@ test("permanently delete a notebook", async ({ page }) => {
   await expect(trashItem.locator).toBeHidden();
 });
 
-test("pin a notebook", async ({ page }) => {
-  const app = new AppModel(page);
-  await app.goto();
-  const notebooks = await app.goToNotebooks();
-  const notebook = await notebooks.createNotebook(NOTEBOOK);
-
-  await notebook?.pin();
-
-  expect(await notebook?.isPinned()).toBe(true);
-});
-
-test("unpin a notebook", async ({ page }) => {
-  const app = new AppModel(page);
-  await app.goto();
-  const notebooks = await app.goToNotebooks();
-  const notebook = await notebooks.createNotebook(NOTEBOOK);
-  await notebook?.pin();
-
-  await notebook?.unpin();
-
-  expect(await notebook?.isPinned()).toBe(false);
-});
-
 test("create shortcut of a notebook", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
@@ -161,8 +137,8 @@ test("create shortcut of a notebook", async ({ page }) => {
   await notebook?.createShortcut();
 
   expect(await notebook?.isShortcut()).toBe(true);
-  const allShortcuts = await app.navigation.getShortcuts();
-  expect(allShortcuts.includes(NOTEBOOK.title)).toBeTruthy();
+  await app.goToHome();
+  expect(await app.navigation.findItem(NOTEBOOK.title)).toBeDefined();
 });
 
 test("remove shortcut of a notebook", async ({ page }) => {
@@ -184,14 +160,13 @@ test("delete all notes within a notebook", async ({ page }) => {
   await app.goto();
   const notebooks = await app.goToNotebooks();
   const notebook = await notebooks.createNotebook(NOTEBOOK);
-  let { notes } = (await notebook?.openNotebook()) || {};
+  let notes = await notebook?.openNotebook();
   for (let i = 0; i < 2; ++i) {
     await notes?.createNote({
       title: `Note ${i}`,
       content: NOTE.content
     });
   }
-  await app.goBack();
 
   await notebook?.moveToTrash(true);
 
@@ -254,20 +229,17 @@ test(`sort notebooks`, async ({ page }, info) => {
     await notebooks.createNotebook(NOTEBOOK);
   }
 
-  for (const groupBy of groupByOptions) {
-    for (const sortBy of sortByOptions) {
-      for (const orderBy of orderByOptions) {
-        await test.step(`group by ${groupBy}, sort by ${sortBy}, order by ${orderBy}`, async () => {
-          const sortResult = await notebooks?.sort({
-            groupBy,
-            orderBy,
-            sortBy
-          });
-          if (!sortResult) return;
-
-          await expect(notebooks.items).toHaveCount(titles.length);
+  for (const sortBy of sortByOptions) {
+    for (const orderBy of orderByOptions) {
+      await test.step(`sort by ${sortBy}, order by ${orderBy}`, async () => {
+        const sortResult = await notebooks?.sort({
+          orderBy,
+          sortBy
         });
-      }
+        if (!sortResult) return;
+
+        await expect(notebooks.items).toHaveCount(titles.length);
+      });
     }
   }
 });
@@ -287,7 +259,7 @@ test("when default notebook is set, created note in notes context should go to d
   notebook = await notebooks.findNotebook(NOTEBOOK);
   const openedNotebook = await notebook?.openNotebook();
 
-  expect(await openedNotebook?.notes.findNote(NOTE)).toBeDefined();
+  expect(await openedNotebook?.findNote(NOTE)).toBeDefined();
 });
 
 test("when default notebook is set, created note in other notebook's context should not go to default notebook", async ({
@@ -303,12 +275,12 @@ test("when default notebook is set, created note in other notebook's context sho
     title: "Other Notebook"
   });
   const openedOtherNotebook = await otherNotebook?.openNotebook();
-  await openedOtherNotebook?.notes.createNote(NOTE);
+  await openedOtherNotebook?.createNote(NOTE);
   notebooks = await app.goToNotebooks();
   notebook = await notebooks.findNotebook(NOTEBOOK);
   const openedNotebook = await notebook?.openNotebook();
 
-  expect(await openedNotebook?.notes.findNote(NOTE)).toBeUndefined();
+  expect(await openedNotebook?.findNote(NOTE)).toBeUndefined();
 });
 
 test("when default notebook is set, created note in tags context should go to default notebook", async ({
@@ -328,7 +300,7 @@ test("when default notebook is set, created note in tags context should go to de
   notebook = await notebooks.findNotebook(NOTEBOOK);
   const openedNotebook = await notebook?.openNotebook();
 
-  expect(await openedNotebook?.notes.findNote(NOTE)).toBeDefined();
+  expect(await openedNotebook?.findNote(NOTE)).toBeDefined();
 });
 
 test("when default notebook is set, created note in colors context should go to default notebook", async ({
@@ -350,5 +322,5 @@ test("when default notebook is set, created note in colors context should go to 
   notebook = await notebooks.findNotebook(NOTEBOOK);
   const openedNotebook = await notebook?.openNotebook();
 
-  expect(await openedNotebook?.notes.findNote(coloredNote)).toBeDefined();
+  expect(await openedNotebook?.findNote(coloredNote)).toBeDefined();
 });

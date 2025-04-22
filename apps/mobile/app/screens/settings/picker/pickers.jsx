@@ -48,19 +48,38 @@ export const FontPicker = createSettingsPicker({
 export const HomePicker = createSettingsPicker({
   getValue: () => useSettingStore.getState().settings.homepage,
   updateValue: (item) => {
-    SettingsService.set({ homepage: item.name });
+    SettingsService.set({ homepage: item.title });
     ToastManager.show({
-      heading: strings.homePageChangedTo(item.name),
+      heading: strings.homePageChangedTo(item.title),
       message: strings.restartAppToApplyChanges(),
       type: "success"
     });
   },
   formatValue: (item) => {
-    return strings.routes[typeof item === "object" ? item.name : item]?.();
+    return strings.routes[typeof item === "object" ? item.title : item]?.();
   },
-  getItemKey: (item) => item.name,
+  getItemKey: (item) => item.title,
   options: MenuItemsList.slice(0, MenuItemsList.length - 1),
-  compareValue: (current, item) => current === item.name,
+  compareValue: (current, item) => current === item.title,
+  premium: true
+});
+
+export const SidebarTabPicker = createSettingsPicker({
+  getValue: () => useSettingStore.getState().settings.defaultSidebarTab,
+  updateValue: (item) => {
+    SettingsService.set({ defaultSidebarTab: item });
+  },
+  formatValue: (item) => {
+    const SidebarTabs = [
+      strings.routes.Home(),
+      strings.routes.Notebooks(),
+      strings.routes.Tags()
+    ];
+    return SidebarTabs[item];
+  },
+  getItemKey: (item) => item,
+  options: [0, 1, 2],
+  compareValue: (current, item) => current === item,
   premium: true
 });
 

@@ -34,7 +34,7 @@ import Sync from "../../services/sync";
 import { clearAllStores } from "../../stores";
 import { useUserStore } from "../../stores/use-user-store";
 import { eLoginSessionExpired, eUserLoggedIn } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { Dialog } from "../dialog";
 import BaseDialog from "../dialog/base-dialog";
@@ -48,18 +48,8 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { LoginSteps, useLogin } from "./use-login";
 import { strings } from "@notesnook/intl";
-
-function getObfuscatedEmail(email) {
-  if (!email) return "";
-  const [username, provider] = email.split("@");
-  if (username.length === 1) return `****@${provider}`;
-  return email.replace(/(.{1})(.*)(?=@)/, function (gp1, gp2, gp3) {
-    for (let i = 0; i < gp3.length; i++) {
-      gp2 += "*";
-    }
-    return gp2;
-  });
-}
+import { getObfuscatedEmail } from "../../utils/functions";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const SessionExpired = () => {
   const { colors } = useThemeColors();
@@ -168,7 +158,7 @@ export const SessionExpired = () => {
         <View
           style={{
             width: focused ? "100%" : "99.9%",
-            padding: 12,
+            padding: DefaultAppStyles.GAP,
             justifyContent: "center",
             flex: 1,
             backgroundColor: colors.primary.background
@@ -193,7 +183,7 @@ export const SessionExpired = () => {
               color={colors.error.icon}
               size={50}
             />
-            <Heading size={SIZE.xxxl} color={colors.primary.heading}>
+            <Heading size={AppFontSize.xxxl} color={colors.primary.heading}>
               {strings.sessionExpired()}
             </Heading>
             <Paragraph
@@ -224,7 +214,7 @@ export const SessionExpired = () => {
 
           <Button
             style={{
-              marginTop: 10,
+              marginTop: DefaultAppStyles.GAP_VERTICAL,
               width: 250,
               borderRadius: 100
             }}
@@ -236,7 +226,7 @@ export const SessionExpired = () => {
 
           <Button
             style={{
-              marginTop: 10,
+              marginTop: DefaultAppStyles.GAP_VERTICAL,
               width: "100%"
             }}
             onPress={() => {

@@ -17,33 +17,35 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useRef, useState } from "react";
+import { strings } from "@notesnook/intl";
+import { useThemeColors } from "@notesnook/theme";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { DDS } from "../../services/device-detection";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
-import { useThemeColors } from "@notesnook/theme";
+import { getContainerBorder } from "../../utils/colors";
 import { getElevationStyle } from "../../utils/elevation";
 import { eCloseSimpleDialog, eOpenSimpleDialog } from "../../utils/events";
+import { defaultBorderRadius } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 import { sleep } from "../../utils/time";
 import { Toast } from "../toast";
+import { Button } from "../ui/button";
 import Input from "../ui/input";
+import { Notice } from "../ui/notice";
 import Seperator from "../ui/seperator";
 import BaseDialog from "./base-dialog";
 import DialogButtons from "./dialog-buttons";
 import DialogHeader from "./dialog-header";
-import { useCallback } from "react";
-import { Button } from "../ui/button";
-import { getContainerBorder } from "../../utils/colors";
-import { Notice } from "../ui/notice";
-import { strings } from "@notesnook/intl";
 
 export const Dialog = ({ context = "global" }) => {
   const { colors } = useThemeColors();
   const [visible, setVisible] = useState(false);
   const [checked, setChecked] = useState(false);
+  const [loading, setLoading] = useState(false);
   const values = useRef({
     inputValue: undefined
   });
@@ -72,14 +74,23 @@ export const Dialog = ({ context = "global" }) => {
   const onPressPositive = async () => {
     if (dialogInfo.positivePress) {
       inputRef.current?.blur();
-      let result = await dialogInfo.positivePress(
-        values.current.inputValue || dialogInfo.defaultValue,
-        checked
-      );
+      setLoading(true);
+      let result;
+      try {
+        result = await dialogInfo.positivePress(
+          values.current.inputValue || dialogInfo.defaultValue,
+          checked
+        );
+      } catch (e) {
+        /** Empty */
+      }
+      setLoading(false);
+
       if (result === false) {
         return;
       }
     }
+
     setChecked(false);
     values.current.inputValue = undefined;
     setVisible(false);
@@ -125,10 +136,11 @@ export const Dialog = ({ context = "global" }) => {
     ...getElevationStyle(5),
     width: DDS.isTab ? 400 : "85%",
     maxHeight: 450,
-    borderRadius: 5,
+    borderRadius: defaultBorderRadius,
     backgroundColor: colors.primary.background,
     paddingTop: 12,
-    ...getContainerBorder(colors.primary.border, 0.5)
+    ...getContainerBorder(colors.primary.border, 0.5),
+    overflow: "hidden"
   };
 
   return visible ? (
@@ -164,7 +176,7 @@ export const Dialog = ({ context = "global" }) => {
         {dialogInfo.input ? (
           <View
             style={{
-              paddingHorizontal: 12
+              paddingHorizontal: DefaultAppStyles.GAP
             }}
           >
             <Input
@@ -188,7 +200,7 @@ export const Dialog = ({ context = "global" }) => {
         {dialogInfo?.notice ? (
           <View
             style={{
-              paddingHorizontal: 12
+              paddingHorizontal: DefaultAppStyles.GAP
             }}
           >
             <Notice
@@ -209,6 +221,7 @@ export const Dialog = ({ context = "global" }) => {
                   ? "check-circle-outline"
                   : "checkbox-blank-circle-outline"
               }
+              iconColor={checked ? colors.secondary.icon : colors.primary.icon}
               style={{
                 justifyContent: "flex-start"
               }}
@@ -224,6 +237,7 @@ export const Dialog = ({ context = "global" }) => {
         <DialogButtons
           onPressNegative={onNegativePress}
           onPressPositive={dialogInfo.positivePress && onPressPositive}
+          loading={loading}
           positiveTitle={dialogInfo.positiveText}
           negativeTitle={dialogInfo.negativeText}
           positiveType={dialogInfo.positiveType}

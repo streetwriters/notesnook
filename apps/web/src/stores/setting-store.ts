@@ -42,6 +42,11 @@ export enum ImageCompressionOptions {
   DISABLE
 }
 
+export type HomePage = {
+  type: "notebook" | "tag" | "color" | "route";
+  id: string;
+};
+
 class SettingStore extends BaseStore<SettingStore> {
   encryptBackups = Config.get("encryptBackups", false);
   backupReminderOffset = Config.get("backupReminderOffset", 0);
@@ -67,7 +72,14 @@ class SettingStore extends BaseStore<SettingStore> {
   profile?: Profile;
 
   trashCleanupInterval: TrashCleanupInterval = 7;
-  homepage = Config.get("homepage", 0);
+  homepage = Config.get<HomePage>("homepage-v2", {
+    type: "route",
+    id: "notes"
+  });
+  defaultSidebarTab = Config.get<"home" | "notebooks" | "tags">(
+    "sidebarTab",
+    "home"
+  );
   imageCompression = Config.get(
     "imageCompression",
     ImageCompressionOptions.ASK_EVERY_TIME
@@ -134,9 +146,14 @@ class SettingStore extends BaseStore<SettingStore> {
     Config.set("encryptBackups", encryptBackups);
   };
 
-  setHomepage = (homepage: number) => {
+  setHomepage = (homepage: HomePage) => {
     this.set({ homepage });
-    Config.set("homepage", homepage);
+    Config.set("homepage-v2", homepage);
+  };
+
+  setDefaultSidebarTab = (defaultSidebarTab: "home" | "notebooks" | "tags") => {
+    this.set({ defaultSidebarTab });
+    Config.set("sidebarTab", defaultSidebarTab);
   };
 
   setImageCompression = (imageCompression: ImageCompressionOptions) => {

@@ -35,7 +35,7 @@ export interface ThemeStore extends State {
 
 export function changeSystemBarColors() {
   const change = () => {
-    let currTheme =
+    const currTheme =
       useThemeStore.getState().colorScheme === "dark"
         ? SettingsService.getProperty("darkTheme")
         : SettingsService.getProperty("lighTheme");

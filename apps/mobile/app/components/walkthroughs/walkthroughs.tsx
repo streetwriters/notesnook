@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Notebook } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
@@ -34,13 +33,13 @@ import { eSendEvent } from "../../services/event-manager";
 import { getContainerBorder } from "../../utils/colors";
 import { getElevationStyle } from "../../utils/elevation";
 import { eOpenAddNotebookDialog } from "../../utils/events";
-import { SIZE } from "../../utils/size";
-import { PinItem } from "../side-menu/pinned-section";
+import { defaultBorderRadius, AppFontSize } from "../../utils/size";
 import { Button } from "../ui/button";
 import Seperator from "../ui/seperator";
 import { SvgView } from "../ui/svg";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export type TStep = {
   text?: string;
@@ -81,7 +80,7 @@ const NotebookWelcome = () => {
     <View
       style={{
         width: "100%",
-        padding: 12,
+        padding: DefaultAppStyles.GAP,
         backgroundColor: colors.secondary.background,
         borderRadius: 10,
         ...getContainerBorder(colors.secondary.background)
@@ -89,24 +88,24 @@ const NotebookWelcome = () => {
     >
       <View
         style={{
-          padding: 12,
+          padding: DefaultAppStyles.GAP,
           width: "100%",
           backgroundColor: colors.primary.background,
           ...getElevationStyle(3),
           borderRadius: 10,
-          marginVertical: 12
+          marginVertical: DefaultAppStyles.GAP
         }}
       >
-        <Heading size={SIZE.md} color={colors.primary.heading}>
+        <Heading size={AppFontSize.md} color={colors.primary.heading}>
           {data?.title}
         </Heading>
         <Paragraph>{data?.description}</Paragraph>
 
         <Paragraph
           style={{
-            marginTop: 5
+            marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL
           }}
-          size={SIZE.xs}
+          size={AppFontSize.xs}
           color={colors.secondary.paragraph}
         >
           {strings.dataTypesCamelCase.notebook()} - {data?.count}{" "}
@@ -136,7 +135,7 @@ const notebooks: { id: string; steps: TStep[] } = {
         <View
           style={{
             width: "100%",
-            padding: 12,
+            padding: DefaultAppStyles.GAP,
             backgroundColor: colors.secondary.background,
             borderRadius: 10,
             ...getContainerBorder(colors.secondary.background)
@@ -144,7 +143,7 @@ const notebooks: { id: string; steps: TStep[] } = {
         >
           <View
             style={{
-              padding: 12,
+              padding: DefaultAppStyles.GAP,
               width: "100%",
               backgroundColor: colors.primary.background,
               ...getElevationStyle(3),
@@ -152,16 +151,16 @@ const notebooks: { id: string; steps: TStep[] } = {
               marginVertical: 12
             }}
           >
-            <Heading size={SIZE.md} color={colors.primary.heading}>
+            <Heading size={AppFontSize.md} color={colors.primary.heading}>
               {strings.workAndOffice()}
             </Heading>
             <Paragraph>{strings.workAndOfficeDesc()}</Paragraph>
 
             <Paragraph
               style={{
-                marginTop: 5
+                marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL
               }}
-              size={SIZE.xs}
+              size={AppFontSize.xs}
               color={colors.secondary.paragraph}
             >
               {strings.notes(2)}
@@ -169,18 +168,18 @@ const notebooks: { id: string; steps: TStep[] } = {
           </View>
           <View
             style={{
-              padding: 12,
+              padding: DefaultAppStyles.GAP,
               width: "90%",
               backgroundColor: colors.primary.background,
               borderRadius: 10,
               alignSelf: "flex-end",
-              marginBottom: 10
+              marginBottom: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             <Paragraph color={colors.primary.accent}>
               <Icon
                 color={colors.primary.accent}
-                size={SIZE.sm}
+                size={AppFontSize.sm}
                 name="bookmark"
               />{" "}
               {strings.tasks()}
@@ -188,50 +187,58 @@ const notebooks: { id: string; steps: TStep[] } = {
           </View>
           <View
             style={{
-              padding: 12,
-              paddingVertical: 12,
+              padding: DefaultAppStyles.GAP,
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL,
               width: "80%",
               backgroundColor: colors.primary.background,
-              borderRadius: 5,
+              borderRadius: defaultBorderRadius,
               alignSelf: "flex-end",
-              marginBottom: 10
+              marginBottom: DefaultAppStyles.GAP_VERTICAL
             }}
           >
-            <Paragraph size={SIZE.xs}>
-              <Icon color={colors.primary.icon} size={SIZE.sm} name="note" />{" "}
+            <Paragraph size={AppFontSize.xs}>
+              <Icon
+                color={colors.primary.icon}
+                size={AppFontSize.sm}
+                name="note"
+              />{" "}
               {strings.taskAValue()}
             </Paragraph>
           </View>
           <View
             style={{
-              padding: 12,
+              padding: DefaultAppStyles.GAP,
               width: "80%",
               backgroundColor: colors.primary.background,
-              borderRadius: 5,
-              paddingVertical: 12,
+              borderRadius: defaultBorderRadius,
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL,
               alignSelf: "flex-end",
-              marginBottom: 10
+              marginBottom: DefaultAppStyles.GAP_VERTICAL
             }}
           >
-            <Paragraph size={SIZE.xs}>
-              <Icon color={colors.primary.icon} size={SIZE.sm} name="note" />{" "}
+            <Paragraph size={AppFontSize.xs}>
+              <Icon
+                color={colors.primary.icon}
+                size={AppFontSize.sm}
+                name="note"
+              />{" "}
               {strings.taskBValue()}
             </Paragraph>
           </View>
           <View
             style={{
-              padding: 12,
+              padding: DefaultAppStyles.GAP,
               width: "90%",
               backgroundColor: colors.primary.background,
               borderRadius: 10,
               alignSelf: "flex-end",
-              marginBottom: 10
+              marginBottom: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             <Paragraph color={colors.primary.accent}>
               <Icon
                 color={colors.primary.accent}
-                size={SIZE.sm}
+                size={AppFontSize.sm}
                 name="bookmark"
               />{" "}
               {strings.meetings()}
@@ -251,10 +258,10 @@ const notebooks: { id: string; steps: TStep[] } = {
         <View
           style={{
             paddingHorizontal: 20,
-            paddingVertical: 12
+            paddingVertical: DefaultAppStyles.GAP_VERTICAL
           }}
         >
-          <PinItem
+          {/* <PinItem
             isPlaceholder={true}
             item={
               {
@@ -274,7 +281,7 @@ const notebooks: { id: string; steps: TStep[] } = {
               } as Notebook
             }
             onPress={() => {}}
-          />
+          /> */}
         </View>
       ),
       button: {
@@ -355,7 +362,7 @@ const Support = () => {
         style={{
           textAlign: "center"
         }}
-        size={SIZE.md}
+        size={AppFontSize.md}
       >
         {strings.weAreAlwaysListening()}
       </Paragraph>
@@ -364,7 +371,7 @@ const Support = () => {
       <Button
         style={{
           justifyContent: "flex-start",
-          marginBottom: 10,
+          marginBottom: DefaultAppStyles.GAP_VERTICAL,
           width: "90%"
         }}
         onPress={() => {
@@ -380,7 +387,7 @@ const Support = () => {
       <Button
         style={{
           justifyContent: "flex-start",
-          marginBottom: 10,
+          marginBottom: DefaultAppStyles.GAP_VERTICAL,
           width: "90%"
         }}
         onPress={() => {
@@ -395,7 +402,7 @@ const Support = () => {
       <Button
         style={{
           justifyContent: "flex-start",
-          marginBottom: 10,
+          marginBottom: DefaultAppStyles.GAP_VERTICAL,
           width: "90%"
         }}
         icon="bug"
@@ -405,7 +412,7 @@ const Support = () => {
       <Button
         style={{
           justifyContent: "flex-start",
-          marginBottom: 10,
+          marginBottom: DefaultAppStyles.GAP_VERTICAL,
           width: "90%"
         }}
         icon="mail"

@@ -21,9 +21,10 @@ import React from "react";
 import { View } from "react-native";
 import FileViewer from "react-native-file-viewer";
 import { ToastManager } from "../../../services/event-manager";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 export const ShareComponent = ({ uri, name, padding }) => {
   return (
     <View
@@ -35,7 +36,7 @@ export const ShareComponent = ({ uri, name, padding }) => {
         title={strings.open()}
         type="accent"
         width="100%"
-        fontSize={SIZE.md}
+        fontSize={AppFontSize.md}
         onPress={async () => {
           FileViewer.open(uri, {
             showOpenWithDialog: true,
@@ -53,9 +54,9 @@ export const ShareComponent = ({ uri, name, padding }) => {
         title={strings.share()}
         type="shade"
         width="100%"
-        fontSize={SIZE.md}
+        fontSize={AppFontSize.md}
         style={{
-          marginTop: 10
+          marginTop: DefaultAppStyles.GAP_VERTICAL
         }}
         onPress={async () => {
           FileViewer.open(uri, {

@@ -48,7 +48,6 @@ import {
   TabSessionHistory
 } from "@notesnook/common";
 import { isCipher } from "@notesnook/core";
-import { hashNavigate } from "../navigation";
 import { AppEventManager, AppEvents } from "../common/app-events";
 import Vault from "../common/vault";
 import { Mutex } from "async-mutex";
@@ -554,8 +553,6 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   activateSession = (id?: string, activeBlockId?: string, silent?: boolean) => {
-    if (!id) hashNavigate(`/`, { replace: true, notify: false });
-
     const session = this.get().sessions.find((s) => s.id === id);
     if (!session) id = undefined;
 
@@ -574,12 +571,6 @@ class EditorStore extends BaseStore<EditorStore> {
     } else setDocumentTitle();
 
     AppEventManager.publish(AppEvents.toggleEditor, true);
-
-    if (id) {
-      if (session?.type === "new")
-        hashNavigate(`/notes/${id}/create`, { replace: true, notify: false });
-      else hashNavigate(`/notes/${id}/edit`, { replace: true, notify: false });
-    }
 
     if (activeBlockId && session)
       this.updateSession(session.id, [session.type], {
@@ -1128,6 +1119,15 @@ class EditorStore extends BaseStore<EditorStore> {
     this.closeTabs(...tabs.map((t) => t.id));
   };
 
+  closeNotes = (...noteIds: string[]) => {
+    const { getTabsForNote, closeTabs } = this.get();
+    const tabs = noteIds
+      .map((id) => getTabsForNote(id))
+      .flat()
+      .map((t) => t.id);
+    closeTabs(...tabs);
+  };
+
   closeTabs = (...ids: string[]) => {
     this.set((state) => {
       const tabs: TabItem[] = [];
@@ -1188,18 +1188,21 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   toggleProperties = (toggleState?: boolean) => {
-    this.set(
-      (state) =>
-        (state.arePropertiesVisible =
-          toggleState !== undefined ? toggleState : !state.arePropertiesVisible)
-    );
+    this.set((state) => {
+      state.arePropertiesVisible =
+        toggleState !== undefined ? toggleState : !state.arePropertiesVisible;
+    });
+    this.toggleTableOfContents(false);
   };
 
   toggleTableOfContents = (toggleState?: boolean) => {
-    const { isTOCVisible } = this.get();
+    const { isTOCVisible, arePropertiesVisible } = this.get();
     const isTOCVisibleState =
       toggleState !== undefined ? toggleState : !isTOCVisible;
-    this.set({ isTOCVisible: isTOCVisibleState });
+    this.set({
+      isTOCVisible: isTOCVisibleState,
+      arePropertiesVisible: isTOCVisibleState ? false : arePropertiesVisible
+    });
     Config.set("editor:toc", isTOCVisibleState);
   };
 

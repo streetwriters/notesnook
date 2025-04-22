@@ -27,7 +27,7 @@ import Navigation from "../../../services/navigation";
 import { useAttachmentStore } from "../../../stores/use-attachment-store";
 import { useThemeColors } from "@notesnook/theme";
 import { openLinkInBrowser } from "../../../utils/functions";
-import { SIZE } from "../../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import DialogHeader from "../../dialog/dialog-header";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
@@ -38,6 +38,7 @@ import Paragraph from "../../ui/typography/paragraph";
 import { requestInAppReview } from "../../../services/app-review";
 import { hosts, Note } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 const PublishNoteSheet = ({
   note: item
@@ -117,7 +118,7 @@ const PublishNoteSheet = ({
       style={{
         width: "100%",
         alignSelf: "center",
-        paddingHorizontal: 12
+        paddingHorizontal: DefaultAppStyles.GAP
       }}
     >
       <DialogHeader
@@ -155,10 +156,10 @@ const PublishNoteSheet = ({
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                marginTop: 10,
+                marginTop: DefaultAppStyles.GAP_VERTICAL,
                 backgroundColor: colors.secondary.background,
-                padding: 12,
-                borderRadius: 5
+                padding: DefaultAppStyles.GAP,
+                borderRadius: defaultBorderRadius
               }}
             >
               <View
@@ -167,8 +168,10 @@ const PublishNoteSheet = ({
                   flexShrink: 1
                 }}
               >
-                <Heading size={SIZE.md}>{strings.publishedAt()}:</Heading>
-                <Paragraph size={SIZE.sm} numberOfLines={1}>
+                <Heading size={AppFontSize.md}>
+                  {strings.publishedAt()}:
+                </Heading>
+                <Paragraph size={AppFontSize.sm} numberOfLines={1}>
                   {publishUrl}
                 </Paragraph>
                 <Paragraph
@@ -179,9 +182,9 @@ const PublishNoteSheet = ({
                       console.error(e);
                     }
                   }}
-                  size={SIZE.xs}
+                  size={AppFontSize.xs}
                   style={{
-                    marginTop: 5,
+                    marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL,
                     color: colors.primary.paragraph
                   }}
                 >
@@ -200,7 +203,7 @@ const PublishNoteSheet = ({
                   });
                 }}
                 color={colors.primary.accent}
-                size={SIZE.lg}
+                size={AppFontSize.lg}
                 name="content-copy"
               />
             </View>
@@ -215,11 +218,11 @@ const PublishNoteSheet = ({
             style={{
               flexDirection: "row",
               alignItems: "center",
-              marginBottom: 10,
+              marginBottom: DefaultAppStyles.GAP_VERTICAL,
               backgroundColor: colors.secondary.background,
-              paddingVertical: 12,
-              borderRadius: 5,
-              marginTop: 10
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL,
+              borderRadius: defaultBorderRadius,
+              marginTop: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             <IconButton
@@ -228,7 +231,7 @@ const PublishNoteSheet = ({
                 setIsLocked(!isLocked);
               }}
               color={isLocked ? colors.selected.icon : colors.primary.icon}
-              size={SIZE.xl}
+              size={AppFontSize.xl}
               name={
                 isLocked
                   ? "check-circle-outline"
@@ -242,7 +245,9 @@ const PublishNoteSheet = ({
                 flexShrink: 1
               }}
             >
-              <Heading size={SIZE.md}>{strings.monographPassHeading()}</Heading>
+              <Heading size={AppFontSize.md}>
+                {strings.monographPassHeading()}
+              </Heading>
               <Paragraph>{strings.monographPassDesc()}</Paragraph>
             </View>
           </TouchableOpacity>
@@ -256,8 +261,8 @@ const PublishNoteSheet = ({
               flexDirection: "row",
               alignItems: "center",
               backgroundColor: colors.secondary.background,
-              paddingVertical: 12,
-              borderRadius: 5
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL,
+              borderRadius: defaultBorderRadius
             }}
           >
             <IconButton
@@ -265,7 +270,7 @@ const PublishNoteSheet = ({
                 setSelfDestruct(!selfDestruct);
               }}
               color={selfDestruct ? colors.selected.icon : colors.primary.icon}
-              size={SIZE.xl}
+              size={AppFontSize.xl}
               name={
                 selfDestruct
                   ? "check-circle-outline"
@@ -279,7 +284,7 @@ const PublishNoteSheet = ({
                 flexShrink: 1
               }}
             >
-              <Heading size={SIZE.md}>
+              <Heading size={AppFontSize.md}>
                 {strings.monographSelfDestructHeading()}
               </Heading>
               <Paragraph>{strings.monographSelfDestructDesc()}</Paragraph>
@@ -290,7 +295,7 @@ const PublishNoteSheet = ({
             style={{
               width: "100%",
               alignSelf: "center",
-              marginTop: 10
+              marginTop: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             {isLocked ? (
@@ -318,7 +323,7 @@ const PublishNoteSheet = ({
                 <>
                   <Button
                     onPress={deletePublishedNote}
-                    fontSize={SIZE.md}
+                    fontSize={AppFontSize.md}
                     type="error"
                     title={strings.unpublish()}
                     style={{
@@ -330,7 +335,7 @@ const PublishNoteSheet = ({
               <Seperator half />
               <Button
                 onPress={publishNote}
-                fontSize={SIZE.md}
+                fontSize={AppFontSize.md}
                 style={{
                   width: isPublished ? "49%" : 250,
                   borderRadius: isPublished ? 5 : 100
@@ -345,10 +350,10 @@ const PublishNoteSheet = ({
 
       <Paragraph
         color={colors.secondary.paragraph}
-        size={SIZE.xs}
+        size={AppFontSize.xs}
         style={{
           textAlign: "center",
-          marginTop: 10,
+          marginTop: DefaultAppStyles.GAP_VERTICAL,
           textDecorationLine: "underline"
         }}
         onPress={async () => {

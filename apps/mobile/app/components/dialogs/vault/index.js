@@ -41,7 +41,7 @@ import {
   eUpdateNoteInEditor
 } from "../../../utils/events";
 import { deleteItems } from "../../../utils/functions";
-import { tabBarRef } from "../../../utils/global-refs";
+import { fluidTabsRef } from "../../../utils/global-refs";
 import { convertNoteToText } from "../../../utils/note-to-text";
 import { sleep } from "../../../utils/time";
 import BaseDialog from "../../dialog/base-dialog";
@@ -53,6 +53,7 @@ import Input from "../../ui/input";
 import Seperator from "../../ui/seperator";
 import Paragraph from "../../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 export class VaultDialog extends Component {
   constructor(props) {
@@ -553,7 +554,7 @@ export class VaultDialog extends Component {
         item: note
       });
       if (!DDS.isTab) {
-        tabBarRef.current?.goToPage(1);
+        fluidTabsRef.current?.goToPage("editor");
       }
     });
   }
@@ -677,7 +678,7 @@ export class VaultDialog extends Component {
 
           <View
             style={{
-              paddingHorizontal: 12
+              paddingHorizontal: DefaultAppStyles.GAP
             }}
           >
             {(novault ||
@@ -750,7 +751,7 @@ export class VaultDialog extends Component {
                     : "checkbox-blank-circle-outline"
                 }
                 style={{
-                  marginTop: 10
+                  marginTop: DefaultAppStyles.GAP_VERTICAL
                 }}
                 width="100%"
                 title={strings.deleteAllNotes()}
@@ -847,7 +848,7 @@ export class VaultDialog extends Component {
                   });
                 }}
                 style={{
-                  marginTop: 10
+                  marginTop: DefaultAppStyles.GAP_VERTICAL
                 }}
                 icon="fingerprint"
                 width="100%"

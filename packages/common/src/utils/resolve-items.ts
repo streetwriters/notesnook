@@ -129,10 +129,10 @@ async function resolveNotes(ids: string[]) {
     } else if (relation.toType === "reminder") {
       data.reminders.push(relation.toId);
       relationIds.reminders.add(relation.toId);
-    } else if (relation.fromType === "notebook" && data.notebooks.length < 2) {
+    } else if (relation.fromType === "notebook") {
       data.notebooks.push(relation.fromId);
       relationIds.notebooks.add(relation.fromId);
-    } else if (relation.fromType === "tag" && data.tags.length < 3) {
+    } else if (relation.fromType === "tag") {
       data.tags.push(relation.fromId);
       relationIds.tags.add(relation.fromId);
     } else if (relation.fromType === "color" && !data.color) {

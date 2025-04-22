@@ -47,12 +47,12 @@ import { TITLE_BAR_HEIGHT } from "./components/title-bar";
 import { getFontSizes } from "@notesnook/theme/theme/font/fontsize.js";
 import { useWindowControls } from "./hooks/use-window-controls";
 import { STATUS_BAR_HEIGHT } from "./common/constants";
+import { NavigationEvents } from "./navigation";
 
 new WebExtensionRelay();
 
 function App() {
   const isMobile = useMobile();
-  const [show, setShow] = useState(true);
   const isFocusMode = useStore((store) => store.isFocusMode);
   const { isFocused } = useWindowFocus();
   const { isFullscreen } = useWindowControls();
@@ -68,9 +68,6 @@ function App() {
           .nav-pane {
             opacity: 0.7;
           }
-          .titlebar {
-            background: var(--background-secondary) !important;
-          }
         `}
         />
       )}
@@ -78,15 +75,9 @@ function App() {
         <Global
           // These styles to make sure the app content doesn't overlap with the traffic lights.
           styles={`
-            .nav-pane,
-            .mobile-nav-pane {
-              margin-top: env(titlebar-area-height) !important;
-              height: calc(100% - env(titlebar-area-height)) !important;
-            }
-            .nav-pane.collapsed + .list-pane .route-container-header,
-            .nav-pane.collapsed + .list-pane.collapsed + .editor-pane .editor-action-bar,
-            .nav-pane.collapsed + .editor-pane .editor-action-bar {
-                padding-left: 25px;
+            .nav-pane .theme-scope-navigationMenu,
+            .mobile-nav-pane .theme-scope-navigationMenu {
+              padding-top: env(titlebar-area-height) !important;
             }
             .editor-pane:first-of-type .editor-action-bar,
             .mobile-editor-pane.pane-active .editor-action-bar,
@@ -102,9 +93,9 @@ function App() {
             .route-container-header .routeHeader {
               font-size: ${getFontSizes().title};
             }
-            .global-split-pane .react-split__sash {
-              height: calc(100% - ${TITLE_BAR_HEIGHT}px);
-            }
+            // .global-split-pane .react-split__sash {
+            //   height: calc(100% - ${TITLE_BAR_HEIGHT}px);
+            // }
           `}
         />
       ) : null}
@@ -114,7 +105,7 @@ function App() {
           <GlobalMenuWrapper />
         </div>
       </Suspense>
-      <AppEffects setShow={setShow} />
+      <AppEffects />
 
       <Flex
         id="app"
@@ -126,11 +117,7 @@ function App() {
           height: "100%"
         }}
       >
-        {isMobile ? (
-          <MobileAppContents />
-        ) : (
-          <DesktopAppContents setShow={setShow} show={show} />
-        )}
+        {isMobile ? <MobileAppContents /> : <DesktopAppContents />}
         <Toaster
           containerClassName="toasts-container"
           containerStyle={{ bottom: STATUS_BAR_HEIGHT + 10 }}
@@ -142,20 +129,47 @@ function App() {
 
 export default App;
 
-type DesktopAppContentsProps = {
-  show: boolean;
-  setShow: (show: boolean) => void;
-};
-function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
+function DesktopAppContents() {
   const isFocusMode = useStore((store) => store.isFocusMode);
+  const isListPaneVisible = useStore((store) => store.isListPaneVisible);
   const isTablet = useTablet();
-  const [isNarrow, setIsNarrow] = useState(isTablet || false);
   const navPane = useRef<SplitPaneImperativeHandle>(null);
 
   useEffect(() => {
     if (isTablet) navPane.current?.collapse(0);
     else if (navPane.current?.isCollapsed(0)) navPane.current?.expand(0);
   }, [isTablet]);
+
+  useEffect(() => {
+    const event = AppEventManager.subscribe(
+      AppEvents.revealItemInList,
+      async (id?: string) => {
+        if (!useStore.getState().isListPaneVisible) {
+          useStore.getState().toggleListPane(true);
+          setTimeout(() => {
+            AppEventManager.publish(AppEvents.revealItemInList, id);
+          }, 500);
+        }
+      }
+    );
+
+    const navEvent = NavigationEvents.subscribe("onNavigate", () => {
+      useStore.getState().toggleListPane(true);
+    });
+    return () => {
+      navEvent.unsubscribe();
+      event.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isListPaneVisible) {
+      navPane.current?.expand(1);
+      navPane.current?.reset(1);
+    } else {
+      navPane.current?.collapse(1);
+    }
+  }, [isListPaneVisible]);
 
   return (
     <>
@@ -171,32 +185,34 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
           autoSaveId="global-panel-group"
           direction="vertical"
           onChange={(sizes) => {
-            setIsNarrow(sizes[0] <= 70);
+            useStore.setState({
+              isNavPaneCollapsed: sizes[0] <= 70,
+              isListPaneVisible: sizes[1] > 5 // we keep a 5px margin just to be safe
+            });
           }}
         >
           {isFocusMode ? null : (
             <Pane
               id="nav-pane"
-              initialSize={180}
+              initialSize={isTablet ? 0 : 250}
               className={`nav-pane`}
+              snapSize={150}
               minSize={50}
-              snapSize={120}
-              maxSize={300}
+              maxSize={isTablet ? 0 : 500}
+              style={{
+                overflow: "initial",
+                zIndex: 3
+              }}
             >
-              <NavigationMenu
-                toggleNavigationContainer={(state) => {
-                  setShow(state || !show);
-                }}
-                isTablet={isNarrow}
-              />
+              <NavigationMenu onExpand={() => navPane.current?.reset(0)} />
             </Pane>
           )}
-          {!isFocusMode && show ? (
+          {isFocusMode ? null : (
             <Pane
               id="list-pane"
               initialSize={380}
               style={{ flex: 1, display: "flex" }}
-              snapSize={200}
+              snapSize={120}
               maxSize={500}
               className="list-pane"
             >
@@ -214,8 +230,7 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
                 <CachedRouter />
               </ScopedThemeProvider>
             </Pane>
-          ) : null}
-
+          )}
           <Pane
             id="editor-pane"
             className="editor-pane"
@@ -301,7 +316,7 @@ function MobileAppContents() {
           flexShrink: 0
         }}
       >
-        <NavigationMenu toggleNavigationContainer={() => {}} isTablet={false} />
+        <NavigationMenu />
       </Flex>
       <Flex
         className="mobile-list-pane"

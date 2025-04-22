@@ -52,7 +52,7 @@ import { eSendEvent } from "../app/services/event-manager";
 import { FILE_SIZE_LIMIT, IMAGE_SIZE_LIMIT } from "../app/utils/constants";
 import { eOnLoadNote } from "../app/utils/events";
 import { NoteBundle } from "../app/utils/note-bundle";
-import { SIZE } from "../app/utils/size";
+import { defaultBorderRadius, AppFontSize } from "../app/utils/size";
 import { AddNotebooks } from "./add-notebooks";
 import { AddTags } from "./add-tags";
 import { Editor } from "./editor";
@@ -492,7 +492,7 @@ const ShareView = () => {
                         flexShrink: 1,
                         flexGrow: 1,
                         fontFamily: "OpenSans-SemiBold",
-                        fontSize: SIZE.lg,
+                        fontSize: AppFontSize.lg,
                         paddingBottom: 0,
                         paddingTop: 0
                       }}
@@ -507,7 +507,7 @@ const ShareView = () => {
                         flexShrink: 1,
                         flexGrow: 1,
                         fontFamily: "OpenSans-SemiBold",
-                        fontSize: SIZE.lg,
+                        fontSize: AppFontSize.lg,
                         paddingBottom: 0,
                         paddingTop: 0,
                         color: colors.primary.heading
@@ -562,7 +562,7 @@ const ShareView = () => {
                               style={{
                                 width: 100,
                                 height: 100,
-                                borderRadius: 5,
+                                borderRadius: defaultBorderRadius,
                                 backgroundColor: "black",
                                 marginRight: 6
                               }}
@@ -578,7 +578,7 @@ const ShareView = () => {
                             }}
                             onPress={() => onRemoveFile(item)}
                             style={{
-                              borderRadius: 5,
+                              borderRadius: defaultBorderRadius,
                               backgroundColor: colors.secondary.background,
                               flexDirection: "row",
                               borderWidth: 1,
@@ -597,7 +597,7 @@ const ShareView = () => {
                             />
 
                             <Paragraph
-                              size={SIZE.xs}
+                              size={AppFontSize.xs}
                               color={colors.primary.paragraph}
                               style={{
                                 marginLeft: 4,
@@ -614,7 +614,7 @@ const ShareView = () => {
 
                     <Paragraph
                       color={colors.secondary.paragraph}
-                      size={SIZE.xs}
+                      size={AppFontSize.xs}
                       style={{
                         marginTop: 6
                       }}
@@ -847,7 +847,7 @@ const AppendNote = ({ id, onLoad }) => {
 
   return !item ? null : (
     <Paragraph
-      size={SIZE.xs}
+      size={AppFontSize.xs}
       color={colors.secondary.paragraph}
       style={{
         paddingHorizontal: 12,
@@ -857,7 +857,7 @@ const AppendNote = ({ id, onLoad }) => {
     >
       Above content will append to{" "}
       <Paragraph
-        size={SIZE.xs}
+        size={AppFontSize.xs}
         style={{
           color: colors.primary.accent,
           fontWeight: "bold"

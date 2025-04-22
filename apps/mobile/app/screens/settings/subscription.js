@@ -32,7 +32,8 @@ import PremiumService from "../../services/premium";
 import { useUserStore } from "../../stores/use-user-store";
 import { SUBSCRIPTION_STATUS } from "../../utils/constants";
 import { eOpenPremiumDialog } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 export const Subscription = () => {
   const user = useUserStore((state) => state.user);
   const monthlyPlan = usePricing("monthly");
@@ -99,10 +100,10 @@ export const Subscription = () => {
           height={40}
           style={{
             borderRadius: 100,
-            paddingHorizontal: 25,
+            paddingHorizontal: DefaultAppStyles.GAP,
             alignSelf: "flex-start"
           }}
-          fontSize={SIZE.sm}
+          fontSize={AppFontSize.sm}
           type="accent"
           onPress={manageSubscription}
           title={
@@ -138,7 +139,7 @@ export const Subscription = () => {
             width: "100%",
             paddingHorizontal: 0
           }}
-          fontSize={SIZE.xs}
+          fontSize={AppFontSize.xs}
           height={30}
           type="secondaryAccented"
         />

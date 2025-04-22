@@ -29,24 +29,32 @@ import { EntityLevel, decode } from "entities";
 import React from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { notesnook } from "../../../../e2e/test.ids";
 import { useIsCompactModeEnabled } from "../../../hooks/use-is-compact-mode-enabled";
-import NotebookScreen from "../../../screens/notebook";
-import { TaggedNotes } from "../../../screens/notes/tagged";
-import useNavigationStore from "../../../stores/use-navigation-store";
+import useNavigationStore, {
+  RouteParams
+} from "../../../stores/use-navigation-store";
 import { useRelationStore } from "../../../stores/use-relation-store";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 
+import {
+  getFormattedDate,
+  NotebooksWithDateEdited,
+  TagsWithDateEdited
+} from "@notesnook/common";
+import { strings } from "@notesnook/intl";
+import { notesnook } from "../../../../e2e/test.ids";
+import useIsSelected from "../../../hooks/use-selected";
 import { useTabStore } from "../../../screens/editor/tiptap/use-tab-store";
-import { NotebooksWithDateEdited, TagsWithDateEdited } from "@notesnook/common";
+import { useSelectionStore } from "../../../stores/use-selection-store";
+import { DefaultAppStyles } from "../../../utils/styles";
 import { Properties } from "../../properties";
-import { Button } from "../../ui/button";
+import AppIcon from "../../ui/AppIcon";
 import { IconButton } from "../../ui/icon-button";
 import { ReminderTime } from "../../ui/reminder-time";
 import { TimeSince } from "../../ui/time-since";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import { strings } from "@notesnook/intl";
+import dayjs from "dayjs";
 
 type NoteItemProps = {
   item: Note | BaseTrashItem<Note>;
@@ -60,6 +68,7 @@ type NoteItemProps = {
   isTrash?: boolean;
   noOpen?: boolean;
   locked?: boolean;
+  renderedInRoute?: keyof RouteParams;
 };
 
 const NoteItem = ({
@@ -72,7 +81,8 @@ const NoteItem = ({
   tags,
   attachmentsCount,
   locked,
-  noOpen = false
+  noOpen = false,
+  renderedInRoute
 }: NoteItemProps) => {
   const isEditingNote = useTabStore(
     (state) =>
@@ -85,7 +95,8 @@ const NoteItem = ({
   );
   const _update = useRelationStore((state) => state.updater);
   const primaryColors = isEditingNote ? colors.selected : colors.primary;
-
+  const selectionMode = useSelectionStore((state) => state.selectionMode);
+  const [selected] = useIsSelected(item);
   return (
     <>
       <View
@@ -94,69 +105,27 @@ const NoteItem = ({
           flexShrink: 1
         }}
       >
-        {!compactMode ? (
-          <View
+        {compactMode ? null : (
+          <Paragraph
             style={{
-              flexDirection: "row",
-              alignItems: "center",
-              zIndex: 10,
-              elevation: 10,
-              marginBottom: 2.5,
-              flexWrap: "wrap"
+              fontSize: AppFontSize.xxxs,
+              color: colors.secondary.paragraph
             }}
           >
-            {notebooks?.items
-              ?.filter(
-                (item) =>
-                  item.id !== useNavigationStore.getState().focusedRouteId
-              )
-              .map((item) => (
-                <Button
-                  title={
-                    item.title.length > 25
-                      ? item.title.slice(0, 25) + "..."
-                      : item.title
-                  }
-                  tooltipText={item.title}
-                  key={item.id}
-                  height={25}
-                  icon="book-outline"
-                  type="secondary"
-                  fontSize={SIZE.xs}
-                  iconSize={SIZE.sm}
-                  textStyle={{
-                    marginRight: 0
-                  }}
-                  style={{
-                    borderRadius: 5,
-                    marginRight: 5,
-                    paddingHorizontal: 6,
-                    marginBottom: 5
-                  }}
-                  onPress={() => {
-                    NotebookScreen.navigate(item, true);
-                  }}
-                />
-              ))}
-
-            <ReminderTime
-              reminder={reminder}
-              color={color?.colorCode}
-              onPress={() => {
-                Properties.present(reminder);
-              }}
-              style={{
-                height: 25
-              }}
-            />
-          </View>
-        ) : null}
+            {getFormattedDate(
+              date,
+              dayjs(date).isBefore(dayjs().subtract(1, "day").hour(23))
+                ? "date"
+                : "time"
+            )}
+          </Paragraph>
+        )}
 
         {compactMode ? (
           <Paragraph
             numberOfLines={1}
             color={color?.colorCode || primaryColors.heading}
-            size={SIZE.sm}
+            size={AppFontSize.sm}
             style={{
               paddingRight: 10
             }}
@@ -167,7 +136,7 @@ const NoteItem = ({
           <Heading
             numberOfLines={1}
             color={color?.colorCode || primaryColors.heading}
-            size={SIZE.md}
+            size={AppFontSize.sm}
             style={{
               paddingRight: 10
             }}
@@ -197,8 +166,10 @@ const NoteItem = ({
               justifyContent: "flex-start",
               alignItems: "center",
               width: "100%",
-              marginTop: 5,
-              height: SIZE.md + 2
+              marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL,
+              columnGap: 8,
+              rowGap: 4,
+              flexWrap: "wrap"
             }}
           >
             {!isTrash ? (
@@ -206,10 +177,7 @@ const NoteItem = ({
                 {item.conflicted ? (
                   <Icon
                     name="alert-circle"
-                    style={{
-                      marginRight: 6
-                    }}
-                    size={SIZE.sm}
+                    size={AppFontSize.sm}
                     color={colors.error.accent}
                   />
                 ) : null}
@@ -218,10 +186,7 @@ const NoteItem = ({
                   <Icon
                     testID="sync-off"
                     name="sync-off"
-                    size={SIZE.sm}
-                    style={{
-                      marginRight: 6
-                    }}
+                    size={AppFontSize.sm}
                     color={primaryColors.icon}
                   />
                 ) : null}
@@ -230,41 +195,27 @@ const NoteItem = ({
                   <Icon
                     testID="pencil-lock"
                     name="pencil-lock"
-                    size={SIZE.sm}
-                    style={{
-                      marginRight: 6
-                    }}
+                    size={AppFontSize.sm}
                     color={primaryColors.icon}
                   />
                 ) : null}
-
-                <TimeSince
-                  style={{
-                    fontSize: SIZE.xs,
-                    color: colors.secondary.paragraph,
-                    marginRight: 6
-                  }}
-                  time={date}
-                  updateFrequency={Date.now() - date < 60000 ? 2000 : 60000}
-                />
 
                 {attachmentsCount > 0 ? (
                   <View
                     style={{
                       flexDirection: "row",
                       alignItems: "center",
-                      marginRight: 6,
                       gap: 2
                     }}
                   >
                     <Icon
                       name="attachment"
-                      size={SIZE.sm}
+                      size={AppFontSize.sm}
                       color={primaryColors.icon}
                     />
                     <Paragraph
                       color={colors.secondary.paragraph}
-                      size={SIZE.xs}
+                      size={AppFontSize.xxs}
                     >
                       {attachmentsCount}
                     </Paragraph>
@@ -275,10 +226,7 @@ const NoteItem = ({
                   <Icon
                     testID="icon-pinned"
                     name="pin-outline"
-                    size={SIZE.sm}
-                    style={{
-                      marginRight: 6
-                    }}
+                    size={AppFontSize.sm}
                     color={color?.colorCode || primaryColors.accent}
                   />
                 ) : null}
@@ -287,10 +235,7 @@ const NoteItem = ({
                   <Icon
                     name="lock"
                     testID="note-locked-icon"
-                    size={SIZE.sm}
-                    style={{
-                      marginRight: 6
-                    }}
+                    size={AppFontSize.sm}
                     color={primaryColors.icon}
                   />
                 ) : null}
@@ -299,37 +244,83 @@ const NoteItem = ({
                   <Icon
                     testID="icon-star"
                     name="star-outline"
-                    size={SIZE.sm}
-                    style={{
-                      marginRight: 6
-                    }}
+                    size={AppFontSize.sm}
                     color="orange"
                   />
                 ) : null}
 
+                {reminder ? (
+                  <ReminderTime
+                    reminder={reminder}
+                    disabled
+                    color={color?.colorCode}
+                    textStyle={{
+                      fontSize: AppFontSize.xxxs
+                    }}
+                    iconSize={AppFontSize.xxxs}
+                    style={{
+                      height: "auto"
+                    }}
+                  />
+                ) : null}
+
+                {notebooks?.items
+                  ?.filter(
+                    (item) =>
+                      renderedInRoute !== "Notebook" ||
+                      item.id !== useNavigationStore.getState().focusedRouteId
+                  )
+                  .map((item) => (
+                    <View
+                      key={item.id}
+                      style={{
+                        borderRadius: 4,
+                        backgroundColor: colors.secondary.background,
+                        paddingHorizontal: DefaultAppStyles.GAP_SMALL / 2,
+                        borderWidth: 0.5,
+                        borderColor: primaryColors.border,
+                        paddingVertical: 1,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: DefaultAppStyles.GAP_SMALL / 2
+                      }}
+                    >
+                      <AppIcon
+                        name="book-outline"
+                        size={AppFontSize.xxxs}
+                        color={colors.secondary.icon}
+                      />
+                      <Paragraph
+                        size={AppFontSize.xxxs}
+                        color={colors.secondary.paragraph}
+                      >
+                        {item.title}
+                      </Paragraph>
+                    </View>
+                  ))}
+
                 {!isTrash && !compactMode && tags
                   ? tags.items?.map((item) =>
                       item.id ? (
-                        <Button
-                          title={"#" + item.title}
+                        <View
                           key={item.id}
-                          height={23}
-                          type="plain"
-                          textStyle={{
-                            textDecorationLine: "underline",
-                            color: colors.secondary.paragraph
-                          }}
-                          hitSlop={{ top: 8, bottom: 12, left: 0, right: 0 }}
-                          fontSize={SIZE.xs}
                           style={{
-                            borderRadius: 5,
-                            paddingHorizontal: 6,
-                            marginRight: 4,
-                            zIndex: 10,
-                            maxWidth: tags.items?.length > 1 ? 130 : null
+                            borderRadius: 4,
+                            backgroundColor: colors.secondary.background,
+                            paddingHorizontal: DefaultAppStyles.GAP_SMALL / 2,
+                            borderWidth: 0.5,
+                            borderColor:
+                              color?.colorCode || primaryColors.border,
+                            paddingVertical: 1
                           }}
-                          onPress={() => TaggedNotes.navigate(item, true)}
-                        />
+                        >
+                          <Paragraph
+                            size={AppFontSize.xxxs}
+                            color={colors.secondary.paragraph}
+                          >
+                            #{item.title}
+                          </Paragraph>
+                        </View>
                       ) : null
                     )
                   : null}
@@ -338,7 +329,7 @@ const NoteItem = ({
               <>
                 <Paragraph
                   color={colors.secondary.paragraph}
-                  size={SIZE.xs}
+                  size={AppFontSize.xxs}
                   style={{
                     marginRight: 6
                   }}
@@ -352,7 +343,7 @@ const NoteItem = ({
 
                 <Paragraph
                   color={primaryColors.accent}
-                  size={SIZE.xs}
+                  size={AppFontSize.xxs}
                   style={{
                     marginRight: 6
                   }}
@@ -378,7 +369,7 @@ const NoteItem = ({
                 style={{
                   marginRight: 6
                 }}
-                size={SIZE.sm}
+                size={AppFontSize.sm}
                 color={colors.error.accent}
               />
             ) : null}
@@ -387,11 +378,11 @@ const NoteItem = ({
               <Icon
                 name="lock"
                 testID="note-locked-icon"
-                size={SIZE.sm}
+                size={AppFontSize.sm}
                 style={{
                   marginRight: 6
                 }}
-                color={colors.secondary.background}
+                color={primaryColors.icon}
               />
             ) : null}
 
@@ -399,17 +390,17 @@ const NoteItem = ({
               <Icon
                 testID="icon-star"
                 name="star-outline"
-                size={SIZE.sm}
+                size={AppFontSize.sm}
                 style={{
                   marginRight: 6
                 }}
-                color="orange"
+                color={colors.static.orange}
               />
             ) : null}
 
             <TimeSince
               style={{
-                fontSize: SIZE.xs,
+                fontSize: AppFontSize.xxs,
                 color: colors.secondary.paragraph,
                 marginRight: 6
               }}
@@ -419,20 +410,39 @@ const NoteItem = ({
           </>
         ) : null}
 
-        <IconButton
-          testID={notesnook.listitem.menu}
-          color={primaryColors.paragraph}
-          name="dots-horizontal"
-          size={SIZE.xl}
-          onPress={() => !noOpen && Properties.present(item)}
-          style={{
-            justifyContent: "center",
-            height: 35,
-            width: 35,
-            borderRadius: 100,
-            alignItems: "center"
-          }}
-        />
+        {selectionMode === "note" || selectionMode === "trash" ? (
+          <>
+            <View
+              style={{
+                height: 35,
+                width: 35,
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              <AppIcon
+                name={selected ? "checkbox-outline" : "checkbox-blank-outline"}
+                color={selected ? colors.selected.icon : colors.primary.icon}
+                size={AppFontSize.lg}
+              />
+            </View>
+          </>
+        ) : (
+          <IconButton
+            testID={notesnook.listitem.menu}
+            color={colors.secondary.icon}
+            name="dots-horizontal"
+            size={AppFontSize.lg}
+            onPress={() => !noOpen && Properties.present(item)}
+            style={{
+              justifyContent: "center",
+              height: 35,
+              width: 35,
+              borderRadius: 100,
+              alignItems: "center"
+            }}
+          />
+        )}
       </View>
     </>
   );

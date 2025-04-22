@@ -31,7 +31,7 @@ import {
   ToastManager,
   presentSheet
 } from "../../../services/event-manager";
-import { SIZE } from "../../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import Input from "../../ui/input";
 
@@ -50,6 +50,7 @@ import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { ItemReference, Note, Reminder } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 type ReminderSheetProps = {
   actionSheetRef: RefObject<ActionSheetRef>;
@@ -224,11 +225,11 @@ export default function ReminderSheet({
   return (
     <View
       style={{
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         maxHeight: "100%"
       }}
     >
-      <Heading size={SIZE.lg}>
+      <Heading size={AppFontSize.lg}>
         {reminder ? strings.editReminder() : strings.newReminder()}
       </Heading>
 
@@ -245,7 +246,7 @@ export default function ReminderSheet({
           placeholder={strings.remindeMeOf()}
           onChangeText={(text) => (title.current = text)}
           wrapperStyle={{
-            marginTop: 10
+            marginTop: DefaultAppStyles.GAP_VERTICAL
           }}
         />
 
@@ -262,18 +263,18 @@ export default function ReminderSheet({
           textAlignVertical="top"
           inputStyle={{
             minHeight: 80,
-            paddingVertical: 12
+            paddingVertical: DefaultAppStyles.GAP_VERTICAL
           }}
           height={80}
           wrapperStyle={{
-            marginBottom: 12
+            marginBottom: DefaultAppStyles.GAP_VERTICAL
           }}
         />
 
         <ScrollView
           style={{
             flexDirection: "row",
-            marginBottom: 12,
+            marginBottom: DefaultAppStyles.GAP_VERTICAL,
             height: 50
           }}
           horizontal
@@ -287,7 +288,8 @@ export default function ReminderSheet({
               style={{
                 marginRight: 12,
                 borderRadius: 100,
-                minWidth: 70
+                minWidth: 70,
+                paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
               }}
               proTag={mode === "Repeat"}
               height={35}
@@ -323,9 +325,9 @@ export default function ReminderSheet({
           <View
             style={{
               backgroundColor: colors.secondary.background,
-              padding: 12,
-              borderRadius: 5,
-              marginBottom: 12
+              padding: DefaultAppStyles.GAP,
+              borderRadius: defaultBorderRadius,
+              marginBottom: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             <View
@@ -344,9 +346,9 @@ export default function ReminderSheet({
                   )}
                   style={{
                     marginRight: 6,
-                    borderRadius: 100
+                    borderRadius: 100,
+                    paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
                   }}
-                  height={35}
                   type={
                     recurringMode ===
                     RecurringModes[mode as keyof typeof RecurringModes]
@@ -382,9 +384,8 @@ export default function ReminderSheet({
                       type={
                         selectedDays.indexOf(index) > -1 ? "selected" : "plain"
                       }
-                      fontSize={SIZE.sm - 1}
+                      fontSize={AppFontSize.xs}
                       style={{
-                        width: 40,
                         height: 40,
                         borderRadius: 100,
                         marginRight: 10
@@ -410,9 +411,8 @@ export default function ReminderSheet({
                           ? "selected"
                           : "plain"
                       }
-                      fontSize={SIZE.sm - 1}
+                      fontSize={AppFontSize.xs}
                       style={{
-                        width: 40,
                         height: 40,
                         borderRadius: 100,
                         marginRight: 10
@@ -439,7 +439,7 @@ export default function ReminderSheet({
               width: "100%",
               flexDirection: "column",
               justifyContent: "center",
-              marginBottom: 12,
+              marginBottom: DefaultAppStyles.GAP_VERTICAL,
               alignItems: "center"
             }}
           >
@@ -480,7 +480,7 @@ export default function ReminderSheet({
                 title={date ? date.toLocaleDateString() : strings.selectDate()}
                 type={date ? "secondaryAccented" : "secondary"}
                 icon="calendar"
-                fontSize={SIZE.md}
+                fontSize={AppFontSize.sm}
                 onPress={() => {
                   showDatePicker();
                 }}
@@ -493,18 +493,19 @@ export default function ReminderSheet({
         reminderMode === ReminderModes.Permanent ? null : (
           <View
             style={{
-              borderRadius: 5,
+              borderRadius: defaultBorderRadius,
               flexDirection: "row",
-              paddingVertical: 6,
-              paddingHorizontal: 12,
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
               alignItems: "center",
               justifyContent: "flex-start",
-              marginBottom: 10,
-              backgroundColor: colors.secondary.background
+              marginBottom: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             <>
-              <Paragraph size={SIZE.xs} color={colors.secondary.paragraph}>
+              <Paragraph
+                size={AppFontSize.xxs}
+                color={colors.secondary.paragraph}
+              >
                 {recurringMode === RecurringModes.Daily
                   ? strings.reminderRepeatStrings.day(
                       dayjs(date).format("hh:mm A")
@@ -539,7 +540,7 @@ export default function ReminderSheet({
             width: "100%",
             justifyContent: "flex-start",
             borderWidth: 0,
-            height: 30,
+            paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
             alignSelf: "flex-start"
           }}
         />
@@ -548,7 +549,7 @@ export default function ReminderSheet({
           <RNScrollView
             style={{
               flexDirection: "row",
-              marginTop: 12,
+              marginTop: DefaultAppStyles.GAP_VERTICAL,
               height: 50
             }}
             horizontal
@@ -561,7 +562,8 @@ export default function ReminderSheet({
                 )}
                 style={{
                   marginRight: 12,
-                  borderRadius: 100
+                  borderRadius: 100,
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
                 }}
                 icon={
                   mode === "Silent"
@@ -597,11 +599,9 @@ export default function ReminderSheet({
       <Button
         title={strings.save()}
         type="accent"
-        height={45}
-        fontSize={SIZE.md}
         style={{
-          paddingHorizontal: 24,
-          marginTop: 10,
+          paddingHorizontal: DefaultAppStyles.GAP * 2,
+          marginTop: DefaultAppStyles.GAP_VERTICAL,
           width: "100%"
         }}
         onPress={saveReminder}

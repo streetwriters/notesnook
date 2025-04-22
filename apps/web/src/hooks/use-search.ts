@@ -21,7 +21,7 @@ import { useStore as useSearchStore } from "../stores/search-store";
 import { VirtualizedGrouping } from "@notesnook/core";
 
 export function useSearch<T>(
-  type: "notes" | "notebooks" | "reminders" | "trash" | "tags",
+  type: "notes" | "notebooks" | "notebook" | "reminders" | "trash" | "tags",
   lookup: (query: string) => Promise<VirtualizedGrouping<T>> | undefined,
   deps: DependencyList = []
 ) {

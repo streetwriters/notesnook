@@ -80,6 +80,7 @@ function StatusBar() {
                   size={7}
                   color={"var(--icon-success)"}
                   sx={{ p: "small" }}
+                  data-test-id="logged-in"
                 />
               ) : (
                 <Button
@@ -92,7 +93,11 @@ function StatusBar() {
                     height: "100%"
                   }}
                 >
-                  <Circle size={7} color={"var(--icon-error)"} />
+                  <Circle
+                    size={7}
+                    color={"var(--icon-error)"}
+                    data-test-id="logged-in"
+                  />
                   <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
                     {strings.emailNotConfirmed()}
                   </Text>
@@ -101,22 +106,6 @@ function StatusBar() {
 
               <SyncStatus />
             </>
-          ) : isLoggedIn === false ? (
-            <Button
-              variant="statusitem"
-              onClick={() => hardNavigate("/login")}
-              sx={{
-                alignItems: "center",
-                justifyContent: "center",
-                display: "flex"
-              }}
-              data-test-id="not-logged-in"
-            >
-              <Circle size={7} color="var(--icon-error)" />
-              <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
-                {strings.notLoggedIn()}
-              </Text>
-            </Button>
           ) : null}
           {activeCredentials().length > 0 && (
             <Button

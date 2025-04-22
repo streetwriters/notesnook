@@ -7,6 +7,8 @@ import { globalSetup } from "detox/runners/jest";
 
 export default async function customGlobalSetup() {
   const config = await resolveConfig();
+  //@ts-ignore
+  globalThis["DEBUG_MODE"] = config.configurationName;
   if (config.device.type === "android.emulator") {
     await downloadTestButlerAPK();
   }

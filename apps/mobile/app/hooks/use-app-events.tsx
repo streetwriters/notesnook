@@ -40,7 +40,6 @@ import {
   NativeModules,
   Platform
 } from "react-native";
-import RNBootSplash from "react-native-bootsplash";
 import { checkVersion } from "react-native-check-version";
 import Config from "react-native-config";
 import * as RNIap from "react-native-iap";
@@ -59,8 +58,7 @@ import {
 import {
   clearAppState,
   editorController,
-  editorState,
-  setAppState
+  editorState
 } from "../screens/editor/tiptap/utils";
 import { useDragState } from "../screens/settings/editor/state";
 import BackupService from "../services/backup";
@@ -84,12 +82,11 @@ import Notifications from "../services/notifications";
 import PremiumService from "../services/premium";
 import SettingsService from "../services/settings";
 import Sync from "../services/sync";
-import { clearAllStores, initAfterSync } from "../stores";
+import { clearAllStores, initAfterSync, initialize } from "../stores";
 import { refreshAllStores } from "../stores/create-db-collection-store";
 import { useAttachmentStore } from "../stores/use-attachment-store";
 import { useMessageStore } from "../stores/use-message-store";
 import { useSettingStore } from "../stores/use-setting-store";
-import { changeSystemBarColors } from "../stores/use-theme-store";
 import { SyncStatus, useUserStore } from "../stores/use-user-store";
 import { updateStatusBarColor } from "../utils/colors";
 import { BETA } from "../utils/constants";
@@ -103,7 +100,7 @@ import {
   refreshNotesPage
 } from "../utils/events";
 import { getGithubVersion } from "../utils/github-version";
-import { tabBarRef } from "../utils/global-refs";
+import { fluidTabsRef } from "../utils/global-refs";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { sleep } from "../utils/time";
 
@@ -168,7 +165,7 @@ const onAppOpenedFromURL = async (event: { url: string }) => {
       clearAppState();
       editorState().movedAway = false;
       eSendEvent(eOnLoadNote, { newNote: true });
-      tabBarRef.current?.goToPage(1, false);
+      fluidTabsRef.current?.goToPage("editor", false);
       return;
     } else if (url.startsWith("https://notesnook.com/open_note")) {
       const id = new URL(url).searchParams.get("id");
@@ -178,7 +175,7 @@ const onAppOpenedFromURL = async (event: { url: string }) => {
           eSendEvent(eOnLoadNote, {
             item: note
           });
-          tabBarRef.current?.goToPage(1, false);
+          fluidTabsRef.current?.goToPage("editor", false);
         }
       }
     } else if (url.startsWith("https://notesnook.com/open_reminder")) {
@@ -267,7 +264,7 @@ async function checkForShareExtensionLaunchedInBackground() {
       }
       eSendEvent(refreshNotesPage);
       MMKV.removeItem("notesAddedFromIntent");
-      initAfterSync();
+      initAfterSync("full");
       eSendEvent(refreshNotesPage);
     }
 
@@ -392,13 +389,11 @@ const IsDatabaseMigrationRequired = () => {
 const initializeDatabase = async (password?: string) => {
   if (useUserStore.getState().appLocked) return;
   if (!db.isInitialized) {
-    RNBootSplash.hide({ fade: false });
-    changeSystemBarColors();
-
     DatabaseLogger.info("Initializing database");
     try {
       await setupDatabase(password);
       await db.init();
+      initialize();
       Sync.run();
     } catch (e) {
       DatabaseLogger.error(e as Error);
@@ -409,12 +404,13 @@ const initializeDatabase = async (password?: string) => {
   if (IsDatabaseMigrationRequired()) return;
 
   if (db.isInitialized) {
+    useSettingStore.getState().setAppLoading(false);
     Notifications.setupReminders(true);
     if (SettingsService.get().notifNotes) {
       Notifications.pinQuickNote(false);
     }
-    useSettingStore.getState().setAppLoading(false);
     DatabaseLogger.info("Database initialized");
+    Notifications.restorePinnedNotes();
   }
   Walkthrough.init();
 };
@@ -442,7 +438,7 @@ export const useAppEvents = () => {
   >({});
 
   const onSyncComplete = useCallback(async () => {
-    initAfterSync();
+    initAfterSync(Sync.getLastSyncType() as "full" | "send");
     setLastSynced(await db.lastSynced());
     eSendEvent(eCloseSheet, "sync_progress");
   }, [setLastSynced]);
@@ -720,7 +716,8 @@ export const useAppEvents = () => {
           SettingsService.canLockAppInBackground() &&
           !useSettingStore.getState().requestBiometrics &&
           !useUserStore.getState().appLocked &&
-          !useUserStore.getState().disableAppLockRequests
+          !useUserStore.getState().disableAppLockRequests &&
+          !useSettingStore.getState().appDidEnterBackgroundForAction
         ) {
           if (SettingsService.shouldLockAppOnEnterForeground()) {
             DatabaseLogger.log(`AppEvents: Locking app on enter background`);

@@ -24,9 +24,9 @@ import React, { useEffect, useRef } from "react";
 import {
   NativeScrollEvent,
   NativeSyntheticEvent,
-  RefreshControl
+  RefreshControl,
+  View
 } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
 import { notesnook } from "../../../e2e/test.ids";
 import { useGroupOptions } from "../../hooks/use-group-options";
 import { eSendEvent } from "../../services/event-manager";
@@ -34,8 +34,7 @@ import Sync from "../../services/sync";
 import { RouteName } from "../../stores/use-navigation-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { eScrollEvent } from "../../utils/events";
-import { tabBarRef } from "../../utils/global-refs";
-import { Footer } from "../list-items/footer";
+import { fluidTabsRef } from "../../utils/global-refs";
 import { Header } from "../list-items/headers/header";
 import { Empty, PlaceholderData } from "./empty";
 import { ListItemWrapper } from "./list-item.wrapper";
@@ -43,6 +42,7 @@ import { ListItemWrapper } from "./list-item.wrapper";
 type ListProps = {
   data: VirtualizedGrouping<Item> | undefined;
   dataType: Item["type"];
+  mode?: "drawer" | "sheet";
   onRefresh?: () => void;
   loading?: boolean;
   headerTitle?: string;
@@ -145,70 +145,80 @@ export default function List(props: ListProps) {
 
   return (
     <>
-      <Animated.View
+      <View
         style={{
           flex: 1
         }}
-        entering={props.renderedInRoute === "Search" ? undefined : FadeInDown}
       >
-        <ListView
-          style={styles}
-          ref={scrollRef}
-          testID={notesnook.list.id}
-          data={props.data?.placeholders || []}
-          renderItem={renderItem}
-          onScroll={onListScroll}
-          nestedScrollEnabled={true}
-          onMomentumScrollEnd={() => {
-            tabBarRef.current?.unlock();
-          }}
-          getItemType={(item: number, index: number) => {
-            return props.data?.type(index);
-          }}
-          estimatedItemSize={isCompactModeEnabled ? 60 : 120}
-          directionalLockEnabled={true}
-          keyboardShouldPersistTaps="always"
-          keyboardDismissMode="interactive"
-          refreshControl={
-            props.isRenderedInActionSheet ? null : (
-              <RefreshControl
-                tintColor={colors.primary.accent}
-                colors={[colors.primary.accent]}
-                progressBackgroundColor={colors.secondary.background}
-                onRefresh={_onRefresh}
-                refreshing={false}
-              />
-            )
-          }
-          ListEmptyComponent={
-            props.placeholder ? (
-              <Empty
-                loading={props.loading}
-                title={props.headerTitle}
-                dataType={props.dataType}
+        {props.data?.placeholders?.length === 0 ? (
+          <>
+            {props.CustomLisHeader ? (
+              props.CustomLisHeader
+            ) : !props.headerTitle ? null : (
+              <Header
                 color={props.customAccentColor}
-                placeholder={props.placeholder}
                 screen={props.renderedInRoute}
               />
-            ) : null
-          }
-          ListFooterComponent={
-            <Footer height={props.renderedInRoute === "Notebook" ? 300 : 150} />
-          }
-          ListHeaderComponent={
-            <>
-              {props.CustomLisHeader ? (
-                props.CustomLisHeader
-              ) : !props.headerTitle ? null : (
-                <Header
-                  color={props.customAccentColor}
-                  screen={props.renderedInRoute}
+            )}
+            <Empty
+              loading={props.loading}
+              title={props.headerTitle}
+              dataType={props.dataType}
+              color={props.customAccentColor}
+              placeholder={props.placeholder}
+              screen={props.renderedInRoute}
+            />
+          </>
+        ) : (
+          <ListView
+            style={styles}
+            ref={scrollRef}
+            testID={notesnook.list.id}
+            data={props.data?.placeholders || []}
+            renderItem={renderItem}
+            onScroll={onListScroll}
+            nestedScrollEnabled={true}
+            onMomentumScrollEnd={() => {
+              fluidTabsRef.current?.unlock();
+            }}
+            getItemType={(item: number, index: number) => {
+              return props.data?.type(index);
+            }}
+            estimatedItemSize={isCompactModeEnabled ? 60 : 120}
+            directionalLockEnabled={true}
+            keyboardShouldPersistTaps="always"
+            keyboardDismissMode="interactive"
+            ListFooterComponent={
+              <View
+                style={{ height: props.data?.placeholders?.length ? 100 : 0 }}
+              />
+            }
+            refreshControl={
+              props.isRenderedInActionSheet ? null : (
+                <RefreshControl
+                  tintColor={colors.primary.accent}
+                  colors={[colors.primary.accent]}
+                  progressBackgroundColor={colors.secondary.background}
+                  onRefresh={_onRefresh}
+                  refreshing={false}
                 />
-              )}
-            </>
-          }
-        />
-      </Animated.View>
+              )
+            }
+            ListHeaderComponent={
+              <>
+                {props.CustomLisHeader ? (
+                  props.CustomLisHeader
+                ) : !props.headerTitle ? null : (
+                  <Header
+                    color={props.customAccentColor}
+                    screen={props.renderedInRoute}
+                  />
+                )}
+              </>
+            }
+          />
+        )}
+      </View>
     </>
   );
 }

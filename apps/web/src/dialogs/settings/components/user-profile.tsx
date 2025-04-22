@@ -32,7 +32,11 @@ import { EditProfilePictureDialog } from "../../edit-profile-picture-dialog";
 import { PromptDialog } from "../../prompt";
 import { strings } from "@notesnook/intl";
 
-export function UserProfile() {
+type Props = {
+  minimal?: boolean;
+};
+
+export function UserProfile({ minimal }: Props) {
   const user = useUserStore((store) => store.user);
   const profile = useSettingStore((store) => store.profile);
 
@@ -66,23 +70,25 @@ export function UserProfile() {
           borderRadius: "default",
           alignItems: "center",
           bg: "var(--background-secondary)",
-          p: 2,
-          mb: 4
+          p: 1,
+          mb: minimal ? 0 : 4,
+          gap: 1
         }}
       >
         <Flex
           variant="columnCenter"
           sx={{
             bg: "shade",
-            mr: 2,
-            size: 60,
+            size: minimal ? 30 : 40,
             borderRadius: 80
           }}
         >
-          <User size={30} />
+          <User size={minimal ? 15 : 20} />
         </Flex>
         <Flex sx={{ flexDirection: "column" }}>
-          <Text variant={"title"}>{strings.loginMessage()}</Text>
+          <Text variant={minimal ? "body" : "subtitle"}>
+            {strings.loginMessage()}
+          </Text>
           <Text variant={"subBody"}>{strings.loginMessageActionText()}</Text>
         </Flex>
       </Flex>
@@ -95,8 +101,8 @@ export function UserProfile() {
         alignItems: "center",
         justifyContent: "space-between",
         bg: "var(--background-secondary)",
-        p: 2,
-        mb: 4
+        p: 1,
+        mb: minimal ? 0 : 4
       }}
     >
       <Flex sx={{ alignItems: "center" }}>
@@ -105,12 +111,12 @@ export function UserProfile() {
           sx={{
             bg: "shade",
             mr: 2,
-            size: 60,
+            size: minimal ? 40 : 50,
             borderRadius: 80,
             overflow: "hidden",
             position: "relative",
             ":hover #profile-picture-edit": {
-              visibility: "visible"
+              visibility: minimal ? "hidden" : "visible"
             }
           }}
         >
@@ -120,7 +126,7 @@ export function UserProfile() {
               src={profile.profilePicture}
             />
           ) : (
-            <User size={30} />
+            <User size={minimal ? 20 : 24} />
           )}
           <Flex
             id="profile-picture-edit"
@@ -142,7 +148,7 @@ export function UserProfile() {
               await EditProfilePictureDialog.show({ profile });
             }}
           >
-            <Text variant="body" sx={{ color: "white" }}>
+            <Text variant="subBody" sx={{ color: "white" }}>
               {strings.edit()}
             </Text>
           </Flex>
@@ -163,37 +169,45 @@ export function UserProfile() {
               : "BASIC"}
           </Text>
 
-          <Text variant={"title"}>
+          <Text variant={minimal ? "body" : "subtitle"}>
             {profile?.fullName || strings.yourFullName()}{" "}
-            <Edit
-              sx={{ display: "inline-block", cursor: "pointer" }}
-              size={12}
-              title={strings.editFullName()}
-              onClick={async () => {
-                const fullName = await PromptDialog.show({
-                  title: strings.editFullName(),
-                  description: strings.setFullNameDesc(),
-                  defaultValue: profile?.fullName
-                });
-
-                if (fullName === profile?.fullName) return;
-
-                try {
-                  await db.settings.setProfile({
-                    fullName: fullName || undefined
+            {minimal ? null : (
+              <Edit
+                sx={{ display: "inline-block", cursor: "pointer" }}
+                size={12}
+                title={strings.editFullName()}
+                onClick={async () => {
+                  const fullName = await PromptDialog.show({
+                    title: strings.editFullName(),
+                    description: strings.setFullNameDesc(),
+                    defaultValue: profile?.fullName
                   });
-                  await useSettingStore.getState().refresh();
-                  showToast("success", strings.fullNameUpdated());
-                } catch (e) {
-                  showToast("error", (e as Error).message);
-                }
-              }}
-            />
+
+                  if (fullName === profile?.fullName) return;
+
+                  try {
+                    await db.settings.setProfile({
+                      fullName: fullName || undefined
+                    });
+                    await useSettingStore.getState().refresh();
+                    showToast("success", strings.fullNameUpdated());
+                  } catch (e) {
+                    showToast("error", (e as Error).message);
+                  }
+                }}
+              />
+            )}
           </Text>
           <Text variant={"subBody"}>
-            {user.email} •{" "}
-            {strings.memberSince(
-              getFormattedDate(getObjectIdTimestamp(user.id), "date")
+            {user.email}
+            {minimal ? null : (
+              <>
+                {" "}
+                •{" "}
+                {strings.memberSince(
+                  getFormattedDate(getObjectIdTimestamp(user.id), "date")
+                )}
+              </>
             )}
           </Text>
         </Flex>

@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Notebook } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import React, { useRef, useState } from "react";
 import { TextInput, View } from "react-native";
 import { notesnook } from "../../../../e2e/test.ids";
@@ -30,17 +31,16 @@ import {
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { useMenuStore } from "../../../stores/use-menu-store";
+import { useNotebookStore } from "../../../stores/use-notebook-store";
 import { useRelationStore } from "../../../stores/use-relation-store";
-import { SIZE } from "../../../utils/size";
+import { eOnNotebookUpdated } from "../../../utils/events";
+import { getParentNotebookId } from "../../../utils/notebooks";
+import { AppFontSize } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import Input from "../../ui/input";
 import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
-import { MoveNotes } from "../move-notes/movenote";
-import { eOnNotebookUpdated } from "../../../utils/events";
-import { getParentNotebookId } from "../../../utils/notebooks";
-import { useNotebookStore } from "../../../stores/use-notebook-store";
-import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 export const AddNotebookSheet = ({
   notebook,
@@ -97,18 +97,28 @@ export const AddNotebookSheet = ({
       parentNotebook?.id ||
       (await getParentNotebookId(notebook?.id || (id as string)));
 
-    eSendEvent(eOnNotebookUpdated, parent);
-    if (notebook) {
-      setImmediate(() => {
-        eSendEvent(eOnNotebookUpdated, notebook.id);
-      });
+    eSendEvent(eOnNotebookUpdated, parent || notebook?.id);
+
+    if (!parent) {
+      useNotebookStore.getState().refresh();
     }
 
-    if (!notebook && showMoveNotesOnComplete && id) {
-      MoveNotes.present(await db.notebooks.notebook(id));
-    } else {
-      close?.(true);
+    if (showMoveNotesOnComplete && id && !notebook?.id) {
+      ToastManager.show({
+        heading: strings.notebookAdded(),
+        type: "success",
+        context: "global",
+        actionText: strings.addNotes(),
+        duration: 8000,
+        func: async () => {
+          Navigation.navigate("MoveNotes", {
+            notebook: (await db.notebooks.notebook(id)) as Notebook
+          });
+          ToastManager.hide();
+        }
+      });
     }
+    close?.(true);
   };
 
   return (
@@ -116,10 +126,10 @@ export const AddNotebookSheet = ({
       style={{
         maxHeight: DDS.isTab ? "90%" : "97%",
         borderRadius: DDS.isTab ? 5 : 0,
-        paddingHorizontal: 12
+        paddingHorizontal: DefaultAppStyles.GAP
       }}
     >
-      <Heading size={SIZE.lg}>
+      <Heading size={AppFontSize.lg}>
         {notebook ? strings.editNotebook() : strings.newNotebook()}
       </Heading>
 
@@ -160,10 +170,8 @@ export const AddNotebookSheet = ({
       <Button
         title={notebook ? strings.save() : strings.add()}
         type="accent"
-        height={45}
-        fontSize={SIZE.md}
         style={{
-          paddingHorizontal: 24,
+          paddingHorizontal: DefaultAppStyles.GAP * 2,
           width: "100%"
         }}
         onPress={onSaveChanges}

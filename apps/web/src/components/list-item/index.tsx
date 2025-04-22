@@ -142,11 +142,9 @@ function ListItem<TItem extends Item, TContext>(
       }}
       tabIndex={-1}
       sx={{
-        pl: 1,
-        pr: 2,
-        py: 1,
-        mb: "1px",
-        height: "inherit",
+        px: 1,
+        py: isCompact ? 0 : 1,
+        height: isCompact ? 25 : "inherit",
         cursor: "pointer",
         position: "relative",
         overflow: "hidden",
@@ -157,9 +155,6 @@ function ListItem<TItem extends Item, TContext>(
         alignItems: isCompact ? "center" : undefined,
 
         opacity: isDisabled ? 0.7 : 1,
-
-        borderLeft: "5px solid",
-        borderLeftColor: isFocused ? accent : "transparent",
 
         backgroundColor: selected ? "background-selected" : background,
 
@@ -201,16 +196,14 @@ function ListItem<TItem extends Item, TContext>(
         <Text
           dir="auto"
           data-test-id={`title`}
-          variant={isCompact ? "body" : "subtitle"}
+          variant={"body"}
           sx={{
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-            fontWeight: isCompact ? "body" : "bold",
+            fontWeight: isCompact ? "body" : "medium",
             color:
-              selected && heading === "heading"
-                ? `${heading}-selected`
-                : heading,
+              selected && heading === "heading" ? `heading-selected` : heading,
             display: "block"
           }}
         >
@@ -227,6 +220,7 @@ function ListItem<TItem extends Item, TContext>(
           dir="auto"
           data-test-id={`description`}
           sx={{
+            mt: "small",
             color: selected ? "paragraph-selected" : "paragraph",
             lineHeight: `1.2rem`,
             overflow: "hidden",
@@ -241,15 +235,7 @@ function ListItem<TItem extends Item, TContext>(
           {props.body}
         </Text>
       )}
-      {props.footer ? (
-        <Box
-          ml={isCompact ? 1 : 0}
-          mt={isCompact ? 0 : 1}
-          sx={{ flexShrink: 0 }}
-        >
-          {props.footer}
-        </Box>
-      ) : null}
+      {props.footer ? <>{props.footer}</> : null}
     </Flex>
   );
 }

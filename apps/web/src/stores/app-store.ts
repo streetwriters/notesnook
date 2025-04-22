@@ -65,6 +65,8 @@ let pendingSync: SyncOptions | undefined = undefined;
 
 class AppStore extends BaseStore<AppStore> {
   isFocusMode = false;
+  isListPaneVisible = true;
+  isNavPaneCollapsed = false;
   isVaultCreated = false;
   isAutoSyncEnabled = Config.get("autoSyncEnabled", true);
   isSyncEnabled = Config.get("syncEnabled", true);
@@ -75,15 +77,18 @@ class AppStore extends BaseStore<AppStore> {
     type: undefined
   };
   colors: Color[] = [];
+  hiddenColors: string[] = Config.get("sidebarHiddenItems:colors", []);
+  hiddenRoutes: string[] = Config.get("sidebarHiddenItems:routes", []);
   notices: Notice[] = [];
   shortcuts: (Notebook | Tag)[] = [];
   lastSynced = 0;
 
   init = () => {
-    settingStore.refresh();
-    // this needs to happen here so reminders can be set on app load.
-    reminderStore.refresh();
-    announcementStore.refresh();
+    this.refresh();
+    this.set({
+      hiddenColors: db.settings.getSideBarHiddenItems("colors"),
+      hiddenRoutes: db.settings.getSideBarHiddenItems("routes")
+    });
     this.get().sync({ type: "full" });
 
     EV.subscribe(EVENTS.appRefreshRequested, () => this.refresh());
@@ -142,6 +147,25 @@ class AppStore extends BaseStore<AppStore> {
       await this.get().sync({ type: "full" });
       await db.connectSSE({ force: false }).catch(logger.error);
     });
+  };
+
+  setHiddenColors = (ids: string[]) => {
+    Config.set("sidebarHiddenItems:colors", ids);
+    db.settings.setSideBarHiddenItems("colors", ids);
+    this.set({ hiddenColors: ids });
+  };
+
+  setHiddenRoutes = (ids: string[]) => {
+    Config.set("sidebarHiddenItems:routes", ids);
+    db.settings.setSideBarHiddenItems("routes", ids);
+    this.set({ hiddenRoutes: ids });
+  };
+
+  toggleListPane = (booleanState?: boolean) => {
+    this.set(
+      (state) =>
+        (state.isListPaneVisible = booleanState ?? !state.isListPaneVisible)
+    );
   };
 
   refresh = async () => {

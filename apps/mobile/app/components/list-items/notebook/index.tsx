@@ -19,18 +19,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { getFormattedDate } from "@notesnook/common";
 import { BaseTrashItem, Notebook, TrashItem } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../../e2e/test.ids";
 import { useIsCompactModeEnabled } from "../../../hooks/use-is-compact-mode-enabled";
-import { SIZE } from "../../../utils/size";
+import useIsSelected from "../../../hooks/use-selected";
+import { useSelectionStore } from "../../../stores/use-selection-store";
+import { AppFontSize } from "../../../utils/size";
 import { Properties } from "../../properties";
+import AppIcon from "../../ui/AppIcon";
 import { IconButton } from "../../ui/icon-button";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 type NotebookItemProps = {
   item: Notebook | BaseTrashItem<Notebook>;
@@ -50,6 +54,8 @@ export const NotebookItem = ({
   const compactMode = useIsCompactModeEnabled(
     (item as TrashItem).itemType || item.type
   );
+  const selectionMode = useSelectionStore((state) => state.selectionMode);
+  const [selected] = useIsSelected(item);
 
   return (
     <>
@@ -61,7 +67,7 @@ export const NotebookItem = ({
       >
         {compactMode ? (
           <Paragraph
-            size={SIZE.sm}
+            size={AppFontSize.sm}
             numberOfLines={1}
             style={{
               flexWrap: "wrap"
@@ -71,7 +77,7 @@ export const NotebookItem = ({
           </Paragraph>
         ) : (
           <Heading
-            size={SIZE.md}
+            size={AppFontSize.md}
             numberOfLines={1}
             style={{
               flexWrap: "wrap"
@@ -83,7 +89,7 @@ export const NotebookItem = ({
 
         {!item.description || compactMode ? null : (
           <Paragraph
-            size={SIZE.sm}
+            size={AppFontSize.sm}
             numberOfLines={2}
             style={{
               flexWrap: "wrap"
@@ -99,15 +105,15 @@ export const NotebookItem = ({
               flexDirection: "row",
               justifyContent: "flex-start",
               alignItems: "center",
-              marginTop: 5,
-              height: SIZE.md + 2
+              marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL,
+              height: AppFontSize.md + 2
             }}
           >
             {isTrash ? (
               <>
                 <Paragraph
                   color={colors.secondary.paragraph}
-                  size={SIZE.xs}
+                  size={AppFontSize.xs}
                   style={{
                     textAlignVertical: "center",
                     marginRight: 6
@@ -121,7 +127,7 @@ export const NotebookItem = ({
                 </Paragraph>
                 <Paragraph
                   color={colors.primary.accent}
-                  size={SIZE.xs}
+                  size={AppFontSize.xs}
                   style={{
                     textAlignVertical: "center",
                     marginRight: 6
@@ -134,7 +140,7 @@ export const NotebookItem = ({
             ) : (
               <Paragraph
                 color={colors.secondary.paragraph}
-                size={SIZE.xs}
+                size={AppFontSize.xs}
                 style={{
                   marginRight: 6
                 }}
@@ -144,7 +150,7 @@ export const NotebookItem = ({
             )}
             <Paragraph
               color={colors.secondary.paragraph}
-              size={SIZE.xs}
+              size={AppFontSize.xs}
               style={{
                 marginRight: 6
               }}
@@ -155,7 +161,7 @@ export const NotebookItem = ({
             {item.pinned ? (
               <Icon
                 name="pin-outline"
-                size={SIZE.sm}
+                size={AppFontSize.sm}
                 style={{
                   marginRight: 10,
                   marginTop: 2
@@ -176,7 +182,7 @@ export const NotebookItem = ({
           <>
             <Paragraph
               color={colors.primary.icon}
-              size={SIZE.xs}
+              size={AppFontSize.xs}
               style={{
                 marginRight: 6
               }}
@@ -185,21 +191,39 @@ export const NotebookItem = ({
             </Paragraph>
           </>
         ) : null}
-
-        <IconButton
-          color={colors.primary.heading}
-          name="dots-horizontal"
-          testID={notesnook.ids.notebook.menu}
-          size={SIZE.xl}
-          onPress={() => Properties.present(item)}
-          style={{
-            justifyContent: "center",
-            height: 35,
-            width: 35,
-            borderRadius: 100,
-            alignItems: "center"
-          }}
-        />
+        {selectionMode === "notebook" || selectionMode === "trash" ? (
+          <>
+            <View
+              style={{
+                height: 35,
+                width: 35,
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              <AppIcon
+                name={selected ? "checkbox-outline" : "checkbox-blank-outline"}
+                color={selected ? colors.selected.icon : colors.primary.icon}
+                size={AppFontSize.lg}
+              />
+            </View>
+          </>
+        ) : (
+          <IconButton
+            color={colors.primary.heading}
+            name="dots-horizontal"
+            testID={notesnook.ids.notebook.menu}
+            size={AppFontSize.xl}
+            onPress={() => Properties.present(item)}
+            style={{
+              justifyContent: "center",
+              height: 35,
+              width: 35,
+              borderRadius: 100,
+              alignItems: "center"
+            }}
+          />
+        )}
       </View>
     </>
   );

@@ -221,7 +221,14 @@ import {
   mdiChatQuestionOutline,
   mdiNoteRemoveOutline,
   mdiTabPlus,
-  mdiRadar
+  mdiRadar,
+  mdiLinkBoxOutline,
+  mdiHistory,
+  mdiArrowCollapseLeft,
+  mdiArrowCollapseRight,
+  mdiHamburger,
+  mdiNotePlus,
+  mdiNoteEditOutline
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
@@ -316,6 +323,7 @@ export function createIcon(path: string, rotate = false) {
 }
 
 export const Plus = createIcon(mdiPlus);
+export const NoteAdd = createIcon(mdiNoteEditOutline);
 export const Note = createIcon(mdiNoteOutline);
 export const NoteRemove = createIcon(mdiNoteRemoveOutline);
 export const Notes = createIcon(mdiNoteMultipleOutline);
@@ -565,3 +573,10 @@ export const Coupon = createIcon(mdiTagOutline);
 export const Support = createIcon(mdiChatQuestionOutline);
 export const NewTab = createIcon(mdiTabPlus);
 export const Radar = createIcon(mdiRadar);
+
+export const LinkedTo = createIcon(mdiVectorLink);
+export const ReferencedIn = createIcon(mdiLink);
+export const SessionHistory = createIcon(mdiHistory);
+export const ColorRemove = createIcon(mdiCloseCircleOutline);
+export const ExpandSidebar = createIcon(mdiArrowCollapseRight);
+export const HamburgerMenu = createIcon(mdiMenu);

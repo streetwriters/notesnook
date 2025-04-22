@@ -84,16 +84,18 @@ async function createNotes(bundle) {
 
   if (bundle.tags) {
     for (const tagId of bundle.tags) {
-      await db.relations.add(
-        {
-          type: "tag",
-          id: tagId
-        },
-        {
-          id: id,
-          type: "note"
-        }
-      );
+      if (await db.tags.exists(tagId)) {
+        await db.relations.add(
+          {
+            type: "tag",
+            id: tagId
+          },
+          {
+            id: id,
+            type: "note"
+          }
+        );
+      }
     }
   }
   const compress = bundle.compress;

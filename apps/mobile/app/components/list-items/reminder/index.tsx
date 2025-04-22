@@ -22,7 +22,7 @@ import React from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../../e2e/test.ids";
-import { SIZE } from "../../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import { Properties } from "../../properties";
 import ReminderSheet from "../../sheets/reminder";
 import { IconButton } from "../../ui/icon-button";
@@ -31,6 +31,10 @@ import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import SelectionWrapper, { selectItem } from "../selection-wrapper";
 import { strings } from "@notesnook/intl";
+import { useSelectionStore } from "../../../stores/use-selection-store";
+import useIsSelected from "../../../hooks/use-selected";
+import AppIcon from "../../ui/AppIcon";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 const ReminderItem = React.memo(
   ({
@@ -48,6 +52,8 @@ const ReminderItem = React.memo(
 
       ReminderSheet.present(item, undefined, isSheet);
     };
+    const selectionMode = useSelectionStore((state) => state.selectionMode);
+    const [selected] = useIsSelected(item);
     return (
       <SelectionWrapper onPress={openReminder} item={item} isSheet={isSheet}>
         <View
@@ -62,7 +68,7 @@ const ReminderItem = React.memo(
             style={{
               flexWrap: "wrap"
             }}
-            size={SIZE.md}
+            size={AppFontSize.md}
           >
             {item.title}
           </Heading>
@@ -82,18 +88,18 @@ const ReminderItem = React.memo(
             style={{
               flexDirection: "row",
               flexWrap: "wrap",
-              marginTop: 5
+              marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL
             }}
           >
             {item.disabled ? (
               <View
                 style={{
                   backgroundColor: colors.secondary.background,
-                  borderRadius: 5,
+                  borderRadius: defaultBorderRadius,
                   flexDirection: "row",
-                  paddingHorizontal: 6,
+                  paddingHorizontal: DefaultAppStyles.GAP_SMALL,
                   alignItems: "center",
-                  marginTop: 5,
+                  marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL,
                   justifyContent: "flex-start",
                   alignSelf: "flex-start",
                   marginRight: 10,
@@ -102,11 +108,11 @@ const ReminderItem = React.memo(
               >
                 <Icon
                   name="bell-off-outline"
-                  size={SIZE.md}
+                  size={AppFontSize.md}
                   color={colors.error.icon}
                 />
                 <Paragraph
-                  size={SIZE.xs}
+                  size={AppFontSize.xs}
                   color={colors.secondary.paragraph}
                   style={{ marginLeft: 5 }}
                 >
@@ -118,24 +124,24 @@ const ReminderItem = React.memo(
               <View
                 style={{
                   backgroundColor: colors.secondary.background,
-                  borderRadius: 5,
+                  borderRadius: defaultBorderRadius,
                   flexDirection: "row",
-                  paddingHorizontal: 6,
+                  paddingHorizontal: DefaultAppStyles.GAP_SMALL,
                   alignItems: "center",
-                  marginTop: 5,
+                  marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL,
                   justifyContent: "flex-start",
                   alignSelf: "flex-start",
-                  marginRight: 10,
+                  marginRight: DefaultAppStyles.GAP_SMALL,
                   height: 30
                 }}
               >
                 <Icon
                   name="reload"
-                  size={SIZE.md}
+                  size={AppFontSize.md}
                   color={colors.primary.accent}
                 />
                 <Paragraph
-                  size={SIZE.xs}
+                  size={AppFontSize.xs}
                   color={colors.secondary.paragraph}
                   style={{ marginLeft: 5 }}
                 >
@@ -147,29 +153,49 @@ const ReminderItem = React.memo(
             <ReminderTime
               reminder={item}
               checkIsActive={false}
-              fontSize={SIZE.xs}
+              fontSize={AppFontSize.xxs}
               style={{
                 justifyContent: "flex-start",
-                height: 25,
+                paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL / 2,
                 alignSelf: "flex-start"
               }}
             />
           </View>
         </View>
-        <IconButton
-          testID={notesnook.listitem.menu}
-          color={colors.primary.paragraph}
-          name="dots-horizontal"
-          size={SIZE.xl}
-          onPress={() => Properties.present(item, [], isSheet)}
-          style={{
-            justifyContent: "center",
-            height: 35,
-            width: 35,
-            borderRadius: 100,
-            alignItems: "center"
-          }}
-        />
+
+        {selectionMode === "note" || selectionMode === "trash" ? (
+          <>
+            <View
+              style={{
+                height: 35,
+                width: 35,
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              <AppIcon
+                name={selected ? "checkbox-outline" : "checkbox-blank-outline"}
+                color={selected ? colors.selected.icon : colors.primary.icon}
+                size={AppFontSize.lg}
+              />
+            </View>
+          </>
+        ) : (
+          <IconButton
+            testID={notesnook.listitem.menu}
+            color={colors.primary.paragraph}
+            name="dots-horizontal"
+            size={AppFontSize.xl}
+            onPress={() => Properties.present(item, isSheet)}
+            style={{
+              justifyContent: "center",
+              height: 35,
+              width: 35,
+              borderRadius: 100,
+              alignItems: "center"
+            }}
+          />
+        )}
       </SelectionWrapper>
     );
   },
