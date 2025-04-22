@@ -30,7 +30,9 @@ import React from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useIsCompactModeEnabled } from "../../../hooks/use-is-compact-mode-enabled";
-import useNavigationStore from "../../../stores/use-navigation-store";
+import useNavigationStore, {
+  RouteParams
+} from "../../../stores/use-navigation-store";
 import { useRelationStore } from "../../../stores/use-relation-store";
 import { AppFontSize } from "../../../utils/size";
 
@@ -53,7 +55,6 @@ import { TimeSince } from "../../ui/time-since";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import dayjs from "dayjs";
-import { useRoute } from "@react-navigation/native";
 
 type NoteItemProps = {
   item: Note | BaseTrashItem<Note>;
@@ -67,6 +68,7 @@ type NoteItemProps = {
   isTrash?: boolean;
   noOpen?: boolean;
   locked?: boolean;
+  renderedInRoute?: keyof RouteParams;
 };
 
 const NoteItem = ({
@@ -79,9 +81,9 @@ const NoteItem = ({
   tags,
   attachmentsCount,
   locked,
-  noOpen = false
+  noOpen = false,
+  renderedInRoute
 }: NoteItemProps) => {
-  const route = useRoute();
   const isEditingNote = useTabStore(
     (state) =>
       state.tabs.find((t) => t.id === state.currentTab)?.session?.noteId ===
@@ -265,7 +267,7 @@ const NoteItem = ({
                 {notebooks?.items
                   ?.filter(
                     (item) =>
-                      route.name !== "Notebook" ||
+                      renderedInRoute !== "Notebook" ||
                       item.id !== useNavigationStore.getState().focusedRouteId
                   )
                   .map((item) => (

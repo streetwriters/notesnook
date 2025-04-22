@@ -35,6 +35,7 @@ import { useSettingStore } from "../../stores/use-setting-store";
 import { getElevationStyle } from "../../utils/elevation";
 import { AppFontSize, normalize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
+import { hexToRGBA, RGB_Linear_Shade } from "../../utils/colors";
 
 interface FloatingButtonProps {
   onPress: () => void;
@@ -147,7 +148,9 @@ const FloatingButton = ({
             justifyContent: "center",
             height: normalize(size === "small" ? 40 : 60),
             width: normalize(size === "small" ? 40 : 60),
-            backgroundColor: colors.primary.shade,
+            backgroundColor: color
+              ? RGB_Linear_Shade(0.87, hexToRGBA(color))
+              : colors.primary.shade,
             borderRadius: size === "small" ? 15 : 20
           }}
         >
@@ -161,7 +164,7 @@ const FloatingButton = ({
                 ? "delete"
                 : "plus"
             }
-            color={colors.primary.accent}
+            color={color || colors.primary.accent}
             size={size === "small" ? AppFontSize.xl : AppFontSize.xxxl}
           />
         </View>

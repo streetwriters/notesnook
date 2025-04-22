@@ -34,6 +34,7 @@ import { fluidTabsRef } from "../../../utils/global-refs";
 import { NotebooksWithDateEdited, TagsWithDateEdited } from "@notesnook/common";
 import NotePreview from "../../note-history/preview";
 import SelectionWrapper, { selectItem } from "../selection-wrapper";
+import { RouteParams } from "../../../stores/use-navigation-store";
 
 export const openNote = async (
   item: Note,
@@ -82,6 +83,7 @@ type NoteWrapperProps = {
   date: number;
   isRenderedInActionSheet: boolean;
   locked?: boolean;
+  renderedInRoute?: keyof RouteParams;
 };
 
 export const NoteWrapper = React.memo<
