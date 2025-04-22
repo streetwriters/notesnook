@@ -54,6 +54,8 @@ import Paragraph from "../ui/typography/paragraph";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { strings } from "@notesnook/intl";
 import { AppFontSize } from "../../utils/size";
+import { editorController } from "../../screens/editor/tiptap/utils";
+import { useTabStore } from "../../screens/editor/tiptap/use-tab-store";
 
 const getUser = () => {
   const user = MMKV.getString("user");
@@ -109,6 +111,9 @@ const AppLocked = () => {
   );
 
   const onUnlockAppRequested = useCallback(async () => {
+    editorController.current?.commands.blur(useTabStore.getState().currentTab);
+    editorController.current?.commands.blurPassInput();
+
     if (
       !biometricsAuthEnabled ||
       !(await BiometricService.isBiometryAvailable())
@@ -294,7 +299,9 @@ const AppLocked = () => {
                     !biometricsAuthEnabled ||
                     !(await BiometricService.isBiometryAvailable())
                   ) {
-                    passwordInputRef.current?.focus();
+                    setTimeout(() => {
+                      passwordInputRef.current?.focus();
+                    }, 32);
                   }
                 }}
                 placeholder={
