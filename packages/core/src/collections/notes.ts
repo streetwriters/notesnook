@@ -87,6 +87,7 @@ export class Notes implements ICollection {
       let contentId = item.contentId;
       let dateEdited = item.dateEdited;
       let headline = item.headline;
+      let headlineTitle = "";
 
       if (item.content && item.content.data && item.content.type) {
         logger.debug("saving content", { id });
@@ -96,6 +97,7 @@ export class Notes implements ICollection {
         if (!content) throw new Error("Invalid content type.");
 
         headline = getNoteHeadline(content);
+        headlineTitle = getNoteHeadlineTitle(content);
         dateEdited = Date.now();
         contentId = await this.db.content.add({
           noteId: id,
@@ -125,7 +127,7 @@ export class Notes implements ICollection {
             this.db.settings.getTitleFormat(),
             this.db.settings.getDateFormat(),
             this.db.settings.getTimeFormat(),
-            headline ? headlineToTitle(headline) : "",
+            headlineTitle,
             this.totalNotes
           );
         item.isGeneratedTitle = true;
@@ -148,12 +150,9 @@ export class Notes implements ICollection {
           item.isGeneratedTitle &&
           HEADLINE_REGEX.test(titleFormat) &&
           headline &&
-          currentNoteTitleFields?.title !== headlineToTitle(headline)
+          currentNoteTitleFields?.title !== headlineTitle
         ) {
-          item.title = titleFormat.replace(
-            HEADLINE_REGEX,
-            headlineToTitle(headline)
-          );
+          item.title = titleFormat.replace(HEADLINE_REGEX, headlineTitle);
         }
       }
 
@@ -493,6 +492,6 @@ function getNoteHeadline(content: Tiptap) {
   return content.toHeadline();
 }
 
-function headlineToTitle(headline: string) {
-  return headline.split(" ").splice(0, 10).join(" ");
+function getNoteHeadlineTitle(content: Tiptap) {
+  return content.toHeadlineTitle();
 }

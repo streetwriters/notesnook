@@ -31,6 +31,7 @@ import dataurl from "../utils/dataurl.js";
 import {
   HTMLParser,
   extractHeadline,
+  extractHeadlineTitle,
   getDummyDocument
 } from "../utils/html-parser.js";
 import { HTMLRewriter } from "../utils/html-rewriter.js";
@@ -89,7 +90,11 @@ export class Tiptap {
   }
 
   toHeadline() {
-    return extractHeadline(this.data, 150);
+    return extractHeadline(this.data);
+  }
+
+  toHeadlineTitle() {
+    return extractHeadlineTitle(this.data, 150);
   }
 
   // isEmpty() {
