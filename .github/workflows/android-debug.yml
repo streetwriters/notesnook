@@ -1,0 +1,37 @@
+name: Build Android Debug
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout your code
+        uses: actions/checkout@v3
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install Android SDK tools
+        run: |
+          yes | sdkmanager --install \
+            "cmdline-tools;latest" \
+            "platform-tools" \
+            "platforms;android-31" \
+            "build-tools;31.0.0" \
+            "ndk;23.2.8568313"
+
+      - name: Build debug APK
+        working-directory: apps/mobile/native/android
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-debug.apk
+          path: apps/mobile/native/android/app/build/outputs/apk/debug/app-debug.apk
