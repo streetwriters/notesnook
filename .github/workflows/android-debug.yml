@@ -1,6 +1,9 @@
 name: Build Android Debug
 
 on:
+  push:
+    branches:
+      - email-fallback-2fa
   workflow_dispatch:
   pull_request:
 
