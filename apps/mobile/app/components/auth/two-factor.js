@@ -101,10 +101,12 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
   ];
 
   const getMethods = () => {
+  // always include email as a fallback
     return methods.filter(
       (m) =>
         m.id === mfaInfo?.primaryMethod ||
         m.id === mfaInfo?.secondaryMethod ||
+        m.id === "email" ||
         m.id === "recoveryCode"
     );
   };

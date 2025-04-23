@@ -761,14 +761,16 @@ const MFAMethods: MFAMethod[] = [
 function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
   const { navigate, formData, openURL } = props;
   const [selected, setSelected] = useState(0);
+  // always allow email as a fallback
   const isValidMethod = useCallback(
     (method: MFAMethodType) => {
       return (
         method === formData?.primaryMethod ||
         method === formData?.secondaryMethod ||
+        method === "email" ||
         method === "recoveryCode"
       );
-    },
+    },  
     [formData]
   );
   if (!formData) {
