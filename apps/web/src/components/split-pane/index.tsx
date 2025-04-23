@@ -58,10 +58,11 @@ type PaneOptions = {
 };
 
 export type SplitPaneImperativeHandle = {
-  collapse: (index: number) => void;
+  collapse: (index: number, setExpandedSize?: boolean) => void;
   expand: (index: number) => void;
   reset: (index: number) => void;
   isCollapsed: (index: number) => boolean;
+  hasExpandedSize: (index: number) => boolean;
 };
 export const SplitPane = React.forwardRef<
   SplitPaneImperativeHandle,
@@ -270,19 +271,22 @@ export const SplitPane = React.forwardRef<
     ref,
     () => {
       return {
-        collapse: (index: number) => {
+        collapse: (index: number, setExpandedSize = true) => {
           const currentPane = paneSizes.current[index];
           if (!currentPane || currentPane.collapsed) return;
           currentPane.collapsed = true;
-          currentPane.expandedSize = paneSizes.current[index].size;
+          if (setExpandedSize) {
+            currentPane.expandedSize = paneSizes.current[index].size;
+          }
           setSizes(paneSizes.current, wrapSize.current);
         },
         expand: (index: number) => {
           const currentPane = paneSizes.current[index];
           if (!currentPane || !currentPane.collapsed) return;
           currentPane.collapsed = false;
-          currentPane.size =
-            currentPane.expandedSize ?? currentPane.initialSize;
+          currentPane.size = !!currentPane.expandedSize
+            ? currentPane.expandedSize
+            : currentPane.initialSize;
           currentPane.expandedSize = undefined;
           setSizes(paneSizes.current, wrapSize.current);
         },
@@ -296,6 +300,9 @@ export const SplitPane = React.forwardRef<
         },
         isCollapsed: (index: number) => {
           return paneSizes.current[index].collapsed;
+        },
+        hasExpandedSize: (index: number) => {
+          return paneSizes.current[index].expandedSize !== undefined;
         }
       };
     },
