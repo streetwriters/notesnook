@@ -17,80 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { db } from "../common/db";
 import {
-  Note,
-  Notebook,
   ContentType,
-  LegacyNotebook
+  LegacyNotebook,
+  Note,
+  Notebook
 } from "@notesnook-importer/core/dist/src/models";
-import {
-  ATTACHMENTS_DIRECTORY_NAME,
-  NOTE_DATA_FILENAME
-} from "@notesnook-importer/core/dist/src/utils/note-stream";
-import { path } from "@notesnook-importer/core/dist/src/utils/path";
-import { type ZipEntry } from "./streams/unzip-stream";
-import { hashBuffer, writeEncryptedFile } from "../interfaces/fs";
 import { Notebook as NotebookType } from "@notesnook/core";
+import { SerializedKey } from "@notesnook/crypto";
+import { db } from "../common/db";
+import { writeEncryptedFile } from "../interfaces/fs";
 
-export async function* importFiles(zipFiles: File[]) {
-  const { createUnzipIterator } = await import("./streams/unzip-stream");
-
-  for (const zip of zipFiles) {
-    let count = 0;
-    let filesRead = 0;
-
-    const attachments: Record<string, any> = {};
-
-    for await (const entry of createUnzipIterator(zip)) {
-      ++filesRead;
-
-      const isAttachment = entry.name.includes(
-        `/${ATTACHMENTS_DIRECTORY_NAME}/`
-      );
-      const isNote = !isAttachment && entry.name.endsWith(NOTE_DATA_FILENAME);
-
-      try {
-        if (isAttachment) {
-          await processAttachment(entry, attachments);
-        } else if (isNote) {
-          await processNote(entry, attachments);
-          ++count;
-        }
-      } catch (e) {
-        if (e instanceof Error) yield { type: "error" as const, error: e };
-      }
-
-      yield {
-        type: "progress" as const,
-        count,
-        filesRead
-      };
-    }
-  }
-}
-
-async function processAttachment(
-  entry: ZipEntry,
-  attachments: Record<string, any>
-) {
-  const name = path.basename(entry.name);
-  if (!name || attachments[name] || (await db.attachments?.exists(name)))
-    return;
-
-  const data = await entry.arrayBuffer();
-  const { hash } = await hashBuffer(new Uint8Array(data));
-  if (hash !== name) {
-    throw new Error(`integrity check failed: ${name} !== ${hash}`);
-  }
-
-  const file = new File([data], name, {
-    type: "application/octet-stream"
-  });
-  const key = await db.attachments?.generateKey();
-  const cipherData = await writeEncryptedFile(file, key, name);
-  attachments[name] = { ...cipherData, key };
-}
+type EncryptedAttachmentFields = Awaited<
+  ReturnType<typeof writeEncryptedFile>
+> & {
+  key: SerializedKey;
+};
 
 const colorMap: Record<string, string | undefined> = {
   default: undefined,
@@ -107,18 +49,50 @@ const colorMap: Record<string, string | undefined> = {
   yellow: "#FFC107"
 };
 
-async function processNote(entry: ZipEntry, attachments: Record<string, any>) {
-  const note = await fileToJson<Note>(entry);
-  for (const attachment of note.attachments || []) {
-    const cipherData = attachments[attachment.hash];
-    if (!cipherData || (await db.attachments?.exists(attachment.hash)))
+export async function importNote(note: Note) {
+  const encryptedAttachmentFieldsMap = await processAttachments(
+    note.attachments
+  );
+  await processNote(note, encryptedAttachmentFieldsMap);
+}
+
+async function processAttachments(attachments: Note["attachments"]) {
+  if (!attachments) return {};
+
+  const map: Record<string, EncryptedAttachmentFields | undefined> = {};
+  for (const { hash, filename, data } of attachments) {
+    if (!data || !hash || map[hash]) {
       continue;
+    }
+    const exists = await db.attachments?.exists(hash);
+    if (exists) continue;
+
+    const file = new File([data], filename, {
+      type: "application/octet-stream"
+    });
+    const key = await db.attachments?.generateKey();
+    const cipherData = await writeEncryptedFile(file, key, hash);
+    map[hash] = { ...cipherData, key };
+  }
+  return map;
+}
+
+async function processNote(
+  note: Note,
+  map: Record<string, EncryptedAttachmentFields | undefined>
+) {
+  for (const attachment of note.attachments || []) {
+    const cipherData = map[attachment.hash];
+    if (!cipherData || (await db.attachments?.exists(attachment.hash))) {
+      continue;
+    }
 
     await db.attachments?.add({
       ...cipherData,
       hash: attachment.hash,
       hashType: attachment.hashType,
       filename: attachment.filename,
+      // todo: figure out typescript error
       type: attachment.mime
     });
   }
@@ -196,11 +170,6 @@ async function processNote(entry: ZipEntry, attachments: Record<string, any>) {
         await db.notes.addToNotebook(notebookId, noteId);
     }
   }
-}
-
-async function fileToJson<T>(file: ZipEntry) {
-  const text = await file.text();
-  return JSON.parse(text) as T;
 }
 
 /**
