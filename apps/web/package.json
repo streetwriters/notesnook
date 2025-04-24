@@ -19,7 +19,7 @@
     "@lingui/react": "5.1.2",
     "@mdi/js": "7.4.47",
     "@mdi/react": "1.6.1",
-    "@notesnook-importer/core": "^2.1.1",
+    "@notesnook-importer/core": "^2.1.2",
     "@notesnook/common": "file:../../packages/common",
     "@notesnook/core": "file:../../packages/core",
     "@notesnook/crypto": "file:../../packages/crypto",
