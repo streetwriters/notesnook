@@ -231,7 +231,8 @@ import {
   mdiNotePlus,
   mdiNoteEditOutline,
   mdiArrowUp,
-  mdiInbox
+  mdiInbox,
+  mdiConsoleLine
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
@@ -456,6 +457,7 @@ export const ImageDownload = createIcon(mdiImage);
 export const Billboard = createIcon(mdiBillboard);
 export const Cellphone = createIcon(mdiCellphone);
 export const CellphoneLock = createIcon(mdiCellphoneLock);
+export const ConsoleLine = createIcon(mdiConsoleLine);
 export const FileLock = createIcon(mdiFileLockOutline);
 export const ShieldLock = createIcon(mdiShieldLockOutline);
 export const ImageMultiple = createIcon(mdiImageMultipleOutline);
