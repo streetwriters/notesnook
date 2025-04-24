@@ -39,6 +39,26 @@
     <title>Notesnook</title>
 
     <style id="theme-colors"></style>
+    <script>
+      (async function validateServiceWorkerTrack() {
+        const cookie = document.cookie.match(/release\-track=([^;]+)/);
+        const releaseTrack = cookie ? cookie[1] : "stable";
+        const expectedPrefix =
+          releaseTrack === "beta" ? "notesnook-beta" : "notesnook";
+
+        const cacheKeys = await caches.keys();
+        const mismatched = cacheKeys.some(
+          (key) => !key.startsWith(expectedPrefix)
+        );
+
+        if (mismatched) {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(regs.map((r) => r.unregister()));
+          await Promise.all(cacheKeys.map((key) => caches.delete(key)));
+          window.location.reload();
+        }
+      })();
+    </script>
     <script type="module" src="./index.ts"></script>
     <style>
       html {
