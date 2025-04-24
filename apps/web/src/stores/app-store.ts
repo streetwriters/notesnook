@@ -64,7 +64,7 @@ let syncTimeout = 0;
 let pendingSync: SyncOptions | undefined = undefined;
 
 class AppStore extends BaseStore<AppStore> {
-  isFocusMode = false;
+  isFocusMode = Config.get("focusModeEnabled", false);
   isListPaneVisible = true;
   isNavPaneCollapsed = false;
   isVaultCreated = false;
@@ -197,7 +197,9 @@ class AppStore extends BaseStore<AppStore> {
   };
 
   toggleFocusMode = () => {
-    this.set((state) => (state.isFocusMode = !state.isFocusMode));
+    const { isFocusMode } = this.get();
+    this.set({ isFocusMode: !isFocusMode });
+    Config.set("focusModeEnabled", !isFocusMode);
     if (document.fullscreenElement) exitFullscreen();
     const session = useEditorStore.getState().getActiveSession();
     const editor = session && useEditorManager.getState().getEditor(session.id);

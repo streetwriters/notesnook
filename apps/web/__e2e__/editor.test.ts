@@ -35,6 +35,27 @@ test("focus mode", async ({ page }) => {
   ).toMatchSnapshot("focus-mode.jpg", { maxDiffPixelRatio: 0.01 });
 });
 
+test("focus mode state should persist across page reloads", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  await notes.createNote(NOTE);
+
+  await notes.editor.enterFocusMode();
+  await page.reload();
+  await notes.editor.waitForLoading();
+
+  expect(await notes.editor.isFocusMode()).toBeTruthy();
+
+  await notes.editor.exitFocusMode();
+  await page.reload();
+  await notes.editor.waitForLoading();
+
+  expect(await notes.editor.isFocusMode()).toBeFalsy();
+});
+
 test("full screen in focus mode", async ({ page, headless }) => {
   // fullscreen doesn't work in headless mode
   if (headless) return;
