@@ -32,6 +32,7 @@ import { useDropzone } from "react-dropzone";
 import { importNote } from "../../../utils/importer";
 import Accordion from "../../accordion";
 import { TransformResult } from "../types";
+import { useStore as useAppStore } from "../../../stores/app-store";
 
 type FileProviderHandlerProps = {
   provider: IFileProvider;
@@ -125,7 +126,7 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
       };
       errors.push(...(await transform(provider, [providerFile], settings)));
     }
-    console.log("DONE", totalNotes);
+    await useAppStore.getState().refresh();
     onTransformFinished({
       totalNotes,
       errors
