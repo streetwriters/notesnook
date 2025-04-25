@@ -4,24 +4,24 @@ title: Importing notes
 
 # Import notes from any notes app
 
-Notesnook importer is your one stop location to import all your notes from any notes app. We have added support for most of the popular note apps and common export formats such as markdown, html and text files.
+Notesnook supports importing from most of the popular note apps and common export formats such as markdown, html and text files.
 
 ## Try it out
 
-You can try out the importer by going to [https://importer.notesnook.com](https://importer.notesnook.com) to import your notes from any notes app.
+You can try out the importer by opening the web or desktop app and going to   `Settings > Notesnook Importer`.
 
 ## Supported note apps and formats
 
 1. Plain text files
 2. HTML files
 3. Markdown (.md) files
-4. OneNote
-5. EverNote
-6. Standard Notes
-7. Simplenote
-8. Google Keep
-9. Joplin
-10. Zoho Notebook
+4. EverNote
+5. Simplenote
+6. Google Keep
+7. Joplin
+8. Zoho Notebook
+9. Obsidian
+10. Skiff Pages
 
 **Don't see your notes app?** No worries, create an issue on [Github](https://github.com/streetwriters/notesnook/issues)
 
