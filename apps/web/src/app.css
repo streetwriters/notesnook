@@ -1,6 +1,7 @@
 .tabsScroll,
 .titlebarLogo,
 .theme-scope-titleBar,
+.navigation-menu-header,
 .route-container-header {
   -webkit-app-region: drag;
 }

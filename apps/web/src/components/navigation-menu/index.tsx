@@ -279,7 +279,9 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
           }}
         >
           <Flex
+            className="navigation-menu-header"
             sx={{
+              flex: 1,
               flexDirection: "row",
               alignItems: "center",
               gap: 1
