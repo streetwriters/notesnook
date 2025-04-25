@@ -19,17 +19,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* eslint-disable no-var */
 /// <reference lib="webworker" />
 
-import { ExpirationPlugin } from "workbox-expiration";
 import {
   precacheAndRoute,
   createHandlerBoundToURL,
   cleanupOutdatedCaches
 } from "workbox-precaching";
+import { setCacheNameDetails } from "workbox-core";
 import { registerRoute } from "workbox-routing";
-import { StaleWhileRevalidate } from "workbox-strategies";
 import "./service-worker.dev.js";
 
 declare var self: ServiceWorkerGlobalScope & typeof globalThis;
+
+setCacheNameDetails({
+  prefix: IS_BETA ? "notesnook-beta" : "notesnook",
+  suffix: `${self.registration.scope}-${APP_VERSION}-${GIT_HASH}`,
+  precache: "precache",
+  runtime: "runtime"
+});
 
 cleanupOutdatedCaches();
 
@@ -58,20 +64,4 @@ registerRoute(
     return true;
   },
   createHandlerBoundToURL(PUBLIC_URL + "/index.html")
-);
-
-// An example runtime caching route for requests that aren't handled by the
-// precache, in this case same-origin .png requests like those from in public/
-registerRoute(
-  // Add in any other file extensions or routing criteria as needed.
-  ({ url }) =>
-    url.origin === self.location.origin && url.pathname.endsWith(".png"), // Customize this strategy as needed, e.g., by changing to CacheFirst.
-  new StaleWhileRevalidate({
-    cacheName: "images",
-    plugins: [
-      // Ensure that once this runtime cache reaches a maximum size the
-      // least-recently used images are removed.
-      new ExpirationPlugin({ maxEntries: 50 })
-    ]
-  })
 );
