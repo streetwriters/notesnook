@@ -272,7 +272,9 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
           }}
         >
           <Flex
+            className="navigation-menu-drag-area"
             sx={{
+              flex: 1,
               flexDirection: "row",
               alignItems: "center",
               gap: 1
