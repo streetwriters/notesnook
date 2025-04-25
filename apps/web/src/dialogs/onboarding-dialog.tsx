@@ -48,6 +48,7 @@ import { ErrorText } from "../components/error-text";
 import { BuyDialog } from "./buy-dialog";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
+import { SettingsDialog } from "./settings";
 
 type Step = {
   title: string;
@@ -297,7 +298,9 @@ function Importer({ onClose }: { onClose: () => void }) {
         variant="accent"
         sx={{ borderRadius: 50, alignSelf: "center", px: 30 }}
         onClick={() => {
-          window.open("https://importer.notesnook.com/", "_blank");
+          SettingsDialog.show({
+            activeSection: "importer"
+          });
           onClose();
         }}
       >
