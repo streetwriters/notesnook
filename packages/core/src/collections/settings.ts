@@ -62,6 +62,7 @@ const defaultSettings: SettingItemMap = {
   "groupOptions:notes": DEFAULT_GROUP_OPTIONS("notes"),
   "groupOptions:notebooks": DEFAULT_GROUP_OPTIONS("notebooks"),
   "groupOptions:favorites": DEFAULT_GROUP_OPTIONS("favorites"),
+  "groupOptions:archive": DEFAULT_GROUP_OPTIONS("archive"),
   "groupOptions:home": DEFAULT_GROUP_OPTIONS("home"),
   "groupOptions:reminders": DEFAULT_GROUP_OPTIONS("reminders"),
 

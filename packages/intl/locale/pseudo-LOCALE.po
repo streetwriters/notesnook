@@ -866,6 +866,10 @@ msgstr ""
 msgid "Applying changes"
 msgstr ""
 
+#: src/strings.ts:2468
+msgid "Archive"
+msgstr ""
+
 #: src/strings.ts:1431
 msgid "Are you scrolling a lot to find a specific note? Pin it to the top from Note properties."
 msgstr ""
@@ -6951,6 +6955,10 @@ msgstr ""
 
 #: src/strings.ts:1023
 msgid "Your account will be downgraded in {days} days"
+msgstr ""
+
+#: src/strings.ts:2469
+msgid "Your archive is empty"
 msgstr ""
 
 #: src/strings.ts:1914

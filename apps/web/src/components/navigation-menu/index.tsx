@@ -46,7 +46,8 @@ import {
   Reset,
   Rename,
   ExpandSidebar,
-  HamburgerMenu
+  HamburgerMenu,
+  Archive
 } from "../icons";
 import { SortableNavigationItem } from "./navigation-item";
 import {
@@ -111,7 +112,7 @@ import { showSortMenu } from "../group-header";
 import { Freeze } from "react-freeze";
 
 type Route = {
-  id: "notes" | "favorites" | "reminders" | "monographs" | "trash";
+  id: "notes" | "favorites" | "reminders" | "monographs" | "trash" | "archive";
   title: string;
   path: string;
   icon: Icon;
@@ -138,7 +139,13 @@ const routes: Route[] = [
     path: "/monographs",
     icon: Monographs
   },
-  { id: "trash", title: strings.routes.Trash(), path: "/trash", icon: Trash }
+  { id: "trash", title: strings.routes.Trash(), path: "/trash", icon: Trash },
+  {
+    id: "archive",
+    title: strings.archive(),
+    path: "/archive",
+    icon: Archive
+  }
 ];
 
 const tabs = [
@@ -704,6 +711,8 @@ function ItemCount({ item }: { item: Route | Color | Notebook | Tag }) {
             return trash?.length || 0;
           case "monographs":
             return monographs?.length || 0;
+          case "archive":
+            return db.notes.archived.count();
           default:
             return 0;
         }

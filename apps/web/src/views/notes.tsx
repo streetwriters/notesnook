@@ -35,7 +35,12 @@ function Notes(props: NotesProps) {
   const context = useNotesStore((store) => store.context);
   const contextNotes = useNotesStore((store) => store.contextNotes);
   const refreshContext = useNotesStore((store) => store.refreshContext);
-  const type = context?.type === "favorite" ? "favorites" : "notes";
+  const type =
+    context?.type === "favorite"
+      ? "favorites"
+      : context?.type === "archive"
+      ? "archive"
+      : "notes";
   const isCompact = useNotesStore((store) => store.viewMode === "compact");
   const filteredItems = useSearch(
     context?.type === "notebook" ? "notebook" : "notes",
@@ -62,6 +67,8 @@ function Notes(props: NotesProps) {
           context={
             context.type === "favorite"
               ? "favorites"
+              : context.type === "archive"
+              ? "archive"
               : context.type === "monographs"
               ? "monographs"
               : "notes"

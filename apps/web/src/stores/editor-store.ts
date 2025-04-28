@@ -382,6 +382,8 @@ class EditorStore extends BaseStore<EditorStore> {
                     event.item.localOnly ?? session.note.localOnly;
                   session.note.favorite =
                     event.item.favorite ?? session.note.favorite;
+                  session.note.archived =
+                    event.item.archived ?? session.note.archived;
                   session.note.dateEdited =
                     event.item.dateEdited ?? session.note.dateEdited;
                 });
