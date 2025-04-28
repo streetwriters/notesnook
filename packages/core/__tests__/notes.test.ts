@@ -191,7 +191,7 @@ test("note title with headline format should keep generating headline title unti
     "headlineLorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam rutrum ex ac eros egestas, ut rhoncus felis faucibus. Mauris tempor orci nisl,"
   ]
 ].forEach(([testCase, content, expectedHeadline]) => {
-  test(`note title with headline format should generate headline title up to HEADLINE_CHARACTER_LIMIT characters - ${testCase}`, () =>
+  test(`note title with headline format should generate headline title up to 150 characters - ${testCase}`, () =>
     noteTest().then(async ({ db }) => {
       await db.settings.setTitleFormat("$headline$");
       const id = await db.notes.add({

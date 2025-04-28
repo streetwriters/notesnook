@@ -96,8 +96,8 @@ export class Notes implements ICollection {
         const content = await getContentFromData(type, data);
         if (!content) throw new Error("Invalid content type.");
 
-        headline = getNoteHeadline(content);
-        headlineTitle = getNoteHeadlineTitle(content);
+        headline = content.toHeadline();
+        headlineTitle = content.toTitle();
         dateEdited = Date.now();
         contentId = await this.db.content.add({
           noteId: id,
@@ -149,7 +149,7 @@ export class Notes implements ICollection {
         if (
           item.isGeneratedTitle &&
           HEADLINE_REGEX.test(titleFormat) &&
-          headline &&
+          headlineTitle &&
           currentNoteTitleFields?.title !== headlineTitle
         ) {
           item.title = titleFormat.replace(HEADLINE_REGEX, headlineTitle);
@@ -486,12 +486,4 @@ export class Notes implements ICollection {
       "internalLinks"
     ).internalLinks;
   }
-}
-
-function getNoteHeadline(content: Tiptap) {
-  return content.toHeadline();
-}
-
-function getNoteHeadlineTitle(content: Tiptap) {
-  return content.toHeadlineTitle();
 }

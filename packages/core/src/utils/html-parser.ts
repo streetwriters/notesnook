@@ -72,17 +72,14 @@ export function extractHeadline(html: string) {
   return text;
 }
 
-export function extractHeadlineTitle(
-  html: string,
-  headlineCharacterLimit: number
-) {
+export function extractTitle(html: string, characterLimit: number) {
   let text = "";
   const parser = new Parser(
     {
       ontext: (data) => {
         text += data;
-        if (text.length > headlineCharacterLimit) {
-          text = text.slice(0, headlineCharacterLimit);
+        if (text.length > characterLimit) {
+          text = text.slice(0, characterLimit);
           parser.pause();
           parser.end();
         }
