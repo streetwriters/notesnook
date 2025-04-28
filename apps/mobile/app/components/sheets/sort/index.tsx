@@ -56,7 +56,7 @@ const Sort = ({
     db.settings.getGroupOptions(
       screen === "Notes"
         ? "home"
-        : screen === "Trash"
+        : screen === "Trash" || type === "trash"
         ? "trash"
         : ((type + "s") as GroupingKey)
     )
@@ -65,7 +65,7 @@ const Sort = ({
     const groupType =
       screen === "Notes"
         ? "home"
-        : screen === "Trash"
+        : screen === "Trash" || type === "trash"
         ? "trash"
         : screen === "Favorites"
         ? "favorites"
