@@ -19,13 +19,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { FeatureType } from "./components/sheets/new-feature";
 
-export const features: FeatureType[] = [
-  {
-    title: "Notebook Tree View",
-    body: "Notebooks are now displayed in a tree view for better organization and user experience."
-  },
-  {
-    title: "New SideBar",
-    body: "Sidebar now contains tabs for Notebooks and Tags for easy navigation."
-  }
-];
+export const features: FeatureType[] = [];
