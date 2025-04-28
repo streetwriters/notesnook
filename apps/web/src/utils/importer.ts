@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
   ContentType,
-  LegacyNotebook,
   Note,
   Notebook
 } from "@notesnook-importer/core/dist/src/models";
@@ -92,8 +91,7 @@ async function processNote(
       hash: attachment.hash,
       hashType: attachment.hashType,
       filename: attachment.filename,
-      // todo: figure out typescript error
-      type: attachment.mime
+      mimeType: attachment.mime
     });
   }
 
@@ -159,32 +157,11 @@ async function processNote(
   }
 
   for (const nb of notebooks) {
-    if ("notebook" in nb) {
-      const notebookId = await importLegacyNotebook(nb).catch(() => undefined);
-      if (!notebookId) continue;
+    const notebookIds = await importNotebook(nb).catch(() => undefined);
+    if (!notebookIds) continue;
+    for (const notebookId of notebookIds)
       await db.notes.addToNotebook(notebookId, noteId);
-    } else {
-      const notebookIds = await importNotebook(nb).catch(() => undefined);
-      if (!notebookIds) continue;
-      for (const notebookId of notebookIds)
-        await db.notes.addToNotebook(notebookId, noteId);
-    }
   }
-}
-
-/**
- * @deprecated
- */
-async function importLegacyNotebook(
-  notebook: LegacyNotebook | undefined
-): Promise<string | undefined> {
-  if (!notebook) return;
-  const nb = await db.notebooks.find(notebook.notebook);
-  return nb
-    ? nb.id
-    : await db.notebooks.add({
-        title: notebook.notebook
-      });
 }
 
 async function importNotebook(
