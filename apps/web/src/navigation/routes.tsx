@@ -106,7 +106,7 @@ const routes = defineRoutes({
     });
   },
   "/archive": () => {
-    notestore.setContext({ type: "archive" });
+    useNoteStore.getState().setContext({ type: "archive" });
     return defineRoute({
       key: "notes",
       title: strings.archive(),
