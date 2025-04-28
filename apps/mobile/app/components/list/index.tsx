@@ -73,7 +73,7 @@ export default function List(props: ListProps) {
       ? "home"
       : props.renderedInRoute === "Favorites"
       ? "favorites"
-      : props.renderedInRoute === "Trash"
+      : props.renderedInRoute === "Trash" || props.dataType === "trash"
       ? "trash"
       : `${props.dataType}s`;
 
