@@ -67,8 +67,9 @@ const Sort = ({
         ? "home"
         : screen === "Trash"
         ? "trash"
+        : screen === "Favorites"
+        ? "favorites"
         : ((type + "s") as GroupingKey);
-    console.log("updateGroupOptions for group", groupType, "in", screen);
     await db.settings.setGroupOptions(groupType, _groupOptions);
     setGroupOptions(_groupOptions);
     setTimeout(() => {

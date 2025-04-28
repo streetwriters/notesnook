@@ -32,7 +32,7 @@ export function useGroupOptions(type: any) {
     const onUpdate = (groupType: string) => {
       if (groupType !== type) return;
       const options = db.settings?.getGroupOptions(type) as any;
-
+      if (!options) return;
       if (
         groupOptions?.groupBy !== options.groupBy ||
         groupOptions?.sortBy !== options.sortBy ||
