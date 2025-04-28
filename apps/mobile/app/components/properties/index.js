@@ -58,7 +58,6 @@ const Line = ({ top = 6, bottom = 6 }) => {
 
 export const Properties = ({ close = () => {}, item, buttons = [] }) => {
   const { colors } = useThemeColors();
-  const isColor = !!ColorValues[item.title];
   if (!item || !item.id) {
     return (
       <Paragraph style={{ marginVertical: 10, alignSelf: "center" }}>
