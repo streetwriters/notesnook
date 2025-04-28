@@ -14,6 +14,11 @@ jobs:
       - name: Setup Node
         uses: ./.github/actions/setup-node-with-cache
 
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "16.1"
+
       - name: Install node modules
         run: |
           npm ci --ignore-scripts --prefer-offline --no-audit
