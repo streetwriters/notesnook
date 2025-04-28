@@ -177,7 +177,7 @@ export const useEditorEvents = (
   useEffect(() => {
     const handleKeyboardDidShow: KeyboardEventListener = () => {
       editor.commands.keyboardShown(true);
-      //editor.postMessage(NativeEvents.keyboardShown, undefined);
+      editor.postMessage(NativeEvents.keyboardShown, undefined);
     };
     const handleKeyboardDidHide: KeyboardEventListener = () => {
       editor.commands.keyboardShown(false);
