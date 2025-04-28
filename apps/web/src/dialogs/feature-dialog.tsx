@@ -93,27 +93,21 @@ const features: Record<FeatureKeys, Feature> = {
         ]
       : [
           {
-            title: "New sidebar UI/UX",
+            title: "Archive",
             subtitle: (
               <>
-                Your notebooks &amp; tags are now displayed directly in the
-                sidebar making organization &amp; navigation much easier.
+                You can now archive your notes to hide them from the main list.
               </>
             )
           },
           {
-            title: "Hierarchical tree view for notebooks",
+            title: "Integrated Notesnook Importer",
             subtitle: (
               <>
-                Notebooks are now displayed in a hierarchical tree view so you
-                can jump back and forth between them easily.
+                Notesnook Importer is now integrated directly into the app
+                allowing for faster and more seamless import of your notes. Just
+                drag and drop your notes from other note-taking apps and viola!
               </>
-            )
-          },
-          {
-            title: "Set any tag, color or notebook as homepage",
-            subtitle: (
-              <>You can now set any tag, color or notebook as your homepage.</>
             )
           }
         ],
