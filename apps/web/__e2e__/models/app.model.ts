@@ -108,6 +108,12 @@ export class AppModel {
     return new TrashViewModel(this.page);
   }
 
+  async goToArchive() {
+    await this.page.locator(getTestId("tab-home")).click();
+    await this.navigateTo("Archive");
+    return new NotesViewModel(this.page, "notes", "archive");
+  }
+
   async goToSettings() {
     await this.profileDropdown.open(
       this.page.locator(getTestId("profile-dropdown")),

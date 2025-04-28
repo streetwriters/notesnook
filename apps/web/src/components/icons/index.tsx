@@ -40,6 +40,7 @@ import {
   mdiClose,
   mdiDotsVertical,
   mdiTrashCanOutline,
+  mdiArchiveOutline,
   mdiBookRemoveOutline,
   mdiMagnify,
   mdiMenu,
@@ -351,6 +352,7 @@ export const Cross = createIcon(mdiClose);
 export const MoreVertical = createIcon(mdiDotsVertical);
 export const MoreHorizontal = createIcon(mdiDotsHorizontal);
 export const Trash = createIcon(mdiTrashCanOutline);
+export const Archive = createIcon(mdiArchiveOutline);
 export const TopicRemove = createIcon(mdiBookmarkRemoveOutline);
 export const NotebookRemove = createIcon(mdiBookRemoveOutline);
 export const Search = createIcon(mdiMagnify);

@@ -391,6 +391,14 @@ export class NNMigrationProvider implements MigrationProvider {
             .addColumn("isGeneratedTitle", "boolean")
             .execute();
         }
+      },
+      "9": {
+        async up(db) {
+          await db.schema
+            .alterTable("notes")
+            .addColumn("archived", "boolean")
+            .execute();
+        }
       }
     };
   }

@@ -866,6 +866,10 @@ msgstr "Apply changes"
 msgid "Applying changes"
 msgstr "Applying changes"
 
+#: src/strings.ts:2468
+msgid "Archive"
+msgstr "Archive"
+
 #: src/strings.ts:1431
 msgid "Are you scrolling a lot to find a specific note? Pin it to the top from Note properties."
 msgstr "Are you scrolling a lot to find a specific note? Pin it to the top from Note properties."
@@ -7006,6 +7010,10 @@ msgstr "Your account password must be strong & unique."
 #: src/strings.ts:1023
 msgid "Your account will be downgraded in {days} days"
 msgstr "Your account will be downgraded in {days} days"
+
+#: src/strings.ts:2469
+msgid "Your archive is empty"
+msgstr "Your archive is empty"
 
 #: src/strings.ts:1914
 msgid "Your backup is ready to download"

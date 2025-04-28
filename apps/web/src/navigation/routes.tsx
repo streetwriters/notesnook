@@ -105,6 +105,15 @@ const routes = defineRoutes({
       component: Trash
     });
   },
+  "/archive": () => {
+    notestore.setContext({ type: "archive" });
+    return defineRoute({
+      key: "notes",
+      title: strings.archive(),
+      type: "notes",
+      component: Notes
+    });
+  },
   "/tags/:tagId": async ({ tagId }) => {
     const tag = await db.tags.tag(tagId);
     if (!tag) return NOT_FOUND_ROUTE;
