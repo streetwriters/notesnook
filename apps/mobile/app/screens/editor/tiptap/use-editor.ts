@@ -352,7 +352,7 @@ export const useEditor = (
           DatabaseLogger.log(`Note saved: ${id}...`);
 
           clearTimeout(saveTimer);
-
+          const oldNote = currentNotes.current[id];
           if (id) {
             currentNotes.current[id] = await db.notes?.note(id);
           }
@@ -376,11 +376,16 @@ export const useEditor = (
             }
           }
 
-          postMessage(
-            NativeEvents.title,
-            currentNotes.current[id]?.title,
-            tabId
-          );
+          if (
+            oldNote?.title !== currentNotes.current[id]?.title &&
+            !noteData.title
+          ) {
+            postMessage(
+              NativeEvents.title,
+              currentNotes.current[id]?.title,
+              tabId
+            );
+          }
 
           if (Notifications.isNotePinned(id as string)) {
             Notifications.pinNote(id as string);
