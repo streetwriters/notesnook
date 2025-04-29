@@ -134,7 +134,7 @@ test("changing content shouldn't reset the note title ", () =>
     expect(note?.title).toBe("I am a note");
   }));
 
-test("note title with headline format should keep generating headline until title is edited", () =>
+test("note title with headline format should keep generating headline title until title is edited", () =>
   noteTest().then(async ({ db }) => {
     await db.settings.setTitleFormat("$headline$");
     const id = await db.notes.add({
@@ -191,18 +191,43 @@ test("note title with headline format should keep generating headline until titl
     "headlineLorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam rutrum ex ac eros egestas, ut rhoncus felis faucibus. Mauris tempor orci nisl,"
   ]
 ].forEach(([testCase, content, expectedHeadline]) => {
-  test(`note should generate headline up to HEADLINE_CHARACTER_LIMIT characters - ${testCase}`, () =>
-    noteTest({
-      ...TEST_NOTE,
-      content: {
-        type: TEST_NOTE.content.type,
-        data: content
-      }
-    }).then(async ({ db, id }) => {
+  test(`note title with headline format should generate headline title up to 150 characters - ${testCase}`, () =>
+    noteTest().then(async ({ db }) => {
+      await db.settings.setTitleFormat("$headline$");
+      const id = await db.notes.add({
+        content: {
+          type: TEST_NOTE.content.type,
+          data: content
+        }
+      });
       const note = await db.notes.note(id);
-      expect(note?.headline).toBe(expectedHeadline);
+      expect(note?.title).toBe(expectedHeadline);
     }));
 });
+
+test("note should get headline from first paragraph in content", () =>
+  noteTest({
+    ...TEST_NOTE,
+    content: {
+      type: TEST_NOTE.content.type,
+      data: "<p>This is a very colorful existence.</p>"
+    }
+  }).then(async ({ db, id }) => {
+    const note = await db.notes.note(id);
+    expect(note?.headline).toBe("This is a very colorful existence.");
+  }));
+
+test("note should not get headline if there is no p tag", () =>
+  noteTest({
+    ...TEST_NOTE,
+    content: {
+      type: TEST_NOTE.content.type,
+      data: `<ol style="list-style-type: decimal;" data-mce-style="list-style-type: decimal;"><li>Hello I won't be a headline :(</li><li>Me too.</li><li>Gold.</li></ol>`
+    }
+  }).then(async ({ db, id }) => {
+    const note = await db.notes.note(id);
+    expect(note?.headline).toBe("");
+  }));
 
 test("note title should allow trailing space", () =>
   noteTest({ title: "Hello ", content: TEST_NOTE.content }).then(
