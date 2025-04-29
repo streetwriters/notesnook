@@ -129,8 +129,6 @@ function App() {
 
 export default App;
 
-const LIST_PANE_SNAP_SIZE = 120;
-
 function DesktopAppContents() {
   const isFocusMode = useStore((store) => store.isFocusMode);
   const isListPaneVisible = useStore((store) => store.isListPaneVisible);
@@ -194,10 +192,6 @@ function DesktopAppContents() {
               isNavPaneCollapsed: sizes[0] <= 70,
               isListPaneVisible: sizes[1] > 5 // we keep a 5px margin just to be safe
             });
-
-            if (sizes[1] < LIST_PANE_SNAP_SIZE) {
-              navPane.current?.collapse(1, false);
-            }
           }}
         >
           {isFocusMode ? null : (
@@ -221,7 +215,7 @@ function DesktopAppContents() {
               id="list-pane"
               initialSize={380}
               style={{ flex: 1, display: "flex" }}
-              snapSize={LIST_PANE_SNAP_SIZE}
+              snapSize={120}
               maxSize={500}
               className="list-pane"
             >
