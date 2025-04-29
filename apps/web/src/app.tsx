@@ -164,8 +164,11 @@ function DesktopAppContents() {
 
   useEffect(() => {
     if (isListPaneVisible) {
-      navPane.current?.expand(1);
-      navPane.current?.reset(1);
+      if (navPane.current?.hasExpandedSize(1)) {
+        navPane.current?.expand(1);
+      } else {
+        navPane.current?.reset(1);
+      }
     } else {
       navPane.current?.collapse(1);
     }
