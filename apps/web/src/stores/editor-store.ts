@@ -851,13 +851,13 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   focusLastActiveTab = () => {
-    const history = useEditorStore.getState().history;
-    if (history.length < 2) return;
+    const { tabs, history, focusTab } = this.get();
+    if (tabs.length < 2 || history.length < 2) return;
 
     const previousTab = history.at(-2);
     if (!previousTab) return;
 
-    useEditorStore.getState().focusTab(previousTab);
+    focusTab(previousTab);
   };
 
   goBack = async () => {
