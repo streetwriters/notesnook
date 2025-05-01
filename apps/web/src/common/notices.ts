@@ -86,9 +86,12 @@ export async function scheduleFullBackups() {
   );
 }
 
-export function shouldAddAutoBackupsDisabledNotice() {
+export async function shouldAddAutoBackupsDisabledNotice() {
+  const user = await db.user.getUser();
+  if (!user) return false;
+
   const backupInterval = Config.get("backupReminderOffset", 0);
-  if (!isUserPremium() && backupInterval) {
+  if (!isUserPremium(user) && backupInterval) {
     Config.set("backupReminderOffset", 0);
     return true;
   }
@@ -177,7 +180,7 @@ export const NoticesData: Record<NoticeType, NoticeData> = {
 export async function resetNotices() {
   const notices: Notice[] = [];
 
-  if (shouldAddAutoBackupsDisabledNotice()) {
+  if (await shouldAddAutoBackupsDisabledNotice()) {
     notices.push({ type: "autoBackupsOff", priority: 3 });
   }
   if (await shouldAddBackupNotice()) {
