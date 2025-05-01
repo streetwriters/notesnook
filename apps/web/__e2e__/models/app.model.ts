@@ -159,12 +159,8 @@ export class AppModel {
 
   async search(query: string, type: string) {
     const searchinput = this.page.locator(getTestId("search-input"));
-    const searchButton = this.page.locator(getTestId("search-button"));
-    const openSearch = this.page.locator(getTestId("open-search"));
 
-    await openSearch.click();
     await searchinput.fill(query);
-    await searchButton.click();
     return new SearchViewModel(this.page, type);
   }
 }
