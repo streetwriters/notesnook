@@ -43,7 +43,7 @@
     "@types/node": "22.7.0",
     "@types/yargs": "^17.0.33",
     "chokidar": "^4.0.1",
-    "electron": "^31.7.4",
+    "electron": "^34.0.0",
     "electron-builder": "^25.1.8",
     "esbuild": "0.21.5",
     "node-abi": "^3.68.0",
