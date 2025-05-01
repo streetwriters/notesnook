@@ -206,6 +206,10 @@ textarea,
   display: none;
 }
 
+a {
+  color: var(--accent);
+}
+
 .flash {
   animation: flash 1s;
 }
