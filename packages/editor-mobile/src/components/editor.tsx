@@ -421,13 +421,6 @@ const Tiptap = ({
         ref={editorRoot}
         onDoubleClick={onClickEmptyArea}
       >
-        <Header
-          hasRedo={redo}
-          hasUndo={undo}
-          settings={settings}
-          noHeader={settings.noHeader || false}
-        />
-
         <div
           id="editor-saving-failed-overlay"
           style={{
@@ -532,9 +525,17 @@ const Tiptap = ({
             overflowY: controller.loading ? "hidden" : "scroll",
             height: "100%",
             display: "block",
-            position: "relative"
+            position: "relative",
+            overscrollBehavior: "none"
           }}
         >
+          <Header
+            hasRedo={redo}
+            hasUndo={undo}
+            settings={settings}
+            noHeader={settings.noHeader || false}
+          />
+
           {settings.noHeader || tab.session?.locked ? null : (
             <>
               <Tags settings={settings} loading={controller.loading} />
@@ -854,25 +855,24 @@ const Tiptap = ({
               minHeight: 300
             }}
           />
+          <TiptapEditorWrapper
+            key={tick + tab.id + "-editor"}
+            options={tiptapOptions}
+            settings={settings}
+            onEditorUpdate={(editor) => {
+              if (!editor) {
+                setUndo(false);
+                setRedo(false);
+              }
+              if (undo !== editor.can().undo()) {
+                setUndo(editor.can().undo());
+              }
+              if (redo !== editor.can().redo()) {
+                setRedo(editor.can().redo());
+              }
+            }}
+          />
         </div>
-
-        <TiptapEditorWrapper
-          key={tick + tab.id + "-editor"}
-          options={tiptapOptions}
-          settings={settings}
-          onEditorUpdate={(editor) => {
-            if (!editor) {
-              setUndo(false);
-              setRedo(false);
-            }
-            if (undo !== editor.can().undo()) {
-              setUndo(editor.can().undo());
-            }
-            if (redo !== editor.can().redo()) {
-              setRedo(editor.can().redo());
-            }
-          }}
-        />
       </div>
     </>
   );

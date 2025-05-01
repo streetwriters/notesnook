@@ -44,10 +44,10 @@ export default function TiptapEditorWrapper(props: {
               display: props.settings.noToolbar ? "none" : "flex",
               overflowY: "hidden",
               minHeight: "50px",
-              position: "absolute",
+              position: "fixed",
               bottom: 0,
-              left: 0,
-              right: 0
+              width: "100%",
+              overscrollBehavior: "none"
             }}
             editor={editor}
             location="bottom"

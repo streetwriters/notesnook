@@ -118,7 +118,8 @@ function Header({
         backgroundColor: "var(--nn_primary_background)",
         position: "sticky",
         width: "100vw",
-        zIndex: 999
+        zIndex: 999,
+        top: 0
       }}
     >
       {noHeader ? null : (

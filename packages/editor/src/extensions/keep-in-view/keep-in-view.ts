@@ -71,7 +71,7 @@ export const KeepInView = Extension.create<
 
 export function keepLastLineInView(
   editor: Editor,
-  THRESHOLD = 90,
+  THRESHOLD = 120,
   SCROLL_THRESHOLD = 100
 ) {
   if (
