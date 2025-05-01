@@ -160,23 +160,20 @@ module.exports = {
     description: "Your private note taking space",
     executableName: linuxExecutableName,
     desktop: {
-      actions: [
-        {
-          id: "new-note",
-          name: "New note",
-          args: "new note"
+      desktopActions: {
+        "new-note": {
+          Name: "New note",
+          Exec: `${linuxExecutableName} new note`
         },
-        {
-          id: "new-notebook",
-          name: "New notebook",
-          args: "new notebook"
+        "new-notebook": {
+          Name: "New notebook",
+          Exec: `${linuxExecutableName} new notebook`
         },
-        {
-          id: "new-reminder",
-          name: "New reminder",
-          args: "new reminder"
+        "new-reminder": {
+          Name: "New reminder",
+          Exec: `${linuxExecutableName} new reminder`
         }
-      ]
+      }
     }
   },
   snap: {
