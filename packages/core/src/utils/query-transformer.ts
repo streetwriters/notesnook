@@ -33,20 +33,20 @@ type OperatorNode = {
   type: "AND" | "OR" | "NOT";
 };
 
-const INVALID_CHARS = /[:<>./\\()$&=#!\-+~§@^?,;'"[\]{}|]/;
+const INVALID_QUERY_REGEX = /[!"#$%&'()*+,\-./:;<>=?@[\\\]^_`{|}~§]/;
 function escapeSQLString(str: string): string {
   if (str.startsWith('"') && str.endsWith('"')) {
     const innerStr = str.slice(1, -1).replace(/"/g, '""');
     return `"${innerStr}"`;
   }
 
-  const isInvalidChar = INVALID_CHARS.test(str);
+  const hasInvalidSymbol = INVALID_QUERY_REGEX.test(str);
   const isWildcard =
     str.startsWith("*") ||
     str.endsWith("*") ||
     str.startsWith("%") ||
     str.endsWith("%");
-  if (isInvalidChar || isWildcard) {
+  if (hasInvalidSymbol || isWildcard) {
     return `"${str}"`;
   }
 
