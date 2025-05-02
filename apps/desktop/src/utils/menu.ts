@@ -143,15 +143,43 @@ function setupMenu() {
         })
       );
 
-    if (params.isEditable)
+    if (params.isEditable) {
       menu.append(
         new MenuItem({
           label: strings.paste(),
-          role: "pasteAndMatchStyle",
+          role: "paste",
           enabled: clipboard.readText("clipboard").length > 0,
           accelerator: "CommandOrControl+V"
         })
       );
+
+      menu.append(
+        new MenuItem({
+          label:
+            process.platform === "darwin"
+              ? strings.pasteAndMatchStyle()
+              : strings.pasteWithoutFormatting(),
+          role: "pasteAndMatchStyle",
+          enabled: clipboard.readText("clipboard").length > 0,
+          accelerator:
+            process.platform === "darwin"
+              ? "Option+Shift+Command+V"
+              : "Shift+CommandOrControl+V"
+        })
+      );
+
+      menu.append(
+        new MenuItem({
+          type: "separator"
+        })
+      );
+      menu.append(
+        new MenuItem({
+          label: strings.spellCheck(),
+          role: "toggleSpellChecker"
+        })
+      );
+    }
 
     if (menu.items.length > 0) menu.popup();
   });
