@@ -358,6 +358,9 @@ export class NNMigrationProvider implements MigrationProvider {
         }
       },
       "7": {
+        async up() {}
+      },
+      "8": {
         async up(db) {
           await db.transaction().execute(async (tx) => {
             await tx.schema.dropTable("content_fts").execute();
