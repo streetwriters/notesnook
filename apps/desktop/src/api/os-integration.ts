@@ -43,7 +43,6 @@ import { setupDesktopIntegration } from "../utils/desktop-integration";
 import { rm } from "fs/promises";
 import { disableCustomDns, enableCustomDns } from "../utils/custom-dns";
 import type { MenuItem as NNMenuItem } from "@notesnook/ui";
-import { Resvg } from "@resvg/resvg-js";
 
 const t = initTRPC.create();
 
@@ -241,20 +240,15 @@ export const osIntegrationRouter = t.router({
   showMenu: t.procedure
     .input(
       z.object({
-        menuItems: z.array(z.any()),
-        menuIconColor: z.string()
+        menuItems: z.array(z.any())
       })
     )
-    .subscription(({ input: { menuItems, menuIconColor } }) =>
+    .subscription(({ input: { menuItems } }) =>
       observable<string[]>((emit) => {
         const items = menuItems as NNMenuItem[];
         const menu = new Menu();
         for (const item of items) {
-          const menuItem = toMenuItem(
-            item,
-            (id) => emit.next(id),
-            menuIconColor
-          );
+          const menuItem = toMenuItem(item, (id) => emit.next(id));
           if (menuItem) menu.append(menuItem);
         }
         if (menu.items.length > 0) menu.popup();
@@ -269,7 +263,6 @@ export const osIntegrationRouter = t.router({
 function toMenuItem(
   item: NNMenuItem,
   onClick: (id: string[]) => void,
-  menuIconColor: string,
   parentKey?: string
 ): MenuItem | undefined {
   switch (item.type) {
@@ -281,12 +274,7 @@ function toMenuItem(
       const submenu = item.menu ? new Menu() : undefined;
       if (submenu && item.menu) {
         for (const subitem of item.menu.items) {
-          const subMenuItem = toMenuItem(
-            subitem,
-            onClick,
-            menuIconColor,
-            item.key
-          );
+          const subMenuItem = toMenuItem(subitem, onClick, item.key);
           if (subMenuItem) submenu.append(subMenuItem);
         }
       }
@@ -300,35 +288,10 @@ function toMenuItem(
         checked: item.isChecked,
         type: submenu ? "submenu" : item.isChecked ? "checkbox" : "normal",
         id: item.key,
-        icon: item.icon
-          ? svgPathToPng(
-              item.icon,
-              (item.styles?.icon?.color as string | undefined) || menuIconColor
-            )
-          : undefined,
         submenu,
         click: () => onClick(parentKey ? [parentKey, item.key] : [item.key]),
         accelerator: item.modifier?.replace("Mod", "CommandOrControl")
       });
     }
   }
-}
-
-function svgPathToPng(path: string, color?: string) {
-  const svg = Buffer.from(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="presentation" class="icon" style="stroke-width: 0px; stroke: ${
-      color || config.windowControlsIconColor
-    }; width: 14px; height: 14px;"><path d="${path}" style="fill: ${
-      color || config.windowControlsIconColor
-    };"></path></svg>`
-  );
-  const resvg = new Resvg(svg, {
-    fitTo: { mode: "width", value: 14 },
-    logLevel: "error",
-    font: {
-      loadSystemFonts: false
-    }
-  });
-  const pngData = resvg.render();
-  return nativeImage.createFromBuffer(pngData.asPng());
 }
