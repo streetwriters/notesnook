@@ -21,6 +21,7 @@ import {
   ColumnBuilderCallback,
   CreateTableBuilder,
   ExpressionBuilder,
+  Kysely,
   Migration,
   MigrationProvider,
   sql
@@ -362,33 +363,6 @@ export class NNMigrationProvider implements MigrationProvider {
       },
       "8": {
         async up(db) {
-          await db.transaction().execute(async (tx) => {
-            await tx.schema.dropTable("content_fts").execute();
-            await tx.schema.dropTable("notes_fts").execute();
-
-            await createFTS5Table(
-              "notes_fts",
-              [{ name: "id" }, { name: "title" }],
-              {
-                contentTable: "notes",
-                tokenizer: ["porter", "better_trigram", "remove_diacritics 1"]
-              }
-            ).execute(tx);
-
-            await createFTS5Table(
-              "content_fts",
-              [{ name: "id" }, { name: "noteId" }, { name: "data" }],
-              {
-                contentTable: "content",
-                tokenizer: ["porter", "better_trigram", "remove_diacritics 1"]
-              }
-            ).execute(tx);
-          });
-          await rebuildSearchIndex(db);
-        }
-      },
-      "8": {
-        async up(db) {
           await db.schema
             .alterTable("notes")
             .addColumn("isGeneratedTitle", "boolean")
@@ -401,6 +375,11 @@ export class NNMigrationProvider implements MigrationProvider {
             .alterTable("notes")
             .addColumn("archived", "boolean")
             .execute();
+        }
+      },
+      "10": {
+        async up(db) {
+          await runFTSTablesMigrations(db);
         }
       }
     };
@@ -463,4 +442,26 @@ function createFTS5Table(
   ]);
 
   return sql`CREATE VIRTUAL TABLE ${sql.raw(name)} USING fts5(${args})`;
+}
+
+async function runFTSTablesMigrations(db: Kysely<any>) {
+  await db.transaction().execute(async (tx) => {
+    await tx.schema.dropTable("content_fts").execute();
+    await tx.schema.dropTable("notes_fts").execute();
+
+    await createFTS5Table("notes_fts", [{ name: "id" }, { name: "title" }], {
+      contentTable: "notes",
+      tokenizer: ["porter", "better_trigram", "remove_diacritics 1"]
+    }).execute(tx);
+
+    await createFTS5Table(
+      "content_fts",
+      [{ name: "id" }, { name: "noteId" }, { name: "data" }],
+      {
+        contentTable: "content",
+        tokenizer: ["porter", "better_trigram", "remove_diacritics 1"]
+      }
+    ).execute(tx);
+  });
+  await rebuildSearchIndex(db);
 }
