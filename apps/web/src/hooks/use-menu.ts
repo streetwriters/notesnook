@@ -21,7 +21,6 @@ import { create } from "zustand";
 import { shallow } from "zustand/shallow";
 import { MenuItem, PositionOptions } from "@notesnook/ui";
 import { desktop } from "../common/desktop-bridge";
-import { useThemeEngineStore } from "@notesnook/theme";
 import { isMac } from "../utils/platform";
 
 type MenuOptions = {
@@ -47,18 +46,14 @@ const useMenuStore = create<MenuStore>((set) => ({
   },
   open: async (items, options) => {
     if (IS_DESKTOP_APP && canShowNativeMenu(items) && isMac()) {
-      const serializedItems = await resolveMenuItems(items);
-      const scopes = useThemeEngineStore.getState().theme.scopes;
-      const menuIconColor =
-        scopes.contextMenu?.primary?.icon || scopes.base?.primary?.icon;
+      const resolvedItems = await resolveMenuItems(items);
       desktop?.integration.showMenu.subscribe(
         {
-          menuItems: JSON.parse(JSON.stringify(serializedItems)),
-          menuIconColor
+          menuItems: JSON.parse(JSON.stringify(resolvedItems))
         },
         {
           onData(ids) {
-            findAndCallAction(serializedItems, ids);
+            findAndCallAction(resolvedItems, ids);
           }
         }
       );
