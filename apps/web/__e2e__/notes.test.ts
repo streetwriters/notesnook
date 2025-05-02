@@ -415,3 +415,35 @@ test("archived notebook note shouldn't be in notebooks note list", async ({
 
   expect(await notes?.findNote(NOTE)).toBeUndefined();
 });
+
+test("archived colored note shouldn't be in colors note list", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  let note = await notes.createNote(NOTE);
+  await note?.contextMenu.newColor({ title: "red", color: "#ff0000" });
+  const color = await app.goToColor("red");
+
+  note = await color.findNote(NOTE);
+  expect(note).toBeDefined();
+  await note?.contextMenu.archive();
+
+  expect(await color.findNote(NOTE)).toBeUndefined();
+});
+
+test("archived note shouldn't appear in search results", async ({ page }) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note = await notes.createNote(NOTE);
+
+  await app.search(NOTE.title, "notes");
+  expect(await notes.findNote(NOTE)).toBeDefined();
+  await note?.contextMenu.archive();
+
+  await app.search(NOTE.title, "notes");
+  const searchedNote = await notes.findNote(NOTE);
+  expect(searchedNote).toBeUndefined();
+});
