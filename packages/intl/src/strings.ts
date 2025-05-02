@@ -2231,6 +2231,8 @@ Use this if changes from other devices are not appearing on this device. This wi
   copyLinkText: () => t`Copy link text`,
   copyImage: () => t`Copy image`,
   paste: () => t`Paste`,
+  pasteAndMatchStyle: () => t`Paste and match style`,
+  pasteWithoutFormatting: () => t`Paste without formatting`,
   configure: () => t`Configure`,
   usingOfficialInstance: () => t`Using official Notesnook instance`,
   usingInstance: (instance: string, version: string) =>

@@ -20,7 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { create } from "zustand";
 import { shallow } from "zustand/shallow";
 import { MenuItem, PositionOptions } from "@notesnook/ui";
-// import { isUserPremium } from "./use-is-user-premium";
+import { desktop } from "../common/desktop-bridge";
+import { useThemeEngineStore } from "@notesnook/theme";
 
 type MenuOptions = {
   position?: PositionOptions;
@@ -43,7 +44,28 @@ const useMenuStore = create<MenuStore>((set) => ({
   options: {
     blocking: false
   },
-  open: (items, options) => set(() => ({ isOpen: true, items, options })),
+  open: async (items, options) => {
+    if (IS_DESKTOP_APP && canShowNativeMenu(items)) {
+      const serializedItems = await resolveMenuItems(items);
+      const scopes = useThemeEngineStore.getState().theme.scopes;
+      const menuIconColor =
+        scopes.contextMenu?.primary?.icon || scopes.base?.primary?.icon;
+      desktop?.integration.showMenu.subscribe(
+        {
+          menuItems: JSON.parse(JSON.stringify(serializedItems)),
+          menuIconColor
+        },
+        {
+          onData(ids) {
+            findAndCallAction(serializedItems, ids);
+          }
+        }
+      );
+      set(() => ({ options }));
+    } else {
+      set(() => ({ isOpen: true, items, options }));
+    }
+  },
   close: () =>
     set(() => ({
       isOpen: false,
@@ -83,4 +105,36 @@ export function useMenu() {
     store.options
   ]);
   return { items, options };
+}
+
+async function resolveMenuItems(items: MenuItem[]): Promise<MenuItem[]> {
+  const serialized = [];
+  for (const item of items) {
+    if (item.type === "lazy-loader")
+      serialized.push(...(await resolveMenuItems(await item.items())));
+    else if (item.type === "button") {
+      if (item.menu) item.menu.items = await resolveMenuItems(item.menu.items);
+      serialized.push(item);
+    } else serialized.push(item);
+  }
+  return serialized;
+}
+
+function findAndCallAction(items: MenuItem[], ids: string[]) {
+  let _items: MenuItem[] = items;
+  const actionId = ids.at(-1);
+  for (const id of ids) {
+    const item = _items.find((item) => item.key === id);
+    if (!item || item?.type !== "button") continue;
+    console.log(item);
+    if (id === actionId) {
+      item?.onClick?.();
+    } else {
+      _items = item.menu?.items || [];
+    }
+  }
+}
+
+function canShowNativeMenu(items: MenuItem[]) {
+  return items.every((item) => item.type !== "popup");
 }
