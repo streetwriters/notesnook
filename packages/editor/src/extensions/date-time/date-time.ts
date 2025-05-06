@@ -55,6 +55,8 @@ export type DateTimeOptions = {
   timeFormat: "12-hour" | "24-hour";
 };
 
+const shortcutPrefix = "@";
+
 export const DateTime = Extension.create<DateTimeOptions>({
   name: "datetime",
 
@@ -120,7 +122,7 @@ export const DateTime = Extension.create<DateTimeOptions>({
   addInputRules() {
     return [
       shortcutInputRule({
-        shortcut: "/time",
+        shortcut: shortcutText("time"),
         replace: () => {
           return formatDate(Date.now(), {
             timeFormat: this.options.timeFormat,
@@ -129,7 +131,7 @@ export const DateTime = Extension.create<DateTimeOptions>({
         }
       }),
       shortcutInputRule({
-        shortcut: "/date",
+        shortcut: shortcutText("date"),
         replace: () => {
           return formatDate(Date.now(), {
             dateFormat: this.options.dateFormat,
@@ -138,7 +140,7 @@ export const DateTime = Extension.create<DateTimeOptions>({
         }
       }),
       shortcutInputRule({
-        shortcut: "/now",
+        shortcut: shortcutText("now"),
         replace: () => {
           return formatDate(Date.now(), {
             dateFormat: this.options.dateFormat,
@@ -148,7 +150,7 @@ export const DateTime = Extension.create<DateTimeOptions>({
         }
       }),
       shortcutInputRule({
-        shortcut: "/nowz",
+        shortcut: shortcutText("nowz"),
         replace: () => {
           return formatDate(Date.now(), {
             dateFormat: this.options.dateFormat,
@@ -160,6 +162,10 @@ export const DateTime = Extension.create<DateTimeOptions>({
     ];
   }
 });
+
+function shortcutText(text: string) {
+  return shortcutPrefix + text;
+}
 
 function shortcutInputRule(config: {
   shortcut: string;
