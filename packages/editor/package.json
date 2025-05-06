@@ -32,6 +32,7 @@
   "dependencies": {
     "@notesnook-importer/core": "^2.1.1",
     "@notesnook/common": "file:../common",
+    "@notesnook/core": "file:../core",
     "@notesnook/intl": "file:../intl",
     "@notesnook/theme": "file:../theme",
     "@notesnook/ui": "file:../ui",
@@ -63,6 +64,7 @@
     "@tiptap/extension-underline": "2.6.6",
     "@tiptap/pm": "2.6.6",
     "@tiptap/starter-kit": "2.6.6",
+    "@tiptap/suggestion": "2.6.6",
     "alfaaz": "^1.1.0",
     "async-mutex": "0.5.0",
     "clipboard-polyfill": "4.1.0",
