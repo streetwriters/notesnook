@@ -115,27 +115,31 @@ export default class Lookup {
 
       const titles = await db
         .selectFrom("notes")
-        .where("id", "in", resultsA)
+        .$if(!!transformedQuery && resultsA.length > 0, (eb) =>
+          eb.where("id", "in", resultsA)
+        )
         .select(["id", "title"])
         .execute();
 
       const htmls = await db
         .selectFrom("content")
-        .where("noteId", "in", resultsA)
+        .$if(!!transformedQuery && resultsA.length > 0, (eb) =>
+          eb.where("noteId", "in", resultsA)
+        )
         .select(["data", "noteId as id"])
         .$castTo<{ data: string; id: string }>()
         .execute();
 
-      for (const id of resultsA) {
-        const title = titles.find((t) => t.id === id);
-        const html = htmls.find((h) => h.id === id);
+      for (let i = 0; i < titles.length; i++) {
+        const title = titles[i];
+        const html = htmls.find((h) => h.id === title.id);
         const text = html ? extractText(html.data) : "";
 
         if (
-          smallTokens.every((token) => !!title?.title?.includes(token)) ||
+          smallTokens.every((token) => !!title.title?.includes(token)) ||
           smallTokens.every((token) => !!text?.includes(token))
         ) {
-          results.push(id);
+          results.push(title.id);
         }
       }
 
