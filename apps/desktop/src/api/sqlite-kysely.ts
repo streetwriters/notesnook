@@ -47,7 +47,9 @@ export class SQLite {
       filePath
     ).unsafeMode(true);
     const betterTrigram = require("sqlite-better-trigram");
+    const fts5Html = require("sqlite3-fts5-html");
     betterTrigram.load(this.sqlite);
+    fts5Html.load(this.sqlite);
   }
 
   /**
