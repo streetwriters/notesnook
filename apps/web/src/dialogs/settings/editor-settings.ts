@@ -135,6 +135,20 @@ export const EditorSettings: SettingsGroup[] = [
             toggle: () => useSettingStore.getState().toggleFontLigatures()
           }
         ]
+      },
+      {
+        key: "slash-commands",
+        title: strings.slashCommands(),
+        description: strings.slashCommandsDesc(),
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((c) => c.slashCommands, listener),
+        components: [
+          {
+            type: "toggle",
+            isToggled: () => useSettingStore.getState().slashCommands,
+            toggle: () => useSettingStore.getState().toggleSlashCommands()
+          }
+        ]
       }
     ]
   },

@@ -2329,6 +2329,10 @@ msgstr ""
 msgid "Enable regex"
 msgstr ""
 
+#: src/strings.ts:2474
+msgid "Enable slash commands in the editor, activated by typing \"/\""
+msgstr ""
+
 #: src/strings.ts:2112
 msgid "Enable spell checker"
 msgstr ""
@@ -5688,6 +5692,10 @@ msgstr ""
 
 #: src/strings.ts:664
 msgid "Skip introduction"
+msgstr ""
+
+#: src/strings.ts:2472
+msgid "Slash commands"
 msgstr ""
 
 #: src/strings.ts:1589

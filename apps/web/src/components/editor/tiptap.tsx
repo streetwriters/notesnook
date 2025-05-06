@@ -105,6 +105,7 @@ type TipTapProps = {
   timeFormat: TimeFormat;
   markdownShortcuts: boolean;
   fontLigatures: boolean;
+  slashCommands: boolean;
 };
 
 function updateWordCount(id: string, content: () => Fragment) {
@@ -147,7 +148,8 @@ function TipTap(props: TipTapProps) {
     dateFormat,
     timeFormat,
     markdownShortcuts,
-    fontLigatures
+    fontLigatures,
+    slashCommands
   } = props;
 
   const isUserPremium = useIsUserPremium();
@@ -196,6 +198,7 @@ function TipTap(props: TipTapProps) {
       },
       enableInputRules: markdownShortcuts,
       enableFontLigatures: fontLigatures,
+      enableSlashCommands: slashCommands,
       downloadOptions,
       doubleSpacedLines,
       dateFormat,
@@ -317,7 +320,8 @@ function TipTap(props: TipTapProps) {
     dateFormat,
     timeFormat,
     markdownShortcuts,
-    fontLigatures
+    fontLigatures,
+    slashCommands
   ]);
 
   const editor = useTiptap(
@@ -440,6 +444,7 @@ function TiptapWrapper(
     (store) => store.markdownShortcuts
   );
   const fontLigatures = useSettingsStore((store) => store.fontLigatures);
+  const slashCommands = useSettingsStore((store) => store.slashCommands);
   const containerRef = useRef<HTMLDivElement>(null);
   const editorContainerRef = useRef<HTMLDivElement>();
   const { editorConfig, setEditorConfig } = useEditorConfig();
@@ -514,7 +519,7 @@ function TiptapWrapper(
       }}
     >
       <TipTap
-        key={`tiptap-${props.id}-${doubleSpacedLines}-${dateFormat}-${timeFormat}-${markdownShortcuts}-${fontLigatures}`}
+        key={`tiptap-${props.id}-${doubleSpacedLines}-${dateFormat}-${timeFormat}-${markdownShortcuts}-${fontLigatures}-${slashCommands}`}
         {...props}
         isMobile={isMobile}
         isTablet={isTablet}
@@ -523,6 +528,7 @@ function TiptapWrapper(
         timeFormat={timeFormat}
         markdownShortcuts={markdownShortcuts}
         fontLigatures={fontLigatures}
+        slashCommands={slashCommands}
         onLoad={(editor) => {
           if (!isHydrating) {
             onLoad?.(editor);

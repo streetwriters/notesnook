@@ -58,6 +58,7 @@ class SettingStore extends BaseStore<SettingStore> {
   doubleSpacedParagraphs = Config.get("doubleSpacedLines", true);
   markdownShortcuts = Config.get("markdownShortcuts", true);
   fontLigatures = Config.get("fontLigatures", false);
+  slashCommands = Config.get("slashCommands", true);
   notificationsSettings = Config.get("notifications", { reminder: true });
   isFullOfflineMode = Config.get("fullOfflineMode", false);
   serverUrls: Partial<Record<HostId, string>> = Config.get("serverUrls", {});
@@ -221,6 +222,12 @@ class SettingStore extends BaseStore<SettingStore> {
     const fontLigatures = this.get().fontLigatures;
     this.set((state) => (state.fontLigatures = !fontLigatures));
     Config.set("fontLigatures", !fontLigatures);
+  };
+
+  toggleSlashCommands = () => {
+    const slashCommands = this.get().slashCommands;
+    this.set((state) => (state.slashCommands = !slashCommands));
+    Config.set("slashCommands", !slashCommands);
   };
 
   togglePrivacyMode = async () => {

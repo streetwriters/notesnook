@@ -23,19 +23,21 @@ import { MenuButtonItem, MenuItem } from "./types.js";
 export function useFocus(
   items: MenuItem[],
   onAction: (event: KeyboardEvent) => void,
-  onClose: (event: KeyboardEvent) => void
+  onClose: (event: KeyboardEvent) => void,
+  autoSelectFirstItem: boolean = false
 ) {
-  const [focusIndex, setFocusIndex] = useState(-1);
+  const [focusIndex, setFocusIndex] = useState(autoSelectFirstItem ? 0 : -1);
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
 
   const moveItemIntoView = useCallback(
     (index: number) => {
       const item = items[index];
       if (!item) return;
-      const element = document.getElementById(item.key);
+      const element = document.getElementById("menu-item-" + item.key);
       if (!element) return;
       element.scrollIntoView({
-        behavior: "auto"
+        behavior: "auto",
+        block: "nearest"
       });
     },
     [items]

@@ -39,10 +39,11 @@ import { ScrollContainer } from "../scroll-container/index.js";
 type MenuProps = MenuContainerProps & {
   items?: MenuItem[];
   onClose: () => void;
+  autoSelectFirstItem?: boolean;
 };
 
 export function Menu(props: MenuProps) {
-  const { items = [], onClose, ...containerProps } = props;
+  const { items = [], onClose, autoSelectFirstItem, ...containerProps } = props;
   const hoverTimeout = useRef<number>();
   const onAction = useCallback(
     (e?: Event, item?: MenuButtonItem) => {
@@ -63,7 +64,8 @@ export function Menu(props: MenuProps) {
         const item = items[focusIndex];
         if (item && item.type === "button") onAction(e, item);
       },
-      () => onClose()
+      () => onClose(),
+      autoSelectFirstItem
     );
   const focusedItem = items[focusIndex];
 

@@ -86,6 +86,7 @@ import { getChangedNodes } from "./utils/prosemirror.js";
 import { strings } from "@notesnook/intl";
 import { InlineCode } from "./extensions/inline-code/inline-code.js";
 import { FontLigature } from "./extensions/font-ligature/font-ligature.js";
+import { SlashCommands } from "./extensions/slash-commands/slash-commands.js";
 
 interface TiptapStorage {
   dateFormat?: DateTimeOptions["dateFormat"];
@@ -129,6 +130,7 @@ export type TiptapOptions = EditorOptions &
     isMobile?: boolean;
     doubleSpacedLines?: boolean;
     enableFontLigatures?: boolean;
+    enableSlashCommands?: boolean;
   } & {
     placeholder: string;
   };
@@ -154,6 +156,7 @@ const useTiptap = (
     downloadOptions,
     editorProps,
     enableFontLigatures,
+    enableSlashCommands,
     ...restOptions
   } = options;
 
@@ -362,7 +365,10 @@ const useTiptap = (
             }
           ]
         }),
-        FontLigature.configure({ enabled: enableFontLigatures })
+        FontLigature.configure({ enabled: enableFontLigatures }),
+        SlashCommands.configure({
+          enabled: enableSlashCommands
+        })
       ],
       onBeforeCreate: ({ editor }) => {
         editor.storage.dateFormat = dateFormat;
