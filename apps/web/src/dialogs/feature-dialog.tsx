@@ -109,6 +109,10 @@ const features: Record<FeatureKeys, Feature> = {
                 drag and drop your notes from other note-taking apps and viola!
               </>
             )
+          },
+          {
+            title: "Improved search",
+            subtitle: "Search should now be much more accurate and predictable."
           }
         ],
     cta: {
