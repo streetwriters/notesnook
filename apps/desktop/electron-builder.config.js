@@ -57,6 +57,7 @@ module.exports = {
     "node_modules/bindings",
     "node_modules/node-gyp-build",
     "node_modules/sqlite-better-trigram",
+    "node_modules/sqlite3-fts5-html",
     "node_modules/sodium-native/prebuilds/${platform}-${arch}",
     {
       from: "node_modules/sqlite-better-trigram-linux-${arch}",
@@ -70,6 +71,20 @@ module.exports = {
       from: "node_modules/sqlite-better-trigram-windows-${arch}",
       to: "node_modules/sqlite-better-trigram-windows-${arch}"
     },
+
+    {
+      from: "node_modules/sqlite3-fts5-html-linux-${arch}",
+      to: "node_modules/sqlite3-fts5-html-linux-${arch}"
+    },
+    {
+      from: "node_modules/sqlite3-fts5-html-darwin-${arch}",
+      to: "node_modules/sqlite3-fts5-html-darwin-${arch}"
+    },
+    {
+      from: "node_modules/sqlite3-fts5-html-windows-${arch}",
+      to: "node_modules/sqlite3-fts5-html-windows-${arch}"
+    },
+
     "node_modules/sodium-native/index.js",
     "node_modules/sodium-native/package.json"
   ],
