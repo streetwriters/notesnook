@@ -459,7 +459,7 @@ async function runFTSTablesMigrations(db: Kysely<any>) {
       [{ name: "id" }, { name: "noteId" }, { name: "data" }],
       {
         contentTable: "content",
-        tokenizer: ["porter", "better_trigram", "remove_diacritics 1"]
+        tokenizer: ["html", "porter", "better_trigram", "remove_diacritics 1"]
       }
     ).execute(tx);
   });

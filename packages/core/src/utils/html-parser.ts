@@ -102,3 +102,17 @@ export class HTMLParser {
     this.parser.reset();
   }
 }
+
+export function extractText(html: string) {
+  let text = "";
+  const parser = new Parser(
+    {
+      ontext: (data) => (text += data)
+    },
+    {
+      lowerCaseTags: false
+    }
+  );
+  parser.end(html);
+  return text;
+}

@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { stopwords } from "@orama/stopwords";
+
 type ASTNode = QueryNode | PhraseNode | OperatorNode;
 
 type QueryNode = {
@@ -150,35 +152,7 @@ function generateSQL(ast: QueryNode): string {
   return ast.children
     .map((child) => {
       if (child.type === "phrase") {
-        const result: string[] = [];
-        for (const value of child.value) {
-          if (value.length === 1 || value.length === 2) {
-            result.push(`(">${value}"`, "OR", value, "OR", `"${value}<")`);
-            result.push("AND");
-            continue;
-          } else if (
-            value.length === 3 &&
-            value[0] === '"' &&
-            value[2] === '"' &&
-            !["<", ">"].includes(value[1])
-          ) {
-            result.push(
-              `(">${value[1]}"`,
-              "OR",
-              value,
-              "OR",
-              `"${value[1]}<")`
-            );
-            result.push("AND");
-            continue;
-          }
-
-          result.push(value);
-          result.push("AND");
-        }
-        result.pop();
-        return result.join(" ");
-        // return child.value.join(" AND ");
+        return child.value.join(" AND ");
       }
       if (child.type === "AND" || child.type === "OR" || child.type === "NOT") {
         return child.type;
@@ -188,6 +162,11 @@ function generateSQL(ast: QueryNode): string {
     .join(" ");
 }
 
-export function transformQuery(query: string): string {
-  return generateSQL(transformAST(parseTokens(tokenize(query))));
+export function transformQuery(query: string) {
+  const tokens = tokenize(query).filter((token) => !stopwords.includes(token));
+  const largeTokens = tokens.filter((token) => token.length >= 3);
+  return {
+    query: generateSQL(transformAST(parseTokens(largeTokens))),
+    tokens
+  };
 }
