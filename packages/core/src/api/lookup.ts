@@ -36,6 +36,7 @@ import { rebuildSearchIndex } from "../database/fts.js";
 import { transformQuery } from "../utils/query-transformer.js";
 import { getSortSelectors } from "../utils/grouping.js";
 import { fuzzy } from "../utils/fuzzy.js";
+import { extractText } from "../utils/html-parser.js";
 
 type SearchResults<T> = {
   sorted: (limit?: number) => Promise<VirtualizedGrouping<T>>;
@@ -52,65 +53,93 @@ type FuzzySearchField<T> = {
 export default class Lookup {
   constructor(private readonly db: Database) {}
 
-  notes(
-    query: string,
-    notes?: FilteredSelector<Note>,
-    opts?: { titleOnly?: boolean }
-  ): SearchResults<Note> {
+  notes(query: string, notes?: FilteredSelector<Note>): SearchResults<Note> {
     return this.toSearchResults(async (limit, sortOptions) => {
       const db = this.db.sql() as unknown as Kysely<RawDatabaseSchema>;
       const excludedIds = this.db.trash.cache.notes;
 
-      query = transformQuery(query);
-      const results = await db
-        .selectFrom((eb) =>
-          eb
-            .selectFrom("notes_fts")
-            .$if(!!notes, (eb) =>
-              eb.where("id", "in", notes!.filter.select("id"))
-            )
-            .$if(excludedIds.length > 0, (eb) =>
-              eb.where("id", "not in", excludedIds)
-            )
-            .where("title", "match", query)
-            .select(["id", sql<number>`rank * 10`.as("rank")])
-            .$if(!opts?.titleOnly, (eb) =>
-              eb.unionAll((eb) =>
+      const { query: transformedQuery, tokens } = transformQuery(query);
+
+      const resultsA: string[] =
+        transformedQuery.length === 0
+          ? []
+          : await db
+              .selectFrom((eb) =>
                 eb
-                  .selectFrom("content_fts")
+                  .selectFrom("notes_fts")
                   .$if(!!notes, (eb) =>
-                    eb.where("noteId", "in", notes!.filter.select("id"))
+                    eb.where("id", "in", notes!.filter.select("id"))
                   )
                   .$if(excludedIds.length > 0, (eb) =>
                     eb.where("id", "not in", excludedIds)
                   )
-                  .where("data", "match", query)
-                  .select(["noteId as id", "rank"])
-                  .$castTo<{
-                    id: string;
-                    rank: number;
-                  }>()
+                  .where("title", "match", transformedQuery)
+                  .select(["id", sql<number>`rank * 10`.as("rank")])
+                  .unionAll((eb) =>
+                    eb
+                      .selectFrom("content_fts")
+                      .$if(!!notes, (eb) =>
+                        eb.where("noteId", "in", notes!.filter.select("id"))
+                      )
+                      .$if(excludedIds.length > 0, (eb) =>
+                        eb.where("noteId", "not in", excludedIds)
+                      )
+                      .where("data", "match", transformedQuery)
+                      .select(["noteId as id", "rank"])
+                      .$castTo<{
+                        id: string;
+                        rank: number;
+                      }>()
+                  )
+                  .as("results")
               )
-            )
-            .as("results")
-        )
-        .select(["results.id"])
-        .groupBy("results.id")
-        .orderBy(sql`SUM(results.rank)`, sortOptions?.sortDirection || "desc")
-        .$if(!!limit, (eb) => eb.limit(limit!))
+              .select(["results.id"])
+              .groupBy("results.id")
+              .orderBy(
+                sql`SUM(results.rank)`,
+                sortOptions?.sortDirection || "desc"
+              )
+              .execute()
+              .catch((e) => {
+                logger.error(e, `Error while searching`, { query });
+                return [];
+              })
+              .then((r) => r.map((r) => r.id));
 
-        // filter out ids that have no note against them
-        .where(
-          "results.id",
-          "in",
-          (notes || this.db.notes.all).filter.select("id")
-        )
-        .execute()
-        .catch((e) => {
-          logger.error(e, `Error while searching`, { query });
-          return [];
-        });
-      return results.map((r) => r.id);
+      const smallTokens = tokens.filter(
+        (token) => token.length < 3 && token !== "OR"
+      );
+      if (smallTokens.length === 0) return resultsA;
+
+      const results = [];
+
+      const titles = await db
+        .selectFrom("notes")
+        .where("id", "in", resultsA)
+        .select(["id", "title"])
+        .execute();
+
+      const htmls = await db
+        .selectFrom("content")
+        .where("noteId", "in", resultsA)
+        .select(["data", "noteId as id"])
+        .$castTo<{ data: string; id: string }>()
+        .execute();
+
+      for (const id of resultsA) {
+        const title = titles.find((t) => t.id === id);
+        const html = htmls.find((h) => h.id === id);
+        const text = html ? extractText(html.data) : "";
+
+        if (
+          smallTokens.every((token) => !!title?.title?.includes(token)) ||
+          smallTokens.every((token) => !!text?.includes(token))
+        ) {
+          results.push(id);
+        }
+      }
+
+      return results;
     }, notes || this.db.notes.all);
   }
 
