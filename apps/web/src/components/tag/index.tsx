@@ -105,6 +105,7 @@ export const tagMenuItems: (tag: TagType, ids?: string[]) => MenuItem[] = (
   tag,
   ids = []
 ) => {
+  const defaultTag = db.settings.getDefaultTag();
   return [
     {
       type: "button",
@@ -112,6 +113,18 @@ export const tagMenuItems: (tag: TagType, ids?: string[]) => MenuItem[] = (
       title: strings.renameTag(),
       icon: Edit.path,
       onClick: () => EditTagDialog.show(tag)
+    },
+    {
+      type: "button",
+      key: "set-as-default",
+      title: strings.setAsDefault(),
+      isChecked: defaultTag === tag.id,
+      icon: TagIcon.path,
+      onClick: async () => {
+        const defaultTag = db.settings.getDefaultTag();
+        const isDefault = defaultTag === tag.id;
+        await db.settings.setDefaultTag(isDefault ? undefined : tag.id);
+      }
     },
     {
       type: "lazy-loader",

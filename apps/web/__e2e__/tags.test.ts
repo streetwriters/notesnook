@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { test, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
 import { Item } from "./models/types";
-import { groupByOptions, NOTE, orderByOptions, sortByOptions } from "./utils";
+import { NOTE, orderByOptions, sortByOptions } from "./utils";
 
 const TAG: Item = { title: "hello-world" };
 const EDITED_TAG: Item = { title: "hello-world-2" };
@@ -235,4 +235,85 @@ test("creating more than 5 tags shouldn't be possible on basic plan", async ({
     app.toasts.waitForToast("Upgrade to Notesnook Pro to create more tags.")
   ]);
   expect(result).toBe(true);
+});
+
+test("when default tag is set, created note in notes context should have default tag", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  let tags = await app.goToTags();
+  let tag = await tags.createItem(TAG);
+  await tag?.setAsDefault();
+
+  const notes = await app.goToNotes();
+  await notes?.createNote(NOTE);
+  tags = await app.goToTags();
+  tag = await tags.findItem(TAG);
+  const openedTag = await tag?.open();
+
+  expect(await openedTag?.findNote(NOTE)).toBeDefined();
+});
+
+test("when default tag is set, created note in other tag's context should not have default tag", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  let tags = await app.goToTags();
+  let tag = await tags.createItem(TAG);
+  await tag?.setAsDefault();
+
+  const otherTag = await tags.createItem({
+    title: "Other Tag"
+  });
+  const openedOtherTag = await otherTag?.open();
+  await openedOtherTag?.createNote(NOTE);
+  tags = await app.goToTags();
+  tag = await tags.findItem(TAG);
+  const openedTag = await tag?.open();
+
+  expect(await openedTag?.findNote(NOTE)).toBeUndefined();
+});
+
+test("when default tag is set, created note in notebooks context should have default tag", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  let tags = await app.goToTags();
+  let tag = await tags.createItem(TAG);
+  await tag?.setAsDefault();
+
+  const notebooks = await app.goToNotebooks();
+  const notebook = await notebooks.createNotebook({ title: "Test Notebook" });
+  const openedNotebook = await notebook?.openNotebook();
+  await openedNotebook?.createNote(NOTE);
+  tags = await app.goToTags();
+  tag = await tags.findItem(TAG);
+  const openedTag = await tag?.open();
+
+  expect(await openedTag?.findNote(NOTE)).toBeDefined();
+});
+
+test("when default tag is set, created note in colors context should have default tag", async ({
+  page
+}) => {
+  const coloredNote = { title: "Red note", content: NOTE.content };
+  const app = new AppModel(page);
+  await app.goto();
+  let tags = await app.goToTags();
+  let tag = await tags.createItem(TAG);
+  await tag?.setAsDefault();
+
+  const notes = await app.goToNotes();
+  const note = await notes.createNote(NOTE);
+  await note?.contextMenu.newColor({ color: "#ff0000", title: "red" });
+  const color = await app.goToColor("red");
+  await color?.createNote(coloredNote);
+  tags = await app.goToTags();
+  tag = await tags.findItem(TAG);
+  const openedTag = await tag?.open();
+
+  expect(await openedTag?.findNote(coloredNote)).toBeDefined();
 });
