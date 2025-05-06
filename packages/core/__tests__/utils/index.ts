@@ -31,6 +31,7 @@ import { tmpdir } from "os";
 import { getId } from "../../src/utils/id.js";
 import { existsSync, mkdirSync } from "fs";
 import * as betterTrigram from "sqlite-better-trigram";
+import * as fts5Html from "sqlite3-fts5-html";
 
 const TEST_NOTEBOOK: Partial<Notebook> = {
   title: "Test Notebook",
@@ -65,6 +66,7 @@ function databaseTest(type: "memory" | "persistent" = "memory") {
     batchSize: 500
   });
   betterTrigram.load(betterSqliteDb);
+  fts5Html.load(betterSqliteDb);
   return db.init().then(() => db);
 }
 
