@@ -106,8 +106,10 @@ export default class Lookup {
               })
               .then((r) => r.map((r) => r.id));
 
-      const smallTokens = tokens.filter(
-        (token) => token.length < 3 && token !== "OR"
+      const smallTokens = Array.from(
+        new Set(
+          tokens.filter((token) => token.length < 3 && token !== "OR")
+        ).values()
       );
       if (smallTokens.length === 0) return resultsA;
 

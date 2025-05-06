@@ -162,7 +162,9 @@ function generateSQL(ast: QueryNode): string {
 
 export function transformQuery(query: string) {
   const tokens = tokenize(query);
-  const largeTokens = tokens.filter((token) => token.length >= 3);
+  const largeTokens = tokens.filter(
+    (token) => token.length >= 3 || token === "OR"
+  );
   return {
     query: generateSQL(transformAST(parseTokens(largeTokens))),
     tokens
