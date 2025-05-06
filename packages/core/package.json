@@ -67,7 +67,6 @@
     "@leeoniya/ufuzzy": "^1.0.10",
     "@microsoft/signalr": "^8.0.0",
     "@notesnook/logger": "file:../logger",
-    "@orama/stopwords": "^3.1.6",
     "@readme/data-urls": "^3.0.0",
     "@streetwriters/kysely": "^0.27.4",
     "@streetwriters/showdown": "^3.0.9-alpha",
