@@ -60,13 +60,13 @@ test("add invalid note", () =>
   databaseTest().then(async (db) => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    expect(db.notes.add()).rejects.toThrow();
+    await expect(db.notes.add()).rejects.toThrow();
 
-    expect(db.notes.add({})).rejects.toThrow();
+    await expect(db.notes.add({})).rejects.toThrow();
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    expect(db.notes.add({ hello: "world" })).rejects.toThrow();
+    await expect(db.notes.add({ hello: "world" })).rejects.toThrow();
   }));
 
 test("add note", () =>
