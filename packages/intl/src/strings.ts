@@ -2468,5 +2468,8 @@ Use this if changes from other devices are not appearing on this device. This wi
   defaultSidebarTabDesc: () => t`Select the default sidebar tab`,
   unsetAsHomepage: () => t`Reset homepage`,
   archive: () => t`Archive`,
-  yourArchiveIsEmpty: () => t`Your archive is empty`
+  yourArchiveIsEmpty: () => t`Your archive is empty`,
+  slashCommands: () => t`Slash commands`,
+  slashCommandsDesc: () =>
+    t`Enable slash commands in the editor, activated by typing "/"`
 };

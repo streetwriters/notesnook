@@ -145,7 +145,15 @@ const slashCommands = [
 ];
 
 export const SlashCommands = Extension.create({
+  addOptions() {
+    return {
+      enabled: false
+    };
+  },
+
   addProseMirrorPlugins() {
+    if (!this.options.enabled) return [];
+
     return [
       Suggestion({
         editor: this.editor,

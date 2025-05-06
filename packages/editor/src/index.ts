@@ -130,6 +130,7 @@ export type TiptapOptions = EditorOptions &
     isMobile?: boolean;
     doubleSpacedLines?: boolean;
     enableFontLigatures?: boolean;
+    enableSlashCommands?: boolean;
   } & {
     placeholder: string;
   };
@@ -155,6 +156,7 @@ const useTiptap = (
     downloadOptions,
     editorProps,
     enableFontLigatures,
+    enableSlashCommands,
     ...restOptions
   } = options;
 
@@ -364,7 +366,9 @@ const useTiptap = (
           ]
         }),
         FontLigature.configure({ enabled: enableFontLigatures }),
-        SlashCommands
+        SlashCommands.configure({
+          enabled: enableSlashCommands
+        })
       ],
       onBeforeCreate: ({ editor }) => {
         editor.storage.dateFormat = dateFormat;

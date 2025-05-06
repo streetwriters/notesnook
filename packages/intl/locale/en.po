@@ -2340,6 +2340,10 @@ msgstr "Enable ligatures for common symbols like →, ←, etc"
 msgid "Enable regex"
 msgstr "Enable regex"
 
+#: src/strings.ts:2474
+msgid "Enable slash commands in the editor, activated by typing \"/\""
+msgstr "Enable slash commands in the editor, activated by typing \"/\""
+
 #: src/strings.ts:2112
 msgid "Enable spell checker"
 msgstr "Enable spell checker"
@@ -5723,6 +5727,10 @@ msgstr "Skip & go directly to the app"
 #: src/strings.ts:664
 msgid "Skip introduction"
 msgstr "Skip introduction"
+
+#: src/strings.ts:2472
+msgid "Slash commands"
+msgstr "Slash commands"
 
 #: src/strings.ts:1589
 msgid "Some exported notes are locked, Unlock to export them"
