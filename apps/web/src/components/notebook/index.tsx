@@ -25,12 +25,12 @@ import {
   ChevronDown,
   ChevronRight,
   NotebookEdit,
-  Pin,
   Plus,
   RemoveShortcutLink,
   Shortcut,
   Trash,
-  Notebook as NotebookIcon
+  Notebook as NotebookIcon,
+  ArrowUp
 } from "../icons";
 import { MenuItem } from "@notesnook/ui";
 import { hashNavigate, navigate } from "../../navigation";
@@ -44,6 +44,7 @@ import { Multiselect } from "../../common/multi-select";
 import { strings } from "@notesnook/intl";
 import { db } from "../../common/db";
 import { createSetDefaultHomepageMenuItem } from "../../common";
+import { useStore as useNotebookStore } from "../../stores/notebook-store";
 
 type NotebookProps = {
   item: NotebookType;
@@ -191,7 +192,6 @@ export const notebookMenuItems: (
         )
     },
     { type: "separator", key: "sepep2" },
-
     {
       type: "button",
       key: "edit",
@@ -233,6 +233,11 @@ export const notebookMenuItems: (
     },
     { key: "sep", type: "separator" },
     {
+      type: "lazy-loader",
+      key: "move-to-top-loader",
+      items: async () => moveToTopMenuItem(notebook)
+    },
+    {
       type: "button",
       key: "movetotrash",
       title: strings.moveToTrash(),
@@ -243,3 +248,40 @@ export const notebookMenuItems: (
     }
   ];
 };
+
+async function moveToTopMenuItem(notebook: NotebookType): Promise<MenuItem[]> {
+  const relation = await db.relations
+    .to(
+      {
+        id: notebook.id,
+        type: "notebook"
+      },
+      "notebook"
+    )
+    .get();
+  const parentNotebookId = relation[0]?.fromId;
+
+  return [
+    {
+      type: "button",
+      key: "move-to-top",
+      icon: ArrowUp.path,
+      title: strings.moveToTop(),
+      isHidden: !parentNotebookId,
+      onClick: async () => {
+        if (!parentNotebookId) return;
+
+        await db.relations.unlink(
+          {
+            type: "notebook",
+            id: parentNotebookId
+          },
+          notebook
+        );
+        await useNotebookStore.getState().refresh();
+      },
+      multiSelect: false
+    },
+    { key: "move-to-top-sep", type: "separator", isHidden: !parentNotebookId }
+  ];
+}
