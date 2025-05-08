@@ -32,6 +32,7 @@ import Dialog from "../../components/dialog";
 import { Cross } from "../../components/icons";
 import { CustomScrollbarsVirtualList } from "../../components/list-container";
 import { useEditorStore } from "../../stores/editor-store";
+import { useStore as useNoteStore } from "../../stores/note-store";
 import { strings } from "@notesnook/intl";
 import { isMac } from "../../utils/platform";
 import {
@@ -119,6 +120,16 @@ export const CommandPaletteDialog = DialogManager.register(
             if (commands.status !== "fulfilled") return;
             if (e.key == "Enter") {
               e.preventDefault();
+
+              if (e.shiftKey && !props.isCommandMode) {
+                db.notes.add({ title: query }).then((note) => {
+                  useEditorStore.getState().openSession(note);
+                  useNoteStore.getState().refresh();
+                });
+                props.onClose(false);
+                return;
+              }
+
               const command = commands.value.commands[selected];
               if (!command) return;
               command.action?.(command, {
@@ -524,6 +535,10 @@ function getCommandPaletteHelp(isCommandMode: boolean) {
           {
             key: isMac() ? "⌘⏎" : "Ctrl+⏎",
             description: strings.openInNewTab()
+          },
+          {
+            key: "Shift+⏎",
+            description: strings.createNewNote()
           },
           {
             key: isMac() ? "⌘K" : "Ctrl+K",
