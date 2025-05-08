@@ -21,10 +21,8 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Box, Button, Flex, Image, Text } from "@theme-ui/components";
 import {
   Note,
-  Notebook as NotebookIcon,
   StarOutline,
   Monographs,
-  Tag as TagIcon,
   Trash,
   Settings,
   Notebook2,
@@ -37,12 +35,9 @@ import {
   Icon,
   Reminders,
   User,
-  Home,
   Pro,
   Documentation,
   Logout,
-  Plus,
-  SortBy,
   Reset,
   Rename,
   ExpandSidebar,
@@ -67,8 +62,6 @@ import { useStore as useNoteStore } from "../../stores/note-store";
 import { useStore as useReminderStore } from "../../stores/reminder-store";
 import { useStore as useMonographStore } from "../../stores/monograph-store";
 import { useStore as useTrashStore } from "../../stores/trash-store";
-import { useStore as useNotebookStore } from "../../stores/notebook-store";
-import { useStore as useTagStore } from "../../stores/tag-store";
 import { useStore as useSearchStore } from "../../stores/search-store";
 import useLocation from "../../hooks/use-location";
 import { FlexScrollContainer } from "../scroll-container";
@@ -100,16 +93,11 @@ import Tags from "../../views/tags";
 import { Notebooks } from "../../views/notebooks";
 import { UserProfile } from "../../dialogs/settings/components/user-profile";
 import { SUBSCRIPTION_STATUS } from "../../common/constants";
-import {
-  CREATE_BUTTON_MAP,
-  createSetDefaultHomepageMenuItem,
-  logout
-} from "../../common";
+import { createSetDefaultHomepageMenuItem, logout } from "../../common";
 import { TabItem } from "./tab-item";
 import Notice from "../notice";
-import { usePromise } from "@notesnook/common";
-import { showSortMenu } from "../group-header";
 import { Freeze } from "react-freeze";
+import { NavigationTabItem, tabs } from "./tabs";
 
 type Route = {
   id: "notes" | "favorites" | "reminders" | "monographs" | "trash" | "archive";
@@ -148,55 +136,6 @@ const routes: Route[] = [
   }
 ];
 
-const tabs = [
-  {
-    id: "home",
-    icon: Home,
-    title: strings.routes.Home(),
-    actions: []
-  },
-  {
-    id: "notebooks",
-    icon: NotebookIcon,
-    title: strings.routes.Notebooks(),
-    actions: [
-      {
-        id: "create-notebook-button",
-        title: CREATE_BUTTON_MAP.notebooks.title,
-        icon: Plus,
-        onClick: CREATE_BUTTON_MAP.notebooks.onClick
-      },
-      {
-        id: "notebooks-sort-button",
-        title: strings.sortBy(),
-        icon: SortBy,
-        onClick: () =>
-          showSortMenu("notebooks", () => useNotebookStore.getState().refresh())
-      }
-    ]
-  },
-  {
-    id: "tags",
-    icon: TagIcon,
-    title: strings.routes.Tags(),
-    actions: [
-      {
-        id: "create-tag-button",
-        title: CREATE_BUTTON_MAP.tags.title,
-        icon: Plus,
-        onClick: CREATE_BUTTON_MAP.tags.onClick
-      },
-      {
-        id: "tags-sort-button",
-        title: strings.sortBy(),
-        icon: SortBy,
-        onClick: () =>
-          showSortMenu("tags", () => useTagStore.getState().refresh())
-      }
-    ]
-  }
-] as const;
-
 const settings = {
   id: "settings",
   title: strings.routes.Settings(),
@@ -206,14 +145,13 @@ const settings = {
 
 function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
   const isFocusMode = useAppStore((store) => store.isFocusMode);
-  const [currentTab, setCurrentTab] = useState<(typeof tabs)[number]>(() => {
-    const defaultSidebarTab = useSettingStore.getState().defaultSidebarTab;
-    return tabs.find((tab) => tab.id === defaultSidebarTab) || tabs[0];
-  });
+  const navigationTab = useAppStore((store) => store.navigationTab);
+  const setNavigationTab = useAppStore((store) => store.setNavigationTab);
   const isNavPaneCollapsed = useAppStore((store) => store.isNavPaneCollapsed);
   const [expanded, setExpanded] = useState(false);
   const isCollapsed = isNavPaneCollapsed && !expanded;
   const mouseHoverTimeout = useRef(0);
+  const currentTab = tabs.find((tab) => tab.id === navigationTab) || tabs[0];
 
   useEffect(() => {
     if (isNavPaneCollapsed) setExpanded(false);
@@ -351,7 +289,7 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
               selected={currentTab.id === tab.id}
               onClick={() => {
                 if (isNavPaneCollapsed) setExpanded(true);
-                setCurrentTab(tab);
+                setNavigationTab(tab.id);
               }}
             />
           ))}
@@ -433,6 +371,7 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
   );
 }
 export default React.memo(NavigationMenu);
+export { type NavigationTabItem };
 
 function Routes({
   isCollapsed,

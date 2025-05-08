@@ -26,7 +26,6 @@ import { store as tagStore } from "./tag-store";
 import { store as attachmentStore } from "./attachment-store";
 import { store as monographStore } from "./monograph-store";
 import { store as reminderStore } from "./reminder-store";
-import { store as announcementStore } from "./announcement-store";
 import { store as settingStore } from "./setting-store";
 import BaseStore from "./index";
 import { showToast } from "../utils/toast";
@@ -44,6 +43,7 @@ import { strings } from "@notesnook/intl";
 import { useEditorStore } from "./editor-store";
 import { useEditorManager } from "../components/editor/manager";
 import { exitFullscreen } from "../utils/fullscreen";
+import { NavigationTabItem } from "../components/navigation-menu";
 
 type SyncState =
   | "synced"
@@ -82,6 +82,7 @@ class AppStore extends BaseStore<AppStore> {
   notices: Notice[] = [];
   shortcuts: (Notebook | Tag)[] = [];
   lastSynced = 0;
+  navigationTab: NavigationTabItem["id"] = settingStore.get().defaultSidebarTab;
 
   init = () => {
     this.refresh();
@@ -367,6 +368,10 @@ class AppStore extends BaseStore<AppStore> {
   isSyncing = () => {
     const status = this.get().syncStatus.key;
     return status === "syncing";
+  };
+
+  setNavigationTab = (tab: NavigationTabItem["id"]) => {
+    this.set((state) => (state.navigationTab = tab));
   };
 }
 
