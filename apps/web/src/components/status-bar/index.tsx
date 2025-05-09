@@ -182,11 +182,12 @@ function StatusBar() {
               sx={{
                 alignItems: "center",
                 justifyContent: "center",
-                display: "flex"
+                display: "flex",
+                height: "100%"
               }}
               data-test-id="vault-unlocked"
             >
-              <Unlock size={10} />
+              <Unlock size={12} />
               <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
                 {strings.vaultUnlocked()}
               </Text>

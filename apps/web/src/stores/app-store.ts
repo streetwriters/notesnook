@@ -68,6 +68,7 @@ class AppStore extends BaseStore<AppStore> {
   isListPaneVisible = true;
   isNavPaneCollapsed = false;
   isVaultCreated = false;
+  keepVaultNotesUnlocked = Config.get("keepVaultNotesUnlocked", false);
   isAutoSyncEnabled = Config.get("autoSyncEnabled", true);
   isSyncEnabled = Config.get("syncEnabled", true);
   isRealtimeSyncEnabled = Config.get("isRealtimeSyncEnabled", true);
@@ -367,6 +368,12 @@ class AppStore extends BaseStore<AppStore> {
   isSyncing = () => {
     const status = this.get().syncStatus.key;
     return status === "syncing";
+  };
+
+  toggleKeepVaultNotesUnlocked = () => {
+    const newValue = !this.get().keepVaultNotesUnlocked;
+    Config.set("keepVaultNotesUnlocked", newValue);
+    this.set({ keepVaultNotesUnlocked: newValue });
   };
 }
 

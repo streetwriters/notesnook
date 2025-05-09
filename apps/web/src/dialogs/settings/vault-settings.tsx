@@ -55,6 +55,24 @@ export const VaultSettings: SettingsGroup[] = [
         ]
       },
       {
+        key: "keep-note-unlocked",
+        title: "Keep note unlocked",
+        description:
+          "Keep a vault note unlocked once it is opened. Note will be locked back once vault is locked.",
+        isHidden: () => !useAppStore.getState().isVaultCreated,
+        onStateChange: (listener) =>
+          useAppStore.subscribe((s) => s.isVaultCreated, listener),
+        components: [
+          {
+            type: "toggle",
+            isToggled: () => useAppStore.getState().keepVaultNotesUnlocked,
+            toggle: () => {
+              useAppStore.getState().toggleKeepVaultNotesUnlocked();
+            }
+          }
+        ]
+      },
+      {
         key: "change-vault-password",
         title: strings.changeVaultPassword(),
         description: strings.changeVaultPasswordDesc(),
