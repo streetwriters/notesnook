@@ -2468,5 +2468,8 @@ Use this if changes from other devices are not appearing on this device. This wi
   defaultSidebarTabDesc: () => t`Select the default sidebar tab`,
   unsetAsHomepage: () => t`Reset homepage`,
   archive: () => t`Archive`,
-  yourArchiveIsEmpty: () => t`Your archive is empty`
+  yourArchiveIsEmpty: () => t`Your archive is empty`,
+  keepNoteUnlocked: () => t`Keep note unlocked`,
+  keepNoteUnlockedDesc: () =>
+    t`Keep a vault note unlocked once it is opened. Note will be locked back once vault is locked.`
 };

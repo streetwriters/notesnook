@@ -77,4 +77,11 @@ export class NoteItemModel extends BaseItemModel {
     }
     return tags;
   }
+
+  async isLockedNotePasswordFieldVisible() {
+    return this.page
+      .locator(".active")
+      .locator(getTestId("unlock-note-password"))
+      .isVisible();
+  }
 }

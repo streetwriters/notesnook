@@ -3278,6 +3278,14 @@ msgstr ""
 msgid "Keep"
 msgstr ""
 
+#: src/strings.ts:2474
+msgid "Keep a vault note unlocked once it is opened. Note will be locked back once vault is locked."
+msgstr ""
+
+#: src/strings.ts:2472
+msgid "Keep note unlocked"
+msgstr ""
+
 #: src/strings.ts:2006
 msgid "Keep open"
 msgstr ""

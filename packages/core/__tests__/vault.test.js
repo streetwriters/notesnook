@@ -83,6 +83,7 @@ test("lock a note", () =>
     expect(content.data.cipher).toBeDefined();
 
     expect(await db.relations.from(vault, "note").has(id)).toBe(true);
+    expect(db.vault.isNoteOpened(id)).toBeFalsy();
   }));
 
 test("locked note is not favorited", () =>
@@ -106,6 +107,7 @@ test("unlock a note", () =>
     expect(note.content.data).toBeDefined();
     expect(note.content.type).toBe(TEST_NOTE.content.type);
     expect(await db.relations.from(vault, "note").has(id)).toBe(true);
+    expect(db.vault.isNoteOpened(id)).toBeTruthy();
   }));
 
 test("unlock a note permanently", () =>
@@ -124,6 +126,7 @@ test("unlock a note permanently", () =>
     expect(content.data).toBeDefined();
     expect(typeof content.data).toBe("string");
     expect(await db.relations.from(vault, "note").has(id)).toBe(false);
+    expect(db.vault.isNoteOpened(id)).toBeFalsy();
   }));
 
 test("lock an empty note", () =>
@@ -141,6 +144,7 @@ test("lock an empty note", () =>
     expect(content.data.iv).toBeDefined();
     expect(content.data.cipher).toBeDefined();
     expect(await db.relations.from(vault, "note").has(id)).toBe(true);
+    expect(db.vault.isNoteOpened(id)).toBeFalsy();
   }));
 
 test("save a locked note", () =>
@@ -154,6 +158,7 @@ test("save a locked note", () =>
     const content = await db.content.get(note.contentId);
 
     expect(content.data.cipher).toBeTypeOf("string");
+    expect(db.vault.isNoteOpened(id)).toBeFalsy();
   }));
 
 test("save an edited locked note", () =>
@@ -173,6 +178,7 @@ test("save an edited locked note", () =>
     expect(() => JSON.parse(content.data.cipher)).toThrow();
     expect(note.dateEdited).toBeLessThan((await db.notes.note(id)).dateEdited);
     expect(note.dateEdited).toBeLessThan(content.dateEdited);
+    expect(db.vault.isNoteOpened(id)).toBeFalsy();
   }));
 
 test("change vault password", () =>

@@ -189,4 +189,15 @@ export class SettingsViewModel {
       .locator("input");
     await titleFormatInput.fill(format);
   }
+
+  async toggleKeepVaultNotesUnlocked() {
+    const item = await this.navigation.findItem("Vault");
+    await item?.click();
+
+    const keepVaultNotesUnlocked = this.page
+      .locator(getTestId("setting-keep-note-unlocked"))
+      .locator("label");
+
+    await keepVaultNotesUnlocked.click();
+  }
 }
