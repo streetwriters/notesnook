@@ -45,10 +45,7 @@ export const VaultSettings: SettingsGroup[] = [
             title: strings.create(),
             action: () => {
               if (!isUserPremium()) BuyDialog.show({});
-              else
-                Vault.createVault().then((res) => {
-                  useAppStore.getState().setIsVaultCreated(res);
-                });
+              else Vault.createVault();
             },
             variant: "secondary"
           }
@@ -56,9 +53,8 @@ export const VaultSettings: SettingsGroup[] = [
       },
       {
         key: "keep-note-unlocked",
-        title: "Keep note unlocked",
-        description:
-          "Keep a vault note unlocked once it is opened. Note will be locked back once vault is locked.",
+        title: strings.keepNoteUnlocked(),
+        description: strings.keepNoteUnlockedDesc(),
         isHidden: () => !useAppStore.getState().isVaultCreated,
         onStateChange: (listener) =>
           useAppStore.subscribe((s) => s.isVaultCreated, listener),

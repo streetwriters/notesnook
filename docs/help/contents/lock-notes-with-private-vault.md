@@ -51,6 +51,16 @@ Adding notes to private vault is useful when you do not want anyone to read your
 
 To open, edit or delete a locked note, you must provide the password for the vault to unlock it.
 
+## Keep note unlocked when it is opened
+
+By default, when you open a locked note, it will be locked again after you close the note or lock the vault. You can change this behavior, so that the note remains unlocked even after you close it. Now the note will only be locked when the vault is locked. 
+
+# [Desktop/Web](#/tab/web)
+
+1. Go to Settings
+2. Go to `Vault` in `Security & privacy` section
+3. Toggle `Keep note unlocked`
+
 ## Unlock a note permanently
 
 # [Desktop/Web](#/tab/web)
