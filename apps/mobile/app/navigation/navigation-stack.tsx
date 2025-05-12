@@ -43,7 +43,7 @@ let Reminders: any = null;
 let Monographs: any = null;
 let TaggedNotes: any = null;
 let ColoredNotes: any = null;
-
+let Archive: any = null;
 const AppNavigation = React.memo(
   () => {
     const { colors } = useThemeColors();
@@ -190,6 +190,14 @@ const AppNavigation = React.memo(
             return ColoredNotes;
           }}
           initialParams={home.name === "ColoredNotes" ? home.params : undefined}
+        />
+
+        <AppStack.Screen
+          name="Archive"
+          getComponent={() => {
+            Archive = Archive || require("../screens/archive").default;
+            return Archive;
+          }}
         />
 
         <AppStack.Screen

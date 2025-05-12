@@ -77,12 +77,13 @@ export const MenuItemsList: SideMenuItem[] = [
     },
     type: "side-menu-item"
   },
-  // {
-  //   dataType: "note",
-  //   id: "Archive",
-  //   title: "Archive",
-  //   icon: "archive"
-  // },
+  {
+    dataType: "note",
+    id: "Archive",
+    title: "Archive",
+    icon: "archive",
+    type: "side-menu-item"
+  },
   {
     dataType: "note",
     id: "Trash",

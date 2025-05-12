@@ -66,9 +66,11 @@ import { convertNoteToText } from "../utils/note-to-text";
 import { sleep } from "../utils/time";
 import SettingsService from "../services/settings";
 import { useSettingStore } from "../stores/use-setting-store";
+import { useArchivedStore } from "../stores/use-archived-store";
 
 export type ActionId =
   | "select"
+  | "archive"
   | "restore"
   | "delete"
   | "reorder"
@@ -972,6 +974,19 @@ export const useActions = ({
             reference: item as ItemReference
           });
         }
+      },
+      {
+        id: "archive",
+        title: !item.archived ? strings.archive() : strings.unarchive(),
+        icon: "archive",
+        onPress: async () => {
+          db.notes.archive(!item.archived, item.id);
+          setItem((await db.notes.note(item.id)) as Item);
+          Navigation.queueRoutesForUpdate();
+          useArchivedStore.getState().refresh();
+        },
+        checked: item.archived,
+        isToggle: true
       }
     );
 
