@@ -257,35 +257,6 @@ class EditorStore extends BaseStore<EditorStore> {
       });
     });
 
-    // EV.subscribe(EVENTS.vaultUnlocked, () => {
-    //   (async () => {
-    //     const { sessions } = this.get();
-    //     const updatedSessions: typeof sessions = [];
-
-    //     for (const session of sessions) {
-    //       if (session.type === "locked") {
-    //         const tags = await db.notes.tags(session.note.id);
-    //         const note = await db.vault.open(session.note.id);
-    //         if (!note) continue;
-    //         updatedSessions.push({
-    //           type: session.note.readonly ? "readonly" : "default",
-    //           locked: true,
-    //           id: session.id,
-    //           note: note,
-    //           saveState: SaveState.Saved,
-    //           sessionId: `${Date.now()}`,
-    //           tags: tags,
-    //           tabId: session.tabId,
-    //           content: note.content
-    //         });
-    //       } else {
-    //         updatedSessions.push(session);
-    //       }
-    //     }
-    //     this.set({ sessions: updatedSessions });
-    //   })();
-    // });
-
     db.eventManager.subscribe(
       EVENTS.syncItemMerged,
       (item?: MaybeDeletedItem<Item>) => {

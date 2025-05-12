@@ -54,7 +54,6 @@ export default class Vault {
     clearTimeout(this.erasureTimeout);
     this.erasureTimeout = setTimeout(() => {
       this.lock();
-      this.openedNotes = [];
     }, this.eraseTime) as unknown as number;
   }
 
@@ -89,6 +88,7 @@ export default class Vault {
 
   async lock() {
     this.password = undefined;
+    this.openedNotes = [];
     EV.publish(EVENTS.vaultLocked);
     return true;
   }
