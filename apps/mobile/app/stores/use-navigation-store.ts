@@ -74,6 +74,7 @@ export interface RouteParams extends ParamListBase {
   TaggedNotes: NotesScreenParams;
   ColoredNotes: NotesScreenParams;
   TopicNotes: NotesScreenParams;
+  Archive: GenericRouteParam;
   Monographs: NotesScreenParams;
   Reminders: GenericRouteParam;
   SettingsGroup: GenericRouteParam;

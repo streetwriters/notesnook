@@ -36,6 +36,7 @@ import Paragraph from "../ui/typography/paragraph";
 const TOP_BAR_ITEMS: ActionId[] = [
   "pin",
   "favorite",
+  "archive",
   "lock-unlock",
   "publish",
   "local-only",

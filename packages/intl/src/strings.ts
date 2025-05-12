@@ -948,6 +948,7 @@ $headline$: Use starting line of the note as title.`,
   yourNotebooks: () => t`Your notebooks`,
   yourReminders: () => t`Your reminders`,
   yourMonographs: () => t`Your monographs`,
+  yourArchive: () => t`Your archive`,
   favoritesEmpty: () => t`You have not favorited any notes yet`,
   notesEmpty: () => t`You have not created any notes yet`,
   tagsEmpty: () => t`You have not added any tags yet`,
@@ -960,6 +961,7 @@ $headline$: Use starting line of the note as title.`,
   loadingNotebooks: () => t`Loading your notebooks`,
   loadingReminders: () => t`Loading your reminders`,
   loadingMonographs: () => t`Loading your monographs`,
+  loadingArchive: () => t`Loading your archive`,
   addFirstNote: () => t`Add your first note`,
   addFirstNotebook: () => t`Add your first notebook`,
   setReminder: () => t`Set a reminder`,
@@ -1512,7 +1514,8 @@ For example:
     Editor: () => t`Editor`,
     Home: () => t`Home`,
     Search: () => t`Search`,
-    Monographs: () => t`Monographs`
+    Monographs: () => t`Monographs`,
+    Archive: () => t`Archive`
   },
   searchInRoute: (
     routeName: keyof typeof SEARCH_IN_ROUTE_STRINGS | ({} & string)
@@ -2468,5 +2471,6 @@ Use this if changes from other devices are not appearing on this device. This wi
   defaultSidebarTabDesc: () => t`Select the default sidebar tab`,
   unsetAsHomepage: () => t`Reset homepage`,
   archive: () => t`Archive`,
-  yourArchiveIsEmpty: () => t`Your archive is empty`
+  yourArchiveIsEmpty: () => t`Your archive is empty`,
+  unarchive: () => t`Unarchive`
 };

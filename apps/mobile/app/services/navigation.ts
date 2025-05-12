@@ -37,6 +37,7 @@ import {
   rootNavigatorRef
 } from "../utils/global-refs";
 import { eSendEvent } from "./event-manager";
+import { useArchivedStore } from "../stores/use-archived-store";
 
 /**
  * Routes that should be updated on focus
@@ -66,7 +67,8 @@ const routeNames = {
   Reminders: "Reminders",
   MoveNotebook: "MoveNotebook",
   LinkNotebooks: "LinkNotebooks",
-  MoveNotes: "MoveNotes"
+  MoveNotes: "MoveNotes",
+  Archive: "Archive"
 };
 
 export type NavigationProps<T extends RouteName> = NativeStackScreenProps<
@@ -92,7 +94,8 @@ const routeUpdateFunctions: {
   TopicNotes: (params) => eSendEvent("TopicNotes", params),
   Monographs: (params) => eSendEvent("Monographs", params),
   Reminders: () => useReminderStore.getState().refresh(),
-  Search: () => eSendEvent(eOnRefreshSearch)
+  Search: () => eSendEvent(eOnRefreshSearch),
+  Archive: () => useArchivedStore.getState().refresh()
 };
 
 function clearRouteFromQueue(routeName: RouteName) {

@@ -1899,7 +1899,7 @@ SPEC CHECKSUMS:
   react-native-orientation-locker: cc6f357b289a2e0dd2210fea0c52cb8e0727fdaa
   react-native-pager-view: f530c9533319e0355da3551ade81d471b5a04c44
   react-native-pdf: da10473ae54555c373c62af671da8fe0eef846e2
-  react-native-quick-sqlite: 80b5b3405bfc92e97b6041d2c2a446800bea6ad7
+  react-native-quick-sqlite: ae74515f7a941f3e7f9e5ea7aff603da1b1c3010
   react-native-safe-area-context: b72c4611af2e86d80a59ac76279043d8f75f454c
   react-native-screenguard: 82437eeb0086a90b5e5d7e54130bb04fb406373e
   react-native-share-extension: bcb7e466390a9e50c742f4b1019d6f181aedd7ad
