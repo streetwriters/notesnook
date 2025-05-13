@@ -164,7 +164,8 @@ export type DocumentPreview = {
 export function isLockedSession(session: EditorSession): boolean {
   return (
     session.type === "locked" ||
-    (session.type === "default" && !!session.locked) ||
+    ((session.type === "default" || session.type === "readonly") &&
+      !!session.locked) ||
     ("content" in session &&
       !!session.content &&
       "locked" in session.content &&
