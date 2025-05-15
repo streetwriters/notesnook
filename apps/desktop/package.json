@@ -60,6 +60,9 @@
   "optionalDependencies": {
     "dmg-license": "^1.0.11"
   },
+  "overrides": {
+    "@electron/node-gyp": "^10.2.0-electron.2"
+  },
   "scripts": {
     "start": "node scripts/dev.mjs",
     "staging": "node scripts/build.mjs --run",
