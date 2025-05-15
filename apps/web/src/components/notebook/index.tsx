@@ -19,18 +19,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import ListItem from "../list-item";
 import { Button, Flex, Text } from "@theme-ui/components";
-import { store, useStore as useNotesStore } from "../../stores/note-store";
+import { useStore as useNotesStore } from "../../stores/note-store";
 import { Notebook as NotebookType } from "@notesnook/core";
 import {
   ChevronDown,
   ChevronRight,
   NotebookEdit,
-  Pin,
   Plus,
   RemoveShortcutLink,
   Shortcut,
   Trash,
-  Notebook as NotebookIcon
+  Notebook as NotebookIcon,
+  Move
 } from "../icons";
 import { MenuItem } from "@notesnook/ui";
 import { hashNavigate, navigate } from "../../navigation";
@@ -44,6 +44,7 @@ import { Multiselect } from "../../common/multi-select";
 import { strings } from "@notesnook/intl";
 import { db } from "../../common/db";
 import { createSetDefaultHomepageMenuItem } from "../../common";
+import { MoveNotebookDialog } from "../../dialogs/move-notebook-dialog";
 
 type NotebookProps = {
   item: NotebookType;
@@ -230,6 +231,15 @@ export const notebookMenuItems: (
         ? strings.removeShortcut()
         : strings.addShortcut(),
       onClick: () => appStore.addToShortcuts(notebook)
+    },
+    {
+      type: "button",
+      key: "move",
+      icon: Move.path,
+      title: "Move",
+      onClick: () => {
+        MoveNotebookDialog.show({ notebookId: notebook.id });
+      }
     },
     { key: "sep", type: "separator" },
     {
