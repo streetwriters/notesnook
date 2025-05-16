@@ -670,6 +670,13 @@ export const settingsGroups: SettingSection[] = [
               });
             },
             disabled: () => !db.settings.getDefaultNotebook()
+          },
+          {
+            id: "disable-update-check",
+            type: "switch",
+            name: strings.autoUpdateCheck(),
+            description: strings.autoUpdateCheckDesc(),
+            property: "checkForUpdates"
           }
         ]
       },
