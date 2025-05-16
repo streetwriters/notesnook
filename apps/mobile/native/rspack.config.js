@@ -228,16 +228,6 @@ module.exports = (env) => {
        * from `Repack.plugins`.
        */
       new Repack.RepackPlugin({
-        logger: {
-          console: false,
-          listener: (e => {
-            if (e.message[0].includes("Bundle built with warnings")) {
-              console.warn(`ℹ ` + e.message[0] + " time: " + e.message[1].time);
-              return;
-            }
-          })
-          
-        },
         extraChunks: [
           {
             type: "local",
