@@ -710,7 +710,7 @@ p > *::selection {
 
 .ProseMirror div.callout > :first-child::after {
   position: absolute;
-  top: 3px;
+  top: 0px;
   right: 0px;
   cursor: pointer;
   content: "";
