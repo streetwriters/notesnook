@@ -63,6 +63,10 @@ const directoryTree = {
     ui: {
       "package.json": ["packages", "ui", "package.json"],
       "package-lock.json": ["packages", "ui", "package-lock.json"]
+    },
+    theme: {
+      "package.json": ["packages", "theme", "package.json"],
+      "package-lock.json": ["packages", "theme", "package-lock.json"]
     }
   }
 };
@@ -122,6 +126,10 @@ const lockfiles = [
   {
     name: "ui",
     path: path.join(TEMP_FOLDER, "packages", "ui", "package-lock.json")
+  },
+  {
+    name: "theme",
+    path: path.join(TEMP_FOLDER, "packages", "theme", "package-lock.json")
   }
 ];
 
