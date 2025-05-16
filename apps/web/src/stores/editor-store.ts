@@ -832,6 +832,18 @@ class EditorStore extends BaseStore<EditorStore> {
     }
   };
 
+  openSessionInTab = async (noteId: string, tabId: string) => {
+    const { tabs } = this.get();
+    const tab = tabs.find((t) => t.id === tabId);
+    if (!tab) {
+      this.openSession(noteId, { openInNewTab: true });
+      return;
+    }
+
+    this.focusTab(tabId);
+    this.openSession(noteId, { force: true });
+  };
+
   focusNextTab = () => {
     const { tabs, activeTabId } = this.get();
     if (tabs.length <= 1) return;

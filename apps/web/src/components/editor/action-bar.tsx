@@ -82,6 +82,7 @@ import { getWindowControls } from "../title-bar";
 import useTablet from "../../hooks/use-tablet";
 import { isMac } from "../../utils/platform";
 import { CREATE_BUTTON_MAP } from "../../common";
+import { getDragData } from "../../utils/data-transfer";
 
 type ToolButton = {
   title: string;
@@ -340,6 +341,19 @@ const TabStrip = React.memo(function TabStrip() {
             e.stopPropagation();
             useEditorStore.getState().addTab();
           }}
+          onDragOver={(e) => {
+            e.preventDefault();
+          }}
+          onDrop={(e) => {
+            e.stopPropagation();
+
+            const noteId = getDragData(e.dataTransfer, "note")?.[0];
+            if (!noteId) return;
+
+            useEditorStore
+              .getState()
+              .openSession(noteId, { openInNewTab: true });
+          }}
           data-test-id="tabs"
         >
           <ReorderableList
@@ -519,6 +533,17 @@ function Tab(props: TabProps) {
       }}
       className={`tab${isActive || active?.id === id ? " active" : ""}`}
       data-test-id={`tab-${id}`}
+      onDragOver={(e) => {
+        e.preventDefault();
+      }}
+      onDrop={(e) => {
+        e.stopPropagation();
+
+        const noteId = getDragData(e.dataTransfer, "note")?.[0];
+        if (!noteId) return;
+
+        useEditorStore.getState().openSessionInTab(noteId, id);
+      }}
       sx={{
         height: "100%",
         cursor: "pointer",
