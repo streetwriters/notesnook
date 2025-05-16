@@ -113,4 +113,11 @@ export class NotebookItemModel extends BaseItemModel {
     await this.contextMenu.open(this.locator);
     await new ToggleModel(this.page, "menu-button-set-as-default").on();
   }
+
+  async waitForMoveToTop(state: "hidden" | "visible") {
+    await this.contextMenu.open(this.locator);
+    await this.contextMenu.menuContainer
+      .locator(getTestId("menu-button-move-to-top"))
+      .waitFor({ state });
+  }
 }
