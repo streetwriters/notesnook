@@ -341,8 +341,15 @@ const doAppLoadActions = async () => {
 };
 
 const checkAppUpdateAvailable = async () => {
-  if (__DEV__ || Config.isTesting === "true" || Config.FDROID_BUILD || BETA)
+  if (
+    __DEV__ ||
+    Config.isTesting === "true" ||
+    Config.FDROID_BUILD ||
+    BETA ||
+    !SettingsService.getProperty("checkForUpdates")
+  )
     return;
+
   try {
     const version =
       Config.GITHUB_RELEASE === "true"
