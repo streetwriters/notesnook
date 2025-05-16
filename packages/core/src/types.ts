@@ -468,6 +468,7 @@ export type SettingItemMap = {
   timeFormat: TimeFormat;
   dateFormat: string;
   defaultNotebook: string | undefined;
+  defaultTag: string | undefined;
   profile: Profile | undefined;
 } & Record<`groupOptions:${GroupingKey}`, GroupOptions> &
   Record<`toolbarConfig:${ToolbarConfigPlatforms}`, ToolbarConfig | undefined> &

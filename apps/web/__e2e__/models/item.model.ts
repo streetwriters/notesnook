@@ -84,4 +84,9 @@ export class ItemModel extends BaseItemModel {
     await this.contextMenu.close();
     return state;
   }
+
+  async setAsDefault() {
+    await this.contextMenu.open(this.locator);
+    await this.contextMenu.clickOnItem("set-as-default");
+  }
 }
