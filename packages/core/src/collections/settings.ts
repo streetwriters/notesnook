@@ -157,7 +157,7 @@ export class Settings implements ICollection {
   getTrashCleanupInterval() {
     const t = this.get("trashCleanupInterval");
     // stored as a string in db, need conversion before use
-    return Number(t);
+    return Number(t) as TrashCleanupInterval;
   }
 
   setDefaultNotebook(item: string | undefined) {
