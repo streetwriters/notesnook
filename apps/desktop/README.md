@@ -58,10 +58,10 @@ This will compile and run the app in production mode but it won't generate any p
 npm run release -- --rebuild
 
 # For macOS
-npx electron-builder --config=electron-builder.config.js --mac dmg --arm64 --x64 -publish never
+npx electron-builder --config=electron-builder.config.js --mac dmg --arm64 --x64 --publish never
 
 # For Linux (AppImage)
-npx electron-builder --config=electron-builder.config.js --linux AppImage:x64 AppImage:arm64 -publish never
+npx electron-builder --config=electron-builder.config.js --linux AppImage:x64 AppImage:arm64 --publish never
 
 # For Windows
 npx electron-builder --config=electron-builder.config.js --win --publish never
