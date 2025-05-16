@@ -98,6 +98,7 @@ export type Settings = {
   lastFullBackupDate?: number;
   serverUrls?: Record<HostId, string>;
   defaultSidebarTab: number;
+  checkForUpdates?: boolean;
 };
 
 type DimensionsType = {
@@ -196,7 +197,8 @@ export const defaultSettings: SettingStore["settings"] = {
   settingsVersion: 0,
   backupType: "partial",
   fullBackupReminder: "never",
-  lastFullBackupDate: 0
+  lastFullBackupDate: 0,
+  checkForUpdates: true
 };
 
 export const useSettingStore = create<SettingStore>((set, get) => ({

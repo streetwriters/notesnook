@@ -1285,6 +1285,9 @@ $headline$: Use starting line of the note as title.`,
   roadmapDesc: () => t`See what the future of Notesnook is going to be like.`,
   checkForUpdates: () => t`Check for updates`,
   checkForUpdatesDesc: () => t`Check for new version of Notesnook`,
+  autoUpdateCheck: () => t`Check for updates automatically`,
+  autoUpdateCheckDesc: () =>
+    t`Check for new version of the app available on app launch`,
   appVersion: () => t`App version`,
   defaultSound: () => t`Default sound`,
   subNotSupported: () =>
