@@ -377,7 +377,12 @@ export class NNMigrationProvider implements MigrationProvider {
             .execute();
         }
       },
-      "10": {
+      // changing the migrations name scheme from here because
+      // apparently, Kysley runs migrations in alphanumeric order.
+      // To ensure things keep running smoothly, we are now moving
+      // to a date-based migration name but since any number is smaller
+      // than 9, we have to use "a" in the beginning.
+      "a-2025-05-16": {
         async up(db) {
           await runFTSTablesMigrations(db);
         }
