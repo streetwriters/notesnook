@@ -336,10 +336,6 @@ img.ProseMirror-separator {
   background-color: var(--backdrop);
 } */
 
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
 .ProseMirror blockquote {
   border-inline-start: 5px solid var(--border);
   padding-inline-start: 15px;
