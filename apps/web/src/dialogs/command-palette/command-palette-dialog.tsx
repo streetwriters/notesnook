@@ -118,6 +118,18 @@ export const CommandPaletteDialog = DialogManager.register(
           }}
           onKeyDown={(e) => {
             if (commands.status !== "fulfilled") return;
+            if (e.key === "Delete") {
+              e.preventDefault();
+              const command = commands.value.commands[selected];
+              if (!command) return;
+              if (command.group !== "recent") return;
+              removeRecentCommand(command.id);
+              getDefaultCommands().then((resolved) => {
+                defaultCommands.current = resolved;
+                commands.refresh();
+              });
+              return;
+            }
             if (e.key == "Enter") {
               e.preventDefault();
 
