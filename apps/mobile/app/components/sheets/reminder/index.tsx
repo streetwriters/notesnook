@@ -48,7 +48,7 @@ import { Dialog } from "../../dialog";
 import { ReminderTime } from "../../ui/reminder-time";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import { ItemReference, Note, Reminder } from "@notesnook/core";
+import { Note, Reminder } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../../utils/styles";
 
@@ -57,7 +57,7 @@ type ReminderSheetProps = {
   close?: (ctx?: string) => void;
   update?: (options: PresentSheetOptions) => void;
   reminder?: Reminder;
-  reference?: ItemReference;
+  reference?: Note;
 };
 
 const ReminderModes =
@@ -612,7 +612,7 @@ export default function ReminderSheet({
 
 ReminderSheet.present = (
   reminder?: Reminder,
-  reference?: ItemReference,
+  reference?: Note,
   isSheet?: boolean
 ) => {
   presentSheet({
