@@ -34,14 +34,14 @@ import { VirtualizedGrouping } from "../utils/virtualized-grouping.js";
 import { logger } from "../logger.js";
 import { rebuildSearchIndex } from "../database/fts.js";
 import { transformQuery } from "../utils/query-transformer.js";
-import { getSortSelectors } from "../utils/grouping.js";
+import { getSortSelectors, groupArray } from "../utils/grouping.js";
 import { fuzzy } from "../utils/fuzzy.js";
 import { extractText } from "../utils/html-parser.js";
 
 type SearchResults<T> = {
-  sorted: (limit?: number) => Promise<VirtualizedGrouping<T>>;
-  items: (limit?: number) => Promise<T[]>;
-  ids: () => Promise<string[]>;
+  sorted: (sortOptions?: SortOptions) => Promise<VirtualizedGrouping<T>>;
+  items: (sortOptions?: SortOptions) => Promise<T[]>;
+  ids: (sortOptions?: SortOptions) => Promise<string[]>;
 };
 
 type FuzzySearchField<T> = {
@@ -54,7 +54,7 @@ export default class Lookup {
   constructor(private readonly db: Database) {}
 
   notes(query: string, notes?: FilteredSelector<Note>): SearchResults<Note> {
-    return this.toSearchResults(async (limit, sortOptions) => {
+    return this.toSearchResults(async (sortOptions) => {
       const db = this.db.sql() as unknown as Kysely<RawDatabaseSchema>;
       const excludedIds = this.db.trash.cache.notes;
 
@@ -181,17 +181,9 @@ export default class Lookup {
   }
 
   trash(query: string): SearchResults<TrashItem> {
-    const sortOptions: SortOptions = {
-      sortBy: "dateDeleted",
-      sortDirection: "desc"
-    };
     return {
-      sorted: async (limit?: number) => {
-        const { ids, items } = await this.filterTrash(
-          query,
-          limit,
-          sortOptions
-        );
+      sorted: async (sortOptions?: SortOptions) => {
+        const { ids, items } = await this.filterTrash(query, sortOptions);
         return new VirtualizedGrouping<TrashItem>(
           ids.length,
           this.db.options.batchSize,
@@ -204,8 +196,8 @@ export default class Lookup {
           }
         );
       },
-      items: async (limit?: number) => {
-        const { items } = await this.filterTrash(query, limit, sortOptions);
+      items: async (sortOptions?: SortOptions) => {
+        const { items } = await this.filterTrash(query, sortOptions);
         return items;
       },
       ids: () => this.filterTrash(query).then(({ ids }) => ids)
@@ -226,9 +218,8 @@ export default class Lookup {
     query: string,
     fields: FuzzySearchField<T>[]
   ) {
-    return this.toSearchResults(async (limit, sortOptions) => {
+    return this.toSearchResults(async (sortOptions) => {
       const results = await this.filter(selector, query, fields, {
-        limit,
         sortOptions
       });
       return results.map((item) => item.id);
@@ -261,37 +252,27 @@ export default class Lookup {
   }
 
   private toSearchResults<T extends Item>(
-    ids: (limit?: number, sortOptions?: SortOptions) => Promise<string[]>,
+    ids: (sortOptions?: SortOptions) => Promise<string[]>,
     selector: FilteredSelector<T>
   ): SearchResults<T> {
-    const sortOptions: SortOptions = {
-      sortBy: "dateCreated",
-      sortDirection: "desc"
-    };
     return {
-      sorted: async (limit?: number) =>
+      sorted: async (sortOptions?: SortOptions) =>
         this.toVirtualizedGrouping(
-          await ids(limit, sortOptions),
+          await ids(sortOptions),
           selector,
           sortOptions
         ),
-      items: async (limit?: number) =>
-        this.toItems(await ids(limit, sortOptions), selector, sortOptions),
+      items: async (sortOptions?: SortOptions) =>
+        this.toItems(await ids(sortOptions), selector, sortOptions),
       ids
     };
   }
 
-  private async filterTrash(
-    query: string,
-    limit?: number,
-    sortOptions?: SortOptions
-  ) {
+  private async filterTrash(query: string, sortOptions?: SortOptions) {
     const items = await this.db.trash.all();
 
     const results: Map<string, { rank: number; item: TrashItem }> = new Map();
     for (const item of items) {
-      if (limit && results.size >= limit) break;
-
       const result = match(query, item.title);
       if (result.match) {
         results.set(item.id, { rank: result.score, item });
@@ -299,13 +280,11 @@ export default class Lookup {
     }
     const sorted = Array.from(results.entries());
 
-    if (!sortOptions)
-      // || sortOptions.sortBy === "relevance")
+    if (!sortOptions || sortOptions.sortBy === "relevance")
       sorted.sort(
-        // sortOptions?.sortDirection === "desc"
-        //   ? (a, b) => a[1].rank - b[1].rank
-        // :
-        (a, b) => b[1].rank - a[1].rank
+        sortOptions?.sortDirection === "desc"
+          ? (a, b) => a[1].rank - b[1].rank
+          : (a, b) => b[1].rank - a[1].rank
       );
     else {
       const selector = getSortSelectors(sortOptions)[sortOptions.sortDirection];
@@ -322,7 +301,7 @@ export default class Lookup {
     selector: FilteredSelector<T>,
     sortOptions?: SortOptions
   ) {
-    // if (sortOptions?.sortBy === "relevance") sortOptions = undefined;
+    if (sortOptions?.sortBy === "relevance") sortOptions = undefined;
     return new VirtualizedGrouping<T>(
       ids.length,
       this.db.options.batchSize,
@@ -333,8 +312,8 @@ export default class Lookup {
           ids: items.map((i) => i.id),
           items
         };
-      }
-      // (items) => groupArray(items, () => `${items.length} results`)
+      },
+      (items) => groupArray(items, () => `${items.length} results`)
     );
   }
 
@@ -344,7 +323,7 @@ export default class Lookup {
     sortOptions?: SortOptions
   ) {
     if (!ids.length) return [];
-    // if (sortOptions?.sortBy === "relevance") sortOptions = undefined;
+    if (sortOptions?.sortBy === "relevance") sortOptions = undefined;
     return selector.items(ids, sortOptions);
   }
 

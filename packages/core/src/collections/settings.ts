@@ -37,9 +37,11 @@ import { SQLCachedCollection } from "../database/sql-cached-collection.js";
 
 const DEFAULT_GROUP_OPTIONS = (key: GroupingKey) =>
   ({
-    groupBy: "default",
+    groupBy: key === "search" ? "none" : "default",
     sortBy:
-      key === "trash"
+      key === "search"
+        ? "relevance"
+        : key === "trash"
         ? "dateDeleted"
         : key === "tags"
         ? "dateCreated"
@@ -65,6 +67,7 @@ const defaultSettings: SettingItemMap = {
   "groupOptions:archive": DEFAULT_GROUP_OPTIONS("archive"),
   "groupOptions:home": DEFAULT_GROUP_OPTIONS("home"),
   "groupOptions:reminders": DEFAULT_GROUP_OPTIONS("reminders"),
+  "groupOptions:search": DEFAULT_GROUP_OPTIONS("search"),
 
   "toolbarConfig:desktop": undefined,
   "toolbarConfig:mobile": undefined,

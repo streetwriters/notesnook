@@ -34,9 +34,9 @@ function Home() {
   const setContext = useStore((store) => store.setContext);
   const filteredItems = useSearch(
     "notes",
-    (query) => {
+    async (query, sortOptions) => {
       if (useStore.getState().context) return;
-      return db.lookup.notes(query).sorted();
+      return await db.lookup.notes(query).sorted(sortOptions);
     },
     [notes]
   );
@@ -72,7 +72,8 @@ function Home() {
       compact={isCompact}
       refresh={refresh}
       items={filteredItems || notes}
-      placeholder={<Placeholder context="notes" />}
+      isSearching={!!filteredItems}
+      placeholder={<Placeholder context={filteredItems ? "search" : "notes"} />}
       button={{
         onClick: () => useEditorStore.getState().newSession()
       }}

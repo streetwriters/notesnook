@@ -28,8 +28,7 @@ import {
   SortDesc,
   DetailedView,
   CompactView,
-  Icon,
-  Loading
+  Icon
 } from "../icons";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Button, Flex, Text } from "@theme-ui/components";
@@ -45,6 +44,7 @@ import {
   GroupingKey
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
+import { useStore as useSearchStore } from "../../stores/search-store";
 
 const groupByToTitleMap = {
   none: "None",
@@ -60,12 +60,13 @@ type GroupingMenuOptions = {
   parentKey: keyof GroupOptions;
   groupingKey: GroupingKey;
   refresh: () => void;
+  isSearching?: boolean;
 };
 
 const groupByMenu: (options: GroupingMenuOptions) => MenuItem | null = (
   options
 ) =>
-  options.groupingKey === "reminders"
+  options.groupingKey === "reminders" || options.isSearching
     ? null
     : {
         type: "button",
@@ -105,6 +106,8 @@ const orderByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
             ? strings.aToZ()
             : options.groupOptions.sortBy === "dueDate"
             ? strings.earliestFirst()
+            : options.groupOptions.sortBy === "relevance"
+            ? strings.leastRelevantFirst()
             : strings.oldestToNewest()
       },
       {
@@ -114,6 +117,8 @@ const orderByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
             ? strings.zToA()
             : options.groupOptions.sortBy === "dueDate"
             ? strings.latestFirst()
+            : options.groupOptions.sortBy === "relevance"
+            ? strings.mostRelevantFirst()
             : strings.newestToOldest()
       }
     ])
@@ -156,6 +161,11 @@ const sortByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
       {
         key: "title",
         title: strings.sortByStrings.title()
+      },
+      {
+        key: "relevance",
+        title: strings.sortByStrings.relevance(),
+        isHidden: options.groupingKey !== "search"
       }
     ])
   }
@@ -198,6 +208,8 @@ async function changeGroupOptions(
         : groupOptions.sortBy;
   }
   await db.settings.setGroupOptions(options.groupingKey, groupOptions);
+  if (options.groupingKey === "search")
+    useSearchStore.setState({ sortOptions: groupOptions });
   options.refresh();
 }
 
@@ -209,7 +221,7 @@ function map(
     item.isChecked = options.groupOptions[options.parentKey] === item.key;
     item.onClick = () => changeGroupOptions(options, item);
     return { ...item, type: "button" };
-  }, []);
+  });
 }
 
 type GroupHeaderProps = {
@@ -222,6 +234,7 @@ type GroupHeaderProps = {
   refresh: () => void;
   onSelectGroup: () => void;
   isFocused: boolean;
+  isSearching?: boolean;
 };
 function GroupHeader(props: GroupHeaderProps) {
   const {
@@ -232,10 +245,11 @@ function GroupHeader(props: GroupHeaderProps) {
     groupingKey,
     refresh,
     onSelectGroup,
-    isFocused
+    isFocused,
+    isSearching
   } = props;
   const [groupOptions, setGroupOptions] = useState(
-    db.settings.getGroupOptions(groupingKey)
+    db.settings.getGroupOptions(isSearching ? "search" : groupingKey)
   );
   const groupHeaderRef = useRef<HTMLDivElement>(null);
   const { openMenu, target } = useMenuTrigger();
@@ -270,33 +284,25 @@ function GroupHeader(props: GroupHeaderProps) {
   return (
     <Flex
       ref={groupHeaderRef}
-      onClick={(e) => {
+      onClick={async (e) => {
         if (e.ctrlKey) {
           onSelectGroup();
           return;
         }
         e.stopPropagation();
 
-        const items: MenuItem[] = [
-          {
-            key: "groups",
-            type: "lazy-loader",
-            loader: <Loading sx={{ my: 2 }} />,
-            async items() {
-              const items = await groups();
-              return items.map(({ group, index }) => {
-                const groupTitle = group.title.toString();
-                return {
-                  type: "button",
-                  key: groupTitle,
-                  title: groupTitle,
-                  onClick: () => onJump(index),
-                  checked: group.title === title
-                } as MenuItem;
-              });
-            }
-          }
-        ];
+        const groupItems = await groups();
+        const items: MenuItem[] = groupItems.map(({ group, index }) => {
+          const groupTitle = group.title.toString();
+          return {
+            type: "button",
+            key: groupTitle,
+            title: groupTitle,
+            onClick: () => onJump(index),
+            checked: group.title === title
+          } as MenuItem;
+        });
+        if (!items.length) return;
 
         openMenu(items, {
           title: strings.jumpToGroup(),
@@ -352,13 +358,16 @@ function GroupHeader(props: GroupHeaderProps) {
                 groupByToTitleMap[groupOptions.groupBy || "default"]
               }`}
               onClick={() => {
-                const groupOptions = db.settings!.getGroupOptions(groupingKey);
+                const groupOptions = db.settings.getGroupOptions(
+                  isSearching ? "search" : groupingKey
+                );
                 setGroupOptions(groupOptions);
 
                 const menuOptions: Omit<GroupingMenuOptions, "parentKey"> = {
-                  groupingKey,
+                  groupingKey: isSearching ? "search" : groupingKey,
                   groupOptions,
-                  refresh
+                  refresh,
+                  isSearching
                 };
                 const groupBy = groupByMenu({
                   ...menuOptions,

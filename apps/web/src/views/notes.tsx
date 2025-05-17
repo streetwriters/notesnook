@@ -44,10 +44,10 @@ function Notes(props: NotesProps) {
   const isCompact = useNotesStore((store) => store.viewMode === "compact");
   const filteredItems = useSearch(
     context?.type === "notebook" ? "notebook" : "notes",
-    (query) => {
+    async (query, sortOptions) => {
       if (!context || !contextNotes) return;
       const notes = notesFromContext(context);
-      return db.lookup.notes(query, notes).sorted();
+      return await db.lookup.notes(query, notes).sorted(sortOptions);
     },
     [context, contextNotes]
   );
@@ -58,6 +58,7 @@ function Notes(props: NotesProps) {
       type={type}
       group={type}
       refresh={refreshContext}
+      isSearching={!!filteredItems}
       compact={isCompact}
       context={context}
       items={filteredItems || contextNotes}
@@ -65,7 +66,9 @@ function Notes(props: NotesProps) {
       placeholder={
         <Placeholder
           context={
-            context.type === "favorite"
+            filteredItems
+              ? "search"
+              : context.type === "favorite"
               ? "favorites"
               : context.type === "archive"
               ? "archive"

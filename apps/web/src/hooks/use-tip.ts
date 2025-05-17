@@ -110,6 +110,10 @@ export const useTip = (
 
 const tips: Tip[] = [
   {
+    text: `Wrap a query in double quotes to search for an exact match.`,
+    contexts: ["search"]
+  },
+  {
     text: "Hold Ctrl/Cmd & click on multiple items to select them.",
     contexts: ["notes", "notebooks", "tags"]
   },

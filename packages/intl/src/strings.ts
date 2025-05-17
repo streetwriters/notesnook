@@ -636,6 +636,8 @@ $headline$: Use starting line of the note as title.`,
   newOld: () => t`New - old`,
   latestFirst: () => t`Latest first`,
   earliestFirst: () => t`Earliest first`,
+  mostRelevantFirst: () => t`Most relevant first`,
+  leastRelevantFirst: () => t`Least relevant first`,
   aToZ: () => t`A to Z`,
   zToA: () => t`Z to A`,
   title: () => t`Title`,
@@ -645,7 +647,8 @@ $headline$: Use starting line of the note as title.`,
     dateCreated: () => t`Date created`,
     title: () => t`Title`,
     dueDate: () => t`Due date`,
-    dateDeleted: () => t`Date deleted`
+    dateDeleted: () => t`Date deleted`,
+    relevance: () => t`Relevance`
   },
   groupByStrings: {
     default: () => t`Default`,

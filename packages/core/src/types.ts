@@ -32,7 +32,8 @@ export type SortOptions = {
     | "filename"
     | "size"
     | "dateUploaded"
-    | "dueDate";
+    | "dueDate"
+    | "relevance";
   sortDirection: "desc" | "asc";
 };
 
@@ -50,7 +51,8 @@ export const GroupingKey = [
   "trash",
   "favorites",
   "reminders",
-  "archive"
+  "archive",
+  "search"
 ] as const;
 export type GroupingKey = (typeof GroupingKey)[number];
 
