@@ -33,8 +33,8 @@ function Trash() {
   const items = useStore((store) => store.trash);
   const refresh = useStore((store) => store.refresh);
   const clearTrash = useStore((store) => store.clear);
-  const filteredItems = useSearch("trash", (query) =>
-    db.lookup.trash(query).sorted()
+  const filteredItems = useSearch("trash", (query, sortOptions) =>
+    db.lookup.trash(query).sorted(sortOptions)
   );
 
   if (!items) return <ListLoader />;
@@ -43,7 +43,8 @@ function Trash() {
       type="trash"
       group="trash"
       refresh={refresh}
-      placeholder={<Placeholder context="trash" />}
+      isSearching={!!filteredItems}
+      placeholder={<Placeholder context={filteredItems ? "search" : "trash"} />}
       items={filteredItems || items}
       button={{
         onClick: function () {
