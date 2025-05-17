@@ -30,8 +30,8 @@ function Reminders() {
   useNavigate("reminders", () => store.refresh());
   const reminders = useStore((state) => state.reminders);
   const refresh = useStore((state) => state.refresh);
-  const filteredItems = useSearch("reminders", (query) =>
-    db.lookup.reminders(query).sorted()
+  const filteredItems = useSearch("reminders", (query, sortOptions) =>
+    db.lookup.reminders(query).sorted(sortOptions)
   );
 
   if (!reminders) return <ListLoader />;
@@ -42,7 +42,10 @@ function Reminders() {
         group="reminders"
         refresh={refresh}
         items={filteredItems || reminders}
-        placeholder={<Placeholder context="reminders" />}
+        isSearching={!!filteredItems}
+        placeholder={
+          <Placeholder context={filteredItems ? "search" : "reminders"} />
+        }
         button={{
           onClick: () => hashNavigate("/reminders/create")
         }}

@@ -74,6 +74,7 @@ type ListContainerProps = {
   header?: JSX.Element;
   placeholder: JSX.Element;
   isLoading?: boolean;
+  isSearching?: boolean;
   onDrop?: (e: React.DragEvent<HTMLDivElement>) => void;
   button?: {
     onClick: () => void;
@@ -91,7 +92,8 @@ function ListContainer(props: ListContainerProps) {
     button,
     compact,
     sx,
-    Scroller
+    Scroller,
+    isSearching
   } = props;
 
   const [focusedGroupIndex, setFocusedGroupIndex] = useState(-1);
@@ -243,11 +245,14 @@ function ListContainer(props: ListContainerProps) {
                 focusGroup: setFocusedGroupIndex,
                 context,
                 compact,
-                onMouseUp
+                onMouseUp,
+                isSearching
               }}
-              itemContent={(index, _data, context) => (
-                <ItemRenderer context={context} index={index} />
-              )}
+              itemContent={(index, _data, context) =>
+                context ? (
+                  <ItemRenderer context={context} index={index} />
+                ) : null
+              }
             />
           </Flex>
         </>
@@ -293,6 +298,7 @@ type ListContext = {
   focusGroup: (index: number) => void;
   context?: Context;
   compact?: boolean;
+  isSearching?: boolean;
 
   onMouseUp: (e: MouseEvent, itemIndex: number) => void;
 };
@@ -312,8 +318,10 @@ function ItemRenderer({
     selectItems,
     scrollToIndex,
     context: itemContext,
-    compact
+    compact,
+    isSearching
   } = context;
+
   const resolvedItem = useResolvedItem({ index, items });
   if (!resolvedItem || !resolvedItem.item) {
     const placeholderData = getListItemPlaceholderData(group, compact);
@@ -351,6 +359,7 @@ function ItemRenderer({
       {resolvedItem.group && group ? (
         <GroupHeader
           groupingKey={group}
+          isSearching={isSearching}
           refresh={refresh}
           title={resolvedItem.group.title}
           isFocused={index === focusedGroupIndex}
