@@ -383,6 +383,9 @@ export class NNMigrationProvider implements MigrationProvider {
       // to a date-based migration name but since any number is smaller
       // than 9, we have to use "a" in the beginning.
       "a-2025-05-16": {
+        async up() {}
+      },
+      "a-2025-05-17": {
         async up(db) {
           await runFTSTablesMigrations(db);
         }
