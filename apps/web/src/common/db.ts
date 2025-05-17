@@ -40,12 +40,24 @@ async function initializeDatabase(persistence: DatabasePersistence) {
   }
 
   db.host({
-    API_HOST: "https://api.notesnook.com",
-    AUTH_HOST: "https://auth.streetwriters.co",
-    SSE_HOST: "https://events.streetwriters.co",
-    ISSUES_HOST: "https://issues.streetwriters.co",
-    MONOGRAPH_HOST: "https://monogr.ph",
-    SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co",
+    API_HOST:
+      import.meta.env.NN_API_HOST ||
+      "https://api.notesnook.com",
+    AUTH_HOST:
+      import.meta.env.NN_AUTH_HOST ||
+      "https://auth.streetwriters.co",
+    SSE_HOST:
+      import.meta.env.NN_SSE_HOST ||
+      "https://events.streetwriters.co",
+    ISSUES_HOST:
+      import.meta.env.NN_ISSUES_HOST ||
+      "https://issues.streetwriters.co",
+    MONOGRAPH_HOST:
+      import.meta.env.NN_MONOGRAPH_HOST ||
+      "https://monogr.ph",
+    SUBSCRIPTIONS_HOST:
+      import.meta.env.NN_SUBSCRIPTIONS_HOST ||
+      "https://subscriptions.streetwriters.co",
     ...Config.get("serverUrls", {})
   });
 
