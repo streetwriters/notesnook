@@ -928,7 +928,7 @@ export const useActions = ({
         title: strings.remindMe(),
         icon: "clock-plus-outline",
         onPress: () => {
-          ReminderSheet.present(undefined, { id: item.id, type: "note" });
+          ReminderSheet.present(undefined, item);
         }
       },
       {
