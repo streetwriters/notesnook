@@ -396,7 +396,7 @@ function ItemRenderer({
         item={resolvedItem.item}
         data={resolvedItem.data}
         context={itemContext}
-        group={group}
+        group={isSearching ? "search" : group}
         compact={compact}
       />
     </>
