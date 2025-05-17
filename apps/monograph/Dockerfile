@@ -1,14 +1,35 @@
+# Build stage
+FROM node:20-alpine AS build
 
-FROM oven/bun:1.2.2-alpine
+# Install dependencies for gyp to work
+RUN --mount=type=cache,target=/var/cache/apk,sharing=locked apk add --update build-base git python3 py3-setuptools
 
-RUN mkdir -p /home/bun/app && chown -R bun:bun /home/bun/app
+WORKDIR /app
 
+# Copy files
+COPY . .
+
+# Install dependencies
+RUN --mount=type=cache,target=/root/.npm npm ci --ignore-scripts --prefer-offline --no-audit
+
+# Bootstrap the project
+RUN --mount=type=cache,target=/root/.npm npm run bootstrap -- --scope=monograph
+
+# Build the application
+RUN npx nx build @notesnook/monograph
+
+# Production stage
+FROM oven/bun:1.2.2-alpine AS production
+
+# Copy built files from build stage
 WORKDIR /home/bun/app
+COPY --chown=bun:bun --from=build /app/apps/monograph/output .
 
+# Set the user to bun
+RUN chown -R bun:bun /home/bun/app
 USER bun
 
-COPY --chown=bun:bun output .
-
+# Install server dependencies
 RUN bun install
 
 CMD [ "bun", "run", "start" ]
