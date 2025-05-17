@@ -18,9 +18,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import path from "path";
+import { fileURLToPath } from "url";
 import { Counter } from "./counter";
 
-export const THEMES_REPO_URL = `https://github.com/streetwriters/notesnook-themes.git`;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+export const THEMES_REPO_URL =
+  process.env.THEMES_REPO_URL ||
+  "https://github.com/streetwriters/notesnook-themes.git";
+
 export const THEME_REPO_DIR_NAME = "notesnook-themes";
 export const THEME_METADATA_JSON = path.join(__dirname, "themes-metadata.json");
 export const THEME_REPO_DIR_PATH = path.resolve(
