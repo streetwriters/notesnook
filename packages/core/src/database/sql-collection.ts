@@ -530,8 +530,7 @@ export class FilteredSelector<T extends Item> {
     if (options.groupBy === "abc") fields.push("title");
     else if (options.sortBy === "title" && options.groupBy !== "none")
       fields.push("dateCreated");
-    else if (options.sortBy !== "dueDate")
-      // && options.sortBy !== "relevance")
+    else if (options.sortBy !== "dueDate" && options.sortBy !== "relevance")
       fields.push(options.sortBy);
 
     return Array.from(
@@ -649,8 +648,8 @@ export class FilteredSelector<T extends Item> {
                   (qb) => qb.parens(createUpcomingReminderTimeQuery()),
                   options.sortDirection
                 );
-            } // if (item !== "relevance")
-            else qb = qb.orderBy(item, options.sortDirection);
+            } else if (item !== "relevance")
+              qb = qb.orderBy(item, options.sortDirection);
             continue;
           }
 
