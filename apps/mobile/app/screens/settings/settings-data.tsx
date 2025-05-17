@@ -82,7 +82,8 @@ export const settingsGroups: SettingSection[] = [
         useHook: () => useUserStore((state) => state.user),
         hidden: (current) => !current,
         name: (current) => {
-          const user = current as User;
+          const user = (current as User) || useUserStore.getState().user;
+          if (!user) return strings.subscribeToPro();
           const isBasic = user.subscription?.type === SUBSCRIPTION_STATUS.BASIC;
           const isTrial = user.subscription?.type === SUBSCRIPTION_STATUS.TRIAL;
           return isBasic || !user.subscription?.type
@@ -96,6 +97,7 @@ export const settingsGroups: SettingSection[] = [
         icon: "crown",
         description: (current) => {
           const user = current as User;
+          if (!user) return strings.neverHesitate();
           const subscriptionDaysLeft =
             user &&
             getTimeLeft(
