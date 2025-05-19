@@ -206,25 +206,13 @@ test("clear vault", () =>
     expect(await db.relations.from(vault, "note").has(id)).toBe(false);
   }));
 
-test("delete vault without deleting all locked notes", () =>
+test("delete vault", () =>
   noteTest().then(async ({ db, id }) => {
     await db.vault.create("password");
     await db.vault.add(id);
     const vault = await db.vaults.default();
 
     await db.vault.delete();
-
-    expect(await db.relations.from(vault, "note").has(id)).toBe(false);
-    expect(await db.vaults.default()).toBeUndefined();
-  }));
-
-test("delete vault and delete all locked notes", () =>
-  noteTest().then(async ({ db, id }) => {
-    await db.vault.create("password");
-    await db.vault.add(id);
-    const vault = await db.vaults.default();
-
-    await db.vault.delete(true);
 
     expect(await db.relations.from(vault, "note").has(id)).toBe(false);
     expect(await db.notes.exists(id)).toBe(false);

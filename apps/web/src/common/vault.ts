@@ -63,25 +63,19 @@ class Vault {
     if (!(await db.vault.exists())) return false;
     const result = await showPasswordDialog({
       title: strings.deleteVault(),
-      subtitle: strings.deleteVaultDesc(),
       inputs: {
         password: {
           label: strings.accountPassword(),
           autoComplete: "current-password"
         }
       },
-      checks: {
-        deleteAllLockedNotes: {
-          text: strings.deleteAllNotes(),
-          default: false
-        }
-      },
+      message: strings.deleteVaultDesc(),
       validate: ({ password }) => {
         return db.user.verifyPassword(password);
       }
     });
     if (result) {
-      await db.vault.delete(result.deleteAllLockedNotes);
+      await db.vault.delete();
       return true;
     }
     return false;
