@@ -80,6 +80,9 @@ function _MenuItem({
             case "Monographs":
               setItemCount(await db.monographs.all.count());
               break;
+            case "Archive":
+              setItemCount(await db.notes.archived.count());
+              break;
             case "Trash":
               setItemCount((await db.trash.all()).length);
               break;
