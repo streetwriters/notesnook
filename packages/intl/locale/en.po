@@ -5387,6 +5387,10 @@ msgstr "Select"
 msgid "Select a backup file from your device to restore backup"
 msgstr "Select a backup file from your device to restore backup"
 
+#: src/strings.ts:2480
+msgid "Select a notebook to move this notebook into, or unselect to move it to the root level."
+msgstr "Select a notebook to move this notebook into, or unselect to move it to the root level."
+
 #: src/strings.ts:2089
 msgid "Select a theme"
 msgstr "Select a theme"
