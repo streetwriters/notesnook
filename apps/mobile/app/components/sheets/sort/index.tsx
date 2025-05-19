@@ -52,24 +52,42 @@ const Sort = ({
   hideGroupOptions?: boolean;
 }) => {
   const { colors } = useThemeColors();
+
+  const groupType =
+    screen === "Archive"
+      ? "archive"
+      : screen === "Search"
+      ? "search"
+      : screen === "Notes"
+      ? "home"
+      : screen === "Trash" || type === "trash"
+      ? "trash"
+      : ((type + "s") as GroupingKey);
+
   const [groupOptions, setGroupOptions] = useState(
-    db.settings.getGroupOptions(
-      screen === "Notes"
-        ? "home"
-        : screen === "Trash" || type === "trash"
-        ? "trash"
-        : ((type + "s") as GroupingKey)
-    )
+    db.settings.getGroupOptions(groupType)
   );
+
+  const getSortButtonTitle = () => {
+    const { sortDirection, groupBy, sortBy } = groupOptions || {};
+    const isAlphabetical = groupBy === "abc" || sortBy === "title";
+    const isDueDate = sortBy === "dueDate";
+    const isRelevance = sortBy === "relevance";
+
+    if (sortDirection === "asc") {
+      if (isAlphabetical) return strings.aToZ();
+      if (isDueDate) return strings.earliestFirst();
+      if (isRelevance) return strings.leastRelevantFirst();
+      return strings.oldNew();
+    } else {
+      if (isAlphabetical) return strings.zToA();
+      if (isDueDate) return strings.latestFirst();
+      if (isRelevance) return strings.mostRelevantFirst();
+      return strings.newOld();
+    }
+  };
+
   const updateGroupOptions = async (_groupOptions: GroupOptions) => {
-    const groupType =
-      screen === "Notes"
-        ? "home"
-        : screen === "Trash" || type === "trash"
-        ? "trash"
-        : screen === "Favorites"
-        ? "favorites"
-        : ((type + "s") as GroupingKey);
     await db.settings.setGroupOptions(groupType, _groupOptions);
     setGroupOptions(_groupOptions);
     setTimeout(() => {
@@ -110,31 +128,10 @@ const Sort = ({
           paddingHorizontal: DefaultAppStyles.GAP
         }}
       >
-        <Heading
-          size={AppFontSize.lg}
-          style={{
-            alignSelf: "center"
-          }}
-        >
-          {strings.sortBy()}
-        </Heading>
+        <Heading size={AppFontSize.lg}>{strings.sortBy()}</Heading>
 
         <Button
-          title={
-            groupOptions?.sortDirection === "asc"
-              ? groupOptions?.groupBy === "abc" ||
-                groupOptions?.sortBy === "title"
-                ? strings.aToZ()
-                : groupOptions?.sortBy === "dueDate"
-                ? strings.earliestFirst()
-                : strings.oldNew()
-              : groupOptions?.groupBy === "abc" ||
-                groupOptions?.sortBy === "title"
-              ? strings.zToA()
-              : groupOptions?.sortBy === "dueDate"
-              ? strings.latestFirst()
-              : strings.newOld()
-          }
+          title={getSortButtonTitle()}
           icon={
             groupOptions?.sortDirection === "asc"
               ? "sort-ascending"
@@ -158,13 +155,24 @@ const Sort = ({
           borderBottomColor: colors.primary.border
         }}
       >
-        {Object.keys(SORT).map((item) =>
-          (item === "dueDate" && screen !== "Reminders") ||
-          (screen !== "Tags" &&
-            screen !== "Reminders" &&
-            item === "dateModified") ||
-          ((screen === "Tags" || screen === "Reminders") &&
-            item === "dateEdited") ? null : (
+        {Object.keys(SORT).map((item) => {
+          const sortOptionVisibility = {
+            relevance: screen === "Search",
+            dueDate: screen === "Reminders",
+            dateModified: screen === "Tags" || screen === "Reminders",
+            dateEdited: screen !== "Tags" && screen !== "Reminders"
+          };
+
+          // Check if this sort option should be skipped for the current screen
+          const shouldSkip =
+            item in sortOptionVisibility &&
+            !sortOptionVisibility[item as keyof typeof sortOptionVisibility];
+
+          if (shouldSkip) {
+            return null;
+          }
+
+          return (
             <Pressable
               key={item}
               type={groupOptions?.sortBy === item ? "selected" : "plain"}
@@ -202,8 +210,8 @@ const Sort = ({
                 />
               ) : null}
             </Pressable>
-          )
-        )}
+          );
+        })}
       </View>
 
       {!hideGroupOptions ? (

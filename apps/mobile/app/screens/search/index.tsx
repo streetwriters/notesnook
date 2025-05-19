@@ -23,14 +23,10 @@ import { DatabaseLogger, db } from "../../common/database";
 import List from "../../components/list";
 import SelectionHeader from "../../components/selection-header";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
-import {
-  ToastManager,
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} from "../../services/event-manager";
+import { ToastManager, eSubscribeEvent } from "../../services/event-manager";
 import { NavigationProps } from "../../services/navigation";
 import useNavigationStore from "../../stores/use-navigation-store";
-import { eOnRefreshSearch } from "../../utils/events";
+import { eGroupOptionsUpdated, eOnRefreshSearch } from "../../utils/events";
 import { SearchBar } from "./search-bar";
 import { FilteredSelector } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
@@ -60,27 +56,28 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
       try {
         setLoading(true);
         let results: VirtualizedGrouping<Item> | undefined;
+        const groupOptions = db.settings.getGroupOptions("search");
 
         switch (route.params.type) {
           case "note":
             results = await db.lookup
               .notes(query, route.params.items as FilteredSelector<Note>)
-              .sorted();
+              .sorted(groupOptions);
             break;
           case "notebook":
-            results = await db.lookup.notebooks(query).sorted();
+            results = await db.lookup.notebooks(query).sorted(groupOptions);
             break;
           case "tag":
-            results = await db.lookup.tags(query).sorted();
+            results = await db.lookup.tags(query).sorted(groupOptions);
             break;
           case "reminder":
-            results = await db.lookup.reminders(query).sorted();
+            results = await db.lookup.reminders(query).sorted(groupOptions);
             break;
           case "trash":
-            results = await db.lookup.trash(query).sorted();
+            results = await db.lookup.trash(query).sorted(groupOptions);
             break;
           case "attachment":
-            results = await db.lookup.attachments(query).sorted();
+            results = await db.lookup.attachments(query).sorted(groupOptions);
             break;
           default:
             results = undefined;
@@ -118,9 +115,18 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
         onSearch(currentQuery.current);
       }
     };
-    eSubscribeEvent(eOnRefreshSearch, onRefreshSearch);
+
+    const subs = [
+      eSubscribeEvent(eGroupOptionsUpdated, (groupType) => {
+        if (groupType === "search") {
+          onSearch(currentQuery.current);
+        }
+      }),
+      eSubscribeEvent(eOnRefreshSearch, onRefreshSearch)
+    ];
+
     return () => {
-      eUnSubscribeEvent(eOnRefreshSearch, onRefreshSearch);
+      subs.forEach((sub) => sub?.unsubscribe());
     };
   }, [onSearch, route.params?.type]);
 

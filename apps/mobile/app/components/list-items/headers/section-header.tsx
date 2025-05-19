@@ -133,7 +133,9 @@ export const SectionHeader = React.memo<
                         <Sort
                           screen={screen}
                           type={dataType}
-                          hideGroupOptions={screen === "Reminders"}
+                          hideGroupOptions={
+                            screen === "Reminders" || screen === "Search"
+                          }
                         />
                       )
                     });
