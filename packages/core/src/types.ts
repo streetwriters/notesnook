@@ -488,6 +488,18 @@ export interface Vault extends BaseItem<"vault"> {
   key: Cipher<"base64">;
 }
 
+export type Match = {
+  prefix: string;
+  match: string;
+  suffix: string;
+};
+export interface HighlightedResult {
+  type: "searchResult";
+  id: string;
+  title: Match[];
+  content: Match[][];
+}
+
 export interface DeletedItem {
   id: string;
   deleted: true;
