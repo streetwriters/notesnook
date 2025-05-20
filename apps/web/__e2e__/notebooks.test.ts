@@ -324,3 +324,30 @@ test("when default notebook is set, created note in colors context should go to 
 
   expect(await openedNotebook?.findNote(coloredNote)).toBeDefined();
 });
+
+test("move to top option should not be available for root notebook", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notebooks = await app.goToNotebooks();
+
+  const notebook = await notebooks.createNotebook(NOTEBOOK);
+
+  expect(await notebook?.isMoveToTopVisible()).toBe(false);
+});
+
+test("move to top option should be available for sub-notebook", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notebooks = await app.goToNotebooks();
+
+  const notebook = await notebooks.createNotebook(NOTEBOOK);
+  const subNotebook = await notebook?.createSubnotebook({
+    title: "Subnotebook 1"
+  });
+
+  expect(await subNotebook?.isMoveToTopVisible()).toBe(true);
+});

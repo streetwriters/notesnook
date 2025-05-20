@@ -326,7 +326,10 @@ async function getActiveNotebookCommands() {
 
   const commands: Command[] = [];
 
-  const menuItems = notebookMenuItems(notebook, [notebook.id]);
+  const parentId = await db.notebooks.parentId(notebook.id);
+  const menuItems = notebookMenuItems(notebook, [notebook.id], {
+    isRoot: !parentId
+  });
   for (const menuItem of menuItems) {
     commands.push(...menuItemToCommands(menuItem, group, "active-notebook"));
   }

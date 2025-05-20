@@ -25,12 +25,12 @@ import {
   ChevronDown,
   ChevronRight,
   NotebookEdit,
-  Pin,
   Plus,
   RemoveShortcutLink,
   Shortcut,
   Trash,
-  Notebook as NotebookIcon
+  Notebook as NotebookIcon,
+  ArrowUp
 } from "../icons";
 import { MenuItem } from "@notesnook/ui";
 import { hashNavigate, navigate } from "../../navigation";
@@ -44,6 +44,7 @@ import { Multiselect } from "../../common/multi-select";
 import { strings } from "@notesnook/intl";
 import { db } from "../../common/db";
 import { createSetDefaultHomepageMenuItem } from "../../common";
+import { useStore as useNotebookStore } from "../../stores/notebook-store";
 
 type NotebookProps = {
   item: NotebookType;
@@ -163,7 +164,7 @@ export function Notebook(props: NotebookProps) {
         </Text>
       }
       menuItems={notebookMenuItems}
-      context={{ refresh }}
+      context={{ refresh, isRoot: depth === 0 }}
       sx={{
         mb: "small",
         borderRadius: "default",
@@ -176,7 +177,7 @@ export function Notebook(props: NotebookProps) {
 export const notebookMenuItems: (
   notebook: NotebookType,
   ids?: string[],
-  context?: { refresh?: () => void }
+  context?: { refresh?: () => void; isRoot?: boolean }
 ) => MenuItem[] = (notebook, ids = [], context) => {
   const defaultNotebook = db.settings.getDefaultNotebook();
   return [
@@ -190,8 +191,7 @@ export const notebookMenuItems: (
           res ? context?.refresh?.() : null
         )
     },
-    { type: "separator", key: "sepep2" },
-
+    { type: "separator", key: "sep0" },
     {
       type: "button",
       key: "edit",
@@ -231,7 +231,31 @@ export const notebookMenuItems: (
         : strings.addShortcut(),
       onClick: () => appStore.addToShortcuts(notebook)
     },
-    { key: "sep", type: "separator" },
+    { key: "sep1", type: "separator" },
+    {
+      type: "button",
+      key: "move-to-top",
+      icon: ArrowUp.path,
+      title: strings.moveToTop(),
+      isHidden: context?.isRoot,
+      onClick: async () => {
+        if (context?.isRoot) return;
+
+        const parentId = await db.notebooks.parentId(notebook.id);
+        if (!parentId) return;
+
+        await db.relations.unlink(
+          {
+            type: "notebook",
+            id: parentId
+          },
+          notebook
+        );
+        await useNotebookStore.getState().refresh();
+      },
+      multiSelect: false
+    },
+    { key: "sep2", type: "separator", isHidden: context?.isRoot },
     {
       type: "button",
       key: "movetotrash",

@@ -291,4 +291,17 @@ export class Notebooks implements ICollection {
       await this.collection.softDelete(ids);
     });
   }
+
+  async parentId(id: string): Promise<string | undefined> {
+    const relation = await this.db.relations
+      .to(
+        {
+          id: id,
+          type: "notebook"
+        },
+        "notebook"
+      )
+      .get();
+    return relation[0]?.fromId;
+  }
 }
