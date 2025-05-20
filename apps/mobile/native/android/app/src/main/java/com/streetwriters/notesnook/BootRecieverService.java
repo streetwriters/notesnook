@@ -14,19 +14,21 @@ public class BootRecieverService extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-          if (!isAppOnForeground((context))) {
-            /**
-             We will start our service and send extra info about
-             network connections
-             **/
-            Intent serviceIntent = new Intent(context, BootTaskService.class);
-              if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                  context.startForegroundService(serviceIntent);
-              } else {
-                  context.startService(serviceIntent);
-              }
-              HeadlessJsTaskService.acquireWakeLockNow(context);
-        }
+         try {
+             if (!isAppOnForeground((context))) {
+                 /**
+                  We will start our service and send extra info about
+                  network connections
+                  **/
+                 Intent serviceIntent = new Intent(context, BootTaskService.class);
+                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                     context.startForegroundService(serviceIntent);
+                 } else {
+                     context.startService(serviceIntent);
+                 }
+                 HeadlessJsTaskService.acquireWakeLockNow(context);
+             }
+         } catch (Exception ignored) {}
     }
 
     private boolean isAppOnForeground(Context context) {
