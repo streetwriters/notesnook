@@ -185,11 +185,14 @@ export default class Lookup {
           title.title &&
           smallTokens.every((token) => !!title.title?.includes(token))
         ) {
-          result.title.push(
-            ...splitHighlightedMatch(
+          const merged = mergeMatches(
+            result.title,
+            splitHighlightedMatch(
               highlightQueries(title.title, smallTokens)
             ).flatMap((m) => m)
           );
+          if (!merged) continue;
+          result.title = merged;
         }
 
         if (text && smallTokens.every((token) => !!text?.includes(token))) {
@@ -639,4 +642,95 @@ function stringToMatch(str: string): Match[] {
       suffix: ""
     }
   ];
+}
+
+type Match = {
+  prefix: string;
+  match: string;
+  suffix: string;
+};
+
+function mergeMatches(matches1: Match[], matches2: Match[]): Match[] | null {
+  if (!matches1.length) return matches2;
+  if (!matches2.length) return matches1;
+
+  // Helper to get full text from matches array
+  function getFullText(matches: Match[]): string {
+    if (!matches.length) return "";
+    return matches.reduce(
+      (text, curr) => text + curr.prefix + curr.match + curr.suffix,
+      ""
+    );
+  }
+
+  // Get the full original text
+  const text = getFullText(matches1);
+  if (getFullText(matches2) !== text) return null;
+
+  // Create array of all match positions
+  type Position = {
+    start: number;
+    end: number;
+    match: string;
+  };
+
+  function getPositions(matches: Match[]) {
+    const positions: Position[] = [];
+    let pos = 0;
+    for (let i = 0; i < matches.length; i++) {
+      const m = matches[i];
+      pos += m.prefix.length;
+      positions.push({
+        start: pos,
+        end: pos + m.match.length,
+        match: m.match
+      });
+      pos += m.match.length + m.suffix.length;
+    }
+    return positions;
+  }
+
+  const positions = [...getPositions(matches1), ...getPositions(matches2)].sort(
+    (a, b) => a.start - b.start || b.end - a.end
+  );
+
+  // Merge overlapping or adjacent positions
+  const merged: Position[] = [];
+  let current = positions[0];
+
+  for (let i = 1; i < positions.length; i++) {
+    const next = positions[i];
+    if (next.start <= current.end) {
+      // Overlapping or adjacent matches
+      if (next.end > current.end) {
+        // Extend current match if next one is longer
+        current = {
+          start: current.start,
+          end: next.end,
+          match: text.slice(current.start, next.end)
+        };
+      }
+    } else {
+      merged.push(current);
+      current = next;
+    }
+  }
+  merged.push(current);
+
+  // Create final matches array
+  const result: Match[] = [];
+  for (let i = 0; i < merged.length; i++) {
+    const pos = merged[i];
+    const nextPos = merged[i + 1];
+
+    const prefix = i === 0 ? text.slice(0, pos.start) : "";
+    const match = pos.match;
+    const suffix = nextPos
+      ? text.slice(pos.end, nextPos.start)
+      : text.slice(pos.end);
+
+    result.push({ prefix, match, suffix });
+  }
+
+  return result;
 }
