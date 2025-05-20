@@ -498,6 +498,7 @@ export interface HighlightedResult {
   id: string;
   title: Match[];
   content: Match[][];
+  rank: number;
 }
 
 export interface DeletedItem {
