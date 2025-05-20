@@ -131,11 +131,17 @@ export class HTMLParser {
   }
 }
 
-export function extractText(html: string) {
+export function extractText(html: string, retainTags?: string[]) {
   let text = "";
   const parser = new Parser(
     {
-      ontext: (data) => (text += data)
+      ontext: (data) => (text += data),
+      onopentag(name) {
+        if (retainTags?.includes(name)) text += `<${name}>`;
+      },
+      onclosetag(name) {
+        if (retainTags?.includes(name)) text += `</${name}>`;
+      }
     },
     {
       lowerCaseTags: false
@@ -143,4 +149,81 @@ export function extractText(html: string) {
   );
   parser.end(html);
   return text;
+}
+
+const INLINE_TAGS = [
+  "a",
+  "abbr",
+  "acronym",
+  "b",
+  "bdo",
+  "big",
+  "br",
+  "button",
+  "cite",
+  "code",
+  "dfn",
+  "em",
+  "i",
+  "img",
+  "input",
+  "kbd",
+  "label",
+  "map",
+  "object",
+  "output",
+  "q",
+  "samp",
+  "script",
+  "select",
+  "small",
+  "span",
+  "strong",
+  "sub",
+  "sup",
+  "textarea",
+  "time",
+  "tt",
+  "var"
+];
+
+export function extractMatchingBlocks(html: string, matchTagName: string) {
+  const matches: string[] = [];
+  let text = "";
+  let openedTag: string | undefined = undefined;
+  let hasMatches = false;
+
+  const parser = new Parser(
+    {
+      ontext: (data) => (text += data),
+      onopentag(name) {
+        if (!INLINE_TAGS.includes(name) && name !== matchTagName) {
+          openedTag = name;
+          text = "";
+          hasMatches = false;
+        }
+        if (name === matchTagName) {
+          hasMatches = true;
+          text += `<${name}>`;
+        }
+      },
+      onclosetag(name) {
+        if (name === "br") text += "\n";
+        if (name === openedTag) {
+          if (hasMatches) matches.push(text);
+          text = "";
+          hasMatches = false;
+          openedTag = undefined;
+        }
+        if (name === matchTagName) text += `</${name}>`;
+      }
+    },
+    {
+      lowerCaseTags: false
+    }
+  );
+  parser.end(html);
+  if (hasMatches && text) matches.push(text);
+
+  return matches;
 }
