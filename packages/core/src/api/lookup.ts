@@ -58,6 +58,7 @@ export default class Lookup {
 
   async notes(
     query: string,
+    sortOptions?: SortOptions,
     notes?: FilteredSelector<Note>
   ): Promise<VirtualizedGrouping<HighlightedResult>> {
     const db = this.db.sql() as unknown as Kysely<RawDatabaseSchema>;
@@ -125,7 +126,8 @@ export default class Lookup {
           type: "searchResult",
           id: result.id,
           content: [],
-          title: []
+          title: [],
+          rank: 0
         });
 
         if (result.type === "content")
@@ -136,26 +138,8 @@ export default class Lookup {
           );
         if (result.type === "title")
           old.title = splitHighlightedMatch(result.match).flatMap((m) => m);
+        old.rank += result.rank;
       }
-
-      const resultsWithMissingTitle = mergedResults
-        .filter((r) => !r.title.length)
-        .map((r) => r.id);
-
-      if (resultsWithMissingTitle.length > 0) {
-        const titles = await db
-          .selectFrom("notes")
-          .where("id", "in", resultsWithMissingTitle)
-          .select(["id", "title"])
-          .execute();
-        for (const title of titles) {
-          const result = mergedResults.find((r) => r.id === title.id);
-          if (!result || !title.title) continue;
-          result.title = stringToMatch(title.title);
-        }
-      }
-
-      mergedResults = mergedResults.filter((r) => !!r.title);
     }
 
     const smallTokens = Array.from(
@@ -164,61 +148,96 @@ export default class Lookup {
       ).values()
     );
 
-    if (smallTokens.length === 0)
-      return arrayToVirtualizedGrouping(
-        mergedResults,
-        this.db.options.batchSize
-      );
+    if (smallTokens.length > 0) {
+      const ids = mergedResults.map((r) => r.id);
+      const titles = await db
+        .selectFrom("notes")
+        .$if(!!transformedQuery && ids.length > 0, (eb) =>
+          eb.where("id", "in", ids)
+        )
+        .select(["id", "title"])
+        .execute();
 
-    const ids = mergedResults.map((r) => r.id);
-    const titles = await db
-      .selectFrom("notes")
-      .$if(!!transformedQuery && ids.length > 0, (eb) =>
-        eb.where("id", "in", ids)
-      )
-      .select(["id", "title"])
-      .execute();
+      const htmls = await db
+        .selectFrom("content")
+        .where("content.locked", "!=", true)
+        .$if(!!transformedQuery && ids.length > 0, (eb) =>
+          eb.where("noteId", "in", ids)
+        )
+        .select(["data", "noteId as id"])
+        .$castTo<{ data: string; id: string }>()
+        .execute();
 
-    const htmls = await db
-      .selectFrom("content")
-      .where("content.locked", "!=", true)
-      .$if(!!transformedQuery && ids.length > 0, (eb) =>
-        eb.where("noteId", "in", ids)
-      )
-      .select(["data", "noteId as id"])
-      .$castTo<{ data: string; id: string }>()
-      .execute();
+      for (let i = 0; i < titles.length; i++) {
+        const title = titles[i];
+        const result = findOrAdd(mergedResults, (r) => r.id === title.id, {
+          id: title.id,
+          title: stringToMatch(title.title || ""),
+          type: "searchResult",
+          content: [],
+          rank: 0
+        });
 
-    for (let i = 0; i < titles.length; i++) {
-      const title = titles[i];
-      const result = findOrAdd(mergedResults, (r) => r.id === title.id, {
-        id: title.id,
-        title: stringToMatch(title.title || ""),
-        type: "searchResult",
-        content: []
-      });
+        const html = htmls.find((h) => h.id === title.id);
+        const text = html ? extractText(html.data) : "";
 
-      const html = htmls.find((h) => h.id === title.id);
-      const text = html ? extractText(html.data) : "";
+        if (
+          title.title &&
+          smallTokens.every((token) => !!title.title?.includes(token))
+        ) {
+          result.title.push(
+            ...splitHighlightedMatch(
+              highlightQueries(title.title, smallTokens)
+            ).flatMap((m) => m)
+          );
+        }
 
-      if (
-        title.title &&
-        smallTokens.every((token) => !!title.title?.includes(token))
-      ) {
-        result.title.push(
-          ...splitHighlightedMatch(
-            highlightQueries(title.title, smallTokens)
-          ).flatMap((m) => m)
-        );
-      }
-
-      if (text && smallTokens.every((token) => !!text?.includes(token))) {
-        result.content.push(
-          ...splitHighlightedMatch(highlightQueries(text, smallTokens))
-        );
+        if (text && smallTokens.every((token) => !!text?.includes(token))) {
+          result.content.push(
+            ...splitHighlightedMatch(highlightQueries(text, smallTokens))
+          );
+        }
       }
     }
 
+    const resultsWithMissingTitle = mergedResults
+      .filter((r) => !r.title.length)
+      .map((r) => r.id);
+
+    if (resultsWithMissingTitle.length > 0) {
+      const titles = await db
+        .selectFrom("notes")
+        .where("id", "in", resultsWithMissingTitle)
+        .select(["id", "title"])
+        .execute();
+      for (const title of titles) {
+        const result = mergedResults.find((r) => r.id === title.id);
+        if (!result || !title.title) continue;
+        result.title = stringToMatch(title.title);
+      }
+    }
+
+    mergedResults = mergedResults.filter((r) => !!r.title.length);
+
+    if (!sortOptions || sortOptions.sortBy === "relevance")
+      mergedResults.sort(
+        sortOptions?.sortDirection === "desc"
+          ? (a, b) => a.rank - b.rank
+          : (a, b) => b.rank - a.rank
+      );
+    else {
+      const sortedNoteIds = await this.db.notes.all.fields(["notes.id"]).items(
+        mergedResults.map((r) => r.id),
+        sortOptions
+      );
+      const sorted: HighlightedResult[] = [];
+      for (const { id } of sortedNoteIds) {
+        const resultForId = mergedResults.find((r) => r.id === id);
+        if (!resultForId) continue;
+        sorted.push(resultForId);
+      }
+      mergedResults = sorted;
+    }
     return arrayToVirtualizedGrouping(mergedResults, this.db.options.batchSize);
   }
 
