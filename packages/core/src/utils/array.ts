@@ -54,6 +54,19 @@ export function findById<T extends { id: string }>(array: T[], id: string) {
   return array.find((item) => item.id === id);
 }
 
+export function findOrAdd<T>(
+  array: T[],
+  predicate: (item: T) => boolean,
+  item: T
+) {
+  const index = array.findIndex(predicate);
+  if (index === -1) {
+    array.push(item);
+    return item;
+  }
+  return array[index];
+}
+
 export function hasItem<T>(array: T[], item: T) {
   if (!array) return false;
   return array.indexOf(item) > -1;

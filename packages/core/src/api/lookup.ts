@@ -20,7 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { match } from "fuzzyjs";
 import Database from "./index.js";
 import {
+  HighlightedResult,
   Item,
+  Match,
   Note,
   Notebook,
   Reminder,
@@ -36,7 +38,8 @@ import { rebuildSearchIndex } from "../database/fts.js";
 import { transformQuery } from "../utils/query-transformer.js";
 import { getSortSelectors, groupArray } from "../utils/grouping.js";
 import { fuzzy } from "../utils/fuzzy.js";
-import { extractText } from "../utils/html-parser.js";
+import { extractMatchingBlocks, extractText } from "../utils/html-parser.js";
+import { findOrAdd } from "../utils/array.js";
 
 type SearchResults<T> = {
   sorted: (sortOptions?: SortOptions) => Promise<VirtualizedGrouping<T>>;
@@ -53,100 +56,170 @@ type FuzzySearchField<T> = {
 export default class Lookup {
   constructor(private readonly db: Database) {}
 
-  notes(query: string, notes?: FilteredSelector<Note>): SearchResults<Note> {
-    return this.toSearchResults(async (sortOptions) => {
-      const db = this.db.sql() as unknown as Kysely<RawDatabaseSchema>;
-      const excludedIds = this.db.trash.cache.notes;
+  async notes(
+    query: string,
+    notes?: FilteredSelector<Note>
+  ): Promise<VirtualizedGrouping<HighlightedResult>> {
+    const db = this.db.sql() as unknown as Kysely<RawDatabaseSchema>;
+    const excludedIds = this.db.trash.cache.notes;
 
-      const { query: transformedQuery, tokens } = transformQuery(query);
+    const { query: transformedQuery, tokens } = transformQuery(query);
 
-      const resultsA: string[] =
-        transformedQuery.length === 0
-          ? []
-          : await db
-              .selectFrom((eb) =>
-                eb
-                  .selectFrom("notes_fts")
-                  .$if(!!notes, (eb) =>
-                    eb.where("id", "in", notes!.filter.select("id"))
-                  )
-                  .$if(excludedIds.length > 0, (eb) =>
-                    eb.where("id", "not in", excludedIds)
-                  )
-                  .where("title", "match", transformedQuery)
-                  .select(["id", sql<number>`rank * 10`.as("rank")])
-                  .unionAll((eb) =>
-                    eb
-                      .selectFrom("content_fts")
-                      .$if(!!notes, (eb) =>
-                        eb.where("noteId", "in", notes!.filter.select("id"))
-                      )
-                      .$if(excludedIds.length > 0, (eb) =>
-                        eb.where("noteId", "not in", excludedIds)
-                      )
-                      .where("data", "match", transformedQuery)
-                      .select(["noteId as id", "rank"])
-                      .$castTo<{
-                        id: string;
-                        rank: number;
-                      }>()
-                  )
-                  .as("results")
-              )
-              .select(["results.id"])
-              .groupBy("results.id")
-              .orderBy(
-                sql`SUM(results.rank)`,
-                sortOptions?.sortDirection || "desc"
-              )
-              .execute()
-              .catch((e) => {
-                logger.error(e, `Error while searching`, { query });
-                return [];
-              })
-              .then((r) => r.map((r) => r.id));
-
-      const smallTokens = Array.from(
-        new Set(
-          tokens.filter((token) => token.length < 3 && token !== "OR")
-        ).values()
-      );
-      if (smallTokens.length === 0) return resultsA;
-
-      const results = [];
-
-      const titles = await db
-        .selectFrom("notes")
-        .$if(!!transformedQuery && resultsA.length > 0, (eb) =>
-          eb.where("id", "in", resultsA)
+    let mergedResults: HighlightedResult[] = [];
+    if (transformedQuery.length > 0) {
+      const results = await db
+        .selectFrom((eb) =>
+          eb
+            .selectFrom("notes_fts")
+            .$if(!!notes, (eb) =>
+              eb.where("id", "in", notes!.filter.select("id"))
+            )
+            .$if(excludedIds.length > 0, (eb) =>
+              eb.where("id", "not in", excludedIds)
+            )
+            .where("title", "match", transformedQuery)
+            .select([
+              "id",
+              sql<string>`'title'`.as("type"),
+              sql<string>`highlight(notes_fts, 1, '<nnmark>', '</nnmark>')`.as(
+                "match"
+              ),
+              sql<number>`rank * 10`.as("rank")
+            ])
+            .unionAll((eb) =>
+              eb
+                .selectFrom("content_fts")
+                .$if(!!notes, (eb) =>
+                  eb.where("noteId", "in", notes!.filter.select("id"))
+                )
+                .$if(excludedIds.length > 0, (eb) =>
+                  eb.where("noteId", "not in", excludedIds)
+                )
+                .where("data", "match", transformedQuery)
+                .select([
+                  "noteId as id",
+                  sql<string>`'content'`.as("type"),
+                  sql<string>`highlight(content_fts, 2, '<nnmark>', '</nnmark>')`.as(
+                    "match"
+                  ),
+                  "rank"
+                ])
+                .$castTo<{
+                  id: string;
+                  type: string;
+                  rank: number;
+                  match: string;
+                }>()
+            )
+            .as("results")
         )
-        .select(["id", "title"])
-        .execute();
+        .select(["results.id", "results.match", "results.type", "results.rank"])
+        .execute()
+        .catch((e) => {
+          logger.error(e, `Error while searching`, { query });
+          return [];
+        });
 
-      const htmls = await db
-        .selectFrom("content")
-        .$if(!!transformedQuery && resultsA.length > 0, (eb) =>
-          eb.where("noteId", "in", resultsA)
-        )
-        .select(["data", "noteId as id"])
-        .$castTo<{ data: string; id: string }>()
-        .execute();
+      for (const result of results) {
+        const old = findOrAdd(mergedResults, (r) => r.id === result.id, {
+          type: "searchResult",
+          id: result.id,
+          content: [],
+          title: []
+        });
 
-      for (let i = 0; i < titles.length; i++) {
-        const title = titles[i];
-        const html = htmls.find((h) => h.id === title.id);
-        const text = html ? extractText(html.data) : "";
+        if (result.type === "content")
+          old.content = extractMatchingBlocks(result.match, "nnmark").flatMap(
+            (block) => {
+              return splitHighlightedMatch(block);
+            }
+          );
+        if (result.type === "title")
+          old.title = splitHighlightedMatch(result.match).flatMap((m) => m);
+      }
 
-        if (
-          smallTokens.every((token) => !!title.title?.includes(token)) ||
-          smallTokens.every((token) => !!text?.includes(token))
-        ) {
-          results.push(title.id);
+      const resultsWithMissingTitle = mergedResults
+        .filter((r) => !r.title.length)
+        .map((r) => r.id);
+
+      if (resultsWithMissingTitle.length > 0) {
+        const titles = await db
+          .selectFrom("notes")
+          .where("id", "in", resultsWithMissingTitle)
+          .select(["id", "title"])
+          .execute();
+        for (const title of titles) {
+          const result = mergedResults.find((r) => r.id === title.id);
+          if (!result || !title.title) continue;
+          result.title = stringToMatch(title.title);
         }
       }
 
-      return results;
-    }, notes || this.db.notes.all);
+      mergedResults = mergedResults.filter((r) => !!r.title);
+    }
+
+    const smallTokens = Array.from(
+      new Set(
+        tokens.filter((token) => token.length < 3 && token !== "OR")
+      ).values()
+    );
+
+    if (smallTokens.length === 0)
+      return arrayToVirtualizedGrouping(
+        mergedResults,
+        this.db.options.batchSize
+      );
+
+    const ids = mergedResults.map((r) => r.id);
+    const titles = await db
+      .selectFrom("notes")
+      .$if(!!transformedQuery && ids.length > 0, (eb) =>
+        eb.where("id", "in", ids)
+      )
+      .select(["id", "title"])
+      .execute();
+
+    const htmls = await db
+      .selectFrom("content")
+      .where("content.locked", "!=", true)
+      .$if(!!transformedQuery && ids.length > 0, (eb) =>
+        eb.where("noteId", "in", ids)
+      )
+      .select(["data", "noteId as id"])
+      .$castTo<{ data: string; id: string }>()
+      .execute();
+
+    for (let i = 0; i < titles.length; i++) {
+      const title = titles[i];
+      const result = findOrAdd(mergedResults, (r) => r.id === title.id, {
+        id: title.id,
+        title: stringToMatch(title.title || ""),
+        type: "searchResult",
+        content: []
+      });
+
+      const html = htmls.find((h) => h.id === title.id);
+      const text = html ? extractText(html.data) : "";
+
+      if (
+        title.title &&
+        smallTokens.every((token) => !!title.title?.includes(token))
+      ) {
+        result.title.push(
+          ...splitHighlightedMatch(
+            highlightQueries(title.title, smallTokens)
+          ).flatMap((m) => m)
+        );
+      }
+
+      if (text && smallTokens.every((token) => !!text?.includes(token))) {
+        result.content.push(
+          ...splitHighlightedMatch(highlightQueries(text, smallTokens))
+        );
+      }
+    }
+
+    return arrayToVirtualizedGrouping(mergedResults, this.db.options.batchSize);
   }
 
   notebooks(query: string) {
@@ -331,4 +404,220 @@ export default class Lookup {
     const db = this.db.sql() as unknown as Kysely<RawDatabaseSchema>;
     await rebuildSearchIndex(db);
   }
+}
+
+function highlightQueries(text: string, queries: string[]): string {
+  if (!text || !queries.length) return text;
+
+  // Collect all ranges
+  const ranges = [];
+  const lowerText = text.toLowerCase();
+
+  for (let i = 0; i < queries.length; i++) {
+    const query = queries[i];
+    const lowerQuery = query.toLowerCase();
+    const queryLen = query.length;
+    let pos = 0;
+
+    while ((pos = lowerText.indexOf(lowerQuery, pos)) !== -1) {
+      ranges.push({
+        start: pos,
+        end: pos + queryLen,
+        len: queryLen
+      });
+      pos += 1;
+    }
+  }
+
+  if (!ranges.length) return text;
+
+  // Sort by start position, then by length (longer first)
+  ranges.sort((a, b) => a.start - b.start || b.len - a.len);
+
+  // Filter overlaps and merge adjacent ranges
+  const merged = [ranges[0]];
+  for (let i = 1; i < ranges.length; i++) {
+    const current = ranges[i];
+    const previous = merged[merged.length - 1];
+
+    if (current.start > previous.end) {
+      // No overlap or adjacency - add as new range
+      merged.push(current);
+    } else if (current.start === previous.end) {
+      // Adjacent ranges - merge them
+      previous.end = current.end;
+      previous.len = previous.end - previous.start;
+    }
+    // Overlapping ranges are skipped
+  }
+
+  // Build result using array of parts
+  const parts = [];
+  let lastEnd = 0;
+
+  for (const { start, end } of merged) {
+    if (start > lastEnd) {
+      parts.push(text.slice(lastEnd, start));
+    }
+    parts.push("<nnmark>", text.slice(start, end), "</nnmark>");
+    lastEnd = end;
+  }
+
+  if (lastEnd < text.length) {
+    parts.push(text.slice(lastEnd));
+  }
+
+  return parts.join("");
+}
+
+function arrayToVirtualizedGrouping<T extends { id: string }>(
+  array: T[],
+  batchSize: number
+): VirtualizedGrouping<T> {
+  return new VirtualizedGrouping<T>(
+    array.length,
+    batchSize,
+    () => Promise.resolve(array.map((c) => c.id)),
+    async (start, end) => {
+      const items = array.slice(start, end);
+      return {
+        ids: items.map((i) => i.id),
+        items
+      };
+    },
+    (items) => groupArray(items, () => `${items.length} results`)
+  );
+}
+
+function splitHighlightedMatch(text: string): Match[][] {
+  const parts = text.split(/<nnmark>(.*?)<\/nnmark>/g);
+  const allMatches: Match[][] = [];
+  let matches: Match[] = [];
+  let totalLength = 0;
+
+  for (let i = 0; i < parts.length - 1; i += 2) {
+    const prefix = parts[i];
+    const match = parts[i + 1];
+    // const suffix = parts[i + 2] || "";
+    const matchLength = prefix.length + match.length; // + suffix.length;
+
+    if (totalLength > 120 && matches.length > 0) {
+      matches[matches.length - 1].suffix += "...";
+      allMatches.push(matches);
+      matches = [];
+      totalLength = 0;
+    }
+
+    matches.push({
+      match,
+      prefix,
+      suffix: ""
+    });
+
+    totalLength += matchLength;
+  }
+
+  if (matches.length > 0) {
+    matches[matches.length - 1].suffix += parts[parts.length - 1];
+    allMatches.push(matches);
+  }
+
+  for (const matches of allMatches) {
+    const totalLength = matches.reduce(
+      (length, curr) =>
+        length + curr.match.length + curr.prefix.length + curr.suffix.length,
+      0
+    );
+    if (totalLength > 200) {
+      const start = matches[0];
+      const end = matches[matches.length - 1];
+
+      const centered = centerMatch(
+        start.prefix,
+        end.suffix,
+        totalLength - (start.prefix.length + end.suffix.length),
+        {
+          maxLength: 200
+        }
+      );
+
+      start.prefix = centered.prefix || " ";
+      end.suffix = centered.suffix || " ";
+    }
+  }
+
+  return allMatches;
+}
+
+interface CenterOptions {
+  maxLength?: number; // Maximum total length of output
+  minContext?: number; // Minimum context on each side
+  ellipsis?: string; // String to use for truncation
+  preferLeft?: boolean; // Prefer more context on left when odd length
+}
+
+function centerMatch(
+  prefix: string,
+  suffix: string,
+  matchLength: number,
+  options: CenterOptions = {}
+): { prefix?: string; suffix?: string } {
+  const {
+    maxLength = 120,
+    minContext = 20,
+    ellipsis = "...",
+    preferLeft = true
+  } = options;
+
+  // Handle edge cases
+  if (!match) return {};
+  if (matchLength >= maxLength) return {};
+
+  // Calculate available space for context
+  const availableSpace = maxLength - matchLength;
+
+  // Calculate initial context lengths
+  let leftLength = Math.floor(availableSpace / 2);
+  let rightLength = availableSpace - leftLength;
+
+  // Adjust if we prefer left context
+  if (preferLeft && availableSpace % 2 !== 0) {
+    leftLength++;
+    rightLength--;
+  }
+
+  // Ensure minimum context if possible
+  if (leftLength < minContext && prefix.length > leftLength) {
+    const diff = Math.min(rightLength - minContext, minContext - leftLength);
+    if (diff > 0) {
+      leftLength += diff;
+      rightLength -= diff;
+    }
+  } else if (rightLength < minContext && suffix.length > rightLength) {
+    const diff = Math.min(leftLength - minContext, minContext - rightLength);
+    if (diff > 0) {
+      rightLength += diff;
+      leftLength -= diff;
+    }
+  }
+
+  // Build result
+  const left =
+    prefix.length > leftLength ? ellipsis + prefix.slice(-leftLength) : prefix;
+  const right =
+    suffix.length > rightLength
+      ? suffix.slice(0, rightLength) + ellipsis
+      : suffix;
+
+  return { prefix: left, suffix: right };
+}
+
+function stringToMatch(str: string): Match[] {
+  return [
+    {
+      prefix: str,
+      match: "",
+      suffix: ""
+    }
+  ];
 }
