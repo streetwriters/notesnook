@@ -1164,7 +1164,10 @@ $headline$: Use starting line of the note as title.`,
   changeVaultPasswordDesc: () =>
     t`All locked notes will be re-encrypted with the new password.`,
   clearVaultDesc: () => t`Remove all notes from the vault.`,
-  deleteVaultDesc: () => t`Delete vault (and optionally remove all notes).`,
+  deleteVaultDesc: () => t`
+All locked notes associated will be <b style='color:var(--accent-error)'>PERMANENTLY DELETED</b>. 
+
+If you want to keep them, remove locked notes from the vault.`,
   biometricUnlock: () => t`Biometric unlocking`,
   biometricUnlockDesc: () => t`Unlock your vault with biometric authentication`,
   revokeBiometricUnlock: () => t`Revoke biometric unlocking`,

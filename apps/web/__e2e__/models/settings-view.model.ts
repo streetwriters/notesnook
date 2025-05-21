@@ -189,4 +189,16 @@ export class SettingsViewModel {
       .locator("input");
     await titleFormatInput.fill(format);
   }
+
+  async deleteVault(password: string) {
+    const item = await this.navigation.findItem("Vault");
+    await item?.click();
+
+    const deleteVaultButton = this.page
+      .locator(getTestId("setting-delete-vault"))
+      .locator("button");
+
+    await deleteVaultButton.click();
+    await fillPasswordDialog(this.page, password);
+  }
 }

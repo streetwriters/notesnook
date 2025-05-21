@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { test, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
-import { getTestId, NOTE, PASSWORD } from "./utils";
+import { getTestId, NOTE, PASSWORD, USER } from "./utils";
 
 test("locking a note should show vault unlocked status", async ({ page }) => {
   const app = new AppModel(page);
@@ -124,4 +124,28 @@ test("clicking on vault unlocked status should lock the readonly note", async ({
   await vaultUnlockedStatus.click();
 
   expect(await note?.isLockedNotePasswordFieldVisible()).toBe(true);
+});
+
+test("deleting the vault should permanently delete locked notes", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.auth.goto();
+  await app.auth.login(USER.CURRENT);
+
+  let notes = await app.goToNotes();
+  let note = await notes.createNote(NOTE);
+  await note?.contextMenu.lock(PASSWORD);
+
+  const settings = await app.goToSettings();
+  await settings.deleteVault(USER.CURRENT.password!);
+  await settings.close();
+
+  notes = await app.goToNotes();
+  note = await notes.findNote(NOTE);
+  expect(note).toBeUndefined();
+
+  const trash = await app.goToTrash();
+  const trashNote = await trash.findItem(NOTE.title);
+  expect(trashNote).toBeUndefined();
 });
