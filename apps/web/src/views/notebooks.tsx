@@ -18,18 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Notebook as NotebookType, VirtualizedGrouping } from "@notesnook/core";
-import { Box, Flex, Input, Text } from "@theme-ui/components";
-import {
-  forwardRef,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState
-} from "react";
+import { Box, Input, Text } from "@theme-ui/components";
+import { useEffect, useRef, useState } from "react";
 import { db } from "../common/db";
 import { store, useStore } from "../stores/notebook-store";
 import { useStore as useSelectionStore } from "../stores/selection-store";
-import Placeholder from "../components/placeholders";
 import { Notebook } from "../components/notebook";
 import {
   TreeNode,
@@ -39,9 +32,6 @@ import {
 import { ListLoader } from "../components/loaders/list-loader";
 import { debounce } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
-import { CustomScrollbarsVirtualList } from "../components/list-container";
-import { ScrollerProps } from "react-virtuoso";
-import ScrollContainer from "../components/scroll-container";
 import { SidebarScroller } from "../components/sidebar-scroller";
 
 export function Notebooks() {
@@ -107,16 +97,16 @@ export function Notebooks() {
             onDeselect={deselectItem}
             onSelect={selectItem}
             saveKey="notebook-tree"
-            getChildNodes={async (parentId, depth) => {
+            getChildNodes={async (parent) => {
               const nodes: TreeNode<{
                 notebook: NotebookType;
                 totalNotes: number;
               }>[] = [];
               const grouping =
-                parentId === "root"
+                parent.id === "root"
                   ? notebooks
                   : await db.relations
-                      .from({ type: "notebook", id: parentId }, "notebook")
+                      .from({ type: "notebook", id: parent.id }, "notebook")
                       .selector.sorted(
                         db.settings.getGroupOptions("notebooks")
                       );
@@ -125,10 +115,10 @@ export function Notebooks() {
                 if (!notebook.item) continue;
                 nodes.push({
                   data: { notebook: notebook.item, totalNotes: 0 },
-                  depth: depth + 1,
+                  depth: parent.depth + 1,
                   hasChildren: false,
                   id: notebook.item.id,
-                  parentId
+                  parentId: parent.id
                 });
               }
               const allRelations = await db.relations

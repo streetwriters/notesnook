@@ -219,7 +219,7 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
               rootId={"root"}
               itemHeight={30}
               treeRef={treeRef}
-              getChildNodes={async (id, depth) => {
+              getChildNodes={async ({ id, depth }) => {
                 const nodes: TreeNode<Notebook>[] = [];
                 if (id === "root") {
                   for (const id of notebooks) {

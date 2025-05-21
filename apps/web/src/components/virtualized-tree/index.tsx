@@ -39,7 +39,7 @@ export type VirtualizedTreeHandle<T> = {
 };
 export type TreeNode<T = any> = {
   id: string;
-  parentId: string;
+  parentId?: string;
   depth: number;
   hasChildren: boolean;
   data: T;
@@ -49,8 +49,8 @@ type ExpandedIds = Record<string, boolean>;
 type TreeViewProps<T> = {
   treeRef?: React.Ref<VirtualizedTreeHandle<T>> | null;
   rootId: string;
-  itemHeight: number;
-  getChildNodes: (id: string, depth: number) => Promise<TreeNode<T>[]>;
+  itemHeight?: number;
+  getChildNodes: (parent: TreeNode<T>) => Promise<TreeNode<T>[]>;
   renderItem: (props: {
     item: TreeNode<T>;
     index: number;
@@ -101,8 +101,7 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
     () => ({
       async refresh() {
         const { children } = await fetchChildren(
-          rootId,
-          -1,
+          { id: rootId, depth: -1, data: {} as T, hasChildren: true },
           expandedIds,
           getChildNodes
         );
@@ -117,7 +116,7 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
         const node = nodes[index];
         const removeIds: string[] = [node.id];
         for (const treeNode of nodes) {
-          if (removeIds.includes(treeNode.parentId)) {
+          if (treeNode.parentId && removeIds.includes(treeNode.parentId)) {
             removeIds.push(treeNode.id);
           }
         }
@@ -128,14 +127,13 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
           return;
         }
 
-        const childNodes = await getChildNodes(node.id, node.depth);
+        const childNodes = await getChildNodes(node);
         if (childNodes.length > 0 && itemOptions?.expand) {
           expandedIds[node.id] = true;
         }
 
         const { children } = await fetchChildren(
-          node.id,
-          node.depth,
+          node,
           expandedIds,
           getChildNodes
         );
@@ -202,12 +200,14 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
   });
 
   useEffect(() => {
-    fetchChildren(rootId, -1, expandedIds, getChildNodes).then(
-      ({ children, expandedIds }) => {
-        setNodes(children);
-        setExpandedIds(expandedIds);
-      }
-    );
+    fetchChildren(
+      { depth: -1, id: rootId, data: {} as T, hasChildren: true },
+      expandedIds,
+      getChildNodes
+    ).then(({ children, expandedIds }) => {
+      setNodes(children);
+      setExpandedIds(expandedIds);
+    });
     console.log("fetching");
   }, [rootId]);
 
@@ -242,8 +242,9 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
                 const removeIds: string[] = [];
                 for (const treeNode of tree) {
                   if (
-                    treeNode.parentId === node.id ||
-                    removeIds.includes(treeNode.parentId)
+                    treeNode.parentId &&
+                    (treeNode.parentId === node.id ||
+                      removeIds.includes(treeNode.parentId))
                   ) {
                     removeIds.push(treeNode.id);
                   }
@@ -256,8 +257,7 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
               if (expandedIds[node.id]) return;
 
               const { children } = await fetchChildren(
-                node.id,
-                node.depth,
+                node,
                 expandedIds,
                 getChildNodes
               );
@@ -298,12 +298,11 @@ function VirtuosoItem({
 }
 
 async function fetchChildren<T>(
-  id: string,
-  depth: number,
+  node: TreeNode<T>,
   expandedIds: ExpandedIds,
-  getChildNodes: (id: string, depth: number) => Promise<TreeNode<T>[]>
+  getChildNodes: TreeViewProps<T>["getChildNodes"]
 ) {
-  const children = await getChildNodes(id, depth);
+  const children = await getChildNodes(node);
   for (let i = 0; i < children.length; i++) {
     const childNode = children[i];
     if (
@@ -314,8 +313,7 @@ async function fetchChildren<T>(
     ) {
       expandedIds[childNode.id] = true;
       const { children: nodes } = await fetchChildren(
-        childNode.id,
-        childNode.depth,
+        childNode,
         expandedIds,
         getChildNodes
       );
