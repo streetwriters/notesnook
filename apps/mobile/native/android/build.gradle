@@ -3,16 +3,16 @@ import org.apache.tools.ant.taskdefs.condition.Os
 
 buildscript {
     ext {
-        buildToolsVersion = "34.0.0"
-        minSdkVersion = 23
-        compileSdkVersion = 34
+        buildToolsVersion = "35.0.0"
+        minSdkVersion = 24
+        compileSdkVersion = 35
         targetSdkVersion = 34
-        kotlinVersion = '1.9.22'
+        kotlinVersion = '2.0.21'
         androidXAnnotation = "1.1.0"
         androidXCoreVersion = "1.7.0"
         androidXCore = "1.7.0"
         androidXBrowser = "1.0.0"
-        ndkVersion = "23.2.8568313"
+        ndkVersion = "27.1.12297006"
     }
     
     repositories {
