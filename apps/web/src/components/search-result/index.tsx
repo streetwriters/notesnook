@@ -1,0 +1,137 @@
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2023 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+import { HighlightedResult, Match } from "@notesnook/core";
+import { Button, Flex, Text } from "@theme-ui/components";
+import React from "react";
+import { useEditorStore } from "../../stores/editor-store";
+
+import ListItem from "../list-item";
+import { ChevronDown, ChevronRight } from "../icons";
+
+type SearchResultProps = {
+  item: HighlightedResult;
+  match?: Match[];
+  depth: number;
+  isExpandable: boolean;
+  isExpanded: boolean;
+  collapse: () => void;
+  expand: () => void;
+};
+
+function SearchResult(props: SearchResultProps) {
+  const { item, match, collapse, depth, expand, isExpandable, isExpanded } =
+    props;
+
+  const isOpened = useEditorStore((store) => store.isNoteOpen(item.id));
+
+  return (
+    <ListItem
+      isFocused={isOpened}
+      isCompact={!match}
+      item={item}
+      onClick={() =>
+        useEditorStore
+          .getState()
+          .openSession(item.id, { considerPinnedTab: true })
+      }
+      onMiddleClick={() =>
+        useEditorStore.getState().openSession(item.id, { openInNewTab: true })
+      }
+      title={
+        <Flex sx={{ alignItems: "center", gap: "small" }}>
+          {isExpandable ? (
+            <Button
+              variant="secondary"
+              sx={{ bg: "transparent", p: 0, borderRadius: 100 }}
+              onClick={(e) => {
+                e.stopPropagation();
+                isExpanded ? collapse() : expand();
+              }}
+            >
+              {isExpanded ? (
+                <ChevronDown
+                  size={14}
+                  color={isOpened ? "icon-selected" : "icon"}
+                />
+              ) : (
+                <ChevronRight
+                  size={14}
+                  color={isOpened ? "icon-selected" : "icon"}
+                />
+              )}
+            </Button>
+          ) : null}
+          <Text
+            data-test-id={`title`}
+            variant={"body"}
+            color={isOpened ? "paragraph-selected" : "paragraph"}
+            sx={{
+              ...(match
+                ? {
+                    whiteSpace: "pre-wrap"
+                  }
+                : {
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis"
+                  }),
+              fontWeight: "body",
+              display: "block",
+              ".match": {
+                bg: "accent-secondary",
+                color: "accentForeground-secondary"
+              }
+            }}
+          >
+            {match
+              ? match.map((match) => (
+                  <>
+                    <span>{match.prefix}</span>
+                    <span className="match">{match.match}</span>
+                    {match.suffix ? <span>{match.suffix}</span> : null}
+                  </>
+                ))
+              : item.title.map((match) => (
+                  <>
+                    <span>{match.prefix}</span>
+                    <span className="match">{match.match}</span>
+                    {match.suffix ? <span>{match.suffix}</span> : null}
+                  </>
+                ))}
+          </Text>
+        </Flex>
+      }
+      footer={
+        match ? undefined : (
+          <Text variant="subBody">
+            {item.content?.reduce((count, next) => next.length + count, 0) || 0}
+          </Text>
+        )
+      }
+      sx={{
+        mb: "small",
+        borderRadius: "default",
+        paddingLeft: `${5 + (depth === 0 ? 0 : 15 * depth)}px`
+      }}
+    />
+  );
+}
+
+export default React.memo(SearchResult);

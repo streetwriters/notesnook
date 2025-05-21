@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useStore } from "../stores/note-store";
 import ListContainer from "../components/list-container";
 import useNavigate from "../hooks/use-navigate";
@@ -26,8 +26,24 @@ import { useSearch } from "../hooks/use-search";
 import { db } from "../common/db";
 import { useEditorStore } from "../stores/editor-store";
 import { ListLoader } from "../components/loaders/list-loader";
+import { Box, Text } from "@theme-ui/components";
+import { strings } from "@notesnook/intl";
+import {
+  TreeNode,
+  VirtualizedTree,
+  VirtualizedTreeHandle
+} from "../components/virtualized-tree";
+import SearchResult from "../components/search-result";
+import { HighlightedResult, Match } from "@notesnook/core";
+import GroupHeader from "../components/group-header";
 
 function Home() {
+  const treeRef = useRef<
+    VirtualizedTreeHandle<{
+      item: HighlightedResult;
+      match?: Match[];
+    }>
+  >(null);
   const notes = useStore((store) => store.notes);
   const isCompact = useStore((store) => store.viewMode === "compact");
   const refresh = useStore((store) => store.refresh);
@@ -36,7 +52,7 @@ function Home() {
     "notes",
     async (query, sortOptions) => {
       if (useStore.getState().context) return;
-      return await db.lookup.notes(query).sorted(sortOptions);
+      return await db.lookup.notes(query, sortOptions);
     },
     [notes]
   );
@@ -46,6 +62,10 @@ function Home() {
   useEffect(() => {
     useStore.getState().refresh();
   }, []);
+
+  useEffect(() => {
+    treeRef.current?.resetAndRefresh();
+  }, [filteredItems]);
 
   // useEffect(() => {
   //   (async function () {
@@ -64,6 +84,94 @@ function Home() {
   //   })();
   // }, []);
 
+  if (filteredItems) {
+    return (
+      <Box
+        id="search-results"
+        sx={{
+          flex: 1,
+          '[data-viewport-type="element"]': {
+            px: 1,
+            width: `calc(100% - ${2 * 6}px) !important`
+          }
+        }}
+      >
+        {filteredItems.length === 0 ? (
+          <Text
+            variant="body"
+            sx={{ color: "paragraph-secondary", mx: 1 }}
+            data-test-id="list-placeholder"
+          >
+            {strings.noResultsFound()}
+          </Text>
+        ) : (
+          <>
+            <GroupHeader
+              groupingKey={"search"}
+              isSearching={true}
+              refresh={refresh}
+              title={`${filteredItems.length} results`}
+              isFocused={false}
+              index={0}
+              onSelectGroup={() => {}}
+              groups={async () => []}
+              onJump={() => {}}
+            />
+            <VirtualizedTree
+              treeRef={treeRef}
+              testId="search-results-list"
+              rootId={"root"}
+              getChildNodes={async (parent) => {
+                const nodes: TreeNode<{
+                  item: HighlightedResult;
+                  match?: Match[];
+                }>[] = [];
+                if (parent.id === "root") {
+                  for (let i = 0; i < filteredItems.length; ++i) {
+                    const result = await filteredItems.item(i);
+                    if (!result.item) continue;
+                    nodes.push({
+                      data: { item: result.item },
+                      depth: parent.depth + 1,
+                      hasChildren: !!result.item.content?.length,
+                      id: result.item.id,
+                      parentId: parent.id,
+                      expanded: true
+                    });
+                  }
+                } else {
+                  let i = 0;
+                  for (const match of parent.data.item.content || []) {
+                    nodes.push({
+                      data: { item: parent.data.item, match },
+                      depth: parent.depth + 1,
+                      parentId: parent.id,
+                      id: parent.id + i++,
+                      hasChildren: false
+                    });
+                  }
+                }
+                return nodes;
+              }}
+              renderItem={({ collapse, expand, expanded, item: node }) => (
+                <SearchResult
+                  key={node.id}
+                  depth={node.depth}
+                  isExpandable={node.hasChildren}
+                  item={node.data.item}
+                  match={node.data.match}
+                  isExpanded={expanded}
+                  collapse={collapse}
+                  expand={expand}
+                />
+              )}
+            />
+          </>
+        )}
+      </Box>
+    );
+  }
+
   if (!notes) return <ListLoader />;
   return (
     <ListContainer
@@ -72,7 +180,6 @@ function Home() {
       compact={isCompact}
       refresh={refresh}
       items={filteredItems || notes}
-      isSearching={!!filteredItems}
       placeholder={<Placeholder context={filteredItems ? "search" : "notes"} />}
       button={{
         onClick: () => useEditorStore.getState().newSession()

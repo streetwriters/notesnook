@@ -134,18 +134,19 @@ function TableOfContents(props: TableOfContentsProps) {
                 treeRef={treeRef}
                 rootId="root"
                 itemHeight={27}
-                getChildNodes={async (id, depth) => {
+                getChildNodes={async (parent) => {
                   const remainingToc =
-                    id === "root"
+                    parent.id === "root"
                       ? tableOfContents
                       : tableOfContents.slice(
                           tableOfContents.findIndex((item) => item.id === id)
                         );
 
-                  let items: typeof remainingToc = [];
+                  const items: typeof remainingToc = [];
                   let added = false;
                   for (let i = 0; i < remainingToc.length; i++) {
-                    if (added && depth + 1 > remainingToc[i].level) break;
+                    if (added && parent.depth + 1 > remainingToc[i].level)
+                      break;
 
                     items.push(remainingToc[i]);
                     added = true;
@@ -154,12 +155,12 @@ function TableOfContents(props: TableOfContentsProps) {
                   const nodes: TreeNode<TOCItem>[] = [];
                   for (let i = 0; i < items.length; i++) {
                     const item = items[i];
-                    if (item.level !== depth + 1) continue;
+                    if (item.level !== parent.depth + 1) continue;
                     nodes.push({
                       id: item.id,
                       data: item,
-                      depth: depth + 1,
-                      parentId: id,
+                      depth: parent.depth + 1,
+                      parentId: parent.id,
                       hasChildren:
                         i + 1 < items.length && items[i + 1].level > item.level,
                       expanded: true
