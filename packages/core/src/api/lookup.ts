@@ -170,32 +170,30 @@ export default class Lookup {
 
       for (let i = 0; i < titles.length; i++) {
         const title = titles[i];
-        const result = findOrAdd(mergedResults, (r) => r.id === title.id, {
-          id: title.id,
-          title: stringToMatch(title.title || ""),
-          type: "searchResult",
-          content: [],
-          rank: 0
-        });
-
         const html = htmls.find((h) => h.id === title.id);
         const text = html ? extractText(html.data) : "";
 
         if (
-          title.title &&
-          smallTokens.every((token) => !!title.title?.includes(token))
+          (title.title &&
+            smallTokens.every((token) => !!title.title?.includes(token))) ||
+          (text && smallTokens.every((token) => !!text?.includes(token)))
         ) {
+          const result = findOrAdd(mergedResults, (r) => r.id === title.id, {
+            id: title.id,
+            title: stringToMatch(title.title || ""),
+            type: "searchResult",
+            content: [],
+            rank: 0
+          });
+
           const merged = mergeMatches(
             result.title,
             splitHighlightedMatch(
-              highlightQueries(title.title, smallTokens)
+              highlightQueries(title.title || "", smallTokens)
             ).flatMap((m) => m)
           );
-          if (!merged) continue;
-          result.title = merged;
-        }
+          if (merged) result.title = merged;
 
-        if (text && smallTokens.every((token) => !!text?.includes(token))) {
           result.content.push(
             ...splitHighlightedMatch(highlightQueries(text, smallTokens))
           );
@@ -513,6 +511,7 @@ function arrayToVirtualizedGrouping<T extends { id: string }>(
 
 function splitHighlightedMatch(text: string): Match[][] {
   const parts = text.split(/<nnmark>(.*?)<\/nnmark>/g);
+  console.log(parts);
   const allMatches: Match[][] = [];
   let matches: Match[] = [];
   let totalLength = 0;
@@ -520,8 +519,8 @@ function splitHighlightedMatch(text: string): Match[][] {
   for (let i = 0; i < parts.length - 1; i += 2) {
     const prefix = parts[i];
     const match = parts[i + 1];
-    // const suffix = parts[i + 2] || "";
-    const matchLength = prefix.length + match.length; // + suffix.length;
+    let suffix = parts.at(i + 2);
+    const matchLength = prefix.length + match.length + (suffix?.length || 0);
 
     if (totalLength > 120 && matches.length > 0) {
       matches[matches.length - 1].suffix += "...";
@@ -530,11 +529,18 @@ function splitHighlightedMatch(text: string): Match[][] {
       totalLength = 0;
     }
 
+    if (suffix) {
+      suffix = suffix.replace(/\s{2,}/gm, " ");
+      suffix = suffix.slice(0, Math.max(suffix.length / 2, 60));
+    }
+
     matches.push({
       match,
-      prefix,
-      suffix: ""
+      prefix: prefix.replace(/\s{2,}/gm, " "),
+      suffix: suffix || ""
     });
+
+    if (suffix) parts[i + 2] = suffix.slice(suffix.length);
 
     totalLength += matchLength;
   }
@@ -567,7 +573,7 @@ function splitHighlightedMatch(text: string): Match[][] {
       end.suffix = centered.suffix || " ";
     }
   }
-
+  console.log(allMatches);
   return allMatches;
 }
 
