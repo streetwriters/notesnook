@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import ListItem from "../list-item";
 import { Button, Flex, Text } from "@theme-ui/components";
-import { store, useStore as useNotesStore } from "../../stores/note-store";
+import { useStore as useNotesStore } from "../../stores/note-store";
 import { Notebook as NotebookType } from "@notesnook/core";
 import {
   ChevronDown,
@@ -30,7 +30,8 @@ import {
   Shortcut,
   Trash,
   Notebook as NotebookIcon,
-  ArrowUp
+  ArrowUp,
+  Move
 } from "../icons";
 import { MenuItem } from "@notesnook/ui";
 import { hashNavigate, navigate } from "../../navigation";
@@ -45,6 +46,7 @@ import { strings } from "@notesnook/intl";
 import { db } from "../../common/db";
 import { createSetDefaultHomepageMenuItem } from "../../common";
 import { useStore as useNotebookStore } from "../../stores/notebook-store";
+import { MoveNotebookDialog } from "../../dialogs/move-notebook-dialog";
 
 type NotebookProps = {
   item: NotebookType;
@@ -234,6 +236,15 @@ export const notebookMenuItems: (
     { key: "sep1", type: "separator" },
     {
       type: "button",
+      key: "move",
+      icon: Move.path,
+      title: strings.move(),
+      onClick: () => {
+        MoveNotebookDialog.show({ notebook: notebook });
+      }
+    },
+    {
+      type: "button",
       key: "move-to-top",
       icon: ArrowUp.path,
       title: strings.moveToTop(),
@@ -255,7 +266,7 @@ export const notebookMenuItems: (
       },
       multiSelect: false
     },
-    { key: "sep2", type: "separator", isHidden: context?.isRoot },
+    { key: "sep2", type: "separator" },
     {
       type: "button",
       key: "movetotrash",
