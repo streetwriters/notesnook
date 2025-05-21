@@ -58,9 +58,8 @@
         android:requestLegacyExternalStorage="true"
         android:theme="@style/BootTheme"
         android:largeHeap="true"
-        android:supportsRtl="false"
-        android:networkSecurityConfig="@xml/network_security_config"
-        tools:replace="android:supportsRtl">
+        android:supportsRtl="true"
+        android:networkSecurityConfig="@xml/network_security_config">
 
         <receiver android:exported="false" android:label="@string/reminders_title" android:name=".ReminderWidgetProvider">
             <intent-filter>
