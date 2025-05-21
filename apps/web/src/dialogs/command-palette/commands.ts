@@ -72,8 +72,14 @@ export const commandActions = {
   command: (command: Command) => getCommandById(command.id)?.action(command),
   note: (command: Command, options?: { openInNewTab?: boolean }) =>
     useEditorStore.getState().openSession(command.id, options),
-  notebook: (command: Command) => navigate(`/notebooks/${command.id}`),
-  tag: (command: Command) => navigate(`/tags/${command.id}`),
+  notebook: (command: Command) => {
+    useAppStore.getState().setNavigationTab("notebooks");
+    navigate(`/notebooks/${command.id}`);
+  },
+  tag: (command: Command) => {
+    useAppStore.getState().setNavigationTab("tags");
+    navigate(`/tags/${command.id}`);
+  },
   reminder: (command: Command) => hashNavigate(`/reminders/${command.id}/edit`)
 };
 
@@ -92,7 +98,10 @@ const staticCommands: Command[] = [
     id: "notes",
     title: strings.dataTypesPluralCamelCase.note(),
     icon: ArrowTopRight,
-    action: () => navigate("/"),
+    action: () => {
+      useAppStore.getState().setNavigationTab("home");
+      navigate("/");
+    },
     group: strings.navigate(),
     type: "command"
   },
@@ -100,7 +109,7 @@ const staticCommands: Command[] = [
     id: "notebooks",
     title: strings.dataTypesPluralCamelCase.notebook(),
     icon: ArrowTopRight,
-    action: () => navigate("/notebooks"),
+    action: () => useAppStore.getState().setNavigationTab("notebooks"),
     group: strings.navigate(),
     type: "command"
   },
@@ -108,7 +117,7 @@ const staticCommands: Command[] = [
     id: "tags",
     title: strings.dataTypesPluralCamelCase.tag(),
     icon: ArrowTopRight,
-    action: () => navigate("/tags"),
+    action: () => useAppStore.getState().setNavigationTab("tags"),
     group: strings.navigate(),
     type: "command"
   },
@@ -116,7 +125,10 @@ const staticCommands: Command[] = [
     id: "favorites",
     title: strings.dataTypesPluralCamelCase.favorite(),
     icon: ArrowTopRight,
-    action: () => navigate("/favorites"),
+    action: () => {
+      useAppStore.getState().setNavigationTab("home");
+      navigate("/favorites");
+    },
     group: strings.navigate(),
     type: "command"
   },
@@ -124,7 +136,10 @@ const staticCommands: Command[] = [
     id: "reminders",
     title: strings.dataTypesPluralCamelCase.reminder(),
     icon: ArrowTopRight,
-    action: () => navigate("/reminders"),
+    action: () => {
+      useAppStore.getState().setNavigationTab("home");
+      navigate("/reminders");
+    },
     group: strings.navigate(),
     type: "command"
   },
@@ -132,7 +147,10 @@ const staticCommands: Command[] = [
     id: "monographs",
     title: strings.dataTypesPluralCamelCase.monograph(),
     icon: ArrowTopRight,
-    action: () => navigate("/monographs"),
+    action: () => {
+      useAppStore.getState().setNavigationTab("home");
+      navigate("/monographs");
+    },
     group: strings.navigate(),
     type: "command"
   },
@@ -140,7 +158,10 @@ const staticCommands: Command[] = [
     id: "trash",
     title: strings.trash(),
     icon: ArrowTopRight,
-    action: () => navigate("/trash"),
+    action: () => {
+      useAppStore.getState().setNavigationTab("home");
+      navigate("/trash");
+    },
     group: strings.navigate(),
     type: "command"
   },
