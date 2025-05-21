@@ -68,6 +68,7 @@ export default class Lookup {
 
     let mergedResults: HighlightedResult[] = [];
     if (transformedQuery.length > 0) {
+      console.time("sql lookup");
       const results = await db
         .selectFrom((eb) =>
           eb
@@ -120,7 +121,9 @@ export default class Lookup {
           logger.error(e, `Error while searching`, { query });
           return [];
         });
+      console.timeEnd("sql lookup");
 
+      console.time("merge results");
       for (const result of results) {
         const old = findOrAdd(mergedResults, (r) => r.id === result.id, {
           type: "searchResult",
@@ -140,6 +143,7 @@ export default class Lookup {
           old.title = splitHighlightedMatch(result.match).flatMap((m) => m);
         old.rank += result.rank;
       }
+      console.timeEnd("merge results");
     }
 
     const smallTokens = Array.from(
@@ -150,6 +154,7 @@ export default class Lookup {
 
     if (smallTokens.length > 0) {
       const ids = mergedResults.map((r) => r.id);
+      console.time("fetch titles");
       const titles = await db
         .selectFrom("notes")
         .$if(!!transformedQuery && ids.length > 0, (eb) =>
@@ -157,7 +162,9 @@ export default class Lookup {
         )
         .select(["id", "title"])
         .execute();
+      console.timeEnd("fetch titles");
 
+      console.time("fetch htmls");
       const htmls = await db
         .selectFrom("content")
         .where("content.locked", "!=", true)
@@ -167,7 +174,9 @@ export default class Lookup {
         .select(["data", "noteId as id"])
         .$castTo<{ data: string; id: string }>()
         .execute();
+      console.timeEnd("fetch htmls");
 
+      console.time("small token lookup");
       for (let i = 0; i < titles.length; i++) {
         const title = titles[i];
         const html = htmls.find((h) => h.id === title.id);
@@ -199,6 +208,7 @@ export default class Lookup {
           );
         }
       }
+      console.timeEnd("small token lookup");
     }
 
     const resultsWithMissingTitle = mergedResults
@@ -206,6 +216,7 @@ export default class Lookup {
       .map((r) => r.id);
 
     if (resultsWithMissingTitle.length > 0) {
+      console.time("missing title");
       const titles = await db
         .selectFrom("notes")
         .where("id", "in", resultsWithMissingTitle)
@@ -216,6 +227,7 @@ export default class Lookup {
         if (!result || !title.title) continue;
         result.title = stringToMatch(title.title);
       }
+      console.timeEnd("missing title");
     }
 
     mergedResults = mergedResults.filter((r) => !!r.title.length);
@@ -511,7 +523,6 @@ function arrayToVirtualizedGrouping<T extends { id: string }>(
 
 function splitHighlightedMatch(text: string): Match[][] {
   const parts = text.split(/<nnmark>(.*?)<\/nnmark>/g);
-  console.log(parts);
   const allMatches: Match[][] = [];
   let matches: Match[] = [];
   let totalLength = 0;
@@ -573,7 +584,6 @@ function splitHighlightedMatch(text: string): Match[][] {
       end.suffix = centered.suffix || " ";
     }
   }
-  console.log(allMatches);
   return allMatches;
 }
 
