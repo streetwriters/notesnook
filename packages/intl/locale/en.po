@@ -3307,6 +3307,14 @@ msgstr "Jump to group"
 msgid "Keep"
 msgstr "Keep"
 
+#: src/strings.ts:2481
+msgid "Keep a vault note unlocked once it is opened. Note will be locked back once vault is locked."
+msgstr "Keep a vault note unlocked once it is opened. Note will be locked back once vault is locked."
+
+#: src/strings.ts:2479
+msgid "Keep note unlocked"
+msgstr "Keep note unlocked"
+
 #: src/strings.ts:2012
 msgid "Keep open"
 msgstr "Keep open"

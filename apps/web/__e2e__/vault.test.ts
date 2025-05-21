@@ -125,3 +125,42 @@ test("clicking on vault unlocked status should lock the readonly note", async ({
 
   expect(await note?.isLockedNotePasswordFieldVisible()).toBe(true);
 });
+
+test("when keep note unlocked setting is disabled (default), locked note should be locked again when it is closed after opening", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note = await notes.createNote(NOTE);
+
+  await note?.contextMenu.lock(PASSWORD);
+  await note?.openLockedNote(PASSWORD);
+  const tabs = await notes.editor.getTabs();
+  await tabs[0].close();
+
+  await note?.click();
+
+  expect(await note?.isLockedNotePasswordFieldVisible()).toBe(true);
+});
+
+test("when keep note unlocked setting is enabled, locked note should not be locked again when it is closed after opening", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note = await notes.createNote(NOTE);
+
+  await note?.contextMenu.lock(PASSWORD);
+  const settings = await app.goToSettings();
+  await settings.toggleKeepVaultNotesUnlocked();
+  await settings.close();
+  await note?.openLockedNote(PASSWORD);
+  const tabs = await notes.editor.getTabs();
+  await tabs[0].close();
+
+  await note?.click();
+
+  expect(await note?.isLockedNotePasswordFieldVisible()).toBe(false);
+});
