@@ -29,7 +29,8 @@ import {
   SyncOff,
   Icon,
   Unlock,
-  CellphoneLock
+  CellphoneLock,
+  ConsoleLine
 } from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useAppStore } from "../../stores/app-store";
@@ -45,6 +46,7 @@ import { strings } from "@notesnook/intl";
 import { useVault } from "../../hooks/use-vault";
 import { useKeyStore } from "../../interfaces/key-store";
 import { STATUS_BAR_HEIGHT } from "../../common/constants";
+import { CommandPaletteDialog } from "../../dialogs/command-palette";
 
 function StatusBar() {
   const user = useUserStore((state) => state.user);
@@ -73,6 +75,20 @@ function StatusBar() {
         <Flex />
       ) : (
         <Flex sx={{ gap: "small" }}>
+          <Button
+            variant="statusitem"
+            onClick={() => CommandPaletteDialog.show({ isCommandMode: true })}
+            sx={{
+              alignItems: "center",
+              justifyContent: "center",
+              display: "flex",
+              color: "paragraph",
+              height: "100%"
+            }}
+            title={"Open command palette"}
+          >
+            <ConsoleLine size={12} />
+          </Button>
           {isLoggedIn ? (
             <>
               {user?.isEmailConfirmed ? (
