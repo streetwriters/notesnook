@@ -299,7 +299,8 @@ img.ProseMirror-separator {
 }
 
 .search-result.selected,
-.search-result.selected::selection {
+.search-result.selected::selection,
+nn-search-result {
   background-color: var(--accent-secondary) !important;
   color: var(--accentForeground-secondary) !important;
 }
