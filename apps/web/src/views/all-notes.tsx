@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import { useStore } from "../stores/note-store";
 import ListContainer from "../components/list-container";
 import useNavigate from "../hooks/use-navigate";
@@ -26,24 +26,9 @@ import { useSearch } from "../hooks/use-search";
 import { db } from "../common/db";
 import { useEditorStore } from "../stores/editor-store";
 import { ListLoader } from "../components/loaders/list-loader";
-import { Box, Text } from "@theme-ui/components";
-import { strings } from "@notesnook/intl";
-import {
-  TreeNode,
-  VirtualizedTree,
-  VirtualizedTreeHandle
-} from "../components/virtualized-tree";
-import SearchResult from "../components/search-result";
-import { HighlightedResult, Match } from "@notesnook/core";
-import GroupHeader from "../components/group-header";
+import Search from "./search";
 
 function Home() {
-  const treeRef = useRef<
-    VirtualizedTreeHandle<{
-      item: HighlightedResult;
-      matchIndex?: number;
-    }>
-  >(null);
   const notes = useStore((store) => store.notes);
   const isCompact = useStore((store) => store.viewMode === "compact");
   const refresh = useStore((store) => store.refresh);
@@ -63,10 +48,6 @@ function Home() {
     useStore.getState().refresh();
   }, []);
 
-  useEffect(() => {
-    treeRef.current?.resetAndRefresh();
-  }, [filteredItems]);
-
   // useEffect(() => {
   //   (async function () {
 
@@ -84,87 +65,7 @@ function Home() {
   //   })();
   // }, []);
 
-  if (filteredItems) {
-    return (
-      <>
-        {filteredItems.length === 0 ? (
-          <Text
-            variant="body"
-            sx={{ color: "paragraph-secondary", mx: 1 }}
-            data-test-id="list-placeholder"
-          >
-            {strings.noResultsFound()}
-          </Text>
-        ) : (
-          <>
-            <GroupHeader
-              groupingKey={"search"}
-              isSearching={true}
-              refresh={refresh}
-              title={`${filteredItems.length} results`}
-              isFocused={false}
-              index={0}
-              onSelectGroup={() => {}}
-              groups={async () => []}
-              onJump={() => {}}
-            />
-            <VirtualizedTree
-              treeRef={treeRef}
-              testId="search-results-list"
-              rootId={"root"}
-              getChildNodes={async (parent) => {
-                const nodes: TreeNode<{
-                  item: HighlightedResult;
-                  matchIndex?: number;
-                }>[] = [];
-                if (parent.id === "root") {
-                  for (let i = 0; i < filteredItems.length; ++i) {
-                    const result = await filteredItems.item(i);
-                    if (!result.item) continue;
-                    nodes.push({
-                      data: { item: result.item },
-                      depth: parent.depth + 1,
-                      hasChildren: !!result.item.content?.length,
-                      id: result.item.id,
-                      parentId: parent.id,
-                      expanded: true
-                    });
-                  }
-                } else {
-                  for (
-                    let i = 0;
-                    i < (parent.data.item.content.length || 0);
-                    ++i
-                  ) {
-                    nodes.push({
-                      data: { item: parent.data.item, matchIndex: i },
-                      depth: parent.depth + 1,
-                      parentId: parent.id,
-                      id: parent.id + i,
-                      hasChildren: false
-                    });
-                  }
-                }
-                return nodes;
-              }}
-              renderItem={({ collapse, expand, expanded, item: node }) => (
-                <SearchResult
-                  key={node.id}
-                  depth={node.depth}
-                  isExpandable={node.hasChildren}
-                  item={node.data.item}
-                  matchIndex={node.data.matchIndex}
-                  isExpanded={expanded}
-                  collapse={collapse}
-                  expand={expand}
-                />
-              )}
-            />
-          </>
-        )}
-      </>
-    );
-  }
+  if (filteredItems) return <Search items={filteredItems} refresh={refresh} />;
 
   if (!notes) return <ListLoader />;
   return (
