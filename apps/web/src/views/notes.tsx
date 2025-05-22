@@ -28,6 +28,7 @@ import { db } from "../common/db";
 import { handleDrop } from "../common/drop-handler";
 import { useEditorStore } from "../stores/editor-store";
 import { ListLoader } from "../components/loaders/list-loader";
+import Search from "./search";
 
 type NotesProps = { header?: JSX.Element };
 function Notes(props: NotesProps) {
@@ -47,10 +48,13 @@ function Notes(props: NotesProps) {
     async (query, sortOptions) => {
       if (!context || !contextNotes) return;
       const notes = notesFromContext(context);
-      return await db.lookup.notes(query, notes).sorted(sortOptions);
+      return await db.lookup.notes(query, sortOptions, notes);
     },
     [context, contextNotes]
   );
+
+  if (filteredItems)
+    return <Search items={filteredItems} refresh={refreshContext} />;
 
   if (!context || !contextNotes) return <ListLoader />;
   return (
@@ -58,10 +62,9 @@ function Notes(props: NotesProps) {
       type={type}
       group={type}
       refresh={refreshContext}
-      isSearching={!!filteredItems}
       compact={isCompact}
       context={context}
-      items={filteredItems || contextNotes}
+      items={contextNotes}
       onDrop={(e) => handleDrop(e.dataTransfer, context)}
       placeholder={
         <Placeholder
