@@ -168,7 +168,20 @@ function TipTap(props: TipTapProps) {
   const tiptapOptions = useMemo<Partial<TiptapOptions>>(() => {
     return {
       editorProps: {
-        handleKeyDown(_, event) {
+        handleKeyDown(view, event) {
+          if (event.key === "ArrowUp") {
+            const isAtStart = view.state.selection.$from.pos === 1;
+            if (isAtStart) {
+              const editorTitle = document.querySelector(
+                `#editor-title[data-session-id="${id}"]`
+              ) as HTMLTextAreaElement;
+              if (editorTitle) {
+                event.preventDefault();
+                editorTitle.focus();
+              }
+            }
+          }
+
           if ((event.ctrlKey || event.metaKey) && event.key === "s") {
             event.preventDefault();
             onChange?.(
