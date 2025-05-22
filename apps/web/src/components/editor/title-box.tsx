@@ -62,7 +62,7 @@ function TitleBox(props: TitleBoxProps) {
 
     withSelectionPersist(inputRef.current, (input) => {
       input.value = title || "";
-      requestAnimationFrame(() => resizeTextarea(input));
+      setTimeout(() => resizeTextarea(input));
     });
   }, [sessionType, id, sessionTitle]);
 
