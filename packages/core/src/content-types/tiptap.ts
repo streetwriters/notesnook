@@ -286,7 +286,8 @@ export class Tiptap {
       !this.data.includes(ATTRIBUTES.src) &&
       !this.data.includes(ATTRIBUTES.hash) &&
       // check for internal links
-      !this.data.includes("nn://")
+      !this.data.includes("nn://") &&
+      !this.data.includes("nn-search-result")
     )
       return {
         data: this.data,
@@ -342,6 +343,8 @@ export class Tiptap {
     const html = new HTMLRewriter({
       ontag: (name, attr, pos) => {
         switch (name) {
+          case "nn-search-result":
+            return null;
           case "img": {
             const hash = attr[ATTRIBUTES.hash];
 
