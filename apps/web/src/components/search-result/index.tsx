@@ -24,6 +24,7 @@ import { useEditorStore } from "../../stores/editor-store";
 
 import ListItem from "../list-item";
 import { ChevronDown, ChevronRight } from "../icons";
+import { noteMenuItems } from "../note";
 
 type SearchResultProps = {
   item: HighlightedResult;
@@ -54,18 +55,17 @@ function SearchResult(props: SearchResultProps) {
       isFocused={isOpened}
       isCompact={!match}
       item={item}
+      menuItems={noteMenuItems}
       onClick={() => {
         let activeIndex = 0;
         for (let i = 0; i <= (matchIndex || 0) - 1; ++i) {
           activeIndex += item.content[i].length;
         }
-        useEditorStore
-          .getState()
-          .openSession(item.id, {
-            rawContent: item.rawContent,
-            force: true,
-            activeSearchResultIndex: activeIndex
-          });
+        useEditorStore.getState().openSession(item.id, {
+          rawContent: item.rawContent,
+          force: true,
+          activeSearchResultIndex: activeIndex
+        });
       }}
       onMiddleClick={() =>
         useEditorStore.getState().openSession(item.id, {
@@ -112,7 +112,7 @@ function SearchResult(props: SearchResultProps) {
                     overflow: "hidden",
                     textOverflow: "ellipsis"
                   }),
-              fontWeight: "body",
+              fontWeight: match ? "body" : "medium",
               display: "block",
               ".match": {
                 bg: "accent-secondary",
@@ -146,9 +146,16 @@ function SearchResult(props: SearchResultProps) {
         )
       }
       sx={{
-        mb: "small",
-        borderRadius: "default",
-        paddingLeft: `${5 + (depth === 0 ? 0 : 15 * depth)}px`
+        ...(match
+          ? {
+              px: 1,
+              borderBottom: "1px solid var(--border)"
+            }
+          : {
+              my: "small",
+              borderRadius: "default"
+            }),
+        mx: 1
       }}
     />
   );

@@ -86,16 +86,7 @@ function Home() {
 
   if (filteredItems) {
     return (
-      <Box
-        id="search-results"
-        sx={{
-          flex: 1,
-          '[data-viewport-type="element"]': {
-            px: 1,
-            width: `calc(100% - ${2 * 6}px) !important`
-          }
-        }}
-      >
+      <>
         {filteredItems.length === 0 ? (
           <Text
             variant="body"
@@ -171,7 +162,7 @@ function Home() {
             />
           </>
         )}
-      </Box>
+      </>
     );
   }
 
