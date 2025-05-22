@@ -41,7 +41,7 @@ function Home() {
   const treeRef = useRef<
     VirtualizedTreeHandle<{
       item: HighlightedResult;
-      match?: Match[];
+      matchIndex?: number;
     }>
   >(null);
   const notes = useStore((store) => store.notes);
@@ -124,7 +124,7 @@ function Home() {
               getChildNodes={async (parent) => {
                 const nodes: TreeNode<{
                   item: HighlightedResult;
-                  match?: Match[];
+                  matchIndex?: number;
                 }>[] = [];
                 if (parent.id === "root") {
                   for (let i = 0; i < filteredItems.length; ++i) {
@@ -140,13 +140,16 @@ function Home() {
                     });
                   }
                 } else {
-                  let i = 0;
-                  for (const match of parent.data.item.content || []) {
+                  for (
+                    let i = 0;
+                    i < (parent.data.item.content.length || 0);
+                    ++i
+                  ) {
                     nodes.push({
-                      data: { item: parent.data.item, match },
+                      data: { item: parent.data.item, matchIndex: i },
                       depth: parent.depth + 1,
                       parentId: parent.id,
-                      id: parent.id + i++,
+                      id: parent.id + i,
                       hasChildren: false
                     });
                   }
@@ -159,7 +162,7 @@ function Home() {
                   depth={node.depth}
                   isExpandable={node.hasChildren}
                   item={node.data.item}
-                  match={node.data.match}
+                  matchIndex={node.data.matchIndex}
                   isExpanded={expanded}
                   collapse={collapse}
                   expand={expand}

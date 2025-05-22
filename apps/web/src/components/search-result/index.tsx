@@ -27,7 +27,7 @@ import { ChevronDown, ChevronRight } from "../icons";
 
 type SearchResultProps = {
   item: HighlightedResult;
-  match?: Match[];
+  matchIndex?: number;
   depth: number;
   isExpandable: boolean;
   isExpanded: boolean;
@@ -36,23 +36,43 @@ type SearchResultProps = {
 };
 
 function SearchResult(props: SearchResultProps) {
-  const { item, match, collapse, depth, expand, isExpandable, isExpanded } =
-    props;
+  const {
+    item,
+    matchIndex,
+    collapse,
+    depth,
+    expand,
+    isExpandable,
+    isExpanded
+  } = props;
 
   const isOpened = useEditorStore((store) => store.isNoteOpen(item.id));
+  const match = matchIndex !== undefined ? item.content[matchIndex] : undefined;
 
   return (
     <ListItem
       isFocused={isOpened}
       isCompact={!match}
       item={item}
-      onClick={() =>
+      onClick={() => {
+        let activeIndex = 0;
+        for (let i = 0; i <= (matchIndex || 0) - 1; ++i) {
+          activeIndex += item.content[i].length;
+        }
         useEditorStore
           .getState()
-          .openSession(item.id, { considerPinnedTab: true })
-      }
+          .openSession(item.id, {
+            rawContent: item.rawContent,
+            force: true,
+            activeSearchResultIndex: activeIndex
+          });
+      }}
       onMiddleClick={() =>
-        useEditorStore.getState().openSession(item.id, { openInNewTab: true })
+        useEditorStore.getState().openSession(item.id, {
+          openInNewTab: true,
+          rawContent: item.rawContent,
+          force: true
+        })
       }
       title={
         <Flex sx={{ alignItems: "center", gap: "small" }}>

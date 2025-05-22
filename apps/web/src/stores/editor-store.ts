@@ -83,6 +83,10 @@ export type BaseEditorSession = {
    * The id of block to scroll to after opening the session successfully.
    */
   activeBlockId?: string;
+  /**
+   * The index of search result to scroll to after opening the session successfully.
+   */
+  activeSearchResultIndex?: number;
 };
 
 export type LockedEditorSession = BaseEditorSession & {
@@ -659,10 +663,8 @@ class EditorStore extends BaseStore<EditorStore> {
       activeBlockId?: string;
       silent?: boolean;
       openInNewTab?: boolean;
-      /**
-       * Should be true if we want to open a new tab when the active tab is pinned
-       */
-      considerPinnedTab?: boolean;
+      rawContent?: string;
+      activeSearchResultIndex?: number;
     } = {}
   ): Promise<void> => {
     const {
@@ -786,6 +788,7 @@ class EditorStore extends BaseStore<EditorStore> {
             id: sessionId,
             content,
             activeBlockId: options.activeBlockId,
+            activeSearchResultIndex: options.activeSearchResultIndex,
             tabId
           },
           options.silent
@@ -802,10 +805,14 @@ class EditorStore extends BaseStore<EditorStore> {
               type: "readonly",
               note,
               id: sessionId,
-              content,
+              content:
+                options.rawContent && content
+                  ? { data: options.rawContent, type: content.type }
+                  : content,
               color: colors[0]?.fromId,
               tags,
               activeBlockId: options.activeBlockId,
+              activeSearchResultIndex: options.activeSearchResultIndex,
               tabId
             },
             options.silent
@@ -821,8 +828,12 @@ class EditorStore extends BaseStore<EditorStore> {
               attachmentsLength,
               tags,
               color: colors[0]?.fromId,
-              content,
+              content:
+                options.rawContent && content
+                  ? { ...content, data: options.rawContent }
+                  : content,
               activeBlockId: options.activeBlockId,
+              activeSearchResultIndex: options.activeSearchResultIndex,
               tabId
             },
             options.silent
