@@ -475,6 +475,7 @@ export function Editor(props: EditorProps) {
   );
   const setEditorSaveState = useEditorStore((store) => store.setSaveState);
   useScrollToBlock(session);
+  useScrollToSearchResult(session);
 
   useEffect(() => {
     if (!autoSaveToast.show) {
@@ -835,6 +836,25 @@ function useScrollToBlock(session: EditorSession) {
       activeBlockId: undefined
     });
   }, [session.id, session.type, blockId]);
+}
+
+function useScrollToSearchResult(session: EditorSession) {
+  const index = useEditorStore(
+    (store) => store.getSession(session.id)?.activeSearchResultIndex
+  );
+  useEffect(() => {
+    if (index === undefined) return;
+    const scrollContainer = document.getElementById(
+      `editorScroll_${session.id}`
+    );
+    const elements = scrollContainer?.getElementsByTagName("nn-search-result");
+    setTimeout(() =>
+      elements?.item(index)?.scrollIntoView({ block: "center" })
+    );
+    useEditorStore.getState().updateSession(session.id, [session.type], {
+      activeSearchResultIndex: undefined
+    });
+  }, [session.id, session.type, index]);
 }
 
 function isFile(e: DragEvent) {
