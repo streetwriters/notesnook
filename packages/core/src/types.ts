@@ -496,6 +496,7 @@ export type Match = {
 export interface HighlightedResult {
   type: "searchResult";
   id: string;
+  rawContent?: string;
   title: Match[];
   content: Match[][];
   rank: number;

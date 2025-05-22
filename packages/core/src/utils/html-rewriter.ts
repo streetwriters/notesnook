@@ -23,7 +23,12 @@ type OnTagHandler = (
   name: string,
   attr: Record<string, string>,
   pos: { start: number; end: number }
-) => false | { name: string; attr: Record<string, string> } | undefined | void;
+) =>
+  | false
+  | { name: string; attr: Record<string, string> }
+  | null
+  | undefined
+  | void;
 
 export class HTMLRewriter {
   private transformed = "";
@@ -65,7 +70,8 @@ export class HTMLRewriter {
             if (result === false) {
               this.ignoreIndex = 0;
               return;
-            } else if (result) {
+            } else if (result === null) return;
+            else if (result) {
               name = result.name;
               attr = result.attr;
             }

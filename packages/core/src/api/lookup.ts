@@ -53,6 +53,14 @@ type FuzzySearchField<T> = {
   column: AnyColumnWithTable<DatabaseSchema, keyof DatabaseSchema>;
   ignore?: boolean;
 };
+
+const MATCH_TAG_NAME = "nn-search-result";
+const MATCH_TAG_OPEN = `<${MATCH_TAG_NAME}>`;
+const MATCH_TAG_CLOSE = `</${MATCH_TAG_NAME}>`;
+const MATCH_TAG_REGEX = new RegExp(
+  `<${MATCH_TAG_NAME}>(.*?)<\\/${MATCH_TAG_NAME}>`,
+  "gm"
+);
 export default class Lookup {
   constructor(private readonly db: Database) {}
 
@@ -83,7 +91,7 @@ export default class Lookup {
             .select([
               "id",
               sql<string>`'title'`.as("type"),
-              sql<string>`highlight(notes_fts, 1, '<nnmark>', '</nnmark>')`.as(
+              sql<string>`highlight(notes_fts, 1, '<nn-search-result>', '</nn-search-result>')`.as(
                 "match"
               ),
               sql<number>`rank * 10`.as("rank")
@@ -101,7 +109,7 @@ export default class Lookup {
                 .select([
                   "noteId as id",
                   sql<string>`'content'`.as("type"),
-                  sql<string>`highlight(content_fts, 2, '<nnmark>', '</nnmark>')`.as(
+                  sql<string>`highlight(content_fts, 2, '<nn-search-result>', '</nn-search-result>')`.as(
                     "match"
                   ),
                   "rank"
@@ -130,15 +138,19 @@ export default class Lookup {
           id: result.id,
           content: [],
           title: [],
-          rank: 0
+          rank: 0,
+          rawContent: ""
         });
 
-        if (result.type === "content")
-          old.content = extractMatchingBlocks(result.match, "nnmark").flatMap(
-            (block) => {
-              return splitHighlightedMatch(block);
-            }
-          );
+        if (result.type === "content") {
+          old.content = extractMatchingBlocks(
+            result.match,
+            MATCH_TAG_NAME
+          ).flatMap((block) => {
+            return splitHighlightedMatch(block);
+          });
+          old.rawContent = result.match;
+        }
         if (result.type === "title")
           old.title = splitHighlightedMatch(result.match).flatMap((m) => m);
         old.rank += result.rank;
@@ -491,7 +503,7 @@ function highlightQueries(text: string, queries: string[]): string {
     if (start > lastEnd) {
       parts.push(text.slice(lastEnd, start));
     }
-    parts.push("<nnmark>", text.slice(start, end), "</nnmark>");
+    parts.push(MATCH_TAG_OPEN, text.slice(start, end), MATCH_TAG_CLOSE);
     lastEnd = end;
   }
 
@@ -522,7 +534,7 @@ function arrayToVirtualizedGrouping<T extends { id: string }>(
 }
 
 function splitHighlightedMatch(text: string): Match[][] {
-  const parts = text.split(/<nnmark>(.*?)<\/nnmark>/g);
+  const parts = text.split(MATCH_TAG_REGEX);
   const allMatches: Match[][] = [];
   let matches: Match[] = [];
   let totalLength = 0;
