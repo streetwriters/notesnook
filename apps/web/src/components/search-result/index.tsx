@@ -52,7 +52,7 @@ function SearchResult(props: SearchResultProps) {
 
   return (
     <ListItem
-      isFocused={isOpened}
+      isFocused={match ? false : isOpened}
       isCompact={!match}
       item={item}
       menuItems={noteMenuItems}
