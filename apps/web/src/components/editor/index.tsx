@@ -239,7 +239,10 @@ const MemoizedEditorView = React.memo(EditorView, (prev, next) => {
   return (
     prev.session.id === next.session.id &&
     prev.session.type === next.session.type &&
-    prev.session.needsHydration === next.session.needsHydration
+    prev.session.needsHydration === next.session.needsHydration &&
+    prev.session.activeBlockId === next.session.activeBlockId &&
+    prev.session.activeSearchResultIndex ===
+      next.session.activeSearchResultIndex
   );
 });
 function EditorView({
