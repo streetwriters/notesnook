@@ -145,8 +145,7 @@ export class Notes implements ICollection {
       const currentNoteTitleFields = await this.db
         .sql()
         .selectFrom("notes")
-        .select("isGeneratedTitle")
-        .select("title")
+        .select(["isGeneratedTitle", "title"])
         .where("id", "=", id)
         .executeTakeFirst();
       if (isUpdating) {
@@ -162,7 +161,8 @@ export class Notes implements ICollection {
           currentNoteTitleFields?.title !== headlineTitle
         ) {
           item.title = titleFormat.replace(HEADLINE_REGEX, headlineTitle);
-        }
+        } else if (item.title === "")
+          item.title = currentNoteTitleFields?.title || "Untitled";
       }
 
       if (isUpdating) {
