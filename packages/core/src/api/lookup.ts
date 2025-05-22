@@ -533,7 +533,7 @@ function arrayToVirtualizedGrouping<T extends { id: string }>(
   );
 }
 
-function splitHighlightedMatch(text: string): Match[][] {
+export function splitHighlightedMatch(text: string): Match[][] {
   const parts = text.split(MATCH_TAG_REGEX);
   const allMatches: Match[][] = [];
   let matches: Match[] = [];
@@ -554,16 +554,19 @@ function splitHighlightedMatch(text: string): Match[][] {
 
     if (suffix) {
       suffix = suffix.replace(/\s{2,}/gm, " ");
-      suffix = suffix.slice(0, Math.max(suffix.length / 2, 60));
+      const [_suffix, remaining] = splitToNearestWord(
+        suffix,
+        Math.max(suffix.length / 2, 60)
+      );
+      parts[i + 2] = remaining;
+      suffix = _suffix;
     }
 
     matches.push({
       match,
-      prefix: prefix.replace(/\s{2,}/gm, " "),
+      prefix: prefix.replace(/\s{2,}/gm, " ").trimStart(),
       suffix: suffix || ""
     });
-
-    if (suffix) parts[i + 2] = suffix.slice(suffix.length);
 
     totalLength += matchLength;
   }
@@ -597,6 +600,23 @@ function splitHighlightedMatch(text: string): Match[][] {
     }
   }
   return allMatches;
+}
+
+function splitToNearestWord(text: string, maxLength: number): [string, string] {
+  if (text.length <= maxLength) return [text, ""];
+
+  // Find the last space before maxLength
+  let splitIndex = text.lastIndexOf(" ", maxLength);
+
+  // If no space found, force split at maxLength
+  if (splitIndex === -1) {
+    splitIndex = maxLength;
+  }
+
+  const firstPart = text.substring(0, splitIndex);
+  const remainingText = text.substring(splitIndex);
+
+  return [firstPart, remainingText];
 }
 
 interface CenterOptions {
