@@ -719,12 +719,13 @@ class EditorStore extends BaseStore<EditorStore> {
     const oldSessionOfNote = sessions.find(
       (s) => "note" in s && s.note.id === noteId && s.tabId === tabId
     );
-    const sessionId =
-      activeSession?.needsHydration ||
-      activeSession?.type === "new" ||
-      noteAlreadyOpened
-        ? activeSession.id
-        : tabSessionHistory.add(tabId, oldSessionOfNote?.id);
+    const sessionId = options.force
+      ? tabSessionHistory.add(tabId)
+      : activeSession?.needsHydration ||
+        activeSession?.type === "new" ||
+        noteAlreadyOpened
+      ? activeSession.id
+      : tabSessionHistory.add(tabId, oldSessionOfNote?.id);
     const isLocked = await db.vaults.itemExists(note);
 
     if (note.conflicted) {
