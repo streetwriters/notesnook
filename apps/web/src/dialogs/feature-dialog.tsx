@@ -111,8 +111,14 @@ const features: Record<FeatureKeys, Feature> = {
             )
           },
           {
-            title: "Improved search",
-            subtitle: "Search should now be much more accurate and predictable."
+            title: "Improved search UX",
+            subtitle:
+              "Searching for notes will now show exactly where the term occurs"
+          },
+          {
+            title: "Sortable search",
+            subtitle:
+              "Search results are now sortable (just like notes, notebooks etc.)"
           }
         ],
     cta: {
