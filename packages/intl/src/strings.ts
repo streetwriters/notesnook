@@ -404,6 +404,11 @@ export const strings = {
   loggingOutDesc: () => t`Please wait while we log you out.`,
   by: () => t`By`,
   noResultsForSearch: (query: string) => t`No results found for "${query}"`,
+  results: (count: number) =>
+    plural(count, {
+      one: "1 result",
+      other: `# results`
+    }),
   noThemesFound: () => t`No themes found`,
   errorLoadingThemes: () => t`Error loading themes`,
   loadingThemes: () => t`Loading themes...`,
