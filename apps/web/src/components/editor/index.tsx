@@ -44,6 +44,7 @@ import {
   useStore as useAppStore,
   store as appstore
 } from "../../stores/app-store";
+import { useStore as useSearchStore } from "../../stores/search-store";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { FlexScrollContainer } from "../scroll-container";
 import Tiptap, { OnChangeHandler } from "./tiptap";
@@ -305,10 +306,18 @@ function EditorView({
   useLayoutEffect(() => {
     editor?.focus();
 
+    const unsub = useSearchStore.subscribe(
+      (store) => store.isSearching,
+      (value) => {
+        if (!value) element?.classList.remove("searching");
+      }
+    );
+
     const element = root.current;
-    element?.classList.add("active");
+    element?.classList.add("active", "searching");
     return () => {
-      element?.classList.remove("active");
+      element?.classList.remove("active", "searching");
+      unsub();
     };
   }, [editor]);
 
@@ -341,6 +350,7 @@ function EditorView({
           useEditorStore.setState({ documentPreview: preview })
         }
         onContentChange={() => (lastChangedTime.current = Date.now())}
+        onSelectionChange={() => root.current?.classList.remove("searching")}
         onSave={(content, ignoreEdit) => {
           const currentSession = useEditorStore
             .getState()
@@ -454,6 +464,7 @@ type EditorProps = {
   nonce?: number;
   options?: EditorOptions;
   onContentChange?: () => void;
+  onSelectionChange?: () => void;
   onSave?: OnChangeHandler;
   onPreviewDocument?: (preview: DocumentPreview) => void;
 };
@@ -463,6 +474,7 @@ export function Editor(props: EditorProps) {
     session,
     content,
     onSave,
+    onSelectionChange,
     nonce,
     options,
     onContentChange,
@@ -534,9 +546,10 @@ export function Editor(props: EditorProps) {
           if (editor) restoreSelection(editor, id);
           restoreScrollPosition(session);
         }}
-        onSelectionChange={({ from, to }) =>
-          Config.set(`${id}:selection`, { from, to })
-        }
+        onSelectionChange={({ from, to }) => {
+          Config.set(`${id}:selection`, { from, to });
+          onSelectionChange?.();
+        }}
         onContentChange={onContentChange}
         onChange={onSave}
         onDownloadAttachment={(attachment) => saveAttachment(attachment.hash)}
@@ -845,11 +858,13 @@ function useScrollToSearchResult(session: EditorSession) {
   const index = useEditorStore(
     (store) => store.getSession(session.id)?.activeSearchResultIndex
   );
+
   useEffect(() => {
     if (index === undefined) return;
     const scrollContainer = document.getElementById(
       `editorScroll_${session.id}`
     );
+    scrollContainer?.closest(".active")?.classList.add("searching");
     const elements = scrollContainer?.getElementsByTagName("nn-search-result");
     setTimeout(() =>
       elements?.item(index)?.scrollIntoView({ block: "center" })

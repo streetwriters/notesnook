@@ -37,15 +37,8 @@ type SearchResultProps = {
 };
 
 function SearchResult(props: SearchResultProps) {
-  const {
-    item,
-    matchIndex,
-    collapse,
-    depth,
-    expand,
-    isExpandable,
-    isExpanded
-  } = props;
+  const { item, matchIndex, collapse, expand, isExpandable, isExpanded } =
+    props;
 
   const isOpened = useEditorStore((store) => store.isNoteOpen(item.id));
   const match = matchIndex !== undefined ? item.content[matchIndex] : undefined;
@@ -67,13 +60,17 @@ function SearchResult(props: SearchResultProps) {
           activeSearchResultIndex: activeIndex
         });
       }}
-      onMiddleClick={() =>
+      onMiddleClick={() => {
+        let activeIndex = 0;
+        for (let i = 0; i <= (matchIndex || 0) - 1; ++i) {
+          activeIndex += item.content[i].length;
+        }
         useEditorStore.getState().openSession(item.id, {
           openInNewTab: true,
           rawContent: item.rawContent,
-          force: true
-        })
-      }
+          activeSearchResultIndex: activeIndex
+        });
+      }}
       title={
         <Flex sx={{ alignItems: "center", gap: "small" }}>
           {isExpandable ? (
