@@ -17,7 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Item, Note, VirtualizedGrouping } from "@notesnook/core";
+import {
+  FilteredSelector,
+  Item,
+  Note,
+  VirtualizedGrouping
+} from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import React, { useEffect, useRef, useState } from "react";
 import { DatabaseLogger, db } from "../../common/database";
 import List from "../../components/list";
@@ -28,20 +34,20 @@ import { NavigationProps } from "../../services/navigation";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { eGroupOptionsUpdated, eOnRefreshSearch } from "../../utils/events";
 import { SearchBar } from "./search-bar";
-import { FilteredSelector } from "@notesnook/core";
-import { strings } from "@notesnook/intl";
 export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
   const [results, setResults] = useState<VirtualizedGrouping<Item>>();
   const [loading, setLoading] = useState(false);
   const [searchStatus, setSearchStatus] = useState<string>();
   const currentQuery = useRef<string>();
   const timer = useRef<NodeJS.Timeout>();
-  const isFocused = useNavigationFocus(navigation, {
+  useNavigationFocus(navigation, {
     onFocus: (prev) => {
       useNavigationStore.getState().setFocusedRouteId(route.name);
       return !prev?.current;
     },
-    onBlur: () => false
+    onBlur: () => {
+      return false;
+    }
   });
 
   const onSearch = React.useCallback(
@@ -57,12 +63,14 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
         setLoading(true);
         let results: VirtualizedGrouping<Item> | undefined;
         const groupOptions = db.settings.getGroupOptions("search");
-
         switch (route.params.type) {
           case "note":
-            results = await db.lookup
-              .notes(query, route.params.items as FilteredSelector<Note>)
-              .sorted(groupOptions);
+            results = await db.lookup.notes(
+              query,
+              groupOptions,
+              route.params.items as FilteredSelector<Note>
+            );
+
             break;
           case "notebook":
             results = await db.lookup.notebooks(query).sorted(groupOptions);
@@ -143,7 +151,7 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
           clearTimeout(timer.current);
           timer.current = setTimeout(() => {
             onSearch(query);
-          }, 300);
+          }, 500);
         }}
         loading={loading}
       />

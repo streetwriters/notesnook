@@ -150,7 +150,7 @@ export default function List(props: ListProps) {
           flex: 1
         }}
       >
-        {props.data?.placeholders?.length === 0 ? (
+        {props.data?.placeholders?.length === 0 || !props.data ? (
           <>
             {props.CustomLisHeader ? (
               props.CustomLisHeader

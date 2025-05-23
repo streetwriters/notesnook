@@ -93,7 +93,7 @@ export type Collections = {
 
 export type CollectionType = keyof Collections;
 
-export type ItemType = ValueOf<Collections>;
+export type ItemType = ValueOf<Collections> | "searchResult";
 
 export type Item = ValueOf<ItemMap>;
 export type GroupableItem = ValueOf<
@@ -130,6 +130,7 @@ export type ItemMap = {
   sessioncontent: SessionContentItem;
   settingitem: SettingItem;
   vault: Vault;
+  searchResult: HighlightedResult;
 
   /**
    * @deprecated only kept here for migration purposes
@@ -493,9 +494,8 @@ export type Match = {
   match: string;
   suffix: string;
 };
-export interface HighlightedResult {
-  type: "searchResult";
-  id: string;
+
+export interface HighlightedResult extends BaseItem<"searchResult"> {
   rawContent?: string;
   title: Match[];
   content: Match[][];
