@@ -27,6 +27,7 @@ import {
   GroupHeader,
   GroupOptions,
   GroupingKey,
+  HighlightedResult,
   Item,
   ItemType,
   Note,
@@ -49,6 +50,7 @@ import { NoteWrapper } from "../list-items/note/wrapper";
 import { NotebookWrapper } from "../list-items/notebook/wrapper";
 import ReminderItem from "../list-items/reminder";
 import TagItem from "../list-items/tag";
+import { SearchResult } from "../list-items/search-result";
 
 type ListItemWrapperProps<TItem = Item> = {
   group?: GroupingKey;
@@ -153,7 +155,9 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
           },
           items?.cacheItem(index) ? 100 : 0
         );
-      } catch (e) {}
+      } catch (e) {
+        /** empty */
+      }
     })();
   }, [index, items, refreshItem]);
 
@@ -196,7 +200,7 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
             notebooks={notebooks.current}
             reminder={reminder.current}
             attachmentsCount={attachmentsCount.current}
-            date={getDate(item, group)}
+            date={getDate(item as Note, group)}
             isRenderedInActionSheet={isSheet}
             index={index}
             locked={locked.current}
@@ -227,7 +231,7 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
           <NotebookWrapper
             item={item as Notebook}
             totalNotes={totalNotes.current}
-            date={getDate(item, group)}
+            date={getDate(item as Notebook, group)}
             index={index}
           />
         </>
@@ -285,12 +289,34 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
           />
         </>
       );
+    case "searchResult":
+      return (
+        <>
+          {groupHeader && previousIndex.current === index && !isSheet ? (
+            <SectionHeader
+              screen={props.renderedInRoute}
+              item={groupHeader}
+              index={index}
+              dataType={item.type}
+              color={props.customAccentColor}
+              groupOptions={groupOptions}
+              onOpenJumpToDialog={() => {
+                eSendEvent(eOpenJumpToDialog, {
+                  ref: props.scrollRef,
+                  data: items
+                });
+              }}
+            />
+          ) : null}
+          <SearchResult item={item as HighlightedResult} />
+        </>
+      );
     default:
       return null;
   }
 }
 
-function getDate(item: Item, groupType?: GroupingKey): number {
+function getDate(item: Notebook | Note, groupType?: GroupingKey): number {
   return (
     getSortValue(
       groupType

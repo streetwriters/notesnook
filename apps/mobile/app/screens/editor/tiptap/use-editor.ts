@@ -469,8 +469,7 @@ export const useEditor = (
       }
     ) => {
       currentNotes.current[note.id] = note;
-      const locked = note && (await db.vaults.itemExists(note));
-      if ((locked || note.content) && note.content?.data) {
+      if (note.content && note.content?.data) {
         currentContents.current[note.id] = {
           data: note.content?.data,
           type: note.content?.type || "tiptap",
@@ -498,6 +497,7 @@ export const useEditor = (
       session?: TabSessionItem;
       newTab?: boolean;
       refresh?: boolean;
+      searchResultIndex?: number;
     }) => {
       loadNoteMutex.runExclusive(async () => {
         if (!event) return;
@@ -683,13 +683,17 @@ export const useEditor = (
             {
               data: currentContents.current[item.id]?.data || "",
               scrollTop: tab?.session?.scrollTop,
-              selection: tab?.session?.selection
+              selection: tab?.session?.selection,
+              searchResultIndex: event.searchResultIndex
             },
             tabId,
             10000
           );
 
           setTimeout(() => {
+            if (event.searchResultIndex !== undefined) {
+              commands.scrollToSearchResult(event.searchResultIndex);
+            }
             if (blockIdRef.current) {
               commands.scrollIntoViewById(blockIdRef.current);
               blockIdRef.current = undefined;

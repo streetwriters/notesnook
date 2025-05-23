@@ -201,6 +201,9 @@ const Tiptap = ({
       copyToClipboard: (text) => {
         globalThis.editorControllers[tab.id]?.copyToClipboard(text);
       },
+      onFocus: () => {
+        getContentDiv().classList.remove("searching");
+      },
       onSelectionUpdate: () => {
         if (tabRef.current.session?.noteId) {
           clearTimeout(noteStateUpdateTimer.current);
@@ -245,7 +248,11 @@ const Tiptap = ({
   ]);
 
   const update = useCallback(
-    (scrollTop?: number, selection?: { to: number; from: number }) => {
+    (
+      scrollTop?: number,
+      selection?: { to: number; from: number },
+      searchResultIndex?: number
+    ) => {
       setTick((tick) => tick + 1);
       globalThis.editorControllers[tabRef.current.id]?.setTitlePlaceholder(
         strings.noteTitle()
@@ -253,7 +260,13 @@ const Tiptap = ({
       setTimeout(() => {
         editorControllers[tabRef.current.id]?.setLoading(false);
         setTimeout(() => {
-          restoreNoteSelection(scrollTop, selection);
+          if (searchResultIndex !== undefined) {
+            globalThis.editorControllers[
+              tabRef.current.id
+            ]?.scrollToSearchResult(searchResultIndex);
+          } else {
+            restoreNoteSelection(scrollTop, selection);
+          }
         }, 300);
       }, 1);
     },
@@ -270,6 +283,9 @@ const Tiptap = ({
     scrollTop: () => containerRef.current?.scrollTop || 0,
     scrollTo: (top) => {
       containerRef.current?.scrollTo({ top, behavior: "auto" });
+    },
+    getContentDiv() {
+      return getContentDiv();
     }
   });
   const controllerRef = useRef(controller);
@@ -888,7 +904,7 @@ const TiptapProvider = (): JSX.Element => {
       return contentRef.current;
     }
     const editorContainer = document.createElement("div");
-    editorContainer.classList.add("selectable", "main-editor");
+    editorContainer.classList.add("selectable", "main-editor", "searching");
     editorContainer.style.flex = "1";
     editorContainer.style.cursor = "text";
     editorContainer.style.padding = "0px 12px";
@@ -897,6 +913,7 @@ const TiptapProvider = (): JSX.Element => {
     editorContainer.style.fontFamily =
       getFontById(settings.fontFamily)?.font || "sans-serif";
     contentRef.current = editorContainer;
+
     return editorContainer;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
