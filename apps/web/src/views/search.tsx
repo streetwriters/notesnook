@@ -62,7 +62,7 @@ function Search(props: NotesProps) {
             groupingKey={"search"}
             isSearching={true}
             refresh={refresh}
-            title={`${items.length} results`}
+            title={strings.results(items.length)}
             isFocused={false}
             index={0}
             onSelectGroup={() => {}}
