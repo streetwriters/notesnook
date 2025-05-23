@@ -59,7 +59,10 @@ export function clickHandler(options: ClickHandlerOptions): Plugin {
           if (options.editor.storage.openLink) {
             event.preventDefault();
             setTimeout(() =>
-              options.editor.storage.openLink?.(href, isAuxClick)
+              options.editor.storage.openLink?.(
+                href,
+                isAuxClick || event.ctrlKey || event.metaKey
+              )
             );
           }
 
