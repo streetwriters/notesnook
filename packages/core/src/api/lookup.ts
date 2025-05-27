@@ -64,7 +64,103 @@ const MATCH_TAG_REGEX = new RegExp(
 export default class Lookup {
   constructor(private readonly db: Database) {}
 
-  async notes(
+  notes(query: string, notes?: FilteredSelector<Note>): SearchResults<Note> {
+    return this.toSearchResults(async (sortOptions) => {
+      const db = this.db.sql() as unknown as Kysely<RawDatabaseSchema>;
+      const excludedIds = this.db.trash.cache.notes;
+
+      const { query: transformedQuery, tokens } = transformQuery(query);
+
+      const resultsA: string[] =
+        transformedQuery.length === 0
+          ? []
+          : await db
+              .selectFrom((eb) =>
+                eb
+                  .selectFrom("notes_fts")
+                  .$if(!!notes, (eb) =>
+                    eb.where("id", "in", notes!.filter.select("id"))
+                  )
+                  .$if(excludedIds.length > 0, (eb) =>
+                    eb.where("id", "not in", excludedIds)
+                  )
+                  .where("title", "match", transformedQuery)
+                  .select(["id", sql<number>`rank * 10`.as("rank")])
+                  .unionAll((eb) =>
+                    eb
+                      .selectFrom("content_fts")
+                      .$if(!!notes, (eb) =>
+                        eb.where("noteId", "in", notes!.filter.select("id"))
+                      )
+                      .$if(excludedIds.length > 0, (eb) =>
+                        eb.where("noteId", "not in", excludedIds)
+                      )
+                      .where("data", "match", transformedQuery)
+                      .select(["noteId as id", "rank"])
+                      .$castTo<{
+                        id: string;
+                        rank: number;
+                      }>()
+                  )
+                  .as("results")
+              )
+              .select(["results.id"])
+              .groupBy("results.id")
+              .orderBy(
+                sql`SUM(results.rank)`,
+                sortOptions?.sortDirection || "desc"
+              )
+              .execute()
+              .catch((e) => {
+                logger.error(e, `Error while searching`, { query });
+                return [];
+              })
+              .then((r) => r.map((r) => r.id));
+
+      const smallTokens = Array.from(
+        new Set(
+          tokens.filter((token) => token.length < 3 && token !== "OR")
+        ).values()
+      );
+      if (smallTokens.length === 0) return resultsA;
+
+      const results = [];
+
+      const titles = await db
+        .selectFrom("notes")
+        .$if(!!transformedQuery && resultsA.length > 0, (eb) =>
+          eb.where("id", "in", resultsA)
+        )
+        .select(["id", "title"])
+        .execute();
+
+      const htmls = await db
+        .selectFrom("content")
+        .$if(!!transformedQuery && resultsA.length > 0, (eb) =>
+          eb.where("noteId", "in", resultsA)
+        )
+        .select(["data", "noteId as id"])
+        .$castTo<{ data: string; id: string }>()
+        .execute();
+
+      for (let i = 0; i < titles.length; i++) {
+        const title = titles[i];
+        const html = htmls.find((h) => h.id === title.id);
+        const text = html ? extractText(html.data) : "";
+
+        if (
+          smallTokens.every((token) => !!title.title?.includes(token)) ||
+          smallTokens.every((token) => !!text?.includes(token))
+        ) {
+          results.push(title.id);
+        }
+      }
+
+      return results;
+    }, notes || this.db.notes.all);
+  }
+
+  async notesWithHighlighting(
     query: string,
     sortOptions?: SortOptions,
     notes?: FilteredSelector<Note>
@@ -139,7 +235,9 @@ export default class Lookup {
           content: [],
           title: [],
           rank: 0,
-          rawContent: ""
+          rawContent: "",
+          dateCreated: 0,
+          dateModified: 0
         });
 
         if (result.type === "content") {
@@ -204,7 +302,9 @@ export default class Lookup {
             title: stringToMatch(title.title || ""),
             type: "searchResult",
             content: [],
-            rank: 0
+            rank: 0,
+            dateCreated: 0,
+            dateModified: 0
           });
 
           const merged = mergeMatches(
