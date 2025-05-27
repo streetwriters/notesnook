@@ -65,7 +65,7 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
         const groupOptions = db.settings.getGroupOptions("search");
         switch (route.params.type) {
           case "note":
-            results = await db.lookup.notes(
+            results = await db.lookup.notesWithHighlighting(
               query,
               groupOptions,
               route.params.items as FilteredSelector<Note>

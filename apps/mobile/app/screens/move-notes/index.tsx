@@ -248,7 +248,13 @@ const SelectableNoteItem = React.memo(
                 flexGrow: 1
               }}
             >
-              <Heading size={AppFontSize.sm} numberOfLines={1}>
+              <Heading
+                size={AppFontSize.sm}
+                numberOfLines={1}
+                style={{
+                  maxWidth: "93%"
+                }}
+              >
                 {item?.title}
               </Heading>
               {item.type == "note" && item.headline ? (
@@ -256,6 +262,9 @@ const SelectableNoteItem = React.memo(
                   numberOfLines={1}
                   color={colors?.secondary.paragraph}
                   size={AppFontSize.sm}
+                  style={{
+                    maxWidth: "93%"
+                  }}
                 >
                   {item.headline}
                 </Paragraph>

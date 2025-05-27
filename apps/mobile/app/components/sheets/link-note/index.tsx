@@ -283,7 +283,14 @@ export default function LinkNote(props: {
                   width: "100%"
                 }}
               >
-                <Paragraph numberOfLines={1}>{selectedNote?.title}</Paragraph>
+                <Paragraph
+                  style={{
+                    flexShrink: 1
+                  }}
+                  numberOfLines={1}
+                >
+                  {selectedNote?.title}
+                </Paragraph>
 
                 <Paragraph
                   color={colors.secondary.paragraph}
