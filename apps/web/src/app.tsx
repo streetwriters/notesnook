@@ -207,7 +207,10 @@ function DesktopAppContents() {
                 zIndex: 3
               }}
             >
-              <NavigationMenu onExpand={() => navPane.current?.reset(0)} />
+              <NavigationMenu
+                onExpand={() => navPane.current?.reset(0)}
+                onCollapse={() => navPane.current?.collapse(0)}
+              />
             </Pane>
           )}
           {isFocusMode ? null : (

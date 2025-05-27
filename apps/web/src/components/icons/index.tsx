@@ -584,3 +584,4 @@ export const ColorRemove = createIcon(mdiCloseCircleOutline);
 export const ExpandSidebar = createIcon(mdiArrowCollapseRight);
 export const HamburgerMenu = createIcon(mdiMenu);
 export const ArrowUp = createIcon(mdiArrowUp);
+export const CollapseSidebar = createIcon(mdiArrowCollapseLeft);

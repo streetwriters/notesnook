@@ -47,7 +47,8 @@ import {
   Rename,
   ExpandSidebar,
   HamburgerMenu,
-  Archive
+  Archive,
+  CollapseSidebar
 } from "../icons";
 import { SortableNavigationItem } from "./navigation-item";
 import {
@@ -204,7 +205,12 @@ const settings = {
   icon: Settings
 } as const;
 
-function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
+type NavigationMenuProps = {
+  onExpand: () => void;
+  onCollapse: () => void;
+};
+
+function NavigationMenu({ onExpand, onCollapse }: NavigationMenuProps) {
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const [currentTab, setCurrentTab] = useState<(typeof tabs)[number]>(() => {
     const defaultSidebarTab = useSettingStore.getState().defaultSidebarTab;
@@ -312,12 +318,27 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
               <Button
                 variant="secondary"
                 sx={{ p: 1, bg: "transparent" }}
-                onClick={onExpand}
+                onClick={() => {
+                  onExpand();
+                  setExpanded(false);
+                }}
                 title={strings.expandSidebar()}
               >
                 <ExpandSidebar size={13} color="icon" />
               </Button>
-            ) : null}
+            ) : (
+              <Button
+                variant="secondary"
+                sx={{ p: 1, bg: "transparent" }}
+                onClick={() => {
+                  onCollapse();
+                  setExpanded(false);
+                }}
+                title={strings.collapseSidebar()}
+              >
+                <CollapseSidebar size={13} color="icon" />
+              </Button>
+            )}
             <NavigationDropdown />
           </Flex>
         </Flex>
