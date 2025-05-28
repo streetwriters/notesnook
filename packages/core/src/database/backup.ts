@@ -559,7 +559,8 @@ export default class Backup {
         !item ||
         typeof item !== "object" ||
         Array.isArray(item) ||
-        isDeleted(item)
+        isDeleted(item) ||
+        item.type === "searchResult"
       )
         continue;
       // in v5.6 of the database, we did not set note history session's type
