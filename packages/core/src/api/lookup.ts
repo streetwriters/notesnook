@@ -43,8 +43,8 @@ import { findOrAdd } from "../utils/array.js";
 
 type SearchResults<T> = {
   sorted: (sortOptions?: SortOptions) => Promise<VirtualizedGrouping<T>>;
-  items: (sortOptions?: SortOptions) => Promise<T[]>;
-  ids: (sortOptions?: SortOptions) => Promise<string[]>;
+  items: (limit?: number, sortOptions?: SortOptions) => Promise<T[]>;
+  ids: (limit?: number, sortOptions?: SortOptions) => Promise<string[]>;
 };
 
 type FuzzySearchField<T> = {
@@ -65,7 +65,7 @@ export default class Lookup {
   constructor(private readonly db: Database) {}
 
   notes(query: string, notes?: FilteredSelector<Note>): SearchResults<Note> {
-    return this.toSearchResults(async (sortOptions) => {
+    return this.toSearchResults(async (limit, sortOptions) => {
       const db = this.db.sql() as unknown as Kysely<RawDatabaseSchema>;
       const excludedIds = this.db.trash.cache.notes;
 
@@ -400,7 +400,11 @@ export default class Lookup {
   trash(query: string): SearchResults<TrashItem> {
     return {
       sorted: async (sortOptions?: SortOptions) => {
-        const { ids, items } = await this.filterTrash(query, sortOptions);
+        const { ids, items } = await this.filterTrash(
+          query,
+          undefined,
+          sortOptions
+        );
         return new VirtualizedGrouping<TrashItem>(
           ids.length,
           this.db.options.batchSize,
@@ -413,8 +417,8 @@ export default class Lookup {
           }
         );
       },
-      items: async (sortOptions?: SortOptions) => {
-        const { items } = await this.filterTrash(query, sortOptions);
+      items: async (limit, sortOptions?: SortOptions) => {
+        const { items } = await this.filterTrash(query, limit, sortOptions);
         return items;
       },
       ids: () => this.filterTrash(query).then(({ ids }) => ids)
@@ -435,9 +439,10 @@ export default class Lookup {
     query: string,
     fields: FuzzySearchField<T>[]
   ) {
-    return this.toSearchResults(async (sortOptions) => {
+    return this.toSearchResults(async (limit, sortOptions) => {
       const results = await this.filter(selector, query, fields, {
-        sortOptions
+        sortOptions,
+        limit
       });
       return results.map((item) => item.id);
     }, selector);
@@ -469,27 +474,33 @@ export default class Lookup {
   }
 
   private toSearchResults<T extends Item>(
-    ids: (sortOptions?: SortOptions) => Promise<string[]>,
+    ids: (limit?: number, sortOptions?: SortOptions) => Promise<string[]>,
     selector: FilteredSelector<T>
   ): SearchResults<T> {
     return {
-      sorted: async (sortOptions?: SortOptions) =>
+      sorted: async (sortOptions) =>
         this.toVirtualizedGrouping(
-          await ids(sortOptions),
+          await ids(undefined, sortOptions),
           selector,
           sortOptions
         ),
-      items: async (sortOptions?: SortOptions) =>
-        this.toItems(await ids(sortOptions), selector, sortOptions),
+      items: async (limit, sortOptions) =>
+        this.toItems(await ids(limit, sortOptions), selector, sortOptions),
       ids
     };
   }
 
-  private async filterTrash(query: string, sortOptions?: SortOptions) {
+  private async filterTrash(
+    query: string,
+    limit?: number,
+    sortOptions?: SortOptions
+  ) {
     const items = await this.db.trash.all();
 
     const results: Map<string, { rank: number; item: TrashItem }> = new Map();
     for (const item of items) {
+      if (limit !== undefined && results.size === limit) break;
+
       const result = match(query, item.title);
       if (result.match) {
         results.set(item.id, { rank: result.score, item });
@@ -791,12 +802,6 @@ function stringToMatch(str: string): Match[] {
     }
   ];
 }
-
-type Match = {
-  prefix: string;
-  match: string;
-  suffix: string;
-};
 
 function mergeMatches(matches1: Match[], matches2: Match[]): Match[] | null {
   if (!matches1.length) return matches2;
