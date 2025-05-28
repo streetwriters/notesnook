@@ -36,7 +36,7 @@ import {
 import { strings } from "@notesnook/intl";
 import { SchemeColors } from "@notesnook/theme";
 import { MenuItem } from "@notesnook/ui";
-import { Button, Flex, Text } from "@theme-ui/components";
+import { Flex, Text } from "@theme-ui/components";
 import React from "react";
 import { db } from "../../common/db";
 import { exportNote, exportNotes } from "../../common/export";
@@ -89,7 +89,6 @@ import {
   StarOutline,
   Sync,
   SyncOff,
-  Tag,
   Tag2,
   Tag as TagIcon,
   Trash,
@@ -153,9 +152,7 @@ function Note(props: NoteProps) {
       }}
       context={{ color, locked }}
       menuItems={noteMenuItems}
-      onClick={() =>
-        useEditorStore.getState().openSession(note, { considerPinnedTab: true })
-      }
+      onClick={() => useEditorStore.getState().openSession(note)}
       onMiddleClick={() =>
         useEditorStore.getState().openSession(note, { openInNewTab: true })
       }

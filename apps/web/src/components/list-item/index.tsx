@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Box, Flex, Text } from "@theme-ui/components";
+import { Flex, Text } from "@theme-ui/components";
 import { ThemeUIStyleObject } from "@theme-ui/css";
 import {
   store as selectionStore,
@@ -58,7 +58,11 @@ type ListItemProps<TItem extends Item, TContext> = {
   footer?: JSX.Element;
 
   context?: TContext;
-  menuItems?: (item: TItem, ids?: string[], context?: TContext) => MenuItem[];
+  menuItems?: (
+    item: TItem,
+    ids?: string[],
+    context?: TContext
+  ) => Promise<MenuItem[]> | MenuItem[];
 
   sx?: ThemeUIStyleObject;
 };
@@ -116,7 +120,7 @@ function ListItem<TItem extends Item, TContext>(
         }
         setDragData(e.dataTransfer, item.type, selectedItems);
       }}
-      onContextMenu={(e) => {
+      onContextMenu={async (e) => {
         e.preventDefault();
         e.stopPropagation();
 
@@ -127,7 +131,7 @@ function ListItem<TItem extends Item, TContext>(
           selectedItems = [];
           selectedItems.push(item.id);
         }
-        let menuItems = props.menuItems?.(item, selectedItems, context);
+        let menuItems = await props.menuItems?.(item, selectedItems, context);
 
         if (selectedItems.length > 1) {
           title = `${selectedItems.length} items selected`;

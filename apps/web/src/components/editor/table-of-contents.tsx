@@ -139,7 +139,9 @@ function TableOfContents(props: TableOfContentsProps) {
                     parent.id === "root"
                       ? tableOfContents
                       : tableOfContents.slice(
-                          tableOfContents.findIndex((item) => item.id === id)
+                          tableOfContents.findIndex(
+                            (item) => item.id === parent.id
+                          )
                         );
 
                   const items: typeof remainingToc = [];

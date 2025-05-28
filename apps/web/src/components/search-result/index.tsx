@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { HighlightedResult, Match } from "@notesnook/core";
+import { HighlightedResult } from "@notesnook/core";
 import { Button, Flex, Text } from "@theme-ui/components";
 import React from "react";
 import { useEditorStore } from "../../stores/editor-store";
@@ -25,6 +25,7 @@ import { useEditorStore } from "../../stores/editor-store";
 import ListItem from "../list-item";
 import { ChevronDown, ChevronRight } from "../icons";
 import { noteMenuItems } from "../note";
+import { db } from "../../common/db";
 
 type SearchResultProps = {
   item: HighlightedResult;
@@ -48,27 +49,37 @@ function SearchResult(props: SearchResultProps) {
       isFocused={match ? false : isOpened}
       isCompact={!match}
       item={item}
-      menuItems={noteMenuItems}
+      menuItems={async (item, ids) => {
+        const note = await db.notes.note(item.id);
+        if (!note) return [];
+
+        const colors = await db.relations
+          .to({ type: "note", id: item.id }, "color")
+          .resolve();
+        return noteMenuItems(note, ids, {
+          locked: !!(
+            await db
+              .sql()
+              .selectFrom("content")
+              .where("noteId", "in", [note.id])
+              .select(["noteId", "locked"])
+              .executeTakeFirst()
+          )?.locked,
+          color: colors[0]
+        });
+      }}
       onClick={() => {
-        let activeIndex = 0;
-        for (let i = 0; i <= (matchIndex || 0) - 1; ++i) {
-          activeIndex += item.content[i].length;
-        }
         useEditorStore.getState().openSession(item.id, {
           rawContent: item.rawContent,
           force: true,
-          activeSearchResultIndex: activeIndex
+          activeSearchResultIndex: findSelectedMatchIndex(item, matchIndex || 0)
         });
       }}
       onMiddleClick={() => {
-        let activeIndex = 0;
-        for (let i = 0; i <= (matchIndex || 0) - 1; ++i) {
-          activeIndex += item.content[i].length;
-        }
         useEditorStore.getState().openSession(item.id, {
           openInNewTab: true,
           rawContent: item.rawContent,
-          activeSearchResultIndex: activeIndex
+          activeSearchResultIndex: findSelectedMatchIndex(item, matchIndex || 0)
         });
       }}
       title={
@@ -159,3 +170,11 @@ function SearchResult(props: SearchResultProps) {
 }
 
 export default React.memo(SearchResult);
+
+function findSelectedMatchIndex(item: HighlightedResult, matchIndex: number) {
+  let activeIndex = 0;
+  for (let i = 0; i <= matchIndex - 1; ++i) {
+    activeIndex += item.content[i].length;
+  }
+  return activeIndex;
+}

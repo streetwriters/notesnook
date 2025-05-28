@@ -43,7 +43,7 @@
     "@theme-ui/core": "0.16.1",
     "@trpc/client": "10.45.2",
     "@trpc/react-query": "10.45.2",
-    "@zip.js/zip.js": "^2.7.54",
+    "@zip.js/zip.js": "^2.7.62",
     "async-mutex": "0.5.0",
     "axios": "^1.7.9",
     "clipboard-polyfill": "4.1.0",
