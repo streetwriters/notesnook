@@ -422,6 +422,7 @@ function TiptapWrapper(
       | "dateFormat"
       | "timeFormat"
       | "markdownShortcuts"
+      | "fontLigatures"
     >
   > & {
     isHydrating?: boolean;
