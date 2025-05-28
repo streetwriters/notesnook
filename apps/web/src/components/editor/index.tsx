@@ -866,8 +866,12 @@ function useScrollToSearchResult(session: EditorSession) {
     );
     scrollContainer?.closest(".active")?.classList.add("searching");
     const elements = scrollContainer?.getElementsByTagName("nn-search-result");
-    setTimeout(() =>
-      elements?.item(index)?.scrollIntoView({ block: "center" })
+    setTimeout(
+      () =>
+        elements
+          ?.item(index)
+          ?.scrollIntoView({ block: "center", behavior: "instant" }),
+      100
     );
     useEditorStore.getState().updateSession(session.id, [session.type], {
       activeSearchResultIndex: undefined
