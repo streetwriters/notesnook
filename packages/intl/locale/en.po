@@ -1565,6 +1565,10 @@ msgstr "Code block"
 msgid "Code remove"
 msgstr "Code remove"
 
+#: src/strings.ts:2487
+msgid "Collapse sidebar"
+msgstr "Collapse sidebar"
+
 #: src/strings.ts:430
 msgid "COLLAPSED"
 msgstr "COLLAPSED"
