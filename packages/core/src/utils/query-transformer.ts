@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { EN_STOPWORDS } from "./stop-words";
+import { EN_STOPWORDS } from "./stop-words.js";
 
 type ASTNode = QueryNode | PhraseNode | OperatorNode;
 
