@@ -119,15 +119,6 @@
  margin-bottom: 0px;
 }
 
-/* Add top & bottom margin for double spaced paragraphs & adjacent nodes
-except single spaced paragraphs. */
-.ProseMirror > p[data-spacing="double"] + *:not(p[data-spacing="single"]),
-.ProseMirror div.callout > p[data-spacing="double"] + *:not(div.callout > p[data-spacing="single"]),
-.ProseMirror blockquote > p[data-spacing="double"] + *:not(.ProseMirror blockquote p[data-spacing="single"]) {
- margin-top: 1em;
- margin-bottom: 1em;
-}
-
 /* Remove all margins for single spaced paragraphs */
 .ProseMirror p[data-spacing="single"] {
  margin-top: 0px;
