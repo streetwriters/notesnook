@@ -66,6 +66,7 @@
   "dependencies": {
     "@leeoniya/ufuzzy": "^1.0.10",
     "@microsoft/signalr": "^8.0.0",
+    "@notesnook/intl": "file:../intl",
     "@notesnook/logger": "file:../logger",
     "@readme/data-urls": "^3.0.0",
     "@streetwriters/kysely": "^0.27.4",
