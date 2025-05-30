@@ -79,6 +79,7 @@ import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { useTabStore } from "./use-tab-store";
 import { editorState, openInternalLink } from "./utils";
 import { Properties } from "../../../components/properties";
+import { sleep } from "../../../utils/time";
 
 const publishNote = async () => {
   const user = useUserStore.getState().user;
@@ -613,6 +614,10 @@ export const useEditorEvents = (
           eSendEvent(eEditorTabFocused, editorMessage.tabId);
           if (!editor.state.current.initialLoadCalled) break;
           if (editorMessage.noteId) {
+            // Wait for next tick to ensure the tab is not changed.
+            await sleep(1);
+            if (useTabStore.getState().currentTab !== editorMessage.tabId)
+              return;
             if (!useSettingStore.getState().isAppLoading) {
               const note = await db.notes.note(editorMessage.noteId);
               if (note) {
