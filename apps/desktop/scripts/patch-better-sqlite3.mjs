@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { readFile, writeFile } from "fs/promises";
+import { readFile, rm, writeFile } from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -34,12 +34,21 @@ export async function patchBetterSQLite3() {
   );
   const json = JSON.parse(await readFile(jsonPath, "utf-8"));
 
-  json.version = "11.6.1";
-  json.homepage = "https://github.com/thecodrr/better-sqlite3-multiple-ciphers";
-  json.repository.url =
-    "git://github.com/thecodrr/better-sqlite3-multiple-ciphers.git";
+  delete json.homepage;
+  delete json.repository;
 
   await writeFile(jsonPath, JSON.stringify(json));
+
+  await rm(
+    path.join(
+      __dirname,
+      "..",
+      "node_modules",
+      "better-sqlite3-multiple-ciphers",
+      "build"
+    ),
+    { force: true, recursive: true }
+  );
 }
 
 if (process.argv[1] === __filename) {
