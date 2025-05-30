@@ -52,7 +52,6 @@ export const CustomScrollbarsVirtualList = forwardRef<
   HTMLDivElement,
   ScrollerProps & ScrollContainerProps
 >(function CustomScrollbarsVirtualList(props, ref) {
-  console.log({ props, ref });
   return (
     <ScrollContainer
       {...props}

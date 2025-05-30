@@ -28,6 +28,7 @@ import { GroupingKey, Item } from "@notesnook/core";
 import { isNoteResolvedData } from "@notesnook/common";
 import { Attachment } from "../attachment";
 import { Notebook } from "../notebook";
+import SearchResult from "../search-result";
 
 const SINGLE_LINE_HEIGHT = 1.4;
 const DEFAULT_LINE_HEIGHT =
@@ -46,6 +47,8 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
   const { group, compact, context, item, data } = props;
 
   switch (item.type) {
+    case "searchResult":
+      return <SearchResult item={item} />;
     case "note": {
       return (
         <Note

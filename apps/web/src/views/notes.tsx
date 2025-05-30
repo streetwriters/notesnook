@@ -28,7 +28,6 @@ import { db } from "../common/db";
 import { handleDrop } from "../common/drop-handler";
 import { useEditorStore } from "../stores/editor-store";
 import { ListLoader } from "../components/loaders/list-loader";
-import Search from "./search";
 
 type NotesProps = { header?: JSX.Element };
 function Notes(props: NotesProps) {
@@ -53,9 +52,6 @@ function Notes(props: NotesProps) {
     [context, contextNotes]
   );
 
-  if (filteredItems)
-    return <Search items={filteredItems} refresh={refreshContext} />;
-
   if (!context || !contextNotes) return <ListLoader />;
   return (
     <ListContainer
@@ -64,7 +60,8 @@ function Notes(props: NotesProps) {
       refresh={refreshContext}
       compact={isCompact}
       context={context}
-      items={contextNotes}
+      items={filteredItems || contextNotes}
+      isSearching={!!filteredItems}
       onDrop={(e) => handleDrop(e.dataTransfer, context)}
       placeholder={
         <Placeholder
