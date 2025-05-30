@@ -43,8 +43,7 @@ if (args.rebuild || !existsSync(path.join(webAppPath, "build"))) {
   );
 }
 
-// temporary until there's support for prebuilt binaries for linux ARM
-if (os.platform() === "linux") await patchBetterSQLite3();
+await patchBetterSQLite3();
 
 await fs.cp(path.join(webAppPath, "build"), path.join(root, "build"), {
   recursive: true,
