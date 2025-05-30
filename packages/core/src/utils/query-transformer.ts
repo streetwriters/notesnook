@@ -17,8 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { EN_STOPWORDS } from "./stop-words.js";
-
 type ASTNode = QueryNode | PhraseNode | OperatorNode;
 
 type QueryNode = {
@@ -163,9 +161,7 @@ function generateSQL(ast: QueryNode): string {
 }
 
 export function transformQuery(query: string) {
-  const tokens = tokenize(query).filter(
-    (token) => !EN_STOPWORDS.includes(token)
-  );
+  const tokens = tokenize(query);
   const largeTokens = tokens.filter(
     (token) => token.length >= 3 || token === "OR"
   );
