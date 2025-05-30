@@ -131,26 +131,6 @@ export class HTMLParser {
   }
 }
 
-export function extractText(html: string, retainTags?: string[]) {
-  let text = "";
-  const parser = new Parser(
-    {
-      ontext: (data) => (text += data),
-      onopentag(name) {
-        if (retainTags?.includes(name)) text += `<${name}>`;
-      },
-      onclosetag(name) {
-        if (retainTags?.includes(name)) text += `</${name}>`;
-      }
-    },
-    {
-      lowerCaseTags: false
-    }
-  );
-  parser.end(html);
-  return text;
-}
-
 const INLINE_TAGS = [
   "a",
   "abbr",

@@ -38,8 +38,9 @@ import { rebuildSearchIndex } from "../database/fts.js";
 import { transformQuery } from "../utils/query-transformer.js";
 import { getSortSelectors, groupArray } from "../utils/grouping.js";
 import { fuzzy } from "../utils/fuzzy.js";
-import { extractMatchingBlocks, extractText } from "../utils/html-parser.js";
+import { extractMatchingBlocks } from "../utils/html-parser.js";
 import { findOrAdd } from "../utils/array.js";
+import { Parser } from "htmlparser2";
 
 type SearchResults<T> = {
   sorted: (sortOptions?: SortOptions) => Promise<VirtualizedGrouping<T>>;
@@ -66,7 +67,6 @@ export default class Lookup {
 
   notes(query: string, notes?: FilteredSelector<Note>): SearchResults<Note> {
     return this.toSearchResults(async (limit, sortOptions) => {
-      const db = this.db.sql() as unknown as Kysely<RawDatabaseSchema>;
       const excludedIds = this.db.trash.cache.notes;
 
       const { query: transformedQuery, tokens } = transformQuery(query);
@@ -74,36 +74,7 @@ export default class Lookup {
       const resultsA: string[] =
         transformedQuery.length === 0
           ? []
-          : await db
-              .selectFrom((eb) =>
-                eb
-                  .selectFrom("notes_fts")
-                  .$if(!!notes, (eb) =>
-                    eb.where("id", "in", notes!.filter.select("id"))
-                  )
-                  .$if(excludedIds.length > 0, (eb) =>
-                    eb.where("id", "not in", excludedIds)
-                  )
-                  .where("title", "match", transformedQuery)
-                  .select(["id", sql<number>`rank * 10`.as("rank")])
-                  .unionAll((eb) =>
-                    eb
-                      .selectFrom("content_fts")
-                      .$if(!!notes, (eb) =>
-                        eb.where("noteId", "in", notes!.filter.select("id"))
-                      )
-                      .$if(excludedIds.length > 0, (eb) =>
-                        eb.where("noteId", "not in", excludedIds)
-                      )
-                      .where("data", "match", transformedQuery)
-                      .select(["noteId as id", "rank"])
-                      .$castTo<{
-                        id: string;
-                        rank: number;
-                      }>()
-                  )
-                  .as("results")
-              )
+          : await this.ftsQueryBuilder(transformedQuery, excludedIds, notes)
               .select(["results.id"])
               .groupBy("results.id")
               .orderBy(
@@ -124,39 +95,14 @@ export default class Lookup {
       );
       if (smallTokens.length === 0) return resultsA;
 
-      const results = [];
-
-      const titles = await db
-        .selectFrom("notes")
-        .$if(!!transformedQuery && resultsA.length > 0, (eb) =>
-          eb.where("id", "in", resultsA)
-        )
-        .select(["id", "title"])
+      const results = await this.regexQueryBuilder(
+        smallTokens,
+        !!transformedQuery && resultsA.length > 0 ? resultsA : notes
+      )
+        .select("results.id")
         .execute();
 
-      const htmls = await db
-        .selectFrom("content")
-        .$if(!!transformedQuery && resultsA.length > 0, (eb) =>
-          eb.where("noteId", "in", resultsA)
-        )
-        .select(["data", "noteId as id"])
-        .$castTo<{ data: string; id: string }>()
-        .execute();
-
-      for (let i = 0; i < titles.length; i++) {
-        const title = titles[i];
-        const html = htmls.find((h) => h.id === title.id);
-        const text = html ? extractText(html.data) : "";
-
-        if (
-          smallTokens.every((token) => !!title.title?.includes(token)) ||
-          smallTokens.every((token) => !!text?.includes(token))
-        ) {
-          results.push(title.id);
-        }
-      }
-
-      return results;
+      return results.map((r) => r.id);
     }, notes || this.db.notes.all);
   }
 
@@ -170,91 +116,17 @@ export default class Lookup {
 
     const { query: transformedQuery, tokens } = transformQuery(query);
 
-    let mergedResults: HighlightedResult[] = [];
-    if (transformedQuery.length > 0) {
-      console.time("sql lookup");
-      const results = await db
-        .selectFrom((eb) =>
-          eb
-            .selectFrom("notes_fts")
-            .$if(!!notes, (eb) =>
-              eb.where("id", "in", notes!.filter.select("id"))
-            )
-            .$if(excludedIds.length > 0, (eb) =>
-              eb.where("id", "not in", excludedIds)
-            )
-            .where("title", "match", transformedQuery)
-            .select([
-              "id",
-              sql<string>`'title'`.as("type"),
-              sql<string>`highlight(notes_fts, 1, '<nn-search-result>', '</nn-search-result>')`.as(
-                "match"
-              ),
-              sql<number>`rank * 10`.as("rank")
-            ])
-            .unionAll((eb) =>
-              eb
-                .selectFrom("content_fts")
-                .$if(!!notes, (eb) =>
-                  eb.where("noteId", "in", notes!.filter.select("id"))
-                )
-                .$if(excludedIds.length > 0, (eb) =>
-                  eb.where("noteId", "not in", excludedIds)
-                )
-                .where("data", "match", transformedQuery)
-                .select([
-                  "noteId as id",
-                  sql<string>`'content'`.as("type"),
-                  sql<string>`highlight(content_fts, 2, '<nn-search-result>', '</nn-search-result>')`.as(
-                    "match"
-                  ),
-                  "rank"
-                ])
-                .$castTo<{
-                  id: string;
-                  type: string;
-                  rank: number;
-                  match: string;
-                }>()
-            )
-            .as("results")
-        )
-        .select(["results.id", "results.match", "results.type", "results.rank"])
-        .execute()
-        .catch((e) => {
-          logger.error(e, `Error while searching`, { query });
-          return [];
-        });
-      console.timeEnd("sql lookup");
-
-      console.time("merge results");
-      for (const result of results) {
-        const old = findOrAdd(mergedResults, (r) => r.id === result.id, {
-          type: "searchResult",
-          id: result.id,
-          content: [],
-          title: [],
-          rank: 0,
-          rawContent: "",
-          dateCreated: 0,
-          dateModified: 0
-        });
-
-        if (result.type === "content") {
-          old.content = extractMatchingBlocks(
-            result.match,
-            MATCH_TAG_NAME
-          ).flatMap((block) => {
-            return splitHighlightedMatch(block);
-          });
-          old.rawContent = result.match;
-        }
-        if (result.type === "title")
-          old.title = splitHighlightedMatch(result.match).flatMap((m) => m);
-        old.rank += result.rank;
-      }
-      console.timeEnd("merge results");
-    }
+    console.time("gather matches");
+    const ftsResults =
+      transformedQuery.length <= 0
+        ? []
+        : await this.ftsQueryBuilder(transformedQuery, excludedIds, notes)
+            .select(["id", "type", "rank"])
+            .execute()
+            .catch((e) => {
+              logger.error(e, `Error while searching`, { query });
+              return [];
+            });
 
     const smallTokens = Array.from(
       new Set(
@@ -262,108 +134,233 @@ export default class Lookup {
       ).values()
     );
 
-    if (smallTokens.length > 0) {
-      const ids = mergedResults.map((r) => r.id);
-      console.time("fetch titles");
-      const titles = await db
-        .selectFrom("notes")
-        .$if(!!transformedQuery && ids.length > 0, (eb) =>
-          eb.where("id", "in", ids)
-        )
-        .select(["id", "title"])
-        .execute();
-      console.timeEnd("fetch titles");
+    const ftsIds = ftsResults.map((r) => r.id);
+    const regexMatches =
+      smallTokens.length > 0
+        ? await this.regexQueryBuilder(
+            smallTokens,
+            !!transformedQuery && ftsIds.length > 0 ? ftsIds : notes
+          )
+            .select(["results.id", "results.type", sql<number>`1`.as("rank")])
+            .execute()
+        : [];
+    console.timeEnd("gather matches");
 
-      console.time("fetch htmls");
-      const htmls = await db
-        .selectFrom("content")
-        .where("content.locked", "!=", true)
-        .$if(!!transformedQuery && ids.length > 0, (eb) =>
-          eb.where("noteId", "in", ids)
-        )
-        .select(["data", "noteId as id"])
-        .$castTo<{ data: string; id: string }>()
-        .execute();
-      console.timeEnd("fetch htmls");
+    console.time("sorting matches");
+    type Matches = {
+      ids: string[];
+      values: { id: string; types: string[]; rank: number }[];
+    };
+    let matches: Matches = { ids: [], values: [] };
+    for (const array of [ftsResults, regexMatches])
+      for (const { id, type, rank } of array) {
+        const index = matches.ids.indexOf(id);
+        const match =
+          index === -1
+            ? {
+                id,
+                types: [],
+                rank: 0
+              }
+            : matches.values[index];
+        match.types.push(type);
+        match.rank += rank || 0;
 
-      console.time("small token lookup");
-      for (let i = 0; i < titles.length; i++) {
-        const title = titles[i];
-        const html = htmls.find((h) => h.id === title.id);
-        const text = html ? extractText(html.data) : "";
+        if (index === -1) {
+          matches.ids.push(id);
+          matches.values.push(match);
+        }
+      }
 
-        if (
-          (title.title &&
-            smallTokens.every((token) => !!title.title?.includes(token))) ||
-          (text && smallTokens.every((token) => !!text?.includes(token)))
-        ) {
-          const result = findOrAdd(mergedResults, (r) => r.id === title.id, {
+    if (!sortOptions || sortOptions.sortBy === "relevance") {
+      matches.values.sort(
+        sortOptions?.sortDirection === "desc"
+          ? (a, b) => a.rank - b.rank
+          : (a, b) => b.rank - a.rank
+      );
+      matches.ids = matches.values.map((c) => c.id);
+    } else {
+      const sortedNoteIds = await this.db.notes.all
+        .fields(["notes.id"])
+        .items(matches.ids, sortOptions);
+      const sorted: Matches = { ids: [], values: [] };
+      for (const { id } of sortedNoteIds) {
+        const index = matches.ids.indexOf(id);
+        if (index === -1) continue;
+        sorted.values.push(matches.values[index]);
+        sorted.ids.push(id);
+      }
+      matches = sorted;
+    }
+    console.timeEnd("sorting matches");
+
+    return new VirtualizedGrouping<HighlightedResult>(
+      matches.ids.length,
+      20,
+      async () => matches.ids,
+      async (start, end) => {
+        const chunk = matches.values.slice(start, end);
+        const titleMatches = chunk
+          .filter((c) => c.types.includes("title"))
+          .map((c) => c.id);
+        const contentMatches = chunk
+          .filter((c) => c.types.includes("content"))
+          .map((c) => c.id);
+        const results: HighlightedResult[] = [];
+
+        const titles = await db
+          .selectFrom("notes")
+          .where("id", "in", titleMatches)
+          .select(["id", "title"])
+          .execute();
+
+        for (const title of titles) {
+          results.push({
             id: title.id,
-            title: stringToMatch(title.title || ""),
+            title: splitHighlightedMatch(
+              highlightQueries(title.title || "", tokens).text
+            ).flatMap((m) => m),
             type: "searchResult",
             content: [],
             rank: 0,
             dateCreated: 0,
             dateModified: 0
           });
-
-          const merged = mergeMatches(
-            result.title,
-            splitHighlightedMatch(
-              highlightQueries(title.title || "", smallTokens)
-            ).flatMap((m) => m)
-          );
-          if (merged) result.title = merged;
-
-          result.content.push(
-            ...splitHighlightedMatch(highlightQueries(text, smallTokens))
-          );
         }
+
+        const htmls = await db
+          .selectFrom("content")
+          .where("noteId", "in", contentMatches)
+          .select(["data", "noteId as id"])
+          .$castTo<{ data: string; id: string }>()
+          .execute();
+
+        for (const html of htmls) {
+          const result = findOrAdd(results, (r) => r.id === html.id, {
+            id: html.id,
+            title: [],
+            type: "searchResult",
+            content: [],
+            rank: 0,
+            dateCreated: 0,
+            dateModified: 0
+          });
+          const highlighted = highlightHtmlContent(html.data, tokens);
+          result.content = extractMatchingBlocks(
+            highlighted,
+            MATCH_TAG_NAME
+          ).flatMap((block) => {
+            return splitHighlightedMatch(block);
+          });
+          if (result.content.length === 0) continue;
+          result.rawContent = highlighted;
+        }
+
+        const resultsWithMissingTitle = results
+          .filter((r) => !r.title.length)
+          .map((r) => r.id);
+
+        if (resultsWithMissingTitle.length > 0) {
+          const titles = await db
+            .selectFrom("notes")
+            .where("id", "in", resultsWithMissingTitle)
+            .select(["id", "title"])
+            .execute();
+          for (const title of titles) {
+            const result = results.find((r) => r.id === title.id);
+            if (!result || !title.title) continue;
+            result.title = stringToMatch(title.title);
+          }
+        }
+
+        return {
+          ids: results.map((c) => c.id),
+          items: results
+        };
       }
-      console.timeEnd("small token lookup");
-    }
+    );
+  }
 
-    const resultsWithMissingTitle = mergedResults
-      .filter((r) => !r.title.length)
-      .map((r) => r.id);
+  private ftsQueryBuilder(
+    query: string,
+    excludedIds: string[] = [],
+    filter?: FilteredSelector<Note>
+  ) {
+    const db = this.db.sql() as unknown as Kysely<RawDatabaseSchema>;
 
-    if (resultsWithMissingTitle.length > 0) {
-      console.time("missing title");
-      const titles = await db
+    return db.selectFrom((eb) =>
+      eb
+        .selectFrom("notes_fts")
+        .$if(!!filter, (eb) =>
+          eb.where("id", "in", filter!.filter.select("id"))
+        )
+        .$if(excludedIds.length > 0, (eb) =>
+          eb.where("id", "not in", excludedIds)
+        )
+        .where("title", "match", query)
+        .where("rank", "=", sql<number>`'bm25(1.0, 10.0)'`)
+        .select(["id", "rank", sql<string>`'title'`.as("type")])
+        .unionAll((eb) =>
+          eb
+            .selectFrom("content_fts")
+            .$if(!!filter, (eb) =>
+              eb.where("noteId", "in", filter!.filter.select("id"))
+            )
+            .$if(excludedIds.length > 0, (eb) =>
+              eb.where("noteId", "not in", excludedIds)
+            )
+            .where("data", "match", query)
+            .where("rank", "=", sql<number>`'bm25(1.0, 1.0, 10.0)'`)
+            .select(["noteId as id", "rank", sql<string>`'content'`.as("type")])
+            .$castTo<{
+              id: string;
+              rank: number;
+              type: "content" | "title";
+            }>()
+        )
+        .as("results")
+    );
+  }
+  private regexQueryBuilder(
+    queries: string[],
+    ids?: string[] | FilteredSelector<Note>
+  ) {
+    const regex = queries
+      .filter((q) => q && q.length > 0)
+      .map((q) => q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+      .join("|");
+    return this.db.sql().selectFrom((eb) =>
+      eb
         .selectFrom("notes")
-        .where("id", "in", resultsWithMissingTitle)
-        .select(["id", "title"])
-        .execute();
-      for (const title of titles) {
-        const result = mergedResults.find((r) => r.id === title.id);
-        if (!result || !title.title) continue;
-        result.title = stringToMatch(title.title);
-      }
-      console.timeEnd("missing title");
-    }
-
-    mergedResults = mergedResults.filter((r) => !!r.title.length);
-
-    if (!sortOptions || sortOptions.sortBy === "relevance")
-      mergedResults.sort(
-        sortOptions?.sortDirection === "desc"
-          ? (a, b) => a.rank - b.rank
-          : (a, b) => b.rank - a.rank
-      );
-    else {
-      const sortedNoteIds = await this.db.notes.all.fields(["notes.id"]).items(
-        mergedResults.map((r) => r.id),
-        sortOptions
-      );
-      const sorted: HighlightedResult[] = [];
-      for (const { id } of sortedNoteIds) {
-        const resultForId = mergedResults.find((r) => r.id === id);
-        if (!resultForId) continue;
-        sorted.push(resultForId);
-      }
-      mergedResults = sorted;
-    }
-    return arrayToVirtualizedGrouping(mergedResults, this.db.options.batchSize);
+        .$if(!!ids, (eb) =>
+          eb.where(
+            "id",
+            "in",
+            Array.isArray(ids) ? ids! : ids!.filter.select("id")
+          )
+        )
+        .where("title", "regexp", sql<string>`${regex}`)
+        .select(["id", sql<string>`'title'`.as("type")])
+        .unionAll((eb) =>
+          eb
+            .selectFrom("content")
+            .where("content.locked", "!=", true)
+            .$if(!!ids, (eb) =>
+              eb.where(
+                "noteId",
+                "in",
+                Array.isArray(ids) ? ids! : ids!.filter.select("id")
+              )
+            )
+            .where("data", "regexp", sql<string>`${regex}`)
+            .select(["noteId as id", sql<string>`'content'`.as("type")])
+            .$castTo<{
+              id: string;
+              type: "content" | "title";
+            }>()
+        )
+        .as("results")
+    );
   }
 
   notebooks(query: string) {
@@ -561,87 +558,39 @@ export default class Lookup {
   }
 }
 
-function highlightQueries(text: string, queries: string[]): string {
-  if (!text || !queries.length) return text;
+function highlightQueries(
+  text: string,
+  queries: string[]
+): { text: string; hasMatches: boolean } {
+  if (!text || !queries.length) return { text, hasMatches: false };
 
-  // Collect all ranges
-  const ranges = [];
-  const lowerText = text.toLowerCase();
+  // Filter out empty queries and escape regex special characters
+  const patterns = queries
+    .filter((q) => q.length > 0)
+    .map((q) => q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
 
-  for (let i = 0; i < queries.length; i++) {
-    const query = queries[i];
-    const lowerQuery = query.toLowerCase();
-    const queryLen = query.length;
-    let pos = 0;
+  if (patterns.length === 0) return { text, hasMatches: false };
 
-    while ((pos = lowerText.indexOf(lowerQuery, pos)) !== -1) {
-      ranges.push({
-        start: pos,
-        end: pos + queryLen,
-        len: queryLen
-      });
-      pos += 1;
-    }
+  try {
+    // Create a single regex for all patterns
+    // Use word boundaries to avoid partial word matches if needed
+    // (?:) creates a non-capturing group
+    const regex = new RegExp(patterns.join("|"), "gi");
+
+    // Track if we found any matches
+    let hasMatches = false;
+
+    // Replace all matches at once using a string builder approach
+    const result = text.replace(regex, (match) => {
+      hasMatches = true;
+      return `${MATCH_TAG_OPEN}${match}${MATCH_TAG_CLOSE}`;
+    });
+
+    return { text: result, hasMatches };
+  } catch (error) {
+    // Fallback to original approach if regex fails (e.g., too large pattern)
+    return { text, hasMatches: false };
   }
-
-  if (!ranges.length) return text;
-
-  // Sort by start position, then by length (longer first)
-  ranges.sort((a, b) => a.start - b.start || b.len - a.len);
-
-  // Filter overlaps and merge adjacent ranges
-  const merged = [ranges[0]];
-  for (let i = 1; i < ranges.length; i++) {
-    const current = ranges[i];
-    const previous = merged[merged.length - 1];
-
-    if (current.start > previous.end) {
-      // No overlap or adjacency - add as new range
-      merged.push(current);
-    } else if (current.start === previous.end) {
-      // Adjacent ranges - merge them
-      previous.end = current.end;
-      previous.len = previous.end - previous.start;
-    }
-    // Overlapping ranges are skipped
-  }
-
-  // Build result using array of parts
-  const parts = [];
-  let lastEnd = 0;
-
-  for (const { start, end } of merged) {
-    if (start > lastEnd) {
-      parts.push(text.slice(lastEnd, start));
-    }
-    parts.push(MATCH_TAG_OPEN, text.slice(start, end), MATCH_TAG_CLOSE);
-    lastEnd = end;
-  }
-
-  if (lastEnd < text.length) {
-    parts.push(text.slice(lastEnd));
-  }
-
-  return parts.join("");
-}
-
-function arrayToVirtualizedGrouping<T extends { id: string }>(
-  array: T[],
-  batchSize: number
-): VirtualizedGrouping<T> {
-  return new VirtualizedGrouping<T>(
-    array.length,
-    batchSize,
-    () => Promise.resolve(array.map((c) => c.id)),
-    async (start, end) => {
-      const items = array.slice(start, end);
-      return {
-        ids: items.map((i) => i.id),
-        items
-      };
-    },
-    (items) => groupArray(items, () => `${items.length} results`)
-  );
 }
 
 export function splitHighlightedMatch(text: string): Match[][] {
@@ -803,86 +752,78 @@ function stringToMatch(str: string): Match[] {
   ];
 }
 
-function mergeMatches(matches1: Match[], matches2: Match[]): Match[] | null {
-  if (!matches1.length) return matches2;
-  if (!matches2.length) return matches1;
+function highlightHtmlContent(html: string, queries: string[]): string {
+  if (!html || !queries.length) return html;
 
-  // Helper to get full text from matches array
-  function getFullText(matches: Match[]): string {
-    if (!matches.length) return "";
-    return matches.reduce(
-      (text, curr) => text + curr.prefix + curr.match + curr.suffix,
-      ""
-    );
-  }
+  // Filter and escape regex special chars
+  const patterns = queries
+    .filter((q) => q && q.length > 0)
+    .map((q) => q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
 
-  // Get the full original text
-  const text = getFullText(matches1);
-  if (getFullText(matches2) !== text) return null;
+  if (!patterns.length) return html;
 
-  // Create array of all match positions
-  type Position = {
-    start: number;
-    end: number;
-    match: string;
-  };
+  // Create single regex for all patterns
+  const searchRegex = new RegExp(`(${patterns.join("|")})`, "gi");
 
-  function getPositions(matches: Match[]) {
-    const positions: Position[] = [];
-    let pos = 0;
-    for (let i = 0; i < matches.length; i++) {
-      const m = matches[i];
-      pos += m.prefix.length;
-      positions.push({
-        start: pos,
-        end: pos + m.match.length,
-        match: m.match
-      });
-      pos += m.match.length + m.suffix.length;
+  let result = "";
+  let textBuffer = "";
+
+  // Create parser instance
+  const parser = new Parser(
+    {
+      ontext(text) {
+        // Process any accumulated text with search regex
+        textBuffer += text;
+      },
+      onopentag(name, attributes) {
+        // When we hit a tag, process any accumulated text first
+        if (textBuffer) {
+          result += textBuffer.replace(
+            searchRegex,
+            "<nn-search-result>$1</nn-search-result>"
+          );
+          textBuffer = "";
+        }
+        // Add the tag with its attributes
+        result += `<${name}`;
+        for (const [key, value] of Object.entries(attributes)) {
+          result += ` ${key}="${value}"`;
+        }
+        result += ">";
+      },
+      onclosetag(name) {
+        // Process any text before closing tag
+        if (textBuffer) {
+          result += textBuffer.replace(
+            searchRegex,
+            "<nn-search-result>$1</nn-search-result>"
+          );
+          textBuffer = "";
+        }
+        result += `</${name}>`;
+      },
+
+      onprocessinginstruction(name, data) {
+        // Preserve processing instructions (like <!DOCTYPE>)
+        result += `<${data}>`;
+      }
+    },
+    {
+      decodeEntities: false, // Preserve HTML entities
+      xmlMode: false // Handle HTML specifically
     }
-    return positions;
-  }
-
-  const positions = [...getPositions(matches1), ...getPositions(matches2)].sort(
-    (a, b) => a.start - b.start || b.end - a.end
   );
 
-  // Merge overlapping or adjacent positions
-  const merged: Position[] = [];
-  let current = positions[0];
+  // Parse the HTML
+  parser.write(html);
+  parser.end();
 
-  for (let i = 1; i < positions.length; i++) {
-    const next = positions[i];
-    if (next.start <= current.end) {
-      // Overlapping or adjacent matches
-      if (next.end > current.end) {
-        // Extend current match if next one is longer
-        current = {
-          start: current.start,
-          end: next.end,
-          match: text.slice(current.start, next.end)
-        };
-      }
-    } else {
-      merged.push(current);
-      current = next;
-    }
-  }
-  merged.push(current);
-
-  // Create final matches array
-  const result: Match[] = [];
-  for (let i = 0; i < merged.length; i++) {
-    const pos = merged[i];
-    const nextPos = merged[i + 1];
-
-    const prefix = i === 0 ? text.slice(0, pos.start) : "";
-    const match = pos.match;
-    const suffix = nextPos
-      ? text.slice(pos.end, nextPos.start)
-      : text.slice(pos.end);
-
-    result.push({ prefix, match, suffix });
+  // Process any remaining text
+  if (textBuffer) {
+    result += textBuffer.replace(
+      searchRegex,
+      "<nn-search-result>$1</nn-search-result>"
+    );
   }
 
   return result;
