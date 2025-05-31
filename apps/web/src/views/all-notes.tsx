@@ -26,7 +26,6 @@ import { useSearch } from "../hooks/use-search";
 import { db } from "../common/db";
 import { useEditorStore } from "../stores/editor-store";
 import { ListLoader } from "../components/loaders/list-loader";
-import Search from "./search";
 
 function Home() {
   const notes = useStore((store) => store.notes);
