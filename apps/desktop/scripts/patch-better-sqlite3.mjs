@@ -25,6 +25,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export async function patchBetterSQLite3() {
+  console.log("Patching better-sqlite3");
+
   const jsonPath = path.join(
     __dirname,
     "..",
@@ -52,6 +54,5 @@ export async function patchBetterSQLite3() {
 }
 
 if (process.argv[1] === __filename) {
-  console.log("Patching better-sqlite3");
   patchBetterSQLite3();
 }
