@@ -1,0 +1,11 @@
+diff --git a/node_modules/better-sqlite3-multiple-ciphers/deps/defines.gypi b/node_modules/better-sqlite3-multiple-ciphers/deps/defines.gypi
+index 1a14ecd..dabcce2 100644
+--- a/node_modules/better-sqlite3-multiple-ciphers/deps/defines.gypi
++++ b/node_modules/better-sqlite3-multiple-ciphers/deps/defines.gypi
+@@ -38,5 +38,6 @@
+     'SQLITE_TRACE_SIZE_LIMIT=32',
+     'SQLITE_USER_AUTHENTICATION=0',
+     'SQLITE_USE_URI=0',
++    'SQLITE_ENABLE_REGEXP',
+   ],
+ }
