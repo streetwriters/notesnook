@@ -107,7 +107,8 @@ jobs:
           name: Notesnook Desktop v${{ steps.app_metadata.outputs.app_version }}
           tag_name: v${{ steps.app_metadata.outputs.app_version }}
           files: ./notesnook_build_v${{ steps.app_metadata.outputs.app_version }}.zip
-          prerelease: ${{ endsWith(steps.app_metadata.outputs.app_version, '-beta') }}
+          prerelease: ${{ inputs.release-track == 'beta' }}
+          target_commitish: ${{ github.ref }}
 
       - name: Generate flatpak sources
         if: inputs.publish-github && inputs.build-linux
