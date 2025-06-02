@@ -39,9 +39,14 @@ export function useSearch<T>(
     if (!query || !isSearching) return setFilteredItems(undefined);
     if (searchType !== type) return;
 
-    lookup(query, sortOptions || db.settings.getGroupOptions("search")).then(
-      (items) => setFilteredItems(items)
-    );
+    const cachedQuery = query;
+    lookup(
+      cachedQuery,
+      sortOptions || db.settings.getGroupOptions("search")
+    ).then((items) => {
+      if (useSearchStore.getState().query === cachedQuery)
+        setFilteredItems(items);
+    });
   }, [isSearching, query, searchType, type, sortOptions, ...deps]);
 
   return filteredItems;
