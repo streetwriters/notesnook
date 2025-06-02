@@ -9,7 +9,7 @@
     "react": "18.2.0"
   },
 "dependencies": {
-    "@ammarahmed/notifee-react-native": "7.4.7",
+    "@ammarahmed/notifee-react-native": "7.4.9",
     "@callstack/repack": "~5.0.0",
     "@bam.tech/react-native-image-resizer": "3.0.11",
     "@react-native-clipboard/clipboard": "^1.9.0",
@@ -41,7 +41,7 @@
     "react-native-get-random-values": "^1.7.0",
     "react-native-gzip": "1.1.0",
     "react-native-html-to-pdf-lite": "^0.9.1",
-    "react-native-iap": "12.15.1",
+    "react-native-iap": "12.16.2",
     "react-native-in-app-review": "4.3.3",
     "react-native-keychain": "4.0.5",
     "react-native-modal-datetime-picker": "14.0.0",
