@@ -804,6 +804,14 @@ function highlightHtmlContent(html: string, queries: string[]): string {
         // Add the tag with its attributes
         result += `<${name}`;
         for (const [key, value] of Object.entries(attributes)) {
+          // auto expand outline lists
+          if (name === "li" && key === "data-collapsed") continue;
+          // auto expand callouts
+          if (name === "div" && key === "class" && value?.includes("callout")) {
+            result += ` ${key}="callout"`;
+            continue;
+          }
+
           result += ` ${key}="${value}"`;
         }
         result += ">";
