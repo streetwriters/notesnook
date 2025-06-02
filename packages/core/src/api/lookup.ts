@@ -768,7 +768,6 @@ function stringToMatch(str: string): Match[] {
     }
   ];
 }
-
 function highlightHtmlContent(html: string, queries: string[]): string {
   if (!html || !queries.length) return html;
 
@@ -783,59 +782,102 @@ function highlightHtmlContent(html: string, queries: string[]): string {
   const searchRegex = new RegExp(`(${patterns.join("|")})`, "gi");
 
   let result = "";
-  let textBuffer = "";
+
+  // Stack to track elements and their buffered content
+  interface ElementInfo {
+    name: string;
+    attributes: Record<string, string>;
+    hasMatch: boolean;
+    buffer: string;
+  }
+  const elementStack: ElementInfo[] = [];
 
   // Create parser instance
   const parser = new Parser(
     {
       ontext(text) {
-        // Process any accumulated text with search regex
-        textBuffer += text;
+        // Check for matches in text
+        const hasMatch = searchRegex.test(text);
+        // Reset regex state after test
+        searchRegex.lastIndex = 0;
+
+        const processed = text.replace(
+          searchRegex,
+          "<nn-search-result>$1</nn-search-result>"
+        );
+
+        if (hasMatch) {
+          // Mark all ancestor elements as containing a match
+          elementStack.forEach((el) => (el.hasMatch = true));
+        }
+
+        // Add text to current element's buffer or main result
+        if (elementStack.length > 0) {
+          elementStack[elementStack.length - 1].buffer += processed;
+        } else {
+          result += processed;
+        }
       },
       onopentag(name, attributes) {
-        // When we hit a tag, process any accumulated text first
-        if (textBuffer) {
-          result += textBuffer.replace(
-            searchRegex,
-            "<nn-search-result>$1</nn-search-result>"
-          );
-          textBuffer = "";
-        }
-        // Add the tag with its attributes
-        result += `<${name}`;
-        for (const [key, value] of Object.entries(attributes)) {
-          // auto expand outline lists
-          if (name === "li" && key === "data-collapsed") continue;
-          // auto expand callouts
-          if (name === "div" && key === "class" && value?.includes("callout")) {
-            result += ` ${key}="callout"`;
+        // Create new element info
+        elementStack.push({
+          name,
+          attributes: { ...attributes },
+          hasMatch: false,
+          buffer: ""
+        });
+      },
+      onclosetag(_name) {
+        const element = elementStack.pop();
+        if (!element) return;
+
+        let html = `<${element.name}`;
+
+        // Process attributes based on match status
+        for (const [key, value] of Object.entries(element.attributes)) {
+          // auto expand outline list item if it has matches
+          if (
+            element.name === "li" &&
+            key === "data-collapsed" &&
+            element.hasMatch
+          ) {
             continue;
           }
 
-          result += ` ${key}="${value}"`;
-        }
-        result += ">";
-      },
-      onclosetag(name) {
-        // Process any text before closing tag
-        if (textBuffer) {
-          result += textBuffer.replace(
-            searchRegex,
-            "<nn-search-result>$1</nn-search-result>"
-          );
-          textBuffer = "";
-        }
-        result += `</${name}>`;
-      },
+          // auto expand callout if it has matches
+          if (
+            element.name === "div" &&
+            key === "class" &&
+            value?.includes("callout") &&
+            element.hasMatch
+          ) {
+            html += ` ${key}="callout"`;
+            continue;
+          }
 
-      onprocessinginstruction(name, data) {
-        // Preserve processing instructions (like <!DOCTYPE>)
-        result += `<${data}>`;
+          html += ` ${key}="${value}"`;
+        }
+
+        html += `>${element.buffer}</${element.name}>`;
+
+        // Add to parent's buffer or main result
+        if (elementStack.length > 0) {
+          elementStack[elementStack.length - 1].buffer += html;
+        } else {
+          result += html;
+        }
+      },
+      onprocessinginstruction(_name, data) {
+        if (elementStack.length > 0) {
+          elementStack[elementStack.length - 1].buffer += `<${data}>`;
+        } else {
+          result += `<${data}>`;
+        }
       }
     },
     {
-      decodeEntities: false, // Preserve HTML entities
-      xmlMode: false // Handle HTML specifically
+      decodeEntities: false,
+      xmlMode: false
     }
   );
 
