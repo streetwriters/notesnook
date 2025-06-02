@@ -52,6 +52,7 @@ import { AppEventManager, AppEvents } from "../common/app-events";
 import Vault from "../common/vault";
 import { Mutex } from "async-mutex";
 import { useEditorManager } from "../components/editor/manager";
+import { Context } from "../components/list-container/types";
 
 export enum SaveState {
   NotSaved = -1,
@@ -1007,23 +1008,9 @@ class EditorStore extends BaseStore<EditorStore> {
 
         if (currentSession.type === "new") {
           const context = useNoteStore.getState().context;
-          const defaultNotebook = db.settings.getDefaultNotebook();
-          if (context) {
-            const { type } = context;
-            if (type === "notebook")
-              await db.notes.addToNotebook(context.id, note.id);
-            else if (type === "color" || type === "tag") {
-              await db.relations.add(
-                { type, id: context.id },
-                { id: note.id, type: "note" }
-              );
-              if (defaultNotebook)
-                await db.notes.addToNotebook(defaultNotebook, note.id);
-            }
-          } else {
-            if (defaultNotebook)
-              await db.notes.addToNotebook(defaultNotebook, note.id);
-          }
+          await addNotebook(note, context);
+          await addTag(note, context);
+          await addColor(note, context);
         }
 
         const attachmentsLength = await db.attachments
@@ -1366,4 +1353,37 @@ async function waitForSync() {
   return new Promise((resolve) => {
     db.eventManager.subscribe(EVENTS.syncCompleted, resolve, true);
   });
+}
+
+async function addNotebook(note: Note, context?: Context) {
+  const notebookId =
+    context && context.type === "notebook"
+      ? context.id
+      : db.settings.getDefaultNotebook();
+  if (!notebookId) return;
+
+  await db.notes.addToNotebook(notebookId, note.id);
+}
+
+async function addTag(note: Note, context?: Context) {
+  const tagId =
+    context && context.type === "tag"
+      ? context.id
+      : db.settings.getDefaultTag();
+  if (!tagId) return;
+
+  await db.relations.add(
+    { type: "tag", id: tagId },
+    { type: "note", id: note.id }
+  );
+}
+
+async function addColor(note: Note, context?: Context) {
+  const colorId = context && context.type === "color" ? context.id : undefined;
+  if (!colorId) return;
+
+  await db.relations.add(
+    { type: "color", id: colorId },
+    { type: "note", id: note.id }
+  );
 }
