@@ -195,6 +195,8 @@ export default class Lookup {
     }
     console.timeEnd("sorting matches");
 
+    const highlightTokens = tokens.map((t) => t.replace(/"(.+)"/g, "$1"));
+
     return new VirtualizedGrouping<HighlightedResult>(
       matches.ids.length,
       20,
@@ -219,7 +221,7 @@ export default class Lookup {
           results.push({
             id: title.id,
             title: splitHighlightedMatch(
-              highlightQueries(title.title || "", tokens).text
+              highlightQueries(title.title || "", highlightTokens).text
             ).flatMap((m) => m),
             type: "searchResult",
             content: [],
@@ -246,7 +248,7 @@ export default class Lookup {
             dateCreated: 0,
             dateModified: 0
           });
-          const highlighted = highlightHtmlContent(html.data, tokens);
+          const highlighted = highlightHtmlContent(html.data, highlightTokens);
           result.content = extractMatchingBlocks(
             highlighted,
             MATCH_TAG_NAME
