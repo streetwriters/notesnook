@@ -119,6 +119,11 @@ const features: Record<FeatureKeys, Feature> = {
             title: "Sortable search",
             subtitle:
               "Search results are now sortable (just like notes, notebooks etc.)"
+          },
+          {
+            title: "Set default tag",
+            subtitle:
+              "You can now set any tag as default and it'll automatically be applied whenever you create a note."
           }
         ],
     cta: {
