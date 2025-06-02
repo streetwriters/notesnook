@@ -276,6 +276,14 @@ export default class Lookup {
           }
         }
 
+        for (const result of results) {
+          result.content.sort(
+            (a, b) =>
+              getMatchScore(b, highlightTokens) -
+              getMatchScore(a, highlightTokens)
+          );
+        }
+
         return {
           ids: results.map((c) => c.id),
           items: results
@@ -885,13 +893,85 @@ function highlightHtmlContent(html: string, queries: string[]): string {
   parser.write(html);
   parser.end();
 
-  // Process any remaining text
-  if (textBuffer) {
-    result += textBuffer.replace(
-      searchRegex,
-      "<nn-search-result>$1</nn-search-result>"
-    );
-  }
-
   return result;
+}
+
+interface MatchScoreOptions {
+  lengthMultiplier: number; // Weight for match length
+  positionPenalty: number; // Penalty for matches further down
+  consecutiveBonus: number; // Bonus for different consecutive token matches
+  repetitionPenalty: number; // Penalty for same token repeated consecutively
+  uniqueTokenBonus: number; // Large bonus for each unique token matched
+  completeWordBonus: number; // Bonus for complete word matches
+}
+
+const DEFAULT_SCORE_OPTIONS: MatchScoreOptions = {
+  lengthMultiplier: 1.5, // Favor longer matches
+  positionPenalty: 0.05, // Small penalty for each position down
+  consecutiveBonus: 2.0, // Bonus for consecutive different tokens
+  repetitionPenalty: 0.5, // Significant penalty for repetition
+  uniqueTokenBonus: 10.0, // Large bonus for each unique token
+  completeWordBonus: 5.0 // Significant bonus for complete word matches
+};
+
+function isCompleteWord(match: Match): boolean {
+  const prefixEndsWithSpace = /\s$/.test(match.prefix) || match.prefix === "";
+  const suffixStartsWithSpace = /^\s/.test(match.suffix) || match.suffix === "";
+  return prefixEndsWithSpace && suffixStartsWithSpace;
+}
+
+function getMatchScore(
+  matches: Match[],
+  tokens: string[],
+  options: MatchScoreOptions = DEFAULT_SCORE_OPTIONS
+): number {
+  let score = 0;
+  let lastMatchText = "";
+  let repetitionCount = 0;
+  const uniqueTokens = new Set<string>();
+
+  matches.forEach((match, index) => {
+    const matchText = match.match.toLowerCase();
+    let matchScore = 0;
+
+    // Get matching tokens for this match
+    const matchingTokens = tokens.filter((token) =>
+      matchText.includes(token.toLowerCase())
+    );
+
+    // Add to unique tokens set
+    matchingTokens.forEach((token) => {
+      uniqueTokens.add(token.toLowerCase());
+    });
+
+    // Base score from match length
+    matchScore += match.match.length * options.lengthMultiplier;
+
+    // Check if it's a complete word only once per match
+    if (isCompleteWord(match)) {
+      matchScore += options.completeWordBonus;
+    }
+
+    // Position penalty
+    matchScore *= 1 - index * options.positionPenalty;
+
+    // Handle consecutive matches and repetition
+    if (index > 0) {
+      if (matchText === lastMatchText) {
+        repetitionCount++;
+        matchScore *= Math.pow(options.repetitionPenalty, repetitionCount);
+      } else {
+        matchScore *= options.consecutiveBonus;
+        repetitionCount = 0;
+      }
+    }
+
+    lastMatchText = matchText;
+    score += matchScore;
+  });
+
+  // Add unique token bonus once at the end
+  score += uniqueTokens.size * options.uniqueTokenBonus;
+
+  return score;
 }
