@@ -30,16 +30,14 @@ import { MenuItem } from "@notesnook/ui";
 
 type SearchResultProps = {
   item: HighlightedResult;
-  matchIndex?: number;
 };
 
 function SearchResult(props: SearchResultProps) {
-  const { item, matchIndex } = props;
+  const { item } = props;
 
   const isOpened = useEditorStore((store) => store.isNoteOpen(item.id));
-  const match = matchIndex !== undefined ? item.content[matchIndex] : undefined;
-  const isExpandable = !match && item.content.length > 0;
-  const [isExpanded, setIsExpanded] = useState(true);
+  const isExpandable = item.content.length > 0;
+  const [isExpanded, setIsExpanded] = useState(isExpandable);
 
   if (!item.title.length && !item.content.length) return null;
   return (
@@ -104,7 +102,7 @@ function SearchResult(props: SearchResultProps) {
                   whiteSpace: "nowrap",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
-                  fontWeight: "medium",
+                  fontWeight: "bold",
                   display: "block",
                   ".match": {
                     bg: "accent-secondary",
@@ -147,20 +145,14 @@ function SearchResult(props: SearchResultProps) {
                 useEditorStore.getState().openSession(item.id, {
                   rawContent: item.rawContent,
                   force: true,
-                  activeSearchResultIndex: findSelectedMatchIndex(
-                    item,
-                    matchIndex || 0
-                  )
+                  activeSearchResultIndex: findSelectedMatchIndex(item, index)
                 });
               }}
               onMiddleClick={() => {
                 useEditorStore.getState().openSession(item.id, {
                   openInNewTab: true,
                   rawContent: item.rawContent,
-                  activeSearchResultIndex: findSelectedMatchIndex(
-                    item,
-                    matchIndex || 0
-                  )
+                  activeSearchResultIndex: findSelectedMatchIndex(item, index)
                 });
               }}
               title={
