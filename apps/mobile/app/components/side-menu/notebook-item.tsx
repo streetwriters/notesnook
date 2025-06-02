@@ -93,7 +93,11 @@ export const NotebookItem = ({
     <View
       style={{
         paddingLeft:
-          item.depth > 0 && item.depth < 6 ? 15 * item.depth : undefined,
+          item.depth === 0
+            ? undefined
+            : item.depth < 6
+            ? 15 * item.depth
+            : 15 * 5,
         width: "100%",
         marginTop: 2
       }}
