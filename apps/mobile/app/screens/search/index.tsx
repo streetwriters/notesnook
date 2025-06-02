@@ -90,7 +90,7 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
           default:
             results = undefined;
         }
-
+        if (currentQuery.current !== query) return;
         if (!results) {
           setSearchStatus(strings.noResultsFound(query));
           setLoading(false);
@@ -102,6 +102,7 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
         );
         if (currentQuery.current !== query) return;
         await results.item(0);
+        if (currentQuery.current !== query) return;
         setResults(results);
         if (results.placeholders?.length === 0) {
           setSearchStatus(strings.noResultsFound(query));
