@@ -1746,7 +1746,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNIap (12.15.1):
+  - RNIap (12.16.2):
     - React-Core
   - RNImageCropPicker (0.40.2):
     - React-Core
@@ -1759,10 +1759,10 @@ PODS:
     - TOCropViewController
   - RNKeychain (4.0.5):
     - React
-  - RNNotifee (7.4.7):
+  - RNNotifee (7.4.9):
     - React-Core
-    - RNNotifee/NotifeeCore (= 7.4.7)
-  - RNNotifee/NotifeeCore (7.4.7):
+    - RNNotifee/NotifeeCore (= 7.4.9)
+  - RNNotifee/NotifeeCore (7.4.9):
     - React-Core
   - RNPrivacySnapshot (1.0.0):
     - React-Core
@@ -2456,10 +2456,10 @@ SPEC CHECKSUMS:
   RNFileViewer: 4b5d83358214347e4ab2d4ca8d5c1c90d869e251
   RNFlashList: ff5a0b3113c4cda0eaf4b94df8572ccad3c40fd5
   RNGestureHandler: 92e89a04cd0d1c77f383a55d14c15e7f423f4c00
-  RNIap: aa38c2cc8a2a75ba8112d161ca084a0b611955df
+  RNIap: f94647b3a3dbd5fa08ad7ed847eb588aa5fe95fe
   RNImageCropPicker: 30d770b383d84e1067d82ea7b5ed4fff851bbbb2
   RNKeychain: ffd0513e676445c637410b47249460cbf56bc9cb
-  RNNotifee: b98fb71f678f6644fa48ec6d515ec6fcfc5214ba
+  RNNotifee: dabf3cdd7bfd9340bb84358cc78f635af4bc80e2
   RNPrivacySnapshot: ccad3a548338c2f526bb7b1789af3fb0618b7d1d
   RNReanimated: 96a7ed0d44c0a5b044c6c8a1c98474818a554a8a
   RNScreens: cfb34cc4609bb92bd4fad6583be815075705a912
