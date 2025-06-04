@@ -386,6 +386,9 @@ export class NNMigrationProvider implements MigrationProvider {
         async up() {}
       },
       "a-2025-05-17": {
+        async up() {}
+      },
+      "a-2025-06-04": {
         async up(db) {
           await runFTSTablesMigrations(db);
         }
@@ -459,7 +462,7 @@ async function runFTSTablesMigrations(db: Kysely<any>) {
 
     await createFTS5Table("notes_fts", [{ name: "id" }, { name: "title" }], {
       contentTable: "notes",
-      tokenizer: ["porter", "better_trigram", "remove_diacritics 1"]
+      tokenizer: ["better_trigram", "remove_diacritics 1"]
     }).execute(tx);
 
     await createFTS5Table(
@@ -467,7 +470,7 @@ async function runFTSTablesMigrations(db: Kysely<any>) {
       [{ name: "id" }, { name: "noteId" }, { name: "data" }],
       {
         contentTable: "content",
-        tokenizer: ["html", "porter", "better_trigram", "remove_diacritics 1"]
+        tokenizer: ["html", "better_trigram", "remove_diacritics 1"]
       }
     ).execute(tx);
   });
