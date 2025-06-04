@@ -218,11 +218,18 @@ export default class Lookup {
           .execute();
 
         for (const title of titles) {
+          const highlighted = highlightQueries(
+            title.title || "",
+            highlightTokens
+          );
+          const hasMatches = !highlightTokens.every((t) =>
+            highlighted.includes(`${MATCH_TAG_OPEN}${t}${MATCH_TAG_CLOSE}`)
+          );
           results.push({
             id: title.id,
-            title: splitHighlightedMatch(
-              highlightQueries(title.title || "", highlightTokens).text
-            ).flatMap((m) => m),
+            title: hasMatches
+              ? splitHighlightedMatch(highlighted).flatMap((m) => m)
+              : [],
             type: "searchResult",
             content: [],
             rank: 0,
@@ -249,6 +256,12 @@ export default class Lookup {
             dateModified: 0
           });
           const highlighted = highlightHtmlContent(html.data, highlightTokens);
+          if (
+            !highlightTokens.every((t) =>
+              highlighted.includes(`${MATCH_TAG_OPEN}${t}${MATCH_TAG_CLOSE}`)
+            )
+          )
+            continue;
           result.content = extractMatchingBlocks(
             highlighted,
             MATCH_TAG_NAME
@@ -260,7 +273,7 @@ export default class Lookup {
         }
 
         const resultsWithMissingTitle = results
-          .filter((r) => !r.title.length)
+          .filter((r) => !r.title.length && r.content.length > 0)
           .map((r) => r.id);
 
         if (resultsWithMissingTitle.length > 0) {
@@ -583,38 +596,25 @@ export default class Lookup {
   }
 }
 
-function highlightQueries(
-  text: string,
-  queries: string[]
-): { text: string; hasMatches: boolean } {
-  if (!text || !queries.length) return { text, hasMatches: false };
+function highlightQueries(text: string, queries: string[]): string {
+  if (!text || !queries.length) return text;
 
-  // Filter out empty queries and escape regex special characters
   const patterns = queries
     .filter((q) => q.length > 0)
     .map((q) => q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
 
-  if (patterns.length === 0) return { text, hasMatches: false };
+  if (patterns.length === 0) return text;
 
   try {
-    // Create a single regex for all patterns
-    // Use word boundaries to avoid partial word matches if needed
-    // (?:) creates a non-capturing group
     const regex = new RegExp(patterns.join("|"), "gi");
+    text.replace(
+      regex,
+      (match) => `${MATCH_TAG_OPEN}${match}${MATCH_TAG_CLOSE}`
+    );
 
-    // Track if we found any matches
-    let hasMatches = false;
-
-    // Replace all matches at once using a string builder approach
-    const result = text.replace(regex, (match) => {
-      hasMatches = true;
-      return `${MATCH_TAG_OPEN}${match}${MATCH_TAG_CLOSE}`;
-    });
-
-    return { text: result, hasMatches };
+    return text;
   } catch (error) {
-    // Fallback to original approach if regex fails (e.g., too large pattern)
-    return { text, hasMatches: false };
+    return text;
   }
 }
 
