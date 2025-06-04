@@ -105,8 +105,8 @@ export const SearchResult = (props: SearchResultProps) => {
               flexShrink: 1
             }}
           >
-            {props.item.title.map((title) => (
-              <>
+            {props.item.title.map((title, index) => (
+              <React.Fragment key={props.item.id + index + "-srt"}>
                 {title.prefix}
                 <Heading
                   size={AppFontSize.sm}
@@ -118,7 +118,7 @@ export const SearchResult = (props: SearchResultProps) => {
                   {title.match}
                 </Heading>
                 {title.suffix}
-              </>
+              </React.Fragment>
             ))}
           </Heading>
         </View>
@@ -158,8 +158,8 @@ export const SearchResult = (props: SearchResultProps) => {
             }}
           >
             <Paragraph>
-              {content.map((match) => (
-                <>
+              {content.map((match, index) => (
+                <React.Fragment key={props.item.id + index + "src"}>
                   {match.prefix}
                   <Paragraph
                     size={AppFontSize.sm}
@@ -171,7 +171,7 @@ export const SearchResult = (props: SearchResultProps) => {
                     {match.match}
                   </Paragraph>
                   {match.suffix}
-                </>
+                </React.Fragment>
               ))}
             </Paragraph>
           </Pressable>
