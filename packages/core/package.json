@@ -47,6 +47,7 @@
     "otplib": "^12.0.1",
     "refractor": "^4.8.1",
     "sqlite-better-trigram": "^0.0.3",
+    "sqlite-regex": "^0.2.4-alpha.1",
     "sqlite3-fts5-html": "^0.0.3",
     "vitest": "2.1.8",
     "vitest-fetch-mock": "^0.2.2",
@@ -80,7 +81,7 @@
     "entities": "5.0.0",
     "fuzzyjs": "^5.0.1",
     "html-to-text": "^9.0.5",
-    "htmlparser2": "^8.0.1",
+    "htmlparser2": "^10.0.0",
     "katex": "0.16.11",
     "linkedom": "^0.14.17",
     "liqe": "^1.13.0",
@@ -91,6 +92,6 @@
     "spark-md5": "^3.0.2"
   },
   "overrides": {
-    "htmlparser2": "^8.0.1"
+    "htmlparser2": "^10.0.0"
   }
 }
