@@ -32,6 +32,7 @@ import { getId } from "../../src/utils/id.js";
 import { existsSync, mkdirSync } from "fs";
 import * as betterTrigram from "sqlite-better-trigram";
 import * as fts5Html from "sqlite3-fts5-html";
+import { getLoadablePath } from "sqlite-regex";
 
 const TEST_NOTEBOOK: Partial<Notebook> = {
   title: "Test Notebook",
@@ -67,6 +68,7 @@ function databaseTest(type: "memory" | "persistent" = "memory") {
   });
   betterTrigram.load(betterSqliteDb);
   fts5Html.load(betterSqliteDb);
+  betterSqliteDb.loadExtension(getLoadablePath());
   return db.init().then(() => db);
 }
 
