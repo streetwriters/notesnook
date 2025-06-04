@@ -199,7 +199,8 @@ export function extractMatchingBlocks(html: string, matchTagName: string) {
       }
     },
     {
-      lowerCaseTags: false
+      lowerCaseTags: false,
+      decodeEntities: false
     }
   );
   parser.end(html);
