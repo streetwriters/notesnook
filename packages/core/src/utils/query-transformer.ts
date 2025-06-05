@@ -165,8 +165,67 @@ export function transformQuery(query: string) {
   const largeTokens = tokens.filter(
     (token) => token.length >= 3 || token === "OR"
   );
+  const ast = transformAST(parseTokens(largeTokens));
   return {
-    query: generateSQL(transformAST(parseTokens(largeTokens))),
-    tokens
+    query: generateSQL(ast),
+    tokens: tokenizeAst(ast)
   };
+}
+
+interface QueryTokens {
+  andTokens: string[];
+  orTokens: string[];
+  notTokens: string[];
+}
+
+function tokenizeAst(ast: QueryNode): QueryTokens {
+  const result: QueryTokens = {
+    andTokens: [],
+    orTokens: [],
+    notTokens: []
+  };
+
+  let isNextNot = false;
+  let isNextOr = false;
+
+  for (let i = 0; i < ast.children.length; i++) {
+    const node = ast.children[i];
+
+    if (node.type === "NOT") {
+      isNextNot = true;
+      continue;
+    }
+
+    if (node.type === "OR") {
+      isNextOr = true;
+      continue;
+    }
+
+    if (node.type === "phrase") {
+      // Handle each word in the phrase
+      for (const word of node.value) {
+        if (
+          result.orTokens.includes(word) ||
+          result.andTokens.includes(word) ||
+          result.notTokens.includes(word)
+        ) {
+          isNextOr = false;
+          isNextNot = false;
+          continue;
+        }
+        if (isNextOr) {
+          result.orTokens.push(word);
+        } else if (isNextNot) {
+          result.notTokens.push(word);
+        } else {
+          result.andTokens.push(word);
+        }
+      }
+
+      isNextOr = false;
+      isNextNot = false;
+    }
+  }
+
+  return result;
 }
