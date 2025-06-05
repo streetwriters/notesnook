@@ -26,20 +26,13 @@ import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import Dialog from "../components/dialog";
 import Field from "../components/field";
 import {
-  CheckCircleOutline,
-  ChevronDown,
-  ChevronRight,
-  Circle,
-  CircleEmpty,
-  Plus
-} from "../components/icons";
-import {
   TreeNode,
   VirtualizedTree,
   VirtualizedTreeHandle
 } from "../components/virtualized-tree";
 import { store as notebookStore, useStore } from "../stores/notebook-store";
 import { AddNotebookDialog } from "./add-notebook-dialog";
+import { NotebookItem, useSelectionStore } from "./move-note-dialog";
 
 type MoveNotebookDialogProps = BaseDialogProps<boolean> & {
   notebook: Notebook;
@@ -47,7 +40,7 @@ type MoveNotebookDialogProps = BaseDialogProps<boolean> & {
 
 export const MoveNotebookDialog = DialogManager.register(
   function MoveNotebookDialog({ onClose, notebook }: MoveNotebookDialogProps) {
-    const [selected, setSelected] = useState<string | null>(null);
+    const setSelected = useSelectionStore((store) => store.setSelected);
     const refreshNotebooks = useStore((store) => store.refresh);
     const treeRef = useRef<VirtualizedTreeHandle<Notebook>>(null);
     const [notebooks, setNotebooks] = useState<string[]>([]);
@@ -62,8 +55,9 @@ export const MoveNotebookDialog = DialogManager.register(
     useEffect(() => {
       (async function () {
         const parentNotebookId = await getParentNotebookId(notebookId);
-        if (selected === null && parentNotebookId) {
-          setSelected(parentNotebookId);
+        const selected = useSelectionStore.getState().selected[0];
+        if (!selected && parentNotebookId) {
+          setSelected([{ id: parentNotebookId, new: false, op: "add" }]);
         }
       })();
     }, [notebookId, refreshNotebooks, setSelected]);
@@ -74,7 +68,7 @@ export const MoveNotebookDialog = DialogManager.register(
 
     const _onClose = useCallback(
       (result: boolean) => {
-        setSelected(null);
+        setSelected([]);
         onClose(result);
       },
       [setSelected, onClose]
@@ -92,32 +86,20 @@ export const MoveNotebookDialog = DialogManager.register(
         positiveButton={{
           text: strings.done(),
           onClick: async () => {
-            const parentNotebookId = await getParentNotebookId(notebookId);
-            if (parentNotebookId) {
-              await db.relations.unlink(
-                {
-                  type: "notebook",
-                  id: parentNotebookId
-                },
-                {
-                  type: "notebook",
-                  id: notebookId
-                }
-              );
+            const { selected } = useSelectionStore.getState();
+            for (const item of selected) {
+              if (item.op === "remove") {
+                await db.relations.unlink(
+                  { type: "notebook", id: item.id },
+                  { id: notebookId, type: "notebook" }
+                );
+              } else if (item.op === "add") {
+                await db.relations.add(
+                  { type: "notebook", id: item.id },
+                  { id: notebookId, type: "notebook" }
+                );
+              }
             }
-            if (selected) {
-              await db.relations.add(
-                {
-                  type: "notebook",
-                  id: selected
-                },
-                {
-                  type: "notebook",
-                  id: notebookId
-                }
-              );
-            }
-
             await notebookStore.refresh();
             _onClose(true);
           }
@@ -159,6 +141,9 @@ export const MoveNotebookDialog = DialogManager.register(
                 itemHeight={30}
                 treeRef={treeRef}
                 getChildNodes={async (id, depth) => {
+                  const parentNotebookId = await getParentNotebookId(
+                    notebookId
+                  );
                   const nodes: TreeNode<Notebook>[] = [];
                   if (id === "root") {
                     for (const id of notebooks) {
@@ -167,8 +152,7 @@ export const MoveNotebookDialog = DialogManager.register(
                       const childrenCount = await db.relations
                         .from(notebook, "notebook")
                         .count();
-                      const isParent =
-                        (await getParentNotebookId(notebookId)) === notebook.id;
+                      const isParent = parentNotebookId === notebook.id;
                       nodes.push({
                         data: notebook,
                         depth: depth + 1,
@@ -192,8 +176,7 @@ export const MoveNotebookDialog = DialogManager.register(
                     const childrenCount = await db.relations
                       .from(notebook, "notebook")
                       .count();
-                    const isParent =
-                      (await getParentNotebookId(notebookId)) === notebook.id;
+                    const isParent = parentNotebookId === notebook.id;
 
                     nodes.push({
                       parentId: id,
@@ -220,8 +203,6 @@ export const MoveNotebookDialog = DialogManager.register(
                         expand: true
                       });
                     }}
-                    isSelected={item.id === selected}
-                    setSelected={setSelected}
                   />
                 )}
               />
@@ -259,152 +240,6 @@ export const MoveNotebookDialog = DialogManager.register(
     );
   }
 );
-
-function calculateIndentation(
-  expandable: boolean,
-  depth: number,
-  base: number
-) {
-  if (expandable && depth > 0) return depth * 7 + base;
-  else if (depth === 0) return 0;
-  else return depth * 12 + base;
-}
-
-function NotebookItem(props: {
-  notebook: Notebook;
-  isExpanded: boolean;
-  isExpandable: boolean;
-  toggle: () => void;
-  depth: number;
-  onCreateItem: () => void;
-  isSelected: boolean;
-  setSelected: (selected: string | null) => void;
-}) {
-  const {
-    notebook,
-    isExpanded,
-    toggle,
-    depth,
-    isExpandable,
-    onCreateItem,
-    isSelected,
-    setSelected
-  } = props;
-
-  const check: React.MouseEventHandler<HTMLDivElement> = useCallback(
-    (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-
-      if (isSelected) {
-        setSelected(null);
-        return;
-      }
-
-      setSelected(notebook.id);
-    },
-    [notebook, setSelected]
-  );
-
-  return (
-    <Flex
-      as="li"
-      data-test-id="notebook"
-      sx={{
-        cursor: "pointer",
-        justifyContent: "space-between",
-        alignItems: "center",
-        bg: depth === 0 ? "var(--background-secondary)" : "transparent",
-        borderRadius: "default",
-        p: depth === 0 ? 1 : 0,
-        height: depth === 0 ? "30px" : "auto",
-        ml: `${calculateIndentation(isExpandable, depth, 5)}px`,
-        mb: depth === 0 ? 1 : 2
-      }}
-      onClick={(e) => {
-        if (!isExpandable) {
-          check(e);
-          return;
-        }
-        e.stopPropagation();
-        e.preventDefault();
-        toggle();
-      }}
-    >
-      <Flex sx={{ alignItems: "center" }}>
-        {isExpandable ? (
-          isExpanded ? (
-            <ChevronDown
-              data-test-id="collapse-notebook"
-              size={20}
-              sx={{ height: "20px" }}
-            />
-          ) : (
-            <ChevronRight
-              data-test-id="expand-notebook"
-              size={20}
-              sx={{ height: "20px" }}
-            />
-          )
-        ) : null}
-        <SelectedCheck
-          type={isSelected ? "selected" : "none"}
-          onClick={check}
-        />
-        <Text
-          className="title"
-          data-test-id="notebook-title"
-          variant="subtitle"
-          sx={{ fontWeight: "body" }}
-        >
-          {notebook.title}
-        </Text>
-      </Flex>
-      <Flex data-test-id="notebook-tools" sx={{ alignItems: "center" }}>
-        {isSelected ? <Circle size={8} color="accent" sx={{ mr: 1 }} /> : null}
-        <Button
-          variant="secondary"
-          data-test-id="add-sub-notebook"
-          sx={{ p: "small" }}
-        >
-          <Plus
-            size={18}
-            title={strings.newNotebook()}
-            onClick={async (e) => {
-              e.stopPropagation();
-              await AddNotebookDialog.show({ parentId: notebook.id });
-              onCreateItem();
-            }}
-          />
-        </Button>
-      </Flex>
-    </Flex>
-  );
-}
-
-function SelectedCheck({
-  type,
-  onClick
-}: {
-  type: "selected" | "none";
-  onClick?: React.MouseEventHandler<HTMLDivElement>;
-}) {
-  switch (type) {
-    case "selected":
-      return (
-        <CheckCircleOutline
-          size={20}
-          sx={{ mr: 1 }}
-          color="accent"
-          onClick={onClick}
-        />
-      );
-    case "none":
-      return (
-        <CircleEmpty size={20} sx={{ mr: 1, opacity: 0.4 }} onClick={onClick} />
-      );
-  }
-}
 
 async function getParentNotebookId(notebookId: string) {
   const relation = await db.relations
