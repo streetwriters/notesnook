@@ -49,16 +49,16 @@ import {
 } from "../components/virtualized-tree";
 
 type MoveNoteDialogProps = BaseDialogProps<boolean> & { noteIds: string[] };
-type NotebookReference = {
+export type SelectedReference = {
   id: string;
   new: boolean;
   op: "add" | "remove";
 };
 
 interface ISelectionStore {
-  selected: NotebookReference[];
+  selected: SelectedReference[];
   isMultiselect: boolean;
-  setSelected(refs: NotebookReference[]): void;
+  setSelected(refs: SelectedReference[]): void;
   setIsMultiselect(state: boolean): void;
 }
 export const useSelectionStore = create<ISelectionStore>((set) => ({
@@ -87,7 +87,7 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
 
   useEffect(() => {
     (async function () {
-      const selected: NotebookReference[] = useSelectionStore
+      const selected: SelectedReference[] = useSelectionStore
         .getState()
         .selected.slice();
 
@@ -201,7 +201,7 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
           <Button
             variant="anchor"
             onClick={() => {
-              const originalSelection: NotebookReference[] = useSelectionStore
+              const originalSelection: SelectedReference[] = useSelectionStore
                 .getState()
                 .selected.filter((a) => !a.new)
                 .map((s) => ({ ...s, op: "add" }));
@@ -268,6 +268,7 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
                       expand: true
                     });
                   }}
+                  multiSelectable
                 />
               )}
             />
@@ -310,20 +311,28 @@ function calculateIndentation(
   depth: number,
   base: number
 ) {
-  if (expandable && depth > 0) return depth * 7 + base;
+  if (expandable && depth > 0) return depth * 18 + base;
   else if (depth === 0) return 0;
-  else return depth * 12 + base;
+  else return depth * 24 + base;
 }
-function NotebookItem(props: {
+export function NotebookItem(props: {
   notebook: Notebook;
   isExpanded: boolean;
   isExpandable: boolean;
   toggle: () => void;
   depth: number;
   onCreateItem: () => void;
+  multiSelectable?: boolean;
 }) {
-  const { notebook, isExpanded, toggle, depth, isExpandable, onCreateItem } =
-    props;
+  const {
+    notebook,
+    isExpanded,
+    toggle,
+    depth,
+    isExpandable,
+    onCreateItem,
+    multiSelectable
+  } = props;
 
   const setIsMultiselect = useSelectionStore((store) => store.setIsMultiselect);
   const setSelected = useSelectionStore((store) => store.setSelected);
@@ -339,13 +348,13 @@ function NotebookItem(props: {
       const isCtrlPressed = e.ctrlKey || e.metaKey;
       if (isCtrlPressed) setIsMultiselect(true);
 
-      if (isMultiselect || isCtrlPressed) {
+      if (multiSelectable && (isMultiselect || isCtrlPressed)) {
         setSelected(selectMultiple(notebook, selected));
       } else {
         setSelected(selectSingle(notebook, selected));
       }
     },
-    [isMultiselect, notebook, setIsMultiselect, setSelected]
+    [isMultiselect, multiSelectable, notebook, setIsMultiselect, setSelected]
   );
 
   return (
@@ -377,35 +386,17 @@ function NotebookItem(props: {
       <Flex sx={{ alignItems: "center" }}>
         {isExpandable ? (
           isExpanded ? (
-            <ChevronDown
-              data-test-id="collapse-notebook"
-              size={20}
-              sx={{ height: "20px" }}
-            />
+            <ChevronDown data-test-id="collapse-notebook" size={18} />
           ) : (
-            <ChevronRight
-              data-test-id="expand-notebook"
-              size={20}
-              sx={{ height: "20px" }}
-            />
+            <ChevronRight data-test-id="expand-notebook" size={18} />
           )
         ) : null}
-        <SelectedCheck size={20} item={notebook} onClick={check} />
-        <Text
-          className="title"
-          data-test-id="notebook-title"
-          variant="subtitle"
-          sx={{ fontWeight: "body" }}
-        >
+        <SelectedCheck size={18} item={notebook} onClick={check} />
+        <Text className="title" data-test-id="notebook-title" variant="body">
           {notebook.title}
-          {/* <Text variant="subBody" sx={{ fontWeight: "body" }}>
-                {" "}
-                ({pluralize(notebook.topics.length, "topic")})
-              </Text> */}
         </Text>
       </Flex>
       <Flex data-test-id="notebook-tools" sx={{ alignItems: "center" }}>
-        <TopicSelectionIndicator notebook={notebook} />
         <Button
           variant="secondary"
           data-test-id="add-sub-notebook"
@@ -426,46 +417,27 @@ function NotebookItem(props: {
   );
 }
 
-function TopicSelectionIndicator({ notebook }: { notebook: Notebook }) {
-  const hasSelectedTopics = useSelectionStore(
-    (store) => store.selected.filter((nb) => nb.id === notebook.id).length > 0
-  );
-
-  if (!hasSelectedTopics) return null;
-  return <Circle size={8} color="accent" sx={{ mr: 1 }} />;
-}
-
-function SelectedCheck({
+export function SelectedCheck({
   item,
   size = 20,
   onClick
 }: {
-  item?: Notebook;
+  item?: { id: string };
   size?: number;
   onClick?: React.MouseEventHandler<HTMLDivElement>;
 }) {
   const selectedItems = useSelectionStore((store) => store.selected);
-
   const selectedItem =
     item && selectedItems[findSelectionIndex(item, selectedItems)];
-  const selected =
-    selectedItem?.op === "remove" ? "remove" : selectedItem?.op === "add";
 
-  return selected === true ? (
+  return selectedItem?.op === "add" ? (
     <CheckCircleOutline
       size={size}
       sx={{ mr: 1 }}
       color="accent"
       onClick={onClick}
     />
-  ) : selected === null ? (
-    <CheckIntermediate
-      size={size}
-      sx={{ mr: 1 }}
-      color="var(--accent-secondary)"
-      onClick={onClick}
-    />
-  ) : selected === "remove" ? (
+  ) : selectedItem?.op === "remove" ? (
     <CheckRemove
       size={size}
       sx={{ mr: 1 }}
@@ -477,18 +449,15 @@ function SelectedCheck({
   );
 }
 
-function createSelection(notebook: Notebook): NotebookReference {
+function createSelection(item: { id: string }): SelectedReference {
   return {
-    id: notebook.id,
+    id: item.id,
     op: "add",
     new: true
   };
 }
 
-function findSelectionIndex(
-  ref: NotebookReference | Notebook,
-  array: NotebookReference[]
-) {
+function findSelectionIndex(ref: { id: string }, array: { id: string }[]) {
   return array.findIndex((a) => a.id === ref.id);
 }
 
@@ -498,7 +467,10 @@ function notebookHasNotes(notebookId: string, noteIds: string[]) {
     .has(...noteIds);
 }
 
-function selectMultiple(topic: Notebook, selected: NotebookReference[]) {
+export function selectMultiple(
+  topic: { id: string },
+  selected: SelectedReference[]
+) {
   const index = findSelectionIndex(topic, selected);
   const isSelected = index > -1;
   const item = selected[index];
@@ -514,8 +486,8 @@ function selectMultiple(topic: Notebook, selected: NotebookReference[]) {
   return selected;
 }
 
-function selectSingle(topic: Notebook, array: NotebookReference[]) {
-  const selected: NotebookReference[] = array.filter((ref) => !ref.new);
+function selectSingle(topic: { id: string }, array: SelectedReference[]) {
+  const selected: SelectedReference[] = array.filter((ref) => !ref.new);
 
   const index = findSelectionIndex(topic, array);
   const item = array[index];

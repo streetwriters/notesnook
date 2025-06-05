@@ -2483,5 +2483,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   unsetAsHomepage: () => t`Reset homepage`,
   archive: () => t`Archive`,
   yourArchiveIsEmpty: () => t`Your archive is empty`,
-  unarchive: () => t`Unarchive`
+  unarchive: () => t`Unarchive`,
+  moveNotebookDesc: () =>
+    t`Select a notebook to move this notebook into, or unselect to move it to the root level.`
 };
