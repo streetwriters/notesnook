@@ -67,6 +67,7 @@ const COLUMN_BAR_ITEMS: ActionId[] = [
   "move-notebook",
   "pin",
   "default-notebook",
+  "default-tag",
   "default-homepage",
   "add-shortcut",
   "reorder",

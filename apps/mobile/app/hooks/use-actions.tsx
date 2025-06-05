@@ -110,7 +110,8 @@ export type ActionId =
   | "favorite"
   | "remove-from-notebook"
   | "trash"
-  | "default-homepage";
+  | "default-homepage"
+  | "default-tag";
 
 export type Action = {
   id: ActionId;
@@ -158,6 +159,8 @@ export const useActions = ({
   const [defaultNotebook, setDefaultNotebook] = useState(
     db.settings.getDefaultNotebook()
   );
+  const [defaultTag, setDefaultTag] = useState(db.settings.getDefaultTag());
+
   const [noteInCurrentNotebook, setNoteInCurrentNotebook] = useState(false);
   const [locked, setLocked] = useState(false);
   const isHomepage = useSettingStore(
@@ -469,15 +472,39 @@ export const useActions = ({
   }
 
   if (item.type === "tag" || item.type === "notebook") {
-    actions.push({
-      id: "add-shortcut",
-      title: isPinnedToMenu ? strings.removeShortcut() : strings.addShortcut(),
-      icon: isPinnedToMenu ? "link-variant-remove" : "link-variant",
-      onPress: createMenuShortcut,
-      isToggle: true,
-      checked: isPinnedToMenu,
-      activeColor: colors.error.paragraph
-    });
+    actions.push(
+      {
+        id: "add-shortcut",
+        title: isPinnedToMenu
+          ? strings.removeShortcut()
+          : strings.addShortcut(),
+        icon: isPinnedToMenu ? "link-variant-remove" : "link-variant",
+        onPress: createMenuShortcut,
+        isToggle: true,
+        checked: isPinnedToMenu,
+        activeColor: colors.error.paragraph
+      },
+      {
+        id: "default-tag",
+        title:
+          defaultTag === item.id
+            ? strings.removeAsDefault()
+            : strings.setAsDefault(),
+        hidden: item.type !== "tag",
+        icon: "pound",
+        onPress: async () => {
+          if (defaultTag === item.id) {
+            await db.settings.setDefaultTag(undefined);
+            setDefaultTag(undefined);
+          } else {
+            await db.settings.setDefaultTag(item.id);
+            setDefaultTag(item.id);
+          }
+          close();
+        },
+        checked: defaultTag === item.id
+      }
+    );
   }
 
   if (item.type === "notebook") {

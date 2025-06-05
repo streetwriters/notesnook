@@ -365,14 +365,24 @@ export const useEditor = (
               }
             });
 
-            const defaultNotebook = db.settings.getDefaultNotebook();
-            if (!state.current.onNoteCreated && defaultNotebook) {
-              onNoteCreated(id, {
-                type: "notebook",
-                id: defaultNotebook
-              });
+            if (!state.current.onNoteCreated) {
+              const defaultNotebook = db.settings.getDefaultNotebook();
+              if (defaultNotebook) {
+                onNoteCreated(id, {
+                  type: "notebook",
+                  id: defaultNotebook
+                });
+              }
+
+              const defaultTag = db.settings.getDefaultTag();
+              if (defaultTag) {
+                onNoteCreated(id, {
+                  type: "tag",
+                  id: defaultTag
+                });
+              }
             } else {
-              state.current?.onNoteCreated && state.current.onNoteCreated(id);
+              state.current.onNoteCreated(id);
             }
           }
 
