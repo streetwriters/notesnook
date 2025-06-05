@@ -89,10 +89,8 @@ export default class Lookup {
               })
               .then((r) => r.map((r) => r.id));
 
-      const smallTokens = Array.from(
-        new Set(
-          tokens.filter((token) => token.length < 3 && token !== "OR")
-        ).values()
+      const smallTokens = [...tokens.andTokens, ...tokens.orTokens].filter(
+        (token) => token.length < 3
       );
       if (smallTokens.length === 0) return resultsA;
 
@@ -129,10 +127,8 @@ export default class Lookup {
               return [];
             });
 
-    const smallTokens = Array.from(
-      new Set(
-        tokens.filter((token) => token.length < 3 && token !== "OR")
-      ).values()
+    const smallTokens = [...tokens.andTokens, ...tokens.orTokens].filter(
+      (token) => token.length < 3
     );
 
     const ftsIds = ftsResults.map((r) => r.id);
@@ -195,7 +191,16 @@ export default class Lookup {
     }
     console.timeEnd("sorting matches");
 
-    const highlightTokens = tokens.map((t) => t.replace(/"(.+)"/g, "$1"));
+    const andTokens = tokens.andTokens.map((t) =>
+      t.replace(/"(.+)"/g, "$1").toLowerCase()
+    );
+    const orTokens = tokens.orTokens.map((t) =>
+      t.replace(/"(.+)"/g, "$1").toLowerCase()
+    );
+    const notTokens = tokens.notTokens.map((t) =>
+      t.replace(/"(.+)"/g, "$1").toLowerCase()
+    );
+    const allTokens = [...andTokens, ...orTokens];
 
     return new VirtualizedGrouping<HighlightedResult>(
       matches.ids.length,
@@ -218,12 +223,15 @@ export default class Lookup {
           .execute();
 
         for (const title of titles) {
-          const highlighted = highlightQueries(
+          const { text: highlighted } = highlightQueries(
             title.title || "",
-            highlightTokens
+            allTokens
           );
-          const hasMatches = !highlightTokens.every((t) =>
-            highlighted.includes(`${MATCH_TAG_OPEN}${t}${MATCH_TAG_CLOSE}`)
+          const hasMatches = textContainsTokens(
+            highlighted,
+            andTokens,
+            orTokens,
+            notTokens
           );
           results.push({
             id: title.id,
@@ -255,12 +263,8 @@ export default class Lookup {
             dateCreated: 0,
             dateModified: 0
           });
-          const highlighted = highlightHtmlContent(html.data, highlightTokens);
-          if (
-            !highlightTokens.every((t) =>
-              highlighted.includes(`${MATCH_TAG_OPEN}${t}${MATCH_TAG_CLOSE}`)
-            )
-          )
+          const highlighted = highlightHtmlContent(html.data, allTokens);
+          if (!textContainsTokens(highlighted, andTokens, orTokens, notTokens))
             continue;
           result.content = extractMatchingBlocks(
             highlighted,
@@ -291,9 +295,7 @@ export default class Lookup {
 
         for (const result of results) {
           result.content.sort(
-            (a, b) =>
-              getMatchScore(b, highlightTokens) -
-              getMatchScore(a, highlightTokens)
+            (a, b) => getMatchScore(b, allTokens) - getMatchScore(a, allTokens)
           );
         }
 
@@ -596,25 +598,31 @@ export default class Lookup {
   }
 }
 
-function highlightQueries(text: string, queries: string[]): string {
-  if (!text || !queries.length) return text;
+function highlightQueries(
+  text: string,
+  queries: string[]
+): { text: string; hasMatches: boolean } {
+  if (!text || !queries.length) return { text, hasMatches: false };
 
   const patterns = queries
     .filter((q) => q.length > 0)
     .map((q) => q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
 
-  if (patterns.length === 0) return text;
+  if (patterns.length === 0) return { text, hasMatches: false };
 
   try {
     const regex = new RegExp(patterns.join("|"), "gi");
-    text.replace(
-      regex,
-      (match) => `${MATCH_TAG_OPEN}${match}${MATCH_TAG_CLOSE}`
-    );
 
-    return text;
+    let hasMatches = false;
+
+    const result = text.replace(regex, (match) => {
+      hasMatches = true;
+      return `${MATCH_TAG_OPEN}${match}${MATCH_TAG_CLOSE}`;
+    });
+
+    return { text: result, hasMatches };
   } catch (error) {
-    return text;
+    return { text, hasMatches: false };
   }
 }
 
@@ -974,4 +982,27 @@ function getMatchScore(
   score += uniqueTokens.size * options.uniqueTokenBonus;
 
   return score;
+}
+
+function textContainsTokens(
+  text: string,
+  andTokens: string[],
+  orTokens: string[],
+  notTokens: string[]
+) {
+  const lowerCasedText = text.toLowerCase();
+  if (
+    !notTokens.every(
+      (t) => !lowerCasedText.includes(`${MATCH_TAG_OPEN}${t}${MATCH_TAG_CLOSE}`)
+    )
+  )
+    return false;
+  return (
+    andTokens.every((t) =>
+      lowerCasedText.includes(`${MATCH_TAG_OPEN}${t}${MATCH_TAG_CLOSE}`)
+    ) ||
+    orTokens.some((t) =>
+      lowerCasedText.includes(`${MATCH_TAG_OPEN}${t}${MATCH_TAG_CLOSE}`)
+    )
+  );
 }
