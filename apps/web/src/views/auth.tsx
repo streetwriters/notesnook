@@ -201,7 +201,7 @@ export function HeadlessAuth(props: AuthProps) {
       performance.mark("load:auth");
       setIsReady(true);
     });
-  }, [route, openURL]);
+  }, [route]);
 
   if (!isReady) return <></>;
 

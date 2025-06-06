@@ -34,21 +34,18 @@ import { ScrollContainer } from "@notesnook/ui";
 import useMobile from "../../hooks/use-mobile";
 import { logger } from "../../utils/logger";
 import { isFeatureSupported } from "../../utils/feature-check";
+import { isDev } from "./plans";
 
-// const isDev = false; // import.meta.env.DEV;
-const VENDOR_ID = import.meta.env.DEV || IS_TESTING ? 1506 : 128190;
-const PADDLE_ORIGIN =
-  import.meta.env.DEV || IS_TESTING
-    ? "https://sandbox-buy.paddle.com"
-    : "https://buy.paddle.com";
-const SUBSCRIPTION_MANAGEMENT_URL =
-  import.meta.env.DEV || IS_TESTING
-    ? "https://sandbox-subscription-management.paddle.com"
-    : "https://subscription-management.paddle.com";
-const CHECKOUT_SERVICE_ORIGIN =
-  import.meta.env.DEV || IS_TESTING
-    ? "https://sandbox-checkout-service.paddle.com"
-    : "https://checkout-service.paddle.com";
+const VENDOR_ID = isDev ? 1506 : 128190;
+const PADDLE_ORIGIN = isDev
+  ? "https://sandbox-buy.paddle.com"
+  : "https://buy.paddle.com";
+const SUBSCRIPTION_MANAGEMENT_URL = isDev
+  ? "https://sandbox-subscription-management.paddle.com"
+  : "https://subscription-management.paddle.com";
+const CHECKOUT_SERVICE_ORIGIN = isDev
+  ? "https://sandbox-checkout-service.paddle.com"
+  : "https://checkout-service.paddle.com";
 
 const SUBSCRIBED_EVENTS: PaddleEvents[] = [
   PaddleEvents["Checkout.Loaded"],

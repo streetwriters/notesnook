@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useState } from "react";
-
 import { Period, Plan } from "./types";
 
 type PlanMetadata = {
@@ -26,8 +25,10 @@ type PlanMetadata = {
   subtitle: string;
 };
 
+export const isDev = import.meta.env.DEV || IS_TESTING;
+
 export const EDUCATION_PLAN: Plan = {
-  id: import.meta.env.DEV || IS_TESTING ? "50305" : "658759",
+  id: isDev ? "50305" : "658759",
   period: "education",
   country: "US",
   currency: "USD",
@@ -43,7 +44,7 @@ export const DEFAULT_PLANS: Plan[] = [
     currency: "USD",
     discount: { type: "regional", amount: 0, recurring: false },
     originalPrice: { gross: 4.49, net: 0, tax: 0 },
-    id: import.meta.env.DEV || IS_TESTING ? "9822" : "648884",
+    id: isDev ? "9822" : "648884",
     price: { gross: 4.49, net: 0, tax: 0 }
   },
   {
@@ -51,7 +52,7 @@ export const DEFAULT_PLANS: Plan[] = [
     country: "PK",
     currency: "USD",
     discount: { type: "regional", amount: 0, recurring: false },
-    id: import.meta.env.DEV || IS_TESTING ? "50305" : "658759",
+    id: isDev ? "50305" : "658759",
     price: { gross: 49.99, net: 0, tax: 0 },
     originalPrice: { gross: 49.99, net: 0, tax: 0 }
   },
