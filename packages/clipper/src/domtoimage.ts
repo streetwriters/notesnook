@@ -35,22 +35,24 @@ async function getInlinedNode(node: HTMLElement, options: Options) {
 
   if (stylesheets) await inlineStylesheets(options.fetchOptions);
 
-  const documentStyles = getComputedStyle(document.documentElement);
+  // const documentStyles = getComputedStyle(document.documentElement);
 
-  const styleCache = stylesheets
-    ? await cacheStylesheets(documentStyles)
-    : undefined;
+  // const styleCache = stylesheets
+  //   ? await cacheStylesheets(documentStyles)
+  //   : undefined;
 
-  let clone = await cloneNode(node, {
-    styles: options.styles,
-    filter: options.filter,
-    root: true,
-    vector: !options.raster,
-    fetchOptions: options.fetchOptions,
-    getElementStyles: styleCache?.get,
-    getPseudoElementStyles: styleCache?.getPseudo,
-    images: images
-  });
+  // let clone = await cloneNode(node, {
+  //   styles: options.styles,
+  //   filter: options.filter,
+  //   root: true,
+  //   vector: !options.raster,
+  //   fetchOptions: options.fetchOptions,
+  //   getElementStyles: styleCache?.get,
+  //   getPseudoElementStyles: styleCache?.getPseudo,
+  //   images: images
+  // });
+  // let clone = node.cloneNode(true) as HTMLElement;
+  let clone = node.cloneNode(true) as HTMLElement;
 
   if (!clone || clone instanceof Text) return;
 
@@ -213,7 +215,7 @@ function finalize(root: HTMLElement) {
         continue;
 
       if (!VALID_ATTRIBUTES.includes(attribute.name)) {
-        element.removeAttribute(attribute.name);
+        // element.removeAttribute(attribute.name);
       }
     }
 

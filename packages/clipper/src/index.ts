@@ -23,6 +23,7 @@ import { app, h, text } from "hyperapp";
 import { getInlinedNode, toBlob, toJpeg, toPng } from "./domtoimage.js";
 import { Config, InlineOptions } from "./types.js";
 import { FetchOptions } from "./fetch.js";
+import { downloadStylesheet } from "./styles.js";
 
 type ReadabilityEnhanced = Readability<string> & {
   PRESENTATIONAL_ATTRIBUTES: string[];
@@ -475,6 +476,19 @@ async function getPage(
   const title = document.createElement("title");
   title.innerText = document.title;
   head.appendChild(title);
+
+  for (const sheet of document.styleSheets) {
+    const node = sheet.ownerNode;
+    if (sheet.href && node instanceof HTMLLinkElement) {
+      const styleNode = await downloadStylesheet(
+        node.href,
+        resolveFetchOptions(config)
+      );
+      if (styleNode) {
+        head.appendChild(styleNode);
+      }
+    }
+  }
 
   return {
     body,

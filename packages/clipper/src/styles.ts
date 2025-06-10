@@ -100,7 +100,7 @@ async function resolveImports(options?: FetchOptions) {
   }
 }
 
-async function downloadStylesheet(href: string, options?: FetchOptions) {
+export async function downloadStylesheet(href: string, options?: FetchOptions) {
   try {
     const style = document.createElement("style");
     const response = await fetch(constructUrl(href, options));
