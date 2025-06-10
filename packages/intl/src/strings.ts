@@ -439,7 +439,7 @@ $headline$: Use starting line of the note as title.`,
     }),
 
   createVault: () => t`Create vault`,
-  createVaultDesc: () => t`A vault stores your notes in a encrypted storage.`,
+  createVaultDesc: () => t`A vault stores your notes in an encrypted storage.`,
   vaultFingerprintUnlock: () => t`Vault fingerprint unlock`,
   revokeVaultFingerprintUnlock: () => t`Revoke vault fingerprint unlock`,
   changeVaultPassword: () => t`Change vault password`,
