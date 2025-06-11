@@ -165,14 +165,6 @@ function getRootStylesheet() {
   return null;
 }
 
-function safeQuerySelectorAll(root: Node, selector: string) {
-  try {
-    return (root as HTMLElement).querySelectorAll(selector);
-  } catch (e) {
-    return new NodeList();
-  }
-}
-
 const SVGElements = [
   "altGlyph",
   "altGlyphDef",
@@ -272,6 +264,5 @@ export {
   escapeXhtml,
   width,
   height,
-  safeQuerySelectorAll,
   isSVGElement
 };
