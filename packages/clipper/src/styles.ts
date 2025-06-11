@@ -100,7 +100,7 @@ async function resolveImports(options?: FetchOptions) {
   }
 }
 
-export async function downloadStylesheet(href: string, options?: FetchOptions) {
+async function downloadStylesheet(href: string, options?: FetchOptions) {
   try {
     const style = document.createElement("style");
     const response = await fetch(constructUrl(href, options));
@@ -427,4 +427,27 @@ function parsePseudoSelector(selector: string) {
     });
   }
   return output;
+}
+
+export async function addStylesToHead(
+  head: HTMLHeadElement,
+  options?: FetchOptions
+) {
+  for (const sheet of document.styleSheets) {
+    const node = sheet.ownerNode;
+    const href =
+      sheet.href && node instanceof HTMLLinkElement
+        ? node.href
+        : node instanceof HTMLStyleElement
+        ? node.getAttribute("href")
+        : null;
+    if (href) {
+      const styleNode = await downloadStylesheet(href, options);
+      if (styleNode) {
+        head.appendChild(styleNode);
+      }
+    } else if (node instanceof HTMLStyleElement) {
+      head.appendChild(node.cloneNode(true));
+    }
+  }
 }
