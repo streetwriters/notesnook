@@ -22,6 +22,7 @@ import { isInTable } from "@tiptap/pm/tables";
 import { CodeBlock } from "../code-block/index.js";
 import { showLinkPopup } from "../../toolbar/popups/link-popup.js";
 import { isListActive } from "../../utils/list.js";
+import { Node } from "@tiptap/pm/model";
 
 export const KeyMap = Extension.create({
   name: "key-map",
@@ -70,6 +71,15 @@ export const KeyMap = Extension.create({
       "Shift-Mod-k": ({ editor }) => {
         showLinkPopup(editor);
         return true;
+      },
+      "Ctrl-Shift-K": ({ editor }) => {
+        let currentNode: Node;
+        if (isListActive(editor)) {
+          currentNode = editor.state.selection.$from.node(-1);
+        } else {
+          currentNode = editor.state.selection.$from.node();
+        }
+        return editor.commands.deleteNode(currentNode.type);
       }
     };
   }
