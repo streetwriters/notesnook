@@ -36,13 +36,19 @@ const defaultOptions: Options = {
 };
 
 async function getInlinedNode(node: HTMLElement, options: Options) {
-  const { fonts, stylesheets, inlineImages } = options.inlineOptions || {};
+  const { fonts, images, stylesheets, inlineImages } =
+    options.inlineOptions || {};
 
   if (stylesheets) await inlineStylesheets(options.fetchOptions);
 
   let clone = node.cloneNode(true) as HTMLElement;
 
   if (!clone || clone instanceof Text) return;
+
+  if (!images) {
+    const images = clone.querySelectorAll("img");
+    images.forEach((image) => image.remove());
+  }
 
   if (fonts) clone = await embedFonts(clone, options.fetchOptions);
 
