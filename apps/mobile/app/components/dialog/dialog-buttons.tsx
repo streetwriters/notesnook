@@ -26,7 +26,7 @@ import { notesnook } from "../../../e2e/test.ids";
 import { getColorLinearShade } from "../../utils/colors";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
-import { Button } from "../ui/button";
+import { Button, ButtonProps } from "../ui/button";
 import Paragraph from "../ui/typography/paragraph";
 
 const DialogButtons = ({
@@ -37,6 +37,14 @@ const DialogButtons = ({
   loading,
   doneText,
   positiveType
+}: {
+  onPressPositive?: () => void;
+  onPressNegative: () => void;
+  positiveTitle: string;
+  negativeTitle?: string;
+  loading?: boolean;
+  doneText?: string;
+  positiveType?: ButtonProps["type"];
 }) => {
   const { colors, isDark } = useThemeColors();
 

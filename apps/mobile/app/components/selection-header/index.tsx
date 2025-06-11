@@ -42,10 +42,11 @@ import { DefaultAppStyles } from "../../utils/styles";
 import { sleep } from "../../utils/time";
 import { presentDialog } from "../dialog/functions";
 import ExportNotesSheet from "../sheets/export-notes";
-import ManageTagsSheet from "../sheets/manage-tags";
+
 import { MoveNotebook } from "../../screens/move-notebook";
 import { IconButton } from "../ui/icon-button";
 import NativeTooltip from "../../utils/tooltip";
+import ManageTags from "../../screens/manage-tags";
 
 export const SelectionHeader = React.memo(
   ({
@@ -209,7 +210,7 @@ export const SelectionHeader = React.memo(
                     {
                       title: strings.manageTags(),
                       onPress: async () => {
-                        ManageTagsSheet.present(selectedItemsList);
+                        ManageTags.present(selectedItemsList);
                       },
                       visible: type === "note",
                       icon: "pound"
