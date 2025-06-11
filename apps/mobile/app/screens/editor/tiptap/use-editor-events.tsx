@@ -41,7 +41,6 @@ import { AuthMode } from "../../../components/auth/common";
 import EditorTabs from "../../../components/sheets/editor-tabs";
 import { Issue } from "../../../components/sheets/github/issue";
 import LinkNote from "../../../components/sheets/link-note";
-import ManageTagsSheet from "../../../components/sheets/manage-tags";
 import { RelationsList } from "../../../components/sheets/relations-list";
 import ReminderSheet from "../../../components/sheets/reminder";
 import TableOfContents from "../../../components/sheets/toc";
@@ -80,6 +79,7 @@ import { useTabStore } from "./use-tab-store";
 import { editorState, openInternalLink } from "./utils";
 import { Properties } from "../../../components/properties";
 import { sleep } from "../../../utils/time";
+import ManageTags from "../../manage-tags";
 
 const publishNote = async () => {
   const user = useUserStore.getState().user;
@@ -449,7 +449,7 @@ export const useEditorEvents = (
             });
             return;
           }
-          ManageTagsSheet.present([noteId]);
+          ManageTags.present([noteId]);
           break;
         case EditorEvents.tag:
           if (editorMessage.value) {

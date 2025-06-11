@@ -247,6 +247,7 @@ let LinkNotebooks: any = null;
 let MoveNotebook: any = null;
 let MoveNotes: any = null;
 let Settings: any = null;
+let ManageTags: any = null;
 
 export const RootNavigation = () => {
   const introCompleted = useSettingStore(
@@ -324,6 +325,15 @@ export const RootNavigation = () => {
           getComponent={() => {
             Settings = Settings || require("../screens/settings").default;
             return Settings;
+          }}
+        />
+
+        <RootStack.Screen
+          name="ManageTags"
+          getComponent={() => {
+            ManageTags =
+              ManageTags || require("../screens/manage-tags").default;
+            return ManageTags;
           }}
         />
       </RootStack.Navigator>

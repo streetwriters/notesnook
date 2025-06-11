@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { View } from "react-native";
+import { TextInput, View, ViewStyle } from "react-native";
 import { DDS } from "../../services/device-detection";
 import {
   eSubscribeEvent,
@@ -40,42 +40,26 @@ import Seperator from "../ui/seperator";
 import BaseDialog from "./base-dialog";
 import DialogButtons from "./dialog-buttons";
 import DialogHeader from "./dialog-header";
+import { DialogInfo } from "./functions";
 
-export const Dialog = ({ context = "global" }) => {
+export const Dialog = ({ context = "global" }: { context?: string }) => {
   const { colors } = useThemeColors();
-  const [visible, setVisible] = useState(false);
-  const [checked, setChecked] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const values = useRef({
+  const [visible, setVisible] = useState<boolean>();
+  const [checked, setChecked] = useState<boolean>();
+  const [loading, setLoading] = useState<boolean>();
+  const values = useRef<{
+    inputValue?: string;
+  }>({
     inputValue: undefined
   });
-  const inputRef = useRef();
-  const [dialogInfo, setDialogInfo] = useState({
-    title: "",
-    paragraph: "",
-    positiveText: strings.done(),
-    negativeText: strings.cancel(),
-    positivePress: () => {},
-    onClose: () => {},
-    positiveType: "transparent",
-    icon: null,
-    paragraphColor: colors.primary.paragraph,
-    input: false,
-    inputPlaceholder: "Enter some text",
-    defaultValue: "",
-    disableBackdropClosing: false,
-    check: {
-      info: "Check",
-      type: "transparent",
-      defaultValue: false
-    }
-  });
+  const inputRef = useRef<TextInput>(null);
+  const [dialogInfo, setDialogInfo] = useState<DialogInfo>();
 
   const onPressPositive = async () => {
-    if (dialogInfo.positivePress) {
+    if (dialogInfo?.positivePress) {
       inputRef.current?.blur();
       setLoading(true);
-      let result;
+      let result = false;
       try {
         result = await dialogInfo.positivePress(
           values.current.inputValue || dialogInfo.defaultValue,
@@ -97,7 +81,7 @@ export const Dialog = ({ context = "global" }) => {
   };
 
   const show = useCallback(
-    (data) => {
+    (data: DialogInfo) => {
       if (!data.context) data.context = "global";
       if (data.context !== context) return;
       setDialogInfo(data);
@@ -107,6 +91,14 @@ export const Dialog = ({ context = "global" }) => {
     },
     [context]
   );
+
+  const hide = React.useCallback(() => {
+    setChecked(false);
+    values.current.inputValue = undefined;
+    setVisible(false);
+    setDialogInfo(undefined);
+    dialogInfo?.onClose?.();
+  }, [dialogInfo]);
 
   useEffect(() => {
     eSubscribeEvent(eOpenSimpleDialog, show);
@@ -118,21 +110,14 @@ export const Dialog = ({ context = "global" }) => {
     };
   }, [hide, show]);
 
-  const hide = React.useCallback(() => {
-    setChecked(false);
-    values.current.inputValue = undefined;
-    setVisible(false);
-    dialogInfo.onClose?.();
-  }, [dialogInfo]);
-
   const onNegativePress = async () => {
-    if (dialogInfo.onClose) {
+    if (dialogInfo?.onClose) {
       await dialogInfo.onClose();
     }
     hide();
   };
 
-  const style = {
+  const style: ViewStyle = {
     ...getElevationStyle(5),
     width: DDS.isTab ? 400 : "85%",
     maxHeight: 450,
@@ -143,7 +128,7 @@ export const Dialog = ({ context = "global" }) => {
     overflow: "hidden"
   };
 
-  return visible ? (
+  return visible && dialogInfo ? (
     <BaseDialog
       statusBarTranslucent={false}
       bounce={!dialogInfo.input}
@@ -160,89 +145,99 @@ export const Dialog = ({ context = "global" }) => {
       visible={true}
       onRequestClose={hide}
     >
-      <View style={style}>
-        <DialogHeader
-          title={dialogInfo.title}
-          icon={dialogInfo.icon}
-          paragraph={dialogInfo.paragraph}
-          paragraphColor={dialogInfo.paragraphColor}
-          padding={12}
-          style={{
-            minHeight: 0
-          }}
-        />
-        <Seperator half />
+      {typeof dialogInfo.component === "function"
+        ? dialogInfo.component(() => hide())
+        : dialogInfo.component}
 
-        {dialogInfo.input ? (
-          <View
+      {dialogInfo.component ? null : (
+        <View style={style}>
+          <DialogHeader
+            title={dialogInfo.title}
+            icon={dialogInfo.icon}
+            paragraph={dialogInfo.paragraph}
+            paragraphColor={dialogInfo.paragraphColor}
+            padding={12}
             style={{
-              paddingHorizontal: DefaultAppStyles.GAP
+              minHeight: 0
             }}
-          >
-            <Input
-              fwdRef={inputRef}
-              autoCapitalize="none"
-              onChangeText={(value) => {
-                values.current.inputValue = value;
-              }}
-              testID="input-value"
-              secureTextEntry={dialogInfo.secureTextEntry}
-              //defaultValue={dialogInfo.defaultValue}
-              onSubmit={onPressPositive}
-              returnKeyLabel="Done"
-              returnKeyType="done"
-              keyboardType={dialogInfo.keyboardType || "default"}
-              placeholder={dialogInfo.inputPlaceholder}
-            />
-          </View>
-        ) : null}
+          />
+          <Seperator half />
 
-        {dialogInfo?.notice ? (
-          <View
-            style={{
-              paddingHorizontal: DefaultAppStyles.GAP
-            }}
-          >
-            <Notice
-              type={dialogInfo.notice.type || "information"}
-              text={dialogInfo.notice.text}
-            />
-          </View>
-        ) : null}
-
-        {dialogInfo.check ? (
-          <>
-            <Button
-              onPress={() => {
-                setChecked(!checked);
-              }}
-              icon={
-                checked
-                  ? "check-circle-outline"
-                  : "checkbox-blank-circle-outline"
-              }
-              iconColor={checked ? colors.secondary.icon : colors.primary.icon}
+          {dialogInfo.input ? (
+            <View
               style={{
-                justifyContent: "flex-start"
+                paddingHorizontal: DefaultAppStyles.GAP
               }}
-              height={35}
-              iconSize={20}
-              width="100%"
-              title={dialogInfo.check.info}
-              type={checked ? dialogInfo.check.type || "plain" : "plain"}
-            />
-          </>
-        ) : null}
+            >
+              <Input
+                fwdRef={inputRef}
+                autoCapitalize="none"
+                onChangeText={(value) => {
+                  values.current.inputValue = value;
+                }}
+                testID="input-value"
+                secureTextEntry={dialogInfo.secureTextEntry}
+                //defaultValue={dialogInfo.defaultValue}
+                onSubmit={() => {
+                  onPressPositive();
+                }}
+                returnKeyLabel="Done"
+                returnKeyType="done"
+                keyboardType={dialogInfo.keyboardType || "default"}
+                placeholder={dialogInfo.inputPlaceholder}
+              />
+            </View>
+          ) : null}
 
-        <DialogButtons
-          onPressNegative={onNegativePress}
-          onPressPositive={dialogInfo.positivePress && onPressPositive}
-          loading={loading}
-          positiveTitle={dialogInfo.positiveText}
-          negativeTitle={dialogInfo.negativeText}
-          positiveType={dialogInfo.positiveType}
-        />
-      </View>
+          {dialogInfo?.notice ? (
+            <View
+              style={{
+                paddingHorizontal: DefaultAppStyles.GAP
+              }}
+            >
+              <Notice
+                type={dialogInfo.notice.type || "information"}
+                text={dialogInfo.notice.text}
+              />
+            </View>
+          ) : null}
+
+          {dialogInfo.check ? (
+            <>
+              <Button
+                onPress={() => {
+                  setChecked(!checked);
+                }}
+                icon={
+                  checked
+                    ? "check-circle-outline"
+                    : "checkbox-blank-circle-outline"
+                }
+                iconColor={
+                  checked ? colors.secondary.icon : colors.primary.icon
+                }
+                style={{
+                  justifyContent: "flex-start"
+                }}
+                height={35}
+                iconSize={20}
+                width="100%"
+                title={dialogInfo.check.info}
+                type={checked ? dialogInfo.check.type || "plain" : "plain"}
+              />
+            </>
+          ) : null}
+
+          <DialogButtons
+            onPressNegative={onNegativePress}
+            onPressPositive={dialogInfo.positivePress && onPressPositive}
+            loading={loading}
+            positiveTitle={dialogInfo.positiveText}
+            negativeTitle={dialogInfo.negativeText}
+            positiveType={dialogInfo.positiveType}
+          />
+        </View>
+      )}
       <Toast context="local" />
     </BaseDialog>
   ) : null;

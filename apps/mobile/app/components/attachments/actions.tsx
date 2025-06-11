@@ -167,6 +167,7 @@ const Actions = ({
               setAttachments();
               eSendEvent(eDBItemUpdate, attachment.id);
             }
+            return true;
           },
           positiveText: strings.rename()
         });

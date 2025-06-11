@@ -68,7 +68,8 @@ const routeNames = {
   MoveNotebook: "MoveNotebook",
   LinkNotebooks: "LinkNotebooks",
   MoveNotes: "MoveNotes",
-  Archive: "Archive"
+  Archive: "Archive",
+  ManageTags: "ManageTags"
 };
 
 export type NavigationProps<T extends RouteName> = NativeStackScreenProps<

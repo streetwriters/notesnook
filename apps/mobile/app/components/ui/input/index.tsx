@@ -321,6 +321,9 @@ const Input = ({
                 bottom={10}
                 onPress={button.onPress}
                 color={button.color}
+                style={{
+                  marginRight: -8
+                }}
               />
             )}
 

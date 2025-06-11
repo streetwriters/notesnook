@@ -91,6 +91,9 @@ export interface RouteParams extends ParamListBase {
   MoveNotes: {
     notebook: Notebook;
   };
+  ManageTags: {
+    ids?: string[];
+  };
 }
 
 export type RouteName = keyof RouteParams;

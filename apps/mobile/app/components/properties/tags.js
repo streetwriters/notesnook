@@ -24,11 +24,11 @@ import { TaggedNotes } from "../../screens/notes/tagged";
 import { useThemeColors } from "@notesnook/theme";
 import { AppFontSize } from "../../utils/size";
 import { sleep } from "../../utils/time";
-import ManageTagsSheet from "../sheets/manage-tags";
 import { Button } from "../ui/button";
 import { ColorTags } from "./color-tags";
 import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../utils/styles";
+import ManageTags from "../../screens/manage-tags";
 
 export const Tags = ({ item, close }) => {
   const { colors } = useThemeColors();
@@ -47,7 +47,8 @@ export const Tags = ({ item, close }) => {
     >
       <Button
         onPress={async () => {
-          ManageTagsSheet.present([item.id]);
+          ManageTags.present([item.id]);
+          close();
         }}
         buttonType={{
           text: colors.primary.accent
