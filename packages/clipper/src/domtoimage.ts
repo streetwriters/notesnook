@@ -16,12 +16,18 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { isSVGElement } from "./clone.js";
 import { createImage, FetchOptions } from "./fetch.js";
 import { resolveAll } from "./fontfaces.js";
 import { inlineAllImages } from "./images.js";
 import { Options } from "./types.js";
-import { canvasToBlob, delay, escapeXhtml, height, width } from "./utils.js";
+import {
+  canvasToBlob,
+  delay,
+  escapeXhtml,
+  height,
+  width,
+  isSVGElement
+} from "./utils.js";
 import { inlineStylesheets } from "./styles.js";
 
 // Default impl options

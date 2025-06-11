@@ -455,9 +455,10 @@ async function getPage(
   config?: Config,
   onlyVisible = false
 ) {
+  const fetchOptions = resolveFetchOptions(config);
   const body = await getInlinedNode(document.body, {
     raster: true,
-    fetchOptions: resolveFetchOptions(config),
+    fetchOptions,
     inlineOptions: {
       fonts: false,
       inlineImages: config?.inlineImages,
@@ -478,7 +479,7 @@ async function getPage(
   head.appendChild(title);
 
   if (config?.styles) {
-    await addStylesToHead(head, resolveFetchOptions(config));
+    await addStylesToHead(head, fetchOptions);
   }
 
   return {
