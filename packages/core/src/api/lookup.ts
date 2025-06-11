@@ -214,13 +214,24 @@ export default class Lookup {
         const contentMatches = chunk
           .filter((c) => c.types.includes("content"))
           .map((c) => c.id);
-        const results: HighlightedResult[] = [];
+        const results: HighlightedResult[] = chunk.map((c) => ({
+          id: c.id,
+          title: [],
+          type: "searchResult",
+          content: [],
+          rank: 0,
+          dateCreated: 0,
+          dateModified: 0
+        }));
 
-        const titles = await db
-          .selectFrom("notes")
-          .where("id", "in", titleMatches)
-          .select(["id", "title"])
-          .execute();
+        const titles =
+          titleMatches.length > 0
+            ? await db
+                .selectFrom("notes")
+                .where("id", "in", titleMatches)
+                .select(["id", "title"])
+                .execute()
+            : [];
 
         for (const title of titles) {
           const { text: highlighted } = highlightQueries(
@@ -233,36 +244,27 @@ export default class Lookup {
             orTokens,
             notTokens
           );
-          results.push({
-            id: title.id,
-            title: hasMatches
-              ? splitHighlightedMatch(highlighted).flatMap((m) => m)
-              : [],
-            type: "searchResult",
-            content: [],
-            rank: 0,
-            dateCreated: 0,
-            dateModified: 0
-          });
+          const result = results.find((c) => c.id === title.id);
+          if (!result) continue;
+          result.title = hasMatches
+            ? splitHighlightedMatch(highlighted).flatMap((m) => m)
+            : [];
         }
 
-        const htmls = await db
-          .selectFrom("content")
-          .where("noteId", "in", contentMatches)
-          .select(["data", "noteId as id"])
-          .$castTo<{ data: string; id: string }>()
-          .execute();
+        const htmls =
+          contentMatches.length > 0
+            ? await db
+                .selectFrom("content")
+                .where("noteId", "in", contentMatches)
+                .select(["data", "noteId as id"])
+                .$castTo<{ data: string; id: string }>()
+                .execute()
+            : [];
 
         for (const html of htmls) {
-          const result = findOrAdd(results, (r) => r.id === html.id, {
-            id: html.id,
-            title: [],
-            type: "searchResult",
-            content: [],
-            rank: 0,
-            dateCreated: 0,
-            dateModified: 0
-          });
+          const result = results.find((r) => r.id === html.id);
+          if (!result) continue;
+
           const highlighted = highlightHtmlContent(html.data, allTokens);
           if (!textContainsTokens(highlighted, andTokens, orTokens, notTokens))
             continue;
