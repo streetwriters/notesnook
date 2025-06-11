@@ -176,39 +176,9 @@ function makeSvgDataUri(node: HTMLElement, width: number, height: number) {
 
 export { toJpeg, toBlob, toCanvas, toPixelData, toPng, toSvg, getInlinedNode };
 
-const VALID_ATTRIBUTES = [
-  "src",
-  "href",
-  "title",
-  "style",
-  "srcset",
-  "sizes",
-  "width",
-  "height",
-  "target",
-  "rel",
-  "class",
-  "id",
-  "disabled",
-  "type",
-  "data-",
-  "aria-"
-];
-
 function finalize(root: HTMLElement) {
   for (const element of root.querySelectorAll("*")) {
     if (!(element instanceof HTMLElement) || isSVGElement(element)) continue;
-    for (const attribute of Array.from(element.attributes)) {
-      if (attribute.name === "class" && element.className.includes("pseudo--"))
-        continue;
-
-      const isValidAttribute = VALID_ATTRIBUTES.some((attr) =>
-        attribute.name.startsWith(attr)
-      );
-      if (!isValidAttribute) {
-        element.removeAttribute(attribute.name);
-      }
-    }
 
     if (element instanceof HTMLAnchorElement) {
       element.href = element.href.startsWith("http")
