@@ -16,13 +16,13 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { cloneNode, isSVGElement } from "./clone.js";
+import { isSVGElement } from "./clone.js";
 import { createImage, FetchOptions } from "./fetch.js";
 import { resolveAll } from "./fontfaces.js";
 import { inlineAllImages } from "./images.js";
 import { Options } from "./types.js";
 import { canvasToBlob, delay, escapeXhtml, height, width } from "./utils.js";
-import { cacheStylesheets, inlineStylesheets } from "./styles.js";
+import { inlineStylesheets } from "./styles.js";
 
 // Default impl options
 const defaultOptions: Options = {
@@ -30,28 +30,10 @@ const defaultOptions: Options = {
 };
 
 async function getInlinedNode(node: HTMLElement, options: Options) {
-  const { fonts, images, stylesheets, inlineImages } =
-    options.inlineOptions || {};
+  const { fonts, stylesheets, inlineImages } = options.inlineOptions || {};
 
   if (stylesheets) await inlineStylesheets(options.fetchOptions);
 
-  // const documentStyles = getComputedStyle(document.documentElement);
-
-  // const styleCache = stylesheets
-  //   ? await cacheStylesheets(documentStyles)
-  //   : undefined;
-
-  // let clone = await cloneNode(node, {
-  //   styles: options.styles,
-  //   filter: options.filter,
-  //   root: true,
-  //   vector: !options.raster,
-  //   fetchOptions: options.fetchOptions,
-  //   getElementStyles: styleCache?.get,
-  //   getPseudoElementStyles: styleCache?.getPseudo,
-  //   images: images
-  // });
-  // let clone = node.cloneNode(true) as HTMLElement;
   let clone = node.cloneNode(true) as HTMLElement;
 
   if (!clone || clone instanceof Text) return;
@@ -204,7 +186,13 @@ const VALID_ATTRIBUTES = [
   "width",
   "height",
   "target",
-  "rel"
+  "rel",
+  "class",
+  "id",
+  "disabled",
+  "type",
+  "data-",
+  "aria-"
 ];
 
 function finalize(root: HTMLElement) {
@@ -214,8 +202,11 @@ function finalize(root: HTMLElement) {
       if (attribute.name === "class" && element.className.includes("pseudo--"))
         continue;
 
-      if (!VALID_ATTRIBUTES.includes(attribute.name)) {
-        // element.removeAttribute(attribute.name);
+      const isValidAttribute = VALID_ATTRIBUTES.some((attr) =>
+        attribute.name.startsWith(attr)
+      );
+      if (!isValidAttribute) {
+        element.removeAttribute(attribute.name);
       }
     }
 

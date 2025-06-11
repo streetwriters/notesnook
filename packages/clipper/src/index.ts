@@ -477,15 +477,25 @@ async function getPage(
   title.innerText = document.title;
   head.appendChild(title);
 
-  for (const sheet of document.styleSheets) {
-    const node = sheet.ownerNode;
-    if (sheet.href && node instanceof HTMLLinkElement) {
-      const styleNode = await downloadStylesheet(
-        node.href,
-        resolveFetchOptions(config)
-      );
-      if (styleNode) {
-        head.appendChild(styleNode);
+  if (config?.styles) {
+    for (const sheet of document.styleSheets) {
+      const node = sheet.ownerNode;
+      const href =
+        sheet.href && node instanceof HTMLLinkElement
+          ? node.href
+          : node instanceof HTMLStyleElement
+          ? node.getAttribute("href")
+          : null;
+      if (href) {
+        const styleNode = await downloadStylesheet(
+          href,
+          resolveFetchOptions(config)
+        );
+        if (styleNode) {
+          head.appendChild(styleNode);
+        }
+      } else if (node instanceof HTMLStyleElement) {
+        head.appendChild(node.cloneNode(true));
       }
     }
   }
