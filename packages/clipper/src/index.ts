@@ -50,7 +50,8 @@ async function clipPage(
 ): Promise<string | null> {
   const { body, head } = await getPage(document, config, onlyVisible);
   if (!body || !head) return null;
-  const result = toDocument(head, body).documentElement.outerHTML;
+  const result = toDocument(head, body, toAttributes(document.documentElement))
+    .documentElement.outerHTML;
   return `<!doctype html>\n${result}`;
 }
 
@@ -427,8 +428,19 @@ function getElementViewportInfo(el: HTMLElement) {
   return result;
 }
 
-function toDocument(head: HTMLElement, body: HTMLElement) {
+function toDocument(
+  head: HTMLElement,
+  body: HTMLElement,
+  rootAttributes?: Record<string, string>
+) {
   const doc = document.implementation.createHTMLDocument();
+
+  if (rootAttributes) {
+    for (const [name, value] of Object.entries(rootAttributes)) {
+      doc.documentElement.setAttribute(name, value);
+    }
+  }
+
   doc.documentElement.replaceChildren(head, body);
   return doc;
 }
@@ -497,4 +509,14 @@ function resolveFetchOptions(config?: Config): FetchOptions | undefined {
         noCache: true
       }
     : undefined;
+}
+
+function toAttributes(element: HTMLElement) {
+  const attributes: Record<string, string> = {};
+  for (const { name } of element.attributes) {
+    const value = element.getAttribute(name);
+    if (!value) continue;
+    attributes[name] = value;
+  }
+  return attributes;
 }
