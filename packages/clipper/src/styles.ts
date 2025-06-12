@@ -54,7 +54,7 @@ async function downloadStylesheet(href: string, options?: FetchOptions) {
     const style = document.createElement("style");
     const response = await fetch(constructUrl(href, options));
     if (!response.ok) return false;
-    style.innerText = await response.text();
+    style.innerHTML = await response.text();
     style.setAttribute("href", href);
     return style;
   } catch (e) {
