@@ -39,9 +39,7 @@ import { transformQuery } from "../utils/query-transformer.js";
 import { getSortSelectors, groupArray } from "../utils/grouping.js";
 import { fuzzy } from "../utils/fuzzy.js";
 import { extractMatchingBlocks } from "../utils/html-parser.js";
-import { findOrAdd } from "../utils/array.js";
 import { Parser } from "htmlparser2";
-import { strings } from "@notesnook/intl";
 
 type SearchResults<T> = {
   sorted: (sortOptions?: SortOptions) => Promise<VirtualizedGrouping<T>>;
@@ -305,21 +303,7 @@ export default class Lookup {
           ids: results.map((c) => c.id),
           items: results
         };
-      },
-      () =>
-        new Map([
-          [
-            0,
-            {
-              index: 0,
-              group: {
-                id: "0",
-                title: strings.results(matches.ids.length),
-                type: "header"
-              }
-            }
-          ]
-        ])
+      }
     );
   }
 
