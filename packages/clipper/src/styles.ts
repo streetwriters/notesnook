@@ -97,8 +97,26 @@ export async function addStylesToHead(
       if (styleNode) {
         head.appendChild(styleNode);
       }
-    } else if (node instanceof HTMLStyleElement) {
+      continue;
+    }
+
+    if (sheet.cssRules.length) {
+      const styleNode = rulesToStyleNode(sheet.cssRules);
+      head.appendChild(styleNode);
+      continue;
+    }
+
+    if (node instanceof HTMLStyleElement) {
       head.appendChild(node.cloneNode(true));
     }
   }
+}
+
+function rulesToStyleNode(cssRules: CSSRuleList) {
+  const cssText = Array.from(cssRules)
+    .map((r) => r.cssText)
+    .reduce((acc, text) => acc + text);
+  const style = document.createElement("style");
+  style.innerHTML = cssText;
+  return style;
 }
