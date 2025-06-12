@@ -474,7 +474,7 @@ function TrialOffer({ onClose }: { onClose: () => void }) {
           p={1}
           sx={{ borderRadius: "default", color: "var(--paragraph-secondary)" }}
         >
-          <b>Note:</b> Upgrade now and get 50% discount on all plans.
+          <b>Note:</b> Upgrade now and get 30% discount on all plans.
         </Text>
       )}
 
