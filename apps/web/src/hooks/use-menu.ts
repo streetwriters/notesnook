@@ -27,6 +27,7 @@ type MenuOptions = {
   position?: PositionOptions;
   blocking?: boolean;
   title?: string;
+  forceCustom?: boolean;
 };
 type MenuStore = {
   isOpen: boolean;
@@ -45,7 +46,12 @@ const useMenuStore = create<MenuStore>((set) => ({
     blocking: false
   },
   open: async (items, options) => {
-    if (IS_DESKTOP_APP && canShowNativeMenu(items) && isMac()) {
+    if (
+      IS_DESKTOP_APP &&
+      canShowNativeMenu(items) &&
+      isMac() &&
+      !options?.forceCustom
+    ) {
       const resolvedItems = await resolveMenuItems(items);
       desktop?.integration.showMenu.subscribe(
         {
