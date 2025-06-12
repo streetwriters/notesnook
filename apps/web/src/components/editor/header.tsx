@@ -188,6 +188,7 @@ export function Autosuggest<T>(props: AutosuggestProps<T>) {
 
       openMenu(toMenuItems(filtered, reset, filterText), {
         blocking: true,
+        forceCustom: true,
         position: {
           target: inputRef.current,
           isTargetAbsolute: true,
