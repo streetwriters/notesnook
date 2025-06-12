@@ -74,6 +74,10 @@ async function skipStyleSheet(sheet: CSSStyleSheet, options?: FetchOptions) {
     return true;
   }
 
+  return isStylesheetForPrint(sheet);
+}
+
+function isStylesheetForPrint(sheet: CSSStyleSheet) {
   return sheet.media.mediaText
     .split(",")
     .map((t) => t.trim())
@@ -85,6 +89,7 @@ export async function addStylesToHead(
   options?: FetchOptions
 ) {
   for (const sheet of document.styleSheets) {
+    if (isStylesheetForPrint(sheet)) continue;
     const node = sheet.ownerNode;
     const href =
       sheet.href && node instanceof HTMLLinkElement
