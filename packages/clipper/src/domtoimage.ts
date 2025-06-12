@@ -20,15 +20,9 @@ import { createImage, FetchOptions } from "./fetch.js";
 import { resolveAll } from "./fontfaces.js";
 import { inlineAllImages } from "./images.js";
 import { Options } from "./types.js";
-import {
-  canvasToBlob,
-  delay,
-  escapeXhtml,
-  height,
-  width,
-  isSVGElement
-} from "./utils.js";
+import { canvasToBlob, delay, escapeXhtml, height, width } from "./utils.js";
 import { inlineStylesheets } from "./styles.js";
+import { cloneNode, isSVGElement } from "./clone.js";
 
 // Default impl options
 const defaultOptions: Options = {
@@ -41,14 +35,12 @@ async function getInlinedNode(node: HTMLElement, options: Options) {
 
   if (stylesheets) await inlineStylesheets(options.fetchOptions);
 
-  let clone = node.cloneNode(true) as HTMLElement;
+  let clone = cloneNode(node, {
+    images,
+    styles: options.styles
+  });
 
   if (!clone || clone instanceof Text) return;
-
-  if (!images) {
-    const images = clone.querySelectorAll("img");
-    images.forEach((image) => image.remove());
-  }
 
   if (fonts) clone = await embedFonts(clone, options.fetchOptions);
 
