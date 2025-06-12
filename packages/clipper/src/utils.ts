@@ -24,6 +24,85 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 const WOFF = "application/font-woff";
 const JPEG = "image/jpeg";
 
+const SVGElements = [
+  "altGlyph",
+  "altGlyphDef",
+  "altGlyphItem",
+  "animate",
+  "animateColor",
+  "animateMotion",
+  "animateTransform",
+  "circle",
+  "clipPath",
+  "color-profile",
+  "cursor",
+  "defs",
+  "desc",
+  "ellipse",
+  "feBlend",
+  "feColorMatrix",
+  "feComponentTransfer",
+  "feComposite",
+  "feConvolveMatrix",
+  "feDiffuseLighting",
+  "feDisplacementMap",
+  "feDistantLight",
+  "feFlood",
+  "feFuncA",
+  "feFuncB",
+  "feFuncG",
+  "feFuncR",
+  "feGaussianBlur",
+  "feImage",
+  "feMerge",
+  "feMergeNode",
+  "feMorphology",
+  "feOffset",
+  "fePointLight",
+  "feSpecularLighting",
+  "feSpotLight",
+  "feTile",
+  "feTurbulence",
+  "filter",
+  "font-face",
+  "font-face-format",
+  "font-face-name",
+  "font-face-src",
+  "font-face-uri",
+  "foreignObject",
+  "g",
+  "glyph",
+  "glyphRef",
+  "hkern",
+  "image",
+  "line",
+  "linearGradient",
+  "marker",
+  "mask",
+  "metadata",
+  "missing-glyph",
+  "mpath",
+  "path",
+  "pattern",
+  "polygon",
+  "polyline",
+  "radialGradient",
+  "rect",
+  "set",
+  "stop",
+  "svg",
+  "switch",
+  "symbol",
+  "text",
+  "textPath",
+  "title",
+  "tref",
+  "tspan",
+  "use",
+  "view",
+  "vkern"
+].map((a) => a.toLowerCase());
+
 const mimes = {
   woff: WOFF,
   woff2: WOFF,
@@ -165,6 +244,11 @@ function getRootStylesheet() {
   return null;
 }
 
+function isSVGElement(element: HTMLElement) {
+  if (!element || !element.tagName) return false;
+  return SVGElements.includes(element.tagName.toLowerCase());
+}
+
 export {
   injectCss,
   escape,
@@ -179,5 +263,6 @@ export {
   asArray,
   escapeXhtml,
   width,
-  height
+  height,
+  isSVGElement
 };

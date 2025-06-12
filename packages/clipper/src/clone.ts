@@ -17,85 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const SVGElements = [
-  "altGlyph",
-  "altGlyphDef",
-  "altGlyphItem",
-  "animate",
-  "animateColor",
-  "animateMotion",
-  "animateTransform",
-  "circle",
-  "clipPath",
-  "color-profile",
-  "cursor",
-  "defs",
-  "desc",
-  "ellipse",
-  "feBlend",
-  "feColorMatrix",
-  "feComponentTransfer",
-  "feComposite",
-  "feConvolveMatrix",
-  "feDiffuseLighting",
-  "feDisplacementMap",
-  "feDistantLight",
-  "feFlood",
-  "feFuncA",
-  "feFuncB",
-  "feFuncG",
-  "feFuncR",
-  "feGaussianBlur",
-  "feImage",
-  "feMerge",
-  "feMergeNode",
-  "feMorphology",
-  "feOffset",
-  "fePointLight",
-  "feSpecularLighting",
-  "feSpotLight",
-  "feTile",
-  "feTurbulence",
-  "filter",
-  "font-face",
-  "font-face-format",
-  "font-face-name",
-  "font-face-src",
-  "font-face-uri",
-  "foreignObject",
-  "g",
-  "glyph",
-  "glyphRef",
-  "hkern",
-  "image",
-  "line",
-  "linearGradient",
-  "marker",
-  "mask",
-  "metadata",
-  "missing-glyph",
-  "mpath",
-  "path",
-  "pattern",
-  "polygon",
-  "polyline",
-  "radialGradient",
-  "rect",
-  "set",
-  "stop",
-  "svg",
-  "switch",
-  "symbol",
-  "text",
-  "textPath",
-  "title",
-  "tref",
-  "tspan",
-  "use",
-  "view",
-  "vkern"
-].map((a) => a.toLowerCase());
-
 const INVALID_ELEMENTS = ["script"].map((a) => a.toLowerCase());
 
 type CloneNodeOptions = {
@@ -111,53 +32,38 @@ export function cloneNode(node: HTMLElement, options: CloneNodeOptions) {
 
 function processNode(node: HTMLElement, options: CloneNodeOptions) {
   try {
-    if (!options.images && node instanceof HTMLImageElement) {
-      node.remove();
-      return;
-    }
+    const tagNames = [
+      "img",
+      "button",
+      "form",
+      "select",
+      "input",
+      "textarea"
+    ].concat(INVALID_ELEMENTS);
+    const elements = node.querySelectorAll(tagNames.join(","));
 
-    if (
-      !options.styles &&
-      (node instanceof HTMLButtonElement ||
-        node instanceof HTMLFormElement ||
-        node instanceof HTMLSelectElement ||
-        node instanceof HTMLInputElement ||
-        node instanceof HTMLTextAreaElement)
-    ) {
-      node.remove();
-      return;
-    }
-
-    if (node.nodeType === Node.COMMENT_NODE) {
-      node.remove();
-      return;
-    }
-
-    if (isInvalidElement(node)) {
-      node.remove();
-      return;
-    }
-
-    if (node.nodeType !== Node.TEXT_NODE && !isSVGElement(node)) {
-      const { display, width, height } = window.getComputedStyle(node);
-      if (display === "none" || (width === "0px" && height === "0px")) {
-        node.remove();
-        return;
+    for (const element of elements) {
+      if (!options.images && element instanceof HTMLImageElement) {
+        element.remove();
+        continue;
       }
 
-      if (isCustomElement(node)) {
-        const isInline = display.includes("inline");
-        const element = document.createElement(isInline ? "span" : "div");
-        for (const attribute of node.attributes) {
-          element.setAttribute(attribute.name, attribute.value);
-        }
-        node.replaceWith(element);
+      if (
+        !options.styles &&
+        (element instanceof HTMLButtonElement ||
+          element instanceof HTMLFormElement ||
+          element instanceof HTMLSelectElement ||
+          element instanceof HTMLInputElement ||
+          element instanceof HTMLTextAreaElement)
+      ) {
+        element.remove();
+        continue;
+      }
+
+      if (isInvalidElement(element as HTMLElement)) {
+        element.remove();
       }
     }
-
-    node.childNodes.forEach((child) =>
-      processNode(child as HTMLElement, options)
-    );
   } catch (e) {
     console.error("Failed to process node", e);
     return null;
@@ -167,17 +73,4 @@ function processNode(node: HTMLElement, options: CloneNodeOptions) {
 function isInvalidElement(element: HTMLElement) {
   if (!element || !element.tagName) return false;
   return INVALID_ELEMENTS.includes(element.tagName.toLowerCase());
-}
-
-export function isSVGElement(element: HTMLElement) {
-  if (!element || !element.tagName) return false;
-  return SVGElements.includes(element.tagName.toLowerCase());
-}
-
-function isCustomElement(element: HTMLElement) {
-  if (!element || !element.tagName) return false;
-  return (
-    !SVGElements.includes(element.tagName.toLowerCase()) &&
-    element.tagName.includes("-")
-  );
 }

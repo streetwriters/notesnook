@@ -20,9 +20,16 @@ import { createImage, FetchOptions } from "./fetch.js";
 import { resolveAll } from "./fontfaces.js";
 import { inlineAllImages } from "./images.js";
 import { Options } from "./types.js";
-import { canvasToBlob, delay, escapeXhtml, height, width } from "./utils.js";
+import {
+  canvasToBlob,
+  delay,
+  escapeXhtml,
+  height,
+  width,
+  isSVGElement
+} from "./utils.js";
 import { inlineStylesheets } from "./styles.js";
-import { cloneNode, isSVGElement } from "./clone.js";
+import { cloneNode } from "./clone.js";
 
 // Default impl options
 const defaultOptions: Options = {
