@@ -28,14 +28,6 @@ async function inlineAllImages(root: HTMLElement, options?: FetchOptions) {
     promises.push(inlineImage(image, options));
   }
 
-  const backgroundImageNodes = root.querySelectorAll(
-    `[style*="background-image:"],[style*="background:"]`
-  );
-  for (let i = 0; i < backgroundImageNodes.length; ++i) {
-    const image = backgroundImageNodes[i];
-    promises.push(inlineBackground(image as HTMLElement, options));
-  }
-
   await Promise.all(promises).catch((e) => console.error(e));
 }
 export { inlineAllImages };
@@ -65,15 +57,4 @@ async function inlineImage(element: HTMLImageElement, options?: FetchOptions) {
     element.src = dataURL;
     element.removeAttribute("srcset");
   });
-}
-
-async function inlineBackground(
-  backgroundNode: HTMLElement,
-  options?: FetchOptions
-) {
-  const background = backgroundNode.style.getPropertyValue("background-image");
-  if (!background) return backgroundNode;
-  const inlined = await inlineAll(background, options);
-  backgroundNode.style.setProperty("background-image", inlined);
-  return backgroundNode;
 }

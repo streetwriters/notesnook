@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { constructUrl, FetchOptions } from "./fetch.js";
+import { inlineAll } from "./inliner.js";
 
 export async function inlineStylesheets(options?: FetchOptions) {
   for (const sheet of document.styleSheets) {
@@ -98,14 +99,19 @@ export async function addStylesToHead(
         ? node.getAttribute("href")
         : null;
     if (href) {
-      const styleNode = await downloadStylesheet(href, options);
-      if (styleNode) {
+      const downloadedStyleNode = await downloadStylesheet(href, options);
+      if (downloadedStyleNode) {
+        const cssStyleSheet = new CSSStyleSheet();
+        cssStyleSheet.replace(downloadedStyleNode.innerHTML);
+        await inlineBackgroundImages(cssStyleSheet, options);
+        const styleNode = rulesToStyleNode(cssStyleSheet.cssRules);
         head.appendChild(styleNode);
       }
       continue;
     }
 
     if (sheet.cssRules.length) {
+      await inlineBackgroundImages(sheet, options);
       const styleNode = rulesToStyleNode(sheet.cssRules);
       head.appendChild(styleNode);
       continue;
@@ -124,4 +130,41 @@ function rulesToStyleNode(cssRules: CSSRuleList) {
   const style = document.createElement("style");
   style.innerHTML = cssText;
   return style;
+}
+
+async function inlineBackgroundImages(
+  stylesheet: CSSStyleSheet,
+  options?: FetchOptions
+) {
+  for (let i = 0; i < stylesheet.cssRules.length; ++i) {
+    const rule = stylesheet.cssRules.item(i);
+    if (!rule) continue;
+
+    const styleRules: CSSStyleRule[] = [];
+
+    if (rule.type === CSSRule.STYLE_RULE) {
+      styleRules.push(rule as CSSStyleRule);
+    } else if (rule.type === CSSRule.MEDIA_RULE) {
+      const mediaRule: CSSMediaRule = rule as CSSMediaRule;
+      for (let i = 0; i < mediaRule.cssRules.length; ++i) {
+        if (!window.matchMedia(mediaRule.media.mediaText).matches) {
+          continue;
+        }
+        const innerRule = mediaRule.cssRules.item(i);
+        if (innerRule && innerRule.type === CSSRule.STYLE_RULE) {
+          styleRules.push(innerRule as CSSStyleRule);
+        }
+      }
+    }
+
+    for (const styleRule of styleRules) {
+      const backgroundImage =
+        styleRule.style.getPropertyValue("background-image");
+      if (!backgroundImage || !backgroundImage.startsWith("url(")) continue;
+
+      const inlined = await inlineAll(backgroundImage, options);
+
+      styleRule.style.setProperty("background-image", inlined);
+    }
+  }
 }
