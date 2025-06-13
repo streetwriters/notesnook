@@ -83,6 +83,8 @@ import useTablet from "../../hooks/use-tablet";
 import { isMac } from "../../utils/platform";
 import { CREATE_BUTTON_MAP } from "../../common";
 import { getDragData } from "../../utils/data-transfer";
+import { useStore as useNoteStore } from "../../stores/note-store";
+import { EV, EVENTS } from "@notesnook/core";
 
 type ToolButton = {
   title: string;
@@ -272,6 +274,48 @@ const TabStrip = React.memo(function TabStrip() {
   const currentTab = useEditorStore((store) => store.activeTabId);
   const canGoBack = useEditorStore((store) => store.canGoBack);
   const canGoForward = useEditorStore((store) => store.canGoForward);
+  const { context } = useNoteStore();
+  const [isNewNoteButtonDisabled, setIsNewNoteButtonDisabled] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      if (context?.type !== "notebook") {
+        setIsNewNoteButtonDisabled(false);
+        return;
+      }
+      if (db.notebooks.cache.lockOpenedNotebooks.includes(context.id)) {
+        setIsNewNoteButtonDisabled(false);
+        return;
+      }
+      const notebook = await db.notebooks.notebook(context.id);
+      setIsNewNoteButtonDisabled(Boolean(notebook?.password));
+    })();
+
+    const { unsubscribe: notebookLockOpenedEventUnsub } = EV.subscribe(
+      EVENTS.notebookLockOpened,
+      (notebookId) => {
+        if (notebookId === context?.id) {
+          setIsNewNoteButtonDisabled(false);
+        }
+      }
+    );
+    const { unsubscribe: notebooksLockedEventUnsub } = EV.subscribe(
+      EVENTS.notebooksLocked,
+      async () => {
+        if (context?.type === "notebook") {
+          const notebook = await db.notebooks.notebook(context.id!);
+          if (notebook?.password) {
+            setIsNewNoteButtonDisabled(true);
+          }
+        }
+      }
+    );
+
+    return () => {
+      notebookLockOpenedEventUnsub();
+      notebooksLockedEventUnsub();
+    };
+  }, [context]);
 
   return (
     <Flex sx={{ flex: 1 }}>
@@ -288,6 +332,7 @@ const TabStrip = React.memo(function TabStrip() {
         <Button
           variant="accent"
           {...CREATE_BUTTON_MAP.notes}
+          disabled={isNewNoteButtonDisabled}
           data-test-id={`create-new-note`}
           sx={{
             p: 1,

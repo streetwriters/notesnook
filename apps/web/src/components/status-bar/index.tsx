@@ -33,6 +33,7 @@ import {
 } from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useAppStore } from "../../stores/app-store";
+import { useStore as useNotebookStore } from "../../stores/notebook-store";
 import { hardNavigate, hashNavigate } from "../../navigation";
 import { useAutoUpdater, UpdateStatus } from "../../hooks/use-auto-updater";
 import useStatus, { statusToString } from "../../hooks/use-status";
@@ -45,6 +46,7 @@ import { strings } from "@notesnook/intl";
 import { useVault } from "../../hooks/use-vault";
 import { useKeyStore } from "../../interfaces/key-store";
 import { STATUS_BAR_HEIGHT } from "../../common/constants";
+import { db } from "../../common/db";
 
 function StatusBar() {
   const user = useUserStore((state) => state.user);
@@ -54,6 +56,7 @@ function StatusBar() {
   const isFocusMode = useAppStore((state) => state.isFocusMode);
   const { isVaultLocked, lockVault } = useVault();
   const { activeCredentials, relock } = useKeyStore();
+  const { lockOpenedNotebooks } = useNotebookStore();
 
   return (
     <ScopedThemeProvider
@@ -189,6 +192,27 @@ function StatusBar() {
               <Unlock size={10} />
               <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
                 {strings.vaultUnlocked()}
+              </Text>
+            </Button>
+          )}
+          {lockOpenedNotebooks && lockOpenedNotebooks.length > 0 && (
+            <Button
+              variant="statusitem"
+              onClick={() => {
+                db.notebooks.closeLockAll();
+                useNotebookStore.getState().refresh();
+              }}
+              sx={{
+                alignItems: "center",
+                justifyContent: "center",
+                display: "flex",
+                height: "100%"
+              }}
+              title={"Click to close all"}
+            >
+              <Unlock size={10} />
+              <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
+                {lockOpenedNotebooks.length} notebooks opened
               </Text>
             </Button>
           )}

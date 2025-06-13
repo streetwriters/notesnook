@@ -24,10 +24,12 @@ import { ICollection } from "./collection.js";
 import { SQLCollection } from "../database/sql-collection.js";
 import { isFalse } from "../database/index.js";
 import { sql } from "@streetwriters/kysely";
-import { deleteItems } from "../utils/array.js";
+import { addItem, deleteItem, deleteItems } from "../utils/array.js";
 import {
   CHECK_IDS,
   checkIsUserPremium,
+  EV,
+  EVENTS,
   FREE_NOTEBOOKS_LIMIT
 } from "../common.js";
 
@@ -37,6 +39,10 @@ export class Notebooks implements ICollection {
    * @internal
    */
   collection: SQLCollection<"notebooks", TrashOrItem<Notebook>>;
+  cache: { lockOpenedNotebooks: Notebook["id"][] } = {
+    lockOpenedNotebooks: []
+  };
+  private key = "notebooklockkey";
   constructor(private readonly db: Database) {
     this.collection = new SQLCollection(
       db.sql,
@@ -88,7 +94,8 @@ export class Notebooks implements ICollection {
 
       dateCreated: mergedNotebook.dateCreated || Date.now(),
       dateModified: mergedNotebook.dateModified || Date.now(),
-      dateEdited: Date.now()
+      dateEdited: Date.now(),
+      password: mergedNotebook.password || ""
     });
     return id;
   }
@@ -303,5 +310,51 @@ export class Notebooks implements ICollection {
       )
       .get();
     return relation[0]?.fromId;
+  }
+
+  async closeLockAll() {
+    EV.publish(EVENTS.notebooksLocked);
+    this.cache.lockOpenedNotebooks = [];
+  }
+
+  async openLock(id: Notebook["id"], password: string): Promise<boolean> {
+    const notebook = await this.collection.get(id);
+    if (!notebook) return false;
+    if (!notebook.password) return false;
+
+    try {
+      await this.db.storage().decrypt({ password }, notebook.password);
+    } catch (e) {
+      return false;
+    }
+
+    addItem(this.cache.lockOpenedNotebooks, id);
+    EV.publish(EVENTS.notebookLockOpened, id);
+    return true;
+  }
+
+  async lock(id: Notebook["id"], password: string) {
+    if (password === "") {
+      throw new Error("Password cannot be empty");
+    }
+
+    const encrypted = await this.db.storage().encrypt({ password }, this.key);
+    await this.collection.update([id], {
+      password: encrypted || ""
+    });
+    deleteItem(this.cache.lockOpenedNotebooks, id);
+    EV.publish(EVENTS.notebooksLocked);
+    return;
+  }
+
+  async unlock(id: Notebook["id"]) {
+    const notebook = await this.collection.get(id);
+    if (!notebook) return;
+    if (!notebook.password) return;
+
+    deleteItem(this.cache.lockOpenedNotebooks, id);
+    await this.collection.update([id], {
+      password: ""
+    });
   }
 }
