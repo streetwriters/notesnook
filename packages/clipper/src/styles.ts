@@ -21,13 +21,6 @@ import { inlineAll } from "./inliner.js";
 
 export async function inlineStylesheets(options?: FetchOptions) {
   for (const sheet of document.styleSheets) {
-    if (await skipStyleSheet(sheet, options)) continue;
-  }
-  await resolveImports(options);
-}
-
-async function resolveImports(options?: FetchOptions) {
-  for (const sheet of document.styleSheets) {
     const rulesToDelete = [];
     if (await skipStyleSheet(sheet, options)) continue;
 
@@ -38,13 +31,14 @@ async function resolveImports(options?: FetchOptions) {
       if (rule.type === CSSRule.IMPORT_RULE) {
         const href = (rule as CSSImportRule).href;
         const result = await downloadStylesheet(href, options);
-        if (result) {
-          if (sheet.ownerNode) sheet.ownerNode.before(result);
-          else document.head.appendChild(result);
-          rulesToDelete.push(i);
-        }
+        if (!result) continue;
+        if (sheet.ownerNode) sheet.ownerNode.before(result);
+        else document.head.appendChild(result);
+        rulesToDelete.push(i);
       }
     }
+
+    await inlineBackgroundImages(sheet, options);
 
     for (const ruleIndex of rulesToDelete) sheet.deleteRule(ruleIndex);
   }
@@ -68,7 +62,11 @@ async function skipStyleSheet(sheet: CSSStyleSheet, options?: FetchOptions) {
     sheet.cssRules.length;
   } catch (_e) {
     const node = sheet.ownerNode;
-    if (sheet.href && node instanceof HTMLLinkElement) {
+    if (
+      sheet.href &&
+      node instanceof HTMLLinkElement &&
+      !isStylesheetForPrint(node)
+    ) {
       const styleNode = await downloadStylesheet(node.href, options);
       if (styleNode) node.replaceWith(styleNode);
     }
@@ -78,48 +76,20 @@ async function skipStyleSheet(sheet: CSSStyleSheet, options?: FetchOptions) {
   return isStylesheetForPrint(sheet);
 }
 
-function isStylesheetForPrint(sheet: CSSStyleSheet) {
-  return sheet.media.mediaText
+function isStylesheetForPrint(sheet: CSSStyleSheet | HTMLLinkElement) {
+  const mediaText =
+    typeof sheet.media === "string" ? sheet.media : sheet.media.mediaText;
+  return mediaText
     .split(",")
     .map((t) => t.trim())
     .includes("print");
 }
 
-export async function addStylesToHead(
-  head: HTMLHeadElement,
-  options?: FetchOptions
-) {
+export function addStylesToHead(head: HTMLHeadElement, options?: FetchOptions) {
   for (const sheet of document.styleSheets) {
     if (isStylesheetForPrint(sheet)) continue;
-    const node = sheet.ownerNode;
-    const href =
-      sheet.href && node instanceof HTMLLinkElement
-        ? node.href
-        : node instanceof HTMLStyleElement
-        ? node.getAttribute("href")
-        : null;
-    if (href) {
-      const downloadedStyleNode = await downloadStylesheet(href, options);
-      if (downloadedStyleNode) {
-        const cssStyleSheet = new CSSStyleSheet();
-        cssStyleSheet.replace(downloadedStyleNode.innerHTML);
-        await inlineBackgroundImages(cssStyleSheet, options);
-        const styleNode = rulesToStyleNode(cssStyleSheet.cssRules);
-        head.appendChild(styleNode);
-      }
-      continue;
-    }
-
-    if (sheet.cssRules.length) {
-      await inlineBackgroundImages(sheet, options);
-      const styleNode = rulesToStyleNode(sheet.cssRules);
-      head.appendChild(styleNode);
-      continue;
-    }
-
-    if (node instanceof HTMLStyleElement) {
-      head.appendChild(node.cloneNode(true));
-    }
+    const styleNode = rulesToStyleNode(sheet.cssRules);
+    head.appendChild(styleNode);
   }
 }
 
@@ -133,38 +103,52 @@ function rulesToStyleNode(cssRules: CSSRuleList) {
 }
 
 async function inlineBackgroundImages(
-  stylesheet: CSSStyleSheet,
+  sheet: CSSStyleSheet,
   options?: FetchOptions
 ) {
-  for (let i = 0; i < stylesheet.cssRules.length; ++i) {
-    const rule = stylesheet.cssRules.item(i);
-    if (!rule) continue;
-
-    const styleRules: CSSStyleRule[] = [];
-
+  const promises: Promise<void>[] = [];
+  for (const rule of sheet.cssRules) {
     if (rule.type === CSSRule.STYLE_RULE) {
-      styleRules.push(rule as CSSStyleRule);
+      promises.push(processStyleRule(sheet, rule as CSSStyleRule, options));
     } else if (rule.type === CSSRule.MEDIA_RULE) {
-      const mediaRule: CSSMediaRule = rule as CSSMediaRule;
-      for (let i = 0; i < mediaRule.cssRules.length; ++i) {
-        if (!window.matchMedia(mediaRule.media.mediaText).matches) {
-          continue;
-        }
-        const innerRule = mediaRule.cssRules.item(i);
+      const mediaRule = rule as CSSMediaRule;
+      const mediaMatches = window.matchMedia(mediaRule.media.mediaText).matches;
+      for (const innerRule of mediaRule.cssRules) {
         if (innerRule && innerRule.type === CSSRule.STYLE_RULE) {
-          styleRules.push(innerRule as CSSStyleRule);
+          promises.push(
+            processStyleRule(
+              sheet,
+              innerRule as CSSStyleRule,
+              options,
+              mediaMatches
+            )
+          );
+        }
+      }
+    } else if (rule.type === CSSRule.SUPPORTS_RULE) {
+      const supportsRule = rule as CSSSupportsRule;
+      for (const innerRule of supportsRule.cssRules) {
+        if (innerRule && innerRule.type === CSSRule.STYLE_RULE) {
+          promises.push(
+            processStyleRule(sheet, innerRule as CSSStyleRule, options, false)
+          );
         }
       }
     }
+  }
+  await Promise.allSettled(promises);
+}
 
-    for (const styleRule of styleRules) {
-      const backgroundImage =
-        styleRule.style.getPropertyValue("background-image");
-      if (!backgroundImage || !backgroundImage.startsWith("url(")) continue;
-
-      const inlined = await inlineAll(backgroundImage, options);
-
-      styleRule.style.setProperty("background-image", inlined);
-    }
+async function processStyleRule(
+  sheet: CSSStyleSheet,
+  rule: CSSStyleRule,
+  options?: FetchOptions,
+  inline = true
+) {
+  const baseUrl = sheet.href || document.location.origin;
+  for (const property of rule.style) {
+    const oldValue = rule.style.getPropertyValue(property);
+    const resolved = await inlineAll(oldValue, options, baseUrl, !inline);
+    rule.style.setProperty(property, resolved);
   }
 }

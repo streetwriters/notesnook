@@ -491,7 +491,7 @@ async function getPage(
   head.appendChild(title);
 
   if (config?.styles) {
-    await addStylesToHead(head, fetchOptions);
+    addStylesToHead(head, fetchOptions);
   }
 
   return {

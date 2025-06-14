@@ -40,14 +40,14 @@ async function getInlinedNode(node: HTMLElement, options: Options) {
   const { fonts, images, stylesheets, inlineImages } =
     options.inlineOptions || {};
 
-  if (stylesheets) await inlineStylesheets(options.fetchOptions);
-
   let clone = cloneNode(node, {
     images,
     styles: options.styles
   });
 
   if (!clone || clone instanceof Text) return;
+
+  if (stylesheets) await inlineStylesheets(options.fetchOptions);
 
   if (fonts) clone = await embedFonts(clone, options.fetchOptions);
 

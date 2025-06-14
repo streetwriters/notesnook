@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const INVALID_ELEMENTS = ["script"].map((a) => a.toLowerCase());
+const INVALID_ELEMENTS = ["script"];
 
 type CloneNodeOptions = {
   images?: boolean;
@@ -25,52 +25,20 @@ type CloneNodeOptions = {
 };
 
 export function cloneNode(node: HTMLElement, options: CloneNodeOptions) {
-  const clone = node.cloneNode(true) as HTMLElement;
-  processNode(clone, options);
-  return clone;
-}
-
-function processNode(node: HTMLElement, options: CloneNodeOptions) {
-  try {
-    const tagNames = [
-      "img",
-      "button",
-      "form",
-      "select",
-      "input",
-      "textarea"
-    ].concat(INVALID_ELEMENTS);
-    const elements = node.querySelectorAll(tagNames.join(","));
-
-    for (const element of elements) {
-      if (!options.images && element instanceof HTMLImageElement) {
-        element.remove();
-        continue;
-      }
-
-      if (
-        !options.styles &&
-        (element instanceof HTMLButtonElement ||
-          element instanceof HTMLFormElement ||
-          element instanceof HTMLSelectElement ||
-          element instanceof HTMLInputElement ||
-          element instanceof HTMLTextAreaElement)
-      ) {
-        element.remove();
-        continue;
-      }
-
-      if (isInvalidElement(element as HTMLElement)) {
-        element.remove();
-      }
-    }
-  } catch (e) {
-    console.error("Failed to process node", e);
-    return null;
+  node = node.cloneNode(true) as HTMLElement;
+  if (!options.images) {
+    const images = node.getElementsByTagName("img");
+    for (const image of images) image.remove();
   }
-}
 
-function isInvalidElement(element: HTMLElement) {
-  if (!element || !element.tagName) return false;
-  return INVALID_ELEMENTS.includes(element.tagName.toLowerCase());
+  if (!options.styles) {
+    const elements = node.querySelectorAll(
+      `button, form, select, input, textarea`
+    );
+    for (const element of elements) element.remove();
+  }
+
+  const invalidElements = node.querySelectorAll(INVALID_ELEMENTS.join(","));
+  for (const element of invalidElements) element.remove();
+  return node;
 }
