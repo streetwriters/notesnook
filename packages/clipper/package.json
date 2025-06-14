@@ -34,8 +34,6 @@
   },
   "dependencies": {
     "@mozilla/readability": "^0.4.2",
-    "css-what": "6.1.0",
-    "hyperapp": "^2.0.22",
-    "specificity": "^0.4.1"
+    "hyperapp": "^2.0.22"
   }
 }

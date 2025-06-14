@@ -16,13 +16,20 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { cloneNode, isSVGElement } from "./clone.js";
 import { createImage, FetchOptions } from "./fetch.js";
 import { resolveAll } from "./fontfaces.js";
 import { inlineAllImages } from "./images.js";
 import { Options } from "./types.js";
-import { canvasToBlob, delay, escapeXhtml, height, width } from "./utils.js";
-import { cacheStylesheets, inlineStylesheets } from "./styles.js";
+import {
+  canvasToBlob,
+  delay,
+  escapeXhtml,
+  height,
+  width,
+  isSVGElement
+} from "./utils.js";
+import { inlineStylesheets } from "./styles.js";
+import { cloneNode } from "./clone.js";
 
 // Default impl options
 const defaultOptions: Options = {
@@ -33,26 +40,14 @@ async function getInlinedNode(node: HTMLElement, options: Options) {
   const { fonts, images, stylesheets, inlineImages } =
     options.inlineOptions || {};
 
-  if (stylesheets) await inlineStylesheets(options.fetchOptions);
-
-  const documentStyles = getComputedStyle(document.documentElement);
-
-  const styleCache = stylesheets
-    ? await cacheStylesheets(documentStyles)
-    : undefined;
-
-  let clone = await cloneNode(node, {
-    styles: options.styles,
-    filter: options.filter,
-    root: true,
-    vector: !options.raster,
-    fetchOptions: options.fetchOptions,
-    getElementStyles: styleCache?.get,
-    getPseudoElementStyles: styleCache?.getPseudo,
-    images: images
+  let clone = cloneNode(node, {
+    images,
+    styles: options.styles
   });
 
   if (!clone || clone instanceof Text) return;
+
+  if (stylesheets) await inlineStylesheets(options.fetchOptions);
 
   if (fonts) clone = await embedFonts(clone, options.fetchOptions);
 
@@ -192,30 +187,9 @@ function makeSvgDataUri(node: HTMLElement, width: number, height: number) {
 
 export { toJpeg, toBlob, toCanvas, toPixelData, toPng, toSvg, getInlinedNode };
 
-const VALID_ATTRIBUTES = [
-  "src",
-  "href",
-  "title",
-  "style",
-  "srcset",
-  "sizes",
-  "width",
-  "height",
-  "target",
-  "rel"
-];
-
 function finalize(root: HTMLElement) {
   for (const element of root.querySelectorAll("*")) {
     if (!(element instanceof HTMLElement) || isSVGElement(element)) continue;
-    for (const attribute of Array.from(element.attributes)) {
-      if (attribute.name === "class" && element.className.includes("pseudo--"))
-        continue;
-
-      if (!VALID_ATTRIBUTES.includes(attribute.name)) {
-        element.removeAttribute(attribute.name);
-      }
-    }
 
     if (element instanceof HTMLAnchorElement) {
       element.href = element.href.startsWith("http")

@@ -23,6 +23,7 @@ import { app, h, text } from "hyperapp";
 import { getInlinedNode, toBlob, toJpeg, toPng } from "./domtoimage.js";
 import { Config, InlineOptions } from "./types.js";
 import { FetchOptions } from "./fetch.js";
+import { addStylesToHead } from "./styles.js";
 
 type ReadabilityEnhanced = Readability<string> & {
   PRESENTATIONAL_ATTRIBUTES: string[];
@@ -49,7 +50,8 @@ async function clipPage(
 ): Promise<string | null> {
   const { body, head } = await getPage(document, config, onlyVisible);
   if (!body || !head) return null;
-  const result = toDocument(head, body).documentElement.outerHTML;
+  const result = toDocument(head, body, toAttributes(document.documentElement))
+    .documentElement.outerHTML;
   return `<!doctype html>\n${result}`;
 }
 
@@ -426,8 +428,19 @@ function getElementViewportInfo(el: HTMLElement) {
   return result;
 }
 
-function toDocument(head: HTMLElement, body: HTMLElement) {
+function toDocument(
+  head: HTMLElement,
+  body: HTMLElement,
+  rootAttributes?: Record<string, string>
+) {
   const doc = document.implementation.createHTMLDocument();
+
+  if (rootAttributes) {
+    for (const [name, value] of Object.entries(rootAttributes)) {
+      doc.documentElement.setAttribute(name, value);
+    }
+  }
+
   doc.documentElement.replaceChildren(head, body);
   return doc;
 }
@@ -454,9 +467,10 @@ async function getPage(
   config?: Config,
   onlyVisible = false
 ) {
+  const fetchOptions = resolveFetchOptions(config);
   const body = await getInlinedNode(document.body, {
     raster: true,
-    fetchOptions: resolveFetchOptions(config),
+    fetchOptions,
     inlineOptions: {
       fonts: false,
       inlineImages: config?.inlineImages,
@@ -476,6 +490,10 @@ async function getPage(
   title.innerText = document.title;
   head.appendChild(title);
 
+  if (config?.styles) {
+    addStylesToHead(head, fetchOptions);
+  }
+
   return {
     body,
     head
@@ -491,4 +509,14 @@ function resolveFetchOptions(config?: Config): FetchOptions | undefined {
         noCache: true
       }
     : undefined;
+}
+
+function toAttributes(element: HTMLElement) {
+  const attributes: Record<string, string> = {};
+  for (const { name } of element.attributes) {
+    const value = element.getAttribute(name);
+    if (!value) continue;
+    attributes[name] = value;
+  }
+  return attributes;
 }
