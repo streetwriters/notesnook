@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { constructUrl, FetchOptions } from "./fetch.js";
 import { inlineAll } from "./inliner.js";
 
-export async function inlineStylesheets(options?: FetchOptions) {
+async function resolveImports(options?: FetchOptions) {
   for (const sheet of document.styleSheets) {
     const rulesToDelete = [];
     if (await skipStyleSheet(sheet, options)) continue;
@@ -31,16 +31,17 @@ export async function inlineStylesheets(options?: FetchOptions) {
       if (rule.type === CSSRule.IMPORT_RULE) {
         const href = (rule as CSSImportRule).href;
         const result = await downloadStylesheet(href, options);
-        if (!result) continue;
-        if (sheet.ownerNode) sheet.ownerNode.before(result);
-        else document.head.appendChild(result);
-        rulesToDelete.push(i);
+        if (result) {
+          if (sheet.ownerNode) sheet.ownerNode.before(result);
+          else document.head.appendChild(result);
+          rulesToDelete.push(i);
+        }
       }
     }
 
-    await inlineBackgroundImages(sheet, options);
-
-    for (const ruleIndex of rulesToDelete) sheet.deleteRule(ruleIndex);
+    if (sheet.cssRules.length !== 0) {
+      for (const ruleIndex of rulesToDelete) sheet.deleteRule(ruleIndex);
+    }
   }
 }
 
@@ -83,20 +84,50 @@ function isStylesheetForPrint(sheet: CSSStyleSheet | HTMLLinkElement) {
     .includes("print");
 }
 
-export function addStylesToHead(head: HTMLHeadElement, options?: FetchOptions) {
+export async function addStylesToHead(
+  head: HTMLHeadElement,
+  options?: FetchOptions
+) {
+  await resolveImports(options);
+
   for (const sheet of document.styleSheets) {
     if (isStylesheetForPrint(sheet)) continue;
-    if (sheet.href && sheet.ownerNode instanceof HTMLLinkElement) continue;
 
-    const styleNode = rulesToStyleNode(sheet.cssRules);
-    head.appendChild(styleNode);
+    const href =
+      sheet.href && sheet.ownerNode instanceof HTMLLinkElement
+        ? sheet.ownerNode.href
+        : sheet.ownerNode instanceof HTMLStyleElement
+        ? sheet.ownerNode.getAttribute("href")
+        : null;
+    if (href) {
+      const result = await downloadStylesheet(href, options);
+      if (!result) continue;
+      const cssStylesheet = new CSSStyleSheet();
+      cssStylesheet.replace(result.innerHTML);
+      await inlineBackgroundImages(cssStylesheet, options);
+      const toAppend = rulesToStyleNode(cssStylesheet.cssRules);
+      head.appendChild(toAppend);
+      continue;
+    }
+
+    if (sheet.cssRules.length > 0) {
+      await inlineBackgroundImages(sheet, options);
+      const styleNode = rulesToStyleNode(sheet.cssRules);
+      head.appendChild(styleNode);
+      continue;
+    }
+
+    if (sheet.ownerNode instanceof HTMLStyleElement) {
+      head.appendChild(sheet.ownerNode.cloneNode(true));
+      continue;
+    }
   }
 }
 
 function rulesToStyleNode(cssRules: CSSRuleList) {
   const cssText = Array.from(cssRules)
     .map((r) => r.cssText)
-    .reduce((acc, text) => acc + text);
+    .reduce((acc, text) => acc + text, "");
   const style = document.createElement("style");
   style.innerHTML = cssText;
   return style;

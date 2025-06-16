@@ -490,7 +490,7 @@ async function getPage(
   head.appendChild(title);
 
   if (config?.styles) {
-    addStylesToHead(head, fetchOptions);
+    await addStylesToHead(head, fetchOptions);
   }
 
   return {
