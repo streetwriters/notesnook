@@ -62,6 +62,7 @@ async function toSvg(node: HTMLElement, options: Options) {
     fonts: true,
     images: true,
     stylesheets: true,
+    inlineImages: true,
     ...options.inlineOptions
   };
 

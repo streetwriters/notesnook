@@ -27,7 +27,7 @@ async function inlineAllImages(root: HTMLElement, options?: FetchOptions) {
     promises.push(inlineImage(image, options));
   }
 
-  await Promise.all(promises).catch((e) => console.error(e));
+  await Promise.allSettled(promises).catch((e) => console.error(e));
 }
 export { inlineAllImages };
 
@@ -45,15 +45,10 @@ async function inlineImage(element: HTMLImageElement, options?: FetchOptions) {
     return element;
   }
 
-  return new Promise<HTMLImageElement | null>(function (resolve, reject) {
-    if (element.parentElement?.tagName === "PICTURE") {
-      element.parentElement?.replaceWith(element);
-    }
+  if (element.parentElement?.tagName === "PICTURE") {
+    element.parentElement?.replaceWith(element);
+  }
 
-    element.onload = () => resolve(element);
-    // for any image with invalid src(such as <img src />), just ignore it
-    element.onerror = (e) => reject(e);
-    element.src = dataURL;
-    element.removeAttribute("srcset");
-  });
+  element.src = dataURL;
+  element.removeAttribute("srcset");
 }
