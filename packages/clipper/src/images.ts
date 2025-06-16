@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { FetchOptions, fetchResource } from "./fetch.js";
-import { inlineAll } from "./inliner.js";
 import { isDataUrl } from "./utils.js";
 
 async function inlineAllImages(root: HTMLElement, options?: FetchOptions) {
@@ -28,15 +27,7 @@ async function inlineAllImages(root: HTMLElement, options?: FetchOptions) {
     promises.push(inlineImage(image, options));
   }
 
-  const backgroundImageNodes = root.querySelectorAll(
-    `[style*="background-image:"],[style*="background:"]`
-  );
-  for (let i = 0; i < backgroundImageNodes.length; ++i) {
-    const image = backgroundImageNodes[i];
-    promises.push(inlineBackground(image as HTMLElement, options));
-  }
-
-  await Promise.all(promises).catch((e) => console.error(e));
+  await Promise.allSettled(promises).catch((e) => console.error(e));
 }
 export { inlineAllImages };
 
@@ -54,26 +45,10 @@ async function inlineImage(element: HTMLImageElement, options?: FetchOptions) {
     return element;
   }
 
-  return new Promise<HTMLImageElement | null>(function (resolve, reject) {
-    if (element.parentElement?.tagName === "PICTURE") {
-      element.parentElement?.replaceWith(element);
-    }
+  if (element.parentElement?.tagName === "PICTURE") {
+    element.parentElement?.replaceWith(element);
+  }
 
-    element.onload = () => resolve(element);
-    // for any image with invalid src(such as <img src />), just ignore it
-    element.onerror = (e) => reject(e);
-    element.src = dataURL;
-    element.removeAttribute("srcset");
-  });
-}
-
-async function inlineBackground(
-  backgroundNode: HTMLElement,
-  options?: FetchOptions
-) {
-  const background = backgroundNode.style.getPropertyValue("background-image");
-  if (!background) return backgroundNode;
-  const inlined = await inlineAll(background, options);
-  backgroundNode.style.setProperty("background-image", inlined);
-  return backgroundNode;
+  element.src = dataURL;
+  element.removeAttribute("srcset");
 }
