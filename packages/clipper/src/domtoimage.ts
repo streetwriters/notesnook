@@ -28,7 +28,6 @@ import {
   width,
   isSVGElement
 } from "./utils.js";
-import { inlineStylesheets } from "./styles.js";
 import { cloneNode } from "./clone.js";
 
 // Default impl options
@@ -46,8 +45,6 @@ async function getInlinedNode(node: HTMLElement, options: Options) {
   });
 
   if (!clone || clone instanceof Text) return;
-
-  if (stylesheets) await inlineStylesheets(options.fetchOptions);
 
   if (fonts) clone = await embedFonts(clone, options.fetchOptions);
 
