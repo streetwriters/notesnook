@@ -107,11 +107,11 @@ async function clipScreenshot<
     height: document.body.scrollHeight,
     fetchOptions: resolveFetchOptions(config),
     inlineOptions: {
+      inlineImages: true,
       fonts: true,
       images: true,
       stylesheets: true
-    },
-    styles: true
+    }
   });
 
   if (output === "jpeg" || output === "png")

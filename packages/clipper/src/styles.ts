@@ -62,11 +62,9 @@ async function skipStyleSheet(sheet: CSSStyleSheet, options?: FetchOptions) {
     sheet.cssRules.length;
   } catch (_e) {
     const node = sheet.ownerNode;
-    if (
-      sheet.href &&
-      node instanceof HTMLLinkElement &&
-      !isStylesheetForPrint(node)
-    ) {
+    if (sheet.href && node instanceof HTMLLinkElement) {
+      if (isStylesheetForPrint(node)) return true;
+
       const styleNode = await downloadStylesheet(node.href, options);
       if (styleNode) node.replaceWith(styleNode);
     }
@@ -88,6 +86,8 @@ function isStylesheetForPrint(sheet: CSSStyleSheet | HTMLLinkElement) {
 export function addStylesToHead(head: HTMLHeadElement, options?: FetchOptions) {
   for (const sheet of document.styleSheets) {
     if (isStylesheetForPrint(sheet)) continue;
+    if (sheet.href && sheet.ownerNode instanceof HTMLLinkElement) continue;
+
     const styleNode = rulesToStyleNode(sheet.cssRules);
     head.appendChild(styleNode);
   }
