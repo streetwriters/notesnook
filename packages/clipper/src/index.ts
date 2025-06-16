@@ -477,7 +477,6 @@ async function getPage(
       images: config?.images,
       stylesheets: config?.styles
     },
-    styles: config?.styles,
     filter: (node) => {
       return !onlyVisible || isElementInViewport(node);
     }

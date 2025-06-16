@@ -42,7 +42,7 @@ async function getInlinedNode(node: HTMLElement, options: Options) {
 
   let clone = cloneNode(node, {
     images,
-    styles: options.styles
+    styles: stylesheets
   });
 
   if (!clone || clone instanceof Text) return;
