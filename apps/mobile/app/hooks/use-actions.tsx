@@ -680,7 +680,8 @@ export const useActions = ({
 
     async function pinToNotifications() {
       if (notifPinned) {
-        Notifications.remove(item.id);
+        await Notifications.remove(item.id);
+        await sleep(500);
         await Notifications.get();
         setNotifPinned(isNotePinnedInNotifications(item));
         return;
@@ -694,7 +695,8 @@ export const useActions = ({
         return;
       }
 
-      Notifications.pinNote(item.id);
+      await Notifications.pinNote(item.id);
+      await sleep(500);
       await Notifications.get();
       setNotifPinned(isNotePinnedInNotifications(item));
     }
