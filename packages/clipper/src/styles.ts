@@ -176,7 +176,7 @@ async function processStyleRule(
   options?: FetchOptions,
   inline = true
 ) {
-  const baseUrl = sheet.href || document.location.origin;
+  const baseUrl = sheet.href || document.location.href;
   for (const property of rule.style) {
     const oldValue = rule.style.getPropertyValue(property);
     const resolved = await inlineAll(oldValue, options, baseUrl, !inline);
