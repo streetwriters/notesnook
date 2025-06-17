@@ -1,0 +1,13 @@
+diff --git a/node_modules/app-builder-lib/out/targets/snap.js b/node_modules/app-builder-lib/out/targets/snap.js
+index 0b5405e..753f6c6 100644
+--- a/node_modules/app-builder-lib/out/targets/snap.js
++++ b/node_modules/app-builder-lib/out/targets/snap.js
+@@ -115,7 +115,7 @@ class SnapTarget extends core_1.Target {
+         else {
+             const archTriplet = archNameToTriplet(arch);
+             appDescriptor.environment = {
+-                DISABLE_WAYLAND: options.allowNativeWayland ? "" : "1",
++                DISABLE_WAYLAND: options.allowNativeWayland ? "0" : "1",
+                 PATH: "$SNAP/usr/sbin:$SNAP/usr/bin:$SNAP/sbin:$SNAP/bin:$PATH",
+                 SNAP_DESKTOP_RUNTIME: "$SNAP/gnome-platform",
+                 LD_LIBRARY_PATH: [
