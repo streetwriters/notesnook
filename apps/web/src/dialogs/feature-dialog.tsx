@@ -93,6 +93,16 @@ const features: Record<FeatureKeys, Feature> = {
         ]
       : [
           {
+            title: "Improved search UX",
+            subtitle:
+              "Searching for notes will now show exactly where the term occurs"
+          },
+          {
+            title: "Sortable search",
+            subtitle:
+              "Search results are now sortable (just like notes, notebooks etc.)"
+          },
+          {
             title: "Archive",
             subtitle: (
               <>
@@ -109,16 +119,6 @@ const features: Record<FeatureKeys, Feature> = {
                 drag and drop your notes from other note-taking apps and viola!
               </>
             )
-          },
-          {
-            title: "Improved search UX",
-            subtitle:
-              "Searching for notes will now show exactly where the term occurs"
-          },
-          {
-            title: "Sortable search",
-            subtitle:
-              "Search results are now sortable (just like notes, notebooks etc.)"
           },
           {
             title: "Set default tag",
