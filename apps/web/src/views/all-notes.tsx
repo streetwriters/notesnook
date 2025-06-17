@@ -36,7 +36,11 @@ function Home() {
     "notes",
     async (query, sortOptions) => {
       if (useStore.getState().context) return;
-      return await db.lookup.notesWithHighlighting(query, sortOptions);
+      return await db.lookup.notesWithHighlighting(
+        query,
+        sortOptions,
+        db.notes.all
+      );
     },
     [notes]
   );
