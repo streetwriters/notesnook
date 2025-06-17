@@ -234,7 +234,7 @@ jobs:
         working-directory: ./apps/desktop
 
   build-linux-x64:
-    name: Build for Linux
+    name: Build for Linux x64
     needs: build
     if: inputs.build-linux
     runs-on: ubuntu-22.04
@@ -298,7 +298,7 @@ jobs:
         working-directory: ./apps/desktop
 
   build-linux-arm64:
-    name: Build for Linux
+    name: Build for Linux arm64
     needs: build
     if: inputs.build-linux
     runs-on: ubuntu-22.04-arm
@@ -310,13 +310,13 @@ jobs:
       - name: Setup Node
         uses: ./.github/actions/setup-node-with-cache
 
-      - name: Setup Snapcraft Auth
-        if: inputs.publish-snap
-        run: echo "SNAPCRAFT_STORE_CREDENTIALS=${{ secrets.snapcraft_token }}" >> $GITHUB_ENV
+      # - name: Setup Snapcraft Auth
+      #   if: inputs.publish-snap
+      #   run: echo "SNAPCRAFT_STORE_CREDENTIALS=${{ secrets.snapcraft_token }}" >> $GITHUB_ENV
 
-      - name: Install Snapcraft
-        uses: samuelmeuli/action-snapcraft@v1
-        if: inputs.publish-snap
+      # - name: Install Snapcraft
+      #   uses: samuelmeuli/action-snapcraft@v1
+      #   if: inputs.publish-snap
 
       - name: Download build
         uses: actions/download-artifact@v4
@@ -338,11 +338,11 @@ jobs:
         run: npx nx run release --project @notesnook/desktop
         working-directory: ./apps/desktop
 
-      - name: Build snap
-        if: inputs.publish-snap
-        run: |
-          yarn electron-builder --config=electron-builder.config.js --linux snap:arm64 -p never
-        working-directory: ./apps/desktop
+      # - name: Build snap
+      #   if: inputs.publish-snap
+      #   run: |
+      #     yarn electron-builder --config=electron-builder.config.js --linux snap:arm64 -p never
+      #   working-directory: ./apps/desktop
 
       - name: Build AppImage
         env:
@@ -355,11 +355,11 @@ jobs:
           fi
         working-directory: ./apps/desktop
 
-      - name: Publish on Snapcraft
-        if: inputs.publish-snap
-        run: |
-          snapcraft upload --release=stable ./output/notesnook_linux_arm64.snap
-        working-directory: ./apps/desktop
+      # - name: Publish on Snapcraft
+      #   if: inputs.publish-snap
+      #   run: |
+      #     snapcraft upload --release=stable ./output/notesnook_linux_arm64.snap
+      #   working-directory: ./apps/desktop
 
   build-windows:
     name: Build for Windows
