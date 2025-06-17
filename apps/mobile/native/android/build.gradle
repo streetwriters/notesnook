@@ -6,7 +6,7 @@ buildscript {
         buildToolsVersion = "35.0.0"
         minSdkVersion = 24
         compileSdkVersion = 35
-        targetSdkVersion = 34
+        targetSdkVersion = 35
         kotlinVersion = '2.0.21'
         androidXAnnotation = "1.1.0"
         androidXCoreVersion = "1.7.0"
