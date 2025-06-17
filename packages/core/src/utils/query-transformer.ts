@@ -165,10 +165,9 @@ export function transformQuery(query: string) {
   const largeTokens = tokens.filter(
     (token) => token.length >= 3 || token === "OR"
   );
-  const ast = transformAST(parseTokens(largeTokens));
   return {
-    query: generateSQL(ast),
-    tokens: tokenizeAst(ast)
+    query: generateSQL(transformAST(parseTokens(largeTokens))),
+    tokens: tokenizeAst(transformAST(parseTokens(tokens)))
   };
 }
 
