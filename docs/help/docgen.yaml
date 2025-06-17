@@ -34,9 +34,7 @@ navigation:
       - path: importing-notes/import-notes-from-evernote.md
       - path: importing-notes/import-notes-from-googlekeep.md
       - path: importing-notes/import-notes-from-joplin.md
-      - path: importing-notes/import-notes-from-onenote.md
       - path: importing-notes/import-notes-from-simplenote.md
-      - path: importing-notes/import-notes-from-standardnotes.md
       - path: importing-notes/import-notes-from-zoho-notebook.md
       - path: importing-notes/import-notes-from-skiff-pages.md
       - path: importing-notes/import-notes-from-obsidian.md
