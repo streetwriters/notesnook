@@ -47,7 +47,7 @@ function Notes(props: NotesProps) {
     async (query, sortOptions) => {
       if (!context || !contextNotes) return;
       const notes = notesFromContext(context);
-      return await db.lookup.notesWithHighlighting(query, sortOptions, notes);
+      return await db.lookup.notesWithHighlighting(query, notes, sortOptions);
     },
     [context, contextNotes]
   );
