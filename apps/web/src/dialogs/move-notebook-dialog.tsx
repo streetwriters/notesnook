@@ -54,7 +54,7 @@ export const MoveNotebookDialog = DialogManager.register(
 
     useEffect(() => {
       (async function () {
-        const parentNotebookId = await getParentNotebookId(notebookId);
+        const parentNotebookId = await db.notebooks.parentId(notebookId);
         const selected = useSelectionStore.getState().selected[0];
         if (!selected && parentNotebookId) {
           setSelected([{ id: parentNotebookId, new: false, op: "add" }]);
@@ -140,8 +140,8 @@ export const MoveNotebookDialog = DialogManager.register(
                 rootId={"root"}
                 itemHeight={30}
                 treeRef={treeRef}
-                getChildNodes={async (id, depth) => {
-                  const parentNotebookId = await getParentNotebookId(
+                getChildNodes={async ({ id, depth }) => {
+                  const parentNotebookId = await db.notebooks.parentId(
                     notebookId
                   );
                   const nodes: TreeNode<Notebook>[] = [];
@@ -240,16 +240,3 @@ export const MoveNotebookDialog = DialogManager.register(
     );
   }
 );
-
-async function getParentNotebookId(notebookId: string) {
-  const relation = await db.relations
-    .to(
-      {
-        id: notebookId,
-        type: "notebook"
-      },
-      "notebook"
-    )
-    .get();
-  return relation[0]?.fromId;
-}
