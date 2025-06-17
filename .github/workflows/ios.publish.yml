@@ -59,7 +59,10 @@ jobs:
           key: ${{ runner.os }}-pods-${{ hashFiles('apps/mobile/native/ios/Podfile.lock') }}
 
       - name: Install Pods
-        run: npm run prepare:ios
+        run: |
+          cd apps/mobile/native/ios
+          bundle install
+          RCT_NEW_ARCH_ENABLED=0 bundle exec pod install
 
       - name: CCache Stats Before Build
         run: ccache -sv
