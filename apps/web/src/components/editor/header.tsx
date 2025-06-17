@@ -21,6 +21,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { useEditorStore } from "../../stores/editor-store";
 import { useStore as useTagStore } from "../../stores/tag-store";
 import { useStore as useNoteStore } from "../../stores/note-store";
+import { useStore as useAppStore } from "../../stores/app-store";
 import { Input } from "@theme-ui/components";
 import { Tag as TagIcon, Plus } from "../icons";
 import { Flex } from "@theme-ui/components";
@@ -78,7 +79,10 @@ function Header(props: HeaderProps) {
             key={tag.id}
             text={tag.title}
             icon={TagIcon}
-            onClick={() => navigate(`/tags/${tag.id}`)}
+            onClick={() => {
+              useAppStore.getState().setNavigationTab("tags");
+              navigate(`/tags/${tag.id}`);
+            }}
             onDismiss={
               readonly || !noteId
                 ? undefined
