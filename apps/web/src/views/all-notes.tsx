@@ -38,8 +38,8 @@ function Home() {
       if (useStore.getState().context) return;
       return await db.lookup.notesWithHighlighting(
         query,
-        sortOptions,
-        db.notes.all
+        db.notes.all,
+        sortOptions
       );
     },
     [notes]
