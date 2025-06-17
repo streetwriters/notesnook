@@ -55,6 +55,7 @@ import { store } from "../../stores/note-store";
 import { store as selectionStore } from "../../stores/selection-store";
 import { store as tagStore } from "../../stores/tag-store";
 import { store as userstore } from "../../stores/user-store";
+import { store as appStore } from "../../stores/app-store";
 import { writeToClipboard } from "../../utils/clipboard";
 import { showToast } from "../../utils/toast";
 import IconTag from "../icon-tag";
@@ -229,6 +230,8 @@ function Note(props: NoteProps) {
                       e.stopPropagation();
                       if (!tag.id)
                         return showToast("error", strings.tagNotFound());
+
+                      appStore.get().setNavigationTab("tags");
                       navigate(`/tags/${tag.id}`);
                     }}
                     text={tag.title}
@@ -243,6 +246,7 @@ function Note(props: NoteProps) {
                   <IconTag
                     key={notebook.id}
                     onClick={() => {
+                      appStore.get().setNavigationTab("notebooks");
                       navigate(`/notebooks/${notebook.id}`);
                     }}
                     text={notebook.title}
