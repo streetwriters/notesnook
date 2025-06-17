@@ -4,3 +4,6 @@ extensions.configure(com.facebook.react.ReactSettingsExtension){ ex -> ex.autoli
 rootProject.name = 'Notesnook'
 include ':app'
 includeBuild('../../node_modules/@react-native/gradle-plugin')
+
+include ":lazysodium"
+project(':lazysodium').projectDir = new File(rootProject.projectDir, '../../node_modules/@ammarahmed/react-native-sodium/android/lazysodium')
