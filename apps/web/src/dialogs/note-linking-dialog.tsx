@@ -111,7 +111,7 @@ export const NoteLinkingDialog = DialogManager.register(
               />
               <Button
                 variant="accentSecondary"
-                sx={{ mt: 1, textAlign: "left" }}
+                sx={{ mt: 1, textAlign: "left", flexShrink: 0 }}
                 onClick={() => {
                   setSelectedNote(undefined);
                   setIsNoteLocked(false);
