@@ -127,6 +127,7 @@ exports[`copying text from a list item shouldn't add extra spaces at the end 1`]
                 "class": null,
                 "href": "https://google.com/",
                 "rel": "noopener noreferrer nofollow",
+                "spellcheck": "false",
                 "target": "_blank",
                 "title": null,
               },
