@@ -251,7 +251,7 @@ jobs:
         run: echo "SNAPCRAFT_STORE_CREDENTIALS=${{ secrets.snapcraft_token }}" >> $GITHUB_ENV
 
       - name: Install Snapcraft
-        uses: samuelmeuli/action-snapcraft@v1
+        uses: samuelmeuli/action-snapcraft@v3
         if: inputs.publish-snap
 
       - name: Download build
@@ -294,7 +294,11 @@ jobs:
       - name: Publish on Snapcraft
         if: inputs.publish-snap
         run: |
-          snapcraft upload --release=stable ./output/notesnook_linux_amd64.snap
+          if [ ${{ inputs.release-track }} == 'beta' ]; then
+            snapcraft upload --release=beta ./output/notesnook_linux_amd64.snap
+          else
+            snapcraft upload --release=release ./output/notesnook_linux_amd64.snap
+          fi
         working-directory: ./apps/desktop
 
   build-linux-arm64:
