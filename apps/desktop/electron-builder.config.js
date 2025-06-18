@@ -38,6 +38,9 @@ const linuxExecutableName = process.env.NN_PRODUCT_NAME
 const year = new Date().getFullYear();
 const isBeta = pkg.version.includes("-beta");
 
+/**
+ * @type {import("app-builder-lib").Configuration}
+ */
 module.exports = {
   appId: appId,
   productName: productName,
@@ -194,7 +197,8 @@ module.exports = {
   snap: {
     autoStart: false,
     confinement: "strict",
-    allowNativeWayland: true
+    allowNativeWayland: true,
+    base: "core22"
   },
   extraResources: ["app-update.yml", "./assets/**"],
   extraMetadata: {
