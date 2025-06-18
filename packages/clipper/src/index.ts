@@ -24,6 +24,7 @@ import { getInlinedNode, toBlob, toJpeg, toPng } from "./domtoimage.js";
 import { Config, InlineOptions } from "./types.js";
 import { FetchOptions } from "./fetch.js";
 import { addStylesToHead } from "./styles.js";
+import { inlineAllImages } from "./images.js";
 
 type ReadabilityEnhanced = Readability<string> & {
   PRESENTATIONAL_ATTRIBUTES: string[];
@@ -99,13 +100,16 @@ async function clipScreenshot<
 ): Promise<TOutput> {
   const screenshotTarget = target || document.body;
 
+  const fetchOptions = resolveFetchOptions(config);
+  await inlineAllImages(screenshotTarget, fetchOptions);
+
   const func = output === "jpeg" ? toJpeg : output === "png" ? toPng : toBlob;
   const screenshot = await func(screenshotTarget, {
     quality: 1,
     backgroundColor: "white",
     width: document.body.scrollWidth,
     height: document.body.scrollHeight,
-    fetchOptions: resolveFetchOptions(config),
+    fetchOptions,
     inlineOptions: {
       inlineImages: true,
       fonts: true,

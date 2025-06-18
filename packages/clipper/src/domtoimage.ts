@@ -29,6 +29,7 @@ import {
   isSVGElement
 } from "./utils.js";
 import { cloneNode } from "./clone.js";
+import html2canvas from "html2canvas";
 
 // Default impl options
 const defaultOptions: Options = {
@@ -101,10 +102,11 @@ function toPng(node: HTMLElement, options: Options) {
   });
 }
 
-function toJpeg(node: HTMLElement, options: Options) {
+async function toJpeg(node: HTMLElement, options: Options) {
   options.raster = true;
-  return draw(node, options).then(function (canvas) {
-    return canvas?.toDataURL("image/jpeg", options.quality || 1.0);
+
+  return html2canvas(node).then(function (canvas) {
+    return canvas.toDataURL("image/jpeg", options.quality || 1.0);
   });
 }
 
