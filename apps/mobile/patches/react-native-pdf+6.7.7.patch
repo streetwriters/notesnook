@@ -1,0 +1,38 @@
+diff --git a/node_modules/react-native-pdf/android/.gradle/5.6.1/fileChanges/last-build.bin b/node_modules/react-native-pdf/android/.gradle/5.6.1/fileChanges/last-build.bin
+deleted file mode 100644
+index f76dd23..0000000
+Binary files a/node_modules/react-native-pdf/android/.gradle/5.6.1/fileChanges/last-build.bin and /dev/null differ
+diff --git a/node_modules/react-native-pdf/android/.gradle/5.6.1/fileHashes/fileHashes.lock b/node_modules/react-native-pdf/android/.gradle/5.6.1/fileHashes/fileHashes.lock
+deleted file mode 100644
+index 52d8866..0000000
+Binary files a/node_modules/react-native-pdf/android/.gradle/5.6.1/fileHashes/fileHashes.lock and /dev/null differ
+diff --git a/node_modules/react-native-pdf/android/.gradle/5.6.1/gc.properties b/node_modules/react-native-pdf/android/.gradle/5.6.1/gc.properties
+deleted file mode 100644
+index e69de29..0000000
+diff --git a/node_modules/react-native-pdf/android/.gradle/buildOutputCleanup/buildOutputCleanup.lock b/node_modules/react-native-pdf/android/.gradle/buildOutputCleanup/buildOutputCleanup.lock
+deleted file mode 100644
+index 1508dc9..0000000
+Binary files a/node_modules/react-native-pdf/android/.gradle/buildOutputCleanup/buildOutputCleanup.lock and /dev/null differ
+diff --git a/node_modules/react-native-pdf/android/.gradle/buildOutputCleanup/cache.properties b/node_modules/react-native-pdf/android/.gradle/buildOutputCleanup/cache.properties
+deleted file mode 100644
+index f4a32a7..0000000
+--- a/node_modules/react-native-pdf/android/.gradle/buildOutputCleanup/cache.properties
++++ /dev/null
+@@ -1,2 +0,0 @@
+-#Sat Oct 12 21:44:37 CST 2019
+-gradle.version=5.6.1
+diff --git a/node_modules/react-native-pdf/android/.gradle/vcs-1/gc.properties b/node_modules/react-native-pdf/android/.gradle/vcs-1/gc.properties
+deleted file mode 100644
+index e69de29..0000000
+diff --git a/node_modules/react-native-pdf/android/build.gradle b/node_modules/react-native-pdf/android/build.gradle
+index 3dfe1dc..70ef9da 100644
+--- a/node_modules/react-native-pdf/android/build.gradle
++++ b/node_modules/react-native-pdf/android/build.gradle
+@@ -126,6 +126,6 @@ dependencies {
+     // The repo from zacharee is based on PdfiumAndroidKt, a much newer fork of PdfiumAndroid, with better maintenance and updated native libraries.
+     implementation 'com.github.zacharee:AndroidPdfViewer:4.0.1'
+     // Depend on PdfiumAndroidKt directly so this can be updated independently of AndroidPdfViewer as updates are provided.
+-    implementation 'io.legere:pdfiumandroid:1.0.24'
++    implementation 'io.legere:pdfiumandroid:1.0.32'
+     implementation 'com.google.code.gson:gson:2.8.5'
+ }

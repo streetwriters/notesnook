@@ -60,15 +60,6 @@
         android:largeHeap="true"
         android:supportsRtl="true"
         android:networkSecurityConfig="@xml/network_security_config">
-
-        <receiver android:exported="false" android:label="@string/reminders_title" android:name=".ReminderWidgetProvider">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_reminders_info" />
-        </receiver>
     
         <receiver android:exported="false" android:label="@string/quick_note" android:name=".NoteWidget">
             <intent-filter>
@@ -88,6 +79,15 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/note_widget_info" />
+        </receiver>
+
+        <receiver android:exported="false" android:label="@string/reminders_title" android:name=".ReminderWidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_reminders_info" />
         </receiver>
 
         <activity android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
