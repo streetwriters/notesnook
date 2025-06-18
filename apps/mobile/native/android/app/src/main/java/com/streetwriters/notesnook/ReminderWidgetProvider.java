@@ -26,7 +26,8 @@ public class ReminderWidgetProvider extends AppWidgetProvider {
     private static Bundle getActivityOptionsBundle() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             ActivityOptions activityOptions = ActivityOptions.makeBasic();
-            activityOptions.setPendingIntentBackgroundActivityStartMode(ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED);
+            activityOptions.setPendingIntentCreatorBackgroundActivityStartMode(
+                    ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED);
             return activityOptions.toBundle();
         } else
             return null;

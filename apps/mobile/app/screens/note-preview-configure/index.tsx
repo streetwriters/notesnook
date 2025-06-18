@@ -29,6 +29,7 @@ import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { NotesnookModule } from "../../utils/notesnook-module";
 import { DefaultAppStyles } from "../../utils/styles";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const NoteItem = (props: {
   id: string | number;
@@ -111,7 +112,7 @@ export const NotePreviewConfigure = () => {
   );
 
   return (
-    <View
+    <SafeAreaView
       style={{
         backgroundColor: colors.primary.background,
         flex: 1
@@ -165,6 +166,6 @@ export const NotePreviewConfigure = () => {
           ListFooterComponent={<View style={{ height: 200 }} />}
         />
       </View>
-    </View>
+    </SafeAreaView>
   );
 };

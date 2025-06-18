@@ -97,7 +97,6 @@ export const Header = ({
         style={{
           flexDirection: "row",
           justifyContent: "space-between",
-          marginTop: DefaultAppStyles.GAP_SMALL,
           borderRadius: 10,
           paddingVertical: 3,
           borderWidth: hasSearch ? 1 : 0,
