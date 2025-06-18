@@ -297,7 +297,7 @@ jobs:
           if [ ${{ inputs.release-track }} == 'beta' ]; then
             snapcraft upload --release=beta ./output/notesnook_linux_amd64.snap
           else
-            snapcraft upload --release=release ./output/notesnook_linux_amd64.snap
+            snapcraft upload --release=stable ./output/notesnook_linux_amd64.snap
           fi
         working-directory: ./apps/desktop
 
