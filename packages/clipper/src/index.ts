@@ -50,8 +50,7 @@ async function clipPage(
 ): Promise<string | null> {
   const { body, head } = await getPage(document, config, onlyVisible);
   if (!body || !head) return null;
-  const result = toDocument(head, body, toAttributes(document.documentElement))
-    .documentElement.outerHTML;
+  const result = toDocument(head, body).documentElement.outerHTML;
   return `<!doctype html>\n${result}`;
 }
 
@@ -434,19 +433,8 @@ function getElementViewportInfo(el: HTMLElement) {
   return result;
 }
 
-function toDocument(
-  head: HTMLElement,
-  body: HTMLElement,
-  rootAttributes?: Record<string, string>
-) {
+function toDocument(head: HTMLElement, body: HTMLElement) {
   const doc = document.implementation.createHTMLDocument();
-
-  if (rootAttributes) {
-    for (const [name, value] of Object.entries(rootAttributes)) {
-      doc.documentElement.setAttribute(name, value);
-    }
-  }
-
   doc.documentElement.replaceChildren(head, body);
   return doc;
 }
@@ -497,6 +485,12 @@ async function getPage(
 
   if (config?.styles) {
     await addStylesToHead(head, fetchOptions);
+  }
+
+  for (const [name, value] of Object.entries(
+    toAttributes(document.documentElement)
+  )) {
+    body.setAttribute(name, value);
   }
 
   return {
