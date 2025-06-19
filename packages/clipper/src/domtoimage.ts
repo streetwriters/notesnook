@@ -20,14 +20,7 @@ import { createImage, FetchOptions } from "./fetch.js";
 import { resolveAll } from "./fontfaces.js";
 import { inlineAllImages } from "./images.js";
 import { Options } from "./types.js";
-import {
-  canvasToBlob,
-  delay,
-  escapeXhtml,
-  height,
-  width,
-  isSVGElement
-} from "./utils.js";
+import { canvasToBlob, delay, height, width, isSVGElement } from "./utils.js";
 import { cloneNode } from "./clone.js";
 
 // Default impl options
@@ -147,21 +140,22 @@ function makeSvgDataUri(
 
   const xhtml = new XMLSerializer().serializeToString(body);
 
+  const xstyles = Array.from(head.getElementsByTagName("style"))
+    .map((s) => new XMLSerializer().serializeToString(s))
+    .join("\n");
+
   const foreignObject =
     '<foreignObject x="0" y="0" width="100%" height="100%">' +
     xhtml +
     "</foreignObject>";
 
-  const styles = Array.from(head.getElementsByTagName("style"))
-    .map((e) => e.outerHTML.replace(/\\"/gm, "'"))
-    .join("\n");
   const svgStr =
     '<svg xmlns="http://www.w3.org/2000/svg" width="' +
     width +
     '" height="' +
     height +
     '">' +
-    styles +
+    xstyles +
     foreignObject +
     "</svg>";
 
