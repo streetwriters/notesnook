@@ -39,7 +39,10 @@ export async function fetchResource(url: string, options?: FetchOptions) {
   });
 }
 
-export function createImage(url: string, options?: FetchOptions) {
+export function createImage(
+  url: string,
+  options?: FetchOptions
+): Promise<HTMLImageElement | null> {
   if (url === "data:,") return Promise.resolve(null);
   return new Promise<HTMLImageElement>(function (resolve, reject) {
     const image = new Image();
@@ -47,7 +50,7 @@ export function createImage(url: string, options?: FetchOptions) {
     image.onload = function () {
       resolve(image);
     };
-    image.onerror = reject;
+    image.onerror = () => reject(new Error("Failed to render image."));
     image.src = constructUrl(url, options);
   });
 }
