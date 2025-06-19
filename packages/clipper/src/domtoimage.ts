@@ -29,7 +29,6 @@ import {
   isSVGElement
 } from "./utils.js";
 import { cloneNode } from "./clone.js";
-import html2canvas from "html2canvas";
 
 // Default impl options
 const defaultOptions: Options = {
@@ -55,88 +54,61 @@ async function getInlinedNode(node: HTMLElement, options: Options) {
   return clone;
 }
 
-async function toSvg(node: HTMLElement, options: Options) {
-  options.inlineOptions = {
-    fonts: true,
-    images: true,
-    stylesheets: true,
-    inlineImages: true,
-    ...options.inlineOptions
-  };
-
-  let clone = await getInlinedNode(node, options);
-  if (!clone) return;
-
-  clone = applyOptions(clone, options);
-
-  return makeSvgDataUri(
-    clone,
-    options.width || width(node),
-    options.height || height(node)
-  );
-}
-
-function applyOptions(clone: HTMLElement, options: Options) {
-  if (options.backgroundColor)
-    clone.style.backgroundColor = options.backgroundColor;
-  if (options.width) clone.style.width = options.width + "px";
-  if (options.height) clone.style.height = options.height + "px";
-
-  return clone;
-}
-
-function toPixelData(node: HTMLElement, options: Options) {
-  options = options || {};
+function toPng(body: HTMLElement, head: HTMLHeadElement, options: Options) {
   options.raster = true;
-  return draw(node, options).then(function (canvas) {
-    return canvas
-      ?.getContext("2d")
-      ?.getImageData(0, 0, width(node), height(node)).data;
-  });
-}
-
-function toPng(node: HTMLElement, options: Options) {
-  options.raster = true;
-  return draw(node, options).then(function (canvas) {
+  return draw(body, head, options).then(function (canvas) {
     return canvas?.toDataURL();
   });
 }
 
-async function toJpeg(node: HTMLElement, options: Options) {
+async function toJpeg(
+  body: HTMLElement,
+  head: HTMLHeadElement,
+  options: Options
+) {
   options.raster = true;
 
-  return html2canvas(node).then(function (canvas) {
-    return canvas.toDataURL("image/jpeg", options.quality || 1.0);
-  });
+  return draw(body, head, options).then((canvas) =>
+    canvas?.toDataURL("image/jpeg", options.quality || 1.0)
+  );
 }
 
-function toBlob(node: HTMLElement, options: Options) {
+function toBlob(body: HTMLElement, head: HTMLHeadElement, options: Options) {
   options.raster = true;
-  return draw(node, options).then((canvas) => canvas && canvasToBlob(canvas));
+  return draw(body, head, options).then(
+    (canvas) => canvas && canvasToBlob(canvas)
+  );
 }
 
-function toCanvas(node: HTMLElement, options: Options) {
-  options.raster = true;
-  return draw(node, options);
-}
-
-function draw(domNode: HTMLElement, options: Options) {
+async function draw(
+  body: HTMLElement,
+  head: HTMLHeadElement,
+  options: Options
+) {
   options = { ...defaultOptions, ...options };
-  return toSvg(domNode, options)
-    .then((uri) => (uri ? createImage(uri, options.fetchOptions) : null))
+  const uri = makeSvgDataUri(
+    body,
+    head,
+    options.width || width(body),
+    options.height || height(body)
+  );
+
+  return createImage(uri, options.fetchOptions)
     .then(delay(0))
     .then(function (image) {
+      if (!image) return null;
+
+      image.setAttribute("crossorigin", "anonymous");
+
       const scale = typeof options.scale !== "number" ? 1 : options.scale;
-      const canvas = newCanvas(domNode, scale, options);
+      const canvas = newCanvas(body, scale, options);
       const ctx = canvas?.getContext("2d");
       if (!ctx) return null;
       //   ctx.mozImageSmoothingEnabled = false;
       //   ctx.msImageSmoothingEnabled = false;
       ctx.imageSmoothingEnabled = false;
-      if (image) {
-        ctx.scale(scale, scale);
-        ctx.drawImage(image, 0, 0);
-      }
+      ctx.scale(scale, scale);
+      ctx.drawImage(image as HTMLImageElement, 0, 0);
       return canvas;
     });
 }
@@ -165,27 +137,38 @@ function embedFonts(node: HTMLElement, options?: FetchOptions) {
   });
 }
 
-function makeSvgDataUri(node: HTMLElement, width: number, height: number) {
-  node.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-  const xhtml = escapeXhtml(new XMLSerializer().serializeToString(node));
+function makeSvgDataUri(
+  body: HTMLElement,
+  head: HTMLHeadElement,
+  width: number,
+  height: number
+) {
+  body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+
+  const xhtml = new XMLSerializer().serializeToString(body);
+
   const foreignObject =
     '<foreignObject x="0" y="0" width="100%" height="100%">' +
     xhtml +
     "</foreignObject>";
 
+  const styles = Array.from(head.getElementsByTagName("style"))
+    .map((e) => e.outerHTML.replace(/\\"/gm, "'"))
+    .join("\n");
   const svgStr =
     '<svg xmlns="http://www.w3.org/2000/svg" width="' +
     width +
     '" height="' +
     height +
     '">' +
+    styles +
     foreignObject +
     "</svg>";
 
-  return "data:image/svg+xml;charset=utf-8," + svgStr;
+  return "data:image/svg+xml; charset=utf8, " + encodeURIComponent(svgStr);
 }
 
-export { toJpeg, toBlob, toCanvas, toPixelData, toPng, toSvg, getInlinedNode };
+export { toJpeg, toBlob, toPng, getInlinedNode };
 
 function finalize(root: HTMLElement) {
   for (const element of root.querySelectorAll("*")) {
