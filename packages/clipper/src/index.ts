@@ -199,7 +199,11 @@ function enterNodeSelectionMode(doc: Document, config?: Config) {
           `.${CLASSES.nodeSelected}`
         );
 
-        const div = document.createElement("div");
+        const { head } = await getPage(document, config, false);
+        const html = document.createElement("html");
+        html.append(head!);
+        const body = document.createElement("body");
+        html.append(body);
         for (const node of selectedNodes) {
           node.classList.remove(CLASSES.nodeSelected);
           const inlined = await getInlinedNode(node as HTMLElement, {
@@ -212,9 +216,9 @@ function enterNodeSelectionMode(doc: Document, config?: Config) {
             }
           });
           if (!inlined) continue;
-          div.appendChild(inlined);
+          body.appendChild(inlined);
         }
-        resolve(div?.outerHTML);
+        resolve(html?.outerHTML);
       },
       () => reject("Cancelled.")
     );
