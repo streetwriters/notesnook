@@ -138,6 +138,20 @@ function makeSvgDataUri(
 ) {
   body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
 
+  /**
+   * We're removing all attributes that contain non-word characters
+   * Sometimes a webpage could have invalid html and that causes attribute names to break
+   * HTML is resilient to this but SVG is not and will throw an error, so we remove these attributes altogether
+   */
+  for (const element of body.querySelectorAll("img, svg, video, iframe")) {
+    const attributes = element.getAttributeNames();
+    for (const attribute of attributes) {
+      if (attribute.match(/\W/)) {
+        element.removeAttribute(attribute);
+      }
+    }
+  }
+
   const xhtml = new XMLSerializer().serializeToString(body);
 
   const xstyles = Array.from(head.getElementsByTagName("style"))
