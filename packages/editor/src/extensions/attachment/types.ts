@@ -54,4 +54,8 @@ export type ImageAlignmentOptions = {
   align?: "center" | "left" | "right";
 };
 
-export type Attachment = FileAttachment | AudioAttachment | WebClipAttachment | ImageAttachment;
+export type Attachment =
+  | FileAttachment
+  | AudioAttachment
+  | WebClipAttachment
+  | ImageAttachment;
