@@ -1,17 +1,11 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-06-05 11:43+0500\n"
+"POT-Creation-Date: 2025-06-21 11:05+0500\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
 "Language: en\n"
-"Project-Id-Version: \n"
-"Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: \n"
-"Last-Translator: \n"
-"Language-Team: \n"
-"Plural-Forms: \n"
 
 #: src/strings.ts:2410
 msgid " \"Notebook > Notes\""
@@ -157,7 +151,7 @@ msgstr "{count, plural, one {Attachment deleted} other {# attachments deleted}}"
 msgid "{count, plural, one {Attachment downloaded at {path}} other {#/{total} attachments downloaded as a zip file at {path}}}"
 msgstr "{count, plural, one {Attachment downloaded at {path}} other {#/{total} attachments downloaded as a zip file at {path}}}"
 
-#: generated/actions.ts:210
+#: generated/actions.ts:216
 msgid "{count, plural, one {Color renamed} other {# colors renamed}}"
 msgstr "{count, plural, one {Color renamed} other {# colors renamed}}"
 
@@ -250,7 +244,7 @@ msgstr "{count, plural, one {Item could not be published} other {# items could n
 msgid "{count, plural, one {Item could not be unpublished} other {# items could not be unpublished}}"
 msgstr "{count, plural, one {Item could not be unpublished} other {# items could not be unpublished}}"
 
-#: generated/actions.ts:202
+#: generated/actions.ts:208
 msgid "{count, plural, one {Item created} other {# items created}}"
 msgstr "{count, plural, one {Item created} other {# items created}}"
 
@@ -258,7 +252,7 @@ msgstr "{count, plural, one {Item created} other {# items created}}"
 msgid "{count, plural, one {Item deleted} other {# items deleted}}"
 msgstr "{count, plural, one {Item deleted} other {# items deleted}}"
 
-#: generated/actions.ts:173
+#: generated/actions.ts:179
 msgid "{count, plural, one {Item edited} other {# items edited}}"
 msgstr "{count, plural, one {Item edited} other {# items edited}}"
 
@@ -266,24 +260,25 @@ msgstr "{count, plural, one {Item edited} other {# items edited}}"
 msgid "{count, plural, one {Item moved to trash} other {# items moved to trash}}"
 msgstr "{count, plural, one {Item moved to trash} other {# items moved to trash}}"
 
-#: generated/actions.ts:87
+#: generated/actions.ts:80
+#: generated/actions.ts:93
 msgid "{count, plural, one {Item permanently deleted} other {# items permanently deleted}}"
 msgstr "{count, plural, one {Item permanently deleted} other {# items permanently deleted}}"
 
-#: generated/actions.ts:104
+#: generated/actions.ts:110
 msgid "{count, plural, one {Item published} other {# items published}}"
 msgstr "{count, plural, one {Item published} other {# items published}}"
 
-#: generated/actions.ts:219
+#: generated/actions.ts:225
 msgid "{count, plural, one {Item renamed} other {# items renamed}}"
 msgstr "{count, plural, one {Item renamed} other {# items renamed}}"
 
-#: generated/actions.ts:137
-#: generated/actions.ts:150
+#: generated/actions.ts:143
+#: generated/actions.ts:156
 msgid "{count, plural, one {Item restored} other {# items restored}}"
 msgstr "{count, plural, one {Item restored} other {# items restored}}"
 
-#: generated/actions.ts:121
+#: generated/actions.ts:127
 msgid "{count, plural, one {Item unpublished} other {# items unpublished}}"
 msgstr "{count, plural, one {Item unpublished} other {# items unpublished}}"
 
@@ -323,15 +318,15 @@ msgstr "{count, plural, one {Note moved to trash} other {# notes moved to trash}
 msgid "{count, plural, one {Note permanently deleted} other {# notes permanently deleted}}"
 msgstr "{count, plural, one {Note permanently deleted} other {# notes permanently deleted}}"
 
-#: generated/actions.ts:95
+#: generated/actions.ts:101
 msgid "{count, plural, one {Note published} other {# notes published}}"
 msgstr "{count, plural, one {Note published} other {# notes published}}"
 
-#: generated/actions.ts:129
+#: generated/actions.ts:135
 msgid "{count, plural, one {Note restored} other {# notes restored}}"
 msgstr "{count, plural, one {Note restored} other {# notes restored}}"
 
-#: generated/actions.ts:112
+#: generated/actions.ts:118
 msgid "{count, plural, one {Note unpublished} other {# notes unpublished}}"
 msgstr "{count, plural, one {Note unpublished} other {# notes unpublished}}"
 
@@ -339,7 +334,7 @@ msgstr "{count, plural, one {Note unpublished} other {# notes unpublished}}"
 msgid "{count, plural, one {Note will be automatically deleted from all other devices & any future changes won't get synced. Are you sure you want to continue?} other {# notes will be automatically deleted from all other devices & any future changes won't get synced. Are you sure you want to continue?}}"
 msgstr "{count, plural, one {Note will be automatically deleted from all other devices & any future changes won't get synced. Are you sure you want to continue?} other {# notes will be automatically deleted from all other devices & any future changes won't get synced. Are you sure you want to continue?}}"
 
-#: generated/actions.ts:181
+#: generated/actions.ts:187
 msgid "{count, plural, one {Notebook created} other {# notebooks created}}"
 msgstr "{count, plural, one {Notebook created} other {# notebooks created}}"
 
@@ -347,7 +342,7 @@ msgstr "{count, plural, one {Notebook created} other {# notebooks created}}"
 msgid "{count, plural, one {Notebook deleted} other {# notebooks deleted}}"
 msgstr "{count, plural, one {Notebook deleted} other {# notebooks deleted}}"
 
-#: generated/actions.ts:162
+#: generated/actions.ts:168
 msgid "{count, plural, one {Notebook edited} other {# notebooks edited}}"
 msgstr "{count, plural, one {Notebook edited} other {# notebooks edited}}"
 
@@ -359,7 +354,7 @@ msgstr "{count, plural, one {Notebook moved to trash} other {# notebooks moved t
 msgid "{count, plural, one {Notebook permanently deleted} other {# notebooks permanently deleted}}"
 msgstr "{count, plural, one {Notebook permanently deleted} other {# notebooks permanently deleted}}"
 
-#: generated/actions.ts:133
+#: generated/actions.ts:139
 msgid "{count, plural, one {Notebook restored} other {# notebooks restored}}"
 msgstr "{count, plural, one {Notebook restored} other {# notebooks restored}}"
 
@@ -371,6 +366,11 @@ msgstr "{count, plural, one {Permanently delete attachment} other {Permanently d
 #: generated/do-actions.ts:156
 msgid "{count, plural, one {Permanently delete item} other {Permanently delete # items}}"
 msgstr "{count, plural, one {Permanently delete item} other {Permanently delete # items}}"
+
+#: generated/in-progress-actions.ts:66
+#: generated/in-progress-actions.ts:75
+msgid "{count, plural, one {permanently deleting item...} other {permanently deleting # items...}}"
+msgstr "{count, plural, one {permanently deleting item...} other {permanently deleting # items...}}"
 
 #: generated/do-actions.ts:99
 msgid "{count, plural, one {Pin item} other {Pin # items}}"
@@ -444,11 +444,16 @@ msgstr "{count, plural, one {Restore note} other {Restore # notes}}"
 msgid "{count, plural, one {Restore notebook} other {Restore # notebooks}}"
 msgstr "{count, plural, one {Restore notebook} other {Restore # notebooks}}"
 
-#: generated/actions.ts:189
+#: generated/in-progress-actions.ts:49
+#: generated/in-progress-actions.ts:58
+msgid "{count, plural, one {Restoring item...} other {Restoring # items...}}"
+msgstr "{count, plural, one {Restoring item...} other {Restoring # items...}}"
+
+#: generated/actions.ts:195
 msgid "{count, plural, one {Shortcut created} other {# shortcuts created}}"
 msgstr "{count, plural, one {Shortcut created} other {# shortcuts created}}"
 
-#: generated/actions.ts:185
+#: generated/actions.ts:191
 msgid "{count, plural, one {Tag created} other {# tags created}}"
 msgstr "{count, plural, one {Tag created} other {# tags created}}"
 
@@ -456,7 +461,7 @@ msgstr "{count, plural, one {Tag created} other {# tags created}}"
 msgid "{count, plural, one {Tag deleted} other {# tags deleted}}"
 msgstr "{count, plural, one {Tag deleted} other {# tags deleted}}"
 
-#: generated/actions.ts:158
+#: generated/actions.ts:164
 msgid "{count, plural, one {Tag edited} other {# tags edited}}"
 msgstr "{count, plural, one {Tag edited} other {# tags edited}}"
 
@@ -613,8 +618,8 @@ msgid "A to Z"
 msgstr "A to Z"
 
 #: src/strings.ts:447
-msgid "A vault stores your notes in a encrypted storage."
-msgstr "A vault stores your notes in a encrypted storage."
+msgid "A vault stores your notes in an encrypted storage."
+msgstr "A vault stores your notes in an encrypted storage."
 
 #: src/strings.ts:661
 msgid "Abc"
