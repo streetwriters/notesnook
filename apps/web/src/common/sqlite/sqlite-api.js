@@ -561,11 +561,16 @@ export function Factory(Module) {
       databases.add(db);
       Module._sqlite3_free(zVfs);
 
+      check(fname, result);
+      return db;
+    };
+  })();
+
+  sqlite3.register_extensions = (function () {
+    return async function (db) {
       Module.ccall("RegisterExtensionFunctions", "void", ["number"], [db]);
       Module.ccall("sqlite3Fts5BetterTrigramInit", "void", ["number"], [db]);
       Module.ccall("sqlite3Fts5HtmlInit", "void", ["number"], [db]);
-      check(fname, result);
-      return db;
     };
   })();
 

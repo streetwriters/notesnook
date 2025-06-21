@@ -227,6 +227,9 @@ class _SQLiteWorker {
   }
 
   async initialize() {
+    if (typeof this.db === "number")
+      await this.sqlite.register_extensions(this.db);
+
     self.dispatchEvent(
       new MessageEvent("message", {
         data: { type: "databaseInitialized", dbName: this.name }
