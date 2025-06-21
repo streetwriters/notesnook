@@ -30,7 +30,7 @@
     "@notesnook/ui": "file:../../packages/ui",
     "@trpc/client": "10.45.2",
     "@trpc/server": "10.45.2",
-    "better-sqlite3-multiple-ciphers": "11.3.0",
+    "better-sqlite3-multiple-ciphers": "^11.10.0",
     "electron-trpc": "0.7.1",
     "electron-updater": "^6.6.2",
     "icojs": "^0.19.5",
