@@ -83,7 +83,7 @@ const ACTIONS = [
   {
     action: "permanentlyDeleted",
     label: "permanently deleted",
-    dataTypes: ["note", "notebook"]
+    dataTypes: ["note", "notebook", "item"]
   },
   { action: "published", label: "published", dataTypes: ["note"] },
   { action: "unpublished", label: "unpublished", dataTypes: ["note"] },
@@ -121,7 +121,7 @@ const ACTION_CONFIRMATIONS = [
       "tag",
       "color",
       "attachment"
-    ]
+    ],
   },
   {
     action: "permanentlyDelete",
@@ -148,6 +148,16 @@ const IN_PROGRESS_ACTIONS = [
     action: "deleting",
     label: "Deleting",
     dataTypes: ["note", "notebook", "attachment", "tag", "reminder"]
+  },
+  {
+    action: "restoring",
+    label: "Restoring",
+    dataTypes: ["item"]
+  },
+  {
+    action: "permanentlyDeleting",
+    label: "permanently deleting",
+    dataTypes: ["item"]
   }
 ];
 
