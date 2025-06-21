@@ -73,6 +73,15 @@ function toBlob(body: HTMLElement, head: HTMLHeadElement, options: Options) {
   );
 }
 
+function toSvg(body: HTMLElement, head: HTMLHeadElement, options: Options) {
+  return makeSvg(
+    body,
+    head,
+    options.width || width(body),
+    options.height || height(body)
+  );
+}
+
 async function draw(
   body: HTMLElement,
   head: HTMLHeadElement,
@@ -80,10 +89,12 @@ async function draw(
 ) {
   options = { ...defaultOptions, ...options };
   const uri = makeSvgDataUri(
-    body,
-    head,
-    options.width || width(body),
-    options.height || height(body)
+    makeSvg(
+      body,
+      head,
+      options.width || width(body),
+      options.height || height(body)
+    )
   );
 
   return createImage(uri, options.fetchOptions)
@@ -130,7 +141,7 @@ function embedFonts(node: HTMLElement, options?: FetchOptions) {
   });
 }
 
-function makeSvgDataUri(
+function makeSvg(
   body: HTMLElement,
   head: HTMLHeadElement,
   width: number,
@@ -163,7 +174,7 @@ function makeSvgDataUri(
     xhtml +
     "</foreignObject>";
 
-  const svgStr =
+  return (
     '<svg xmlns="http://www.w3.org/2000/svg" width="' +
     width +
     '" height="' +
@@ -171,12 +182,15 @@ function makeSvgDataUri(
     '">' +
     xstyles +
     foreignObject +
-    "</svg>";
-
-  return "data:image/svg+xml; charset=utf8, " + encodeURIComponent(svgStr);
+    "</svg>"
+  );
 }
 
-export { toJpeg, toBlob, toPng, getInlinedNode };
+function makeSvgDataUri(str: string) {
+  return "data:image/svg+xml; charset=utf8, " + encodeURIComponent(str);
+}
+
+export { toJpeg, toBlob, toPng, toSvg, getInlinedNode };
 
 function finalize(root: HTMLElement) {
   for (const element of root.querySelectorAll("*")) {

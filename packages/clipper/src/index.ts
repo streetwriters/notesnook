@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Readability } from "@mozilla/readability";
 import { injectCss } from "./utils.js";
 import { app, h, text } from "hyperapp";
-import { getInlinedNode, toBlob, toJpeg, toPng } from "./domtoimage.js";
+import { getInlinedNode, toBlob, toJpeg, toPng, toSvg } from "./domtoimage.js";
 import { Config, InlineOptions } from "./types.js";
 import { FetchOptions } from "./fetch.js";
 import { addStylesToHead } from "./styles.js";
@@ -85,10 +85,8 @@ async function clipArticle(
 }
 
 async function clipScreenshot<
-  TOutputFormat extends "jpeg" | "png" | "raw",
-  TOutput extends TOutputFormat extends "jpeg"
-    ? string
-    : TOutputFormat extends "png"
+  TOutputFormat extends "jpeg" | "png" | "raw" | "svg",
+  TOutput extends TOutputFormat extends "jpeg" | "png" | "svg"
     ? string
     : Blob | undefined
 >(
@@ -96,15 +94,19 @@ async function clipScreenshot<
   output: TOutputFormat = "jpeg" as TOutputFormat,
   config?: Config
 ): Promise<TOutput | null> {
-  // const screenshotTarget = target || document.body;
-
   const fetchOptions = resolveFetchOptions(config);
-  // await inlineAllImages(screenshotTarget, fetchOptions);
 
   const { body, head } = await getPage(document, config, false);
   if (!body || !head) return null;
 
-  const func = output === "jpeg" ? toJpeg : output === "png" ? toPng : toBlob;
+  const func =
+    output === "jpeg"
+      ? toJpeg
+      : output === "png"
+      ? toPng
+      : output === "svg"
+      ? toSvg
+      : toBlob;
   const screenshot = await func(body, head, {
     quality: 1,
     backgroundColor: "white",
@@ -121,6 +123,7 @@ async function clipScreenshot<
 
   if (output === "jpeg" || output === "png")
     return `<img width="${document.body.scrollWidth}px" height="${document.body.scrollHeight}px" src="${screenshot}" />` as TOutput;
+  else if (output === "svg") return screenshot as TOutput;
   else return screenshot as TOutput;
 }
 
