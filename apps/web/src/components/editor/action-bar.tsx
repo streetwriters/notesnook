@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Button, Flex, Text } from "@theme-ui/components";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -272,9 +272,29 @@ const TabStrip = React.memo(function TabStrip() {
   const currentTab = useEditorStore((store) => store.activeTabId);
   const canGoBack = useEditorStore((store) => store.canGoBack);
   const canGoForward = useEditorStore((store) => store.canGoForward);
+  const tabStripRef = useRef<HTMLDivElement>(null);
+
+  const tabWidth = useMemo(() => {
+    const tabWidthBounds = { initial: 150, min: 50 };
+    if (!tabStripRef.current || tabs.length === 0) {
+      return tabWidthBounds.initial;
+    }
+
+    const tabStripWidth = tabStripRef.current.offsetWidth;
+    let idealWidth = Math.floor(tabStripWidth / tabs.length);
+    // subtract some margin from ideal tab width to remove overflow
+    const tabWidthMargin = 20;
+    idealWidth =
+      idealWidth > tabWidthMargin ? idealWidth - tabWidthMargin : idealWidth;
+    const clampedWidth = Math.max(
+      Math.min(idealWidth, tabWidthBounds.initial),
+      tabWidthBounds.min
+    );
+    return clampedWidth;
+  }, [tabs.length, tabStripRef.current]);
 
   return (
-    <Flex sx={{ flex: 1 }}>
+    <Flex sx={{ flex: 1 }} ref={tabStripRef}>
       <Flex
         sx={{
           px: 1,
@@ -387,6 +407,7 @@ const TabStrip = React.memo(function TabStrip() {
 
               return (
                 <Tab
+                  width={tabWidth}
                   id={tab.id}
                   key={tab.sessionId}
                   title={
@@ -479,6 +500,7 @@ type TabProps = {
   onCloseToTheLeft: () => void;
   onCloseAll: () => void;
   onPin: () => void;
+  width: number;
   onRevealInList?: () => void;
 };
 function Tab(props: TabProps) {
@@ -497,7 +519,8 @@ function Tab(props: TabProps) {
     onCloseToTheRight,
     onCloseToTheLeft,
     onRevealInList,
-    onPin
+    onPin,
+    width
   } = props;
   const Icon = isLocked
     ? type === "locked"
@@ -545,6 +568,7 @@ function Tab(props: TabProps) {
         useEditorStore.getState().openSessionInTab(noteId, id);
       }}
       sx={{
+        width,
         height: "100%",
         cursor: "pointer",
         pl: 2,
@@ -647,7 +671,6 @@ function Tab(props: TabProps) {
             textOverflow: "ellipsis",
             overflowX: "hidden",
             pointerEvents: "none",
-            maxWidth: 120,
             color: isActive ? "paragraph-selected" : "paragraph-secondary"
           }}
           ml={1}
