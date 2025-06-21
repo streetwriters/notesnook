@@ -1,5 +1,5 @@
 diff --git a/node_modules/better-sqlite3-multiple-ciphers/deps/defines.gypi b/node_modules/better-sqlite3-multiple-ciphers/deps/defines.gypi
-index 1a14ecd..dabcce2 100644
+index 1a14ecd..ff938f1 100644
 --- a/node_modules/better-sqlite3-multiple-ciphers/deps/defines.gypi
 +++ b/node_modules/better-sqlite3-multiple-ciphers/deps/defines.gypi
 @@ -38,5 +38,6 @@

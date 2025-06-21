@@ -33,6 +33,8 @@ export class SQLite {
   initialized = false;
   preparedStatements: Map<string, Statement<unknown[]>> = new Map();
   retryCounter: Record<string, number> = {};
+  extensionsLoaded = false;
+
   constructor() {
     console.log("new sqlite worker");
   }
@@ -46,10 +48,6 @@ export class SQLite {
     this.sqlite = require("better-sqlite3-multiple-ciphers")(
       filePath
     ).unsafeMode(true);
-    const betterTrigram = require("sqlite-better-trigram");
-    const fts5Html = require("sqlite3-fts5-html");
-    betterTrigram.load(this.sqlite);
-    fts5Html.load(this.sqlite);
   }
 
   /**
@@ -117,6 +115,20 @@ export class SQLite {
     } catch (e) {
       if (e instanceof Error) e.message += ` (query: ${sql})`;
       throw e;
+    } finally {
+      // Since SQLite 3.48.0 (SQLite3MC v2.0.2) it's not possible to load fts5
+      // extensions before database has been decrypting. This is because
+      // executing a `SELECT` now accesses the underlying databases resulting in
+      // an error. Since FTS5 extensions depend on `SELECT fts5` to load the
+      // fts5 API, we must wait decrypt the database before we can load
+      // the extensions.
+      if (!this.extensionsLoaded && (await this.isDatabaseReady())) {
+        const betterTrigram = require("sqlite-better-trigram");
+        const fts5Html = require("sqlite3-fts5-html");
+        betterTrigram.load(this.sqlite);
+        fts5Html.load(this.sqlite);
+        this.extensionsLoaded = true;
+      }
     }
   }
 
@@ -143,5 +155,23 @@ export class SQLite {
       maxRetries: 5,
       retryDelay: 500
     });
+  }
+
+  /**
+   * This just executes `SELECT 1` on the database to make sure its ready.
+   * On an encrypted database, this will fail until `PRAGMA key` has been
+   * called.
+   */
+  private async isDatabaseReady() {
+    // return this.exec(`SELECT 1;`)
+    //   .then(() => true)
+    //   .catch(() => false);
+    if (!this.sqlite) return false;
+    try {
+      this.sqlite.prepare(`SELECT 1;`).run();
+      return true;
+    } catch {
+      return false;
+    }
   }
 }
