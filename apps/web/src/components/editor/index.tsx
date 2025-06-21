@@ -49,11 +49,11 @@ import { AppEventManager, AppEvents } from "../../common/app-events";
 import { FlexScrollContainer } from "../scroll-container";
 import Tiptap, { OnChangeHandler } from "./tiptap";
 import Header from "./header";
-import { Attachment } from "../icons";
+import { Attachment, Notebook as NotebookIcon } from "../icons";
 import { attachFiles, AttachmentProgress, insertAttachments } from "./picker";
 import { useEditorManager } from "./manager";
 import { saveAttachment, downloadAttachment } from "../../common/attachments";
-import { EV, EVENTS } from "@notesnook/core";
+import { EV, EVENTS, Notebook } from "@notesnook/core";
 import { db } from "../../common/db";
 import Titlebox from "./title-box";
 import Config from "../../utils/config";
@@ -77,6 +77,8 @@ import { Pane, SplitPane } from "../split-pane";
 import { TITLE_BAR_HEIGHT } from "../title-bar";
 import { isMobile } from "../../hooks/use-mobile";
 import { isTablet } from "../../hooks/use-tablet";
+import { navigate } from "../../navigation";
+import IconTag from "../icon-tag";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
@@ -171,6 +173,8 @@ export default function TabsView() {
                 <Freeze key={session.id} freeze={tab.id !== activeTabId}>
                   {session.type === "locked" ? (
                     <UnlockNoteView session={session} />
+                  ) : session.type === "locked:notebook" ? (
+                    <NotebookLockedView noteId={session.note.id} />
                   ) : session.type === "conflicted" ||
                     session.type === "diff" ? (
                     <DiffViewer session={session} />
@@ -968,5 +972,50 @@ function UnlockNoteView(props: UnlockNoteViewProps) {
         }}
       />
     </div>
+  );
+}
+
+function NotebookLockedView({ noteId }: { noteId: string }) {
+  const [notebook, setNotebook] = useState<Notebook | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const relations = await db.relations
+        .to({ type: "note", id: noteId }, "notebook")
+        .get();
+      for (const { fromId } of relations) {
+        const notebook = await db.notebooks.notebook(fromId);
+        if (!notebook) continue;
+        // ASSUMPTION: note can be in max 1 locked notebook
+        if (notebook.password) setNotebook(notebook);
+      }
+    })();
+  }, [noteId]);
+
+  return (
+    <Flex
+      sx={{
+        flexDirection: "column",
+        alignItems: "center",
+        mt: 25,
+        gap: 10
+      }}
+    >
+      <Text variant="heading">Note's notebook locked</Text>
+      {notebook && (
+        <Flex sx={{ gap: 1 }}>
+          <Text>Unlock</Text>
+          <IconTag
+            key={notebook.id}
+            onClick={() => {
+              navigate(`/notebooks/${notebook.id}`);
+            }}
+            text={notebook.title}
+            icon={NotebookIcon}
+          />
+          <Text>to view note contents</Text>
+        </Flex>
+      )}
+    </Flex>
   );
 }

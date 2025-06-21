@@ -28,6 +28,7 @@ import { Notebook, VirtualizedGrouping } from "@notesnook/core";
 type ViewMode = "detailed" | "compact";
 class NotebookStore extends BaseStore<NotebookStore> {
   notebooks?: VirtualizedGrouping<Notebook>;
+  lockOpenedNotebooks?: string[];
   viewMode = Config.get<ViewMode>("notebooks:viewMode", "detailed");
 
   setViewMode = (viewMode: ViewMode) => {
@@ -39,7 +40,10 @@ class NotebookStore extends BaseStore<NotebookStore> {
     const notebooks = await db.notebooks.roots.sorted(
       db.settings.getGroupOptions("notebooks")
     );
-    this.set({ notebooks });
+    this.set({
+      notebooks,
+      lockOpenedNotebooks: db.notebooks.cache.lockOpenedNotebooks
+    });
   };
 
   delete = async (...ids: string[]) => {

@@ -229,6 +229,7 @@ export interface Notebook extends BaseItem<"notebook"> {
   dateDeleted: null;
   itemType: null;
   deletedBy: null;
+  password?: Cipher<"base64">;
 }
 
 /**
