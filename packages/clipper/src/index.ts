@@ -20,9 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Readability } from "@mozilla/readability";
 import { injectCss } from "./utils.js";
 import { app, h, text } from "hyperapp";
-import { getInlinedNode, toBlob, toJpeg, toPng } from "./domtoimage.js";
+import { getInlinedNode, toBlob, toJpeg, toPng, toSvg } from "./domtoimage.js";
 import { Config, InlineOptions } from "./types.js";
 import { FetchOptions } from "./fetch.js";
+import { addStylesToHead } from "./styles.js";
 
 type ReadabilityEnhanced = Readability<string> & {
   PRESENTATIONAL_ATTRIBUTES: string[];
@@ -84,36 +85,45 @@ async function clipArticle(
 }
 
 async function clipScreenshot<
-  TOutputFormat extends "jpeg" | "png" | "raw",
-  TOutput extends TOutputFormat extends "jpeg"
-    ? string
-    : TOutputFormat extends "png"
+  TOutputFormat extends "jpeg" | "png" | "raw" | "svg",
+  TOutput extends TOutputFormat extends "jpeg" | "png" | "svg"
     ? string
     : Blob | undefined
 >(
   target?: HTMLElement,
   output: TOutputFormat = "jpeg" as TOutputFormat,
   config?: Config
-): Promise<TOutput> {
-  const screenshotTarget = target || document.body;
+): Promise<TOutput | null> {
+  const fetchOptions = resolveFetchOptions(config);
 
-  const func = output === "jpeg" ? toJpeg : output === "png" ? toPng : toBlob;
-  const screenshot = await func(screenshotTarget, {
+  const { body, head } = await getPage(document, config, false);
+  if (!body || !head) return null;
+
+  const func =
+    output === "jpeg"
+      ? toJpeg
+      : output === "png"
+      ? toPng
+      : output === "svg"
+      ? toSvg
+      : toBlob;
+  const screenshot = await func(body, head, {
     quality: 1,
     backgroundColor: "white",
     width: document.body.scrollWidth,
     height: document.body.scrollHeight,
-    fetchOptions: resolveFetchOptions(config),
+    fetchOptions,
     inlineOptions: {
+      inlineImages: true,
       fonts: true,
       images: true,
       stylesheets: true
-    },
-    styles: true
+    }
   });
 
   if (output === "jpeg" || output === "png")
     return `<img width="${document.body.scrollWidth}px" height="${document.body.scrollHeight}px" src="${screenshot}" />` as TOutput;
+  else if (output === "svg") return screenshot as TOutput;
   else return screenshot as TOutput;
 }
 
@@ -192,7 +202,11 @@ function enterNodeSelectionMode(doc: Document, config?: Config) {
           `.${CLASSES.nodeSelected}`
         );
 
-        const div = document.createElement("div");
+        const { head } = await getPage(document, config, false);
+        const html = document.createElement("html");
+        html.append(head!);
+        const body = document.createElement("body");
+        html.append(body);
         for (const node of selectedNodes) {
           node.classList.remove(CLASSES.nodeSelected);
           const inlined = await getInlinedNode(node as HTMLElement, {
@@ -205,9 +219,9 @@ function enterNodeSelectionMode(doc: Document, config?: Config) {
             }
           });
           if (!inlined) continue;
-          div.appendChild(inlined);
+          body.appendChild(inlined);
         }
-        resolve(div?.outerHTML);
+        resolve(html?.outerHTML);
       },
       () => reject("Cancelled.")
     );
@@ -454,16 +468,16 @@ async function getPage(
   config?: Config,
   onlyVisible = false
 ) {
+  const fetchOptions = resolveFetchOptions(config);
   const body = await getInlinedNode(document.body, {
     raster: true,
-    fetchOptions: resolveFetchOptions(config),
+    fetchOptions,
     inlineOptions: {
       fonts: false,
       inlineImages: config?.inlineImages,
       images: config?.images,
       stylesheets: config?.styles
     },
-    styles: config?.styles,
     filter: (node) => {
       return !onlyVisible || isElementInViewport(node);
     }
@@ -475,6 +489,16 @@ async function getPage(
   const title = document.createElement("title");
   title.innerText = document.title;
   head.appendChild(title);
+
+  if (config?.styles) {
+    await addStylesToHead(head, fetchOptions);
+  }
+
+  for (const [name, value] of Object.entries(
+    toAttributes(document.documentElement)
+  )) {
+    body.setAttribute(name, value);
+  }
 
   return {
     body,
@@ -491,4 +515,14 @@ function resolveFetchOptions(config?: Config): FetchOptions | undefined {
         noCache: true
       }
     : undefined;
+}
+
+function toAttributes(element: HTMLElement) {
+  const attributes: Record<string, string> = {};
+  for (const { name } of element.attributes) {
+    const value = element.getAttribute(name);
+    if (!value) continue;
+    attributes[name] = value;
+  }
+  return attributes;
 }
