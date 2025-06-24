@@ -378,7 +378,7 @@ function TipTap(props: TipTapProps) {
         <ScrollContainer
           className="toolbarScroll"
           suppressScrollY
-          style={{ display: "flex" }}
+          style={{ display: "flex", overscrollBehavior: "contain" }}
           trackStyle={() => ({
             backgroundColor: "transparent",
             "--ms-track-size": "6px"
