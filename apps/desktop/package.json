@@ -45,7 +45,7 @@
     "@types/node": "22.15.3",
     "@types/yargs": "^17.0.33",
     "chokidar": "^4.0.3",
-    "electron": "^34.0.0",
+    "electron": "^35.0.0",
     "electron-builder": "^26.0.12",
     "esbuild": "0.21.5",
     "node-abi": "^4.5.0",
