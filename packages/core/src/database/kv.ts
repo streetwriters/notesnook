@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { DatabaseAccessor, RawDatabaseSchema } from "./index.js";
+import { LazyDatabaseAccessor, RawDatabaseSchema } from "./index.js";
 import { Token } from "../api/token-manager.js";
 import { User } from "../types.js";
 
@@ -44,38 +44,44 @@ export const KEYS: (keyof KV)[] = [
 ];
 
 export class KVStorage {
-  private readonly db: DatabaseAccessor<RawDatabaseSchema>;
-  constructor(db: DatabaseAccessor) {
-    this.db = db as unknown as DatabaseAccessor<RawDatabaseSchema>;
+  private readonly db: LazyDatabaseAccessor<RawDatabaseSchema>;
+  constructor(db: LazyDatabaseAccessor) {
+    this.db = db as unknown as LazyDatabaseAccessor<RawDatabaseSchema>;
   }
 
   async read<T extends keyof KV>(key: T): Promise<KV[T] | undefined> {
-    const result = await this.db()
-      .selectFrom("kv")
-      .where("key", "==", key)
-      .select("value")
-      .limit(1)
-      .executeTakeFirst();
+    const result = await this.db.then((db) =>
+      db
+        .selectFrom("kv")
+        .where("key", "==", key)
+        .select("value")
+        .limit(1)
+        .executeTakeFirst()
+    );
     if (!result?.value) return;
     return JSON.parse(result.value) as KV[T];
   }
 
   async write<T extends keyof KV>(key: T, value: KV[T]) {
-    await this.db()
-      .replaceInto("kv")
-      .values({
-        key,
-        value: JSON.stringify(value),
-        dateModified: Date.now()
-      })
-      .execute();
+    await this.db.then((db) =>
+      db
+        .replaceInto("kv")
+        .values({
+          key,
+          value: JSON.stringify(value),
+          dateModified: Date.now()
+        })
+        .execute()
+    );
   }
 
   async delete<T extends keyof KV>(key: T) {
-    await this.db().deleteFrom("kv").where("key", "==", key).execute();
+    await this.db.then((db) =>
+      db.deleteFrom("kv").where("key", "==", key).execute()
+    );
   }
 
   async clear() {
-    await this.db().deleteFrom("kv").execute();
+    await this.db.then((db) => db.deleteFrom("kv").execute());
   }
 }

@@ -16,7 +16,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { mergeAttributes, Node } from "@tiptap/core";
+import { mergeAttributes, Node, wrappingInputRule } from "@tiptap/core";
+import { inputRegex } from "@tiptap/extension-task-item";
+import { getParentAttributes } from "../../utils/prosemirror.js";
+import { ListItem } from "../list-item/index.js";
 
 export interface CheckListOptions {
   itemTypeName: string;
@@ -77,6 +80,45 @@ export const CheckList = Node.create<CheckListOptions>({
           return commands.toggleList(this.name, this.options.itemTypeName);
         }
     };
+  },
+
+  addInputRules() {
+    const inputRule = wrappingInputRule({
+      find: inputRegex,
+      type: this.type,
+      getAttributes: () => {
+        return getParentAttributes(this.editor, true, true);
+      }
+    });
+    const oldHandler = inputRule.handler;
+    inputRule.handler = ({ state, range, match, chain, can, commands }) => {
+      const $from = state.selection.$from;
+      const parentNode = $from.node($from.depth - 1);
+      if (parentNode.type.name !== ListItem.name) {
+        return;
+      }
+
+      const tr = state.tr;
+      // reset nodes before converting them to a check list.
+      commands.clearNodes();
+
+      oldHandler({
+        state,
+        range: {
+          from: tr.mapping.map(range.from),
+          to: tr.mapping.map(range.to)
+        },
+        match,
+        chain,
+        can,
+        commands
+      });
+
+      tr.setNodeMarkup(state.tr.selection.to - 2, undefined, {
+        checked: match[match.length - 1] === "x"
+      });
+    };
+    return [inputRule];
   },
 
   addKeyboardShortcuts() {

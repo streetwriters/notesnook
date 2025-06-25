@@ -23,9 +23,10 @@ import {
   StackActions,
   useNavigation
 } from "@react-navigation/native";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, TextInput, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+//@ts-ignore
 import ToggleSwitch from "toggle-switch-react-native";
 import { IconButton } from "../../components/ui/icon-button";
 import Input from "../../components/ui/input";
@@ -35,16 +36,26 @@ import Paragraph from "../../components/ui/typography/paragraph";
 import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { SettingStore, useSettingStore } from "../../stores/use-setting-store";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { components } from "./components";
 import { RouteParams, SettingSection } from "./types";
+import Heading from "../../components/ui/typography/heading";
+import { DefaultAppStyles } from "../../utils/styles";
 
 const _SectionItem = ({ item }: { item: SettingSection }) => {
   const { colors } = useThemeColors();
-  const settings = useSettingStore((state) => state.settings);
+  const [settings, itemProperty] = useSettingStore((state) => [
+    state.settings,
+    item.property ? state.settings[item.property] : null
+  ]);
   const navigation = useNavigation<NavigationProp<RouteParams>>();
   const current = item.useHook && item.useHook(item);
-  const isHidden = item.hidden && item.hidden(item.property || current);
+  const [isHidden, setIsHidden] = useState(
+    item.hidden && item.hidden(item.property || current)
+  );
+  const [isDisabled, setIsDisabled] = useState(
+    item.disabled && item.disabled(item.property || current)
+  );
   const inputRef = useRef<TextInput>(null);
   const [loading, setLoading] = useState(false);
 
@@ -62,7 +73,13 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
     SettingsService.set({
       [item.property]: nextValue
     });
-    setImmediate(() => item.onChange?.(nextValue));
+    setImmediate(() => {
+      item.onChange?.(nextValue);
+      item.hidden &&
+        setIsHidden(item.hidden && item.hidden(item.property || current));
+      item.disabled &&
+        setIsDisabled(item.disabled && item.disabled(item.property || current));
+    });
   };
 
   const styles =
@@ -92,20 +109,27 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
     }
   };
 
+  useEffect(() => {
+    setIsHidden(item.hidden && item.hidden(item.property || current));
+    setIsDisabled(item.disabled && item.disabled(item.property || current));
+  }, [current, item, itemProperty]);
+
   return isHidden ? null : (
     <Pressable
-      disabled={item.type === "component"}
+      disabled={item.type === "component" || isDisabled}
       style={{
         width: "100%",
         alignItems: "center",
-        padding: 12,
+        padding: DefaultAppStyles.GAP,
         flexDirection: "row",
         justifyContent: "space-between",
-        paddingVertical: 20,
+        paddingVertical: DefaultAppStyles.GAP,
+        opacity: isDisabled ? 0.5 : 1,
         borderRadius: 0,
         ...styles
       }}
       onPress={async () => {
+        if (isDisabled) return;
         switch (item.type) {
           case "screen":
             {
@@ -167,16 +191,17 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
             paddingRight: item.type === "switch" ? 10 : 0
           }}
         >
-          <Paragraph
+          <Heading
             color={
               item.type === "danger"
                 ? colors.error.paragraph
                 : colors.primary.heading
             }
-            size={SIZE.md + 1}
+            size={AppFontSize.sm}
           >
             {typeof item.name === "function" ? item.name(current) : item.name}
-          </Paragraph>
+          </Heading>
+
           {!!item.description && (
             <Paragraph
               color={
@@ -184,7 +209,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                   ? colors.error.paragraph
                   : colors.primary.paragraph
               }
-              size={SIZE.sm}
+              size={AppFontSize.sm}
             >
               {typeof item.description === "function"
                 ? item.description(current)
@@ -203,22 +228,19 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
             <Input
               {...item.inputProperties}
               onSubmit={(e) => {
-                if (e.nativeEvent.text) {
-                  SettingsService.set({
-                    [item.property as string]: e.nativeEvent.text
-                  });
-                }
+                SettingsService.set({
+                  [item.property as string]: e.nativeEvent.text
+                });
                 item.inputProperties?.onSubmitEditing?.(e);
               }}
+              editable={!isDisabled}
               onChangeText={(text) => {
-                if (text) {
-                  SettingsService.set({
-                    [item.property as string]: text
-                  });
-                }
+                SettingsService.set({
+                  [item.property as string]: text
+                });
                 item.inputProperties?.onSubmitEditing?.(text as any);
               }}
-              containerStyle={{ marginTop: 12 }}
+              containerStyle={{ marginTop: DefaultAppStyles.GAP_VERTICAL }}
               fwdRef={inputRef}
               onLayout={() => {
                 inputRef?.current?.setNativeProps({
@@ -237,13 +259,14 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                marginTop: 12
+                marginTop: DefaultAppStyles.GAP_VERTICAL
               }}
             >
               <IconButton
                 name="minus"
                 color={colors.primary.icon}
                 onPress={() => {
+                  if (isDisabled) return;
                   const rawValue = SettingsService.get()[
                     item.property as keyof SettingStore["settings"]
                   ] as string;
@@ -258,7 +281,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                     updateInput(nextValue);
                   }
                 }}
-                size={SIZE.xl}
+                size={AppFontSize.xl}
               />
               <Input
                 {...item.inputProperties}
@@ -266,18 +289,24 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                   onChangeInputSelectorValue(e.nativeEvent.text);
                   item.inputProperties?.onSubmitEditing?.(e);
                 }}
+                editable={!isDisabled}
                 onChangeText={(text) => {
                   onChangeInputSelectorValue(text);
                   item.inputProperties?.onSubmitEditing?.(text as any);
                 }}
                 keyboardType="decimal-pad"
                 containerStyle={{
-                  width: 65
+                  width: 60
+                }}
+                inputStyle={{
+                  width: 60,
+                  textAlign: "center"
                 }}
                 wrapperStyle={{
-                  maxWidth: 65,
+                  maxWidth: 60,
+                  flexGrow: 0,
                   marginBottom: 0,
-                  marginHorizontal: 6
+                  marginHorizontal: DefaultAppStyles.GAP_SMALL
                 }}
                 fwdRef={inputRef}
                 onLayout={() => {
@@ -291,6 +320,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                 name="plus"
                 color={colors.primary.icon}
                 onPress={() => {
+                  if (isDisabled) return;
                   const rawValue = SettingsService.get()[
                     item.property as keyof SettingStore["settings"]
                   ] as string;
@@ -305,7 +335,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                     updateInput(nextValue);
                   }
                 }}
-                size={SIZE.xl}
+                size={AppFontSize.xl}
               />
             </View>
           )}
@@ -320,7 +350,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
               : settings[item?.property as never]
           }
           onColor={colors.primary.accent}
-          offColor={colors.secondary.icon}
+          offColor={colors.primary.icon}
           size="small"
           animationSpeed={150}
           onToggle={onChangeSettings}
@@ -328,7 +358,10 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
       )}
 
       {loading ? (
-        <ActivityIndicator size={SIZE.xxl} color={colors.primary.accent} />
+        <ActivityIndicator
+          size={AppFontSize.xxl}
+          color={colors.primary.accent}
+        />
       ) : null}
     </Pressable>
   );

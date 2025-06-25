@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { DATE_FORMATS, TIME_FORMATS } from "@notesnook/core";
-import { getFontById, getFonts } from "@notesnook/editor/dist/utils/font";
+import { getFontById, getFonts } from "@notesnook/editor/dist/cjs/utils/font";
 import dayjs from "dayjs";
 import { createSettingsPicker } from ".";
 import { db } from "../../../common/database";
@@ -33,7 +33,6 @@ import { strings } from "@notesnook/intl";
 export const FontPicker = createSettingsPicker({
   getValue: () => useSettingStore.getState().settings.defaultFontFamily,
   updateValue: (item) => {
-    console.log(item.id);
     SettingsService.set({
       defaultFontFamily: item.id
     });
@@ -49,19 +48,38 @@ export const FontPicker = createSettingsPicker({
 export const HomePicker = createSettingsPicker({
   getValue: () => useSettingStore.getState().settings.homepage,
   updateValue: (item) => {
-    SettingsService.set({ homepage: item.name });
+    SettingsService.set({ homepage: item.title });
     ToastManager.show({
-      heading: strings.homePageChangedTo(item.name),
+      heading: strings.homePageChangedTo(item.title),
       message: strings.restartAppToApplyChanges(),
       type: "success"
     });
   },
   formatValue: (item) => {
-    return strings.routes[typeof item === "object" ? item.name : item]();
+    return strings.routes[typeof item === "object" ? item.title : item]?.();
   },
-  getItemKey: (item) => item.name,
+  getItemKey: (item) => item.title,
   options: MenuItemsList.slice(0, MenuItemsList.length - 1),
-  compareValue: (current, item) => current === item.name,
+  compareValue: (current, item) => current === item.title,
+  premium: true
+});
+
+export const SidebarTabPicker = createSettingsPicker({
+  getValue: () => useSettingStore.getState().settings.defaultSidebarTab,
+  updateValue: (item) => {
+    SettingsService.set({ defaultSidebarTab: item });
+  },
+  formatValue: (item) => {
+    const SidebarTabs = [
+      strings.routes.Home(),
+      strings.routes.Notebooks(),
+      strings.routes.Tags()
+    ];
+    return SidebarTabs[item];
+  },
+  getItemKey: (item) => item,
+  options: [0, 1, 2],
+  compareValue: (current, item) => current === item,
   premium: true
 });
 
@@ -75,7 +93,7 @@ export const TrashIntervalPicker = createSettingsPicker({
       ? strings.never()
       : item === 1
       ? strings.reminderRecurringMode.day()
-      : item + " " + strings.days();
+      : strings.days(item);
   },
   getItemKey: (item) => item.toString(),
   options: [-1, 1, 7, 30, 365],

@@ -1,0 +1,8 @@
+- v3.1.0 brings new features and improvements to enhance your Notesnook experience.
+- Notebooks and Tags are not located in the Sidebar
+- Tree view for notebooks
+- Improved list view UI for better user experience
+- Improved notebook related actions by integrating tree view in most places
+- You can set any notebook, tag or colors as home screen
+
+Thank you for using Notesnook!

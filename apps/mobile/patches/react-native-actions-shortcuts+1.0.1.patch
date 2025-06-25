@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-actions-shortcuts/android/build.gradle b/node_modules/react-native-actions-shortcuts/android/build.gradle
-index 19bd311..d15cdaf 100644
+index 19bd311..bc37238 100644
 --- a/node_modules/react-native-actions-shortcuts/android/build.gradle
 +++ b/node_modules/react-native-actions-shortcuts/android/build.gradle
 @@ -29,7 +29,7 @@ android {
@@ -7,7 +7,7 @@ index 19bd311..d15cdaf 100644
    buildToolsVersion getExtOrDefault('buildToolsVersion')
    defaultConfig {
 -    minSdkVersion 16
-+    minSdkVersion 21
++    minSdkVersion getExtOrDefault('minSdkVersion')
      targetSdkVersion getExtOrIntegerDefault('targetSdkVersion')
      versionCode 1
      versionName "1.0"

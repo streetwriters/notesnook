@@ -40,10 +40,12 @@ test("remove color", async ({ page }) => {
   const notes = await app.goToNotes();
   const note = await notes.createNote(NOTE);
   await note?.contextMenu.newColor({ title: "red", color: "#ff0000" });
+  await app.navigation.waitForItem("red");
   const colorItem = await app.navigation.findItem("red");
 
   await colorItem?.removeColor();
 
+  await expect(colorItem!.locator).toBeHidden();
   expect(await app.navigation.findItem("red")).toBeUndefined();
   expect(await note?.contextMenu.isColored("red")).toBe(false);
 });
@@ -54,6 +56,7 @@ test("rename color", async ({ page }) => {
   const notes = await app.goToNotes();
   const note = await notes.createNote(NOTE);
   await note?.contextMenu.newColor({ title: "red", color: "#ff0000" });
+  await app.navigation.waitForItem("red");
   const colorItem = await app.navigation.findItem("red");
 
   await colorItem?.renameColor("priority-33");
@@ -73,8 +76,6 @@ test("creating a color shouldn't be possible on basic plan", async ({
   await note?.contextMenu.newColor({ title: "red", color: "#ff0000" });
 
   expect(
-    await app.toasts.waitForToast(
-      "Please upgrade your account to Pro to add colors."
-    )
+    await app.toasts.waitForToast("Upgrade to Notesnook Pro to add colors.")
   ).toBe(true);
 });

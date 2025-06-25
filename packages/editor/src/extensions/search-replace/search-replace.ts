@@ -63,9 +63,7 @@ export type SearchStorage = {
 interface TextNodesWithPosition {
   text: string;
   startPos: number;
-  endPos: number;
   start: number;
-  end: number;
 }
 
 const updateView = (state: EditorState, dispatch: DispatchFn) => {
@@ -113,14 +111,11 @@ function searchDocument(
     if (node.isText) {
       if (textNodesWithPosition[index]) {
         textNodesWithPosition[index].text += node.text;
-        textNodesWithPosition[index].end = cursor + (node.text?.length || 0);
       } else {
         textNodesWithPosition[index] = {
           text: node.text || "",
           startPos: pos,
-          endPos: pos + node.nodeSize,
-          start: cursor,
-          end: cursor + (node.text?.length || 0)
+          start: cursor
         };
       }
       cursor += node.text?.length || 0;
@@ -128,8 +123,6 @@ function searchDocument(
       const lastNode = textNodesWithPosition[index];
       if (lastNode) {
         lastNode.text += "\n";
-        lastNode.end++;
-        lastNode.endPos = pos;
         cursor++;
       }
       index++;
@@ -145,7 +138,7 @@ function searchDocument(
     // search term in them. This adds support for multi line regex searches.
     const nodes = textNodesWithPosition.filter((node) => {
       const nodeStart = node.start;
-      const nodeEnd = node.end;
+      const nodeEnd = nodeStart + node.text.length;
       return (
         (start >= nodeStart && start < nodeEnd) ||
         (end >= nodeStart && end < nodeEnd)
@@ -157,8 +150,9 @@ function searchDocument(
     const startNode = nodes[0];
     results.push({
       // reposition our RegExp match index relative to the actual node.
-      from: start + (startNode.startPos - startNode.start),
-      to: end + (endNode.endPos - endNode.end)
+      from:
+        startNode.startPos + /*offset in startNode=*/ (start - startNode.start),
+      to: endNode.startPos + /*length inside endNode=*/ (end - endNode.start)
     });
   }
 
@@ -262,6 +256,9 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
       endSearch:
         () =>
         ({ state, dispatch }) => {
+          this.storage.results = [];
+          this.storage.selectedIndex = 0;
+          state.tr.setMeta("selectedIndex", 0);
           state.tr.setMeta("isSearching", false);
           if (dispatch) updateView(state, dispatch);
           return this.options.onEndSearch();

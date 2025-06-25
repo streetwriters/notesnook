@@ -258,6 +258,15 @@ function LanguageSelector(props: LanguageSelectorProps) {
             zIndex: 999,
             mt: 1
           }}
+          onKeyDown={(e: React.KeyboardEvent) => {
+            if (e.key === "Enter" && languages.length > 0) {
+              onLanguageSelected(languages[0].filename);
+              e.preventDefault();
+            } else if (e.key === "Escape") {
+              onClose();
+              e.preventDefault();
+            }
+          }}
           onChange={(e) => {
             if (!e.target.value) return setLanguages(Languages);
             const query = e.target.value.toLowerCase();

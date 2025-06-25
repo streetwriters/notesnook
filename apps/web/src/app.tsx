@@ -17,69 +17,111 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useState, Suspense, useRef, useEffect } from "react";
+import { useState, Suspense, useEffect, useRef } from "react";
 import { Box, Flex } from "@theme-ui/components";
 import { ScopedThemeProvider } from "./components/theme-provider";
 import useMobile from "./hooks/use-mobile";
 import useTablet from "./hooks/use-tablet";
 import { useStore } from "./stores/app-store";
+import { useStore as useSettingStore } from "./stores/setting-store";
 import { Toaster } from "react-hot-toast";
 import NavigationMenu from "./components/navigation-menu";
 import StatusBar from "./components/status-bar";
-import { EditorLoader } from "./components/loaders/editor-loader";
 import { FlexScrollContainer } from "./components/scroll-container";
 import CachedRouter from "./components/cached-router";
 import { WebExtensionRelay } from "./utils/web-extension-relay";
 import {
-  PanelGroup,
-  Panel,
-  PanelResizeHandle,
-  ImperativePanelHandle
-} from "react-resizable-panels";
+  Pane,
+  SplitPane,
+  SplitPaneImperativeHandle
+} from "./components/split-pane";
 import GlobalMenuWrapper from "./components/global-menu-wrapper";
+import AppEffects from "./app-effects";
+import HashRouter from "./components/hash-router";
+import { useWindowFocus } from "./hooks/use-window-focus";
+import { Global } from "@emotion/react";
+import { isMac } from "./utils/platform";
+import useSlider from "./hooks/use-slider";
+import { AppEventManager, AppEvents } from "./common/app-events";
+import { TITLE_BAR_HEIGHT } from "./components/title-bar";
+import { getFontSizes } from "@notesnook/theme/theme/font/fontsize.js";
+import { useWindowControls } from "./hooks/use-window-controls";
+import { STATUS_BAR_HEIGHT } from "./common/constants";
+import { NavigationEvents } from "./navigation";
 
 new WebExtensionRelay();
 
-// const GlobalMenuWrapper = React.lazy(
-//   () => import("./components/global-menu-wrapper")
-// );
-const AppEffects = React.lazy(() => import("./app-effects"));
-const MobileAppEffects = React.lazy(() => import("./app-effects.mobile"));
-const HashRouter = React.lazy(() => import("./components/hash-router"));
-
 function App() {
   const isMobile = useMobile();
-  const [show, setShow] = useState(true);
   const isFocusMode = useStore((store) => store.isFocusMode);
+  const { isFocused } = useWindowFocus();
+  const { isFullscreen } = useWindowControls();
+  const hasNativeTitlebar =
+    useSettingStore.getState().desktopIntegrationSettings?.nativeTitlebar;
+  console.timeEnd("loading app");
 
   return (
     <>
+      {isFocused ? null : (
+        <Global
+          styles={`
+          .nav-pane {
+            opacity: 0.7;
+          }
+        `}
+        />
+      )}
+      {IS_DESKTOP_APP && isMac() && !isFullscreen && !hasNativeTitlebar ? (
+        <Global
+          // These styles to make sure the app content doesn't overlap with the traffic lights.
+          styles={`
+            .nav-pane .theme-scope-navigationMenu,
+            .mobile-nav-pane .theme-scope-navigationMenu {
+              padding-top: env(titlebar-area-height) !important;
+            }
+            .editor-pane:first-of-type .editor-action-bar,
+            .mobile-editor-pane.pane-active .editor-action-bar,
+            .mobile-list-pane.pane-active .route-container-header {
+                padding-left: 80px;
+            }
+            .route-container-header, .editor-action-bar {
+                transition: padding-left 0.4s ease-out;
+            }
+            .editor-action-bar {
+              border-bottom: none;
+            }
+            .route-container-header .routeHeader {
+              font-size: ${getFontSizes().title};
+            }
+            // .global-split-pane .react-split__sash {
+            //   height: calc(100% - ${TITLE_BAR_HEIGHT}px);
+            // }
+          `}
+        />
+      ) : null}
+
       <Suspense fallback={<div style={{ display: "none" }} />}>
         <div id="menu-wrapper">
           <GlobalMenuWrapper />
         </div>
-        <AppEffects setShow={setShow} />
-        {isMobile && (
-          <MobileAppEffects
-            sliderId="slider"
-            overlayId="overlay"
-            setShow={setShow}
-          />
-        )}
       </Suspense>
+      <AppEffects />
 
       <Flex
         id="app"
         bg="background"
         className={isFocusMode ? "app-focus-mode" : ""}
-        sx={{ overflow: "hidden", flexDirection: "column", height: "100%" }}
+        sx={{
+          overflow: "hidden",
+          flexDirection: "column",
+          height: "100%"
+        }}
       >
-        {isMobile ? (
-          <MobileAppContents />
-        ) : (
-          <DesktopAppContents setShow={setShow} show={show} />
-        )}
-        <Toaster containerClassName="toasts-container" />
+        {isMobile ? <MobileAppContents /> : <DesktopAppContents />}
+        <Toaster
+          containerClassName="toasts-container"
+          containerStyle={{ bottom: STATUS_BAR_HEIGHT + 10 }}
+        />
       </Flex>
     </>
   );
@@ -87,63 +129,50 @@ function App() {
 
 export default App;
 
-type SuspenseLoaderProps<TComponent extends React.JSXElementConstructor<any>> =
-  {
-    condition: boolean;
-    props?: React.ComponentProps<TComponent>;
-    component: TComponent;
-    fallback: JSX.Element;
-  };
-
-function SuspenseLoader<TComponent extends React.JSXElementConstructor<any>>({
-  condition,
-  props,
-  component,
-  fallback
-}: SuspenseLoaderProps<TComponent>) {
-  if (!condition) return fallback;
-
-  const Component = component as (
-    props: any
-  ) => React.ReactComponentElement<any, any>;
-  return (
-    <Suspense fallback={IS_DESKTOP_APP ? null : fallback}>
-      <Component {...props} />
-    </Suspense>
-  );
-}
-
-type DesktopAppContentsProps = {
-  show: boolean;
-  setShow: (show: boolean) => void;
-};
-function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
+function DesktopAppContents() {
   const isFocusMode = useStore((store) => store.isFocusMode);
+  const isListPaneVisible = useStore((store) => store.isListPaneVisible);
   const isTablet = useTablet();
-  const [isNarrow, setIsNarrow] = useState(isTablet || false);
-  const navPane = useRef<ImperativePanelHandle>(null);
-  const middlePane = useRef<ImperativePanelHandle>(null);
+  const navPane = useRef<SplitPaneImperativeHandle>(null);
 
   useEffect(() => {
-    const size = navPane.current?.getSize();
-    // Toggle `isNarrow` to true if panel size isn't set to narrow by user 
-    setIsNarrow((size && size <= 5) || isTablet);
+    if (isTablet) navPane.current?.collapse(0);
+    else if (navPane.current?.isCollapsed(0)) navPane.current?.expand(0);
   }, [isTablet]);
 
-  // useEffect(() => {
-  //   if (show) middlePane.current?.expand();
-  //   else middlePane.current?.collapse();
-  // }, [show]);
+  useEffect(() => {
+    const event = AppEventManager.subscribe(
+      AppEvents.revealItemInList,
+      async (id?: string) => {
+        if (!useStore.getState().isListPaneVisible) {
+          useStore.getState().toggleListPane(true);
+          setTimeout(() => {
+            AppEventManager.publish(AppEvents.revealItemInList, id);
+          }, 500);
+        }
+      }
+    );
 
-  // useEffect(() => {
-  //   if (isFocusMode) {
-  //     const middlePaneSize = middlePane.current?.getSize() || 20;
-  //     navPane.current?.collapse();
-  //     // the middle pane has to be resized because collapsing the nav
-  //     // pane increases the middle pane's size every time.
-  //     middlePane.current?.resize(middlePaneSize);
-  //   } else navPane.current?.expand();
-  // }, [isFocusMode]);
+    const navEvent = NavigationEvents.subscribe("onNavigate", () => {
+      useStore.getState().toggleListPane(true);
+    });
+    return () => {
+      navEvent.unsubscribe();
+      event.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isListPaneVisible) {
+      if (navPane.current?.hasExpandedSize(1)) {
+        navPane.current?.expand(1);
+      } else {
+        navPane.current?.reset(1);
+      }
+    } else {
+      navPane.current?.collapse(1);
+    }
+  }, [isListPaneVisible]);
 
   return (
     <>
@@ -153,81 +182,72 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
           overflow: "hidden"
         }}
       >
-        <PanelGroup autoSaveId="global-panel-group" direction="horizontal">
-          {!isFocusMode && isTablet ? (
-            <Flex sx={{ width: 50 }}>
-              <NavigationMenu
-                toggleNavigationContainer={(state) => {
-                  setShow(state || !show);
-                }}
-                isTablet={isNarrow}
-              />
-            </Flex>
-          ) : (
-            !isFocusMode && (
-              <>
-                <Panel
-                  ref={navPane}
-                  order={1}
-                  className="nav-pane"
-                  defaultSize={10}
-                  minSize={3.5}
-                  // maxSize={isNarrow ? 5 : undefined}
-                  onResize={(size) => setIsNarrow(size <= 5)}
-                  collapsible
-                  collapsedSize={3.5}
-                >
-                  <NavigationMenu
-                    toggleNavigationContainer={(state) => {
-                      setShow(state || !show);
-                    }}
-                    isTablet={isNarrow}
-                  />
-                </Panel>
-                <PanelResizeHandle className="panel-resize-handle" />
-              </>
-            )
-          )}
-          {!isFocusMode && show && (
-            <>
-              <Panel
-                ref={middlePane}
-                className="middle-pane"
-                order={2}
-                collapsible
-                defaultSize={20}
-              >
-                <ScopedThemeProvider
-                  className="listMenu"
-                  scope="list"
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    flex: 1,
-                    bg: "background",
-                    borderRight: "1px solid var(--separator)"
-                  }}
-                >
-                  <CachedRouter />
-                </ScopedThemeProvider>
-              </Panel>
-              <PanelResizeHandle className="panel-resize-handle" />
-            </>
-          )}
-          <Panel className="editor-pane" order={3} defaultSize={70}>
-            <Flex
-              sx={{
-                display: "flex",
-                overflow: "hidden",
-                flex: 1,
-                flexDirection: "column",
-                bg: "background"
+        <SplitPane
+          className="global-split-pane"
+          ref={navPane}
+          autoSaveId="global-panel-group"
+          direction="vertical"
+          onChange={(sizes) => {
+            useStore.setState({
+              isNavPaneCollapsed: sizes[0] <= 70,
+              isListPaneVisible: sizes[1] > 5 // we keep a 5px margin just to be safe
+            });
+          }}
+        >
+          {isFocusMode ? null : (
+            <Pane
+              id="nav-pane"
+              initialSize={isTablet ? 0 : 250}
+              className={`nav-pane`}
+              snapSize={150}
+              minSize={50}
+              maxSize={isTablet ? 0 : 500}
+              style={{
+                overflow: "initial",
+                zIndex: 3
               }}
             >
-              {<HashRouter />}
-            </Flex>
-          </Panel>
-        </PanelGroup>
+              <NavigationMenu onExpand={() => navPane.current?.reset(0)} />
+            </Pane>
+          )}
+          {isFocusMode ? null : (
+            <Pane
+              id="list-pane"
+              initialSize={380}
+              style={{ flex: 1, display: "flex" }}
+              snapSize={120}
+              maxSize={500}
+              className="list-pane"
+            >
+              <ScopedThemeProvider
+                className="listMenu"
+                scope="list"
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  flex: 1,
+                  bg: "background",
+                  borderRight: "1px solid var(--separator)"
+                }}
+              >
+                <CachedRouter />
+              </ScopedThemeProvider>
+            </Pane>
+          )}
+          <Pane
+            id="editor-pane"
+            className="editor-pane"
+            style={{
+              flex: 1,
+              display: "flex",
+              backgroundColor: "var(--background)",
+              overflow: "hidden",
+              flexDirection: "column"
+            }}
+          >
+            {<HashRouter />}
+          </Pane>
+        </SplitPane>
       </Flex>
       <StatusBar />
     </>
@@ -235,8 +255,46 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
 }
 
 function MobileAppContents() {
+  const { ref, slideToIndex } = useSlider({
+    onSliding: (_e, { position }) => {
+      const offset = 70;
+      const width = 300;
+
+      const percent = offset - (position / width) * offset;
+      const overlay = document.getElementById("overlay");
+      if (!overlay) return;
+      if (percent > 0) {
+        overlay.style.opacity = `${percent}%`;
+        overlay.style.pointerEvents = "all";
+      } else {
+        overlay.style.opacity = "0%";
+        overlay.style.pointerEvents = "none";
+      }
+    },
+    onChange: (e, { slide, lastSlide }) => {
+      slide.node.classList.add("pane-active");
+      lastSlide?.node.classList.remove("pane-active");
+    }
+  });
+
+  useEffect(() => {
+    const toggleSideMenuEvent = AppEventManager.subscribe(
+      AppEvents.toggleSideMenu,
+      (state) => slideToIndex(state ? 0 : 1)
+    );
+    const toggleEditorEvent = AppEventManager.subscribe(
+      AppEvents.toggleEditor,
+      (state) => slideToIndex(state ? 2 : 1)
+    );
+    return () => {
+      toggleSideMenuEvent.unsubscribe();
+      toggleEditorEvent.unsubscribe();
+    };
+  }, [slideToIndex]);
+
   return (
     <FlexScrollContainer
+      scrollRef={ref}
       id="slider"
       suppressScrollX
       style={{
@@ -253,17 +311,18 @@ function MobileAppContents() {
       }}
     >
       <Flex
+        className="mobile-nav-pane"
         sx={{
           scrollSnapAlign: "start",
           scrollSnapStop: "always",
-          width: [300, 60],
+          width: 300,
           flexShrink: 0
         }}
       >
-        <NavigationMenu toggleNavigationContainer={() => {}} isTablet={false} />
+        <NavigationMenu />
       </Flex>
       <Flex
-        className="listMenu"
+        className="mobile-list-pane"
         variant="columnFill"
         sx={{
           position: "relative",
@@ -276,6 +335,7 @@ function MobileAppContents() {
         <CachedRouter />
         <Box
           id="overlay"
+          onClick={() => slideToIndex(1)}
           sx={{
             position: "absolute",
             width: "100%",
@@ -291,6 +351,7 @@ function MobileAppContents() {
         />
       </Flex>
       <Flex
+        className="mobile-editor-pane"
         sx={{
           scrollSnapAlign: "start",
           scrollSnapStop: "always",
@@ -299,11 +360,7 @@ function MobileAppContents() {
           width: "100vw"
         }}
       >
-        <SuspenseLoader
-          fallback={<EditorLoader />}
-          component={HashRouter}
-          condition={true}
-        />
+        <HashRouter />
       </Flex>
     </FlexScrollContainer>
   );

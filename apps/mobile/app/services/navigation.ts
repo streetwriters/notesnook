@@ -31,8 +31,13 @@ import { useReminderStore } from "../stores/use-reminder-store";
 import { useTagStore } from "../stores/use-tag-store";
 import { useTrashStore } from "../stores/use-trash-store";
 import { eOnRefreshSearch, eUpdateNotebookRoute } from "../utils/events";
-import { rootNavigatorRef, tabBarRef } from "../utils/global-refs";
+import {
+  appNavigatorRef,
+  fluidTabsRef,
+  rootNavigatorRef
+} from "../utils/global-refs";
 import { eSendEvent } from "./event-manager";
+import { useArchivedStore } from "../stores/use-archived-store";
 
 /**
  * Routes that should be updated on focus
@@ -59,7 +64,12 @@ const routeNames = {
   AppLock: "AppLock",
   Login: "Login",
   Signup: "Signup",
-  Reminders: "Reminders"
+  Reminders: "Reminders",
+  MoveNotebook: "MoveNotebook",
+  LinkNotebooks: "LinkNotebooks",
+  MoveNotes: "MoveNotes",
+  Archive: "Archive",
+  ManageTags: "ManageTags"
 };
 
 export type NavigationProps<T extends RouteName> = NativeStackScreenProps<
@@ -85,7 +95,8 @@ const routeUpdateFunctions: {
   TopicNotes: (params) => eSendEvent("TopicNotes", params),
   Monographs: (params) => eSendEvent("Monographs", params),
   Reminders: () => useReminderStore.getState().refresh(),
-  Search: () => eSendEvent(eOnRefreshSearch)
+  Search: () => eSendEvent(eOnRefreshSearch),
+  Archive: () => useArchivedStore.getState().refresh()
 };
 
 function clearRouteFromQueue(routeName: RouteName) {
@@ -137,19 +148,21 @@ function push<T extends RouteName>(screen: T, params: RouteParams[T]) {
 
 function replace<T extends RouteName>(screen: T, params: RouteParams[T]) {
   console.log(`Navigation.replace ${screen} route`);
-  rootNavigatorRef.current?.dispatch(StackActions.replace(screen, params));
+  rootNavigatorRef.current?.dispatch(
+    StackActions.replace(screen as string, params)
+  );
 }
 
 function popToTop() {
   console.log(`Navigation.popToTop`);
-  rootNavigatorRef.current?.dispatch(StackActions.popToTop());
+  appNavigatorRef.current?.dispatch(StackActions.popToTop());
 }
 
 function openDrawer() {
-  tabBarRef.current?.openDrawer();
+  fluidTabsRef.current?.openDrawer();
 }
 function closeDrawer() {
-  tabBarRef.current?.closeDrawer();
+  fluidTabsRef.current?.closeDrawer();
 }
 
 const Navigation = {

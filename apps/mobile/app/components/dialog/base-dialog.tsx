@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { ScopedThemeProvider } from "@notesnook/theme";
 import React, { PropsWithChildren, useEffect, useRef, useState } from "react";
 import {
   ColorValue,
@@ -30,15 +31,12 @@ import {
 } from "react-native";
 import useIsFloatingKeyboard from "../../hooks/use-is-floating-keyboard";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { BouncingView } from "../ui/transitions/bouncing-view";
-import { ScopedThemeProvider } from "@notesnook/theme";
-import SettingsService from "../../services/settings";
 import { useUserStore } from "../../stores/use-user-store";
-import { useAppState } from "../../hooks/use-app-state";
+import { BouncingView } from "../ui/transitions/bouncing-view";
 
 export interface BaseDialogProps extends PropsWithChildren {
   animation?: "fade" | "none" | "slide" | undefined;
-  visible: boolean;
+  visible?: boolean;
   onRequestClose?: () => void;
   onShow?: () => void;
   premium?: boolean;
@@ -75,9 +73,9 @@ const BaseDialog = ({
   background
 }: BaseDialogProps) => {
   const floating = useIsFloatingKeyboard();
-  const appState = useAppState();
   const lockEvents = useRef(false);
   const [internalVisible, setIntervalVisible] = useState(true);
+  const locked = useUserStore((state) => state.appLocked);
 
   useEffect(() => {
     return () => {
@@ -86,26 +84,20 @@ const BaseDialog = ({
   }, []);
 
   useEffect(() => {
-    if (useUserStore.getState().disableAppLockRequests) return;
-
-    if (SettingsService.canLockAppInBackground()) {
-      if (appState === "background") {
-        setIntervalVisible(false);
-        if (useUserStore.getState().appLocked) {
-          lockEvents.current = true;
-          const unsub = useUserStore.subscribe((state) => {
-            if (!state.appLocked) {
-              setIntervalVisible(true);
-              unsub();
-              setTimeout(() => {
-                lockEvents.current = false;
-              });
-            }
+    if (locked) {
+      setIntervalVisible(false);
+      lockEvents.current = true;
+      const unsub = useUserStore.subscribe((state) => {
+        if (!state.appLocked) {
+          setIntervalVisible(true);
+          unsub();
+          setTimeout(() => {
+            lockEvents.current = false;
           });
         }
-      }
+      });
     }
-  }, [appState]);
+  }, [locked]);
 
   const Wrapper = useSafeArea ? SafeAreaView : View;
 

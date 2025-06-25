@@ -188,3 +188,7 @@ pre {
 .docgen-content {
   box-shadow: none;
 }
+
+nav details[open] {
+  max-height: max-content;
+}

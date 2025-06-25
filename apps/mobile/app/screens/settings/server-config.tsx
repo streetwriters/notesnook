@@ -31,8 +31,14 @@ import { ToastManager } from "../../services/event-manager";
 import SettingsService from "../../services/settings";
 import { HostId, HostIds } from "../../stores/use-setting-store";
 import { useUserStore } from "../../stores/use-user-store";
+import { DefaultAppStyles } from "../../utils/styles";
 
-export const ServerIds = ["notesnook-sync", "auth", "sse"] as const;
+export const ServerIds = [
+  "notesnook-sync",
+  "auth",
+  "sse",
+  "monograph"
+] as const;
 export type ServerId = (typeof ServerIds)[number];
 type Server = {
   id: ServerId;
@@ -40,6 +46,7 @@ type Server = {
   title: string;
   example: string;
   description: string;
+  versionEndpoint: string;
 };
 type VersionResponse = {
   version: number;
@@ -52,21 +59,32 @@ const SERVERS: Server[] = [
     host: "API_HOST",
     title: strings.syncServer(),
     example: "http://localhost:4326",
-    description: strings.syncServerDesc()
+    description: strings.syncServerDesc(),
+    versionEndpoint: "/version"
   },
   {
     id: "auth",
     host: "AUTH_HOST",
     title: strings.authServer(),
     example: "http://localhost:5326",
-    description: strings.authServerDesc()
+    description: strings.authServerDesc(),
+    versionEndpoint: "/version"
   },
   {
     id: "sse",
     host: "SSE_HOST",
     title: strings.sseServer(),
     example: "http://localhost:7326",
-    description: strings.sseServerDesc()
+    description: strings.sseServerDesc(),
+    versionEndpoint: "/version"
+  },
+  {
+    id: "monograph",
+    host: "MONOGRAPH_HOST",
+    title: strings.monographServer(),
+    example: "http://localhost:6326",
+    description: strings.monographServerDesc(),
+    versionEndpoint: "/api/version"
   }
 ];
 export function ServersConfiguration() {
@@ -81,9 +99,9 @@ export function ServersConfiguration() {
   return (
     <View
       style={{
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         gap: 12,
-        marginTop: 12
+        marginTop: DefaultAppStyles.GAP_VERTICAL
       }}
     >
       {isLoggedIn ? (
@@ -111,7 +129,7 @@ export function ServersConfiguration() {
         {error ? (
           <Paragraph
             style={{
-              paddingVertical: 12
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL
             }}
             color={colors.error.paragraph}
           >
@@ -122,41 +140,50 @@ export function ServersConfiguration() {
         {success === true ? (
           <Paragraph
             style={{
-              paddingVertical: 12
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL
             }}
             color={colors.success.paragraph}
           >
             {strings.connectedToServer()}
           </Paragraph>
         ) : null}
-        <View style={{ marginTop: 1, justifyContent: "flex-end", gap: 12 }}>
+        <View
+          style={{
+            marginTop: 1,
+            justifyContent: "flex-end",
+            gap: DefaultAppStyles.GAP_VERTICAL
+          }}
+        >
           <Button
             disabled={isLoggedIn}
             type="secondary"
             width="100%"
             onPress={async () => {
+              setError(undefined);
               try {
                 for (const host of HostIds) {
                   const url = urls[host];
                   const server = SERVERS.find((s) => s.host === host)!;
+                  if (!server) throw new Error(strings.serverNotFound(host));
                   if (!url) throw new Error(strings.allServerUrlsRequired());
-                  const version = await fetch(`${url}/version`)
+                  const version = await fetch(`${url}${server.versionEndpoint}`)
                     .then((r) => r.json() as Promise<VersionResponse>)
                     .catch(() => undefined);
                   if (!version)
                     throw new Error(
-                      `${strings.couldNotConnectTo()} ${server.title}.`
+                      `${strings.couldNotConnectTo(server.title)}`
                     );
                   if (version.id !== server.id)
                     throw new Error(
-                      `${strings.incorrectServerUrl(url)} ${server.title}.`
+                      `${strings.incorrectServerUrl(url, server.title)}.`
                     );
                   if (!isServerCompatible(version.version)) {
-                    throw new Error(strings.serverVersionMismatch());
+                    throw new Error(
+                      strings.serverVersionMismatch(server.title, url)
+                    );
                   }
                 }
                 setSuccess(true);
-                setError(undefined);
               } catch (e) {
                 setError((e as Error).message);
               }

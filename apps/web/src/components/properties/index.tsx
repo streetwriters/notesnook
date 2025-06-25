@@ -28,9 +28,13 @@ import {
   Circle,
   Checkmark,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  LinkedTo,
+  ReferencedIn as ReferencedInIcon,
+  Note as NoteIcon,
+  Archive
 } from "../icons";
-import { Box, Button, Flex, Text } from "@theme-ui/components";
+import { Box, Button, Flex, Text, FlexProps } from "@theme-ui/components";
 import {
   useEditorStore,
   ReadonlyEditorSession,
@@ -39,14 +43,14 @@ import {
 import { db } from "../../common/db";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { store as noteStore } from "../../stores/note-store";
-import { AnimatedFlex } from "../animated";
 import Toggle from "./toggle";
 import ScrollContainer from "../scroll-container";
 import {
   getFormattedDate,
   usePromise,
   ResolvedItem,
-  useResolvedItem
+  useResolvedItem,
+  useUnresolvedItem
 } from "@notesnook/common";
 import { ScopedThemeProvider } from "../theme-provider";
 import { ListItemWrapper } from "../list-container/list-profiles";
@@ -54,6 +58,7 @@ import { VirtualizedList } from "../virtualized-list";
 import { SessionItem } from "../session-item";
 import {
   ContentBlock,
+  InternalLink,
   Note,
   VirtualizedGrouping,
   createInternalLink,
@@ -78,6 +83,12 @@ const tools = [
     icon: Readonly,
     label: strings.readOnly(),
     property: "readonly"
+  },
+  {
+    key: "archive",
+    icon: Archive,
+    label: strings.archive(),
+    property: "archived"
   },
   {
     key: "local-only",
@@ -113,29 +124,20 @@ function EditorProperties(props: EditorPropertiesProps) {
   const toggleProperties = useEditorStore((store) => store.toggleProperties);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const session = useEditorStore((store) =>
-    store.getSession(props.sessionId, ["default", "readonly", "deleted"])
+    store.getSession(props.sessionId, [
+      "default",
+      "readonly",
+      "deleted",
+      "diff"
+    ])
   );
   if (isFocusMode || !session) return null;
   return (
-    <AnimatedFlex
-      animate={{
-        x: 0
-      }}
-      transition={{
-        duration: 0.1,
-        bounceDamping: 1,
-        bounceStiffness: 1,
-        ease: "easeOut"
-      }}
-      initial={{ x: 600 }}
+    <Flex
       sx={{
         display: "flex",
-        position: "absolute",
-        top: TITLE_BAR_HEIGHT,
-        right: 0,
-        zIndex: 999,
         height: "100%",
-        width: "300px",
+        width: "100%",
         borderLeft: "1px solid",
         borderLeftColor: "border"
       }}
@@ -152,82 +154,97 @@ function EditorProperties(props: EditorPropertiesProps) {
         }}
       >
         <ScrollContainer>
-          <Section
-            title={strings.properties()}
-            button={
-              <ArrowLeft
-                data-test-id="properties-close"
-                onClick={() => toggleProperties(false)}
-                size={18}
-                sx={{ mr: 1, cursor: "pointer" }}
-              />
-            }
+          {/* <Flex
+            sx={{
+              alignItems: "center",
+              gap: 1
+            }}
           >
+            <ArrowLeft
+              data-test-id="properties-close"
+              onClick={() => toggleProperties(false)}
+              size={18}
+              sx={{ cursor: "pointer" }}
+            />
+            <Text variant="subtitle">{strings.properties()}</Text>
+          </Flex> */}
+          <Flex
+            data-test-id="general-section"
+            sx={{ flexDirection: "column", gap: 1 }}
+          >
+            <Section title="Properties">
+              <Flex sx={{ flexDirection: "column", gap: 1, px: 2, pt: 1 }}>
+                {session.type === "deleted" ||
+                session.type === "diff" ? null : (
+                  <>
+                    {tools.map((tool) => (
+                      <Toggle
+                        {...tool}
+                        key={tool.key}
+                        isOn={
+                          tool.property === "locked"
+                            ? "locked" in session && !!session.locked
+                            : !!session.note[tool.property]
+                        }
+                        onToggle={() => changeToggleState(tool.key, session)}
+                        testId={`properties-${tool.key}`}
+                      />
+                    ))}
+                  </>
+                )}
+
+                {metadataItems.map((item) => (
+                  <Flex
+                    key={item.key}
+                    sx={{
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      py: "small"
+                    }}
+                  >
+                    <Text
+                      variant="body"
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis"
+                      }}
+                    >
+                      {item.label}
+                    </Text>
+                    <Text
+                      className="selectable"
+                      variant="subBody"
+                      sx={{ fontSize: "body", flexShrink: 0 }}
+                    >
+                      {item.value(session.note[item.key])}
+                    </Text>
+                  </Flex>
+                ))}
+                {session.type === "deleted" ||
+                session.type === "diff" ? null : (
+                  <Colors noteId={session.note.id} color={session.color} />
+                )}
+              </Flex>
+            </Section>
             {session.type === "deleted" ? null : (
               <>
-                {tools.map((tool) => (
-                  <Toggle
-                    {...tool}
-                    key={tool.key}
-                    isOn={
-                      tool.property === "locked"
-                        ? "locked" in session && !!session.locked
-                        : !!session.note[tool.property]
-                    }
-                    onToggle={() => changeToggleState(tool.key, session)}
-                    testId={`properties-${tool.key}`}
-                  />
-                ))}
+                {session.type === "diff" ? (
+                  <SessionHistory noteId={session.note.id} />
+                ) : (
+                  <>
+                    <InternalLinks noteId={session.note.id} />
+                    <Notebooks noteId={session.note.id} />
+                    <Reminders noteId={session.note.id} />
+                    <Attachments noteId={session.note.id} />
+                    <SessionHistory noteId={session.note.id} />
+                  </>
+                )}
               </>
             )}
-
-            {metadataItems.map((item) => (
-              <Flex
-                key={item.key}
-                py={2}
-                px={1}
-                sx={{
-                  borderBottom: "1px solid var(--separator)",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: 1
-                }}
-              >
-                <Text
-                  variant="subBody"
-                  sx={{
-                    fontSize: "body",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis"
-                  }}
-                >
-                  {item.label}
-                </Text>
-                <Text
-                  className="selectable"
-                  variant="subBody"
-                  sx={{ fontSize: "body", flexShrink: 0 }}
-                >
-                  {item.value(session.note[item.key])}
-                </Text>
-              </Flex>
-            ))}
-            {session.type === "deleted" ? null : (
-              <Colors noteId={session.note.id} color={session.color} />
-            )}
-          </Section>
-          {session.type === "deleted" ? null : (
-            <>
-              <InternalLinks noteId={session.note.id} />
-              <Notebooks noteId={session.note.id} />
-              <Reminders noteId={session.note.id} />
-              <Attachments noteId={session.note.id} />
-              <SessionHistory noteId={session.note.id} />
-            </>
-          )}
+          </Flex>
         </ScrollContainer>
       </ScopedThemeProvider>
-    </AnimatedFlex>
+    </Flex>
   );
 }
 export default React.memo(EditorProperties);
@@ -245,46 +262,61 @@ function InternalLinks({ noteId }: { noteId: string }) {
       tabIndex === InternalLinksTabs.LINKED_NOTES
         ? db.relations.from({ id: noteId, type: "note" }, "note")
         : db.relations.to({ id: noteId, type: "note" }, "note");
-    return links.selector.sorted(db.settings.getGroupOptions("notes"));
+    return links.selector
+      .fields(["notes.id", "notes.title"])
+      .sorted(db.settings.getGroupOptions("notes"));
   }, [tabIndex, noteId]);
 
   return (
-    <Flex sx={{ flexDirection: "column", mt: 2 }}>
+    <Flex sx={{ flexDirection: "column" }}>
       <Flex
         sx={{
-          justifyContent: "stretch",
-          borderRadius: "default",
-          overflow: "hidden",
-          mx: 1,
+          borderTop: "1px solid var(--border)",
+          borderBottom: "1px solid var(--border)",
+          py: 1,
+          px: 2,
+          justifyContent: "space-between",
+          alignItems: "center",
           mb: 1
         }}
       >
-        {[strings.linkedNotes(), strings.referencedIn()].map((title, index) => (
-          <Button
-            key={title}
-            variant="secondary"
-            sx={{
-              flex: 1,
-              borderRadius: 0,
-              color: tabIndex === index ? "accent-selected" : "paragraph",
-              bg:
-                tabIndex === index
-                  ? "background-selected"
-                  : "background-secondary"
-            }}
-            onClick={() => {
-              setTabIndex(index);
-              setExpandedId(undefined);
-            }}
-          >
-            {title}
-          </Button>
-        ))}
+        <Flex
+          sx={{
+            gap: 1
+          }}
+        >
+          {[LinkedTo, ReferencedInIcon].map((Icon, index) => (
+            <Button
+              key={index.toString()}
+              variant="secondary"
+              sx={{
+                p: 1,
+                color: tabIndex === index ? "accent-selected" : "paragraph",
+                bg: tabIndex === index ? "background-selected" : "transparent"
+              }}
+              onClick={() => {
+                setTabIndex(index);
+                setExpandedId(undefined);
+              }}
+            >
+              <Icon
+                size={16}
+                color={tabIndex === index ? "icon-selected" : "icon"}
+              />
+            </Button>
+          ))}
+        </Flex>
+        <Text variant="body" color="paragraph-secondary">
+          ({result.status === "fulfilled" ? result.value.length : 0}){" "}
+          {tabIndex === InternalLinksTabs.LINKED_NOTES
+            ? strings.linkedNotes()
+            : strings.referencedIn()}{" "}
+        </Text>
       </Flex>
 
       {result.status === "fulfilled" &&
         (result.value.length === 0 ? (
-          <Text variant="body" mx={1}>
+          <Text variant="body" mx={2}>
             {tabIndex === InternalLinksTabs.LINKED_NOTES
               ? strings.notLinked()
               : strings.notReferenced()}
@@ -325,9 +357,9 @@ function InternalLinkItem({
   };
 }) {
   const { items, tabIndex, noteId, isExpanded, toggleExpand } = context;
-  const item = useResolvedItem({ items, index });
+  const item = useUnresolvedItem({ items, index, type: "note" });
 
-  if (!item || item.item?.type !== "note") return null;
+  if (!item) return null;
 
   if (tabIndex === InternalLinksTabs.LINKED_NOTES)
     return (
@@ -359,90 +391,108 @@ function LinkedNote({
   isExpanded: boolean;
 }) {
   const [blocks, setBlocks] = useState<ContentBlock[]>([]);
+  const linkedBlocks = usePromise(
+    async () =>
+      (await db.notes.internalLinks(noteId)).filter(
+        (l) => l.id === item.id && !!l.params?.blockId
+      ),
+    [item.id]
+  );
 
   return (
     <>
-      <Button
-        variant="menuitem"
-        sx={{
-          p: 1,
-          width: "100%",
-          textAlign: "left",
-          display: "flex",
-          justifyContent: "start",
-          alignItems: "center",
-          borderBottom: isExpanded ? "none" : "1px solid var(--border)"
-        }}
-        onClick={() => useEditorStore.getState().openSession(item)}
-      >
-        <Box
-          onClick={async (e) => {
-            e.stopPropagation();
-            if (isExpanded) return toggleExpand();
-
-            const blocks = await db.notes.contentBlocks(item.id);
-            const linkedBlocks = (await db.notes.internalLinks(noteId)).filter(
-              (l) => l.id === item.id
-            );
-            setBlocks(
-              linkedBlocks.length > 0
-                ? blocks.filter((a) =>
-                    linkedBlocks.some((l) => l.params?.blockId === a.id)
-                  )
-                : []
-            );
-            toggleExpand();
+      <Flex sx={{ width: "100%", alignItems: "center" }}>
+        <Button
+          variant="menuitem"
+          sx={{
+            flex: 1,
+            p: 1,
+            mx: 2,
+            borderRadius: "default",
+            textAlign: "left",
+            display: "flex",
+            justifyContent: "start",
+            alignItems: "center",
+            gap: "small"
+            //  borderBottom: isExpanded ? "none" : "1px solid var(--border)"
           }}
+          onClick={() => useEditorStore.getState().openSession(item)}
         >
-          {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-        </Box>
-        <Text>{item.title}</Text>
-      </Button>
+          {linkedBlocks.status === "fulfilled" &&
+          linkedBlocks.value.length > 0 ? (
+            <Button
+              variant="secondary"
+              sx={{ bg: "transparent", p: 0, borderRadius: 100 }}
+              onClick={async (e) => {
+                e.stopPropagation();
+                if (isExpanded) return toggleExpand();
+                setBlocks(
+                  (await db.notes.contentBlocks(item.id)).filter((a) =>
+                    linkedBlocks.value.some((l) => l.params?.blockId === a.id)
+                  )
+                );
+                toggleExpand();
+              }}
+            >
+              {isExpanded ? (
+                <ChevronDown size={14} />
+              ) : (
+                <ChevronRight size={14} />
+              )}
+            </Button>
+          ) : (
+            <NoteIcon size={14} />
+          )}
+          <Text>{item.title}</Text>
+        </Button>
+      </Flex>
       {isExpanded
         ? blocks.map((block) => (
-            <Button
-              key={block.id}
-              variant="menuitem"
-              sx={{
-                p: 1,
-                pl: 4,
-                gap: 1,
-                width: "100%",
-                textAlign: "left",
-                display: "flex",
-                alignItems: "center",
-                borderBottom: "1px solid var(--border)"
-              }}
-              onClick={() =>
-                useEditorStore
-                  .getState()
-                  .openSession(item, { activeBlockId: block.id })
-              }
-            >
-              <Text
-                variant="subBody"
+            <Flex key={block.id} sx={{ width: "100%", alignItems: "center" }}>
+              <Button
+                variant="menuitem"
                 sx={{
-                  bg: "background-secondary",
-                  p: "small",
-                  flexShrink: 0,
-                  px: 1,
+                  flex: 1,
                   borderRadius: "default",
-                  alignSelf: "flex-start"
+                  p: 1,
+                  mx: 2,
+                  pl: 4,
+                  gap: 1,
+                  textAlign: "left",
+                  display: "flex",
+                  alignItems: "center"
                 }}
+                onClick={() =>
+                  useEditorStore
+                    .getState()
+                    .openSession(item, { activeBlockId: block.id })
+                }
               >
-                {block.type.toUpperCase()}
-              </Text>
-              <Text
-                variant="body"
-                sx={{
-                  fontSize: "subBody",
-                  fontFamily: "monospace",
-                  whiteSpace: "pre-wrap"
-                }}
-              >
-                {block.content}
-              </Text>
-            </Button>
+                <Text
+                  variant="subBody"
+                  sx={{
+                    bg: "background-secondary",
+                    p: "small",
+                    flexShrink: 0,
+                    px: 1,
+                    borderRadius: "default",
+                    alignSelf: "flex-start"
+                  }}
+                >
+                  {block.type.toUpperCase()}
+                </Text>
+                <Text
+                  variant="body"
+                  sx={{
+                    fontSize: "subBody",
+                    fontFamily: "monospace",
+                    whiteSpace: "pre-wrap"
+                  }}
+                >
+                  {block.content}
+                </Text>
+              </Button>
+            </Flex>
           ))
         : null}
     </>
@@ -466,41 +516,51 @@ function ReferencedIn({
 
   return (
     <>
-      <Button
-        variant="menuitem"
-        sx={{
-          p: 1,
-          width: "100%",
-          textAlign: "left",
-          display: "flex",
-          justifyContent: "start",
-          alignItems: "center",
-          borderBottom: isExpanded ? "none" : "1px solid var(--border)"
-        }}
-        onClick={() => useEditorStore.getState().openSession(item)}
-      >
-        <Box
-          onClick={async (e) => {
-            e.stopPropagation();
-            if (isExpanded) return toggleExpand();
-            const blocks = await db.notes.contentBlocksWithLinks(item.id);
-            setBlocks(
-              blocks
-                .filter((b) =>
-                  b.content.includes(createInternalLink("note", noteId))
-                )
-                .map((block) => ({
-                  id: block.id,
-                  links: highlightInternalLinks(block, noteId)
-                }))
-            );
-            toggleExpand();
+      <Flex sx={{ width: "100%", alignItems: "center" }}>
+        <Button
+          variant="menuitem"
+          sx={{
+            flex: 1,
+            p: 1,
+            mx: 2,
+            borderRadius: "default",
+            textAlign: "left",
+            display: "flex",
+            justifyContent: "start",
+            alignItems: "center",
+            gap: "small"
           }}
+          onClick={() => useEditorStore.getState().openSession(item)}
         >
-          {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-        </Box>
-        <Text variant="body">{item.title}</Text>
-      </Button>
+          <Button
+            variant="secondary"
+            sx={{ bg: "transparent", p: 0, borderRadius: 100 }}
+            onClick={async (e) => {
+              e.stopPropagation();
+              if (isExpanded) return toggleExpand();
+              const blocks = await db.notes.contentBlocksWithLinks(item.id);
+              setBlocks(
+                blocks
+                  .filter((b) =>
+                    b.content.includes(createInternalLink("note", noteId))
+                  )
+                  .map((block) => ({
+                    id: block.id,
+                    links: highlightInternalLinks(block, noteId)
+                  }))
+              );
+              toggleExpand();
+            }}
+          >
+            {isExpanded ? (
+              <ChevronDown size={16} />
+            ) : (
+              <ChevronRight size={16} />
+            )}
+          </Button>
+          <Text variant="body">{item.title}</Text>
+        </Button>
+      </Flex>
       {isExpanded
         ? blocks.map((block) => (
             <>
@@ -509,13 +569,16 @@ function ReferencedIn({
                   key={index.toString()}
                   variant="menuitem"
                   sx={{
+                    flex: 1,
+                    borderRadius: "default",
                     p: 1,
+                    mx: 2,
                     pl: 4,
-                    pr: 2,
-                    gap: 1,
-                    width: "100%",
                     textAlign: "left",
-                    borderBottom: "1px solid var(--border)"
+                    whiteSpace: "pre-wrap",
+                    display: "flex",
+                    flexDirection: "row",
+                    gap: 2
                   }}
                   onClick={() =>
                     useEditorStore
@@ -523,23 +586,27 @@ function ReferencedIn({
                       .openSession(item, { activeBlockId: block.id })
                   }
                 >
-                  {link.map((slice) => (
-                    <Text
-                      key={slice.text}
-                      variant="body"
-                      sx={{
-                        color: slice.highlighted
-                          ? "accent-selected"
-                          : "paragraph",
-                        fontWeight: slice.highlighted ? "bold" : "normal",
-                        textDecoration: slice.highlighted
-                          ? "underline solid var(--accent-selected)"
-                          : "none"
-                      }}
-                    >
-                      {slice.text}
-                    </Text>
-                  ))}
+                  <Text variant="subBody">{index + 1}.</Text>
+                  <Text as="div" variant="body">
+                    {link.map((slice) =>
+                      slice.highlighted ? (
+                        <Text
+                          key={slice.text}
+                          as="span"
+                          sx={{
+                            color: "accent-selected",
+                            fontWeight: "bold",
+                            textDecoration:
+                              "underline solid var(--accent-selected)"
+                          }}
+                        >
+                          {slice.text}
+                        </Text>
+                      ) : (
+                        <>{slice.text}</>
+                      )
+                    )}
+                  </Text>
                 </Button>
               ))}
             </>
@@ -553,11 +620,10 @@ function Colors({ noteId, color }: { noteId: string; color?: string }) {
   const result = usePromise(() => db.colors.all.items(), [color]);
   return (
     <Flex
-      py={2}
-      px={1}
       sx={{
         cursor: "pointer",
-        justifyContent: "start"
+        justifyContent: "start",
+        gap: "small"
       }}
     >
       {result.status === "fulfilled" &&
@@ -576,7 +642,7 @@ function Colors({ noteId, color }: { noteId: string; color?: string }) {
               data-test-id={`properties-${c.title}`}
             >
               <Circle
-                size={35}
+                size={25}
                 color={c.colorCode}
                 data-test-id={`toggle-state-${isChecked ? "on" : "off"}`}
               />
@@ -606,10 +672,14 @@ function Notebooks({ noteId }: { noteId: string }) {
   if (result.status !== "fulfilled" || result.value.length <= 0) return null;
 
   return (
-    <Section title={strings.notebooks()}>
+    <Section
+      title={strings.notebooks()}
+      sx={{ borderTop: "1px solid var(--border)" }}
+    >
       <VirtualizedList
+        style={{ marginTop: 5 }}
         mode="fixed"
-        estimatedSize={50}
+        estimatedSize={25}
         getItemKey={(index) => result.value.key(index)}
         items={result.value.placeholders}
         renderItem={({ index }) => (
@@ -635,10 +705,14 @@ function Reminders({ noteId }: { noteId: string }) {
   if (result.status !== "fulfilled" || result.value.length <= 0) return null;
 
   return (
-    <Section title={strings.dataTypesPluralCamelCase.reminder()}>
+    <Section
+      sx={{ borderTop: "1px solid var(--border)" }}
+      title={strings.dataTypesPluralCamelCase.reminder()}
+    >
       <VirtualizedList
         mode="fixed"
-        estimatedSize={54}
+        style={{ marginTop: 5, marginLeft: 10, marginRight: 10 }}
+        estimatedSize={48}
         getItemKey={(index) => result.value.key(index)}
         items={result.value.placeholders}
         renderItem={({ index }) => (
@@ -663,12 +737,19 @@ function Attachments({ noteId }: { noteId: string }) {
   if (result.status !== "fulfilled" || result.value.length <= 0) return null;
 
   return (
-    <Section title={strings.dataTypesPluralCamelCase.attachment()}>
+    <Section
+      title={strings.dataTypesPluralCamelCase.attachment()}
+      sx={{ borderTop: "1px solid var(--border)" }}
+    >
       <VirtualizedTable
-        estimatedSize={30}
+        estimatedSize={25}
         getItemKey={(index) => result.value.key(index)}
         items={result.value.placeholders}
-        style={{ tableLayout: "fixed", width: "100%" }}
+        style={{
+          marginTop: 5,
+          tableLayout: "fixed",
+          width: "100%"
+        }}
         header={
           <tr>
             <th style={{ width: "75%" }} />
@@ -697,12 +778,16 @@ function SessionHistory({ noteId }: { noteId: string }) {
 
   return (
     <Section
+      sx={{
+        borderTop: "1px solid var(--border)"
+      }}
       title={strings.noteHistory()}
       subtitle={strings.noteHistoryNotice[0]()}
     >
       <VirtualizedList
         mode="dynamic"
         estimatedSize={28}
+        style={{ marginLeft: 10, marginRight: 10, marginTop: 5 }}
         getItemKey={(index) => result.value.key(index)}
         items={result.value.placeholders}
         renderItem={({ index }) => (
@@ -715,39 +800,61 @@ function SessionHistory({ noteId }: { noteId: string }) {
   );
 }
 
-type SectionProps = { title: string; subtitle?: string; button?: JSX.Element };
+type SectionProps = {
+  title?: string;
+  subtitle?: string;
+} & FlexProps;
 export function Section({
   title,
   subtitle,
-  button,
-  children
+  children,
+  sx,
+  ...otherProps
 }: PropsWithChildren<SectionProps>) {
   return (
     <Flex
       sx={{
-        borderRadius: "default",
-        flexDirection: "column"
+        // borderRadius: "default",
+        flexDirection: "column",
+        // bg: "background-secondary",
+        // border: "1px solid var(--border)",
+        ...sx
       }}
+      {...otherProps}
     >
-      <Flex mx={1} mt={2} sx={{ alignItems: "center" }}>
-        {button}
-        <Text variant="subtitle">{title}</Text>
-      </Flex>
-      {subtitle && (
-        <Text variant="subBody" mb={1} mx={1}>
-          {subtitle}
-        </Text>
-      )}
+      {title || subtitle ? (
+        <Flex
+          sx={{
+            flexDirection: "column",
+            borderBottom: "1px solid var(--border)",
+            p: 2
+          }}
+        >
+          {title && (
+            <Text variant="subBody" sx={{ fontWeight: "medium" }}>
+              {title.toUpperCase()}
+            </Text>
+          )}
+          {subtitle && <Text variant="subBody">{subtitle}</Text>}
+        </Flex>
+      ) : null}
       {children}
     </Flex>
   );
 }
 
 function changeToggleState(
-  prop: "lock" | "readonly" | "local-only" | "pin" | "favorite",
+  prop: "lock" | "readonly" | "local-only" | "pin" | "favorite" | "archive",
   session: ReadonlyEditorSession | DefaultEditorSession
 ) {
-  const { id: sessionId, readonly, localOnly, pinned, favorite } = session.note;
+  const {
+    id: sessionId,
+    readonly,
+    localOnly,
+    pinned,
+    favorite,
+    archived
+  } = session.note;
   if (!sessionId) return;
   switch (prop) {
     case "lock":
@@ -762,6 +869,8 @@ function changeToggleState(
       return noteStore.pin(!pinned, sessionId);
     case "favorite":
       return noteStore.favorite(!favorite, sessionId);
+    case "archive":
+      return noteStore.archive(!archived, sessionId);
     default:
       return;
   }

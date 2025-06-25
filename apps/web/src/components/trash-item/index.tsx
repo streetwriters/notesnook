@@ -19,22 +19,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import ListItem from "../list-item";
 import { Restore, DeleteForver } from "../icons";
-import { store } from "../../stores/trash-store";
 import { Flex, Text } from "@theme-ui/components";
 import TimeAgo from "../time-ago";
-import { pluralize, toTitleCase } from "@notesnook/common";
-import { showToast } from "../../utils/toast";
+import { toTitleCase } from "@notesnook/common";
 import { MenuItem } from "@notesnook/ui";
 import { TrashItem as TrashItemType } from "@notesnook/core";
 import { useEditorStore } from "../../stores/editor-store";
-import { showMultiPermanentDeleteConfirmation } from "../../dialogs/confirm";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
 import { strings } from "@notesnook/intl";
+import { Multiselect } from "../../common/multi-select";
 
 type TrashItemProps = { item: TrashItemType; date: number };
 function TrashItem(props: TrashItemProps) {
   const { item, date } = props;
-  const isOpened = useEditorStore((store) => store.activeSessionId === item.id);
+  const isOpened = useEditorStore((store) => store.isNoteOpen(item.id));
 
   return (
     <ListItem
@@ -44,7 +42,9 @@ function TrashItem(props: TrashItemProps) {
       body={item.itemType === "note" ? item.headline : item.description}
       onKeyPress={async (e) => {
         if (e.key === "Delete") {
-          await deleteTrash(useSelectionStore.getState().selectedItems);
+          await Multiselect.deleteItemsFromTrash(
+            useSelectionStore.getState().selectedItems
+          );
         }
       }}
       footer={
@@ -61,7 +61,7 @@ function TrashItem(props: TrashItemProps) {
           </Text>
         </Flex>
       }
-      menuItems={menuItems}
+      menuItems={trashMenuItems}
       onClick={async () => {
         if (item.itemType === "note")
           useEditorStore.getState().openSession(item);
@@ -71,20 +71,17 @@ function TrashItem(props: TrashItemProps) {
 }
 export default TrashItem;
 
-const menuItems: (item: TrashItemType, ids?: string[]) => MenuItem[] = (
-  item,
-  ids = []
-) => {
+export const trashMenuItems: (
+  item: TrashItemType,
+  ids?: string[]
+) => MenuItem[] = (item, ids = []) => {
   return [
     {
       type: "button",
       key: "restore",
       title: strings.restore(),
       icon: Restore.path,
-      onClick: async () => {
-        await store.restore(...ids);
-        showToast("success", strings.action("item", ids.length, "restored"));
-      },
+      onClick: () => Multiselect.restoreItemsFromTrash(ids),
       multiSelect: true
     },
     {
@@ -93,16 +90,8 @@ const menuItems: (item: TrashItemType, ids?: string[]) => MenuItem[] = (
       title: strings.delete(),
       icon: DeleteForver.path,
       variant: "dangerous",
-      onClick: async () => {
-        await deleteTrash(ids);
-      },
+      onClick: () => Multiselect.deleteItemsFromTrash(ids),
       multiSelect: true
     }
   ];
 };
-
-async function deleteTrash(ids: string[]) {
-  if (!(await showMultiPermanentDeleteConfirmation(ids.length))) return;
-  await store.delete(...ids);
-  showToast("success", `${pluralize(ids.length, "item")} permanently deleted`);
-}

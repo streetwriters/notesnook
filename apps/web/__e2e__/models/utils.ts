@@ -123,6 +123,13 @@ export async function fillPasswordDialog(page: Page, password: string) {
   await confirmDialog(dialog);
 }
 
+export async function fillConfirmPasswordDialog(page: Page, password: string) {
+  const dialog = page.locator(getTestId("password-dialog"));
+  await dialog.locator(getTestId("password")).fill(password);
+  await dialog.locator(getTestId("confirmPassword")).fill(password);
+  await confirmDialog(dialog);
+}
+
 export async function confirmDialog(dialog: Locator) {
   const dialogConfirm = dialog.locator(getTestId("dialog-yes"));
   await dialogConfirm.click();

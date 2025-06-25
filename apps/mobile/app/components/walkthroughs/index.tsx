@@ -23,13 +23,14 @@ import { MMKV } from "../../common/database/mmkv";
 import { eSendEvent, presentSheet } from "../../services/event-manager";
 import { useThemeColors } from "@notesnook/theme";
 import { eCloseSheet } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import walkthroughs, { TStep } from "./walkthroughs";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 export const Walkthrough = ({
   steps,
   canSkip = true
@@ -51,7 +52,7 @@ export const Walkthrough = ({
       style={{
         justifyContent: "center",
         alignItems: "center",
-        padding: 12,
+        padding: DefaultAppStyles.GAP,
         paddingBottom: 0
       }}
     >
@@ -65,7 +66,7 @@ export const Walkthrough = ({
             alignSelf: "center",
             maxWidth: "80%"
           }}
-          size={SIZE.md}
+          size={AppFontSize.md}
         >
           {step.text}
         </Paragraph>
@@ -74,7 +75,7 @@ export const Walkthrough = ({
         <Button
           style={{
             height: 30,
-            marginTop: 10
+            marginTop: DefaultAppStyles.GAP_VERTICAL
           }}
           textStyle={{
             textDecorationLine: "underline"
@@ -91,7 +92,7 @@ export const Walkthrough = ({
         style={{
           borderRadius: 100,
           height: 40,
-          marginTop: 20
+          marginTop: DefaultAppStyles.GAP
         }}
         onPress={async () => {
           switch (step.button?.type) {
@@ -113,8 +114,8 @@ export const Walkthrough = ({
       {canSkip ? (
         <Button
           style={{
-            height: 30,
-            marginTop: 10
+            marginTop: DefaultAppStyles.GAP,
+            paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
           }}
           textStyle={{
             textDecorationLine: "underline"

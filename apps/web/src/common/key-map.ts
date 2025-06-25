@@ -18,10 +18,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import hotkeys from "hotkeys-js";
-import { GlobalKeyboard } from "../utils/keyboard";
 import { useEditorStore } from "../stores/editor-store";
 import { useStore as useSearchStore } from "../stores/search-store";
 import { useEditorManager } from "../components/editor/manager";
+import { CommandPaletteDialog } from "../dialogs/command-palette";
+import { hashNavigate } from "../navigation";
+
+function isInEditor(e: KeyboardEvent) {
+  return (
+    e.target instanceof HTMLElement && !!e.target?.closest(".editor-container")
+  );
+}
 
 const KEYMAP = [
   // {
@@ -55,14 +62,63 @@ const KEYMAP = [
   //   },
   // },
   {
+    keys: [
+      "command+option+right",
+      "ctrl+alt+right",
+      "command+option+shift+right",
+      "ctrl+alt+shift+right",
+      "ctrl+tab",
+      "command+tab"
+    ],
+    description: "Go to next tab",
+    action: () => useEditorStore.getState().focusNextTab()
+  },
+  {
+    keys: [
+      "command+option+left",
+      "ctrl+alt+left",
+      "command+option+shift+left",
+      "ctrl+alt+shift+left",
+      "ctrl+shift+tab",
+      "command+shift+tab"
+    ],
+    description: "Go to previous tab",
+    action: () => useEditorStore.getState().focusPreviousTab()
+  },
+  {
+    keys: ["ctrl+t", "command+t"],
+    description: "Create a new tab",
+    action: () => useEditorStore.getState().addTab()
+  },
+  {
+    keys: ["ctrl+n", "command+n"],
+    description: "Create a new note",
+    action: () => useEditorStore.getState().newSession()
+  },
+  {
+    keys: ["ctrl+w", "command+w"],
+    description:
+      "Close active tab or focus previously activated tab if active tab pinned",
+    action: () => {
+      const activeTab = useEditorStore.getState().getActiveTab();
+      if (activeTab?.pinned) {
+        useEditorStore.getState().focusLastActiveTab();
+        return;
+      }
+      useEditorStore.getState().closeActiveTab();
+    }
+  },
+  {
+    keys: ["ctrl+shift+w", "command+shift+w"],
+    description: "Close all tabs",
+    action: () => useEditorStore.getState().closeAllTabs()
+  },
+  {
     keys: ["command+f", "ctrl+f"],
     description: "Search all notes",
     global: false,
     action: (e: KeyboardEvent) => {
-      const isInEditor =
-        e.target instanceof HTMLElement &&
-        !!e.target?.closest(".editor-container");
-      if (isInEditor) {
+      if (isInEditor(e)) {
         const activeSession = useEditorStore.getState().getActiveSession();
         if (activeSession?.type === "readonly") {
           e.preventDefault();
@@ -77,7 +133,7 @@ const KEYMAP = [
 
       useSearchStore.setState({ isSearching: true, searchType: "notes" });
     }
-  }
+  },
   // {
   //   keys: ["alt+n"],
   //   description: "Go to Notes",
@@ -141,6 +197,22 @@ const KEYMAP = [
   //     themestore.get().toggleNightMode();
   //   },
   // },
+  {
+    keys: ["ctrl+k", "cmd+k", "ctrl+p", "cmd+p"],
+    description: "Open command palette",
+    action: (e: KeyboardEvent) => {
+      e.preventDefault();
+      CommandPaletteDialog.close();
+      CommandPaletteDialog.show({
+        isCommandMode: e.key === "k"
+      }).catch(() => {});
+    }
+  },
+  {
+    keys: ["ctrl+,", "command+,"],
+    description: "Open settings",
+    action: () => hashNavigate("/settings", { replace: true })
+  }
 ];
 
 export function registerKeyMap() {
@@ -149,14 +221,9 @@ export function registerKeyMap() {
   };
 
   KEYMAP.forEach((key) => {
-    hotkeys(
-      key.keys.join(","),
-      {
-        element: key.global
-          ? (GlobalKeyboard as unknown as HTMLElement)
-          : document.body
-      },
-      key.action
-    );
+    hotkeys(key.keys.join(","), (e) => {
+      e.preventDefault();
+      key.action?.(e);
+    });
   });
 }

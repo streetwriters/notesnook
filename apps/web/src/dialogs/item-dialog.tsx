@@ -106,7 +106,7 @@ export const CreateTagDialog = {
       )
         return;
 
-      showToast("success", strings.action("tag", 1, "created"));
+      showToast("success", strings.actions.created.tag(1));
       useTagStore.getState().refresh();
     })
 };
@@ -114,7 +114,7 @@ export const CreateTagDialog = {
 export const EditTagDialog = {
   show: (tag: Tag) =>
     ItemDialog.show({
-      title: strings.doAction("tag", 1, "edit"),
+      title: strings.doActions.edit.tag(1),
       subtitle: strings.editingTagDesc(tag.title),
       defaultValue: tag.title
     }).then(async (title) => {
@@ -126,7 +126,7 @@ export const EditTagDialog = {
         }))
       )
         return;
-      showToast("success", strings.action("tag", 1, "edited"));
+      showToast("success", strings.actions.edited.tag(1));
       await useTagStore.getState().refresh();
       await useNoteStore.getState().refresh();
       await useAppStore.getState().refreshNavItems();
@@ -148,7 +148,7 @@ export const RenameColorDialog = {
         }))
       )
         return;
-      showToast("success", strings.action("color", 1, "renamed"));
+      showToast("success", strings.actions.renamed.color(1));
       useAppStore.getState().refreshNavItems();
     })
 };

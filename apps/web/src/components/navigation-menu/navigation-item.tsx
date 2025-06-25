@@ -17,29 +17,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Button, Flex, FlexProps, Image, Text } from "@theme-ui/components";
-import { useStore as useAppStore } from "../../stores/app-store";
+import { Button, Flex, FlexProps, Text } from "@theme-ui/components";
 import { Menu } from "../../hooks/use-menu";
-import useMobile from "../../hooks/use-mobile";
 import { PropsWithChildren } from "react";
-import { Icon, Shortcut } from "../icons";
+import { Icon } from "../icons";
 import { SchemeColors, createButtonVariant } from "@notesnook/theme";
 import { MenuItem } from "@notesnook/ui";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { AppEventManager, AppEvents } from "../../common/app-events";
 
 type NavigationItemProps = {
   icon?: Icon;
-  image?: string;
   color?: SchemeColors;
-  title: string;
-  isTablet?: boolean;
+  title?: string;
+  isCollapsed?: boolean;
   isLoading?: boolean;
-  isShortcut?: boolean;
-  tag?: string;
   selected?: boolean;
   onClick?: () => void;
-  count?: number;
   menuItems?: MenuItem[];
 };
 
@@ -50,24 +45,18 @@ function NavigationItem(
 ) {
   const {
     icon: Icon,
-    image,
     color,
     title,
     isLoading,
-    isShortcut,
-    tag,
     children,
-    isTablet,
+    isCollapsed,
     selected,
     onClick,
     menuItems,
-    count,
     sx,
     containerRef,
     ...restProps
   } = props;
-  const toggleSideMenu = useAppStore((store) => store.toggleSideMenu);
-  const isMobile = useMobile();
 
   return (
     <Flex
@@ -88,119 +77,60 @@ function NavigationItem(
           }
         ),
         borderRadius: "default",
-        mx: 1,
-        p: 0,
-        mt: isTablet ? 1 : "3px",
+        px: isCollapsed ? 1 : 2,
+        py: 1,
         alignItems: "center",
         position: "relative",
-        ":first-of-type": { mt: 1 },
-        ":last-of-type": { mb: 1 },
         ":focus": { bg: selected ? "hover-selected" : "hover" },
         ...sx
-        // ":hover:not(:disabled)": {
-        //   bg: "hover",
-        //   filter: "brightness(100%)"
-        // }
+      }}
+      onClick={() => {
+        AppEventManager.publish(AppEvents.toggleSideMenu, false);
+        if (onClick) onClick();
+      }}
+      data-test-id={`navigation-item`}
+      title={title}
+      onContextMenu={(e) => {
+        if (!menuItems) return;
+        e.preventDefault();
+        e.stopPropagation();
+        Menu.openMenu(menuItems);
       }}
     >
-      <Button
-        data-test-id={`navigation-item`}
+      <Flex
         sx={{
-          px: isTablet ? 1 : 2,
+          p: 0,
           flex: 1,
           alignItems: "center",
-          justifyContent: isTablet ? "center" : "flex-start",
-          display: "flex"
-        }}
-        title={title}
-        onContextMenu={(e) => {
-          if (!menuItems) return;
-          e.preventDefault();
-          e.stopPropagation();
-          Menu.openMenu(menuItems);
-        }}
-        onClick={() => {
-          if (isMobile) toggleSideMenu(false);
-          if (onClick) onClick();
+          justifyContent: isCollapsed ? "center" : "flex-start"
         }}
       >
-        {image ? (
-          <Image
-            src={image}
-            sx={{ borderRadius: 50, size: 20, minWidth: 20, flexShrink: 0 }}
-          />
-        ) : Icon ? (
+        {Icon ? (
           <Icon
-            size={isTablet ? 16 : 15}
+            size={isCollapsed ? 16 : 14}
             color={color || (selected ? "icon-selected" : "icon")}
             rotate={isLoading}
           />
         ) : null}
-        {isShortcut && (
-          <Shortcut
-            size={8}
-            sx={{ position: "absolute", bottom: "8px", left: "6px" }}
-            color={color || "icon"}
-            data-test-id="shortcut"
-          />
-        )}
 
-        <Text
-          variant="body"
-          sx={{
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            fontWeight: selected ? "bold" : "normal",
-            color: selected ? "paragraph-selected" : "paragraph",
-            fontSize: "subtitle",
-            display: isTablet ? "none" : "block"
-          }}
-          ml={1}
-          data-test-id="title"
-        >
-          {title}
-          {/* {tag && (
-            <Text
-              variant="subBody"
-              as="span"
-              sx={{
-                bg: "accent",
-                color: "white",
-                ml: 1,
-                px: "small",
-                borderRadius: "default"
-              }}
-            >
-              {tag}
-            </Text>
-          )} */}
-        </Text>
-      </Button>
-      {children ? (
-        children
-      ) : !isTablet && count !== undefined ? (
-        <Text
-          variant="subBody"
-          sx={{
-            mr: 1,
-            px: "3px",
-            borderRadius: "default"
-          }}
-        >
-          {count > 100 ? "100+" : count}
-        </Text>
-      ) : !isTablet && tag ? (
-        <Text
-          variant="subBody"
-          sx={{
-            mr: 1,
-            borderRadius: "100px"
-          }}
-        >
-          {tag}
-        </Text>
-      ) : null}
+        {isCollapsed ? null : (
+          <Text
+            variant="body"
+            sx={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              fontWeight: "normal",
+              color: selected ? "paragraph-selected" : "paragraph"
+            }}
+            ml={1}
+            data-test-id="title"
+          >
+            {title}
+          </Text>
+        )}
+      </Flex>
+      {children && !isCollapsed ? children : null}
     </Flex>
   );
 }

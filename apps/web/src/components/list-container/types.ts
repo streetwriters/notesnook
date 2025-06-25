@@ -26,12 +26,17 @@ export type NotebookContext = {
 };
 export type Context =
   | {
-      type: "tag" | "color";
+      type: "tag";
+      id: string;
+      item?: Tag;
+    }
+  | {
+      type: "color";
       id: string;
     }
   | NotebookContext
   | {
-      type: "favorite" | "monographs";
+      type: "favorite" | "monographs" | "archive";
     };
 
 export type WithDateEdited<T> = { items: T[]; dateEdited: number };

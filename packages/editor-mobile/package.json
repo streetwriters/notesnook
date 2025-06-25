@@ -11,16 +11,16 @@
     "@notesnook/intl": "file:../intl",
     "@szhsin/react-menu": "^4.1.0",
     "buffer": "^6.0.3",
-    "framer-motion": "^10.16.8",
     "localforage": "^1.10.0",
     "mdi-react": "9.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-freeze": "^1.0.3",
-    "tinycolor2": "1.6.0",
     "zustand": "^4.4.7",
-    "@lingui/core": "4.11.4",
-    "@lingui/react": "4.11.4"
+    "@lingui/core": "5.1.2",
+    "@lingui/react": "5.1.2",
+    "tinycolor2": "1.6.0",
+    "@notesnook/common": "file:../common"
   },
   "devDependencies": {
     "@playwright/test": "^1.37.1",

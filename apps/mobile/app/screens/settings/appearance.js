@@ -30,7 +30,7 @@ import {
   hexToRGBA,
   switchAccentColor
 } from "../../utils/colors";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 
 export const AccentColorPicker = () => {
   const { colors, isDark } = useThemeColors();
@@ -95,7 +95,7 @@ export const AccentColorPicker = () => {
         >
           {colors.primary.accent === item ? (
             <Icon
-              size={DDS.isLargeTablet() ? SIZE.lg : SIZE.xxl}
+              size={DDS.isLargeTablet() ? AppFontSize.lg : AppFontSize.xxl}
               color="white"
               name="check"
             />

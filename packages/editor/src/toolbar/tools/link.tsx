@@ -107,6 +107,7 @@ export function EditLink(props: ToolProps) {
   const link = node ? findMark(node, LinkNode.name) : null;
   const attrs = link?.attrs || getMarkAttributes(editor.state, LinkNode.name);
 
+  if (!editor.isEditable) return null;
   if (attrs && isInternalLink(attrs.href))
     return (
       <ToolButton
@@ -118,7 +119,17 @@ export function EditLink(props: ToolProps) {
           const { from, to } = editor.state.selection;
           if (selectedNode.current)
             editor.commands.setTextSelection(selectedNode.current);
-          editor.commands.setLink(link);
+
+          const selectedText =
+            !!selectedNode.current &&
+            editor.state.doc.textBetween(
+              selectedNode.current.from,
+              selectedNode.current.to
+            );
+          editor.commands.setLink({
+            ...link,
+            title: selectedText || link.title
+          });
           if (selectedNode.current)
             editor.commands.setTextSelection({ from, to });
         }}
@@ -240,12 +251,7 @@ export function CopyLink(props: ToolProps) {
       {...props}
       toggled={false}
       onClick={() => {
-        editor.storage.copyToClipboard?.(
-          href,
-          `<a href="${href}">${
-            selectedNode.current?.node?.textContent || link?.attrs.title
-          }</a>`
-        );
+        editor.storage.copyToClipboard?.(href);
         hide();
       }}
     />

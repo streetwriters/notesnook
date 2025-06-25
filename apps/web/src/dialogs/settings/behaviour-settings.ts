@@ -19,12 +19,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { DATE_FORMATS } from "@notesnook/core";
 import { SettingsGroup } from "./types";
-import { useStore as useSettingStore } from "../../stores/setting-store";
+import {
+  ImageCompressionOptions,
+  useStore as useSettingStore
+} from "../../stores/setting-store";
 import dayjs from "dayjs";
 import { isUserPremium } from "../../hooks/use-is-user-premium";
 import { TimeFormat } from "@notesnook/core";
 import { TrashCleanupInterval } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
+import { BuyDialog } from "../buy-dialog";
 
 export const BehaviourSettings: SettingsGroup[] = [
   {
@@ -34,24 +38,59 @@ export const BehaviourSettings: SettingsGroup[] = [
     isHidden: () => !isUserPremium(),
     settings: [
       {
-        key: "default-homepage",
-        title: strings.homepage(),
-        description: strings.homepageDesc(),
-        keywords: ["welcome page", "default screen"],
+        key: "default-sidebar-tab",
+        title: strings.defaultSidebarTab(),
+        description: strings.defaultSidebarTabDesc(),
+        keywords: ["default sidebar tab"],
         onStateChange: (listener) =>
-          useSettingStore.subscribe((s) => s.homepage, listener),
+          useSettingStore.subscribe((s) => s.defaultSidebarTab, listener),
+        components: [
+          {
+            type: "dropdown",
+            onSelectionChanged: (value) => {
+              if (!isUserPremium()) {
+                BuyDialog.show({});
+                return;
+              }
+
+              useSettingStore.getState().setDefaultSidebarTab(value as any);
+            },
+            selectedOption: () => useSettingStore.getState().defaultSidebarTab,
+            options: [
+              { value: "home", title: strings.routes.Notes() },
+              { value: "notebooks", title: strings.routes.Notebooks() },
+              { value: "tags", title: strings.routes.Tags() }
+            ]
+          }
+        ]
+      },
+      {
+        key: "image-compression",
+        title: strings.imageCompression(),
+        description: strings.imageCompressionDesc(),
+        keywords: ["compress images", "image quality"],
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => s.imageCompression, listener),
         components: [
           {
             type: "dropdown",
             onSelectionChanged: (value) =>
-              useSettingStore.getState().setHomepage(parseInt(value)),
+              useSettingStore.getState().setImageCompression(parseInt(value)),
             selectedOption: () =>
-              useSettingStore.getState().homepage.toString(),
+              useSettingStore.getState().imageCompression.toString(),
             options: [
-              { value: "0", title: strings.routes.Notes() },
-              { value: "1", title: strings.routes.Notebooks() },
-              { value: "2", title: strings.routes.Favorites() },
-              { value: "3", title: strings.routes.Tags() }
+              {
+                value: ImageCompressionOptions.ASK_EVERY_TIME.toString(),
+                title: strings.askEveryTime()
+              },
+              {
+                value: ImageCompressionOptions.ENABLE.toString(),
+                title: strings.enableRecommended()
+              },
+              {
+                value: ImageCompressionOptions.DISABLE.toString(),
+                title: strings.disable()
+              }
             ]
           }
         ]
@@ -120,19 +159,25 @@ export const BehaviourSettings: SettingsGroup[] = [
         components: [
           {
             type: "dropdown",
-            onSelectionChanged: (value) =>
+            onSelectionChanged: (value) => {
+              if (!isUserPremium()) {
+                BuyDialog.show({});
+                return;
+              }
+
               useSettingStore
                 .getState()
                 .setTrashCleanupInterval(
                   parseInt(value) as TrashCleanupInterval
-                ),
+                );
+            },
             selectedOption: () =>
               useSettingStore.getState().trashCleanupInterval.toString(),
             options: [
               { value: "1", title: strings.daily() },
-              { value: "7", title: `7 ${strings.days()}` },
-              { value: "30", title: `30 ${strings.days()}` },
-              { value: "365", title: `365 ${strings.days()}` },
+              { value: "7", title: strings.days(7) },
+              { value: "30", title: strings.days(30) },
+              { value: "365", title: strings.days(365) },
               { value: "-1", title: strings.never(), premium: true }
             ]
           }
@@ -152,7 +197,9 @@ export const BehaviourSettings: SettingsGroup[] = [
         description: strings.automaticUpdatesDesc(),
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.autoUpdates, listener),
-        isHidden: () => useSettingStore.getState().isFlatpak,
+        isHidden: () =>
+          useSettingStore.getState().isFlatpak ||
+          useSettingStore.getState().isSnap,
         components: [
           {
             type: "toggle",

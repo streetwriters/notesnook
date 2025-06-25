@@ -18,59 +18,58 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import path from "path";
-import fs, { readFile, writeFile } from "fs/promises";
-import { existsSync, readFileSync } from "fs";
+import fs from "fs/promises";
+import { existsSync } from "fs";
 import yargs from "yargs-parser";
 import os from "os";
 import * as childProcess from "child_process";
 import { fileURLToPath } from "url";
+import { patchBetterSQLite3 } from "./patch-better-sqlite3.mjs";
 
 const args = yargs(process.argv);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const packageJson = JSON.parse(
-  readFileSync(path.join(__dirname, "..", "package.json"), "utf-8")
-);
+const root = args.root || path.join(__dirname, "..");
+const skipTscBuild = args.skipTscBuild || false;
 
 const webAppPath = path.resolve(path.join(__dirname, "..", "..", "web"));
 
-await fs.rm("./build/", { force: true, recursive: true });
+await fs.rm(path.join(root, "build"), { force: true, recursive: true });
 
 if (args.rebuild || !existsSync(path.join(webAppPath, "build"))) {
   await exec(
-    "yarn nx build:desktop @notesnook/web",
+    "npx nx build:desktop @notesnook/web",
     path.join(__dirname, "..", "..", "..")
   );
 }
 
-// temporary until there's support for prebuilt binaries for linux ARM
-if (os.platform() === "linux") await patchBetterSQLite3();
+await patchBetterSQLite3();
 
-// if (os.platform() === "win32")
-//   await exec(
-//     `npx prebuildify --arch=arm64 --strip -t electron@${packageJson.devDependencies.electron}`,
-//     path.join(__dirname, "..", "node_modules", "sodium-native")
-//   );
-
-await fs.cp(path.join(webAppPath, "build"), "build", {
+await fs.cp(path.join(webAppPath, "build"), path.join(root, "build"), {
   recursive: true,
   force: true
 });
 
 if (args.variant === "mas") {
-  await exec(`yarn run bundle:mas`);
+  await exec(`yarn run bundle:mas --outdir=${path.join(root, "build")}`);
 } else {
-  await exec(`yarn run bundle`);
+  await exec(`yarn run bundle --outdir=${path.join(root, "build")}`);
 }
 
-await exec(`yarn tsc`);
+if (!skipTscBuild) {
+  await exec(`yarn run build`);
+}
 
 if (args.run) {
-  await exec(`yarn electron-builder --dir --x64`);
+  await exec(
+    `yarn electron-builder --dir --${process.arch} --config=electron-builder.config.js`
+  );
   if (process.platform === "win32") {
     await exec(`.\\output\\win-unpacked\\Notesnook.exe`);
   } else if (process.platform === "darwin") {
-    await exec(`./output/mac/Notesnook.app/Contents/MacOS/Notesnook`);
+    if (process.arch === "arm64")
+      await exec(`./output/mac-arm64/Notesnook.app/Contents/MacOS/Notesnook`);
+    else await exec(`./output/mac/Notesnook.app/Contents/MacOS/Notesnook`);
   } else {
     await exec(`./output/linux-unpacked/Notesnook`);
   }
@@ -82,22 +81,4 @@ async function exec(cmd, cwd) {
     stdio: "inherit",
     cwd: cwd || process.cwd()
   });
-}
-
-async function patchBetterSQLite3() {
-  const jsonPath = path.join(
-    __dirname,
-    "..",
-    "node_modules",
-    "better-sqlite3-multiple-ciphers",
-    "package.json"
-  );
-  const json = JSON.parse(await readFile(jsonPath, "utf-8"));
-
-  json.version = "11.2.2";
-  json.homepage = "https://github.com/thecodrr/better-sqlite3-multiple-ciphers";
-  json.repository.url =
-    "git://github.com/thecodrr/better-sqlite3-multiple-ciphers.git";
-
-  await writeFile(jsonPath, JSON.stringify(json));
 }

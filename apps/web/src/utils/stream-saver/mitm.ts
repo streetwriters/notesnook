@@ -63,7 +63,7 @@ export async function postMessage(
   // so all download links needs to be prefixed to avoid any other conflict
   data.origin = window.location.origin;
 
-  // if we ever (in some feature versoin of streamsaver) would like to
+  // if we ever (in some feature version of streamsaver) would like to
   // redirect back to the page of who initiated a http request
   data.referrer = data.referrer || document.referrer || origin;
 

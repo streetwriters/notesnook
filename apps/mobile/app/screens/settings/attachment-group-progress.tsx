@@ -28,7 +28,9 @@ import Paragraph from "../../components/ui/typography/paragraph";
 import { useAttachmentProgress } from "../../hooks/use-attachment-progress";
 import { useDBItem } from "../../hooks/use-db-item";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
+import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const AttachmentGroupProgress = (props: { groupId?: string }) => {
   const { colors } = useThemeColors();
@@ -46,15 +48,15 @@ export const AttachmentGroupProgress = (props: { groupId?: string }) => {
         borderWidth: 1,
         borderColor: colors.primary.border,
         borderRadius: 10,
-        padding: 12,
+        padding: DefaultAppStyles.GAP,
         flexDirection: "row",
         gap: 10
       }}
     >
-      <Icon name="download" size={SIZE.xxxl} />
+      <Icon name="download" size={AppFontSize.xxxl} />
       <View
         style={{
-          gap: 5,
+          gap: DefaultAppStyles.GAP_VERTICAL_SMALL,
           flex: 1
         }}
       >
@@ -67,7 +69,7 @@ export const AttachmentGroupProgress = (props: { groupId?: string }) => {
           <View
             style={{
               width: "100%",
-              marginTop: 10
+              marginTop: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             <ProgressBarComponent
@@ -90,11 +92,12 @@ export const AttachmentGroupProgress = (props: { groupId?: string }) => {
           }}
           numberOfLines={1}
         >
-          Downloading {file?.filename} {formatBytes(file?.size || 0)}{" "}
+          {strings.downloading()} {file?.filename}{" "}
+          {formatBytes(file?.size || 0)}{" "}
           {fileProgress?.percent ? `(${fileProgress.percent})` : ""}
         </Paragraph>
         <Paragraph size={10} color={colors.secondary.paragraph}>
-          Group: {props.groupId}
+          {strings.group()}: {props.groupId}
         </Paragraph>
       </View>
       {props.groupId === "offline-mode" ? null : (

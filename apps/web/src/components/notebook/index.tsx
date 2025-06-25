@@ -17,61 +17,81 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useRef } from "react";
-import { Flex, Text } from "@theme-ui/components";
 import ListItem from "../list-item";
-import { store } from "../../stores/notebook-store";
+import { Button, Flex, Text } from "@theme-ui/components";
 import { useStore as useNotesStore } from "../../stores/note-store";
-import { store as appStore } from "../../stores/app-store";
-import { db } from "../../common/db";
+import { Notebook as NotebookType } from "@notesnook/core";
 import {
-  Topic as TopicIcon,
-  PinFilled,
+  ChevronDown,
+  ChevronRight,
   NotebookEdit,
-  Notebook as NotebookIcon,
-  Pin,
+  Plus,
   RemoveShortcutLink,
   Shortcut,
-  Trash
+  Trash,
+  Notebook as NotebookIcon,
+  ArrowUp,
+  Move
 } from "../icons";
-import { hashNavigate, navigate } from "../../navigation";
-import IconTag from "../icon-tag";
-import { Multiselect } from "../../common/multi-select";
-import { pluralize } from "@notesnook/common";
-import { getFormattedDate } from "@notesnook/common";
 import { MenuItem } from "@notesnook/ui";
-import { Notebook as NotebookType } from "@notesnook/core";
+import { hashNavigate, navigate } from "../../navigation";
+import { useRef } from "react";
 import { handleDrop } from "../../common/drop-handler";
 import { useDragHandler } from "../../hooks/use-drag-handler";
-import { ConfirmDialog } from "../../dialogs/confirm";
+import { AddNotebookDialog } from "../../dialogs/add-notebook-dialog";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
+import { store as appStore } from "../../stores/app-store";
+import { Multiselect } from "../../common/multi-select";
 import { strings } from "@notesnook/intl";
+import { db } from "../../common/db";
+import { createSetDefaultHomepageMenuItem } from "../../common";
+import { useStore as useNotebookStore } from "../../stores/notebook-store";
+import { MoveNotebookDialog } from "../../dialogs/move-notebook-dialog";
 
 type NotebookProps = {
   item: NotebookType;
-  totalNotes: number;
-  date: number;
-  compact?: boolean;
+  totalNotes?: number;
+  isExpandable?: boolean;
+  isExpanded?: boolean;
+  expand?: () => void;
+  collapse?: () => void;
+  refresh?: () => void;
+  depth?: number;
 };
-function Notebook(props: NotebookProps) {
-  const { item, totalNotes, date, compact } = props;
-  const notebook = item;
+export function Notebook(props: NotebookProps) {
+  const {
+    item,
+    totalNotes = 0,
+    isExpandable = false,
+    isExpanded = false,
+    expand = () => {},
+    collapse = () => {},
+    refresh = () => {},
+    depth = 0
+  } = props;
+  const currentContext = useNotesStore((store) =>
+    store.context?.type === "notebook" && store.context.id === item.id
+      ? store.contextNotes
+      : null
+  );
+  const isOpened = !!currentContext;
   const dragTimeout = useRef(0);
-  const { isDragEntering, isDragLeaving } = useDragHandler(`id_${notebook.id}`);
+  const { isDragEntering, isDragLeaving } = useDragHandler(`id_${item.id}`);
 
   return (
     <ListItem
       draggable
-      isCompact={compact}
-      item={notebook}
-      onClick={() => openNotebook(notebook, totalNotes)}
+      isFocused={isOpened}
+      isCompact
+      item={item}
+      onClick={() => navigate(`/notebooks/${item.id}`)}
       onDragEnter={(e) => {
         if (!isDragEntering(e)) return;
         e.currentTarget.focus();
-        dragTimeout.current = setTimeout(
-          () => openNotebook(notebook, totalNotes),
-          1000
-        ) as unknown as number;
+
+        dragTimeout.current = setTimeout(() => {
+          expand();
+        }, 700) as unknown as number;
       }}
       onDragLeave={(e) => {
         if (!isDragLeaving(e)) return;
@@ -79,89 +99,101 @@ function Notebook(props: NotebookProps) {
       }}
       onDrop={async (e) => {
         clearTimeout(dragTimeout.current);
-
-        handleDrop(e.dataTransfer, notebook);
+        handleDrop(e.dataTransfer, item);
       }}
       onKeyPress={async (e) => {
-        if (e.key === "Delete") {
+        if (e.code === "Space") {
+          e.stopPropagation();
+          if (isExpandable) isExpanded ? collapse() : expand();
+          else navigate(`/notebooks/${item.id}`);
+        } else if (e.code === "Delete") {
+          e.stopPropagation();
           await Multiselect.moveNotebooksToTrash(
             useSelectionStore.getState().selectedItems
           );
         }
       }}
-      title={notebook.title}
-      body={notebook.description as string}
-      menuItems={notebookMenuItems}
-      footer={
-        <>
-          {compact ? (
-            <>
-              <Text variant="subBody">{strings.notes(totalNotes)}</Text>
-            </>
-          ) : (
-            <>
-              {notebook?.topics && (
-                <Flex mb={1} sx={{ gap: 1 }}>
-                  {notebook.topics.slice(0, 3).map((topic) => (
-                    <IconTag
-                      key={topic.id}
-                      text={topic.title}
-                      icon={TopicIcon}
-                      onClick={() => {
-                        navigate(`/notebooks/${notebook.id}/${topic.id}`);
-                      }}
-                    />
-                  ))}
-                </Flex>
+      title={
+        <Flex
+          sx={{ alignItems: "center", justifyContent: "center", gap: "small" }}
+        >
+          {isExpandable ? (
+            <Button
+              variant="secondary"
+              sx={{ bg: "transparent", p: 0, borderRadius: 100 }}
+              onClick={(e) => {
+                e.stopPropagation();
+                isExpanded ? collapse() : expand();
+              }}
+            >
+              {isExpanded ? (
+                <ChevronDown
+                  size={14}
+                  color={isOpened ? "icon-selected" : "icon"}
+                />
+              ) : (
+                <ChevronRight
+                  size={14}
+                  color={isOpened ? "icon-selected" : "icon"}
+                />
               )}
-              <Flex
-                sx={{
-                  fontSize: "subBody",
-                  color: "var(--paragraph-secondary)",
-                  alignItems: "center",
-                  fontFamily: "body"
-                }}
-              >
-                {notebook.pinned && (
-                  <PinFilled color="accent" size={13} sx={{ mr: 1 }} />
-                )}
-
-                {getFormattedDate(date, "date")}
-                <Text as="span" mx={1} sx={{ color: "inherit" }}>
-                  •
-                </Text>
-                <Text sx={{ color: "inherit" }}>
-                  {strings.notes(totalNotes)}
-                </Text>
-              </Flex>
-            </>
+            </Button>
+          ) : (
+            <NotebookIcon
+              size={14}
+              color={isOpened ? "icon-selected" : "icon"}
+            />
           )}
-        </>
+          <Text
+            data-test-id={`title`}
+            variant={"body"}
+            color={isOpened ? "paragraph-selected" : "paragraph"}
+            sx={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              fontWeight: "body",
+              display: "block"
+            }}
+          >
+            {item.title}
+          </Text>
+        </Flex>
       }
+      footer={
+        <Text variant="subBody">
+          {currentContext ? currentContext?.length : totalNotes}
+        </Text>
+      }
+      menuItems={notebookMenuItems}
+      context={{ refresh, isRoot: depth === 0 }}
+      sx={{
+        mb: "small",
+        borderRadius: "default",
+        paddingLeft: `${5 + (depth === 0 ? 0 : 15 * depth)}px`
+      }}
     />
   );
 }
-export default React.memo(Notebook, (prev, next) => {
-  const prevItem = prev.item;
-  const nextItem = next.item;
-
-  return (
-    prev.date === next.date &&
-    prevItem.pinned === nextItem.pinned &&
-    prevItem.title === nextItem.title &&
-    prevItem.description === nextItem.description &&
-    prev.totalNotes === next.totalNotes &&
-    prev.compact === next.compact
-  );
-});
 
 export const notebookMenuItems: (
   notebook: NotebookType,
-  ids?: string[]
-) => MenuItem[] = (notebook, ids = []) => {
+  ids?: string[],
+  context?: { refresh?: () => void; isRoot?: boolean }
+) => MenuItem[] = (notebook, ids = [], context) => {
   const defaultNotebook = db.settings.getDefaultNotebook();
-
   return [
+    {
+      type: "button",
+      key: "add",
+      title: strings.newNotebook(),
+      icon: Plus.path,
+      onClick: () =>
+        AddNotebookDialog.show({ parentId: notebook.id }).then((res) =>
+          res ? context?.refresh?.() : null
+        )
+    },
+    { type: "separator", key: "sep0" },
     {
       type: "button",
       key: "edit",
@@ -184,13 +216,11 @@ export const notebookMenuItems: (
       }
     },
     {
-      type: "button",
-      key: "pin",
-      icon: Pin.path,
-      title: strings.pin(),
-      isChecked: notebook.pinned,
-      onClick: () => store.pin(!notebook.pinned, ...ids),
-      multiSelect: true
+      type: "lazy-loader",
+      key: "sidebar-items-loader",
+      items: async () => [
+        createSetDefaultHomepageMenuItem(notebook.id, notebook.type)
+      ]
     },
     {
       type: "button",
@@ -203,48 +233,48 @@ export const notebookMenuItems: (
         : strings.addShortcut(),
       onClick: () => appStore.addToShortcuts(notebook)
     },
-    { key: "sep", type: "separator" },
+    { key: "sep1", type: "separator" },
+    {
+      type: "button",
+      key: "move",
+      icon: Move.path,
+      title: strings.move(),
+      onClick: () => {
+        MoveNotebookDialog.show({ notebook: notebook });
+      }
+    },
+    {
+      type: "button",
+      key: "move-to-top",
+      icon: ArrowUp.path,
+      title: strings.moveToTop(),
+      isHidden: context?.isRoot,
+      onClick: async () => {
+        if (context?.isRoot) return;
+
+        const parentId = await db.notebooks.parentId(notebook.id);
+        if (!parentId) return;
+
+        await db.relations.unlink(
+          {
+            type: "notebook",
+            id: parentId
+          },
+          notebook
+        );
+        await useNotebookStore.getState().refresh();
+      },
+      multiSelect: false
+    },
+    { key: "sep2", type: "separator" },
     {
       type: "button",
       key: "movetotrash",
       title: strings.moveToTrash(),
       variant: "dangerous",
       icon: Trash.path,
-      onClick: async () => {
-        const result = await ConfirmDialog.show({
-          title: `Delete ${pluralize(ids.length, "notebook")}?`,
-          positiveButtonText: strings.yes(),
-          negativeButtonText: strings.no(),
-          checks: {
-            deleteContainingNotes: {
-              text: `Move all notes in ${
-                ids.length > 1 ? "these notebooks" : "this notebook"
-              } to trash`
-            }
-          }
-        });
-
-        if (result) {
-          if (result.deleteContainingNotes) {
-            await Multiselect.moveNotesToTrash(
-              await db.notebooks.notes(notebook.id),
-              false
-            );
-          }
-          await Multiselect.moveNotebooksToTrash(ids);
-        }
-      },
+      onClick: () => Multiselect.moveNotebooksToTrash(ids),
       multiSelect: true
     }
   ];
 };
-
-async function openNotebook(notebook: NotebookType, totalNotes?: number) {
-  await useNotesStore.getState().setContext({
-    type: "notebook",
-    id: notebook.id,
-    item: notebook,
-    totalNotes: totalNotes
-  });
-  navigate(`/notebooks/${notebook.id}`);
-}

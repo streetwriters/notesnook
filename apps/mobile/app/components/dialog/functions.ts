@@ -17,15 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { KeyboardTypeOptions } from "react-native";
 import { eSendEvent } from "../../services/event-manager";
 import { eCloseSimpleDialog, eOpenSimpleDialog } from "../../utils/events";
+import { ButtonProps } from "../ui/button";
 
-type DialogInfo = {
+export type DialogInfo = {
   title?: string;
   paragraph?: string;
-  positiveText?: string;
-  negativeText?: string;
-  positivePress?: (...args: any[]) => void;
+  positiveText: string;
+  negativeText: string;
+  positivePress?: (...args: any[]) => Promise<any>;
   onClose?: () => void;
   positiveType?:
     | "transparent"
@@ -44,16 +46,18 @@ type DialogInfo = {
   // eslint-disable-next-line @typescript-eslint/ban-types
   context: "global" | "local" | (string & {});
   secureTextEntry?: boolean;
-  keyboardType?: string;
+  keyboardType?: KeyboardTypeOptions;
   check?: {
     info: string;
-    type?: string;
+    type?: ButtonProps["type"];
     defaultValue?: boolean;
   };
   notice: {
     text: string;
     type: "alert" | "information";
   };
+  disableBackdropClosing: boolean;
+  component: JSX.Element | ((close?: () => void) => JSX.Element);
 };
 
 export function presentDialog(data: Partial<DialogInfo>): void {

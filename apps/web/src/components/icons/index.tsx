@@ -40,6 +40,7 @@ import {
   mdiClose,
   mdiDotsVertical,
   mdiTrashCanOutline,
+  mdiArchiveOutline,
   mdiBookRemoveOutline,
   mdiMagnify,
   mdiMenu,
@@ -216,7 +217,20 @@ import {
   mdiFileMusicOutline,
   mdiBroom,
   mdiServerSecurity,
-  mdiOpenInNew
+  mdiOpenInNew,
+  mdiTagOutline,
+  mdiChatQuestionOutline,
+  mdiNoteRemoveOutline,
+  mdiTabPlus,
+  mdiRadar,
+  mdiLinkBoxOutline,
+  mdiHistory,
+  mdiArrowCollapseLeft,
+  mdiArrowCollapseRight,
+  mdiHamburger,
+  mdiNotePlus,
+  mdiNoteEditOutline,
+  mdiArrowUp
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
@@ -270,7 +284,8 @@ const MDIIconWrapper = memo(
   (prev, next) =>
     prev.rotate === next.rotate &&
     prev.color === next.color &&
-    prev.title === next.title
+    prev.title === next.title &&
+    prev.size === next.size
 );
 
 export type IconProps = FlexProps & Omit<MDIIconWrapperProps, "path">;
@@ -281,7 +296,7 @@ export type Icon = {
   path: string;
 };
 
-function createIcon(path: string, rotate = false) {
+export function createIcon(path: string, rotate = false) {
   const NNIcon: Icon = function Icon(props) {
     const { sx, rotate: _rotate = rotate, size, ...restProps } = props;
     return (
@@ -310,7 +325,9 @@ function createIcon(path: string, rotate = false) {
 }
 
 export const Plus = createIcon(mdiPlus);
+export const NoteAdd = createIcon(mdiNoteEditOutline);
 export const Note = createIcon(mdiNoteOutline);
+export const NoteRemove = createIcon(mdiNoteRemoveOutline);
 export const Notes = createIcon(mdiNoteMultipleOutline);
 export const Minus = createIcon(mdiMinus);
 export const Notebook = createIcon(mdiBookOutline);
@@ -336,6 +353,7 @@ export const Cross = createIcon(mdiClose);
 export const MoreVertical = createIcon(mdiDotsVertical);
 export const MoreHorizontal = createIcon(mdiDotsHorizontal);
 export const Trash = createIcon(mdiTrashCanOutline);
+export const Archive = createIcon(mdiArchiveOutline);
 export const TopicRemove = createIcon(mdiBookmarkRemoveOutline);
 export const NotebookRemove = createIcon(mdiBookRemoveOutline);
 export const Search = createIcon(mdiMagnify);
@@ -554,3 +572,15 @@ export const WindowRestore = createIcon(
 export const WindowClose = createIcon(mdiWindowClose);
 export const ClearCache = createIcon(mdiBroom);
 export const OpenInNew = createIcon(mdiOpenInNew);
+export const Coupon = createIcon(mdiTagOutline);
+export const Support = createIcon(mdiChatQuestionOutline);
+export const NewTab = createIcon(mdiTabPlus);
+export const Radar = createIcon(mdiRadar);
+
+export const LinkedTo = createIcon(mdiVectorLink);
+export const ReferencedIn = createIcon(mdiLink);
+export const SessionHistory = createIcon(mdiHistory);
+export const ColorRemove = createIcon(mdiCloseCircleOutline);
+export const ExpandSidebar = createIcon(mdiArrowCollapseRight);
+export const HamburgerMenu = createIcon(mdiMenu);
+export const ArrowUp = createIcon(mdiArrowUp);

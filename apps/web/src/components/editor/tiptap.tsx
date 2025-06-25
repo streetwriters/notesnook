@@ -62,6 +62,8 @@ import useMobile from "../../hooks/use-mobile";
 import useTablet from "../../hooks/use-tablet";
 import { TimeFormat } from "@notesnook/core";
 import { BuyDialog } from "../../dialogs/buy-dialog";
+import { EDITOR_ZOOM } from "./common";
+import { ScrollContainer } from "@notesnook/ui";
 
 export type OnChangeHandler = (
   content: () => string,
@@ -88,6 +90,7 @@ type TipTapProps = {
   ) => Promise<LinkAttributes | undefined>;
   onAttachFile?: (file: File) => void;
   onFocus?: () => void;
+  onAutoSaveDisabled: () => void;
   content?: () => string | undefined;
   readonly?: boolean;
   nonce?: number;
@@ -101,6 +104,7 @@ type TipTapProps = {
   dateFormat: string;
   timeFormat: TimeFormat;
   markdownShortcuts: boolean;
+  fontLigatures: boolean;
 };
 
 function updateWordCount(id: string, content: () => Fragment) {
@@ -131,19 +135,19 @@ function TipTap(props: TipTapProps) {
     onInsertInternalLink,
     onContentChange,
     onFocus = () => {},
+    onAutoSaveDisabled,
     content,
     editorContainer,
     readonly,
     nonce,
-    isMobile,
-    isTablet,
     downloadOptions,
     fontSize,
     fontFamily,
     doubleSpacedLines,
     dateFormat,
     timeFormat,
-    markdownShortcuts
+    markdownShortcuts,
+    fontLigatures
   } = props;
 
   const isUserPremium = useIsUserPremium();
@@ -164,7 +168,7 @@ function TipTap(props: TipTapProps) {
   const tiptapOptions = useMemo<Partial<TiptapOptions>>(() => {
     return {
       editorProps: {
-        handleKeyDown(view, event) {
+        handleKeyDown(_, event) {
           if ((event.ctrlKey || event.metaKey) && event.key === "s") {
             event.preventDefault();
             onChange?.(
@@ -191,6 +195,7 @@ function TipTap(props: TipTapProps) {
         }
       },
       enableInputRules: markdownShortcuts,
+      enableFontLigatures: fontLigatures,
       downloadOptions,
       doubleSpacedLines,
       dateFormat,
@@ -295,22 +300,24 @@ function TipTap(props: TipTapProps) {
       previewAttachment: onPreviewAttachment,
       createInternalLink: onInsertInternalLink,
       getAttachmentData: onGetAttachmentData,
-      openLink: (url) => {
+      openLink: (url, openInNewTab) => {
         const link = parseInternalLink(url);
         if (link && link.type === "note") {
           useEditorStore.getState().openSession(link.id, {
-            activeBlockId: link.params?.blockId || undefined
+            activeBlockId: link.params?.blockId || undefined,
+            openInNewTab: openInNewTab
           });
         } else window.open(url, "_blank");
       }
     };
   }, [
+    content,
     readonly,
-    nonce,
     doubleSpacedLines,
     dateFormat,
     timeFormat,
-    markdownShortcuts
+    markdownShortcuts,
+    fontLigatures
   ]);
 
   const editor = useTiptap(
@@ -346,6 +353,9 @@ function TipTap(props: TipTapProps) {
       (s) => s.editors[id]?.statistics?.words.total,
       (totalWords) => {
         autoSave.current = !totalWords || totalWords < MAX_AUTO_SAVEABLE_WORDS;
+        if (!autoSave.current) {
+          onAutoSaveDisabled();
+        }
       }
     );
     return () => {
@@ -365,18 +375,36 @@ function TipTap(props: TipTapProps) {
           zIndex: 2
         }}
       >
-        <Toolbar
-          editor={editor}
-          location={"top"}
-          sx={
-            isTablet || isMobile
-              ? { overflowX: "scroll", flexWrap: "nowrap" }
-              : {}
-          }
-          tools={toolbarConfig}
-          defaultFontFamily={fontFamily}
-          defaultFontSize={fontSize}
-        />
+        <ScrollContainer
+          className="toolbarScroll"
+          suppressScrollY
+          style={{ display: "flex" }}
+          trackStyle={() => ({
+            backgroundColor: "transparent",
+            "--ms-track-size": "6px"
+          })}
+          thumbStyle={() => ({ height: 3 })}
+          onWheel={(e) => {
+            const scrollcontainer = document.querySelector(
+              ".active .toolbarScroll"
+            );
+            if (!scrollcontainer) return;
+            if (e.deltaY > 0) scrollcontainer.scrollLeft += 100;
+            else if (e.deltaY < 0) scrollcontainer.scrollLeft -= 100;
+          }}
+        >
+          <Toolbar
+            editor={editor}
+            location={"top"}
+            sx={{
+              flexWrap: "unset",
+              overflowX: "unset"
+            }}
+            tools={toolbarConfig}
+            defaultFontFamily={fontFamily}
+            defaultFontSize={fontSize}
+          />
+        </ScrollContainer>
       </ScopedThemeProvider>
     </>
   );
@@ -394,6 +422,7 @@ function TiptapWrapper(
       | "dateFormat"
       | "timeFormat"
       | "markdownShortcuts"
+      | "fontLigatures"
     >
   > & {
     isHydrating?: boolean;
@@ -411,9 +440,10 @@ function TiptapWrapper(
   const markdownShortcuts = useSettingsStore(
     (store) => store.markdownShortcuts
   );
+  const fontLigatures = useSettingsStore((store) => store.fontLigatures);
   const containerRef = useRef<HTMLDivElement>(null);
   const editorContainerRef = useRef<HTMLDivElement>();
-  const { editorConfig } = useEditorConfig();
+  const { editorConfig, setEditorConfig } = useEditorConfig();
   const isMobile = useMobile();
   const isTablet = useTablet();
 
@@ -443,6 +473,33 @@ function TiptapWrapper(
     }
   }, [isHydrating]);
 
+  useEffect(() => {
+    if (!editorContainerRef.current) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      if (e.ctrlKey) {
+        if (e.deltaY === 0) return;
+
+        e.preventDefault();
+        const delta =
+          (e.deltaY > 0 && e.deltaY < 10) || (e.deltaY > -10 && e.deltaY < 0)
+            ? -e.deltaY
+            : e.deltaY > 0
+            ? -EDITOR_ZOOM.STEP
+            : EDITOR_ZOOM.STEP;
+        const zoom = Math.min(
+          EDITOR_ZOOM.MAX,
+          Math.max(EDITOR_ZOOM.MIN, Math.round(editorConfig.zoom + delta))
+        );
+        setEditorConfig({ zoom });
+      }
+    };
+    editorContainerRef.current.addEventListener("wheel", handleWheel);
+    return () => {
+      editorContainerRef.current?.removeEventListener("wheel", handleWheel);
+    };
+  }, [editorConfig.zoom]);
+
   return (
     <Flex
       ref={containerRef}
@@ -450,12 +507,15 @@ function TiptapWrapper(
         flex: 1,
         flexDirection: "column",
         ".tiptap.ProseMirror": { pb: 150 },
-        ".editor-container": { opacity: isHydrating ? 0 : 1 },
+        ".editor-container": {
+          opacity: isHydrating ? 0 : 1,
+          zoom: editorConfig.zoom + "%"
+        },
         ".editor-loading-container.hidden": { display: "none" }
       }}
     >
       <TipTap
-        key={`tiptap-${props.id}-${doubleSpacedLines}-${dateFormat}-${timeFormat}-${markdownShortcuts}`}
+        key={`tiptap-${props.id}-${doubleSpacedLines}-${dateFormat}-${timeFormat}-${markdownShortcuts}-${fontLigatures}`}
         {...props}
         isMobile={isMobile}
         isTablet={isTablet}
@@ -463,6 +523,7 @@ function TiptapWrapper(
         dateFormat={dateFormat}
         timeFormat={timeFormat}
         markdownShortcuts={markdownShortcuts}
+        fontLigatures={fontLigatures}
         onLoad={(editor) => {
           if (!isHydrating) {
             onLoad?.(editor);
@@ -549,7 +610,13 @@ function toIEditor(editor: Editor): IEditor {
         },
         { query: (a) => a.hash === hash, preventUpdate: true }
       ),
-    startSearch: () => editor.commands.startSearch()
+    startSearch: () => editor.commands.startSearch(),
+    getContent: () =>
+      getHTMLFromFragment(editor.state.doc.content, editor.schema),
+    getSelection: () => {
+      const { from, to } = editor.state.selection;
+      return { from, to };
+    }
   };
 }
 

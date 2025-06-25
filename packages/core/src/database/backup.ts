@@ -244,7 +244,7 @@ export default class Backup {
         buffer = [];
         bufferLength = 0;
 
-        itemsJSON = await this.db.compressor().compress(itemsJSON);
+        itemsJSON = await (await this.db.compressor()).compress(itemsJSON);
 
         const hash = SparkMD5.hash(itemsJSON);
 
@@ -361,7 +361,7 @@ export default class Backup {
       };
 
       let current = 0;
-      for await (const attachment of this.db.attachments.all) {
+      for await (const attachment of this.db.attachments.all.iterate()) {
         current++;
         if (
           !(await this.db
@@ -405,7 +405,7 @@ export default class Backup {
     state.buffer = [];
     state.bufferLength = 0;
 
-    itemsJSON = await this.db.compressor().compress(itemsJSON);
+    itemsJSON = await (await this.db.compressor()).compress(itemsJSON);
 
     const hash = SparkMD5.hash(itemsJSON);
 
@@ -478,7 +478,9 @@ export default class Backup {
             e.message.includes("ciphertext cannot be decrypted") ||
             e.message === "FAILURE"
           )
-            throw new Error("Incorrect password.");
+            throw new Error(
+              encryptionKey ? "Invalid encryption key." : "Incorrect password."
+            );
           throw new Error(`Could not decrypt backup: ${e.message}`);
         }
       }
@@ -493,7 +495,9 @@ export default class Backup {
       throw new Error("Backup file has been tempered, aborting...");
 
     if ("compressed" in backup && typeof decryptedData === "string")
-      decryptedData = await this.db.compressor().decompress(decryptedData);
+      decryptedData = await (
+        await this.db.compressor()
+      ).decompress(decryptedData);
 
     const data =
       typeof decryptedData === "string"
@@ -555,7 +559,8 @@ export default class Backup {
         !item ||
         typeof item !== "object" ||
         Array.isArray(item) ||
-        isDeleted(item)
+        isDeleted(item) ||
+        item.type === "searchResult"
       )
         continue;
       // in v5.6 of the database, we did not set note history session's type

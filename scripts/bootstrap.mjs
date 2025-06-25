@@ -18,12 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { exec } from "child_process";
-import { readFile } from "fs/promises";
+import { readFile, writeFile } from "fs/promises";
 import path from "path";
 import os from "os";
 import parser from "yargs-parser";
 import { fdir } from "fdir";
 import { Listr } from "listr2";
+import { createInterface } from "readline/promises";
 
 const args = parser(process.argv, { alias: { scope: ["s"], offline: ["o"] } });
 const IS_CI = process.env.CI;
@@ -83,7 +84,12 @@ if (IS_BOOTSTRAP_ALL) {
 
   await bootstrapPackages(dependencies);
 } else {
-  const dependencies = await findDependencies(scopes[args.scope]);
+  const dependencyMap = {};
+  const dependencies = await findDependencies(
+    scopes[args.scope],
+    dependencyMap
+  );
+  // analyzeDependencyMap(dependencyMap);
   await bootstrapPackages(dependencies);
 }
 
@@ -148,7 +154,9 @@ async function bootstrapPackage(cwd, outputs) {
 
   const packages = await needsRebuild(cwd);
   if (packages.length > 0) {
-    postInstallCommands.push(`npm rebuild ${packages.join(" ")}`);
+    postInstallCommands.push(
+      `npm rebuild --foreground-scripts ${packages.join(" ")}`
+    );
   }
 
   if (await hasScript(cwd, "postinstall"))
@@ -158,6 +166,7 @@ async function bootstrapPackage(cwd, outputs) {
     let retries = 3;
     while (--retries > 0) {
       try {
+        console.log("Running postinstall command:", cmd, "in", cwd);
         await execute(cmd, cwd, outputs);
         break;
       } catch (e) {
@@ -167,7 +176,7 @@ async function bootstrapPackage(cwd, outputs) {
   }
 }
 
-async function findDependencies(scope) {
+async function findDependencies(scope, dependencyMap = {}) {
   try {
     const packageJsonPath = path.join(scope, "package.json");
     const packageJson = JSON.parse(await readFile(packageJsonPath, "utf-8"));
@@ -179,8 +188,20 @@ async function findDependencies(scope) {
       ...filterDependencies(scope, packageJson.peerDependencies)
     ]);
 
+    for (const depArray of [
+      packageJson.dependencies,
+      packageJson.devDependencies
+    ]) {
+      for (const dep in depArray) {
+        dependencyMap[dep] = dependencyMap[dep] || {};
+        dependencyMap[dep][packageJsonPath] = depArray[dep];
+      }
+    }
+
     for (const dependency of dependencies) {
-      (await findDependencies(dependency)).forEach((v) => dependencies.add(v));
+      (await findDependencies(dependency, dependencyMap)).forEach((v) =>
+        dependencies.add(v)
+      );
     }
 
     dependencies.add(path.resolve(scope));
@@ -234,4 +255,48 @@ async function hasScript(cwd, scriptName) {
     .then(JSON.parse)
     .catch(Object);
   return pkg && pkg.scripts && pkg.scripts[scriptName];
+}
+
+async function prompt(question) {
+  const rl = createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  const answer = await rl.question(question);
+  rl.close();
+  return answer.trim();
+}
+
+async function analyzeDependencyMap(map) {
+  for (const dep in map) {
+    const versions = Object.values(map[dep]);
+    if (versions.length <= 1) continue;
+    const baseVersion = versions[0];
+    if (baseVersion.startsWith("file")) continue;
+    if (versions.some((v) => v !== baseVersion)) {
+      console.error(
+        `There are multiple different versions of "${dep}" in the monorepo. This can cause issues.`
+      );
+      console.table(map[dep]);
+      const version = await prompt(
+        "Which version would you like to use everywhere?"
+      );
+      for (const packageJsonPath in map[dep]) {
+        const packageJson = JSON.parse(
+          await readFile(packageJsonPath, "utf-8")
+        );
+        for (const key of ["dependencies", "devDependencies"]) {
+          if (packageJson[key] && packageJson[key][dep]) {
+            packageJson[key][dep] = version;
+          }
+        }
+        await writeFile(
+          packageJsonPath,
+          JSON.stringify(packageJson, undefined, 2)
+        );
+      }
+      continue;
+    }
+  }
 }

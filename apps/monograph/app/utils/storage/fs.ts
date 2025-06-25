@@ -23,7 +23,7 @@ export async function read<T>(key: string, fallback: T): Promise<T> {
   try {
     return (JSON.parse(await readFile(key, "utf-8")) as T) || fallback;
   } catch (e) {
-    console.error(e);
+    // console.error(e);
     return fallback;
   }
 }

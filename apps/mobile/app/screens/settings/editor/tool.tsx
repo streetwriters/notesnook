@@ -27,7 +27,7 @@ import { SvgView } from "../../../components/ui/svg";
 import Paragraph from "../../../components/ui/typography/paragraph";
 import { useThemeColors } from "@notesnook/theme";
 import { getElevationStyle } from "../../../utils/elevation";
-import { SIZE } from "../../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import { renderGroup } from "./common";
 import { DraggableItem, useDragState } from "./state";
 import { findToolById, getToolIcon } from "./toolbar-definition";
@@ -37,6 +37,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import type { ToolId } from "@notesnook/editor";
 import PremiumService from "../../../services/premium";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 export const Tool = ({
   item,
@@ -179,13 +180,13 @@ export const Tool = ({
               : colors.secondary.background,
             borderWidth: isSubgroup ? 0 : 1,
             borderColor: isSubgroup ? undefined : colors.secondary.background,
-            marginBottom: 10,
+            marginBottom: DefaultAppStyles.GAP_VERTICAL,
             width: isDragged ? dimensions.current.width : "100%",
             paddingTop: isSubgroup ? 15 : 0,
             height: 40,
-            paddingHorizontal: isSubgroup ? 0 : 12,
+            paddingHorizontal: isSubgroup ? 0 : DefaultAppStyles.GAP,
             paddingRight: 0,
-            borderRadius: 5,
+            borderRadius: defaultBorderRadius,
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
@@ -205,7 +206,7 @@ export const Tool = ({
             {isSubgroup && (
               <Icon
                 style={{ marginRight: 5 }}
-                size={SIZE.md}
+                size={AppFontSize.md}
                 name="drag"
                 color={colors.primary.icon}
               />
@@ -219,7 +220,7 @@ export const Tool = ({
                   ? colors.secondary.paragraph
                   : colors.primary.paragraph
               }
-              size={isSubgroup ? SIZE.xs : SIZE.sm - 1}
+              size={isSubgroup ? AppFontSize.xs : AppFontSize.sm - 1}
             >
               {isSubgroup ? strings.collapsed() : tool?.title}
             </Paragraph>
@@ -244,7 +245,7 @@ export const Tool = ({
                 }}
                 name={btn.name}
                 color={colors.primary.icon}
-                size={SIZE.lg}
+                size={AppFontSize.lg}
               />
             ))}
           </View>
@@ -368,8 +369,10 @@ export const Tool = ({
             dragged?.type === "subgroup"
               ? colors.secondary.background
               : undefined,
-          marginTop: recievePosition === "above" ? 5 : 0,
-          marginBottom: recievePosition === "below" ? 5 : 0,
+          marginTop:
+            recievePosition === "above" ? DefaultAppStyles.GAP_VERTICAL : 0,
+          marginBottom:
+            recievePosition === "below" ? DefaultAppStyles.GAP_VERTICAL : 0,
           borderRadius: 10
         }}
         renderHoverContent={() => renderChild(true)}

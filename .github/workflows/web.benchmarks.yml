@@ -1,0 +1,44 @@
+name: Benchmark @notesnook/web
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "master"
+    paths:
+      - "apps/web/**"
+      # re-run workflow if workflow file changes
+      - ".github/workflows/web.benchmarks.yml"
+  pull_request:
+
+jobs:
+  bench:
+    name: Bench
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Install packages
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=web
+
+      - name: Setup environment
+        run: |
+          echo "NX_CLOUD_ACCESS_TOKEN=${{ secrets.NX_CLOUD_ACCESS_TOKEN }}" >> $GITHUB_ENV
+
+      - name: Build
+        run: npm run build:web
+
+      - name: Install Playwright Browsers
+        run: npx playwright install chromium --with-deps
+        working-directory: apps/web
+
+      - name: Run benchmarks
+        id: benchmark
+        run: node __bench__/app.bench.mjs
+        working-directory: apps/web

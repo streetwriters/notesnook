@@ -93,19 +93,37 @@ const features: Record<FeatureKeys, Feature> = {
         ]
       : [
           {
-            title: "Full offline mode",
+            title: "Improved search UX",
             subtitle:
-              "You can now download all your attachments upfront so they are always available on your device even without an Internet connection. To enable just go to Settings > Sync and toggle Full Offline Mode."
+              "Searching for notes will now show exactly where the term occurs"
           },
           {
-            title: "Backup with attachments",
+            title: "Sortable search",
             subtitle:
-              "You can now backup your notes alongwith all your attachments - kind of like a full account snapshot."
+              "Search results are now sortable (just like notes, notebooks etc.)"
           },
           {
-            title: "Self hosting",
+            title: "Archive",
+            subtitle: (
+              <>
+                You can now archive your notes to hide them from the main list.
+              </>
+            )
+          },
+          {
+            title: "Integrated Notesnook Importer",
+            subtitle: (
+              <>
+                Notesnook Importer is now integrated directly into the app
+                allowing for faster and more seamless import of your notes. Just
+                drag and drop your notes from other note-taking apps and viola!
+              </>
+            )
+          },
+          {
+            title: "Set default tag",
             subtitle:
-              "This release also adds initial support for changing server URLs i.e. to connect your own instance of Notesnook. Please note that this is still experimental and may not work as expected."
+              "You can now set any tag as default and it'll automatically be applied whenever you create a note."
           }
         ],
     cta: {
@@ -138,12 +156,7 @@ export const FeatureDialog = DialogManager.register(function FeatureDialog(
 ) {
   const { featureName, onClose } = props;
   const feature = features[featureName];
-
-  useEffect(() => {
-    if (!feature || (feature.shouldShow && !feature.shouldShow())) {
-      onClose(false);
-    }
-  }, [feature, onClose]);
+  const isShown = feature && feature.shouldShow && feature.shouldShow();
 
   return (
     <Dialog
@@ -151,6 +164,9 @@ export const FeatureDialog = DialogManager.register(function FeatureDialog(
       title={feature.title}
       description={feature.subtitle}
       textAlignment="center"
+      onOpen={() => {
+        if (!isShown) onClose(false);
+      }}
       positiveButton={{
         text: (
           <Flex>

@@ -17,9 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-function info(context: string, ...logs: unknown[]) {
-  console.log(`${new Date().toLocaleDateString()}::info::${context}:`, ...logs);
-}
+function info(context: string, ...logs: unknown[]) {}
 
 function error(context: string, ...logs: unknown[]) {
   console.log(

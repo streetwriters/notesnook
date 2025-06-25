@@ -18,7 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { isReminderActive } from "../collections/reminders.js";
-import { GroupHeader, GroupOptions, ItemType, Reminder } from "../types.js";
+import {
+  GroupHeader,
+  GroupOptions,
+  ItemType,
+  Reminder,
+  SortOptions
+} from "../types.js";
 import { getWeekGroupFromTimestamp, MONTHS_FULL } from "../utils/date.js";
 
 type PartialGroupableItem = {
@@ -33,7 +39,7 @@ type PartialGroupableItem = {
 export type GroupKeySelectorFunction<T> = (item: T) => string;
 
 export const getSortValue = (
-  options: GroupOptions | undefined,
+  options: SortOptions | undefined,
   item: PartialGroupableItem
 ) => {
   if (
@@ -53,7 +59,7 @@ export const getSortValue = (
 };
 
 export function getSortSelectors<T extends PartialGroupableItem>(
-  options: GroupOptions
+  options: SortOptions
 ) {
   if (options.sortBy === "title")
     return {

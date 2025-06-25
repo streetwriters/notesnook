@@ -24,7 +24,7 @@ import {
   TEST_NOTEBOOK2,
   databaseTest
 } from "./utils/index.ts";
-import { test, expect } from "vitest";
+import { test, expect, describe } from "vitest";
 
 const content = {
   ...TEST_NOTE.content,
@@ -37,8 +37,13 @@ test("search notes", () =>
     content: content
   }).then(async ({ db }) => {
     await db.notes.add(TEST_NOTE);
-    let filtered = await db.lookup.notes("note of the world").ids();
-    expect(filtered).toHaveLength(1);
+    await db.notes.add({
+      content: { data: "<p>hb <b>kb</b> ch</p>", type: "tiptap" },
+      title: "hello"
+    });
+
+    expect(await db.lookup.notes("note of the world").ids()).toHaveLength(1);
+    expect(await db.lookup.notes("hb kb ch").ids()).toHaveLength(1);
   }));
 
 test("search notes (remove diacritics)", () =>
@@ -51,6 +56,19 @@ test("search notes (remove diacritics)", () =>
     await db.notes.add(TEST_NOTE);
     let filtered = await db.lookup.notes("a la maison").ids();
     expect(filtered).toHaveLength(1);
+  }));
+
+test("search notes (remove html tags)", () =>
+  noteTest({
+    content: {
+      type: "tiptap",
+      data: "<p block-id='1'>hello this is a word</p>"
+    }
+  }).then(async ({ db }) => {
+    await db.notes.add(TEST_NOTE);
+    expect(await db.lookup.notes("block").ids()).toHaveLength(0);
+    expect(await db.lookup.notes("hello").ids()).toHaveLength(2);
+    expect(await db.lookup.notes("word").ids()).toHaveLength(1);
   }));
 
 test("search notes with a locked note", () =>
@@ -106,4 +124,18 @@ test("search should return restored notes", () =>
     const filtered = await db.lookup.notes("heavy tune").ids();
 
     expect(filtered).toHaveLength(1);
+  }));
+
+test("search reminders", () =>
+  databaseTest().then(async (db) => {
+    await db.reminders.add({
+      title: "remind me",
+      description: "please do",
+      date: Date.now()
+    });
+
+    const titleSearch = await db.lookup.reminders("remind me").ids();
+    expect(titleSearch).toHaveLength(1);
+    const descriptionSearch = await db.lookup.reminders("please do").ids();
+    expect(descriptionSearch).toHaveLength(1);
   }));

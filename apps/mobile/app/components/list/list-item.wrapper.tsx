@@ -27,6 +27,7 @@ import {
   GroupHeader,
   GroupOptions,
   GroupingKey,
+  HighlightedResult,
   Item,
   ItemType,
   Note,
@@ -34,12 +35,13 @@ import {
   Reminder,
   Tag,
   TrashItem,
-  VirtualizedGrouping
+  VirtualizedGrouping,
+  getSortValue
 } from "@notesnook/core";
-import { getSortValue } from "@notesnook/core";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { db } from "../../common/database";
+import { useIsCompactModeEnabled } from "../../hooks/use-is-compact-mode-enabled";
 import { eSendEvent } from "../../services/event-manager";
 import { RouteName } from "../../stores/use-navigation-store";
 import { eOpenJumpToDialog } from "../../utils/events";
@@ -48,7 +50,7 @@ import { NoteWrapper } from "../list-items/note/wrapper";
 import { NotebookWrapper } from "../list-items/notebook/wrapper";
 import ReminderItem from "../list-items/reminder";
 import TagItem from "../list-items/tag";
-import { useIsCompactModeEnabled } from "../../hooks/use-is-compact-mode-enabled";
+import { SearchResult } from "../list-items/search-result";
 
 type ListItemWrapperProps<TItem = Item> = {
   group?: GroupingKey;
@@ -154,7 +156,7 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
           items?.cacheItem(index) ? 100 : 0
         );
       } catch (e) {
-        console.log("Error", e);
+        /** empty */
       }
     })();
   }, [index, items, refreshItem]);
@@ -198,10 +200,11 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
             notebooks={notebooks.current}
             reminder={reminder.current}
             attachmentsCount={attachmentsCount.current}
-            date={getDate(item, group)}
+            date={getDate(item as Note, group)}
             isRenderedInActionSheet={isSheet}
             index={index}
             locked={locked.current}
+            renderedInRoute={props.renderedInRoute}
           />
         </>
       );
@@ -228,7 +231,7 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
           <NotebookWrapper
             item={item as Notebook}
             totalNotes={totalNotes.current}
-            date={getDate(item, group)}
+            date={getDate(item as Notebook, group)}
             index={index}
           />
         </>
@@ -286,18 +289,39 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
           />
         </>
       );
+    case "searchResult":
+      return (
+        <>
+          {groupHeader && previousIndex.current === index && !isSheet ? (
+            <SectionHeader
+              screen={props.renderedInRoute}
+              item={groupHeader}
+              index={index}
+              dataType={item.type}
+              color={props.customAccentColor}
+              groupOptions={groupOptions}
+              onOpenJumpToDialog={() => {
+                eSendEvent(eOpenJumpToDialog, {
+                  ref: props.scrollRef,
+                  data: items
+                });
+              }}
+            />
+          ) : null}
+          <SearchResult item={item as HighlightedResult} />
+        </>
+      );
     default:
       return null;
   }
 }
 
-function getDate(item: Item, groupType?: GroupingKey): number {
+function getDate(item: Notebook | Note, groupType?: GroupingKey): number {
   return (
     getSortValue(
       groupType
         ? db.settings.getGroupOptions(groupType)
         : {
-            groupBy: "default",
             sortBy: "dateEdited",
             sortDirection: "desc"
           },

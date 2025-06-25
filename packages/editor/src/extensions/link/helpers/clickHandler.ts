@@ -31,7 +31,9 @@ export function clickHandler(options: ClickHandlerOptions): Plugin {
     key: new PluginKey("handleClickLink"),
     props: {
       handleClick: (view, pos, event) => {
-        if (event.button !== 0) {
+        const isMainClick = event.button === 0;
+        const isAuxClick = event.button === 1;
+        if (!isMainClick && !isAuxClick) {
           return false;
         }
 
@@ -56,7 +58,12 @@ export function clickHandler(options: ClickHandlerOptions): Plugin {
         if (link && href) {
           if (options.editor.storage.openLink) {
             event.preventDefault();
-            setTimeout(() => options.editor.storage.openLink?.(href));
+            setTimeout(() =>
+              options.editor.storage.openLink?.(
+                href,
+                isAuxClick || event.ctrlKey || event.metaKey
+              )
+            );
           }
 
           return true;

@@ -25,6 +25,7 @@ import {
   CredentialType,
   CredentialWithSecret,
   CredentialWithoutSecret,
+  DEFAULT_ITERATIONS,
   useKeyStore,
   wrongCredentialError
 } from "../../interfaces/key-store";
@@ -36,6 +37,78 @@ import { PromptDialog } from "../prompt";
 import { SettingComponent, SettingsGroup } from "./types";
 
 export const AppLockSettings: SettingsGroup[] = [
+  {
+    key: "app-lock",
+    section: "app-lock",
+    header: "App lock",
+    onStateChange: (listener) =>
+      useKeyStore.subscribe((s) => s.credentials, listener),
+    settings: [
+      {
+        key: "enable-app-lock",
+        title: "Enable app lock",
+        onStateChange: (listener) =>
+          useKeyStore.subscribe((s) => s.credentials, listener),
+        components: [
+          {
+            type: "toggle",
+            toggle: async () => {
+              const { credentials } = useKeyStore.getState();
+              const defaultCredential = credentials
+                .filter((c) => c.active)
+                .at(0);
+
+              if (!defaultCredential) {
+                const verified = await verifyAccount();
+                if (!verified) return;
+
+                await registerCredential("password");
+              } else {
+                await unlockAppLock(defaultCredential);
+              }
+            },
+            isToggled: () =>
+              useKeyStore.getState().credentials.some((c) => c.active)
+          }
+        ]
+      },
+      {
+        key: "lock-app-after",
+        title: "Lock app after",
+        description:
+          "How long should the app wait to lock itself after going into the background or going idle?",
+        isHidden: () => useKeyStore.getState().activeCredentials().length <= 0,
+        onStateChange: (listener) =>
+          useKeyStore.subscribe((s) => s.secrets.lockAfter, listener),
+        components: [
+          {
+            type: "dropdown",
+            options: [
+              { title: "Immediately", value: 0 },
+              { title: "1 minute", value: 1 },
+              { title: "5 minutes", value: 5 },
+              { title: "10 minutes", value: 10 },
+              { title: "15 minutes", value: 15 },
+              { title: "30 minutes", value: 30 },
+              { title: "45 minutes", value: 45 },
+              { title: "1 hour", value: 60 },
+              { title: "Never", value: -1 }
+            ],
+            onSelectionChanged: async (value) => {
+              if (!(await authenticateAppLock())) {
+                showToast("error", "Failed to authenticate.");
+                return;
+              }
+              useKeyStore.getState().setValue("lockAfter", parseInt(value));
+            },
+            selectedOption: async () => {
+              return (await useKeyStore.getState().getValue("lockAfter")) || 0;
+            }
+          }
+        ]
+      }
+    ]
+  },
   {
     key: "app-lock-credentials",
     section: "app-lock",
@@ -72,9 +145,15 @@ export const AppLockSettings: SettingsGroup[] = [
                     newPassword: {
                       label: strings.newPassword(),
                       autoComplete: "new-password"
+                    },
+                    confirmPassword: {
+                      label: strings.confirmPassword(),
+                      autoComplete: "new-password"
                     }
                   },
-                  validate({ newPassword, oldPassword }) {
+                  validate({ newPassword, oldPassword, confirmPassword }) {
+                    if (newPassword !== confirmPassword)
+                      return Promise.resolve(false);
                     return useKeyStore
                       .getState()
                       .changeCredential(
@@ -230,7 +309,8 @@ async function registerCredential(type: CredentialType) {
         await register({
           type,
           id: "password",
-          salt: window.crypto.getRandomValues(new Uint8Array(16))
+          salt: window.crypto.getRandomValues(new Uint8Array(16)),
+          iterations: DEFAULT_ITERATIONS
         }).then(() =>
           activate({
             type,

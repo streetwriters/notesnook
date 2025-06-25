@@ -29,7 +29,7 @@ import {
 } from "../../../services/event-manager";
 import Notifications from "../../../services/notifications";
 import { useThemeColors } from "@notesnook/theme";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import List from "../../list";
 import { Button } from "../../ui/button";
 import Heading from "../../ui/typography/heading";
@@ -41,6 +41,7 @@ import {
   Note
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 type ReminderSheetProps = {
   actionSheetRef: RefObject<ActionSheetRef>;
@@ -68,19 +69,19 @@ export default function ReminderNotify({
 
   const QuickActions = [
     {
-      title: `5 ${strings.timeShort.minute}`,
+      title: `5 ${strings.timeShort.minute()}`,
       time: 5
     },
     {
-      title: `15 ${strings.timeShort.minute}`,
+      title: `15 ${strings.timeShort.minute()}`,
       time: 15
     },
     {
-      title: `30 ${strings.timeShort.minute}`,
+      title: `30 ${strings.timeShort.minute()}`,
       time: 30
     },
     {
-      title: `1 ${strings.timeShort.hour}`,
+      title: `1 ${strings.timeShort.hour()}`,
       time: 60
     }
   ];
@@ -102,7 +103,7 @@ export default function ReminderNotify({
       style={{
         justifyContent: "center",
         alignItems: "center",
-        paddingHorizontal: 12
+        paddingHorizontal: DefaultAppStyles.GAP
       }}
     >
       <Heading>{reminder?.title}</Heading>
@@ -112,7 +113,7 @@ export default function ReminderNotify({
         style={{
           height: 40,
           borderRadius: 100,
-          paddingHorizontal: 12,
+          paddingHorizontal: DefaultAppStyles.GAP,
           flexDirection: "row",
           alignItems: "center"
         }}
@@ -128,23 +129,26 @@ export default function ReminderNotify({
         horizontal={true}
         contentContainerStyle={{
           alignItems: "center",
-          paddingVertical: 10
+          paddingVertical: DefaultAppStyles.GAP_VERTICAL
         }}
         showsHorizontalScrollIndicator={false}
         style={{
-          marginTop: 10
+          marginTop: DefaultAppStyles.GAP_VERTICAL
         }}
       >
-        <Paragraph size={SIZE.xs}>{strings.remindMeIn()}:</Paragraph>
+        <Paragraph size={AppFontSize.xs}>{strings.remindMeIn()}:</Paragraph>
         {QuickActions.map((item) => {
           return (
             <Button
               type="secondaryAccented"
               key={item.title}
               title={item.title}
-              height={30}
-              fontSize={SIZE.xs}
-              style={{ marginLeft: 10, borderRadius: 100 }}
+              fontSize={AppFontSize.xs}
+              style={{
+                marginLeft: 10,
+                borderRadius: 100,
+                paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
+              }}
               onPress={() => onSnooze(item.time)}
             />
           );
@@ -161,15 +165,15 @@ export default function ReminderNotify({
                 : 500,
             borderTopWidth: 1,
             borderTopColor: colors.primary.border,
-            marginTop: 5,
-            paddingTop: 5
+            marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL,
+            paddingTop: DefaultAppStyles.GAP_VERTICAL_SMALL
           }}
         >
           <Paragraph
             style={{
               color: colors.secondary.paragraph,
-              fontSize: SIZE.xs,
-              marginBottom: 10
+              fontSize: AppFontSize.xs,
+              marginBottom: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             {strings.referencedIn()}

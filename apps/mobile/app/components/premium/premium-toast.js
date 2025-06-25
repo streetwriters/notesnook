@@ -35,11 +35,12 @@ import {
   eOpenPremiumDialog,
   eShowGetPremium
 } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const PremiumToast = ({ context = "global", offset = 0 }) => {
   const { colors } = useThemeColors();
@@ -95,7 +96,7 @@ export const PremiumToast = ({ context = "global", offset = 0 }) => {
           backgroundColor: colors.secondary.background,
           zIndex: 999,
           ...getElevationStyle(20),
-          padding: 12,
+          padding: DefaultAppStyles.GAP,
           borderRadius: 10,
           flexDirection: "row",
           alignSelf: "center",
@@ -120,7 +121,7 @@ export const PremiumToast = ({ context = "global", offset = 0 }) => {
               flexWrap: "wrap"
             }}
             color={colors.primary.accent}
-            size={SIZE.md}
+            size={AppFontSize.md}
           >
             {msg.title}
           </Heading>
@@ -129,7 +130,7 @@ export const PremiumToast = ({ context = "global", offset = 0 }) => {
             style={{
               flexWrap: "wrap"
             }}
-            size={SIZE.sm}
+            size={AppFontSize.sm}
             color={colors.primary.paragraph}
           >
             {msg.desc}

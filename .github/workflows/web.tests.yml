@@ -19,10 +19,10 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node
         uses: ./.github/actions/setup-node-with-cache
@@ -49,11 +49,11 @@ jobs:
     name: 🧪 Test (${{ matrix.shard }}/${{ strategy.job-total }})
     strategy:
       matrix:
-        shard: [1, 2, 3, 4]
+        shard: [1, 2, 3, 4, 5]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Download build
         uses: actions/download-artifact@v4

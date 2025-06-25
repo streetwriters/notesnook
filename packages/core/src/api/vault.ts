@@ -48,10 +48,10 @@ export default class Vault {
   }
 
   private startEraser() {
+    EV.publish(EVENTS.vaultUnlocked);
     clearTimeout(this.erasureTimeout);
     this.erasureTimeout = setTimeout(() => {
-      this.password = undefined;
-      EV.publish(EVENTS.vaultLocked);
+      this.lock();
     }, this.eraseTime) as unknown as number;
   }
 
@@ -77,6 +77,12 @@ export default class Vault {
       await this.setKey(encryptedData);
       this.password = password;
     }
+    return true;
+  }
+
+  async lock() {
+    this.password = undefined;
+    EV.publish(EVENTS.vaultLocked);
     return true;
   }
 
@@ -346,7 +352,7 @@ export default class Vault {
     }
     const decryptedContent = await this.decryptContent(content, password);
 
-    if (this.db.content.preProcess(decryptedContent)) {
+    if (await this.db.content.preProcess(decryptedContent)) {
       if (!password) password = await this.getVaultPassword();
       await this.encryptContent(
         decryptedContent,

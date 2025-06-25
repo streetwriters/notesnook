@@ -37,6 +37,7 @@ export type EditorState = {
   scrollPosition: number;
   overlay?: boolean;
   initialLoadCalled?: boolean;
+  editorStateRestored?: boolean;
 };
 
 export type Settings = {
@@ -73,7 +74,7 @@ export type EditorMessage<T> = {
   value: T;
   type: string;
   noteId: string;
-  tabId: number;
+  tabId: string;
   resolverId?: string;
   hasTimeout?: boolean;
 };
@@ -85,7 +86,7 @@ export type SavePayload = {
   type?: "tiptap";
   sessionHistoryId?: number;
   ignoreEdit: boolean;
-  tabId: number;
+  tabId: string;
   pendingChanges?: boolean;
 };
 
@@ -93,4 +94,5 @@ export type AppState = {
   editing: boolean;
   movedAway: boolean;
   timestamp: number;
+  noteId?: string;
 };

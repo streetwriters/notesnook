@@ -18,9 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import SharedWorker from "./shared-service.worker.ts?sharedworker";
+import { Mutex } from "async-mutex";
 
-const PROVIDER_REQUEST_TIMEOUT = 1000;
-const sharedWorker = globalThis.SharedWorker ? new SharedWorker() : null;
+const sharedWorker = globalThis.SharedWorker
+  ? new SharedWorker({
+      name: "SharedService"
+    })
+  : null;
 
 export class SharedService<T extends object> extends EventTarget {
   #clientId: Promise<string>;
@@ -35,7 +39,8 @@ export class SharedService<T extends object> extends EventTarget {
 
   // This is client state to track the provider. The provider state is
   // mostly managed within activate().
-  #providerPort: Promise<MessagePort | null>;
+  #providerPort?: Promise<MessagePort | null>;
+  #providerPortMutex = new Mutex();
   providerCallbacks: Map<
     string,
     {
@@ -48,6 +53,7 @@ export class SharedService<T extends object> extends EventTarget {
   > = new Map();
   #providerCounter = 0;
   #providerChangeCleanup: (() => void)[] = [];
+  #providerId?: string;
 
   proxy: T;
 
@@ -57,23 +63,31 @@ export class SharedService<T extends object> extends EventTarget {
     this.#clientId = this.#getClientId();
 
     // Connect to the current provider and future providers.
-    this.#providerPort = this.#providerChange();
     this.#clientChannel.addEventListener(
       "message",
       async ({ data }) => {
+        console.log("got message from provider", data);
         if (
           data?.type === "provider" &&
-          data?.sharedService === this.serviceName
+          data?.sharedService === this.serviceName &&
+          data?.providerId !== this.#providerId
         ) {
+          this.#providerId = data.providerId;
           // A context (possibly this one) announced itself as the new provider.
           // Discard any old provider and connect to the new one.
-          this.#providerPort.then((port) => port?.close());
+          this.#providerPort?.then((port) => port?.close());
           this.#providerPort = this.#providerChange();
+          this.#providerPortMutex.release();
           await this.#resendPendingCallbacks();
         }
       },
       { signal: this.#onClose.signal }
     );
+    this.#clientChannel.postMessage({
+      type: "client",
+      sharedService: this.serviceName
+    });
+    this.#providerPortMutex.acquire();
 
     window.addEventListener("beforeunload", () => {
       this.close();
@@ -87,7 +101,6 @@ export class SharedService<T extends object> extends EventTarget {
     onClientConnected: () => Promise<void>
   ) {
     if (this.#onDeactivate) return;
-
     // When acquire a lock on the service name then we become the service
     // provider. Only one instance at a time will get the lock; the rest
     // will wait their turn.
@@ -96,9 +109,11 @@ export class SharedService<T extends object> extends EventTarget {
     const LOCK_NAME = `SharedService-${this.serviceName}`;
     navigator.locks
       .request(LOCK_NAME, { signal: this.#onDeactivate.signal }, async () => {
+        console.time("getting provider port");
         // Get the port to request client ports.
         const { port, onclose } = await portProviderFunc();
         port.start();
+        console.timeEnd("getting provider port");
 
         // Listen for client requests. A separate BroadcastChannel
         // instance is necessary because we may be serving our own
@@ -112,6 +127,17 @@ export class SharedService<T extends object> extends EventTarget {
           "message",
           async function onMessage(event) {
             const { data } = event;
+            if (
+              data?.type === "client" &&
+              data?.sharedService === thisArg.serviceName
+            ) {
+              broadcastChannel.postMessage({
+                type: "provider",
+                sharedService: data?.sharedService,
+                providerId
+              });
+            }
+
             if (
               data?.type === "request" &&
               data?.sharedService === thisArg.serviceName
@@ -133,7 +159,7 @@ export class SharedService<T extends object> extends EventTarget {
               }
 
               try {
-                thisArg.#sendPortToClient(data, requestedPort);
+                await thisArg.#sendPortToClient(data, requestedPort);
               } catch (e) {
                 console.error(e, providerId, data);
                 // retry if port has been neutered, this can happen when
@@ -149,6 +175,7 @@ export class SharedService<T extends object> extends EventTarget {
           { signal: this.#onDeactivate?.signal }
         );
 
+        console.log("sending message to clients", providerId, this.serviceName);
         // Tell everyone that we are the new provider.
         broadcastChannel.postMessage({
           type: "provider",
@@ -181,38 +208,70 @@ export class SharedService<T extends object> extends EventTarget {
     this.#onClose.abort();
   }
 
-  #sendPortToClient(message: any, port: MessagePort) {
-    if (!sharedWorker)
-      throw new Error("Shared worker is not supported in this environment.");
-    sharedWorker.port.postMessage(message, [port]);
+  async #sendPortToClient(message: any, port: MessagePort) {
+    if (!sharedWorker) {
+      // Return the port to the client via the service worker.
+      const serviceWorker = await navigator.serviceWorker.ready;
+      serviceWorker.active?.postMessage(message, [port]);
+    } else sharedWorker.port.postMessage(message, [port]);
   }
 
   async #getClientId() {
-    // Use a Web Lock to determine our clientId.
-    const nonce = Math.random().toString();
-    const clientId = await navigator.locks.request(nonce, async () => {
-      const { held } = await navigator.locks.query();
-      return held?.find((lock) => lock.name === nonce)?.clientId;
-    });
+    if (sharedWorker) {
+      console.time("getting client id");
+      // Use a Web Lock to determine our clientId.
+      const nonce = Math.random().toString();
+      const clientId = await navigator.locks.request(nonce, async () => {
+        console.log("got clientid lock");
+        const { held } = await navigator.locks.query();
+        return held?.find((lock) => lock.name === nonce)?.clientId;
+      });
 
-    // Acquire a Web Lock named after the clientId. This lets other contexts
-    // track this context's lifetime.
-    // TODO: It would be better to lock on the clientId+serviceName (passing
-    // that lock name in the service request). That would allow independent
-    // instance lifetime tracking.
-    await SharedService.#acquireContextLock(clientId);
+      // Acquire a Web Lock named after the clientId. This lets other contexts
+      // track this context's lifetime.
+      // TODO: It would be better to lock on the clientId+serviceName (passing
+      // that lock name in the service request). That would allow independent
+      // instance lifetime tracking.
+      await SharedService.#acquireContextLock(clientId);
 
-    // Configure message forwarding via the SharedWorker. This must be
-    // done after acquiring the clientId lock to avoid a race condition
-    // in the SharedWorker.
-    sharedWorker?.port.addEventListener("message", (event) => {
-      event.data.ports = event.ports;
-      this.dispatchEvent(new MessageEvent("message", { data: event.data }));
-    });
-    sharedWorker?.port.start();
-    sharedWorker?.port.postMessage({ clientId });
+      // Configure message forwarding via the SharedWorker. This must be
+      // done after acquiring the clientId lock to avoid a race condition
+      // in the SharedWorker.
+      sharedWorker?.port.addEventListener("message", (event) => {
+        event.data.ports = event.ports;
+        this.dispatchEvent(new MessageEvent("message", { data: event.data }));
+      });
+      sharedWorker?.port.start();
+      sharedWorker?.port.postMessage({ clientId });
 
-    return clientId;
+      console.timeEnd("getting client id");
+      return clientId;
+    } else {
+      // Getting the clientId from the service worker accomplishes two things:
+      // 1. It gets the clientId for this context.
+      // 2. It ensures that the service worker is activated.
+      //
+      // It is possible to do this without polling but it requires about the
+      // same amount of code and using fetch makes 100% certain the service
+      // worker is handling requests.
+      let clientId: string | undefined;
+      while (!clientId) {
+        clientId = await fetch("/clientId").then((response) => {
+          if (response.ok && !!response.headers.get("x-client-id")) {
+            return response.text();
+          }
+          console.warn("service worker not ready, retrying...");
+          return new Promise((resolve) => setTimeout(resolve, 100));
+        });
+      }
+
+      navigator.serviceWorker.addEventListener("message", (event) => {
+        event.data.ports = event.ports;
+        this.dispatchEvent(new MessageEvent("message", { data: event.data }));
+      });
+
+      return clientId;
+    }
   }
 
   async #providerChange() {
@@ -255,18 +314,7 @@ export class SharedService<T extends object> extends EventTarget {
         this.#providerChangeCleanup.push(() => abortController.abort());
       });
 
-      let timeout = 0;
-      providerPort = await Promise.race([
-        providerPortReady,
-        new Promise<null>(
-          (resolve) =>
-            (timeout = setTimeout(() => {
-              console.error("Provider request timed out", nonce);
-              resolve(null);
-            }, PROVIDER_REQUEST_TIMEOUT) as unknown as number)
-        )
-      ]);
-      clearTimeout(timeout);
+      providerPort = await providerPortReady;
 
       if (!providerPort) {
         // The provider request timed out. If it does eventually arrive
@@ -356,6 +404,8 @@ export class SharedService<T extends object> extends EventTarget {
   })();
 
   async getProviderPort() {
+    await this.#providerPortMutex.waitForUnlock();
+
     let tries = 0;
     let providerPort = await this.#providerPort;
     while (!providerPort) {
@@ -363,7 +413,10 @@ export class SharedService<T extends object> extends EventTarget {
         throw new Error("Could not find a provider port to communicate with.");
 
       providerPort = await this.#providerPort;
-      console.warn("Provider port not found. Retrying in 50ms...");
+      console.warn(
+        "Provider port not found. Retrying in 50ms...",
+        this.#providerPort
+      );
       await new Promise((resolve) => setTimeout(resolve, 50));
     }
     return providerPort;

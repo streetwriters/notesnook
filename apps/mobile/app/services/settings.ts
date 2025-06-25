@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { NativeModules, Platform } from "react-native";
+//@ts-ignore
 import { enabled } from "react-native-privacy-snapshot";
 import { MMKV } from "../common/database/mmkv";
 import {
@@ -45,7 +46,17 @@ function resetSettings() {
     ...defaultSettings,
     introCompleted: true,
     serverUrls: get().serverUrls,
-    backupDirectoryAndroid: undefined
+    backupDirectoryAndroid: get().backupDirectoryAndroid,
+    darkTheme: get().darkTheme,
+    lighTheme: get().lighTheme,
+    useSystemTheme: get().useSystemTheme,
+    colorScheme: get().colorScheme,
+    defaultSnoozeTime: get().defaultSnoozeTime,
+    defaultFontFamily: get().defaultFontFamily,
+    defaultFontSize: get().defaultFontSize,
+    privacyScreen: get().privacyScreen,
+    corsProxy: get().corsProxy,
+    showBackupCompleteSheet: get().showBackupCompleteSheet
   };
 
   MMKV.setString("appSettings", JSON.stringify(settings));
@@ -112,10 +123,10 @@ function init() {
     scale.fontScale = settings.fontScale;
   }
 
-  setTimeout(() => setPrivacyScreen(settings), 1);
   updateSize();
   useSettingStore.getState().setSettings({ ...settings });
   migrateAppLock();
+  setPrivacyScreen(settings);
 }
 
 function setPrivacyScreen(settings: SettingStore["settings"]) {

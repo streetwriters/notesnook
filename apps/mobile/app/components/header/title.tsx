@@ -25,7 +25,7 @@ import {
   eUnSubscribeEvent
 } from "../../services/event-manager";
 import { eScrollEvent } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import Tag from "../ui/tag";
 import Heading from "../ui/typography/heading";
 
@@ -41,7 +41,7 @@ export const Title = ({
   isHiddenOnRender?: boolean;
   accentColor?: string;
   isBeta?: boolean;
-  renderedInRoute: string;
+  renderedInRoute?: string;
   id?: string;
 }) => {
   const { colors } = useThemeColors();
@@ -75,7 +75,7 @@ export const Title = ({
       {!visible ? (
         <Heading
           numberOfLines={1}
-          size={SIZE.lg}
+          size={AppFontSize.lg}
           style={{
             flexWrap: "wrap",
             marginTop: Platform.OS === "ios" ? -1 : 0
@@ -83,7 +83,7 @@ export const Title = ({
           color={accentColor || colors.primary.heading}
         >
           {isTag ? (
-            <Heading size={SIZE.xl} color={colors.primary.accent}>
+            <Heading size={AppFontSize.xl} color={colors.primary.accent}>
               #
             </Heading>
           ) : null}

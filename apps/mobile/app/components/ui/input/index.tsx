@@ -37,11 +37,12 @@ import {
 } from "../../../services/validation";
 import { useThemeColors } from "@notesnook/theme";
 import { getElevationStyle } from "../../../utils/elevation";
-import { SIZE } from "../../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import { IconButton } from "../icon-button";
 import Paragraph from "../typography/paragraph";
 import phone from "phone";
 import isURL from "validator/lib/isURL";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 interface InputProps extends TextInputProps {
   fwdRef?: RefObject<TextInput>;
@@ -70,7 +71,6 @@ interface InputProps extends TextInputProps {
   };
   buttons?: React.ReactNode;
   onBlurInput?: () => void;
-  onPress?: () => void;
   height?: number;
   fontSize?: number;
   onFocusInput?: () => void;
@@ -98,7 +98,7 @@ const Input = ({
   onBlurInput,
   onPress,
   height = 45,
-  fontSize = SIZE.md,
+  fontSize = AppFontSize.sm,
   onFocusInput,
   buttons,
   marginRight,
@@ -119,9 +119,9 @@ const Input = ({
   });
   type ErrorKey = keyof typeof errorList;
   const color = error
-    ? colors.error.paragraph
+    ? colors.error.border
     : focus
-    ? customColor || colors.primary.accent
+    ? customColor || colors.selected.border
     : colors.primary.border;
 
   const validate = async (value: string) => {
@@ -217,15 +217,16 @@ const Input = ({
 
   const style: ViewStyle = {
     borderWidth: 1,
-    borderRadius: 5,
+    borderRadius: defaultBorderRadius,
     borderColor: color,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    flexGrow: 1,
-    height: height || 50,
-    paddingHorizontal: 12,
-    paddingRight: buttons || button || secureTextEntry || error ? 6 : 12,
+    paddingHorizontal: DefaultAppStyles.GAP,
+    paddingRight:
+      buttons || button || secureTextEntry || error
+        ? DefaultAppStyles.GAP
+        : DefaultAppStyles.GAP,
     ...containerStyle
   };
 
@@ -234,11 +235,10 @@ const Input = ({
     fontSize: fontSize,
     color:
       onPress && loading ? colors.primary.accent : colors.primary.paragraph,
-    paddingVertical: 0,
-    paddingBottom: 2.5,
     flexGrow: 1,
-    height: height || 50,
     flexShrink: 1,
+    paddingBottom: DefaultAppStyles.GAP_VERTICAL - 2,
+    paddingTop: DefaultAppStyles.GAP_VERTICAL - 2,
     fontFamily: "OpenSans-Regular",
     ...(inputStyle as ViewStyle)
   };
@@ -248,10 +248,7 @@ const Input = ({
       <View
         importantForAccessibility="yes"
         style={{
-          height: height,
           marginBottom: marginBottom,
-          flexGrow: flexGrow,
-          maxHeight: height,
           marginRight: marginRight,
           ...wrapperStyle
         }}
@@ -308,7 +305,7 @@ const Input = ({
                   marginLeft: 5
                 }}
                 color={
-                  secureEntry ? colors.primary.icon : colors.primary.accent
+                  secureEntry ? colors.secondary.icon : colors.primary.accent
                 }
               />
             )}
@@ -319,11 +316,14 @@ const Input = ({
               <IconButton
                 testID={button.testID}
                 name={button.icon}
-                size={SIZE.xl}
+                size={AppFontSize.xl}
                 top={10}
                 bottom={10}
                 onPress={button.onPress}
                 color={button.color}
+                style={{
+                  marginRight: -8
+                }}
               />
             )}
 
@@ -351,14 +351,14 @@ const Input = ({
                 position: "absolute",
                 backgroundColor: colors.secondary.background,
                 paddingVertical: 3,
-                paddingHorizontal: 5,
+                paddingHorizontal: DefaultAppStyles.GAP_SMALL / 2,
                 borderRadius: 2.5,
                 ...getElevationStyle(2),
                 top: 0
               }}
             >
               <Paragraph
-                size={SIZE.xs}
+                size={AppFontSize.xs}
                 style={{
                   textAlign: "right",
                   textAlignVertical: "bottom"
@@ -366,7 +366,7 @@ const Input = ({
               >
                 <Icon
                   name="alert-circle-outline"
-                  size={SIZE.xs}
+                  size={AppFontSize.xs}
                   color={colors.error.icon}
                 />{" "}
                 {errorMessage}
@@ -399,7 +399,7 @@ const Input = ({
                     color={errorList[error as ErrorKey] ? "red" : "green"}
                   />
 
-                  <Paragraph style={{ marginLeft: 5 }} size={SIZE.xs}>
+                  <Paragraph style={{ marginLeft: 5 }} size={AppFontSize.xs}>
                     {ERRORS_LIST[error as ErrorKey]}
                   </Paragraph>
                 </View>

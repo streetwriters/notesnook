@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { test, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
-import { NOTE, TITLE_ONLY_NOTE } from "./utils";
+import { getTestId, NOTE, TITLE_ONLY_NOTE } from "./utils";
 
 test("focus mode", async ({ page }) => {
   const app = new AppModel(page);
@@ -129,6 +129,35 @@ test("focus should not jump to editor while typing in title input", async ({
 
   expect(await notes.editor.getTitle()).toBe("Hello");
   expect(await notes.editor.getContent("text")).toBe("");
+});
+
+test("when title format is set to headline, title should be generated from headline until user edits the title", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const settings = await app.goToSettings();
+  await settings.setTitleFormat("$headline$");
+  await settings.close();
+
+  const notes = await app.goToNotes();
+  await notes.createNote({ content: "my precious" });
+
+  expect(await notes.editor.getTitle()).toBe("my precious");
+
+  await notes.editor.setContent(", my precious note");
+  await notes.editor.waitForSaving();
+
+  expect(await notes.editor.getTitle()).toBe("my precious, my precious note");
+
+  await notes.editor.setTitle("not precious");
+
+  expect(await notes.editor.getTitle()).toBe("not precious");
+
+  await notes.editor.setContent(", but...");
+  await notes.editor.waitForSaving();
+
+  expect(await notes.editor.getTitle()).toBe("not precious");
 });
 
 test("select all & backspace should clear all content in editor", async ({
@@ -258,6 +287,21 @@ test("creating a new note and toggling read-only mode should not empty editor co
   expect(await notes.editor.getContent("text")).toBe(NOTE.content);
 });
 
+test("toggling read-only should hide undo & redo buttons", async ({ page }) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note = await notes.createNote(NOTE);
+
+  await notes.editor.undoButton.waitFor({ state: "visible" });
+  await notes.editor.redoButton.waitFor({ state: "visible" });
+  await note?.properties.readonly();
+
+  expect(await note?.properties.isReadonly()).toBeTruthy();
+  expect(notes.editor.undoButton).not.toBeVisible();
+  expect(notes.editor.redoButton).not.toBeVisible();
+});
+
 test("#1468 count words separated by newlines", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
@@ -269,4 +313,158 @@ test("#1468 count words separated by newlines", async ({ page }) => {
   });
 
   expect((await notes.editor.getWordCount()) === 10).toBeTruthy();
+});
+
+test("disable autosave when note crosses MAX_AUTO_SAVEABLE_WORDS", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const content = "a ".repeat(100);
+
+  await notes.createNote({
+    title: "many words",
+    content
+  });
+
+  expect(
+    await app.toasts.waitForToast(
+      "Auto-save is disabled for large notes. Press Ctrl + S to save."
+    )
+  ).toBe(true);
+  await expect(notes.editor.notSavedIcon).toBeVisible();
+});
+
+test("when autosave is disabled, pressing ctrl+s should save the note", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const content = "a ".repeat(100);
+  await notes.createNote({
+    title: NOTE.title,
+    content
+  });
+
+  await page.keyboard.press("Control+s");
+
+  await expect(notes.editor.savedIcon).toBeVisible();
+});
+
+test("when autosave is disabled, switching to another note should save the note", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const content = "a ".repeat(100);
+  const note1 = await notes.createNote({
+    title: "Test note 1"
+  });
+  const note2 = await notes.createNote({
+    title: "Test note 2"
+  });
+  await note1?.openNote();
+  await notes.editor.setContent(content);
+
+  await note2?.openNote();
+
+  await note1?.openNote();
+  await expect(notes.editor.savedIcon).toBeVisible();
+  expect(await notes.editor.getContent("text")).toBe(content.trim());
+});
+
+test("when autosave is disabled, creating a new note should save the note", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const content = "a ".repeat(100);
+  const note = await notes.createNote({
+    title: NOTE.title,
+    content
+  });
+
+  await notes.newNote();
+
+  await note?.openNote();
+  // await expect(notes.editor.savedIcon).toBeVisible();
+  expect(await notes.editor.getContent("text")).toBe(content.trim());
+});
+
+test("when autosave is disabled, closing the note should save it", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const content = "a ".repeat(100);
+  const note = await notes.createNote({
+    title: "Title",
+    content
+  });
+
+  const noteTab = await notes.editor.findTab((await note!.getId())!);
+  await noteTab?.close();
+
+  await note?.openNote();
+  await expect(notes.editor.savedIcon).toBeVisible();
+  expect(await notes.editor.getContent("text")).toBe(content.trim());
+});
+
+test("control + alt + right arrow should go to next note", async ({ page }) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note1 = await notes.createNote({
+    title: "Note 1",
+    content: "Note 1 content"
+  });
+  const note2 = await notes.createNote({
+    title: "Note 2",
+    content: "Note 2 content"
+  });
+
+  await note1?.openNote();
+  await note2?.openNote(true);
+  await page.keyboard.press("Control+Alt+ArrowRight");
+
+  expect(await notes.editor.getTitle()).toBe("Note 1");
+  expect(await notes.editor.getContent("text")).toBe("Note 1 content");
+
+  await page.keyboard.press("Control+Alt+ArrowRight");
+
+  expect(await notes.editor.getTitle()).toBe("Note 2");
+  expect(await notes.editor.getContent("text")).toBe("Note 2 content");
+});
+
+test("control + alt + left arrow should go to previous note", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note1 = await notes.createNote({
+    title: "Note 1",
+    content: "Note 1 content"
+  });
+  const note2 = await notes.createNote({
+    title: "Note 2",
+    content: "Note 2 content"
+  });
+
+  await note1?.openNote();
+  await note2?.openNote(true);
+  await page.keyboard.press("Control+Alt+ArrowLeft");
+
+  expect(await notes.editor.getTitle()).toBe("Note 1");
+  expect(await notes.editor.getContent("text")).toBe("Note 1 content");
+
+  await page.keyboard.press("Control+Alt+ArrowLeft");
+
+  expect(await notes.editor.getTitle()).toBe("Note 2");
+  expect(await notes.editor.getContent("text")).toBe("Note 2 content");
 });

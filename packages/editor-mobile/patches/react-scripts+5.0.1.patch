@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-scripts/config/webpack.config.js b/node_modules/react-scripts/config/webpack.config.js
-index e465d8e..5e3771c 100644
+index e465d8e..19a2c01 100644
 --- a/node_modules/react-scripts/config/webpack.config.js
 +++ b/node_modules/react-scripts/config/webpack.config.js
 @@ -106,6 +106,9 @@ module.exports = function (webpackEnv) {
@@ -21,7 +21,7 @@ index e465d8e..5e3771c 100644
        minimizer: [
          // This is only used in production mode
          new TerserPlugin({
-@@ -304,6 +307,13 @@ module.exports = function (webpackEnv) {
+@@ -304,6 +307,14 @@ module.exports = function (webpackEnv) {
      },
      resolve: {
        // This allows you to set a fallback for where webpack should look for modules.
@@ -31,11 +31,12 @@ index e465d8e..5e3771c 100644
 +        dgram: false,
 +        path: false,
 +        url: false,
++        fs: false
 +      },
        // We placed these paths second because we want `node_modules` to "win"
        // if there are any conflicts. This matches Node resolution mechanism.
        // https://github.com/facebook/create-react-app/issues/253
-@@ -320,13 +330,19 @@ module.exports = function (webpackEnv) {
+@@ -320,13 +331,19 @@ module.exports = function (webpackEnv) {
          .map(ext => `.${ext}`)
          .filter(ext => useTypeScript || !ext.includes('ts')),
        alias: {
@@ -56,7 +57,7 @@ index e465d8e..5e3771c 100644
          }),
          ...(modules.webpackAliases || {}),
        },
-@@ -336,14 +352,14 @@ module.exports = function (webpackEnv) {
+@@ -336,14 +353,14 @@ module.exports = function (webpackEnv) {
          // To fix this, we prevent you from importing files out of src/ -- if you'd like to,
          // please link the files into your node_modules/ and let module-resolution kick in.
          // Make sure your source files are compiled, as they will not be processed in any way.
@@ -79,7 +80,7 @@ index e465d8e..5e3771c 100644
        ],
      },
      module: {
-@@ -353,7 +369,7 @@ module.exports = function (webpackEnv) {
+@@ -353,7 +370,7 @@ module.exports = function (webpackEnv) {
          shouldUseSourceMap && {
            enforce: 'pre',
            exclude: /@babel(?:\/|\\{1,2})runtime/,
@@ -88,7 +89,7 @@ index e465d8e..5e3771c 100644
            loader: require.resolve('source-map-loader'),
          },
          {
-@@ -408,13 +424,13 @@ module.exports = function (webpackEnv) {
+@@ -408,13 +425,13 @@ module.exports = function (webpackEnv) {
                  },
                ],
                issuer: {
@@ -104,7 +105,7 @@ index e465d8e..5e3771c 100644
                include: paths.appSrc,
                loader: require.resolve('babel-loader'),
                options: {
-@@ -452,7 +468,7 @@ module.exports = function (webpackEnv) {
+@@ -452,7 +469,7 @@ module.exports = function (webpackEnv) {
                  plugins: [
                    isEnvDevelopment &&
                      shouldUseReactRefresh &&
@@ -113,7 +114,7 @@ index e465d8e..5e3771c 100644
                  ].filter(Boolean),
                  // This is a feature of `babel-loader` for webpack (not Babel itself).
                  // It enables caching results in ./node_modules/.cache/babel-loader/
-@@ -460,13 +476,13 @@ module.exports = function (webpackEnv) {
+@@ -460,13 +477,13 @@ module.exports = function (webpackEnv) {
                  cacheDirectory: true,
                  // See #6846 for context on why cacheCompression is disabled
                  cacheCompression: false,
@@ -129,7 +130,7 @@ index e465d8e..5e3771c 100644
                exclude: /@babel(?:\/|\\{1,2})runtime/,
                loader: require.resolve('babel-loader'),
                options: {
-@@ -594,7 +610,7 @@ module.exports = function (webpackEnv) {
+@@ -594,7 +611,7 @@ module.exports = function (webpackEnv) {
                // its runtime that would otherwise be processed through "file" loader.
                // Also exclude `html` and `json` extensions so they get processed
                // by webpacks internal loaders.

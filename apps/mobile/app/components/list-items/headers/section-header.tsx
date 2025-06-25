@@ -18,21 +18,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { GroupHeader, GroupOptions, ItemType } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
-import { TouchableOpacity, View, useWindowDimensions } from "react-native";
+import { View } from "react-native";
 import { useIsCompactModeEnabled } from "../../../hooks/use-is-compact-mode-enabled";
 import { presentSheet } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
 import { RouteName } from "../../../stores/use-navigation-store";
-import { getContainerBorder } from "../../../utils/colors";
-import { GROUP } from "../../../utils/constants";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
+import { DefaultAppStyles } from "../../../utils/styles";
 import Sort from "../../sheets/sort";
-import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
+import { Pressable } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
-import { strings } from "@notesnook/intl";
 
 type SectionHeaderProps = {
   item: GroupHeader;
@@ -57,126 +56,135 @@ export const SectionHeader = React.memo<
     onOpenJumpToDialog
   }: SectionHeaderProps) {
     const { colors } = useThemeColors();
-    const { fontScale } = useWindowDimensions();
-    let groupBy = Object.keys(GROUP).find(
-      (key) => GROUP[key as keyof typeof GROUP] === groupOptions.groupBy
-    );
     const isCompactModeEnabled = useIsCompactModeEnabled(
       dataType as "note" | "notebook"
     );
 
-    groupBy = !groupBy
-      ? "Default"
-      : groupBy.slice(0, 1).toUpperCase() + groupBy.slice(1, groupBy.length);
-
     return (
       <View
         style={{
-          flexDirection: "row",
-          alignItems: "center",
-          width: "95%",
-          justifyContent: "space-between",
-          paddingHorizontal: 12,
-          height: 35 * fontScale,
-          backgroundColor: colors.secondary.background,
-          alignSelf: "center",
-          borderRadius: 5,
-          marginVertical: 5,
-          ...getContainerBorder(colors.secondary.background, 0.8)
+          width: "100%",
+          paddingHorizontal: DefaultAppStyles.GAP,
+          marginBottom: DefaultAppStyles.GAP_VERTICAL
         }}
       >
-        <TouchableOpacity
-          onPress={() => {
-            onOpenJumpToDialog();
-          }}
-          activeOpacity={0.9}
-          hitSlop={{ top: 10, left: 10, right: 30, bottom: 15 }}
-          style={{
-            height: "100%",
-            justifyContent: "center"
-          }}
-        >
-          <Heading
-            color={color || colors.primary.accent}
-            size={SIZE.sm}
-            style={{
-              alignSelf: "center",
-              textAlignVertical: "center"
-            }}
-          >
-            {!item.title || item.title === "" ? strings.pinned() : item.title}
-          </Heading>
-        </TouchableOpacity>
-
         <View
           style={{
             flexDirection: "row",
-            alignItems: "center"
+            alignItems: "center",
+            width: "100%",
+            alignSelf: "center",
+            justifyContent: "space-between",
+            borderBottomWidth: 1,
+            borderColor: colors.primary.border,
+            paddingBottom: 1,
+            paddingTop:
+              index === 0
+                ? DefaultAppStyles.GAP_VERTICAL
+                : DefaultAppStyles.GAP_VERTICAL_SMALL
           }}
         >
-          {index === 0 ? (
-            <>
-              <Button
-                onPress={() => {
-                  console.log("Opening Sort sheet", screen, dataType);
-                  presentSheet({
-                    component: <Sort screen={screen} type={dataType} />
-                  });
-                }}
-                tooltipText="Change sorting of items in list"
-                title={groupBy}
-                icon={
-                  groupOptions.sortDirection === "asc"
-                    ? "sort-ascending"
-                    : "sort-descending"
-                }
-                height={25}
-                style={{
-                  borderRadius: 100,
-                  paddingHorizontal: 0,
-                  backgroundColor: "transparent",
-                  marginRight:
-                    dataType === "note" ||
-                    screen === "Notes" ||
-                    dataType === "notebook"
-                      ? 10
-                      : 0
-                }}
-                type="plain"
-                iconPosition="right"
-              />
+          <Pressable
+            onPress={() => {
+              onOpenJumpToDialog();
+            }}
+            hitSlop={{ top: 10, left: 10, right: 30, bottom: 15 }}
+            style={{
+              justifyContent: "flex-start",
+              flexDirection: "row",
+              width: "auto"
+            }}
+          >
+            <Heading
+              size={AppFontSize.xxs}
+              style={{
+                alignSelf: "center",
+                textAlignVertical: "center"
+              }}
+              color={color || colors.primary.accent}
+            >
+              {!item.title || item.title === ""
+                ? strings.pinned().toUpperCase()
+                : item.title.toUpperCase()}
+            </Heading>
+          </Pressable>
 
-              <IconButton
-                style={{
-                  width: 25,
-                  height: 25
-                }}
-                hidden={
-                  dataType !== "note" &&
-                  dataType !== "notebook" &&
-                  screen !== "Notes"
-                }
-                testID="icon-compact-mode"
-                tooltipText={
-                  isCompactModeEnabled
-                    ? "Switch to normal mode"
-                    : "Switch to compact mode"
-                }
-                color={colors.secondary.icon}
-                name={isCompactModeEnabled ? "view-list" : "view-list-outline"}
-                onPress={() => {
-                  SettingsService.set({
-                    [dataType !== "notebook"
-                      ? "notesListMode"
-                      : "notebooksListMode"]: !isCompactModeEnabled
-                      ? "compact"
-                      : "normal"
-                  });
-                }}
-                size={SIZE.lg - 2}
-              />
-            </>
-          ) : null}
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: DefaultAppStyles.GAP_SMALL
+            }}
+          >
+            {index === 0 ? (
+              <>
+                <IconButton
+                  name={
+                    groupOptions.sortDirection === "asc"
+                      ? "sort-ascending"
+                      : "sort-descending"
+                  }
+                  color={colors.secondary.icon}
+                  testID="icon-sort"
+                  onPress={() => {
+                    if (!screen) return;
+                    presentSheet({
+                      component: (
+                        <Sort
+                          screen={screen}
+                          type={dataType}
+                          hideGroupOptions={
+                            screen === "Reminders" || screen === "Search"
+                          }
+                        />
+                      )
+                    });
+                  }}
+                  style={{
+                    width: 25,
+                    height: 25
+                  }}
+                  size={AppFontSize.lg - 2}
+                />
+                <IconButton
+                  hidden={
+                    dataType !== "note" &&
+                    dataType !== "notebook" &&
+                    screen !== "Notes"
+                  }
+                  style={{
+                    width: 25,
+                    height: 25
+                  }}
+                  testID="icon-compact-mode"
+                  color={colors.secondary.icon}
+                  name={
+                    isCompactModeEnabled ? "view-list" : "view-list-outline"
+                  }
+                  onPress={() => {
+                    SettingsService.set({
+                      [dataType !== "notebook"
+                        ? "notesListMode"
+                        : "notebooksListMode"]: !isCompactModeEnabled
+                        ? "compact"
+                        : "normal"
+                    });
+                  }}
+                  size={AppFontSize.lg - 2}
+                />
+              </>
+            ) : null}
+
+            {/* <IconButton
+              style={{
+                width: 25,
+                height: 25
+              }}
+              color={colors.secondary.icon}
+              name={"chevron-down"}
+              size={SIZE.lg - 2}
+            /> */}
+          </View>
         </View>
       </View>
     );

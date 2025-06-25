@@ -19,6 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Locator, Page } from "@playwright/test";
 import { getTestId } from "../utils";
+import { TabItemModel } from "./tab-item.model";
+import { iterateList } from "./utils";
 
 export class EditorModel {
   private readonly page: Page;
@@ -33,6 +35,14 @@ export class EditorModel {
   private readonly wordCountText: Locator;
   private readonly dateEditedText: Locator;
   private readonly searchButton: Locator;
+  private readonly tabsList: Locator;
+  private readonly goBackButton: Locator;
+  private readonly goForwardButton: Locator;
+  private readonly newTabButton: Locator;
+  readonly savedIcon: Locator;
+  readonly notSavedIcon: Locator;
+  readonly undoButton: Locator;
+  readonly redoButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -51,6 +61,14 @@ export class EditorModel {
     this.wordCountText = page.locator(getTestId("editor-word-count"));
     this.dateEditedText = page.locator(getTestId("editor-date-edited"));
     this.searchButton = page.locator(getTestId("Search"));
+    this.savedIcon = page.locator(getTestId("editor-save-state-saved"));
+    this.notSavedIcon = page.locator(getTestId("editor-save-state-notsaved"));
+    this.tabsList = page.locator(getTestId("tabs"));
+    this.goBackButton = page.locator(getTestId("go-back"));
+    this.goForwardButton = page.locator(getTestId("go-forward"));
+    this.newTabButton = page.locator(getTestId("New tab"));
+    this.undoButton = page.locator(getTestId("Undo"));
+    this.redoButton = page.locator(getTestId("Redo"));
   }
 
   async waitForLoading(title?: string, content?: string) {
@@ -75,19 +93,17 @@ export class EditorModel {
   }
 
   async waitForUnloading() {
-    await this.page.waitForURL(/#\/notes\/?.+\/create/gm);
     await this.searchButton.isDisabled();
     await this.page
       .locator(".active")
-      .locator(getTestId("tags"))
-      .waitFor({ state: "hidden" });
+      .locator(getTestId("editor-tag-input"))
+      .isDisabled();
     await this.dateEditedText.waitFor({ state: "hidden" });
     await this.wordCountText.waitFor();
     await this.waitForLoading("", "");
   }
 
   async waitForSaving() {
-    await this.page.waitForURL(/#\/notes\/?.+\/edit/gm);
     await this.page.locator(".active").locator(getTestId("tags")).waitFor();
     await this.searchButton.waitFor();
     await this.wordCountText.waitFor();
@@ -95,7 +111,7 @@ export class EditorModel {
 
   async isUnloaded() {
     return (
-      (await this.tagInput.isHidden()) &&
+      (await this.tagInput.isDisabled()) &&
       (await this.enterFullscreenButton.isHidden()) &&
       (await this.dateEditedText.isHidden())
     );
@@ -110,7 +126,8 @@ export class EditorModel {
   async typeTitle(text: string, delay = 0) {
     await this.editAndWait(async () => {
       await this.title.focus();
-      await this.title.press("End");
+      await this.title.selectText();
+      await this.title.press("ArrowRight");
       await this.title.type(text, { delay });
     });
   }
@@ -156,7 +173,7 @@ export class EditorModel {
 
   async selectAll() {
     await this.content.focus();
-    await this.page.keyboard.press("Control+a");
+    await this.page.keyboard.press("ControlOrMeta+a");
     await this.page.waitForTimeout(500);
   }
 
@@ -180,6 +197,16 @@ export class EditorModel {
       if (tag) tags.push(tag);
     }
     return tags;
+  }
+
+  async removeTags(tags: string[]) {
+    for (const tag of tags) {
+      const item = this.tags
+        .filter({ hasText: tag })
+        .getByTitle("Remove")
+        .first();
+      await item.click();
+    }
   }
 
   async getTitle() {
@@ -226,5 +253,51 @@ export class EditorModel {
         .toString()
         .replace(" words", "")
     );
+  }
+
+  async findTab(id: string) {
+    for await (const item of iterateList(this.tabsList.locator(".tab"))) {
+      const tabModel = new TabItemModel(item, this.page);
+      if ((await tabModel.getId()) === id) return tabModel;
+    }
+  }
+
+  async getTabs() {
+    const tabs: TabItemModel[] = [];
+    for await (const item of iterateList(this.tabsList.locator(".tab"))) {
+      tabs.push(new TabItemModel(item, this.page));
+    }
+    return tabs;
+  }
+
+  async goBack() {
+    await this.goBackButton.click();
+  }
+
+  async goForward() {
+    await this.goForwardButton.click();
+  }
+
+  async newTab() {
+    await this.newTabButton.click();
+  }
+
+  async attachImage() {
+    await this.page
+      .context()
+      .grantPermissions(["clipboard-read", "clipboard-write"]);
+    await this.page.evaluate(async () => {
+      const resp = await fetch("https://dummyjson.com/image/150");
+      const blob = await resp.blob();
+      window.navigator.clipboard.write([
+        new ClipboardItem({
+          "image/png": new Blob([blob], { type: "image/png" })
+        })
+      ]);
+    });
+
+    await this.page.keyboard.down("ControlOrMeta");
+    await this.page.keyboard.press("KeyV");
+    await this.page.keyboard.up("ControlOrMeta");
   }
 }

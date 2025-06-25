@@ -27,7 +27,12 @@ import { TaskManager } from "../../../common/task-manager";
 import { isServerCompatible } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 
-export const ServerIds = ["notesnook-sync", "auth", "sse"] as const;
+export const ServerIds = [
+  "notesnook-sync",
+  "auth",
+  "sse",
+  "monograph"
+] as const;
 export type ServerId = (typeof ServerIds)[number];
 type Server = {
   id: ServerId;
@@ -35,6 +40,7 @@ type Server = {
   title: string;
   example: string;
   description: string;
+  versionEndpoint: string;
 };
 type VersionResponse = {
   version: number;
@@ -47,21 +53,32 @@ const SERVERS: Server[] = [
     host: "API_HOST",
     title: strings.syncServer(),
     example: "http://localhost:4326",
-    description: strings.syncServerDesc()
+    description: strings.syncServerDesc(),
+    versionEndpoint: "/version"
   },
   {
     id: "auth",
     host: "AUTH_HOST",
     title: strings.authServer(),
     example: "http://localhost:5326",
-    description: strings.authServerDesc()
+    description: strings.authServerDesc(),
+    versionEndpoint: "/version"
   },
   {
     id: "sse",
     host: "SSE_HOST",
     title: strings.sseServer(),
     example: "http://localhost:7326",
-    description: strings.sseServerDesc()
+    description: strings.sseServerDesc(),
+    versionEndpoint: "/version"
+  },
+  {
+    id: "monograph",
+    host: "MONOGRAPH_HOST",
+    title: strings.monographServer(),
+    example: "http://localhost:6326",
+    description: strings.monographServerDesc(),
+    versionEndpoint: "/api/version"
   }
 ];
 export function ServersConfiguration() {
@@ -150,16 +167,14 @@ export function ServersConfiguration() {
                   const server = SERVERS.find((s) => s.host === host);
                   if (!server) throw new Error(strings.serverNotFound(host));
                   if (!url) throw new Error(strings.allServerUrlsRequired());
-                  const version = await fetch(`${url}/version`)
+                  const version = await fetch(`${url}${server.versionEndpoint}`)
                     .then((r) => r.json() as Promise<VersionResponse>)
                     .catch(() => undefined);
                   if (!version)
-                    throw new Error(
-                      `${strings.couldNotConnectTo(server.title)} .`
-                    );
+                    throw new Error(strings.couldNotConnectTo(server.title));
                   if (version.id !== server.id)
                     throw new Error(
-                      `${strings.incorrectServerUrl(url, server.title)}.`
+                      strings.incorrectServerUrl(url, server.title)
                     );
                   if (!isServerCompatible(version.version))
                     throw new Error(

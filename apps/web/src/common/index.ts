@@ -22,7 +22,7 @@ import { hashNavigate, getCurrentHash } from "../navigation";
 import { db } from "./db";
 import { sanitizeFilename } from "@notesnook/common";
 import { useStore as useUserStore } from "../stores/user-store";
-import { useStore as useSettingStore } from "../stores/setting-store";
+import { HomePage, useStore as useSettingStore } from "../stores/setting-store";
 import { showToast } from "../utils/toast";
 import { SUBSCRIPTION_STATUS } from "./constants";
 import { readFile, showFilePicker } from "../utils/file-picker";
@@ -31,9 +31,7 @@ import { PATHS } from "@notesnook/desktop";
 import { TaskManager } from "./task-manager";
 import { EVENTS } from "@notesnook/core";
 import { createWritableStream } from "./desktop-bridge";
-import { createZipStream, ZipFile } from "../utils/streams/zip-stream";
 import { FeatureDialog, FeatureKeys } from "../dialogs/feature-dialog";
-import { ZipEntry, createUnzipIterator } from "../utils/streams/unzip-stream";
 import { User } from "@notesnook/core";
 import { LegacyBackupFile } from "@notesnook/core";
 import { useEditorStore } from "../stores/editor-store";
@@ -44,8 +42,13 @@ import { ReminderDialog } from "../dialogs/reminder-dialog";
 import { Cipher, SerializedKey } from "@notesnook/crypto";
 import { ChunkedStream } from "../utils/streams/chunked-stream";
 import { isFeatureSupported } from "../utils/feature-check";
-import { NNCrypto } from "../interfaces/nncrypto";
 import { strings } from "@notesnook/intl";
+import { ABYTES, streamablefs } from "../interfaces/fs";
+import { type ZipEntry } from "../utils/streams/unzip-stream";
+import { ZipFile } from "../utils/streams/zip-stream";
+import { ConfirmDialog, showLogoutConfirmation } from "../dialogs/confirm";
+import { Home } from "../components/icons";
+import { MenuItem } from "@notesnook/ui";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
@@ -122,11 +125,11 @@ export async function createBackup(
     title: strings.backingUpData(mode),
     subtitle: strings.backingUpDataWait(),
     action: async (report) => {
+      const { createZipStream } = await import("../utils/streams/zip-stream");
       const writeStream = await createWritableStream(filePath);
       await new ReadableStream<ZipFile>({
         start() {},
         async pull(controller) {
-          const { streamablefs } = await import("../interfaces/fs");
           for await (const output of db.backup!.export({
             type: "web",
             encrypt: encryptedBackups,
@@ -215,9 +218,13 @@ export async function restoreBackupFile(backupFile: File) {
   } else {
     const error = await TaskManager.startTask<Error | void>({
       title: strings.restoringBackup(),
-      subtitle: `${strings.restoringBackupDesc()}...`,
+      subtitle: strings.restoringBackupDesc(),
       type: "modal",
       action: async (report) => {
+        const { createUnzipIterator } = await import(
+          "../utils/streams/unzip-stream"
+        );
+
         let cachedPassword: string | undefined = undefined;
         let cachedKey: string | undefined = undefined;
         // const { read, totalFiles } = await Reader(backupFile);
@@ -283,7 +290,6 @@ export async function restoreBackupFile(backupFile: File) {
         });
         await db.initCollections();
 
-        const { ABYTES, streamablefs } = await import("../interfaces/fs");
         let current = 0;
         for (const entry of attachments) {
           const hash = entry.name.replace("attachments/", "");
@@ -344,14 +350,14 @@ async function restoreWithProgress(
           current: number;
         }) => {
           report({
-            text: `Restoring ${collection}...`,
+            text: strings.restoringCollection(collection),
             current,
             total
           });
         }
       );
 
-      report({ text: `Restoring...` });
+      report({ text: strings.restoring() });
       return restore(backup, password, key);
     }
   });
@@ -417,4 +423,51 @@ async function restore(
       `${strings.backupFailed()}: ${(e as Error).message || e}`
     );
   }
+}
+
+export async function logout() {
+  const result = await showLogoutConfirmation();
+  if (!result) return;
+
+  if (result.backup) {
+    try {
+      await createBackup({ mode: "partial" });
+    } catch (e) {
+      logger.error(e, "Failed to take backup before logout");
+      if (
+        !(await ConfirmDialog.show({
+          title: strings.failedToTakeBackup(),
+          message: strings.failedToTakeBackupMessage(),
+          negativeButtonText: strings.no(),
+          positiveButtonText: strings.yes()
+        }))
+      )
+        return;
+    }
+  }
+
+  await TaskManager.startTask({
+    type: "modal",
+    title: strings.loggingOut(),
+    subtitle: strings.pleaseWait(),
+    action: () => db.user.logout(true)
+  });
+  showToast("success", strings.loggedOut());
+}
+
+export function createSetDefaultHomepageMenuItem(
+  id: string,
+  type: HomePage["type"]
+) {
+  const homepage = useSettingStore.getState().homepage;
+  return {
+    key: "set-as-homepage",
+    type: "button",
+    title: strings.setAsHomepage(),
+    isChecked: homepage?.id === id && homepage?.type === type,
+    onClick: () => {
+      useSettingStore.getState().setHomepage({ id, type });
+    },
+    icon: Home.path
+  } as MenuItem;
 }

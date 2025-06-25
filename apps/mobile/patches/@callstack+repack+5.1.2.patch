@@ -1,0 +1,14 @@
+diff --git a/node_modules/@callstack/repack/android/build.gradle b/node_modules/@callstack/repack/android/build.gradle
+index b968f5a..62464d8 100644
+--- a/node_modules/@callstack/repack/android/build.gradle
++++ b/node_modules/@callstack/repack/android/build.gradle
+@@ -106,7 +106,8 @@ android {
+             cmake {
+                 cppFlags "-O2 -frtti -fexceptions -Wall -Wno-unused-variable -fstack-protector-all"
+                 arguments "-DANDROID_STL=c++_shared",
+-                        "-DREACT_NATIVE_DIR=${REACT_NATIVE_DIR}"
++                        "-DREACT_NATIVE_DIR=${REACT_NATIVE_DIR}",
++                        "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
+                 abiFilters(*reactNativeArchitectures())
+             }
+         }

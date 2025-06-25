@@ -2,7 +2,8 @@
   "extends": "../../tsconfig",
   "compilerOptions": {
     "outDir": "./dist/",
-    "lib": ["ESNext"]
+    "lib": ["ESNext"],
+    "moduleResolution": "Bundler"
   },
   "include": ["src", "global.d.ts"]
 }

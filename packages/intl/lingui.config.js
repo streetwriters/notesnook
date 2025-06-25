@@ -28,7 +28,7 @@ module.exports = {
   catalogs: [
     {
       path: "<rootDir>/locale/{locale}",
-      include: ["src"]
+      include: ["src", "generated"]
     }
   ],
   format: "po",

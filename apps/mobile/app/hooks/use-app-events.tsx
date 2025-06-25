@@ -17,9 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { User } from "@notesnook/core";
-import { EV, EVENTS, SYNC_CHECK_IDS, SyncStatusEvent } from "@notesnook/core";
-import { EventManagerSubscription } from "@notesnook/core";
+import {
+  EV,
+  EVENTS,
+  EventManagerSubscription,
+  SYNC_CHECK_IDS,
+  SyncStatusEvent,
+  User
+} from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import notifee from "@notifee/react-native";
 import NetInfo, { NetInfoSubscription } from "@react-native-community/netinfo";
 import React, { useCallback, useEffect, useRef } from "react";
@@ -34,17 +40,21 @@ import {
   NativeModules,
   Platform
 } from "react-native";
-import RNBootSplash from "react-native-bootsplash";
 import { checkVersion } from "react-native-check-version";
 import Config from "react-native-config";
 import * as RNIap from "react-native-iap";
 import { DatabaseLogger, db, setupDatabase } from "../common/database";
 import { initializeLogger } from "../common/database/logger";
 import { MMKV } from "../common/database/mmkv";
+import { endProgress, startProgress } from "../components/dialogs/progress";
 import Migrate from "../components/sheets/migrate";
 import NewFeature from "../components/sheets/new-feature";
+import ReminderSheet from "../components/sheets/reminder";
 import { Walkthrough } from "../components/walkthroughs";
-import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
+import {
+  resetTabStore,
+  useTabStore
+} from "../screens/editor/tiptap/use-tab-store";
 import {
   clearAppState,
   editorController,
@@ -52,6 +62,7 @@ import {
 } from "../screens/editor/tiptap/utils";
 import { useDragState } from "../screens/settings/editor/state";
 import BackupService from "../services/backup";
+import BiometricService from "../services/biometrics";
 import {
   ToastManager,
   eSendEvent,
@@ -66,11 +77,13 @@ import {
   setRecoveryKeyMessage,
   setUpdateAvailableMessage
 } from "../services/message";
+import Navigation from "../services/navigation";
 import Notifications from "../services/notifications";
 import PremiumService from "../services/premium";
 import SettingsService from "../services/settings";
 import Sync from "../services/sync";
-import { initAfterSync } from "../stores";
+import { clearAllStores, initAfterSync, initialize } from "../stores";
+import { refreshAllStores } from "../stores/create-db-collection-store";
 import { useAttachmentStore } from "../stores/use-attachment-store";
 import { useMessageStore } from "../stores/use-message-store";
 import { useSettingStore } from "../stores/use-setting-store";
@@ -83,16 +96,13 @@ import {
   eLoginSessionExpired,
   eOnLoadNote,
   eOpenAnnouncementDialog,
-  eUnlockNote,
   eUserLoggedIn,
   refreshNotesPage
 } from "../utils/events";
 import { getGithubVersion } from "../utils/github-version";
-import { tabBarRef } from "../utils/global-refs";
-import { sleep } from "../utils/time";
+import { fluidTabsRef } from "../utils/global-refs";
 import { NotesnookModule } from "../utils/notesnook-module";
-import { changeSystemBarColors } from "../stores/use-theme-store";
-import { strings } from "@notesnook/intl";
+import { sleep } from "../utils/time";
 
 const onCheckSyncStatus = async (type: SyncStatusEvent) => {
   const { disableSync, disableAutoSync } = SettingsService.get();
@@ -147,6 +157,7 @@ const onUserSessionExpired = async () => {
 
 const onAppOpenedFromURL = async (event: { url: string }) => {
   const url = event.url;
+
   try {
     if (url.startsWith("https://app.notesnook.com/account/verified")) {
       await onUserEmailVerified();
@@ -154,8 +165,27 @@ const onAppOpenedFromURL = async (event: { url: string }) => {
       clearAppState();
       editorState().movedAway = false;
       eSendEvent(eOnLoadNote, { newNote: true });
-      tabBarRef.current?.goToPage(1, false);
+      fluidTabsRef.current?.goToPage("editor", false);
       return;
+    } else if (url.startsWith("https://notesnook.com/open_note")) {
+      const id = new URL(url).searchParams.get("id");
+      if (id) {
+        const note = await db.notes.note(id);
+        if (note) {
+          eSendEvent(eOnLoadNote, {
+            item: note
+          });
+          fluidTabsRef.current?.goToPage("editor", false);
+        }
+      }
+    } else if (url.startsWith("https://notesnook.com/open_reminder")) {
+      const id = new URL(url).searchParams.get("id");
+      if (id) {
+        const reminder = await db.reminders.reminder(id);
+        if (reminder) ReminderSheet.present(reminder);
+      }
+    } else if (url.startsWith("https://notesnook.com/new_reminder")) {
+      ReminderSheet.present();
     }
   } catch (e) {
     console.error(e);
@@ -207,11 +237,20 @@ const onRequestPartialSync = async (
 };
 
 const onLogout = async (reason: string) => {
-  DatabaseLogger.log("User Logged Out" + reason);
-  Notifications.setupReminders(true);
-  SettingsService.set({
-    introCompleted: true
+  DatabaseLogger.log("User Logged Out " + reason);
+  setLoginMessage();
+  await PremiumService.setPremiumStatus();
+  await BiometricService.resetCredentials();
+  MMKV.clearStore();
+  resetTabStore();
+  clearAllStores();
+  setImmediate(() => {
+    refreshAllStores();
   });
+  Navigation.queueRoutesForUpdate();
+  SettingsService.resetSettings();
+  useUserStore.getState().setUser(null);
+  useUserStore.getState().setSyncing(false);
 };
 
 async function checkForShareExtensionLaunchedInBackground() {
@@ -225,7 +264,7 @@ async function checkForShareExtensionLaunchedInBackground() {
       }
       eSendEvent(refreshNotesPage);
       MMKV.removeItem("notesAddedFromIntent");
-      initAfterSync();
+      initAfterSync("full");
       eSendEvent(refreshNotesPage);
     }
 
@@ -236,9 +275,7 @@ async function checkForShareExtensionLaunchedInBackground() {
       if (note) setTimeout(() => eSendEvent("loadingNote", note), 1);
       MMKV.removeItem("shareExtensionOpened");
     }
-  } catch (e) {
-    console.log(e);
-  }
+  } catch (e) {}
 }
 
 async function saveEditorState() {
@@ -304,8 +341,15 @@ const doAppLoadActions = async () => {
 };
 
 const checkAppUpdateAvailable = async () => {
-  if (__DEV__ || Config.isTesting === "true" || Config.FDROID_BUILD || BETA)
+  if (
+    __DEV__ ||
+    Config.isTesting === "true" ||
+    Config.FDROID_BUILD ||
+    BETA ||
+    !SettingsService.getProperty("checkForUpdates")
+  )
     return;
+
   try {
     const version =
       Config.GITHUB_RELEASE === "true"
@@ -352,13 +396,11 @@ const IsDatabaseMigrationRequired = () => {
 const initializeDatabase = async (password?: string) => {
   if (useUserStore.getState().appLocked) return;
   if (!db.isInitialized) {
-    RNBootSplash.hide({ fade: false });
-    changeSystemBarColors();
-
     DatabaseLogger.info("Initializing database");
     try {
       await setupDatabase(password);
       await db.init();
+      initialize();
       Sync.run();
     } catch (e) {
       DatabaseLogger.error(e as Error);
@@ -369,12 +411,13 @@ const initializeDatabase = async (password?: string) => {
   if (IsDatabaseMigrationRequired()) return;
 
   if (db.isInitialized) {
+    useSettingStore.getState().setAppLoading(false);
     Notifications.setupReminders(true);
     if (SettingsService.get().notifNotes) {
       Notifications.pinQuickNote(false);
     }
-    useSettingStore.getState().setAppLoading(false);
     DatabaseLogger.info("Database initialized");
+    Notifications.restorePinnedNotes();
   }
   Walkthrough.init();
 };
@@ -402,7 +445,7 @@ export const useAppEvents = () => {
   >({});
 
   const onSyncComplete = useCallback(async () => {
-    initAfterSync();
+    initAfterSync(Sync.getLastSyncType() as "full" | "send");
     setLastSynced(await db.lastSynced());
     eSendEvent(eCloseSheet, "sync_progress");
   }, [setLastSynced]);
@@ -479,12 +522,14 @@ export const useAppEvents = () => {
         }
 
         if (fullBackup) {
-          await BackupService.run(true, undefined, "full");
+          await BackupService.run(false, undefined, "full");
         }
       }
 
       if (SettingsService.getProperty("offlineMode")) {
-        db.attachments.cacheAttachments().catch(console.log);
+        db.attachments.cacheAttachments().catch(() => {
+          /* empty */
+        });
       }
     }
   }, []);
@@ -532,7 +577,6 @@ export const useAppEvents = () => {
           });
         }
       } catch (e) {
-        console.log(e);
         ToastManager.error(e as Error, "Error updating user", "global");
       }
 
@@ -577,25 +621,43 @@ export const useAppEvents = () => {
       EV.subscribe(EVENTS.uploadCanceled, (data) => {
         useAttachmentStore.getState().setUploading(data);
       }),
+      EV.subscribe(EVENTS.migrationStarted, (name) => {
+        if (
+          name !== "notesnook" ||
+          !SettingsService.getProperty("introCompleted") ||
+          Config.isTesting === "true"
+        )
+          return;
+        startProgress({
+          title: "Migrating Data",
+          paragraph: "Please wait while we migrate your data",
+          canHideProgress: false,
+          fillBackground: true
+        });
+      }),
+      EV.subscribe(EVENTS.migrationFinished, (name) => {
+        if (
+          name !== "notesnook" ||
+          !SettingsService.getProperty("introCompleted") ||
+          Config.isTesting === "true"
+        )
+          return;
+        endProgress();
+      }),
       EV.subscribe(EVENTS.vaultLocked, async () => {
         // Lock all notes in all tabs...
         for (const tab of useTabStore.getState().tabs) {
-          const noteId = useTabStore.getState().getTab(tab.id)?.noteId;
+          const noteId = useTabStore.getState().getTab(tab.id)?.session?.noteId;
           if (!noteId) continue;
           const note = await db.notes.note(noteId);
           const locked = note && (await db.vaults.itemExists(note));
           if (locked) {
             useTabStore.getState().updateTab(tab.id, {
-              locked: true
+              session: {
+                locked: true,
+                noteLocked: true
+              }
             });
-            if (
-              tab.id === useTabStore.getState().currentTab &&
-              locked &&
-              !editorState().movedAway
-            ) {
-              // Show unlock note screen.
-              eSendEvent(eUnlockNote);
-            }
           }
         }
       }),
@@ -604,6 +666,7 @@ export const useAppEvents = () => {
 
     const emitterSubscriptions = [
       Linking.addEventListener("url", onAppOpenedFromURL),
+
       SodiumEventEmitter.addListener(
         "onSodiumProgress",
         onFileEncryptionProgress
@@ -660,7 +723,8 @@ export const useAppEvents = () => {
           SettingsService.canLockAppInBackground() &&
           !useSettingStore.getState().requestBiometrics &&
           !useUserStore.getState().appLocked &&
-          !useUserStore.getState().disableAppLockRequests
+          !useUserStore.getState().disableAppLockRequests &&
+          !useSettingStore.getState().appDidEnterBackgroundForAction
         ) {
           if (SettingsService.shouldLockAppOnEnterForeground()) {
             DatabaseLogger.log(`AppEvents: Locking app on enter background`);
@@ -689,13 +753,15 @@ export const useAppEvents = () => {
       setTimeout(() => {
         sub = AppState.addEventListener("change", onAppStateChanged);
         if (
-          refValues.current.initialUrl?.startsWith(
-            "https://app.notesnook.com/account/verified"
-          )
+          refValues.current.initialUrl &&
+          !refValues.current.initialUrl?.includes("open_note")
         ) {
-          onUserEmailVerified();
+          onAppOpenedFromURL({
+            url: refValues.current.initialUrl!
+          });
         }
       }, 1000);
+
       refValues.current.removeInternetStateListener = NetInfo.addEventListener(
         onInternetStateChanged
       );
@@ -738,9 +804,7 @@ export const useAppEvents = () => {
   useEffect(() => {
     if (!appLocked && isAppLoading) {
       initializeLogger()
-        .catch((e) => {
-          console.log(e);
-        })
+        .catch((e) => {})
         .finally(() => {
           //@ts-ignore
           initializeDatabase();

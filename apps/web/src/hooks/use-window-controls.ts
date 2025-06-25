@@ -37,7 +37,6 @@ export function useWindowControls() {
 
     function onFullscreenChange() {
       setIsFullscreen(!!document.fullscreenElement);
-      console.log(document.fullscreenElement);
     }
     document.addEventListener("fullscreenchange", onFullscreenChange);
     return () => {

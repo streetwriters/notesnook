@@ -21,6 +21,7 @@ import { Page } from "@playwright/test";
 import { downloadAndReadFile, getTestId, uploadFile } from "../utils";
 import {
   confirmDialog,
+  fillConfirmPasswordDialog,
   fillPasswordDialog,
   waitForDialog,
   waitToHaveText
@@ -55,8 +56,8 @@ export class SettingsViewModel {
     await confirmDialog(this.page.locator(getTestId("confirm-dialog")));
 
     await this.page
-      .locator(getTestId("not-logged-in"))
-      .waitFor({ state: "visible" });
+      .locator(getTestId("logged-in"))
+      .waitFor({ state: "hidden" });
   }
 
   async getRecoveryKey(password: string) {
@@ -82,8 +83,8 @@ export class SettingsViewModel {
   }
 
   async isLoggedIn() {
-    const item = await this.navigation.findItem("Subscription");
-    return !!(await item?.getTitle());
+    const loggedInButton = this.page.locator(getTestId("logged-in"));
+    return await loggedInButton.isVisible();
   }
 
   async isBackupEncryptionEnabled(state: boolean) {
@@ -138,5 +139,54 @@ export class SettingsViewModel {
     if (password) await fillPasswordDialog(this.page, password);
 
     await waitForDialog(this.page, "Restoring backup");
+  }
+
+  async selectImageCompression(option: { value: string; label: string }) {
+    const item = await this.navigation.findItem("Behaviour");
+    await item?.click();
+
+    const imageCompressionDropdown = this.page
+      .locator(getTestId("setting-image-compression"))
+      .locator("select");
+
+    await imageCompressionDropdown.selectOption(option);
+  }
+
+  async enableAppLock(userPassword: string, appLockPassword: string) {
+    const item = await this.navigation.findItem("App lock");
+    await item?.click();
+
+    const appLockSwitch = this.page
+      .locator(getTestId("setting-enable-app-lock"))
+      .locator("label");
+
+    await appLockSwitch.click();
+    await fillPasswordDialog(this.page, userPassword);
+    await this.page.waitForTimeout(100);
+    await fillConfirmPasswordDialog(this.page, appLockPassword);
+    await this.page.waitForTimeout(100);
+  }
+
+  async disableAppLock(appLockPassword: string) {
+    const item = await this.navigation.findItem("App lock");
+    await item?.click();
+
+    const appLockSwitch = this.page
+      .locator(getTestId("setting-enable-app-lock"))
+      .locator("label");
+
+    await appLockSwitch.click();
+    await fillPasswordDialog(this.page, appLockPassword);
+    await this.page.waitForTimeout(100);
+  }
+
+  async setTitleFormat(format: string) {
+    const item = await this.navigation.findItem("Editor");
+    await item?.click();
+
+    const titleFormatInput = this.page
+      .locator(getTestId("setting-default-title"))
+      .locator("input");
+    await titleFormatInput.fill(format);
   }
 }

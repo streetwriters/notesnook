@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Item, ItemType, VirtualizedGrouping } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useRef } from "react";
 import {
@@ -26,27 +27,26 @@ import {
   Platform,
   View
 } from "react-native";
-import Menu from "react-native-reanimated-material-menu/src/Menu";
+import { Menu } from "react-native-material-menu";
 import { db } from "../../common/database";
-import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { ToastManager } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
+import { useTrashStore } from "../../stores/use-trash-store";
 import { deleteItems } from "../../utils/functions";
-import { tabBarRef } from "../../utils/global-refs";
+import { fluidTabsRef } from "../../utils/global-refs";
 import { updateNotebook } from "../../utils/notebooks";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 import { sleep } from "../../utils/time";
 import { presentDialog } from "../dialog/functions";
-import MoveNoteSheet from "../sheets/add-to";
 import ExportNotesSheet from "../sheets/export-notes";
-import ManageTagsSheet from "../sheets/manage-tags";
-import { MoveNotebookSheet } from "../sheets/move-notebook";
-import { Button } from "../ui/button";
+
+import { MoveNotebook } from "../../screens/move-notebook";
 import { IconButton } from "../ui/icon-button";
-import Heading from "../ui/typography/heading";
-import { strings } from "@notesnook/intl";
+import NativeTooltip from "../../utils/tooltip";
+import ManageTags from "../../screens/manage-tags";
 
 export const SelectionHeader = React.memo(
   ({
@@ -61,23 +61,20 @@ export const SelectionHeader = React.memo(
     renderedInRoute?: string;
   }) => {
     const menuRef = useRef<Menu>(null);
-    const { colors: contextMenuColors } = useThemeColors("contextMenu");
     const { colors } = useThemeColors();
     const selectionMode = useSelectionStore((state) => state.selectionMode);
     const selectedItemsList = useSelectionStore(
       (state) => state.selectedItemsList
     );
     const clearSelection = useSelectionStore((state) => state.clearSelection);
-    const insets = useGlobalSafeAreaInsets();
     const allSelected =
       items?.placeholders?.length === selectedItemsList.length;
     const focusedRouteId = useNavigationStore((state) => state.focusedRouteId);
-
     useEffect(() => {
       if (selectionMode) {
-        tabBarRef.current?.lock();
+        fluidTabsRef.current?.lock();
       } else {
-        tabBarRef.current?.unlock();
+        fluidTabsRef.current?.unlock();
       }
     }, [selectionMode]);
 
@@ -90,7 +87,7 @@ export const SelectionHeader = React.memo(
 
     const restoreItem = async () => {
       if (!selectedItemsList.length) return;
-      await db.trash.restore(...selectedItemsList);
+      if ((await db.trash.restore(...selectedItemsList)) === false) return;
       Navigation.queueRoutesForUpdate();
 
       clearSelection();
@@ -101,10 +98,14 @@ export const SelectionHeader = React.memo(
     };
 
     const deleteItem = async () => {
+      if (!type) return;
       presentDialog({
-        title: strings.deleteItems(type as string, selectedItemsList.length),
-        paragraph: strings.deleteItemsConfirmation(
-          type as string,
+        title: strings.doActions.permanentlyDelete.unknown(
+          type,
+          selectedItemsList.length
+        ),
+        paragraph: strings.actionConfirmations.permanentlyDelete.unknown(
+          type,
           selectedItemsList.length
         ),
         positiveText: strings.delete(),
@@ -112,7 +113,7 @@ export const SelectionHeader = React.memo(
         positivePress: async () => {
           if (!selectedItemsList.length) return;
           await db.trash.delete(...selectedItemsList);
-          Navigation.queueRoutesForUpdate();
+          useTrashStore.getState().refresh();
           clearSelection();
         },
         positiveType: "errorShade"
@@ -138,61 +139,24 @@ export const SelectionHeader = React.memo(
       <View
         style={{
           width: "100%",
-          height: Platform.OS === "android" ? 50 + insets.top : 50,
-          paddingTop: Platform.OS === "android" ? insets.top : null,
           backgroundColor: colors.primary.background,
-          justifyContent: "space-between",
+          paddingVertical: DefaultAppStyles.GAP_VERTICAL,
           alignItems: "center",
           flexDirection: "row",
           zIndex: 999,
-          paddingHorizontal: 12
+          paddingHorizontal: DefaultAppStyles.GAP,
+          position: "absolute",
+          bottom: 0,
+          borderTopWidth: 1,
+          borderColor: colors.primary.border,
+          justifyContent: "space-between"
         }}
       >
         <View
           style={{
             flexDirection: "row",
-            justifyContent: "flex-start",
             alignItems: "center",
-            borderRadius: 100
-          }}
-        >
-          <IconButton
-            style={{
-              justifyContent: "center",
-              alignItems: "center",
-              height: 40,
-              width: 40,
-              borderRadius: 100,
-              marginRight: 10
-            }}
-            onPress={() => {
-              clearSelection();
-            }}
-            color={colors.primary.icon}
-            name="close"
-          />
-
-          <View
-            style={{
-              height: 40,
-              borderRadius: 100,
-              paddingHorizontal: 16,
-              justifyContent: "center",
-              flexDirection: "row",
-              alignItems: "center"
-            }}
-          >
-            <Heading size={SIZE.lg} color={colors.primary.paragraph}>
-              {selectedItemsList.length}
-            </Heading>
-          </View>
-        </View>
-
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "flex-start",
-            alignItems: "center"
+            gap: DefaultAppStyles.GAP_SMALL
           }}
         >
           <IconButton
@@ -201,137 +165,157 @@ export const SelectionHeader = React.memo(
                 .getState()
                 .setAll(allSelected ? [] : [...((await items?.ids()) || [])]);
             }}
-            tooltipText="Select all"
-            tooltipPosition={4}
-            style={{
-              marginLeft: 10
-            }}
-            color={
-              allSelected ? colors.primary.accent : colors.primary.paragraph
-            }
+            size={AppFontSize.lg}
+            color={allSelected ? colors.primary.accent : colors.primary.icon}
             name="select-all"
           />
-
-          {selectedItemsList.length ? (
-            <Menu
-              ref={menuRef}
-              animationDuration={200}
-              style={{
-                borderRadius: 5,
-                backgroundColor: contextMenuColors.primary.background,
-                marginTop: -20
-              }}
-              onRequestClose={() => {
-                menuRef.current?.hide();
-              }}
-              anchor={
-                <IconButton
-                  onPress={() => {
-                    menuRef.current?.show();
-                  }}
-                  name="dots-vertical"
-                  color={colors.primary.paragraph}
-                />
-              }
-            >
-              {[
-                {
-                  title: strings.move(),
-                  onPress: async () => {
-                    const ids = selectedItemsList;
-                    const notebooks = await db.notebooks.all.items(ids);
-                    MoveNotebookSheet.present(notebooks);
-                  },
-                  visible: renderedInRoute === "Notebooks",
-                  icon: "arrow-right-bold-box-outline"
-                },
-                {
-                  title: strings.manageTags(),
-                  onPress: async () => {
-                    await sleep(100);
-                    ManageTagsSheet.present(selectedItemsList);
-                  },
-                  visible: type === "note",
-                  icon: "pound"
-                },
-                {
-                  title: strings.export(),
-                  onPress: async () => {
-                    await sleep(100);
-                    ExportNotesSheet.present(selectedItemsList);
-                  },
-                  visible: type === "note",
-                  icon: "export"
-                },
-                {
-                  title: strings.linkNotebook(),
-                  onPress: async () => {
-                    await sleep(100);
-                    MoveNoteSheet.present();
-                  },
-                  visible: type === "note",
-                  icon: "plus"
-                },
-                {
-                  title: strings.unlinkNotebook(),
-                  onPress: async () => {
-                    if (!id) return;
-                    await db.notes.removeFromNotebook(id, ...selectedItemsList);
-                    updateNotebook(id);
-                    Navigation.queueRoutesForUpdate();
-                    clearSelection();
-                  },
-                  visible: renderedInRoute === "Notebook",
-                  icon: "minus"
-                },
-                {
-                  title: strings.unfavorite(),
-                  onPress: addToFavorite,
-                  visible: focusedRouteId === "Favorites",
-                  icon: "star-off"
-                },
-                {
-                  title: strings.moveToTrash(),
-                  onPress: async () => {
-                    deleteItems(
-                      undefined,
-                      useSelectionStore.getState().selectionMode
-                    ).then(() => {
-                      useSelectionStore.getState().clearSelection();
-                      useSelectionStore.getState().setSelectionMode(undefined);
-                    });
-                  },
-                  visible: type !== "trash",
-                  icon: "delete"
-                },
-                {
-                  title: strings.restore(),
-                  onPress: restoreItem,
-                  visible: type === "trash",
-                  icon: "delete-restore"
-                },
-                {
-                  title: strings.delete(),
-                  onPress: deleteItem,
-                  visible: type === "trash",
-                  icon: "delete"
-                }
-              ].map((item) =>
+          {!selectedItemsList.length
+            ? null
+            : (focusedRouteId === "Monographs"
+                ? [
+                    {
+                      title: strings.unpublish(),
+                      onPress: () => {
+                        presentDialog({
+                          title: strings.doActions.unpublish.note(
+                            selectedItemsList.length
+                          ),
+                          positiveText: strings.unpublish(),
+                          negativeText: strings.cancel(),
+                          positivePress: async () => {
+                            for (const id of selectedItemsList) {
+                              await db.monographs.unpublish(id);
+                            }
+                            Navigation.queueRoutesForUpdate();
+                            clearSelection();
+                          },
+                          positiveType: "errorShade"
+                        });
+                      },
+                      visible: true,
+                      icon: "delete"
+                    }
+                  ]
+                : [
+                    {
+                      title: strings.move(),
+                      onPress: async () => {
+                        const ids = selectedItemsList;
+                        const notebooks = await db.notebooks.all.items(ids);
+                        MoveNotebook.present(notebooks);
+                      },
+                      visible: renderedInRoute === "Notebooks",
+                      icon: "arrow-right-bold-box-outline"
+                    },
+                    {
+                      title: strings.manageTags(),
+                      onPress: async () => {
+                        ManageTags.present(selectedItemsList);
+                      },
+                      visible: type === "note",
+                      icon: "pound"
+                    },
+                    {
+                      title: strings.export(),
+                      onPress: async () => {
+                        ExportNotesSheet.present(selectedItemsList);
+                      },
+                      visible: type === "note",
+                      icon: "export"
+                    },
+                    {
+                      title: strings.addToNotebook(),
+                      onPress: async () => {
+                        Navigation.navigate("LinkNotebooks", {
+                          noteIds: selectedItemsList
+                        });
+                      },
+                      visible: type === "note",
+                      icon: "plus"
+                    },
+                    {
+                      title: strings.unlinkNotebook(),
+                      onPress: async () => {
+                        if (!id) return;
+                        await db.notes.removeFromNotebook(
+                          id,
+                          ...selectedItemsList
+                        );
+                        updateNotebook(id);
+                        Navigation.queueRoutesForUpdate();
+                        clearSelection();
+                      },
+                      visible: renderedInRoute === "Notebook",
+                      icon: "minus"
+                    },
+                    {
+                      title: strings.unfavorite(),
+                      onPress: addToFavorite,
+                      visible: focusedRouteId === "Favorites",
+                      icon: "star-off"
+                    },
+                    {
+                      title: strings.moveToTrash(),
+                      onPress: async () => {
+                        const selection = useSelectionStore.getState();
+                        if (!selection.selectionMode) return;
+                        await deleteItems(
+                          selection.selectionMode as ItemType,
+                          selection.selectedItemsList
+                        );
+                        selection.clearSelection();
+                        selection.setSelectionMode(undefined);
+                      },
+                      visible: type === "note" || type === "notebook",
+                      icon: "delete"
+                    },
+                    {
+                      title: strings.doActions.delete.unknown(
+                        type!,
+                        selectedItemsList.length
+                      ),
+                      onPress: async () => {
+                        const selection = useSelectionStore.getState();
+                        if (!selection.selectionMode) return;
+                        await deleteItems(
+                          selection.selectionMode as ItemType,
+                          selection.selectedItemsList
+                        );
+                        selection.clearSelection();
+                        selection.setSelectionMode(undefined);
+                      },
+                      visible:
+                        type !== "trash" &&
+                        type !== "note" &&
+                        type !== "notebook",
+                      icon: "delete"
+                    },
+                    {
+                      title: strings.restore(),
+                      onPress: restoreItem,
+                      visible: type === "trash",
+                      icon: "delete-restore"
+                    },
+                    {
+                      title: strings.delete(),
+                      onPress: deleteItem,
+                      visible: type === "trash",
+                      icon: "delete"
+                    }
+                  ]
+              ).map((item) =>
                 !item.visible ? null : (
-                  <Button
-                    style={{
-                      width: 150,
-                      justifyContent: "flex-start",
-                      borderRadius: 0
-                    }}
+                  <IconButton
+                    size={AppFontSize.lg}
                     type="plain"
-                    buttonType={{
-                      text: contextMenuColors.primary.paragraph
-                    }}
-                    icon={item.icon}
+                    tooltipText={item.title}
+                    tooltipPosition={NativeTooltip.POSITIONS.TOP}
+                    testID={`select-${item.icon}`}
+                    name={item.icon}
                     key={item.title}
-                    title={item.title}
+                    color={colors.primary.icon}
                     onPress={async () => {
+                      //@ts-ignore
                       menuRef.current?.hide();
                       if (Platform.OS === "ios") await sleep(300);
                       item.onPress();
@@ -339,9 +323,16 @@ export const SelectionHeader = React.memo(
                   />
                 )
               )}
-            </Menu>
-          ) : null}
         </View>
+
+        <IconButton
+          size={AppFontSize.lg}
+          onPress={() => {
+            clearSelection();
+          }}
+          color={colors.primary.icon}
+          name="close"
+        />
       </View>
     );
   }

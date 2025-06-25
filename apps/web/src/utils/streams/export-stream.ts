@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { ExportableItem } from "@notesnook/common";
 import { db } from "../../common/db";
 import { ZipFile } from "./zip-stream";
-import { lazify } from "../lazify";
+import { streamingDecryptFile } from "../../interfaces/fs";
 
 export class ExportStream extends TransformStream<
   ExportableItem | Error,
@@ -44,17 +44,14 @@ export class ExportStream extends TransformStream<
             .downloadFile("exports", item.data.hash, item.data.chunkSize);
           const key = await db.attachments.decryptKey(item.data.key);
           if (!key) return;
-          const stream = await lazify(
-            import("../../interfaces/fs"),
-            ({ streamingDecryptFile }) =>
-              streamingDecryptFile(item.data.hash, {
-                key,
-                iv: item.data.iv,
-                name: item.data.filename,
-                type: item.data.mimeType,
-                isUploaded: !!item.data.dateUploaded
-              })
-          );
+          const stream = await streamingDecryptFile(item.data.hash, {
+            key,
+            iv: item.data.iv,
+            name: item.data.filename,
+            type: item.data.mimeType,
+            isUploaded: !!item.data.dateUploaded
+          });
+
           if (!stream) return;
           controller.enqueue({ ...item, data: stream });
           report({

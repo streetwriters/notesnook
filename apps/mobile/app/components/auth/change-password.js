@@ -36,6 +36,7 @@ import { Dialog } from "../dialog";
 import BackupService from "../../services/backup";
 import { sleep } from "../../utils/time";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const ChangePassword = () => {
   const passwordInputRef = useRef();
@@ -68,11 +69,15 @@ export const ChangePassword = () => {
     }
     setLoading(true);
     try {
-      const result = await BackupService.run(false, "change-password-dialog");
-      if (!result.error)
+      const result = await BackupService.run(
+        false,
+        "change-password-dialog",
+        "partial"
+      );
+      if (result.error) {
         throw new Error(strings.backupFailed() + `: ${result.error}`);
+      }
 
-      await db.user.clearSessions();
       await db.user.changePassword(oldPassword.current, password.current);
       ToastManager.show({
         heading: strings.passwordChangedSuccessfully(),
@@ -99,7 +104,7 @@ export const ChangePassword = () => {
     <View
       style={{
         width: "100%",
-        padding: 12
+        padding: DefaultAppStyles.GAP
       }}
     >
       <Dialog context="change-password-dialog" />
@@ -144,7 +149,7 @@ export const ChangePassword = () => {
 
       <Button
         style={{
-          marginTop: 10,
+          marginTop: DefaultAppStyles.GAP_VERTICAL,
           width: "100%"
         }}
         loading={loading}

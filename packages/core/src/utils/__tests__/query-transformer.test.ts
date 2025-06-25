@@ -20,53 +20,57 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { expect, test } from "vitest";
 import { transformQuery } from "../query-transformer.js";
 
-const TRANSFORM_QUERY_TESTS = [
-  ["hello world", `"hello world"`],
-  ["hello world OR bar", `"hello world" OR "bar"`],
-  ["hello world OR bar NOT baz", `"hello world" OR "bar" NOT "baz"`],
-  ["hello world OR NOT AND", `"hello world"`],
-  ["hello world OR NOT AND something", `"hello world" AND "something"`],
-  ["hello world -foo", `"hello world -foo"`],
-  ["hello world phrase-with-dash", `"hello world phrase-with-dash"`],
-  ["hello world phrase-with-dash*", '"hello world phrase-with-dash*"'],
-  ["example + foo + bar", `"example + foo + bar"`],
-  ["example OR foo NOT bar", `"example" OR "foo" NOT "bar"`],
+const TRANSFORM_QUERY_TESTS: [string, string][] = [
+  ["hello world", `hello AND world`],
+  ["hello world OR bar", `hello AND world OR bar`],
+  ["hello world OR bar NOT baz", `hello AND world OR bar NOT baz`],
+  ["hello world OR NOT AND", `hello AND world`],
+  ["hello world OR NOT AND something", `hello AND world AND something`],
+  ["hello world -foo", `hello AND world AND "-foo"`],
+  ["hello world phrase-with-dash", `hello AND world AND "phrase-with-dash"`],
+  ["hello world phrase-with-dash*", 'hello AND world AND "phrase-with-dash*"'],
+  ["example + foo + bar", `example AND foo AND bar`],
+  ["example OR foo NOT bar", `example OR foo NOT bar`],
   [
     'example "quoted phrase" "another quoted phrase"',
-    `"example ""quoted phrase"" ""another quoted phrase"""`
+    `example AND "quoted phrase" AND "another quoted phrase"`
   ],
-  ['"phrase-with-dash*"', `""phrase-with-dash*""`],
-  ['-foo + bar OR "quoted-phrase"', '"-foo + bar" OR ""quoted-phrase""'],
+  ['"phrase-with-dash*"', `"phrase-with-dash*"`],
+  ['-foo + bar OR "quoted-phrase"', `"-foo" AND bar OR "quoted-phrase"`],
   [
     'phrase-with-dash* + "quoted-phrase"',
-    '"phrase-with-dash* + ""quoted-phrase"""'
+    `"phrase-with-dash*" AND "quoted-phrase"`
   ],
   [
     'example -foo + bar + "quoted-dash-phrase*" OR "another-quoted-phrase"',
-    '"example -foo + bar + ""quoted-dash-phrase*""" OR ""another-quoted-phrase""'
+    `example AND "-foo" AND bar AND "quoted-dash-phrase*" OR "another-quoted-phrase"`
   ],
   ["", ""],
-  ["foo", `"foo"`],
-  ['"quoted"', '""quoted""'],
-  ["-foo -bar", `"-foo -bar"`],
-  ["foo + + bar", `"foo + + bar"`],
-  ["foo + OR", `"foo +"`],
-  ['"special -phrase*"', '""special -phrase*""'],
-  ["foo* + bar*", `"foo* + bar*"`],
-  ["(foo + bar) -baz", `"(foo + bar) -baz"`],
-  ['"phrase with "quotes""', '""phrase with ""quotes""""'],
-  ['foo + "bar -baz" OR "qux*"', '"foo + ""bar -baz""" OR ""qux*""'],
-  ["foo + bar + ", `"foo + bar +"`],
-  ["+foo bar", `"+foo bar"`],
+  ["foo", `foo`],
+  ['"quoted"', '"quoted"'],
+  ["-foo -bar", `"-foo" AND "-bar"`],
+  ["foo + + bar", `foo AND bar`],
+  ["foo + OR", `foo`],
+  ['"special -phrase*"', '"special -phrase*"'],
+  ["foo* + bar*", `"foo*" AND "bar*"`],
+  ["(foo + bar) -baz", `"(foo" AND "bar)" AND "-baz"`],
+  ['"phrase with "quotes""', '"phrase with ""quotes"""'],
+  ['foo + "bar -baz" OR "qux*"', `foo AND "bar -baz" OR "qux*"`],
+  ["foo + bar + ", `foo AND bar`],
+  ["+foo bar", `"+foo" AND bar`],
   ["foo*bar*", `"foo*bar*"`],
-  ['"escaped "quotes""', '""escaped ""quotes""""'],
+  ['"escaped "quotes""', '"escaped ""quotes"""'],
   ["-hello-world", `"-hello-world"`],
   ["-hello-world*", '"-hello-world*"'],
-  ["*helo*", `"*helo*"`]
+  ["*helo*", `"*helo*"`],
+  [">he", `">he"`],
+  ["something<hello", `"something<hello"`],
+  ["<", ``],
+  [">", ``]
 ];
 
 for (const [input, expectedOutput] of TRANSFORM_QUERY_TESTS) {
   test(`should transform "${input}" into a valid SQL query`, () => {
-    expect(transformQuery(input)).toBe(expectedOutput);
+    expect(transformQuery(input).query).toBe(expectedOutput);
   });
 }

@@ -20,11 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import { ScrollView, View } from "react-native";
 import { useThemeColors } from "@notesnook/theme";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { FeatureBlock } from "./feature";
 import { ProTag } from "./pro-tag";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const Group = ({ item, index }) => {
   const { colors } = useThemeColors();
@@ -32,24 +33,31 @@ export const Group = ({ item, index }) => {
   return (
     <View
       style={{
-        paddingHorizontal: 12,
-        backgroundColor: index % 2 !== 0 ? colors.primary.background : colors.secondary.background,
+        paddingHorizontal: DefaultAppStyles.GAP,
+        backgroundColor:
+          index % 2 !== 0
+            ? colors.primary.background
+            : colors.secondary.background,
         paddingVertical: 40
       }}
     >
       {item?.pro ? (
         <ProTag
-          size={SIZE.sm}
-          background={index % 2 === 0 ? colors.primary.background : colors.secondary.background}
+          size={AppFontSize.sm}
+          background={
+            index % 2 === 0
+              ? colors.primary.background
+              : colors.secondary.background
+          }
         />
       ) : null}
       <Heading>{item.title}</Heading>
-      <Paragraph size={SIZE.md}>{item.detail}</Paragraph>
+      <Paragraph size={AppFontSize.md}>{item.detail}</Paragraph>
 
       {item.features && (
         <ScrollView
           style={{
-            marginTop: 20
+            marginTop: DefaultAppStyles.GAP
           }}
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -60,7 +68,11 @@ export const Group = ({ item, index }) => {
               {...item}
               detail={item.detail}
               pro={item.pro}
-              proTagBg={index % 2 === 0 ? colors.primary.background : colors.secondary.background}
+              proTagBg={
+                index % 2 === 0
+                  ? colors.primary.background
+                  : colors.secondary.background
+              }
             />
           ))}
         </ScrollView>
@@ -68,9 +80,9 @@ export const Group = ({ item, index }) => {
       {item.info ? (
         <Paragraph
           style={{
-            marginTop: 10
+            marginTop: DefaultAppStyles.GAP_VERTICAL
           }}
-          size={SIZE.xs}
+          size={AppFontSize.xs}
           color={colors.secondary.paragraph}
         >
           {item.info}

@@ -17,8 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useRef, useState } from "react";
+import { strings } from "@notesnook/intl";
+import { useThemeColors } from "@notesnook/theme";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View } from "react-native";
+import { ScrollView } from "react-native-actions-sheet";
 import { db } from "../../common/database/index";
 import useTimer from "../../hooks/use-timer";
 import {
@@ -26,21 +29,17 @@ import {
   presentSheet,
   ToastManager
 } from "../../services/event-manager";
-import { useThemeColors } from "@notesnook/theme";
 import { eCloseSheet } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
 import Input from "../ui/input";
 import { Pressable } from "../ui/pressable";
-import Seperator from "../ui/seperator";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { useCallback } from "react";
-import { ScrollView } from "react-native-actions-sheet";
-import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 
-const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
+const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
   const { colors } = useThemeColors();
   const code = useRef();
   const [currentMethod, setCurrentMethod] = useState({
@@ -138,7 +137,8 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
       <View
         style={{
           alignItems: "center",
-          paddingHorizontal: currentMethod.method ? 12 : 0
+          paddingHorizontal: currentMethod.method ? 12 : 0,
+          gap: 12
         }}
       >
         <IconButton
@@ -163,11 +163,9 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
             textAlign: "center"
           }}
         >
-          {strings["2faCodeHelpText"][currentMethod.method]() ||
+          {strings["2faCodeHelpText"][currentMethod.method]?.() ||
             strings.select2faCodeHelpText()}
         </Paragraph>
-
-        <Seperator />
 
         {currentMethod.method === "sms" || currentMethod.method === "email" ? (
           <Button
@@ -186,8 +184,6 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
             height={30}
           />
         ) : null}
-
-        <Seperator />
 
         {currentMethod.method ? (
           <>
@@ -209,9 +205,9 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
               }}
               onSubmitEditing={onNext}
               caretHidden
+              height={60}
               inputStyle={{
-                fontSize: SIZE.lg,
-                height: 60,
+                fontSize: AppFontSize.lg,
                 textAlign: "center",
                 letterSpacing: 10,
                 width: 250
@@ -221,23 +217,27 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
               }
               enablesReturnKeyAutomatically
               containerStyle={{
-                height: 60,
                 borderWidth: 0,
                 width: undefined,
                 minWidth: "50%"
               }}
+              wrapperStyle={{
+                height: 60
+              }}
             />
-            <Seperator />
+
             <Button
               title={loading ? null : strings.next()}
               type="accent"
               width={250}
               loading={loading}
               onPress={onNext}
-              style={{
-                borderRadius: 100,
-                marginBottom: 10
-              }}
+            />
+            <Button
+              title={strings.cancel()}
+              type="secondaryAccented"
+              onPress={onCancel}
+              width={250}
             />
 
             <Button
@@ -261,8 +261,8 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
                   });
                 }}
                 style={{
-                  paddingHorizontal: 12,
-                  paddingVertical: 12,
+                  paddingHorizontal: DefaultAppStyles.GAP,
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL,
                   marginTop: 0,
                   flexDirection: "row",
                   borderRadius: 0,
@@ -274,8 +274,6 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
                 <IconButton
                   type="secondaryAccented"
                   style={{
-                    width: 40,
-                    height: 40,
                     marginRight: 10
                   }}
                   size={15}
@@ -287,7 +285,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
                     flexShrink: 1
                   }}
                 >
-                  <Paragraph size={SIZE.md}>{item.title}</Paragraph>
+                  <Paragraph size={AppFontSize.md}>{item.title}</Paragraph>
                 </View>
               </Pressable>
             ))}
@@ -298,15 +296,16 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
   );
 };
 
-TwoFactorVerification.present = (onMfaLogin, data, context) => {
+TwoFactorVerification.present = (onMfaLogin, data, onCancel, context) => {
   presentSheet({
     component: () => (
-      <TwoFactorVerification onMfaLogin={onMfaLogin} mfaInfo={data} />
+      <TwoFactorVerification
+        onMfaLogin={onMfaLogin}
+        mfaInfo={data}
+        onCancel={onCancel}
+      />
     ),
     context: context || "two_factor_verify",
-    onClose: () => {
-      onMfaLogin();
-    },
     disableClosing: true
   });
 };

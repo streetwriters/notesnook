@@ -58,3 +58,9 @@
 
 # Background fetch
 -keep class com.transistorsoft.rnbackgroundfetch.HeadlessTask { *; }
+
+#Gson
+-keepattributes Signature
+-keep class com.google.gson.reflect.TypeToken { *; }
+-keep class * extends com.google.gson.reflect.TypeToken
+-keep class com.streetwriters.notesnook.datatypes.* { *; }

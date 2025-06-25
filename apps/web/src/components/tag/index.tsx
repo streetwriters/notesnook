@@ -19,38 +19,64 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import ListItem from "../list-item";
 import { navigate } from "../../navigation";
-import { Text } from "@theme-ui/components";
+import { Flex, Text } from "@theme-ui/components";
 import { store as appStore } from "../../stores/app-store";
 import { db } from "../../common/db";
-import { Edit, Shortcut, DeleteForver } from "../icons";
+import { Edit, Shortcut, DeleteForver, Tag as TagIcon } from "../icons";
 import { MenuItem } from "@notesnook/ui";
 import { Tag as TagType } from "@notesnook/core";
 import { handleDrop } from "../../common/drop-handler";
 import { EditTagDialog } from "../../dialogs/item-dialog";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
+import { useStore as useNoteStore } from "../../stores/note-store";
 import { Multiselect } from "../../common/multi-select";
 import { strings } from "@notesnook/intl";
+import { createSetDefaultHomepageMenuItem } from "../../common";
 
 type TagProps = { item: TagType; totalNotes: number };
 function Tag(props: TagProps) {
   const { item, totalNotes } = props;
-  const { id, title } = item;
+  const { id } = item;
+  const currentContext = useNoteStore((store) =>
+    store.context?.type === "tag" && store.context.id === id
+      ? store.contextNotes
+      : null
+  );
+  const isSelected = !!currentContext;
 
   return (
     <ListItem
       item={item}
       isCompact
+      isFocused={isSelected}
+      sx={{
+        borderRadius: "default",
+        mb: "small"
+      }}
       title={
-        <Text as="span" variant="body" data-test-id={`title`}>
-          <Text as="span" sx={{ color: "accent" }}>
-            {"#"}
+        <Flex
+          sx={{ alignItems: "center", justifyContent: "center", gap: "small" }}
+        >
+          <TagIcon size={14} color={isSelected ? "icon-selected" : "icon"} />
+          <Text
+            data-test-id={`title`}
+            variant={"body"}
+            color={isSelected ? "paragraph-selected" : "paragraph"}
+            sx={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              fontWeight: "body",
+              display: "block"
+            }}
+          >
+            {item.title}
           </Text>
-          {title}
-        </Text>
+        </Flex>
       }
       footer={
         <Text mt={1} variant="subBody">
-          {totalNotes}
+          {currentContext?.length || totalNotes}
         </Text>
       }
       onKeyPress={async (e) => {
@@ -58,9 +84,11 @@ function Tag(props: TagProps) {
           await Multiselect.deleteTags(
             useSelectionStore.getState().selectedItems
           );
+        } else if (e.key === "Enter") {
+          navigate(`/tags/${id}`);
         }
       }}
-      menuItems={menuItems}
+      menuItems={tagMenuItems}
       onClick={() => {
         navigate(`/tags/${id}`);
       }}
@@ -73,10 +101,11 @@ function Tag(props: TagProps) {
 }
 export default Tag;
 
-const menuItems: (tag: TagType, ids?: string[]) => MenuItem[] = (
+export const tagMenuItems: (tag: TagType, ids?: string[]) => MenuItem[] = (
   tag,
   ids = []
 ) => {
+  const defaultTag = db.settings.getDefaultTag();
   return [
     {
       type: "button",
@@ -84,6 +113,23 @@ const menuItems: (tag: TagType, ids?: string[]) => MenuItem[] = (
       title: strings.renameTag(),
       icon: Edit.path,
       onClick: () => EditTagDialog.show(tag)
+    },
+    {
+      type: "button",
+      key: "set-as-default",
+      title: strings.setAsDefault(),
+      isChecked: defaultTag === tag.id,
+      icon: TagIcon.path,
+      onClick: async () => {
+        const defaultTag = db.settings.getDefaultTag();
+        const isDefault = defaultTag === tag.id;
+        await db.settings.setDefaultTag(isDefault ? undefined : tag.id);
+      }
+    },
+    {
+      type: "lazy-loader",
+      key: "sidebar-items-loader",
+      items: async () => [createSetDefaultHomepageMenuItem(tag.id, tag.type)]
     },
     {
       type: "button",

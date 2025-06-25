@@ -36,18 +36,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useState } from "react";
-import { ArrowLeft } from "../icons";
-import { useEditorStore } from "../../stores/editor-store";
-import { AnimatedFlex } from "../animated";
-import ScrollContainer from "../scroll-container";
-import { ScopedThemeProvider } from "../theme-provider";
-import { Section } from "../properties";
-import { scrollIntoViewById } from "@notesnook/editor";
-import { Button, Flex, Text } from "@theme-ui/components";
-import { useEditorManager } from "./manager";
-import { TITLE_BAR_HEIGHT } from "../title-bar";
+import { scrollIntoViewById, TOCItem } from "@notesnook/editor";
 import { strings } from "@notesnook/intl";
+import { Button, Flex, Text } from "@theme-ui/components";
+import React, { useLayoutEffect } from "react";
+import { ChevronDown, ChevronRight, Circle } from "../icons";
+import { Section } from "../properties";
+import { ScopedThemeProvider } from "../theme-provider";
+import { TITLE_BAR_HEIGHT } from "../title-bar";
+import {
+  TreeNode,
+  VirtualizedTree,
+  VirtualizedTreeHandle
+} from "../virtualized-tree";
+import { useEditorManager } from "./manager";
 
 type TableOfContentsProps = {
   sessionId: string;
@@ -55,57 +57,45 @@ type TableOfContentsProps = {
 function TableOfContents(props: TableOfContentsProps) {
   const { sessionId } = props;
 
-  const [active, setActive] = useState<string[]>([]);
-  const toggleTableOfContents = useEditorStore(
-    (store) => store.toggleTableOfContents
-  );
+  const treeRef = React.useRef<VirtualizedTreeHandle<TOCItem>>(null);
   const tableOfContents = useEditorManager(
     (store) => store.editors[sessionId]?.tableOfContents || []
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    treeRef.current?.refresh();
     const editorScroll = document.getElementById(`editorScroll_${sessionId}`);
-    if (!editorScroll) return;
     function onScroll() {
       const scrollTop = editorScroll?.scrollTop || 0;
       const height = editorScroll?.clientHeight || 0;
-      const active = tableOfContents.filter((t, i, array) => {
-        const next = array.at(i + 1);
+      for (let i = 0; i < tableOfContents.length; i++) {
+        const toc = tableOfContents[i];
+        const element = document.getElementById(`toc-${toc.id}`);
+        if (!element) continue;
+
+        const next = tableOfContents.at(i + 1);
         const viewport = scrollTop + height - 160;
         const lessThanNext = next ? scrollTop <= next.top : true;
-        const isInViewport = t.top <= viewport && t.top >= scrollTop;
-        const isActive = scrollTop >= t.top && lessThanNext;
-        return isInViewport || isActive;
-      });
-      setActive(active.map((a) => a.id));
+        const isInViewport = toc.top <= viewport && toc.top >= scrollTop;
+        const isActive = scrollTop >= toc.top && lessThanNext;
+
+        element.classList.toggle("active", isActive || isInViewport);
+      }
     }
-    editorScroll.addEventListener("scroll", onScroll);
+    editorScroll?.addEventListener("scroll", onScroll);
     onScroll();
     return () => {
-      editorScroll.removeEventListener("scroll", onScroll);
+      editorScroll?.removeEventListener("scroll", onScroll);
     };
   }, [sessionId, tableOfContents]);
 
   return (
-    <AnimatedFlex
-      animate={{
-        x: 0
-      }}
-      transition={{
-        duration: 0.1,
-        bounceDamping: 1,
-        bounceStiffness: 1,
-        ease: "easeOut"
-      }}
-      initial={{ x: 600 }}
+    <Flex
       sx={{
         display: "flex",
-        position: "absolute",
-        right: 0,
         top: TITLE_BAR_HEIGHT,
         zIndex: 999,
         height: "100%",
-        width: "300px",
         borderLeft: "1px solid",
         borderLeftColor: "border"
       }}
@@ -121,57 +111,120 @@ function TableOfContents(props: TableOfContentsProps) {
           flexDirection: "column"
         }}
       >
-        <ScrollContainer>
-          <Section
-            title={strings.toc()}
-            button={
-              <ArrowLeft
-                data-test-id="toc-close"
-                onClick={() => toggleTableOfContents(false)}
-                size={18}
-                sx={{ mr: 1, cursor: "pointer" }}
-              />
-            }
+        <Section title={strings.toc()} sx={{ flex: 1 }}>
+          <Flex
+            sx={{
+              mt: 1,
+              flexDirection: "column",
+              mx: 1,
+              flex: 1
+            }}
           >
-            <Flex sx={{ mt: 2, flexDirection: "column" }}>
-              {tableOfContents.length <= 0 ? (
-                <Text
-                  variant="body"
-                  sx={{
-                    pl: 1
-                  }}
-                >
-                  {strings.noHeadingsFound()}.
-                </Text>
-              ) : (
-                tableOfContents.map((t) => (
+            {tableOfContents.length <= 0 ? (
+              <Text
+                variant="body"
+                sx={{
+                  pl: 1
+                }}
+              >
+                {strings.noHeadingsFound()}.
+              </Text>
+            ) : (
+              <VirtualizedTree
+                treeRef={treeRef}
+                rootId="root"
+                itemHeight={27}
+                getChildNodes={async (parent) => {
+                  const remainingToc =
+                    parent.id === "root"
+                      ? tableOfContents
+                      : tableOfContents.slice(
+                          tableOfContents.findIndex(
+                            (item) => item.id === parent.id
+                          )
+                        );
+
+                  const items: typeof remainingToc = [];
+                  let added = false;
+                  for (let i = 0; i < remainingToc.length; i++) {
+                    if (added && parent.depth + 1 > remainingToc[i].level)
+                      break;
+
+                    items.push(remainingToc[i]);
+                    added = true;
+                  }
+
+                  const nodes: TreeNode<TOCItem>[] = [];
+                  for (let i = 0; i < items.length; i++) {
+                    const item = items[i];
+                    if (item.level !== parent.depth + 1) continue;
+                    nodes.push({
+                      id: item.id,
+                      data: item,
+                      depth: parent.depth + 1,
+                      parentId: parent.id,
+                      hasChildren:
+                        i + 1 < items.length && items[i + 1].level > item.level,
+                      expanded: true
+                    });
+                  }
+                  return nodes;
+                }}
+                renderItem={({ item, collapse, expand, expanded }) => (
                   <Button
                     variant="menuitem"
-                    key={t.id}
+                    key={item.id}
+                    id={`toc-${item.id}`}
                     sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      width: "100%",
                       textAlign: "left",
-                      paddingLeft: `${t.level * 5 + (t.level - 1) * 5}px`,
+                      borderRadius: "default",
+                      marginLeft: `${
+                        item.depth === 0 ? 0 : 5 + 10 * item.depth
+                      }px`,
+                      px: 1,
                       py: 1,
-                      pr: 1,
-                      borderLeft: "5px solid transparent",
-                      borderColor: active.includes(t.id)
-                        ? "accent-selected"
-                        : "transparent",
-                      color: active.includes(t.id)
-                        ? "accent-selected"
-                        : "paragraph"
+                      "&.active": {
+                        color: "accent-selected"
+                      },
+                      "&.active path": {
+                        fill: "var(--accent-selected) !important"
+                      }
                     }}
-                    onClick={() => scrollIntoViewById(t.id)}
+                    onClick={() =>
+                      scrollIntoViewById(item.id, "scroll-margin-top: 35px;")
+                    }
                   >
-                    {t.title}
+                    {item.hasChildren ? (
+                      <Button
+                        variant="secondary"
+                        sx={{ bg: "transparent", p: 0, borderRadius: 100 }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          expanded ? collapse() : expand();
+                        }}
+                      >
+                        {expanded ? (
+                          <ChevronDown size={14} color="icon-secondary" />
+                        ) : (
+                          <ChevronRight size={14} color="icon-secondary" />
+                        )}
+                      </Button>
+                    ) : (
+                      <Circle size={5} color="icon-secondary" />
+                    )}
+                    {item.data.title}
                   </Button>
-                ))
-              )}
-            </Flex>
-          </Section>
-        </ScrollContainer>
+                )}
+              ></VirtualizedTree>
+            )}
+          </Flex>
+        </Section>
       </ScopedThemeProvider>
-    </AnimatedFlex>
+    </Flex>
   );
 }
 export default React.memo(TableOfContents);

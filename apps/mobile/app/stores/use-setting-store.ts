@@ -25,7 +25,12 @@ import { FileType } from "react-native-scoped-storage";
 import create, { State } from "zustand";
 import { ThemeDark, ThemeLight, ThemeDefinition } from "@notesnook/theme";
 import { Reminder } from "@notesnook/core";
-export const HostIds = ["API_HOST", "AUTH_HOST", "SSE_HOST"] as const;
+export const HostIds = [
+  "API_HOST",
+  "AUTH_HOST",
+  "SSE_HOST",
+  "MONOGRAPH_HOST"
+] as const;
 export type HostId = (typeof HostIds)[number];
 
 export type Settings = {
@@ -38,6 +43,10 @@ export type Settings = {
   fullBackupReminder: "never" | "weekly" | "monthly";
   encryptedBackup?: boolean;
   homepage?: string;
+  homepageV2?: {
+    id: string;
+    type: "notebook" | "tag" | "color" | "default";
+  };
   sort?: string;
   sortOrder?: string;
   screenshotMode?: boolean;
@@ -88,6 +97,8 @@ export type Settings = {
   offlineMode?: boolean;
   lastFullBackupDate?: number;
   serverUrls?: Record<HostId, string>;
+  defaultSidebarTab: number;
+  checkForUpdates?: boolean;
 };
 
 type DimensionsType = {
@@ -109,7 +120,7 @@ export interface SettingStore extends State {
   dimensions: DimensionsType;
   setSettings: (settings: Settings) => void;
   setFullscreen: (fullscreen: boolean) => void;
-  setDeviceMode: (mode: string) => void;
+  setDeviceMode: (mode: string | null) => void;
   setDimensions: (dimensions: DimensionsType) => void;
   isAppLoading: boolean;
   setAppLoading: (isAppLoading: boolean) => void;
@@ -144,6 +155,7 @@ export const defaultSettings: SettingStore["settings"] = {
   forcePortraitOnTablet: false,
   useSystemTheme: true,
   reminder: "off",
+  defaultSidebarTab: 0,
   encryptedBackup: false,
   homepage: "Notes",
   sort: "default",
@@ -185,7 +197,8 @@ export const defaultSettings: SettingStore["settings"] = {
   settingsVersion: 0,
   backupType: "partial",
   fullBackupReminder: "never",
-  lastFullBackupDate: 0
+  lastFullBackupDate: 0,
+  checkForUpdates: true
 };
 
 export const useSettingStore = create<SettingStore>((set, get) => ({

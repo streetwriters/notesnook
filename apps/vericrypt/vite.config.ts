@@ -22,6 +22,7 @@ import svgrPlugin from "vite-plugin-svgr";
 import autoprefixer from "autoprefixer";
 import { version } from "./package.json";
 import envCompatible from "vite-plugin-env-compatible";
+import react from "@vitejs/plugin-react-swc";
 
 export default defineConfig({
   envPrefix: "REACT_APP_",
@@ -57,10 +58,15 @@ export default defineConfig({
     }
   },
   plugins: [
-    envCompatible(),
+    react(),
+    envCompatible({
+      prefix: "NN_",
+      mountedPath: "process.env"
+    }),
     svgrPlugin({
       svgrOptions: {
-        icon: true
+        icon: true,
+        namedExport: "ReactComponent"
         // ...svgr options (https://react-svgr.com/docs/options/)
       }
     })

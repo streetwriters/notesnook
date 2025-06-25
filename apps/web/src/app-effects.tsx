@@ -48,11 +48,9 @@ import { AnnouncementDialog } from "./dialogs/announcement-dialog";
 import { logger } from "./utils/logger";
 import { strings } from "@notesnook/intl";
 
-type AppEffectsProps = {
-  setShow: (show: boolean) => void;
-};
-export default function AppEffects({ setShow }: AppEffectsProps) {
+export default function AppEffects() {
   const refreshNavItems = useStore((store) => store.refreshNavItems);
+  const toggleListPane = useStore((store) => store.toggleListPane);
   const updateLastSynced = useStore((store) => store.updateLastSynced);
   const isFocusMode = useStore((store) => store.isFocusMode);
   const initUser = useUserStore((store) => store.init);
@@ -77,7 +75,7 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
                 sentence = strings.upgradeToProToUseFeature("color");
                 break;
               case CHECK_IDS.noteTag:
-                sentence = strings.upgradeToProToUseFeature("tag");
+                sentence = strings.upgradeToProToUseFeature("tags");
                 break;
               case CHECK_IDS.notebookAdd:
                 sentence = strings.upgradeToProToUseFeature("notebook");
@@ -234,15 +232,12 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
   }, []);
 
   useEffect(() => {
-    setShow(!isFocusMode);
+    toggleListPane(!isFocusMode);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFocusMode]);
 
   useEffect(() => {
     introduceFeatures();
-    return () => {
-      EV.unsubscribeAll();
-    };
   }, []);
 
   useEffect(() => {

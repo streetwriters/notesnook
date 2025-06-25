@@ -402,7 +402,9 @@ export class FilteredSelector<T extends Item> {
     return (
       await this.filter
         .$if(!!sortOptions, (eb) =>
-          eb.$call(this.buildSortExpression(sortOptions!))
+          eb.$call(
+            this.buildSortExpression({ ...sortOptions!, groupBy: "none" })
+          )
         )
         .select("id")
         .execute()
@@ -414,7 +416,7 @@ export class FilteredSelector<T extends Item> {
     return (await this.filter
       .$if(!!ids && ids.length > 0, (eb) => eb.where("id", "in", ids!))
       .$if(!!sortOptions, (eb) =>
-        eb.$call(this.buildSortExpression(sortOptions!))
+        eb.$call(this.buildSortExpression({ ...sortOptions!, groupBy: "none" }))
       )
       .$if(this._fields.length === 0, (eb) => eb.selectAll())
       .$if(this._fields.length > 0, (eb) => eb.select(this._fields))
@@ -474,7 +476,7 @@ export class FilteredSelector<T extends Item> {
   async *map<TReturnType>(
     fn: (item: T) => TReturnType
   ): AsyncIterableIterator<TReturnType> {
-    for await (const item of this) {
+    for await (const item of this.iterate()) {
       yield fn(item);
     }
   }
@@ -528,7 +530,8 @@ export class FilteredSelector<T extends Item> {
     if (options.groupBy === "abc") fields.push("title");
     else if (options.sortBy === "title" && options.groupBy !== "none")
       fields.push("dateCreated");
-    else if (options.sortBy !== "dueDate") fields.push(options.sortBy);
+    else if (options.sortBy !== "dueDate" && options.sortBy !== "relevance")
+      fields.push(options.sortBy);
 
     return Array.from(
       groupArray(
@@ -550,7 +553,7 @@ export class FilteredSelector<T extends Item> {
       () => this.ids(options),
       async (start, end) => {
         const items = (await this.filter
-          .$call(this.buildSortExpression(options))
+          .$call(this.buildSortExpression({ ...options, groupBy: "none" }))
           .offset(start)
           .limit(end - start)
           .selectAll()
@@ -563,51 +566,52 @@ export class FilteredSelector<T extends Item> {
     );
   }
 
-  async *[Symbol.asyncIterator]() {
-    let lastRow: any | null = null;
-    const fields = this._fields.slice();
-    if (fields.length > 0) {
-      if (!fields.find((f) => f.includes(".dateCreated")))
-        fields.push("dateCreated");
-      if (!fields.find((f) => f.includes(".id"))) fields.push("id");
-    }
+  iterate() {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const thisArg = this;
+    return {
+      async *[Symbol.asyncIterator]() {
+        let lastRow: any | null = null;
+        const fields = thisArg._fields.slice();
+        if (fields.length > 0) {
+          if (!fields.find((f) => f.includes(".dateCreated")))
+            fields.push("dateCreated");
+          if (!fields.find((f) => f.includes(".id"))) fields.push("id");
+        }
 
-    while (true) {
-      const rows = await this.filter
-        .orderBy("dateCreated asc")
-        .orderBy("id asc")
-        .$if(lastRow !== null, (qb) =>
-          qb.where(
-            (eb) => eb.refTuple("dateCreated", "id"),
-            ">",
-            (eb) => eb.tuple(lastRow.dateCreated, lastRow.id)
-          )
-        )
-        .limit(this.batchSize)
-        .$if(fields.length === 0, (eb) => eb.selectAll())
-        .$if(fields.length > 0, (eb) => eb.select(fields))
-        .execute();
-      if (rows.length === 0) break;
-      for (const row of rows) {
-        yield row as T;
+        while (true) {
+          const rows = await thisArg.filter
+            .orderBy("dateCreated asc")
+            .orderBy("id asc")
+            .$if(lastRow !== null, (qb) =>
+              qb.where(
+                (eb) => eb.refTuple("dateCreated", "id"),
+                ">",
+                (eb) => eb.tuple(lastRow.dateCreated, lastRow.id)
+              )
+            )
+            .limit(thisArg.batchSize)
+            .$if(fields.length === 0, (eb) => eb.selectAll())
+            .$if(fields.length > 0, (eb) => eb.select(fields))
+            .execute();
+          if (rows.length === 0) break;
+          for (const row of rows) {
+            yield row as T;
+          }
+
+          lastRow = rows[rows.length - 1];
+        }
       }
-
-      lastRow = rows[rows.length - 1];
-    }
+    };
   }
 
-  private buildSortExpression(
-    options: GroupOptions | SortOptions,
-    hasDueDate?: boolean
-  ) {
+  private buildSortExpression(options: GroupOptions, hasDueDate?: boolean) {
     sanitizeSortOptions(this.type, options);
 
     const sortBy: Set<SortOptions["sortBy"]> = new Set();
-    if (isGroupOptions(options)) {
-      if (options.groupBy === "abc") sortBy.add("title");
-      else if (options.sortBy === "title" && options.groupBy !== "none")
-        sortBy.add("dateCreated");
-    }
+    if (options.groupBy === "abc") sortBy.add("title");
+    else if (options.sortBy === "title" && options.groupBy !== "none")
+      sortBy.add("dateCreated");
     sortBy.add(options.sortBy);
 
     return <T>(
@@ -644,7 +648,8 @@ export class FilteredSelector<T extends Item> {
                   (qb) => qb.parens(createUpcomingReminderTimeQuery()),
                   options.sortDirection
                 );
-            } else qb = qb.orderBy(item, options.sortDirection);
+            } else if (item !== "relevance")
+              qb = qb.orderBy(item, options.sortDirection);
             continue;
           }
 

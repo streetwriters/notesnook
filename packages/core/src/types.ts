@@ -32,7 +32,8 @@ export type SortOptions = {
     | "filename"
     | "size"
     | "dateUploaded"
-    | "dueDate";
+    | "dueDate"
+    | "relevance";
   sortDirection: "desc" | "asc";
 };
 
@@ -49,7 +50,9 @@ export const GroupingKey = [
   "tags",
   "trash",
   "favorites",
-  "reminders"
+  "reminders",
+  "archive",
+  "search"
 ] as const;
 export type GroupingKey = (typeof GroupingKey)[number];
 
@@ -90,7 +93,7 @@ export type Collections = {
 
 export type CollectionType = keyof Collections;
 
-export type ItemType = ValueOf<Collections>;
+export type ItemType = ValueOf<Collections> | "searchResult";
 
 export type Item = ValueOf<ItemMap>;
 export type GroupableItem = ValueOf<
@@ -127,6 +130,7 @@ export type ItemMap = {
   sessioncontent: SessionContentItem;
   settingitem: SettingItem;
   vault: Vault;
+  searchResult: HighlightedResult;
 
   /**
    * @deprecated only kept here for migration purposes
@@ -198,6 +202,9 @@ export interface Note extends BaseItem<"note"> {
   dateDeleted: null;
   itemType: null;
   deletedBy: null;
+
+  isGeneratedTitle?: boolean;
+  archived?: boolean;
 }
 
 export interface Notebook extends BaseItem<"notebook"> {
@@ -464,6 +471,7 @@ export type SettingItemMap = {
   timeFormat: TimeFormat;
   dateFormat: string;
   defaultNotebook: string | undefined;
+  defaultTag: string | undefined;
   profile: Profile | undefined;
 } & Record<`groupOptions:${GroupingKey}`, GroupOptions> &
   Record<`toolbarConfig:${ToolbarConfigPlatforms}`, ToolbarConfig | undefined> &
@@ -480,6 +488,19 @@ export interface SettingItem<
 export interface Vault extends BaseItem<"vault"> {
   title: string;
   key: Cipher<"base64">;
+}
+
+export type Match = {
+  prefix: string;
+  match: string;
+  suffix: string;
+};
+
+export interface HighlightedResult extends BaseItem<"searchResult"> {
+  rawContent?: string;
+  title: Match[];
+  content: Match[][];
+  rank: number;
 }
 
 export interface DeletedItem {
@@ -536,7 +557,7 @@ export type User = {
     cancelURL: string | null;
     expiry: number;
     productId: string;
-    provider: 0 | 1 | 2 | 3;
+    provider: 0 | 1 | 2 | 3 | 4;
     start: number;
     type: 0 | 1 | 2 | 5 | 6 | 7;
     updateURL: string | null;

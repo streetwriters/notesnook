@@ -23,22 +23,23 @@
     "url": "git://github.com/streetwriters/notesnook.git"
   },
   "scripts": {
-    "extract": "lingui extract",
+    "extract": "lingui extract --clean --overwrite",
     "compile": "lingui compile --typescript",
-    "build-locale": "npm run extract && npm run compile",
+    "build-locale": "node scripts/generate-strings.mjs && npm run extract && npm run compile",
     "build": "npm run build-locale && npx vite build && node scripts/postbuild.mjs",
-    "watch": "nodemon --watch ./src/*.ts --exec \"npx vite build\"",
+    "watch": "nodemon --watch scripts/ --watch src --ext ts,mjs --exec \"npm run build\"",
     "postinstall": "patch-package"
   },
   "devDependencies": {
-    "@lingui/cli": "^4.11.4",
-    "@lingui/macro": "^4.11.4 ",
-    "@lingui/swc-plugin": "^4.0.10",
-    "@types/react": "^18.2.39",
+    "@lingui/cli": "5.1.2",
+    "@lingui/swc-plugin": "5.0.2",
+    "@lingui/core": "5.1.2",
+    "@types/react": "18.3.5",
     "babel-plugin-macros": "^3.1.0",
-    "react": "18.2.0",
-    "typescript": "5.5.3",
-    "vite": "^5.4.8",
+    "nodemon": "^3.1.7",
+    "react": "18.3.1",
+    "rollup": "^4.24.4",
+    "vite": "5.4.11",
     "vite-plugin-dts": "^4.2.3",
     "vite-plugin-static-copy": "^2.0.0",
     "vite-plugin-swc-transform": "^1.0.1"

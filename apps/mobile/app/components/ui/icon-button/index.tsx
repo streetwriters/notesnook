@@ -18,14 +18,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useThemeColors } from "@notesnook/theme";
-import React from "react";
-import { ColorValue, GestureResponderEvent, TextStyle } from "react-native";
+import React, { useRef } from "react";
+import {
+  ColorValue,
+  GestureResponderEvent,
+  TextStyle,
+  useWindowDimensions
+} from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { RGB_Linear_Shade, hexToRGBA } from "../../../utils/colors";
-import { SIZE } from "../../../utils/size";
+import { hexToRGBA, RGB_Linear_Shade } from "../../../utils/colors";
+import { AppFontSize } from "../../../utils/size";
 import NativeTooltip from "../../../utils/tooltip";
 import { Pressable, PressableProps } from "../pressable";
-interface IconButtonProps extends PressableProps {
+export interface IconButtonProps extends PressableProps {
   name: string;
   color?: ColorValue;
   size?: number;
@@ -44,7 +49,7 @@ export const IconButton = ({
   name,
   color,
   style,
-  size = SIZE.xxl,
+  size = AppFontSize.xxl,
   iconStyle = {},
   left = 10,
   right = 10,
@@ -58,6 +63,9 @@ export const IconButton = ({
   ...restProps
 }: IconButtonProps) => {
   const { colors } = useThemeColors();
+  const localRef = useRef(null);
+  const { fontScale } = useWindowDimensions();
+  const growFactor = 1 + (fontScale - 1) / 10;
 
   const _onLongPress = (event: GestureResponderEvent) => {
     if (onLongPress) {
@@ -65,24 +73,30 @@ export const IconButton = ({
       return;
     }
     if (tooltipText) {
-      NativeTooltip.show(event, tooltipText, tooltipPosition);
+      NativeTooltip.show(
+        {
+          target: fwdRef?.current || localRef.current
+        },
+        tooltipText,
+        tooltipPosition
+      );
     }
   };
 
   return (
     <Pressable
       {...restProps}
-      fwdRef={fwdRef}
+      fwdRef={fwdRef || localRef}
       onPress={onPress}
       hitSlop={{ top: top, left: left, right: right, bottom: bottom }}
       onLongPress={_onLongPress}
       type={type}
       style={{
-        width: 40,
-        height: 40,
         justifyContent: "center",
         alignItems: "center",
         borderRadius: 100,
+        width: 40 * growFactor,
+        height: 40 * growFactor,
         ...style
       }}
     >

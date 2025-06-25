@@ -57,7 +57,8 @@ function getSystemTheme() {
   nativeTheme.themeSource = oldThemeSource;
 
   setTimeout(
-    () => listeners.forEach((a) => nativeTheme.addListener("updated", a)),
+    () =>
+      listeners.forEach((a) => nativeTheme.addListener("updated", () => a())),
     1000
   );
   return currentTheme;
@@ -72,7 +73,8 @@ function changeTheme(theme: Theme) {
   nativeTheme.themeSource = theme;
 
   setTimeout(
-    () => listeners.forEach((a) => nativeTheme.addListener("updated", a)),
+    () =>
+      listeners.forEach((a) => nativeTheme.addListener("updated", () => a())),
     1000
   );
 }

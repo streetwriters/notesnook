@@ -24,6 +24,7 @@ import { useMessageStore } from "../../stores/use-message-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
 import { allowedOnPlatform, renderItem } from "./functions";
 import { getContainerBorder } from "../../utils/colors";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const Announcement = ({ color }) => {
   const { colors } = useThemeColors();
@@ -36,9 +37,8 @@ export const Announcement = ({ color }) => {
       style={{
         backgroundColor: colors.primary.background,
         width: "100%",
-        paddingHorizontal: 12,
-        paddingTop: 12,
-        paddingBottom: 12
+        paddingHorizontal: DefaultAppStyles.GAP,
+        paddingVertical: DefaultAppStyles.GAP_VERTICAL
       }}
     >
       <View
@@ -54,7 +54,7 @@ export const Announcement = ({ color }) => {
         <View
           style={{
             width: "100%",
-            marginTop: 12
+            marginTop: DefaultAppStyles.GAP_VERTICAL
           }}
         >
           {announcement?.body

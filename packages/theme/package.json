@@ -1,18 +1,31 @@
 {
   "name": "@notesnook/theme",
   "version": "2.1.3",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
   "license": "GPL-3.0-or-later",
+  "sideEffects": false,
   "exports": {
-    "require": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+    ".": {
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      },
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/esm/index.js"
+      }
     },
-    "import": {
-      "types": "./dist/index.d.mts",
-      "default": "./dist/index.mjs"
+    "./*": {
+      "require": {
+        "types": "./dist/types/*",
+        "default": "./dist/cjs/*"
+      },
+      "import": {
+        "types": "./dist/types/*",
+        "default": "./dist/esm/*"
+      }
     }
   },
   "repository": {
@@ -22,16 +35,14 @@
   "devDependencies": {
     "@emotion/react": "11.11.1",
     "@theme-ui/color": "^0.16.1",
-    "@theme-ui/components": "^0.16.1",
-    "@theme-ui/core": "^0.16.1",
-    "@trpc/server": "^10.45.2",
-    "@types/react": "^18.2.39",
-    "@types/tinycolor2": "^1.4.3",
+    "@theme-ui/components": "0.16.1",
+    "@theme-ui/core": "0.16.1",
+    "@trpc/server": "10.45.2",
+    "@types/react": "18.3.5",
     "isomorphic-fetch": "^3.0.0",
-    "react": "18.2.0",
-    "tinycolor2": "^1.6.0",
+    "react": "18.3.1",
     "ts-json-schema-generator": "^1.2.0",
-    "zustand": "4.4.7"
+    "zustand": "4.5.5"
   },
   "peerDependencies": {
     "@emotion/react": ">=11",
@@ -39,13 +50,12 @@
     "@theme-ui/components": ">=0.16.0",
     "@theme-ui/core": ">=0.16.0",
     "react": ">=18",
-    "tinycolor2": ">=1",
     "zustand": ">=4"
   },
   "scripts": {
     "prebuild": "node ./scripts/prebuild.mjs",
     "generate": "node ./scripts/schema-generator.mjs",
-    "build": "tsup-node src/index.ts",
+    "build": "node ../../scripts/build.mjs",
     "prepublishOnly": "npm run build",
     "watch": "npm run build -- --watch"
   }

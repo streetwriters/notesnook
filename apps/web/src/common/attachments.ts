@@ -18,10 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { strings } from "@notesnook/intl";
-import { lazify } from "../utils/lazify";
 import { logger } from "../utils/logger";
 import { showToast } from "../utils/toast";
 import { db } from "./db";
+import { checkUpload, decryptFile, saveFile } from "../interfaces/fs";
 
 async function download(hash: string, groupId?: string) {
   const attachment = await db.attachments.attachment(hash);
@@ -50,15 +50,13 @@ export async function saveAttachment(hash: string) {
     if (!response) return;
 
     const { attachment, key } = response;
-    await lazify(import("../interfaces/fs"), ({ saveFile }) =>
-      saveFile(attachment.hash, {
-        key,
-        iv: attachment.iv,
-        name: attachment.filename,
-        type: attachment.mimeType,
-        isUploaded: !!attachment.dateUploaded
-      })
-    );
+    await saveFile(attachment.hash, {
+      key,
+      iv: attachment.iv,
+      name: attachment.filename,
+      type: attachment.mimeType,
+      isUploaded: !!attachment.dateUploaded
+    });
   } catch (e) {
     console.error(e);
     showToast(
@@ -92,15 +90,14 @@ export async function downloadAttachment<
     if (type === "base64" || type === "text")
       return (await db.attachments.read(hash, type)) as TOutputType;
 
-    const blob = await lazify(import("../interfaces/fs"), ({ decryptFile }) =>
-      decryptFile(attachment.hash, {
-        key,
-        iv: attachment.iv,
-        name: attachment.filename,
-        type: attachment.mimeType,
-        isUploaded: !!attachment.dateUploaded
-      })
-    );
+    const blob = await decryptFile(attachment.hash, {
+      key,
+      iv: attachment.iv,
+      name: attachment.filename,
+      type: attachment.mimeType,
+      isUploaded: !!attachment.dateUploaded
+    });
+
     logger.debug("Attachment decrypted", { hash });
 
     if (!blob) return;
@@ -121,9 +118,7 @@ export async function checkAttachment(hash: string) {
   if (!attachment) return { failed: "Attachment not found." };
 
   try {
-    await lazify(import("../interfaces/fs"), ({ checkUpload }) =>
-      checkUpload(hash, attachment.chunkSize, attachment.size)
-    );
+    await checkUpload(hash, attachment.chunkSize, attachment.size);
     await db.attachments.markAsFailed(attachment.id);
   } catch (e) {
     const reason = e instanceof Error ? e.message : "Unknown error.";

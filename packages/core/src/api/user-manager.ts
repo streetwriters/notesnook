@@ -136,17 +136,39 @@ class UserManager {
       hashedPassword = await this.db.storage().hash(password, email);
     }
     try {
+      let usesFallback = false;
       await this.tokenManager.saveToken(
-        await http.post(
-          `${constants.AUTH_HOST}${ENDPOINTS.token}`,
-          {
-            grant_type: "mfa_password",
-            client_id: "notesnook",
-            scope: "notesnook.sync offline_access IdentityServerApi",
-            password: hashedPassword
-          },
-          token.access_token
-        )
+        await http
+          .post(
+            `${constants.AUTH_HOST}${ENDPOINTS.token}`,
+            {
+              grant_type: "mfa_password",
+              client_id: "notesnook",
+              scope: "notesnook.sync offline_access IdentityServerApi",
+              password: hashedPassword
+            },
+            token.access_token
+          )
+          .catch(async (e) => {
+            if (e instanceof Error && e.message === "Password is incorrect.") {
+              hashedPassword = await this.db
+                .storage()
+                .hash(password, email, { usesFallback: true });
+              if (hashedPassword === null) return Promise.reject(e);
+              usesFallback = true;
+              return await http.post(
+                `${constants.AUTH_HOST}${ENDPOINTS.token}`,
+                {
+                  grant_type: "mfa_password",
+                  client_id: "notesnook",
+                  scope: "notesnook.sync offline_access IdentityServerApi",
+                  password: hashedPassword
+                },
+                token.access_token
+              );
+            }
+            return Promise.reject(e);
+          })
       );
 
       const user = await this.fetchUser();
@@ -157,10 +179,17 @@ class UserManager {
         await this.db.syncer.devices.register();
       }
 
-      await this.db.storage().deriveCryptoKey({
-        password,
-        salt: user.salt
-      });
+      if (usesFallback) {
+        await this.db.storage().deriveCryptoKeyFallback({
+          password,
+          salt: user.salt
+        });
+      } else {
+        await this.db.storage().deriveCryptoKey({
+          password,
+          salt: user.salt
+        });
+      }
       EV.publish(EVENTS.userLoggedIn, user);
     } catch (e) {
       await this.tokenManager.saveToken(token);
@@ -301,7 +330,11 @@ class UserManager {
 
     await http.post(
       `${constants.API_HOST}${ENDPOINTS.deleteUser}`,
-      { password: await this.db.storage().hash(password, user.email) },
+      {
+        password: await this.db.storage().hash(password, user.email, {
+          usesFallback: await this.usesFallbackPWHash(password)
+        })
+      },
       token
     );
     await this.logout(false, "Account deleted.");
@@ -450,16 +483,13 @@ class UserManager {
       {
         type: "change_email",
         new_email: newEmail,
-        password: await this.db.storage().hash(password, email),
+        password: await this.db.storage().hash(password, email, {
+          usesFallback: await this.usesFallbackPWHash(password)
+        }),
         verification_code: code
       },
       token
     );
-
-    await this.db.storage().deriveCryptoKey({
-      password,
-      salt: user.salt
-    });
   }
 
   recoverAccount(email: string) {
@@ -510,6 +540,11 @@ class UserManager {
 
     if (data.encryptionKey) await this.db.sync({ type: "fetch", force: true });
 
+    if (old_password)
+      old_password = await this.db.storage().hash(old_password, email, {
+        usesFallback: await this.usesFallbackPWHash(old_password)
+      });
+
     await this.db.storage().deriveCryptoKey({
       password: new_password,
       salt
@@ -528,8 +563,6 @@ class UserManager {
       await this.updateUser({ attachmentsKey: user.attachmentsKey });
     }
 
-    if (old_password)
-      old_password = await this.db.storage().hash(old_password, email);
     if (new_password)
       new_password = await this.db.storage().hash(new_password, email);
 
@@ -544,6 +577,30 @@ class UserManager {
     );
 
     return true;
+  }
+
+  private async usesFallbackPWHash(password: string) {
+    const user = await this.getUser();
+    const encryptionKey = await this.getEncryptionKey();
+    if (!user || !encryptionKey) return false;
+    const fallbackCryptoKey = await this.db
+      .storage()
+      .generateCryptoKeyFallback(password, user.salt);
+    if (!fallbackCryptoKey) return false;
+    const cryptoKey = await this.db
+      .storage()
+      .generateCryptoKey(password, user.salt);
+
+    if (!encryptionKey.key || !fallbackCryptoKey.key || !cryptoKey.key)
+      throw new Error("Failed to generate crypto keys.");
+
+    if (
+      fallbackCryptoKey.key !== encryptionKey.key &&
+      cryptoKey.key !== encryptionKey.key
+    )
+      throw new Error("Wrong password.");
+
+    return fallbackCryptoKey.key === encryptionKey.key;
   }
 }
 

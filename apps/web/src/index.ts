@@ -28,17 +28,6 @@ import Config from "./utils/config";
 import { setI18nGlobal, Messages } from "@notesnook/intl";
 import { i18n } from "@lingui/core";
 
-const locale = import.meta.env.DEV
-  ? import("@notesnook/intl/locales/$pseudo-LOCALE.json")
-  : import("@notesnook/intl/locales/$en.json");
-locale.then(({ default: locale }) => {
-  i18n.load({
-    en: locale.messages as unknown as Messages
-  });
-  i18n.activate("en");
-});
-setI18nGlobal(i18n);
-
 const colorScheme = JSON.parse(
   window.localStorage.getItem("colorScheme") || '"light"'
 );
@@ -55,7 +44,24 @@ if (theme) {
   if (stylesheet) stylesheet.innerHTML = css;
 } else stylesheet?.remove();
 
-if (!IS_DESKTOP_APP && !IS_TESTING) {
+const locale = import.meta.env.DEV
+  ? import("@notesnook/intl/locales/$pseudo-LOCALE.json")
+  : import("@notesnook/intl/locales/$en.json");
+locale.then(({ default: locale }) => {
+  i18n.load({
+    en: locale.messages as unknown as Messages
+  });
+  i18n.activate("en");
+
+  performance.mark("import:root");
+  import("./root").then(({ startApp }) => {
+    performance.mark("start:app");
+    startApp();
+  });
+});
+setI18nGlobal(i18n);
+
+if (!IS_DESKTOP_APP) {
   //   logger.info("Initializing service worker...");
 
   // If you want your app to work offline and load faster, you can change
@@ -76,7 +82,3 @@ if (!IS_DESKTOP_APP && !IS_TESTING) {
 
   // window.addEventListener("beforeinstallprompt", () => showInstallNotice());
 }
-
-import("./root").then(({ startApp }) => {
-  startApp();
-});

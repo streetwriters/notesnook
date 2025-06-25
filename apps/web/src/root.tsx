@@ -25,14 +25,18 @@ import {
   ErrorComponent,
   GlobalErrorHandler
 } from "./components/error-boundary";
-import { TitleBar } from "./components/title-bar";
 import { desktop } from "./common/desktop-bridge";
 import { useKeyStore } from "./interfaces/key-store";
 import Config from "./utils/config";
 import { usePromise } from "@notesnook/common";
 import { AuthProps } from "./views/auth";
+import { loadDatabase } from "./hooks/use-database";
+import AppLock from "./views/app-lock";
+import { Text } from "@theme-ui/components";
+import { EV, EVENTS } from "@notesnook/core";
+import { useEffect, useState } from "react";
 
-export async function startApp() {
+export async function startApp(children?: React.ReactNode) {
   const rootElement = document.getElementById("root");
   if (!rootElement) return;
   const root = createRoot(rootElement);
@@ -43,16 +47,18 @@ export async function startApp() {
       .query()
       ?.then((s) => s.nativeTitlebar));
 
+  const TitleBar = window.hasNativeTitlebar
+    ? () => <></>
+    : await import("./components/title-bar").then((m) => m.TitleBar);
+
   try {
-    const { component, props, path } = await init();
+    const { Component, props, path } = await init();
 
     await useKeyStore.getState().init();
 
-    const { default: AppLock } = await import("./views/app-lock");
-
     root.render(
       <>
-        {hasNativeTitlebar ? null : <TitleBar />}
+        <TitleBar />
         <ErrorBoundary>
           <GlobalErrorHandler>
             <BaseThemeProvider
@@ -61,11 +67,12 @@ export async function startApp() {
             >
               <AppLock>
                 <RouteWrapper
-                  component={component}
+                  Component={Component}
                   path={path}
                   routeProps={props}
                 />
               </AppLock>
+              {children}
             </BaseThemeProvider>
           </GlobalErrorHandler>
         </ErrorBoundary>
@@ -75,7 +82,7 @@ export async function startApp() {
     console.error(e);
     root.render(
       <>
-        {hasNativeTitlebar ? null : <TitleBar />}
+        <TitleBar isUnderlay={false} />
         <ErrorComponent
           error={e}
           resetErrorBoundary={() => window.location.reload()}
@@ -86,29 +93,38 @@ export async function startApp() {
 }
 
 function RouteWrapper(props: {
-  component: () => Promise<{
-    default: (props: AuthProps) => JSX.Element;
-  }>;
+  Component: (props: AuthProps) => JSX.Element;
   path: Routes;
   routeProps: AuthProps | null;
 }) {
-  const { component, path, routeProps } = props;
+  const [isMigrating, setIsMigrating] = useState(false);
+  const { Component, path, routeProps } = props;
+
+  useEffect(() => {
+    EV.subscribe(EVENTS.migrationStarted, (name) =>
+      setIsMigrating(name === "notesnook")
+    );
+    EV.subscribe(EVENTS.migrationFinished, () => setIsMigrating(false));
+    return () => {
+      EV.unsubscribeAll();
+    };
+  }, []);
+
   const result = usePromise(async () => {
-    const { loadDatabase } = await import("./hooks/use-database");
+    performance.mark("load:database");
     await loadDatabase(
       path !== "/sessionexpired" || Config.get("sessionExpired", false)
         ? "db"
         : "memory"
     );
-    return (await component()).default;
-  }, [component, path]);
+  }, [path]);
 
   if (result.status === "rejected") {
     throw result.reason instanceof Error
       ? result.reason
       : new Error(result.reason);
   }
-  if (result.status === "pending")
+  if (result.status === "pending" || isMigrating)
     return (
       <div
         style={{
@@ -124,12 +140,25 @@ function RouteWrapper(props: {
           alignItems: "center"
         }}
       >
-        <svg style={{ height: 120 }}>
+        <svg
+          style={{
+            height: 120,
+            transform: "scale(1)",
+            animation: "pulse 2s infinite",
+            marginBottom: 10
+          }}
+        >
           <use href="#themed-logo" />
         </svg>
+        <Text variant="body" sx={{ fontFamily: "monospace" }}>
+          {isMigrating
+            ? "Migrating database. This might take a while."
+            : "Decrypting your notes"}
+        </Text>
       </div>
     );
-  return <result.value route={routeProps?.route || "login:email"} />;
+  performance.mark("render:app");
+  return <Component route={routeProps?.route || "login:email"} />;
 }
 
 if (import.meta.hot) import.meta.hot.accept();

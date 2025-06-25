@@ -18,14 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Text, Flex, Button, Link } from "@theme-ui/components";
+import { Text, Flex, Button, Link, Box, Image } from "@theme-ui/components";
 import { Cross, Check, Loading } from "../../components/icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
-import { useTheme } from "@emotion/react";
-import Rocket from "../../assets/rocket.svg?react";
-import WorkAnywhere from "../../assets/workanywhere.svg?react";
-import WorkLate from "../../assets/worklate.svg?react";
+import Rocket from "../../assets/rocket.svg?url";
+import WorkAnywhere from "../../assets/workanywhere.svg?url";
+import WorkLate from "../../assets/worklate.svg?url";
 import Field from "../../components/field";
 import { hardNavigate } from "../../navigation";
 import { Features } from "./features";
@@ -38,7 +37,6 @@ import { TaskManager } from "../../common/task-manager";
 import { db } from "../../common/db";
 import { useCheckoutStore } from "./store";
 import { getCurrencySymbol } from "./helpers";
-import { Theme } from "@notesnook/theme";
 import { isMacStoreApp } from "../../utils/platform";
 import { isUserSubscribed } from "../../hooks/use-is-user-premium";
 import { SUBSCRIPTION_STATUS } from "../../common/constants";
@@ -57,10 +55,10 @@ export const BuyDialog = DialogManager.register(function BuyDialog(
   props: BuyDialogProps
 ) {
   const { onClose, couponCode, plan } = props;
-  const theme = useTheme() as Theme;
 
   const onApplyCoupon = useCheckoutStore((store) => store.applyCoupon);
   const isCheckoutCompleted = useCheckoutStore((store) => store.isCompleted);
+  const user = useUserStore((store) => store.user);
 
   useEffect(() => {
     return () => {
@@ -110,9 +108,13 @@ export const BuyDialog = DialogManager.register(function BuyDialog(
             py: 50
           }}
         >
-          <SideBar onClose={() => onClose(false)} initialPlan={plan} />
+          <CheckoutSideBar
+            onClose={() => onClose(false)}
+            initialPlan={plan}
+            user={user}
+          />
         </ScopedThemeProvider>
-        <Details />
+        <CheckoutDetails user={user} />
       </Flex>
     </BaseDialog>
   );
@@ -121,14 +123,14 @@ export const BuyDialog = DialogManager.register(function BuyDialog(
 type SideBarProps = {
   initialPlan?: Period;
   onClose: () => void;
+  user?: User;
 };
-function SideBar(props: SideBarProps) {
-  const { initialPlan, onClose } = props;
+export function CheckoutSideBar(props: SideBarProps) {
+  const { initialPlan, onClose, user } = props;
   const [showPlans, setShowPlans] = useState(false);
   const onPlanSelected = useCheckoutStore((state) => state.selectPlan);
   const selectedPlan = useCheckoutStore((state) => state.selectedPlan);
   const pricingInfo = useCheckoutStore((state) => state.pricingInfo);
-  const user = useUserStore((store) => store.user);
   const couponCode = useCheckoutStore((store) => store.couponCode);
   const onApplyCoupon = useCheckoutStore((store) => store.applyCoupon);
   const isCheckoutCompleted = useCheckoutStore((store) => store.isCompleted);
@@ -150,7 +152,12 @@ function SideBar(props: SideBarProps) {
 
   if (user && !showPlans && isUserSubscribed(user)) {
     return (
-      <AlreadyPremium user={user} onShowPlans={() => setShowPlans(true)} />
+      <AlreadyPremium
+        isCanceled={
+          user?.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELED
+        }
+        onShowPlans={() => setShowPlans(true)}
+      />
     );
   }
 
@@ -184,7 +191,7 @@ function SideBar(props: SideBarProps) {
           if (e instanceof Error)
             showToast(
               "error",
-              `${strings.couldNotActivateTrial()}. ${strings.pleaseTryAgain()} Error: ${
+              `${strings.couldNotActivateTrial()} ${strings.error()}: ${
                 e.message
               }`
             );
@@ -194,8 +201,11 @@ function SideBar(props: SideBarProps) {
   );
 }
 
-function Details() {
-  const user = useUserStore((store) => store.user);
+export function CheckoutDetails({
+  user
+}: {
+  user?: { id: string; email: string };
+}) {
   const selectedPlan = useCheckoutStore((state) => state.selectedPlan);
   const onPriceUpdated = useCheckoutStore((state) => state.updatePrice);
   const completeCheckout = useCheckoutStore((state) => state.completeCheckout);
@@ -205,7 +215,6 @@ function Details() {
     (store) => store.setIsApplyingCoupon
   );
   const theme = useThemeStore((store) => store.colorScheme);
-
   if (isCheckoutCompleted) return null;
 
   if (selectedPlan && user)
@@ -249,7 +258,7 @@ function TrialOrUpgrade(props: TrialOrUpgradeProps) {
 
   return (
     <>
-      <Rocket style={{ flexShrink: 0, width: 200, height: 200 }} />
+      <Image src={Rocket} style={{ flexShrink: 0, width: 200, height: 200 }} />
       <Text variant="heading" mt={4} sx={{ textAlign: "center" }}>
         Notesnook Pro
       </Text>
@@ -329,18 +338,14 @@ function TrialOrUpgrade(props: TrialOrUpgradeProps) {
 }
 
 type AlreadyPremiumProps = {
-  user: User | undefined;
+  isCanceled?: boolean;
   onShowPlans: () => void;
 };
 function AlreadyPremium(props: AlreadyPremiumProps) {
-  const { user, onShowPlans } = props;
-
-  const isCanceled =
-    user?.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELED;
-
+  const { isCanceled, onShowPlans } = props;
   return (
     <>
-      <Rocket style={{ flexShrink: 0, width: 200, height: 200 }} />
+      <Image src={Rocket} style={{ flexShrink: 0, width: 200, height: 200 }} />
       <Text variant="heading" mt={4} sx={{ textAlign: "center" }}>
         Notesnook Pro
       </Text>
@@ -369,17 +374,20 @@ function AlreadyPremium(props: AlreadyPremiumProps) {
   );
 }
 
-function CheckoutCompleted(props: { onClose: () => void }) {
-  const { onClose } = props;
+export function CheckoutCompleted(props: {
+  onClose: () => void;
+  buttonText?: string;
+}) {
+  const { onClose, buttonText } = props;
 
   return (
     <>
-      <Rocket style={{ flexShrink: 0, width: 200, height: 200 }} />
+      <Image src={Rocket} style={{ flexShrink: 0, width: 200, height: 200 }} />
       <Text variant="heading" mt={4} sx={{ textAlign: "center" }}>
-        Thank you!
+        You are awesome!
       </Text>
       <Text variant="body" mt={1} sx={{ textAlign: "center" }}>
-        You have successfully subscribed to Notesnook Pro.
+        Thank you for supporting privacy! Your subscription is now active.
       </Text>
       <Button
         variant="accent"
@@ -388,7 +396,7 @@ function CheckoutCompleted(props: { onClose: () => void }) {
         onClick={onClose}
         data-test-id="see-all-plans"
       >
-        Continue
+        {buttonText || "Continue"}
       </Button>
     </>
   );
@@ -441,9 +449,15 @@ function SelectedPlan(props: SelectedPlanProps) {
   return (
     <>
       {plan.period === "monthly" ? (
-        <WorkAnywhere style={{ flexShrink: 0, width: 180, height: 180 }} />
+        <Image
+          src={WorkAnywhere}
+          style={{ flexShrink: 0, width: 180, height: 180 }}
+        />
       ) : (
-        <WorkLate style={{ flexShrink: 0, width: 180, height: 180 }} />
+        <Image
+          src={WorkLate}
+          style={{ flexShrink: 0, width: 180, height: 180 }}
+        />
       )}
       <Text variant="heading" mt={4} sx={{ textAlign: "center" }}>
         Notesnook Pro
@@ -473,10 +487,16 @@ function SelectedPlan(props: SelectedPlanProps) {
       )}
       {pricingInfo ? (
         <>
-          <Text data-test-id={`checkout-plan-country-${pricingInfo.country}`} />
-          {pricingInfo.coupon && (
-            <Text data-test-id={`checkout-plan-coupon-applied`} />
-          )}
+          {IS_TESTING ? (
+            <>
+              <span
+                data-test-id={`checkout-plan-country-${pricingInfo.country}`}
+              />
+              {pricingInfo.coupon && (
+                <span data-test-id={`checkout-plan-coupon-applied`} />
+              )}
+            </>
+          ) : null}
 
           <Field
             inputRef={couponInputRef}
@@ -527,7 +547,7 @@ function SelectedPlan(props: SelectedPlanProps) {
 type CheckoutPricingProps = {
   pricingInfo: PricingInfo;
 };
-function CheckoutPricing(props: CheckoutPricingProps) {
+export function CheckoutPricing(props: CheckoutPricingProps) {
   const { pricingInfo } = props;
   const { currency, price, discount, period, recurringPrice } = pricingInfo;
   const fields = [
@@ -577,40 +597,44 @@ function CheckoutPricing(props: CheckoutPricingProps) {
         >
           <Text
             variant="body"
-            sx={{ fontSize: "subtitle" }}
             data-test-id={`label`}
+            sx={{ fontWeight: "bold" }}
           >
             {field.label}
           </Text>
           <Text
             data-test-id={`value`}
             variant="body"
-            sx={{ fontSize: "subtitle", color: field.color || "paragraph" }}
+            sx={{ color: field.color || "paragraph" }}
           >
             {field.value}
           </Text>
         </Flex>
       ))}
+      <Box sx={{ my: 2, height: 1, bg: "separator" }} />
       <Flex
         mt={1}
         sx={{ justifyContent: "space-between", alignSelf: "stretch" }}
         data-test-id={`checkout-price-item`}
       >
-        <Text
-          variant="body"
-          sx={{ fontSize: "heading" }}
-          data-test-id={`label`}
-        >
+        <Text variant="title" data-test-id={`label`}>
           Total
         </Text>
-        <Text as="div" variant="body" sx={{ textAlign: "end" }}>
+        <Text as="div" variant="title" sx={{ textAlign: "end" }}>
           <Text
             data-test-id={`value`}
-            sx={{ fontSize: "heading", color: "paragraph" }}
+            sx={{ fontSize: "title", color: "paragraph" }}
           >
             {currentTotal}
           </Text>
-          <Text as="div" sx={{ fontSize: "body", color: "paragraph" }}>
+          <Text
+            as="div"
+            sx={{
+              fontSize: "body",
+              color: "paragraph-secondary",
+              fontWeight: "body"
+            }}
+          >
             {period === "education" && discount.amount > 0
               ? "for one year"
               : isDiscounted

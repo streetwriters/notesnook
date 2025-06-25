@@ -27,13 +27,16 @@ import WebView from "react-native-webview";
 import { useRef } from "react";
 import { EDITOR_URI } from "./source";
 import { EditorMessage } from "./tiptap/types";
-import { EventTypes } from "./tiptap/editor-events";
+import { EditorEvents } from "@notesnook/editor-mobile/src/utils/editor-events";
 import { Attachment } from "@notesnook/editor";
 import downloadAttachment from "../../common/filesystem/download-attachment";
-import { EditorEvents } from "./tiptap/utils";
+import { NativeEvents } from "@notesnook/editor-mobile/src/utils/native-events";
 import { useThemeColors } from "@notesnook/theme";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { db } from "../../common/database";
+import { i18n } from "@lingui/core";
+import { defaultBorderRadius } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 
 const onShouldStartLoadWithRequest = (request: ShouldStartLoadRequest) => {
   if (request.url.includes("https")) {
@@ -68,12 +71,11 @@ export function ReadonlyEditor(props: {
     const data = event.nativeEvent.data;
     const editorMessage = JSON.parse(data) as EditorMessage<any>;
 
-    if (editorMessage.type === EventTypes.logger) {
+    if (editorMessage.type === EditorEvents.logger) {
       logger.info("[READONLY EDITOR LOG]", editorMessage.value);
     }
 
-    if (editorMessage.type === EventTypes.readonlyEditorLoaded) {
-      console.log("Readonly editor loaded.");
+    if (editorMessage.type === EditorEvents.readonlyEditorLoaded) {
       props.onLoad?.((content: { data: string; id: string }) => {
         setTimeout(() => {
           noteId.current = content.id;
@@ -86,10 +88,9 @@ export function ReadonlyEditor(props: {
           setLoading(false);
         }, 300);
       });
-    } else if (editorMessage.type === EventTypes.getAttachmentData) {
+    } else if (editorMessage.type === EditorEvents.getAttachmentData) {
       const attachment = (editorMessage.value as any).attachment as Attachment;
 
-      console.log("Getting attachment data:", attachment.hash, attachment.type);
       downloadAttachment(attachment.hash, true, {
         base64: attachment.type === "image",
         text: attachment.type === "web-clip",
@@ -105,7 +106,7 @@ export function ReadonlyEditor(props: {
           );
           editorRef.current?.postMessage(
             JSON.stringify({
-              type: EditorEvents.attachmentData,
+              type: NativeEvents.attachmentData,
               value: {
                 resolverId: (editorMessage.value as any).resolverId,
                 data
@@ -114,10 +115,9 @@ export function ReadonlyEditor(props: {
           );
         })
         .catch(() => {
-          console.log("Error downloading attachment data");
           editorRef.current?.postMessage(
             JSON.stringify({
-              type: EditorEvents.attachmentData,
+              type: NativeEvents.attachmentData,
               data: {
                 resolverId: (editorMessage.value as any).resolverId,
                 data: undefined
@@ -143,10 +143,17 @@ export function ReadonlyEditor(props: {
         ref={editorRef}
         key={"readonly-editor:" + props.editorId}
         nestedScrollEnabled
-        injectedJavaScriptBeforeContentLoaded={`globalThis.readonlyEditor=true;`}
-        injectedJavaScript="globalThis.readonlyEditor=true;"
+        injectedJavaScript={`
+        globalThis.__DEV__ = ${__DEV__}
+        globalThis.readonlyEditor=true;
+        globalThis.LINGUI_LOCALE = "${i18n.locale}";
+        globalThis.LINGUI_LOCALE_DATA = ${JSON.stringify({
+          [i18n.locale]: i18n.messages
+        })};
+        globalThis.loadApp();`}
         useSharedProcessPool={false}
         javaScriptEnabled={true}
+        webviewDebuggingEnabled={__DEV__}
         focusable={true}
         setSupportMultipleWindows={false}
         overScrollMode="never"
@@ -192,7 +199,7 @@ export function ReadonlyEditor(props: {
             style={{
               width: "100%",
               backgroundColor: colors.primary.background,
-              borderRadius: 5,
+              borderRadius: defaultBorderRadius,
               height: "100%",
               alignItems: "flex-start",
               paddingTop: insets.top
@@ -200,7 +207,7 @@ export function ReadonlyEditor(props: {
           >
             <View
               style={{
-                paddingHorizontal: 12,
+                paddingHorizontal: DefaultAppStyles.GAP,
                 width: "100%",
                 alignItems: "flex-start"
               }}
@@ -210,7 +217,7 @@ export function ReadonlyEditor(props: {
                   height: 25,
                   width: "100%",
                   backgroundColor: colors.secondary.background,
-                  borderRadius: 5
+                  borderRadius: defaultBorderRadius
                 }}
               />
 
@@ -218,7 +225,7 @@ export function ReadonlyEditor(props: {
                 style={{
                   height: 12,
                   width: "100%",
-                  marginTop: 10,
+                  marginTop: DefaultAppStyles.GAP_VERTICAL,
                   flexDirection: "row"
                 }}
               >
@@ -227,7 +234,7 @@ export function ReadonlyEditor(props: {
                     height: 12,
                     width: 60,
                     backgroundColor: colors.secondary.background,
-                    borderRadius: 5,
+                    borderRadius: defaultBorderRadius,
                     marginRight: 10
                   }}
                 />
@@ -236,7 +243,7 @@ export function ReadonlyEditor(props: {
                     height: 12,
                     width: 60,
                     backgroundColor: colors.secondary.background,
-                    borderRadius: 5,
+                    borderRadius: defaultBorderRadius,
                     marginRight: 10
                   }}
                 />
@@ -245,7 +252,7 @@ export function ReadonlyEditor(props: {
                     height: 12,
                     width: 60,
                     backgroundColor: colors.secondary.background,
-                    borderRadius: 5,
+                    borderRadius: defaultBorderRadius,
                     marginRight: 10
                   }}
                 />
@@ -256,8 +263,8 @@ export function ReadonlyEditor(props: {
                   height: 16,
                   width: "100%",
                   backgroundColor: colors.secondary.background,
-                  borderRadius: 5,
-                  marginTop: 10
+                  borderRadius: defaultBorderRadius,
+                  marginTop: DefaultAppStyles.GAP_VERTICAL
                 }}
               />
 
@@ -266,8 +273,8 @@ export function ReadonlyEditor(props: {
                   height: 16,
                   width: "100%",
                   backgroundColor: colors.secondary.background,
-                  borderRadius: 5,
-                  marginTop: 10
+                  borderRadius: defaultBorderRadius,
+                  marginTop: DefaultAppStyles.GAP_VERTICAL
                 }}
               />
 
@@ -276,8 +283,8 @@ export function ReadonlyEditor(props: {
                   height: 16,
                   width: 200,
                   backgroundColor: colors.secondary.background,
-                  borderRadius: 5,
-                  marginTop: 10
+                  borderRadius: defaultBorderRadius,
+                  marginTop: DefaultAppStyles.GAP_VERTICAL
                 }}
               />
             </View>

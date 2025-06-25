@@ -20,21 +20,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import {
   NoteResolvedData,
   exportContent,
+  getFormattedDate,
   getFormattedReminderTime
 } from "@notesnook/common";
 import {
   Color,
   Note as NoteType,
   Notebook as NotebookItem,
-  Tag,
+  Tag as TagType,
   createInternalLink,
+  hosts,
   isReminderActive,
   isReminderToday
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { SchemeColors } from "@notesnook/theme";
 import { MenuItem } from "@notesnook/ui";
-import { Button, Flex, Text } from "@theme-ui/components";
+import { Flex, Text } from "@theme-ui/components";
 import React from "react";
 import { db } from "../../common/db";
 import { exportNote, exportNotes } from "../../common/export";
@@ -53,6 +55,7 @@ import { store } from "../../stores/note-store";
 import { store as selectionStore } from "../../stores/selection-store";
 import { store as tagStore } from "../../stores/tag-store";
 import { store as userstore } from "../../stores/user-store";
+import { store as appStore } from "../../stores/app-store";
 import { writeToClipboard } from "../../utils/clipboard";
 import { showToast } from "../../utils/toast";
 import IconTag from "../icon-tag";
@@ -60,6 +63,7 @@ import {
   AddReminder,
   AddToNotebook,
   Alert,
+  Archive,
   Attachment,
   AttachmentError,
   Circle,
@@ -88,7 +92,8 @@ import {
   SyncOff,
   Tag2,
   Tag as TagIcon,
-  Trash
+  Trash,
+  Update
 } from "../icons";
 import { Context } from "../list-container/types";
 import ListItem from "../list-item";
@@ -117,7 +122,7 @@ function Note(props: NoteProps) {
   } = props;
   const note = item;
 
-  const isOpened = useEditorStore((store) => store.activeSessionId === item.id);
+  const isOpened = useEditorStore((store) => store.isNoteOpen(item.id));
   const primary: SchemeColors = color ? color.colorCode : "accent-selected";
 
   return (
@@ -141,42 +146,20 @@ function Note(props: NoteProps) {
         heading: color ? primary : "heading",
         background: "background"
       }}
+      sx={{
+        borderLeft: isOpened ? "4px solid" : "none",
+        pl: isOpened ? "3px" : "7px",
+        borderLeftColor: isOpened ? primary : "transparent"
+      }}
       context={{ color, locked }}
-      menuItems={menuItems}
+      menuItems={noteMenuItems}
       onClick={() => useEditorStore.getState().openSession(note)}
       onMiddleClick={() =>
-        useEditorStore.getState().openSession(note, { newSession: true })
+        useEditorStore.getState().openSession(note, { openInNewTab: true })
       }
       header={
-        <Flex
-          sx={{ alignItems: "center", flexWrap: "wrap", gap: 1, mt: "small" }}
-        >
-          {context?.type !== "notebook" &&
-            notebooks?.items.map((notebook) => (
-              <IconTag
-                key={notebook.id}
-                onClick={() => {
-                  navigate(`/notebooks/${notebook.id}`);
-                }}
-                text={notebook.title}
-                icon={Notebook}
-              />
-            ))}
-          {reminder && isReminderActive(reminder) ? (
-            <IconTag
-              icon={Reminder}
-              text={getFormattedReminderTime(reminder, true)}
-              title={reminder.title}
-              styles={
-                isReminderToday(reminder)
-                  ? {
-                      icon: { color: primary },
-                      text: { color: primary }
-                    }
-                  : {}
-              }
-            />
-          ) : null}
+        <Flex sx={{ alignItems: "center", mb: 1 }}>
+          <Text variant="subBody">{getFormattedDate(date, "date")}</Text>
         </Flex>
       }
       footer={
@@ -185,7 +168,10 @@ function Note(props: NoteProps) {
             fontSize: "subBody",
             color: "paragraph-secondary",
             alignItems: "center",
-            gap: 1
+            gap: 1,
+            flexWrap: "wrap",
+            mt: "small",
+            flexShrink: 0
           }}
         >
           {compact ? (
@@ -202,12 +188,12 @@ function Note(props: NoteProps) {
 
               {note.localOnly && <SyncOff size={13} />}
 
-              <TimeAgo
+              {/* <TimeAgo
                 sx={{ flexShrink: 0 }}
                 locale="en_short"
                 live={true}
                 datetime={date}
-              />
+              /> */}
 
               {attachments?.total ? (
                 <Flex sx={{ alignItems: "center", justifyContent: "center" }}>
@@ -225,9 +211,7 @@ function Note(props: NoteProps) {
                 </Flex>
               ) : null}
 
-              {note.pinned && !props.context && (
-                <Pin size={13} color={primary} />
-              )}
+              {note.pinned && !props.context && <Pin size={13} />}
 
               {locked && <Lock size={13} data-test-id={`locked`} />}
 
@@ -239,28 +223,52 @@ function Note(props: NoteProps) {
 
               {tags?.items.map((tag) => {
                 return (
-                  <Button
-                    data-test-id={`tag-item`}
+                  <IconTag
+                    testId={`tag-item`}
                     key={tag.id}
-                    variant="anchor"
-                    title={`${strings.goTo()} #${tag.title}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       if (!tag.id)
                         return showToast("error", strings.tagNotFound());
+
+                      appStore.get().setNavigationTab("tags");
                       navigate(`/tags/${tag.id}`);
                     }}
-                    sx={{
-                      maxWidth: `calc(100% / ${tags.items.length})`,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      color: "var(--paragraph-secondary)"
-                    }}
-                  >
-                    #{tag.title}
-                  </Button>
+                    text={tag.title}
+                    title={strings.goToTag(tag.title)}
+                    icon={TagIcon}
+                  />
                 );
               })}
+
+              {context?.type !== "notebook" &&
+                notebooks?.items.map((notebook) => (
+                  <IconTag
+                    key={notebook.id}
+                    onClick={() => {
+                      appStore.get().setNavigationTab("notebooks");
+                      navigate(`/notebooks/${notebook.id}`);
+                    }}
+                    text={notebook.title}
+                    icon={Notebook}
+                  />
+                ))}
+
+              {reminder && isReminderActive(reminder) ? (
+                <IconTag
+                  icon={Reminder}
+                  text={getFormattedReminderTime(reminder, true)}
+                  title={reminder.title}
+                  styles={
+                    isReminderToday(reminder)
+                      ? {
+                          icon: { color: primary },
+                          text: { color: primary }
+                        }
+                      : {}
+                  }
+                />
+              ) : null}
             </>
           )}
         </Flex>
@@ -319,9 +327,7 @@ const formats = [
   }
 ] as const;
 
-const notFullySyncedText =
-  "Cannot perform this action because note is not fully synced.";
-const menuItems: (
+export const noteMenuItems: (
   note: NoteType,
   ids?: string[],
   context?: { color?: Color; locked?: boolean }
@@ -330,6 +336,14 @@ const menuItems: (
   // const isSynced = db.notes.note(note.id)?.synced();
 
   return [
+    {
+      type: "button",
+      key: "openinnewtab",
+      title: strings.openInNewTab(),
+      icon: OpenInNew.path,
+      onClick: () =>
+        useEditorStore.getState().openSession(note.id, { openInNewTab: true })
+    },
     {
       type: "button",
       key: "pin",
@@ -382,6 +396,15 @@ const menuItems: (
       onClick: async () => {
         await AddReminderDialog.show({ note });
       }
+    },
+    {
+      type: "button",
+      key: "archive",
+      title: strings.archive(),
+      isChecked: note.archived,
+      icon: Archive.path,
+      onClick: () => store.archive(!note.archived, ...ids),
+      multiSelect: true
     },
     { key: "sep1", type: "separator" },
     {
@@ -436,7 +459,7 @@ const menuItems: (
                 title: strings.open(),
                 icon: OpenInNew.path,
                 onClick: async () => {
-                  const url = `https://monogr.ph/${note.id}`;
+                  const url = `${hosts.MONOGRAPH_HOST}/${note.id}`;
                   window.open(url, "_blank");
                 }
               },
@@ -446,12 +469,21 @@ const menuItems: (
                 title: strings.copyLink(),
                 icon: Copy.path,
                 onClick: async () => {
-                  const url = `https://monogr.ph/${note.id}`;
+                  const url = `${hosts.MONOGRAPH_HOST}/${note.id}`;
                   await writeToClipboard({
                     "text/plain": url,
                     "text/html": `<a href="${url}">${note.title}</a>`,
                     "text/markdown": `[${note.title}](${url})`
                   });
+                }
+              },
+              {
+                type: "button",
+                key: "update",
+                title: strings.update(),
+                icon: Update.path,
+                onClick: () => {
+                  showPublishView(note, "bottom");
                 }
               },
               {
@@ -720,7 +752,7 @@ function tagsMenuItems(ids: string[]): MenuItem[] {
     {
       type: "button",
       key: "assign-tags",
-      title: `${strings.assignTo()}...`,
+      title: strings.assignTo(),
       icon: Plus.path,
       onClick: () => AddTagsDialog.show({ noteIds: ids })
     },
@@ -728,8 +760,8 @@ function tagsMenuItems(ids: string[]): MenuItem[] {
       type: "lazy-loader",
       key: "tags-lazy-loader",
       async items() {
-        const tags: Map<string, Tag> = new Map();
-        const tagShortcuts: Map<string, Tag> = new Map();
+        const tags: Map<string, TagType> = new Map();
+        const tagShortcuts: Map<string, TagType> = new Map();
 
         const linkedTags = await db.relations
           .to({ ids, type: "note" }, "tag")
@@ -814,7 +846,7 @@ async function copyNote(noteId: string, format: "md" | "txt") {
       disableTemplate: true,
       unlockVault: Vault.unlockVault
     });
-    if (!result) throw new Error(`${strings.couldNotConvertNote(format)}.`);
+    if (!result) throw new Error(strings.couldNotConvertNote(format));
 
     await navigator.clipboard.writeText(result);
     showToast("success", strings.noteCopied());

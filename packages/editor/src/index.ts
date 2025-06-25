@@ -23,7 +23,6 @@ import {
   getHTMLFromFragment
 } from "@tiptap/core";
 import CharacterCount from "@tiptap/extension-character-count";
-import { Code } from "@tiptap/extension-code";
 import Color from "@tiptap/extension-color";
 import HorizontalRule from "@tiptap/extension-horizontal-rule";
 import { Link, LinkAttributes } from "./extensions/link/index.js";
@@ -85,11 +84,14 @@ import { useEditorSearchStore } from "./toolbar/stores/search-store.js";
 import { DiffHighlighter } from "./extensions/diff-highlighter/index.js";
 import { getChangedNodes } from "./utils/prosemirror.js";
 import { strings } from "@notesnook/intl";
+import { InlineCode } from "./extensions/inline-code/inline-code.js";
+import { FontLigature } from "./extensions/font-ligature/font-ligature.js";
+import { SearchResult } from "./extensions/search-result/search-result.js";
 
 interface TiptapStorage {
   dateFormat?: DateTimeOptions["dateFormat"];
   timeFormat?: DateTimeOptions["timeFormat"];
-  openLink?: (url: string) => void;
+  openLink?: (url: string, openInNewTab?: boolean) => void;
   downloadAttachment?: (attachment: Attachment) => void;
   openAttachmentPicker?: (type: AttachmentType) => void;
   previewAttachment?: (attachment: Attachment) => void;
@@ -127,6 +129,7 @@ export type TiptapOptions = EditorOptions &
     downloadOptions?: DownloadOptions;
     isMobile?: boolean;
     doubleSpacedLines?: boolean;
+    enableFontLigatures?: boolean;
   } & {
     placeholder: string;
   };
@@ -151,6 +154,7 @@ const useTiptap = (
     isMobile,
     downloadOptions,
     editorProps,
+    enableFontLigatures,
     ...restOptions
   } = options;
 
@@ -179,7 +183,9 @@ const useTiptap = (
     () => ({
       enableCoreExtensions: false,
       editorProps: {
-        ...editorProps
+        ...editorProps,
+        scrollMargin: 50,
+        scrollThreshold: 50
       },
       extensions: [
         ...CoreExtensions,
@@ -231,7 +237,8 @@ const useTiptap = (
             newGroupDelay: 1000
           },
           dropcursor: {
-            class: "drop-cursor"
+            class: "drop-cursor",
+            width: 3
           },
           horizontalRule: false
         }),
@@ -302,7 +309,7 @@ const useTiptap = (
         OutlineListItem,
         OutlineList.configure({ keepAttributes: true, keepMarks: true }),
         ListItem,
-        Code.extend({ excludes: "link" }),
+        InlineCode,
         Codemark,
         MathInline,
         MathBlock,
@@ -324,7 +331,9 @@ const useTiptap = (
           irremovableNodesOnBackspace: [
             CodeBlock.name,
             TaskListNode.name,
-            Table.name
+            Table.name,
+            CheckList.name,
+            AttachmentNode.name
           ],
           escapableNodesIfAtDocumentStart: [
             CodeBlock.name,
@@ -353,7 +362,9 @@ const useTiptap = (
               wrapperNames: [CheckList.name]
             }
           ]
-        })
+        }),
+        FontLigature.configure({ enabled: enableFontLigatures }),
+        SearchResult.configure()
       ],
       onBeforeCreate: ({ editor }) => {
         editor.storage.dateFormat = dateFormat;

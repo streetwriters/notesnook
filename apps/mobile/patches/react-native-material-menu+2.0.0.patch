@@ -1,0 +1,33 @@
+diff --git a/node_modules/react-native-material-menu/dist/Menu.js b/node_modules/react-native-material-menu/dist/Menu.js
+index 64fbf13..beeda72 100644
+--- a/node_modules/react-native-material-menu/dist/Menu.js
++++ b/node_modules/react-native-material-menu/dist/Menu.js
+@@ -55,7 +55,7 @@ class Menu extends react_1.default.Component {
+     };
+     // Start menu animation
+     onMenuLayout = (e) => {
+-        if (this.state.menuState === States.Animating) {
++        if (this.state.menuState === States.Animating || this.state.menuState === States.Hidden) {
+             return;
+         }
+         const { width, height } = e.nativeEvent.layout;
+@@ -110,6 +110,7 @@ class Menu extends react_1.default.Component {
+         this.props.onRequestClose?.();
+     };
+     render() {
++
+         const { isRTL } = react_native_1.I18nManager;
+         const dimensions = react_native_1.Dimensions.get('window');
+         const { width: windowWidth } = dimensions;
+@@ -134,8 +135,10 @@ class Menu extends react_1.default.Component {
+         }
+         // Flip by Y axis if menu hits bottom screen border
+         if (top > windowHeight - menuHeight - SCREEN_INDENT) {
++            const diff = top - (windowHeight - menuHeight - SCREEN_INDENT);
++            const fraction = (diff / menuHeight);
+             transforms.push({
+-                translateY: react_native_1.Animated.multiply(menuSizeAnimation.y, -1),
++                translateY: react_native_1.Animated.multiply(menuSizeAnimation.y, -(fraction + 1)),
+             });
+             top = windowHeight - SCREEN_INDENT;
+             top = Math.min(windowHeight - SCREEN_INDENT, top + buttonHeight);

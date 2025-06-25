@@ -59,8 +59,9 @@ const SheetWrapper = ({
   const smallTablet = deviceMode === "smallTablet";
   const dimensions = useSettingStore((state) => state.dimensions);
   const insets = useGlobalSafeAreaInsets();
-  const appState = useAppState();
   const lockEvents = useRef(false);
+  const locked = useUserStore((state) => state.appLocked);
+
   let width = dimensions.width > 600 ? 600 : 500;
 
   const style = React.useMemo(() => {
@@ -99,24 +100,21 @@ const SheetWrapper = ({
   };
 
   useEffect(() => {
-    if (useUserStore.getState().disableAppLockRequests) return;
-    if (SettingsService.canLockAppInBackground()) {
-      if (appState === "background") {
-        const ref = fwdRef || localRef;
-        ref?.current?.hide();
-        if (useUserStore.getState().appLocked) {
-          lockEvents.current = true;
-          const unsub = useUserStore.subscribe((state) => {
-            if (!state.appLocked) {
-              ref?.current?.show();
-              unsub();
-              lockEvents.current = false;
-            }
-          });
-        }
+    if (locked) {
+      const ref = fwdRef || localRef;
+      ref?.current?.hide();
+      if (useUserStore.getState().appLocked) {
+        lockEvents.current = true;
+        const unsub = useUserStore.subscribe((state) => {
+          if (!state.appLocked) {
+            ref?.current?.show();
+            unsub();
+            lockEvents.current = false;
+          }
+        });
       }
     }
-  }, [appState, fwdRef]);
+  }, [locked, fwdRef]);
 
   return (
     <ScopedThemeProvider value="sheet">

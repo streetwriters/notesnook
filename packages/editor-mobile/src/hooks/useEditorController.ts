@@ -18,6 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Editor, scrollIntoViewById } from "@notesnook/editor";
+import { keepLastLineInView } from "@notesnook/editor/extensions/keep-in-view/keep-in-view.js";
+import { strings } from "@notesnook/intl";
 import {
   ThemeDefinition,
   useThemeColors,
@@ -31,16 +33,16 @@ import {
   useState
 } from "react";
 import {
-  EventTypes,
   getRoot,
+  isReactNative,
   post,
   postAsyncWithTimeout,
   saveTheme
 } from "../utils";
 import { injectCss, transform } from "../utils/css";
+import { EditorEvents } from "../utils/editor-events";
 import { pendingSaveRequests } from "../utils/pending-saves";
 import { useTabContext, useTabStore } from "./useTabStore";
-import { strings } from "@notesnook/intl";
 
 type Attachment = {
   hash: string;
@@ -65,34 +67,12 @@ type Timers = {
   scroll: NodeJS.Timeout | null;
 };
 
-function isInViewport(element: any) {
-  const rect = element.getBoundingClientRect();
-  return (
-    rect.top >= 0 &&
-    rect.left >= 0 &&
-    rect.bottom <=
-      (window.innerHeight || document.documentElement.clientHeight) &&
-    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-  );
-}
-
 function scrollIntoView(editor: Editor) {
+  if (__PLATFORM__ == "android") return;
   setTimeout(() => {
-    const node = editor?.state.selection.$from;
-    const dom = node ? editor?.view?.domAtPos(node.pos) : null;
-    let domNode = dom?.node;
-
-    if (domNode) {
-      if (domNode.nodeType === Node.TEXT_NODE && domNode.parentNode) {
-        domNode = domNode.parentNode;
-      }
-      if (isInViewport(domNode)) return;
-      (domNode as HTMLElement).scrollIntoView({
-        behavior: "smooth",
-        block: "end"
-      });
-    }
-  }, 100);
+    if (!editor.isFocused) return;
+    keepLastLineInView(editor);
+  }, 1);
 }
 
 export type EditorController = {
@@ -121,22 +101,32 @@ export type EditorController = {
   passwordInputRef: MutableRefObject<HTMLInputElement | null>;
   focusPassInput: () => void;
   blurPassInput: () => void;
+  scrollToSearchResult: (index: number) => void;
+  getContentDiv: () => HTMLElement | null;
 };
 export function useEditorController({
   update,
   getTableOfContents,
-  scrollTo
+  scrollTo,
+  scrollTop,
+  getContentDiv
 }: {
-  update: () => void;
+  update: (
+    scrollTop?: number,
+    selection?: { to: number; from: number },
+    searchResultIndex?: number
+  ) => void;
   getTableOfContents: () => any[];
   scrollTo: (top: number) => void;
+  scrollTop: () => number;
+  getContentDiv: () => HTMLElement | null;
 }): EditorController {
   const passwordInputRef = useRef<HTMLInputElement | null>(null);
   const tab = useTabContext();
   const tabRef = useRef(tab);
   tabRef.current = tab;
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const setTheme = useThemeEngineStore((store) => store.setTheme);
   const { colors } = useThemeColors("editor");
   const [title, setTitle] = useState("");
@@ -150,30 +140,36 @@ export function useEditorController({
     scroll: null
   });
 
-  if (!tabRef.current.noteId && loading) {
-    setLoading(false);
+  if (!tabRef.current.session?.noteId && loading) {
+    setTimeout(() => {
+      if (!tabRef.current.session?.noteId && loading) {
+        setLoading(false);
+      }
+    }, 3000);
   }
 
   const selectionChange = useCallback((_editor: Editor) => {}, []);
 
   const titleChange = useCallback(async (title: string) => {
+    if (!isReactNative()) return;
     const currentSessionId = globalThis.sessionId;
     post(
-      EventTypes.contentchange,
+      EditorEvents.contentchange,
       undefined,
       tabRef.current.id,
-      tabRef.current.noteId
+      tabRef.current.session?.noteId
     );
     const params = [
       {
         title
       },
       tabRef.current.id,
-      tabRef.current.noteId,
-      currentSessionId
+      tabRef.current.session?.noteId,
+      currentSessionId,
+      1000
     ];
     const pendingTitleIds = await pendingSaveRequests.getPendingTitleIds();
-    postAsyncWithTimeout(EventTypes.title, ...params, 1000)
+    postAsyncWithTimeout(EditorEvents.title, ...params)
       .then(() => {
         if (pendingTitleIds.length) {
           dbLogger(
@@ -215,36 +211,39 @@ export function useEditorController({
 
   const contentChange = useCallback(
     (editor: Editor, ignoreEdit?: boolean) => {
+      if (!isReactNative()) return;
       if (editorControllers[tabRef.current.id]?.loading) {
         logger("info", "Edit skipped, tab is in loading state");
         return;
       }
       const currentSessionId = globalThis.sessionId;
       post(
-        EventTypes.contentchange,
+        EditorEvents.contentchange,
         undefined,
         tabRef.current.id,
-        tabRef.current.noteId
+        tabRef.current.session?.noteId
       );
       if (!editor) return;
       if (typeof timers.current.change === "number") {
         clearTimeout(timers.current?.change);
       }
+
       timers.current.change = setTimeout(async () => {
         htmlContentRef.current = editor.getHTML();
-
         const params = [
           {
             html: htmlContentRef.current,
             ignoreEdit: ignoreEdit
           },
           tabRef.current.id,
-          tabRef.current.noteId,
-          currentSessionId
+          tabRef.current.session?.noteId,
+          currentSessionId,
+          5000
         ];
+
         const pendingContentIds =
           await pendingSaveRequests.getPendingContentIds();
-        postAsyncWithTimeout(EventTypes.content, ...params, 5000)
+        postAsyncWithTimeout(EditorEvents.content, ...params)
           .then(() => {
             if (pendingContentIds.length) {
               dbLogger(
@@ -275,12 +274,7 @@ export function useEditorController({
             }
           });
 
-        logger(
-          "info",
-          "Editor saving content",
-          tabRef.current.id,
-          tabRef.current.noteId
-        );
+        logger("info", "Editor saving content", params[1], params[2]);
       }, 300);
 
       countWords(5000);
@@ -294,14 +288,24 @@ export function useEditorController({
       if (timers.current.scroll !== null) clearTimeout(timers.current.scroll);
       timers.current.scroll = setTimeout(() => {
         if (
-          tabRef.current.noteId &&
-          tabRef.current.noteId === useTabStore.getState().getCurrentNoteId()
+          tabRef.current.session?.noteId &&
+          tabRef.current.session?.noteId ===
+            useTabStore.getState().getCurrentNoteId()
         ) {
-          useTabStore.getState().setNoteState(tabRef.current.noteId, {
-            top: value
-          });
+          post(
+            EditorEvents.saveScroll,
+            {
+              scrollTop: value,
+              selection: {
+                to: editors[tabRef.current.id]?.state.selection.to,
+                from: editors[tabRef.current.id]?.state.selection.from
+              }
+            },
+            tabRef.current.id,
+            tabRef.current.session?.noteId
+          );
         }
-      }, 16);
+      }, 300);
     },
     []
   );
@@ -312,12 +316,12 @@ export function useEditorController({
   }, [update]);
 
   useEffect(() => {
-    if (tab.locked) {
+    if (tab.session?.locked) {
       htmlContentRef.current = "";
       setLoading(true);
       onUpdate();
     }
-  }, [tab.locked, onUpdate]);
+  }, [tab.session?.locked, onUpdate]);
 
   const onMessage = useCallback(
     (event: Event & { data?: string }) => {
@@ -333,40 +337,35 @@ export function useEditorController({
       const editor = editors[tabRef.current.id];
       switch (type) {
         case "native:updatehtml": {
-          htmlContentRef.current = value;
-          logger("info", "UPDATING NOTE HTML");
+          htmlContentRef.current = value.data;
           if (tabRef.current.id !== useTabStore.getState().currentTab) {
             updateTabOnFocus.current = true;
           } else {
             if (!editor) break;
-
-            const noteState = tabRef.current?.noteId
-              ? useTabStore.getState().noteState[tabRef.current?.noteId]
-              : null;
-
             editor?.commands.setContent(htmlContentRef.current, false, {
               preserveWhitespace: true
             });
 
-            if (noteState) {
-              editor.commands.setTextSelection({
-                from: noteState.from,
-                to: noteState.to
-              });
+            if (value.selection) {
+              editor.commands.setTextSelection(value.selection);
             }
 
-            scrollTo?.(noteState?.top || 0);
+            scrollTo?.(value.scrollTop || 0);
+            setLoading(false);
             countWords(0);
           }
 
           break;
         }
         case "native:html":
-          if (htmlContentRef.current === value) break;
-          htmlContentRef.current = value;
+          if (htmlContentRef.current === value.data) {
+            setLoading(false);
+            break;
+          }
+          htmlContentRef.current = value.data;
           logger("info", "LOADING NOTE HTML");
           if (!editor) break;
-          update();
+          update(value.scrollTop, value.selection, value.searchResultIndex);
           setTimeout(() => {
             countWords(0);
           }, 300);
@@ -400,7 +399,7 @@ export function useEditorController({
       }
       post(type); // Notify that message was delivered successfully.
     },
-    [update, countWords, setTheme]
+    [update, setTheme, scrollTo, countWords]
   );
 
   useEffect(() => {
@@ -411,43 +410,67 @@ export function useEditorController({
   }, [onMessage]);
 
   const openFilePicker = useCallback((type: "image" | "file" | "camera") => {
-    post(EventTypes.filepicker, type, tabRef.current.id, tabRef.current.noteId);
+    post(
+      EditorEvents.filepicker,
+      type,
+      tabRef.current.id,
+      tabRef.current.session?.noteId
+    );
   }, []);
 
   const downloadAttachment = useCallback((attachment: Attachment) => {
     post(
-      EventTypes.download,
+      EditorEvents.download,
       attachment,
       tabRef.current.id,
-      tabRef.current.noteId
+      tabRef.current.session?.noteId
     );
   }, []);
   const previewAttachment = useCallback((attachment: Attachment) => {
     post(
-      EventTypes.previewAttachment,
+      EditorEvents.previewAttachment,
       attachment,
       tabRef.current.id,
-      tabRef.current.noteId
+      tabRef.current.session?.noteId
     );
   }, []);
   const openLink = useCallback((url: string) => {
-    post(EventTypes.link, url, tabRef.current.id, tabRef.current.noteId);
+    post(
+      EditorEvents.link,
+      url,
+      tabRef.current.id,
+      tabRef.current.session?.noteId
+    );
     return true;
   }, []);
 
   const copyToClipboard = (text: string) => {
-    post(EventTypes.copyToClipboard, text);
+    post(EditorEvents.copyToClipboard, text);
   };
 
   const getAttachmentData = (attachment: Partial<Attachment>) => {
-    return postAsyncWithTimeout(EventTypes.getAttachmentData, {
+    return postAsyncWithTimeout(EditorEvents.getAttachmentData, {
       attachment
     });
   };
 
+  const scrollToSearchResult = useCallback((index: number) => {
+    const marks = document.getElementsByTagName("nn-search-result");
+    if (marks.length > index) {
+      const mark = marks[index];
+      if (mark) {
+        mark.scrollIntoView({
+          behavior: "instant",
+          block: "start"
+        });
+      }
+    }
+  }, []);
+
   return {
     getTableOfContents: getTableOfContents,
     scrollIntoView: (id: string) => scrollIntoViewById(id),
+    scrollToSearchResult: scrollToSearchResult,
     contentChange,
     selectionChange,
     titleChange,
@@ -467,6 +490,7 @@ export function useEditorController({
     countWords,
     copyToClipboard,
     getAttachmentData,
+    getContentDiv,
     updateTab: () => {
       // When the tab is focused, we apply any updates to content that were recieved when
       // the tab was not focused.

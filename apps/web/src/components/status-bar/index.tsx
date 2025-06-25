@@ -27,7 +27,9 @@ import {
   SyncError,
   Alert,
   SyncOff,
-  Icon
+  Icon,
+  Unlock,
+  CellphoneLock
 } from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useAppStore } from "../../stores/app-store";
@@ -40,6 +42,9 @@ import { getTimeAgo, toTitleCase } from "@notesnook/common";
 import { User } from "@notesnook/core";
 import { showUpdateAvailableNotice } from "../../dialogs/confirm";
 import { strings } from "@notesnook/intl";
+import { useVault } from "../../hooks/use-vault";
+import { useKeyStore } from "../../interfaces/key-store";
+import { STATUS_BAR_HEIGHT } from "../../common/constants";
 
 function StatusBar() {
   const user = useUserStore((state) => state.user);
@@ -47,6 +52,8 @@ function StatusBar() {
   const statuses = useStatus();
   const updateStatus = useAutoUpdater();
   const isFocusMode = useAppStore((state) => state.isFocusMode);
+  const { isVaultLocked, lockVault } = useVault();
+  const { activeCredentials, relock } = useKeyStore();
 
   return (
     <ScopedThemeProvider
@@ -56,7 +63,9 @@ function StatusBar() {
         borderTop: "1px solid",
         borderTopColor: "separator",
         justifyContent: "space-between",
-        display: ["none", "none", "flex"]
+        display: ["none", "flex", "flex"],
+        flexShrink: 0,
+        height: STATUS_BAR_HEIGHT
       }}
       px={2}
     >
@@ -71,6 +80,7 @@ function StatusBar() {
                   size={7}
                   color={"var(--icon-success)"}
                   sx={{ p: "small" }}
+                  data-test-id="logged-in"
                 />
               ) : (
                 <Button
@@ -83,7 +93,11 @@ function StatusBar() {
                     height: "100%"
                   }}
                 >
-                  <Circle size={7} color={"var(--icon-error)"} />
+                  <Circle
+                    size={7}
+                    color={"var(--icon-error)"}
+                    data-test-id="logged-in"
+                  />
                   <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
                     {strings.emailNotConfirmed()}
                   </Text>
@@ -92,23 +106,24 @@ function StatusBar() {
 
               <SyncStatus />
             </>
-          ) : isLoggedIn === false ? (
+          ) : null}
+          {activeCredentials().length > 0 && (
             <Button
               variant="statusitem"
-              onClick={() => hardNavigate("/login")}
+              onClick={relock}
               sx={{
                 alignItems: "center",
                 justifyContent: "center",
-                display: "flex"
+                display: "flex",
+                color: "paragraph",
+                height: "100%"
               }}
-              data-test-id="not-logged-in"
+              title={"Lock app"}
+              data-test-id="lock-app"
             >
-              <Circle size={7} color="var(--icon-error)" />
-              <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
-                {strings.notLoggedIn()}
-              </Text>
+              <CellphoneLock size={12} />
             </Button>
-          ) : null}
+          )}
           {statuses?.map((status) => {
             const { key, icon: Icon } = status;
             return (
@@ -160,6 +175,23 @@ function StatusBar() {
               </Text>
             </Button>
           )}
+          {!isVaultLocked && (
+            <Button
+              variant="statusitem"
+              onClick={lockVault}
+              sx={{
+                alignItems: "center",
+                justifyContent: "center",
+                display: "flex"
+              }}
+              data-test-id="vault-unlocked"
+            >
+              <Unlock size={10} />
+              <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
+                {strings.vaultUnlocked()}
+              </Text>
+            </Button>
+          )}
         </Flex>
       )}
       <EditorFooter />
@@ -174,13 +206,11 @@ function statusToInfoText(status: UpdateStatus) {
   return type === "checking"
     ? strings.checkingForUpdates()
     : type === "downloading"
-    ? `${Math.round(status.progress)}% ${strings.updating()}...`
+    ? strings.updating(Math.round(status.progress))
     : type === "completed"
-    ? `v${
-        status.version
-      } ${strings.network.downloaded()} (${strings.restartRequired()})`
+    ? strings.updateCompleted(status.version)
     : type === "available"
-    ? `v${status.version} ${strings.available()}`
+    ? strings.updateNewVersionAvailable(status.version)
     : "";
 }
 

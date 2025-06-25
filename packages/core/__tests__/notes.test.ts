@@ -60,13 +60,13 @@ test("add invalid note", () =>
   databaseTest().then(async (db) => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    expect(db.notes.add()).rejects.toThrow();
+    await expect(db.notes.add()).rejects.toThrow();
 
-    expect(db.notes.add({})).rejects.toThrow();
+    await expect(db.notes.add({})).rejects.toThrow();
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    expect(db.notes.add({ hello: "world" })).rejects.toThrow();
+    await expect(db.notes.add({ hello: "world" })).rejects.toThrow();
   }));
 
 test("add note", () =>
@@ -99,8 +99,8 @@ test("delete note", () =>
     await db.notes.moveToTrash(id);
 
     expect(await db.notes.note(id)).toBeUndefined();
-    expect(await db.notebooks.totalNotes(notebookId)).toBe(0);
-    expect(await db.notebooks.totalNotes(subNotebookId)).toBe(0);
+    expect(await db.notebooks.totalNotes(notebookId)).toStrictEqual([0]);
+    expect(await db.notebooks.totalNotes(subNotebookId)).toStrictEqual([0]);
   }));
 
 test("get all notes", () =>
@@ -134,7 +134,78 @@ test("changing content shouldn't reset the note title ", () =>
     expect(note?.title).toBe("I am a note");
   }));
 
-test("note should get headline from content", () =>
+test("note title with headline format should keep generating headline title until title is edited", () =>
+  noteTest().then(async ({ db }) => {
+    await db.settings.setTitleFormat("$headline$");
+    const id = await db.notes.add({
+      content: {
+        type: TEST_NOTE.content.type,
+        data: "<p>super delicious note</p>"
+      }
+    });
+
+    let note = await db.notes.note(id);
+    expect(note?.title).toBe("super delicious note");
+
+    await db.notes.add({
+      id,
+      content: {
+        type: TEST_NOTE.content.type,
+        data: "<p>super duper delicious note</p>"
+      }
+    });
+
+    note = await db.notes.note(id);
+    expect(note?.title).toBe("super duper delicious note");
+
+    await db.notes.add({
+      id,
+      title: "not delicious anymore",
+      content: {
+        type: TEST_NOTE.content.type,
+        data: "<p>super duper delicious note</p>"
+      }
+    });
+
+    note = await db.notes.note(id);
+    expect(note?.title).toBe("not delicious anymore");
+
+    await db.notes.add({
+      id,
+      content: {
+        type: TEST_NOTE.content.type,
+        data: "<p>super duper extra delicious note</p>"
+      }
+    });
+
+    note = await db.notes.note(id);
+    expect(note?.title).toBe("not delicious anymore");
+  }));
+
+[
+  ["simple p tag", "<p>headline</p>", "headline"],
+  ["across multiple tags", "<h1>title<h1><ol><li>list</li></ol>", "titlelist"],
+  [
+    "content with exceeded HEADLINE_CHARACTER_LIMIT",
+    "<p><strong>head</strong><em>line</em></p><h1>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam rutrum ex ac eros egestas, ut rhoncus felis faucibus. Mauris tempor orci nisl, vitae pulvinar turpis convallis n</h1>",
+    "headlineLorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam rutrum ex ac eros egestas, ut rhoncus felis faucibus. Mauris tempor orci nisl,"
+  ]
+].forEach(([testCase, content, expectedHeadline]) => {
+  test(`note title with headline format should generate headline title up to 150 characters - ${testCase}`, () =>
+    noteTest().then(async ({ db }) => {
+      await db.settings.setTitleFormat("$headline$");
+      const id = await db.notes.add({
+        content: {
+          type: TEST_NOTE.content.type,
+          data: content
+        }
+      });
+      const note = await db.notes.note(id);
+      expect(note?.title).toBe(expectedHeadline);
+    }));
+});
+
+test("note should get headline from first paragraph in content", () =>
   noteTest({
     ...TEST_NOTE,
     content: {
@@ -197,6 +268,15 @@ test("update note", () =>
     expect(note?.favorite).toBe(true);
   }));
 
+test("get note tags", () =>
+  noteTest({
+    ...TEST_NOTE
+  }).then(async ({ db, id }) => {
+    const tag = await db.tags.add({ title: "hello" });
+    await db.relations.add({ type: "tag", id: tag }, { type: "note", id });
+    expect(await db.notes.tags(id)).toEqual([await db.tags.tag(tag)]);
+  }));
+
 test("get favorite notes", () =>
   noteTest({
     ...TEST_NOTE,
@@ -243,8 +323,8 @@ test("add note to subnotebook", () =>
         .from({ type: "notebook", id: notebookId }, "notebook")
         .count()
     ).toBe(1);
-    expect(await db.notebooks.totalNotes(subNotebookId)).toBe(1);
-    expect(await db.notebooks.totalNotes(notebookId)).toBe(1);
+    expect(await db.notebooks.totalNotes(subNotebookId)).toStrictEqual([1]);
+    expect(await db.notebooks.totalNotes(notebookId)).toStrictEqual([1]);
   }));
 
 test("duplicate note to topic should not be added", () =>
@@ -253,7 +333,7 @@ test("duplicate note to topic should not be added", () =>
       notebookTitle: "Hello",
       subNotebookTitle: "Home"
     });
-    expect(await db.notebooks.totalNotes(subNotebookId)).toBe(1);
+    expect(await db.notebooks.totalNotes(subNotebookId)).toStrictEqual([1]);
   }));
 
 test("add the same note to 2 notebooks", () =>
@@ -627,3 +707,54 @@ for (const group of groups) {
       }));
   }
 }
+
+test("get archived notes", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.notes.archive(true, id);
+    expect(await db.notes.archived.count()).toBeGreaterThan(0);
+  }));
+
+test("archive note", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.notes.archive(true, id);
+    const note = await db.notes.note(id);
+    expect(note?.archived).toBe(true);
+  }));
+
+test("unarchive note", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.notes.archive(true, id);
+    await db.notes.archive(false, id);
+    const note = await db.notes.note(id);
+    expect(note?.archived).toBe(false);
+  }));
+
+test("archiving note should update cache.archived", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.notes.archive(true, id);
+    const note = await db.notes.note(id);
+    expect(db.notes.cache.archived).toEqual([note?.id]);
+  }));
+
+test("un-archiving note should update cache.archived", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.notes.archive(true, id);
+    const note = await db.notes.note(id);
+    expect(db.notes.cache.archived).toEqual([note?.id]);
+
+    await db.notes.archive(false, id);
+    expect(db.notes.cache.archived).toEqual([]);
+  }));
+
+test("archived note shouldn't be in all notes", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.notes.archive(true, id);
+    expect(await db.notes.all.count()).toBe(0);
+  }));
+
+test("archived note shouldn't be in favorites", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.notes.favorite(true, id);
+    await db.notes.archive(true, id);
+    expect(await db.notes.favorites.count()).toBe(0);
+  }));

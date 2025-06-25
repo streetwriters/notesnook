@@ -1,0 +1,100 @@
+name: e2e-android
+on: workflow_dispatch
+
+jobs:
+  e2e-android:
+    runs-on: ubuntu-latest
+    env:
+      API_LEVEL: 34
+      ARCH: x86_64
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Free Disk Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: false
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Install node modules
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=mobile
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: wrapper
+          cache-read-only: false
+
+      - name: Use specific Java version for the builds
+        uses: joschi/setup-jdk@v2
+        with:
+          java-version: "17"
+          architecture: "x64"
+
+      - name: Install Detox CLI
+        run: npm install detox-cli --global
+
+      - name: Detox build
+        run: |
+          yarn build:android
+          ls apps/mobile/native/android/app/build/outputs/apk
+          ls apps/mobile/native/android/app/build/outputs/apk/release
+
+      - name: Get device name
+        id: device
+        run: |
+          AVD_NAME=$(node -p "require('./apps/mobile/native/.detoxrc.js').devices.emulator.device.avdName")
+          echo "AVD_NAME=$AVD_NAME" >> $GITHUB_OUTPUT
+
+      - name: AVD cache
+        uses: actions/cache@v4
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: ${{ steps.device.outputs.AVD_NAME }}
+
+      - name: create AVD and generate snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ env.API_LEVEL }}
+          arch: ${{ env.ARCH }}
+          avd-name: ${{ steps.device.outputs.AVD_NAME }}
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: echo "Generated AVD snapshot for caching."
+
+      - name: Detox test
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ env.API_LEVEL }}
+          arch: ${{ env.ARCH }}
+          avd-name: ${{ steps.device.outputs.AVD_NAME }}
+          disable-animations: true
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          force-avd-creation: false
+          script: yarn test:android --headless --record-logs failing --record-videos failing --take-screenshots failing
+
+      - name: Upload artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: detox-artifacts
+          path: artifacts
+          retention-days: 14

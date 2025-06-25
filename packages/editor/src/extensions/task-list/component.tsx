@@ -53,7 +53,8 @@ export function TaskListComponent(
           sx={{
             position: "relative",
             bg: "var(--background-secondary)",
-            py: 1,
+            py: "0.5rem",
+            px: "0.5rem",
             borderRadius: "default",
             mb: 2,
             alignItems: "center",
@@ -108,7 +109,7 @@ export function TaskListComponent(
                 });
               }}
               color={checked ? "accent" : "icon"}
-              size={isMobile ? "1.70ch" : "1.46ch"}
+              size={isMobile ? "1.70ch" : "1.36ch"}
             />
           ) : null}
           <Input
@@ -230,6 +231,9 @@ export function TaskListComponent(
         ref={forwardRef}
         dir={textDirection}
         contentEditable={editor.isEditable && !readonly}
+        onPaste={(e) => {
+          if (readonly) e.preventDefault();
+        }}
         sx={{
           ul: {
             display: "block",
@@ -248,10 +252,10 @@ export function TaskListComponent(
             display: "flex",
             bg: "background",
             borderRadius: "default",
-            ":hover > .dragHandle": {
+            ":hover > div > div > .dragHandle": {
               opacity: editor.isEditable ? 1 : 0
             },
-            ":hover > .taskItemTools": {
+            ":hover > div > .taskItemTools": {
               opacity: 1
             }
           }

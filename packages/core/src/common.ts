@@ -108,6 +108,8 @@ export const EVENTS = {
   databaseCollectionInitiated: "db:collectionInitiated",
   appRefreshRequested: "app:refreshRequested",
   migrationProgress: "migration:progress",
+  migrationStarted: "migration:start",
+  migrationFinished: "migration:finished",
   noteRemoved: "note:removed",
   tokenRefreshed: "token:refreshed",
   userUnauthorized: "user:unauthorized",
@@ -120,6 +122,7 @@ export const EVENTS = {
   attachmentDeleted: "attachment:deleted",
   mediaAttachmentDownloaded: "attachments:mediaDownloaded",
   vaultLocked: "vault:locked",
+  vaultUnlocked: "vault:unlocked",
   systemTimeInvalid: "system:invalidTime"
 };
 
@@ -141,3 +144,5 @@ export const DATE_FORMATS = [
 export const TIME_FORMATS = ["12-hour", "24-hour"];
 
 export const CURRENT_DATABASE_VERSION = 6.1;
+
+export const FREE_NOTEBOOKS_LIMIT = 20;

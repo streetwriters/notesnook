@@ -66,7 +66,7 @@ class Vault {
       subtitle: strings.deleteVaultDesc(),
       inputs: {
         password: {
-          label: strings.password(),
+          label: strings.accountPassword(),
           autoComplete: "current-password"
         }
       },
@@ -183,6 +183,11 @@ class Vault {
         return action(password);
       }
     });
+  }
+
+  static async lockVault() {
+    await db.vault.lock();
+    showToast("success", strings.vaultLocked());
   }
 }
 export default Vault;

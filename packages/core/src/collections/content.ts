@@ -174,7 +174,7 @@ export class Content implements ICollection {
   async get(id: string) {
     const content = await this.collection.get(id);
     if (!content || isDeleted(content)) return;
-    if (!content.locked && this.preProcess(content)) {
+    if (!content.locked && (await this.preProcess(content))) {
       await this.collection.update([content.id], content, { modify: false });
     }
     return content;
@@ -242,7 +242,7 @@ export class Content implements ICollection {
       .selectAll()
       .executeTakeFirst()) as ContentItem;
     if (!content || isDeleted(content)) return;
-    if (!content.locked && this.preProcess(content)) {
+    if (!content.locked && (await this.preProcess(content))) {
       await this.collection.update([content.id], content, { modify: false });
     }
     return content;
@@ -267,7 +267,10 @@ export class Content implements ICollection {
     contentItem: { type: ContentType; data: string },
     notify = true
   ) {
-    const content = getContentFromData(contentItem.type, contentItem.data);
+    const content = await getContentFromData(
+      contentItem.type,
+      contentItem.data
+    );
     if (!content) return contentItem;
     contentItem.data = await content.insertMedia(async (hashes) => {
       const attachments = await this.db.attachments.all
@@ -300,13 +303,16 @@ export class Content implements ICollection {
   async removeAttachments(id: string, hashes: string[]) {
     const contentItem = await this.get(id);
     if (!contentItem || isCipher(contentItem.data)) return;
-    const content = getContentFromData(contentItem.type, contentItem.data);
+    const content = await getContentFromData(
+      contentItem.type,
+      contentItem.data
+    );
     if (!content) return;
     contentItem.data = content.removeAttachments(hashes);
     await this.add(contentItem);
   }
 
-  preProcess(content: NoteContent<false>) {
+  async preProcess(content: NoteContent<false>) {
     let changed = false;
 
     // #MIGRATION: convert tiny to tiptap
@@ -318,9 +324,8 @@ export class Content implements ICollection {
 
     // add block id on all appropriate nodes
     if (!content.data.includes("data-block-id")) {
-      content.data = getContentFromData(
-        content.type,
-        content.data
+      content.data = (
+        await getContentFromData(content.type, content.data)
       ).insertBlockIds();
       changed = true;
     }
@@ -329,7 +334,10 @@ export class Content implements ICollection {
   }
 
   async postProcess(contentItem: NoteContent<false> & { noteId: string }) {
-    const content = getContentFromData(contentItem.type, contentItem.data);
+    const content = await getContentFromData(
+      contentItem.type,
+      contentItem.data
+    );
     if (!content) return contentItem.data;
     const { data, hashes, internalLinks } = await content.postProcess(
       this.db.attachments.save.bind(this.db.attachments)

@@ -148,28 +148,31 @@ export const ToastManager = {
     type = "error",
     context = "global",
     func,
-    actionText
+    actionText,
+    icon,
+    duration = 3000
   }: ToastOptions) => {
     if (Config.isTesting) return;
     eSendEvent(eShowToast, {
-      heading: heading,
-      message: message,
-      type: type,
-      context: context,
-      duration: 3000,
-      func: func,
-      actionText: actionText
+      heading,
+      message,
+      type,
+      context,
+      func,
+      actionText,
+      icon,
+      duration
     });
   },
   hide: () => eSendEvent(eHideToast),
-  error: (e: Error, title?: string, context?: any, duration = 5000) => {
+  error: (e: Error, title?: string, context?: any, duration = 6000) => {
     ToastManager.show({
       heading: title,
       message: e?.message || "",
       type: "error",
       context: context || "global",
       actionText: "Copy logs",
-      duration: 6000,
+      duration: duration,
       func: () => {
         Clipboard.setString(e?.stack || "");
         ToastManager.show({

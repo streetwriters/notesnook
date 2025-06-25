@@ -33,7 +33,7 @@ import {
   getColorLinearShade,
   hexToRGBA
 } from "../../../utils/colors";
-import { br } from "../../../utils/size";
+import { defaultBorderRadius } from "../../../utils/size";
 export interface PressableProps extends RNPressableProps {
   style?: ViewStyle;
   noborder?: boolean;
@@ -234,7 +234,8 @@ export const Pressable = ({
   customAlpha,
   customOpacity,
   fwdRef,
-  hidden
+  hidden,
+  ...props
 }: PressableProps) => {
   const { isDark } = useThemeColors();
   const {
@@ -263,12 +264,13 @@ export const Pressable = ({
   const getStyle = useCallback(
     ({ pressed }: PressableStateCallbackType): ViewStyle | ViewStyle[] => [
       {
-        backgroundColor: pressed
-          ? RGB_Linear_Shade(alpha, hexToRGBA(selectedColor, opacity || 1))
-          : hexToRGBA(primaryColor, opacity || 1),
+        backgroundColor:
+          pressed && !disabled
+            ? RGB_Linear_Shade(alpha, hexToRGBA(selectedColor, opacity || 1))
+            : hexToRGBA(primaryColor, opacity || 1),
         width: "100%",
         alignSelf: "center",
-        borderRadius: noborder ? 0 : br,
+        borderRadius: noborder ? 0 : defaultBorderRadius,
         justifyContent: "center",
         alignItems: "center",
         marginBottom: 0,
@@ -277,7 +279,7 @@ export const Pressable = ({
             ? getColorLinearShade(customSelectedColor, 0.3, false)
             : borderSelectedColor || borderColor
           : borderColor || "transparent",
-        borderWidth: borderWidth
+        borderWidth: noborder ? 0 : borderWidth
       },
       style,
       {
@@ -298,12 +300,14 @@ export const Pressable = ({
       borderColor,
       borderWidth,
       style,
-      growFactor
+      growFactor,
+      disabled
     ]
   );
 
   return hidden ? null : (
     <RNPressable
+      {...props}
       testID={testID}
       ref={fwdRef}
       disabled={disabled}

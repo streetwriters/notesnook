@@ -26,8 +26,8 @@ import {
   DraxListRenderItemContent
 } from "react-native-drax";
 
-import { tabBarRef } from "../../utils/global-refs";
-import { SIZE } from "../../utils/size";
+import { fluidTabsRef } from "../../utils/global-refs";
+import { AppFontSize } from "../../utils/size";
 import { useSideBarDraggingStore } from "../side-menu/dragging-store";
 import { IconButton } from "../ui/icon-button";
 
@@ -61,9 +61,9 @@ function ReorderableList<T extends { id: string }>({
   const listRef = useRef<FlatList | null>(null);
 
   if (dragging) {
-    tabBarRef.current?.lock();
+    fluidTabsRef.current?.lock();
   } else {
-    tabBarRef.current?.unlock();
+    fluidTabsRef.current?.unlock();
   }
 
   useEffect(() => {
@@ -79,13 +79,14 @@ function ReorderableList<T extends { id: string }>({
         <View
           style={{
             flexDirection: "row",
-            paddingHorizontal: 12
+            width: "100%"
           }}
         >
           <View
             style={{
+              opacity: isHidden ? 0.4 : 1,
               flexGrow: 1,
-              opacity: isHidden ? 0.4 : 1
+              flexShrink: 1
             }}
           >
             {renderDraggableItem(info, props)}
@@ -94,13 +95,12 @@ function ReorderableList<T extends { id: string }>({
             <IconButton
               name={!isHidden ? "minus" : "plus"}
               color={colors.primary.icon}
-              size={SIZE.lg}
+              size={AppFontSize.lg}
               top={0}
               bottom={0}
               onPress={() => {
                 const _hiddenItems = hiddenItemsState.slice();
                 const index = _hiddenItems.indexOf(info.item.id);
-
                 if (index === -1) {
                   _hiddenItems.push(info.item?.id);
                 } else {

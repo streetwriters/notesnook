@@ -29,7 +29,15 @@ import {
 import { useKeyStore } from "../../interfaces/key-store";
 import { isFeatureSupported } from "../../utils/feature-check";
 import { strings } from "@notesnook/intl";
+import { db } from "../../common/db";
+import { createDialect } from "../../common/sqlite";
+import { getDeviceInfo } from "../../utils/platform";
 
+const IGNORED_ERRORS = [
+  "Error in input stream",
+  "network error",
+  "NetworkError when attempting to fetch resource."
+];
 export function GlobalErrorHandler(props: PropsWithChildren) {
   const { showBoundary } = useErrorBoundary();
 
@@ -42,7 +50,7 @@ export function GlobalErrorHandler(props: PropsWithChildren) {
     function handleUnhandledRejection(e: PromiseRejectionEvent) {
       if (
         e.reason instanceof TypeError &&
-        e.reason.message === "Error in input stream"
+        IGNORED_ERRORS.includes(e.reason.message)
       )
         return;
       showBoundary(e.reason);
@@ -164,9 +172,6 @@ export function ErrorComponent({ error, resetErrorBoundary }: FallbackProps) {
                 variant="secondary"
                 sx={{ alignSelf: "start", px: 30, mt: 1 }}
                 onClick={async () => {
-                  const { getDeviceInfo } = await import(
-                    "../../dialogs/issue-dialog"
-                  );
                   const mailto = new URL("mailto:support@streetwriters.co");
                   mailto.searchParams.set(
                     "body",
@@ -199,7 +204,10 @@ function getErrorHelp(props: FallbackProps) {
     errorText.includes("null function or function signature mismatch") ||
     errorText.includes("malformed database schema") ||
     /table ".+?" already exists/.test(errorText) ||
-    errorText.includes("corrupted migrations:")
+    errorText.includes("corrupted migrations:") ||
+    errorText.includes(
+      "Error while decrypting the ciphertext provided to safeStorage.decryptString"
+    )
   ) {
     return {
       explanation: strings.databaseCorruptExplain(),
@@ -223,7 +231,6 @@ function getErrorHelp(props: FallbackProps) {
       explanation: strings.searchIndexCorrupt(),
       action: strings.searchIndexCorruptFix(),
       fix: async () => {
-        const { db } = await import("../../common/db");
         await db.lookup.rebuild();
         resetErrorBoundary();
       }
@@ -240,8 +247,7 @@ function errorToString(error: unknown) {
 }
 
 async function resetDatabase() {
-  const { createDialect } = await import("../../common/sqlite");
-  const multiTab = !!globalThis.SharedWorker && isFeatureSupported("opfs");
+  const multiTab = isFeatureSupported("opfs");
   await useKeyStore.getState().clear();
   const dialect = createDialect({
     name: "notesnook",

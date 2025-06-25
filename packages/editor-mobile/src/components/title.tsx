@@ -17,8 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { getFontById } from "@notesnook/editor";
-import { replaceDateTime } from "@notesnook/editor";
+import { getFontById, replaceDateTime } from "@notesnook/editor";
 import React, { RefObject, useCallback, useEffect, useRef } from "react";
 import { EditorController } from "../hooks/useEditorController";
 import { useTabContext } from "../hooks/useTabStore";
@@ -92,7 +91,7 @@ function Title({
           paddingRight: 10,
           paddingLeft: 10,
           fontWeight: 600,
-          fontFamily: getFontById(fontFamily)?.font || "Open Sans",
+          fontFamily: getFontById(fontFamily)?.font || "Inter",
           boxSizing: "border-box",
           fontSize: 25,
           zIndex: -1,
@@ -123,7 +122,7 @@ function Title({
           paddingRight: 10,
           paddingLeft: 10,
           fontWeight: 600,
-          fontFamily: getFontById(fontFamily)?.font || "Open Sans",
+          fontFamily: getFontById(fontFamily)?.font || "Inter",
           backgroundColor: "transparent",
           color: "var(--nn_primary_heading)",
           caretColor: "var(--nn_primary_accent)",

@@ -23,22 +23,20 @@
     "@notesnook/theme": "file:../theme"
   },
   "devDependencies": {
-    "mac-scrollbar": "^0.10.3",
-    "framer-motion": "^10.6.8",
-    "@mdi/js": "^7.2.96",
-    "@types/react": "^18.2.39",
-    "@types/react-dom": "^18.2.17",
+    "mac-scrollbar": "0.13.6",
+    "@mdi/js": "7.4.47",
+    "@types/react": "18.3.5",
+    "@types/react-dom": "18.3.0",
     "@types/react-modal": "3.16.3",
-    "@theme-ui/components": "^0.16.1",
-    "@theme-ui/core": "^0.16.1",
+    "@theme-ui/components": "0.16.1",
+    "@theme-ui/core": "0.16.1",
     "@emotion/react": "11.11.1",
-    "react-modal": "3.16.1",
-    "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-modal": "3.16.3",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
   },
   "peerDependencies": {
     "mac-scrollbar": ">=0.10",
-    "framer-motion": ">=10",
     "react-modal": ">=3",
     "@mdi/js": ">=7",
     "@emotion/react": ">=11",

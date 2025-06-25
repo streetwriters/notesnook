@@ -30,13 +30,8 @@ import { Features } from "../../buy-dialog/features";
 import { ConfirmDialog } from "../../confirm";
 import { BuyDialog } from "../../buy-dialog";
 import { strings } from "@notesnook/intl";
+import { PromptDialog } from "../../prompt";
 
-const PROVIDER_MAP = {
-  0: "Streetwriters",
-  1: "iOS",
-  2: "Android",
-  3: "Web"
-} as const;
 export function SubscriptionStatus() {
   const user = useUserStore((store) => store.user);
 
@@ -44,7 +39,8 @@ export function SubscriptionStatus() {
     await db.user.activateTrial();
   });
 
-  const provider = PROVIDER_MAP[user?.subscription?.provider || 0];
+  const provider =
+    strings.subscriptionProviderInfo[user?.subscription?.provider || 0];
   const {
     isTrial,
     isBeta,
@@ -72,7 +68,7 @@ export function SubscriptionStatus() {
     const expiryDate = dayjs(user?.subscription?.expiry).format("MMMM D, YYYY");
     const startDate = dayjs(user?.subscription?.start).format("MMMM D, YYYY");
     return isPro
-      ? provider === "Streetwriters"
+      ? provider.type === "Streetwriters" || provider.type === "Gift card"
         ? `Ending on ${expiryDate}`
         : `Next payment on ${expiryDate}.`
       : isProCancelled
@@ -131,11 +127,13 @@ export function SubscriptionStatus() {
           notebooks & tags.`
             : "Access only to basic features including unlimited notes & end-to-end encrypted syncing to unlimited devices."}
         </Text>
-        <Text sx={{ mt: 2 }} variant="subBody">
-          {subtitle}
-        </Text>
+        {remainingDays > 0 && (isPro || isProCancelled) ? (
+          <Text sx={{ mt: 2 }} variant="subBody">
+            {subtitle}. {provider.desc()}
+          </Text>
+        ) : null}
         <Flex sx={{ gap: 1, mt: 2 }}>
-          {provider === "Web" && (isPro || isProCancelled) ? (
+          {provider.type === "Web" && (isPro || isProCancelled) ? (
             <>
               {isPro && (
                 <Button
@@ -209,6 +207,26 @@ export function SubscriptionStatus() {
                   )}
                 </Button>
               )}
+              <Button
+                variant="secondary"
+                onClick={async () => {
+                  const giftCode = await PromptDialog.show({
+                    title: strings.redeemGiftCode(),
+                    description: strings.redeemGiftCodeDesc()
+                  });
+                  if (giftCode) {
+                    await TaskManager.startTask({
+                      type: "modal",
+                      title: strings.redeemingGiftCode(),
+                      subtitle: strings.pleaseWait() + "...",
+                      action: () => db.subscriptions.redeemCode(giftCode)
+                    }).catch((e) => showToast("error", e.message));
+                  }
+                }}
+                sx={{ bg: "background" }}
+              >
+                {strings.redeemGiftCode()}
+              </Button>
             </>
           )}
         </Flex>

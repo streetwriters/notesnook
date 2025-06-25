@@ -32,10 +32,18 @@ function Home() {
   const isCompact = useStore((store) => store.viewMode === "compact");
   const refresh = useStore((store) => store.refresh);
   const setContext = useStore((store) => store.setContext);
-  const filteredItems = useSearch("notes", (query) => {
-    if (useStore.getState().context) return;
-    return db.lookup.notes(query).sorted();
-  });
+  const filteredItems = useSearch(
+    "notes",
+    async (query, sortOptions) => {
+      if (useStore.getState().context) return;
+      return await db.lookup.notesWithHighlighting(
+        query,
+        db.notes.all,
+        sortOptions
+      );
+    },
+    [notes]
+  );
 
   useNavigate("home", setContext);
 
@@ -43,31 +51,16 @@ function Home() {
     useStore.getState().refresh();
   }, []);
 
-  // useEffect(() => {
-  //   (async function () {
-
-  //     // const titles =
-  //     //   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".split("");
-  //     // for (let i = 0; i < 10000; ++i) {
-  //     //   await db.notes.add({
-  //     //     title: `${
-  //     //       titles[getRandom(0, titles.length)]
-  //     //     } Some other title of mine`
-  //     //   });
-  //     //   if (i % 100 === 0) console.log(i);
-  //     // }
-  //     // console.log("DONE");
-  //   })();
-  // }, []);
-
   if (!notes) return <ListLoader />;
   return (
     <ListContainer
+      type="home"
       group="home"
       compact={isCompact}
       refresh={refresh}
       items={filteredItems || notes}
-      placeholder={<Placeholder context="notes" />}
+      isSearching={!!filteredItems}
+      placeholder={<Placeholder context={filteredItems ? "search" : "notes"} />}
       button={{
         onClick: () => useEditorStore.getState().newSession()
       }}

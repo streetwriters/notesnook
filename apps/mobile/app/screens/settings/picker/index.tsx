@@ -20,16 +20,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useThemeColors } from "@notesnook/theme";
 import React, { useRef, useState } from "react";
 import { View } from "react-native";
-import Menu, { MenuItem } from "react-native-reanimated-material-menu";
+import { Menu, MenuItem } from "react-native-material-menu";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { Dialog } from "../../../components/dialog";
 import { Pressable } from "../../../components/ui/pressable";
 import Paragraph from "../../../components/ui/typography/paragraph";
 import PremiumService from "../../../services/premium";
 import { getColorLinearShade } from "../../../utils/colors";
-import { SIZE } from "../../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 import { verifyUser } from "../functions";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 interface PickerOptions<T> {
   getValue: () => T;
@@ -96,7 +97,7 @@ export function SettingsPicker<T>({
         ref={menuRef}
         animationDuration={200}
         style={{
-          borderRadius: 5,
+          borderRadius: defaultBorderRadius,
           backgroundColor: colors.primary.background,
           width: width,
           marginTop: 60,
@@ -121,14 +122,18 @@ export function SettingsPicker<T>({
             style={{
               flexDirection: "row",
               alignItems: "center",
-              marginTop: 10,
               width: "100%",
               justifyContent: "space-between",
-              padding: 12
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL,
+              paddingHorizontal: DefaultAppStyles.GAP
             }}
           >
             <Paragraph>{formatValue(currentValue)}</Paragraph>
-            <Icon color={colors.primary.icon} name="menu-down" size={SIZE.md} />
+            <Icon
+              color={colors.primary.icon}
+              name="menu-down"
+              size={AppFontSize.md}
+            />
           </Pressable>
         }
       >
@@ -146,7 +151,7 @@ export function SettingsPicker<T>({
                 onChange(item);
               }
             }}
-            underlayColor={colors.primary.hover}
+            pressColor={colors.primary.hover}
             style={{
               backgroundColor: compareValue(currentValue, item)
                 ? colors.selected.background
@@ -155,7 +160,8 @@ export function SettingsPicker<T>({
               maxWidth: width
             }}
             textStyle={{
-              fontSize: SIZE.md,
+              fontSize: AppFontSize.sm,
+              fontFamily: "Inter-Regular",
               color: compareValue(currentValue, item)
                 ? colors.primary.accent
                 : colors.primary.paragraph

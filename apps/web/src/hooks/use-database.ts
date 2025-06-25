@@ -19,12 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { initializeDatabase } from "../common/db";
 
-const memory = {
-  isDatabaseLoaded: false
-};
-export async function loadDatabase(persistence: "db" | "memory" = "db") {
-  if (memory.isDatabaseLoaded) return;
-
-  await initializeDatabase(persistence);
-  memory.isDatabaseLoaded = true;
+let isDatabaseLoaded: false | Promise<any> = false;
+export function loadDatabase(persistence: "db" | "memory" = "db") {
+  isDatabaseLoaded = isDatabaseLoaded || initializeDatabase(persistence);
+  return isDatabaseLoaded;
 }

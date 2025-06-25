@@ -19,11 +19,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Button, Flex, Text } from "@theme-ui/components";
 import { SaveState, useEditorStore } from "../../stores/editor-store";
-import { Loading, Saved, NotSaved } from "../icons";
-import { useNoteStatistics } from "./manager";
+import { useStore as useAppStore } from "../../stores/app-store";
+import {
+  Loading,
+  Saved,
+  NotSaved,
+  FocusMode,
+  Plus,
+  Minus,
+  EditorNormalWidth,
+  TableOfContents,
+  ExitFullscreen,
+  Fullscreen,
+  EditorFullWidth,
+  NormalMode
+} from "../icons";
+import {
+  useEditorConfig,
+  useNoteStatistics,
+  useEditorManager
+} from "./manager";
 import { getFormattedDate } from "@notesnook/common";
 import { MAX_AUTO_SAVEABLE_WORDS } from "./types";
 import { strings } from "@notesnook/intl";
+import { EDITOR_ZOOM } from "./common";
+import { useWindowControls } from "../../hooks/use-window-controls";
+import { exitFullscreen } from "../../utils/fullscreen";
 
 const SAVE_STATE_ICON_MAP = {
   "-1": NotSaved,
@@ -32,17 +53,122 @@ const SAVE_STATE_ICON_MAP = {
 };
 
 function EditorFooter() {
+  const { isFullscreen } = useWindowControls();
   const { words } = useNoteStatistics();
   const session = useEditorStore((store) => store.getActiveSession());
+  const { editorConfig, setEditorConfig } = useEditorConfig();
+  const editorMargins = useEditorStore((store) => store.editorMargins);
+  const isFocusMode = useAppStore((store) => store.isFocusMode);
+
   if (!session) return null;
 
   const saveState =
     session.type === "default" ? session.saveState : SaveState.NotSaved;
   const dateEdited = "note" in session ? session.note.dateEdited : 0;
   const SaveStateIcon = SAVE_STATE_ICON_MAP[saveState];
+  const tools = [
+    {
+      title: editorMargins
+        ? strings.disableEditorMargins()
+        : strings.enableEditorMargins(),
+      icon: editorMargins ? EditorNormalWidth : EditorFullWidth,
+      enabled: true,
+      hideOnMobile: true,
+      onClick: () => useEditorStore.getState().toggleEditorMargins()
+    },
+    {
+      title: isFullscreen
+        ? strings.exitFullScreen()
+        : strings.enterFullScreen(),
+      icon: isFullscreen ? ExitFullscreen : Fullscreen,
+      enabled: true,
+      hidden: !isFocusMode,
+      hideOnMobile: true,
+      onClick: () => {
+        if (isFullscreen) {
+          exitFullscreen();
+        } else {
+          enterFullscreen(document.documentElement);
+        }
+      }
+    },
+    {
+      title: isFocusMode ? strings.normalMode() : strings.focusMode(),
+      icon: isFocusMode ? FocusMode : NormalMode,
+      enabled: true,
+      hideOnMobile: true,
+      onClick: () => useAppStore.getState().toggleFocusMode()
+    }
+  ];
 
   return (
     <Flex sx={{ alignItems: "center", justifyContent: "center", gap: 2 }}>
+      <Flex
+        sx={{
+          alignItems: "center",
+          justifyContent: "center",
+          flex: 1,
+          height: "100%"
+        }}
+      >
+        {tools.map((tool) => (
+          <Button
+            data-test-id={tool.title}
+            disabled={!tool.enabled}
+            title={tool.title}
+            key={tool.title}
+            onClick={tool.onClick}
+            sx={{
+              py: 0,
+              px: 1,
+              height: "100%",
+              display: tool.hidden ? "none" : "block"
+            }}
+            variant="icon"
+          >
+            <tool.icon size={13} />
+          </Button>
+        ))}
+        <Button
+          variant="icon"
+          onClick={() =>
+            setEditorConfig({
+              zoom: Math.max(
+                EDITOR_ZOOM.MIN,
+                editorConfig.zoom - EDITOR_ZOOM.STEP
+              )
+            })
+          }
+          disabled={editorConfig.zoom <= EDITOR_ZOOM.MIN}
+          sx={{ py: 0, px: 1, height: "100%" }}
+        >
+          <Minus size={13} />
+        </Button>
+        <Button
+          title={strings.clickToReset(strings.zoom().toLocaleLowerCase())}
+          variant="statusitem"
+          onClick={() => setEditorConfig({ zoom: EDITOR_ZOOM.DEFAULT })}
+        >
+          <Text variant="subBody" sx={{ color: "paragraph" }}>
+            {editorConfig.zoom}%{" "}
+          </Text>
+        </Button>
+        <Button
+          variant="icon"
+          onClick={() =>
+            setEditorConfig({
+              zoom: Math.min(
+                EDITOR_ZOOM.MAX,
+                editorConfig.zoom + EDITOR_ZOOM.STEP
+              )
+            })
+          }
+          disabled={editorConfig.zoom >= EDITOR_ZOOM.MAX}
+          sx={{ py: 0, px: 1, height: "100%" }}
+        >
+          <Plus size={13} />
+        </Button>
+      </Flex>
       {words.total > MAX_AUTO_SAVEABLE_WORDS ? (
         <Text
           className="selectable"
@@ -58,8 +184,8 @@ function EditorFooter() {
         variant="subBody"
         sx={{ color: "paragraph" }}
       >
-        {words.total + " " + strings.words()}
-        {words.selected ? ` (${words.selected} ${strings.selected()})` : ""}
+        {strings.totalWords(words.total)}
+        {words.selected ? ` (${strings.selectedWords(words.selected)})` : ""}
       </Text>
       {dateEdited > 0 ? (
         <Text
@@ -74,6 +200,13 @@ function EditorFooter() {
       ) : null}
       {SaveStateIcon && (
         <SaveStateIcon
+          data-test-id={`editor-save-state-${
+            saveState === SaveState.Saved
+              ? "saved"
+              : saveState === SaveState.NotSaved
+              ? "notsaved"
+              : "loading"
+          }`}
           size={13}
           color={
             saveState === SaveState.Saved
@@ -88,3 +221,7 @@ function EditorFooter() {
   );
 }
 export default EditorFooter;
+
+function enterFullscreen(elem: HTMLElement) {
+  elem.requestFullscreen();
+}

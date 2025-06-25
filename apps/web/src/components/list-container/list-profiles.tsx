@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Note from "../note";
-import Notebook from "../notebook";
 import Tag from "../tag";
 import TrashItem from "../trash-item";
 import { db } from "../../common/db";
@@ -28,6 +27,8 @@ import { getSortValue } from "@notesnook/core";
 import { GroupingKey, Item } from "@notesnook/core";
 import { isNoteResolvedData } from "@notesnook/common";
 import { Attachment } from "../attachment";
+import { Notebook } from "../notebook";
+import SearchResult from "../search-result";
 
 const SINGLE_LINE_HEIGHT = 1.4;
 const DEFAULT_LINE_HEIGHT =
@@ -46,6 +47,8 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
   const { group, compact, context, item, data } = props;
 
   switch (item.type) {
+    case "searchResult":
+      return <SearchResult item={item} />;
     case "note": {
       return (
         <Note
@@ -57,17 +60,15 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
         />
       );
     }
+    case "trash":
+      return <TrashItem item={item} date={getDate(item, group)} />;
     case "notebook":
       return (
         <Notebook
           item={item}
           totalNotes={typeof data === "number" ? data : 0}
-          date={getDate(item, group)}
-          compact={compact}
         />
       );
-    case "trash":
-      return <TrashItem item={item} date={getDate(item, group)} />;
     case "reminder":
       return <Reminder item={item} compact={compact} />;
     case "tag":
@@ -147,7 +148,6 @@ function getDate(item: Item, groupType?: GroupingKey): number {
       groupType
         ? db.settings.getGroupOptions(groupType)
         : {
-            groupBy: "default",
             sortBy: "dateEdited",
             sortDirection: "desc"
           },

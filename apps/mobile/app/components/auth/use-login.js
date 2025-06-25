@@ -70,33 +70,41 @@ export const useLogin = (onFinishLogin, sessionExpired = false) => {
       switch (step) {
         case LoginSteps.emailAuth: {
           const mfaInfo = await db.user.authenticateEmail(email.current);
-          console.log("email auth", mfaInfo);
-          if (mfaInfo) {
-            TwoFactorVerification.present(async (mfa, callback) => {
-              try {
-                const success = await db.user.authenticateMultiFactorCode(
-                  mfa.code,
-                  mfa.method
-                );
 
-                if (success) {
-                  setStep(LoginSteps.passwordAuth);
-                  setLoading(false);
-                  setTimeout(() => {
-                    passwordInputRef.current?.focus();
-                  }, 500);
-                  callback && callback(true);
+          if (mfaInfo) {
+            TwoFactorVerification.present(
+              async (mfa, callback) => {
+                try {
+                  const success = await db.user.authenticateMultiFactorCode(
+                    mfa.code,
+                    mfa.method
+                  );
+
+                  if (success) {
+                    setStep(LoginSteps.passwordAuth);
+                    setLoading(false);
+                    setTimeout(() => {
+                      passwordInputRef.current?.focus();
+                    }, 500);
+                    callback && callback(true);
+                  }
+                  callback && callback(false);
+                } catch (e) {
+                  callback && callback(false);
+                  if (e.message === "invalid_grant") {
+                    eSendEvent(eCloseSheet, "two_factor_verify");
+                    setLoading(false);
+                    setStep(LoginSteps.emailAuth);
+                  }
                 }
-                callback && callback(false);
-              } catch (e) {
-                callback && callback(false);
-                if (e.message === "invalid_grant") {
-                  eSendEvent(eCloseSheet, "two_factor_verify");
-                  setLoading(false);
-                  setStep(LoginSteps.emailAuth);
-                }
+              },
+              mfaInfo,
+              () => {
+                eSendEvent(eCloseSheet, "two_factor_verify");
+                setLoading(false);
+                setStep(LoginSteps.emailAuth);
               }
-            }, mfaInfo);
+            );
           } else {
             finishWithError(new Error(strings.unableToSend2faCode()));
           }

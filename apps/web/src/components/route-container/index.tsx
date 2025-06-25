@@ -17,15 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { PropsWithChildren } from "react";
-import { Flex, Text } from "@theme-ui/components";
-import { ArrowLeft, Menu, Search, Plus, Close } from "../icons";
-import { useStore } from "../../stores/app-store";
+import { PropsWithChildren, useEffect, useRef } from "react";
+import { Box } from "@theme-ui/components";
+import { Close, AddReminder } from "../icons";
 import { useStore as useSearchStore } from "../../stores/search-store";
 import useMobile from "../../hooks/use-mobile";
 import { debounce, usePromise } from "@notesnook/common";
 import Field from "../field";
 import { strings } from "@notesnook/intl";
+import { RouteResult } from "../../navigation/types";
+import { CREATE_BUTTON_MAP } from "../../common";
 
 export type RouteContainerButtons = {
   search?: {
@@ -41,16 +42,12 @@ export type RouteContainerButtons = {
   };
 };
 
-export type RouteContainerProps = {
-  type: string;
-  title?: string | (() => Promise<string | undefined>);
-  buttons?: RouteContainerButtons;
-};
+export type RouteContainerProps = RouteResult;
 function RouteContainer(props: PropsWithChildren<RouteContainerProps>) {
-  const { type, title, buttons, children } = props;
+  const { children } = props;
   return (
     <>
-      <Header type={type} title={title} buttons={buttons} />
+      <Header {...props} />
       {children}
     </>
   );
@@ -59,131 +56,105 @@ function RouteContainer(props: PropsWithChildren<RouteContainerProps>) {
 export default RouteContainer;
 
 function Header(props: RouteContainerProps) {
-  const { buttons, type } = props;
+  const { type } = props;
   const titlePromise = usePromise<string | undefined>(
     () => (typeof props.title === "string" ? props.title : props.title?.()),
     [props.title]
   );
-  const toggleSideMenu = useStore((store) => store.toggleSideMenu);
   const isMobile = useMobile();
   const isSearching = useSearchStore((store) => store.isSearching);
   const query = useSearchStore((store) => store.query);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  if (isSearching)
-    return (
-      <Flex
-        sx={{ alignItems: "center", justifyContent: "center", mx: 1, my: 1 }}
-      >
-        <Field
-          data-test-id="search-input"
-          autoFocus
-          id="search"
-          name="search"
-          type="text"
-          sx={{ m: 0, flex: 1 }}
-          styles={{ input: { p: "7px" } }}
-          defaultValue={query}
-          placeholder={strings.typeAKeyword()}
-          onChange={debounce(
-            (e) => useSearchStore.setState({ query: e.target.value }),
-            250
-          )}
-          onKeyUp={(e) => {
-            if (e.key === "Escape")
-              useSearchStore.setState({
-                isSearching: false,
-                searchType: undefined
-              });
-          }}
-          action={{
-            icon: Close,
-            testId: "search-button",
-            onClick: () =>
-              useSearchStore.setState({
-                isSearching: false,
-                searchType: undefined
-              })
-          }}
-        />
-      </Flex>
-    );
+  useEffect(() => {
+    if (inputRef.current && inputRef.current.value !== query) {
+      inputRef.current.value = query || "";
+    }
+  }, [query]);
+
+  useEffect(() => {
+    if (isSearching) inputRef.current?.focus();
+  }, [isSearching]);
 
   return (
-    <Flex
-      className="route-container-header"
-      mx={2}
+    <Box
       sx={{
-        alignItems: "center",
-        justifyContent: "space-between",
-        height: 42.8
+        bg: type === "notebook" ? "background-secondary" : "transparent",
+        zIndex: 2,
+        p: 1
       }}
+      className="route-container-header search-container"
+      data-test-id="routeHeader"
+      data-header={
+        titlePromise.status === "fulfilled" ? titlePromise.value || type : type
+      }
     >
-      <Flex
-        py={1}
+      <Field
+        inputRef={inputRef}
+        data-test-id="search-input"
+        id="search"
+        name="search"
+        type="text"
         sx={{
-          alignItems: "center",
-          justifyContent: "center",
-          overflow: "hidden"
+          bg: "background",
+          m: 0,
+          mr: 0,
+
+          borderRadius: "large",
+          gap: 0
         }}
-      >
-        {buttons?.back ? (
-          <ArrowLeft
-            size={24}
-            {...buttons.back}
-            sx={{ flexShrink: 0, mr: 2, cursor: "pointer" }}
-            data-test-id="go-back"
-          />
-        ) : (
-          <Menu
-            onClick={() => toggleSideMenu(true)}
-            sx={{
-              flexShrink: 0,
-              ml: 0,
-              mr: 4,
-              mt: 1,
-              display: ["block", "none", "none"]
-            }}
-            size={30}
-          />
-        )}
-        {titlePromise.status === "fulfilled" && titlePromise.value && (
-          <Text variant="heading" data-test-id="routeHeader" color="heading">
-            {titlePromise.value}
-          </Text>
-        )}
-      </Flex>
-      <Flex sx={{ flexShrink: 0 }}>
-        {buttons?.search && (
-          <Search
-            data-test-id={"open-search"}
-            size={24}
-            title={buttons.search.title}
-            onClick={() =>
-              useSearchStore.setState({ isSearching: true, searchType: type })
+        styles={{
+          input: {
+            m: 0,
+            p: "7.5px",
+            fontSize: "body",
+            "::placeholder": {
+              textAlign: "center"
+            },
+            "& + .rightActions #search-action-button": {
+              opacity: query ? 1 : 0
+            },
+            "&:focus + .rightActions #search-action-button": {
+              opacity: 1
             }
-            sx={{
-              size: 24,
-              cursor: "pointer"
-            }}
-          />
+          }
+        }}
+        defaultValue={query}
+        placeholder={strings.searchInRoute(
+          titlePromise.status === "fulfilled"
+            ? titlePromise.value || type
+            : type
         )}
-        {!isMobile && buttons?.create && (
-          <Plus
-            data-test-id={`${type}-action-button`}
-            color="accentForeground"
-            size={18}
-            sx={{
-              bg: "accent",
-              ml: 2,
-              borderRadius: 100,
-              size: 28,
-              cursor: "pointer",
-              ":hover": { boxShadow: "0px 0px 5px 0px var(--accent)" }
-            }}
-            {...buttons.create}
-          />
+        onChange={debounce(
+          (e) => useSearchStore.setState({ query: e.target.value }),
+          250
         )}
-      </Flex>
-    </Flex>
+        onKeyUp={(e) => {
+          if (e.key === "Escape") useSearchStore.getState().resetSearch();
+          else useSearchStore.setState({ isSearching: true, searchType: type });
+        }}
+        rightActions={[
+          {
+            icon: Close,
+            id: "search-action-button",
+            testId: "search-button",
+            onClick: () => {
+              if (inputRef.current) inputRef.current.value = "";
+              useSearchStore.getState().resetSearch();
+            },
+            hidden: !Boolean(query)
+          },
+          ...(type === "reminders"
+            ? [
+                {
+                  icon: AddReminder,
+                  testId: "create-reminder-button",
+                  ...CREATE_BUTTON_MAP.reminders
+                }
+              ]
+            : [])
+        ]}
+      />
+    </Box>
   );
 }

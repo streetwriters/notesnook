@@ -1,0 +1,6 @@
+- New and improved editor tabs with history
+- Fixed a crash on app launch faced by some users
+- Fixed homescreen note widget does not open correct note
+- Many small bug fixes and improvements
+
+Thank you for using Notesnook!

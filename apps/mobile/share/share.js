@@ -43,7 +43,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import isURL from "validator/lib/isURL";
 import { DatabaseLogger, db } from "../app/common/database";
-import Storage from "../app/common/database/storage";
+import { Storage } from "../app/common/database/storage";
 import { Button } from "../app/components/ui/button";
 import Heading from "../app/components/ui/typography/heading";
 import Paragraph from "../app/components/ui/typography/paragraph";
@@ -52,7 +52,7 @@ import { eSendEvent } from "../app/services/event-manager";
 import { FILE_SIZE_LIMIT, IMAGE_SIZE_LIMIT } from "../app/utils/constants";
 import { eOnLoadNote } from "../app/utils/events";
 import { NoteBundle } from "../app/utils/note-bundle";
-import { SIZE } from "../app/utils/size";
+import { defaultBorderRadius, AppFontSize } from "../app/utils/size";
 import { AddNotebooks } from "./add-notebooks";
 import { AddTags } from "./add-tags";
 import { Editor } from "./editor";
@@ -307,7 +307,7 @@ const ShareView = () => {
 
       noteData = {
         content: {
-          data: (rawContent?.data || "") + noteContent.current,
+          data: (rawContent?.data || "") + "<br/>" + noteContent.current,
           type: "tiptap"
         },
         id: note.id,
@@ -492,7 +492,7 @@ const ShareView = () => {
                         flexShrink: 1,
                         flexGrow: 1,
                         fontFamily: "OpenSans-SemiBold",
-                        fontSize: SIZE.lg,
+                        fontSize: AppFontSize.lg,
                         paddingBottom: 0,
                         paddingTop: 0
                       }}
@@ -507,7 +507,7 @@ const ShareView = () => {
                         flexShrink: 1,
                         flexGrow: 1,
                         fontFamily: "OpenSans-SemiBold",
-                        fontSize: SIZE.lg,
+                        fontSize: AppFontSize.lg,
                         paddingBottom: 0,
                         paddingTop: 0,
                         color: colors.primary.heading
@@ -546,7 +546,7 @@ const ShareView = () => {
                     </Paragraph>
                     <ScrollView horizontal>
                       {rawFiles.map((item) =>
-                        isImage(item.type) ? (
+                        isImage(item.type) || item.value?.endsWith(".png") ? (
                           <TouchableOpacity
                             onPress={() => onRemoveFile(item)}
                             key={item.name}
@@ -562,7 +562,7 @@ const ShareView = () => {
                               style={{
                                 width: 100,
                                 height: 100,
-                                borderRadius: 5,
+                                borderRadius: defaultBorderRadius,
                                 backgroundColor: "black",
                                 marginRight: 6
                               }}
@@ -578,7 +578,7 @@ const ShareView = () => {
                             }}
                             onPress={() => onRemoveFile(item)}
                             style={{
-                              borderRadius: 5,
+                              borderRadius: defaultBorderRadius,
                               backgroundColor: colors.secondary.background,
                               flexDirection: "row",
                               borderWidth: 1,
@@ -597,14 +597,15 @@ const ShareView = () => {
                             />
 
                             <Paragraph
-                              size={SIZE.xs}
+                              size={AppFontSize.xs}
                               color={colors.primary.paragraph}
                               style={{
                                 marginLeft: 4,
                                 paddingRight: 8
                               }}
                             >
-                              {item.name} ({formatBytes(item.size)})
+                              {item.name || item.value.split("/").pop()}
+                              {item.size ? `(${formatBytes(item.size)})` : ""}
                             </Paragraph>
                           </TouchableOpacity>
                         )
@@ -613,48 +614,52 @@ const ShareView = () => {
 
                     <Paragraph
                       color={colors.secondary.paragraph}
-                      size={SIZE.xs}
+                      size={AppFontSize.xs}
                       style={{
                         marginTop: 6
                       }}
                     >
                       Tap to remove an attachment.
                     </Paragraph>
-                    <TouchableOpacity
-                      activeOpacity={1}
-                      style={{
-                        flexDirection: "row",
-                        alignSelf: "center",
-                        alignItems: "center",
-                        width: "100%",
-                        marginTop: 6
-                      }}
-                      onPress={() => {
-                        setCompress(!compress);
-                      }}
-                    >
-                      <Icon
-                        size={20}
-                        name={
-                          compress
-                            ? "checkbox-marked"
-                            : "checkbox-blank-outline"
-                        }
-                        color={
-                          compress ? colors.primary.accent : colors.primary.icon
-                        }
-                      />
-
-                      <Text
+                    {rawFiles.some((item) => isImage(item.type)) ? (
+                      <TouchableOpacity
+                        activeOpacity={1}
                         style={{
-                          flexShrink: 1,
-                          marginLeft: 3,
-                          fontSize: 12
+                          flexDirection: "row",
+                          alignSelf: "center",
+                          alignItems: "center",
+                          width: "100%",
+                          marginTop: 6
+                        }}
+                        onPress={() => {
+                          setCompress(!compress);
                         }}
                       >
-                        Compress image (recommended)
-                      </Text>
-                    </TouchableOpacity>
+                        <Icon
+                          size={20}
+                          name={
+                            compress
+                              ? "checkbox-marked"
+                              : "checkbox-blank-outline"
+                          }
+                          color={
+                            compress
+                              ? colors.primary.accent
+                              : colors.primary.icon
+                          }
+                        />
+
+                        <Text
+                          style={{
+                            flexShrink: 1,
+                            marginLeft: 3,
+                            fontSize: 12
+                          }}
+                        >
+                          Compress image(s) (recommended)
+                        </Text>
+                      </TouchableOpacity>
+                    ) : null}
                   </View>
                 ) : null}
                 <View
@@ -842,7 +847,7 @@ const AppendNote = ({ id, onLoad }) => {
 
   return !item ? null : (
     <Paragraph
-      size={SIZE.xs}
+      size={AppFontSize.xs}
       color={colors.secondary.paragraph}
       style={{
         paddingHorizontal: 12,
@@ -852,7 +857,7 @@ const AppendNote = ({ id, onLoad }) => {
     >
       Above content will append to{" "}
       <Paragraph
-        size={SIZE.xs}
+        size={AppFontSize.xs}
         style={{
           color: colors.primary.accent,
           fontWeight: "bold"

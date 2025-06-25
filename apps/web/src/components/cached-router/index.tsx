@@ -18,12 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useEffect, useRef } from "react";
-import { getHomeRoute, NavigationEvents } from "../../navigation";
+import { getHomeRoute, navigate, NavigationEvents } from "../../navigation";
 import { store as selectionStore } from "../../stores/selection-store";
+import { useStore as useSearchStore } from "../../stores/search-store";
 import useRoutes from "../../hooks/use-routes";
 import RouteContainer from "../route-container";
 import routes from "../../navigation/routes";
-import { isRouteResult } from "../../navigation/types";
 import { Freeze } from "react-freeze";
 import { Flex } from "@theme-ui/components";
 
@@ -31,7 +31,16 @@ function CachedRouter() {
   const [RouteResult, location] = useRoutes(routes, {
     fallbackRoute: getHomeRoute(),
     hooks: {
-      beforeNavigate: () => selectionStore.toggleSelectionMode(false)
+      beforeNavigate: (location) => {
+        selectionStore.toggleSelectionMode(false);
+        useSearchStore.getState().resetSearch();
+        if (location === "/") {
+          console.log("Redirecting to", getHomeRoute());
+          navigate(getHomeRoute());
+          return false;
+        }
+        return true;
+      }
     }
   });
   const cachedRoutes = useRef<Record<string, React.FunctionComponent>>({});
@@ -41,17 +50,17 @@ function CachedRouter() {
     NavigationEvents.publish("onNavigate", RouteResult, location);
   }, [RouteResult, location]);
 
-  if (!RouteResult || !isRouteResult(RouteResult)) return null;
-  if (RouteResult.key === "general" || !cachedRoutes.current[RouteResult.key])
+  if (!RouteResult) return null;
+  if (
+    RouteResult.key === "general" ||
+    !cachedRoutes.current[RouteResult.key] ||
+    RouteResult.noCache
+  )
     cachedRoutes.current[RouteResult.key] =
       RouteResult.component as React.FunctionComponent;
 
   return (
-    <RouteContainer
-      type={RouteResult.type}
-      title={RouteResult.title}
-      buttons={RouteResult.buttons}
-    >
+    <RouteContainer {...RouteResult}>
       {Object.entries(cachedRoutes.current).map(([key, Component]) => (
         <Freeze key={key} freeze={key !== RouteResult.key}>
           <Flex
@@ -71,4 +80,4 @@ function CachedRouter() {
   );
 }
 
-export default React.memo(CachedRouter, () => true);
+export default React.memo(CachedRouter);

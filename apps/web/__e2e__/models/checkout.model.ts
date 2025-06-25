@@ -101,6 +101,10 @@ class PricingModel {
     });
   }
 
+  async waitForPaddleFrame() {
+    await getPaddleFrame(this.page);
+  }
+
   getTitle() {
     return this.title.textContent();
   }

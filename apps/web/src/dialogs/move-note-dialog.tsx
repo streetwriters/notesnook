@@ -38,30 +38,27 @@ import { showToast } from "../utils/toast";
 import { isMac } from "../utils/platform";
 import { create } from "zustand";
 import { Notebook } from "@notesnook/core";
-import {
-  UncontrolledTreeEnvironment,
-  Tree,
-  TreeItemIndex,
-  TreeEnvironmentRef
-} from "react-complex-tree";
-import { FlexScrollContainer } from "../components/scroll-container";
-import { pluralize } from "@notesnook/common";
 import Field from "../components/field";
 import { AddNotebookDialog } from "./add-notebook-dialog";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
+import {
+  TreeNode,
+  VirtualizedTree,
+  VirtualizedTreeHandle
+} from "../components/virtualized-tree";
 
 type MoveNoteDialogProps = BaseDialogProps<boolean> & { noteIds: string[] };
-type NotebookReference = {
+export type SelectedReference = {
   id: string;
   new: boolean;
   op: "add" | "remove";
 };
 
 interface ISelectionStore {
-  selected: NotebookReference[];
+  selected: SelectedReference[];
   isMultiselect: boolean;
-  setSelected(refs: NotebookReference[]): void;
+  setSelected(refs: SelectedReference[]): void;
   setIsMultiselect(state: boolean): void;
 }
 export const useSelectionStore = create<ISelectionStore>((set) => ({
@@ -79,8 +76,7 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
   const setIsMultiselect = useSelectionStore((store) => store.setIsMultiselect);
   const isMultiselect = useSelectionStore((store) => store.isMultiselect);
   const refreshNotebooks = useStore((store) => store.refresh);
-  const reloadItem = useRef<(changedItemIds: TreeItemIndex[]) => void>();
-  const treeRef = useRef<TreeEnvironmentRef>(null);
+  const treeRef = useRef<VirtualizedTreeHandle<Notebook>>(null);
   const [notebooks, setNotebooks] = useState<string[]>([]);
 
   useEffect(() => {
@@ -91,7 +87,7 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
 
   useEffect(() => {
     (async function () {
-      const selected: NotebookReference[] = useSelectionStore
+      const selected: SelectedReference[] = useSelectionStore
         .getState()
         .selected.slice();
 
@@ -116,6 +112,10 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
     })();
   }, [noteIds, refreshNotebooks, setSelected, setIsMultiselect]);
 
+  useEffect(() => {
+    treeRef.current?.refresh();
+  }, [notebooks]);
+
   const _onClose = useCallback(
     (result: boolean) => {
       setSelected([]);
@@ -132,7 +132,8 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
       title={strings.selectNotebooks()}
       description={strings.selectNotebooksDesktopDesc(isMac() ? "Cmd" : "Ctrl")}
       onClose={() => _onClose(false)}
-      width={450}
+      width={500}
+      noScroll
       positiveButton={{
         text: strings.done(),
         onClick: async () => {
@@ -153,11 +154,13 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
           await noteStore.refresh();
           await notebookStore.refresh();
 
-          const stringified = stringifySelected(selected);
-          if (stringified) {
+          const added = selected.filter((a) => a.new && a.op === "add").length;
+          const removed = selected.filter((a) => a.op === "remove").length;
+
+          if (added > 0 || removed > 0) {
             showToast(
               "success",
-              `${strings.notes(noteIds.length)} ${stringified}`
+              strings.assignedToNotebookMessage(noteIds.length, added, removed)
             );
           }
 
@@ -169,170 +172,136 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
         onClick: () => _onClose(false)
       }}
     >
-      <Field
-        autoFocus
-        sx={{ m: 0, mb: 2 }}
-        styles={{
-          input: { p: "7.5px" }
+      <Flex
+        id="subnotebooks"
+        variant="columnFill"
+        sx={{
+          height: "80vh",
+          px: 4
         }}
-        placeholder={strings.searchNotebooks()}
-        onChange={async (e) => {
-          const query = e.target.value.trim();
-          const ids = await (query
-            ? db.lookup.notebooks(query).ids()
-            : db.notebooks.roots.ids(db.settings.getGroupOptions("notebooks")));
-          setNotebooks(ids);
-          reloadItem.current?.(["root"]);
-        }}
-      />
-      {isMultiselect && (
-        <Button
-          variant="anchor"
-          onClick={() => {
-            const originalSelection: NotebookReference[] = useSelectionStore
-              .getState()
-              .selected.filter((a) => !a.new)
-              .map((s) => ({ ...s, op: "add" }));
-            setSelected(originalSelection);
-            setIsMultiselect(originalSelection.length > 1);
+      >
+        <Field
+          autoFocus
+          sx={{ m: 0, mb: 2 }}
+          styles={{
+            input: { p: "7.5px" }
           }}
-          sx={{ textDecoration: "none", mb: 2 }}
-        >
-          {strings.resetSelection()}
-        </Button>
-      )}
-      {notebooks.length > 0 ? (
-        <FlexScrollContainer>
-          <UncontrolledTreeEnvironment
-            ref={treeRef}
-            dataProvider={{
-              onDidChangeTreeData(listener) {
-                reloadItem.current = listener;
-                return {
-                  dispose() {
-                    reloadItem.current = undefined;
+          placeholder={strings.searchNotebooks()}
+          onChange={async (e) => {
+            const query = e.target.value.trim();
+            const ids = await (query
+              ? db.lookup.notebooks(query).ids()
+              : db.notebooks.roots.ids(
+                  db.settings.getGroupOptions("notebooks")
+                ));
+            setNotebooks(ids);
+          }}
+        />
+        {isMultiselect && (
+          <Button
+            variant="anchor"
+            onClick={() => {
+              const originalSelection: SelectedReference[] = useSelectionStore
+                .getState()
+                .selected.filter((a) => !a.new)
+                .map((s) => ({ ...s, op: "add" }));
+              setSelected(originalSelection);
+              setIsMultiselect(originalSelection.length > 1);
+            }}
+            sx={{ textDecoration: "none", mb: 2 }}
+          >
+            {strings.resetSelection()}
+          </Button>
+        )}
+        {notebooks.length > 0 ? (
+          <>
+            <VirtualizedTree
+              rootId={"root"}
+              itemHeight={30}
+              treeRef={treeRef}
+              getChildNodes={async ({ id, depth }) => {
+                const nodes: TreeNode<Notebook>[] = [];
+                if (id === "root") {
+                  for (const id of notebooks) {
+                    const notebook = (await db.notebooks.notebook(id))!;
+                    const children = await db.relations
+                      .from(notebook, "notebook")
+                      .count();
+                    nodes.push({
+                      data: notebook,
+                      depth: depth + 1,
+                      hasChildren: children > 0,
+                      id,
+                      parentId: "root"
+                    });
                   }
-                };
-              },
-              async getTreeItem(itemId) {
-                if (itemId === "root") {
-                  return {
-                    data: { title: "Root" },
-                    index: itemId,
-                    isFolder: true,
-                    canMove: false,
-                    canRename: false,
-                    children: notebooks
-                  };
+                  return nodes;
                 }
 
-                const notebook = (await db.notebooks.notebook(
-                  itemId as string
-                ))!;
-                const children = await db.relations
-                  .from({ type: "notebook", id: itemId as string }, "notebook")
-                  .get();
-                return {
-                  index: itemId,
-                  data: notebook,
-                  children: children.map((i) => i.toId),
-                  isFolder: children.length > 0
-                };
-              },
-              async getTreeItems(itemIds) {
-                const records = await db.notebooks.all.records(
-                  itemIds as string[],
-                  db.settings.getGroupOptions("notebooks")
-                );
-                const children = await db.relations
-                  .from(
-                    { type: "notebook", ids: itemIds as string[] },
-                    "notebook"
-                  )
-                  .get();
-                return itemIds.filter(Boolean).map((id) => {
-                  if (id === "root") {
-                    return {
-                      data: { title: "Root" },
-                      index: id,
-                      isFolder: true,
-                      canMove: false,
-                      canRename: false,
-                      children: notebooks
-                    };
-                  }
+                const subNotebooks = await db.relations
+                  .from({ type: "notebook", id }, "notebook")
+                  .resolve();
 
-                  const notebook = records[id];
-                  const subNotebooks = children
-                    .filter((r) => r.fromId === id)
-                    .map((r) => r.toId);
-                  // const totalNotes = allChildren.filter(
-                  //   (r) => r.fromId === id && r.toType === "note"
-                  // ).length;
-                  return {
-                    index: id,
+                for (const notebook of subNotebooks) {
+                  const hasChildren =
+                    (await db.relations.from(notebook, "notebook").count()) > 0;
+                  nodes.push({
+                    parentId: id,
+                    id: notebook.id,
                     data: notebook,
-                    children: subNotebooks,
-                    isFolder: subNotebooks.length > 0
-                  };
-                });
-              }
-            }}
-            renderItem={(props) => (
-              <>
-                <NotebookItem
-                  notebook={props.item.data as any}
-                  depth={props.depth}
-                  isExpandable={props.item.isFolder || false}
-                  isExpanded={props.context.isExpanded || false}
-                  toggle={props.context.toggleExpandedState}
-                  onCreateItem={() => {
-                    console.log([props.item.index]);
-                    reloadItem.current?.([props.item.index]);
-                    treeRef.current?.expandItem(
-                      props.item.index,
-                      props.info.treeId
-                    );
-                  }}
-                />
+                    depth: depth + 1,
+                    hasChildren
+                  });
+                }
 
-                {props.children}
-              </>
-            )}
-            getItemTitle={(item) => item.data.title}
-            viewState={{}}
+                return nodes;
+              }}
+              renderItem={({ item, expanded, index, collapse, expand }) => (
+                <NotebookItem
+                  notebook={item.data}
+                  depth={item.depth}
+                  isExpandable={item.hasChildren}
+                  isExpanded={expanded}
+                  toggle={expanded ? collapse : expand}
+                  onCreateItem={() => {
+                    treeRef.current?.refreshItem(index, item.data, {
+                      expand: true
+                    });
+                  }}
+                  multiSelectable
+                />
+              )}
+            />
+          </>
+        ) : (
+          <Flex
+            sx={{
+              my: 2,
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center"
+            }}
           >
-            <Tree treeId={"root"} rootItem="root" treeLabel="Tree Example" />
-          </UncontrolledTreeEnvironment>
-        </FlexScrollContainer>
-      ) : (
-        <Flex
-          sx={{
-            my: 2,
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center"
-          }}
-        >
-          <Text variant="body">{strings.notebooksEmpty()}</Text>
-          <Button
-            data-test-id="add-new-notebook"
-            variant="secondary"
-            sx={{ mt: 2 }}
-            onClick={() =>
-              AddNotebookDialog.show({}).then((res) =>
-                res
-                  ? db.notebooks.roots
-                      .ids(db.settings.getGroupOptions("notebooks"))
-                      .then((ids) => setNotebooks(ids))
-                  : null
-              )
-            }
-          >
-            {strings.addNotebook()}
-          </Button>
-        </Flex>
-      )}
+            <Text variant="body">{strings.notebooksEmpty()}</Text>
+            <Button
+              data-test-id="add-new-notebook"
+              variant="secondary"
+              sx={{ mt: 2 }}
+              onClick={() =>
+                AddNotebookDialog.show({}).then((res) =>
+                  res
+                    ? db.notebooks.roots
+                        .ids(db.settings.getGroupOptions("notebooks"))
+                        .then((ids) => setNotebooks(ids))
+                    : null
+                )
+              }
+            >
+              {strings.addNotebook()}
+            </Button>
+          </Flex>
+        )}
+      </Flex>
     </Dialog>
   );
 });
@@ -342,20 +311,28 @@ function calculateIndentation(
   depth: number,
   base: number
 ) {
-  if (expandable && depth > 0) return depth * 7 + base;
+  if (expandable && depth > 0) return depth * 18 + base;
   else if (depth === 0) return 0;
-  else return depth * 12 + base;
+  else return depth * 24 + base;
 }
-function NotebookItem(props: {
+export function NotebookItem(props: {
   notebook: Notebook;
   isExpanded: boolean;
   isExpandable: boolean;
   toggle: () => void;
   depth: number;
   onCreateItem: () => void;
+  multiSelectable?: boolean;
 }) {
-  const { notebook, isExpanded, toggle, depth, isExpandable, onCreateItem } =
-    props;
+  const {
+    notebook,
+    isExpanded,
+    toggle,
+    depth,
+    isExpandable,
+    onCreateItem,
+    multiSelectable
+  } = props;
 
   const setIsMultiselect = useSelectionStore((store) => store.setIsMultiselect);
   const setSelected = useSelectionStore((store) => store.setSelected);
@@ -371,13 +348,13 @@ function NotebookItem(props: {
       const isCtrlPressed = e.ctrlKey || e.metaKey;
       if (isCtrlPressed) setIsMultiselect(true);
 
-      if (isMultiselect || isCtrlPressed) {
+      if (multiSelectable && (isMultiselect || isCtrlPressed)) {
         setSelected(selectMultiple(notebook, selected));
       } else {
         setSelected(selectSingle(notebook, selected));
       }
     },
-    [isMultiselect, notebook, setIsMultiselect, setSelected]
+    [isMultiselect, multiSelectable, notebook, setIsMultiselect, setSelected]
   );
 
   return (
@@ -409,35 +386,17 @@ function NotebookItem(props: {
       <Flex sx={{ alignItems: "center" }}>
         {isExpandable ? (
           isExpanded ? (
-            <ChevronDown
-              data-test-id="collapse-notebook"
-              size={20}
-              sx={{ height: "20px" }}
-            />
+            <ChevronDown data-test-id="collapse-notebook" size={18} />
           ) : (
-            <ChevronRight
-              data-test-id="expand-notebook"
-              size={20}
-              sx={{ height: "20px" }}
-            />
+            <ChevronRight data-test-id="expand-notebook" size={18} />
           )
         ) : null}
-        <SelectedCheck size={20} item={notebook} onClick={check} />
-        <Text
-          className="title"
-          data-test-id="notebook-title"
-          variant="subtitle"
-          sx={{ fontWeight: "body" }}
-        >
+        <SelectedCheck size={18} item={notebook} onClick={check} />
+        <Text className="title" data-test-id="notebook-title" variant="body">
           {notebook.title}
-          {/* <Text variant="subBody" sx={{ fontWeight: "body" }}>
-                {" "}
-                ({pluralize(notebook.topics.length, "topic")})
-              </Text> */}
         </Text>
       </Flex>
       <Flex data-test-id="notebook-tools" sx={{ alignItems: "center" }}>
-        <TopicSelectionIndicator notebook={notebook} />
         <Button
           variant="secondary"
           data-test-id="add-sub-notebook"
@@ -458,46 +417,27 @@ function NotebookItem(props: {
   );
 }
 
-function TopicSelectionIndicator({ notebook }: { notebook: Notebook }) {
-  const hasSelectedTopics = useSelectionStore(
-    (store) => store.selected.filter((nb) => nb.id === notebook.id).length > 0
-  );
-
-  if (!hasSelectedTopics) return null;
-  return <Circle size={8} color="accent" sx={{ mr: 1 }} />;
-}
-
-function SelectedCheck({
+export function SelectedCheck({
   item,
   size = 20,
   onClick
 }: {
-  item?: Notebook;
+  item?: { id: string };
   size?: number;
   onClick?: React.MouseEventHandler<HTMLDivElement>;
 }) {
   const selectedItems = useSelectionStore((store) => store.selected);
-
   const selectedItem =
     item && selectedItems[findSelectionIndex(item, selectedItems)];
-  const selected =
-    selectedItem?.op === "remove" ? "remove" : selectedItem?.op === "add";
 
-  return selected === true ? (
+  return selectedItem?.op === "add" ? (
     <CheckCircleOutline
       size={size}
       sx={{ mr: 1 }}
       color="accent"
       onClick={onClick}
     />
-  ) : selected === null ? (
-    <CheckIntermediate
-      size={size}
-      sx={{ mr: 1 }}
-      color="var(--accent-secondary)"
-      onClick={onClick}
-    />
-  ) : selected === "remove" ? (
+  ) : selectedItem?.op === "remove" ? (
     <CheckRemove
       size={size}
       sx={{ mr: 1 }}
@@ -509,18 +449,15 @@ function SelectedCheck({
   );
 }
 
-function createSelection(notebook: Notebook): NotebookReference {
+function createSelection(item: { id: string }): SelectedReference {
   return {
-    id: notebook.id,
+    id: item.id,
     op: "add",
     new: true
   };
 }
 
-function findSelectionIndex(
-  ref: NotebookReference | Notebook,
-  array: NotebookReference[]
-) {
+function findSelectionIndex(ref: { id: string }, array: { id: string }[]) {
   return array.findIndex((a) => a.id === ref.id);
 }
 
@@ -530,7 +467,10 @@ function notebookHasNotes(notebookId: string, noteIds: string[]) {
     .has(...noteIds);
 }
 
-function selectMultiple(topic: Notebook, selected: NotebookReference[]) {
+export function selectMultiple(
+  topic: { id: string },
+  selected: SelectedReference[]
+) {
   const index = findSelectionIndex(topic, selected);
   const isSelected = index > -1;
   const item = selected[index];
@@ -546,8 +486,8 @@ function selectMultiple(topic: Notebook, selected: NotebookReference[]) {
   return selected;
 }
 
-function selectSingle(topic: Notebook, array: NotebookReference[]) {
-  const selected: NotebookReference[] = array.filter((ref) => !ref.new);
+function selectSingle(topic: { id: string }, array: SelectedReference[]) {
+  const selected: SelectedReference[] = array.filter((ref) => !ref.new);
 
   const index = findSelectionIndex(topic, array);
   const item = array[index];
@@ -562,37 +502,3 @@ function selectSingle(topic: Notebook, array: NotebookReference[]) {
 
   return selected;
 }
-
-function stringifySelected(suggestion: NotebookReference[]) {
-  const added = suggestion.filter((a) => a.new && a.op === "add");
-  // .map(resolveReference)
-  // .filter(Boolean);
-  const removed = suggestion.filter((a) => a.op === "remove");
-  // .map(resolveReference)
-  // .filter(Boolean);
-  if (!added.length && !removed.length) return;
-
-  const parts = [];
-  if (added.length > 0) parts.push(strings.addedToNotebook(added.length));
-  // if (added.length >= 1) parts.push(added[0]);
-  // if (added.length > 1) parts.push(`and ${added.length - 1} others`);
-
-  if (removed.length >= 1) {
-    if (parts.length > 0) parts.push("&");
-    parts.push(`removed from ${strings.removedFromNotebook(removed.length)}`);
-  }
-  // if (removed.length > 1) parts.push(`and ${removed.length - 1} others`);
-
-  return parts.join(" ") + ".";
-}
-
-// function resolveReference(ref: NotebookReference): string | undefined {
-//   const notebook = db.notebooks.notebook(ref.id);
-//   if (!notebook) return undefined;
-
-//   // if (ref.topic) {
-//   //   return notebook.topics.topic(ref.topic)?._topic?.title;
-//   // } else {
-//   return notebook.title;
-//   // }
-// }

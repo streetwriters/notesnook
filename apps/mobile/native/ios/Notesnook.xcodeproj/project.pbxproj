@@ -112,7 +112,7 @@
 		2D02E4901E0B4A5D006451C7 /* Notesnook-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Notesnook-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		41D57E9831C724F59F18FBAE /* libPods-Notesnook-Add to Notes.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Notesnook-Add to Notes.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		47AE097A087A651BD60CAD7B /* Pods-Notesnook-Make Note.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notesnook-Make Note.release.xcconfig"; path = "Target Support Files/Pods-Notesnook-Make Note/Pods-Notesnook-Make Note.release.xcconfig"; sourceTree = "<group>"; };
-		4B679E87FDFB1312CAD6CF45 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = Notesnook/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		4B679E87FDFB1312CAD6CF45 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = Notesnook/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		4BD34AE0C0FD2416E48803B8 /* libPods-Notesnook.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Notesnook.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C4AF691C324D95337F2FB0A /* libPods-Make Note.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Make Note.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6510E6D62877215700DACAA9 /* build.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = build.bundle; path = "../../../../packages/editor-mobile/build.bundle"; sourceTree = "<group>"; };
@@ -124,6 +124,7 @@
 		6529D2B0257B4A2900B49BC3 /* NotesnookDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = NotesnookDebug.entitlements; path = Notesnook/NotesnookDebug.entitlements; sourceTree = "<group>"; };
 		656835802BB29A8300144BAB /* OpenSans-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "OpenSans-Italic.ttf"; path = "../../../../packages/editor-mobile/public/fonts/OpenSans-Italic.ttf"; sourceTree = "<group>"; };
 		6593E4A2281C345400492C50 /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = Notesnook/AppDelegate.mm; sourceTree = "<group>"; };
+		6594DDF22CD8BFE8007F5EC2 /* BetterTrigram.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = BetterTrigram.xcframework; sourceTree = "<group>"; };
 		659BE46625E11A5100E05671 /* notesnook-text.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "notesnook-text.png"; path = "Notesnook/Images.xcassets/notesnook-text.png"; sourceTree = "<group>"; };
 		65A7F34F255689AD00699170 /* Notesnook.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Notesnook.entitlements; path = Notesnook/Notesnook.entitlements; sourceTree = "<group>"; };
 		65AA857725E6DDEC00772A01 /* NotesWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NotesWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -152,7 +153,7 @@
 		88211800FA8BF60638327ADE /* Pods-Make Note.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Make Note.debug.xcconfig"; path = "Target Support Files/Pods-Make Note/Pods-Make Note.debug.xcconfig"; sourceTree = "<group>"; };
 		A03E3F5851D27269540E147C /* libPods-Notesnook-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Notesnook-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A84F3F0D50641D1CD4569B0E /* Pods-Make Note.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Make Note.release.xcconfig"; path = "Target Support Files/Pods-Make Note/Pods-Make Note.release.xcconfig"; sourceTree = "<group>"; };
-		B5216B66C0B4A91C0A69128B /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = Notesnook/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		B5216B66C0B4A91C0A69128B /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = Notesnook/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		B9989E5C777BB11343A62D09 /* Pods-Notesnook-NotesnookTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notesnook-NotesnookTests.debug.xcconfig"; path = "Target Support Files/Pods-Notesnook-NotesnookTests/Pods-Notesnook-NotesnookTests.debug.xcconfig"; sourceTree = "<group>"; };
 		D1710CA05FED221CC56D2BE1 /* Pods-Notesnook-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notesnook-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-Notesnook-tvOSTests/Pods-Notesnook-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -255,6 +256,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				6594DDF22CD8BFE8007F5EC2 /* BetterTrigram.xcframework */,
 				6515C42E2580AA2F00E83E39 /* StoreKit.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
@@ -651,15 +653,25 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Notesnook/Pods-Notesnook-resources.sh",
+				"${PODS_CONFIGURATION_BUILD_DIR}/RCT-Folly/RCT-Folly_privacy.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/RNImageCropPicker/QBImagePicker.bundle",
-				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/RCTI18nStrings.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/RNSVG/RNSVGFilters.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/React-Core_privacy.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/React-cxxreact/React-cxxreact_privacy.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/TOCropViewController/TOCropViewControllerBundle.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/boost/boost_privacy.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/glog/glog_privacy.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/RCT-Folly_privacy.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/QBImagePicker.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/RCTI18nStrings.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/RNSVGFilters.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/React-Core_privacy.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/React-cxxreact_privacy.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/TOCropViewControllerBundle.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/boost_privacy.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/glog_privacy.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -808,15 +820,25 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Notesnook-NotesnookTests/Pods-Notesnook-NotesnookTests-resources.sh",
+				"${PODS_CONFIGURATION_BUILD_DIR}/RCT-Folly/RCT-Folly_privacy.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/RNImageCropPicker/QBImagePicker.bundle",
-				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/RCTI18nStrings.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/RNSVG/RNSVGFilters.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/React-Core_privacy.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/React-cxxreact/React-cxxreact_privacy.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/TOCropViewController/TOCropViewControllerBundle.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/boost/boost_privacy.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/glog/glog_privacy.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/RCT-Folly_privacy.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/QBImagePicker.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/RCTI18nStrings.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/RNSVGFilters.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/React-Core_privacy.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/React-cxxreact_privacy.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/TOCropViewControllerBundle.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/boost_privacy.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/glog_privacy.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -852,11 +874,19 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Make Note/Pods-Make Note-resources.sh",
-				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/RCTI18nStrings.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/RCT-Folly/RCT-Folly_privacy.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/React-Core_privacy.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/React-cxxreact/React-cxxreact_privacy.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/boost/boost_privacy.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/glog/glog_privacy.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/RCTI18nStrings.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/RCT-Folly_privacy.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/React-Core_privacy.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/React-cxxreact_privacy.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/boost_privacy.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/glog_privacy.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1061,7 +1091,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2115;
+				CURRENT_PROJECT_VERSION = 2136;
 				DEVELOPMENT_TEAM = 53CWBG3QUC;
 				ENABLE_BITCODE = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -1135,7 +1165,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.0.18;
+				MARKETING_VERSION = 3.2.2;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1166,7 +1196,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2115;
+				CURRENT_PROJECT_VERSION = 2136;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 53CWBG3QUC;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -1240,7 +1270,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.0.18;
+				MARKETING_VERSION = 3.2.2;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -1250,7 +1280,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook;
 				PRODUCT_NAME = Notesnook;
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Notesnook App Distribution 2024";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Notesnook App Distribution 2025";
 				SWIFT_OBJC_BRIDGING_HEADER = "Notesnook-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1399,7 +1429,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2115;
+				CURRENT_PROJECT_VERSION = 2136;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 53CWBG3QUC;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -1411,7 +1441,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.0.18;
+				MARKETING_VERSION = 3.2.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook.notewidget;
@@ -1442,7 +1472,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2115;
+				CURRENT_PROJECT_VERSION = 2136;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 53CWBG3QUC;
@@ -1455,12 +1485,12 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.0.18;
+				MARKETING_VERSION = 3.2.2;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook.notewidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Notesnook Widget Distribution 2024";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Notesnook Widget Distribution 2025";
 				SKIP_INSTALL = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
@@ -1485,7 +1515,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Make Note/Make Note.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2115;
+				CURRENT_PROJECT_VERSION = 2136;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 53CWBG3QUC;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -1559,7 +1589,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.0.18;
+				MARKETING_VERSION = 3.2.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook.share;
@@ -1590,7 +1620,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2115;
+				CURRENT_PROJECT_VERSION = 2136;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 53CWBG3QUC;
@@ -1665,12 +1695,12 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.0.18;
+				MARKETING_VERSION = 3.2.2;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook.share;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Notesnook Share Distribution 2024";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Notesnook Share Distribution 2025";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "Make Note/Make Note-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -1748,6 +1778,7 @@
 				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../../node_modules/react-native";
 				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
 				USE_HERMES = true;
 			};
 			name = Debug;

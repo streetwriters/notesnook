@@ -1,0 +1,14 @@
+diff --git a/node_modules/react-native-mmkv-storage/android/build.gradle b/node_modules/react-native-mmkv-storage/android/build.gradle
+index abb696e..ba35baa 100644
+--- a/node_modules/react-native-mmkv-storage/android/build.gradle
++++ b/node_modules/react-native-mmkv-storage/android/build.gradle
+@@ -98,7 +98,8 @@ android {
+       cmake {
+         cppFlags "-O3 -frtti -fexceptions -Wall -fstack-protector-all"
+         arguments "-DANDROID_STL=c++_shared",
+-                  "-DREACT_NATIVE_MINOR_VERSION=${REACT_NATIVE_MINOR_VERSION}"
++                  "-DREACT_NATIVE_MINOR_VERSION=${REACT_NATIVE_MINOR_VERSION}",
++                  "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
+         abiFilters (*reactNativeArchitectures())
+       }
+     }

@@ -16,8 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { VirtualizedGrouping } from "@notesnook/core";
-import { Item, ItemReference } from "@notesnook/core";
+import { Item, ItemReference, VirtualizedGrouping } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { RefObject, useEffect, useState } from "react";
 import { View } from "react-native";
@@ -30,15 +30,14 @@ import {
   presentSheet
 } from "../../../services/event-manager";
 import { useRelationStore } from "../../../stores/use-relation-store";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import DialogHeader from "../../dialog/dialog-header";
 import List from "../../list";
 import SheetProvider from "../../sheet-provider";
 import { Button } from "../../ui/button";
 import { PressableProps } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
-import { isStringLiteralOrJsxExpression } from "typescript";
-import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 type RelationsListProps = {
   actionSheetRef: RefObject<ActionSheetRef>;
@@ -90,14 +89,14 @@ export const RelationsList = ({
         sortDirection: "desc"
       })
       .then((grouped) => {
-        setItems(grouped);
+        setTimeout(() => {
+          setItems(grouped);
+        }, 300);
       });
-  }, [relationType, referenceType, item?.id, item?.type]);
+  }, [relationType, referenceType, item?.id, item?.type, updater]);
 
   return (
-    <View
-      style={{ paddingHorizontal: 12, height: hasNoRelations ? 300 : "100%" }}
-    >
+    <View style={{ paddingHorizontal: DefaultAppStyles.GAP, height: "100%" }}>
       <SheetProvider context="local" />
       <DialogHeader
         title={title}
@@ -121,11 +120,13 @@ export const RelationsList = ({
             onPress={() => {
               onAdd?.();
             }}
-            fontSize={SIZE.sm}
+            fontSize={AppFontSize.sm}
             //  width="100%"
             type="inverted"
             icon="plus"
-            title={strings.addItem(referenceType)}
+            title={strings.addItem(
+              referenceType as "notebook" | "tag" | "reminder" | "note"
+            )}
           />
         </View>
       ) : (

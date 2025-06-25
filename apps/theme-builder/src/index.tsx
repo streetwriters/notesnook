@@ -17,60 +17,44 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { init } from "@notesnook/web/src/bootstrap";
-import { createRoot } from "react-dom/client";
-import {
-  ErrorBoundary,
-  ErrorComponent
-} from "@notesnook/web/src/components/error-boundary";
-import { BaseThemeProvider } from "@notesnook/web/src/components/theme-provider";
+import "./index.css";
+import "@notesnook/web/src/polyfills";
+import "@notesnook/web/src/app.css";
+import { ThemeDark, ThemeLight, themeToCSS } from "@notesnook/theme";
+import Config from "@notesnook/web/src/utils/config";
+import { setI18nGlobal, Messages } from "@notesnook/intl";
+import { i18n } from "@lingui/core";
 import { App } from "./app";
 
-renderApp();
+const colorScheme = JSON.parse(
+  window.localStorage.getItem("colorScheme") || '"light"'
+);
+const root = document.querySelector("html");
+if (root) root.setAttribute("data-theme", colorScheme);
 
-async function renderApp() {
-  const rootElement = document.getElementById("root");
-  if (!rootElement) return;
-  const root = createRoot(rootElement);
-  try {
-    const { component, props } = await init();
+const theme =
+  colorScheme === "dark"
+    ? Config.get("theme:dark", ThemeDark)
+    : Config.get("theme:light", ThemeLight);
+const stylesheet = document.getElementById("theme-colors");
+if (theme) {
+  const css = themeToCSS(theme);
+  if (stylesheet) stylesheet.innerHTML = css;
+} else stylesheet?.remove();
 
-    const { useKeyStore } = await import(
-      "@notesnook/web/src/interfaces/key-store"
-    );
-    await useKeyStore.getState().init();
+const locale = import.meta.env.DEV
+  ? import("@notesnook/intl/locales/$pseudo-LOCALE.json")
+  : import("@notesnook/intl/locales/$en.json");
+locale.then(({ default: locale }) => {
+  i18n.load({
+    en: locale.messages as unknown as Messages
+  });
+  i18n.activate("en");
 
-    const { default: Component } = await component();
-    const { default: AppLock } = await import(
-      "@notesnook/web/src/views/app-lock"
-    );
-
-    root.render(
-      <ErrorBoundary>
-        <BaseThemeProvider
-          onRender={() => document.getElementById("splash")?.remove()}
-          sx={{
-            display: "flex",
-            "#app": { flex: 1, height: "unset" },
-            "& > :first-child:not(#menu-wrapper)": { flex: 1 },
-            height: "100%"
-          }}
-        >
-          <AppLock>
-            <Component route={props?.route || "login:email"} />
-          </AppLock>
-          <App />
-        </BaseThemeProvider>
-      </ErrorBoundary>
-    );
-  } catch (e) {
-    root.render(
-      <>
-        <ErrorComponent
-          error={e}
-          resetErrorBoundary={() => window.location.reload()}
-        />
-      </>
-    );
-  }
-}
+  performance.mark("import:root");
+  import("@notesnook/web/src/root.js").then(({ startApp }) => {
+    performance.mark("start:app");
+    startApp(<App />);
+  });
+});
+setI18nGlobal(i18n);

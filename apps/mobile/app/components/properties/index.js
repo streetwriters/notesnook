@@ -16,18 +16,19 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
-import { Platform, View } from "react-native";
+import { View } from "react-native";
 import { FlatList } from "react-native-actions-sheet";
 import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
 import { eSendEvent, presentSheet } from "../../services/event-manager";
 import { ColorValues } from "../../utils/colors";
 import { eOnLoadNote } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { fluidTabsRef } from "../../utils/global-refs";
+import { AppFontSize } from "../../utils/size";
 import SheetProvider from "../sheet-provider";
-import { useSideBarDraggingStore } from "../side-menu/dragging-store";
 import { IconButton } from "../ui/icon-button";
 import { Pressable } from "../ui/pressable";
 import { ReminderTime } from "../ui/reminder-time";
@@ -36,10 +37,9 @@ import Paragraph from "../ui/typography/paragraph";
 import { DateMeta } from "./date-meta";
 import { Items } from "./items";
 import Notebooks from "./notebooks";
-import { Synced } from "./synced";
 import { TagStrip, Tags } from "./tags";
-import { tabBarRef } from "../../utils/global-refs";
-import { strings } from "@notesnook/intl";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { DefaultAppStyles } from "../../utils/styles";
 
 const Line = ({ top = 6, bottom = 6 }) => {
   const { colors } = useThemeColors();
@@ -58,7 +58,6 @@ const Line = ({ top = 6, bottom = 6 }) => {
 
 export const Properties = ({ close = () => {}, item, buttons = [] }) => {
   const { colors } = useThemeColors();
-  const isColor = !!ColorValues[item.title];
   if (!item || !item.id) {
     return (
       <Paragraph style={{ marginVertical: 10, alignSelf: "center" }}>
@@ -82,13 +81,14 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
       data={[0]}
       keyExtractor={() => "properties-scroll-item"}
       renderItem={() => (
-        <View>
+        <View
+          style={{
+            gap: DefaultAppStyles.GAP_VERTICAL
+          }}
+        >
           <View
             style={{
-              paddingHorizontal: 12,
-              marginTop: 5,
-              zIndex: 10,
-              marginBottom: 5
+              paddingHorizontal: DefaultAppStyles.GAP
             }}
           >
             <View
@@ -101,7 +101,8 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
-                  flexShrink: 1
+                  flexShrink: 1,
+                  gap: 5
                 }}
               >
                 {item.type === "color" ? (
@@ -116,16 +117,15 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
                       marginRight: 10
                     }}
                   />
+                ) : item.type === "tag" ? (
+                  <Icon
+                    name="pound"
+                    size={AppFontSize.lg}
+                    color={colors.primary.icon}
+                  />
                 ) : null}
 
-                <Heading size={SIZE.lg}>
-                  {item.type === "tag" && !isColor ? (
-                    <Heading size={SIZE.xl} color={colors.primary.accent}>
-                      #
-                    </Heading>
-                  ) : null}
-                  {item.title}
-                </Heading>
+                <Heading size={AppFontSize.lg}>{item.title}</Heading>
               </View>
 
               {item.type === "note" ? (
@@ -133,7 +133,7 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
                   name="open-in-new"
                   type="plain"
                   color={colors.primary.icon}
-                  size={SIZE.lg}
+                  size={AppFontSize.lg}
                   style={{
                     alignSelf: "flex-start"
                   }}
@@ -141,10 +141,10 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
                     close();
                     eSendEvent(eOnLoadNote, {
                       item: item,
-                      presistTab: true
+                      newTab: true
                     });
                     if (!DDS.isTab) {
-                      tabBarRef.current?.goToPage(1);
+                      fluidTabsRef.current?.goToPage("editor");
                     }
                   }}
                 />
@@ -165,35 +165,28 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
                 style={{
                   justifyContent: "flex-start",
                   borderWidth: 0,
-                  height: 30,
                   alignSelf: "flex-start",
                   backgroundColor: "transparent",
-                  paddingHorizontal: 0
+                  paddingHorizontal: 0,
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
                 }}
-                fontSize={SIZE.xs}
+                fontSize={AppFontSize.xs}
               />
             ) : null}
           </View>
 
           <DateMeta item={item} />
-          <Line bottom={0} />
+          <Line bottom={0} top={0} />
 
           {item.type === "note" ? (
             <>
               <Tags close={close} item={item} />
-              <Line bottom={0} />
+              <Line bottom={0} top={0} />
             </>
           ) : null}
           {item.type === "note" ? (
-            <View
-              style={{
-                paddingHorizontal: 12
-              }}
-            >
-              <Notebooks note={item} close={close} />
-            </View>
+            <Notebooks note={item} close={close} />
           ) : null}
-
           <Items
             item={item}
             buttons={buttons}
@@ -201,8 +194,6 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
               close();
             }}
           />
-
-          <Synced item={item} close={close} />
 
           {DDS.isTab ? (
             <View
@@ -218,86 +209,40 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
   );
 };
 
-Properties.present = async (item, buttons = [], isSheet) => {
+Properties.present = async (item, isSheet, buttons = []) => {
   if (!item) return;
   let type = item?.type;
-  let props = [];
-  let android = [];
+  let dbItem;
   switch (type) {
     case "trash":
-      props[0] = item;
-      props.push(["delete", "restore"]);
+      dbItem = item;
       break;
     case "note":
-      android = Platform.OS === "android" ? ["pin-to-notifications"] : [];
-      props[0] = await db.notes.note(item.id);
-      props.push([
-        "notebooks",
-        "add-reminder",
-        "share",
-        "export",
-        "copy",
-        "publish",
-        "pin",
-        "favorite",
-        "attachments",
-        "lock-unlock",
-        "trash",
-        "remove-from-notebook",
-        "history",
-        "read-only",
-        "reminders",
-        "local-only",
-        "duplicate",
-        "copy-link",
-        "references",
-        ...android,
-        ...buttons
-      ]);
+      dbItem = await db.notes.note(item.id);
       break;
     case "notebook":
-      props[0] = await db.notebooks.notebook(item.id);
-      props.push([
-        "edit-notebook",
-        "pin",
-        "add-shortcut",
-        "trash",
-        "default-notebook",
-        "add-notebook",
-        "move-notes",
-        "move-notebook"
-      ]);
+      dbItem = await db.notebooks.notebook(item.id);
       break;
     case "tag":
-      props[0] = await db.tags.tag(item.id);
-      props.push(["add-shortcut", "trash", "rename-tag"]);
+      dbItem = await db.tags.tag(item.id);
       break;
     case "color":
-      props[0] = await db.colors.color(item.id);
-
-      props.push([
-        "trash",
-        "rename-color",
-        ...(useSideBarDraggingStore.getState().dragging ? [] : ["reorder"])
-      ]);
+      dbItem = await db.colors.color(item.id);
       break;
     case "reminder": {
-      props[0] = await db.reminders.reminder(item.id);
-      props.push(["edit-reminder", "trash", "disable-reminder"]);
+      dbItem = await db.reminders.reminder(item.id);
       break;
     }
   }
-  if (!props[0]) return;
+
   presentSheet({
     context: isSheet ? "local" : undefined,
     component: (ref, close) => (
       <Properties
-        close={() => {
-          close();
-        }}
+        close={close}
         actionSheetRef={ref}
-        item={props[0]}
-        buttons={props[1]}
+        item={dbItem}
+        buttons={buttons}
       />
     )
   });

@@ -51,3 +51,18 @@ test("updating notebook with empty title should throw", () =>
   notebookTest().then(async ({ db, id }) => {
     await expect(db.notebooks.add({ id, title: "" })).rejects.toThrow();
   }));
+
+test("parentId() returns parentId if notebook is a subnotebook", () =>
+  notebookTest().then(async ({ db, id }) => {
+    const subId = await db.notebooks.add({ title: "Sub", id });
+    await db.relations.add(
+      { type: "notebook", id },
+      { type: "notebook", id, subId }
+    );
+    expect(await db.notebooks.parentId(subId)).toBe(id);
+  }));
+
+test("parentId() returns undefined if notebook is not a subnotebook", () =>
+  notebookTest().then(async ({ db, id }) => {
+    expect(await db.notebooks.parentId(id)).toBeUndefined();
+  }));

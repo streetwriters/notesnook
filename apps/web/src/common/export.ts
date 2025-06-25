@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { TaskManager } from "./task-manager";
-import { createZipStream } from "../utils/streams/zip-stream";
 import { createWriteStream } from "../utils/stream-saver";
 import { FilteredSelector } from "@notesnook/core";
 import { Note } from "@notesnook/core";
@@ -90,6 +89,8 @@ export async function exportNotes(
     title: strings.exportingNotes(),
     subtitle: strings.exportingNotesDesc(),
     action: async (report) => {
+      const { createZipStream } = await import("../utils/streams/zip-stream");
+
       const errors: Error[] = [];
       const exportStream = new ExportStream(report, (e) => errors.push(e));
       await fromAsyncIterator(
@@ -170,6 +171,7 @@ export async function exportNote(
       );
 
       if (hasAttachments) {
+        const { createZipStream } = await import("../utils/streams/zip-stream");
         await stream
           .pipeThrough(createZipStream())
           .pipeTo(

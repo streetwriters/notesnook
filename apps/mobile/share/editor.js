@@ -21,18 +21,17 @@ import React, {
   useCallback,
   useEffect,
   useLayoutEffect,
-  useMemo,
   useRef,
   useState
 } from "react";
 import { Linking, Platform, TextInput, View } from "react-native";
 import { WebView } from "react-native-webview";
-import Commands from "../app/screens/editor/tiptap/commands";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../app/services/event-manager";
 import { eOnLoadNote } from "../app/utils/events";
+import { defaultBorderRadius } from "../app/utils/size";
 
 const EditorMobileSourceUrl =
   Platform.OS === "android"
@@ -57,7 +56,6 @@ export async function post(ref, type, value = null) {
 const useEditor = () => {
   const ref = useRef();
   const { colors } = useThemeColors("editor");
-  const commands = useMemo(() => new Commands(ref), [ref]);
   const currentNote = useRef();
 
   const postMessage = useCallback(
@@ -106,7 +104,7 @@ const useEditor = () => {
     }, 1);
   };
 
-  return { ref, onLoad, currentNote, commands };
+  return { ref, onLoad, currentNote };
 };
 
 const useEditorEvents = (editor, onChange) => {
@@ -236,7 +234,7 @@ export const Editor = ({ onChange, onLoad, editorRef }) => {
               height: 16,
               width: "100%",
               backgroundColor: colors.secondary.background,
-              borderRadius: 5,
+              borderRadius: defaultBorderRadius,
               marginTop: 10
             }}
           />
@@ -246,7 +244,7 @@ export const Editor = ({ onChange, onLoad, editorRef }) => {
               height: 16,
               width: "100%",
               backgroundColor: colors.secondary.background,
-              borderRadius: 5,
+              borderRadius: defaultBorderRadius,
               marginTop: 10
             }}
           />
@@ -256,7 +254,7 @@ export const Editor = ({ onChange, onLoad, editorRef }) => {
               height: 16,
               width: "60%",
               backgroundColor: colors.secondary.background,
-              borderRadius: 5,
+              borderRadius: defaultBorderRadius,
               marginTop: 10
             }}
           />

@@ -25,7 +25,7 @@ import { SvgView } from "../../../components/ui/svg";
 import Paragraph from "../../../components/ui/typography/paragraph";
 import { presentSheet } from "../../../services/event-manager";
 import { useThemeColors } from "@notesnook/theme";
-import { SIZE } from "../../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import { DraggableItem, useDragState } from "./state";
 import {
   findToolById,
@@ -34,6 +34,7 @@ import {
 } from "./toolbar-definition";
 import { ActionSheetRef, ScrollView } from "react-native-actions-sheet";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 export default function ToolSheet({
   group,
@@ -69,12 +70,12 @@ export default function ToolSheet({
             useDragState.getState().setData(_data);
           }}
           style={{
-            marginBottom: 10,
+            marginBottom: DefaultAppStyles.GAP_VERTICAL,
             width: "100%",
             height: 50,
-            paddingHorizontal: 12,
+            paddingHorizontal: DefaultAppStyles.GAP,
             paddingRight: 0,
-            borderRadius: 5,
+            borderRadius: defaultBorderRadius,
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "flex-start"
@@ -94,7 +95,7 @@ export default function ToolSheet({
                 marginLeft: iconSvgString ? 10 : 0
               }}
               color={colors.primary.paragraph}
-              size={SIZE.sm}
+              size={AppFontSize.sm}
             >
               {tool?.title}
             </Paragraph>
@@ -114,7 +115,7 @@ export default function ToolSheet({
     <View
       style={{
         maxHeight: "100%",
-        padding: 12
+        padding: DefaultAppStyles.GAP
       }}
     >
       <ScrollView nestedScrollEnabled={true}>

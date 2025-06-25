@@ -137,10 +137,7 @@ function useAuthenticateUser({
         const user = await db.user.fetchUser();
         setUser(user);
       } catch (e) {
-        showToast(
-          "error",
-          `${strings.biometricsAuthFailed()}. ${strings.pleaseTryAgain()}.`
-        );
+        showToast("error", strings.biometricsAuthFailed());
         openURL("/");
       } finally {
         setIsAuthenticating(false);
@@ -235,10 +232,31 @@ type RecoveryMethod = {
   isDangerous?: boolean;
 };
 
+const recoveryMethods: RecoveryMethod[] = [
+  {
+    type: "key",
+    testId: "step-recovery-key",
+    title: () => strings.recoveryKeyMethod(),
+    description: () => strings.recoveryKeyMethodDesc()
+  },
+  {
+    type: "backup",
+    testId: "step-backup",
+    title: () => strings.backupFileMethod(),
+    description: () => strings.backupFileMethodDesc()
+  },
+  {
+    type: "reset",
+    testId: "step-reset-account",
+    title: () => strings.clearDataAndResetMethod(),
+    description: () => strings.clearDataAndResetMethodDesc(),
+    isDangerous: true
+  }
+];
+
 function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
   const { navigate } = props;
   const [selected, setSelected] = useState(0);
-  const recoveryMethods = strings.accountRecoveryMethods as RecoveryMethod[];
 
   if (isSessionExpired()) {
     navigate("new");
@@ -292,7 +310,8 @@ function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
             sx={{
               color: method.isDangerous
                 ? "var(--paragraph-error)"
-                : "var(--paragraph-secondary)"
+                : "var(--paragraph-secondary)",
+              whiteSpace: "pre-wrap"
             }}
           >
             {method.description()}
@@ -325,7 +344,7 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
       title={strings.accountRecovery()}
       subtitle={strings.accountRecoveryWithKey()}
       loading={{
-        title: `${strings.network.downloading()} (${progress})`,
+        title: strings.network.downloading(progress),
         subtitle: strings.keyRecoveryProgressDesc()
       }}
       onSubmit={async (form) => {
@@ -461,7 +480,7 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
       title={strings.resetAccountPassword()}
       subtitle={strings.accountPassDesc()}
       loading={{
-        title: `${strings.resettingAccountPassword()} (${progress})`,
+        title: strings.resettingAccountPassword(progress),
         subtitle: strings.resetPasswordWait()
       }}
       onSubmit={async (form) => {

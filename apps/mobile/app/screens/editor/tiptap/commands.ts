@@ -18,9 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Note } from "@notesnook/core";
-import type { Attachment } from "@notesnook/editor";
-import type { ImageAttributes } from "@notesnook/editor";
-import type { LinkAttributes } from "@notesnook/editor";
+import type {
+  Attachment,
+  ImageAttributes,
+  LinkAttributes
+} from "@notesnook/editor";
 import { createRef, RefObject } from "react";
 import { Platform } from "react-native";
 import { EdgeInsets } from "react-native-safe-area-context";
@@ -37,9 +39,6 @@ async function call(webview: RefObject<WebView | undefined>, action?: Action) {
   if (!webview.current || !action) return;
   setImmediate(() => webview.current?.injectJavaScript(action.job));
   const response = await getResponse(action.id);
-  // if (!response) {
-  //   console.warn("webview job failed", action.id);
-  // }
   return response ? response.value : response;
 }
 
@@ -75,110 +74,71 @@ class Commands {
     return call(this.ref, fn(job, name)) as Promise<T>;
   }
 
-  focus = async (tabId: number) => {
+  async sendCommand<T>(command: string, ...args: any[]) {
+    return this.doAsync(
+      `response = globalThis.commands.${command}(${args
+        .map((arg) =>
+          typeof arg === "string" ? `"${arg}"` : JSON.stringify(arg)
+        )
+        .join(",")})`,
+      command
+    );
+  }
+
+  focus = async (tabId: string) => {
     if (!this.ref.current) return;
+
+    const locked = useTabStore.getState().getTab(tabId)?.session?.locked;
     if (Platform.OS === "android") {
-      //this.ref.current?.requestFocus();
       setTimeout(async () => {
+        if (
+          locked &&
+          useTabStore.getState().biometryAvailable &&
+          useTabStore.getState().biometryEnrolled
+        )
+          return;
+
         if (!this.ref) return;
         textInput.current?.focus();
-
-        const locked = useTabStore.getState().getTab(tabId)?.locked;
-        await this.doAsync(
-          locked
-            ? `editorControllers[${tabId}]?.focusPassInput();`
-            : `editors[${tabId}]?.commands.focus()`,
-          "focus"
-        );
-
+        await this.sendCommand("focus", tabId, locked);
         this.ref?.current?.requestFocus();
       }, 1);
     } else {
       await sleep(400);
-      await this.doAsync(`editors[${tabId}]?.commands.focus()`, "focus");
+      await this.sendCommand("focus", tabId, locked);
     }
   };
 
-  blur = async (tabId: number) =>
-    await this.doAsync(
-      `
-    const editor = editors[${tabId}];
-    const editorTitle = editorTitles[${tabId}];
-    typeof editor !== "undefined" && editor.commands.blur();
-    typeof editorTitle !== "undefined" && editorTitle.current && editorTitle.current.blur();
-    
-    editorControllers[${tabId}]?.blurPassInput();
+  blur = async (tabId: string) => this.sendCommand("blur", tabId);
 
-  `,
-      "blur"
-    );
-
-  clearContent = async (tabId: number) => {
+  clearContent = async (tabId: string) => {
     this.previousSettings = null;
-    await this.doAsync(
-      `
-const editor = editors[${tabId}];
-const editorController = editorControllers[${tabId}];
-const editorTitle = editorTitles[${tabId}];
-const statusBar = statusBars[${tabId}];
-
-if (typeof editor !== "undefined") {
-  editor.commands.blur();
-  editor.commands.clearContent(false);
-}
-
-typeof editorTitle !== "undefined" && editorTitle.current && editorTitle.current?.blur();
-if (typeof editorController.content !== undefined) editorController.content.current = '';
-editorController.onUpdate();
-editorController.setTitle('');
-if (typeof statusBar !== "undefined") {
-  statusBar.current.resetWords();
-  statusBar.current.set({date:"",saved:""});
-}`,
-      "clearContent"
-    );
+    await this.sendCommand("clearContent", tabId);
   };
 
   setSessionId = async (id: string | null) =>
-    await this.doAsync(`globalThis.sessionId = "${id}";`);
+    await this.sendCommand("setSessionId", id);
 
   setStatus = async (
     date: string | undefined,
     saved: string,
-    tabId: number
+    tabId: string
   ) => {
-    await this.doAsync(
-      `
-      const statusBar = statusBars[${tabId}];
-      typeof statusBar !== "undefined" && statusBar.current.set({date:"${date}",saved:"${saved}"})`,
-      "setStatus"
+    this.sendCommand("setStatus", date, saved, tabId);
+  };
+
+  setPlaceholder = async (placeholder: string) => {};
+
+  setLoading = async (loading?: boolean, tabId?: string) => {
+    this.sendCommand(
+      "setLoading",
+      loading,
+      tabId === undefined ? useTabStore.getState().currentTab : tabId
     );
   };
 
-  setPlaceholder = async (placeholder: string) => {
-    // await this.doAsync(`
-    // const element = document.querySelector(".is-editor-empty");
-    // if (element) {
-    //   element.setAttribute("data-placeholder","${placeholder}");
-    // }
-    // `);
-  };
-
-  setLoading = async (loading?: boolean, tabId?: number) => {
-    await this.doAsync(`
-    const editorController = editorControllers[${
-      tabId || useTabStore.getState().currentTab
-    }];
-    editorController.setLoading(${loading})
-    `);
-  };
-
   setInsets = async (insets: EdgeInsets) => {
-    await this.doAsync(`
-      if (typeof safeAreaController !== "undefined") {
-        safeAreaController.update(${JSON.stringify(insets)}) 
-      }
-    `);
+    this.sendCommand("setInsets", insets);
   };
 
   updateSettings = async (settings?: Partial<Settings>) => {
@@ -187,13 +147,7 @@ if (typeof statusBar !== "undefined") {
       ...this.previousSettings,
       ...settings
     };
-    await this.doAsync(`
-      if (typeof globalThis.settingsController !== "undefined") {
-        globalThis.settingsController.update(${JSON.stringify(
-          this.previousSettings
-        )}) 
-      }
-    `);
+    this.sendCommand("updateSettings", settings);
   };
 
   setSettings = async (settings?: Partial<Settings>) => {
@@ -206,123 +160,63 @@ if (typeof statusBar !== "undefined") {
         return;
       }
     }
-    await this.doAsync(`
-      if (typeof globalThis.settingsController !== "undefined") {
-        globalThis.settingsController.update(${JSON.stringify(settings)}) 
-      }
-    `);
+    this.sendCommand("setSettings", settings);
   };
 
   setTags = async (note: Note | null | undefined) => {
     if (!note) return;
-    const tabId = useTabStore.getState().getTabForNote(note.id);
-
-    const tags = await db.relations.to(note, "tag").resolve();
-    await this.doAsync(
-      `
-    const tags = editorTags[${tabId}];
-    if (tags && tags.current) {
-      tags.current.setTags(${JSON.stringify(
-        tags.map((tag) => ({
-          title: tag.title,
-          alias: tag.title,
-          id: tag.id,
-          type: tag.type
-        }))
-      )});
-    }
-  `,
-      "setTags"
-    );
+    useTabStore.getState().forEachNoteTab(note.id, async (tab) => {
+      const tabId = tab.id;
+      const tags = await db.relations.to(note, "tag").resolve();
+      await this.sendCommand("setTags", tabId, tags);
+    });
   };
 
-  clearTags = async (tabId: number) => {
-    await this.doAsync(
-      `
-    const tags = editorTags[${tabId}];
-    logger("info", Object.keys(editorTags), typeof editorTags[0]);
-    if (tags && tags.current) {
-      tags.current.setTags([]);
-    }
-  `,
-      "clearTags"
-    );
+  clearTags = async (tabId: string) => {
+    await this.sendCommand("clearTags", tabId);
   };
 
-  insertAttachment = async (attachment: Attachment, tabId: number) => {
-    await this.doAsync(
-      `const editor = editors[${tabId}];
-editor && editor.commands.insertAttachment(${JSON.stringify(attachment)})`
-    );
+  insertAttachment = async (attachment: Attachment, tabId: string) => {
+    await this.sendCommand("insertAttachment", attachment, tabId);
   };
 
   setAttachmentProgress = async (
     attachmentProgress: Partial<Attachment>,
-    tabId: number
+    tabId: string
   ) => {
-    await this.doAsync(
-      `const editor = editors[${tabId}];
-editor && editor.commands.updateAttachment(${JSON.stringify(
-        attachmentProgress
-      )}, {
-        preventUpdate: true,
-        query: (attachment) => {
-          return attachment.hash === "${attachmentProgress.hash}";
-        }
-      })`
-    );
+    await this.sendCommand("setAttachmentProgress", attachmentProgress, tabId);
   };
 
   insertImage = async (
     image: Omit<ImageAttributes, "bloburl"> & {
       dataurl: string;
     },
-    tabId: number
+    tabId: string
   ) => {
-    await this.doAsync(
-      `const editor = editors[${tabId}];
-
-const image = toBlobURL("${image.dataurl}", "${image.hash}");
-
-editor && editor.commands.insertImage({
-        ...${JSON.stringify({
-          ...image,
-          dataurl: undefined
-        })},
-        bloburl: image
-      })`
-    );
+    await this.sendCommand("insertImage", image, tabId);
   };
 
   handleBack = async () => {
-    return this.doAsync<boolean>(
-      'response = window.dispatchEvent(new Event("handleBackPress",{cancelable:true}));'
-    );
+    return this.sendCommand("handleBack");
   };
 
   keyboardShown = async (keyboardShown: boolean) => {
-    return this.doAsync(`globalThis['keyboardShown']=${keyboardShown};`);
+    return this.sendCommand("keyboardShown", keyboardShown);
   };
 
   getTableOfContents = async () => {
     const tabId = useTabStore.getState().currentTab;
-    return this.doAsync(`
-      response = editorControllers[${tabId}]?.getTableOfContents() || [];
-    `);
+    return this.sendCommand("getTableOfContents", tabId);
   };
 
   focusPassInput = async () => {
     const tabId = useTabStore.getState().currentTab;
-    return this.doAsync(`
-      response = editorControllers[${tabId}]?.focusPassInput() || [];
-    `);
+    return this.sendCommand("focusPassInput", tabId);
   };
 
   blurPassInput = async () => {
     const tabId = useTabStore.getState().currentTab;
-    return this.doAsync(`
-      response = editorControllers[${tabId}]?.blurPassInput() || [];
-    `);
+    return this.sendCommand("blurPassInput", tabId);
   };
 
   createInternalLink = async (
@@ -330,30 +224,23 @@ editor && editor.commands.insertImage({
     resolverId: string
   ) => {
     if (!resolverId) return;
-    return this.doAsync(`
-    if (globalThis.pendingResolvers["${resolverId}"]) {
-      globalThis.pendingResolvers["${resolverId}"](${JSON.stringify(
-      attributes
-    )});
-    }`);
+    return this.sendCommand("createInternalLink", attributes, resolverId);
   };
 
   dismissCreateInternalLinkRequest = async (resolverId: string) => {
     if (!resolverId) return;
-    return this.doAsync(`
-    if (globalThis.pendingResolvers["${resolverId}"]) {
-      globalThis.pendingResolvers["${resolverId}"](undefined);
-    }
-    `);
+    return this.sendCommand("dismissCreateInternalLinkRequest", resolverId);
   };
 
   scrollIntoViewById = async (id: string) => {
     const tabId = useTabStore.getState().currentTab;
-    return this.doAsync(`
-      response = editorControllers[${tabId}]?.scrollIntoView("${id}") || [];
-    `);
+    return this.sendCommand("scrollIntoViewById", id, tabId);
   };
-  //todo add replace image function
+
+  scrollToSearchResult = (index: number) => {
+    const tabId = useTabStore.getState().currentTab;
+    return this.sendCommand("scrollToSearchResult", index, tabId);
+  };
 }
 
 export default Commands;

@@ -26,7 +26,6 @@ import { store as tagStore } from "./tag-store";
 import { store as attachmentStore } from "./attachment-store";
 import { store as monographStore } from "./monograph-store";
 import { store as reminderStore } from "./reminder-store";
-import { store as announcementStore } from "./announcement-store";
 import { store as settingStore } from "./setting-store";
 import BaseStore from "./index";
 import { showToast } from "../utils/toast";
@@ -41,6 +40,10 @@ import {
 import { NetworkCheck } from "../utils/network-check";
 import { Color, Notebook, Tag } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
+import { useEditorStore } from "./editor-store";
+import { useEditorManager } from "../components/editor/manager";
+import { exitFullscreen } from "../utils/fullscreen";
+import { NavigationTabItem } from "../components/navigation-menu";
 
 type SyncState =
   | "synced"
@@ -61,10 +64,9 @@ let syncTimeout = 0;
 let pendingSync: SyncOptions | undefined = undefined;
 
 class AppStore extends BaseStore<AppStore> {
-  // default state
-  isSideMenuOpen = false;
   isFocusMode = false;
-  isEditorOpen = false;
+  isListPaneVisible = true;
+  isNavPaneCollapsed = false;
   isVaultCreated = false;
   isAutoSyncEnabled = Config.get("autoSyncEnabled", true);
   isSyncEnabled = Config.get("syncEnabled", true);
@@ -75,15 +77,19 @@ class AppStore extends BaseStore<AppStore> {
     type: undefined
   };
   colors: Color[] = [];
+  hiddenColors: string[] = Config.get("sidebarHiddenItems:colors", []);
+  hiddenRoutes: string[] = Config.get("sidebarHiddenItems:routes", []);
   notices: Notice[] = [];
   shortcuts: (Notebook | Tag)[] = [];
   lastSynced = 0;
+  navigationTab: NavigationTabItem["id"] = settingStore.get().defaultSidebarTab;
 
   init = () => {
-    settingStore.refresh();
-    // this needs to happen here so reminders can be set on app load.
-    reminderStore.refresh();
-    announcementStore.refresh();
+    this.refresh();
+    this.set({
+      hiddenColors: db.settings.getSideBarHiddenItems("colors"),
+      hiddenRoutes: db.settings.getSideBarHiddenItems("routes")
+    });
     this.get().sync({ type: "full" });
 
     EV.subscribe(EVENTS.appRefreshRequested, () => this.refresh());
@@ -144,6 +150,25 @@ class AppStore extends BaseStore<AppStore> {
     });
   };
 
+  setHiddenColors = (ids: string[]) => {
+    Config.set("sidebarHiddenItems:colors", ids);
+    db.settings.setSideBarHiddenItems("colors", ids);
+    this.set({ hiddenColors: ids });
+  };
+
+  setHiddenRoutes = (ids: string[]) => {
+    Config.set("sidebarHiddenItems:routes", ids);
+    db.settings.setSideBarHiddenItems("routes", ids);
+    this.set({ hiddenRoutes: ids });
+  };
+
+  toggleListPane = (booleanState?: boolean) => {
+    this.set(
+      (state) =>
+        (state.isListPaneVisible = booleanState ?? !state.isListPaneVisible)
+    );
+  };
+
   refresh = async () => {
     logger.measure("refreshing app");
 
@@ -174,6 +199,10 @@ class AppStore extends BaseStore<AppStore> {
 
   toggleFocusMode = () => {
     this.set((state) => (state.isFocusMode = !state.isFocusMode));
+    if (document.fullscreenElement) exitFullscreen();
+    const session = useEditorStore.getState().getActiveSession();
+    const editor = session && useEditorManager.getState().getEditor(session.id);
+    if (editor) editor.editor?.focus();
   };
 
   toggleAutoSync = () => {
@@ -197,17 +226,6 @@ class AppStore extends BaseStore<AppStore> {
     this.set(
       (state) => (state.isRealtimeSyncEnabled = !state.isRealtimeSyncEnabled)
     );
-  };
-
-  toggleSideMenu = (toggleState: boolean) => {
-    console.log("toggling side menu");
-    this.set(
-      (state) => (state.isSideMenuOpen = toggleState ?? !state.isSideMenuOpen)
-    );
-  };
-
-  setIsEditorOpen = (toggleState: boolean) => {
-    this.set((state) => (state.isEditorOpen = toggleState));
   };
 
   setIsVaultCreated = (toggleState: boolean) => {
@@ -350,6 +368,10 @@ class AppStore extends BaseStore<AppStore> {
   isSyncing = () => {
     const status = this.get().syncStatus.key;
     return status === "syncing";
+  };
+
+  setNavigationTab = (tab: NavigationTabItem["id"]) => {
+    this.set((state) => (state.navigationTab = tab));
   };
 }
 

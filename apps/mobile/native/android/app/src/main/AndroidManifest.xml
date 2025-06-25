@@ -15,7 +15,6 @@
     <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="remove"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:node="remove"/>
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" tools:node="remove" />
@@ -59,12 +58,21 @@
         android:requestLegacyExternalStorage="true"
         android:theme="@style/BootTheme"
         android:largeHeap="true"
-        android:supportsRtl="false"
-        android:networkSecurityConfig="@xml/network_security_config"
-        tools:replace="android:supportsRtl">
+        android:supportsRtl="true"
+        android:networkSecurityConfig="@xml/network_security_config">
     
-        <receiver android:exported="false" android:name=".NoteWidget">
+        <receiver android:exported="false" android:label="@string/quick_note" android:name=".NoteWidget">
             <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/new_note_widget_info" />
+        </receiver>
+
+        <receiver android:exported="false" android:label="@string/note" android:name=".NotePreviewWidget">
+            <intent-filter>"
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
 
@@ -72,6 +80,26 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/note_widget_info" />
         </receiver>
+
+        <receiver android:exported="false" android:label="@string/reminders_title" android:name=".ReminderWidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_reminders_info" />
+        </receiver>
+
+        <activity android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
+            android:label="NotePreviewConfigure"
+            android:launchMode="singleTask"
+            android:exported="true"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustResize" android:name=".NotePreviewConfigureActivity">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".MainActivity"
@@ -130,6 +158,16 @@
             </intent-filter>
 
             <intent-filter android:label="Make Note">
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/*" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="video/*" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="application/*" />
+            </intent-filter>
+
+            <intent-filter android:label="Make Note">
                 <action android:name="android.intent.action.PROCESS_TEXT" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/*" />
@@ -155,6 +193,11 @@
                 <action android:name="android.service.quicksettings.action.QS_TILE"/>
             </intent-filter>
         </service>
+
+        <service 
+        android:name=".ReminderViewsService"
+        android:exported="true"
+        android:permission="android.permission.BIND_REMOTEVIEWS" />
 
         <provider
         android:name="androidx.core.content.FileProvider"
@@ -182,9 +225,6 @@
                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
            </intent-filter>
       </receiver>
-
-
-        
 
     </application>
 

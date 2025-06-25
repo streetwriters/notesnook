@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Reminder } from "@notesnook/core";
+import { isReminderActive, Reminder } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import notifee, {
   AndroidStyle,
@@ -43,7 +43,8 @@ import { useRelationStore } from "../stores/use-relation-store";
 import { useReminderStore } from "../stores/use-reminder-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { useUserStore } from "../stores/use-user-store";
-import { tabBarRef } from "../utils/global-refs";
+import { eOnLoadNote } from "../utils/events";
+import { fluidTabsRef } from "../utils/global-refs";
 import { convertNoteToText } from "../utils/note-to-text";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { sleep } from "../utils/time";
@@ -51,6 +52,8 @@ import { DDS } from "./device-detection";
 import { eSendEvent } from "./event-manager";
 import Navigation from "./navigation";
 import SettingsService from "./settings";
+import { getFormattedReminderTime } from "@notesnook/common";
+import { MMKV } from "../common/database/mmkv";
 
 let pinned: DisplayedNotification[] = [];
 
@@ -120,7 +123,7 @@ const onEvent = async ({ type, detail }: Event) => {
         await scheduleNotification(reminder);
       }
     }
-
+    updateRemindersForWidget();
     return;
   }
   if (type === EventType.PRESS) {
@@ -141,7 +144,7 @@ const onEvent = async ({ type, detail }: Event) => {
     }
     editorState().movedAway = false;
     const noteId = notification?.id;
-    console.log("NOTE ID", noteId);
+
     loadNote(noteId as string, true);
   }
 
@@ -167,6 +170,7 @@ const onEvent = async ({ type, detail }: Event) => {
         );
         useRelationStore.getState().update();
         useReminderStore.getState().refresh();
+        updateRemindersForWidget();
         break;
       }
       case "REMINDER_DISABLE": {
@@ -184,6 +188,7 @@ const onEvent = async ({ type, detail }: Event) => {
         );
         useRelationStore.getState().update();
         useReminderStore.getState().refresh();
+        updateRemindersForWidget();
         break;
       }
       case strings.unpin(): {
@@ -235,11 +240,9 @@ const onEvent = async ({ type, detail }: Event) => {
           try {
             if (!globalThis["IS_MAIN_APP_RUNNING" as never]) {
               await db.sync({ type: "send", force: false });
-            } else {
-              console.log("main app running, skipping sync");
             }
           } catch (e) {
-            console.log(e, (e as Error).stack);
+            /* empty */
           }
         }
         Navigation.queueRoutesForUpdate();
@@ -248,6 +251,35 @@ const onEvent = async ({ type, detail }: Event) => {
     }
   }
 };
+
+type ReminderWithFormattedTime = Reminder & {
+  formattedTime?: string;
+};
+
+async function updateRemindersForWidget() {
+  if (Platform.OS === "ios") return;
+  const reminders: ReminderWithFormattedTime[] = await db.reminders?.all.items(
+    undefined,
+    {
+      sortBy: "dueDate",
+      sortDirection: "asc"
+    }
+  );
+  const activeReminders = [];
+  if (!reminders) return;
+  for (const reminder of reminders) {
+    if (isReminderActive(reminder)) {
+      reminder.formattedTime = getFormattedReminderTime(reminder);
+      activeReminders.push(reminder);
+    }
+  }
+  NotesnookModule.setString(
+    "appPreview",
+    "remindersList",
+    JSON.stringify(activeReminders)
+  );
+  NotesnookModule.updateReminderWidget();
+}
 
 async function setupIOSCategories() {
   try {
@@ -288,7 +320,7 @@ async function setupIOSCategories() {
       }
     }
   } catch (e) {
-    console.log("ERROR in setupIOSCategories", e);
+    /* empty */
   }
 }
 
@@ -398,8 +430,9 @@ async function scheduleNotification(
         trigger
       );
     }
+    updateRemindersForWidget();
   } catch (e) {
-    console.log("Schedule notification", e);
+    /* empty */
   }
 }
 
@@ -408,7 +441,7 @@ async function loadNote(id: string, jump: boolean) {
   const note = await db.notes.note(id);
   if (!note) return;
   if (!DDS.isTab && jump) {
-    tabBarRef.current?.goToPage(1);
+    fluidTabsRef.current?.goToPage("editor");
   }
   NotesnookModule.setAppState(
     JSON.stringify({
@@ -418,19 +451,10 @@ async function loadNote(id: string, jump: boolean) {
     })
   );
 
-  const isLocked = await db.vaults.itemExists({
-    type: "note",
-    id: id
-  });
-
   const tab = useTabStore.getState().getTabForNote(id);
-  if (tab !== undefined) {
-    useTabStore.getState().focusTab(tab);
-  } else {
-    useTabStore.getState().focusPreviewTab(id, {
-      noteId: id,
-      readonly: note.readonly,
-      noteLocked: isLocked
+  if (useTabStore.getState().currentTab !== tab) {
+    eSendEvent(eOnLoadNote, {
+      note: note
     });
   }
 }
@@ -542,7 +566,7 @@ async function displayNotification({
       }
     });
   } catch (e) {
-    console.log(e);
+    /* empty */
   }
 }
 
@@ -860,13 +884,6 @@ function init() {
   notifee.onForegroundEvent(onEvent);
 }
 
-async function remove(id: string) {
-  await notifee.cancelNotification(id);
-  get().then(() => {
-    eSendEvent("onUpdate", "unpin");
-  });
-}
-
 async function pinQuickNote(launch: boolean) {
   useUserStore.setState({
     disableAppLockRequests: true
@@ -943,13 +960,52 @@ async function setupReminders(checkNeedsScheduling = false) {
       trigger.notification.id &&
       notifee.cancelTriggerNotification(trigger.notification.id as string)
   );
+  updateRemindersForWidget();
+}
+
+class PinnedNotesStorage {
+  static storageKey = "nn::pinnedNoteIds";
+  static get() {
+    const items = MMKV.getArray<string>(PinnedNotesStorage.storageKey);
+    if (!items) return [];
+    return items;
+  }
+
+  static add(id: string) {
+    const items = PinnedNotesStorage.get();
+    if (items.indexOf(id) === -1) {
+      items.push(id);
+      MMKV.setArray(PinnedNotesStorage.storageKey, items);
+    }
+  }
+
+  static remove(id: string) {
+    const items = PinnedNotesStorage.get();
+    const index = items.indexOf(id);
+    if (index > -1) {
+      items.splice(index, 1);
+      MMKV.setArray(PinnedNotesStorage.storageKey, items);
+    }
+  }
+
+  static clear() {
+    MMKV.removeItem(PinnedNotesStorage.storageKey);
+  }
+}
+
+async function remove(id: string) {
+  await notifee.cancelNotification(id);
+  PinnedNotesStorage.remove(id);
+  get().then(() => {
+    eSendEvent("onUpdate", "unpin");
+  });
 }
 
 async function pinNote(id: string) {
   try {
     const note = await db.notes.note(id as string);
     if (!note) return;
-
+    PinnedNotesStorage.add(id);
     let text = await convertNoteToText(note, true);
     if (!text) text = "";
     const html = text.replace(/\n/g, "<br />");
@@ -963,9 +1019,17 @@ async function pinNote(id: string) {
       id: note.id
     });
   } catch (e) {
-    console.log(e);
+    /* empty */
   }
 }
+
+async function restorePinnedNotes() {
+  const pinnedNotes = PinnedNotesStorage.get();
+  for (const id of pinnedNotes) {
+    pinNote(id);
+  }
+}
+
 const Events = {
   onUpdate: "onUpdate"
 };
@@ -988,7 +1052,9 @@ const Notifications = {
   getChannelId,
   isNotePinned,
   pinNote,
-  Events
+  Events,
+  updateRemindersForWidget,
+  restorePinnedNotes
 };
 
 export default Notifications;

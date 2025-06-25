@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useThemeColors } from "@notesnook/theme";
 import { useRoute } from "@react-navigation/native";
 import React, { useCallback, useEffect } from "react";
-import { Keyboard, View } from "react-native";
+import { Keyboard, TouchableOpacity, View, ViewStyle } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -33,20 +33,31 @@ import { editorState } from "../../screens/editor/tiptap/utils";
 import { useSelectionStore } from "../../stores/use-selection-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { getElevationStyle } from "../../utils/elevation";
-import { SIZE, normalize } from "../../utils/size";
-import { Pressable } from "../ui/pressable";
+import { AppFontSize, normalize } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
+import { hexToRGBA, RGB_Linear_Shade } from "../../utils/colors";
 
 interface FloatingButtonProps {
   onPress: () => void;
   color?: string;
   shouldShow?: boolean;
   alwaysVisible?: boolean;
+  icon?: string;
+  testID?: string;
+  position?: "left" | "right";
+  size?: "small" | "large";
+  style?: ViewStyle;
 }
 
 const FloatingButton = ({
   onPress,
   color,
-  alwaysVisible = false
+  alwaysVisible = false,
+  icon,
+  testID,
+  position = "right",
+  size = "large",
+  style
 }: FloatingButtonProps) => {
   const { colors } = useThemeColors();
   const deviceMode = useSettingStore((state) => state.deviceMode);
@@ -108,20 +119,26 @@ const FloatingButton = ({
       style={[
         {
           position: "absolute",
-          right: 12,
+          right: position === "right" ? DefaultAppStyles.GAP : undefined,
+          left: position === "left" ? DefaultAppStyles.GAP : undefined,
           bottom: 20,
-          zIndex: 10
+          zIndex: 10,
+          ...style
         },
         animatedStyle
       ]}
     >
-      <Pressable
-        testID={notesnook.buttons.add}
-        type="accent"
-        accentColor={color}
+      <TouchableOpacity
+        testID={testID || notesnook.buttons.add}
+        activeOpacity={0.95}
         style={{
           ...getElevationStyle(5),
-          borderRadius: 100
+          borderRadius: size === "small" ? 15 : 20,
+          borderTopWidth: 0,
+          borderBottomWidth: 0,
+          borderLeftWidth: 0,
+          borderRightWidth: 0,
+          backgroundColor: colors.primary.background
         }}
         onPress={onPress}
       >
@@ -129,23 +146,29 @@ const FloatingButton = ({
           style={{
             alignItems: "center",
             justifyContent: "center",
-            height: normalize(60),
-            width: normalize(60)
+            height: normalize(size === "small" ? 40 : 60),
+            width: normalize(size === "small" ? 40 : 60),
+            backgroundColor: color
+              ? RGB_Linear_Shade(0.87, hexToRGBA(color))
+              : colors.primary.shade,
+            borderRadius: size === "small" ? 15 : 20
           }}
         >
           <Icon
             name={
-              route.name === "Notebooks"
+              icon
+                ? icon
+                : route.name === "Notebooks"
                 ? "notebook-plus"
                 : route.name === "Trash"
                 ? "delete"
                 : "plus"
             }
-            color={colors.primary.accentForeground}
-            size={SIZE.xxl}
+            color={color || colors.primary.accent}
+            size={size === "small" ? AppFontSize.xl : AppFontSize.xxxl}
           />
         </View>
-      </Pressable>
+      </TouchableOpacity>
     </Animated.View>
   );
 };

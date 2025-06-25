@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { Fragment, useState } from "react";
 import {
@@ -39,9 +40,11 @@ import {
 } from "../../../services/event-manager";
 import Exporter from "../../../services/exporter";
 import PremiumService from "../../../services/premium";
+import { useSettingStore } from "../../../stores/use-setting-store";
 import { useUserStore } from "../../../stores/use-user-store";
 import { getElevationStyle } from "../../../utils/elevation";
-import { SIZE, ph, pv } from "../../../utils/size";
+import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
+import { DefaultAppStyles } from "../../../utils/styles";
 import { sleep } from "../../../utils/time";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
@@ -52,14 +55,15 @@ import { Pressable } from "../../ui/pressable";
 import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import { strings } from "@notesnook/intl";
 
 const ExportNotesSheet = ({
   ids,
-  update
+  update,
+  close
 }: {
   ids: string[];
   update: ((props: PresentSheetOptions) => void) | undefined;
+  close: ((ctx?: string) => void) | undefined;
 }) => {
   const { colors } = useThemeColors();
   const [exporting, setExporting] = useState(false);
@@ -166,12 +170,12 @@ const ExportNotesSheet = ({
         <>
           <View
             style={{
-              paddingHorizontal: 12
+              paddingHorizontal: DefaultAppStyles.GAP
             }}
           >
             <DialogHeader
               icon="export"
-              title={`${strings.export()} ${strings.notes(ids.length)}`}
+              title={strings.exportNotes(ids.length)}
             />
           </View>
 
@@ -193,17 +197,17 @@ const ExportNotesSheet = ({
                   alignItems: "center",
                   flexDirection: "row",
                   paddingRight: 12,
-                  paddingVertical: 10,
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL,
                   justifyContent: "flex-start",
                   borderRadius: 0,
-                  paddingHorizontal: 12,
+                  paddingHorizontal: DefaultAppStyles.GAP,
                   opacity: item.pro ? 1 : 0.5
                 }}
               >
                 <View
                   style={{
                     backgroundColor: colors.primary.shade,
-                    borderRadius: 5,
+                    borderRadius: defaultBorderRadius,
                     height: 60,
                     width: 60,
                     justifyContent: "center",
@@ -215,7 +219,7 @@ const ExportNotesSheet = ({
                     color={
                       item.pro ? colors.primary.accent : colors.primary.icon
                     }
-                    size={SIZE.xxxl + 10}
+                    size={AppFontSize.xxxl + 10}
                   />
                 </View>
                 <View
@@ -224,7 +228,7 @@ const ExportNotesSheet = ({
                   }}
                 >
                   {!item.pro ? <ProTag size={12} /> : null}
-                  <Heading style={{ marginLeft: 10 }} size={SIZE.md}>
+                  <Heading style={{ marginLeft: 10 }} size={AppFontSize.md}>
                     {item.title}
                   </Heading>
                   {/* <Paragraph
@@ -245,8 +249,8 @@ const ExportNotesSheet = ({
               justifyContent: "center",
               alignItems: "center",
               width: "100%",
-              paddingHorizontal: 12,
-              paddingVertical: 20
+              paddingHorizontal: DefaultAppStyles.GAP,
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             {!complete ? (
@@ -273,7 +277,7 @@ const ExportNotesSheet = ({
                 <Heading
                   style={{
                     textAlign: "center",
-                    marginTop: 10
+                    marginTop: DefaultAppStyles.GAP_VERTICAL
                   }}
                   color={colors.secondary.heading}
                 >
@@ -294,13 +298,13 @@ const ExportNotesSheet = ({
                   }
                   type="accent"
                   width={250}
-                  fontSize={SIZE.md}
+                  fontSize={AppFontSize.md}
                   style={{
-                    marginTop: 10,
-                    borderRadius: 100
+                    marginTop: DefaultAppStyles.GAP_VERTICAL
                   }}
                   onPress={async () => {
                     if (!result?.filePath) return;
+                    close?.();
                     if (Platform.OS === "android") {
                       Linking.openURL(result.fileDir).catch((e) => {
                         ToastManager.error(e as Error);
@@ -323,34 +327,40 @@ const ExportNotesSheet = ({
                   title={strings.share()}
                   type="secondaryAccented"
                   width={250}
-                  fontSize={SIZE.md}
+                  fontSize={AppFontSize.md}
                   style={{
-                    marginTop: 10,
-                    borderRadius: 100
+                    marginTop: DefaultAppStyles.GAP_VERTICAL
                   }}
                   onPress={async () => {
                     if (!result) return;
+                    close?.();
+                    useSettingStore
+                      .getState()
+                      .setAppDidEnterBackgroundForAction(true);
                     if (Platform.OS === "ios") {
                       Share.open({
                         url: result?.fileDir + result.fileName
-                      }).catch(console.log);
+                      }).catch(() => {
+                        /* empty */
+                      });
                     } else {
                       FileViewer.open(result.filePath, {
                         showOpenWithDialog: true,
                         showAppsSuggestions: true,
                         shareFile: true
-                      } as any).catch(console.log);
+                      } as any).catch(() => {
+                        /* empty */
+                      });
                     }
                   }}
                 />
                 <Button
                   title={strings.exportAgain()}
-                  type="inverted"
+                  type="secondaryAccented"
                   width={250}
-                  fontSize={SIZE.md}
+                  fontSize={AppFontSize.md}
                   style={{
-                    marginTop: 10,
-                    borderRadius: 100
+                    marginTop: DefaultAppStyles.GAP_VERTICAL
                   }}
                   onPress={async () => {
                     setComplete(false);
@@ -371,7 +381,7 @@ ExportNotesSheet.present = async (ids?: string[], allNotes?: boolean) => {
   const exportNoteIds = allNotes ? await db.notes.all?.ids() : ids || [];
   presentSheet({
     component: (ref, close, update) => (
-      <ExportNotesSheet ids={exportNoteIds} update={update} />
+      <ExportNotesSheet ids={exportNoteIds} update={update} close={close} />
     ),
     keyboardHandlerDisabled: true
   });
@@ -380,18 +390,18 @@ ExportNotesSheet.present = async (ids?: string[], allNotes?: boolean) => {
 const styles = StyleSheet.create({
   container: {
     ...getElevationStyle(5),
-    borderRadius: 5,
-    paddingVertical: pv
+    borderRadius: defaultBorderRadius,
+    paddingVertical: DefaultAppStyles.GAP_VERTICAL
   },
   buttonContainer: {
     justifyContent: "space-between",
     alignItems: "center"
   },
   button: {
-    paddingVertical: pv,
-    paddingHorizontal: ph,
-    marginTop: 10,
-    borderRadius: 5,
+    paddingVertical: DefaultAppStyles.GAP_VERTICAL,
+    paddingHorizontal: DefaultAppStyles.GAP,
+    marginTop: DefaultAppStyles.GAP_VERTICAL,
+    borderRadius: defaultBorderRadius,
     width: "100%",
     justifyContent: "center",
     alignItems: "center",
@@ -401,7 +411,7 @@ const styles = StyleSheet.create({
   buttonText: {
     //fontFamily: "sans-serif",
     color: "white",
-    fontSize: SIZE.sm,
+    fontSize: AppFontSize.sm,
     marginLeft: 5
   },
   overlay: {

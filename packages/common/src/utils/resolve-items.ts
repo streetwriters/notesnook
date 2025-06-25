@@ -48,11 +48,12 @@ export async function resolveItems(ids: string[], items: Item[]) {
   const { type } = items[0];
   if (type === "note") return resolveNotes(ids);
   else if (type === "notebook") {
-    return Promise.all(ids.map((id) => db.notebooks.totalNotes(id)));
+    return await db.notebooks.totalNotes(...ids);
   } else if (type === "tag") {
-    return Promise.all(
-      ids.map((id) => db.relations.from({ id, type: "tag" }, "note").count())
-    );
+    const relations = await db.relations
+      .from({ type: "tag", ids }, "note")
+      .get();
+    return ids.map((id) => relations.filter((r) => r.fromId === id).length);
   }
   return [];
 }
@@ -129,10 +130,10 @@ async function resolveNotes(ids: string[]) {
     } else if (relation.toType === "reminder") {
       data.reminders.push(relation.toId);
       relationIds.reminders.add(relation.toId);
-    } else if (relation.fromType === "notebook" && data.notebooks.length < 2) {
+    } else if (relation.fromType === "notebook") {
       data.notebooks.push(relation.fromId);
       relationIds.notebooks.add(relation.fromId);
-    } else if (relation.fromType === "tag" && data.tags.length < 3) {
+    } else if (relation.fromType === "tag") {
       data.tags.push(relation.fromId);
       relationIds.tags.add(relation.fromId);
     } else if (relation.fromType === "color" && !data.color) {

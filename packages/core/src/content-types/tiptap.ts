@@ -30,7 +30,8 @@ import { parseDocument } from "htmlparser2";
 import dataurl from "../utils/dataurl.js";
 import {
   HTMLParser,
-  extractFirstParagraph,
+  extractHeadline,
+  extractTitle,
   getDummyDocument
 } from "../utils/html-parser.js";
 import { HTMLRewriter } from "../utils/html-rewriter.js";
@@ -89,7 +90,11 @@ export class Tiptap {
   }
 
   toHeadline() {
-    return extractFirstParagraph(this.data);
+    return extractHeadline(this.data);
+  }
+
+  toTitle() {
+    return extractTitle(this.data, 150);
   }
 
   // isEmpty() {
@@ -281,7 +286,8 @@ export class Tiptap {
       !this.data.includes(ATTRIBUTES.src) &&
       !this.data.includes(ATTRIBUTES.hash) &&
       // check for internal links
-      !this.data.includes("nn://")
+      !this.data.includes("nn://") &&
+      !this.data.includes("nn-search-result")
     )
       return {
         data: this.data,
@@ -337,6 +343,8 @@ export class Tiptap {
     const html = new HTMLRewriter({
       ontag: (name, attr, pos) => {
         switch (name) {
+          case "nn-search-result":
+            return null;
           case "img": {
             const hash = attr[ATTRIBUTES.hash];
 

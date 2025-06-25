@@ -34,7 +34,6 @@ export async function unlockVault({
   paragraph: string;
 }) {
   if (unlockPromise) {
-    console.log("Unlocking.... waiting for unlock promise");
     return unlockPromise;
   }
   unlockPromise = new Promise(async (resolve) => {
@@ -58,10 +57,10 @@ export async function unlockVault({
             context: context,
             input: true,
             secureTextEntry: true,
-            positiveText: "Unlock",
+            positiveText: strings.unlock(),
             title: title,
             paragraph: paragraph,
-            inputPlaceholder: "Enter password",
+            inputPlaceholder: strings.enterPassword(),
             positivePress: async (value) => {
               const unlocked = await db.vault.unlock(value);
               if (!unlocked) {

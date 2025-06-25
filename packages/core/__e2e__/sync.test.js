@@ -17,16 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Database from "../src/api/index.ts";
-import { NodeStorageInterface } from "../__mocks__/node-storage.mock.ts";
-import { FS } from "../__mocks__/fs.mock.ts";
-import Compressor from "../__mocks__/compressor.mock.js";
 import { CHECK_IDS, EV, EVENTS } from "../src/common.ts";
-import { EventSource } from "event-source-polyfill";
 import { test, expect, vitest } from "vitest";
 import { login } from "./utils.js";
-import { SqliteDialect } from "@streetwriters/kysely";
-import BetterSQLite3 from "better-sqlite3-multiple-ciphers";
+import { databaseTest } from "../__tests__/utils/index.ts";
 
 const TEST_TIMEOUT = 60 * 1000;
 
@@ -499,22 +493,7 @@ async function initializeDevice(id, capabilities = []) {
     };
   });
 
-  const device = new Database();
-  device.setup({
-    storage: new NodeStorageInterface(),
-    eventsource: EventSource,
-    fs: FS,
-    compressor: Compressor,
-    sqliteOptions: {
-      dialect: (name) =>
-        new SqliteDialect({
-          database: BetterSQLite3(":memory:").unsafeMode(true)
-        })
-    },
-    batchSize: 500
-  });
-
-  await device.init();
+  const device = await databaseTest("memory");
 
   await login(device);
 

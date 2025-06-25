@@ -38,20 +38,20 @@ function StatusBar({
   const stickyRef = useRef(false);
   const prevScroll = useRef(0);
   const lastStickyChangeTime = useRef(0);
-  const [words, setWords] = useState(`0 ${strings.words()}`);
+  const [words, setWords] = useState(strings.totalWords(0));
   const currentWords = useRef(words);
   const statusBar = useRef({
     set: setStatus,
     updateWords: () => {
       const editor = editors[tab.id];
       if (!editor) return;
-      const words = getTotalWords(editor as Editor) + ` ${strings.words()}`;
+      const words = strings.totalWords(getTotalWords(editor as Editor));
       if (currentWords.current === words) return;
       setWords(words);
     },
     resetWords: () => {
-      currentWords.current = `0 ${strings.words()}`;
-      setWords(`0 ${strings.words()}`);
+      currentWords.current = strings.totalWords(0);
+      setWords(currentWords.current);
     }
   });
 
@@ -62,9 +62,12 @@ function StatusBar({
     };
   }, [tab.id, statusBar]);
 
+  const scrollState = useRef({
+    isMovingUp: false,
+    startingOffset: 0
+  });
   const onScroll = React.useCallback((event: Event) => {
     const currentOffset = (event.target as HTMLElement)?.scrollTop;
-    post("editor-event:scroll", currentOffset);
     if (currentOffset < 200) {
       if (stickyRef.current) {
         stickyRef.current = false;
@@ -76,11 +79,39 @@ function StatusBar({
     }
     if (Date.now() - lastStickyChangeTime.current < 300) return;
     if (currentOffset > prevScroll.current) {
-      setSticky(false);
-      stickyRef.current = false;
+      if (
+        !scrollState.current.startingOffset ||
+        scrollState.current.isMovingUp
+      ) {
+        scrollState.current.startingOffset = currentOffset;
+      }
+      scrollState.current.isMovingUp = false;
     } else {
-      setSticky(true);
-      stickyRef.current = true;
+      if (
+        !scrollState.current.startingOffset ||
+        !scrollState.current.isMovingUp
+      ) {
+        scrollState.current.startingOffset = currentOffset;
+      }
+      scrollState.current.isMovingUp = true;
+    }
+
+    if (scrollState.current.isMovingUp) {
+      if (currentOffset < scrollState.current.startingOffset - 50) {
+        if (!stickyRef.current) {
+          stickyRef.current = true;
+          setSticky(true);
+        }
+        scrollState.current.startingOffset = 0;
+      }
+    } else {
+      if (currentOffset > scrollState.current.startingOffset + 50) {
+        if (stickyRef.current) {
+          stickyRef.current = false;
+          setSticky(false);
+        }
+        scrollState.current.startingOffset = 0;
+      }
     }
     lastStickyChangeTime.current = Date.now();
     prevScroll.current = currentOffset;
@@ -119,7 +150,7 @@ function StatusBar({
         position: sticky ? "sticky" : "relative",
         top: -3,
         backgroundColor: "var(--nn_primary_background)",
-        zIndex: 1,
+        zIndex: 10,
         justifyContent: sticky ? "center" : "flex-start",
         paddingTop: 4,
         paddingBottom: 2

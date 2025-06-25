@@ -38,7 +38,7 @@ import { downloadAttachments } from "../../common/filesystem/download-attachment
 import { AttachmentGroupProgress } from "../../screens/settings/attachment-group-progress";
 import { presentSheet, ToastManager } from "../../services/event-manager";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { Dialog } from "../dialog";
 import { presentDialog } from "../dialog/functions";
 import { Header } from "../header";
@@ -50,6 +50,7 @@ import Seperator from "../ui/seperator";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { AttachmentItem } from "./attachment-item";
+import { DefaultAppStyles } from "../../utils/styles";
 
 const DEFAULT_SORTING: SortOptions = {
   sortBy: "dateEdited",
@@ -206,7 +207,7 @@ export const AttachmentDialog = ({
       errorOnly={currentFilter === "errors"}
       attachments={attachments}
       id={index}
-      context="global"
+      context={!isSheet ? "global" : "attachments-list"}
     />
   );
 
@@ -235,7 +236,7 @@ export const AttachmentDialog = ({
     for (let i = 0; i < filteredAttachments.placeholders.length; i++) {
       if (!getState().isWorking) {
         ToastManager.show({
-          message: "Attachment recheck cancelled",
+          message: strings.attachmentRecheckCancelled(),
           type: "info",
           context: isSheet ? "local" : "global"
         });
@@ -322,33 +323,34 @@ export const AttachmentDialog = ({
       ) : null}
       {!isSheet ? (
         <Header
-          title="Manage attachments"
+          title={strings.manageAttachments()}
           renderedInRoute="SettingsGroup"
           canGoBack
-          headerRightButtons={[
-            {
-              onPress() {
-                onCheck();
-              },
-              title: "Recheck all"
-            },
-            {
-              onPress() {
-                if (!attachments) return;
-                presentDialog({
-                  title: `Download ${attachments.placeholders.length} attachments`,
-                  paragraph:
-                    "Are you sure you want to download all attachments?",
-                  positiveText: "Download",
-                  positivePress: async () => {
-                    downloadAttachments(await attachments.ids());
-                  },
-                  negativeText: "Cancel"
-                });
-              },
-              title: "Download all"
-            }
-          ]}
+          // TODO: Add headerRightButtons
+          // headerRightButtons={[
+          //   {
+          //     onPress() {
+          //       onCheck();
+          //     },
+          //     title: strings.recheckAll()
+          //   },
+          //   {
+          //     onPress() {
+          //       if (!attachments) return;
+          //       presentDialog({
+          //         title: strings.doActions.download.attachment(
+          //           attachments.placeholders.length
+          //         ),
+          //         positiveText: strings.network.download(),
+          //         positivePress: async () => {
+          //           downloadAttachments(await attachments.ids());
+          //         },
+          //         negativeText: strings.cancel()
+          //       });
+          //     },
+          //     title: strings.downloadAllAttachments()
+          //   }
+          // ]}
         />
       ) : (
         <View
@@ -356,7 +358,7 @@ export const AttachmentDialog = ({
             flexDirection: "row",
             justifyContent: "space-between",
             alignItems: "center",
-            paddingHorizontal: 12
+            paddingHorizontal: DefaultAppStyles.GAP
           }}
         >
           <Heading>{strings.dataTypesPluralCamelCase.attachment()}</Heading>
@@ -369,37 +371,30 @@ export const AttachmentDialog = ({
             <IconButton
               name="check-all"
               style={{
-                height: 40,
-                width: 40,
                 marginRight: 10
               }}
               color={colors.primary.paragraph}
-              size={SIZE.lg}
+              size={AppFontSize.lg}
               onPress={onCheck}
             />
 
             <IconButton
               name="download"
-              style={{
-                height: 40,
-                width: 40
-              }}
               color={colors.primary.paragraph}
               onPress={() => {
                 if (!attachments) return;
                 presentDialog({
-                  title: `Download ${attachments.placeholders.length} attachments`,
-                  paragraph:
-                    "Are you sure you want to download all attachments?",
-                  context: "local",
-                  positiveText: "Download",
+                  title: strings.doActions.download.attachment(
+                    attachments.placeholders.length
+                  ),
+                  positiveText: strings.network.download(),
                   positivePress: async () => {
                     downloadAttachments(await attachments.ids());
                   },
-                  negativeText: "Cancel"
+                  negativeText: strings.cancel()
                 });
               }}
-              size={SIZE.lg}
+              size={AppFontSize.lg}
             />
           </View>
         </View>
@@ -409,7 +404,7 @@ export const AttachmentDialog = ({
         style={{
           width: "100%",
           alignSelf: "center",
-          paddingHorizontal: 12,
+          paddingHorizontal: DefaultAppStyles.GAP,
           height: "100%"
         }}
       >
@@ -429,7 +424,7 @@ export const AttachmentDialog = ({
               alignItems: "center",
               width: "100%",
               borderRadius: 10,
-              padding: 10,
+              padding: DefaultAppStyles.GAP_SMALL,
               borderWidth: 1,
               borderColor: colors.primary.border,
               gap: 12,
@@ -457,14 +452,16 @@ export const AttachmentDialog = ({
                 <Paragraph>
                   {rechecker.isWorking
                     ? note
-                      ? `Checking ${rechecker.filter.toLowerCase()} note attachments`
-                      : `Checking ${rechecker.filter.toLowerCase()} attachments`
-                    : "Attachments recheck complete"}
+                      ? strings.checkingNoteAttachments()
+                      : strings.checkingAllAttachments()
+                    : strings.attachmentRecheckComplete()}
                 </Paragraph>
                 <Paragraph>
-                  {`${rechecker.isWorking ? "Please wait... " : ""}Passed: ${
+                  {`${
+                    rechecker.isWorking ? `${strings.pleaseWait()} ` : ""
+                  }${strings.passed()}: ${
                     rechecker.passed
-                  }, Failed: ${rechecker.failed}`}
+                  }, ${strings.failed()}: ${rechecker.failed}`}
                 </Paragraph>
               </View>
             </View>
@@ -472,7 +469,7 @@ export const AttachmentDialog = ({
             <IconButton
               type={rechecker.isWorking ? "errorShade" : "plain"}
               name={rechecker.isWorking ? "close" : "check"}
-              size={SIZE.lg}
+              size={AppFontSize.lg}
               color={
                 rechecker.isWorking ? colors.error.icon : colors.primary.accent
               }
@@ -493,7 +490,7 @@ export const AttachmentDialog = ({
               backgroundColor: colors.primary.background,
               flexWrap: "wrap",
               flexDirection: "row",
-              paddingVertical: 12
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL
             }}
             contentContainerStyle={{
               alignItems: "center"
@@ -510,10 +507,10 @@ export const AttachmentDialog = ({
                   }
                   key={item.title}
                   title={item.title}
-                  fontSize={SIZE.sm}
+                  fontSize={AppFontSize.sm}
                   style={{
                     borderRadius: 100,
-                    paddingHorizontal: 12,
+                    paddingHorizontal: DefaultAppStyles.GAP,
                     height: 40,
                     minWidth: 80
                   }}
@@ -527,7 +524,9 @@ export const AttachmentDialog = ({
                         setAttachments(results);
                         setLoading(false);
                       })
-                      .catch(console.log);
+                      .catch(() => {
+                        /* empty */
+                      });
                   }}
                 />
               )

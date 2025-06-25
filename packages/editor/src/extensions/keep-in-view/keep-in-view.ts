@@ -71,7 +71,7 @@ export const KeepInView = Extension.create<
 
 export function keepLastLineInView(
   editor: Editor,
-  THRESHOLD = 80,
+  THRESHOLD = 90,
   SCROLL_THRESHOLD = 100
 ) {
   if (
@@ -82,9 +82,7 @@ export function keepLastLineInView(
   )
     return;
 
-  const isPopupVisible = document.getElementsByClassName(
-    "editor-mobile-toolbar-popup"
-  );
+  const isPopupVisible = document.querySelector(".editor-mobile-toolbar-popup");
 
   const node = editor.state.selection.$from;
   if (node.pos > editor.state.doc.nodeSize) return;

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:initialKeyguardLayout="@layout/new_note_widget"
+    android:initialLayout="@layout/new_note_widget"
+    android:minWidth="400dp"
+    android:minHeight="50dp"
+    android:minResizeWidth="50dp"
+    android:minResizeHeight="50dp"
+    android:description="@string/take_a_quick_note"
+    android:targetCellWidth="5"
+    android:targetCellHeight="1"
+    android:previewImage="@drawable/widget_preview"
+    android:resizeMode="horizontal|vertical"
+    android:updatePeriodMillis="86400000"
+    android:widgetCategory="home_screen"/>

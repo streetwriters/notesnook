@@ -31,6 +31,7 @@ import {
   DateFormatPicker,
   FontPicker,
   HomePicker,
+  SidebarTabPicker,
   TimeFormatPicker,
   TrashIntervalPicker
 } from "./picker/pickers";
@@ -41,6 +42,7 @@ import { Subscription } from "./subscription";
 import ThemeSelector from "./theme-selector";
 import { TitleFormat } from "./title-format";
 import { View } from "react-native";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const components: { [name: string]: ReactElement } = {
   colorpicker: <AccentColorPicker />,
@@ -63,8 +65,9 @@ export const components: { [name: string]: ReactElement } = {
   "server-config": <ServersConfiguration />,
   "attachments-manager": <AttachmentDialog note={undefined} isSheet={false} />,
   "offline-mode-progress": (
-    <View style={{ paddingHorizontal: 12 }}>
+    <View style={{ paddingHorizontal: DefaultAppStyles.GAP }}>
       <AttachmentGroupProgress groupId="offline-mode" />
     </View>
-  )
+  ),
+  "sidebar-tab-selector": <SidebarTabPicker />
 };

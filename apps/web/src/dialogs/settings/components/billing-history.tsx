@@ -130,7 +130,7 @@ export function BillingHistory() {
                   {transaction.amount} {transaction.currency}
                 </Text>
                 <Text as="td" variant="body">
-                  {strings.transactionStatusToText[transaction.status]()}
+                  {strings.transactionStatusToText(transaction.status)}
                 </Text>
                 <Text as="td" variant="body">
                   <Link

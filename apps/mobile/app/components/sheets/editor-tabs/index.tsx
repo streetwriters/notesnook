@@ -16,8 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { Note } from "@notesnook/core";
-import { EVENTS } from "@notesnook/core";
+import { EVENTS, Note } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect } from "react";
 import { View } from "react-native";
@@ -25,27 +25,19 @@ import { FlatList } from "react-native-actions-sheet";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../../common/database";
 import { useDBItem } from "../../../hooks/use-db-item";
-import { useTabStore } from "../../../screens/editor/tiptap/use-tab-store";
+import {
+  TabItem,
+  useTabStore
+} from "../../../screens/editor/tiptap/use-tab-store";
 import { editorController } from "../../../screens/editor/tiptap/utils";
 import { eSendEvent, presentSheet } from "../../../services/event-manager";
 import { eUnlockNote } from "../../../utils/events";
-import { SIZE } from "../../../utils/size";
-import { Button } from "../../ui/button";
+import { AppFontSize } from "../../../utils/size";
 import { IconButton } from "../../ui/icon-button";
 import { Pressable } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import { strings } from "@notesnook/intl";
-
-type TabItem = {
-  id: number;
-  noteId?: string;
-  previewTab?: boolean;
-  locked?: boolean;
-  noteLocked?: boolean;
-  readonly?: boolean;
-  pinned?: boolean;
-};
+import { DefaultAppStyles } from "../../../utils/styles";
 
 const TabItemComponent = (props: {
   tab: TabItem;
@@ -53,7 +45,7 @@ const TabItemComponent = (props: {
   close?: (ctx?: string | undefined) => void;
 }) => {
   const { colors } = useThemeColors();
-  const [item, update] = useDBItem(props.tab.noteId, "note");
+  const [item, update] = useDBItem(props.tab.session?.noteId, "note");
 
   useEffect(() => {
     const syncCompletedSubscription = db.eventManager?.subscribe(
@@ -85,22 +77,17 @@ const TabItemComponent = (props: {
       onPress={() => {
         if (!props.isFocused) {
           useTabStore.getState().focusTab(props.tab.id);
-          if (props.tab.locked) {
+          if (props.tab.session?.locked) {
             eSendEvent(eUnlockNote);
           }
 
-          if (!props.tab.noteId) {
+          if (!props.tab.session?.noteId) {
             setTimeout(() => {
               editorController?.current?.commands?.focus(props.tab.id);
             }, 300);
           }
         }
         props.close?.();
-      }}
-      onLongPress={() => {
-        useTabStore.getState().updateTab(props.tab.id, {
-          previewTab: false
-        });
       }}
     >
       <View
@@ -112,17 +99,19 @@ const TabItemComponent = (props: {
           flexShrink: 1
         }}
       >
-        {props.tab.noteLocked ? (
+        {props.tab.session?.noteLocked ? (
           <>
-            {props.tab.locked ? (
-              <Icon size={SIZE.md} name="lock" />
+            {props.tab.session?.locked ? (
+              <Icon size={AppFontSize.md} name="lock" />
             ) : (
-              <Icon size={SIZE.md} name="lock-open-outline" />
+              <Icon size={AppFontSize.md} name="lock-open-outline" />
             )}
           </>
         ) : null}
 
-        {props.tab.readonly ? <Icon size={SIZE.md} name="pencil-lock" /> : null}
+        {props.tab.session?.readonly ? (
+          <Icon size={AppFontSize.md} name="pencil-lock" />
+        ) : null}
 
         <Paragraph
           color={
@@ -130,15 +119,10 @@ const TabItemComponent = (props: {
               ? colors.selected.paragraph
               : colors.primary.paragraph
           }
-          style={{
-            fontFamily: props.tab.previewTab
-              ? "OpenSans-Italic"
-              : "OpenSans-Regular"
-          }}
           numberOfLines={1}
-          size={SIZE.md}
+          size={AppFontSize.md}
         >
-          {props.tab.noteId
+          {props.tab.session?.noteId
             ? item?.title || strings.untitledNote()
             : strings.newNote()}
         </Paragraph>
@@ -153,12 +137,11 @@ const TabItemComponent = (props: {
       >
         <IconButton
           name="pin"
-          size={SIZE.lg}
+          size={AppFontSize.lg}
           color={props.tab.pinned ? colors.primary.accent : colors.primary.icon}
           onPress={() => {
             useTabStore.getState().updateTab(props.tab.id, {
-              pinned: !props.tab.pinned,
-              previewTab: false
+              pinned: !props.tab.pinned
             });
           }}
           top={0}
@@ -170,7 +153,7 @@ const TabItemComponent = (props: {
         {!props.tab?.pinned ? (
           <IconButton
             name="close"
-            size={SIZE.lg}
+            size={AppFontSize.lg}
             color={colors.primary.icon}
             onPress={() => {
               const isLastTab = useTabStore.getState().tabs.length === 1;
@@ -197,6 +180,7 @@ export default function EditorTabs({
 }: {
   close?: (ctx?: string | undefined) => void;
 }) {
+  const { colors } = useThemeColors();
   const [tabs, currentTab] = useTabStore((state) => [
     state.tabs,
     state.currentTab
@@ -219,7 +203,7 @@ export default function EditorTabs({
   return (
     <View
       style={{
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         gap: 12,
         maxHeight: "100%"
       }}
@@ -232,26 +216,14 @@ export default function EditorTabs({
           alignItems: "center"
         }}
       >
-        <Heading size={SIZE.lg}>{strings.tabs()}</Heading>
-        <Button
+        <Heading size={AppFontSize.lg}>{strings.tabs()}</Heading>
+        <IconButton
           onPress={() => {
             useTabStore.getState().newTab();
-            setTimeout(() => {
-              editorController?.current?.commands?.focus(
-                useTabStore.getState().currentTab
-              );
-            }, 500);
             close?.();
           }}
-          title={strings.newTab()}
-          icon="plus"
-          style={{
-            flexDirection: "row",
-            justifyContent: "flex-start",
-            borderRadius: 100,
-            height: 35
-          }}
-          iconSize={SIZE.lg}
+          name="plus"
+          color={colors.primary.accent}
         />
       </View>
 

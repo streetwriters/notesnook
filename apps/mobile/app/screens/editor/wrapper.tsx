@@ -123,3 +123,5 @@ export const EditorWrapper = ({ widths }: { widths: any }) => {
     </View>
   );
 };
+
+export default EditorWrapper;

@@ -27,13 +27,11 @@ import { generatePassword } from "../utils/password-generator";
 import { deriveKey, useKeyStore } from "../interfaces/key-store";
 import { logManager } from "@notesnook/core";
 import Config from "../utils/config";
+import { FileStorage } from "../interfaces/fs";
 
 const db = database;
 async function initializeDatabase(persistence: DatabasePersistence) {
-  logger.measure("Database initialization");
-
-  const { FileStorage } = await import("../interfaces/fs");
-  const { Compressor } = await import("../utils/compressor");
+  performance.mark("start:initializeDatabase");
 
   let databaseKey = await useKeyStore.getState().getValue("databaseKey");
   if (!databaseKey) {
@@ -46,6 +44,7 @@ async function initializeDatabase(persistence: DatabasePersistence) {
     AUTH_HOST: "https://auth.streetwriters.co",
     SSE_HOST: "https://events.streetwriters.co",
     ISSUES_HOST: "https://issues.streetwriters.co",
+    MONOGRAPH_HOST: "https://monogr.ph",
     SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co",
     ...Config.get("serverUrls", {})
   });
@@ -57,7 +56,7 @@ async function initializeDatabase(persistence: DatabasePersistence) {
   );
   await storage.migrate();
 
-  const multiTab = !!globalThis.SharedWorker && isFeatureSupported("opfs");
+  const multiTab = isFeatureSupported("opfs");
   database.setup({
     sqliteOptions: {
       dialect: (name, init) =>
@@ -84,7 +83,8 @@ async function initializeDatabase(persistence: DatabasePersistence) {
     storage: storage,
     eventsource: EventSource,
     fs: FileStorage,
-    compressor: new Compressor(),
+    compressor: () =>
+      import("../utils/compressor").then(({ Compressor }) => new Compressor()),
     batchSize: 100
   });
 
@@ -106,9 +106,9 @@ async function initializeDatabase(persistence: DatabasePersistence) {
   // });
   // }
 
-  console.log("loading db");
+  performance.mark("start:initdb");
   await db.init();
-  console.log("db loaded");
+  performance.mark("end:initdb");
 
   window.addEventListener("beforeunload", async () => {
     if (IS_DESKTOP_APP) {
@@ -117,14 +117,13 @@ async function initializeDatabase(persistence: DatabasePersistence) {
     }
   });
 
-  logger.measure("Database initialization");
-
   if (db.migrations?.required()) {
     await import("../dialogs/migration-dialog").then(({ MigrationDialog }) =>
       MigrationDialog.show({})
     );
   }
 
+  performance.mark("end:initializeDatabase");
   return db;
 }
 

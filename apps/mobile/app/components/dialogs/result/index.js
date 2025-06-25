@@ -27,13 +27,14 @@ import {
 import { useThemeColors } from "@notesnook/theme";
 import { getElevationStyle } from "../../../utils/elevation";
 import { eCloseResultDialog, eOpenResultDialog } from "../../../utils/events";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import BaseDialog from "../../dialog/base-dialog";
 import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { ProFeatures } from "./pro-features";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 const ResultDialog = () => {
   const { colors } = useThemeColors();
@@ -78,15 +79,15 @@ const ResultDialog = () => {
         }}
       >
         <Heading
-          size={SIZE.lg}
+          size={AppFontSize.lg}
           textBreakStrategy="balanced"
           style={{
             alignSelf: "center",
             textAlign: "center",
-            marginTop: 10,
+            marginTop: DefaultAppStyles.GAP_VERTICAL,
             maxWidth: "100%",
-            marginBottom: 10,
-            paddingHorizontal: 12
+            marginBottom: DefaultAppStyles.GAP_VERTICAL,
+            paddingHorizontal: DefaultAppStyles.GAP
           }}
         >
           {dialogData.title}
@@ -94,12 +95,12 @@ const ResultDialog = () => {
 
         <Paragraph
           color={colors.secondary.paragraph}
-          size={SIZE.md}
+          size={AppFontSize.md}
           style={{
             alignSelf: "center",
             textAlign: "center",
             maxWidth: "80%",
-            lineHeight: SIZE.sm + 5
+            lineHeight: AppFontSize.sm + 5
           }}
         >
           {dialogData.paragraph}
@@ -109,7 +110,7 @@ const ResultDialog = () => {
 
         <View
           style={{
-            paddingHorizontal: 12,
+            paddingHorizontal: DefaultAppStyles.GAP,
             alignItems: "center",
             width: "100%"
           }}
@@ -124,17 +125,17 @@ const ResultDialog = () => {
             width: "100%",
             borderBottomRightRadius: 10,
             borderBottomLeftRadius: 10,
-            paddingVertical: 10
+            paddingVertical: DefaultAppStyles.GAP_VERTICAL
           }}
         >
           <Button
             title={dialogData.button}
             width={null}
             style={{
-              paddingHorizontal: 12
+              paddingHorizontal: DefaultAppStyles.GAP
             }}
             onPress={close}
-            fontSize={SIZE.md + 2}
+            fontSize={AppFontSize.md + 2}
           />
         </View>
       </View>

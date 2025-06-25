@@ -19,25 +19,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import {
+  ScopedThemeProvider,
   THEME_COMPATIBILITY_VERSION,
   useThemeEngineStore
 } from "@notesnook/theme";
 import React, { useEffect } from "react";
-import { I18nManager, View } from "react-native";
+import { Appearance, I18nManager, StatusBar } from "react-native";
 import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import AppLockedOverlay from "./components/app-lock-overlay";
+import DialogProvider from "./components/dialog-provider";
 import { withErrorBoundry } from "./components/exception-handler";
 import GlobalSafeAreaProvider from "./components/globalsafearea";
+import { Toast } from "./components/toast";
 import { useAppEvents } from "./hooks/use-app-events";
-import { ApplicationHolder } from "./navigation";
+import { NotePreviewConfigure } from "./screens/note-preview-configure";
+import { RootNavigation } from "./navigation/navigation-stack";
 import { themeTrpcClient } from "./screens/settings/theme-selector";
 import Notifications from "./services/notifications";
 import SettingsService from "./services/settings";
 import { TipManager } from "./services/tip-manager";
-import { useThemeStore } from "./stores/use-theme-store";
+import { changeSystemBarColors, useThemeStore } from "./stores/use-theme-store";
 import { useUserStore } from "./stores/use-user-store";
+import RNBootSplash from "react-native-bootsplash";
+import AppLocked from "./components/app-lock";
 
 I18nManager.allowRTL(false);
 I18nManager.forceRTL(false);
@@ -47,11 +52,13 @@ if (appLockEnabled || appLockMode !== "none") {
   useUserStore.getState().lockApp(true);
 }
 
-const App = () => {
+RNBootSplash.hide();
+const App = (props: { configureMode: "note-preview" }) => {
   useAppEvents();
   //@ts-ignore
   globalThis["IS_MAIN_APP_RUNNING"] = true;
   useEffect(() => {
+    changeSystemBarColors();
     SettingsService.onFirstLaunch();
     setTimeout(async () => {
       await Notifications.get();
@@ -61,39 +68,29 @@ const App = () => {
       TipManager.init();
     }, 100);
   }, []);
-  return (
-    <View
-      style={{
-        height: "100%",
-        width: "100%",
-        justifyContent: "center",
-        alignItems: "center"
-      }}
-    >
-      <View
-        style={{
-          position: "absolute",
-          width: "100%",
-          height: "100%",
-          zIndex: -1
-        }}
-        pointerEvents="none"
-      >
-        <SafeAreaProvider>
-          <GlobalSafeAreaProvider />
-        </SafeAreaProvider>
-      </View>
 
+  return (
+    <SafeAreaProvider>
+      <StatusBar translucent={true} backgroundColor="transparent" />
       <GestureHandlerRootView
         style={{
           height: "100%",
           width: "100%"
         }}
       >
-        <ApplicationHolder />
+        <GlobalSafeAreaProvider />
+        {props.configureMode === "note-preview" ? (
+          <NotePreviewConfigure />
+        ) : (
+          <RootNavigation />
+        )}
+        <ScopedThemeProvider value="dialog">
+          <Toast />
+        </ScopedThemeProvider>
+        <DialogProvider />
+        <AppLocked />
       </GestureHandlerRootView>
-      <AppLockedOverlay />
-    </View>
+    </SafeAreaProvider>
   );
 };
 
@@ -103,8 +100,8 @@ let currTheme =
     : SettingsService.getProperty("lighTheme");
 useThemeEngineStore.getState().setTheme(currTheme);
 
-export const withTheme = (Element: () => JSX.Element) => {
-  return function AppWithThemeProvider() {
+export const withTheme = (Element: (props: any) => JSX.Element) => {
+  return function AppWithThemeProvider(props: any) {
     const [colorScheme, darkTheme, lightTheme] = useThemeStore((state) => [
       state.colorScheme,
       state.darkTheme,
@@ -123,28 +120,40 @@ export const withTheme = (Element: () => JSX.Element) => {
           })
           .then((theme) => {
             if (theme) {
-              console.log(theme.version, "theme updated");
               theme.colorScheme === "dark"
                 ? useThemeStore.getState().setDarkTheme(theme)
                 : useThemeStore.getState().setLightTheme(theme);
             }
           })
-          .catch(console.log);
+          .catch(() => {
+            /* empty */
+          });
       }, 1000);
+
+      const listener = Appearance.addChangeListener(({ colorScheme }) => {
+        if (colorScheme && SettingsService.getProperty("useSystemTheme")) {
+          useThemeStore.getState().setColorScheme(colorScheme);
+        }
+      });
+      return () => {
+        listener.remove();
+      };
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const nextTheme = colorScheme === "dark" ? darkTheme : lightTheme;
-    if (JSON.stringify(nextTheme) !== JSON.stringify(currTheme)) {
-      useThemeEngineStore
-        .getState()
-        .setTheme(colorScheme === "dark" ? darkTheme : lightTheme);
-      currTheme = nextTheme;
-    }
+    useEffect(() => {
+      const nextTheme = colorScheme === "dark" ? darkTheme : lightTheme;
+      if (JSON.stringify(nextTheme) !== JSON.stringify(currTheme)) {
+        useThemeEngineStore
+          .getState()
+          .setTheme(colorScheme === "dark" ? darkTheme : lightTheme);
+        currTheme = nextTheme;
+      }
+    }, [colorScheme, darkTheme, lightTheme]);
 
     return (
       <I18nProvider i18n={i18n}>
-        <Element />
+        <Element {...props} />
       </I18nProvider>
     );
   };

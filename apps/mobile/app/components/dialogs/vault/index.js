@@ -41,7 +41,7 @@ import {
   eUpdateNoteInEditor
 } from "../../../utils/events";
 import { deleteItems } from "../../../utils/functions";
-import { tabBarRef } from "../../../utils/global-refs";
+import { fluidTabsRef } from "../../../utils/global-refs";
 import { convertNoteToText } from "../../../utils/note-to-text";
 import { sleep } from "../../../utils/time";
 import BaseDialog from "../../dialog/base-dialog";
@@ -53,6 +53,7 @@ import Input from "../../ui/input";
 import Seperator from "../../ui/seperator";
 import Paragraph from "../../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 export class VaultDialog extends Component {
   constructor(props) {
@@ -311,8 +312,10 @@ export class VaultDialog extends Component {
       loading: true
     });
     try {
-      let verified = await db.user.verifyPassword(this.password);
-      if (!(await db.user.getUser())) verified = true;
+      let verified = true;
+      if (await db.user.getUser()) {
+        verified = await db.user.verifyPassword(this.password);
+      }
       if (verified) {
         let noteIds = [];
         if (this.state.deleteAll) {
@@ -320,19 +323,20 @@ export class VaultDialog extends Component {
           const relations = await db.relations.from(vault, "note").get();
           noteIds = relations.map((item) => item.toId);
         }
-
         await db.vault.delete(this.state.deleteAll);
 
-        noteIds.forEach((id) => {
-          eSendEvent(
-            eUpdateNoteInEditor,
-            {
-              id: id,
-              deleted: true
-            },
-            true
-          );
-        });
+        if (this.state.deleteAll) {
+          noteIds.forEach((id) => {
+            eSendEvent(
+              eUpdateNoteInEditor,
+              {
+                id: id,
+                deleted: true
+              },
+              true
+            );
+          });
+        }
 
         eSendEvent("vaultUpdated");
         this.setState({
@@ -403,7 +407,6 @@ export class VaultDialog extends Component {
     } else {
       await db.vault.add(this.state.note.id);
 
-      console.log("update note event...");
       eSendEvent(eUpdateNoteInEditor, this.state.note, true);
 
       this.close();
@@ -457,7 +460,7 @@ export class VaultDialog extends Component {
   async _deleteNote() {
     try {
       await db.vault.remove(this.state.note.id, this.password);
-      await deleteItems([this.state.note.id], "note");
+      await deleteItems("note", [this.state.note.id]);
       this.close();
     } catch (e) {
       this._takeErrorAction(e);
@@ -517,7 +520,6 @@ export class VaultDialog extends Component {
       });
       this.close();
     } else {
-      eSendEvent("vaultUpdated");
       ToastManager.show({
         heading: strings.vaultCreated(),
         type: "success",
@@ -525,6 +527,7 @@ export class VaultDialog extends Component {
       });
       this.close();
     }
+    eSendEvent("vaultUpdated");
   }
 
   _permanantUnlock() {
@@ -551,7 +554,7 @@ export class VaultDialog extends Component {
         item: note
       });
       if (!DDS.isTab) {
-        tabBarRef.current?.goToPage(1);
+        fluidTabsRef.current?.goToPage("editor");
       }
     });
   }
@@ -580,24 +583,17 @@ export class VaultDialog extends Component {
   }
 
   _takeErrorAction(e) {
-    if (
-      e.message === db.vault.ERRORS.wrongPassword ||
-      e.message === "FAILURE"
-    ) {
-      this.setState({
-        wrongPassword: true,
-        visible: true
+    this.setState({
+      wrongPassword: true,
+      visible: true
+    });
+    setTimeout(() => {
+      ToastManager.show({
+        heading: strings.passwordIncorrect(),
+        type: "error",
+        context: "local"
       });
-      setTimeout(() => {
-        ToastManager.show({
-          heading: strings.passwordIncorrect(),
-          type: "error",
-          context: "local"
-        });
-      }, 500);
-
-      return;
-    }
+    }, 500);
   }
 
   _revokeFingerprintAccess = async () => {
@@ -682,7 +678,7 @@ export class VaultDialog extends Component {
 
           <View
             style={{
-              paddingHorizontal: 12
+              paddingHorizontal: DefaultAppStyles.GAP
             }}
           >
             {(novault ||
@@ -755,7 +751,7 @@ export class VaultDialog extends Component {
                     : "checkbox-blank-circle-outline"
                 }
                 style={{
-                  marginTop: 10
+                  marginTop: DefaultAppStyles.GAP_VERTICAL
                 }}
                 width="100%"
                 title={strings.deleteAllNotes()}
@@ -852,7 +848,7 @@ export class VaultDialog extends Component {
                   });
                 }}
                 style={{
-                  marginTop: 10
+                  marginTop: DefaultAppStyles.GAP_VERTICAL
                 }}
                 icon="fingerprint"
                 width="100%"
@@ -876,9 +872,9 @@ export class VaultDialog extends Component {
             }
             positiveTitle={
               deleteVault
-                ? strings.deleteVault()
+                ? strings.delete()
                 : clearVault
-                ? strings.clearVault()
+                ? strings.clear()
                 : fingerprintAccess
                 ? strings.enable()
                 : this.state.revokeFingerprintAccess

@@ -2,7 +2,7 @@ const PerformanceNow =
   (global.performance && global.performance.now) ||
   global.performanceNow ||
   global.nativePerformanceNow || (() => { try {
-    var now = require('fbjs/lib/performanceNow')
+    var now = __DEV__ ? require('fbjs/lib/performanceNow') : () => Date.now()
   } finally { return now }})();
 
 const DEFAULT_LABEL = 'default';

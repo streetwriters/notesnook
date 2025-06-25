@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import tinycolor from "tinycolor2";
+import { colord } from "colord";
 import { PopupWrapper } from "../../components/popup-presenter/index.js";
 import { config } from "../../utils/config.js";
 import { SplitButton } from "../components/split-button.js";
@@ -35,7 +35,7 @@ import { strings } from "@notesnook/intl";
 type ColorType = "background" | "text" | "border";
 type ColorToolProps = ToolProps & {
   onColorChange: (color?: string) => void;
-  activeColor: string;
+  activeColor?: string;
   title: string;
   cacheKey: string;
   type: ColorType;
@@ -103,7 +103,7 @@ export function ColorTool(props: ColorToolProps) {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const defaultColors = DEFAULT_COLORS[type];
   const activeColor = _activeColor || config.get(cacheKey);
-  const tColor = tinycolor(activeColor);
+  const tColor = activeColor ? colord(activeColor) : undefined;
   const isBottom = useToolbarLocation() === "bottom";
   const { toggle, isOpen, close, isPinned, togglePinned } = usePopupManager({
     id: props.icon,
@@ -132,12 +132,12 @@ export function ColorTool(props: ColorToolProps) {
     <SplitButton
       {...toolProps}
       buttonRef={buttonRef}
-      iconColor={activeColor && tColor.isDark() ? "white" : "icon"}
+      iconColor={activeColor && tColor?.isDark() ? "white" : "icon"}
       sx={{
         mr: 0,
         bg: activeColor || "transparent",
         ":hover:not(:disabled):not(:active)": {
-          bg: activeColor ? tColor.darken(5).toRgbString() : "transparent"
+          bg: tColor ? tColor.darken().toRgbString() : "transparent"
         }
       }}
       onOpen={toggle}

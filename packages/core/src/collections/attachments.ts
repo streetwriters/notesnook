@@ -171,10 +171,10 @@ export class Attachments implements ICollection {
 
       filename:
         filename ||
-        getFileNameWithExtension(
+        (await getFileNameWithExtension(
           filename || hash,
           mimeType || "application/octet-stream"
-        ),
+        )),
       hash,
       hashType,
       mimeType: mimeType || "application/octet-stream",
@@ -422,7 +422,7 @@ export class Attachments implements ICollection {
   async cleanup() {
     const now = dayjs().unix();
     const ids: string[] = [];
-    for await (const attachment of this.deleted) {
+    for await (const attachment of this.deleted.iterate()) {
       if (dayjs(attachment.dateDeleted).add(7, "days").unix() < now) continue;
 
       const isDeleted = await this.db.fs().deleteFile(attachment.hash);

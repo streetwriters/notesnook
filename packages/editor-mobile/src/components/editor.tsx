@@ -22,9 +22,9 @@ import {
   getFontById,
   getTableOfContents,
   TiptapOptions,
+  toBlobURL,
   usePermissionHandler
 } from "@notesnook/editor";
-import { toBlobURL } from "@notesnook/editor";
 import { useThemeColors } from "@notesnook/theme";
 import FingerprintIcon from "mdi-react/FingerprintIcon";
 import {
@@ -36,15 +36,11 @@ import {
   useState
 } from "react";
 import { useEditorController } from "../hooks/useEditorController";
+import { useSafeArea } from "../hooks/useSafeArea";
 import { useSettings } from "../hooks/useSettings";
-import {
-  NoteState,
-  TabItem,
-  TabStore,
-  useTabContext,
-  useTabStore
-} from "../hooks/useTabStore";
-import { EventTypes, postAsyncWithTimeout, Settings } from "../utils";
+import { TabItem, useTabContext, useTabStore } from "../hooks/useTabStore";
+import { postAsyncWithTimeout, Settings } from "../utils";
+import { EditorEvents } from "../utils/editor-events";
 import { pendingSaveRequests } from "../utils/pending-saves";
 import Header from "./header";
 import StatusBar from "./statusbar";
@@ -78,45 +74,47 @@ const Tiptap = ({
   const isFocusedRef = useRef<boolean>(false);
   const [undo, setUndo] = useState(false);
   const [redo, setRedo] = useState(false);
+  const valueRef = useRef({
+    undo,
+    redo
+  });
+  const insets = useSafeArea();
   tabRef.current = tab;
+  valueRef.current = {
+    undo,
+    redo
+  };
 
-  function restoreNoteSelection(state?: NoteState) {
-    try {
-      if (!tabRef.current.noteId) return;
-      const noteState =
-        state || useTabStore.getState().noteState[tabRef.current.noteId];
+  logger("info", tabRef.current.id, "rendering");
 
-      if (noteState && (noteState.to || noteState.from)) {
+  const restoreNoteSelection = useCallback(
+    (scrollTop?: number, selection?: { to: number; from: number }) => {
+      if (!tabRef.current.session?.noteId) return;
+      const sel = selection || tabRef.current.session?.selection;
+      if (sel && sel.to && sel.from) {
         const size = editors[tabRef.current.id]?.state.doc.content.size || 0;
-        if (
-          noteState.to > 0 &&
-          noteState.to <= size &&
-          noteState.from > 0 &&
-          noteState.from <= size
-        ) {
+        if (sel.to > 0 && sel.to <= size && sel.from > 0 && sel.from <= size) {
           editors[tabRef.current.id]?.chain().setTextSelection({
-            to: noteState.to,
-            from: noteState.from
+            to: sel.to,
+            from: sel.from
           });
         }
       }
-
       containerRef.current?.scrollTo({
         left: 0,
-        top: noteState?.top || 0,
+        top: scrollTop || tabRef.current.session?.scrollTop || 0,
         behavior: "auto"
       });
-    } catch (e) {
-      logger("error", (e as Error).message, (e as Error).stack);
-    }
-  }
+    },
+    []
+  );
 
   usePermissionHandler({
     claims: {
       premium: settings.premium
     },
     onPermissionDenied: () => {
-      post(EventTypes.pro, undefined, tabRef.current.id, tab.noteId);
+      post(EditorEvents.pro, undefined, tabRef.current.id, tab.session?.noteId);
     }
   });
 
@@ -127,8 +125,14 @@ const Tiptap = ({
           editor as Editor,
           transaction.getMeta("ignoreEdit")
         );
-      },
 
+        if (valueRef.current.undo !== editor.can().undo()) {
+          setUndo(editor.can().undo());
+        }
+        if (valueRef.current.redo !== editor.can().redo()) {
+          setRedo(editor.can().redo());
+        }
+      },
       openAttachmentPicker: (type) => {
         globalThis.editorControllers[tab.id]?.openFilePicker(type);
         return true;
@@ -147,14 +151,14 @@ const Tiptap = ({
         ) as Promise<string | undefined>;
       },
       createInternalLink(attributes) {
-        return postAsyncWithTimeout(EventTypes.createInternalLink, {
+        return postAsyncWithTimeout(EditorEvents.createInternalLink, {
           attributes
         });
       },
       element: getContentDiv(),
-      editable: !tab.readonly,
+      editable: !tab.session?.readonly,
       editorProps: {
-        editable: () => !tab.readonly,
+        editable: () => !tab.session?.readonly,
         handlePaste: (view, event) => {
           const hasFiles = event.clipboardData?.types?.some((type) =>
             type.startsWith("Files")
@@ -197,20 +201,25 @@ const Tiptap = ({
       copyToClipboard: (text) => {
         globalThis.editorControllers[tab.id]?.copyToClipboard(text);
       },
-      placeholder: strings.startWritingNote(),
+      onFocus: () => {
+        getContentDiv().classList.remove("searching");
+      },
       onSelectionUpdate: () => {
-        if (tabRef.current.noteId) {
-          const noteId = tabRef.current.noteId;
+        if (tabRef.current.session?.noteId) {
           clearTimeout(noteStateUpdateTimer.current);
           noteStateUpdateTimer.current = setTimeout(() => {
-            if (tabRef.current.noteId !== noteId) return;
-            const { to, from } =
-              editors[tabRef.current?.id]?.state.selection || {};
-            useTabStore.getState().setNoteState(noteId, {
-              to,
-              from
-            });
-          }, 500);
+            post(
+              EditorEvents.saveScroll,
+              {
+                selection: {
+                  to: editors[tabRef.current.id]?.state.selection.to,
+                  from: editors[tabRef.current.id]?.state.selection.from
+                }
+              },
+              tabRef.current.id,
+              tabRef.current.session?.noteId
+            );
+          }, 300);
         }
       },
       onCreate() {
@@ -228,7 +237,7 @@ const Tiptap = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     getContentDiv,
-    tab.readonly,
+    tab.session?.readonly,
     settings.doubleSpacedLines,
     settings.corsProxy,
     settings.dateFormat,
@@ -238,15 +247,31 @@ const Tiptap = ({
     tick
   ]);
 
-  const update = useCallback(() => {
-    setTick((tick) => tick + 1);
-    globalThis.editorControllers[tabRef.current.id]?.setTitlePlaceholder(
-      strings.noteTitle()
-    );
-    setTimeout(() => {
-      editorControllers[tabRef.current.id]?.setLoading(false);
-    }, 300);
-  }, []);
+  const update = useCallback(
+    (
+      scrollTop?: number,
+      selection?: { to: number; from: number },
+      searchResultIndex?: number
+    ) => {
+      setTick((tick) => tick + 1);
+      globalThis.editorControllers[tabRef.current.id]?.setTitlePlaceholder(
+        strings.noteTitle()
+      );
+      setTimeout(() => {
+        editorControllers[tabRef.current.id]?.setLoading(false);
+        setTimeout(() => {
+          if (searchResultIndex !== undefined) {
+            globalThis.editorControllers[
+              tabRef.current.id
+            ]?.scrollToSearchResult(searchResultIndex);
+          } else {
+            restoreNoteSelection(scrollTop, selection);
+          }
+        }, 300);
+      }, 1);
+    },
+    [restoreNoteSelection]
+  );
 
   const controller = useEditorController({
     update,
@@ -255,8 +280,12 @@ const Tiptap = ({
         ? []
         : getTableOfContents(containerRef.current);
     },
+    scrollTop: () => containerRef.current?.scrollTop || 0,
     scrollTo: (top) => {
       containerRef.current?.scrollTo({ top, behavior: "auto" });
+    },
+    getContentDiv() {
+      return getContentDiv();
     }
   });
   const controllerRef = useRef(controller);
@@ -286,60 +315,40 @@ const Tiptap = ({
         });
     }
 
-    const updateScrollPosition = (state: TabStore) => {
+    const updateFocusedTab = () => {
       if (isFocusedRef.current) return;
-      if (state.currentTab === tabRef.current.id) {
-        isFocusedRef.current = true;
-        const noteState = tabRef.current.noteId
-          ? state.noteState[tabRef.current.noteId]
-          : undefined;
+      isFocusedRef.current = true;
+      const noteId = useTabStore
+        .getState()
+        .tabs.find((tab) => tab.id === useTabStore.getState().currentTab)
+        ?.session?.noteId;
+      post(
+        EditorEvents.tabFocused,
+        undefined,
+        useTabStore.getState().currentTab,
+        noteId
+      );
+      editorControllers[tabRef.current.id]?.updateTab();
 
-        post(
-          EventTypes.tabFocused,
-          !!globalThis.editorControllers[tabRef.current.id]?.content.current &&
-            !editorControllers[tabRef.current.id]?.loading,
-          tabRef.current.id,
-          state.getCurrentNoteId()
-        );
-        editorControllers[tabRef.current.id]?.updateTab();
+      restoreNoteSelection();
 
-        if (noteState) {
-          if (
-            containerRef.current &&
-            containerRef.current?.scrollHeight < noteState.top
-          ) {
-            console.log("Container too small to scroll.");
-            return;
-          }
-
-          restoreNoteSelection(noteState);
-        } else {
-          containerRef.current?.scrollTo({
-            left: 0,
-            top: 0,
-            behavior: "auto"
-          });
-        }
-
-        if (
-          !globalThis.editorControllers[tabRef.current.id]?.content.current &&
-          tabRef.current.noteId
-        ) {
-          editorControllers[tabRef.current.id]?.setLoading(true);
-        }
-      } else {
-        isFocusedRef.current = false;
+      if (
+        !globalThis.editorControllers[tabRef.current.id]?.content.current &&
+        tabRef.current.session?.noteId
+      ) {
+        editorControllers[tabRef.current.id]?.setLoading(true);
       }
     };
 
-    updateScrollPosition(useTabStore.getState());
+    updateFocusedTab();
 
     const unsub = useTabStore.subscribe((state, prevState) => {
       if (state.currentTab !== tabRef.current.id) {
         isFocusedRef.current = false;
       }
-      if (state.currentTab === prevState.currentTab) return;
-      updateScrollPosition(state);
+      if (state.currentTab === prevState.currentTab && isFocusedRef.current)
+        return;
+      updateFocusedTab();
       logger("info", "updating scroll position");
     });
     logger("info", tabRef.current.id, "active");
@@ -348,7 +357,7 @@ const Tiptap = ({
       logger("info", tabRef.current.id, "inactive");
       unsub();
     };
-  }, [getContentDiv]);
+  }, [getContentDiv, restoreNoteSelection]);
 
   const onClickEmptyArea: React.MouseEventHandler<HTMLDivElement> = useCallback(
     (event) => {
@@ -542,7 +551,7 @@ const Tiptap = ({
             position: "relative"
           }}
         >
-          {settings.noHeader || tab.locked ? null : (
+          {settings.noHeader || tab.session?.locked ? null : (
             <>
               <Tags settings={settings} loading={controller.loading} />
               <Title
@@ -563,7 +572,7 @@ const Tiptap = ({
             </>
           )}
 
-          {controller.loading || tab.locked ? (
+          {controller.loading || tab.session?.locked ? (
             <div
               style={{
                 width: "100%",
@@ -575,13 +584,15 @@ const Tiptap = ({
                 paddingLeft: 12,
                 display: "flex",
                 flexDirection: "column",
-                alignItems: tab.locked ? "center" : "flex-start",
-                justifyContent: tab.locked ? "center" : "flex-start",
+                alignItems: tab.session?.noteLocked ? "center" : "flex-start",
+                justifyContent: tab.session?.noteLocked
+                  ? "center"
+                  : "flex-start",
                 boxSizing: "border-box",
                 rowGap: 10
               }}
             >
-              {tab.locked ? (
+              {tab.session?.noteLocked ? (
                 <>
                   <p
                     style={{
@@ -621,7 +632,9 @@ const Tiptap = ({
                     style={{
                       display: "flex",
                       flexDirection: "column",
-                      rowGap: 10
+                      rowGap: 10,
+                      justifyContent: "center",
+                      alignItems: "center"
                     }}
                   >
                     <input
@@ -646,6 +659,7 @@ const Tiptap = ({
                     />
 
                     <button
+                      className="unlock-note"
                       style={{
                         backgroundColor: colors.primary.accent,
                         borderRadius: 5,
@@ -833,7 +847,7 @@ const Tiptap = ({
 
           <div
             style={{
-              display: tab.locked ? "none" : "block"
+              display: tab.session?.locked ? "none" : "block"
             }}
             ref={contentPlaceholderRef}
             className="theme-scope-editor"
@@ -841,11 +855,11 @@ const Tiptap = ({
 
           <div
             onClick={(e) => {
-              if (tab.locked) return;
+              if (tab.session?.locked) return;
               onClickBottomArea();
             }}
             onMouseDown={(e) => {
-              if (tab.locked) return;
+              if (tab.session?.locked) return;
               if (globalThis.keyboardShown) {
                 e.preventDefault();
               }
@@ -890,7 +904,7 @@ const TiptapProvider = (): JSX.Element => {
       return contentRef.current;
     }
     const editorContainer = document.createElement("div");
-    editorContainer.classList.add("selectable", "main-editor");
+    editorContainer.classList.add("selectable", "main-editor", "searching");
     editorContainer.style.flex = "1";
     editorContainer.style.cursor = "text";
     editorContainer.style.padding = "0px 12px";
@@ -899,6 +913,7 @@ const TiptapProvider = (): JSX.Element => {
     editorContainer.style.fontFamily =
       getFontById(settings.fontFamily)?.font || "sans-serif";
     contentRef.current = editorContainer;
+
     return editorContainer;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

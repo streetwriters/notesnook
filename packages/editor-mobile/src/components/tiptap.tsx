@@ -36,14 +36,20 @@ export default function TiptapEditorWrapper(props: {
 
   return (
     <>
-      {tab.locked ? null : (
+      {tab.session?.locked ? null : (
         <EmotionEditorToolbarTheme>
           <Toolbar
             className="theme-scope-editorToolbar"
             sx={{
               display: props.settings.noToolbar ? "none" : "flex",
               overflowY: "hidden",
-              minHeight: "50px"
+              minHeight: "50px",
+              ...(globalThis.__PLATFORM__ === "ios" && {
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                right: 0
+              })
             }}
             editor={editor}
             location="bottom"

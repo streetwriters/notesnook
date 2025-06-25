@@ -121,6 +121,20 @@ export const EditorSettings: SettingsGroup[] = [
             toggle: () => useSettingStore.getState().toggleMarkdownShortcuts()
           }
         ]
+      },
+      {
+        key: "font-ligatures",
+        title: strings.fontLigatures(),
+        description: strings.fontLigaturesDesc(),
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((c) => c.fontLigatures, listener),
+        components: [
+          {
+            type: "toggle",
+            isToggled: () => useSettingStore.getState().fontLigatures,
+            toggle: () => useSettingStore.getState().toggleFontLigatures()
+          }
+        ]
       }
     ]
   },

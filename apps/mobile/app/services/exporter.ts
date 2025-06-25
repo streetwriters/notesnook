@@ -19,11 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
+//@ts-ignore
 import RNHTMLtoPDF from "react-native-html-to-pdf-lite";
 import * as ScopedStorage from "react-native-scoped-storage";
 import { zip } from "react-native-zip-archive";
 import { DatabaseLogger } from "../common/database/index";
-import Storage from "../common/database/storage";
 
 import {
   exportNote as _exportNote,
@@ -31,13 +31,14 @@ import {
   ExportableNote,
   exportNotes
 } from "@notesnook/common";
-import { Note } from "@notesnook/core";
-import { FilteredSelector } from "@notesnook/core";
-import { basename, dirname, join } from "pathe";
+import { FilteredSelector, Note } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
+import { basename, dirname, extname, join } from "pathe";
+import filesystem from "../common/filesystem";
 import downloadAttachment from "../common/filesystem/download-attachment";
 import { cacheDir } from "../common/filesystem/utils";
 import { unlockVault } from "../utils/unlock-vault";
-import { strings } from "@notesnook/intl";
+import { useUserStore } from "../stores/use-user-store";
 
 const FolderNames: { [name: string]: string } = {
   txt: "Text",
@@ -49,10 +50,18 @@ const FolderNames: { [name: string]: string } = {
 async function getPath(type: string) {
   let path =
     Platform.OS === "ios" &&
-    (await Storage.checkAndCreateDir(`/exported/${type}/`));
+    (await filesystem.checkAndCreateDir(`/exported/${type}/`));
 
   if (Platform.OS === "android") {
+    useUserStore.setState({
+      disableAppLockRequests: true
+    });
     const file = await ScopedStorage.openDocumentTree(true);
+    setTimeout(() => {
+      useUserStore.setState({
+        disableAppLockRequests: false
+      });
+    }, 1000);
     if (!file) return;
     path = file.uri;
   }
@@ -86,7 +95,7 @@ async function resolveFileFunctions(
     `/export_${Date.now()}`
   );
 
-  await RNFetchBlob.fs.mkdir(exportCacheFolder).catch((e) => console.log(e));
+  await RNFetchBlob.fs.mkdir(exportCacheFolder).catch((e) => {});
 
   const mkdir = async (dir: string) => {
     const folder = join(exportCacheFolder, dir);
@@ -97,7 +106,7 @@ async function resolveFileFunctions(
 
   const writeFile = async (path: string, result: string) => {
     const cacheFilePath = join(exportCacheFolder, path);
-    console.log(cacheFilePath, result.length);
+
     await RNFetchBlob.fs.writeFile(
       cacheFilePath,
       result,
@@ -195,7 +204,7 @@ async function bulkExport(
       try {
         await exportNoteToFile(item, type, mkdir, writeFile);
       } catch (e) {
-        console.log(item.type, e);
+        /* empty */
       }
     } else if (item.type === "attachment") {
       currentAttachmentProgress += 1;
@@ -203,11 +212,11 @@ async function bulkExport(
       try {
         await exportAttachmentToFile(item, mkdir, cacheFolder);
       } catch (e) {
-        console.log(item.path, e);
+        /* empty */
       }
     }
   }
-  console.log(cacheFolder);
+
   return createZip(totalNotes, cacheFolder, type, path, callback);
 }
 
@@ -241,7 +250,7 @@ async function exportNote(
         noteItem = item;
         await exportNoteToFile(item, type, mkdir, writeFile);
       } catch (e) {
-        console.log("exportNoteToFile", item.type, e);
+        /* empty */
       }
     } else if (item.type === "attachment") {
       currentAttachmentProgress += 1;
@@ -250,7 +259,7 @@ async function exportNote(
         hasAttachments = true;
         await exportAttachmentToFile(item, mkdir, cacheFolder);
       } catch (e) {
-        console.log("exportAttachmentToFile", item.path, e);
+        /* empty */
       }
     }
   }
@@ -314,15 +323,31 @@ async function createFile(
   path: string,
   cacheFolder: string
 ) {
-  const file = await ScopedStorage.createFile(
-    path,
-    basename(noteItem?.path as string),
-    FileMime[type]
-  );
   const exportedFile = join(cacheFolder, noteItem?.path as string);
-  await copyFileAsync("file://" + exportedFile, file.uri);
+  let filePath: string;
+  if (Platform.OS === "android") {
+    const file = await ScopedStorage.createFile(
+      path,
+      basename(noteItem?.path as string),
+      FileMime[type]
+    );
+    await copyFileAsync("file://" + exportedFile, file.uri);
+    filePath = file.uri;
+  } else {
+    const originalPath = join(path, basename(noteItem.path));
+    filePath = originalPath;
+    const ext = extname(originalPath);
+    let id = 1;
+    while (await RNFetchBlob.fs.exists(filePath)) {
+      filePath = originalPath.replace(`${ext}`, "") + "_" + id + ext;
+      id++;
+    }
+
+    await RNFetchBlob.fs.mv(exportedFile, filePath);
+  }
+
   return {
-    filePath: file.uri,
+    filePath: filePath,
     fileDir: path,
     type: FileMime[type],
     name: type,

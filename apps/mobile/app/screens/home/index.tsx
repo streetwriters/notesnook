@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import React from "react";
 import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
@@ -29,7 +30,6 @@ import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useNotes } from "../../stores/use-notes-store";
 import { openEditor } from "../notes/common";
-import { strings } from "@notesnook/intl";
 
 export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
   const [notes, loading] = useNotes();
@@ -52,7 +52,7 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
       <SelectionHeader id={route.name} items={notes} type="note" />
       <Header
         renderedInRoute={route.name}
-        title={strings.routes[route.name as keyof typeof strings.routes]()}
+        title={strings.routes[route.name]()}
         canGoBack={false}
         hasSearch={true}
         onSearch={() => {
@@ -66,25 +66,24 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
         id={route.name}
         onPressDefaultRightButton={openEditor}
       />
+
       <DelayLayout wait={loading}>
         <List
           data={notes}
           dataType="note"
           renderedInRoute={route.name}
           loading={loading || !isFocused}
-          headerTitle={strings.routes[
-            route.name as keyof typeof strings.routes
-          ]?.()}
+          headerTitle={strings.routes[route.name]()}
           placeholder={{
             title: route.name?.toLowerCase(),
             paragraph: strings.notesEmpty(),
-            button: strings.newNote(),
+            button: strings.createNewNote(),
             action: openEditor,
             loading: strings.loadingNotes()
           }}
         />
         {!notes || !notes.placeholders?.length ? null : (
-          <FloatingButton onPress={openEditor} />
+          <FloatingButton onPress={openEditor} alwaysVisible />
         )}
       </DelayLayout>
     </>

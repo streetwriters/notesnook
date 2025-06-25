@@ -118,6 +118,7 @@ export function EmbedComponent(
           src={src}
           width={"100%"}
           height={"100%"}
+          sandbox={getSandboxFeatures(src)}
           sx={{
             bg: "var(--background-secondary)",
             border: selected
@@ -145,4 +146,25 @@ export function EmbedComponent(
       </Resizer>
     </Flex>
   );
+}
+
+function getSandboxFeatures(src: string) {
+  const features = [];
+  try {
+    const url = new URL(src);
+    if (url.protocol === "http:" || url.protocol === "https:")
+      features.push(
+        "allow-scripts",
+        "allow-same-origin",
+        "allow-popups",
+        "allow-popups-to-escape-sandbox",
+        "allow-forms",
+        "allow-modals",
+        "allow-downloads",
+        "allow-presentation"
+      );
+  } catch {
+    // ignore
+  }
+  return features.join(" ");
 }

@@ -35,7 +35,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { NNCrypto } from "../../utils/nncrypto.client";
 import { hashNavigate } from "../../utils/use-hash-location";
 import { Icon } from "@notesnook/ui";
-import { mdiAlertCircleOutline, mdiArrowUp, mdiLockOutline } from "@mdi/js";
+import {
+  mdiAlertCircleOutline,
+  mdiArrowUp,
+  mdiClose,
+  mdiListBoxOutline,
+  mdiLockOutline
+} from "@mdi/js";
 import { Footer } from "../footer";
 import ReportDialog from "./report-modal";
 
@@ -67,6 +73,11 @@ function generateTableOfContents() {
   let currentHeading = 0;
 
   for (const heading of headings) {
+    const isCalloutHeading = heading.closest(".callout");
+    if (isCalloutHeading) {
+      continue;
+    }
+
     const text = heading.textContent || "<empty>";
     const nodeName = heading.nodeName;
     const headingLevel = levelsMap[nodeName];
@@ -80,7 +91,7 @@ function generateTableOfContents() {
       currentHeading < headingLevel
         ? level + 1
         : currentHeading > headingLevel
-        ? level - 1
+        ? headingLevel
         : level;
     currentHeading = headingLevel;
 
@@ -103,40 +114,9 @@ export const MonographPage = ({
 }) => {
   const [reportDialogVisible, setReportDialogVisible] = useState(false);
   const [tableOfContents, setTableOfContents] = useState<TableOfContent[]>([]);
-  const [activeHeadings, setActiveHeadings] = useState<string[]>();
   const [content, setContent] = useState(monograph.content);
-  const [showScrollToTop, setShowScrollToTop] = useState(false);
+  const [showTableOfContents, setShowTableOfContents] = useState(false);
   const editorContainer = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function onScroll() {
-      const scrollTop = window.scrollY;
-      const height = window.innerHeight || 0;
-      const viewportHeight = scrollTop + height - 30;
-      const documentOffset = editorContainer.current?.offsetTop || 0;
-      const active = tableOfContents.filter((t, i, array) => {
-        const next = array.at(i + 1);
-        const headingOffset =
-          documentOffset + t.node.offsetTop + t.node.clientHeight;
-        const lessThanNext = next
-          ? scrollTop <=
-            next.node.offsetTop + documentOffset + next.node.clientHeight
-          : true;
-        const isInViewport =
-          headingOffset > scrollTop && headingOffset < viewportHeight;
-        const isActive = scrollTop >= headingOffset && lessThanNext;
-        return isInViewport || isActive;
-      });
-
-      setShowScrollToTop(scrollTop > 120);
-      setActiveHeadings(active.map((a) => a.id));
-    }
-    onScroll();
-    window.addEventListener("scroll", onScroll);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-    };
-  }, [tableOfContents]);
 
   if (!content && monograph.encryptedContent)
     return (
@@ -158,68 +138,69 @@ export const MonographPage = ({
       <Box
         sx={{
           bg: "background-secondary",
-          borderBottom: "1px solid var(--border)",
-          px: [10, "15%"],
-          pb: 20
+          py: 4,
+          top: 0,
+          zIndex: 999,
+          position: "sticky"
         }}
       >
+        <Button
+          sx={{ position: "absolute", top: 20, right: 20, p: 0 }}
+          onClick={() => setShowTableOfContents((s) => !s)}
+        >
+          <Icon
+            path={mdiListBoxOutline}
+            size={24}
+            color={showTableOfContents ? "var(--accent)" : "var(--icon)"}
+          />
+        </Button>
         <Box
           sx={{
-            width: "100%",
-            textAlign: "center",
-            mt: 20,
-            mb: 100
+            px: "10%",
+            textAlign: "center"
           }}
         >
-          <Link
-            as="a"
-            variant="text.body"
-            href="/"
-            sx={{
-              fontSize: 18,
-              fontFamily: "monospace",
-              textDecoration: "none"
-            }}
-          >
-            <span style={{ color: "var(--accent)" }}>Mono</span>graph
-          </Link>
+          <ResponsiveTitle title={monograph.title} />
         </Box>
+      </Box>
+      <Box
+        sx={{
+          bg: "background-secondary",
+          borderBottom: "1px solid var(--border)",
+          px: [10, 10, "15%"],
+          pb: 20,
+          pt: 100
+        }}
+      >
         <Text as="h1" variant="heading" sx={{ fontSize: 32, fontWeight: 800 }}>
           {monograph.title}
         </Text>
-        <Flex sx={{ justifyContent: "space-between" }}>
-          <Flex sx={{ gap: 1 }}>
-            <Text
-              variant="subtitle"
-              sx={{
-                color: "paragraph-secondary"
-              }}
-            >
-              {formatDate(monograph.datePublished, {
-                type: "date-time",
-                dateFormat: "YYYY-MM-DD",
-                timeFormat: "24-hour"
-              })}
-            </Text>
-            {monograph.encryptedContent ? (
-              <Flex sx={{ gap: "2px" }}>
-                <Icon path={mdiLockOutline} size={14} color="var(--accent)" />
-                <Text
-                  variant="subtitle"
-                  sx={{
-                    color: "accent"
-                  }}
-                >
-                  End-to-end encrypted
-                </Text>
-              </Flex>
-            ) : null}
-            <Image
-              sx={{ display: "none" }}
-              src={`https://api.notesnook.com/monographs/${monograph.id}/view`}
-            />
-          </Flex>
-          {monograph.encryptedContent ? null : (
+        <Flex sx={{ gap: 2 }}>
+          <Text
+            variant="subtitle"
+            sx={{
+              color: "paragraph-secondary"
+            }}
+          >
+            {formatDate(monograph.datePublished, {
+              type: "date-time",
+              dateFormat: "YYYY-MM-DD",
+              timeFormat: "24-hour"
+            })}
+          </Text>
+          {monograph.encryptedContent ? (
+            <Flex sx={{ gap: "2px" }}>
+              <Icon path={mdiLockOutline} size={14} color="var(--accent)" />
+              <Text
+                variant="subtitle"
+                sx={{
+                  color: "accent"
+                }}
+              >
+                End-to-end encrypted
+              </Text>
+            </Flex>
+          ) : (
             <Button
               title="Report"
               onClick={() => {
@@ -236,12 +217,18 @@ export const MonographPage = ({
             >
               <Icon
                 path={mdiAlertCircleOutline}
-                color="var(--icon-error)"
+                color="var(--paragraph-secondary)"
                 size={16}
               />
-              <Text variant="error">Report</Text>
+              <Text variant="error" sx={{ color: "paragraph-secondary" }}>
+                Report
+              </Text>
             </Button>
           )}
+          <Image
+            sx={{ display: "none" }}
+            src={`https://api.notesnook.com/monographs/${monograph.id}/view`}
+          />
         </Flex>
       </Box>
       <Flex
@@ -250,14 +237,19 @@ export const MonographPage = ({
         <Box
           ref={editorContainer}
           sx={{
-            ml: [10, "15%"],
+            ml: [10, 10, "15%"],
             mr: [10, 20],
-            pr: [0, "max(50px, calc(20% - 300px))"],
+            pr: [0, 0, "max(50px, calc(20% - 300px))"],
+            pb: 50,
             flex: 1,
-            borderRight: ["none", "1px solid var(--border)"]
+            borderRight: [
+              "none",
+              "none",
+              showTableOfContents ? "1px solid var(--border)" : "none"
+            ]
           }}
         >
-          {showScrollToTop && <ScrollToTopButton />}
+          <ScrollToTopButton />
           <ClientOnly
             fallback={
               <Box
@@ -283,69 +275,91 @@ export const MonographPage = ({
 
         <Flex
           sx={{
-            display: ["none", "flex"],
+            display: ["none", "none", "flex"],
             flexDirection: "column",
             flexShrink: 0,
             mt: 16,
             pr: 20,
+            pb: 50,
             width: 300,
             alignSelf: "start",
             gap: 2,
             position: "sticky",
-            top: 20
+            top: 80
           }}
         >
-          <Text
-            variant="subtitle"
-            sx={{
-              color: "heading-secondary",
-              mb: 2
-            }}
-          >
-            CONTENTS
-          </Text>
-          {tableOfContents.length === 0 ? (
+          {showTableOfContents ? (
             <>
-              <Text variant="subBody">
-                This monograph has no table of contents.
+              <Text
+                variant="subtitle"
+                sx={{
+                  color: "heading-secondary",
+                  mb: 2
+                }}
+              >
+                CONTENTS
               </Text>
+              <TableOfContents
+                container={editorContainer}
+                contents={tableOfContents}
+              />
             </>
           ) : null}
-          {tableOfContents.map((item) => (
-            <Button
-              variant="anchor"
-              key={item.id}
+        </Flex>
+        {showTableOfContents ? (
+          <Flex
+            sx={{
+              display: ["flex", "flex", "none"],
+              flexDirection: "column",
+              position: "fixed",
+              zIndex: 999,
+              bottom: 0,
+              right: 0,
+              borderTopLeftRadius: 15,
+              borderTopRightRadius: 15,
+              boxShadow: "0px 0px 15px 5px rgba(0,0,0,0.1)",
+              bg: "background-secondary",
+              px: 4,
+              gap: 2,
+              height: "60vh",
+              width: "100%",
+              overflowY: "auto",
+              border: "1px solid var(--theme-ui-colors-border)"
+            }}
+          >
+            <Flex
               sx={{
-                textAlign: "left",
-                p: 0,
-                m: 0,
-                pl: item.level * 10,
-                textDecoration: "none"
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                mx: 0,
+                // px: "16px",
+                mt: 4
               }}
               onClick={() => {
-                const documentOffset = editorContainer.current?.offsetTop || 0;
-                const headingOffset =
-                  documentOffset + item.node.offsetTop + item.node.clientHeight;
-                window.scrollTo({
-                  top: headingOffset - 100,
-                  behavior: "smooth"
-                });
+                setShowTableOfContents(false);
               }}
             >
               <Text
                 variant="subtitle"
                 sx={{
-                  color: activeHeadings?.includes(item.id)
-                    ? "accent"
-                    : "paragraph-secondary",
-                  fontWeight: 600
+                  color: "heading-secondary",
+                  mb: 2
                 }}
               >
-                {item.title}
+                CONTENTS
               </Text>
-            </Button>
-          ))}
-        </Flex>
+              <Button>
+                <Icon path={mdiClose} size={24} color="var(--icon)" />
+              </Button>
+            </Flex>
+            <TableOfContents
+              container={editorContainer}
+              contents={tableOfContents}
+              onNavigate={() => setShowTableOfContents(false)}
+            />
+          </Flex>
+        ) : null}
       </Flex>
       <Footer subtitle="Published via Notesnook" />
       {reportDialogVisible ? (
@@ -479,6 +493,20 @@ function MonographLockscreen({
 }
 
 function ScrollToTopButton() {
+  const [showScrollToTop, setShowScrollToTop] = useState(false);
+  useEffect(() => {
+    function onScroll() {
+      const scrollTop = window.scrollY;
+      setShowScrollToTop(scrollTop > 120);
+    }
+    onScroll();
+    window.addEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+
+  if (!showScrollToTop) return null;
   return (
     <Box
       onClick={() => {
@@ -504,6 +532,139 @@ function ScrollToTopButton() {
     >
       <Icon path={mdiArrowUp} size={24} color="var(--accent)" />
     </Box>
+  );
+}
+
+function ResponsiveTitle({ title }: { title: string }) {
+  const [showTitle, setShowTitle] = useState(false);
+  useEffect(() => {
+    function onScroll() {
+      const scrollTop = window.scrollY;
+      setShowTitle(scrollTop > 120);
+    }
+    onScroll();
+    window.addEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+
+  return (
+    <>
+      <Link
+        as="a"
+        variant="text.body"
+        href="/"
+        sx={{
+          fontSize: 18,
+          fontFamily: "monospace",
+          textDecoration: "none",
+          display: "block",
+          whiteSpace: "nowrap",
+          overflow: "hidden"
+        }}
+      >
+        {showTitle ? (
+          title
+        ) : (
+          <>
+            <span style={{ color: "var(--accent)" }}>Mono</span>graph
+          </>
+        )}
+      </Link>
+    </>
+  );
+}
+
+function TableOfContents({
+  contents,
+  container,
+  onNavigate,
+  showActive
+}: {
+  contents: TableOfContent[];
+  container: React.RefObject<HTMLDivElement>;
+  onNavigate?: (id: string) => void;
+  showActive?: boolean;
+}) {
+  const [activeHeadings, setActiveHeadings] = useState<string[]>();
+  useEffect(() => {
+    if (!showActive) return;
+    function onScroll() {
+      const scrollTop = window.scrollY;
+      const height = window.innerHeight || 0;
+      const viewportHeight = scrollTop + height - 30;
+      const documentOffset = container.current?.offsetTop || 0;
+      const active = contents.filter((t, i, array) => {
+        const next = array.at(i + 1);
+        const headingOffset =
+          documentOffset + t.node.offsetTop + t.node.clientHeight;
+        const lessThanNext = next
+          ? scrollTop <=
+            next.node.offsetTop + documentOffset + next.node.clientHeight
+          : true;
+        const isInViewport =
+          headingOffset > scrollTop && headingOffset < viewportHeight;
+        const isActive = scrollTop >= headingOffset && lessThanNext;
+        return isInViewport || isActive;
+      });
+
+      setActiveHeadings(active.map((a) => a.id));
+    }
+    onScroll();
+    window.addEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [contents, showActive]);
+
+  return (
+    <>
+      {contents.length === 0 ? (
+        <>
+          <Text variant="subBody">
+            This monograph has no table of contents.
+          </Text>
+        </>
+      ) : null}
+      {contents.map((item) => (
+        <Button
+          variant="anchor"
+          key={item.id}
+          sx={{
+            textAlign: "left",
+            p: 0,
+            m: 0,
+            pl: item.level * 10,
+            textDecoration: "none",
+            flexShrink: 0
+          }}
+          onClick={() => {
+            const documentOffset = container.current?.offsetTop || 0;
+            const headingOffset =
+              documentOffset + item.node.offsetTop + item.node.clientHeight;
+            window.scrollTo({
+              top: headingOffset - 100,
+              behavior: "smooth"
+            });
+            onNavigate?.(item.id);
+          }}
+        >
+          <Text
+            variant="subtitle"
+            sx={{
+              color:
+                showActive && activeHeadings?.includes(item.id)
+                  ? "accent"
+                  : "paragraph-secondary",
+              fontWeight: 600
+            }}
+          >
+            {item.title}
+          </Text>
+        </Button>
+      ))}
+    </>
   );
 }
 

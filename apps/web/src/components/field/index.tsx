@@ -24,6 +24,15 @@ import { ThemeUIStyleObject } from "@theme-ui/css";
 import { PasswordVisible, PasswordInvisible, Icon } from "../icons";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 
+type Action = {
+  id?: string;
+  testId?: string;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+  disabled?: boolean;
+  icon?: Icon;
+  component?: JSX.Element;
+  hidden?: boolean;
+};
 export type FieldProps = InputProps & {
   label?: string;
   helpText?: string;
@@ -35,13 +44,9 @@ export type FieldProps = InputProps & {
     label?: ThemeUIStyleObject;
     helpText?: ThemeUIStyleObject;
   };
-  action?: {
-    testId?: string;
-    onClick?: React.MouseEventHandler<HTMLButtonElement>;
-    disabled?: boolean;
-    icon?: Icon;
-    component?: JSX.Element;
-  };
+  action?: Action;
+  rightActions?: Action[];
+  leftActions?: Action[];
 };
 
 function Field(props: FieldProps) {
@@ -61,6 +66,14 @@ function Field(props: FieldProps) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const colorScheme = useThemeStore((state) => state.colorScheme);
   const [isValid, setIsValid] = useState(true);
+  const rightActions = props.rightActions
+    ? props.rightActions.filter((a) => !a.hidden)
+    : action && !action.hidden
+    ? [action]
+    : [];
+  const leftActions = props.leftActions
+    ? props.leftActions.filter((a) => !a.hidden)
+    : [];
 
   return (
     <Flex
@@ -68,7 +81,7 @@ function Field(props: FieldProps) {
         m: "2px",
         mr: "2px",
         opacity: disabled ? 0.7 : 1,
-        pointerEvents: disabled ? "none" : "all",
+        gap: 1,
         ...sx,
         flexDirection: "column"
       }}
@@ -99,7 +112,7 @@ function Field(props: FieldProps) {
         )}
       </Label>
 
-      <Flex mt={1} sx={{ position: "relative" }}>
+      <Flex sx={{ position: "relative", flex: 1 }}>
         <Input
           {...inputProps}
           variant={isValid ? inputProps.variant || "input" : "error"}
@@ -109,6 +122,7 @@ function Field(props: FieldProps) {
           sx={{
             flex: 1,
             ...styles?.input,
+            pointerEvents: disabled ? "none" : "all",
             ":disabled": {
               bg: "background-disabled"
             },
@@ -139,32 +153,92 @@ function Field(props: FieldProps) {
             {isPasswordVisible ? <PasswordVisible /> : <PasswordInvisible />}
           </Flex>
         )}
-        {action && (
-          <Button
-            type="button"
-            variant={"secondary"}
-            data-test-id={action.testId}
-            onClick={action.onClick}
+
+        {leftActions.length > 0 ? (
+          <Flex
             sx={{
-              bg: "transparent",
               position: "absolute",
-              margin: 0,
               top: 0,
-              right: "2px",
+              left: 0,
               height: "100%",
-              px: 1,
-              borderRadius: "default",
-              ":hover": { bg: "border" }
+              borderTopLeftRadius: "default",
+              borderBottomLeftRadius: "default",
+              overflow: "hidden"
             }}
-            disabled={action.disabled}
           >
-            {action.component ? (
-              action.component
-            ) : action.icon ? (
-              <action.icon size={20} />
-            ) : null}
-          </Button>
-        )}
+            {leftActions.map((action) => (
+              <Button
+                id={action.id}
+                key={action.testId}
+                type="button"
+                variant={"secondary"}
+                data-test-id={action.testId}
+                onClick={action.onClick}
+                sx={{
+                  p: 0,
+                  px: 1,
+                  height: "100%",
+                  bg: "transparent",
+                  borderRadius: 0,
+                  margin: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}
+                disabled={action.disabled}
+              >
+                {action.component ? (
+                  action.component
+                ) : action.icon ? (
+                  <action.icon size={20} />
+                ) : null}
+              </Button>
+            ))}
+          </Flex>
+        ) : null}
+        {rightActions.length > 0 ? (
+          <Flex
+            className="rightActions"
+            sx={{
+              position: "absolute",
+              top: 0,
+              right: 0,
+              height: "100%",
+              borderTopRightRadius: "default",
+              borderBottomRightRadius: "default",
+              overflow: "hidden"
+            }}
+          >
+            {rightActions.map((action) => (
+              <Button
+                id={action.id}
+                key={action.testId}
+                type="button"
+                variant={"secondary"}
+                data-test-id={action.testId}
+                onClick={action.onClick}
+                sx={{
+                  p: 0,
+                  px: 1,
+                  height: "100%",
+                  bg: "transparent",
+                  borderRadius: 0,
+                  margin: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}
+                disabled={action.disabled}
+              >
+                {action.component ? (
+                  action.component
+                ) : action.icon ? (
+                  <action.icon size={16} />
+                ) : null}
+              </Button>
+            ))}
+          </Flex>
+        ) : null}
       </Flex>
     </Flex>
   );

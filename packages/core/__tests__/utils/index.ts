@@ -30,6 +30,9 @@ import path from "path";
 import { tmpdir } from "os";
 import { getId } from "../../src/utils/id.js";
 import { existsSync, mkdirSync } from "fs";
+import * as betterTrigram from "sqlite-better-trigram";
+import * as fts5Html from "sqlite3-fts5-html";
+import { getLoadablePath } from "sqlite-regex";
 
 const TEST_NOTEBOOK: Partial<Notebook> = {
   title: "Test Notebook",
@@ -46,22 +49,26 @@ function databaseTest(type: "memory" | "persistent" = "memory") {
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
   const dbPath = path.join(dir, `notesnook-${getId()}.sql`);
   const db = new DB();
+  const betterSqliteDb = BetterSQLite3(
+    type === "persistent" ? dbPath : ":memory:"
+  ).unsafeMode(true);
   db.setup({
     storage: new NodeStorageInterface(),
     eventsource: EventSource,
     fs: FS,
-    compressor: Compressor,
+    compressor: async () => Compressor,
     sqliteOptions: {
       dialect: (name) =>
         new SqliteDialect({
-          database: BetterSQLite3(
-            type === "persistent" ? dbPath : ":memory:"
-          ).unsafeMode(true)
+          database: betterSqliteDb
         }),
       password: type === "persistent" ? "iamalongpassword" : undefined
     },
     batchSize: 500
   });
+  betterTrigram.load(betterSqliteDb);
+  fts5Html.load(betterSqliteDb);
+  betterSqliteDb.loadExtension(getLoadablePath());
   return db.init().then(() => db);
 }
 

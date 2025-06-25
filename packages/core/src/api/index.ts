@@ -79,6 +79,7 @@ import { Sanitizer } from "../database/sanitizer.js";
 import { createTriggers, dropTriggers } from "../database/triggers.js";
 import { NNMigrationProvider } from "../database/migrations.js";
 import { ConfigStorage } from "../database/config.js";
+import { LazyPromise } from "../utils/lazy-promise.js";
 
 type EventSourceConstructor = new (
   uri: string,
@@ -89,7 +90,7 @@ type Options = {
   storage: IStorage;
   eventsource?: EventSourceConstructor;
   fs: IFileStorage;
-  compressor: ICompressor;
+  compressor: () => Promise<ICompressor>;
   batchSize: number;
 };
 
@@ -100,6 +101,10 @@ class Database {
   eventManager = new EventManager();
   sseMutex = new Mutex();
   _fs?: FileStorage;
+  _compressor?: Promise<ICompressor>;
+  private databaseReady = new LazyPromise<
+    Kysely<DatabaseSchema> | Transaction<DatabaseSchema>
+  >();
 
   storage: StorageAccessor = () => {
     if (!this.options?.storage)
@@ -133,7 +138,7 @@ class Database {
       throw new Error(
         "Database not initialized. Did you forget to call db.setup()?"
       );
-    return this.options.compressor;
+    return this._compressor || (this._compressor = this.options.compressor());
   };
 
   private _sql?: Kysely<DatabaseSchema>;
@@ -147,11 +152,12 @@ class Database {
     return this._sql;
   };
 
-  private _kv?: KVStorage;
-  kv: KVStorageAccessor = () => this._kv || new KVStorage(this.sql);
-  private _config?: ConfigStorage;
-  config: ConfigStorageAccessor = () =>
-    this._config || new ConfigStorage(this.sql);
+  private _kv = new KVStorage(this.databaseReady.promise);
+  kv: KVStorageAccessor = () => this._kv;
+  private _config: ConfigStorage = new ConfigStorage(
+    this.databaseReady.promise
+  );
+  config: ConfigStorageAccessor = () => this._config;
 
   private _transaction?: QueueValue<Transaction<DatabaseSchema>>;
   transaction = async (
@@ -183,7 +189,7 @@ class Database {
   tokenManager = new TokenManager(this.kv);
   mfa = new MFAManager(this.tokenManager);
   subscriptions = new Subscriptions(this.tokenManager);
-  offers = new Offers();
+  offers = Offers;
   debug = new Debug();
   pricing = Pricing;
 
@@ -252,7 +258,8 @@ class Database {
 
     await initializeDatabase(
       this.sql().withTables(),
-      new NNMigrationProvider()
+      new NNMigrationProvider(),
+      "notesnook"
     );
     await this.onInit(this.sql() as unknown as Kysely<RawDatabaseSchema>);
     await this.initCollections();
@@ -289,6 +296,7 @@ class Database {
       migrationProvider: new NNMigrationProvider(),
       onInit: (db) => this.onInit(db)
     })) as unknown as Kysely<DatabaseSchema>;
+    this.databaseReady.resolve(this._sql);
 
     await this.sanitizer.init();
 
@@ -431,6 +439,7 @@ class Database {
     Hosts.SUBSCRIPTIONS_HOST =
       hosts.SUBSCRIPTIONS_HOST || Hosts.SUBSCRIPTIONS_HOST;
     Hosts.ISSUES_HOST = hosts.ISSUES_HOST || Hosts.ISSUES_HOST;
+    Hosts.MONOGRAPH_HOST = hosts.MONOGRAPH_HOST || Hosts.MONOGRAPH_HOST;
   }
 
   version() {

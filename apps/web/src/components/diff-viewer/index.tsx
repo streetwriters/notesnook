@@ -17,7 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState
+} from "react";
 import { Flex, Text, Button } from "@theme-ui/components";
 import { Copy, Restore } from "../icons";
 import ContentToggle from "./content-toggle";
@@ -25,6 +31,7 @@ import { store as notesStore } from "../../stores/note-store";
 import { db } from "../../common/db";
 import {
   ConflictedEditorSession,
+  DiffEditorSession,
   useEditorStore
 } from "../../stores/editor-store";
 import { ScrollSync, ScrollSyncPane } from "react-scroll-sync";
@@ -35,7 +42,7 @@ import { getFormattedDate } from "@notesnook/common";
 import { diff } from "diffblazer";
 import { strings } from "@notesnook/intl";
 
-type DiffViewerProps = { session: ConflictedEditorSession };
+type DiffViewerProps = { session: ConflictedEditorSession | DiffEditorSession };
 function DiffViewer(props: DiffViewerProps) {
   const { session } = props;
 
@@ -44,7 +51,11 @@ function DiffViewer(props: DiffViewerProps) {
   const [conflictedContent, setConflictedContent] = useState(
     content?.conflicted
   );
-  const root = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setContent(session.content);
+    setConflictedContent(session.content?.conflicted);
+  }, [session.content]);
 
   const onResolveContent = useCallback(
     (saveCopy: boolean) => {
@@ -71,19 +82,13 @@ function DiffViewer(props: DiffViewerProps) {
     });
   }, [session]);
 
-  useLayoutEffect(() => {
-    const element = root.current;
-    element?.classList.add("active");
-    return () => {
-      element?.classList.remove("active");
-    };
-  }, []);
-
   if (!conflictedContent || !content) return null;
 
   return (
     <Flex
-      ref={root}
+      ref={(el) => {
+        if (el) el.classList.add("active");
+      }}
       className="diffviewer"
       data-test-id="diff-viewer"
       sx={{
@@ -112,12 +117,15 @@ function DiffViewer(props: DiffViewerProps) {
               variant="secondary"
               data-test-id="restore-session"
               onClick={async () => {
-                const { closeSessions, openSession } =
+                const { closeTabs, openSession, getSessionsForNote } =
                   useEditorStore.getState();
 
-                await db.noteHistory.restore(session.id);
+                await db.noteHistory.restore(session.historySessionId);
 
-                closeSessions(session.id, session.note.id);
+                closeTabs(
+                  session.id,
+                  ...getSessionsForNote(session.note.id).map((s) => s.id)
+                );
 
                 await notesStore.refresh();
                 await openSession(session.note.id, { force: true });
@@ -135,12 +143,11 @@ function DiffViewer(props: DiffViewerProps) {
             <Button
               variant="secondary"
               onClick={async () => {
-                const { closeSessions, openSession } =
-                  useEditorStore.getState();
+                const { closeTabs, openSession } = useEditorStore.getState();
 
                 const noteId = await createCopy(session.note, content);
 
-                closeSessions(session.id);
+                closeTabs(session.id);
 
                 await notesStore.refresh();
                 await openSession(noteId);
@@ -154,6 +161,15 @@ function DiffViewer(props: DiffViewerProps) {
             >
               <Copy size={18} />
               <Text ml={1}>{strings.saveACopy()}</Text>
+            </Button>
+            <Button
+              variant="errorSecondary"
+              onClick={() => {
+                const { openSession } = useEditorStore.getState();
+                openSession(session.note.id, { force: true });
+              }}
+            >
+              {strings.close()}
             </Button>
           </>
         ) : null}

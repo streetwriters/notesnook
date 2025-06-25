@@ -27,187 +27,51 @@ globalThis.editorTitles = {};
 globalThis.statusBars = {};
 
 export type TabItem = {
-  id: number;
-  noteId?: string;
-  previewTab?: boolean;
-  readonly?: boolean;
-  locked?: boolean;
-  noteLocked?: boolean;
+  id: string;
+  session?: {
+    noteId?: string;
+    readonly?: boolean;
+    locked?: boolean;
+    noteLocked?: boolean;
+    scrollTop?: number;
+    selection?: { to: number; from: number };
+  };
   pinned?: boolean;
-};
-
-export type NoteState = {
-  top: number;
-  to: number;
-  from: number;
+  needsRefresh?: boolean;
 };
 
 export type TabStore = {
   tabs: TabItem[];
-  currentTab: number;
+  currentTab?: string;
   scrollPosition: Record<number, number>;
-  noteState: Record<string, NoteState>;
-  updateTab: (id: number, options: Omit<Partial<TabItem>, "id">) => void;
-  removeTab: (index: number) => void;
-  moveTab: (index: number, toIndex: number) => void;
-  newTab: (noteId?: string, previewTab?: boolean) => void;
-  focusTab: (id: number) => void;
-  setScrollPosition: (id: number, position: number) => void;
-  getNoteIdForTab: (id: number) => string | undefined;
-  getTabForNote: (noteId: string) => number | undefined;
-  hasTabForNote: (noteId: string) => boolean;
-  focusEmptyTab: () => void;
-  focusPreviewTab: (
-    noteId: string,
-    options: Omit<Partial<TabItem>, "id">
-  ) => void;
-  getCurrentNoteId: () => string | undefined;
-  getTab: (tabId: number) => TabItem | undefined;
-  setNoteState: (noteId: string, state: Partial<NoteState>) => void;
   biometryAvailable?: boolean;
   biometryEnrolled?: boolean;
+  canGoBack?: boolean;
+  canGoForward?: boolean;
+  sessionId?: string;
+  getCurrentNoteId: () => string | undefined;
 };
-
-function getId(id: number, tabs: TabItem[]): number {
-  const exists = tabs.find((t) => t.id === id);
-  if (exists) {
-    return getId(id + 1, tabs);
-  }
-  return id;
-}
 
 export const useTabStore = create(
   persist<TabStore>(
     (set, get) => ({
-      noteState: {},
       tabs: [
         {
-          id: 0,
-          previewTab: true
+          id: "679da59a3924d4bd56d16d3f",
+          session: {
+            id: "679da5a5667a16db2353a062"
+          }
         }
       ],
-      currentTab: 0,
+      currentTab: "679da59a3924d4bd56d16d3f",
       scrollPosition: {},
-      setNoteState: (noteId: string, state: Partial<NoteState>) => {
-        if (editorControllers[get().currentTab]?.loading) return;
-
-        const noteState = {
-          ...get().noteState
-        };
-        noteState[noteId] = {
-          ...get().noteState[noteId],
-          ...state
-        };
-
-        set({
-          noteState
-        });
-      },
-      updateTab: (id: number, options: Omit<Partial<TabItem>, "id">) => {
-        const index = get().tabs.findIndex((t) => t.id === id);
-        if (index == -1) return;
-        const tabs = [...get().tabs];
-        tabs[index] = {
-          ...tabs[index],
-          ...options
-        };
-        set({
-          tabs: tabs
-        });
-      },
-      removeTab: (index: number) => {
-        const scrollPosition = { ...get().scrollPosition };
-        if (scrollPosition[index]) {
-          delete scrollPosition[index];
-        }
-        globalThis.editorControllers[index] = undefined;
-        globalThis.editors[index] = null;
-
-        set({
-          scrollPosition
-        });
-      },
-      focusPreviewTab: (noteId: string, options) => {
-        const index = get().tabs.findIndex((t) => t.previewTab);
-        if (index == -1) return get().newTab(noteId, true);
-        const tabs = [...get().tabs];
-        tabs[index] = {
-          ...tabs[index],
-          noteId: noteId,
-          previewTab: true,
-          ...options
-        };
-
-        set({
-          currentTab: tabs[index].id
-        });
-      },
-      focusEmptyTab: () => {
-        const index = get().tabs.findIndex((t) => !t.noteId);
-        if (index == -1) return get().newTab();
-        const tabs = [...get().tabs];
-        tabs[index] = {
-          ...tabs[index]
-        };
-        set({
-          currentTab: tabs[index].id
-        });
-      },
-      newTab: (noteId?: string, previewTab?: boolean) => {
-        const id = getId(get().tabs.length, get().tabs);
-        const nextTabs = [
-          ...get().tabs,
-          {
-            id: id,
-            noteId,
-            previewTab: previewTab
-          }
-        ];
-        set({
-          tabs: nextTabs,
-          currentTab: id
-        });
-      },
-      moveTab: (index: number, toIndex: number) => {
-        const tabs = get().tabs.slice();
-        tabs.splice(toIndex, 0, tabs.slice(index, 1)[0]);
-        set({
-          tabs: tabs
-        });
-      },
-      focusTab: (id: number) => {
-        set({
-          currentTab: id
-        });
-      },
-      setScrollPosition: (id: number, position: number) => {
-        set({
-          scrollPosition: {
-            ...get().scrollPosition,
-            [id]: position
-          }
-        });
-      },
-      getNoteIdForTab: (id: number) => {
-        return get().tabs.find((t) => t.id === id)?.noteId;
-      },
-      hasTabForNote: (noteId: string) => {
-        return (
-          typeof get().tabs.find((t) => t.noteId === noteId)?.id === "number"
-        );
-      },
-      getTabForNote: (noteId: string) => {
-        return get().tabs.find((t) => t.noteId === noteId)?.id;
-      },
       getCurrentNoteId: () => {
-        return get().tabs.find((t) => t.id === get().currentTab)?.noteId;
-      },
-      getTab: (tabId) => {
-        return get().tabs.find((t) => t.id === tabId);
+        return get().tabs.find((t) => t.id === get().currentTab)?.session
+          ?.noteId;
       }
     }),
     {
-      name: "tab-storage",
+      name: "tab-storage-v5",
       storage: createJSONStorage(() => localStorage)
     }
   )
@@ -215,9 +79,7 @@ export const useTabStore = create(
 
 globalThis.tabStore = useTabStore;
 
-export const TabContext = createContext<TabItem>({
-  id: 0
-});
+export const TabContext = createContext<TabItem>({} as TabItem);
 
 export const useTabContext = () => {
   const tab = useContext(TabContext);

@@ -33,20 +33,23 @@ type OperatorNode = {
   type: "AND" | "OR" | "NOT";
 };
 
+const INVALID_QUERY_REGEX = /[!"#$%&'()*+,\-./:;<>=?@[\\\]^_`{|}~§]/;
 function escapeSQLString(str: string): string {
   if (str.startsWith('"') && str.endsWith('"')) {
     const innerStr = str.slice(1, -1).replace(/"/g, '""');
     return `"${innerStr}"`;
   }
 
-  // const isSubstitution = str.startsWith("-");
-  // if (isSubstitution) {
-  //   return str.replace(/^-(.+)/g, (_, rest) => {
-  //     return `-${escapeSQLString(rest)}`;
-  //   });
-  // }
+  const hasInvalidSymbol = INVALID_QUERY_REGEX.test(str);
+  const isWildcard =
+    str.startsWith("*") ||
+    str.endsWith("*") ||
+    str.startsWith("%") ||
+    str.endsWith("%");
+  if (hasInvalidSymbol || isWildcard) {
+    return `"${str}"`;
+  }
 
-  // const isWildcard = str.endsWith("*");
   // if (isWildcard) {
   //   return str.replace(/(.+?)(\*?$)/gm, (_, text, end) => {
   //     return `${escapeSQLString(text)}${end}`;
@@ -118,10 +121,10 @@ function transformAST(ast: QueryNode): QueryNode {
       if (lastWasPhrase) {
         transformedAST.children.push({ type: "AND" });
       }
-      // const transformedPhrase = child.value;//.map(escapeSQLString);
+      const transformedPhrase = child.value.map(escapeSQLString);
       transformedAST.children.push({
         type: "phrase",
-        value: child.value
+        value: transformedPhrase
       });
       lastWasPhrase = true;
     } else if (
@@ -147,7 +150,7 @@ function generateSQL(ast: QueryNode): string {
   return ast.children
     .map((child) => {
       if (child.type === "phrase") {
-        return `"${escapeSQLString(child.value.join(" "))}"`;
+        return child.value.join(" AND ");
       }
       if (child.type === "AND" || child.type === "OR" || child.type === "NOT") {
         return child.type;
@@ -157,6 +160,71 @@ function generateSQL(ast: QueryNode): string {
     .join(" ");
 }
 
-export function transformQuery(query: string): string {
-  return generateSQL(transformAST(parseTokens(tokenize(query))));
+export function transformQuery(query: string) {
+  const tokens = tokenize(query);
+  const largeTokens = tokens.filter(
+    (token) => token.length >= 3 || token === "OR"
+  );
+  return {
+    query: generateSQL(transformAST(parseTokens(largeTokens))),
+    tokens: tokenizeAst(transformAST(parseTokens(tokens)))
+  };
+}
+
+interface QueryTokens {
+  andTokens: string[];
+  orTokens: string[];
+  notTokens: string[];
+}
+
+function tokenizeAst(ast: QueryNode): QueryTokens {
+  const result: QueryTokens = {
+    andTokens: [],
+    orTokens: [],
+    notTokens: []
+  };
+
+  let isNextNot = false;
+  let isNextOr = false;
+
+  for (let i = 0; i < ast.children.length; i++) {
+    const node = ast.children[i];
+
+    if (node.type === "NOT") {
+      isNextNot = true;
+      continue;
+    }
+
+    if (node.type === "OR") {
+      isNextOr = true;
+      continue;
+    }
+
+    if (node.type === "phrase") {
+      // Handle each word in the phrase
+      for (const word of node.value) {
+        if (
+          result.orTokens.includes(word) ||
+          result.andTokens.includes(word) ||
+          result.notTokens.includes(word)
+        ) {
+          isNextOr = false;
+          isNextNot = false;
+          continue;
+        }
+        if (isNextOr) {
+          result.orTokens.push(word);
+        } else if (isNextNot) {
+          result.notTokens.push(word);
+        } else {
+          result.andTokens.push(word);
+        }
+      }
+
+      isNextOr = false;
+      isNextNot = false;
+    }
+  }
+
+  return result;
 }

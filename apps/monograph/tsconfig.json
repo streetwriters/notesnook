@@ -9,7 +9,7 @@
   ],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
-    "types": ["vite/client", "vite-plugin-arraybuffer/types"],
+    "types": ["vite/client", "vite-plugin-arraybuffer/types", "bun"],
     "isolatedModules": true,
     "esModuleInterop": true,
     "jsx": "react-jsx",

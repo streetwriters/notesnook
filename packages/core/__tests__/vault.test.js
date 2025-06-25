@@ -31,6 +31,17 @@ test("create vault", () =>
     expect(vault.key.length).toBeDefined();
   }));
 
+test("lock vault", () =>
+  databaseTest().then(async (db) => {
+    await expect(db.vault.create("password")).resolves.toBe(true);
+    await expect(db.vault.lock()).resolves.toBe(true);
+  }));
+
+test("lock non-existent vault", () =>
+  databaseTest().then(async (db) => {
+    await expect(db.vault.lock()).resolves.toBe(true);
+  }));
+
 test("unlock vault", () =>
   databaseTest().then(async (db) => {
     await expect(db.vault.create("password")).resolves.toBe(true);

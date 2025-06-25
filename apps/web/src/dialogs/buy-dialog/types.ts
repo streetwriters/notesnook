@@ -69,19 +69,39 @@ export enum PaddleEvents {
   /**  User has selected "Change Payment Method" when on the payment screen  **/
   "Checkout.PaymentMethodChange" = "Checkout.PaymentMethodChange",
   /**  User has selected "Change Payment Method" when on the Wire Transfer screen  **/
-  "Checkout.WireTransfer.PaymentMethodChange" = "Checkout.WireTransfer.PaymentMethodChange"
+  "Checkout.WireTransfer.PaymentMethodChange" = "Checkout.WireTransfer.PaymentMethodChange",
+
+  "Checkout.Customer.Details" = "Checkout.Customer.Details",
+  "Checkout.RemoveSpinner" = "Checkout.RemoveSpinner"
 }
 
 export interface CallbackData {
   checkout?: Checkout;
+  coupon?: { coupon_code: string };
+  user?: {
+    email: string;
+    id: string;
+    country: string;
+  };
 }
 
 export interface Checkout {
   id?: string;
+  prices: {
+    customer: {
+      items: CheckoutPrices[];
+    };
+  };
+  recurring_prices: {
+    customer: {
+      items: CheckoutPrices[];
+    };
+  };
 }
 
 export type PaddleEvent = {
   action: "event";
+  event: PaddleEvents;
   event_name: PaddleEvents;
   callback_data: CallbackData;
 };
@@ -91,8 +111,9 @@ export interface Plan {
   period: Period;
   price: Price;
   currency: string;
-  originalPrice?: Price;
-  discount: number;
+  currencySymbol?: string;
+  originalPrice: Price;
+  discount?: Discount;
   country: string;
 }
 
@@ -108,14 +129,19 @@ export type PricingInfo = {
 };
 
 export type Discount = {
+  type: "regional" | "promo";
+  code?: string;
   recurring: boolean;
   amount: number;
 };
 
 export interface Price {
   gross: number;
+  gross_after_discount?: number;
   net: number;
+  net_after_discount?: number;
   tax: number;
+  tax_after_discount?: number;
   currency?: string;
 }
 
@@ -125,67 +151,69 @@ export interface CheckoutDataResponse {
 
 export interface CheckoutData {
   public_checkout_id: string;
-  type: string;
-  uuid: string;
-  vendor: Vendor;
-  display_currency: string;
-  charge_currency: string;
-  customer: Customer;
+  // type: string;
+  // uuid: string;
+  // vendor: Vendor;
+  // display_currency: string;
+  // charge_currency: string;
+  // customer: Customer;
   items: Item[];
-  available_payment_methods: unknown[];
-  total: TotalPrice[];
-  pending_payment: boolean;
-  completed: boolean;
-  payment_method_type: null;
-  flagged_for_review: boolean;
+  // available_payment_methods: unknown[];
+  // total: TotalPrice[];
+  // pending_payment: boolean;
+  // completed: boolean;
+  // payment_method_type: null;
+  // flagged_for_review: boolean;
   ip_geo_country_code: string;
-  tax: null;
-  name: null;
-  image_url: null;
-  message: null;
-  passthrough: string;
-  redirect_url: null;
-  created_at: Date;
+  // tax: null;
+  // name: null;
+  // image_url: null;
+  // message: null;
+  // passthrough: string;
+  // redirect_url: null;
+  // created_at: Date;
 }
 
 export interface Customer {
-  id: number;
-  email: string;
+  // id: number;
+  // email: string;
   country_code: string;
-  postcode: null;
-  audience_opt_in: boolean;
+  // postcode: null;
+  // audience_opt_in: boolean;
 }
 
 export interface Item {
-  checkout_product_id: number;
-  product_id: number;
-  name: string;
-  custom_message: string;
-  quantity: number;
-  allow_quantity: boolean;
-  min_quantity: number;
-  max_quantity: number;
-  icon_url: string;
+  // checkout_product_id: number;
+  // product_id: number;
+  // name: string;
+  // custom_message: string;
+  // quantity: number;
+  // allow_quantity: boolean;
+  // min_quantity: number;
+  // max_quantity: number;
+  // icon_url: string;
   prices: CheckoutPrices[];
   recurring: Recurring;
-  webhook_url: null;
+  // webhook_url: null;
 }
 
 export interface CheckoutPrices {
   currency: string;
   unit_price: CheckoutPrice;
-  line_price: CheckoutPrice;
+  // line_price: CheckoutPrice;
   discounts: CheckoutDiscount[];
-  tax_rate: number;
+
+  recurring: CheckoutPrices;
+  // tax_rate: number;
 }
 
 export interface CheckoutDiscount {
-  rank: number;
-  type: string;
-  net_discount: number;
+  // rank: number;
+  // type: string;
+  // net_discount: number;
   gross_discount: number;
   code: string;
-  description: string;
+  // description: string;
 }
 
 export interface CheckoutPrice {
@@ -200,9 +228,9 @@ export interface CheckoutPrice {
 }
 
 export interface Recurring {
-  period: string;
-  interval: number;
-  trial_days: number;
+  // period: string;
+  // interval: number;
+  // trial_days: number;
   prices: CheckoutPrices[];
 }
 

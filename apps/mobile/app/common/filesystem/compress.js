@@ -27,13 +27,9 @@ import RNFetchBlob from "react-native-blob-util";
  */
 export async function compressToBase64(path, type) {
   const { width: screenWidth, scale } = Dimensions.get("window");
-  console.log("COMPRESSING TO BASE64...");
+
   return new Promise((resolve) => {
-    console.log(path, "image path...");
-
     Image.getSize(path, async (width) => {
-      console.log("image width", width);
-
       const response = await ImageResizer.createResizedImage(
         path,
         screenWidth * scale,
@@ -55,10 +51,12 @@ export async function compressToBase64(path, type) {
           : response.uri,
         "base64"
       );
-      RNFetchBlob.fs.unlink(path.replace("file://", "")).catch(console.log);
-      RNFetchBlob.fs
-        .unlink(response.uri.replace("file://", ""))
-        .catch(console.log);
+      RNFetchBlob.fs.unlink(path.replace("file://", "")).catch(() => {
+        /* empty */
+      });
+      RNFetchBlob.fs.unlink(response.uri.replace("file://", "")).catch(() => {
+        /* empty */
+      });
 
       resolve(base64);
     });
@@ -80,6 +78,8 @@ export async function compressToFile(path, type) {
       onlyScaleDown: true
     }
   );
-  RNFetchBlob.fs.unlink(path.replace("file://", "")).catch(console.log);
+  RNFetchBlob.fs.unlink(path.replace("file://", "")).catch(() => {
+    /* empty */
+  });
   return response.uri;
 }

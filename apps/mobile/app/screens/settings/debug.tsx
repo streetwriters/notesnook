@@ -17,24 +17,25 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Clipboard from "@react-native-clipboard/clipboard";
-import { LogMessage } from "@notesnook/logger";
+import { sanitizeFilename } from "@notesnook/common";
 import { format, LogLevel, logManager } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
+import { LogMessage } from "@notesnook/logger";
+import { useThemeColors } from "@notesnook/theme";
+import Clipboard from "@react-native-clipboard/clipboard";
 import React, { useEffect, useRef, useState } from "react";
 import { FlatList, Platform, TouchableOpacity, View } from "react-native";
-import * as ScopedStorage from "react-native-scoped-storage";
 import RNFetchBlob from "react-native-blob-util";
-import Storage from "../../common/database/storage";
+import * as ScopedStorage from "react-native-scoped-storage";
+import filesystem from "../../common/filesystem";
 import { presentDialog } from "../../components/dialog/functions";
 import { IconButton } from "../../components/ui/icon-button";
 import { Notice } from "../../components/ui/notice";
 import Paragraph from "../../components/ui/typography/paragraph";
 import useTimer from "../../hooks/use-timer";
 import { ToastManager } from "../../services/event-manager";
-import { useThemeColors } from "@notesnook/theme";
 import { hexToRGBA } from "../../utils/colors";
-import { sanitizeFilename } from "@notesnook/common";
-import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export default function DebugLogs() {
   const { colors } = useThemeColors();
@@ -96,8 +97,8 @@ export default function DebugLogs() {
             });
           }}
           style={{
-            paddingHorizontal: 12,
-            paddingVertical: 12,
+            paddingHorizontal: DefaultAppStyles.GAP,
+            paddingVertical: DefaultAppStyles.GAP_VERTICAL,
             backgroundColor: background,
             flexShrink: 1,
             borderBottomWidth: 1,
@@ -119,7 +120,6 @@ export default function DebugLogs() {
       );
     },
     [
-      colors.secondary.background,
       colors.primary.paragraph,
       colors.error.paragraph,
       colors.static.black,
@@ -148,7 +148,7 @@ export default function DebugLogs() {
         if (!file) return;
         path = file.uri;
       } else {
-        path = await Storage.checkAndCreateDir("/");
+        path = await filesystem.checkAndCreateDir("/");
         await RNFetchBlob.fs.writeFile(path + fileName + ".txt", data, "utf8");
         path = path + fileName;
       }
@@ -160,9 +160,7 @@ export default function DebugLogs() {
           type: "success"
         });
       }
-    } catch (e) {
-      console.log(e);
-    }
+    } catch (e) {}
   }, [currentLog?.logs]);
 
   const copyLogs = React.useCallback(() => {
@@ -211,7 +209,7 @@ export default function DebugLogs() {
     >
       <View
         style={{
-          padding: 12
+          padding: DefaultAppStyles.GAP
         }}
       >
         <Notice text={strings.debugNotice()} type="information" />
@@ -223,8 +221,8 @@ export default function DebugLogs() {
           ListHeaderComponent={
             <View
               style={{
-                paddingHorizontal: 12,
-                marginBottom: 10,
+                paddingHorizontal: DefaultAppStyles.GAP,
+                marginBottom: DefaultAppStyles.GAP_VERTICAL,
                 flexDirection: "row",
                 alignItems: "center",
                 backgroundColor: colors.primary.background,

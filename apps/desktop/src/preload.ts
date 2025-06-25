@@ -19,22 +19,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* eslint-disable no-var */
 
 import { ELECTRON_TRPC_CHANNEL } from "electron-trpc/main";
-import { type RendererGlobalElectronTRPC } from "electron-trpc/src/types";
 // import type { NNCrypto } from "@notesnook/crypto";
 import { ipcRenderer } from "electron";
 import { platform } from "os";
 
 declare global {
   var os: () => "mas" | ReturnType<typeof platform>;
-  var electronTRPC: RendererGlobalElectronTRPC;
+  var electronTRPC: any;
   // var NativeNNCrypto: (new () => NNCrypto) | undefined;
 }
 
 process.once("loaded", async () => {
-  const electronTRPC: RendererGlobalElectronTRPC = {
-    sendMessage: (operation) =>
+  const electronTRPC = {
+    sendMessage: (operation: any) =>
       ipcRenderer.send(ELECTRON_TRPC_CHANNEL, operation),
-    onMessage: (callback) =>
+    onMessage: (callback: any) =>
       ipcRenderer.on(ELECTRON_TRPC_CHANNEL, (_event, args) => callback(args))
   };
   globalThis.electronTRPC = electronTRPC;

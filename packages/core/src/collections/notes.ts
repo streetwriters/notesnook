@@ -19,7 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { getId } from "../utils/id.js";
 import { getContentFromData } from "../content-types/index.js";
-import { NEWLINE_STRIP_REGEX, formatTitle } from "../utils/title-format.js";
+import {
+  HEADLINE_REGEX,
+  NEWLINE_STRIP_REGEX,
+  formatTitle
+} from "../utils/title-format.js";
 import { clone } from "../utils/clone.js";
 import { Tiptap } from "../content-types/tiptap.js";
 import { EMPTY_CONTENT } from "./content.js";
@@ -36,6 +40,7 @@ import { ICollection } from "./collection.js";
 import { SQLCollection } from "../database/sql-collection.js";
 import { isFalse } from "../database/index.js";
 import { logger } from "../logger.js";
+import { addItems, deleteItems } from "../utils/array.js";
 
 export type ExportOptions = {
   format: "html" | "md" | "txt" | "md-frontmatter";
@@ -47,6 +52,7 @@ export type ExportOptions = {
 
 export class Notes implements ICollection {
   name = "notes";
+  cache: { archived: string[] } = { archived: [] };
   /**
    * @internal
    */
@@ -65,6 +71,13 @@ export class Notes implements ICollection {
   async init() {
     await this.collection.init();
     this.totalNotes = await this.collection.count();
+    await this.buildCache();
+  }
+
+  async buildCache() {
+    this.cache.archived = [];
+    const archived = await this.archived.ids();
+    this.cache.archived = archived;
   }
 
   async add(
@@ -83,15 +96,17 @@ export class Notes implements ICollection {
       let contentId = item.contentId;
       let dateEdited = item.dateEdited;
       let headline = item.headline;
+      let headlineTitle = "";
 
       if (item.content && item.content.data && item.content.type) {
         logger.debug("saving content", { id });
         const { type, data } = item.content;
 
-        const content = getContentFromData(type, data);
+        const content = await getContentFromData(type, data);
         if (!content) throw new Error("Invalid content type.");
 
-        headline = getNoteHeadline(content);
+        headline = content.toHeadline();
+        headlineTitle = content.toTitle();
         dateEdited = Date.now();
         contentId = await this.db.content.add({
           noteId: id,
@@ -121,9 +136,33 @@ export class Notes implements ICollection {
             this.db.settings.getTitleFormat(),
             this.db.settings.getDateFormat(),
             this.db.settings.getTimeFormat(),
-            headline?.split(" ").splice(0, 10).join(" ") || "",
+            headlineTitle,
             this.totalNotes
           );
+        item.isGeneratedTitle = true;
+      }
+
+      const currentNoteTitleFields = await this.db
+        .sql()
+        .selectFrom("notes")
+        .select(["isGeneratedTitle", "title"])
+        .where("id", "=", id)
+        .executeTakeFirst();
+      if (isUpdating) {
+        const didUserEditTitle = Boolean(item.title);
+        item.isGeneratedTitle =
+          Boolean(currentNoteTitleFields?.isGeneratedTitle) &&
+          !didUserEditTitle;
+        const titleFormat = this.db.settings.getTitleFormat();
+        if (
+          item.isGeneratedTitle &&
+          HEADLINE_REGEX.test(titleFormat) &&
+          headlineTitle &&
+          currentNoteTitleFields?.title !== headlineTitle
+        ) {
+          item.title = titleFormat.replace(HEADLINE_REGEX, headlineTitle);
+        } else if (item.title === "")
+          item.title = currentNoteTitleFields?.title || "Untitled";
       }
 
       if (isUpdating) {
@@ -138,7 +177,9 @@ export class Notes implements ICollection {
           conflicted: item.conflicted,
           readonly: item.readonly,
 
-          dateEdited: item.dateEdited || dateEdited
+          dateEdited: item.dateEdited || dateEdited,
+
+          isGeneratedTitle: item.isGeneratedTitle
         });
       } else {
         await this.collection.upsert({
@@ -156,7 +197,9 @@ export class Notes implements ICollection {
           readonly: item.readonly,
 
           dateCreated: item.dateCreated || Date.now(),
-          dateEdited: item.dateEdited || dateEdited || Date.now()
+          dateEdited: item.dateEdited || dateEdited || Date.now(),
+
+          isGeneratedTitle: item.isGeneratedTitle
         });
         this.totalNotes++;
       }
@@ -176,6 +219,15 @@ export class Notes implements ICollection {
     return note;
   }
 
+  async tags(id: string) {
+    return this.db.relations
+      .to({ id, type: "note" }, "tag")
+      .selector.items(undefined, {
+        sortBy: "dateCreated",
+        sortDirection: "asc"
+      });
+  }
+
   // note(idOrNote: string | Note) {
   //   if (!idOrNote) return;
   //   const note =
@@ -190,7 +242,11 @@ export class Notes implements ICollection {
 
   get all() {
     return this.collection.createFilter<Note>(
-      (qb) => qb.where(isFalse("dateDeleted")).where(isFalse("deleted")),
+      (qb) =>
+        qb
+          .where(isFalse("dateDeleted"))
+          .where(isFalse("deleted"))
+          .where(isFalse("archived")),
       this.db.options?.batchSize
     );
   }
@@ -233,7 +289,19 @@ export class Notes implements ICollection {
         qb
           .where(isFalse("dateDeleted"))
           .where(isFalse("deleted"))
+          .where(isFalse("archived"))
           .where("favorite", "==", true),
+      this.db.options?.batchSize
+    );
+  }
+
+  get archived() {
+    return this.collection.createFilter<Note>(
+      (qb) =>
+        qb
+          .where(isFalse("dateDeleted"))
+          .where(isFalse("deleted"))
+          .where("archived", "==", true),
       this.db.options?.batchSize
     );
   }
@@ -256,6 +324,14 @@ export class Notes implements ICollection {
   favorite(state: boolean, ...ids: string[]) {
     return this.collection.update(ids, { favorite: state });
   }
+  async archive(state: boolean, ...ids: string[]) {
+    await this.collection.update(ids, { archived: state });
+    if (state) {
+      addItems(this.cache.archived, ...ids);
+    } else {
+      deleteItems(this.cache.archived, ...ids);
+    }
+  }
   readonly(state: boolean, ...ids: string[]) {
     return this.collection.update(ids, { readonly: state });
   }
@@ -276,31 +352,32 @@ export class Notes implements ICollection {
     const { format, rawContent } = options;
 
     const contentString =
-      rawContent ||
-      (await (async () => {
-        let contentItem = options.contentItem;
-        if (!contentItem) {
-          const rawContent = await this.db.content.findByNoteId(note.id);
-          if (rawContent && rawContent.locked) return false;
-          contentItem = rawContent || EMPTY_CONTENT(note.id);
-        }
+      rawContent === undefined
+        ? await (async () => {
+            let contentItem = options.contentItem;
+            if (!contentItem) {
+              const rawContent = await this.db.content.findByNoteId(note.id);
+              if (rawContent && rawContent.locked) return false;
+              contentItem = rawContent || EMPTY_CONTENT(note.id);
+            }
 
-        const { data, type } =
-          options?.embedMedia && format !== "txt"
-            ? await this.db.content.downloadMedia(
-                `export-${note.id}`,
-                contentItem,
-                false
-              )
-            : contentItem;
-        const content = getContentFromData(type, data);
-        return format === "html"
-          ? content.toHTML()
-          : format === "md"
-          ? content.toMD()
-          : content.toTXT();
-      })());
-    if (!contentString) return false;
+            const { data, type } =
+              options?.embedMedia && format !== "txt"
+                ? await this.db.content.downloadMedia(
+                    `export-${note.id}`,
+                    contentItem,
+                    false
+                  )
+                : contentItem;
+            const content = await getContentFromData(type, data);
+            return format === "html"
+              ? content.toHTML()
+              : format === "md"
+              ? content.toMD()
+              : content.toTXT();
+          })()
+        : rawContent;
+    if (contentString === false) return false;
 
     const tags = (await this.db.relations.to(note, "tag").resolve()).map(
       (tag) => tag.title
@@ -420,15 +497,16 @@ export class Notes implements ICollection {
     const content = await this.db.content.findByNoteId(id);
     if (!content || content.locked) return [];
 
-    return getContentFromData(content.type, content.data).extract("blocks")
-      .blocks;
+    return (await getContentFromData(content.type, content.data)).extract(
+      "blocks"
+    ).blocks;
   }
 
   async contentBlocksWithLinks(id: string) {
     const content = await this.db.content.findByNoteId(id);
     if (!content || content.locked) return [];
 
-    return getContentFromData(content.type, content.data).extract(
+    return (await getContentFromData(content.type, content.data)).extract(
       "blocksWithLink"
     ).blocks;
   }
@@ -437,12 +515,8 @@ export class Notes implements ICollection {
     const content = await this.db.content.findByNoteId(id);
     if (!content || content.locked) return [];
 
-    return getContentFromData(content.type, content.data).extract(
+    return (await getContentFromData(content.type, content.data)).extract(
       "internalLinks"
     ).internalLinks;
   }
-}
-
-function getNoteHeadline(content: Tiptap) {
-  return content.toHeadline();
 }

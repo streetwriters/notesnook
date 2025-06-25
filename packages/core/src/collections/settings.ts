@@ -37,9 +37,11 @@ import { SQLCachedCollection } from "../database/sql-cached-collection.js";
 
 const DEFAULT_GROUP_OPTIONS = (key: GroupingKey) =>
   ({
-    groupBy: "default",
+    groupBy: key === "search" ? "none" : "default",
     sortBy:
-      key === "trash"
+      key === "search"
+        ? "relevance"
+        : key === "trash"
         ? "dateDeleted"
         : key === "tags"
         ? "dateCreated"
@@ -54,6 +56,7 @@ const defaultSettings: SettingItemMap = {
   dateFormat: "DD-MM-YYYY",
   titleFormat: "Note $date$ $time$",
   defaultNotebook: undefined,
+  defaultTag: undefined,
   trashCleanupInterval: 7,
   profile: undefined,
 
@@ -62,8 +65,10 @@ const defaultSettings: SettingItemMap = {
   "groupOptions:notes": DEFAULT_GROUP_OPTIONS("notes"),
   "groupOptions:notebooks": DEFAULT_GROUP_OPTIONS("notebooks"),
   "groupOptions:favorites": DEFAULT_GROUP_OPTIONS("favorites"),
+  "groupOptions:archive": DEFAULT_GROUP_OPTIONS("archive"),
   "groupOptions:home": DEFAULT_GROUP_OPTIONS("home"),
   "groupOptions:reminders": DEFAULT_GROUP_OPTIONS("reminders"),
+  "groupOptions:search": DEFAULT_GROUP_OPTIONS("search"),
 
   "toolbarConfig:desktop": undefined,
   "toolbarConfig:mobile": undefined,
@@ -154,7 +159,9 @@ export class Settings implements ICollection {
   }
 
   getTrashCleanupInterval() {
-    return this.get("trashCleanupInterval");
+    const t = this.get("trashCleanupInterval");
+    // stored as a string in db, need conversion before use
+    return Number(t) as TrashCleanupInterval;
   }
 
   setDefaultNotebook(item: string | undefined) {
@@ -163,6 +170,14 @@ export class Settings implements ICollection {
 
   getDefaultNotebook() {
     return this.get("defaultNotebook");
+  }
+
+  setDefaultTag(item: string | undefined) {
+    return this.set("defaultTag", item);
+  }
+
+  getDefaultTag() {
+    return this.get("defaultTag");
   }
 
   setTitleFormat(format: string) {

@@ -31,6 +31,13 @@ export function addItem<T>(array: T[], item: T) {
   return true;
 }
 
+export function addItems<T>(array: T[], ...items: T[]) {
+  for (const item of items) {
+    addItem(array, item);
+  }
+  return array;
+}
+
 export function deleteItem<T>(array: T[], item: T) {
   return deleteAtIndex(array, array.indexOf(item));
 }
@@ -45,6 +52,19 @@ export function deleteItems<T>(array: T[], ...items: T[]) {
 export function findById<T extends { id: string }>(array: T[], id: string) {
   if (!array) return false;
   return array.find((item) => item.id === id);
+}
+
+export function findOrAdd<T>(
+  array: T[],
+  predicate: (item: T) => boolean,
+  item: T
+) {
+  const index = array.findIndex(predicate);
+  if (index === -1) {
+    array.push(item);
+    return item;
+  }
+  return array[index];
 }
 
 export function hasItem<T>(array: T[], item: T) {

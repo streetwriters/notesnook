@@ -27,6 +27,9 @@ import { clearLogs, downloadLogs } from "../../utils/logger";
 import { useAutoUpdateStore } from "../../hooks/use-auto-updater";
 import { IssueDialog } from "../issue-dialog";
 import { strings } from "@notesnook/intl";
+import { desktop } from "../../common/desktop-bridge";
+import { TaskManager } from "../../common/task-manager";
+import { useStore as useSettingStore } from "../../stores/setting-store";
 
 export const AboutSettings: SettingsGroup[] = [
   {
@@ -72,6 +75,76 @@ export const AboutSettings: SettingsGroup[] = [
             }
           ];
         }
+      },
+      {
+        key: "release-track",
+        title: strings.releaseTrack(),
+        description: strings.releaseTrackDesc(),
+        isHidden: () =>
+          useSettingStore.getState().isFlatpak ||
+          useSettingStore.getState().isSnap,
+        components: [
+          {
+            type: "dropdown",
+            options: [
+              {
+                title: strings.stable(),
+                value: "stable"
+              },
+              {
+                title: strings.beta(),
+                value: "beta"
+              }
+            ],
+            selectedOption: async () => {
+              if (IS_DESKTOP_APP)
+                return (
+                  (await desktop?.updater.releaseTrack.query()) || "stable"
+                );
+
+              return (
+                document.cookie
+                  .split("; ")
+                  .find((row) => row.startsWith("release-track="))
+                  ?.split("=")[1] || "stable"
+              );
+            },
+            async onSelectionChanged(value) {
+              if (IS_DESKTOP_APP) {
+                return await desktop?.updater.changeReleaseTrack.mutate({
+                  track: value
+                });
+              }
+              const registration =
+                await navigator.serviceWorker.getRegistration();
+              if (!registration) return;
+              const worker =
+                registration.active ||
+                registration.waiting ||
+                registration.installing;
+              if (!worker) return;
+              if (worker.state === "activated") {
+                await switchReleaseTrack(value);
+              } else {
+                await TaskManager.startTask({
+                  type: "modal",
+                  title: "Changing release track",
+                  subtitle:
+                    "Please wait while we switch to the new release track...",
+                  action: () =>
+                    new Promise<void>((resolve) => {
+                      worker.onstatechange = async function () {
+                        if (this.state === "activated") {
+                          await switchReleaseTrack(value);
+                          resolve();
+                        }
+                      };
+                    })
+                });
+              }
+            }
+          }
+        ]
       },
       {
         key: "source-code",
@@ -278,6 +351,15 @@ export const SupportSettings: SettingsGroup[] = [
         components: [
           {
             type: "button",
+            action: async () => {
+              await navigator.clipboard.writeText("support@streetwriters.co");
+              showToast("info", strings.copied());
+            },
+            title: strings.copy(),
+            variant: "secondary"
+          },
+          {
+            type: "button",
             action: () => {
               window.open("mailto:support@streetwriters.co", "_blank");
             },
@@ -329,3 +411,12 @@ export const SupportSettings: SettingsGroup[] = [
     ]
   }
 ];
+
+async function switchReleaseTrack(track: string) {
+  const registration = await navigator.serviceWorker.getRegistration();
+  if (!registration) return;
+  await registration.unregister();
+  for (const key of await caches.keys()) await caches.delete(key);
+  document.cookie = `release-track=${track}; Secure; Path=/`;
+  window.location.reload();
+}

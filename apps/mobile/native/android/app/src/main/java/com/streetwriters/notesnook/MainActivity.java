@@ -3,7 +3,6 @@ package com.streetwriters.notesnook;
 import com.facebook.react.ReactActivity;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.os.Build;
 import android.os.Bundle;
 import android.webkit.WebView;
 import com.facebook.react.ReactActivityDelegate;
@@ -12,22 +11,17 @@ import com.facebook.react.defaults.DefaultReactActivityDelegate;
 import com.zoontek.rnbootsplash.RNBootSplash;
 
 public class MainActivity extends ReactActivity {
-
-
   @Override
     protected void onCreate(Bundle savedInstanceState) {
     RNBootSplash.init(this);
     super.onCreate(null);
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && BuildConfig.DEBUG) {
+    if (BuildConfig.DEBUG) {
       WebView.setWebContentsDebuggingEnabled(true);
     }
 
     try {
       startService(new Intent(getBaseContext(), OnClearFromRecentService.class));
-    } catch (Exception e) {
-
-    }
-
+    } catch (Exception ignored) {}
   }
 
   /**
@@ -49,7 +43,7 @@ public void onNewIntent(Intent intent) {
   setIntent(intent);
 }
 
- @Override
+@Override
 public void onConfigurationChanged(Configuration newConfig) {
   super.onConfigurationChanged(newConfig);
   getReactInstanceManager().onConfigurationChanged(this, newConfig);
@@ -62,7 +56,6 @@ public void onConfigurationChanged(Configuration newConfig) {
   protected String getMainComponentName() {
     return "Notesnook";
   }
-
 
   @Override
   public void invokeDefaultOnBackPressed() {

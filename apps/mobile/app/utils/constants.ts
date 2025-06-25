@@ -18,12 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Platform } from "react-native";
+import { getVersion } from "react-native-device-info";
 
 export const IOS_APPGROUPID = "group.org.streetwriters.notesnook";
 export const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
 export const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
 
-export const BETA = false;
+export const BETA = getVersion().includes("beta");
 
 export const STORE_LINK =
   Platform.OS === "ios"
@@ -32,7 +33,7 @@ export const STORE_LINK =
 
 export const GROUP = {
   default: "default",
-  None: "none",
+  none: "none",
   abc: "abc",
   year: "year",
   week: "week",
@@ -44,7 +45,8 @@ export const SORT = {
   dateEdited: "Date edited",
   dateCreated: "Date created",
   title: "Title",
-  dueDate: "Due date"
+  dueDate: "Due date",
+  relevance: "Relevance"
 };
 
 export const itemSkus = [

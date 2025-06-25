@@ -18,7 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useEffect, useRef, useState } from "react";
-import { EventTypes, Settings } from "../utils";
+import { Settings } from "../utils";
+import { EditorEvents } from "../utils/editor-events";
 import styles from "./styles.module.css";
 import { useTabContext } from "../hooks/useTabStore";
 import { strings } from "@notesnook/intl";
@@ -45,7 +46,7 @@ function Tags(props: { settings: Settings; loading?: boolean }): JSX.Element {
       editor.commands.blur();
       editorTitles[tab.id]?.current?.blur();
     }
-    post(EventTypes.newtag, undefined, tab.id, tab.noteId);
+    post(EditorEvents.newtag, undefined, tab.id, tab.session?.noteId);
   };
   const fontScale = props.settings?.fontScale || 1;
 
@@ -73,7 +74,7 @@ function Tags(props: { settings: Settings; loading?: boolean }): JSX.Element {
           marginRight: 5,
           borderRadius: 100,
           padding: "0px 10px",
-          fontFamily: "Open Sans",
+          fontFamily: "Inter",
           display: "flex",
           alignItems: "center",
           height: "30px",
@@ -118,7 +119,7 @@ function Tags(props: { settings: Settings; loading?: boolean }): JSX.Element {
             borderRadius: 100,
             padding: "0px 10px",
             height: "30px",
-            fontFamily: "Open Sans",
+            fontFamily: "Inter",
             fontSize: 13,
             color: "var(--nn_primary_icon)",
             userSelect: "none",
@@ -126,7 +127,7 @@ function Tags(props: { settings: Settings; loading?: boolean }): JSX.Element {
           }}
           onClick={(e) => {
             e.preventDefault();
-            post(EventTypes.tag, tag, tab.id, tab.noteId);
+            post(EditorEvents.tag, tag, tab.id, tab.session?.noteId);
           }}
         >
           #{tag.alias}

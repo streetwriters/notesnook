@@ -22,13 +22,21 @@ import {
   Meta,
   Outlet,
   Scripts,
-  ScrollRestoration
+  ScrollRestoration,
+  useLoaderData
 } from "@remix-run/react";
 import { BaseThemeProvider } from "./components/theme-provider";
 import { Buffer } from "buffer";
 import { ThemeDark, themeToCSS } from "@notesnook/theme";
+import { LoaderFunction } from "@remix-run/node";
 
 globalThis.Buffer = Buffer;
+
+type RootLoaderData = { cspScriptNonce: string };
+export const loader: LoaderFunction = async () => {
+  const crypto = await import("node:crypto");
+  return { cspScriptNonce: crypto.randomBytes(16).toString("hex") };
+};
 
 export function Head() {
   return (
@@ -40,13 +48,17 @@ export function Head() {
       <Links />
       <style
         id="theme-colors"
-        dangerouslySetInnerHTML={{ __html: colorsToCSS() }}
+        dangerouslySetInnerHTML={{ __html: themeToCSS(ThemeDark) }}
       />
     </>
   );
 }
 
 export default function App() {
+  const data = useLoaderData<RootLoaderData>();
+  const cspScriptNonce =
+    typeof document === "undefined" ? data.cspScriptNonce : "";
+
   return (
     <>
       <BaseThemeProvider
@@ -56,29 +68,8 @@ export default function App() {
       >
         <Outlet />
       </BaseThemeProvider>
-      <ScrollRestoration />
-      <Scripts />
+      <ScrollRestoration nonce={cspScriptNonce} />
+      <Scripts nonce={cspScriptNonce} />
     </>
   );
-}
-
-function colorsToCSS() {
-  // const colorScheme = JSON.parse(
-  //   window.localStorage.getItem("colorScheme") || '"light"'
-  // );
-  // const root = document.querySelector("html");
-  // if (root) root.setAttribute("data-theme", colorScheme);
-
-  // const theme =
-  //   colorScheme === "dark"
-  //     ? JSON.parse(window.localStorage.getItem("theme:dark") || "false") ||
-  //       ThemeDark
-  //     : JSON.parse(window.localStorage.getItem("theme:light") || "false") ||
-  //       ThemeLight;
-  //  const stylesheet = document.getElementById("theme-colors");
-  // if (theme) {
-  //   const css = ;
-  //   if (stylesheet) stylesheet.innerHTML = css;
-  // } else stylesheet?.remove();
-  return themeToCSS(ThemeDark);
 }

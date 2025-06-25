@@ -1,139 +1,90 @@
-:root {
-  --sash-size: 10px;
-  --sash-hover-size: 4px;
-}
-
 .tabsScroll,
 .titlebarLogo,
-.theme-scope-titleBar {
+.theme-scope-titleBar,
+.navigation-menu-header,
+.route-container-header {
   -webkit-app-region: drag;
 }
 
 .theme-scope-titleBar button,
-.tabsScroll .tab {
+.tabsScroll .tab,
+.editor-action-bar button,
+.route-container-header button,
+.search-container {
   -webkit-app-region: no-drag;
 }
 
-.panel-resize-handle {
-  position: relative;
-}
-
-.panel-resize-handle::before {
-  content: " ";
-  position: absolute;
-  transition: background-color 300ms ease-out;
-  z-index: 999;
-}
-
-.panel-resize-handle[data-panel-group-direction="horizontal"]::before {
-  width: 5px;
-  height: 100%;
-}
-
-.panel-resize-handle[data-panel-group-direction="vertical"]::before {
-  width: 100%;
-  height: 5px;
-}
-
-.panel-resize-handle[data-resize-handle-state="hover"]::before {
-  background-color: var(--accent);
-}
-
-/* open-sans-regular - vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic */
 @font-face {
-  font-family: "Open Sans";
+  font-family: "Inter";
   font-style: normal;
   font-display: swap;
   font-weight: 400;
-  src: local(""),
-    url("./assets/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-regular.woff2")
-      format("woff2"),
-    /* Super Modern Browsers */
-      url("./assets/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-regular.woff")
-      format("woff"),
-    /* Modern Browsers */
-      url("./assets/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-regular.ttf")
-      format("truetype");
+  src: local(""), url("./assets/fonts/Inter-Regular.woff2") format("woff2"),
+    url("./assets/fonts/Inter-Regular.ttf") format("truetype");
 }
-/* open-sans-600 - vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic */
+
 @font-face {
-  font-family: "Open Sans";
+  font-family: "Inter";
   font-style: normal;
+  font-display: swap;
   font-weight: 600;
-  font-display: swap;
-  src: local(""),
-    url("./assets/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-600.woff2")
-      format("woff2"),
-    /* Super Modern Browsers */
-      url("./assets/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-600.woff")
-      format("woff"),
-    /* Modern Browsers */
-      url("./assets/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-600.ttf")
-      format("truetype");
+  src: local(""), url("./assets/fonts/Inter-SemiBold.woff2") format("woff2"),
+    url("./assets/fonts/Inter-SemiBold.ttf") format("truetype");
 }
-/* open-sans-700 - vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic */
+
 @font-face {
-  font-family: "Open Sans";
+  font-family: "Inter";
   font-style: normal;
-  font-weight: 700;
   font-display: swap;
-  src: local(""),
-    url("./assets/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-700.woff2")
-      format("woff2"),
-    /* Super Modern Browsers */
-      url("./assets/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-700.woff")
-      format("woff"),
-    /* Modern Browsers */
-      url("./assets/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-700.ttf")
-      format("truetype");
+  font-weight: 700;
+  src: local(""), url("./assets/fonts/Inter-Bold.woff2") format("woff2"),
+    url("./assets/fonts/Inter-Bold.ttf") format("truetype");
 }
-/* open-sans-italic - vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic */
+
 @font-face {
-  font-family: "Open Sans";
+  font-family: "Inter";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: local(""), url("./assets/fonts/Inter-Medium.woff2") format("woff2"),
+    url("./assets/fonts/Inter-Medium.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Inter";
   font-style: italic;
+  font-display: swap;
   font-weight: 400;
-  font-display: swap;
-  src: local(""),
-    url("./assets/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-italic.woff2")
-      format("woff2"),
-    /* Super Modern Browsers */
-      url("./assets/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-italic.woff")
-      format("woff"),
-    /* Modern Browsers */
-      url("./assets/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-italic.ttf")
-      format("truetype");
+  src: local(""), url("./assets/fonts/Inter-Italic.woff2") format("woff2"),
+    url("./assets/fonts/Inter-Italic.ttf") format("truetype");
 }
-/* open-sans-600italic - vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic */
+
 @font-face {
-  font-family: "Open Sans";
+  font-family: "Inter";
   font-style: italic;
+  font-display: swap;
   font-weight: 600;
-  font-display: swap;
   src: local(""),
-    url("./assets/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-600italic.woff2")
-      format("woff2"),
-    /* Super Modern Browsers */
-      url("./assets/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-600italic.woff")
-      format("woff"),
-    /* Modern Browsers */
-      url("./assets/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-600italic.ttf")
-      format("truetype");
+    url("./assets/fonts/Inter-SemiBoldItalic.woff2") format("woff2"),
+    url("./assets/fonts/Inter-SemiBoldItalic.ttf") format("truetype");
 }
-/* open-sans-700italic - vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic */
+
 @font-face {
-  font-family: "Open Sans";
+  font-family: "Inter";
   font-style: italic;
-  font-weight: 700;
   font-display: swap;
-  src: local(""),
-    url("./assets/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-700italic.woff2")
-      format("woff2"),
-    /* Super Modern Browsers */
-      url("./assets/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-700italic.woff")
-      format("woff"),
-    /* Modern Browsers */
-      url("./assets/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-700italic.ttf")
-      format("truetype");
+  font-weight: 700;
+  src: local(""), url("./assets/fonts/Inter-BoldItalic.woff2") format("woff2"),
+    url("./assets/fonts/Inter-BoldItalic.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: italic;
+  font-display: swap;
+  font-weight: 500;
+  src: local(""), url("./assets/fonts/Inter-MediumItalic.woff2") format("woff2"),
+    url("./assets/fonts/Inter-MediumItalic.ttf") format("truetype");
 }
 
 .rpv-core__text-layer,
@@ -253,4 +204,47 @@ textarea,
 
 #app.app-focus-mode .toasts-container {
   display: none;
+}
+
+a {
+  color: var(--accent);
+}
+
+.flash {
+  animation: flash 1s;
+}
+
+@keyframes flash {
+  0% {
+    background-color: color-mix(in srgb, var(--accent) 5%, transparent);
+  }
+  50% {
+    background-color: initial;
+  }
+  100% {
+    background-color: color-mix(in srgb, var(--accent) 5%, transparent);
+  }
+}
+
+kbd {
+  background: var(--background);
+  border-radius: 3px;
+  padding: 2px 5px;
+  color: var(--paragraph-secondary);
+}
+
+.ping {
+  animation: ping 1s infinite;
+}
+
+@keyframes ping {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
 }

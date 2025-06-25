@@ -3,4 +3,10 @@
     <string name="title_activity_share">NotesnookShare</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
+    <string name="take_a_quick_note">Take a quick note.</string>
+    <string name="reminders">Quick overview of upcoming reminders</string>
+    <string name="reminders_title">Reminders</string>
+    <string name="note">Note</string>
+    <string name="note_description">Add a note to home screen</string>
+    <string name="quick_note">Quick note</string>
 </resources>

@@ -17,12 +17,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { createBackup, verifyAccount } from "../../common";
+import { createBackup, verifyAccount, importBackup } from "../../common";
 import { db } from "../../common/db";
 import { exportNotes } from "../../common/export";
 import { SettingsGroup } from "./types";
-
 import { strings } from "@notesnook/intl";
+import { useStore as useSettingStore } from "../../stores/setting-store";
+import { useStore as useAppStore } from "../../stores/app-store";
+import { useStore as useUserStore } from "../../stores/user-store";
+import { desktop } from "../../common/desktop-bridge";
+import { PATHS } from "@notesnook/desktop";
+
+const getDesktopBackupsDirectoryPath = () =>
+  useSettingStore.getState().backupStorageLocation || PATHS.backupsDirectory;
 
 export const BackupExportSettings: SettingsGroup[] = [
   {
@@ -49,6 +56,143 @@ export const BackupExportSettings: SettingsGroup[] = [
                 mode: value === "partial" ? "partial" : "full"
               });
             }
+          }
+        ]
+      },
+      {
+        key: "restore-backup",
+        title: strings.restoreBackup(),
+        description: strings.restoreBackupDesc(),
+        components: [
+          {
+            type: "button",
+            title: "Restore",
+            action: async () => {
+              if (await importBackup()) {
+                await useAppStore.getState().refresh();
+              }
+            },
+            variant: "secondary"
+          }
+        ]
+      },
+      {
+        key: "auto-backup",
+        title: strings.automaticBackups(),
+        description: strings.automaticBackupsDesc(),
+        // isHidden: () => !isUserPremium(),
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => s.backupReminderOffset, listener),
+        components: [
+          {
+            type: "dropdown",
+            options: [
+              { value: "0", title: strings.never(), premium: true },
+              { value: "1", title: strings.daily(), premium: true },
+              { value: "2", title: strings.weekly(), premium: true },
+              { value: "3", title: strings.monthly(), premium: true }
+            ],
+            selectedOption: () =>
+              useSettingStore.getState().backupReminderOffset.toString(),
+            onSelectionChanged: async (value) => {
+              const verified =
+                useSettingStore.getState().encryptBackups ||
+                (await verifyAccount());
+              if (verified)
+                useSettingStore
+                  .getState()
+                  .setBackupReminderOffset(parseInt(value));
+            }
+          }
+        ]
+      },
+      {
+        key: "auto-backup-with-attachments",
+        title: strings.automaticBackupsWithAttachments(),
+        description: strings.automaticBackupsWithAttachmentsDesc().join("\n\n"),
+        onStateChange: (listener) =>
+          useSettingStore.subscribe(
+            (s) => s.fullBackupReminderOffset,
+            listener
+          ),
+        components: [
+          {
+            type: "dropdown",
+            options: [
+              { value: "0", title: strings.never(), premium: true },
+              { value: "1", title: strings.weekly(), premium: true },
+              { value: "2", title: strings.monthly(), premium: true }
+            ],
+            selectedOption: () =>
+              useSettingStore.getState().fullBackupReminderOffset.toString(),
+            onSelectionChanged: async (value) => {
+              const verified =
+                useSettingStore.getState().encryptBackups ||
+                (await verifyAccount());
+              if (verified)
+                useSettingStore
+                  .getState()
+                  .setFullBackupReminderOffset(parseInt(value));
+            }
+          }
+        ]
+      },
+      {
+        key: "encrypt-backups",
+        title: strings.backupEncryption(),
+        description: strings.backupEncryptionDesc(),
+        isHidden: () => !useUserStore.getState().isLoggedIn,
+        onStateChange: (listener) => {
+          const subscriptions = [
+            useUserStore.subscribe((s) => s.isLoggedIn, listener),
+            useSettingStore.subscribe((s) => s.encryptBackups, listener)
+          ];
+          return () => subscriptions.forEach((s) => s());
+        },
+        components: [
+          {
+            type: "toggle",
+            isToggled: () =>
+              !!useUserStore.getState().isLoggedIn &&
+              useSettingStore.getState().encryptBackups,
+            toggle: async () => {
+              const verified =
+                !useSettingStore.getState().encryptBackups ||
+                (await verifyAccount());
+              if (verified) useSettingStore.getState().toggleEncryptBackups();
+            }
+          }
+        ]
+      },
+      {
+        key: "backup-directory",
+        title: strings.selectBackupDir(),
+        description: () =>
+          strings
+            .selectBackupDirDesc(getDesktopBackupsDirectoryPath())
+            .join("\n\n"),
+        isHidden: () => !IS_DESKTOP_APP,
+        components: [
+          {
+            type: "button",
+            title: strings.select(),
+            action: async () => {
+              const verified =
+                useSettingStore.getState().encryptBackups ||
+                (await verifyAccount());
+              if (!verified) return;
+
+              const backupStorageLocation = getDesktopBackupsDirectoryPath();
+              const location = await desktop?.integration.selectDirectory.query(
+                {
+                  title: strings.selectBackupDir(),
+                  defaultPath: backupStorageLocation
+                }
+              );
+              if (!location) return;
+              useSettingStore.getState().setBackupStorageLocation(location);
+            },
+            variant: "secondary"
           }
         ]
       }

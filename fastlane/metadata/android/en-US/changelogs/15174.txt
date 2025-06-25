@@ -1,0 +1,6 @@
+- Added a widget to add a note to home screen for quick access
+- Added a widget that shows upcoming reminders on home screen
+- Now you can share an image with other apps from image viewer
+- Many small bug fixes and improvements
+
+Thank you for using Notesnook!

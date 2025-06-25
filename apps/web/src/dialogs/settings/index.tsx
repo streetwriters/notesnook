@@ -77,6 +77,7 @@ import { AppLockSettings } from "./app-lock-settings";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import { ServersSettings } from "./servers-settings";
 import { strings } from "@notesnook/intl";
+import { mdToHtml } from "../../utils/md";
 
 type SettingsDialogProps = BaseDialogProps<false> & {
   activeSection?: SectionKeys;
@@ -186,7 +187,7 @@ const SettingsGroups = [
 // 2. Settings will be synced so their state must be serializable
 // 3. Settings will be grouped
 //    - Where group header is customizable
-// 4. Sections/groups must be able to accomodate tips & tutorials for future.
+// 4. Sections/groups must be able to accommodate tips & tutorials for future.
 // 5. Settings will be stateful but independent such that any one setting
 // can appear independent of others (e.g. as a search result)
 
@@ -230,7 +231,7 @@ export const SettingsDialog = DialogManager.register(function SettingsDialog(
             flexDirection: "column",
             padding: 20,
             gap: 20,
-            minHeight: "min-content",
+            minHeight: "auto",
             overflow: "auto"
           }}
         >
@@ -268,17 +269,18 @@ function SettingsSideBar(props: SettingsSideBarProps) {
           sx={{
             flexDirection: "column",
             display: "flex",
-            overflow: "hidden"
+            overflow: "hidden",
+            gap: 2
           }}
         >
           <Input
             id="search"
             name="search"
+            autoFocus
             placeholder={strings.search()}
             data-test-id="settings-search"
             sx={{
-              m: 2,
-              mb: 2,
+              m: 1,
               width: "auto",
               bg: "background",
               py: "7px"
@@ -324,14 +326,17 @@ function SettingsSideBar(props: SettingsSideBarProps) {
             }}
           />
           {sectionGroups.map((group) => (
-            <Flex key={group.key} sx={{ flexDirection: "column", mb: 2 }}>
+            <Flex
+              key={group.key}
+              sx={{ flexDirection: "column", mx: 1, gap: "small" }}
+            >
               <Text
                 variant={"subBody"}
                 sx={{
                   fontWeight: "bold",
-                  color: "paragraph",
-                  mx: 3,
+                  color: "heading",
                   mb: 1,
+                  ml: 1,
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   wordSpacing: "nowrap"
@@ -466,17 +471,26 @@ function SettingItem(props: { item: Setting }) {
           gap: 4
         }}
       >
-        <Flex sx={{ flexDirection: "column", flexShrink: 0 }}>
-          <Text variant={"subtitle"}>{item.title}</Text>
+        <Flex sx={{ flexDirection: "column", flex: 1 }}>
+          <Text
+            variant={"body"}
+            sx={{ fontWeight: "medium", color: "heading" }}
+          >
+            {item.title}
+          </Text>
           {item.description && (
             <Text
+              as={"div"}
               variant={"body"}
               sx={{ mt: 1, color: "paragraph", whiteSpace: "pre-wrap" }}
-            >
-              {typeof item.description === "function"
-                ? item.description(state)
-                : item.description}
-            </Text>
+              dangerouslySetInnerHTML={{
+                __html: mdToHtml(
+                  typeof item.description === "function"
+                    ? item.description(state)
+                    : item.description
+                )
+              }}
+            />
           )}
         </Flex>
 
@@ -485,7 +499,8 @@ function SettingItem(props: { item: Setting }) {
             alignItems: "center",
             justifyContent: "end",
             gap: 2,
-            "& > label": { width: "auto" }
+            "& > label": { width: "auto" },
+            "& > *": { flexShrink: 0 }
           }}
         >
           {components.map((component, index) => {

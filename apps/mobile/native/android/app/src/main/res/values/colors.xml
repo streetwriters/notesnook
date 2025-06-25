@@ -5,4 +5,7 @@
     <color name="light_blue_600">#FF039BE5</color>
     <color name="light_blue_900">#FF01579B</color>
     <color name="bootsplash_background">#FFFFFF</color>
+    <color name="background">#DCEDEDED</color>
+    <color name="border">#BFBFBF</color>
+    <color name="text">#1D1D1D</color>
 </resources>

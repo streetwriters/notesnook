@@ -39,6 +39,7 @@ DerivedData
 *.xcuserstate
 *.hprof
 **/.xcode.env.local
+native/cache
 # Android/IntelliJ
 #
 rn-build-deps/
@@ -68,6 +69,7 @@ buck-out/
 */fastlane/report.xml
 */fastlane/Preview.html
 */fastlane/screenshots
+native/vendor
 
 # Bundle artifact
 *.jsbundle

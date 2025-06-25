@@ -2,230 +2,80 @@
   "name": "@notesnook/desktop",
   "productName": "Notesnook",
   "description": "Your private note taking space",
-  "version": "3.0.18",
+  "version": "3.2.2",
   "appAppleId": "1544027013",
   "private": true,
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      },
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/esm/index.js"
+      }
+    }
+  },
   "homepage": "https://notesnook.com/",
   "repository": "https://github.com/streetwriters/notesnook",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@lingui/core": "4.11.4",
+    "@lingui/core": "5.1.2",
     "@notesnook/intl": "file:../../packages/intl",
+    "@notesnook/ui": "file:../../packages/ui",
     "@trpc/client": "10.45.2",
     "@trpc/server": "10.45.2",
-    "better-sqlite3-multiple-ciphers": "11.2.1",
-    "electron-trpc": "0.6.1",
-    "electron-updater": "^6.3.4",
-    "icojs": "^0.19.4",
+    "better-sqlite3-multiple-ciphers": "^11.10.0",
+    "electron-trpc": "0.7.1",
+    "electron-updater": "^6.6.2",
+    "icojs": "^0.19.5",
+    "sqlite-better-trigram": "0.0.3",
+    "sqlite3-fts5-html": "^0.0.3",
     "typed-emitter": "^2.1.0",
     "yargs": "^17.7.2",
-    "zod": "^3.23.8"
+    "zod": "3.24.3"
   },
   "devDependencies": {
     "@streetwriters/kysely": "^0.27.4",
-    "@types/node": "22.7.0",
+    "@types/node": "22.15.3",
     "@types/yargs": "^17.0.33",
-    "chokidar": "^4.0.1",
-    "electron": "^30.5.1",
-    "electron-builder": "^25.1.7",
-    "esbuild": "^0.24.0",
-    "node-abi": "^3.68.0",
-    "node-gyp-build": "^4.8.2",
+    "chokidar": "^4.0.3",
+    "electron": "^34.0.0",
+    "electron-builder": "^26.0.12",
+    "esbuild": "0.21.5",
+    "node-abi": "^4.5.0",
+    "node-gyp-build": "^4.8.4",
+    "playwright": "1.48.2",
     "prebuildify": "^6.0.1",
+    "slugify": "1.6.6",
     "tree-kill": "^1.2.2",
-    "undici": "^6.19.8"
+    "undici": "^7.8.0",
+    "vitest": "2.1.8"
   },
   "optionalDependencies": {
     "dmg-license": "^1.0.11"
+  },
+  "overrides": {
+    "@electron/node-gyp": "^10.2.0-electron.2"
   },
   "scripts": {
     "start": "node scripts/dev.mjs",
     "staging": "node scripts/build.mjs --run",
     "release": "node scripts/build.mjs",
-    "build": "tsc",
-    "bundle": "esbuild electron=./src/main.ts ./src/preload.ts --external:electron --external:fsevents --external:better-sqlite3-multiple-ciphers --external:sodium-native --minify --bundle --outdir=./build --platform=node --tsconfig=tsconfig.json --define:MAC_APP_STORE=false --define:RELEASE=true",
+    "build": "node ../../scripts/build.mjs",
+    "bundle": "esbuild electron=./src/main.ts ./src/preload.ts --external:electron --external:fsevents --external:better-sqlite3-multiple-ciphers --external:sodium-native --bundle --outdir=./build --platform=node --tsconfig=tsconfig.json --define:MAC_APP_STORE=false --define:RELEASE=true",
     "bundle:mas": "esbuild electron=./src/main.ts ./src/preload.ts --minify --external:electron --external:fsevents --bundle --outdir=./build --platform=node --tsconfig=tsconfig.json --define:MAC_APP_STORE=true --define:RELEASE=true",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "test": "vitest run"
   },
   "author": {
     "name": "Streetwriters (Private) Limited",
     "email": "support@streetwriters.co",
     "url": "https://streetwriters.co"
-  },
-  "build": {
-    "appId": "org.streetwriters.notesnook",
-    "productName": "Notesnook",
-    "copyright": "Copyright © 2023 Streetwriters (Private) Limited",
-    "artifactName": "notesnook_${os}_${arch}.${ext}",
-    "generateUpdatesFilesForAllChannels": true,
-    "asar": false,
-    "files": [
-      "!*.chunk.js.map",
-      "!*.chunk.js.LICENSE.txt",
-      "build/",
-      "!build/screenshots${/*}",
-      "!build/banner.jpg",
-      "!build/*.ico",
-      "!build/*.png",
-      "!node_modules${/*}",
-      "node_modules/better-sqlite3-multiple-ciphers/build/Release/better_sqlite3.node",
-      "node_modules/better-sqlite3-multiple-ciphers/lib",
-      "node_modules/better-sqlite3-multiple-ciphers/package.json",
-      "node_modules/file-uri-to-path",
-      "node_modules/bindings",
-      "node_modules/node-gyp-build",
-      "node_modules/sodium-native/prebuilds/${platform}-${arch}",
-      "node_modules/sodium-native/index.js",
-      "node_modules/sodium-native/package.json"
-    ],
-    "afterPack": "./scripts/removeLocales.js",
-    "mac": {
-      "bundleVersion": "240",
-      "minimumSystemVersion": "10.12.0",
-      "target": [
-        {
-          "target": "dmg",
-          "arch": [
-            "arm64",
-            "x64"
-          ]
-        },
-        {
-          "target": "zip",
-          "arch": [
-            "arm64",
-            "x64"
-          ]
-        }
-      ],
-      "category": "public.app-category.productivity",
-      "darkModeSupport": true,
-      "type": "distribution",
-      "hardenedRuntime": true,
-      "entitlements": "assets/entitlements.mac.plist",
-      "entitlementsInherit": "assets/entitlements.mac.plist",
-      "gatekeeperAssess": false,
-      "icon": "assets/icons/app.icns",
-      "notarize": true
-    },
-    "dmg": {
-      "contents": [
-        {
-          "x": 130,
-          "y": 220
-        },
-        {
-          "x": 410,
-          "y": 220,
-          "type": "link",
-          "path": "/Applications"
-        }
-      ],
-      "icon": "assets/icons/app.icns",
-      "title": "Install Notesnook"
-    },
-    "mas": {
-      "entitlements": "assets/entitlements.mas.plist",
-      "entitlementsInherit": "assets/entitlements.mas.inherit.plist",
-      "entitlementsLoginHelper": "assets/entitlements.mas.loginhelper.plist",
-      "hardenedRuntime": true
-    },
-    "win": {
-      "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64",
-            "arm64"
-          ]
-        },
-        {
-          "target": "portable",
-          "arch": [
-            "x64",
-            "arm64"
-          ]
-        }
-      ],
-      "signingHashAlgorithms": [
-        "sha256"
-      ],
-      "sign": "./scripts/sign.js",
-      "icon": "assets/icons/app.ico"
-    },
-    "portable": {
-      "artifactName": "notesnook_${os}_${arch}_portable.${ext}"
-    },
-    "nsis": {
-      "oneClick": true,
-      "createDesktopShortcut": "always",
-      "deleteAppDataOnUninstall": true
-    },
-    "linux": {
-      "target": [
-        {
-          "target": "AppImage",
-          "arch": [
-            "x64",
-            "arm64"
-          ]
-        },
-        {
-          "target": "snap",
-          "arch": [
-            "x64",
-            "arm64"
-          ]
-        }
-      ],
-      "category": "Office",
-      "icon": "assets/icons/app.icns",
-      "description": "Your private note taking space",
-      "executableName": "notesnook",
-      "desktop": {
-        "actions": [
-          {
-            "id": "new-note",
-            "name": "New note",
-            "args": "new note"
-          },
-          {
-            "id": "new-notebook",
-            "name": "New notebook",
-            "args": "new notebook"
-          },
-          {
-            "id": "new-reminder",
-            "name": "New reminder",
-            "args": "new reminder"
-          }
-        ]
-      }
-    },
-    "snap": {
-      "autoStart": false,
-      "confinement": "strict",
-      "allowNativeWayland": true
-    },
-    "extraResources": [
-      "app-update.yml",
-      "./assets/**"
-    ],
-    "extraMetadata": {
-      "main": "./build/electron.js"
-    },
-    "directories": {
-      "buildResources": "assets",
-      "output": "./output/"
-    },
-    "publish": [
-      {
-        "provider": "github",
-        "repo": "notesnook",
-        "owner": "streetwriters"
-      }
-    ]
   }
 }

@@ -43,6 +43,7 @@ import { AuthenticatorType, User } from "@notesnook/core";
 import { showLogoutConfirmation } from "../dialogs/confirm";
 import { TaskManager } from "../common/task-manager";
 import { strings } from "@notesnook/intl";
+import { ScrollContainer } from "@notesnook/ui";
 
 type EmailFormData = {
   email: string;
@@ -97,11 +98,17 @@ type BaseFormData =
   | AccountRecoveryFormData
   | SignupFormData;
 
+type OpenURLFunction = (
+  url: string,
+  context?: { authenticated: boolean }
+) => void;
 type NavigateFunction = <TRoute extends AuthRoutes>(
   route: TRoute,
   formData?: AuthFormData[TRoute]
 ) => void;
 type BaseAuthComponentProps<TRoute extends AuthRoutes> = {
+  canSkip?: boolean;
+  openURL: OpenURLFunction;
   navigate: NavigateFunction;
   formData?: AuthFormData[TRoute];
 };
@@ -113,7 +120,12 @@ type AuthRoutes =
   | "recover"
   | "mfa:code"
   | "mfa:select";
-export type AuthProps = { route: AuthRoutes };
+export type AuthProps = {
+  route: AuthRoutes;
+  isolated?: boolean;
+  canSkip?: boolean;
+  openURL?: OpenURLFunction;
+};
 
 type AuthComponent<TRoute extends AuthRoutes> = (
   props: BaseAuthComponentProps<TRoute>
@@ -161,6 +173,16 @@ const authorizedRoutes: AuthRoutes[] = [
 ];
 
 function Auth(props: AuthProps) {
+  return (
+    <AuthContainer>
+      <HeadlessAuth {...props} />
+    </AuthContainer>
+  );
+}
+export default Auth;
+
+export function HeadlessAuth(props: AuthProps) {
+  const { openURL = _openURL, isolated } = props;
   const [route, setRoute] = useState(props.route);
   const [isReady, setIsReady] = useState(false);
   const [storedFormData, setStoredFormData] = useState<
@@ -168,13 +190,15 @@ function Auth(props: AuthProps) {
   >();
   const Route = useMemo(() => getRouteComponent(route), [route]);
   useEffect(() => {
+    if (isolated) return;
     window.history.replaceState({}, "", makeURL(routePaths[route]));
-  }, [route]);
+  }, [route, isolated]);
 
   useEffect(() => {
     db.user.getUser().then((user) => {
       if (user && authorizedRoutes.includes(route) && !isSessionExpired())
-        return openURL("/");
+        return openURL("/", { authenticated: true });
+      performance.mark("load:auth");
       setIsReady(true);
     });
   }, [route]);
@@ -182,38 +206,40 @@ function Auth(props: AuthProps) {
   if (!isReady) return <></>;
 
   return (
-    <AuthContainer>
-      <Flex
-        sx={{
-          zIndex: 1,
-          flex: 1,
-          overflowY: "auto",
-          flexDirection: "column"
-        }}
-      >
-        {Route && (
-          <Route
-            navigate={(route, formData) => {
-              setStoredFormData(formData);
-              setRoute(route);
-            }}
-            formData={storedFormData}
-          />
-        )}
-      </Flex>
-    </AuthContainer>
+    <ScrollContainer
+      className="auth-scroll-container"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        zIndex: 1,
+        flex: 1,
+        flexShrink: 0
+      }}
+    >
+      {Route && (
+        <Route
+          openURL={openURL}
+          canSkip={props.canSkip}
+          navigate={(route, formData) => {
+            setStoredFormData(formData);
+            setRoute(route);
+          }}
+          formData={storedFormData}
+        />
+      )}
+    </ScrollContainer>
   );
 }
-export default Auth;
 
 function LoginEmail(props: BaseAuthComponentProps<"login:email">) {
-  const { navigate } = props;
+  const { navigate, canSkip = true, openURL } = props;
 
   return (
     <AuthForm
       type="login:email"
       title={strings.welcomeBack()}
-      canSkip
+      canSkip={canSkip}
+      openURL={openURL}
       subtitle={
         <SubtitleWithAction
           text={strings.dontHaveAccount()}
@@ -267,10 +293,10 @@ function LoginEmail(props: BaseAuthComponentProps<"login:email">) {
 }
 
 function LoginPassword(props: BaseAuthComponentProps<"login:password">) {
-  const { navigate, formData } = props;
+  const { navigate, formData, openURL } = props;
 
   if (!formData) {
-    openURL("/");
+    openURL("/", { authenticated: false });
     return null;
   }
 
@@ -284,6 +310,7 @@ function LoginPassword(props: BaseAuthComponentProps<"login:password">) {
         title: strings.loggingIn(),
         subtitle: strings.authWait()
       }}
+      openURL={openURL}
       onSubmit={async (form) => {
         await userstore.login(
           {
@@ -294,7 +321,7 @@ function LoginPassword(props: BaseAuthComponentProps<"login:password">) {
           Config.get("sessionExpired", false)
         );
         Config.set("sessionExpired", false);
-        openURL("/");
+        openURL("/", { authenticated: true });
       }}
     >
       {(form?: PasswordFormData) => (
@@ -325,13 +352,13 @@ function LoginPassword(props: BaseAuthComponentProps<"login:password">) {
 }
 
 function Signup(props: BaseAuthComponentProps<"signup">) {
-  const { navigate } = props;
+  const { navigate, canSkip = true, openURL } = props;
 
   return (
     <AuthForm
       type="signup"
       title={strings.createAccount()}
-      canSkip
+      canSkip={canSkip}
       subtitle={
         <SubtitleWithAction
           text={strings.alreadyHaveAccount()}
@@ -345,13 +372,14 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
         title: strings.creatingAccount(),
         subtitle: strings.creatingAccountDesc()
       }}
+      openURL={openURL}
       onSubmit={async (form) => {
         if (form.password !== form["confirm-password"]) {
           throw new Error(strings.passwordNotMatched());
         }
 
         await userstore.signup(form);
-        openURL("/notes/#/welcome");
+        openURL("/notes/#/welcome", { authenticated: true });
       }}
     >
       {(form?: SignupFormData) => (
@@ -410,7 +438,7 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
 }
 
 function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
-  const { navigate } = props;
+  const { navigate, openURL } = props;
   const [user, setUser] = useState<User | undefined>();
 
   useEffect(() => {
@@ -420,10 +448,10 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
         setUser(user);
       } else if (!user) {
         Config.set("sessionExpired", false);
-        openURL("/login");
-      } else openURL("/");
+        navigate("login:email");
+      } else openURL("/", { authenticated: true });
     })();
-  }, []);
+  }, [navigate, openURL]);
 
   return (
     <AuthForm
@@ -432,7 +460,7 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
       subtitle={
         <Flex bg="shade" p={1} sx={{ borderRadius: "default" }}>
           <Text as="span" sx={{ fontSize: "body", color: "accent" }}>
-            {strings.sessionExpiredDesc(user?.email as string)}
+            {strings.sessionExpiredDesc(user ? maskEmail(user.email) : "")}
           </Text>
         </Flex>
       }
@@ -440,6 +468,7 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
         title: strings.loggingIn(),
         subtitle: strings.pleaseWaitLogin()
       }}
+      openURL={openURL}
       onSubmit={async () => {
         if (!user) return;
 
@@ -494,7 +523,7 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
               action: () => db.user.logout(true),
               subtitle: strings.loggingOutDesc()
             });
-            openURL("/login");
+            navigate("login:email");
           }
         }}
       >
@@ -505,7 +534,7 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
 }
 
 function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
-  const { navigate, formData } = props;
+  const { navigate, formData, openURL } = props;
   const [success, setSuccess] = useState<string>();
 
   return (
@@ -525,6 +554,7 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
         title: strings.sendingRecoveryEmail(),
         subtitle: strings.sendingRecoveryEmailDesc()
       }}
+      openURL={openURL}
       onSubmit={async (form) => {
         if (!form.email) {
           setSuccess(undefined);
@@ -598,7 +628,7 @@ function getTexts(formData: MFAFormData) {
 }
 
 function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
-  const { navigate, formData } = props;
+  const { navigate, formData, openURL } = props;
   const [isSending, setIsSending] = useState(false);
   const { elapsed, enabled, setEnabled } = useTimer(
     `2fa.${formData?.primaryMethod}`,
@@ -637,7 +667,7 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
   }, [formData, sendCode]);
 
   if (!formData) {
-    openURL("/");
+    openURL("/", { authenticated: false });
     return null;
   }
 
@@ -655,6 +685,7 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
         title: strings.verifying2faCode(),
         subtitle: strings.authWait()
       }}
+      openURL={openURL}
       onSubmit={async (form) => {
         if (!form.code) throw new Error(strings.coreRequired());
 
@@ -728,7 +759,7 @@ const MFAMethods: MFAMethod[] = [
   { type: "recoveryCode", title: strings.recoveryCode(), icon: MfaRecoveryCode }
 ];
 function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
-  const { navigate, formData } = props;
+  const { navigate, formData, openURL } = props;
   const [selected, setSelected] = useState(0);
   const isValidMethod = useCallback(
     (method: MFAMethodType) => {
@@ -741,7 +772,7 @@ function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
     [formData]
   );
   if (!formData) {
-    openURL("/");
+    openURL("/", { authenticated: false });
     return null;
   }
 
@@ -754,6 +785,7 @@ function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
         title: strings.loggingIn(),
         subtitle: strings.authWait()
       }}
+      openURL={openURL}
       onSubmit={async () => {
         const selectedType = MFAMethods[selected];
         formData.selectedMethod = selectedType.type;
@@ -816,6 +848,7 @@ type AuthFormProps<TType extends AuthRoutes> = {
   loading: { title: string; subtitle: string };
   type: TType;
   onSubmit: (form: AuthFormData[TType]) => Promise<void>;
+  openURL: OpenURLFunction;
   loadForever?: boolean;
   canSkip?: boolean;
   children?:
@@ -824,7 +857,7 @@ type AuthFormProps<TType extends AuthRoutes> = {
 };
 
 export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
-  const { title, subtitle, children, canSkip, loadForever } = props;
+  const { title, subtitle, children, canSkip, loadForever, openURL } = props;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>();
   const formRef = useRef<HTMLFormElement>(null);
@@ -867,7 +900,7 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        width: ["95%", "45%"],
+        width: ["95%", "95%", "45%"],
         alignSelf: "center"
       }}
     >
@@ -897,7 +930,7 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
             textDecoration: "none"
           }}
           onClick={() => {
-            openURL("/notes/");
+            openURL("/notes/", { authenticated: false });
           }}
         >
           {strings.skipAndGoToApp()}
@@ -952,7 +985,14 @@ export function AuthField(props: FieldProps) {
           p: "12px",
           borderRadius: "default",
           bg: "background",
-          boxShadow: "0px 0px 5px 0px #00000019"
+          boxShadow: "0px 0px 5px 0px #00000019",
+          "::-moz-appearance": "textfield",
+          "::-webkit-inner-spin-button": {
+            "-webkit-appearance": "none"
+          },
+          "::-webkit-outer-spin-button": {
+            "-webkit-appearance": "none"
+          }
         }
       }}
     />
@@ -986,11 +1026,11 @@ export function SubmitButton(props: SubmitButtonProps) {
   );
 }
 
-function openURL(url: string, force?: boolean) {
+function _openURL(url: string, _context?: any) {
   const queryParams = getQueryParams();
   const redirect = queryParams?.redirect;
   Config.set("skipInitiation", true);
-  hardNavigate(force ? url : redirect || url);
+  hardNavigate(redirect || url);
 }
 
 function maskEmail(email: string) {

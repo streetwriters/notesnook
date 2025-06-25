@@ -269,7 +269,7 @@ export interface SQLiteModule {
  * the corresponding Javascript wrapper will throw an exception with a
  * `code` property on an error.
  *
- * Note that a few functions return a Promise in order to accomodate
+ * Note that a few functions return a Promise in order to accommodate
  * either a synchronous or asynchronous SQLite build, generally those
  * involved with opening/closing a database or executing a statement.
  *
@@ -493,7 +493,7 @@ export interface SQLiteAPI {
   column(stmt: number, i: number): SQLiteCompatibleType;
 
   /**
-   * Extract a column value from a row after a prepared statment {@link step}
+   * Extract a column value from a row after a prepared statement {@link step}
    *
    * The contents of the returned buffer may be invalid after the
    * next SQLite call. Make a copy of the data (e.g. with `.slice()`)
@@ -523,7 +523,7 @@ export interface SQLiteAPI {
   column_count(stmt: number): number;
 
   /**
-   * Extract a column value from a row after a prepared statment {@link step}
+   * Extract a column value from a row after a prepared statement {@link step}
    * @see https://www.sqlite.org/c3ref/column_blob.html
    * @param stmt prepared statement pointer
    * @param i column index
@@ -532,7 +532,7 @@ export interface SQLiteAPI {
   column_double(stmt: number, i: number): number;
 
   /**
-   * Extract a column value from a row after a prepared statment {@link step}
+   * Extract a column value from a row after a prepared statement {@link step}
    * @see https://www.sqlite.org/c3ref/column_blob.html
    * @param stmt prepared statement pointer
    * @param i column index
@@ -541,7 +541,7 @@ export interface SQLiteAPI {
   column_int(stmt: number, i: number): number;
 
   /**
-   * Extract a column value from a row after a prepared statment {@link step}
+   * Extract a column value from a row after a prepared statement {@link step}
    * @see https://www.sqlite.org/c3ref/column_blob.html
    * @param stmt prepared statement pointer
    * @param i column index
@@ -569,7 +569,7 @@ export interface SQLiteAPI {
   column_names(stmt: number): Array<string>;
 
   /**
-   * Extract a column value from a row after a prepared statment {@link step}
+   * Extract a column value from a row after a prepared statement {@link step}
    * @see https://www.sqlite.org/c3ref/column_blob.html
    * @param stmt prepared statement pointer
    * @param i column index
@@ -723,6 +723,12 @@ export interface SQLiteAPI {
    * @returns Promise-wrapped database pointer.
    */
   open_v2(zFilename: string, iFlags?: number, zVfs?: string): Promise<number>;
+
+  /**
+   * Register and init extensions.
+   * @param db database pointer
+   */
+  register_extensions(db: number): Promise<void>;
 
   /**
    * Compile an SQL statement

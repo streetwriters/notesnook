@@ -1,7 +1,17 @@
 diff --git a/node_modules/prosemirror-view/dist/index.cjs b/node_modules/prosemirror-view/dist/index.cjs
-index 8ea57c7..aeda01d 100644
+index 8ea57c7..c289489 100644
 --- a/node_modules/prosemirror-view/dist/index.cjs
 +++ b/node_modules/prosemirror-view/dist/index.cjs
+@@ -980,8 +980,8 @@ var ViewDesc = function () {
+       if (!(force || brKludge && safari) && isEquivalentPosition(anchorDOM.node, anchorDOM.offset, domSel.anchorNode, domSel.anchorOffset) && isEquivalentPosition(headDOM.node, headDOM.offset, domSel.focusNode, domSel.focusOffset)) return;
+       var domSelExtended = false;
+       if ((domSel.extend || anchor == head) && !brKludge) {
+-        domSel.collapse(anchorDOM.node, anchorDOM.offset);
+         try {
++          domSel.collapse(anchorDOM.node, anchorDOM.offset);
+           if (anchor != head) domSel.extend(headDOM.node, headDOM.offset);
+           domSelExtended = true;
+         } catch (_) {}
 @@ -3456,7 +3456,7 @@ editHandlers.drop = function (view, _event) {
      });
      tr.setSelection(selectionBetween(view, $pos, tr.doc.resolve(end)));
@@ -12,9 +22,19 @@ index 8ea57c7..aeda01d 100644
  };
  handlers.focus = function (view) {
 diff --git a/node_modules/prosemirror-view/dist/index.js b/node_modules/prosemirror-view/dist/index.js
-index 9583dc3..991bf0a 100644
+index 9583dc3..6899e62 100644
 --- a/node_modules/prosemirror-view/dist/index.js
 +++ b/node_modules/prosemirror-view/dist/index.js
+@@ -1052,8 +1052,8 @@ class ViewDesc {
+         // browsers support it yet.
+         let domSelExtended = false;
+         if ((domSel.extend || anchor == head) && !brKludge) {
+-            domSel.collapse(anchorDOM.node, anchorDOM.offset);
+             try {
++                domSel.collapse(anchorDOM.node, anchorDOM.offset);
+                 if (anchor != head)
+                     domSel.extend(headDOM.node, headDOM.offset);
+                 domSelExtended = true;
 @@ -3731,7 +3731,7 @@ editHandlers.drop = (view, _event) => {
          tr.mapping.maps[tr.mapping.maps.length - 1].forEach((_from, _to, _newFrom, newTo) => end = newTo);
          tr.setSelection(selectionBetween(view, $pos, tr.doc.resolve(end)));

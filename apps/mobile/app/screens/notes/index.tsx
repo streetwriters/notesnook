@@ -119,6 +119,7 @@ const NotesPage = ({
   const onRequestUpdate = React.useCallback(
     async (data?: NotesScreenParams) => {
       if (
+        params.current.item.id &&
         useNavigationStore.getState().focusedRouteId !==
           params.current.item.id &&
         !data
@@ -171,7 +172,6 @@ const NotesPage = ({
           setLoadingNotes(false);
         })
         .catch((e) => {
-          console.log("Error loading notes", params.current?.title, e, e.stack);
           setLoadingNotes(false);
         });
     }
@@ -188,7 +188,7 @@ const NotesPage = ({
   return (
     <>
       <SelectionHeader
-        id={route.params?.item?.id}
+        id={route.params?.item?.id || route.name}
         items={notes}
         type="note"
         renderedInRoute={route.name}
@@ -196,8 +196,7 @@ const NotesPage = ({
       <Header
         renderedInRoute={route.name}
         title={
-          title ||
-          strings.routes[route.name as unknown as keyof typeof strings.routes]()
+          route.name === "Monographs" ? strings.routes[route.name]() : title
         }
         canGoBack={params?.current?.canGoBack}
         hasSearch={true}
@@ -218,9 +217,7 @@ const NotesPage = ({
             items: selector
           });
         }}
-        accentColor={accentColor}
         onPressDefaultRightButton={onPressFloatingButton}
-        headerRightButtons={rightButtons?.(params?.current)}
       />
 
       <DelayLayout color={accentColor} wait={loadingNotes}>
@@ -228,7 +225,7 @@ const NotesPage = ({
           data={notes}
           dataType="note"
           onRefresh={onRequestUpdate}
-          loading={!isFocused}
+          loading={false}
           renderedInRoute={route.name}
           id={params.current.item?.id}
           headerTitle={title || "Monographs"}
@@ -239,7 +236,11 @@ const NotesPage = ({
         {!isMonograph &&
         ((notes?.placeholders && (notes?.placeholders?.length || 0) > 0) ||
           isFocused) ? (
-          <FloatingButton color={accentColor} onPress={onPressFloatingButton} />
+          <FloatingButton
+            color={accentColor}
+            onPress={onPressFloatingButton}
+            alwaysVisible
+          />
         ) : null}
       </DelayLayout>
     </>

@@ -41,6 +41,7 @@ type BaseCredential<T extends CredentialType> = { type: T; id: string };
 type PasswordCredential = BaseCredential<"password"> & {
   password: string;
   salt: Uint8Array;
+  iterations: number | undefined;
 };
 
 type SecurityKeyCredential = BaseCredential<"securityKey"> & {
@@ -58,7 +59,7 @@ export type SerializableCredential = CredentialWithoutSecret & {
   active: boolean;
 };
 export type CredentialWithSecret =
-  | Omit<PasswordCredential, "salt">
+  | Omit<PasswordCredential, "salt" | "iterations">
   | Omit<SecurityKeyCredential, "config">;
 export type CredentialQuery = BaseCredential<CredentialType> & {
   active?: boolean;
@@ -82,6 +83,8 @@ const defaultSecrets = {
 };
 type Secrets = typeof defaultSecrets;
 
+export const DEFAULT_ITERATIONS = 100000;
+const FALLBACK_ITERATIONS = 650000;
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
@@ -169,12 +172,13 @@ class KeyStore extends BaseStore<KeyStore> {
     const index = credentials.findIndex(
       (c) => c.type === credential.type && c.id === credential.id
     );
-    if (index > -1) return;
+    if (index > -1) return credentials[index];
 
     this.set((store) =>
       store.credentials.push(serializeCredential(credential, false))
     );
     await this.#metadataStore.set("credentials", this.get().credentials);
+    return credential;
   };
 
   unregister = async (
@@ -257,10 +261,14 @@ class KeyStore extends BaseStore<KeyStore> {
     if (!encryptedKey)
       throw new Error("Could not find credential's encrypted key.");
 
-    const key = await unwrapKey(
-      encryptedKey,
-      await getWrappingKey(deserializeCredential(cred, credential))
-    );
+    const key = await unwrapKey(encryptedKey, [
+      await getWrappingKey(deserializeCredential(cred, credential)),
+      await getWrappingKey(fallbackCredential(cred, credential))
+    ]).catch((e) => {
+      if (e instanceof Error && e.message === "Could not unwrap key.")
+        throw new Error(wrongCredentialError(credential));
+      throw e;
+    });
     if (options?.permanent) {
       await this.resetCredentials();
       await this.storeKey(key);
@@ -295,14 +303,15 @@ class KeyStore extends BaseStore<KeyStore> {
     );
     if (!encryptedKey) return;
 
-    const decryptedKey = await unwrapKey(
-      encryptedKey,
-      await getWrappingKey(deserializeCredential(cred, oldCredential))
-    );
+    const decryptedKey = await unwrapKey(encryptedKey, [
+      await getWrappingKey(deserializeCredential(cred, oldCredential)),
+      await getWrappingKey(fallbackCredential(cred, oldCredential))
+    ]);
 
+    const newCred = deserializeCredential(cred, newCredential);
     const reencryptedKey = await wrapKey(
       decryptedKey,
-      await getWrappingKey(deserializeCredential(cred, newCredential))
+      await getWrappingKey(newCred)
     );
     if (!reencryptedKey) throw new Error(wrongCredentialError(newCredential));
 
@@ -310,6 +319,10 @@ class KeyStore extends BaseStore<KeyStore> {
       this.getCredentialKey(newCredential),
       reencryptedKey
     );
+    await this.update(oldCredential, (c) => {
+      if (c.type === "password" && newCred.type === "password")
+        c.iterations = newCred.iterations;
+    });
   };
 
   verifyCredential = async (credential: CredentialWithSecret) => {
@@ -322,10 +335,10 @@ class KeyStore extends BaseStore<KeyStore> {
       );
       if (!encryptedKey) return false;
 
-      const decryptedKey = await unwrapKey(
-        encryptedKey,
-        await getWrappingKey(deserializeCredential(cred, credential))
-      );
+      const decryptedKey = await unwrapKey(encryptedKey, [
+        await getWrappingKey(deserializeCredential(cred, credential)),
+        await getWrappingKey(fallbackCredential(cred, credential))
+      ]);
       return !!decryptedKey;
     } catch {
       return false;
@@ -358,8 +371,8 @@ class KeyStore extends BaseStore<KeyStore> {
   };
 
   clear = async () => {
-    await this.#metadataStore.clear();
-    await this.#secretStore.clear();
+    await this.#metadataStore?.clear();
+    await this.#secretStore?.clear();
     this.#key = undefined;
     this.set({ credentials: [], secrets: {}, isLocked: false });
   };
@@ -414,7 +427,7 @@ class KeyStore extends BaseStore<KeyStore> {
         ["encrypt", "decrypt"]
       );
     } else if (wrappingKey) {
-      return unwrapKey(wrappedKey, wrappingKey);
+      return unwrapKey(wrappedKey, [wrappingKey]);
     } else throw new Error("Could not decrypt key.");
   };
 
@@ -479,7 +492,8 @@ function serializeCredential(
         type: "password",
         id: credential.id,
         active,
-        salt: credential.salt
+        salt: credential.salt,
+        iterations: credential.iterations
       };
     case "securityKey":
       return {
@@ -500,7 +514,8 @@ function deserializeCredential(
       type: "password",
       id: credential.id,
       salt: credential.salt,
-      password: secret.password
+      password: secret.password,
+      iterations: credential.iterations || DEFAULT_ITERATIONS
     };
   } else if (secret.type === "securityKey" && credential.type === "securityKey")
     return {
@@ -511,6 +526,21 @@ function deserializeCredential(
     };
 
   throw new Error("Credentials are of different types.");
+}
+
+function fallbackCredential(
+  credential: SerializableCredential,
+  secret: CredentialWithSecret
+): Credential | undefined {
+  if (secret.type === "password" && credential.type === "password") {
+    return {
+      type: "password",
+      id: credential.id,
+      salt: credential.salt,
+      password: secret.password,
+      iterations: FALLBACK_ITERATIONS
+    };
+  }
 }
 
 export function wrongCredentialError(query: CredentialQuery): string {
@@ -524,17 +554,23 @@ export function wrongCredentialError(query: CredentialQuery): string {
 
 async function unwrapKey(
   wrappedKey: ArrayBuffer,
-  wrappingKey: CryptoKey
+  wrappingKeys: CryptoKey[]
 ): Promise<CryptoKey> {
-  return await window.crypto.subtle.unwrapKey(
-    "raw",
-    wrappedKey,
-    wrappingKey,
-    "AES-KW",
-    { name: "AES-GCM", length: 256 },
-    true,
-    ["encrypt", "decrypt"]
-  );
+  for (const key of wrappingKeys) {
+    const unwrapped = await window.crypto.subtle
+      .unwrapKey(
+        "raw",
+        wrappedKey,
+        key,
+        "AES-KW",
+        { name: "AES-GCM", length: 256 },
+        true,
+        ["encrypt", "decrypt"]
+      )
+      .catch(() => undefined);
+    if (unwrapped) return unwrapped;
+  }
+  throw new Error("Could not unwrap key.");
 }
 
 async function wrapKey(key: CryptoKey, wrappingKey: CryptoKey) {
@@ -555,7 +591,7 @@ async function getWrappingKey(credential?: Credential): Promise<CryptoKey> {
       {
         name: "PBKDF2",
         salt: credential.salt,
-        iterations: 650000,
+        iterations: credential.iterations || DEFAULT_ITERATIONS,
         hash: "SHA-512"
       },
       await window.crypto.subtle.importKey(
@@ -639,7 +675,7 @@ export async function deriveKey(password: string) {
       name: "PBKDF2",
       hash: "SHA-512",
       salt,
-      iterations: 650000
+      iterations: 100000
     },
     importedKey,
     32 * 8

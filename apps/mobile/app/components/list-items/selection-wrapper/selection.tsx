@@ -24,7 +24,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useIsCompactModeEnabled } from "../../../hooks/use-is-compact-mode-enabled";
 import useIsSelected from "../../../hooks/use-selected";
 import { useSelectionStore } from "../../../stores/use-selection-store";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { Item, TrashItem } from "@notesnook/core";
 
 export const SelectionIcon = ({ item }: { item: Item }) => {
@@ -52,7 +52,7 @@ export const SelectionIcon = ({ item }: { item: Item }) => {
     >
       {selected ? (
         <Icon
-          size={compactMode ? SIZE.xl - 2 : SIZE.xl}
+          size={compactMode ? AppFontSize.xl - 2 : AppFontSize.xl}
           color={selected ? colors.selected.accent : colors.primary.icon}
           name={"check"}
         />

@@ -14,6 +14,8 @@ runs:
           apps/mobile/package-lock.json
           apps/desktop/package-lock.json
           apps/web/package-lock.json
+          apps/monograph/package-lock.json
+          apps/theme-builder/package-lock.json
           extensions/web-clipper/package-lock.json
           packages/core/package-lock.json
           packages/crypto/package-lock.json
@@ -24,3 +26,4 @@ runs:
           packages/logger/package-lock.json
           packages/streamable-fs/package-lock.json
           packages/theme/package-lock.json
+          packages/intl/package-lock.json

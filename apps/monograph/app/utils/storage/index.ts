@@ -17,11 +17,33 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+const cache: Record<
+  string,
+  {
+    ttl: number;
+    value: any;
+    cachedAt: number;
+  }
+> = {};
 export async function read<T>(key: string, fallback: T) {
-  return (await provider).read<T>(key, fallback);
+  const cached = cache[key];
+  if (cached && cached.ttl > Date.now() - cached.cachedAt) {
+    return cached.value as T;
+  }
+  const value = (await provider).read<T>(key, fallback);
+  cache[key] = {
+    ttl: 60 * 60 * 1000,
+    value,
+    cachedAt: Date.now()
+  };
+  return value;
 }
 
 export async function write<T>(key: string, data: T) {
+  if (cache[key]) {
+    cache[key].value = data;
+    cache[key].cachedAt = Date.now();
+  }
   return (await provider).write<T>(key, data);
 }
 

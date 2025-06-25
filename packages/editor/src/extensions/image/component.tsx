@@ -38,12 +38,9 @@ import {
   toBlobURL,
   toDataURL
 } from "../../utils/downloader.js";
-import { motion } from "framer-motion";
 import { useObserver } from "../../hooks/use-observer.js";
 import { Attachment, ImageAlignmentOptions } from "../attachment/index.js";
 import { DataURL } from "@notesnook/common";
-
-export const AnimatedImage = motion.create(Image);
 
 export function ImageComponent(
   props: ReactNodeViewProps<Partial<ImageAttributes>>
@@ -62,7 +59,8 @@ export function ImageComponent(
     once: true
   });
 
-  const dom = editor.view.dom.parentElement || editor.view.dom;
+  const dom = editor.view.dom;
+
   const size =
     editor.view.dom.clientWidth === 0
       ? node.attrs
@@ -107,6 +105,7 @@ export function ImageComponent(
   return (
     <>
       <Box
+        className="image-container"
         sx={{
           ...getAlignmentStyles(node.attrs),
           height: float ? size.height : "unset",
@@ -252,32 +251,32 @@ export function ImageComponent(
               />
             </Flex>
           )}
-          <AnimatedImage
-            as={isSVG ? "object" : "img"}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: bloburl || src ? 1 : 0 }}
-            transition={{ duration: 0.2, ease: "easeIn" }}
+          <Image
+            as={isSVG ? "iframe" : "img"}
             data-drag-image
             ref={imageRef}
             alt={alt}
             crossOrigin="anonymous"
             {...(isSVG
               ? {
-                  data: bloburl || corsify(src, downloadOptions?.corsHost),
-                  type: mime
+                  src: bloburl || corsify(src, downloadOptions?.corsHost),
+                  type: mime,
+                  sandbox: ""
                 }
               : {
                   src: bloburl || corsify(src, downloadOptions?.corsHost)
                 })}
             title={title}
             sx={{
+              animation: bloburl || src ? "0.2s ease-in 0s 1 fadeIn" : "none",
               objectFit: "contain",
               width: editor.isEditable ? "100%" : size.width,
               height: editor.isEditable ? "100%" : size.height,
               border: selected
                 ? "2px solid var(--accent) !important"
                 : "2px solid transparent !important",
-              borderRadius: "default"
+              borderRadius: "default",
+              ...(isSVG ? { bg: "transparent" } : {})
             }}
             onDoubleClick={() => {
               const { hash, filename, mime, size } = node.attrs;

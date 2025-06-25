@@ -54,8 +54,8 @@ export function DecryptedResult(props: DecryptedResultProps) {
         for (const arrayKey in data) {
           const array = data[arrayKey];
           for (const encryptedItem of (props.data as any)[arrayKey]) {
-            const { data } = await crypto.decrypt(key, encryptedItem, "text");
-            array.push(JSON.parse(data as string));
+            const data = await crypto.decrypt(key, encryptedItem, "text");
+            array.push(JSON.parse(data));
           }
         }
         setDecryptedData(JSON.stringify(data, undefined, "  "));

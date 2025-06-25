@@ -18,154 +18,176 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useThemeColors } from "@notesnook/theme";
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import ToggleSwitch from "toggle-switch-react-native";
+import { useTotalNotes } from "../../hooks/use-db-item";
+
+import { db } from "../../common/database";
+import { eSubscribeEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
-import useNavigationStore from "../../stores/use-navigation-store";
-import { SIZE, normalize } from "../../utils/size";
-import { Button } from "../ui/button";
+import useNavigationStore, {
+  RouteParams
+} from "../../stores/use-navigation-store";
+import { eAfterSync } from "../../utils/events";
+import { SideMenuItem } from "../../utils/menu-items";
+import { AppFontSize, defaultBorderRadius } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 import { Pressable } from "../ui/pressable";
-import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { strings } from "@notesnook/intl";
+import { useSideBarDraggingStore } from "./dragging-store";
 
 function _MenuItem({
   item,
   index,
   testID,
-  rightBtn
+  renderIcon
 }: {
-  item: any;
-  index: number;
-  testID: string;
-  rightBtn?: {
-    name: string;
-    icon: string;
-    func: () => void;
-  };
+  item: SideMenuItem;
+  index?: number;
+  testID?: string;
+  renderIcon?: (item: SideMenuItem, size: number) => React.ReactNode;
 }) {
+  const [itemCount, setItemCount] = useState(0);
   const { colors } = useThemeColors();
   const isFocused = useNavigationStore(
-    (state) => state.focusedRouteId === item.name
+    (state) => state.focusedRouteId === item.id
   );
-  const primaryColors = isFocused ? colors.selected : colors.primary;
+  const totalNotes = useTotalNotes(
+    item.dataType as "notebook" | "tag" | "color"
+  );
+  const getTotalNotesRef = useRef(totalNotes.getTotalNotes);
+  getTotalNotesRef.current = totalNotes.getTotalNotes;
+
+  const menuItemCount = !item.data
+    ? itemCount
+    : totalNotes.totalNotes(item.data.id);
+
+  useEffect(() => {
+    const onSyncComplete = async () => {
+      try {
+        if (!item.data) {
+          switch (item.id) {
+            case "Notes":
+              setItemCount(await db.notes.all.count());
+              break;
+            case "Favorites":
+              setItemCount(await db.notes.favorites.count());
+              break;
+            case "Reminders":
+              setItemCount(await db.reminders.all.count());
+              break;
+            case "Monographs":
+              setItemCount(await db.monographs.all.count());
+              break;
+            case "Archive":
+              setItemCount(await db.notes.archived.count());
+              break;
+            case "Trash":
+              setItemCount((await db.trash.all()).length);
+              break;
+          }
+        } else {
+          getTotalNotesRef.current?.([item.data.id]);
+        }
+      } catch (e) {
+        /** Empty */
+      }
+    };
+    const event = eSubscribeEvent(eAfterSync, onSyncComplete);
+    onSyncComplete();
+    return () => {
+      event?.unsubscribe();
+    };
+  }, [item.data, item.id]);
 
   const _onPress = () => {
-    if (item.func) {
-      item.func();
-    } else {
-      if (useNavigationStore.getState().currentRoute !== item.name) {
-        Navigation.navigate(item.name, {
-          canGoBack: false,
-          beta: item.isBeta
-        });
-      }
-    }
-    if (item.close) {
-      setImmediate(() => {
-        Navigation.closeDrawer();
+    if (useSideBarDraggingStore.getState().dragging) return;
+    if (item.onPress) return item.onPress(item);
+
+    if (useNavigationStore.getState().currentRoute !== item.id) {
+      Navigation.navigate(item.id as keyof RouteParams, {
+        canGoBack: false
       });
     }
+    setImmediate(() => {
+      Navigation.closeDrawer();
+    });
   };
 
   return (
     <Pressable
       testID={testID}
-      key={item.name + index}
+      key={item.id}
       onPress={_onPress}
+      onLongPress={() => item.onLongPress?.(item)}
       type={isFocused ? "selected" : "plain"}
       style={{
         width: "100%",
         alignSelf: "center",
-        borderRadius: 5,
+        borderRadius: defaultBorderRadius,
         flexDirection: "row",
-        paddingHorizontal: 8,
+        paddingHorizontal: DefaultAppStyles.GAP_SMALL,
         justifyContent: "space-between",
         alignItems: "center",
-        height: normalize(50),
-        marginBottom: 5
+        paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
       }}
     >
       <View
         style={{
           flexDirection: "row",
-          alignItems: "center"
+          alignItems: "center",
+          gap: DefaultAppStyles.GAP_SMALL
         }}
       >
-        <Icon
-          style={{
-            width: 30,
-            textAlignVertical: "center",
-            textAlign: "left"
-          }}
-          allowFontScaling
-          name={item.icon}
-          color={
-            item.icon === "crown"
-              ? colors.static.yellow
-              : isFocused
-              ? colors.selected.icon
-              : colors.secondary.icon
-          }
-          size={SIZE.lg - 2}
-        />
-        {isFocused ? (
-          <Heading color={colors.selected.heading} size={SIZE.md}>
-            {item.title || item.name}
-          </Heading>
+        {renderIcon ? (
+          renderIcon(item, AppFontSize.md)
         ) : (
-          <Paragraph size={SIZE.md}>{item.title || item.name}</Paragraph>
+          <Icon
+            style={{
+              textAlignVertical: "center",
+              textAlign: "left"
+            }}
+            allowFontScaling
+            name={item.icon}
+            color={
+              item.icon === "crown"
+                ? colors.static.yellow
+                : isFocused
+                ? colors.selected.icon
+                : colors.secondary.icon
+            }
+            size={AppFontSize.md}
+          />
         )}
 
-        {item.isBeta ? (
-          <View
-            style={{
-              borderRadius: 100,
-              backgroundColor: primaryColors.accent,
-              paddingHorizontal: 4,
-              marginLeft: 5,
-              paddingVertical: 2
-            }}
-          >
-            <Paragraph color={primaryColors.accentForeground} size={SIZE.xxs}>
-              {strings.beta()}
-            </Paragraph>
-          </View>
-        ) : null}
+        <Paragraph
+          color={
+            isFocused ? colors.selected.paragraph : colors.primary.paragraph
+          }
+          size={AppFontSize.sm}
+        >
+          {item.title}
+        </Paragraph>
       </View>
 
-      {item.switch ? (
-        <ToggleSwitch
-          isOn={item.on}
-          onColor={primaryColors.accent}
-          offColor={primaryColors.icon}
-          size="small"
-          animationSpeed={150}
-          onToggle={_onPress}
-        />
-      ) : rightBtn ? (
-        <Button
-          title={rightBtn.name}
-          type="shade"
-          height={30}
-          fontSize={SIZE.xs}
-          iconSize={SIZE.xs}
-          icon={rightBtn.icon}
-          style={{
-            borderRadius: 100,
-            paddingHorizontal: 16
-          }}
-          onPress={rightBtn.func}
-        />
-      ) : null}
+      <Paragraph
+        size={AppFontSize.xxs}
+        color={
+          isFocused ? colors.primary.paragraph : colors.secondary.paragraph
+        }
+      >
+        {menuItemCount}
+      </Paragraph>
     </Pressable>
   );
 }
 
 export const MenuItem = React.memo(_MenuItem, (prev, next) => {
-  if (prev.item.name !== next.item.name) return false;
-  if (prev.rightBtn?.name !== next.rightBtn?.name) return false;
+  if (
+    prev.item.id !== next.item.id &&
+    prev.item.data?.dateModified !== next.item.data?.dateModified
+  )
+    return false;
   return true;
 });

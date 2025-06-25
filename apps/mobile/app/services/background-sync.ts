@@ -21,33 +21,23 @@ import { AppRegistry, AppState, Platform } from "react-native";
 import {
   beginBackgroundTask,
   endBackgroundTask
+  //@ts-ignore
 } from "react-native-begin-background-task";
 import { DatabaseLogger, db, setupDatabase } from "../common/database";
 import { deleteDCacheFiles } from "../common/filesystem/io";
 import { useUserStore } from "../stores/use-user-store";
+import { NotePreviewWidget } from "./note-preview-widget";
 import Notifications from "./notifications";
 import SettingsService from "./settings";
 
 async function doInBackground(callback: () => Promise<void>) {
   if (Platform.OS === "ios") {
-    try {
-      const bgTaskId = await beginBackgroundTask();
-      const result = await callback();
-      await endBackgroundTask(bgTaskId);
-      return result;
-    } catch (e) {
-      return (e as Error).message;
-    }
+    const bgTaskId = await beginBackgroundTask();
+    const result = await callback();
+    await endBackgroundTask(bgTaskId);
+    return result;
   } else {
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve) => {
-      try {
-        const result = await callback();
-        resolve(result);
-      } catch (e) {
-        resolve((e as Error).message);
-      }
-    });
+    return await callback();
   }
 }
 
@@ -97,7 +87,6 @@ const task = async (event: { taskId: string; timeout: boolean }) => {
   const taskId = event.taskId;
   const isTimeout = event.timeout; // <-- true when your background-time has expired.
   if (isTimeout) {
-    console.log(`BACKGROUND FETCH TIMEOUT: ${taskId}`);
     BackgroundFetch.finish(taskId);
     return;
   }
@@ -124,12 +113,13 @@ async function onBackgroundSyncStarted() {
       useUserStore.getState().setSyncing(false);
     }
     await Notifications.setupReminders();
+
+    NotePreviewWidget.updateNotes();
     deleteDCacheFiles();
     DatabaseLogger.info("BACKGROUND SYNC COMPLETE");
   } catch (e) {
     useUserStore.getState().setSyncing(false);
     DatabaseLogger.error(e as Error);
-    console.log("BACKGROUND SYNC ERROR", (e as Error).message);
   }
 }
 
@@ -151,10 +141,10 @@ const onBoot = async () => {
     if (SettingsService.get().notifNotes) {
       Notifications.pinQuickNote(false);
     }
+    Notifications.restorePinnedNotes();
     DatabaseLogger.info("BOOT TASK COMPLETE");
   } catch (e) {
     DatabaseLogger.error(e as Error);
-    console.log(e);
   }
 };
 

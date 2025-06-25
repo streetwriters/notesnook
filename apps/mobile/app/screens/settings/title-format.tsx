@@ -23,8 +23,9 @@ import React from "react";
 import { TextInput } from "react-native";
 import Paragraph from "../../components/ui/typography/paragraph";
 import { useThemeColors } from "@notesnook/theme";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const TitleFormat = () => {
   const [titleFormat] = useState(db.settings.getTitleFormat());
@@ -40,7 +41,7 @@ export const TitleFormat = () => {
         onChangeText={(text) => {
           db.settings.setTitleFormat(text);
         }}
-        containerStyle={{ marginTop: 6 }}
+        containerStyle={{ marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL }}
         onLayout={() => {
           inputRef?.current?.setNativeProps({
             text: titleFormat
@@ -52,7 +53,7 @@ export const TitleFormat = () => {
       <Paragraph
         style={{ marginTop: 2 }}
         color={colors.secondary.paragraph}
-        size={SIZE.xs}
+        size={AppFontSize.xs}
       >
         {strings.titleFormattingGuide()}
       </Paragraph>

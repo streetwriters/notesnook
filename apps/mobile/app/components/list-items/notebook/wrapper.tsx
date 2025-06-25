@@ -41,7 +41,7 @@ export const openNotebook = (item: Notebook | BaseTrashItem<Notebook>) => {
       positiveText: strings.restore(),
       negativeText: strings.delete(),
       positivePress: async () => {
-        await db.trash.restore(item.id);
+        if ((await db.trash.restore(item.id)) === false) return;
         Navigation.queueRoutesForUpdate();
         useSelectionStore.getState().setSelectionMode(undefined);
         ToastManager.show({

@@ -37,6 +37,7 @@ abstract class BaseProperties {
   private readonly pinToggle: ToggleModel;
   private readonly favoriteToggle: ToggleModel;
   private readonly lockToggle: ToggleModel;
+  private readonly archiveToggle: ToggleModel;
 
   constructor(
     page: Page,
@@ -47,6 +48,7 @@ abstract class BaseProperties {
     this.pinToggle = new ToggleModel(page, `${itemPrefix}-pin`);
     this.lockToggle = new ToggleModel(page, `${itemPrefix}-lock`);
     this.favoriteToggle = new ToggleModel(page, `${itemPrefix}-favorite`);
+    this.archiveToggle = new ToggleModel(page, `${itemPrefix}-archive`);
   }
 
   async isPinned() {
@@ -126,6 +128,25 @@ abstract class BaseProperties {
     await this.close();
   }
 
+  async isArchived() {
+    await this.open();
+    const state = await this.archiveToggle.isToggled();
+    await this.close();
+    return state;
+  }
+
+  async archive() {
+    await this.open();
+    await this.archiveToggle.on();
+    await this.close();
+  }
+
+  async unarchive() {
+    await this.open();
+    await this.archiveToggle.off();
+    await this.close();
+  }
+
   abstract isColored(color: string): Promise<boolean>;
   abstract color(color: string): Promise<void>;
   abstract open(): Promise<void>;
@@ -134,14 +155,14 @@ abstract class BaseProperties {
 
 export class NotePropertiesModel extends BaseProperties {
   private readonly propertiesButton: Locator;
-  private readonly propertiesCloseButton: Locator;
+  private readonly generalSection: Locator;
   private readonly readonlyToggle: ToggleModel;
   private readonly sessionItems: Locator;
 
   constructor(page: Page, noteLocator: Locator) {
     super(page, noteLocator, "properties");
     this.propertiesButton = page.locator(getTestId("Properties"));
-    this.propertiesCloseButton = page.locator(getTestId("properties-close"));
+    this.generalSection = page.locator(getTestId("general-section"));
     this.readonlyToggle = new ToggleModel(page, `properties-readonly`);
     this.sessionItems = page.locator(getTestId("session-item"));
   }
@@ -183,12 +204,11 @@ export class NotePropertiesModel extends BaseProperties {
 
   async open() {
     await this.propertiesButton.click();
-    await this.propertiesCloseButton.waitFor();
-    await this.page.waitForTimeout(1000);
+    await this.generalSection.waitFor();
   }
 
   async close() {
-    await this.propertiesCloseButton.click();
+    await this.propertiesButton.click();
   }
 
   async getSessionHistory() {
@@ -209,6 +229,11 @@ export class NoteContextMenuModel extends BaseProperties {
   constructor(page: Page, noteLocator: Locator) {
     super(page, noteLocator, "menu-button");
     this.menu = new ContextMenuModel(page);
+  }
+
+  async openInNewTab() {
+    await this.open();
+    await this.menu.clickOnItem("openinnewtab");
   }
 
   async isColored(color: string): Promise<boolean> {
@@ -291,9 +316,9 @@ export class NoteContextMenuModel extends BaseProperties {
           });
           await subNotebookItem.waitFor();
 
-          await page.keyboard.down("Control");
+          await page.keyboard.down("ControlOrMeta");
           await subNotebookItem.click();
-          await page.keyboard.up("Control");
+          await page.keyboard.up("ControlOrMeta");
 
           await addSubNotebooks(page, dialog, subNotebookItem, subNotebook);
         }
@@ -317,9 +342,9 @@ export class NoteContextMenuModel extends BaseProperties {
 
     await notebookItem.waitFor({ state: "visible" });
 
-    await this.page.keyboard.down("Control");
+    await this.page.keyboard.down("ControlOrMeta");
     await notebookItem.click();
-    await this.page.keyboard.up("Control");
+    await this.page.keyboard.up("ControlOrMeta");
 
     await addSubNotebooks(this.page, dialog, notebookItem, notebook);
 

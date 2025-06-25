@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useState } from "react";
-
 import { Period, Plan } from "./types";
 
 type PlanMetadata = {
@@ -26,13 +25,16 @@ type PlanMetadata = {
   subtitle: string;
 };
 
+export const isDev = import.meta.env.DEV || IS_TESTING;
+
 export const EDUCATION_PLAN: Plan = {
-  id: import.meta.env.DEV || IS_TESTING ? "50305" : "658759",
+  id: isDev ? "50305" : "658759",
   period: "education",
   country: "US",
   currency: "USD",
-  discount: 0,
-  price: { gross: 9.99, net: 0, tax: 0 }
+  discount: { type: "regional", amount: 0, recurring: false },
+  price: { gross: 9.99, net: 0, tax: 0 },
+  originalPrice: { gross: 9.99, net: 0, tax: 0 }
 };
 
 export const DEFAULT_PLANS: Plan[] = [
@@ -40,17 +42,19 @@ export const DEFAULT_PLANS: Plan[] = [
     period: "monthly",
     country: "PK",
     currency: "USD",
-    discount: 0,
-    id: import.meta.env.DEV || IS_TESTING ? "9822" : "648884",
+    discount: { type: "regional", amount: 0, recurring: false },
+    originalPrice: { gross: 4.49, net: 0, tax: 0 },
+    id: isDev ? "9822" : "648884",
     price: { gross: 4.49, net: 0, tax: 0 }
   },
   {
     period: "yearly",
     country: "PK",
     currency: "USD",
-    discount: 0,
-    id: import.meta.env.DEV || IS_TESTING ? "50305" : "658759",
-    price: { gross: 49.99, net: 0, tax: 0 }
+    discount: { type: "regional", amount: 0, recurring: false },
+    id: isDev ? "50305" : "658759",
+    price: { gross: 49.99, net: 0, tax: 0 },
+    originalPrice: { gross: 49.99, net: 0, tax: 0 }
   },
   EDUCATION_PLAN
 ];
@@ -90,7 +94,7 @@ export function usePlans() {
         const plans = await getPlans();
         if (!plans) return;
         setPlans(plans);
-        setDiscount(Math.max(...plans.map((p) => p.discount)));
+        setDiscount(Math.max(...plans.map((p) => p.discount?.amount || 0)));
         setCountry(plans[0].country);
       } catch (e) {
         console.error(e);

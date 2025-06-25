@@ -23,7 +23,7 @@ import Dialog from "../components/dialog";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 
-export type PromptDialogProps = BaseDialogProps<false | string> & {
+export type PromptDialogProps = BaseDialogProps<undefined | string> & {
   title: string;
   description?: string;
   defaultValue?: string;
@@ -38,14 +38,14 @@ export const PromptDialog = DialogManager.register(function PromptDialog(
       isOpen={true}
       title={props.title}
       description={props.description}
-      onClose={() => props.onClose(false)}
+      onClose={() => props.onClose(props.defaultValue)}
       positiveButton={{
         text: strings.submit(),
         onClick: () => props.onClose(inputRef.current?.value || "")
       }}
       negativeButton={{
         text: strings.cancel(),
-        onClick: () => props.onClose(false)
+        onClick: () => props.onClose(props.defaultValue)
       }}
     >
       <Field

@@ -4,15 +4,20 @@ on: workflow_dispatch
 
 jobs:
   build:
-    runs-on: macos-13
+    runs-on: macos-14
     timeout-minutes: 60
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup Node
         uses: ./.github/actions/setup-node-with-cache
+
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "16.1"
 
       - name: Install node modules
         run: |
@@ -47,14 +52,17 @@ jobs:
           ccache -p
 
       - name: Cache Pods
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: pods-cache
         with:
           path: apps/mobile/native/ios/Pods
           key: ${{ runner.os }}-pods-${{ hashFiles('apps/mobile/native/ios/Podfile.lock') }}
 
       - name: Install Pods
-        run: npm run prepare:ios
+        run: |
+          cd apps/mobile/native/ios
+          bundle install
+          RCT_NEW_ARCH_ENABLED=0 bundle exec pod install
 
       - name: CCache Stats Before Build
         run: ccache -sv

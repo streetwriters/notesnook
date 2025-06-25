@@ -39,7 +39,7 @@ import {
   eCloseAppLocKPasswordDailog,
   eOpenAppLockPasswordDialog
 } from "../../../utils/events";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 import BaseDialog from "../../dialog/base-dialog";
 import DialogButtons from "../../dialog/dialog-buttons";
@@ -50,6 +50,7 @@ import { IconButton } from "../../ui/icon-button";
 import Input from "../../ui/input";
 import Seperator from "../../ui/seperator";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 export const AppLockPassword = () => {
   const { colors } = useThemeColors();
@@ -128,7 +129,7 @@ export const AppLockPassword = () => {
 
         <View
           style={{
-            paddingHorizontal: 12
+            paddingHorizontal: DefaultAppStyles.GAP
           }}
         >
           {mode === "change" ? (
@@ -192,7 +193,7 @@ export const AppLockPassword = () => {
                     height: 25,
                     marginRight: 5
                   }}
-                  size={SIZE.lg}
+                  size={AppFontSize.lg}
                 />
               )
             }
@@ -248,7 +249,7 @@ export const AppLockPassword = () => {
                     setSecureTextEntry(true);
                   });
                 }}
-                iconSize={SIZE.lg}
+                iconSize={AppFontSize.lg}
                 type="plain"
                 iconColor={
                   accountPass ? colors.primary.accent : colors.primary.icon
@@ -259,7 +260,7 @@ export const AppLockPassword = () => {
                   alignSelf: "flex-start",
                   justifyContent: "flex-start",
                   paddingHorizontal: 0,
-                  height: 30
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
                 }}
               />
             </>

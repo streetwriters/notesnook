@@ -59,6 +59,9 @@
     },
     "release-ios": {
       "dependsOn": ["^build"]
+    },
+    "repack": {
+      "dependsOn": ["^build"]
     }
   },
   "namedInputs": {

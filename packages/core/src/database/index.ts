@@ -60,6 +60,7 @@ import {
   isDeleted
 } from "../types.js";
 import { logger } from "../logger.js";
+import { EV, EVENTS } from "../common.js";
 
 // type FilteredKeys<T, U> = {
 //   [P in keyof T]: T[P] extends U ? P : never;
@@ -197,6 +198,10 @@ export type DatabaseAccessor<TSchema = DatabaseSchema> = () =>
   | Kysely<TSchema>
   | Transaction<TSchema>;
 
+export type LazyDatabaseAccessor<TSchema = DatabaseSchema> = Promise<
+  Kysely<TSchema> | Transaction<TSchema>
+>;
+
 type FilterBooleanProperties<T, Type> = keyof {
   [K in keyof T as T[K] extends Type ? K : never]: T[K];
 };
@@ -226,7 +231,9 @@ const BooleanProperties: Set<BooleanFields> = new Set([
   "pinned",
   "readonly",
   "remote",
-  "synced"
+  "synced",
+  "isGeneratedTitle",
+  "archived"
 ]);
 
 const DataMappers: Partial<Record<ItemType, (row: any) => void>> = {
@@ -301,14 +308,22 @@ async function setupDatabase<Schema>(
 
 export async function initializeDatabase<Schema>(
   db: Kysely<Schema>,
-  migrationProvider: MigrationProvider
+  migrationProvider: MigrationProvider,
+  name: string
 ) {
   try {
     const migrator = new Migrator({
       db,
       provider: migrationProvider
     });
+    const needsMigration = await migrator
+      .getMigrations()
+      .then((m) => m.some((m) => !m.executedAt));
+    if (!needsMigration) return db;
+
+    EV.publish(EVENTS.migrationStarted, name);
     const { error, results } = await migrator.migrateToLatest();
+    EV.publish(EVENTS.migrationFinished, name);
 
     if (error)
       throw error instanceof Error ? error : new Error(JSON.stringify(error));
@@ -356,7 +371,7 @@ export async function createDatabase<Schema>(
     dialect: options.dialect(name, async () => {
       await db.connection().execute(async (db) => {
         await setupDatabase(db, options);
-        await initializeDatabase(db, options.migrationProvider);
+        await initializeDatabase(db, options.migrationProvider, name);
         if (options.onInit) await options.onInit(db);
       });
     }),
@@ -365,7 +380,7 @@ export async function createDatabase<Schema>(
   if (!options.skipInitialization)
     await db.connection().execute(async (db) => {
       await setupDatabase(db, options);
-      await initializeDatabase(db, options.migrationProvider);
+      await initializeDatabase(db, options.migrationProvider, name);
       if (options.onInit) await options.onInit(db);
     });
 

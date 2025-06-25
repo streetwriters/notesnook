@@ -17,8 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Extension, NodeWithPos } from "@tiptap/core";
-import { Node } from "@tiptap/pm/model";
+import { Extension } from "@tiptap/core";
 import { Plugin } from "@tiptap/pm/state";
 import { nanoid } from "nanoid";
 
@@ -41,13 +40,8 @@ const BLOCK_ID_TYPES = [
   "embed"
 ];
 
-export const BlockId = Extension.create<any, { seen: WeakSet<Node> }>({
+export const BlockId = Extension.create({
   name: "blockId",
-  addStorage() {
-    return {
-      seen: new WeakSet()
-    };
-  },
 
   addGlobalAttributes() {
     return [
@@ -80,29 +74,25 @@ export const BlockId = Extension.create<any, { seen: WeakSet<Node> }>({
           const isDocChanged = transactions.some((tr) => tr.docChanged);
           if (!isDocChanged) return null;
 
-          const blocksWithoutBlockId: NodeWithPos[] = [];
-          const seen = this.storage.seen;
-          newState.tr.doc.forEach(function addBlocks(n, offset) {
-            if (seen.has(n)) return;
-            seen.add(n);
-
+          let updated = false;
+          const { tr } = newState;
+          tr.doc.forEach(function addBlockId(n, offset) {
             if (!n.isBlock || !BLOCK_ID_TYPES.includes(n.type.name)) return;
-            if (!n.attrs.blockId)
-              blocksWithoutBlockId.push({ node: n, pos: offset });
+            if (!n.attrs.blockId) {
+              const id = nanoid(8);
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore we can't use tr.setNodeMarkup as that creates
+              // a new transaction for every single node update causing
+              // significant performance issues
+              n.attrs.blockId = id;
+              updated = true;
+            }
 
             if (NESTED_BLOCK_ID_TYPES.includes(n.type.name))
-              n.forEach((n, pos) => addBlocks(n, offset + pos + 1));
+              n.forEach((n, pos) => addBlockId(n, offset + pos + 1));
           });
-          if (blocksWithoutBlockId.length > 0) {
-            const { tr } = newState;
+          if (updated) {
             tr.setMeta("ignoreEdit", true);
-            for (const { node, pos } of blocksWithoutBlockId) {
-              const id = nanoid(8);
-              tr.setNodeMarkup(pos, undefined, {
-                ...node.attrs,
-                blockId: id
-              });
-            }
             return tr;
           }
 

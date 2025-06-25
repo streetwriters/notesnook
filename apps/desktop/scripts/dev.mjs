@@ -36,6 +36,8 @@ const ENV = {
   FORCE_COLOR: "false",
   COLOR: "0"
 };
+process.chdir(path.join(__dirname, ".."));
+
 await onChange(true);
 
 console.log("Watching...");
@@ -53,11 +55,13 @@ async function onChange(first) {
   if (first) {
     await fs.rm("./build/", { force: true, recursive: true });
 
+    await exec("npm rebuild electron --verbose --foreground-scripts");
+
     await exec("yarn electron-builder install-app-deps");
   }
 
   await exec(`yarn run bundle`);
-  execAsync(`yarn`, [`tsc`]);
+  await exec(`yarn run build`);
 
   if (await isBundleSame()) {
     console.log("Bundle is same. Doing nothing.");
@@ -66,8 +70,8 @@ async function onChange(first) {
 
   if (first) {
     await spawnAndWaitUntil(
-      ["yarn", "nx", "start:desktop", "@notesnook/web"],
-      path.join(__dirname, "..", "..", ".."),
+      ["npm", "run", "start:desktop"],
+      path.join(__dirname, "..", "..", "web"),
       (data) => data.includes("Network: use --host to expose")
     );
   }

@@ -36,7 +36,7 @@ The flow will be as follows:
 5. Use the database password to init the db & keep the user's encryption key in memory. (we have 2 choices here: either keep the encryption key in memory or keep the pin in memory)
 6. If not enabled, we will ask the keystore to give us the database password + user's encryption key
 
-We should store both the database password and the user's encryption key in a keychain. If user sets a pin, we can just double encrypt these values. This will keep things simple and seemless.
+We should store both the database password and the user's encryption key in a keychain. If user sets a pin, we can just double encrypt these values. This will keep things simple and seamless.
 
 Q: How to find out if app lock is enabled?
 

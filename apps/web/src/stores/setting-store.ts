@@ -28,8 +28,25 @@ import { setDocumentTitle } from "../utils/dom";
 import { TimeFormat } from "@notesnook/core";
 import { Profile, TrashCleanupInterval } from "@notesnook/core";
 
-export const HostIds = ["API_HOST", "AUTH_HOST", "SSE_HOST"] as const;
+export const HostIds = [
+  "API_HOST",
+  "AUTH_HOST",
+  "SSE_HOST",
+  "MONOGRAPH_HOST"
+] as const;
 export type HostId = (typeof HostIds)[number];
+
+export enum ImageCompressionOptions {
+  ASK_EVERY_TIME,
+  ENABLE,
+  DISABLE
+}
+
+export type HomePage = {
+  type: "notebook" | "tag" | "color" | "route";
+  id: string;
+};
+
 class SettingStore extends BaseStore<SettingStore> {
   encryptBackups = Config.get("encryptBackups", false);
   backupReminderOffset = Config.get("backupReminderOffset", 0);
@@ -40,6 +57,7 @@ class SettingStore extends BaseStore<SettingStore> {
   );
   doubleSpacedParagraphs = Config.get("doubleSpacedLines", true);
   markdownShortcuts = Config.get("markdownShortcuts", true);
+  fontLigatures = Config.get("fontLigatures", false);
   notificationsSettings = Config.get("notifications", { reminder: true });
   isFullOfflineMode = Config.get("fullOfflineMode", false);
   serverUrls: Partial<Record<HostId, string>> = Config.get("serverUrls", {});
@@ -54,10 +72,22 @@ class SettingStore extends BaseStore<SettingStore> {
   profile?: Profile;
 
   trashCleanupInterval: TrashCleanupInterval = 7;
-  homepage = Config.get("homepage", 0);
+  homepage = Config.get<HomePage>("homepage-v2", {
+    type: "route",
+    id: "notes"
+  });
+  defaultSidebarTab = Config.get<"home" | "notebooks" | "tags">(
+    "sidebarTab",
+    "home"
+  );
+  imageCompression = Config.get(
+    "imageCompression",
+    ImageCompressionOptions.ASK_EVERY_TIME
+  );
   desktopIntegrationSettings?: DesktopIntegration;
   autoUpdates = true;
   isFlatpak = false;
+  isSnap = false;
   proxyRules?: string;
 
   refresh = async () => {
@@ -68,6 +98,7 @@ class SettingStore extends BaseStore<SettingStore> {
       trashCleanupInterval: db.settings.getTrashCleanupInterval(),
       profile: db.settings.getProfile(),
       isFlatpak: await desktop?.integration.isFlatpak.query(),
+      isSnap: await desktop?.integration.isSnap.query(),
       desktopIntegrationSettings:
         await desktop?.integration.desktopIntegration.query(),
       privacyMode: await desktop?.integration.privacyMode.query(),
@@ -115,9 +146,19 @@ class SettingStore extends BaseStore<SettingStore> {
     Config.set("encryptBackups", encryptBackups);
   };
 
-  setHomepage = (homepage: number) => {
+  setHomepage = (homepage: HomePage) => {
     this.set({ homepage });
-    Config.set("homepage", homepage);
+    Config.set("homepage-v2", homepage);
+  };
+
+  setDefaultSidebarTab = (defaultSidebarTab: "home" | "notebooks" | "tags") => {
+    this.set({ defaultSidebarTab });
+    Config.set("sidebarTab", defaultSidebarTab);
+  };
+
+  setImageCompression = (imageCompression: ImageCompressionOptions) => {
+    this.set({ imageCompression });
+    Config.set("imageCompression", imageCompression);
   };
 
   setDesktopIntegration = async (settings: DesktopIntegration) => {
@@ -174,6 +215,12 @@ class SettingStore extends BaseStore<SettingStore> {
       state.markdownShortcuts = toggleState ?? !state.markdownShortcuts;
     });
     Config.set("markdownShortcuts", !markdownShortcuts);
+  };
+
+  toggleFontLigatures = () => {
+    const fontLigatures = this.get().fontLigatures;
+    this.set((state) => (state.fontLigatures = !fontLigatures));
+    Config.set("fontLigatures", !fontLigatures);
   };
 
   togglePrivacyMode = async () => {

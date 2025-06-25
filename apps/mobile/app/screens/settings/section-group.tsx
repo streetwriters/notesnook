@@ -21,9 +21,10 @@ import React from "react";
 import { View } from "react-native";
 import Heading from "../../components/ui/typography/heading";
 import { useThemeColors } from "@notesnook/theme";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { SectionItem } from "./section-item";
 import { SettingSection } from "./types";
+import { DefaultAppStyles } from "../../utils/styles";
 export const SectionGroup = ({ item }: { item: SettingSection }) => {
   const { colors } = useThemeColors();
   const current = item.useHook && item.useHook();
@@ -37,10 +38,10 @@ export const SectionGroup = ({ item }: { item: SettingSection }) => {
       {item.name && item.sections ? (
         <Heading
           style={{
-            paddingHorizontal: 12
+            paddingHorizontal: DefaultAppStyles.GAP
           }}
           color={colors.primary.accent}
-          size={SIZE.xs}
+          size={AppFontSize.xs}
         >
           {(item.name as string).toUpperCase()}
         </Heading>

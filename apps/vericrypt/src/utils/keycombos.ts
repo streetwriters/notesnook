@@ -19,11 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Platform from "platform";
 
-const isMac = Platform.os?.toString().toLowerCase().includes("mac");
+const isMac =
+  Platform.os?.family?.toLowerCase().includes("mac") ||
+  Platform.os?.family?.toLowerCase().includes("os x");
 
 const combos = {
   macos: {
-    chromium: { developerTools: ["Cmd", "Opt", "J"] },
+    chromium: { developerTools: ["Command", "Option", "J"] },
     firefox: { developerTools: ["Command", "Option", "K"] }
   },
   others: {

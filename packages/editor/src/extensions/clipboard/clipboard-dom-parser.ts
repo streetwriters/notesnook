@@ -22,7 +22,7 @@ import {
   ParseOptions
 } from "@tiptap/pm/model";
 import { encodeNonAsciiHTML } from "entities";
-import { Schema, Slice } from "prosemirror-model";
+import { Node as PMNode, Schema, Slice } from "prosemirror-model";
 import { inferLanguage } from "../code-block/index.js";
 import { hasPermission } from "../../types.js";
 
@@ -46,6 +46,17 @@ export class ClipboardDOMParser extends ProsemirrorDOMParser {
       removeBlockId(dom);
     }
     return super.parseSlice(dom, options);
+  }
+
+  parse(dom: Node, options?: ParseOptions): PMNode {
+    if (dom instanceof HTMLElement || dom instanceof Document) {
+      convertGoogleDocsChecklist(dom);
+      formatCodeblocks(dom);
+      convertBrToSingleSpacedParagraphs(dom);
+      removeImages(dom);
+      removeBlockId(dom);
+    }
+    return super.parse(dom, options);
   }
 }
 

@@ -1,0 +1,5 @@
+- New and improved editor tabs with history
+- Fixed homescreen widget bugs
+- Many small bug fixes and improvements
+
+Thank you for using Notesnook!

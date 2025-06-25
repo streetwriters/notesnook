@@ -58,9 +58,19 @@ export interface IStorage {
     items: Cipher<"base64">[]
   ): Promise<string[]>;
   deriveCryptoKey(credentials: SerializedKey): Promise<void>;
-  hash(password: string, email: string): Promise<string>;
+  hash(
+    password: string,
+    email: string,
+    options?: { usesFallback?: boolean }
+  ): Promise<string>;
   getCryptoKey(): Promise<string | undefined>;
   generateCryptoKey(password: string, salt?: string): Promise<SerializedKey>;
+
+  generateCryptoKeyFallback(
+    password: string,
+    salt?: string
+  ): Promise<SerializedKey>;
+  deriveCryptoKeyFallback(credentials: SerializedKey): Promise<void>;
 
   //   async generateRandomKey() {
   //     const passwordBytes = randomBytes(124);
@@ -117,4 +127,4 @@ export interface IFileStorage {
 export type StorageAccessor = () => IStorage;
 export type KVStorageAccessor = () => KVStorage;
 export type ConfigStorageAccessor = () => ConfigStorage;
-export type CompressorAccessor = () => ICompressor;
+export type CompressorAccessor = () => Promise<ICompressor>;

@@ -23,7 +23,8 @@ import React, {
   useRef,
   PropsWithChildren,
   Suspense,
-  useLayoutEffect
+  useLayoutEffect,
+  useCallback
 } from "react";
 import ReactDOM from "react-dom";
 import { Box, Button, Flex, Progress, Text } from "@theme-ui/components";
@@ -43,6 +44,7 @@ import {
   useStore as useAppStore,
   store as appstore
 } from "../../stores/app-store";
+import { useStore as useSearchStore } from "../../stores/search-store";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { FlexScrollContainer } from "../scroll-container";
 import Tiptap, { OnChangeHandler } from "./tiptap";
@@ -68,11 +70,17 @@ import { scrollIntoViewById } from "@notesnook/editor";
 import { IEditor } from "./types";
 import { EditorActionBar } from "./action-bar";
 import { logger } from "../../utils/logger";
-import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels";
 import { NoteLinkingDialog } from "../../dialogs/note-linking-dialog";
 import { strings } from "@notesnook/intl";
+import { onPageVisibilityChanged } from "../../utils/page-visibility";
+import { Pane, SplitPane } from "../split-pane";
+import { TITLE_BAR_HEIGHT } from "../title-bar";
+import { isMobile } from "../../hooks/use-mobile";
+import { isTablet } from "../../hooks/use-tablet";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
+
+const autoSaveToast = { show: true, hide: () => {} };
 
 async function saveContent(
   noteId: string,
@@ -112,9 +120,10 @@ async function saveContent(
 const deferredSave = debounceWithId(saveContent, 100);
 
 export default function TabsView() {
-  const sessions = useEditorStore((store) => store.sessions);
+  const tabs = useEditorStore((store) => store.tabs);
   const documentPreview = useEditorStore((store) => store.documentPreview);
-  const activeSessionId = useEditorStore((store) => store.activeSessionId);
+  const activeTabId = useEditorStore((store) => store.activeTabId);
+  const activeSession = useEditorStore((store) => store.getActiveSession());
   const arePropertiesVisible = useEditorStore(
     (store) => store.arePropertiesVisible
   );
@@ -123,107 +132,120 @@ export default function TabsView() {
 
   return (
     <>
-      {!hasNativeTitlebar ? (
-        <EditorActionBarPortal />
-      ) : (
-        <Flex sx={{ px: 1 }}>
-          <EditorActionBar />
-        </Flex>
-      )}
-
       <ScopedThemeProvider
         scope="editor"
         ref={dropRef}
         sx={{
           bg: "background",
-          pt: 1,
           flex: 1,
           overflow: "hidden",
           display: "flex",
           flexDirection: "column"
         }}
       >
-        <PanelGroup direction="horizontal" autoSaveId={"editor-panels"}>
-          <Panel id="editor-panel" className="editor-pane" order={1}>
-            {sessions.map((session) => (
-              <Freeze key={session.id} freeze={session.id !== activeSessionId}>
-                {session.type === "locked" ? (
-                  <UnlockNoteView session={session} />
-                ) : session.type === "conflicted" || session.type === "diff" ? (
-                  <DiffViewer session={session} />
-                ) : (
-                  <MemoizedEditorView session={session} />
-                )}
-              </Freeze>
-            ))}
-          </Panel>
-
-          {documentPreview && (
-            <>
-              <PanelResizeHandle className="panel-resize-handle" />
-              <Panel
-                id="pdf-preview-panel"
-                order={2}
-                minSize={35}
-                defaultSize={35}
-              >
-                <ScopedThemeProvider
-                  scope="editorSidebar"
-                  id="editorSidebar"
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    overflow: "hidden",
-                    borderLeft: "1px solid var(--border)",
-                    height: "100%",
-                    bg: "background"
-                  }}
-                >
-                  {documentPreview.url ? (
-                    <Suspense
-                      fallback={
-                        <DownloadAttachmentProgress
-                          hash={documentPreview.hash}
-                        />
-                      }
-                    >
-                      <PDFPreview
-                        fileUrl={documentPreview.url}
-                        hash={documentPreview.hash}
-                        onClose={() =>
-                          useEditorStore.setState({
-                            documentPreview: undefined
-                          })
-                        }
-                      />
-                    </Suspense>
+        <Flex
+          className="editor-action-bar"
+          sx={{
+            zIndex: 2,
+            height: TITLE_BAR_HEIGHT,
+            bg: "background-secondary"
+            // borderBottom: "1px solid var(--border)"
+          }}
+        >
+          <EditorActionBar />
+        </Flex>
+        <SplitPane
+          style={{
+            position: "relative"
+          }}
+          direction="vertical"
+          autoSaveId={"editor-panels"}
+        >
+          <Pane id="editor-panel" className="editor-pane">
+            {tabs.map((tab) => {
+              const session = useEditorStore
+                .getState()
+                .getSession(tab.sessionId);
+              if (!session) return null;
+              return (
+                <Freeze key={session.id} freeze={tab.id !== activeTabId}>
+                  {session.type === "locked" ? (
+                    <UnlockNoteView session={session} />
+                  ) : session.type === "conflicted" ||
+                    session.type === "diff" ? (
+                    <DiffViewer session={session} />
                   ) : (
-                    <DownloadAttachmentProgress hash={documentPreview.hash} />
+                    <MemoizedEditorView session={session} />
                   )}
-                </ScopedThemeProvider>
-              </Panel>
-            </>
+                </Freeze>
+              );
+            })}
+          </Pane>
+
+          {documentPreview ? (
+            <Pane id="pdf-preview-panel" initialSize={435} minSize={435}>
+              <ScopedThemeProvider
+                scope="editorSidebar"
+                id="editorSidebar"
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  overflow: "hidden",
+                  borderLeft: "1px solid var(--border)",
+                  height: "100%",
+                  bg: "background"
+                }}
+              >
+                {documentPreview.url ? (
+                  <Suspense
+                    fallback={
+                      <DownloadAttachmentProgress hash={documentPreview.hash} />
+                    }
+                  >
+                    <PDFPreview
+                      fileUrl={documentPreview.url}
+                      hash={documentPreview.hash}
+                      onClose={() =>
+                        useEditorStore.setState({
+                          documentPreview: undefined
+                        })
+                      }
+                    />
+                  </Suspense>
+                ) : (
+                  <DownloadAttachmentProgress hash={documentPreview.hash} />
+                )}
+              </ScopedThemeProvider>
+            </Pane>
+          ) : null}
+
+          {isTOCVisible && activeSession ? (
+            <Pane id="table-of-contents-pane" initialSize={300} minSize={300}>
+              <TableOfContents sessionId={activeSession.id} />
+            </Pane>
+          ) : null}
+          {arePropertiesVisible && activeSession && (
+            <Pane id="properties-pane" initialSize={250} minSize={250}>
+              <Properties sessionId={activeSession.id} />
+            </Pane>
           )}
-        </PanelGroup>
+        </SplitPane>
         <DropZone overlayRef={overlayRef} />
-        {arePropertiesVisible && activeSessionId && (
-          <Properties sessionId={activeSessionId} />
-        )}
-        {isTOCVisible && activeSessionId && (
-          <TableOfContents sessionId={activeSessionId} />
-        )}
       </ScopedThemeProvider>
     </>
   );
 }
 
-const MemoizedEditorView = React.memo(
-  EditorView,
-  (prev, next) =>
+const MemoizedEditorView = React.memo(EditorView, (prev, next) => {
+  return (
     prev.session.id === next.session.id &&
     prev.session.type === next.session.type &&
-    prev.session.needsHydration === next.session.needsHydration
-);
+    prev.session.needsHydration === next.session.needsHydration &&
+    prev.session.activeBlockId === next.session.activeBlockId &&
+    prev.session.activeSearchResultIndex ===
+      next.session.activeSearchResultIndex
+  );
+});
 function EditorView({
   session
 }: {
@@ -236,7 +258,6 @@ function EditorView({
   const lastChangedTime = useRef<number>(0);
   const root = useRef<HTMLDivElement>(null);
 
-  const toggleProperties = useEditorStore((store) => store.toggleProperties);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const editor = useEditorManager((store) => store.editors[session.id]?.editor);
 
@@ -270,6 +291,7 @@ function EditorView({
           editor.updateContent(result.data);
         } else if (isNote && session.note.title !== item.title) {
           AppEventManager.publish(AppEvents.changeNoteTitle, {
+            sessionId: session.id,
             title: item.title,
             preventSave: true
           });
@@ -284,18 +306,26 @@ function EditorView({
   useLayoutEffect(() => {
     editor?.focus();
 
+    const unsub = useSearchStore.subscribe(
+      (store) => store.isSearching,
+      (value) => {
+        if (!value) element?.classList.remove("searching");
+      }
+    );
+
     const element = root.current;
-    element?.classList.add("active");
+    element?.classList.add("active", "searching");
     return () => {
-      element?.classList.remove("active");
+      element?.classList.remove("active", "searching");
+      unsub();
     };
   }, [editor]);
 
-  useEffect(() => {
-    if (!session.needsHydration && session.content) {
-      editor?.updateContent(session.content.data);
-    }
-  }, [editor, session.needsHydration]);
+  const getContent = useCallback(() => {
+    return session.content?.data;
+  }, [session.content?.data]);
+
+  if (session.needsHydration) return null;
 
   return (
     <Flex
@@ -314,32 +344,52 @@ function EditorView({
       <Editor
         id={session.id}
         nonce={1}
-        content={() => session.content?.data}
+        content={getContent}
         session={session}
         onPreviewDocument={(preview) =>
           useEditorStore.setState({ documentPreview: preview })
         }
         onContentChange={() => (lastChangedTime.current = Date.now())}
+        onSelectionChange={() => root.current?.classList.remove("searching")}
         onSave={(content, ignoreEdit) => {
           const currentSession = useEditorStore
             .getState()
-            .getSession(session.id, ["default", "readonly", "new"]);
-          if (!currentSession) return;
+            .getSession(session.id);
+          const noteId =
+            currentSession && "note" in currentSession
+              ? currentSession.note.id
+              : null;
+          const sessions = noteId
+            ? useEditorStore.getState().getSessionsForNote(noteId)
+            : [currentSession];
 
+          const currentSessionId = session.id;
           const data = content();
-          if (!currentSession.content)
-            currentSession.content = { type: "tiptap", data };
-          else currentSession.content.data = data;
+          for (const session of sessions) {
+            if (
+              session?.type !== "default" &&
+              session?.type !== "readonly" &&
+              session?.type !== "new"
+            )
+              continue;
+            if (!session.content) session.content = { type: "tiptap", data };
+            else session.content.data = data;
+
+            // update content in other tabs
+            if (session.id !== currentSessionId) {
+              const editor = useEditorManager.getState().getEditor(session.id);
+              editor?.editor?.updateContent(data);
+            }
+          }
 
           logger.debug("scheduling save", {
             id: session.id,
             length: data.length
           });
-          deferredSave(currentSession.id, currentSession.id, ignoreEdit, data);
+          deferredSave(session.id, session.id, ignoreEdit, data);
         }}
         options={{
           readonly: session?.type === "readonly" || session?.type === "deleted",
-          onRequestFocus: () => toggleProperties(false),
           focusMode: isFocusMode
         }}
       />
@@ -390,9 +440,9 @@ function DownloadAttachmentProgress(props: DownloadAttachmentProgressProps) {
         variant="secondary"
         mt={2}
         onClick={() => {
-          const id = useEditorStore.getState().activeSessionId;
+          const note = useEditorStore.getState().getActiveNote();
           useEditorStore.setState({ documentPreview: undefined });
-          if (id) db.fs().cancel(id).catch(console.error);
+          if (note) db.fs().cancel(note.id).catch(console.error);
         }}
       >
         {strings.cancel()}
@@ -414,6 +464,7 @@ type EditorProps = {
   nonce?: number;
   options?: EditorOptions;
   onContentChange?: () => void;
+  onSelectionChange?: () => void;
   onSave?: OnChangeHandler;
   onPreviewDocument?: (preview: DocumentPreview) => void;
 };
@@ -423,6 +474,7 @@ export function Editor(props: EditorProps) {
     session,
     content,
     onSave,
+    onSelectionChange,
     nonce,
     options,
     onContentChange,
@@ -433,9 +485,18 @@ export function Editor(props: EditorProps) {
     readonly: false,
     focusMode: false
   };
+  const saveSessionContentIfNotSaved = useEditorStore(
+    (store) => store.saveSessionContentIfNotSaved
+  );
+  const setEditorSaveState = useEditorStore((store) => store.setSaveState);
   useScrollToBlock(session);
+  useScrollToSearchResult(session);
 
   useEffect(() => {
+    if (!autoSaveToast.show) {
+      autoSaveToast.hide();
+    }
+
     const event = AppEventManager.subscribe(
       AppEvents.UPDATE_ATTACHMENT_PROGRESS,
       ({ hash, loaded, total }: AttachmentProgress) => {
@@ -449,6 +510,23 @@ export function Editor(props: EditorProps) {
 
     return () => {
       event.unsubscribe();
+    };
+  }, [id]);
+
+  useEffect(() => {
+    const unsub = onPageVisibilityChanged((_, hidden) => {
+      if (hidden) {
+        saveSessionContentIfNotSaved(id);
+      }
+    });
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      const editor = useEditorManager.getState().getEditor(id)?.editor;
+      const selection = editor?.getSelection();
+      if (selection) Config.set(`${id}:selection`, selection);
     };
   }, [id]);
 
@@ -468,16 +546,17 @@ export function Editor(props: EditorProps) {
           if (editor) restoreSelection(editor, id);
           restoreScrollPosition(session);
         }}
-        onSelectionChange={({ from, to }) =>
-          Config.set(`${id}:selection`, { from, to })
-        }
+        onSelectionChange={({ from, to }) => {
+          Config.set(`${id}:selection`, { from, to });
+          onSelectionChange?.();
+        }}
         onContentChange={onContentChange}
         onChange={onSave}
         onDownloadAttachment={(attachment) => saveAttachment(attachment.hash)}
         onPreviewAttachment={async (data) => {
-          const { hash } = data;
+          const { hash, type } = data;
           const attachment = await db.attachments.attachment(hash);
-          if (attachment && attachment.mimeType.startsWith("image/")) {
+          if (attachment && type === "image") {
             const container = document.getElementById("dialogContainer");
             if (!(container instanceof HTMLElement)) return;
 
@@ -496,7 +575,12 @@ export function Editor(props: EditorProps) {
               </ScopedThemeProvider>,
               container
             );
-          } else if (attachment && onPreviewDocument) {
+          } else if (
+            attachment &&
+            onPreviewDocument &&
+            type === "file" &&
+            attachment.mimeType.startsWith("application/pdf")
+          ) {
             onPreviewDocument({ hash });
             const blob = await downloadAttachment(hash, "blob", id);
             if (!blob) {
@@ -504,6 +588,8 @@ export function Editor(props: EditorProps) {
               return;
             }
             onPreviewDocument({ url: URL.createObjectURL(blob), hash });
+          } else {
+            showToast("error", strings.attachmentPreviewFailed());
           }
         }}
         onInsertAttachment={async (type) => {
@@ -546,6 +632,25 @@ export function Editor(props: EditorProps) {
           const link = await NoteLinkingDialog.show({ attributes });
           return link || undefined;
         }}
+        onAutoSaveDisabled={() => {
+          setEditorSaveState(id, SaveState.NotSaved);
+          if (autoSaveToast.show === false) return;
+          const { hide } = showToast(
+            "error",
+            "Auto-save is disabled for large notes. Press Ctrl + S to save.",
+            [
+              {
+                text: "Dismiss",
+                onClick: () => {
+                  hide();
+                }
+              }
+            ],
+            Infinity
+          );
+          autoSaveToast.show = false;
+          autoSaveToast.hide = hide;
+        }}
       >
         {headless ? null : (
           <>
@@ -582,15 +687,17 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
       const child = editorContainerRef.current?.getBoundingClientRect();
       if (!parent || !child || !editor || entries.length <= 0) return;
 
-      const CONTAINER_MARGIN = 30;
+      const CONTAINER_MARGIN = isMobile() || isTablet() ? 10 : 30;
       const negativeSpace = Math.abs(
         parent.left - child.left - CONTAINER_MARGIN
       );
 
-      editor.style.marginLeft = `-${negativeSpace}px`;
-      editor.style.marginRight = `-${negativeSpace}px`;
-      editor.style.paddingLeft = `${negativeSpace}px`;
-      editor.style.paddingRight = `${negativeSpace}px`;
+      requestAnimationFrame(() => {
+        editor.style.marginLeft = `-${negativeSpace}px`;
+        editor.style.marginRight = `-${negativeSpace}px`;
+        editor.style.paddingLeft = `${negativeSpace}px`;
+        editor.style.paddingRight = `${negativeSpace}px`;
+      });
     }
     const observer = new ResizeObserver(debounce(onResize, 500));
     observer.observe(editorScrollRef.current);
@@ -747,6 +854,31 @@ function useScrollToBlock(session: EditorSession) {
   }, [session.id, session.type, blockId]);
 }
 
+function useScrollToSearchResult(session: EditorSession) {
+  const index = useEditorStore(
+    (store) => store.getSession(session.id)?.activeSearchResultIndex
+  );
+
+  useEffect(() => {
+    if (index === undefined) return;
+    const scrollContainer = document.getElementById(
+      `editorScroll_${session.id}`
+    );
+    scrollContainer?.closest(".active")?.classList.add("searching");
+    const elements = scrollContainer?.getElementsByTagName("nn-search-result");
+    setTimeout(
+      () =>
+        elements
+          ?.item(index)
+          ?.scrollIntoView({ block: "center", behavior: "instant" }),
+      100
+    );
+    useEditorStore.getState().updateSession(session.id, [session.type], {
+      activeSearchResultIndex: undefined
+    });
+  }, [session.id, session.type, index]);
+}
+
 function isFile(e: DragEvent) {
   return (
     e.dataTransfer &&
@@ -784,7 +916,7 @@ function restoreScrollPosition(session: EditorSession) {
 function restoreSelection(editor: IEditor, id: string) {
   setTimeout(() => {
     editor.focus({
-      position: Config.get(`${id}:selection`, { from: 0, to: 0 })
+      position: Config.get(`${id}:selection`)
     });
   });
 }
@@ -817,10 +949,11 @@ function UnlockNoteView(props: UnlockNoteViewProps) {
         subtitle={strings.enterPasswordToUnlockNote()}
         title={session.note.title}
         unlock={async (password) => {
-          const note = await db.vault.open(session.id, password);
+          const note = await db.vault.open(session.note.id, password);
           if (!note || !note.content)
             throw new Error("note with this id does not exist.");
 
+          const tags = await db.notes.tags(note.id);
           useEditorStore.getState().addSession({
             type: session.note.readonly ? "readonly" : "default",
             locked: true,
@@ -828,18 +961,12 @@ function UnlockNoteView(props: UnlockNoteViewProps) {
             note: session.note,
             saveState: SaveState.Saved,
             sessionId: `${Date.now()}`,
-            pinned: session.pinned,
-            preview: session.preview,
+            tags,
+            tabId: session.tabId,
             content: note.content
           });
         }}
       />
     </div>
   );
-}
-
-function EditorActionBarPortal() {
-  const container = document.getElementById("titlebar-portal-container");
-  if (!container) return null;
-  return ReactDOM.createPortal(<EditorActionBar />, container);
 }

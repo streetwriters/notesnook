@@ -18,10 +18,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { db } from "../common/database";
+import { eSendEvent } from "../services/event-manager";
 import Navigation from "../services/navigation";
+import { NotePreviewWidget } from "../services/note-preview-widget";
 import Notifications from "../services/notifications";
+import { eAfterSync } from "../utils/events";
 import { useFavoriteStore } from "./use-favorite-store";
 import { useMenuStore } from "./use-menu-store";
+import { useMonographStore } from "./use-monograph-store";
 import { useNotebookStore } from "./use-notebook-store";
 import { useNoteStore } from "./use-notes-store";
 import { useRelationStore } from "./use-relation-store";
@@ -30,17 +34,21 @@ import { useTagStore } from "./use-tag-store";
 import { useTrashStore } from "./use-trash-store";
 import { useUserStore } from "./use-user-store";
 
-export function initAfterSync() {
-  Navigation.queueRoutesForUpdate();
-  // Whenever sync completes, try to reschedule
-  // any new/updated reminders.
+export function initAfterSync(type: "full" | "send" = "send") {
+  if (type === "full") {
+    Navigation.queueRoutesForUpdate();
+    // Whenever sync completes, try to reschedule
+    // any new/updated reminders.
+    useRelationStore.getState().update();
+    useMenuStore.getState().setColorNotes();
+    useMenuStore.getState().setMenuPins();
+    useUserStore.setState({
+      profile: db.settings.getProfile()
+    });
+    eSendEvent(eAfterSync);
+  }
   Notifications.setupReminders(true);
-  useRelationStore.getState().update();
-  useMenuStore.getState().setColorNotes();
-  useMenuStore.getState().setMenuPins();
-  useUserStore.setState({
-    profile: db.settings.getProfile()
-  });
+  NotePreviewWidget.updateNotes();
 }
 
 export async function initialize() {}
@@ -54,4 +62,5 @@ export function clearAllStores() {
   useMenuStore.getState().clearAll();
   useTrashStore.getState().clear();
   useReminderStore.getState().clear();
+  useMonographStore.getState().clear();
 }

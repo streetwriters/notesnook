@@ -20,10 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Platform } from "react-native";
 import FingerprintScanner, {
   AuthenticateIOS
-} from "react-native-fingerprint-scanner";
+} from "@ammarahmed/react-native-fingerprint-scanner";
 import * as Keychain from "react-native-keychain";
 import { MMKV } from "../common/database/mmkv";
-import Storage from "../common/database/storage";
+import { Storage } from "../common/database/storage";
 import { useSettingStore } from "../stores/use-setting-store";
 import { ToastOptions, ToastManager } from "./event-manager";
 import { useUserStore } from "../stores/use-user-store";

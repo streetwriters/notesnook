@@ -58,7 +58,7 @@ import {
   openInternalLink,
   randId
 } from "./tiptap/utils";
-import { tabBarRef } from "../../utils/global-refs";
+import { fluidTabsRef } from "../../utils/global-refs";
 import { strings } from "@notesnook/intl";
 import { i18n } from "@lingui/core";
 
@@ -146,15 +146,16 @@ const Editor = React.memo(
             onRenderProcessGone={onError}
             nestedScrollEnabled
             onError={onError}
-            injectedJavaScriptBeforeContentLoaded={`
-          globalThis.LINGUI_LOCALE = "${i18n.locale}";
-          globalThis.LINGUI_LOCALE_DATA = ${JSON.stringify({
-            [i18n.locale]: i18n.messages
-          })};
-          globalThis.__DEV__ = ${__DEV__}
-          globalThis.readonly=${readonly};
-          globalThis.noToolbar=${noToolbar};
-          globalThis.noHeader=${noHeader};
+            injectedJavaScript={`
+              globalThis.__DEV__ = ${__DEV__}
+              globalThis.readonly=${readonly};
+              globalThis.noToolbar=${noToolbar};
+              globalThis.noHeader=${noHeader};
+              globalThis.LINGUI_LOCALE = "${i18n.locale}";
+              globalThis.LINGUI_LOCALE_DATA = ${JSON.stringify({
+                [i18n.locale]: i18n.messages
+              })};
+              globalThis.loadApp();
           `}
             useSharedProcessPool={false}
             javaScriptEnabled={true}
@@ -202,11 +203,13 @@ const useLockedNoteHandler = () => {
 
   useEffect(() => {
     for (const tab of useTabStore.getState().tabs) {
-      const noteId = useTabStore.getState().getTab(tab.id)?.noteId;
+      const noteId = useTabStore.getState().getTab(tab.id)?.session?.noteId;
       if (!noteId) continue;
-      if (tabRef.current && tabRef.current.noteLocked) {
+      if (tabRef.current && tabRef.current.session?.noteLocked) {
         useTabStore.getState().updateTab(tabRef.current.id, {
-          locked: true
+          session: {
+            locked: true
+          }
         });
       }
     }
@@ -220,33 +223,38 @@ const useLockedNoteHandler = () => {
         biometryAvailable: !!biometry,
         biometryEnrolled: !!fingerprint
       });
-      syncTabs();
+      syncTabs("biometry");
     })();
   }, [tab?.id]);
 
   useEffect(() => {
     const unlockWithBiometrics = async () => {
       try {
-        if (!tabRef.current?.noteLocked || !tabRef.current) return;
+        if (!tabRef.current?.session?.noteLocked || !tabRef.current) return;
         console.log("Trying to unlock with biometrics...");
         const credentials = await BiometricService.getCredentials(
           "Unlock note",
           "Unlock note to open it in editor."
         );
 
-        if (credentials && credentials?.password && tabRef.current.noteId) {
+        if (
+          credentials &&
+          credentials?.password &&
+          tabRef.current.session?.noteId
+        ) {
           const note = await db.vault.open(
-            tabRef.current.noteId,
+            tabRef.current.session?.noteId,
             credentials?.password
           );
 
           eSendEvent(eOnLoadNote, {
-            item: note
+            item: note,
+            refresh: true
           });
-
-          useTabStore.getState().updateTab(tabRef.current.id, {
-            locked: false
-          });
+        } else {
+          if (tabRef.current && tabRef.current.session?.locked) {
+            editorController.current?.commands.focusPassInput();
+          }
         }
       } catch (e) {
         console.error(e);
@@ -260,7 +268,7 @@ const useLockedNoteHandler = () => {
       password: string;
       biometrics?: boolean;
     }) => {
-      if (!tabRef.current?.noteId || !tabRef.current) return;
+      if (!tabRef.current?.session?.noteId || !tabRef.current) return;
       if (!password || password.trim().length === 0) {
         ToastManager.show({
           heading: strings.passwordNotEntered(),
@@ -270,7 +278,10 @@ const useLockedNoteHandler = () => {
       }
 
       try {
-        const note = await db.vault.open(tabRef.current?.noteId, password);
+        const note = await db.vault.open(
+          tabRef.current?.session?.noteId,
+          password
+        );
         if (enrollBiometrics && note) {
           try {
             const unlocked = await db.vault.unlock(password);
@@ -298,13 +309,10 @@ const useLockedNoteHandler = () => {
           }
         }
         eSendEvent(eOnLoadNote, {
-          item: note
-        });
-        useTabStore.getState().updateTab(tabRef.current.id, {
-          locked: false
+          item: note,
+          refresh: true
         });
       } catch (e) {
-        console.log(e);
         ToastManager.show({
           heading: strings.passwordIncorrect(),
           type: "error"
@@ -314,7 +322,7 @@ const useLockedNoteHandler = () => {
 
     const unlock = () => {
       if (
-        (tabRef.current?.locked,
+        (tabRef.current?.session?.locked,
         useTabStore.getState().biometryAvailable &&
           useTabStore.getState().biometryEnrolled &&
           !editorState().movedAway)
@@ -323,10 +331,9 @@ const useLockedNoteHandler = () => {
           unlockWithBiometrics();
         }, 150);
       } else {
-        console.log("Biometrics unavailable.", editorState().movedAway);
         if (!editorState().movedAway) {
           setTimeout(() => {
-            if (tabRef.current && tabRef.current?.locked) {
+            if (tabRef.current && tabRef.current?.session?.locked) {
               editorController.current?.commands.focus(tabRef.current?.id);
             }
           }, 100);
@@ -341,13 +348,16 @@ const useLockedNoteHandler = () => {
       }),
       eSubscribeEvent(eUnlockWithPassword, onSubmit)
     ];
-    if (tabRef.current?.locked && tabBarRef.current?.page() === 2) {
+    if (
+      tabRef.current?.session?.locked &&
+      fluidTabsRef.current?.page() === "editor"
+    ) {
       unlock();
     }
     return () => {
       subs.map((s) => s?.unsubscribe());
     };
-  }, [tab?.id, tab?.locked]);
+  }, [tab?.id, tab?.session?.locked]);
 
   return null;
 };
