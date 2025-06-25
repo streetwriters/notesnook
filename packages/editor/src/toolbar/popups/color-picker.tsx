@@ -171,13 +171,16 @@ export function ColorPicker(props: ColorPickerProps) {
         ) : null}
         <Flex>
           <Flex
-            className="hide-scrollbar"
             sx={{
               flex: 1,
               p: 1,
               overflowX: ["auto", "hidden"],
               flexWrap: ["nowrap", "wrap"],
-              overflowY: ["hidden", "auto"]
+              overflowY: ["auto", "auto"],
+              maxHeight: "250px"
+            }}
+            onWheel={(e) => {
+              e.stopPropagation();
             }}
           >
             {!deleteMode && (
