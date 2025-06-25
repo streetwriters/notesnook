@@ -35,7 +35,7 @@
     "electron-updater": "^6.6.2",
     "icojs": "^0.19.5",
     "sqlite-better-trigram": "0.0.3",
-    "sqlite3-fts5-html": "^0.0.3",
+    "sqlite3-fts5-html": "^0.0.4",
     "typed-emitter": "^2.1.0",
     "yargs": "^17.7.2",
     "zod": "3.24.3"
