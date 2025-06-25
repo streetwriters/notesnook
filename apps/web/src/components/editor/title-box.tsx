@@ -100,6 +100,7 @@ function TitleBox(props: TitleBoxProps) {
       ref={inputRef}
       variant="clean"
       id="editor-title"
+      data-session-id={id}
       data-test-id="editor-title"
       className="editorTitle"
       placeholder={strings.noteTitle()}
@@ -126,13 +127,18 @@ function TitleBox(props: TitleBoxProps) {
         if (e.key === "Enter") {
           e.preventDefault();
         }
+
+        const isAtEnd =
+          inputRef.current?.selectionStart === inputRef.current?.value.length;
+        if (e.key === "ArrowDown" && isAtEnd) {
+          e.preventDefault();
+          focusEditor(id);
+        }
       }}
       onKeyUp={(e) => {
         if (e.key === "Enter") {
           e.preventDefault();
-          const context = useEditorManager.getState().getEditor(id);
-          if (!context) return;
-          context.editor?.focus({ scrollIntoView: true });
+          focusEditor(id);
         }
       }}
       onChange={(e) => {
@@ -187,4 +193,10 @@ function withSelectionPersist(
     selection.end,
     selection.direction || undefined
   );
+}
+
+function focusEditor(id: string) {
+  const context = useEditorManager.getState().getEditor(id);
+  if (!context) return;
+  context.editor?.focus({ scrollIntoView: true });
 }
