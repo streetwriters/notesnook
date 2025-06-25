@@ -27,6 +27,9 @@ export type DialogInfo = {
   paragraph?: string;
   positiveText: string;
   negativeText: string;
+  background?: string;
+  transparent?: boolean;
+  statusBarTranslucent?: boolean;
   positivePress?: (...args: any[]) => Promise<any>;
   onClose?: () => void;
   positiveType?:

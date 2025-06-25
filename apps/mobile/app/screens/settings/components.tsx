@@ -43,6 +43,8 @@ import ThemeSelector from "./theme-selector";
 import { TitleFormat } from "./title-format";
 import { View } from "react-native";
 import { DefaultAppStyles } from "../../utils/styles";
+import { ChangePassword } from "../../components/auth/change-password";
+import { ChangeEmail } from "./change-email";
 
 export const components: { [name: string]: ReactElement } = {
   colorpicker: <AccentColorPicker />,
@@ -69,5 +71,7 @@ export const components: { [name: string]: ReactElement } = {
       <AttachmentGroupProgress groupId="offline-mode" />
     </View>
   ),
-  "sidebar-tab-selector": <SidebarTabPicker />
+  "sidebar-tab-selector": <SidebarTabPicker />,
+  "change-password": <ChangePassword />,
+  "change-email": <ChangeEmail />
 };

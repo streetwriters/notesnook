@@ -16,35 +16,22 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import React, { RefObject, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { TextInput, View } from "react-native";
-import { ActionSheetRef } from "react-native-actions-sheet";
 import { db } from "../../../common/database";
-import {
-  eSendEvent,
-  presentSheet,
-  PresentSheetOptions,
-  ToastManager
-} from "../../../services/event-manager";
-import DialogHeader from "../../dialog/dialog-header";
-import { Button } from "../../ui/button";
-import Input from "../../ui/input";
+import { eSendEvent, ToastManager } from "../../../services/event-manager";
 import { eUserLoggedIn } from "../../../utils/events";
 import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../../utils/styles";
-
-type ChangeEmailProps = {
-  actionSheetRef: RefObject<ActionSheetRef>;
-  close?: () => void;
-  update?: (options: PresentSheetOptions) => void;
-};
+import Input from "../../../components/ui/input";
+import { Button } from "../../../components/ui/button";
 
 enum EmailChangeSteps {
   verify,
   changeEmail
 }
 
-export const ChangeEmail = ({ close }: ChangeEmailProps) => {
+export const ChangeEmail = () => {
   const [step, setStep] = useState(EmailChangeSteps.verify);
   const emailChangeData = useRef<{
     email?: string;
@@ -103,10 +90,6 @@ export const ChangeEmail = ({ close }: ChangeEmailProps) => {
 
   return (
     <View style={{ paddingHorizontal: DefaultAppStyles.GAP }}>
-      <DialogHeader
-        title={strings.changeEmail()}
-        paragraph={strings.changeEmailDesc()}
-      />
       <View
         style={{
           marginTop: DefaultAppStyles.GAP_VERTICAL
@@ -156,23 +139,12 @@ export const ChangeEmail = ({ close }: ChangeEmailProps) => {
             : strings.changeEmail()
         }
         type="accent"
-        width={250}
+        style={{
+          width: "100%"
+        }}
         loading={loading}
         onPress={onSubmit}
-        style={{
-          borderRadius: 100,
-          height: 45,
-          marginTop: 2
-        }}
       />
     </View>
   );
-};
-
-ChangeEmail.present = () => {
-  presentSheet({
-    component: (ref, close, update) => (
-      <ChangeEmail actionSheetRef={ref} close={close} update={update} />
-    )
-  });
 };

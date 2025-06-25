@@ -24,12 +24,8 @@ import { View } from "react-native";
 import { ScrollView } from "react-native-actions-sheet";
 import { db } from "../../common/database/index";
 import useTimer from "../../hooks/use-timer";
-import {
-  eSendEvent,
-  presentSheet,
-  ToastManager
-} from "../../services/event-manager";
-import { eCloseSheet } from "../../utils/events";
+import { eSendEvent, ToastManager } from "../../services/event-manager";
+import { eCloseSimpleDialog } from "../../utils/events";
 import { AppFontSize } from "../../utils/size";
 import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
@@ -38,6 +34,7 @@ import { Pressable } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { DefaultAppStyles } from "../../utils/styles";
+import { presentDialog } from "../dialog/functions";
 
 const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
   const { colors } = useThemeColors();
@@ -46,7 +43,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
     method: mfaInfo?.primaryMethod,
     isPrimary: true
   });
-  const { seconds, start } = useTimer(currentMethod.method);
+  const { seconds, start, reset } = useTimer(currentMethod.method);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef();
   const [sending, setSending] = useState(false);
@@ -62,7 +59,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
       },
       (result) => {
         if (result) {
-          eSendEvent(eCloseSheet, "two_factor_verify");
+          eSendEvent(eCloseSimpleDialog, "two_factor_verify");
         }
         setLoading(false);
       }
@@ -133,6 +130,12 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
     <ScrollView
       keyboardShouldPersistTaps="handled"
       keyboardDismissMode="interactive"
+      style={{
+        width: "100%",
+        height: "100%",
+        backgroundColor: colors.primary.background,
+        paddingTop: 60
+      }}
     >
       <View
         style={{
@@ -236,7 +239,10 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
             <Button
               title={strings.cancel()}
               type="secondaryAccented"
-              onPress={onCancel}
+              onPress={() => {
+                reset();
+                onCancel();
+              }}
               width={250}
             />
 
@@ -297,7 +303,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
 };
 
 TwoFactorVerification.present = (onMfaLogin, data, onCancel, context) => {
-  presentSheet({
+  presentDialog({
     component: () => (
       <TwoFactorVerification
         onMfaLogin={onMfaLogin}
@@ -306,7 +312,9 @@ TwoFactorVerification.present = (onMfaLogin, data, onCancel, context) => {
       />
     ),
     context: context || "two_factor_verify",
-    disableClosing: true
+    disableClosing: true,
+    transparent: false,
+    statusBarTranslucent: true
   });
 };
 

@@ -24,7 +24,7 @@ import { clearMessage } from "../../services/message";
 import PremiumService from "../../services/premium";
 import SettingsService from "../../services/settings";
 import { useUserStore } from "../../stores/use-user-store";
-import { eCloseSheet } from "../../utils/events";
+import { eCloseSimpleDialog } from "../../utils/events";
 import TwoFactorVerification from "./two-factor";
 import { strings } from "@notesnook/intl";
 
@@ -92,7 +92,7 @@ export const useLogin = (onFinishLogin, sessionExpired = false) => {
                 } catch (e) {
                   callback && callback(false);
                   if (e.message === "invalid_grant") {
-                    eSendEvent(eCloseSheet, "two_factor_verify");
+                    eSendEvent(eCloseSimpleDialog, "two_factor_verify");
                     setLoading(false);
                     setStep(LoginSteps.emailAuth);
                   }
@@ -100,7 +100,7 @@ export const useLogin = (onFinishLogin, sessionExpired = false) => {
               },
               mfaInfo,
               () => {
-                eSendEvent(eCloseSheet, "two_factor_verify");
+                eSendEvent(eCloseSimpleDialog, "two_factor_verify");
                 setLoading(false);
                 setStep(LoginSteps.emailAuth);
               }

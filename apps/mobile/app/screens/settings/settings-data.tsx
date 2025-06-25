@@ -32,11 +32,9 @@ import { enabled } from "react-native-privacy-snapshot";
 import ScreenGuardModule from "react-native-screenguard";
 import { db } from "../../common/database";
 import filesystem from "../../common/filesystem";
-import { ChangePassword } from "../../components/auth/change-password";
 import { presentDialog } from "../../components/dialog/functions";
 import { AppLockPassword } from "../../components/dialogs/applock-password";
 import { endProgress, startProgress } from "../../components/dialogs/progress";
-import { ChangeEmail } from "../../components/sheets/change-email";
 import ExportNotesSheet from "../../components/sheets/export-notes";
 import { Issue } from "../../components/sheets/github/issue";
 import { Progress } from "../../components/sheets/progress";
@@ -243,17 +241,15 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "change-password",
             name: strings.changePassword(),
-            modifer: async () => {
-              ChangePassword.present();
-            },
-            description: strings.changePasswordDesc()
+            type: "screen",
+            description: strings.changePasswordDesc(),
+            component: "change-password"
           },
           {
             id: "change-email",
             name: strings.changeEmail(),
-            modifer: async () => {
-              ChangeEmail.present();
-            },
+            type: "screen",
+            component: "change-email",
             description: strings.changeEmailDesc()
           },
           {
