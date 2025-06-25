@@ -130,9 +130,17 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
 
   return visible && dialogInfo ? (
     <BaseDialog
-      statusBarTranslucent={false}
+      statusBarTranslucent={
+        dialogInfo.statusBarTranslucent === undefined
+          ? false
+          : dialogInfo.statusBarTranslucent
+      }
       bounce={!dialogInfo.input}
       closeOnTouch={!dialogInfo.disableBackdropClosing}
+      background={dialogInfo.background}
+      transparent={
+        dialogInfo.transparent === undefined ? true : dialogInfo.transparent
+      }
       onShow={async () => {
         if (dialogInfo.input) {
           inputRef.current?.setNativeProps({

@@ -52,7 +52,14 @@ const useTimer = (initialId?: string) => {
     };
   }, [seconds, id]);
 
-  return { seconds, setId, start };
+  const reset = () => {
+    if (id) {
+      timers[id] = 0;
+      setSeconds(0);
+    }
+  };
+
+  return { seconds, setId, start, reset };
 };
 
 export default useTimer;

@@ -39,6 +39,7 @@ import { hideAuth } from "./common";
 import { ForgotPassword } from "./forgot-password";
 import { useLogin } from "./use-login";
 import { DefaultAppStyles } from "../../utils/styles";
+import { Dialog } from "../dialog";
 
 const LoginSteps = {
   emailAuth: 1,
@@ -89,7 +90,7 @@ export const Login = ({ changeMode }) => {
   return (
     <>
       <ForgotPassword />
-      <SheetProvider context="two_factor_verify" />
+      <Dialog context="two_factor_verify" />
       <View
         style={{
           borderRadius: DDS.isTab ? 5 : 0,
