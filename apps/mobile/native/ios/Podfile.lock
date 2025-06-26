@@ -1352,7 +1352,7 @@ PODS:
     - SDWebImage (~> 5.11.1)
   - react-native-share-extension (2.9.0):
     - React
-  - react-native-sodium (1.6.3):
+  - react-native-sodium (1.6.4):
     - React
   - react-native-theme-switch-animation (0.6.0):
     - DoubleConversion
@@ -2409,11 +2409,11 @@ SPEC CHECKSUMS:
   react-native-orientation-locker: cc6f357b289a2e0dd2210fea0c52cb8e0727fdaa
   react-native-pager-view: 5aaf51a9338f7997b8acee0e0febfddd1ade5c0a
   react-native-pdf: 6a51a22ccefb23eb93298771e4bf090913e86d70
-  react-native-quick-sqlite: 6aebe0e1c264c48450059e271e5d2404013cea93
+  react-native-quick-sqlite: d09ab51a1111d7713a2f38fe7805e021a74fe877
   react-native-safe-area-context: 9d72abf6d8473da73033b597090a80b709c0b2f1
   react-native-screenguard: 82437eeb0086a90b5e5d7e54130bb04fb406373e
   react-native-share-extension: bcb7e466390a9e50c742f4b1019d6f181aedd7ad
-  react-native-sodium: aa26d9f46dcfdebd92d3af793b74fbb234a4d75d
+  react-native-sodium: 5b55f74705005612e12838ffd583927229a65e6a
   react-native-theme-switch-animation: d90fe2de0d9e87a63cd6235d98cba6e7054e9a10
   react-native-webview: 079eca50edf657503318b66687dadfb903731aa8
   React-nativeconfig: ecf4dc92c40b97e2b3f0c619938f78bfd6507b08
