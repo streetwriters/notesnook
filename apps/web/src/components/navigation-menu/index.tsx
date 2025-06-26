@@ -113,6 +113,7 @@ type Route = {
   path: string;
   icon: Icon;
   tag?: string;
+  loginRequired?: boolean;
 };
 
 const routes: Route[] = [
@@ -133,7 +134,8 @@ const routes: Route[] = [
     id: "monographs",
     title: strings.routes.Monographs(),
     path: "/monographs",
-    icon: Monographs
+    icon: Monographs,
+    loginRequired: true
   },
   { id: "trash", title: strings.routes.Trash(), path: "/trash", icon: Trash },
   {
@@ -449,9 +451,12 @@ function Routes({
   collapse: () => void;
 }) {
   const hiddenRoutes = useAppStore((store) => store.hiddenRoutes);
+  const isLoggedIn = useUserStore((store) => store.isLoggedIn);
   return (
     <ReorderableList
-      items={routes.filter((r) => !hiddenRoutes.includes(r.id))}
+      items={routes
+        .filter((r) => !hiddenRoutes.includes(r.id))
+        .filter((r) => (r.loginRequired ? isLoggedIn : true))}
       orderKey={`sidebarOrder:routes`}
       order={() => db.settings.getSideBarOrder("routes")}
       onOrderChanged={(order) => db.settings.setSideBarOrder("routes", order)}
