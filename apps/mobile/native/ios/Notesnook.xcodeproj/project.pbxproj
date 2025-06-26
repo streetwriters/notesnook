@@ -20,6 +20,10 @@
 		6517B7C12B6838EB0079FF37 /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6517B7BE2B6838EB0079FF37 /* OpenSans-Regular.ttf */; };
 		6517B7C22B6838EB0079FF37 /* OpenSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6517B7BF2B6838EB0079FF37 /* OpenSans-SemiBold.ttf */; };
 		6517B7C32B6838EB0079FF37 /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6517B7C02B6838EB0079FF37 /* OpenSans-Bold.ttf */; };
+		651F09DA2E0D262B00495DED /* fts5-html.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 651F09D92E0D262B00495DED /* fts5-html.xcframework */; };
+		651F09DB2E0D262B00495DED /* fts5-html.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 651F09D92E0D262B00495DED /* fts5-html.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		651F09DD2E0D263300495DED /* fts5-html.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 651F09D92E0D262B00495DED /* fts5-html.xcframework */; };
+		651F09DE2E0D263300495DED /* fts5-html.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 651F09D92E0D262B00495DED /* fts5-html.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6529A13E279BC4C70048D4A8 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6529A13D279BC4C70048D4A8 /* BootSplash.storyboard */; };
 		656835812BB29A9800144BAB /* OpenSans-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 656835802BB29A8300144BAB /* OpenSans-Italic.ttf */; };
 		6569927F2C5754F10041CD41 /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6517B7C02B6838EB0079FF37 /* OpenSans-Bold.ttf */; };
@@ -79,6 +83,28 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		651F09DC2E0D262C00495DED /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				651F09DB2E0D262B00495DED /* fts5-html.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		651F09DF2E0D263300495DED /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				651F09DE2E0D263300495DED /* fts5-html.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		65A7F34B255687E600699170 /* Embed App Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -120,11 +146,11 @@
 		6517B7BE2B6838EB0079FF37 /* OpenSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "OpenSans-Regular.ttf"; path = "../../../../packages/editor-mobile/public/fonts/OpenSans-Regular.ttf"; sourceTree = "<group>"; };
 		6517B7BF2B6838EB0079FF37 /* OpenSans-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "OpenSans-SemiBold.ttf"; path = "../../../../packages/editor-mobile/public/fonts/OpenSans-SemiBold.ttf"; sourceTree = "<group>"; };
 		6517B7C02B6838EB0079FF37 /* OpenSans-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "OpenSans-Bold.ttf"; path = "../../../../packages/editor-mobile/public/fonts/OpenSans-Bold.ttf"; sourceTree = "<group>"; };
+		651F09D92E0D262B00495DED /* fts5-html.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = "fts5-html.xcframework"; sourceTree = "<group>"; };
 		6529A13D279BC4C70048D4A8 /* BootSplash.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = BootSplash.storyboard; path = Notesnook/BootSplash.storyboard; sourceTree = "<group>"; };
 		6529D2B0257B4A2900B49BC3 /* NotesnookDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = NotesnookDebug.entitlements; path = Notesnook/NotesnookDebug.entitlements; sourceTree = "<group>"; };
 		656835802BB29A8300144BAB /* OpenSans-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "OpenSans-Italic.ttf"; path = "../../../../packages/editor-mobile/public/fonts/OpenSans-Italic.ttf"; sourceTree = "<group>"; };
 		6593E4A2281C345400492C50 /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = Notesnook/AppDelegate.mm; sourceTree = "<group>"; };
-		6594DDF22CD8BFE8007F5EC2 /* BetterTrigram.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = BetterTrigram.xcframework; sourceTree = "<group>"; };
 		659BE46625E11A5100E05671 /* notesnook-text.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "notesnook-text.png"; path = "Notesnook/Images.xcassets/notesnook-text.png"; sourceTree = "<group>"; };
 		65A7F34F255689AD00699170 /* Notesnook.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Notesnook.entitlements; path = Notesnook/Notesnook.entitlements; sourceTree = "<group>"; };
 		65AA857725E6DDEC00772A01 /* NotesWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NotesWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -177,6 +203,7 @@
 			files = (
 				2B3F87EC6B2264CD8ABA5DA8 /* libPods-Notesnook.a in Frameworks */,
 				6515C42F2580AA3000E83E39 /* StoreKit.framework in Frameworks */,
+				651F09DA2E0D262B00495DED /* fts5-html.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -209,6 +236,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				651F09DD2E0D263300495DED /* fts5-html.xcframework in Frameworks */,
 				C619D096A9DE2070DBEAC70F /* libPods-Make Note.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -256,7 +284,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				6594DDF22CD8BFE8007F5EC2 /* BetterTrigram.xcframework */,
+				651F09D92E0D262B00495DED /* fts5-html.xcframework */,
 				6515C42E2580AA2F00E83E39 /* StoreKit.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
@@ -400,6 +428,7 @@
 				240525450DF9ABA0F332B52E /* [CP] Copy Pods Resources */,
 				65A7F34B255687E600699170 /* Embed App Extensions */,
 				48C834D962D612F18A0388B3 /* [CP] Embed Pods Frameworks */,
+				651F09DC2E0D262C00495DED /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -478,6 +507,7 @@
 				65B5013E25A672B200E2D264 /* Resources */,
 				658D06A625A7446E008C70C0 /* Run Script */,
 				E81EC4451F76606456BCA61F /* [CP] Copy Pods Resources */,
+				651F09DF2E0D263300495DED /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1772,10 +1802,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
@@ -1840,10 +1867,7 @@
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
