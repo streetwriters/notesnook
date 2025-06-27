@@ -17,19 +17,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import React from "react";
 import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
 import { Header } from "../../components/header";
 import List from "../../components/list";
 import SelectionHeader from "../../components/selection-header";
-import ReminderSheet from "../../components/sheets/reminder";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useReminders } from "../../stores/use-reminder-store";
-import { strings } from "@notesnook/intl";
+import AddReminder from "../add-reminder";
 
 export const Reminders = ({
   navigation,
@@ -68,7 +68,7 @@ export const Reminders = ({
         }}
         id={route.name}
         onPressDefaultRightButton={() => {
-          ReminderSheet.present();
+          AddReminder.present();
         }}
       />
 
@@ -84,7 +84,7 @@ export const Reminders = ({
             paragraph: strings.remindersEmpty(),
             button: strings.setReminder(),
             action: () => {
-              ReminderSheet.present();
+              AddReminder.present();
             },
             loading: strings.loadingReminders()
           }}
@@ -92,7 +92,7 @@ export const Reminders = ({
 
         <FloatingButton
           onPress={() => {
-            ReminderSheet.present();
+            AddReminder.present();
           }}
           alwaysVisible
         />

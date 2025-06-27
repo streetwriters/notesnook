@@ -38,11 +38,11 @@ import { WebViewMessageEvent } from "react-native-webview";
 import { DatabaseLogger, db } from "../../../common/database";
 import downloadAttachment from "../../../common/filesystem/download-attachment";
 import { AuthMode } from "../../../components/auth/common";
+import { Properties } from "../../../components/properties";
 import EditorTabs from "../../../components/sheets/editor-tabs";
 import { Issue } from "../../../components/sheets/github/issue";
 import LinkNote from "../../../components/sheets/link-note";
 import { RelationsList } from "../../../components/sheets/relations-list";
-import ReminderSheet from "../../../components/sheets/reminder";
 import TableOfContents from "../../../components/sheets/toc";
 import { DDS } from "../../../services/device-detection";
 import {
@@ -73,13 +73,13 @@ import {
 } from "../../../utils/events";
 import { openLinkInBrowser } from "../../../utils/functions";
 import { fluidTabsRef } from "../../../utils/global-refs";
+import { sleep } from "../../../utils/time";
+import ManageTags from "../../manage-tags";
 import { useDragState } from "../../settings/editor/state";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { useTabStore } from "./use-tab-store";
 import { editorState, openInternalLink } from "./utils";
-import { Properties } from "../../../components/properties";
-import { sleep } from "../../../utils/time";
-import ManageTags from "../../manage-tags";
+import AddReminder from "../../add-reminder";
 
 const publishNote = async () => {
   const user = useUserStore.getState().user;
@@ -438,7 +438,7 @@ export const useEditorEvents = (
             referenceType: "reminder",
             relationType: "from",
             title: strings.dataTypesPluralCamelCase.reminder(),
-            onAdd: () => ReminderSheet.present(undefined, note, true)
+            onAdd: () => AddReminder.present(undefined, note)
           });
           break;
         case EditorEvents.newtag:

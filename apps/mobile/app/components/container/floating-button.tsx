@@ -36,6 +36,7 @@ import { getElevationStyle } from "../../utils/elevation";
 import { AppFontSize, normalize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { hexToRGBA, RGB_Linear_Shade } from "../../utils/colors";
+import useKeyboard from "../../hooks/use-keyboard";
 
 interface FloatingButtonProps {
   onPress: () => void;

@@ -34,7 +34,7 @@ import { AppFontSize } from "../../../utils/size";
 import DialogHeader from "../../dialog/dialog-header";
 import List from "../../list";
 import SheetProvider from "../../sheet-provider";
-import { Button } from "../../ui/button";
+import { Button, ButtonProps } from "../../ui/button";
 import { PressableProps } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
 import { DefaultAppStyles } from "../../../utils/styles";
@@ -47,16 +47,8 @@ type RelationsListProps = {
   referenceType: string;
   relationType: "to" | "from";
   title: string;
-  button?: Button;
+  button?: ButtonProps;
   onAdd: () => void;
-};
-
-type Button = {
-  onPress?: (() => void) | undefined;
-  loading?: boolean | undefined;
-  title?: string | undefined;
-  type?: PressableProps["type"];
-  icon?: string;
 };
 
 const IconsByType = {
@@ -154,7 +146,7 @@ RelationsList.present = ({
   referenceType: string;
   relationType: "to" | "from";
   title: string;
-  button?: Button;
+  button?: ButtonProps;
   onAdd: () => void;
 }) => {
   presentSheet({

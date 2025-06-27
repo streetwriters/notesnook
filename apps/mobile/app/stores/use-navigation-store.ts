@@ -94,6 +94,10 @@ export interface RouteParams extends ParamListBase {
   ManageTags: {
     ids?: string[];
   };
+  AddReminder: {
+    reminder?: Reminder;
+    reference?: Note;
+  };
 }
 
 export type RouteName = keyof RouteParams;

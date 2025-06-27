@@ -16,49 +16,31 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { useThemeColors } from "@notesnook/theme";
-import React, { RefObject, useRef, useState } from "react";
-import {
-  Platform,
-  TextInput,
-  View,
-  ScrollView as RNScrollView
-} from "react-native";
-import { ActionSheetRef, ScrollView } from "react-native-actions-sheet";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
-import {
-  PresentSheetOptions,
-  ToastManager,
-  presentSheet
-} from "../../../services/event-manager";
-import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
-import { Button } from "../../ui/button";
-import Input from "../../ui/input";
-
-import dayjs from "dayjs";
-import DatePicker from "react-native-date-picker";
-import { db } from "../../../common/database";
-import { DDS } from "../../../services/device-detection";
-import Navigation from "../../../services/navigation";
-import Notifications from "../../../services/notifications";
-import PremiumService from "../../../services/premium";
-import SettingsService from "../../../services/settings";
-import { useRelationStore } from "../../../stores/use-relation-store";
-import { Dialog } from "../../dialog";
-import { ReminderTime } from "../../ui/reminder-time";
-import Heading from "../../ui/typography/heading";
-import Paragraph from "../../ui/typography/paragraph";
 import { Note, Reminder } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { DefaultAppStyles } from "../../../utils/styles";
-
-type ReminderSheetProps = {
-  actionSheetRef: RefObject<ActionSheetRef>;
-  close?: (ctx?: string) => void;
-  update?: (options: PresentSheetOptions) => void;
-  reminder?: Reminder;
-  reference?: Note;
-};
+import { useThemeColors } from "@notesnook/theme";
+import dayjs from "dayjs";
+import React, { useRef, useState } from "react";
+import { Platform, ScrollView, TextInput, View } from "react-native";
+import DatePicker from "react-native-date-picker";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { db } from "../../common/database";
+import { Dialog } from "../../components/dialog";
+import { Header } from "../../components/header";
+import { Button } from "../../components/ui/button";
+import Input from "../../components/ui/input";
+import { ReminderTime } from "../../components/ui/reminder-time";
+import Paragraph from "../../components/ui/typography/paragraph";
+import { DDS } from "../../services/device-detection";
+import { ToastManager } from "../../services/event-manager";
+import Navigation, { NavigationProps } from "../../services/navigation";
+import Notifications from "../../services/notifications";
+import PremiumService from "../../services/premium";
+import SettingsService from "../../services/settings";
+import { useRelationStore } from "../../stores/use-relation-store";
+import { AppFontSize, defaultBorderRadius } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 
 const ReminderModes =
   Platform.OS === "ios"
@@ -97,13 +79,8 @@ const ReminderNotificationModes = {
   Urgent: "urgent"
 };
 
-export default function ReminderSheet({
-  actionSheetRef,
-  close,
-  update,
-  reminder,
-  reference
-}: ReminderSheetProps) {
+export default function AddReminder(props: NavigationProps<"AddReminder">) {
+  const { reminder, reference } = props.route.params;
   const { colors, isDark } = useThemeColors();
   const [reminderMode, setReminderMode] = useState<Reminder["mode"]>(
     reminder?.mode || "once"
@@ -216,28 +193,33 @@ export default function ReminderSheet({
       Notifications.scheduleNotification(_reminder as Reminder);
       Navigation.queueRoutesForUpdate();
       useRelationStore.getState().update();
-      close?.();
+      Navigation.goBack();
     } catch (e) {
-      ToastManager.error(e as Error, undefined, "local");
+      ToastManager.error(e as Error, undefined);
     }
   }
 
   return (
-    <View
+    <SafeAreaView
       style={{
-        paddingHorizontal: DefaultAppStyles.GAP,
-        maxHeight: "100%"
+        backgroundColor: colors.primary.background,
+        flex: 1
       }}
     >
-      <Heading size={AppFontSize.lg}>
-        {reminder ? strings.editReminder() : strings.newReminder()}
-      </Heading>
-
+      <Header
+        title={reminder ? strings.editReminder() : strings.newReminder()}
+        canGoBack
+        rightButton={{
+          name: "check",
+          onPress: saveReminder
+        }}
+      />
       <Dialog context="local" />
       <ScrollView
         bounces={false}
         style={{
-          marginBottom: DDS.isTab ? 25 : undefined
+          marginBottom: DDS.isTab ? 25 : undefined,
+          paddingHorizontal: DefaultAppStyles.GAP
         }}
       >
         <Input
@@ -274,8 +256,7 @@ export default function ReminderSheet({
         <ScrollView
           style={{
             flexDirection: "row",
-            marginBottom: DefaultAppStyles.GAP_VERTICAL,
-            height: 50
+            marginBottom: DefaultAppStyles.GAP_VERTICAL
           }}
           horizontal
         >
@@ -286,10 +267,8 @@ export default function ReminderSheet({
                 ReminderModes[mode as keyof typeof ReminderModes] as string
               )}
               style={{
-                marginRight: 12,
-                borderRadius: 100,
-                minWidth: 70,
-                paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
+                paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
+                marginRight: DefaultAppStyles.GAP_SMALL
               }}
               proTag={mode === "Repeat"}
               height={35}
@@ -368,7 +347,7 @@ export default function ReminderSheet({
               ))}
             </View>
 
-            <RNScrollView showsHorizontalScrollIndicator={false} horizontal>
+            <ScrollView showsHorizontalScrollIndicator={false} horizontal>
               {recurringMode === RecurringModes.Daily ||
               recurringMode === RecurringModes.Year
                 ? null
@@ -429,7 +408,7 @@ export default function ReminderSheet({
                       }}
                     />
                   ))}
-            </RNScrollView>
+            </ScrollView>
           </View>
         ) : null}
 
@@ -546,7 +525,7 @@ export default function ReminderSheet({
         />
 
         {reminderMode === ReminderModes.Permanent ? null : (
-          <RNScrollView
+          <ScrollView
             style={{
               flexDirection: "row",
               marginTop: DefaultAppStyles.GAP_VERTICAL,
@@ -562,7 +541,6 @@ export default function ReminderSheet({
                 )}
                 style={{
                   marginRight: 12,
-                  borderRadius: 100,
                   paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
                 }}
                 icon={
@@ -572,6 +550,7 @@ export default function ReminderSheet({
                     ? "vibrate"
                     : "volume-high"
                 }
+                fontSize={AppFontSize.xs}
                 height={35}
                 type={
                   reminderNotificationMode ===
@@ -592,39 +571,16 @@ export default function ReminderSheet({
                 }}
               />
             ))}
-          </RNScrollView>
+          </ScrollView>
         )}
       </ScrollView>
-
-      <Button
-        title={strings.save()}
-        type="accent"
-        style={{
-          paddingHorizontal: DefaultAppStyles.GAP * 2,
-          marginTop: DefaultAppStyles.GAP_VERTICAL,
-          width: "100%"
-        }}
-        onPress={saveReminder}
-      />
-    </View>
+    </SafeAreaView>
   );
 }
 
-ReminderSheet.present = (
-  reminder?: Reminder,
-  reference?: Note,
-  isSheet?: boolean
-) => {
-  presentSheet({
-    context: isSheet ? "local" : undefined,
-    component: (ref, close, update) => (
-      <ReminderSheet
-        actionSheetRef={ref}
-        close={close}
-        update={update}
-        reminder={reminder}
-        reference={reference}
-      />
-    )
+AddReminder.present = (reminder?: Reminder, reference?: Note) => {
+  Navigation.navigate("AddReminder", {
+    reminder,
+    reference
   });
 };

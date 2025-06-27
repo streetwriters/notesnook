@@ -49,7 +49,6 @@ import { MMKV } from "../common/database/mmkv";
 import { endProgress, startProgress } from "../components/dialogs/progress";
 import Migrate from "../components/sheets/migrate";
 import NewFeature from "../components/sheets/new-feature";
-import ReminderSheet from "../components/sheets/reminder";
 import { Walkthrough } from "../components/walkthroughs";
 import {
   resetTabStore,
@@ -103,6 +102,7 @@ import { getGithubVersion } from "../utils/github-version";
 import { fluidTabsRef } from "../utils/global-refs";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { sleep } from "../utils/time";
+import AddReminder from "../screens/add-reminder";
 
 const onCheckSyncStatus = async (type: SyncStatusEvent) => {
   const { disableSync, disableAutoSync } = SettingsService.get();
@@ -182,10 +182,10 @@ const onAppOpenedFromURL = async (event: { url: string }) => {
       const id = new URL(url).searchParams.get("id");
       if (id) {
         const reminder = await db.reminders.reminder(id);
-        if (reminder) ReminderSheet.present(reminder);
+        if (reminder) AddReminder.present(reminder);
       }
     } else if (url.startsWith("https://notesnook.com/new_reminder")) {
-      ReminderSheet.present();
+      AddReminder.present();
     }
   } catch (e) {
     console.error(e);

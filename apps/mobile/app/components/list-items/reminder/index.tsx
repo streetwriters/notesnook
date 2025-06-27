@@ -17,24 +17,26 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { Reminder } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../../e2e/test.ids";
-import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
+import useIsSelected from "../../../hooks/use-selected";
+import AddReminder from "../../../screens/add-reminder";
+import { eSendEvent } from "../../../services/event-manager";
+import { useSelectionStore } from "../../../stores/use-selection-store";
+import { eCloseSheet } from "../../../utils/events";
+import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
+import { DefaultAppStyles } from "../../../utils/styles";
 import { Properties } from "../../properties";
-import ReminderSheet from "../../sheets/reminder";
+import AppIcon from "../../ui/AppIcon";
 import { IconButton } from "../../ui/icon-button";
 import { ReminderTime } from "../../ui/reminder-time";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import SelectionWrapper, { selectItem } from "../selection-wrapper";
-import { strings } from "@notesnook/intl";
-import { useSelectionStore } from "../../../stores/use-selection-store";
-import useIsSelected from "../../../hooks/use-selected";
-import AppIcon from "../../ui/AppIcon";
-import { DefaultAppStyles } from "../../../utils/styles";
 
 const ReminderItem = React.memo(
   ({
@@ -49,8 +51,10 @@ const ReminderItem = React.memo(
     const { colors } = useThemeColors();
     const openReminder = () => {
       if (selectItem(item)) return;
-
-      ReminderSheet.present(item, undefined, isSheet);
+      AddReminder.present(item, undefined);
+      if (isSheet) {
+        eSendEvent(eCloseSheet);
+      }
     };
     const selectionMode = useSelectionStore((state) => state.selectionMode);
     const [selected] = useIsSelected(item);

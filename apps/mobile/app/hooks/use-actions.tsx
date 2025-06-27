@@ -41,7 +41,6 @@ import ExportNotesSheet from "../components/sheets/export-notes";
 import PublishNoteSheet from "../components/sheets/publish-note";
 import { ReferencesList } from "../components/sheets/references";
 import { RelationsList } from "../components/sheets/relations-list/index";
-import ReminderSheet from "../components/sheets/reminder";
 import { useSideBarDraggingStore } from "../components/side-menu/dragging-store";
 import { ButtonProps } from "../components/ui/button";
 import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
@@ -54,19 +53,20 @@ import {
 } from "../services/event-manager";
 import Navigation from "../services/navigation";
 import Notifications from "../services/notifications";
+import SettingsService from "../services/settings";
+import { useArchivedStore } from "../stores/use-archived-store";
 import { useMenuStore } from "../stores/use-menu-store";
 import useNavigationStore from "../stores/use-navigation-store";
 import { useRelationStore } from "../stores/use-relation-store";
 import { useSelectionStore } from "../stores/use-selection-store";
+import { useSettingStore } from "../stores/use-setting-store";
 import { useTagStore } from "../stores/use-tag-store";
 import { useUserStore } from "../stores/use-user-store";
 import { eUpdateNoteInEditor } from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { convertNoteToText } from "../utils/note-to-text";
 import { sleep } from "../utils/time";
-import SettingsService from "../services/settings";
-import { useSettingStore } from "../stores/use-setting-store";
-import { useArchivedStore } from "../stores/use-archived-store";
+import AddReminder from "../screens/add-reminder";
 
 export type ActionId =
   | "select"
@@ -448,7 +448,8 @@ export const useActions = ({
         title: strings.editReminder(),
         icon: "pencil",
         onPress: async () => {
-          ReminderSheet.present(item);
+          AddReminder.present(item);
+          close();
         }
       }
     );
@@ -908,12 +909,18 @@ export const useActions = ({
             referenceType: "reminder",
             relationType: "from",
             title: strings.dataTypesPluralCamelCase.reminder(),
-            onAdd: () => ReminderSheet.present(undefined, item, true),
+            onAdd: () => {
+              AddReminder.present(undefined, item);
+              close();
+            },
             button: {
-              title: strings.add(),
-              type: "accent",
-              onPress: () => ReminderSheet.present(undefined, item, true),
-              icon: "plus"
+              type: "plain",
+              onPress: () => {
+                AddReminder.present(undefined, item);
+                close();
+              },
+              icon: "plus",
+              iconSize: 20
             }
           });
         }
@@ -957,7 +964,8 @@ export const useActions = ({
         title: strings.remindMe(),
         icon: "clock-plus-outline",
         onPress: () => {
-          ReminderSheet.present(undefined, item);
+          close();
+          AddReminder.present(undefined, item);
         }
       },
       {

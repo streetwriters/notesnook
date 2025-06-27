@@ -18,12 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { Platform } from "react-native";
 import { db } from "../common/database";
-import ReminderSheet from "../components/sheets/reminder";
 import { setAppState } from "../screens/editor/tiptap/utils";
 import { eOnLoadNote } from "../utils/events";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { eSendEvent } from "./event-manager";
 import { fluidTabsRef } from "../utils/global-refs";
+import AddReminder from "../screens/add-reminder";
 
 const launchIntent = Platform.OS === "ios" ? {} : NotesnookModule.getIntent();
 let used = false;
@@ -65,9 +65,9 @@ export const IntentService = {
         const reminder = await db.reminders.reminder(
           intent["com.streetwriters.notesnook.OpenReminderId"]
         );
-        if (reminder) ReminderSheet.present(reminder);
+        if (reminder) AddReminder.present(reminder);
       } else if (intent["com.streetwriters.notesnook.NewReminder"]) {
-        ReminderSheet.present();
+        AddReminder.present();
       }
     } catch (e) {
       /* empty */

@@ -21,6 +21,7 @@ import { useThemeColors } from "@notesnook/theme";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as React from "react";
+import { db } from "../common/database";
 import { hideAllTooltips } from "../hooks/use-tooltip";
 import SettingsService from "../services/settings";
 import useNavigationStore, {
@@ -29,7 +30,6 @@ import useNavigationStore, {
 import { useSelectionStore } from "../stores/use-selection-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { rootNavigatorRef } from "../utils/global-refs";
-import { db } from "../common/database";
 
 const RootStack = createNativeStackNavigator();
 const AppStack = createNativeStackNavigator();
@@ -248,6 +248,7 @@ let MoveNotebook: any = null;
 let MoveNotes: any = null;
 let Settings: any = null;
 let ManageTags: any = null;
+let AddReminder: any = null;
 
 export const RootNavigation = () => {
   const introCompleted = useSettingStore(
@@ -334,6 +335,15 @@ export const RootNavigation = () => {
             ManageTags =
               ManageTags || require("../screens/manage-tags").default;
             return ManageTags;
+          }}
+        />
+
+        <RootStack.Screen
+          name="AddReminder"
+          getComponent={() => {
+            AddReminder =
+              AddReminder || require("../screens/add-reminder").default;
+            return AddReminder;
           }}
         />
       </RootStack.Navigator>
