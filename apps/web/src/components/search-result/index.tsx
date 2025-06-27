@@ -21,7 +21,7 @@ import { HighlightedResult } from "@notesnook/core";
 import { Button, Flex, Text } from "@theme-ui/components";
 import React, { useState } from "react";
 import { useEditorStore } from "../../stores/editor-store";
-
+import { useStore as useNoteStore } from "../../stores/note-store";
 import ListItem from "../list-item";
 import { ChevronDown, ChevronRight } from "../icons";
 import { noteMenuItems } from "../note";
@@ -38,6 +38,7 @@ function SearchResult(props: SearchResultProps) {
   const isOpened = useEditorStore((store) => store.isNoteOpen(item.id));
   const isExpandable = item.content.length > 0;
   const [isExpanded, setIsExpanded] = useState(isExpandable);
+  const isCompact = useNoteStore((store) => store.viewMode === "compact");
 
   if (!item.title.length && !item.content.length) return null;
   return (
@@ -60,7 +61,7 @@ function SearchResult(props: SearchResultProps) {
         }}
         title={
           <Flex sx={{ alignItems: "center", gap: "small" }}>
-            {isExpandable ? (
+            {isExpandable && !isCompact ? (
               <Button
                 variant="secondary"
                 sx={{
@@ -102,7 +103,7 @@ function SearchResult(props: SearchResultProps) {
                   whiteSpace: "nowrap",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
-                  fontWeight: "bold",
+                  fontWeight: isCompact ? "bold" : "bolder",
                   display: "block",
                   ".match": {
                     bg: "accent-secondary",
@@ -134,7 +135,7 @@ function SearchResult(props: SearchResultProps) {
           mx: 1
         }}
       />
-      {isExpanded
+      {isExpanded && !isCompact
         ? item.content.map((match, index) => (
             <ListItem
               key={`${item.id}${index}`}
@@ -162,7 +163,6 @@ function SearchResult(props: SearchResultProps) {
                   color={isOpened ? "paragraph-selected" : "paragraph"}
                   sx={{
                     whiteSpace: "pre-wrap",
-                    fontWeight: "body",
                     display: "block",
                     ".match": {
                       bg: "accent-secondary",
