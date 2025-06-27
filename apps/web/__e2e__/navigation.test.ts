@@ -28,7 +28,6 @@ function createRoute(key: string, header: string) {
 const routes = [
   createRoute("notes", "Notes"),
   createRoute("favorites", "Favorites"),
-  createRoute("monographs", "Monographs"),
   createRoute("reminders", "Reminders"),
   createRoute("trash", "Trash")
 ];
