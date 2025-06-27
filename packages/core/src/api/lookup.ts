@@ -30,12 +30,18 @@ import {
   TrashItem
 } from "../types.js";
 import { DatabaseSchema, RawDatabaseSchema } from "../database/index.js";
-import { AnyColumnWithTable, Kysely, sql } from "@streetwriters/kysely";
+import {
+  AnyColumnWithTable,
+  ExpressionBuilder,
+  Kysely,
+  SelectQueryBuilder,
+  sql
+} from "@streetwriters/kysely";
 import { FilteredSelector } from "../database/sql-collection.js";
 import { VirtualizedGrouping } from "../utils/virtualized-grouping.js";
 import { logger } from "../logger.js";
 import { rebuildSearchIndex } from "../database/fts.js";
-import { transformQuery } from "../utils/query-transformer.js";
+import { QueryTokens, transformQuery } from "../utils/query-transformer.js";
 import { getSortSelectors, groupArray } from "../utils/grouping.js";
 import { fuzzy } from "../utils/fuzzy.js";
 import { extractMatchingBlocks } from "../utils/html-parser.js";
@@ -69,38 +75,36 @@ export default class Lookup {
     return this.toSearchResults(async (limit, sortOptions) => {
       const excludedIds = this.db.trash.cache.notes;
 
-      const { query: transformedQuery, tokens } = transformQuery(query);
+      const { content, title } = transformQuery(query);
 
-      const resultsA: string[] =
-        transformedQuery.length === 0
-          ? []
-          : await this.ftsQueryBuilder(transformedQuery, excludedIds, notes)
-              .select(["results.id"])
-              .groupBy("results.id")
-              .orderBy(
-                sql`SUM(results.rank)`,
-                sortOptions?.sortDirection || "desc"
-              )
-              .execute()
-              .catch((e) => {
-                logger.error(e, `Error while searching`, { query });
-                return [];
-              })
-              .then((r) => r.map((r) => r.id));
+      const ftsResults: string[] =
+        (await this.ftsQueryBuilder(
+          { content: content?.query, title: title?.query },
+          excludedIds,
+          notes
+        )
+          ?.select(["results.id"])
+          .groupBy("results.id")
+          .orderBy(sql`SUM(results.rank)`, sortOptions?.sortDirection || "desc")
+          .execute()
+          .catch((e) => {
+            logger.error(e, `Error while searching`, { query });
+            return [];
+          })
+          .then((r) => r.map((r) => r.id))) || [];
 
-      const smallTokens = [...tokens.andTokens, ...tokens.orTokens].filter(
-        (token) => token.length < 3
-      );
-      if (smallTokens.length === 0) return resultsA;
-
-      const results = await this.regexQueryBuilder(
-        smallTokens,
-        !!transformedQuery && resultsA.length > 0 ? resultsA : notes
+      const regexMatches = await this.regexQueryBuilder(
+        {
+          content: filterSmallTokens(content?.tokens),
+          title: filterSmallTokens(title?.tokens)
+        },
+        (!!content || !!title) && ftsResults.length > 0 ? ftsResults : notes
       )
-        .select("results.id")
+        ?.select("results.id")
         .execute();
+      if (!regexMatches) return ftsResults;
 
-      return results.map((r) => r.id);
+      return regexMatches.map((r) => r.id);
     }, notes || this.db.notes.all);
   }
 
@@ -112,34 +116,107 @@ export default class Lookup {
     const db = this.db.sql() as unknown as Kysely<RawDatabaseSchema>;
     const excludedIds = this.db.trash.cache.notes;
 
-    const { query: transformedQuery, tokens } = transformQuery(query);
+    const {
+      content,
+      title,
+      tag,
+      color,
+      archived,
+      favorite,
+      locked,
+      pinned,
+      readonly,
+      created_before,
+      created_after,
+      edited_after,
+      edited_before,
+      filters
+    } = transformQuery(query);
+
+    const tagIds = tag?.length
+      ? await this.db.tags.all.where((eb) => eb("tags.title", "in", tag)).ids()
+      : [];
+    const colorIds = color?.length
+      ? await this.db.colors.all
+          .where((eb) => eb("colors.title", "in", color))
+          .ids()
+      : [];
+
+    if (filters > 0) {
+      const defaultVault = await this.db.vaults.default();
+      notes = notes.where((eb) => {
+        const exprs = [];
+        if (tagIds.length > 0)
+          exprs.push(
+            eb(
+              "notes.id",
+              "in",
+              this.db.relations
+                .from({ ids: tagIds, type: "tag" }, "note")
+                .selector.filter.select("id")
+            )
+          );
+        if (colorIds.length > 0)
+          exprs.push(
+            eb(
+              "notes.id",
+              "in",
+              this.db.relations
+                .from({ ids: colorIds, type: "color" }, "note")
+                .selector.filter.select("id")
+            )
+          );
+        if (typeof locked === "boolean" && defaultVault) {
+          const filter = this.db.relations
+            .from(defaultVault, "note")
+            .selector.filter.select("id");
+          exprs.push(eb("notes.id", locked ? "in" : "not in", filter));
+        }
+        if (typeof archived === "boolean")
+          exprs.push(eb("notes.archived", "==", archived));
+        if (typeof favorite === "boolean")
+          exprs.push(eb("notes.favorite", "==", favorite));
+        if (typeof pinned === "boolean")
+          exprs.push(eb("notes.pinned", "==", pinned));
+        if (typeof readonly === "boolean")
+          exprs.push(eb("notes.readonly", "==", readonly));
+        if (typeof created_after === "number")
+          exprs.push(eb("notes.dateCreated", ">", created_after));
+        if (typeof created_before === "number")
+          exprs.push(eb("notes.dateCreated", "<", created_before));
+        if (typeof edited_after === "number")
+          exprs.push(eb("notes.dateEdited", ">", edited_after));
+        if (typeof edited_before === "number")
+          exprs.push(eb("notes.dateEdited", "<", edited_before));
+        return eb.and(exprs);
+      });
+    }
 
     console.time("gather matches");
     const ftsResults =
-      transformedQuery.length <= 0
-        ? []
-        : await this.ftsQueryBuilder(transformedQuery, excludedIds, notes)
-            .select(["id", "type", "rank"])
-            .execute()
-            .catch((e) => {
-              logger.error(e, `Error while searching`, { query });
-              return [];
-            });
-
-    const smallTokens = [...tokens.andTokens, ...tokens.orTokens].filter(
-      (token) => token.length < 3
-    );
+      (await this.ftsQueryBuilder(
+        { content: content?.query, title: title?.query },
+        excludedIds,
+        notes
+      )
+        ?.select(["id", "type", "rank"])
+        .execute()
+        .catch((e) => {
+          logger.error(e, `Error while searching`, { query });
+          return [];
+        })) || [];
 
     const ftsIds = ftsResults.map((r) => r.id);
     const regexMatches =
-      smallTokens.length > 0
-        ? await this.regexQueryBuilder(
-            smallTokens,
-            !!transformedQuery && ftsIds.length > 0 ? ftsIds : notes
-          )
-            .select(["results.id", "results.type", sql<number>`1`.as("rank")])
-            .execute()
-        : [];
+      (await this.regexQueryBuilder(
+        {
+          content: filterSmallTokens(content?.tokens),
+          title: filterSmallTokens(title?.tokens)
+        },
+        (!!content || !!title) && ftsIds.length > 0 ? ftsIds : notes
+      )
+        ?.select(["results.id", "results.type", sql<number>`1`.as("rank")])
+        .execute()) || [];
     console.timeEnd("gather matches");
 
     console.time("sorting matches");
@@ -190,16 +267,21 @@ export default class Lookup {
     }
     console.timeEnd("sorting matches");
 
-    const andTokens = tokens.andTokens.map((t) =>
-      t.replace(/"(.+)"/g, "$1").toLowerCase()
-    );
-    const orTokens = tokens.orTokens.map((t) =>
-      t.replace(/"(.+)"/g, "$1").toLowerCase()
-    );
-    const notTokens = tokens.notTokens.map((t) =>
-      t.replace(/"(.+)"/g, "$1").toLowerCase()
-    );
-    const allTokens = [...andTokens, ...orTokens];
+    const isQueryless = !matches.ids.length && filters > 0;
+    if (isQueryless) {
+      const ids = await notes.items(undefined, sortOptions);
+      for (const { id } of ids) {
+        matches.values.push({
+          id,
+          rank: 1,
+          types: ["title"]
+        });
+        matches.ids.push(id);
+      }
+    }
+
+    const titleTokens = transformTokens(title?.tokens);
+    const contentTokens = transformTokens(content?.tokens);
 
     return new VirtualizedGrouping<HighlightedResult>(
       matches.ids.length,
@@ -224,7 +306,7 @@ export default class Lookup {
         }));
 
         const titles =
-          titleMatches.length > 0
+          titleMatches.length > 0 && !isQueryless
             ? await db
                 .selectFrom("notes")
                 .where("id", "in", titleMatches)
@@ -235,14 +317,9 @@ export default class Lookup {
         for (const title of titles) {
           const { text: highlighted } = highlightQueries(
             title.title || "",
-            allTokens
+            titleTokens.allTokens
           );
-          const hasMatches = textContainsTokens(
-            highlighted,
-            andTokens,
-            orTokens,
-            notTokens
-          );
+          const hasMatches = textContainsTokens(highlighted, titleTokens);
           const result = results.find((c) => c.id === title.id);
           if (!result) continue;
           result.title = hasMatches
@@ -251,7 +328,7 @@ export default class Lookup {
         }
 
         const htmls =
-          contentMatches.length > 0
+          contentMatches.length > 0 && !isQueryless
             ? await db
                 .selectFrom("content")
                 .where("noteId", "in", contentMatches)
@@ -264,9 +341,11 @@ export default class Lookup {
           const result = results.find((r) => r.id === html.id);
           if (!result) continue;
 
-          const highlighted = highlightHtmlContent(html.data, allTokens);
-          if (!textContainsTokens(highlighted, andTokens, orTokens, notTokens))
-            continue;
+          const highlighted = highlightHtmlContent(
+            html.data,
+            contentTokens.allTokens
+          );
+          if (!textContainsTokens(highlighted, contentTokens)) continue;
           result.content = extractMatchingBlocks(
             highlighted,
             MATCH_TAG_NAME
@@ -278,7 +357,11 @@ export default class Lookup {
         }
 
         const resultsWithMissingTitle = results
-          .filter((r) => !r.title.length && r.content.length > 0)
+          .filter(
+            isQueryless
+              ? (r) => !r.title.length
+              : (r) => !r.title.length && r.content.length > 0
+          )
           .map((r) => r.id);
 
         if (resultsWithMissingTitle.length > 0) {
@@ -296,7 +379,9 @@ export default class Lookup {
 
         for (const result of results) {
           result.content.sort(
-            (a, b) => getMatchScore(b, allTokens) - getMatchScore(a, allTokens)
+            (a, b) =>
+              getMatchScore(b, contentTokens.allTokens) -
+              getMatchScore(a, contentTokens.allTokens)
           );
         }
 
@@ -323,14 +408,23 @@ export default class Lookup {
   }
 
   private ftsQueryBuilder(
-    query: string,
+    queries: {
+      title?: string;
+      content?: string;
+    },
     excludedIds: string[] = [],
     filter?: FilteredSelector<Note>
   ) {
+    if (!queries.content && !queries.title) return;
+
     const db = this.db.sql() as unknown as Kysely<RawDatabaseSchema>;
 
-    return db.selectFrom((eb) =>
-      eb
+    function buildTitleQuery(
+      eb:
+        | Kysely<RawDatabaseSchema>
+        | ExpressionBuilder<RawDatabaseSchema, never>
+    ) {
+      return eb
         .selectFrom("notes_fts")
         .$if(!!filter, (eb) =>
           eb.where("id", "in", filter!.filter.select("id"))
@@ -338,40 +432,67 @@ export default class Lookup {
         .$if(excludedIds.length > 0, (eb) =>
           eb.where("id", "not in", excludedIds)
         )
-        .where("title", "match", query)
+        .where("title", "match", queries.title)
         .where("rank", "=", sql<number>`'bm25(1.0, 10.0)'`)
-        .select(["id", "rank", sql<string>`'title'`.as("type")])
-        .unionAll((eb) =>
-          eb
-            .selectFrom("content_fts")
-            .$if(!!filter, (eb) =>
-              eb.where("noteId", "in", filter!.filter.select("id"))
-            )
-            .$if(excludedIds.length > 0, (eb) =>
-              eb.where("noteId", "not in", excludedIds)
-            )
-            .where("data", "match", query)
-            .where("rank", "=", sql<number>`'bm25(1.0, 1.0, 10.0)'`)
-            .select(["noteId as id", "rank", sql<string>`'content'`.as("type")])
-            .$castTo<{
-              id: string;
-              rank: number;
-              type: "content" | "title";
-            }>()
+        .select(["id", "rank", sql<string>`'title'`.as("type")]);
+    }
+
+    function buildContentQuery(
+      eb:
+        | Kysely<RawDatabaseSchema>
+        | ExpressionBuilder<RawDatabaseSchema, never>
+    ) {
+      return eb
+        .selectFrom("content_fts")
+        .$if(!!filter, (eb) =>
+          eb.where("noteId", "in", filter!.filter.select("id"))
         )
-        .as("results")
-    );
+        .$if(excludedIds.length > 0, (eb) =>
+          eb.where("noteId", "not in", excludedIds)
+        )
+        .where("data", "match", queries.content)
+        .where("rank", "=", sql<number>`'bm25(1.0, 1.0, 10.0)'`)
+        .select(["noteId as id", "rank", sql<string>`'content'`.as("type")])
+        .$castTo<{
+          id: string;
+          rank: number;
+          type: "content" | "title";
+        }>();
+    }
+
+    if (queries.content && queries.title)
+      return db.selectFrom((eb) =>
+        buildTitleQuery(eb)
+          .unionAll((eb) => buildContentQuery(eb))
+          .as("results")
+      );
+    else if (queries.content)
+      return db.selectFrom((eb) => buildContentQuery(eb).as("results"));
+    else if (queries.title)
+      return db.selectFrom((eb) => buildTitleQuery(eb).as("results"));
   }
+
   private regexQueryBuilder(
-    queries: string[],
+    queries: {
+      title?: string[];
+      content?: string[];
+    },
     ids?: string[] | FilteredSelector<Note>
   ) {
-    const regex = queries
-      .filter((q) => q && q.length > 0)
-      .map((q) => q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
-      .join("|");
-    return this.db.sql().selectFrom((eb) =>
-      eb
+    if (!queries.content?.length && !queries.title?.length) return;
+
+    const buildRegex = (queries: string[]) =>
+      queries
+        .filter((q) => q && q.length > 0)
+        .map((q) => q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+        .join("|");
+
+    function buildTitleQuery(
+      eb: Kysely<DatabaseSchema> | ExpressionBuilder<DatabaseSchema, never>,
+      queries: string[]
+    ) {
+      const regex = buildRegex(queries);
+      return eb
         .selectFrom("notes")
         .$if(!!ids, (eb) =>
           eb.where(
@@ -381,27 +502,48 @@ export default class Lookup {
           )
         )
         .where("title", "regexp", sql<string>`${regex}`)
-        .select(["id", sql<string>`'title'`.as("type")])
-        .unionAll((eb) =>
-          eb
-            .selectFrom("content")
-            .where("content.locked", "!=", true)
-            .$if(!!ids, (eb) =>
-              eb.where(
-                "noteId",
-                "in",
-                Array.isArray(ids) ? ids! : ids!.filter.select("id")
-              )
-            )
-            .where("data", "regexp", sql<string>`${regex}`)
-            .select(["noteId as id", sql<string>`'content'`.as("type")])
-            .$castTo<{
-              id: string;
-              type: "content" | "title";
-            }>()
+        .select(["id", sql<string>`'title'`.as("type")]);
+    }
+
+    function buildContentQuery(
+      eb: Kysely<DatabaseSchema> | ExpressionBuilder<DatabaseSchema, never>,
+      queries: string[]
+    ) {
+      const regex = buildRegex(queries);
+      return eb
+        .selectFrom("content")
+        .where("content.locked", "!=", true)
+        .$if(!!ids, (eb) =>
+          eb.where(
+            "noteId",
+            "in",
+            Array.isArray(ids) ? ids! : ids!.filter.select("id")
+          )
         )
-        .as("results")
-    );
+        .where("data", "regexp", sql<string>`${regex}`)
+        .select(["noteId as id", sql<string>`'content'`.as("type")])
+        .$castTo<{
+          id: string;
+          type: "content" | "title";
+        }>();
+    }
+
+    if (queries.content && queries.title)
+      return this.db.sql().selectFrom((eb) =>
+        buildTitleQuery(eb, queries.title!)
+          .unionAll((eb) => buildContentQuery(eb, queries.content!))
+          .as("results")
+      );
+    else if (queries.content)
+      return this.db
+        .sql()
+        .selectFrom((eb) =>
+          buildContentQuery(eb, queries.content!).as("results")
+        );
+    else if (queries.title)
+      return this.db
+        .sql()
+        .selectFrom((eb) => buildTitleQuery(eb, queries.title!).as("results"));
   }
 
   notebooks(query: string) {
@@ -985,25 +1127,53 @@ function getMatchScore(
   return score;
 }
 
-function textContainsTokens(
-  text: string,
-  andTokens: string[],
-  orTokens: string[],
-  notTokens: string[]
-) {
+function textContainsTokens(text: string, tokens: QueryTokens) {
   const lowerCasedText = text.toLowerCase();
   if (
-    !notTokens.every(
+    !tokens.notTokens.every(
       (t) => !lowerCasedText.includes(`${MATCH_TAG_OPEN}${t}${MATCH_TAG_CLOSE}`)
     )
   )
     return false;
   return (
-    andTokens.every((t) =>
+    tokens.andTokens.every((t) =>
       lowerCasedText.includes(`${MATCH_TAG_OPEN}${t}${MATCH_TAG_CLOSE}`)
     ) ||
-    orTokens.some((t) =>
+    tokens.orTokens.some((t) =>
       lowerCasedText.includes(`${MATCH_TAG_OPEN}${t}${MATCH_TAG_CLOSE}`)
     )
   );
+}
+
+function filterSmallTokens(tokens: QueryTokens | undefined) {
+  if (!tokens) return;
+  return [...tokens.andTokens, ...tokens.orTokens].filter(
+    (token) => token.length < 3
+  );
+}
+
+function transformTokens(tokens: QueryTokens | undefined) {
+  if (!tokens)
+    return {
+      andTokens: [],
+      orTokens: [],
+      notTokens: [],
+      allTokens: []
+    };
+
+  const andTokens = tokens.andTokens.map((t) =>
+    t.replace(/"(.+)"/g, "$1").toLowerCase()
+  );
+  const orTokens = tokens.orTokens.map((t) =>
+    t.replace(/"(.+)"/g, "$1").toLowerCase()
+  );
+  const notTokens = tokens.notTokens.map((t) =>
+    t.replace(/"(.+)"/g, "$1").toLowerCase()
+  );
+  return {
+    andTokens,
+    orTokens,
+    notTokens,
+    allTokens: [...andTokens, ...orTokens]
+  };
 }
