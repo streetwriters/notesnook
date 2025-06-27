@@ -205,6 +205,20 @@ test("note title with headline format should keep generating headline title unti
     }));
 });
 
+test("note title with headline format should not generate headline title if title was set during note creation", () =>
+  noteTest({ title: "already set title" }).then(async ({ db, id }) => {
+    await db.settings.setTitleFormat("$headline$");
+    await db.notes.add({
+      id,
+      content: {
+        type: TEST_NOTE.content.type,
+        data: "<p>some note content</p>"
+      }
+    });
+    const note = await db.notes.note(id);
+    expect(note?.title).toBe("already set title");
+  }));
+
 test("note should get headline from first paragraph in content", () =>
   noteTest({
     ...TEST_NOTE,

@@ -130,6 +130,7 @@ export class Notes implements ICollection {
       }
 
       if (!isUpdating || item.title === "") {
+        item.isGeneratedTitle = !Boolean(item.title);
         item.title =
           item.title ||
           formatTitle(
@@ -139,7 +140,6 @@ export class Notes implements ICollection {
             headlineTitle,
             this.totalNotes
           );
-        item.isGeneratedTitle = true;
       }
 
       const currentNoteTitleFields = await this.db
