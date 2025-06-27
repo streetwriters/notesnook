@@ -72,8 +72,8 @@ const SUPPORTED_FIELDS = {
   readonly: (ast) => parseBooleanField("readonly", ast),
   favorite: (ast) => parseBooleanField("favorite", ast),
   archived: (ast) => parseBooleanField("archived", ast),
-  untagged: (ast) => parseBooleanField("untagged", ast),
-  uncolored: (ast) => parseBooleanField("uncolored", ast),
+  tagged: (ast) => parseBooleanField("tagged", ast),
+  colored: (ast) => parseBooleanField("colored", ast),
   in_notebook: (ast) => parseBooleanField("in_notebook", ast)
 } satisfies Record<string, (ast: (QueryNode | FieldPhraseNode)[]) => unknown>;
 

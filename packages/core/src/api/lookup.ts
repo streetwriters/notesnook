@@ -130,42 +130,63 @@ export default class Lookup {
       created_after,
       edited_after,
       edited_before,
+      colored,
+      tagged,
+      in_notebook,
       filters
     } = transformQuery(query);
 
-    const tagIds = tag?.length
-      ? await this.db.tags.all.where((eb) => eb("tags.title", "in", tag)).ids()
-      : [];
-    const colorIds = color?.length
-      ? await this.db.colors.all
-          .where((eb) => eb("colors.title", "in", color))
-          .ids()
-      : [];
-
     if (filters > 0) {
+      const tagIds = tagged
+        ? await this.db.tags.all.ids()
+        : tag?.length
+        ? await this.db.tags.all
+            .where((eb) => eb("tags.title", "in", tag))
+            .ids()
+        : [];
+      const colorIds = colored
+        ? await this.db.colors.all.ids()
+        : color?.length
+        ? await this.db.colors.all
+            .where((eb) => eb("colors.title", "in", color))
+            .ids()
+        : [];
+      const notebookIds =
+        typeof in_notebook === "boolean"
+          ? await this.db.notebooks.all.ids()
+          : [];
+
       const defaultVault = await this.db.vaults.default();
       notes = notes.where((eb) => {
         const exprs = [];
-        if (tagIds.length > 0)
+        const tagsFilter = this.db.relations
+          .from({ ids: tagIds, type: "tag" }, "note")
+          .selector.filter.select("id");
+        const colorsFilter = this.db.relations
+          .from({ ids: colorIds, type: "color" }, "note")
+          .selector.filter.select("id");
+
+        if (typeof tagged === "boolean")
+          exprs.push(eb("notes.id", tagged ? "in" : "not in", tagsFilter));
+        else if (tagIds.length > 0)
+          exprs.push(eb("notes.id", "in", tagsFilter));
+
+        if (typeof colored === "boolean")
+          exprs.push(eb("notes.id", colored ? "in" : "not in", colorsFilter));
+        else if (colorIds.length > 0)
+          exprs.push(eb("notes.id", "in", colorsFilter));
+
+        if (typeof in_notebook === "boolean")
           exprs.push(
             eb(
               "notes.id",
-              "in",
+              in_notebook ? "in" : "not in",
               this.db.relations
-                .from({ ids: tagIds, type: "tag" }, "note")
+                .from({ ids: notebookIds, type: "notebook" }, "note")
                 .selector.filter.select("id")
             )
           );
-        if (colorIds.length > 0)
-          exprs.push(
-            eb(
-              "notes.id",
-              "in",
-              this.db.relations
-                .from({ ids: colorIds, type: "color" }, "note")
-                .selector.filter.select("id")
-            )
-          );
+
         if (typeof locked === "boolean" && defaultVault) {
           const filter = this.db.relations
             .from(defaultVault, "note")
