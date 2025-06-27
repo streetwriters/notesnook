@@ -32,7 +32,6 @@ import Dialog from "../../components/dialog";
 import { Cross } from "../../components/icons";
 import { CustomScrollbarsVirtualList } from "../../components/list-container";
 import { useEditorStore } from "../../stores/editor-store";
-import { useStore as useNoteStore } from "../../stores/note-store";
 import { strings } from "@notesnook/intl";
 import { isMac } from "../../utils/platform";
 import {
@@ -134,10 +133,15 @@ export const CommandPaletteDialog = DialogManager.register(
               e.preventDefault();
 
               if (e.shiftKey && !props.isCommandMode) {
-                db.notes.add({ title: query }).then((note) => {
-                  useEditorStore.getState().openSession(note);
-                  useNoteStore.getState().refresh();
-                });
+                useEditorStore.getState().addTab();
+                if (query) {
+                  const activeSessionId = useEditorStore
+                    .getState()
+                    .getActiveSession()?.id;
+                  if (activeSessionId) {
+                    useEditorStore.getState().setTitle(activeSessionId, query);
+                  }
+                }
                 props.onClose(false);
                 return;
               }
