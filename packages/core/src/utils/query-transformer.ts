@@ -70,9 +70,11 @@ const SUPPORTED_FIELDS = {
   pinned: (ast) => parseBooleanField("pinned", ast),
   locked: (ast) => parseBooleanField("locked", ast),
   readonly: (ast) => parseBooleanField("readonly", ast),
-  local_only: (ast) => parseBooleanField("local_only", ast),
   favorite: (ast) => parseBooleanField("favorite", ast),
-  archived: (ast) => parseBooleanField("archived", ast)
+  archived: (ast) => parseBooleanField("archived", ast),
+  untagged: (ast) => parseBooleanField("untagged", ast),
+  uncolored: (ast) => parseBooleanField("uncolored", ast),
+  in_notebook: (ast) => parseBooleanField("in_notebook", ast)
 } satisfies Record<string, (ast: (QueryNode | FieldPhraseNode)[]) => unknown>;
 
 function isFieldSupported(field: string) {
