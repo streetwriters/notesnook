@@ -111,13 +111,7 @@ export function ClearFormatting(props: ToolProps) {
       {...props}
       toggled={false}
       onClick={() =>
-        editor
-          ?.chain()
-          .focus()
-          .clearNodes()
-          .unsetAllMarks()
-          .unsetMark("link")
-          .run()
+        editor?.chain().focus().unsetAllMarks().unsetMark("link").run()
       }
     />
   );
