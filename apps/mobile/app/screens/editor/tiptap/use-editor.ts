@@ -755,6 +755,8 @@ export const useEditor = (
             ? (data as ContentItem).noteId
             : data.id;
 
+        if (!useTabStore.getState().hasTabForNote(noteId)) return;
+
         const note = data.type === "note" ? data : await db.notes?.note(noteId);
         lock.current = true;
         // Handle this case where note was locked on another device and synced.
