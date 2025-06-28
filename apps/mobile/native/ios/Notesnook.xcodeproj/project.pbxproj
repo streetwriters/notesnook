@@ -23,7 +23,6 @@
 		651F09DA2E0D262B00495DED /* fts5-html.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 651F09D92E0D262B00495DED /* fts5-html.xcframework */; };
 		651F09DB2E0D262B00495DED /* fts5-html.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 651F09D92E0D262B00495DED /* fts5-html.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		651F09DD2E0D263300495DED /* fts5-html.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 651F09D92E0D262B00495DED /* fts5-html.xcframework */; };
-		651F09DE2E0D263300495DED /* fts5-html.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 651F09D92E0D262B00495DED /* fts5-html.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6529A13E279BC4C70048D4A8 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6529A13D279BC4C70048D4A8 /* BootSplash.storyboard */; };
 		656835812BB29A9800144BAB /* OpenSans-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 656835802BB29A8300144BAB /* OpenSans-Italic.ttf */; };
 		6569927F2C5754F10041CD41 /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6517B7C02B6838EB0079FF37 /* OpenSans-Bold.ttf */; };
@@ -90,17 +89,6 @@
 			dstSubfolderSpec = 10;
 			files = (
 				651F09DB2E0D262B00495DED /* fts5-html.xcframework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		651F09DF2E0D263300495DED /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				651F09DE2E0D263300495DED /* fts5-html.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -507,7 +495,6 @@
 				65B5013E25A672B200E2D264 /* Resources */,
 				658D06A625A7446E008C70C0 /* Run Script */,
 				E81EC4451F76606456BCA61F /* [CP] Copy Pods Resources */,
-				651F09DF2E0D263300495DED /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
