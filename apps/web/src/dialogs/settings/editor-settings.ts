@@ -27,11 +27,11 @@ import { useStore as useSettingStore } from "../../stores/setting-store";
 import { getFonts } from "@notesnook/editor";
 import { useSpellChecker } from "../../hooks/use-spell-checker";
 import { SpellCheckerLanguages } from "./components/spell-checker-languages";
-
 import { CustomizeToolbar } from "./components/customize-toolbar";
 import { DictionaryWords } from "./components/dictionary-words";
 import { strings } from "@notesnook/intl";
 import { isMac } from "../../utils/platform";
+import { EDITOR_LINE_HEIGHT } from "../../components/editor/common";
 
 export const EditorSettings: SettingsGroup[] = [
   {
@@ -91,6 +91,24 @@ export const EditorSettings: SettingsGroup[] = [
             defaultValue: () => editorConfig().fontSize,
             onChange: (value) =>
               useEditorManager.getState().setEditorConfig({ fontSize: value })
+          }
+        ]
+      },
+      {
+        key: "line-height",
+        title: strings.lineHeight(),
+        description: strings.lineHeightDesc(),
+        onStateChange: (listener) =>
+          onEditorConfigChange((c) => c.lineHeight, listener),
+        components: [
+          {
+            type: "input",
+            inputType: "number",
+            max: EDITOR_LINE_HEIGHT.MAX,
+            min: EDITOR_LINE_HEIGHT.MIN,
+            defaultValue: () => editorConfig().lineHeight,
+            onChange: (value) =>
+              useEditorManager.getState().setEditorConfig({ lineHeight: value })
           }
         ]
       },

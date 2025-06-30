@@ -624,7 +624,8 @@ function TiptapWrapper(
         ".tiptap.ProseMirror": { pb: 150 },
         ".editor-container": {
           opacity: isHydrating ? 0 : 1,
-          zoom: editorConfig.zoom + "%"
+          zoom: editorConfig.zoom + "%",
+          lineHeight: editorConfig.lineHeight
         },
         ".editor-loading-container.hidden": { display: "none" }
       }}

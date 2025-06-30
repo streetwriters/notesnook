@@ -2611,5 +2611,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   noPassword: () => t`No password`,
   publishToTheWeb: () => t`Publish to the web`,
   addToHome: () => t`Add to home`,
-  clickToSave: () => t`Click to save`
+  clickToSave: () => t`Click to save`,
+  lineHeight: () => t`Line height`,
+  lineHeightDesc: () => t`Adjust the line height of the editor`
 };
