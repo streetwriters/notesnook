@@ -251,6 +251,13 @@ export class Notes implements ICollection {
     );
   }
 
+  get exportable() {
+    return this.collection.createFilter<Note>(
+      (qb) => qb.where(isFalse("dateDeleted")).where(isFalse("deleted")),
+      this.db.options?.batchSize
+    );
+  }
+
   // isTrashed(id: string) {
   //   return this.raw.find((item) => item.id === id && isTrashItem(item));
   // }
