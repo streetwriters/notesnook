@@ -1337,6 +1337,28 @@ PODS:
     - React-featureflags
     - React-graphics
     - React-ImageManager
+    - react-native-quick-sqlite/lexbor (= 8.2.7)
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
+  - react-native-quick-sqlite/lexbor (8.2.7):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.11.18.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
     - React-NativeModulesApple
     - React-RCTFabric
     - React-rendererdebug
@@ -2409,7 +2431,7 @@ SPEC CHECKSUMS:
   react-native-orientation-locker: cc6f357b289a2e0dd2210fea0c52cb8e0727fdaa
   react-native-pager-view: 5aaf51a9338f7997b8acee0e0febfddd1ade5c0a
   react-native-pdf: 6a51a22ccefb23eb93298771e4bf090913e86d70
-  react-native-quick-sqlite: d09ab51a1111d7713a2f38fe7805e021a74fe877
+  react-native-quick-sqlite: 1bfc7f1e9acbe9a5aa5c4cc81712e9bde3ab7672
   react-native-safe-area-context: 9d72abf6d8473da73033b597090a80b709c0b2f1
   react-native-screenguard: 82437eeb0086a90b5e5d7e54130bb04fb406373e
   react-native-share-extension: bcb7e466390a9e50c742f4b1019d6f181aedd7ad
