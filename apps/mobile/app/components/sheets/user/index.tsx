@@ -40,6 +40,7 @@ import Sync from "../../../services/sync";
 
 import Clipboard from "@react-native-clipboard/clipboard";
 import { logoutUser } from "../../../screens/settings/logout";
+import { sleep } from "../../../utils/time";
 export const UserSheet = () => {
   const ref = useSheetRef();
   const { colors } = useThemeColors();
@@ -310,10 +311,11 @@ export const UserSheet = () => {
           {
             icon: "logout",
             title: strings.logout(),
-            onPress: () => {
+            onPress: async () => {
               console.log("logout");
-              logoutUser();
               ref.current?.hide();
+              await sleep(300);
+              logoutUser();
             },
             hidden: !user
           }
