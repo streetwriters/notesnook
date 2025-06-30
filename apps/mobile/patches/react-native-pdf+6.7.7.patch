@@ -36,3 +36,37 @@ index 3dfe1dc..70ef9da 100644
 +    implementation 'io.legere:pdfiumandroid:1.0.32'
      implementation 'com.google.code.gson:gson:2.8.5'
  }
+diff --git a/node_modules/react-native-pdf/android/src/main/java/org/wonday/pdf/PdfView.java b/node_modules/react-native-pdf/android/src/main/java/org/wonday/pdf/PdfView.java
+index 7b7a125..361924b 100644
+--- a/node_modules/react-native-pdf/android/src/main/java/org/wonday/pdf/PdfView.java
++++ b/node_modules/react-native-pdf/android/src/main/java/org/wonday/pdf/PdfView.java
+@@ -12,6 +12,8 @@ import java.io.File;
+ 
+ import android.content.ContentResolver;
+ import android.content.Context;
++import android.os.Handler;
++import android.os.Looper;
+ import android.util.SizeF;
+ import android.view.View;
+ import android.view.ViewGroup;
+@@ -105,7 +107,7 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
+         TopChangeEvent tce = new TopChangeEvent(surfaceId, getId(), event);
+ 
+         if (dispatcher != null) {
+-            dispatcher.dispatchEvent(tce);
++            new Handler(Looper.getMainLooper()).postDelayed(() -> dispatcher.dispatchEvent(tce), 10);
+         }
+ 
+ //        ReactContext reactContext = (ReactContext)this.getContext();
+diff --git a/node_modules/react-native-pdf/index.js b/node_modules/react-native-pdf/index.js
+index 56df005..dd14412 100644
+--- a/node_modules/react-native-pdf/index.js
++++ b/node_modules/react-native-pdf/index.js
+@@ -364,7 +364,6 @@ export default class Pdf extends Component {
+     }
+ 
+     _onChange = (event) => {
+-
+         let message = event.nativeEvent.message.split('|');
+         //__DEV__ && console.log("onChange: " + message);
+         if (message.length > 0) {
