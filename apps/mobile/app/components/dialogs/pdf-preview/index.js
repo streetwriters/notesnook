@@ -108,11 +108,15 @@ const PDFPreview = () => {
         setAttachment(attachment);
         let hash = attachment.hash;
         if (!hash) return;
-        if (!exists(hash)) setLoading(true);
+        if (!(await exists(hash))) setLoading(true);
         const uri = await downloadAttachment(hash, false, {
           silent: true,
           cache: true
         });
+        if (!(await exists(hash))) {
+          setVisible(false);
+          return;
+        }
         const path = `${cacheDir}/${uri}`;
         snapshotValue.current = snapshot.current;
         setPDFSource("file://" + path);
