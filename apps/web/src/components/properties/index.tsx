@@ -632,6 +632,7 @@ function Colors({ noteId, color }: { noteId: string; color?: string }) {
           return (
             <Flex
               key={c.id}
+              title={c.title}
               onClick={() => noteStore.get().setColor(c.id, isChecked, noteId)}
               sx={{
                 cursor: "pointer",
