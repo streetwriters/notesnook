@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Plan, PricingInfo } from "./types";
+import { Plan, Price, PricingInfo } from "./types";
 import { create } from "zustand";
 import { create as produce } from "mutative";
 
@@ -25,7 +25,8 @@ interface ICheckoutStore {
   isCompleted: boolean;
   completeCheckout: () => void;
   selectedPlan?: Plan;
-  selectPlan: (plan?: Plan) => void;
+  selectedPrice?: Price;
+  selectPlan: (plan?: Plan, price?: Price) => void;
   pricingInfo?: PricingInfo;
   updatePrice: (pricingInfo?: PricingInfo) => void;
   isApplyingCoupon: boolean;
@@ -37,6 +38,7 @@ interface ICheckoutStore {
 export const useCheckoutStore = create<ICheckoutStore>((set) => ({
   isCompleted: false,
   selectedPlan: undefined,
+  selectedPrice: undefined,
   pricingInfo: undefined,
   couponCode: undefined,
   isApplyingCoupon: false,
@@ -46,10 +48,11 @@ export const useCheckoutStore = create<ICheckoutStore>((set) => ({
         state.isCompleted = true;
       })
     ),
-  selectPlan: (plan) =>
+  selectPlan: (plan, price) =>
     set(
       produce((state: ICheckoutStore) => {
         state.selectedPlan = plan;
+        state.selectedPrice = price;
         state.pricingInfo = undefined;
       })
     ),

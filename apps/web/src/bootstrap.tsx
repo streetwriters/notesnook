@@ -53,7 +53,10 @@ export type Routes = keyof typeof routes;
 
 const routes = {
   "/checkout": {
-    component: () => import("./views/checkout"),
+    component: () => import("./views/checkout")
+  },
+  "/payments": {
+    component: () => import("./views/payments"),
     props: {}
   },
   "/account/recovery": {
@@ -96,6 +99,7 @@ const routes = {
 } as const;
 
 const sessionExpiryExceptions: Routes[] = [
+  "/payments",
   "/recover",
   "/account/recovery",
   "/sessionexpired",

@@ -106,6 +106,7 @@ import { CREATE_BUTTON_MAP } from "../../common";
 import { useStore as useNotebookStore } from "../../stores/notebook-store";
 import { useStore as useTagStore } from "../../stores/tag-store";
 import { showSortMenu } from "../group-header";
+import { BuyDialog } from "../../dialogs/buy-dialog";
 
 type Route = {
   id: "notes" | "favorites" | "reminders" | "monographs" | "trash" | "archive";
@@ -792,6 +793,7 @@ function NavigationDropdown() {
               title: strings.upgradeToPro(),
               icon: Pro.path,
               key: "upgrade",
+              onClick: () => BuyDialog.show({}),
               isHidden: notLoggedIn || isPro
             },
             {
