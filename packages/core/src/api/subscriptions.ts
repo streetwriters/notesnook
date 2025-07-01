@@ -23,36 +23,37 @@ import TokenManager from "./token-manager.js";
 
 export type TransactionStatus =
   | "completed"
-  | "refunded"
-  | "partially_refunded"
-  | "disputed";
+  | "billed"
+  | "paid"
+  | "past_due"
+  | "canceled";
 
-export type Transaction = {
-  order_id: string;
-  checkout_id: string;
-  amount: string;
-  currency: string;
+export interface Transaction {
+  id: string;
   status: TransactionStatus;
-  created_at: string;
-  passthrough: null;
-  product_id: number;
-  is_subscription: boolean;
-  is_one_off: boolean;
-  subscription: Subscription;
-  user: User;
-  receipt_url: string;
-};
+  created_at: Date;
+  billed_at: Date;
+  details: Details;
+}
 
-type Subscription = {
-  subscription_id: number;
-  status: string;
-};
+export interface Details {
+  totals: Totals;
+  line_items: LineItem[];
+}
 
-type User = {
-  user_id: number;
-  email: string;
-  marketing_consent: boolean;
-};
+export interface LineItem {
+  id: string;
+}
+
+export interface Totals {
+  subtotal: number;
+  tax: number;
+  discount: number;
+  total: number;
+  grand_total: number;
+  balance: number;
+  currency_code: string;
+}
 
 export default class Subscriptions {
   constructor(private readonly tokenManager: TokenManager) {}
@@ -60,14 +61,38 @@ export default class Subscriptions {
   async cancel() {
     const token = await this.tokenManager.getAccessToken();
     if (!token) return;
-    await http.delete(`${hosts.SUBSCRIPTIONS_HOST}/subscriptions`, token);
+    await http.post(
+      `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/v2/cancel`,
+      null,
+      token
+    );
+  }
+
+  async pause() {
+    const token = await this.tokenManager.getAccessToken();
+    if (!token) return;
+    await http.post(
+      `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/v2/pause`,
+      null,
+      token
+    );
+  }
+
+  async resume() {
+    const token = await this.tokenManager.getAccessToken();
+    if (!token) return;
+    await http.post(
+      `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/v2/resume`,
+      null,
+      token
+    );
   }
 
   async refund() {
     const token = await this.tokenManager.getAccessToken();
     if (!token) return;
     await http.post(
-      `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/refund`,
+      `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/v2/refund`,
       null,
       token
     );
@@ -77,16 +102,28 @@ export default class Subscriptions {
     const token = await this.tokenManager.getAccessToken();
     if (!token) return;
     return await http.get(
-      `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/transactions`,
+      `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/v2/transactions`,
       token
     );
   }
 
-  async updateUrl(): Promise<string | undefined> {
+  async invoice(transactionId: string): Promise<string | undefined> {
+    const token = await this.tokenManager.getAccessToken();
+    if (!token) return;
+    const response = await http.get(
+      `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/v2/invoice?transactionId=${transactionId}`,
+      token
+    );
+    return response.url;
+  }
+
+  async urls(): Promise<
+    { update_payment_method: string; cancel: string } | undefined
+  > {
     const token = await this.tokenManager.getAccessToken();
     if (!token) return;
     return await http.get(
-      `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/update`,
+      `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/v2/urls`,
       token
     );
   }
