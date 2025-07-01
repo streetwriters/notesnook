@@ -23,3 +23,9 @@ export const EDITOR_ZOOM = {
   MIN: 30,
   STEP: 10
 };
+
+export const EDITOR_LINE_HEIGHT = {
+  DEFAULT: 1.2,
+  MAX: 10,
+  MIN: 1
+};
