@@ -31,7 +31,9 @@ import {
 import { ParamListBase } from "@react-navigation/core";
 import create, { State } from "zustand";
 
-export type GenericRouteParam = undefined;
+export type GenericRouteParam = {
+  canGoBack?: boolean;
+};
 
 export type NotebookScreenParams = {
   item: Notebook;
@@ -98,7 +100,8 @@ export interface RouteParams extends ParamListBase {
     reminder?: Reminder;
     reference?: Note;
   };
-}
+  Intro: GenericRouteParam;
+};
 
 export type RouteName = keyof RouteParams;
 

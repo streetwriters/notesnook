@@ -44,6 +44,10 @@ let premiumStatus = 0;
 /**
  * @type {RNIap.Subscription[]}
  */
+let subs = [];
+/**
+ * @type {RNIap.Product[]}
+ */
 let products = [];
 let user = null;
 
@@ -73,7 +77,7 @@ async function setPremiumStatus() {
   }
   try {
     await RNIap.initConnection();
-    products = await RNIap.getSubscriptions({
+    subs = await RNIap.getSubscriptions({
       skus: itemSkus
     });
   } catch (e) {}
@@ -83,7 +87,7 @@ async function setPremiumStatus() {
 }
 
 function getMontlySub() {
-  let _product = products.find(
+  let _product = subs.find(
     (p) => p.productId === "com.streetwriters.notesnook.sub.mo"
   );
   if (!_product) {
@@ -95,11 +99,23 @@ function getMontlySub() {
   return _product;
 }
 
-async function getProducts() {
-  if (!products || products.length === 0) {
-    products = await RNIap.getSubscriptions(itemSkus);
+async function loadProductsAndSubs() {
+  if (!subs || subs.length === 0) {
+    subs = await RNIap.getSubscriptions({
+      skus: itemSkus
+    });
   }
-  return products;
+
+  if (!products || products.length === 0) {
+    products = await RNIap.getProducts({
+      skus: ["notesnook.pro.5year", "notesnook.believer.5year"]
+    });
+  }
+
+  return {
+    subs,
+    products
+  };
 }
 
 function get() {
@@ -427,7 +443,7 @@ const PremiumService = {
   get,
   onUserStatusCheck,
   showVerifyEmailDialog,
-  getProducts,
+  loadProductsAndSubs: loadProductsAndSubs,
   getUser,
   subscriptions,
   getMontlySub,

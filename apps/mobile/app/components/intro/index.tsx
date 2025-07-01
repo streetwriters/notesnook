@@ -24,13 +24,13 @@ import { Linking, ScrollView, useWindowDimensions, View } from "react-native";
 import { SwiperFlatList } from "react-native-swiper-flatlist";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import Navigation from "../../services/navigation";
+import SettingsService from "../../services/settings";
 import { AppFontSize } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
+import { AuthMode } from "../auth/common";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import SettingsService from "../../services/settings";
-import { AuthMode } from "../auth/common";
-import { DefaultAppStyles } from "../../utils/styles";
 
 const Intro = () => {
   const { colors } = useThemeColors();
@@ -181,6 +181,17 @@ const Intro = () => {
           fontSize={AppFontSize.md}
           type="accent"
           title={strings.getStarted()}
+        />
+
+        <Button
+          width="100%"
+          title={"I already have an account"}
+          type="secondary"
+          onPress={() => {
+            SettingsService.set({
+              introCompleted: true
+            });
+          }}
         />
       </View>
     </ScrollView>
