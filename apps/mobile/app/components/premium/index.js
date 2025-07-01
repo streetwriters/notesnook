@@ -24,7 +24,8 @@ import {
 } from "../../services/event-manager";
 import { eClosePremiumDialog, eOpenPremiumDialog } from "../../utils/events";
 import BaseDialog from "../dialog/base-dialog";
-import { Component } from "./component";
+import { PaywallComponent } from "./component";
+import { IconButton } from "../ui/icon-button";
 
 class PremiumDialog extends React.Component {
   constructor(props) {
@@ -74,7 +75,7 @@ class PremiumDialog extends React.Component {
         background={this.props.colors.primary.background}
         onRequestClose={this.onClose}
       >
-        <Component
+        <PaywallComponent
           getRef={() => this.actionSheetRef}
           promo={this.state.promo}
           close={this.close}

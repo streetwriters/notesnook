@@ -49,7 +49,7 @@ export const ProTag = ({ width, size, background }) => {
           marginRight: 3
         }}
         size={size}
-        color={colors.primary.accent}
+        color={colors.static.orange}
         name="crown"
       />
       <Paragraph size={size - 1.5} color={colors.primary.accent}>

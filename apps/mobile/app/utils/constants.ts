@@ -50,19 +50,17 @@ export const SORT = {
 };
 
 export const itemSkus = [
-  "com.streetwriters.notesnook.sub.mo",
-  "com.streetwriters.notesnook.sub.yr",
-  "com.streetwriters.notesnook.sub.yr.15",
-  "com.streetwriters.notesnook.sub.mo.15",
-  "com.streetwriters.notesnook.sub.mo.ofr",
-  "com.streetwriters.notesnook.sub.yr.trialoffer",
-  "com.streetwriters.notesnook.sub.mo.trialoffer",
-  "com.streetwriters.notesnook.sub.mo.tier1",
-  "com.streetwriters.notesnook.sub.yr.tier1",
-  "com.streetwriters.notesnook.sub.mo.tier2",
-  "com.streetwriters.notesnook.sub.yr.tier2",
-  "com.streetwriters.notesnook.sub.mo.tier3",
-  "com.streetwriters.notesnook.sub.yr.tier3"
+  "notesnook.essential.monthly",
+  "notesnook.essential.yearly",
+  "notesnook.pro.monthly",
+  "notesnook.pro.yearly",
+  "notesnook.pro.monthly.tier2",
+  "notesnook.pro.yearly.tier2",
+  "notesnook.pro.monthly.tier3",
+  "notesnook.pro.yearly.tier3",
+  "notesnook.believer.monthly",
+  "notesnook.believer.yearly",
+  "notesnook.believer.5year"
 ];
 
 export const SUBSCRIPTION_STATUS = {

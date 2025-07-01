@@ -18,8 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useRef, useState } from "react";
+import { TextInput } from "react-native";
 import { db } from "../../common/database";
-import { eSendEvent, ToastManager } from "../../services/event-manager";
+import { ToastManager, eSendEvent } from "../../services/event-manager";
 import { clearMessage } from "../../services/message";
 import PremiumService from "../../services/premium";
 import SettingsService from "../../services/settings";
@@ -34,15 +35,18 @@ export const LoginSteps = {
   passwordAuth: 3
 };
 
-export const useLogin = (onFinishLogin, sessionExpired = false) => {
+export const useLogin = (
+  onFinishLogin?: () => void,
+  sessionExpired = false
+) => {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const setUser = useUserStore((state) => state.setUser);
   const [step, setStep] = useState(LoginSteps.emailAuth);
-  const email = useRef();
-  const password = useRef();
-  const emailInputRef = useRef();
-  const passwordInputRef = useRef();
+  const email = useRef<string>();
+  const password = useRef<string>();
+  const emailInputRef = useRef<TextInput>(null);
+  const passwordInputRef = useRef<TextInput>(null);
 
   const validateInfo = () => {
     if (
@@ -69,11 +73,15 @@ export const useLogin = (onFinishLogin, sessionExpired = false) => {
       setLoading(true);
       switch (step) {
         case LoginSteps.emailAuth: {
+          if (!email.current) {
+            setLoading(false);
+            return;
+          }
           const mfaInfo = await db.user.authenticateEmail(email.current);
 
           if (mfaInfo) {
             TwoFactorVerification.present(
-              async (mfa, callback) => {
+              async (mfa: any, callback: (success: boolean) => void) => {
                 try {
                   const success = await db.user.authenticateMultiFactorCode(
                     mfa.code,
@@ -111,10 +119,14 @@ export const useLogin = (onFinishLogin, sessionExpired = false) => {
           break;
         }
         case LoginSteps.passwordAuth: {
+          if (!email.current || !password.current) {
+            setLoading(false);
+            return;
+          }
           await db.user.authenticatePassword(
             email.current,
             password.current,
-            null,
+            undefined,
             sessionExpired
           );
           finishLogin();
@@ -123,11 +135,11 @@ export const useLogin = (onFinishLogin, sessionExpired = false) => {
       }
       setLoading(false);
     } catch (e) {
-      finishWithError(e);
+      finishWithError(e as Error);
     }
   };
 
-  const finishWithError = async (e) => {
+  const finishWithError = async (e: Error) => {
     if (e.message === "invalid_grant") setStep(LoginSteps.emailAuth);
     setLoading(false);
     ToastManager.show({
@@ -146,7 +158,7 @@ export const useLogin = (onFinishLogin, sessionExpired = false) => {
     clearMessage();
     ToastManager.show({
       heading: strings.loginSuccess(),
-      message: strings.loginSuccessDesc(),
+      message: strings.loginSuccessDesc(user.email),
       type: "success",
       context: "global"
     });
