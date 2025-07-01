@@ -48,7 +48,6 @@ export type Options = {
   scale?: number;
   fetchOptions?: FetchOptions;
   inlineOptions?: InlineOptions;
-  styles?: boolean;
 };
 
 export type Config = {
