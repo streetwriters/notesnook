@@ -73,11 +73,21 @@ export async function* exportNotes(
   const notePathMap: Map<string, string[]> = new Map();
 
   for await (const note of notes
-    .fields(["notes.id", "notes.title"])
+    .fields(["notes.id", "notes.title", "notes.archived"])
     .iterate()) {
     const filename = `${sanitizeFilename(note.title || "Untitled", {
       replacement: "-"
     })}.${FORMAT_TO_EXT[format]}`;
+
+    if (note.archived) {
+      const archivePath = pathTree.add("_archive", "underscore");
+      notePathMap.set(
+        note.id,
+        [archivePath].map((p) => pathTree.add(join(p, filename)))
+      );
+      continue;
+    }
+
     const notebooks = await database.relations
       .to({ id: note.id, type: "note" }, "notebook")
       .get();
