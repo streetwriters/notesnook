@@ -18,58 +18,129 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useState } from "react";
-import { Period, Plan } from "./types";
+import { Period, Plan, Price } from "./types";
+import { IS_DEV } from "./helpers";
 
-type PlanMetadata = {
-  title: string;
-  subtitle: string;
-};
+function createPrice(id: string, period: Period, subtotal: number): Price {
+  return {
+    id,
+    period,
+    subtotal,
+    total: 0,
+    tax: 0,
+    currency: "USD"
+  };
+}
 
-export const isDev = import.meta.env.DEV || IS_TESTING;
-
-export const EDUCATION_PLAN: Plan = {
-  id: isDev ? "50305" : "658759",
-  period: "education",
-  country: "US",
-  currency: "USD",
-  discount: { type: "regional", amount: 0, recurring: false },
-  price: { gross: 9.99, net: 0, tax: 0 },
-  originalPrice: { gross: 9.99, net: 0, tax: 0 }
+const FREE_PLAN: Plan = {
+  id: "free",
+  title: "Free",
+  recurring: true,
+  prices: [
+    createPrice("monthly", "monthly", 0),
+    createPrice("yearly", "yearly", 0),
+    createPrice("5-year", "5-year", 0)
+  ]
 };
 
 export const DEFAULT_PLANS: Plan[] = [
+  FREE_PLAN,
   {
-    period: "monthly",
-    country: "PK",
-    currency: "USD",
-    discount: { type: "regional", amount: 0, recurring: false },
-    originalPrice: { gross: 4.49, net: 0, tax: 0 },
-    id: isDev ? "9822" : "648884",
-    price: { gross: 4.49, net: 0, tax: 0 }
+    id: "essential",
+    title: "Essential",
+    recurring: true,
+    prices: [
+      createPrice(
+        IS_DEV
+          ? "pri_01j00cf6v5kqqvchcpgapr7123"
+          : "pri_01j02dbe7btgk6ta3ctper2161",
+        "monthly",
+        1.99
+      ),
+      createPrice(
+        IS_DEV
+          ? "pri_01j00d1qq3bart3w1rvt0q8bkt"
+          : "pri_01j02dckdey85cgmrdknd2f4zx",
+        "yearly",
+        1.24
+      )
+    ]
   },
   {
-    period: "yearly",
-    country: "PK",
-    currency: "USD",
-    discount: { type: "regional", amount: 0, recurring: false },
-    id: isDev ? "50305" : "658759",
-    price: { gross: 49.99, net: 0, tax: 0 },
-    originalPrice: { gross: 49.99, net: 0, tax: 0 }
+    id: "pro",
+    title: "Pro",
+    recurring: true,
+    prices: [
+      createPrice(
+        IS_DEV
+          ? "pri_01j00fnbzth05aafjb05kcahvq"
+          : "pri_01h9qprh1xvvxbs8vcpcg7qacm",
+        "monthly",
+        6.49
+      ),
+      createPrice(
+        IS_DEV
+          ? "pri_01j00fpawjwkrqxy2faqhzts9m"
+          : "pri_01h9qpqyjwbm3m2xy7834t3azt",
+        "yearly",
+        5.49
+      ),
+      createPrice(
+        IS_DEV
+          ? "pri_01j00fr72gn40xzk9cdcfpzevw"
+          : "pri_01j02da6n9c1xmzq15kjhjxngn",
+        "5-year",
+        4.49
+      )
+    ]
   },
-  EDUCATION_PLAN
-];
-
-export const PLAN_METADATA: Record<Period, PlanMetadata> = {
-  monthly: { title: "Monthly", subtitle: `Pay once a month.` },
-  yearly: { title: "Yearly", subtitle: `Pay once a year.` },
-  education: {
+  {
+    id: "believer",
+    title: "Believer",
+    recurring: true,
+    prices: [
+      createPrice(
+        IS_DEV
+          ? "pri_01j00fxsryh5jfyfjqq5tsx4c7"
+          : "pri_01j02ddzyc1m63s3b1kq6g4bnn",
+        "monthly",
+        7.49
+      ),
+      createPrice(
+        IS_DEV
+          ? "pri_01j00fzbz01rfn3f30crwxc7y9"
+          : "pri_01j02dezv9v5ncw3e16ncvz7x7",
+        "yearly",
+        6.49
+      ),
+      createPrice(
+        IS_DEV
+          ? "pri_01j00g0wpmj6m9vcvpjq97jwpp"
+          : "pri_01j02dfxz6y8hghfbr5p8cqtgb",
+        "5-year",
+        5.49
+      )
+    ]
+  },
+  {
+    id: "education",
     title: "Education",
-    subtitle: "Special offer for students & teachers."
+    recurring: false,
+    prices: [
+      createPrice(
+        IS_DEV
+          ? "pri_01j00g6asxjskghjcrbxpbd26e"
+          : "pri_01j02dh4mwkbsvpygyf1bd9whs",
+        "yearly",
+        19.99
+      )
+    ]
   }
-};
+];
 
 let CACHED_PLANS: Plan[];
 export async function getPlans(): Promise<Plan[] | null> {
+  return DEFAULT_PLANS;
   if (IS_TESTING || import.meta.env.DEV) return DEFAULT_PLANS;
   if (CACHED_PLANS) return CACHED_PLANS;
 
@@ -77,7 +148,7 @@ export async function getPlans(): Promise<Plan[] | null> {
   const response = await fetch(url);
   if (!response.ok) return null;
   const plans = (await response.json()) as Plan[];
-  plans.push(EDUCATION_PLAN);
+  //  plans.push(EDUCATION_PLAN);
   CACHED_PLANS = plans;
   return plans;
 }
@@ -94,8 +165,8 @@ export function usePlans() {
         const plans = await getPlans();
         if (!plans) return;
         setPlans(plans);
-        setDiscount(Math.max(...plans.map((p) => p.discount?.amount || 0)));
-        setCountry(plans[0].country);
+        // setDiscount(Math.max(...plans.map((p) => p.discount?.amount || 0)));
+        // setCountry(plans[0].country);
       } catch (e) {
         console.error(e);
       } finally {

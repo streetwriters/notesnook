@@ -29,9 +29,13 @@ import Field from "../../components/field";
 import { hardNavigate } from "../../navigation";
 import { Features } from "./features";
 import { PaddleCheckout } from "./paddle";
-import { Period, Plan, PricingInfo } from "./types";
-import { PLAN_METADATA, usePlans } from "./plans";
-import { formatPeriod, getFullPeriod, PlansList } from "./plan-list";
+import { Period, Plan, PlanId, Price, PricingInfo } from "./types";
+import { usePlans } from "./plans";
+import {
+  formatRecurringPeriodShort,
+  getFullPeriod,
+  PlansList
+} from "./plan-list";
 import { showToast } from "../../utils/toast";
 import { TaskManager } from "../../common/task-manager";
 import { db } from "../../common/db";
@@ -48,7 +52,8 @@ import { strings } from "@notesnook/intl";
 
 type BuyDialogProps = BaseDialogProps<false> & {
   couponCode?: string;
-  plan?: "monthly" | "yearly" | "education";
+  plan?: PlanId;
+  onClose: () => void;
 };
 
 export const BuyDialog = DialogManager.register(function BuyDialog(
@@ -110,7 +115,7 @@ export const BuyDialog = DialogManager.register(function BuyDialog(
         >
           <CheckoutSideBar
             onClose={() => onClose(false)}
-            initialPlan={plan}
+            initialPlan={plan || "free"}
             user={user}
           />
         </ScopedThemeProvider>
@@ -121,7 +126,7 @@ export const BuyDialog = DialogManager.register(function BuyDialog(
 });
 
 type SideBarProps = {
-  initialPlan?: Period;
+  initialPlan: PlanId;
   onClose: () => void;
   user?: User;
 };
@@ -130,6 +135,7 @@ export function CheckoutSideBar(props: SideBarProps) {
   const [showPlans, setShowPlans] = useState(false);
   const onPlanSelected = useCheckoutStore((state) => state.selectPlan);
   const selectedPlan = useCheckoutStore((state) => state.selectedPlan);
+  const selectedPrice = useCheckoutStore((state) => state.selectedPrice);
   const pricingInfo = useCheckoutStore((state) => state.pricingInfo);
   const couponCode = useCheckoutStore((store) => store.couponCode);
   const onApplyCoupon = useCheckoutStore((store) => store.applyCoupon);
@@ -137,10 +143,11 @@ export function CheckoutSideBar(props: SideBarProps) {
 
   if (isCheckoutCompleted) return <CheckoutCompleted onClose={onClose} />;
 
-  if (user && selectedPlan)
+  if (user && selectedPlan && selectedPrice)
     return (
       <SelectedPlan
         plan={selectedPlan}
+        price={selectedPrice}
         pricingInfo={pricingInfo}
         onChangePlan={() => {
           onApplyCoupon(undefined);
@@ -161,13 +168,14 @@ export function CheckoutSideBar(props: SideBarProps) {
     );
   }
 
-  if (user && (showPlans || !!initialPlan))
+  if (user)
     return (
       <PlansList
+        selectedPlan={selectedPlan?.id || initialPlan || "free"}
         onPlansLoaded={(plans) => {
-          if (!initialPlan || showPlans) return;
-          const plan = plans.find((p) => p.period === initialPlan);
-          onPlanSelected(plan);
+          // if (!initialPlan || showPlans) return;
+          // const plan = plans.find((p) => p.id === initialPlan);
+          // onPlanSelected(plan);
         }}
         onPlanSelected={onPlanSelected}
       />
@@ -207,25 +215,23 @@ export function CheckoutDetails({
   user?: { id: string; email: string };
 }) {
   const selectedPlan = useCheckoutStore((state) => state.selectedPlan);
+  const selectedPrice = useCheckoutStore((state) => state.selectedPrice);
   const onPriceUpdated = useCheckoutStore((state) => state.updatePrice);
   const completeCheckout = useCheckoutStore((state) => state.completeCheckout);
   const isCheckoutCompleted = useCheckoutStore((store) => store.isCompleted);
   const couponCode = useCheckoutStore((store) => store.couponCode);
-  const setIsApplyingCoupon = useCheckoutStore(
-    (store) => store.setIsApplyingCoupon
-  );
   const theme = useThemeStore((store) => store.colorScheme);
   if (isCheckoutCompleted) return null;
 
-  if (selectedPlan && user)
+  if (selectedPlan && user && selectedPrice)
     return (
       <PaddleCheckout
         plan={selectedPlan}
+        price={selectedPrice}
         theme={theme}
         user={user}
         coupon={couponCode}
         onCompleted={completeCheckout}
-        onCouponApplied={() => setIsApplyingCoupon(true)}
         onPriceUpdated={(pricingInfo) => {
           onPriceUpdated(pricingInfo);
           // console.log(
@@ -269,9 +275,9 @@ function TrialOrUpgrade(props: TrialOrUpgradeProps) {
         <Loading sx={{ mt: 4 }} />
       ) : (
         <Text variant={"body"} mt={4} sx={{ fontSize: "title" }}>
-          Starting from {getCurrencySymbol(plan.currency)}
+          {/* Starting from {getCurrencySymbol(plan.currency)}
           {plan.price.gross}
-          {formatPeriod(plan.period)}
+          {formatPeriod(plan.period)} */}
         </Text>
       )}
       {isMacStoreApp() ? (
@@ -404,12 +410,12 @@ export function CheckoutCompleted(props: {
 
 type SelectedPlanProps = {
   plan: Plan;
+  price: Price;
   pricingInfo: PricingInfo | undefined;
   onChangePlan?: () => void;
 };
 function SelectedPlan(props: SelectedPlanProps) {
-  const { plan, pricingInfo, onChangePlan } = props;
-  const metadata = PLAN_METADATA[plan.period];
+  const { plan, price, pricingInfo, onChangePlan } = props;
   const [isApplyingCoupon, setIsApplyingCoupon] = useCheckoutStore((store) => [
     store.isApplyingCoupon,
     store.setIsApplyingCoupon
@@ -448,15 +454,15 @@ function SelectedPlan(props: SelectedPlanProps) {
 
   return (
     <>
-      {plan.period === "monthly" ? (
+      {price.period === "monthly" ? (
         <Image
           src={WorkAnywhere}
-          style={{ flexShrink: 0, width: 180, height: 180 }}
+          style={{ flexShrink: 0, width: 120, height: 120 }}
         />
       ) : (
         <Image
           src={WorkLate}
-          style={{ flexShrink: 0, width: 180, height: 180 }}
+          style={{ flexShrink: 0, width: 120, height: 120 }}
         />
       )}
       <Text variant="heading" mt={4} sx={{ textAlign: "center" }}>
@@ -468,9 +474,9 @@ function SelectedPlan(props: SelectedPlanProps) {
         mt={1}
         sx={{ fontSize: "subheading", textAlign: "center" }}
       >
-        {metadata.title}
+        {plan.title}
       </Text>
-      {plan.period === "education" && (
+      {plan.id === "education" && (
         <Link
           href="https://notesnook.com/education"
           target="_blank"
@@ -531,6 +537,7 @@ function SelectedPlan(props: SelectedPlanProps) {
               variant="secondary"
               mt={4}
               px={4}
+              sx={{ flexShrink: 0 }}
               onClick={onChangePlan}
             >
               Change plan
@@ -549,43 +556,30 @@ type CheckoutPricingProps = {
 };
 export function CheckoutPricing(props: CheckoutPricingProps) {
   const { pricingInfo } = props;
-  const { currency, price, discount, period, recurringPrice } = pricingInfo;
+  const { price, discount, period, recurringPrice } = pricingInfo;
   const fields = [
     {
       key: "subtotal",
       label: "Subtotal",
-      value: formatPrice(currency, price.net.toFixed(2), null)
+      value: price.subtotal
     },
     {
       key: "tax",
       label: "Sales tax",
       color: "red",
-      value: formatPrice(currency, price.tax.toFixed(2), null)
+      value: price.tax
     },
     {
       key: "discount",
       label: "Discount",
-      color: "accent",
-      value: formatPrice(
-        currency,
-        discount.amount.toFixed(2),
-        null,
-        discount.amount > 0
-      )
+      color: "green",
+      value: price.discount
     }
   ];
 
-  const isDiscounted = discount.recurring || discount.amount <= 0;
-  const currentTotal = formatPrice(
-    currency,
-    (price.gross - discount.amount).toFixed(2),
-    isDiscounted ? period : undefined
-  );
-  const recurringTotal = formatPrice(
-    currency,
-    recurringPrice.gross.toFixed(2),
-    period
-  );
+  const isRecurringDiscount = !discount || discount.recurring;
+  const currentTotal = price.total;
+  const recurringTotal = recurringPrice ? recurringPrice.total : undefined;
   return (
     <>
       {fields.map((field) => (
@@ -627,19 +621,12 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
           >
             {currentTotal}
           </Text>
-          <Text
-            as="div"
-            sx={{
-              fontSize: "body",
-              color: "paragraph-secondary",
-              fontWeight: "body"
-            }}
-          >
-            {period === "education" && discount.amount > 0
-              ? "for one year"
-              : isDiscounted
-              ? "forever"
-              : `first ${getFullPeriod(period)} then ${recurringTotal}`}
+          <Text as="div" sx={{ fontSize: "body", color: "paragraph" }}>
+            {recurringTotal
+              ? isRecurringDiscount
+                ? "forever"
+                : `first ${getFullPeriod(period)} then ${recurringTotal}`
+              : "for one year"}
           </Text>
         </Text>
       </Flex>
@@ -653,7 +640,7 @@ function formatPrice(
   period?: Period | null,
   negative = false
 ) {
-  const formattedPeriod = period ? formatPeriod(period) : "";
+  const formattedPeriod = period ? formatRecurringPeriodShort(period) : "";
   const currencySymbol = getCurrencySymbol(currency);
   const prefix = negative ? "-" : "";
   return `${prefix}${currencySymbol}${price}${formattedPeriod}`;

@@ -22,6 +22,17 @@ import {
   ICurrencySymbols
 } from "@brixtol/currency-symbols";
 
+export const IS_DEV = import.meta.env.DEV || IS_TESTING;
 export function getCurrencySymbol(currency: string) {
   return _getSymbol(currency as keyof ICurrencySymbols) || currency;
+}
+
+export function parseAmount(amount: string) {
+  const matches = /(.+?)([\d.]+)/.exec(amount);
+  if (!matches || matches.length < 3) return;
+  return {
+    formatted: amount,
+    symbol: matches[1],
+    amount: parseFloat(matches[2])
+  };
 }

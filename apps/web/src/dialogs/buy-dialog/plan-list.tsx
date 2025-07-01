@@ -20,19 +20,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Text, Flex, Button, Image } from "@theme-ui/components";
 import { Loading } from "../../components/icons";
 import Nomad from "../../assets/nomad.svg?url";
-import { Period, Plan } from "./types";
-import { PLAN_METADATA, usePlans } from "./plans";
-import { useEffect } from "react";
-import { getCurrencySymbol } from "./helpers";
+import { Period, Plan, PlanId, Price } from "./types";
+import { usePlans } from "./plans";
+import { useEffect, useState } from "react";
+import { getCurrencySymbol, parseAmount } from "./helpers";
+import { strings } from "@notesnook/intl";
 
 type PlansListProps = {
-  onPlanSelected: (plan: Plan) => void;
+  selectedPlan: PlanId;
+  onPlanSelected: (plan: Plan, price: Price) => void;
   onPlansLoaded?: (plans: Plan[]) => void;
 };
+const periods: { id: Period; title: string }[] = [
+  {
+    title: strings.monthly(),
+    id: "monthly"
+  },
+  {
+    title: strings.yearly(),
+    id: "yearly"
+  },
+  {
+    id: "5-year",
+    title: "5 year"
+  }
+];
 export function PlansList(props: PlansListProps) {
-  const { onPlanSelected, onPlansLoaded } = props;
+  const { onPlanSelected, onPlansLoaded, selectedPlan } = props;
   const { isLoading, plans, discount, country } = usePlans();
-
+  const [selectedPeriod, setPeriod] = useState<Period>("yearly");
+  console.log({ selectedPlan });
   useEffect(() => {
     if (isLoading || !onPlansLoaded) return;
     onPlansLoaded(plans);
@@ -40,7 +57,10 @@ export function PlansList(props: PlansListProps) {
 
   return (
     <>
-      <Image src={Nomad} style={{ flexShrink: 0, width: 200, height: 200 }} />
+      <Image
+        src={Nomad}
+        style={{ flexShrink: 0, width: 150, height: 150, marginTop: 20 }}
+      />
       <Text variant="heading" mt={4} sx={{ textAlign: "center" }}>
         Choose a plan
       </Text>
@@ -54,32 +74,67 @@ export function PlansList(props: PlansListProps) {
           "Notesnook profits when you purchase a subscription — not by selling your data."
         )}
       </Text>
+      <Flex
+        sx={{
+          bg: "background-secondary",
+          borderRadius: "default",
+          overflow: "hidden",
+          flexShrink: 0
+        }}
+      >
+        {periods.map((period) => (
+          <Button
+            key={period.id}
+            variant="secondary"
+            sx={{
+              bg:
+                selectedPeriod === period.id
+                  ? "background-selected"
+                  : "transparent",
+              color:
+                selectedPeriod === period.id ? "accent-selected" : "paragraph",
+              borderRadius: 0,
+              py: 1
+            }}
+            onClick={() => setPeriod(period.id)}
+          >
+            {period.title}
+          </Button>
+        ))}
+      </Flex>
       <Flex mt={2} sx={{ flexDirection: "column", alignSelf: "stretch" }}>
         {plans.map((plan) => {
-          const metadata = PLAN_METADATA[plan.period];
+          const price = plan.prices.find((p) => p.period === selectedPeriod);
+          if (!price) return null;
+          // const metadata = PLAN_METADATA[plan.period];
           return (
             <Button
-              key={metadata.title}
+              key={plan.title}
               disabled={isLoading}
               data-test-id={`checkout-plan`}
               variant="secondary"
               mt={1}
-              bg="transparent"
+              // bg="transparent"
               // sx={
               //   {
               //     // bg: selectedPlan?.key === plan.key ? "border" : "transparent",
-              //     // border:
-              //     //   selectedPlan?.key === plan.key ? "1px solid var(--accent)" : "none",
+              // border:
+              //   selectedPlan?.key === plan.key ? "1px solid var(--accent)" : "none",
               //   }
               // }
-              onClick={() => onPlanSelected(plan)}
+              onClick={() => onPlanSelected(plan, price)}
               sx={{
                 flexShrink: 0,
                 flex: 1,
                 textAlign: "start",
                 alignItems: "center",
                 justifyContent: "space-between",
-                display: "flex"
+                display: "flex",
+                border:
+                  selectedPlan === plan.id
+                    ? "1px solid var(--accent-selected)"
+                    : "none",
+                borderRadius: "default"
               }}
             >
               <Text
@@ -87,8 +142,8 @@ export function PlansList(props: PlansListProps) {
                 sx={{ fontWeight: "normal" }}
                 data-test-id="title"
               >
-                {metadata.title}
-                <br />
+                {plan.title}
+                {/* <br />
                 <Text
                   variant="body"
                   sx={{
@@ -97,9 +152,15 @@ export function PlansList(props: PlansListProps) {
                   }}
                 >
                   {metadata.subtitle}
-                </Text>
+                </Text> */}
               </Text>
-              {isLoading ? <Loading /> : <RecurringPricing plan={plan} />}
+              {isLoading ? (
+                <Loading />
+              ) : plan.recurring ? (
+                <RecurringPricing plan={plan} price={price} />
+              ) : (
+                <OneTimePricing plan={plan} price={price} />
+              )}
             </Button>
           );
         })}
@@ -108,17 +169,23 @@ export function PlansList(props: PlansListProps) {
   );
 }
 
-type RecurringPricingProps = {
+type PricingProps = {
   plan: Plan;
+  price: Price;
 };
-function RecurringPricing(props: RecurringPricingProps) {
-  const { plan } = props;
+function RecurringPricing(props: PricingProps) {
+  const { plan, price } = props;
+  // const price = plan.prices.find((p) => p.period === period);
+  // if (!price) return null;
+  const monthPrice = plan.prices.find(
+    (p) => p.period === "monthly" && price.period !== p.period
+  );
   return (
     <Text
       sx={{ flexShrink: 0, fontSize: "subBody", textAlign: "end" }}
       variant="body"
     >
-      {plan.originalPrice && plan.originalPrice.gross !== plan.price.gross ? (
+      {/* {plan.originalPrice && plan.originalPrice.gross !== plan.price.gross && (
         <Text
           sx={{
             textDecorationLine: "line-through",
@@ -129,23 +196,91 @@ function RecurringPricing(props: RecurringPricingProps) {
           {getCurrencySymbol(plan.currency)}
           {plan.originalPrice.gross}
         </Text>
-      ) : null}
-      <Text>
-        <Text as="span" sx={{ fontSize: "subtitle" }}>
-          {getCurrencySymbol(plan.currency)}
-          {plan.price.gross}
+      )} */}
+      {/* {monthPrice && (
+        <Text
+          variant="subBody"
+          sx={{
+            textDecorationLine: "line-through",
+            color: "var(--paragraph-secondary)"
+          }}
+        >
+          {getCurrencySymbol(price.currency)}
+          {monthPrice.gross}
         </Text>
-        {formatPeriod(plan.period)}
+      )} */}
+      <Text as="div" sx={{ fontSize: "subtitle", fontWeight: "bold" }}>
+        {monthPrice && monthPrice.subtotal < price.subtotal && (
+          <Text
+            variant="subBody"
+            sx={{
+              textDecorationLine: "line-through",
+              color: "var(--paragraph-secondary)",
+              fontWeight: "body"
+            }}
+          >
+            {getCurrencySymbol(price.currency)}
+            {monthPrice.subtotal}
+          </Text>
+        )}{" "}
+        {getCurrencySymbol(price.currency)}
+        {price.subtotal}
+        /month
+      </Text>
+      {parseAmount(price.subtotal)?.amount === 0 ? null : (
+        <Text as="div" variant="subBody">
+          billed {formatRecurringPeriod(price.period)}
+        </Text>
+      )}
+    </Text>
+  );
+}
+
+function OneTimePricing(props: PricingProps) {
+  const { price } = props;
+  return (
+    <Text
+      sx={{ flexShrink: 0, fontSize: "subBody", textAlign: "end" }}
+      variant="body"
+    >
+      <Text as="div" sx={{ fontSize: "subtitle", fontWeight: "bold" }}>
+        {getCurrencySymbol(price.currency)}
+        {price.subtotal}
+      </Text>
+      <Text as="div" variant="subBody">
+        {formatOneTimePeriod(price.period)}
       </Text>
     </Text>
   );
 }
 
-export function formatPeriod(period: Period) {
+export function formatOneTimePeriod(period: Period) {
+  return period === "monthly"
+    ? "for 1 month"
+    : period === "yearly"
+    ? "for 1 year"
+    : period === "5-year"
+    ? "for 5 years"
+    : "";
+}
+
+export function formatRecurringPeriod(period: Period) {
+  return period === "monthly"
+    ? "monthly"
+    : period === "yearly"
+    ? "annually"
+    : period === "5-year"
+    ? "every 5 years"
+    : "";
+}
+
+export function formatRecurringPeriodShort(period: Period) {
   return period === "monthly"
     ? "/mo"
-    : period === "yearly" || period === "education"
+    : period === "yearly"
     ? "/yr"
+    : period === "5-year"
+    ? "/5yr"
     : "";
 }
 
