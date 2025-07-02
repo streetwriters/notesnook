@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { HighlightedResult } from "@notesnook/core";
 import { Button, Flex, Text } from "@theme-ui/components";
-import React, { useState } from "react";
+import React, { Fragment, useState } from "react";
 import { useEditorStore } from "../../stores/editor-store";
 import { useStore as useNoteStore } from "../../stores/note-store";
 import ListItem from "../list-item";
@@ -112,11 +112,11 @@ function SearchResult(props: SearchResultProps) {
                 }}
               >
                 {item.title.map((match) => (
-                  <>
+                  <Fragment key={match.id}>
                     <span>{match.prefix}</span>
                     <span className="match">{match.match}</span>
                     {match.suffix ? <span>{match.suffix}</span> : null}
-                  </>
+                  </Fragment>
                 ))}
               </Text>
 
@@ -146,14 +146,14 @@ function SearchResult(props: SearchResultProps) {
                 useEditorStore.getState().openSession(item.id, {
                   rawContent: item.rawContent,
                   force: true,
-                  activeSearchResultIndex: findSelectedMatchIndex(item, index)
+                  activeSearchResultId: match[0].id
                 });
               }}
               onMiddleClick={() => {
                 useEditorStore.getState().openSession(item.id, {
                   openInNewTab: true,
                   rawContent: item.rawContent,
-                  activeSearchResultIndex: findSelectedMatchIndex(item, index)
+                  activeSearchResultId: match[0].id
                 });
               }}
               title={
@@ -171,11 +171,11 @@ function SearchResult(props: SearchResultProps) {
                   }}
                 >
                   {match.map((match) => (
-                    <>
+                    <Fragment key={match.id}>
                       <span>{match.prefix}</span>
                       <span className="match">{match.match}</span>
                       {match.suffix ? <span>{match.suffix}</span> : null}
-                    </>
+                    </Fragment>
                   ))}
                 </Text>
               }

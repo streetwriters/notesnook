@@ -494,6 +494,7 @@ export type Match = {
   prefix: string;
   match: string;
   suffix: string;
+  id?: string;
 };
 
 export interface HighlightedResult extends BaseItem<"searchResult"> {
