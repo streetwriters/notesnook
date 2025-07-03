@@ -85,9 +85,9 @@ export type BaseEditorSession = {
    */
   activeBlockId?: string;
   /**
-   * The index of search result to scroll to after opening the session successfully.
+   * The id of search result to scroll to after opening the session successfully.
    */
-  activeSearchResultIndex?: number;
+  activeSearchResultId?: string;
 };
 
 export type LockedEditorSession = BaseEditorSession & {
@@ -666,7 +666,7 @@ class EditorStore extends BaseStore<EditorStore> {
       silent?: boolean;
       openInNewTab?: boolean;
       rawContent?: string;
-      activeSearchResultIndex?: number;
+      activeSearchResultId?: string;
     } = {}
   ): Promise<void> => {
     const {
@@ -790,7 +790,7 @@ class EditorStore extends BaseStore<EditorStore> {
             id: sessionId,
             content,
             activeBlockId: options.activeBlockId,
-            activeSearchResultIndex: options.activeSearchResultIndex,
+            activeSearchResultId: options.activeSearchResultId,
             tabId
           },
           options.silent
@@ -814,7 +814,7 @@ class EditorStore extends BaseStore<EditorStore> {
               color: colors[0]?.fromId,
               tags,
               activeBlockId: options.activeBlockId,
-              activeSearchResultIndex: options.activeSearchResultIndex,
+              activeSearchResultId: options.activeSearchResultId,
               tabId
             },
             options.silent
@@ -835,7 +835,7 @@ class EditorStore extends BaseStore<EditorStore> {
                   ? { ...content, data: options.rawContent }
                   : content,
               activeBlockId: options.activeBlockId,
-              activeSearchResultIndex: options.activeSearchResultIndex,
+              activeSearchResultId: options.activeSearchResultId,
               tabId
             },
             options.silent

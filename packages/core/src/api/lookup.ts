@@ -62,10 +62,8 @@ type FuzzySearchField<T> = {
 };
 
 const MATCH_TAG_NAME = "nn-search-result";
-const MATCH_TAG_OPEN = `<${MATCH_TAG_NAME}>`;
-const MATCH_TAG_CLOSE = `</${MATCH_TAG_NAME}>`;
 const MATCH_TAG_REGEX = new RegExp(
-  `<${MATCH_TAG_NAME}>(.*?)<\\/${MATCH_TAG_NAME}>`,
+  `<${MATCH_TAG_NAME}\\s+id="(.+?)">(.*?)<\\/${MATCH_TAG_NAME}>`,
   "gm"
 );
 export default class Lookup {
@@ -778,10 +776,11 @@ function highlightQueries(
     const regex = new RegExp(patterns.join("|"), "gi");
 
     let hasMatches = false;
+    let matchIdCounter = 0;
 
     const result = text.replace(regex, (match) => {
       hasMatches = true;
-      return `${MATCH_TAG_OPEN}${match}${MATCH_TAG_CLOSE}`;
+      return createSearchResultTag(match, `match-${++matchIdCounter}`);
     });
 
     return { text: result, hasMatches };
@@ -796,10 +795,11 @@ export function splitHighlightedMatch(text: string): Match[][] {
   let matches: Match[] = [];
   let totalLength = 0;
 
-  for (let i = 0; i < parts.length - 1; i += 2) {
+  for (let i = 0; i < parts.length - 1; i += 3) {
     const prefix = parts[i];
-    const match = parts[i + 1];
-    let suffix = parts.at(i + 2);
+    const matchId = parts[i + 1];
+    const match = parts[i + 2];
+    let suffix = parts[i + 3];
     const matchLength = prefix.length + match.length + (suffix?.length || 0);
 
     if (totalLength > 120 && matches.length > 0) {
@@ -815,14 +815,15 @@ export function splitHighlightedMatch(text: string): Match[][] {
         suffix,
         Math.max(suffix.length / 2, 60)
       );
-      parts[i + 2] = remaining;
+      parts[i + 3] = remaining;
       suffix = _suffix;
     }
 
     matches.push({
       match,
       prefix: prefix.replace(/\s{2,}/gm, " ").trimStart(),
-      suffix: suffix || ""
+      suffix: suffix || "",
+      id: matchId || undefined
     });
 
     totalLength += matchLength;
@@ -944,7 +945,8 @@ function stringToMatch(str: string): Match[] {
     {
       prefix: str,
       match: "",
-      suffix: ""
+      suffix: "",
+      id: undefined
     }
   ];
 }
@@ -962,6 +964,7 @@ function highlightHtmlContent(html: string, queries: string[]): string {
   const searchRegex = new RegExp(`(${patterns.join("|")})`, "gi");
 
   let result = "";
+  let matchIdCounter = 0;
 
   // Stack to track elements and their buffered content
   interface ElementInfo {
@@ -981,9 +984,8 @@ function highlightHtmlContent(html: string, queries: string[]): string {
         // Reset regex state after test
         searchRegex.lastIndex = 0;
 
-        const processed = text.replace(
-          searchRegex,
-          "<nn-search-result>$1</nn-search-result>"
+        const processed = text.replace(searchRegex, (match) =>
+          createSearchResultTag(match, `match-${++matchIdCounter}`)
         );
 
         if (hasMatch) {
@@ -1150,18 +1152,23 @@ function getMatchScore(
 
 function textContainsTokens(text: string, tokens: QueryTokens) {
   const lowerCasedText = text.toLowerCase();
+
+  const createTagPattern = (token: string) => {
+    return `<${MATCH_TAG_NAME}\\s+id="(.+?)">${token}<\\/${MATCH_TAG_NAME}>`;
+  };
+
   if (
     !tokens.notTokens.every(
-      (t) => !lowerCasedText.includes(`${MATCH_TAG_OPEN}${t}${MATCH_TAG_CLOSE}`)
+      (t) => !new RegExp(createTagPattern(t), "i").test(lowerCasedText)
     )
   )
     return false;
   return (
     tokens.andTokens.every((t) =>
-      lowerCasedText.includes(`${MATCH_TAG_OPEN}${t}${MATCH_TAG_CLOSE}`)
+      new RegExp(createTagPattern(t), "i").test(lowerCasedText)
     ) ||
     tokens.orTokens.some((t) =>
-      lowerCasedText.includes(`${MATCH_TAG_OPEN}${t}${MATCH_TAG_CLOSE}`)
+      new RegExp(createTagPattern(t), "i").test(lowerCasedText)
     )
   );
 }
@@ -1197,4 +1204,8 @@ function transformTokens(tokens: QueryTokens | undefined) {
     notTokens,
     allTokens: [...andTokens, ...orTokens]
   };
+}
+
+function createSearchResultTag(content: string, id: string) {
+  return `<${MATCH_TAG_NAME} id="${id}">${content}</${MATCH_TAG_NAME}>`;
 }
