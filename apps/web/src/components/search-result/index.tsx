@@ -215,11 +215,3 @@ async function menuItems(
     color: colors[0]
   });
 }
-
-function findSelectedMatchIndex(item: HighlightedResult, matchIndex: number) {
-  let activeIndex = 0;
-  for (let i = 0; i <= matchIndex - 1; ++i) {
-    activeIndex += item.content[i].length;
-  }
-  return activeIndex;
-}

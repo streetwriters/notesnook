@@ -63,7 +63,7 @@ type FuzzySearchField<T> = {
 
 const MATCH_TAG_NAME = "nn-search-result";
 const MATCH_TAG_REGEX = new RegExp(
-  `<${MATCH_TAG_NAME}(?:\\s+id="([^"]*)")?>(.*?)<\\/${MATCH_TAG_NAME}>`,
+  `<${MATCH_TAG_NAME}\\s+id="(.+?)">(.*?)<\\/${MATCH_TAG_NAME}>`,
   "gm"
 );
 export default class Lookup {
@@ -780,7 +780,7 @@ function highlightQueries(
 
     const result = text.replace(regex, (match) => {
       hasMatches = true;
-      return `<${MATCH_TAG_NAME} id="match-${++matchIdCounter}">${match}</${MATCH_TAG_NAME}>`;
+      return createSearchResultTag(match, `match-${++matchIdCounter}`);
     });
 
     return { text: result, hasMatches };
@@ -799,7 +799,7 @@ export function splitHighlightedMatch(text: string): Match[][] {
     const prefix = parts[i];
     const matchId = parts[i + 1];
     const match = parts[i + 2];
-    let suffix = i + 3 < parts.length ? parts[i + 3] : "";
+    let suffix = parts[i + 3];
     const matchLength = prefix.length + match.length + (suffix?.length || 0);
 
     if (totalLength > 120 && matches.length > 0) {
@@ -815,9 +815,7 @@ export function splitHighlightedMatch(text: string): Match[][] {
         suffix,
         Math.max(suffix.length / 2, 60)
       );
-      if (i + 3 < parts.length) {
-        parts[i + 3] = remaining;
-      }
+      parts[i + 3] = remaining;
       suffix = _suffix;
     }
 
@@ -986,10 +984,8 @@ function highlightHtmlContent(html: string, queries: string[]): string {
         // Reset regex state after test
         searchRegex.lastIndex = 0;
 
-        const processed = text.replace(
-          searchRegex,
-          (match) =>
-            `<nn-search-result id="match-${++matchIdCounter}">${match}</nn-search-result>`
+        const processed = text.replace(searchRegex, (match) =>
+          createSearchResultTag(match, `match-${++matchIdCounter}`)
         );
 
         if (hasMatch) {
@@ -1158,7 +1154,7 @@ function textContainsTokens(text: string, tokens: QueryTokens) {
   const lowerCasedText = text.toLowerCase();
 
   const createTagPattern = (token: string) => {
-    return `<${MATCH_TAG_NAME}(?:\\s+id="[^"]*")?>${token}<\\/${MATCH_TAG_NAME}>`;
+    return `<${MATCH_TAG_NAME}\\s+id="(.+?)">${token}<\\/${MATCH_TAG_NAME}>`;
   };
 
   if (
@@ -1208,4 +1204,8 @@ function transformTokens(tokens: QueryTokens | undefined) {
     notTokens,
     allTokens: [...andTokens, ...orTokens]
   };
+}
+
+function createSearchResultTag(content: string, id: string) {
+  return `<${MATCH_TAG_NAME} id="${id}">${content}</${MATCH_TAG_NAME}>`;
 }
