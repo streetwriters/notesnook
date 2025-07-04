@@ -24,19 +24,17 @@ import {
   ColorValue,
   DimensionValue,
   TextStyle,
-  View,
   ViewStyle,
   useWindowDimensions
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useUserStore } from "../../../stores/use-user-store";
-import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
+import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
+import { DefaultAppStyles } from "../../../utils/styles";
 import NativeTooltip from "../../../utils/tooltip";
-import { ProTag } from "../../premium/pro-tag";
 import { Pressable, PressableProps, useButton } from "../pressable";
 import Heading from "../typography/heading";
 import Paragraph from "../typography/paragraph";
-import { DefaultAppStyles } from "../../../utils/styles";
 export interface ButtonProps extends PressableProps {
   height?: number;
   icon?: string;
@@ -167,15 +165,6 @@ export const Button = ({
           {title}
         </Component>
       )}
-      {proTag && !premium ? (
-        <View
-          style={{
-            marginLeft: 10
-          }}
-        >
-          <ProTag size={10} width={40} background={colors.primary.shade} />
-        </View>
-      ) : null}
 
       {icon && !loading && iconPosition === "right" ? (
         <Icon

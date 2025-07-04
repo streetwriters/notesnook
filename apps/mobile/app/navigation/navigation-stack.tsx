@@ -250,7 +250,7 @@ let MoveNotes: any = null;
 let Settings: any = null;
 let ManageTags: any = null;
 let AddReminder: any = null;
-
+let PayWall: any = null;
 export const RootNavigation = () => {
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
@@ -351,6 +351,14 @@ export const RootNavigation = () => {
             AddReminder =
               AddReminder || require("../screens/add-reminder").default;
             return AddReminder;
+          }}
+        />
+        <RootStack.Screen
+          name="PayWall"
+          getComponent={() => {
+            PayWall =
+              PayWall || require("../components/premium/paywall").default;
+            return PayWall;
           }}
         />
       </RootStack.Navigator>

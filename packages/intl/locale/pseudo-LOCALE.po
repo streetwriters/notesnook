@@ -3038,6 +3038,10 @@ msgstr ""
 msgid "hr"
 msgstr ""
 
+#: src/strings.ts:2489
+msgid "I already have an account"
+msgstr ""
+
 #: src/strings.ts:125
 msgid "I don't have access to authenticator app"
 msgstr ""

@@ -28,9 +28,10 @@ import { ToastManager } from "../../services/event-manager";
 import { clearMessage, setEmailVerifyMessage } from "../../services/message";
 import { useUserStore } from "../../stores/use-user-store";
 import { openLinkInBrowser } from "../../utils/functions";
-import { AppFontSize, SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 import { Loading } from "../loading";
-import { PaywallComponent } from "../premium/component";
+import { PaywallComponent } from "../premium/paywall";
 import { Button } from "../ui/button";
 import Input from "../ui/input";
 import Heading from "../ui/typography/heading";
@@ -38,6 +39,7 @@ import Paragraph from "../ui/typography/paragraph";
 import { hideAuth } from "./common";
 import { AuthHeader } from "./header";
 import { SignupContext } from "./signup-context";
+import Navigation from "../../services/navigation";
 
 const SignupSteps = {
   signup: 0,
@@ -60,7 +62,6 @@ export const Signup = ({ changeMode, welcome }) => {
   const setLastSynced = useUserStore((state) => state.setLastSynced);
   const { width, height } = useWindowDimensions();
   const isTablet = width > 600;
-  const deviceMode = useSettingStore((state) => state.deviceMode);
   const validateInfo = () => {
     if (!password.current || !email.current || !confirmPassword.current) {
       ToastManager.show({
@@ -89,7 +90,9 @@ export const Signup = ({ changeMode, welcome }) => {
       setLastSynced(await db.lastSynced());
       clearMessage();
       setEmailVerifyMessage();
-      setCurrentStep(SignupSteps.selectPlan);
+      Navigation.navigate("PayWall", {
+        canGoBack: false
+      });
       return true;
     } catch (e) {
       setCurrentStep(SignupSteps.signup);
@@ -138,17 +141,15 @@ export const Signup = ({ changeMode, welcome }) => {
                 style={{
                   justifyContent: "flex-end",
                   paddingHorizontal: 16,
-                  backgroundColor: colors.secondary.background,
-                  marginBottom: 20,
+                  marginBottom: DefaultAppStyles.GAP_VERTICAL,
                   borderBottomWidth: 0.8,
                   borderBottomColor: colors.primary.border,
-                  alignSelf: deviceMode !== "mobile" ? "center" : undefined,
-                  borderWidth: deviceMode !== "mobile" ? 1 : null,
-                  borderColor:
-                    deviceMode !== "mobile" ? colors.primary.border : null,
-                  borderRadius: deviceMode !== "mobile" ? 20 : null,
-                  marginTop: deviceMode !== "mobile" ? 50 : null,
-                  width: deviceMode === "mobile" ? null : "50%",
+                  alignSelf: isTablet ? "center" : undefined,
+                  borderWidth: isTablet ? 1 : null,
+                  borderColor: isTablet ? colors.primary.border : null,
+                  borderRadius: isTablet ? 20 : null,
+                  marginTop: isTablet ? 50 : null,
+                  width: !isTablet ? null : "50%",
                   minHeight: height * 0.25
                 }}
               >
@@ -182,7 +183,7 @@ export const Signup = ({ changeMode, welcome }) => {
                     marginBottom: 25,
                     marginTop: 10
                   }}
-                  size={SIZE.xxl}
+                  size={AppFontSize.xxl}
                 >
                   {strings.createAccount()}
                 </Heading>
@@ -268,7 +269,7 @@ export const Signup = ({ changeMode, welcome }) => {
                   onPress={() => {
                     signup();
                   }}
-                  fontSize={SIZE.md}
+                  fontSize={AppFontSize.md}
                   width="100%"
                 />
 
@@ -285,12 +286,12 @@ export const Signup = ({ changeMode, welcome }) => {
                   }}
                 >
                   <Paragraph
-                    size={SIZE.xs + 1}
+                    size={AppFontSize.xs + 1}
                     color={colors.secondary.paragraph}
                   >
                     {strings.alreadyHaveAccount()}{" "}
                     <Paragraph
-                      size={SIZE.xs + 1}
+                      size={AppFontSize.xs + 1}
                       style={{ color: colors.primary.accent }}
                     >
                       {strings.login()}
@@ -299,63 +300,61 @@ export const Signup = ({ changeMode, welcome }) => {
                 </TouchableOpacity>
               </View>
 
-              <Paragraph
+              <View
                 style={{
-                  marginBottom: 25
+                  paddingHorizontal: DefaultAppStyles.GAP
                 }}
-                size={AppFontSize.xxs}
-                color={colors.secondary.paragraph}
               >
-                {strings.signupAgreement[0]()}
                 <Paragraph
-                  size={AppFontSize.xxs}
-                  onPress={() => {
-                    openLinkInBrowser("https://notesnook.com/tos", colors);
-                  }}
                   style={{
-                    textDecorationLine: "underline"
+                    marginBottom: 25,
+                    textAlign: "center"
                   }}
-                  color={colors.primary.accent}
-                >
-                  {" "}
-                  {strings.signupAgreement[1]()}
-                </Paragraph>{" "}
-                {strings.signupAgreement[2]()}
-                <Paragraph
                   size={AppFontSize.xxs}
-                  onPress={() => {
-                    openLinkInBrowser("https://notesnook.com/privacy", colors);
-                  }}
-                  style={{
-                    textDecorationLine: "underline"
-                  }}
-                  color={colors.primary.accent}
+                  color={colors.secondary.paragraph}
                 >
-                  {" "}
-                  {strings.signupAgreement[3]()}
-                </Paragraph>{" "}
-                {strings.signupAgreement[4]()}
-              </Paragraph>
+                  {strings.signupAgreement[0]()}
+                  <Paragraph
+                    size={AppFontSize.xxs}
+                    onPress={() => {
+                      openLinkInBrowser("https://notesnook.com/tos", colors);
+                    }}
+                    style={{
+                      textDecorationLine: "underline"
+                    }}
+                    color={colors.primary.accent}
+                  >
+                    {" "}
+                    {strings.signupAgreement[1]()}
+                  </Paragraph>{" "}
+                  {strings.signupAgreement[2]()}
+                  <Paragraph
+                    size={AppFontSize.xxs}
+                    onPress={() => {
+                      openLinkInBrowser(
+                        "https://notesnook.com/privacy",
+                        colors
+                      );
+                    }}
+                    style={{
+                      textDecorationLine: "underline"
+                    }}
+                    color={colors.primary.accent}
+                  >
+                    {" "}
+                    {strings.signupAgreement[3]()}
+                  </Paragraph>{" "}
+                  {strings.signupAgreement[4]()}
+                </Paragraph>
+              </View>
             </View>
           </KeyboardAwareScrollView>
         </>
-      ) : currentStep === SignupSteps.createAccount ? (
+      ) : (
         <>
           <Loading
             title={"Setting up your account..."}
             description="Your account is almost ready, please wait..."
-          />
-        </>
-      ) : (
-        <>
-          <PaywallComponent
-            close={() => {
-              hideAuth();
-            }}
-            setupAccount={() => {
-              setCurrentStep(SignupSteps.createAccount);
-            }}
-            isModal={false}
           />
         </>
       )}

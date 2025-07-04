@@ -115,65 +115,75 @@ const Intro = () => {
   );
 
   return (
-    <ScrollView
-      testID="notesnook.splashscreen"
+    <View
       style={{
-        width: "100%",
+        flex: 1,
+        height: "100%",
         backgroundColor: colors.primary.background
       }}
     >
       <View
-        style={[
-          {
-            width: "100%",
-            backgroundColor: colors.secondary.background,
-            borderBottomWidth: 1,
-            borderBottomColor: colors.primary.border,
-            paddingTop: insets.top + 10,
-            paddingBottom: insets.top + 10,
-            minHeight: height * 0.7 - (insets.top + insets.bottom)
-          },
-          isTablet && {
-            width: width / 2,
-            alignSelf: "center",
-            borderWidth: 1,
-            borderColor: colors.primary.border,
-            borderRadius: 20,
-            marginTop: 50
-          }
-        ]}
+        testID="notesnook.splashscreen"
+        style={{
+          flex: 1
+        }}
       >
-        <SwiperFlatList
-          autoplay
-          autoplayDelay={10}
-          autoplayLoop={true}
-          index={0}
-          useReactNativeGestureHandler={true}
-          showPagination
-          data={strings.introData}
-          paginationActiveColor={colors.primary.accent}
-          paginationStyleItem={{
-            width: 10,
-            height: 5,
-            marginRight: 4,
-            marginLeft: 4
-          }}
-          paginationDefaultColor={colors.primary.border}
-          renderItem={renderItem}
-        />
+        <View
+          style={[
+            {
+              width: "100%",
+              borderBottomWidth: 1,
+              borderBottomColor: colors.primary.border,
+              paddingTop: insets.top + 10,
+              paddingBottom: insets.top + 10,
+              flexGrow: 1
+            },
+            isTablet && {
+              width: width / 2,
+              alignSelf: "center",
+              borderWidth: 1,
+              borderColor: colors.primary.border,
+              borderRadius: 20,
+              marginTop: 50
+            }
+          ]}
+        >
+          <SwiperFlatList
+            autoplay
+            autoplayDelay={10}
+            autoplayLoop={true}
+            index={0}
+            useReactNativeGestureHandler={true}
+            showPagination
+            data={strings.introData}
+            paginationActiveColor={colors.primary.accent}
+            paginationStyleItem={{
+              width: 10,
+              height: 5,
+              marginRight: 4,
+              marginLeft: 4
+            }}
+            paginationDefaultColor={colors.primary.border}
+            renderItem={renderItem}
+          />
+        </View>
       </View>
-
       <View
         style={{
           width: "100%",
           justifyContent: "center",
-          minHeight: height * 0.3
+          gap: DefaultAppStyles.GAP_VERTICAL,
+          paddingHorizontal: DefaultAppStyles.GAP,
+          paddingVertical: DefaultAppStyles.GAP_VERTICAL,
+          flexShrink: 1
         }}
       >
         <Button
-          width={250}
+          style={{
+            width: "100%"
+          }}
           onPress={async () => {
-            SettingsService.set({ introCompleted: true });
+            // SettingsService.set({ introCompleted: true });
             Navigation.push("Auth", {
               mode: AuthMode.welcomeSignup
             });
@@ -184,17 +194,23 @@ const Intro = () => {
         />
 
         <Button
-          width="100%"
-          title={"I already have an account"}
+          style={{
+            width: "100%"
+          }}
+          title={strings.iAlreadyHaveAnAccount()}
           type="secondary"
+          fontSize={AppFontSize.md}
           onPress={() => {
-            SettingsService.set({
-              introCompleted: true
+            // SettingsService.set({
+            //   introCompleted: true
+            // });
+            Navigation.push("Auth", {
+              mode: AuthMode.login
             });
           }}
         />
       </View>
-    </ScrollView>
+    </View>
   );
 };
 

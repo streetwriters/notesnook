@@ -101,7 +101,11 @@ export interface RouteParams extends ParamListBase {
     reference?: Note;
   };
   Intro: GenericRouteParam;
-};
+  PayWall: {
+    canGoBack?: boolean;
+    context: "signup" | "logged-in" | "logged-out";
+  };
+}
 
 export type RouteName = keyof RouteParams;
 

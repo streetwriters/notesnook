@@ -16,6 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { useThemeColors } from "@notesnook/theme";
+import dayjs from "dayjs";
 import React from "react";
 import {
   Platform,
@@ -24,19 +26,17 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import usePricingPlans from "../../../hooks/use-pricing-plans";
-import { presentSheet } from "../../../services/event-manager";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { SIZE } from "../../../utils/size";
-import Paragraph from "../../ui/typography/paragraph";
-import Heading from "../../ui/typography/heading";
-import { useThemeColors } from "@notesnook/theme";
 import * as RNIap from "react-native-iap";
-import { Button } from "../../ui/button";
-import dayjs from "dayjs";
-import { openLinkInBrowser } from "../../../utils/functions";
-import { IconButton } from "../../ui/icon-button";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import useGlobalSafeAreaInsets from "../../../hooks/use-global-safe-area-insets";
+import usePricingPlans from "../../../hooks/use-pricing-plans";
+import { openLinkInBrowser } from "../../../utils/functions";
+import { AppFontSize } from "../../../utils/size";
+import { Button } from "../../ui/button";
+import { IconButton } from "../../ui/icon-button";
+import Heading from "../../ui/typography/heading";
+import Paragraph from "../../ui/typography/paragraph";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 export const BuyPlan = (props: {
   planId: string;
@@ -67,9 +67,8 @@ export const BuyPlan = (props: {
   return (
     <ScrollView
       contentContainerStyle={{
-        gap: 16,
         paddingBottom: 80,
-        paddingTop: Platform.OS === "android" ? insets.top : 0
+        marginTop: DefaultAppStyles.GAP
       }}
       keyboardDismissMode="none"
       keyboardShouldPersistTaps="always"
@@ -77,40 +76,9 @@ export const BuyPlan = (props: {
     >
       <View
         style={{
-          flexDirection: "row",
-          alignItems: "center",
-          width: "100%",
-          backgroundColor: colors.primary.background
+          paddingHorizontal: DefaultAppStyles.GAP
         }}
       >
-        <IconButton
-          name="chevron-left"
-          onPress={() => {
-            props.goBack();
-          }}
-          style={{
-            alignSelf: "flex-start"
-          }}
-        />
-      </View>
-
-      <View
-        style={{
-          paddingHorizontal: 16,
-          gap: 16
-        }}
-      >
-        <Heading
-          style={{
-            alignSelf: "center",
-            marginBottom: 10
-          }}
-        >
-          {props.canActivateTrial
-            ? `Try ${pricingPlans.currentPlan?.name} plan for free`
-            : `${pricingPlans.currentPlan?.name} plan`}{" "}
-        </Heading>
-
         {props.canActivateTrial ? (
           <View
             style={{
@@ -138,7 +106,7 @@ export const BuyPlan = (props: {
               >
                 <Icon
                   color={colors.primary.accent}
-                  size={SIZE.lg}
+                  size={AppFontSize.lg}
                   name="check"
                 />
                 <Paragraph>{item}</Paragraph>
@@ -164,11 +132,10 @@ export const BuyPlan = (props: {
         <View
           style={{
             flexDirection: "row",
-            justifyContent: "space-between",
-            marginTop: 20
+            justifyContent: "space-between"
           }}
         >
-          <Heading color={colors.primary.paragraph} size={SIZE.sm}>
+          <Heading color={colors.primary.paragraph} size={AppFontSize.sm}>
             Due today{" "}
             {pricingPlans.userCanRequestTrial ? (
               <Text
@@ -220,6 +187,10 @@ export const BuyPlan = (props: {
               ? "Subscribe and start free trial"
               : "Subscribe"
           }
+          style={{
+            marginTop: DefaultAppStyles.GAP_VERTICAL,
+            marginBottom: DefaultAppStyles.GAP_VERTICAL
+          }}
           onPress={() => {
             const offerToken = pricingPlans.getOfferTokenAndroid(
               pricingPlans.selectedProduct as RNIap.SubscriptionAndroid,
@@ -232,50 +203,48 @@ export const BuyPlan = (props: {
           }}
         />
 
-        <View>
-          <Heading
+        <Heading
+          style={{
+            textAlign: "center"
+          }}
+          color={colors.secondary.paragraph}
+          size={AppFontSize.xs}
+        >
+          {is5YearPlanSelected
+            ? `This is a one time purchase, no subscription.`
+            : `Cancel anytime, subscription auto-renews.`}
+        </Heading>
+        <Heading
+          style={{
+            textAlign: "center"
+          }}
+          color={colors.secondary.paragraph}
+          size={AppFontSize.xs}
+        >
+          By joining you agree to our{" "}
+          <Text
             style={{
-              textAlign: "center"
+              textDecorationLine: "underline"
             }}
-            color={colors.secondary.paragraph}
-            size={SIZE.xs}
+            onPress={() => {
+              openLinkInBrowser("https://notesnook.com/privacy");
+            }}
           >
-            {is5YearPlanSelected
-              ? `This is a one time purchase, no subscription.`
-              : `Cancel anytime, subscription auto-renews.`}
-          </Heading>
-          <Heading
+            privacy policy
+          </Text>{" "}
+          and{" "}
+          <Text
             style={{
-              textAlign: "center"
+              textDecorationLine: "underline"
             }}
-            color={colors.secondary.paragraph}
-            size={SIZE.xs}
+            onPress={() => {
+              openLinkInBrowser("https://notesnook.com/tos");
+            }}
           >
-            By joining you agree to our{" "}
-            <Text
-              style={{
-                textDecorationLine: "underline"
-              }}
-              onPress={() => {
-                openLinkInBrowser("https://notesnook.com/privacy");
-              }}
-            >
-              privacy policy
-            </Text>{" "}
-            and{" "}
-            <Text
-              style={{
-                textDecorationLine: "underline"
-              }}
-              onPress={() => {
-                openLinkInBrowser("https://notesnook.com/tos");
-              }}
-            >
-              terms of use
-            </Text>
-            .
-          </Heading>
-        </View>
+            terms of use
+          </Text>
+          .
+        </Heading>
       </View>
     </ScrollView>
   );
@@ -307,20 +276,20 @@ const ProductItem = (props: {
       <Icon
         name={isSelected ? "radiobox-marked" : "radiobox-blank"}
         color={isSelected ? colors.primary.accent : colors.secondary.icon}
-        size={SIZE.lg}
+        size={AppFontSize.lg}
       />
       <View
         style={{
-          gap: 10
+          gap: DefaultAppStyles.GAP_VERTICAL
         }}
       >
         <View
           style={{
             flexDirection: "row",
-            gap: 10
+            gap: DefaultAppStyles.GAP_VERTICAL
           }}
         >
-          <Heading size={SIZE.md}>
+          <Heading size={AppFontSize.md}>
             {isAnnual
               ? "Yearly"
               : product?.productId.includes("5year")
@@ -338,7 +307,7 @@ const ProductItem = (props: {
                 justifyContent: "center"
               }}
             >
-              <Heading color={colors.static.white} size={SIZE.xs}>
+              <Heading color={colors.static.white} size={AppFontSize.xs}>
                 Best value -{" "}
                 {props.pricingPlans.compareProductPrice(
                   props.pricingPlans.currentPlan?.id as string,

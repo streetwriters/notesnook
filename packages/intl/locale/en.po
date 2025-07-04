@@ -3056,6 +3056,10 @@ msgstr "How to fix it?"
 msgid "hr"
 msgstr "hr"
 
+#: src/strings.ts:2489
+msgid "I already have an account"
+msgstr "I already have an account"
+
 #: src/strings.ts:125
 msgid "I don't have access to authenticator app"
 msgstr "I don't have access to authenticator app"

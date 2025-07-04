@@ -31,8 +31,6 @@ import ResultDialog from "../dialogs/result";
 import { VaultDialog } from "../dialogs/vault";
 import ImagePreview from "../image-preview";
 import MergeConflicts from "../merge-conflicts";
-import PremiumDialog from "../premium";
-import { Expiring } from "../premium/expiring";
 import SheetProvider from "../sheet-provider";
 import RateAppSheet from "../sheets/rate-app";
 import RecoveryKeySheet from "../sheets/recovery-key";
@@ -46,7 +44,6 @@ const DialogProvider = () => {
       <AppLockPassword />
       <LoadingDialog />
       <Dialog context="global" />
-      <PremiumDialog colors={colors} />
       <AuthModal colors={colors} />
       <MergeConflicts />
       <RecoveryKeySheet colors={colors} />
@@ -56,7 +53,6 @@ const DialogProvider = () => {
       <VaultDialog colors={colors} />
       <RateAppSheet />
       <ImagePreview />
-      <Expiring />
       <AnnouncementDialog />
       <SessionExpired />
       <PDFPreview />

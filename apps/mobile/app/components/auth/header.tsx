@@ -31,7 +31,6 @@ export const AuthHeader = (props: { welcome?: boolean }) => {
     <View
       style={{
         paddingTop: Platform.OS === "android" ? 0 : insets.top,
-        backgroundColor: colors.secondary.background,
         width: "100%"
       }}
     >

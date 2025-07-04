@@ -329,7 +329,6 @@ const doAppLoadActions = async () => {
   if (NewFeature.present()) return;
   if (await checkAppUpdateAvailable()) return;
   if (await checkForRateAppRequest()) return;
-  if (await PremiumService.getRemainingTrialDaysStatus()) return;
   if (SettingsService.get().introCompleted) {
     useMessageStore.subscribe((state) => {
       const dialogs = state.dialogs;

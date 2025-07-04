@@ -18,27 +18,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { CHECK_IDS } from "@notesnook/core";
-import React from "react";
 import { Platform } from "react-native";
 import Config from "react-native-config";
 import * as RNIap from "react-native-iap";
 import { db } from "../common/database";
 import { MMKV } from "../common/database/mmkv";
-import DialogHeader from "../components/dialog/dialog-header";
-import { CompactFeatures } from "../components/premium/compact-features";
-import { PricingPlans } from "../components/premium/pricing-plans";
-import Seperator from "../components/ui/seperator";
 import { useUserStore } from "../stores/use-user-store";
 import { itemSkus, SUBSCRIPTION_STATUS } from "../utils/constants";
-import {
-  eOpenPremiumDialog,
-  eOpenTrialEndingDialog,
-  eShowGetPremium
-} from "../utils/events";
+import { eOpenPremiumDialog, eShowGetPremium } from "../utils/events";
 import { eSendEvent, presentSheet, ToastManager } from "./event-manager";
 
-import SettingsService from "./settings";
 import { strings } from "@notesnook/intl";
+import SettingsService from "./settings";
 let premiumStatus = 0;
 
 /**
@@ -100,22 +91,31 @@ function getMontlySub() {
 }
 
 async function loadProductsAndSubs() {
-  if (!subs || subs.length === 0) {
-    subs = await RNIap.getSubscriptions({
-      skus: itemSkus
-    });
-  }
+  try {
+    if (!subs || subs.length === 0) {
+      subs = await RNIap.getSubscriptions({
+        skus: itemSkus
+      });
+      console.log("SUBS", subs);
+    }
 
-  if (!products || products.length === 0) {
-    products = await RNIap.getProducts({
-      skus: ["notesnook.pro.5year", "notesnook.believer.5year"]
-    });
-  }
+    if (!products || products.length === 0) {
+      products = await RNIap.getProducts({
+        skus: ["notesnook.pro.5year", "notesnook.believer.5year"]
+      });
+    }
 
-  return {
-    subs,
-    products
-  };
+    return {
+      subs,
+      products
+    };
+  } catch (e) {
+    console.error("Failed to load products and subscriptions", e);
+    return {
+      subs: [],
+      products: []
+    };
+  }
 }
 
 function get() {
@@ -355,87 +355,7 @@ const subscriptions = {
   }
 };
 
-async function getRemainingTrialDaysStatus() {
-  let user = await db.user.getUser();
-  if (!user || !user.subscription || user.subscription?.expiry === 0) return;
-
-  let premium = user.subscription.type !== SUBSCRIPTION_STATUS.BASIC;
-  let isTrial = user.subscription.type === SUBSCRIPTION_STATUS.TRIAL;
-  let total = user.subscription.expiry - user.subscription.start;
-  let current = Date.now() - user.subscription.start;
-  current = (current / total) * 100;
-
-  let lastTrialDialogShownAt = MMKV.getString("lastTrialDialogShownAt");
-
-  if (current > 75 && isTrial && lastTrialDialogShownAt !== "ending") {
-    eSendEvent(eOpenTrialEndingDialog, {
-      title: strings.trialEndingSoon(),
-      offer: null,
-      extend: false
-    });
-    MMKV.setItem("lastTrialDialogShownAt", "ending");
-    return true;
-  }
-
-  if (!premium && lastTrialDialogShownAt !== "expired") {
-    eSendEvent(eOpenTrialEndingDialog, {
-      title: strings.trialExpired(),
-      offer: 30,
-      extend: false
-    });
-    MMKV.setItem("lastTrialDialogShownAt", "expired");
-    return true;
-  }
-  return false;
-}
-
-const features_list = [
-  {
-    content: "Unlock unlimited notebooks, tags, colors. Organize like a pro"
-  },
-  {
-    content: "Attach files upto 500MB, upload 4K images with unlimited storage"
-  },
-  {
-    content: "Instantly sync to unlimited devices"
-  },
-  {
-    content: "A private vault to keep everything important always locked"
-  },
-  {
-    content:
-      "Rich note editing experience with markdown, tables, checklists and more"
-  },
-  {
-    content: "Export your notes in PDF, markdown and html formats"
-  }
-];
-
-const sheet = (context, promo, trial) => {
-  presentSheet({
-    context: context,
-    component: (ref) => (
-      <>
-        <DialogHeader
-          centered
-          title="Upgrade to Notesnook"
-          titlePart="Pro"
-          paragraph="Manage your work on another level, enjoy seamless sync and keep all notes in one place."
-          padding={12}
-        />
-        <Seperator />
-        <CompactFeatures
-          scrollRef={ref}
-          maxHeight={400}
-          features={features_list}
-          vertical
-        />
-        <Seperator half />
-        <PricingPlans trial={trial} compact heading={false} promo={promo} />
-      </>
-    )
-  });
-};
+const sheet = (context, promo, trial) => {};
 
 const PremiumService = {
   verify,
@@ -447,7 +367,6 @@ const PremiumService = {
   getUser,
   subscriptions,
   getMontlySub,
-  getRemainingTrialDaysStatus,
   sheet
 };
 
