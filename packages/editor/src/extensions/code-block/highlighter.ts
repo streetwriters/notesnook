@@ -31,6 +31,7 @@ import { toCaretPosition, toCodeLines } from "./utils.js";
 import Languages from "./languages.json";
 import { isLanguageLoaded, loadLanguage } from "./loader.js";
 import { getChangedNodes } from "../../utils/prosemirror.js";
+import { Node } from "@tiptap/pm/model";
 
 export type ReplaceMergedStep = ReplaceAroundStep | ReplaceStep;
 
@@ -69,7 +70,7 @@ function getDecorations({
   defaultLanguage
 }: {
   block: NodeWithPos;
-  defaultLanguage: string | null | undefined;
+  defaultLanguage: () => string | null | undefined;
 }) {
   const decorations: Decoration[] = [];
   const languages = refractor.listLanguages();
@@ -77,7 +78,7 @@ function getDecorations({
   const { node, pos } = block;
   const code = node.textContent;
 
-  const language = node.attrs.language || defaultLanguage;
+  const language = node.attrs.language || defaultLanguage();
   const nodes = languages.includes(language)
     ? getHighlightNodes(refractor.highlight(code, language))
     : null;
@@ -107,7 +108,7 @@ export function HighlighterPlugin({
   defaultLanguage
 }: {
   name: string;
-  defaultLanguage: string | null | undefined;
+  defaultLanguage: () => string | null | undefined;
 }) {
   const HIGHLIGHTER_PLUGIN_KEY = new PluginKey<HighlighterState>("highlighter");
   const HIGHLIGHTED_BLOCKS: Set<string> = new Set();
@@ -270,16 +271,64 @@ export function HighlighterPlugin({
     },
     appendTransaction(transactions, oldState, newState) {
       const isDocChanged = transactions.some((tr) => tr.docChanged);
-      return updateSelection(name, oldState, newState, isDocChanged);
+
+      const { newAdded } = compareDocuments(oldState.doc, newState.doc);
+      let isCodeBlockNew = false;
+      newAdded.forEach((block) => {
+        if (block.child.type.name === name) isCodeBlockNew = true;
+      });
+
+      return updateSelection(
+        name,
+        oldState,
+        newState,
+        isDocChanged,
+        defaultLanguage,
+        isCodeBlockNew
+      );
     }
   });
+}
+
+// https://discuss.prosemirror.net/t/changed-part-of-document/992/3
+function compareDocuments(oldDocument: Node, newDocument: Node) {
+  let diff = new Map<Node, number>();
+  let removed: { child: Node; position: number }[] = [];
+
+  newDocument.content.forEach((child, position) => {
+    diff.set(child, position);
+  });
+
+  oldDocument.content.forEach((child, position) => {
+    if (diff.has(child)) {
+      diff.delete(child);
+    } else {
+      removed.push({ child: child, position: position });
+    }
+  });
+
+  let added = Array.from(diff.entries()).map((value) => {
+    return { child: value[0], position: value[1] };
+  });
+
+  const newAdded = added.filter((value) => {
+    // when the page loads there is a paragraph node with null blockId, no idea why
+    if (removed.some((r) => r.child.attrs.blockId === null)) return false;
+    return removed.every((removedValue) => {
+      return removedValue.child.attrs.blockId !== value.child.attrs.blockId;
+    });
+  });
+
+  return { removed, added, newAdded };
 }
 
 function updateSelection(
   name: string,
   oldState: EditorState,
   newState: EditorState,
-  isDocChanged: boolean
+  isDocChanged: boolean,
+  defaultLanguage: () => string | null | undefined,
+  isCodeBlockNew: boolean
 ) {
   const oldNodeName = oldState.selection.$head.parent.type.name;
   const newNodeName = newState.selection.$head.parent.type.name;
@@ -307,6 +356,9 @@ function updateSelection(
       isDocChanged ? toCodeLines(node.textContent, pos) : undefined
     );
     attributes.caretPosition = position;
+    if (isCodeBlockNew) {
+      attributes.language = node.attrs.language ?? defaultLanguage();
+    }
 
     const { tr } = newState;
     tr.setMeta("preventUpdate", true);
