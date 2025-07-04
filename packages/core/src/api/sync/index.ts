@@ -467,7 +467,7 @@ class Sync {
 
   private async getKey() {
     const key = await this.db.user.getEncryptionKey();
-    if (!key || !key || !key) {
+    if (!key?.key) {
       this.logger.error(
         new Error("User encryption key not generated. Please relogin.")
       );
