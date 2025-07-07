@@ -137,7 +137,7 @@ function updateNoteStatistics(id: string, content: () => Fragment) {
         selected: 0
       },
       characters: {
-        total: countCharacters(fragment.textBetween(0, fragment.size, "", "")),
+        total: countCharacters(removeNewlineCharacters(documentText)),
         selected: 0
       },
       paragraphs: {
@@ -357,12 +357,7 @@ function TipTap(props: TipTapProps) {
             transaction.selection
           );
           const selectedCharacters = countCharacters(
-            editor.state.doc.textBetween(
-              transaction.selection.from,
-              transaction.selection.to,
-              "",
-              ""
-            )
+            removeNewlineCharacters(selectedText)
           );
           return {
             statistics: {
@@ -720,4 +715,8 @@ function getSelectedParagraphs(editor: Editor, selection: Selection): number {
     return true;
   });
   return count;
+}
+
+function removeNewlineCharacters(text: string) {
+  return text.replaceAll(/\n/g, "");
 }
