@@ -54,6 +54,7 @@ export type AppLockRouteParams = {
 
 export type AuthParams = {
   mode: number;
+  context?: "intro";
 };
 
 export interface RouteParams extends ParamListBase {
