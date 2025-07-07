@@ -119,7 +119,10 @@ export function useNoteStatistics(): NoteStatistics {
     (store) =>
       (store.activeEditorId &&
         store.editors[store.activeEditorId]?.statistics) || {
-        words: { total: 0 }
+        words: { total: 0 },
+        characters: { total: 0 },
+        paragraphs: { total: 0 },
+        spaces: { total: 0 }
       }
   );
 }

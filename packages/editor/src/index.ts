@@ -438,3 +438,4 @@ export {
 };
 export { replaceDateTime } from "./extensions/date-time/index.js";
 export type * from "./extension-imports.js";
+export { type Selection } from "@tiptap/pm/state";
