@@ -20,11 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
-import { Linking, ScrollView, useWindowDimensions, View } from "react-native";
+import { Linking, useWindowDimensions, View } from "react-native";
 import { SwiperFlatList } from "react-native-swiper-flatlist";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import Navigation from "../../services/navigation";
-import SettingsService from "../../services/settings";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { AuthMode } from "../auth/common";
@@ -34,7 +33,7 @@ import Paragraph from "../ui/typography/paragraph";
 
 const Intro = () => {
   const { colors } = useThemeColors();
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const insets = useGlobalSafeAreaInsets();
   const isTablet = width > 600;
 
@@ -205,7 +204,8 @@ const Intro = () => {
             //   introCompleted: true
             // });
             Navigation.push("Auth", {
-              mode: AuthMode.login
+              mode: AuthMode.login,
+              context: "intro"
             });
           }}
         />
