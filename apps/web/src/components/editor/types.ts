@@ -26,6 +26,18 @@ export type NoteStatistics = {
     total: number;
     selected?: number;
   };
+  characters: {
+    total: number;
+    selected?: number;
+  };
+  paragraphs: {
+    total: number;
+    selected?: number;
+  };
+  spaces: {
+    total: number;
+    selected?: number;
+  };
 };
 
 export interface IEditor {
