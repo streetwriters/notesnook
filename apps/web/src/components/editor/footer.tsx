@@ -41,10 +41,8 @@ import { strings } from "@notesnook/intl";
 import { EDITOR_ZOOM } from "./common";
 import { useWindowControls } from "../../hooks/use-window-controls";
 import { exitFullscreen } from "../../utils/fullscreen";
-import ReactDOM from "react-dom";
-import ReactModal from "react-modal";
-import { ScopedThemeProvider } from "../theme-provider";
-import { STATUS_BAR_HEIGHT } from "../../common/constants";
+import { useRef, useState } from "react";
+import { PopupPresenter } from "@notesnook/ui";
 
 const SAVE_STATE_ICON_MAP = {
   "-1": NotSaved,
@@ -59,6 +57,8 @@ function EditorFooter() {
   const { editorConfig, setEditorConfig } = useEditorConfig();
   const editorMargins = useEditorStore((store) => store.editorMargins);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
+  const [isStatisticsPopupOpen, setIsStatisticsPopupOpen] = useState(false);
+  const statisticsRef = useRef<HTMLButtonElement | null>(null);
 
   if (!session) return null;
 
@@ -182,13 +182,8 @@ function EditorFooter() {
         className="selectable"
         data-test-id="editor-word-count"
         variant="statusitem"
-        onClick={(e) => {
-          const target = e.target as HTMLElement;
-          showNoteStatisticsView(statistics, {
-            bottom: STATUS_BAR_HEIGHT + 5,
-            left: target.getBoundingClientRect().left - 40
-          });
-        }}
+        ref={statisticsRef}
+        onClick={() => setIsStatisticsPopupOpen(true)}
       >
         <Text variant="subBody" sx={{ color: "paragraph" }}>
           {strings.totalWords(statistics.words.total)}
@@ -197,6 +192,62 @@ function EditorFooter() {
             : ""}
         </Text>
       </Button>
+      <PopupPresenter
+        isOpen={isStatisticsPopupOpen}
+        onClose={() => setIsStatisticsPopupOpen(false)}
+        position={{
+          isTargetAbsolute: true,
+          target: statisticsRef.current,
+          location: "top",
+          align: "center",
+          yOffset: 5
+        }}
+      >
+        <Flex
+          sx={{
+            width: ["100%", "fit-content"],
+            border: "1px solid",
+            borderColor: "border",
+            borderRadius: "dialog",
+            boxShadow: "0px 0px 15px 0px #00000011",
+            bg: "background-secondary",
+            flexDirection: "column",
+            gap: 2,
+            pt: 2,
+            justifyContent: "center"
+          }}
+        >
+          {Object.entries(statistics).map(([key, value]) => (
+            <Flex key={key} sx={{ justifyContent: "space-between", px: 4 }}>
+              <Text variant="body" sx={{ width: 100 }}>
+                {strings[key as keyof NoteStatistics]()}
+              </Text>
+              <Text
+                variant="body"
+                sx={{ color: "paragraph", fontWeight: "bold" }}
+              >
+                {value.total}
+                {value.selected ? (
+                  <span style={{ fontWeight: "normal" }}>
+                    {" "}
+                    ({value.selected} selected)
+                  </span>
+                ) : (
+                  ""
+                )}
+              </Text>
+            </Flex>
+          ))}
+          <Button
+            data-test-id="dialog-no"
+            onClick={() => setIsStatisticsPopupOpen(false)}
+            color="paragraph"
+            variant="icon"
+          >
+            <Cross size={12} />
+          </Button>
+        </Flex>
+      </PopupPresenter>
       {dateEdited > 0 ? (
         <Text
           className="selectable"
@@ -234,109 +285,4 @@ export default EditorFooter;
 
 function enterFullscreen(elem: HTMLElement) {
   elem.requestFullscreen();
-}
-
-export function showNoteStatisticsView(
-  statistics: NoteStatistics,
-  { bottom, left }: { bottom?: number; left?: number } = {}
-) {
-  const root = document.getElementById("dialogContainer");
-
-  if (root) {
-    return new Promise((resolve) => {
-      const perform = (result: boolean) => {
-        ReactDOM.unmountComponentAtNode(root);
-        closeNoteStatisticsView();
-        resolve(result);
-      };
-      ReactDOM.render(
-        <ReactModal
-          isOpen
-          onRequestClose={() => perform(false)}
-          preventScroll={false}
-          shouldCloseOnOverlayClick
-          shouldCloseOnEsc
-          shouldFocusAfterRender
-          shouldReturnFocusAfterClose
-          style={{
-            overlay: { backgroundColor: "transparent", zIndex: 999 },
-            content: {
-              padding: 0,
-              top: undefined,
-              left: left,
-              bottom: bottom,
-              right: undefined,
-              background: "transparent",
-              border: "none",
-              borderRadius: 0,
-              boxShadow: "0px 0px 15px 0px #00000011"
-            }
-          }}
-        >
-          <ScopedThemeProvider
-            scope="dialog"
-            injectCssVars
-            sx={{
-              width: ["100%", "fit-content"],
-              border: "1px solid",
-              borderColor: "border",
-              borderRadius: "dialog",
-              overflow: "hidden"
-            }}
-            bg="background-secondary"
-          >
-            <Flex
-              sx={{
-                flexDirection: "column",
-                gap: 2,
-                pt: 2,
-                justifyContent: "center"
-              }}
-            >
-              {Object.entries(statistics).map(([key, value]) => (
-                <Flex key={key} sx={{ justifyContent: "space-between", px: 4 }}>
-                  <Text variant="body" sx={{ width: 100 }}>
-                    {strings[key as keyof NoteStatistics]()}
-                  </Text>
-                  <Text
-                    variant="body"
-                    sx={{ color: "paragraph", fontWeight: "bold" }}
-                  >
-                    {value.total}
-                    {value.selected ? (
-                      <span style={{ fontWeight: "normal" }}>
-                        {" "}
-                        ({value.selected} selected)
-                      </span>
-                    ) : (
-                      ""
-                    )}
-                  </Text>
-                </Flex>
-              ))}
-              <Button
-                data-test-id="dialog-no"
-                onClick={() => {
-                  perform(false);
-                }}
-                color="paragraph"
-                variant="icon"
-              >
-                <Cross size={12} />
-              </Button>
-            </Flex>
-          </ScopedThemeProvider>
-        </ReactModal>,
-        root
-      );
-    });
-  }
-  return Promise.reject("No element with id 'dialogContainer'");
-}
-
-function closeNoteStatisticsView() {
-  const root = document.getElementById("dialogContainer");
-  if (root) {
-    root.innerHTML = "";
-  }
 }
