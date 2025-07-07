@@ -344,21 +344,25 @@ function TipTap(props: TipTapProps) {
               : old;
           }
 
-          const selectedWords = getSelectedWords(
-            editor as Editor,
-            transaction.selection
+          const selectedText = editor.state.doc.textBetween(
+            transaction.selection.from,
+            transaction.selection.to,
+            "\n",
+            " "
           );
+          const selectedWords = countWords(selectedText);
+          const selectedSpaces = countSpaces(selectedText);
           const selectedParagraphs = getSelectedParagraphs(
             editor as Editor,
             transaction.selection
           );
-          const selectedSpaces = getSelectedSpaces(
-            editor as Editor,
-            transaction.selection
-          );
-          const selectedCharacters = getSelectedCharacters(
-            editor as Editor,
-            transaction.selection
+          const selectedCharacters = countCharacters(
+            editor.state.doc.textBetween(
+              transaction.selection.from,
+              transaction.selection.to,
+              "",
+              ""
+            )
           );
           return {
             statistics: {
@@ -707,23 +711,7 @@ function toIEditor(editor: Editor): IEditor {
   };
 }
 
-function getSelectedWords(editor: Editor, selection: Selection): number {
-  const selectedText = selection.empty
-    ? ""
-    : editor.state.doc.textBetween(selection.from, selection.to, "\n", " ");
-  return countWords(selectedText);
-}
-
-function getSelectedCharacters(editor: Editor, selection: Selection): number {
-  if (selection.empty) return 0;
-  return countCharacters(
-    editor.state.doc.textBetween(selection.from, selection.to, "", "")
-  );
-}
-
 function getSelectedParagraphs(editor: Editor, selection: Selection): number {
-  if (selection.empty) return 0;
-
   let count = 0;
   editor.state.doc.nodesBetween(selection.from, selection.to, (node) => {
     if (node.type.name === "paragraph") {
@@ -732,16 +720,4 @@ function getSelectedParagraphs(editor: Editor, selection: Selection): number {
     return true;
   });
   return count;
-}
-
-function getSelectedSpaces(editor: Editor, selection: Selection): number {
-  if (selection.empty) return 0;
-
-  const selectedText = editor.state.doc.textBetween(
-    selection.from,
-    selection.to,
-    "\n",
-    " "
-  );
-  return countSpaces(selectedText);
 }
