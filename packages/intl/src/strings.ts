@@ -2610,5 +2610,6 @@ Use this if changes from other devices are not appearing on this device. This wi
   clickToUpdate: () => t`Click to update`,
   noPassword: () => t`No password`,
   publishToTheWeb: () => t`Publish to the web`,
-  addToHome: () => t`Add to home`
+  addToHome: () => t`Add to home`,
+  clickToSave: () => t`Click to save`
 };

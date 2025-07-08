@@ -68,6 +68,7 @@ import { showFeatureNotAllowedToast } from "../../common/toasts";
 import { UpgradeDialog } from "../../dialogs/buy-dialog/upgrade-dialog";
 import { ConfirmDialog } from "../../dialogs/confirm";
 import { strings } from "@notesnook/intl";
+import { AppEventManager, AppEvents } from "../../common/app-events";
 
 export type OnChangeHandler = (
   content: () => string,
@@ -470,6 +471,21 @@ function TipTap(props: TipTapProps) {
         if (!autoSave.current) {
           onAutoSaveDisabled();
         }
+      }
+    );
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    const { unsubscribe } = AppEventManager.subscribe(
+      AppEvents.saveEditor,
+      () => {
+        onChange?.(
+          () => getHTMLFromFragment(editor.state.doc.content, editor.schema),
+          false
+        );
       }
     );
     return () => {
