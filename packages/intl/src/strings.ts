@@ -2488,5 +2488,6 @@ Use this if changes from other devices are not appearing on this device. This wi
     t`Select a notebook to move this notebook into, or unselect to move it to the root level.`,
   words: () => t`Words`,
   characters: () => t`Characters`,
-  paragraphs: () => t`Paragraphs`
+  paragraphs: () => t`Paragraphs`,
+  clickToSave: () => t`Click to save`
 };

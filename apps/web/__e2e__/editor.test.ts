@@ -415,6 +415,44 @@ test("when autosave is disabled, closing the note should save it", async ({
   expect(await notes.editor.getContent("text")).toBe(content.trim());
 });
 
+test("when autosave is disabled, clicking the not saved icon should save the note", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const content = "a ".repeat(100);
+  await notes.createNote({
+    title: NOTE.title,
+    content
+  });
+
+  await notes.editor.notSavedIcon.waitFor({ state: "visible" });
+  await notes.editor.notSavedIcon.click();
+
+  await expect(notes.editor.savedIcon).toBeVisible();
+  expect(await notes.editor.getContent("text")).toBe(content.trim());
+});
+
+test("when autosave is disabled, clicking save from tab menu should save the note", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const content = "a ".repeat(100);
+  await notes.createNote({
+    title: NOTE.title,
+    content
+  });
+
+  const tab = (await notes.editor.getTabs())[0];
+  await tab.contextMenu.save();
+
+  await expect(notes.editor.savedIcon).toBeVisible();
+  expect(await notes.editor.getContent("text")).toBe(content.trim());
+});
+
 test("control + alt + right arrow should go to next note", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();

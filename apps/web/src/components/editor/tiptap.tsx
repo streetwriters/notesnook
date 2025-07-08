@@ -65,6 +65,7 @@ import { TimeFormat } from "@notesnook/core";
 import { BuyDialog } from "../../dialogs/buy-dialog";
 import { EDITOR_ZOOM } from "./common";
 import { ScrollContainer } from "@notesnook/ui";
+import { AppEventManager, AppEvents } from "../../common/app-events";
 
 export type OnChangeHandler = (
   content: () => string,
@@ -442,6 +443,21 @@ function TipTap(props: TipTapProps) {
         if (!autoSave.current) {
           onAutoSaveDisabled();
         }
+      }
+    );
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    const { unsubscribe } = AppEventManager.subscribe(
+      AppEvents.saveEditor,
+      () => {
+        onChange?.(
+          () => getHTMLFromFragment(editor.state.doc.content, editor.schema),
+          false
+        );
       }
     );
     return () => {
