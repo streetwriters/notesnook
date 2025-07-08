@@ -348,7 +348,7 @@ async function scheduleNotification(
           title: title,
           message: description || "",
           ongoing: true,
-          subtitle: description || "",
+          // subtitle: description || "",
           actions: [strings.unpin()]
         });
       }
@@ -396,7 +396,7 @@ async function scheduleNotification(
             payload: payload || "",
             dateModified: reminder.dateModified + ""
           },
-          subtitle: !description ? undefined : description,
+          // subtitle: !description ? undefined : description,
           android: {
             channelId: await getChannelId(priority),
             smallIcon: "ic_stat_name",
