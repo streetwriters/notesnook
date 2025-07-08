@@ -39,7 +39,6 @@ public class BootTaskService extends HeadlessJsTaskService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel("com.streetwriters.notesnook",
                     "Default",
@@ -55,7 +54,7 @@ public class BootTaskService extends HeadlessJsTaskService {
                 this.startForeground(
                         1,
                         notification,
-                        ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
+                        ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
             } else {
                 this.startForeground(
                         1,
