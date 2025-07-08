@@ -11,57 +11,69 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="remove"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:node="remove"/>
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" tools:node="remove" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        tools:node="remove" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        tools:node="remove" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission
+        android:name="android.permission.USE_FULL_SCREEN_INTENT"
+        tools:node="remove" />
 
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
 
     <queries>
-            <intent>
-                <action android:name="android.intent.action.VIEW" />
-                <!-- If you don't know the MIME type in advance, set "mimeType" to "*/*". -->
-                <data android:mimeType="application/pdf" />
-            </intent>
-            <intent>
-                <action android:name="android.intent.action.VIEW" />
-                <!-- If you don't know the MIME type in advance, set "mimeType" to "*/*". -->
-                <data android:mimeType="text/*" />
-            </intent>
-            <intent>
-                <action android:name="android.intent.action.VIEW" />
-                <!-- If you don't know the MIME type in advance, set "mimeType" to "*/*". -->
-                <data android:mimeType="image/*" />
-            </intent>
-            <intent>
-                <action android:name="android.intent.action.VIEW" />
-                <!-- If you don't know the MIME type in advance, set "mimeType" to "*/*". -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <!-- If you don't know the MIME type in advance, set "mimeType" to "*/*". -->
+            <data android:mimeType="application/pdf" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <!-- If you don't know the MIME type in advance, set "mimeType" to "*/*". -->
+            <data android:mimeType="text/*" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <!-- If you don't know the MIME type in advance, set "mimeType" to "*/*". -->
+            <data android:mimeType="image/*" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <!-- If you don't know the MIME type in advance, set "mimeType" to "*/*". -->
 
-                <data android:mimeType="video/*" />
-            </intent>
-            <intent>
-                <action android:name="android.intent.action.VIEW" />
-                <!-- If you don't know the MIME type in advance, set "mimeType" to "*/*". -->
-                <data android:mimeType="audio/*" />
-            </intent>
-        </queries>
+            <data android:mimeType="video/*" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <!-- If you don't know the MIME type in advance, set "mimeType" to "*/*". -->
+            <data android:mimeType="audio/*" />
+        </intent>
+    </queries>
 
     <application
         android:name=".MainApplication"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:requestLegacyExternalStorage="true"
-        android:theme="@style/BootTheme"
         android:largeHeap="true"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
-        android:networkSecurityConfig="@xml/network_security_config">
-    
-        <receiver android:exported="false" android:label="@string/quick_note" android:name=".NoteWidget">
+        android:theme="@style/BootTheme">
+
+        <receiver
+            android:name=".NoteWidget"
+            android:exported="false"
+            android:label="@string/quick_note">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -71,7 +83,10 @@
                 android:resource="@xml/new_note_widget_info" />
         </receiver>
 
-        <receiver android:exported="false" android:label="@string/note" android:name=".NotePreviewWidget">
+        <receiver
+            android:name=".NotePreviewWidget"
+            android:exported="false"
+            android:label="@string/note">
             <intent-filter>"
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -81,7 +96,10 @@
                 android:resource="@xml/note_widget_info" />
         </receiver>
 
-        <receiver android:exported="false" android:label="@string/reminders_title" android:name=".ReminderWidgetProvider">
+        <receiver
+            android:name=".ReminderWidgetProvider"
+            android:exported="false"
+            android:label="@string/reminders_title">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -90,33 +108,37 @@
                 android:resource="@xml/widget_reminders_info" />
         </receiver>
 
-        <activity android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
+        <activity
+            android:name=".NotePreviewConfigureActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
+            android:exported="true"
             android:label="NotePreviewConfigure"
             android:launchMode="singleTask"
-            android:exported="true"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustResize" android:name=".NotePreviewConfigureActivity">
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
         </activity>
 
         <activity
             android:name=".MainActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
+            android:exported="true"
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:resizeableActivity="true"
-            android:exported="true"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/>
+                <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
             <intent-filter android:label="Notesnook">
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
@@ -127,6 +149,7 @@
 
             <intent-filter android:label="Notesnook">
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
@@ -134,22 +157,25 @@
             </intent-filter>
 
         </activity>
-        <activity android:exported="false" android:name="com.facebook.react.devsupport.DevSettingsActivity" />
+        <activity
+            android:name="com.facebook.react.devsupport.DevSettingsActivity"
+            android:exported="false" />
         <activity
             android:name=".ShareActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
+            android:excludeFromRecents="true"
+            android:exported="true"
             android:label="@string/title_activity_share"
             android:noHistory="true"
             android:screenOrientation="unspecified"
-            android:exported="true"
             android:taskAffinity=""
-            android:excludeFromRecents="true"
-            android:windowSoftInputMode="adjustResize"
-            android:theme="@style/AppThemeB">
+            android:theme="@style/AppThemeB"
+            android:windowSoftInputMode="adjustResize">
 
             <intent-filter android:label="Make Note">
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="text/*" />
                 <data android:mimeType="image/*" />
                 <data android:mimeType="video/*" />
@@ -160,6 +186,7 @@
             <intent-filter android:label="Make Note">
                 <action android:name="android.intent.action.SEND_MULTIPLE" />
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="text/*" />
                 <data android:mimeType="image/*" />
                 <data android:mimeType="video/*" />
@@ -179,35 +206,41 @@
             android:enabled="true"
             android:exported="true"
             android:stopWithTask="false" />
-        <service android:name="com.asterinet.react.bgactions.RNBackgroundActionsTask" />   
+        <service android:name="com.asterinet.react.bgactions.RNBackgroundActionsTask" />
 
-        <service android:name="com.streetwriters.notesnook.BootTaskService" android:foregroundServiceType="dataSync" />
+        <service
+            android:name="com.streetwriters.notesnook.BootTaskService"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="The service is required by the app to restore notifications of pinned notes, restore notification with reply input for creating notes and restore data in note preview widgets on device reboot." />
+        </service>
 
         <service
             android:name=".NotesnookTileService"
+            android:exported="true"
             android:icon="@drawable/add_note"
             android:label="New note"
-            android:exported="true"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
-                <action android:name="android.service.quicksettings.action.QS_TILE"/>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
         </service>
 
-        <service 
-        android:name=".ReminderViewsService"
-        android:exported="true"
-        android:permission="android.permission.BIND_REMOTEVIEWS" />
+        <service
+            android:name=".ReminderViewsService"
+            android:exported="true"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
 
         <provider
-        android:name="androidx.core.content.FileProvider"
-        android:authorities="${applicationId}.provider"
-        android:grantUriPermissions="true"
-        android:exported="false">
-        <meta-data
-            android:name="android.support.FILE_PROVIDER_PATHS"
-            android:resource="@xml/file_viewer_provider_paths" />
-    </provider> 
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_viewer_provider_paths" />
+        </provider>
 
         <provider
             android:name="com.vinzscam.reactnativefileviewer.FileProvider"
@@ -219,12 +252,14 @@
                 android:resource="@xml/file_viewer_provider_paths" />
         </provider>
 
-       <receiver android:exported="true" android:name=".BootRecieverService">
-           <intent-filter>
-               <action android:name="android.intent.action.BOOT_COMPLETED" />
-               <action android:name="android.intent.action.QUICKBOOT_POWERON" />
-           </intent-filter>
-      </receiver>
+        <receiver
+            android:name=".BootRecieverService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
 
     </application>
 
