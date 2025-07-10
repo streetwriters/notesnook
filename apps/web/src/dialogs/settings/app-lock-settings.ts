@@ -47,6 +47,7 @@ export const AppLockSettings: SettingsGroup[] = [
       {
         key: "enable-app-lock",
         title: "Enable app lock",
+        localOnly: true,
         onStateChange: (listener) =>
           useKeyStore.subscribe((s) => s.credentials, listener),
         components: [

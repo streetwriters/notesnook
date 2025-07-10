@@ -31,6 +31,7 @@ export const NotificationsSettings: SettingsGroup[] = [
         key: "reminders",
         title: strings.reminderNotification(),
         description: strings.reminderNotificationDesc(),
+        localOnly: true,
         onStateChange: (listener) =>
           useSettingStore.subscribe(
             (s) => s.notificationsSettings.reminder,

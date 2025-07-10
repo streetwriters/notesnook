@@ -80,6 +80,7 @@ export const BackupExportSettings: SettingsGroup[] = [
         key: "auto-backup",
         title: strings.automaticBackups(),
         description: strings.automaticBackupsDesc(),
+        localOnly: true,
         // isHidden: () => !isUserPremium(),
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.backupReminderOffset, listener),
@@ -110,6 +111,7 @@ export const BackupExportSettings: SettingsGroup[] = [
         key: "auto-backup-with-attachments",
         title: strings.automaticBackupsWithAttachments(),
         description: strings.automaticBackupsWithAttachmentsDesc().join("\n\n"),
+        localOnly: true,
         onStateChange: (listener) =>
           useSettingStore.subscribe(
             (s) => s.fullBackupReminderOffset,

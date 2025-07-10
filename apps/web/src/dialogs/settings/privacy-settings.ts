@@ -57,6 +57,7 @@ export const PrivacySettings: SettingsGroup[] = [
         key: "hide-note-title",
         title: strings.hideNoteTitle(),
         description: strings.hideNoteTitleDescription(),
+        localOnly: true,
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.hideNoteTitle, listener),
         components: [
@@ -71,6 +72,7 @@ export const PrivacySettings: SettingsGroup[] = [
         key: "privacy-mode",
         title: strings.privacyMode(),
         description: strings.privacyModeDesc(),
+        localOnly: true,
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.privacyMode, listener),
         isHidden: () => !IS_DESKTOP_APP || getPlatform() === "linux",
@@ -93,6 +95,7 @@ export const PrivacySettings: SettingsGroup[] = [
         key: "custom-dns",
         title: strings.useCustomDns(),
         description: strings.customDnsDescription(),
+        localOnly: true,
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.customDns, listener),
         isHidden: () => !IS_DESKTOP_APP,
@@ -108,6 +111,7 @@ export const PrivacySettings: SettingsGroup[] = [
         key: "custom-cors",
         title: strings.corsBypass(),
         description: strings.corsBypassDesc(),
+        localOnly: true,
         components: [
           {
             type: "button",
@@ -138,6 +142,7 @@ export const PrivacySettings: SettingsGroup[] = [
         key: "proxy-config",
         title: strings.proxy(),
         description: strings.proxyDescription(),
+        localOnly: true,
         onStateChange: (listener) =>
           useSettingStore.subscribe((c) => c.proxyRules, listener),
         components: [
