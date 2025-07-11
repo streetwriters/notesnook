@@ -25,6 +25,8 @@ import { Icons } from "../../toolbar/icons.js";
 import { ReactNodeViewProps } from "../react/index.js";
 import { ToolbarGroup } from "../../toolbar/components/toolbar-group.js";
 import { DesktopOnly } from "../../components/responsive/index.js";
+import { ToolbarGroupDefinition } from "../../toolbar/types.js";
+import { toBlobURL, revokeBloburl } from "../../utils/downloader.js";
 
 export function AttachmentComponent(
   props: ReactNodeViewProps<FileAttachment | AudioAttachment>
@@ -35,10 +37,8 @@ export function AttachmentComponent(
   const [isDragging, setIsDragging] = useState(false);
   const [audioSrc, setAudioSrc] = useState<string>();
 
-  // Check if this is an audio file
   const isAudioFile = mime && mime.startsWith("audio/");
 
-  // Load audio data if it's an audio file
   useEffect(() => {
     if (isAudioFile && editor.storage?.getAttachmentData && hash) {
       editor.storage
@@ -48,17 +48,11 @@ export function AttachmentComponent(
         })
         .then((data: string | undefined) => {
           if (data) {
-            // Convert base64 data to blob URL for audio playback
             try {
-              const byteCharacters = atob(data.split(",")[1] || data);
-              const byteNumbers = new Array(byteCharacters.length);
-              for (let i = 0; i < byteCharacters.length; i++) {
-                byteNumbers[i] = byteCharacters.charCodeAt(i);
+              const url = toBlobURL(data, "other", mime, hash);
+              if (url) {
+                setAudioSrc(url);
               }
-              const byteArray = new Uint8Array(byteNumbers);
-              const blob = new Blob([byteArray], { type: mime });
-              const url = URL.createObjectURL(blob);
-              setAudioSrc(url);
             } catch (error) {
               console.error("Failed to create audio blob:", error);
             }
@@ -68,70 +62,88 @@ export function AttachmentComponent(
     }
   }, [isAudioFile, editor.storage, hash, mime]);
 
-  // Clean up blob URL on unmount
   useEffect(() => {
     return () => {
-      if (audioSrc) {
-        URL.revokeObjectURL(audioSrc);
+      if (audioSrc && hash) {
+        revokeBloburl(hash);
       }
     };
-  }, [audioSrc]);
+  }, [audioSrc, hash]);
 
-  if (isAudioFile && audioSrc) {
-    return (
+  return (
+    <Box
+      ref={elementRef}
+      as="span"
+      contentEditable={false}
+      variant={"body"}
+      sx={{
+        display: "inline-flex",
+        position: "relative",
+        userSelect: "none",
+        backgroundColor: "var(--background-secondary)",
+        m: 1,
+        borderRadius: "default",
+        border: "1px solid var(--border)",
+        borderColor: selected ? "accent" : "border",
+        ":hover": {
+          bg: "hover"
+        },
+        ...(isAudioFile && audioSrc
+          ? {
+              flexDirection: "column",
+              p: 2,
+              width: "50%"
+            }
+          : {
+              justifyContent: "center",
+              alignItems: "center",
+              px: 1,
+              cursor: "pointer",
+              maxWidth: 250
+            })
+      }}
+      title={!isAudioFile || !audioSrc ? filename : undefined}
+      onDragStart={() => setIsDragging(true)}
+      onDragEnd={() => setIsDragging(false)}
+      data-drag-handle
+    >
       <Box
-        ref={elementRef}
-        as="span"
-        contentEditable={false}
-        variant={"body"}
         sx={{
-          display: "inline-flex",
-          flexDirection: "column",
-          position: "relative",
-          userSelect: "none",
-          backgroundColor: "var(--background-secondary)",
-          p: 2,
-          m: 1,
-          borderRadius: "default",
-          border: "1px solid var(--border)",
-          maxWidth: 350,
-          borderColor: selected ? "accent" : "border",
-          ":hover": {
-            bg: "hover"
-          }
+          display: "flex",
+          alignItems: "center",
+          mb: isAudioFile && audioSrc ? 1 : 0
         }}
-        data-drag-handle
-        onDragStart={() => setIsDragging(true)}
-        onDragEnd={() => setIsDragging(false)}
       >
-        <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-          <Icon path={Icons.attachment} size={16} />
-          <Text
-            as="span"
-            sx={{
-              ml: "small",
-              fontSize: "body",
-              whiteSpace: "nowrap",
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-              flex: 1
-            }}
-          >
-            {filename}
-          </Text>
-          <Text
-            as="span"
-            sx={{
-              ml: 1,
-              fontSize: "0.65rem",
-              color: "var(--paragraph-secondary)",
-              flexShrink: 0
-            }}
-          >
-            {progress ? `${progress}%` : formatBytes(size)}
-          </Text>
-        </Box>
-
+        <Icon
+          path={Icons.attachment}
+          size={isAudioFile && audioSrc ? 16 : 14}
+        />
+        <Text
+          as="span"
+          sx={{
+            ml: "small",
+            fontSize: "body",
+            whiteSpace: "nowrap",
+            textOverflow: "ellipsis",
+            overflow: "hidden",
+            flex: isAudioFile && audioSrc ? 1 : "none"
+          }}
+        >
+          {filename}
+        </Text>
+        <Text
+          as="span"
+          sx={{
+            ml: 1,
+            fontSize: "0.65rem",
+            color: "var(--paragraph-secondary)",
+            flexShrink: 0
+          }}
+        >
+          {progress ? `${progress}%` : formatBytes(size)}
+        </Text>
+      </Box>
+      {isAudioFile && audioSrc && (
         <Box
           sx={{
             width: "100%",
@@ -143,91 +155,18 @@ export function AttachmentComponent(
         >
           <audio controls preload="metadata" src={audioSrc} />
         </Box>
-
-        <DesktopOnly>
-          {selected && !isDragging && (
-            <ToolbarGroup
-              editor={editor}
-              groupId="attachmentTools"
-              tools={
-                editor.isEditable
-                  ? ["removeAttachment", "downloadAttachment"]
-                  : ["downloadAttachment"]
-              }
-              sx={{
-                boxShadow: "menu",
-                borderRadius: "default",
-                bg: "background",
-                position: "absolute",
-                top: -35
-              }}
-            />
-          )}
-        </DesktopOnly>
-      </Box>
-    );
-  }
-
-  return (
-    <Box
-      ref={elementRef}
-      as="span"
-      contentEditable={false}
-      variant={"body"}
-      sx={{
-        display: "inline-flex",
-        position: "relative",
-        justifyContent: "center",
-        userSelect: "none",
-        alignItems: "center",
-        backgroundColor: "var(--background-secondary)",
-        px: 1,
-        m: 1,
-        borderRadius: "default",
-        border: "1px solid var(--border)",
-        cursor: "pointer",
-        maxWidth: 250,
-        borderColor: selected ? "accent" : "border",
-        ":hover": {
-          bg: "hover"
-        }
-      }}
-      title={filename}
-      onDragStart={() => setIsDragging(true)}
-      onDragEnd={() => setIsDragging(false)}
-      data-drag-handle
-    >
-      <Icon path={Icons.attachment} size={14} />
-      <Text
-        as="span"
-        sx={{
-          ml: "small",
-          fontSize: "body",
-          whiteSpace: "nowrap",
-          textOverflow: "ellipsis",
-          overflow: "hidden"
-        }}
-      >
-        {filename}
-      </Text>
-      <Text
-        as="span"
-        sx={{
-          ml: 1,
-          fontSize: "0.65rem",
-          color: "var(--paragraph-secondary)",
-          flexShrink: 0
-        }}
-      >
-        {progress ? `${progress}%` : formatBytes(size)}
-      </Text>
+      )}
       <DesktopOnly>
         {selected && !isDragging && (
           <ToolbarGroup
             editor={editor}
             groupId="attachmentTools"
             tools={
-              editor.isEditable
+              isAudioFile
+                ? editor.isEditable
+                  ? ["removeAttachment", "downloadAttachment"]
+                  : ["downloadAttachment"]
+                : editor.isEditable
                 ? [
                     "removeAttachment",
                     "downloadAttachment",
