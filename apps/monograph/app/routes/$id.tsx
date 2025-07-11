@@ -85,7 +85,8 @@ export async function loader({ params }: LoaderFunctionArgs) {
     const metadata = getMonographMetadata(monograph);
     return {
       monograph,
-      metadata
+      metadata,
+      apiHost: API_HOST
     };
   } catch (e) {
     // console.error(e);
@@ -96,19 +97,24 @@ export async function loader({ params }: LoaderFunctionArgs) {
         fullDescription: "This monograph does not exist.",
         shortDescription: "This monograph does not exist.",
         datePublished: ""
-      }
+      },
+      apiHost: API_HOST
     };
   }
 }
 
 export default function MonographPost() {
-  const { monograph } = useLoaderData<typeof loader>();
+  const { monograph, apiHost } = useLoaderData<typeof loader>();
   const [_, hashParams] = useHashLocation();
 
   return (
     <>
       {monograph ? (
-        <MonographPage monograph={monograph} encodedKey={hashParams.key} />
+        <MonographPage
+          monograph={monograph}
+          encodedKey={hashParams.key}
+          apiHost={apiHost}
+        />
       ) : (
         <>
           <Header />
