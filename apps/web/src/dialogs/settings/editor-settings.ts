@@ -57,6 +57,7 @@ export const EditorSettings: SettingsGroup[] = [
       {
         key: "default-font",
         title: strings.defaultFontFamily(),
+        localOnly: true,
         onStateChange: (listener) =>
           onEditorConfigChange((c) => c.fontFamily, listener),
         components: [
@@ -79,6 +80,7 @@ export const EditorSettings: SettingsGroup[] = [
         key: "default-font-size",
         title: strings.defaultFontSize(),
         description: strings.defaultFontSizeDesc(),
+        localOnly: true,
         onStateChange: (listener) =>
           onEditorConfigChange((c) => c.fontSize, listener),
         components: [
@@ -97,6 +99,7 @@ export const EditorSettings: SettingsGroup[] = [
         key: "double-spacing",
         title: strings.doubleSpacedLines(),
         description: strings.doubleSpacedLinesDesc(),
+        localOnly: true,
         onStateChange: (listener) =>
           useSettingStore.subscribe((c) => c.doubleSpacedParagraphs, listener),
         components: [
@@ -112,6 +115,7 @@ export const EditorSettings: SettingsGroup[] = [
         key: "markdown-shortcuts",
         title: strings.mardownShortcuts(),
         description: strings.mardownShortcutsDesc(),
+        localOnly: true,
         onStateChange: (listener) =>
           useSettingStore.subscribe((c) => c.markdownShortcuts, listener),
         components: [
@@ -126,6 +130,7 @@ export const EditorSettings: SettingsGroup[] = [
         key: "font-ligatures",
         title: strings.fontLigatures(),
         description: strings.fontLigaturesDesc(),
+        localOnly: true,
         onStateChange: (listener) =>
           useSettingStore.subscribe((c) => c.fontLigatures, listener),
         components: [
@@ -150,6 +155,7 @@ export const EditorSettings: SettingsGroup[] = [
       {
         key: "enable-spellchecker",
         title: strings.enableSpellChecker(),
+        localOnly: true,
         onStateChange: (listener) =>
           useSpellChecker.subscribe((c) => c.enabled, listener),
         components: [

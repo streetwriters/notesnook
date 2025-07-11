@@ -6,6 +6,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
 "Language: pseudo-LOCALE\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
 
 #: src/strings.ts:2410
 msgid " \"Notebook > Notes\""
@@ -3477,6 +3483,10 @@ msgstr ""
 msgid "Loading your tags"
 msgstr ""
 
+#: src/strings.ts:2489
+msgid "Local only"
+msgstr ""
+
 #: src/strings.ts:159
 msgid "Lock"
 msgstr ""
@@ -6215,6 +6225,10 @@ msgstr ""
 
 #: src/strings.ts:264
 msgid "This note will be published to a public URL."
+msgstr ""
+
+#: src/strings.ts:2490
+msgid "This setting is not synced across devices"
 msgstr ""
 
 #: src/strings.ts:2090

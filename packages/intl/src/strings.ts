@@ -2485,5 +2485,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   yourArchiveIsEmpty: () => t`Your archive is empty`,
   unarchive: () => t`Unarchive`,
   moveNotebookDesc: () =>
-    t`Select a notebook to move this notebook into, or unselect to move it to the root level.`
+    t`Select a notebook to move this notebook into, or unselect to move it to the root level.`,
+  localOnly: () => t`Local only`,
+  localOnlySettingDesc: () => t`This setting is not synced across devices`
 };

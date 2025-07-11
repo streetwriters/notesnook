@@ -472,12 +472,28 @@ function SettingItem(props: { item: Setting }) {
         }}
       >
         <Flex sx={{ flexDirection: "column", flex: 1 }}>
-          <Text
-            variant={"body"}
-            sx={{ fontWeight: "medium", color: "heading" }}
-          >
-            {item.title}
-          </Text>
+          <Flex sx={{ alignItems: "center", gap: 2 }}>
+            <Text
+              variant={"body"}
+              sx={{ fontWeight: "medium", color: "heading" }}
+            >
+              {item.title}
+            </Text>
+            {useUserStore.getState().isLoggedIn && item.localOnly ? (
+              <Text
+                variant="subBody"
+                title={strings.localOnlySettingDesc()}
+                sx={{
+                  background: "accent",
+                  color: "background",
+                  borderRadius: "12px",
+                  px: 2
+                }}
+              >
+                {strings.localOnly()}
+              </Text>
+            ) : null}
+          </Flex>
           {item.description && (
             <Text
               as={"div"}
