@@ -1525,6 +1525,10 @@ msgstr ""
 msgid "Click to reset {title}"
 msgstr ""
 
+#: src/strings.ts:2492
+msgid "Click to save"
+msgstr ""
+
 #: src/strings.ts:1380
 msgid "Close"
 msgstr ""

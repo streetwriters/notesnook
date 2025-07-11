@@ -74,4 +74,9 @@ class TabContextMenuModel {
     await this.open();
     return this.menu.getItem("reveal-in-list");
   }
+
+  async save() {
+    await this.open();
+    return this.menu.clickOnItem("save");
+  }
 }
