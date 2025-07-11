@@ -530,17 +530,11 @@ const onChangeTab = async (event: { i: number; from: number }) => {
     activateKeepAwake();
     eSendEvent(eOnEnterEditor);
 
-    if (!useTabStore.getState().getCurrentNoteId()) {
-      eSendEvent(eOnLoadNote, {
-        newNote: true
-      });
-    } else {
-      if (
-        useTabStore.getState().getTab(useTabStore.getState().currentTab)
-          ?.session?.locked
-      ) {
-        eSendEvent(eUnlockNote);
-      }
+    if (
+      useTabStore.getState().getTab(useTabStore.getState().currentTab)?.session
+        ?.locked
+    ) {
+      eSendEvent(eUnlockNote);
     }
   } else {
     if (event.from === 2) {
