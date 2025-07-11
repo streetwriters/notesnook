@@ -29,6 +29,7 @@ import { createWriteStream } from "../utils/stream-saver";
 import { Attachment } from "@notesnook/core";
 import { TaskManager } from "../common/task-manager";
 import { strings } from "@notesnook/intl";
+import { useEditorManager } from "../components/editor/manager";
 
 let abortController: AbortController | undefined = undefined;
 class AttachmentStore extends BaseStore<AttachmentStore> {
@@ -135,7 +136,33 @@ class AttachmentStore extends BaseStore<AttachmentStore> {
       if (await db.attachments.remove(attachment.hash, false)) {
         await this.get().refresh();
         await useNoteStore.getState().refresh();
-        useEditorStore.getState().closeNotes(...linkedNotes);
+
+        const sessions = useEditorStore.getState().sessions;
+        for (const session of sessions) {
+          if (
+            !("note" in session) ||
+            !session.note.id ||
+            !session.note.contentId
+          ) {
+            continue;
+          }
+          if (!linkedNotes.includes(session.note.id)) {
+            continue;
+          }
+
+          const content = await db.content.get(session.note.contentId);
+          if (!content || content.locked) {
+            continue;
+          }
+
+          useEditorManager
+            .getState()
+            .getEditor(session.id)
+            ?.editor?.updateContent(content.data);
+          useEditorStore.getState().updateSession(session.id, undefined, {
+            content
+          });
+        }
       }
     } catch (e) {
       console.error(e);
