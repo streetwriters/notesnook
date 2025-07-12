@@ -211,6 +211,14 @@ const TabBar = (
                         const ids = useSideMenuNotebookSelectionStore
                           .getState()
                           .getSelectedItemIds();
+                        if (!ids.length) {
+                          ToastManager.show({
+                            context: "local",
+                            type: "error",
+                            message: strings.noNotebooksSelectedToMove()
+                          });
+                          return;
+                        }
                         const notebooks = await db.notebooks.all.items(ids);
                         Navigation.navigate("MoveNotebook", {
                           selectedNotebooks: notebooks
