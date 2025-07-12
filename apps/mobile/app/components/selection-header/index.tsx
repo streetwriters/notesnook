@@ -198,16 +198,6 @@ export const SelectionHeader = React.memo(
                   ]
                 : [
                     {
-                      title: strings.move(),
-                      onPress: async () => {
-                        const ids = selectedItemsList;
-                        const notebooks = await db.notebooks.all.items(ids);
-                        MoveNotebook.present(notebooks);
-                      },
-                      visible: renderedInRoute === "Notebooks",
-                      icon: "arrow-right-bold-box-outline"
-                    },
-                    {
                       title: strings.manageTags(),
                       onPress: async () => {
                         ManageTags.present(selectedItemsList);
