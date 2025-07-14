@@ -96,14 +96,16 @@ export const EditorWrapper = ({ widths }: { widths: any }) => {
         minHeight: "100%",
         backgroundColor: toolBarColors.primary.background,
         borderLeftWidth: DDS.isTab ? 1 : 0,
-        borderLeftColor: DDS.isTab ? colors.secondary.background : "transparent"
+        borderLeftColor: DDS.isTab
+          ? colors.secondary.background
+          : "transparent",
+        paddingBottom: insets.bottom
       }}
     >
       {loading || !introCompleted ? null : (
         <KeyboardAvoidingViewIOS
           behavior="padding"
           style={{
-            marginBottom: getMarginBottom(),
             backgroundColor: colors.primary.background,
             flex: 1
           }}
