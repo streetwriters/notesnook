@@ -102,6 +102,7 @@ export type ReadonlyEditorSession = BaseEditorSession & {
   color?: string;
   tags?: Tag[];
   locked?: boolean;
+  attachmentsLength?: number;
 };
 
 export type DeletedEditorSession = BaseEditorSession & {
@@ -815,7 +816,8 @@ class EditorStore extends BaseStore<EditorStore> {
               tags,
               activeBlockId: options.activeBlockId,
               activeSearchResultId: options.activeSearchResultId,
-              tabId
+              tabId,
+              attachmentsLength
             },
             options.silent
           );

@@ -237,13 +237,24 @@ export default function TabsView() {
 }
 
 const MemoizedEditorView = React.memo(EditorView, (prev, next) => {
-  return (
+  const baseConditions =
     prev.session.id === next.session.id &&
     prev.session.type === next.session.type &&
     prev.session.needsHydration === next.session.needsHydration &&
     prev.session.activeBlockId === next.session.activeBlockId &&
-    prev.session.activeSearchResultId === next.session.activeSearchResultId
-  );
+    prev.session.activeSearchResultId === next.session.activeSearchResultId;
+
+  if (
+    "attachmentsLength" in prev.session &&
+    "attachmentsLength" in next.session
+  ) {
+    return (
+      baseConditions &&
+      prev.session.attachmentsLength === next.session.attachmentsLength
+    );
+  }
+
+  return baseConditions;
 });
 function EditorView({
   session
