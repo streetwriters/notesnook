@@ -34,6 +34,8 @@ import {
   showMultiPermanentDeleteConfirmation
 } from "../dialogs/confirm";
 import { strings } from "@notesnook/intl";
+import { isFeatureAvailable } from "@notesnook/common";
+import { showFeatureNotAllowedToast } from "./toasts";
 
 async function moveNotesToTrash(ids: string[], confirm = true) {
   if (confirm && !(await showMultiDeleteConfirmation(ids.length))) return;
@@ -182,6 +184,13 @@ async function deleteTags(ids: string[]) {
 
 async function restoreItemsFromTrash(ids: string[]) {
   if (!ids.length) return;
+
+  const notebookIds = ids.filter((id) => db.trash.cache.notebooks.includes(id));
+  const result = await isFeatureAvailable(
+    "notebooks",
+    (await db.notebooks.all.count()) + notebookIds.length
+  );
+  if (!result.isAllowed) return showFeatureNotAllowedToast(result);
 
   await TaskManager.startTask({
     type: "status",
