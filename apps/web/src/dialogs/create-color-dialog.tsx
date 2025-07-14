@@ -25,6 +25,8 @@ import { db } from "../common/db";
 import { showToast } from "../utils/toast";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
+import { isFeatureAvailable } from "@notesnook/common";
+import { showFeatureNotAllowedToast } from "../common/toasts";
 
 type CreateColorDialogProps = BaseDialogProps<string | false>;
 export const CreateColorDialog = DialogManager.register(
@@ -59,6 +61,10 @@ export const CreateColorDialog = DialogManager.register(
               showToast("error", strings.invalidHexColor());
               return;
             }
+
+            const result = await isFeatureAvailable("colors");
+            if (!result.isAllowed) return showFeatureNotAllowedToast(result);
+
             const colorId = await db.colors.add({
               colorCode: form.color,
               title: form.title

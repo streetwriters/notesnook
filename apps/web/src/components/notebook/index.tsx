@@ -47,6 +47,8 @@ import { db } from "../../common/db";
 import { createSetDefaultHomepageMenuItem } from "../../common";
 import { useStore as useNotebookStore } from "../../stores/notebook-store";
 import { MoveNotebookDialog } from "../../dialogs/move-notebook-dialog";
+import { isFeatureAvailable } from "@notesnook/common";
+import { showFeatureNotAllowedToast } from "../../common/toasts";
 
 type NotebookProps = {
   item: NotebookType;
@@ -210,6 +212,10 @@ export const notebookMenuItems: (
       onClick: async () => {
         const defaultNotebook = db.settings.getDefaultNotebook();
         const isDefault = defaultNotebook === notebook.id;
+        if (!isDefault) {
+          const result = await isFeatureAvailable("defaultNotebookAndTag");
+          if (!result.isAllowed) return showFeatureNotAllowedToast(result);
+        }
         await db.settings.setDefaultNotebook(
           isDefault ? undefined : notebook.id
         );

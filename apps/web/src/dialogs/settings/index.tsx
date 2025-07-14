@@ -53,7 +53,6 @@ import {
 } from "./types";
 import { ProfileSettings } from "./profile-settings";
 import { AuthenticationSettings } from "./auth-settings";
-import { useIsUserPremium } from "../../hooks/use-is-user-premium";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { SyncSettings } from "./sync-settings";
 import { BehaviourSettings } from "./behaviour-settings";
@@ -433,7 +432,6 @@ function SettingItem(props: { item: Setting }) {
   const { item } = props;
   const [state, setState] = useState<unknown>();
   const [workIndex, setWorkIndex] = useState<number>();
-  const isUserPremium = useIsUserPremium();
 
   useEffect(() => {
     if (!item.onStateChange) return;
@@ -545,12 +543,7 @@ function SettingItem(props: { item: Setting }) {
                   />
                 );
               case "dropdown":
-                return (
-                  <SelectComponent
-                    {...component}
-                    isUserPremium={isUserPremium}
-                  />
-                );
+                return <SelectComponent {...component} />;
               case "input":
                 return component.inputType === "number" ? (
                   <Input
@@ -604,10 +597,8 @@ function SettingItem(props: { item: Setting }) {
   );
 }
 
-function SelectComponent(
-  props: DropdownSettingComponent & { isUserPremium: boolean }
-) {
-  const { onSelectionChanged, options, isUserPremium } = props;
+function SelectComponent(props: DropdownSettingComponent) {
+  const { onSelectionChanged, options } = props;
   const selectedOption = usePromise(() => props.selectedOption(), [props]);
 
   return (
@@ -629,11 +620,7 @@ function SelectComponent(
       }
     >
       {options.map((option) => (
-        <option
-          disabled={option.premium && !isUserPremium}
-          key={option.value}
-          value={option.value}
-        >
+        <option key={option.value} value={option.value}>
           {option.title}
         </option>
       ))}

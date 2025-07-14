@@ -31,22 +31,18 @@ import {
 import { introduceFeatures, showUpgradeReminderDialogs } from "./common";
 import { AppEventManager, AppEvents } from "./common/app-events";
 import { db } from "./common/db";
-import { CHECK_IDS, EV, EVENTS } from "@notesnook/core";
+import { EV, EVENTS } from "@notesnook/core";
 import { registerKeyMap } from "./common/key-map";
-import { isUserPremium } from "./hooks/use-is-user-premium";
 import { updateStatus, removeStatus, getStatus } from "./hooks/use-status";
-import { showToast } from "./utils/toast";
 import {
   interruptedOnboarding,
   OnboardingDialog
 } from "./dialogs/onboarding-dialog";
 import { hashNavigate } from "./navigation";
 import { desktop } from "./common/desktop-bridge";
-import { BuyDialog } from "./dialogs/buy-dialog";
 import { FeatureDialog } from "./dialogs/feature-dialog";
 import { AnnouncementDialog } from "./dialogs/announcement-dialog";
 import { logger } from "./utils/logger";
-import { strings } from "@notesnook/intl";
 
 export default function AppEffects() {
   const refreshNavItems = useStore((store) => store.refreshNavItems);
@@ -63,38 +59,6 @@ export default function AppEffects() {
 
   useEffect(
     function initializeApp() {
-      const userCheckStatusEvent = EV.subscribe(
-        EVENTS.userCheckStatus,
-        async (type: string) => {
-          if (isUserPremium()) {
-            return { type, result: true };
-          } else {
-            let sentence;
-            switch (type) {
-              case CHECK_IDS.noteColor:
-                sentence = strings.upgradeToProToUseFeature("color");
-                break;
-              case CHECK_IDS.noteTag:
-                sentence = strings.upgradeToProToUseFeature("tags");
-                break;
-              case CHECK_IDS.notebookAdd:
-                sentence = strings.upgradeToProToUseFeature("notebook");
-                break;
-              case CHECK_IDS.vaultAdd:
-                sentence = strings.upgradeToProToUseFeature("vault");
-                break;
-              default:
-                sentence = strings.upgradeToProToUseFeature();
-                break;
-            }
-            showToast("error", sentence, [
-              { text: strings.upgradeNow(), onClick: () => BuyDialog.show({}) }
-            ]);
-            return { type, result: false };
-          }
-        }
-      );
-
       initStore();
       initEditorStore();
 
@@ -116,10 +80,6 @@ export default function AppEffects() {
           // NOTE: we deliberately don't await here because we don't want to pause execution.
           db.attachments.cacheAttachments().catch(logger.error);
       })();
-
-      return () => {
-        userCheckStatusEvent.unsubscribe();
-      };
     },
     [
       initEditorStore,

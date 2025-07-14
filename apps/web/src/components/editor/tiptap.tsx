@@ -50,9 +50,12 @@ import {
 } from "react";
 import { IEditor, MAX_AUTO_SAVEABLE_WORDS } from "./types";
 import { useEditorConfig, useToolbarConfig, useEditorManager } from "./manager";
-import { useIsUserPremium } from "../../hooks/use-is-user-premium";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
-import { debounce } from "@notesnook/common";
+import {
+  debounce,
+  useAreFeaturesAvailable,
+  useIsFeatureAvailable
+} from "@notesnook/common";
 import { ScopedThemeProvider } from "../theme-provider";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { writeToClipboard } from "../../utils/clipboard";
@@ -65,6 +68,7 @@ import { TimeFormat } from "@notesnook/core";
 import { BuyDialog } from "../../dialogs/buy-dialog";
 import { EDITOR_ZOOM } from "./common";
 import { ScrollContainer } from "@notesnook/ui";
+import { showFeatureNotAllowedToast } from "../../common/toasts";
 
 export type OnChangeHandler = (
   content: () => string,
@@ -183,16 +187,31 @@ function TipTap(props: TipTapProps) {
     fontLigatures
   } = props;
 
-  const isUserPremium = useIsUserPremium();
   const autoSave = useRef(true);
   const { toolbarConfig } = useToolbarConfig();
 
+  const features = useAreFeaturesAvailable([
+    "callout",
+    "outlineList",
+    "taskList"
+  ]);
+
   usePermissionHandler({
     claims: {
-      premium: isUserPremium
+      callout: !!features?.callout?.isAllowed,
+      outlineList: !!features?.outlineList?.isAllowed,
+      taskList: !!features?.taskList?.isAllowed
     },
-    onPermissionDenied: (claim) => {
-      if (claim === "premium") BuyDialog.show({});
+    onPermissionDenied: (claim, silent) => {
+      if (silent) {
+        console.log(features, features?.[claim]);
+        if (features?.[claim]) showFeatureNotAllowedToast(features[claim]);
+        return;
+      }
+
+      BuyDialog.show({
+        plan: features?.[claim]?.availableOn
+      });
     }
   });
 

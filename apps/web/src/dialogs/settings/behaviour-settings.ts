@@ -24,18 +24,18 @@ import {
   useStore as useSettingStore
 } from "../../stores/setting-store";
 import dayjs from "dayjs";
-import { isUserPremium } from "../../hooks/use-is-user-premium";
 import { TimeFormat } from "@notesnook/core";
 import { TrashCleanupInterval } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { BuyDialog } from "../buy-dialog";
+import { isFeatureAvailable } from "@notesnook/common";
+import { showFeatureNotAllowedToast } from "../../common/toasts";
 
 export const BehaviourSettings: SettingsGroup[] = [
   {
     key: "general",
     section: "behaviour",
     header: strings.general(),
-    isHidden: () => !isUserPremium(),
     settings: [
       {
         key: "default-sidebar-tab",
@@ -47,9 +47,12 @@ export const BehaviourSettings: SettingsGroup[] = [
         components: [
           {
             type: "dropdown",
-            onSelectionChanged: (value) => {
-              if (!isUserPremium()) {
-                BuyDialog.show({});
+            onSelectionChanged: async (value) => {
+              const defaultSidebarTab = await isFeatureAvailable(
+                "defaultSidebarTab"
+              );
+              if (!defaultSidebarTab.isAllowed) {
+                BuyDialog.show({ plan: defaultSidebarTab.availableOn });
                 return;
               }
 
@@ -74,8 +77,15 @@ export const BehaviourSettings: SettingsGroup[] = [
         components: [
           {
             type: "dropdown",
-            onSelectionChanged: (value) =>
-              useSettingStore.getState().setImageCompression(parseInt(value)),
+            onSelectionChanged: async (value) => {
+              if (value === ImageCompressionOptions.DISABLE.toString()) {
+                const result = await isFeatureAvailable("fullQualityImages");
+                if (!result.isAllowed)
+                  return showFeatureNotAllowedToast(result);
+              }
+
+              useSettingStore.getState().setImageCompression(parseInt(value));
+            },
             selectedOption: () =>
               useSettingStore.getState().imageCompression.toString(),
             options: [
@@ -159,9 +169,12 @@ export const BehaviourSettings: SettingsGroup[] = [
         components: [
           {
             type: "dropdown",
-            onSelectionChanged: (value) => {
-              if (!isUserPremium()) {
-                BuyDialog.show({});
+            onSelectionChanged: async (value) => {
+              const disableTrashCleanup = await isFeatureAvailable(
+                "disableTrashCleanup"
+              );
+              if (value === "-1" && !disableTrashCleanup.isAllowed) {
+                BuyDialog.show({ plan: disableTrashCleanup.availableOn });
                 return;
               }
 
@@ -178,7 +191,7 @@ export const BehaviourSettings: SettingsGroup[] = [
               { value: "7", title: strings.days(7) },
               { value: "30", title: strings.days(30) },
               { value: "365", title: strings.days(365) },
-              { value: "-1", title: strings.never(), premium: true }
+              { value: "-1", title: strings.never() }
             ]
           }
         ]

@@ -30,7 +30,6 @@ import { ConfirmDialog } from "./confirm";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 import { getDeviceInfo } from "../utils/platform";
-import { isUserPremium } from "../hooks/use-is-user-premium";
 
 const PLACEHOLDERS = {
   title: strings.issueTitlePlaceholder(),

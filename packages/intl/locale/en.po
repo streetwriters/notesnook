@@ -2739,8 +2739,8 @@ msgid "File mismatch"
 msgstr "File mismatch"
 
 #: src/strings.ts:944
-msgid "File size should be less than {sizeInMB}MB"
-msgstr "File size should be less than {sizeInMB}MB"
+msgid "File size should be less than {sizeInMB}"
+msgstr "File size should be less than {sizeInMB}"
 
 #: src/strings.ts:942
 msgid "File too big"
@@ -3153,8 +3153,8 @@ msgid "Image settings"
 msgstr "Image settings"
 
 #: src/strings.ts:946
-msgid "Image size should be less than {sizeInMB}MB"
-msgstr "Image size should be less than {sizeInMB}MB"
+msgid "Image size should be less than {sizeInMB}"
+msgstr "Image size should be less than {sizeInMB}"
 
 #: src/strings.ts:754
 msgid "Images"

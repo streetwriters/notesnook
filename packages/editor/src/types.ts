@@ -20,20 +20,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { UnionCommands, Editor as TiptapEditor } from "@tiptap/core";
 import { Mutex } from "async-mutex";
 
-export type PermissionRequestEvent = CustomEvent<{ id: keyof UnionCommands }>;
+export type PermissionRequestEvent = CustomEvent<{
+  id: keyof UnionCommands;
+  silent: boolean;
+}>;
 
 export class Editor extends TiptapEditor {
   private mutex: Mutex = new Mutex();
-
-  /**
-   * Request permission before executing a command to make sure user
-   * is allowed to perform the action.
-   * @param id the command id to get permission for
-   * @returns latest editor instance
-   */
-  requestPermission(id: keyof UnionCommands): TiptapEditor | undefined {
-    return hasPermission(id) ? this : undefined;
-  }
 
   /**
    * Performs editor state changes in a thread-safe manner using a mutex
@@ -45,9 +38,12 @@ export class Editor extends TiptapEditor {
   }
 }
 
-export function hasPermission(id: keyof UnionCommands): boolean {
+export function hasPermission(
+  id: keyof UnionCommands,
+  silent = false
+): boolean {
   const event = new CustomEvent("permissionrequest", {
-    detail: { id },
+    detail: { id, silent },
     cancelable: true
   });
   return window.dispatchEvent(event);

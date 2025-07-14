@@ -80,7 +80,6 @@ export const BackupExportSettings: SettingsGroup[] = [
         key: "auto-backup",
         title: strings.automaticBackups(),
         description: strings.automaticBackupsDesc(),
-        // isHidden: () => !isUserPremium(),
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.backupReminderOffset, listener),
         components: [

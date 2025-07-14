@@ -24,7 +24,6 @@ import Database from "../api/index.js";
 import { sanitizeTag } from "./tags.js";
 import { SQLCollection } from "../database/sql-collection.js";
 import { isFalse } from "../database/index.js";
-import { CHECK_IDS, checkIsUserPremium } from "../common.js";
 
 export const DefaultColors: Record<string, string> = {
   red: "#f44336",
@@ -85,7 +84,7 @@ export class Colors implements ICollection {
       await this.collection.update([oldColor.id], item);
       return oldColor.id;
     }
-    if (!(await checkIsUserPremium(CHECK_IDS.noteColor))) return;
+    if (!this.db.features.allowed("colors")) return;
 
     const id = item.id || getId(item.dateCreated);
     await this.collection.upsert({

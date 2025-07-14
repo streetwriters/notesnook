@@ -25,11 +25,6 @@ import { SQLCollection } from "../database/sql-collection.js";
 import { DatabaseSchema, isFalse } from "../database/index.js";
 import { Kysely, sql, Transaction } from "@streetwriters/kysely";
 import { deleteItems } from "../utils/array.js";
-import {
-  CHECK_IDS,
-  checkIsUserPremium,
-  FREE_NOTEBOOKS_LIMIT
-} from "../common.js";
 
 export class Notebooks implements ICollection {
   name = "notebooks";
@@ -64,12 +59,7 @@ export class Notebooks implements ICollection {
     if (oldNotebook && isTrashItem(oldNotebook))
       throw new Error("Cannot modify trashed notebooks.");
 
-    if (
-      !oldNotebook &&
-      (await this.all.count()) >= FREE_NOTEBOOKS_LIMIT &&
-      !(await checkIsUserPremium(CHECK_IDS.notebookAdd))
-    )
-      return;
+    if (!oldNotebook && !(await this.db.features.allowed("notebooks"))) return;
 
     const mergedNotebook: Partial<Notebook> = {
       ...oldNotebook,

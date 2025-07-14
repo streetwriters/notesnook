@@ -44,6 +44,8 @@ import { useEditorStore } from "./editor-store";
 import { useEditorManager } from "../components/editor/manager";
 import { exitFullscreen } from "../utils/fullscreen";
 import { NavigationTabItem } from "../components/navigation-menu";
+import { isFeatureAvailable } from "@notesnook/common";
+import { showFeatureNotAllowedToast } from "../common/toasts";
 
 type SyncState =
   | "synced"
@@ -251,11 +253,14 @@ class AppStore extends BaseStore<AppStore> {
   };
 
   addToShortcuts = async (item: { type: "tag" | "notebook"; id: string }) => {
-    if (await db.shortcuts.exists(item.id)) {
+    if (db.shortcuts.exists(item.id)) {
       await db.shortcuts.remove(item.id);
       this.refreshNavItems();
       showToast("success", strings.shortcutRemoved());
     } else {
+      const result = await isFeatureAvailable("shortcuts");
+      if (!result.isAllowed) return showFeatureNotAllowedToast(result);
+
       await db.shortcuts.add({
         itemType: item.type,
         itemId: item.id
