@@ -53,7 +53,8 @@ import { MenuItem } from "@notesnook/ui";
 export const CREATE_BUTTON_MAP = {
   notes: {
     title: strings.addItem("note"),
-    onClick: () => useEditorStore.getState().newSession()
+    onClick: () => useEditorStore.getState().newSession(),
+    onAuxClick: () => useEditorStore.getState().addTab()
   },
   notebooks: {
     title: strings.addItem("notebook"),
