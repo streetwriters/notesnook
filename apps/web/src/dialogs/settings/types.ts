@@ -83,6 +83,7 @@ export type Setting = {
   onStateChange?: (
     listener: (state: unknown, prevState: unknown) => void
   ) => () => void;
+  localOnly?: boolean;
 };
 
 export type SettingComponentType =

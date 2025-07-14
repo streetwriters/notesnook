@@ -41,6 +41,7 @@ export const BehaviourSettings: SettingsGroup[] = [
         key: "default-sidebar-tab",
         title: strings.defaultSidebarTab(),
         description: strings.defaultSidebarTabDesc(),
+        localOnly: true,
         keywords: ["default sidebar tab"],
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.defaultSidebarTab, listener),
@@ -68,6 +69,7 @@ export const BehaviourSettings: SettingsGroup[] = [
         key: "image-compression",
         title: strings.imageCompression(),
         description: strings.imageCompressionDesc(),
+        localOnly: true,
         keywords: ["compress images", "image quality"],
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.imageCompression, listener),
@@ -195,6 +197,7 @@ export const BehaviourSettings: SettingsGroup[] = [
         key: "auto-updates",
         title: strings.automaticUpdates(),
         description: strings.automaticUpdatesDesc(),
+        localOnly: true,
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.autoUpdates, listener),
         isHidden: () =>

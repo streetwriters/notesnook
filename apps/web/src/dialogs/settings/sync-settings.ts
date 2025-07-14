@@ -34,6 +34,7 @@ export const SyncSettings: SettingsGroup[] = [
         key: "toggle-sync",
         title: strings.disableSync(),
         description: strings.disableSyncDesc(),
+        localOnly: true,
         keywords: ["sync off", "toggle sync"],
         onStateChange: (listener) =>
           useAppStore.subscribe((s) => s.isSyncEnabled, listener),
@@ -49,6 +50,7 @@ export const SyncSettings: SettingsGroup[] = [
         key: "toggle-auto-sync",
         title: strings.disableAutoSync(),
         description: strings.disableAutoSyncDesc(),
+        localOnly: true,
         keywords: ["auto sync off", "automatic sync", "toggle auto sync"],
         onStateChange: (listener) =>
           useAppStore.subscribe((s) => s.isSyncEnabled, listener),
@@ -64,6 +66,7 @@ export const SyncSettings: SettingsGroup[] = [
         key: "toggle-realtime-sync",
         title: strings.disableRealtimeSync(),
         description: strings.disableRealtimeSyncDesc(),
+        localOnly: true,
         keywords: ["auto sync off", "automatic sync", "toggle auto sync"],
         onStateChange: (listener) =>
           useAppStore.subscribe((s) => s.isSyncEnabled, listener),
@@ -79,6 +82,7 @@ export const SyncSettings: SettingsGroup[] = [
         key: "full-offline-mode",
         title: strings.fullOfflineMode(),
         description: strings.fullOfflineModeDesc(),
+        localOnly: true,
         keywords: ["offline mode"],
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.isFullOfflineMode, listener),

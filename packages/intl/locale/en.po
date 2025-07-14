@@ -6,6 +6,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
 "Language: en\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
 
 #: src/strings.ts:2410
 msgid " \"Notebook > Notes\""
@@ -3497,6 +3503,10 @@ msgstr "Loading your reminders"
 msgid "Loading your tags"
 msgstr "Loading your tags"
 
+#: src/strings.ts:2489
+msgid "Local only"
+msgstr "Local only"
+
 #: src/strings.ts:159
 msgid "Lock"
 msgstr "Lock"
@@ -6257,6 +6267,10 @@ msgstr "This note is not referenced in other notes."
 #: src/strings.ts:264
 msgid "This note will be published to a public URL."
 msgstr "This note will be published to a public URL."
+
+#: src/strings.ts:2490
+msgid "This setting is not synced across devices"
+msgstr "This setting is not synced across devices"
 
 #: src/strings.ts:2090
 msgid "This username will be used to distinguish between different credentials in your security key. Make sure it is unique."

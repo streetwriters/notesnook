@@ -34,6 +34,7 @@ export const AppearanceSettings: SettingsGroup[] = [
         key: "zoom-factor",
         title: strings.zoomFactor(),
         description: strings.zoomFactorDescription(),
+        localOnly: true,
         isHidden: () => !IS_DESKTOP_APP,
         onStateChange: (listener) =>
           useThemeStore.subscribe(
@@ -63,6 +64,7 @@ export const AppearanceSettings: SettingsGroup[] = [
         key: "color-scheme",
         title: strings.colorScheme(),
         description: strings.colorSchemeDescription(),
+        localOnly: true,
         onStateChange: (listener) =>
           useThemeStore.subscribe(
             (s) => [s.colorScheme, s.followSystemTheme],
@@ -93,6 +95,7 @@ export const AppearanceSettings: SettingsGroup[] = [
       {
         key: "themes",
         title: strings.selectTheme(),
+        localOnly: true,
         components: [{ type: "custom", component: ThemesSelector }]
       }
     ]
