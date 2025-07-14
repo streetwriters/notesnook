@@ -23,13 +23,11 @@ import { Platform, View } from "react-native";
 import ActionSheet from "react-native-actions-sheet";
 import useGlobalSafeAreaInsets from "../../../hooks/use-global-safe-area-insets";
 import { useSettingStore } from "../../../stores/use-setting-store";
-import { PremiumToast } from "../../premium/premium-toast";
-import { Toast } from "../../toast";
-import { useAppState } from "../../../hooks/use-app-state";
-import SettingsService from "../../../services/settings";
 import { useUserStore } from "../../../stores/use-user-store";
 import { getContainerBorder } from "../../../utils/colors";
-
+import { PremiumToast } from "../../premium/premium-toast";
+import { Toast } from "../../toast";
+import { NotesnookModule } from "../../../utils/notesnook-module";
 /**
  *
  * @param {any} param0
@@ -63,6 +61,10 @@ const SheetWrapper = ({
   const locked = useUserStore((state) => state.appLocked);
 
   let width = dimensions.width > 600 ? 600 : 500;
+  const isGestureNavigationEnabled =
+    NotesnookModule.isGestureNavigationEnabled();
+
+  console.log(isGestureNavigationEnabled);
 
   const style = React.useMemo(() => {
     return {
@@ -77,14 +79,18 @@ const SheetWrapper = ({
       borderBottomRightRadius: 0,
       borderBottomLeftRadius: 0,
       ...getContainerBorder(colors.primary.border, 0.5),
-      borderBottomWidth: 0
+      borderBottomWidth: 0,
+      paddingBottom: isGestureNavigationEnabled
+        ? insets.bottom
+        : insets.bottom || 48
     };
   }, [
     colors.primary.background,
     colors.primary.border,
     largeTablet,
     smallTablet,
-    width
+    width,
+    insets.bottom
   ]);
 
   const _onOpen = () => {

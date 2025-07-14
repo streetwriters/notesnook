@@ -7,7 +7,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.RemoteViews;
@@ -217,4 +219,24 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
             wm.notifyAppWidgetViewDataChanged(id, R.id.widget_list_view);
         }
     }
+
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public boolean isGestureNavigationEnabled() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            try {
+                String navBarMode = Settings.Secure.getString(
+                        mContext.getContentResolver(),
+                        "navigation_mode"
+                );
+                return "2".equals(navBarMode);
+            } catch (Exception e) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+
+
 }

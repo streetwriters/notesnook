@@ -43,7 +43,7 @@ export function changeSystemBarColors() {
     const isDark = useThemeStore.getState().colorScheme === "dark";
     changeNavigationBarColor(
       currTheme.scopes.base.primary.background,
-      isDark,
+      !isDark,
       false
     );
     StatusBar.setBackgroundColor("transparent" as any);
