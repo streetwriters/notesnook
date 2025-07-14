@@ -43,6 +43,7 @@ import {
 import { db } from "../../common/db";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { store as noteStore } from "../../stores/note-store";
+import { useStore as useAttachmentStore } from "../../stores/attachment-store";
 import Toggle from "./toggle";
 import ScrollContainer from "../scroll-container";
 import {
@@ -728,12 +729,13 @@ function Reminders({ noteId }: { noteId: string }) {
   );
 }
 function Attachments({ noteId }: { noteId: string }) {
+  const attachmentStoreNonce = useAttachmentStore((store) => store.nonce);
   const result = usePromise(
     () =>
       db.attachments
         .ofNote(noteId, "all")
         .sorted({ sortBy: "dateCreated", sortDirection: "desc" }),
-    [noteId]
+    [noteId, attachmentStoreNonce]
   );
   if (result.status !== "fulfilled" || result.value.length <= 0) return null;
 
