@@ -680,7 +680,8 @@ type ResolvedGroup = {
 };
 function getGroup(items: TreeNode[], groupId: string): ResolvedGroup | null {
   const index = items.findIndex((item) => item.id === groupId);
-  const group = items[index];
+  const group = items.at(index);
+  if (!group) return null;
   if (!isGroup(group) && !isSubgroup(group)) return null;
 
   const nextGroupIndex = items.findIndex(
