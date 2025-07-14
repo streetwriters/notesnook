@@ -197,11 +197,6 @@ export default class Trash {
     }
 
     if (notebookIds.length > 0) {
-      const expectedCount =
-        (await this.db.notebooks.all.count()) + notebookIds.length;
-      if (!(await this.db.features.allowed("notebooks", expectedCount)))
-        return false;
-
       const ids = [...notebookIds, ...(await this.subNotebooks(notebookIds))];
       await this.db.notebooks.collection.update(ids, {
         type: "notebook",
