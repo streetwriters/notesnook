@@ -59,8 +59,6 @@ export class Notebooks implements ICollection {
     if (oldNotebook && isTrashItem(oldNotebook))
       throw new Error("Cannot modify trashed notebooks.");
 
-    if (!oldNotebook && !(await this.db.features.allowed("notebooks"))) return;
-
     const mergedNotebook: Partial<Notebook> = {
       ...oldNotebook,
       ...notebookArg

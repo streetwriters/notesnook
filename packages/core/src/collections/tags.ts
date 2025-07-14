@@ -64,7 +64,6 @@ export class Tags implements ICollection {
       await this.collection.update([oldTag.id], item);
       return oldTag.id;
     }
-    if (!(await this.db.features.allowed("tags"))) return;
 
     const id = item.id || getId();
     await this.collection.upsert({

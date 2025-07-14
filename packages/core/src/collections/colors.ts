@@ -84,7 +84,6 @@ export class Colors implements ICollection {
       await this.collection.update([oldColor.id], item);
       return oldColor.id;
     }
-    if (!this.db.features.allowed("colors")) return;
 
     const id = item.id || getId(item.dateCreated);
     await this.collection.upsert({
