@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { SubscriptionPlan } from "@notesnook/core";
 import {
   CheckoutEventNames,
   CheckoutEventsCustomer,
@@ -51,10 +52,9 @@ export type PaddleEvent = {
   callback_data: PaddleEventData;
 };
 
-export type PlanId = "free" | "essential" | "pro" | "believer" | "education";
 export interface Plan {
   // period: Period;
-  id: PlanId;
+  id: SubscriptionPlan;
   title: string;
   prices: Price[];
   recurring: boolean;

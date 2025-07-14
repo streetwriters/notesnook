@@ -32,6 +32,8 @@ import { useStore as useNoteStore } from "../../stores/note-store";
 import { Multiselect } from "../../common/multi-select";
 import { strings } from "@notesnook/intl";
 import { createSetDefaultHomepageMenuItem } from "../../common";
+import { isFeatureAvailable } from "@notesnook/common";
+import { showFeatureNotAllowedToast } from "../../common/toasts";
 
 type TagProps = { item: TagType; totalNotes: number };
 function Tag(props: TagProps) {
@@ -123,6 +125,10 @@ export const tagMenuItems: (tag: TagType, ids?: string[]) => MenuItem[] = (
       onClick: async () => {
         const defaultTag = db.settings.getDefaultTag();
         const isDefault = defaultTag === tag.id;
+        if (!isDefault) {
+          const result = await isFeatureAvailable("defaultNotebookAndTag");
+          if (!result.isAllowed) return showFeatureNotAllowedToast(result);
+        }
         await db.settings.setDefaultTag(isDefault ? undefined : tag.id);
       }
     },

@@ -124,7 +124,7 @@ export type ToggleSettingComponent = BaseSettingComponent<"toggle"> & {
 };
 
 export type DropdownSettingComponent = BaseSettingComponent<"dropdown"> & {
-  options: { value: string | number; title: string; premium?: boolean }[];
+  options: { value: string | number; title: string }[];
   selectedOption: () => string | number | Promise<string | number>;
   onSelectionChanged: (value: string) => void | Promise<void>;
 };

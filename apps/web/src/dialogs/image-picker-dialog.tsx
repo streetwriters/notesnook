@@ -21,10 +21,11 @@ import { useEffect, useState } from "react";
 import Dialog from "../components/dialog";
 import { ScrollContainer } from "@notesnook/ui";
 import { Flex, Image, Label, Text } from "@theme-ui/components";
-import { formatBytes } from "@notesnook/common";
+import { formatBytes, isFeatureAvailable } from "@notesnook/common";
 import { compressImage, FileWithURI } from "../utils/image-compressor";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
+import { showFeatureNotAllowedToast } from "../common/toasts";
 
 export type ImagePickerDialogProps = BaseDialogProps<false | File[]> & {
   images: File[];
@@ -130,7 +131,11 @@ export const ImagePickerDialog = DialogManager.register(
             }}
             defaultChecked={compress}
             checked={compress}
-            onChange={() => setCompress((s) => !s)}
+            onChange={async () => {
+              const result = await isFeatureAvailable("fullQualityImages");
+              if (!result.isAllowed) return showFeatureNotAllowedToast(result);
+              setCompress((s) => !s);
+            }}
           />
           <span style={{ marginLeft: 5 }}>
             Enable compression (recommended)

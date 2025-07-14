@@ -30,6 +30,8 @@ import { useStore as useNoteStore } from "../stores/note-store";
 import { useStore as useAppStore } from "../stores/app-store";
 import { Color, Tag } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
+import { isFeatureAvailable } from "@notesnook/common";
+import { showFeatureNotAllowedToast } from "../common/toasts";
 
 type ItemDialogProps = BaseDialogProps<false | string> & {
   title: string;
@@ -97,6 +99,11 @@ export const CreateTagDialog = {
       title: strings.addTag(),
       subtitle: strings.addTagDesc()
     }).then(async (title) => {
+      const result = await isFeatureAvailable("tags");
+      if (!result.isAllowed) {
+        return showFeatureNotAllowedToast(result);
+      }
+
       if (
         !title ||
         !(await db.tags.add({ title }).catch((e) => {

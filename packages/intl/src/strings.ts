@@ -940,10 +940,10 @@ $headline$: Use starting line of the note as title.`,
   encryptingAttachmentDesc: (name = "attachment") =>
     t`Please wait while we encrypt ${name} for upload.`,
   fileTooLarge: () => t`File too big`,
-  fileTooLargeDesc: (sizeInMB: number) =>
-    t`File size should be less than ${sizeInMB}MB`,
-  imageTooLarge: (sizeInMB: number) =>
-    t`Image size should be less than ${sizeInMB}MB`,
+  fileTooLargeDesc: (sizeInMB: string) =>
+    t`File size should be less than ${sizeInMB}`,
+  imageTooLarge: (sizeInMB: string) =>
+    t`Image size should be less than ${sizeInMB}`,
   failToOpen: () => t`Failed to open`,
   fileMismatch: () => t`File mismatch`,
   noNoteProperties: () => t`Start writing to create a new note`,

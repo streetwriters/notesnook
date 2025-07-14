@@ -23,8 +23,6 @@ import { useStore as useNotesStore } from "../../stores/note-store";
 import Vault from "../../common/vault";
 import { showToast } from "../../utils/toast";
 import { db } from "../../common/db";
-import { isUserPremium } from "../../hooks/use-is-user-premium";
-import { BuyDialog } from "../buy-dialog/buy-dialog";
 import { strings } from "@notesnook/intl";
 
 export const VaultSettings: SettingsGroup[] = [
@@ -44,11 +42,9 @@ export const VaultSettings: SettingsGroup[] = [
             type: "button",
             title: strings.create(),
             action: () => {
-              if (!isUserPremium()) BuyDialog.show({});
-              else
-                Vault.createVault().then((res) => {
-                  useAppStore.getState().setIsVaultCreated(res);
-                });
+              Vault.createVault().then((res) => {
+                useAppStore.getState().setIsVaultCreated(res);
+              });
             },
             variant: "secondary"
           }

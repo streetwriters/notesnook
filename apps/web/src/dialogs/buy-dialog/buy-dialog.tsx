@@ -29,7 +29,7 @@ import Field from "../../components/field";
 import { hardNavigate } from "../../navigation";
 import { Features } from "./features";
 import { PaddleCheckout } from "./paddle";
-import { Period, Plan, PlanId, Price, PricingInfo } from "./types";
+import { Period, Plan, Price, PricingInfo } from "./types";
 import { usePlans } from "./plans";
 import {
   formatRecurringPeriodShort,
@@ -46,13 +46,13 @@ import { isUserSubscribed } from "../../hooks/use-is-user-premium";
 import { SUBSCRIPTION_STATUS } from "../../common/constants";
 import BaseDialog from "../../components/dialog";
 import { ScopedThemeProvider } from "../../components/theme-provider";
-import { User } from "@notesnook/core";
+import { SubscriptionPlan, User } from "@notesnook/core";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 
 type BuyDialogProps = BaseDialogProps<false> & {
   couponCode?: string;
-  plan?: PlanId;
+  plan?: SubscriptionPlan;
   onClose: () => void;
 };
 
@@ -115,7 +115,7 @@ export const BuyDialog = DialogManager.register(function BuyDialog(
         >
           <CheckoutSideBar
             onClose={() => onClose(false)}
-            initialPlan={plan || "free"}
+            initialPlan={plan || SubscriptionPlan.FREE}
             user={user}
           />
         </ScopedThemeProvider>
@@ -126,7 +126,7 @@ export const BuyDialog = DialogManager.register(function BuyDialog(
 });
 
 type SideBarProps = {
-  initialPlan: PlanId;
+  initialPlan: SubscriptionPlan;
   onClose: () => void;
   user?: User;
 };
@@ -171,7 +171,7 @@ export function CheckoutSideBar(props: SideBarProps) {
   if (user)
     return (
       <PlansList
-        selectedPlan={selectedPlan?.id || initialPlan || "free"}
+        selectedPlan={selectedPlan?.id || initialPlan}
         onPlansLoaded={(plans) => {
           // if (!initialPlan || showPlans) return;
           // const plan = plans.find((p) => p.id === initialPlan);
@@ -476,7 +476,7 @@ function SelectedPlan(props: SelectedPlanProps) {
       >
         {plan.title}
       </Text>
-      {plan.id === "education" && (
+      {plan.id === SubscriptionPlan.EDUCATION && (
         <Link
           href="https://notesnook.com/education"
           target="_blank"

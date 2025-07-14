@@ -107,6 +107,8 @@ import { useStore as useNotebookStore } from "../../stores/notebook-store";
 import { useStore as useTagStore } from "../../stores/tag-store";
 import { showSortMenu } from "../group-header";
 import { BuyDialog } from "../../dialogs/buy-dialog";
+import { useIsFeatureAvailable } from "@notesnook/common";
+import { showFeatureNotAllowedToast } from "../../common/toasts";
 
 type Route = {
   id: "notes" | "favorites" | "reminders" | "monographs" | "trash" | "archive";
@@ -902,6 +904,7 @@ function ReorderableList<T extends { id: string }>(
   const [activeItem, setActiveItem] = useState<T>();
   const [order, setOrder] = usePersistentState<string[]>(orderKey, _order());
   const orderedItems = orderItems(items, order);
+  const customizableSidebar = useIsFeatureAvailable("customizableSidebar");
 
   useEffect(() => {
     setOrder(_order());
@@ -912,10 +915,10 @@ function ReorderableList<T extends { id: string }>(
       sensors={sensors}
       collisionDetection={closestCenter}
       cancelDrop={() => {
-        // if (!isUserPremium()) {
-        //   showToast("error", "You need to be Pro to customize the sidebar.");
-        //   return true;
-        // }
+        if (!customizableSidebar?.isAllowed) {
+          showFeatureNotAllowedToast(customizableSidebar);
+          return true;
+        }
         return false;
       }}
       onDragStart={(event) => {

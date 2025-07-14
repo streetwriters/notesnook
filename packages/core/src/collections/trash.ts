@@ -29,11 +29,6 @@ import {
 } from "../utils/grouping.js";
 import { sql } from "@streetwriters/kysely";
 import { MAX_SQL_PARAMETERS } from "../database/sql-collection.js";
-import {
-  CHECK_IDS,
-  checkIsUserPremium,
-  FREE_NOTEBOOKS_LIMIT
-} from "../common.js";
 import { withSubNotebooks } from "./notebooks.js";
 
 export default class Trash {
@@ -202,13 +197,11 @@ export default class Trash {
     }
 
     if (notebookIds.length > 0) {
-      const notebooksLimitReached =
-        (await this.db.notebooks.all.count()) + notebookIds.length >
-        FREE_NOTEBOOKS_LIMIT;
-      const isUserPremium = await checkIsUserPremium(CHECK_IDS.notebookAdd);
-      if (notebooksLimitReached && !isUserPremium) {
+      const expectedCount =
+        (await this.db.notebooks.all.count()) + notebookIds.length;
+      if (!(await this.db.features.allowed("notebooks", expectedCount)))
         return false;
-      }
+
       const ids = [...notebookIds, ...(await this.subNotebooks(notebookIds))];
       await this.db.notebooks.collection.update(ids, {
         type: "notebook",

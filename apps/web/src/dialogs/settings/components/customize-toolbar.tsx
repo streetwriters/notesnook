@@ -59,12 +59,14 @@ import {
   PresetId
 } from "../../../common/toolbar-config";
 import { showToast } from "../../../utils/toast";
-import { isUserPremium } from "../../../hooks/use-is-user-premium";
 import { Pro } from "../../../components/icons";
-
 import { Icon } from "@notesnook/ui";
-import { CURRENT_TOOLBAR_VERSION } from "@notesnook/common";
+import {
+  CURRENT_TOOLBAR_VERSION,
+  useIsFeatureAvailable
+} from "@notesnook/common";
 import { strings } from "@notesnook/intl";
+import { showFeatureNotAllowedToast } from "../../../common/toasts";
 
 export function CustomizeToolbar() {
   const sensors = useSensors(
@@ -77,6 +79,7 @@ export function CustomizeToolbar() {
   const [activeItem, setActiveItem] = useState<TreeNode>();
   const [currentPreset, setCurrentPreset] = useState<Preset>();
   const { setToolbarConfig } = useToolbarConfig();
+  const customToolbarPreset = useIsFeatureAvailable("customToolbarPreset");
 
   useEffect(() => {
     if (!currentPreset) return;
@@ -131,18 +134,12 @@ export function CustomizeToolbar() {
                 value={preset.id}
                 checked={preset.id === currentPreset.id}
                 defaultChecked={preset.id === currentPreset.id}
-                disabled={preset.id === "custom" && !isUserPremium()}
+                disabled={
+                  preset.id === "custom" && !customToolbarPreset?.isAllowed
+                }
                 style={{ accentColor: "var(--accent)" }}
                 onChange={async (e) => {
                   const { value } = e.target;
-                  if (preset.id === "custom" && !isUserPremium()) {
-                    showToast(
-                      "info",
-                      strings.upgradeToProToUseFeature("customPresets")
-                    );
-                    return;
-                  }
-                  console.log("CHANGE PRESET", value);
                   setCurrentPreset(getPreset(value as PresetId));
                 }}
               />
@@ -155,7 +152,7 @@ export function CustomizeToolbar() {
               >
                 {preset.title}
               </span>
-              {preset.id === "custom" && !isUserPremium() ? (
+              {preset.id === "custom" && !customToolbarPreset?.isAllowed ? (
                 <Pro color="accent" size={18} sx={{ ml: 1 }} />
               ) : null}
             </Label>
@@ -185,11 +182,8 @@ export function CustomizeToolbar() {
         sensors={sensors}
         collisionDetection={closestCenter}
         cancelDrop={() => {
-          if (!isUserPremium()) {
-            showToast(
-              "error",
-              strings.upgradeToProToUseFeature("customizeToolbar")
-            );
+          if (!customToolbarPreset?.isAllowed) {
+            showFeatureNotAllowedToast(customToolbarPreset);
             return true;
           }
           return false;

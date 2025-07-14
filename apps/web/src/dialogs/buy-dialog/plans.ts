@@ -20,20 +20,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useEffect, useState } from "react";
 import { Period, Plan, Price } from "./types";
 import { IS_DEV } from "./helpers";
+import { SubscriptionPlan } from "@notesnook/core";
 
 function createPrice(id: string, period: Period, subtotal: number): Price {
   return {
     id,
     period,
-    subtotal,
-    total: 0,
-    tax: 0,
+    subtotal: `${subtotal}USD`,
+    total: `0.00USD`,
+    tax: `0.00USD`,
     currency: "USD"
   };
 }
 
 const FREE_PLAN: Plan = {
-  id: "free",
+  id: SubscriptionPlan.FREE,
   title: "Free",
   recurring: true,
   prices: [
@@ -46,7 +47,7 @@ const FREE_PLAN: Plan = {
 export const DEFAULT_PLANS: Plan[] = [
   FREE_PLAN,
   {
-    id: "essential",
+    id: SubscriptionPlan.ESSENTIAL,
     title: "Essential",
     recurring: true,
     prices: [
@@ -67,7 +68,7 @@ export const DEFAULT_PLANS: Plan[] = [
     ]
   },
   {
-    id: "pro",
+    id: SubscriptionPlan.PRO,
     title: "Pro",
     recurring: true,
     prices: [
@@ -95,7 +96,7 @@ export const DEFAULT_PLANS: Plan[] = [
     ]
   },
   {
-    id: "believer",
+    id: SubscriptionPlan.BELIEVER,
     title: "Believer",
     recurring: true,
     prices: [
@@ -123,7 +124,7 @@ export const DEFAULT_PLANS: Plan[] = [
     ]
   },
   {
-    id: "education",
+    id: SubscriptionPlan.EDUCATION,
     title: "Education",
     recurring: false,
     prices: [

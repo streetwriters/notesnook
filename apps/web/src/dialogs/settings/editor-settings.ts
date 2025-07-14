@@ -32,6 +32,8 @@ import { CustomizeToolbar } from "./components/customize-toolbar";
 import { DictionaryWords } from "./components/dictionary-words";
 import { strings } from "@notesnook/intl";
 import { isMac } from "../../utils/platform";
+import { isFeatureAvailable } from "@notesnook/common";
+import { showFeatureNotAllowedToast } from "../../common/toasts";
 
 export const EditorSettings: SettingsGroup[] = [
   {
@@ -119,7 +121,11 @@ export const EditorSettings: SettingsGroup[] = [
           {
             type: "toggle",
             isToggled: () => useSettingStore.getState().markdownShortcuts,
-            toggle: () => useSettingStore.getState().toggleMarkdownShortcuts()
+            toggle: async () => {
+              const result = await isFeatureAvailable("markdownShortcuts");
+              if (!result.isAllowed) return showFeatureNotAllowedToast(result);
+              useSettingStore.getState().toggleMarkdownShortcuts();
+            }
           }
         ]
       },
@@ -133,7 +139,11 @@ export const EditorSettings: SettingsGroup[] = [
           {
             type: "toggle",
             isToggled: () => useSettingStore.getState().fontLigatures,
-            toggle: () => useSettingStore.getState().toggleFontLigatures()
+            toggle: async () => {
+              const result = await isFeatureAvailable("fontLigatures");
+              if (!result.isAllowed) return showFeatureNotAllowedToast(result);
+              useSettingStore.getState().toggleFontLigatures();
+            }
           }
         ]
       }

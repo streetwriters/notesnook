@@ -24,7 +24,6 @@ import { ICollection } from "./collection.js";
 import { SQLCollection } from "../database/sql-collection.js";
 import { isFalse } from "../database/index.js";
 import { sql } from "@streetwriters/kysely";
-import { CHECK_IDS, checkIsUserPremium } from "../common.js";
 
 export class Tags implements ICollection {
   name = "tags";
@@ -65,11 +64,7 @@ export class Tags implements ICollection {
       await this.collection.update([oldTag.id], item);
       return oldTag.id;
     }
-    if (
-      (await this.all.count()) >= 5 &&
-      !(await checkIsUserPremium(CHECK_IDS.noteTag))
-    )
-      return;
+    if (!(await this.db.features.allowed("tags"))) return;
 
     const id = item.id || getId();
     await this.collection.upsert({
