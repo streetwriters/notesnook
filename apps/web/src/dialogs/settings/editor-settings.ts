@@ -31,6 +31,7 @@ import { SpellCheckerLanguages } from "./components/spell-checker-languages";
 import { CustomizeToolbar } from "./components/customize-toolbar";
 import { DictionaryWords } from "./components/dictionary-words";
 import { strings } from "@notesnook/intl";
+import { isMac } from "../../utils/platform";
 
 export const EditorSettings: SettingsGroup[] = [
   {
@@ -164,7 +165,7 @@ export const EditorSettings: SettingsGroup[] = [
         key: "spell-checker-languages",
         title: strings.languages(),
         description: strings.spellCheckerLanguagesDescription(),
-        isHidden: () => !useSpellChecker.getState().enabled,
+        isHidden: () => !useSpellChecker.getState().enabled || isMac(),
         onStateChange: (listener) =>
           useSpellChecker.subscribe((c) => c.enabled, listener),
         components: [
