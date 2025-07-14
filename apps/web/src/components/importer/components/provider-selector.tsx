@@ -46,7 +46,10 @@ export function ProviderSelector(props: ProviderSelectorProps) {
           sx={{ mt: 1, color: "paragraph", whiteSpace: "pre-wrap" }}
         >
           Can&apos;t find your notes app in the list?{" "}
-          <a href="https://github.com/streetwriters/notesnook-importer/issues/new">
+          <a
+            href="https://github.com/streetwriters/notesnook/issues/new"
+            target="_blank"
+          >
             Send us a request.
           </a>
         </Text>
