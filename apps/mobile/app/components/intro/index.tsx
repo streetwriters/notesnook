@@ -30,6 +30,7 @@ import { AuthMode } from "../auth/common";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import SettingsService from "../../services/settings";
 
 const Intro = () => {
   const { colors } = useThemeColors();
@@ -182,7 +183,7 @@ const Intro = () => {
             width: "100%"
           }}
           onPress={async () => {
-            // SettingsService.set({ introCompleted: true });
+            SettingsService.set({ introCompleted: true });
             Navigation.push("Auth", {
               mode: AuthMode.welcomeSignup
             });
@@ -200,9 +201,9 @@ const Intro = () => {
           type="secondary"
           fontSize={AppFontSize.md}
           onPress={() => {
-            // SettingsService.set({
-            //   introCompleted: true
-            // });
+            SettingsService.set({
+              introCompleted: true
+            });
             Navigation.push("Auth", {
               mode: AuthMode.login,
               context: "intro"
