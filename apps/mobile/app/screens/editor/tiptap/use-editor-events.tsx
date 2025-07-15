@@ -80,6 +80,7 @@ import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { useTabStore } from "./use-tab-store";
 import { editorState, openInternalLink } from "./utils";
 import AddReminder from "../../add-reminder";
+import { useAreFeaturesAvailable } from "@notesnook/common";
 
 const publishNote = async () => {
   const user = useUserStore.getState().user;
@@ -148,6 +149,11 @@ export const useEditorEvents = (
   editor: useEditorType,
   { readonly: editorPropReadonly, noHeader, noToolbar }: Partial<EditorProps>
 ) => {
+  const features = useAreFeaturesAvailable([
+    "callout",
+    "outlineList",
+    "taskList"
+  ]);
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const fullscreen = useSettingStore((state) => state.fullscreen);
   const corsProxy = useSettingStore((state) => state.settings.corsProxy);
@@ -216,7 +222,8 @@ export const useEditorEvents = (
       dateFormat: db.settings?.getDateFormat(),
       timeFormat: db.settings?.getTimeFormat(),
       fontScale,
-      markdownShortcuts
+      markdownShortcuts,
+      features
     });
   }, [
     fullscreen,
@@ -235,7 +242,8 @@ export const useEditorEvents = (
     timeFormat,
     loading,
     fontScale,
-    markdownShortcuts
+    markdownShortcuts,
+    features
   ]);
 
   const onBackPress = useCallback(async () => {
