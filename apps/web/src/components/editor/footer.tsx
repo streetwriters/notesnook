@@ -43,6 +43,7 @@ import { useWindowControls } from "../../hooks/use-window-controls";
 import { exitFullscreen } from "../../utils/fullscreen";
 import { useRef, useState } from "react";
 import { PopupPresenter } from "@notesnook/ui";
+import { AppEventManager, AppEvents } from "../../common/app-events";
 
 const SAVE_STATE_ICON_MAP = {
   "-1": NotSaved,
@@ -276,6 +277,21 @@ function EditorFooter() {
               ? "icon-error"
               : "paragraph"
           }
+          title={
+            saveState === SaveState.NotSaved ? strings.clickToSave() : undefined
+          }
+          sx={{
+            height: "100%",
+            cursor: saveState === SaveState.NotSaved ? "pointer" : "default",
+            ":hover": {
+              bg: saveState === SaveState.NotSaved ? "hover" : "initial"
+            }
+          }}
+          onClick={() => {
+            if (saveState === SaveState.NotSaved) {
+              AppEventManager.publish(AppEvents.saveEditor);
+            }
+          }}
         />
       )}
     </Flex>

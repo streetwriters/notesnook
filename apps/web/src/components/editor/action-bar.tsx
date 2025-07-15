@@ -578,6 +578,16 @@ function Tab(props: TabProps) {
         Menu.openMenu([
           {
             type: "button",
+            title: strings.save(),
+            key: "save",
+            onClick: () => {
+              AppEventManager.publish(AppEvents.saveEditor);
+            },
+            isHidden: !isUnsaved
+          },
+          { type: "separator", key: "sep0", isHidden: !isUnsaved },
+          {
+            type: "button",
             title: strings.close(),
             key: "close",
             onClick: onClose
@@ -606,7 +616,7 @@ function Tab(props: TabProps) {
             key: "close-all",
             onClick: onCloseAll
           },
-          { type: "separator", key: "sep" },
+          { type: "separator", key: "sep1" },
           {
             type: "button",
             title: strings.revealInList(),
