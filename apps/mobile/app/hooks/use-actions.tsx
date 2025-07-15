@@ -67,6 +67,8 @@ import { deleteItems } from "../utils/functions";
 import { convertNoteToText } from "../utils/note-to-text";
 import { sleep } from "../utils/time";
 import AddReminder from "../screens/add-reminder";
+import { isFeatureAvailable } from "@notesnook/common";
+import PaywallSheet from "../components/sheets/paywall";
 
 export type ActionId =
   | "select"
@@ -684,6 +686,12 @@ export const useActions = ({
     }
 
     async function pinToNotifications() {
+      const result = await isFeatureAvailable("pinNoteInNotification");
+      if (!result.isAllowed) {
+        PaywallSheet.present();
+        return;
+      }
+
       if (notifPinned) {
         await Notifications.remove(item.id);
         await sleep(500);
