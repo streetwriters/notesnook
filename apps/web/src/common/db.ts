@@ -20,7 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { EventSourcePolyfill as EventSource } from "event-source-polyfill";
 import { DatabasePersistence, NNStorage } from "../interfaces/storage";
 import { logger } from "../utils/logger";
-import { database } from "@notesnook/common";
+import {
+  database,
+  getFeatureLimit,
+  isFeatureAvailable
+} from "@notesnook/common";
 import { createDialect } from "./sqlite";
 import { isFeatureSupported } from "../utils/feature-check";
 import { generatePassword } from "../utils/password-generator";
@@ -94,6 +98,10 @@ async function initializeDatabase(persistence: DatabasePersistence) {
     fs: FileStorage,
     compressor: () =>
       import("../utils/compressor").then(({ Compressor }) => new Compressor()),
+    maxNoteVersions: async () => {
+      const limit = await getFeatureLimit("maxNoteVersions");
+      return typeof limit.caption === "number" ? limit.caption : undefined;
+    },
     batchSize: 100
   });
 
