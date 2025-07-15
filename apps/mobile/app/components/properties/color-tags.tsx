@@ -73,9 +73,6 @@ const ColorItem = ({ item, note }: { item: Color; note: Note }) => {
       testID={notesnook.ids.dialogs.actionsheet.color(item.colorCode)}
       key={item.id}
       onPress={toggleColor}
-      onLongPress={(event) => {
-        NativeTooltip.show(event, item.title, NativeTooltip.POSITIONS.TOP);
-      }}
       style={{
         width: 35,
         height: 35,
