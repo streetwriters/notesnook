@@ -122,8 +122,11 @@ export const EditorSettings: SettingsGroup[] = [
             type: "toggle",
             isToggled: () => useSettingStore.getState().markdownShortcuts,
             toggle: async () => {
-              const result = await isFeatureAvailable("markdownShortcuts");
-              if (!result.isAllowed) return showFeatureNotAllowedToast(result);
+              if (!useSettingStore.getState().markdownShortcuts) {
+                const result = await isFeatureAvailable("markdownShortcuts");
+                if (!result.isAllowed)
+                  return showFeatureNotAllowedToast(result);
+              }
               useSettingStore.getState().toggleMarkdownShortcuts();
             }
           }
