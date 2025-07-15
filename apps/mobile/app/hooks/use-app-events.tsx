@@ -605,7 +605,6 @@ export const useAppEvents = () => {
       EV.subscribe(EVENTS.userLoggedOut, onLogout),
       EV.subscribe(EVENTS.userEmailConfirmed, onUserEmailVerified),
       EV.subscribe(EVENTS.userSessionExpired, onUserSessionExpired),
-      EV.subscribe(EVENTS.userCheckStatus, PremiumService.onUserStatusCheck),
       EV.subscribe(
         EVENTS.userSubscriptionUpdated,
         onUserSubscriptionStatusChanged
