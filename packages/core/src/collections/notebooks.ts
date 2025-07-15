@@ -310,6 +310,8 @@ export class Notebooks implements ICollection {
     }
 
     addItem(this.cache.lockOpenedNotebooks, id);
+    addItem(this.cache.lockedNotebooks, id);
+
     EV.publish(EVENTS.notebookLockOpened, id);
     return true;
   }
@@ -323,7 +325,10 @@ export class Notebooks implements ICollection {
     await this.collection.update([id], {
       password: encrypted || null
     });
+
     deleteItem(this.cache.lockOpenedNotebooks, id);
+    deleteItem(this.cache.lockedNotebooks, id);
+
     EV.publish(EVENTS.notebooksLocked);
     return;
   }
@@ -334,6 +339,8 @@ export class Notebooks implements ICollection {
     if (!notebook.password) return;
 
     deleteItem(this.cache.lockOpenedNotebooks, id);
+    deleteItem(this.cache.lockedNotebooks, id);
+
     await this.collection.update([id], {
       password: null
     });

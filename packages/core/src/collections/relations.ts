@@ -436,20 +436,20 @@ class RelationsArray<TType extends keyof RelatableTable> {
           )
           .$if(
             !!this.types?.includes("note" as TType) &&
+              (this.reference.type === "tag" ||
+                this.reference.type === "color") &&
               this.db.notebooks.cache.lockedNotebooks.length > 0,
             (b) =>
               b.where((eb) =>
-                eb.not(
-                  eb.exists(
-                    eb
-                      .selectFrom("relations as r")
-                      .innerJoin("notebooks", "r.fromId", "notebooks.id")
-                      .select("r.id")
-                      .where("r.toType", "==", "note")
-                      .where("r.toId", "==", "relations.toId")
-                      .where("r.fromType", "==", "notebook")
-                      .where("notebooks.password", "is not", null)
-                  )
+                eb.exists(
+                  eb
+                    .selectFrom("relations as r")
+                    .innerJoin("notebooks", "r.fromId", "notebooks.id")
+                    .select("r.id")
+                    .where("r.toType", "==", "note")
+                    .where("r.toId", "==", "relations.toId")
+                    .where("r.fromType", "==", "notebook")
+                    .where("notebooks.password", "is not", null)
                 )
               )
           )
