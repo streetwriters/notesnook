@@ -40,6 +40,7 @@ interface NotesnookModuleInterface {
   hasWidgetNote: (noteId: string) => Promise<boolean>;
   updateWidgetNote: (noteId: string, data: string) => void;
   updateReminderWidget: () => void;
+  isGestureNavigationEnabled: () => boolean;
 }
 
 export const NotesnookModule: NotesnookModuleInterface = Platform.select({
@@ -59,7 +60,8 @@ export const NotesnookModule: NotesnookModuleInterface = Platform.select({
     getWidgetNotes: () => {},
     hasWidgetNote: () => {},
     updateWidgetNote: () => {},
-    updateReminderWidget: () => {}
+    updateReminderWidget: () => {},
+    isGestureNavigationEnabled: () => true
   },
   android: NativeModules.NNativeModule
 });

@@ -421,7 +421,6 @@ export const FluidPanelsView = React.memo(
           height: "100%",
           width: "100%",
           backgroundColor: colors.primary.background,
-          paddingBottom: Platform.OS === "android" ? insets?.bottom : 0,
           marginRight:
             orientation === "LANDSCAPE-RIGHT" && Platform.OS === "ios"
               ? insets.right
