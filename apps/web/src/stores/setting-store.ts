@@ -58,7 +58,7 @@ class SettingStore extends BaseStore<SettingStore> {
     PATHS.backupsDirectory
   );
   doubleSpacedParagraphs = Config.get("doubleSpacedLines", true);
-  markdownShortcuts = Config.get("markdownShortcuts", true);
+  markdownShortcuts = Config.get("markdownShortcuts", false);
   fontLigatures = Config.get("fontLigatures", false);
   notificationsSettings = Config.get("notifications", { reminder: true });
   isFullOfflineMode = Config.get("fullOfflineMode", false);
