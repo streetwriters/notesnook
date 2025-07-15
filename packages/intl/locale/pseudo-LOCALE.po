@@ -3936,6 +3936,10 @@ msgstr ""
 msgid "No note history available for this device."
 msgstr ""
 
+#: src/strings.ts:2489
+msgid "No notebooks selected to move"
+msgstr ""
+
 #: src/strings.ts:202
 msgid "No one can view this {type} except you."
 msgstr ""
