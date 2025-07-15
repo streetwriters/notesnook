@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import Config from "../utils/config";
 import { hashNavigate, getCurrentHash } from "../navigation";
 import { db } from "./db";
-import { sanitizeFilename } from "@notesnook/common";
+import { isFeatureAvailable, sanitizeFilename } from "@notesnook/common";
 import { useStore as useUserStore } from "../stores/user-store";
 import { HomePage, useStore as useSettingStore } from "../stores/setting-store";
 import { showToast } from "../utils/toast";
@@ -49,6 +49,7 @@ import { ZipFile } from "../utils/streams/zip-stream";
 import { ConfirmDialog, showLogoutConfirmation } from "../dialogs/confirm";
 import { Home } from "../components/icons";
 import { MenuItem } from "@notesnook/ui";
+import { showFeatureNotAllowedToast } from "./toasts";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
@@ -466,8 +467,14 @@ export function createSetDefaultHomepageMenuItem(
     type: "button",
     title: strings.setAsHomepage(),
     isChecked: homepage?.id === id && homepage?.type === type,
-    onClick: () => {
-      useSettingStore.getState().setHomepage({ id, type });
+    onClick: async () => {
+      if (homepage?.id === id && homepage?.type === type)
+        useSettingStore.getState().setHomepage();
+      else {
+        const result = await isFeatureAvailable("customHomepage");
+        if (!result.isAllowed) return showFeatureNotAllowedToast(result);
+        useSettingStore.getState().setHomepage({ id, type });
+      }
     },
     icon: Home.path
   } as MenuItem;

@@ -150,9 +150,15 @@ class SettingStore extends BaseStore<SettingStore> {
     Config.set("encryptBackups", encryptBackups);
   };
 
-  setHomepage = (homepage: HomePage) => {
+  setHomepage = (homepage?: HomePage) => {
     this.set({ homepage });
-    Config.set("homepage-v2", homepage);
+    Config.set(
+      "homepage-v2",
+      homepage || {
+        type: "route",
+        id: "notes"
+      }
+    );
   };
 
   setDefaultSidebarTab = (defaultSidebarTab: "home" | "notebooks" | "tags") => {
