@@ -103,21 +103,10 @@ const features = {
       legacyPro: createLimit(true, alwaysTrue)
     }
   }),
-  // checkList: createFeature({
-  //   id: "checkList",
-  //   title: "Check list",
-  //   availability: {
-  //     free: createLimit(true, alwaysTrue),
-  //     essential: createLimit(true, alwaysTrue),
-  //     pro: createLimit(true, alwaysTrue),
-  //     believer: createLimit(true, alwaysTrue),
-  //     legacyPro: createLimit(true, alwaysTrue)
-  //   }
-  // }),
-
-  noteLink: createFeature({
+  blockLinking: createFeature({
     id: "blockLinking",
     title: "Block-level note links",
+    error: () => `Block-level note links are not available on this plan.`,
     availability: {
       free: createLimit(false, alwaysFalse),
       essential: createLimit(true, alwaysTrue),
@@ -241,17 +230,6 @@ const features = {
       legacyPro: createLimit("∞", alwaysInfinite)
     }
   }),
-  // noteHistory: createFeature({
-  //   id: "noteHistory",
-  //   title: "Note history",
-  //   availability: {
-  //     free: createLimit("Local", alwaysTrue),
-  //     essential: createLimit("Local", alwaysTrue),
-  //     pro: createLimit("Synced", alwaysTrue),
-  //     believer: createLimit("Synced", alwaysTrue),
-  //     legacyPro: createLimit("Synced", alwaysTrue)
-  //   }
-  // }),
   defaultNotebookAndTag: createFeature({
     id: "defaultNotebookAndTag",
     title: "Default notebook & tag",
@@ -264,17 +242,6 @@ const features = {
       legacyPro: createLimit(true, alwaysTrue)
     }
   }),
-  // securityKeyAppLock: createFeature({
-  //   id: "securityKeyAppLock",
-  //   title: "Security key app lock",
-  //   availability: {
-  //     free: createLimit(false, alwaysFalse),
-  //     essential: createLimit(false, alwaysFalse),
-  //     pro: createLimit(true, alwaysTrue),
-  //     believer: createLimit(true, alwaysTrue),
-  //     legacyPro: createLimit(true, alwaysTrue)
-  //   }
-  // }),
   recurringReminders: createFeature({
     id: "recurringReminders",
     title: "Recurring reminders",
@@ -311,6 +278,17 @@ const features = {
   defaultSidebarTab: createFeature({
     id: "defaultSidebarTab",
     title: "Default sidebar tab",
+    availability: {
+      free: createLimit(false, alwaysFalse),
+      essential: createLimit(false, alwaysFalse),
+      pro: createLimit(true, alwaysTrue),
+      believer: createLimit(true, alwaysTrue),
+      legacyPro: createLimit(true, alwaysTrue)
+    }
+  }),
+  customHomepage: createFeature({
+    id: "customHomepage",
+    title: "Custom homepage",
     availability: {
       free: createLimit(false, alwaysFalse),
       essential: createLimit(false, alwaysFalse),
@@ -373,102 +351,36 @@ const features = {
       believer: createLimit(true, alwaysTrue),
       legacyPro: createLimit(true, alwaysTrue)
     }
+  }),
+  appLock: createFeature({
+    id: "appLock",
+    title: "App lock",
+    availability: {
+      free: createLimit(false, alwaysFalse),
+      essential: createLimit(false, alwaysFalse),
+      pro: createLimit(true, alwaysTrue),
+      believer: createLimit(true, alwaysTrue),
+      legacyPro: createLimit(true, alwaysTrue)
+    }
+  }),
+  maxNoteVersions: createFeature({
+    id: "maxNoteVersions",
+    title: "Maximum note versions",
+    availability: {
+      free: createLimit(100, lte(100)),
+      essential: createLimit(1000, lte(1000)),
+      pro: createLimit("∞", alwaysInfinite),
+      believer: createLimit("∞", alwaysInfinite),
+      legacyPro: createLimit("∞", alwaysInfinite)
+    }
   })
-  // filesInMonograph: createFeature({
-  //   id: "filesInMonograph",
-  //   title: "Files in monograph",
-  //   availability: {
-  //     free: createLimit("Images", alwaysTrue),
-  //     essential: createLimit("Images & files", alwaysTrue),
-  //     pro: createLimit("Images & files", alwaysTrue),
-  //     believer: createLimit("Images & files", alwaysTrue),
-  //     legacyPro: createLimit("Images & files", alwaysTrue)
-  //   }
-  // }),
-  // noteHistoryRetention: createFeature({
-  //   id: "noteHistoryRetention",
-  //   title: "Note history retention",
-  //   availability: {
-  //     free: createLimit("1 month", alwaysTrue),
-  //     essential: createLimit("∞", alwaysInfinite),
-  //     pro: createLimit("∞", alwaysInfinite),
-  //     believer: createLimit("∞", alwaysInfinite),
-  //     legacyPro: createLimit("∞", alwaysInfinite)
-  //   }
-  // }),
-  // appLock: createFeature({
-  //   id: "appLockDelay",
-  //   title: "App lock delay",
-  //   availability: {
-  //     free: createLimit("immediate", alwaysTrue),
-  //     essential: createLimit("immediate", alwaysTrue),
-  //     pro: createLimit("any", alwaysTrue),
-  //     believer: createLimit("any", alwaysTrue),
-  //     legacyPro: createLimit("any", alwaysTrue)
-  //   }
-  // }),
-  // passwordOnMonograph: createFeature({
-  //   id: "passwordOnMonograph",
-  //   title: "Password on monograph",
-  //   availability: {
-  //     free: createLimit("Default", alwaysTrue),
-  //     essential: createLimit("Custom", alwaysTrue),
-  //     pro: createLimit("Custom", alwaysTrue),
-  //     believer: createLimit("Custom", alwaysTrue),
-  //     legacyPro: createLimit("Custom", alwaysTrue)
-  //   }
-  // }),
-  // voiceMemos: createFeature({
-  //   id: "voiceMemos",
-  //   title: "Voice memos",
-  //   availability: {
-  //     free: createLimit("5 minute", lte(5)),
-  //     essential: createLimit("1 hour", lte(60)),
-  //     pro: createLimit("∞", alwaysInfinite),
-  //     believer: createLimit(true, alwaysTrue),
-  //     legacyPro: createLimit(true, alwaysTrue)
-  //   }
-  // }),
-  // notebookPublishing: createFeature({
-  //   id: "notebookPublishing",
-  //   title: "Notebook publishing",
-  //   availability: {
-  //     free: createLimit(1, lte(1)),
-  //     essential: createLimit(2, lte(2)),
-  //     pro: createLimit(5, lte(5)),
-  //     believer: createLimit(true, alwaysTrue),
-  //     legacyPro: createLimit(true, alwaysTrue)
-  //   }
-  // }),
-  // vaults: createFeature({
-  //   id: "vaults",
-  //   title: "Vaults",
-  //   availability: {
-  //     free: createLimit(1, lte(1)),
-  //     essential: createLimit(3, lte(3)),
-  //     pro: createLimit("∞", alwaysInfinite),
-  //     believer: createLimit("∞", alwaysInfinite),
-  //     legacyPro: createLimit("∞", alwaysInfinite)
-  //   }
-  // })
 };
 
 export async function isFeatureAvailable<TId extends FeatureId>(
   id: TId,
   value?: number
 ): Promise<FeatureResult<TId>> {
-  const user = await db.user.getUser();
-  const type = user?.subscription?.type;
-
-  const isLegacyPro =
-    type !== undefined &&
-    (type === SubscriptionType.BETA ||
-      type === SubscriptionType.PREMIUM ||
-      type === SubscriptionType.PREMIUM_CANCELED ||
-      type === SubscriptionType.TRIAL);
-  const plan = user?.subscription?.plan || SubscriptionPlan.FREE;
-
-  const limit = getFeatureLimitFromPlan(id, plan, isLegacyPro);
+  const limit = await getFeatureLimit(id);
   const isAllowed = await limit.isAllowed(value);
 
   return {
@@ -479,21 +391,16 @@ export async function isFeatureAvailable<TId extends FeatureId>(
   };
 }
 
+export async function getFeatureLimit<TId extends FeatureId>(id: TId) {
+  const { isLegacyPro, plan } = await getUserPlan();
+  return getFeatureLimitFromPlan(id, plan, isLegacyPro);
+}
+
 export async function areFeaturesAvailable<TIds extends FeatureId[]>(
   ids: TIds,
   values: number[] = []
 ): Promise<Record<TIds[number], FeatureResult<TIds[number]>>> {
-  const user = await db.user.getUser();
-  const type = user?.subscription?.type;
-
-  const isLegacyPro =
-    type !== undefined &&
-    (type === SubscriptionType.BETA ||
-      type === SubscriptionType.PREMIUM ||
-      type === SubscriptionType.PREMIUM_CANCELED ||
-      type === SubscriptionType.TRIAL);
-  const plan = user?.subscription?.plan || SubscriptionPlan.FREE;
-
+  const { isLegacyPro, plan } = await getUserPlan();
   const results = {} as Record<TIds[number], FeatureResult<TIds[number]>>;
   for (let i = 0; i < ids.length; ++i) {
     const value = values.at(i);
@@ -511,6 +418,20 @@ export async function areFeaturesAvailable<TIds extends FeatureId[]>(
   }
 
   return results;
+}
+
+async function getUserPlan() {
+  const user = await db.user.getUser();
+  const type = user?.subscription?.type;
+
+  const isLegacyPro =
+    type !== undefined &&
+    (type === SubscriptionType.BETA ||
+      type === SubscriptionType.PREMIUM ||
+      type === SubscriptionType.PREMIUM_CANCELED ||
+      type === SubscriptionType.TRIAL);
+  const plan = user?.subscription?.plan || SubscriptionPlan.FREE;
+  return { plan, isLegacyPro };
 }
 
 async function availableOn(id: FeatureId, value?: number) {
