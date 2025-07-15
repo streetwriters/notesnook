@@ -369,7 +369,12 @@ export function NotebookItem(props: {
         if (selected.find((s) => s.id === notebook.id)) {
           setSelected([]);
         } else {
-          setSelected([createSelection(notebook)]);
+          setSelected([
+            {
+              ...createSelection(notebook),
+              isLocked: Boolean(notebook.password)
+            }
+          ]);
         }
         setIsMultiselect(false);
         return;
@@ -490,8 +495,7 @@ function createSelection(item: { id: string }): SelectedReference {
   return {
     id: item.id,
     op: "add",
-    new: true,
-    isLocked: Boolean(notebook.password)
+    new: true
   };
 }
 
