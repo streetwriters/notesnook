@@ -23,8 +23,8 @@ import {
   FeatureId,
   FeatureResult,
   isFeatureAvailable
-} from "../utils";
-import { usePromise } from "./use-promise";
+} from "../utils/index.js";
+import { usePromise } from "./use-promise.js";
 
 export function useIsFeatureAvailable<TId extends FeatureId>(
   id: TId,
