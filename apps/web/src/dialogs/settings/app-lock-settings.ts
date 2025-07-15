@@ -35,6 +35,8 @@ import { showToast } from "../../utils/toast";
 import { WebAuthn } from "../../utils/webauthn";
 import { PromptDialog } from "../prompt";
 import { SettingComponent, SettingsGroup } from "./types";
+import { isFeatureAvailable } from "@notesnook/common";
+import { BuyDialog } from "../buy-dialog";
 
 export const AppLockSettings: SettingsGroup[] = [
   {
@@ -53,6 +55,11 @@ export const AppLockSettings: SettingsGroup[] = [
           {
             type: "toggle",
             toggle: async () => {
+              if (!useKeyStore.getState().credentials.some((c) => c.active)) {
+                const result = await isFeatureAvailable("appLock");
+                if (!result.isAllowed)
+                  return BuyDialog.show({ plan: result.availableOn });
+              }
               const { credentials } = useKeyStore.getState();
               const defaultCredential = credentials
                 .filter((c) => c.active)
