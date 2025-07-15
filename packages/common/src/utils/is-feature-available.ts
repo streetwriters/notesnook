@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { database as db } from "../database";
+import { database as db } from "../database.js";
 import { SubscriptionPlan, SubscriptionType } from "@notesnook/core";
 
 type CaptionValue = ("infinity" | (string & {})) | boolean | number;
