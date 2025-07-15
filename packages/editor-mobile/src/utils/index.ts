@@ -52,6 +52,7 @@ export type Settings = {
   dateFormat: string;
   fontScale: number;
   markdownShortcuts: boolean;
+  features: Record<any, any>;
 };
 
 /* eslint-disable no-var */
