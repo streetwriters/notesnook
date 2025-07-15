@@ -435,6 +435,25 @@ class RelationsArray<TType extends keyof RelatableTable> {
             (b) => b.where("toId", "not in", this.db.notes.cache.archived)
           )
           .$if(
+            !!this.types?.includes("note" as TType) &&
+              this.db.notebooks.cache.lockedNotebooks.length > 0,
+            (b) =>
+              b.where((eb) =>
+                eb.not(
+                  eb.exists(
+                    eb
+                      .selectFrom("relations as r")
+                      .innerJoin("notebooks", "r.fromId", "notebooks.id")
+                      .select("r.id")
+                      .where("r.toType", "==", "note")
+                      .where("r.toId", "==", "relations.toId")
+                      .where("r.fromType", "==", "notebook")
+                      .where("notebooks.password", "is not", null)
+                  )
+                )
+              )
+          )
+          .$if(
             !!this.types?.includes("notebook" as TType) &&
               this.db.trash.cache.notebooks.length > 0,
             (b) => b.where("toId", "not in", this.db.trash.cache.notebooks)

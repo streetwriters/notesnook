@@ -392,6 +392,14 @@ export class NNMigrationProvider implements MigrationProvider {
         async up(db) {
           await runFTSTablesMigrations(db);
         }
+      },
+      "a-2025-05-28": {
+        async up(db) {
+          await db.schema
+            .alterTable("notebooks")
+            .addColumn("password", "text")
+            .execute();
+        }
       }
     };
   }
