@@ -45,10 +45,10 @@ export function initAfterSync(type: "full" | "send" = "send") {
     useUserStore.setState({
       profile: db.settings.getProfile()
     });
-    eSendEvent(eAfterSync);
   }
   Notifications.setupReminders(true);
   NotePreviewWidget.updateNotes();
+  eSendEvent(eAfterSync);
 }
 
 export async function initialize() {}
