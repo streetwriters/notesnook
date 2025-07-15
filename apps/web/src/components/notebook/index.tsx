@@ -306,7 +306,8 @@ export const notebookMenuItems: (
       variant: "dangerous",
       icon: Trash.path,
       onClick: () => Multiselect.moveNotebooksToTrash(ids),
-      multiSelect: true
+      multiSelect: true,
+      isDisabled: Boolean(notebook.password)
     }
   ];
 };
