@@ -916,8 +916,19 @@ async function pinQuickNote(launch: boolean) {
  * A function that checks if reminders need to be reconfigured &
  * reschedules them if anything has changed.
  */
+
 async function setupReminders(checkNeedsScheduling = false) {
   const reminders = ((await db.reminders?.all.items()) as Reminder[]) || [];
+  if (Platform.OS === "android") {
+    // If the API level has changed, cancel all notifications.
+    // This is to ensure that the app does not crash on Android 14+.
+    const API_LEVEL = MMKV.getInt("android_apiLevel");
+    if (API_LEVEL !== (Platform.Version as number)) {
+      await notifee.cancelAllNotifications();
+      MMKV.setInt("android_apiLevel", Platform.Version as number);
+    }
+  }
+
   const triggers = await notifee.getTriggerNotifications();
   for (const reminder of reminders) {
     if (reminder.mode === "permanent") {
