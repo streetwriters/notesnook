@@ -80,11 +80,8 @@ export async function* exportNotes(
     })}.${FORMAT_TO_EXT[format]}`;
 
     if (note.archived) {
-      const archivePath = pathTree.add("_archive", "underscore");
-      notePathMap.set(
-        note.id,
-        [archivePath].map((p) => pathTree.add(join(p, filename)))
-      );
+      const archiveNotePath = join("_archive", filename);
+      notePathMap.set(note.id, [pathTree.add(archiveNotePath)]);
       continue;
     }
 
