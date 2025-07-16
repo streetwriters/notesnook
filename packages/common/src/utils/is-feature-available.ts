@@ -79,6 +79,19 @@ type Caption<TId extends FeatureId> =
   Features[TId]["availability"][keyof Feature["availability"]]["caption"];
 
 const features = {
+  storage: createFeature({
+    id: "storage",
+    title: "Storage",
+    error: (limit) =>
+      `You have exceeded your monthly ${limit.caption} limit for file uploads.`,
+    availability: {
+      free: createLimit("50MB", lte(50 * 1024 * 1024)),
+      essential: createLimit("1GB", lte(1024 * 1024 * 1024)),
+      pro: createLimit("10GB", lte(10 * 1024 * 1024 * 1024)),
+      believer: createLimit("25GB", lte(25 * 1024 * 1024 * 1024)),
+      legacyPro: createLimit("∞", alwaysInfinite)
+    }
+  }),
   fileSize: createFeature({
     id: "fileSize",
     title: "File size",
@@ -89,7 +102,7 @@ const features = {
       essential: createLimit("100MB", lte(100 * 1024 * 1024)),
       pro: createLimit("1GB", lte(1024 * 1024 * 1024)),
       believer: createLimit("5GB", lte(5 * 1024 * 1024 * 1024)),
-      legacyPro: createLimit("Unlimited", alwaysInfinite)
+      legacyPro: createLimit("512MB", lte(512 * 1024 * 1024))
     }
   }),
   fullQualityImages: createFeature({
