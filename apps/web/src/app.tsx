@@ -60,6 +60,14 @@ function App() {
     useSettingStore.getState().desktopIntegrationSettings?.nativeTitlebar;
   console.timeEnd("loading app");
 
+  useEffect(() => {
+    if (isMobile) {
+      useStore.setState({
+        isNavPaneCollapsed: false
+      });
+    }
+  }, [isMobile]);
+
   return (
     <>
       {isFocused ? null : (
