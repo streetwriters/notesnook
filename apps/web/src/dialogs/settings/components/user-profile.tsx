@@ -17,12 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Image, Text } from "@theme-ui/components";
+import { Flex, Image, Progress, Text } from "@theme-ui/components";
 import { Edit, User as UserIcon } from "../../../components/icons";
 import { useStore as useUserStore } from "../../../stores/user-store";
 import { useStore as useSettingStore } from "../../../stores/setting-store";
 import { getObjectIdTimestamp } from "@notesnook/core";
-import { getFormattedDate } from "@notesnook/common";
+import { formatBytes, getFormattedDate } from "@notesnook/common";
 import { db } from "../../../common/db";
 import { showToast } from "../../../utils/toast";
 import { EditProfilePictureDialog } from "../../edit-profile-picture-dialog";
@@ -144,7 +144,7 @@ export function UserProfile({ minimal }: Props) {
         mb: minimal ? 0 : 4
       }}
     >
-      <Flex sx={{ alignItems: "center" }}>
+      <Flex sx={{ alignItems: "center", flex: 1 }}>
         <Flex
           variant="columnCenter"
           sx={{
@@ -192,7 +192,7 @@ export function UserProfile({ minimal }: Props) {
             </Text>
           </Flex>
         </Flex>
-        <Flex sx={{ flexDirection: "column" }}>
+        <Flex sx={{ flexDirection: "column", flex: 1 }}>
           <Text
             variant="subBody"
             sx={{
@@ -243,6 +243,15 @@ export function UserProfile({ minimal }: Props) {
               </>
             )}
           </Text>
+          {user.totalStorage && !minimal ? (
+            <Flex sx={{ maxWidth: 300, alignItems: "center", gap: 1 }}>
+              <Progress max={user.totalStorage} value={user.storageUsed || 0} />
+              <Text variant="subBody" sx={{ flexShrink: 0 }}>
+                {formatBytes(user.storageUsed || 0)}/
+                {formatBytes(user.totalStorage)} used
+              </Text>
+            </Flex>
+          ) : null}
         </Flex>
       </Flex>
       {/* <Button
