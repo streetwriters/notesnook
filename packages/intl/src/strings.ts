@@ -2003,7 +2003,7 @@ All attachments will be downloaded & cached again on access.
   couldNotClearTrash: () => t`Could not clear trash.`,
   automaticBackupsDisabled: () => t`Automatic backups disabled`,
   automaticBackupsDisabledDesc: () =>
-    t`Please upgrade to Pro to enable automatic backups.`,
+    t`Please enable automatic backups to avoid losing important data.`,
   default: () => t`Default`,
   minimal: () => t`Minimal`,
   custom: () => t`Custom`,

@@ -29,6 +29,7 @@ import { TaskScheduler } from "../utils/task-scheduler";
 import { BuyDialog } from "../dialogs/buy-dialog";
 import { RecoveryKeyDialog } from "../dialogs/recovery-key-dialog";
 import { strings } from "@notesnook/intl";
+import { SettingsDialog } from "../dialogs/settings";
 
 export type NoticeType = "autoBackupsOff" | "login" | "email" | "recoverykey";
 
@@ -141,7 +142,7 @@ export const NoticesData: Record<NoticeType, NoticeData> = {
     key: "autoBackupsOff",
     title: strings.automaticBackupsDisabled(),
     subtitle: strings.automaticBackupsDisabledDesc(),
-    action: () => BuyDialog.show({}),
+    action: () => SettingsDialog.show({ activeSection: "backup-export" }),
     dismissable: true,
     icon: Backup
   },
