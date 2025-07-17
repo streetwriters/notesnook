@@ -592,6 +592,8 @@ export type User = {
   monographPasswordsKey?: Cipher<"base64">;
   inboxKeys?: { public: string; private: Cipher<"base64"> };
   marketingConsent?: boolean;
+  storageUsed?: number;
+  totalStorage?: number;
   mfa: {
     isEnabled: boolean;
     primaryMethod: AuthenticatorType;
