@@ -20,24 +20,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { database as db } from "../database";
 import { SubscriptionPlan, SubscriptionType } from "@notesnook/core";
 
-type Limit<
-  TCaption extends string | boolean | number = string | boolean | number
-> = {
+type CaptionValue = ("infinity" | (string & {})) | boolean | number;
+type Limit<TCaption extends CaptionValue = CaptionValue> = {
   caption: TCaption;
   isAllowed: (value?: number) => Promise<boolean> | boolean;
 };
-export type Feature = {
+type FeatureAvailability<TCaption extends CaptionValue = CaptionValue> = {
+  free: Limit<TCaption>;
+  essential: Limit<TCaption>;
+  pro: Limit<TCaption>;
+  believer: Limit<TCaption>;
+
+  legacyPro: Limit<TCaption>;
+};
+export type Feature<TCaption extends CaptionValue = CaptionValue> = {
   id: string;
   title: string;
   error: (limit: Limit) => string;
-  availability: {
-    free: Limit;
-    essential: Limit;
-    pro: Limit;
-    believer: Limit;
-
-    legacyPro: Limit;
-  };
+  used?: () => Promise<number> | number;
+  availability: FeatureAvailability<TCaption>;
 };
 
 export type FeatureResult<TId extends FeatureId = FeatureId> = {
@@ -47,9 +48,19 @@ export type FeatureResult<TId extends FeatureId = FeatureId> = {
   error: string;
 };
 
-function createFeature<T extends Feature>(
-  feature: Omit<T, "error"> & { error?: Feature["error"] }
-): T {
+type CaptionsFromAvailability<A> = A extends Record<
+  string,
+  { caption: infer C }
+>
+  ? C
+  : never;
+
+function createFeature<A extends FeatureAvailability>(
+  feature: Omit<Feature, "error" | "availability"> & {
+    error?: Feature["error"];
+    availability: A;
+  }
+): Feature<CaptionsFromAvailability<A>> {
   return {
     ...feature,
     error:
@@ -60,7 +71,7 @@ function createFeature<T extends Feature>(
               l.caption
             } ${feature.title.toLowerCase()}.`
           : `${feature.title} is not available on this plan.`)
-  } as unknown as T;
+  } as unknown as Feature<CaptionsFromAvailability<A>>;
 }
 
 function createLimit<TCaption extends Limit["caption"]>(
@@ -76,22 +87,9 @@ function createLimit<TCaption extends Limit["caption"]>(
 export type FeatureId = keyof typeof features;
 type Features = typeof features;
 type Caption<TId extends FeatureId> =
-  Features[TId]["availability"][keyof Feature["availability"]]["caption"];
+  Features[TId]["availability"][keyof FeatureAvailability]["caption"];
 
 const features = {
-  storage: createFeature({
-    id: "storage",
-    title: "Storage",
-    error: (limit) =>
-      `You have exceeded your monthly ${limit.caption} limit for file uploads.`,
-    availability: {
-      free: createLimit("50MB", lte(50 * 1024 * 1024)),
-      essential: createLimit("1GB", lte(1024 * 1024 * 1024)),
-      pro: createLimit("10GB", lte(10 * 1024 * 1024 * 1024)),
-      believer: createLimit("25GB", lte(25 * 1024 * 1024 * 1024)),
-      legacyPro: createLimit("∞", alwaysInfinite)
-    }
-  }),
   fileSize: createFeature({
     id: "fileSize",
     title: "File size",
@@ -164,83 +162,61 @@ const features = {
   colors: createFeature({
     id: "colors",
     title: "Colors",
+    used: () => db.colors.all.count(),
     availability: {
-      free: createLimit(
-        7,
-        lt(7, () => db.colors.all.count())
-      ),
-      essential: createLimit(
-        20,
-        lt(20, () => db.colors.all.count())
-      ),
-      pro: createLimit("∞", alwaysInfinite),
-      believer: createLimit("∞", alwaysInfinite),
-      legacyPro: createLimit("∞", alwaysInfinite)
+      free: createLimit(7, lt(7)),
+      essential: createLimit(20, lt(20)),
+      pro: createLimit("infinity", alwaysInfinite),
+      believer: createLimit("infinity", alwaysInfinite),
+      legacyPro: createLimit("infinity", alwaysInfinite)
     }
   }),
   tags: createFeature({
     id: "tags",
     title: "Tags",
+    used: () => db.tags.all.count(),
     availability: {
-      free: createLimit(
-        50,
-        lt(50, () => db.tags.all.count())
-      ),
-      essential: createLimit(
-        500,
-        lt(500, () => db.tags.all.count())
-      ),
-      pro: createLimit("∞", alwaysInfinite),
-      believer: createLimit("∞", alwaysInfinite),
-      legacyPro: createLimit("∞", alwaysInfinite)
+      free: createLimit(50, lt(50)),
+      essential: createLimit(500, lt(500)),
+      pro: createLimit("infinity", alwaysInfinite),
+      believer: createLimit("infinity", alwaysInfinite),
+      legacyPro: createLimit("infinity", alwaysInfinite)
     }
   }),
   notebooks: createFeature({
     id: "notebooks",
     title: "Notebooks",
+    used: () => db.notebooks.all.count(),
     availability: {
-      free: createLimit(
-        50,
-        lt(50, () => db.notebooks.all.count())
-      ),
-      essential: createLimit(
-        500,
-        lt(500, () => db.notebooks.all.count())
-      ),
-      pro: createLimit("∞", alwaysInfinite),
-      believer: createLimit("∞", alwaysInfinite),
-      legacyPro: createLimit("∞", alwaysInfinite)
+      free: createLimit(50, lt(50)),
+      essential: createLimit(500, lt(500)),
+      pro: createLimit("infinity", alwaysInfinite),
+      believer: createLimit("infinity", alwaysInfinite),
+      legacyPro: createLimit("infinity", alwaysInfinite)
     }
   }),
   activeReminders: createFeature({
     id: "activeReminders",
     title: "Active reminders",
+    used: () => db.reminders.active.count(),
     availability: {
-      free: createLimit(
-        10,
-        lt(10, () => db.reminders.active.count())
-      ),
-      essential: createLimit(
-        50,
-        lt(50, () => db.reminders.active.count())
-      ),
-      pro: createLimit("∞", alwaysInfinite),
-      believer: createLimit("∞", alwaysInfinite),
-      legacyPro: createLimit("∞", alwaysInfinite)
+      free: createLimit(10, lt(10)),
+      essential: createLimit(50, lt(50)),
+      pro: createLimit("infinity", alwaysInfinite),
+      believer: createLimit("infinity", alwaysInfinite),
+      legacyPro: createLimit("infinity", alwaysInfinite)
     }
   }),
   shortcuts: createFeature({
     id: "shortcuts",
     title: "Shortcuts",
+    used: () => db.shortcuts.all.length,
     availability: {
-      free: createLimit(
-        10,
-        lt(10, () => db.shortcuts.all.length)
-      ),
-      essential: createLimit("∞", alwaysInfinite),
-      pro: createLimit("∞", alwaysInfinite),
-      believer: createLimit("∞", alwaysInfinite),
-      legacyPro: createLimit("∞", alwaysInfinite)
+      free: createLimit(10, lt(10)),
+      essential: createLimit("infinity", alwaysInfinite),
+      pro: createLimit("infinity", alwaysInfinite),
+      believer: createLimit("infinity", alwaysInfinite),
+      legacyPro: createLimit("infinity", alwaysInfinite)
     }
   }),
   defaultNotebookAndTag: createFeature({
@@ -382,9 +358,9 @@ const features = {
     availability: {
       free: createLimit(100, lte(100)),
       essential: createLimit(1000, lte(1000)),
-      pro: createLimit("∞", alwaysInfinite),
-      believer: createLimit("∞", alwaysInfinite),
-      legacyPro: createLimit("∞", alwaysInfinite)
+      pro: createLimit("infinity", alwaysInfinite),
+      believer: createLimit("infinity", alwaysInfinite),
+      legacyPro: createLimit("infinity", alwaysInfinite)
     }
   })
 };
@@ -393,20 +369,23 @@ export async function isFeatureAvailable<TId extends FeatureId>(
   id: TId,
   value?: number
 ): Promise<FeatureResult<TId>> {
-  const limit = await getFeatureLimit(id);
-  const isAllowed = await limit.isAllowed(value);
+  const feature = getFeature(id);
+  const limit = await getFeatureLimit(feature);
+  const isAllowed = await limit.isAllowed(value || (await feature.used?.()));
 
   return {
     isAllowed,
     availableOn: isAllowed ? undefined : await availableOn(id, value),
-    caption: limit.caption as Caption<TId>,
+    caption: limit.caption,
     error: features[id].error(limit)
   };
 }
 
-export async function getFeatureLimit<TId extends FeatureId>(id: TId) {
+export async function getFeatureLimit<TId extends FeatureId>(
+  feature: Feature<TId>
+) {
   const { isLegacyPro, plan } = await getUserPlan();
-  return getFeatureLimitFromPlan(id, plan, isLegacyPro);
+  return getFeatureLimitFromPlan(feature, plan, isLegacyPro);
 }
 
 export async function areFeaturesAvailable<TIds extends FeatureId[]>(
@@ -419,8 +398,9 @@ export async function areFeaturesAvailable<TIds extends FeatureId[]>(
     const value = values.at(i);
     const id = ids[i];
 
-    const limit = getFeatureLimitFromPlan(id, plan, isLegacyPro);
-    const isAllowed = await limit.isAllowed(value);
+    const feature = getFeature(id);
+    const limit = getFeatureLimitFromPlan(feature, plan, isLegacyPro);
+    const isAllowed = await limit.isAllowed(value || (await feature.used?.()));
 
     results[id as TIds[number]] = {
       isAllowed,
@@ -461,15 +441,17 @@ async function availableOn(id: FeatureId, value?: number) {
   }
 }
 
-function getFeatureLimitFromPlan(
-  id: FeatureId,
+function getFeature<TId extends FeatureId>(id: TId): Feature<TId> {
+  return features[id] as unknown as Feature<TId>;
+}
+
+function getFeatureLimitFromPlan<TId extends FeatureId>(
+  feature: Feature<TId>,
   plan: SubscriptionPlan,
   isLegacyPro: boolean
-) {
-  const feature = features[id];
+): Limit<Caption<TId>> {
   const key = isLegacyPro ? "legacyPro" : PLAN_TO_AVAILABILITY[plan];
-
-  return feature.availability[key];
+  return feature.availability[key] as unknown as Limit<Caption<TId>>;
 }
 
 const PLAN_TO_AVAILABILITY: Record<
@@ -494,36 +476,25 @@ const AVAILABILITY_TO_PLAN: Record<
   legacyPro: undefined
 };
 
-function lte(
-  limit: number,
-  getValue?: () => Promise<number | undefined> | number | undefined
-) {
+function lte(limit: number) {
   return async (value?: number) => {
-    value = value ?? (await getValue?.());
     if (typeof value === "undefined") return false;
     return value <= limit;
   };
 }
 
-function lt(
-  limit: number,
-  getValue?: () => Promise<number | undefined> | number | undefined
-) {
+function lt(limit: number) {
   return async (value?: number) => {
-    value = value ?? (await getValue?.());
     if (typeof value === "undefined") return false;
     return value < limit;
   };
 }
-// Helper to always allow
 function alwaysTrue() {
   return true;
 }
-// Helper to always disallow
 function alwaysFalse() {
   return false;
 }
-// Helper for "infinite" or "any" values
 function alwaysInfinite() {
   return true;
 }
