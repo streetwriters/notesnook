@@ -300,20 +300,11 @@ async function singlePartUploadFile(
   console.log("Streaming file upload!");
   const { url, headers, signal } = requestOptions;
 
-  const uploadUrl: string | { error?: string } = await fetch(url, {
-    method: "PUT",
-    headers,
-    signal
-  }).then((res) => (res.ok ? res.text() : res.json()));
-  if (typeof uploadUrl !== "string")
-    throw new Error(
-      uploadUrl.error || "Unable to resolve attachment upload url."
-    );
-
   const response = await axios.request({
-    url: uploadUrl,
+    url,
     method: "PUT",
     headers: {
+      ...headers,
       "Content-Type": ""
     },
     data: await fileHandle.toBlob(),
