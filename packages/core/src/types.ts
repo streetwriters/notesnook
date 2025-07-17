@@ -579,6 +579,8 @@ export type User = {
   salt: string;
   attachmentsKey?: Cipher<"base64">;
   marketingConsent?: boolean;
+  storageUsed?: number;
+  totalStorage?: number;
   mfa: {
     isEnabled: boolean;
     primaryMethod: AuthenticatorType;
