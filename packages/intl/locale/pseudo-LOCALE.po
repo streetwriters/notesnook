@@ -4386,6 +4386,10 @@ msgstr ""
 msgid "Please download a backup of your data as your account will be cleared before recovery."
 msgstr ""
 
+#: src/strings.ts:2006
+msgid "Please enable automatic backups to avoid losing important data."
+msgstr ""
+
 #: src/strings.ts:1511
 msgid "Please enter a valid email address"
 msgstr ""
@@ -4476,10 +4480,6 @@ msgstr ""
 
 #: src/strings.ts:1986
 msgid "Please try again"
-msgstr ""
-
-#: src/strings.ts:2006
-msgid "Please upgrade to Pro to enable automatic backups."
 msgstr ""
 
 #: src/strings.ts:56

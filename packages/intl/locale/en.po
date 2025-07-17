@@ -4412,6 +4412,10 @@ msgstr "Please confirm your identity by entering the authentication code sent to
 msgid "Please download a backup of your data as your account will be cleared before recovery."
 msgstr "Please download a backup of your data as your account will be cleared before recovery."
 
+#: src/strings.ts:2006
+msgid "Please enable automatic backups to avoid losing important data."
+msgstr "Please enable automatic backups to avoid losing important data."
+
 #: src/strings.ts:1511
 msgid "Please enter a valid email address"
 msgstr "Please enter a valid email address"
@@ -4503,10 +4507,6 @@ msgstr "Please set title of the reminder"
 #: src/strings.ts:1986
 msgid "Please try again"
 msgstr "Please try again"
-
-#: src/strings.ts:2006
-msgid "Please upgrade to Pro to enable automatic backups."
-msgstr "Please upgrade to Pro to enable automatic backups."
 
 #: src/strings.ts:56
 msgid "Please verify it's you"
