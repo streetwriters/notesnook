@@ -36,6 +36,7 @@ function useForceUpdate() {
   return () => setValue((value) => value + 1);
 }
 
+// TODO: remove
 const bindings: Record<any, any> = {};
 
 export const useEditor = (
@@ -46,6 +47,7 @@ export const useEditor = (
   const forceUpdate = useForceUpdate();
   const editorRef = useRef<TiptapEditor>(editor);
 
+  // TODO: remove
   const resolvedExtensions = editor.extensionManager.extensions;
   for (const extension of resolvedExtensions) {
     const addKeyboardShortcuts = getExtensionField<
