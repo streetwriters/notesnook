@@ -21,7 +21,11 @@ import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { View } from "react-native";
-import { eSendEvent, presentSheet } from "../../../services/event-manager";
+import {
+  eSendEvent,
+  presentSheet,
+  ToastManager
+} from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
 import { eCloseSheet } from "../../../utils/events";
 import { SideMenuItem } from "../../../utils/menu-items";
@@ -31,6 +35,8 @@ import { useSideBarDraggingStore } from "../../side-menu/dragging-store";
 import AppIcon from "../../ui/AppIcon";
 import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
+import { isFeatureAvailable } from "@notesnook/common";
+import PaywallSheet from "../paywall";
 export const MenuItemProperties = ({ item }: { item: SideMenuItem }) => {
   const { colors } = useThemeColors();
   return (
@@ -44,18 +50,50 @@ export const MenuItemProperties = ({ item }: { item: SideMenuItem }) => {
       {[
         {
           title: strings.setAsHomepage(),
-          onPress: () => {
+          onPress: async () => {
+            const customHomepageFeature = await isFeatureAvailable(
+              "customHomepage"
+            );
+            if (!customHomepageFeature.isAllowed) {
+              ToastManager.show({
+                message: customHomepageFeature.error,
+                type: "info",
+                context: "local",
+                actionText: strings.upgrade(),
+                func: () => {
+                  PaywallSheet.present(customHomepageFeature);
+                }
+              });
+              return;
+            }
             SettingsService.setProperty("homepageV2", {
               id: item.id,
               type: "default"
             });
             eSendEvent(eCloseSheet);
           },
-          icon: "home-outline"
+          icon: "home-outline",
+          type: "switch",
+          state: SettingsService.getProperty("homepageV2")?.id === item.id
         },
         {
           title: strings.reorder(),
-          onPress: () => {
+          onPress: async () => {
+            const sidebarReorderFeature = await isFeatureAvailable(
+              "customizableSidebar"
+            );
+            if (!sidebarReorderFeature.isAllowed) {
+              ToastManager.show({
+                message: sidebarReorderFeature.error,
+                type: "info",
+                context: "local",
+                actionText: strings.upgrade(),
+                func: () => {
+                  PaywallSheet.present(sidebarReorderFeature);
+                }
+              });
+              return;
+            }
             useSideBarDraggingStore.setState({
               dragging: true
             });
@@ -79,12 +117,28 @@ export const MenuItemProperties = ({ item }: { item: SideMenuItem }) => {
             item.onPress();
           }}
         >
-          <AppIcon
-            color={colors.secondary.icon}
-            name={item.icon}
-            size={AppFontSize.xl}
-          />
-          <Paragraph>{item.title}</Paragraph>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: DefaultAppStyles.GAP_SMALL
+            }}
+          >
+            <AppIcon
+              color={colors.secondary.icon}
+              name={item.icon}
+              size={AppFontSize.xl}
+            />
+            <Paragraph>{item.title}</Paragraph>
+          </View>
+          {item.type === "switch" && item.state ? (
+            <AppIcon
+              name="check"
+              size={AppFontSize.lg}
+              color={colors.primary.accent}
+              style={{ marginLeft: "auto" }}
+            />
+          ) : null}
         </Pressable>
       ))}
     </View>

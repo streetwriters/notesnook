@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 /* eslint-disable no-inner-declarations */
+import { isFeatureAvailable } from "@notesnook/common";
 import {
   createInternalLink,
   Item,
@@ -38,11 +39,13 @@ import { presentDialog } from "../components/dialog/functions";
 import NoteHistory from "../components/note-history";
 import { AddNotebookSheet } from "../components/sheets/add-notebook";
 import ExportNotesSheet from "../components/sheets/export-notes";
+import PaywallSheet from "../components/sheets/paywall";
 import PublishNoteSheet from "../components/sheets/publish-note";
 import { ReferencesList } from "../components/sheets/references";
 import { RelationsList } from "../components/sheets/relations-list/index";
 import { useSideBarDraggingStore } from "../components/side-menu/dragging-store";
 import { ButtonProps } from "../components/ui/button";
+import AddReminder from "../screens/add-reminder";
 import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
 import {
   eSendEvent,
@@ -66,9 +69,6 @@ import { eUpdateNoteInEditor } from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { convertNoteToText } from "../utils/note-to-text";
 import { sleep } from "../utils/time";
-import AddReminder from "../screens/add-reminder";
-import { isFeatureAvailable } from "@notesnook/common";
-import PaywallSheet from "../components/sheets/paywall";
 
 export type ActionId =
   | "select"
@@ -216,7 +216,7 @@ export const useActions = ({
 
   async function restoreTrashItem() {
     close();
-    if ((await db.trash.restore(item.id)) === false) return;
+    await db.trash.restore(item.id);
     Navigation.queueRoutesForUpdate();
     const type = item.type === "trash" ? item.itemType : item.type;
     ToastManager.show({
@@ -248,6 +248,19 @@ export const useActions = ({
       if (isPinnedToMenu) {
         await db.shortcuts.remove(item.id);
       } else {
+        const shortcutsFeature = await isFeatureAvailable("shortcuts");
+        if (!shortcutsFeature.isAllowed) {
+          ToastManager.show({
+            message: shortcutsFeature.error,
+            type: "info",
+            context: "local",
+            actionText: strings.upgrade(),
+            func: () => {
+              PaywallSheet.present(shortcutsFeature);
+            }
+          });
+          return;
+        }
         await db.shortcuts.add({
           itemId: item.id,
           itemType: item.type
@@ -417,7 +430,22 @@ export const useActions = ({
       id: "reorder",
       title: strings.reorder(),
       icon: "sort-ascending",
-      onPress: () => {
+      onPress: async () => {
+        const sidebarReorderFeature = await isFeatureAvailable(
+          "customizableSidebar"
+        );
+        if (!sidebarReorderFeature.isAllowed) {
+          ToastManager.show({
+            message: sidebarReorderFeature.error,
+            type: "info",
+            context: "local",
+            actionText: strings.upgrade(),
+            func: () => {
+              PaywallSheet.present(sidebarReorderFeature);
+            }
+          });
+          return;
+        }
         useSideBarDraggingStore.setState({
           dragging: true
         });
@@ -500,6 +528,22 @@ export const useActions = ({
             await db.settings.setDefaultTag(undefined);
             setDefaultTag(undefined);
           } else {
+            const defaultNotebookAndTagFeature = await isFeatureAvailable(
+              "defaultNotebookAndTag"
+            );
+            if (!defaultNotebookAndTagFeature.isAllowed) {
+              ToastManager.show({
+                message: defaultNotebookAndTagFeature.error,
+                type: "info",
+                context: "local",
+                actionText: strings.upgrade(),
+                func: () => {
+                  PaywallSheet.present(defaultNotebookAndTagFeature);
+                }
+              });
+              return;
+            }
+
             await db.settings.setDefaultTag(item.id);
             setDefaultTag(item.id);
           }
@@ -517,6 +561,20 @@ export const useActions = ({
         title: strings.addNotebook(),
         icon: "plus",
         onPress: async () => {
+          const notebooksFeature = await isFeatureAvailable("notebooks");
+          if (!notebooksFeature.isAllowed) {
+            ToastManager.show({
+              message: notebooksFeature.error,
+              type: "info",
+              context: "local",
+              actionText: strings.upgrade(),
+              func: () => {
+                ToastManager.hide();
+                PaywallSheet.present(notebooksFeature);
+              }
+            });
+            return;
+          }
           close();
           await sleep(300);
           AddNotebookSheet.present(undefined, item);
@@ -545,6 +603,22 @@ export const useActions = ({
             await db.settings.setDefaultNotebook(undefined);
             setDefaultNotebook(undefined);
           } else {
+            const defaultNotebookAndTagFeature = await isFeatureAvailable(
+              "defaultNotebookAndTag"
+            );
+            if (!defaultNotebookAndTagFeature.isAllowed) {
+              ToastManager.show({
+                message: defaultNotebookAndTagFeature.error,
+                type: "info",
+                context: "local",
+                actionText: strings.upgrade(),
+                func: () => {
+                  PaywallSheet.present(defaultNotebookAndTagFeature);
+                }
+              });
+              return;
+            }
+
             const notebook = {
               id: item.id
             };
@@ -604,7 +678,24 @@ export const useActions = ({
       icon: "home-outline",
       isToggle: true,
       checked: isHomepage,
-      onPress: () => {
+      onPress: async () => {
+        const customHomepageFeature = await isFeatureAvailable(
+          "customHomepage"
+        );
+
+        if (!customHomepageFeature.isAllowed) {
+          ToastManager.show({
+            message: customHomepageFeature.error,
+            type: "info",
+            context: "local",
+            actionText: strings.upgrade(),
+            func: () => {
+              PaywallSheet.present(customHomepageFeature);
+            }
+          });
+          return;
+        }
+
         SettingsService.setProperty(
           "homepageV2",
           isHomepage
@@ -688,7 +779,14 @@ export const useActions = ({
     async function pinToNotifications() {
       const result = await isFeatureAvailable("pinNoteInNotification");
       if (!result.isAllowed) {
-        PaywallSheet.present();
+        ToastManager.show({
+          message: result.error,
+          type: "info",
+          actionText: strings.upgrade(),
+          func: () => {
+            PaywallSheet.present(result);
+          }
+        });
         return;
       }
 
@@ -921,13 +1019,40 @@ export const useActions = ({
             referenceType: "reminder",
             relationType: "from",
             title: strings.dataTypesPluralCamelCase.reminder(),
-            onAdd: () => {
+            onAdd: async () => {
+              const reminderFeature = await isFeatureAvailable(
+                "activeReminders"
+              );
+              if (!reminderFeature.isAllowed) {
+                ToastManager.show({
+                  type: "info",
+                  message: reminderFeature.error,
+                  actionText: strings.upgrade(),
+                  func: () => {
+                    PaywallSheet.present(reminderFeature);
+                  }
+                });
+              }
               AddReminder.present(undefined, item);
               close();
             },
             button: {
               type: "plain",
-              onPress: () => {
+              onPress: async () => {
+                const reminderFeature = await isFeatureAvailable(
+                  "activeReminders"
+                );
+                if (!reminderFeature.isAllowed) {
+                  ToastManager.show({
+                    type: "info",
+                    message: reminderFeature.error,
+                    actionText: strings.upgrade(),
+                    func: () => {
+                      PaywallSheet.present(reminderFeature);
+                    }
+                  });
+                  return;
+                }
                 AddReminder.present(undefined, item);
                 close();
               },

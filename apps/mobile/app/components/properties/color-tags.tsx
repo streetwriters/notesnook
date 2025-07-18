@@ -25,7 +25,7 @@ import { FlashList } from "@shopify/flash-list";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../e2e/test.ids";
 import { db } from "../../common/database";
-import { eSendEvent } from "../../services/event-manager";
+import { eSendEvent, ToastManager } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import { useMenuStore } from "../../stores/use-menu-store";
 import { useRelationStore } from "../../stores/use-relation-store";
@@ -38,6 +38,8 @@ import NativeTooltip from "../../utils/tooltip";
 import { Pressable } from "../ui/pressable";
 import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../utils/styles";
+import { isFeatureAvailable } from "@notesnook/common";
+import PaywallSheet from "../sheets/paywall";
 
 const ColorItem = ({ item, note }: { item: Color; note: Note }) => {
   const { colors } = useThemeColors();
@@ -109,6 +111,25 @@ export const ColorTags = ({ item }: { item: Note }) => {
     [note]
   );
 
+  const onPress = React.useCallback(async () => {
+    const colorTagsAvailable = await isFeatureAvailable("colors");
+    if (!colorTagsAvailable.isAllowed) {
+      ToastManager.show({
+        message: colorTagsAvailable.error,
+        type: "info",
+        context: "local",
+        actionText: strings.upgrade(),
+        func: () => {
+          PaywallSheet.present(colorTagsAvailable);
+          ToastManager.hide();
+        }
+      });
+      return;
+    }
+    useSettingStore.getState().setSheetKeyboardHandler(false);
+    setVisible(true);
+  }, []);
+
   return (
     <>
       <ColorPicker
@@ -133,10 +154,7 @@ export const ColorTags = ({ item }: { item: Note }) => {
       >
         {!colorNotes || !colorNotes.length ? (
           <Button
-            onPress={async () => {
-              useSettingStore.getState().setSheetKeyboardHandler(false);
-              setVisible(true);
-            }}
+            onPress={onPress}
             buttonType={{
               text: colors.primary.accent
             }}
@@ -172,10 +190,7 @@ export const ColorTags = ({ item }: { item: Note }) => {
                   marginRight: 5
                 }}
                 type="secondary"
-                onPress={() => {
-                  useSettingStore.getState().setSheetKeyboardHandler(false);
-                  setVisible(true);
-                }}
+                onPress={onPress}
               >
                 <Icon
                   testID="icon-plus"

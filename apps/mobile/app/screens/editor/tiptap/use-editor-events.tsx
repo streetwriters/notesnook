@@ -80,7 +80,8 @@ import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { useTabStore } from "./use-tab-store";
 import { editorState, openInternalLink } from "./utils";
 import AddReminder from "../../add-reminder";
-import { useAreFeaturesAvailable } from "@notesnook/common";
+import { isFeatureAvailable, useAreFeaturesAvailable } from "@notesnook/common";
+import PaywallSheet from "../../../components/sheets/paywall";
 
 const publishNote = async () => {
   const user = useUserStore.getState().user;
@@ -445,7 +446,23 @@ export const useEditorEvents = (
             referenceType: "reminder",
             relationType: "from",
             title: strings.dataTypesPluralCamelCase.reminder(),
-            onAdd: () => AddReminder.present(undefined, note)
+            onAdd: async () => {
+              const reminderFeature = await isFeatureAvailable(
+                "activeReminders"
+              );
+              if (!reminderFeature.isAllowed) {
+                ToastManager.show({
+                  type: "info",
+                  message: reminderFeature.error,
+                  actionText: strings.upgrade(),
+                  func: () => {
+                    PaywallSheet.present(reminderFeature);
+                  }
+                });
+                return;
+              }
+              AddReminder.present(undefined, note);
+            }
           });
           break;
         case EditorEvents.newtag:
@@ -533,7 +550,9 @@ export const useEditorEvents = (
           if (editor.state.current?.isFocused) {
             editor.state.current.isFocused = true;
           }
-          eSendEvent(eOpenPremiumDialog);
+          PaywallSheet.present(
+            await isFeatureAvailable(editorMessage.value.feature)
+          );
           break;
         case EditorEvents.monograph:
           publishNote();

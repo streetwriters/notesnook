@@ -1,7 +1,10 @@
 import { View, Text } from "react-native";
 import { presentSheet } from "../../../services/event-manager";
+import { FeatureId, FeatureResult } from "@notesnook/common";
 
-export default function PaywallSheet() {
+export default function PaywallSheet<Tid extends FeatureId>(props: {
+  feature: FeatureResult<Tid>;
+}) {
   return (
     <View
       style={{
@@ -20,8 +23,8 @@ export default function PaywallSheet() {
   );
 }
 
-PaywallSheet.present = () => {
+PaywallSheet.present = <Tid extends FeatureId>(feature: FeatureResult<Tid>) => {
   presentSheet({
-    component: <PaywallSheet />
+    component: <PaywallSheet feature={feature} />
   });
 };

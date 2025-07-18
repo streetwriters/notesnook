@@ -265,7 +265,7 @@ export const Login = ({ changeMode }) => {
                 style={{
                   alignSelf: "center",
                   marginTop: DefaultAppStyles.GAP_VERTICAL,
-                  width: 250
+                  width: "100%"
                 }}
                 onPress={() => {
                   if (loading) return;
