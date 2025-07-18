@@ -455,6 +455,7 @@ test("if note is active in multiple tabs, moving the note to trash should close 
     title: "Note 1"
   });
   await note?.contextMenu.openInNewTab();
+  await page.waitForTimeout(1000);
 
   await note?.contextMenu.moveToTrash();
 
