@@ -50,8 +50,10 @@ import {
 } from "../../utils/notebooks";
 import { DefaultAppStyles } from "../../utils/styles";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
-import { eSendEvent } from "../../services/event-manager";
+import { eSendEvent, ToastManager } from "../../services/event-manager";
 import { eUpdateNotebookRoute } from "../../utils/events";
+import { isFeatureAvailable } from "@notesnook/common";
+import PaywallSheet from "../../components/sheets/paywall";
 
 const {
   useNotebookExpandedStore,
@@ -239,7 +241,23 @@ export const MoveNotebook = (props: NavigationProps<"MoveNotebook">) => {
               }}
               button={{
                 icon: "plus",
-                onPress: () => {
+                onPress: async () => {
+                  const notebooksFeature = await isFeatureAvailable(
+                    "notebooks"
+                  );
+                  if (!notebooksFeature.isAllowed) {
+                    ToastManager.show({
+                      message: notebooksFeature.error,
+                      type: "info",
+                      context: "local",
+                      actionText: strings.upgrade(),
+                      func: () => {
+                        ToastManager.hide();
+                        PaywallSheet.present(notebooksFeature);
+                      }
+                    });
+                    return;
+                  }
                   AddNotebookSheet.present(
                     undefined,
                     undefined,
@@ -387,7 +405,21 @@ const NotebookItemWrapper = React.memo(
           onItemUpdate={onItemUpdate}
           focused={false}
           onPress={onPress}
-          onAddNotebook={() => {
+          onAddNotebook={async () => {
+            const notebooksFeature = await isFeatureAvailable("notebooks");
+            if (!notebooksFeature.isAllowed) {
+              ToastManager.show({
+                message: notebooksFeature.error,
+                type: "info",
+                context: "local",
+                actionText: strings.upgrade(),
+                func: () => {
+                  ToastManager.hide();
+                  PaywallSheet.present(notebooksFeature);
+                }
+              });
+              return;
+            }
             AddNotebookSheet.present(
               undefined,
               item.notebook,

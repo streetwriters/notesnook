@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { formatBytes } from "@notesnook/common";
+import { formatBytes, isFeatureAvailable } from "@notesnook/common";
 import { User } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import notifee from "@notifee/react-native";
@@ -67,6 +67,7 @@ import { verifyUser, verifyUserWithApplock } from "./functions";
 import { logoutUser } from "./logout";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
+import PaywallSheet from "../../components/sheets/paywall";
 
 export const settingsGroups: SettingSection[] = [
   {
@@ -749,7 +750,25 @@ export const settingsGroups: SettingSection[] = [
             name: strings.mardownShortcuts(),
             property: "markdownShortcuts",
             description: strings.mardownShortcutsDesc(),
-            type: "switch"
+            type: "switch",
+            onVerify: async () => {
+              const markdownShortcuts = await isFeatureAvailable(
+                "markdownShortcuts"
+              );
+
+              if (!markdownShortcuts.isAllowed) {
+                ToastManager.show({
+                  message: markdownShortcuts.error,
+                  type: "info",
+                  context: "local",
+                  actionText: strings.upgrade(),
+                  func: () => {
+                    PaywallSheet.present(markdownShortcuts);
+                  }
+                });
+              }
+              return markdownShortcuts.isAllowed;
+            }
           }
         ]
       },
@@ -941,6 +960,19 @@ export const settingsGroups: SettingSection[] = [
               SettingsService.setPrivacyScreen(SettingsService.get());
             },
             onVerify: async () => {
+              const appLockFeature = await isFeatureAvailable("appLock");
+              if (!appLockFeature.isAllowed) {
+                ToastManager.show({
+                  message: appLockFeature.error,
+                  type: "info",
+                  actionText: strings.upgrade(),
+                  func: () => {
+                    PaywallSheet.present(appLockFeature);
+                  }
+                });
+                return;
+              }
+
               const verified = await verifyUserWithApplock();
               if (!verified) return false;
 
@@ -1244,11 +1276,23 @@ export const settingsGroups: SettingSection[] = [
         description: strings.quickNoteNotificationDesc(),
         property: "notifNotes",
         icon: "form-textbox",
-        modifer: () => {
+        modifer: async () => {
           const settings = SettingsService.get();
           if (settings.notifNotes) {
             Notifications.unpinQuickNote();
           } else {
+            const createNoteFromNotificationDrawerFeature =
+              await isFeatureAvailable("createNoteFromNotificationDrawer");
+            if (!createNoteFromNotificationDrawerFeature.isAllowed) {
+              ToastManager.show({
+                message: createNoteFromNotificationDrawerFeature.error,
+                type: "info",
+                actionText: strings.upgrade(),
+                func: () => {
+                  PaywallSheet.present(createNoteFromNotificationDrawerFeature);
+                }
+              });
+            }
             Notifications.pinQuickNote(false);
           }
           SettingsService.set({

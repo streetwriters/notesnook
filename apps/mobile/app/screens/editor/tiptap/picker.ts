@@ -18,7 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Sodium from "@ammarahmed/react-native-sodium";
+import { isFeatureAvailable } from "@notesnook/common";
 import { isImage } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { basename } from "pathe";
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
@@ -38,12 +40,10 @@ import {
 } from "../../../services/event-manager";
 import PremiumService from "../../../services/premium";
 import { useSettingStore } from "../../../stores/use-setting-store";
-import { FILE_SIZE_LIMIT, IMAGE_SIZE_LIMIT } from "../../../utils/constants";
+import { useUserStore } from "../../../stores/use-user-store";
 import { eCloseSheet } from "../../../utils/events";
 import { useTabStore } from "./use-tab-store";
 import { editorController, editorState } from "./utils";
-import { strings } from "@notesnook/intl";
-import { useUserStore } from "../../../stores/use-user-store";
 
 const showEncryptionSheet = (file: DocumentPickerResponse) => {
   presentSheet({
@@ -92,13 +92,13 @@ const file = async (fileOptions: PickerOptions) => {
 
     let uri = Platform.OS === "ios" ? file.fileCopyUri || file.uri : file.uri;
 
-    if ((file.size || 0) > FILE_SIZE_LIMIT) {
+    const featureResult = await isFeatureAvailable("fileSize", file.size || 0);
+    if (!featureResult.isAllowed) {
       ToastManager.show({
         heading: strings.fileTooLarge(),
-        message: strings.fileTooLargeDesc(500),
+        message: featureResult.error,
         type: "error"
       });
-      return;
     }
 
     if (file.copyError) {
@@ -290,14 +290,15 @@ const handleImageResponse = async (
         Platform.OS === "ios" ? image.path.replace("file://", "") : image.path;
     }
 
-    if (image.size > IMAGE_SIZE_LIMIT) {
+    const featureResult = await isFeatureAvailable("fileSize", image.size || 0);
+    if (!featureResult.isAllowed) {
       ToastManager.show({
         heading: strings.fileTooLarge(),
-        message: strings.fileTooLargeDesc(50),
+        message: featureResult.error,
         type: "error"
       });
-      return;
     }
+
     const b64 = `data:${image.mime};base64, ` + image.data;
     const uri = decodeURI(image.path);
     const hash = await Sodium.hashFile({

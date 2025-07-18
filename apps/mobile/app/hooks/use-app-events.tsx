@@ -103,6 +103,8 @@ import { fluidTabsRef } from "../utils/global-refs";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { sleep } from "../utils/time";
 import AddReminder from "../screens/add-reminder";
+import { isFeatureAvailable } from "@notesnook/common";
+import PaywallSheet from "../components/sheets/paywall";
 
 const onCheckSyncStatus = async (type: SyncStatusEvent) => {
   const { disableSync, disableAutoSync } = SettingsService.get();
@@ -185,6 +187,18 @@ const onAppOpenedFromURL = async (event: { url: string }) => {
         if (reminder) AddReminder.present(reminder);
       }
     } else if (url.startsWith("https://notesnook.com/new_reminder")) {
+      const reminderFeature = await isFeatureAvailable("activeReminders");
+      if (!reminderFeature.isAllowed) {
+        ToastManager.show({
+          type: "info",
+          message: reminderFeature.error,
+          actionText: strings.upgrade(),
+          func: () => {
+            PaywallSheet.present(reminderFeature);
+          }
+        });
+        return;
+      }
       AddReminder.present();
     }
   } catch (e) {

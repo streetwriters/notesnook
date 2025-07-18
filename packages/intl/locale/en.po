@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-06-21 11:05+0500\n"
+"POT-Creation-Date: 2025-07-16 12:02+0500\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -6544,9 +6544,17 @@ msgstr "Update available"
 msgid "Update now"
 msgstr "Update now"
 
+#: src/strings.ts:2491
+msgid "Upgrade"
+msgstr "Upgrade"
+
 #: src/strings.ts:1917
 msgid "Upgrade now"
 msgstr "Upgrade now"
+
+#: src/strings.ts:2490
+msgid "Upgrade plan"
+msgstr "Upgrade plan"
 
 #: src/strings.ts:1938
 msgid "Upgrade to Notesnook Pro to add colors."

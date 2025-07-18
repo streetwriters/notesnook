@@ -31,6 +31,9 @@ import { Group } from "./group";
 import { DragState, useDragState } from "./state";
 import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../../utils/styles";
+import { isFeatureAvailable } from "@notesnook/common";
+import { ToastManager } from "../../../services/event-manager";
+import PaywallSheet from "../../../components/sheets/paywall";
 export const ConfigureToolbar = () => {
   const data = useDragState((state) => state.data);
   const preset = useDragState((state) => state.preset);
@@ -97,10 +100,21 @@ export const ConfigureToolbar = () => {
                   paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
                 }}
                 proTag={item.pro}
-                onPress={() => {
-                  if (item.id === "custom" && !PremiumService.get()) {
-                    PremiumService.sheet("global");
-                    return;
+                onPress={async () => {
+                  if (item.id === "custom") {
+                    const customToolbarPresetFeature = await isFeatureAvailable(
+                      "customToolbarPreset"
+                    );
+                    if (!customToolbarPresetFeature.isAllowed) {
+                      ToastManager.show({
+                        message: customToolbarPresetFeature.error,
+                        type: "info",
+                        actionText: strings.upgrade(),
+                        func: () =>
+                          PaywallSheet.present(customToolbarPresetFeature)
+                      });
+                      return;
+                    }
                   }
                   useDragState
                     .getState()

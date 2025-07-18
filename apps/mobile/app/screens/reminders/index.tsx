@@ -30,6 +30,9 @@ import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useReminders } from "../../stores/use-reminder-store";
 import AddReminder from "../add-reminder";
+import { isFeatureAvailable } from "@notesnook/common";
+import { ToastManager } from "../../services/event-manager";
+import PaywallSheet from "../../components/sheets/paywall";
 
 export const Reminders = ({
   navigation,
@@ -67,7 +70,19 @@ export const Reminders = ({
           });
         }}
         id={route.name}
-        onPressDefaultRightButton={() => {
+        onPressDefaultRightButton={async () => {
+          const reminderFeature = await isFeatureAvailable("activeReminders");
+          if (!reminderFeature.isAllowed) {
+            ToastManager.show({
+              type: "info",
+              message: reminderFeature.error,
+              actionText: strings.upgrade(),
+              func: () => {
+                PaywallSheet.present(reminderFeature);
+              }
+            });
+            return;
+          }
           AddReminder.present();
         }}
       />
@@ -83,7 +98,21 @@ export const Reminders = ({
             title: strings.yourReminders(),
             paragraph: strings.remindersEmpty(),
             button: strings.setReminder(),
-            action: () => {
+            action: async () => {
+              const reminderFeature = await isFeatureAvailable(
+                "activeReminders"
+              );
+              if (!reminderFeature.isAllowed) {
+                ToastManager.show({
+                  type: "info",
+                  message: reminderFeature.error,
+                  actionText: strings.upgrade(),
+                  func: () => {
+                    PaywallSheet.present(reminderFeature);
+                  }
+                });
+                return;
+              }
               AddReminder.present();
             },
             loading: strings.loadingReminders()
@@ -91,7 +120,19 @@ export const Reminders = ({
         />
 
         <FloatingButton
-          onPress={() => {
+          onPress={async () => {
+            const reminderFeature = await isFeatureAvailable("activeReminders");
+            if (!reminderFeature.isAllowed) {
+              ToastManager.show({
+                type: "info",
+                message: reminderFeature.error,
+                actionText: strings.upgrade(),
+                func: () => {
+                  PaywallSheet.present(reminderFeature);
+                }
+              });
+              return;
+            }
             AddReminder.present();
           }}
           alwaysVisible
