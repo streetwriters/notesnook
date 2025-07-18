@@ -23,6 +23,9 @@ import { useStore as useSearchStore } from "../stores/search-store";
 import { useEditorManager } from "../components/editor/manager";
 import { CommandPaletteDialog } from "../dialogs/command-palette";
 import { hashNavigate } from "../navigation";
+import { getKeybinding, keybindings } from "@notesnook/common";
+import { KeyboardShortcutsDialog } from "../dialogs/keyboard-shortcuts-dialog";
+import { isMac } from "../utils/platform";
 
 function isInEditor(e: KeyboardEvent) {
   return (
@@ -30,200 +33,68 @@ function isInEditor(e: KeyboardEvent) {
   );
 }
 
-const KEYMAP = [
-  // {
-  //   keys: ["command+n", "ctrl+n", "command+alt+n", "ctrl+alt+n"],
-  //   description: "Create a new note",
-  //   global: true,
-  //   action: (e) => {
-  //     e.preventDefault();
-  //     hashNavigate("/notes/create", {
-  //       addNonce: true,
-  //       replace: true,
-  //       notify: true,
-  //     });
-  //   },
-  // },
-  // {
-  //   keys: [
-  //     "command+shift+n",
-  //     "ctrl+shift+n",
-  //     "command+shift+alt+n",
-  //     "ctrl+shift+alt+n",
-  //   ],
-  //   description: "Create a new notebook",
-  //   global: true,
-  //   action: (e) => {
-  //     e.preventDefault();
-  //     hashNavigate("/notebooks/create", {
-  //       replace: true,
-  //       notify: true,
-  //     });
-  //   },
-  // },
-  {
-    keys: [
-      "command+option+right",
-      "ctrl+alt+right",
-      "command+option+shift+right",
-      "ctrl+alt+shift+right",
-      "ctrl+tab",
-      "command+tab"
-    ],
-    description: "Go to next tab",
-    action: () => useEditorStore.getState().focusNextTab()
-  },
-  {
-    keys: [
-      "command+option+left",
-      "ctrl+alt+left",
-      "command+option+shift+left",
-      "ctrl+alt+shift+left",
-      "ctrl+shift+tab",
-      "command+shift+tab"
-    ],
-    description: "Go to previous tab",
-    action: () => useEditorStore.getState().focusPreviousTab()
-  },
-  {
-    keys: ["ctrl+t", "command+t"],
-    description: "Create a new tab",
-    action: () => useEditorStore.getState().addTab()
-  },
-  {
-    keys: ["ctrl+n", "command+n"],
-    description: "Create a new note",
-    action: () => useEditorStore.getState().newSession()
-  },
-  {
-    keys: ["ctrl+w", "command+w"],
-    description:
-      "Close active tab or focus previously activated tab if active tab pinned",
-    action: () => {
-      const activeTab = useEditorStore.getState().getActiveTab();
-      if (activeTab?.pinned) {
-        useEditorStore.getState().focusLastActiveTab();
-        return;
-      }
-      useEditorStore.getState().closeActiveTab();
+const actions: Partial<
+  Record<keyof typeof keybindings, (() => void) | ((e: KeyboardEvent) => void)>
+> = {
+  nextTab: () => useEditorStore.getState().focusNextTab(),
+  previousTab: () => useEditorStore.getState().focusPreviousTab(),
+  newTab: () => useEditorStore.getState().addTab(),
+  newNote: () => useEditorStore.getState().newSession(),
+  closeActiveTab: () => {
+    const activeTab = useEditorStore.getState().getActiveTab();
+    if (activeTab?.pinned) {
+      useEditorStore.getState().focusLastActiveTab();
+      return;
     }
+    useEditorStore.getState().closeActiveTab();
   },
-  {
-    keys: ["ctrl+shift+w", "command+shift+w"],
-    description: "Close all tabs",
-    action: () => useEditorStore.getState().closeAllTabs()
-  },
-  {
-    keys: ["command+f", "ctrl+f"],
-    description: "Search all notes",
-    global: false,
-    action: (e: KeyboardEvent) => {
-      if (isInEditor(e)) {
-        const activeSession = useEditorStore.getState().getActiveSession();
-        if (activeSession?.type === "readonly") {
-          e.preventDefault();
-          const editor = useEditorManager
-            .getState()
-            .getEditor(activeSession.id);
-          editor?.editor?.startSearch();
-        }
-        return;
+  closeAllTabs: () => useEditorStore.getState().closeAllTabs(),
+  searchInNotes: (e: KeyboardEvent) => {
+    if (isInEditor(e)) {
+      const activeSession = useEditorStore.getState().getActiveSession();
+      if (activeSession?.type === "readonly") {
+        e.preventDefault();
+        const editor = useEditorManager.getState().getEditor(activeSession.id);
+        editor?.editor?.startSearch();
       }
-      e.preventDefault();
+      return;
+    }
+    e.preventDefault();
 
-      useSearchStore.setState({ isSearching: true, searchType: "notes" });
-    }
+    useSearchStore.setState({ isSearching: true, searchType: "notes" });
   },
-  // {
-  //   keys: ["alt+n"],
-  //   description: "Go to Notes",
-  //   global: false,
-  //   action: (e) => {
-  //     e.preventDefault();
-  //     navigate("/notes");
-  //   },
-  // },
-  // {
-  //   keys: ["alt+b"],
-  //   description: "Go to Notebooks",
-  //   global: false,
-  //   action: (e) => {
-  //     e.preventDefault();
-  //     navigate("/notebooks");
-  //   },
-  // },
-  // {
-  //   keys: ["alt+f"],
-  //   description: "Go to Favorites",
-  //   global: false,
-  //   action: (e) => {
-  //     e.preventDefault();
-  //     navigate("/favorites");
-  //   },
-  // },
-  // {
-  //   keys: ["alt+t"],
-  //   description: "Go to Tags",
-  //   global: false,
-  //   action: (e) => {
-  //     e.preventDefault();
-  //     navigate("/tags");
-  //   },
-  // },
-  // {
-  //   keys: ["alt+d"],
-  //   description: "Go to Trash",
-  //   global: false,
-  //   action: (e) => {
-  //     e.preventDefault();
-  //     navigate("/trash");
-  //   },
-  // },
-  // {
-  //   keys: ["alt+s"],
-  //   description: "Go to Settings",
-  //   global: false,
-  //   action: (e) => {
-  //     e.preventDefault();
-  //     navigate("/settings");
-  //   },
-  // },
-  // {
-  //   keys: ["command+d", "ctrl+d"],
-  //   description: "Toggle dark/light mode",
-  //   global: true,
-  //   action: (e) => {
-  //     e.preventDefault();
-  //     themestore.get().toggleNightMode();
-  //   },
-  // },
-  {
-    keys: ["ctrl+k", "cmd+k", "ctrl+p", "cmd+p"],
-    description: "Open command palette",
-    action: (e: KeyboardEvent) => {
-      e.preventDefault();
-      CommandPaletteDialog.close();
-      CommandPaletteDialog.show({
-        isCommandMode: e.key === "k"
-      }).catch(() => {});
-    }
+  openCommandPalette: () => {
+    CommandPaletteDialog.close();
+    CommandPaletteDialog.show({
+      isCommandMode: true
+    }).catch(() => {});
   },
-  {
-    keys: ["ctrl+,", "command+,"],
-    description: "Open settings",
-    action: () => hashNavigate("/settings", { replace: true })
-  }
-];
+  openQuickOpen: () => {
+    CommandPaletteDialog.close();
+    CommandPaletteDialog.show({
+      isCommandMode: false
+    }).catch(() => {});
+  },
+  openSettings: () => hashNavigate("/settings", { replace: true }),
+  openKeyboardShortcuts: () => KeyboardShortcutsDialog.show({})
+};
 
 export function registerKeyMap() {
   hotkeys.filter = function () {
     return true;
   };
 
-  KEYMAP.forEach((key) => {
-    hotkeys(key.keys.join(","), (e) => {
+  Object.entries(actions).forEach(([id, action]) => {
+    const keys = getKeybinding(
+      id as keyof typeof keybindings,
+      IS_DESKTOP_APP,
+      isMac()
+    );
+    if (!keys || keys.length === 0) return;
+
+    hotkeys(keys.join(","), (e) => {
       e.preventDefault();
-      key.action?.(e);
+      action(e);
     });
   });
 }
