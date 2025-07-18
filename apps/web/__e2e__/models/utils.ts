@@ -91,6 +91,7 @@ export async function fillReminderDialog(
   }
 
   await confirmDialog(dialog);
+  await dialog.waitFor({ state: "hidden" });
 }
 
 export async function fillItemDialog(page: Page, item: Item) {
