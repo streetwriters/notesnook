@@ -185,3 +185,20 @@ test(`sorting a task list with no checked items should do nothing`, async () => 
 
   expect(eq(editor.state.doc, beforeDoc)).toBe(true);
 });
+
+test("sorting a task list should preserve cursor location", async () => {
+  const { editor } = createEditor({
+    initialContent: NESTED_TASK_LIST,
+    extensions: {
+      taskItem: TaskItemNode.configure({ nested: true }),
+      taskList: TaskListNode
+    }
+  });
+  const beforeFrom = editor.state.selection.from;
+  const beforeTo = editor.state.selection.to;
+
+  editor.commands.command(({ tr }) => !!sortList(tr, 0));
+
+  expect(editor.state.selection.from).toBe(beforeFrom);
+  expect(editor.state.selection.to).toBe(beforeTo);
+});
