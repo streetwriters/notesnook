@@ -145,11 +145,13 @@ export function ImageComponent(
                     isReadonly
                       ? [
                           hash ? "previewAttachment" : "none",
-                          hash ? "downloadAttachment" : "none"
+                          hash ? "downloadAttachment" : "none",
+                          "copyImage"
                         ]
                       : [
                           hash ? "previewAttachment" : "none",
                           hash ? "downloadAttachment" : "none",
+                          "copyImage",
                           "imageAlignLeft",
                           "imageAlignCenter",
                           "imageAlignRight",

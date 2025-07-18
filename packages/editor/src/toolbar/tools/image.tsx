@@ -26,6 +26,7 @@ import { useToolbarLocation } from "../stores/toolbar-store.js";
 import { ImageProperties as ImagePropertiesPopup } from "../popups/image-properties.js";
 import { findSelectedNode } from "../../utils/prosemirror.js";
 import { ImageAttributes } from "../../extensions/image/index.js";
+import { toBlob } from "../../utils/downloader.js";
 
 export function ImageSettings(props: ToolProps) {
   const { editor } = props;
@@ -42,13 +43,14 @@ export function ImageSettings(props: ToolProps) {
         editor.isEditable
           ? [
               "downloadAttachment",
+              "copyImage",
               "imageAlignLeft",
               "imageAlignCenter",
               "imageAlignRight",
               "imageFloat",
               "imageProperties"
             ]
-          : ["downloadAttachment"]
+          : ["downloadAttachment", "copyImage"]
       }
     />
   );
@@ -161,5 +163,45 @@ export function ImageProperties(props: ToolProps) {
         />
       </ResponsivePresenter>
     </>
+  );
+}
+
+export function CopyImage(props: ToolProps) {
+  const { editor } = props;
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  return (
+    <ToolButton
+      {...props}
+      icon={isSuccess ? "check" : props.icon || "copy"}
+      iconColor={isSuccess ? "accent" : undefined}
+      toggled={false}
+      onClick={async () => {
+        if (isSuccess) return;
+
+        const imageNode = findSelectedNode(editor, "image");
+        if (!imageNode) return;
+
+        const { hash, mime } = imageNode.attrs as ImageAttributes;
+        const imageData = await editor.storage.getAttachmentData?.({
+          type: "image",
+          hash
+        });
+        if (typeof imageData !== "string" || !imageData) return;
+
+        const imageBlob = toBlob(imageData, mime);
+        if (!imageBlob) return;
+
+        if (navigator.clipboard && navigator.clipboard.write) {
+          await navigator.clipboard.write([
+            new ClipboardItem({
+              [imageBlob.type]: imageBlob
+            })
+          ]);
+          setIsSuccess(true);
+          setTimeout(() => setIsSuccess(false), 1500);
+        }
+      }}
+    />
   );
 }

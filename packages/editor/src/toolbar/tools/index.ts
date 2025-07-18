@@ -35,7 +35,13 @@ import { InsertBlock } from "./block.js";
 import { FontSize, FontFamily } from "./font.js";
 import { Alignment } from "./alignment.js";
 import { Headings } from "./headings.js";
-import { NumberedList, BulletList, Outdent, Indent, CheckList } from "./lists.js";
+import {
+  NumberedList,
+  BulletList,
+  Outdent,
+  Indent,
+  CheckList
+} from "./lists.js";
 import { TextDirection } from "./text-direction.js";
 import { Highlight, TextColor } from "./colors.js";
 import {
@@ -67,7 +73,8 @@ import {
   ImageAlignLeft,
   ImageAlignRight,
   ImageFloat,
-  ImageProperties
+  ImageProperties,
+  CopyImage
 } from "./image.js";
 import {
   AttachmentSettings,
@@ -135,6 +142,7 @@ const tools = {
   imageAlignRight: ImageAlignRight,
   imageProperties: ImageProperties,
   imageFloat: ImageFloat,
+  copyImage: CopyImage,
 
   embedAlignCenter: EmbedAlignCenter,
   embedAlignLeft: EmbedAlignLeft,
