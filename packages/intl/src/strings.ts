@@ -2486,5 +2486,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   unarchive: () => t`Unarchive`,
   moveNotebookDesc: () =>
     t`Select a notebook to move this notebook into, or unselect to move it to the root level.`,
-  iAlreadyHaveAnAccount: () => t`I already have an account`
+  iAlreadyHaveAnAccount: () => t`I already have an account`,
+  upgradePlan: () => t`Upgrade plan`,
+  upgrade: () => t`Upgrade`
 };

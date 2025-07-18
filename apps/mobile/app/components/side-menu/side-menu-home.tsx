@@ -18,32 +18,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import React, { Fragment } from "react";
+import React from "react";
 import { FlatList, View } from "react-native";
 import { DraxProvider, DraxScrollView } from "react-native-drax";
 import { db } from "../../common/database";
+import Navigation from "../../services/navigation";
 import { useMenuStore } from "../../stores/use-menu-store";
 import { useSettingStore } from "../../stores/use-setting-store";
+import { useUserStore } from "../../stores/use-user-store";
+import { SUBSCRIPTION_STATUS } from "../../utils/constants";
 import { MenuItemsList } from "../../utils/menu-items";
 import { DefaultAppStyles } from "../../utils/styles";
 import ReorderableList from "../list/reorderable-list";
+import { MenuItemProperties } from "../sheets/menu-item-properties";
+import { Button } from "../ui/button";
 import { ColorSection } from "./color-section";
 import { MenuItem } from "./menu-item";
 import { PinnedSection } from "./pinned-section";
 import { SideMenuHeader } from "./side-menu-header";
-import { SUBSCRIPTION_STATUS } from "../../utils/constants";
-import { eSendEvent } from "../../services/event-manager";
-import { eOpenPremiumDialog } from "../../utils/events";
-import { useUserStore } from "../../stores/use-user-store";
-import { Button } from "../ui/button";
-import { MenuItemProperties } from "../sheets/menu-item-properties";
 
 const pro = {
-  title: strings.getNotesnookPro(),
+  title: strings.upgradePlan(),
   icon: "crown",
   id: "pro",
   onPress: () => {
-    eSendEvent(eOpenPremiumDialog);
+    Navigation.navigate("PayWall", {
+      context: "logged-in"
+    });
   }
 };
 
@@ -141,15 +142,10 @@ export function SideMenuHome() {
         subscriptionType === SUBSCRIPTION_STATUS.BASIC ? (
           <Button
             title={pro.title}
-            iconColor={colors.static.yellow}
-            textStyle={{
-              color: colors.static.white
-            }}
-            icon={pro.icon}
             style={{
-              backgroundColor: colors.static.black,
               width: "100%"
             }}
+            type="accent"
             onPress={pro.onPress}
           />
         ) : null}

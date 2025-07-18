@@ -30,6 +30,7 @@ import useNavigationStore, {
 import { useSelectionStore } from "../stores/use-selection-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { rootNavigatorRef } from "../utils/global-refs";
+import { useIsFeatureAvailable } from "@notesnook/common";
 
 const RootStack = createNativeStackNavigator();
 const AppStack = createNativeStackNavigator();
@@ -46,6 +47,7 @@ let ColoredNotes: any = null;
 let Archive: any = null;
 const AppNavigation = React.memo(
   () => {
+    const customHomepageFeature = useIsFeatureAvailable("customHomepage");
     const { colors } = useThemeColors();
     const [home, setHome] = React.useState<{
       name: string;
@@ -57,7 +59,7 @@ const AppNavigation = React.memo(
     React.useEffect(() => {
       (async () => {
         if (loading) return;
-        if (!homepageV2) {
+        if (!homepageV2 || !customHomepageFeature?.isAllowed) {
           setHome({
             name: "Notes",
             params: undefined
