@@ -367,6 +367,22 @@ export const keybindings = {
   ...tiptapKeys
 };
 
+export function getKeybinding(
+  key: keyof typeof keybindings,
+  isDesktop = false,
+  isMac = false
+) {
+  const keybinding = keybindings[key];
+  if (keybinding.type === "hotkeys") {
+    const hotkeys = keybinding.keys(isDesktop);
+    return isMac ? hotkeys.map(macify) : hotkeys;
+  }
+  const tiptapKeys = Array.isArray(keybinding.keys)
+    ? keybinding.keys
+    : [keybinding.keys];
+  return isMac ? tiptapKeys.map(macify) : tiptapKeys;
+}
+
 function normalizeKeys(
   keys: string[] | { web?: string[]; desktop?: string[] }
 ): (isDesktop?: boolean) => string[] {
