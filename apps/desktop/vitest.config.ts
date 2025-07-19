@@ -23,7 +23,7 @@ export default defineConfig({
   test: {
     testTimeout: process.env.CI ? 120 * 1000 : 120 * 1000,
     sequence: {
-      concurrent: true,
+      concurrent: false,
       shuffle: true
     },
     dir: "./__tests__/",
