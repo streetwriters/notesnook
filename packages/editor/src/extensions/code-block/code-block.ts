@@ -36,6 +36,7 @@ import stripIndent from "strip-indent";
 import { nanoid } from "nanoid";
 import Languages from "./languages.json";
 import { CaretPosition, CodeLine } from "./utils.js";
+import { config } from "../../utils/config.js";
 
 interface Indent {
   type: "tab" | "space";
@@ -524,7 +525,14 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
           }
         }
       }),
-      HighlighterPlugin({ name: this.name, defaultLanguage: "txt" })
+      HighlighterPlugin({
+        name: this.name,
+        defaultLanguage: () => {
+          const cachedLanguage =
+            config.get<(typeof Languages)[number]>("codeBlockLanguage");
+          return cachedLanguage?.filename ?? "Plaintext";
+        }
+      })
     ];
   },
 

@@ -56,12 +56,17 @@ export async function langen(rootDirectory) {
         : undefined
     });
   }
+  languages.push({
+    filename: "Plaintext",
+    title: "Plaintext"
+  });
 
   const languageIndex = `/* !!! THIS IS A GENERATED FILE. DO NOT EDIT !!! */
 export async function loadLanguage(language: string) {
   switch (language) {
     ${languages
       .map(({ filename, alias }) => {
+        if (filename === "Plaintext") return "";
         return [
           ...(alias || []).map((a) => `case "${a}":`),
           `case "${filename}":`,
