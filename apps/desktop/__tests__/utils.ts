@@ -18,12 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { execSync } from "child_process";
-import { mkdir, rm } from "fs/promises";
+import { mkdir, rm, rmdir } from "fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "path";
 import { _electron as electron } from "playwright";
 import slugify from "slugify";
 import { test as vitestTest, TestContext } from "vitest";
+import { patchBetterSQLite3 } from "../scripts/patch-better-sqlite3.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -53,8 +54,8 @@ export const test = vitestTest.extend<Fixtures>({
     const ctx = await buildAndLaunchApp(options);
     await use(ctx);
     await ctx.app.close();
-    await rm(ctx.userDataDir, { recursive: true, force: true });
-    await rm(ctx.outputDir, { recursive: true, force: true });
+    await rmdir(ctx.userDataDir, { recursive: true });
+    await rmdir(ctx.outputDir, { recursive: true });
   }
 });
 
@@ -159,6 +160,8 @@ async function buildApp({
       NN_OUTPUT_DIR: outputDir
     }
   });
+
+  await patchBetterSQLite3();
 
   return path.join(
     __dirname,
