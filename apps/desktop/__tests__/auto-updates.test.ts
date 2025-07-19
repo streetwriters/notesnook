@@ -228,19 +228,19 @@ test("downgrade to stable on switching to stable release track", async (t) => {
 });
 
 async function skipDialog(page: Page) {
-  await page
-    .waitForSelector(".ReactModal__Content", {
-      timeout: 1000
-    })
-    .catch(() => {})
-    .then(async () => {
-      const positiveButton = page.locator(
-        "button[data-role='positive-button']"
-      );
-      const negativeButton = page.locator(
-        "button[data-role='negative-button']"
-      );
-      if (await positiveButton.isVisible()) await positiveButton.click();
-      else if (await negativeButton.isVisible()) await negativeButton.click();
-    });
+  try {
+    const dialog = page.locator(".ReactModal__Content");
+    const positiveButton = dialog.locator(
+      "button[data-role='positive-button']"
+    );
+    const negativeButton = dialog.locator(
+      "button[data-role='negative-button']"
+    );
+    if (await positiveButton.isVisible())
+      await positiveButton.click({ timeout: 2000 });
+    else if (await negativeButton.isVisible())
+      await negativeButton.click({ timeout: 2000 });
+  } catch (e) {
+    // ignore error
+  }
 }
