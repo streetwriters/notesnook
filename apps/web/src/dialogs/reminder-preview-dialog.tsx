@@ -96,7 +96,8 @@ export const ReminderPreviewDialog = DialogManager.register(
           sx={{
             alignItems: "center",
             my: 1,
-            gap: 1
+            gap: 1,
+            flexWrap: "wrap"
           }}
         >
           {SNOOZE_TIMES.map((time) => (
