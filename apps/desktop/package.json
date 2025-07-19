@@ -8,7 +8,9 @@
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",
-  "sideEffects": false,
+  "sideEffects": [
+    "src/overrides.ts"
+  ],
   "exports": {
     ".": {
       "require": {
