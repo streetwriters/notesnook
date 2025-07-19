@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { execSync } from "child_process";
-import { mkdir } from "fs/promises";
+import { mkdir, rm } from "fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "path";
 import { _electron as electron } from "playwright";
@@ -33,6 +33,8 @@ interface AppContext {
   app: import("playwright").ElectronApplication;
   page: import("playwright").Page;
   configPath: string;
+  userDataDir: string;
+  outputDir: string;
   relaunch: () => Promise<void>;
 }
 
@@ -60,23 +62,37 @@ export async function harness(
       });
     }
     await ctx.app.close();
+    await rm(ctx.userDataDir, { recursive: true, force: true });
+    await rm(ctx.outputDir, { recursive: true, force: true });
   });
 
   await cb(ctx);
 }
 
 async function buildAndLaunchApp(options?: TestOptions): Promise<AppContext> {
-  const productName = makeid(10);
-  const executablePath = await buildApp({ ...options, productName });
-  const { app, page, configPath } = await launchApp(executablePath);
+  const productName = `notesnooktest${makeid(10)}`;
+  const outputDir = path.join("test-artifacts", `${productName}-output`);
+  const executablePath = await buildApp({
+    ...options,
+    productName,
+    outputDir
+  });
+  const { app, page, configPath, userDataDir } = await launchApp(
+    executablePath
+  );
   const ctx: AppContext = {
     app,
     page,
     configPath,
+    userDataDir,
+    outputDir,
     relaunch: async () => {
-      const { app, page, configPath } = await launchApp(executablePath);
+      const { app, page, configPath, userDataDir } = await launchApp(
+        executablePath
+      );
       ctx.app = app;
       ctx.page = page;
+      ctx.userDataDir = userDataDir;
       ctx.configPath = configPath;
     }
   };
@@ -98,53 +114,53 @@ async function launchApp(executablePath: string) {
 
   const page = await app.firstWindow();
 
-  const userDataDirectory = await app.evaluate((a) => {
+  const userDataDir = await app.evaluate((a) => {
     return a.app.getPath("userData");
   });
-  const configPath = path.join(userDataDirectory, "config.json");
+  const configPath = path.join(userDataDir, "config.json");
   return {
     app,
     page,
-    configPath
+    configPath,
+    userDataDir
   };
 }
 
 async function buildApp({
   version,
-  productName
+  productName,
+  outputDir
 }: {
   version?: string;
   productName: string;
+  outputDir: string;
 }) {
-  const buildRoot = path.join("test-artifacts", `${productName}-build`);
-  const output = path.join("test-artifacts", `${productName}-output`);
-  execSync(`npm run release -- --root ${buildRoot} --skip-tsc-build`, {
-    stdio: IS_DEBUG ? "inherit" : "ignore"
-  });
-
   const args = [
+    "electron-builder",
+    "--dir",
+    `--${process.arch}`,
     `--config electron-builder.config.js`,
     `--c.extraMetadata.productName=${productName}`,
+    `--c.compression=store`,
     "--publish=never"
   ];
   if (version) args.push(`--c.extraMetadata.version=${version}`);
 
-  execSync(`npx electron-builder --dir --${process.arch} ${args.join(" ")}`, {
+  execSync(`npx ${args.join(" ")}`, {
     stdio: IS_DEBUG ? "inherit" : "ignore",
     env: {
       ...process.env,
       NOTESNOOK_STAGING: "true",
-      NN_BUILD_ROOT: buildRoot,
       NN_PRODUCT_NAME: productName,
       NN_APP_ID: `com.notesnook.test.${productName}`,
-      NN_OUTPUT_DIR: output
+      NN_OUTPUT_DIR: outputDir
     }
   });
 
   return path.join(
     __dirname,
     "..",
-    output,
+    outputDir,
     process.platform === "linux"
       ? process.arch === "arm64"
         ? "linux-arm64-unpacked"
