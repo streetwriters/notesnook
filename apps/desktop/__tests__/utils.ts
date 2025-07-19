@@ -23,7 +23,7 @@ import { fileURLToPath } from "node:url";
 import path from "path";
 import { _electron as electron } from "playwright";
 import slugify from "slugify";
-import { TaskContext } from "vitest";
+import { test as vitestTest, TestContext } from "vitest";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -42,31 +42,34 @@ interface TestOptions {
   version: string;
 }
 
-export async function harness(
-  t: TaskContext,
-  cb: (ctx: AppContext) => Promise<void>,
-  options?: TestOptions
-) {
-  const ctx = await buildAndLaunchApp(options);
+interface Fixtures {
+  options: TestOptions;
+  ctx: AppContext;
+}
 
-  t.onTestFinished(async (result) => {
-    if (result.state === "fail") {
-      await mkdir("test-results", { recursive: true });
-      await ctx.page.screenshot({
-        path: path.join(
-          "test-results",
-          `${slugify(t.task.name)}-${process.platform}-${
-            process.arch
-          }-error.png`
-        )
-      });
-    }
+export const test = vitestTest.extend<Fixtures>({
+  options: { version: "3.0.0" } as TestOptions,
+  ctx: async ({ options }, use) => {
+    const ctx = await buildAndLaunchApp(options);
+    await use(ctx);
     await ctx.app.close();
     await rm(ctx.userDataDir, { recursive: true, force: true });
     await rm(ctx.outputDir, { recursive: true, force: true });
-  });
+  }
+});
 
-  await cb(ctx);
+export async function testCleanup(context: TestContext) {
+  if (context.task.result?.state === "fail") {
+    await mkdir("test-results", { recursive: true });
+    await (context.task.context as unknown as Fixtures).ctx.page.screenshot({
+      path: path.join(
+        "test-results",
+        `${slugify(context.task.name)}-${process.platform}-${
+          process.arch
+        }-error.png`
+      )
+    });
+  }
 }
 
 async function buildAndLaunchApp(options?: TestOptions): Promise<AppContext> {
