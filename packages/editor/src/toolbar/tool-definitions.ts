@@ -276,6 +276,11 @@ const tools: Record<ToolId, ToolDefinition> = {
     title: strings.imageFloat(),
     conditional: true
   },
+  copyImage: {
+    icon: "copy",
+    title: strings.copyImage(),
+    conditional: true
+  },
   imageProperties: {
     icon: "more",
     title: strings.imageProperties(),
