@@ -24,8 +24,10 @@ import { Button, Flex, Text } from "@theme-ui/components";
 import {
   ChevronRight,
   Edit,
+  Lock,
   MoreHorizontal,
   Notebook2,
+  RemoveLock,
   RemoveShortcutLink,
   ShortcutLink
 } from "./icons";
@@ -34,8 +36,9 @@ import { db } from "../common/db";
 import { getFormattedDate } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
 import { Notebook } from "@notesnook/core";
-import { TITLE_BAR_HEIGHT } from "./title-bar";
 import { Menu } from "../hooks/use-menu";
+import { NotebookLock } from "../common/NotebookLock";
+import { isUserPremium } from "../hooks/use-is-user-premium";
 
 export function NotebookHeader(props: {
   notebook: Notebook;
@@ -132,6 +135,26 @@ export function NotebookHeader(props: {
           >
             <Edit size={14} />
           </Button>
+          {isUserPremium() && (
+            <Button
+              variant="secondary"
+              sx={{ borderRadius: 100, p: 1 }}
+              title={strings.lock()}
+              onClick={async () => {
+                if (notebook.password) {
+                  NotebookLock.unlock(notebook.id);
+                } else {
+                  NotebookLock.lock(notebook.id);
+                }
+              }}
+            >
+              {notebook.password ? (
+                <RemoveLock size={14} />
+              ) : (
+                <Lock size={14} />
+              )}
+            </Button>
+          )}
         </Flex>
       </Flex>
     </Flex>

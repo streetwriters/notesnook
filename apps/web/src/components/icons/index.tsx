@@ -230,7 +230,9 @@ import {
   mdiHamburger,
   mdiNotePlus,
   mdiNoteEditOutline,
-  mdiArrowUp
+  mdiArrowUp,
+  mdiLockOffOutline,
+  mdiLockOpenVariantOutline
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
@@ -342,7 +344,9 @@ export const Topic = createIcon(mdiBookmarkOutline);
 export const Alert = createIcon(mdiAlertOctagonOutline);
 export const Vault = createIcon(mdiShieldOutline);
 export const Unlock = createIcon(mdiLockOpenOutline);
+export const UnlockVariant = createIcon(mdiLockOpenVariantOutline);
 export const Lock = createIcon(mdiLockOutline);
+export const RemoveLock = createIcon(mdiLockOffOutline);
 export const Star = createIcon(mdiStarOutline);
 export const StarOutline = createIcon(mdiStarOutline);
 export const Circle = createIcon(mdiCircle);
