@@ -18,12 +18,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { execSync } from "child_process";
-import { mkdir } from "fs/promises";
+import { cp, mkdir, readFile, rm, rmdir, writeFile } from "fs/promises";
 import { fileURLToPath } from "node:url";
-import path from "path";
+import path, { join, resolve } from "path";
 import { _electron as electron } from "playwright";
 import slugify from "slugify";
-import { TaskContext } from "vitest";
+import { test as vitestTest, TestContext } from "vitest";
+import { patchBetterSQLite3 } from "../scripts/patch-better-sqlite3.mjs";
+import { existsSync } from "fs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,6 +35,8 @@ interface AppContext {
   app: import("playwright").ElectronApplication;
   page: import("playwright").Page;
   configPath: string;
+  userDataDir: string;
+  outputDir: string;
   relaunch: () => Promise<void>;
 }
 
@@ -40,122 +44,226 @@ interface TestOptions {
   version: string;
 }
 
-export async function harness(
-  t: TaskContext,
-  cb: (ctx: AppContext) => Promise<void>,
-  options?: TestOptions
-) {
-  const ctx = await buildAndLaunchApp(options);
+interface Fixtures {
+  options: TestOptions;
+  ctx: AppContext;
+}
 
-  t.onTestFinished(async (result) => {
-    if (result.state === "fail") {
-      await mkdir("test-results", { recursive: true });
-      await ctx.page.screenshot({
-        path: path.join(
-          "test-results",
-          `${slugify(t.task.name)}-${process.platform}-${
-            process.arch
-          }-error.png`
-        )
-      });
-    }
-    await ctx.app.close();
-  });
+export const test = vitestTest.extend<Fixtures>({
+  options: { version: "3.0.0" } as TestOptions,
+  ctx: async ({ options }, use) => {
+    const ctx = await buildAndLaunchApp(options);
+    await use(ctx);
+  }
+});
 
-  await cb(ctx);
+export async function testCleanup(context: TestContext) {
+  const ctx = (context.task.context as unknown as Fixtures).ctx;
+  if (context.task.result?.state === "fail") {
+    await mkdir("test-results", { recursive: true });
+    await ctx.page.screenshot({
+      path: path.join(
+        "test-results",
+        `${slugify(context.task.name)}-${process.platform}-${
+          process.arch
+        }-error.png`
+      )
+    });
+  }
+  await ctx.app.close();
+  await rmdir(ctx.userDataDir, { recursive: true });
+  await rmdir(ctx.outputDir, { recursive: true });
 }
 
 async function buildAndLaunchApp(options?: TestOptions): Promise<AppContext> {
-  const productName = makeid(10);
-  const executablePath = await buildApp({ ...options, productName });
-  const { app, page, configPath } = await launchApp(executablePath);
+  const productName = `notesnooktest${makeid(10)}`;
+  const outputDir = path.join("test-artifacts", `${productName}-output`);
+  const executablePath = await buildApp({
+    ...options,
+    outputDir
+  });
+  const { app, page, configPath, userDataDir } = await launchApp(
+    executablePath,
+    productName
+  );
   const ctx: AppContext = {
     app,
     page,
     configPath,
+    userDataDir,
+    outputDir,
     relaunch: async () => {
-      const { app, page, configPath } = await launchApp(executablePath);
+      const { app, page, configPath, userDataDir } = await launchApp(
+        executablePath,
+        productName
+      );
       ctx.app = app;
       ctx.page = page;
+      ctx.userDataDir = userDataDir;
       ctx.configPath = configPath;
     }
   };
   return ctx;
 }
 
-async function launchApp(executablePath: string) {
+async function launchApp(executablePath: string, packageName: string) {
+  const userDataDir = resolve(
+    __dirname,
+    "..",
+    "test-artifacts",
+    "user_data_dirs",
+    packageName
+  );
   const app = await electron.launch({
     executablePath,
     args: IS_DEBUG ? [] : ["--hidden"],
-    env:
-      process.platform === "linux"
+    env: {
+      ...(process.platform === "linux"
         ? {
             ...(process.env as Record<string, string>),
             APPIMAGE: "true"
           }
-        : (process.env as Record<string, string>)
+        : (process.env as Record<string, string>)),
+      CUSTOM_USER_DATA_DIR: userDataDir
+    }
   });
 
   const page = await app.firstWindow();
 
-  const userDataDirectory = await app.evaluate((a) => {
-    return a.app.getPath("userData");
-  });
-  const configPath = path.join(userDataDirectory, "config.json");
+  const configPath = path.join(userDataDir, "UserData", "config.json");
   return {
     app,
     page,
-    configPath
+    configPath,
+    userDataDir
   };
 }
 
 async function buildApp({
   version,
-  productName
+  outputDir
 }: {
   version?: string;
-  productName: string;
+  outputDir: string;
 }) {
-  const buildRoot = path.join("test-artifacts", `${productName}-build`);
-  const output = path.join("test-artifacts", `${productName}-output`);
-  execSync(`npm run release -- --root ${buildRoot} --skip-tsc-build`, {
-    stdio: IS_DEBUG ? "inherit" : "ignore"
-  });
+  const productName = `NotesnookTestHarness`;
+  const sourceDir = resolve("output", productName);
+  if (!existsSync(sourceDir)) {
+    const args = [
+      "electron-builder",
+      "--dir",
+      `--${process.arch}`,
+      `--config electron-builder.config.js`,
+      `--c.extraMetadata.productName=${productName}`,
+      `--c.compression=store`,
+      "--publish=never"
+    ];
+    if (version) args.push(`--c.extraMetadata.version=${version}`);
 
-  const args = [
-    `--config electron-builder.config.js`,
-    `--c.extraMetadata.productName=${productName}`,
-    "--publish=never"
-  ];
-  if (version) args.push(`--c.extraMetadata.version=${version}`);
+    execSync(`npx ${args.join(" ")}`, {
+      stdio: IS_DEBUG ? "inherit" : "ignore",
+      env: {
+        ...process.env,
+        NOTESNOOK_STAGING: "true",
+        NN_PRODUCT_NAME: productName,
+        NN_APP_ID: `com.notesnook.test.${productName}`,
+        NN_OUTPUT_DIR: sourceDir
+      }
+    });
+  }
+  return process.platform === "win32"
+    ? await copyBuildWindows(sourceDir, outputDir, productName, version)
+    : process.platform === "darwin"
+    ? await copyBuildMacOS(sourceDir, outputDir, productName, version)
+    : await copyBuildLinux(sourceDir, outputDir, productName, version);
+}
 
-  execSync(`npx electron-builder --dir --${process.arch} ${args.join(" ")}`, {
-    stdio: IS_DEBUG ? "inherit" : "ignore",
-    env: {
-      ...process.env,
-      NOTESNOOK_STAGING: "true",
-      NN_BUILD_ROOT: buildRoot,
-      NN_PRODUCT_NAME: productName,
-      NN_APP_ID: `com.notesnook.test.${productName}`,
-      NN_OUTPUT_DIR: output
-    }
-  });
+async function copyBuildLinux(
+  sourceDir: string,
+  outputDir: string,
+  productName: string,
+  version?: string
+) {
+  const platformDir =
+    process.arch === "arm64" ? "linux-arm64-unpacked" : "linux-unpacked";
+  const appDir = await copyBuild(
+    sourceDir,
+    outputDir,
+    platformDir,
+    "resources",
+    version
+  );
+  return resolve(__dirname, "..", appDir, productName);
+}
 
-  return path.join(
+async function copyBuildWindows(
+  sourceDir: string,
+  outputDir: string,
+  productName: string,
+  version?: string
+) {
+  const platformDir =
+    process.arch === "arm64" ? "win-arm64-unpacked" : "win-unpacked";
+  const appDir = await copyBuild(
+    sourceDir,
+    outputDir,
+    platformDir,
+    "resources",
+    version
+  );
+  return resolve(__dirname, "..", appDir, `${productName}.exe`);
+}
+
+async function copyBuildMacOS(
+  sourceDir: string,
+  outputDir: string,
+  productName: string,
+  version?: string
+) {
+  const platformDir = process.arch === "arm64" ? "mac-arm64" : "mac";
+  const appDir = await copyBuild(
+    sourceDir,
+    outputDir,
+    platformDir,
+    join(`${productName}.app`, "Contents", "Resources"),
+    version
+  );
+  return resolve(
     __dirname,
     "..",
-    output,
-    process.platform === "linux"
-      ? process.arch === "arm64"
-        ? "linux-arm64-unpacked"
-        : "linux-unpacked"
-      : process.platform === "darwin"
-      ? process.arch === "arm64"
-        ? `mac-arm64/${productName}.app/Contents/MacOS/`
-        : `mac/${productName}.app/Contents/MacOS/`
-      : "win-unpacked",
-    process.platform === "win32" ? `${productName}.exe` : productName
+    appDir,
+    `${productName}.app`,
+    "Contents",
+    "MacOS",
+    productName
   );
+}
+
+async function copyBuild(
+  sourceDir: string,
+  outputDir: string,
+  platformDir: string,
+  resourcesDir: string,
+  version?: string
+) {
+  const appDir = outputDir;
+  await cp(join(sourceDir, platformDir), outputDir, {
+    recursive: true,
+    preserveTimestamps: true,
+    verbatimSymlinks: true,
+    dereference: false,
+    force: true
+  });
+
+  const packageJsonPath = join(appDir, resourcesDir, "app", "package.json");
+
+  const packageJson = JSON.parse(await readFile(packageJsonPath, "utf-8"));
+  if (version) {
+    packageJson.version = version;
+    await writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2));
+  }
+
+  return appDir;
 }
 
 function makeid(length: number) {

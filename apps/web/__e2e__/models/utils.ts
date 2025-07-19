@@ -91,6 +91,7 @@ export async function fillReminderDialog(
   }
 
   await confirmDialog(dialog);
+  await dialog.waitFor({ state: "hidden" });
 }
 
 export async function fillItemDialog(page: Page, item: Item) {
@@ -133,7 +134,6 @@ export async function fillConfirmPasswordDialog(page: Page, password: string) {
 export async function confirmDialog(dialog: Locator) {
   const dialogConfirm = dialog.locator(getTestId("dialog-yes"));
   await dialogConfirm.click();
-  // await dialogConfirm.waitFor({ state: "detached" });
 }
 
 export async function denyDialog(page: Page) {
