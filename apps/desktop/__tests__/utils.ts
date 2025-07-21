@@ -18,13 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { execSync } from "child_process";
-import { cp, mkdir, readFile, rm, rmdir, writeFile } from "fs/promises";
+import { cp, mkdir, readFile, rm, writeFile } from "fs/promises";
 import { fileURLToPath } from "node:url";
 import path, { join, resolve } from "path";
 import { _electron as electron } from "playwright";
 import slugify from "slugify";
 import { test as vitestTest, TestContext } from "vitest";
-import { patchBetterSQLite3 } from "../scripts/patch-better-sqlite3.mjs";
 import { existsSync } from "fs";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -71,8 +70,8 @@ export async function testCleanup(context: TestContext) {
     });
   }
   await ctx.app.close();
-  await rmdir(ctx.userDataDir, { recursive: true });
-  await rmdir(ctx.outputDir, { recursive: true });
+  await rm(ctx.userDataDir, { force: true, recursive: true });
+  await rm(ctx.outputDir, { force: true, recursive: true });
 }
 
 async function buildAndLaunchApp(options?: TestOptions): Promise<AppContext> {
@@ -139,6 +138,7 @@ async function launchApp(executablePath: string, packageName: string) {
   };
 }
 
+let MAX_RETRIES = 3;
 async function buildApp({
   version,
   outputDir
@@ -159,17 +159,23 @@ async function buildApp({
       "--publish=never"
     ];
     if (version) args.push(`--c.extraMetadata.version=${version}`);
-
-    execSync(`npx ${args.join(" ")}`, {
-      stdio: IS_DEBUG ? "inherit" : "ignore",
-      env: {
-        ...process.env,
-        NOTESNOOK_STAGING: "true",
-        NN_PRODUCT_NAME: productName,
-        NN_APP_ID: `com.notesnook.test.${productName}`,
-        NN_OUTPUT_DIR: sourceDir
-      }
-    });
+    try {
+      execSync(`npx ${args.join(" ")}`, {
+        stdio: IS_DEBUG ? "inherit" : "ignore",
+        env: {
+          ...process.env,
+          NOTESNOOK_STAGING: "true",
+          NN_PRODUCT_NAME: productName,
+          NN_APP_ID: `com.notesnook.test.${productName}`,
+          NN_OUTPUT_DIR: sourceDir
+        }
+      });
+    } catch (e) {
+      if (--MAX_RETRIES) {
+        console.log("retrying...");
+        return await buildApp({ outputDir, version });
+      } else throw e;
+    }
   }
   return process.platform === "win32"
     ? await copyBuildWindows(sourceDir, outputDir, productName, version)
@@ -193,7 +199,12 @@ async function copyBuildLinux(
     "resources",
     version
   );
-  return resolve(__dirname, "..", appDir, productName);
+  return resolve(
+    __dirname,
+    "..",
+    appDir,
+    productName.toLowerCase().replace(/\s+/g, "-")
+  );
 }
 
 async function copyBuildWindows(
