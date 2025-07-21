@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { PropsWithChildren, useEffect, useRef } from "react";
 import { Box } from "@theme-ui/components";
-import { Close, AddReminder } from "../icons";
+import { Close, AddReminder, Menu } from "../icons";
 import { useStore as useSearchStore } from "../../stores/search-store";
 import useMobile from "../../hooks/use-mobile";
 import { debounce, usePromise } from "@notesnook/common";
@@ -27,6 +27,7 @@ import Field from "../field";
 import { strings } from "@notesnook/intl";
 import { RouteResult } from "../../navigation/types";
 import { CREATE_BUTTON_MAP } from "../../common";
+import { AppEventManager, AppEvents } from "../../common/app-events";
 
 export type RouteContainerButtons = {
   search?: {
@@ -133,6 +134,16 @@ function Header(props: RouteContainerProps) {
           if (e.key === "Escape") useSearchStore.getState().resetSearch();
           else useSearchStore.setState({ isSearching: true, searchType: type });
         }}
+        leftActions={[
+          {
+            icon: Menu,
+            hidden: !isMobile,
+            id: "hamburger-menu",
+            onClick: () => {
+              AppEventManager.publish(AppEvents.toggleSideMenu, true);
+            }
+          }
+        ]}
         rightActions={[
           {
             icon: Close,
