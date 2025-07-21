@@ -492,6 +492,7 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
         placeholder={user ? maskEmail(user.email) : undefined}
         autoFocus
         disabled
+        required={false}
       />
       <Button
         data-test-id="auth-forgot-password"
@@ -974,10 +975,10 @@ function SubtitleWithAction(props: SubtitleWithActionProps) {
 export function AuthField(props: FieldProps) {
   return (
     <Field
+      required
       {...props}
       name={props.name || props.id}
       data-test-id={props["data-test-id"] || props.id}
-      required
       sx={{ mt: 2, width: "100%" }}
       styles={{
         // label: { fontWeight: "normal" },
