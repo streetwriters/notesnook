@@ -9,7 +9,7 @@ on:
       - "apps/web/**"
       # re-run workflow if workflow file changes
       - ".github/workflows/web.tests.yml"
-  pull_request:
+  pull_request_target:
     branches:
       - "master"
     paths:
@@ -23,7 +23,16 @@ on:
       - "reopened"
 
 jobs:
+  authorize:
+    environment: ${{ github.event_name == 'pull_request_target' &&
+      github.event.pull_request.head.repo.full_name != github.repository &&
+      'external' || 'internal' }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo true
+
   build:
+    needs: authorize
     name: Build
     runs-on: ubuntu-22.04
     steps:
