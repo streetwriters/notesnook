@@ -10,6 +10,12 @@ on:
       # re-run workflow if workflow file changes
       - ".github/workflows/desktop.tests.yml"
   pull_request:
+    branches:
+      - "master"
+    paths:
+      - "app/desktop/**"
+      # re-run workflow if workflow file changes
+      - ".github/workflows/desktop.tests.yml"
 
 jobs:
   build:

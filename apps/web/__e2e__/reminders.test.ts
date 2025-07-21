@@ -53,16 +53,17 @@ test("adding a one-time reminder before current time should not be possible", as
   await app.goto();
   const reminders = await app.goToReminders();
 
-  await reminders.createReminder({
-    ...ONE_TIME_REMINDER,
-    date: 0
-  });
-
-  expect(
-    await app.toasts.waitForToast(
+  const result = await Promise.race([
+    reminders.createReminder({
+      ...ONE_TIME_REMINDER,
+      date: 0
+    }),
+    app.toasts.waitForToast(
       "Reminder time cannot be earlier than the current time."
     )
-  ).toBeTruthy();
+  ]);
+
+  expect(result).toBeTruthy();
 });
 
 for (const recurringMode of ["Daily", "Weekly", "Monthly"] as const) {
