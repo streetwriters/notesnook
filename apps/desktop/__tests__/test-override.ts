@@ -45,6 +45,20 @@ export async function testCleanup(context: TestContext) {
     });
   }
   await ctx.app.close();
-  await rm(ctx.userDataDir, { force: true, recursive: true });
-  await rm(ctx.outputDir, { force: true, recursive: true });
+  await rm(ctx.userDataDir, {
+    force: true,
+    recursive: true,
+    maxRetries: 3,
+    retryDelay: 5000
+  }).catch(() => {
+    /*ignore */
+  });
+  await rm(ctx.outputDir, {
+    force: true,
+    recursive: true,
+    maxRetries: 3,
+    retryDelay: 5000
+  }).catch(() => {
+    /*ignore */
+  });
 }
