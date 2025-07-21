@@ -10,6 +10,12 @@ on:
       # re-run workflow if workflow file changes
       - ".github/workflows/core.tests.yml"
   pull_request:
+    branches:
+      - "master"
+    paths:
+      - "packages/core/**"
+      # re-run workflow if workflow file changes
+      - ".github/workflows/core.tests.yml"
     types:
       - "ready_for_review"
       - "opened"

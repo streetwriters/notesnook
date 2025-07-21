@@ -5,7 +5,8 @@
       "outputs": [
         "{projectRoot}/build",
         "{projectRoot}/dist",
-        "{projectRoot}/languages"
+        "{projectRoot}/languages",
+        "{projectRoot}/src/extensions/code-block/languages"
       ],
       "cache": true
     },

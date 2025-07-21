@@ -17,22 +17,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { test } from "vitest";
-import { harness } from "./utils.js";
-import assert from "assert";
+import { testCleanup, test } from "./test-override.js";
 
-test("make sure app loads", async (t) => {
-  await harness(t, async ({ page }) => {
-    await page.waitForSelector("#authForm");
+test("make sure app loads", async ({
+  ctx: { page },
+  expect,
+  onTestFinished
+}) => {
+  onTestFinished(testCleanup);
 
-    assert.ok(
-      await page.getByRole("button", { name: "Create account" }).isVisible()
-    );
+  await page.waitForSelector("#authForm");
 
-    await page
-      .getByRole("button", { name: "Skip & go directly to the app" })
-      .click();
+  expect(
+    await page.getByRole("button", { name: "Create account" }).isVisible()
+  ).toBe(true);
 
-    await page.waitForSelector(".ProseMirror");
-  });
+  await page
+    .getByRole("button", { name: "Skip & go directly to the app" })
+    .click();
+
+  await page.waitForSelector(".ProseMirror");
 });
