@@ -17,25 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { defineConfig } from "vitest/config";
+import { buildApp } from "./utils";
 
-export default defineConfig({
-  test: {
-    testTimeout: process.env.CI ? 120 * 1000 : 120 * 1000,
-    sequence: {
-      concurrent: true,
-      shuffle: true
-    },
-    globalSetup: "./__tests__/global-setup.ts",
-    dir: "./__tests__/",
-    exclude: [
-      "**/node_modules/**",
-      "**/dist/**",
-      "**/cypress/**",
-      "**/.{idea,git,cache,output,temp}/**",
-      "**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build,eslint,prettier}.config.*",
-      "**/test-results/**",
-      "**/test-artifacts/**"
-    ]
-  }
-});
+export default async function setup() {
+  await buildApp();
+}

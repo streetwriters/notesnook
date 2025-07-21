@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { test, testCleanup } from "./utils.js";
+import { testCleanup, test } from "./test-override.js";
 import { writeFile } from "fs/promises";
 import { Page } from "playwright";
 import { gt, lt } from "semver";

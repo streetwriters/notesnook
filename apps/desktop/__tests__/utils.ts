@@ -18,19 +18,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { execSync } from "child_process";
-import { cp, mkdir, readFile, rm, writeFile } from "fs/promises";
+import { cp, readFile, writeFile } from "fs/promises";
 import { fileURLToPath } from "node:url";
 import path, { join, resolve } from "path";
 import { _electron as electron } from "playwright";
-import slugify from "slugify";
-import { test as vitestTest, TestContext } from "vitest";
 import { existsSync } from "fs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const IS_DEBUG = process.env.NN_DEBUG === "true" || process.env.CI === "true";
+const productName = `NotesnookTestHarness`;
+const SOURCE_DIR = resolve("output", productName);
 
-interface AppContext {
+export interface AppContext {
   app: import("playwright").ElectronApplication;
   page: import("playwright").Page;
   configPath: string;
@@ -39,45 +39,21 @@ interface AppContext {
   relaunch: () => Promise<void>;
 }
 
-interface TestOptions {
+export interface TestOptions {
   version: string;
 }
 
-interface Fixtures {
+export interface Fixtures {
   options: TestOptions;
   ctx: AppContext;
 }
 
-export const test = vitestTest.extend<Fixtures>({
-  options: { version: "3.0.0" } as TestOptions,
-  ctx: async ({ options }, use) => {
-    const ctx = await buildAndLaunchApp(options);
-    await use(ctx);
-  }
-});
-
-export async function testCleanup(context: TestContext) {
-  const ctx = (context.task.context as unknown as Fixtures).ctx;
-  if (context.task.result?.state === "fail") {
-    await mkdir("test-results", { recursive: true });
-    await ctx.page.screenshot({
-      path: path.join(
-        "test-results",
-        `${slugify(context.task.name)}-${process.platform}-${
-          process.arch
-        }-error.png`
-      )
-    });
-  }
-  await ctx.app.close();
-  await rm(ctx.userDataDir, { force: true, recursive: true });
-  await rm(ctx.outputDir, { force: true, recursive: true });
-}
-
-async function buildAndLaunchApp(options?: TestOptions): Promise<AppContext> {
+export async function buildAndLaunchApp(
+  options?: TestOptions
+): Promise<AppContext> {
   const productName = `notesnooktest${makeid(10)}`;
   const outputDir = path.join("test-artifacts", `${productName}-output`);
-  const executablePath = await buildApp({
+  const executablePath = await copyBuild({
     ...options,
     outputDir
   });
@@ -139,16 +115,8 @@ async function launchApp(executablePath: string, packageName: string) {
 }
 
 let MAX_RETRIES = 3;
-async function buildApp({
-  version,
-  outputDir
-}: {
-  version?: string;
-  outputDir: string;
-}) {
-  const productName = `NotesnookTestHarness`;
-  const sourceDir = resolve("output", productName);
-  if (!existsSync(sourceDir)) {
+export async function buildApp(version?: string) {
+  if (!existsSync(SOURCE_DIR)) {
     const args = [
       "electron-builder",
       "--dir",
@@ -167,33 +135,40 @@ async function buildApp({
           NOTESNOOK_STAGING: "true",
           NN_PRODUCT_NAME: productName,
           NN_APP_ID: `com.notesnook.test.${productName}`,
-          NN_OUTPUT_DIR: sourceDir
+          NN_OUTPUT_DIR: SOURCE_DIR
         }
       });
     } catch (e) {
       if (--MAX_RETRIES) {
         console.log("retrying...");
-        return await buildApp({ outputDir, version });
+        return await buildApp(version);
       } else throw e;
     }
   }
-  return process.platform === "win32"
-    ? await copyBuildWindows(sourceDir, outputDir, productName, version)
-    : process.platform === "darwin"
-    ? await copyBuildMacOS(sourceDir, outputDir, productName, version)
-    : await copyBuildLinux(sourceDir, outputDir, productName, version);
 }
 
-async function copyBuildLinux(
-  sourceDir: string,
+async function copyBuild({
+  version,
+  outputDir
+}: {
+  version?: string;
+  outputDir: string;
+}) {
+  return process.platform === "win32"
+    ? await makeBuildCopyWindows(outputDir, productName, version)
+    : process.platform === "darwin"
+    ? await makeBuildCopyMacOS(outputDir, productName, version)
+    : await makeBuildCopyLinux(outputDir, productName, version);
+}
+
+async function makeBuildCopyLinux(
   outputDir: string,
   productName: string,
   version?: string
 ) {
   const platformDir =
     process.arch === "arm64" ? "linux-arm64-unpacked" : "linux-unpacked";
-  const appDir = await copyBuild(
-    sourceDir,
+  const appDir = await makeBuildCopy(
     outputDir,
     platformDir,
     "resources",
@@ -207,16 +182,14 @@ async function copyBuildLinux(
   );
 }
 
-async function copyBuildWindows(
-  sourceDir: string,
+async function makeBuildCopyWindows(
   outputDir: string,
   productName: string,
   version?: string
 ) {
   const platformDir =
     process.arch === "arm64" ? "win-arm64-unpacked" : "win-unpacked";
-  const appDir = await copyBuild(
-    sourceDir,
+  const appDir = await makeBuildCopy(
     outputDir,
     platformDir,
     "resources",
@@ -225,15 +198,13 @@ async function copyBuildWindows(
   return resolve(__dirname, "..", appDir, `${productName}.exe`);
 }
 
-async function copyBuildMacOS(
-  sourceDir: string,
+async function makeBuildCopyMacOS(
   outputDir: string,
   productName: string,
   version?: string
 ) {
   const platformDir = process.arch === "arm64" ? "mac-arm64" : "mac";
-  const appDir = await copyBuild(
-    sourceDir,
+  const appDir = await makeBuildCopy(
     outputDir,
     platformDir,
     join(`${productName}.app`, "Contents", "Resources"),
@@ -250,15 +221,14 @@ async function copyBuildMacOS(
   );
 }
 
-async function copyBuild(
-  sourceDir: string,
+async function makeBuildCopy(
   outputDir: string,
   platformDir: string,
   resourcesDir: string,
   version?: string
 ) {
   const appDir = outputDir;
-  await cp(join(sourceDir, platformDir), outputDir, {
+  await cp(join(SOURCE_DIR, platformDir), outputDir, {
     recursive: true,
     preserveTimestamps: true,
     verbatimSymlinks: true,
