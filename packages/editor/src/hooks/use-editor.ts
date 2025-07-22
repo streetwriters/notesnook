@@ -17,14 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  AnyConfig,
-  EditorOptions,
-  Editor as TiptapEditor,
-  createDocument,
-  getExtensionField,
-  resolveFocusPosition
-} from "@tiptap/core";
+import { EditorOptions, Editor as TiptapEditor } from "@tiptap/core";
 import { DependencyList, useEffect, useMemo, useRef, useState } from "react";
 import { Editor } from "../types.js";
 import { useToolbarStore } from "../toolbar/stores/toolbar-store.js";
@@ -36,9 +29,6 @@ function useForceUpdate() {
   return () => setValue((value) => value + 1);
 }
 
-// TODO: remove
-const bindings: Record<any, any> = {};
-
 export const useEditor = (
   options: Partial<EditorOptions> = {},
   deps: DependencyList = []
@@ -46,21 +36,6 @@ export const useEditor = (
   const editor = useMemo<Editor>(() => new Editor(options), []);
   const forceUpdate = useForceUpdate();
   const editorRef = useRef<TiptapEditor>(editor);
-
-  // TODO: remove
-  const resolvedExtensions = editor.extensionManager.extensions;
-  for (const extension of resolvedExtensions) {
-    const addKeyboardShortcuts = getExtensionField<
-      AnyConfig["addKeyboardShortcuts"]
-    >(extension, "addKeyboardShortcuts", {
-      name: extension.name,
-      options: extension.options,
-      storage: extension.storage,
-      editor
-    });
-    bindings[extension.name] = addKeyboardShortcuts?.();
-  }
-  console.log("bindings", bindings);
 
   useEffect(
     () => {
