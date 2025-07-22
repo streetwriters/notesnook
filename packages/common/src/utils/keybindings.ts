@@ -410,9 +410,9 @@ export function macify(key: string) {
     .replace(/mod/gi, "Command");
 }
 
-export function formatKey(key: string, isMac = false) {
+export function formatKey(key: string, isMac = false, separator = " ") {
   return key
-    .replace(/\+|-/g, " ")
+    .replace(/\+|-/g, separator)
     .replace(/\bcommand\b/gi, isMac ? "⌘" : "Command")
     .replace(/\bctrl\b/gi, isMac ? "⌘" : "Ctrl")
     .replace(/\bshift\b/gi, "⇧")
