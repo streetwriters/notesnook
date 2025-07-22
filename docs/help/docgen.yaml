@@ -54,6 +54,7 @@ navigation:
   - path: deleting-your-account.md
   - path: app-lock.md
   - path: gift-cards.md
+  - path: keyboard-shortcuts.md
 
   - path: privacy-mode.md
   - path: web-clipper

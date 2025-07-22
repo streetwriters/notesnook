@@ -14,7 +14,6 @@ The following keyboard shortcuts will help you navigate Notesnook faster.
 | New tab | - | Ctrl t | Command t |
 | Close active tab | - | Ctrl w | Command w |
 | Close all tabs | - | Ctrl Shift w | Command Shift w |
-| Search in notes list view if editor is not focused | Ctrl f | Ctrl f | Command f |
 | Command palette | Ctrl k | Ctrl k | Command k |
 | Quick open | Ctrl p | Ctrl p | Command p |
 
@@ -28,6 +27,7 @@ The following keyboard shortcuts will help you navigate Notesnook faster.
 
 | Description | Web | Windows/Linux | Mac |
 | --- | --- | --- | --- |
+| Search in notes list view if editor is not focused | Ctrl f | Ctrl f | Command f |
 | Settings | Ctrl , | Ctrl , | Command , |
 | Keyboard shortcuts | Ctrl / | Ctrl / | Command / |
 

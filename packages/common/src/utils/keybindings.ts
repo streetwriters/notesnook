@@ -397,7 +397,7 @@ function normalizeKeys(
   };
 }
 
-function macify(key: string) {
+export function macify(key: string) {
   return key
     .replace(/ctrl/gi, "Command")
     .replace(/alt/gi, "Option")
@@ -441,50 +441,4 @@ export function getGroupedKeybindings(isDesktop: boolean, isMac: boolean) {
   }
 
   return grouped;
-}
-
-export function getGroupedTableKeybindingsMarkdown(): string {
-  const desktopKeybindings = getGroupedKeybindings(true, false);
-  const webKeybindings = getGroupedKeybindings(false, false);
-
-  const header = `| Description | Web | Windows/Linux | Mac |
-| --- | --- | --- | --- |`;
-
-  return Object.keys({ ...webKeybindings, ...desktopKeybindings })
-    .map((category) => {
-      const webShortcuts = webKeybindings[category] || [];
-      const desktopShortcuts = desktopKeybindings[category] || [];
-
-      const mergedShortcuts: Record<
-        string,
-        { web?: string[]; desktop?: string[] }
-      > = {};
-
-      webShortcuts.forEach(({ description, keys }) => {
-        if (!mergedShortcuts[description]) {
-          mergedShortcuts[description] = {};
-        }
-        mergedShortcuts[description].web = keys.map(formatKey);
-      });
-      desktopShortcuts.forEach(({ description, keys }) => {
-        if (!mergedShortcuts[description]) {
-          mergedShortcuts[description] = {};
-        }
-        mergedShortcuts[description].desktop = keys.map(formatKey);
-      });
-
-      const rows = Object.entries(mergedShortcuts)
-        .map(([description, { web, desktop }]) => {
-          const webKeys = web?.join(" / ") || "-";
-          const windowsLinuxKeys = desktop?.join(" / ") || "-";
-          const macKeys =
-            desktop?.map(macify).map(formatKey).join(" / ") || "-";
-
-          return `| ${description} | ${webKeys} | ${windowsLinuxKeys} | ${macKeys} |`;
-        })
-        .join("\n");
-
-      return `### ${category}\n\n${header}\n${rows}`;
-    })
-    .join("\n\n");
 }
