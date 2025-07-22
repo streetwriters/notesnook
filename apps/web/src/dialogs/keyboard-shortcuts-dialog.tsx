@@ -79,7 +79,7 @@ export const KeyboardShortcutsDialog = DialogManager.register(
                       <Text as="p">
                         {shortcut.keys.map((k, i) => (
                           <>
-                            <Keys keys={formatKey(k)} />
+                            <Keys keys={formatKey(k, isMac())} />
                             {shortcut.keys.length - 1 !== i && (
                               <Text as="span" sx={{ mx: 1, fontSize: "0.8em" }}>
                                 /
