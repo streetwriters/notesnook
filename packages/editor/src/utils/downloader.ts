@@ -146,3 +146,15 @@ export function revokeBloburl(id: string) {
   URL.revokeObjectURL(url);
   OBJECT_URL_CACHE[id] = undefined;
 }
+
+export function toBlob(dataurl: string, mimeType: string): Blob | undefined {
+  if (!DataURL.isValid(dataurl)) return;
+
+  const dataurlObject = DataURL.toObject(dataurl);
+  const data = dataurlObject.data;
+  if (!data) return;
+
+  return new Blob([Buffer.from(data, "base64")], {
+    type: mimeType
+  });
+}
