@@ -50,6 +50,7 @@ import { notebookMenuItems } from "../../components/notebook";
 import { tagMenuItems } from "../../components/tag";
 import { useEditorManager } from "../../components/editor/manager";
 import Config from "../../utils/config";
+import { KeyboardShortcutsDialog } from "../keyboard-shortcuts-dialog";
 
 export interface BaseCommand {
   id: string;
@@ -178,6 +179,14 @@ const staticCommands: Command[] = [
     title: strings.helpAndSupport(),
     icon: ArrowTopRight,
     action: () => (window.location.href = "https://help.notesnook.com"),
+    group: strings.navigate(),
+    type: "command"
+  },
+  {
+    id: "keyboard-shortcuts",
+    title: "Keyboard shortcuts",
+    icon: ArrowTopRight,
+    action: () => KeyboardShortcutsDialog.show({}),
     group: strings.navigate(),
     type: "command"
   },

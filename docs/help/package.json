@@ -1,0 +1,25 @@
+{
+  "name": "@notesnook/docs-help",
+  "version": "1.0.0",
+  "scripts": {
+    "document-keyboard-shortcuts": "node scripts/document-keyboard-shortcuts.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/streetwriters/notesnook.git"
+  },
+  "keywords": [
+    "notesnook",
+    "docs",
+    "help"
+  ],
+  "author": "",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/streetwriters/notesnook/issues"
+  },
+  "homepage": "https://github.com/streetwriters/notesnook#readme",
+  "devDependencies": {
+    "@notesnook/common": "file:../../packages/common"
+  }
+}
