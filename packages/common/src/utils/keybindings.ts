@@ -422,6 +422,7 @@ export function formatKey(key: string, isMac = false, separator = " ") {
     .replace(/\bright\b/gi, "→")
     .replace(/\bleft\b/gi, "←")
     .replace(/\benter\b/gi, "↵")
+    .replace(/\b\w\b/gi, (e) => e.toUpperCase())
     .trim();
 }
 
