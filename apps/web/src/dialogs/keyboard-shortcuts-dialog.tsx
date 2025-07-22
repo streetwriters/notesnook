@@ -41,24 +41,20 @@ export const KeyboardShortcutsDialog = DialogManager.register(
             height: 650
           }}
         >
-          {Object.entries(groupedKeybindings).map(([group, shortcuts]) => {
-            if (
-              shortcuts.length === 0 ||
-              shortcuts.every((s) => s.keys.length === 0)
-            ) {
-              return null;
-            }
+          {groupedKeybindings.map((group) => {
             return (
-              <Flex key={group} sx={{ flexDirection: "column", mb: 2 }}>
-                <Text sx={{ mt: 1, fontWeight: "bold" }}>{group}</Text>
-                <hr
-                  style={{
-                    width: "100%",
-                    background: "var(--background-secondary)"
+              <Flex key={group.category} sx={{ flexDirection: "column" }}>
+                <Text
+                  variant="subtitle"
+                  sx={{
+                    borderBottom: "1px solid var(--border)",
+                    mb: 1,
+                    pb: 1
                   }}
-                />
-                {shortcuts.map((shortcut) => {
-                  if (shortcut.keys.length === 0) return null;
+                >
+                  {group.category}
+                </Text>
+                {group.shortcuts.map((shortcut) => {
                   return (
                     <Flex
                       key={shortcut.description}

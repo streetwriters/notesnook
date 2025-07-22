@@ -5,31 +5,26 @@ description: Keyboard shortcuts for Notesnook
 
 The following keyboard shortcuts will help you navigate Notesnook faster.
 
+### General
+
+| Description | Web | Windows/Linux | Mac |
+| --- | --- | --- | --- |
+| Search in notes list view if editor is not focused | Ctrl F | Ctrl F | ⌘ F |
+| Settings | Ctrl , | Ctrl , | ⌘ , |
+| Keyboard shortcuts | Ctrl / | Ctrl / | ⌘ / |
+| New note | - | Ctrl N | ⌘ N |
+
 ### Navigation
 
 | Description | Web | Windows/Linux | Mac |
 | --- | --- | --- | --- |
 | Next tab | Ctrl Alt → / Ctrl Alt ⇧ → | Ctrl tab | ⌘ tab |
 | Previous tab | Ctrl Alt ← / Ctrl Alt ⇧ ← | Ctrl ⇧ tab | ⌘ ⇧ tab |
-| New tab | - | Ctrl t | ⌘ t |
-| Close active tab | - | Ctrl w | ⌘ w |
-| Close all tabs | - | Ctrl ⇧ w | ⌘ ⇧ w |
-| Command palette | Ctrl k | Ctrl k | ⌘ k |
-| Quick open | Ctrl p | Ctrl p | ⌘ p |
-
-### Note
-
-| Description | Web | Windows/Linux | Mac |
-| --- | --- | --- | --- |
-| New note | - | Ctrl n | ⌘ n |
-
-### General
-
-| Description | Web | Windows/Linux | Mac |
-| --- | --- | --- | --- |
-| Search in notes list view if editor is not focused | Ctrl f | Ctrl f | ⌘ f |
-| Settings | Ctrl , | Ctrl , | ⌘ , |
-| Keyboard shortcuts | Ctrl / | Ctrl / | ⌘ / |
+| Command palette | Ctrl K | Ctrl K | ⌘ K |
+| Quick open | Ctrl P | Ctrl P | ⌘ P |
+| New tab | - | Ctrl T | ⌘ T |
+| Close active tab | - | Ctrl W | ⌘ W |
+| Close all tabs | - | Ctrl ⇧ W | ⌘ ⇧ W |
 
 ### Editor
 
@@ -37,18 +32,18 @@ The following keyboard shortcuts will help you navigate Notesnook faster.
 | --- | --- | --- | --- |
 | Add attachment | Ctrl ⇧ A | Ctrl ⇧ A | ⌘ ⇧ A |
 | Insert blockquote | Ctrl ⇧ B | Ctrl ⇧ B | ⌘ ⇧ B |
-| Toggle bold | Ctrl b | Ctrl b | ⌘ b |
+| Toggle bold | Ctrl B | Ctrl B | ⌘ B |
 | Toggle bullet list | Ctrl ⇧ 8 | Ctrl ⇧ 8 | ⌘ ⇧ 8 |
 | Toggle check list | Ctrl ⇧ 9 | Ctrl ⇧ 9 | ⌘ ⇧ 9 |
 | Split list item | ↵ | ↵ | ↵ |
 | Lift list item | ⇧ Tab | ⇧ Tab | ⇧ Tab |
 | Sink list item | Ctrl ⇧ Down | Ctrl ⇧ Down | ⌘ ⇧ Down |
-| Toggle code | Ctrl e | Ctrl e | ⌘ e |
+| Toggle code | Ctrl E | Ctrl E | ⌘ E |
 | Toggle code block | Ctrl ⇧ C | Ctrl ⇧ C | ⌘ ⇧ C |
-| Insert date | Alt d | Alt d | ⌥ d |
-| Insert time | Alt t | Alt t | ⌥ t |
-| Insert date and time | Ctrl Alt d | Ctrl Alt d | ⌘ ⌥ d |
-| Insert date and time with timezone | Ctrl Alt z | Ctrl Alt z | ⌘ ⌥ z |
+| Insert date | Alt D | Alt D | ⌥ D |
+| Insert time | Alt T | Alt T | ⌥ T |
+| Insert date and time | Ctrl Alt D | Ctrl Alt D | ⌘ ⌥ D |
+| Insert date and time with timezone | Ctrl Alt Z | Ctrl Alt Z | ⌘ ⌥ Z |
 | Increase font size | Ctrl [ | Ctrl [ | ⌘ [ |
 | Decrease font size | Ctrl ] | Ctrl ] | ⌘ ] |
 | Insert paragraph | Ctrl ⇧ 0 | Ctrl ⇧ 0 | ⌘ ⇧ 0 |
@@ -58,10 +53,10 @@ The following keyboard shortcuts will help you navigate Notesnook faster.
 | Insert heading 4 | Ctrl Alt 4 | Ctrl Alt 4 | ⌘ ⌥ 4 |
 | Insert heading 5 | Ctrl Alt 5 | Ctrl Alt 5 | ⌘ ⌥ 5 |
 | Insert heading 6 | Ctrl Alt 6 | Ctrl Alt 6 | ⌘ ⌥ 6 |
-| Undo | Ctrl z | Ctrl z | ⌘ z |
-| Redo | Ctrl ⇧ z / Ctrl y | Ctrl ⇧ z / Ctrl y | ⌘ ⇧ z / ⌘ y |
+| Undo | Ctrl Z | Ctrl Z | ⌘ Z |
+| Redo | Ctrl ⇧ Z / Ctrl Y | Ctrl ⇧ Z / Ctrl Y | ⌘ ⇧ Z / ⌘ Y |
 | Add image | Ctrl ⇧ I | Ctrl ⇧ I | ⌘ ⇧ I |
-| Toggle italic | Ctrl i | Ctrl i | ⌘ i |
+| Toggle italic | Ctrl I | Ctrl I | ⌘ I |
 | Remove formatting in selection | Ctrl \ | Ctrl \ | ⌘ \ |
 | Insert internal link | Ctrl ⇧ L | Ctrl ⇧ L | ⌘ ⇧ L |
 | Insert link | Ctrl ⇧ K | Ctrl ⇧ K | ⌘ ⇧ K |
@@ -78,4 +73,4 @@ The following keyboard shortcuts will help you navigate Notesnook faster.
 | Text align justify | Ctrl ⇧ J | Ctrl ⇧ J | ⌘ ⇧ J |
 | Text align left | Ctrl ⇧ L | Ctrl ⇧ L | ⌘ ⇧ L |
 | Text align right | Ctrl ⇧ R | Ctrl ⇧ R | ⌘ ⇧ R |
-| Underline | Ctrl u | Ctrl u | ⌘ u |
+| Underline | Ctrl U | Ctrl U | ⌘ U |

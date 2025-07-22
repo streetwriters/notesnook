@@ -1,16 +1,20 @@
 interface Hotkeys {
   keys: (isDesktop: boolean) => string[];
   description: string;
-  category: string;
+  category: Category;
   type: "hotkeys";
 }
 
 interface TipTapKey {
   keys: string | string[];
   description: string;
-  category: string;
+  category: Category;
   type: "tiptap";
 }
+
+type Category = (typeof CATEGORIES)[number];
+
+export const CATEGORIES = ["General", "Navigation", "Editor"] as const;
 
 /**
  * consumed by hotkeys-js
@@ -427,7 +431,13 @@ export function formatKey(key: string, isMac = false, separator = " ") {
 }
 
 export function getGroupedKeybindings(isDesktop: boolean, isMac: boolean) {
-  const grouped: Record<string, { keys: string[]; description: string }[]> = {};
+  const grouped: {
+    shortcuts: { keys: string[]; description: string }[];
+    category: Category;
+  }[] = CATEGORIES.map((c) => ({
+    category: c,
+    shortcuts: []
+  }));
 
   const allKeybindings = { ...hotkeys, ...tiptapKeys };
 
@@ -437,15 +447,16 @@ export function getGroupedKeybindings(isDesktop: boolean, isMac: boolean) {
       typeof binding.keys === "function"
         ? binding.keys(isDesktop)
         : binding.keys;
+    if (!keys || !keys.length) continue;
+
     if (isMac) {
       keys = Array.isArray(keys) ? keys.map(macify) : macify(keys);
     }
 
-    if (!grouped[binding.category]) {
-      grouped[binding.category] = [];
-    }
+    const group = grouped.find((g) => g.category === binding.category);
+    if (!group) throw new Error("Invalid group category: " + binding.category);
 
-    grouped[binding.category].push({
+    group.shortcuts.push({
       keys: Array.isArray(keys) ? keys : [keys],
       description: binding.description
     });
