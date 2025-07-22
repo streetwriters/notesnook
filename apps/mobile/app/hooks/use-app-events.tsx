@@ -105,6 +105,7 @@ import { sleep } from "../utils/time";
 import AddReminder from "../screens/add-reminder";
 import { isFeatureAvailable } from "@notesnook/common";
 import PaywallSheet from "../components/sheets/paywall";
+import useFeatureManager from "./use-feature-manager";
 
 const onCheckSyncStatus = async (type: SyncStatusEvent) => {
   const { disableSync, disableAutoSync } = SettingsService.get();
@@ -443,7 +444,7 @@ export const useAppEvents = () => {
     state.appLocked,
     state.syncing
   ]);
-
+  useFeatureManager();
   const syncedOnLaunch = useRef(false);
   const refValues = useRef<
     Partial<{
