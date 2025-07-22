@@ -121,7 +121,7 @@ export const Paragraph = Node.create<ParagraphOptions>({
         createParagraph(editor, this.type, false, true),
       "Shift-Enter": ({ editor }) =>
         createParagraph(editor, this.type, false, true),
-      [keybindings.insertParapraph.keys]: () =>
+      [keybindings.insertParagraph.keys]: () =>
         this.editor.commands.setParagraph()
     };
   }
