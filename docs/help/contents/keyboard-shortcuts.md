@@ -9,8 +9,8 @@ The following keyboard shortcuts will help you navigate Notesnook faster.
 
 | Description | Web | Windows/Linux | Mac |
 | --- | --- | --- | --- |
-| Next tab | Ctrl Alt right / ⌘ ⌥ ⇧ right | Ctrl tab | ⌘ tab |
-| Previous tab | Ctrl Alt left / ⌘ ⌥ ⇧ left | Ctrl ⇧ tab | ⌘ ⇧ tab |
+| Next tab | Ctrl Alt → / Ctrl Alt ⇧ → | Ctrl tab | ⌘ tab |
+| Previous tab | Ctrl Alt ← / Ctrl Alt ⇧ ← | Ctrl ⇧ tab | ⌘ ⇧ tab |
 | New tab | - | Ctrl t | ⌘ t |
 | Close active tab | - | Ctrl w | ⌘ w |
 | Close all tabs | - | Ctrl ⇧ w | ⌘ ⇧ w |
@@ -40,26 +40,26 @@ The following keyboard shortcuts will help you navigate Notesnook faster.
 | Toggle bold | Ctrl b | Ctrl b | ⌘ b |
 | Toggle bullet list | Ctrl ⇧ 8 | Ctrl ⇧ 8 | ⌘ ⇧ 8 |
 | Toggle check list | Ctrl ⇧ 9 | Ctrl ⇧ 9 | ⌘ ⇧ 9 |
-| Split list item | Enter | Enter | Enter |
+| Split list item | ↵ | ↵ | ↵ |
 | Lift list item | ⇧ Tab | ⇧ Tab | ⇧ Tab |
 | Sink list item | Ctrl ⇧ Down | Ctrl ⇧ Down | ⌘ ⇧ Down |
 | Toggle code | Ctrl e | Ctrl e | ⌘ e |
 | Toggle code block | Ctrl ⇧ C | Ctrl ⇧ C | ⌘ ⇧ C |
-| Insert date | Alt d | Alt d | Option d |
-| Insert time | Alt t | Alt t | Option t |
-| Insert date and time | Ctrl Alt d | Ctrl Alt d | ⌘ Option d |
-| Insert date and time with timezone | Ctrl Alt z | Ctrl Alt z | ⌘ Option z |
+| Insert date | Alt d | Alt d | ⌥ d |
+| Insert time | Alt t | Alt t | ⌥ t |
+| Insert date and time | Ctrl Alt d | Ctrl Alt d | ⌘ ⌥ d |
+| Insert date and time with timezone | Ctrl Alt z | Ctrl Alt z | ⌘ ⌥ z |
 | Increase font size | Ctrl [ | Ctrl [ | ⌘ [ |
 | Decrease font size | Ctrl ] | Ctrl ] | ⌘ ] |
 | Insert paragraph | Ctrl ⇧ 0 | Ctrl ⇧ 0 | ⌘ ⇧ 0 |
-| Insert heading 1 | Ctrl Alt 1 | Ctrl Alt 1 | ⌘ Option 1 |
-| Insert heading 2 | Ctrl Alt 2 | Ctrl Alt 2 | ⌘ Option 2 |
-| Insert heading 3 | Ctrl Alt 3 | Ctrl Alt 3 | ⌘ Option 3 |
-| Insert heading 4 | Ctrl Alt 4 | Ctrl Alt 4 | ⌘ Option 4 |
-| Insert heading 5 | Ctrl Alt 5 | Ctrl Alt 5 | ⌘ Option 5 |
-| Insert heading 6 | Ctrl Alt 6 | Ctrl Alt 6 | ⌘ Option 6 |
+| Insert heading 1 | Ctrl Alt 1 | Ctrl Alt 1 | ⌘ ⌥ 1 |
+| Insert heading 2 | Ctrl Alt 2 | Ctrl Alt 2 | ⌘ ⌥ 2 |
+| Insert heading 3 | Ctrl Alt 3 | Ctrl Alt 3 | ⌘ ⌥ 3 |
+| Insert heading 4 | Ctrl Alt 4 | Ctrl Alt 4 | ⌘ ⌥ 4 |
+| Insert heading 5 | Ctrl Alt 5 | Ctrl Alt 5 | ⌘ ⌥ 5 |
+| Insert heading 6 | Ctrl Alt 6 | Ctrl Alt 6 | ⌘ ⌥ 6 |
 | Undo | Ctrl z | Ctrl z | ⌘ z |
-| Redo | Ctrl ⇧ z / ⌘ y | Ctrl ⇧ z / ⌘ y | ⌘ ⇧ z / ⌘ y |
+| Redo | Ctrl ⇧ z / Ctrl y | Ctrl ⇧ z / Ctrl y | ⌘ ⇧ z / ⌘ y |
 | Add image | Ctrl ⇧ I | Ctrl ⇧ I | ⌘ ⇧ I |
 | Toggle italic | Ctrl i | Ctrl i | ⌘ i |
 | Remove formatting in selection | Ctrl \ | Ctrl \ | ⌘ \ |

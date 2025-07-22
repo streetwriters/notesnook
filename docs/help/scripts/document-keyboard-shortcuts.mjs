@@ -56,8 +56,9 @@ function getGroupedTableKeybindingsMarkdown() {
 
       const rows = Object.entries(mergedShortcuts)
         .map(([description, { web, desktop }]) => {
-          const webKeys = web?.map(formatKey).join(" / ") || "-";
-          const windowsLinuxKeys = desktop?.map(formatKey).join(" / ") || "-";
+          const webKeys = web?.map((k) => formatKey(k)).join(" / ") || "-";
+          const windowsLinuxKeys =
+            desktop?.map((k) => formatKey(k)).join(" / ") || "-";
           const macKeys =
             desktop
               ?.map(macify)

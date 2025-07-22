@@ -413,11 +413,15 @@ export function macify(key: string) {
 export function formatKey(key: string, isMac = false, separator = " ") {
   return key
     .replace(/\+|-/g, separator)
-    .replace(/\bcommand\b/gi, isMac ? "⌘" : "Command")
+    .replace(/\bcommand\b/gi, isMac ? "⌘" : "Ctrl")
     .replace(/\bctrl\b/gi, isMac ? "⌘" : "Ctrl")
-    .replace(/\bshift\b/gi, "⇧")
-    .replace(/\balt\b/gi, isMac ? "⌥" : "Alt")
     .replace(/\bmod\b/gi, isMac ? "⌘" : "Ctrl")
+    .replace(/\balt\b/gi, isMac ? "⌥" : "Alt")
+    .replace(/\boption\b/gi, isMac ? "⌥" : "Alt")
+    .replace(/\bshift\b/gi, "⇧")
+    .replace(/\bright\b/gi, "→")
+    .replace(/\bleft\b/gi, "←")
+    .replace(/\benter\b/gi, "↵")
     .trim();
 }
 
