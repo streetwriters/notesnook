@@ -27,15 +27,15 @@ import {
   VirtualizedGrouping,
   createInternalLink
 } from "@notesnook/core";
-import { VirtualizedList } from "../components/virtualized-list";
 import { Button, Flex, Text } from "@theme-ui/components";
-import { ScrollContainer } from "@notesnook/ui";
 import { LinkAttributes } from "@notesnook/editor";
 import { NoteResolvedData, ResolvedItem } from "@notesnook/common";
 import { Lock } from "../components/icons";
 import { ellipsize } from "@notesnook/core";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
+import { Virtuoso } from "react-virtuoso";
+import { CustomScrollbarsVirtualList } from "../components/list-container";
 
 export type NoteLinkingDialogProps = BaseDialogProps<LinkAttributes | false> & {
   attributes?: LinkAttributes;
@@ -83,7 +83,10 @@ export const NoteLinkingDialog = DialogManager.register(
         }}
         noScroll
       >
-        <Flex variant="columnFill" sx={{ mx: 3, overflow: "hidden" }}>
+        <Flex
+          variant="columnFill"
+          sx={{ mx: 3, overflow: "hidden", height: 500 }}
+        >
           {selectedNote ? (
             <>
               <Field
@@ -131,15 +134,15 @@ export const NoteLinkingDialog = DialogManager.register(
                   {strings.noBlocksOnNote()}
                 </Text>
               ) : null}
-              <ScrollContainer>
-                <VirtualizedList
-                  items={filteredBlocks || blocks}
-                  estimatedSize={34}
-                  mode="dynamic"
-                  itemGap={5}
-                  getItemKey={(i) => blocks[i].id}
-                  mt={1}
-                  renderItem={({ item }) => (
+              <Virtuoso
+                style={{ height: "100%", width: "100%" }}
+                components={{
+                  Scroller: CustomScrollbarsVirtualList
+                }}
+                data={filteredBlocks || blocks}
+                context={{ items: filteredBlocks || blocks }}
+                itemContent={(_, item) => {
+                  return (
                     <Button
                       variant="menuitem"
                       sx={{
@@ -162,7 +165,10 @@ export const NoteLinkingDialog = DialogManager.register(
                     >
                       <Text
                         variant="body"
-                        sx={{ fontFamily: "monospace", whiteSpace: "pre-wrap" }}
+                        sx={{
+                          fontFamily: "monospace",
+                          whiteSpace: "pre-wrap"
+                        }}
                       >
                         {ellipsize(item.content, 200, "end").trim() ||
                           strings.linkNoteEmptyBlock()}
@@ -181,9 +187,9 @@ export const NoteLinkingDialog = DialogManager.register(
                         {item.type.toUpperCase()}
                       </Text>
                     </Button>
-                  )}
-                />
-              </ScrollContainer>
+                  );
+                }}
+              />
             </>
           ) : (
             <>
@@ -203,14 +209,14 @@ export const NoteLinkingDialog = DialogManager.register(
                 }}
               />
               {notes && (
-                <ScrollContainer>
-                  <VirtualizedList
-                    items={notes.placeholders}
-                    estimatedSize={28}
-                    itemGap={5}
-                    getItemKey={notes.key}
-                    mt={1}
-                    renderItem={({ index }) => (
+                <Virtuoso
+                  data={notes.placeholders}
+                  components={{
+                    Scroller: CustomScrollbarsVirtualList
+                  }}
+                  style={{ height: "100%", width: "100%" }}
+                  itemContent={(index) => (
+                    <div style={{ height: 28 }}>
                       <ResolvedItem items={notes} index={index} type="note">
                         {({ item: note, data }) => (
                           <Button
@@ -239,9 +245,9 @@ export const NoteLinkingDialog = DialogManager.register(
                           </Button>
                         )}
                       </ResolvedItem>
-                    )}
-                  />
-                </ScrollContainer>
+                    </div>
+                  )}
+                />
               )}
             </>
           )}
