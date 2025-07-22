@@ -198,6 +198,12 @@ export const tiptapKeys = {
     category: "Editor",
     type: "tiptap"
   },
+  insertParagraph: {
+    keys: "Mod-Shift-0",
+    description: "Insert paragraph",
+    category: "Editor",
+    type: "tiptap"
+  },
   insertHeading1: {
     keys: "Mod-Alt-1",
     description: "Insert heading 1",
