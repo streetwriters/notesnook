@@ -3,6 +3,8 @@ title: Keyboard Shortcuts
 description: Keyboard shortcuts for Notesnook
 ---
 
+# Keyboard shortcuts
+
 The following keyboard shortcuts will help you navigate Notesnook faster.
 
 ### General

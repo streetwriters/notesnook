@@ -35,8 +35,9 @@ description: Keyboard shortcuts for Notesnook
 ---
 `;
 
-const content =
-  "The following keyboard shortcuts will help you navigate Notesnook faster.";
+const content = `# Keyboard shortcuts
+
+The following keyboard shortcuts will help you navigate Notesnook faster.`;
 
 const markdownTable = getGroupedTableKeybindingsMarkdown();
 
