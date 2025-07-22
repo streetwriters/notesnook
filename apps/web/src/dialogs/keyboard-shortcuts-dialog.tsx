@@ -38,7 +38,8 @@ export const KeyboardShortcutsDialog = DialogManager.register(
           sx={{
             flexDirection: "column",
             flexWrap: "nowrap",
-            height: 650
+            mt: 2,
+            gap: 1
           }}
         >
           {groupedKeybindings.map((group) => {
@@ -64,26 +65,8 @@ export const KeyboardShortcutsDialog = DialogManager.register(
                         justifyContent: "space-between"
                       }}
                     >
-                      <Text
-                        variant="subtitle"
-                        sx={{
-                          fontWeight: "normal"
-                        }}
-                      >
-                        {shortcut.description}
-                      </Text>
-                      <Text as="p">
-                        {shortcut.keys.map((k, i) => (
-                          <>
-                            <Keys keys={formatKey(k, isMac())} />
-                            {shortcut.keys.length - 1 !== i && (
-                              <Text as="span" sx={{ mx: 1, fontSize: "0.8em" }}>
-                                /
-                              </Text>
-                            )}
-                          </>
-                        ))}
-                      </Text>
+                      <Text variant="body">{shortcut.description}</Text>
+                      <Keys keys={shortcut.keys} />
                     </Flex>
                   );
                 })}
@@ -96,17 +79,34 @@ export const KeyboardShortcutsDialog = DialogManager.register(
   }
 );
 
-function Keys({ keys }: { keys: string }) {
-  return keys.split(" ").map((k) => (
-    <kbd
-      style={{
-        margin: "0 1px",
-        background: "var(--background-secondary)",
-        fontSize: "0.8em",
-        fontWeight: "bold"
-      }}
-    >
-      {k}
-    </kbd>
-  ));
+function Keys({ keys }: { keys: string[] }) {
+  return (
+    <Flex sx={{ gap: 1 }}>
+      {keys.map((key, index) => (
+        <>
+          {key.split(" ").map((k) => (
+            <Text
+              key={k}
+              as="code"
+              sx={{
+                bg: "background",
+                color: "paragraph",
+                px: 1,
+                borderRadius: 5,
+                fontSize: "body",
+                border: "1px solid var(--border)"
+              }}
+            >
+              {formatKey(k, isMac())}
+            </Text>
+          ))}
+          {keys.length - 1 !== index && (
+            <Text as="span" sx={{ fontSize: "0.8em" }}>
+              /
+            </Text>
+          )}
+        </>
+      ))}
+    </Flex>
+  );
 }
