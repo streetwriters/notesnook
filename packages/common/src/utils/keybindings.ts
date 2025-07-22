@@ -86,7 +86,7 @@ export const hotkeys = {
       desktop: ["ctrl+n"]
     }),
     description: "New note",
-    category: "Note",
+    category: "General",
     type: "hotkeys"
   },
   searchInNotes: {
