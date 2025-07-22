@@ -45,21 +45,24 @@ function getGroupedTableKeybindingsMarkdown() {
         if (!mergedShortcuts[description]) {
           mergedShortcuts[description] = {};
         }
-        mergedShortcuts[description].web = keys.map(formatKey);
+        mergedShortcuts[description].web = keys;
       });
       desktopShortcuts.forEach(({ description, keys }) => {
         if (!mergedShortcuts[description]) {
           mergedShortcuts[description] = {};
         }
-        mergedShortcuts[description].desktop = keys.map(formatKey);
+        mergedShortcuts[description].desktop = keys;
       });
 
       const rows = Object.entries(mergedShortcuts)
         .map(([description, { web, desktop }]) => {
-          const webKeys = web?.join(" / ") || "-";
-          const windowsLinuxKeys = desktop?.join(" / ") || "-";
+          const webKeys = web?.map(formatKey).join(" / ") || "-";
+          const windowsLinuxKeys = desktop?.map(formatKey).join(" / ") || "-";
           const macKeys =
-            desktop?.map(macify).map(formatKey).join(" / ") || "-";
+            desktop
+              ?.map(macify)
+              .map((k) => formatKey(k, true))
+              .join(" / ") || "-";
 
           return `| ${description} | ${webKeys} | ${windowsLinuxKeys} | ${macKeys} |`;
         })

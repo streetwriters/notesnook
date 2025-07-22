@@ -410,14 +410,14 @@ export function macify(key: string) {
     .replace(/mod/gi, "Command");
 }
 
-export function formatKey(key: string) {
+export function formatKey(key: string, isMac = false) {
   return key
     .replace(/\+|-/g, " ")
-    .replace(/\bcommand\b/gi, "Command")
-    .replace(/\bctrl\b/gi, "Ctrl")
-    .replace(/\bshift\b/gi, "Shift")
-    .replace(/\balt\b/gi, "Alt")
-    .replace(/\bmod\b/gi, "Ctrl")
+    .replace(/\bcommand\b/gi, isMac ? "⌘" : "Command")
+    .replace(/\bctrl\b/gi, isMac ? "⌘" : "Ctrl")
+    .replace(/\bshift\b/gi, "⇧")
+    .replace(/\balt\b/gi, isMac ? "⌥" : "Alt")
+    .replace(/\bmod\b/gi, isMac ? "⌘" : "Ctrl")
     .trim();
 }
 
