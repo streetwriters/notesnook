@@ -184,7 +184,7 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
             currentPlan,
             selectedProductSku
           ) as RNIap.SubscriptionAndroid
-        ).subscriptionOfferDetails?.[0]?.pricingPhases?.pricingPhaseList
+        )?.subscriptionOfferDetails?.[0]?.pricingPhases?.pricingPhaseList
           ?.length > 1;
   };
 
@@ -261,7 +261,7 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
     product: RNIap.Subscription,
     offerIndex: number
   ) {
-    return (product as RNIap.SubscriptionAndroid).subscriptionOfferDetails?.[
+    return (product as RNIap.SubscriptionAndroid)?.subscriptionOfferDetails?.[
       offerIndex
     ].offerToken;
   }
@@ -279,16 +279,16 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
       }
       useSettingStore.getState().setAppDidEnterBackgroundForAction(true);
 
-      if (product.productId.includes("5year")) {
+      if (!product.productId.includes("5year")) {
         if (Platform.OS === "android") {
           androidOfferToken =
             (
               product as RNIap.SubscriptionAndroid
-            ).subscriptionOfferDetails.find(
+            )?.subscriptionOfferDetails.find(
               (offer) => offer.offerToken === androidOfferToken
             )?.offerToken ||
-            (product as RNIap.SubscriptionAndroid).subscriptionOfferDetails?.[0]
-              .offerToken;
+            (product as RNIap.SubscriptionAndroid)
+              ?.subscriptionOfferDetails?.[0].offerToken;
 
           if (!androidOfferToken) return;
         }
@@ -329,6 +329,7 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
       setLoading(false);
       options?.onBuy?.();
     } catch (e) {
+      console.log(e);
       setLoading(false);
     }
   }
@@ -340,8 +341,9 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
     const cycleText = isMonthly
       ? promoCyclesMonthly[
           (Platform.OS === "android"
-            ? (product as RNIap.SubscriptionAndroid).subscriptionOfferDetails[0]
-                ?.pricingPhases.pricingPhaseList?.[0].billingCycleCount
+            ? (product as RNIap.SubscriptionAndroid)
+                ?.subscriptionOfferDetails[0]?.pricingPhases
+                .pricingPhaseList?.[0].billingCycleCount
             : parseInt(
                 (product as RNIap.SubscriptionIOS)
                   .introductoryPriceNumberOfPeriodsIOS as string
@@ -349,8 +351,9 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
         ]
       : promoCyclesYearly[
           (Platform.OS === "android"
-            ? (product as RNIap.SubscriptionAndroid).subscriptionOfferDetails[0]
-                ?.pricingPhases.pricingPhaseList?.[0].billingCycleCount
+            ? (product as RNIap.SubscriptionAndroid)
+                ?.subscriptionOfferDetails[0]?.pricingPhases
+                .pricingPhaseList?.[0].billingCycleCount
             : parseInt(
                 (product as RNIap.SubscriptionIOS)
                   .introductoryPriceNumberOfPeriodsIOS as string
@@ -430,7 +433,7 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
   const getTrialInfo = (product: RNIap.Subscription) => {
     if (Platform.OS === "android") {
       const ProductAndroid = (product as RNIap.SubscriptionAndroid)
-        .subscriptionOfferDetails?.[0];
+        ?.subscriptionOfferDetails?.[0];
       if (ProductAndroid.pricingPhases.pricingPhaseList?.length === 1) return;
       return {
         period:

@@ -139,7 +139,7 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
                   gap: 5
                 }}
               >
-                <Icon name="crown" size={30} color={colors.static.orange} />
+                {/* <Icon name="crown" size={30} color={colors.static.orange} /> */}
                 <Heading
                   key="heading"
                   size={AppFontSize.xl}
