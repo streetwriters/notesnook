@@ -19,13 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useThemeColors } from "@notesnook/theme";
 import dayjs from "dayjs";
 import React from "react";
-import {
-  Platform,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View
-} from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import * as RNIap from "react-native-iap";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import useGlobalSafeAreaInsets from "../../../hooks/use-global-safe-area-insets";
@@ -33,7 +27,6 @@ import usePricingPlans from "../../../hooks/use-pricing-plans";
 import { openLinkInBrowser } from "../../../utils/functions";
 import { AppFontSize } from "../../../utils/size";
 import { Button } from "../../ui/button";
-import { IconButton } from "../../ui/icon-button";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { DefaultAppStyles } from "../../../utils/styles";
@@ -67,8 +60,7 @@ export const BuyPlan = (props: {
   return (
     <ScrollView
       contentContainerStyle={{
-        paddingBottom: 80,
-        marginTop: DefaultAppStyles.GAP
+        marginTop: DefaultAppStyles.GAP_VERTICAL
       }}
       keyboardDismissMode="none"
       keyboardShouldPersistTaps="always"
@@ -132,7 +124,9 @@ export const BuyPlan = (props: {
         <View
           style={{
             flexDirection: "row",
-            justifyContent: "space-between"
+            justifyContent: "space-between",
+
+            marginTop: DefaultAppStyles.GAP_VERTICAL
           }}
         >
           <Heading color={colors.primary.paragraph} size={AppFontSize.sm}>
@@ -278,15 +272,11 @@ const ProductItem = (props: {
         color={isSelected ? colors.primary.accent : colors.secondary.icon}
         size={AppFontSize.lg}
       />
-      <View
-        style={{
-          gap: DefaultAppStyles.GAP_VERTICAL
-        }}
-      >
+      <View>
         <View
           style={{
             flexDirection: "row",
-            gap: DefaultAppStyles.GAP_VERTICAL
+            gap: DefaultAppStyles.GAP_VERTICAL_SMALL
           }}
         >
           <Heading size={AppFontSize.md}>
