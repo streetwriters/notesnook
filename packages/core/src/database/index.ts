@@ -266,6 +266,9 @@ const DataMappers: Partial<Record<ItemType, (row: any) => void>> = {
   },
   vault: (row) => {
     if (row.key) row.key = JSON.parse(row.key);
+  },
+  notebook: (row) => {
+    if (row.password) row.password = JSON.parse(row.password);
   }
 };
 
