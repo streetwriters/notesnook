@@ -90,6 +90,13 @@ export type BaseEditorSession = {
   activeSearchResultId?: string;
 };
 
+export type LockedNotebookEditorSession = BaseEditorSession & {
+  type: "locked:notebook";
+  targetType: Exclude<SessionType, "locked:notebook">;
+  note: Note;
+  content?: NoteContent<false> | ContentItem;
+};
+
 export type LockedEditorSession = BaseEditorSession & {
   type: "locked";
   note: Note;
@@ -144,6 +151,7 @@ export type DiffEditorSession = BaseEditorSession & {
 
 export type EditorSession =
   | DefaultEditorSession
+  | LockedNotebookEditorSession
   | LockedEditorSession
   | NewEditorSession
   | ConflictedEditorSession
@@ -160,6 +168,7 @@ type SessionTypeMap = {
   diff: DiffEditorSession;
   readonly: ReadonlyEditorSession;
   deleted: DeletedEditorSession;
+  ["locked:notebook"]: LockedNotebookEditorSession;
 };
 
 export type DocumentPreview = {
@@ -261,6 +270,41 @@ class EditorStore extends BaseStore<EditorStore> {
           return session;
         });
       });
+    });
+
+    EV.subscribe(EVENTS.notebooksLocked, async (notebookIds: string[]) => {
+      const notes = await getNotebooksNotes(notebookIds);
+      notes.forEach(this.replaceNoteSessionsWithLockedNotebookSession);
+    });
+
+    EV.subscribe(EVENTS.notebookLockOpened, async (notebookId) => {
+      const { sessions } = this.get();
+      const replacedSessions: typeof sessions = [];
+      for (const session of sessions) {
+        if (session.type !== "locked:notebook") {
+          replacedSessions.push(session);
+          continue;
+        }
+        if (!("note" in session)) {
+          replacedSessions.push(session);
+          continue;
+        }
+
+        const notebookNotes = await getNotebooksNotes([notebookId]);
+        if (!notebookNotes.includes(session.note.id)) {
+          replacedSessions.push(session);
+          continue;
+        }
+
+        const { targetType, ...targetSession } = session;
+        replacedSessions.push(<
+          Exclude<EditorSession, LockedNotebookEditorSession>
+        >{
+          ...targetSession,
+          type: targetType
+        });
+      }
+      this.set({ sessions: replacedSessions });
     });
 
     db.eventManager.subscribe(
@@ -728,6 +772,7 @@ class EditorStore extends BaseStore<EditorStore> {
         ? activeSession.id
         : tabSessionHistory.add(tabId, oldSessionOfNote?.id);
     const isLocked = await db.vaults.itemExists(note);
+    const isNotebookLocked = await isNoteInLockedNotebook(note.id);
 
     if (note.conflicted) {
       const content = note.contentId
@@ -768,6 +813,25 @@ class EditorStore extends BaseStore<EditorStore> {
           type: "locked",
           id: sessionId,
           note,
+          activeBlockId: options.activeBlockId,
+          tabId
+        },
+        options.silent
+      );
+    } else if (isNotebookLocked && note.type !== "trash") {
+      const content = note.contentId
+        ? await db.content.get(note.contentId)
+        : undefined;
+      this.addSession(
+        {
+          type: "locked:notebook",
+          id: sessionId,
+          note,
+          targetType:
+            activeSession?.type && activeSession.type !== "locked:notebook"
+              ? activeSession.type
+              : "default",
+          content: content?.locked ? undefined : content,
           activeBlockId: options.activeBlockId,
           tabId
         },
@@ -1303,6 +1367,22 @@ class EditorStore extends BaseStore<EditorStore> {
     sessionId = sessionId || tab?.sessionId;
     if (sessionId) this.rehydrateSession(sessionId);
   };
+
+  replaceNoteSessionsWithLockedNotebookSession = (noteId: string) => {
+    this.set((state) => {
+      state.sessions = state.sessions.map((session) => {
+        if ("note" in session && session.note.id === noteId) {
+          if (session.type === "locked:notebook") return session;
+          return <LockedNotebookEditorSession>{
+            ...session,
+            type: "locked:notebook",
+            targetType: session.type
+          };
+        }
+        return session;
+      });
+    });
+  };
 }
 
 const useEditorStore = createPersistedStore(EditorStore, {
@@ -1364,7 +1444,12 @@ async function addNotebook(note: Note, context?: Context) {
       : db.settings.getDefaultNotebook();
   if (!notebookId) return;
 
-  await db.notes.addToNotebook(notebookId, note.id);
+  if (
+    db.notebooks.isLocked(notebookId) &&
+    db.notebooks.isLockOpen(notebookId)
+  ) {
+    await db.notes.addToNotebook(notebookId, note.id);
+  }
 }
 
 async function addTag(note: Note, context?: Context) {
@@ -1388,4 +1473,27 @@ async function addColor(note: Note, context?: Context) {
     { type: "color", id: colorId },
     { type: "note", id: note.id }
   );
+}
+
+async function isNoteInLockedNotebook(noteId: string) {
+  const relations = await db.relations
+    .to({ type: "note", id: noteId }, "notebook")
+    .get();
+  for (const { fromId } of relations) {
+    const notebook = await db.notebooks.notebook(fromId);
+    if (!notebook) continue;
+    if (
+      db.notebooks.isLocked(notebook) &&
+      !db.notebooks.isLockOpen(notebook.id)
+    )
+      return true;
+  }
+  return false;
+}
+
+async function getNotebooksNotes(notebookIds: string[]) {
+  const relations = await db.relations
+    .from({ type: "notebook", ids: notebookIds }, "note")
+    .get();
+  return relations.map((r) => r.toId);
 }

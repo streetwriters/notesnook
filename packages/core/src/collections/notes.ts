@@ -25,7 +25,6 @@ import {
   formatTitle
 } from "../utils/title-format.js";
 import { clone } from "../utils/clone.js";
-import { Tiptap } from "../content-types/tiptap.js";
 import { EMPTY_CONTENT } from "./content.js";
 import { buildFromTemplate } from "../utils/templates/index.js";
 import {
@@ -38,9 +37,10 @@ import {
 import Database from "../api/index.js";
 import { ICollection } from "./collection.js";
 import { SQLCollection } from "../database/sql-collection.js";
-import { isFalse } from "../database/index.js";
+import { DatabaseSchema, isFalse } from "../database/index.js";
 import { logger } from "../logger.js";
 import { addItems, deleteItems } from "../utils/array.js";
+import { ExpressionBuilder } from "@streetwriters/kysely";
 
 export type ExportOptions = {
   format: "html" | "md" | "txt" | "md-frontmatter";
@@ -246,7 +246,8 @@ export class Notes implements ICollection {
         qb
           .where(isFalse("dateDeleted"))
           .where(isFalse("deleted"))
-          .where(isFalse("archived")),
+          .where(isFalse("archived"))
+          .where((eb) => isNotInLockedNotebook(eb)),
       this.db.options?.batchSize
     );
   }
@@ -297,7 +298,8 @@ export class Notes implements ICollection {
           .where(isFalse("dateDeleted"))
           .where(isFalse("deleted"))
           .where(isFalse("archived"))
-          .where("favorite", "==", true),
+          .where("favorite", "==", true)
+          .where((eb) => isNotInLockedNotebook(eb)),
       this.db.options?.batchSize
     );
   }
@@ -308,7 +310,8 @@ export class Notes implements ICollection {
         qb
           .where(isFalse("dateDeleted"))
           .where(isFalse("deleted"))
-          .where("archived", "==", true),
+          .where("archived", "==", true)
+          .where((eb) => isNotInLockedNotebook(eb)),
       this.db.options?.batchSize
     );
   }
@@ -526,4 +529,21 @@ export class Notes implements ICollection {
       "internalLinks"
     ).internalLinks;
   }
+}
+
+export function isNotInLockedNotebook(
+  eb: ExpressionBuilder<DatabaseSchema, keyof DatabaseSchema>
+) {
+  return eb.not(
+    eb.exists(
+      eb
+        .selectFrom("relations")
+        .innerJoin("notebooks", "relations.fromId", "notebooks.id")
+        .select("relations.id")
+        .where("relations.toId", "=", eb.ref("notes.id"))
+        .where("relations.toType", "=", "note")
+        .where("relations.fromType", "=", "notebook")
+        .where("notebooks.password", "is not", null)
+    )
+  );
 }

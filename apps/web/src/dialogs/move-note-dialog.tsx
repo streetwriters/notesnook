@@ -27,7 +27,8 @@ import {
   CheckIntermediate,
   CheckRemove,
   CircleEmpty,
-  ChevronRight
+  ChevronRight,
+  Lock
 } from "../components/icons";
 import { db } from "../common/db";
 import Dialog from "../components/dialog";
@@ -47,12 +48,14 @@ import {
   VirtualizedTree,
   VirtualizedTreeHandle
 } from "../components/virtualized-tree";
+import { useEditorStore } from "../stores/editor-store";
 
 type MoveNoteDialogProps = BaseDialogProps<boolean> & { noteIds: string[] };
 export type SelectedReference = {
   id: string;
   new: boolean;
   op: "add" | "remove";
+  isLocked?: boolean;
 };
 
 interface ISelectionStore {
@@ -99,10 +102,14 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
         if (isSelected) continue;
 
         if (await notebookHasNotes(notebookId, noteIds)) {
+          const isLocked = Boolean(
+            (await db.notebooks.notebook(notebookId))?.password
+          );
           selected.push({
             id: notebookId,
             op: "add",
-            new: false
+            new: false,
+            isLocked
           });
         }
       }
@@ -140,6 +147,17 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
           const { selected } = useSelectionStore.getState();
           for (const item of selected) {
             try {
+              if (item.isLocked) {
+                await db.notes.removeFromAllNotebooks(...noteIds);
+                await db.notes.addToNotebook(item.id, ...noteIds);
+                noteIds.forEach((id) => {
+                  useEditorStore
+                    .getState()
+                    .replaceNoteSessionsWithLockedNotebookSession(id);
+                });
+                break;
+              }
+
               if (item.op === "remove") {
                 await db.notes.removeFromNotebook(item.id, ...noteIds);
               } else if (item.op === "add") {
@@ -345,6 +363,23 @@ export function NotebookItem(props: {
 
       const { selected } = useSelectionStore.getState();
 
+      const isCurrentLocked = db.notebooks.isLocked(notebook);
+      const hasLockedSelected = selected.some((s) => s.isLocked);
+      if (isCurrentLocked || hasLockedSelected) {
+        if (selected.find((s) => s.id === notebook.id)) {
+          setSelected([]);
+        } else {
+          setSelected([
+            {
+              ...createSelection(notebook),
+              isLocked: db.notebooks.isLocked(notebook)
+            }
+          ]);
+        }
+        setIsMultiselect(false);
+        return;
+      }
+
       const isCtrlPressed = e.ctrlKey || e.metaKey;
       if (isCtrlPressed) setIsMultiselect(true);
 
@@ -395,6 +430,13 @@ export function NotebookItem(props: {
         <Text className="title" data-test-id="notebook-title" variant="body">
           {notebook.title}
         </Text>
+        {db.notebooks.isLocked(notebook) ? (
+          <Lock
+            title="This notebook is locked, selecting it will remove other selections"
+            size={14}
+            sx={{ px: 1, opacity: 0.7 }}
+          />
+        ) : null}
       </Flex>
       <Flex data-test-id="notebook-tools" sx={{ alignItems: "center" }}>
         <Button
