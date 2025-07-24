@@ -441,7 +441,7 @@ async function availableOn(id: FeatureId, value?: number) {
   }
 }
 
-function getFeature<TId extends FeatureId>(id: TId): Feature<TId> {
+export function getFeature<TId extends FeatureId>(id: TId): Feature<TId> {
   return features[id] as unknown as Feature<TId>;
 }
 
