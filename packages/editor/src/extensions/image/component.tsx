@@ -51,6 +51,10 @@ export function ImageComponent(
   const [bloburl, setBloburl] = useState<string | undefined>(
     toBlobURL("", "image", mime, hash)
   );
+  const [resizing, setResizing] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
   const controllerRef = useRef(new AbortController());
 
   const isMobile = useIsMobile();
@@ -123,6 +127,10 @@ export function ImageComponent(
           width={size.width}
           height={size.height}
           onResize={(width, height) => {
+            setResizing({ width, height });
+          }}
+          onResizeStop={(width, height) => {
+            setResizing(null);
             editor.commands.setImageSize({ width, height });
           }}
         >
@@ -164,6 +172,26 @@ export function ImageComponent(
                   }}
                 />
               </Flex>
+            )}
+            {Boolean(resizing) && (
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: -30,
+                  left: 0,
+                  zIndex: 9999,
+                  background: "var(--background-secondary)",
+                  px: 2,
+                  py: 1,
+                  borderRadius: "default"
+                }}
+              >
+                <Text variant="subBody" sx={{ fontWeight: "bold" }}>
+                  {resizing?.width}
+                  {" × "}
+                  {resizing?.height}
+                </Text>
+              </Box>
             )}
           </DesktopOnly>
           {progress ? (
