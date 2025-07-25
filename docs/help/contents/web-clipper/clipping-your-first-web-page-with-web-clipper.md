@@ -73,6 +73,10 @@ The `Selected nodes` mode allows you to select exactly which nodes you want to c
 
 The clipping mode controls how the final clip should look.
 
+### Bookmark
+
+`Bookmark` mode saves only the URL of the page along with the title. It is best suited to save pages for later reading/reference.
+
 ### Simplified
 
 `Simplified` mode doesn't include any styles. It is best suited for long-form content such as articles & blogs. All clips in `Simplified` mode are saved directly as is i.e. they do not appear as web clip embeds in the Notesnook editor.
