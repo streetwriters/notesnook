@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useAreFeaturesAvailable } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
@@ -35,11 +36,14 @@ import { useSideBarDraggingStore } from "../../side-menu/dragging-store";
 import AppIcon from "../../ui/AppIcon";
 import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
-import { isFeatureAvailable } from "@notesnook/common";
 import PaywallSheet from "../paywall";
 export const MenuItemProperties = ({ item }: { item: SideMenuItem }) => {
   const { colors } = useThemeColors();
-  return (
+  const featuresAvailable = useAreFeaturesAvailable([
+    "customHomepage",
+    "customizableSidebar"
+  ]);
+  return !featuresAvailable ? null : (
     <View
       style={{
         width: "100%",
@@ -51,17 +55,14 @@ export const MenuItemProperties = ({ item }: { item: SideMenuItem }) => {
         {
           title: strings.setAsHomepage(),
           onPress: async () => {
-            const customHomepageFeature = await isFeatureAvailable(
-              "customHomepage"
-            );
-            if (!customHomepageFeature.isAllowed) {
+            if (!featuresAvailable?.customHomepage.isAllowed) {
               ToastManager.show({
-                message: customHomepageFeature.error,
+                message: featuresAvailable?.customHomepage.error,
                 type: "info",
                 context: "local",
                 actionText: strings.upgrade(),
                 func: () => {
-                  PaywallSheet.present(customHomepageFeature);
+                  PaywallSheet.present(featuresAvailable?.customHomepage);
                 }
               });
               return;
@@ -74,22 +75,20 @@ export const MenuItemProperties = ({ item }: { item: SideMenuItem }) => {
           },
           icon: "home-outline",
           type: "switch",
-          state: SettingsService.getProperty("homepageV2")?.id === item.id
+          state: SettingsService.getProperty("homepageV2")?.id === item.id,
+          locked: !featuresAvailable?.customHomepage.isAllowed
         },
         {
           title: strings.reorder(),
           onPress: async () => {
-            const sidebarReorderFeature = await isFeatureAvailable(
-              "customizableSidebar"
-            );
-            if (!sidebarReorderFeature.isAllowed) {
+            if (!featuresAvailable?.customizableSidebar.isAllowed) {
               ToastManager.show({
-                message: sidebarReorderFeature.error,
+                message: featuresAvailable?.customizableSidebar.error,
                 type: "info",
                 context: "local",
                 actionText: strings.upgrade(),
                 func: () => {
-                  PaywallSheet.present(sidebarReorderFeature);
+                  PaywallSheet.present(featuresAvailable?.customizableSidebar);
                 }
               });
               return;
@@ -99,7 +98,8 @@ export const MenuItemProperties = ({ item }: { item: SideMenuItem }) => {
             });
             eSendEvent(eCloseSheet);
           },
-          icon: "sort-ascending"
+          icon: "sort-ascending",
+          locked: !featuresAvailable?.customizableSidebar.isAllowed
         }
       ].map((item) => (
         <Pressable
@@ -111,7 +111,8 @@ export const MenuItemProperties = ({ item }: { item: SideMenuItem }) => {
             justifyContent: "flex-start",
             gap: DefaultAppStyles.GAP_SMALL,
             borderRadius: 0,
-            paddingHorizontal: DefaultAppStyles.GAP
+            paddingHorizontal: DefaultAppStyles.GAP,
+            opacity: item.locked ? 0.6 : 1
           }}
           onPress={() => {
             item.onPress();
@@ -131,7 +132,14 @@ export const MenuItemProperties = ({ item }: { item: SideMenuItem }) => {
             />
             <Paragraph>{item.title}</Paragraph>
           </View>
-          {item.type === "switch" && item.state ? (
+          {item.locked ? (
+            <AppIcon
+              name="lock"
+              size={AppFontSize.lg}
+              color={colors.primary.icon}
+              style={{ marginLeft: "auto" }}
+            />
+          ) : item.type === "switch" && item.state ? (
             <AppIcon
               name="check"
               size={AppFontSize.lg}

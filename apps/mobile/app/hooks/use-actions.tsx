@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 /* eslint-disable no-inner-declarations */
-import { isFeatureAvailable } from "@notesnook/common";
+import { useAreFeaturesAvailable } from "@notesnook/common";
 import {
   createInternalLink,
   Item,
@@ -126,6 +126,7 @@ export type Action = {
   hidden?: boolean;
   activeColor?: string;
   type?: ButtonProps["type"];
+  locked?: boolean;
 };
 
 function isNotePinnedInNotifications(item: Item) {
@@ -149,6 +150,15 @@ export const useActions = ({
   close: () => void;
   customActionHandlers?: Record<ActionId, () => void>;
 }) => {
+  const features = useAreFeaturesAvailable([
+    "defaultNotebookAndTag",
+    "activeReminders",
+    "pinNoteInNotification",
+    "shortcuts",
+    "notebooks",
+    "customizableSidebar",
+    "customHomepage"
+  ]);
   const [item, setItem] = useState(propItem);
   const { colors } = useThemeColors();
   const setMenuPins = useMenuStore((state) => state.setMenuPins);
@@ -248,15 +258,14 @@ export const useActions = ({
       if (isPinnedToMenu) {
         await db.shortcuts.remove(item.id);
       } else {
-        const shortcutsFeature = await isFeatureAvailable("shortcuts");
-        if (!shortcutsFeature.isAllowed) {
+        if (features && !features?.shortcuts.isAllowed) {
           ToastManager.show({
-            message: shortcutsFeature.error,
+            message: features?.shortcuts.error,
             type: "info",
             context: "local",
             actionText: strings.upgrade(),
             func: () => {
-              PaywallSheet.present(shortcutsFeature);
+              PaywallSheet.present(features?.shortcuts);
             }
           });
           return;
@@ -431,17 +440,14 @@ export const useActions = ({
       title: strings.reorder(),
       icon: "sort-ascending",
       onPress: async () => {
-        const sidebarReorderFeature = await isFeatureAvailable(
-          "customizableSidebar"
-        );
-        if (!sidebarReorderFeature.isAllowed) {
+        if (features && !features.customizableSidebar.isAllowed) {
           ToastManager.show({
-            message: sidebarReorderFeature.error,
+            message: features.customizableSidebar.error,
             type: "info",
             context: "local",
             actionText: strings.upgrade(),
             func: () => {
-              PaywallSheet.present(sidebarReorderFeature);
+              PaywallSheet.present(features.customizableSidebar);
             }
           });
           return;
@@ -450,7 +456,8 @@ export const useActions = ({
           dragging: true
         });
         close();
-      }
+      },
+      locked: !features?.customizableSidebar.isAllowed
     });
   }
 
@@ -528,17 +535,14 @@ export const useActions = ({
             await db.settings.setDefaultTag(undefined);
             setDefaultTag(undefined);
           } else {
-            const defaultNotebookAndTagFeature = await isFeatureAvailable(
-              "defaultNotebookAndTag"
-            );
-            if (!defaultNotebookAndTagFeature.isAllowed) {
+            if (features && !features.defaultNotebookAndTag.isAllowed) {
               ToastManager.show({
-                message: defaultNotebookAndTagFeature.error,
+                message: features.defaultNotebookAndTag.error,
                 type: "info",
                 context: "local",
                 actionText: strings.upgrade(),
                 func: () => {
-                  PaywallSheet.present(defaultNotebookAndTagFeature);
+                  PaywallSheet.present(features.defaultNotebookAndTag);
                 }
               });
               return;
@@ -549,7 +553,8 @@ export const useActions = ({
           }
           close();
         },
-        checked: defaultTag === item.id
+        checked: defaultTag === item.id,
+        locked: !features?.defaultNotebookAndTag.isAllowed
       }
     );
   }
@@ -561,16 +566,15 @@ export const useActions = ({
         title: strings.addNotebook(),
         icon: "plus",
         onPress: async () => {
-          const notebooksFeature = await isFeatureAvailable("notebooks");
-          if (!notebooksFeature.isAllowed) {
+          if (features && !features.notebooks.isAllowed) {
             ToastManager.show({
-              message: notebooksFeature.error,
+              message: features.notebooks.error,
               type: "info",
               context: "local",
               actionText: strings.upgrade(),
               func: () => {
                 ToastManager.hide();
-                PaywallSheet.present(notebooksFeature);
+                PaywallSheet.present(features.notebooks);
               }
             });
             return;
@@ -578,7 +582,8 @@ export const useActions = ({
           close();
           await sleep(300);
           AddNotebookSheet.present(undefined, item);
-        }
+        },
+        locked: !features?.notebooks.isAllowed
       },
       {
         id: "edit-notebook",
@@ -603,17 +608,14 @@ export const useActions = ({
             await db.settings.setDefaultNotebook(undefined);
             setDefaultNotebook(undefined);
           } else {
-            const defaultNotebookAndTagFeature = await isFeatureAvailable(
-              "defaultNotebookAndTag"
-            );
-            if (!defaultNotebookAndTagFeature.isAllowed) {
+            if (features && !features.defaultNotebookAndTag.isAllowed) {
               ToastManager.show({
-                message: defaultNotebookAndTagFeature.error,
+                message: features.defaultNotebookAndTag.error,
                 type: "info",
                 context: "local",
                 actionText: strings.upgrade(),
                 func: () => {
-                  PaywallSheet.present(defaultNotebookAndTagFeature);
+                  PaywallSheet.present(features.defaultNotebookAndTag);
                 }
               });
               return;
@@ -627,7 +629,9 @@ export const useActions = ({
           }
           close();
         },
-        checked: defaultNotebook === item.id
+        checked: defaultNotebook === item.id,
+
+        locked: !features?.defaultNotebookAndTag.isAllowed
       },
       {
         id: "move-notes",
@@ -679,18 +683,14 @@ export const useActions = ({
       isToggle: true,
       checked: isHomepage,
       onPress: async () => {
-        const customHomepageFeature = await isFeatureAvailable(
-          "customHomepage"
-        );
-
-        if (!customHomepageFeature.isAllowed) {
+        if (features && !features?.customHomepage.isAllowed) {
           ToastManager.show({
-            message: customHomepageFeature.error,
+            message: features?.customHomepage.error,
             type: "info",
             context: "local",
             actionText: strings.upgrade(),
             func: () => {
-              PaywallSheet.present(customHomepageFeature);
+              PaywallSheet.present(features?.customHomepage);
             }
           });
           return;
@@ -777,14 +777,14 @@ export const useActions = ({
     }
 
     async function pinToNotifications() {
-      const result = await isFeatureAvailable("pinNoteInNotification");
-      if (!result.isAllowed) {
+      if (features && !features?.pinNoteInNotification.isAllowed) {
         ToastManager.show({
-          message: result.error,
+          message: features?.pinNoteInNotification.error,
           type: "info",
           actionText: strings.upgrade(),
+          context: "local",
           func: () => {
-            PaywallSheet.present(result);
+            PaywallSheet.present(features?.pinNoteInNotification);
           }
         });
         return;
@@ -1020,16 +1020,13 @@ export const useActions = ({
             relationType: "from",
             title: strings.dataTypesPluralCamelCase.reminder(),
             onAdd: async () => {
-              const reminderFeature = await isFeatureAvailable(
-                "activeReminders"
-              );
-              if (!reminderFeature.isAllowed) {
+              if (features && !features.activeReminders.isAllowed) {
                 ToastManager.show({
                   type: "info",
-                  message: reminderFeature.error,
+                  message: features.activeReminders.error,
                   actionText: strings.upgrade(),
                   func: () => {
-                    PaywallSheet.present(reminderFeature);
+                    PaywallSheet.present(features.activeReminders);
                   }
                 });
               }
@@ -1039,16 +1036,13 @@ export const useActions = ({
             button: {
               type: "plain",
               onPress: async () => {
-                const reminderFeature = await isFeatureAvailable(
-                  "activeReminders"
-                );
-                if (!reminderFeature.isAllowed) {
+                if (features && !features.activeReminders.isAllowed) {
                   ToastManager.show({
                     type: "info",
-                    message: reminderFeature.error,
+                    message: features.activeReminders.error,
                     actionText: strings.upgrade(),
                     func: () => {
-                      PaywallSheet.present(reminderFeature);
+                      PaywallSheet.present(features.activeReminders);
                     }
                   });
                   return;
@@ -1060,7 +1054,8 @@ export const useActions = ({
               iconSize: 20
             }
           });
-        }
+        },
+        locked: !features?.activeReminders.isAllowed
       },
 
       {
@@ -1172,7 +1167,8 @@ export const useActions = ({
           : strings.pinToNotifications(),
         icon: "message-badge-outline",
         checked: !!notifPinned,
-        onPress: pinToNotifications
+        onPress: pinToNotifications,
+        locked: !features?.pinNoteInNotification.isAllowed
       });
     }
   }

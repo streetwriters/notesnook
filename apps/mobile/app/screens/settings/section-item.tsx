@@ -27,23 +27,32 @@ import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, TextInput, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 //@ts-ignore
+import { FeatureResult, useIsFeatureAvailable } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
 import ToggleSwitch from "toggle-switch-react-native";
+import PaywallSheet from "../../components/sheets/paywall";
 import { IconButton } from "../../components/ui/icon-button";
 import Input from "../../components/ui/input";
 import { Pressable } from "../../components/ui/pressable";
 import Seperator from "../../components/ui/seperator";
+import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
+import { ToastManager } from "../../services/event-manager";
 import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { SettingStore, useSettingStore } from "../../stores/use-setting-store";
 import { AppFontSize } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 import { components } from "./components";
 import { RouteParams, SettingSection } from "./types";
-import Heading from "../../components/ui/typography/heading";
-import { DefaultAppStyles } from "../../utils/styles";
 
 const _SectionItem = ({ item }: { item: SettingSection }) => {
   const { colors } = useThemeColors();
+  const isFeatureAvailable = item.featureId
+    ? useIsFeatureAvailable(item.featureId)
+    : ({
+        isAllowed: true
+      } as FeatureResult);
   const [settings, itemProperty] = useSettingStore((state) => [
     state.settings,
     item.property ? state.settings[item.property] : null
@@ -60,6 +69,8 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
   const [loading, setLoading] = useState(false);
 
   const onChangeSettings = async () => {
+    if (isDisabled) return;
+    if (!checkIsFeatureAvailable()) return;
     if (loading) return;
     if (item.onVerify && !(await item.onVerify())) return;
     if (item.modifer) {
@@ -111,12 +122,33 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
 
   useEffect(() => {
     setIsHidden(item.hidden && item.hidden(item.property || current));
-    setIsDisabled(item.disabled && item.disabled(item.property || current));
-  }, [current, item, itemProperty]);
+    setIsDisabled(
+      !isFeatureAvailable?.isAllowed ||
+        (item.disabled && item.disabled(item.property || current))
+    );
+  }, [current, item, itemProperty, isFeatureAvailable?.isAllowed]);
+
+  const checkIsFeatureAvailable = React.useCallback(() => {
+    if (!isFeatureAvailable) return false;
+    if (isFeatureAvailable && !isFeatureAvailable?.isAllowed) {
+      ToastManager.show({
+        message: isFeatureAvailable?.error,
+        type: "info",
+        context: "global",
+        actionText: strings.upgrade(),
+        func: () => {
+          PaywallSheet.present(isFeatureAvailable);
+        }
+      });
+      return false;
+    }
+
+    return true;
+  }, [isFeatureAvailable]);
 
   return isHidden ? null : (
     <Pressable
-      disabled={item.type === "component" || isDisabled}
+      disabled={item.type === "component"}
       style={{
         width: "100%",
         alignItems: "center",
@@ -129,6 +161,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
         ...styles
       }}
       onPress={async () => {
+        if (!checkIsFeatureAvailable()) return;
         if (isDisabled) return;
         switch (item.type) {
           case "screen":
@@ -266,6 +299,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                 name="minus"
                 color={colors.primary.icon}
                 onPress={() => {
+                  if (!checkIsFeatureAvailable()) return;
                   if (isDisabled) return;
                   const rawValue = SettingsService.get()[
                     item.property as keyof SettingStore["settings"]
@@ -320,6 +354,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                 name="plus"
                 color={colors.primary.icon}
                 onPress={() => {
+                  if (!checkIsFeatureAvailable()) return;
                   if (isDisabled) return;
                   const rawValue = SettingsService.get()[
                     item.property as keyof SettingStore["settings"]

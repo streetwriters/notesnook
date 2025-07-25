@@ -55,6 +55,13 @@ export type AppLockRouteParams = {
 export type AuthParams = {
   mode: number;
   context?: "intro";
+  state?: BillingState;
+};
+
+export type BillingState = {
+  productId?: string;
+  planId?: string;
+  billingType?: "annual" | "monthly";
 };
 
 export interface RouteParams extends ParamListBase {
@@ -105,6 +112,7 @@ export interface RouteParams extends ParamListBase {
   PayWall: {
     canGoBack?: boolean;
     context: "signup" | "logged-in" | "logged-out";
+    state?: BillingState;
   };
 }
 

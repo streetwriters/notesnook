@@ -61,6 +61,7 @@ export function SideMenuHome() {
   const subscriptionType = useUserStore(
     (state) => state.user?.subscription?.type
   );
+  const user = useUserStore.getState().user;
 
   return (
     <View
@@ -139,7 +140,8 @@ export function SideMenuHome() {
         }}
       >
         {subscriptionType === SUBSCRIPTION_STATUS.TRIAL ||
-        subscriptionType === SUBSCRIPTION_STATUS.BASIC ? (
+        subscriptionType === SUBSCRIPTION_STATUS.BASIC ||
+        !user ? (
           <Button
             title={pro.title}
             style={{

@@ -17,22 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
+import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { db } from "../../common/database";
+import ManageTags from "../../screens/manage-tags";
 import { TaggedNotes } from "../../screens/notes/tagged";
-import { useThemeColors } from "@notesnook/theme";
 import { AppFontSize } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
 import { ColorTags } from "./color-tags";
 import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../utils/styles";
 import ManageTags from "../../screens/manage-tags";
-import {
-  paddingTop,
-  paddingVertical
-} from "deprecated-react-native-prop-types/DeprecatedLayoutPropTypes";
 
 export const Tags = ({ item, close }) => {
   const { colors } = useThemeColors();

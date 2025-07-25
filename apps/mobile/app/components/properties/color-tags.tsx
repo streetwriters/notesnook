@@ -38,7 +38,7 @@ import NativeTooltip from "../../utils/tooltip";
 import { Pressable } from "../ui/pressable";
 import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../utils/styles";
-import { isFeatureAvailable } from "@notesnook/common";
+import { isFeatureAvailable, useIsFeatureAvailable } from "@notesnook/common";
 import PaywallSheet from "../sheets/paywall";
 
 const ColorItem = ({ item, note }: { item: Color; note: Note }) => {
@@ -97,6 +97,7 @@ const ColorItem = ({ item, note }: { item: Color; note: Note }) => {
 };
 
 export const ColorTags = ({ item }: { item: Note }) => {
+  const colorFeature = useIsFeatureAvailable("colors");
   const { colors } = useThemeColors();
   const colorNotes = useMenuStore((state) => state.colorNotes);
   const isTablet = useSettingStore((state) => state.deviceMode) !== "mobile";
@@ -112,15 +113,14 @@ export const ColorTags = ({ item }: { item: Note }) => {
   );
 
   const onPress = React.useCallback(async () => {
-    const colorTagsAvailable = await isFeatureAvailable("colors");
-    if (!colorTagsAvailable.isAllowed) {
+    if (colorFeature && !colorFeature.isAllowed) {
       ToastManager.show({
-        message: colorTagsAvailable.error,
+        message: colorFeature.error,
         type: "info",
         context: "local",
         actionText: strings.upgrade(),
         func: () => {
-          PaywallSheet.present(colorTagsAvailable);
+          PaywallSheet.present(colorFeature);
           ToastManager.hide();
         }
       });
@@ -187,7 +187,8 @@ export const ColorTags = ({ item }: { item: Note }) => {
                   borderRadius: 100,
                   justifyContent: "center",
                   alignItems: "center",
-                  marginRight: 5
+                  marginRight: 5,
+                  opacity: !colorFeature?.isAllowed ? 0.5 : 1
                 }}
                 type="secondary"
                 onPress={onPress}

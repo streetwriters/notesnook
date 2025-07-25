@@ -42,6 +42,7 @@ import { hideAuth } from "./common";
 import { ForgotPassword } from "./forgot-password";
 import { AuthHeader } from "./header";
 import { useLogin } from "./use-login";
+import { useRoute } from "@react-navigation/native";
 
 const LoginSteps = {
   emailAuth: 1,
@@ -52,6 +53,7 @@ const LoginSteps = {
 export const Login = ({ changeMode }) => {
   const { colors } = useThemeColors();
   const [focused, setFocused] = useState(false);
+  const route = useRoute();
   const {
     step,
     setStep,
@@ -74,7 +76,8 @@ export const Login = ({ changeMode }) => {
     }, 5000);
     if (!PremiumService.get()) {
       Navigation.navigate("PayWall", {
-        context: "logged-in"
+        context: "logged-in",
+        state: route.params.state
       });
     } else {
       Progress.present();

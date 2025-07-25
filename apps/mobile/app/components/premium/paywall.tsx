@@ -29,6 +29,8 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import { WebView } from "react-native-webview";
+import Config from "react-native-config";
 import * as RNIap from "react-native-iap";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -40,6 +42,7 @@ import { getElevationStyle } from "../../utils/elevation";
 import { openLinkInBrowser } from "../../utils/functions";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
+import { AuthMode } from "../auth/common";
 import { Header } from "../header";
 import { BuyPlan } from "../sheets/buy-plan";
 import { Toast } from "../toast";
@@ -47,19 +50,34 @@ import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { FeaturesList } from "./features-list";
+import { db } from "../../common/database";
 
 const Steps = {
   select: 1,
   buy: 2,
-  finish: 3
+  finish: 3,
+  buyWeb: 4
 };
 
 const PayWall = (props: NavigationProps<"PayWall">) => {
+  const isGithubRelease = Config.GITHUB_RELEASE === "true";
   const routeParams = props.route.params;
+  const [webUrl, setWebUrl] = useState("https://notesnook.com");
   const { colors } = useThemeColors();
-  const pricingPlans = usePricingPlans();
-  const [annualBilling, setAnnualBilling] = useState(true);
-  const [step, setStep] = useState(Steps.select);
+  const pricingPlans = usePricingPlans({
+    planId: routeParams.state?.planId,
+    productId: routeParams.state?.productId
+  });
+  const [annualBilling, setAnnualBilling] = useState(
+    routeParams.state ? routeParams.state.billingType === "annual" : true
+  );
+  const [step, setStep] = useState(
+    routeParams.state
+      ? isGithubRelease
+        ? Steps.buyWeb
+        : Steps.buy
+      : Steps.select
+  );
   const isFocused = useNavigationFocus(props.navigation, {
     onBlur: () => true,
     onFocus: () => true
@@ -79,7 +97,7 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
       });
     }
     return () => {
-      listener.remove();
+      listener?.remove();
     };
   }, [isFocused, step]);
 
@@ -101,7 +119,7 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
             props.navigation.goBack();
           }}
           title={
-            step === Steps.buy
+            step === Steps.buy || step === Steps.buyWeb
               ? pricingPlans.userCanRequestTrial
                 ? `Try ${pricingPlans.currentPlan?.name} plan for free`
                 : `${pricingPlans.currentPlan?.name} plan`
@@ -467,7 +485,9 @@ After trying all the privacy security oriented note taking apps, for the price a
                   ? "I'll stay on the Free plan"
                   : pricingPlans.userCanRequestTrial
                   ? `Start ${annualBilling ? "14" : "7"} days free trial`
-                  : "Subscribe"
+                  : pricingPlans.user
+                  ? "Subscribe"
+                  : "Login to subscribe"
               }
               onPress={() => {
                 if (pricingPlans.currentPlan?.id === "free") {
@@ -477,6 +497,23 @@ After trying all the privacy security oriented note taking apps, for the price a
                     Navigation.goBack();
                   }
                 }
+
+                if (!pricingPlans.user) {
+                  Navigation.navigate("Auth", {
+                    mode: AuthMode.login,
+                    state: {
+                      planId: pricingPlans.currentPlan?.id,
+                      productId: pricingPlans.selectedProduct?.productId,
+                      billingType: annualBilling ? "annual" : "monthly"
+                    }
+                  });
+                  return;
+                }
+
+                if (isGithubRelease) {
+                  setStep(Steps.buyWeb);
+                }
+
                 if (
                   !pricingPlans.currentPlan?.id ||
                   !pricingPlans.selectedProduct
@@ -503,6 +540,18 @@ After trying all the privacy security oriented note taking apps, for the price a
             setStep(Steps.finish);
           }}
         />
+      ) : step === Steps.buyWeb ? (
+        <View
+          style={{
+            flex: 1
+          }}
+        >
+          <WebView
+            source={{
+              uri: webUrl
+            }}
+          />
+        </View>
       ) : (
         <View />
       )}
@@ -719,6 +768,14 @@ const PricingPlanCard = ({
     annualBilling
   );
 
+  console.log("PRODUCT", product?.productId, plan.id);
+
+  const DefaultPricing = {
+    essential: "$2.99",
+    pro: "$5.99",
+    believer: "$6.99"
+  };
+
   return (
     <TouchableOpacity
       activeOpacity={0.9}
@@ -778,10 +835,14 @@ const PricingPlanCard = ({
       ) : (
         <View>
           <Paragraph size={AppFontSize.lg}>
-            {isFreePlan ? "0.00" : price} <Paragraph>/month</Paragraph>
+            {isFreePlan
+              ? "0.00"
+              : price ||
+                DefaultPricing[plan.id as keyof typeof DefaultPricing]}{" "}
+            <Paragraph>/month</Paragraph>
           </Paragraph>
 
-          {isFreePlan ? null : (
+          {isFreePlan || !product ? null : (
             <Paragraph color={colors.secondary.paragraph} size={AppFontSize.xs}>
               billed {annualBilling ? "annually" : "monthly"} at{" "}
               {pricingPlans?.getStandardPrice(product as RNIap.Subscription)}{" "}

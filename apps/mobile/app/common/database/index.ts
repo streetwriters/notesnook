@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { database, getFeatureLimit } from "@notesnook/common";
+import { database, getFeature, getFeatureLimit } from "@notesnook/common";
 import { logger as dbLogger, ICompressor } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import {
@@ -75,7 +75,7 @@ export async function setupDatabase(password?: string) {
       password: key
     },
     maxNoteVersions: async () => {
-      const limit = await getFeatureLimit("maxNoteVersions");
+      const limit = await getFeatureLimit(getFeature("maxNoteVersions"));
       return typeof limit.caption === "number" ? limit.caption : undefined;
     }
   });
