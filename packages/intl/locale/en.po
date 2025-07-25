@@ -5301,6 +5301,14 @@ msgstr "Scan the QR code with your authenticator app"
 msgid "School work"
 msgstr "School work"
 
+#: src/strings.ts:2491
+msgid "Scroll to bottom"
+msgstr "Scroll to bottom"
+
+#: src/strings.ts:2490
+msgid "Scroll to top"
+msgstr "Scroll to top"
+
 #: src/strings.ts:1509
 #: src/strings.ts:1527
 msgid "Search"
