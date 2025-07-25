@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { formatBytes, isFeatureAvailable } from "@notesnook/common";
+import { formatBytes } from "@notesnook/common";
 import { User } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import notifee from "@notifee/react-native";
@@ -67,7 +67,6 @@ import { verifyUser, verifyUserWithApplock } from "./functions";
 import { logoutUser } from "./logout";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
-import PaywallSheet from "../../components/sheets/paywall";
 
 export const settingsGroups: SettingSection[] = [
   {
@@ -751,24 +750,7 @@ export const settingsGroups: SettingSection[] = [
             property: "markdownShortcuts",
             description: strings.mardownShortcutsDesc(),
             type: "switch",
-            onVerify: async () => {
-              const markdownShortcuts = await isFeatureAvailable(
-                "markdownShortcuts"
-              );
-
-              if (!markdownShortcuts.isAllowed) {
-                ToastManager.show({
-                  message: markdownShortcuts.error,
-                  type: "info",
-                  context: "local",
-                  actionText: strings.upgrade(),
-                  func: () => {
-                    PaywallSheet.present(markdownShortcuts);
-                  }
-                });
-              }
-              return markdownShortcuts.isAllowed;
-            }
+            featureId: "markdownShortcuts"
           }
         ]
       },
@@ -945,6 +927,7 @@ export const settingsGroups: SettingSection[] = [
         type: "screen",
         description: strings.appLockDesc(),
         icon: "lock",
+        featureId: "appLock",
         sections: [
           {
             id: "app-lock-mode",
@@ -953,6 +936,7 @@ export const settingsGroups: SettingSection[] = [
             icon: "lock",
             type: "switch",
             property: "appLockEnabled",
+            featureId: "appLock",
             onChange: () => {
               SettingsService.set({
                 privacyScreen: true
@@ -960,19 +944,6 @@ export const settingsGroups: SettingSection[] = [
               SettingsService.setPrivacyScreen(SettingsService.get());
             },
             onVerify: async () => {
-              const appLockFeature = await isFeatureAvailable("appLock");
-              if (!appLockFeature.isAllowed) {
-                ToastManager.show({
-                  message: appLockFeature.error,
-                  type: "info",
-                  actionText: strings.upgrade(),
-                  func: () => {
-                    PaywallSheet.present(appLockFeature);
-                  }
-                });
-                return;
-              }
-
               const verified = await verifyUserWithApplock();
               if (!verified) return false;
 
@@ -1281,18 +1252,6 @@ export const settingsGroups: SettingSection[] = [
           if (settings.notifNotes) {
             Notifications.unpinQuickNote();
           } else {
-            const createNoteFromNotificationDrawerFeature =
-              await isFeatureAvailable("createNoteFromNotificationDrawer");
-            if (!createNoteFromNotificationDrawerFeature.isAllowed) {
-              ToastManager.show({
-                message: createNoteFromNotificationDrawerFeature.error,
-                type: "info",
-                actionText: strings.upgrade(),
-                func: () => {
-                  PaywallSheet.present(createNoteFromNotificationDrawerFeature);
-                }
-              });
-            }
             Notifications.pinQuickNote(false);
           }
           SettingsService.set({

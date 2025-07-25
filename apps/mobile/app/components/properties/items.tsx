@@ -143,7 +143,8 @@ export const Items = ({
         key={item.id}
         style={{
           alignItems: "center",
-          width: columnItemWidth - 8
+          width: columnItemWidth - 8,
+          opacity: item.locked ? 0.5 : 1
         }}
       >
         <Pressable
@@ -218,7 +219,8 @@ export const Items = ({
           borderRadius: 0,
           justifyContent: "flex-start",
           alignSelf: "flex-start",
-          width: "100%"
+          width: "100%",
+          opacity: item.locked ? 0.5 : 1
         }}
       />
     ),
@@ -242,7 +244,8 @@ export const Items = ({
           key={item.id}
           testID={"icon-" + item.id}
           style={{
-            width: columnItemWidth - 8
+            width: columnItemWidth - 8,
+            opacity: item.locked ? 0.5 : 1
           }}
         >
           <View
