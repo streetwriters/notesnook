@@ -386,7 +386,8 @@ const Tiptap = ({
           firstChildNodeType !== "embed" &&
           firstChildNodeType !== "attachment" &&
           firstChildNodeType !== "mathBlock" &&
-          firstChildNodeType !== "horizontalRule";
+          firstChildNodeType !== "horizontalRule" &&
+          firstChildNodeType !== "table";
         if (isSimpleNode) {
           editor?.commands.focus("end");
           return;
@@ -414,7 +415,8 @@ const Tiptap = ({
         lastChildNodeType !== "embed" &&
         lastChildNodeType !== "attachment" &&
         lastChildNodeType !== "mathBlock" &&
-        lastChildNodeType !== "horizontalRule";
+        lastChildNodeType !== "horizontalRule" &&
+        lastChildNodeType !== "table";
       if (isSimpleNode) {
         editor?.commands.focus("end");
         return;
