@@ -24,7 +24,7 @@ Requirements:
 
 Before you can do anything, you'll need to [install Node.js](https://nodejs.org/en/download/) v16 or later on your system.
 
-Once you have completed the setup, the first step is to `clone` the monorepo:
+1. `clone` the monorepo:
 
 ```bash
 git clone https://github.com/streetwriters/notesnook.git
@@ -33,18 +33,27 @@ git clone https://github.com/streetwriters/notesnook.git
 cd notesnook
 ```
 
-Once you are inside the `./notesnook` directory, run the preparation step:
+2. Install dependencies:
 
 ```bash
 # this might take a while to complete
 npm install
 ```
 
-Now you can finally start the desktop app for development:
+3. Run the webapp for desktop environment:
+
+```bash
+cd apps/web
+npm run start:desktop
+```
+
+4. In a separate terminal session, run the desktop app from the root of the project:
 
 ```bash
 npm run start:desktop
 ```
+
+### Release mode
 
 To run the app in release mode:
 
