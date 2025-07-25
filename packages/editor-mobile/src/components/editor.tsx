@@ -547,7 +547,8 @@ const Tiptap = ({
           style={{
             overflowY: controller.loading ? "hidden" : "scroll",
             height: "100%",
-            display: "block",
+            display: "flex",
+            flexDirection: "column",
             position: "relative"
           }}
         >
@@ -865,9 +866,9 @@ const Tiptap = ({
               }
             }}
             style={{
-              flexGrow: 1,
               width: "100%",
-              minHeight: 300
+              display: "flex",
+              flex: 1
             }}
           />
         </div>
