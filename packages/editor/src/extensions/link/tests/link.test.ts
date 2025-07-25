@@ -114,4 +114,33 @@ describe("paste text", () => {
 
     expect(editorElement.outerHTML).toMatchSnapshot();
   });
+
+  test("with html link", async () => {
+    const editorElement = h("div");
+    const { editor } = createEditor({
+      element: editorElement,
+      extensions: {
+        link: Link
+      }
+    });
+
+    const clipboardEvent = new Event("paste", {
+      bubbles: true,
+      cancelable: true,
+      composed: true
+    });
+
+    (clipboardEvent as unknown as any)["clipboardData"] = {
+      getData: (type: string) =>
+        type === "text/html"
+          ? `<meta charset='utf-8'><html><head></head><body><a href="nn://note/68798972093c8c6ea22efca2">example.py</a></body></html>`
+          : ""
+    };
+
+    editor.view.dom.dispatchEvent(clipboardEvent);
+
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    expect(editorElement.outerHTML).toMatchSnapshot();
+  });
 });

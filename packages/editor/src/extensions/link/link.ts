@@ -34,6 +34,7 @@ import { clickHandler } from "./helpers/clickHandler.js";
 import { pasteHandler } from "./helpers/pasteHandler.js";
 import { ImageNode } from "../image/index.js";
 import { selectionToOffset } from "../../utils/prosemirror.js";
+import { smartLinkPaste } from "./helpers/smartLinkPaste.js";
 
 export interface LinkProtocolOptions {
   scheme: string;
@@ -230,35 +231,6 @@ export const Link = Mark.create<LinkOptions>({
             href: regExp.exec(match[0])?.[1]
           };
         }
-      }),
-      markPasteRule({
-        find: (text) => {
-          const foundLinks: PasteRuleMatch[] = [];
-
-          if (text) {
-            const links = find(text).filter((item) => item.isLink);
-
-            if (links.length) {
-              links.forEach((link) =>
-                foundLinks.push({
-                  text: link.value,
-                  data: {
-                    href: link.href
-                  },
-                  index: link.start
-                })
-              );
-            }
-          }
-
-          return foundLinks;
-        },
-        type: this.type,
-        getAttributes: (match) => {
-          return {
-            href: match.data?.href
-          };
-        }
       })
     ];
   },
@@ -291,6 +263,7 @@ export const Link = Mark.create<LinkOptions>({
           type: this.type
         })
       );
+      plugins.push(smartLinkPaste());
     }
 
     return plugins;
