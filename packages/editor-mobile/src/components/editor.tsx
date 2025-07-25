@@ -25,6 +25,7 @@ import {
   toBlobURL,
   usePermissionHandler
 } from "@notesnook/editor";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import FingerprintIcon from "mdi-react/FingerprintIcon";
 import {
@@ -47,7 +48,6 @@ import StatusBar from "./statusbar";
 import Tags from "./tags";
 import TiptapEditorWrapper from "./tiptap";
 import Title from "./title";
-import { strings } from "@notesnook/intl";
 
 globalThis.toBlobURL = toBlobURL as typeof globalThis.toBlobURL;
 
@@ -380,11 +380,14 @@ const Tiptap = ({
 
         const editor = editors[tab.id];
 
-        const firstChild = editor?.state.doc.firstChild;
-        const isParagraph = firstChild?.type.name === "paragraph";
-        const isFirstChildEmpty =
-          !firstChild?.textContent || firstChild?.textContent?.length === 0;
-        if (isParagraph && isFirstChildEmpty) {
+        const firstChildNodeType = editor?.state.doc.firstChild?.type.name;
+        const isSimpleNode =
+          firstChildNodeType !== "image" &&
+          firstChildNodeType !== "embed" &&
+          firstChildNodeType !== "attachment" &&
+          firstChildNodeType !== "mathBlock" &&
+          firstChildNodeType !== "horizontalRule";
+        if (isSimpleNode) {
           editor?.commands.focus("end");
           return;
         }
@@ -405,11 +408,14 @@ const Tiptap = ({
       const editor = editors[tab.id];
       const docSize = editor?.state.doc.content.size;
       if (!docSize) return;
-      const lastChild = editor?.state.doc.lastChild;
-      const isParagraph = lastChild?.type.name === "paragraph";
-      const isLastChildEmpty =
-        !lastChild?.textContent || lastChild?.textContent?.length === 0;
-      if (isParagraph && isLastChildEmpty) {
+      const lastChildNodeType = editor?.state.doc.lastChild?.type.name;
+      const isSimpleNode =
+        lastChildNodeType !== "image" &&
+        lastChildNodeType !== "embed" &&
+        lastChildNodeType !== "attachment" &&
+        lastChildNodeType !== "mathBlock" &&
+        lastChildNodeType !== "horizontalRule";
+      if (isSimpleNode) {
         editor?.commands.focus("end");
         return;
       }
@@ -544,6 +550,7 @@ const Tiptap = ({
         <div
           onScroll={controller.scroll}
           ref={containerRef}
+          id="editor-container-scroller"
           style={{
             overflowY: controller.loading ? "hidden" : "scroll",
             height: "100%",
@@ -868,7 +875,8 @@ const Tiptap = ({
             style={{
               width: "100%",
               display: "flex",
-              flex: 1
+              flex: 1,
+              minHeight: 100
             }}
           />
         </div>
