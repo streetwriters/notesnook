@@ -26,20 +26,19 @@ import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
 import { ToastManager } from "../../services/event-manager";
 import { clearMessage, setEmailVerifyMessage } from "../../services/message";
+import Navigation from "../../services/navigation";
 import { useUserStore } from "../../stores/use-user-store";
 import { openLinkInBrowser } from "../../utils/functions";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { Loading } from "../loading";
-import { PaywallComponent } from "../premium/paywall";
 import { Button } from "../ui/button";
 import Input from "../ui/input";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { hideAuth } from "./common";
 import { AuthHeader } from "./header";
 import { SignupContext } from "./signup-context";
-import Navigation from "../../services/navigation";
+import { useRoute } from "@react-navigation/native";
 
 const SignupSteps = {
   signup: 0,
@@ -62,6 +61,8 @@ export const Signup = ({ changeMode, welcome }) => {
   const setLastSynced = useUserStore((state) => state.setLastSynced);
   const { width, height } = useWindowDimensions();
   const isTablet = width > 600;
+  const route = useRoute();
+
   const validateInfo = () => {
     if (!password.current || !email.current || !confirmPassword.current) {
       ToastManager.show({
@@ -91,7 +92,8 @@ export const Signup = ({ changeMode, welcome }) => {
       clearMessage();
       setEmailVerifyMessage();
       Navigation.navigate("PayWall", {
-        canGoBack: false
+        canGoBack: false,
+        state: route.params.state
       });
       return true;
     } catch (e) {

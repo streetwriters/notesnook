@@ -1,27 +1,29 @@
-import { View, Text } from "react-native";
+import { FeatureId, FeatureResult } from "@notesnook/common";
+import { useThemeColors } from "@notesnook/theme";
+import { useEffect, useState } from "react";
+import { View } from "react-native";
+import usePricingPlans from "../../../hooks/use-pricing-plans";
 import {
   eSendEvent,
   presentSheet,
   ToastManager
 } from "../../../services/event-manager";
-import { FeatureId, FeatureResult } from "@notesnook/common";
-import { useEffect, useState } from "react";
-import usePricingPlans from "../../../hooks/use-pricing-plans";
-import { BuyPlan } from "../buy-plan";
-import Heading from "../../ui/typography/heading";
+import Navigation from "../../../services/navigation";
+import { useUserStore } from "../../../stores/use-user-store";
+import { eCloseSheet } from "../../../utils/events";
 import { AppFontSize } from "../../../utils/size";
 import { DefaultAppStyles } from "../../../utils/styles";
-import Paragraph from "../../ui/typography/paragraph";
-import { Button } from "../../ui/button";
-import { eCloseSheet } from "../../../utils/events";
-import Navigation from "../../../services/navigation";
-import { useThemeColors } from "@notesnook/theme";
+import { AuthMode } from "../../auth/common";
 import AppIcon from "../../ui/AppIcon";
+import { Button } from "../../ui/button";
+import Heading from "../../ui/typography/heading";
+import Paragraph from "../../ui/typography/paragraph";
+import { BuyPlan } from "../buy-plan";
 
 const INDEX_TO_PLAN = {
-  0: "essential",
-  1: "pro",
-  2: "believer"
+  1: "essential",
+  2: "pro",
+  3: "believer"
 };
 
 const Steps = {
@@ -186,6 +188,13 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
                 width: "100%"
               }}
               onPress={() => {
+                if (!useUserStore.getState().user) {
+                  eSendEvent(eCloseSheet);
+                  Navigation.navigate("Auth", {
+                    mode: AuthMode.login
+                  });
+                  return;
+                }
                 setStep(Steps.Buy);
               }}
             />
@@ -199,7 +208,9 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
             onPress={() => {
               eSendEvent(eCloseSheet);
               Navigation.navigate("PayWall", {
-                context: "logged-in"
+                context: useUserStore.getState().user
+                  ? "logged-in"
+                  : "logged-out"
               });
             }}
           />
