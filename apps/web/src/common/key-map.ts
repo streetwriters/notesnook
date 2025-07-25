@@ -75,7 +75,10 @@ const actions: Partial<
       isCommandMode: false
     }).catch(() => {});
   },
-  openSettings: () => hashNavigate("/settings", { replace: true }),
+  openSettings: (e) => {
+    if (isInEditor(e)) return;
+    hashNavigate("/settings", { replace: true });
+  },
   openKeyboardShortcuts: () => KeyboardShortcutsDialog.show({})
 };
 
