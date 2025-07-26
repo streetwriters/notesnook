@@ -31,7 +31,9 @@ import {
   Trash,
   Notebook as NotebookIcon,
   ArrowUp,
-  Move
+  Move,
+  Lock,
+  UnlockVariant
 } from "../icons";
 import { MenuItem } from "@notesnook/ui";
 import { hashNavigate, navigate } from "../../navigation";
@@ -47,6 +49,8 @@ import { db } from "../../common/db";
 import { createSetDefaultHomepageMenuItem } from "../../common";
 import { useStore as useNotebookStore } from "../../stores/notebook-store";
 import { MoveNotebookDialog } from "../../dialogs/move-notebook-dialog";
+import { NotebookLock } from "../../common/NotebookLock";
+import { isUserPremium } from "../../hooks/use-is-user-premium";
 
 type NotebookProps = {
   item: NotebookType;
@@ -161,9 +165,22 @@ export function Notebook(props: NotebookProps) {
         </Flex>
       }
       footer={
-        <Text variant="subBody">
-          {currentContext ? currentContext?.length : totalNotes}
-        </Text>
+        <Flex sx={{ alignItems: "center", gap: 1 }}>
+          {db.notebooks.isLocked(item) ? (
+            db.notebooks.isLockOpen(item.id) ? (
+              <UnlockVariant
+                title="Notebook opened"
+                variant="subBody"
+                size={12}
+              />
+            ) : (
+              <Lock title="Notebook locked" variant="subBody" size={12} />
+            )
+          ) : null}
+          <Text variant="subBody">
+            {currentContext ? currentContext?.length : totalNotes}
+          </Text>
+        </Flex>
       }
       menuItems={notebookMenuItems}
       context={{ refresh, isRoot: depth === 0 }}
@@ -200,6 +217,21 @@ export const notebookMenuItems: (
       title: strings.edit(),
       icon: NotebookEdit.path,
       onClick: () => hashNavigate(`/notebooks/${notebook.id}/edit`)
+    },
+    {
+      type: "button",
+      key: "lock",
+      title: strings.lock(),
+      icon: Lock.path,
+      isChecked: db.notebooks.isLocked(notebook),
+      isHidden: !isUserPremium(),
+      onClick: async () => {
+        if (db.notebooks.isLocked(notebook)) {
+          NotebookLock.unlock(notebook.id);
+        } else {
+          NotebookLock.lock(notebook.id);
+        }
+      }
     },
     {
       type: "button",
@@ -274,7 +306,8 @@ export const notebookMenuItems: (
       variant: "dangerous",
       icon: Trash.path,
       onClick: () => Multiselect.moveNotebooksToTrash(ids),
-      multiSelect: true
+      multiSelect: true,
+      isDisabled: db.notebooks.isLocked(notebook)
     }
   ];
 };

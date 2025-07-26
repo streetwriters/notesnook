@@ -83,6 +83,8 @@ import useTablet from "../../hooks/use-tablet";
 import { isMac } from "../../utils/platform";
 import { CREATE_BUTTON_MAP } from "../../common";
 import { getDragData } from "../../utils/data-transfer";
+import { useStore as useNoteStore } from "../../stores/note-store";
+import { EV, EVENTS } from "@notesnook/core";
 
 type ToolButton = {
   title: string;
@@ -273,6 +275,41 @@ const TabStrip = React.memo(function TabStrip() {
   const canGoBack = useEditorStore((store) => store.canGoBack);
   const canGoForward = useEditorStore((store) => store.canGoForward);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
+  const { context } = useNoteStore();
+  const [isNewNoteButtonDisabled, setIsNewNoteButtonDisabled] = useState(false);
+
+  useEffect(() => {
+    if (context?.type !== "notebook") {
+      setIsNewNoteButtonDisabled(false);
+      return;
+    }
+
+    const disableNewNoteButton =
+      db.notebooks.isLocked(context.id) && !db.notebooks.isLockOpen(context.id);
+    setIsNewNoteButtonDisabled(disableNewNoteButton);
+
+    const { unsubscribe: notebookLockOpenedEventUnsub } = EV.subscribe(
+      EVENTS.notebookLockOpened,
+      (notebookId) => {
+        if (notebookId === context.id) {
+          setIsNewNoteButtonDisabled(false);
+        }
+      }
+    );
+    const { unsubscribe: notebooksLockedEventUnsub } = EV.subscribe(
+      EVENTS.notebooksLocked,
+      (ids: string[]) => {
+        if (ids.includes(context.id)) {
+          setIsNewNoteButtonDisabled(true);
+        }
+      }
+    );
+
+    return () => {
+      notebookLockOpenedEventUnsub();
+      notebooksLockedEventUnsub();
+    };
+  }, [context]);
 
   return (
     <Flex sx={{ flex: 1 }}>
@@ -289,6 +326,7 @@ const TabStrip = React.memo(function TabStrip() {
         <Button
           variant="accent"
           {...CREATE_BUTTON_MAP.notes}
+          disabled={isNewNoteButtonDisabled}
           data-test-id={`create-new-note`}
           sx={{
             p: 1,
@@ -507,6 +545,8 @@ function Tab(props: TabProps) {
     ? type === "locked"
       ? Lock
       : Unlock
+    : type === "locked:notebook"
+    ? Lock
     : type === "readonly"
     ? Readonly
     : type === "deleted"
