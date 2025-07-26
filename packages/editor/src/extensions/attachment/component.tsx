@@ -18,19 +18,57 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Box, Text } from "@theme-ui/components";
-import { FileAttachment } from "./types.js";
-import { useRef, useState } from "react";
+import { FileAttachment, AudioAttachment } from "./types.js";
+import { useRef, useState, useEffect } from "react";
 import { Icon } from "@notesnook/ui";
 import { Icons } from "../../toolbar/icons.js";
 import { ReactNodeViewProps } from "../react/index.js";
 import { ToolbarGroup } from "../../toolbar/components/toolbar-group.js";
 import { DesktopOnly } from "../../components/responsive/index.js";
+import { ToolbarGroupDefinition } from "../../toolbar/types.js";
+import { toBlobURL, revokeBloburl } from "../../utils/downloader.js";
 
-export function AttachmentComponent(props: ReactNodeViewProps<FileAttachment>) {
+export function AttachmentComponent(
+  props: ReactNodeViewProps<FileAttachment | AudioAttachment>
+) {
   const { editor, node, selected } = props;
-  const { filename, size, progress } = node.attrs;
+  const { filename, size, progress, mime, hash } = node.attrs;
   const elementRef = useRef<HTMLSpanElement>();
   const [isDragging, setIsDragging] = useState(false);
+  const [audioSrc, setAudioSrc] = useState<string>();
+
+  const isAudioFile = mime && mime.startsWith("audio/");
+
+  useEffect(() => {
+    if (isAudioFile && editor.storage?.getAttachmentData && hash) {
+      editor.storage
+        .getAttachmentData({
+          type: "file",
+          hash
+        })
+        .then((data: string | undefined) => {
+          if (data) {
+            try {
+              const url = toBlobURL(data, "other", mime, hash);
+              if (url) {
+                setAudioSrc(url);
+              }
+            } catch (error) {
+              console.error("Failed to create audio blob:", error);
+            }
+          }
+        })
+        .catch(console.error);
+    }
+  }, [isAudioFile, editor.storage, hash, mime]);
+
+  useEffect(() => {
+    return () => {
+      if (audioSrc && hash) {
+        revokeBloburl(hash);
+      }
+    };
+  }, [audioSrc, hash]);
 
   return (
     <Box
@@ -41,56 +79,94 @@ export function AttachmentComponent(props: ReactNodeViewProps<FileAttachment>) {
       sx={{
         display: "inline-flex",
         position: "relative",
-        justifyContent: "center",
         userSelect: "none",
-        alignItems: "center",
         backgroundColor: "var(--background-secondary)",
-        px: 1,
+        m: 1,
         borderRadius: "default",
         border: "1px solid var(--border)",
-        cursor: "pointer",
-        maxWidth: 250,
         borderColor: selected ? "accent" : "border",
         ":hover": {
           bg: "hover"
-        }
+        },
+        ...(isAudioFile && audioSrc
+          ? {
+              flexDirection: "column",
+              p: 2,
+              width: "50%"
+            }
+          : {
+              justifyContent: "center",
+              alignItems: "center",
+              px: 1,
+              cursor: "pointer",
+              maxWidth: 250
+            })
       }}
-      title={filename}
+      title={!isAudioFile || !audioSrc ? filename : undefined}
       onDragStart={() => setIsDragging(true)}
       onDragEnd={() => setIsDragging(false)}
       data-drag-handle
     >
-      <Icon path={Icons.attachment} size={14} />
-      <Text
-        as="span"
+      <Box
         sx={{
-          ml: "small",
-          fontSize: "body",
-          whiteSpace: "nowrap",
-          textOverflow: "ellipsis",
-          overflow: "hidden"
+          display: "flex",
+          alignItems: "center",
+          mb: isAudioFile && audioSrc ? 1 : 0
         }}
       >
-        {filename}
-      </Text>
-      <Text
-        as="span"
-        sx={{
-          ml: 1,
-          fontSize: "0.65rem",
-          color: "var(--paragraph-secondary)",
-          flexShrink: 0
-        }}
-      >
-        {progress ? `${progress}%` : formatBytes(size)}
-      </Text>
+        <Icon
+          path={Icons.attachment}
+          size={isAudioFile && audioSrc ? 16 : 14}
+        />
+        <Text
+          as="span"
+          sx={{
+            ml: "small",
+            fontSize: "body",
+            whiteSpace: "nowrap",
+            textOverflow: "ellipsis",
+            overflow: "hidden",
+            flex: isAudioFile && audioSrc ? 1 : "none"
+          }}
+        >
+          {filename}
+        </Text>
+        <Text
+          as="span"
+          sx={{
+            ml: 1,
+            fontSize: "0.65rem",
+            color: "var(--paragraph-secondary)",
+            flexShrink: 0
+          }}
+        >
+          {progress ? `${progress}%` : formatBytes(size)}
+        </Text>
+      </Box>
+      {isAudioFile && audioSrc && (
+        <Box
+          sx={{
+            width: "100%",
+            "& audio": {
+              width: "100%",
+              height: "32px"
+            }
+          }}
+        >
+          <audio controls preload="metadata" src={audioSrc} />
+        </Box>
+      )}
       <DesktopOnly>
         {selected && !isDragging && (
           <ToolbarGroup
             editor={editor}
             groupId="attachmentTools"
             tools={
-              editor.isEditable
+              isAudioFile
+                ? editor.isEditable
+                  ? ["removeAttachment", "downloadAttachment"]
+                  : ["downloadAttachment"]
+                : editor.isEditable
                 ? [
                     "removeAttachment",
                     "downloadAttachment",
