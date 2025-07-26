@@ -2489,5 +2489,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   words: () => t`Words`,
   characters: () => t`Characters`,
   paragraphs: () => t`Paragraphs`,
-  noNotebooksSelectedToMove: () => t`No notebooks selected to move`
+  noNotebooksSelectedToMove: () => t`No notebooks selected to move`,
+  scrollToTop: () => t`Scroll to top`,
+  scrollToBottom: () => t`Scroll to bottom`
 };
