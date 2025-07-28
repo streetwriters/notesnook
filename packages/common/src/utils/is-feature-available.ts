@@ -90,6 +90,17 @@ type Caption<TId extends FeatureId> =
   Features[TId]["availability"][keyof FeatureAvailability]["caption"];
 
 const features = {
+  storage: createFeature({
+    id: "storage",
+    title: "Storage",
+    availability: {
+      free: createLimit("50MB", lte(50 * 1024 * 1024)),
+      essential: createLimit("1GB", lte(1024 * 1024 * 1024)),
+      pro: createLimit("10GB", lte(10 * 1024 * 1024 * 1024)),
+      believer: createLimit("25GB", lte(25 * 1024 * 1024 * 1024)),
+      legacyPro: createLimit("infinity", alwaysInfinite)
+    }
+  }),
   fileSize: createFeature({
     id: "fileSize",
     title: "File size",
@@ -236,7 +247,7 @@ const features = {
     title: "Recurring reminders",
     availability: {
       free: createLimit(false, alwaysFalse),
-      essential: createLimit(false, alwaysTrue),
+      essential: createLimit(true, alwaysTrue),
       pro: createLimit(true, alwaysTrue),
       believer: createLimit(true, alwaysTrue),
       legacyPro: createLimit(true, alwaysTrue)
@@ -443,6 +454,26 @@ async function availableOn(id: FeatureId, value?: number) {
 
 export function getFeature<TId extends FeatureId>(id: TId): Feature<TId> {
   return features[id] as unknown as Feature<TId>;
+}
+
+export function planToAvailability(plan: SubscriptionPlan) {
+  return PLAN_TO_AVAILABILITY[plan];
+}
+
+export function getFeaturesTable() {
+  // Feature  FREE  ESSENTIAL  PRO   BELIEVER
+  const rows: [string, Limit, Limit, Limit, Limit][] = [];
+  for (const key in features) {
+    const feature = features[key as FeatureId];
+    rows.push([
+      feature.title,
+      feature.availability.free,
+      feature.availability.essential,
+      feature.availability.pro,
+      feature.availability.believer
+    ]);
+  }
+  return rows;
 }
 
 function getFeatureLimitFromPlan<TId extends FeatureId>(
