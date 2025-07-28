@@ -66,7 +66,7 @@ export const SideMenuNotebooks = () => {
     if (lastQuery.current) {
       db.lookup
         .notebooks(lastQuery.current)
-        .sorted()
+        .sorted(db.settings.getGroupOptions("notebooks"))
         .then((filtered) => {
           setFilteredNotebooks(filtered);
         });
