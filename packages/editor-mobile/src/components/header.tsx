@@ -19,6 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { ControlledMenu, MenuItem as MenuItemInner } from "@szhsin/react-menu";
 import ArrowBackIcon from "mdi-react/ArrowBackIcon";
+import ArrowTopIcon from "mdi-react/ArrowTopIcon";
+import ArrowDownIcon from "mdi-react/ArrowDownIcon";
 import ArrowForwardIcon from "mdi-react/ArrowForwardIcon";
 import ArrowULeftTopIcon from "mdi-react/ArrowULeftTopIcon";
 import ArrowURightTopIcon from "mdi-react/ArrowURightTopIcon";
@@ -428,6 +430,30 @@ function Header({
                       tab.session?.noteId
                     );
                     break;
+                  case "scroll-top":
+                    {
+                      const element = document.getElementById(
+                        "editor-container-scroller"
+                      );
+                      element?.scrollTo({
+                        top: 0,
+                        left: 0,
+                        behavior: "smooth"
+                      });
+                    }
+                    break;
+                  case "scroll-bottom":
+                    {
+                      const element = document.getElementById(
+                        "editor-container-scroller"
+                      );
+                      element?.scrollTo({
+                        top: element?.scrollHeight,
+                        left: 0,
+                        behavior: "smooth"
+                      });
+                    }
+                    break;
                   case "properties":
                     post(
                       EditorEvents.properties,
@@ -588,6 +614,47 @@ function Header({
                   }}
                 >
                   {strings.toc()}
+                </span>
+              </MenuItem>
+              <MenuItem
+                value="scroll-top"
+                style={{
+                  display: "flex",
+                  gap: 10,
+                  alignItems: "center"
+                }}
+              >
+                <ArrowTopIcon
+                  size={22 * settings.fontScale}
+                  color="var(--nn_primary_icon)"
+                />
+                <span
+                  style={{
+                    color: "var(--nn_primary_paragraph)"
+                  }}
+                >
+                  {strings.scrollToTop()}
+                </span>
+              </MenuItem>
+
+              <MenuItem
+                value="scroll-bottom"
+                style={{
+                  display: "flex",
+                  gap: 10,
+                  alignItems: "center"
+                }}
+              >
+                <ArrowDownIcon
+                  size={22 * settings.fontScale}
+                  color="var(--nn_primary_icon)"
+                />
+                <span
+                  style={{
+                    color: "var(--nn_primary_paragraph)"
+                  }}
+                >
+                  {strings.scrollToBottom()}
                 </span>
               </MenuItem>
               <MenuItem

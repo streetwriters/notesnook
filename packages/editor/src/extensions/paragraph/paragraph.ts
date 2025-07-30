@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { keybindings } from "@notesnook/common";
 import { Editor, mergeAttributes, Node } from "@tiptap/core";
 import { NodeType } from "prosemirror-model";
 
@@ -120,7 +121,8 @@ export const Paragraph = Node.create<ParagraphOptions>({
         createParagraph(editor, this.type, false, true),
       "Shift-Enter": ({ editor }) =>
         createParagraph(editor, this.type, false, true),
-      "Mod-Alt-0": () => this.editor.commands.setParagraph()
+      [keybindings.insertParagraph.keys]: () =>
+        this.editor.commands.setParagraph()
     };
   }
 });

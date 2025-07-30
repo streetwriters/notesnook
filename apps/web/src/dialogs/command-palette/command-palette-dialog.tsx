@@ -17,7 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { debounce, usePromise } from "@notesnook/common";
+import {
+  debounce,
+  formatKey,
+  keybindings,
+  usePromise
+} from "@notesnook/common";
 import { EVENTS, fuzzy, Note, Notebook, Reminder, Tag } from "@notesnook/core";
 import { Box, Button, Flex, Input, Text } from "@theme-ui/components";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -539,7 +544,10 @@ function getCommandPaletteHelp(isCommandMode: boolean) {
     ...(isCommandMode
       ? [
           {
-            key: isMac() ? "⌘P" : "Ctrl+P",
+            key: keybindings.openQuickOpen
+              .keys(IS_DESKTOP_APP)
+              .map((k) => formatKey(k, isMac(), "+"))
+              .join(" / "),
             description: strings.quickOpen()
           }
         ]
@@ -553,7 +561,10 @@ function getCommandPaletteHelp(isCommandMode: boolean) {
             description: strings.createNewNote()
           },
           {
-            key: isMac() ? "⌘K" : "Ctrl+K",
+            key: keybindings.openCommandPalette
+              .keys(IS_DESKTOP_APP)
+              .map((k) => formatKey(k, isMac(), "+"))
+              .join(" / "),
             description: strings.commandPalette()
           }
         ])

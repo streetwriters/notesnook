@@ -515,6 +515,8 @@ export const useActions = ({
         title: strings.addNotebook(),
         icon: "plus",
         onPress: async () => {
+          close();
+          await sleep(300);
           AddNotebookSheet.present(undefined, item);
         }
       },
@@ -523,6 +525,8 @@ export const useActions = ({
         title: strings.editNotebook(),
         icon: "square-edit-outline",
         onPress: async () => {
+          close();
+          await sleep(300);
           AddNotebookSheet.present(item);
         }
       },

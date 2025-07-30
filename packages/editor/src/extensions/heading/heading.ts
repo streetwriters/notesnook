@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { tiptapKeys } from "@notesnook/common";
 import { textblockTypeInputRule } from "@tiptap/core";
 import { Heading as TiptapHeading } from "@tiptap/extension-heading";
 
@@ -49,7 +50,8 @@ export const Heading = TiptapHeading.extend({
       (items, level) => ({
         ...items,
         ...{
-          [`Mod-Alt-${level}`]: () => this.editor.commands.setHeading({ level })
+          [tiptapKeys[`insertHeading${level}`].keys]: () =>
+            this.editor.commands.setHeading({ level })
         }
       }),
       {}

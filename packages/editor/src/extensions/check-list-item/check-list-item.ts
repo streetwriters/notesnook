@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { keybindings } from "@notesnook/common";
 import { KeyboardShortcutCommand, mergeAttributes, Node } from "@tiptap/core";
 import { Node as ProseMirrorNode } from "@tiptap/pm/model";
 
@@ -80,7 +81,8 @@ export const CheckListItem = Node.create<CheckListItemOptions>({
       [key: string]: KeyboardShortcutCommand;
     } = {
       Enter: () => this.editor.commands.splitListItem(this.name),
-      "Shift-Tab": () => this.editor.commands.liftListItem(this.name)
+      [keybindings.liftListItem.keys]: () =>
+        this.editor.commands.liftListItem(this.name)
     };
 
     if (!this.options.nested) {

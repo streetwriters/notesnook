@@ -19,9 +19,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { FeatureType } from "./components/sheets/new-feature";
 
-export const features: FeatureType[] = [
-  {
-    title: "Improved Search",
-    body: "Improved search results with better relevance and highlighting."
-  }
-];
+export const features: FeatureType[] = [];

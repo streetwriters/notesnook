@@ -30,6 +30,7 @@ import { BackHandler, Platform, ViewProps } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   runOnJS,
+  SharedValue,
   useAnimatedReaction,
   useAnimatedStyle,
   useSharedValue,
@@ -67,6 +68,7 @@ export interface TabsRef {
   setScrollEnabled: () => true;
   isDrawerOpen: () => boolean;
   node: RefObject<Animated.View>;
+  tabChangedFromSwipeAction: SharedValue<boolean>;
 }
 
 export const FluidPanels = forwardRef<TabsRef, TabProps>(function FluidTabs(
@@ -116,6 +118,7 @@ export const FluidPanels = forwardRef<TabsRef, TabProps>(function FluidTabs(
   const isLoaded = useRef(false);
   const prevWidths = useRef(widths);
   const isIPhone = Platform.OS === "ios";
+  const tabChangedFromSwipeAction = useSharedValue(false);
 
   useEffect(() => {
     if (deviceMode === "tablet" || fullscreen) {
@@ -191,6 +194,7 @@ export const FluidPanels = forwardRef<TabsRef, TabProps>(function FluidTabs(
             : withTiming(editorPosition);
           currentTab.value = 2;
         }
+        tabChangedFromSwipeAction.value = false;
       },
       goToIndex: (index: number, animated = true) => {
         if (deviceMode === "tablet") {
@@ -210,6 +214,7 @@ export const FluidPanels = forwardRef<TabsRef, TabProps>(function FluidTabs(
             : editorPosition;
           currentTab.value = 2;
         }
+        tabChangedFromSwipeAction.value = false;
       },
       unlock: () => {
         forcedLock.value = false;
@@ -252,7 +257,8 @@ export const FluidPanels = forwardRef<TabsRef, TabProps>(function FluidTabs(
       },
       page: () => (currentTab.value === 1 ? "home" : "editor"),
       setScrollEnabled: () => true,
-      node: node
+      node: node,
+      tabChangedFromSwipeAction: tabChangedFromSwipeAction
     }),
     [
       currentTab,
@@ -262,7 +268,8 @@ export const FluidPanels = forwardRef<TabsRef, TabProps>(function FluidTabs(
       homePosition,
       editorPosition,
       forcedLock,
-      isDrawerOpen
+      isDrawerOpen,
+      tabChangedFromSwipeAction
     ]
   );
 
@@ -362,18 +369,20 @@ export const FluidPanels = forwardRef<TabsRef, TabProps>(function FluidTabs(
           isDrawerOpen.value = true;
           currentTab.value = 1;
           runOnJS(onDrawerStateChange)(true);
+          tabChangedFromSwipeAction.value = true;
           return;
         } else if (!isSwipeLeft && finalValue > 100) {
           translateX.value = withSpring(homePosition, animationConfig);
           isDrawerOpen.value = false;
           currentTab.value = 1;
           runOnJS(onDrawerStateChange)(false);
-
+          tabChangedFromSwipeAction.value = true;
           return;
         } else if (!isSwipeLeft && finalValue < 100) {
           translateX.value = withSpring(0, animationConfig);
           isDrawerOpen.value = true;
           currentTab.value = 1;
+          tabChangedFromSwipeAction.value = true;
           return;
         }
       }
@@ -384,6 +393,8 @@ export const FluidPanels = forwardRef<TabsRef, TabProps>(function FluidTabs(
           translateX.value = withSpring(editorPosition, animationConfig);
           currentTab.value = 2;
           isDrawerOpen.value = false;
+
+          tabChangedFromSwipeAction.value = true;
           return;
         }
       }
@@ -398,6 +409,8 @@ export const FluidPanels = forwardRef<TabsRef, TabProps>(function FluidTabs(
           translateX.value = withSpring(editorPosition, animationConfig);
           currentTab.value = 2;
         }
+
+        tabChangedFromSwipeAction.value = true;
         return;
       }
 
