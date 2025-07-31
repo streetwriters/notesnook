@@ -45,6 +45,7 @@ import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { components } from "./components";
 import { RouteParams, SettingSection } from "./types";
+import AppIcon from "../../components/ui/AppIcon";
 
 const _SectionItem = ({ item }: { item: SettingSection }) => {
   const { colors } = useThemeColors();
@@ -131,15 +132,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
   const checkIsFeatureAvailable = React.useCallback(() => {
     if (!isFeatureAvailable) return false;
     if (isFeatureAvailable && !isFeatureAvailable?.isAllowed) {
-      ToastManager.show({
-        message: isFeatureAvailable?.error,
-        type: "info",
-        context: "global",
-        actionText: strings.upgrade(),
-        func: () => {
-          PaywallSheet.present(isFeatureAvailable);
-        }
-      });
+      PaywallSheet.present(isFeatureAvailable);
       return false;
     }
 
@@ -156,8 +149,8 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
         flexDirection: "row",
         justifyContent: "space-between",
         paddingVertical: DefaultAppStyles.GAP,
-        opacity: isDisabled ? 0.5 : 1,
         borderRadius: 0,
+        overflow: "hidden",
         ...styles
       }}
       onPress={async () => {
@@ -185,6 +178,27 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
         }
       }}
     >
+      {!isFeatureAvailable?.isAllowed ? (
+        <View
+          style={{
+            width: 35,
+            height: 35,
+            borderRadius: 100,
+            backgroundColor: colors.primary.accent,
+            justifyContent: "center",
+            alignItems: "center",
+            position: "absolute",
+            bottom: -8,
+            right: -8
+          }}
+        >
+          <AppIcon
+            color={colors.static.orange}
+            size={AppFontSize.md}
+            name="crown"
+          />
+        </View>
+      ) : null}
       <View
         style={{
           flexDirection: "row",

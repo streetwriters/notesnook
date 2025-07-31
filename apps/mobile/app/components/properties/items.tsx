@@ -27,11 +27,12 @@ import { Action, ActionId, useActions } from "../../hooks/use-actions";
 import { useStoredRef } from "../../hooks/use-stored-ref";
 import { DDS } from "../../services/device-detection";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { AppFontSize } from "../../utils/size";
+import { AppFontSize, defaultBorderRadius } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { Button } from "../ui/button";
 import { Pressable } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
+import AppIcon from "../ui/AppIcon";
 
 const TOP_BAR_ITEMS: ActionId[] = [
   "pin",
@@ -247,7 +248,7 @@ export const Items = ({
           testID={"icon-" + item.id}
           style={{
             width: columnItemWidth - 8,
-            opacity: item.locked ? 0.5 : 1
+            alignSelf: "flex-start"
           }}
         >
           <View
@@ -255,7 +256,11 @@ export const Items = ({
               height: columnItemWidth / 2,
               width: columnItemWidth - DefaultAppStyles.GAP_SMALL,
               justifyContent: "center",
-              alignItems: "center"
+              alignItems: "center",
+              borderWidth: 1,
+              borderRadius: defaultBorderRadius,
+              borderColor: colors.primary.border,
+              overflow: "hidden"
             }}
           >
             <Icon
@@ -270,6 +275,28 @@ export const Items = ({
                   : colors.secondary.icon
               }
             />
+
+            {item.locked ? (
+              <View
+                style={{
+                  width: 20,
+                  height: 20,
+                  borderRadius: 100,
+                  backgroundColor: colors.primary.accent,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  position: "absolute",
+                  bottom: -3,
+                  right: -3
+                }}
+              >
+                <AppIcon
+                  color={colors.static.orange}
+                  size={AppFontSize.xxxs}
+                  name="crown"
+                />
+              </View>
+            ) : null}
           </View>
 
           <Paragraph
@@ -327,9 +354,14 @@ export const Items = ({
               paginationStyle={{
                 position: "relative",
                 marginHorizontal: 2,
-                marginBottom: 0,
-                marginTop: DefaultAppStyles.GAP
+                marginBottom: 0
               }}
+              contentContainerStyle={{
+                justifyContent: "flex-start",
+                alignItems: "flex-start",
+                alignSelf: "flex-start"
+              }}
+              centerContent={false}
               renderItem={({ item, index }) => (
                 <View
                   style={{
