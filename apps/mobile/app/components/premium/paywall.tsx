@@ -29,11 +29,11 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import { WebView } from "react-native-webview";
 import Config from "react-native-config";
 import * as RNIap from "react-native-iap";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { WebView } from "react-native-webview";
 import ToggleSwitch from "toggle-switch-react-native";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import usePricingPlans, { PricingPlan } from "../../hooks/use-pricing-plans";
@@ -50,13 +50,35 @@ import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { FeaturesList } from "./features-list";
-import { db } from "../../common/database";
 
 const Steps = {
   select: 1,
   buy: 2,
   finish: 3,
   buyWeb: 4
+};
+
+const PlanOverView = {
+  free: {
+    storage: `100 MB`,
+    fileSize: `1 MB`,
+    hdImages: false
+  },
+  essential: {
+    storage: `1 GB`,
+    fileSize: `25 MB`,
+    hdImages: false
+  },
+  pro: {
+    storage: `10 GB`,
+    fileSize: `25 MB`,
+    hdImages: true
+  },
+  believer: {
+    storage: `50 GB`,
+    fileSize: `25 MB`,
+    hdImages: true
+  }
 };
 
 const PayWall = (props: NavigationProps<"PayWall">) => {
@@ -71,6 +93,7 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
   const [annualBilling, setAnnualBilling] = useState(
     routeParams.state ? routeParams.state.billingType === "annual" : true
   );
+  const [ctaButtonVisible, setCtaButtonVisible] = useState(false);
   const [step, setStep] = useState(
     routeParams.state
       ? isGithubRelease
@@ -139,6 +162,13 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
             }}
             keyboardDismissMode="none"
             keyboardShouldPersistTaps="always"
+            onScroll={(event) => {
+              if (event.nativeEvent.contentOffset.y > 1000) {
+                setCtaButtonVisible(true);
+              } else {
+                setCtaButtonVisible(false);
+              }
+            }}
           >
             <View
               style={{
@@ -208,7 +238,10 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
                     setAnnualBilling((state) => !state);
                   }}
                 />
-                <Paragraph>Yearly </Paragraph>
+                <Paragraph>
+                  Yearly{" "}
+                  <Paragraph color={colors.primary.accent}>(15% off)</Paragraph>
+                </Paragraph>
               </TouchableOpacity>
 
               {pricingPlans.pricingPlans.map((plan) => (
@@ -795,7 +828,7 @@ const PricingPlanCard = ({
         gap: 6
       }}
     >
-      {discountPercentage ? (
+      {/* {discountPercentage ? (
         <View
           style={{
             backgroundColor: colors.static.red,
@@ -811,7 +844,7 @@ const PricingPlanCard = ({
             {discountPercentage}% Off
           </Heading>
         </View>
-      ) : null}
+      ) : null} */}
 
       <View>
         <Heading size={AppFontSize.md}>
@@ -828,6 +861,57 @@ const PricingPlanCard = ({
           ) : null}
         </Heading>
         <Paragraph>{plan.description}</Paragraph>
+
+        <View
+          style={{
+            gap: 5,
+            marginVertical: DefaultAppStyles.GAP_VERTICAL
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              width: "100%",
+              justifyContent: "space-between"
+            }}
+          >
+            <Paragraph size={AppFontSize.xs}>Storage</Paragraph>
+
+            <Paragraph size={AppFontSize.xs}>
+              {PlanOverView[plan.id as keyof typeof PlanOverView].storage}
+            </Paragraph>
+          </View>
+
+          <View
+            style={{
+              flexDirection: "row",
+              width: "100%",
+              justifyContent: "space-between"
+            }}
+          >
+            <Paragraph size={AppFontSize.xs}>File size</Paragraph>
+
+            <Paragraph size={AppFontSize.xs}>
+              {PlanOverView[plan.id as keyof typeof PlanOverView].fileSize}
+            </Paragraph>
+          </View>
+
+          <View
+            style={{
+              flexDirection: "row",
+              width: "100%",
+              justifyContent: "space-between"
+            }}
+          >
+            <Paragraph size={AppFontSize.xs}>HD images</Paragraph>
+
+            <Paragraph size={AppFontSize.xs}>
+              {PlanOverView[plan.id as keyof typeof PlanOverView].hdImages
+                ? "Yes"
+                : "No"}
+            </Paragraph>
+          </View>
+        </View>
       </View>
 
       {pricingPlans?.loading ? (

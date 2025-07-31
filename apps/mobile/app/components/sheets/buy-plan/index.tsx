@@ -25,11 +25,11 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import useGlobalSafeAreaInsets from "../../../hooks/use-global-safe-area-insets";
 import usePricingPlans from "../../../hooks/use-pricing-plans";
 import { openLinkInBrowser } from "../../../utils/functions";
-import { AppFontSize } from "../../../utils/size";
+import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
+import { DefaultAppStyles } from "../../../utils/styles";
 import { Button } from "../../ui/button";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import { DefaultAppStyles } from "../../../utils/styles";
 
 export const BuyPlan = (props: {
   planId: string;
@@ -64,18 +64,90 @@ export const BuyPlan = (props: {
       }}
       keyboardDismissMode="none"
       keyboardShouldPersistTaps="always"
-      stickyHeaderIndices={[0]}
     >
       <View
         style={{
-          paddingHorizontal: DefaultAppStyles.GAP
+          paddingHorizontal: DefaultAppStyles.GAP,
+          gap: DefaultAppStyles.GAP_VERTICAL
         }}
       >
+        {[
+          `notesnook.${props.planId}.yearly`,
+          `notesnook.${props.planId}.monthly`,
+          ...(props.planId === "essential"
+            ? []
+            : [`notesnook.${props.planId}.5year`])
+        ].map((item) => (
+          <ProductItem
+            key={item}
+            pricingPlans={pricingPlans}
+            productId={item}
+          />
+        ))}
+
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            borderWidth: 1,
+            borderColor: colors.primary.border,
+            padding: DefaultAppStyles.GAP,
+            borderRadius: defaultBorderRadius
+          }}
+        >
+          <Heading color={colors.primary.paragraph} size={AppFontSize.sm}>
+            Due today{" "}
+            {pricingPlans.userCanRequestTrial ? (
+              <Text
+                style={{
+                  color: colors.primary.accent
+                }}
+              >
+                ({billingDuration.duration} days free)
+              </Text>
+            ) : null}
+          </Heading>
+
+          <Paragraph color={colors.primary.paragraph}>
+            {pricingPlans.userCanRequestTrial
+              ? "FREE"
+              : pricingPlans.getStandardPrice(
+                  pricingPlans.selectedProduct as RNIap.Subscription
+                )}
+          </Paragraph>
+        </View>
+
+        {pricingPlans.userCanRequestTrial ? (
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              borderWidth: 1,
+              borderColor: colors.primary.border,
+              padding: DefaultAppStyles.GAP,
+              borderRadius: defaultBorderRadius
+            }}
+          >
+            <Paragraph color={colors.secondary.paragraph}>
+              Due{" "}
+              {dayjs().add(billingDuration.duration, "day").format("DD MMMM")}
+            </Paragraph>
+            <Paragraph color={colors.secondary.paragraph}>
+              {pricingPlans.getStandardPrice(
+                pricingPlans.selectedProduct as RNIap.Subscription
+              )}
+            </Paragraph>
+          </View>
+        ) : null}
+
         {props.canActivateTrial ? (
           <View
             style={{
-              gap: 10,
-              marginBottom: 10
+              gap: DefaultAppStyles.GAP_VERTICAL,
+              borderWidth: 1,
+              borderColor: colors.primary.border,
+              padding: DefaultAppStyles.GAP,
+              borderRadius: defaultBorderRadius
             }}
           >
             {(is5YearPlanSelected
@@ -107,69 +179,6 @@ export const BuyPlan = (props: {
           </View>
         ) : null}
 
-        {[
-          `notesnook.${props.planId}.yearly`,
-          `notesnook.${props.planId}.monthly`,
-          ...(props.planId === "essential"
-            ? []
-            : [`notesnook.${props.planId}.5year`])
-        ].map((item) => (
-          <ProductItem
-            key={item}
-            pricingPlans={pricingPlans}
-            productId={item}
-          />
-        ))}
-
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-
-            marginTop: DefaultAppStyles.GAP_VERTICAL
-          }}
-        >
-          <Heading color={colors.primary.paragraph} size={AppFontSize.sm}>
-            Due today{" "}
-            {pricingPlans.userCanRequestTrial ? (
-              <Text
-                style={{
-                  color: colors.primary.accent
-                }}
-              >
-                ({billingDuration.duration} days free)
-              </Text>
-            ) : null}
-          </Heading>
-
-          <Paragraph color={colors.primary.paragraph}>
-            {pricingPlans.userCanRequestTrial
-              ? "0.00"
-              : pricingPlans.getStandardPrice(
-                  pricingPlans.selectedProduct as RNIap.Subscription
-                )}
-          </Paragraph>
-        </View>
-
-        {pricingPlans.userCanRequestTrial ? (
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between"
-            }}
-          >
-            <Paragraph color={colors.secondary.paragraph}>
-              Due{" "}
-              {dayjs().add(billingDuration.duration, "day").format("DD MMMM")}
-            </Paragraph>
-            <Paragraph color={colors.secondary.paragraph}>
-              {pricingPlans.getStandardPrice(
-                pricingPlans.selectedProduct as RNIap.Subscription
-              )}
-            </Paragraph>
-          </View>
-        ) : null}
-
         <Button
           width="100%"
           type="accent"
@@ -181,10 +190,6 @@ export const BuyPlan = (props: {
               ? "Subscribe and start free trial"
               : "Subscribe"
           }
-          style={{
-            marginTop: DefaultAppStyles.GAP_VERTICAL,
-            marginBottom: DefaultAppStyles.GAP_VERTICAL
-          }}
           onPress={() => {
             const offerToken = pricingPlans.getOfferTokenAndroid(
               pricingPlans.selectedProduct as RNIap.SubscriptionAndroid,
@@ -264,6 +269,7 @@ const ProductItem = (props: {
       }}
       activeOpacity={0.9}
       onPress={() => {
+        if (!product) return;
         props.pricingPlans.selectProduct(product?.productId);
       }}
     >
@@ -310,18 +316,21 @@ const ProductItem = (props: {
           ) : null}
         </View>
 
-        <Paragraph>
-          {product?.productId.includes("5year")
-            ? (product as RNIap.Product).localizedPrice
-            : props.pricingPlans.getStandardPrice(
-                product as RNIap.Subscription
-              )}{" "}
+        <Paragraph size={AppFontSize.md}>
           {isAnnual || product?.productId.includes("5year")
-            ? `(${props.pricingPlans.getPrice(
+            ? `${props.pricingPlans.getPrice(
                 product as RNIap.Subscription,
-                props.pricingPlans.hasTrialOffer() ? 1 : 0,
+                props.pricingPlans.hasTrialOffer(undefined, product?.productId)
+                  ? 1
+                  : 0,
                 isAnnual
-              )}/month)`
+              )}/month`
+            : null}
+
+          {!isAnnual && !product?.productId.includes("5year")
+            ? `${props.pricingPlans.getStandardPrice(
+                product as RNIap.Subscription
+              )}/month`
             : null}
         </Paragraph>
       </View>

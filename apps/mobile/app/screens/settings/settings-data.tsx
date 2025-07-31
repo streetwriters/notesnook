@@ -1258,7 +1258,8 @@ export const settingsGroups: SettingSection[] = [
             notifNotes: !settings.notifNotes
           });
         },
-        hidden: () => Platform.OS !== "android"
+        hidden: () => Platform.OS !== "android",
+        featureId: "createNoteFromNotificationDrawer"
       },
       {
         id: "reminders",

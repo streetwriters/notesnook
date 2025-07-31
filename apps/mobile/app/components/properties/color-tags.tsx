@@ -190,8 +190,7 @@ export const ColorTags = ({ item }: { item: Note }) => {
                   borderRadius: 100,
                   justifyContent: "center",
                   alignItems: "center",
-                  marginRight: 5,
-                  opacity: !colorFeature?.isAllowed ? 0.5 : 1
+                  marginRight: 5
                 }}
                 type="secondary"
                 onPress={onPress}
