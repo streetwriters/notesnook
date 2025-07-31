@@ -20,12 +20,9 @@ import { useEffect, useState } from "react";
 import { Platform } from "react-native";
 import * as RNIap from "react-native-iap";
 import { DatabaseLogger, db } from "../common/database";
-import { eSendEvent } from "../services/event-manager";
 import PremiumService from "../services/premium";
 import { useSettingStore } from "../stores/use-setting-store";
 import { useUserStore } from "../stores/use-user-store";
-import { eClosePremiumDialog, eCloseSheet } from "../utils/events";
-import { sleep } from "../utils/time";
 
 function numberWithCommas(x: string) {
   const parts = x.toString().split(".");
@@ -147,16 +144,17 @@ type PricingPlansOptions = {
 const usePricingPlans = (options?: PricingPlansOptions) => {
   const user = useUserStore((state) => state.user);
   const [currentPlan, setCurrentPlan] = useState<string>(
-    options?.planId || pricingPlans[0].id
+    options?.planId || pricingPlans[2].id
   );
   const [plans, setPlans] = useState<PricingPlan[]>(pricingPlans);
   const [loading, setLoading] = useState(false);
   const [loadingPlans, setLoadingPlans] = useState(true);
-  const [selectedProductSku, setSelectedProductSku] = useState<
-    string | undefined
-  >(options?.productId || undefined);
+  const [selectedProductSku, setSelectedProductSku] = useState<string>(
+    options?.productId || "notesnook.pro.yearly"
+  );
   const [isPromoOffer, setIsPromoOffer] = useState(false);
   const [cancelPromo, setCancelPromo] = useState(false);
+  const [userCanRequestTrial, setUserCanRequestTrial] = useState(false);
 
   const getProduct = (planId: string, skuId: string) => {
     return (
@@ -173,22 +171,25 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
     return getProduct(planId, skuId) as RNIap.SubscriptionIOS;
   };
 
-  const hasTrialOffer = () => {
-    if (!selectedProductSku) return false;
+  const hasTrialOffer = (planId?: string, productId?: string) => {
+    if (!selectedProductSku && !productId) return false;
 
     return Platform.OS === "ios"
-      ? !!(getProduct(currentPlan, selectedProductSku) as RNIap.SubscriptionIOS)
-          ?.introductoryPrice
+      ? !!(
+          getProduct(
+            planId || currentPlan,
+            productId || selectedProductSku
+          ) as RNIap.SubscriptionIOS
+        )?.introductoryPrice
       : (
           getProduct(
-            currentPlan,
-            selectedProductSku
+            planId || currentPlan,
+            productId || selectedProductSku
           ) as RNIap.SubscriptionAndroid
         )?.subscriptionOfferDetails?.[0]?.pricingPhases?.pricingPhaseList
           ?.length > 1;
   };
 
-  const userCanRequestTrial = hasTrialOffer();
   // user && (!user.subscription || !user.subscription.expiry) ? true : false;
 
   useEffect(() => {
@@ -207,6 +208,7 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
         });
       });
       setPlans([...pricingPlans]);
+      setUserCanRequestTrial(hasTrialOffer());
       setLoadingPlans(false);
     };
 
@@ -586,9 +588,12 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
     loading,
     selectPlan: (planId: string) => {
       setCurrentPlan(planId);
-      setSelectedProductSku(
-        plans.find((p) => p.id === planId)?.subscriptionSkuList?.[0]
-      );
+      const product = plans.find((p) => p.id === planId)
+        ?.subscriptionSkuList?.[0];
+      if (product) {
+        setSelectedProductSku(product);
+      }
+
       setIsPromoOffer(false);
     },
     convertYearlyPriceToMonthly: convertPrice,
