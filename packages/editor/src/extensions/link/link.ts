@@ -232,9 +232,10 @@ export const Link = Mark.create<LinkOptions>({
         }
       }),
       markPasteRule({
-        find: (text) => {
+        find: (text, ev) => {
           const foundLinks: PasteRuleMatch[] = [];
-
+          const html = ev?.clipboardData?.getData("text/html");
+          if (html && html.includes("<a")) return [];
           if (text) {
             const links = find(text).filter((item) => item.isLink);
 
