@@ -42,6 +42,7 @@ export type Feature<TCaption extends CaptionValue = CaptionValue> = {
 };
 
 export type FeatureResult<TId extends FeatureId = FeatureId> = {
+  id: TId;
   isAllowed: boolean;
   availableOn?: SubscriptionPlan;
   caption: Caption<TId>;
@@ -94,10 +95,10 @@ const features = {
     id: "storage",
     title: "Storage",
     availability: {
-      free: createLimit("50MB", lte(50 * 1024 * 1024)),
-      essential: createLimit("1GB", lte(1024 * 1024 * 1024)),
-      pro: createLimit("10GB", lte(10 * 1024 * 1024 * 1024)),
-      believer: createLimit("25GB", lte(25 * 1024 * 1024 * 1024)),
+      free: createLimit("50MB/mo", lte(50 * 1024 * 1024)),
+      essential: createLimit("1GB/mo", lte(1024 * 1024 * 1024)),
+      pro: createLimit("10GB/mo", lte(10 * 1024 * 1024 * 1024)),
+      believer: createLimit("25GB/mo", lte(25 * 1024 * 1024 * 1024)),
       legacyPro: createLimit("infinity", alwaysInfinite)
     }
   }),
@@ -373,6 +374,28 @@ const features = {
       believer: createLimit("infinity", alwaysInfinite),
       legacyPro: createLimit("infinity", alwaysInfinite)
     }
+  }),
+  fullOfflineMode: createFeature({
+    id: "fullOfflineMode",
+    title: "Full offline mode",
+    availability: {
+      free: createLimit(false, alwaysFalse),
+      essential: createLimit(true, alwaysTrue),
+      pro: createLimit(true, alwaysTrue),
+      believer: createLimit(true, alwaysTrue),
+      legacyPro: createLimit(true, alwaysTrue)
+    }
+  }),
+  syncControls: createFeature({
+    id: "syncControls",
+    title: "Sync controls",
+    availability: {
+      free: createLimit(false, alwaysFalse),
+      essential: createLimit(false, alwaysFalse),
+      pro: createLimit(true, alwaysTrue),
+      believer: createLimit(true, alwaysTrue),
+      legacyPro: createLimit(true, alwaysTrue)
+    }
   })
 };
 
@@ -385,6 +408,7 @@ export async function isFeatureAvailable<TId extends FeatureId>(
   const isAllowed = await limit.isAllowed(value || (await feature.used?.()));
 
   return {
+    id,
     isAllowed,
     availableOn: isAllowed ? undefined : await availableOn(id, value),
     caption: limit.caption,
@@ -402,9 +426,13 @@ export async function getFeatureLimit<TId extends FeatureId>(
 export async function areFeaturesAvailable<TIds extends FeatureId[]>(
   ids: TIds,
   values: number[] = []
-): Promise<Record<TIds[number], FeatureResult<TIds[number]>>> {
+): Promise<{
+  [K in TIds[number]]: FeatureResult<K>;
+}> {
   const { isLegacyPro, plan } = await getUserPlan();
-  const results = {} as Record<TIds[number], FeatureResult<TIds[number]>>;
+  const results = {} as {
+    [K in TIds[number]]: FeatureResult<K>;
+  };
   for (let i = 0; i < ids.length; ++i) {
     const value = values.at(i);
     const id = ids[i];
@@ -414,6 +442,7 @@ export async function areFeaturesAvailable<TIds extends FeatureId[]>(
     const isAllowed = await limit.isAllowed(value || (await feature.used?.()));
 
     results[id as TIds[number]] = {
+      id: id as TIds[number],
       isAllowed,
       availableOn: isAllowed ? undefined : await availableOn(id, value),
       caption: limit.caption as Caption<TIds[number]>,
