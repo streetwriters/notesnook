@@ -474,6 +474,7 @@ export const settingsGroups: SettingSection[] = [
             description: strings.fullOfflineModeDesc(),
             type: "switch",
             property: "offlineMode",
+            featureId: "fullOfflineMode",
             modifer: () => {
               const current = SettingsService.get().offlineMode;
               if (current) {
@@ -494,21 +495,24 @@ export const settingsGroups: SettingSection[] = [
             name: strings.disableAutoSync(),
             description: strings.disableAutoSyncDesc(),
             type: "switch",
-            property: "disableAutoSync"
+            property: "disableAutoSync",
+            featureId: "syncControls"
           },
           {
             id: "disable-realtime-sync",
             name: strings.disableRealtimeSync(),
             description: strings.disableRealtimeSyncDesc(),
             type: "switch",
-            property: "disableRealtimeSync"
+            property: "disableRealtimeSync",
+            featureId: "syncControls"
           },
           {
             id: "disable-sync",
             name: strings.disableSync(),
             description: strings.disableSyncDesc(),
             type: "switch",
-            property: "disableSync"
+            property: "disableSync",
+            featureId: "syncControls"
           },
           {
             id: "background-sync",
