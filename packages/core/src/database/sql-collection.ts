@@ -701,7 +701,8 @@ const VALID_SORT_OPTIONS: Record<
   sessioncontent: [],
   settings: [],
   shortcuts: [],
-  vaults: []
+  vaults: [],
+  monographs: []
 };
 
 function sanitizeSortOptions(type: keyof DatabaseSchema, options: SortOptions) {

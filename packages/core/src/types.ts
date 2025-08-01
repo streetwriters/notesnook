@@ -80,6 +80,7 @@ export type Collections = {
   sessioncontent: "sessioncontent";
   settingsv2: "settingitem";
   vaults: "vault";
+  monographs: "monograph";
 
   /**
    * @deprecated only kept here for migration purposes
@@ -110,6 +111,7 @@ export type GroupableItem = ValueOf<
     | "settings"
     | "settingitem"
     | "vault"
+    | "monograph"
   >
 >;
 
@@ -131,6 +133,7 @@ export type ItemMap = {
   settingitem: SettingItem;
   vault: Vault;
   searchResult: HighlightedResult;
+  monograph: Monograph;
 
   /**
    * @deprecated only kept here for migration purposes
@@ -488,6 +491,13 @@ export interface SettingItem<
 export interface Vault extends BaseItem<"vault"> {
   title: string;
   key: Cipher<"base64">;
+}
+
+export interface Monograph extends BaseItem<"monograph"> {
+  title: string;
+  datePublished: number;
+  selfDestruct: boolean;
+  password?: Cipher<"base64">;
 }
 
 export type Match = {
