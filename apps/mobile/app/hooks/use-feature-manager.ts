@@ -21,7 +21,8 @@ export default function useFeatureManager() {
     "defaultNotebookAndTag",
     "defaultSidebarTab",
     "customToolbarPreset",
-    "disableTrashCleanup"
+    "disableTrashCleanup",
+    "fullOfflineMode"
   ]);
   const user = useUserStore((state) => state.user);
 
@@ -55,33 +56,42 @@ export default function useFeatureManager() {
       useDragState.getState().setPreset("default");
     }
 
+    if (!features.fullOfflineMode.isAllowed) {
+      SettingsService.setProperty("offlineMode", false);
+    }
+
     if (!features.defaultNotebookAndTag.isAllowed) {
       db.settings.setDefaultNotebook(undefined);
       db.settings.setDefaultTag(undefined);
     }
+    const isAppLocked = useUserStore.getState().appLocked;
+    let unsub: () => void;
 
-    const unsub = useUserStore.subscribe((state) => {
-      if (!state.appLocked && !features?.appLock?.isAllowed) {
-        unsub();
-        SettingsService.setProperty("appLockEnabled", false);
-        setTimeout(() => {
-          presentDialog({
-            title: "App Lock Disabled",
-            paragraph: features?.appLock?.error,
-            positiveText: strings.upgrade(),
-            negativeText: strings.cancel(),
-            positivePress: async () => {
-              eSendEvent(eCloseSimpleDialog);
-              Navigation.navigate("PayWall", {
-                context: "logged-in"
-              });
-            }
-          });
-        }, 1000);
-      }
-    });
+    if (isAppLocked) {
+      unsub = useUserStore.subscribe((state) => {
+        if (!state.appLocked && !features?.appLock?.isAllowed) {
+          unsub();
+          SettingsService.setProperty("appLockEnabled", false);
+          setTimeout(() => {
+            presentDialog({
+              title: "App Lock Disabled",
+              paragraph: features?.appLock?.error,
+              positiveText: strings.upgrade(),
+              negativeText: strings.cancel(),
+              positivePress: async () => {
+                eSendEvent(eCloseSimpleDialog);
+                Navigation.navigate("PayWall", {
+                  context: "logged-in"
+                });
+              }
+            });
+          }, 1000);
+        }
+      });
+    }
+
     return () => {
-      unsub();
+      unsub?.();
     };
   }, [features]);
 
