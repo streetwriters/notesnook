@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import { useNetInfo } from "@react-native-community/netinfo";
 import dayjs from "dayjs";
@@ -27,16 +28,15 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import { presentDialog } from "../../components/dialog/functions";
 import AppIcon from "../../components/ui/AppIcon";
+import { Button } from "../../components/ui/button";
 import { TimeSince } from "../../components/ui/time-since";
-import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
+import Navigation from "../../services/navigation";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SyncStatus, useUserStore } from "../../stores/use-user-store";
-import { SUBSCRIPTION_STATUS_STRINGS } from "../../utils/constants";
 import { AppFontSize } from "../../utils/size";
-import { SectionItem } from "./section-item";
-import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../utils/styles";
+import { SectionItem } from "./section-item";
 
 export const getTimeLeft = (t2) => {
   let daysRemaining = dayjs(t2).diff(dayjs(), "days");
@@ -60,8 +60,8 @@ const ProfilePicPlaceholder = (props) => {
         style={{
           backgroundColor: colors.primary.shade,
           borderRadius: 100,
-          width: 100,
-          height: 100,
+          width: 80,
+          height: 80,
           alignItems: "center",
           justifyContent: "center"
         }}
@@ -123,6 +123,8 @@ const SettingsUserSection = ({ item }) => {
   const { isInternetReachable } = useNetInfo();
   const isOffline = !isInternetReachable;
   const userProfile = useUserStore((state) => state.profile);
+  const used = 50;
+  const total = 100;
 
   return (
     <>
@@ -131,7 +133,7 @@ const SettingsUserSection = ({ item }) => {
           <View
             style={{
               paddingHorizontal: DefaultAppStyles.GAP,
-              paddingTop: 50,
+              paddingTop: 25,
               borderBottomWidth: 1,
               paddingBottom: 20,
               borderColor: colors.primary.border
@@ -140,23 +142,23 @@ const SettingsUserSection = ({ item }) => {
             <View
               style={{
                 flexDirection: "row",
-                justifyContent: "space-between",
                 width: "100%"
               }}
             >
               <View
                 style={{
-                  flexDirection: "column",
-                  alignItems: "center",
-                  width: "100%"
+                  flexDirection: "row",
+                  width: "100%",
+                  gap: DefaultAppStyles.GAP,
+                  alignItems: "center"
                 }}
               >
                 <View
                   style={{
                     borderWidth: 2,
                     borderRadius: 100,
-                    marginBottom: DefaultAppStyles.GAP_VERTICAL,
-                    borderColor: colors.primary.accent
+                    borderColor: colors.primary.accent,
+                    alignSelf: "flex-start"
                   }}
                 >
                   {userProfile?.profilePicture ? (
@@ -169,9 +171,9 @@ const SettingsUserSection = ({ item }) => {
                           uri: userProfile?.profilePicture
                         }}
                         style={{
-                          width: 100,
-                          height: 100,
-                          borderRadius: 100
+                          width: 80,
+                          height: 80,
+                          borderRadius: 80
                         }}
                       />
                     </TouchableOpacity>
@@ -180,22 +182,7 @@ const SettingsUserSection = ({ item }) => {
                   )}
                 </View>
 
-                <View
-                  style={{
-                    alignItems: "center"
-                  }}
-                >
-                  {premium ? (
-                    <Heading
-                      color={colors.primary.accent}
-                      size={AppFontSize.sm}
-                    >
-                      {SUBSCRIPTION_STATUS_STRINGS[
-                        user.subscription?.type
-                      ]?.toUpperCase() || strings.basic()}
-                    </Heading>
-                  ) : null}
-
+                <View>
                   <Paragraph
                     onPress={() => {
                       presentDialog({
@@ -219,12 +206,12 @@ const SettingsUserSection = ({ item }) => {
                       });
                     }}
                     color={colors.primary.heading}
-                    size={AppFontSize.lg}
+                    size={AppFontSize.md}
                   >
                     {userProfile?.fullName
                       ? userProfile.fullName + " "
                       : strings.setYourName() + " "}
-                    <AppIcon name="pencil" size={AppFontSize.lg} />
+                    <AppIcon name="pencil" size={AppFontSize.md} />
                   </Paragraph>
 
                   <Paragraph
@@ -236,8 +223,7 @@ const SettingsUserSection = ({ item }) => {
 
                   <Paragraph
                     style={{
-                      flexWrap: "wrap",
-                      marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL
+                      flexWrap: "wrap"
                     }}
                     size={AppFontSize.xs}
                     color={colors.secondary.heading}
@@ -255,26 +241,103 @@ const SettingsUserSection = ({ item }) => {
                             color: colors.secondary.paragraph
                           }}
                           time={lastSynced}
-                        />
+                        />{" "}
+                        ago
                         {isOffline ? ` (${strings.offline()})` : ""}
                       </>
                     ) : (
                       strings.never()
-                    )}{" "}
-                    <Icon
-                      name="checkbox-blank-circle"
-                      size={11}
-                      allowFontScaling
-                      color={
-                        !user || lastSyncStatus === SyncStatus.Failed
-                          ? colors.error.icon
-                          : isOffline
-                          ? colors.static.orange
-                          : colors.success.icon
-                      }
-                    />
+                    )}
                   </Paragraph>
                 </View>
+              </View>
+            </View>
+
+            <View
+              style={{
+                paddingVertical: DefaultAppStyles.GAP_SMALL,
+                gap: DefaultAppStyles.GAP_VERTICAL,
+                borderRadius: 10
+              }}
+            >
+              <View
+                style={{
+                  gap: DefaultAppStyles.GAP_SMALL,
+                  paddingHorizontal: DefaultAppStyles.GAP_SMALL
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    width: "100%",
+                    justifyContent: "space-between"
+                  }}
+                >
+                  <Paragraph size={AppFontSize.xxs}>
+                    {strings.storage()}
+                  </Paragraph>
+                  <Paragraph size={AppFontSize.xxs}>
+                    50/100MB {strings.used()}
+                  </Paragraph>
+                </View>
+                <View
+                  style={{
+                    backgroundColor: colors.secondary.background,
+                    width: "100%",
+                    height: 5,
+                    borderRadius: 10
+                  }}
+                >
+                  <View
+                    style={{
+                      backgroundColor: colors.static.black,
+                      height: 5,
+                      width: `${(used / total) * 100}%`,
+                      borderRadius: 10
+                    }}
+                  />
+                </View>
+              </View>
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  width: "100%",
+                  paddingHorizontal: DefaultAppStyles.GAP_SMALL,
+                  borderRadius: 10
+                }}
+              >
+                <View>
+                  <Paragraph size={AppFontSize.sm}>
+                    {strings.freePlan()}
+                  </Paragraph>
+                  <Paragraph
+                    color={colors.secondary.paragraph}
+                    size={AppFontSize.xxxs}
+                  >
+                    {strings.viewAllLimits()}{" "}
+                    <AppIcon name="information" size={AppFontSize.xxxs} />
+                  </Paragraph>
+                </View>
+
+                <Button
+                  title={strings.upgradePlan()}
+                  onPress={() => {
+                    Navigation.navigate("PayWall", {
+                      context: "logged-in",
+                      canGoBack: true
+                    });
+                  }}
+                  type="accent"
+                  fontSize={AppFontSize.xs}
+                  style={{
+                    paddingHorizontal: DefaultAppStyles.GAP_SMALL,
+                    height: "auto",
+                    paddingVertical: DefaultAppStyles.GAP_SMALL
+                  }}
+                />
               </View>
             </View>
           </View>
