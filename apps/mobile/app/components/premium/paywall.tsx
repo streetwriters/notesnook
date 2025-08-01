@@ -50,6 +50,7 @@ import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { FeaturesList } from "./features-list";
+import { getFeaturesTable } from "@notesnook/common";
 
 const Steps = {
   select: 1,
@@ -60,23 +61,23 @@ const Steps = {
 
 const PlanOverView = {
   free: {
-    storage: `100 MB`,
+    storage: `50 MB/mo`,
     fileSize: `1 MB`,
     hdImages: false
   },
   essential: {
     storage: `1 GB`,
-    fileSize: `25 MB`,
+    fileSize: `100 MB/mo`,
     hdImages: false
   },
   pro: {
-    storage: `10 GB`,
-    fileSize: `25 MB`,
+    storage: `10 GB/mo`,
+    fileSize: `1 GB`,
     hdImages: true
   },
   believer: {
-    storage: `50 GB`,
-    fileSize: `25 MB`,
+    storage: `25 GB/mo`,
+    fileSize: `5 GB`,
     hdImages: true
   }
 };
@@ -653,10 +654,37 @@ const ComparePlans = React.memo(
           flexDirection: "column"
         }}
       >
-        {Object.keys(FeaturesList).map((key, keyIndex) => {
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            width: "100%",
+            gap: 10
+          }}
+        >
+          {["Features", "Free", "Essential", "Pro", "Believer"].map(
+            (plan, index) => (
+              <View
+                style={{
+                  width: index === 0 ? 150 : 120,
+                  paddingHorizontal: 16,
+                  paddingVertical: 12,
+                  backgroundColor:
+                    index === 0 ? colors.secondary.background : undefined,
+                  borderBottomWidth: index === 0 ? 1 : undefined,
+                  borderBottomColor: colors.primary.border
+                }}
+              >
+                <Heading size={AppFontSize.sm}>{plan}</Heading>
+              </View>
+            )
+          )}
+        </View>
+
+        {getFeaturesTable().map((item, keyIndex) => {
           return (
             <View
-              key={key}
+              key={keyIndex + "feature-item"}
               style={{
                 flexDirection: "row",
                 alignItems: "center",
@@ -664,10 +692,7 @@ const ComparePlans = React.memo(
                 gap: 10
               }}
             >
-              {[
-                key === "Plans" ? "" : key,
-                ...FeaturesList[key as keyof typeof FeaturesList]
-              ].map((item, index) => (
+              {item.map((featureItem, index) => (
                 <View
                   style={{
                     width: index === 0 ? 150 : 120,
@@ -678,24 +703,39 @@ const ComparePlans = React.memo(
                     borderBottomWidth: index === 0 ? 1 : undefined,
                     borderBottomColor: colors.primary.border
                   }}
-                  key={item + key + index}
+                  key={item[0] + index}
                 >
-                  {item === true ? (
-                    <Icon
-                      color={colors.primary.accent}
-                      size={AppFontSize.sm}
-                      name="check"
-                    />
-                  ) : item === false ? (
-                    <Icon
-                      size={AppFontSize.sm}
-                      color={colors.static.red}
-                      name="close"
-                    />
-                  ) : keyIndex === 0 ? (
-                    <Heading size={AppFontSize.sm}>{item}</Heading>
+                  {typeof featureItem === "string" ? (
+                    <Heading size={AppFontSize.sm}>
+                      {featureItem as string}
+                    </Heading>
                   ) : (
-                    <Paragraph>{item}</Paragraph>
+                    <>
+                      {typeof featureItem.caption === "string" ||
+                      typeof featureItem.caption === "number" ? (
+                        <Paragraph>
+                          {featureItem.caption === "infinity"
+                            ? "∞"
+                            : featureItem.caption}
+                        </Paragraph>
+                      ) : typeof featureItem.caption === "boolean" ? (
+                        <>
+                          {featureItem.caption === true ? (
+                            <Icon
+                              color={colors.primary.accent}
+                              size={AppFontSize.sm}
+                              name="check"
+                            />
+                          ) : (
+                            <Icon
+                              size={AppFontSize.sm}
+                              color={colors.static.red}
+                              name="close"
+                            />
+                          )}
+                        </>
+                      ) : null}
+                    </>
                   )}
                 </View>
               ))}
