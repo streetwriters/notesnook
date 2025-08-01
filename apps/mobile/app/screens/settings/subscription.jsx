@@ -21,7 +21,6 @@ import { strings } from "@notesnook/intl";
 import React from "react";
 import { Linking, Platform, View } from "react-native";
 import Config from "react-native-config";
-import { Button } from "../../components/ui/button";
 import { usePricing } from "../../hooks/use-pricing";
 import {
   eSendEvent,
@@ -32,8 +31,6 @@ import PremiumService from "../../services/premium";
 import { useUserStore } from "../../stores/use-user-store";
 import { SUBSCRIPTION_STATUS } from "../../utils/constants";
 import { eOpenPremiumDialog } from "../../utils/events";
-import { AppFontSize } from "../../utils/size";
-import { DefaultAppStyles } from "../../utils/styles";
 export const Subscription = () => {
   const user = useUserStore((state) => state.user);
   const monthlyPlan = usePricing("monthly");
@@ -95,7 +92,7 @@ export const Subscription = () => {
 
   return (
     <View>
-      {isNotPro ? (
+      {/* {isNotPro ? (
         <Button
           height={40}
           style={{
@@ -121,9 +118,9 @@ export const Subscription = () => {
               : `${strings.getPro()} (${getPrice() || "$4.49"} / mo)`
           }
         />
-      ) : null}
+      ) : null} */}
 
-      {subscriptionProviderInfo &&
+      {/* {subscriptionProviderInfo &&
       user.subscription?.type !== SUBSCRIPTION_STATUS.PREMIUM_EXPIRED &&
       user.subscription?.type !== SUBSCRIPTION_STATUS.BASIC ? (
         <Button
@@ -143,7 +140,7 @@ export const Subscription = () => {
           height={30}
           type="secondaryAccented"
         />
-      ) : null}
+      ) : null} */}
     </View>
   );
 };

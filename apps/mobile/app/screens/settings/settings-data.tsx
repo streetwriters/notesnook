@@ -81,14 +81,15 @@ export const settingsGroups: SettingSection[] = [
         hidden: (current) => !current,
         name: (current) => {
           const user = (current as User) || useUserStore.getState().user;
-          if (!user) return strings.subscribeToPro();
+          if (!user) return strings.upgradePlan();
           const isBasic = user.subscription?.type === SUBSCRIPTION_STATUS.BASIC;
           const isTrial = user.subscription?.type === SUBSCRIPTION_STATUS.TRIAL;
           return isBasic || !user.subscription?.type
-            ? strings.subscribeToPro()
+            ? strings.upgradePlan()
             : isTrial
             ? strings.trialStarted()
             : strings.subDetails();
+          ``;
         },
         type: "component",
         component: "subscription",
