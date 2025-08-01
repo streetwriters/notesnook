@@ -55,6 +55,29 @@ function PublishView(props: PublishViewProps) {
   const unpublishNote = useStore((store) => store.unpublish);
 
   useEffect(() => {
+    if (!publishId) return;
+    (async () => {
+      const monographId = db.monographs.monograph(note.id);
+      if (monographId) {
+        const monograph = await db.monographs.get(monographId);
+        if (!monograph) return;
+        setPublishId(monographId);
+        setIsPasswordProtected(!!monograph.password);
+        setSelfDestruct(!!monograph.selfDestruct);
+
+        if (monograph.password) {
+          const password = await db.monographs.decryptPassword(
+            monograph.password
+          );
+          if (passwordInput.current) {
+            passwordInput.current.value = password;
+          }
+        }
+      }
+    })();
+  }, [publishId, isPublishing]);
+
+  useEffect(() => {
     const fileDownloadedEvent = EV.subscribe(
       EVENTS.fileDownloaded,
       ({ total, current, groupId }) => {
@@ -110,7 +133,13 @@ function PublishView(props: PublishViewProps) {
         ) : (
           <>
             {publishId ? (
-              <Flex mt={1} sx={{ flexDirection: "column", overflow: "hidden" }}>
+              <Flex
+                mt={1}
+                sx={{
+                  flexDirection: "column",
+                  overflow: "hidden"
+                }}
+              >
                 <Text
                   variant="body"
                   sx={{ fontWeight: "bold", color: "paragraph" }}
@@ -154,7 +183,12 @@ function PublishView(props: PublishViewProps) {
                 </Flex>
               </Flex>
             ) : (
-              <Text variant="body" sx={{ color: "paragraph" }}>
+              <Text
+                variant="body"
+                sx={{
+                  color: "paragraph"
+                }}
+              >
                 {strings.monographDesc()}
               </Text>
             )}
