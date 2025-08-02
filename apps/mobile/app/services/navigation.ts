@@ -166,6 +166,20 @@ function closeDrawer() {
   fluidTabsRef.current?.closeDrawer();
 }
 
+function resetRootState() {
+  const state = rootNavigatorRef.getState();
+  const focusedRouteKey = state.routes[state.index].key;
+  const routes = state.routes.filter(
+    (route) => route.name !== "Auth" && route.name !== "Welcome"
+  );
+  const newIndex = routes.findIndex((route) => route.key === focusedRouteKey);
+  rootNavigatorRef.reset({
+    ...state,
+    routes: routes,
+    index: newIndex
+  });
+}
+
 const Navigation = {
   navigate,
   goBack,
@@ -177,7 +191,8 @@ const Navigation = {
   queueRoutesForUpdate,
   routeNeedsUpdate,
   routeNames,
-  routeUpdateFunctions
+  routeUpdateFunctions,
+  resetRootState
 };
 
 export default Navigation;
