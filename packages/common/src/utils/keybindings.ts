@@ -96,7 +96,7 @@ export const hotkeys = {
     type: "hotkeys"
   },
   openCommandPalette: {
-    keys: normalizeKeys(["ctrl+k"]),
+    keys: normalizeKeys(["ctrl+shift+p"]),
     description: "Command palette",
     category: "Navigation",
     type: "hotkeys"
@@ -294,13 +294,13 @@ export const tiptapKeys = {
     type: "tiptap"
   },
   insertInternalLink: {
-    keys: "Mod-Shift-L",
+    keys: "Mod-Shift-K",
     description: "Insert internal link",
     category: "Editor",
     type: "tiptap"
   },
   insertLink: {
-    keys: "Mod-Shift-K",
+    keys: "Mod-k",
     description: "Insert link",
     category: "Editor",
     type: "tiptap"
@@ -330,7 +330,7 @@ export const tiptapKeys = {
     type: "tiptap"
   },
   openSearch: {
-    keys: "Mod-F",
+    keys: "Mod-f",
     description: "Open search",
     category: "Editor",
     type: "tiptap"
