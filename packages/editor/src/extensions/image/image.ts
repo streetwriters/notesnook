@@ -18,7 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Node, nodeInputRule, mergeAttributes } from "@tiptap/core";
-import { hasSameAttributes } from "../../utils/prosemirror.js";
+import {
+  findSelectedNode,
+  hasSameAttributes
+} from "../../utils/prosemirror.js";
 import {
   ImageAlignmentOptions,
   ImageAttachment,
@@ -28,6 +31,7 @@ import { createNodeView } from "../react/index.js";
 import { TextDirections } from "../text-direction/index.js";
 import { ImageComponent } from "./component.js";
 import { tiptapKeys } from "@notesnook/common";
+import { toBlob } from "../../utils/downloader.js";
 
 export interface ImageOptions {
   inline: boolean;
@@ -201,7 +205,41 @@ export const ImageNode = Node.create<ImageOptions>({
   addKeyboardShortcuts() {
     return {
       [tiptapKeys.addImage.keys]: () =>
-        this.editor.storage.openAttachmentPicker?.("image") || true
+        this.editor.storage.openAttachmentPicker?.("image") || true,
+      "Mod-c": () => {
+        if (!this.editor.isActive("image")) return false;
+
+        const imageNode = findSelectedNode(this.editor, "image");
+        if (!imageNode || imageNode.type.name !== "image") return false;
+
+        const { hash, mime } = imageNode.attrs as ImageAttributes;
+        if (!hash || !mime) return false;
+
+        (async () => {
+          try {
+            const imageData = await this.editor.storage.getAttachmentData?.({
+              type: "image",
+              hash
+            });
+            if (typeof imageData !== "string" || !imageData) return;
+
+            const imageBlob = toBlob(imageData, mime);
+            if (!imageBlob) return;
+
+            if (navigator.clipboard && navigator.clipboard.write) {
+              await navigator.clipboard.write([
+                new ClipboardItem({
+                  [imageBlob.type]: imageBlob
+                })
+              ]);
+            }
+          } catch (error) {
+            console.error("Failed to copy image to clipboard:", error);
+          }
+        })();
+
+        return true;
+      }
     };
   }
 });
