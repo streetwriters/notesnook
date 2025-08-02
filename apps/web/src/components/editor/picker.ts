@@ -98,11 +98,14 @@ export async function attachFiles(files: File[]) {
           : [];
   }
 
-  const documents = files.filter((f) => !f.type.startsWith("image/"));
+  const documents = files.filter((f) => !f.type.startsWith("image/") && !f.type.startsWith("audio/"));
+  const audios = files.filter((f) => f.type.startsWith("audio/"));
   const attachments: Attachment[] = [];
-  for (const file of [...images, ...documents]) {
+  for (const file of [...images, ...documents, ...audios]) {
     const attachment = file.type.startsWith("image/")
       ? await pickImage(file)
+      : file.type.startsWith("audio/")
+      ? await pickAudio(file)
       : await pickFile(file);
     if (!attachment) continue;
     attachments.push(attachment);
@@ -128,6 +131,9 @@ export async function reuploadAttachment(
   if (selectedFile.type.startsWith("image/")) {
     const image = await pickImage(selectedFile, options);
     if (!image) return;
+  } else if (selectedFile.type.startsWith("audio/")) {
+    const audio = await pickAudio(selectedFile, options);
+    if (!audio) return;
   } else {
     const file = await pickFile(selectedFile, options);
     if (!file) return;
@@ -182,6 +188,24 @@ async function pickImage(
       mime: file.type,
       size: file.size,
       ...dimensions
+    };
+  } catch (e) {
+    showToast("error", (e as Error).message);
+  }
+}
+
+async function pickAudio(
+  file: File,
+  options?: AddAttachmentOptions
+): Promise<Attachment | undefined> {
+  try {
+    const hash = await addAttachment(file, options);
+    return {
+      type: "audio",
+      filename: file.name,
+      hash,
+      mime: file.type,
+      size: file.size
     };
   } catch (e) {
     showToast("error", (e as Error).message);

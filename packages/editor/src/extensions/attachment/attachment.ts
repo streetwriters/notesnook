@@ -83,7 +83,14 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
   parseHTML() {
     return [
       {
-        tag: "span[data-hash]"
+        tag: "span[data-hash]",
+        getAttrs: (dom) => {
+          const element = dom as HTMLElement;
+          if (element.dataset.mime?.startsWith("audio/")) {
+            return false;
+          }
+          return {};
+        }
       }
     ];
   },

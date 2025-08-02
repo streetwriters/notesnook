@@ -25,8 +25,11 @@ import { Icons } from "../../toolbar/icons.js";
 import { ReactNodeViewProps } from "../react/index.js";
 import { ToolbarGroup } from "../../toolbar/components/toolbar-group.js";
 import { DesktopOnly } from "../../components/responsive/index.js";
+import { formatBytes } from "../../utils/format-bytes.js";
 
-export function AttachmentComponent(props: ReactNodeViewProps<FileAttachment>) {
+export function AttachmentComponent(
+  props: ReactNodeViewProps<FileAttachment>
+) {
   const { editor, node, selected } = props;
   const { filename, size, progress } = node.attrs;
   const elementRef = useRef<HTMLSpanElement>();
@@ -110,16 +113,4 @@ export function AttachmentComponent(props: ReactNodeViewProps<FileAttachment>) {
       </DesktopOnly>
     </Box>
   );
-}
-
-function formatBytes(bytes: number, decimals = 1) {
-  if (bytes === 0) return "0B";
-
-  const k = 1024;
-  const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ["B", "K", "M", "G", "T", "P", "E", "Z", "Y"];
-
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + sizes[i];
 }
