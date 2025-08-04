@@ -17,18 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { FeatureId, FeatureResult } from "@notesnook/common";
+import { FeatureResult } from "@notesnook/common";
 import { showToast } from "../utils/toast";
-import { BuyDialog } from "../dialogs/buy-dialog";
+import { UpgradeDialog } from "../dialogs/buy-dialog/upgrade-dialog";
 
-export function showFeatureNotAllowedToast<TId extends FeatureId>(
-  result: FeatureResult<TId> | undefined
+export function showFeatureNotAllowedToast(
+  result: FeatureResult<any> | undefined
 ) {
   if (!result) return;
   showToast("error", result.error, [
     {
       text: "Upgrade",
-      onClick: () => BuyDialog.show({ plan: result.availableOn })
+      onClick: () =>
+        UpgradeDialog.show({
+          feature: result
+        })
     }
   ]);
 }
