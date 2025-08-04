@@ -44,6 +44,7 @@ import { getId } from "@notesnook/core";
 import { PersistStorage } from "zustand/middleware";
 import {
   getFormattedHistorySessionDate,
+  isFeatureAvailable,
   TabHistory,
   TabSessionHistory
 } from "@notesnook/common";
@@ -1367,20 +1368,31 @@ async function waitForSync() {
 }
 
 async function addNotebook(note: Note, context?: Context) {
+  const defaultNotebook = db.settings.getDefaultNotebook();
+  if (
+    context?.type !== "notebook" &&
+    defaultNotebook &&
+    !(await isFeatureAvailable("defaultNotebookAndTag")).isAllowed
+  )
+    return;
+
   const notebookId =
-    context && context.type === "notebook"
-      ? context.id
-      : db.settings.getDefaultNotebook();
+    context?.type === "notebook" ? context.id : defaultNotebook;
   if (!notebookId) return;
 
   await db.notes.addToNotebook(notebookId, note.id);
 }
 
 async function addTag(note: Note, context?: Context) {
-  const tagId =
-    context && context.type === "tag"
-      ? context.id
-      : db.settings.getDefaultTag();
+  const defaultTag = db.settings.getDefaultTag();
+  if (
+    context?.type !== "tag" &&
+    defaultTag &&
+    !(await isFeatureAvailable("defaultNotebookAndTag")).isAllowed
+  )
+    return;
+
+  const tagId = context?.type === "tag" ? context.id : defaultTag;
   if (!tagId) return;
 
   await db.relations.add(
