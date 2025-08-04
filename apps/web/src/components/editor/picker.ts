@@ -34,7 +34,7 @@ import {
 import Config from "../../utils/config";
 import { compressImage, FileWithURI } from "../../utils/image-compressor";
 import { ImageCompressionOptions } from "../../stores/setting-store";
-import { isFeatureAvailable } from "@notesnook/common";
+import { checkFeature } from "../../common";
 
 export async function insertAttachments(type = "*/*") {
   const files = await showFilePicker({
@@ -129,8 +129,7 @@ async function pickFile(
   options?: AddAttachmentOptions
 ): Promise<Attachment | undefined> {
   try {
-    const feature = await isFeatureAvailable("fileSize", file.size);
-    if (!feature.isAllowed) throw new Error(feature.error);
+    if (!(await checkFeature("fileSize", file.size))) return;
 
     const hash = await addAttachment(file, options);
     return {
@@ -155,8 +154,7 @@ async function pickImage(
   options?: AddAttachmentOptions
 ): Promise<Attachment | undefined> {
   try {
-    const feature = await isFeatureAvailable("fileSize", file.size);
-    if (!feature.isAllowed) throw new Error(feature.error);
+    if (!(await checkFeature("fileSize", file.size))) return;
 
     const hash = await addAttachment(file, options);
     const dimensions = await getImageDimensions(file);
