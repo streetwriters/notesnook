@@ -85,7 +85,10 @@ export default class Trash {
 
   async cleanup() {
     const duration = this.db.settings.getTrashCleanupInterval();
-    if (duration === -1 || !duration) return;
+    if (duration === -1 || !duration) {
+      await this.buildCache();
+      return;
+    }
 
     const maxMs = dayjs()
       .startOf("day")
