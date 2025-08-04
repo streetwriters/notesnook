@@ -44,8 +44,6 @@ import { useEditorStore } from "./editor-store";
 import { useEditorManager } from "../components/editor/manager";
 import { exitFullscreen } from "../utils/fullscreen";
 import { NavigationTabItem } from "../components/navigation-menu";
-import { isFeatureAvailable } from "@notesnook/common";
-import { showFeatureNotAllowedToast } from "../common/toasts";
 
 type SyncState =
   | "synced"
@@ -258,9 +256,6 @@ class AppStore extends BaseStore<AppStore> {
       this.refreshNavItems();
       showToast("success", strings.shortcutRemoved());
     } else {
-      const result = await isFeatureAvailable("shortcuts");
-      if (!result.isAllowed) return showFeatureNotAllowedToast(result);
-
       await db.shortcuts.add({
         itemType: item.type,
         itemId: item.id
