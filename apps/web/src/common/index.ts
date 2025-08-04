@@ -20,9 +20,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import Config from "../utils/config";
 import { hashNavigate, getCurrentHash } from "../navigation";
 import { db } from "./db";
-import { isFeatureAvailable, sanitizeFilename } from "@notesnook/common";
+import {
+  areFeaturesAvailable,
+  FeatureId,
+  FeatureResult,
+  isFeatureAvailable,
+  sanitizeFilename
+} from "@notesnook/common";
 import { useStore as useUserStore } from "../stores/user-store";
-import { HomePage, useStore as useSettingStore } from "../stores/setting-store";
+import { useStore as useAppStore } from "../stores/app-store";
+import {
+  HomePage,
+  ImageCompressionOptions,
+  useStore as useSettingStore
+} from "../stores/setting-store";
 import { showToast } from "../utils/toast";
 import { SUBSCRIPTION_STATUS } from "./constants";
 import { readFile, showFilePicker } from "../utils/file-picker";
@@ -50,6 +61,8 @@ import { ConfirmDialog, showLogoutConfirmation } from "../dialogs/confirm";
 import { Home } from "../components/icons";
 import { MenuItem } from "@notesnook/ui";
 import { showFeatureNotAllowedToast } from "./toasts";
+import { UpgradeDialog } from "../dialogs/buy-dialog/upgrade-dialog";
+import { setToolbarPreset } from "./toolbar-config";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
@@ -459,7 +472,8 @@ export async function logout() {
 
 export function createSetDefaultHomepageMenuItem(
   id: string,
-  type: HomePage["type"]
+  type: HomePage["type"],
+  availability: FeatureResult<"customHomepage">
 ) {
   const homepage = useSettingStore.getState().homepage;
   return {
@@ -467,15 +481,89 @@ export function createSetDefaultHomepageMenuItem(
     type: "button",
     title: strings.setAsHomepage(),
     isChecked: homepage?.id === id && homepage?.type === type,
-    onClick: async () => {
+    premium: !availability.isAllowed,
+    onClick: withFeatureCheck(availability, async () => {
       if (homepage?.id === id && homepage?.type === type)
         useSettingStore.getState().setHomepage();
       else {
-        const result = await isFeatureAvailable("customHomepage");
-        if (!result.isAllowed) return showFeatureNotAllowedToast(result);
         useSettingStore.getState().setHomepage({ id, type });
       }
-    },
+    }),
     icon: Home.path
   } as MenuItem;
+}
+
+export async function checkFeature<TId extends FeatureId>(
+  idOrFeature: TId | FeatureResult<TId>,
+  { type = "dialog", value }: { value?: number; type?: "toast" | "dialog" } = {}
+) {
+  const result =
+    typeof idOrFeature === "object"
+      ? idOrFeature
+      : await isFeatureAvailable(idOrFeature, value);
+  if (!result.isAllowed) {
+    type === "dialog"
+      ? await UpgradeDialog.show({ feature: result })
+      : showFeatureNotAllowedToast(result);
+    return false;
+  }
+  return true;
+}
+
+export function withFeatureCheck<TId extends FeatureId>(
+  idOrFeature: TId | FeatureResult<TId> | undefined,
+  callback: (...args: any[]) => Promise<void> | void
+) {
+  return async (...args: any[]) => {
+    if (idOrFeature && !(await checkFeature(idOrFeature))) return;
+    await callback(...args);
+  };
+}
+
+async function resetFeatures() {
+  const features = await areFeaturesAvailable([
+    "customHomepage",
+    "customToolbarPreset",
+    "markdownShortcuts",
+    "fontLigatures",
+    "fullQualityImages",
+    "defaultSidebarTab",
+    "disableTrashCleanup",
+    "syncControls",
+    "fullOfflineMode"
+  ]);
+
+  if (!features.customHomepage.isAllowed)
+    useSettingStore.getState().setHomepage();
+
+  if (!features.customToolbarPreset.isAllowed)
+    await setToolbarPreset("default");
+
+  if (!features.markdownShortcuts.isAllowed)
+    useSettingStore.getState().toggleMarkdownShortcuts(false);
+
+  if (!features.fontLigatures.isAllowed)
+    useSettingStore.getState().toggleFontLigatures(false);
+
+  if (!features.fullQualityImages.isAllowed)
+    useSettingStore
+      .getState()
+      .setImageCompression(ImageCompressionOptions.ENABLE);
+
+  if (!features.defaultSidebarTab.isAllowed)
+    useSettingStore.getState().setDefaultSidebarTab("home");
+
+  if (!features.disableTrashCleanup.isAllowed)
+    useSettingStore.getState().setTrashCleanupInterval(7);
+
+  if (!features.syncControls.isAllowed) {
+    useAppStore.setState({
+      isSyncEnabled: true,
+      isAutoSyncEnabled: true,
+      isRealtimeSyncEnabled: true
+    });
+  }
+
+  if (!features.fullOfflineMode.isAllowed)
+    useSettingStore.getState().toggleFullOfflineMode(false);
 }
