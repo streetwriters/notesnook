@@ -27,10 +27,13 @@ import {
 import { usePromise } from "./use-promise.js";
 
 export function useIsFeatureAvailable<TId extends FeatureId>(
-  id: TId,
+  id: TId | undefined,
   value?: number
 ) {
-  const result = usePromise(() => isFeatureAvailable(id, value), [id, value]);
+  const result = usePromise(
+    () => (id ? isFeatureAvailable(id, value) : undefined),
+    [id, value]
+  );
   return result.status === "fulfilled" ? result.value : undefined;
 }
 
@@ -39,11 +42,11 @@ export function useAreFeaturesAvailable<TIds extends FeatureId[]>(
   values: number[] = []
 ) {
   const [result, setResult] =
-    useState<Record<TIds[number], FeatureResult<TIds[number]>>>();
+    useState<{ [K in TIds[number]]: FeatureResult<K> }>();
 
   useEffect(() => {
     areFeaturesAvailable(ids, values).then((result) => setResult(result));
-  }, []);
+  }, [ids, values]);
 
   return result;
 }
