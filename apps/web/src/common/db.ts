@@ -22,6 +22,7 @@ import { DatabasePersistence, NNStorage } from "../interfaces/storage";
 import { logger } from "../utils/logger";
 import {
   database,
+  getFeature,
   getFeatureLimit,
   isFeatureAvailable
 } from "@notesnook/common";
@@ -99,7 +100,7 @@ async function initializeDatabase(persistence: DatabasePersistence) {
     compressor: () =>
       import("../utils/compressor").then(({ Compressor }) => new Compressor()),
     maxNoteVersions: async () => {
-      const limit = await getFeatureLimit("maxNoteVersions");
+      const limit = await getFeatureLimit(getFeature("maxNoteVersions"));
       return typeof limit.caption === "number" ? limit.caption : undefined;
     },
     batchSize: 100
