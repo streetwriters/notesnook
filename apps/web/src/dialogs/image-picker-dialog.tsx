@@ -21,11 +21,11 @@ import { useEffect, useState } from "react";
 import Dialog from "../components/dialog";
 import { ScrollContainer } from "@notesnook/ui";
 import { Flex, Image, Label, Text } from "@theme-ui/components";
-import { formatBytes, isFeatureAvailable } from "@notesnook/common";
+import { formatBytes } from "@notesnook/common";
 import { compressImage, FileWithURI } from "../utils/image-compressor";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
-import { showFeatureNotAllowedToast } from "../common/toasts";
+import { checkFeature } from "../common";
 
 export type ImagePickerDialogProps = BaseDialogProps<false | File[]> & {
   images: File[];
@@ -132,8 +132,8 @@ export const ImagePickerDialog = DialogManager.register(
             defaultChecked={compress}
             checked={compress}
             onChange={async () => {
-              const result = await isFeatureAvailable("fullQualityImages");
-              if (!result.isAllowed) return showFeatureNotAllowedToast(result);
+              if (!(await checkFeature("fullQualityImages", { type: "toast" })))
+                return;
               setCompress((s) => !s);
             }}
           />
