@@ -17,241 +17,593 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Text, Flex, Button, Image } from "@theme-ui/components";
-import { Loading } from "../../components/icons";
-import Nomad from "../../assets/nomad.svg?url";
-import { Period, Plan, Price } from "./types";
-import { usePlans } from "./plans";
-import { useEffect, useState } from "react";
-import { getCurrencySymbol, parseAmount } from "./helpers";
+import { Text, Flex, Button, Image, Link, Box } from "@theme-ui/components";
+import {
+  Check,
+  CheckCircleOutline,
+  Cross,
+  Loading
+} from "../../components/icons";
+import { Period, Plan } from "./types";
+import { PERIOD_METADATA, PLAN_METADATA, usePlans } from "./plans";
+import { useState } from "react";
+import { FEATURE_HIGHLIGHTS, getCurrencySymbol } from "./helpers";
 import { strings } from "@notesnook/intl";
 import { SubscriptionPlan } from "@notesnook/core";
+import Cameron from "../../assets/testimonials/cameron.jpg";
+import AndroidPolice from "../../assets/featured/android-police.svg";
+import AppleInsider from "../../assets/featured/appleinsider.svg";
+import Hackernoon from "../../assets/featured/hackernoon.png";
+import ItsFoss from "../../assets/featured/itsfoss.webp";
+import XDA from "../../assets/featured/xda.svg";
+import PrivacyGuides from "../../assets/featured/privacy-guides.svg";
+import Techlore from "../../assets/featured/techlore.svg";
+import TheVerge from "../../assets/featured/theverge.svg";
+import FreedomPress from "../../assets/featured/freedom-press.svg";
+import {
+  getFeature,
+  getFeaturesTable,
+  planToAvailability
+} from "@notesnook/common";
+import { FeatureCaption } from "./feature-caption";
 
 type PlansListProps = {
   selectedPlan: SubscriptionPlan;
-  onPlanSelected: (plan: Plan, price: Price) => void;
-  onPlansLoaded?: (plans: Plan[]) => void;
+  onPlanSelected: (plan: Plan) => void;
 };
-const periods: { id: Period; title: string }[] = [
+
+const testimonial = {
+  username: "camflint",
+  image: Cameron,
+  name: "Cameron Flint",
+  link: "https://twitter.com/camflint/status/1481061416434286592",
+  text: "I'm pretty impressed at the progress @notesnook are making on their app — particularly in respect to how performant the app runs and behaves, despite the overhead of end-to-end encrypting user data."
+};
+
+const FEATURED_ON = [
   {
-    title: strings.monthly(),
-    id: "monthly"
+    id: "android-police",
+    logo: AndroidPolice,
+    size: 70,
+    filter: {
+      light: `grayscale(1) contrast(100) brightness(1)`
+    },
+    link: "https://www.androidpolice.com/tried-encrypted-all-in-one-productivity-app-blew-my-mind/"
   },
   {
-    title: strings.yearly(),
-    id: "yearly"
+    id: "apple-insider",
+    logo: AppleInsider,
+    link: "https://appleinsider.com/articles/22/08/18/the-best-secure-note-apps-for-ios-ipados-and-macos-to-keep-your-thoughts-private"
   },
   {
-    id: "5-year",
-    title: "5 year"
+    id: "itsfoss",
+    logo: ItsFoss,
+    link: "https://news.itsfoss.com/standard-notes-to-notesnook/"
+  },
+  {
+    id: "Hackernoon",
+    logo: Hackernoon,
+    link: "https://hackernoon.com/top-6-privacy-note-apps-for-linux-and-android-that-actually-sync"
+  },
+  {
+    id: "xda",
+    logo: XDA,
+    size: 100,
+    link: "https://www.xda-developers.com/note-taking-app-is-onenote-on-steroids/"
   }
 ];
+
+const RECOMMENDED_BY = [
+  {
+    id: "privacy-guides",
+    logo: PrivacyGuides,
+    size: 45,
+    link: "https://www.privacyguides.org/en/notebooks/#notesnook"
+  },
+  {
+    id: "techlore",
+    logo: Techlore,
+    size: 45,
+    link: "https://www.youtube.com/watch?v=I9ibGRNjK3E"
+  },
+  {
+    id: "theverge",
+    logo: TheVerge,
+    size: 140,
+    link: "http://www.theverge.com/23942597/notes-text-evernote-onenote-keep-apps"
+  },
+  {
+    id: "freedom-press",
+    logo: FreedomPress,
+    filter: {
+      light: `grayscale(1) contrast(100) brightness(0)`,
+      dark: "brightness(0) invert(1)"
+    },
+    link: "https://freedom.press/digisec/blog/note-taking-security/#notesnook"
+  }
+];
+
 export function PlansList(props: PlansListProps) {
-  const { onPlanSelected, onPlansLoaded, selectedPlan } = props;
+  const { onPlanSelected, selectedPlan } = props;
   const { isLoading, plans, discount, country } = usePlans();
   const [selectedPeriod, setPeriod] = useState<Period>("yearly");
-  console.log({ selectedPlan });
-  useEffect(() => {
-    if (isLoading || !onPlansLoaded) return;
-    onPlansLoaded(plans);
-  }, [isLoading, onPlansLoaded, plans]);
 
   return (
-    <>
-      <Image
+    <Flex sx={{ flexDirection: "column", py: 25, flex: 1, px: 25 }}>
+      {/* <Image
         src={Nomad}
         style={{ flexShrink: 0, width: 150, height: 150, marginTop: 20 }}
-      />
-      <Text variant="heading" mt={4} sx={{ textAlign: "center" }}>
-        Choose a plan
-      </Text>
-      <Text variant="body" mt={1} sx={{ textAlign: "center" }}>
-        {discount ? (
-          <>
-            We are giving a special <b>{discount}% discount</b> to all users
-            from {country}.
-          </>
-        ) : (
-          "Notesnook profits when you purchase a subscription — not by selling your data."
-        )}
-      </Text>
+      /> */}
+      <Flex sx={{ flexDirection: "column", alignSelf: "center" }}>
+        <Text variant="heading" sx={{ textAlign: "center" }}>
+          Select a plan
+        </Text>
+        <Text
+          variant="title"
+          mt={1}
+          sx={{ color: "heading-secondary", textAlign: "center" }}
+        >
+          One subscription for a lifetime of notes.
+        </Text>
+      </Flex>
       <Flex
         sx={{
+          mt: 25,
           bg: "background-secondary",
-          borderRadius: "default",
+          border: "1px solid var(--border)",
+          borderRadius: "100px",
           overflow: "hidden",
-          flexShrink: 0
+          alignSelf: "center"
         }}
       >
-        {periods.map((period) => (
+        {Object.entries(PERIOD_METADATA).map(([id, period]) => (
           <Button
-            key={period.id}
-            variant="secondary"
+            key={id}
+            variant={selectedPeriod === id ? "accent" : "secondary"}
             sx={{
-              bg:
-                selectedPeriod === period.id
-                  ? "background-selected"
-                  : "transparent",
+              bg: selectedPeriod === id ? "accent-selected" : "transparent",
               color:
-                selectedPeriod === period.id ? "accent-selected" : "paragraph",
-              borderRadius: 0,
+                selectedPeriod === id
+                  ? "accentForeground-selected"
+                  : "paragraph",
+              borderRadius: 100,
               py: 1
             }}
-            onClick={() => setPeriod(period.id)}
+            onClick={() => setPeriod(id)}
           >
             {period.title}
           </Button>
         ))}
       </Flex>
-      <Flex mt={2} sx={{ flexDirection: "column", alignSelf: "stretch" }}>
-        {plans.map((plan) => {
-          const price = plan.prices.find((p) => p.period === selectedPeriod);
-          if (!price) return null;
-          // const metadata = PLAN_METADATA[plan.period];
-          return (
-            <Button
-              key={plan.title}
-              disabled={isLoading}
-              data-test-id={`checkout-plan`}
-              variant="secondary"
-              mt={1}
-              // bg="transparent"
-              // sx={
-              //   {
-              //     // bg: selectedPlan?.key === plan.key ? "border" : "transparent",
-              // border:
-              //   selectedPlan?.key === plan.key ? "1px solid var(--accent)" : "none",
-              //   }
-              // }
-              onClick={() => onPlanSelected(plan, price)}
-              sx={{
-                flexShrink: 0,
-                flex: 1,
-                textAlign: "start",
-                alignItems: "center",
-                justifyContent: "space-between",
-                display: "flex",
-                border:
-                  selectedPlan === plan.id
-                    ? "1px solid var(--accent-selected)"
-                    : "none",
-                borderRadius: "default"
-              }}
-            >
-              <Text
-                variant="subtitle"
-                sx={{ fontWeight: "normal" }}
-                data-test-id="title"
+      <Flex
+        mt={2}
+        sx={{
+          flexDirection: "row",
+          gap: 2,
+          alignItems: "center",
+          justifyContent: "center"
+        }}
+      >
+        {plans
+          .filter(
+            (p) =>
+              p.plan !== SubscriptionPlan.EDUCATION &&
+              p.period === selectedPeriod
+          )
+          .map((plan) => {
+            const metadata = PLAN_METADATA[plan.plan];
+            return (
+              <Flex
+                key={plan.id}
+                data-test-id={`checkout-plan`}
+                mt={1}
+                sx={{
+                  maxWidth: 300,
+                  p: 2,
+                  flexShrink: 0,
+                  flex: 1,
+                  textAlign: "start",
+                  display: "flex",
+                  flexDirection: "column",
+                  border: metadata.recommended
+                    ? "2px solid var(--accent)"
+                    : "1px solid var(--border)",
+                  borderRadius: "dialog"
+                }}
               >
-                {plan.title}
-                {/* <br />
+                <Flex
+                  sx={{ justifyContent: "space-between", alignItems: "start" }}
+                >
+                  <Text
+                    variant="title"
+                    sx={{
+                      color: "heading-secondary"
+                    }}
+                    data-test-id="title"
+                  >
+                    {metadata.title}
+                  </Text>{" "}
+                  {metadata.recommended ? (
+                    <Text
+                      variant="subBody"
+                      sx={{
+                        bg: "accent",
+                        color: "accentForeground",
+                        borderRadius: 100,
+                        px: 1,
+                        py: "small"
+                      }}
+                    >
+                      Most popular
+                    </Text>
+                  ) : null}
+                </Flex>
+
                 <Text
                   variant="body"
                   sx={{
-                    fontWeight: "normal",
-                    color: "var(--paragraph-secondary)"
+                    color: "paragraph-secondary"
                   }}
                 >
                   {metadata.subtitle}
-                </Text> */}
-              </Text>
-              {isLoading ? (
-                <Loading />
-              ) : plan.recurring ? (
-                <RecurringPricing plan={plan} price={price} />
-              ) : (
-                <OneTimePricing plan={plan} price={price} />
-              )}
-            </Button>
-          );
-        })}
+                </Text>
+                <Text sx={{ mt: 1 }} variant="body">
+                  {isLoading ? (
+                    <Loading />
+                  ) : plan.recurring ? (
+                    <RecurringPricing plan={plan} />
+                  ) : (
+                    <OneTimePricing plan={plan} />
+                  )}
+                </Text>
+                <Flex
+                  sx={{
+                    flexDirection: "column",
+                    pt: 2,
+                    mt: 1,
+                    gap: 1,
+                    borderTop: "1px solid var(--border)"
+                  }}
+                >
+                  {FEATURE_HIGHLIGHTS.map((feature) => {
+                    const caption =
+                      feature.availability[planToAvailability(plan.plan)]
+                        .caption;
+                    return (
+                      <Flex
+                        key={feature.id}
+                        sx={{ justifyContent: "space-between" }}
+                      >
+                        <Text variant="body">{feature.title}</Text>
+                        <Text
+                          variant="body"
+                          sx={{ color: "paragraph-secondary" }}
+                        >
+                          <FeatureCaption caption={caption} />
+                        </Text>
+                      </Flex>
+                    );
+                  })}
+                </Flex>
+                {selectedPlan === plan.plan ? (
+                  <Flex sx={{ mt: 2, alignItems: "center", gap: 1 }}>
+                    <CheckCircleOutline color="accent" size={16} />
+                    <Text variant="subBody">You are on this plan.</Text>
+                  </Flex>
+                ) : (
+                  <Button
+                    variant={metadata.recommended ? "accent" : "secondary"}
+                    onClick={() => onPlanSelected(plan)}
+                    sx={{ mt: 2 }}
+                  >
+                    Select plan
+                  </Button>
+                )}
+              </Flex>
+            );
+          })}
       </Flex>
-    </>
+
+      <Text variant="body" sx={{ alignSelf: "center", mt: 2 }}>
+        Cancel anytime. {PERIOD_METADATA[selectedPeriod].refundDays}-day
+        money-back guarantee.
+      </Text>
+      <Button
+        variant="tertiary"
+        sx={{ alignSelf: "center", mt: 25 }}
+        onClick={() =>
+          document
+            .getElementById("compare-plans")
+            ?.scrollIntoView({ behavior: "smooth" })
+        }
+      >
+        Compare all plans
+      </Button>
+      <Flex
+        sx={{ alignItems: "center", justifyContent: "center", gap: 4, mt: 50 }}
+      >
+        {FEATURED_ON.map((f) => (
+          <Link key={f.id} href={f.link} title={f.id} target="_blank">
+            <Image
+              src={f.logo}
+              width={f.size || 200}
+              css={`
+                [data-theme="dark"] & {
+                  filter: ${f.filter?.dark || "grayscale(1) invert(1)"};
+                }
+                [data-theme="light"] & {
+                  filter: ${f.filter?.light || "grayscale(1)"};
+                  mix-blend-mode: multiply;
+                }
+              `}
+              sx={{
+                objectFit: "scale-down"
+              }}
+            />
+          </Link>
+        ))}
+      </Flex>
+      <Testimonial />
+      <ComparePlans />
+
+      <Text
+        variant="heading"
+        sx={{ fontSize: "subheading", textAlign: "center", mt: 50 }}
+      >
+        Trusted and recommended by over 200K users
+      </Text>
+      <Flex
+        sx={{ alignItems: "center", justifyContent: "center", gap: 4, mt: 4 }}
+      >
+        {RECOMMENDED_BY.map((f) => (
+          <Link key={f.id} href={f.link} title={f.id} target="_blank">
+            <Image
+              src={f.logo}
+              width={f.size || 200}
+              css={`
+                [data-theme="dark"] & {
+                  filter: ${f.filter?.dark || "grayscale(1) invert(1)"};
+                }
+                [data-theme="light"] & {
+                  filter: ${f.filter?.light || "grayscale(1)"};
+                  mix-blend-mode: multiply;
+                }
+              `}
+              sx={{
+                objectFit: "scale-down"
+              }}
+            />
+          </Link>
+        ))}
+      </Flex>
+      <Button
+        variant="accent"
+        sx={{ alignSelf: "center", mt: 2 }}
+        onClick={() =>
+          document
+            .getElementById("compare-plans")
+            ?.scrollIntoView({ behavior: "smooth" })
+        }
+      >
+        Subscribe to Pro
+      </Button>
+    </Flex>
   );
 }
 
 type PricingProps = {
   plan: Plan;
-  price: Price;
 };
 function RecurringPricing(props: PricingProps) {
-  const { plan, price } = props;
-  // const price = plan.prices.find((p) => p.period === period);
-  // if (!price) return null;
-  const monthPrice = plan.prices.find(
-    (p) => p.period === "monthly" && price.period !== p.period
-  );
+  const { plan } = props;
+  const isZero = plan.price.gross === 0;
+  const monthlyPrice = toMonthlyPrice(plan.price.gross, plan.period);
   return (
-    <Text
-      sx={{ flexShrink: 0, fontSize: "subBody", textAlign: "end" }}
-      variant="body"
-    >
-      {/* {plan.originalPrice && plan.originalPrice.gross !== plan.price.gross && (
-        <Text
-          sx={{
-            textDecorationLine: "line-through",
-            fontSize: "body",
-            color: "var(--paragraph-secondary)"
-          }}
-        >
-          {getCurrencySymbol(plan.currency)}
-          {plan.originalPrice.gross}
-        </Text>
-      )} */}
-      {/* {monthPrice && (
-        <Text
-          variant="subBody"
-          sx={{
-            textDecorationLine: "line-through",
-            color: "var(--paragraph-secondary)"
-          }}
-        >
-          {getCurrencySymbol(price.currency)}
-          {monthPrice.gross}
-        </Text>
-      )} */}
-      <Text as="div" sx={{ fontSize: "subtitle", fontWeight: "bold" }}>
-        {monthPrice && monthPrice.subtotal < price.subtotal && (
+    <>
+      {plan.originalPrice && plan.originalPrice.gross !== plan.price.gross ? (
+        <Flex sx={{ justifyContent: "space-between" }}>
           <Text
-            variant="subBody"
             sx={{
               textDecorationLine: "line-through",
-              color: "var(--paragraph-secondary)",
-              fontWeight: "body"
+              fontSize: "subtitle",
+              color: "var(--paragraph-secondary)"
             }}
           >
-            {getCurrencySymbol(price.currency)}
-            {monthPrice.subtotal}
+            {getCurrencySymbol(plan.currency)}
+            {toMonthlyPrice(plan.originalPrice.gross, plan.period)}
           </Text>
-        )}{" "}
-        {getCurrencySymbol(price.currency)}
-        {price.subtotal}
-        /month
-      </Text>
-      {parseAmount(price.subtotal)?.amount === 0 ? null : (
-        <Text as="div" variant="subBody">
-          billed {formatRecurringPeriod(price.period)}
-        </Text>
+          {plan.discount?.type === "regional" ? (
+            <Text
+              variant="subBody"
+              sx={{
+                bg: "shade",
+                color: "accent",
+                borderRadius: 100,
+                px: 1,
+                py: "small"
+              }}
+            >
+              {plan.discount?.amount}% off in {plan.country}
+            </Text>
+          ) : null}
+        </Flex>
+      ) : (
+        <br />
       )}
-    </Text>
+      <Text variant="heading" sx={{ fontWeight: "normal", fontSize: "2em" }}>
+        {getCurrencySymbol(plan.currency)}
+        {monthlyPrice}{" "}
+        {isZero ? (
+          ""
+        ) : (
+          <Text sx={{ fontSize: "title", color: "paragraph-secondary" }}>
+            / month
+          </Text>
+        )}
+      </Text>
+      <Text as="div" variant="subBody">
+        {isZero ? (
+          "forever"
+        ) : plan.period === "monthly" ? (
+          ""
+        ) : (
+          <>
+            billed {formatRecurringPeriod(plan.period)} at{" "}
+            {getCurrencySymbol(plan.currency)}
+            {plan.price.gross}
+          </>
+        )}
+      </Text>
+    </>
   );
 }
 
 function OneTimePricing(props: PricingProps) {
-  const { price } = props;
+  const { plan } = props;
   return (
-    <Text
-      sx={{ flexShrink: 0, fontSize: "subBody", textAlign: "end" }}
-      variant="body"
-    >
+    <>
       <Text as="div" sx={{ fontSize: "subtitle", fontWeight: "bold" }}>
-        {getCurrencySymbol(price.currency)}
-        {price.subtotal}
+        {getCurrencySymbol(plan.currency)}
+        {plan.price.gross}
       </Text>
       <Text as="div" variant="subBody">
-        {formatOneTimePeriod(price.period)}
+        {formatOneTimePeriod(plan.period)}
       </Text>
-    </Text>
+    </>
+  );
+}
+
+const rows = getFeaturesTable();
+function ComparePlans() {
+  return (
+    <Flex
+      sx={{
+        flexDirection: "column",
+        mt: 50,
+        // alignSelf: "center",
+        bg: "background-secondary",
+        border: "1px solid var(--border)",
+        borderRadius: "dialog",
+        p: 50
+      }}
+    >
+      <Text
+        variant="title"
+        sx={{ alignSelf: "center", fontSize: "heading", mb: 25 }}
+        id="compare-plans"
+      >
+        Compare plans
+      </Text>
+      <table
+        style={{
+          tableLayout: "fixed",
+          borderCollapse: "collapse"
+        }}
+        cellPadding={0}
+        cellSpacing={0}
+      >
+        <thead>
+          <Box
+            as="tr"
+            sx={{
+              height: 30,
+              th: { borderBottom: "1px solid var(--separator)" }
+            }}
+          >
+            {[
+              { id: "id", title: "", width: "5%" },
+              ...[
+                SubscriptionPlan.FREE,
+                SubscriptionPlan.ESSENTIAL,
+                SubscriptionPlan.PRO,
+                SubscriptionPlan.BELIEVER
+              ].map((p) => ({
+                id: p,
+                title: PLAN_METADATA[p].title,
+                width: "20%"
+              }))
+            ].map((column) =>
+              !column.title ? (
+                <th key={column.id} />
+              ) : (
+                <Box
+                  as="th"
+                  key={column.id}
+                  sx={{
+                    width: column.width,
+                    px: 1,
+                    mb: 2,
+                    textAlign: "center"
+                  }}
+                >
+                  <Text variant="subtitle" sx={{ textAlign: "center" }}>
+                    {column.title}
+                  </Text>
+                </Box>
+              )
+            )}
+          </Box>
+        </thead>
+        <tbody>
+          {rows.map((feature) => (
+            <Box key={feature[0]} as="tr" sx={{ height: 30 }}>
+              <Text
+                as="td"
+                variant="body"
+                sx={{ overflow: "hidden", whiteSpace: "nowrap" }}
+              >
+                {feature[0]}
+              </Text>
+              {feature.slice(1).map((limit, index) => (
+                <Text
+                  key={index}
+                  as="td"
+                  variant="body"
+                  sx={{ textAlign: "center" }}
+                >
+                  <FeatureCaption caption={(limit as any).caption} />
+                </Text>
+              ))}
+            </Box>
+          ))}
+        </tbody>
+      </table>
+    </Flex>
+  );
+}
+
+function Testimonial() {
+  return (
+    <Flex sx={{ flexDirection: "column", width: "40%", alignSelf: "center" }}>
+      <Text
+        variant="body"
+        sx={{
+          fontSize: "body",
+          color: "paragraph-secondary",
+          mt: 5,
+          textAlign: "center"
+        }}
+      >
+        {testimonial.text} —{" "}
+        <Link
+          sx={{ fontStyle: "italic", color: "paragraph-secondary" }}
+          href={testimonial.link}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          source
+        </Link>
+      </Text>
+      <Flex mt={2} sx={{ alignItems: "center", justifyContent: "center" }}>
+        <Image src={testimonial.image} sx={{ borderRadius: 50, width: 40 }} />
+        <Flex ml={2} sx={{ flexDirection: "column" }}>
+          <Text variant="body" sx={{ fontSize: 14, fontWeight: "bold" }}>
+            {testimonial.name}
+          </Text>
+          <Text variant="subBody">@{testimonial.username}</Text>
+        </Flex>
+      </Flex>
+    </Flex>
   );
 }
 
@@ -287,4 +639,12 @@ export function formatRecurringPeriodShort(period: Period) {
 
 export function getFullPeriod(period: Period) {
   return period === "monthly" ? "month" : period === "yearly" ? "year" : "";
+}
+
+function toMonthlyPrice(price: number, period: Period) {
+  return period === "monthly"
+    ? price
+    : period === "5-year"
+    ? (price / (12 * 5)).toFixed(2)
+    : (price / 12).toFixed(2);
 }

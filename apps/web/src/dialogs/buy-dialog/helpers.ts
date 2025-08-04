@@ -21,6 +21,7 @@ import {
   getCurrencySymbol as _getSymbol,
   ICurrencySymbols
 } from "@brixtol/currency-symbols";
+import { getFeature } from "@notesnook/common";
 
 export const IS_DEV = import.meta.env.DEV || IS_TESTING;
 export function getCurrencySymbol(currency: string) {
@@ -36,3 +37,10 @@ export function parseAmount(amount: string) {
     amount: parseFloat(matches[2])
   };
 }
+
+export const FEATURE_HIGHLIGHTS = [
+  getFeature("storage"),
+  getFeature("fileSize"),
+  getFeature("fullQualityImages"),
+  getFeature("appLock")
+];

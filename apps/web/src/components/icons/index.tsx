@@ -304,10 +304,10 @@ export function createIcon(path: string, rotate = false) {
       <Flex
         {...restProps}
         sx={{
-          ...sx,
           justifyContent: "center",
           alignItems: "center",
-          flexShrink: 0
+          flexShrink: 0,
+          ...sx
         }}
       >
         <MDIIconWrapper
