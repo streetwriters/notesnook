@@ -76,6 +76,9 @@ export function BaseThemeProvider(
     const css = themeToCSS(theme);
     const stylesheet = document.getElementById("theme-colors");
     if (stylesheet) stylesheet.innerHTML = css;
+
+    const root = document.querySelector("html");
+    if (root) root.setAttribute("data-theme", theme.colorScheme);
   }, [theme]);
 
   useEffect(() => {
