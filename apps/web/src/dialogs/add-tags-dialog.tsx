@@ -26,7 +26,7 @@ import { store as notestore } from "../stores/note-store";
 import { FilteredList } from "../components/filtered-list";
 import { ItemReference, Tag } from "@notesnook/core";
 import { VirtualizedGrouping } from "@notesnook/core";
-import { isFeatureAvailable, ResolvedItem } from "@notesnook/common";
+import { ResolvedItem } from "@notesnook/common";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 import {
@@ -35,7 +35,7 @@ import {
   selectMultiple,
   useSelectionStore
 } from "./move-note-dialog";
-import { showFeatureNotAllowedToast } from "../common/toasts";
+import { checkFeature } from "../common";
 
 type AddTagsDialogProps = BaseDialogProps<boolean> & { noteIds: string[] };
 export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
@@ -116,10 +116,7 @@ export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
             );
           }}
           onCreateNewItem={async (title) => {
-            const result = await isFeatureAvailable("tags");
-            if (!result.isAllowed) {
-              return showFeatureNotAllowedToast(result);
-            }
+            if (!(await checkFeature("tags", { type: "toast" }))) return;
 
             const tagId = await db.tags.add({ title });
             if (!tagId) return;
