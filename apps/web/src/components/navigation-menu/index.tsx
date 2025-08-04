@@ -98,7 +98,12 @@ import Tags from "../../views/tags";
 import { Notebooks } from "../../views/notebooks";
 import { UserProfile } from "../../dialogs/settings/components/user-profile";
 import { SUBSCRIPTION_STATUS } from "../../common/constants";
-import { createSetDefaultHomepageMenuItem, logout } from "../../common";
+import {
+  checkFeature,
+  createSetDefaultHomepageMenuItem,
+  logout,
+  withFeatureCheck
+} from "../../common";
 import { TabItem } from "./tab-item";
 import Notice from "../notice";
 import { Freeze } from "react-freeze";
@@ -107,8 +112,11 @@ import { useStore as useNotebookStore } from "../../stores/notebook-store";
 import { useStore as useTagStore } from "../../stores/tag-store";
 import { showSortMenu } from "../group-header";
 import { BuyDialog } from "../../dialogs/buy-dialog";
-import { useIsFeatureAvailable } from "@notesnook/common";
-import { showFeatureNotAllowedToast } from "../../common/toasts";
+import {
+  FeatureResult,
+  isFeatureAvailable,
+  useIsFeatureAvailable
+} from "@notesnook/common";
 
 type Route = {
   id: "notes" | "favorites" | "reminders" | "monographs" | "trash" | "archive";
@@ -453,12 +461,17 @@ function Routes({
   isCollapsed: boolean;
   collapse: () => void;
 }) {
+  const customizableSidebar = useIsFeatureAvailable("customizableSidebar");
   const hiddenRoutes = useAppStore((store) => store.hiddenRoutes);
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
   return (
     <ReorderableList
       items={routes
-        .filter((r) => !hiddenRoutes.includes(r.id))
+        .filter(
+          customizableSidebar?.isAllowed
+            ? (r) => !hiddenRoutes.includes(r.id)
+            : () => true
+        )
         .filter((r) => (r.loginRequired ? isLoggedIn : true))}
       orderKey={`sidebarOrder:routes`}
       order={() => db.settings.getSideBarOrder("routes")}
@@ -509,7 +522,11 @@ function RouteItem({
           type: "lazy-loader",
           key: "sidebar-items-loader",
           items: async () => [
-            createSetDefaultHomepageMenuItem(item.id, "route")
+            createSetDefaultHomepageMenuItem(
+              item.id,
+              "route",
+              await isFeatureAvailable("customHomepage")
+            )
           ]
         },
         {
@@ -535,12 +552,17 @@ function Colors({
   isCollapsed: boolean;
   collapse: () => void;
 }) {
+  const customizableSidebar = useIsFeatureAvailable("customizableSidebar");
   const colors = useAppStore((store) => store.colors);
   const hiddenColors = useAppStore((store) => store.hiddenColors);
 
   return (
     <ReorderableList
-      items={colors.filter((c) => !hiddenColors.includes(c.id))}
+      items={
+        customizableSidebar?.isAllowed
+          ? colors.filter((c) => !hiddenColors.includes(c.id))
+          : colors
+      }
       orderKey={`sidebarOrder:colors`}
       order={() => db.settings.getSideBarOrder("colors")}
       onOrderChanged={(order) => db.settings.setSideBarOrder("colors", order)}
@@ -596,7 +618,11 @@ function ColorItem({
           type: "lazy-loader",
           key: "sidebar-items-loader",
           items: async () => [
-            createSetDefaultHomepageMenuItem(color.id, color.type)
+            createSetDefaultHomepageMenuItem(
+              color.id,
+              color.type,
+              await isFeatureAvailable("customHomepage")
+            )
           ]
         },
         {
@@ -662,7 +688,11 @@ function ShortcutItem({
           type: "lazy-loader",
           key: "sidebar-items-loader",
           items: async () => [
-            createSetDefaultHomepageMenuItem(item.id, item.type)
+            createSetDefaultHomepageMenuItem(
+              item.id,
+              item.type,
+              await isFeatureAvailable("customHomepage")
+            )
           ]
         },
         {
@@ -903,8 +933,10 @@ function ReorderableList<T extends { id: string }>(
   );
   const [activeItem, setActiveItem] = useState<T>();
   const [order, setOrder] = usePersistentState<string[]>(orderKey, _order());
-  const orderedItems = orderItems(items, order);
   const customizableSidebar = useIsFeatureAvailable("customizableSidebar");
+  const orderedItems = customizableSidebar?.isAllowed
+    ? orderItems(items, order)
+    : items;
 
   useEffect(() => {
     setOrder(_order());
@@ -914,12 +946,10 @@ function ReorderableList<T extends { id: string }>(
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
-      cancelDrop={() => {
-        if (!customizableSidebar?.isAllowed) {
-          showFeatureNotAllowedToast(customizableSidebar);
-          return true;
-        }
-        return false;
+      cancelDrop={async () => {
+        return (
+          !customizableSidebar || !(await checkFeature(customizableSidebar))
+        );
       }}
       onDragStart={(event) => {
         setActiveItem(orderedItems.find((i) => i.id === event.active.id));
@@ -981,6 +1011,7 @@ function toMenuItems<T extends { id: string; title: string }>(
   items: T[],
   hiddenIds: string[],
   onHiddenIdsUpdated: (ids: string[]) => void,
+  customizableSidebar: FeatureResult<"customizableSidebar">,
   extraProps?: (item: T) => Partial<MenuItem>
 ): MenuItem[] {
   return items.map((item) => ({
@@ -989,20 +1020,26 @@ function toMenuItems<T extends { id: string; title: string }>(
     key: item.id,
     title: item.title,
     isChecked: !hiddenIds.includes(item.id),
-    onClick: async () => {
+    premium: !customizableSidebar.isAllowed,
+    onClick: withFeatureCheck(customizableSidebar, async () => {
       const copy = hiddenIds.slice();
       const index = copy.indexOf(item.id);
       if (index > -1) copy.splice(index, 1);
       else copy.push(item.id);
       onHiddenIdsUpdated(copy);
-    }
+    })
   }));
 }
 
 async function getSidebarItemsAsMenuItems(): Promise<MenuItem[]> {
+  const customizableSidebar = await isFeatureAvailable("customizableSidebar");
   const colors = useAppStore.getState().colors;
-  const hiddenColors = useAppStore.getState().hiddenColors;
-  const hiddenRoutes = useAppStore.getState().hiddenRoutes;
+  const hiddenColors = customizableSidebar.isAllowed
+    ? useAppStore.getState().hiddenColors
+    : [];
+  const hiddenRoutes = customizableSidebar.isAllowed
+    ? useAppStore.getState().hiddenRoutes
+    : [];
   return [
     {
       key: "reset-sidebar",
@@ -1030,6 +1067,7 @@ async function getSidebarItemsAsMenuItems(): Promise<MenuItem[]> {
         db.settings
           .setSideBarHiddenItems("routes", ids)
           .then(() => useAppStore.getState().setHiddenRoutes(ids)),
+      customizableSidebar,
       (item) => ({ icon: item.icon.path })
     ),
     { type: "separator", key: "sep", isHidden: colors.length <= 0 },
@@ -1040,6 +1078,7 @@ async function getSidebarItemsAsMenuItems(): Promise<MenuItem[]> {
         db.settings
           .setSideBarHiddenItems("colors", ids)
           .then(() => useAppStore.getState().setHiddenColors(ids)),
+      customizableSidebar,
       (item) => ({
         icon: Circle.path,
         styles: { icon: { color: item.colorCode } }
