@@ -44,11 +44,13 @@ import { store as appStore } from "../../stores/app-store";
 import { Multiselect } from "../../common/multi-select";
 import { strings } from "@notesnook/intl";
 import { db } from "../../common/db";
-import { createSetDefaultHomepageMenuItem } from "../../common";
+import {
+  createSetDefaultHomepageMenuItem,
+  withFeatureCheck
+} from "../../common";
 import { useStore as useNotebookStore } from "../../stores/notebook-store";
 import { MoveNotebookDialog } from "../../dialogs/move-notebook-dialog";
-import { isFeatureAvailable } from "@notesnook/common";
-import { showFeatureNotAllowedToast } from "../../common/toasts";
+import { areFeaturesAvailable } from "@notesnook/common";
 
 type NotebookProps = {
   item: NotebookType;
@@ -182,8 +184,13 @@ export const notebookMenuItems: (
   notebook: NotebookType,
   ids?: string[],
   context?: { refresh?: () => void; isRoot?: boolean }
-) => MenuItem[] = (notebook, ids = [], context) => {
+) => Promise<MenuItem[]> = async (notebook, ids = [], context) => {
   const defaultNotebook = db.settings.getDefaultNotebook();
+  const features = await areFeaturesAvailable([
+    "shortcuts",
+    "defaultNotebookAndTag",
+    "customHomepage"
+  ]);
   return [
     {
       type: "button",
@@ -209,25 +216,20 @@ export const notebookMenuItems: (
       title: strings.setAsDefault(),
       isChecked: defaultNotebook === notebook.id,
       icon: NotebookIcon.path,
-      onClick: async () => {
+      premium: !features.defaultNotebookAndTag.isAllowed,
+      onClick: withFeatureCheck(features.defaultNotebookAndTag, async () => {
         const defaultNotebook = db.settings.getDefaultNotebook();
         const isDefault = defaultNotebook === notebook.id;
-        if (!isDefault) {
-          const result = await isFeatureAvailable("defaultNotebookAndTag");
-          if (!result.isAllowed) return showFeatureNotAllowedToast(result);
-        }
         await db.settings.setDefaultNotebook(
           isDefault ? undefined : notebook.id
         );
-      }
+      })
     },
-    {
-      type: "lazy-loader",
-      key: "sidebar-items-loader",
-      items: async () => [
-        createSetDefaultHomepageMenuItem(notebook.id, notebook.type)
-      ]
-    },
+    createSetDefaultHomepageMenuItem(
+      notebook.id,
+      notebook.type,
+      features.customHomepage
+    ),
     {
       type: "button",
       key: "shortcut",
@@ -237,7 +239,10 @@ export const notebookMenuItems: (
       title: db.shortcuts.exists(notebook.id)
         ? strings.removeShortcut()
         : strings.addShortcut(),
-      onClick: () => appStore.addToShortcuts(notebook)
+      premium: !features.shortcuts.isAllowed,
+      onClick: withFeatureCheck(features.shortcuts, () =>
+        appStore.addToShortcuts(notebook)
+      )
     },
     { key: "sep1", type: "separator" },
     {
