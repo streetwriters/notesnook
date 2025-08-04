@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { FeatureId } from "@notesnook/common";
 import { Icon } from "../../components/icons";
 
 export type SectionKeys =
@@ -84,6 +85,7 @@ export type Setting = {
   onStateChange?: (
     listener: (state: unknown, prevState: unknown) => void
   ) => () => void;
+  featureId?: FeatureId;
 };
 
 export type SettingComponentType =
