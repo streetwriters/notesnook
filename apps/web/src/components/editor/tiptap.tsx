@@ -50,11 +50,7 @@ import {
 import { IEditor, MAX_AUTO_SAVEABLE_WORDS } from "./types";
 import { useEditorConfig, useToolbarConfig, useEditorManager } from "./manager";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
-import {
-  debounce,
-  useAreFeaturesAvailable,
-  useIsFeatureAvailable
-} from "@notesnook/common";
+import { debounce, useAreFeaturesAvailable } from "@notesnook/common";
 import { ScopedThemeProvider } from "../theme-provider";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { writeToClipboard } from "../../utils/clipboard";
@@ -64,10 +60,10 @@ import Skeleton from "react-loading-skeleton";
 import useMobile from "../../hooks/use-mobile";
 import useTablet from "../../hooks/use-tablet";
 import { TimeFormat } from "@notesnook/core";
-import { BuyDialog } from "../../dialogs/buy-dialog";
 import { EDITOR_ZOOM } from "./common";
 import { ScrollContainer } from "@notesnook/ui";
 import { showFeatureNotAllowedToast } from "../../common/toasts";
+import { UpgradeDialog } from "../../dialogs/buy-dialog/upgrade-dialog";
 
 export type OnChangeHandler = (
   content: () => string,
@@ -176,9 +172,10 @@ function TipTap(props: TipTapProps) {
         return;
       }
 
-      BuyDialog.show({
-        plan: features?.[claim]?.availableOn
-      });
+      if (features)
+        UpgradeDialog.show({
+          feature: features[claim]
+        });
     }
   });
 
