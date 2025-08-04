@@ -32,8 +32,6 @@ import { CustomizeToolbar } from "./components/customize-toolbar";
 import { DictionaryWords } from "./components/dictionary-words";
 import { strings } from "@notesnook/intl";
 import { isMac } from "../../utils/platform";
-import { isFeatureAvailable } from "@notesnook/common";
-import { showFeatureNotAllowedToast } from "../../common/toasts";
 
 export const EditorSettings: SettingsGroup[] = [
   {
@@ -117,18 +115,12 @@ export const EditorSettings: SettingsGroup[] = [
         description: strings.mardownShortcutsDesc(),
         onStateChange: (listener) =>
           useSettingStore.subscribe((c) => c.markdownShortcuts, listener),
+        featureId: "markdownShortcuts",
         components: [
           {
             type: "toggle",
             isToggled: () => useSettingStore.getState().markdownShortcuts,
-            toggle: async () => {
-              if (!useSettingStore.getState().markdownShortcuts) {
-                const result = await isFeatureAvailable("markdownShortcuts");
-                if (!result.isAllowed)
-                  return showFeatureNotAllowedToast(result);
-              }
-              useSettingStore.getState().toggleMarkdownShortcuts();
-            }
+            toggle: () => useSettingStore.getState().toggleMarkdownShortcuts()
           }
         ]
       },
@@ -138,15 +130,12 @@ export const EditorSettings: SettingsGroup[] = [
         description: strings.fontLigaturesDesc(),
         onStateChange: (listener) =>
           useSettingStore.subscribe((c) => c.fontLigatures, listener),
+        featureId: "fontLigatures",
         components: [
           {
             type: "toggle",
             isToggled: () => useSettingStore.getState().fontLigatures,
-            toggle: async () => {
-              const result = await isFeatureAvailable("fontLigatures");
-              if (!result.isAllowed) return showFeatureNotAllowedToast(result);
-              useSettingStore.getState().toggleFontLigatures();
-            }
+            toggle: () => useSettingStore.getState().toggleFontLigatures()
           }
         ]
       }

@@ -23,6 +23,7 @@ import { useStore as useSettingStore } from "../../stores/setting-store";
 import { ConfirmDialog } from "../confirm";
 
 import { strings } from "@notesnook/intl";
+import { withFeatureCheck } from "../../common";
 
 export const SyncSettings: SettingsGroup[] = [
   {
@@ -37,6 +38,7 @@ export const SyncSettings: SettingsGroup[] = [
         keywords: ["sync off", "toggle sync"],
         onStateChange: (listener) =>
           useAppStore.subscribe((s) => s.isSyncEnabled, listener),
+        featureId: "syncControls",
         components: [
           {
             type: "toggle",
@@ -52,6 +54,7 @@ export const SyncSettings: SettingsGroup[] = [
         keywords: ["auto sync off", "automatic sync", "toggle auto sync"],
         onStateChange: (listener) =>
           useAppStore.subscribe((s) => s.isSyncEnabled, listener),
+        featureId: "syncControls",
         components: [
           {
             type: "toggle",
@@ -67,6 +70,7 @@ export const SyncSettings: SettingsGroup[] = [
         keywords: ["auto sync off", "automatic sync", "toggle auto sync"],
         onStateChange: (listener) =>
           useAppStore.subscribe((s) => s.isSyncEnabled, listener),
+        featureId: "syncControls",
         components: [
           {
             type: "toggle",
@@ -82,6 +86,7 @@ export const SyncSettings: SettingsGroup[] = [
         keywords: ["offline mode"],
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.isFullOfflineMode, listener),
+        featureId: "fullOfflineMode",
         components: [
           {
             type: "toggle",
