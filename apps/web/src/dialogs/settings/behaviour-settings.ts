@@ -27,9 +27,7 @@ import dayjs from "dayjs";
 import { TimeFormat } from "@notesnook/core";
 import { TrashCleanupInterval } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { BuyDialog } from "../buy-dialog";
-import { isFeatureAvailable } from "@notesnook/common";
-import { showFeatureNotAllowedToast } from "../../common/toasts";
+import { checkFeature } from "../../common";
 
 export const BehaviourSettings: SettingsGroup[] = [
   {
@@ -44,20 +42,12 @@ export const BehaviourSettings: SettingsGroup[] = [
         keywords: ["default sidebar tab"],
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.defaultSidebarTab, listener),
+        featureId: "defaultSidebarTab",
         components: [
           {
             type: "dropdown",
-            onSelectionChanged: async (value) => {
-              const defaultSidebarTab = await isFeatureAvailable(
-                "defaultSidebarTab"
-              );
-              if (!defaultSidebarTab.isAllowed) {
-                BuyDialog.show({ plan: defaultSidebarTab.availableOn });
-                return;
-              }
-
-              useSettingStore.getState().setDefaultSidebarTab(value as any);
-            },
+            onSelectionChanged: (value) =>
+              useSettingStore.getState().setDefaultSidebarTab(value as any),
             selectedOption: () => useSettingStore.getState().defaultSidebarTab,
             options: [
               { value: "home", title: strings.routes.Notes() },
@@ -78,11 +68,11 @@ export const BehaviourSettings: SettingsGroup[] = [
           {
             type: "dropdown",
             onSelectionChanged: async (value) => {
-              if (value === ImageCompressionOptions.DISABLE.toString()) {
-                const result = await isFeatureAvailable("fullQualityImages");
-                if (!result.isAllowed)
-                  return showFeatureNotAllowedToast(result);
-              }
+              if (
+                value === ImageCompressionOptions.DISABLE.toString() &&
+                !(await checkFeature("fullQualityImages"))
+              )
+                return;
 
               useSettingStore.getState().setImageCompression(parseInt(value));
             },
@@ -170,13 +160,11 @@ export const BehaviourSettings: SettingsGroup[] = [
           {
             type: "dropdown",
             onSelectionChanged: async (value) => {
-              const disableTrashCleanup = await isFeatureAvailable(
-                "disableTrashCleanup"
-              );
-              if (value === "-1" && !disableTrashCleanup.isAllowed) {
-                BuyDialog.show({ plan: disableTrashCleanup.availableOn });
+              if (
+                value === "-1" &&
+                !(await checkFeature("disableTrashCleanup"))
+              )
                 return;
-              }
 
               useSettingStore
                 .getState()
