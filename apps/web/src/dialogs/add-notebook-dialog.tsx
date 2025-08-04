@@ -28,8 +28,7 @@ import { store as appStore } from "../stores/app-store";
 import { db } from "../common/db";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
-import { isFeatureAvailable } from "@notesnook/common";
-import { showFeatureNotAllowedToast } from "../common/toasts";
+import { checkFeature } from "../common";
 
 type AddNotebookDialogProps = BaseDialogProps<boolean> & {
   parentId?: string;
@@ -46,11 +45,6 @@ export const AddNotebookDialog = DialogManager.register(
     const onSubmit = useCallback(async () => {
       if (!title.current.trim())
         return showToast("error", strings.allFieldsRequired());
-
-      const result = await isFeatureAvailable("notebooks");
-      if (!result.isAllowed) {
-        return showFeatureNotAllowedToast(result);
-      }
 
       const id = await db.notebooks.add({
         id: props.notebook?.id,
@@ -125,6 +119,9 @@ export const AddNotebookDialog = DialogManager.register(
         />
       </Dialog>
     );
+  },
+  {
+    onBeforeOpen: (props) => (props.edit ? true : checkFeature("notebooks"))
   }
 );
 

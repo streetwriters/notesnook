@@ -30,8 +30,7 @@ import { useStore as useNoteStore } from "../stores/note-store";
 import { useStore as useAppStore } from "../stores/app-store";
 import { Color, Tag } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { isFeatureAvailable } from "@notesnook/common";
-import { showFeatureNotAllowedToast } from "../common/toasts";
+import { checkFeature } from "../common";
 
 type ItemDialogProps = BaseDialogProps<false | string> & {
   title: string;
@@ -63,14 +62,14 @@ export const ItemDialog = DialogManager.register(function ItemDialog(
       <Box
         as="form"
         id="itemForm"
-        onSubmit={async (e) => {
+        onSubmit={(e) => {
           e.preventDefault();
           setError(undefined);
           const formData = new FormData(e.target as HTMLFormElement);
           const title = formData.get("title");
           if (!title) return;
           try {
-            await props.onClose(title as string);
+            props.onClose(title as string);
           } catch (e) {
             if (e instanceof Error) {
               setError(e);
@@ -94,16 +93,12 @@ export const ItemDialog = DialogManager.register(function ItemDialog(
 });
 
 export const CreateTagDialog = {
-  show: () =>
-    ItemDialog.show({
+  show: async () => {
+    if (!(await checkFeature("tags"))) return;
+    await ItemDialog.show({
       title: strings.addTag(),
       subtitle: strings.addTagDesc()
     }).then(async (title) => {
-      const result = await isFeatureAvailable("tags");
-      if (!result.isAllowed) {
-        return showFeatureNotAllowedToast(result);
-      }
-
       if (
         !title ||
         !(await db.tags.add({ title }).catch((e) => {
@@ -115,7 +110,8 @@ export const CreateTagDialog = {
 
       showToast("success", strings.actions.created.tag(1));
       useTagStore.getState().refresh();
-    })
+    });
+  }
 };
 
 export const EditTagDialog = {
