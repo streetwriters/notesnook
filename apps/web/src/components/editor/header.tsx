@@ -32,8 +32,7 @@ import { MenuItem } from "@notesnook/ui";
 import { navigate } from "../../navigation";
 import { Tag } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { isFeatureAvailable } from "@notesnook/common";
-import { showFeatureNotAllowedToast } from "../../common/toasts";
+import { checkFeature } from "../../common";
 
 type HeaderProps = { readonly: boolean; id: string };
 function Header(props: HeaderProps) {
@@ -55,8 +54,7 @@ function Header(props: HeaderProps) {
     } else {
       let id = (await db.tags.find(value))?.id;
       if (!id) {
-        const result = await isFeatureAvailable("tags");
-        if (!result.isAllowed) return showFeatureNotAllowedToast(result);
+        if (!(await checkFeature("tags"))) return;
         id = await db.tags.add({ title: value });
       }
       if (!id) return;
