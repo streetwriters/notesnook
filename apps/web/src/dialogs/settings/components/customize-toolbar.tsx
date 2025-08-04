@@ -48,7 +48,6 @@ import { CSS } from "@dnd-kit/utilities";
 import { createPortal } from "react-dom";
 import { getId } from "@notesnook/core";
 import { Label } from "@theme-ui/components";
-import { db } from "../../../common/db";
 import { useToolbarConfig } from "../../../components/editor/manager";
 import {
   getAllPresets,
@@ -56,17 +55,15 @@ import {
   getPreset,
   getPresetTools,
   Preset,
-  PresetId
+  PresetId,
+  setToolbarPreset
 } from "../../../common/toolbar-config";
 import { showToast } from "../../../utils/toast";
 import { Pro } from "../../../components/icons";
 import { Icon } from "@notesnook/ui";
-import {
-  CURRENT_TOOLBAR_VERSION,
-  useIsFeatureAvailable
-} from "@notesnook/common";
+import { useIsFeatureAvailable } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
-import { showFeatureNotAllowedToast } from "../../../common/toasts";
+import { checkFeature } from "../../../common";
 
 export function CustomizeToolbar() {
   const sensors = useSensors(
@@ -100,13 +97,7 @@ export function CustomizeToolbar() {
     (async () => {
       if (!currentPreset) return;
       const tools = unflatten(items).slice(0, -1);
-
-      await db.settings.setToolbarConfig("desktop", {
-        version: CURRENT_TOOLBAR_VERSION,
-        preset: currentPreset.id,
-        config: currentPreset.id === "custom" ? tools : undefined
-      });
-
+      await setToolbarPreset(currentPreset.id, tools);
       setToolbarConfig(tools);
     })();
   }, [items]);
@@ -153,7 +144,7 @@ export function CustomizeToolbar() {
                 {preset.title}
               </span>
               {preset.id === "custom" && !customToolbarPreset?.isAllowed ? (
-                <Pro color="accent" size={18} sx={{ ml: 1 }} />
+                <Pro color="orange" size={18} sx={{ ml: 1 }} />
               ) : null}
             </Label>
           ))}
@@ -181,12 +172,10 @@ export function CustomizeToolbar() {
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
-        cancelDrop={() => {
-          if (!customToolbarPreset?.isAllowed) {
-            showFeatureNotAllowedToast(customToolbarPreset);
-            return true;
-          }
-          return false;
+        cancelDrop={async () => {
+          return (
+            !customToolbarPreset || !(await checkFeature(customToolbarPreset))
+          );
         }}
         onDragStart={(event) => {
           if (currentPreset.id !== "custom") {
