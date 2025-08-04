@@ -62,14 +62,12 @@ type PaddleCheckoutProps = {
   user: { id: string; email: string };
   theme: "dark" | "light";
   plan: Plan;
-  price: Price;
   onPriceUpdated?: (pricingInfo: PricingInfo) => void;
   onCompleted?: () => void;
   coupon?: string;
 };
 export function PaddleCheckout(props: PaddleCheckoutProps) {
-  const { plan, price, onPriceUpdated, coupon, onCompleted, user, theme } =
-    props;
+  const { plan, onPriceUpdated, coupon, onCompleted, user, theme } = props;
   const [isLoading, setIsLoading] = useState(true);
   const appliedCouponCode = useRef<string>();
   const checkoutDataRef = useRef<CheckoutEventsData>();
@@ -100,10 +98,10 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
           checkoutDataRef.current.discount.id
         ).then(() => reloadCheckout());
     } else {
-      createCheckout({ theme, user, coupon, price }).then(
+      createCheckout({ theme, user, coupon, plan }).then(
         async (checkoutData) => {
           if (!checkoutData) return;
-          const pricingInfo = await getPrice(price, checkoutData);
+          const pricingInfo = await getPrice(plan, checkoutData);
           if (!pricingInfo) return;
 
           addressRef.current = checkoutData.customer.address || undefined;
@@ -114,7 +112,7 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
         }
       );
     }
-  }, [coupon, onPriceUpdated, price, reloadCheckout, theme, user]);
+  }, [coupon, onPriceUpdated, plan, reloadCheckout, theme, user]);
 
   useEffect(() => {
     async function onMessage(ev: MessageEvent<PaddleEvent>) {
@@ -139,9 +137,10 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
       if (event_name === CheckoutEventNames.CHECKOUT_LOADED) {
         setIsLoading(false);
       }
+      console.log(callback_data);
 
       addressRef.current = callback_data.data.customer.address || undefined;
-      const pricingInfo = await getPrice(price, callback_data.data);
+      const pricingInfo = await getPrice(plan, callback_data.data);
       if (!pricingInfo) return;
 
       pricingInfo.invalidCoupon =
@@ -154,7 +153,7 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
     return () => {
       window.removeEventListener("message", onMessage, false);
     };
-  }, [onPriceUpdated, plan, price, props.coupon, onCompleted]);
+  }, [onPriceUpdated, plan, props.coupon, onCompleted]);
 
   return (
     <ScrollContainer
@@ -206,14 +205,14 @@ function getCheckoutURL(id: string, theme: PaddleCheckoutProps["theme"]) {
   )}`;
 }
 
-async function getPrice(price: Price, checkoutData: CheckoutEventsData) {
+async function getPrice(plan: Plan, checkoutData: CheckoutEventsData) {
   const response = await fetch(`${PADDLE_API}/pricing-preview`, {
     method: "POST",
     body: JSON.stringify({
       items: [
         {
           quantity: 1,
-          price_id: price.id
+          price_id: plan.id
         }
       ],
       currency_code: checkoutData.currency_code,
@@ -234,7 +233,7 @@ async function getPrice(price: Price, checkoutData: CheckoutEventsData) {
   if (!response.ok) return false;
   const json = (await response.json()) as PricePreviewResponse;
   console.log(json);
-  return getPricingInfo(json.data, price.period, checkoutData);
+  return getPricingInfo(json.data, plan.period, checkoutData);
 }
 
 function getPricingInfo(
@@ -276,7 +275,8 @@ function getPricingInfo(
       id: _price.id,
       period,
       currency: checkoutData.currency_code,
-      ...totals
+      ...totals,
+      trial_period: _price.trial_period
     },
     recurringPrice: {
       id: _price.id,
@@ -419,19 +419,19 @@ interface CheckoutDataResponse {
 }
 
 async function createCheckout(props: {
-  price: PaddleCheckoutProps["price"];
+  plan: PaddleCheckoutProps["plan"];
   user: PaddleCheckoutProps["user"];
   theme: PaddleCheckoutProps["theme"];
   coupon?: PaddleCheckoutProps["coupon"];
 }) {
-  const { user, theme, coupon, price } = props;
+  const { user, theme, coupon, plan } = props;
   const response = await fetch(`${CHECKOUT_SERVICE}/transaction-checkout`, {
     method: "POST",
     body: JSON.stringify({
       data: {
         custom_data: JSON.stringify({ userId: user.id }),
         customer: { email: user.email },
-        items: [{ price_id: price.id, quantity: 1 }],
+        items: [{ price_id: plan.id, quantity: 1 }],
         settings: getCheckoutSettings(theme)
       }
     }),

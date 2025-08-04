@@ -20,13 +20,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Plan, Price, PricingInfo } from "./types";
 import { create } from "zustand";
 import { create as produce } from "mutative";
+import { DEFAULT_PLANS } from "./plans";
 
 interface ICheckoutStore {
   isCompleted: boolean;
   completeCheckout: () => void;
   selectedPlan?: Plan;
-  selectedPrice?: Price;
-  selectPlan: (plan?: Plan, price?: Price) => void;
+  selectPlan: (plan?: Plan) => void;
   pricingInfo?: PricingInfo;
   updatePrice: (pricingInfo?: PricingInfo) => void;
   isApplyingCoupon: boolean;
@@ -48,11 +48,10 @@ export const useCheckoutStore = create<ICheckoutStore>((set) => ({
         state.isCompleted = true;
       })
     ),
-  selectPlan: (plan, price) =>
+  selectPlan: (plan) =>
     set(
       produce((state: ICheckoutStore) => {
         state.selectedPlan = plan;
-        state.selectedPrice = price;
         state.pricingInfo = undefined;
       })
     ),
