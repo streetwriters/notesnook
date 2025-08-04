@@ -31,16 +31,12 @@ import { usePersistentState } from "../hooks/use-persistent-state";
 import { DayPicker } from "../components/day-picker";
 import { PopupPresenter } from "@notesnook/ui";
 import { useStore as useThemeStore } from "../stores/theme-store";
-import {
-  isFeatureAvailable,
-  getFormattedDate,
-  useIsFeatureAvailable
-} from "@notesnook/common";
+import { getFormattedDate, useIsFeatureAvailable } from "@notesnook/common";
 import { MONTHS_FULL, getTimeFormat } from "@notesnook/core";
 import { Note, Reminder } from "@notesnook/core";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
-import { showFeatureNotAllowedToast } from "../common/toasts";
+import { checkFeature } from "../common";
 
 dayjs.extend(customParseFormat);
 
@@ -180,12 +176,6 @@ export const AddReminderDialog = DialogManager.register(
 
             if (mode !== Modes.REPEAT && date.isBefore(dayjs())) {
               showToast("error", strings.dateError());
-              return;
-            }
-
-            const feature = await isFeatureAvailable("activeReminders");
-            if (!feature.isAllowed) {
-              showFeatureNotAllowedToast(feature);
               return;
             }
 
@@ -518,6 +508,10 @@ export const AddReminderDialog = DialogManager.register(
         )}
       </Dialog>
     );
+  },
+  {
+    onBeforeOpen: (props) =>
+      props.reminder ? true : checkFeature("activeReminders")
   }
 );
 
