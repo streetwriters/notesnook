@@ -221,15 +221,15 @@ class SettingStore extends BaseStore<SettingStore> {
 
   toggleMarkdownShortcuts = (toggleState?: boolean) => {
     const markdownShortcuts = this.get().markdownShortcuts;
-    this.set((state) => {
-      state.markdownShortcuts = toggleState ?? !state.markdownShortcuts;
-    });
+    this.set(
+      (state) => (state.markdownShortcuts = toggleState ?? !markdownShortcuts)
+    );
     Config.set("markdownShortcuts", !markdownShortcuts);
   };
 
-  toggleFontLigatures = () => {
+  toggleFontLigatures = (toggleState?: boolean) => {
     const fontLigatures = this.get().fontLigatures;
-    this.set((state) => (state.fontLigatures = !fontLigatures));
+    this.set((state) => (state.fontLigatures = toggleState ?? !fontLigatures));
     Config.set("fontLigatures", !fontLigatures);
   };
 
@@ -262,12 +262,12 @@ class SettingStore extends BaseStore<SettingStore> {
     await desktop?.updater.toggleAutoUpdates.mutate({ enabled: !autoUpdates });
   };
 
-  toggleFullOfflineMode = () => {
-    const isFullOfflineMode = this.get().isFullOfflineMode;
-    this.set({ isFullOfflineMode: !isFullOfflineMode });
-    Config.set("fullOfflineMode", !isFullOfflineMode);
+  toggleFullOfflineMode = (toggleState?: boolean) => {
+    const state = toggleState ?? !this.get().isFullOfflineMode;
+    this.set({ isFullOfflineMode: state });
+    Config.set("fullOfflineMode", state);
 
-    if (isFullOfflineMode) db.fs().cancel("offline-mode");
+    if (!state) db.fs().cancel("offline-mode");
     else db.attachments.cacheAttachments();
   };
 
