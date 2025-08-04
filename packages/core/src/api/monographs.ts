@@ -40,7 +40,6 @@ type MonographApiRequest = (UnencryptedMonograph | EncryptedMonograph) & {
 
 export type PublishOptions = { password?: string; selfDestruct?: boolean };
 export class Monographs {
-  private readonly passwordEncryptionKey = "monographpasswordencryptionkey";
   monographs: string[] = [];
   constructor(private readonly db: Database) {}
 
@@ -97,6 +96,7 @@ export class Monographs {
       false
     );
 
+    const userKey = await this.db.user.getEncryptionKey();
     const monograph: MonographApiRequest = {
       id: noteId,
       title: note.title,
@@ -104,9 +104,9 @@ export class Monographs {
       selfDestruct: opts.selfDestruct || false,
       ...(opts.password
         ? {
-            password: await this.db
-              .storage()
-              .encrypt({ password: this.passwordEncryptionKey }, opts.password),
+            password: userKey
+              ? await this.db.storage().encrypt(userKey, opts.password)
+              : undefined,
             encryptedContent: await this.db
               .storage()
               .encrypt(
@@ -180,9 +180,9 @@ export class Monographs {
     return this.db.monographsCollection.collection.get(monographId);
   }
 
-  decryptPassword(password: Cipher<"base64">) {
-    return this.db
-      .storage()
-      .decrypt({ password: this.passwordEncryptionKey }, password);
+  async decryptPassword(password: Cipher<"base64">) {
+    const userKey = await this.db.user.getEncryptionKey();
+    if (!userKey) return "";
+    return this.db.storage().decrypt(userKey, password);
   }
 }
