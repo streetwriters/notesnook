@@ -70,7 +70,7 @@ import {
   SupportSettings
 } from "./other-settings";
 import { AppearanceSettings } from "./appearance-settings";
-import { debounce, usePromise } from "@notesnook/common";
+import { debounce, useIsFeatureAvailable, usePromise } from "@notesnook/common";
 import { SubscriptionSettings } from "./subscription-settings";
 import { ScopedThemeProvider } from "../../components/theme-provider";
 import { AppLockSettings } from "./app-lock-settings";
@@ -79,6 +79,7 @@ import { ServersSettings } from "./servers-settings";
 import { strings } from "@notesnook/intl";
 import { mdToHtml } from "../../utils/md";
 import { InboxSettings } from "./inbox-settings";
+import { withFeatureCheck } from "../../common";
 
 type SettingsDialogProps = BaseDialogProps<false> & {
   activeSection?: SectionKeys;
@@ -432,6 +433,7 @@ function SettingItem(props: { item: Setting }) {
   const { item } = props;
   const [state, setState] = useState<unknown>();
   const [workIndex, setWorkIndex] = useState<number>();
+  const feature = useIsFeatureAvailable(item.featureId);
 
   useEffect(() => {
     if (!item.onStateChange) return;
@@ -479,12 +481,17 @@ function SettingItem(props: { item: Setting }) {
         }}
       >
         <Flex sx={{ flexDirection: "column", flex: 1 }}>
-          <Text
-            variant={"body"}
-            sx={{ fontWeight: "medium", color: "heading" }}
-          >
-            {item.title}
-          </Text>
+          <Flex sx={{ alignItems: "center", gap: 1 }}>
+            <Text
+              variant={"body"}
+              sx={{ fontWeight: "medium", color: "heading" }}
+            >
+              {item.title}
+            </Text>
+            {feature && !feature.isAllowed ? (
+              <Pro size={14} color="orange" />
+            ) : null}
+          </Flex>
           {item.description && (
             <Text
               as={"div"}
@@ -518,7 +525,9 @@ function SettingItem(props: { item: Setting }) {
                     disabled={workIndex === index}
                     title={component.title}
                     variant={component.variant}
-                    onClick={() => workWithLoading(index, component.action)}
+                    onClick={withFeatureCheck(feature, () =>
+                      workWithLoading(index, component.action)
+                    )}
                   >
                     {workIndex === index ? (
                       <Loading size={18} sx={{ mr: 2 }} />
@@ -537,13 +546,22 @@ function SettingItem(props: { item: Setting }) {
                         : "icon-secondary"
                     }}
                     disabled={workIndex === index}
-                    onChange={() => workWithLoading(index, component.toggle)}
+                    onChange={withFeatureCheck(feature, () =>
+                      workWithLoading(index, component.toggle)
+                    )}
                     checked={component.isToggled()}
                     data-checked={component.isToggled()}
                   />
                 );
               case "dropdown":
-                return <SelectComponent {...component} />;
+                return (
+                  <SelectComponent
+                    {...component}
+                    onSelectionChanged={withFeatureCheck(feature, (value) =>
+                      component.onSelectionChanged(value)
+                    )}
+                  />
+                );
               case "input":
                 return component.inputType === "number" ? (
                   <Input
