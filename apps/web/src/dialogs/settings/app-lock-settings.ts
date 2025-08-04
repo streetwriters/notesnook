@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { strings } from "@notesnook/intl";
-import { verifyAccount } from "../../common";
+import { checkFeature, verifyAccount } from "../../common";
 import { Checkmark } from "../../components/icons";
 import { showPasswordDialog } from "../../dialogs/password-dialog";
 import {
@@ -35,8 +35,6 @@ import { showToast } from "../../utils/toast";
 import { WebAuthn } from "../../utils/webauthn";
 import { PromptDialog } from "../prompt";
 import { SettingComponent, SettingsGroup } from "./types";
-import { isFeatureAvailable } from "@notesnook/common";
-import { BuyDialog } from "../buy-dialog";
 
 export const AppLockSettings: SettingsGroup[] = [
   {
@@ -51,15 +49,11 @@ export const AppLockSettings: SettingsGroup[] = [
         title: "Enable app lock",
         onStateChange: (listener) =>
           useKeyStore.subscribe((s) => s.credentials, listener),
+        featureId: "appLock",
         components: [
           {
             type: "toggle",
             toggle: async () => {
-              if (!useKeyStore.getState().credentials.some((c) => c.active)) {
-                const result = await isFeatureAvailable("appLock");
-                if (!result.isAllowed)
-                  return BuyDialog.show({ plan: result.availableOn });
-              }
               const { credentials } = useKeyStore.getState();
               const defaultCredential = credentials
                 .filter((c) => c.active)
