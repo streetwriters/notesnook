@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { database as db } from "../database.js";
 import { SubscriptionPlan, SubscriptionType } from "@notesnook/core";
+import { database as db } from "../database.js";
 
 type CaptionValue = ("infinity" | (string & {})) | boolean | number;
 type Limit<TCaption extends CaptionValue = CaptionValue> = {
@@ -533,7 +533,7 @@ export function getFeaturesTable() {
   return rows;
 }
 
-type FeatureUsage = {
+export type FeatureUsage = {
   id: FeatureId;
   total: number;
   used: number;

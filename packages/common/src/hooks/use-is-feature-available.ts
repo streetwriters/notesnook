@@ -32,7 +32,7 @@ export function useIsFeatureAvailable<TId extends FeatureId>(
 ) {
   const result = usePromise(
     () => (id ? isFeatureAvailable(id, value) : undefined),
-    [id, value]
+    []
   );
   return result.status === "fulfilled" ? result.value : undefined;
 }
@@ -46,7 +46,7 @@ export function useAreFeaturesAvailable<TIds extends FeatureId[]>(
 
   useEffect(() => {
     areFeaturesAvailable(ids, values).then((result) => setResult(result));
-  }, [ids, values]);
+  }, []);
 
   return result;
 }
