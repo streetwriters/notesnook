@@ -23,6 +23,7 @@ import { SubscriptionPlan, SubscriptionType } from "@notesnook/core";
 type CaptionValue = ("infinity" | (string & {})) | boolean | number;
 type Limit<TCaption extends CaptionValue = CaptionValue> = {
   caption: TCaption;
+  value: number | boolean;
   isAllowed: (value?: number) => Promise<boolean> | boolean;
 };
 type FeatureAvailability<TCaption extends CaptionValue = CaptionValue> = {
@@ -75,13 +76,36 @@ function createFeature<A extends FeatureAvailability>(
   } as unknown as Feature<CaptionsFromAvailability<A>>;
 }
 
-function createLimit<TCaption extends Limit["caption"]>(
+function createLimit<
+  TCaption extends Limit["caption"],
+  TValue extends Limit["value"]
+>(
   caption: TCaption,
-  isAllowed: Limit["isAllowed"]
+  value?: TValue,
+  isAllowed?: (value: TValue) => Limit["isAllowed"]
 ): Limit<TCaption> {
+  const inferredValue =
+    value ?? caption === "infinity"
+      ? Infinity
+      : typeof caption === "boolean"
+      ? !!caption
+      : typeof caption === "number"
+      ? caption
+      : false;
   return {
     caption,
-    isAllowed
+    isAllowed: isAllowed
+      ? isAllowed(inferredValue as TValue)
+      : caption === "infinity"
+      ? alwaysInfinite
+      : inferredValue === false
+      ? alwaysFalse
+      : inferredValue === true
+      ? alwaysTrue
+      : typeof inferredValue === "number"
+      ? lte(inferredValue)
+      : alwaysFalse,
+    value: inferredValue
   };
 }
 
@@ -94,12 +118,16 @@ const features = {
   storage: createFeature({
     id: "storage",
     title: "Storage",
+    used: async () => {
+      const user = await db.user.getUser();
+      return user?.storageUsed || 0;
+    },
     availability: {
-      free: createLimit("50MB/mo", lte(50 * 1024 * 1024)),
-      essential: createLimit("1GB/mo", lte(1024 * 1024 * 1024)),
-      pro: createLimit("10GB/mo", lte(10 * 1024 * 1024 * 1024)),
-      believer: createLimit("25GB/mo", lte(25 * 1024 * 1024 * 1024)),
-      legacyPro: createLimit("infinity", alwaysInfinite)
+      free: createLimit("50MB/mo", 50 * 1024 * 1024),
+      essential: createLimit("1GB/mo", 1024 * 1024 * 1024),
+      pro: createLimit("10GB/mo", 10 * 1024 * 1024 * 1024),
+      believer: createLimit("25GB/mo", 25 * 1024 * 1024 * 1024),
+      legacyPro: createLimit("infinity", Infinity)
     }
   }),
   fileSize: createFeature({
@@ -108,22 +136,22 @@ const features = {
     error: (limit) =>
       `You cannot upload files larger than ${limit.caption} on this plan.`,
     availability: {
-      free: createLimit("10MB", lte(10 * 1024 * 1024)),
-      essential: createLimit("100MB", lte(100 * 1024 * 1024)),
-      pro: createLimit("1GB", lte(1024 * 1024 * 1024)),
-      believer: createLimit("5GB", lte(5 * 1024 * 1024 * 1024)),
-      legacyPro: createLimit("512MB", lte(512 * 1024 * 1024))
+      free: createLimit("10MB", 10 * 1024 * 1024),
+      essential: createLimit("100MB", 100 * 1024 * 1024),
+      pro: createLimit("1GB", 1024 * 1024 * 1024),
+      believer: createLimit("5GB", 5 * 1024 * 1024 * 1024),
+      legacyPro: createLimit("512MB", 512 * 1024 * 1024)
     }
   }),
   fullQualityImages: createFeature({
     id: "fullQualityImages",
     title: "Full quality images",
     availability: {
-      free: createLimit(false, alwaysFalse),
-      essential: createLimit(false, alwaysFalse),
-      pro: createLimit(true, alwaysTrue),
-      believer: createLimit(true, alwaysTrue),
-      legacyPro: createLimit(true, alwaysTrue)
+      free: createLimit(false),
+      essential: createLimit(false),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
     }
   }),
   blockLinking: createFeature({
@@ -131,44 +159,44 @@ const features = {
     title: "Block-level note links",
     error: () => `Block-level note links are not available on this plan.`,
     availability: {
-      free: createLimit(false, alwaysFalse),
-      essential: createLimit(true, alwaysTrue),
-      pro: createLimit(true, alwaysTrue),
-      believer: createLimit(true, alwaysTrue),
-      legacyPro: createLimit(true, alwaysTrue)
+      free: createLimit(false),
+      essential: createLimit(true),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
     }
   }),
   taskList: createFeature({
     id: "taskList",
     title: "Task list",
     availability: {
-      free: createLimit(false, alwaysFalse),
-      essential: createLimit(true, alwaysTrue),
-      pro: createLimit(true, alwaysTrue),
-      believer: createLimit(true, alwaysTrue),
-      legacyPro: createLimit(true, alwaysTrue)
+      free: createLimit(false),
+      essential: createLimit(true),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
     }
   }),
   outlineList: createFeature({
     id: "outlineList",
     title: "Outline list",
     availability: {
-      free: createLimit(false, alwaysFalse),
-      essential: createLimit(true, alwaysTrue),
-      pro: createLimit(true, alwaysTrue),
-      believer: createLimit(true, alwaysTrue),
-      legacyPro: createLimit(true, alwaysTrue)
+      free: createLimit(false),
+      essential: createLimit(true),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
     }
   }),
   callout: createFeature({
     id: "callout",
     title: "Callouts",
     availability: {
-      free: createLimit(false, alwaysFalse),
-      essential: createLimit(true, alwaysTrue),
-      pro: createLimit(true, alwaysTrue),
-      believer: createLimit(true, alwaysTrue),
-      legacyPro: createLimit(true, alwaysTrue)
+      free: createLimit(false),
+      essential: createLimit(true),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
     }
   }),
   colors: createFeature({
@@ -176,11 +204,11 @@ const features = {
     title: "Colors",
     used: () => db.colors.all.count(),
     availability: {
-      free: createLimit(7, lt(7)),
-      essential: createLimit(20, lt(20)),
-      pro: createLimit("infinity", alwaysInfinite),
-      believer: createLimit("infinity", alwaysInfinite),
-      legacyPro: createLimit("infinity", alwaysInfinite)
+      free: createLimit(7),
+      essential: createLimit(20),
+      pro: createLimit("infinity"),
+      believer: createLimit("infinity"),
+      legacyPro: createLimit("infinity")
     }
   }),
   tags: createFeature({
@@ -188,11 +216,11 @@ const features = {
     title: "Tags",
     used: () => db.tags.all.count(),
     availability: {
-      free: createLimit(50, lt(50)),
-      essential: createLimit(500, lt(500)),
-      pro: createLimit("infinity", alwaysInfinite),
-      believer: createLimit("infinity", alwaysInfinite),
-      legacyPro: createLimit("infinity", alwaysInfinite)
+      free: createLimit(50),
+      essential: createLimit(500),
+      pro: createLimit("infinity"),
+      believer: createLimit("infinity"),
+      legacyPro: createLimit("infinity")
     }
   }),
   notebooks: createFeature({
@@ -200,11 +228,11 @@ const features = {
     title: "Notebooks",
     used: () => db.notebooks.all.count(),
     availability: {
-      free: createLimit(50, lt(50)),
-      essential: createLimit(500, lt(500)),
-      pro: createLimit("infinity", alwaysInfinite),
-      believer: createLimit("infinity", alwaysInfinite),
-      legacyPro: createLimit("infinity", alwaysInfinite)
+      free: createLimit(50),
+      essential: createLimit(500),
+      pro: createLimit("infinity"),
+      believer: createLimit("infinity"),
+      legacyPro: createLimit("infinity")
     }
   }),
   activeReminders: createFeature({
@@ -212,11 +240,11 @@ const features = {
     title: "Active reminders",
     used: () => db.reminders.active.count(),
     availability: {
-      free: createLimit(10, lt(10)),
-      essential: createLimit(50, lt(50)),
-      pro: createLimit("infinity", alwaysInfinite),
-      believer: createLimit("infinity", alwaysInfinite),
-      legacyPro: createLimit("infinity", alwaysInfinite)
+      free: createLimit(10),
+      essential: createLimit(50),
+      pro: createLimit("infinity"),
+      believer: createLimit("infinity"),
+      legacyPro: createLimit("infinity")
     }
   }),
   shortcuts: createFeature({
@@ -224,11 +252,11 @@ const features = {
     title: "Shortcuts",
     used: () => db.shortcuts.all.length,
     availability: {
-      free: createLimit(10, lt(10)),
-      essential: createLimit("infinity", alwaysInfinite),
-      pro: createLimit("infinity", alwaysInfinite),
-      believer: createLimit("infinity", alwaysInfinite),
-      legacyPro: createLimit("infinity", alwaysInfinite)
+      free: createLimit(10),
+      essential: createLimit("infinity"),
+      pro: createLimit("infinity"),
+      believer: createLimit("infinity"),
+      legacyPro: createLimit("infinity")
     }
   }),
   defaultNotebookAndTag: createFeature({
@@ -236,165 +264,165 @@ const features = {
     title: "Default notebook & tag",
     error: () => `You cannot set a default notebook or tag on this plan.`,
     availability: {
-      free: createLimit(false, alwaysFalse),
-      essential: createLimit(false, alwaysFalse),
-      pro: createLimit(true, alwaysTrue),
-      believer: createLimit(true, alwaysTrue),
-      legacyPro: createLimit(true, alwaysTrue)
+      free: createLimit(false),
+      essential: createLimit(false),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
     }
   }),
   recurringReminders: createFeature({
     id: "recurringReminders",
     title: "Recurring reminders",
     availability: {
-      free: createLimit(false, alwaysFalse),
-      essential: createLimit(true, alwaysTrue),
-      pro: createLimit(true, alwaysTrue),
-      believer: createLimit(true, alwaysTrue),
-      legacyPro: createLimit(true, alwaysTrue)
+      free: createLimit(false),
+      essential: createLimit(true),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
     }
   }),
   pinNoteInNotification: createFeature({
     id: "pinNoteInNotification",
     title: "Pin note in notification",
     availability: {
-      free: createLimit(false, alwaysFalse),
-      essential: createLimit(false, alwaysFalse),
-      pro: createLimit(true, alwaysTrue),
-      believer: createLimit(true, alwaysTrue),
-      legacyPro: createLimit(true, alwaysTrue)
+      free: createLimit(false),
+      essential: createLimit(false),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
     }
   }),
   createNoteFromNotificationDrawer: createFeature({
     id: "createNoteFromNotificationDrawer",
     title: "Create note from notification drawer",
     availability: {
-      free: createLimit(false, alwaysFalse),
-      essential: createLimit(false, alwaysFalse),
-      pro: createLimit(true, alwaysTrue),
-      believer: createLimit(true, alwaysTrue),
-      legacyPro: createLimit(true, alwaysTrue)
+      free: createLimit(false),
+      essential: createLimit(false),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
     }
   }),
   defaultSidebarTab: createFeature({
     id: "defaultSidebarTab",
     title: "Default sidebar tab",
     availability: {
-      free: createLimit(false, alwaysFalse),
-      essential: createLimit(false, alwaysFalse),
-      pro: createLimit(true, alwaysTrue),
-      believer: createLimit(true, alwaysTrue),
-      legacyPro: createLimit(true, alwaysTrue)
+      free: createLimit(false),
+      essential: createLimit(false),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
     }
   }),
   customHomepage: createFeature({
     id: "customHomepage",
     title: "Custom homepage",
     availability: {
-      free: createLimit(false, alwaysFalse),
-      essential: createLimit(false, alwaysFalse),
-      pro: createLimit(true, alwaysTrue),
-      believer: createLimit(true, alwaysTrue),
-      legacyPro: createLimit(true, alwaysTrue)
+      free: createLimit(false),
+      essential: createLimit(false),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
     }
   }),
   markdownShortcuts: createFeature({
     id: "markdownShortcuts",
     title: "Markdown shortcuts",
     availability: {
-      free: createLimit(false, alwaysFalse),
-      essential: createLimit(true, alwaysTrue),
-      pro: createLimit(true, alwaysTrue),
-      believer: createLimit(true, alwaysTrue),
-      legacyPro: createLimit(true, alwaysTrue)
+      free: createLimit(false),
+      essential: createLimit(true),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
     }
   }),
   fontLigatures: createFeature({
     id: "fontLigatures",
     title: "Font ligatures",
     availability: {
-      free: createLimit(false, alwaysFalse),
-      essential: createLimit(false, alwaysFalse),
-      pro: createLimit(true, alwaysTrue),
-      believer: createLimit(true, alwaysTrue),
-      legacyPro: createLimit(true, alwaysTrue)
+      free: createLimit(false),
+      essential: createLimit(false),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
     }
   }),
   customToolbarPreset: createFeature({
     id: "customToolbarPreset",
     title: "Custom toolbar preset",
     availability: {
-      free: createLimit(false, alwaysFalse),
-      essential: createLimit(false, alwaysFalse),
-      pro: createLimit(true, alwaysTrue),
-      believer: createLimit(true, alwaysTrue),
-      legacyPro: createLimit(true, alwaysTrue)
+      free: createLimit(false),
+      essential: createLimit(false),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
     }
   }),
   customizableSidebar: createFeature({
     id: "customizableSidebar",
     title: "Customizable sidebar",
     availability: {
-      free: createLimit(false, alwaysFalse),
-      essential: createLimit(true, alwaysTrue),
-      pro: createLimit(true, alwaysTrue),
-      believer: createLimit(true, alwaysTrue),
-      legacyPro: createLimit(true, alwaysTrue)
+      free: createLimit(false),
+      essential: createLimit(true),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
     }
   }),
   disableTrashCleanup: createFeature({
     id: "disableTrashCleanup",
     title: "Disable trash cleanup",
     availability: {
-      free: createLimit(false, alwaysFalse),
-      essential: createLimit(false, alwaysFalse),
-      pro: createLimit(true, alwaysTrue),
-      believer: createLimit(true, alwaysTrue),
-      legacyPro: createLimit(true, alwaysTrue)
+      free: createLimit(false),
+      essential: createLimit(false),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
     }
   }),
   appLock: createFeature({
     id: "appLock",
     title: "App lock",
     availability: {
-      free: createLimit(false, alwaysFalse),
-      essential: createLimit(false, alwaysFalse),
-      pro: createLimit(true, alwaysTrue),
-      believer: createLimit(true, alwaysTrue),
-      legacyPro: createLimit(true, alwaysTrue)
+      free: createLimit(false),
+      essential: createLimit(false),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
     }
   }),
   maxNoteVersions: createFeature({
     id: "maxNoteVersions",
     title: "Maximum note versions",
     availability: {
-      free: createLimit(100, lte(100)),
-      essential: createLimit(1000, lte(1000)),
-      pro: createLimit("infinity", alwaysInfinite),
-      believer: createLimit("infinity", alwaysInfinite),
-      legacyPro: createLimit("infinity", alwaysInfinite)
+      free: createLimit(100),
+      essential: createLimit(1000),
+      pro: createLimit("infinity"),
+      believer: createLimit("infinity"),
+      legacyPro: createLimit("infinity")
     }
   }),
   fullOfflineMode: createFeature({
     id: "fullOfflineMode",
     title: "Full offline mode",
     availability: {
-      free: createLimit(false, alwaysFalse),
-      essential: createLimit(true, alwaysTrue),
-      pro: createLimit(true, alwaysTrue),
-      believer: createLimit(true, alwaysTrue),
-      legacyPro: createLimit(true, alwaysTrue)
+      free: createLimit(false),
+      essential: createLimit(true),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
     }
   }),
   syncControls: createFeature({
     id: "syncControls",
     title: "Sync controls",
     availability: {
-      free: createLimit(false, alwaysFalse),
-      essential: createLimit(false, alwaysFalse),
-      pro: createLimit(true, alwaysTrue),
-      believer: createLimit(true, alwaysTrue),
-      legacyPro: createLimit(true, alwaysTrue)
+      free: createLimit(false),
+      essential: createLimit(false),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
     }
   })
 };
@@ -503,6 +531,27 @@ export function getFeaturesTable() {
     ]);
   }
   return rows;
+}
+
+type FeatureUsage = {
+  id: FeatureId;
+  total: number;
+  used: number;
+};
+export async function getFeaturesUsage(): Promise<FeatureUsage[]> {
+  const { isLegacyPro, plan } = await getUserPlan();
+  const usage: FeatureUsage[] = [];
+  for (const key in features) {
+    const feature = getFeature(key as FeatureId);
+    const limit = getFeatureLimitFromPlan(feature, plan, isLegacyPro);
+    if (!feature.used || typeof limit.value !== "number") continue;
+    usage.push({
+      id: key as FeatureId,
+      total: limit.value,
+      used: await feature.used()
+    });
+  }
+  return usage;
 }
 
 function getFeatureLimitFromPlan<TId extends FeatureId>(
