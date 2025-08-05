@@ -96,7 +96,7 @@ export class Monographs {
       false
     );
 
-    const userKey = await this.db.user.getEncryptionKey();
+    const monographPasswordsKey = await this.db.user.getMonographPasswordsKey();
     const monograph: MonographApiRequest = {
       id: noteId,
       title: note.title,
@@ -104,8 +104,10 @@ export class Monographs {
       selfDestruct: opts.selfDestruct || false,
       ...(opts.password
         ? {
-            password: userKey
-              ? await this.db.storage().encrypt(userKey, opts.password)
+            password: monographPasswordsKey
+              ? await this.db
+                  .storage()
+                  .encrypt(monographPasswordsKey, opts.password)
               : undefined,
             encryptedContent: await this.db
               .storage()
@@ -181,8 +183,8 @@ export class Monographs {
   }
 
   async decryptPassword(password: Cipher<"base64">) {
-    const userKey = await this.db.user.getEncryptionKey();
-    if (!userKey) return "";
-    return this.db.storage().decrypt(userKey, password);
+    const monographPasswordsKey = await this.db.user.getMonographPasswordsKey();
+    if (!monographPasswordsKey) return "";
+    return this.db.storage().decrypt(monographPasswordsKey, password);
   }
 }

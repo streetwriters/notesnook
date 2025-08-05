@@ -43,6 +43,7 @@ const ENDPOINTS = {
 class UserManager {
   private tokenManager: TokenManager;
   private cachedAttachmentKey?: SerializedKey;
+  private cachedMonographPasswordsKey?: SerializedKey;
   constructor(private readonly db: Database) {
     this.tokenManager = new TokenManager(this.db.kv);
 
@@ -459,6 +460,51 @@ class UserManager {
     }
   }
 
+  async getMonographPasswordsKey() {
+    if (this.cachedMonographPasswordsKey) {
+      return this.cachedMonographPasswordsKey;
+    }
+
+    try {
+      let user = await this.getUser();
+      if (!user) return;
+
+      if (!user.monographPasswordsKey) {
+        const token = await this.tokenManager.getAccessToken();
+        user = await http.get(`${constants.API_HOST}${ENDPOINTS.user}`, token);
+      }
+      if (!user) return;
+
+      const userEncryptionKey = await this.getEncryptionKey();
+      if (!userEncryptionKey) return;
+
+      if (!user.monographPasswordsKey) {
+        const key = await this.db.crypto().generateRandomKey();
+        user.monographPasswordsKey = await this.db
+          .storage()
+          .encrypt(userEncryptionKey, JSON.stringify(key));
+
+        await this.updateUser({
+          monographPasswordsKey: user.monographPasswordsKey
+        });
+        return key;
+      }
+
+      const plainData = await this.db
+        .storage()
+        .decrypt(userEncryptionKey, user.monographPasswordsKey);
+      if (!plainData) return;
+      this.cachedMonographPasswordsKey = JSON.parse(plainData) as SerializedKey;
+      return this.cachedMonographPasswordsKey;
+    } catch (e) {
+      logger.error(e, "Could not get attachments encryption key.");
+      if (e instanceof Error)
+        throw new Error(
+          `Could not get attachments encryption key. Error: ${e.message}`
+        );
+    }
+  }
+
   async sendVerificationEmail(newEmail?: string) {
     const token = await this.tokenManager.getAccessToken();
     if (!token) return;
@@ -533,7 +579,6 @@ class UserManager {
 
     if (!new_password) throw new Error("New password is required.");
 
-    const attachmentsKey = await this.getAttachmentsKey();
     data.encryptionKey = data.encryptionKey || (await this.getEncryptionKey());
 
     await this.clearSessions();
@@ -554,13 +599,26 @@ class UserManager {
 
     await this.db.sync({ type: "send", force: true });
 
-    if (attachmentsKey) {
-      const userEncryptionKey = await this.getEncryptionKey();
-      if (!userEncryptionKey) return;
-      user.attachmentsKey = await this.db
-        .storage()
-        .encrypt(userEncryptionKey, JSON.stringify(attachmentsKey));
-      await this.updateUser({ attachmentsKey: user.attachmentsKey });
+    const userEncryptionKey = await this.getEncryptionKey();
+    if (userEncryptionKey) {
+      const updateUserPayload: Partial<User> = {};
+      const attachmentsKey = await this.getAttachmentsKey();
+      if (attachmentsKey) {
+        user.attachmentsKey = await this.db
+          .storage()
+          .encrypt(userEncryptionKey, JSON.stringify(attachmentsKey));
+        updateUserPayload.attachmentsKey = user.attachmentsKey;
+      }
+      const monographPasswordsKey = await this.getMonographPasswordsKey();
+      if (monographPasswordsKey) {
+        user.monographPasswordsKey = await this.db
+          .storage()
+          .encrypt(userEncryptionKey, JSON.stringify(monographPasswordsKey));
+        updateUserPayload.monographPasswordsKey = user.monographPasswordsKey;
+      }
+      if (Object.keys(updateUserPayload).length > 0) {
+        await this.updateUser(updateUserPayload);
+      }
     }
 
     if (new_password)
