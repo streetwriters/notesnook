@@ -18,21 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useState } from "react";
-import { Period, Plan, PlanMetadata, Price } from "./types";
+import { Plan, PlanMetadata } from "./types";
 import { IS_DEV } from "./helpers";
-import { SubscriptionPlan } from "@notesnook/core";
+import { Period, SubscriptionPlan } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-
-// function createPrice(id: string, period: Period, subtotal: number): Price {
-//   return {
-//     id,
-//     period,
-//     subtotal: `${subtotal.toFixed(2)}USD`,
-//     total: `0.00USD`,
-//     tax: `0.00USD`,
-//     currency: "USD"
-//   };
-// }
+import { db } from "../../common/db";
 
 function createPlan(
   id: string,
@@ -172,10 +162,7 @@ export async function getPlans(): Promise<Plan[] | null> {
   if (IS_TESTING || import.meta.env.DEV) return DEFAULT_PLANS;
   if (CACHED_PLANS) return CACHED_PLANS;
 
-  const url = `http://localhost:8788/api/v2/prices/products/web`;
-  const response = await fetch(url);
-  if (!response.ok) return null;
-  const plans = (await response.json()) as Plan[];
+  const plans = await db.pricing.products();
   CACHED_PLANS = plans.sort((a, b) => a.plan - b.plan);
   return plans;
 }
@@ -192,8 +179,8 @@ export function usePlans() {
         const plans = await getPlans();
         if (!plans) return;
         setPlans(plans);
-        // setDiscount(Math.max(...plans.map((p) => p.discount?.amount || 0)));
-        // setCountry(plans[0].country);
+        setDiscount(Math.max(...plans.map((p) => p.discount?.amount || 0)));
+        setCountry(plans[0].country);
       } catch (e) {
         console.error(e);
       } finally {

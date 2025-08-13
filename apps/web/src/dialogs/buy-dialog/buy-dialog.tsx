@@ -34,7 +34,7 @@ import {
   PlansList
 } from "./plan-list";
 import { useCheckoutStore } from "./store";
-import { getCurrencySymbol } from "./helpers";
+import { getCurrencySymbol, toPricingInfo } from "./helpers";
 import { isMacStoreApp } from "../../utils/platform";
 import { isUserSubscribed } from "../../hooks/use-is-user-premium";
 import { SUBSCRIPTION_STATUS } from "../../common/constants";
@@ -413,32 +413,7 @@ type SelectedPlanProps = {
   onChangePlan?: () => void;
 };
 function SelectedPlan(props: SelectedPlanProps) {
-  const {
-    plan,
-    pricingInfo = {
-      country: plan.country,
-      period: plan.period,
-      price: {
-        currency: plan.currency,
-        id: plan.id,
-        period: plan.period,
-        subtotal: `${getCurrencySymbol(plan.currency)}${plan.price.net}`,
-        tax: `${getCurrencySymbol(plan.currency)}${plan.price.tax}`,
-        total: `${getCurrencySymbol(plan.currency)}${plan.price.gross}`
-      },
-      discount: plan.discount,
-      coupon: plan.discount?.code,
-      recurringPrice: {
-        currency: plan.currency,
-        id: plan.id,
-        period: plan.period,
-        subtotal: `${getCurrencySymbol(plan.currency)}${plan.price.net}`,
-        tax: `${getCurrencySymbol(plan.currency)}${plan.price.tax}`,
-        total: `${getCurrencySymbol(plan.currency)}${plan.price.gross}`
-      }
-    },
-    onChangePlan
-  } = props;
+  const { plan, pricingInfo = toPricingInfo(plan), onChangePlan } = props;
   const selectPlan = useCheckoutStore((store) => store.selectPlan);
   const upsellDetails = usePromise(() => getUpsellDetails(plan), [plan]);
 
