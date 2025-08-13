@@ -22,7 +22,7 @@ The following keyboard shortcuts will help you navigate Notesnook faster.
 | --- | --- | --- | --- |
 | Next tab | Ctrl Alt → / Ctrl Alt ⇧ → | Ctrl tab | ⌘ tab |
 | Previous tab | Ctrl Alt ← / Ctrl Alt ⇧ ← | Ctrl ⇧ tab | ⌘ ⇧ tab |
-| Command palette | Ctrl K | Ctrl K | ⌘ K |
+| Command palette | Ctrl ⇧ P | Ctrl ⇧ P | ⌘ ⇧ P |
 | Quick open | Ctrl P | Ctrl P | ⌘ P |
 | New tab | - | Ctrl T | ⌘ T |
 | Close active tab | - | Ctrl W | ⌘ W |
@@ -60,8 +60,8 @@ The following keyboard shortcuts will help you navigate Notesnook faster.
 | Add image | Ctrl ⇧ I | Ctrl ⇧ I | ⌘ ⇧ I |
 | Toggle italic | Ctrl I | Ctrl I | ⌘ I |
 | Remove formatting in selection | Ctrl \ | Ctrl \ | ⌘ \ |
-| Insert internal link | Ctrl ⇧ L | Ctrl ⇧ L | ⌘ ⇧ L |
-| Insert link | Ctrl ⇧ K | Ctrl ⇧ K | ⌘ ⇧ K |
+| Insert internal link | Ctrl ⇧ K | Ctrl ⇧ K | ⌘ ⇧ K |
+| Insert link | Ctrl K | Ctrl K | ⌘ K |
 | Insert math block | Ctrl ⇧ M | Ctrl ⇧ M | ⌘ ⇧ M |
 | Toggle ordered list | Ctrl ⇧ 7 | Ctrl ⇧ 7 | ⌘ ⇧ 7 |
 | Toggle outline list | Ctrl ⇧ O | Ctrl ⇧ O | ⌘ ⇧ O |
