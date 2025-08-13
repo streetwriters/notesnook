@@ -550,6 +550,13 @@ export type TrashItem = BaseTrashItem<Note> | BaseTrashItem<Notebook>;
 
 export type AuthenticatorType = "app" | "sms" | "email";
 
+export type SubscriptionPlanId =
+  | "free"
+  | "essential"
+  | "pro"
+  | "believer"
+  | "education";
+
 export enum SubscriptionPlan {
   FREE = 0,
   ESSENTIAL = 1,
@@ -664,4 +671,19 @@ export function isEncryptedContent(
   content: NoteContent<boolean>
 ): content is NoteContent<true> {
   return isCipher(content.data);
+}
+
+export function planToId(plan: SubscriptionPlan): SubscriptionPlanId {
+  switch (plan) {
+    case SubscriptionPlan.FREE:
+      return "free";
+    case SubscriptionPlan.BELIEVER:
+      return "believer";
+    case SubscriptionPlan.EDUCATION:
+      return "education";
+    case SubscriptionPlan.ESSENTIAL:
+      return "essential";
+    case SubscriptionPlan.PRO:
+      return "pro";
+  }
 }
