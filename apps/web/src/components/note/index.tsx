@@ -46,6 +46,7 @@ import { AddReminderDialog } from "../../dialogs/add-reminder-dialog";
 import { AddTagsDialog } from "../../dialogs/add-tags-dialog";
 import { ConfirmDialog } from "../../dialogs/confirm";
 import { CreateColorDialog } from "../../dialogs/create-color-dialog";
+import { MergeNotesDialog } from "../../dialogs/merge-notes-dialog";
 import { MoveNoteDialog } from "../../dialogs/move-note-dialog";
 import { isUserPremium } from "../../hooks/use-is-user-premium";
 import { navigate } from "../../navigation";
@@ -75,6 +76,7 @@ import {
   InternalLink,
   Lock,
   Markdown,
+  Merge,
   Notebook,
   OpenInNew,
   PDF,
@@ -262,9 +264,9 @@ function Note(props: NoteProps) {
                   styles={
                     isReminderToday(reminder)
                       ? {
-                          icon: { color: primary },
-                          text: { color: primary }
-                        }
+                        icon: { color: primary },
+                        text: { color: primary }
+                      }
                       : {}
                   }
                 />
@@ -406,6 +408,17 @@ export const noteMenuItems: (
       onClick: () => store.archive(!note.archived, ...ids),
       multiSelect: true
     },
+    {
+      type: "button",
+      key: "merge",
+      title: "Merge with...",
+      icon: Merge.path,
+      isDisabled: context?.locked || db.monographs.isPublished(note.id),
+      multiSelect: true,
+      onClick: () => {
+        MergeNotesDialog.show({ noteIds: ids.length > 0 ? ids : [note.id] });
+      }
+    },
     { key: "sep1", type: "separator" },
     {
       type: "button",
@@ -452,55 +465,55 @@ export const noteMenuItems: (
       title: strings.publish(),
       menu: db.monographs.isPublished(note.id)
         ? {
-            items: [
-              {
-                type: "button",
-                key: "open",
-                title: strings.open(),
-                icon: OpenInNew.path,
-                onClick: async () => {
-                  const url = `${hosts.MONOGRAPH_HOST}/${note.id}`;
-                  window.open(url, "_blank");
-                }
-              },
-              {
-                type: "button",
-                key: "copy-link",
-                title: strings.copyLink(),
-                icon: Copy.path,
-                onClick: async () => {
-                  const url = `${hosts.MONOGRAPH_HOST}/${note.id}`;
-                  await writeToClipboard({
-                    "text/plain": url,
-                    "text/html": `<a href="${url}">${note.title}</a>`,
-                    "text/markdown": `[${note.title}](${url})`
-                  });
-                }
-              },
-              {
-                type: "button",
-                key: "update",
-                title: strings.update(),
-                icon: Update.path,
-                onClick: () => {
-                  showPublishView(note, "bottom");
-                }
-              },
-              {
-                type: "separator",
-                key: "sep"
-              },
-              {
-                type: "button",
-                key: "unpublish",
-                title: strings.unpublish(),
-                icon: Publish.path,
-                onClick: async () => {
-                  await useMonographStore.getState().unpublish(note.id);
-                }
+          items: [
+            {
+              type: "button",
+              key: "open",
+              title: strings.open(),
+              icon: OpenInNew.path,
+              onClick: async () => {
+                const url = `${hosts.MONOGRAPH_HOST}/${note.id}`;
+                window.open(url, "_blank");
               }
-            ]
-          }
+            },
+            {
+              type: "button",
+              key: "copy-link",
+              title: strings.copyLink(),
+              icon: Copy.path,
+              onClick: async () => {
+                const url = `${hosts.MONOGRAPH_HOST}/${note.id}`;
+                await writeToClipboard({
+                  "text/plain": url,
+                  "text/html": `<a href="${url}">${note.title}</a>`,
+                  "text/markdown": `[${note.title}](${url})`
+                });
+              }
+            },
+            {
+              type: "button",
+              key: "update",
+              title: strings.update(),
+              icon: Update.path,
+              onClick: () => {
+                showPublishView(note, "bottom");
+              }
+            },
+            {
+              type: "separator",
+              key: "sep"
+            },
+            {
+              type: "button",
+              key: "unpublish",
+              title: strings.unpublish(),
+              icon: Publish.path,
+              onClick: async () => {
+                await useMonographStore.getState().unpublish(note.id);
+              }
+            }
+          ]
+        }
         : undefined,
       onClick: () => showPublishView(note, "bottom")
     },
