@@ -191,7 +191,7 @@ class Database {
 
   tokenManager = new TokenManager(this.kv);
   mfa = new MFAManager(this.tokenManager);
-  subscriptions = new Subscriptions(this.tokenManager);
+  subscriptions = new Subscriptions(this);
   offers = Offers;
   debug = new Debug();
   pricing = Pricing;
