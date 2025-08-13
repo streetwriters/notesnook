@@ -22,6 +22,8 @@ import {
   ICurrencySymbols
 } from "@brixtol/currency-symbols";
 import { getFeature } from "@notesnook/common";
+import { Plan } from "@notesnook/core";
+import { PricingInfo } from "./types";
 
 export const IS_DEV = import.meta.env.DEV || IS_TESTING;
 export function getCurrencySymbol(currency: string) {
@@ -41,6 +43,33 @@ export function parseAmount(amount: string) {
 export const FEATURE_HIGHLIGHTS = [
   getFeature("storage"),
   getFeature("fileSize"),
+  getFeature("colors"),
+  getFeature("notebooks"),
   getFeature("fullQualityImages"),
   getFeature("appLock")
 ];
+
+export function toPricingInfo(plan: Plan): PricingInfo {
+  return {
+    country: plan.country,
+    period: plan.period,
+    price: {
+      currency: plan.currency,
+      id: plan.id,
+      period: plan.period,
+      subtotal: `${getCurrencySymbol(plan.currency)}${plan.price.net}`,
+      tax: `${getCurrencySymbol(plan.currency)}${plan.price.tax}`,
+      total: `${getCurrencySymbol(plan.currency)}${plan.price.gross}`
+    },
+    discount: plan.discount,
+    coupon: plan.discount?.code,
+    recurringPrice: {
+      currency: plan.currency,
+      id: plan.id,
+      period: plan.period,
+      subtotal: `${getCurrencySymbol(plan.currency)}${plan.price.net}`,
+      tax: `${getCurrencySymbol(plan.currency)}${plan.price.tax}`,
+      total: `${getCurrencySymbol(plan.currency)}${plan.price.gross}`
+    }
+  };
+}

@@ -17,8 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { FeatureId } from "@notesnook/common";
-import { SubscriptionPlan } from "@notesnook/core";
+import { Discount, Period, PlanPrice, SubscriptionPlan } from "@notesnook/core";
 import {
   CheckoutEventNames,
   CheckoutEventsCustomer,
@@ -26,8 +25,6 @@ import {
   CheckoutEventsItem,
   PaddleEventData
 } from "@paddle/paddle-js";
-
-export type Period = "monthly" | "yearly" | "5-year";
 
 // export interface CallbackData {
 //   checkout?: Checkout;
@@ -61,13 +58,6 @@ export type PlanMetadata = Record<
     recommended?: boolean;
   }
 >;
-
-export interface PlanPrice {
-  gross: number;
-  net: number;
-  tax: number;
-  currency?: string;
-}
 
 export interface Plan {
   plan: SubscriptionPlan;
@@ -105,13 +95,6 @@ export type PricingInfo = {
   discount?: Discount;
   coupon?: string;
   invalidCoupon?: boolean;
-};
-
-export type Discount = {
-  type: "regional" | "promo";
-  code?: string;
-  recurring: boolean;
-  amount: number;
 };
 
 export interface Customer {
