@@ -17,9 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { planToId, SubscriptionPlan } from "../types.js";
 import hosts from "../utils/constants.js";
 import http from "../utils/http.js";
-import TokenManager from "./token-manager.js";
+import Database from "./index.js";
+import { Period } from "./pricing.js";
 
 export type TransactionStatus =
   | "completed"
@@ -56,10 +58,10 @@ export interface Totals {
 }
 
 export default class Subscriptions {
-  constructor(private readonly tokenManager: TokenManager) {}
+  constructor(private readonly db: Database) {}
 
   async cancel() {
-    const token = await this.tokenManager.getAccessToken();
+    const token = await this.db.tokenManager.getAccessToken();
     if (!token) return;
     await http.post(
       `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/v2/cancel`,
@@ -69,7 +71,7 @@ export default class Subscriptions {
   }
 
   async pause() {
-    const token = await this.tokenManager.getAccessToken();
+    const token = await this.db.tokenManager.getAccessToken();
     if (!token) return;
     await http.post(
       `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/v2/pause`,
@@ -79,7 +81,7 @@ export default class Subscriptions {
   }
 
   async resume() {
-    const token = await this.tokenManager.getAccessToken();
+    const token = await this.db.tokenManager.getAccessToken();
     if (!token) return;
     await http.post(
       `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/v2/resume`,
@@ -89,7 +91,7 @@ export default class Subscriptions {
   }
 
   async refund() {
-    const token = await this.tokenManager.getAccessToken();
+    const token = await this.db.tokenManager.getAccessToken();
     if (!token) return;
     await http.post(
       `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/v2/refund`,
@@ -99,7 +101,7 @@ export default class Subscriptions {
   }
 
   async transactions(): Promise<Transaction[] | undefined> {
-    const token = await this.tokenManager.getAccessToken();
+    const token = await this.db.tokenManager.getAccessToken();
     if (!token) return;
     return await http.get(
       `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/v2/transactions`,
@@ -108,7 +110,7 @@ export default class Subscriptions {
   }
 
   async invoice(transactionId: string): Promise<string | undefined> {
-    const token = await this.tokenManager.getAccessToken();
+    const token = await this.db.tokenManager.getAccessToken();
     if (!token) return;
     const response = await http.get(
       `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/v2/invoice?transactionId=${transactionId}`,
@@ -120,7 +122,7 @@ export default class Subscriptions {
   async urls(): Promise<
     { update_payment_method: string; cancel: string } | undefined
   > {
-    const token = await this.tokenManager.getAccessToken();
+    const token = await this.db.tokenManager.getAccessToken();
     if (!token) return;
     return await http.get(
       `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/v2/urls`,
@@ -129,7 +131,7 @@ export default class Subscriptions {
   }
 
   async redeemCode(code: string) {
-    const token = await this.tokenManager.getAccessToken();
+    const token = await this.db.tokenManager.getAccessToken();
     if (!token) return;
     return http.post.json(
       `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/redeem`,
@@ -138,5 +140,13 @@ export default class Subscriptions {
       },
       token
     );
+  }
+
+  async checkoutUrl(plan: SubscriptionPlan, period: Period) {
+    const user = await this.db.user.getUser();
+    if (!user) return;
+    return `https://notesnook.com/api/v2/checkout?userId=${user.id}&email=${
+      user.email
+    }&plan=${planToId(plan)}&period=${period}`;
   }
 }
