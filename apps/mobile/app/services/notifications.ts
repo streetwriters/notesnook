@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { getFormattedReminderTime } from "@notesnook/common";
 import { isReminderActive, Reminder } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import notifee, {
@@ -36,6 +37,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { encodeNonAsciiHTML } from "entities";
 import { Platform } from "react-native";
 import { db, setupDatabase } from "../common/database";
+import { MMKV } from "../common/database/mmkv";
 import { presentDialog } from "../components/dialog/functions";
 import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
 import { editorState } from "../screens/editor/tiptap/utils";
@@ -52,8 +54,6 @@ import { DDS } from "./device-detection";
 import { eSendEvent } from "./event-manager";
 import Navigation from "./navigation";
 import SettingsService from "./settings";
-import { getFormattedReminderTime } from "@notesnook/common";
-import { MMKV } from "../common/database/mmkv";
 
 let pinned: DisplayedNotification[] = [];
 
@@ -454,7 +454,7 @@ async function loadNote(id: string, jump: boolean) {
   const tab = useTabStore.getState().getTabForNote(id);
   if (useTabStore.getState().currentTab !== tab) {
     eSendEvent(eOnLoadNote, {
-      note: note
+      item: note
     });
   }
 }
