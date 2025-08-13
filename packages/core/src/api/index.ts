@@ -36,6 +36,7 @@ import Migrations from "./migrations.js";
 import UserManager from "./user-manager.js";
 import http from "../utils/http.js";
 import { Monographs } from "./monographs.js";
+import { Monographs as MonographsCollection } from "../collections/monographs.js";
 import { Offers } from "./offers.js";
 import { Attachments } from "../collections/attachments.js";
 import { Debug } from "./debug.js";
@@ -203,6 +204,7 @@ class Database {
   trash = new Trash(this);
   sanitizer = new Sanitizer(this.sql);
 
+  monographsCollection = new MonographsCollection(this);
   notebooks = new Notebooks(this);
   tags = new Tags(this);
   colors = new Colors(this);
@@ -329,6 +331,7 @@ class Database {
     await this.relations.init();
     await this.notes.init();
     await this.vaults.init();
+    await this.monographsCollection.init();
 
     await this.trash.init();
 
@@ -406,6 +409,9 @@ class Database {
               await this.user.fetchUser();
               EV.publish(EVENTS.userEmailConfirmed);
               break;
+            }
+            case "triggerSync": {
+              await this.sync({ type: "fetch" });
             }
           }
         } catch (e) {

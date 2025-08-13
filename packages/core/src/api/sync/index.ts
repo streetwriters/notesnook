@@ -42,6 +42,7 @@ import {
   isTrashItem,
   Item,
   MaybeDeletedItem,
+  Monograph,
   Note,
   Notebook
 } from "../../types.js";
@@ -53,6 +54,7 @@ import {
 import { DownloadableFile } from "../../database/fs.js";
 import { SyncDevices } from "./devices.js";
 import { DefaultColors } from "../../collections/colors.js";
+import { Monographs } from "../monographs.js";
 
 enum LogLevel {
   /** Log level for very low severity diagnostic messages. */
@@ -460,6 +462,19 @@ class Sync {
       await this.processChunk(chunk, key, options);
 
       sendSyncProgressEvent(this.db.eventManager, `download`, chunk.count);
+
+      return true;
+    });
+
+    this.connection.on("SendMonographs", async (monographs) => {
+      if (this.connection?.state !== HubConnectionState.Connected) return false;
+
+      this.db.monographsCollection.collection.put(
+        monographs.map((m: Monograph) => ({
+          ...m,
+          type: "monograph"
+        }))
+      );
 
       return true;
     });
