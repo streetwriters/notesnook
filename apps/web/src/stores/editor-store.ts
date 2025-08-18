@@ -410,6 +410,8 @@ class EditorStore extends BaseStore<EditorStore> {
                     event.item.dateCreated ?? session.note.dateCreated;
                   session.note.dateEdited =
                     event.item.dateEdited ?? session.note.dateEdited;
+                  session.note.spellcheck =
+                    event.item.spellcheck ?? session.note.spellcheck;
                 });
               }
             }

@@ -430,7 +430,19 @@ export class NNMigrationProvider implements MigrationProvider {
         async up(db) {
           await db.schema
             .alterTable("monographs")
-            .addColumn("publishUrl", "text", COLLATE_NOCASE)
+            .addColumn("publishUrl", "text", COLLATE_NOCASE);
+        }
+      },
+      "a-2026-04-06": {
+        async up(db) {
+          await db.schema
+            .alterTable("notes")
+            .addColumn("spellcheck", "boolean")
+            .execute();
+          await db
+            .updateTable("notes")
+            .set({ spellcheck: true })
+            .where("spellcheck", "is", null)
             .execute();
         }
       }

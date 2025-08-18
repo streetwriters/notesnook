@@ -214,6 +214,7 @@ export interface Note extends BaseItem<"note"> {
     dateModified: number;
     value: number | null;
   };
+  spellcheck?: boolean;
 }
 
 export interface Notebook extends BaseItem<"notebook"> {
