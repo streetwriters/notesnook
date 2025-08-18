@@ -27,16 +27,17 @@ import ImagePicker from "react-native-image-crop-picker";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import { presentDialog } from "../../components/dialog/functions";
+import { PlanLimits } from "../../components/sheets/plan-limits";
 import AppIcon from "../../components/ui/AppIcon";
 import { Button } from "../../components/ui/button";
 import { TimeSince } from "../../components/ui/time-since";
 import Paragraph from "../../components/ui/typography/paragraph";
+import { presentSheet } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SyncStatus, useUserStore } from "../../stores/use-user-store";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
-import { SectionItem } from "./section-item";
 
 export const getTimeLeft = (t2) => {
   let daysRemaining = dayjs(t2).diff(dayjs(), "days");
@@ -134,9 +135,7 @@ const SettingsUserSection = ({ item }) => {
             style={{
               paddingHorizontal: DefaultAppStyles.GAP,
               paddingTop: 25,
-              borderBottomWidth: 1,
-              paddingBottom: 20,
-              borderColor: colors.primary.border
+              paddingBottom: 20
             }}
           >
             <View
@@ -309,7 +308,14 @@ const SettingsUserSection = ({ item }) => {
                   borderRadius: 10
                 }}
               >
-                <View>
+                <TouchableOpacity
+                  activeOpacity={1}
+                  onPress={() => {
+                    presentSheet({
+                      component: <PlanLimits />
+                    });
+                  }}
+                >
                   <Paragraph size={AppFontSize.sm}>
                     {strings.freePlan()}
                   </Paragraph>
@@ -320,7 +326,7 @@ const SettingsUserSection = ({ item }) => {
                     {strings.viewAllLimits()}{" "}
                     <AppIcon name="information" size={AppFontSize.xxxs} />
                   </Paragraph>
-                </View>
+                </TouchableOpacity>
 
                 <Button
                   title={strings.upgradePlan()}
@@ -342,9 +348,9 @@ const SettingsUserSection = ({ item }) => {
             </View>
           </View>
 
-          {item.sections.map((item) => (
+          {/* {item.sections.map((item) => (
             <SectionItem key={item.name} item={item} />
-          ))}
+          ))} */}
         </>
       ) : null}
     </>
