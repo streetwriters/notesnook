@@ -32,7 +32,8 @@ import {
   LinkedTo,
   ReferencedIn as ReferencedInIcon,
   Note as NoteIcon,
-  Archive
+  Archive,
+  SpellCheck
 } from "../icons";
 import { Box, Button, Flex, Text, FlexProps } from "@theme-ui/components";
 import {
@@ -96,6 +97,12 @@ const tools = [
     icon: SyncOff,
     label: strings.disableSync(),
     property: "localOnly"
+  },
+  {
+    key: "spellcheck",
+    icon: SpellCheck,
+    label: strings.spellCheck(),
+    property: "spellcheck"
   }
 ] as const;
 
@@ -847,7 +854,14 @@ export function Section({
 }
 
 function changeToggleState(
-  prop: "lock" | "readonly" | "local-only" | "pin" | "favorite" | "archive",
+  prop:
+    | "lock"
+    | "readonly"
+    | "local-only"
+    | "pin"
+    | "favorite"
+    | "archive"
+    | "spellcheck",
   session: ReadonlyEditorSession | DefaultEditorSession
 ) {
   const {
@@ -856,7 +870,8 @@ function changeToggleState(
     localOnly,
     pinned,
     favorite,
-    archived
+    archived,
+    spellcheck
   } = session.note;
   if (!sessionId) return;
   switch (prop) {
@@ -874,6 +889,8 @@ function changeToggleState(
       return noteStore.favorite(!favorite, sessionId);
     case "archive":
       return noteStore.archive(!archived, sessionId);
+    case "spellcheck":
+      return noteStore.spellcheck(!spellcheck, sessionId);
     default:
       return;
   }

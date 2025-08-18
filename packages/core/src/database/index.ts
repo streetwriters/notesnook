@@ -236,7 +236,8 @@ const BooleanProperties: Set<BooleanFields> = new Set([
   "synced",
   "isGeneratedTitle",
   "archived",
-  "selfDestruct"
+  "selfDestruct",
+  "spellcheck"
 ]);
 
 const DataMappers: Partial<Record<ItemType, (row: any) => void>> = {

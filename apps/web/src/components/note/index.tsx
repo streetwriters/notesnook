@@ -85,6 +85,7 @@ import {
   Readonly,
   Reminder,
   RemoveShortcutLink,
+  SpellCheck,
   Star,
   StarOutline,
   Sync,
@@ -98,6 +99,7 @@ import { Context } from "../list-container/types";
 import ListItem from "../list-item";
 import { PublishDialog } from "../publish-view";
 import TimeAgo from "../time-ago";
+import { useSpellChecker } from "../../hooks/use-spell-checker";
 
 type NoteProps = NoteResolvedData & {
   item: NoteType;
@@ -401,6 +403,16 @@ export const noteMenuItems: (
       isChecked: note.archived,
       icon: Archive.path,
       onClick: () => store.archive(!note.archived, ...ids),
+      multiSelect: true
+    },
+    {
+      type: "button",
+      key: "spellcheck",
+      title: strings.spellCheck(),
+      isChecked: note.spellcheck,
+      icon: SpellCheck.path,
+      isHidden: IS_DESKTOP_APP && !useSpellChecker.getState().enabled,
+      onClick: () => store.spellcheck(!note.spellcheck, ...ids),
       multiSelect: true
     },
     { key: "sep1", type: "separator" },

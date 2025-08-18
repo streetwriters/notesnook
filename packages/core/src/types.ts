@@ -208,6 +208,7 @@ export interface Note extends BaseItem<"note"> {
 
   isGeneratedTitle?: boolean;
   archived?: boolean;
+  spellcheck?: boolean;
 }
 
 export interface Notebook extends BaseItem<"notebook"> {

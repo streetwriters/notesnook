@@ -98,6 +98,7 @@ type TipTapProps = {
   onAutoSaveDisabled: () => void;
   content?: () => string | undefined;
   readonly?: boolean;
+  spellcheck?: boolean;
   nonce?: number;
   isMobile?: boolean;
   isTablet?: boolean;
@@ -615,6 +616,26 @@ function TiptapWrapper(
     };
   }, [editorConfig.zoom]);
 
+  useEffect(() => {
+    const { unsubscribe } = AppEventManager.subscribe(
+      AppEvents.spellcheckUpdated,
+      ({ noteIds, spellcheck }) => {
+        const session = useEditorStore.getState().getSession(props.id);
+        if (
+          session &&
+          "note" in session &&
+          noteIds.includes(session.note.id) &&
+          editorContainerRef.current
+        ) {
+          editorContainerRef.current.spellcheck = spellcheck;
+        }
+      }
+    );
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
   return (
     <Flex
       ref={containerRef}
@@ -661,6 +682,7 @@ function TiptapWrapper(
           editorContainer.style.fontFamily =
             getFontById(editorConfig.fontFamily)?.font || "sans-serif";
           editorContainer.tabIndex = -1;
+          editorContainer.spellcheck = props.spellcheck === true;
           editorContainerRef.current = editorContainer;
           return editorContainer;
         }}

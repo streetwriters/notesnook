@@ -407,6 +407,8 @@ class EditorStore extends BaseStore<EditorStore> {
                     event.item.archived ?? session.note.archived;
                   session.note.dateEdited =
                     event.item.dateEdited ?? session.note.dateEdited;
+                  session.note.spellcheck =
+                    event.item.spellcheck ?? session.note.spellcheck;
                 });
               }
             }
