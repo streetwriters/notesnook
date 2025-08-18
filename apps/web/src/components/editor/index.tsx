@@ -390,7 +390,8 @@ function EditorView({
         }}
         options={{
           readonly: session?.type === "readonly" || session?.type === "deleted",
-          focusMode: isFocusMode
+          focusMode: isFocusMode,
+          spellcheck: "note" in session && session.note.spellcheck
         }}
       />
     </Flex>
@@ -455,6 +456,7 @@ type EditorOptions = {
   headless?: boolean;
   readonly?: boolean;
   focusMode?: boolean;
+  spellcheck?: boolean;
   onRequestFocus?: () => void;
 };
 type EditorProps = {
@@ -480,10 +482,11 @@ export function Editor(props: EditorProps) {
     onContentChange,
     onPreviewDocument
   } = props;
-  const { readonly, headless } = options || {
+  const { readonly, headless, spellcheck } = options || {
     headless: false,
     readonly: false,
-    focusMode: false
+    focusMode: false,
+    spellcheck: false
   };
   const saveSessionContentIfNotSaved = useEditorStore(
     (store) => store.saveSessionContentIfNotSaved
@@ -537,6 +540,7 @@ export function Editor(props: EditorProps) {
         isHydrating={!!session.needsHydration}
         nonce={nonce}
         readonly={readonly}
+        spellcheck={spellcheck}
         content={content}
         downloadOptions={{
           corsHost: Config.get("corsProxy", "https://cors.notesnook.com")
