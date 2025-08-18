@@ -243,8 +243,7 @@ export const useEditorEvents = (
     timeFormat,
     loading,
     fontScale,
-    markdownShortcuts,
-    features
+    markdownShortcuts
   ]);
 
   const onBackPress = useCallback(async () => {

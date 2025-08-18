@@ -29,10 +29,10 @@ import { DDS } from "../../services/device-detection";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { AppFontSize, defaultBorderRadius } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
+import AppIcon from "../ui/AppIcon";
 import { Button } from "../ui/button";
 import { Pressable } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
-import AppIcon from "../ui/AppIcon";
 
 const TOP_BAR_ITEMS: ActionId[] = [
   "pin",
@@ -354,7 +354,8 @@ export const Items = ({
               paginationStyle={{
                 position: "relative",
                 marginHorizontal: 2,
-                marginBottom: 0
+                marginBottom: 0,
+                marginTop: 0
               }}
               contentContainerStyle={{
                 justifyContent: "flex-start",
