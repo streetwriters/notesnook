@@ -497,10 +497,10 @@ class UserManager {
       this.cachedMonographPasswordsKey = JSON.parse(plainData) as SerializedKey;
       return this.cachedMonographPasswordsKey;
     } catch (e) {
-      logger.error(e, "Could not get attachments encryption key.");
+      logger.error(e, "Could not get monographs encryption key.");
       if (e instanceof Error)
         throw new Error(
-          `Could not get attachments encryption key. Error: ${e.message}`
+          `Could not get monographs encryption key. Error: ${e.message}`
         );
     }
   }
