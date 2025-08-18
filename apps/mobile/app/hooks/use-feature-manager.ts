@@ -61,8 +61,12 @@ export default function useFeatureManager() {
     }
 
     if (!features.defaultNotebookAndTag.isAllowed) {
-      db.settings.setDefaultNotebook(undefined);
-      db.settings.setDefaultTag(undefined);
+      if (db.settings.getDefaultNotebook()) {
+        db.settings.setDefaultNotebook(undefined);
+      }
+      if (db.settings.getDefaultTag()) {
+        db.settings.setDefaultTag(undefined);
+      }
     }
     const isAppLocked = useUserStore.getState().appLocked;
     let unsub: () => void;
