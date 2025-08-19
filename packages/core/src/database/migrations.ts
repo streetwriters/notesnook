@@ -397,7 +397,7 @@ export class NNMigrationProvider implements MigrationProvider {
         async up(db) {
           await db.schema
             .alterTable("notes")
-            .addColumn("spellcheck", "boolean")
+            .addColumn("spellcheck", "boolean", (c) => c.defaultTo(true))
             .execute();
           await db
             .updateTable("notes")
