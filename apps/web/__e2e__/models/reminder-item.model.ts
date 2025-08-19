@@ -62,4 +62,9 @@ export class ReminderItemModel extends BaseItemModel {
     await this.contextMenu.open(this.locator);
     await this.contextMenu.clickOnItem("toggle");
   }
+
+  async open() {
+    await this.contextMenu.open(this.locator);
+    await this.contextMenu.clickOnItem("edit");
+  }
 }
