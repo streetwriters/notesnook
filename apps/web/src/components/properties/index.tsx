@@ -70,6 +70,7 @@ import { VirtualizedTable } from "../virtualized-table";
 import { TextSlice } from "@notesnook/core";
 import { TITLE_BAR_HEIGHT } from "../title-bar";
 import { strings } from "@notesnook/intl";
+import { useSpellChecker } from "../../hooks/use-spell-checker";
 
 const tools = [
   { key: "pin", property: "pinned", icon: Pin, label: strings.pin() },
@@ -102,7 +103,8 @@ const tools = [
     key: "spellcheck",
     icon: SpellCheck,
     label: strings.spellCheck(),
-    property: "spellcheck"
+    property: "spellcheck",
+    isHidden: () => IS_DESKTOP_APP && !useSpellChecker.getState().enabled
   }
 ] as const;
 
@@ -130,6 +132,7 @@ type EditorPropertiesProps = {
 };
 function EditorProperties(props: EditorPropertiesProps) {
   const toggleProperties = useEditorStore((store) => store.toggleProperties);
+  useSpellChecker((store) => store.enabled);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const session = useEditorStore((store) =>
     store.getSession(props.sessionId, [
@@ -185,19 +188,21 @@ function EditorProperties(props: EditorPropertiesProps) {
                 {session.type === "deleted" ||
                 session.type === "diff" ? null : (
                   <>
-                    {tools.map((tool) => (
-                      <Toggle
-                        {...tool}
-                        key={tool.key}
-                        isOn={
-                          tool.property === "locked"
-                            ? "locked" in session && !!session.locked
-                            : !!session.note[tool.property]
-                        }
-                        onToggle={() => changeToggleState(tool.key, session)}
-                        testId={`properties-${tool.key}`}
-                      />
-                    ))}
+                    {tools.map((tool) =>
+                      "isHidden" in tool && tool.isHidden() ? null : (
+                        <Toggle
+                          {...tool}
+                          key={tool.key}
+                          isOn={
+                            tool.property === "locked"
+                              ? "locked" in session && !!session.locked
+                              : !!session.note[tool.property]
+                          }
+                          onToggle={() => changeToggleState(tool.key, session)}
+                          testId={`properties-${tool.key}`}
+                        />
+                      )
+                    )}
                   </>
                 )}
 

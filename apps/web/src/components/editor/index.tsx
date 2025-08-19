@@ -404,7 +404,8 @@ function EditorView({
         options={{
           readonly: session?.type === "readonly" || session?.type === "deleted",
           focusMode: isFocusMode,
-          spellcheck: "note" in session && session.note.spellcheck
+          spellcheck:
+            "note" in session ? session.note.spellcheck : session.type === "new"
         }}
       />
     </Flex>
