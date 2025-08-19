@@ -41,6 +41,7 @@ abstract class BaseProperties {
   private readonly favoriteToggle: ToggleModel;
   private readonly lockToggle: ToggleModel;
   private readonly archiveToggle: ToggleModel;
+  private readonly spellcheckToggle: ToggleModel;
 
   constructor(
     page: Page,
@@ -52,6 +53,7 @@ abstract class BaseProperties {
     this.lockToggle = new ToggleModel(page, `${itemPrefix}-lock`);
     this.favoriteToggle = new ToggleModel(page, `${itemPrefix}-favorite`);
     this.archiveToggle = new ToggleModel(page, `${itemPrefix}-archive`);
+    this.spellcheckToggle = new ToggleModel(page, `${itemPrefix}-spellcheck`);
   }
 
   async isPinned() {
@@ -148,6 +150,13 @@ abstract class BaseProperties {
     await this.open();
     await this.archiveToggle.off();
     await this.close();
+  }
+
+  async isSpellcheckEnabled() {
+    await this.open();
+    const state = await this.spellcheckToggle.isToggled();
+    await this.close();
+    return state;
   }
 
   abstract isColored(color: string): Promise<boolean>;
