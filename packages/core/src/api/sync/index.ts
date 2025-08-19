@@ -233,7 +233,7 @@ class Sync {
   async fetch(deviceId: string, options: SyncOptions) {
     await this.checkConnection();
 
-    await this.connection?.invoke("RequestFetch", deviceId);
+    await this.connection?.invoke("RequestFetchV2", deviceId);
 
     if (this.conflictedNoteIds.length > 0) {
       await this.db
