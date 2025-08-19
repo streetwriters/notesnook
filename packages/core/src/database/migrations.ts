@@ -400,7 +400,8 @@ export class NNMigrationProvider implements MigrationProvider {
             .$call(addBaseColumns)
             .addColumn("datePublished", "integer")
             .addColumn("title", "text", COLLATE_NOCASE)
-            .addColumn("selfDestruct", "boolean");
+            .addColumn("selfDestruct", "boolean")
+            .execute();
         }
       },
       "a-2025-08-19": {

@@ -302,12 +302,7 @@ export class Notebooks implements ICollection {
     const notebook = await this.collection.get(id);
     if (!notebook) return false;
     if (!notebook.password) return false;
-
-    try {
-      await this.db.storage().decrypt({ password }, notebook.password);
-    } catch (e) {
-      return false;
-    }
+    if (password !== notebook.password) return false;
 
     addItem(this.cache.lockOpenedNotebooks, id);
 
@@ -320,9 +315,8 @@ export class Notebooks implements ICollection {
       throw new Error("Password cannot be empty");
     }
 
-    const encrypted = await this.db.storage().encrypt({ password }, this.key);
     await this.collection.update([id], {
-      password: encrypted || null
+      password: password
     });
 
     deleteItem(this.cache.lockOpenedNotebooks, id);

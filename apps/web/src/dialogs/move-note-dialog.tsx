@@ -150,11 +150,13 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
               if (item.isLocked) {
                 await db.notes.removeFromAllNotebooks(...noteIds);
                 await db.notes.addToNotebook(item.id, ...noteIds);
-                noteIds.forEach((id) => {
-                  useEditorStore
-                    .getState()
-                    .replaceNoteSessionsWithLockedNotebookSession(id);
-                });
+                if (!db.notebooks.isLockOpen(item.id)) {
+                  noteIds.forEach((id) => {
+                    useEditorStore
+                      .getState()
+                      .replaceNoteSessionsWithLockedNotebookSession(id);
+                  });
+                }
                 break;
               }
 

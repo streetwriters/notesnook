@@ -376,7 +376,7 @@ export const noteMenuItems: (
       title: strings.favorite(),
       isChecked: note.favorite,
       icon: StarOutline.path,
-      isDisabled: Boolean(context?.isInLockedNotebook),
+      isHidden: Boolean(context?.isInLockedNotebook),
       onClick: () => store.favorite(!note.favorite, ...ids),
       multiSelect: true
     },
@@ -412,7 +412,7 @@ export const noteMenuItems: (
       title: strings.archive(),
       isChecked: note.archived,
       icon: Archive.path,
-      isDisabled: context?.isInLockedNotebook,
+      isHidden: context?.isInLockedNotebook,
       onClick: () => store.archive(!note.archived, ...ids),
       multiSelect: true
     },
@@ -706,7 +706,7 @@ function notebooksMenuItems(
       key: "link-notebooks",
       title: strings.linkNotebooks(),
       icon: AddToNotebook.path,
-      isDisabled: context?.isInLockedNotebook,
+      isHidden: context?.isInLockedNotebook,
       onClick: () => MoveNoteDialog.show({ noteIds: ids })
     },
     {
