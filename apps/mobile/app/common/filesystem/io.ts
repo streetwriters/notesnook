@@ -137,6 +137,7 @@ export async function deleteFile(
 
 export async function clearFileStorage() {
   try {
+    await createCacheDir();
     const files = await RNFetchBlob.fs.ls(cacheDir);
     const oldCache = await RNFetchBlob.fs.ls(cacheDirOld);
 
@@ -221,6 +222,7 @@ export async function deleteCacheFileByName(name: string) {
 }
 
 export async function deleteDCacheFiles() {
+  await createCacheDir();
   const files = await RNFetchBlob.fs.ls(cacheDir);
   for (const file of files) {
     if (file.includes("_dcache") || file.startsWith("NN_")) {
