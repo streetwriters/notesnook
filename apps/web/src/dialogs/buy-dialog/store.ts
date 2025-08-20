@@ -23,8 +23,6 @@ import { create as produce } from "mutative";
 import { DEFAULT_PLANS } from "./plans";
 
 interface ICheckoutStore {
-  isCompleted: boolean;
-  completeCheckout: () => void;
   selectedPlan?: Plan;
   selectPlan: (plan?: Plan) => void;
   pricingInfo?: PricingInfo;
@@ -36,18 +34,11 @@ interface ICheckoutStore {
   reset: () => void;
 }
 export const useCheckoutStore = create<ICheckoutStore>((set) => ({
-  isCompleted: false,
   selectedPlan: undefined,
   selectedPrice: undefined,
   pricingInfo: undefined,
   couponCode: undefined,
   isApplyingCoupon: false,
-  completeCheckout: () =>
-    set(
-      produce((state: ICheckoutStore) => {
-        state.isCompleted = true;
-      })
-    ),
   selectPlan: (plan) =>
     set(
       produce((state: ICheckoutStore) => {
