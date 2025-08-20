@@ -17,17 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { EV, EVENTS } from "@notesnook/core";
+import { Button } from "@theme-ui/components";
+import { useEffect, useState } from "react";
+import { db } from "../common/db";
+import { handleDrop } from "../common/drop-handler";
+import { NotebookLock } from "../common/NotebookLock";
 import ListContainer from "../components/list-container";
+import { ListLoader } from "../components/loaders/list-loader";
+import Placeholder from "../components/placeholders";
+import { useSearch } from "../hooks/use-search";
+import { useEditorStore } from "../stores/editor-store";
 import {
   notesFromContext,
   useStore as useNotesStore
 } from "../stores/note-store";
-import Placeholder from "../components/placeholders";
-import { useSearch } from "../hooks/use-search";
-import { db } from "../common/db";
-import { handleDrop } from "../common/drop-handler";
-import { useEditorStore } from "../stores/editor-store";
-import { ListLoader } from "../components/loaders/list-loader";
 
 type NotesProps = { header?: JSX.Element };
 function Notes(props: NotesProps) {
@@ -51,8 +55,59 @@ function Notes(props: NotesProps) {
     },
     [context, contextNotes]
   );
+  const [showUnlockNotebookPreview, setShowUnlockNotebookPreview] =
+    useState(false);
+
+  useEffect(() => {
+    if (context?.type !== "notebook") {
+      setShowUnlockNotebookPreview(false);
+      return;
+    }
+
+    const showLockPreview =
+      db.notebooks.isLocked(context.id) && !db.notebooks.isLockOpen(context.id);
+    setShowUnlockNotebookPreview(showLockPreview);
+
+    const { unsubscribe: notebookLockOpenedEventUnsub } = EV.subscribe(
+      EVENTS.notebookLockOpened,
+      (notebookId) => {
+        if (notebookId === context.id) {
+          setShowUnlockNotebookPreview(false);
+        }
+      }
+    );
+    const { unsubscribe: notebooksLockedEventUnsub } = EV.subscribe(
+      EVENTS.notebooksLocked,
+      (ids: string[]) => {
+        if (ids.includes(context.id)) {
+          setShowUnlockNotebookPreview(true);
+        }
+      }
+    );
+
+    return () => {
+      notebookLockOpenedEventUnsub();
+      notebooksLockedEventUnsub();
+    };
+  }, [context]);
 
   if (!context || !contextNotes) return <ListLoader />;
+
+  if (showUnlockNotebookPreview && context.type === "notebook") {
+    return (
+      <>
+        {header}
+        <Button
+          variant="accent"
+          sx={{ borderRadius: 100, mt: 20, mx: "10%" }}
+          onClick={() => NotebookLock.openLock(context.id)}
+        >
+          Open
+        </Button>
+      </>
+    );
+  }
+
   return (
     <ListContainer
       type={type}

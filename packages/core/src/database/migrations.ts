@@ -401,6 +401,13 @@ export class NNMigrationProvider implements MigrationProvider {
             .addColumn("datePublished", "integer")
             .addColumn("title", "text", COLLATE_NOCASE)
             .addColumn("selfDestruct", "boolean")
+            .execute();
+        }
+      },
+      "a-2025-08-19": {
+        async up(db) {
+          await db.schema
+            .alterTable("notebooks")
             .addColumn("password", "text")
             .execute();
         }
