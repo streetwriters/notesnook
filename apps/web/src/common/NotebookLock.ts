@@ -45,6 +45,28 @@ export class NotebookLock {
     });
   }
 
+  static async openLock(notebookId: string) {
+    return showPasswordDialog({
+      title: "Open notebook",
+      subtitle: "Enter the notebook password to open this notebook.",
+      inputs: {
+        password: {
+          label: "Notebook password"
+        }
+      },
+      validate: async ({ password }) => {
+        const valid = await db.notebooks.openLock(notebookId, password);
+        if (!valid) {
+          showToast("error", "Invalid notebook password");
+          return false;
+        }
+        useNotebookStore.getState().refresh();
+        showToast("success", "Notebook unlocked");
+        return true;
+      }
+    });
+  }
+
   static async unlock(notebookId: string) {
     showPasswordDialog({
       title: "Unlock notebook",

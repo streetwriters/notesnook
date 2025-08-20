@@ -88,7 +88,12 @@ export function Notebook(props: NotebookProps) {
       isFocused={isOpened}
       isCompact
       item={item}
-      onClick={() => navigate(`/notebooks/${item.id}`)}
+      onClick={() => {
+        navigate(`/notebooks/${item.id}`);
+        if (db.notebooks.isLocked(item) && !db.notebooks.isLockOpen(item.id)) {
+          NotebookLock.openLock(item.id);
+        }
+      }}
       onDragEnter={(e) => {
         if (!isDragEntering(e)) return;
         e.currentTarget.focus();

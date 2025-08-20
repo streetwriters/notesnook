@@ -17,25 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { EV, EVENTS } from "@notesnook/core";
+import { Button } from "@theme-ui/components";
+import { useEffect, useState } from "react";
+import { db } from "../common/db";
+import { handleDrop } from "../common/drop-handler";
+import { NotebookLock } from "../common/NotebookLock";
 import ListContainer from "../components/list-container";
+import { ListLoader } from "../components/loaders/list-loader";
+import Placeholder from "../components/placeholders";
+import { useSearch } from "../hooks/use-search";
+import { useEditorStore } from "../stores/editor-store";
 import {
   notesFromContext,
   useStore as useNotesStore
 } from "../stores/note-store";
-import Placeholder from "../components/placeholders";
-import { useSearch } from "../hooks/use-search";
-import { db } from "../common/db";
-import { handleDrop } from "../common/drop-handler";
-import { useEditorStore } from "../stores/editor-store";
-import { ListLoader } from "../components/loaders/list-loader";
-import Field from "../components/field";
-import { Button, Flex, Text } from "@theme-ui/components";
-import { useStore } from "../stores/notebook-store";
-import { useEffect, useRef, useState } from "react";
-import { EV, EVENTS } from "@notesnook/core";
-import { strings } from "@notesnook/intl";
-import { showToast } from "../utils/toast";
-import { ErrorText } from "../components/error-text";
 
 type NotesProps = { header?: JSX.Element };
 function Notes(props: NotesProps) {
@@ -101,7 +97,13 @@ function Notes(props: NotesProps) {
     return (
       <>
         {header}
-        <UnlockNotebookPreview notebookId={context.id} />
+        <Button
+          variant="accent"
+          sx={{ borderRadius: 100, mt: 20, mx: "10%" }}
+          onClick={() => NotebookLock.openLock(context.id)}
+        >
+          Open
+        </Button>
       </>
     );
   }
@@ -139,64 +141,3 @@ function Notes(props: NotesProps) {
   );
 }
 export default Notes;
-
-function UnlockNotebookPreview({ notebookId }: { notebookId: string }) {
-  const [isWrong, setIsWrong] = useState(false);
-  const passwordRef = useRef<HTMLInputElement | null>(null);
-
-  async function submit() {
-    if (!passwordRef.current?.value) return;
-
-    const password = passwordRef.current.value;
-    try {
-      const valid = await db.notebooks.openLock(notebookId, password);
-      if (valid) {
-        useStore.getState().refresh();
-      } else {
-        setIsWrong(true);
-      }
-    } catch (e) {
-      showToast("error", `${strings.couldNotUnlock()}: ` + e);
-      console.error(e);
-    }
-  }
-
-  return (
-    <Flex
-      mx={2}
-      sx={{
-        flex: "1",
-        flexDirection: "column"
-      }}
-    >
-      <Text variant="heading" mt={25} sx={{ textAlign: "center" }}>
-        Open notebook
-      </Text>
-      <Field
-        id="notebookPassword"
-        data-test-id="unlock-notebook-password"
-        inputRef={passwordRef}
-        autoFocus
-        placeholder={"Enter password"}
-        type="password"
-        onKeyUp={async (e) => {
-          if (e.key === "Enter") {
-            await submit();
-          } else if (isWrong) {
-            setIsWrong(false);
-          }
-        }}
-      />
-      {isWrong && <ErrorText error="Wrong password" />}
-      <Button
-        mt={3}
-        variant="accent"
-        data-test-id="unlock-notebook-submit"
-        sx={{ borderRadius: 100, px: 30 }}
-        onClick={submit}
-      >
-        Unlock
-      </Button>
-    </Flex>
-  );
-}
