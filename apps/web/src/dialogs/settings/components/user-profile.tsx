@@ -47,23 +47,23 @@ export function getSubscriptionInfo(user: User | undefined): {
   autoRenew?: boolean;
 } {
   const { type, expiry, plan, status, provider } = user?.subscription || {};
-  if (!expiry) return { title: "FREE" };
+  if (!expiry) return { title: "Free" };
 
   const legacy = !!type;
   const trial =
     status === SubscriptionStatus.TRIAL || type === SubscriptionType.TRIAL;
   const title =
     plan === SubscriptionPlan.BELIEVER
-      ? "BELIEVER"
+      ? "Believer"
       : plan === SubscriptionPlan.PRO ||
         type === SubscriptionType.PREMIUM ||
         type === SubscriptionType.PREMIUM_CANCELED
-      ? "PRO"
+      ? "Pro"
       : plan === SubscriptionPlan.ESSENTIAL
-      ? "ESSENTIAL"
+      ? "Essential"
       : plan === SubscriptionPlan.EDUCATION
-      ? "EDUCATION"
-      : "FREE";
+      ? "Education"
+      : "Free";
   const autoRenew =
     (status === SubscriptionStatus.ACTIVE ||
       status === SubscriptionStatus.TRIAL) &&
