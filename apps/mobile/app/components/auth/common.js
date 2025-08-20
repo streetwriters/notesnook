@@ -35,7 +35,7 @@ export function hideAuth() {
     Navigation.replace("FluidPanelsView");
     setTimeout(() => {
       Navigation.resetRootState();
-    }, 300);
+    }, 1000);
   } else {
     Navigation.goBack();
   }

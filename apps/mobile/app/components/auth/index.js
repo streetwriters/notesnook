@@ -91,7 +91,7 @@ const Auth = ({ navigation, route }) => {
                   Navigation.replace("FluidPanelsView");
                   setTimeout(() => {
                     Navigation.resetRootState();
-                  }, 300);
+                  }, 1000);
                 } else {
                   Navigation.goBack();
                 }
