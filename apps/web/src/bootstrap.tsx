@@ -52,6 +52,9 @@ export type Routes = keyof typeof routes;
 // | "default";
 
 const routes = {
+  "/plans": {
+    component: () => import("./views/plans")
+  },
   "/checkout": {
     component: () => import("./views/checkout")
   },

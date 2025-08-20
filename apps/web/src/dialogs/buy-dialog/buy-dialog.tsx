@@ -49,16 +49,17 @@ import { usePromise } from "@notesnook/common";
 
 type BuyDialogProps = BaseDialogProps<false> & {
   couponCode?: string;
+  onShowPlans?: () => void;
+  onCheckoutComplete?: () => void;
   onClose: () => void;
 };
 
 export const BuyDialog = DialogManager.register(function BuyDialog(
   props: BuyDialogProps
 ) {
-  const { onClose, couponCode } = props;
+  const { onClose, onShowPlans, onCheckoutComplete, couponCode } = props;
 
   const applyCoupon = useCheckoutStore((store) => store.applyCoupon);
-  const isCheckoutCompleted = useCheckoutStore((store) => store.isCompleted);
   const user = useUserStore((store) => store.user);
   const selectedPlan = useCheckoutStore((state) => state.selectedPlan);
   const selectPlan = useCheckoutStore((state) => state.selectPlan);
@@ -77,10 +78,10 @@ export const BuyDialog = DialogManager.register(function BuyDialog(
     <BaseDialog
       isOpen={true}
       width={"868px"}
-      onClose={() => props.onClose(false)}
+      onClose={() => onClose(false)}
       noScroll={!!selectedPlan}
       sx={{
-        width: ["95%", "80%", isCheckoutCompleted ? "400px" : "60%"]
+        width: ["95%", "80%", "60%"]
       }}
     >
       {selectedPlan ? (
@@ -106,26 +107,45 @@ export const BuyDialog = DialogManager.register(function BuyDialog(
               flexShrink: 0,
               // alignItems: "center",
               // justifyContent: "center",
-              width: ["100%", "100%", isCheckoutCompleted ? "100%" : 350],
+              width: ["100%", "100%", 350],
               p: 4
             }}
           >
             <CheckoutSideBar
-              onClose={() => onClose(false)}
               selectedPlan={selectedPlan}
-              onShowPlans={() => {
-                selectPlan(undefined);
-              }}
+              onShowPlans={
+                onShowPlans ??
+                (() => {
+                  selectPlan(undefined);
+                })
+              }
               user={user}
             />
           </ScopedThemeProvider>
-          <CheckoutDetails user={user} />
+          <CheckoutDetails
+            onComplete={onCheckoutComplete ?? (() => {})}
+            user={user}
+          />
         </Flex>
       ) : (
-        <PlansList
-          selectedPlan={user?.subscription.plan || SubscriptionPlan.FREE}
-          onPlanSelected={(plan) => selectPlan(plan)}
-        />
+        <Flex sx={{ flexDirection: "column", py: 25, flex: 1, px: 25 }}>
+          <Flex sx={{ flexDirection: "column", alignSelf: "center" }}>
+            <Text variant="heading" sx={{ textAlign: "center" }}>
+              Select a plan
+            </Text>
+            <Text
+              variant="title"
+              mt={1}
+              sx={{ color: "heading-secondary", textAlign: "center" }}
+            >
+              One subscription for a lifetime of notes.
+            </Text>
+          </Flex>
+          <PlansList
+            selectedPlan={user?.subscription.plan || SubscriptionPlan.FREE}
+            onPlanSelected={(plan) => selectPlan(plan)}
+          />
+        </Flex>
       )}
     </BaseDialog>
   );
@@ -134,15 +154,11 @@ export const BuyDialog = DialogManager.register(function BuyDialog(
 type SideBarProps = {
   selectedPlan: Plan;
   onShowPlans: () => void;
-  onClose: () => void;
   user?: User;
 };
 export function CheckoutSideBar(props: SideBarProps) {
-  const { onShowPlans, selectedPlan, onClose, user } = props;
+  const { onShowPlans, selectedPlan, user } = props;
   const pricingInfo = useCheckoutStore((state) => state.pricingInfo);
-  const isCheckoutCompleted = useCheckoutStore((store) => store.isCompleted);
-
-  if (isCheckoutCompleted) return <CheckoutCompleted onClose={onClose} />;
 
   if (user && selectedPlan)
     return (
@@ -165,62 +181,22 @@ export function CheckoutSideBar(props: SideBarProps) {
   }
 
   return null;
-  // if (user)
-  //   return (
-  //     <PlansList
-  //       selectedPlan={selectedPlan?.plan || initialPlan}
-  //       onPlansLoaded={(plans) => {
-  //         // if (!initialPlan || showPlans) return;
-  //         // const plan = plans.find((p) => p.id === initialPlan);
-  //         // onPlanSelected(plan);
-  //       }}
-  //       onPlanSelected={onPlanSelected}
-  //     />
-  //   );
-
-  // return (
-  //   <TrialOrUpgrade
-  //     couponCode={couponCode}
-  //     user={user}
-  //     onShowPlans={onShowPlans}
-  //     onTrialRequested={async () => {
-  //       try {
-  //         const result = await TaskManager.startTask({
-  //           type: "status",
-  //           id: "trialActivation",
-  //           title: strings.activatingTrial(),
-  //           action: () => db.user.activateTrial()
-  //         });
-  //         if (result) onClose();
-  //       } catch (e) {
-  //         if (e instanceof Error)
-  //           showToast(
-  //             "error",
-  //             `${strings.couldNotActivateTrial()} ${strings.error()}: ${
-  //               e.message
-  //             }`
-  //           );
-  //       }
-  //     }}
-  //   />
-  // );
 }
 
 export function CheckoutDetails({
-  user
+  user,
+  onComplete
 }: {
   user?: { id: string; email: string };
+  onComplete: () => void;
 }) {
   const selectedPlan = useCheckoutStore((state) => state.selectedPlan);
   const onPriceUpdated = useCheckoutStore((state) => state.updatePrice);
-  const completeCheckout = useCheckoutStore((state) => state.completeCheckout);
-  const isCheckoutCompleted = useCheckoutStore((store) => store.isCompleted);
   const couponCode = useCheckoutStore((store) => store.couponCode);
   const setIsApplyingCoupon = useCheckoutStore(
     (store) => store.setIsApplyingCoupon
   );
   const theme = useThemeStore((store) => store.colorScheme);
-  if (isCheckoutCompleted) return null;
 
   if (selectedPlan && user)
     return (
@@ -229,20 +205,10 @@ export function CheckoutDetails({
         theme={theme}
         user={user}
         coupon={couponCode}
-        onCompleted={completeCheckout}
+        onCompleted={onComplete}
         onPriceUpdated={(pricingInfo) => {
           onPriceUpdated(pricingInfo);
           setIsApplyingCoupon(false);
-          // console.log(
-          //   initialCouponCode,
-          //   "applying coupon",
-          //   couponCode,
-          //   pricingInfo.coupon
-          // );
-
-          // if (!initialCouponCode || initialCouponCode === couponCode) return;
-          // console.log(initialCouponCode, "applying coupon");
-          // onApplyCoupon(initialCouponCode);
         }}
       />
     );
