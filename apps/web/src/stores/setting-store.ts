@@ -25,7 +25,7 @@ import Config from "../utils/config";
 import BaseStore from "./index";
 import { useEditorStore } from "./editor-store";
 import { setDocumentTitle } from "../utils/dom";
-import { TimeFormat } from "@notesnook/core";
+import { TimeFormat, DayFormat } from "@notesnook/core";
 import { Profile, TrashCleanupInterval } from "@notesnook/core";
 
 export const HostIds = [
@@ -68,6 +68,7 @@ class SettingStore extends BaseStore<SettingStore> {
   hideNoteTitle = Config.get("hideNoteTitle", false);
   dateFormat = "DD-MM-YYYY";
   timeFormat: TimeFormat = "12-hour";
+  dayFormat: DayFormat = "short";
   titleFormat = "Note $date$ $time$";
   profile?: Profile;
 
@@ -94,6 +95,7 @@ class SettingStore extends BaseStore<SettingStore> {
     this.set({
       dateFormat: db.settings.getDateFormat(),
       timeFormat: db.settings.getTimeFormat(),
+      dayFormat: db.settings.getDayFormat(),
       titleFormat: db.settings.getTitleFormat(),
       trashCleanupInterval: db.settings.getTrashCleanupInterval(),
       profile: db.settings.getProfile(),
@@ -117,6 +119,11 @@ class SettingStore extends BaseStore<SettingStore> {
   setTimeFormat = async (timeFormat: TimeFormat) => {
     await db.settings.setTimeFormat(timeFormat);
     this.set({ timeFormat });
+  };
+
+  setDayFormat = async (dayFormat: DayFormat) => {
+    await db.settings.setDayFormat(dayFormat);
+    this.set({ dayFormat });
   };
 
   setTitleFormat = async (titleFormat: string) => {
