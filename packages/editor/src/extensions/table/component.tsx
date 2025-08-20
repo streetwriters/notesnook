@@ -32,7 +32,7 @@ import {
   TableProperties
 } from "../../toolbar/tools/table.js";
 import { getToolDefinition } from "../../toolbar/tool-definitions.js";
-import { getPosition } from "@notesnook/ui";
+import { getPosition, ScrollContainer } from "@notesnook/ui";
 import {
   findSelectedDOMNode,
   hasSameAttributes
@@ -67,17 +67,25 @@ export function TableComponent(props: ReactNodeViewProps) {
           textDirection={textDirection}
         />
       </DesktopOnly>
-      <div className="tableWrapper" dir={textDirection}>
-        <table
-          ref={(ref) => {
-            forwardRef?.(ref);
-            tableRef.current = ref || undefined;
-          }}
-        >
-          <colgroup ref={colgroupRef} />
-          {/* <tbody /> */}
-        </table>
-      </div>
+      <ScrollContainer
+        style={{ display: "flex", overscrollBehavior: "contain" }}
+        trackStyle={() => ({
+          backgroundColor: "transparent",
+          "--ms-track-size": "6px"
+        })}
+      >
+        <div dir={textDirection}>
+          <table
+            ref={(ref) => {
+              forwardRef?.(ref);
+              tableRef.current = ref || undefined;
+            }}
+          >
+            <colgroup ref={colgroupRef} />
+            {/* <tbody /> */}
+          </table>
+        </div>
+      </ScrollContainer>
     </>
   );
 }
@@ -181,7 +189,7 @@ function TableRowToolbar(props: TableToolbarProps) {
         flexWrap: "nowrap",
         borderRadius: "default",
         flexDirection: "column",
-        opacity: 0.3,
+        opacity: 0.8,
         ":hover": {
           opacity: 1
         }
@@ -231,9 +239,10 @@ function TableColumnToolbar(props: TableToolbarProps) {
         yOffset: 2
       });
 
-      columnToolsRef.current.style.left = `${
-        pos.left - (table.current.parentElement?.scrollLeft || 0)
-      }px`;
+      const scrollLeft =
+        table.current.parentElement?.parentElement?.scrollLeft || 0;
+
+      columnToolsRef.current.style.left = `${pos.left - scrollLeft}px`;
       columnToolsRef.current.style.top = `${pos.top}px`;
     }
 
@@ -255,7 +264,7 @@ function TableColumnToolbar(props: TableToolbarProps) {
         bg: "background",
         flexWrap: "nowrap",
         borderRadius: "default",
-        opacity: 0.3,
+        opacity: 0.8,
         ":hover": {
           opacity: 1
         }
