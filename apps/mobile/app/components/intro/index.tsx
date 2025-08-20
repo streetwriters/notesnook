@@ -205,7 +205,7 @@ const Intro = () => {
               introCompleted: true
             });
             Navigation.push("Auth", {
-              mode: AuthMode.login,
+              mode: AuthMode.welcomeLogin,
               context: "intro"
             });
           }}

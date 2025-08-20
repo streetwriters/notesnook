@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { CHECK_IDS } from "@notesnook/core";
+import { CHECK_IDS, SubscriptionPlan } from "@notesnook/core";
 import { Platform } from "react-native";
 import Config from "react-native-config";
 import * as RNIap from "react-native-iap";
@@ -119,9 +119,12 @@ async function loadProductsAndSubs() {
 }
 
 function get() {
-  if (__DEV__ || Config.isTesting === "true") return true;
+  // if (__DEV__ || Config.isTesting === "true") return true;
 
-  return SUBSCRIPTION_STATUS.BASIC !== premiumStatus;
+  return (
+    useUserStore.getState().user?.subscription?.plan !== undefined &&
+    useUserStore.getState().user?.subscription?.plan !== SubscriptionPlan.FREE
+  );
 }
 
 async function verify(callback, error) {

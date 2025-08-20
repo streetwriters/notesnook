@@ -38,7 +38,8 @@ const Auth = ({ navigation, route }) => {
     <SafeAreaView
       style={{ flex: 1, backgroundColor: colors.primary.background }}
     >
-      {currentAuthMode !== AuthMode.login ? (
+      {currentAuthMode !== AuthMode.login &&
+      currentAuthMode !== AuthMode.welcomeLogin ? (
         <Signup
           changeMode={(mode) => setCurrentAuthMode(mode)}
           trial={AuthMode.trialSignup === currentAuthMode}

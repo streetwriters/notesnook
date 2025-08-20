@@ -74,6 +74,7 @@ export const Login = ({ changeMode }) => {
         Sync.run("global", false, "full");
       }
     }, 5000);
+
     if (!PremiumService.get()) {
       Navigation.navigate("PayWall", {
         context: "logged-in",
@@ -275,7 +276,7 @@ export const Login = ({ changeMode }) => {
                   setStep(LoginSteps.emailAuth);
                   setLoading(false);
                 }}
-                fontSize={AppFontSize.xs}
+                fontSize={AppFontSize.md}
                 type="secondaryAccented"
               />
             )}
