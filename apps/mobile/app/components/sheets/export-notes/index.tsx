@@ -310,6 +310,7 @@ const ExportNotesSheet = ({
                         ToastManager.error(e as Error);
                       });
                     } else {
+                      await sleep(500);
                       FileViewer.open(result?.filePath, {
                         showOpenWithDialog: true,
                         showAppsSuggestions: true
@@ -338,6 +339,7 @@ const ExportNotesSheet = ({
                       .getState()
                       .setAppDidEnterBackgroundForAction(true);
                     if (Platform.OS === "ios") {
+                      await sleep(500);
                       Share.open({
                         url: result?.fileDir + result.fileName
                       }).catch(() => {
