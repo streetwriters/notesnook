@@ -25,7 +25,8 @@ export const AuthMode = {
   login: 0,
   signup: 1,
   welcomeSignup: 2,
-  trialSignup: 3
+  welcomeLogin: 3,
+  trialSignup: 4
 };
 
 export const initialAuthMode = createRef(0);
@@ -33,6 +34,7 @@ export function hideAuth(context) {
   eSendEvent(eCloseLoginDialog);
   if (
     initialAuthMode.current === AuthMode.welcomeSignup ||
+    initialAuthMode.current === AuthMode.welcomeLogin ||
     context === "intro"
   ) {
     Navigation.replace("FluidPanelsView");
