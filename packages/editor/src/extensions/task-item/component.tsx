@@ -114,8 +114,8 @@ export function TaskItemComponent(
             ":hover": isMobile
               ? undefined
               : {
-                  borderColor: "accent"
-                },
+                borderColor: "accent"
+              },
             fontFamily: "inherit",
             marginTop: "0.13rem"
           }}
