@@ -159,7 +159,7 @@ export const EDUCATION_PLAN: Plan = createPlan(
 
 let CACHED_PLANS: Plan[];
 export async function getPlans(): Promise<Plan[] | null> {
-  if (IS_TESTING || import.meta.env.DEV) return DEFAULT_PLANS;
+  // if (IS_TESTING || import.meta.env.DEV) return DEFAULT_PLANS;
   if (CACHED_PLANS) return CACHED_PLANS;
 
   const plans = await db.pricing.products();

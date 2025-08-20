@@ -129,23 +129,7 @@ export function PlansList(props: PlansListProps) {
   const [selectedPeriod, setPeriod] = useState<Period>("yearly");
 
   return (
-    <Flex sx={{ flexDirection: "column", py: 25, flex: 1, px: 25 }}>
-      {/* <Image
-        src={Nomad}
-        style={{ flexShrink: 0, width: 150, height: 150, marginTop: 20 }}
-      /> */}
-      <Flex sx={{ flexDirection: "column", alignSelf: "center" }}>
-        <Text variant="heading" sx={{ textAlign: "center" }}>
-          Select a plan
-        </Text>
-        <Text
-          variant="title"
-          mt={1}
-          sx={{ color: "heading-secondary", textAlign: "center" }}
-        >
-          One subscription for a lifetime of notes.
-        </Text>
-      </Flex>
+    <>
       <Flex
         sx={{
           mt: 25,
@@ -344,11 +328,16 @@ export function PlansList(props: PlansListProps) {
         ))}
       </Flex>
       <Testimonial />
-      <ComparePlans />
+    </>
+  );
+}
 
+export function Footer() {
+  return (
+    <>
       <Text
         variant="heading"
-        sx={{ fontSize: "subheading", textAlign: "center", mt: 50 }}
+        sx={{ fontSize: "subheading", textAlign: "center", mt: 100 }}
       >
         Trusted and recommended by over 200K users
       </Text>
@@ -387,7 +376,7 @@ export function PlansList(props: PlansListProps) {
       >
         Subscribe to Pro
       </Button>
-    </Flex>
+    </>
   );
 }
 
@@ -474,12 +463,11 @@ function OneTimePricing(props: PricingProps) {
 }
 
 const rows = getFeaturesTable();
-function ComparePlans() {
+export function ComparePlans() {
   return (
     <Flex
       sx={{
         flexDirection: "column",
-        mt: 50,
         // alignSelf: "center",
         bg: "background-secondary",
         border: "1px solid var(--border)",
