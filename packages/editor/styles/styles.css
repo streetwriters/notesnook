@@ -229,7 +229,7 @@ img.ProseMirror-separator {
   border: 1px solid var(--border);
   box-sizing: border-box;
   min-width: 1em;
-  padding: 3px 5px;
+  padding: 7px 9px;
   position: relative;
   vertical-align: top;
 }
@@ -244,6 +244,7 @@ img.ProseMirror-separator {
 }
 
 .ProseMirror table th {
+  background-color: var(--background-secondary);
   font-weight: bold;
   text-align: left;
 }
@@ -273,11 +274,6 @@ img.ProseMirror-separator {
 
 .ProseMirror table p {
   margin: 0;
-}
-
-.tableWrapper {
-  /* padding: 1rem 0; */
-  overflow-x: auto;
 }
 
 .resize-cursor {
