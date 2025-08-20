@@ -32,10 +32,16 @@ declare module "@tiptap/core" {
        * Insert time at current position
        */
       insertTime: () => ReturnType;
+
       /**
        * Insert date at current position
        */
       insertDate: () => ReturnType;
+
+      /**
+       * Insert day at current position
+       */
+      insertDay: () => ReturnType;
 
       /**
        * Insert date & time at current position
@@ -53,6 +59,7 @@ declare module "@tiptap/core" {
 export type DateTimeOptions = {
   dateFormat: string;
   timeFormat: "12-hour" | "24-hour";
+  dayFormat: "short" | "long";
 };
 
 export const DateTime = Extension.create<DateTimeOptions>({
@@ -61,7 +68,8 @@ export const DateTime = Extension.create<DateTimeOptions>({
   addOptions() {
     return {
       dateFormat: "DD-MM-YYYY",
-      timeFormat: "12-hour"
+      timeFormat: "12-hour",
+      dayFormat: "short"
     };
   },
 
@@ -96,6 +104,15 @@ export const DateTime = Extension.create<DateTimeOptions>({
             formatDate(Date.now(), {
               timeFormat: this.options.timeFormat,
               type: "time"
+            })
+          ),
+      insertDay:
+        () =>
+        ({ commands }) =>
+          commands.insertContent(
+            formatDate(Date.now(), {
+              dayFormat: this.options.dayFormat,
+              type: "day"
             })
           ),
       insertDateTime:
@@ -138,6 +155,15 @@ export const DateTime = Extension.create<DateTimeOptions>({
           return formatDate(Date.now(), {
             dateFormat: this.options.dateFormat,
             type: "date"
+          });
+        }
+      }),
+      shortcutInputRule({
+        shortcut: "/day",
+        replace: () => {
+          return formatDate(Date.now(), {
+            dayFormat: this.options.dayFormat,
+            type: "day"
           });
         }
       }),
@@ -206,7 +232,8 @@ function textInputRule(config: {
 export function replaceDateTime(
   value: string,
   dateFormat = "DD-MM-YYYY",
-  timeFormat: "12-hour" | "24-hour" = "12-hour"
+  timeFormat: "12-hour" | "24-hour" = "12-hour",
+  dayFormat: DateTimeOptions["dayFormat"] = "short"
 ) {
   value = value.replaceAll(
     "/time ",
@@ -239,6 +266,14 @@ export function replaceDateTime(
       dateFormat,
       timeFormat,
       type: "date-time-timezone"
+    }) + " "
+  );
+
+  value = value.replaceAll(
+    "/day ",
+    formatDate(Date.now(), {
+      dayFormat: dayFormat,
+      type: "day"
     }) + " "
   );
 

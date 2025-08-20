@@ -21,6 +21,7 @@ import { Cipher } from "@notesnook/crypto";
 import { isCipher } from "./utils/index.js";
 
 export type TimeFormat = "12-hour" | "24-hour";
+export type DayFormat = "short" | "long";
 
 export type SortOptions = {
   sortBy:
@@ -472,6 +473,7 @@ export type SettingItemMap = {
   trashCleanupInterval: TrashCleanupInterval;
   titleFormat: string;
   timeFormat: TimeFormat;
+  dayFormat: DayFormat;
   dateFormat: string;
   defaultNotebook: string | undefined;
   defaultTag: string | undefined;

@@ -1486,6 +1486,10 @@ msgstr "Choose from pre-built themes or create your own"
 msgid "Choose how dates are displayed in the app"
 msgstr "Choose how dates are displayed in the app"
 
+#: src/strings.ts:2610
+msgid "Choose how day is displayed in the app"
+msgstr "Choose how day is displayed in the app"
+
 #: src/strings.ts:1157
 msgid "Choose how the new note titles are formatted"
 msgstr "Choose how the new note titles are formatted"
@@ -2035,6 +2039,10 @@ msgstr "Date uploaded"
 #: src/strings.ts:1840
 msgid "Day"
 msgstr "Day"
+
+#: src/strings.ts:2609
+msgid "Day format"
+msgstr "Day format"
 
 #: src/strings.ts:2037
 msgid "Deactivate"

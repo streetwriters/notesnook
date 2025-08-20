@@ -137,6 +137,7 @@ export class Notes implements ICollection {
             this.db.settings.getTitleFormat(),
             this.db.settings.getDateFormat(),
             this.db.settings.getTimeFormat(),
+            this.db.settings.getDayFormat(),
             headlineTitle,
             this.totalNotes
           );

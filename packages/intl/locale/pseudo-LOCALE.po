@@ -1486,6 +1486,10 @@ msgstr ""
 msgid "Choose how dates are displayed in the app"
 msgstr ""
 
+#: src/strings.ts:2610
+msgid "Choose how day is displayed in the app"
+msgstr ""
+
 #: src/strings.ts:1157
 msgid "Choose how the new note titles are formatted"
 msgstr ""
@@ -2023,6 +2027,10 @@ msgstr ""
 
 #: src/strings.ts:1840
 msgid "Day"
+msgstr ""
+
+#: src/strings.ts:2609
+msgid "Day format"
 msgstr ""
 
 #: src/strings.ts:2037
