@@ -220,7 +220,7 @@ export const SideMenuTags = () => {
     if (lastQuery.current) {
       db.lookup
         .tags(lastQuery.current.trim())
-        .sorted()
+        .sorted(db.settings.getGroupOptions("tags"))
         .then(async (filtered) => {
           setFilteredTags(filtered);
         });
