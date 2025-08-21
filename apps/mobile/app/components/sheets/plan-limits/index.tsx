@@ -1,4 +1,9 @@
-import { FeatureUsage, getFeature, getFeaturesUsage } from "@notesnook/common";
+import {
+  FeatureUsage,
+  formatBytes,
+  getFeature,
+  getFeaturesUsage
+} from "@notesnook/common";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import { useEffect, useState } from "react";
@@ -54,7 +59,11 @@ export function PlanLimits() {
               {getFeature(item.id).title}
             </Paragraph>
             <Paragraph size={AppFontSize.sm}>
-              {item.used}/{item.total} {strings.used()}
+              {item.id === "storage"
+                ? `${formatBytes(item.used)}/${formatBytes(
+                    item.total
+                  )} ${strings.used()}`
+                : `${item.used}/${item.total} ${strings.used()}`}
             </Paragraph>
           </View>
           <View
