@@ -2437,6 +2437,10 @@ msgstr ""
 msgid "Enter fullscreen"
 msgstr ""
 
+#: src/strings.ts:2496
+msgid "Enter monograph title"
+msgstr ""
+
 #: src/strings.ts:1489
 msgid "Enter notebook description"
 msgstr ""
@@ -3697,6 +3701,10 @@ msgstr ""
 msgid "Monograph server"
 msgstr ""
 
+#: src/strings.ts:2495
+msgid "Monograph title"
+msgstr ""
+
 #: src/strings.ts:869
 msgid "Monograph URL copied"
 msgstr ""
@@ -3936,7 +3944,7 @@ msgstr ""
 msgid "No note history available for this device."
 msgstr ""
 
-#: src/strings.ts:2489
+#: src/strings.ts:2492
 msgid "No notebooks selected to move"
 msgstr ""
 
@@ -5283,11 +5291,11 @@ msgstr ""
 msgid "School work"
 msgstr ""
 
-#: src/strings.ts:2491
+#: src/strings.ts:2494
 msgid "Scroll to bottom"
 msgstr ""
 
-#: src/strings.ts:2490
+#: src/strings.ts:2493
 msgid "Scroll to top"
 msgstr ""
 
