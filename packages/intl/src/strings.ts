@@ -2491,5 +2491,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   paragraphs: () => t`Paragraphs`,
   noNotebooksSelectedToMove: () => t`No notebooks selected to move`,
   scrollToTop: () => t`Scroll to top`,
-  scrollToBottom: () => t`Scroll to bottom`
+  scrollToBottom: () => t`Scroll to bottom`,
+  monographTitle: () => t`Monograph title`,
+  enterMonographTitle: () => t`Enter monograph title`
 };
