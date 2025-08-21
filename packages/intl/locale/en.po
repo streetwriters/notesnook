@@ -1229,6 +1229,10 @@ msgstr "By signing up, you agree to our "
 msgid "Callout"
 msgstr "Callout"
 
+#: src/strings.ts:2506
+msgid "Can I cancel my free trial anytime?"
+msgstr "Can I cancel my free trial anytime?"
+
 #: src/strings.ts:548
 msgid "Cancel"
 msgstr "Cancel"
@@ -2797,6 +2801,10 @@ msgstr "Font ligatures"
 #: src/strings.ts:2276
 msgid "Font size"
 msgstr "Font size"
+
+#: src/strings.ts:2513
+msgid "For a monthly subscription, you can get a refund within 7 days of purchase. For a yearly subscription, we offer a full refund within 14 days of purchase. For a 5 year subscription, you can request a refund within 30 days of purchase."
+msgstr "For a monthly subscription, you can get a refund within 7 days of purchase. For a yearly subscription, we offer a full refund within 14 days of purchase. For a 5 year subscription, you can request a refund within 30 days of purchase."
 
 #: src/strings.ts:1685
 msgid "For a more integrated user experience, try out Notesnook for {platform}"
@@ -6818,6 +6826,10 @@ msgstr "We are sorry, it seems that the app crashed due to an error. You can sub
 msgid "We have sent you an email confirmation link. Please check your email inbox. If you cannot find the email, check your spam folder."
 msgstr "We have sent you an email confirmation link. Please check your email inbox. If you cannot find the email, check your spam folder."
 
+#: src/strings.ts:2503
+msgid "We require credit card details to fight abuse and to make it seamless for you to upgrade. Your credit card is NOT charged until your free trial ends and your subscription starts. You will be notified via email of the upcoming charge before your trial ends."
+msgstr "We require credit card details to fight abuse and to make it seamless for you to upgrade. Your credit card is NOT charged until your free trial ends and your subscription starts. You will be notified via email of the upcoming charge before your trial ends."
+
 #: src/strings.ts:2166
 msgid "We send you occasional promotional offers & product updates on your email (once every month)."
 msgstr "We send you occasional promotional offers & product updates on your email (once every month)."
@@ -6871,9 +6883,21 @@ msgstr "Welcome to Notesnook Pro"
 msgid "What do I do if I am not getting the email?"
 msgstr "What do I do if I am not getting the email?"
 
+#: src/strings.ts:2495
+msgid "What happens to my data if I switch plans?"
+msgstr "What happens to my data if I switch plans?"
+
+#: src/strings.ts:2511
+msgid "What is your refund policy?"
+msgstr "What is your refund policy?"
+
 #: src/strings.ts:1666
 msgid "What went wrong?"
 msgstr "What went wrong?"
+
+#: src/strings.ts:2501
+msgid "Why do you need my credit card details for a free trial?"
+msgstr "Why do you need my credit card details for a free trial?"
 
 #: src/strings.ts:2383
 msgid "Width"
@@ -6915,6 +6939,10 @@ msgstr "Yearly"
 #: src/strings.ts:547
 msgid "Yes"
 msgstr "Yes"
+
+#: src/strings.ts:2508
+msgid "Yes, you can cancel your trial anytime. No questions asked."
+msgstr "Yes, you can cancel your trial anytime. No questions asked."
 
 #: src/strings.ts:106
 msgid "You also agree to recieve marketing emails from us which you can opt-out of from app settings."
@@ -7138,6 +7166,10 @@ msgstr "Your data recovery key is basically a hashed version of your password (p
 #: src/strings.ts:1853
 msgid "Your data recovery key will be used to decrypt your data"
 msgstr "Your data recovery key will be used to decrypt your data"
+
+#: src/strings.ts:2497
+msgid "Your data remains 100% accessible regardless of what plan you are on. That includes your notes, notebooks, attachments, and anything else you might have created."
+msgstr "Your data remains 100% accessible regardless of what plan you are on. That includes your notes, notebooks, attachments, and anything else you might have created."
 
 #: src/strings.ts:1783
 msgid "Your email has been confirmed."

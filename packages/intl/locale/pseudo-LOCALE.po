@@ -1229,6 +1229,10 @@ msgstr ""
 msgid "Callout"
 msgstr ""
 
+#: src/strings.ts:2506
+msgid "Can I cancel my free trial anytime?"
+msgstr ""
+
 #: src/strings.ts:548
 msgid "Cancel"
 msgstr ""
@@ -2785,6 +2789,10 @@ msgstr ""
 
 #: src/strings.ts:2276
 msgid "Font size"
+msgstr ""
+
+#: src/strings.ts:2513
+msgid "For a monthly subscription, you can get a refund within 7 days of purchase. For a yearly subscription, we offer a full refund within 14 days of purchase. For a 5 year subscription, you can request a refund within 30 days of purchase."
 msgstr ""
 
 #: src/strings.ts:1685
@@ -6769,6 +6777,10 @@ msgstr ""
 msgid "We have sent you an email confirmation link. Please check your email inbox. If you cannot find the email, check your spam folder."
 msgstr ""
 
+#: src/strings.ts:2503
+msgid "We require credit card details to fight abuse and to make it seamless for you to upgrade. Your credit card is NOT charged until your free trial ends and your subscription starts. You will be notified via email of the upcoming charge before your trial ends."
+msgstr ""
+
 #: src/strings.ts:2166
 msgid "We send you occasional promotional offers & product updates on your email (once every month)."
 msgstr ""
@@ -6822,8 +6834,20 @@ msgstr ""
 msgid "What do I do if I am not getting the email?"
 msgstr ""
 
+#: src/strings.ts:2495
+msgid "What happens to my data if I switch plans?"
+msgstr ""
+
+#: src/strings.ts:2511
+msgid "What is your refund policy?"
+msgstr ""
+
 #: src/strings.ts:1666
 msgid "What went wrong?"
+msgstr ""
+
+#: src/strings.ts:2501
+msgid "Why do you need my credit card details for a free trial?"
 msgstr ""
 
 #: src/strings.ts:2383
@@ -6865,6 +6889,10 @@ msgstr ""
 
 #: src/strings.ts:547
 msgid "Yes"
+msgstr ""
+
+#: src/strings.ts:2508
+msgid "Yes, you can cancel your trial anytime. No questions asked."
 msgstr ""
 
 #: src/strings.ts:106
@@ -7083,6 +7111,10 @@ msgstr ""
 
 #: src/strings.ts:1853
 msgid "Your data recovery key will be used to decrypt your data"
+msgstr ""
+
+#: src/strings.ts:2497
+msgid "Your data remains 100% accessible regardless of what plan you are on. That includes your notes, notebooks, attachments, and anything else you might have created."
 msgstr ""
 
 #: src/strings.ts:1783

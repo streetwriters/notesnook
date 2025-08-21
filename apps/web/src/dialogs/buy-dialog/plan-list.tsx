@@ -46,6 +46,7 @@ import {
   planToAvailability
 } from "@notesnook/common";
 import { FeatureCaption } from "./feature-caption";
+import Accordion from "../../components/accordion";
 
 type PlansListProps = {
   selectedPlan: SubscriptionPlan;
@@ -336,6 +337,20 @@ export function Footer() {
   return (
     <>
       <Text
+        variant="title"
+        sx={{ alignSelf: "center", fontSize: "heading", mb: 25, mt: 100 }}
+        id="compare-plans"
+      >
+        FAQs
+      </Text>
+      <Flex sx={{ flexDirection: "column", gap: 2 }}>
+        {strings.checkoutFaqs.map((faq) => (
+          <Accordion key={faq.question()} title={faq.question()} isClosed>
+            <Text>{faq.answer()}</Text>
+          </Accordion>
+        ))}
+      </Flex>
+      <Text
         variant="heading"
         sx={{ fontSize: "subheading", textAlign: "center", mt: 100 }}
       >
@@ -367,14 +382,14 @@ export function Footer() {
       </Flex>
       <Button
         variant="accent"
-        sx={{ alignSelf: "center", mt: 2 }}
+        sx={{ alignSelf: "center", mt: 2, mb: 25 }}
         onClick={() =>
           document
-            .getElementById("compare-plans")
+            .getElementById("select-plan")
             ?.scrollIntoView({ behavior: "smooth" })
         }
       >
-        Subscribe to Pro
+        Upgrade now
       </Button>
     </>
   );
