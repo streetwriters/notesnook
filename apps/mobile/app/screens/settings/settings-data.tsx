@@ -75,59 +75,59 @@ export const settingsGroups: SettingSection[] = [
     useHook: () => useUserStore((state) => state.user),
     hidden: (current) => !current,
     sections: [
-      {
-        id: "subscription-status",
-        useHook: () => useUserStore((state) => state.user),
-        hidden: (current) => !current,
-        name: (current) => {
-          const user = (current as User) || useUserStore.getState().user;
-          if (!user) return strings.upgradePlan();
-          const isBasic = user.subscription?.type === SUBSCRIPTION_STATUS.BASIC;
-          const isTrial = user.subscription?.type === SUBSCRIPTION_STATUS.TRIAL;
-          return isBasic || !user.subscription?.type
-            ? strings.upgradePlan()
-            : isTrial
-            ? strings.trialStarted()
-            : strings.subDetails();
-          ``;
-        },
-        type: "component",
-        component: "subscription",
-        icon: "crown",
-        description: (current) => {
-          const user = current as User;
-          if (!user) return strings.neverHesitate();
-          const subscriptionDaysLeft =
-            user &&
-            getTimeLeft(
-              parseInt(user.subscription?.expiry as unknown as string)
-            );
-          const expiryDate = dayjs(user?.subscription?.expiry).format(
-            "MMMM D, YYYY"
-          );
-          const startDate = dayjs(user?.subscription?.start).format(
-            "MMMM D, YYYY"
-          );
+      // {
+      //   id: "subscription-status",
+      //   useHook: () => useUserStore((state) => state.user),
+      //   hidden: (current) => !current,
+      //   name: (current) => {
+      //     const user = (current as User) || useUserStore.getState().user;
+      //     if (!user) return strings.upgradePlan();
+      //     const isBasic = user.subscription?.type === SUBSCRIPTION_STATUS.BASIC;
+      //     const isTrial = user.subscription?.type === SUBSCRIPTION_STATUS.TRIAL;
+      //     return isBasic || !user.subscription?.type
+      //       ? strings.upgradePlan()
+      //       : isTrial
+      //       ? strings.trialStarted()
+      //       : strings.subDetails();
+      //     ``;
+      //   },
+      //   type: "component",
+      //   component: "subscription",
+      //   icon: "crown",
+      //   description: (current) => {
+      //     const user = current as User;
+      //     if (!user) return strings.neverHesitate();
+      //     const subscriptionDaysLeft =
+      //       user &&
+      //       getTimeLeft(
+      //         parseInt(user.subscription?.expiry as unknown as string)
+      //       );
+      //     const expiryDate = dayjs(user?.subscription?.expiry).format(
+      //       "MMMM D, YYYY"
+      //     );
+      //     const startDate = dayjs(user?.subscription?.start).format(
+      //       "MMMM D, YYYY"
+      //     );
 
-          if (user.subscription.provider === 4) {
-            return strings.subEndsOn(expiryDate);
-          }
+      //     if (user.subscription.provider === 4) {
+      //       return strings.subEndsOn(expiryDate);
+      //     }
 
-          return user.subscription?.type === 2
-            ? strings.signedUpOn(startDate)
-            : user.subscription?.type === 1
-            ? strings.trialEndsOn(expiryDate)
-            : user.subscription?.type === 6
-            ? subscriptionDaysLeft.time < -3
-              ? strings.subEnded()
-              : strings.accountDowngradedIn(3)
-            : user.subscription?.type === 7
-            ? strings.subEndsOn(expiryDate)
-            : user.subscription?.type === 5
-            ? strings.subRenewOn(expiryDate)
-            : strings.neverHesitate();
-        }
-      },
+      //     return user.subscription?.type === 2
+      //       ? strings.signedUpOn(startDate)
+      //       : user.subscription?.type === 1
+      //       ? strings.trialEndsOn(expiryDate)
+      //       : user.subscription?.type === 6
+      //       ? subscriptionDaysLeft.time < -3
+      //         ? strings.subEnded()
+      //         : strings.accountDowngradedIn(3)
+      //       : user.subscription?.type === 7
+      //       ? strings.subEndsOn(expiryDate)
+      //       : user.subscription?.type === 5
+      //       ? strings.subRenewOn(expiryDate)
+      //       : strings.neverHesitate();
+      //   }
+      // },
       {
         id: "redeem-gift-code",
         name: strings.redeemGiftCode(),

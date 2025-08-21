@@ -93,7 +93,8 @@ export const Signup = ({ changeMode, welcome }) => {
       setEmailVerifyMessage();
       Navigation.navigate("PayWall", {
         canGoBack: false,
-        state: route.params.state
+        state: route.params.state,
+        context: "signup"
       });
       return true;
     } catch (e) {
