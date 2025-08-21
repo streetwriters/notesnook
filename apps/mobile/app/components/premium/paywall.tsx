@@ -503,24 +503,11 @@ After trying all the privacy security oriented note taking apps, for the price a
                 paddingBottom: 16
               }}
             >
-              {[
-                {
-                  question: "What happens after my free trial ends?",
-                  answer: `You will be automatically subscribed to the plan you selected during the trial period.`
-                },
-                {
-                  question: "What happens if I don't renew my subscription?",
-                  answer: `You will be`
-                },
-                {
-                  question: "What happens if I don't renew my subscription?",
-                  answer: `You will be`
-                }
-              ].map((item) => (
+              {strings.checkoutFaqs.map((item) => (
                 <FAQItem
-                  key={item.question}
-                  question={item.question}
-                  answer={item.answer}
+                  key={item.question()}
+                  question={item.question()}
+                  answer={item.answer()}
                 />
               ))}
             </View>
