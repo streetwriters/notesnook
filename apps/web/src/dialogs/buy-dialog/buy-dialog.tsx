@@ -29,6 +29,8 @@ import { PaddleCheckout } from "./paddle";
 import { Period, Plan, PricingInfo } from "./types";
 import { getPlans, PERIOD_METADATA, PLAN_METADATA, usePlans } from "./plans";
 import {
+  ComparePlans,
+  Footer,
   formatRecurringPeriod,
   formatRecurringPeriodShort,
   PlansList
@@ -130,7 +132,11 @@ export const BuyDialog = DialogManager.register(function BuyDialog(
       ) : (
         <Flex sx={{ flexDirection: "column", py: 25, flex: 1, px: 25 }}>
           <Flex sx={{ flexDirection: "column", alignSelf: "center" }}>
-            <Text variant="heading" sx={{ textAlign: "center" }}>
+            <Text
+              id="select-plan"
+              variant="heading"
+              sx={{ textAlign: "center" }}
+            >
               Select a plan
             </Text>
             <Text
@@ -145,6 +151,15 @@ export const BuyDialog = DialogManager.register(function BuyDialog(
             selectedPlan={user?.subscription.plan || SubscriptionPlan.FREE}
             onPlanSelected={(plan) => selectPlan(plan)}
           />
+          <Flex
+            sx={{
+              flexDirection: "column",
+              mt: 100
+            }}
+          >
+            <ComparePlans />
+            <Footer />
+          </Flex>
         </Flex>
       )}
     </BaseDialog>
