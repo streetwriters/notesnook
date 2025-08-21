@@ -56,6 +56,7 @@ function PublishView(props: PublishViewProps) {
     current: number;
   }>();
   const passwordInput = useRef<HTMLInputElement>(null);
+  const titleInput = useRef<HTMLInputElement>(null);
   const publishNote = useStore((store) => store.publish);
   const unpublishNote = useStore((store) => store.unpublish);
   const [monograph, setMonograph] = useState(props.monograph);
@@ -125,6 +126,26 @@ function PublishView(props: PublishViewProps) {
           borderRadius: "default"
         }}
       >
+        <Flex
+          sx={{
+            alignItems: "center",
+            justifyContent: "space-between",
+            px: 1,
+            height: 30,
+
+            "& label": { width: "auto", flexShrink: 0 }
+          }}
+        >
+          <Text variant="body">{strings.title()} *</Text>
+          <Input
+            ref={titleInput}
+            type="text"
+            variant="clean"
+            placeholder={strings.enterTitle()}
+            defaultValue={monograph ? monograph.title : note.title}
+            sx={{ textAlign: "right", p: 0 }}
+          />
+        </Flex>
         {monograph?.publishedAt ? (
           <Flex
             sx={{
@@ -286,8 +307,14 @@ function PublishView(props: PublishViewProps) {
             try {
               setStatus({ action: "publish" });
               const password = passwordInput.current?.value;
+              const title = titleInput.current?.value;
 
-              await publishNote(note.id, {
+              if (!title || title.trim().length === 0) {
+                showToast("error", "Title cannot be empty.");
+                return;
+              }
+
+              await publishNote(note.id, title, {
                 selfDestruct,
                 password
               });
@@ -425,6 +452,7 @@ type ResolvedMonograph = {
   selfDestruct: boolean;
   publishedAt?: number;
   password?: string;
+  title: string;
 };
 
 async function resolveMonograph(
@@ -436,6 +464,7 @@ async function resolveMonograph(
     id: monographId,
     selfDestruct: !!monograph.selfDestruct,
     publishedAt: monograph.datePublished,
+    title: monograph.title,
     password: monograph.password
       ? await db.monographs.decryptPassword(monograph.password)
       : undefined
