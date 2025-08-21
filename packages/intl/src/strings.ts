@@ -2496,5 +2496,29 @@ Use this if changes from other devices are not appearing on this device. This wi
   charactersCount: (count: number) => t`${count} characters`,
   iAlreadyHaveAnAccount: () => t`I already have an account`,
   upgradePlan: () => t`Upgrade plan`,
-  upgrade: () => t`Upgrade`
+  upgrade: () => t`Upgrade`,
+
+  checkoutFaqs: [
+    {
+      question: () => t`What happens to my data if I switch plans?`,
+      answer: () =>
+        t`Your data remains 100% accessible regardless of what plan you are on. That includes your notes, notebooks, attachments, and anything else you might have created.`
+    },
+    {
+      question: () =>
+        t`Why do you need my credit card details for a free trial?`,
+      answer: () =>
+        t`We require credit card details to fight abuse and to make it seamless for you to upgrade. Your credit card is NOT charged until your free trial ends and your subscription starts. You will be notified via email of the upcoming charge before your trial ends.`
+    },
+    {
+      question: () => t`Can I cancel my free trial anytime?`,
+      answer: () =>
+        t`Yes, you can cancel your trial anytime. No questions asked.`
+    },
+    {
+      question: () => t`What is your refund policy?`,
+      answer: () =>
+        t`For a monthly subscription, you can get a refund within 7 days of purchase. For a yearly subscription, we offer a full refund within 14 days of purchase. For a 5 year subscription, you can request a refund within 30 days of purchase.`
+    }
+  ]
 };
