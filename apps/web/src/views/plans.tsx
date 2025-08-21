@@ -81,6 +81,7 @@ function Plans() {
           >
             <Flex sx={{ flexDirection: "column", alignSelf: "center" }}>
               <Text
+                id="select-plan"
                 variant="heading"
                 sx={{ fontSize: 32, textAlign: "center" }}
               >
