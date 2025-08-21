@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { getFeaturesTable } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useState } from "react";
 import {
@@ -42,15 +44,14 @@ import { getElevationStyle } from "../../utils/elevation";
 import { openLinkInBrowser } from "../../utils/functions";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
-import { AuthMode } from "../auth/common";
 import { Header } from "../header";
 import { BuyPlan } from "../sheets/buy-plan";
 import { Toast } from "../toast";
+import AppIcon from "../ui/AppIcon";
 import { Button } from "../ui/button";
+import { IconButton } from "../ui/icon-button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { FeaturesList } from "./features-list";
-import { getFeaturesTable } from "@notesnook/common";
 
 const Steps = {
   select: 1,
@@ -132,7 +133,26 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
         flex: 1
       }}
     >
-      {routeParams.context === "signup" && step === Steps.select ? null : (
+      {step === Steps.finish ? null : routeParams.context === "signup" &&
+        step === Steps.select ? (
+        <View
+          style={{
+            height: 50,
+            justifyContent: "flex-end",
+            alignItems: "flex-end",
+            width: "100%",
+            flexDirection: "row",
+            paddingHorizontal: DefaultAppStyles.GAP
+          }}
+        >
+          <IconButton
+            name="close"
+            onPress={() => {
+              Navigation.replace("FluidPanelsView", {});
+            }}
+          />
+        </View>
+      ) : (
         <Header
           canGoBack={true}
           onLeftMenuButtonPress={() => {
@@ -140,7 +160,11 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
               setStep(Steps.select);
               return;
             }
-            props.navigation.goBack();
+            if (routeParams.context === "signup") {
+              Navigation.replace("FluidPanelsView", {});
+            } else {
+              Navigation.goBack();
+            }
           }}
           title={
             step === Steps.buy || step === Steps.buyWeb
@@ -151,6 +175,7 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
           }
         />
       )}
+
       {step === Steps.select ? (
         <>
           <ScrollView
@@ -245,14 +270,17 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
                 </Paragraph>
               </TouchableOpacity>
 
-              {pricingPlans.pricingPlans.map((plan) => (
-                <PricingPlanCard
-                  key={plan.id}
-                  plan={plan}
-                  pricingPlans={pricingPlans}
-                  annualBilling={annualBilling}
-                />
-              ))}
+              {pricingPlans.pricingPlans.map((plan) =>
+                plan.id !== "free" ? (
+                  <PricingPlanCard
+                    key={plan.id}
+                    plan={plan}
+                    setStep={setStep}
+                    pricingPlans={pricingPlans}
+                    annualBilling={annualBilling}
+                  />
+                ) : null
+              )}
             </View>
 
             <View
@@ -459,7 +487,7 @@ After trying all the privacy security oriented note taking apps, for the price a
             >
               <Heading>Compare plans</Heading>
             </View>
-            <ComparePlans />
+            <ComparePlans pricingPlans={pricingPlans} setStep={setStep} />
             <View
               style={{
                 alignItems: "center",
@@ -497,66 +525,6 @@ After trying all the privacy security oriented note taking apps, for the price a
               ))}
             </View>
           </ScrollView>
-
-          <View
-            style={{
-              width: "100%",
-              backgroundColor: colors.primary.background,
-              paddingHorizontal: 16,
-              paddingVertical: 16,
-              borderTopWidth: 1,
-              borderTopColor: colors.primary.border,
-              position: "absolute",
-              paddingBottom: DefaultAppStyles.GAP_VERTICAL,
-              bottom: 0
-            }}
-          >
-            <Button
-              width="100%"
-              type="accent"
-              title={
-                pricingPlans.currentPlan?.id === "free"
-                  ? "I'll stay on the Free plan"
-                  : pricingPlans.userCanRequestTrial
-                  ? `Start ${annualBilling ? "14" : "7"} days free trial`
-                  : pricingPlans.user
-                  ? "Subscribe"
-                  : "Login to subscribe"
-              }
-              onPress={() => {
-                if (pricingPlans.currentPlan?.id === "free") {
-                  if (routeParams.context === "signup") {
-                    Navigation.replace("FluidPanelsView", {});
-                  } else {
-                    Navigation.goBack();
-                  }
-                }
-
-                if (!pricingPlans.user) {
-                  Navigation.navigate("Auth", {
-                    mode: AuthMode.login,
-                    state: {
-                      planId: pricingPlans.currentPlan?.id,
-                      productId: pricingPlans.selectedProduct?.productId,
-                      billingType: annualBilling ? "annual" : "monthly"
-                    }
-                  });
-                  return;
-                }
-
-                if (isGithubRelease) {
-                  setStep(Steps.buyWeb);
-                }
-
-                if (
-                  !pricingPlans.currentPlan?.id ||
-                  !pricingPlans.selectedProduct
-                )
-                  return;
-                setStep(Steps.buy);
-              }}
-            />
-          </View>
         </>
       ) : step === Steps.buy ? (
         <BuyPlan
@@ -586,9 +554,53 @@ After trying all the privacy security oriented note taking apps, for the price a
             }}
           />
         </View>
-      ) : (
-        <View />
-      )}
+      ) : step === Steps.finish ? (
+        <View
+          style={{
+            width: "100%",
+            height: "100%",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: DefaultAppStyles.GAP_VERTICAL,
+            maxWidth: "80%",
+            alignSelf: "center"
+          }}
+        >
+          <View
+            style={{
+              width: 60,
+              height: 60,
+              borderRadius: 200,
+              backgroundColor: colors.primary.shade,
+              justifyContent: "center",
+              alignItems: "center"
+            }}
+          >
+            <AppIcon color={colors.primary.accent} name="check" size={30} />
+          </View>
+          <Heading>Thank you for subscribing</Heading>
+          <Paragraph
+            style={{
+              textAlign: "center"
+            }}
+          >
+            We’re setting up your plan right now. We’ll notify you as soon as
+            everything is ready.
+          </Paragraph>
+
+          <Button
+            title={strings.continue()}
+            type="accent"
+            onPress={() => {
+              if (routeParams.context === "signup") {
+                Navigation.replace("FluidPanelsView", {});
+              } else {
+                Navigation.goBack();
+              }
+            }}
+          />
+        </View>
+      ) : null}
 
       <Toast context="local" />
     </SafeAreaView>
@@ -642,7 +654,10 @@ const FAQItem = (props: { question: string; answer: string }) => {
 };
 
 const ComparePlans = React.memo(
-  () => {
+  (props: {
+    pricingPlans?: ReturnType<typeof usePricingPlans>;
+    setStep: (step: number) => void;
+  }) => {
     const { colors } = useThemeColors();
     return (
       <ScrollView
@@ -742,6 +757,39 @@ const ComparePlans = React.memo(
             </View>
           );
         })}
+
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            width: "100%",
+            gap: 10
+          }}
+        >
+          {["features", "free", "essential", "pro", "believer"].map(
+            (plan, index) => (
+              <View
+                style={{
+                  width: index === 0 ? 150 : 120,
+                  paddingHorizontal: 16,
+                  paddingVertical: 8
+                }}
+              >
+                {plan !== "free" && plan !== "features" ? (
+                  <Button
+                    title={strings.select()}
+                    type="accent"
+                    fontSize={AppFontSize.xs}
+                    onPress={() => {
+                      props.pricingPlans?.selectPlan(plan);
+                      props.setStep(Steps.buy);
+                    }}
+                  />
+                ) : null}
+              </View>
+            )
+          )}
+        </View>
       </ScrollView>
     );
   },
@@ -812,11 +860,13 @@ const ReviewItem = (props: {
 const PricingPlanCard = ({
   plan,
   pricingPlans,
-  annualBilling
+  annualBilling,
+  setStep
 }: {
   plan: PricingPlan;
   pricingPlans?: ReturnType<typeof usePricingPlans>;
   annualBilling?: boolean;
+  setStep: (step: number) => void;
 }) => {
   const { colors } = useThemeColors();
   const isSelected = pricingPlans?.currentPlan?.id === plan.id;
@@ -841,8 +891,6 @@ const PricingPlanCard = ({
     annualBilling
   );
 
-  console.log("PRODUCT", product?.productId, plan.id);
-
   const DefaultPricing = {
     essential: "$2.99",
     pro: "$5.99",
@@ -851,15 +899,17 @@ const PricingPlanCard = ({
 
   return (
     <TouchableOpacity
-      activeOpacity={0.9}
+      activeOpacity={0.8}
       onPress={() => {
         pricingPlans?.selectPlan(plan.id);
+        setStep(Steps.buy);
       }}
       style={{
         ...getElevationStyle(3),
         backgroundColor: colors.primary.background,
         borderWidth: 1,
-        borderColor: isSelected ? colors.primary.accent : colors.primary.border,
+        borderColor:
+          plan.id === "pro" ? colors.primary.accent : colors.primary.border,
         borderRadius: 10,
         padding: 16,
         width: "100%",

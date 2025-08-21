@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { formatBytes } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import { useNetInfo } from "@react-native-community/netinfo";
@@ -38,6 +39,7 @@ import { useThemeStore } from "../../stores/use-theme-store";
 import { SyncStatus, useUserStore } from "../../stores/use-user-store";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
+import { SectionItem } from "./section-item";
 
 export const getTimeLeft = (t2) => {
   let daysRemaining = dayjs(t2).diff(dayjs(), "days");
@@ -67,7 +69,7 @@ const ProfilePicPlaceholder = (props) => {
           justifyContent: "center"
         }}
       >
-        <Icon size={50} color={colors.primary.accent} name="account-outline" />
+        <Icon size={35} color={colors.primary.accent} name="account-outline" />
       </View>
     </TouchableOpacity>
   );
@@ -118,14 +120,14 @@ const onChangePicture = () => {
 
 const SettingsUserSection = ({ item }) => {
   const { colors } = useThemeColors();
-  const [user, premium] = useUserStore((state) => [state.user, state.premium]);
+  const [user] = useUserStore((state) => [state.user]);
   const lastSynced = useUserStore((state) => state.lastSynced);
   const lastSyncStatus = useUserStore((state) => state.lastSyncStatus);
   const { isInternetReachable } = useNetInfo();
   const isOffline = !isInternetReachable;
   const userProfile = useUserStore((state) => state.profile);
-  const used = 50;
-  const total = 100;
+  const used = user.storageUsed || 0;
+  const total = user.totalStorage || 0;
 
   return (
     <>
@@ -154,9 +156,7 @@ const SettingsUserSection = ({ item }) => {
               >
                 <View
                   style={{
-                    borderWidth: 2,
                     borderRadius: 100,
-                    borderColor: colors.primary.accent,
                     alignSelf: "flex-start"
                   }}
                 >
@@ -276,7 +276,7 @@ const SettingsUserSection = ({ item }) => {
                     {strings.storage()}
                   </Paragraph>
                   <Paragraph size={AppFontSize.xxs}>
-                    50/100MB {strings.used()}
+                    {formatBytes(used)}/{formatBytes(total)} {strings.used()}
                   </Paragraph>
                 </View>
                 <View
@@ -289,7 +289,7 @@ const SettingsUserSection = ({ item }) => {
                 >
                   <View
                     style={{
-                      backgroundColor: colors.static.black,
+                      backgroundColor: colors.primary.accent,
                       height: 5,
                       width: `${(used / total) * 100}%`,
                       borderRadius: 10
@@ -348,9 +348,9 @@ const SettingsUserSection = ({ item }) => {
             </View>
           </View>
 
-          {/* {item.sections.map((item) => (
+          {item.sections.map((item) => (
             <SectionItem key={item.name} item={item} />
-          ))} */}
+          ))}
         </>
       ) : null}
     </>

@@ -77,8 +77,9 @@ export const Login = ({ changeMode }) => {
 
     if (!PremiumService.get()) {
       Navigation.navigate("PayWall", {
-        context: "logged-in",
-        state: route.params.state
+        context: "signup",
+        state: route.params.state,
+        canGoBack: false
       });
     } else {
       Progress.present();
