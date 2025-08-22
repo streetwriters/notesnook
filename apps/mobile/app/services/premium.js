@@ -30,7 +30,6 @@ import { eSendEvent, presentSheet, ToastManager } from "./event-manager";
 
 import { strings } from "@notesnook/intl";
 import SettingsService from "./settings";
-let premiumStatus = 0;
 
 /**
  * @type {RNIap.Subscription[]}
@@ -51,16 +50,12 @@ async function setPremiumStatus() {
   try {
     user = await db.user.getUser();
     if (!user) {
-      premiumStatus = 0;
       userstore.setPremium(get());
     } else {
-      premiumStatus = user.subscription?.type || 0;
       userstore.setPremium(get());
       userstore.setUser(user);
     }
-  } catch (e) {
-    premiumStatus = 0;
-  }
+  } catch (e) {}
   if (Config.GITHUB_RELEASE === "true") return;
 
   if (get()) {
@@ -72,9 +67,6 @@ async function setPremiumStatus() {
       skus: itemSkus
     });
   } catch (e) {}
-  if (premiumStatus === 0 && !__DEV__) {
-    SettingsService.reset();
-  }
 }
 
 function getMontlySub() {
@@ -143,62 +135,6 @@ async function verify(callback, error) {
     console.error(e);
   }
 }
-
-const onUserStatusCheck = async (type) => {
-  let user = await db.user.getUser();
-  let userstore = useUserStore.getState();
-  premiumStatus = user?.subscription?.type || 0;
-  if (userstore?.premium !== get()) {
-    userstore.setPremium(get());
-  }
-
-  let status = get();
-  let message = null;
-  if (!status) {
-    switch (type) {
-      case CHECK_IDS.noteColor:
-        message = {
-          context: "sheet",
-          title: strings.getNotesnookPro(),
-          desc: strings.colorsProMessage()
-        };
-        break;
-      case CHECK_IDS.noteExport:
-        message = {
-          context: "export",
-          title: strings.getNotesnookPro(),
-          desc: strings.exportProMessage()
-        };
-        break;
-      case CHECK_IDS.noteTag:
-        message = {
-          context: "sheet",
-          title: strings.getNotesnookPro(),
-          desc: strings.tagsProMessage()
-        };
-        break;
-      case CHECK_IDS.notebookAdd:
-        message = {
-          context: "sheet",
-          title: strings.getNotesnookPro(),
-          desc: strings.notebookProMessage()
-        };
-        break;
-      case CHECK_IDS.vaultAdd:
-        message = {
-          context: "sheet",
-          title: strings.getNotesnookPro(),
-          desc: strings.vaultProMessage()
-        };
-        break;
-    }
-
-    if (message) {
-      eSendEvent(eShowGetPremium, message);
-    }
-  }
-  return { type, result: status };
-};
 
 const showVerifyEmailDialog = () => {
   presentSheet({
@@ -358,19 +294,15 @@ const subscriptions = {
   }
 };
 
-const sheet = (context, promo, trial) => {};
-
 const PremiumService = {
   verify,
   setPremiumStatus,
   get,
-  onUserStatusCheck,
   showVerifyEmailDialog,
   loadProductsAndSubs: loadProductsAndSubs,
   getUser,
   subscriptions,
-  getMontlySub,
-  sheet
+  getMontlySub
 };
 
 export default PremiumService;

@@ -78,7 +78,6 @@ const ExportNotesSheet = ({
     | undefined
   >();
   const [status, setStatus] = useState<string>();
-  const premium = useUserStore((state) => state.premium);
 
   const exportNoteAs = async (
     type: "pdf" | "txt" | "md" | "html" | "md-frontmatter"
@@ -122,8 +121,7 @@ const ExportNotesSheet = ({
         await exportNoteAs("pdf");
       },
       icon: "file-pdf-box",
-      id: notesnook.ids.dialogs.export.pdf,
-      pro: premium
+      id: notesnook.ids.dialogs.export.pdf
     },
     {
       title: "Markdown",
@@ -131,8 +129,7 @@ const ExportNotesSheet = ({
         await exportNoteAs("md");
       },
       icon: "language-markdown",
-      id: notesnook.ids.dialogs.export.md,
-      pro: premium
+      id: notesnook.ids.dialogs.export.md
     },
     {
       title: "Markdown + Frontmatter",
@@ -140,8 +137,7 @@ const ExportNotesSheet = ({
         await exportNoteAs("md-frontmatter");
       },
       icon: "language-markdown",
-      id: notesnook.ids.dialogs.export.md,
-      pro: premium
+      id: notesnook.ids.dialogs.export.md
     },
     {
       title: "Plain Text",
@@ -158,8 +154,7 @@ const ExportNotesSheet = ({
         await exportNoteAs("html");
       },
       icon: "language-html5",
-      id: notesnook.ids.dialogs.export.html,
-      pro: premium
+      id: notesnook.ids.dialogs.export.html
     }
   ];
 
@@ -215,9 +210,7 @@ const ExportNotesSheet = ({
                 >
                   <Icon
                     name={item.icon}
-                    color={
-                      item.pro ? colors.primary.accent : colors.primary.icon
-                    }
+                    color={colors.primary.icon}
                     size={AppFontSize.xxxl + 10}
                   />
                 </View>
