@@ -16,12 +16,17 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { Plan } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import dayjs from "dayjs";
 import React, { useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import Config from "react-native-config";
 import * as RNIap from "react-native-iap";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { WebView } from "react-native-webview";
+import { db } from "../../../common/database";
 import useGlobalSafeAreaInsets from "../../../hooks/use-global-safe-area-insets";
 import usePricingPlans from "../../../hooks/use-pricing-plans";
 import { openLinkInBrowser } from "../../../utils/functions";
@@ -30,10 +35,6 @@ import { DefaultAppStyles } from "../../../utils/styles";
 import { Button } from "../../ui/button";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import Config from "react-native-config";
-import { Plan } from "@notesnook/core";
-import { db } from "../../../common/database";
-import { WebView } from "react-native-webview";
 const isGithubRelease = Config.GITHUB_RELEASE === "true";
 export const BuyPlan = (props: {
   planId: string;
@@ -157,14 +158,14 @@ export const BuyPlan = (props: {
           }}
         >
           <Heading color={colors.primary.paragraph} size={AppFontSize.sm}>
-            Due today{" "}
+            {strings.dueToday()}{" "}
             {pricingPlans.userCanRequestTrial ? (
               <Text
                 style={{
                   color: colors.primary.accent
                 }}
               >
-                ({billingDuration?.duration} days free)
+                ({strings.daysFree(`${billingDuration?.duration || 0}`)})
               </Text>
             ) : null}
           </Heading>
@@ -190,10 +191,11 @@ export const BuyPlan = (props: {
             }}
           >
             <Paragraph color={colors.secondary.paragraph}>
-              Due{" "}
-              {dayjs()
-                .add(billingDuration?.duration || 0, "day")
-                .format("DD MMMM")}
+              {strings.due(
+                dayjs()
+                  .add(billingDuration?.duration || 0, "day")
+                  .format("DD MMMM")
+              )}
             </Paragraph>
             <Paragraph color={colors.secondary.paragraph}>
               {pricingPlans.getStandardPrice(
@@ -214,13 +216,12 @@ export const BuyPlan = (props: {
             }}
           >
             {(is5YearPlanSelected
-              ? [
-                  "One time purchase, no auto-renewal",
-                  "Pay once and use for 5 years"
-                ]
+              ? strings["5yearPlanConditions"]()
               : [
-                  `Free ${billingDuration?.duration} day trial, cancel any time`,
-                  "Google will remind you before your trial ends"
+                  strings.trialPlanConditions[0](
+                    billingDuration?.duration as number
+                  ),
+                  strings.trialPlanConditions[1](0)
                 ]
             ).map((item) => (
               <View
@@ -248,10 +249,10 @@ export const BuyPlan = (props: {
           loading={pricingPlans.loading}
           title={
             is5YearPlanSelected
-              ? "Purchase"
+              ? strings.purchase()
               : pricingPlans?.userCanRequestTrial
-              ? "Subscribe and start free trial"
-              : "Subscribe"
+              ? strings.subscribeAndStartTrial()
+              : strings.subscribe()
           }
           onPress={async () => {
             if (isGithubRelease) {
@@ -283,8 +284,8 @@ export const BuyPlan = (props: {
           size={AppFontSize.xs}
         >
           {is5YearPlanSelected
-            ? `This is a one time purchase, no subscription.`
-            : `Cancel anytime, subscription auto-renews.`}
+            ? strings.oneTimePurchase()
+            : strings.cancelAnytimeAlt()}
         </Heading>
         <Heading
           style={{
@@ -293,7 +294,7 @@ export const BuyPlan = (props: {
           color={colors.secondary.paragraph}
           size={AppFontSize.xs}
         >
-          By joining you agree to our{" "}
+          {strings.subTerms[0]()}{" "}
           <Text
             style={{
               textDecorationLine: "underline"
@@ -302,9 +303,9 @@ export const BuyPlan = (props: {
               openLinkInBrowser("https://notesnook.com/privacy");
             }}
           >
-            privacy policy
+            {strings.subTerms[1]()}
           </Text>{" "}
-          and{" "}
+          {strings.subTerms[2]()}{" "}
           <Text
             style={{
               textDecorationLine: "underline"
@@ -313,9 +314,8 @@ export const BuyPlan = (props: {
               openLinkInBrowser("https://notesnook.com/tos");
             }}
           >
-            terms of use
+            {strings.subTerms[3]()}
           </Text>
-          .
         </Heading>
       </View>
     </ScrollView>
@@ -399,15 +399,16 @@ const ProductItem = (props: {
               }}
             >
               <Heading color={colors.static.white} size={AppFontSize.xs}>
-                Best value -{" "}
-                {isGithubRelease
-                  ? (product as Plan).discount?.amount
-                  : props.pricingPlans.compareProductPrice(
-                      props.pricingPlans.currentPlan?.id as string,
-                      `notesnook.${props.pricingPlans.currentPlan?.id}.yearly`,
-                      `notesnook.${props.pricingPlans.currentPlan?.id}.monthly`
-                    )}
-                % Off
+                {strings.bestValue()} -{" "}
+                {strings.percentOff(
+                  (isGithubRelease
+                    ? (product as Plan).discount?.amount
+                    : props.pricingPlans.compareProductPrice(
+                        props.pricingPlans.currentPlan?.id as string,
+                        `notesnook.${props.pricingPlans.currentPlan?.id}.yearly`,
+                        `notesnook.${props.pricingPlans.currentPlan?.id}.monthly`
+                      )) as string
+                )}
               </Heading>
             </View>
           ) : null}
@@ -424,13 +425,13 @@ const ProductItem = (props: {
                   ? 1
                   : 0,
                 isAnnual
-              )}/month`
+              )}/${strings.month}`
             : null}
 
           {!isAnnual && !is5YearProduct
             ? `${props.pricingPlans.getStandardPrice(
                 product as RNIap.Subscription
-              )}/month`
+              )}/${strings.month()}`
             : null}
         </Paragraph>
       </View>

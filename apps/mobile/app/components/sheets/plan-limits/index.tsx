@@ -38,7 +38,7 @@ export function PlanLimits() {
         gap: DefaultAppStyles.GAP_VERTICAL
       }}
     >
-      <Heading>Plan limits</Heading>
+      <Heading>{strings.planLimits()}</Heading>
 
       {featureUsage?.map((item) => (
         <View
@@ -60,7 +60,7 @@ export function PlanLimits() {
             </Paragraph>
             <Paragraph size={AppFontSize.sm}>
               {item.total === Infinity
-                ? "Unlimited"
+                ? strings.unlimited()
                 : item.id === "storage"
                 ? `${formatBytes(item.used)}/${formatBytes(
                     item.total

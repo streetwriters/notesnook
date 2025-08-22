@@ -2497,7 +2497,6 @@ Use this if changes from other devices are not appearing on this device. This wi
   iAlreadyHaveAnAccount: () => t`I already have an account`,
   upgradePlan: () => t`Upgrade plan`,
   upgrade: () => t`Upgrade`,
-
   checkoutFaqs: [
     {
       question: () => t`What happens to my data if I switch plans?`,
@@ -2520,5 +2519,62 @@ Use this if changes from other devices are not appearing on this device. This wi
       answer: () =>
         t`For a monthly subscription, you can get a refund within 7 days of purchase. For a yearly subscription, we offer a full refund within 14 days of purchase. For a 5 year subscription, you can request a refund within 30 days of purchase.`
     }
-  ]
+  ],
+  upgradePlanTo: (plan: string) =>
+    t`Upgrade plan to ${plan} to use this feature.`,
+  tryItForFree: () => t`Try it for free`,
+  getThisAndSoMuchMore: () => t`Get this and so much more:`,
+  cloudSpace: () => t`cloud storage space for storing images and files.`,
+  appLockFeatureBenefit: () =>
+    t`for locking your notes as soon as app enters background`,
+  advancedNoteTaking: [
+    () => t`Use advanced note taking features like`,
+    () => t`tables, outlines, block level note linking`,
+    () => t`and much more.`
+  ],
+  cancelAnytime: () => t`Cancel anytime.`,
+  googleReminderTrial: () =>
+    t`Google will remind you 2 days before your trial ends.`,
+  exploreAllPlans: () => t`Explore all plans`,
+  tryPlanForFree: (plan: string) => t`Try ${plan} for free`,
+  plan: (plan: string) => t`${plan} plan`,
+  notesnookPlans: [() => t`Notesnook`, () => t`Plans`],
+  readyToTakeNextStep: () =>
+    t`Ready to take the next step on your private note taking journey?`,
+  percentOff: (discount: string) => `${discount}% off`,
+  recommendedByPrivacyGuides: () => t`Recommended by Privacy Guides`,
+  featuredOn: () => t`Featured on`,
+  comparePlans: () => t`Compare plans`,
+  faqs: () => t`FAQs`,
+  thankYouForSubscribing: () => t`Thank you for subscribing`,
+  settingUpPlan: () =>
+    t`We’re setting up your plan right now. We’ll notify you as soon as everything is ready.`,
+  hdImages: () => t`hdImages`,
+  billedAnnually: (price: string) => t`billed annually at ${price}`,
+  billedMonthly: (price: string) => t`billed monthly at ${price}`,
+  dueToday: () => t`Due today`,
+  daysFree: (days: string) => t`${days} days free`,
+  due: (date: string) => t`Due ${date}`,
+  "5yearPlanConditions": () => [
+    t`One time purchase, no auto-renewal`,
+    t`Pay once and use for 5 years`
+  ],
+  trialPlanConditions: [
+    (duration: number) => t`Free ${duration} day trial, cancel any time`,
+    () => t`Google will remind you before your trial ends`
+  ],
+  purchase: () => t`Purchase`,
+  subscribe: () => t`Subscribe`,
+  subscribeAndStartTrial: () => t`Subscribe and start free trial`,
+  oneTimePurchase: () => t`This is a one time purchase, no subscription.`,
+  cancelAnytimeAlt: () => t`Cancel anytime, subscription auto-renews.`,
+  subTerms: [
+    () => t`By joining you agree to our`,
+    () => t`privacy policy`,
+    () => t`and`,
+    () => t`terms of use.`
+  ],
+  bestValue: () => t`Best value`,
+  planLimits: () => t`Plan limits`,
+  unlimited: () => t`Unlimited`
 };
