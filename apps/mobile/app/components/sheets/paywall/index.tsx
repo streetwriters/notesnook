@@ -1,6 +1,7 @@
 import { FeatureId, FeatureResult } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { View } from "react-native";
 import Config from "react-native-config";
 import usePricingPlans from "../../../hooks/use-pricing-plans";
@@ -26,16 +27,10 @@ const INDEX_TO_PLAN = {
   3: "believer"
 };
 
-const Steps = {
-  Select: 0,
-  Buy: 1
-};
-
 export default function PaywallSheet<Tid extends FeatureId>(props: {
   feature: FeatureResult<Tid>;
 }) {
   const { colors } = useThemeColors();
-  const [step, setStep] = useState(Steps.Select);
   const pricingPlans = usePricingPlans();
   useEffect(() => {
     console.log("PaywallSheet mounted with feature:", props.feature);
@@ -47,16 +42,15 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
     );
     if (!plan) return;
     pricingPlans.selectPlan(plan?.id);
-    pricingPlans.selectProduct(
-      isGithubRelease
-        ? "yearly"
-        : plan?.subscriptionSkuList?.find((sku) => sku.includes("year"))
-    );
+    const product = isGithubRelease
+      ? "yearly"
+      : plan?.subscriptionSkuList?.find((sku) => sku.includes("year"));
+    if (product) {
+      pricingPlans.selectProduct(product);
+    }
   }, []);
 
-  console.log(pricingPlans.currentPlan, pricingPlans.selectedProduct);
-
-  return (
+  return !pricingPlans.currentPlan ? null : (
     <View
       style={{
         width: "100%",
@@ -79,9 +73,8 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
               name="crown"
               size={AppFontSize.md}
               color={colors.static.orange}
-            />{" "}
-            Upgrade plan to {pricingPlans.currentPlan?.name} to use this
-            feature.
+            />
+            {strings.upgradePlanTo(pricingPlans.currentPlan?.name)}
           </Paragraph>
 
           <View
@@ -90,9 +83,11 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
               width: "100%"
             }}
           >
-            <Heading>Try it for free</Heading>
+            <Heading>{strings.tryItForFree()}</Heading>
 
-            <Heading size={AppFontSize.sm}>Get this and so much more:</Heading>
+            <Heading size={AppFontSize.sm}>
+              {strings.getThisAndSoMuchMore()}
+            </Heading>
 
             <View
               style={{
@@ -106,8 +101,8 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
                   flexShrink: 1
                 }}
               >
-                <Heading size={AppFontSize.sm}>25 GB</Heading> cloud storage
-                space for storing images and files upto 5 GB every month.
+                <Heading size={AppFontSize.sm}>25 GB</Heading>{" "}
+                {strings.cloudSpace()}
               </Paragraph>
             </View>
 
@@ -123,8 +118,8 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
                   flexShrink: 1
                 }}
               >
-                <Heading size={AppFontSize.sm}>App lock</Heading> for locking
-                your notes as soon as app enters background
+                <Heading size={AppFontSize.sm}>{strings.appLock()}</Heading>{" "}
+                {strings.appLockFeatureBenefit()}
               </Paragraph>
             </View>
 
@@ -140,11 +135,11 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
                   flexShrink: 1
                 }}
               >
-                Use advanced note taking features like{" "}
+                {strings.advancedNoteTaking[0]()}{" "}
                 <Heading size={AppFontSize.sm}>
-                  tables, outlines, block level note linking
+                  {strings.advancedNoteTaking[1]()}
                 </Heading>{" "}
-                and much more.
+                {strings.advancedNoteTaking[2]()}
               </Paragraph>
             </View>
           </View>
@@ -162,13 +157,13 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
             }}
             size={AppFontSize.xs}
           >
-            <Heading size={AppFontSize.xs}>Cancel anytime.</Heading> Google will
-            remind you 2 days before your trial ends.
+            <Heading size={AppFontSize.xs}>{strings.cancelAnytime()}</Heading>{" "}
+            {strings.googleReminderTrial()}
           </Paragraph>
 
           <Button
             type="accent"
-            title="Upgrade"
+            title={strings.upgrade()}
             style={{
               marginVertical: DefaultAppStyles.GAP_VERTICAL,
               width: "100%"
@@ -197,7 +192,7 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
 
         <Button
           type="plain"
-          title="Explore all plans"
+          title={strings.exploreAllPlans()}
           icon="arrow-right"
           iconPosition="right"
           onPress={() => {
