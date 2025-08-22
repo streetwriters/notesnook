@@ -64,6 +64,7 @@ import {
   TECHLORE_SVG,
   XDA_SVG
 } from "../../assets/images/assets";
+import { EV, EVENTS, SubscriptionPlan, User } from "@notesnook/core";
 
 const Steps = {
   select: 1,
@@ -133,6 +134,23 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
       listener?.remove();
     };
   }, [isFocused, step]);
+
+  useEffect(() => {
+    const sub = EV.subscribe(
+      EVENTS.userSubscriptionUpdated,
+      (sub: User["subscription"]) => {
+        if (sub.plan === SubscriptionPlan.FREE) return;
+        if (routeParams.context === "signup") {
+          Navigation.replace("FluidPanelsView", {});
+        } else {
+          Navigation.goBack();
+        }
+      }
+    );
+    return () => {
+      sub?.unsubscribe();
+    };
+  }, []);
 
   return (
     <SafeAreaView
