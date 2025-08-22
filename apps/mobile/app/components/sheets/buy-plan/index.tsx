@@ -381,10 +381,10 @@ const ProductItem = (props: {
         >
           <Heading size={AppFontSize.md}>
             {isAnnual
-              ? "Yearly"
+              ? strings.yearly()
               : is5YearProduct
-              ? "5 year plan (One time purchase)"
-              : "Monthly"}
+              ? strings.fiveYearPlan()
+              : strings.monthly()}
           </Heading>
 
           {(isAnnual && !isGithubRelease) ||
@@ -425,7 +425,7 @@ const ProductItem = (props: {
                   ? 1
                   : 0,
                 isAnnual
-              )}/${strings.month}`
+              )}/${strings.month()}`
             : null}
 
           {!isAnnual && !is5YearProduct
