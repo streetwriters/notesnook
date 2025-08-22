@@ -234,25 +234,22 @@ const gallery = async (options: PickerOptions) => {
 };
 
 const pick = async (options: PickerOptions) => {
-  if (!PremiumService.get()) {
-    const user = await db.user.getUser();
-    if (!user) {
-      ToastManager.show({
-        heading: strings.loginRequired(),
-        type: "error"
-      });
-      return;
-    }
-    if (editorState().isFocused) {
-      editorState().isFocused = true;
-    }
-    if (user && !PremiumService.get() && !user?.isEmailConfirmed) {
-      PremiumService.showVerifyEmailDialog();
-    } else {
-      PremiumService.sheet();
-    }
+  const user = await db.user.getUser();
+  if (!user) {
+    ToastManager.show({
+      heading: strings.loginRequired(),
+      type: "error"
+    });
     return;
   }
+  if (editorState().isFocused) {
+    editorState().isFocused = true;
+  }
+  if (user && !user?.isEmailConfirmed) {
+    PremiumService.showVerifyEmailDialog();
+    return;
+  }
+
   useUserStore.getState().setDisableAppLockRequests(true);
   if (options?.type.startsWith("image") || options?.type === "camera") {
     if (options.type.startsWith("image")) {

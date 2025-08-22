@@ -165,7 +165,6 @@ export const useEditorEvents = (
     state.timeFormat
   ]);
   const handleBack = useRef<NativeEventSubscription>();
-  const isPremium = useUserStore((state) => state.premium);
   const { fontScale } = useWindowDimensions();
 
   const doubleSpacedLines = useSettingStore(
@@ -209,7 +208,7 @@ export const useEditorEvents = (
     editor.commands.setSettings({
       deviceMode: deviceMode || "mobile",
       fullscreen: fullscreen || false,
-      premium: isPremium,
+      premium: false,
       readonly: false,
       tools: tools || getDefaultPresets().default,
       noHeader: noHeader,
@@ -229,7 +228,6 @@ export const useEditorEvents = (
     });
   }, [
     fullscreen,
-    isPremium,
     editor.loading,
     deviceMode,
     tools,

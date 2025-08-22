@@ -84,7 +84,6 @@ export const Button = ({
   ...restProps
 }: ButtonProps) => {
   const { colors } = useThemeColors();
-  const premium = useUserStore((state) => state.premium);
   const { text } = useButton({
     type,
     accent: accentColor,
