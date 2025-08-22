@@ -22,7 +22,7 @@ import { useRef, useState } from "react";
 import { Button } from "../../components/button.js";
 import { ResponsivePresenter } from "../../components/responsive/index.js";
 import { useTimer } from "../../hooks/use-timer.js";
-import { Icon } from "@notesnook/ui";
+import { Icon, ScrollContainer } from "@notesnook/ui";
 import { Popup } from "../../toolbar/components/popup.js";
 import { Icons } from "../../toolbar/icons.js";
 import { ReactNodeViewProps } from "../react/types.js";
@@ -58,45 +58,57 @@ export function CodeblockComponent(
           overflow: "hidden"
         }}
       >
-        <Text
-          ref={(ref) => {
-            elementRef.current = ref ?? undefined;
-            forwardRef?.(ref);
+        <ScrollContainer
+          style={{
+            display: "flex",
+            overscrollBehavior: "contain"
           }}
-          autoCorrect="off"
-          autoCapitalize="none"
-          css={theme.codeBlockCSS}
-          sx={{
-            pre: {
-              fontFamily: "inherit !important",
-              tabSize: "inherit !important",
-              // background: "transparent !important",
-              padding: "10px !important",
-              margin: "0px !important",
-              width: "100%",
-              borderRadius: `0px !important`,
+          trackStyle={() => ({
+            backgroundColor: "transparent"
+          })}
+        >
+          <div style={{ flex: 1 }}>
+            <Text
+              ref={(ref) => {
+                elementRef.current = ref ?? undefined;
+                forwardRef?.(ref);
+              }}
+              autoCorrect="off"
+              autoCapitalize="none"
+              css={theme.codeBlockCSS}
+              sx={{
+                pre: {
+                  fontFamily: "inherit !important",
+                  tabSize: "inherit !important",
+                  // background: "transparent !important",
+                  padding: "10px !important",
+                  margin: "0px !important",
+                  width: "100%",
+                  borderRadius: `0px !important`,
 
-              "::selection,*::selection": {
-                bg: "background-selected",
-                color: "inherit"
-              },
-              "::-moz-selection,*::-moz-selection": {
-                bg: "background-selected",
-                color: "inherit"
-              }
-            },
-            fontFamily: "monospace",
-            whiteSpace: "pre", // TODO !important
-            tabSize: 1,
-            position: "relative",
-            lineHeight: "20px",
-            // bg: "var(--background-secondary)",
-            // color: "white",
-            overflowX: "hidden",
-            display: "flex"
-          }}
-          spellCheck={false}
-        />
+                  "::selection,*::selection": {
+                    bg: "background-selected",
+                    color: "inherit"
+                  },
+                  "::-moz-selection,*::-moz-selection": {
+                    bg: "background-selected",
+                    color: "inherit"
+                  }
+                },
+                fontFamily: "monospace",
+                whiteSpace: "pre", // TODO !important
+                tabSize: 1,
+                position: "relative",
+                lineHeight: "20px",
+                // bg: "var(--background-secondary)",
+                // color: "white",
+                overflowX: "hidden",
+                display: "flex"
+              }}
+              spellCheck={false}
+            />
+          </div>
+        </ScrollContainer>
         <Flex
           ref={toolbarRef}
           contentEditable={false}
