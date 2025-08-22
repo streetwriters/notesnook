@@ -623,6 +623,10 @@ msgstr "2FA code is required()"
 msgid "2FA code sent via {method}"
 msgstr "2FA code sent via {method}"
 
+#: src/strings.ts:2572
+msgid "5 year plan (One time purchase)"
+msgstr "5 year plan (One time purchase)"
+
 #: src/strings.ts:1844
 msgid "6 digit code"
 msgstr "6 digit code"
