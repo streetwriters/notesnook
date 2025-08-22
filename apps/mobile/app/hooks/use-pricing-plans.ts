@@ -16,14 +16,15 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { Plan } from "@notesnook/core";
 import { useEffect, useState } from "react";
 import { Platform } from "react-native";
+import Config from "react-native-config";
 import * as RNIap from "react-native-iap";
 import { DatabaseLogger, db } from "../common/database";
 import PremiumService from "../services/premium";
 import { useSettingStore } from "../stores/use-setting-store";
 import { useUserStore } from "../stores/use-user-store";
-
 function numberWithCommas(x: string) {
   const parts = x.toString().split(".");
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -140,8 +141,13 @@ type PricingPlansOptions = {
   productId?: string;
   onBuy?: () => void;
 };
-
+const planIdToIndex = (planId: string) => {
+  const planIndex = planId === "essential" ? 1 : planId === "pro" ? 2 : 3;
+  return planIndex;
+};
+let WebPlanCache: Plan[];
 const usePricingPlans = (options?: PricingPlansOptions) => {
+  const isGithubRelease = Config.GITHUB_RELEASE === "true";
   const user = useUserStore((state) => state.user);
   const [currentPlan, setCurrentPlan] = useState<string>(
     options?.planId || pricingPlans[2].id
@@ -155,8 +161,14 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
   const [isPromoOffer, setIsPromoOffer] = useState(false);
   const [cancelPromo, setCancelPromo] = useState(false);
   const [userCanRequestTrial, setUserCanRequestTrial] = useState(false);
+  const [webPricingPlans, setWebPricingPlans] = useState<Plan[]>([]);
 
   const getProduct = (planId: string, skuId: string) => {
+    if (isGithubRelease)
+      return webPricingPlans.find(
+        (plan) => planIdToIndex(planId) === plan.plan && skuId === plan.period
+      );
+
     return (
       plans.find((p) => p.id === planId)?.subscriptions?.[skuId] ||
       plans.find((p) => p.id === planId)?.products?.[skuId]
@@ -164,6 +176,10 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
   };
 
   const getProductAndroid = (planId: string, skuId: string) => {
+    if (isGithubRelease)
+      return webPricingPlans.find(
+        (plan) => planIdToIndex(planId) === plan.plan && skuId === plan.period
+      );
     return getProduct(planId, skuId) as RNIap.SubscriptionAndroid;
   };
 
@@ -209,6 +225,13 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
       });
       setPlans([...pricingPlans]);
       setUserCanRequestTrial(hasTrialOffer());
+      if (Config.GITHUB_RELEASE === "true") {
+        try {
+          const products = WebPlanCache || (await db.pricing.products());
+          WebPlanCache = products;
+          setWebPricingPlans(products);
+        } catch (e) {}
+      }
       setLoadingPlans(false);
     };
 
@@ -243,10 +266,21 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
     loadPlans().then(() => loadPromoOffer());
   }, [options?.promoOffer, cancelPromo]);
 
-  function getLocalizedPrice(product: RNIap.Subscription | RNIap.Product) {
+  function getLocalizedPrice(
+    product: RNIap.Subscription | RNIap.Product | Plan
+  ) {
     if (!product) return;
 
     if (Platform.OS === "android") {
+      if (isGithubRelease)
+        return `${(product as Plan).price.currency} ${
+          (product as Plan).period === "yearly"
+            ? ((product as Plan).price.gross / 12).toFixed(2)
+            : (product as Plan).period === "5-year"
+            ? ((product as Plan).price.gross / (12 * 5)).toFixed(2)
+            : (product as Plan).price.gross
+        }`;
+
       const pricingPhaseListItem = (product as RNIap.SubscriptionAndroid)
         ?.subscriptionOfferDetails?.[0]?.pricingPhases?.pricingPhaseList?.[1];
 
@@ -272,7 +306,7 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
     product: RNIap.Subscription,
     androidOfferToken?: string
   ) {
-    if (loading || !product) return;
+    if (loading || !product || isGithubRelease) return;
     setLoading(true);
     try {
       if (!user) {
@@ -366,9 +400,13 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
   }
 
   const getBillingPeriod = (
-    product: RNIap.Subscription,
+    product: RNIap.Subscription | Plan,
     offerIndex: number
   ) => {
+    if (isGithubRelease) {
+      return (product as Plan).period;
+    }
+
     if (Platform.OS === "android") {
       const period = (product as RNIap.SubscriptionAndroid)
         ?.subscriptionOfferDetails?.[offerIndex]?.pricingPhases
@@ -386,12 +424,21 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
   };
 
   const getBillingDuration = (
-    product: RNIap.Subscription,
+    product: RNIap.Subscription | Plan,
     offerIndex: number,
     phaseIndex: number,
     trialDurationIos?: boolean
   ) => {
-    if (product.productId.includes("5year")) {
+    if (!product) return;
+
+    if (isGithubRelease) {
+      return {
+        duration: 1,
+        type: (product as Plan).period
+      };
+    }
+
+    if ((product as RNIap.Subscription)?.productId.includes("5year")) {
       return {
         type: "year",
         duration: 5
@@ -520,17 +567,25 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
   };
 
   const getPrice = (
-    product: RNIap.Subscription | RNIap.Product,
+    product: RNIap.Subscription | RNIap.Product | Plan,
     phaseIndex: number,
     annualBilling?: boolean
   ) => {
     if (!product) return null;
 
+    if (isGithubRelease)
+      return `${(product as Plan).price.currency} ${
+        (product as Plan).period === "yearly"
+          ? ((product as Plan).price.gross / 12).toFixed(2)
+          : (product as Plan).period === "5-year"
+          ? ((product as Plan).price.gross / (12 * 5)).toFixed(2)
+          : (product as Plan).price.gross
+      }`;
+
     const androidPricingPhase = (product as RNIap.SubscriptionAndroid)
       ?.subscriptionOfferDetails?.[0].pricingPhases?.pricingPhaseList?.[
       phaseIndex
     ];
-    console.log(product as RNIap.Product);
 
     const { localizedPrice, priceSymbol, priceValue } = getPriceParts(
       Platform.OS === "android"
@@ -549,7 +604,8 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
         : (product as RNIap.SubscriptionIOS).localizedPrice
     );
 
-    return !annualBilling && !product?.productId.includes("5year")
+    return !annualBilling &&
+      !(product as RNIap.Subscription)?.productId.includes("5year")
       ? getLocalizedPrice(product as RNIap.Subscription)
       : convertPrice(
           priceValue,
@@ -622,204 +678,14 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
       return plans.find((p) => p.id === "pro")?.products?.[
         `notesnook.${currentPlan}.5year`
       ];
+    },
+    getWebPlan(plan: string, period: "monthly" | "yearly") {
+      const planIndex = planIdToIndex(plan);
+      return webPricingPlans.find(
+        (plan) => plan.plan === planIndex && plan.period === period
+      );
     }
   };
 };
-
-// const usePricingPlans = (options?: {
-//   promo?: {
-//     promoCode?: string;
-//   };
-// }) => {
-//   const user = useUserStore((state) => state.user);
-//   const [product, setProduct] = useState<{
-//     type: string;
-//     offerType: "monthly" | "yearly";
-//     data: RNIap.Subscription;
-//     cycleText: string;
-//     info: string;
-//   }>();
-
-//   const [buying, setBuying] = useState(false);
-//   const [loading, setLoading] = useState(false);
-//   const userCanRequestTrial =
-//     user && (!user.subscription || !user.subscription.expiry) ? true : false;
-//   const yearlyPlan = usePricing("yearly");
-//   const monthlyPlan = usePricing("monthly");
-//   const promoCode = options?.promo?.promoCode;
-
-//   const getSkus = useCallback(async () => {
-//     try {
-//       setLoading(true);
-//       if (promoCode) {
-//         getPromo(promoCode);
-//       }
-//       setLoading(false);
-//     } catch (e) {
-//       setLoading(false);
-//       console.log("error getting sku", e);
-//     }
-//   }, [promoCode]);
-
-//   const getPromo = async (code: string) => {
-//     try {
-//       let skuId: string;
-//       if (code.startsWith("com.streetwriters.notesnook")) {
-//         skuId = code;
-//       } else {
-//         skuId = await db.offers?.getCode(
-//           code.split(":")[0],
-//           Platform.OS as "ios" | "android" | "web"
-//         );
-//       }
-
-//       const products = await PremiumService.getProducts();
-//       const product = products.find((p) => p.productId === skuId);
-//       if (!product) return false;
-//       const isMonthly = product.productId.indexOf(".mo") > -1;
-
-//       const cycleText = isMonthly
-//         ? promoCyclesMonthly[
-//             (Platform.OS === "android"
-//               ? (product as RNIap.SubscriptionAndroid)
-//                   .subscriptionOfferDetails[0]?.pricingPhases
-//                   .pricingPhaseList?.[0].billingCycleCount
-//               : parseInt(
-//                   (product as RNIap.SubscriptionIOS)
-//                     .introductoryPriceNumberOfPeriodsIOS as string
-//                 )) as keyof typeof promoCyclesMonthly
-//           ]
-//         : promoCyclesYearly[
-//             (Platform.OS === "android"
-//               ? (product as RNIap.SubscriptionAndroid)
-//                   .subscriptionOfferDetails[0]?.pricingPhases
-//                   .pricingPhaseList?.[0].billingCycleCount
-//               : parseInt(
-//                   (product as RNIap.SubscriptionIOS)
-//                     .introductoryPriceNumberOfPeriodsIOS as string
-//                 )) as keyof typeof promoCyclesYearly
-//           ];
-
-//       setProduct({
-//         type: "promo",
-//         offerType: isMonthly ? "monthly" : "yearly",
-//         data: product,
-//         cycleText: cycleText,
-//         info: `Pay ${isMonthly ? "monthly" : "yearly"}, cancel anytime`
-//       });
-//       return true;
-//     } catch (e) {
-//       console.log("PROMOCODE ERROR:", code, e);
-//       return false;
-//     }
-//   };
-
-//   useEffect(() => {
-//     getSkus();
-//   }, [getSkus]);
-
-//   const buySubscription = async (product: RNIap.Subscription) => {
-//     if (buying || !product) return;
-//     setBuying(true);
-//     try {
-//       if (!user) {
-//         setBuying(false);
-//         return;
-//       }
-//       useSettingStore.getState().setAppDidEnterBackgroundForAction(true);
-//       const androidOfferToken =
-//         Platform.OS === "android"
-//           ? (product as RNIap.SubscriptionAndroid).subscriptionOfferDetails[0]
-//               .offerToken
-//           : null;
-
-//       DatabaseLogger.info(
-//         `Subscription Requested initiated for user ${toUUID(user.id)}`
-//       );
-
-//       await RNIap.requestSubscription({
-//         sku: product?.productId,
-//         obfuscatedAccountIdAndroid: user.id,
-//         obfuscatedProfileIdAndroid: user.id,
-//         appAccountToken: toUUID(user.id),
-//         andDangerouslyFinishTransactionAutomaticallyIOS: false,
-//         subscriptionOffers: androidOfferToken
-//           ? [
-//               {
-//                 offerToken: androidOfferToken,
-//                 sku: product?.productId
-//               }
-//             ]
-//           : undefined
-//       });
-//       useSettingStore.getState().setAppDidEnterBackgroundForAction(false);
-//       setBuying(false);
-//       eSendEvent(eCloseSheet);
-//       eSendEvent(eClosePremiumDialog);
-//       await sleep(500);
-//       presentSheet({
-//         title: "Thank you for subscribing!",
-//         paragraph:
-//           "Your Notesnook Pro subscription will be activated soon. If your account is not upgraded to Notesnook Pro, your money will be refunded to you. In case of any issues, please reach out to us at support@streetwriters.co",
-//         action: async () => {
-//           eSendEvent(eCloseSheet);
-//         },
-//         icon: "check",
-//         actionText: "Continue"
-//       });
-//     } catch (e) {
-//       setBuying(false);
-//       console.log(e);
-//     }
-//   };
-
-//   function getStandardPrice(
-//     type: "monthly" | "yearly",
-//     product: RNIap.Subscription
-//   ) {
-//     if (!product) return;
-//     const productType = type;
-
-//     if (Platform.OS === "android") {
-//       const pricingPhaseListItem = (product as RNIap.SubscriptionAndroid)
-//         ?.subscriptionOfferDetails?.[0]?.pricingPhases?.pricingPhaseList?.[1];
-
-//       if (!pricingPhaseListItem) {
-//         const product =
-//           productType === "monthly"
-//             ? monthlyPlan?.product
-//             : yearlyPlan?.product;
-//         return (product as RNIap.SubscriptionAndroid)
-//           ?.subscriptionOfferDetails?.[0]?.pricingPhases?.pricingPhaseList?.[0]
-//           ?.formattedPrice;
-//       }
-
-//       return pricingPhaseListItem?.formattedPrice;
-//     } else {
-//       const productDefault =
-//         productType === "monthly" ? monthlyPlan?.product : yearlyPlan?.product;
-//       return (
-//         (product as RNIap.SubscriptionIOS)?.localizedPrice ||
-//         (productDefault as RNIap.SubscriptionIOS)?.localizedPrice
-//       );
-//     }
-//   }
-
-//   return {
-//     product,
-//     buySubscription,
-//     getStandardPrice,
-//     loading,
-//     userCanRequestTrial,
-//     buying,
-//     setBuying,
-//     setLoading,
-//     user,
-//     setProduct,
-//     monthlyPlan,
-//     yearlyPlan,
-//     getPromo
-//   };
-// };
 
 export default usePricingPlans;

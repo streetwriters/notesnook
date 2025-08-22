@@ -52,6 +52,7 @@ import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { db } from "../../common/database";
 
 const Steps = {
   select: 1,
@@ -97,11 +98,7 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
   );
   const [ctaButtonVisible, setCtaButtonVisible] = useState(false);
   const [step, setStep] = useState(
-    routeParams.state
-      ? isGithubRelease
-        ? Steps.buyWeb
-        : Steps.buy
-      : Steps.select
+    routeParams.state ? Steps.buy : Steps.select
   );
   const isFocused = useNavigationFocus(props.navigation, {
     onBlur: () => true,
@@ -518,7 +515,11 @@ After trying all the privacy security oriented note taking apps, for the price a
           planId={pricingPlans.currentPlan?.id as string}
           productId={
             annualBilling
-              ? `notesnook.${pricingPlans?.currentPlan?.id as string}.yearly`
+              ? Config.GITHUB_RELEASE === "true"
+                ? "yearly"
+                : `notesnook.${pricingPlans?.currentPlan?.id as string}.yearly`
+              : Config.GITHUB_RELEASE === "true"
+              ? "monthly"
               : `notesnook.${pricingPlans?.currentPlan?.id as string}.monthly`
           }
           canActivateTrial={pricingPlans.userCanRequestTrial}
@@ -537,7 +538,11 @@ After trying all the privacy security oriented note taking apps, for the price a
         >
           <WebView
             source={{
-              uri: webUrl
+              html: `
+             <button onclick="function() { window.ReactNativeWebView.postMessage(JSON.stringify({
+                success:true
+             })) }" /> 
+              `
             }}
           />
         </View>
@@ -878,11 +883,10 @@ const PricingPlanCard = ({
     annualBilling
   );
 
-  const DefaultPricing = {
-    essential: "$2.99",
-    pro: "$5.99",
-    believer: "$6.99"
-  };
+  const WebPlan = pricingPlans?.getWebPlan(
+    plan.id,
+    annualBilling ? "yearly" : "monthly"
+  );
 
   return (
     <TouchableOpacity
@@ -999,7 +1003,7 @@ const PricingPlanCard = ({
             {isFreePlan
               ? "0.00"
               : price ||
-                DefaultPricing[plan.id as keyof typeof DefaultPricing]}{" "}
+                `${WebPlan?.price.currency} ${WebPlan?.price.gross}`}{" "}
             <Paragraph>/month</Paragraph>
           </Paragraph>
 

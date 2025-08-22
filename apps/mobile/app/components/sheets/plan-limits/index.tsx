@@ -59,33 +59,14 @@ export function PlanLimits() {
               {getFeature(item.id).title}
             </Paragraph>
             <Paragraph size={AppFontSize.sm}>
-              {item.id === "storage"
+              {item.total === Infinity
+                ? "Unlimited"
+                : item.id === "storage"
                 ? `${formatBytes(item.used)}/${formatBytes(
                     item.total
                   )} ${strings.used()}`
                 : `${item.used}/${item.total} ${strings.used()}`}
             </Paragraph>
-          </View>
-          <View
-            style={{
-              backgroundColor: colors.secondary.background,
-              width: "100%",
-              height: 5,
-              borderRadius: 10
-            }}
-          >
-            <View
-              style={{
-                backgroundColor: colors.primary.accent,
-                height: 5,
-                width: `${
-                  ((item.used > item.total ? item.total : item.used) /
-                    item.total) *
-                  100
-                }%`,
-                borderRadius: 10
-              }}
-            />
           </View>
         </View>
       ))}

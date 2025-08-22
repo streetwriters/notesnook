@@ -2,6 +2,7 @@ import { FeatureId, FeatureResult } from "@notesnook/common";
 import { useThemeColors } from "@notesnook/theme";
 import { useEffect, useState } from "react";
 import { View } from "react-native";
+import Config from "react-native-config";
 import usePricingPlans from "../../../hooks/use-pricing-plans";
 import {
   eSendEvent,
@@ -18,8 +19,7 @@ import AppIcon from "../../ui/AppIcon";
 import { Button } from "../../ui/button";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import { BuyPlan } from "../buy-plan";
-
+const isGithubRelease = Config.GITHUB_RELEASE === "true";
 const INDEX_TO_PLAN = {
   1: "essential",
   2: "pro",
@@ -48,7 +48,9 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
     if (!plan) return;
     pricingPlans.selectPlan(plan?.id);
     pricingPlans.selectProduct(
-      plan?.subscriptionSkuList?.find((sku) => sku.includes("year"))
+      isGithubRelease
+        ? "yearly"
+        : plan?.subscriptionSkuList?.find((sku) => sku.includes("year"))
     );
   }, []);
 
@@ -64,180 +66,148 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
         paddingBottom: DefaultAppStyles.GAP
       }}
     >
-      {step === Steps.Select ? (
-        <>
-          <View
-            style={{
-              width: "100%",
-              paddingHorizontal: DefaultAppStyles.GAP,
-              gap: DefaultAppStyles.GAP_VERTICAL
-            }}
-          >
-            {/* <View
+      <>
+        <View
           style={{
-            backgroundColor: colors.secondary.background,
-            borderRadius: 10,
-            height: 150,
             width: "100%",
-            justifyContent: "center",
-            alignItems: "center"
+            paddingHorizontal: DefaultAppStyles.GAP,
+            gap: DefaultAppStyles.GAP_VERTICAL
           }}
         >
-          <Heading>{pricingPlans.currentPlan?.name}</Heading>
-        </View> */}
+          <Paragraph>
+            <AppIcon
+              name="crown"
+              size={AppFontSize.md}
+              color={colors.static.orange}
+            />{" "}
+            Upgrade plan to {pricingPlans.currentPlan?.name} to use this
+            feature.
+          </Paragraph>
 
-            <Paragraph>
-              <AppIcon
-                name="crown"
-                size={AppFontSize.md}
-                color={colors.static.orange}
-              />{" "}
-              Upgrade plan to {pricingPlans.currentPlan?.name} to use this
-              feature.
-            </Paragraph>
+          <View
+            style={{
+              gap: DefaultAppStyles.GAP_VERTICAL_SMALL,
+              width: "100%"
+            }}
+          >
+            <Heading>Try it for free</Heading>
+
+            <Heading size={AppFontSize.sm}>Get this and so much more:</Heading>
 
             <View
               style={{
-                gap: DefaultAppStyles.GAP_VERTICAL_SMALL,
-                width: "100%"
+                gap: DefaultAppStyles.GAP_SMALL,
+                flexDirection: "row"
               }}
             >
-              <Heading>Try it for free</Heading>
-
-              <Heading size={AppFontSize.sm}>
-                Get this and so much more:
-              </Heading>
-
-              <View
+              <AppIcon name="cloud" size={AppFontSize.xxl} />
+              <Paragraph
                 style={{
-                  gap: DefaultAppStyles.GAP_SMALL,
-                  flexDirection: "row"
+                  flexShrink: 1
                 }}
               >
-                <AppIcon name="cloud" size={AppFontSize.xxl} />
-                <Paragraph
-                  style={{
-                    flexShrink: 1
-                  }}
-                >
-                  <Heading size={AppFontSize.sm}>25 GB</Heading> cloud storage
-                  space for storing images and files upto 5 GB every month.
-                </Paragraph>
-              </View>
+                <Heading size={AppFontSize.sm}>25 GB</Heading> cloud storage
+                space for storing images and files upto 5 GB every month.
+              </Paragraph>
+            </View>
 
-              <View
+            <View
+              style={{
+                gap: DefaultAppStyles.GAP_SMALL,
+                flexDirection: "row"
+              }}
+            >
+              <AppIcon name="lock" size={AppFontSize.xxl} />
+              <Paragraph
                 style={{
-                  gap: DefaultAppStyles.GAP_SMALL,
-                  flexDirection: "row"
+                  flexShrink: 1
                 }}
               >
-                <AppIcon name="lock" size={AppFontSize.xxl} />
-                <Paragraph
-                  style={{
-                    flexShrink: 1
-                  }}
-                >
-                  <Heading size={AppFontSize.sm}>App lock</Heading> for locking
-                  your notes as soon as app enters background
-                </Paragraph>
-              </View>
+                <Heading size={AppFontSize.sm}>App lock</Heading> for locking
+                your notes as soon as app enters background
+              </Paragraph>
+            </View>
 
-              <View
+            <View
+              style={{
+                gap: DefaultAppStyles.GAP_SMALL,
+                flexDirection: "row"
+              }}
+            >
+              <AppIcon name="vector-link" size={AppFontSize.xxl} />
+              <Paragraph
                 style={{
-                  gap: DefaultAppStyles.GAP_SMALL,
-                  flexDirection: "row"
+                  flexShrink: 1
                 }}
               >
-                <AppIcon name="vector-link" size={AppFontSize.xxl} />
-                <Paragraph
-                  style={{
-                    flexShrink: 1
-                  }}
-                >
-                  Use advanced note taking features like{" "}
-                  <Heading size={AppFontSize.sm}>
-                    tables, outlines, block level note linking
-                  </Heading>{" "}
-                  and much more.
-                </Paragraph>
-              </View>
+                Use advanced note taking features like{" "}
+                <Heading size={AppFontSize.sm}>
+                  tables, outlines, block level note linking
+                </Heading>{" "}
+                and much more.
+              </Paragraph>
             </View>
           </View>
+        </View>
 
-          <View
+        <View
+          style={{
+            width: "100%",
+            paddingHorizontal: DefaultAppStyles.GAP
+          }}
+        >
+          <Paragraph
             style={{
-              width: "100%",
-              paddingHorizontal: DefaultAppStyles.GAP
+              marginVertical: 10
             }}
+            size={AppFontSize.xs}
           >
-            <Paragraph
-              style={{
-                marginVertical: 10
-              }}
-              size={AppFontSize.xs}
-            >
-              <Heading size={AppFontSize.xs}>Cancel anytime.</Heading> Google
-              will remind you 2 days before your trial ends.
-            </Paragraph>
-
-            <Button
-              type="accent"
-              title="Upgrade"
-              style={{
-                marginVertical: DefaultAppStyles.GAP_VERTICAL,
-                width: "100%"
-              }}
-              onPress={() => {
-                if (!useUserStore.getState().user) {
-                  eSendEvent(eCloseSheet);
-                  Navigation.navigate("Auth", {
-                    mode: AuthMode.login
-                  });
-                  return;
-                }
-                setStep(Steps.Buy);
-              }}
-            />
-          </View>
+            <Heading size={AppFontSize.xs}>Cancel anytime.</Heading> Google will
+            remind you 2 days before your trial ends.
+          </Paragraph>
 
           <Button
-            type="plain"
-            title="Explore all plans"
-            icon="arrow-right"
-            iconPosition="right"
+            type="accent"
+            title="Upgrade"
+            style={{
+              marginVertical: DefaultAppStyles.GAP_VERTICAL,
+              width: "100%"
+            }}
             onPress={() => {
               eSendEvent(eCloseSheet);
+              if (!useUserStore.getState().user) {
+                Navigation.navigate("Auth", {
+                  mode: AuthMode.login
+                });
+                return;
+              }
               Navigation.navigate("PayWall", {
-                context: useUserStore.getState().user
-                  ? "logged-in"
-                  : "logged-out"
+                context: "logged-in",
+                state: {
+                  planId: pricingPlans.currentPlan?.id,
+                  productId: isGithubRelease
+                    ? "yearly"
+                    : (pricingPlans.selectProduct as any).productId,
+                  billingType: "annual"
+                }
               });
             }}
           />
-        </>
-      ) : null}
+        </View>
 
-      {pricingPlans.currentPlan &&
-      pricingPlans.selectedProduct &&
-      step === Steps.Buy ? (
-        <>
-          <View
-            style={{
-              width: "100%",
-              paddingHorizontal: DefaultAppStyles.GAP
-            }}
-          >
-            <Heading>{pricingPlans.currentPlan.name} plan</Heading>
-            <Paragraph>{pricingPlans.currentPlan.description}</Paragraph>
-          </View>
-          <BuyPlan
-            planId={pricingPlans.currentPlan?.id}
-            productId={pricingPlans.selectedProduct?.productId}
-            goBack={() => {}}
-            goNext={() => {}}
-          />
-        </>
-      ) : null}
+        <Button
+          type="plain"
+          title="Explore all plans"
+          icon="arrow-right"
+          iconPosition="right"
+          onPress={() => {
+            eSendEvent(eCloseSheet);
+            Navigation.navigate("PayWall", {
+              context: useUserStore.getState().user ? "logged-in" : "logged-out"
+            });
+          }}
+        />
+      </>
     </View>
   );
 }
