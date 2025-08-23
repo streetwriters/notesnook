@@ -64,7 +64,8 @@ import {
   TECHLORE_SVG,
   XDA_SVG
 } from "../../assets/images/assets";
-import { EV, EVENTS, SubscriptionPlan, User } from "@notesnook/core";
+import { EV, EVENTS, Plan, SubscriptionPlan, User } from "@notesnook/core";
+import { AuthMode } from "../auth/common";
 
 const Steps = {
   select: 1,
@@ -305,7 +306,24 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
                   <PricingPlanCard
                     key={plan.id}
                     plan={plan}
-                    setStep={setStep}
+                    setStep={(step) => {
+                      if (!pricingPlans.user) {
+                        Navigation.navigate("Auth", {
+                          mode: AuthMode.login,
+                          state: {
+                            planId: pricingPlans.currentPlan?.id,
+                            productId:
+                              (
+                                pricingPlans.selectedProduct as RNIap.Subscription
+                              )?.productId ||
+                              (pricingPlans.selectedProduct as Plan).period,
+                            billingType: annualBilling ? "annual" : "monthly"
+                          }
+                        });
+                        return;
+                      }
+                      setStep(step);
+                    }}
                     pricingPlans={pricingPlans}
                     annualBilling={annualBilling}
                   />
