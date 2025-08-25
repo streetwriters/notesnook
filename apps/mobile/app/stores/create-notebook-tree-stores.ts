@@ -49,6 +49,7 @@ export function createNotebookTreeStores(
 ) {
   const useNotebookTreeStore = create<{
     tree: TreeItem[];
+    isSearching?: boolean;
     setTree: (tree: TreeItem[]) => void;
     removeItem: (id: string) => void;
     addNotebooks: (
@@ -130,7 +131,7 @@ export function createNotebookTreeStores(
         const expanded =
           useNotebookExpandedStore.getState().expanded[item.notebook.id] &&
           item.hasChildren;
-        if (expanded) {
+        if (expanded && !get().isSearching) {
           newTree = await get().fetchAndAdd(
             item.notebook.id,
             depth + 1,

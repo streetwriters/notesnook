@@ -90,8 +90,14 @@ export const MoveNotebook = (props: NavigationProps<"MoveNotebook">) => {
         .then((filtered) => {
           setFilteredNotebooks(filtered);
         });
+      useNotebookTreeStore.setState({
+        isSearching: true
+      });
     } else {
       setFilteredNotebooks(notebooks);
+      useNotebookTreeStore.setState({
+        isSearching: false
+      });
     }
   }, [notebooks]);
 
@@ -328,6 +334,8 @@ const NotebookItemWrapper = React.memo(
     const expanded = useNotebookExpandedStore(
       (state) => state.expanded[item.notebook.id]
     );
+    const disableExpand = useNotebookTreeStore((state) => state.isSearching);
+
     const selectionEnabled = useNotebookSelectionStore(
       (state) => state.enabled
     );
@@ -378,6 +386,7 @@ const NotebookItemWrapper = React.memo(
               useNotebookTreeStore.getState().removeChildren(item.notebook.id);
             }
           }}
+          disableExpand={disableExpand}
           selected={selected}
           selectionEnabled={selectionEnabled}
           selectionStore={useNotebookSelectionStore}

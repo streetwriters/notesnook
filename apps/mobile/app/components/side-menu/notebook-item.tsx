@@ -49,7 +49,8 @@ export const NotebookItem = ({
   onPress,
   onLongPress,
   onAddNotebook,
-  canDisableSelectionMode
+  canDisableSelectionMode,
+  disableExpand
 }: {
   index: number;
   item: TreeItem;
@@ -64,6 +65,7 @@ export const NotebookItem = ({
   onLongPress?: () => void;
   onAddNotebook?: () => void;
   canDisableSelectionMode?: boolean;
+  disableExpand?: boolean;
 }) => {
   const notebook = item.notebook;
   const isFocused = focused;
@@ -166,7 +168,7 @@ export const NotebookItem = ({
             }
             testID={item.hasChildren ? `expand-notebook-${index}` : ""}
             onPress={() => {
-              if (item.hasChildren) {
+              if (item.hasChildren && disableExpand) {
                 onToggleExpanded?.();
               } else {
                 onPress?.();
@@ -182,7 +184,7 @@ export const NotebookItem = ({
               borderRadius: defaultBorderRadius
             }}
             name={
-              !item.hasChildren
+              !item.hasChildren || disableExpand
                 ? "book-outline"
                 : expanded
                 ? "chevron-down"
