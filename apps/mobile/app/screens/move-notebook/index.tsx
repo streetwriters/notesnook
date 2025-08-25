@@ -90,14 +90,8 @@ export const MoveNotebook = (props: NavigationProps<"MoveNotebook">) => {
         .then((filtered) => {
           setFilteredNotebooks(filtered);
         });
-      useNotebookTreeStore.setState({
-        isSearching: true
-      });
     } else {
       setFilteredNotebooks(notebooks);
-      useNotebookTreeStore.setState({
-        isSearching: false
-      });
     }
   }, [notebooks]);
 

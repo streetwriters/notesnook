@@ -114,16 +114,32 @@ export function createNotebookTreeStores(
         }
       }
 
-      const newTreeItems = notebooks.map((notebook) => {
-        return {
-          parentId,
-          notebook,
-          depth: depth,
-          hasChildren: items.some((item) => {
-            return item.fromId === notebook.id;
-          })
-        };
-      });
+      const rootTreeItems = newTree.filter((item) => item.parentId === "root");
+      const newTreeItems = notebooks.reduce((acc, notebook) => {
+        if (!rootTreeItems.find((item) => item.notebook.id === notebook.id)) {
+          acc.push({
+            parentId,
+            notebook,
+            depth: depth,
+            hasChildren: false
+          });
+        }
+        return acc;
+      }, [] as TreeItem[]);
+
+      if (parentId === "root") {
+        rootTreeItems.splice(0, 0, ...newTreeItems);
+      }
+
+      for (const treeItem of newTreeItems) {
+        treeItem.hasChildren = items.some((item) => {
+          return (
+            rootTreeItems.findIndex(
+              (treeItem) => treeItem.notebook.id === item.toId
+            ) === -1 && item.fromId === treeItem.notebook.id
+          );
+        });
+      }
 
       newTree.splice(parentIndex + 1, 0, ...newTreeItems);
 

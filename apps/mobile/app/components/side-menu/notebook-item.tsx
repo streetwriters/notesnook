@@ -168,7 +168,7 @@ export const NotebookItem = ({
             }
             testID={item.hasChildren ? `expand-notebook-${index}` : ""}
             onPress={() => {
-              if (item.hasChildren && disableExpand) {
+              if (item.hasChildren && !disableExpand) {
                 onToggleExpanded?.();
               } else {
                 onPress?.();

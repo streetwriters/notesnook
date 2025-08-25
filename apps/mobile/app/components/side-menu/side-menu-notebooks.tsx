@@ -66,9 +66,9 @@ export const SideMenuNotebooks = () => {
 
   const updateNotebooks = React.useCallback(() => {
     if (lastQuery.current) {
-      useSideMenuNotebookTreeStore.setState({
-        isSearching: true
-      });
+      // useSideMenuNotebookTreeStore.setState({
+      //   isSearching: true
+      // });
       db.lookup
         .notebooks(lastQuery.current)
         .sorted(db.settings.getGroupOptions("notebooks"))
@@ -76,9 +76,9 @@ export const SideMenuNotebooks = () => {
           setFilteredNotebooks(filtered);
         });
     } else {
-      useSideMenuNotebookTreeStore.setState({
-        isSearching: false
-      });
+      // useSideMenuNotebookTreeStore.setState({
+      //   isSearching: false
+      // });
       setFilteredNotebooks(notebooks);
     }
   }, [notebooks]);

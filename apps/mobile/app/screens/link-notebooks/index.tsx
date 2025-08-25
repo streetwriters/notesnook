@@ -118,14 +118,8 @@ const LinkNotebooks = (props: NavigationProps<"LinkNotebooks">) => {
         .then((filtered) => {
           setFilteredNotebooks(filtered);
         });
-      useNotebookTreeStore.setState({
-        isSearching: true
-      });
     } else {
       setFilteredNotebooks(notebooks);
-      useNotebookTreeStore.setState({
-        isSearching: false
-      });
     }
   }, [notebooks]);
 
