@@ -803,3 +803,26 @@ del.diffdel {
 del.diffdel {
   text-decoration: none;
 }
+
+.drag-handle {
+  position: fixed;
+  opacity: 1;
+  transition: opacity ease-in 0.2s;
+
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTcsMTlWMTdIOVYxOUg3TTExLDE5VjE3SDEzVjE5SDExTTE1LDE5VjE3SDE3VjE5SDE1TTcsMTVWMTNIOVYxNUg3TTExLDE1VjEzSDEzVjE1SDExTTE1LDE1VjEzSDE3VjE1SDE1TTcsMTFWOUg5VjExSDdNMTEsMTFWOUgxM1YxMUgxMU0xNSwxMVY5SDE3VjExSDE1TTcsN1Y1SDlWN0g3TTExLDdWNUgxM1Y3SDExTTE1LDdWNUgxN1Y3SDE1WiIgLz48L3N2Zz4=");
+  background-size: calc(0.5em + 0.375rem) calc(0.5em + 0.375rem);
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 1.2rem;
+  height: 1.5rem;
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  &.hide {
+    opacity: 0;
+    pointer-events: none;
+  }
+}

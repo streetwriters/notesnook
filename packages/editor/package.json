@@ -80,6 +80,7 @@
     "redent": "^4.0.0",
     "refractor": "^4.8.1",
     "strip-indent": "^4.0.0",
+    "tiptap-extension-global-drag-handle": "^0.1.18",
     "unfurl.js": "^6.4.0"
   },
   "devDependencies": {
