@@ -87,6 +87,7 @@ import { strings } from "@notesnook/intl";
 import { InlineCode } from "./extensions/inline-code/inline-code.js";
 import { FontLigature } from "./extensions/font-ligature/font-ligature.js";
 import { SearchResult } from "./extensions/search-result/search-result.js";
+import GlobalDragHandle from "tiptap-extension-global-drag-handle";
 
 interface TiptapStorage {
   dateFormat?: DateTimeOptions["dateFormat"];
@@ -189,6 +190,10 @@ const useTiptap = (
       },
       extensions: [
         ...CoreExtensions,
+        GlobalDragHandle.configure({
+          dragHandleWidth: 20,
+          scrollTreshold: 100
+        }),
         SearchReplace.configure({
           onStartSearch: (term) => {
             useEditorSearchStore.setState({
