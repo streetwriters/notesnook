@@ -17,10 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Plan, Price, PricingInfo } from "./types";
+import { Plan, PricingInfo } from "./types";
 import { create } from "zustand";
 import { create as produce } from "mutative";
-import { DEFAULT_PLANS } from "./plans";
 
 interface ICheckoutStore {
   selectedPlan?: Plan;

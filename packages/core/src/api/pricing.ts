@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { SubscriptionPlan, SubscriptionPlanId } from "../types.js";
+import hosts from "../utils/constants.js";
 import http from "../utils/http.js";
 
 export type SKUResponse = {
@@ -57,7 +58,6 @@ export interface Plan {
   country: string;
 }
 
-const BASE_URL = `https://notesnook.com/api/v2/prices`;
 export class Pricing {
   static sku(
     platform: "android" | "ios" | "web",
@@ -65,11 +65,14 @@ export class Pricing {
     plan: SubscriptionPlanId
   ): Promise<SKUResponse> {
     return http.get(
-      `${BASE_URL}/skus?platform=${platform}&period=${period}&plan=${plan}`
+      `${hosts.NOTESNOOK_HOST}/api/v2/prices/skus?platform=${platform}&period=${period}&plan=${plan}`
     );
   }
 
-  static products(): Promise<Plan[]> {
-    return http.get(`${BASE_URL}/products`);
+  static products(trialsAvailed?: SubscriptionPlan[]): Promise<Plan[]> {
+    const url = new URL(`${hosts.NOTESNOOK_HOST}/api/v2/prices/products`);
+    if (trialsAvailed)
+      url.searchParams.set("trialsAvailed", trialsAvailed.join(","));
+    return http.get(url.toString());
   }
 }

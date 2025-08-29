@@ -39,13 +39,16 @@ export function SubscriptionStatus() {
 
   const { title, autoRenew, expiryDate, trial, legacy } =
     getSubscriptionInfo(user);
-  const subtitle = trial
-    ? "Your free trial is on-going."
-    : autoRenew
-    ? `Your subscription will auto renew on ${expiryDate}.`
-    : expiryDate
-    ? `Your account will automatically downgrade to the Free plan on ${expiryDate}.`
-    : "";
+  const subtitle =
+    title === "Free"
+      ? ""
+      : trial
+      ? `Your free trial is on-going. Your subscription will start on ${expiryDate}.`
+      : autoRenew
+      ? `Your subscription will auto renew on ${expiryDate}.`
+      : expiryDate
+      ? `Your account will automatically downgrade to the Free plan on ${expiryDate}.`
+      : "";
 
   if (!user) return null;
   return (
@@ -82,7 +85,10 @@ export function SubscriptionStatus() {
           <Grid
             sx={{
               gridTemplateRows: "1fr ".repeat(featuresUsage.value.length),
-              gridTemplateColumns: "1fr 2fr 1fr"
+              gridTemplateColumns: "1fr 3fr 1fr",
+              borderTop: "1px solid var(--border)",
+              pt: 2,
+              width: "100%"
             }}
           >
             {featuresUsage.value.map((feature, index) => (
@@ -90,19 +96,16 @@ export function SubscriptionStatus() {
                 <Text sx={{ gridRow: index + 1, gridColumn: 1 }} variant="body">
                   {getFeature(feature.id).title}
                 </Text>
-                <Progress
-                  sx={{ gridRow: index + 1, gridColumn: 2 }}
-                  max={feature.total}
-                  value={feature.used}
-                />
                 <Text
-                  sx={{ gridRow: index + 1, gridColumn: 3 }}
+                  sx={{ gridRow: index + 1, gridColumn: 3, textAlign: "right" }}
                   variant="subBody"
                 >
                   {feature.id === "storage"
                     ? `${formatBytes(feature.used)}/${formatBytes(
                         feature.total
                       )}`
+                    : feature.total === Infinity
+                    ? "Unlimited"
                     : `${feature.used} of ${feature.total}`}
                 </Text>
               </>

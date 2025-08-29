@@ -22,8 +22,9 @@ import {
   ICurrencySymbols
 } from "@brixtol/currency-symbols";
 import { getFeature } from "@notesnook/common";
-import { Plan } from "@notesnook/core";
+import { Period, Plan, SubscriptionPlan, User } from "@notesnook/core";
 import { PricingInfo } from "./types";
+import { useStore as useUserStore } from "../../stores/user-store";
 
 export const IS_DEV = import.meta.env.DEV || IS_TESTING;
 export function getCurrencySymbol(currency: string) {
@@ -49,6 +50,12 @@ export const FEATURE_HIGHLIGHTS = [
   getFeature("appLock")
 ];
 
+const TRIAL_PERIODS: Record<Period, number> = {
+  yearly: 14,
+  monthly: 7,
+  "5-year": 30
+};
+
 export function toPricingInfo(plan: Plan): PricingInfo {
   return {
     country: plan.country,
@@ -59,7 +66,12 @@ export function toPricingInfo(plan: Plan): PricingInfo {
       period: plan.period,
       subtotal: `${getCurrencySymbol(plan.currency)}${plan.price.net}`,
       tax: `${getCurrencySymbol(plan.currency)}${plan.price.tax}`,
-      total: `${getCurrencySymbol(plan.currency)}${plan.price.gross}`
+      total: `${getCurrencySymbol(plan.currency)}${plan.price.gross}`,
+      trial_period: isTrialAvailableForPlan(plan.plan)
+        ? {
+            frequency: TRIAL_PERIODS[plan.period]
+          }
+        : undefined
     },
     discount: plan.discount,
     coupon: plan.discount?.code,
@@ -72,4 +84,12 @@ export function toPricingInfo(plan: Plan): PricingInfo {
       total: `${getCurrencySymbol(plan.currency)}${plan.price.gross}`
     }
   };
+}
+
+export function isTrialAvailableForPlan(plan: SubscriptionPlan) {
+  const user = useUserStore.getState().user;
+  return (
+    !user?.subscription.trialsAvailed ||
+    !user?.subscription.trialsAvailed?.includes(plan)
+  );
 }
