@@ -70,7 +70,7 @@ export type SettingsGroup = {
   header: string | ((props: any) => JSX.Element | null);
   isHidden?: () => boolean;
   onStateChange?: (
-    listener: (state: unknown, prevState: unknown) => void
+    listener: (state: any, prevState: unknown) => void
   ) => () => void;
   onRender?: () => void | Promise<void>;
 };
@@ -79,9 +79,9 @@ export type Setting = {
   key: string;
   keywords?: string[];
   title: string;
-  description?: string | ((state?: unknown) => string);
-  components: SettingComponent[] | ((state?: unknown) => SettingComponent[]);
-  isHidden?: (state?: unknown) => boolean;
+  description?: string | ((state?: any) => string);
+  components: SettingComponent[] | ((state?: any) => SettingComponent[]);
+  isHidden?: (state?: any) => boolean;
   onStateChange?: (
     listener: (state: unknown, prevState: unknown) => void
   ) => () => void;
@@ -126,7 +126,7 @@ export type ToggleSettingComponent = BaseSettingComponent<"toggle"> & {
 };
 
 export type DropdownSettingComponent = BaseSettingComponent<"dropdown"> & {
-  options: { value: string | number; title: string }[];
+  options: { value: string | number; title: string; disabled?: boolean }[];
   selectedOption: () => string | number | Promise<string | number>;
   onSelectionChanged: (value: string) => void | Promise<void>;
 };

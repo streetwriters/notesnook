@@ -617,6 +617,7 @@ export type User = {
     type: SubscriptionType;
     plan: SubscriptionPlan;
     status: SubscriptionStatus;
+    trialsAvailed?: SubscriptionPlan[];
     updateURL: string | null;
   };
 };
