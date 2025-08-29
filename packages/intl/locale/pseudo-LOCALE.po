@@ -2449,6 +2449,14 @@ msgstr ""
 msgid "Enter password"
 msgstr ""
 
+#: src/strings.ts:2496
+msgid "Enter password for this notebook to open it"
+msgstr ""
+
+#: src/strings.ts:2500
+msgid "Enter password for this notebook to unlock it"
+msgstr ""
+
 #: src/strings.ts:2087
 msgid "Enter pin or password to enable app lock."
 msgstr ""
@@ -3495,6 +3503,10 @@ msgstr ""
 msgid "Lock note"
 msgstr ""
 
+#: src/strings.ts:2497
+msgid "Lock notebook"
+msgstr ""
+
 #: src/strings.ts:1183
 msgid "Lock the app with a password or pin"
 msgstr ""
@@ -3936,7 +3948,7 @@ msgstr ""
 msgid "No note history available for this device."
 msgstr ""
 
-#: src/strings.ts:2489
+#: src/strings.ts:2492
 msgid "No notebooks selected to move"
 msgstr ""
 
@@ -4185,6 +4197,10 @@ msgstr ""
 
 #: src/strings.ts:1862
 msgid "Open note"
+msgstr ""
+
+#: src/strings.ts:2495
+msgid "Open notebook"
 msgstr ""
 
 #: src/strings.ts:1379
@@ -5283,11 +5299,11 @@ msgstr ""
 msgid "School work"
 msgstr ""
 
-#: src/strings.ts:2491
+#: src/strings.ts:2494
 msgid "Scroll to bottom"
 msgstr ""
 
-#: src/strings.ts:2490
+#: src/strings.ts:2493
 msgid "Scroll to top"
 msgstr ""
 
@@ -5570,6 +5586,10 @@ msgstr ""
 
 #: src/strings.ts:2190
 msgid "Sessions"
+msgstr ""
+
+#: src/strings.ts:2498
+msgid "Set a password for this notebook to lock it"
 msgstr ""
 
 #: src/strings.ts:975
@@ -6428,6 +6448,10 @@ msgstr ""
 
 #: src/strings.ts:887
 msgid "Unlock note to delete it"
+msgstr ""
+
+#: src/strings.ts:2499
+msgid "Unlock notebook"
 msgstr ""
 
 #: src/strings.ts:1207

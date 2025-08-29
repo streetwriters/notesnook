@@ -24,7 +24,8 @@ import { UseBoundStore } from "zustand";
 import { useTotalNotes } from "../../hooks/use-db-item";
 import {
   eSubscribeEvent,
-  eUnSubscribeEvent
+  eUnSubscribeEvent,
+  ToastManager
 } from "../../services/event-manager";
 import { TreeItem } from "../../stores/create-notebook-tree-stores";
 import { SelectionStore } from "../../stores/item-selection-store";
@@ -35,6 +36,11 @@ import AppIcon from "../ui/AppIcon";
 import { IconButton } from "../ui/icon-button";
 import { Pressable } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
+import { db } from "../../common/database";
+import { EVENTS } from "@notesnook/core";
+import { useNotebookLock } from "../../hooks/use-notebook-lock";
+import { presentDialog } from "../dialog/functions";
+import { strings } from "@notesnook/intl";
 
 export const NotebookItem = ({
   index,
@@ -68,6 +74,7 @@ export const NotebookItem = ({
   const notebook = item.notebook;
   const isFocused = focused;
   const { totalNotes, getTotalNotes } = useTotalNotes("notebook");
+  const notebookLock = useNotebookLock(notebook.id);
   const getTotalNotesRef = React.useRef(getTotalNotes);
   getTotalNotesRef.current = getTotalNotes;
   const { colors } = useThemeColors();
@@ -141,6 +148,29 @@ export const NotebookItem = ({
               });
             }
           } else {
+            if (!notebookLock.notebookOpen) {
+              presentDialog({
+                title: strings.openNotebook(),
+                paragraph: strings.openNotebookDescription(),
+                input: true,
+                inputPlaceholder: strings.password(),
+                positivePress: async (inputValue) => {
+                  if (inputValue) {
+                    const opened = notebookLock.open(inputValue);
+                    if (!opened) {
+                      ToastManager.error(
+                        new Error(strings.passwordIncorrect())
+                      );
+                    } else {
+                      onPress?.();
+                    }
+                  }
+                  return true;
+                },
+                positiveText: strings.open()
+              });
+              return;
+            }
             onPress?.();
           }
         }}
@@ -166,6 +196,33 @@ export const NotebookItem = ({
             }
             testID={item.hasChildren ? `expand-notebook-${index}` : ""}
             onPress={() => {
+              if (!notebookLock.notebookOpen) {
+                presentDialog({
+                  title: "Open Notebook",
+                  paragraph: "This is a test",
+                  input: true,
+                  inputPlaceholder: strings.password(),
+                  positivePress: async (inputValue) => {
+                    if (inputValue) {
+                      const opened = notebookLock.open(inputValue);
+                      if (!opened) {
+                        ToastManager.error(
+                          new Error(strings.passwordIncorrect())
+                        );
+                      } else {
+                        if (item.hasChildren) {
+                          onToggleExpanded?.();
+                        } else {
+                          onPress?.();
+                        }
+                      }
+                    }
+                    return true;
+                  },
+                  positiveText: strings.lock()
+                });
+                return;
+              }
               if (item.hasChildren) {
                 onToggleExpanded?.();
               } else {
@@ -225,6 +282,17 @@ export const NotebookItem = ({
             </View>
           ) : (
             <>
+              {notebookLock.locked ? (
+                <AppIcon
+                  name={
+                    notebookLock.notebookOpen
+                      ? "lock-open-outline"
+                      : "lock-outline"
+                  }
+                  size={AppFontSize.xs}
+                  color={colors.primary.icon}
+                />
+              ) : null}
               <Paragraph
                 size={AppFontSize.xxs}
                 color={colors.secondary.paragraph}

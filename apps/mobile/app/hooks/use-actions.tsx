@@ -43,6 +43,7 @@ import { ReferencesList } from "../components/sheets/references";
 import { RelationsList } from "../components/sheets/relations-list/index";
 import { useSideBarDraggingStore } from "../components/side-menu/dragging-store";
 import { ButtonProps } from "../components/ui/button";
+import AddReminder from "../screens/add-reminder";
 import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
 import {
   eSendEvent,
@@ -66,7 +67,7 @@ import { eUpdateNoteInEditor } from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { convertNoteToText } from "../utils/note-to-text";
 import { sleep } from "../utils/time";
-import AddReminder from "../screens/add-reminder";
+import { useNotebookLock } from "./use-notebook-lock";
 
 export type ActionId =
   | "select"
@@ -111,7 +112,8 @@ export type ActionId =
   | "remove-from-notebook"
   | "trash"
   | "default-homepage"
-  | "default-tag";
+  | "default-tag"
+  | "notebook-lock";
 
 export type Action = {
   id: ActionId;
@@ -150,6 +152,7 @@ export const useActions = ({
   const [item, setItem] = useState(propItem);
   const { colors } = useThemeColors();
   const setMenuPins = useMenuStore((state) => state.setMenuPins);
+  const notebookLock = useNotebookLock(item.id);
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(
     db.shortcuts.exists(item.id)
   );
@@ -510,6 +513,57 @@ export const useActions = ({
 
   if (item.type === "notebook") {
     actions.push(
+      {
+        id: "notebook-lock",
+        title: notebookLock.locked ? strings.unlock() : strings.lock(),
+        icon: "lock",
+        onPress: () => {
+          if (notebookLock.locked) {
+            presentDialog({
+              title: strings.unlockNotebook(),
+              paragraph: strings.unlockNotebookDesc(),
+              input: true,
+              inputPlaceholder: strings.password(),
+              check: {
+                info: strings.useAccountPassword(),
+                defaultValue: false
+              },
+              positivePress: async (inputValue, useAccountPassword) => {
+                if (inputValue) {
+                  const opened = useAccountPassword
+                    ? await db.user.verifyPassword(inputValue)
+                    : await notebookLock.open(inputValue);
+                  if (opened) {
+                    notebookLock.unlock();
+                  } else {
+                    ToastManager.error(
+                      new Error(strings.passwordIncorrect()),
+                      undefined,
+                      "local"
+                    );
+                  }
+                }
+                return true;
+              },
+              positiveText: strings.unlock()
+            });
+          } else {
+            presentDialog({
+              title: strings.lockNotebook(),
+              paragraph: strings.lockNotebookDescription(),
+              input: true,
+              inputPlaceholder: strings.password(),
+              positivePress: async (inputValue) => {
+                if (inputValue) {
+                  notebookLock.lock(inputValue);
+                }
+                return true;
+              },
+              positiveText: strings.lock()
+            });
+          }
+        }
+      },
       {
         id: "add-notebook",
         title: strings.addNotebook(),

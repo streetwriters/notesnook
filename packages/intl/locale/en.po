@@ -2460,6 +2460,14 @@ msgstr "Enter notebook title"
 msgid "Enter password"
 msgstr "Enter password"
 
+#: src/strings.ts:2496
+msgid "Enter password for this notebook to open it"
+msgstr "Enter password for this notebook to open it"
+
+#: src/strings.ts:2500
+msgid "Enter password for this notebook to unlock it"
+msgstr "Enter password for this notebook to unlock it"
+
 #: src/strings.ts:2087
 msgid "Enter pin or password to enable app lock."
 msgstr "Enter pin or password to enable app lock."
@@ -3515,6 +3523,10 @@ msgstr "Lock"
 msgid "Lock note"
 msgstr "Lock note"
 
+#: src/strings.ts:2497
+msgid "Lock notebook"
+msgstr "Lock notebook"
+
 #: src/strings.ts:1183
 msgid "Lock the app with a password or pin"
 msgstr "Lock the app with a password or pin"
@@ -3956,7 +3968,7 @@ msgstr "No links found"
 msgid "No note history available for this device."
 msgstr "No note history available for this device."
 
-#: src/strings.ts:2489
+#: src/strings.ts:2492
 msgid "No notebooks selected to move"
 msgstr "No notebooks selected to move"
 
@@ -4212,6 +4224,10 @@ msgstr "Open link"
 #: src/strings.ts:1862
 msgid "Open note"
 msgstr "Open note"
+
+#: src/strings.ts:2495
+msgid "Open notebook"
+msgstr "Open notebook"
 
 #: src/strings.ts:1379
 msgid "Open settings"
@@ -5309,11 +5325,11 @@ msgstr "Scan the QR code with your authenticator app"
 msgid "School work"
 msgstr "School work"
 
-#: src/strings.ts:2491
+#: src/strings.ts:2494
 msgid "Scroll to bottom"
 msgstr "Scroll to bottom"
 
-#: src/strings.ts:2490
+#: src/strings.ts:2493
 msgid "Scroll to top"
 msgstr "Scroll to top"
 
@@ -5597,6 +5613,10 @@ msgstr "Session expired"
 #: src/strings.ts:2190
 msgid "Sessions"
 msgstr "Sessions"
+
+#: src/strings.ts:2498
+msgid "Set a password for this notebook to lock it"
+msgstr "Set a password for this notebook to lock it"
 
 #: src/strings.ts:975
 msgid "Set a reminder"
@@ -6470,6 +6490,10 @@ msgstr "Unlock note"
 #: src/strings.ts:887
 msgid "Unlock note to delete it"
 msgstr "Unlock note to delete it"
+
+#: src/strings.ts:2499
+msgid "Unlock notebook"
+msgstr "Unlock notebook"
 
 #: src/strings.ts:1207
 msgid "Unlock the app with biometric authentication. This requires biometrics to be enabled on your device."
