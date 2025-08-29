@@ -22,7 +22,10 @@ import { Box, Flex, Image, Text } from "@theme-ui/components";
 import { ImageAttributes } from "./image.js";
 import { useEffect, useRef, useState } from "react";
 import { ReactNodeViewProps } from "../react/index.js";
-import { DesktopOnly } from "../../components/responsive/index.js";
+import {
+  DesktopOnly,
+  ResponsivePresenter
+} from "../../components/responsive/index.js";
 import { Icon } from "@notesnook/ui";
 import { Icons } from "../../toolbar/icons.js";
 import { ToolbarGroup } from "../../toolbar/components/toolbar-group.js";
@@ -51,6 +54,10 @@ export function ImageComponent(
   const [bloburl, setBloburl] = useState<string | undefined>(
     toBlobURL("", "image", mime, hash)
   );
+  const [resizing, setResizing] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
   const controllerRef = useRef(new AbortController());
 
   const isMobile = useIsMobile();
@@ -116,6 +123,36 @@ export function ImageComponent(
           }
         }}
       >
+        <ResponsivePresenter
+          isOpen={Boolean(resizing)}
+          desktop="popup"
+          mobile="none"
+          blocking
+          focusOnRender={false}
+          onClose={() => {}}
+          position={{
+            target: imageRef.current || "mouse",
+            align: "start",
+            location: "top",
+            yOffset: 2,
+            isTargetAbsolute: true
+          }}
+        >
+          <Box
+            sx={{
+              background: "var(--background-secondary)",
+              px: 2,
+              py: 1,
+              borderRadius: "default"
+            }}
+          >
+            <Text variant="subBody" sx={{ fontWeight: "bold" }}>
+              {resizing?.width}
+              {" × "}
+              {resizing?.height}
+            </Text>
+          </Box>
+        </ResponsivePresenter>
         <Resizer
           style={{ marginTop: 5 }}
           enabled={editor.isEditable && !float}
@@ -123,6 +160,10 @@ export function ImageComponent(
           width={size.width}
           height={size.height}
           onResize={(width, height) => {
+            setResizing({ width, height });
+          }}
+          onResizeStop={(width, height) => {
+            setResizing(null);
             editor.commands.setImageSize({ width, height });
           }}
         >
