@@ -26,6 +26,7 @@ import BaseStore from ".";
 import Config from "../utils/config";
 import { Note, VirtualizedGrouping } from "@notesnook/core";
 import { Context } from "../components/list-container/types";
+import { useEditorStore } from "./editor-store";
 
 type ViewMode = "detailed" | "compact";
 class NoteStore extends BaseStore<NoteStore> {
@@ -61,14 +62,14 @@ class NoteStore extends BaseStore<NoteStore> {
       context,
       contextNotes: context
         ? await notesFromContext(context).grouped(
-            db.settings.getGroupOptions(
-              context.type === "favorite"
-                ? "favorites"
-                : context.type === "archive"
+          db.settings.getGroupOptions(
+            context.type === "favorite"
+              ? "favorites"
+              : context.type === "archive"
                 ? "archive"
                 : "notes"
-            )
           )
+        )
         : undefined
     });
   };
@@ -133,6 +134,18 @@ class NoteStore extends BaseStore<NoteStore> {
     }
     await appStore.refreshNavItems();
     await this.refresh();
+  };
+
+  merge = async (title: string, noteIds: string[]) => {
+    const hasPublished = noteIds.some((id) => db.monographs.isPublished(id));
+    if (hasPublished) {
+      throw new Error("Cannot merge published notes");
+    }
+
+    const id = await db.notes.merge(title, noteIds);
+    await this.refresh();
+    await trashStore.refresh();
+    await useEditorStore.getState().openSession(id);
   };
 }
 
