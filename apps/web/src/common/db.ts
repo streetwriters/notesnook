@@ -60,7 +60,8 @@ async function initializeDatabase(persistence: DatabasePersistence) {
     SSE_HOST: `${base}:7264`,
     ISSUES_HOST: `${base}:2624`,
     SUBSCRIPTIONS_HOST: `${base}:9264`,
-    MONOGRAPH_HOST: `${base}:6264`
+    MONOGRAPH_HOST: `${base}:6264`,
+    NOTESNOOK_HOST: `${base}:8788`
   });
 
   const storage = new NNStorage(

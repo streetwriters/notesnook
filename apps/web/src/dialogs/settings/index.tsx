@@ -437,7 +437,7 @@ function SettingItem(props: { item: Setting }) {
 
   useEffect(() => {
     if (!item.onStateChange) return;
-    const unsubscribe = item.onStateChange(setState);
+    const unsubscribe = item.onStateChange((state) => setState(state));
     return () => {
       unsubscribe?.();
     };
@@ -615,7 +615,7 @@ function SettingItem(props: { item: Setting }) {
   );
 }
 
-function SelectComponent(props: DropdownSettingComponent) {
+export function SelectComponent(props: Omit<DropdownSettingComponent, "type">) {
   const { onSelectionChanged, options } = props;
   const selectedOption = usePromise(() => props.selectedOption(), [props]);
 
@@ -638,7 +638,11 @@ function SelectComponent(props: DropdownSettingComponent) {
       }
     >
       {options.map((option) => (
-        <option key={option.value} value={option.value}>
+        <option
+          key={option.value}
+          value={option.value}
+          disabled={option.disabled}
+        >
           {option.title}
         </option>
       ))}

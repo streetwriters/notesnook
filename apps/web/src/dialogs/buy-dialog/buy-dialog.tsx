@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { Text, Flex, Button, Box, Image } from "@theme-ui/components";
 import { Loading, Coupon } from "../../components/icons";
 import { useStore as useUserStore } from "../../stores/user-store";
@@ -26,7 +26,7 @@ import Rocket from "../../assets/rocket.svg?url";
 import { hardNavigate } from "../../navigation";
 import { Features } from "./features";
 import { PaddleCheckout } from "./paddle";
-import { Period, Plan, PricingInfo } from "./types";
+import { Plan, PricingInfo } from "./types";
 import { getPlans, PERIOD_METADATA, PLAN_METADATA, usePlans } from "./plans";
 import {
   ComparePlans,
@@ -42,7 +42,7 @@ import { isUserSubscribed } from "../../hooks/use-is-user-premium";
 import { SUBSCRIPTION_STATUS } from "../../common/constants";
 import BaseDialog from "../../components/dialog";
 import { ScopedThemeProvider } from "../../components/theme-provider";
-import { SubscriptionPlan, User } from "@notesnook/core";
+import { Period, SubscriptionPlan, User } from "@notesnook/core";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import dayjs from "dayjs";
 import { PromptDialog } from "../prompt";
@@ -83,14 +83,15 @@ export const BuyDialog = DialogManager.register(function BuyDialog(
       onClose={() => onClose(false)}
       noScroll={!!selectedPlan}
       sx={{
-        width: ["95%", "80%", "60%"]
+        width: ["95%", "80%", "60%"],
+        height: ["auto", "auto", "80vw"]
       }}
     >
       {selectedPlan ? (
         <Flex
           sx={{
-            // height: ["auto", "auto", "80vw"],
             width: "100%",
+            height: "100%",
             overflow: "hidden",
             position: "relative",
             flexDirection: ["column", "column", "row"],
@@ -229,98 +230,6 @@ export function CheckoutDetails({
     );
 
   return <Features />;
-}
-
-type TrialOrUpgradeProps = {
-  couponCode?: string;
-  user: User | undefined;
-  onShowPlans: () => void;
-  onTrialRequested: () => void | Promise<void>;
-};
-function TrialOrUpgrade(props: TrialOrUpgradeProps) {
-  const { user, onShowPlans, onTrialRequested, couponCode } = props;
-  const { isLoading, plans } = usePlans();
-  const plan = plans[0];
-
-  return (
-    <>
-      <Image src={Rocket} style={{ flexShrink: 0, width: 200, height: 200 }} />
-      <Text variant="heading" mt={4} sx={{ textAlign: "center" }}>
-        Notesnook Pro
-      </Text>
-      <Text variant="body" mt={1} sx={{ textAlign: "center" }}>
-        Ready to take the next step in your private note taking journey?
-      </Text>
-      {isLoading || !plan ? (
-        <Loading sx={{ mt: 4 }} />
-      ) : (
-        <Text variant={"body"} mt={4} sx={{ fontSize: "title" }}>
-          {/* Starting from {getCurrencySymbol(plan.currency)}
-          {plan.price.gross}
-          {formatPeriod(plan.period)} */}
-        </Text>
-      )}
-      {isMacStoreApp() ? (
-        <>
-          <Text variant={"subBody"} mt={2} sx={{ textAlign: "center" }}>
-            You cannot upgrade from the macOS app.
-          </Text>
-        </>
-      ) : user ? (
-        <>
-          <Button
-            variant="accent"
-            mt={2}
-            sx={{ borderRadius: 100, px: 6 }}
-            onClick={onShowPlans}
-            data-test-id="see-all-plans"
-          >
-            See all plans
-          </Button>
-          {!user.subscription || !user.subscription.expiry ? (
-            <Button
-              variant="secondary"
-              mt={2}
-              sx={{ borderRadius: 100, px: 6 }}
-              onClick={onTrialRequested}
-            >
-              Try free for 14 days
-            </Button>
-          ) : null}
-        </>
-      ) : (
-        <>
-          <Button
-            variant="accent"
-            mt={4}
-            sx={{ borderRadius: 100, px: 6 }}
-            onClick={() => hardNavigate("/signup")}
-          >
-            Sign up for free
-          </Button>
-          <Text variant={"subBody"} mt={2} sx={{ textAlign: "center" }}>
-            After creating your account, you will be asked to activate your free
-            trial. <b>No credit card is required.</b>
-          </Text>
-        </>
-      )}
-
-      {couponCode && (
-        <Text
-          variant="subBody"
-          bg="shade"
-          mt={4}
-          p={1}
-          sx={{ borderRadius: "default", color: "accent" }}
-        >
-          {user
-            ? "Please select a plan to use your coupon:"
-            : `Please sign up or login to use your coupon:`}{" "}
-          <b>{couponCode}</b>
-        </Text>
-      )}
-    </>
-  );
 }
 
 type AlreadyPremiumProps = {

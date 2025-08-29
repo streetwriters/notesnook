@@ -17,7 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { SubscriptionPlan, SubscriptionType, User } from "@notesnook/core";
+import {
+  SubscriptionPlan,
+  SubscriptionStatus,
+  SubscriptionType,
+  User
+} from "@notesnook/core";
 import { SUBSCRIPTION_STATUS } from "../common/constants";
 import {
   useStore as useUserStore,
@@ -43,14 +48,44 @@ export function isUserPremium(user?: User) {
   );
 }
 
-export function isUserSubscribed(user?: User) {
-  if (!user) user = userstore.get().user;
+export function isActiveSubscription(user?: User) {
+  user = user || userstore.get().user;
   if (!user) return false;
 
-  const { type, plan } = user.subscription || {};
+  const { status } = user?.subscription || {};
+
   return (
-    (type === SubscriptionType.PREMIUM ||
-      type === SubscriptionType.PREMIUM_CANCELED) &&
-    plan !== SubscriptionPlan.FREE
+    status === SubscriptionStatus.ACTIVE || status === SubscriptionStatus.TRIAL
   );
+}
+export function isUserSubscribed(user?: User) {
+  user = user || userstore.get().user;
+  if (!user) return false;
+
+  const { type, expiry, plan, status } = user?.subscription || {};
+  if (!expiry) return false;
+  const isLegacyPro =
+    type !== undefined &&
+    (type === SubscriptionType.BETA ||
+      type === SubscriptionType.PREMIUM ||
+      type === SubscriptionType.PREMIUM_CANCELED ||
+      type === SubscriptionType.TRIAL);
+
+  if (isLegacyPro) {
+    return (
+      type === SubscriptionType.PREMIUM ||
+      type === SubscriptionType.PREMIUM_CANCELED
+    );
+  }
+
+  return (
+    plan !== SubscriptionPlan.FREE && status !== SubscriptionStatus.EXPIRED
+  );
+
+  // const { type, plan } = user.subscription || {};
+  // return (
+  // (type === SubscriptionType.TRIAL || type === SubscriptionType.PREMIUM ||
+  //   type === SubscriptionType.PREMIUM_CANCELED) &&
+  // plan !== SubscriptionPlan.FREE
+  // );
 }

@@ -450,6 +450,7 @@ class Database {
       hosts.SUBSCRIPTIONS_HOST || Hosts.SUBSCRIPTIONS_HOST;
     Hosts.ISSUES_HOST = hosts.ISSUES_HOST || Hosts.ISSUES_HOST;
     Hosts.MONOGRAPH_HOST = hosts.MONOGRAPH_HOST || Hosts.MONOGRAPH_HOST;
+    Hosts.NOTESNOOK_HOST = hosts.NOTESNOOK_HOST || Hosts.NOTESNOOK_HOST;
   }
 
   version() {

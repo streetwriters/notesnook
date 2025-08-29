@@ -76,6 +76,10 @@ export function BillingHistory() {
             {error.stack}
           </Text>
         </Flex>
+      ) : transactions.length === 0 ? (
+        <Text variant="body" sx={{ mt: 2, color: "paragraph-secondary" }}>
+          You have not been billed yet.
+        </Text>
       ) : (
         <table
           style={{ tableLayout: "fixed", borderCollapse: "collapse" }}

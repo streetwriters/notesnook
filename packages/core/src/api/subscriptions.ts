@@ -90,12 +90,12 @@ export default class Subscriptions {
     );
   }
 
-  async refund() {
+  async refund(reason?: string) {
     const token = await this.db.tokenManager.getAccessToken();
     if (!token) return;
     await http.post(
       `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/v2/refund`,
-      null,
+      { reason },
       token
     );
   }
@@ -145,8 +145,32 @@ export default class Subscriptions {
   async checkoutUrl(plan: SubscriptionPlan, period: Period) {
     const user = await this.db.user.getUser();
     if (!user) return;
-    return `https://notesnook.com/api/v2/checkout?userId=${user.id}&email=${
+    return `${hosts.NOTESNOOK_HOST}/api/v2/checkout?userId=${user.id}&email=${
       user.email
     }&plan=${planToId(plan)}&period=${period}`;
+  }
+
+  async preview(productId: string) {
+    const token = await this.db.tokenManager.getAccessToken();
+    if (!token) return;
+    return http.post(
+      `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/v2/preview`,
+      {
+        productId: productId
+      },
+      token
+    );
+  }
+
+  async change(productId: string) {
+    const token = await this.db.tokenManager.getAccessToken();
+    if (!token) return;
+    return http.post(
+      `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/v2/change`,
+      {
+        productId: productId
+      },
+      token
+    );
   }
 }

@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useEffect, useState, useRef, useCallback } from "react";
 import { Flex } from "@theme-ui/components";
 import { Loader } from "../../components/loader";
-import { PaddleEvent, Period, Plan, Price, PricingInfo } from "./types";
+import { PaddleEvent, Plan, Price, PricingInfo } from "./types";
 import { ScrollContainer } from "@notesnook/ui";
 import useMobile from "../../hooks/use-mobile";
 import {
@@ -37,6 +37,7 @@ import { isFeatureSupported } from "../../utils/feature-check";
 import { IS_DEV, parseAmount } from "./helpers";
 import { CheckoutCustomerUserInfo } from "@paddle/paddle-js/types/checkout/customer";
 import { logger } from "../../utils/logger";
+import { Period } from "@notesnook/core";
 
 export const SELLER_ID = IS_DEV ? 1506 : 128190;
 export const CLIENT_PADDLE_TOKEN = IS_DEV
@@ -101,7 +102,11 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
       createCheckout({ theme, user, coupon, plan }).then(
         async (checkoutData) => {
           if (!checkoutData) return;
-          const pricingInfo = await getPrice(plan, checkoutData);
+          const pricingInfo = await getPrice(plan, {
+            currencyCode: checkoutData.currency_code,
+            discount: checkoutData.discount,
+            countryCode: checkoutData.customer.address?.country_code
+          });
           if (!pricingInfo) return;
 
           addressRef.current = checkoutData.customer.address || undefined;
@@ -116,7 +121,7 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
 
   useEffect(() => {
     async function onMessage(ev: MessageEvent<PaddleEvent>) {
-      if (ev.origin !== PADDLE_ORIGIN) return;
+      if (ev.origin !== PADDLE_ORIGIN || !ev.data) return;
       logger.debug("Paddle event received", { data: ev.data });
       const { event_name, callback_data } = ev.data;
 
@@ -140,7 +145,11 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
       console.log(callback_data);
 
       addressRef.current = callback_data.data.customer.address || undefined;
-      const pricingInfo = await getPrice(plan, callback_data.data);
+      const pricingInfo = await getPrice(plan, {
+        currencyCode: callback_data.data.currency_code,
+        discount: callback_data.data.discount,
+        countryCode: callback_data.data.customer.address?.country_code
+      });
       if (!pricingInfo) return;
 
       pricingInfo.invalidCoupon =
@@ -205,7 +214,12 @@ function getCheckoutURL(id: string, theme: PaddleCheckoutProps["theme"]) {
   )}`;
 }
 
-async function getPrice(plan: Plan, checkoutData: CheckoutEventsData) {
+type PriceOptions = {
+  currencyCode: string;
+  discount?: { id: string; code: string };
+  countryCode?: string;
+};
+export async function getPrice(plan: Plan, data: PriceOptions) {
   const response = await fetch(`${PADDLE_API}/pricing-preview`, {
     method: "POST",
     body: JSON.stringify({
@@ -215,14 +229,8 @@ async function getPrice(plan: Plan, checkoutData: CheckoutEventsData) {
           price_id: plan.id
         }
       ],
-      currency_code: checkoutData.currency_code,
-      address: checkoutData.customer.address
-        ? {
-            postal_code: checkoutData.customer.address?.postal_code,
-            country_code: checkoutData.customer.address?.country_code
-          }
-        : undefined,
-      discount_id: checkoutData.discount?.id
+      currency_code: data.currencyCode,
+      discount_id: data.discount?.id
     }),
     headers: {
       "Content-Type": "application/json",
@@ -233,13 +241,13 @@ async function getPrice(plan: Plan, checkoutData: CheckoutEventsData) {
   if (!response.ok) return false;
   const json = (await response.json()) as PricePreviewResponse;
   console.log(json);
-  return getPricingInfo(json.data, plan.period, checkoutData);
+  return getPricingInfo(json.data, plan.period, data);
 }
 
 function getPricingInfo(
   price: PricePreviewResponse["data"],
   period: Period,
-  checkoutData: CheckoutEventsData
+  options: PriceOptions
 ): PricingInfo {
   const {
     discounts,
@@ -262,7 +270,7 @@ function getPricingInfo(
     totalsWithoutDiscount.total = `${symbol}${(total / 100).toFixed(2)}`;
   }
   return {
-    country: checkoutData.customer.address?.country_code || "US",
+    country: options.countryCode || "US",
     discount: discount
       ? {
           recurring: isRecurring,
@@ -274,17 +282,17 @@ function getPricingInfo(
     price: {
       id: _price.id,
       period,
-      currency: checkoutData.currency_code,
+      currency: options.currencyCode,
       ...totals,
       trial_period: _price.trial_period
     },
     recurringPrice: {
       id: _price.id,
       period,
-      currency: checkoutData.currency_code,
+      currency: options.currencyCode,
       ...totalsWithoutDiscount
     },
-    coupon: checkoutData.discount?.code
+    coupon: options.discount?.code
   };
 }
 

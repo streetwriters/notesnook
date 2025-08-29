@@ -18,18 +18,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Text, Flex, Button, Image, Link, Box } from "@theme-ui/components";
-import {
-  Check,
-  CheckCircleOutline,
-  Cross,
-  Loading
-} from "../../components/icons";
-import { Period, Plan } from "./types";
+import { CheckCircleOutline, Loading } from "../../components/icons";
+import { Plan } from "./types";
 import { PERIOD_METADATA, PLAN_METADATA, usePlans } from "./plans";
 import { useState } from "react";
-import { FEATURE_HIGHLIGHTS, getCurrencySymbol } from "./helpers";
+import {
+  FEATURE_HIGHLIGHTS,
+  getCurrencySymbol,
+  isTrialAvailableForPlan
+} from "./helpers";
 import { strings } from "@notesnook/intl";
-import { SubscriptionPlan } from "@notesnook/core";
+import { Period, SubscriptionPlan } from "@notesnook/core";
 import Cameron from "../../assets/testimonials/cameron.jpg";
 import AndroidPolice from "../../assets/featured/android-police.svg";
 import AppleInsider from "../../assets/featured/appleinsider.svg";
@@ -40,13 +39,10 @@ import PrivacyGuides from "../../assets/featured/privacy-guides.svg";
 import Techlore from "../../assets/featured/techlore.svg";
 import TheVerge from "../../assets/featured/theverge.svg";
 import FreedomPress from "../../assets/featured/freedom-press.svg";
-import {
-  getFeature,
-  getFeaturesTable,
-  planToAvailability
-} from "@notesnook/common";
+import { getFeaturesTable, planToAvailability } from "@notesnook/common";
 import { FeatureCaption } from "./feature-caption";
 import Accordion from "../../components/accordion";
+import { useStore as useUserStore } from "../../stores/user-store";
 
 type PlansListProps = {
   selectedPlan: SubscriptionPlan;
@@ -126,7 +122,7 @@ const RECOMMENDED_BY = [
 
 export function PlansList(props: PlansListProps) {
   const { onPlanSelected, selectedPlan } = props;
-  const { isLoading, plans, discount, country } = usePlans();
+  const { isLoading, plans } = usePlans();
   const [selectedPeriod, setPeriod] = useState<Period>("yearly");
 
   return (
@@ -154,7 +150,7 @@ export function PlansList(props: PlansListProps) {
               borderRadius: 100,
               py: 1
             }}
-            onClick={() => setPeriod(id)}
+            onClick={() => setPeriod(id as Period)}
           >
             {period.title}
           </Button>
@@ -281,7 +277,9 @@ export function PlansList(props: PlansListProps) {
                     onClick={() => onPlanSelected(plan)}
                     sx={{ mt: 2 }}
                   >
-                    Select plan
+                    {isTrialAvailableForPlan(plan.plan)
+                      ? "Start your free trial"
+                      : "Select plan"}
                   </Button>
                 )}
               </Flex>

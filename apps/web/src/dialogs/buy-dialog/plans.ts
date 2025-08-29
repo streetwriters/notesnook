@@ -19,28 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useEffect, useState } from "react";
 import { Plan, PlanMetadata } from "./types";
-import { IS_DEV } from "./helpers";
 import { Period, SubscriptionPlan } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { db } from "../../common/db";
-
-function createPlan(
-  id: string,
-  plan: SubscriptionPlan,
-  period: Period,
-  price: number,
-  recurring = true
-): Plan {
-  return {
-    plan,
-    id,
-    price: { gross: price, net: price, tax: 0 },
-    currency: "USD",
-    country: "US",
-    period: period,
-    recurring
-  };
-}
 
 export const PLAN_METADATA: PlanMetadata = {
   [SubscriptionPlan.FREE]: {
@@ -82,101 +63,23 @@ export const PERIOD_METADATA: Record<Period, PeriodMetadata> = {
   }
 };
 
-export const DEFAULT_PLANS: Plan[] = [
-  createPlan(
-    IS_DEV
-      ? "pri_01j00cf6v5kqqvchcpgapr7123"
-      : "pri_01j02dbe7btgk6ta3ctper2161",
-    SubscriptionPlan.ESSENTIAL,
-    "monthly",
-    1.99
-  ),
-  createPlan(
-    IS_DEV
-      ? "pri_01j00d1qq3bart3w1rvt0q8bkt"
-      : "pri_01j02dckdey85cgmrdknd2f4zx",
-    SubscriptionPlan.ESSENTIAL,
-    "yearly",
-    19.99
-  ),
-  createPlan(
-    IS_DEV
-      ? "pri_01j00fnbzth05aafjb05kcahvq"
-      : "pri_01h9qprh1xvvxbs8vcpcg7qacm",
-    SubscriptionPlan.PRO,
-    "monthly",
-    6.99
-  ),
-  createPlan(
-    IS_DEV
-      ? "pri_01j00fpawjwkrqxy2faqhzts9m"
-      : "pri_01h9qpqyjwbm3m2xy7834t3azt",
-    SubscriptionPlan.PRO,
-    "yearly",
-    69.99
-  ),
-  createPlan(
-    IS_DEV
-      ? "pri_01j00fr72gn40xzk9cdcfpzevw"
-      : "pri_01j02da6n9c1xmzq15kjhjxngn",
-    SubscriptionPlan.PRO,
-    "5-year",
-    299.99
-  ),
-  createPlan(
-    IS_DEV
-      ? "pri_01j00fxsryh5jfyfjqq5tsx4c7"
-      : "pri_01j02ddzyc1m63s3b1kq6g4bnn",
-    SubscriptionPlan.BELIEVER,
-    "monthly",
-    8.99
-  ),
-  createPlan(
-    IS_DEV
-      ? "pri_01j00fzbz01rfn3f30crwxc7y9"
-      : "pri_01j02dezv9v5ncw3e16ncvz7x7",
-    SubscriptionPlan.BELIEVER,
-    "yearly",
-    89.99
-  ),
-  createPlan(
-    IS_DEV
-      ? "pri_01j00g0wpmj6m9vcvpjq97jwpp"
-      : "pri_01j02dfxz6y8hghfbr5p8cqtgb",
-    SubscriptionPlan.BELIEVER,
-    "5-year",
-    399.99
-  )
-];
-
-export const EDUCATION_PLAN: Plan = createPlan(
-  IS_DEV ? "pri_01j00g6asxjskghjcrbxpbd26e" : "pri_01j02dh4mwkbsvpygyf1bd9whs",
-  SubscriptionPlan.EDUCATION,
-  "yearly",
-  19.99,
-  false
-);
-
-let CACHED_PLANS: Plan[];
+const PLANS = getPlans().catch(console.error);
 export async function getPlans(): Promise<Plan[] | null> {
-  // if (IS_TESTING || import.meta.env.DEV) return DEFAULT_PLANS;
-  if (CACHED_PLANS) return CACHED_PLANS;
-
-  const plans = await db.pricing.products();
-  CACHED_PLANS = plans.sort((a, b) => a.plan - b.plan);
-  return plans;
+  const user = await db.user.getUser();
+  const plans = await db.pricing.products(user?.subscription?.trialsAvailed);
+  return plans.sort((a, b) => a.plan - b.plan);
 }
 
 export function usePlans() {
   const [isLoading, setIsLoading] = useState(false);
-  const [plans, setPlans] = useState<Plan[]>(DEFAULT_PLANS);
+  const [plans, setPlans] = useState<Plan[]>([]);
   const [discount, setDiscount] = useState<number>();
   const [country, setCountry] = useState<string>();
   useEffect(() => {
     (async function () {
       try {
         setIsLoading(true);
-        const plans = await getPlans();
+        const plans = await PLANS;
         if (!plans) return;
         setPlans(plans);
         setDiscount(Math.max(...plans.map((p) => p.discount?.amount || 0)));
