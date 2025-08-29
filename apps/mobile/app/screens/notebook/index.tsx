@@ -20,6 +20,7 @@ import { resolveItems } from "@notesnook/common";
 import { Note, Notebook, VirtualizedGrouping } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import React, { useEffect, useRef, useState } from "react";
+import { View } from "react-native";
 import { db } from "../../common/database";
 import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
@@ -28,7 +29,9 @@ import List from "../../components/list";
 import { NotebookHeader } from "../../components/list-items/headers/notebook-header";
 import { Properties } from "../../components/properties";
 import SelectionHeader from "../../components/selection-header";
+import { Notebooks } from "../../components/sheets/notebooks";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
+import { useNotebookLock } from "../../hooks/use-notebook-lock";
 import { eSendEvent, eSubscribeEvent } from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import useNavigationStore, {
@@ -36,10 +39,8 @@ import useNavigationStore, {
 } from "../../stores/use-navigation-store";
 import { eUpdateNotebookRoute } from "../../utils/events";
 import { findRootNotebookId } from "../../utils/notebooks";
-import { openEditor, setOnFirstSave } from "../notes/common";
-import { View } from "react-native";
 import { DefaultAppStyles } from "../../utils/styles";
-import { Notebooks } from "../../components/sheets/notebooks";
+import { openEditor, setOnFirstSave } from "../notes/common";
 
 const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
   const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
@@ -52,6 +53,8 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
       title: string;
     }[]
   >([]);
+  const notebookLock = useNotebookLock(params.current.item?.id);
+  const focusRef = useRef(false);
 
   useNavigationFocus(navigation, {
     onFocus: () => {
@@ -61,15 +64,23 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
       } else {
         Navigation.routeNeedsUpdate(route.name, onRequestUpdate);
       }
+      focusRef.current = true;
       syncWithNavigation();
       return false;
     },
     onBlur: () => {
       updateOnFocus.current = false;
       setOnFirstSave(null);
+      focusRef.current = false;
       return false;
     }
   });
+
+  useEffect(() => {
+    if (notebookLock.locked && !notebookLock.notebookOpen && focusRef.current) {
+      navigation.goBack();
+    }
+  }, [notebookLock.locked, notebookLock.notebookOpen]);
 
   const syncWithNavigation = React.useCallback(() => {
     useNavigationStore.getState().setFocusedRouteId(params?.current?.item?.id);

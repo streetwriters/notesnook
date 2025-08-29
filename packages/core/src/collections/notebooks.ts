@@ -24,10 +24,12 @@ import { ICollection } from "./collection.js";
 import { SQLCollection } from "../database/sql-collection.js";
 import { DatabaseSchema, isFalse } from "../database/index.js";
 import { Kysely, sql, Transaction } from "@streetwriters/kysely";
-import { deleteItems } from "../utils/array.js";
+import { addItem, deleteItem, deleteItems } from "../utils/array.js";
 import {
   CHECK_IDS,
   checkIsUserPremium,
+  EV,
+  EVENTS,
   FREE_NOTEBOOKS_LIMIT
 } from "../common.js";
 
@@ -37,6 +39,14 @@ export class Notebooks implements ICollection {
    * @internal
    */
   collection: SQLCollection<"notebooks", TrashOrItem<Notebook>>;
+  cache: {
+    lockOpenedNotebooks: Notebook["id"][];
+    lockedNotebooks: Notebook["id"][];
+  } = {
+    lockOpenedNotebooks: [],
+    lockedNotebooks: []
+  };
+  private key = "notebooklockkey";
   constructor(private readonly db: Database) {
     this.collection = new SQLCollection(
       db.sql,
@@ -47,8 +57,24 @@ export class Notebooks implements ICollection {
     );
   }
 
-  init() {
-    return this.collection.init();
+  async init() {
+    await this.collection.init();
+    await this.buildCache();
+  }
+
+  async buildCache() {
+    this.cache.lockedNotebooks = [];
+    const lockedNotebooks = await this.collection
+      .createFilter<Notebook>(
+        (qb) =>
+          qb
+            .where(isFalse("dateDeleted"))
+            .where(isFalse("deleted"))
+            .where("password", "is not", null),
+        this.db.options?.batchSize
+      )
+      .ids();
+    this.cache.lockedNotebooks = lockedNotebooks;
   }
 
   async add(notebookArg: Partial<Notebook>) {
@@ -88,7 +114,8 @@ export class Notebooks implements ICollection {
 
       dateCreated: mergedNotebook.dateCreated || Date.now(),
       dateModified: mergedNotebook.dateModified || Date.now(),
-      dateEdited: Date.now()
+      dateEdited: Date.now(),
+      password: mergedNotebook.password || null
     });
     return id;
   }
@@ -264,6 +291,67 @@ export class Notebooks implements ICollection {
       )
       .get();
     return relation[0]?.fromId;
+  }
+
+  async closeLockAll() {
+    EV.publish(EVENTS.notebooksLocked, this.cache.lockOpenedNotebooks);
+    this.cache.lockOpenedNotebooks = [];
+  }
+
+  async openLock(id: Notebook["id"], password: string): Promise<boolean> {
+    const notebook = await this.collection.get(id);
+    if (!notebook) return false;
+    if (!notebook.password) return false;
+    if (password !== notebook.password) return false;
+
+    addItem(this.cache.lockOpenedNotebooks, id);
+
+    EV.publish(EVENTS.notebookLockOpened, id);
+    return true;
+  }
+
+  async lock(id: Notebook["id"], password: string) {
+    if (password === "") {
+      throw new Error("Password cannot be empty");
+    }
+
+    await this.collection.update([id], {
+      password: password
+    });
+
+    deleteItem(this.cache.lockOpenedNotebooks, id);
+    addItem(this.cache.lockedNotebooks, id);
+
+    EV.publish(EVENTS.notebooksLocked, [id]);
+    return;
+  }
+
+  async unlock(id: Notebook["id"]) {
+    const notebook = await this.collection.get(id);
+    if (!notebook) return;
+    if (!notebook.password) return;
+
+    deleteItem(this.cache.lockOpenedNotebooks, id);
+    deleteItem(this.cache.lockedNotebooks, id);
+
+    await this.collection.update([id], {
+      password: null
+    });
+
+    EV.publish(EVENTS.notebookLockOpened, id);
+  }
+
+  isLocked(id: Notebook["id"]): boolean;
+  isLocked(notebook: Notebook): boolean;
+  isLocked(arg: Notebook | Notebook["id"]): boolean {
+    if (typeof arg === "string") {
+      return this.cache.lockedNotebooks.includes(arg);
+    }
+    return Boolean(arg.password);
+  }
+
+  isLockOpen(id: Notebook["id"]) {
+    return this.cache.lockOpenedNotebooks.includes(id);
   }
 }
 

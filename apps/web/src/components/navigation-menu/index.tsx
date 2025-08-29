@@ -47,7 +47,9 @@ import {
   Notebook as NotebookIcon,
   Plus,
   SortBy,
-  Tag as TagIcon
+  Tag as TagIcon,
+  UnlockVariant,
+  Lock
 } from "../icons";
 import { SortableNavigationItem } from "./navigation-item";
 import {
@@ -695,7 +697,20 @@ function ShortcutItem({
         context?.collapse();
       }}
     >
-      <ItemCount item={item} />
+      <Flex sx={{ alignItems: "center", gap: 1 }}>
+        {item.type === "notebook" && db.notebooks.isLocked(item) ? (
+          db.notebooks.isLockOpen(item.id) ? (
+            <UnlockVariant
+              title="Notebook opened"
+              variant="subBody"
+              size={12}
+            />
+          ) : (
+            <Lock title="Notebook locked" variant="subBody" size={12} />
+          )
+        ) : null}
+        <ItemCount item={item} />
+      </Flex>
     </SortableNavigationItem>
   );
 }

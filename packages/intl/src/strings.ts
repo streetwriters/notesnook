@@ -2491,5 +2491,11 @@ Use this if changes from other devices are not appearing on this device. This wi
   paragraphs: () => t`Paragraphs`,
   noNotebooksSelectedToMove: () => t`No notebooks selected to move`,
   scrollToTop: () => t`Scroll to top`,
-  scrollToBottom: () => t`Scroll to bottom`
+  scrollToBottom: () => t`Scroll to bottom`,
+  openNotebook: () => t`Open notebook`,
+  openNotebookDescription: () => t`Enter password for this notebook to open it`,
+  lockNotebook: () => t`Lock notebook`,
+  lockNotebookDescription: () => t`Set a password for this notebook to lock it`,
+  unlockNotebook: () => t`Unlock notebook`,
+  unlockNotebookDesc: () => t`Enter password for this notebook to unlock it`
 };

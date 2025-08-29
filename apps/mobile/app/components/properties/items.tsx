@@ -61,6 +61,7 @@ const BOTTOM_BAR_ITEMS: ActionId[] = [
 
 const COLUMN_BAR_ITEMS: ActionId[] = [
   "select",
+  "notebook-lock",
   "add-notebook",
   "edit-notebook",
   "move-notes",

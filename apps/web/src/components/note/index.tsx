@@ -151,7 +151,11 @@ function Note(props: NoteProps) {
         pl: isOpened ? "3px" : "7px",
         borderLeftColor: isOpened ? primary : "transparent"
       }}
-      context={{ color, locked }}
+      context={{
+        color,
+        locked,
+        isInLockedNotebook: notebooks?.items.some(db.notebooks.isLocked)
+      }}
       menuItems={noteMenuItems}
       onClick={() => useEditorStore.getState().openSession(note)}
       onMiddleClick={() =>
@@ -330,7 +334,11 @@ const formats = [
 export const noteMenuItems: (
   note: NoteType,
   ids?: string[],
-  context?: { color?: Color; locked?: boolean }
+  context?: {
+    color?: Color;
+    locked?: boolean;
+    isInLockedNotebook?: boolean;
+  }
 ) => MenuItem[] = (note, ids = [], context) => {
   const isPro = isUserPremium();
   // const isSynced = db.notes.note(note.id)?.synced();
@@ -368,6 +376,7 @@ export const noteMenuItems: (
       title: strings.favorite(),
       isChecked: note.favorite,
       icon: StarOutline.path,
+      isHidden: Boolean(context?.isInLockedNotebook),
       onClick: () => store.favorite(!note.favorite, ...ids),
       multiSelect: true
     },
@@ -403,6 +412,7 @@ export const noteMenuItems: (
       title: strings.archive(),
       isChecked: note.archived,
       icon: Archive.path,
+      isHidden: context?.isInLockedNotebook,
       onClick: () => store.archive(!note.archived, ...ids),
       multiSelect: true
     },
@@ -412,7 +422,11 @@ export const noteMenuItems: (
       key: "notebooks",
       title: strings.notebooks(),
       icon: Notebook.path,
-      menu: { items: notebooksMenuItems(ids) },
+      menu: {
+        items: notebooksMenuItems(ids, {
+          isInLockedNotebook: context?.isInLockedNotebook
+        })
+      },
       multiSelect: true
     },
     {
@@ -421,7 +435,11 @@ export const noteMenuItems: (
       title: strings.assignColor(),
       icon: Colors.path,
       multiSelect: true,
-      menu: { items: colorsToMenuItems(context?.color, ids) }
+      menu: {
+        items: colorsToMenuItems(context?.color, ids, {
+          disableNewColor: context?.isInLockedNotebook
+        })
+      }
     },
     {
       type: "button",
@@ -429,7 +447,11 @@ export const noteMenuItems: (
       title: strings.dataTypesPluralCamelCase.tag(),
       icon: Tag2.path,
       multiSelect: true,
-      menu: { items: tagsMenuItems(ids) }
+      menu: {
+        items: tagsMenuItems(ids, {
+          disableAssignTo: context?.isInLockedNotebook
+        })
+      }
     },
     { key: "sep2", type: "separator" },
     {
@@ -625,7 +647,8 @@ export const noteMenuItems: (
 
 function colorsToMenuItems(
   noteColor: Color | undefined,
-  ids: string[]
+  ids: string[],
+  context?: { disableNewColor?: boolean }
 ): MenuItem[] {
   return [
     {
@@ -633,6 +656,7 @@ function colorsToMenuItems(
       type: "button",
       title: strings.addColor(),
       icon: Plus.path,
+      isDisabled: context?.disableNewColor,
       onClick: async () => {
         const id = await CreateColorDialog.show({});
         if (!id) return;
@@ -648,18 +672,23 @@ function colorsToMenuItems(
         if (colors.length > 0)
           menuItems.push({ type: "separator", key: "sep" });
         menuItems.push(
-          ...colors.map((color) => {
-            const isChecked = !!noteColor && noteColor.id === color.id;
-            return {
-              type: "button",
-              key: color.title,
-              title: color.title,
-              icon: Circle.path,
-              styles: { icon: { color: color.colorCode } },
-              isChecked,
-              onClick: () => store.setColor(color.id, isChecked, ...ids)
-            } satisfies MenuItem;
-          })
+          ...colors
+            .map((color) => {
+              const isChecked = !!noteColor && noteColor.id === color.id;
+              if (context?.disableNewColor) {
+                if (!isChecked) return null;
+              }
+              return {
+                type: "button",
+                key: color.title,
+                title: color.title,
+                icon: Circle.path,
+                styles: { icon: { color: color.colorCode } },
+                isChecked,
+                onClick: () => store.setColor(color.id, isChecked, ...ids)
+              } satisfies MenuItem;
+            })
+            .filter((c) => c !== null)
         );
         return menuItems;
       }
@@ -667,13 +696,17 @@ function colorsToMenuItems(
   ];
 }
 
-function notebooksMenuItems(ids: string[]): MenuItem[] {
+function notebooksMenuItems(
+  ids: string[],
+  context?: { isInLockedNotebook?: boolean }
+): MenuItem[] {
   return [
     {
       type: "button",
       key: "link-notebooks",
       title: strings.linkNotebooks(),
       icon: AddToNotebook.path,
+      isHidden: context?.isInLockedNotebook,
       onClick: () => MoveNoteDialog.show({ noteIds: ids })
     },
     {
@@ -688,8 +721,26 @@ function notebooksMenuItems(ids: string[]): MenuItem[] {
           .resolve();
         linkedNotebooks.forEach((nb) => notebooks.set(nb.id, nb));
 
+        if (context?.isInLockedNotebook) {
+          const lockedNotebook = notebooks.values().find((nb) => nb.password);
+          if (!lockedNotebook) return [];
+          return [
+            {
+              type: "button",
+              key: "unlink-from-locked-notebook",
+              title: `Unlink from ${lockedNotebook.title}`,
+              icon: RemoveShortcutLink.path,
+              onClick: async () => {
+                await db.notes.removeFromNotebook(lockedNotebook.id, ...ids);
+                store.refresh();
+              }
+            }
+          ];
+        }
+
         for (const notebook of await db.shortcuts.resolved("notebooks")) {
           if (notebooks.has(notebook.id)) continue;
+          if (db.notebooks.isLocked(notebook)) continue;
           notebookShortcuts.set(notebook.id, notebook);
         }
 
@@ -747,13 +798,17 @@ function notebooksMenuItems(ids: string[]): MenuItem[] {
   ];
 }
 
-function tagsMenuItems(ids: string[]): MenuItem[] {
+function tagsMenuItems(
+  ids: string[],
+  context?: { disableAssignTo?: boolean }
+): MenuItem[] {
   return [
     {
       type: "button",
       key: "assign-tags",
       title: strings.assignTo(),
       icon: Plus.path,
+      isDisabled: context?.disableAssignTo,
       onClick: () => AddTagsDialog.show({ noteIds: ids })
     },
     {
@@ -768,9 +823,11 @@ function tagsMenuItems(ids: string[]): MenuItem[] {
           .resolve();
         linkedTags.forEach((tag) => tags.set(tag.id, tag));
 
-        for (const tag of await db.shortcuts.resolved("tags")) {
-          if (tags.has(tag.id)) continue;
-          tagShortcuts.set(tag.id, tag);
+        if (context?.disableAssignTo) {
+          for (const tag of await db.shortcuts.resolved("tags")) {
+            if (tags.has(tag.id)) continue;
+            tagShortcuts.set(tag.id, tag);
+          }
         }
 
         const menuItems: MenuItem[] = [];

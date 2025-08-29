@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { TextInput, View, ViewStyle } from "react-native";
@@ -225,9 +224,9 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
                   checked ? colors.secondary.icon : colors.primary.icon
                 }
                 style={{
-                  justifyContent: "flex-start"
+                  justifyContent: "flex-start",
+                  paddingTop: 0
                 }}
-                height={35}
                 iconSize={20}
                 width="100%"
                 title={dialogInfo.check.info}
