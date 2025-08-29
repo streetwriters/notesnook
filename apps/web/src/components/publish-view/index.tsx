@@ -51,6 +51,7 @@ function PublishView(props: PublishViewProps) {
     current: number;
   }>();
   const passwordInput = useRef<HTMLInputElement>(null);
+  const titleInput = useRef<HTMLInputElement>(null);
   const publishNote = useStore((store) => store.publish);
   const unpublishNote = useStore((store) => store.unpublish);
 
@@ -64,6 +65,10 @@ function PublishView(props: PublishViewProps) {
         setPublishId(monographId);
         setIsPasswordProtected(!!monograph.password);
         setSelfDestruct(!!monograph.selfDestruct);
+
+        if (titleInput.current) {
+          titleInput.current.value = monograph.title;
+        }
 
         if (monograph.password) {
           const password = await db.monographs.decryptPassword(
@@ -192,6 +197,19 @@ function PublishView(props: PublishViewProps) {
                 {strings.monographDesc()}
               </Text>
             )}
+            <Field
+              inputRef={titleInput}
+              id="monograph-title"
+              label={strings.monographTitle()}
+              placeholder={strings.enterMonographTitle()}
+              defaultValue={publishId ? "" : note.title}
+              sx={{
+                my: 1,
+                "& > label": {
+                  fontSize: "body"
+                }
+              }}
+            />
             <Toggle
               title={strings.monographSelfDestructHeading()}
               tip={strings.monographSelfDestructDesc()}
@@ -231,8 +249,9 @@ function PublishView(props: PublishViewProps) {
             try {
               setIsPublishing(true);
               const password = passwordInput.current?.value;
+              const title = titleInput.current?.value ?? "";
 
-              const publishId = await publishNote(note.id, {
+              const publishId = await publishNote(note.id, title, {
                 selfDestruct,
                 password
               });
