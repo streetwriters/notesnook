@@ -30,8 +30,10 @@ function Reminders() {
   useNavigate("reminders", () => store.refresh());
   const reminders = useStore((state) => state.reminders);
   const refresh = useStore((state) => state.refresh);
-  const filteredItems = useSearch("reminders", (query, sortOptions) =>
-    db.lookup.reminders(query).sorted(sortOptions)
+  const filteredItems = useSearch(
+    "reminders",
+    (query, sortOptions) => db.lookup.reminders(query).sorted(sortOptions),
+    [reminders]
   );
 
   if (!reminders) return <ListLoader />;
