@@ -69,6 +69,11 @@ const clipAreas: { name: string; id: ClipArea; icon: string }[] = [
 const clipModes: { name: string; id: ClipMode; icon: string; pro?: boolean }[] =
   [
     {
+      name: "Bookmark",
+      id: "bookmark",
+      icon: Icons.bookmark
+    },
+    {
       name: "Simplified",
       id: "simplified",
       icon: Icons.simplified
@@ -137,6 +142,7 @@ export function Main() {
         setClipMode("simplified");
         return;
       }
+      if (clipMode === "bookmark") return;
 
       try {
         setIsClipping(true);
@@ -244,7 +250,7 @@ export function Main() {
               setClipArea(item.id);
               setClipNonce((s) => ++s);
             }}
-            disabled={isClipping}
+            disabled={isClipping || clipMode === "bookmark"}
             sx={{
               display: "flex",
               borderRadius: "default",
@@ -313,33 +319,36 @@ export function Main() {
           </Button>
         ))}
 
-        {clipData && clipData.data && !isClipping && (
-          <Text
-            variant="body"
-            sx={{
-              mt: 1,
-              bg: "shade",
-              color: "accent",
-              p: 1,
-              border: "1px solid var(--accent)",
-              borderRadius: "default",
-              cursor: "pointer",
-              ":hover": {
-                filter: "brightness(80%)"
-              }
-            }}
-            onClick={async () => {
-              const winUrl = URL.createObjectURL(
-                new Blob(["\ufeff", clipData.data], { type: "text/html" })
-              );
-              await browser.windows.create({
-                url: winUrl
-              });
-            }}
-          >
-            Clip done. Click here to preview.
-          </Text>
-        )}
+        {clipMode !== "bookmark" &&
+          clipData &&
+          clipData.data &&
+          !isClipping && (
+            <Text
+              variant="body"
+              sx={{
+                mt: 1,
+                bg: "shade",
+                color: "accent",
+                p: 1,
+                border: "1px solid var(--accent)",
+                borderRadius: "default",
+                cursor: "pointer",
+                ":hover": {
+                  filter: "brightness(80%)"
+                }
+              }}
+              onClick={async () => {
+                const winUrl = URL.createObjectURL(
+                  new Blob(["\ufeff", clipData.data], { type: "text/html" })
+                );
+                await browser.windows.create({
+                  url: winUrl
+                });
+              }}
+            >
+              Clip done. Click here to preview.
+            </Text>
+          )}
 
         {error && (
           <Text
@@ -400,9 +409,16 @@ export function Main() {
         <Button
           variant="accent"
           sx={{ mt: 1 }}
-          disabled={!clipData}
+          disabled={(!clipData && clipMode !== "bookmark") || !title || !url}
           onClick={async () => {
-            if (!clipData || !title || !clipArea || !clipMode || !url) return;
+            const isBookmark = clipMode === "bookmark";
+            const data = isBookmark
+              ? {
+                  data: `<a href="${url}">${title}</a>`
+                }
+              : clipData;
+
+            if (!data || !title || !clipArea || !clipMode || !url) return;
 
             const notesnook = await connectApi(false);
             if (!notesnook) {
@@ -417,7 +433,7 @@ export function Main() {
               note,
               refs,
               pageTitle: pageTitle.current,
-              ...clipData
+              ...data
             });
 
             setClipData(undefined);
@@ -433,7 +449,7 @@ export function Main() {
             window.close();
           }}
         >
-          Save clip
+          {clipMode === "bookmark" ? "Save bookmark" : "Save clip"}
         </Button>
 
         <Flex

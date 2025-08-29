@@ -57,6 +57,7 @@ export const Icons = {
   visible: mdiViewDayOutline,
   selection: mdiCursorDefaultClickOutline,
 
+  bookmark: mdiBookmarkOutline,
   simplified: mdiTextBoxOutline,
   screenshot: mdiFitToScreenOutline,
   complete: mdiViewDashboardOutline,
