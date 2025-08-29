@@ -196,6 +196,7 @@ export function OpenLink(props: ToolProps) {
   const link = node ? findMark(node, "link") : null;
   if (!link) return null;
   const href = link?.attrs.href;
+  if (!href) return null;
 
   return (
     <Flex sx={{ alignItems: "center" }}>
@@ -245,6 +246,7 @@ export function CopyLink(props: ToolProps) {
   const link = node ? findMark(node, "link") : null;
   if (!link) return null;
   const href = link?.attrs.href;
+  if (!href) return null;
 
   return (
     <ToolButton
