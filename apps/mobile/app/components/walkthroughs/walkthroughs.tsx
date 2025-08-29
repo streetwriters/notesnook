@@ -336,7 +336,7 @@ const emailconfirmed: { id: string; steps: TStep[] } = {
   steps: [
     {
       title: strings.emailConfirmed(),
-      text: strings.emailNotConfirmedDesc(),
+      text: strings.emailConfirmedDesc(),
       walkthroughItem: (colors) => (
         <SvgView src={WELCOME_SVG(colors.primary.paragraph)} />
       ),
