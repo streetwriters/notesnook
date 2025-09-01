@@ -43,6 +43,7 @@ import { ReferencesList } from "../components/sheets/references";
 import { RelationsList } from "../components/sheets/relations-list/index";
 import { useSideBarDraggingStore } from "../components/side-menu/dragging-store";
 import { ButtonProps } from "../components/ui/button";
+import AddReminder from "../screens/add-reminder";
 import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
 import {
   eSendEvent,
@@ -66,7 +67,6 @@ import { eUpdateNoteInEditor } from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { convertNoteToText } from "../utils/note-to-text";
 import { sleep } from "../utils/time";
-import AddReminder from "../screens/add-reminder";
 
 export type ActionId =
   | "select"
@@ -111,7 +111,8 @@ export type ActionId =
   | "remove-from-notebook"
   | "trash"
   | "default-homepage"
-  | "default-tag";
+  | "default-tag"
+  | "spell-check";
 
 export type Action = {
   id: ActionId;
@@ -869,6 +870,28 @@ export const useActions = ({
         checked: item.favorite,
         pro: true,
         activeColor: "orange"
+      },
+      {
+        id: "spell-check",
+        title: strings.spellCheck(),
+        icon: "spellcheck",
+        isToggle: true,
+        checked: item.spellcheck,
+        onPress: async () => {
+          db.notes.spellcheck(!item.spellcheck, item.id);
+          const note = await db.notes.note(item.id);
+          if (note) {
+            setItem(note);
+            const tabs = useTabStore.getState().getTabsForNote(note.id);
+            tabs.forEach((tab) => {
+              useTabStore.getState().updateTab(tab.id, {
+                session: {
+                  spellCheckDisabled: !note.spellcheck
+                }
+              });
+            });
+          }
+        }
       },
       {
         id: "remove-from-notebook",

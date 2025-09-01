@@ -285,7 +285,8 @@ export const useEditor = (
               locked: undefined,
               readonly: undefined,
               scrollTop: undefined,
-              selection: undefined
+              selection: undefined,
+              spellCheckDisabled: false
             }
           });
           return;
@@ -632,6 +633,7 @@ export const useEditor = (
           session.noteLocked = isLockedNote;
           session.locked = tabLocked;
           session.readonly = item.readonly;
+          session.spellCheckDisabled = !item.spellcheck;
 
           const tab = useTabStore.getState().getTab(tabId!);
 

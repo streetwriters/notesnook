@@ -86,6 +86,7 @@ export type TabSessionItem = {
   noteLocked?: boolean;
   locked?: boolean;
   readonly?: boolean;
+  spellCheckDisabled: boolean;
 };
 
 const TabSessionStorageKV = new MMKVLoader()
@@ -208,7 +209,8 @@ const DEFAULT_TABS = {
     {
       id: "679da59a3924d4bd56d16d3f",
       session: {
-        id: "679da5a5667a16db2353a062"
+        id: "679da5a5667a16db2353a062",
+        spellCheckDisabled: false
       }
     }
   ],
