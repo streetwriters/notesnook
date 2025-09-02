@@ -24,7 +24,6 @@ import {
 import { getFeature } from "@notesnook/common";
 import { Period, Plan, SubscriptionPlan, User } from "@notesnook/core";
 import { PricingInfo } from "./types";
-import { useStore as useUserStore } from "../../stores/user-store";
 
 export const IS_DEV = import.meta.env.DEV || IS_TESTING;
 export function getCurrencySymbol(currency: string) {
@@ -56,7 +55,7 @@ const TRIAL_PERIODS: Record<Period, number> = {
   "5-year": 30
 };
 
-export function toPricingInfo(plan: Plan): PricingInfo {
+export function toPricingInfo(plan: Plan, user: User | undefined): PricingInfo {
   return {
     country: plan.country,
     period: plan.period,
@@ -67,7 +66,7 @@ export function toPricingInfo(plan: Plan): PricingInfo {
       subtotal: `${getCurrencySymbol(plan.currency)}${plan.price.net}`,
       tax: `${getCurrencySymbol(plan.currency)}${plan.price.tax}`,
       total: `${getCurrencySymbol(plan.currency)}${plan.price.gross}`,
-      trial_period: isTrialAvailableForPlan(plan.plan)
+      trial_period: isTrialAvailableForPlan(plan.plan, user)
         ? {
             frequency: TRIAL_PERIODS[plan.period]
           }
@@ -86,8 +85,10 @@ export function toPricingInfo(plan: Plan): PricingInfo {
   };
 }
 
-export function isTrialAvailableForPlan(plan: SubscriptionPlan) {
-  const user = useUserStore.getState().user;
+export function isTrialAvailableForPlan(
+  plan: SubscriptionPlan,
+  user: User | undefined
+) {
   return (
     !user?.subscription.trialsAvailed ||
     !user?.subscription.trialsAvailed?.includes(plan)

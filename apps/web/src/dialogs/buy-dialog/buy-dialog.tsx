@@ -179,6 +179,7 @@ export function CheckoutSideBar(props: SideBarProps) {
   if (user && selectedPlan)
     return (
       <SelectedPlan
+        user={user}
         plan={selectedPlan}
         pricingInfo={pricingInfo}
         onChangePlan={onShowPlans}
@@ -299,11 +300,17 @@ export function CheckoutCompleted(props: {
 
 type SelectedPlanProps = {
   plan: Plan;
+  user: User;
   pricingInfo: PricingInfo | undefined;
   onChangePlan?: () => void;
 };
 function SelectedPlan(props: SelectedPlanProps) {
-  const { plan, pricingInfo = toPricingInfo(plan), onChangePlan } = props;
+  const {
+    plan,
+    user,
+    pricingInfo = toPricingInfo(plan, user),
+    onChangePlan
+  } = props;
   const selectPlan = useCheckoutStore((store) => store.selectPlan);
   const upsellDetails = usePromise(() => getUpsellDetails(plan), [plan]);
 
