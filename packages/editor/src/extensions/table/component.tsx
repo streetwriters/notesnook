@@ -40,6 +40,7 @@ import {
 import { DesktopOnly } from "../../components/responsive/index.js";
 import { TextDirections } from "../text-direction/index.js";
 import { strings } from "@notesnook/intl";
+import SimpleBar from "simplebar-react";
 
 export function TableComponent(props: ReactNodeViewProps) {
   const { editor, node, forwardRef } = props;
@@ -67,17 +68,19 @@ export function TableComponent(props: ReactNodeViewProps) {
           textDirection={textDirection}
         />
       </DesktopOnly>
-      <div className="tableWrapper" dir={textDirection}>
-        <table
-          ref={(ref) => {
-            forwardRef?.(ref);
-            tableRef.current = ref || undefined;
-          }}
-        >
-          <colgroup ref={colgroupRef} />
-          {/* <tbody /> */}
-        </table>
-      </div>
+      <SimpleBar autoHide>
+        <div dir={textDirection}>
+          <table
+            ref={(ref) => {
+              forwardRef?.(ref);
+              tableRef.current = ref || undefined;
+            }}
+          >
+            <colgroup ref={colgroupRef} />
+            {/* <tbody /> */}
+          </table>
+        </div>
+      </SimpleBar>
     </>
   );
 }
@@ -181,7 +184,7 @@ function TableRowToolbar(props: TableToolbarProps) {
         flexWrap: "nowrap",
         borderRadius: "default",
         flexDirection: "column",
-        opacity: 0.3,
+        opacity: 0.8,
         ":hover": {
           opacity: 1
         }
@@ -231,9 +234,10 @@ function TableColumnToolbar(props: TableToolbarProps) {
         yOffset: 2
       });
 
-      columnToolsRef.current.style.left = `${
-        pos.left - (table.current.parentElement?.scrollLeft || 0)
-      }px`;
+      const scrollLeft =
+        table.current?.closest(".simplebar-content-wrapper")?.scrollLeft || 0;
+
+      columnToolsRef.current.style.left = `${pos.left - scrollLeft}px`;
       columnToolsRef.current.style.top = `${pos.top}px`;
     }
 
@@ -255,7 +259,7 @@ function TableColumnToolbar(props: TableToolbarProps) {
         bg: "background",
         flexWrap: "nowrap",
         borderRadius: "default",
-        opacity: 0.3,
+        opacity: 0.8,
         ":hover": {
           opacity: 1
         }
