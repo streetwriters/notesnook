@@ -25,6 +25,7 @@ import {
 import { Heading as TiptapHeading } from "@tiptap/extension-heading";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
 import { Decoration, DecorationSet } from "@tiptap/pm/view";
+import { isClickWithinBounds } from "../../utils/prosemirror";
 
 const HEADING_REGEX = /^(#{1,6})\s$/;
 export const Heading = TiptapHeading.extend({
@@ -169,33 +170,7 @@ export const Heading = TiptapHeading.extend({
         );
         if (calloutAncestor) return;
 
-        const { x, y, right } = heading.getBoundingClientRect();
-
-        const clientX =
-          e instanceof MouseEvent ? e.clientX : e.touches[0].clientX;
-        const clientY =
-          e instanceof MouseEvent ? e.clientY : e.touches[0].clientY;
-
-        const hitArea = { width: 40, height: 40 };
-
-        const isRtl =
-          heading.dir === "rtl" ||
-          findParentNodeClosestToPos(
-            resolvedPos,
-            (node) => !!node.attrs.textDirection
-          )?.node.attrs.textDirection === "rtl";
-
-        let xStart = clientX >= x - hitArea.width;
-        let xEnd = clientX <= x;
-        const yStart = clientY >= y;
-        const yEnd = clientY <= y + hitArea.height;
-
-        if (isRtl) {
-          xEnd = clientX <= x + hitArea.width;
-          xStart = clientX >= right;
-        }
-
-        if (xStart && xEnd && yStart && yEnd) {
+        if (isClickWithinBounds(e, resolvedPos, "left")) {
           e.preventDefault();
           e.stopImmediatePropagation();
 
