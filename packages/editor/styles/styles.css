@@ -799,3 +799,11 @@ del.diffdel {
 del.diffdel {
   text-decoration: none;
 }
+
+/* simplebar */
+.simplebar-track {
+  height: 9px !important;
+}
+.simplebar-content:before {
+  content: "" !important;
+}

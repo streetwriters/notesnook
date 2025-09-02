@@ -32,7 +32,7 @@ import {
   TableProperties
 } from "../../toolbar/tools/table.js";
 import { getToolDefinition } from "../../toolbar/tool-definitions.js";
-import { getPosition, ScrollContainer } from "@notesnook/ui";
+import { getPosition } from "@notesnook/ui";
 import {
   findSelectedDOMNode,
   hasSameAttributes
@@ -40,6 +40,7 @@ import {
 import { DesktopOnly } from "../../components/responsive/index.js";
 import { TextDirections } from "../text-direction/index.js";
 import { strings } from "@notesnook/intl";
+import SimpleBar from "simplebar-react";
 
 export function TableComponent(props: ReactNodeViewProps) {
   const { editor, node, forwardRef } = props;
@@ -67,13 +68,7 @@ export function TableComponent(props: ReactNodeViewProps) {
           textDirection={textDirection}
         />
       </DesktopOnly>
-      <ScrollContainer
-        style={{ display: "flex", overscrollBehavior: "contain" }}
-        trackStyle={() => ({
-          backgroundColor: "transparent",
-          "--ms-track-size": "6px"
-        })}
-      >
+      <SimpleBar autoHide>
         <div dir={textDirection}>
           <table
             ref={(ref) => {
@@ -85,7 +80,7 @@ export function TableComponent(props: ReactNodeViewProps) {
             {/* <tbody /> */}
           </table>
         </div>
-      </ScrollContainer>
+      </SimpleBar>
     </>
   );
 }
@@ -240,7 +235,7 @@ function TableColumnToolbar(props: TableToolbarProps) {
       });
 
       const scrollLeft =
-        table.current.parentElement?.parentElement?.scrollLeft || 0;
+        table.current?.closest(".simplebar-content-wrapper")?.scrollLeft || 0;
 
       columnToolsRef.current.style.left = `${pos.left - scrollLeft}px`;
       columnToolsRef.current.style.top = `${pos.top}px`;
