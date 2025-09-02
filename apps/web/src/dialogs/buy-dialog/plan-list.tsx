@@ -124,6 +124,7 @@ export function PlansList(props: PlansListProps) {
   const { onPlanSelected, selectedPlan } = props;
   const { isLoading, plans } = usePlans();
   const [selectedPeriod, setPeriod] = useState<Period>("yearly");
+  const user = useUserStore((store) => store.user);
 
   return (
     <>
@@ -277,7 +278,7 @@ export function PlansList(props: PlansListProps) {
                     onClick={() => onPlanSelected(plan)}
                     sx={{ mt: 2 }}
                   >
-                    {isTrialAvailableForPlan(plan.plan)
+                    {isTrialAvailableForPlan(plan.plan, user)
                       ? "Start your free trial"
                       : "Select plan"}
                   </Button>
