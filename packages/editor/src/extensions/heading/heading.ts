@@ -18,11 +18,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { tiptapKeys } from "@notesnook/common";
-import { textblockTypeInputRule } from "@tiptap/core";
+import {
+  textblockTypeInputRule,
+  findParentNodeClosestToPos
+} from "@tiptap/core";
 import { Heading as TiptapHeading } from "@tiptap/extension-heading";
+import { Plugin, PluginKey } from "@tiptap/pm/state";
+import { Decoration, DecorationSet } from "@tiptap/pm/view";
+import { isClickWithinBounds } from "../../utils/prosemirror";
 
 const HEADING_REGEX = /^(#{1,6})\s$/;
 export const Heading = TiptapHeading.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      collapsed: {
+        default: false,
+        keepOnSplit: false,
+        parseHTML: (element) => element.dataset.collapsed === "true",
+        renderHTML: (attributes) => ({
+          "data-collapsed": attributes.collapsed === true
+        })
+      }
+    };
+  },
+
   addCommands() {
     return {
       ...this.parent?.(),
@@ -41,6 +61,16 @@ export const Heading = TiptapHeading.extend({
             textAlign,
             textDirection
           });
+        },
+      toggleHeadingCollapse:
+        (pos: number) =>
+        ({ tr }: { tr: any }) => {
+          const node = tr.doc.nodeAt(pos);
+          if (node && node.type === this.type) {
+            tr.setNodeAttribute(pos, "collapsed", !node.attrs.collapsed);
+            return true;
+          }
+          return false;
         }
     };
   },
@@ -71,5 +101,114 @@ export const Heading = TiptapHeading.extend({
         }
       })
     ];
+  },
+
+  addProseMirrorPlugins() {
+    return [
+      new Plugin({
+        key: new PluginKey("collapsibleHeadings"),
+        props: {
+          decorations: (state) => {
+            const decorations: Decoration[] = [];
+            const { doc } = state;
+
+            doc.descendants((node, pos) => {
+              if (node.type.name === "heading" && node.attrs.collapsed) {
+                const headingLevel = node.attrs.level;
+                let nextPos = pos + node.nodeSize;
+
+                while (nextPos < doc.content.size) {
+                  const nextNode = doc.nodeAt(nextPos);
+                  if (!nextNode) break;
+                  if (
+                    nextNode.type.name === "heading" &&
+                    nextNode.attrs.level <= headingLevel
+                  ) {
+                    break;
+                  }
+
+                  decorations.push(
+                    Decoration.node(nextPos, nextPos + nextNode.nodeSize, {
+                      style: "display: none;"
+                    })
+                  );
+
+                  nextPos += nextNode.nodeSize;
+                }
+              }
+            });
+
+            return DecorationSet.create(doc, decorations);
+          }
+        }
+      })
+    ];
+  },
+
+  addNodeView() {
+    return ({ node, getPos, editor, HTMLAttributes }) => {
+      const heading = document.createElement(`h${node.attrs.level}`);
+
+      for (const attr in HTMLAttributes) {
+        heading.setAttribute(attr, HTMLAttributes[attr]);
+      }
+
+      if (node.attrs.collapsed) heading.dataset.collapsed = "true";
+      else delete heading.dataset.collapsed;
+
+      function onClick(e: MouseEvent | TouchEvent) {
+        if (e instanceof MouseEvent && e.button !== 0) return;
+        if (!(e.target instanceof HTMLHeadingElement)) return;
+
+        const pos = typeof getPos === "function" ? getPos() : 0;
+        if (typeof pos !== "number") return;
+
+        const resolvedPos = editor.state.doc.resolve(pos);
+        const calloutAncestor = findParentNodeClosestToPos(
+          resolvedPos,
+          (node) => node.type.name === "callout"
+        );
+        if (calloutAncestor) return;
+
+        if (isClickWithinBounds(e, resolvedPos, "left")) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+
+          editor.commands.command(({ tr }) => {
+            const currentNode = tr.doc.nodeAt(pos);
+            if (currentNode) {
+              tr.setNodeAttribute(
+                pos,
+                "collapsed",
+                !currentNode.attrs.collapsed
+              );
+            }
+            return true;
+          });
+        }
+      }
+
+      heading.onmousedown = onClick;
+      heading.ontouchstart = onClick;
+
+      return {
+        dom: heading,
+        contentDOM: heading,
+        update: (updatedNode) => {
+          if (updatedNode.type !== this.type) {
+            return false;
+          }
+
+          if (updatedNode.attrs.level !== node.attrs.level) {
+            return false;
+          }
+
+          if (updatedNode.attrs.collapsed) heading.dataset.collapsed = "true";
+          else delete heading.dataset.collapsed;
+
+          return true;
+        }
+      };
+    };
   }
 });

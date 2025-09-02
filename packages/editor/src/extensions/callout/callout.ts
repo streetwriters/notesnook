@@ -16,13 +16,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { getParentAttributes } from "../../utils/prosemirror.js";
 import {
-  InputRule,
-  Node,
-  findParentNodeClosestToPos,
-  mergeAttributes
-} from "@tiptap/core";
+  getParentAttributes,
+  isClickWithinBounds
+} from "../../utils/prosemirror.js";
+import { InputRule, Node, mergeAttributes } from "@tiptap/core";
 import { Paragraph } from "../paragraph/index.js";
 import { Heading } from "../heading/index.js";
 import { TextSelection } from "@tiptap/pm/state";
@@ -231,37 +229,9 @@ export const Callout = Node.create({
 
         const pos = typeof getPos === "function" ? getPos() : 0;
         if (typeof pos !== "number") return;
+
         const resolvedPos = editor.state.doc.resolve(pos);
-
-        const { x, y, width } = e.target.getBoundingClientRect();
-
-        const clientX =
-          e instanceof MouseEvent ? e.clientX : e.touches[0].clientX;
-
-        const clientY =
-          e instanceof MouseEvent ? e.clientY : e.touches[0].clientY;
-
-        const hitArea = { width: 40, height: 40 };
-
-        const isRtl =
-          e.target.dir === "rtl" ||
-          findParentNodeClosestToPos(
-            resolvedPos,
-            (node) => !!node.attrs.textDirection
-          )?.node.attrs.textDirection === "rtl";
-
-        let xEnd = clientX <= x + width;
-        let xStart = clientX >= x + width - hitArea.width;
-
-        const yStart = clientY >= y;
-        const yEnd = clientY <= y + hitArea.height;
-
-        if (isRtl) {
-          xStart = clientX >= x;
-          xEnd = clientX <= x + hitArea.width;
-        }
-
-        if (xStart && xEnd && yStart && yEnd) {
+        if (isClickWithinBounds(e, resolvedPos, "right")) {
           e.preventDefault();
           e.stopImmediatePropagation();
 
