@@ -34,10 +34,6 @@ import { db } from "./common/db";
 import { EV, EVENTS } from "@notesnook/core";
 import { registerKeyMap } from "./common/key-map";
 import { updateStatus, removeStatus, getStatus } from "./hooks/use-status";
-import {
-  interruptedOnboarding,
-  OnboardingDialog
-} from "./dialogs/onboarding-dialog";
 import { hashNavigate } from "./navigation";
 import { desktop } from "./common/desktop-bridge";
 import { FeatureDialog } from "./dialogs/feature-dialog";
@@ -69,8 +65,6 @@ export default function AppEffects() {
         await resetNotices();
         setIsVaultCreated(await db.vault.exists());
 
-        const onboardingKey = interruptedOnboarding();
-        if (onboardingKey) await OnboardingDialog.show({ type: onboardingKey });
         await FeatureDialog.show({ featureName: "highlights" });
         await scheduleBackups();
         await scheduleFullBackups();

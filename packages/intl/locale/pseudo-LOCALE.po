@@ -7011,7 +7011,7 @@ msgid "Welcome back!"
 msgstr ""
 
 #: src/strings.ts:2574
-msgid "Welcome to Notesnook {plan} plan"
+msgid "Welcome to Notesnook {plan}"
 msgstr ""
 
 #: src/strings.ts:2072

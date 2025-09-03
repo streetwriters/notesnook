@@ -542,11 +542,9 @@ export type FeatureUsage = {
 export async function getFeaturesUsage(): Promise<FeatureUsage[]> {
   const { isLegacyPro, plan } = await getUserPlan();
   const usage: FeatureUsage[] = [];
-  console.log(isLegacyPro, plan);
   for (const key in features) {
     const feature = getFeature(key as FeatureId);
     const limit = getFeatureLimitFromPlan(feature, plan, isLegacyPro);
-    console.log(limit, feature, key);
     if (!feature.used || typeof limit.value !== "number") continue;
     usage.push({
       id: key as FeatureId,

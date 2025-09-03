@@ -101,9 +101,11 @@ export function SubscriptionStatus() {
                   variant="subBody"
                 >
                   {feature.id === "storage"
-                    ? `${formatBytes(feature.used)}/${formatBytes(
-                        feature.total
-                      )}`
+                    ? `${formatBytes(feature.used)}/${
+                        feature.total === Infinity
+                          ? "Unlimited"
+                          : formatBytes(feature.total)
+                      }`
                     : feature.total === Infinity
                     ? "Unlimited"
                     : `${feature.used} of ${feature.total}`}

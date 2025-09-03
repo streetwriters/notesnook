@@ -36,7 +36,7 @@ import {
   User
 } from "@notesnook/core";
 
-export function getSubscriptionInfo(user: User | undefined): {
+export function getSubscriptionInfo(user?: User): {
   title: string;
   trial?: boolean;
   paused?: boolean;
@@ -47,6 +47,7 @@ export function getSubscriptionInfo(user: User | undefined): {
   autoRenew?: boolean;
   trialExpiryDate?: string;
 } {
+  user = user || useUserStore.getState().user;
   const { type, expiry, plan, status, provider } = user?.subscription || {};
   if (!expiry) return { title: "Free" };
 
@@ -251,10 +252,17 @@ export function UserProfile({ minimal }: Props) {
           </Text>
           {user.totalStorage && !minimal ? (
             <Flex sx={{ maxWidth: 300, alignItems: "center", gap: 1 }}>
-              <Progress max={user.totalStorage} value={user.storageUsed || 0} />
+              <Progress
+                max={user.totalStorage === -1 ? Infinity : user.totalStorage}
+                value={user.storageUsed || 0}
+                color="var(--accent)"
+              />
               <Text variant="subBody" sx={{ flexShrink: 0 }}>
                 {formatBytes(user.storageUsed || 0)}/
-                {formatBytes(user.totalStorage)} used
+                {user.totalStorage === -1
+                  ? "Unlimited"
+                  : formatBytes(user.totalStorage)}{" "}
+                used
               </Text>
             </Flex>
           ) : null}

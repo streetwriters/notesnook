@@ -36,6 +36,7 @@ import {
 import { TaskManager } from "../../common/task-manager";
 import { ConfirmDialog } from "../confirm";
 import { ChangePlanDialog } from "../buy-dialog/change-plan-dialog";
+import { getSubscriptionInfo } from "./components/user-profile";
 
 export const SubscriptionSettings: SettingsGroup[] = [
   {
@@ -89,6 +90,7 @@ export const SubscriptionSettings: SettingsGroup[] = [
           const user = useUserStore.getState().user;
           const status = user?.subscription.status;
           return (
+            getSubscriptionInfo(user).legacy ||
             user?.subscription.provider !== SubscriptionProvider.PADDLE ||
             !isUserSubscribed(user) ||
             status === SubscriptionStatusEnum.CANCELED ||
@@ -136,12 +138,12 @@ export const SubscriptionSettings: SettingsGroup[] = [
             title: strings.update(),
             action: async () => {
               try {
-                const urls = await db.subscriptions.urls();
-                if (!urls)
+                const url = await db.subscriptions.updateUrl();
+                if (!url)
                   throw new Error(
-                    "Failed to get subscription management urls. Please contact us at support@streetwriters.co so we can help you update your payment method."
+                    "Failed to get subscription update url. Please contact us at support@streetwriters.co so we can help you update your payment method."
                   );
-                window.open(urls?.update_payment_method, "_blank");
+                window.open(url, "_blank");
               } catch (e) {
                 if (e instanceof Error) showToast("error", e.message);
               }
@@ -160,6 +162,7 @@ export const SubscriptionSettings: SettingsGroup[] = [
           const user = useUserStore.getState().user;
           const status = user?.subscription.status;
           return (
+            getSubscriptionInfo(user).legacy ||
             user?.subscription.provider !== SubscriptionProvider.PADDLE ||
             !isUserSubscribed(user) ||
             status !== SubscriptionStatusEnum.TRIAL
