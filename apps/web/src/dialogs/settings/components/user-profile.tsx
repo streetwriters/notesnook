@@ -45,6 +45,7 @@ export function getSubscriptionInfo(user: User | undefined): {
   expiryDate?: string;
   startDate?: string;
   autoRenew?: boolean;
+  trialExpiryDate?: string;
 } {
   const { type, expiry, plan, status, provider } = user?.subscription || {};
   if (!expiry) return { title: "Free" };
@@ -73,7 +74,11 @@ export function getSubscriptionInfo(user: User | undefined): {
 
   const expiryDate =
     (!!user?.subscription?.expiry &&
-      getFormattedDate(user?.subscription?.expiry, "date-time")) ||
+      getFormattedDate(user.subscription.expiry, "date-time")) ||
+    undefined;
+  const trialExpiryDate =
+    (!!user?.subscription?.trialExpiry &&
+      getFormattedDate(user.subscription.trialExpiry, "date-time")) ||
     undefined;
   const startDate =
     (!!user?.subscription?.start &&
@@ -86,6 +91,7 @@ export function getSubscriptionInfo(user: User | undefined): {
     trial,
     expiryDate,
     startDate,
+    trialExpiryDate,
     autoRenew,
     paused,
     canceled

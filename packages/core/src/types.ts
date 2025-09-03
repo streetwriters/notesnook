@@ -611,6 +611,7 @@ export type User = {
     appId: 0;
     cancelURL: string | null;
     expiry: number;
+    trialExpiry?: number;
     productId: string;
     provider: SubscriptionProvider;
     start: number;
