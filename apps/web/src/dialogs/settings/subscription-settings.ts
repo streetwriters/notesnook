@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { SettingComponent, SettingsGroup } from "./types";
+import { SettingsGroup } from "./types";
 import { SubscriptionStatus } from "./components/subscription-status";
 import { showToast } from "../../utils/toast";
 import { db } from "../../common/db";
@@ -218,14 +218,22 @@ export const SubscriptionSettings: SettingsGroup[] = [
                 message:
                   "You will only be issued a refund if you are eligible as per our refund policy. Your account will immediately be downgraded to Basic and your funds will be transferred to your account within 24 hours.",
                 negativeButtonText: "No",
-                positiveButtonText: "Yes"
+                positiveButtonText: "Yes",
+                inputs: {
+                  reason: {
+                    title: "Reason for refund",
+                    helpText: "Optional",
+                    multiline: true
+                  }
+                }
               });
               if (refundSubscription) {
                 const result = await TaskManager.startTask({
                   type: "modal",
                   title: "Requesting refund for your subscription",
                   subtitle: "Please wait...",
-                  action: () => db.subscriptions.refund()
+                  action: () =>
+                    db.subscriptions.refund(refundSubscription.inputs?.reason)
                 });
                 if (result instanceof Error) {
                   showToast("error", result.message);

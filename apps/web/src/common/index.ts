@@ -35,7 +35,6 @@ import {
   useStore as useSettingStore
 } from "../stores/setting-store";
 import { showToast } from "../utils/toast";
-import { SUBSCRIPTION_STATUS } from "./constants";
 import { readFile, showFilePicker } from "../utils/file-picker";
 import { logger } from "../utils/logger";
 import { PATHS } from "@notesnook/desktop";
@@ -49,7 +48,6 @@ import { useEditorStore } from "../stores/editor-store";
 import { formatDate } from "@notesnook/core";
 import { showPasswordDialog } from "../dialogs/password-dialog";
 import { BackupPasswordDialog } from "../dialogs/backup-password-dialog";
-import { ReminderDialog } from "../dialogs/reminder-dialog";
 import { Cipher, SerializedKey } from "@notesnook/crypto";
 import { ChunkedStream } from "../utils/streams/chunked-stream";
 import { isFeatureSupported } from "../utils/feature-check";
@@ -405,22 +403,6 @@ export function totalSubscriptionConsumed(user: User) {
   const consumed = Date.now() - start;
 
   return Math.round((consumed / total) * 100);
-}
-
-export async function showUpgradeReminderDialogs() {
-  if (IS_TESTING) return;
-
-  const user = useUserStore.getState().user;
-  if (!user || !user.subscription || user.subscription?.expiry === 0) return;
-
-  const consumed = totalSubscriptionConsumed(user);
-  const isTrial = user.subscription?.type === SUBSCRIPTION_STATUS.TRIAL;
-  const isBasic = user.subscription?.type === SUBSCRIPTION_STATUS.BASIC;
-  if (isBasic && consumed >= 100) {
-    await ReminderDialog.show({ reminderKey: "trialexpired" });
-  } else if (isTrial && consumed >= 75) {
-    await ReminderDialog.show({ reminderKey: "trialexpiring" });
-  }
 }
 
 async function restore(
