@@ -49,7 +49,7 @@ export function BillingHistory() {
 
         const transactions = await db.subscriptions.transactions();
         if (!transactions) return;
-        setTransactions(transactions);
+        setTransactions(transactions.filter((c) => !!c.billed_at));
       } catch (e) {
         if (e instanceof Error) setError(e);
       } finally {
