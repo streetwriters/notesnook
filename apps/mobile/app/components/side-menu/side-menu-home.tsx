@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { SubscriptionPlan } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
@@ -27,7 +28,6 @@ import { useMenuStore } from "../../stores/use-menu-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useUserStore } from "../../stores/use-user-store";
 import { SUBSCRIPTION_STATUS } from "../../utils/constants";
-import { MenuItemsList } from "../../utils/menu-items";
 import { DefaultAppStyles } from "../../utils/styles";
 import ReorderableList from "../list/reorderable-list";
 import { MenuItemProperties } from "../sheets/menu-item-properties";
@@ -36,6 +36,7 @@ import { ColorSection } from "./color-section";
 import { MenuItem } from "./menu-item";
 import { PinnedSection } from "./pinned-section";
 import { SideMenuHeader } from "./side-menu-header";
+import { MenuItemsList } from "../../utils/menu-items";
 
 const pro = {
   title: strings.upgradePlan(),
@@ -59,7 +60,7 @@ export function SideMenuHome() {
     state.hiddenItems["routes"]
   ]);
   const subscriptionType = useUserStore(
-    (state) => state.user?.subscription?.type
+    (state) => state.user?.subscription?.plan
   );
   const user = useUserStore.getState().user;
 
@@ -139,8 +140,9 @@ export function SideMenuHome() {
           paddingVertical: DefaultAppStyles.GAP_VERTICAL
         }}
       >
-        {subscriptionType === SUBSCRIPTION_STATUS.TRIAL ||
-        subscriptionType === SUBSCRIPTION_STATUS.BASIC ||
+        {((subscriptionType === SUBSCRIPTION_STATUS.TRIAL ||
+          subscriptionType === SUBSCRIPTION_STATUS.BASIC) &&
+          subscriptionType === SubscriptionPlan.FREE) ||
         !user ? (
           <Button
             title={pro.title}

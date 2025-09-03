@@ -2372,6 +2372,10 @@ msgstr "Edit your full name"
 msgid "Editor"
 msgstr "Editor"
 
+#: src/strings.ts:2573
+msgid "Education plan"
+msgstr "Education plan"
+
 #: src/strings.ts:1480
 msgid "Email"
 msgstr "Email"
@@ -7054,6 +7058,10 @@ msgstr "Welcome back, {email}"
 #: src/strings.ts:1887
 msgid "Welcome back!"
 msgstr "Welcome back!"
+
+#: src/strings.ts:2574
+msgid "Welcome to Notesnook {plan} plan"
+msgstr "Welcome to Notesnook {plan} plan"
 
 #: src/strings.ts:2072
 msgid "Welcome to Notesnook Pro"

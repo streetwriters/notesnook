@@ -53,12 +53,21 @@ export const Walkthrough = ({
         justifyContent: "center",
         alignItems: "center",
         padding: DefaultAppStyles.GAP,
-        paddingBottom: 0
+        paddingBottom: DefaultAppStyles.GAP * 2,
+        gap: DefaultAppStyles.GAP_VERTICAL
       }}
     >
       {step.walkthroughItem(colors)}
 
-      {step.title ? <Heading>{step.title}</Heading> : null}
+      {step.title ? (
+        <Heading
+          style={{
+            textAlign: "center"
+          }}
+        >
+          Notesnook Free plan activated
+        </Heading>
+      ) : null}
       {step.text ? (
         <Paragraph
           style={{
@@ -74,8 +83,7 @@ export const Walkthrough = ({
       {step.actionButton && (
         <Button
           style={{
-            height: 30,
-            marginTop: DefaultAppStyles.GAP_VERTICAL
+            height: 30
           }}
           textStyle={{
             textDecorationLine: "underline"
@@ -89,11 +97,6 @@ export const Walkthrough = ({
       )}
 
       <Button
-        style={{
-          borderRadius: 100,
-          height: 40,
-          marginTop: DefaultAppStyles.GAP
-        }}
         onPress={async () => {
           switch (step.button?.type) {
             case "next":

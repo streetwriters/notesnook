@@ -40,6 +40,8 @@ import { SyncStatus, useUserStore } from "../../stores/use-user-store";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { SectionItem } from "./section-item";
+import { planToDisplayName } from "../../utils/constants";
+import { SubscriptionType } from "@notesnook/core";
 
 export const getTimeLeft = (t2) => {
   let daysRemaining = dayjs(t2).diff(dayjs(), "days");
@@ -117,6 +119,8 @@ const onChangePicture = () => {
       }, 1000);
     });
 };
+
+const LONG_MAX = 9223372036854776000;
 
 const SettingsUserSection = ({ item }) => {
   const { colors } = useThemeColors();
@@ -276,7 +280,10 @@ const SettingsUserSection = ({ item }) => {
                     {strings.storage()}
                   </Paragraph>
                   <Paragraph size={AppFontSize.xxs}>
-                    {formatBytes(used)}/{formatBytes(total)} {strings.used()}
+                    {formatBytes(used)}/
+                    {total === LONG_MAX
+                      ? "Unlimited"
+                      : formatBytes(total) + " " + strings.used()}
                   </Paragraph>
                 </View>
                 <View
@@ -317,7 +324,10 @@ const SettingsUserSection = ({ item }) => {
                   }}
                 >
                   <Paragraph size={AppFontSize.sm}>
-                    {strings.freePlan()}
+                    {user.subscription.plan === 0 &&
+                    user.subscription.type === SubscriptionType.PREMIUM
+                      ? strings.proPlan()
+                      : planToDisplayName(user.subscription.plan)}
                   </Paragraph>
                   <Paragraph
                     color={colors.secondary.paragraph}
