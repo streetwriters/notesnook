@@ -17,7 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { planToId, SubscriptionPlan } from "../types.js";
+import {
+  planToId,
+  SubscriptionPlan,
+  SubscriptionType,
+  User
+} from "../types.js";
 import hosts from "../utils/constants.js";
 import http from "../utils/http.js";
 import Database from "./index.js";
@@ -29,6 +34,33 @@ export type TransactionStatus =
   | "paid"
   | "past_due"
   | "canceled";
+
+export type TransactionStatusV1 =
+  | "completed"
+  | "refunded"
+  | "partially_refunded"
+  | "disputed";
+
+export type TransactionV1 = {
+  order_id: string;
+  checkout_id: string;
+  amount: string;
+  currency: string;
+  status: TransactionStatusV1;
+  created_at: string;
+  passthrough: null;
+  product_id: number;
+  is_subscription: boolean;
+  is_one_off: boolean;
+  subscription: SubscriptionV1;
+  user: User;
+  receipt_url: string;
+};
+
+type SubscriptionV1 = {
+  subscription_id: number;
+  status: string;
+};
 
 export interface Transaction {
   id: string;
@@ -62,51 +94,76 @@ export default class Subscriptions {
 
   async cancel() {
     const token = await this.db.tokenManager.getAccessToken();
-    if (!token) return;
-    await http.post(
-      `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/v2/cancel`,
-      null,
-      token
-    );
+    const user = await this.db.user.getUser();
+    if (!token || !user) return;
+    const endpoint = isLegacySubscription(user)
+      ? `subscriptions/cancel`
+      : `subscriptions/v2/cancel`;
+    await http.post(`${hosts.SUBSCRIPTIONS_HOST}/${endpoint}`, null, token);
   }
 
   async pause() {
     const token = await this.db.tokenManager.getAccessToken();
-    if (!token) return;
-    await http.post(
-      `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/v2/pause`,
-      null,
-      token
-    );
+    const user = await this.db.user.getUser();
+    if (!token || !user) return;
+    const endpoint = isLegacySubscription(user)
+      ? `subscriptions/cancel?pause=true`
+      : `subscriptions/v2/pause`;
+    if (isLegacySubscription(user))
+      await http.delete(`${hosts.SUBSCRIPTIONS_HOST}/${endpoint}`, token);
+    else
+      await http.post(`${hosts.SUBSCRIPTIONS_HOST}/${endpoint}`, null, token);
   }
 
   async resume() {
     const token = await this.db.tokenManager.getAccessToken();
-    if (!token) return;
-    await http.post(
-      `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/v2/resume`,
-      null,
-      token
-    );
+    const user = await this.db.user.getUser();
+    if (!token || !user) return;
+    const endpoint = isLegacySubscription(user)
+      ? `subscriptions/resume`
+      : `subscriptions/v2/resume`;
+    await http.post(`${hosts.SUBSCRIPTIONS_HOST}/${endpoint}`, null, token);
   }
 
   async refund(reason?: string) {
     const token = await this.db.tokenManager.getAccessToken();
-    if (!token) return;
+    const user = await this.db.user.getUser();
+    if (!token || !user) return;
+    const endpoint = isLegacySubscription(user)
+      ? `subscriptions/refund`
+      : `subscriptions/v2/refund`;
     await http.post(
-      `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/v2/refund`,
+      `${hosts.SUBSCRIPTIONS_HOST}/${endpoint}`,
       { reason },
       token
     );
   }
 
-  async transactions(): Promise<Transaction[] | undefined> {
+  async transactions(): Promise<
+    | { type: "v2"; transactions: Transaction[] }
+    | { type: "v1"; transactions: TransactionV1[] }
+    | undefined
+  > {
     const token = await this.db.tokenManager.getAccessToken();
-    if (!token) return;
-    return await http.get(
-      `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/v2/transactions`,
-      token
-    );
+    const user = await this.db.user.getUser();
+    if (!token || !user) return;
+    if (isLegacySubscription(user)) {
+      return {
+        type: "v1",
+        transactions: await http.get(
+          `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/transactions`,
+          token
+        )
+      };
+    } else {
+      return {
+        type: "v2",
+        transactions: await http.get(
+          `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/v2/transactions`,
+          token
+        )
+      };
+    }
   }
 
   async invoice(transactionId: string): Promise<string | undefined> {
@@ -119,15 +176,23 @@ export default class Subscriptions {
     return response.url;
   }
 
-  async urls(): Promise<
-    { update_payment_method: string; cancel: string } | undefined
-  > {
+  async updateUrl(): Promise<string | undefined> {
     const token = await this.db.tokenManager.getAccessToken();
     if (!token) return;
-    return await http.get(
-      `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/v2/urls`,
-      token
-    );
+    const user = await this.db.user.getUser();
+    if (!token || !user) return;
+    if (isLegacySubscription(user)) {
+      return await http.get(
+        `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/update`,
+        token
+      );
+    } else {
+      const result = await http.get(
+        `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/v2/urls`,
+        token
+      );
+      return result.update_payment_method;
+    }
   }
 
   async redeemCode(code: string) {
@@ -173,4 +238,15 @@ export default class Subscriptions {
       token
     );
   }
+}
+
+function isLegacySubscription(user: User) {
+  const type = user.subscription.type;
+  return (
+    type !== undefined &&
+    (type === SubscriptionType.BETA ||
+      type === SubscriptionType.PREMIUM ||
+      type === SubscriptionType.PREMIUM_CANCELED ||
+      type === SubscriptionType.TRIAL)
+  );
 }

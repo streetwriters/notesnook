@@ -7060,8 +7060,8 @@ msgid "Welcome back!"
 msgstr "Welcome back!"
 
 #: src/strings.ts:2574
-msgid "Welcome to Notesnook {plan} plan"
-msgstr "Welcome to Notesnook {plan} plan"
+msgid "Welcome to Notesnook {plan}"
+msgstr "Welcome to Notesnook {plan}"
 
 #: src/strings.ts:2072
 msgid "Welcome to Notesnook Pro"

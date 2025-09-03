@@ -37,7 +37,6 @@ import {
 } from "./plan-list";
 import { useCheckoutStore } from "./store";
 import { getCurrencySymbol, toPricingInfo } from "./helpers";
-import { isMacStoreApp } from "../../utils/platform";
 import { isUserSubscribed } from "../../hooks/use-is-user-premium";
 import { SUBSCRIPTION_STATUS } from "../../common/constants";
 import BaseDialog from "../../components/dialog";
@@ -126,7 +125,7 @@ export const BuyDialog = DialogManager.register(function BuyDialog(
             />
           </ScopedThemeProvider>
           <CheckoutDetails
-            onComplete={onCheckoutComplete ?? (() => {})}
+            onComplete={onCheckoutComplete ?? (() => onClose(false))}
             user={user}
           />
         </Flex>
