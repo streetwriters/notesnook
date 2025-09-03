@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { getFeaturesTable } from "@notesnook/common";
+import { EV, EVENTS, Plan, SubscriptionPlan, User } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useState } from "react";
@@ -37,6 +38,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { WebView } from "react-native-webview";
 import ToggleSwitch from "toggle-switch-react-native";
+import {
+  ANDROID_POLICE_SVG,
+  APPLE_INSIDER_PNG,
+  ITS_FOSS_NEWS_PNG,
+  NESS_LABS_PNG,
+  PRIVACY_GUIDES_SVG,
+  TECHLORE_SVG,
+  XDA_SVG
+} from "../../assets/images/assets";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import usePricingPlans, { PricingPlan } from "../../hooks/use-pricing-plans";
 import Navigation, { NavigationProps } from "../../services/navigation";
@@ -44,28 +54,16 @@ import { getElevationStyle } from "../../utils/elevation";
 import { openLinkInBrowser } from "../../utils/functions";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
+import { AuthMode } from "../auth/common";
 import { Header } from "../header";
 import { BuyPlan } from "../sheets/buy-plan";
 import { Toast } from "../toast";
 import AppIcon from "../ui/AppIcon";
 import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
+import { SvgView } from "../ui/svg";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { db } from "../../common/database";
-import { SvgView } from "../ui/svg";
-import {
-  ANDROID_POLICE_SVG,
-  APPLE_INSIDER_PNG,
-  FREEDOM_PRESS_SVG,
-  ITS_FOSS_NEWS_PNG,
-  NESS_LABS_PNG,
-  PRIVACY_GUIDES_SVG,
-  TECHLORE_SVG,
-  XDA_SVG
-} from "../../assets/images/assets";
-import { EV, EVENTS, Plan, SubscriptionPlan, User } from "@notesnook/core";
-import { AuthMode } from "../auth/common";
 
 const Steps = {
   select: 1,
@@ -944,7 +942,7 @@ const PricingPlanCard = ({
 
   const price = pricingPlans?.getPrice(
     product as RNIap.Subscription,
-    1,
+    pricingPlans.hasTrialOffer(plan.id, product?.productId) ? 1 : 0,
     annualBilling
   );
 

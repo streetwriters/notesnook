@@ -86,9 +86,7 @@ const pricingPlans: PricingPlan[] = [
     subscriptionSkuList: [
       "notesnook.pro.monthly",
       "notesnook.pro.yearly",
-      "notesnook.pro.monthly.tier2",
       "notesnook.pro.yearly.tier2",
-      "notesnook.pro.monthly.tier3",
       "notesnook.pro.yearly.tier3",
       // no trial
       "notesnook.pro.monthly.nt",
@@ -281,8 +279,11 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
             : (product as Plan).price.gross
         }`;
 
-      const pricingPhaseListItem = (product as RNIap.SubscriptionAndroid)
-        ?.subscriptionOfferDetails?.[0]?.pricingPhases?.pricingPhaseList?.[1];
+      const pricingPhaseListItem =
+        (product as RNIap.SubscriptionAndroid)?.subscriptionOfferDetails?.[0]
+          ?.pricingPhases?.pricingPhaseList?.[1] ||
+        (product as RNIap.SubscriptionAndroid)?.subscriptionOfferDetails?.[0]
+          ?.pricingPhases?.pricingPhaseList?.[0];
 
       return (
         pricingPhaseListItem?.formattedPrice ||
@@ -534,10 +535,18 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
     if (!p1 || !p2) return 0;
 
     if (Platform.OS === "android") {
-      const androidPricingPhase1 = (p1 as RNIap.SubscriptionAndroid)
-        ?.subscriptionOfferDetails?.[0].pricingPhases?.pricingPhaseList?.[1];
-      const androidPricingPhase2 = (p2 as RNIap.SubscriptionAndroid)
-        ?.subscriptionOfferDetails?.[0].pricingPhases?.pricingPhaseList?.[1];
+      const androidPricingPhase1 =
+        (p1 as RNIap.SubscriptionAndroid)?.subscriptionOfferDetails?.[0]
+          .pricingPhases?.pricingPhaseList?.[1] ||
+        (p1 as RNIap.SubscriptionAndroid)?.subscriptionOfferDetails?.[0]
+          .pricingPhases?.pricingPhaseList?.[0];
+      const androidPricingPhase2 =
+        (p2 as RNIap.SubscriptionAndroid)?.subscriptionOfferDetails?.[0]
+          .pricingPhases?.pricingPhaseList?.[1] ||
+        (p2 as RNIap.SubscriptionAndroid)?.subscriptionOfferDetails?.[0]
+          .pricingPhases?.pricingPhaseList?.[0];
+
+      if (!androidPricingPhase1 || !androidPricingPhase2) return 0;
 
       return getDiscountValue(
         androidPricingPhase1.priceAmountMicros,

@@ -132,7 +132,8 @@ function ReorderableList<T extends { id: string }>({
   );
 
   function getOrderedItems() {
-    const items: T[] = customizableSidebarFeature?.isAllowed ? data : [];
+    if (!customizableSidebarFeature?.isAllowed) return data;
+    const items: T[] = [];
     itemOrderState.forEach((id) => {
       const item = data.find((i) => i.id === id);
       if (!item) return;
@@ -183,7 +184,6 @@ function ReorderableList<T extends { id: string }>({
             dragging: true
           });
         }}
-        disableVirtualization
         itemsDraggable={disableDefaultDrag ? dragging : true}
         lockItemDragsToMainAxis
         onItemReorder={async ({ fromIndex, fromItem, toIndex, toItem }) => {
