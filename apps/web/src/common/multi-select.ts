@@ -82,7 +82,7 @@ async function moveNotebooksToTrash(ids: string[]) {
 
   if (!result) return;
 
-  if (result.deleteContainingNotes) {
+  if (result.checks?.deleteContainingNotes) {
     await Multiselect.moveNotesToTrash(await db.notebooks.notes(...ids), false);
   }
 
@@ -186,10 +186,9 @@ async function restoreItemsFromTrash(ids: string[]) {
 
   const notebookIds = ids.filter((id) => db.trash.cache.notebooks.includes(id));
   if (
-    !(await checkFeature(
-      "notebooks",
-      (await db.notebooks.all.count()) + notebookIds.length
-    ))
+    !(await checkFeature("notebooks", {
+      value: (await db.notebooks.all.count()) + notebookIds.length
+    }))
   )
     return;
 

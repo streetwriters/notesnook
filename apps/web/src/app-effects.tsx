@@ -28,7 +28,7 @@ import {
   scheduleBackups,
   scheduleFullBackups
 } from "./common/notices";
-import { introduceFeatures, showUpgradeReminderDialogs } from "./common";
+import { introduceFeatures } from "./common";
 import { AppEventManager, AppEvents } from "./common/app-events";
 import { db } from "./common/db";
 import { EV, EVENTS } from "@notesnook/core";
@@ -65,9 +65,7 @@ export default function AppEffects() {
       (async function () {
         await refreshNavItems();
         await updateLastSynced();
-        if (await initUser()) {
-          showUpgradeReminderDialogs();
-        }
+        await initUser();
         await resetNotices();
         setIsVaultCreated(await db.vault.exists());
 
