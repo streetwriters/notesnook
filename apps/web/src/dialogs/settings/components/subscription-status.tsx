@@ -37,13 +37,13 @@ export function SubscriptionStatus() {
   const user = useUserStore((store) => store.user);
   const featuresUsage = usePromise(() => getFeaturesUsage(), [user]);
 
-  const { title, autoRenew, expiryDate, trial, legacy } =
+  const { title, autoRenew, expiryDate, trialExpiryDate, trial, legacy } =
     getSubscriptionInfo(user);
   const subtitle =
     title === "Free"
       ? ""
       : trial
-      ? `Your free trial is on-going. Your subscription will start on ${expiryDate}.`
+      ? `Your free trial is on-going. Your subscription will start on ${trialExpiryDate}.`
       : autoRenew
       ? `Your subscription will auto renew on ${expiryDate}.`
       : expiryDate
