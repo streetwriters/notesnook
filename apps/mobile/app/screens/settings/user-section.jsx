@@ -130,8 +130,8 @@ const SettingsUserSection = ({ item }) => {
   const { isInternetReachable } = useNetInfo();
   const isOffline = !isInternetReachable;
   const userProfile = useUserStore((state) => state.profile);
-  const used = user.storageUsed || 0;
-  const total = user.totalStorage || 0;
+  const used = user?.storageUsed || 0;
+  const total = user?.totalStorage || 0;
 
   return (
     <>
