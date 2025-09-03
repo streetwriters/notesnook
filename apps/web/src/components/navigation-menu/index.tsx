@@ -117,6 +117,7 @@ import {
   isFeatureAvailable,
   useIsFeatureAvailable
 } from "@notesnook/common";
+import { isUserSubscribed } from "../../hooks/use-is-user-premium";
 
 type Route = {
   id: "notes" | "favorites" | "reminders" | "monographs" | "trash" | "archive";
@@ -778,19 +779,7 @@ function NavigationDropdown() {
     (store) => store.setFollowSystemTheme
   );
 
-  const { isPro } = useMemo(() => {
-    const type = user?.subscription?.type;
-    const expiry = user?.subscription?.expiry;
-    if (!expiry) return { isBasic: true, remainingDays: 0 };
-    return {
-      isTrial: type === SUBSCRIPTION_STATUS.TRIAL,
-      isBasic: type === SUBSCRIPTION_STATUS.BASIC,
-      isBeta: type === SUBSCRIPTION_STATUS.BETA,
-      isPro: type === SUBSCRIPTION_STATUS.PREMIUM,
-      isProCancelled: type === SUBSCRIPTION_STATUS.PREMIUM_CANCELED,
-      isProExpired: type === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED
-    };
-  }, [user]);
+  const isSubscribed = useMemo(() => isUserSubscribed(user), [user]);
 
   const notLoggedIn = Boolean(!user || !user.id);
 
@@ -826,7 +815,7 @@ function NavigationDropdown() {
               icon: Pro.path,
               key: "upgrade",
               onClick: () => BuyDialog.show({}),
-              isHidden: notLoggedIn || isPro
+              isHidden: notLoggedIn || isSubscribed
             },
             {
               type: "button",
