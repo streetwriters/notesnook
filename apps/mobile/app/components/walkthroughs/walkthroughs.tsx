@@ -40,6 +40,10 @@ import { SvgView } from "../ui/svg";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { DefaultAppStyles } from "../../utils/styles";
+import { useUserStore } from "../../stores/use-user-store";
+import { planToId, SubscriptionPlan } from "@notesnook/core";
+import { planToDisplayName } from "../../utils/constants";
+import AppIcon from "../ui/AppIcon";
 
 export type TStep = {
   text?: string;
@@ -356,7 +360,6 @@ const Support = () => {
         alignItems: "center"
       }}
     >
-      <SvgView src={SUPPORT_SVG()} />
       <Heading>{strings.prioritySupport()}</Heading>
       <Paragraph
         style={{
@@ -390,21 +393,6 @@ const Support = () => {
           marginBottom: DefaultAppStyles.GAP_VERTICAL,
           width: "90%"
         }}
-        onPress={() => {
-          Linking.openURL("https://t.me/notesnook").catch(() => {
-            /* empty */
-          });
-        }}
-        icon="telegram"
-        type="secondary"
-        title={strings.joinTelegram()}
-      />
-      <Button
-        style={{
-          justifyContent: "flex-start",
-          marginBottom: DefaultAppStyles.GAP_VERTICAL,
-          width: "90%"
-        }}
         icon="bug"
         type="secondary"
         title={strings.reportAnIssue()}
@@ -415,7 +403,7 @@ const Support = () => {
           marginBottom: DefaultAppStyles.GAP_VERTICAL,
           width: "90%"
         }}
-        icon="mail"
+        icon="email"
         type="secondary"
         title={strings.emailSupport()}
       />
@@ -427,18 +415,15 @@ const prouser: { id: string; steps: TStep[] } = {
   id: "prouser",
   steps: [
     {
-      title: strings.welcomeToNotesnookPro(),
+      title: strings.welcomeToPlan(
+        planToDisplayName(
+          useUserStore.getState().user?.subscription?.plan as SubscriptionPlan
+        )
+      ),
       text: strings.thankYouPrivacy(),
       walkthroughItem: (colors) => (
-        <SvgView src={LAUNCH_ROCKET(colors.primary.paragraph)} />
+        <AppIcon name="check" color={colors.primary.accent} size={50} />
       ),
-      button: {
-        type: "next",
-        title: strings.next()
-      }
-    },
-    {
-      walkthroughItem: () => <Support />,
       button: {
         type: "done",
         title: strings.continue()

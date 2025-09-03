@@ -2361,6 +2361,10 @@ msgstr ""
 msgid "Editor"
 msgstr ""
 
+#: src/strings.ts:2573
+msgid "Education plan"
+msgstr ""
+
 #: src/strings.ts:1480
 msgid "Email"
 msgstr ""
@@ -7004,6 +7008,10 @@ msgstr ""
 
 #: src/strings.ts:1887
 msgid "Welcome back!"
+msgstr ""
+
+#: src/strings.ts:2574
+msgid "Welcome to Notesnook {plan} plan"
 msgstr ""
 
 #: src/strings.ts:2072

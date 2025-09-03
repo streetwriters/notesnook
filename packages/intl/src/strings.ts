@@ -2577,5 +2577,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   bestValue: () => t`Best value`,
   planLimits: () => t`Plan limits`,
   unlimited: () => t`Unlimited`,
-  fiveYearPlan: () => t`5 year plan (One time purchase)`
+  fiveYearPlan: () => t`5 year plan (One time purchase)`,
+  educationPlan: () => t`Education plan`,
+  welcomeToPlan: (plan: string) => t`Welcome to Notesnook ${plan}`
 };

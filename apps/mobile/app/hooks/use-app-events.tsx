@@ -22,6 +22,8 @@ import {
   EVENTS,
   EventManagerSubscription,
   SYNC_CHECK_IDS,
+  SubscriptionPlan,
+  SubscriptionType,
   SyncStatusEvent,
   User
 } from "@notesnook/core";
@@ -224,7 +226,11 @@ const onUserEmailVerified = async () => {
 const onUserSubscriptionStatusChanged = async (
   subscription: User["subscription"]
 ) => {
-  if (!PremiumService.get() && subscription.type === 5) {
+  if (
+    !PremiumService.get() &&
+    (subscription.type === SubscriptionType.PREMIUM ||
+      subscription.plan != SubscriptionPlan.FREE)
+  ) {
     PremiumService.subscriptions.clear();
     Walkthrough.present("prouser", false, true);
   }
