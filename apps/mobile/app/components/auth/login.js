@@ -20,7 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useState } from "react";
-import { TouchableOpacity, View, useWindowDimensions } from "react-native";
+import {
+  ScrollView,
+  TouchableOpacity,
+  View,
+  useWindowDimensions
+} from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
 import { DDS } from "../../services/device-detection";
 import { eSendEvent } from "../../services/event-manager";
@@ -43,6 +48,7 @@ import { ForgotPassword } from "./forgot-password";
 import { AuthHeader } from "./header";
 import { useLogin } from "./use-login";
 import { useRoute } from "@react-navigation/native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const LoginSteps = {
   emailAuth: 1,
@@ -105,213 +111,225 @@ export const Login = ({ changeMode }) => {
       <AuthHeader />
       <ForgotPassword />
       <Dialog context="two_factor_verify" />
-      <View
+      <KeyboardAwareScrollView
         style={{
-          borderRadius: DDS.isTab ? 5 : 0,
-          backgroundColor: colors.primary.background,
-          zIndex: 10,
-          width: "100%",
-          height: "100%",
-          alignSelf: "center"
+          width: "100%"
         }}
+        contentContainerStyle={{
+          minHeight: "90%"
+        }}
+        nestedScrollEnabled
+        enableAutomaticScroll={false}
+        keyboardShouldPersistTaps="handled"
       >
         <View
           style={{
-            justifyContent: "flex-end",
-            paddingHorizontal: DefaultAppStyles.GAP,
-            borderBottomWidth: 0.8,
-            marginBottom: DefaultAppStyles.GAP_VERTICAL,
-            borderBottomColor: colors.primary.border,
-            alignSelf: isTablet ? "center" : undefined,
-            borderWidth: isTablet ? 1 : null,
-            borderColor: isTablet ? colors.primary.border : null,
-            borderRadius: isTablet ? 20 : null,
-            marginTop: isTablet ? 50 : null,
-            width: !isTablet ? null : "70%",
-            minHeight: height * 0.4
+            borderRadius: DDS.isTab ? 5 : 0,
+            backgroundColor: colors.primary.background,
+            zIndex: 10,
+            width: "100%",
+            height: "100%",
+            alignSelf: "center"
           }}
         >
           <View
             style={{
-              flexDirection: "row"
+              justifyContent: "flex-end",
+              paddingHorizontal: DefaultAppStyles.GAP,
+              borderBottomWidth: 0.8,
+              marginBottom: DefaultAppStyles.GAP_VERTICAL,
+              borderBottomColor: colors.primary.border,
+              alignSelf: isTablet ? "center" : undefined,
+              borderWidth: isTablet ? 1 : null,
+              borderColor: isTablet ? colors.primary.border : null,
+              borderRadius: isTablet ? 20 : null,
+              marginTop: isTablet ? 50 : null,
+              width: !isTablet ? null : "70%",
+              minHeight: height * 0.4
             }}
           >
             <View
               style={{
-                width: 100,
-                height: 5,
-                backgroundColor: colors.primary.accent,
-                borderRadius: 2,
-                marginRight: 7
+                flexDirection: "row"
               }}
-            />
-
-            <View
-              style={{
-                width: 20,
-                height: 5,
-                backgroundColor: colors.secondary.background,
-                borderRadius: 2
-              }}
-            />
-          </View>
-          <Heading
-            style={{
-              marginBottom: 25,
-              marginTop: DefaultAppStyles.GAP_VERTICAL
-            }}
-            extraBold
-            size={AppFontSize.xxl}
-          >
-            {strings.loginToYourAccount()}
-          </Heading>
-        </View>
-
-        <View
-          style={{
-            width: DDS.isTab
-              ? focused
-                ? "50%"
-                : "49.99%"
-              : focused
-              ? "100%"
-              : "99.9%",
-            backgroundColor: colors.primary.background,
-            alignSelf: "center",
-            paddingHorizontal: DefaultAppStyles.GAP,
-            gap: DefaultAppStyles.GAP_VERTICAL
-          }}
-        >
-          <Input
-            fwdRef={emailInputRef}
-            onChangeText={(value) => {
-              email.current = value;
-            }}
-            testID="input.email"
-            onErrorCheck={(e) => setError(e)}
-            returnKeyLabel="Next"
-            returnKeyType="next"
-            autoComplete="email"
-            validationType="email"
-            marginBottom={0}
-            autoCorrect={false}
-            autoCapitalize="none"
-            errorMessage={strings.emailInvalid()}
-            placeholder={strings.email()}
-            defaultValue={email.current}
-            editable={step === LoginSteps.emailAuth && !loading}
-            onSubmit={() => {
-              if (step === LoginSteps.emailAuth) {
-                login();
-              } else {
-                passwordInputRef.current?.focus();
-              }
-            }}
-          />
-
-          {step === LoginSteps.passwordAuth && (
-            <>
-              <Input
-                fwdRef={passwordInputRef}
-                onChangeText={(value) => {
-                  password.current = value;
-                }}
-                testID="input.password"
-                returnKeyLabel={strings.done()}
-                returnKeyType="done"
-                secureTextEntry
-                autoComplete="password"
-                autoCapitalize="none"
-                autoCorrect={false}
-                placeholder={strings.password()}
-                marginBottom={0}
-                editable={!loading}
-                defaultValue={password.current}
-                onSubmit={() => login()}
-              />
-              <Button
-                title={strings.forgotPassword()}
+            >
+              <View
                 style={{
-                  alignSelf: "flex-end",
-                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
-                  paddingHorizontal: 0
+                  width: 100,
+                  height: 5,
+                  backgroundColor: colors.primary.accent,
+                  borderRadius: 2,
+                  marginRight: 7
                 }}
-                onPress={() => {
-                  if (loading) return;
-                  SheetManager.show("forgotpassword_sheet", email.current);
-                }}
-                textStyle={{
-                  textDecorationLine: "underline"
-                }}
-                fontSize={AppFontSize.xs}
-                type="plain"
               />
-            </>
-          )}
 
-          <View>
-            <Button
-              loading={loading}
-              onPress={() => {
-                if (loading) return;
-                login();
-              }}
+              <View
+                style={{
+                  width: 20,
+                  height: 5,
+                  backgroundColor: colors.secondary.background,
+                  borderRadius: 2
+                }}
+              />
+            </View>
+            <Heading
               style={{
-                width: "100%"
+                marginBottom: 25,
+                marginTop: DefaultAppStyles.GAP_VERTICAL
               }}
-              type="accent"
-              title={!loading ? strings.continue() : null}
-              fontSize={AppFontSize.md}
+              extraBold
+              size={AppFontSize.xxl}
+            >
+              {strings.loginToYourAccount()}
+            </Heading>
+          </View>
+
+          <View
+            style={{
+              width: DDS.isTab
+                ? focused
+                  ? "50%"
+                  : "49.99%"
+                : focused
+                ? "100%"
+                : "99.9%",
+              backgroundColor: colors.primary.background,
+              alignSelf: "center",
+              paddingHorizontal: DefaultAppStyles.GAP,
+              gap: DefaultAppStyles.GAP_VERTICAL
+            }}
+          >
+            <Input
+              fwdRef={emailInputRef}
+              onChangeText={(value) => {
+                email.current = value;
+              }}
+              testID="input.email"
+              onErrorCheck={(e) => setError(e)}
+              returnKeyLabel="Next"
+              returnKeyType="next"
+              autoComplete="email"
+              validationType="email"
+              marginBottom={0}
+              autoCorrect={false}
+              autoCapitalize="none"
+              errorMessage={strings.emailInvalid()}
+              placeholder={strings.email()}
+              defaultValue={email.current}
+              editable={step === LoginSteps.emailAuth && !loading}
+              onSubmit={() => {
+                if (step === LoginSteps.emailAuth) {
+                  login();
+                } else {
+                  passwordInputRef.current?.focus();
+                }
+              }}
             />
 
             {step === LoginSteps.passwordAuth && (
-              <Button
-                title={strings.cancelLogin()}
-                style={{
-                  alignSelf: "center",
-                  marginTop: DefaultAppStyles.GAP_VERTICAL,
-                  width: "100%"
-                }}
-                onPress={() => {
-                  if (loading) return;
-                  setStep(LoginSteps.emailAuth);
-                  setLoading(false);
-                }}
-                fontSize={AppFontSize.md}
-                type="secondaryAccented"
-              />
+              <>
+                <Input
+                  fwdRef={passwordInputRef}
+                  onChangeText={(value) => {
+                    password.current = value;
+                  }}
+                  testID="input.password"
+                  returnKeyLabel={strings.done()}
+                  returnKeyType="done"
+                  secureTextEntry
+                  autoComplete="password"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  placeholder={strings.password()}
+                  marginBottom={0}
+                  editable={!loading}
+                  defaultValue={password.current}
+                  onSubmit={() => login()}
+                />
+                <Button
+                  title={strings.forgotPassword()}
+                  style={{
+                    alignSelf: "flex-end",
+                    paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
+                    paddingHorizontal: 0
+                  }}
+                  onPress={() => {
+                    if (loading) return;
+                    SheetManager.show("forgotpassword_sheet", email.current);
+                  }}
+                  textStyle={{
+                    textDecorationLine: "underline"
+                  }}
+                  fontSize={AppFontSize.xs}
+                  type="plain"
+                />
+              </>
             )}
 
-            {!loading ? (
-              <TouchableOpacity
+            <View>
+              <Button
+                loading={loading}
                 onPress={() => {
                   if (loading) return;
-                  changeMode(1);
+                  login();
                 }}
-                activeOpacity={0.8}
                 style={{
-                  alignSelf: "center",
-                  marginTop: DefaultAppStyles.GAP_VERTICAL,
-                  paddingVertical: DefaultAppStyles.GAP_VERTICAL
+                  width: "100%"
                 }}
-              >
-                <Paragraph
-                  size={AppFontSize.xs}
-                  color={colors.secondary.paragraph}
+                type="accent"
+                title={!loading ? strings.continue() : null}
+                fontSize={AppFontSize.md}
+              />
+
+              {step === LoginSteps.passwordAuth && (
+                <Button
+                  title={strings.cancelLogin()}
+                  style={{
+                    alignSelf: "center",
+                    marginTop: DefaultAppStyles.GAP_VERTICAL,
+                    width: "100%"
+                  }}
+                  onPress={() => {
+                    if (loading) return;
+                    setStep(LoginSteps.emailAuth);
+                    setLoading(false);
+                  }}
+                  fontSize={AppFontSize.md}
+                  type="secondaryAccented"
+                />
+              )}
+
+              {!loading ? (
+                <TouchableOpacity
+                  onPress={() => {
+                    if (loading) return;
+                    changeMode(1);
+                  }}
+                  activeOpacity={0.8}
+                  style={{
+                    alignSelf: "center",
+                    marginTop: DefaultAppStyles.GAP_VERTICAL,
+                    paddingVertical: DefaultAppStyles.GAP_VERTICAL
+                  }}
                 >
-                  {strings.dontHaveAccount()}{" "}
                   <Paragraph
                     size={AppFontSize.xs}
-                    style={{ color: colors.primary.accent }}
+                    color={colors.secondary.paragraph}
                   >
-                    {strings.signUp()}
+                    {strings.dontHaveAccount()}{" "}
+                    <Paragraph
+                      size={AppFontSize.xs}
+                      style={{ color: colors.primary.accent }}
+                    >
+                      {strings.signUp()}
+                    </Paragraph>
                   </Paragraph>
-                </Paragraph>
-              </TouchableOpacity>
-            ) : null}
+                </TouchableOpacity>
+              ) : null}
+            </View>
           </View>
         </View>
-      </View>
+      </KeyboardAwareScrollView>
     </>
   );
 };

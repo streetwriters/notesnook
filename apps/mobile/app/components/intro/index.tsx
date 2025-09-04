@@ -31,6 +31,7 @@ import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import SettingsService from "../../services/settings";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Intro = () => {
   const { colors } = useThemeColors();
@@ -115,7 +116,7 @@ const Intro = () => {
   );
 
   return (
-    <View
+    <SafeAreaView
       style={{
         flex: 1,
         height: "100%",
@@ -211,7 +212,7 @@ const Intro = () => {
           }}
         />
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
