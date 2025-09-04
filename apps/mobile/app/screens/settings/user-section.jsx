@@ -18,6 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { formatBytes } from "@notesnook/common";
+import {
+  SubscriptionPlan,
+  SubscriptionStatus,
+  SubscriptionType
+} from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import { useNetInfo } from "@react-native-community/netinfo";
@@ -37,11 +42,11 @@ import { presentSheet } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SyncStatus, useUserStore } from "../../stores/use-user-store";
+import { planToDisplayName } from "../../utils/constants";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { SectionItem } from "./section-item";
-import { planToDisplayName } from "../../utils/constants";
-import { SubscriptionType } from "@notesnook/core";
+import { Notice } from "../../components/ui/notice";
 
 export const getTimeLeft = (t2) => {
   let daysRemaining = dayjs(t2).diff(dayjs(), "days");
@@ -120,8 +125,6 @@ const onChangePicture = () => {
     });
 };
 
-const LONG_MAX = 9223372036854776000;
-
 const SettingsUserSection = ({ item }) => {
   const { colors } = useThemeColors();
   const [user] = useUserStore((state) => [state.user]);
@@ -132,6 +135,48 @@ const SettingsUserSection = ({ item }) => {
   const userProfile = useUserStore((state) => state.profile);
   const used = user?.storageUsed || 0;
   const total = user?.totalStorage || 0;
+
+  const getSubscriptionStatus = () => {
+    if (!user) return strings.neverHesitate();
+    const subscriptionDaysLeft = user && getTimeLeft(user.subscription?.expiry);
+    const expiryDate = dayjs(user?.subscription?.expiry).format(
+      "dddd, MMMM D, YYYY h:mm A"
+    );
+    const startDate = dayjs(user?.subscription?.start).format(
+      "dddd, MMMM D, YYYY h:mm A"
+    );
+
+    if (user.subscription.plan !== SubscriptionPlan.FREE) {
+      const status = user.subscription.status;
+      return status === SubscriptionStatus.TRIAL
+        ? strings.trialEndsOn(
+            dayjs(user?.subscription?.start)
+              .add(user?.subscription?.productId.includes("monthly") ? 7 : 14)
+              .format("dddd, MMMM D, YYYY h:mm A")
+          )
+        : status === SubscriptionStatus.ACTIVE
+        ? strings.subRenewOn(expiryDate)
+        : status === SubscriptionStatus.CANCELED
+        ? strings.subEndsOn(expiryDate)
+        : status === SubscriptionStatus.EXPIRED
+        ? subscriptionDaysLeft.time < -3
+          ? strings.subEnded()
+          : strings.accountDowngradedIn(3)
+        : strings.neverHesitate();
+    }
+
+    return user.subscription?.type === SubscriptionType.TRIAL
+      ? strings.trialEndsOn(expiryDate)
+      : user.subscription?.type === SubscriptionType.PREMIUM_EXPIRED
+      ? subscriptionDaysLeft.time < -3
+        ? strings.subEnded()
+        : strings.accountDowngradedIn(3)
+      : user.subscription?.type === SubscriptionType.PREMIUM_CANCELED
+      ? strings.subEndsOn(expiryDate)
+      : user.subscription?.type === SubscriptionType.PREMIUM
+      ? strings.subRenewOn(expiryDate)
+      : strings.neverHesitate();
+  };
 
   return (
     <>
@@ -281,7 +326,7 @@ const SettingsUserSection = ({ item }) => {
                   </Paragraph>
                   <Paragraph size={AppFontSize.xxs}>
                     {formatBytes(used)}/
-                    {total === LONG_MAX
+                    {total === -1
                       ? "Unlimited"
                       : formatBytes(total) + " " + strings.used()}
                   </Paragraph>
@@ -356,6 +401,15 @@ const SettingsUserSection = ({ item }) => {
                 />
               </View>
             </View>
+
+            {user.subscription.plan === SubscriptionPlan.FREE ||
+            user.subscription.type === SubscriptionType.BASIC ? null : (
+              <Notice
+                size="small"
+                text={getSubscriptionStatus()}
+                type="information"
+              />
+            )}
           </View>
 
           {item.sections.map((item) => (
