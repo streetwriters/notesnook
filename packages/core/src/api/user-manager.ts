@@ -24,7 +24,7 @@ import TokenManager from "./token-manager.js";
 import { EV, EVENTS } from "../common.js";
 import { HealthCheck } from "./healthcheck.js";
 import Database from "./index.js";
-import { SerializedKey } from "@notesnook/crypto";
+import { SerializedKeyPair, SerializedKey, Cipher } from "@notesnook/crypto";
 import { logger } from "../logger.js";
 
 const ENDPOINTS = {
@@ -44,6 +44,7 @@ class UserManager {
   private tokenManager: TokenManager;
   private cachedAttachmentKey?: SerializedKey;
   private cachedMonographPasswordsKey?: SerializedKey;
+  private cachedInboxKeys?: SerializedKeyPair;
   constructor(private readonly db: Database) {
     this.tokenManager = new TokenManager(this.db.kv);
 
@@ -278,6 +279,7 @@ class UserManager {
       logger.error(e, "Error logging out user.", { revoke, reason });
     } finally {
       this.cachedAttachmentKey = undefined;
+      this.cachedInboxKeys = undefined;
       await this.db.reset();
       EV.publish(EVENTS.userLoggedOut, reason);
       EV.publish(EVENTS.appRefreshRequested);
@@ -420,13 +422,26 @@ class UserManager {
     return { key, salt: user.salt };
   }
 
-  async getAttachmentsKey() {
-    if (this.cachedAttachmentKey) return this.cachedAttachmentKey;
+  private async getUserKey<T>(config: {
+    getCache: () => T | undefined;
+    setCache: (key: T) => void;
+    userProperty: keyof User;
+    generateKey: () => Promise<T>;
+    errorContext: string;
+    decrypt: (user: User, userEncryptionKey: SerializedKey) => Promise<T>;
+    encrypt: (
+      key: T,
+      userEncryptionKey: SerializedKey
+    ) => Promise<Partial<User>>;
+  }): Promise<T | undefined> {
+    const cachedKey = config.getCache();
+    if (cachedKey) return cachedKey;
+
     try {
       let user = await this.getUser();
       if (!user) return;
 
-      if (!user.attachmentsKey) {
+      if (!user[config.userProperty]) {
         const token = await this.tokenManager.getAccessToken();
         user = await http.get(`${constants.API_HOST}${ENDPOINTS.user}`, token);
       }
@@ -435,74 +450,134 @@ class UserManager {
       const userEncryptionKey = await this.getEncryptionKey();
       if (!userEncryptionKey) return;
 
-      if (!user.attachmentsKey) {
-        const key = await this.db.crypto().generateRandomKey();
-        user.attachmentsKey = await this.db
-          .storage()
-          .encrypt(userEncryptionKey, JSON.stringify(key));
-
-        await this.updateUser({ attachmentsKey: user.attachmentsKey });
+      if (!user[config.userProperty]) {
+        const key = await config.generateKey();
+        const updatePayload = await config.encrypt(key, userEncryptionKey);
+        await this.updateUser(updatePayload);
         return key;
       }
 
-      const plainData = await this.db
-        .storage()
-        .decrypt(userEncryptionKey, user.attachmentsKey);
-      if (!plainData) return;
-      this.cachedAttachmentKey = JSON.parse(plainData) as SerializedKey;
-      return this.cachedAttachmentKey;
+      const decryptedKey = await config.decrypt(user, userEncryptionKey);
+      config.setCache(decryptedKey);
+      return decryptedKey;
     } catch (e) {
-      logger.error(e, "Could not get attachments encryption key.");
+      logger.error(e, `Could not get ${config.errorContext}.`);
       if (e instanceof Error)
         throw new Error(
-          `Could not get attachments encryption key. Error: ${e.message}`
+          `Could not get ${config.errorContext}. Error: ${e.message}`
         );
     }
   }
 
-  async getMonographPasswordsKey() {
-    if (this.cachedMonographPasswordsKey) {
-      return this.cachedMonographPasswordsKey;
-    }
-
-    try {
-      let user = await this.getUser();
-      if (!user) return;
-
-      if (!user.monographPasswordsKey) {
-        const token = await this.tokenManager.getAccessToken();
-        user = await http.get(`${constants.API_HOST}${ENDPOINTS.user}`, token);
-      }
-      if (!user) return;
-
-      const userEncryptionKey = await this.getEncryptionKey();
-      if (!userEncryptionKey) return;
-
-      if (!user.monographPasswordsKey) {
-        const key = await this.db.crypto().generateRandomKey();
-        user.monographPasswordsKey = await this.db
+  async getAttachmentsKey() {
+    return this.getUserKey<SerializedKey>({
+      getCache: () => this.cachedAttachmentKey,
+      setCache: (key) => {
+        this.cachedAttachmentKey = key;
+      },
+      userProperty: "attachmentsKey",
+      generateKey: () => this.db.crypto().generateRandomKey(),
+      errorContext: "attachments encryption key",
+      encrypt: async (key, userEncryptionKey) => {
+        const encryptedKey = await this.db
           .storage()
           .encrypt(userEncryptionKey, JSON.stringify(key));
-
-        await this.updateUser({
-          monographPasswordsKey: user.monographPasswordsKey
-        });
-        return key;
+        return { attachmentsKey: encryptedKey };
+      },
+      decrypt: async (user, userEncryptionKey) => {
+        const encryptedKey = user.attachmentsKey as Cipher<"base64">;
+        const plainData = await this.db
+          .storage()
+          .decrypt(userEncryptionKey, encryptedKey);
+        if (!plainData) throw new Error("Failed to decrypt attachments key");
+        return JSON.parse(plainData) as SerializedKey;
       }
+    });
+  }
 
-      const plainData = await this.db
-        .storage()
-        .decrypt(userEncryptionKey, user.monographPasswordsKey);
-      if (!plainData) return;
-      this.cachedMonographPasswordsKey = JSON.parse(plainData) as SerializedKey;
-      return this.cachedMonographPasswordsKey;
-    } catch (e) {
-      logger.error(e, "Could not get monographs encryption key.");
-      if (e instanceof Error)
-        throw new Error(
-          `Could not get monographs encryption key. Error: ${e.message}`
-        );
-    }
+  async getMonographPasswordsKey() {
+    return this.getUserKey<SerializedKey>({
+      getCache: () => this.cachedMonographPasswordsKey,
+      setCache: (key) => {
+        this.cachedMonographPasswordsKey = key;
+      },
+      userProperty: "monographPasswordsKey",
+      generateKey: () => this.db.crypto().generateRandomKey(),
+      errorContext: "monographs encryption key",
+      encrypt: async (key, userEncryptionKey) => {
+        const encryptedKey = await this.db
+          .storage()
+          .encrypt(userEncryptionKey, JSON.stringify(key));
+        return { monographPasswordsKey: encryptedKey };
+      },
+      decrypt: async (user, userEncryptionKey) => {
+        const encryptedKey = user.monographPasswordsKey as Cipher<"base64">;
+        const plainData = await this.db
+          .storage()
+          .decrypt(userEncryptionKey, encryptedKey);
+        if (!plainData)
+          throw new Error("Failed to decrypt monograph passwords key");
+        return JSON.parse(plainData) as SerializedKey;
+      }
+    });
+  }
+
+  async getInboxKeys() {
+    return this.getUserKey<SerializedKeyPair>({
+      getCache: () => this.cachedInboxKeys,
+      setCache: (key) => {
+        this.cachedInboxKeys = key;
+      },
+      userProperty: "inboxKeys",
+      generateKey: () => this.db.crypto().generateCryptoKeyPair(),
+      errorContext: "inbox encryption keys",
+      encrypt: async (keys, userEncryptionKey) => {
+        const encryptedPrivateKey = await this.db
+          .storage()
+          .encrypt(userEncryptionKey, JSON.stringify(keys.privateKey));
+        return {
+          inboxKeys: {
+            public: keys.publicKey,
+            private: encryptedPrivateKey
+          }
+        };
+      },
+      decrypt: async (user, userEncryptionKey) => {
+        if (!user.inboxKeys) throw new Error("Inbox keys not found");
+        const decryptedPrivateKey = await this.db
+          .storage()
+          .decrypt(userEncryptionKey, user.inboxKeys.private);
+        return {
+          publicKey: user.inboxKeys.public,
+          privateKey: JSON.parse(decryptedPrivateKey)
+        };
+      }
+    });
+  }
+
+  async hasInboxKeys() {
+    if (this.cachedInboxKeys) return true;
+
+    let user = await this.getUser();
+    if (!user) return false;
+
+    return !!user.inboxKeys;
+  }
+
+  async discardInboxKeys() {
+    this.cachedInboxKeys = undefined;
+
+    const user = await this.getUser();
+    if (!user) return;
+
+    const token = await this.tokenManager.getAccessToken();
+    await http.patch.json(
+      `${constants.API_HOST}${ENDPOINTS.user}`,
+      { inboxKeys: { public: null, private: null } },
+      token
+    );
+
+    await this.setUser({ ...user, inboxKeys: undefined });
   }
 
   async sendVerificationEmail(newEmail?: string) {
@@ -615,6 +690,16 @@ class UserManager {
           .storage()
           .encrypt(userEncryptionKey, JSON.stringify(monographPasswordsKey));
         updateUserPayload.monographPasswordsKey = user.monographPasswordsKey;
+      }
+      const inboxKeys = await this.getInboxKeys();
+      if (inboxKeys) {
+        user.inboxKeys = {
+          public: inboxKeys.publicKey,
+          private: await this.db
+            .storage()
+            .encrypt(userEncryptionKey, JSON.stringify(inboxKeys.privateKey))
+        };
+        updateUserPayload.inboxKeys = user.inboxKeys;
       }
       if (Object.keys(updateUserPayload).length > 0) {
         await this.updateUser(updateUserPayload);

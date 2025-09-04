@@ -29,7 +29,9 @@ import {
   Input,
   Output,
   DataFormat,
-  SerializedKey
+  SerializedKey,
+  SerializedKeyPair,
+  EncryptionKeyPair
 } from "./types.js";
 
 export class NNCrypto implements INNCrypto {
@@ -104,9 +106,19 @@ export class NNCrypto implements INNCrypto {
     return KeyUtils.deriveKey(this.sodium, password, salt);
   }
 
+  async deriveKeyPair(): Promise<EncryptionKeyPair> {
+    await this.init();
+    return KeyUtils.deriveKeyPair(this.sodium);
+  }
+
   async exportKey(password: string, salt?: string): Promise<SerializedKey> {
     await this.init();
     return KeyUtils.exportKey(this.sodium, password, salt);
+  }
+
+  async exportKeyPair(): Promise<SerializedKeyPair> {
+    await this.init();
+    return KeyUtils.exportKeyPair(this.sodium);
   }
 
   async createEncryptionStream(key: SerializedKey) {

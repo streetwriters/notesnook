@@ -557,6 +557,7 @@ export type User = {
   salt: string;
   attachmentsKey?: Cipher<"base64">;
   monographPasswordsKey?: Cipher<"base64">;
+  inboxKeys?: { public: string; private: Cipher<"base64"> };
   marketingConsent?: boolean;
   mfa: {
     isEnabled: boolean;

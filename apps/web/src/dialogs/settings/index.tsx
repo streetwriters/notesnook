@@ -38,7 +38,8 @@ import {
   Pro,
   Servers,
   ShieldLock,
-  Sync
+  Sync,
+  Inbox
 } from "../../components/icons";
 import NavigationItem from "../../components/navigation-menu/navigation-item";
 import { FlexScrollContainer } from "../../components/scroll-container";
@@ -78,6 +79,7 @@ import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import { ServersSettings } from "./servers-settings";
 import { strings } from "@notesnook/intl";
 import { mdToHtml } from "../../utils/md";
+import { InboxSettings } from "./inbox-settings";
 
 type SettingsDialogProps = BaseDialogProps<false> & {
   activeSection?: SectionKeys;
@@ -106,6 +108,12 @@ const sectionGroups: SectionGroup[] = [
         title: strings.sync(),
         icon: Sync,
         isHidden: () => !useUserStore.getState().isLoggedIn
+      },
+      {
+        key: "inbox",
+        title: "Inbox",
+        icon: Inbox,
+        isHidden: () => true // hidden until complete
       }
     ]
   },
@@ -176,7 +184,8 @@ const SettingsGroups = [
   ...SupportSettings,
   ...AboutSettings,
   ...SubscriptionSettings,
-  ...ServersSettings
+  ...ServersSettings,
+  ...InboxSettings
 ];
 
 // Thoughts:
