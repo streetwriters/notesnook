@@ -128,6 +128,10 @@ export class NNStorage implements IStorage {
     return await NNCrypto.exportKey(password, salt);
   }
 
+  async generateCryptoKeyPair() {
+    return await NNCrypto.exportKeyPair();
+  }
+
   async hash(password: string, email: string): Promise<string> {
     return await NNCrypto.hash(password, `${APP_SALT}${email}`);
   }

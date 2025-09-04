@@ -49,3 +49,13 @@ export type Chunk = {
   data: Uint8Array;
   final: boolean;
 };
+
+export type EncryptionKeyPair = {
+  publicKey: Uint8Array;
+  privateKey: Uint8Array;
+};
+
+export type SerializedKeyPair = {
+  publicKey: string;
+  privateKey: string;
+};

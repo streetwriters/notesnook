@@ -70,6 +70,7 @@ class AppStore extends BaseStore<AppStore> {
   isVaultCreated = false;
   isAutoSyncEnabled = Config.get("autoSyncEnabled", true);
   isSyncEnabled = Config.get("syncEnabled", true);
+  isInboxEnabled = Config.get("inboxEnabled", false);
   isRealtimeSyncEnabled = Config.get("isRealtimeSyncEnabled", true);
   syncStatus: SyncStatus = {
     key: navigator.onLine ? "disabled" : "offline",
@@ -217,6 +218,26 @@ class AppStore extends BaseStore<AppStore> {
 
     if (isSyncEnabled) {
       this.abortSync("disabled");
+    }
+  };
+
+  toggleInbox = async () => {
+    const { isInboxEnabled } = this.get();
+    const newState = !isInboxEnabled;
+
+    try {
+      if (newState) {
+        await db.user.getInboxKeys();
+      } else {
+        await db.user.discardInboxKeys();
+      }
+
+      Config.set("inboxEnabled", newState);
+      this.set((state) => (state.isInboxEnabled = newState));
+    } catch (e) {
+      if (e instanceof Error) {
+        showToast("error", e.message);
+      }
     }
   };
 
