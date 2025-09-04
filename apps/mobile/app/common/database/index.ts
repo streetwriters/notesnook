@@ -26,7 +26,6 @@ import {
 } from "@streetwriters/kysely";
 import { Platform } from "react-native";
 import * as Gzip from "react-native-gzip";
-import SettingsService from "../../services/settings";
 import EventSource from "../../utils/sse/even-source-ios";
 import AndroidEventSource from "../../utils/sse/event-source";
 import { FileStorage } from "../filesystem";
@@ -39,15 +38,28 @@ export async function setupDatabase(password?: string) {
   const key = await getDatabaseKey(password);
   if (!key) throw new Error(strings.databaseSetupFailed());
 
+  const base = `http://192.168.100.79`;
+
   database.host({
-    API_HOST: "https://api.notesnook.com",
-    AUTH_HOST: "https://auth.streetwriters.co",
-    SSE_HOST: "https://events.streetwriters.co",
-    SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co",
-    ISSUES_HOST: "https://issues.streetwriters.co",
-    MONOGRAPH_HOST: "https://monogr.ph",
-    ...(SettingsService.getProperty("serverUrls") || {})
+    API_HOST: `${base}:5264`,
+    AUTH_HOST: `${base}:8264`,
+    SSE_HOST: `${base}:7264`,
+    ISSUES_HOST: `${base}:2624`,
+    SUBSCRIPTIONS_HOST: `${base}:9264`,
+    MONOGRAPH_HOST: `${base}:6264`,
+    NOTESNOOK_HOST: `${base}:8788`
   });
+
+  // database.host( {
+  //   API_HOST: "https://api.notesnook.com",
+  //   AUTH_HOST: "https://auth.streetwriters.co",
+  //   SSE_HOST: "https://events.streetwriters.co",
+  //   SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co",
+  //   ISSUES_HOST: "https://issues.streetwriters.co",
+  //   MONOGRAPH_HOST: "https://monogr.ph",
+  //   NOTESNOOK_HOST: "https://notesnook.com",
+  //   ...(SettingsService.getProperty("serverUrls") || {})
+  // });
 
   database.setup({
     storage: Storage,

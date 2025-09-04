@@ -19,20 +19,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useThemeColors } from "@notesnook/theme";
 import { useRoute } from "@react-navigation/native";
 import React from "react";
-import { Platform, View } from "react-native";
-import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
+import { View } from "react-native";
 import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
 import { hideAuth } from "./common";
 export const AuthHeader = (props: { welcome?: boolean }) => {
   const { colors } = useThemeColors();
-  const insets = useGlobalSafeAreaInsets();
   const route = useRoute();
 
   return (
     <View
       style={{
-        paddingTop: Platform.OS === "android" ? 0 : insets.top,
         width: "100%"
       }}
     >

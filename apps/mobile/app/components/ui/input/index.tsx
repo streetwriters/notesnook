@@ -237,8 +237,8 @@ const Input = ({
       onPress && loading ? colors.primary.accent : colors.primary.paragraph,
     flexGrow: 1,
     flexShrink: 1,
-    paddingBottom: DefaultAppStyles.GAP_VERTICAL - 2,
-    paddingTop: DefaultAppStyles.GAP_VERTICAL - 2,
+    paddingBottom: DefaultAppStyles.GAP_VERTICAL,
+    paddingTop: DefaultAppStyles.GAP_VERTICAL,
     fontFamily: "OpenSans-Regular",
     ...(inputStyle as ViewStyle)
   };
