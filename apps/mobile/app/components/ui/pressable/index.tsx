@@ -54,6 +54,7 @@ type ButtonTypes =
   | "accent"
   | "shade"
   | "secondary"
+  | "selectedAccent"
   | "secondaryAccented"
   | "inverted"
   | "white"
@@ -122,6 +123,18 @@ const buttonTypes = (
     borderColor: getColorLinearShade(colors.selected.background, 0.05, isDark),
     borderSelectedColor: getColorLinearShade(
       colors.selected.background,
+      0.05,
+      isDark
+    )
+  },
+  selectedAccent: {
+    primary: colors.selected.accent,
+    text: colors.selected.accentForeground,
+    selected: colors.selected.accent,
+    borderWidth: 0.8,
+    borderColor: getColorLinearShade(colors.selected.accent, 0.05, isDark),
+    borderSelectedColor: getColorLinearShade(
+      colors.selected.accent,
       0.05,
       isDark
     )
