@@ -261,8 +261,9 @@ export const RootNavigation = () => {
       if (useSelectionStore.getState().selectionMode) {
         clearSelection();
       }
-      console.log(state);
-      Navigation.resetRootState(state);
+      setTimeout(() => {
+        Navigation.resetRootState(state);
+      }, 1000);
       hideAllTooltips();
     },
     [clearSelection]

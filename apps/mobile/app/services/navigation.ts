@@ -176,13 +176,11 @@ function resetRootState(
 
   const routes = state.routes.filter(
     (route) =>
-      route.name !== "Auth" &&
-      route.name !== "Welcome" &&
-      route.key != focusedRoute.key
+      (route.name !== "Auth" && route.name !== "Welcome") ||
+      route.key === focusedRoute.key
   );
 
   if (routes.length === state.routes.length) return;
-  console.log("ROOT STATE RESET");
   if (routes.length === 0) {
     routes.push(focusedRoute);
   }
