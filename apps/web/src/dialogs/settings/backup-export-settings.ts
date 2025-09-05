@@ -27,6 +27,8 @@ import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { desktop } from "../../common/desktop-bridge";
 import { PATHS } from "@notesnook/desktop";
+import { exportSettings, importSettingsFile } from "./settings-import-export";
+import { showToast } from "../../utils/toast";
 
 const getDesktopBackupsDirectoryPath = () =>
   useSettingStore.getState().backupStorageLocation || PATHS.backupsDirectory;
@@ -230,6 +232,45 @@ export const BackupExportSettings: SettingsGroup[] = [
                   db.notes.all
                 );
             }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    key: "settings-import-export",
+    section: "backup-export",
+    header: strings.settings(),
+    settings: [
+      {
+        key: "export-settings",
+        title: strings.exportSettings(),
+        description: strings.exportSettingsDesc(),
+        keywords: ["export settings", "backup settings", "download settings"],
+        components: [
+          {
+            type: "button",
+            title: strings.export(),
+            action: async () => {
+              await exportSettings();
+            },
+            variant: "secondary"
+          }
+        ]
+      },
+      {
+        key: "import-settings",
+        title: strings.importSettings(),
+        description: strings.importSettingsDesc(),
+        keywords: ["import settings", "restore settings", "upload settings"],
+        components: [
+          {
+            type: "button",
+            title: strings.import(),
+            action: async () => {
+              await importSettingsFile();
+            },
+            variant: "secondary"
           }
         ]
       }

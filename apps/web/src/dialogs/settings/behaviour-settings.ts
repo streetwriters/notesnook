@@ -160,11 +160,6 @@ export const BehaviourSettings: SettingsGroup[] = [
           {
             type: "dropdown",
             onSelectionChanged: (value) => {
-              if (!isUserPremium()) {
-                BuyDialog.show({});
-                return;
-              }
-
               useSettingStore
                 .getState()
                 .setTrashCleanupInterval(
@@ -174,10 +169,10 @@ export const BehaviourSettings: SettingsGroup[] = [
             selectedOption: () =>
               useSettingStore.getState().trashCleanupInterval.toString(),
             options: [
-              { value: "1", title: strings.daily() },
-              { value: "7", title: strings.days(7) },
-              { value: "30", title: strings.days(30) },
-              { value: "365", title: strings.days(365) },
+              { value: "1", title: strings.daily(), premium: true },
+              { value: "7", title: strings.days(7), premium: true },
+              { value: "30", title: strings.days(30), premium: true },
+              { value: "365", title: strings.days(365), premium: true },
               { value: "-1", title: strings.never(), premium: true }
             ]
           }
