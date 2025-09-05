@@ -33,9 +33,6 @@ export function hideAuth() {
   eSendEvent(eCloseLoginDialog);
   if (initialAuthMode.current === AuthMode.welcomeSignup) {
     Navigation.replace("FluidPanelsView");
-    setTimeout(() => {
-      Navigation.resetRootState();
-    }, 300);
   } else {
     Navigation.goBack();
   }

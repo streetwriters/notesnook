@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { StackActions } from "@react-navigation/native";
+import { NavigationHelpers, StackActions } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useFavoriteStore } from "../stores/use-favorite-store";
 import useNavigationStore, {
@@ -166,13 +166,25 @@ function closeDrawer() {
   fluidTabsRef.current?.closeDrawer();
 }
 
-function resetRootState() {
-  const state = rootNavigatorRef.getState();
-  const focusedRouteKey = state.routes[state.index].key;
+function resetRootState(
+  _state?: ReturnType<NavigationHelpers<any, any>["getState"]>
+) {
+  const state = _state || rootNavigatorRef.getState();
+  const focusedRoute = state.routes[state.index];
+
+  if (state.routes.length < 2) return;
+
   const routes = state.routes.filter(
-    (route) => route.name !== "Auth" && route.name !== "Welcome"
+    (route) =>
+      (route.name !== "Auth" && route.name !== "Welcome") ||
+      route.key === focusedRoute.key
   );
-  const newIndex = routes.findIndex((route) => route.key === focusedRouteKey);
+
+  if (routes.length === state.routes.length) return;
+  if (routes.length === 0) {
+    routes.push(focusedRoute);
+  }
+  const newIndex = routes.findIndex((route) => route.key === focusedRoute.key);
   rootNavigatorRef.reset({
     ...state,
     routes: routes,
