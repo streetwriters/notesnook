@@ -83,7 +83,7 @@ type SettingsDialogProps = BaseDialogProps<false> & {
   activeSection?: SectionKeys;
 };
 
-const sectionGroups: SectionGroup[] = [
+export const sectionGroups: SectionGroup[] = [
   {
     key: "account",
     title: strings.account(),
@@ -158,7 +158,7 @@ const sectionGroups: SectionGroup[] = [
   }
 ];
 
-const SettingsGroups = [
+export const SettingsGroups = [
   ...ProfileSettings,
   ...AuthenticationSettings,
   ...SyncSettings,

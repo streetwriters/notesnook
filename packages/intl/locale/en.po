@@ -2601,6 +2601,14 @@ msgstr "Export as{0}"
 msgid "Export notes as PDF, Markdown and HTML with Notesnook Pro"
 msgstr "Export notes as PDF, Markdown and HTML with Notesnook Pro"
 
+#: src/strings.ts:2493
+msgid "Export settings"
+msgstr "Export settings"
+
+#: src/strings.ts:2494
+msgid "Export your app settings to a JSON file."
+msgstr "Export your app settings to a JSON file."
+
 #: src/strings.ts:215
 msgid "Exporting \"{title}\""
 msgstr "Exporting \"{title}\""
@@ -3156,6 +3164,10 @@ msgstr "Images uploaded without compression are slow to load and take more bandw
 msgid "Immediately"
 msgstr "Immediately"
 
+#: src/strings.ts:2492
+msgid "Import"
+msgstr "Import"
+
 #: src/strings.ts:2139
 msgid "Import & export"
 msgstr "Import & export"
@@ -3167,6 +3179,14 @@ msgstr "Import completed"
 #: src/strings.ts:1765
 msgid "import guide"
 msgstr "import guide"
+
+#: src/strings.ts:2497
+msgid "Import settings"
+msgstr "Import settings"
+
+#: src/strings.ts:2496
+msgid "Import your app settings from a previously exported JSON file."
+msgstr "Import your app settings from a previously exported JSON file."
 
 #: src/strings.ts:174
 msgid "Incoming"
@@ -5642,6 +5662,22 @@ msgstr "Set your name"
 #: src/strings.ts:1523
 msgid "Settings"
 msgstr "Settings"
+
+#: src/strings.ts:2500
+msgid "Settings export failed"
+msgstr "Settings export failed"
+
+#: src/strings.ts:2498
+msgid "Settings exported"
+msgstr "Settings exported"
+
+#: src/strings.ts:2501
+msgid "Settings import failed"
+msgstr "Settings import failed"
+
+#: src/strings.ts:2499
+msgid "Settings imported"
+msgstr "Settings imported"
 
 #: src/strings.ts:1198
 #: src/strings.ts:1199

@@ -2488,5 +2488,15 @@ Use this if changes from other devices are not appearing on this device. This wi
     t`Select a notebook to move this notebook into, or unselect to move it to the root level.`,
   noNotebooksSelectedToMove: () => t`No notebooks selected to move`,
   scrollToTop: () => t`Scroll to top`,
-  scrollToBottom: () => t`Scroll to bottom`
+  scrollToBottom: () => t`Scroll to bottom`,
+  import: () => t`Import`,
+  exportSettings: () => t`Export settings`,
+  exportSettingsDesc: () => t`Export your app settings to a JSON file.`,
+  importSettingsDesc: () =>
+    t`Import your app settings from a previously exported JSON file.`,
+  importSettings: () => t`Import settings`,
+  settingsExported: () => t`Settings exported`,
+  settingsImported: () => t`Settings imported`,
+  settingsExportedFailed: () => t`Settings export failed`,
+  settingsImportedFailed: () => t`Settings import failed`
 };
