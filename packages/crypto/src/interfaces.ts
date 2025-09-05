@@ -24,7 +24,9 @@ import {
   SerializedKey,
   Chunk,
   Output,
-  Input
+  Input,
+  EncryptionKeyPair,
+  SerializedKeyPair
 } from "./types.js";
 
 export interface IStreamable {
@@ -63,7 +65,11 @@ export interface INNCrypto {
 
   deriveKey(password: string, salt?: string): Promise<EncryptionKey>;
 
+  deriveKeyPair(): Promise<EncryptionKeyPair>;
+
   exportKey(password: string, salt?: string): Promise<SerializedKey>;
+
+  exportKeyPair(): Promise<SerializedKeyPair>;
 
   createEncryptionStream(
     key: SerializedKey

@@ -24,7 +24,7 @@ import TokenManager from "./token-manager.js";
 import { EV, EVENTS } from "../common.js";
 import { HealthCheck } from "./healthcheck.js";
 import Database from "./index.js";
-import { SerializedKey } from "@notesnook/crypto";
+import { SerializedKeyPair, SerializedKey } from "@notesnook/crypto";
 import { logger } from "../logger.js";
 
 const ENDPOINTS = {
@@ -44,6 +44,7 @@ class UserManager {
   private tokenManager: TokenManager;
   private cachedAttachmentKey?: SerializedKey;
   private cachedMonographPasswordsKey?: SerializedKey;
+  private cachedInboxKeys?: SerializedKeyPair;
   constructor(private readonly db: Database) {
     this.tokenManager = new TokenManager(this.db.kv);
 
@@ -278,6 +279,7 @@ class UserManager {
       logger.error(e, "Error logging out user.", { revoke, reason });
     } finally {
       this.cachedAttachmentKey = undefined;
+      this.cachedInboxKeys = undefined;
       await this.db.reset();
       EV.publish(EVENTS.userLoggedOut, reason);
       EV.publish(EVENTS.appRefreshRequested);
@@ -460,6 +462,58 @@ class UserManager {
     }
   }
 
+  async getInboxKeys() {
+    if (this.cachedInboxKeys) return this.cachedInboxKeys;
+    try {
+      let user = await this.getUser();
+      if (!user) return;
+
+      if (!user.inboxKeys) {
+        const token = await this.tokenManager.getAccessToken();
+        user = await http.get(`${constants.API_HOST}${ENDPOINTS.user}`, token);
+      }
+      if (!user) return;
+
+      const userEncryptionKey = await this.getEncryptionKey();
+      if (!userEncryptionKey) return;
+
+      if (!user.inboxKeys) {
+        const keys = await this.db.crypto().generateRandomKeyPair();
+        user.inboxKeys = {
+          public: keys.publicKey,
+          private: await this.db
+            .storage()
+            .encrypt(userEncryptionKey, JSON.stringify(keys.privateKey))
+        };
+        await this.updateUser({ inboxKeys: user.inboxKeys });
+        return keys;
+      }
+
+      const plainData: SerializedKeyPair = {
+        publicKey: user.inboxKeys.public,
+        privateKey: JSON.parse(
+          await this.db
+            .storage()
+            .decrypt(userEncryptionKey, user.inboxKeys.private)
+        )
+      };
+      this.cachedInboxKeys = plainData;
+      return this.cachedInboxKeys;
+    } catch (e) {
+      logger.error(e, "Could not get inbox encryption keys.");
+      if (e instanceof Error)
+        throw new Error(
+          `Could not get inbox encryption keys. Error: ${e.message}`
+        );
+    }
+  }
+
+  async discardInboxKeys() {
+    this.cachedInboxKeys = undefined;
+    // @ts-expect-error sending public & private keys as null to remove them
+    await this.updateUser({ inboxKeys: { public: null, private: null } });
+  }
+
   async getMonographPasswordsKey() {
     if (this.cachedMonographPasswordsKey) {
       return this.cachedMonographPasswordsKey;
@@ -615,6 +669,16 @@ class UserManager {
           .storage()
           .encrypt(userEncryptionKey, JSON.stringify(monographPasswordsKey));
         updateUserPayload.monographPasswordsKey = user.monographPasswordsKey;
+      }
+      const inboxKeys = await this.getInboxKeys();
+      if (inboxKeys) {
+        user.inboxKeys = {
+          public: inboxKeys.publicKey,
+          private: await this.db
+            .storage()
+            .encrypt(userEncryptionKey, JSON.stringify(inboxKeys.privateKey))
+        };
+        updateUserPayload.inboxKeys = user.inboxKeys;
       }
       if (Object.keys(updateUserPayload).length > 0) {
         await this.updateUser(updateUserPayload);
