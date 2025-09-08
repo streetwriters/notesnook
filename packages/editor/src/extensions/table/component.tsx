@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex } from "@theme-ui/components";
+import { Box, Flex } from "@theme-ui/components";
 import { ReactNodeView, ReactNodeViewProps } from "../react/index.js";
 import { Node as ProsemirrorNode } from "prosemirror-model";
 import { Editor } from "../../types.js";
@@ -69,7 +69,10 @@ export function TableComponent(props: ReactNodeViewProps) {
         />
       </DesktopOnly>
       <SimpleBar autoHide>
-        <div dir={textDirection}>
+        <Box
+          dir={textDirection}
+          sx={{ "& table": { width: "100% !important" } }}
+        >
           <table
             ref={(ref) => {
               forwardRef?.(ref);
@@ -79,7 +82,7 @@ export function TableComponent(props: ReactNodeViewProps) {
             <colgroup ref={colgroupRef} />
             {/* <tbody /> */}
           </table>
-        </div>
+        </Box>
       </SimpleBar>
     </>
   );
@@ -184,7 +187,7 @@ function TableRowToolbar(props: TableToolbarProps) {
         flexWrap: "nowrap",
         borderRadius: "default",
         flexDirection: "column",
-        opacity: 0.8,
+        opacity: 0.4,
         ":hover": {
           opacity: 1
         }
@@ -259,7 +262,7 @@ function TableColumnToolbar(props: TableToolbarProps) {
         bg: "background",
         flexWrap: "nowrap",
         borderRadius: "default",
-        opacity: 0.8,
+        opacity: 0.4,
         ":hover": {
           opacity: 1
         }
