@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Editor } from "@tiptap/core";
 import { selectedRect, TableRect } from "@tiptap/pm/tables";
-import { Transaction } from "prosemirror-state";
+import { EditorState, TextSelection, Transaction } from "prosemirror-state";
 import { Node } from "prosemirror-model";
 
 type TableCell = {
@@ -159,4 +159,47 @@ function moveCells(
   return tr;
 }
 
-export { moveColumnLeft, moveColumnRight, moveRowDown, moveRowUp };
+function selectRow(
+  tr: Transaction,
+  state: EditorState,
+  direction: "prev" | "next"
+) {
+  const rect = selectedRect(state);
+  const currentCellIndex = rect.map.width * (rect.bottom - 1) + rect.right;
+  const rowIndex = Math.floor(currentCellIndex / rect.map.width);
+  const nextRowIndex = direction === "prev" ? rowIndex - 1 : rowIndex + 1;
+  tr.setSelection(
+    new TextSelection(
+      tr.doc.resolve(rect.map.positionAt(nextRowIndex, rect.right, rect.table))
+    )
+  );
+  return true;
+}
+
+function selectColumn(
+  tr: Transaction,
+  state: EditorState,
+  direction: "prev" | "next"
+) {
+  const rect = selectedRect(state);
+  const columnIndex = rect.right;
+  const nextColumnIndex =
+    direction === "prev" ? columnIndex - 1 : columnIndex + 1;
+  const currentCellIndex = rect.map.width * (rect.bottom - 1) + rect.right;
+  const rowIndex = Math.floor(currentCellIndex / rect.map.width);
+  tr.setSelection(
+    new TextSelection(
+      tr.doc.resolve(rect.map.positionAt(rowIndex, nextColumnIndex, rect.table))
+    )
+  );
+  return true;
+}
+
+export {
+  moveColumnLeft,
+  moveColumnRight,
+  moveRowDown,
+  moveRowUp,
+  selectRow,
+  selectColumn
+};

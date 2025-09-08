@@ -27,7 +27,9 @@ import {
   moveColumnLeft as moveColumnLeftAction,
   moveColumnRight as moveColumnRightAction,
   moveRowDown as moveRowDownAction,
-  moveRowUp as moveRowUpAction
+  moveRowUp as moveRowUpAction,
+  selectColumn,
+  selectRow
 } from "../../extensions/table/actions.js";
 import { MoreTools } from "../components/more-tools.js";
 import { menuButtonToTool, toolToMenuButton } from "./utils.js";
@@ -39,6 +41,8 @@ import { useToolbarLocation } from "../stores/toolbar-store.js";
 import { showPopup } from "../../components/popup-presenter/index.js";
 import { useRefValue } from "../../hooks/use-ref-value.js";
 import { strings } from "@notesnook/intl";
+import { selectedRect } from "@tiptap/pm/tables";
+import { TextSelection } from "@tiptap/pm/state";
 
 export function TableSettings(props: ToolProps) {
   const { editor } = props;
@@ -308,12 +312,24 @@ export function CellBorderWidth(props: ToolProps) {
 
 const insertColumnLeft = (editor: Editor): MenuButtonItem => ({
   ...toolToMenuButton(getToolDefinition("insertColumnLeft")),
-  onClick: () => editor.chain().focus().addColumnBefore().run()
+  onClick: () =>
+    editor
+      .chain()
+      .focus()
+      .addColumnBefore()
+      .command(({ tr, state }) => selectColumn(tr, state, "prev"))
+      .run()
 });
 
 const insertColumnRight = (editor: Editor): MenuButtonItem => ({
   ...toolToMenuButton(getToolDefinition("insertColumnRight")),
-  onClick: () => editor.chain().focus().addColumnAfter().run()
+  onClick: () =>
+    editor
+      .chain()
+      .focus()
+      .addColumnAfter()
+      .command(({ tr, state }) => selectColumn(tr, state, "next"))
+      .run()
 });
 
 const moveColumnLeft = (editor: Editor): MenuButtonItem => ({
@@ -343,12 +359,25 @@ const mergeCells = (editor: Editor): MenuButtonItem => ({
 
 const insertRowAbove = (editor: Editor): MenuButtonItem => ({
   ...toolToMenuButton(getToolDefinition("insertRowAbove")),
-  onClick: () => editor.chain().focus().addRowBefore().run()
+  onClick: () =>
+    editor
+      .chain()
+      .focus()
+      .addRowBefore()
+      .command(({ tr, state }) => selectRow(tr, state, "prev"))
+      .run()
 });
 
 const insertRowBelow = (editor: Editor): MenuButtonItem => ({
   ...toolToMenuButton(getToolDefinition("insertRowBelow")),
-  onClick: () => editor.chain().focus().addRowAfter().run()
+  onClick: () => {
+    editor
+      .chain()
+      .focus()
+      .addRowAfter()
+      .command(({ tr, state }) => selectRow(tr, state, "next"))
+      .run();
+  }
 });
 
 const moveRowUp = (editor: Editor): MenuButtonItem => ({
