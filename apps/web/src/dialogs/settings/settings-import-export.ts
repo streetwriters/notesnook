@@ -97,11 +97,7 @@ export async function exportSettings(): Promise<void> {
 
     for (const group of SettingsGroups) {
       if (group.isHidden?.()) continue;
-      if (
-        sectionGroups.find((sg) =>
-          sg.sections.find((s) => s.key === group.section)?.isHidden?.()
-        )
-      ) {
+      if (isSectionHidden(group)) {
         continue;
       }
 
@@ -217,11 +213,7 @@ export async function importSettings(): Promise<void> {
       const groupKey = group.key;
       if (!(groupKey in settingsGroups)) continue;
       if (group.isHidden?.()) continue;
-      if (
-        sectionGroups.find((sg) =>
-          sg.sections.find((s) => s.key === group.section)?.isHidden?.()
-        )
-      ) {
+      if (isSectionHidden(group)) {
         continue;
       }
 
@@ -250,4 +242,10 @@ export async function importSettings(): Promise<void> {
     console.error("Failed to import settings:", error);
     showToast("error", strings.settingsImportedFailed());
   }
+}
+
+function isSectionHidden(group: SettingsGroup) {
+  const sections = sectionGroups.flatMap((sg) => sg.sections);
+  const section = sections.find((s) => s.key === group.section);
+  return section?.isHidden?.() ?? false;
 }
