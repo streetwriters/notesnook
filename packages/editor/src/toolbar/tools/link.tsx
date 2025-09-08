@@ -32,6 +32,7 @@ import { Link as LinkNode } from "../../extensions/link/index.js";
 import { getMarkAttributes } from "@tiptap/core";
 import { useHoverPopupContext } from "../floating-menus/hover-popup/context.js";
 import { strings } from "@notesnook/intl";
+import { find } from "linkifyjs";
 
 export function LinkSettings(props: ToolProps) {
   const { editor } = props;
@@ -69,7 +70,11 @@ export function AddLink(props: ToolProps) {
           editor.state.selection.from,
           editor.state.selection.to
         );
-        return { title: selectedText, href: "" };
+        const href =
+          find(selectedText).find(
+            (item) => item.isLink && item.href === selectedText
+          )?.href ?? "";
+        return { title: selectedText, href };
       }}
     />
   );
