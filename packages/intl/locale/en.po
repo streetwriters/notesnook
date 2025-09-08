@@ -3185,8 +3185,8 @@ msgid "Import settings"
 msgstr "Import settings"
 
 #: src/strings.ts:2496
-msgid "Import your app settings from a previously exported JSON file."
-msgstr "Import your app settings from a previously exported JSON file."
+msgid "Import your app settings from a previously exported JSON file. This will overwrite your current settings."
+msgstr "Import your app settings from a previously exported JSON file. This will overwrite your current settings."
 
 #: src/strings.ts:174
 msgid "Incoming"

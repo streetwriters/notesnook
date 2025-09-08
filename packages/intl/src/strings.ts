@@ -2493,7 +2493,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   exportSettings: () => t`Export settings`,
   exportSettingsDesc: () => t`Export your app settings to a JSON file.`,
   importSettingsDesc: () =>
-    t`Import your app settings from a previously exported JSON file.`,
+    t`Import your app settings from a previously exported JSON file. This will overwrite your current settings.`,
   importSettings: () => t`Import settings`,
   settingsExported: () => t`Settings exported`,
   settingsImported: () => t`Settings imported`,

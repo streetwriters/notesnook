@@ -24,7 +24,10 @@ import { showFilePicker, readFile } from "../../utils/file-picker";
 import { SettingsGroup } from "./types";
 import { sectionGroups, SettingsGroups } from ".";
 import { ServersSettings } from "./servers-settings";
+import { EditorSettings } from "./editor-settings";
 import { strings } from "@notesnook/intl";
+import dayjs from "dayjs";
+import { useEditorManager } from "../../components/editor/manager";
 
 type ExportedSetting = Record<string, string | number | boolean>;
 
@@ -34,40 +37,52 @@ interface ExportedSettings {
 }
 
 async function extractSettingsValues(
-  settingsGroups: SettingsGroup[]
+  group: SettingsGroup
 ): Promise<ExportedSetting> {
   const exportedSettings: ExportedSetting = {};
 
-  for (const group of settingsGroups) {
-    for (const setting of group.settings) {
-      if (setting.isHidden?.()) continue;
+  for (const setting of group.settings) {
+    if (setting.isHidden?.()) continue;
 
-      const components =
-        typeof setting.components === "function"
-          ? setting.components()
-          : setting.components;
+    const components =
+      typeof setting.components === "function"
+        ? setting.components()
+        : setting.components;
 
-      for (const component of components) {
-        if (component.type === "custom") continue;
-        if (component.type === "dropdown" && "selectedOption" in component) {
+    for (const component of components) {
+      switch (component.type) {
+        case "custom":
+        case "button":
+        case "icon": {
+          continue;
+        }
+        case "dropdown": {
           const value =
             typeof component.selectedOption === "function"
               ? await component.selectedOption()
               : component.selectedOption;
-          if (value === "-" || value === undefined) continue;
+          if (value === "-" || value === "" || value === undefined) continue;
           exportedSettings[setting.key] = value;
-        } else if (component.type === "toggle" && "isToggled" in component) {
+          continue;
+        }
+        case "toggle": {
           const value =
             typeof component.isToggled === "function"
               ? component.isToggled()
               : component.isToggled;
           exportedSettings[setting.key] = value;
-        } else if (component.type === "input" && "defaultValue" in component) {
+          continue;
+        }
+        case "input": {
           const value =
             typeof component.defaultValue === "function"
               ? component.defaultValue()
               : component.defaultValue;
           exportedSettings[setting.key] = value;
+          continue;
+        }
+        default: {
+          throw new Error("Unknown component type");
         }
       }
     }
@@ -90,21 +105,23 @@ export async function exportSettings(): Promise<void> {
         continue;
       }
 
-      const groupSettingsValues = await extractSettingsValues([group]);
+      const groupSettingsValues = await extractSettingsValues(group);
       if (Object.keys(groupSettingsValues).length === 0) continue;
+
       toExport[group.key] = groupSettingsValues;
     }
 
     toExport[ServersSettings[0].key] = useSettingStore.getState().serverUrls;
+    toExport[EditorSettings[0].key]["toolbar"] = JSON.stringify(
+      useEditorManager.getState().toolbarConfig
+    );
 
     const exportData: ExportedSettings = {
-      exportDate: new Date().toISOString(),
+      exportDate: dayjs().toISOString(),
       settings: toExport
     };
 
-    const fileName = `notesnook-settings-${
-      new Date().toISOString().split("T")[0]
-    }.json`;
+    const fileName = `notesnook-settings-${dayjs().format("YYYY-MM-DD")}.json`;
     const blob = new Blob([JSON.stringify(exportData, null, 2)], {
       type: "application/json"
     });
@@ -117,48 +134,37 @@ export async function exportSettings(): Promise<void> {
   }
 }
 
-async function selectSettingsFile() {
-  const [file] = await showFilePicker({
-    acceptedFileTypes: ".json"
-  });
-  if (!file) return;
-  return file;
-}
-
-export async function importSettingsFile() {
-  const settingsFile = await selectSettingsFile();
-  if (!settingsFile) return false;
-  await importSettings(settingsFile);
-  return true;
-}
-
 async function applySettingsValues(
-  settingsGroups: SettingsGroup[],
+  group: SettingsGroup,
   importedValues: ExportedSetting
 ) {
-  for (const group of settingsGroups) {
-    if (group.isHidden?.()) continue;
+  if (group.isHidden?.()) return;
 
-    for (const setting of group.settings) {
-      if (setting.isHidden?.()) continue;
+  for (const setting of group.settings) {
+    if (setting.isHidden?.()) continue;
 
-      const settingKey = setting.key;
-      if (!(settingKey in importedValues)) continue;
+    const settingKey = setting.key;
+    if (!(settingKey in importedValues)) continue;
 
-      const value = importedValues[settingKey];
+    const value = importedValues[settingKey];
 
-      const components =
-        typeof setting.components === "function"
-          ? setting.components()
-          : setting.components;
+    const components =
+      typeof setting.components === "function"
+        ? setting.components()
+        : setting.components;
 
-      for (const component of components) {
-        if (
-          component.type === "dropdown" &&
-          "onSelectionChanged" in component
-        ) {
+    for (const component of components) {
+      switch (component.type) {
+        case "custom":
+        case "button":
+        case "icon": {
+          continue;
+        }
+        case "dropdown": {
           await component.onSelectionChanged(String(value));
-        } else if (component.type === "toggle" && "toggle" in component) {
+          continue;
+        }
+        case "toggle": {
           const currentValue =
             typeof component.isToggled === "function"
               ? component.isToggled()
@@ -166,7 +172,9 @@ async function applySettingsValues(
           if (currentValue !== value) {
             await component.toggle();
           }
-        } else if (component.type === "input" && "onChange" in component) {
+          continue;
+        }
+        case "input": {
           const inputValue = typeof value === "boolean" ? String(value) : value;
           if (
             component.inputType === "text" &&
@@ -179,14 +187,23 @@ async function applySettingsValues(
           ) {
             component.onChange(inputValue);
           }
+          continue;
+        }
+        default: {
+          throw new Error("Unknown component type");
         }
       }
     }
   }
 }
 
-export async function importSettings(file: File): Promise<void> {
+export async function importSettings(): Promise<void> {
   try {
+    const [file] = await showFilePicker({
+      acceptedFileTypes: ".json"
+    });
+    if (!file) return;
+
     const content = await readFile(file);
     const importData: ExportedSettings = JSON.parse(content);
 
@@ -213,11 +230,17 @@ export async function importSettings(file: File): Promise<void> {
         continue;
       }
 
-      await applySettingsValues([group], groupSettingsValues);
+      await applySettingsValues(group, groupSettingsValues);
     }
 
     if (settingsGroups.serverUrls) {
       useSettingStore.getState().setServerUrls(settingsGroups.serverUrls);
+    }
+
+    if (settingsGroups.editor && settingsGroups.editor.toolbar) {
+      useEditorManager.setState({
+        toolbarConfig: JSON.parse(String(settingsGroups.editor.toolbar))
+      });
     }
 
     await useSettingStore.getState().refresh();
