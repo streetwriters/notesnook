@@ -2092,6 +2092,8 @@ If your issue is critical (e.g. notes not syncing, crashes etc.), please [join o
   zoomFactor: () => t`Zoom factor`,
   zoomFactorDescription: () => t`Zoom in or out the app content.`,
   colorScheme: () => t`Color scheme`,
+  listTitle: () => t`Font Size(List Title)`,
+  editorTitle: () => t`Font Size(Editor Title)`,
   colorSchemeDescription: () => t`Dark or light, we won't judge.`,
   auto: () => t`Auto`,
   selectTheme: () => t`Select a theme`,

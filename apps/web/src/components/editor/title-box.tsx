@@ -28,6 +28,8 @@ import { useStore as useSettingsStore } from "../../stores/setting-store";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { strings } from "@notesnook/intl";
 import { NEWLINE_STRIP_REGEX } from "@notesnook/core";
+import { useTitleSize } from "../../hooks/use-title-size";
+import { titleSizeToTextAreaFontSize } from "../../utils/title-size";
 
 type TitleBoxProps = {
   id: string;
@@ -46,11 +48,20 @@ function TitleBox(props: TitleBoxProps) {
   const { editorConfig } = useEditorConfig();
   const dateFormat = useSettingsStore((store) => store.dateFormat);
   const timeFormat = useSettingsStore((store) => store.timeFormat);
+  const { detailViewTitleSize } = useTitleSize();
 
   const fontFamily = useMemo(
     () => getFontById(editorConfig.fontFamily)?.font || "heading",
     [editorConfig.fontFamily]
   );
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (inputRef.current) {
+        resizeTextarea(inputRef.current);
+      }
+    }, 0);
+  }, [detailViewTitleSize]);
 
   useLayoutEffect(() => {
     const session = useEditorStore.getState().getSession(id);
@@ -112,7 +123,7 @@ function TitleBox(props: TitleBoxProps) {
         m: 0,
         p: 0,
         fontFamily,
-        fontSize: ["1.625em", "1.625em", "2.625em"],
+        fontSize: titleSizeToTextAreaFontSize(detailViewTitleSize),
         fontWeight: "heading",
         width: "100%",
         fieldSizing: "content",

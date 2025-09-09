@@ -47,6 +47,8 @@ export type HomePage = {
   id: string;
 };
 
+export type TitleSize = "small" | "medium" | "large";
+
 class SettingStore extends BaseStore<SettingStore> {
   encryptBackups = Config.get("encryptBackups", false);
   backupReminderOffset = Config.get("backupReminderOffset", 0);
@@ -70,6 +72,8 @@ class SettingStore extends BaseStore<SettingStore> {
   timeFormat: TimeFormat = "12-hour";
   titleFormat = "Note $date$ $time$";
   profile?: Profile;
+  listViewTitleSize?: TitleSize = Config.get("listViewTitleSize", "small");
+  detailViewTitleSize?: TitleSize = Config.get("detailViewTitleSize", "medium");
 
   trashCleanupInterval: TrashCleanupInterval = 7;
   homepage = Config.get<HomePage>("homepage-v2", {
@@ -122,6 +126,16 @@ class SettingStore extends BaseStore<SettingStore> {
   setTitleFormat = async (titleFormat: string) => {
     await db.settings.setTitleFormat(titleFormat);
     this.set({ titleFormat });
+  };
+
+  setListViewTitleSize = (listViewTitleSize: TitleSize) => {
+    this.set({ listViewTitleSize });
+    Config.set("listViewTitleSize", listViewTitleSize);
+  };
+
+  setDetailViewTitleSize = (detailViewTitleSize: TitleSize) => {
+    this.set({ detailViewTitleSize });
+    Config.set("detailViewTitleSize", detailViewTitleSize);
   };
 
   setTrashCleanupInterval = async (

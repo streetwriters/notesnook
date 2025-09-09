@@ -32,6 +32,14 @@ const heading: ThemeUIStyleObject = {
   fontSize: "heading"
 };
 
+const subHeading: ThemeUIStyleObject = {
+  variant: "text.heading",
+  color: "heading",
+  fontFamily: "heading",
+  fontWeight: "bold",
+  fontSize: "subheading"
+};
+
 const title: ThemeUIStyleObject = {
   variant: "text.heading",
   color: "heading",
@@ -63,6 +71,7 @@ const error: ThemeUIStyleObject = {
 export const textVariants = {
   default: defaultVariant,
   heading,
+  subHeading,
   title,
   subtitle,
   body,

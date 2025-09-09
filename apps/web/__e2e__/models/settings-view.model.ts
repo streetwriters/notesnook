@@ -152,6 +152,30 @@ export class SettingsViewModel {
     await imageCompressionDropdown.selectOption(option);
   }
 
+  async selectListTitleFontSize(option: { value: string; label: string }) {
+    const item = await this.navigation.findItem("Appearance");
+    await item?.click();
+
+    // Find the actual select element inside the setting container
+    const listTitleFontSize = this.page
+      .locator(getTestId("setting-list-font-size"))
+      .locator("select");
+
+    await listTitleFontSize.selectOption(option);
+  }
+
+  async selectEditorTitleFontSize(option: { value: string; label: string }) {
+    const item = await this.navigation.findItem("Appearance");
+    await item?.click();
+
+    // Find the actual select element inside the setting container
+    const editorTitleFontSize = this.page
+      .locator(getTestId("setting-editor-font-size"))
+      .locator("select");
+
+    await editorTitleFontSize.selectOption(option);
+  }
+
   async enableAppLock(userPassword: string, appLockPassword: string) {
     const item = await this.navigation.findItem("App lock");
     await item?.click();

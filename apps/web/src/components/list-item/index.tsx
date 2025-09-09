@@ -30,6 +30,8 @@ import { MenuItem } from "@notesnook/ui";
 import { alpha } from "@theme-ui/color";
 import { Item } from "@notesnook/core";
 import { setDragData } from "../../utils/data-transfer";
+import { useTitleSize } from "../../hooks/use-title-size";
+import { titleSizeToVariant } from "../../utils/title-size";
 
 type ListItemProps<TItem extends Item, TContext> = {
   colors?: {
@@ -91,6 +93,7 @@ function ListItem<TItem extends Item, TContext>(
   const listItemRef = useRef<HTMLDivElement>(null);
   const { openMenu, target } = useMenuTrigger();
   const isMenuTarget = target && target === listItemRef.current;
+  const { listViewTitleSize } = useTitleSize();
 
   const isSelected = useSelectionStore((store) => {
     const isInSelection = store.selectedItems.includes(props.item.id);
@@ -200,7 +203,7 @@ function ListItem<TItem extends Item, TContext>(
         <Text
           dir="auto"
           data-test-id={`title`}
-          variant={"body"}
+          variant={titleSizeToVariant(listViewTitleSize) || "body"}
           sx={{
             whiteSpace: "nowrap",
             overflow: "hidden",

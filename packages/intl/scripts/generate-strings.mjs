@@ -121,7 +121,7 @@ const ACTION_CONFIRMATIONS = [
       "tag",
       "color",
       "attachment"
-    ],
+    ]
   },
   {
     action: "permanentlyDelete",

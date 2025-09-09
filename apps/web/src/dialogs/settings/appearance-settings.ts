@@ -18,7 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { SettingsGroup } from "./types";
-import { useStore as useSettingStore } from "../../stores/setting-store";
+import {
+  TitleSize,
+  useStore as useSettingStore
+} from "../../stores/setting-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { ThemesSelector } from "./components/themes-selector";
 import { strings } from "@notesnook/intl";
@@ -87,6 +90,50 @@ export const AppearanceSettings: SettingsGroup[] = [
                   .getState()
                   .setColorScheme(value as "dark" | "light");
             }
+          }
+        ]
+      },
+      {
+        key: "list-font-size",
+        title: strings.listTitle(),
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => [s.listViewTitleSize], listener),
+        components: [
+          {
+            type: "dropdown",
+            options: [
+              { title: "Small", value: "small" },
+              { title: "Medium", value: "medium" },
+              { title: "Large", value: "large" }
+            ],
+            selectedOption: () =>
+              useSettingStore.getState().listViewTitleSize || "small",
+            onSelectionChanged: (value) =>
+              useSettingStore
+                .getState()
+                .setListViewTitleSize(value as TitleSize)
+          }
+        ]
+      },
+      {
+        key: "editor-font-size",
+        title: strings.editorTitle(),
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => [s.detailViewTitleSize], listener),
+        components: [
+          {
+            type: "dropdown",
+            options: [
+              { title: "Small", value: "small" },
+              { title: "Medium", value: "medium" },
+              { title: "Large", value: "large" }
+            ],
+            selectedOption: () =>
+              useSettingStore.getState().detailViewTitleSize || "small",
+            onSelectionChanged: (value) =>
+              useSettingStore
+                .getState()
+                .setDetailViewTitleSize(value as TitleSize)
           }
         ]
       },

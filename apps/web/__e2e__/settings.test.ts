@@ -77,3 +77,45 @@ test("do not ask for image compression during image upload when 'Image Compressi
 
   await expect(page.getByText("Enable compression")).toBeHidden();
 });
+
+test("change title size in settings affects note list titles", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+
+  const notes = await app.goToNotes();
+  await notes.createNote(NOTE);
+
+  const settings = await app.goToSettings();
+  await settings.selectListTitleFontSize({ value: "large", label: "Large" });
+  await settings.close();
+
+  const noteItem = page.locator('[data-test-id="list-item"]').first();
+  const titleElement = noteItem.locator('[data-test-id="title"]');
+
+  const fontSize = await titleElement.evaluate(
+    (el) => window.getComputedStyle(el).fontSize
+  );
+  console.log(fontSize);
+
+  expect(parseFloat(fontSize)).toBeGreaterThan(12);
+});
+
+test("change title size affects editor title", async ({ page }) => {
+  const app = new AppModel(page);
+  await app.goto();
+
+  const settings = await app.goToSettings();
+  await settings.selectEditorTitleFontSize({ value: "small", label: "Small" });
+  await settings.close();
+
+  const notes = await app.goToNotes();
+  await notes.createNote(NOTE);
+
+  const editorTitle = page.locator('[data-test-id="editor-title"]');
+  const fontSize = await editorTitle.evaluate(
+    (el) => window.getComputedStyle(el).fontSize
+  );
+  expect(parseFloat(fontSize)).toBeLessThan(50);
+});
