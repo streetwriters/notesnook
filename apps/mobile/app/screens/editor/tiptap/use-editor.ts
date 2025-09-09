@@ -875,7 +875,6 @@ export const useEditor = (
               }
 
               lastContentChangeTime.current[note.id] = note.dateEdited;
-              console.log(tab.session?.selection);
               await postMessage(
                 NativeEvents.updatehtml,
                 {

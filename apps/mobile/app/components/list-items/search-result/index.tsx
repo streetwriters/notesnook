@@ -153,7 +153,6 @@ export const SearchResult = (props: SearchResultProps) => {
               for (let i = 0; i <= index; i++) {
                 activeIndex += props.item.content[i].length;
               }
-              console.log(activeIndex);
               openNote(activeIndex);
             }}
           >
