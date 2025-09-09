@@ -27,6 +27,7 @@ import { useEditorStore } from "./editor-store";
 import { setDocumentTitle } from "../utils/dom";
 import { TimeFormat } from "@notesnook/core";
 import { Profile, TrashCleanupInterval } from "@notesnook/core";
+import { showToast } from "../utils/toast";
 
 export const HostIds = [
   "API_HOST",
@@ -89,6 +90,7 @@ class SettingStore extends BaseStore<SettingStore> {
   isFlatpak = false;
   isSnap = false;
   proxyRules?: string;
+  isInboxEnabled = false;
 
   refresh = async () => {
     this.set({
@@ -105,7 +107,8 @@ class SettingStore extends BaseStore<SettingStore> {
       customDns: await desktop?.integration.customDns.query(),
       zoomFactor: await desktop?.integration.zoomFactor.query(),
       autoUpdates: await desktop?.updater.autoUpdates.query(),
-      proxyRules: await desktop?.integration.proxyRules.query()
+      proxyRules: await desktop?.integration.proxyRules.query(),
+      isInboxEnabled: await db.user.hasInboxKeys()
     });
   };
 
@@ -270,6 +273,25 @@ class SettingStore extends BaseStore<SettingStore> {
     const serverUrls = this.get().serverUrls;
     this.set({ serverUrls: { ...serverUrls, ...urls } });
     Config.set("serverUrls", { ...serverUrls, ...urls });
+  };
+
+  toggleInbox = async () => {
+    const { isInboxEnabled } = this.get();
+    const newState = !isInboxEnabled;
+
+    try {
+      if (newState) {
+        await db.user.getInboxKeys();
+      } else {
+        await db.user.discardInboxKeys();
+      }
+
+      this.set((state) => (state.isInboxEnabled = newState));
+    } catch (e) {
+      if (e instanceof Error) {
+        showToast("error", e.message);
+      }
+    }
   };
 }
 
