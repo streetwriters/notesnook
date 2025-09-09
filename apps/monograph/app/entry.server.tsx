@@ -90,7 +90,7 @@ function getContentSecurityPolicy(nonce?: string) {
   const connect_src =
     process.env.NODE_ENV === "development"
       ? "'self' ws://localhost:*"
-      : "'self'";
+      : "'self' https://notesnook.com/api/v1/reports/submit";
 
   return (
     `script-src ${script_src} 'strict-dynamic'; ` +
