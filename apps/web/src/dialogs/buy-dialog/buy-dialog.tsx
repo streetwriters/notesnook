@@ -232,7 +232,7 @@ function AlreadyPremium() {
       </Text>
       <Text variant="body" mt={1} sx={{ textAlign: "center" }}>
         You already have a Notesnook subscription. You can change your plan from
-        Settings {">"} Subscription.
+        Settings {">"} Subscription details.
       </Text>
     </>
   );
