@@ -61,31 +61,84 @@ export const Heading = TiptapHeading.extend({
             textAlign,
             textDirection
           });
-        },
-      toggleHeadingCollapse:
-        (pos: number) =>
-        ({ tr }: { tr: any }) => {
-          const node = tr.doc.nodeAt(pos);
-          if (node && node.type === this.type) {
-            tr.setNodeAttribute(pos, "collapsed", !node.attrs.collapsed);
-            return true;
-          }
-          return false;
         }
     };
   },
 
   addKeyboardShortcuts() {
-    return this.options.levels.reduce(
-      (items, level) => ({
-        ...items,
-        ...{
-          [tiptapKeys[`insertHeading${level}`].keys]: () =>
-            this.editor.commands.setHeading({ level })
+    return {
+      ...this.options.levels.reduce(
+        (items, level) => ({
+          ...items,
+          ...{
+            [tiptapKeys[`insertHeading${level}`].keys]: () =>
+              this.editor.commands.setHeading({ level })
+          }
+        }),
+        {}
+      ),
+      Enter: ({ editor }) => {
+        const { state, commands } = editor;
+        const { $from } = state.selection;
+        const node = $from.node();
+
+        if (node.type.name !== this.name) return false;
+
+        const isAtEnd = $from.parentOffset === node.textContent.length;
+        if (isAtEnd && node.attrs.collapsed) {
+          const pos = $from.before();
+          commands.command(({ tr }) => {
+            const currentNode = tr.doc.nodeAt(pos);
+            if (currentNode) {
+              tr.setNodeAttribute(pos, "collapsed", false);
+            }
+            return true;
+          });
         }
-      }),
-      {}
-    );
+
+        const isAtStart = $from.parentOffset === 0;
+        // if at start of heading, find all previous headings till level 1 and uncollapse them
+        if (isAtStart) {
+          const currentPos = $from.before();
+          const previousHeadings: {
+            pos: number;
+            level: number;
+            collapsed: boolean;
+          }[] = [];
+          state.doc.nodesBetween(0, currentPos, (node, pos) => {
+            if (node.type.name === this.name && pos < currentPos) {
+              previousHeadings.push({
+                pos,
+                level: node.attrs.level,
+                collapsed: node.attrs.collapsed
+              });
+            }
+          });
+
+          const headingsToUncollapse: number[] = [];
+          for (let i = previousHeadings.length - 1; i >= 0; i--) {
+            const heading = previousHeadings[i];
+            if (heading.collapsed) {
+              headingsToUncollapse.push(heading.pos);
+            }
+            if (heading.level === 1) {
+              break;
+            }
+          }
+
+          if (headingsToUncollapse.length > 0) {
+            commands.command(({ tr }) => {
+              headingsToUncollapse.forEach((pos) => {
+                tr.setNodeAttribute(pos, "collapsed", false);
+              });
+              return true;
+            });
+          }
+        }
+
+        return false;
+      }
+    };
   },
 
   addInputRules() {
