@@ -37,7 +37,7 @@ export function SubscriptionStatus() {
   const user = useUserStore((store) => store.user);
   const featuresUsage = usePromise(() => getFeaturesUsage(), [user]);
 
-  const { title, autoRenew, expiryDate, trialExpiryDate, trial, legacy } =
+  const { title, autoRenew, expiryDate, trialExpiryDate, trial } =
     getSubscriptionInfo(user);
   const subtitle =
     title === "Free"
@@ -76,10 +76,7 @@ export function SubscriptionStatus() {
         >
           {strings.currentPlan()}
         </Text>
-        <Text variant="heading">
-          {title}
-          {legacy ? " (legacy)" : ""}
-        </Text>
+        <Text variant="heading">{title}</Text>
         {subtitle ? <Text variant="body">{subtitle}</Text> : null}
         {featuresUsage.status === "fulfilled" ? (
           <Grid

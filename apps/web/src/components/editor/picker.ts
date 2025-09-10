@@ -129,7 +129,7 @@ async function pickFile(
   options?: AddAttachmentOptions
 ): Promise<Attachment | undefined> {
   try {
-    if (!(await checkFeature("fileSize", file.size))) return;
+    if (!(await checkFeature("fileSize", { value: file.size }))) return;
 
     const hash = await addAttachment(file, options);
     return {
@@ -154,7 +154,7 @@ async function pickImage(
   options?: AddAttachmentOptions
 ): Promise<Attachment | undefined> {
   try {
-    if (!(await checkFeature("fileSize", file.size))) return;
+    if (!(await checkFeature("fileSize", { value: file.size }))) return;
 
     const hash = await addAttachment(file, options);
     const dimensions = await getImageDimensions(file);
