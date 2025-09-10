@@ -90,7 +90,7 @@ export const SubscriptionSettings: SettingsGroup[] = [
           const user = useUserStore.getState().user;
           const status = user?.subscription.status;
           return (
-            getSubscriptionInfo(user).legacy ||
+            user?.subscription.plan === SubscriptionPlan.LEGACY_PRO ||
             user?.subscription.provider !== SubscriptionProvider.PADDLE ||
             !isUserSubscribed(user) ||
             status === SubscriptionStatusEnum.CANCELED ||
@@ -162,7 +162,7 @@ export const SubscriptionSettings: SettingsGroup[] = [
           const user = useUserStore.getState().user;
           const status = user?.subscription.status;
           return (
-            getSubscriptionInfo(user).legacy ||
+            user?.subscription.plan === SubscriptionPlan.LEGACY_PRO ||
             user?.subscription.provider !== SubscriptionProvider.PADDLE ||
             !isUserSubscribed(user) ||
             status !== SubscriptionStatusEnum.TRIAL

@@ -426,7 +426,7 @@ export async function logout() {
   const result = await showLogoutConfirmation();
   if (!result) return;
 
-  if (result.backup) {
+  if (result.checks?.backup) {
     try {
       await createBackup({ mode: "partial" });
     } catch (e) {

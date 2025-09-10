@@ -32,7 +32,6 @@ import {
   SubscriptionPlan,
   SubscriptionProvider,
   SubscriptionStatus,
-  SubscriptionType,
   User
 } from "@notesnook/core";
 
@@ -41,30 +40,27 @@ export function getSubscriptionInfo(user?: User): {
   trial?: boolean;
   paused?: boolean;
   canceled?: boolean;
-  legacy?: boolean;
   expiryDate?: string;
   startDate?: string;
   autoRenew?: boolean;
   trialExpiryDate?: string;
 } {
   user = user || useUserStore.getState().user;
-  const { type, expiry, plan, status, provider } = user?.subscription || {};
+  const { expiry, plan, status, provider } = user?.subscription || {};
   if (!expiry) return { title: "Free" };
 
-  const legacy = !!type;
-  const trial =
-    status === SubscriptionStatus.TRIAL || type === SubscriptionType.TRIAL;
+  const trial = status === SubscriptionStatus.TRIAL;
   const title =
     plan === SubscriptionPlan.BELIEVER
       ? "Believer"
-      : plan === SubscriptionPlan.PRO ||
-        type === SubscriptionType.PREMIUM ||
-        type === SubscriptionType.PREMIUM_CANCELED
+      : plan === SubscriptionPlan.PRO
       ? "Pro"
       : plan === SubscriptionPlan.ESSENTIAL
       ? "Essential"
       : plan === SubscriptionPlan.EDUCATION
       ? "Education"
+      : plan === SubscriptionPlan.LEGACY_PRO
+      ? "Pro (legacy)"
       : "Free";
   const autoRenew =
     (status === SubscriptionStatus.ACTIVE ||
@@ -88,7 +84,6 @@ export function getSubscriptionInfo(user?: User): {
 
   return {
     title,
-    legacy,
     trial,
     expiryDate,
     startDate,
@@ -107,7 +102,7 @@ export function UserProfile({ minimal }: Props) {
   const user = useUserStore((store) => store.user);
   const profile = useSettingStore((store) => store.profile);
 
-  const { title, legacy, trial } = getSubscriptionInfo(user);
+  const { title, trial } = getSubscriptionInfo(user);
 
   if (!user || !user.id)
     return (
@@ -206,7 +201,7 @@ export function UserProfile({ minimal }: Props) {
               color: "accent"
             }}
           >
-            {`${title}${trial ? " (trial)" : ""}${legacy ? " (legacy)" : ""}`}
+            {`${title}${trial ? " (trial)" : ""}`}
           </Text>
 
           <Text variant={minimal ? "body" : "subtitle"}>

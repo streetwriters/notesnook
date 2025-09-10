@@ -44,6 +44,10 @@ export const PLAN_METADATA: PlanMetadata = {
   [SubscriptionPlan.EDUCATION]: {
     title: "Education",
     subtitle: ""
+  },
+  [SubscriptionPlan.LEGACY_PRO]: {
+    title: "Pro (legacy)",
+    subtitle: ""
   }
 };
 
