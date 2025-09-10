@@ -179,7 +179,10 @@ export const BuyPlan = (props: {
           </Paragraph>
         </View>
 
-        {pricingPlans.userCanRequestTrial ? (
+        {pricingPlans.hasTrialOffer(
+          props.planId,
+          (pricingPlans.selectedProduct as RNIap.Product).productId
+        ) ? (
           <View
             style={{
               flexDirection: "row",
@@ -205,7 +208,13 @@ export const BuyPlan = (props: {
           </View>
         ) : null}
 
-        {props.canActivateTrial ? (
+        {pricingPlans.hasTrialOffer(
+          props.planId,
+          (pricingPlans.selectedProduct as RNIap.Product).productId
+        ) ||
+        (pricingPlans.selectedProduct as RNIap.Product).productId.includes(
+          "5"
+        ) ? (
           <View
             style={{
               gap: DefaultAppStyles.GAP_VERTICAL,

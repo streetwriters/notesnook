@@ -188,13 +188,15 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
   const hasTrialOffer = (planId?: string, productId?: string) => {
     if (!selectedProductSku && !productId) return false;
 
+    if (productId?.includes("5year")) return false;
+
     return Platform.OS === "ios"
-      ? !!(
+      ? (
           getProduct(
             planId || currentPlan,
             productId || selectedProductSku
           ) as RNIap.SubscriptionIOS
-        )?.introductoryPrice
+        )?.introductoryPricePaymentModeIOS === "FREETRIAL"
       : (
           getProduct(
             planId || currentPlan,
@@ -260,7 +262,6 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
         }
       }
     };
-
     loadPlans().then(() => loadPromoOffer());
   }, [options?.promoOffer, cancelPromo]);
 
@@ -304,7 +305,7 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
   }
 
   async function subscribe(
-    product: RNIap.Subscription,
+    product: RNIap.Subscription | RNIap.Product,
     androidOfferToken?: string
   ) {
     if (loading || !product || isGithubRelease) return;
@@ -352,6 +353,12 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
               ]
             : undefined
         });
+        if (
+          (product as RNIap.SubscriptionIOS).introductoryPricePaymentModeIOS ===
+          "FREETRIAL"
+        ) {
+          PremiumService.subscriptions.setTrialStatus(true);
+        }
       } else {
         await RNIap.requestPurchase({
           andDangerouslyFinishTransactionAutomaticallyIOS: false,
