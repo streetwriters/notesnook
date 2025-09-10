@@ -1058,7 +1058,7 @@ const PricingPlanCard = ({
         </View>
       </View>
 
-      {pricingPlans?.loading ? (
+      {pricingPlans?.loadingPlans ? (
         <ActivityIndicator size="small" color={colors.primary.accent} />
       ) : (
         <View>

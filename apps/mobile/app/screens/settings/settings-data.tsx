@@ -483,11 +483,9 @@ export const settingsGroups: SettingSection[] = [
                 db.fs().cancel("offline-mode");
                 return;
               }
-              PremiumService.verify(() => {
-                SettingsService.setProperty("offlineMode", true);
-                db.attachments.cacheAttachments().catch(() => {
-                  /* empty */
-                });
+              SettingsService.setProperty("offlineMode", true);
+              db.attachments.cacheAttachments().catch(() => {
+                /* empty */
               });
             }
           },
@@ -821,12 +819,10 @@ export const settingsGroups: SettingSection[] = [
             useHook: useVaultStatus,
             hidden: (current) => (current as VaultStatusType)?.exists,
             modifer: () => {
-              PremiumService.verify(() => {
-                openVault({
-                  item: {},
-                  novault: false,
-                  title: strings.createVault()
-                });
+              openVault({
+                item: {},
+                novault: false,
+                title: strings.createVault()
               });
             }
           },
