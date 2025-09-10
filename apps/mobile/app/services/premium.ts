@@ -90,15 +90,6 @@ async function loadProductsAndSubs() {
 
 function get() {
   // if (__DEV__ || Config.isTesting === "true") return true;
-  if (
-    SubscriptionType.BASIC !==
-      useUserStore.getState().user?.subscription.type &&
-    (!useUserStore.getState().user?.subscription?.plan ||
-      useUserStore.getState().user?.subscription?.plan ===
-        SubscriptionPlan.FREE)
-  )
-    return true;
-
   return (
     useUserStore.getState().user?.subscription?.plan !== undefined &&
     useUserStore.getState().user?.subscription?.plan !== SubscriptionPlan.FREE
