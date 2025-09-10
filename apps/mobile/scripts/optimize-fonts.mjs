@@ -101,7 +101,8 @@ const EXTRA_ICON_NAMES = [
   "format-list-bulleted",
   "file-tree",
   "github",
-  "open-source-initiative"
+  "open-source-initiative",
+  "credit-card"
 ];
 
 const __filename = fileURLToPath(import.meta.url);

@@ -18,11 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { formatBytes } from "@notesnook/common";
-import {
-  SubscriptionPlan,
-  SubscriptionStatus,
-  SubscriptionType
-} from "@notesnook/core";
+import { SubscriptionPlan, SubscriptionStatus } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import { useNetInfo } from "@react-native-community/netinfo";
@@ -46,7 +42,6 @@ import { planToDisplayName } from "../../utils/constants";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { SectionItem } from "./section-item";
-import { Notice } from "../../components/ui/notice";
 
 export const getTimeLeft = (t2) => {
   let daysRemaining = dayjs(t2).diff(dayjs(), "days");
@@ -135,6 +130,8 @@ const SettingsUserSection = ({ item }) => {
   const userProfile = useUserStore((state) => state.profile);
   const used = user?.storageUsed || 0;
   const total = user?.totalStorage || 0;
+  const subscriptionProviderInfo =
+    strings.subscriptionProviderInfo[user?.subscription?.provider];
 
   const getSubscriptionStatus = () => {
     if (!user) return strings.neverHesitate();
@@ -164,18 +161,6 @@ const SettingsUserSection = ({ item }) => {
           : strings.accountDowngradedIn(3)
         : strings.neverHesitate();
     }
-
-    return user.subscription?.type === SubscriptionType.TRIAL
-      ? strings.trialEndsOn(expiryDate)
-      : user.subscription?.type === SubscriptionType.PREMIUM_EXPIRED
-      ? subscriptionDaysLeft.time < -3
-        ? strings.subEnded()
-        : strings.accountDowngradedIn(3)
-      : user.subscription?.type === SubscriptionType.PREMIUM_CANCELED
-      ? strings.subEndsOn(expiryDate)
-      : user.subscription?.type === SubscriptionType.PREMIUM
-      ? strings.subRenewOn(expiryDate)
-      : strings.neverHesitate();
   };
 
   return (
@@ -185,8 +170,7 @@ const SettingsUserSection = ({ item }) => {
           <View
             style={{
               paddingHorizontal: DefaultAppStyles.GAP,
-              paddingTop: 25,
-              paddingBottom: 20
+              paddingTop: 25
             }}
           >
             <View
@@ -305,8 +289,7 @@ const SettingsUserSection = ({ item }) => {
               style={{
                 paddingVertical: DefaultAppStyles.GAP_SMALL,
                 gap: DefaultAppStyles.GAP_VERTICAL,
-                borderRadius: 10,
-                marginBottom: 10
+                borderRadius: 10
               }}
             >
               <View
@@ -370,10 +353,7 @@ const SettingsUserSection = ({ item }) => {
                   }}
                 >
                   <Paragraph size={AppFontSize.sm}>
-                    {user.subscription.plan === 0 &&
-                    user.subscription.type === SubscriptionType.PREMIUM
-                      ? strings.proPlan()
-                      : planToDisplayName(user.subscription.plan)}
+                    {planToDisplayName(user.subscription.plan)}
                   </Paragraph>
                   <Paragraph
                     color={colors.secondary.paragraph}
@@ -402,14 +382,6 @@ const SettingsUserSection = ({ item }) => {
                 />
               </View>
             </View>
-
-            {user.subscription.plan === SubscriptionPlan.FREE ? null : (
-              <Notice
-                size="small"
-                text={getSubscriptionStatus()}
-                type="information"
-              />
-            )}
           </View>
 
           {item.sections.map((item) => (

@@ -17,13 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { isFeatureAvailable } from "@notesnook/common";
 import {
   EV,
   EVENTS,
   EventManagerSubscription,
   SYNC_CHECK_IDS,
   SubscriptionPlan,
-  SubscriptionType,
   SyncStatusEvent,
   User
 } from "@notesnook/core";
@@ -51,7 +51,9 @@ import { MMKV } from "../common/database/mmkv";
 import { endProgress, startProgress } from "../components/dialogs/progress";
 import Migrate from "../components/sheets/migrate";
 import NewFeature from "../components/sheets/new-feature";
+import PaywallSheet from "../components/sheets/paywall";
 import { Walkthrough } from "../components/walkthroughs";
+import AddReminder from "../screens/add-reminder";
 import {
   resetTabStore,
   useTabStore
@@ -104,9 +106,6 @@ import { getGithubVersion } from "../utils/github-version";
 import { fluidTabsRef } from "../utils/global-refs";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { sleep } from "../utils/time";
-import AddReminder from "../screens/add-reminder";
-import { isFeatureAvailable } from "@notesnook/common";
-import PaywallSheet from "../components/sheets/paywall";
 import useFeatureManager from "./use-feature-manager";
 
 const onCheckSyncStatus = async (type: SyncStatusEvent) => {
@@ -226,11 +225,7 @@ const onUserEmailVerified = async () => {
 const onUserSubscriptionStatusChanged = async (
   subscription: User["subscription"]
 ) => {
-  if (
-    !PremiumService.get() &&
-    (subscription.type === SubscriptionType.PREMIUM ||
-      subscription.plan != SubscriptionPlan.FREE)
-  ) {
+  if (!PremiumService.get() && subscription.plan !== SubscriptionPlan.FREE) {
     PremiumService.subscriptions.clear();
     useUserStore.setState({
       user: {

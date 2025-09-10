@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { formatBytes } from "@notesnook/common";
-import { User } from "@notesnook/core";
+import { SubscriptionPlan, SubscriptionStatus, User } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import notifee from "@notifee/react-native";
 import Clipboard from "@react-native-clipboard/clipboard";
@@ -27,7 +27,6 @@ import React from "react";
 import { Appearance, Linking, Platform } from "react-native";
 import { getVersion } from "react-native-device-info";
 import * as RNIap from "react-native-iap";
-//@ts-ignore
 import { enabled } from "react-native-privacy-snapshot";
 import ScreenGuardModule from "react-native-screenguard";
 import { db } from "../../common/database";
@@ -57,7 +56,6 @@ import SettingsService from "../../services/settings";
 import Sync from "../../services/sync";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
-import { SUBSCRIPTION_STATUS } from "../../utils/constants";
 import { eCloseSheet, eOpenRecoveryKeyDialog } from "../../utils/events";
 import { NotesnookModule } from "../../utils/notesnook-module";
 import { sleep } from "../../utils/time";
@@ -75,59 +73,67 @@ export const settingsGroups: SettingSection[] = [
     useHook: () => useUserStore((state) => state.user),
     hidden: (current) => !current,
     sections: [
-      // {
-      //   id: "subscription-status",
-      //   useHook: () => useUserStore((state) => state.user),
-      //   hidden: (current) => !current,
-      //   name: (current) => {
-      //     const user = (current as User) || useUserStore.getState().user;
-      //     if (!user) return strings.upgradePlan();
-      //     const isBasic = user.subscription?.type === SUBSCRIPTION_STATUS.BASIC;
-      //     const isTrial = user.subscription?.type === SUBSCRIPTION_STATUS.TRIAL;
-      //     return isBasic || !user.subscription?.type
-      //       ? strings.upgradePlan()
-      //       : isTrial
-      //       ? strings.trialStarted()
-      //       : strings.subDetails();
-      //     ``;
-      //   },
-      //   type: "component",
-      //   component: "subscription",
-      //   icon: "crown",
-      //   description: (current) => {
-      //     const user = current as User;
-      //     if (!user) return strings.neverHesitate();
-      //     const subscriptionDaysLeft =
-      //       user &&
-      //       getTimeLeft(
-      //         parseInt(user.subscription?.expiry as unknown as string)
-      //       );
-      //     const expiryDate = dayjs(user?.subscription?.expiry).format(
-      //       "MMMM D, YYYY"
-      //     );
-      //     const startDate = dayjs(user?.subscription?.start).format(
-      //       "MMMM D, YYYY"
-      //     );
+      {
+        id: "subscription-status",
+        useHook: () => useUserStore((state) => state.user),
+        hidden: (current) =>
+          !current ||
+          (current as User).subscription?.plan === SubscriptionPlan.FREE,
+        name: (current) => {
+          const user = (current as User) || useUserStore.getState().user;
+          return (
+            strings.subscriptionProviderInfo[
+              user?.subscription?.provider
+            ].title() || "Unknown provider"
+          );
+        },
+        icon: "credit-card",
+        modifer: () => {
+          const user = useUserStore.getState().user;
+          if (!user) return;
+          const subscriptionProviderInfo =
+            strings.subscriptionProviderInfo[user?.subscription.provider];
+          presentSheet({
+            title: subscriptionProviderInfo.title(),
+            paragraph: subscriptionProviderInfo.desc()
+          });
+        },
+        description: (current) => {
+          const user = current as User;
+          if (!user) return strings.neverHesitate();
+          const subscriptionDaysLeft =
+            user && getTimeLeft(user.subscription?.expiry);
+          const expiryDate = dayjs(user?.subscription?.expiry).format(
+            "dddd, MMMM D, YYYY h:mm A"
+          );
+          const startDate = dayjs(user?.subscription?.start).format(
+            "dddd, MMMM D, YYYY h:mm A"
+          );
 
-      //     if (user.subscription.provider === 4) {
-      //       return strings.subEndsOn(expiryDate);
-      //     }
+          if (user.subscription.plan !== SubscriptionPlan.FREE) {
+            const status = user.subscription.status;
+            return status === SubscriptionStatus.TRIAL
+              ? strings.trialEndsOn(
+                  dayjs(user?.subscription?.start)
+                    .add(
+                      user?.subscription?.productId.includes("monthly") ? 7 : 14
+                    )
+                    .format("dddd, MMMM D, YYYY h:mm A")
+                )
+              : status === SubscriptionStatus.ACTIVE
+              ? strings.subRenewOn(expiryDate)
+              : status === SubscriptionStatus.CANCELED
+              ? strings.subEndsOn(expiryDate)
+              : status === SubscriptionStatus.EXPIRED
+              ? subscriptionDaysLeft.time < -3
+                ? strings.subEnded()
+                : strings.accountDowngradedIn(3)
+              : strings.neverHesitate();
+          }
 
-      //     return user.subscription?.type === 2
-      //       ? strings.signedUpOn(startDate)
-      //       : user.subscription?.type === 1
-      //       ? strings.trialEndsOn(expiryDate)
-      //       : user.subscription?.type === 6
-      //       ? subscriptionDaysLeft.time < -3
-      //         ? strings.subEnded()
-      //         : strings.accountDowngradedIn(3)
-      //       : user.subscription?.type === 7
-      //       ? strings.subEndsOn(expiryDate)
-      //       : user.subscription?.type === 5
-      //       ? strings.subRenewOn(expiryDate)
-      //       : strings.neverHesitate();
-      //   }
-      // },
+          return strings.neverHesitate();
+        }
+      },
       {
         id: "redeem-gift-code",
         name: strings.redeemGiftCode(),
@@ -137,9 +143,7 @@ export const settingsGroups: SettingSection[] = [
         },
         useHook: () =>
           useUserStore(
-            (state) =>
-              state.user?.subscription.type == SUBSCRIPTION_STATUS.TRIAL ||
-              state.user?.subscription.type == SUBSCRIPTION_STATUS.BASIC
+            (state) => state.user?.subscription.plan === SubscriptionPlan.FREE
           ),
         icon: "gift",
         modifer: () => {
