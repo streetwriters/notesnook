@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { SubscriptionPlan, SubscriptionType } from "@notesnook/core";
+import { SubscriptionPlan } from "@notesnook/core";
 import { database as db } from "../database.js";
 
 type CaptionValue = ("infinity" | (string & {})) | boolean | number;
@@ -448,8 +448,8 @@ export async function isFeatureAvailable<TId extends FeatureId>(
 export async function getFeatureLimit<TId extends FeatureId>(
   feature: Feature<TId>
 ) {
-  const { isLegacyPro, plan } = await getUserPlan();
-  return getFeatureLimitFromPlan(feature, plan, isLegacyPro);
+  const plan = await getUserPlan();
+  return getFeatureLimitFromPlan(feature, plan);
 }
 
 export async function areFeaturesAvailable<TIds extends FeatureId[]>(
@@ -458,7 +458,7 @@ export async function areFeaturesAvailable<TIds extends FeatureId[]>(
 ): Promise<{
   [K in TIds[number]]: FeatureResult<K>;
 }> {
-  const { isLegacyPro, plan } = await getUserPlan();
+  const plan = await getUserPlan();
   const results = {} as {
     [K in TIds[number]]: FeatureResult<K>;
   };
@@ -467,7 +467,7 @@ export async function areFeaturesAvailable<TIds extends FeatureId[]>(
     const id = ids[i];
 
     const feature = getFeature(id);
-    const limit = getFeatureLimitFromPlan(feature, plan, isLegacyPro);
+    const limit = getFeatureLimitFromPlan(feature, plan);
     const isAllowed = await limit.isAllowed(value || (await feature.used?.()));
 
     results[id as TIds[number]] = {
@@ -484,16 +484,8 @@ export async function areFeaturesAvailable<TIds extends FeatureId[]>(
 
 async function getUserPlan() {
   const user = await db.user.getUser();
-  const type = user?.subscription?.type;
-
-  const isLegacyPro =
-    type !== undefined &&
-    (type === SubscriptionType.BETA ||
-      type === SubscriptionType.PREMIUM ||
-      type === SubscriptionType.PREMIUM_CANCELED ||
-      type === SubscriptionType.TRIAL);
   const plan = user?.subscription?.plan || SubscriptionPlan.FREE;
-  return { plan, isLegacyPro };
+  return plan;
 }
 
 async function availableOn(id: FeatureId, value?: number) {
@@ -540,11 +532,11 @@ export type FeatureUsage = {
   used: number;
 };
 export async function getFeaturesUsage(): Promise<FeatureUsage[]> {
-  const { isLegacyPro, plan } = await getUserPlan();
+  const plan = await getUserPlan();
   const usage: FeatureUsage[] = [];
   for (const key in features) {
     const feature = getFeature(key as FeatureId);
-    const limit = getFeatureLimitFromPlan(feature, plan, isLegacyPro);
+    const limit = getFeatureLimitFromPlan(feature, plan);
     if (!feature.used || typeof limit.value !== "number") continue;
     usage.push({
       id: key as FeatureId,
@@ -557,10 +549,9 @@ export async function getFeaturesUsage(): Promise<FeatureUsage[]> {
 
 function getFeatureLimitFromPlan<TId extends FeatureId>(
   feature: Feature<TId>,
-  plan: SubscriptionPlan,
-  isLegacyPro: boolean
+  plan: SubscriptionPlan
 ): Limit<Caption<TId>> {
-  const key = isLegacyPro ? "legacyPro" : PLAN_TO_AVAILABILITY[plan];
+  const key = PLAN_TO_AVAILABILITY[plan];
   return feature.availability[key] as unknown as Limit<Caption<TId>>;
 }
 
@@ -572,7 +563,8 @@ const PLAN_TO_AVAILABILITY: Record<
   [SubscriptionPlan.ESSENTIAL]: "essential",
   [SubscriptionPlan.PRO]: "pro",
   [SubscriptionPlan.BELIEVER]: "believer",
-  [SubscriptionPlan.EDUCATION]: "pro"
+  [SubscriptionPlan.EDUCATION]: "pro",
+  [SubscriptionPlan.LEGACY_PRO]: "legacyPro"
 };
 
 const AVAILABILITY_TO_PLAN: Record<
