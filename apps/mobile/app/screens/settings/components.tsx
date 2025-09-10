@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { ReactElement } from "react";
 import { AttachmentDialog } from "../../components/attachments";
-import { AccentColorPicker } from "./appearance";
 import DebugLogs from "./debug";
 import { ConfigureToolbar } from "./editor/configure-toolbar";
 import { Licenses } from "./licenses";
@@ -47,7 +46,6 @@ import { ChangePassword } from "../../components/auth/change-password";
 import { ChangeEmail } from "./change-email";
 
 export const components: { [name: string]: ReactElement } = {
-  colorpicker: <AccentColorPicker />,
   homeselector: <HomePicker />,
   autobackups: <BackupReminderPicker />,
   subscription: <Subscription />,

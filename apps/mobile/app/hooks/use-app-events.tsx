@@ -232,6 +232,12 @@ const onUserSubscriptionStatusChanged = async (
       subscription.plan != SubscriptionPlan.FREE)
   ) {
     PremiumService.subscriptions.clear();
+    useUserStore.setState({
+      user: {
+        ...(useUserStore.getState().user as User),
+        subscription: subscription
+      }
+    });
     Walkthrough.present("prouser", false, true);
   }
   await PremiumService.setPremiumStatus();
@@ -319,6 +325,7 @@ async function saveEditorState() {
 const onSuccessfulSubscription = async (
   subscription: RNIap.ProductPurchase | RNIap.SubscriptionPurchase
 ) => {
+  if (Platform.OS === "android") return;
   await PremiumService.subscriptions.set(subscription);
   await PremiumService.subscriptions.verify(subscription);
 };

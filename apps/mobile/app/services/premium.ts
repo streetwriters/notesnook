@@ -17,38 +17,29 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { CHECK_IDS, SubscriptionPlan } from "@notesnook/core";
+import {
+  SubscriptionPlan,
+  SubscriptionStatus,
+  SubscriptionType
+} from "@notesnook/core";
 import { Platform } from "react-native";
 import Config from "react-native-config";
 import * as RNIap from "react-native-iap";
 import { db } from "../common/database";
 import { MMKV } from "../common/database/mmkv";
 import { useUserStore } from "../stores/use-user-store";
-import { itemSkus, SUBSCRIPTION_STATUS } from "../utils/constants";
-import { eOpenPremiumDialog, eShowGetPremium } from "../utils/events";
-import { eSendEvent, presentSheet, ToastManager } from "./event-manager";
-
+import { itemSkus } from "../utils/constants";
+import { presentSheet, ToastManager } from "./event-manager";
 import { strings } from "@notesnook/intl";
 import SettingsService from "./settings";
 
-/**
- * @type {RNIap.Subscription[]}
- */
-let subs = [];
-/**
- * @type {RNIap.Product[]}
- */
-let products = [];
-let user = null;
-
-function getUser() {
-  return user;
-}
+let subs: RNIap.Subscription[] = [];
+let products: RNIap.Product[] = [];
 
 async function setPremiumStatus() {
   let userstore = useUserStore.getState();
   try {
-    user = await db.user.getUser();
+    const user = await db.user.getUser();
     if (!user) {
       userstore.setPremium(get());
     } else {
@@ -67,19 +58,6 @@ async function setPremiumStatus() {
       skus: itemSkus
     });
   } catch (e) {}
-}
-
-function getMontlySub() {
-  let _product = subs.find(
-    (p) => p.productId === "com.streetwriters.notesnook.sub.mo"
-  );
-  if (!_product) {
-    _product = {
-      localizedPrice: "$4.49"
-    };
-  }
-
-  return _product;
 }
 
 async function loadProductsAndSubs() {
@@ -112,28 +90,19 @@ async function loadProductsAndSubs() {
 
 function get() {
   // if (__DEV__ || Config.isTesting === "true") return true;
+  if (
+    SubscriptionType.BASIC !==
+      useUserStore.getState().user?.subscription.type &&
+    (!useUserStore.getState().user?.subscription?.plan ||
+      useUserStore.getState().user?.subscription?.plan ===
+        SubscriptionPlan.FREE)
+  )
+    return true;
 
   return (
     useUserStore.getState().user?.subscription?.plan !== undefined &&
     useUserStore.getState().user?.subscription?.plan !== SubscriptionPlan.FREE
   );
-}
-
-async function verify(callback, error) {
-  try {
-    if (!get()) {
-      if (error) {
-        error();
-        return;
-      }
-      eSendEvent(eOpenPremiumDialog);
-      return;
-    }
-    if (!callback) console.warn("You must provide a callback function");
-    await callback();
-  } catch (e) {
-    console.error(e);
-  }
 }
 
 const showVerifyEmailDialog = () => {
@@ -170,7 +139,7 @@ const showVerifyEmailDialog = () => {
       } catch (e) {
         ToastManager.show({
           heading: strings.failedToSendVerificationEmail(),
-          message: e.message,
+          message: (e as Error).message,
           type: "error",
           context: "local"
         });
@@ -181,6 +150,10 @@ const showVerifyEmailDialog = () => {
 };
 
 const subscriptions = {
+  trialStatus: false,
+  setTrialStatus: (status: boolean) => {
+    subscriptions.trialStatus = status;
+  },
   /**
    *
    * @returns {RNIap.Purchase} subscription
@@ -189,21 +162,23 @@ const subscriptions = {
     if (Platform.OS === "android") return;
     let _subscriptions = MMKV.getString("subscriptionsIOS");
     if (!_subscriptions) return [];
-    return JSON.parse(_subscriptions);
+    return JSON.parse(_subscriptions) as (
+      | RNIap.SubscriptionPurchase
+      | RNIap.ProductPurchase
+    )[];
   },
   /**
    *
    * @param {RNIap.Purchase} subscription
    * @returns
    */
-  set: async (subscription) => {
+  set: async (
+    subscription: RNIap.SubscriptionPurchase | RNIap.ProductPurchase
+  ) => {
     if (Platform.OS === "android") return;
-    let _subscriptions = MMKV.getString("subscriptionsIOS");
-    if (_subscriptions) {
-      _subscriptions = JSON.parse(_subscriptions);
-    } else {
-      _subscriptions = [];
-    }
+    const _subscriptions = subscriptions.get();
+    if (!_subscriptions) return;
+
     let index = _subscriptions.findIndex(
       (s) => s.transactionId === subscription.transactionId
     );
@@ -214,14 +189,11 @@ const subscriptions = {
     }
     MMKV.setString("subscriptionsIOS", JSON.stringify(_subscriptions));
   },
-  remove: async (transactionId) => {
+  remove: async (transactionId: string) => {
     if (Platform.OS === "android") return;
-    let _subscriptions = MMKV.getString("subscriptionsIOS");
-    if (_subscriptions) {
-      _subscriptions = JSON.parse(_subscriptions);
-    } else {
-      _subscriptions = [];
-    }
+    const _subscriptions = subscriptions.get();
+    if (!_subscriptions) return;
+
     let index = _subscriptions.findIndex(
       (s) => s.transactionId === transactionId
     );
@@ -234,7 +206,9 @@ const subscriptions = {
    *
    * @param {RNIap.Purchase} subscription
    */
-  verify: async (subscription) => {
+  verify: async (
+    subscription: RNIap.SubscriptionPurchase | RNIap.ProductPurchase
+  ) => {
     if (Platform.OS === "android") return;
 
     if (subscription.transactionReceipt) {
@@ -245,6 +219,7 @@ const subscriptions = {
           method: "POST",
           body: JSON.stringify({
             receipt_data: subscription.transactionReceipt,
+            trial_status: subscriptions.trialStatus,
             user_id: user.id
           }),
           headers: {
@@ -276,9 +251,12 @@ const subscriptions = {
       }
     }
   },
-  clear: async (_subscription) => {
+  clear: async (
+    _subscription?: RNIap.SubscriptionPurchase | RNIap.ProductPurchase
+  ) => {
     if (Platform.OS === "android") return;
     let _subscriptions = subscriptions.get();
+    if (!_subscriptions) return;
     let subscription = null;
     if (_subscription) {
       subscription = _subscription;
@@ -291,20 +269,17 @@ const subscriptions = {
         purchase: subscription
       });
       await RNIap.clearTransactionIOS();
-      await subscriptions.remove(subscription.transactionId);
+      await subscriptions.remove(subscription.transactionId as string);
     }
   }
 };
 
 const PremiumService = {
-  verify,
   setPremiumStatus,
   get,
   showVerifyEmailDialog,
   loadProductsAndSubs: loadProductsAndSubs,
-  getUser,
-  subscriptions,
-  getMontlySub
+  subscriptions
 };
 
 export default PremiumService;
