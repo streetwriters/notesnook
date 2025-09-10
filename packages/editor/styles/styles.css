@@ -643,24 +643,57 @@ p > *::selection {
 /* Check list */
 .ProseMirror ul.simple-checklist {
   list-style: none;
-  padding: 0;
+  margin-left: -25px;
 }
 
 .ProseMirror ul.simple-checklist > li {
   display: flex;
+  align-items: center;
 }
 
-.ProseMirror ul.simple-checklist > li input {
-  flex: 0 0 auto;
-  margin-right: 0.5rem;
-  user-select: none;
-  height: 1rem;
-  width: 1rem;
-  accent-color: var(--accent);
-}
-
-.ProseMirror ul.simple-checklist > li > div {
+.ProseMirror ul.simple-checklist > li > div.checklist-item-content {
   flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.ProseMirror ul.simple-checklist > li[data-checked="true"] > div.checklist-item-content {
+  opacity: 0.6;
+}
+
+.ProseMirror ul.simple-checklist > li > div.checkbox-wrapper {
+  border: 2px solid var(--icon);
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 4px;
+  margin-right: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 250ms cubic-bezier(1, 0, .37, .91);
+  background-color: transparent;
+}
+
+.ProseMirror ul.simple-checklist > li > div.checkbox-wrapper:hover {
+  border-color: var(--accent);
+}
+
+.ProseMirror ul.simple-checklist > li > div.checkbox-wrapper.checked {
+  border-color: var(--accent);
+}
+
+.ProseMirror ul.simple-checklist > li > div.checkbox-wrapper svg {
+  width: 1rem;
+  height: 1rem;
+  fill: var(--accent);
+  opacity: 0;
+  transition: opacity 250ms cubic-bezier(1, 0, .37, .91);
+}
+
+.ProseMirror ul.simple-checklist > li > div.checkbox-wrapper.checked svg {
+  opacity: 1;
 }
 
 @media screen and (max-width: 480px) {

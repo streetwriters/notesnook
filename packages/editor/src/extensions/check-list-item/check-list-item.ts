@@ -98,31 +98,35 @@ export const CheckListItem = Node.create<CheckListItemOptions>({
   addNodeView() {
     return ({ node, getPos, editor }) => {
       const listItem = document.createElement("li");
-      const checkboxWrapper = document.createElement("label");
-      const checkboxStyler = document.createElement("span");
-      const checkbox = document.createElement("input");
+      const checkboxWrapper = document.createElement("div");
       const content = document.createElement("div");
 
       checkboxWrapper.contentEditable = "false";
-      checkbox.type = "checkbox";
+      checkboxWrapper.className = "checkbox-wrapper";
+      checkboxWrapper.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/>
+        </svg>
+      `;
 
-      checkbox.addEventListener("mousedown", (event) => {
+      content.className = "checklist-item-content";
+
+      checkboxWrapper.addEventListener("mousedown", (event) => {
         if (globalThis.keyboardShown) {
           event.preventDefault();
         }
       });
 
-      checkbox.addEventListener("change", (event) => {
+      checkboxWrapper.addEventListener("click", (event) => {
         event.preventDefault();
-        // if the editor isn’t editable and we don't have a handler for
+
+        const isChecked = checkboxWrapper.classList.contains("checked");
+
+        // if the editor isn't editable and we don't have a handler for
         // readonly checks we have to undo the latest change
         if (!editor.isEditable && !this.options.onReadOnlyChecked) {
-          checkbox.checked = !checkbox.checked;
-
           return;
         }
-
-        const { checked } = event.target as any;
 
         if (editor.isEditable && typeof getPos === "function") {
           editor
@@ -133,7 +137,7 @@ export const CheckListItem = Node.create<CheckListItemOptions>({
 
               tr.setNodeMarkup(position, undefined, {
                 ...currentNode?.attrs,
-                checked
+                checked: !isChecked
               });
 
               return true;
@@ -142,17 +146,17 @@ export const CheckListItem = Node.create<CheckListItemOptions>({
         }
         if (!editor.isEditable && this.options.onReadOnlyChecked) {
           // Reset state if onReadOnlyChecked returns false
-          if (!this.options.onReadOnlyChecked(node, checked)) {
-            checkbox.checked = !checkbox.checked;
+          if (!this.options.onReadOnlyChecked(node, !isChecked)) {
+            return;
           }
         }
       });
 
       if (node.attrs.checked) {
-        checkbox.setAttribute("checked", "checked");
+        checkboxWrapper.classList.add("checked");
+        listItem.dataset.checked = node.attrs.checked;
       }
 
-      checkboxWrapper.append(checkbox, checkboxStyler);
       listItem.append(checkboxWrapper, content);
 
       return {
@@ -165,9 +169,9 @@ export const CheckListItem = Node.create<CheckListItemOptions>({
 
           listItem.dataset.checked = updatedNode.attrs.checked;
           if (updatedNode.attrs.checked) {
-            checkbox.setAttribute("checked", "checked");
+            checkboxWrapper.classList.add("checked");
           } else {
-            checkbox.removeAttribute("checked");
+            checkboxWrapper.classList.remove("checked");
           }
 
           return true;
