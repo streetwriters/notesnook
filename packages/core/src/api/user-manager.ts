@@ -356,7 +356,8 @@ class UserManager {
         const oldUser = await this.getUser();
         if (
           oldUser &&
-          (oldUser.subscription.type !== user.subscription.type ||
+          (oldUser.subscription.plan !== user.subscription.plan ||
+            oldUser.subscription.status !== user.subscription.status ||
             oldUser.subscription.provider !== user.subscription.provider)
         ) {
           await this.tokenManager._refreshToken(true);

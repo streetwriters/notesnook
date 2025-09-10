@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import {
   planToId,
   SubscriptionPlan,
-  SubscriptionType,
+  SubscriptionStatus,
   User
 } from "../types.js";
 import hosts from "../utils/constants.js";
@@ -241,12 +241,8 @@ export default class Subscriptions {
 }
 
 function isLegacySubscription(user: User) {
-  const type = user.subscription.type;
   return (
-    type !== undefined &&
-    (type === SubscriptionType.BETA ||
-      type === SubscriptionType.PREMIUM ||
-      type === SubscriptionType.PREMIUM_CANCELED ||
-      type === SubscriptionType.TRIAL)
+    user.subscription.plan === SubscriptionPlan.LEGACY_PRO &&
+    user.subscription.status !== SubscriptionStatus.EXPIRED
   );
 }
