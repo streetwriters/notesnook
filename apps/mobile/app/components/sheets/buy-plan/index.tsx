@@ -27,7 +27,6 @@ import * as RNIap from "react-native-iap";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { WebView } from "react-native-webview";
 import { db } from "../../../common/database";
-import useGlobalSafeAreaInsets from "../../../hooks/use-global-safe-area-insets";
 import usePricingPlans from "../../../hooks/use-pricing-plans";
 import { openLinkInBrowser } from "../../../utils/functions";
 import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
@@ -44,7 +43,6 @@ export const BuyPlan = (props: {
   goNext: () => void;
 }) => {
   const { colors } = useThemeColors();
-  const insets = useGlobalSafeAreaInsets();
   const [checkoutUrl, setCheckoutUrl] = useState<string>();
   const pricingPlans = usePricingPlans({
     planId: props.planId,
@@ -65,6 +63,8 @@ export const BuyPlan = (props: {
       ? (pricingPlans.selectedProduct as Plan)?.period
       : (pricingPlans.selectedProduct as RNIap.Product)?.productId
   )?.includes("5");
+
+  console.log(checkoutUrl);
 
   return checkoutUrl ? (
     <View
@@ -98,11 +98,12 @@ export const BuyPlan = (props: {
 `
         }}
         onMessage={(message) => {
-          const data = JSON.parse(message.nativeEvent.data);
-          if (data.success) {
-            props.goNext();
-          }
-          return;
+          try {
+            const data = JSON.parse(message.nativeEvent.data);
+            if (data.success) {
+              props.goNext();
+            }
+          } catch (e) {}
         }}
         domStorageEnabled
         javaScriptEnabled
