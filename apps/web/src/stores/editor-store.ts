@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { createPersistedStore } from "../common/store";
 import { useStore as useNoteStore } from "./note-store";
 import { store as appStore } from "./app-store";
-import { store as settingStore } from "./setting-store";
+import { useStore as useSettingStore } from "./setting-store";
 import { db } from "../common/db";
 import BaseStore from ".";
 import { EV, EVENTS } from "@notesnook/core";
@@ -240,6 +240,15 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   init = () => {
+    useSettingStore.subscribe(
+      (s) => s.hideNoteTitle,
+      (state) => {
+        setDocumentTitle(
+          state ? this.get().getActiveSession()?.title : undefined
+        );
+      }
+    );
+
     EV.subscribe(EVENTS.userLoggedOut, () => {
       const { closeTabs, tabs } = this.get();
       closeTabs(...tabs.map((s) => s.id));
@@ -577,7 +586,7 @@ class EditorStore extends BaseStore<EditorStore> {
 
     if (
       id &&
-      !settingStore.get().hideNoteTitle &&
+      !useSettingStore.getState().hideNoteTitle &&
       session &&
       "note" in session
     ) {
@@ -1075,7 +1084,7 @@ class EditorStore extends BaseStore<EditorStore> {
         }
 
         setDocumentTitle(
-          settingStore.get().hideNoteTitle ? undefined : note.title
+          useSettingStore.getState().hideNoteTitle ? undefined : note.title
         );
         this.setSaveState(id, SaveState.Saved);
       } catch (err) {
@@ -1284,7 +1293,7 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   pinTab = (tabId: string) => {
-    const { tabs: _tabs, activeTabId } = this.get();
+    const { tabs: _tabs } = this.get();
     const tabs = _tabs.slice();
     const index = tabs.findIndex((t) => t.id === tabId);
     if (index === -1) return;

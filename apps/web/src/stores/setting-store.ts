@@ -23,8 +23,6 @@ import { desktop } from "../common/desktop-bridge";
 import createStore from "../common/store";
 import Config from "../utils/config";
 import BaseStore from "./index";
-import { useEditorStore } from "./editor-store";
-import { setDocumentTitle } from "../utils/dom";
 import { TimeFormat } from "@notesnook/core";
 import { Profile, TrashCleanupInterval } from "@notesnook/core";
 import { showToast } from "../utils/toast";
@@ -249,11 +247,6 @@ class SettingStore extends BaseStore<SettingStore> {
     const { hideNoteTitle } = this.get();
     this.set({ hideNoteTitle: !hideNoteTitle });
     Config.set("hideNoteTitle", !hideNoteTitle);
-    setDocumentTitle(
-      !hideNoteTitle
-        ? undefined
-        : useEditorStore.getState().getActiveSession()?.title
-    );
   };
 
   toggleAutoUpdates = async () => {
