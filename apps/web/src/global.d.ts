@@ -34,10 +34,6 @@ declare global {
   var IS_THEME_BUILDER: boolean;
   var hasNativeTitlebar: boolean;
 
-  interface Window {
-    ApplePaySession?: PaymentRequest;
-  }
-
   interface AuthenticationExtensionsClientInputs {
     prf?: {
       eval: {

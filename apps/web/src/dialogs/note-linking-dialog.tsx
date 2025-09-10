@@ -40,7 +40,7 @@ import { Lock } from "../components/icons";
 import { ellipsize } from "@notesnook/core";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
-import { BuyDialog } from "./buy-dialog";
+import { UpgradeDialog } from "./buy-dialog/upgrade-dialog";
 
 export type NoteLinkingDialogProps = BaseDialogProps<LinkAttributes | false> & {
   attributes?: LinkAttributes;
@@ -206,9 +206,11 @@ export const NoteLinkingDialog = DialogManager.register(
                   {blockLinkingAvailability?.error}{" "}
                   <Button
                     onClick={() =>
-                      BuyDialog.show({
-                        plan: blockLinkingAvailability?.availableOn
-                      })
+                      blockLinkingAvailability
+                        ? UpgradeDialog.show({
+                            feature: blockLinkingAvailability
+                          })
+                        : null
                     }
                     variant="anchor"
                   >

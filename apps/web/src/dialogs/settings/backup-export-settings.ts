@@ -86,10 +86,10 @@ export const BackupExportSettings: SettingsGroup[] = [
           {
             type: "dropdown",
             options: [
-              { value: "0", title: strings.never(), premium: true },
-              { value: "1", title: strings.daily(), premium: true },
-              { value: "2", title: strings.weekly(), premium: true },
-              { value: "3", title: strings.monthly(), premium: true }
+              { value: "0", title: strings.never() },
+              { value: "1", title: strings.daily() },
+              { value: "2", title: strings.weekly() },
+              { value: "3", title: strings.monthly() }
             ],
             selectedOption: () =>
               useSettingStore.getState().backupReminderOffset.toString(),
@@ -118,9 +118,9 @@ export const BackupExportSettings: SettingsGroup[] = [
           {
             type: "dropdown",
             options: [
-              { value: "0", title: strings.never(), premium: true },
-              { value: "1", title: strings.weekly(), premium: true },
-              { value: "2", title: strings.monthly(), premium: true }
+              { value: "0", title: strings.never() },
+              { value: "1", title: strings.weekly() },
+              { value: "2", title: strings.monthly() }
             ],
             selectedOption: () =>
               useSettingStore.getState().fullBackupReminderOffset.toString(),
@@ -212,13 +212,12 @@ export const BackupExportSettings: SettingsGroup[] = [
             options: [
               { value: "-", title: strings.exportAs() },
               { value: "txt", title: "Text" },
-              { value: "md", title: "Markdown", premium: true },
+              { value: "md", title: "Markdown" },
               {
                 value: "md-frontmatter",
-                title: "Markdown + Frontmatter",
-                premium: true
+                title: "Markdown + Frontmatter"
               },
-              { value: "html", title: "HTML", premium: true }
+              { value: "html", title: "HTML" }
             ],
             selectedOption: () => "-",
             onSelectionChanged: async (value) => {

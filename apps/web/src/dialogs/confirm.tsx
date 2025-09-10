@@ -55,7 +55,7 @@ export type ConfirmDialogProps = BaseDialogProps<
   inputs?: Record<string, Input>;
 };
 
-export const ConfirmDialog = DialogManager.register(function ConfirmDialog<>(
+export const ConfirmDialog = DialogManager.register(function ConfirmDialog(
   props: ConfirmDialogProps
 ) {
   const {

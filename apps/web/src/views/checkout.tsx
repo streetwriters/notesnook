@@ -85,13 +85,6 @@ function Checkout() {
   const [currentStep, setCurrentStep] = useState(0);
   const [error, setError] = useState<string>();
   const [customer, setCustomer] = useState<{ id: string; email: string }>();
-  const isCheckoutCompleted = useCheckoutStore((store) => store.isCompleted);
-
-  useEffect(() => {
-    if (isCheckoutCompleted) {
-      setCurrentStep(2);
-    }
-  }, [isCheckoutCompleted]);
 
   useEffect(() => {
     useUserStore.getState().init();
@@ -106,7 +99,11 @@ function Checkout() {
       return;
     }
     useCheckoutStore.getState().selectPlan(pricingInfo.data);
-    useCheckoutStore.getState().updatePrice(toPricingInfo(pricingInfo.data));
+    useCheckoutStore
+      .getState()
+      .updatePrice(
+        toPricingInfo(pricingInfo.data, useUserStore.getState().user)
+      );
     useCheckoutStore.getState().applyCoupon(pricingInfo.data.discount?.code);
     if (pricingInfo.data.customer) {
       setCustomer(pricingInfo.data.customer);
@@ -263,7 +260,12 @@ function Checkout() {
                   You are one step away from unlocking the full potential of
                   Notesnook.
                 </Text>
-                <CheckoutDetails user={customer} />
+                <CheckoutDetails
+                  user={customer}
+                  onComplete={() => {
+                    setCurrentStep(2);
+                  }}
+                />
               </Flex>
             ) : currentStep === 2 ? (
               <Flex
