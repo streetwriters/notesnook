@@ -17,11 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  SubscriptionPlan,
-  SubscriptionStatus,
-  SubscriptionType
-} from "@notesnook/core";
+import { SubscriptionPlan } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { Platform } from "react-native";
 import Config from "react-native-config";
 import * as RNIap from "react-native-iap";
@@ -30,7 +27,6 @@ import { MMKV } from "../common/database/mmkv";
 import { useUserStore } from "../stores/use-user-store";
 import { itemSkus } from "../utils/constants";
 import { presentSheet, ToastManager } from "./event-manager";
-import { strings } from "@notesnook/intl";
 import SettingsService from "./settings";
 
 let subs: RNIap.Subscription[] = [];
