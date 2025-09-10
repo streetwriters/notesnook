@@ -551,7 +551,8 @@ export enum SubscriptionPlan {
   ESSENTIAL = 1,
   PRO = 2,
   BELIEVER = 3,
-  EDUCATION = 4
+  EDUCATION = 4,
+  LEGACY_PRO = 5
 }
 
 export enum SubscriptionStatus {
@@ -567,16 +568,6 @@ export enum SubscriptionProvider {
   APPLE = 1,
   GOOGLE = 2,
   PADDLE = 3
-}
-
-export enum SubscriptionType {
-  BASIC = 0,
-  TRIAL = 1,
-  BETA = 2,
-  PREMIUM = 5,
-  PREMIUM_EXPIRED = 6,
-  PREMIUM_CANCELED = 7,
-  PREMIUM_PAUSED = 8
 }
 
 export type User = {
@@ -602,7 +593,6 @@ export type User = {
     productId: string;
     provider: SubscriptionProvider;
     start: number;
-    type: SubscriptionType;
     plan: SubscriptionPlan;
     status: SubscriptionStatus;
     trialsAvailed?: SubscriptionPlan[];
