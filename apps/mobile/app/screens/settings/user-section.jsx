@@ -305,7 +305,8 @@ const SettingsUserSection = ({ item }) => {
               style={{
                 paddingVertical: DefaultAppStyles.GAP_SMALL,
                 gap: DefaultAppStyles.GAP_VERTICAL,
-                borderRadius: 10
+                borderRadius: 10,
+                marginBottom: 10
               }}
             >
               <View
@@ -402,8 +403,7 @@ const SettingsUserSection = ({ item }) => {
               </View>
             </View>
 
-            {user.subscription.plan === SubscriptionPlan.FREE ||
-            user.subscription.type === SubscriptionType.BASIC ? null : (
+            {user.subscription.plan === SubscriptionPlan.FREE ? null : (
               <Notice
                 size="small"
                 text={getSubscriptionStatus()}
