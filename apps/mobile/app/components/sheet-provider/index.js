@@ -95,8 +95,6 @@ const SheetProvider = ({ context = "global" }) => {
     [context]
   );
 
-  console.log(data?.keyboardHandlerDisabled);
-
   return !visible || !data ? null : (
     <SheetWrapper
       fwdRef={actionSheetRef}

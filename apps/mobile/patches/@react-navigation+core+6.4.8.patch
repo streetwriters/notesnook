@@ -1,0 +1,39 @@
+diff --git a/node_modules/@react-navigation/core/lib/commonjs/useNavigationCache.js b/node_modules/@react-navigation/core/lib/commonjs/useNavigationCache.js
+index c7f1df6..0141f28 100644
+--- a/node_modules/@react-navigation/core/lib/commonjs/useNavigationCache.js
++++ b/node_modules/@react-navigation/core/lib/commonjs/useNavigationCache.js
+@@ -109,7 +109,7 @@ function useNavigationCache(_ref) {
+         })),
+         isFocused: () => {
+           const state = getState();
+-          if (state.routes[state.index].key !== route.key) {
++          if (state.routes[state.index]?.key !== route.key) {
+             return false;
+           }
+ 
+diff --git a/node_modules/@react-navigation/core/lib/module/useNavigationCache.js b/node_modules/@react-navigation/core/lib/module/useNavigationCache.js
+index c4d65c6..89abe63 100644
+--- a/node_modules/@react-navigation/core/lib/module/useNavigationCache.js
++++ b/node_modules/@react-navigation/core/lib/module/useNavigationCache.js
+@@ -100,7 +100,7 @@ export default function useNavigationCache(_ref) {
+         })),
+         isFocused: () => {
+           const state = getState();
+-          if (state.routes[state.index].key !== route.key) {
++          if (state.routes[state.index]?.key !== route.key) {
+             return false;
+           }
+ 
+diff --git a/node_modules/@react-navigation/core/src/useNavigationCache.tsx b/node_modules/@react-navigation/core/src/useNavigationCache.tsx
+index 390120a..1b0f2d1 100644
+--- a/node_modules/@react-navigation/core/src/useNavigationCache.tsx
++++ b/node_modules/@react-navigation/core/src/useNavigationCache.tsx
+@@ -157,7 +157,7 @@ export default function useNavigationCache<
+         isFocused: () => {
+           const state = getState();
+ 
+-          if (state.routes[state.index].key !== route.key) {
++          if (state.routes[state.index]?.key !== route.key) {
+             return false;
+           }
+ 

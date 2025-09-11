@@ -131,7 +131,6 @@ const showActionsheet = async () => {
     .getState()
     .getNoteIdForTab(useTabStore.getState().currentTab!);
   if (noteId) {
-    console.log("OPEN NOTE");
     const note = await db.notes?.note(noteId);
     Properties.present(note, false);
   } else {
