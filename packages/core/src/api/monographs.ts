@@ -38,7 +38,10 @@ type MonographApiRequest = (UnencryptedMonograph | EncryptedMonograph) & {
   userId: string;
 };
 
-export type PublishOptions = { password?: string; selfDestruct?: boolean };
+export type PublishOptions = {
+  password?: string;
+  selfDestruct?: boolean;
+};
 export class Monographs {
   monographs: string[] = [];
   constructor(private readonly db: Database) {}
@@ -70,7 +73,9 @@ export class Monographs {
   /**
    * Publish a note as a monograph
    */
-  async publish(noteId: string, opts: PublishOptions = {}) {
+  async publish(noteId: string, title: string, opts: PublishOptions = {}) {
+    if (title === "") throw new Error("Title cannot be empty.");
+
     if (!this.monographs.length) await this.refresh();
 
     const update = !!this.isPublished(noteId);
@@ -99,7 +104,7 @@ export class Monographs {
     const monographPasswordsKey = await this.db.user.getMonographPasswordsKey();
     const monograph: MonographApiRequest = {
       id: noteId,
-      title: note.title,
+      title,
       userId: user.id,
       selfDestruct: opts.selfDestruct || false,
       ...(opts.password
