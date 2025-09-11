@@ -91,6 +91,7 @@ import { SearchResult } from "./extensions/search-result/search-result.js";
 interface TiptapStorage {
   dateFormat?: DateTimeOptions["dateFormat"];
   timeFormat?: DateTimeOptions["timeFormat"];
+  dayFormat?: DateTimeOptions["dayFormat"];
   openLink?: (url: string, openInNewTab?: boolean) => void;
   downloadAttachment?: (attachment: Attachment) => void;
   openAttachmentPicker?: (type: AttachmentType) => void;
@@ -147,6 +148,7 @@ const useTiptap = (
     onBeforeCreate,
     dateFormat,
     timeFormat,
+    dayFormat,
     copyToClipboard,
     createInternalLink,
 
@@ -316,7 +318,7 @@ const useTiptap = (
         KeepInView.configure({
           scrollIntoViewOnWindowResize: !isMobile
         }),
-        DateTime.configure({ dateFormat, timeFormat }),
+        DateTime.configure({ dateFormat, timeFormat, dayFormat }),
         KeyMap,
         WebClipNode,
         CheckList,
@@ -369,6 +371,7 @@ const useTiptap = (
       onBeforeCreate: ({ editor }) => {
         editor.storage.dateFormat = dateFormat;
         editor.storage.timeFormat = timeFormat;
+        editor.storage.dayFormat = dayFormat;
 
         editor.storage.openLink = openLink;
         editor.storage.downloadAttachment = downloadAttachment;
