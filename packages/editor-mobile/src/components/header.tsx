@@ -58,6 +58,43 @@ const MenuItem = (props: any) => (
   <MenuItemInner {...props} className={menuItemClassName} />
 );
 
+const iconButtonStyle: React.CSSProperties = {
+  borderWidth: 0,
+  borderRadius: 100,
+  color: "var(--nn_primary_icon)",
+  width: 39,
+  height: 39,
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  position: "relative"
+};
+
+function IconButton({
+  onPress,
+  children,
+  fwdRef,
+  style = {},
+  preventDefault = false
+}: {
+  onPress?: () => void;
+  children: React.ReactNode;
+  fwdRef?: any;
+  style?: React.CSSProperties;
+  preventDefault?: boolean;
+}) {
+  return (
+    <Button
+      onPress={onPress}
+      fwdRef={fwdRef}
+      preventDefault={preventDefault}
+      style={{ ...iconButtonStyle, ...style }}
+    >
+      {children}
+    </Button>
+  );
+}
+
 const Button = ({
   onPress,
   children,
@@ -120,7 +157,8 @@ function Header({
         backgroundColor: "var(--nn_primary_background)",
         position: "sticky",
         width: "100vw",
-        zIndex: 999
+        zIndex: 999,
+        borderBottom: "0.5px solid var(--nn_primary_separator)"
       }}
     >
       {noHeader ? null : (
@@ -132,51 +170,39 @@ function Header({
             flexDirection: "row",
             paddingTop: insets.top,
             height: 50,
-            alignItems: "center"
+            alignItems: "center",
+            paddingLeft: 12,
+            paddingRight: 16
           }}
           id="header"
         >
           {settings.deviceMode !== "mobile" && !settings.fullscreen ? (
             <div />
           ) : (
-            <Button
+            <IconButton
               onPress={() => {
                 post(EditorEvents.back, undefined, tab.id, tab.session?.noteId);
               }}
-              preventDefault={false}
-              style={{
-                borderWidth: 0,
-                borderRadius: 100,
-                color: "var(--nn_primary_icon)",
-                marginLeft: 6,
-                width: 40,
-                height: 40,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                flexDirection: "column",
-                position: "relative"
-              }}
+              style={{ width: 40, height: 40 }}
             >
               <ArrowBackIcon
-                size={28 * settings.fontScale}
-                style={{
-                  position: "absolute"
-                }}
+                size={25 * settings.fontScale}
+                style={{ position: "absolute" }}
                 color="var(--nn_primary_icon)"
               />
-            </Button>
+            </IconButton>
           )}
 
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              flexDirection: "row"
+              flexDirection: "row",
+              gap: 8
             }}
           >
             {settings.deviceMode !== "mobile" && !settings.fullscreen ? (
-              <Button
+              <IconButton
                 onPress={() => {
                   post(
                     EditorEvents.fullscreen,
@@ -185,32 +211,17 @@ function Header({
                     tab.session?.noteId
                   );
                 }}
-                preventDefault={false}
-                style={{
-                  borderWidth: 0,
-                  borderRadius: 100,
-                  color: "var(--nn_primary_icon)",
-                  marginRight: 10,
-                  width: 39,
-                  height: 39,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  position: "relative"
-                }}
               >
                 <FullscreenIcon
                   size={25 * settings.fontScale}
-                  style={{
-                    position: "absolute"
-                  }}
+                  style={{ position: "absolute" }}
                   color="var(--nn_primary_icon)"
                 />
-              </Button>
+              </IconButton>
             ) : null}
 
             {tab.session?.readonly ? (
-              <Button
+              <IconButton
                 onPress={() => {
                   post(
                     "editor-events:disable-readonly-mode",
@@ -218,45 +229,19 @@ function Header({
                   );
                 }}
                 fwdRef={btnRef}
-                preventDefault={false}
-                style={{
-                  borderWidth: 0,
-                  borderRadius: 100,
-                  color: "var(--nn_primary_accent)",
-                  marginRight: 12,
-                  width: 39,
-                  height: 39,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  position: "relative"
-                }}
+                style={{ color: "var(--nn_primary_accent)" }}
               >
                 <PencilLockIcon
                   size={25 * settings.fontScale}
-                  style={{
-                    position: "absolute"
-                  }}
+                  style={{ position: "absolute" }}
                   color="var(--nn_primary_accent)"
                 />
-              </Button>
+              </IconButton>
             ) : null}
 
-            <Button
+            <IconButton
               onPress={() => {
                 editor?.commands.undo();
-              }}
-              style={{
-                borderWidth: 0,
-                borderRadius: 100,
-                color: "var(--nn_primary_icon)",
-                marginRight: 10,
-                width: 39,
-                height: 39,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                position: "relative"
               }}
             >
               <ArrowULeftTopIcon
@@ -266,27 +251,13 @@ function Header({
                     : "var(--nn_primary_icon)"
                 }
                 size={25 * settings.fontScale}
-                style={{
-                  position: "absolute"
-                }}
+                style={{ position: "absolute" }}
               />
-            </Button>
+            </IconButton>
 
-            <Button
+            <IconButton
               onPress={() => {
                 editor?.commands.redo();
-              }}
-              style={{
-                borderWidth: 0,
-                borderRadius: 100,
-                color: "var(--nn_primary_icon)",
-                marginRight: 10,
-                width: 39,
-                height: 39,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                position: "relative"
               }}
             >
               <ArrowURightTopIcon
@@ -296,13 +267,11 @@ function Header({
                     : "var(--nn_primary_icon)"
                 }
                 size={25 * settings.fontScale}
-                style={{
-                  position: "absolute"
-                }}
+                style={{ position: "absolute" }}
               />
-            </Button>
+            </IconButton>
 
-            <Button
+            <IconButton
               onPress={() => {
                 post(
                   EditorEvents.showTabs,
@@ -311,26 +280,13 @@ function Header({
                   tab.session?.noteId
                 );
               }}
-              preventDefault={false}
-              style={{
-                borderWidth: 0,
-                borderRadius: 100,
-                color: "var(--nn_primary_icon)",
-                marginRight: 12,
-                width: 39,
-                height: 39,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                position: "relative"
-              }}
             >
               <div
                 style={{
                   border: "2px solid var(--nn_primary_icon)",
-                  width: 19 * settings.fontScale,
-                  height: 19 * settings.fontScale,
-                  minWidth: 19 * settings.fontScale,
+                  width: 17 * settings.fontScale,
+                  height: 17 * settings.fontScale,
+                  minWidth: 17 * settings.fontScale,
                   borderRadius: 5,
                   display: "flex",
                   justifyContent: "center",
@@ -348,9 +304,9 @@ function Header({
                   {openedTabsCount}
                 </p>
               </div>
-            </Button>
+            </IconButton>
 
-            <Button
+            <IconButton
               fwdRef={btnRef}
               onPress={() => {
                 if (tab.session?.locked) {
@@ -364,38 +320,21 @@ function Header({
                   setOpen(!isOpen);
                 }
               }}
-              preventDefault={false}
-              style={{
-                borderWidth: 0,
-                borderRadius: 100,
-                color: "var(--nn_primary_icon)",
-                marginRight: 12,
-                width: 39,
-                height: 39,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                position: "relative"
-              }}
             >
               {tab.session?.locked ? (
                 <DotsHorizontalIcon
                   size={25 * settings.fontScale}
-                  style={{
-                    position: "absolute"
-                  }}
+                  style={{ position: "absolute" }}
                   color="var(--nn_primary_icon)"
                 />
               ) : (
                 <DotsVerticalIcon
                   size={25 * settings.fontScale}
-                  style={{
-                    position: "absolute"
-                  }}
+                  style={{ position: "absolute" }}
                   color="var(--nn_primary_icon)"
                 />
               )}
-            </Button>
+            </IconButton>
 
             <ControlledMenu
               align="end"
@@ -470,7 +409,7 @@ function Header({
               <div
                 style={{
                   display: "flex",
-                  gap: 10,
+                  gap: 8,
                   alignItems: "center",
                   flexDirection: "row",
                   justifyContent: "center",
@@ -478,7 +417,7 @@ function Header({
                   paddingTop: 5
                 }}
               >
-                <Button
+                <IconButton
                   onPress={() => {
                     post(
                       EditorEvents.goBack,
@@ -488,17 +427,6 @@ function Header({
                     );
                     setOpen(false);
                   }}
-                  style={{
-                    borderWidth: 0,
-                    borderRadius: 100,
-                    color: "var(--nn_primary_icon)",
-                    width: 39,
-                    height: 39,
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    position: "relative"
-                  }}
                 >
                   <ArrowBackIcon
                     color={
@@ -507,13 +435,11 @@ function Header({
                         : "var(--nn_primary_icon)"
                     }
                     size={25 * settings.fontScale}
-                    style={{
-                      position: "absolute"
-                    }}
+                    style={{ position: "absolute" }}
                   />
-                </Button>
+                </IconButton>
 
-                <Button
+                <IconButton
                   onPress={() => {
                     post(
                       EditorEvents.goForward,
@@ -523,17 +449,6 @@ function Header({
                     );
                     setOpen(false);
                   }}
-                  style={{
-                    borderWidth: 0,
-                    borderRadius: 100,
-                    color: "var(--nn_primary_icon)",
-                    width: 39,
-                    height: 39,
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    position: "relative"
-                  }}
                 >
                   <ArrowForwardIcon
                     color={
@@ -542,37 +457,22 @@ function Header({
                         : "var(--nn_primary_icon)"
                     }
                     size={25 * settings.fontScale}
-                    style={{
-                      position: "absolute"
-                    }}
+                    style={{ position: "absolute" }}
                   />
-                </Button>
+                </IconButton>
 
-                <Button
+                <IconButton
                   onPress={() => {
                     editor?.commands.startSearch();
                     setOpen(false);
                   }}
-                  style={{
-                    borderWidth: 0,
-                    borderRadius: 100,
-                    color: "var(--nn_primary_icon)",
-                    width: 39,
-                    height: 39,
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    position: "relative"
-                  }}
                 >
                   <MagnifyIcon
-                    size={28 * settings.fontScale}
-                    style={{
-                      position: "absolute"
-                    }}
+                    size={25 * settings.fontScale}
+                    style={{ position: "absolute" }}
                     color="var(--nn_primary_icon)"
                   />
-                </Button>
+                </IconButton>
               </div>
 
               <MenuItem
@@ -584,7 +484,7 @@ function Header({
                 }}
               >
                 <PlusIcon
-                  size={22 * settings.fontScale}
+                  size={20 * settings.fontScale}
                   color="var(--nn_primary_icon)"
                 />
                 <span
@@ -605,7 +505,7 @@ function Header({
                 }}
               >
                 <TableOfContentsIcon
-                  size={22 * settings.fontScale}
+                  size={20 * settings.fontScale}
                   color="var(--nn_primary_icon)"
                 />
                 <span
@@ -625,7 +525,7 @@ function Header({
                 }}
               >
                 <ArrowTopIcon
-                  size={22 * settings.fontScale}
+                  size={20 * settings.fontScale}
                   color="var(--nn_primary_icon)"
                 />
                 <span
@@ -646,7 +546,7 @@ function Header({
                 }}
               >
                 <ArrowDownIcon
-                  size={22 * settings.fontScale}
+                  size={20 * settings.fontScale}
                   color="var(--nn_primary_icon)"
                 />
                 <span
@@ -666,7 +566,7 @@ function Header({
                 }}
               >
                 <DotsHorizontalIcon
-                  size={22 * settings.fontScale}
+                  size={20 * settings.fontScale}
                   color="var(--nn_primary_icon)"
                 />
                 <span

@@ -29,19 +29,13 @@ function StatusBar({
   container: RefObject<HTMLDivElement>;
   loading?: boolean;
 }) {
-  const [status, setStatus] = useState({
-    date: "",
-    saved: ""
-  });
   const tab = useTabContext();
-  const [sticky, setSticky] = useState(false);
-  const stickyRef = useRef(false);
-  const prevScroll = useRef(0);
-  const lastStickyChangeTime = useRef(0);
+  const [showChars, setShowChars] = useState(false);
   const [words, setWords] = useState(strings.totalWords(0));
   const currentWords = useRef(words);
+  const [chars, setChars] = useState(0);
   const statusBar = useRef({
-    set: setStatus,
+    set: () => {},
     updateWords: () => {
       const editor = editors[tab.id];
       if (!editor) return;
@@ -57,110 +51,44 @@ function StatusBar({
 
   useEffect(() => {
     globalThis.statusBars[tab.id] = statusBar;
+    if (showChars) {
+      editors[tab.id]?.on("selectionUpdate", (event) => {
+        setChars(event.editor.extensionStorage.characterCount.characters());
+      });
+    }
+    if (editors[tab.id]) {
+      setChars(
+        editors[tab.id]?.extensionStorage.characterCount.characters() || 0
+      );
+    }
+
     return () => {
       globalThis.statusBars[tab.id] = undefined;
     };
-  }, [tab.id, statusBar]);
-
-  const scrollState = useRef({
-    isMovingUp: false,
-    startingOffset: 0
-  });
-  const onScroll = React.useCallback((event: Event) => {
-    const currentOffset = (event.target as HTMLElement)?.scrollTop;
-    if (currentOffset < 200) {
-      if (stickyRef.current) {
-        stickyRef.current = false;
-        setSticky(false);
-        lastStickyChangeTime.current = Date.now();
-        prevScroll.current = currentOffset;
-      }
-      return;
-    }
-    if (Date.now() - lastStickyChangeTime.current < 300) return;
-    if (currentOffset > prevScroll.current) {
-      if (
-        !scrollState.current.startingOffset ||
-        scrollState.current.isMovingUp
-      ) {
-        scrollState.current.startingOffset = currentOffset;
-      }
-      scrollState.current.isMovingUp = false;
-    } else {
-      if (
-        !scrollState.current.startingOffset ||
-        !scrollState.current.isMovingUp
-      ) {
-        scrollState.current.startingOffset = currentOffset;
-      }
-      scrollState.current.isMovingUp = true;
-    }
-
-    if (scrollState.current.isMovingUp) {
-      if (currentOffset < scrollState.current.startingOffset - 50) {
-        if (!stickyRef.current) {
-          stickyRef.current = true;
-          setSticky(true);
-        }
-        scrollState.current.startingOffset = 0;
-      }
-    } else {
-      if (currentOffset > scrollState.current.startingOffset + 50) {
-        if (stickyRef.current) {
-          stickyRef.current = false;
-          setSticky(false);
-        }
-        scrollState.current.startingOffset = 0;
-      }
-    }
-    lastStickyChangeTime.current = Date.now();
-    prevScroll.current = currentOffset;
-  }, []);
+  }, [tab.id, statusBar, showChars]);
 
   useEffect(() => {
     currentWords.current = words;
   }, [words]);
 
-  useEffect(() => {
-    const node = container.current;
-    node?.addEventListener("scroll", onScroll);
-    return () => {
-      node?.removeEventListener("scroll", onScroll);
-    };
-  }, [onScroll, container]);
-
   const paragraphStyle: React.CSSProperties = {
     marginTop: 0,
     marginBottom: 0,
-    fontSize: "12px",
+    fontSize: 12,
     color: "var(--nn_secondary_paragraph)",
-    marginRight: 8,
     paddingBottom: 0,
-    userSelect: "none",
-    pointerEvents: "none"
+    userSelect: "none"
   };
 
   return (
-    <div
-      style={{
-        flexDirection: "row",
-        display: loading ? "none" : "flex",
-        paddingRight: 12,
-        paddingLeft: 12,
-        position: sticky ? "sticky" : "relative",
-        top: -3,
-        backgroundColor: "var(--nn_primary_background)",
-        zIndex: 10,
-        justifyContent: sticky ? "center" : "flex-start",
-        paddingTop: 4,
-        paddingBottom: 2
+    <p
+      onMouseDown={(e) => {
+        setShowChars(!showChars);
       }}
-      id="statusbar"
+      style={paragraphStyle}
     >
-      <p style={paragraphStyle}>{words}</p>
-      <p style={paragraphStyle}>{status.date}</p>
-      <p style={paragraphStyle}>{status.saved}</p>
-    </div>
+      {showChars ? strings.characters(chars) : words}
+    </p>
   );
 }
 

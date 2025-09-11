@@ -22,7 +22,6 @@ import { Settings } from "../utils";
 import { EditorEvents } from "../utils/editor-events";
 import styles from "./styles.module.css";
 import { useTabContext } from "../hooks/useTabStore";
-import { strings } from "@notesnook/intl";
 
 function Tags(props: { settings: Settings; loading?: boolean }): JSX.Element {
   const [tags, setTags] = useState<
@@ -54,80 +53,32 @@ function Tags(props: { settings: Settings; loading?: boolean }): JSX.Element {
     <div
       className={styles.container}
       style={{
-        padding: "0px 12px",
         display: "flex",
         alignItems: "center",
         overflowX: "scroll",
         minHeight: "40px",
-        opacity: props.loading ? 0 : 1
+        opacity: props.loading ? 0 : 1,
+        gap: 6
       }}
     >
-      <button
-        className={styles.btn}
-        onClick={(e) => {
-          e.preventDefault();
-          openManageTagsSheet();
-        }}
-        style={{
-          border: `1px solid var(--nn_primary_border)`,
-          backgroundColor: "var(--nn_secondary_background)",
-          marginRight: 5,
-          borderRadius: 100,
-          padding: "0px 10px",
-          fontFamily: "Inter",
-          display: "flex",
-          alignItems: "center",
-          height: "30px",
-          userSelect: "none",
-          WebkitUserSelect: "none"
-        }}
-      >
-        {tags.length === 0 ? (
-          <p
-            style={{
-              marginRight: 4,
-              fontSize: 13,
-              color: "var(--nn_primary_icon)",
-              userSelect: "none"
-            }}
-          >
-            {strings.addATag()}
-          </p>
-        ) : null}
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          version="1.1"
-          width={20 * fontScale}
-          height={20 * fontScale}
-          viewBox={`0 0 24 24`}
-        >
-          <path
-            fill="var(--nn_primary_accent)"
-            d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"
-          />
-        </svg>
-      </button>
-
       {tags.map((tag) => (
         <button
           key={tag.title}
-          className={styles.btn}
           style={{
             border: "1px solid var(--nn_primary_border)",
             backgroundColor: "var(--nn_secondary_background)",
-            marginRight: 5,
-            borderRadius: 100,
-            padding: "0px 10px",
-            height: "30px",
+            borderRadius: 6,
+            padding: "0px 4px",
+            height: "24px",
             fontFamily: "Inter",
-            fontSize: 13,
+            fontSize: 12,
             color: "var(--nn_primary_icon)",
             userSelect: "none",
             WebkitUserSelect: "none"
           }}
           onClick={(e) => {
             e.preventDefault();
-            post(EditorEvents.tag, tag, tab.id, tab.session?.noteId);
+            openManageTagsSheet();
           }}
         >
           #{tag.alias}
