@@ -263,7 +263,15 @@ function Checkout() {
                 <CheckoutDetails
                   user={customer}
                   onComplete={() => {
-                    setCurrentStep(2);
+                    if (window.ReactNativeWebView) {
+                      window.ReactNativeWebView.postMessage(
+                        JSON.stringify({
+                          success: true
+                        })
+                      );
+                    } else {
+                      setCurrentStep(2);
+                    }
                   }}
                 />
               </Flex>
