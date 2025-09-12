@@ -864,6 +864,10 @@ del.diffdel {
   display: none;
 }
 
+[data-hidden-under] {
+  display: none !important;
+}
+
 /* simplebar */
 .simplebar-track {
   height: 9px !important;
