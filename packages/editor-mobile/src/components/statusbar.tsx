@@ -81,14 +81,22 @@ function StatusBar({
   };
 
   return (
-    <p
-      onMouseDown={(e) => {
-        setShowChars(!showChars);
+    <div
+      style={{
+        display: "flex",
+        height: "25px",
+        alignItems: "center"
       }}
-      style={paragraphStyle}
     >
-      {showChars ? strings.characters(chars) : words}
-    </p>
+      <p
+        onMouseDown={(e) => {
+          setShowChars(!showChars);
+        }}
+        style={paragraphStyle}
+      >
+        {showChars ? strings.characters(chars) : words}
+      </p>
+    </div>
   );
 }
 

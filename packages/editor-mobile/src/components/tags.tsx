@@ -17,12 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import React, { useEffect, useRef, useState } from "react";
+import { useTabContext } from "../hooks/useTabStore";
 import { Settings } from "../utils";
 import { EditorEvents } from "../utils/editor-events";
 import styles from "./styles.module.css";
-import { useTabContext } from "../hooks/useTabStore";
-
 function Tags(props: { settings: Settings; loading?: boolean }): JSX.Element {
   const [tags, setTags] = useState<
     { title: string; alias: string; id: string; type: "tag" }[]
@@ -53,20 +53,68 @@ function Tags(props: { settings: Settings; loading?: boolean }): JSX.Element {
     <div
       className={styles.container}
       style={{
-        display: "flex",
+        display: tags.length === 0 ? "none" : "flex",
+        position: tags.length === 0 ? "absolute" : "relative",
         alignItems: "center",
         overflowX: "scroll",
-        minHeight: "40px",
+        minHeight: "25px",
         opacity: props.loading ? 0 : 1,
         gap: 6
       }}
     >
-      {tags.map((tag) => (
+      {tags.length === 0 ? (
+        <button
+          className={styles.btn}
+          onClick={(e) => {
+            e.preventDefault();
+            openManageTagsSheet();
+          }}
+          style={{
+            border: `none`,
+            backgroundColor: "transparent",
+            borderRadius: 8,
+            padding: "0px 6px",
+            fontFamily: "Inter",
+            display: "flex",
+            alignItems: "center",
+            height: "24px",
+            userSelect: "none",
+            WebkitUserSelect: "none"
+          }}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            version="1.1"
+            width={18 * fontScale}
+            height={18 * fontScale}
+            viewBox={`0 0 24 24`}
+          >
+            <path
+              fill="var(--nn_primary_accent)"
+              d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"
+            />
+          </svg>
+
+          <p
+            style={{
+              fontSize: 12,
+              marginLeft: 4,
+              color: "var(--nn_primary_icon)",
+              userSelect: "none"
+            }}
+          >
+            {strings.addTag()}
+          </p>
+        </button>
+      ) : null}
+
+      {tags.slice(0, 2).map((tag, index) => (
         <button
           key={tag.title}
           style={{
-            border: "1px solid var(--nn_primary_border)",
-            backgroundColor: "var(--nn_secondary_background)",
+            border: index !== 0 ? "none" : "1px solid var(--nn_primary_border)",
+            backgroundColor:
+              index !== 0 ? "transparent" : "var(--nn_secondary_background)",
             borderRadius: 6,
             padding: "0px 4px",
             height: "24px",
@@ -81,7 +129,7 @@ function Tags(props: { settings: Settings; loading?: boolean }): JSX.Element {
             openManageTagsSheet();
           }}
         >
-          #{tag.alias}
+          {index > 0 ? `+${tags.length - 1}` : `#${tag.title}`}
         </button>
       ))}
     </div>

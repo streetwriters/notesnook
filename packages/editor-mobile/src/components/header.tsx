@@ -158,7 +158,7 @@ function Header({
         position: "sticky",
         width: "100vw",
         zIndex: 999,
-        borderBottom: "0.5px solid var(--nn_primary_separator)"
+        borderBottom: "0.5px solid var(--nn_primary_border)"
       }}
     >
       {noHeader ? null : (

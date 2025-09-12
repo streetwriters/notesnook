@@ -570,14 +570,15 @@ const Tiptap = ({
                   justifyContent: "space-between",
                   display: "flex",
                   alignItems: "center",
-                  padding: "0px 16px"
+                  padding: "0px 16px",
+                  paddingBottom: "6px"
                 }}
               >
-                <Tags settings={settings} loading={controller.loading} />
                 <StatusBar
                   container={containerRef}
                   loading={controller.loading}
                 />
+                <Tags settings={settings} loading={controller.loading} />
               </div>
 
               <Title
