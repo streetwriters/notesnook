@@ -249,6 +249,12 @@ export const Callout = Node.create({
       container.onmousedown = onClick;
       container.ontouchstart = onClick;
 
+      if (node.attrs.hiddenUnder) {
+        container.dataset.hiddenUnder = node.attrs.hiddenUnder;
+      } else {
+        delete container.dataset.hiddenUnder;
+      }
+
       return {
         dom: container,
         contentDOM: container,
@@ -259,6 +265,10 @@ export const Callout = Node.create({
 
           if (updatedNode.attrs.collapsed) container.classList.add("collapsed");
           else container.classList.remove("collapsed");
+
+          if (updatedNode.attrs.hiddenUnder)
+            container.dataset.hiddenUnder = updatedNode.attrs.hiddenUnder;
+          else delete container.dataset.hiddenUnder;
 
           return true;
         }
