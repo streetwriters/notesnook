@@ -64,8 +64,6 @@ export const BuyPlan = (props: {
       : (pricingPlans.selectedProduct as RNIap.Product)?.productId
   )?.includes("5");
 
-  console.log(checkoutUrl);
-
   return checkoutUrl ? (
     <View
       style={{
@@ -74,28 +72,7 @@ export const BuyPlan = (props: {
     >
       <WebView
         source={{
-          html: `<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Basic HTML Page with Button</title>
-  </head>
-  <body>
-    <h1>Welcome to My Page</h1>
-    <p>This is a simple example of an HTML page with a button.</p>
-
-    <button
-      type="button"
-      onclick="window.ReactNativeWebView.postMessage(JSON.stringify({
-                success:true
-             }));"
-    >
-      Click Me!
-    </button>
-  </body>
-</html>
-`
+          uri: checkoutUrl
         }}
         onMessage={(message) => {
           try {
@@ -107,6 +84,8 @@ export const BuyPlan = (props: {
         }}
         domStorageEnabled
         javaScriptEnabled
+        cacheEnabled
+        enabled
         style={{
           flex: 1
         }}
@@ -182,7 +161,8 @@ export const BuyPlan = (props: {
 
         {pricingPlans.hasTrialOffer(
           props.planId,
-          (pricingPlans.selectedProduct as RNIap.Product).productId
+          (pricingPlans?.selectedProduct as RNIap.Product)?.productId ||
+            (pricingPlans?.selectedProduct as Plan)?.period
         ) ? (
           <View
             style={{
@@ -211,11 +191,9 @@ export const BuyPlan = (props: {
 
         {pricingPlans.hasTrialOffer(
           props.planId,
-          (pricingPlans.selectedProduct as RNIap.Product).productId
-        ) ||
-        (pricingPlans.selectedProduct as RNIap.Product).productId.includes(
-          "5"
-        ) ? (
+          (pricingPlans.selectedProduct as RNIap.Product)?.productId ||
+            (pricingPlans.selectedProduct as Plan)?.period
+        ) || is5YearPlanSelected ? (
           <View
             style={{
               gap: DefaultAppStyles.GAP_VERTICAL,
