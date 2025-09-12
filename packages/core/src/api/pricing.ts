@@ -60,7 +60,7 @@ export interface Plan {
 
 export class Pricing {
   static sku(
-    platform: "android" | "ios" | "web",
+    platform: "google" | "apple" | "paddle" | "paddleNoTrial",
     period: Period,
     plan: SubscriptionPlanId
   ): Promise<SKUResponse> {
