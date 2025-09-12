@@ -105,11 +105,11 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
           const pricingInfo = await getPrice(plan, {
             currencyCode: checkoutData.currency_code,
             discount: checkoutData.discount,
-            countryCode: checkoutData.customer.address?.country_code
+            countryCode: checkoutData.customer?.address?.country_code
           });
           if (!pricingInfo) return;
 
-          addressRef.current = checkoutData.customer.address || undefined;
+          addressRef.current = checkoutData.customer?.address || undefined;
           onPriceUpdated?.(pricingInfo);
           appliedCouponCode.current = pricingInfo.coupon;
           checkoutDataRef.current = checkoutData;
@@ -144,11 +144,11 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
       }
       console.log(callback_data);
 
-      addressRef.current = callback_data.data.customer.address || undefined;
+      addressRef.current = callback_data.data.customer?.address || undefined;
       const pricingInfo = await getPrice(plan, {
         currencyCode: callback_data.data.currency_code,
         discount: callback_data.data.discount,
-        countryCode: callback_data.data.customer.address?.country_code
+        countryCode: callback_data.data.customer?.address?.country_code
       });
       if (!pricingInfo) return;
 
@@ -185,7 +185,7 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
       ) : null}
       <Flex
         className="checkout-container"
-        sx={{ background: "background", overflow: "hidden", px: 30 }}
+        sx={{ background: "background", overflow: "hidden", px: [0, 30] }}
       >
         <iframe
           scrolling="no"
