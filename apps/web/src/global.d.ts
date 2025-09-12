@@ -73,5 +73,8 @@ declare global {
     ApplePaySession?: {
       canMakePayments(): boolean | Promise<boolean>;
     };
+    ReactNativeWebView?: {
+      postMessage(message: string): void;
+    };
   }
 }
