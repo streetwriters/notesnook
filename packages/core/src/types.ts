@@ -582,6 +582,14 @@ export type Profile = {
   profilePicture?: string;
 };
 
+export type InboxApiKey = {
+  name: string;
+  key: string;
+  dateCreated: number;
+  expiryDate: number;
+  lastUsedAt: number;
+};
+
 export function isDeleted(item: any): item is DeletedItem {
   return !!item.deleted && item.type !== "trash";
 }
