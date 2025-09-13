@@ -45,7 +45,6 @@ export function ImageSettings(props: ToolProps) {
               "imageAlignLeft",
               "imageAlignCenter",
               "imageAlignRight",
-              "imageFloat",
               "imageProperties"
             ]
           : ["downloadAttachment"]
@@ -106,24 +105,6 @@ export function ImageAlignCenter(props: ToolProps) {
       toggled={align === "center"}
       onClick={() =>
         editor.chain().focus().setImageAlignment({ align: "center" }).run()
-      }
-    />
-  );
-}
-
-export function ImageFloat(props: ToolProps) {
-  const { editor } = props;
-  const image = findSelectedNode(editor, "image");
-  if (!image) return null;
-
-  const { float } = image.attrs as ImageAttributes;
-
-  return (
-    <ToolButton
-      {...props}
-      toggled={!!float}
-      onClick={() =>
-        editor.chain().focus().setImageAlignment({ float: !float }).run()
       }
     />
   );

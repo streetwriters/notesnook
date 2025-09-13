@@ -70,8 +70,6 @@ export function ImageComponent(
       ? node.attrs
       : clampSize(node.attrs, dom.clientWidth, aspectRatio);
 
-  const float = isMobile ? false : node.attrs.float;
-
   let align = node.attrs.align;
   if (!align) align = textDirection ? "right" : "left";
 
@@ -112,7 +110,6 @@ export function ImageComponent(
         className="image-container"
         sx={{
           ...getAlignmentStyles(node.attrs),
-          height: float ? size.height : "unset",
           position: "relative",
           mt: isSVG ? `24px` : 0,
           ":hover .drag-handle, :active .drag-handle": {
@@ -122,7 +119,7 @@ export function ImageComponent(
       >
         <Resizer
           style={{ marginTop: 5 }}
-          enabled={editor.isEditable && !float}
+          enabled={editor.isEditable}
           selected={selected}
           width={size.width}
           height={size.height}
@@ -161,7 +158,6 @@ export function ImageComponent(
                           "imageAlignLeft",
                           "imageAlignCenter",
                           "imageAlignRight",
-                          "imageFloat",
                           "imageProperties"
                         ]
                   }
@@ -258,8 +254,8 @@ export function ImageComponent(
                 position: "absolute",
                 top: 0,
                 left: 0,
-                width: editor.isEditable && !float ? "100%" : size.width,
-                height: editor.isEditable && !float ? "100%" : size.height,
+                width: editor.isEditable ? "100%" : size.width,
+                height: editor.isEditable ? "100%" : size.height,
                 bg: "background-secondary",
                 border: selected
                   ? "2px solid var(--accent)"

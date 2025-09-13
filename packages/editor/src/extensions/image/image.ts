@@ -95,7 +95,6 @@ export const ImageNode = Node.create<ImageOptions>({
       height: { default: null },
 
       // TODO: maybe these should be stored as styles?
-      float: getDataAttribute("float", false),
       align: getDataAttribute("align"),
 
       hash: getDataAttribute("hash"),
