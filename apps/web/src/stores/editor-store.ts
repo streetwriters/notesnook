@@ -88,6 +88,10 @@ export type BaseEditorSession = {
    * The index of search result to scroll to after opening the session successfully.
    */
   activeSearchResultIndex?: number;
+  /**
+   * Used for force refreshing a session.
+   */
+  nonce?: number;
 };
 
 export type LockedEditorSession = BaseEditorSession & {
@@ -759,7 +763,7 @@ class EditorStore extends BaseStore<EditorStore> {
           activeBlockId: options.activeBlockId,
           tabId
         },
-        options.silent
+        options
       );
     } else if (isLocked && note.type !== "trash") {
       this.addSession(
@@ -770,7 +774,7 @@ class EditorStore extends BaseStore<EditorStore> {
           activeBlockId: options.activeBlockId,
           tabId
         },
-        options.silent
+        options
       );
     } else {
       const content = note.contentId
@@ -793,7 +797,7 @@ class EditorStore extends BaseStore<EditorStore> {
             activeSearchResultIndex: options.activeSearchResultIndex,
             tabId
           },
-          options.silent
+          options
         );
       } else {
         const attachmentsLength = await db.attachments
@@ -817,7 +821,7 @@ class EditorStore extends BaseStore<EditorStore> {
               activeSearchResultIndex: options.activeSearchResultIndex,
               tabId
             },
-            options.silent
+            options
           );
         } else {
           this.addSession(
@@ -838,7 +842,7 @@ class EditorStore extends BaseStore<EditorStore> {
               activeSearchResultIndex: options.activeSearchResultIndex,
               tabId
             },
-            options.silent
+            options
           );
         }
       }
@@ -934,15 +938,20 @@ class EditorStore extends BaseStore<EditorStore> {
     }
   };
 
-  addSession = (session: EditorSession, silent = false) => {
+  addSession = (
+    session: EditorSession,
+    options?: { force?: boolean; silent?: boolean }
+  ) => {
     this.set((state) => {
       const index = state.sessions.findIndex((s) => s.id === session.id);
       if (index > -1) {
+        if (options?.force)
+          session.nonce = (state.sessions[index]?.nonce || 0) + 1;
         state.sessions[index] = session;
       } else state.sessions.push(session);
     });
 
-    this.activateSession(session.id, undefined, silent);
+    this.activateSession(session.id, undefined, options?.silent);
   };
 
   saveSession = async (

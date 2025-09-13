@@ -135,13 +135,19 @@ class AttachmentStore extends BaseStore<AttachmentStore> {
       if (await db.attachments.remove(attachment.hash, false)) {
         await this.get().refresh();
         await useNoteStore.getState().refresh();
-        useEditorStore.getState().closeNotes(...linkedNotes);
+        for (const noteId of linkedNotes) {
+          await useEditorStore.getState().openSession(noteId, {
+            force: true,
+            silent: useEditorStore.getState().getActiveNote()?.id !== noteId
+          });
+        }
       }
     } catch (e) {
       console.error(e);
-      this._changeWorkingStatus(attachment.hash);
       if (e instanceof Error)
         showToast("error", `${strings.failedToDelete()}: ${e.message}`);
+    } finally {
+      this._changeWorkingStatus(attachment.hash);
     }
   };
 
