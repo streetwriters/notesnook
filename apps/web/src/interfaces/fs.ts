@@ -739,6 +739,11 @@ function parseS3Error(data: ArrayBuffer | unknown) {
       ? new TextDecoder().decode(data)
       : typeof data === "string"
       ? data
+      : typeof data === "object" &&
+        data &&
+        "error" in data &&
+        typeof data.error === "string"
+      ? data.error
       : null;
 
   const error = {
@@ -780,9 +785,10 @@ function toS3Error(e: unknown): S3Error {
 }
 
 function showError(error: S3Error, message?: string) {
+  message = `${message ? message + " " : ""}${error.Message}`;
   showToast(
     "error",
-    `[${error.Code}] ${message ? message + " " : ""}${error.Message}`
+    error.Code === "UNKNOWN" ? message : `[${error.Code}] ${message}`
   );
 }
 
