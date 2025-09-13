@@ -36,7 +36,6 @@ export const ShareComponent = ({ uri, name, padding }) => {
         title={strings.open()}
         type="accent"
         width="100%"
-        fontSize={AppFontSize.md}
         onPress={async () => {
           FileViewer.open(uri, {
             showOpenWithDialog: true,
@@ -54,7 +53,6 @@ export const ShareComponent = ({ uri, name, padding }) => {
         title={strings.share()}
         type="shade"
         width="100%"
-        fontSize={AppFontSize.md}
         style={{
           marginTop: DefaultAppStyles.GAP_VERTICAL
         }}

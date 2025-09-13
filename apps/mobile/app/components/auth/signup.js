@@ -272,7 +272,6 @@ export const Signup = ({ changeMode, welcome }) => {
                   onPress={() => {
                     signup();
                   }}
-                  fontSize={AppFontSize.md}
                   width="100%"
                 />
 

@@ -226,7 +226,6 @@ const SheetProvider = ({ context = "global" }) => {
                 marginBottom: DefaultAppStyles.GAP_VERTICAL
               }}
               width="100%"
-              fontSize={AppFontSize.md}
             />
           ))}
 

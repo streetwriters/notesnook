@@ -289,7 +289,6 @@ const ExportNotesSheet = ({
                   }
                   type="accent"
                   width={250}
-                  fontSize={AppFontSize.md}
                   style={{
                     marginTop: DefaultAppStyles.GAP_VERTICAL
                   }}
@@ -318,7 +317,6 @@ const ExportNotesSheet = ({
                   title={strings.share()}
                   type="secondaryAccented"
                   width={250}
-                  fontSize={AppFontSize.md}
                   style={{
                     marginTop: DefaultAppStyles.GAP_VERTICAL
                   }}
@@ -349,7 +347,6 @@ const ExportNotesSheet = ({
                   title={strings.exportAgain()}
                   type="secondaryAccented"
                   width={250}
-                  fontSize={AppFontSize.md}
                   style={{
                     marginTop: DefaultAppStyles.GAP_VERTICAL
                   }}
