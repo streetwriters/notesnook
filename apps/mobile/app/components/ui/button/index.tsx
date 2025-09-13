@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import {
   ActivityIndicator,
@@ -28,7 +27,6 @@ import {
   useWindowDimensions
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { useUserStore } from "../../../stores/use-user-store";
 import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
 import { DefaultAppStyles } from "../../../utils/styles";
 import NativeTooltip from "../../../utils/tooltip";
@@ -83,7 +81,6 @@ export const Button = ({
   iconStyle,
   ...restProps
 }: ButtonProps) => {
-  const { colors } = useThemeColors();
   const { text } = useButton({
     type,
     accent: accentColor,
