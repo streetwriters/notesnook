@@ -323,7 +323,6 @@ const PublishNoteSheet = ({
                 <>
                   <Button
                     onPress={deletePublishedNote}
-                    fontSize={AppFontSize.md}
                     type="error"
                     title={strings.unpublish()}
                     style={{
@@ -335,7 +334,6 @@ const PublishNoteSheet = ({
               <Seperator half />
               <Button
                 onPress={publishNote}
-                fontSize={AppFontSize.md}
                 style={{
                   width: isPublished ? "49%" : 250,
                   borderRadius: isPublished ? 5 : 100

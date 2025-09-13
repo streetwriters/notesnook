@@ -189,7 +189,6 @@ const Intro = () => {
               mode: AuthMode.welcomeSignup
             });
           }}
-          fontSize={AppFontSize.md}
           type="accent"
           title={strings.getStarted()}
         />
@@ -200,7 +199,6 @@ const Intro = () => {
           }}
           title={strings.iAlreadyHaveAnAccount()}
           type="secondary"
-          fontSize={AppFontSize.md}
           onPress={() => {
             SettingsService.set({
               introCompleted: true

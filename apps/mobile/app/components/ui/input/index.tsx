@@ -98,7 +98,7 @@ const Input = ({
   onBlurInput,
   onPress,
   height = 45,
-  fontSize = AppFontSize.md,
+  fontSize = AppFontSize.sm,
   onFocusInput,
   buttons,
   marginRight,
@@ -237,8 +237,8 @@ const Input = ({
       onPress && loading ? colors.primary.accent : colors.primary.paragraph,
     flexGrow: 1,
     flexShrink: 1,
-    paddingBottom: DefaultAppStyles.GAP_VERTICAL,
-    paddingTop: DefaultAppStyles.GAP_VERTICAL,
+    paddingBottom: DefaultAppStyles.GAP_VERTICAL - 4,
+    paddingTop: DefaultAppStyles.GAP_VERTICAL - 4,
     fontFamily: "OpenSans-Regular",
     ...(inputStyle as ViewStyle)
   };
