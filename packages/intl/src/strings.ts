@@ -2307,7 +2307,6 @@ Use this if changes from other devices are not appearing on this device. This wi
   // alignCenter: () => t`Align center`,
   alignLeft: () => t`Align left`,
   alignRight: () => t`Align right`,
-  imageFloat: () => t`Float image`,
   imageProperties: () => t`Image properties`,
   previewAttachment: () => t`Preview attachment`,
   more: () => t`More`,
