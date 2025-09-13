@@ -295,7 +295,6 @@ class RecoveryKeySheet extends React.Component {
             title={strings.copyToClipboard()}
             width="100%"
             type="secondaryAccented"
-            fontSize={AppFontSize.md}
           />
           <Seperator />
           <Button
@@ -303,7 +302,6 @@ class RecoveryKeySheet extends React.Component {
             onPress={this.saveQRCODE}
             width="100%"
             type="secondaryAccented"
-            fontSize={AppFontSize.md}
             icon="qrcode"
           />
           <Seperator />
@@ -313,7 +311,6 @@ class RecoveryKeySheet extends React.Component {
             width="100%"
             type="secondaryAccented"
             icon="text"
-            fontSize={AppFontSize.md}
           />
           <Seperator />
 
@@ -323,7 +320,6 @@ class RecoveryKeySheet extends React.Component {
             width="100%"
             type="secondaryAccented"
             icon="cloud"
-            fontSize={AppFontSize.md}
           />
           <Seperator />
 
@@ -344,7 +340,6 @@ class RecoveryKeySheet extends React.Component {
             title={strings.done()}
             width="100%"
             type="error"
-            fontSize={AppFontSize.md}
             onPress={this.close}
           />
         </View>

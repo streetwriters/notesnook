@@ -278,7 +278,7 @@ export const Login = ({ changeMode }) => {
                 }}
                 type="accent"
                 title={!loading ? strings.continue() : null}
-                fontSize={AppFontSize.md}
+                fontSize={AppFontSize.sm}
               />
 
               {step === LoginSteps.passwordAuth && (
@@ -294,7 +294,6 @@ export const Login = ({ changeMode }) => {
                     setStep(LoginSteps.emailAuth);
                     setLoading(false);
                   }}
-                  fontSize={AppFontSize.md}
                   type="secondaryAccented"
                 />
               )}

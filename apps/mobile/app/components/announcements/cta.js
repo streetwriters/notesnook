@@ -106,7 +106,6 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
               <Button
                 key={item.title}
                 title={item.title}
-                fontSize={AppFontSize.md}
                 buttonType={{
                   color: color ? color : colors.primary.accent,
                   text: color
