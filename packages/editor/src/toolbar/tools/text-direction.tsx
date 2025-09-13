@@ -31,12 +31,13 @@ type TextDirectionToolProps = ToolProps & {
   direction: TextDirections;
 };
 function TextDirectionTool(props: TextDirectionToolProps) {
-  const { editor, direction, ...toolProps } = props;
+  const { editor, direction } = props;
   const directionRef = useRefValue(direction);
 
   return (
     <ToolButton
-      {...toolProps}
+      icon={props.icon}
+      title={props.title}
       onClick={() =>
         editor.chain().focus().setTextDirection(directionRef.current).run()
       }

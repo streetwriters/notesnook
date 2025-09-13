@@ -63,7 +63,8 @@ export function ImageAlignLeft(props: ToolProps) {
 
   return (
     <ToolButton
-      {...props}
+      icon={props.icon}
+      title={props.title}
       toggled={!align || align === "left"}
       onClick={() =>
         editor.chain().focus().setImageAlignment({ align: "left" }).run()
@@ -81,7 +82,8 @@ export function ImageAlignRight(props: ToolProps) {
 
   return (
     <ToolButton
-      {...props}
+      icon={props.icon}
+      title={props.title}
       toggled={align === "right"}
       onClick={() =>
         editor.chain().focus().setImageAlignment({ align: "right" }).run()
@@ -99,7 +101,8 @@ export function ImageAlignCenter(props: ToolProps) {
 
   return (
     <ToolButton
-      {...props}
+      icon={props.icon}
+      title={props.title}
       toggled={align === "center"}
       onClick={() =>
         editor.chain().focus().setImageAlignment({ align: "center" }).run()
@@ -136,7 +139,8 @@ export function ImageProperties(props: ToolProps) {
       <ToolButton
         buttonRef={buttonRef}
         toggled={isOpen}
-        {...props}
+        icon={props.icon}
+        title={props.title}
         onClick={() => setIsOpen((s) => !s)}
       />
 

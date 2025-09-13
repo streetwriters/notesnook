@@ -35,7 +35,13 @@ import { InsertBlock } from "./block.js";
 import { FontSize, FontFamily } from "./font.js";
 import { Alignment } from "./alignment.js";
 import { Headings } from "./headings.js";
-import { NumberedList, BulletList, Outdent, Indent, CheckList } from "./lists.js";
+import {
+  NumberedList,
+  BulletList,
+  Outdent,
+  Indent,
+  CheckList
+} from "./lists.js";
 import { TextDirection } from "./text-direction.js";
 import { Highlight, TextColor } from "./colors.js";
 import {
@@ -66,7 +72,6 @@ import {
   ImageAlignCenter,
   ImageAlignLeft,
   ImageAlignRight,
-  ImageFloat,
   ImageProperties
 } from "./image.js";
 import {
@@ -134,7 +139,6 @@ const tools = {
   imageAlignLeft: ImageAlignLeft,
   imageAlignRight: ImageAlignRight,
   imageProperties: ImageProperties,
-  imageFloat: ImageFloat,
 
   embedAlignCenter: EmbedAlignCenter,
   embedAlignLeft: EmbedAlignLeft,
