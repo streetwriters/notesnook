@@ -18,7 +18,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { getFeaturesTable } from "@notesnook/common";
-import { EV, EVENTS, Plan, SubscriptionPlan, User } from "@notesnook/core";
+import {
+  EV,
+  EVENTS,
+  Plan,
+  SKUResponse,
+  SubscriptionPlan,
+  User
+} from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useState } from "react";
@@ -924,21 +931,13 @@ const PricingPlanCard = ({
   setStep: (step: number) => void;
 }) => {
   const { colors } = useThemeColors();
-  const isSelected = pricingPlans?.currentPlan?.id === plan.id;
   const isFreePlan = plan.id === "free";
+  const [regionalDiscount, setRegionaDiscount] = useState<SKUResponse>();
 
   const product =
     plan.subscriptions?.[
       `notesnook.${plan.id}.${annualBilling ? "yearly" : "monthly"}`
     ];
-
-  const discountPercentage = annualBilling
-    ? pricingPlans?.compareProductPrice(
-        plan.id,
-        `notesnook.${plan.id}.yearly`,
-        `notesnook.${plan.id}.monthly`
-      )
-    : null;
 
   const price = pricingPlans?.getPrice(
     product as RNIap.Subscription,
@@ -950,6 +949,19 @@ const PricingPlanCard = ({
     plan.id,
     annualBilling ? "yearly" : "monthly"
   );
+
+  useEffect(() => {
+    pricingPlans
+      ?.getRegionalDiscount(
+        plan.id,
+        pricingPlans.isGithubRelease
+          ? (WebPlan?.period as string)
+          : (product?.productId as string)
+      )
+      .then((value) => {
+        setRegionaDiscount(value);
+      });
+  }, [pricingPlans, plan, product, WebPlan]);
 
   return (
     <TouchableOpacity
@@ -972,7 +984,7 @@ const PricingPlanCard = ({
         gap: 6
       }}
     >
-      {/* {discountPercentage ? (
+      {regionalDiscount?.discount ? (
         <View
           style={{
             backgroundColor: colors.static.red,
@@ -985,10 +997,10 @@ const PricingPlanCard = ({
           }}
         >
           <Heading color={colors.static.white} size={AppFontSize.xs}>
-            {discountPercentage}% Off
+            {regionalDiscount?.discount}% Off
           </Heading>
         </View>
-      ) : null} */}
+      ) : null}
 
       <View>
         <Heading size={AppFontSize.md}>
