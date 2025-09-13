@@ -39,14 +39,33 @@ async function initializeDatabase(persistence: DatabasePersistence) {
     await useKeyStore.getState().setValue("databaseKey", databaseKey);
   }
 
+  // Get server URLs from environment variables (with NN_ prefix) or user config
+  const getServerUrl = (host: string, defaultValue: string): string => {
+    // Check for environment variable with NN_ prefix first
+    const envVar = `NN_${host}`;
+    const envValue = (import.meta as any).env[envVar];
+    if (envValue) {
+      return envValue;
+    }
+    
+    // Fall back to user config
+    const configUrls = Config.get("serverUrls", {}) as Record<string, string>;
+    const configValue = configUrls[host];
+    if (configValue) {
+      return configValue;
+    }
+    
+    // Fall back to default
+    return defaultValue;
+  };
+
   db.host({
-    API_HOST: "https://api.notesnook.com",
-    AUTH_HOST: "https://auth.streetwriters.co",
-    SSE_HOST: "https://events.streetwriters.co",
-    ISSUES_HOST: "https://issues.streetwriters.co",
-    MONOGRAPH_HOST: "https://monogr.ph",
-    SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co",
-    ...Config.get("serverUrls", {})
+    API_HOST: getServerUrl("API_HOST", "https://api.notesnook.com"),
+    AUTH_HOST: getServerUrl("AUTH_HOST", "https://auth.streetwriters.co"),
+    SSE_HOST: getServerUrl("SSE_HOST", "https://events.streetwriters.co"),
+    ISSUES_HOST: getServerUrl("ISSUES_HOST", "https://issues.streetwriters.co"),
+    MONOGRAPH_HOST: getServerUrl("MONOGRAPH_HOST", "https://monogr.ph"),
+    SUBSCRIPTIONS_HOST: getServerUrl("SUBSCRIPTIONS_HOST", "https://subscriptions.streetwriters.co")
   });
 
   const storage = new NNStorage(
