@@ -2590,6 +2590,14 @@ msgstr ""
 msgid "Export notes as PDF, Markdown and HTML with Notesnook Pro"
 msgstr ""
 
+#: src/strings.ts:2493
+msgid "Export settings"
+msgstr ""
+
+#: src/strings.ts:2494
+msgid "Export your app settings to a JSON file."
+msgstr ""
+
 #: src/strings.ts:215
 msgid "Exporting \"{title}\""
 msgstr ""
@@ -3136,6 +3144,10 @@ msgstr ""
 msgid "Immediately"
 msgstr ""
 
+#: src/strings.ts:2492
+msgid "Import"
+msgstr ""
+
 #: src/strings.ts:2139
 msgid "Import & export"
 msgstr ""
@@ -3146,6 +3158,14 @@ msgstr ""
 
 #: src/strings.ts:1765
 msgid "import guide"
+msgstr ""
+
+#: src/strings.ts:2497
+msgid "Import settings"
+msgstr ""
+
+#: src/strings.ts:2496
+msgid "Import your app settings from a previously exported JSON file. This will overwrite your current settings."
 msgstr ""
 
 #: src/strings.ts:174
@@ -5615,6 +5635,22 @@ msgstr ""
 #: src/strings.ts:387
 #: src/strings.ts:1523
 msgid "Settings"
+msgstr ""
+
+#: src/strings.ts:2500
+msgid "Settings export failed"
+msgstr ""
+
+#: src/strings.ts:2498
+msgid "Settings exported"
+msgstr ""
+
+#: src/strings.ts:2501
+msgid "Settings import failed"
+msgstr ""
+
+#: src/strings.ts:2499
+msgid "Settings imported"
 msgstr ""
 
 #: src/strings.ts:1198
