@@ -351,8 +351,7 @@ export const RootNavigation = () => {
         <RootStack.Screen
           name="PayWall"
           getComponent={() => {
-            PayWall =
-              PayWall || require("../components/premium/paywall").default;
+            PayWall = PayWall || require("../components/paywall").default;
             return PayWall;
           }}
         />
