@@ -74,21 +74,6 @@ export async function uploadFile(
       return true;
     }
 
-    const uploadUrlResponse = await fetch(url, {
-      method: "PUT",
-      headers
-    });
-
-    const uploadUrl = uploadUrlResponse.ok
-      ? await uploadUrlResponse.text()
-      : await uploadUrlResponse.json();
-
-    if (typeof uploadUrl !== "string") {
-      throw new Error(
-        uploadUrl.error || "Unable to resolve attachment upload url."
-      );
-    }
-
     DatabaseLogger.info(`Starting upload: ${filename}`);
 
     const uploadRequest = RNFetchBlob.config({
@@ -97,8 +82,9 @@ export async function uploadFile(
     })
       .fetch(
         "PUT",
-        uploadUrl,
+        url,
         {
+          ...headers,
           "content-type": ""
         },
         RNFetchBlob.wrap(filePath)
