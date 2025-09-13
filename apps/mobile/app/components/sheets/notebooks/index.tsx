@@ -38,8 +38,8 @@ import { eCloseSheet, eOnNotebookUpdated } from "../../../utils/events";
 import { AppFontSize } from "../../../utils/size";
 import { DefaultAppStyles } from "../../../utils/styles";
 import { sleep } from "../../../utils/time";
+import { Dialog } from "../../dialog";
 import { Properties } from "../../properties";
-import SheetProvider from "../../sheet-provider";
 import { NotebookItem } from "../../side-menu/notebook-item";
 import { useSideMenuNotebookTreeStore } from "../../side-menu/stores";
 import { IconButton } from "../../ui/icon-button";
@@ -151,7 +151,7 @@ export const Notebooks = (props: {
         height: 400
       }}
     >
-      <SheetProvider context="local" />
+      <Dialog context="local" />
 
       <View
         style={{
@@ -175,7 +175,7 @@ export const Notebooks = (props: {
           }}
           name="plus"
           onPress={() => {
-            AddNotebookSheet.present(props.rootNotebook, undefined, "local");
+            AddNotebookSheet.present(undefined, props.rootNotebook, "local");
           }}
         />
       </View>
