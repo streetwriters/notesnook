@@ -28,6 +28,7 @@ import { createNodeView } from "../react/index.js";
 import { TextDirections } from "../text-direction/index.js";
 import { ImageComponent } from "./component.js";
 import { tiptapKeys } from "@notesnook/common";
+import { DOMParser } from "@tiptap/pm/model";
 
 export interface ImageOptions {
   inline: boolean;
@@ -61,10 +62,10 @@ const inputRegex = /(!\[(.+|:?)]\((\S+)(?:(?:\s+)["'](\S+)["'])?\))$/;
 
 export const ImageNode = Node.create<ImageOptions>({
   name: "image",
-
+  atom: true,
   addOptions() {
     return {
-      inline: true,
+      inline: false,
       allowBase64: true,
       HTMLAttributes: {}
     };
@@ -122,6 +123,52 @@ export const ImageNode = Node.create<ImageOptions>({
 
   parseHTML() {
     return [
+      // migration for inline image nodes into block nodes
+      {
+        priority: 60,
+        tag: "p",
+        getAttrs(node) {
+          if (node.querySelectorAll("img").length <= 0) return false;
+          return null;
+        },
+        getContent: (dom, schema) => {
+          const wrapper = document.createElement("div");
+          let buffer = "";
+
+          const flushBuffer = () => {
+            if (buffer.trim().length > 0) {
+              const pEl = document.createElement("p");
+              pEl.innerHTML = buffer;
+              wrapper.appendChild(pEl);
+              buffer = "";
+            }
+          };
+
+          for (const child of dom.childNodes) {
+            if (
+              child.nodeType === globalThis.Node.ELEMENT_NODE &&
+              (child as HTMLElement).tagName === "IMG"
+            ) {
+              flushBuffer();
+              wrapper.appendChild(child);
+            } else {
+              if (child.nodeType === globalThis.Node.ELEMENT_NODE) {
+                buffer += (child as HTMLElement).outerHTML;
+              } else if (child.nodeType === globalThis.Node.TEXT_NODE) {
+                buffer += child.textContent;
+              }
+            }
+          }
+          flushBuffer();
+
+          const parser = DOMParser.fromSchema(schema);
+          const parsedTaskList = parser.parse(wrapper).content.firstChild;
+          if (!parsedTaskList)
+            throw new Error("Failed to migrate from old task list.");
+
+          return parsedTaskList.content;
+        }
+      },
       {
         tag: this.options.allowBase64 ? "img" : 'img:not([src^="data:"])'
       }
