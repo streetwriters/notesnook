@@ -281,7 +281,7 @@ class SettingStore extends BaseStore<SettingStore> {
 
     try {
       if (isInboxEnabled) {
-        const inboxTokens = await db.user.getInboxApiKeys();
+        const inboxTokens = await db.inboxApiKeys.get();
         if (inboxTokens && inboxTokens.length > 0) {
           const ok = await ConfirmDialog.show({
             title: "Disable Inbox API",

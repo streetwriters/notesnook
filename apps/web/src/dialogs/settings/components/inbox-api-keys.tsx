@@ -39,7 +39,7 @@ import { showPasswordDialog } from "../../password-dialog";
 import { strings } from "@notesnook/intl";
 
 export function InboxApiKeys() {
-  const apiKeysPromise = usePromise(() => db.user.getInboxApiKeys(), []);
+  const apiKeysPromise = usePromise(() => db.inboxApiKeys.get(), []);
 
   if (apiKeysPromise.status === "pending") {
     return (
@@ -300,7 +300,7 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
 
             try {
               setIsRevoking(true);
-              await db.user.revokeInboxApiKey(apiKey.key);
+              await db.inboxApiKeys.revoke(apiKey.key);
               onRevoke();
               showToast("success", "API key revoked");
             } catch (error) {
@@ -345,7 +345,7 @@ const AddApiKeyDialog = DialogManager.register(function AddApiKeyDialog(
         showToast("error", "Please enter a key name");
         return;
       }
-      await db.user.createInboxApiKey(inputRef.current.value, selectedExpiry);
+      await db.inboxApiKeys.create(inputRef.current.value, selectedExpiry);
       onAdd();
       onClose(true);
     } catch (error) {

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { User, InboxApiKey } from "../types.js";
+import { User } from "../types.js";
 import http from "../utils/http.js";
 import constants from "../utils/constants.js";
 import TokenManager from "./token-manager.js";
@@ -37,8 +37,7 @@ const ENDPOINTS = {
   revoke: "/connect/revocation",
   recoverAccount: "/account/recover",
   resetUser: "/users/reset",
-  activateTrial: "/subscriptions/trial",
-  inboxApiKeys: "/inbox/api-keys"
+  activateTrial: "/subscriptions/trial"
 };
 
 class UserManager {
@@ -579,52 +578,6 @@ class UserManager {
     );
 
     await this.setUser({ ...user, inboxKeys: undefined });
-  }
-
-  async getInboxApiKeys() {
-    const user = await this.getUser();
-    if (!user) return;
-
-    const token = await this.tokenManager.getAccessToken();
-    if (!token) return;
-
-    const inboxApiKeys = await http.get(
-      `${constants.API_HOST}${ENDPOINTS.inboxApiKeys}`,
-      token
-    );
-    return inboxApiKeys as InboxApiKey[];
-  }
-
-  async revokeInboxApiKey(key: string) {
-    const user = await this.getUser();
-    if (!user) return;
-
-    const token = await this.tokenManager.getAccessToken();
-    if (!token) return;
-
-    await http.delete(
-      `${constants.API_HOST}${ENDPOINTS.inboxApiKeys}/${key}`,
-      token
-    );
-  }
-
-  async createInboxApiKey(name: string, expiryDuration: number) {
-    const user = await this.getUser();
-    if (!user) return;
-
-    const token = await this.tokenManager.getAccessToken();
-    if (!token) return;
-
-    const payload: Omit<InboxApiKey, "lastUsedAt" | "key"> = {
-      name,
-      dateCreated: Date.now(),
-      expiryDate: expiryDuration === -1 ? -1 : Date.now() + expiryDuration
-    };
-    await http.post.json(
-      `${constants.API_HOST}${ENDPOINTS.inboxApiKeys}`,
-      payload,
-      token
-    );
   }
 
   async sendVerificationEmail(newEmail?: string) {
