@@ -45,7 +45,7 @@ class _DialogManager {
         onClose: (result: any) => void;
       }
     >;
-    return new Promise<Result>((resolve, reject) => {
+    return new Promise<Result | false>((resolve, reject) => {
       const close = () => {
         this.openedDialogs.delete(component);
         root.unmount();
@@ -53,7 +53,7 @@ class _DialogManager {
       };
       this.openedDialogs.set(component, () => {
         close();
-        reject(new Error("Dialog force closed."));
+        resolve(false);
       });
       root.render(
         <Dialog
@@ -72,11 +72,14 @@ class _DialogManager {
   }
 
   closeAll() {
-    this.openedDialogs.clear();
     const dialogs = document.querySelectorAll(
       ".ReactModalPortal,[data-react-modal-body-trap]"
     );
     dialogs.forEach((elem) => elem.remove());
+
+    for (const close of this.openedDialogs.values()) {
+      close();
+    }
   }
 
   register<Props extends BaseDialogProps<any>>(
