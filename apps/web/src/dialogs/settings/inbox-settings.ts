@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { SettingsGroup } from "./types";
 import { useStore as useSettingStore } from "../../stores/setting-store";
+import { InboxApiKeys } from "./components/inbox-api-keys";
 
 export const InboxSettings: SettingsGroup[] = [
   {
@@ -38,6 +39,19 @@ export const InboxSettings: SettingsGroup[] = [
             type: "toggle",
             isToggled: () => useSettingStore.getState().isInboxEnabled,
             toggle: () => useSettingStore.getState().toggleInbox()
+          }
+        ]
+      },
+      {
+        key: "inbox-api-keys",
+        title: "",
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => s.isInboxEnabled, listener),
+        isHidden: () => !useSettingStore.getState().isInboxEnabled,
+        components: [
+          {
+            type: "custom",
+            component: InboxApiKeys
           }
         ]
       }

@@ -28,6 +28,7 @@ import { setDocumentTitle } from "../utils/dom";
 import { TimeFormat } from "@notesnook/core";
 import { Profile, TrashCleanupInterval } from "@notesnook/core";
 import { showToast } from "../utils/toast";
+import { ConfirmDialog } from "../dialogs/confirm";
 
 export const HostIds = [
   "API_HOST",
@@ -277,16 +278,29 @@ class SettingStore extends BaseStore<SettingStore> {
 
   toggleInbox = async () => {
     const { isInboxEnabled } = this.get();
-    const newState = !isInboxEnabled;
 
     try {
-      if (newState) {
-        await db.user.getInboxKeys();
-      } else {
+      if (isInboxEnabled) {
+        const inboxTokens = await db.inboxApiKeys.get();
+        if (inboxTokens && inboxTokens.length > 0) {
+          const ok = await ConfirmDialog.show({
+            title: "Disable Inbox API",
+            message:
+              "Disabling will revoke all existing API keys, they will no longer work. Are you sure?",
+            positiveButtonText: "Yes",
+            negativeButtonText: "No"
+          });
+          if (!ok) return;
+        }
+
         await db.user.discardInboxKeys();
+        this.set({ isInboxEnabled: false });
+
+        return;
       }
 
-      this.set((state) => (state.isInboxEnabled = newState));
+      await db.user.getInboxKeys();
+      this.set({ isInboxEnabled: true });
     } catch (e) {
       if (e instanceof Error) {
         showToast("error", e.message);
