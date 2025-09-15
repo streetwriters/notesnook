@@ -615,14 +615,8 @@ class UserManager {
     const token = await this.tokenManager.getAccessToken();
     if (!token) return;
 
-    const inboxApiKey = await this.db.crypto().generateRandomKey();
-    if (!inboxApiKey.key) {
-      throw new Error("Failed to generate inbox API key.");
-    }
-
-    const payload: Omit<InboxApiKey, "lastUsedAt"> = {
+    const payload: Omit<InboxApiKey, "lastUsedAt" | "key"> = {
       name,
-      key: "nn__" + inboxApiKey.key,
       dateCreated: Date.now(),
       expiryDate: expiryDuration === -1 ? -1 : Date.now() + expiryDuration
     };
