@@ -21,13 +21,14 @@ import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { View } from "react-native";
 import { FlatList } from "react-native-actions-sheet";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
 import { eSendEvent, presentSheet } from "../../services/event-manager";
-import { ColorValues } from "../../utils/colors";
 import { eOnLoadNote } from "../../utils/events";
 import { fluidTabsRef } from "../../utils/global-refs";
 import { AppFontSize } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 import SheetProvider from "../sheet-provider";
 import { IconButton } from "../ui/icon-button";
 import { Pressable } from "../ui/pressable";
@@ -38,8 +39,6 @@ import { DateMeta } from "./date-meta";
 import { Items } from "./items";
 import Notebooks from "./notebooks";
 import { TagStrip, Tags } from "./tags";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { DefaultAppStyles } from "../../utils/styles";
 
 const Line = ({ top = 6, bottom = 6 }) => {
   const { colors } = useThemeColors();
@@ -151,7 +150,8 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
               ) : null}
             </View>
 
-            {item.type === "notebook" && item.description ? (
+            {(item.type === "notebook" || item.type === "reminder") &&
+            item.description ? (
               <Paragraph>{item.description}</Paragraph>
             ) : null}
 
