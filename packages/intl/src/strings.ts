@@ -2492,5 +2492,6 @@ Use this if changes from other devices are not appearing on this device. This wi
   scrollToTop: () => t`Scroll to top`,
   scrollToBottom: () => t`Scroll to bottom`,
   emailConfirmedDesc: () =>
-    t`Your email has been confirmed. You can now securely sync your encrypted notes across all devices.`
+    t`Your email has been confirmed. You can now securely sync your encrypted notes across all devices.`,
+  charactersCount: (count: number) => t`${count} characters`
 };

@@ -491,6 +491,10 @@ msgstr ""
 msgid "{count, plural, one {Unpublish note} other {Unpublish # notes}}"
 msgstr ""
 
+#: src/strings.ts:2492
+msgid "{count} characters"
+msgstr ""
+
 #: src/strings.ts:1563
 msgid "{days, plural, one {1 day} other {# days}}"
 msgstr ""
