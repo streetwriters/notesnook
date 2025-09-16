@@ -76,3 +76,4 @@ The following keyboard shortcuts will help you navigate Notesnook faster.
 | Text align left | Ctrl ⇧ L | Ctrl ⇧ L | ⌘ ⇧ L |
 | Text align right | Ctrl ⇧ R | Ctrl ⇧ R | ⌘ ⇧ R |
 | Underline | Ctrl U | Ctrl U | ⌘ U |
+| Toggle highlight | Ctrl Alt H / Ctrl ⇧ H | Ctrl Alt H / Ctrl ⇧ H | ⌘ ⌥ H / ⌘ ⇧ H |
