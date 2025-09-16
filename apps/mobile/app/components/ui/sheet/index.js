@@ -64,8 +64,6 @@ const SheetWrapper = ({
   const isGestureNavigationEnabled =
     NotesnookModule.isGestureNavigationEnabled();
 
-  console.log(isGestureNavigationEnabled);
-
   const style = React.useMemo(() => {
     return {
       width: largeTablet || smallTablet ? width : "100%",
