@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Node, mergeAttributes } from "@tiptap/core";
+import { Node, mergeAttributes, nodePasteRule } from "@tiptap/core";
 import { insertMathNode } from "./plugin/index.js";
 import { NodeSelection } from "prosemirror-state";
 import { tiptapKeys } from "@notesnook/common";
@@ -32,6 +32,8 @@ declare module "@tiptap/core" {
 
 // simple inputrule for block math
 const REGEX_BLOCK_MATH_DOLLARS = /\$\$\$\s+$/; //new RegExp("\$\$\s+$", "i");
+const REGEX_PASTE_BLOCK_MATH_DOLLARS = /\$\$\$([\s\S]*?)\$\$\$/g;
+
 export const MathBlock = Node.create({
   name: "mathBlock",
   group: "block math",
@@ -98,6 +100,21 @@ export const MathBlock = Node.create({
           );
         }
       }
+    ];
+  },
+
+  addPasteRules() {
+    return [
+      nodePasteRule({
+        find: REGEX_PASTE_BLOCK_MATH_DOLLARS,
+        type: this.type,
+        getAttributes: (match) => {
+          return { content: match[1] };
+        },
+        getContent: (attrs) => {
+          return attrs.content ? [{ type: "text", text: attrs.content }] : [];
+        }
+      })
     ];
   }
 });

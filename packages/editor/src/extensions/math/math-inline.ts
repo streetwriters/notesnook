@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Node, mergeAttributes } from "@tiptap/core";
+import { Node, mergeAttributes, nodePasteRule } from "@tiptap/core";
 import { mathPlugin } from "./plugin/index.js";
 
 declare module "@tiptap/core" {
@@ -40,6 +40,7 @@ const REGEX_INLINE_MATH_DOLLARS = /\$\$(.+)\$\$/; //new RegExp("\$(.+)\$", "i");
 //     return REGEX_INLINE_MATH_DOLLARS;
 //   }
 // })();
+const REGEX_PASTE_INLINE_MATH_DOLLARS = /\$\$([\s\S]*?)\$\$/g;
 
 export const MathInline = Node.create({
   name: "mathInline",
@@ -106,6 +107,21 @@ export const MathInline = Node.create({
           );
         }
       }
+    ];
+  },
+
+  addPasteRules() {
+    return [
+      nodePasteRule({
+        find: REGEX_PASTE_INLINE_MATH_DOLLARS,
+        type: this.type,
+        getAttributes: (match) => {
+          return { content: match[1] };
+        },
+        getContent: (attrs) => {
+          return attrs.content ? [{ type: "text", text: attrs.content }] : [];
+        }
+      })
     ];
   }
 });
