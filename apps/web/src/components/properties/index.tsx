@@ -42,8 +42,8 @@ import {
 } from "../../stores/editor-store";
 import { db } from "../../common/db";
 import { useStore as useAppStore } from "../../stores/app-store";
-import { store as noteStore } from "../../stores/note-store";
 import { useStore as useAttachmentStore } from "../../stores/attachment-store";
+import { store as noteStore } from "../../stores/note-store";
 import Toggle from "./toggle";
 import ScrollContainer from "../scroll-container";
 import {
@@ -729,27 +729,27 @@ function Reminders({ noteId }: { noteId: string }) {
   );
 }
 function Attachments({ noteId }: { noteId: string }) {
-  const attachmentStoreNonce = useAttachmentStore((store) => store.nonce);
+  const nonce = useAttachmentStore((store) => store.nonce);
   const result = usePromise(
     () =>
       db.attachments
         .ofNote(noteId, "all")
         .sorted({ sortBy: "dateCreated", sortDirection: "desc" }),
-    [noteId, attachmentStoreNonce]
+    [noteId, nonce]
   );
+
   if (result.status !== "fulfilled" || result.value.length <= 0) return null;
 
   return (
     <Section
       title={strings.dataTypesPluralCamelCase.attachment()}
-      sx={{ borderTop: "1px solid var(--border)" }}
+      sx={{ borderTop: "1px solid var(--border)", mt: 1 }}
     >
       <VirtualizedTable
         estimatedSize={25}
         getItemKey={(index) => result.value.key(index)}
         items={result.value.placeholders}
         style={{
-          marginTop: 5,
           tableLayout: "fixed",
           width: "100%"
         }}

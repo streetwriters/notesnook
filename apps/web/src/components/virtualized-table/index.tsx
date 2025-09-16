@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Virtualizer } from "@tanstack/react-virtual";
 import { Flex } from "@theme-ui/components";
-import React, { useRef } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import { TableVirtuoso } from "react-virtuoso";
 
 export type VirtualizedTableRowProps<T, C> = {
@@ -57,6 +57,14 @@ export function VirtualizedTable<T, C>(props: VirtualizedTableProps<T, C>) {
     style
   } = props;
   const containerRef = useRef<HTMLDivElement>(null);
+  const [scrollParent, setScrollParent] = useState(scrollElement);
+
+  useLayoutEffect(() => {
+    setScrollParent(
+      scrollElement ||
+        containerRef.current?.closest<HTMLDivElement>(".ms-container")
+    );
+  }, [scrollElement]);
 
   return (
     <Flex
@@ -67,11 +75,7 @@ export function VirtualizedTable<T, C>(props: VirtualizedTableProps<T, C>) {
       <TableVirtuoso
         data={items}
         context={context}
-        customScrollParent={
-          scrollElement ||
-          containerRef.current?.closest(".ms-container") ||
-          undefined
-        }
+        customScrollParent={scrollParent || undefined}
         increaseViewportBy={300}
         computeItemKey={(index) => getItemKey(index)}
         defaultItemHeight={estimatedSize}
