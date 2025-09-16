@@ -2489,7 +2489,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   noNotebooksSelectedToMove: () => t`No notebooks selected to move`,
   scrollToTop: () => t`Scroll to top`,
   scrollToBottom: () => t`Scroll to bottom`,
-  characters: (count: number) => t`${count} characters`
   emailConfirmedDesc: () =>
-    t`Your email has been confirmed. You can now securely sync your encrypted notes across all devices.`
+    t`Your email has been confirmed. You can now securely sync your encrypted notes across all devices.`,
+  charactersCount: (count: number) => t`${count} characters`
 };
