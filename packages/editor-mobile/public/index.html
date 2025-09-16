@@ -16,8 +16,8 @@
       }
 
       /* p { */
-        /* font-family: "Inter"; */
-        /* color: var(--nn_primary_paragraph) ## TODO: use fixed color */
+      /* font-family: "Inter"; */
+      /* color: var(--nn_primary_paragraph) ## TODO: use fixed color */
       /* } */
 
       ::selection {
@@ -31,6 +31,10 @@
 
       p.is-editor-empty:first-child::before {
         color: var(--nn_primary_placeholder) !important;
+      }
+
+      .main-editor *:first-child {
+        margin-top: 0.5em !important;
       }
 
       #root {
