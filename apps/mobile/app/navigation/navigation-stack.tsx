@@ -30,6 +30,7 @@ import useNavigationStore, {
 import { useSelectionStore } from "../stores/use-selection-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { rootNavigatorRef } from "../utils/global-refs";
+import Navigation from "../services/navigation";
 
 const RootStack = createNativeStackNavigator();
 const AppStack = createNativeStackNavigator();
@@ -255,12 +256,18 @@ export const RootNavigation = () => {
     (state) => state.settings.introCompleted
   );
   const clearSelection = useSelectionStore((state) => state.clearSelection);
-  const onStateChange = React.useCallback(() => {
-    if (useSelectionStore.getState().selectionMode) {
-      clearSelection();
-    }
-    hideAllTooltips();
-  }, [clearSelection]);
+  const onStateChange = React.useCallback(
+    (state: any) => {
+      if (useSelectionStore.getState().selectionMode) {
+        clearSelection();
+      }
+      setTimeout(() => {
+        Navigation.resetRootState(state);
+      }, 1000);
+      hideAllTooltips();
+    },
+    [clearSelection]
+  );
 
   return (
     <NavigationContainer onStateChange={onStateChange} ref={rootNavigatorRef}>
