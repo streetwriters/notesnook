@@ -328,6 +328,8 @@ const NotebookItemWrapper = React.memo(
     const expanded = useNotebookExpandedStore(
       (state) => state.expanded[item.notebook.id]
     );
+    const disableExpand = useNotebookTreeStore((state) => state.isSearching);
+
     const selectionEnabled = useNotebookSelectionStore(
       (state) => state.enabled
     );
@@ -378,6 +380,7 @@ const NotebookItemWrapper = React.memo(
               useNotebookTreeStore.getState().removeChildren(item.notebook.id);
             }
           }}
+          disableExpand={disableExpand}
           selected={selected}
           selectionEnabled={selectionEnabled}
           selectionStore={useNotebookSelectionStore}
