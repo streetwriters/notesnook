@@ -7065,6 +7065,10 @@ msgstr ""
 msgid "Your email has been confirmed."
 msgstr ""
 
+#: src/strings.ts:2493
+msgid "Your email has been confirmed. You can now securely sync your encrypted notes across all devices."
+msgstr ""
+
 #: src/strings.ts:765
 msgid "Your email is not confirmed. Please confirm your email address to change account password."
 msgstr ""

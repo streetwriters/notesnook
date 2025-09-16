@@ -150,7 +150,8 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
               ) : null}
             </View>
 
-            {item.type === "notebook" && item.description ? (
+            {(item.type === "notebook" || item.type === "reminder") &&
+            item.description ? (
               <Paragraph>{item.description}</Paragraph>
             ) : null}
 
