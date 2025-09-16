@@ -171,12 +171,13 @@ const Intro = () => {
       </View>
       <View
         style={{
-          width: "100%",
+          width: isTablet ? "50%" : "100%",
           justifyContent: "center",
           gap: DefaultAppStyles.GAP_VERTICAL,
-          paddingHorizontal: DefaultAppStyles.GAP,
+          paddingHorizontal: isTablet ? 0 : DefaultAppStyles.GAP,
           paddingVertical: DefaultAppStyles.GAP_VERTICAL,
-          flexShrink: 1
+          flexShrink: 1,
+          alignSelf: "center"
         }}
       >
         <Button

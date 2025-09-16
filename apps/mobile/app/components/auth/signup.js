@@ -195,9 +195,10 @@ export const Signup = ({ changeMode, welcome }) => {
               <View
                 style={{
                   width: DDS.isTab ? "50%" : "100%",
-                  paddingHorizontal: 16,
+                  paddingHorizontal: DDS.isTab ? 0 : 16,
                   backgroundColor: colors.primary.background,
-                  flexGrow: 1
+                  flexGrow: 1,
+                  alignSelf: "center"
                 }}
               >
                 <Input
