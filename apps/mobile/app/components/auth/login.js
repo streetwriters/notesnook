@@ -144,7 +144,7 @@ export const Login = ({ changeMode }) => {
               borderColor: isTablet ? colors.primary.border : null,
               borderRadius: isTablet ? 20 : null,
               marginTop: isTablet ? 50 : null,
-              width: !isTablet ? null : "70%",
+              width: !isTablet ? null : "50%",
               minHeight: height * 0.4
             }}
           >
@@ -195,7 +195,7 @@ export const Login = ({ changeMode }) => {
                 : "99.9%",
               backgroundColor: colors.primary.background,
               alignSelf: "center",
-              paddingHorizontal: DefaultAppStyles.GAP,
+              paddingHorizontal: DDS.isTab ? 0 : DefaultAppStyles.GAP,
               gap: DefaultAppStyles.GAP_VERTICAL
             }}
           >

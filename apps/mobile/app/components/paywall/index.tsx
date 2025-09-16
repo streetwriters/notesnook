@@ -37,6 +37,7 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
+  useWindowDimensions,
   View
 } from "react-native";
 import Config from "react-native-config";
@@ -105,6 +106,8 @@ const PlanOverView = {
 const PayWall = (props: NavigationProps<"PayWall">) => {
   const isGithubRelease = Config.GITHUB_RELEASE === "true";
   const routeParams = props.route.params;
+  const { width, height } = useWindowDimensions();
+  const isTablet = width > 600;
   const [webUrl, setWebUrl] = useState("https://notesnook.com");
   const { colors } = useThemeColors();
   const pricingPlans = usePricingPlans({
@@ -306,246 +309,261 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
                 </Paragraph>
               </TouchableOpacity>
 
-              {pricingPlans.pricingPlans.map((plan) =>
-                plan.id !== "free" ? (
-                  <PricingPlanCard
-                    key={plan.id}
-                    plan={plan}
-                    setStep={(step) => {
-                      if (!pricingPlans.user) {
-                        Navigation.navigate("Auth", {
-                          mode: AuthMode.login,
-                          state: {
-                            planId: pricingPlans.currentPlan?.id,
-                            productId:
-                              (
-                                pricingPlans.selectedProduct as RNIap.Subscription
-                              )?.productId ||
-                              (pricingPlans.selectedProduct as Plan).period,
-                            billingType: annualBilling ? "annual" : "monthly"
-                          }
-                        });
-                        return;
-                      }
-                      setStep(step);
+              <View
+                style={{
+                  flexDirection: isTablet ? "row" : "column",
+                  gap: isTablet ? DefaultAppStyles.GAP : 0
+                }}
+              >
+                {pricingPlans.pricingPlans.map((plan) =>
+                  plan.id !== "free" ? (
+                    <PricingPlanCard
+                      key={plan.id}
+                      plan={plan}
+                      setStep={(step) => {
+                        if (!pricingPlans.user) {
+                          Navigation.navigate("Auth", {
+                            mode: AuthMode.login,
+                            state: {
+                              planId: pricingPlans.currentPlan?.id,
+                              productId:
+                                (
+                                  pricingPlans.selectedProduct as RNIap.Subscription
+                                )?.productId ||
+                                (pricingPlans.selectedProduct as Plan).period,
+                              billingType: annualBilling ? "annual" : "monthly"
+                            }
+                          });
+                          return;
+                        }
+                        setStep(step);
+                      }}
+                      pricingPlans={pricingPlans}
+                      annualBilling={annualBilling}
+                    />
+                  ) : null
+                )}
+              </View>
+            </View>
+
+            <View
+              style={{
+                width: "100%"
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  width: "100%",
+                  justifyContent: "space-between",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  flexShrink: 1
+                }}
+              >
+                <TouchableOpacity
+                  onPress={() => {
+                    openLinkInBrowser(
+                      "https://github.com/streetwriters/notesnook"
+                    );
+                  }}
+                  activeOpacity={0.9}
+                  style={{
+                    padding: 16,
+                    gap: 12,
+                    alignItems: "center",
+                    flexGrow: 1
+                  }}
+                >
+                  <View
+                    style={{
+                      justifyContent: "center",
+                      alignItems: "center",
+                      width: 50,
+                      height: 50,
+                      backgroundColor: "black",
+                      borderRadius: 10
                     }}
-                    pricingPlans={pricingPlans}
-                    annualBilling={annualBilling}
-                  />
-                ) : null
-              )}
-            </View>
+                  >
+                    <Icon
+                      size={40}
+                      name="open-source-initiative"
+                      color={colors.static.white}
+                    />
+                  </View>
+                  <Paragraph
+                    style={{
+                      flexShrink: 1
+                    }}
+                    size={AppFontSize.md}
+                  >
+                    Open Source
+                  </Paragraph>
+                </TouchableOpacity>
 
-            <View
-              style={{
-                flexDirection: "row",
-                maxWidth: "100%",
-                justifyContent: "space-between",
-                flexWrap: "wrap",
-                alignItems: "center",
-                flexShrink: 1
-              }}
-            >
-              <TouchableOpacity
-                onPress={() => {
-                  openLinkInBrowser(
-                    "https://github.com/streetwriters/notesnook"
-                  );
-                }}
-                activeOpacity={0.9}
-                style={{
-                  padding: 16,
-                  gap: 12,
-                  alignItems: "center",
-                  flexGrow: 1
-                }}
-              >
-                <View
+                <TouchableOpacity
+                  onPress={() => {
+                    openLinkInBrowser(
+                      "https://github.com/streetwriters/notesnook/stargazers"
+                    );
+                  }}
+                  activeOpacity={0.9}
+                  style={{
+                    padding: 16,
+                    gap: 12,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexGrow: 1
+                  }}
+                >
+                  <View
+                    style={{
+                      justifyContent: "center",
+                      alignItems: "center",
+                      width: 50,
+                      height: 50,
+                      backgroundColor: "black",
+                      borderRadius: 10
+                    }}
+                  >
+                    <Icon size={40} name="github" color={colors.static.white} />
+                  </View>
+                  <Paragraph
+                    style={{
+                      flexShrink: 1
+                    }}
+                    size={AppFontSize.md}
+                  >
+                    12.5K stars
+                  </Paragraph>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => {
+                    openLinkInBrowser(
+                      "https://www.privacyguides.org/en/notebooks/#notesnook"
+                    );
+                  }}
+                  activeOpacity={0.9}
                   style={{
                     justifyContent: "center",
+                    padding: 16,
+                    gap: 12,
                     alignItems: "center",
-                    width: 50,
-                    height: 50,
-                    backgroundColor: "black",
-                    borderRadius: 10
+                    flexGrow: 1
                   }}
                 >
-                  <Icon
-                    size={40}
-                    name="open-source-initiative"
-                    color={colors.static.white}
-                  />
-                </View>
-                <Paragraph
-                  style={{
-                    flexShrink: 1
-                  }}
-                  size={AppFontSize.md}
-                >
-                  Open Source
-                </Paragraph>
-              </TouchableOpacity>
+                  <SvgView width={60} height={60} src={PRIVACY_GUIDES_SVG} />
+                  <Paragraph
+                    style={{
+                      flexShrink: 1,
+                      maxWidth: 300,
+                      textAlign: "center"
+                    }}
+                    size={AppFontSize.md}
+                  >
+                    {strings.recommendedByPrivacyGuides()}
+                  </Paragraph>
+                </TouchableOpacity>
+              </View>
 
-              <TouchableOpacity
-                onPress={() => {
-                  openLinkInBrowser(
-                    "https://github.com/streetwriters/notesnook/stargazers"
-                  );
-                }}
-                activeOpacity={0.9}
+              <Heading
                 style={{
-                  padding: 16,
-                  gap: 12,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexGrow: 1
+                  marginBottom: 20,
+                  alignSelf: "center"
                 }}
               >
+                {strings.featuredOn()}
+              </Heading>
+
+              <View
+                style={{
+                  width: "100%",
+                  paddingHorizontal: 16,
+                  alignItems: "center",
+                  paddingBottom: 16,
+                  flexDirection: "row",
+                  gap: 20,
+                  flexWrap: "wrap",
+                  justifyContent: "center"
+                }}
+              >
+                <Image
+                  source={{
+                    uri: NESS_LABS_PNG
+                  }}
+                  style={{
+                    width: 100,
+                    height: 80
+                  }}
+                />
+
+                <Image
+                  source={{
+                    uri: ITS_FOSS_NEWS_PNG
+                  }}
+                  resizeMode="contain"
+                  style={{
+                    width: 150,
+                    height: 100
+                  }}
+                />
+
+                <Image
+                  source={{
+                    uri: APPLE_INSIDER_PNG
+                  }}
+                  resizeMode="contain"
+                  style={{
+                    width: 368 * 0.5,
+                    height: 100
+                  }}
+                />
+
                 <View
                   style={{
-                    justifyContent: "center",
-                    alignItems: "center",
-                    width: 50,
-                    height: 50,
-                    backgroundColor: "black",
-                    borderRadius: 10
+                    height: 100,
+                    justifyContent: "center"
                   }}
                 >
-                  <Icon size={40} name="github" color={colors.static.white} />
+                  <SvgView width={80} height={80} src={TECHLORE_SVG} />
                 </View>
-                <Paragraph
-                  style={{
-                    flexShrink: 1
-                  }}
-                  size={AppFontSize.md}
-                >
-                  12.5K stars
-                </Paragraph>
-              </TouchableOpacity>
 
-              <TouchableOpacity
-                onPress={() => {
-                  openLinkInBrowser(
-                    "https://www.privacyguides.org/en/notebooks/#notesnook"
-                  );
-                }}
-                activeOpacity={0.9}
+                <View
+                  style={{
+                    height: 100,
+                    justifyContent: "center"
+                  }}
+                >
+                  <SvgView width={100} height={100} src={XDA_SVG} />
+                </View>
+
+                <View
+                  style={{
+                    height: 100,
+                    justifyContent: "center"
+                  }}
+                >
+                  <SvgView width={100} height={100} src={ANDROID_POLICE_SVG} />
+                </View>
+              </View>
+
+              <View
                 style={{
-                  justifyContent: "center",
                   padding: 16,
-                  gap: 12,
-                  alignItems: "center",
-                  flexGrow: 1
+                  alignSelf: "center",
+                  width: isTablet ? 500 : undefined
                 }}
               >
-                <SvgView width={60} height={60} src={PRIVACY_GUIDES_SVG} />
-                <Paragraph
-                  style={{
-                    flexShrink: 1,
-                    maxWidth: 300,
-                    textAlign: "center"
-                  }}
-                  size={AppFontSize.md}
-                >
-                  {strings.recommendedByPrivacyGuides()}
-                </Paragraph>
-              </TouchableOpacity>
-            </View>
-
-            <Heading
-              style={{
-                marginBottom: 20,
-                alignSelf: "center"
-              }}
-            >
-              {strings.featuredOn()}
-            </Heading>
-
-            <View
-              style={{
-                width: "100%",
-                paddingHorizontal: 16,
-                alignItems: "center",
-                paddingBottom: 16,
-                flexDirection: "row",
-                gap: 20,
-                flexWrap: "wrap",
-                justifyContent: "center"
-              }}
-            >
-              <Image
-                source={{
-                  uri: NESS_LABS_PNG
-                }}
-                style={{
-                  width: 100,
-                  height: 80
-                }}
-              />
-
-              <Image
-                source={{
-                  uri: ITS_FOSS_NEWS_PNG
-                }}
-                resizeMode="contain"
-                style={{
-                  width: 150,
-                  height: 100
-                }}
-              />
-
-              <Image
-                source={{
-                  uri: APPLE_INSIDER_PNG
-                }}
-                resizeMode="contain"
-                style={{
-                  width: 368 * 0.5,
-                  height: 100
-                }}
-              />
-
-              <View
-                style={{
-                  height: 100,
-                  justifyContent: "center"
-                }}
-              >
-                <SvgView width={80} height={80} src={TECHLORE_SVG} />
-              </View>
-
-              <View
-                style={{
-                  height: 100,
-                  justifyContent: "center"
-                }}
-              >
-                <SvgView width={100} height={100} src={XDA_SVG} />
-              </View>
-
-              <View
-                style={{
-                  height: 100,
-                  justifyContent: "center"
-                }}
-              >
-                <SvgView width={100} height={100} src={ANDROID_POLICE_SVG} />
-              </View>
-            </View>
-
-            <View
-              style={{
-                padding: 16
-              }}
-            >
-              <ReviewItem
-                user="Tagby on Discord"
-                link="https://discord.com/channels/796015620436787241/828701074465619990/1070172521846026271"
-                userImage="data:image/webp;base64,UklGRrAFAABXRUJQVlA4WAoAAAAQAAAATwAATwAAQUxQSAoAAAABB9D+iAhERP8DVlA4IIAFAAAQGACdASpQAFAAPm0skkYkIqGhL1K86IANiWdqN1k9SfbwDoK2qhJsXhBwv+m+3ujg5HTtBysrex6esj/qeU5883L4Rbay65pvw7npaa0yc/fmrdXlgwv8WNtJN9J5m8XMkAKD7lrd98bFKn2UcICVz6fIlJpW6gQDx3Y/lQzupEnm4fyWa/VI47NFSGLJjPe4K/NR5nIh1I+JaGqh5h6Zn/9771gyWEnxRaaHU7LdnMvNnAtVXhm3Ijxrv+9TKC7rtKa+oqC2ewAA/v17lyxCQMDU8AW7okR5UCCzmkNNZqVrX1NJ2Mu1LrM2qc+DCezUOb2Y8MzxK5xRgGrcR0/FAx88Y1KeuT5RUbhRcNNnTw1Un3MWtOlBIXpYjntwwdRskDymt47ZvkH+V5QANy6cAr+Lrol9EOVUxXc8G5bTJLcIHELmBulybx2w+O+btTXtlkgn0JSy0pAWMfZunaztVCHoyNnmWxhHAFMMUSycgx76ovzc8+Hwd/rRUY3/P+B4/y3dQZ9FB+vMiyYCEdci0l8arhH6f0IOVijOkAXiuS8KfnOh76NP5jbRF0qvz63DDZSUmpsXJGnI7phYFgJ5Em+3zIebcKqPcn4M5hznAH9mYIPsv8jeOCg7+DRYljkh4AbTxImyoRrPy9GUeUA1QC290cK+877ce6yyNzQK8jaLEAz53ccPZj/cHk17B2SCVknKQhV7bz6yg6fLGR5AT3qAPfdQsVeHrPLQdRZmw1ll62E7lCU7+WCuHk+xAg1JwiyZsdWlcSf1Oazs7qgdnon9lQNVKgzGSR+I811YKPAS5U3go9ANCZwqsmdQ07Y+ZzCuLukH46D0tWk/kBVgXBzMhOf8bAlayYfIGvIdEXjm6Z4j0SIz3juiY35mCjXXwez84ESBpc3z0c2gWgRFzWx/iyYBjPzJ5s3Mub6xzfsWtYqAmhAPzeoK5pJWgiB6tEyI2oZmLuj7sLVHARnaswrfzDlIUMPXRSZFoq+mmsIF1aKThJDQTNdgnkLjfz3rDkVaqVhk3sg8jZLIOMJUKsYvujEmGRbRlO3hwfL0JvoORLh8rOJ0prBA2Tnra+VA/RMfJtKC/AjVXRu/nH0tmGg2/Wkra7C/OWK9E2NqBVVjJvrgqvNN0V8gYZdScIl0jQSLRzA4emm2HfC+L8c4FCxheZFDMP+zGUH5JyXLkBX/hGWE+CWhcPjSJ8hAj8yBeXCyWpM07eiFPxxkqYF+Wka211fUU/HygHPX+Qj+CyoMjz9gstrjNPTX0zc3r55VrpiFUjxfgOoY32Eojwr9mWg/dcleov8wSmKuJZtzjxiXFzemVIP5kzrDIffxS6PR30mOq+d9k/ZgJfzhyuPr6W8kOmQXmLnMwbpcr1KSSgjOLmu6oBtjexL/ukI77ygGzDtdDfRPpj7klVHu34xcWAufMWOMlo70oenOeQGueYXGWPZW175I30dvCT/Ra2R+0MbxvxmdpmmoQmzC4d7l/MI2MhUHUW5N79x0vXB1PEGs+F3o+6dO+N1qqqXxJP/0N5BvADUF55dX2vpBSAXyN30UPO9IBqC0JkFPwXiOncsUir6r50C47HnS2WadAlu2QpHFL8YrTsSdhP19HAc6zWDM2/RaJZxFFQj/tqw0rYVYX//7iKKSiXWWQma12fG+HhJD2tBjEcp8+vU2nzjmd4tR6AurIEns1SsWg2cFcvrZzyzKFB0gdnvVpoCwouvl8UuSAyYc+rHMVGhWln+a+bhRgIERIb5XlrazMxJOqksed7mUs5ArKpOEuHWPYu+U+E2T1OkeusgAKL57F73Fm2xbIunW/IbW2wawYHv8u1AWGGSAB8XYJOW1XxpqIgq+V34pqd3WRpBGd1G4rGAA"
-                review={`I just want to say thank you so much.
+                <ReviewItem
+                  user="Tagby on Discord"
+                  link="https://discord.com/channels/796015620436787241/828701074465619990/1070172521846026271"
+                  userImage="data:image/webp;base64,UklGRrAFAABXRUJQVlA4WAoAAAAQAAAATwAATwAAQUxQSAoAAAABB9D+iAhERP8DVlA4IIAFAAAQGACdASpQAFAAPm0skkYkIqGhL1K86IANiWdqN1k9SfbwDoK2qhJsXhBwv+m+3ujg5HTtBysrex6esj/qeU5883L4Rbay65pvw7npaa0yc/fmrdXlgwv8WNtJN9J5m8XMkAKD7lrd98bFKn2UcICVz6fIlJpW6gQDx3Y/lQzupEnm4fyWa/VI47NFSGLJjPe4K/NR5nIh1I+JaGqh5h6Zn/9771gyWEnxRaaHU7LdnMvNnAtVXhm3Ijxrv+9TKC7rtKa+oqC2ewAA/v17lyxCQMDU8AW7okR5UCCzmkNNZqVrX1NJ2Mu1LrM2qc+DCezUOb2Y8MzxK5xRgGrcR0/FAx88Y1KeuT5RUbhRcNNnTw1Un3MWtOlBIXpYjntwwdRskDymt47ZvkH+V5QANy6cAr+Lrol9EOVUxXc8G5bTJLcIHELmBulybx2w+O+btTXtlkgn0JSy0pAWMfZunaztVCHoyNnmWxhHAFMMUSycgx76ovzc8+Hwd/rRUY3/P+B4/y3dQZ9FB+vMiyYCEdci0l8arhH6f0IOVijOkAXiuS8KfnOh76NP5jbRF0qvz63DDZSUmpsXJGnI7phYFgJ5Em+3zIebcKqPcn4M5hznAH9mYIPsv8jeOCg7+DRYljkh4AbTxImyoRrPy9GUeUA1QC290cK+877ce6yyNzQK8jaLEAz53ccPZj/cHk17B2SCVknKQhV7bz6yg6fLGR5AT3qAPfdQsVeHrPLQdRZmw1ll62E7lCU7+WCuHk+xAg1JwiyZsdWlcSf1Oazs7qgdnon9lQNVKgzGSR+I811YKPAS5U3go9ANCZwqsmdQ07Y+ZzCuLukH46D0tWk/kBVgXBzMhOf8bAlayYfIGvIdEXjm6Z4j0SIz3juiY35mCjXXwez84ESBpc3z0c2gWgRFzWx/iyYBjPzJ5s3Mub6xzfsWtYqAmhAPzeoK5pJWgiB6tEyI2oZmLuj7sLVHARnaswrfzDlIUMPXRSZFoq+mmsIF1aKThJDQTNdgnkLjfz3rDkVaqVhk3sg8jZLIOMJUKsYvujEmGRbRlO3hwfL0JvoORLh8rOJ0prBA2Tnra+VA/RMfJtKC/AjVXRu/nH0tmGg2/Wkra7C/OWK9E2NqBVVjJvrgqvNN0V8gYZdScIl0jQSLRzA4emm2HfC+L8c4FCxheZFDMP+zGUH5JyXLkBX/hGWE+CWhcPjSJ8hAj8yBeXCyWpM07eiFPxxkqYF+Wka211fUU/HygHPX+Qj+CyoMjz9gstrjNPTX0zc3r55VrpiFUjxfgOoY32Eojwr9mWg/dcleov8wSmKuJZtzjxiXFzemVIP5kzrDIffxS6PR30mOq+d9k/ZgJfzhyuPr6W8kOmQXmLnMwbpcr1KSSgjOLmu6oBtjexL/ukI77ygGzDtdDfRPpj7klVHu34xcWAufMWOMlo70oenOeQGueYXGWPZW175I30dvCT/Ra2R+0MbxvxmdpmmoQmzC4d7l/MI2MhUHUW5N79x0vXB1PEGs+F3o+6dO+N1qqqXxJP/0N5BvADUF55dX2vpBSAXyN30UPO9IBqC0JkFPwXiOncsUir6r50C47HnS2WadAlu2QpHFL8YrTsSdhP19HAc6zWDM2/RaJZxFFQj/tqw0rYVYX//7iKKSiXWWQma12fG+HhJD2tBjEcp8+vU2nzjmd4tR6AurIEns1SsWg2cFcvrZzyzKFB0gdnvVpoCwouvl8UuSAyYc+rHMVGhWln+a+bhRgIERIb5XlrazMxJOqksed7mUs5ArKpOEuHWPYu+U+E2T1OkeusgAKL57F73Fm2xbIunW/IbW2wawYHv8u1AWGGSAB8XYJOW1XxpqIgq+V34pqd3WRpBGd1G4rGAA"
+                  review={`I just want to say thank you so much.
 
 After trying all the privacy security oriented note taking apps, for the price and the features afforded to your users, Notesnook is hands down the best.`}
-              />
+                />
+              </View>
             </View>
             <View
               style={{
@@ -555,7 +573,16 @@ After trying all the privacy security oriented note taking apps, for the price a
             >
               <Heading>{strings.comparePlans()}</Heading>
             </View>
-            <ComparePlans pricingPlans={pricingPlans} setStep={setStep} />
+
+            <View
+              style={{
+                alignSelf: "center",
+                flexShrink: 1
+              }}
+            >
+              <ComparePlans pricingPlans={pricingPlans} setStep={setStep} />
+            </View>
+
             <View
               style={{
                 alignItems: "center",
@@ -567,8 +594,7 @@ After trying all the privacy security oriented note taking apps, for the price a
 
             <View
               style={{
-                paddingHorizontal: 16,
-                paddingBottom: 16
+                paddingHorizontal: 16
               }}
             >
               {strings.checkoutFaqs.map((item) => (
@@ -721,6 +747,9 @@ const ComparePlans = React.memo(
     setStep: (step: number) => void;
   }) => {
     const { colors } = useThemeColors();
+    const { width } = useWindowDimensions();
+    const isTablet = width > 600;
+
     return (
       <ScrollView
         horizontal
@@ -933,6 +962,8 @@ const PricingPlanCard = ({
   const { colors } = useThemeColors();
   const isFreePlan = plan.id === "free";
   const [regionalDiscount, setRegionaDiscount] = useState<SKUResponse>();
+  const { width, height } = useWindowDimensions();
+  const isTablet = width > 600;
 
   const product =
     plan.subscriptions?.[
@@ -978,7 +1009,8 @@ const PricingPlanCard = ({
           plan.id === "pro" ? colors.primary.accent : colors.primary.border,
         borderRadius: 10,
         padding: 16,
-        width: "100%",
+        width: isTablet ? undefined : "100%",
+        flexShrink: isTablet ? 1 : undefined,
         flexDirection: "column",
         justifyContent: "space-between",
         gap: 6
