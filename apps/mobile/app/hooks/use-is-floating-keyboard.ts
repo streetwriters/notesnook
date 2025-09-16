@@ -26,12 +26,14 @@ import { useCallback } from "react";
  * @returns Is keyboard floating or not
  */
 const useIsFloatingKeyboard = () => {
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
 
   const [floating, setFloating] = useState<boolean>(false);
   const onKeyboardWillChangeFrame = useCallback(
     (event: KeyboardEvent) => {
-      setFloating(event.endCoordinates.width < width);
+      setFloating(
+        event.endCoordinates.width === 0 || event.endCoordinates.width < width
+      );
     },
     [width]
   );
@@ -41,8 +43,13 @@ const useIsFloatingKeyboard = () => {
       "keyboardWillChangeFrame",
       onKeyboardWillChangeFrame
     );
+    const sub2 = Keyboard.addListener(
+      "keyboardWillShow",
+      onKeyboardWillChangeFrame
+    );
     return () => {
       sub1?.remove();
+      sub2?.remove();
     };
   }, [onKeyboardWillChangeFrame, width]);
 
