@@ -219,8 +219,11 @@ export function SubscriptionStatus() {
                       type: "modal",
                       title: strings.redeemingGiftCode(),
                       subtitle: strings.pleaseWait() + "...",
-                      action: () => db.subscriptions.redeemCode(giftCode)
-                    }).catch((e) => showToast("error", e.message));
+                      action: () =>
+                        db.subscriptions
+                          .redeemCode(giftCode)
+                          .catch((e) => showToast("error", e.message))
+                    });
                   }
                 }}
                 sx={{ bg: "background" }}
