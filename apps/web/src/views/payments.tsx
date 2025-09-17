@@ -58,6 +58,7 @@ function Payments() {
                 quantity && !isNaN(parseInt(quantity)) ? parseInt(quantity) : 1
             }
           ],
+          customData: { email },
           customer: email
             ? {
                 email
