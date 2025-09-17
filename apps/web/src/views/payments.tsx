@@ -27,23 +27,43 @@ import { Loader } from "../components/loader";
 import { IS_DEV } from "../dialogs/buy-dialog/helpers";
 
 function Payments() {
-  const [{ _ptxn }] = useQueryParams();
+  const [{ _ptxn, priceId, email, quantity }] = useQueryParams();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!_ptxn) return hardNavigate("/notes");
+    if (!_ptxn && !priceId) return hardNavigate("/notes");
     (async function () {
       const paddle = await initializePaddle({
         token: CLIENT_PADDLE_TOKEN,
         environment: IS_DEV ? "sandbox" : "production"
       });
+      if (!paddle) return hardNavigate("/notes");
+
       setIsLoading(false);
-      paddle?.Checkout.open({
-        transactionId: _ptxn,
-        settings: { displayMode: "overlay" }
-      });
+      if (_ptxn) {
+        paddle.Checkout.open({
+          transactionId: _ptxn,
+          settings: { displayMode: "overlay" }
+        });
+      } else if (priceId) {
+        paddle.Checkout.open({
+          items: [
+            {
+              priceId,
+              quantity:
+                quantity && !isNaN(parseInt(quantity)) ? parseInt(quantity) : 1
+            }
+          ],
+          customer: email
+            ? {
+                email
+              }
+            : undefined,
+          settings: { displayMode: "overlay" }
+        });
+      }
     })();
-  }, [_ptxn]);
+  }, [_ptxn, priceId, email, quantity]);
 
   return isLoading ? (
     <Flex
