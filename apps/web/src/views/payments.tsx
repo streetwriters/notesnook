@@ -21,7 +21,7 @@ import "../app.css";
 import { useEffect, useState } from "react";
 import { Flex } from "@theme-ui/components";
 import { hardNavigate, useQueryParams } from "../navigation";
-import { initializePaddle } from "@paddle/paddle-js";
+import { CheckoutEventNames, initializePaddle } from "@paddle/paddle-js";
 import { CLIENT_PADDLE_TOKEN } from "../dialogs/buy-dialog/paddle";
 import { Loader } from "../components/loader";
 import { IS_DEV } from "../dialogs/buy-dialog/helpers";
@@ -35,7 +35,11 @@ function Payments() {
     (async function () {
       const paddle = await initializePaddle({
         token: CLIENT_PADDLE_TOKEN,
-        environment: IS_DEV ? "sandbox" : "production"
+        environment: IS_DEV ? "sandbox" : "production",
+        eventCallback: (event) => {
+          if (event.name === CheckoutEventNames.CHECKOUT_CLOSED)
+            window.history.back();
+        }
       });
       if (!paddle) return hardNavigate("/notes");
 
