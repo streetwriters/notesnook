@@ -140,7 +140,7 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
       if (ev.origin !== PADDLE_ORIGIN) return;
       logger.debug("Paddle event received", { data: ev.data });
       const { event, event_name, callback_data } = ev.data;
-      const { checkout } = callback_data;
+      const { checkout } = callback_data || {};
 
       if (event === PaddleEvents["Checkout.RemoveSpinner"]) setIsLoading(false);
 
@@ -165,7 +165,7 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
 
       const pricingInfo = getPricingInfo(plan, {
         public_checkout_id: checkout.id,
-        ip_geo_country_code: callback_data.user?.country || "US",
+        ip_geo_country_code: callback_data?.user?.country || "US",
         items: [
           {
             prices: checkout.prices.customer.items,

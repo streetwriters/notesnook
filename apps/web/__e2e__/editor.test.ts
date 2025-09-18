@@ -430,12 +430,12 @@ test("control + alt + right arrow should go to next note", async ({ page }) => {
 
   await note1?.openNote();
   await note2?.openNote(true);
-  await page.keyboard.press("Control+Alt+ArrowRight");
+  await page.keyboard.press("ControlOrMeta+Alt+ArrowRight");
 
   expect(await notes.editor.getTitle()).toBe("Note 1");
   expect(await notes.editor.getContent("text")).toBe("Note 1 content");
 
-  await page.keyboard.press("Control+Alt+ArrowRight");
+  await page.keyboard.press("ControlOrMeta+Alt+ArrowRight");
 
   expect(await notes.editor.getTitle()).toBe("Note 2");
   expect(await notes.editor.getContent("text")).toBe("Note 2 content");
@@ -458,12 +458,12 @@ test("control + alt + left arrow should go to previous note", async ({
 
   await note1?.openNote();
   await note2?.openNote(true);
-  await page.keyboard.press("Control+Alt+ArrowLeft");
+  await page.keyboard.press("ControlOrMeta+Alt+ArrowLeft");
 
   expect(await notes.editor.getTitle()).toBe("Note 1");
   expect(await notes.editor.getContent("text")).toBe("Note 1 content");
 
-  await page.keyboard.press("Control+Alt+ArrowLeft");
+  await page.keyboard.press("ControlOrMeta+Alt+ArrowLeft");
 
   expect(await notes.editor.getTitle()).toBe("Note 2");
   expect(await notes.editor.getContent("text")).toBe("Note 2 content");

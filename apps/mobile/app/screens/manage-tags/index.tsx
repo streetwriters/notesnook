@@ -112,7 +112,7 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
     if (query && query.trim() !== "") {
       db.lookup
         .tags(query)
-        .sorted()
+        .sorted(db.settings.getGroupOptions("tags"))
         .then((items) => {
           setTags(items);
         });
@@ -249,6 +249,7 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
       }}
     >
       <Header title={strings.manageTags()} canGoBack />
+
       <View
         style={{
           paddingHorizontal: DefaultAppStyles.GAP

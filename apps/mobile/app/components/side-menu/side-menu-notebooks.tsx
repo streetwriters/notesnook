@@ -20,8 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Notebook } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
+import { FlashList } from "@shopify/flash-list";
 import React, { useEffect, useState } from "react";
-import { FlatList, TextInput, View } from "react-native";
+import { TextInput, View } from "react-native";
 import { db } from "../../common/database";
 import NotebookScreen from "../../screens/notebook";
 import Navigation from "../../services/navigation";
@@ -42,6 +43,7 @@ import {
 useSideMenuNotebookSelectionStore.setState({
   multiSelect: true
 });
+
 export const SideMenuNotebooks = () => {
   const tree = useSideMenuNotebookTreeStore((state) => state.tree);
   const [notebooks, loading] = useNotebooks();
@@ -64,6 +66,9 @@ export const SideMenuNotebooks = () => {
 
   const updateNotebooks = React.useCallback(() => {
     if (lastQuery.current) {
+      // useSideMenuNotebookTreeStore.setState({
+      //   isSearching: true
+      // });
       db.lookup
         .notebooks(lastQuery.current)
         .sorted(db.settings.getGroupOptions("notebooks"))
@@ -71,6 +76,9 @@ export const SideMenuNotebooks = () => {
           setFilteredNotebooks(filtered);
         });
     } else {
+      // useSideMenuNotebookTreeStore.setState({
+      //   isSearching: false
+      // });
       setFilteredNotebooks(notebooks);
     }
   }, [notebooks]);
@@ -137,13 +145,13 @@ export const SideMenuNotebooks = () => {
         />
       ) : (
         <>
-          <FlatList
+          <FlashList
             data={tree}
             bounces={false}
             bouncesZoom={false}
             overScrollMode="never"
-            keyExtractor={(item) => item.notebook.id}
-            windowSize={3}
+            // keyExtractor={(item,) => item.notebook.id}
+            estimatedItemSize={30}
             ListHeaderComponent={
               <View
                 style={{
@@ -196,7 +204,9 @@ const NotebookItemWrapper = React.memo(
     const expanded = useSideMenuNotebookExpandedStore(
       (state) => state.expanded[item.notebook.id]
     );
-
+    const disableExpand = useSideMenuNotebookTreeStore(
+      (state) => state.isSearching
+    );
     const selectionEnabled = useSideMenuNotebookSelectionStore(
       (state) => state.enabled
     );
@@ -256,6 +266,7 @@ const NotebookItemWrapper = React.memo(
                 .removeChildren(item.notebook.id);
             }
           }}
+          disableExpand={disableExpand}
           selected={selected}
           selectionEnabled={selectionEnabled}
           selectionStore={useSideMenuNotebookSelectionStore}
