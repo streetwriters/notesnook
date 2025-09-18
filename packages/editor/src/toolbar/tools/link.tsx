@@ -145,6 +145,7 @@ export function EditLink(props: ToolProps) {
 
   return (
     <LinkTool
+      editor={props.editor}
       icon={props.icon}
       title={props.title}
       isEditing
