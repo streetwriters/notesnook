@@ -127,6 +127,7 @@ export const ImageNode = Node.create<ImageOptions>({
       {
         priority: 60,
         tag: "p",
+        skip: true,
         getAttrs(node) {
           if (node.querySelectorAll("img").length <= 0) return false;
           return null;
@@ -162,11 +163,7 @@ export const ImageNode = Node.create<ImageOptions>({
           flushBuffer();
 
           const parser = DOMParser.fromSchema(schema);
-          const parsedTaskList = parser.parse(wrapper).content.firstChild;
-          if (!parsedTaskList)
-            throw new Error("Failed to migrate from old task list.");
-
-          return parsedTaskList.content;
+          return parser.parse(wrapper).content;
         }
       },
       {
