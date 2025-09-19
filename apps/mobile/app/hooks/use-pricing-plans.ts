@@ -31,6 +31,29 @@ function numberWithCommas(x: string) {
   return parts.join(".");
 }
 
+export const PlanOverView = {
+  free: {
+    storage: `50 MB/mo`,
+    fileSize: `1 MB`,
+    hdImages: false
+  },
+  essential: {
+    storage: `1 GB`,
+    fileSize: `100 MB/mo`,
+    hdImages: false
+  },
+  pro: {
+    storage: `10 GB/mo`,
+    fileSize: `1 GB`,
+    hdImages: true
+  },
+  believer: {
+    storage: `25 GB/mo`,
+    fileSize: `5 GB`,
+    hdImages: true
+  }
+};
+
 export type PricingPlan = {
   id: string;
   name: string;

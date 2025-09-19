@@ -56,7 +56,10 @@ import {
   XDA_SVG
 } from "../../assets/images/assets";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
-import usePricingPlans, { PricingPlan } from "../../hooks/use-pricing-plans";
+import usePricingPlans, {
+  PlanOverView,
+  PricingPlan
+} from "../../hooks/use-pricing-plans";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import { getElevationStyle } from "../../utils/elevation";
 import { openLinkInBrowser } from "../../utils/functions";
@@ -78,29 +81,6 @@ const Steps = {
   buy: 2,
   finish: 3,
   buyWeb: 4
-};
-
-const PlanOverView = {
-  free: {
-    storage: `50 MB/mo`,
-    fileSize: `1 MB`,
-    hdImages: false
-  },
-  essential: {
-    storage: `1 GB`,
-    fileSize: `100 MB/mo`,
-    hdImages: false
-  },
-  pro: {
-    storage: `10 GB/mo`,
-    fileSize: `1 GB`,
-    hdImages: true
-  },
-  believer: {
-    storage: `25 GB/mo`,
-    fileSize: `5 GB`,
-    hdImages: true
-  }
 };
 
 const PayWall = (props: NavigationProps<"PayWall">) => {
