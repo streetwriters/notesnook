@@ -122,7 +122,7 @@ const RECOMMENDED_BY = [
 
 export function PlansList(props: PlansListProps) {
   const { onPlanSelected, selectedPlan } = props;
-  const { isLoading, plans } = usePlans();
+  const { isLoading, plans = [] } = usePlans();
   const [selectedPeriod, setPeriod] = useState<Period>("yearly");
   const user = useUserStore((store) => store.user);
 
@@ -166,126 +166,131 @@ export function PlansList(props: PlansListProps) {
           justifyContent: "center"
         }}
       >
-        {plans
-          .filter(
-            (p) =>
-              p.plan !== SubscriptionPlan.EDUCATION &&
-              p.period === selectedPeriod
-          )
-          .map((plan) => {
-            const metadata = PLAN_METADATA[plan.plan];
-            return (
-              <Flex
-                key={plan.id}
-                data-test-id={`checkout-plan`}
-                mt={1}
-                sx={{
-                  maxWidth: 300,
-                  p: 2,
-                  flexShrink: 0,
-                  flex: 1,
-                  textAlign: "start",
-                  display: "flex",
-                  flexDirection: "column",
-                  border: metadata.recommended
-                    ? "2px solid var(--accent)"
-                    : "1px solid var(--border)",
-                  borderRadius: "dialog"
-                }}
-              >
+        {isLoading ? (
+          <Loading />
+        ) : (
+          plans
+            .filter(
+              (p) =>
+                p.plan !== SubscriptionPlan.EDUCATION &&
+                p.period === selectedPeriod
+            )
+            .map((plan) => {
+              const metadata = PLAN_METADATA[plan.plan];
+              return (
                 <Flex
-                  sx={{ justifyContent: "space-between", alignItems: "start" }}
-                >
-                  <Text
-                    variant="title"
-                    sx={{
-                      color: "heading-secondary"
-                    }}
-                    data-test-id="title"
-                  >
-                    {metadata.title}
-                  </Text>{" "}
-                  {metadata.recommended ? (
-                    <Text
-                      variant="subBody"
-                      sx={{
-                        bg: "accent",
-                        color: "accentForeground",
-                        borderRadius: 100,
-                        px: 1,
-                        py: "small"
-                      }}
-                    >
-                      Most popular
-                    </Text>
-                  ) : null}
-                </Flex>
-
-                <Text
-                  variant="body"
+                  key={plan.id}
+                  data-test-id={`checkout-plan`}
+                  mt={1}
                   sx={{
-                    color: "paragraph-secondary"
-                  }}
-                >
-                  {metadata.subtitle}
-                </Text>
-                <Text sx={{ mt: 1 }} variant="body">
-                  {isLoading ? (
-                    <Loading />
-                  ) : plan.recurring ? (
-                    <RecurringPricing plan={plan} />
-                  ) : (
-                    <OneTimePricing plan={plan} />
-                  )}
-                </Text>
-                <Flex
-                  sx={{
+                    maxWidth: 300,
+                    p: 2,
+                    flexShrink: 0,
+                    flex: 1,
+                    textAlign: "start",
+                    display: "flex",
                     flexDirection: "column",
-                    pt: 2,
-                    mt: 1,
-                    gap: 1,
-                    borderTop: "1px solid var(--border)"
+                    border: metadata.recommended
+                      ? "2px solid var(--accent)"
+                      : "1px solid var(--border)",
+                    borderRadius: "dialog"
                   }}
                 >
-                  {FEATURE_HIGHLIGHTS.map((feature) => {
-                    const caption =
-                      feature.availability[planToAvailability(plan.plan)]
-                        .caption;
-                    return (
-                      <Flex
-                        key={feature.id}
-                        sx={{ justifyContent: "space-between" }}
-                      >
-                        <Text variant="body">{feature.title}</Text>
-                        <Text
-                          variant="body"
-                          sx={{ color: "paragraph-secondary" }}
-                        >
-                          <FeatureCaption caption={caption} />
-                        </Text>
-                      </Flex>
-                    );
-                  })}
-                </Flex>
-                {selectedPlan === plan.plan ? (
-                  <Flex sx={{ mt: 2, alignItems: "center", gap: 1 }}>
-                    <CheckCircleOutline color="accent" size={16} />
-                    <Text variant="subBody">You are on this plan.</Text>
-                  </Flex>
-                ) : (
-                  <Button
-                    variant={metadata.recommended ? "accent" : "secondary"}
-                    onClick={() => onPlanSelected(plan)}
-                    sx={{ mt: 2 }}
+                  <Flex
+                    sx={{
+                      justifyContent: "space-between",
+                      alignItems: "start"
+                    }}
                   >
-                    {isTrialAvailableForPlan(plan.plan, user)
-                      ? "Start your free trial"
-                      : "Select plan"}
-                  </Button>
-                )}
-              </Flex>
-            );
-          })}
+                    <Text
+                      variant="title"
+                      sx={{
+                        color: "heading-secondary"
+                      }}
+                      data-test-id="title"
+                    >
+                      {metadata.title}
+                    </Text>{" "}
+                    {metadata.recommended ? (
+                      <Text
+                        variant="subBody"
+                        sx={{
+                          bg: "accent",
+                          color: "accentForeground",
+                          borderRadius: 100,
+                          px: 1,
+                          py: "small"
+                        }}
+                      >
+                        Most popular
+                      </Text>
+                    ) : null}
+                  </Flex>
+
+                  <Text
+                    variant="body"
+                    sx={{
+                      color: "paragraph-secondary"
+                    }}
+                  >
+                    {metadata.subtitle}
+                  </Text>
+                  <Text sx={{ mt: 1 }} variant="body">
+                    {plan.recurring ? (
+                      <RecurringPricing plan={plan} />
+                    ) : (
+                      <OneTimePricing plan={plan} />
+                    )}
+                  </Text>
+                  <Flex
+                    sx={{
+                      flexDirection: "column",
+                      pt: 2,
+                      mt: 1,
+                      gap: 1,
+                      borderTop: "1px solid var(--border)"
+                    }}
+                  >
+                    {FEATURE_HIGHLIGHTS.map((feature) => {
+                      const caption =
+                        feature.availability[planToAvailability(plan.plan)]
+                          .caption;
+                      return (
+                        <Flex
+                          key={feature.id}
+                          sx={{ justifyContent: "space-between" }}
+                        >
+                          <Text variant="body">{feature.title}</Text>
+                          <Text
+                            variant="body"
+                            sx={{ color: "paragraph-secondary" }}
+                          >
+                            <FeatureCaption caption={caption} />
+                          </Text>
+                        </Flex>
+                      );
+                    })}
+                  </Flex>
+                  {selectedPlan === plan.plan ? (
+                    <Flex sx={{ mt: 2, alignItems: "center", gap: 1 }}>
+                      <CheckCircleOutline color="accent" size={16} />
+                      <Text variant="subBody">You are on this plan.</Text>
+                    </Flex>
+                  ) : (
+                    <Button
+                      variant={metadata.recommended ? "accent" : "secondary"}
+                      onClick={() => onPlanSelected(plan)}
+                      sx={{ mt: 2 }}
+                    >
+                      {isTrialAvailableForPlan(plan.plan, user)
+                        ? "Start your free trial"
+                        : "Select plan"}
+                    </Button>
+                  )}
+                </Flex>
+              );
+            })
+        )}
       </Flex>
 
       <Text variant="body" sx={{ alignSelf: "center", mt: 2 }}>
@@ -313,7 +318,7 @@ export function PlansList(props: PlansListProps) {
               width={f.size || 200}
               css={`
                 [data-theme="dark"] & {
-                  filter: ${f.filter?.dark || "grayscale(1) invert(1)"};
+                  filter: ${"grayscale(1) invert(1)"};
                 }
                 [data-theme="light"] & {
                   filter: ${f.filter?.light || "grayscale(1)"};

@@ -19,9 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useEffect, useState } from "react";
 import { Plan, PlanMetadata } from "./types";
-import { Period, SubscriptionPlan } from "@notesnook/core";
+import { Period, set, SubscriptionPlan } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { db } from "../../common/db";
+import { usePromise } from "@notesnook/common";
 
 export const PLAN_METADATA: PlanMetadata = {
   [SubscriptionPlan.FREE]: {
@@ -67,33 +68,42 @@ export const PERIOD_METADATA: Record<Period, PeriodMetadata> = {
   }
 };
 
-const PLANS = getPlans().catch(console.error);
 export async function getPlans(): Promise<Plan[] | null> {
   const user = await db.user.getUser();
   const plans = await db.pricing.products(user?.subscription?.trialsAvailed);
   return plans.sort((a, b) => a.plan - b.plan);
 }
 
+export async function getAllPlans(): Promise<Plan[] | null> {
+  const user = await db.user.getUser();
+  const plans = await db.pricing.products();
+  const plansWithoutTrials = await db.pricing.products(
+    user?.subscription?.trialsAvailed
+  );
+
+  return set
+    .union(plans, plansWithoutTrials, (item) => `${item.plan}${item.period}`)
+    .sort((a, b) => a.plan - b.plan);
+}
+
 export function usePlans() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [plans, setPlans] = useState<Plan[]>([]);
-  const [discount, setDiscount] = useState<number>();
-  const [country, setCountry] = useState<string>();
-  useEffect(() => {
-    (async function () {
-      try {
-        setIsLoading(true);
-        const plans = await PLANS;
-        if (!plans) return;
-        setPlans(plans);
-        setDiscount(Math.max(...plans.map((p) => p.discount?.amount || 0)));
-        setCountry(plans[0].country);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setIsLoading(false);
-      }
-    })();
-  }, []);
-  return { isLoading, plans, discount, country };
+  const result = usePromise(async () => {
+    const plans = await getPlans();
+    if (!plans) return;
+    return {
+      plans,
+      discount: Math.max(...plans.map((p) => p.discount?.amount || 0)),
+      country: plans[0].country
+    };
+  });
+
+  if (result.status === "pending") return { isLoading: true };
+  if (result.status === "rejected") return { isLoading: false };
+
+  return {
+    isLoading: false,
+    plans: result.value?.plans,
+    discount: result.value?.discount,
+    country: result.value?.country
+  };
 }

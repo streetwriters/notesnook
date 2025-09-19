@@ -104,16 +104,6 @@ export const SubscriptionSettings: SettingsGroup[] = [
             variant: "secondary",
             action: async () => {
               ChangePlanDialog.show({});
-              // try {
-              //   const urls = await db.subscriptions.urls();
-              //   if (!urls)
-              //     throw new Error(
-              //       "Failed to get subscription management urls. Please contact us at support@streetwriters.co so we can help you update your payment method."
-              //     );
-              //   window.open(urls?.update_payment_method, "_blank");
-              // } catch (e) {
-              //   if (e instanceof Error) showToast("error", e.message);
-              // }
             }
           }
         ]
