@@ -312,7 +312,7 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
               <View
                 style={{
                   flexDirection: isTablet ? "row" : "column",
-                  gap: isTablet ? DefaultAppStyles.GAP : 0
+                  gap: !isTablet ? DefaultAppStyles.GAP : 0
                 }}
               >
                 {pricingPlans.pricingPlans.map((plan) =>
@@ -1102,7 +1102,7 @@ const PricingPlanCard = ({
         </View>
       </View>
 
-      {pricingPlans?.loadingPlans ? (
+      {pricingPlans?.loadingPlans || (!price && !WebPlan?.price.gross) ? (
         <ActivityIndicator size="small" color={colors.primary.accent} />
       ) : (
         <View>
