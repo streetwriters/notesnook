@@ -4,7 +4,9 @@ import { useThemeColors } from "@notesnook/theme";
 import { useEffect } from "react";
 import { View } from "react-native";
 import Config from "react-native-config";
-import usePricingPlans from "../../../hooks/use-pricing-plans";
+import usePricingPlans, {
+  PlanOverView
+} from "../../../hooks/use-pricing-plans";
 import {
   eSendEvent,
   presentSheet,
@@ -56,8 +58,7 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
         width: "100%",
         justifyContent: "center",
         alignItems: "center",
-        gap: DefaultAppStyles.GAP_VERTICAL,
-        paddingBottom: DefaultAppStyles.GAP
+        gap: DefaultAppStyles.GAP_VERTICAL
       }}
     >
       <>
@@ -101,27 +102,35 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
                   flexShrink: 1
                 }}
               >
-                <Heading size={AppFontSize.sm}>25 GB</Heading>{" "}
+                <Heading size={AppFontSize.sm}>
+                  {
+                    PlanOverView[
+                      pricingPlans.currentPlan.id as keyof typeof PlanOverView
+                    ].storage
+                  }
+                </Heading>{" "}
                 {strings.cloudSpace()}
               </Paragraph>
             </View>
 
-            <View
-              style={{
-                gap: DefaultAppStyles.GAP_SMALL,
-                flexDirection: "row"
-              }}
-            >
-              <AppIcon name="lock" size={AppFontSize.xxl} />
-              <Paragraph
+            {pricingPlans.currentPlan.id !== "essential" ? (
+              <View
                 style={{
-                  flexShrink: 1
+                  gap: DefaultAppStyles.GAP_SMALL,
+                  flexDirection: "row"
                 }}
               >
-                <Heading size={AppFontSize.sm}>{strings.appLock()}</Heading>{" "}
-                {strings.appLockFeatureBenefit()}
-              </Paragraph>
-            </View>
+                <AppIcon name="lock" size={AppFontSize.xxl} />
+                <Paragraph
+                  style={{
+                    flexShrink: 1
+                  }}
+                >
+                  <Heading size={AppFontSize.sm}>{strings.appLock()}</Heading>{" "}
+                  {strings.appLockFeatureBenefit()}
+                </Paragraph>
+              </View>
+            ) : null}
 
             <View
               style={{
