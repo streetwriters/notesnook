@@ -29,9 +29,6 @@ import { DefaultAppStyles } from "../../utils/styles";
 import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
 import { ColorTags } from "./color-tags";
-import { strings } from "@notesnook/intl";
-import { DefaultAppStyles } from "../../utils/styles";
-import ManageTags from "../../screens/manage-tags";
 
 export const Tags = ({ item, close }) => {
   const { colors } = useThemeColors();
