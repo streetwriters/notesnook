@@ -25,7 +25,7 @@ import {
 import { Heading as TiptapHeading } from "@tiptap/extension-heading";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
 import { Decoration, DecorationSet } from "@tiptap/pm/view";
-import { isClickWithinBounds } from "../../utils/prosemirror";
+import { isClickWithinBounds } from "../../utils/prosemirror.js";
 
 const HEADING_REGEX = /^(#{1,6})\s$/;
 export const Heading = TiptapHeading.extend({
