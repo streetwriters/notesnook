@@ -156,7 +156,8 @@ function StatusBar() {
                 ml: 1,
                 alignItems: "center",
                 justifyContent: "center",
-                display: "flex"
+                display: "flex",
+                height: "100%"
               }}
             >
               <Update
@@ -182,7 +183,8 @@ function StatusBar() {
               sx={{
                 alignItems: "center",
                 justifyContent: "center",
-                display: "flex"
+                display: "flex",
+                height: "100%"
               }}
               data-test-id="vault-unlocked"
             >
