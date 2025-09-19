@@ -140,9 +140,8 @@ export function SideMenuHome() {
           paddingVertical: DefaultAppStyles.GAP_VERTICAL
         }}
       >
-        {((subscriptionType === SUBSCRIPTION_STATUS.TRIAL ||
-          subscriptionType === SUBSCRIPTION_STATUS.BASIC) &&
-          subscriptionType === SubscriptionPlan.FREE) ||
+        {subscriptionType === SubscriptionPlan.FREE ||
+        !subscriptionType ||
         !user ? (
           <Button
             title={pro.title}
