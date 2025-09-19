@@ -24,6 +24,7 @@ import {
 import { getFeature } from "@notesnook/common";
 import { Period, Plan, SubscriptionPlan, User } from "@notesnook/core";
 import { PricingInfo } from "./types";
+import dayjs from "dayjs";
 
 export const IS_DEV = import.meta.env.DEV || IS_TESTING;
 export function getCurrencySymbol(currency: string) {
