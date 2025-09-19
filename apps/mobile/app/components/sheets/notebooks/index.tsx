@@ -41,7 +41,6 @@ import { sleep } from "../../../utils/time";
 import { Dialog } from "../../dialog";
 import { Properties } from "../../properties";
 import { NotebookItem } from "../../side-menu/notebook-item";
-import { useSideMenuNotebookTreeStore } from "../../side-menu/stores";
 import { IconButton } from "../../ui/icon-button";
 import Paragraph from "../../ui/typography/paragraph";
 import { AddNotebookSheet } from "../add-notebook";
@@ -60,13 +59,8 @@ export const Notebooks = (props: {
   close?: (ctx?: string) => void;
 }) => {
   const tree = useNotebookTreeStore((state) => state.tree);
-  const [isLoading, setIsLoading] = useState(true);
   const { colors } = useThemeColors();
   const [notebooks, setNotebooks] = useState<Notebook[]>();
-  const [filteredNotebooks, setFilteredNotebooks] =
-    React.useState<VirtualizedGrouping<Notebook>>();
-  const searchTimer = React.useRef<NodeJS.Timeout>();
-  const lastQuery = React.useRef<string>();
   const loadRootNotebooks = React.useCallback(async () => {
     const notebooks = await db.relations
       .from(
@@ -95,7 +89,6 @@ export const Notebooks = (props: {
   useEffect(() => {
     (async () => {
       loadRootNotebooks();
-      setIsLoading(false);
     })();
   }, [loadRootNotebooks]);
 
@@ -244,20 +237,18 @@ const NotebookItemWrapper = React.memo(
     const onItemUpdate = React.useCallback(async () => {
       const notebook = await db.notebooks.notebook(item.notebook.id);
       if (notebook) {
-        useSideMenuNotebookTreeStore
-          .getState()
-          .updateItem(item.notebook.id, notebook);
+        useNotebookTreeStore.getState().updateItem(item.notebook.id, notebook);
         if (expanded) {
-          useSideMenuNotebookTreeStore
+          useNotebookTreeStore
             .getState()
             .setTree(
-              await useSideMenuNotebookTreeStore
+              await useNotebookTreeStore
                 .getState()
                 .fetchAndAdd(item.notebook.id, item.depth + 1)
             );
         }
       } else {
-        useSideMenuNotebookTreeStore.getState().removeItem(item.notebook.id);
+        useNotebookTreeStore.getState().removeItem(item.notebook.id);
       }
     }, [expanded, item.depth, item.notebook.id]);
 
@@ -274,17 +265,15 @@ const NotebookItemWrapper = React.memo(
           onToggleExpanded={async () => {
             useNotebookExpandedStore.getState().setExpanded(item.notebook.id);
             if (!expanded) {
-              useSideMenuNotebookTreeStore
+              useNotebookTreeStore
                 .getState()
                 .setTree(
-                  await useSideMenuNotebookTreeStore
+                  await useNotebookTreeStore
                     .getState()
                     .fetchAndAdd(item.notebook.id, item.depth + 1)
                 );
             } else {
-              useSideMenuNotebookTreeStore
-                .getState()
-                .removeChildren(item.notebook.id);
+              useNotebookTreeStore.getState().removeChildren(item.notebook.id);
             }
           }}
           selected={selected}

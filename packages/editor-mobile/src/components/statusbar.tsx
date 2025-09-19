@@ -94,7 +94,7 @@ function StatusBar({
         }}
         style={paragraphStyle}
       >
-        {showChars ? strings.characters(chars) : words}
+        {showChars ? strings.charactersCount(chars) : words}
       </p>
     </div>
   );
