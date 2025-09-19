@@ -20,7 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { EventSourcePolyfill as EventSource } from "event-source-polyfill";
 import { DatabasePersistence, NNStorage } from "../interfaces/storage";
 import { logger } from "../utils/logger";
-import { database } from "@notesnook/common";
+import {
+  database,
+  getFeature,
+  getFeatureLimit,
+  isFeatureAvailable
+} from "@notesnook/common";
 import { createDialect } from "./sqlite";
 import { isFeatureSupported } from "../utils/feature-check";
 import { generatePassword } from "../utils/password-generator";
@@ -39,14 +44,24 @@ async function initializeDatabase(persistence: DatabasePersistence) {
     await useKeyStore.getState().setValue("databaseKey", databaseKey);
   }
 
+  // db.host({
+  //   API_HOST: "https://api.notesnook.com",
+  //   AUTH_HOST: "https://auth.streetwriters.co",
+  //   SSE_HOST: "https://events.streetwriters.co",
+  //   ISSUES_HOST: "https://issues.streetwriters.co",
+  //   MONOGRAPH_HOST: "https://monogr.ph",
+  //   SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co",
+  //   ...Config.get("serverUrls", {})
+  // });
+  const base = `http://localhost`;
   db.host({
-    API_HOST: "https://api.notesnook.com",
-    AUTH_HOST: "https://auth.streetwriters.co",
-    SSE_HOST: "https://events.streetwriters.co",
-    ISSUES_HOST: "https://issues.streetwriters.co",
-    MONOGRAPH_HOST: "https://monogr.ph",
-    SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co",
-    ...Config.get("serverUrls", {})
+    API_HOST: `${base}:5264`,
+    AUTH_HOST: `${base}:8264`,
+    SSE_HOST: `${base}:7264`,
+    ISSUES_HOST: `${base}:2624`,
+    SUBSCRIPTIONS_HOST: `${base}:9264`,
+    MONOGRAPH_HOST: `${base}:6264`,
+    NOTESNOOK_HOST: `${base}:8788`
   });
 
   const storage = new NNStorage(
@@ -85,6 +100,10 @@ async function initializeDatabase(persistence: DatabasePersistence) {
     fs: FileStorage,
     compressor: () =>
       import("../utils/compressor").then(({ Compressor }) => new Compressor()),
+    maxNoteVersions: async () => {
+      const limit = await getFeatureLimit(getFeature("maxNoteVersions"));
+      return typeof limit.caption === "number" ? limit.caption : undefined;
+    },
     batchSize: 100
   });
 

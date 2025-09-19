@@ -24,7 +24,7 @@ import {
   useRef,
   useState
 } from "react";
-import { usePromise } from "@notesnook/common";
+import { isFeatureAvailable, usePromise } from "@notesnook/common";
 // import { KeyChain } from "../interfaces/key-store";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { Loading, Lock } from "../components/icons";
@@ -69,7 +69,12 @@ export default function AppLock(props: PropsWithChildren<unknown>) {
 
       await useKeyStore
         .getState()
-        .unlock({ ...credential, password })
+        .unlock(
+          { ...credential, password },
+          {
+            permanent: !(await isFeatureAvailable("appLock")).isAllowed
+          }
+        )
         .catch((e) => {
           setError(
             typeof e === "string"

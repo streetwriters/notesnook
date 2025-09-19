@@ -56,6 +56,8 @@ import {
 import { useSideBarDraggingStore } from "./dragging-store";
 import { Button } from "../ui/button";
 import SettingsService from "../../services/settings";
+import { isFeatureAvailable } from "@notesnook/common";
+import PaywallSheet from "../sheets/paywall";
 const renderScene = SceneMap({
   home: SideMenuHome,
   notebooks: SideMenuNotebooks,
@@ -347,10 +349,23 @@ const TabBar = (
                       testID="sidebar-add-button"
                       size={AppFontSize.lg - 2}
                       color={colors.primary.icon}
-                      onPress={() => {
+                      onPress={async () => {
                         if (props.navigationState.index === 1) {
+                          const notebooksFeature = await isFeatureAvailable(
+                            "notebooks"
+                          );
+                          if (!notebooksFeature.isAllowed) {
+                            PaywallSheet.present(notebooksFeature);
+                            return;
+                          }
+
                           AddNotebookSheet.present();
                         } else {
+                          const tagsFeature = await isFeatureAvailable("tags");
+                          if (!tagsFeature.isAllowed) {
+                            PaywallSheet.present(tagsFeature);
+                            return;
+                          }
                           presentDialog({
                             title: strings.addTag(),
                             paragraph: strings.addTagDesc(),

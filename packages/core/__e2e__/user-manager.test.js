@@ -52,6 +52,7 @@ test(
 
       const userData = await db.user.getUser();
       expect(userData.email).toBe(USER.email);
+      expect(userData.subscription).toBeDefined();
     }),
   30000
 );

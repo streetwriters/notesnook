@@ -19,9 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useRef, useState } from "react";
-import { Platform, View } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent
@@ -31,9 +28,7 @@ import { eCloseLoginDialog, eOpenLoginDialog } from "../../utils/events";
 import { sleep } from "../../utils/time";
 import BaseDialog from "../dialog/base-dialog";
 import { Toast } from "../toast";
-import { Button } from "../ui/button";
-import { IconButton } from "../ui/icon-button";
-import { hideAuth, initialAuthMode } from "./common";
+import { initialAuthMode } from "./common";
 import { Login } from "./login";
 import { Signup } from "./signup";
 import { strings } from "@notesnook/intl";
@@ -51,7 +46,6 @@ const AuthModal = () => {
   const [visible, setVisible] = useState(false);
   const [currentAuthMode, setCurrentAuthMode] = useState(AuthMode.login);
   const actionSheetRef = useRef();
-  const insets = useGlobalSafeAreaInsets();
 
   useEffect(() => {
     eSubscribeEvent(eOpenLoginDialog, open);
@@ -99,81 +93,18 @@ const AuthModal = () => {
       centered={false}
       enableSheetKeyboardHandler
     >
-      <KeyboardAwareScrollView
-        style={{
-          width: "100%"
-        }}
-        enableAutomaticScroll={false}
-        keyboardShouldPersistTaps="handled"
-      >
-        {currentAuthMode !== AuthMode.login ? (
-          <Signup
-            changeMode={(mode) => setCurrentAuthMode(mode)}
-            trial={AuthMode.trialSignup === currentAuthMode}
-            welcome={initialAuthMode.current === AuthMode.welcomeSignup}
-          />
-        ) : (
-          <Login
-            welcome={initialAuthMode.current === AuthMode.welcomeSignup}
-            changeMode={(mode) => setCurrentAuthMode(mode)}
-          />
-        )}
-      </KeyboardAwareScrollView>
-
-      <View
-        style={{
-          position: "absolute",
-          paddingTop: Platform.OS === "android" ? 0 : insets.top,
-          top: 0,
-          zIndex: 999,
-          backgroundColor: colors.secondary.background,
-          width: "100%"
-        }}
-      >
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            paddingHorizontal: DefaultAppStyles.GAP,
-            width: "100%",
-            height: 50,
-            justifyContent:
-              initialAuthMode.current !== AuthMode.welcomeSignup
-                ? "space-between"
-                : "flex-end"
-          }}
-        >
-          {initialAuthMode.current === AuthMode.welcomeSignup ? null : (
-            <IconButton
-              name="arrow-left"
-              onPress={() => {
-                hideAuth();
-              }}
-              color={colors.primary.paragraph}
-            />
-          )}
-
-          {initialAuthMode.current !== AuthMode.welcomeSignup ? null : (
-            <Button
-              title={strings.skip()}
-              onPress={() => {
-                hideAuth();
-              }}
-              iconSize={16}
-              type="plain"
-              iconPosition="right"
-              icon="chevron-right"
-              height={25}
-              iconStyle={{
-                marginTop: 2
-              }}
-              style={{
-                paddingHorizontal: DefaultAppStyles.GAP_SMALL
-              }}
-            />
-          )}
-        </View>
-      </View>
+      {currentAuthMode !== AuthMode.login ? (
+        <Signup
+          changeMode={(mode) => setCurrentAuthMode(mode)}
+          trial={AuthMode.trialSignup === currentAuthMode}
+          welcome={initialAuthMode.current === AuthMode.welcomeSignup}
+        />
+      ) : (
+        <Login
+          welcome={initialAuthMode.current === AuthMode.welcomeSignup}
+          changeMode={(mode) => setCurrentAuthMode(mode)}
+        />
+      )}
 
       <Toast context="local" />
     </BaseDialog>

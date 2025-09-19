@@ -17,39 +17,27 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { User } from "@notesnook/core";
-import { SUBSCRIPTION_STATUS } from "../common/constants";
-import {
-  useStore as useUserStore,
-  store as userstore
-} from "../stores/user-store";
+import { SubscriptionPlan, SubscriptionStatus, User } from "@notesnook/core";
+import { useStore as useUserStore } from "../stores/user-store";
 
-export function useIsUserPremium() {
-  const user = useUserStore((store) => store.user);
-  return isUserPremium(user);
-}
-
-export function isUserPremium(user?: User) {
-  if (IS_TESTING) return !("isBasic" in window);
-  if (!user) user = userstore.get().user;
+export function isActiveSubscription(user?: User) {
+  user = user || useUserStore.getState().user;
   if (!user) return false;
 
-  const subStatus = user.subscription.type;
+  const { status } = user?.subscription || {};
+
   return (
-    subStatus === SUBSCRIPTION_STATUS.BETA ||
-    subStatus === SUBSCRIPTION_STATUS.PREMIUM ||
-    subStatus === SUBSCRIPTION_STATUS.PREMIUM_CANCELED ||
-    subStatus === SUBSCRIPTION_STATUS.TRIAL
+    status === SubscriptionStatus.ACTIVE || status === SubscriptionStatus.TRIAL
   );
 }
-
 export function isUserSubscribed(user?: User) {
-  if (!user) user = userstore.get().user;
+  user = user || useUserStore.getState().user;
   if (!user) return false;
 
-  const subStatus = user.subscription?.type;
+  const { expiry, plan, status } = user?.subscription || {};
+  if (!expiry) return false;
+
   return (
-    subStatus === SUBSCRIPTION_STATUS.PREMIUM ||
-    subStatus === SUBSCRIPTION_STATUS.PREMIUM_CANCELED
+    plan !== SubscriptionPlan.FREE && status !== SubscriptionStatus.EXPIRED
   );
 }

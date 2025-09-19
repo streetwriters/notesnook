@@ -93,6 +93,7 @@ type Options = {
   eventsource?: EventSourceConstructor;
   fs: IFileStorage;
   compressor: () => Promise<ICompressor>;
+  maxNoteVersions: () => Promise<number | undefined>;
   batchSize: number;
 };
 
@@ -190,7 +191,7 @@ class Database {
 
   tokenManager = new TokenManager(this.kv);
   mfa = new MFAManager(this.tokenManager);
-  subscriptions = new Subscriptions(this.tokenManager);
+  subscriptions = new Subscriptions(this);
   offers = Offers;
   debug = new Debug();
   pricing = Pricing;
@@ -449,6 +450,7 @@ class Database {
       hosts.SUBSCRIPTIONS_HOST || Hosts.SUBSCRIPTIONS_HOST;
     Hosts.ISSUES_HOST = hosts.ISSUES_HOST || Hosts.ISSUES_HOST;
     Hosts.MONOGRAPH_HOST = hosts.MONOGRAPH_HOST || Hosts.MONOGRAPH_HOST;
+    Hosts.NOTESNOOK_HOST = hosts.NOTESNOOK_HOST || Hosts.NOTESNOOK_HOST;
   }
 
   version() {

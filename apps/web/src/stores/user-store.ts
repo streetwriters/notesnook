@@ -23,12 +23,11 @@ import BaseStore from "./index";
 import { EV, EVENTS } from "@notesnook/core";
 import Config from "../utils/config";
 import { hashNavigate } from "../navigation";
-import { isUserPremium } from "../hooks/use-is-user-premium";
-import { SUBSCRIPTION_STATUS } from "../common/constants";
 import { AuthenticatorType, User } from "@notesnook/core";
 import { ConfirmDialog } from "../dialogs/confirm";
 import { OnboardingDialog } from "../dialogs/onboarding-dialog";
 import { strings } from "@notesnook/intl";
+import { isUserSubscribed } from "../hooks/use-is-user-premium";
 
 class UserStore extends BaseStore<UserStore> {
   isLoggedIn?: boolean;
@@ -59,16 +58,12 @@ class UserStore extends BaseStore<UserStore> {
     if (Config.get("sessionExpired")) return;
 
     EV.subscribe(EVENTS.userSubscriptionUpdated, (subscription) => {
-      const wasUserPremium = isUserPremium();
+      const wasSubscribed = isUserSubscribed();
       this.set((state) => {
         if (!state.user) return;
         state.user.subscription = subscription;
       });
-      if (!wasUserPremium && isUserPremium())
-        OnboardingDialog.show({
-          type:
-            subscription.type === SUBSCRIPTION_STATUS.TRIAL ? "trial" : "pro"
-        });
+      if (!wasSubscribed && isUserSubscribed()) OnboardingDialog.show({});
     });
 
     EV.subscribe(EVENTS.userEmailConfirmed, () => {

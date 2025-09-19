@@ -493,7 +493,6 @@ export const MFARecoveryCodes = ({
           >
             <Button
               title={strings.copyCodes()}
-              fontSize={AppFontSize.md}
               onPress={() => {
                 const codeString = codes.join("\n");
                 Clipboard.setString(codeString);
@@ -510,7 +509,6 @@ export const MFARecoveryCodes = ({
 
             <Button
               title={strings.saveToFile()}
-              fontSize={AppFontSize.md}
               onPress={async () => {
                 try {
                   let path;

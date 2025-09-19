@@ -49,7 +49,9 @@ export const usePricing = (period: "monthly" | "yearly") => {
         ));
       skuInfos[period] = skuInfo;
 
-      const products = (await PremiumService.getProducts()) as Subscription[];
+      const products = (await (
+        await PremiumService.loadProductsAndSubs()
+      ).subs) as Subscription[];
       let product = products.find((p) => p.productId === skuInfo?.sku);
       if (!product)
         product = products.find((p) => p.productId === getDefaultSku(period));

@@ -32,6 +32,7 @@
     "@notesnook/themes-server": "file:../../servers/themes",
     "@notesnook/ui": "file:../../packages/ui",
     "@notesnook/web-clipper": "file:../../extensions/web-clipper",
+    "@paddle/paddle-js": "^1.4.2",
     "@react-pdf-viewer/core": "^3.12.0",
     "@react-pdf-viewer/toolbar": "^3.12.0",
     "@rehookify/datepicker": "^6.6.7",

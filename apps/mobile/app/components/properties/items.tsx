@@ -27,8 +27,9 @@ import { Action, ActionId, useActions } from "../../hooks/use-actions";
 import { useStoredRef } from "../../hooks/use-stored-ref";
 import { DDS } from "../../services/device-detection";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { AppFontSize } from "../../utils/size";
+import { AppFontSize, defaultBorderRadius } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
+import AppIcon from "../ui/AppIcon";
 import { Button } from "../ui/button";
 import { Pressable } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
@@ -145,7 +146,8 @@ export const Items = ({
         key={item.id}
         style={{
           alignItems: "center",
-          width: columnItemWidth - 8
+          width: columnItemWidth - 8,
+          opacity: item.locked ? 0.5 : 1
         }}
       >
         <Pressable
@@ -220,7 +222,8 @@ export const Items = ({
           borderRadius: 0,
           justifyContent: "flex-start",
           alignSelf: "flex-start",
-          width: "100%"
+          width: "100%",
+          opacity: item.locked ? 0.5 : 1
         }}
       />
     ),
@@ -244,7 +247,8 @@ export const Items = ({
           key={item.id}
           testID={"icon-" + item.id}
           style={{
-            width: columnItemWidth - 8
+            width: columnItemWidth - 8,
+            alignSelf: "flex-start"
           }}
         >
           <View
@@ -252,7 +256,11 @@ export const Items = ({
               height: columnItemWidth / 2,
               width: columnItemWidth - DefaultAppStyles.GAP_SMALL,
               justifyContent: "center",
-              alignItems: "center"
+              alignItems: "center",
+              borderWidth: 1,
+              borderRadius: defaultBorderRadius,
+              borderColor: colors.primary.border,
+              overflow: "hidden"
             }}
           >
             <Icon
@@ -267,6 +275,28 @@ export const Items = ({
                   : colors.secondary.icon
               }
             />
+
+            {item.locked ? (
+              <View
+                style={{
+                  width: 20,
+                  height: 20,
+                  borderRadius: 100,
+                  backgroundColor: colors.primary.accent,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  position: "absolute",
+                  bottom: -3,
+                  right: -3
+                }}
+              >
+                <AppIcon
+                  color={colors.static.orange}
+                  size={AppFontSize.xxxs}
+                  name="crown"
+                />
+              </View>
+            ) : null}
           </View>
 
           <Paragraph
@@ -325,8 +355,14 @@ export const Items = ({
                 position: "relative",
                 marginHorizontal: 2,
                 marginBottom: 0,
-                marginTop: DefaultAppStyles.GAP
+                marginTop: 0
               }}
+              contentContainerStyle={{
+                justifyContent: "flex-start",
+                alignItems: "flex-start",
+                alignSelf: "flex-start"
+              }}
+              centerContent={false}
               renderItem={({ item, index }) => (
                 <View
                   style={{

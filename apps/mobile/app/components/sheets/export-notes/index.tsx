@@ -48,7 +48,6 @@ import { DefaultAppStyles } from "../../../utils/styles";
 import { sleep } from "../../../utils/time";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
-import { ProTag } from "../../premium/pro-tag";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
 import { Pressable } from "../../ui/pressable";
@@ -79,7 +78,6 @@ const ExportNotesSheet = ({
     | undefined
   >();
   const [status, setStatus] = useState<string>();
-  const premium = useUserStore((state) => state.premium);
 
   const exportNoteAs = async (
     type: "pdf" | "txt" | "md" | "html" | "md-frontmatter"
@@ -123,8 +121,7 @@ const ExportNotesSheet = ({
         await exportNoteAs("pdf");
       },
       icon: "file-pdf-box",
-      id: notesnook.ids.dialogs.export.pdf,
-      pro: premium
+      id: notesnook.ids.dialogs.export.pdf
     },
     {
       title: "Markdown",
@@ -132,8 +129,7 @@ const ExportNotesSheet = ({
         await exportNoteAs("md");
       },
       icon: "language-markdown",
-      id: notesnook.ids.dialogs.export.md,
-      pro: premium
+      id: notesnook.ids.dialogs.export.md
     },
     {
       title: "Markdown + Frontmatter",
@@ -141,8 +137,7 @@ const ExportNotesSheet = ({
         await exportNoteAs("md-frontmatter");
       },
       icon: "language-markdown",
-      id: notesnook.ids.dialogs.export.md,
-      pro: premium
+      id: notesnook.ids.dialogs.export.md
     },
     {
       title: "Plain Text",
@@ -159,8 +154,7 @@ const ExportNotesSheet = ({
         await exportNoteAs("html");
       },
       icon: "language-html5",
-      id: notesnook.ids.dialogs.export.html,
-      pro: premium
+      id: notesnook.ids.dialogs.export.html
     }
   ];
 
@@ -216,9 +210,7 @@ const ExportNotesSheet = ({
                 >
                   <Icon
                     name={item.icon}
-                    color={
-                      item.pro ? colors.primary.accent : colors.primary.icon
-                    }
+                    color={colors.primary.icon}
                     size={AppFontSize.xxxl + 10}
                   />
                 </View>
@@ -227,7 +219,6 @@ const ExportNotesSheet = ({
                     flexShrink: 1
                   }}
                 >
-                  {!item.pro ? <ProTag size={12} /> : null}
                   <Heading style={{ marginLeft: 10 }} size={AppFontSize.md}>
                     {item.title}
                   </Heading>
@@ -298,7 +289,6 @@ const ExportNotesSheet = ({
                   }
                   type="accent"
                   width={250}
-                  fontSize={AppFontSize.md}
                   style={{
                     marginTop: DefaultAppStyles.GAP_VERTICAL
                   }}
@@ -328,7 +318,6 @@ const ExportNotesSheet = ({
                   title={strings.share()}
                   type="secondaryAccented"
                   width={250}
-                  fontSize={AppFontSize.md}
                   style={{
                     marginTop: DefaultAppStyles.GAP_VERTICAL
                   }}
@@ -360,7 +349,6 @@ const ExportNotesSheet = ({
                   title={strings.exportAgain()}
                   type="secondaryAccented"
                   width={250}
-                  fontSize={AppFontSize.md}
                   style={{
                     marginTop: DefaultAppStyles.GAP_VERTICAL
                   }}

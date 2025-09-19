@@ -70,7 +70,7 @@ export function useQueryParams(parseFn = parseQuery) {
   return [parseFn(querystring)];
 }
 
-function parseQuery(querystring: string) {
+function parseQuery(querystring: string): Partial<Record<string, string>> {
   return Object.fromEntries(new URLSearchParams(querystring).entries());
 }
 

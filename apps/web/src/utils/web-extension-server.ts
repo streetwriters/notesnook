@@ -24,7 +24,6 @@ import {
   Server,
   Clip
 } from "@notesnook/web-clipper/dist/common/bridge";
-import { isUserPremium } from "../hooks/use-is-user-premium";
 import { store as appstore } from "../stores/app-store";
 import { h } from "./html";
 import { sanitizeFilename } from "@notesnook/common";
@@ -32,6 +31,7 @@ import { getFormattedDate } from "@notesnook/common";
 import { useStore as useThemeStore } from "../stores/theme-store";
 import { isCipher } from "@notesnook/core";
 import { attachFiles } from "../components/editor/picker";
+import { isUserSubscribed } from "../hooks/use-is-user-premium";
 
 export class WebExtensionServer implements Server {
   async login() {
@@ -39,7 +39,7 @@ export class WebExtensionServer implements Server {
     const user = await db.user.getUser();
     const theme = colorScheme === "dark" ? darkTheme : lightTheme;
     if (!user) return { pro: false, theme };
-    return { email: user.email, pro: isUserPremium(user), theme };
+    return { email: user.email, pro: isUserSubscribed(user), theme };
   }
 
   async getNotes(): Promise<ItemReference[] | undefined> {

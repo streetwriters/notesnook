@@ -17,26 +17,62 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { SubscriptionPlan, SubscriptionPlanId } from "../types.js";
+import hosts from "../utils/constants.js";
 import http from "../utils/http.js";
 
-export type Product = {
+export type SKUResponse = {
   country: string;
   countryCode: string;
   sku?: string;
-  price?: string;
   discount: number;
 };
 
-const BASE_URL = `https://notesnook.com/api/v1/prices`;
+export interface PlanPrice {
+  gross: number;
+  net: number;
+  tax: number;
+  currency?: string;
+}
+
+export type Period = "monthly" | "yearly" | "5-year";
+
+export type Discount = {
+  type: "regional" | "promo";
+  code?: string;
+  recurring: boolean;
+  amount: number;
+};
+
+export interface Plan {
+  plan: SubscriptionPlan;
+  recurring: boolean;
+  id: string;
+  name?: string;
+  period: Period;
+  price: PlanPrice;
+  currency: string;
+  currencySymbol?: string;
+  originalPrice?: PlanPrice;
+  discount?: Discount;
+  country: string;
+}
+
 export class Pricing {
   static sku(
-    platform: "android" | "ios" | "web",
-    period: "monthly" | "yearly"
-  ): Promise<Product> {
-    return http.get(`${BASE_URL}/skus/${platform}/${period}`);
+    platform: "google" | "apple" | "paddle" | "paddleNoTrial",
+    period: Period,
+    plan: SubscriptionPlanId
+  ): Promise<SKUResponse> {
+    return http.get(
+      `${hosts.NOTESNOOK_HOST}/api/v2/prices/skus?platform=${platform}&period=${period}&plan=${plan}`
+    );
   }
 
-  static price(period: "monthly" | "yearly" = "monthly"): Promise<Product> {
-    return http.get(`${BASE_URL}/${period}`);
+  static products(trialsAvailed?: SubscriptionPlan[]): Promise<Plan[]> {
+    const url = new URL(`${hosts.NOTESNOOK_HOST}/api/v2/prices/products`);
+    if (trialsAvailed)
+      url.searchParams.set("trialsAvailed", trialsAvailed.join(","));
+    return http.get(url.toString());
   }
 }

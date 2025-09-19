@@ -80,6 +80,8 @@ import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { useTabStore } from "./use-tab-store";
 import { editorState, openInternalLink } from "./utils";
 import AddReminder from "../../add-reminder";
+import { isFeatureAvailable, useAreFeaturesAvailable } from "@notesnook/common";
+import PaywallSheet from "../../../components/sheets/paywall";
 
 const publishNote = async () => {
   const user = useUserStore.getState().user;
@@ -148,6 +150,11 @@ export const useEditorEvents = (
   editor: useEditorType,
   { readonly: editorPropReadonly, noHeader, noToolbar }: Partial<EditorProps>
 ) => {
+  const features = useAreFeaturesAvailable([
+    "callout",
+    "outlineList",
+    "taskList"
+  ]);
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const fullscreen = useSettingStore((state) => state.fullscreen);
   const corsProxy = useSettingStore((state) => state.settings.corsProxy);
@@ -157,7 +164,6 @@ export const useEditorEvents = (
     state.timeFormat
   ]);
   const handleBack = useRef<NativeEventSubscription>();
-  const isPremium = useUserStore((state) => state.premium);
   const { fontScale } = useWindowDimensions();
 
   const doubleSpacedLines = useSettingStore(
@@ -201,7 +207,7 @@ export const useEditorEvents = (
     editor.commands.setSettings({
       deviceMode: deviceMode || "mobile",
       fullscreen: fullscreen || false,
-      premium: isPremium,
+      premium: false,
       readonly: false,
       tools: tools || getDefaultPresets().default,
       noHeader: noHeader,
@@ -216,11 +222,11 @@ export const useEditorEvents = (
       dateFormat: db.settings?.getDateFormat(),
       timeFormat: db.settings?.getTimeFormat(),
       fontScale,
-      markdownShortcuts
+      markdownShortcuts,
+      features
     });
   }, [
     fullscreen,
-    isPremium,
     editor.loading,
     deviceMode,
     tools,
@@ -437,7 +443,23 @@ export const useEditorEvents = (
             referenceType: "reminder",
             relationType: "from",
             title: strings.dataTypesPluralCamelCase.reminder(),
-            onAdd: () => AddReminder.present(undefined, note)
+            onAdd: async () => {
+              const reminderFeature = await isFeatureAvailable(
+                "activeReminders"
+              );
+              if (!reminderFeature.isAllowed) {
+                ToastManager.show({
+                  type: "info",
+                  message: reminderFeature.error,
+                  actionText: strings.upgrade(),
+                  func: () => {
+                    PaywallSheet.present(reminderFeature);
+                  }
+                });
+                return;
+              }
+              AddReminder.present(undefined, note);
+            }
           });
           break;
         case EditorEvents.newtag:
@@ -525,7 +547,9 @@ export const useEditorEvents = (
           if (editor.state.current?.isFocused) {
             editor.state.current.isFocused = true;
           }
-          eSendEvent(eOpenPremiumDialog);
+          PaywallSheet.present(
+            await isFeatureAvailable(editorMessage.value.feature)
+          );
           break;
         case EditorEvents.monograph:
           publishNote();
