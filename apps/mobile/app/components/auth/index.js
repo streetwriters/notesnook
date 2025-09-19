@@ -89,6 +89,9 @@ const Auth = ({ navigation, route }) => {
               onPress={() => {
                 if (initialAuthMode.current === 2) {
                   Navigation.replace("FluidPanelsView");
+                  setTimeout(() => {
+                    Navigation.resetRootState();
+                  }, 1000);
                 } else {
                   Navigation.goBack();
                 }

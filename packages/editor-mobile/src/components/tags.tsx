@@ -23,7 +23,7 @@ import { useTabContext } from "../hooks/useTabStore";
 import { Settings } from "../utils";
 import { EditorEvents } from "../utils/editor-events";
 import styles from "./styles.module.css";
-function Tags(props: { settings: Settings; loading?: boolean }): JSX.Element {
+function Tags(props: { settings: Settings; loading?: boolean }) {
   const [tags, setTags] = useState<
     { title: string; alias: string; id: string; type: "tag" }[]
   >([]);
@@ -49,14 +49,12 @@ function Tags(props: { settings: Settings; loading?: boolean }): JSX.Element {
   };
   const fontScale = props.settings?.fontScale || 1;
 
-  return (
+  return !tab.session?.noteId ? null : (
     <div
       className={styles.container}
       style={{
-        display: tags.length === 0 ? "none" : "flex",
-        position: tags.length === 0 ? "absolute" : "relative",
+        display: "flex",
         alignItems: "center",
-        overflowX: "scroll",
         minHeight: "25px",
         opacity: props.loading ? 0 : 1,
         gap: 6
