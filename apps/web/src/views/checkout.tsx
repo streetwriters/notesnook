@@ -55,12 +55,14 @@ const PlanSchema = z.object({
   }),
   currency: z.string(),
   currencySymbol: z.string().optional(),
-  originalPrice: z.object({
-    gross: z.number(),
-    net: z.number(),
-    tax: z.number(),
-    currency: z.string().optional()
-  }),
+  originalPrice: z
+    .object({
+      gross: z.number(),
+      net: z.number(),
+      tax: z.number(),
+      currency: z.string().optional()
+    })
+    .optional(),
   discount: z
     .object({
       type: z.enum(["regional", "promo"]),
@@ -70,6 +72,7 @@ const PlanSchema = z.object({
     })
     .optional(),
   country: z.string(),
+  transactionId: z.string().optional(),
   customer: z
     .object({
       id: z.string(),
@@ -91,6 +94,8 @@ function Checkout() {
   }, []);
 
   useEffect(() => {
+    if (!plan) return;
+
     const pricingInfo = PlanSchema.safeParse(
       JSON.parse(Buffer.from(plan, "base64").toString("utf-8"))
     );

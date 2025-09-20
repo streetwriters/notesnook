@@ -71,6 +71,8 @@ export interface Plan {
   originalPrice?: PlanPrice;
   discount?: Discount;
   country: string;
+
+  transactionId?: string;
 }
 
 export interface Price {
@@ -91,7 +93,7 @@ export type PricingInfo = {
   // currency: string;
   price: Price;
   period: Period;
-  recurringPrice: Price;
+  recurringPrice?: Price;
   discount?: Discount;
   coupon?: string;
   invalidCoupon?: boolean;

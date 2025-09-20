@@ -35,7 +35,7 @@ import {
   PlansList
 } from "./plan-list";
 import { useCheckoutStore } from "./store";
-import { getCurrencySymbol, toPricingInfo } from "./helpers";
+import { toPricingInfo } from "./helpers";
 import { isUserSubscribed } from "../../hooks/use-is-user-premium";
 import BaseDialog from "../../components/dialog";
 import { ScopedThemeProvider } from "../../components/theme-provider";
@@ -45,6 +45,7 @@ import dayjs from "dayjs";
 import { PromptDialog } from "../prompt";
 import IconTag from "../../components/icon-tag";
 import { usePromise } from "@notesnook/common";
+import { getCurrencySymbol } from "../../common/currencies";
 
 type BuyDialogProps = BaseDialogProps<false> & {
   couponCode?: string;
@@ -339,8 +340,6 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
   const { pricingInfo } = props;
   const { price } = pricingInfo;
 
-  const currentTotal = price.total;
-
   const [isApplyingCoupon, setIsApplyingCoupon] = useCheckoutStore((store) => [
     store.isApplyingCoupon,
     store.setIsApplyingCoupon
@@ -409,13 +408,13 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
             </Text>
           ) : (
             <Text variant="body" color="heading">
-              {pricingInfo.price.total}
+              {pricingInfo.price.subtotal}
             </Text>
           )}
         </Flex>
-        <Box sx={{ width: "2px", bg: "border", height: "20px" }} />
         {pricingInfo.price.trial_period ? (
           <>
+            <Box sx={{ width: "2px", bg: "border", height: "20px" }} />
             <Flex sx={{ justifyContent: "space-between" }}>
               <Flex sx={{ flexDirection: "column" }}>
                 <Text variant="body" color="heading">
@@ -429,50 +428,57 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
                 </Text>
               </Flex>
               <Text variant="body" color="heading">
-                {pricingInfo.price.total}
+                {pricingInfo.price.subtotal}
               </Text>
             </Flex>
-            <Box sx={{ width: "2px", bg: "border", height: "20px" }} />
           </>
         ) : null}
 
-        <Flex sx={{ justifyContent: "space-between" }}>
-          <Flex sx={{ flexDirection: "column" }}>
-            <Text variant="body" color="heading">
-              {pricingInfo.period === "monthly"
-                ? "Next month"
-                : pricingInfo.period === "yearly"
-                ? "Next year"
-                : dayjs()
-                    .add(5, "year")
-                    .add(pricingInfo.price.trial_period?.frequency || 0, "days")
-                    .format("YYYY-MM-DD")}
-            </Text>
-            {pricingInfo.period === "monthly" ||
-            pricingInfo.period === "yearly" ? (
-              <Text variant="subBody">
-                {pricingInfo.period === "monthly"
-                  ? dayjs()
-                      .add(1, "month")
-                      .add(
-                        pricingInfo.price.trial_period?.frequency || 0,
-                        "days"
-                      )
-                      .format("YYYY-MM-DD")
-                  : dayjs()
-                      .add(1, "year")
-                      .add(
-                        pricingInfo.price.trial_period?.frequency || 0,
-                        "days"
-                      )
-                      .format("YYYY-MM-DD")}
+        {pricingInfo.recurringPrice ? (
+          <>
+            <Box sx={{ width: "2px", bg: "border", height: "20px" }} />
+            <Flex sx={{ justifyContent: "space-between" }}>
+              <Flex sx={{ flexDirection: "column" }}>
+                <Text variant="body" color="heading">
+                  {pricingInfo.period === "monthly"
+                    ? "Next month"
+                    : pricingInfo.period === "yearly"
+                    ? "Next year"
+                    : dayjs()
+                        .add(5, "year")
+                        .add(
+                          pricingInfo.price.trial_period?.frequency || 0,
+                          "days"
+                        )
+                        .format("YYYY-MM-DD")}
+                </Text>
+                {pricingInfo.period === "monthly" ||
+                pricingInfo.period === "yearly" ? (
+                  <Text variant="subBody">
+                    {pricingInfo.period === "monthly"
+                      ? dayjs()
+                          .add(1, "month")
+                          .add(
+                            pricingInfo.price.trial_period?.frequency || 0,
+                            "days"
+                          )
+                          .format("YYYY-MM-DD")
+                      : dayjs()
+                          .add(1, "year")
+                          .add(
+                            pricingInfo.price.trial_period?.frequency || 0,
+                            "days"
+                          )
+                          .format("YYYY-MM-DD")}
+                  </Text>
+                ) : null}
+              </Flex>
+              <Text variant="body" color="heading">
+                {pricingInfo.recurringPrice.subtotal}
               </Text>
-            ) : null}
-          </Flex>
-          <Text variant="body" color="heading">
-            {pricingInfo.recurringPrice.total}
-          </Text>
-        </Flex>
+            </Flex>
+          </>
+        ) : null}
       </Flex>
       <Flex
         sx={{
@@ -565,7 +571,7 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
               variant="title"
               sx={{ textAlign: "end" }}
             >
-              {currentTotal}
+              {price.total}
             </Text>
           )}
         </Flex>

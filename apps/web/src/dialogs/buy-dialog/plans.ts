@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useState } from "react";
 import { Plan, PlanMetadata } from "./types";
 import { Period, set, SubscriptionPlan } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
