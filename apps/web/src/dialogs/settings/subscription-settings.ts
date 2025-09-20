@@ -56,6 +56,7 @@ export const SubscriptionSettings: SettingsGroup[] = [
           const status = user?.subscription.status;
           return (
             user?.subscription.provider !== SubscriptionProvider.PADDLE ||
+            user?.subscription.plan === SubscriptionPlan.EDUCATION ||
             !isUserSubscribed(user) ||
             status === SubscriptionStatusEnum.EXPIRED ||
             status === SubscriptionStatusEnum.TRIAL ||
@@ -91,6 +92,7 @@ export const SubscriptionSettings: SettingsGroup[] = [
           const status = user?.subscription.status;
           return (
             user?.subscription.plan === SubscriptionPlan.LEGACY_PRO ||
+            user?.subscription.plan === SubscriptionPlan.EDUCATION ||
             user?.subscription.provider !== SubscriptionProvider.PADDLE ||
             !isUserSubscribed(user) ||
             status === SubscriptionStatusEnum.CANCELED ||
@@ -197,8 +199,7 @@ export const SubscriptionSettings: SettingsGroup[] = [
           const user = useUserStore.getState().user;
           return (
             user?.subscription.provider !== SubscriptionProvider.PADDLE ||
-            !isUserSubscribed(user) ||
-            user.subscription.plan === SubscriptionPlan.EDUCATION
+            !isUserSubscribed(user)
           );
         },
         components: [

@@ -22,11 +22,7 @@ import { CheckCircleOutline, Loading } from "../../components/icons";
 import { Plan } from "./types";
 import { PERIOD_METADATA, PLAN_METADATA, usePlans } from "./plans";
 import { useState } from "react";
-import {
-  FEATURE_HIGHLIGHTS,
-  getCurrencySymbol,
-  isTrialAvailableForPlan
-} from "./helpers";
+import { FEATURE_HIGHLIGHTS, isTrialAvailableForPlan } from "./helpers";
 import { strings } from "@notesnook/intl";
 import { Period, SubscriptionPlan } from "@notesnook/core";
 import Cameron from "../../assets/testimonials/cameron.jpg";
@@ -43,6 +39,7 @@ import { getFeaturesTable, planToAvailability } from "@notesnook/common";
 import { FeatureCaption } from "./feature-caption";
 import Accordion from "../../components/accordion";
 import { useStore as useUserStore } from "../../stores/user-store";
+import { getCurrencySymbol } from "../../common/currencies";
 
 type PlansListProps = {
   selectedPlan: SubscriptionPlan;

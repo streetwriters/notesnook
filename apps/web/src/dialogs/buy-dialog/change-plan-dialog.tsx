@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { DialogManager } from "../../common/dialog-manager";
 import BaseDialog from "../../components/dialog";
 import { Flex, Text } from "@theme-ui/components";
-import { getCurrencySymbol } from "./helpers";
 import { getAllPlans, PERIOD_METADATA, PLAN_METADATA } from "./plans";
 import { SelectComponent } from "../settings";
 import { useStore as useUserStore } from "../../stores/user-store";
@@ -31,6 +30,7 @@ import { showToast } from "../../utils/toast";
 import { usePromise } from "@notesnook/common";
 import { ErrorText } from "../../components/error-text";
 import { Loading } from "../../components/icons";
+import { getCurrencySymbol } from "../../common/currencies";
 
 export type ChangePlanDialogProps = {
   onClose: () => void;

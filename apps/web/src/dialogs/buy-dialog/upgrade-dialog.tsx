@@ -26,13 +26,13 @@ import { DialogManager } from "../../common/dialog-manager";
 import BaseDialog from "../../components/dialog";
 import { SubscriptionPlan } from "@notesnook/core";
 import { Button, Flex, Text } from "@theme-ui/components";
-import { getCurrencySymbol } from "./helpers";
 import { FeatureCaption } from "./feature-caption";
 import { PERIOD_METADATA, PLAN_METADATA, usePlans } from "./plans";
 import { formatRecurringPeriodShort } from "./plan-list";
 import { useCheckoutStore } from "./store";
 import { BuyDialog } from "./buy-dialog";
 import { ErrorText } from "../../components/error-text";
+import { getCurrencySymbol } from "../../common/currencies";
 
 export type UpgradeDialogProps = {
   feature: FeatureResult<any>;

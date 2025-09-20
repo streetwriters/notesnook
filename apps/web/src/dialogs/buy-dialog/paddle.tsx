@@ -20,21 +20,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useEffect, useState, useRef, useCallback } from "react";
 import { Flex } from "@theme-ui/components";
 import { Loader } from "../../components/loader";
-import { PaddleEvent, Plan, Price, PricingInfo } from "./types";
+import { PaddleEvent, Plan, PricingInfo } from "./types";
 import { ScrollContainer } from "@notesnook/ui";
 import useMobile from "../../hooks/use-mobile";
 import {
   AvailablePaymentMethod,
   CheckoutEventNames,
   CheckoutOpenLineItem,
-  CurrencyCode,
-  Totals,
-  Product,
   CheckoutEventsCustomerAddress,
   CheckoutEventsData
 } from "@paddle/paddle-js";
 import { isFeatureSupported } from "../../utils/feature-check";
-import { IS_DEV, parseAmount } from "./helpers";
+import { formatPrice, IS_DEV } from "./helpers";
 import { CheckoutCustomerUserInfo } from "@paddle/paddle-js/types/checkout/customer";
 import { logger } from "../../utils/logger";
 import { Period } from "@notesnook/core";
@@ -102,9 +99,10 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
       createCheckout({ theme, user, coupon, plan }).then(
         async (checkoutData) => {
           if (!checkoutData) return;
-          const pricingInfo = await getPrice(plan, {
+          const pricingInfo = getPricingInfo(checkoutData, {
             currencyCode: checkoutData.currency_code,
-            discount: checkoutData.discount,
+            period: plan.period,
+            discountCode: coupon,
             countryCode: checkoutData.customer?.address?.country_code
           });
           if (!pricingInfo) return;
@@ -142,18 +140,15 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
       if (event_name === CheckoutEventNames.CHECKOUT_LOADED) {
         setIsLoading(false);
       }
-      console.log(callback_data);
+      console.log(callback_data.data);
 
       addressRef.current = callback_data.data.customer?.address || undefined;
-      const pricingInfo = await getPrice(plan, {
+      const pricingInfo = getPricingInfo(callback_data.data, {
+        period: plan.period,
         currencyCode: callback_data.data.currency_code,
-        discount: callback_data.data.discount,
+        discountCode: coupon,
         countryCode: callback_data.data.customer?.address?.country_code
       });
-      if (!pricingInfo) return;
-
-      pricingInfo.invalidCoupon =
-        !!props.coupon && !callback_data.data.discount;
       if (onPriceUpdated) onPriceUpdated(pricingInfo);
       appliedCouponCode.current = pricingInfo.coupon;
       checkoutDataRef.current = callback_data.data || checkoutDataRef.current;
@@ -162,7 +157,7 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
     return () => {
       window.removeEventListener("message", onMessage, false);
     };
-  }, [onPriceUpdated, plan, props.coupon, onCompleted]);
+  }, [onPriceUpdated, plan, coupon, onCompleted]);
 
   return (
     <ScrollContainer
@@ -215,143 +210,54 @@ function getCheckoutURL(id: string, theme: PaddleCheckoutProps["theme"]) {
 }
 
 type PriceOptions = {
+  period: Period;
   currencyCode: string;
-  discount?: { id: string; code: string };
+  discountCode?: string;
   countryCode?: string;
 };
-export async function getPrice(plan: Plan, data: PriceOptions) {
-  const response = await fetch(`${PADDLE_API}/pricing-preview`, {
-    method: "POST",
-    body: JSON.stringify({
-      items: [
-        {
-          quantity: 1,
-          price_id: plan.id
-        }
-      ],
-      currency_code: data.currencyCode,
-      discount_id: data.discount?.id
-    }),
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      "Paddle-Clienttoken": CLIENT_PADDLE_TOKEN
-    }
-  });
-  if (!response.ok) return false;
-  const json = (await response.json()) as PricePreviewResponse;
-  console.log(json);
-  return getPricingInfo(json.data, plan.period, data);
-}
 
 function getPricingInfo(
-  price: PricePreviewResponse["data"],
-  period: Period,
+  data: CheckoutEventsData,
   options: PriceOptions
 ): PricingInfo {
-  const {
-    discounts,
-    formatted_totals: totals,
-    totals: _totals,
-    price: _price,
-    tax_rate
-  } = price.details.line_items[0];
-  const discount = discounts[0];
-  const isRecurring = !discount || discount.discount.recur;
-  const totalsWithoutDiscount: Totals = { ...totals };
-  if (discount) {
-    const taxRate = parseFloat(tax_rate);
-    const tax = parseInt(_totals.subtotal) * taxRate;
-    const total = parseInt(_totals.subtotal) + tax;
-    const { symbol = price.currency_code } = parseAmount(totals.subtotal) || {};
-    totalsWithoutDiscount.discount = `${symbol}0.00`;
-    totalsWithoutDiscount.subtotal = totals.subtotal;
-    totalsWithoutDiscount.tax = `${symbol}${(tax / 100).toFixed(2)}`;
-    totalsWithoutDiscount.total = `${symbol}${(total / 100).toFixed(2)}`;
-  }
+  const isRecurringDiscount = !!data.recurring_totals?.discount;
+  const price = data.items[0];
   return {
     country: options.countryCode || "US",
-    discount: discount
+    period: options.period,
+    coupon: data.discount?.code,
+    invalidCoupon: !!options.discountCode && !data.discount,
+    discount:
+      data.totals.discount > 0
+        ? {
+            recurring: isRecurringDiscount,
+            type: "promo",
+            code: data.discount?.code,
+            amount: data.totals.discount
+          }
+        : undefined,
+    recurringPrice: data.recurring_totals
       ? {
-          recurring: isRecurring,
-          amount: 0,
-          type: "promo"
+          currency: data.currency_code,
+          id: price.price_id,
+          period: options.period,
+          subtotal: formatPrice(
+            data.recurring_totals.subtotal,
+            data.currency_code
+          ),
+          total: formatPrice(data.recurring_totals.total, data.currency_code),
+          tax: formatPrice(data.recurring_totals.tax, data.currency_code)
         }
       : undefined,
-    period,
     price: {
-      id: _price.id,
-      period,
-      currency: options.currencyCode,
-      ...totals,
-      trial_period: _price.trial_period
-    },
-    recurringPrice: {
-      id: _price.id,
-      period,
-      currency: options.currencyCode,
-      ...totalsWithoutDiscount
-    },
-    coupon: options.discount?.code
+      currency: data.currency_code,
+      id: price.price_id,
+      period: options.period,
+      subtotal: formatPrice(data.totals.subtotal, data.currency_code),
+      total: formatPrice(data.totals.total, data.currency_code),
+      tax: formatPrice(data.totals.tax, data.currency_code)
+    }
   };
-}
-
-interface Discount {
-  id: string;
-  status: "active" | "archived" | "expired" | "used";
-  description: string;
-  enabled_for_checkout: boolean;
-  code: string | null;
-  type: "flat" | "flat_per_seat" | "percentage";
-  amount: string;
-  currency_code: CurrencyCode | null;
-  recur: boolean;
-  maximum_recurring_intervals: number | null;
-  usage_limit: number | null;
-  restrict_to: string[] | null;
-  expires_at: string | null;
-  times_used: number;
-  created_at: string;
-  updated_at: string;
-}
-
-interface DiscountLineItem {
-  discount: Discount;
-  total: string;
-  formatted_total: string;
-}
-
-interface LineItem {
-  price: Price;
-  quantity: number;
-  tax_rate: string;
-  unit_totals: Totals;
-  formatted_unit_totals: Totals;
-  totals: Totals;
-  formatted_totals: Totals;
-  product: Product;
-  discounts: DiscountLineItem[];
-}
-interface PricePreviewResponse {
-  data: {
-    customer_id: string | null;
-    address_id: string | null;
-    business_id: string | null;
-    currency_code: CurrencyCode;
-    address: {
-      country_code: string;
-      postal_code: string | null;
-    } | null;
-    customer_ip_address: string | null;
-    discount_id: string | null;
-    details: {
-      line_items: LineItem[];
-    };
-    availablePaymentMethods: AvailablePaymentMethod[];
-  };
-  // meta: {
-  //   requestId: string;
-  // };
 }
 
 enum THEME {
@@ -436,12 +342,18 @@ async function createCheckout(props: {
   const response = await fetch(`${CHECKOUT_SERVICE}/transaction-checkout`, {
     method: "POST",
     body: JSON.stringify({
-      data: {
-        custom_data: JSON.stringify({ userId: user.id }),
-        customer: { email: user.email },
-        items: [{ price_id: plan.id, quantity: 1 }],
-        settings: getCheckoutSettings(theme)
-      }
+      data: plan.transactionId
+        ? {
+            custom_data: JSON.stringify({ userId: user.id }),
+            transaction_id: plan.transactionId,
+            settings: getCheckoutSettings(theme)
+          }
+        : {
+            custom_data: JSON.stringify({ userId: user.id }),
+            customer: { email: user.email },
+            items: [{ price_id: plan.id, quantity: 1 }],
+            settings: getCheckoutSettings(theme)
+          }
     }),
     headers: {
       "Content-Type": "application/json",
@@ -453,6 +365,8 @@ async function createCheckout(props: {
   const json = (await response.json()) as CheckoutDataResponse;
 
   let checkoutData = json.data;
+  if (plan.transactionId) return checkoutData;
+
   const checkoutId = checkoutData.id;
 
   checkoutData = await submitCustomerInfo(
