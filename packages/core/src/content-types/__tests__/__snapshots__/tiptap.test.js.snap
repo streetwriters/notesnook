@@ -126,6 +126,16 @@ But this post was supposed to be about the "Secrets" of Typescript Generics, rig
 "
 `;
 
+exports[`convert HTML to markdown with leadingWhitespaces > html-to-md-leadingWhitespaces.md 1`] = `
+"two spaces
+
+four spaces  
+two spaces  
+four spaces
+
+"
+`;
+
 exports[`convert HTML to markdown with outlinelists > html-to-md-outlinelists.md 1`] = `
 "Testing outline list:
 
@@ -387,6 +397,14 @@ right? Well, let's get into that.
 
 
 4. TYPE INFERENCE USING INTERFACE PROPERTIES"
+`;
+
+exports[`convert HTML to text with leadingWhitespaces > html-to-txt-leadingWhitespaces.txt 1`] = `
+"  two spaces
+
+    four spaces
+  two spaces
+    four spaces"
 `;
 
 exports[`convert HTML to text with outlinelists > html-to-txt-outlinelists.txt 1`] = `
