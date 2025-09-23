@@ -390,7 +390,7 @@ export const tiptapKeys = {
     type: "tiptap"
   },
   toggleHighlight: {
-    keys: ["ctrl+alt+h", "ctrl+shift+h"],
+    keys: ["Mod-Alt-h", "Mod-Shift-h"],
     description: "Toggle highlight",
     category: "Editor",
     type: "tiptap"
