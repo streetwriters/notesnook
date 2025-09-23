@@ -248,7 +248,8 @@ export const Items = ({
           testID={"icon-" + item.id}
           style={{
             width: columnItemWidth - 8,
-            alignSelf: "flex-start"
+            alignSelf: "flex-start",
+            gap: DefaultAppStyles.GAP_VERTICAL_SMALL
           }}
         >
           <View
@@ -259,7 +260,9 @@ export const Items = ({
               alignItems: "center",
               borderWidth: 1,
               borderRadius: defaultBorderRadius,
-              borderColor: colors.primary.border,
+              borderColor: item.checked
+                ? item.activeColor || colors.primary.accent
+                : colors.primary.border,
               overflow: "hidden"
             }}
           >
@@ -354,8 +357,8 @@ export const Items = ({
               paginationStyle={{
                 position: "relative",
                 marginHorizontal: 2,
-                marginBottom: 0,
-                marginTop: 0
+                marginBottom: -10,
+                marginTop: 10
               }}
               contentContainerStyle={{
                 justifyContent: "flex-start",

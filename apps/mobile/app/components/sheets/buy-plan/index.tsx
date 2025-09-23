@@ -40,7 +40,9 @@ export const BuyPlan = (props: {
   productId: string;
   canActivateTrial?: boolean;
   goBack: () => void;
-  goNext: () => void;
+  goNext: (
+    product: Plan | RNIap.Subscription | RNIap.Product | undefined
+  ) => void;
 }) => {
   const { colors } = useThemeColors();
   const [checkoutUrl, setCheckoutUrl] = useState<string>();
@@ -48,7 +50,7 @@ export const BuyPlan = (props: {
     planId: props.planId,
     productId: props.productId,
     onBuy: () => {
-      props.goNext();
+      props.goNext(pricingPlans.selectedProduct);
     }
   });
 
@@ -78,7 +80,7 @@ export const BuyPlan = (props: {
           try {
             const data = JSON.parse(message.nativeEvent.data);
             if (data.success) {
-              props.goNext();
+              props.goNext(pricingPlans.selectedProduct);
             }
           } catch (e) {}
         }}
@@ -139,7 +141,11 @@ export const BuyPlan = (props: {
         >
           <Heading color={colors.primary.paragraph} size={AppFontSize.sm}>
             {strings.dueToday()}{" "}
-            {pricingPlans.userCanRequestTrial ? (
+            {pricingPlans.hasTrialOffer(
+              props.planId,
+              (pricingPlans?.selectedProduct as RNIap.Product)?.productId ||
+                (pricingPlans?.selectedProduct as Plan)?.period
+            ) ? (
               <Text
                 style={{
                   color: colors.primary.accent
@@ -151,7 +157,11 @@ export const BuyPlan = (props: {
           </Heading>
 
           <Paragraph color={colors.primary.paragraph}>
-            {pricingPlans.userCanRequestTrial
+            {pricingPlans.hasTrialOffer(
+              props.planId,
+              (pricingPlans?.selectedProduct as RNIap.Product)?.productId ||
+                (pricingPlans?.selectedProduct as Plan)?.period
+            )
               ? "FREE"
               : pricingPlans.getStandardPrice(
                   pricingPlans.selectedProduct as RNIap.Subscription

@@ -70,7 +70,6 @@ const SheetWrapper = ({
       backgroundColor: colors.primary.background,
       zIndex: 10,
       paddingTop: 5,
-      paddingBottom: 0,
       borderTopRightRadius: 15,
       borderTopLeftRadius: 15,
       alignSelf: "center",
@@ -78,9 +77,10 @@ const SheetWrapper = ({
       borderBottomLeftRadius: 0,
       ...getContainerBorder(colors.primary.border, 0.5),
       borderBottomWidth: 0,
-      paddingBottom: isGestureNavigationEnabled
-        ? insets.bottom
-        : insets.bottom || 48
+      paddingBottom:
+        isGestureNavigationEnabled && Platform.OS === "android"
+          ? insets.bottom
+          : 0
     };
   }, [
     colors.primary.background,
@@ -165,8 +165,8 @@ const SheetWrapper = ({
           <View
             style={{
               height:
-                Platform.OS === "ios" && insets.bottom !== 0
-                  ? insets.bottom + 5
+                Platform.OS === "ios" || insets.bottom !== 0
+                  ? insets.bottom
                   : 20
             }}
           />

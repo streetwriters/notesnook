@@ -401,6 +401,7 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
           obfuscatedAccountIdAndroid: user.id,
           obfuscatedProfileIdAndroid: user.id,
           sku: product.productId,
+          skus: [product.productId],
           quantity: 1
         });
       }

@@ -2579,5 +2579,6 @@ Use this if changes from other devices are not appearing on this device. This wi
   unlimited: () => t`Unlimited`,
   fiveYearPlan: () => t`5 year plan (One time purchase)`,
   educationPlan: () => t`Education plan`,
-  welcomeToPlan: (plan: string) => t`Welcome to Notesnook ${plan}`
+  welcomeToPlan: (plan: string) => t`Welcome to Notesnook ${plan}`,
+  thankYouForPurchase: () => t`Thank you for the purchase`
 };

@@ -141,6 +141,12 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
     };
   }, []);
 
+  const is5YearPlanSelected = (
+    isGithubRelease
+      ? (pricingPlans.selectedProduct as Plan)?.period
+      : (pricingPlans.selectedProduct as RNIap.Product)?.productId
+  )?.includes("5");
+
   return (
     <SafeAreaView
       style={{
@@ -603,7 +609,11 @@ After trying all the privacy security oriented note taking apps, for the price a
           goBack={() => {
             setStep(Steps.select);
           }}
-          goNext={() => {
+          goNext={(product) => {
+            pricingPlans.selectProduct(
+              (product as RNIap.Subscription).productId ||
+                (product as Plan).period
+            );
             setStep(Steps.finish);
           }}
         />
@@ -647,7 +657,11 @@ After trying all the privacy security oriented note taking apps, for the price a
           >
             <AppIcon color={colors.primary.accent} name="check" size={30} />
           </View>
-          <Heading>{strings.thankYouForSubscribing()}</Heading>
+          <Heading>
+            {is5YearPlanSelected
+              ? strings.thankYouForPurchase()
+              : strings.thankYouForSubscribing()}
+          </Heading>
           <Paragraph
             style={{
               textAlign: "center"

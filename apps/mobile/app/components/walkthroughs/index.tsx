@@ -17,20 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
+import { useThemeColors } from "@notesnook/theme";
 import React, { useState } from "react";
 import { LayoutAnimation, View } from "react-native";
 import { MMKV } from "../../common/database/mmkv";
 import { eSendEvent, presentSheet } from "../../services/event-manager";
-import { useThemeColors } from "@notesnook/theme";
 import { eCloseSheet } from "../../utils/events";
 import { AppFontSize } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import walkthroughs, { TStep } from "./walkthroughs";
-import { strings } from "@notesnook/intl";
-import { DefaultAppStyles } from "../../utils/styles";
 export const Walkthrough = ({
   steps,
   canSkip = true
@@ -65,7 +65,7 @@ export const Walkthrough = ({
             textAlign: "center"
           }}
         >
-          Notesnook Free plan activated
+          {step.title}
         </Heading>
       ) : null}
       {step.text ? (
@@ -151,7 +151,7 @@ Walkthrough.init = async () => {
 };
 
 Walkthrough.present = async (
-  id: "notebooks" | "trialstarted" | "emailconfirmed" | "prouser",
+  id: "emailconfirmed" | "prouser",
   canSkip = true,
   nopersist?: boolean
 ) => {
@@ -162,7 +162,7 @@ Walkthrough.present = async (
     if (walkthroughState[id]) return;
     Walkthrough.update(id);
   }
-  const walkthrough = walkthroughs[id];
+  const walkthrough = walkthroughs[id]();
   if (!walkthrough) return;
   presentSheet({
     component: <Walkthrough canSkip={canSkip} steps={walkthrough.steps} />,
