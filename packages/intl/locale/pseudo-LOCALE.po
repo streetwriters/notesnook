@@ -1362,6 +1362,10 @@ msgstr ""
 msgid "Change password"
 msgstr ""
 
+#: src/strings.ts:2584
+msgid "Change plan"
+msgstr ""
+
 #: src/strings.ts:1817
 msgid "Change profile picture"
 msgstr ""
@@ -7178,6 +7182,10 @@ msgstr ""
 
 #: src/strings.ts:2191
 msgid "You have been logged out."
+msgstr ""
+
+#: src/strings.ts:2586
+msgid "You have made a one time purchase. To change your plan please contact support."
 msgstr ""
 
 #: src/strings.ts:963

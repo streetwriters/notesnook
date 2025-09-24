@@ -2580,5 +2580,8 @@ Use this if changes from other devices are not appearing on this device. This wi
   fiveYearPlan: () => t`5 year plan (One time purchase)`,
   educationPlan: () => t`Education plan`,
   welcomeToPlan: (plan: string) => t`Welcome to Notesnook ${plan}`,
-  thankYouForPurchase: () => t`Thank you for the purchase`
+  thankYouForPurchase: () => t`Thank you for the purchase`,
+  changePlan: () => t`Change plan`,
+  contactSupportToChangePlan: () =>
+    t`You have made a one time purchase. To change your plan please contact support.`
 };

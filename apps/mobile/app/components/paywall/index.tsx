@@ -63,7 +63,7 @@ import usePricingPlans, {
 import Navigation, { NavigationProps } from "../../services/navigation";
 import { getElevationStyle } from "../../utils/elevation";
 import { openLinkInBrowser } from "../../utils/functions";
-import { AppFontSize } from "../../utils/size";
+import { AppFontSize, defaultBorderRadius } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { AuthMode } from "../auth/common";
 import { Header } from "../header";
@@ -236,7 +236,6 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
                   gap: 5
                 }}
               >
-                {/* <Icon name="crown" size={30} color={colors.static.orange} /> */}
                 <Heading
                   key="heading"
                   size={AppFontSize.xl}
@@ -244,10 +243,17 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
                     alignSelf: "center"
                   }}
                 >
-                  {strings.notesnookPlans[0]()}{" "}
-                  <Heading size={AppFontSize.xl} color={colors.primary.accent}>
-                    {strings.notesnookPlans[1]()}
-                  </Heading>
+                  {pricingPlans.isSubscribed()
+                    ? strings.changePlan()
+                    : strings.notesnookPlans[0]() + " "}
+                  {pricingPlans.isSubscribed() ? null : (
+                    <Heading
+                      size={AppFontSize.xl}
+                      color={colors.primary.accent}
+                    >
+                      {strings.notesnookPlans[1]()}
+                    </Heading>
+                  )}
                 </Heading>
               </View>
 
@@ -562,7 +568,7 @@ After trying all the privacy security oriented note taking apps, for the price a
 
             <View
               style={{
-                alignSelf: "center",
+                alignSelf: isTablet ? "center" : "flex-start",
                 flexShrink: 1
               }}
             >
@@ -748,7 +754,7 @@ const ComparePlans = React.memo(
       <ScrollView
         horizontal
         style={{
-          width: "100%"
+          width: isTablet ? "100%" : undefined
         }}
         contentContainerStyle={{
           flexDirection: "column"
@@ -988,6 +994,11 @@ const PricingPlanCard = ({
       });
   }, [pricingPlans, plan, product, WebPlan]);
 
+  console.log(
+    pricingPlans?.user?.subscription.productId,
+    pricingPlans?.currentPlan?.id
+  );
+
   return (
     <TouchableOpacity
       activeOpacity={0.8}
@@ -1014,7 +1025,7 @@ const PricingPlanCard = ({
         <View
           style={{
             backgroundColor: colors.static.red,
-            borderRadius: 100,
+            borderRadius: defaultBorderRadius,
             paddingHorizontal: 6,
             alignItems: "center",
             justifyContent: "center",
@@ -1024,6 +1035,26 @@ const PricingPlanCard = ({
         >
           <Heading color={colors.static.white} size={AppFontSize.xs}>
             {regionalDiscount?.discount}% Off
+          </Heading>
+        </View>
+      ) : null}
+
+      {product?.productId &&
+      pricingPlans?.user?.subscription.productId.includes(plan.id) &&
+      pricingPlans.isSubscribed() ? (
+        <View
+          style={{
+            backgroundColor: colors.primary.accent,
+            borderRadius: defaultBorderRadius,
+            paddingHorizontal: 6,
+            alignItems: "center",
+            justifyContent: "center",
+            height: 25,
+            alignSelf: "flex-start"
+          }}
+        >
+          <Heading color={colors.static.white} size={AppFontSize.xs}>
+            {strings.currentPlan()}
           </Heading>
         </View>
       ) : null}

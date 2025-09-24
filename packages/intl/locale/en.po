@@ -1362,6 +1362,10 @@ msgstr "Change notification sound"
 msgid "Change password"
 msgstr "Change password"
 
+#: src/strings.ts:2584
+msgid "Change plan"
+msgstr "Change plan"
+
 #: src/strings.ts:1817
 msgid "Change profile picture"
 msgstr "Change profile picture"
@@ -7233,6 +7237,10 @@ msgstr "You have been logged out from all other devices."
 #: src/strings.ts:2191
 msgid "You have been logged out."
 msgstr "You have been logged out."
+
+#: src/strings.ts:2586
+msgid "You have made a one time purchase. To change your plan please contact support."
+msgstr "You have made a one time purchase. To change your plan please contact support."
 
 #: src/strings.ts:963
 msgid "You have not added any notebooks yet"

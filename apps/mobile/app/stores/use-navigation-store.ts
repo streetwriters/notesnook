@@ -111,7 +111,7 @@ export interface RouteParams extends ParamListBase {
   Intro: GenericRouteParam;
   PayWall: {
     canGoBack?: boolean;
-    context: "signup" | "logged-in" | "logged-out";
+    context: "signup" | "logged-in" | "logged-out" | "subscribed";
     state?: BillingState;
   };
 }

@@ -16,7 +16,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { Plan, SKUResponse, SubscriptionPlanId } from "@notesnook/core";
+import {
+  Plan,
+  SKUResponse,
+  SubscriptionPlan,
+  SubscriptionPlanId
+} from "@notesnook/core";
 import { useEffect, useState } from "react";
 import { Platform } from "react-native";
 import Config from "react-native-config";
@@ -776,7 +781,8 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
     },
     regionalDiscount,
     getRegionalDiscount,
-    isGithubRelease: isGithubRelease
+    isGithubRelease: isGithubRelease,
+    isSubscribed: () => user?.subscription.plan !== SubscriptionPlan.FREE
   };
 };
 

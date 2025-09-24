@@ -18,7 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { formatBytes } from "@notesnook/common";
-import { SubscriptionPlan, SubscriptionStatus } from "@notesnook/core";
+import {
+  SubscriptionPlan,
+  SubscriptionProvider,
+  SubscriptionStatus
+} from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import { useNetInfo } from "@react-native-community/netinfo";
@@ -34,7 +38,7 @@ import AppIcon from "../../components/ui/AppIcon";
 import { Button } from "../../components/ui/button";
 import { TimeSince } from "../../components/ui/time-since";
 import Paragraph from "../../components/ui/typography/paragraph";
-import { presentSheet } from "../../services/event-manager";
+import { presentSheet, ToastManager } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SyncStatus, useUserStore } from "../../stores/use-user-store";
@@ -364,22 +368,42 @@ const SettingsUserSection = ({ item }) => {
                   </Paragraph>
                 </TouchableOpacity>
 
-                <Button
-                  title={strings.upgradePlan()}
-                  onPress={() => {
-                    Navigation.navigate("PayWall", {
-                      context: "logged-in",
-                      canGoBack: true
-                    });
-                  }}
-                  type="accent"
-                  fontSize={AppFontSize.xs}
-                  style={{
-                    paddingHorizontal: DefaultAppStyles.GAP_SMALL,
-                    height: "auto",
-                    paddingVertical: DefaultAppStyles.GAP_SMALL
-                  }}
-                />
+                {user.subscription.provider === SubscriptionProvider.PADDLE ||
+                user.subscription.provider ===
+                  SubscriptionProvider.STREETWRITERS ? null : (
+                  <Button
+                    title={
+                      user.subscription.plan !== SubscriptionPlan.FREE
+                        ? strings.changePlan()
+                        : strings.upgradePlan()
+                    }
+                    onPress={() => {
+                      // if (
+                      //   user.subscription.plan !== SubscriptionPlan.FREE &&
+                      //   user.subscription.productId.includes("5year")
+                      // ) {
+                      //   ToastManager.show({
+                      //     message:
+                      //       "You have made a one time purchase. To change your plan please contact support.",
+                      //     type: "info"
+                      //   });
+                      //   return;
+                      // }
+
+                      Navigation.navigate("PayWall", {
+                        context: "logged-in",
+                        canGoBack: true
+                      });
+                    }}
+                    type="accent"
+                    fontSize={AppFontSize.xs}
+                    style={{
+                      paddingHorizontal: DefaultAppStyles.GAP_SMALL,
+                      height: "auto",
+                      paddingVertical: DefaultAppStyles.GAP_SMALL
+                    }}
+                  />
+                )}
               </View>
             </View>
           </View>

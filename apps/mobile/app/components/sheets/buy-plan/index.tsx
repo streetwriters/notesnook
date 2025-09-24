@@ -114,7 +114,7 @@ export const BuyPlan = (props: {
           Config.GITHUB_RELEASE === "true"
             ? "monthly"
             : `notesnook.${props.planId}.monthly`,
-          ...(props.planId === "essential"
+          ...(props.planId === "essential" || pricingPlans.isSubscribed()
             ? []
             : [
                 Config.GITHUB_RELEASE === "true"
@@ -349,6 +349,11 @@ const ProductItem = (props: {
       : (product as RNIap.Product)?.productId
   )?.includes("5");
 
+  const isSubscribed =
+    props.pricingPlans.isSubscribed() &&
+    (props.pricingPlans.user?.subscription.productId ===
+      (product as RNIap.Subscription).productId ||
+      props.pricingPlans.user?.subscription.productId === (product as Plan).id);
   return (
     <TouchableOpacity
       style={{
@@ -390,7 +395,7 @@ const ProductItem = (props: {
             <View
               style={{
                 backgroundColor: colors.static.red,
-                borderRadius: 100,
+                borderRadius: defaultBorderRadius,
                 paddingHorizontal: 6,
                 alignItems: "center",
                 justifyContent: "center"
@@ -407,6 +412,22 @@ const ProductItem = (props: {
                         `notesnook.${props.pricingPlans.currentPlan?.id}.monthly`
                       )) as string
                 )}
+              </Heading>
+            </View>
+          ) : null}
+
+          {isSubscribed ? (
+            <View
+              style={{
+                backgroundColor: colors.primary.accent,
+                borderRadius: defaultBorderRadius,
+                paddingHorizontal: 6,
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              <Heading color={colors.static.white} size={AppFontSize.xs}>
+                {strings.currentPlan()}
               </Heading>
             </View>
           ) : null}
