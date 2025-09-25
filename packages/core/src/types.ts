@@ -610,6 +610,7 @@ export type User = {
     status: SubscriptionStatus;
     trialsAvailed?: SubscriptionPlan[];
     updateURL: string | null;
+    googlePurchaseToken: string | null;
   };
 };
 
