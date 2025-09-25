@@ -44,7 +44,6 @@ import Config from "react-native-config";
 import * as RNIap from "react-native-iap";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { WebView } from "react-native-webview";
 import ToggleSwitch from "toggle-switch-react-native";
 import {
   ANDROID_POLICE_SVG,
@@ -75,7 +74,6 @@ import { IconButton } from "../ui/icon-button";
 import { SvgView } from "../ui/svg";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { ToastManager } from "../../services/event-manager";
 
 const Steps = {
   select: 1,
@@ -606,7 +604,9 @@ After trying all the privacy security oriented note taking apps, for the price a
         <BuyPlan
           planId={pricingPlans.currentPlan?.id as string}
           productId={
-            annualBilling
+            annualBilling &&
+            pricingPlans.user?.subscription.productId !==
+              `notesnook.${pricingPlans?.currentPlan?.id as string}.yearly`
               ? Config.GITHUB_RELEASE === "true"
                 ? "yearly"
                 : `notesnook.${pricingPlans?.currentPlan?.id as string}.yearly`
@@ -626,22 +626,6 @@ After trying all the privacy security oriented note taking apps, for the price a
             setStep(Steps.finish);
           }}
         />
-      ) : step === Steps.buyWeb ? (
-        <View
-          style={{
-            flex: 1
-          }}
-        >
-          <WebView
-            source={{
-              html: `
-             <button onclick="function() { window.ReactNativeWebView.postMessage(JSON.stringify({
-                success:true
-             })) }" /> 
-              `
-            }}
-          />
-        </View>
       ) : step === Steps.finish ? (
         <View
           style={{
@@ -997,11 +981,6 @@ const PricingPlanCard = ({
       });
   }, [pricingPlans, plan, product, WebPlan]);
 
-  console.log(
-    pricingPlans?.user?.subscription.productId,
-    pricingPlans?.currentPlan?.id
-  );
-
   const isSubscribed =
     product?.productId &&
     pricingPlans?.user?.subscription.productId.includes(plan.id) &&
@@ -1011,17 +990,6 @@ const PricingPlanCard = ({
     <TouchableOpacity
       activeOpacity={0.8}
       onPress={() => {
-        if (
-          isSubscribed &&
-          pricingPlans?.user?.subscription.productId === product.productId
-        ) {
-          ToastManager.show({
-            message: "You are already subscribed to this plan.",
-            type: "info"
-          });
-          return;
-        }
-
         pricingPlans?.selectPlan(plan.id);
         setStep(Steps.buy);
       }}
@@ -1054,24 +1022,6 @@ const PricingPlanCard = ({
         >
           <Heading color={colors.static.white} size={AppFontSize.xs}>
             {regionalDiscount?.discount}% Off
-          </Heading>
-        </View>
-      ) : null}
-
-      {isSubscribed ? (
-        <View
-          style={{
-            backgroundColor: colors.primary.accent,
-            borderRadius: defaultBorderRadius,
-            paddingHorizontal: 6,
-            alignItems: "center",
-            justifyContent: "center",
-            height: 25,
-            alignSelf: "flex-start"
-          }}
-        >
-          <Heading color={colors.static.white} size={AppFontSize.xs}>
-            {strings.currentPlan()}
           </Heading>
         </View>
       ) : null}
@@ -1171,6 +1121,25 @@ const PricingPlanCard = ({
                   )}
             </Paragraph>
           )}
+
+          {isSubscribed ? (
+            <View
+              style={{
+                backgroundColor: colors.primary.accent,
+                borderRadius: defaultBorderRadius,
+                paddingHorizontal: 6,
+                alignItems: "center",
+                justifyContent: "center",
+                height: 25,
+                alignSelf: "flex-start",
+                marginTop: DefaultAppStyles.GAP_VERTICAL
+              }}
+            >
+              <Heading color={colors.static.white} size={AppFontSize.xs}>
+                {strings.currentPlan()}
+              </Heading>
+            </View>
+          ) : null}
         </View>
       )}
     </TouchableOpacity>

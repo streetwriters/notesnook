@@ -20,7 +20,7 @@ import { Plan } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import dayjs from "dayjs";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import Config from "react-native-config";
 import * as RNIap from "react-native-iap";
@@ -28,6 +28,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { WebView } from "react-native-webview";
 import { db } from "../../../common/database";
 import usePricingPlans from "../../../hooks/use-pricing-plans";
+import { ToastManager } from "../../../services/event-manager";
 import { openLinkInBrowser } from "../../../utils/functions";
 import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
 import { DefaultAppStyles } from "../../../utils/styles";
@@ -274,7 +275,7 @@ export const BuyPlan = (props: {
           }}
         />
 
-        <Heading
+        <Paragraph
           style={{
             textAlign: "center"
           }}
@@ -284,8 +285,8 @@ export const BuyPlan = (props: {
           {is5YearPlanSelected
             ? strings.oneTimePurchase()
             : strings.cancelAnytimeAlt()}
-        </Heading>
-        <Heading
+        </Paragraph>
+        <Paragraph
           style={{
             textAlign: "center"
           }}
@@ -314,7 +315,7 @@ export const BuyPlan = (props: {
           >
             {strings.subTerms[3]()}
           </Text>
-        </Heading>
+        </Paragraph>
       </View>
     </ScrollView>
   );
@@ -358,11 +359,18 @@ const ProductItem = (props: {
     <TouchableOpacity
       style={{
         flexDirection: "row",
-        gap: 10
+        gap: 10,
+        opacity: isSubscribed ? 0.5 : 1
       }}
       activeOpacity={0.9}
       onPress={() => {
-        if (isSubscribed) return;
+        if (isSubscribed) {
+          ToastManager.show({
+            message: strings.alreadySubscribed(),
+            type: "info"
+          });
+          return;
+        }
         if (!product) return;
         props.pricingPlans.selectProduct(
           isGithubRelease

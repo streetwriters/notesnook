@@ -7140,6 +7140,10 @@ msgstr "Yes, you can cancel your trial anytime. No questions asked."
 msgid "You also agree to recieve marketing emails from us which you can opt-out of from app settings."
 msgstr "You also agree to recieve marketing emails from us which you can opt-out of from app settings."
 
+#: src/strings.ts:2587
+msgid "You are already subscribed to this plan."
+msgstr "You are already subscribed to this plan."
+
 #: src/strings.ts:2238
 msgid "You are editing \"{notebookTitle}\"."
 msgstr "You are editing \"{notebookTitle}\"."

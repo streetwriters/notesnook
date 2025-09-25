@@ -2583,5 +2583,6 @@ Use this if changes from other devices are not appearing on this device. This wi
   thankYouForPurchase: () => t`Thank you for the purchase`,
   changePlan: () => t`Change plan`,
   contactSupportToChangePlan: () =>
-    t`You have made a one time purchase. To change your plan please contact support.`
+    t`You have made a one time purchase. To change your plan please contact support.`,
+  alreadySubscribed: () => t`You are already subscribed to this plan.`
 };
