@@ -154,7 +154,7 @@ const Input = ({
         isError = customValidator && value === customValidator();
         break;
       case "url":
-        isError = isURL(value);
+        isError = isURL(value, { allow_underscores: true });
         break;
       case "phonenumber": {
         const result = phone(value, {
