@@ -379,6 +379,14 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
           sku: product?.productId,
           obfuscatedAccountIdAndroid: user.id,
           obfuscatedProfileIdAndroid: user.id,
+          purchaseTokenAndroid:
+            user.subscription?.plan !== SubscriptionPlan.FREE
+              ? user.subscription?.googlePurchaseToken || undefined
+              : undefined,
+          replacementModeAndroid: user.subscription?.googlePurchaseToken
+            ? RNIap.ReplacementModesAndroid.WITH_TIME_PRORATION
+            : undefined,
+
           /**
            * iOS
            */

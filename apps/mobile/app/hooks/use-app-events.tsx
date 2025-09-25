@@ -225,7 +225,11 @@ const onUserEmailVerified = async () => {
 const onUserSubscriptionStatusChanged = async (
   subscription: User["subscription"]
 ) => {
-  if (!PremiumService.get() && subscription.plan !== SubscriptionPlan.FREE) {
+  if (
+    subscription &&
+    subscription.plan !== SubscriptionPlan.FREE &&
+    subscription.plan !== useUserStore.getState().user?.subscription.plan
+  ) {
     PremiumService.subscriptions.clear();
     useUserStore.setState({
       user: {
@@ -237,6 +241,7 @@ const onUserSubscriptionStatusChanged = async (
   }
   await PremiumService.setPremiumStatus();
   useMessageStore.getState().setAnnouncement();
+  useUserStore.getState().setUser(await db.user.fetchUser());
 };
 
 const onRequestPartialSync = async (

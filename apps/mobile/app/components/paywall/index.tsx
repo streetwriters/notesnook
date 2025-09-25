@@ -75,6 +75,7 @@ import { IconButton } from "../ui/icon-button";
 import { SvgView } from "../ui/svg";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { ToastManager } from "../../services/event-manager";
 
 const Steps = {
   select: 1,
@@ -105,6 +106,8 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
     onBlur: () => true,
     onFocus: () => true
   });
+
+  console.log(pricingPlans.user?.subscription);
 
   useEffect(() => {
     let listener: NativeEventSubscription;
@@ -999,10 +1002,26 @@ const PricingPlanCard = ({
     pricingPlans?.currentPlan?.id
   );
 
+  const isSubscribed =
+    product?.productId &&
+    pricingPlans?.user?.subscription.productId.includes(plan.id) &&
+    pricingPlans.isSubscribed();
+
   return (
     <TouchableOpacity
       activeOpacity={0.8}
       onPress={() => {
+        if (
+          isSubscribed &&
+          pricingPlans?.user?.subscription.productId === product.productId
+        ) {
+          ToastManager.show({
+            message: "You are already subscribed to this plan.",
+            type: "info"
+          });
+          return;
+        }
+
         pricingPlans?.selectPlan(plan.id);
         setStep(Steps.buy);
       }}
@@ -1039,9 +1058,7 @@ const PricingPlanCard = ({
         </View>
       ) : null}
 
-      {product?.productId &&
-      pricingPlans?.user?.subscription.productId.includes(plan.id) &&
-      pricingPlans.isSubscribed() ? (
+      {isSubscribed ? (
         <View
           style={{
             backgroundColor: colors.primary.accent,

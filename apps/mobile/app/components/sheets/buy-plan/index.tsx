@@ -20,7 +20,7 @@ import { Plan } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import dayjs from "dayjs";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import Config from "react-native-config";
 import * as RNIap from "react-native-iap";
@@ -362,6 +362,7 @@ const ProductItem = (props: {
       }}
       activeOpacity={0.9}
       onPress={() => {
+        if (isSubscribed) return;
         if (!product) return;
         props.pricingPlans.selectProduct(
           isGithubRelease

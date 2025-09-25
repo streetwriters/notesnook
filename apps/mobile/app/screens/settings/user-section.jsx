@@ -134,38 +134,6 @@ const SettingsUserSection = ({ item }) => {
   const userProfile = useUserStore((state) => state.profile);
   const used = user?.storageUsed || 0;
   const total = user?.totalStorage || 0;
-  const subscriptionProviderInfo =
-    strings.subscriptionProviderInfo[user?.subscription?.provider];
-
-  const getSubscriptionStatus = () => {
-    if (!user) return strings.neverHesitate();
-    const subscriptionDaysLeft = user && getTimeLeft(user.subscription?.expiry);
-    const expiryDate = dayjs(user?.subscription?.expiry).format(
-      "dddd, MMMM D, YYYY h:mm A"
-    );
-    const startDate = dayjs(user?.subscription?.start).format(
-      "dddd, MMMM D, YYYY h:mm A"
-    );
-
-    if (user.subscription.plan !== SubscriptionPlan.FREE) {
-      const status = user.subscription.status;
-      return status === SubscriptionStatus.TRIAL
-        ? strings.trialEndsOn(
-            dayjs(user?.subscription?.start)
-              .add(user?.subscription?.productId.includes("monthly") ? 7 : 14)
-              .format("dddd, MMMM D, YYYY h:mm A")
-          )
-        : status === SubscriptionStatus.ACTIVE
-        ? strings.subRenewOn(expiryDate)
-        : status === SubscriptionStatus.CANCELED
-        ? strings.subEndsOn(expiryDate)
-        : status === SubscriptionStatus.EXPIRED
-        ? subscriptionDaysLeft.time < -3
-          ? strings.subEnded()
-          : strings.accountDowngradedIn(3)
-        : strings.neverHesitate();
-    }
-  };
 
   return (
     <>
@@ -378,17 +346,17 @@ const SettingsUserSection = ({ item }) => {
                         : strings.upgradePlan()
                     }
                     onPress={() => {
-                      // if (
-                      //   user.subscription.plan !== SubscriptionPlan.FREE &&
-                      //   user.subscription.productId.includes("5year")
-                      // ) {
-                      //   ToastManager.show({
-                      //     message:
-                      //       "You have made a one time purchase. To change your plan please contact support.",
-                      //     type: "info"
-                      //   });
-                      //   return;
-                      // }
+                      if (
+                        user.subscription.plan !== SubscriptionPlan.FREE &&
+                        user.subscription.productId.includes("5year")
+                      ) {
+                        ToastManager.show({
+                          message:
+                            "You have made a one time purchase. To change your plan please contact support.",
+                          type: "info"
+                        });
+                        return;
+                      }
 
                       Navigation.navigate("PayWall", {
                         context: "logged-in",
