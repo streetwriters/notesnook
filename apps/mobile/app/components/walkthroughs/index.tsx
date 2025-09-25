@@ -53,7 +53,6 @@ export const Walkthrough = ({
         justifyContent: "center",
         alignItems: "center",
         padding: DefaultAppStyles.GAP,
-        paddingBottom: DefaultAppStyles.GAP * 2,
         gap: DefaultAppStyles.GAP_VERTICAL
       }}
     >
@@ -117,7 +116,6 @@ export const Walkthrough = ({
       {canSkip ? (
         <Button
           style={{
-            marginTop: DefaultAppStyles.GAP,
             paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
           }}
           textStyle={{
@@ -155,13 +153,13 @@ Walkthrough.present = async (
   canSkip = true,
   nopersist?: boolean
 ) => {
-  if (!nopersist) {
-    if (!walkthroughState || Object.keys(walkthroughState).length === 0) {
-      await Walkthrough.init();
-    }
-    if (walkthroughState[id]) return;
-    Walkthrough.update(id);
-  }
+  // if (!nopersist) {
+  //   if (!walkthroughState || Object.keys(walkthroughState).length === 0) {
+  //     await Walkthrough.init();
+  //   }
+  //   if (walkthroughState[id]) return;
+  //   Walkthrough.update(id);
+  // }
   const walkthrough = walkthroughs[id]();
   if (!walkthrough) return;
   presentSheet({
