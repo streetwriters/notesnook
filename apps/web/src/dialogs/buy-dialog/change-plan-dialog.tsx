@@ -24,7 +24,7 @@ import { getAllPlans, PERIOD_METADATA, PLAN_METADATA } from "./plans";
 import { SelectComponent } from "../settings";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { db } from "../../common/db";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { showToast } from "../../utils/toast";
 import { usePromise } from "@notesnook/common";
@@ -34,6 +34,47 @@ import { getCurrencySymbol } from "../../common/currencies";
 
 export type ChangePlanDialogProps = {
   onClose: () => void;
+  selectedPlan?: string;
+};
+
+type ChangePreviewResponse = {
+  update_summary?: {
+    result: {
+      action: "charge";
+    };
+    charge: {
+      amount: string;
+    };
+    credit: { amount: string };
+  };
+  immediate_transaction?: { details: Details };
+  recurring_transaction_details: Details;
+  next_transaction: {
+    billing_period: BillingPeriod;
+    details: Details;
+  };
+  currency_code: string;
+  billing_cycle: {
+    interval: "month" | "year";
+  };
+};
+type BillingPeriod = {
+  ends_at: string;
+  starts_at: string;
+};
+type Totals = {
+  total: number;
+  balance: number;
+};
+type Details = {
+  line_items: LineItem[];
+  totals: Totals;
+};
+type LineItem = {
+  proration: Proration;
+};
+type Proration = {
+  billing_period: BillingPeriod;
 };
 
 export const ChangePlanDialog = DialogManager.register(
@@ -44,8 +85,127 @@ export const ChangePlanDialog = DialogManager.register(
     const [changeSummary, setChangeSummary] = useState<
       { title: string; amount: string }[]
     >([]);
-    const [selectedPlan, setSelectedPlan] = useState<string>();
+    const [selectedPlan, setSelectedPlan] = useState(props.selectedPlan);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<Error>();
+
+    const changePlan = useCallback(async (id: string) => {
+      setLoading(true);
+      setChangeSummary([]);
+      try {
+        const response = (await db.subscriptions.preview(
+          id
+        )) as ChangePreviewResponse | null;
+        if (!response) return;
+
+        const {
+          update_summary,
+          immediate_transaction,
+          recurring_transaction_details,
+          next_transaction,
+          currency_code: currencyCode,
+          billing_cycle
+        } = response;
+        const proration = immediate_transaction?.details.line_items.find(
+          (l) => !!l.proration
+        )?.proration;
+        const recurringBalance = recurring_transaction_details.totals.balance;
+        const recurringTotal = recurring_transaction_details.totals.total;
+
+        const planPrice = update_summary
+          ? parseInt(update_summary?.charge.amount || "0")
+          : recurringTotal;
+
+        const balance =
+          recurringTotal -
+          recurringBalance +
+          parseInt(update_summary?.credit.amount || "0") * -1;
+        const charge = planPrice - balance;
+
+        const summary: { title: string; amount: string }[] = [
+          {
+            title: "Plan price",
+            amount: formatPrice(planPrice, currencyCode)
+          },
+          {
+            title: "Balance from current subscription",
+            amount: formatPrice(balance, currencyCode)
+          }
+        ];
+        if (!update_summary) {
+          const chargeStartDate = dayjs(
+            next_transaction.billing_period.starts_at
+          );
+          const amount = next_transaction.details.totals.total;
+          summary.push({
+            title: `Charged ${chargeStartDate.format("YYYY-MM-DD")}`,
+            amount: formatPrice(amount, currencyCode)
+          });
+        } else if (update_summary.result.action === "charge") {
+          summary.push(
+            {
+              title: "Charged today",
+              amount: formatPrice(charge, currencyCode)
+            },
+            {
+              title: `Charged ${dayjs(
+                next_transaction.billing_period.starts_at
+              ).format("YYYY-MM-DD")}`,
+              amount: formatPrice(recurringTotal, currencyCode)
+            }
+          );
+        } else {
+          const nextCharge = recurringTotal - charge;
+          summary.push({
+            title: "Charged today",
+            amount: formatPrice(0, currencyCode)
+          });
+          if (nextCharge > 0 && proration) {
+            summary.push({
+              title: `Charged ${dayjs(proration.billing_period.ends_at).format(
+                "YYYY-MM-DD"
+              )}`,
+              amount: formatPrice(nextCharge, currencyCode)
+            });
+            summary.push({
+              title: `Charged ${dayjs(proration.billing_period.ends_at)
+                .add(1, billing_cycle.interval)
+                .format("YYYY-MM-DD")}`,
+              amount: formatPrice(planPrice, currencyCode)
+            });
+          } else {
+            const freeIntervals = Math.floor(charge / planPrice);
+            const amount = planPrice - (charge - planPrice * freeIntervals);
+            const chargeStartDate = dayjs(
+              next_transaction.billing_period.starts_at
+            ).add(freeIntervals, billing_cycle.interval);
+            summary.push(
+              {
+                title: `Charged ${chargeStartDate.format("YYYY-MM-DD")}`,
+                amount: formatPrice(amount, currencyCode)
+              },
+              {
+                title: `Charged ${chargeStartDate
+                  .add(1, billing_cycle.interval)
+                  .format("YYYY-MM-DD")}`,
+                amount: formatPrice(planPrice, currencyCode)
+              }
+            );
+          }
+        }
+        setChangeSummary(summary);
+      } catch (e) {
+        console.error(e);
+        setError(e as Error);
+      } finally {
+        setLoading(false);
+      }
+    }, []);
+
+    useEffect(() => {
+      if (!props.selectedPlan) return;
+      changePlan(props.selectedPlan);
+    }, [props.selectedPlan, changePlan]);
 
     return (
       <BaseDialog
@@ -61,6 +221,10 @@ export const ChangePlanDialog = DialogManager.register(
             setLoading(true);
             try {
               await db.subscriptions.change(selectedPlan);
+              showToast(
+                "success",
+                "Subscription changed successfully. It might take a couple of minutes for the changes to reflect in the app."
+              );
               onClose();
             } catch (e) {
               showToast("error", (e as Error).message);
@@ -74,7 +238,9 @@ export const ChangePlanDialog = DialogManager.register(
           onClick: onClose
         }}
       >
-        {plans.status === "rejected" ? (
+        {error ? (
+          <ErrorText error={error} />
+        ) : plans.status === "rejected" ? (
           <ErrorText error={plans.reason} />
         ) : (
           <Flex sx={{ flexDirection: "column" }}>
@@ -97,103 +263,7 @@ export const ChangePlanDialog = DialogManager.register(
                     const plan = plans.value?.find((p) => p.id === id);
                     if (!plan) return;
                     setSelectedPlan(id);
-                    setLoading(true);
-                    setChangeSummary([]);
-                    try {
-                      const {
-                        data: {
-                          update_summary,
-                          immediate_transaction,
-                          recurring_transaction_details,
-                          next_transaction,
-                          currency_code: currencyCode,
-                          billing_cycle
-                        }
-                      } = await db.subscriptions.preview(id);
-                      const proration =
-                        immediate_transaction.details.line_items.find(
-                          (l: any) => !!l.proration
-                        ).proration;
-                      const planPrice = parseInt(update_summary.charge.amount);
-                      const balance =
-                        recurring_transaction_details.totals.total -
-                        recurring_transaction_details.totals.balance +
-                        update_summary.credit.amount * -1;
-                      const charge = planPrice - balance;
-                      const recurringTotal = parseInt(
-                        recurring_transaction_details.totals.total
-                      );
-                      const summary: { title: string; amount: string }[] = [
-                        {
-                          title: "Plan price",
-                          amount: formatPrice(planPrice, currencyCode)
-                        },
-                        {
-                          title: "Balance from current subscription",
-                          amount: formatPrice(balance, currencyCode)
-                        }
-                      ];
-                      if (update_summary.result.action === "charge") {
-                        summary.push(
-                          {
-                            title: "Charged today",
-                            amount: formatPrice(charge, currencyCode)
-                          },
-                          {
-                            title: `Charged ${dayjs(
-                              next_transaction.billing_period.starts_at
-                            ).format("YYYY-MM-DD")}`,
-                            amount: formatPrice(recurringTotal, currencyCode)
-                          }
-                        );
-                      } else {
-                        const nextCharge = recurringTotal - charge;
-                        summary.push({
-                          title: "Charged today",
-                          amount: formatPrice(0, currencyCode)
-                        });
-                        if (nextCharge > 0 && proration) {
-                          summary.push({
-                            title: `Charged ${dayjs(
-                              proration.billing_period.ends_at
-                            ).format("YYYY-MM-DD")}`,
-                            amount: formatPrice(nextCharge, currencyCode)
-                          });
-                          summary.push({
-                            title: `Charged ${dayjs(
-                              proration.billing_period.ends_at
-                            )
-                              .add(1, billing_cycle.interval)
-                              .format("YYYY-MM-DD")}`,
-                            amount: formatPrice(planPrice, currencyCode)
-                          });
-                        } else {
-                          const freeIntervals = Math.floor(charge / planPrice);
-                          const amount =
-                            planPrice - (charge - planPrice * freeIntervals);
-                          const chargeStartDate = dayjs(
-                            next_transaction.billing_period.starts_at
-                          ).add(freeIntervals, billing_cycle.interval);
-                          summary.push(
-                            {
-                              title: `Charged ${chargeStartDate.format(
-                                "YYYY-MM-DD"
-                              )}`,
-                              amount: formatPrice(amount, currencyCode)
-                            },
-                            {
-                              title: `Charged ${chargeStartDate
-                                .add(1, billing_cycle.interval)
-                                .format("YYYY-MM-DD")}`,
-                              amount: formatPrice(planPrice, currencyCode)
-                            }
-                          );
-                        }
-                      }
-                      setChangeSummary(summary);
-                    } finally {
-                      setLoading(false);
-                    }
+                    await changePlan(id);
                   }}
                 />
               )}
@@ -215,10 +285,6 @@ export const ChangePlanDialog = DialogManager.register(
                     </Text>
                   </Flex>
                 ))}
-                <Text variant="subBody">
-                  Note: These are estimated amounts. The real amounts could
-                  differ slightly.
-                </Text>
               </Flex>
             ) : null}
           </Flex>

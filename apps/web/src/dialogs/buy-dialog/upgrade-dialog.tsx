@@ -33,6 +33,9 @@ import { useCheckoutStore } from "./store";
 import { BuyDialog } from "./buy-dialog";
 import { ErrorText } from "../../components/error-text";
 import { getCurrencySymbol } from "../../common/currencies";
+import { useStore as useUserStore } from "../../stores/user-store";
+import { ChangePlanDialog } from "./change-plan-dialog";
+import { Loading } from "../../components/icons";
 
 export type UpgradeDialogProps = {
   feature: FeatureResult<any>;
@@ -44,18 +47,17 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
 ) {
   const { onClose, feature } = props;
   const { plans } = usePlans();
-  const plan = plans.find(
+  const plan = plans?.find(
     (p) =>
-      (p.plan === feature.availableOn || SubscriptionPlan.PRO) &&
+      p.plan === (feature.availableOn || SubscriptionPlan.PRO) &&
       p.period === "yearly"
-  )!;
-  const { title } = getFeature(feature.id);
+  );
+  const metadata = PLAN_METADATA[feature.availableOn || SubscriptionPlan.PRO];
+
   return (
     <BaseDialog
       title={`Unlock this feature today`}
-      description={`Upgrade to the ${
-        PLAN_METADATA[plan?.plan].title
-      } plan to use this feature`}
+      description={`Upgrade to the ${metadata.title} plan to use this feature`}
       isOpen={true}
       onClose={onClose}
       textAlignment="center"
@@ -83,7 +85,7 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
           }}
         >
           <Text variant="body" sx={{ fontWeight: "bold", color: "heading" }}>
-            {PLAN_METADATA[plan?.plan].title} plan
+            {metadata.title} plan
           </Text>
           {[
             getFeature("storage"),
@@ -94,7 +96,9 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
             getFeature("activeReminders")
           ].map((f) => {
             const caption =
-              f.availability[planToAvailability(plan.plan)].caption;
+              f.availability[
+                planToAvailability(feature.availableOn || SubscriptionPlan.PRO)
+              ].caption;
             return (
               <Flex key={f.id} sx={{ justifyContent: "space-between" }}>
                 <Text
@@ -126,15 +130,26 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
         </Text>
         <Button
           variant="accent"
+          disabled={!plan}
           onClick={() => {
+            if (!plan) return;
             onClose();
-            useCheckoutStore.getState().selectPlan(plan);
-            BuyDialog.show({});
+            const subscription = useUserStore.getState().user?.subscription;
+            if (!subscription || subscription.plan === SubscriptionPlan.FREE) {
+              useCheckoutStore.getState().selectPlan(plan);
+              BuyDialog.show({});
+            } else ChangePlanDialog.show({ selectedPlan: plan.id });
           }}
         >
-          Start your free trial {getCurrencySymbol(plan.currency)}
-          {plan.price.gross}
-          {formatRecurringPeriodShort(plan.period)}
+          {plan ? (
+            <>
+              Upgrade to {metadata.title} {getCurrencySymbol(plan.currency)}
+              {plan.price.gross}
+              {formatRecurringPeriodShort(plan.period)}
+            </>
+          ) : (
+            <Loading size={16} color="accentForeground" />
+          )}
         </Button>
         <Button
           variant="tertiary"
