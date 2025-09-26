@@ -246,6 +246,13 @@ export const SubscriptionSettings: SettingsGroup[] = [
       {
         key: "billing-history",
         title: strings.billingHistory(),
+        isHidden: () => {
+          const user = useUserStore.getState().user;
+          return (
+            user?.subscription.provider !== SubscriptionProvider.PADDLE ||
+            !isUserSubscribed(user)
+          );
+        },
         components: [{ type: "custom", component: BillingHistory }]
       }
     ]
