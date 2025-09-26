@@ -255,7 +255,12 @@ function getPricingInfo(
       period: options.period,
       subtotal: formatPrice(data.totals.subtotal, data.currency_code),
       total: formatPrice(data.totals.total, data.currency_code),
-      tax: formatPrice(data.totals.tax, data.currency_code)
+      tax: formatPrice(data.totals.tax, data.currency_code),
+      trial_period: price.trial_period
+        ? {
+            frequency: price.trial_period.frequency
+          }
+        : undefined
     }
   };
 }
