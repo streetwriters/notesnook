@@ -173,7 +173,10 @@ export function BillingHistory() {
                       />
                     </Text>
                     <Text as="td" variant="body">
-                      {getFormattedDate(transaction.billed_at, "date")}
+                      {getFormattedDate(
+                        transaction.billed_at || transaction.created_at,
+                        "date"
+                      )}
                     </Text>
                     <Text as="td" variant="body">
                       {(transaction.details.totals.grand_total / 100).toFixed(
