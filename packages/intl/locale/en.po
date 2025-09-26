@@ -5968,6 +5968,10 @@ msgstr "Source code"
 msgid "Spaces"
 msgstr "Spaces"
 
+#: src/strings.ts:2588
+msgid "Special Offer"
+msgstr "Special Offer"
+
 #: src/strings.ts:2125
 msgid "Spell check"
 msgstr "Spell check"

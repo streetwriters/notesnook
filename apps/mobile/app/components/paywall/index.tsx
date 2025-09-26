@@ -85,18 +85,19 @@ const Steps = {
 const PayWall = (props: NavigationProps<"PayWall">) => {
   const isGithubRelease = Config.GITHUB_RELEASE === "true";
   const routeParams = props.route.params;
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const isTablet = width > 600;
-  const [webUrl, setWebUrl] = useState("https://notesnook.com");
   const { colors } = useThemeColors();
   const pricingPlans = usePricingPlans({
     planId: routeParams.state?.planId,
-    productId: routeParams.state?.productId
+    productId: routeParams.state?.productId,
+    onBuy: () => {
+      setStep(Steps.finish);
+    }
   });
   const [annualBilling, setAnnualBilling] = useState(
     routeParams.state ? routeParams.state.billingType === "annual" : true
   );
-  const [ctaButtonVisible, setCtaButtonVisible] = useState(false);
   const [step, setStep] = useState(
     routeParams.state ? Steps.buy : Steps.select
   );
@@ -105,7 +106,24 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
     onFocus: () => true
   });
 
-  console.log(pricingPlans.user?.subscription);
+  useEffect(() => {
+    if (routeParams.state) {
+      if (routeParams.state?.planId) {
+        pricingPlans.selectPlan(
+          routeParams.state?.planId,
+          routeParams.state?.productId
+        );
+        console.log(
+          "selectPlan",
+          routeParams.state?.planId,
+          routeParams.state?.productId,
+          (pricingPlans.selectedProduct as any).productId
+        );
+      }
+      setStep(Steps.buy);
+      console.log("Buy step");
+    }
+  }, [routeParams.state]);
 
   useEffect(() => {
     let listener: NativeEventSubscription;
@@ -212,13 +230,6 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
             }}
             keyboardDismissMode="none"
             keyboardShouldPersistTaps="always"
-            onScroll={(event) => {
-              if (event.nativeEvent.contentOffset.y > 1000) {
-                setCtaButtonVisible(true);
-              } else {
-                setCtaButtonVisible(false);
-              }
-            }}
           >
             <View
               style={{
@@ -603,28 +614,8 @@ After trying all the privacy security oriented note taking apps, for the price a
       ) : step === Steps.buy ? (
         <BuyPlan
           planId={pricingPlans.currentPlan?.id as string}
-          productId={
-            annualBilling &&
-            pricingPlans.user?.subscription.productId !==
-              `notesnook.${pricingPlans?.currentPlan?.id as string}.yearly`
-              ? Config.GITHUB_RELEASE === "true"
-                ? "yearly"
-                : `notesnook.${pricingPlans?.currentPlan?.id as string}.yearly`
-              : Config.GITHUB_RELEASE === "true"
-              ? "monthly"
-              : `notesnook.${pricingPlans?.currentPlan?.id as string}.monthly`
-          }
           canActivateTrial={pricingPlans.userCanRequestTrial}
-          goBack={() => {
-            setStep(Steps.select);
-          }}
-          goNext={(product) => {
-            pricingPlans.selectProduct(
-              (product as RNIap.Subscription).productId ||
-                (product as Plan).period
-            );
-            setStep(Steps.finish);
-          }}
+          pricingPlans={pricingPlans}
         />
       ) : step === Steps.finish ? (
         <View
@@ -949,14 +940,15 @@ const PricingPlanCard = ({
   const { colors } = useThemeColors();
   const isFreePlan = plan.id === "free";
   const [regionalDiscount, setRegionaDiscount] = useState<SKUResponse>();
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const isTablet = width > 600;
 
   const product =
     plan.subscriptions?.[
-      `notesnook.${plan.id}.${annualBilling ? "yearly" : "monthly"}`
+      regionalDiscount?.sku ||
+        `notesnook.${plan.id}.${annualBilling ? "yearly" : "monthly"}`
     ];
-
+  console.log(regionalDiscount?.sku);
   const price = pricingPlans?.getPrice(
     product as RNIap.Subscription,
     pricingPlans.hasTrialOffer(plan.id, product?.productId) ? 1 : 0,
@@ -974,23 +966,41 @@ const PricingPlanCard = ({
         plan.id,
         pricingPlans.isGithubRelease
           ? (WebPlan?.period as string)
-          : (product?.productId as string)
+          : `notesnook.${plan.id}.${annualBilling ? "yearly" : "monthly"}`
       )
       .then((value) => {
         setRegionaDiscount(value);
       });
-  }, [pricingPlans, plan, product, WebPlan]);
+  }, []);
 
   const isSubscribed =
     product?.productId &&
-    pricingPlans?.user?.subscription.productId.includes(plan.id) &&
+    pricingPlans?.user?.subscription?.productId?.includes(plan.id) &&
     pricingPlans.isSubscribed();
 
   return (
     <TouchableOpacity
       activeOpacity={0.8}
       onPress={() => {
-        pricingPlans?.selectPlan(plan.id);
+        const currentPlanSubscribed =
+          pricingPlans?.user?.subscription?.productId ===
+            (product as RNIap.Subscription)?.productId ||
+          pricingPlans?.user?.subscription?.productId.startsWith(
+            (product as RNIap.Subscription)?.productId
+          );
+
+        pricingPlans?.selectPlan(
+          plan.id,
+          currentPlanSubscribed
+            ? `notesnook.${plan.id}.${
+                !(product as RNIap.Subscription)?.productId.includes("yearly")
+                  ? "yearly"
+                  : "monthly"
+              }`
+            : pricingPlans.isGithubRelease
+            ? (WebPlan?.period as string)
+            : (product?.productId as string)
+        );
         setStep(Steps.buy);
       }}
       style={{
@@ -1021,7 +1031,8 @@ const PricingPlanCard = ({
           }}
         >
           <Heading color={colors.static.white} size={AppFontSize.xs}>
-            {regionalDiscount?.discount}% Off
+            {strings.specialOffer()}{" "}
+            {strings.percentOff(`${regionalDiscount?.discount}`)}
           </Heading>
         </View>
       ) : null}

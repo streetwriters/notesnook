@@ -18,7 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { formatBytes } from "@notesnook/common";
-import { SubscriptionPlan, SubscriptionStatus, User } from "@notesnook/core";
+import {
+  SubscriptionPlan,
+  SubscriptionProvider,
+  SubscriptionStatus,
+  User
+} from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import notifee from "@notifee/react-native";
 import Clipboard from "@react-native-clipboard/clipboard";
@@ -29,7 +34,7 @@ import { getVersion } from "react-native-device-info";
 import * as RNIap from "react-native-iap";
 import { enabled } from "react-native-privacy-snapshot";
 import ScreenGuardModule from "react-native-screenguard";
-import { db } from "../../common/database";
+import { DatabaseLogger, db } from "../../common/database";
 import filesystem from "../../common/filesystem";
 import { presentDialog } from "../../components/dialog/functions";
 import { AppLockPassword } from "../../components/dialogs/applock-password";
@@ -92,11 +97,21 @@ export const settingsGroups: SettingSection[] = [
           const user = useUserStore.getState().user;
           if (!user) return;
           const subscriptionProviderInfo =
-            strings.subscriptionProviderInfo[user?.subscription.provider];
-          presentSheet({
-            title: subscriptionProviderInfo.title(),
-            paragraph: subscriptionProviderInfo.desc()
-          });
+            strings.subscriptionProviderInfo[user?.subscription?.provider];
+
+          if (
+            user.subscription?.provider === SubscriptionProvider.GOOGLE ||
+            user.subscription?.provider === SubscriptionProvider.APPLE
+          ) {
+            RNIap.deepLinkToSubscriptions({
+              sku: user?.subscription.productId
+            });
+          } else {
+            presentSheet({
+              title: subscriptionProviderInfo.title(),
+              paragraph: subscriptionProviderInfo.desc()
+            });
+          }
         },
         description: (current) => {
           const user = current as User;
@@ -143,7 +158,7 @@ export const settingsGroups: SettingSection[] = [
         },
         useHook: () =>
           useUserStore(
-            (state) => state.user?.subscription.plan === SubscriptionPlan.FREE
+            (state) => state.user?.subscription?.plan === SubscriptionPlan.FREE
           ),
         icon: "gift",
         modifer: () => {
@@ -423,6 +438,7 @@ export const settingsGroups: SettingSection[] = [
                 paragraph: strings.deleteAccountDesc(),
                 positiveType: "errorShade",
                 input: true,
+                secureTextEntry: true,
                 inputPlaceholder: strings.enterAccountPassword(),
                 positiveText: strings.delete(),
                 positivePress: async (value) => {
@@ -430,16 +446,28 @@ export const settingsGroups: SettingSection[] = [
                     const verified = await db.user?.verifyPassword(value);
                     if (verified) {
                       setTimeout(async () => {
-                        startProgress({
-                          title: "Deleting account",
-                          paragraph: "Please wait while we delete your account"
-                        });
-                        Navigation.navigate("Notes");
-                        await db.user?.deleteUser(value);
-                        await BiometricService.resetCredentials();
-                        SettingsService.set({
-                          introCompleted: true
-                        });
+                        try {
+                          startProgress({
+                            title: "Deleting account",
+                            paragraph:
+                              "Please wait while we delete your account"
+                          });
+                          await db.user?.deleteUser(value);
+                          DatabaseLogger.info("User account deleted");
+                          Navigation.navigate("Notes");
+                          await BiometricService.resetCredentials();
+                          SettingsService.set({
+                            introCompleted: true
+                          });
+                        } catch (e) {
+                          endProgress();
+                          DatabaseLogger.error(e);
+                          ToastManager.error(
+                            e as Error,
+                            strings.failedToDeleteAccount(),
+                            "global"
+                          );
+                        }
                       }, 300);
                     } else {
                       ToastManager.show({
@@ -448,11 +476,7 @@ export const settingsGroups: SettingSection[] = [
                         context: "global"
                       });
                     }
-
-                    endProgress();
                   } catch (e) {
-                    endProgress();
-
                     ToastManager.error(
                       e as Error,
                       strings.failedToDeleteAccount(),

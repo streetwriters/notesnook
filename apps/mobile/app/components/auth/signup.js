@@ -206,6 +206,7 @@ export const Signup = ({ changeMode, welcome }) => {
                   onChangeText={(value) => {
                     email.current = value;
                   }}
+                  defaultValue={email.current}
                   testID="input.email"
                   onErrorCheck={(e) => setError(e)}
                   returnKeyLabel="Next"
@@ -228,6 +229,7 @@ export const Signup = ({ changeMode, welcome }) => {
                   onChangeText={(value) => {
                     password.current = value;
                   }}
+                  defaultValue={password.current}
                   testID="input.password"
                   onErrorCheck={(e) => setError(e)}
                   returnKeyLabel="Next"
@@ -250,6 +252,7 @@ export const Signup = ({ changeMode, welcome }) => {
                   onChangeText={(value) => {
                     confirmPassword.current = value;
                   }}
+                  defaultValue={confirmPassword.current}
                   testID="input.confirmPassword"
                   onErrorCheck={(e) => setError(e)}
                   returnKeyLabel="Signup"

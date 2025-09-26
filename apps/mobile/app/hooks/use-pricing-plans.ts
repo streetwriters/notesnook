@@ -16,12 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import {
-  Plan,
-  SKUResponse,
-  SubscriptionPlan,
-  SubscriptionPlanId
-} from "@notesnook/core";
+import { Plan, SubscriptionPlan, SubscriptionPlanId } from "@notesnook/core";
 import { useEffect, useState } from "react";
 import { Platform } from "react-native";
 import Config from "react-native-config";
@@ -99,10 +94,7 @@ const pricingPlans: PricingPlan[] = [
     description: "Unlocks essential features for personal use",
     subscriptionSkuList: [
       "notesnook.essential.monthly",
-      "notesnook.essential.yearly",
-      // no trial
-      "notesnook.essential.monthly.nt",
-      "notesnook.essential.yearly.nt"
+      "notesnook.essential.yearly"
     ],
     trialSupported: true,
     productSkuList: []
@@ -115,14 +107,7 @@ const pricingPlans: PricingPlan[] = [
       "notesnook.pro.monthly",
       "notesnook.pro.yearly",
       "notesnook.pro.yearly.tier2",
-      "notesnook.pro.yearly.tier3",
-      // no trial
-      "notesnook.pro.monthly.nt",
-      "notesnook.pro.yearly.nt",
-      "notesnook.pro.monthly.tier2.nt",
-      "notesnook.pro.yearly.tier2.nt",
-      "notesnook.pro.monthly.tier3.nt",
-      "notesnook.pro.yearly.tier3.nt"
+      "notesnook.pro.yearly.tier3"
     ],
     productSkuList: ["notesnook.pro.5year"],
     trialSupported: true,
@@ -134,10 +119,7 @@ const pricingPlans: PricingPlan[] = [
     description: "Become a believer and support the project",
     subscriptionSkuList: [
       "notesnook.believer.monthly",
-      "notesnook.believer.yearly",
-      // no trial
-      "notesnook.believer.monthly.nt",
-      "notesnook.believer.yearly.nt"
+      "notesnook.believer.yearly"
     ],
     productSkuList: ["notesnook.believer.5year"],
     trialSupported: true
@@ -188,7 +170,6 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
   const [cancelPromo, setCancelPromo] = useState(false);
   const [userCanRequestTrial, setUserCanRequestTrial] = useState(false);
   const [webPricingPlans, setWebPricingPlans] = useState<Plan[]>([]);
-  const [regionalDiscount, setRegionalDiscount] = useState<SKUResponse>();
 
   const getProduct = (planId: string, skuId: string) => {
     if (isGithubRelease)
@@ -680,62 +661,19 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
         );
   };
 
-  // const getPricingPhases = (product: RNIap.Subscription) => {
-  //   if (!product) return null;
-
-  //   if (Platform.OS === "android") {
-  //     const offer = (product as RNIap.SubscriptionAndroid)
-  //     ?.subscriptionOfferDetails?.[0];
-
-  //     return offer.pricingPhases?.pricingPhaseList?.map((phase, index) => {
-
-  //       return {
-  //         localizedPrice: phase.formattedPrice,
-  //         price: parseInt(phase.priceAmountMicros) / 1000000,
-  //         monthlyFormattedPrice: getPrice(product, index, offer?.pricingPhases?.pricingPhaseList?.[1].billingPeriod.endsWith("Y"),
-  //       }
-  //     })
-  //   } else {
-  //     return (product as RNIap.SubscriptionIOS)?.pricingPhases;
-  //   }
-
-  // }
-
-  useEffect(() => {
-    db.pricing
-      .sku(
-        isGithubRelease
-          ? "paddle"
-          : Platform.OS === "android"
-          ? "google"
-          : "apple",
-        selectedProductSku.includes("5")
-          ? "5-year"
-          : selectedProductSku.includes("year")
-          ? "yearly"
-          : "monthly",
-        currentPlan as SubscriptionPlanId
-      )
-      .then((sku) => setRegionalDiscount(sku))
-      .catch((e) => console.log(e));
-  }, [currentPlan, selectedProductSku]);
-
   async function getRegionalDiscount(plan: string, productId: string) {
+    if (productId !== "notesnook.pro.yearly") {
+      return;
+    }
     try {
       return await db.pricing.sku(
-        isGithubRelease
-          ? "paddle"
-          : Platform.OS === "android"
-          ? "google"
-          : "apple",
-        productId.includes("5")
-          ? "5-year"
-          : productId.includes("year")
-          ? "yearly"
-          : "monthly",
+        Platform.OS === "android" ? "google" : "apple",
+        "yearly",
         plan as SubscriptionPlanId
       );
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   return {
@@ -744,12 +682,17 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
     getStandardPrice: getLocalizedPrice,
     loadingPlans,
     loading,
-    selectPlan: (planId: string) => {
+    selectPlan: (planId: string, productId?: string) => {
       setCurrentPlan(planId);
-      const product = plans.find((p) => p.id === planId)
-        ?.subscriptionSkuList?.[0];
-      if (product) {
-        setSelectedProductSku(product);
+      if (productId) {
+        console.log(productId, "productId");
+        setSelectedProductSku(productId);
+      } else {
+        const product = plans.find((p) => p.id === planId)
+          ?.subscriptionSkuList?.[0];
+        if (product) {
+          setSelectedProductSku(product);
+        }
       }
 
       setIsPromoOffer(false);
@@ -787,10 +730,10 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
         (plan) => plan.plan === planIndex && plan.period === period
       );
     },
-    regionalDiscount,
     getRegionalDiscount,
     isGithubRelease: isGithubRelease,
-    isSubscribed: () => user?.subscription.plan !== SubscriptionPlan.FREE
+    isSubscribed: () => user?.subscription?.plan !== SubscriptionPlan.FREE,
+    finish: () => options?.onBuy?.()
   };
 };
 

@@ -5934,6 +5934,10 @@ msgstr ""
 msgid "Spaces"
 msgstr ""
 
+#: src/strings.ts:2588
+msgid "Special Offer"
+msgstr ""
+
 #: src/strings.ts:2125
 msgid "Spell check"
 msgstr ""

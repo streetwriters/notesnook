@@ -8,18 +8,22 @@ import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import { useEffect, useState } from "react";
 import { View } from "react-native";
+import { ScrollView } from "react-native-actions-sheet";
+import { eSendEvent, ToastManager } from "../../../services/event-manager";
+import Navigation from "../../../services/navigation";
+import { eCloseSheet } from "../../../utils/events";
 import { AppFontSize } from "../../../utils/size";
 import { DefaultAppStyles } from "../../../utils/styles";
-import Paragraph from "../../ui/typography/paragraph";
-import Heading from "../../ui/typography/heading";
-import Navigation from "../../../services/navigation";
 import { Button } from "../../ui/button";
-import { eSendEvent } from "../../../services/event-manager";
-import { eCloseSheet } from "../../../utils/events";
+import Heading from "../../ui/typography/heading";
+import Paragraph from "../../ui/typography/paragraph";
+import { SubscriptionPlan, SubscriptionProvider } from "@notesnook/core";
+import { useUserStore } from "../../../stores/use-user-store";
 
 export function PlanLimits() {
   const { colors } = useThemeColors();
   const [featureUsage, setFeatureUsage] = useState<FeatureUsage[]>();
+  const user = useUserStore((state) => state.user);
 
   useEffect(() => {
     getFeaturesUsage()
@@ -30,11 +34,13 @@ export function PlanLimits() {
   }, []);
 
   return (
-    <View
+    <ScrollView
       style={{
         paddingHorizontal: DefaultAppStyles.GAP,
         width: "100%",
-        paddingVertical: DefaultAppStyles.GAP_VERTICAL,
+        paddingVertical: DefaultAppStyles.GAP_VERTICAL
+      }}
+      contentContainerStyle={{
         gap: DefaultAppStyles.GAP_VERTICAL
       }}
     >
@@ -71,22 +77,38 @@ export function PlanLimits() {
         </View>
       ))}
 
-      <Button
-        title={strings.upgradePlan()}
-        onPress={() => {
-          Navigation.navigate("PayWall", {
-            context: "logged-in",
-            canGoBack: true
-          });
-          eSendEvent(eCloseSheet);
-        }}
-        type="accent"
-        fontSize={AppFontSize.xs}
-        style={{
-          width: "100%",
-          marginTop: DefaultAppStyles.GAP_VERTICAL
-        }}
-      />
-    </View>
+      {user?.subscription.provider === SubscriptionProvider.PADDLE ||
+      user?.subscription.provider ===
+        SubscriptionProvider.STREETWRITERS ? null : (
+        <Button
+          title={strings.changePlan()}
+          onPress={() => {
+            if (
+              user?.subscription.plan !== SubscriptionPlan.FREE &&
+              user?.subscription.productId.includes("5year")
+            ) {
+              ToastManager.show({
+                message:
+                  "You have made a one time purchase. To change your plan please contact support.",
+                type: "info",
+                context: "local"
+              });
+              return;
+            }
+            Navigation.navigate("PayWall", {
+              context: "logged-in",
+              canGoBack: true
+            });
+            eSendEvent(eCloseSheet);
+          }}
+          type="accent"
+          fontSize={AppFontSize.xs}
+          style={{
+            width: "100%",
+            marginTop: DefaultAppStyles.GAP_VERTICAL
+          }}
+        />
+      )}
+    </ScrollView>
   );
 }

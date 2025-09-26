@@ -228,7 +228,7 @@ const onUserSubscriptionStatusChanged = async (
   if (
     subscription &&
     subscription.plan !== SubscriptionPlan.FREE &&
-    subscription.plan !== useUserStore.getState().user?.subscription.plan
+    subscription.plan !== useUserStore.getState().user?.subscription?.plan
   ) {
     PremiumService.subscriptions.clear();
     useUserStore.setState({

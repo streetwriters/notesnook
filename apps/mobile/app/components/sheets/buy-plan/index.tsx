@@ -16,11 +16,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { Plan } from "@notesnook/core";
+import { Plan, SKUResponse } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import dayjs from "dayjs";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import Config from "react-native-config";
 import * as RNIap from "react-native-iap";
@@ -38,22 +38,12 @@ import Paragraph from "../../ui/typography/paragraph";
 const isGithubRelease = Config.GITHUB_RELEASE === "true";
 export const BuyPlan = (props: {
   planId: string;
-  productId: string;
   canActivateTrial?: boolean;
-  goBack: () => void;
-  goNext: (
-    product: Plan | RNIap.Subscription | RNIap.Product | undefined
-  ) => void;
+  pricingPlans: ReturnType<typeof usePricingPlans>;
 }) => {
   const { colors } = useThemeColors();
   const [checkoutUrl, setCheckoutUrl] = useState<string>();
-  const pricingPlans = usePricingPlans({
-    planId: props.planId,
-    productId: props.productId,
-    onBuy: () => {
-      props.goNext(pricingPlans.selectedProduct);
-    }
-  });
+  const pricingPlans = props.pricingPlans;
 
   const billingDuration = pricingPlans.getBillingDuration(
     pricingPlans.selectedProduct as RNIap.Subscription,
@@ -81,7 +71,7 @@ export const BuyPlan = (props: {
           try {
             const data = JSON.parse(message.nativeEvent.data);
             if (data.success) {
-              props.goNext(pricingPlans.selectedProduct);
+              pricingPlans.finish();
             }
           } catch (e) {}
         }}
@@ -326,8 +316,11 @@ const ProductItem = (props: {
   productId: string;
 }) => {
   const { colors } = useThemeColors();
+  const [regionalDiscount, setRegionaDiscount] = useState<SKUResponse>();
   const product =
-    props.pricingPlans?.currentPlan?.subscriptions?.[props.productId] ||
+    props.pricingPlans?.currentPlan?.subscriptions?.[
+      regionalDiscount?.sku || props.productId
+    ] ||
     props.pricingPlans?.currentPlan?.products?.[props.productId] ||
     props.pricingPlans?.getWebPlan(
       props.pricingPlans?.currentPlan?.id as string,
@@ -336,7 +329,7 @@ const ProductItem = (props: {
 
   const isAnnual = isGithubRelease
     ? (product as Plan)?.period === "yearly"
-    : (product as RNIap.Subscription)?.productId.includes("yearly");
+    : (product as RNIap.Subscription)?.productId?.includes("yearly");
 
   const isSelected = isGithubRelease
     ? (product as Plan)?.period ===
@@ -352,9 +345,36 @@ const ProductItem = (props: {
 
   const isSubscribed =
     props.pricingPlans.isSubscribed() &&
-    (props.pricingPlans.user?.subscription.productId ===
-      (product as RNIap.Subscription).productId ||
-      props.pricingPlans.user?.subscription.productId === (product as Plan).id);
+    (props.pricingPlans.user?.subscription?.productId ===
+      (product as RNIap.Subscription)?.productId ||
+      props.pricingPlans.user?.subscription?.productId.startsWith(
+        (product as RNIap.Subscription)?.productId
+      ) ||
+      props.pricingPlans.user?.subscription?.productId ===
+        (product as Plan).id);
+
+  useEffect(() => {
+    props.pricingPlans
+      ?.getRegionalDiscount(
+        props.pricingPlans.currentPlan?.id as string,
+        props.pricingPlans.isGithubRelease
+          ? ((product as Plan)?.period as string)
+          : props.productId
+      )
+      .then((value) => {
+        if (
+          value &&
+          value.sku?.startsWith(
+            (props.pricingPlans.selectedProduct as RNIap.Subscription)
+              ?.productId
+          )
+        ) {
+          props.pricingPlans.selectProduct(value?.sku as string);
+        }
+        setRegionaDiscount(value);
+      });
+  }, []);
+
   return (
     <TouchableOpacity
       style={{
@@ -413,7 +433,9 @@ const ProductItem = (props: {
               <Heading color={colors.static.white} size={AppFontSize.xs}>
                 {strings.bestValue()} -{" "}
                 {strings.percentOff(
-                  (isGithubRelease
+                  (regionalDiscount
+                    ? regionalDiscount.discount
+                    : isGithubRelease
                     ? (product as Plan).discount?.amount
                     : props.pricingPlans.compareProductPrice(
                         props.pricingPlans.currentPlan?.id as string,

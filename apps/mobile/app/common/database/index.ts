@@ -38,7 +38,7 @@ export async function setupDatabase(password?: string) {
   const key = await getDatabaseKey(password);
   if (!key) throw new Error(strings.databaseSetupFailed());
 
-  const base = `http://192.168.100.83`;
+  const base = `http://192.168.100.88`;
 
   database.host({
     API_HOST: `${base}:5264`,
