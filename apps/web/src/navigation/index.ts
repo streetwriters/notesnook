@@ -116,8 +116,8 @@ export function extendHomeRoute(route: string) {
   return `${getHomeRoute()}${route}`;
 }
 
-export function hardNavigate(route: string) {
-  window.open(makeURL(route, getCurrentHash()), "_self");
+export function hardNavigate(route: string, search?: string) {
+  window.open(makeURL(route, getCurrentHash(), search), "_self");
 }
 
 export function makeURL(route: string, hash?: string, search?: string) {

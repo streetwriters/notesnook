@@ -25,8 +25,6 @@ import {
 } from "../dialogs/buy-dialog/plan-list";
 import { FlexScrollContainer } from "../components/scroll-container";
 import { Button, Flex, Text } from "@theme-ui/components";
-import { useCheckoutStore } from "../dialogs/buy-dialog/store";
-import { BuyDialog } from "../dialogs/buy-dialog";
 import { useStore as useUserStore } from "../stores/user-store";
 import { useEffect } from "react";
 import { getQueryParams, hardNavigate } from "../navigation";
@@ -34,7 +32,6 @@ import { Close } from "../components/icons";
 import { isUserSubscribed } from "../hooks/use-is-user-premium";
 
 function Plans() {
-  const selectPlan = useCheckoutStore((state) => state.selectPlan);
   const user = useUserStore((store) => store.user);
 
   useEffect(() => {
@@ -101,14 +98,10 @@ function Plans() {
             </Flex>
             <PlansList
               onPlanSelected={(plan) => {
-                selectPlan(plan);
-                BuyDialog.show({
-                  onShowPlans: () => BuyDialog.close(),
-                  onCheckoutComplete: () => {
-                    BuyDialog.close();
-                    openURL("/");
-                  }
-                }).catch(console.error);
+                const url = new URLSearchParams({
+                  plan: Buffer.from(JSON.stringify(plan)).toString("base64")
+                });
+                hardNavigate(`/checkout`, url.toString());
               }}
               selectedPlan={SubscriptionPlan.FREE}
             />
