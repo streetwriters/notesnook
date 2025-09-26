@@ -197,9 +197,11 @@ export const SubscriptionSettings: SettingsGroup[] = [
         description: `You will only be issued a refund if you are eligible as per our refund policy. Your account will immediately be downgraded to Basic and your funds will be transferred to your account within 24 hours.`,
         isHidden: () => {
           const user = useUserStore.getState().user;
+          const status = user?.subscription.status;
           return (
             user?.subscription.provider !== SubscriptionProvider.PADDLE ||
-            !isUserSubscribed(user)
+            !isUserSubscribed(user) ||
+            status === SubscriptionStatusEnum.TRIAL
           );
         },
         components: [
