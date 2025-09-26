@@ -138,21 +138,23 @@ function Checkout() {
           px: 2
         }}
       >
-        <Flex sx={{ alignItems: "center", justifyContent: "center", gap: 2 }}>
-          <svg
-            style={{
-              borderRadius: "default",
-              height: 50,
-              width: 30,
-              alignSelf: "start"
-            }}
-          >
-            <use href="#full-logo" />
-          </svg>
-          <Text variant="heading" sx={{ fontSize: 20 }}>
-            Notesnook
-          </Text>
-        </Flex>
+        <a href="/" style={{ textDecoration: "none" }}>
+          <Flex sx={{ alignItems: "center", justifyContent: "center", gap: 2 }}>
+            <svg
+              style={{
+                borderRadius: "default",
+                height: 50,
+                width: 30,
+                alignSelf: "start"
+              }}
+            >
+              <use href="#full-logo" />
+            </svg>
+            <Text variant="heading" sx={{ fontSize: 20 }}>
+              Notesnook
+            </Text>
+          </Flex>
+        </a>
         <Button
           variant="secondary"
           sx={{ display: "flex", alignItems: "center", gap: 1 }}
