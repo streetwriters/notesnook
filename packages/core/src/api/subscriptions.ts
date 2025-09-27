@@ -107,7 +107,7 @@ export default class Subscriptions {
     const user = await this.db.user.getUser();
     if (!token || !user) return;
     const endpoint = isLegacySubscription(user)
-      ? `subscriptions/cancel?pause=true`
+      ? `subscriptions?pause=true`
       : `subscriptions/v2/pause`;
     if (isLegacySubscription(user))
       await http.delete(`${hosts.SUBSCRIPTIONS_HOST}/${endpoint}`, token);
