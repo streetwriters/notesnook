@@ -31,7 +31,6 @@ import { getFormattedDate } from "@notesnook/common";
 import { useStore as useThemeStore } from "../stores/theme-store";
 import { isCipher } from "@notesnook/core";
 import { attachFiles } from "../components/editor/picker";
-import { isUserSubscribed } from "../hooks/use-is-user-premium";
 
 export class WebExtensionServer implements Server {
   async login() {
@@ -39,7 +38,7 @@ export class WebExtensionServer implements Server {
     const user = await db.user.getUser();
     const theme = colorScheme === "dark" ? darkTheme : lightTheme;
     if (!user) return { pro: false, theme };
-    return { email: user.email, pro: isUserSubscribed(user), theme };
+    return { email: user.email, pro: true, theme };
   }
 
   async getNotes(): Promise<ItemReference[] | undefined> {
