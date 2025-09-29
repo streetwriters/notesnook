@@ -425,6 +425,28 @@ const features = {
       believer: createLimit(true),
       legacyPro: createLimit(true)
     }
+  }),
+  monographLinksAndEmbeds: createFeature({
+    id: "monographLinksAndEmbeds",
+    title: "Links & embeds in monographs",
+    availability: {
+      free: createLimit(false),
+      essential: createLimit(true),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
+    }
+  }),
+  sms2FA: createFeature({
+    id: "sms2FA",
+    title: "2FA via SMS",
+    availability: {
+      free: createLimit(false),
+      essential: createLimit(false),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
+    }
   })
 };
 
