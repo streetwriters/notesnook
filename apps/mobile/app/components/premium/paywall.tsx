@@ -18,37 +18,35 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useThemeColors } from "@notesnook/theme";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  BackHandler,
   Image,
+  NativeEventSubscription,
   ScrollView,
   Text,
   TouchableOpacity,
   View
 } from "react-native";
 import * as RNIap from "react-native-iap";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import ToggleSwitch from "toggle-switch-react-native";
+import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import usePricingPlans, { PricingPlan } from "../../hooks/use-pricing-plans";
+import Navigation, { NavigationProps } from "../../services/navigation";
 import { getElevationStyle } from "../../utils/elevation";
 import { openLinkInBrowser } from "../../utils/functions";
-import { SIZE } from "../../utils/size";
-import SheetProvider from "../sheet-provider";
+import { AppFontSize } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
+import { Header } from "../header";
 import { BuyPlan } from "../sheets/buy-plan";
 import { Toast } from "../toast";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { FeaturesList } from "./features-list";
-import { IconButton } from "../ui/icon-button";
-type PaywallComponentProps = {
-  isModal?: boolean;
-  close?: () => void;
-  promo?: {
-    promoCode: string;
-  };
-};
 
 const Steps = {
   select: 1,
@@ -56,20 +54,61 @@ const Steps = {
   finish: 3
 };
 
-export const PaywallComponent = ({
-  close,
-  promo,
-  isModal
-}: PaywallComponentProps) => {
+const PayWall = (props: NavigationProps<"PayWall">) => {
+  const routeParams = props.route.params;
   const { colors } = useThemeColors();
-  const pricingPlans = usePricingPlans({
-    promoOffer: promo
-  });
+  const pricingPlans = usePricingPlans();
   const [annualBilling, setAnnualBilling] = useState(true);
   const [step, setStep] = useState(Steps.select);
+  const isFocused = useNavigationFocus(props.navigation, {
+    onBlur: () => true,
+    onFocus: () => true
+  });
+
+  useEffect(() => {
+    let listener: NativeEventSubscription;
+    if (isFocused) {
+      listener = BackHandler.addEventListener("hardwareBackPress", () => {
+        if (routeParams.context === "signup" && step === Steps.select)
+          return true;
+        if (step === Steps.buy) {
+          setStep(Steps.select);
+          return true;
+        }
+        return false;
+      });
+    }
+    return () => {
+      listener.remove();
+    };
+  }, [isFocused, step]);
 
   return (
-    <>
+    <SafeAreaView
+      style={{
+        backgroundColor: colors.primary.background,
+        flex: 1
+      }}
+    >
+      {routeParams.context === "signup" && step === Steps.select ? null : (
+        <Header
+          canGoBack={true}
+          onLeftMenuButtonPress={() => {
+            if (step === Steps.buy) {
+              setStep(Steps.select);
+              return;
+            }
+            props.navigation.goBack();
+          }}
+          title={
+            step === Steps.buy
+              ? pricingPlans.userCanRequestTrial
+                ? `Try ${pricingPlans.currentPlan?.name} plan for free`
+                : `${pricingPlans.currentPlan?.name} plan`
+              : ""
+          }
+        />
+      )}
       {step === Steps.select ? (
         <>
           <ScrollView
@@ -77,40 +116,20 @@ export const PaywallComponent = ({
               width: "100%"
             }}
             contentContainerStyle={{
-              gap: 12,
+              gap: DefaultAppStyles.GAP_VERTICAL,
               paddingBottom: 80
             }}
             keyboardDismissMode="none"
             keyboardShouldPersistTaps="always"
-            stickyHeaderIndices={[0]}
           >
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                width: "100%",
-                justifyContent: "flex-start",
-                marginBottom: -12,
-                backgroundColor: colors.primary.background
-              }}
-            >
-              <IconButton
-                style={{
-                  alignSelf: "flex-start"
-                }}
-                onPress={() => close?.()}
-                name="chevron-left"
-              />
-            </View>
-
             <View
               style={{
                 paddingTop: 100,
                 borderBottomColor: colors.primary.border,
                 borderBottomWidth: 1,
-                paddingHorizontal: 16,
+                paddingHorizontal: DefaultAppStyles.GAP,
                 paddingBottom: 25,
-                gap: 12
+                gap: DefaultAppStyles.GAP_VERTICAL
               }}
             >
               <View
@@ -123,27 +142,27 @@ export const PaywallComponent = ({
                 <Icon name="crown" size={30} color={colors.static.orange} />
                 <Heading
                   key="heading"
-                  size={SIZE.xl}
+                  size={AppFontSize.xl}
                   style={{
                     alignSelf: "center"
                   }}
                 >
                   Notesnook{" "}
-                  <Heading size={SIZE.xl} color={colors.primary.accent}>
-                    Pro
+                  <Heading size={AppFontSize.xl} color={colors.primary.accent}>
+                    Plans
                   </Heading>
                 </Heading>
               </View>
 
-              <Paragraph key="description" size={SIZE.md}>
+              <Paragraph key="description" size={AppFontSize.md}>
                 Ready to take the next step on your private note taking journey?
               </Paragraph>
             </View>
 
             <View
               style={{
-                gap: 16,
-                paddingHorizontal: 16
+                gap: DefaultAppStyles.GAP_VERTICAL,
+                paddingHorizontal: DefaultAppStyles.GAP
               }}
             >
               <TouchableOpacity
@@ -231,7 +250,7 @@ export const PaywallComponent = ({
                   style={{
                     flexShrink: 1
                   }}
-                  size={SIZE.lg}
+                  size={AppFontSize.lg}
                 >
                   Open Source
                 </Paragraph>
@@ -269,7 +288,7 @@ export const PaywallComponent = ({
                   style={{
                     flexShrink: 1
                   }}
-                  size={SIZE.lg}
+                  size={AppFontSize.lg}
                 >
                   8.7K stars
                 </Paragraph>
@@ -307,7 +326,7 @@ export const PaywallComponent = ({
                     maxWidth: 300,
                     textAlign: "center"
                   }}
-                  size={SIZE.lg}
+                  size={AppFontSize.lg}
                 >
                   Recommended by Privacy Guides
                 </Paragraph>
@@ -436,6 +455,7 @@ After trying all the privacy security oriented note taking apps, for the price a
               borderTopWidth: 1,
               borderTopColor: colors.primary.border,
               position: "absolute",
+              paddingBottom: DefaultAppStyles.GAP_VERTICAL,
               bottom: 0
             }}
           >
@@ -451,7 +471,11 @@ After trying all the privacy security oriented note taking apps, for the price a
               }
               onPress={() => {
                 if (pricingPlans.currentPlan?.id === "free") {
-                  close?.();
+                  if (routeParams.context === "signup") {
+                    Navigation.replace("FluidPanelsView", {});
+                  } else {
+                    Navigation.goBack();
+                  }
                 }
                 if (
                   !pricingPlans.currentPlan?.id ||
@@ -484,7 +508,7 @@ After trying all the privacy security oriented note taking apps, for the price a
       )}
 
       <Toast context="local" />
-    </>
+    </SafeAreaView>
   );
 };
 
@@ -517,17 +541,19 @@ const FAQItem = (props: { question: string; answer: string }) => {
           style={{
             flexShrink: 1
           }}
-          size={SIZE.md}
+          size={AppFontSize.md}
         >
           {props.question}
         </Heading>
         <Icon
           name={expanded ? "chevron-up" : "chevron-down"}
           color={colors.secondary.icon}
-          size={SIZE.xxl}
+          size={AppFontSize.xxl}
         />
       </View>
-      {expanded ? <Paragraph size={SIZE.md}>{props.answer}</Paragraph> : null}
+      {expanded ? (
+        <Paragraph size={AppFontSize.md}>{props.answer}</Paragraph>
+      ) : null}
     </TouchableOpacity>
   );
 };
@@ -575,17 +601,17 @@ const ComparePlans = React.memo(
                   {item === true ? (
                     <Icon
                       color={colors.primary.accent}
-                      size={SIZE.sm}
+                      size={AppFontSize.sm}
                       name="check"
                     />
                   ) : item === false ? (
                     <Icon
-                      size={SIZE.sm}
+                      size={AppFontSize.sm}
                       color={colors.static.red}
                       name="close"
                     />
                   ) : keyIndex === 0 ? (
-                    <Heading size={SIZE.sm}>{item}</Heading>
+                    <Heading size={AppFontSize.sm}>{item}</Heading>
                   ) : (
                     <Paragraph>{item}</Paragraph>
                   )}
@@ -626,7 +652,7 @@ const ReviewItem = (props: {
         style={{
           textAlign: "center"
         }}
-        size={SIZE.md}
+        size={AppFontSize.md}
       >
         {props.review}
       </Paragraph>
@@ -655,7 +681,7 @@ const ReviewItem = (props: {
             }}
           />
         ) : null}
-        <Paragraph size={SIZE.sm}>{props.user}</Paragraph>
+        <Paragraph size={AppFontSize.sm}>{props.user}</Paragraph>
       </View>
     </View>
   );
@@ -724,14 +750,14 @@ const PricingPlanCard = ({
             alignSelf: "flex-start"
           }}
         >
-          <Heading color={colors.static.white} size={SIZE.xs}>
+          <Heading color={colors.static.white} size={AppFontSize.xs}>
             {discountPercentage}% Off
           </Heading>
         </View>
       ) : null}
 
       <View>
-        <Heading size={SIZE.md}>
+        <Heading size={AppFontSize.md}>
           {plan.name}{" "}
           {plan.recommended ? (
             <Text
@@ -751,12 +777,12 @@ const PricingPlanCard = ({
         <ActivityIndicator size="small" color={colors.primary.accent} />
       ) : (
         <View>
-          <Paragraph size={SIZE.lg}>
+          <Paragraph size={AppFontSize.lg}>
             {isFreePlan ? "0.00" : price} <Paragraph>/month</Paragraph>
           </Paragraph>
 
           {isFreePlan ? null : (
-            <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
+            <Paragraph color={colors.secondary.paragraph} size={AppFontSize.xs}>
               billed {annualBilling ? "annually" : "monthly"} at{" "}
               {pricingPlans?.getStandardPrice(product as RNIap.Subscription)}{" "}
             </Paragraph>
@@ -766,3 +792,5 @@ const PricingPlanCard = ({
     </TouchableOpacity>
   );
 };
+
+export default PayWall;

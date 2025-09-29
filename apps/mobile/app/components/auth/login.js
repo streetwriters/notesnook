@@ -24,12 +24,15 @@ import { TouchableOpacity, View, useWindowDimensions } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
 import { DDS } from "../../services/device-detection";
 import { eSendEvent } from "../../services/event-manager";
+import Navigation from "../../services/navigation";
+import PremiumService from "../../services/premium";
 import Sync from "../../services/sync";
 import { useUserStore } from "../../stores/use-user-store";
 import { eUserLoggedIn } from "../../utils/events";
 import { AppFontSize } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 import { sleep } from "../../utils/time";
-import SheetProvider from "../sheet-provider";
+import { Dialog } from "../dialog";
 import { Progress } from "../sheets/progress";
 import { Button } from "../ui/button";
 import Input from "../ui/input";
@@ -37,9 +40,8 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { hideAuth } from "./common";
 import { ForgotPassword } from "./forgot-password";
+import { AuthHeader } from "./header";
 import { useLogin } from "./use-login";
-import { DefaultAppStyles } from "../../utils/styles";
-import { Dialog } from "../dialog";
 
 const LoginSteps = {
   emailAuth: 1,
@@ -62,15 +64,21 @@ export const Login = ({ changeMode }) => {
     setError,
     login
   } = useLogin(async () => {
-    hideAuth();
     eSendEvent(eUserLoggedIn, true);
     await sleep(500);
-    Progress.present();
+    hideAuth();
     setTimeout(() => {
       if (!useUserStore.getState().syncing) {
         Sync.run("global", false, "full");
       }
     }, 5000);
+    if (!PremiumService.get()) {
+      Navigation.navigate("PayWall", {
+        context: "logged-in"
+      });
+    } else {
+      Progress.present();
+    }
   });
   const { width, height } = useWindowDimensions();
   const isTablet = width > 600;
@@ -89,6 +97,7 @@ export const Login = ({ changeMode }) => {
 
   return (
     <>
+      <AuthHeader />
       <ForgotPassword />
       <Dialog context="two_factor_verify" />
       <View
@@ -105,7 +114,6 @@ export const Login = ({ changeMode }) => {
           style={{
             justifyContent: "flex-end",
             paddingHorizontal: DefaultAppStyles.GAP,
-            backgroundColor: colors.secondary.background,
             borderBottomWidth: 0.8,
             marginBottom: DefaultAppStyles.GAP_VERTICAL,
             borderBottomColor: colors.primary.border,
@@ -165,7 +173,8 @@ export const Login = ({ changeMode }) => {
               : "99.9%",
             backgroundColor: colors.primary.background,
             alignSelf: "center",
-            paddingHorizontal: DefaultAppStyles.GAP
+            paddingHorizontal: DefaultAppStyles.GAP,
+            gap: DefaultAppStyles.GAP_VERTICAL
           }}
         >
           <Input
@@ -179,6 +188,7 @@ export const Login = ({ changeMode }) => {
             returnKeyType="next"
             autoComplete="email"
             validationType="email"
+            marginBottom={0}
             autoCorrect={false}
             autoCapitalize="none"
             errorMessage={strings.emailInvalid()}
@@ -234,11 +244,7 @@ export const Login = ({ changeMode }) => {
             </>
           )}
 
-          <View
-            style={{
-              marginTop: 25
-            }}
-          >
+          <View>
             <Button
               loading={loading}
               onPress={() => {
@@ -246,10 +252,11 @@ export const Login = ({ changeMode }) => {
                 login();
               }}
               style={{
-                width: 250
+                width: "100%"
               }}
               type="accent"
               title={!loading ? strings.continue() : null}
+              fontSize={AppFontSize.md}
             />
 
             {step === LoginSteps.passwordAuth && (

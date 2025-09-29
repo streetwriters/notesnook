@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import { useRef, useState } from "react";
 import { TextInput } from "react-native";
 import { db } from "../../common/database";
@@ -27,7 +28,6 @@ import SettingsService from "../../services/settings";
 import { useUserStore } from "../../stores/use-user-store";
 import { eCloseSimpleDialog } from "../../utils/events";
 import TwoFactorVerification from "./two-factor";
-import { strings } from "@notesnook/intl";
 
 export const LoginSteps = {
   emailAuth: 1,

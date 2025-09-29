@@ -48,7 +48,6 @@ import { DefaultAppStyles } from "../../../utils/styles";
 import { sleep } from "../../../utils/time";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
-import { ProTag } from "../../premium/pro-tag";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
 import { Pressable } from "../../ui/pressable";
@@ -227,7 +226,6 @@ const ExportNotesSheet = ({
                     flexShrink: 1
                   }}
                 >
-                  {!item.pro ? <ProTag size={12} /> : null}
                   <Heading style={{ marginLeft: 10 }} size={AppFontSize.md}>
                     {item.title}
                   </Heading>

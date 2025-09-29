@@ -25,7 +25,6 @@ import { eSendEvent, presentSheet } from "../../services/event-manager";
 import { eCloseAnnouncementDialog } from "../../utils/events";
 import { AppFontSize } from "../../utils/size";
 import { sleep } from "../../utils/time";
-import { PricingPlans } from "../premium/pricing-plans";
 import SheetProvider from "../sheet-provider";
 import { Button } from "../ui/button";
 import { allowedOnPlatform, getStyle } from "./functions";
@@ -44,18 +43,6 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
     if (item.type === "link") {
       Linking.openURL(item.data).catch(() => {
         /* empty */
-      });
-    } else if (item.type === "promo") {
-      presentSheet({
-        component: (
-          <PricingPlans
-            marginTop={1}
-            promo={{
-              promoCode: item.data,
-              text: item.title
-            }}
-          />
-        )
       });
     }
   };
