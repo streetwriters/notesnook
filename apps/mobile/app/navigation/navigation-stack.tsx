@@ -31,6 +31,7 @@ import { useSelectionStore } from "../stores/use-selection-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { rootNavigatorRef } from "../utils/global-refs";
 import Navigation from "../services/navigation";
+import { useIsFeatureAvailable } from "@notesnook/common";
 
 const RootStack = createNativeStackNavigator();
 const AppStack = createNativeStackNavigator();
@@ -47,6 +48,7 @@ let ColoredNotes: any = null;
 let Archive: any = null;
 const AppNavigation = React.memo(
   () => {
+    const customHomepageFeature = useIsFeatureAvailable("customHomepage");
     const { colors } = useThemeColors();
     const [home, setHome] = React.useState<{
       name: string;
@@ -58,7 +60,7 @@ const AppNavigation = React.memo(
     React.useEffect(() => {
       (async () => {
         if (loading) return;
-        if (!homepageV2) {
+        if (!homepageV2 || !customHomepageFeature?.isAllowed) {
           setHome({
             name: "Notes",
             params: undefined
@@ -250,7 +252,7 @@ let MoveNotes: any = null;
 let Settings: any = null;
 let ManageTags: any = null;
 let AddReminder: any = null;
-
+let PayWall: any = null;
 export const RootNavigation = () => {
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
@@ -351,6 +353,13 @@ export const RootNavigation = () => {
             AddReminder =
               AddReminder || require("../screens/add-reminder").default;
             return AddReminder;
+          }}
+        />
+        <RootStack.Screen
+          name="PayWall"
+          getComponent={() => {
+            PayWall = PayWall || require("../components/paywall").default;
+            return PayWall;
           }}
         />
       </RootStack.Navigator>

@@ -93,7 +93,6 @@ const RateAppSheet = () => {
         <Seperator half />
         <Button
           onPress={rateApp}
-          fontSize={AppFontSize.md}
           width="100%"
           type="accent"
           title={strings.rateApp()}
@@ -116,14 +115,12 @@ const RateAppSheet = () => {
               setVisible(false);
               clearMessage();
             }}
-            fontSize={AppFontSize.md}
             type="error"
             width="48%"
             title={strings.never()}
           />
           <Button
             onPress={onClose}
-            fontSize={AppFontSize.md}
             width="48%"
             type="secondary"
             title={strings.later()}

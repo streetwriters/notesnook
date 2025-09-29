@@ -32,11 +32,10 @@ export function ErrorText(props: ErrorTextProps) {
       p={1}
       sx={{
         borderRadius: "default",
-        mt: 2,
-        ...sx,
         alignItems: "flex-start",
         maxHeight: 300,
-        overflowY: "auto"
+        overflowY: "auto",
+        ...sx
       }}
       {...restProps}
     >

@@ -31,7 +31,9 @@ import {
 import { ParamListBase } from "@react-navigation/core";
 import create, { State } from "zustand";
 
-export type GenericRouteParam = undefined;
+export type GenericRouteParam = {
+  canGoBack?: boolean;
+};
 
 export type NotebookScreenParams = {
   item: Notebook;
@@ -52,6 +54,14 @@ export type AppLockRouteParams = {
 
 export type AuthParams = {
   mode: number;
+  context?: "intro";
+  state?: BillingState;
+};
+
+export type BillingState = {
+  productId?: string;
+  planId?: string;
+  billingType?: "annual" | "monthly";
 };
 
 export interface RouteParams extends ParamListBase {
@@ -97,6 +107,12 @@ export interface RouteParams extends ParamListBase {
   AddReminder: {
     reminder?: Reminder;
     reference?: Note;
+  };
+  Intro: GenericRouteParam;
+  PayWall: {
+    canGoBack?: boolean;
+    context: "signup" | "logged-in" | "logged-out" | "subscribed";
+    state?: BillingState;
   };
 }
 

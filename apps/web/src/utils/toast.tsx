@@ -36,7 +36,7 @@ const ToastIcons = {
   info: Info
 };
 
-function showToast(
+export function showToast(
   type: ToastType,
   message: string,
   actions?: ToastAction[],
@@ -101,8 +101,6 @@ function ToastContainer(props: ToastContainerProps) {
     </ScopedThemeProvider>
   );
 }
-
-export { showToast };
 
 function ToastIcon({ type }: { type: ToastType }) {
   const IconComponent = ToastIcons[type];

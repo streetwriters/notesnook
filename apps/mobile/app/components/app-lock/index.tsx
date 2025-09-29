@@ -336,7 +336,6 @@ const AppLocked = () => {
                     borderRadius: 150,
                     marginBottom: 10
                   }}
-                  fontSize={AppFontSize.md}
                 />
               </>
             ) : null}

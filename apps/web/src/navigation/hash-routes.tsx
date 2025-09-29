@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { hashNavigate } from ".";
 import { defineHashRoutes } from "./types";
-import { useEditorStore } from "../stores/editor-store";
 import {
   AddNotebookDialog,
   EditNotebookDialog
@@ -59,13 +58,7 @@ const hashroutes = defineHashRoutes({
     BuyDialog.show({}).then(afterAction);
   },
   "/buy/:code": ({ code }: { code: string }) => {
-    BuyDialog.show({ couponCode: code, plan: "monthly" }).then(afterAction);
-  },
-  "/buy/:plan/:code": ({ plan, code }) => {
-    BuyDialog.show({
-      plan: plan === "monthly" ? "monthly" : "yearly",
-      couponCode: code
-    }).then(afterAction);
+    BuyDialog.show({ couponCode: code }).then(afterAction);
   },
   "/welcome": () => {
     OnboardingDialog.show({ type: "new" })?.then(afterAction);

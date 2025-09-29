@@ -25,8 +25,6 @@ import {
   ResolveInternalLink,
   isImage,
   isWebClip,
-  CHECK_IDS,
-  checkIsUserPremium,
   FilteredSelector,
   EMPTY_CONTENT
 } from "@notesnook/core";
@@ -66,8 +64,6 @@ export async function* exportNotes(
   }
 ) {
   const { format } = options;
-  if (format !== "txt" && !(await checkIsUserPremium(CHECK_IDS.noteExport)))
-    return;
 
   const pathTree = new PathTree();
   const notePathMap: Map<string, string[]> = new Map();
@@ -175,8 +171,6 @@ export async function* exportNote(
   }
 ) {
   const { format } = options;
-  if (format !== "txt" && !(await checkIsUserPremium(CHECK_IDS.noteExport)))
-    return;
 
   const attachmentsRoot = "attachments";
   const filename = sanitizeFilename(note.title || "Untitled", {

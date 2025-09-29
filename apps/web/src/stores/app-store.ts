@@ -251,7 +251,7 @@ class AppStore extends BaseStore<AppStore> {
   };
 
   addToShortcuts = async (item: { type: "tag" | "notebook"; id: string }) => {
-    if (await db.shortcuts.exists(item.id)) {
+    if (db.shortcuts.exists(item.id)) {
       await db.shortcuts.remove(item.id);
       this.refreshNavItems();
       showToast("success", strings.shortcutRemoved());

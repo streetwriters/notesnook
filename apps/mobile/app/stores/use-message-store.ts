@@ -17,14 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { User } from "@notesnook/core";
+import { SubscriptionPlan, SubscriptionStatus, User } from "@notesnook/core";
 import { Platform } from "react-native";
 import { getVersion } from "react-native-device-info";
 import create, { State } from "zustand";
 import { db } from "../common/database";
 import { MMKV } from "../common/database/mmkv";
 import PremiumService from "../services/premium";
-import { SUBSCRIPTION_STATUS } from "../utils/constants";
 export interface MessageStore extends State {
   message: Message;
   setMessage: (message: Message) => void;
@@ -168,15 +167,13 @@ async function shouldShowAnnouncement(announcement: Announcement) {
   if (!show) return false;
   if (!show) return false;
   const user = (await db.user?.getUser()) as User;
-  const subStatus = user?.subscription?.type || SUBSCRIPTION_STATUS.BASIC;
+  const subStatus = user?.subscription?.status;
   show = announcement.userTypes.some((userType) => {
     switch (userType) {
       case "pro":
         return PremiumService.get();
       case "trial":
-        return subStatus === SUBSCRIPTION_STATUS.TRIAL;
-      case "trialExpired":
-        return subStatus === SUBSCRIPTION_STATUS.BASIC;
+        return subStatus === SubscriptionStatus.TRIAL;
       case "loggedOut":
         return !user;
       case "verified":
@@ -185,11 +182,6 @@ async function shouldShowAnnouncement(announcement: Announcement) {
         return !!user;
       case "unverified":
         return !user?.isEmailConfirmed;
-      case "proExpired":
-        return (
-          subStatus === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED ||
-          subStatus === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED
-        );
       case "any":
       default:
         return false;

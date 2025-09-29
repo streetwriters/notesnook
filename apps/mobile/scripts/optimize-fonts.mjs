@@ -99,7 +99,10 @@ const EXTRA_ICON_NAMES = [
   "brain",
   "file-tree-outline",
   "format-list-bulleted",
-  "file-tree"
+  "file-tree",
+  "github",
+  "open-source-initiative",
+  "credit-card"
 ];
 
 const __filename = fileURLToPath(import.meta.url);

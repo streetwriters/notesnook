@@ -115,6 +115,7 @@ export const EditorSettings: SettingsGroup[] = [
         description: strings.mardownShortcutsDesc(),
         onStateChange: (listener) =>
           useSettingStore.subscribe((c) => c.markdownShortcuts, listener),
+        featureId: "markdownShortcuts",
         components: [
           {
             type: "toggle",
@@ -129,6 +130,7 @@ export const EditorSettings: SettingsGroup[] = [
         description: strings.fontLigaturesDesc(),
         onStateChange: (listener) =>
           useSettingStore.subscribe((c) => c.fontLigatures, listener),
+        featureId: "fontLigatures",
         components: [
           {
             type: "toggle",

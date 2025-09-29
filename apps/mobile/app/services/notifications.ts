@@ -1045,6 +1045,13 @@ async function restorePinnedNotes() {
   }
 }
 
+async function clearPinnedNotes() {
+  const pinnedNotes = PinnedNotesStorage.get();
+  for (const id of pinnedNotes) {
+    remove(id);
+  }
+}
+
 const Events = {
   onUpdate: "onUpdate"
 };
@@ -1054,6 +1061,7 @@ const Notifications = {
   displayNotification,
   clearAll,
   remove,
+  clearPinnedNotes,
   get,
   getPinnedNotes,
   pinQuickNote,

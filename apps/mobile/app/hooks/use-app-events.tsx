@@ -17,11 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { isFeatureAvailable } from "@notesnook/common";
 import {
   EV,
   EVENTS,
   EventManagerSubscription,
   SYNC_CHECK_IDS,
+  SubscriptionPlan,
   SyncStatusEvent,
   User
 } from "@notesnook/core";
@@ -49,7 +51,9 @@ import { MMKV } from "../common/database/mmkv";
 import { endProgress, startProgress } from "../components/dialogs/progress";
 import Migrate from "../components/sheets/migrate";
 import NewFeature from "../components/sheets/new-feature";
+import PaywallSheet from "../components/sheets/paywall";
 import { Walkthrough } from "../components/walkthroughs";
+import AddReminder from "../screens/add-reminder";
 import {
   resetTabStore,
   useTabStore
@@ -102,7 +106,7 @@ import { getGithubVersion } from "../utils/github-version";
 import { fluidTabsRef } from "../utils/global-refs";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { sleep } from "../utils/time";
-import AddReminder from "../screens/add-reminder";
+import useFeatureManager from "./use-feature-manager";
 
 const onCheckSyncStatus = async (type: SyncStatusEvent) => {
   const { disableSync, disableAutoSync } = SettingsService.get();
@@ -185,6 +189,18 @@ const onAppOpenedFromURL = async (event: { url: string }) => {
         if (reminder) AddReminder.present(reminder);
       }
     } else if (url.startsWith("https://notesnook.com/new_reminder")) {
+      const reminderFeature = await isFeatureAvailable("activeReminders");
+      if (!reminderFeature.isAllowed) {
+        ToastManager.show({
+          type: "info",
+          message: reminderFeature.error,
+          actionText: strings.upgrade(),
+          func: () => {
+            PaywallSheet.present(reminderFeature);
+          }
+        });
+        return;
+      }
       AddReminder.present();
     }
   } catch (e) {
@@ -209,12 +225,23 @@ const onUserEmailVerified = async () => {
 const onUserSubscriptionStatusChanged = async (
   subscription: User["subscription"]
 ) => {
-  if (!PremiumService.get() && subscription.type === 5) {
+  if (
+    subscription &&
+    subscription.plan !== SubscriptionPlan.FREE &&
+    subscription.plan !== useUserStore.getState().user?.subscription?.plan
+  ) {
     PremiumService.subscriptions.clear();
+    useUserStore.setState({
+      user: {
+        ...(useUserStore.getState().user as User),
+        subscription: subscription
+      }
+    });
     Walkthrough.present("prouser", false, true);
   }
   await PremiumService.setPremiumStatus();
   useMessageStore.getState().setAnnouncement();
+  useUserStore.getState().setUser(await db.user.fetchUser());
 };
 
 const onRequestPartialSync = async (
@@ -298,6 +325,7 @@ async function saveEditorState() {
 const onSuccessfulSubscription = async (
   subscription: RNIap.ProductPurchase | RNIap.SubscriptionPurchase
 ) => {
+  if (Platform.OS === "android") return;
   await PremiumService.subscriptions.set(subscription);
   await PremiumService.subscriptions.verify(subscription);
 };
@@ -329,7 +357,6 @@ const doAppLoadActions = async () => {
   if (NewFeature.present()) return;
   if (await checkAppUpdateAvailable()) return;
   if (await checkForRateAppRequest()) return;
-  if (await PremiumService.getRemainingTrialDaysStatus()) return;
   if (SettingsService.get().introCompleted) {
     useMessageStore.subscribe((state) => {
       const dialogs = state.dialogs;
@@ -430,7 +457,7 @@ export const useAppEvents = () => {
     state.appLocked,
     state.syncing
   ]);
-
+  useFeatureManager();
   const syncedOnLaunch = useRef(false);
   const refValues = useRef<
     Partial<{
@@ -606,7 +633,6 @@ export const useAppEvents = () => {
       EV.subscribe(EVENTS.userLoggedOut, onLogout),
       EV.subscribe(EVENTS.userEmailConfirmed, onUserEmailVerified),
       EV.subscribe(EVENTS.userSessionExpired, onUserSessionExpired),
-      EV.subscribe(EVENTS.userCheckStatus, PremiumService.onUserStatusCheck),
       EV.subscribe(
         EVENTS.userSubscriptionUpdated,
         onUserSubscriptionStatusChanged

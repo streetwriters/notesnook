@@ -206,13 +206,15 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
                 code.current = value;
                 //onNext();
               }}
+              cursorColor={colors.selected.accent}
+              selectionHandleColor={colors.selected.accent}
+              selectionColor={colors.selected.accent}
               onSubmitEditing={onNext}
-              caretHidden
               height={60}
               inputStyle={{
                 fontSize: AppFontSize.lg,
                 textAlign: "center",
-                letterSpacing: 10,
+                letterSpacing: 7,
                 width: 250
               }}
               keyboardType={
@@ -220,8 +222,6 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
               }
               enablesReturnKeyAutomatically
               containerStyle={{
-                borderWidth: 0,
-                width: undefined,
                 minWidth: "50%"
               }}
               wrapperStyle={{

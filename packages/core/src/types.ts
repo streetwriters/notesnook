@@ -550,6 +550,37 @@ export type TrashItem = BaseTrashItem<Note> | BaseTrashItem<Notebook>;
 
 export type AuthenticatorType = "app" | "sms" | "email";
 
+export type SubscriptionPlanId =
+  | "free"
+  | "essential"
+  | "pro"
+  | "believer"
+  | "education";
+
+export enum SubscriptionPlan {
+  FREE = 0,
+  ESSENTIAL = 1,
+  PRO = 2,
+  BELIEVER = 3,
+  EDUCATION = 4,
+  LEGACY_PRO = 5
+}
+
+export enum SubscriptionStatus {
+  ACTIVE,
+  TRIAL,
+  CANCELED,
+  PAUSED,
+  EXPIRED
+}
+
+export enum SubscriptionProvider {
+  STREETWRITERS = 0,
+  APPLE = 1,
+  GOOGLE = 2,
+  PADDLE = 3
+}
+
 export type User = {
   id: string;
   email: string;
@@ -559,6 +590,8 @@ export type User = {
   monographPasswordsKey?: Cipher<"base64">;
   inboxKeys?: { public: string; private: Cipher<"base64"> };
   marketingConsent?: boolean;
+  storageUsed?: number;
+  totalStorage?: number;
   mfa: {
     isEnabled: boolean;
     primaryMethod: AuthenticatorType;
@@ -569,11 +602,15 @@ export type User = {
     appId: 0;
     cancelURL: string | null;
     expiry: number;
+    trialExpiry?: number;
     productId: string;
-    provider: 0 | 1 | 2 | 3 | 4;
+    provider: SubscriptionProvider;
     start: number;
-    type: 0 | 1 | 2 | 5 | 6 | 7;
+    plan: SubscriptionPlan;
+    status: SubscriptionStatus;
+    trialsAvailed?: SubscriptionPlan[];
     updateURL: string | null;
+    googlePurchaseToken: string | null;
   };
 };
 
@@ -627,4 +664,19 @@ export function isEncryptedContent(
   content: NoteContent<boolean>
 ): content is NoteContent<true> {
   return isCipher(content.data);
+}
+
+export function planToId(plan: SubscriptionPlan): SubscriptionPlanId {
+  switch (plan) {
+    case SubscriptionPlan.FREE:
+      return "free";
+    case SubscriptionPlan.BELIEVER:
+      return "believer";
+    case SubscriptionPlan.EDUCATION:
+      return "education";
+    case SubscriptionPlan.ESSENTIAL:
+      return "essential";
+    case SubscriptionPlan.PRO:
+      return "pro";
+  }
 }

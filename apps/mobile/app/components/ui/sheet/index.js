@@ -25,9 +25,9 @@ import useGlobalSafeAreaInsets from "../../../hooks/use-global-safe-area-insets"
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { useUserStore } from "../../../stores/use-user-store";
 import { getContainerBorder } from "../../../utils/colors";
-import { PremiumToast } from "../../premium/premium-toast";
-import { Toast } from "../../toast";
 import { NotesnookModule } from "../../../utils/notesnook-module";
+import { Toast } from "../../toast";
+
 /**
  *
  * @param {any} param0
@@ -70,7 +70,6 @@ const SheetWrapper = ({
       backgroundColor: colors.primary.background,
       zIndex: 10,
       paddingTop: 5,
-      paddingBottom: 0,
       borderTopRightRadius: 15,
       borderTopLeftRadius: 15,
       alignSelf: "center",
@@ -78,9 +77,10 @@ const SheetWrapper = ({
       borderBottomLeftRadius: 0,
       ...getContainerBorder(colors.primary.border, 0.5),
       borderBottomWidth: 0,
-      paddingBottom: isGestureNavigationEnabled
-        ? insets.bottom
-        : insets.bottom || 48
+      paddingBottom:
+        isGestureNavigationEnabled && Platform.OS === "android"
+          ? insets.bottom
+          : 0
     };
   }, [
     colors.primary.background,
@@ -155,11 +155,6 @@ const SheetWrapper = ({
         ExtraOverlayComponent={
           <>
             {overlay}
-            <PremiumToast
-              context="sheet"
-              close={() => fwdRef?.current?.hide()}
-              offset={50}
-            />
             <Toast context="local" />
           </>
         }
@@ -170,8 +165,8 @@ const SheetWrapper = ({
           <View
             style={{
               height:
-                Platform.OS === "ios" && insets.bottom !== 0
-                  ? insets.bottom + 5
+                Platform.OS === "ios" || insets.bottom !== 0
+                  ? insets.bottom
                   : 20
             }}
           />

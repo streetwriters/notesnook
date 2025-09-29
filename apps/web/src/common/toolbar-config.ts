@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { getDefaultPresets, ToolbarGroupDefinition } from "@notesnook/editor";
 import { db } from "./db";
-import { migrateToolbar } from "@notesnook/common";
+import { CURRENT_TOOLBAR_VERSION, migrateToolbar } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
 
 const defaultPresets = getDefaultPresets();
@@ -71,4 +71,16 @@ export function getPreset(id: PresetId) {
 
 export function getPresetTools(preset: Preset) {
   return preset.tools;
+}
+
+export async function setToolbarPreset(
+  id: PresetId,
+  tools?: ToolbarGroupDefinition[]
+) {
+  const currentPreset = await getCurrentPreset();
+  await db.settings.setToolbarConfig("desktop", {
+    version: CURRENT_TOOLBAR_VERSION,
+    preset: id,
+    config: id === "custom" ? tools : currentPreset.tools
+  });
 }

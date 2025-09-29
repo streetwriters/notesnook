@@ -18,12 +18,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { ReactElement } from "react";
+import { View } from "react-native";
 import { AttachmentDialog } from "../../components/attachments";
-import { AccentColorPicker } from "./appearance";
+import { ChangePassword } from "../../components/auth/change-password";
+import { DefaultAppStyles } from "../../utils/styles";
+import { AttachmentGroupProgress } from "./attachment-group-progress";
+import { ChangeEmail } from "./change-email";
 import DebugLogs from "./debug";
 import { ConfigureToolbar } from "./editor/configure-toolbar";
 import { Licenses } from "./licenses";
-import { AttachmentGroupProgress } from "./attachment-group-progress";
 import {
   ApplockTimerPicker,
   BackupReminderPicker,
@@ -38,19 +41,12 @@ import {
 import { RestoreBackup } from "./restore-backup";
 import { ServersConfiguration } from "./server-config";
 import SoundPicker from "./sound-picker";
-import { Subscription } from "./subscription";
 import ThemeSelector from "./theme-selector";
 import { TitleFormat } from "./title-format";
-import { View } from "react-native";
-import { DefaultAppStyles } from "../../utils/styles";
-import { ChangePassword } from "../../components/auth/change-password";
-import { ChangeEmail } from "./change-email";
 
 export const components: { [name: string]: ReactElement } = {
-  colorpicker: <AccentColorPicker />,
   homeselector: <HomePicker />,
   autobackups: <BackupReminderPicker />,
-  subscription: <Subscription />,
   configuretoolbar: <ConfigureToolbar />,
   "debug-logs": <DebugLogs />,
   "sound-picker": <SoundPicker />,

@@ -39,8 +39,8 @@ interface PickerOptions<T> {
   compareValue: (current: T, item: T) => boolean;
   getItemKey: (item: T) => string;
   options: T[];
-  premium?: boolean;
-  onCheckOptionIsPremium?: (item: T) => boolean;
+  isFeatureAvailable: () => Promise<boolean>;
+  isOptionAvailable: (item: T) => Promise<boolean>;
   requiresVerification?: () => boolean;
   onVerify?: () => Promise<boolean>;
 }
@@ -52,8 +52,8 @@ export function SettingsPicker<T>({
   compareValue,
   options,
   getItemKey,
-  premium,
-  onCheckOptionIsPremium = () => true,
+  isFeatureAvailable,
+  isOptionAvailable,
   requiresVerification = () => false,
   onVerify
 }: PickerOptions<T>) {
@@ -63,19 +63,10 @@ export function SettingsPicker<T>({
   const [currentValue, setCurrentValue] = useState(getValue());
 
   const onChange = async (item: T) => {
-    if (premium && onCheckOptionIsPremium?.(item)) {
-      await PremiumService.verify(
-        async () => {
-          menuRef.current?.hide();
-          await updateValue(item);
-          setCurrentValue(item);
-        },
-        async () => {
-          menuRef.current?.hide();
-          await sleep(300);
-          PremiumService.sheet();
-        }
-      );
+    if ((await isFeatureAvailable()) && (await isOptionAvailable(item))) {
+      menuRef.current?.hide();
+      await updateValue(item);
+      setCurrentValue(item);
       return;
     }
 
@@ -115,7 +106,11 @@ export function SettingsPicker<T>({
         anchor={
           <Pressable
             onPress={async () => {
-              if (onVerify && !(await onVerify())) return;
+              if (
+                (onVerify && !(await onVerify())) ||
+                !(await isFeatureAvailable())
+              )
+                return;
               menuRef.current?.show();
             }}
             type="secondary"

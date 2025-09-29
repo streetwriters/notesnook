@@ -27,7 +27,6 @@ import { SessionContent } from "./session-content.js";
 
 export class NoteHistory implements ICollection {
   name = "notehistory";
-  versionsLimit = 100;
   sessionContent;
   readonly collection: SQLCollection<"notehistory", HistorySession>;
   constructor(private readonly db: Database) {
@@ -100,7 +99,9 @@ export class NoteHistory implements ICollection {
     return sessionId;
   }
 
-  private async cleanup(noteId: string, limit = this.versionsLimit) {
+  private async cleanup(noteId: string) {
+    const limit = await this.db.options.maxNoteVersions();
+    if (!limit) return;
     const history = await this.db
       .sql()
       .selectFrom("notehistory")
