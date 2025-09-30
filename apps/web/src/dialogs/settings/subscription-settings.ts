@@ -36,19 +36,18 @@ import {
 import { TaskManager } from "../../common/task-manager";
 import { ConfirmDialog } from "../confirm";
 import { ChangePlanDialog } from "../buy-dialog/change-plan-dialog";
-import { getSubscriptionInfo } from "./components/user-profile";
 
 export const SubscriptionSettings: SettingsGroup[] = [
   {
     key: "subscription",
     section: "subscription",
     header: SubscriptionStatus,
+    onStateChange: (listener) =>
+      useUserStore.subscribe((s) => s.user, listener),
     settings: [
       {
         key: "auto-renew",
         title: "Auto renew",
-        onStateChange: (listener) =>
-          useUserStore.subscribe((s) => s.user, listener),
         description:
           "Toggle auto renew to avoid any surprise charges. If you do not turn auto renew back on, you'll be automatically downgraded to the Free plan at the end of your billing period.",
         isHidden: () => {
@@ -147,8 +146,6 @@ export const SubscriptionSettings: SettingsGroup[] = [
       {
         key: "cancel-trial",
         title: "Cancel trial",
-        onStateChange: (listener) =>
-          useUserStore.subscribe((s) => s.user, listener),
         description: `Cancel your trial to stop all future charges permanently. You will be immediately downgraded to the Free plan.`,
         isHidden: () => {
           const user = useUserStore.getState().user;
@@ -192,8 +189,6 @@ export const SubscriptionSettings: SettingsGroup[] = [
       {
         key: "refund-subscription",
         title: "Refund subscription",
-        onStateChange: (listener) =>
-          useUserStore.subscribe((s) => s.user, listener),
         description: `You will only be issued a refund if you are eligible as per our refund policy. Your account will immediately be downgraded to Basic and your funds will be transferred to your account within 24 hours.`,
         isHidden: () => {
           const user = useUserStore.getState().user;
