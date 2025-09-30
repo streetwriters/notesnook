@@ -136,6 +136,11 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
         backgroundColor: colors.primary.background,
         paddingTop: 60
       }}
+      onLayout={() => {
+        setTimeout(() => {
+          inputRef.current?.focus();
+        }, 500);
+      }}
     >
       <View
         style={{
