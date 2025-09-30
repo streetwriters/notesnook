@@ -42,7 +42,10 @@ import { useStore as useUserStore } from "../../stores/user-store";
 import { getCurrencySymbol } from "../../common/currencies";
 
 type PlansListProps = {
-  selectedPlan: SubscriptionPlan;
+  selectedPlan?: string;
+  loadAllPlans?: boolean;
+  ignoreTrial?: boolean;
+  recommendedPlan?: SubscriptionPlan;
   onPlanSelected: (plan: Plan) => void;
 };
 
@@ -118,8 +121,14 @@ const RECOMMENDED_BY = [
 ];
 
 export function PlansList(props: PlansListProps) {
-  const { onPlanSelected, selectedPlan } = props;
-  const { isLoading, plans = [] } = usePlans();
+  const {
+    onPlanSelected,
+    selectedPlan,
+    loadAllPlans,
+    ignoreTrial,
+    recommendedPlan
+  } = props;
+  const { isLoading, plans = [] } = usePlans({ loadAllPlans });
   const [selectedPeriod, setPeriod] = useState<Period>("yearly");
   const user = useUserStore((store) => store.user);
 
@@ -187,9 +196,10 @@ export function PlansList(props: PlansListProps) {
                     textAlign: "start",
                     display: "flex",
                     flexDirection: "column",
-                    border: metadata.recommended
-                      ? "2px solid var(--accent)"
-                      : "1px solid var(--border)",
+                    border:
+                      recommendedPlan === plan.plan
+                        ? "2px solid var(--accent)"
+                        : "1px solid var(--border)",
                     borderRadius: "dialog"
                   }}
                 >
@@ -208,7 +218,7 @@ export function PlansList(props: PlansListProps) {
                     >
                       {metadata.title}
                     </Text>{" "}
-                    {metadata.recommended ? (
+                    {recommendedPlan === plan.plan ? (
                       <Text
                         variant="subBody"
                         sx={{
@@ -268,18 +278,20 @@ export function PlansList(props: PlansListProps) {
                       );
                     })}
                   </Flex>
-                  {selectedPlan === plan.plan ? (
+                  {selectedPlan === plan.id ? (
                     <Flex sx={{ mt: 2, alignItems: "center", gap: 1 }}>
                       <CheckCircleOutline color="accent" size={16} />
                       <Text variant="subBody">You are on this plan.</Text>
                     </Flex>
                   ) : (
                     <Button
-                      variant={metadata.recommended ? "accent" : "secondary"}
+                      variant={
+                        recommendedPlan === plan.plan ? "accent" : "secondary"
+                      }
                       onClick={() => onPlanSelected(plan)}
                       sx={{ mt: 2 }}
                     >
-                      {isTrialAvailableForPlan(plan.plan, user)
+                      {isTrialAvailableForPlan(plan.plan, user) && !ignoreTrial
                         ? "Start your free trial"
                         : "Select plan"}
                     </Button>

@@ -85,9 +85,11 @@ export async function getAllPlans(): Promise<Plan[] | null> {
     .sort((a, b) => a.plan - b.plan);
 }
 
-export function usePlans() {
+export function usePlans(options?: { loadAllPlans?: boolean }) {
   const result = usePromise(async () => {
-    const plans = await getPlans();
+    const plans = options?.loadAllPlans
+      ? await getAllPlans()
+      : await getPlans();
     if (!plans) return;
     return {
       plans,

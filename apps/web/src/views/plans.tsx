@@ -97,13 +97,13 @@ function Plans() {
               </Text>
             </Flex>
             <PlansList
+              recommendedPlan={SubscriptionPlan.PRO}
               onPlanSelected={(plan) => {
                 const url = new URLSearchParams({
                   plan: Buffer.from(JSON.stringify(plan)).toString("base64")
                 });
                 hardNavigate(`/checkout`, url.toString());
               }}
-              selectedPlan={SubscriptionPlan.FREE}
             />
           </Flex>
           <Flex

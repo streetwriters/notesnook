@@ -38,6 +38,7 @@ import { useStore as useUserStore } from "../../stores/user-store";
 import { ChangePlanDialog } from "./change-plan-dialog";
 import { Loading } from "../../components/icons";
 import { showToast } from "../../utils/toast";
+import { isUserSubscribed } from "../../hooks/use-is-user-premium";
 
 export type UpgradeDialogProps = {
   feature: FeatureResult<any>;
@@ -48,6 +49,7 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
   props: UpgradeDialogProps
 ) {
   const { onClose, feature } = props;
+  const subscription = useUserStore((store) => store.user?.subscription);
   const plans = usePromise(() => getAllPlans(), []);
   const plan =
     plans.status === "fulfilled"
@@ -133,47 +135,69 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
           <strong>Cancel anytime.</strong> {PERIOD_METADATA.yearly.refundDays}
           -day money-back guarantee.
         </Text>
-        <Button
-          variant="accent"
-          disabled={!plan}
-          onClick={() => {
-            if (!plan) return;
-            onClose();
-            const subscription = useUserStore.getState().user?.subscription;
-            if (
-              subscription?.provider !== SubscriptionProvider.PADDLE &&
-              subscription?.provider !== SubscriptionProvider.STREETWRITERS
-            )
-              return showToast(
-                "error",
-                `You can only change your plan from the platform you originally bought the subscription from.`
-              );
+        {!subscription || subscription.plan === SubscriptionPlan.FREE ? (
+          <>
+            <Button
+              variant="accent"
+              disabled={!plan}
+              onClick={() => {
+                if (!plan) return;
+                onClose();
 
-            if (!subscription || subscription.plan === SubscriptionPlan.FREE) {
-              useCheckoutStore.getState().selectPlan(plan);
-              BuyDialog.show({});
-            } else ChangePlanDialog.show({ selectedPlan: plan.id });
-          }}
-        >
-          {plan ? (
-            <>
-              Upgrade to {metadata.title} {getCurrencySymbol(plan.currency)}
-              {plan.price.gross}
-              {formatRecurringPeriodShort(plan.period)}
-            </>
-          ) : (
-            <Loading size={16} color="accentForeground" />
-          )}
-        </Button>
-        <Button
-          variant="tertiary"
-          onClick={() => {
-            onClose();
-            BuyDialog.show({});
-          }}
-        >
-          Compare all plans
-        </Button>
+                if (
+                  !subscription ||
+                  subscription.plan === SubscriptionPlan.FREE
+                ) {
+                  useCheckoutStore.getState().selectPlan(plan);
+                  BuyDialog.show({});
+                } else ChangePlanDialog.show({ selectedPlan: plan.id });
+              }}
+            >
+              {plan ? (
+                <>
+                  Upgrade to {metadata.title} {getCurrencySymbol(plan.currency)}
+                  {plan.price.gross}
+                  {formatRecurringPeriodShort(plan.period)}
+                </>
+              ) : (
+                <Loading size={16} color="accentForeground" />
+              )}
+            </Button>
+            <Button
+              variant="tertiary"
+              onClick={() => {
+                onClose();
+                BuyDialog.show({});
+              }}
+            >
+              Compare all plans
+            </Button>
+          </>
+        ) : (
+          <Button
+            variant="accent"
+            disabled={!plan}
+            onClick={() => {
+              if (
+                isUserSubscribed() &&
+                subscription?.provider !== SubscriptionProvider.PADDLE &&
+                subscription?.provider !== SubscriptionProvider.STREETWRITERS
+              )
+                return showToast(
+                  "error",
+                  `You can only change your plan from the platform you originally bought the subscription from.`
+                );
+              onClose();
+              ChangePlanDialog.show({});
+            }}
+          >
+            {plan ? (
+              <>Change plan</>
+            ) : (
+              <Loading size={16} color="accentForeground" />
+            )}
+          </Button>
+        )}
       </Flex>
     </BaseDialog>
   );

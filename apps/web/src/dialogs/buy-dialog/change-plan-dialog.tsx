@@ -20,213 +20,109 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { DialogManager } from "../../common/dialog-manager";
 import BaseDialog from "../../components/dialog";
 import { Flex, Text } from "@theme-ui/components";
-import { getAllPlans, PERIOD_METADATA, PLAN_METADATA } from "./plans";
-import { SelectComponent } from "../settings";
+import { PLAN_METADATA } from "./plans";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { db } from "../../common/db";
-import { useCallback, useEffect, useState } from "react";
-import dayjs from "dayjs";
 import { showToast } from "../../utils/toast";
-import { usePromise } from "@notesnook/common";
-import { ErrorText } from "../../components/error-text";
-import { Loading } from "../../components/icons";
-import { getCurrencySymbol } from "../../common/currencies";
+import { ComparePlans, Footer, PlansList } from "./plan-list";
+import { ConfirmDialog } from "../confirm";
+import { TaskManager } from "../../common/task-manager";
 
 export type ChangePlanDialogProps = {
   onClose: () => void;
-  selectedPlan?: string;
-};
-
-type ChangePreviewResponse = {
-  update_summary?: {
-    result: {
-      action: "charge";
-    };
-    charge: {
-      amount: string;
-    };
-    credit: { amount: string };
-  };
-  immediate_transaction?: { details: Details };
-  recurring_transaction_details: Details;
-  next_transaction: {
-    billing_period: BillingPeriod;
-    details: Details;
-  };
-  currency_code: string;
-  billing_cycle: {
-    interval: "month" | "year";
-  };
-};
-type BillingPeriod = {
-  ends_at: string;
-  starts_at: string;
-};
-type Totals = {
-  total: number;
-  balance: number;
-};
-type Details = {
-  line_items: LineItem[];
-  totals: Totals;
-};
-type LineItem = {
-  proration: Proration;
-};
-type Proration = {
-  billing_period: BillingPeriod;
 };
 
 export const ChangePlanDialog = DialogManager.register(
   function ChangePlanDialog(props: ChangePlanDialogProps) {
     const { onClose } = props;
-    const plans = usePromise(() => getAllPlans(), []);
     const subscription = useUserStore((store) => store.user?.subscription);
-    const [changeSummary, setChangeSummary] = useState<
-      { title: string; amount: string }[]
-    >([]);
-    const [selectedPlan, setSelectedPlan] = useState(props.selectedPlan);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<Error>();
-
-    const changePlan = useCallback(async (id: string) => {
-      setLoading(true);
-      setChangeSummary([]);
-      try {
-        const response = (await db.subscriptions.preview(
-          id
-        )) as ChangePreviewResponse | null;
-        if (!response) return;
-
-        const {
-          update_summary,
-          recurring_transaction_details,
-          currency_code: currencyCode
-        } = response;
-        const recurringTotal = recurring_transaction_details.totals.total;
-
-        const planPrice = update_summary
-          ? parseInt(update_summary?.charge.amount || "0")
-          : recurringTotal;
-
-        const summary: { title: string; amount: string }[] = [
-          {
-            title: "Plan price",
-            amount: formatPrice(planPrice, currencyCode)
-          }
-        ];
-        setChangeSummary(summary);
-      } catch (e) {
-        console.error(e);
-        setError(e as Error);
-      } finally {
-        setLoading(false);
-      }
-    }, []);
-
-    useEffect(() => {
-      if (!props.selectedPlan || plans.status !== "fulfilled") return;
-      setSelectedPlan(props.selectedPlan);
-      changePlan(props.selectedPlan);
-    }, [props.selectedPlan, changePlan, plans]);
 
     return (
       <BaseDialog
-        title={`Change plan`}
         isOpen={true}
         onClose={onClose}
-        positiveButton={{
-          text: "Confirm",
-          disabled: !selectedPlan || loading,
-          loading,
-          onClick: async () => {
-            if (!selectedPlan) return;
-            setLoading(true);
-            try {
-              await db.subscriptions.change(selectedPlan);
-              showToast(
-                "success",
-                "Subscription changed successfully. It might take a couple of minutes for the changes to reflect in the app."
-              );
-              onClose();
-            } catch (e) {
-              showToast("error", (e as Error).message);
-            } finally {
-              setLoading(false);
-            }
-          }
-        }}
-        negativeButton={{
-          text: "Cancel",
-          onClick: onClose
+        sx={{
+          width: ["95%", "80%", "60%"],
+          height: ["auto", "auto", "80vw"]
         }}
       >
-        {error ? (
-          <ErrorText error={error} />
-        ) : plans.status === "rejected" ? (
-          <ErrorText error={plans.reason} />
-        ) : (
-          <Flex sx={{ flexDirection: "column" }}>
-            <Flex
-              sx={{ alignItems: "center", justifyContent: "space-between" }}
+        <Flex
+          sx={{
+            flexDirection: "column",
+            flex: 1,
+            px: 25,
+            justifyContent: "center"
+          }}
+        >
+          <Flex sx={{ flexDirection: "column", alignSelf: "center" }}>
+            <Text
+              id="select-plan"
+              variant="heading"
+              sx={{ fontSize: 32, textAlign: "center" }}
             >
-              <Text variant="body">Select plan</Text>
-              {plans.status === "pending" || !plans.value || !subscription ? (
-                <Loading size={16} />
-              ) : (
-                <SelectComponent
-                  options={plans.value.map((p) => ({
-                    title:
-                      PLAN_METADATA[p.plan].title +
-                      ` (${PERIOD_METADATA[p.period].title})`,
-                    value: p.id
-                  }))}
-                  selectedOption={() => {
-                    console.log(selectedPlan || subscription.productId);
-                    return selectedPlan || subscription.productId;
-                  }}
-                  onSelectionChanged={async (id) => {
-                    const plan = plans.value?.find((p) => p.id === id);
-                    if (!plan) return;
-                    setSelectedPlan(id);
-                    await changePlan(id);
-                  }}
-                />
-              )}
-            </Flex>
-            {changeSummary.length > 0 ? (
-              <Flex sx={{ flexDirection: "column", gap: 1, mt: 1 }}>
-                <Text variant="subtitle">Summary</Text>
-                {changeSummary.map((item) => (
-                  <Flex
-                    key={item.title}
-                    sx={{
-                      alignItems: "center",
-                      justifyContent: "space-between"
-                    }}
-                  >
-                    <Text variant="body">{item.title}</Text>
-                    <Text variant="body" sx={{ color: "paragraph-secondary" }}>
-                      {item.amount}
-                    </Text>
-                  </Flex>
-                ))}
-                <Text variant="body" sx={{ color: "paragraph-secondary" }}>
-                  Note: You will receive a credit for unused time on your
-                  previous plan, and you will only pay the prorated amount for
-                  the new one.
-                </Text>
-              </Flex>
-            ) : null}
+              Change plan
+            </Text>
+            <Text
+              variant="title"
+              mt={1}
+              sx={{
+                fontSize: "title",
+                color: "heading-secondary",
+                textAlign: "center"
+              }}
+            >
+              You will only pay the prorated amount for the new subscription
+              plan
+            </Text>
           </Flex>
-        )}
+          <PlansList
+            selectedPlan={subscription?.productId}
+            loadAllPlans
+            ignoreTrial
+            onPlanSelected={async (plan) => {
+              const result = await ConfirmDialog.show({
+                title: "Confirm plan change",
+                message: `Your plan will be switched to ${
+                  PLAN_METADATA[plan.plan].title
+                } plan. You will receive a credit for unused time on your previous subscription, and you will only pay the prorated amount for your new subscription.`,
+                positiveButtonText: "Confirm",
+                negativeButtonText: "Cancel"
+              });
+              if (result) {
+                onClose();
+                await TaskManager.startTask({
+                  type: "modal",
+                  title: "Changing subscription plan",
+                  subtitle:
+                    "Please wait while we change your subscription plan...",
+                  action: async () => {
+                    try {
+                      await db.subscriptions.change(plan.id);
+                      showToast(
+                        "success",
+                        "Subscription changed successfully. It might take a couple of minutes for the changes to reflect in the app."
+                      );
+                    } catch (e) {
+                      showToast("error", (e as Error).message);
+                    }
+                  }
+                });
+              }
+            }}
+          />
+        </Flex>
+        <Flex
+          sx={{
+            flexDirection: "column",
+            flex: 1,
+            px: "5%",
+            mt: 50
+          }}
+        >
+          <ComparePlans />
+          <Footer />
+        </Flex>
       </BaseDialog>
     );
   }
 );
-
-function formatPrice(amount: string | number, currency: string) {
-  return `${getCurrencySymbol(currency)}${
-    (typeof amount === "string" ? parseInt(amount) : amount) / 100
-  }`;
-}
