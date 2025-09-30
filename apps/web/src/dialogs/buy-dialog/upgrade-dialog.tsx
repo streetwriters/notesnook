@@ -25,7 +25,7 @@ import {
 } from "@notesnook/common";
 import { DialogManager } from "../../common/dialog-manager";
 import BaseDialog from "../../components/dialog";
-import { SubscriptionPlan } from "@notesnook/core";
+import { SubscriptionPlan, SubscriptionProvider } from "@notesnook/core";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { FeatureCaption } from "./feature-caption";
 import { getAllPlans, PERIOD_METADATA, PLAN_METADATA } from "./plans";
@@ -37,6 +37,7 @@ import { getCurrencySymbol } from "../../common/currencies";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { ChangePlanDialog } from "./change-plan-dialog";
 import { Loading } from "../../components/icons";
+import { showToast } from "../../utils/toast";
 
 export type UpgradeDialogProps = {
   feature: FeatureResult<any>;
@@ -139,6 +140,15 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
             if (!plan) return;
             onClose();
             const subscription = useUserStore.getState().user?.subscription;
+            if (
+              subscription?.provider !== SubscriptionProvider.PADDLE &&
+              subscription?.provider !== SubscriptionProvider.STREETWRITERS
+            )
+              return showToast(
+                "error",
+                `You can only change your plan from the platform you originally bought the subscription from.`
+              );
+
             if (!subscription || subscription.plan === SubscriptionPlan.FREE) {
               useCheckoutStore.getState().selectPlan(plan);
               BuyDialog.show({});
