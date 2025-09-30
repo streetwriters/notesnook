@@ -22,6 +22,7 @@ import AppIcon from "../../ui/AppIcon";
 import { Button } from "../../ui/button";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { SubscriptionProvider } from "@notesnook/core";
 const isGithubRelease = Config.GITHUB_RELEASE === "true";
 const INDEX_TO_PLAN = {
   1: "essential",
@@ -51,6 +52,11 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
       pricingPlans.selectProduct(product);
     }
   }, []);
+
+  const isSubscribedOnWeb =
+    pricingPlans.user?.subscription.provider === SubscriptionProvider.PADDLE ||
+    pricingPlans.user?.subscription.provider ===
+      SubscriptionProvider.STREETWRITERS;
 
   return !pricingPlans.currentPlan ? null : (
     <View
@@ -178,6 +184,12 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
               width: "100%"
             }}
             onPress={() => {
+              if (isSubscribedOnWeb) {
+                ToastManager.show({
+                  message: strings.changePlanOnWeb()
+                });
+                return;
+              }
               eSendEvent(eCloseSheet);
               if (!useUserStore.getState().user) {
                 Navigation.navigate("Auth", {
@@ -199,18 +211,22 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
           />
         </View>
 
-        <Button
-          type="plain"
-          title={strings.exploreAllPlans()}
-          icon="arrow-right"
-          iconPosition="right"
-          onPress={() => {
-            eSendEvent(eCloseSheet);
-            Navigation.navigate("PayWall", {
-              context: useUserStore.getState().user ? "logged-in" : "logged-out"
-            });
-          }}
-        />
+        {isSubscribedOnWeb ? null : (
+          <Button
+            type="plain"
+            title={strings.exploreAllPlans()}
+            icon="arrow-right"
+            iconPosition="right"
+            onPress={() => {
+              eSendEvent(eCloseSheet);
+              Navigation.navigate("PayWall", {
+                context: useUserStore.getState().user
+                  ? "logged-in"
+                  : "logged-out"
+              });
+            }}
+          />
+        )}
       </>
     </View>
   );

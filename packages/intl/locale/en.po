@@ -7180,6 +7180,10 @@ msgstr "You can also link a note to multiple Notebooks. Tap and hold any noteboo
 msgid "You can change the theme at any time from Settings or the side menu."
 msgstr "You can change the theme at any time from Settings or the side menu."
 
+#: src/strings.ts:2590
+msgid "You can change your subscription plan from the web app"
+msgstr "You can change your subscription plan from the web app"
+
 #: src/strings.ts:2419
 msgid "You can create shortcuts of frequently accessed notebooks in the side menu"
 msgstr "You can create shortcuts of frequently accessed notebooks in the side menu"

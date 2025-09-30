@@ -7131,6 +7131,10 @@ msgstr ""
 msgid "You can change the theme at any time from Settings or the side menu."
 msgstr ""
 
+#: src/strings.ts:2590
+msgid "You can change your subscription plan from the web app"
+msgstr ""
+
 #: src/strings.ts:2419
 msgid "You can create shortcuts of frequently accessed notebooks in the side menu"
 msgstr ""

@@ -2585,5 +2585,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   contactSupportToChangePlan: () =>
     t`You have made a one time purchase. To change your plan please contact support.`,
   alreadySubscribed: () => t`You are already subscribed to this plan.`,
-  specialOffer: () => t`Special Offer`
+  specialOffer: () => t`Special Offer`,
+  changePlanOnWeb: () =>
+    t`You can change your subscription plan from the web app`
 };
