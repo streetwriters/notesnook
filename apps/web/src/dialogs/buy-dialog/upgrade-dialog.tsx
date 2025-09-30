@@ -20,14 +20,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import {
   FeatureResult,
   getFeature,
-  planToAvailability
+  planToAvailability,
+  usePromise
 } from "@notesnook/common";
 import { DialogManager } from "../../common/dialog-manager";
 import BaseDialog from "../../components/dialog";
 import { SubscriptionPlan } from "@notesnook/core";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { FeatureCaption } from "./feature-caption";
-import { PERIOD_METADATA, PLAN_METADATA, usePlans } from "./plans";
+import { getAllPlans, PERIOD_METADATA, PLAN_METADATA } from "./plans";
 import { formatRecurringPeriodShort } from "./plan-list";
 import { useCheckoutStore } from "./store";
 import { BuyDialog } from "./buy-dialog";
@@ -46,12 +47,15 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
   props: UpgradeDialogProps
 ) {
   const { onClose, feature } = props;
-  const { plans } = usePlans();
-  const plan = plans?.find(
-    (p) =>
-      p.plan === (feature.availableOn || SubscriptionPlan.PRO) &&
-      p.period === "yearly"
-  );
+  const plans = usePromise(() => getAllPlans(), []);
+  const plan =
+    plans.status === "fulfilled"
+      ? plans.value?.find(
+          (p) =>
+            p.plan === (feature.availableOn || SubscriptionPlan.PRO) &&
+            p.period === "yearly"
+        )
+      : null;
   const metadata = PLAN_METADATA[feature.availableOn || SubscriptionPlan.PRO];
 
   return (

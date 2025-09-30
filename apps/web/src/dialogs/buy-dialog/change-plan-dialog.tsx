@@ -100,99 +100,21 @@ export const ChangePlanDialog = DialogManager.register(
 
         const {
           update_summary,
-          immediate_transaction,
           recurring_transaction_details,
-          next_transaction,
-          currency_code: currencyCode,
-          billing_cycle
+          currency_code: currencyCode
         } = response;
-        const proration = immediate_transaction?.details.line_items.find(
-          (l) => !!l.proration
-        )?.proration;
-        const recurringBalance = recurring_transaction_details.totals.balance;
         const recurringTotal = recurring_transaction_details.totals.total;
 
         const planPrice = update_summary
           ? parseInt(update_summary?.charge.amount || "0")
           : recurringTotal;
 
-        const balance =
-          recurringTotal -
-          recurringBalance +
-          parseInt(update_summary?.credit.amount || "0") * -1;
-        const charge = planPrice - balance;
-
         const summary: { title: string; amount: string }[] = [
           {
             title: "Plan price",
             amount: formatPrice(planPrice, currencyCode)
-          },
-          {
-            title: "Balance from current subscription",
-            amount: formatPrice(balance, currencyCode)
           }
         ];
-        if (!update_summary) {
-          const chargeStartDate = dayjs(
-            next_transaction.billing_period.starts_at
-          );
-          const amount = next_transaction.details.totals.total;
-          summary.push({
-            title: `Charged ${chargeStartDate.format("YYYY-MM-DD")}`,
-            amount: formatPrice(amount, currencyCode)
-          });
-        } else if (update_summary.result.action === "charge") {
-          summary.push(
-            {
-              title: "Charged today",
-              amount: formatPrice(charge, currencyCode)
-            },
-            {
-              title: `Charged ${dayjs(
-                next_transaction.billing_period.starts_at
-              ).format("YYYY-MM-DD")}`,
-              amount: formatPrice(recurringTotal, currencyCode)
-            }
-          );
-        } else {
-          const nextCharge = recurringTotal - charge;
-          summary.push({
-            title: "Charged today",
-            amount: formatPrice(0, currencyCode)
-          });
-          if (nextCharge > 0 && proration) {
-            summary.push({
-              title: `Charged ${dayjs(proration.billing_period.ends_at).format(
-                "YYYY-MM-DD"
-              )}`,
-              amount: formatPrice(nextCharge, currencyCode)
-            });
-            summary.push({
-              title: `Charged ${dayjs(proration.billing_period.ends_at)
-                .add(1, billing_cycle.interval)
-                .format("YYYY-MM-DD")}`,
-              amount: formatPrice(planPrice, currencyCode)
-            });
-          } else {
-            const freeIntervals = Math.floor(charge / planPrice);
-            const amount = planPrice - (charge - planPrice * freeIntervals);
-            const chargeStartDate = dayjs(
-              next_transaction.billing_period.starts_at
-            ).add(freeIntervals, billing_cycle.interval);
-            summary.push(
-              {
-                title: `Charged ${chargeStartDate.format("YYYY-MM-DD")}`,
-                amount: formatPrice(amount, currencyCode)
-              },
-              {
-                title: `Charged ${chargeStartDate
-                  .add(1, billing_cycle.interval)
-                  .format("YYYY-MM-DD")}`,
-                amount: formatPrice(planPrice, currencyCode)
-              }
-            );
-          }
-        }
         setChangeSummary(summary);
       } catch (e) {
         console.error(e);
@@ -203,9 +125,10 @@ export const ChangePlanDialog = DialogManager.register(
     }, []);
 
     useEffect(() => {
-      if (!props.selectedPlan) return;
+      if (!props.selectedPlan || plans.status !== "fulfilled") return;
+      setSelectedPlan(props.selectedPlan);
       changePlan(props.selectedPlan);
-    }, [props.selectedPlan, changePlan]);
+    }, [props.selectedPlan, changePlan, plans]);
 
     return (
       <BaseDialog
@@ -258,7 +181,10 @@ export const ChangePlanDialog = DialogManager.register(
                       ` (${PERIOD_METADATA[p.period].title})`,
                     value: p.id
                   }))}
-                  selectedOption={() => selectedPlan || subscription.productId}
+                  selectedOption={() => {
+                    console.log(selectedPlan || subscription.productId);
+                    return selectedPlan || subscription.productId;
+                  }}
                   onSelectionChanged={async (id) => {
                     const plan = plans.value?.find((p) => p.id === id);
                     if (!plan) return;
@@ -285,6 +211,11 @@ export const ChangePlanDialog = DialogManager.register(
                     </Text>
                   </Flex>
                 ))}
+                <Text variant="body" sx={{ color: "paragraph-secondary" }}>
+                  Note: You will receive a credit for unused time on your
+                  previous plan, and you will only pay the prorated amount for
+                  the new one.
+                </Text>
               </Flex>
             ) : null}
           </Flex>
