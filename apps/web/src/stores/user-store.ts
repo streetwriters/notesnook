@@ -59,6 +59,7 @@ class UserStore extends BaseStore<UserStore> {
 
     EV.subscribe(EVENTS.userSubscriptionUpdated, (subscription) => {
       const wasSubscribed = isUserSubscribed();
+      this.refreshUser();
       this.set((state) => {
         if (!state.user) return;
         state.user.subscription = subscription;
