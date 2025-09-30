@@ -46,6 +46,7 @@ import { planToDisplayName } from "../../utils/constants";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { SectionItem } from "./section-item";
+import PremiumService from "../../services/premium";
 
 export const getTimeLeft = (t2) => {
   let daysRemaining = dayjs(t2).diff(dayjs(), "days");
@@ -336,9 +337,10 @@ const SettingsUserSection = ({ item }) => {
                   </Paragraph>
                 </TouchableOpacity>
 
-                {user.subscription.provider === SubscriptionProvider.PADDLE ||
-                user.subscription.provider ===
-                  SubscriptionProvider.STREETWRITERS ? null : (
+                {(user.subscription.provider === SubscriptionProvider.PADDLE ||
+                  user.subscription.provider ===
+                    SubscriptionProvider.STREETWRITERS) &&
+                PremiumService.get() ? null : (
                   <Button
                     title={
                       user.subscription.plan !== SubscriptionPlan.FREE

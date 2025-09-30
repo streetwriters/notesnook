@@ -23,6 +23,7 @@ import { Button } from "../../ui/button";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { SubscriptionProvider } from "@notesnook/core";
+import PremiumService from "../../../services/premium";
 const isGithubRelease = Config.GITHUB_RELEASE === "true";
 const INDEX_TO_PLAN = {
   1: "essential",
@@ -54,7 +55,9 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
   }, []);
 
   const isSubscribedOnWeb =
-    pricingPlans.user?.subscription.provider === SubscriptionProvider.PADDLE ||
+    (PremiumService.get() &&
+      pricingPlans.user?.subscription.provider ===
+        SubscriptionProvider.PADDLE) ||
     pricingPlans.user?.subscription.provider ===
       SubscriptionProvider.STREETWRITERS;
 
@@ -186,7 +189,8 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
             onPress={() => {
               if (isSubscribedOnWeb) {
                 ToastManager.show({
-                  message: strings.changePlanOnWeb()
+                  message: strings.changePlanOnWeb(),
+                  context: "local"
                 });
                 return;
               }

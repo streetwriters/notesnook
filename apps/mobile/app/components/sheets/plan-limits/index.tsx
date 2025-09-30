@@ -19,6 +19,7 @@ import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { SubscriptionPlan, SubscriptionProvider } from "@notesnook/core";
 import { useUserStore } from "../../../stores/use-user-store";
+import PremiumService from "../../../services/premium";
 
 export function PlanLimits() {
   const { colors } = useThemeColors();
@@ -77,9 +78,9 @@ export function PlanLimits() {
         </View>
       ))}
 
-      {user?.subscription.provider === SubscriptionProvider.PADDLE ||
-      user?.subscription.provider ===
-        SubscriptionProvider.STREETWRITERS ? null : (
+      {(user?.subscription.provider === SubscriptionProvider.PADDLE ||
+        user?.subscription.provider === SubscriptionProvider.STREETWRITERS) &&
+      PremiumService.get() ? null : (
         <Button
           title={strings.changePlan()}
           onPress={() => {
