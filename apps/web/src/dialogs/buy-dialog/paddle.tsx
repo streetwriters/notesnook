@@ -222,6 +222,9 @@ function getPricingInfo(
 ): PricingInfo {
   const isRecurringDiscount = !!data.recurring_totals?.discount;
   const price = data.items[0];
+  const totals = price.trial_period
+    ? price.recurring_totals || price.totals
+    : price.totals;
   return {
     country: options.countryCode || "US",
     period: options.period,
@@ -253,9 +256,9 @@ function getPricingInfo(
       currency: data.currency_code,
       id: price.price_id,
       period: options.period,
-      subtotal: formatPrice(data.totals.subtotal, data.currency_code),
-      total: formatPrice(data.totals.total, data.currency_code),
-      tax: formatPrice(data.totals.tax, data.currency_code),
+      subtotal: formatPrice(totals.subtotal, data.currency_code),
+      total: formatPrice(totals.total, data.currency_code),
+      tax: formatPrice(totals.tax, data.currency_code),
       trial_period: price.trial_period
         ? {
             frequency: price.trial_period.frequency

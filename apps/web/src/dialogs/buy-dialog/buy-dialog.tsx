@@ -35,7 +35,7 @@ import {
   PlansList
 } from "./plan-list";
 import { useCheckoutStore } from "./store";
-import { toPricingInfo } from "./helpers";
+import { formatPrice, toPricingInfo } from "./helpers";
 import { isUserSubscribed } from "../../hooks/use-is-user-premium";
 import BaseDialog from "../../components/dialog";
 import { ScopedThemeProvider } from "../../components/theme-provider";
@@ -404,7 +404,7 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
           </Flex>
           {pricingInfo.price.trial_period ? (
             <Text variant="body" color="heading">
-              FREE
+              {formatPrice(0, pricingInfo.price.currency)}
             </Text>
           ) : (
             <Text variant="body" color="heading">
@@ -563,7 +563,7 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
           </Text>
           {price.trial_period ? (
             <Text as="div" variant="title" sx={{ textAlign: "end" }}>
-              FREE
+              {formatPrice(0, pricingInfo.price.currency)}
             </Text>
           ) : (
             <Text
