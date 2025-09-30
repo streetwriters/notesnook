@@ -61,7 +61,7 @@ const hashroutes = defineHashRoutes({
     BuyDialog.show({ couponCode: code }).then(afterAction);
   },
   "/welcome": () => {
-    OnboardingDialog.show({ type: "new" })?.then(afterAction);
+    OnboardingDialog.show({})?.then(afterAction);
   },
   "/confirmed": () => {
     FeatureDialog.show({ featureName: "confirmed" }).then(afterAction);

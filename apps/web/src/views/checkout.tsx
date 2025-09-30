@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import "../app.css";
 import { useEffect, useState } from "react";
 import { Box, Button, Flex, Text } from "@theme-ui/components";
-import { hardNavigate, useQueryParams } from "../navigation";
+import { hardNavigate, hashNavigate, useQueryParams } from "../navigation";
 import { Support } from "../components/icons";
 import { HeadlessAuth } from "./auth";
 import {
@@ -39,6 +39,7 @@ import { isUserSubscribed } from "../hooks/use-is-user-premium";
 import { PLAN_METADATA } from "../dialogs/buy-dialog/plans";
 import { planToAvailability } from "@notesnook/common";
 import { FeatureCaption } from "../dialogs/buy-dialog/feature-caption";
+import { EV, EVENTS } from "@notesnook/core";
 
 export type Plan = z.infer<typeof PlanSchema>;
 
@@ -115,6 +116,17 @@ function Checkout() {
       setCurrentStep(1);
     }
   }, [plan]);
+
+  useEffect(() => {
+    if (currentStep === 2) {
+      var event = EV.subscribe(EVENTS.userSubscriptionUpdated, () => {
+        hardNavigate("/notes#/welcome");
+      });
+      return () => {
+        event.unsubscribe();
+      };
+    }
+  }, [currentStep]);
 
   if (!plan) {
     hardNavigate("/");
