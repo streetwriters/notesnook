@@ -137,7 +137,8 @@ export const settingsGroups: SettingSection[] = [
                 )
               : status === SubscriptionStatus.ACTIVE
               ? strings.subRenewOn(expiryDate)
-              : status === SubscriptionStatus.CANCELED
+              : status === SubscriptionStatus.CANCELED ||
+                status === SubscriptionStatus.PAUSED
               ? strings.subEndsOn(expiryDate)
               : status === SubscriptionStatus.EXPIRED
               ? subscriptionDaysLeft.time < -3
