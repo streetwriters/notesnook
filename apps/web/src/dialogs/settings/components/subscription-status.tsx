@@ -77,7 +77,14 @@ export function SubscriptionStatus() {
           {strings.currentPlan()}
         </Text>
         <Text variant="heading">{title}</Text>
-        {subtitle ? <Text variant="body">{subtitle}</Text> : null}
+        {subtitle ? (
+          <Text variant="body">
+            {subtitle}{" "}
+            {strings.subscriptionProviderInfo[
+              user.subscription.provider || 0
+            ].desc()}
+          </Text>
+        ) : null}
         {featuresUsage.status === "fulfilled" ? (
           <Grid
             sx={{
