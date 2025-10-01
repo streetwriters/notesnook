@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import {
+  FeatureId,
   FeatureResult,
   getFeature,
   planToAvailability,
@@ -60,6 +61,16 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
         )
       : null;
   const metadata = PLAN_METADATA[feature.availableOn || SubscriptionPlan.PRO];
+  const features = [
+    ...new Set<FeatureId>([
+      "storage",
+      "fileSize",
+      feature.id,
+      "notebooks",
+      "tags",
+      "activeReminders"
+    ])
+  ].map((id) => getFeature(id));
 
   return (
     <BaseDialog
@@ -94,14 +105,7 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
           <Text variant="body" sx={{ fontWeight: "bold", color: "heading" }}>
             {metadata.title} plan
           </Text>
-          {[
-            getFeature("storage"),
-            getFeature("fileSize"),
-            getFeature(feature.id),
-            getFeature("notebooks"),
-            getFeature("tags"),
-            getFeature("activeReminders")
-          ].map((f) => {
+          {features.map((f) => {
             const caption =
               f.availability[
                 planToAvailability(feature.availableOn || SubscriptionPlan.PRO)
