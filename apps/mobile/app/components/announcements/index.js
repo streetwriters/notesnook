@@ -33,6 +33,7 @@ import {
 import BaseDialog from "../dialog/base-dialog";
 import { allowedOnPlatform, renderItem } from "./functions";
 import { useCallback } from "react";
+import { DefaultAppStyles } from "../../utils/styles";
 
 /**
  * Test announcement
@@ -138,9 +139,9 @@ export const AnnouncementDialog = () => {
           maxHeight: DDS.isTab ? "90%" : "100%",
           borderRadius: DDS.isTab ? 10 : 0,
           overflow: "hidden",
-          marginBottom: DDS.isTab ? 20 : 0,
-          borderTopRightRadius: 10,
-          borderTopLeftRadius: 10
+          paddingVertical: DefaultAppStyles.GAP,
+          borderTopRightRadius: 15,
+          borderTopLeftRadius: 15
         }}
       >
         <FlatList

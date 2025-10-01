@@ -51,7 +51,8 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
       style={{
         paddingHorizontal: DefaultAppStyles.GAP,
         ...getStyle(style),
-        flexDirection: inline ? "row" : "column"
+        flexDirection: inline ? "row" : "column",
+        gap: DefaultAppStyles.GAP_SMALL
       }}
     >
       <SheetProvider context="premium_cta" />
@@ -86,12 +87,10 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
                 fontSize={AppFontSize.sm}
                 type="plain"
                 onPress={() => onPress(item)}
-                width={null}
-                height={30}
                 style={{
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
                   alignSelf: "flex-start",
-                  paddingHorizontal: 0,
-                  marginLeft: 12
+                  paddingHorizontal: 0
                 }}
                 textStyle={{
                   textDecorationLine: "underline"
@@ -115,10 +114,8 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
                   opacity: 1
                 }}
                 onPress={() => onPress(item)}
-                width={250}
                 style={{
-                  marginBottom: DefaultAppStyles.GAP_VERTICAL,
-                  borderRadius: 100
+                  width: "100%"
                 }}
               />
             ))}
@@ -135,7 +132,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
                 height={30}
                 style={{
                   minWidth: "50%",
-                  marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL
+                  width: "100%"
                 }}
                 textStyle={{
                   textDecorationLine: "underline"

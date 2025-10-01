@@ -110,10 +110,14 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
     );
     const dialogIndex = dialogsCopy.findIndex((dialog) => dialog.id === id);
 
-    if (index >= -1) {
-      dialogsCopy.splice(dialogIndex, 1);
+    if (index != -1) {
       inlineCopy.splice(index, 1);
     }
+
+    if (dialogIndex != -1) {
+      dialogsCopy.splice(dialogIndex, 1);
+    }
+
     set({ announcements: inlineCopy, dialogs: dialogsCopy });
   },
   dialogs: [],
@@ -163,8 +167,6 @@ async function shouldShowAnnouncement(announcement: Announcement) {
   if (announcement.appVersion) {
     return announcement.appVersion === (getVersion() as unknown as number);
   }
-
-  if (!show) return false;
   if (!show) return false;
   const user = (await db.user?.getUser()) as User;
   const subStatus = user?.subscription?.status;
@@ -183,6 +185,7 @@ async function shouldShowAnnouncement(announcement: Announcement) {
       case "unverified":
         return !user?.isEmailConfirmed;
       case "any":
+        return true;
       default:
         return false;
     }

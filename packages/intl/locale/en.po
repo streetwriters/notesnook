@@ -859,6 +859,10 @@ msgstr "and much more."
 msgid "and we will manually confirm your account."
 msgstr "and we will manually confirm your account."
 
+#: src/strings.ts:2591
+msgid "ANNOUNCEMENT"
+msgstr "ANNOUNCEMENT"
+
 #: src/strings.ts:252
 msgid "App data has been cleared. Kindly relaunch the app to login again."
 msgstr "App data has been cleared. Kindly relaunch the app to login again."

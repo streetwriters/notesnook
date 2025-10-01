@@ -346,6 +346,9 @@ const doAppLoadActions = async () => {
     eSendEvent(eLoginSessionExpired);
     return;
   }
+
+  await useMessageStore.getState().setAnnouncement();
+
   notifee.setBadgeCount(0);
 
   if (!(await db.user.getUser())) {
@@ -353,7 +356,6 @@ const doAppLoadActions = async () => {
     return;
   }
 
-  await useMessageStore.getState().setAnnouncement();
   if (NewFeature.present()) return;
   if (await checkAppUpdateAvailable()) return;
   if (await checkForRateAppRequest()) return;

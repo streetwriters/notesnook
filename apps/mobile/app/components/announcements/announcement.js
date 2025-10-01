@@ -25,10 +25,17 @@ import { useSelectionStore } from "../../stores/use-selection-store";
 import { allowedOnPlatform, renderItem } from "./functions";
 import { getContainerBorder } from "../../utils/colors";
 import { DefaultAppStyles } from "../../utils/styles";
+import Heading from "../ui/typography/heading";
+import { AppFontSize } from "../../utils/size";
+import { Button } from "../ui/button";
+import { strings } from "@notesnook/intl";
 
 export const Announcement = ({ color }) => {
   const { colors } = useThemeColors();
-  const announcements = useMessageStore((state) => state.announcements);
+  const [announcements, remove] = useMessageStore((state) => [
+    state.announcements,
+    state.remove
+  ]);
   let announcement = announcements.length > 0 ? announcements[0] : null;
   const selectionMode = useSelectionStore((state) => state.selectionMode);
 
@@ -57,6 +64,38 @@ export const Announcement = ({ color }) => {
             marginTop: DefaultAppStyles.GAP_VERTICAL
           }}
         >
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              paddingHorizontal: DefaultAppStyles.GAP,
+              borderBottomWidth: 1,
+              borderBottomColor: colors.primary.border,
+              paddingBottom: DefaultAppStyles.GAP_VERTICAL_SMALL
+            }}
+          >
+            <Heading color={colors.secondary.heading} size={AppFontSize.xxs}>
+              {strings.announcement()}
+            </Heading>
+
+            <Button
+              type="plain"
+              icon="close"
+              height={null}
+              onPress={() => {
+                remove(announcement.id);
+              }}
+              iconSize={20}
+              fontSize={AppFontSize.xs}
+              style={{
+                paddingVertical: 0,
+                paddingHorizontal: 0,
+                zIndex: 10
+              }}
+            />
+          </View>
+
           {announcement?.body
             .filter((item) => allowedOnPlatform(item.platforms))
             .map((item, index) =>
