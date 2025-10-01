@@ -603,7 +603,7 @@ const AVAILABILITY_TO_PLAN: Record<
 function lte(limit: number) {
   return async (value?: number) => {
     if (typeof value === "undefined") return false;
-    return value <= limit;
+    return value < limit;
   };
 }
 
