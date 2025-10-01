@@ -1018,7 +1018,7 @@ const PricingPlanCard = ({
         gap: 6
       }}
     >
-      {regionalDiscount?.discount ? (
+      {regionalDiscount?.discount || WebPlan?.discount ? (
         <View
           style={{
             backgroundColor: colors.static.red,
@@ -1032,7 +1032,9 @@ const PricingPlanCard = ({
         >
           <Heading color={colors.static.white} size={AppFontSize.xs}>
             {strings.specialOffer()}{" "}
-            {strings.percentOff(`${regionalDiscount?.discount}`)}
+            {strings.percentOff(
+              `${regionalDiscount?.discount || WebPlan?.discount?.amount}`
+            )}
           </Heading>
         </View>
       ) : null}
