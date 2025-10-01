@@ -74,6 +74,7 @@ import { IconButton } from "../ui/icon-button";
 import { SvgView } from "../ui/svg";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import PremiumService from "../../services/premium";
 
 const Steps = {
   select: 1,
@@ -334,7 +335,7 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
                                 (
                                   pricingPlans.selectedProduct as RNIap.Subscription
                                 )?.productId ||
-                                (pricingPlans.selectedProduct as Plan).period,
+                                (pricingPlans.selectedProduct as Plan)?.period,
                               billingType: annualBilling ? "annual" : "monthly"
                             }
                           });
@@ -978,17 +979,21 @@ const PricingPlanCard = ({
     pricingPlans?.user?.subscription?.productId?.includes(plan.id) &&
     pricingPlans.isSubscribed();
 
+  const isNotReady =
+    pricingPlans?.loadingPlans || (!price && !WebPlan?.price.gross);
+
   return (
     <TouchableOpacity
       activeOpacity={0.8}
       onPress={() => {
+        if (isNotReady) return;
         const currentPlanSubscribed =
-          pricingPlans?.user?.subscription?.productId ===
+          PremiumService.get() &&
+          (pricingPlans?.user?.subscription?.productId ===
             (product as RNIap.Subscription)?.productId ||
-          pricingPlans?.user?.subscription?.productId.startsWith(
-            (product as RNIap.Subscription)?.productId
-          );
-
+            pricingPlans?.user?.subscription?.productId.startsWith(
+              (product as RNIap.Subscription)?.productId
+            ));
         pricingPlans?.selectPlan(
           plan.id,
           currentPlanSubscribed

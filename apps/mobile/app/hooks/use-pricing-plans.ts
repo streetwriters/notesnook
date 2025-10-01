@@ -255,35 +255,7 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
       }
       setLoadingPlans(false);
     };
-
-    const loadPromoOffer = async () => {
-      if (cancelPromo) {
-        setIsPromoOffer(false);
-        return;
-      }
-      if (options?.promoOffer?.promoCode) {
-        const promoCode = options.promoOffer.promoCode;
-        let skuId: string;
-        if (promoCode.startsWith("com.streetwriters.notesnook")) {
-          skuId = promoCode;
-        } else {
-          skuId = await db.offers?.getCode(
-            promoCode.split(":")[0],
-            Platform.OS as "ios" | "android" | "web"
-          );
-        }
-
-        const plan = pricingPlans.find((p) =>
-          p.subscriptionSkuList.includes(skuId)
-        );
-        if (plan) {
-          setCurrentPlan(plan.id);
-          setSelectedProductSku(skuId);
-          setIsPromoOffer(true);
-        }
-      }
-    };
-    loadPlans().then(() => loadPromoOffer());
+    loadPlans();
   }, [options?.promoOffer, cancelPromo]);
 
   function getLocalizedPrice(
