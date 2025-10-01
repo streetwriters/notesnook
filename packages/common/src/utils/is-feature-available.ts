@@ -104,7 +104,7 @@ function createLimit<
       : inferredValue === true
       ? alwaysTrue
       : typeof inferredValue === "number"
-      ? lte(inferredValue)
+      ? lt(inferredValue)
       : alwaysFalse,
     value: inferredValue
   };
@@ -599,13 +599,6 @@ const AVAILABILITY_TO_PLAN: Record<
   believer: SubscriptionPlan.BELIEVER,
   legacyPro: undefined
 };
-
-function lte(limit: number) {
-  return async (value?: number) => {
-    if (typeof value === "undefined") return false;
-    return value <= limit;
-  };
-}
 
 function lt(limit: number) {
   return async (value?: number) => {
