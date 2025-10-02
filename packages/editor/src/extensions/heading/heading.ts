@@ -23,9 +23,28 @@ import {
   findParentNodeClosestToPos
 } from "@tiptap/core";
 import { Heading as TiptapHeading } from "@tiptap/extension-heading";
-import { Plugin, PluginKey } from "@tiptap/pm/state";
+import { isClickWithinBounds } from "../../utils/prosemirror";
+import { Selection, Transaction, Plugin, PluginKey } from "@tiptap/pm/state";
 import { Decoration, DecorationSet } from "@tiptap/pm/view";
-import { isClickWithinBounds } from "../../utils/prosemirror.js";
+import { Node } from "@tiptap/pm/model";
+
+const COLLAPSIBLE_BLOCK_TYPES = [
+  "paragraph",
+  "heading",
+  "blockquote",
+  "bulletList",
+  "orderedList",
+  "checkList",
+  "taskList",
+  "table",
+  "callout",
+  "codeblock",
+  "image",
+  "outlineList",
+  "mathBlock",
+  "webclip",
+  "embed"
+];
 
 const HEADING_REGEX = /^(#{1,6})\s$/;
 export const Heading = TiptapHeading.extend({
@@ -61,31 +80,69 @@ export const Heading = TiptapHeading.extend({
             textAlign,
             textDirection
           });
-        },
-      toggleHeadingCollapse:
-        (pos: number) =>
-        ({ tr }: { tr: any }) => {
-          const node = tr.doc.nodeAt(pos);
-          if (node && node.type === this.type) {
-            tr.setNodeAttribute(pos, "collapsed", !node.attrs.collapsed);
-            return true;
-          }
-          return false;
         }
     };
   },
 
-  addKeyboardShortcuts() {
-    return this.options.levels.reduce(
-      (items, level) => ({
-        ...items,
-        ...{
-          [tiptapKeys[`insertHeading${level}`].keys]: () =>
-            this.editor.commands.setHeading({ level })
+  addGlobalAttributes() {
+    return [
+      {
+        types: COLLAPSIBLE_BLOCK_TYPES,
+        attributes: {
+          hiddenUnder: {
+            default: null,
+            keepOnSplit: false,
+            parseHTML: (element) => element.dataset.hiddenUnder || null,
+            renderHTML: (attributes) => {
+              if (!attributes.hiddenUnder) return {};
+              return {
+                "data-hidden-under": attributes.hiddenUnder
+              };
+            }
+          }
         }
-      }),
-      {}
-    );
+      }
+    ];
+  },
+
+  addKeyboardShortcuts() {
+    return {
+      ...this.options.levels.reduce(
+        (items, level) => ({
+          ...items,
+          ...{
+            [tiptapKeys[`insertHeading${level}`].keys]: () =>
+              this.editor.commands.setHeading({ level })
+          }
+        }),
+        {}
+      ),
+      Enter: ({ editor }) => {
+        const { state, commands } = editor;
+        const { $from } = state.selection;
+        const node = $from.node();
+        if (node.type.name !== this.name) return false;
+
+        const isAtEnd = $from.parentOffset === node.textContent.length;
+        if (isAtEnd && node.attrs.collapsed) {
+          const headingPos = $from.before();
+          const endPos = findEndOfCollapsedSection(
+            state.doc,
+            headingPos,
+            node.attrs.level
+          );
+          if (endPos === -1) return false;
+
+          return commands.command(({ tr }) => {
+            tr.insert(endPos, state.schema.nodes.paragraph.create());
+            const newPos = endPos + 1;
+            tr.setSelection(Selection.near(tr.doc.resolve(newPos)));
+            return true;
+          });
+        }
+        return false;
+      }
+    };
   },
 
   addInputRules() {
@@ -98,48 +155,6 @@ export const Heading = TiptapHeading.extend({
             this.editor.state.selection.$from.parent?.attrs || {};
           const level = match[1].length;
           return { level, textAlign, textDirection };
-        }
-      })
-    ];
-  },
-
-  addProseMirrorPlugins() {
-    return [
-      new Plugin({
-        key: new PluginKey("collapsibleHeadings"),
-        props: {
-          decorations: (state) => {
-            const decorations: Decoration[] = [];
-            const { doc } = state;
-
-            doc.descendants((node, pos) => {
-              if (node.type.name === "heading" && node.attrs.collapsed) {
-                const headingLevel = node.attrs.level;
-                let nextPos = pos + node.nodeSize;
-
-                while (nextPos < doc.content.size) {
-                  const nextNode = doc.nodeAt(nextPos);
-                  if (!nextNode) break;
-                  if (
-                    nextNode.type.name === "heading" &&
-                    nextNode.attrs.level <= headingLevel
-                  ) {
-                    break;
-                  }
-
-                  decorations.push(
-                    Decoration.node(nextPos, nextPos + nextNode.nodeSize, {
-                      style: "display: none;"
-                    })
-                  );
-
-                  nextPos += nextNode.nodeSize;
-                }
-              }
-            });
-
-            return DecorationSet.create(doc, decorations);
-          }
         }
       })
     ];
@@ -170,17 +185,26 @@ export const Heading = TiptapHeading.extend({
         );
         if (calloutAncestor) return;
 
-        if (isClickWithinBounds(e, resolvedPos, "left")) {
+        const hitPosition =
+          node.attrs.textDirection === "rtl" ? "right" : "left";
+        if (isClickWithinBounds(e, resolvedPos, hitPosition)) {
           e.preventDefault();
           e.stopImmediatePropagation();
 
           editor.commands.command(({ tr }) => {
             const currentNode = tr.doc.nodeAt(pos);
-            if (currentNode) {
-              tr.setNodeAttribute(
+            if (currentNode && currentNode.type.name === "heading") {
+              const shouldCollapse = !currentNode.attrs.collapsed;
+              const headingLevel = currentNode.attrs.level;
+              const headingId = currentNode.attrs.blockId;
+
+              tr.setNodeAttribute(pos, "collapsed", shouldCollapse);
+              toggleNodesUnderHeading(
+                tr,
                 pos,
-                "collapsed",
-                !currentNode.attrs.collapsed
+                headingLevel,
+                shouldCollapse,
+                headingId
               );
             }
             return true;
@@ -206,9 +230,101 @@ export const Heading = TiptapHeading.extend({
           if (updatedNode.attrs.collapsed) heading.dataset.collapsed = "true";
           else delete heading.dataset.collapsed;
 
+          if (updatedNode.attrs.hiddenUnder)
+            heading.dataset.hiddenUnder = updatedNode.attrs.hiddenUnder;
+          else delete heading.dataset.hiddenUnder;
+
+          if (updatedNode.attrs.textAlign)
+            heading.style.textAlign =
+              updatedNode.attrs.textAlign === "left"
+                ? ""
+                : updatedNode.attrs.textAlign;
+
+          if (updatedNode.attrs.textDirection)
+            heading.dir = updatedNode.attrs.textDirection;
+          else heading.dir = "";
+
           return true;
         }
       };
     };
   }
 });
+
+function toggleNodesUnderHeading(
+  tr: Transaction,
+  headingPos: number,
+  headingLevel: number,
+  isCollapsing: boolean,
+  headingId: string
+) {
+  const { doc } = tr;
+  const headingNode = doc.nodeAt(headingPos);
+  if (!headingNode || headingNode.type.name !== "heading") return;
+
+  let nextPos = headingPos + headingNode.nodeSize;
+  const cursorPos = tr.selection.from;
+  let shouldMoveCursor = false;
+
+  while (nextPos < doc.content.size) {
+    const nextNode = doc.nodeAt(nextPos);
+    if (!nextNode) break;
+
+    if (
+      nextNode.type.name === "heading" &&
+      nextNode.attrs.level <= headingLevel
+    ) {
+      break;
+    }
+
+    if (
+      isCollapsing &&
+      cursorPos >= nextPos &&
+      cursorPos < nextPos + nextNode.nodeSize
+    ) {
+      shouldMoveCursor = true;
+    }
+
+    if (COLLAPSIBLE_BLOCK_TYPES.includes(nextNode.type.name)) {
+      if (isCollapsing && typeof nextNode.attrs.hiddenUnder !== "string") {
+        tr.setNodeAttribute(nextPos, "hiddenUnder", headingId);
+      } else if (!isCollapsing && nextNode.attrs.hiddenUnder === headingId) {
+        tr.setNodeAttribute(nextPos, "hiddenUnder", null);
+      }
+    }
+
+    nextPos += nextNode.nodeSize;
+  }
+
+  if (shouldMoveCursor) {
+    const headingEndPos = headingPos + headingNode.nodeSize - 1;
+    tr.setSelection(Selection.near(tr.doc.resolve(headingEndPos)));
+  }
+}
+
+function findEndOfCollapsedSection(
+  doc: Node,
+  headingPos: number,
+  headingLevel: number
+) {
+  const headingNode = doc.nodeAt(headingPos);
+  if (!headingNode || headingNode.type.name !== "heading") return -1;
+
+  let nextPos = headingPos + headingNode.nodeSize;
+
+  while (nextPos < doc.content.size) {
+    const nextNode = doc.nodeAt(nextPos);
+    if (!nextNode) break;
+
+    if (
+      nextNode.type.name === "heading" &&
+      nextNode.attrs.level <= headingLevel
+    ) {
+      break;
+    }
+
+    nextPos += nextNode.nodeSize;
+  }
+
+  return nextPos;
+}
