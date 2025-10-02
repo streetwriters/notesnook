@@ -102,7 +102,19 @@ const EXTRA_ICON_NAMES = [
   "file-tree",
   "github",
   "open-source-initiative",
-  "credit-card"
+  "credit-card",
+  "form-textbox-password",
+  "at",
+  "key",
+  "cloud-upload-outline",
+  "download",
+  "upload",
+  "download-multiple",
+  "shape",
+  "update",
+  "notebook-minus",
+  "calendar-blank",
+  "email-newsletter"
 ];
 
 const __filename = fileURLToPath(import.meta.url);

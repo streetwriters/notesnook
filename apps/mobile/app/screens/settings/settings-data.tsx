@@ -248,7 +248,8 @@ export const settingsGroups: SettingSection[] = [
                 eSendEvent(eOpenRecoveryKeyDialog);
               });
             },
-            description: strings.saveDataRecoveryKeyDesc()
+            description: strings.saveDataRecoveryKeyDesc(),
+            icon: "key"
           },
           {
             id: "manage-attachments",
@@ -264,14 +265,16 @@ export const settingsGroups: SettingSection[] = [
             name: strings.changePassword(),
             type: "screen",
             description: strings.changePasswordDesc(),
-            component: "change-password"
+            component: "change-password",
+            icon: "form-textbox-password"
           },
           {
             id: "change-email",
             name: strings.changeEmail(),
             type: "screen",
             component: "change-email",
-            description: strings.changeEmailDesc()
+            description: strings.changeEmailDesc(),
+            icon: "at"
           },
           {
             id: "2fa-settings",
@@ -500,6 +503,7 @@ export const settingsGroups: SettingSection[] = [
         sections: [
           {
             id: "offline-mode",
+            icon: "download-multiple",
             name: strings.fullOfflineMode(),
             description: strings.fullOfflineModeDesc(),
             type: "switch",
@@ -524,7 +528,8 @@ export const settingsGroups: SettingSection[] = [
             description: strings.disableAutoSyncDesc(),
             type: "switch",
             property: "disableAutoSync",
-            featureId: "syncControls"
+            featureId: "syncControls",
+            icon: "sync-off"
           },
           {
             id: "disable-realtime-sync",
@@ -540,7 +545,8 @@ export const settingsGroups: SettingSection[] = [
             description: strings.disableSyncDesc(),
             type: "switch",
             property: "disableSync",
-            featureId: "syncControls"
+            featureId: "syncControls",
+            icon: "cloud-off-outline"
           },
           {
             id: "background-sync",
@@ -548,6 +554,7 @@ export const settingsGroups: SettingSection[] = [
             description: strings.backgroundSyncDesc(),
             type: "switch",
             property: "backgroundSync",
+            icon: "cloud-upload-outline",
             onChange: (value) => {
               if (value) {
                 BackgroundSync.start();
@@ -560,6 +567,7 @@ export const settingsGroups: SettingSection[] = [
             id: "pull-sync",
             name: strings.forcePullChanges(),
             description: strings.forcePullChangesDesc(),
+            icon: "download",
             modifer: () => {
               presentDialog({
                 title: strings.forcePullChanges(),
@@ -581,6 +589,7 @@ export const settingsGroups: SettingSection[] = [
             id: "push-sync",
             name: strings.forcePushChanges(),
             description: strings.forcePushChangesDesc(),
+            icon: "upload",
             modifer: () => {
               presentDialog({
                 title: strings.forcePushChanges(),
@@ -618,7 +627,8 @@ export const settingsGroups: SettingSection[] = [
             type: "screen",
             name: strings.themes(),
             description: strings.themesDesc(),
-            component: "theme-selector"
+            component: "theme-selector",
+            icon: "shape"
           },
           {
             id: "use-system-theme",
@@ -672,21 +682,24 @@ export const settingsGroups: SettingSection[] = [
             name: strings.dateFormat(),
             description: strings.dateFormatDesc(),
             type: "component",
-            component: "date-format-selector"
+            component: "date-format-selector",
+            icon: "calendar-blank"
           },
           {
             id: "time-format",
             name: strings.timeFormat(),
             description: strings.timeFormatDesc(),
             type: "component",
-            component: "time-format-selector"
+            component: "time-format-selector",
+            icon: "clock-digital"
           },
           {
             id: "clear-trash-interval",
             type: "component",
             name: strings.clearTrashInterval(),
             description: strings.clearTrashIntervalDesc(),
-            component: "trash-interval-selector"
+            component: "trash-interval-selector",
+            icon: "delete"
           },
           {
             id: "default-notebook",
@@ -699,14 +712,16 @@ export const settingsGroups: SettingSection[] = [
                 type: "success"
               });
             },
-            disabled: () => !db.settings.getDefaultNotebook()
+            disabled: () => !db.settings.getDefaultNotebook(),
+            icon: "notebook-minus"
           },
           {
             id: "disable-update-check",
             type: "switch",
             name: strings.autoUpdateCheck(),
             description: strings.autoUpdateCheckDesc(),
-            property: "checkForUpdates"
+            property: "checkForUpdates",
+            icon: "update"
           }
         ]
       },
@@ -803,6 +818,7 @@ export const settingsGroups: SettingSection[] = [
       {
         id: "marketing-emails",
         type: "switch",
+        icon: "email-newsletter",
         name: strings.marketingEmails(),
         description: strings.marketingEmailsDesc(),
         modifer: async () => {
