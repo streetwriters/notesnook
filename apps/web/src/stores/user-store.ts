@@ -28,6 +28,7 @@ import { ConfirmDialog } from "../dialogs/confirm";
 import { OnboardingDialog } from "../dialogs/onboarding-dialog";
 import { strings } from "@notesnook/intl";
 import { isUserSubscribed } from "../hooks/use-is-user-premium";
+import { resetFeatures } from "../common";
 
 class UserStore extends BaseStore<UserStore> {
   isLoggedIn?: boolean;
@@ -65,6 +66,7 @@ class UserStore extends BaseStore<UserStore> {
         state.user.subscription = subscription;
       });
       if (!wasSubscribed && isUserSubscribed()) OnboardingDialog.show({});
+      resetFeatures();
     });
 
     EV.subscribe(EVENTS.userEmailConfirmed, () => {

@@ -69,12 +69,7 @@ export default function AppLock(props: PropsWithChildren<unknown>) {
 
       await useKeyStore
         .getState()
-        .unlock(
-          { ...credential, password },
-          {
-            permanent: !(await isFeatureAvailable("appLock")).isAllowed
-          }
-        )
+        .unlock({ ...credential, password })
         .catch((e) => {
           setError(
             typeof e === "string"

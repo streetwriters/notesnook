@@ -354,6 +354,7 @@ class UserManager {
       );
       if (user) {
         const oldUser = await this.getUser();
+        await this.setUser(user);
         if (
           oldUser &&
           (oldUser.subscription.plan !== user.subscription.plan ||
@@ -365,7 +366,6 @@ class UserManager {
         }
         if (oldUser && !oldUser.isEmailConfirmed && user.isEmailConfirmed)
           EV.publish(EVENTS.userEmailConfirmed);
-        await this.setUser(user);
         EV.publish(EVENTS.userFetched, user);
         return user;
       } else {

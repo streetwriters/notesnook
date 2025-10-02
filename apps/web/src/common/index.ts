@@ -61,6 +61,7 @@ import { MenuItem } from "@notesnook/ui";
 import { showFeatureNotAllowedToast } from "./toasts";
 import { UpgradeDialog } from "../dialogs/buy-dialog/upgrade-dialog";
 import { setToolbarPreset } from "./toolbar-config";
+import { useKeyStore } from "../interfaces/key-store";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
@@ -512,8 +513,12 @@ export async function resetFeatures() {
     "defaultSidebarTab",
     "disableTrashCleanup",
     "syncControls",
-    "fullOfflineMode"
+    "fullOfflineMode",
+    "appLock"
   ]);
+  if (!features.appLock.isAllowed) {
+    await useKeyStore.getState().disable();
+  }
 
   if (!features.customHomepage.isAllowed)
     useSettingStore.getState().setHomepage();
