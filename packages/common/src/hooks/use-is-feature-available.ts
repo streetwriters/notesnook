@@ -24,17 +24,30 @@ import {
   FeatureResult,
   isFeatureAvailable
 } from "../utils/index.js";
-import { usePromise } from "./use-promise.js";
+import { EV, EVENTS } from "@notesnook/core";
 
 export function useIsFeatureAvailable<TId extends FeatureId>(
   id: TId | undefined,
   value?: number
 ) {
-  const result = usePromise(
-    () => (id ? isFeatureAvailable(id, value) : undefined),
-    []
-  );
-  return result.status === "fulfilled" ? result.value : undefined;
+  const [result, setResult] = useState<FeatureResult<TId>>();
+
+  useEffect(() => {
+    if (!id) return;
+
+    isFeatureAvailable(id, value).then((result) => setResult(result));
+    const userSubscriptionUpdated = EV.subscribe(
+      EVENTS.userSubscriptionUpdated,
+      () => {
+        isFeatureAvailable(id, value).then((result) => setResult(result));
+      }
+    );
+    return () => {
+      userSubscriptionUpdated.unsubscribe();
+    };
+  }, []);
+
+  return result;
 }
 
 export function useAreFeaturesAvailable<TIds extends FeatureId[]>(
@@ -46,6 +59,15 @@ export function useAreFeaturesAvailable<TIds extends FeatureId[]>(
 
   useEffect(() => {
     areFeaturesAvailable(ids, values).then((result) => setResult(result));
+    const userSubscriptionUpdated = EV.subscribe(
+      EVENTS.userSubscriptionUpdated,
+      () => {
+        areFeaturesAvailable(ids, values).then((result) => setResult(result));
+      }
+    );
+    return () => {
+      userSubscriptionUpdated.unsubscribe();
+    };
   }, []);
 
   return result;
