@@ -232,6 +232,16 @@ export const Heading = TiptapHeading.extend({
             heading.dataset.hiddenUnder = updatedNode.attrs.hiddenUnder;
           else delete heading.dataset.hiddenUnder;
 
+          if (updatedNode.attrs.textAlign)
+            heading.style.textAlign =
+              updatedNode.attrs.textAlign === "left"
+                ? ""
+                : updatedNode.attrs.textAlign;
+
+          if (updatedNode.attrs.textDirection)
+            heading.dir = updatedNode.attrs.textDirection;
+          else heading.dir = "";
+
           return true;
         }
       };
