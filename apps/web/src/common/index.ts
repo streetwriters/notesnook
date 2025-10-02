@@ -514,7 +514,8 @@ export async function resetFeatures() {
     "disableTrashCleanup",
     "syncControls",
     "fullOfflineMode",
-    "appLock"
+    "appLock",
+    "defaultNotebookAndTag"
   ]);
   if (!features.appLock.isAllowed) {
     await useKeyStore.getState().disable();
@@ -553,4 +554,9 @@ export async function resetFeatures() {
 
   if (!features.fullOfflineMode.isAllowed)
     useSettingStore.getState().toggleFullOfflineMode(false);
+
+  if (!features.defaultNotebookAndTag.isAllowed) {
+    db.settings.setDefaultNotebook(undefined);
+    db.settings.setDefaultTag(undefined);
+  }
 }
