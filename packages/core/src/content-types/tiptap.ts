@@ -413,6 +413,22 @@ function convertHtmlToTxt(html: string, wrap = true) {
           builder.openBlock({
             leadingLineBreaks: dataSpacing == "single" ? 1 : 2
           });
+
+          // convert leading whitespace to NO-BREAK SPACE
+          if (elem.children && elem.children.length > 0) {
+            const firstChild = elem.children[0];
+            if (firstChild.type === "text" && firstChild.data) {
+              firstChild.data = firstChild.data.replace(
+                /^([ \t]+)/,
+                (match) => {
+                  return match
+                    .replace(/ /g, "\u00A0")
+                    .replace(/\t/g, "\u00A0\u00A0\u00A0\u00A0");
+                }
+              );
+            }
+          }
+
           walk(elem.children, builder);
           builder.closeBlock({
             trailingLineBreaks: 1

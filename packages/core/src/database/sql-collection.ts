@@ -609,10 +609,10 @@ export class FilteredSelector<T extends Item> {
     sanitizeSortOptions(this.type, options);
 
     const sortBy: Set<SortOptions["sortBy"]> = new Set();
+    sortBy.add(options.sortBy);
     if (options.groupBy === "abc") sortBy.add("title");
     else if (options.sortBy === "title" && options.groupBy !== "none")
       sortBy.add("dateCreated");
-    sortBy.add(options.sortBy);
 
     return <T>(
       qb: SelectQueryBuilder<DatabaseSchema, keyof DatabaseSchema, T>

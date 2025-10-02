@@ -18,10 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { databaseTest, noteTest, TEST_NOTE } from "./utils/index.js";
-import { test, expect } from "vitest";
+import { test, expect, describe } from "vitest";
 
-function tag(title: string) {
-  return { title };
+function tag(title: string, dateCreated?: number) {
+  return { title, dateCreated };
 }
 
 function color(title: string) {
@@ -98,3 +98,50 @@ for (const type of ["tag", "color"] as const) {
       );
     }));
 }
+
+describe("sort tags by", () => {
+  const tags = ["apple", "mango", "melon", "orange", "zucchini"];
+  const sortTestCases = [
+    {
+      sortBy: "title",
+      sortDirection: "asc",
+      expectedOrder: ["apple", "mango", "melon", "orange", "zucchini"]
+    },
+    {
+      sortBy: "title",
+      sortDirection: "desc",
+      expectedOrder: ["zucchini", "orange", "melon", "mango", "apple"]
+    },
+    {
+      sortBy: "dateCreated",
+      sortDirection: "asc",
+      expectedOrder: ["apple", "mango", "melon", "orange", "zucchini"]
+    },
+    {
+      sortBy: "dateCreated",
+      sortDirection: "desc",
+      expectedOrder: ["zucchini", "orange", "melon", "mango", "apple"]
+    }
+  ] as const;
+  for (const testCase of sortTestCases) {
+    test(`${testCase.sortBy} ${testCase.sortDirection}`, () =>
+      databaseTest().then(async (db) => {
+        let previousCreatedDate = Date.now();
+        for (const title of tags) {
+          await db.tags.add(tag(title, previousCreatedDate++));
+        }
+
+        const items = await db.tags.all.grouped({
+          sortBy: testCase.sortBy,
+          sortDirection: testCase.sortDirection,
+          groupBy: "default"
+        });
+
+        for (let i = 0; i < testCase.expectedOrder.length; i++) {
+          expect((await items.item(i)).item?.title).toEqual(
+            testCase.expectedOrder[i]
+          );
+        }
+      }));
+  }
+});
