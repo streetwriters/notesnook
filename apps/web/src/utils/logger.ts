@@ -27,7 +27,7 @@ import { isFeatureSupported } from "./feature-check";
 
 let logger: typeof _logger = new NoopLogger();
 async function initializeLogger() {
-  const multiTab = isFeatureSupported("opfs");
+  const multiTab = !!globalThis.SharedWorker && isFeatureSupported("opfs");
   await initialize(
     {
       dialect: (name, init) =>
