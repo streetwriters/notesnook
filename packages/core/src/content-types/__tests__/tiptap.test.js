@@ -65,7 +65,8 @@ const HTMLS = {
   tasklists: `<p>Hello</p><ul data-collapsed="false" class="checklist"><li class="checked checklist--item"><p>Task item 1</p></li><li class="checked checklist--item"><p>Task item 2</p></li><li class="checked checklist--item"><p>Task item 3</p></li><li class="checklist--item"><p>Task item 4</p><ul data-collapsed="false" class="checklist"><li class="checklist--item"><p>Sub task item 1</p></li><li class="checklist--item"><p>Sub task item 2</p></li></ul></li><li class="checklist--item"><p>Task Item 5</p></li></ul><p>Nene</p><ul><li><p>dasvsadv</p></li><li><p>adsva\`sd</p></li><li><p>vasd</p></li><li><p>vsadvdsa</p></li></ul>`,
   outlinelists: `<p >Testing outline list:</p><ul data-collapsed="false" data-type="outlineList"><li data-type="outlineListItem"><p >My outline list</p></li><li data-type="outlineListItem"><p >works</p></li><li data-type="outlineListItem"><p >but sometimes</p><ul data-collapsed="false" data-type="outlineList"><li data-type="outlineListItem"><p >It doesn't</p></li><li data-type="outlineListItem"><p >what do I do?</p></li><li data-type="outlineListItem"><p >I need to do something!</p></li></ul></li><li data-type="outlineListItem"><p >Makes no sense!</p></li><li data-type="outlineListItem"><p >Yes it doesn't!</p></li></ul>`,
   codeblock2: `<pre>hello<br></pre>`,
-  singleSpacedParagraphs: `<p data-spacing="single">hello world</p><p data-spacing="single">hello world 2</p>`
+  singleSpacedParagraphs: `<p data-spacing="single">hello world</p><p data-spacing="single">hello world 2</p>`,
+  leadingWhitespaces: `<p data-spacing="double">  two spaces</p><p data-spacing="double">    four spaces</p><p data-spacing="single">  two spaces</p><p data-spacing="single">    four spaces</p>`
 };
 
 for (const html in HTMLS) {
