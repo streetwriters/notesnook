@@ -2501,7 +2501,7 @@ Use this if changes from other devices are not appearing on this device. This wi
     {
       question: () => t`What happens to my data if I switch plans?`,
       answer: () =>
-        t`Your data remains 100% accessible regardless of what plan you are on. That includes your notes, notebooks, attachments, and anything else you might have created.`
+        t`Your notes, notebooks, tags, reminders & colors will be 100% accessible regardless of which plan you are on. You will not be able to download attachments larger than the maximum file size limit of your plan.`
     },
     {
       question: () =>
