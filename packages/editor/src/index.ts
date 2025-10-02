@@ -286,7 +286,9 @@ const useTiptap = (
           allowTableNodeSelection: true,
           cellMinWidth: 50
         }),
-        Clipboard,
+        Clipboard.configure({
+          parseMarkdownOnPaste: options.enableInputRules
+        }),
         TableRow,
         TableCell,
         TableHeader,
