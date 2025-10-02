@@ -33,7 +33,8 @@ import {
   TrashOrItem,
   isTrashItem,
   isDeleted,
-  NoteContent
+  NoteContent,
+  UnencryptedContentItem
 } from "../types.js";
 import Database from "../api/index.js";
 import { ICollection } from "./collection.js";
@@ -354,28 +355,28 @@ export class Notes implements ICollection {
     const contentString =
       rawContent === undefined
         ? await (async () => {
-            let contentItem = options.contentItem;
-            if (!contentItem) {
-              const rawContent = await this.db.content.findByNoteId(note.id);
-              if (rawContent && rawContent.locked) return false;
-              contentItem = rawContent || EMPTY_CONTENT(note.id);
-            }
+          let contentItem = options.contentItem;
+          if (!contentItem) {
+            const rawContent = await this.db.content.findByNoteId(note.id);
+            if (rawContent && rawContent.locked) return false;
+            contentItem = rawContent || EMPTY_CONTENT(note.id);
+          }
 
-            const { data, type } =
-              options?.embedMedia && format !== "txt"
-                ? await this.db.content.downloadMedia(
-                    `export-${note.id}`,
-                    contentItem,
-                    false
-                  )
-                : contentItem;
-            const content = await getContentFromData(type, data);
-            return format === "html"
-              ? content.toHTML()
-              : format === "md"
+          const { data, type } =
+            options?.embedMedia && format !== "txt"
+              ? await this.db.content.downloadMedia(
+                `export-${note.id}`,
+                contentItem,
+                false
+              )
+              : contentItem;
+          const content = await getContentFromData(type, data);
+          return format === "html"
+            ? content.toHTML()
+            : format === "md"
               ? content.toMD()
               : content.toTXT();
-          })()
+        })()
         : rawContent;
     if (contentString === false) return false;
 
@@ -389,11 +390,11 @@ export class Notes implements ICollection {
     return options?.disableTemplate
       ? contentString
       : buildFromTemplate(format, {
-          ...note,
-          tags,
-          color,
-          content: contentString
-        });
+        ...note,
+        tags,
+        color,
+        content: contentString
+      });
   }
 
   async duplicate(...ids: string[]) {
@@ -519,4 +520,53 @@ export class Notes implements ICollection {
       "internalLinks"
     ).internalLinks;
   }
+
+  async merge(title: string, noteIds: string[]) {
+    if (noteIds.length < 2) {
+      throw new Error("At least 2 notes are required for merging");
+    }
+
+    const notes = [];
+    for (const id of noteIds) {
+      const note = await this.note(id);
+      if (note) notes.push(note);
+    }
+
+    if (notes.length < 2) {
+      throw new Error("Could not find all notes to merge");
+    }
+
+    const contents: UnencryptedContentItem["data"][] = [];
+    for (const note of notes) {
+      try {
+        if (!note.contentId) continue;
+        const content = await this.db.content.get(note.contentId);
+
+        if (content?.locked) {
+          throw new Error("Cannot merge locked notes");
+        }
+
+        if (content && content.data) {
+          contents.push(content.data);
+        }
+      } catch (error) {
+        console.warn(`Failed to get content for note ${note.id}:`, error);
+      }
+    }
+
+    const mergedContent = contents.join("\n\n");
+    const newNoteId = await this.add({
+      title,
+      content: {
+        type: "tiptap",
+        data: mergedContent
+      }
+    });
+
+    for (const id of noteIds) {
+      await this.moveToTrash(id);
+    }
+
+    return newNoteId;
+  };
 }

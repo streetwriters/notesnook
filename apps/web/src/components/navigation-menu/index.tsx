@@ -488,8 +488,8 @@ function RouteItem({
             item.path === "/trash"
               ? "trash"
               : item.path === "/favorites"
-              ? "favorites"
-              : undefined
+                ? "favorites"
+                : undefined
         });
       }}
       selected={
@@ -681,8 +681,8 @@ function ShortcutItem({
         item.type === "notebook"
           ? Notebook2
           : item.type === "tag"
-          ? Tag2
-          : Topic
+            ? Tag2
+            : Topic
       }
       selected={currentContext?.id === item.id}
       onDrop={(e) => handleDrop(e.dataTransfer, item)}
@@ -871,12 +871,12 @@ type ReorderableListProps<T> = {
   orderKey: string;
   items: T[];
   context?: any;
-  renderItem: (props: { item: T; context?: any }) => JSX.Element;
+  renderItem: (props: { item: T; context?: any, isOverlay?: boolean }) => JSX.Element;
   onOrderChanged: (newOrder: string[]) => void;
   order: () => string[];
 };
 
-function ReorderableList<T extends { id: string }>(
+export function ReorderableList<T extends { id: string }>(
   props: ReorderableListProps<T>
 ) {
   const {
@@ -954,7 +954,7 @@ function ReorderableList<T extends { id: string }>(
             easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)"
           }}
         >
-          {activeItem && <Item item={activeItem} context={context} />}
+          {activeItem && <Item item={activeItem} context={context} isOverlay={true} />}
         </DragOverlay>
       </SortableContext>
     </DndContext>
