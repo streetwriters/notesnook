@@ -28,7 +28,7 @@ import {
   scheduleBackups,
   scheduleFullBackups
 } from "./common/notices";
-import { introduceFeatures } from "./common";
+import { introduceFeatures, resetFeatures } from "./common";
 import { AppEventManager, AppEvents } from "./common/app-events";
 import { db } from "./common/db";
 import { EV, EVENTS } from "@notesnook/core";
@@ -59,6 +59,7 @@ export default function AppEffects() {
       initEditorStore();
 
       (async function () {
+        await resetFeatures();
         await refreshNavItems();
         await updateLastSynced();
         await initUser();

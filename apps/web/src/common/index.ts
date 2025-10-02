@@ -502,7 +502,7 @@ export function withFeatureCheck<TId extends FeatureId>(
   };
 }
 
-async function resetFeatures() {
+export async function resetFeatures() {
   const features = await areFeaturesAvailable([
     "customHomepage",
     "customToolbarPreset",
