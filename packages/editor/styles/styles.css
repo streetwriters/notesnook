@@ -807,8 +807,6 @@ del.diffdel {
 .ProseMirror h5,
 .ProseMirror h6 {
   position: relative;
-  display: flex;
-  align-items: center;
 }
 
 .ProseMirror h1::before,
@@ -834,6 +832,30 @@ del.diffdel {
   transition: transform 250ms ease, opacity 200ms ease;
   left: -22px;
   opacity: 0;
+}
+
+.ProseMirror h1::before {
+  top: 8px;
+}
+
+.ProseMirror h2::before {
+  top: 3px;
+}
+
+.ProseMirror h3::before {
+  top: 0px;
+}
+
+.ProseMirror h4::before {
+  top: -1px; 
+}
+
+.ProseMirror h5::before {
+  top: -2px; 
+}
+
+.ProseMirror h6::before {
+  top: -4px; 
 }
 
 .ProseMirror h1[data-collapsed="true"]::before,
