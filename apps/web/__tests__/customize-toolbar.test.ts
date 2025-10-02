@@ -17,85 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import {
+  Item,
+  Group,
+  Subgroup,
+  TreeNode,
+  moveItem
+} from "../src/dialogs/settings/components/customize-toolbar";
 import { describe, it, expect } from "vitest";
-
-// import the functions we need to test
-// we'll need to extract the moveItem function and related types for testing
-
-type TreeNodeType = "group" | "item";
-type BaseTreeNode<Type extends TreeNodeType> = {
-  type: Type;
-  id: string;
-  title: string;
-  depth: number;
-};
-
-type Subgroup = BaseTreeNode<"group"> & {
-  collapsed?: boolean;
-};
-
-type Group = BaseTreeNode<"group">;
-
-type Item = BaseTreeNode<"item"> & {
-  toolId: string;
-  icon: string;
-  collapsed?: boolean;
-};
-
-type TreeNode = Group | Item | Subgroup;
-
-function isGroup(item: TreeNode): item is Group {
-  return item.type === "group" && item.depth === 0;
-}
-
-function isSubgroup(item: TreeNode): item is Subgroup {
-  return item.type === "group" && item.depth > 0;
-}
-
-function isItem(item: TreeNode): item is Item {
-  return item.type === "item";
-}
-
-function arrayMove<T>(array: T[], from: number, to: number): T[] {
-  const newArray = array.slice();
-  const item = newArray.splice(from, 1)[0];
-  newArray.splice(to, 0, item);
-  return newArray;
-}
-
-function getItemGroup(items: TreeNode[], item: TreeNode) {
-  const index = items.findIndex((i) => i.id === item.id);
-  for (let i = index; i >= 0; --i) {
-    const item = items[i];
-    if (isGroup(item) || isSubgroup(item)) return item;
-  }
-  return items[0];
-}
-
-function moveItem(items: TreeNode[], fromId: string, toId: string): TreeNode[] {
-  const fromIndex = items.findIndex((i) => i.id === fromId);
-  const toIndex = items.findIndex((i) => i.id === toId);
-
-  const fromItem = items[fromIndex];
-  const toItem = items[toIndex];
-
-  if (!fromItem || !isItem(fromItem)) return items;
-
-  const movingToGroup = isGroup(toItem) || isSubgroup(toItem);
-
-  if (movingToGroup) {
-    fromItem.depth = toItem.depth + 1;
-  } else {
-    fromItem.depth = toItem.depth;
-  }
-
-  const newArray = arrayMove(items, fromIndex, toIndex);
-
-  const itemGroup = getItemGroup(newArray, fromItem);
-  if (!isGroup(itemGroup) && !isSubgroup(itemGroup)) return items;
-
-  return newArray;
-}
 
 describe("moveItem function", () => {
   it("should correctly set depth when moving item from subgroup to main group", () => {
