@@ -177,7 +177,7 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
       const ids =
         indices.length === nodes.length
           ? nodes.map((c) => c.id)
-          : (indices.map((i) => nodes[i].id).filter(Boolean) as string[]);
+          : (indices.map((i) => nodes[i]?.id).filter(Boolean) as string[]);
       bulkSelect?.(ids);
     },
     focusItemAt: (index) => {

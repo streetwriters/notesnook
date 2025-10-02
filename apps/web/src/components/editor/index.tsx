@@ -242,7 +242,8 @@ const MemoizedEditorView = React.memo(EditorView, (prev, next) => {
     prev.session.type === next.session.type &&
     prev.session.needsHydration === next.session.needsHydration &&
     prev.session.activeBlockId === next.session.activeBlockId &&
-    prev.session.activeSearchResultId === next.session.activeSearchResultId;
+    prev.session.activeSearchResultId === next.session.activeSearchResultId &&
+    prev.session.nonce === next.session.nonce;
 
   if (
     "attachmentsLength" in prev.session &&

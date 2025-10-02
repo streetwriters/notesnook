@@ -47,6 +47,8 @@ import SettingsService from "../../services/settings";
 import { useRelationStore } from "../../stores/use-relation-store";
 import { AppFontSize, defaultBorderRadius } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
+import { getFormattedDate, useIsFeatureAvailable } from "@notesnook/common";
+import PaywallSheet from "../../components/sheets/paywall";
 
 const ReminderModes =
   Platform.OS === "ios"
@@ -106,6 +108,7 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [repeatFrequency, setRepeatFrequency] = useState(1);
   const referencedItem = reference ? (reference as Note) : null;
+  const recurringReminderFeature = useIsFeatureAvailable("recurringReminders");
 
   const title = useRef<string | undefined>(
     !reminder ? referencedItem?.title : reminder?.title
@@ -114,6 +117,7 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
     !reminder ? referencedItem?.headline : reminder?.description
   );
   const titleRef = useRef<TextInput>(null);
+  const descriptionRef = useRef<TextInput>(null);
   const timer = useRef<NodeJS.Timeout>();
 
   const showDatePicker = () => {
@@ -128,7 +132,7 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
     timer.current = setTimeout(() => {
       hideDatePicker();
       setDate(date);
-    }, 50);
+    }, 10);
   };
   function nth(n: number) {
     return (
@@ -166,8 +170,11 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
         throw new Error(strings.selectDayError());
 
       if (!title.current) throw new Error(strings.setTitleError());
-      if (date.getTime() < Date.now() && reminderMode === "once") {
-        titleRef?.current?.focus();
+      if (
+        date.getTime() < Date.now() &&
+        reminderMode === "once" &&
+        !props.route.params.reminder
+      ) {
         throw new Error(strings.dateError());
       }
 
@@ -242,8 +249,12 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
             defaultValue={reminder?.title || referencedItem?.title}
             placeholder={strings.remindeMeOf()}
             onChangeText={(text) => (title.current = text)}
+            autoFocus
             wrapperStyle={{
               marginTop: DefaultAppStyles.GAP_VERTICAL
+            }}
+            onSubmit={() => {
+              descriptionRef.current?.focus();
             }}
           />
 
@@ -251,6 +262,7 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
             defaultValue={
               reminder ? reminder?.description : referencedItem?.headline
             }
+            fwdRef={descriptionRef}
             placeholder={strings.addShortNote()}
             onChangeText={(text) => (details.current = text)}
             containerStyle={{
@@ -290,11 +302,18 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
                 type={
                   reminderMode ===
                   ReminderModes[mode as keyof typeof ReminderModes]
-                    ? "selected"
+                    ? "selectedAccent"
                     : "plain"
                 }
                 onPress={() => {
-                  if (mode === "Repeat" && !PremiumService.get()) return;
+                  if (
+                    recurringReminderFeature &&
+                    !recurringReminderFeature?.isAllowed
+                  ) {
+                    PaywallSheet.present(recurringReminderFeature);
+                    return;
+                  }
+
                   setReminderMode(
                     ReminderModes[
                       mode as keyof typeof ReminderModes
@@ -443,9 +462,10 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
             >
               <DateTimePickerModal
                 isVisible={isDatePickerVisible}
-                mode="date"
+                mode="datetime"
                 onConfirm={handleConfirm}
                 onCancel={hideDatePicker}
+                isDarkModeEnabled={isDark}
                 is24Hour={db.settings.getTimeFormat() === "24-hour"}
                 date={date || new Date(Date.now())}
               />
@@ -476,7 +496,9 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
                     width: "100%"
                   }}
                   title={
-                    date ? date.toLocaleDateString() : strings.selectDate()
+                    date
+                      ? getFormattedDate(date, "date-time")
+                      : strings.selectDate()
                   }
                   type={date ? "secondaryAccented" : "secondary"}
                   icon="calendar"
@@ -578,7 +600,7 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
                     ReminderNotificationModes[
                       mode as keyof typeof ReminderNotificationModes
                     ]
-                      ? "selected"
+                      ? "selectedAccent"
                       : "plain"
                   }
                   onPress={() => {

@@ -34,6 +34,7 @@ import {
   showMultiPermanentDeleteConfirmation
 } from "../dialogs/confirm";
 import { strings } from "@notesnook/intl";
+import { checkFeature } from ".";
 
 async function moveNotesToTrash(ids: string[], confirm = true) {
   if (confirm && !(await showMultiDeleteConfirmation(ids.length))) return;
@@ -81,7 +82,7 @@ async function moveNotebooksToTrash(ids: string[]) {
 
   if (!result) return;
 
-  if (result.deleteContainingNotes) {
+  if (result.checks?.deleteContainingNotes) {
     await Multiselect.moveNotesToTrash(await db.notebooks.notes(...ids), false);
   }
 
@@ -182,6 +183,14 @@ async function deleteTags(ids: string[]) {
 
 async function restoreItemsFromTrash(ids: string[]) {
   if (!ids.length) return;
+
+  const notebookIds = ids.filter((id) => db.trash.cache.notebooks.includes(id));
+  if (
+    !(await checkFeature("notebooks", {
+      value: (await db.notebooks.all.count()) + notebookIds.length
+    }))
+  )
+    return;
 
   await TaskManager.startTask({
     type: "status",

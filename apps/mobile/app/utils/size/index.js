@@ -89,10 +89,10 @@ function getSize() {
     xs: normalize(13.5) * scale.fontScale,
     sm: normalize(14.5) * scale.fontScale,
     md: normalize(16.5) * scale.fontScale,
-    lg: normalize(22) * scale.fontScale,
-    xl: normalize(24) * scale.fontScale,
-    xxl: normalize(28) * scale.fontScale,
-    xxxl: normalize(32) * scale.fontScale
+    lg: normalize(20) * scale.fontScale,
+    xl: normalize(22) * scale.fontScale,
+    xxl: normalize(25) * scale.fontScale,
+    xxxl: normalize(30) * scale.fontScale
   };
 }
 

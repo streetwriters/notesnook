@@ -321,7 +321,7 @@ function LoginPassword(props: BaseAuthComponentProps<"login:password">) {
           Config.get("sessionExpired", false)
         );
         Config.set("sessionExpired", false);
-        openURL("/", { authenticated: true });
+        openURL("/plans", { authenticated: true });
       }}
     >
       {(form?: PasswordFormData) => (
@@ -379,7 +379,7 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
         }
 
         await userstore.signup(form);
-        openURL("/notes/#/welcome", { authenticated: true });
+        openURL("/plans", { authenticated: true });
       }}
     >
       {(form?: SignupFormData) => (

@@ -88,7 +88,8 @@ export function RowProperties(props: ToolProps) {
   return (
     <>
       <ToolButton
-        {...props}
+        icon={props.icon}
+        title={props.title}
         buttonRef={buttonRef}
         toggled={isMenuOpen}
         onClick={() => setIsMenuOpen(true)}
@@ -131,7 +132,8 @@ export function ColumnProperties(props: ToolProps) {
   return (
     <>
       <ToolButton
-        {...props}
+        icon={props.icon}
+        title={props.title}
         buttonRef={buttonRef}
         toggled={isMenuOpen}
         onClick={() => setIsMenuOpen(true)}
@@ -180,7 +182,8 @@ export function TableProperties(props: ToolProps) {
   return (
     <>
       <ToolButton
-        {...props}
+        icon={props.icon}
+        title={props.title}
         buttonRef={buttonRef}
         toggled={isMenuOpen}
         onClick={() => setIsMenuOpen(true)}

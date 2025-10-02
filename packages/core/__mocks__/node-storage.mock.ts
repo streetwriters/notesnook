@@ -17,7 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Cipher, NNCrypto, SerializedKey } from "@notesnook/crypto";
+import {
+  Cipher,
+  NNCrypto,
+  SerializedKey,
+  SerializedKeyPair
+} from "@notesnook/crypto";
 import { IStorage } from "../src/interfaces.js";
 
 export class NodeStorageInterface implements IStorage {
@@ -108,5 +113,18 @@ export class NodeStorageInterface implements IStorage {
     salt?: string | undefined
   ): Promise<SerializedKey> {
     return { password, salt };
+  }
+
+  generateCryptoKeyPair(): Promise<SerializedKeyPair> {
+    throw new Error("Method not implemented.");
+  }
+  generateCryptoKeyFallback(
+    password: string,
+    salt?: string
+  ): Promise<SerializedKey> {
+    throw new Error("Method not implemented.");
+  }
+  deriveCryptoKeyFallback(credentials: SerializedKey): Promise<void> {
+    throw new Error("Method not implemented.");
   }
 }

@@ -154,7 +154,7 @@ const Input = ({
         isError = customValidator && value === customValidator();
         break;
       case "url":
-        isError = isURL(value);
+        isError = isURL(value, { allow_underscores: true });
         break;
       case "phonenumber": {
         const result = phone(value, {
@@ -237,8 +237,8 @@ const Input = ({
       onPress && loading ? colors.primary.accent : colors.primary.paragraph,
     flexGrow: 1,
     flexShrink: 1,
-    paddingBottom: DefaultAppStyles.GAP_VERTICAL - 2,
-    paddingTop: DefaultAppStyles.GAP_VERTICAL - 2,
+    paddingBottom: DefaultAppStyles.GAP_VERTICAL - 4,
+    paddingTop: DefaultAppStyles.GAP_VERTICAL - 4,
     fontFamily: "OpenSans-Regular",
     ...(inputStyle as ViewStyle)
   };

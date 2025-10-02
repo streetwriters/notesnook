@@ -27,10 +27,22 @@ import { getChangelog } from "../utils/version";
 import { downloadUpdate } from "../utils/updater";
 import { ErrorText } from "../components/error-text";
 import { strings } from "@notesnook/intl";
+import Field from "../components/field";
 
 type Check = { text: string; default?: boolean };
-export type ConfirmDialogProps<TCheckId extends string> = BaseDialogProps<
-  false | Record<TCheckId, boolean>
+type Input = {
+  title: string;
+  defaultValue?: string;
+  multiline?: boolean;
+  helpText?: string;
+  required?: boolean;
+};
+export type ConfirmDialogProps = BaseDialogProps<
+  | false
+  | {
+      checks?: Record<string, boolean>;
+      inputs?: Record<string, string>;
+    }
 > & {
   title: string;
   subtitle?: string;
@@ -39,12 +51,13 @@ export type ConfirmDialogProps<TCheckId extends string> = BaseDialogProps<
   negativeButtonText?: string;
   message?: string;
   warnings?: string[];
-  checks?: Partial<Record<TCheckId, Check>>;
+  checks?: Record<string, Check>;
+  inputs?: Record<string, Input>;
 };
 
-export const ConfirmDialog = DialogManager.register(function ConfirmDialog<
-  TCheckId extends string
->(props: ConfirmDialogProps<TCheckId>) {
+export const ConfirmDialog = DialogManager.register(function ConfirmDialog(
+  props: ConfirmDialogProps
+) {
   const {
     onClose,
     title,
@@ -54,9 +67,11 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog<
     positiveButtonText,
     message,
     warnings,
-    checks
+    checks,
+    inputs
   } = props;
-  const checkedItems = useRef<Record<TCheckId, boolean>>({} as any);
+  const checkedItems = useRef<Record<string, boolean>>({} as any);
+  const inputItems = useRef<Record<string, string>>({} as any);
 
   return (
     <Dialog
@@ -68,15 +83,21 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog<
       onClose={() => onClose(false)}
       onOpen={() => {
         for (const checkId in checks) {
-          checkedItems.current[checkId as TCheckId] =
-            checks[checkId as TCheckId]?.default || false;
+          checkedItems.current[checkId] = checks[checkId]?.default || false;
+        }
+        for (const inputId in inputs) {
+          inputItems.current[inputId] = inputs[inputId]?.defaultValue || "";
         }
       }}
       positiveButton={
         positiveButtonText
           ? {
               text: positiveButtonText,
-              onClick: () => onClose(checkedItems.current),
+              onClick: () =>
+                onClose({
+                  checks: checkedItems.current,
+                  inputs: inputItems.current
+                }),
               autoFocus: !!positiveButtonText
             }
           : undefined
@@ -108,34 +129,45 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog<
         {warnings?.map((text) => (
           <ErrorText key={text} error={text} sx={{ mt: 0 }} />
         ))}
+        {inputs
+          ? Object.entries(inputs).map(([id, input]) => (
+              <Field
+                as={input.multiline ? "textarea" : "input"}
+                key={id}
+                label={input.title}
+                helpText={input.helpText}
+                defaultValue={input.defaultValue}
+                required={input.required}
+                onChange={(e) => {
+                  inputItems.current[id] = e.target.value;
+                }}
+              />
+            ))
+          : null}
         {checks
-          ? Object.entries<Check | undefined>(checks).map(
-              ([id, check]) =>
-                check && (
-                  <Label
-                    key={id}
-                    id={id}
-                    variant="text.body"
-                    sx={{ fontWeight: "bold" }}
-                  >
-                    <Checkbox
-                      name={id}
-                      defaultChecked={check.default}
-                      sx={{
-                        mr: "small",
-                        width: 18,
-                        height: 18,
-                        color: "accent"
-                      }}
-                      onChange={(e) =>
-                        (checkedItems.current[id as TCheckId] =
-                          e.currentTarget.checked)
-                      }
-                    />
-                    {check.text}
-                  </Label>
-                )
-            )
+          ? Object.entries<Check>(checks).map(([id, check]) => (
+              <Label
+                key={id}
+                id={id}
+                variant="text.body"
+                sx={{ fontWeight: "bold" }}
+              >
+                <Checkbox
+                  name={id}
+                  defaultChecked={check.default}
+                  sx={{
+                    mr: "small",
+                    width: 18,
+                    height: 18,
+                    color: "accent"
+                  }}
+                  onChange={(e) =>
+                    (checkedItems.current[id] = e.currentTarget.checked)
+                  }
+                />
+                {check.text}
+              </Label>
+            ))
           : null}
       </Flex>
     </Dialog>

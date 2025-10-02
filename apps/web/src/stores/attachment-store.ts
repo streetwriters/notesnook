@@ -149,16 +149,18 @@ class AttachmentStore extends BaseStore<AttachmentStore> {
             continue;
           }
 
-          useEditorStore
-            .getState()
-            .openSession(session.note.id, { force: true });
+          useEditorStore.getState().openSession(session.note.id, {
+            force: true,
+            silent: true
+          });
         }
       }
     } catch (e) {
       console.error(e);
-      this._changeWorkingStatus(attachment.hash);
       if (e instanceof Error)
         showToast("error", `${strings.failedToDelete()}: ${e.message}`);
+    } finally {
+      this._changeWorkingStatus(attachment.hash);
     }
   };
 

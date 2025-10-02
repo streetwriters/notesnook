@@ -111,10 +111,19 @@ const Tiptap = ({
 
   usePermissionHandler({
     claims: {
-      premium: settings.premium
+      callout: !!settings.features?.callout?.isAllowed,
+      outlineList: !!settings.features?.outlineList?.isAllowed,
+      taskList: !!settings.features?.taskList?.isAllowed
     },
-    onPermissionDenied: () => {
-      post(EditorEvents.pro, undefined, tabRef.current.id, tab.session?.noteId);
+    onPermissionDenied: (claim) => {
+      post(
+        EditorEvents.pro,
+        {
+          feature: claim
+        },
+        tabRef.current.id,
+        tab.session?.noteId
+      );
     }
   });
 
@@ -558,12 +567,29 @@ const Tiptap = ({
             height: "100%",
             display: "flex",
             flexDirection: "column",
-            position: "relative"
+            position: "relative",
+            paddingTop: "12px"
           }}
         >
           {settings.noHeader || tab.session?.locked ? null : (
             <>
-              <Tags settings={settings} loading={controller.loading} />
+              <div
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  display: "flex",
+                  alignItems: "center",
+                  padding: "0px 16px",
+                  paddingBottom: "6px"
+                }}
+              >
+                <StatusBar
+                  container={containerRef}
+                  loading={controller.loading}
+                />
+                <Tags settings={settings} loading={controller.loading} />
+              </div>
+
               <Title
                 titlePlaceholder={controller.titlePlaceholder}
                 readonly={settings.readonly}
@@ -572,11 +598,6 @@ const Tiptap = ({
                 fontFamily={settings.fontFamily}
                 dateFormat={settings.dateFormat}
                 timeFormat={settings.timeFormat}
-                loading={controller.loading}
-              />
-
-              <StatusBar
-                container={containerRef}
                 loading={controller.loading}
               />
             </>
@@ -918,7 +939,7 @@ const TiptapProvider = (): JSX.Element => {
     editorContainer.classList.add("selectable", "main-editor", "searching");
     editorContainer.style.flex = "1";
     editorContainer.style.cursor = "text";
-    editorContainer.style.padding = "0px 12px";
+    editorContainer.style.padding = "0px 16px";
     editorContainer.style.color = colors.primary.paragraph;
     editorContainer.style.fontSize = `${settings.fontSize}px`;
     editorContainer.style.fontFamily =

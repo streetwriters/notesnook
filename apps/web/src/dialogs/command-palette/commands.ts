@@ -357,7 +357,7 @@ async function getActiveNotebookCommands() {
   const commands: Command[] = [];
 
   const parentId = await db.notebooks.parentId(notebook.id);
-  const menuItems = notebookMenuItems(notebook, [notebook.id], {
+  const menuItems = await notebookMenuItems(notebook, [notebook.id], {
     isRoot: !parentId
   });
   for (const menuItem of menuItems) {
@@ -375,7 +375,7 @@ async function getActiveTagCommands() {
   const group = strings.actionsForTag(tag.title);
   const commands: Command[] = [];
 
-  const menuItems = tagMenuItems(tag, [tag.id]);
+  const menuItems = await tagMenuItems(tag, [tag.id]);
   for (const menuItem of menuItems) {
     commands.push(...menuItemToCommands(menuItem, group, "active-tag"));
   }

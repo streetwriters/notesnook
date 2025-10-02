@@ -42,7 +42,7 @@
   margin-block: 0px;
   cursor: pointer;
   position: relative;
-  background-color: var(--border);
+  background-color: var(--separator);
   width: 100%;
   height: 5px;
   margin-top: 4px;

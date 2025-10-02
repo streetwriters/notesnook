@@ -37,7 +37,7 @@
     "react-native-reanimated": "3.17.5",
     "react-native-safe-area-context": "^5.4.0",
     "react-native-screens": "^4.10.0",
-    "react-native-vector-icons": "9.2.0",
+    "react-native-vector-icons": "10.3.0",
     "react-native-get-random-values": "^1.7.0",
     "react-native-gzip": "1.1.0",
     "react-native-html-to-pdf-lite": "^0.9.1",

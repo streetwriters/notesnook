@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { TextInput } from "react-native";
 import { Settings } from "../../stores/use-setting-store";
+import { FeatureId } from "@notesnook/common";
 
 export type SettingSection = {
   id: string;
@@ -48,6 +49,7 @@ export type SettingSection = {
   onVerify?: () => Promise<boolean>;
   hideHeader?: boolean;
   disabled?: (current: unknown) => boolean;
+  featureId?: FeatureId;
 };
 
 export type SettingsGroup = {

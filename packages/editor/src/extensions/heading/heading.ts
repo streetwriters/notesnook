@@ -24,7 +24,8 @@ import {
 } from "@tiptap/core";
 import { Heading as TiptapHeading } from "@tiptap/extension-heading";
 import { isClickWithinBounds } from "../../utils/prosemirror";
-import { Selection, Transaction } from "@tiptap/pm/state";
+import { Selection, Transaction, Plugin, PluginKey } from "@tiptap/pm/state";
+import { Decoration, DecorationSet } from "@tiptap/pm/view";
 import { Node } from "@tiptap/pm/model";
 
 const COLLAPSIBLE_BLOCK_TYPES = [

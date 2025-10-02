@@ -59,7 +59,7 @@ const testimonials = [
   }
 ];
 
-function randomTestimonial() {
+function getRandomTestimonial() {
   return testimonials[getRandom(0, testimonials.length - 1)];
 }
 
@@ -70,7 +70,7 @@ function randomTitle() {
 }
 
 function AuthContainer(props) {
-  const testimonial = useMemo(() => randomTestimonial(), []);
+  const testimonial = useMemo(() => getRandomTestimonial(), []);
   const title = useMemo(() => randomTitle(), []);
 
   const version = usePromise(

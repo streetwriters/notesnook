@@ -60,8 +60,9 @@ export async function logoutUser() {
                   }. ${strings.failedToTakeBackupMessage()}?`,
                   positiveText: strings.yes(),
                   negativeText: strings.no(),
-                  positivePress: () => {
+                  positivePress: async () => {
                     resolve(true);
+                    return true;
                   },
                   onClose: () => {
                     resolve(false);

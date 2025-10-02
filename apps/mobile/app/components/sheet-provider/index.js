@@ -95,8 +95,6 @@ const SheetProvider = ({ context = "global" }) => {
     [context]
   );
 
-  console.log(data?.keyboardHandlerDisabled);
-
   return !visible || !data ? null : (
     <SheetWrapper
       fwdRef={actionSheetRef}
@@ -226,7 +224,6 @@ const SheetProvider = ({ context = "global" }) => {
                 marginBottom: DefaultAppStyles.GAP_VERTICAL
               }}
               width="100%"
-              fontSize={AppFontSize.md}
             />
           ))}
 

@@ -1374,7 +1374,7 @@ PODS:
     - SDWebImage (~> 5.11.1)
   - react-native-share-extension (2.9.0):
     - React
-  - react-native-sodium (1.6.4):
+  - react-native-sodium (1.6.5):
     - React
   - react-native-theme-switch-animation (0.6.0):
     - DoubleConversion
@@ -2435,7 +2435,7 @@ SPEC CHECKSUMS:
   react-native-safe-area-context: 9d72abf6d8473da73033b597090a80b709c0b2f1
   react-native-screenguard: 82437eeb0086a90b5e5d7e54130bb04fb406373e
   react-native-share-extension: bcb7e466390a9e50c742f4b1019d6f181aedd7ad
-  react-native-sodium: 5b55f74705005612e12838ffd583927229a65e6a
+  react-native-sodium: 285eec063e4232cb67347ef6a434b85e588d38cb
   react-native-theme-switch-animation: d90fe2de0d9e87a63cd6235d98cba6e7054e9a10
   react-native-webview: 079eca50edf657503318b66687dadfb903731aa8
   React-nativeconfig: ecf4dc92c40b97e2b3f0c619938f78bfd6507b08

@@ -35,6 +35,7 @@ import {
   selectMultiple,
   useSelectionStore
 } from "./move-note-dialog";
+import { checkFeature } from "../common";
 
 type AddTagsDialogProps = BaseDialogProps<boolean> & { noteIds: string[] };
 export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
@@ -115,6 +116,8 @@ export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
             );
           }}
           onCreateNewItem={async (title) => {
+            if (!(await checkFeature("tags", { type: "toast" }))) return;
+
             const tagId = await db.tags.add({ title });
             if (!tagId) return;
             await useStore.getState().refresh();

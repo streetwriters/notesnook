@@ -21,7 +21,6 @@ import { SettingsGroup } from "./types";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import { ConfirmDialog } from "../confirm";
-
 import { strings } from "@notesnook/intl";
 
 export const SyncSettings: SettingsGroup[] = [
@@ -37,6 +36,7 @@ export const SyncSettings: SettingsGroup[] = [
         keywords: ["sync off", "toggle sync"],
         onStateChange: (listener) =>
           useAppStore.subscribe((s) => s.isSyncEnabled, listener),
+        featureId: "syncControls",
         components: [
           {
             type: "toggle",
@@ -52,6 +52,7 @@ export const SyncSettings: SettingsGroup[] = [
         keywords: ["auto sync off", "automatic sync", "toggle auto sync"],
         onStateChange: (listener) =>
           useAppStore.subscribe((s) => s.isSyncEnabled, listener),
+        featureId: "syncControls",
         components: [
           {
             type: "toggle",
@@ -67,6 +68,7 @@ export const SyncSettings: SettingsGroup[] = [
         keywords: ["auto sync off", "automatic sync", "toggle auto sync"],
         onStateChange: (listener) =>
           useAppStore.subscribe((s) => s.isSyncEnabled, listener),
+        featureId: "syncControls",
         components: [
           {
             type: "toggle",
@@ -82,6 +84,7 @@ export const SyncSettings: SettingsGroup[] = [
         keywords: ["offline mode"],
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.isFullOfflineMode, listener),
+        featureId: "fullOfflineMode",
         components: [
           {
             type: "toggle",
@@ -110,7 +113,7 @@ export const SyncSettings: SettingsGroup[] = [
                 positiveButtonText: strings.continue(),
                 negativeButtonText: strings.cancel()
               }).then((result) => {
-                if (!result || !result.accept) return;
+                if (!result || !result.checks?.accept) return;
                 return useAppStore
                   .getState()
                   .sync({ force: true, type: "send" });
@@ -130,7 +133,7 @@ export const SyncSettings: SettingsGroup[] = [
                 positiveButtonText: strings.continue(),
                 negativeButtonText: strings.cancel()
               }).then((result) => {
-                if (!result || !result.accept) return;
+                if (!result || !result.checks?.accept) return;
                 return useAppStore
                   .getState()
                   .sync({ force: true, type: "fetch" });

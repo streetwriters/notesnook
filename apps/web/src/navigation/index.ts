@@ -70,7 +70,7 @@ export function useQueryParams(parseFn = parseQuery) {
   return [parseFn(querystring)];
 }
 
-function parseQuery(querystring: string) {
+function parseQuery(querystring: string): Partial<Record<string, string>> {
   return Object.fromEntries(new URLSearchParams(querystring).entries());
 }
 
@@ -116,8 +116,8 @@ export function extendHomeRoute(route: string) {
   return `${getHomeRoute()}${route}`;
 }
 
-export function hardNavigate(route: string) {
-  window.open(makeURL(route, getCurrentHash()), "_self");
+export function hardNavigate(route: string, search?: string) {
+  window.open(makeURL(route, getCurrentHash(), search), "_self");
 }
 
 export function makeURL(route: string, hash?: string, search?: string) {

@@ -21,17 +21,6 @@ import EventManager from "./utils/event-manager.js";
 
 export const EV = new EventManager();
 
-export async function checkIsUserPremium(type: string) {
-  // if (process.env.NODE_ENV === "test") return true;
-
-  const results = await EV.publishWithResult<{ type: string; result: boolean }>(
-    EVENTS.userCheckStatus,
-    type
-  );
-  if (typeof results === "boolean") return results;
-  return results.some((r) => r.type === type && r.result === true);
-}
-
 export const SYNC_CHECK_IDS = {
   autoSync: "autoSync",
   sync: "sync"
@@ -80,17 +69,7 @@ export function sendMigrationProgressEvent(
 
 export const CLIENT_ID = "notesnook";
 
-export const CHECK_IDS = {
-  noteColor: "note:color",
-  noteTag: "note:tag",
-  noteExport: "note:export",
-  vaultAdd: "vault:add",
-  notebookAdd: "notebook:add",
-  backupEncrypt: "backup:encrypt"
-};
-
 export const EVENTS = {
-  userCheckStatus: "user:checkStatus",
   userSubscriptionUpdated: "user:subscriptionUpdated",
   userEmailConfirmed: "user:emailConfirmed",
   userLoggedIn: "user:loggedIn",

@@ -37,7 +37,8 @@ import {
   Print,
   Copy,
   Refresh,
-  Checkmark
+  Checkmark,
+  Pro
 } from "../../components/icons";
 import Field from "../../components/field";
 import { exportToPDF } from "../../common/export";
@@ -59,6 +60,8 @@ import { ErrorText } from "../../components/error-text";
 import { AuthenticatorType } from "@notesnook/core";
 import { MultifactorDialog } from "./multi-factor-dialog";
 import { strings } from "@notesnook/intl";
+import { withFeatureCheck } from "../../common";
+import { useIsFeatureAvailable } from "@notesnook/common";
 
 const QRCode = React.lazy(() => import("../../re-exports/react-qrcode-logo"));
 
@@ -230,6 +233,7 @@ type ChooseAuthenticatorProps = StepComponentProps<AuthenticatorOnNext> & {
 
 function ChooseAuthenticator(props: ChooseAuthenticatorProps) {
   const [selected, setSelected] = useSessionState("selectedAuthenticator", 0);
+  const sms2FAFeature = useIsFeatureAvailable("sms2FA");
   const { authenticators, onNext } = props;
   const filteredAuthenticators = authenticators
     .map((a) => Authenticators.find((auth) => auth.type === a))
@@ -261,7 +265,10 @@ function ChooseAuthenticator(props: ChooseAuthenticatorProps) {
             bg: selected === index ? "shade" : "transparent",
             px: 0
           }}
-          onClick={() => setSelected(index)}
+          onClick={withFeatureCheck(
+            auth.type === "sms" ? "sms2FA" : undefined,
+            () => setSelected(index)
+          )}
         >
           <auth.icon
             className="2fa-icon"
@@ -276,7 +283,12 @@ function ChooseAuthenticator(props: ChooseAuthenticatorProps) {
             color={selected === index ? "accent" : "icon"}
           />
           <Text variant={"title"} sx={{ fontWeight: "body" }}>
-            {auth.title}{" "}
+            <Flex sx={{ alignItems: "center", gap: 2 }}>
+              {auth.title}{" "}
+              {sms2FAFeature?.isAllowed === false && auth.type === "sms" && (
+                <Pro size={16} color="orange" />
+              )}
+            </Flex>
             {auth.recommended ? (
               <Text
                 as="span"

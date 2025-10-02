@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Cipher } from "@notesnook/crypto";
 import Database from "./index.js";
-import { CHECK_IDS, EV, EVENTS, checkIsUserPremium } from "../common.js";
+import { EV, EVENTS } from "../common.js";
 import { isCipher } from "../utils/crypto.js";
 import { Note, NoteContent } from "../types.js";
 import { logger } from "../logger.js";
@@ -67,8 +67,6 @@ export default class Vault {
   }
 
   async create(password: string) {
-    if (!(await checkIsUserPremium(CHECK_IDS.vaultAdd))) return;
-
     const vaultKey = await this.getKey();
     if (!vaultKey || !isCipher(vaultKey)) {
       const encryptedData = await this.db
@@ -174,8 +172,6 @@ export default class Vault {
    * Locks (add to vault) a note
    */
   async add(noteId: string) {
-    if (!(await checkIsUserPremium(CHECK_IDS.vaultAdd))) return;
-
     await this.lockNote({ id: noteId }, await this.getVaultPassword());
     await this.db.noteHistory.clearSessions(noteId);
   }

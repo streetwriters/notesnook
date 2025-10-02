@@ -81,6 +81,7 @@ import { createTriggers, dropTriggers } from "../database/triggers.js";
 import { NNMigrationProvider } from "../database/migrations.js";
 import { ConfigStorage } from "../database/config.js";
 import { LazyPromise } from "../utils/lazy-promise.js";
+import { InboxApiKeys } from "./inbox-api-keys.js";
 
 type EventSourceConstructor = new (
   uri: string,
@@ -92,6 +93,7 @@ type Options = {
   eventsource?: EventSourceConstructor;
   fs: IFileStorage;
   compressor: () => Promise<ICompressor>;
+  maxNoteVersions: () => Promise<number | undefined>;
   batchSize: number;
 };
 
@@ -189,7 +191,7 @@ class Database {
 
   tokenManager = new TokenManager(this.kv);
   mfa = new MFAManager(this.tokenManager);
-  subscriptions = new Subscriptions(this.tokenManager);
+  subscriptions = new Subscriptions(this);
   offers = Offers;
   debug = new Debug();
   pricing = Pricing;
@@ -217,6 +219,8 @@ class Database {
   notes = new Notes(this);
   vaults = new Vaults(this);
   settings = new Settings(this);
+
+  inboxApiKeys = new InboxApiKeys(this, this.tokenManager);
 
   /**
    * @deprecated only kept here for migration purposes
@@ -446,6 +450,7 @@ class Database {
       hosts.SUBSCRIPTIONS_HOST || Hosts.SUBSCRIPTIONS_HOST;
     Hosts.ISSUES_HOST = hosts.ISSUES_HOST || Hosts.ISSUES_HOST;
     Hosts.MONOGRAPH_HOST = hosts.MONOGRAPH_HOST || Hosts.MONOGRAPH_HOST;
+    Hosts.NOTESNOOK_HOST = hosts.NOTESNOOK_HOST || Hosts.NOTESNOOK_HOST;
   }
 
   version() {

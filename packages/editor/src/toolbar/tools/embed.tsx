@@ -52,7 +52,8 @@ export function EmbedAlignLeft(props: ToolProps) {
   const { editor } = props;
   return (
     <ToolButton
-      {...props}
+      icon={props.icon}
+      title={props.title}
       toggled={false}
       onClick={() =>
         editor.chain().focus().setEmbedAlignment({ align: "left" }).run()
@@ -65,7 +66,8 @@ export function EmbedAlignRight(props: ToolProps) {
   const { editor } = props;
   return (
     <ToolButton
-      {...props}
+      icon={props.icon}
+      title={props.title}
       toggled={false}
       onClick={() =>
         editor.chain().focus().setEmbedAlignment({ align: "right" }).run()
@@ -78,7 +80,8 @@ export function EmbedAlignCenter(props: ToolProps) {
   const { editor } = props;
   return (
     <ToolButton
-      {...props}
+      icon={props.icon}
+      title={props.title}
       toggled={false}
       onClick={() =>
         editor.chain().focus().setEmbedAlignment({ align: "center" }).run()
@@ -102,7 +105,8 @@ export function EmbedProperties(props: ToolProps) {
       <ToolButton
         buttonRef={buttonRef}
         toggled={isOpen}
-        {...props}
+        icon={props.icon}
+        title={props.title}
         onClick={() => setIsOpen((s) => !s)}
       />
 

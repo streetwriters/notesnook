@@ -17,18 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
+import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { db } from "../../common/database";
+import ManageTags from "../../screens/manage-tags";
 import { TaggedNotes } from "../../screens/notes/tagged";
-import { useThemeColors } from "@notesnook/theme";
 import { AppFontSize } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
 import { ColorTags } from "./color-tags";
-import { strings } from "@notesnook/intl";
-import { DefaultAppStyles } from "../../utils/styles";
-import ManageTags from "../../screens/manage-tags";
 
 export const Tags = ({ item, close }) => {
   const { colors } = useThemeColors();
@@ -86,7 +86,6 @@ export const TagStrip = ({ item, close }) => {
         flexDirection: "row",
         flexWrap: "wrap",
         alignItems: "center",
-        marginTop: DefaultAppStyles.GAP_VERTICAL,
         gap: 5
       }}
     >
@@ -107,16 +106,13 @@ const TagItem = ({ tag, close }) => {
 
   const style = {
     paddingHorizontal: 0,
-    borderRadius: 100,
-    marginTop: 0,
-    backgroundColor: "transparent"
+    paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
   };
   return (
     <Button
       onPress={onPress}
       title={"#" + tag.title}
       type="plain"
-      height={20}
       fontSize={AppFontSize.xs}
       style={style}
       textStyle={{

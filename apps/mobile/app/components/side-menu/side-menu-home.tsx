@@ -16,34 +16,36 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { SubscriptionPlan } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import React, { Fragment } from "react";
+import React from "react";
 import { FlatList, View } from "react-native";
 import { DraxProvider, DraxScrollView } from "react-native-drax";
 import { db } from "../../common/database";
+import Navigation from "../../services/navigation";
 import { useMenuStore } from "../../stores/use-menu-store";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { MenuItemsList } from "../../utils/menu-items";
+import { useUserStore } from "../../stores/use-user-store";
+import { SUBSCRIPTION_STATUS } from "../../utils/constants";
 import { DefaultAppStyles } from "../../utils/styles";
 import ReorderableList from "../list/reorderable-list";
+import { MenuItemProperties } from "../sheets/menu-item-properties";
+import { Button } from "../ui/button";
 import { ColorSection } from "./color-section";
 import { MenuItem } from "./menu-item";
 import { PinnedSection } from "./pinned-section";
 import { SideMenuHeader } from "./side-menu-header";
-import { SUBSCRIPTION_STATUS } from "../../utils/constants";
-import { eSendEvent } from "../../services/event-manager";
-import { eOpenPremiumDialog } from "../../utils/events";
-import { useUserStore } from "../../stores/use-user-store";
-import { Button } from "../ui/button";
-import { MenuItemProperties } from "../sheets/menu-item-properties";
+import { MenuItemsList } from "../../utils/menu-items";
 
 const pro = {
-  title: strings.getNotesnookPro(),
+  title: strings.upgradePlan(),
   icon: "crown",
   id: "pro",
   onPress: () => {
-    eSendEvent(eOpenPremiumDialog);
+    Navigation.navigate("PayWall", {
+      context: "logged-in"
+    });
   }
 };
 
@@ -58,8 +60,9 @@ export function SideMenuHome() {
     state.hiddenItems["routes"]
   ]);
   const subscriptionType = useUserStore(
-    (state) => state.user?.subscription?.type
+    (state) => state.user?.subscription?.plan
   );
+  const user = useUserStore.getState().user;
 
   return (
     <View
@@ -137,19 +140,15 @@ export function SideMenuHome() {
           paddingVertical: DefaultAppStyles.GAP_VERTICAL
         }}
       >
-        {subscriptionType === SUBSCRIPTION_STATUS.TRIAL ||
-        subscriptionType === SUBSCRIPTION_STATUS.BASIC ? (
+        {subscriptionType === SubscriptionPlan.FREE ||
+        !subscriptionType ||
+        !user ? (
           <Button
             title={pro.title}
-            iconColor={colors.static.yellow}
-            textStyle={{
-              color: colors.static.white
-            }}
-            icon={pro.icon}
             style={{
-              backgroundColor: colors.static.black,
               width: "100%"
             }}
+            type="accent"
             onPress={pro.onPress}
           />
         ) : null}

@@ -312,7 +312,6 @@ export const UserSheet = () => {
             icon: "logout",
             title: strings.logout(),
             onPress: async () => {
-              console.log("logout");
               ref.current?.hide();
               await sleep(300);
               logoutUser();

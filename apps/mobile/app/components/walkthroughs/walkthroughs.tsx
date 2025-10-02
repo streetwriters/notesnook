@@ -40,6 +40,10 @@ import { SvgView } from "../ui/svg";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { DefaultAppStyles } from "../../utils/styles";
+import { useUserStore } from "../../stores/use-user-store";
+import { planToId, SubscriptionPlan } from "@notesnook/core";
+import { planToDisplayName } from "../../utils/constants";
+import AppIcon from "../ui/AppIcon";
 
 export type TStep = {
   text?: string;
@@ -56,287 +60,12 @@ export type TStep = {
   };
 };
 
-const NotebookWelcome = () => {
-  const { colors } = useThemeColors();
-  const data = useRotator([
-    {
-      title: strings.workAndOffice(),
-      description: strings.workAndOfficeDesc(),
-      count: 2
-    },
-    {
-      title: strings.schoolWork(),
-      description: strings.schoolWorkDesc(),
-      count: 5
-    },
-    {
-      title: strings.recipes(),
-      description: strings.recipesDesc(),
-      count: 10
-    }
-  ]);
-
-  return (
-    <View
-      style={{
-        width: "100%",
-        padding: DefaultAppStyles.GAP,
-        backgroundColor: colors.secondary.background,
-        borderRadius: 10,
-        ...getContainerBorder(colors.secondary.background)
-      }}
-    >
-      <View
-        style={{
-          padding: DefaultAppStyles.GAP,
-          width: "100%",
-          backgroundColor: colors.primary.background,
-          ...getElevationStyle(3),
-          borderRadius: 10,
-          marginVertical: DefaultAppStyles.GAP
-        }}
-      >
-        <Heading size={AppFontSize.md} color={colors.primary.heading}>
-          {data?.title}
-        </Heading>
-        <Paragraph>{data?.description}</Paragraph>
-
-        <Paragraph
-          style={{
-            marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL
-          }}
-          size={AppFontSize.xs}
-          color={colors.secondary.paragraph}
-        >
-          {strings.dataTypesCamelCase.notebook()} - {data?.count}{" "}
-          {strings.dataTypesPlural.note()}
-        </Paragraph>
-      </View>
-    </View>
-  );
-};
-
-const notebooks: { id: string; steps: TStep[] } = {
-  id: "notebooks",
-  steps: [
-    {
-      title: strings.notebooks(),
-      text: strings.boostProductivityNotebook(),
-      walkthroughItem: () => <NotebookWelcome />,
-      button: {
-        type: "next",
-        title: strings.next()
-      }
-    },
-    {
-      title: strings.notebookNotes(),
-      text: strings.notebookNotesDesc(),
-      walkthroughItem: (colors: any) => (
-        <View
-          style={{
-            width: "100%",
-            padding: DefaultAppStyles.GAP,
-            backgroundColor: colors.secondary.background,
-            borderRadius: 10,
-            ...getContainerBorder(colors.secondary.background)
-          }}
-        >
-          <View
-            style={{
-              padding: DefaultAppStyles.GAP,
-              width: "100%",
-              backgroundColor: colors.primary.background,
-              ...getElevationStyle(3),
-              borderRadius: 10,
-              marginVertical: 12
-            }}
-          >
-            <Heading size={AppFontSize.md} color={colors.primary.heading}>
-              {strings.workAndOffice()}
-            </Heading>
-            <Paragraph>{strings.workAndOfficeDesc()}</Paragraph>
-
-            <Paragraph
-              style={{
-                marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL
-              }}
-              size={AppFontSize.xs}
-              color={colors.secondary.paragraph}
-            >
-              {strings.notes(2)}
-            </Paragraph>
-          </View>
-          <View
-            style={{
-              padding: DefaultAppStyles.GAP,
-              width: "90%",
-              backgroundColor: colors.primary.background,
-              borderRadius: 10,
-              alignSelf: "flex-end",
-              marginBottom: DefaultAppStyles.GAP_VERTICAL
-            }}
-          >
-            <Paragraph color={colors.primary.accent}>
-              <Icon
-                color={colors.primary.accent}
-                size={AppFontSize.sm}
-                name="bookmark"
-              />{" "}
-              {strings.tasks()}
-            </Paragraph>
-          </View>
-          <View
-            style={{
-              padding: DefaultAppStyles.GAP,
-              paddingVertical: DefaultAppStyles.GAP_VERTICAL,
-              width: "80%",
-              backgroundColor: colors.primary.background,
-              borderRadius: defaultBorderRadius,
-              alignSelf: "flex-end",
-              marginBottom: DefaultAppStyles.GAP_VERTICAL
-            }}
-          >
-            <Paragraph size={AppFontSize.xs}>
-              <Icon
-                color={colors.primary.icon}
-                size={AppFontSize.sm}
-                name="note"
-              />{" "}
-              {strings.taskAValue()}
-            </Paragraph>
-          </View>
-          <View
-            style={{
-              padding: DefaultAppStyles.GAP,
-              width: "80%",
-              backgroundColor: colors.primary.background,
-              borderRadius: defaultBorderRadius,
-              paddingVertical: DefaultAppStyles.GAP_VERTICAL,
-              alignSelf: "flex-end",
-              marginBottom: DefaultAppStyles.GAP_VERTICAL
-            }}
-          >
-            <Paragraph size={AppFontSize.xs}>
-              <Icon
-                color={colors.primary.icon}
-                size={AppFontSize.sm}
-                name="note"
-              />{" "}
-              {strings.taskBValue()}
-            </Paragraph>
-          </View>
-          <View
-            style={{
-              padding: DefaultAppStyles.GAP,
-              width: "90%",
-              backgroundColor: colors.primary.background,
-              borderRadius: 10,
-              alignSelf: "flex-end",
-              marginBottom: DefaultAppStyles.GAP_VERTICAL
-            }}
-          >
-            <Paragraph color={colors.primary.accent}>
-              <Icon
-                color={colors.primary.accent}
-                size={AppFontSize.sm}
-                name="bookmark"
-              />{" "}
-              {strings.meetings()}
-            </Paragraph>
-          </View>
-        </View>
-      ),
-      button: {
-        type: "next",
-        title: strings.next()
-      }
-    },
-    {
-      title: strings.easyAccess(),
-      text: strings.easyAccessDesc(),
-      walkthroughItem: () => (
-        <View
-          style={{
-            paddingHorizontal: 20,
-            paddingVertical: DefaultAppStyles.GAP_VERTICAL
-          }}
-        >
-          {/* <PinItem
-            isPlaceholder={true}
-            item={
-              {
-                title: strings.tasks(),
-                type: "notebook"
-              } as Notebook
-            }
-            onPress={() => {}}
-          />
-
-          <PinItem
-            isPlaceholder={true}
-            item={
-              {
-                title: strings.workAndOffice(),
-                type: "notebook"
-              } as Notebook
-            }
-            onPress={() => {}}
-          /> */}
-        </View>
-      ),
-      button: {
-        type: "done",
-        title: strings.addFirstNotebook(),
-        action: () => {
-          eSendEvent(eOpenAddNotebookDialog);
-        }
-      }
-    }
-  ]
-};
-
-const trialstarted: { id: string; steps: TStep[] } = {
-  id: "trialstarted",
-  steps: [
-    {
-      title: strings.trialStarted(),
-      text: strings.trialStartedDesc(),
-      walkthroughItem: (colors) => (
-        <SvgView src={LAUNCH_ROCKET(colors.primary.paragraph)} />
-      ),
-      button: {
-        type: "next",
-        title: strings.next()
-      }
-    },
-    {
-      title: strings.joinTheCause(),
-      text: strings.meetPrivacyMinded(),
-      walkthroughItem: (colors) => (
-        <SvgView src={COMMUNITY_SVG(colors.primary.paragraph)} />
-      ),
-      button: {
-        type: "done",
-        title: strings.continue()
-      },
-      actionButton: {
-        text: strings.joinDiscord(),
-        action: () => {
-          Linking.openURL("https://discord.gg/zQBK97EE22").catch(() => {
-            /* empty */
-          });
-        }
-      }
-    }
-  ]
-};
-
-const emailconfirmed: { id: string; steps: TStep[] } = {
+const emailconfirmed: () => { id: string; steps: TStep[] } = () => ({
   id: "emailconfirmed",
   steps: [
     {
       title: strings.emailConfirmed(),
-      text: strings.emailNotConfirmedDesc(),
+      text: strings.emailConfirmedDesc(),
       walkthroughItem: (colors) => (
         <SvgView src={WELCOME_SVG(colors.primary.paragraph)} />
       ),
@@ -346,105 +75,29 @@ const emailconfirmed: { id: string; steps: TStep[] } = {
       }
     }
   ]
-};
+});
 
-const Support = () => {
-  return (
-    <View
-      style={{
-        width: "100%",
-        alignItems: "center"
-      }}
-    >
-      <SvgView src={SUPPORT_SVG()} />
-      <Heading>{strings.prioritySupport()}</Heading>
-      <Paragraph
-        style={{
-          textAlign: "center"
-        }}
-        size={AppFontSize.md}
-      >
-        {strings.weAreAlwaysListening()}
-      </Paragraph>
-      <Seperator />
-
-      <Button
-        style={{
-          justifyContent: "flex-start",
-          marginBottom: DefaultAppStyles.GAP_VERTICAL,
-          width: "90%"
-        }}
-        onPress={() => {
-          Linking.openURL("https://discord.gg/zQBK97EE22").catch(() => {
-            /* empty */
-          });
-        }}
-        icon="discord"
-        type="secondary"
-        title={strings.joinDiscord()}
-      />
-
-      <Button
-        style={{
-          justifyContent: "flex-start",
-          marginBottom: DefaultAppStyles.GAP_VERTICAL,
-          width: "90%"
-        }}
-        onPress={() => {
-          Linking.openURL("https://t.me/notesnook").catch(() => {
-            /* empty */
-          });
-        }}
-        icon="telegram"
-        type="secondary"
-        title={strings.joinTelegram()}
-      />
-      <Button
-        style={{
-          justifyContent: "flex-start",
-          marginBottom: DefaultAppStyles.GAP_VERTICAL,
-          width: "90%"
-        }}
-        icon="bug"
-        type="secondary"
-        title={strings.reportAnIssue()}
-      />
-      <Button
-        style={{
-          justifyContent: "flex-start",
-          marginBottom: DefaultAppStyles.GAP_VERTICAL,
-          width: "90%"
-        }}
-        icon="mail"
-        type="secondary"
-        title={strings.emailSupport()}
-      />
-    </View>
-  );
-};
-
-const prouser: { id: string; steps: TStep[] } = {
-  id: "prouser",
-  steps: [
-    {
-      title: strings.welcomeToNotesnookPro(),
-      text: strings.thankYouPrivacy(),
-      walkthroughItem: (colors) => (
-        <SvgView src={LAUNCH_ROCKET(colors.primary.paragraph)} />
-      ),
-      button: {
-        type: "next",
-        title: strings.next()
+const prouser: () => { id: string; steps: TStep[] } = () => {
+  return {
+    id: "prouser",
+    steps: [
+      {
+        title: strings.welcomeToPlan(
+          planToDisplayName(
+            useUserStore.getState().user?.subscription?.plan as SubscriptionPlan
+          )
+        ),
+        text: strings.thankYouPrivacy(),
+        walkthroughItem: (colors) => (
+          <AppIcon name="check" color={colors.primary.accent} size={50} />
+        ),
+        button: {
+          type: "done",
+          title: strings.continue()
+        }
       }
-    },
-    {
-      walkthroughItem: () => <Support />,
-      button: {
-        type: "done",
-        title: strings.continue()
-      }
-    }
-  ]
+    ]
+  };
 };
 
-export default { notebooks, trialstarted, emailconfirmed, prouser };
+export default { emailconfirmed, prouser };

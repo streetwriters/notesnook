@@ -38,6 +38,7 @@ export function SearchReplaceFloatingMenu(props: FloatingMenuProps) {
     <ResponsivePresenter
       mobile="sheet"
       desktop="popup"
+      scope="dialog"
       isOpen={isSearching}
       onClose={() => editor.commands.endSearch()}
       position={{

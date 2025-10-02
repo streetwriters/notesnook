@@ -135,7 +135,6 @@ const ResultDialog = () => {
               paddingHorizontal: DefaultAppStyles.GAP
             }}
             onPress={close}
-            fontSize={AppFontSize.md + 2}
           />
         </View>
       </View>

@@ -25,6 +25,7 @@ import { formatBytes } from "@notesnook/common";
 import { compressImage, FileWithURI } from "../utils/image-compressor";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
+import { checkFeature } from "../common";
 
 export type ImagePickerDialogProps = BaseDialogProps<false | File[]> & {
   images: File[];
@@ -130,7 +131,11 @@ export const ImagePickerDialog = DialogManager.register(
             }}
             defaultChecked={compress}
             checked={compress}
-            onChange={() => setCompress((s) => !s)}
+            onChange={async () => {
+              if (!(await checkFeature("fullQualityImages", { type: "toast" })))
+                return;
+              setCompress((s) => !s);
+            }}
           />
           <span style={{ marginLeft: 5 }}>
             Enable compression (recommended)

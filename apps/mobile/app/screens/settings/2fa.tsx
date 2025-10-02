@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { sanitizeFilename } from "@notesnook/common";
+import { sanitizeFilename, useIsFeatureAvailable } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
 import { useThemeColors, VariantsWithStaticColors } from "@notesnook/theme";
 import Clipboard from "@react-native-clipboard/clipboard";
@@ -54,6 +54,7 @@ import { eCloseSheet } from "../../utils/events";
 import { AppFontSize } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { DefaultAppStyles } from "../../utils/styles";
+import PaywallSheet from "../../components/sheets/paywall";
 const mfaMethods: MFAMethod[] = [
   {
     id: "app",
@@ -98,6 +99,7 @@ type MFAStepProps = {
 export const MFAMethodsPickerStep = ({ recovery, onSuccess }: MFAStepProps) => {
   const { colors } = useThemeColors();
   const user = useUserStore((state) => state.user);
+  const featureAvailable = useIsFeatureAvailable("sms2FA");
 
   const getMethods = () => {
     if (!recovery) return mfaMethods;
@@ -116,6 +118,22 @@ export const MFAMethodsPickerStep = ({ recovery, onSuccess }: MFAStepProps) => {
         <Pressable
           key={item.title}
           onPress={() => {
+            if (
+              item.id === "sms" &&
+              featureAvailable &&
+              !featureAvailable?.isAllowed
+            ) {
+              ToastManager.show({
+                message: featureAvailable?.error,
+                type: "info",
+                context: "local",
+                actionText: strings.upgrade(),
+                func: () => {
+                  PaywallSheet.present(featureAvailable);
+                }
+              });
+              return;
+            }
             onSuccess && onSuccess(item);
           }}
           style={{
@@ -493,7 +511,6 @@ export const MFARecoveryCodes = ({
           >
             <Button
               title={strings.copyCodes()}
-              fontSize={AppFontSize.md}
               onPress={() => {
                 const codeString = codes.join("\n");
                 Clipboard.setString(codeString);
@@ -510,7 +527,6 @@ export const MFARecoveryCodes = ({
 
             <Button
               title={strings.saveToFile()}
-              fontSize={AppFontSize.md}
               onPress={async () => {
                 try {
                   let path;
