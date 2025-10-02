@@ -385,7 +385,7 @@ export function isClickWithinBounds(
 
       if (isRtl) {
         xStart = clientX >= x;
-        xEnd = clientX <= x + hitArea.width;
+        xEnd = clientX <= x + width + hitArea.width;
       }
 
       return xStart && xEnd && yStart && yEnd;

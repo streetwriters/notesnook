@@ -185,7 +185,9 @@ export const Heading = TiptapHeading.extend({
         );
         if (calloutAncestor) return;
 
-        if (isClickWithinBounds(e, resolvedPos, "left")) {
+        const hitPosition =
+          node.attrs.textDirection === "rtl" ? "right" : "left";
+        if (isClickWithinBounds(e, resolvedPos, hitPosition)) {
           e.preventDefault();
           e.stopImmediatePropagation();
 
