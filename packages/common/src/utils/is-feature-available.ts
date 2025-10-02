@@ -133,7 +133,7 @@ const features = {
   }),
   fileSize: createFeature({
     id: "fileSize",
-    title: "File size",
+    title: "Maximum file size",
     error: (limit) =>
       `You cannot upload files larger than ${limit.caption} on this plan.`,
     availability: {
