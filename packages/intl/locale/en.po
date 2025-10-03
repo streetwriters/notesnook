@@ -7371,6 +7371,10 @@ msgstr "Your changes have been saved and will be reflected after the app has ref
 msgid "Your current 2FA method is {method}"
 msgstr "Your current 2FA method is {method}"
 
+#: src/strings.ts:2593
+msgid "Your current subscription does not allow changing plans"
+msgstr "Your current subscription does not allow changing plans"
+
 #: src/strings.ts:1800
 msgid "Your data recovery key is basically a hashed version of your password (plus some random salt). It can be used to decrypt your data for re-encryption."
 msgstr "Your data recovery key is basically a hashed version of your password (plus some random salt). It can be used to decrypt your data for re-encryption."

@@ -1,4 +1,5 @@
 import { FeatureId, FeatureResult } from "@notesnook/common";
+import { SubscriptionPlan, SubscriptionProvider } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import { useEffect } from "react";
@@ -13,6 +14,7 @@ import {
   ToastManager
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
+import PremiumService from "../../../services/premium";
 import { useUserStore } from "../../../stores/use-user-store";
 import { eCloseSheet } from "../../../utils/events";
 import { AppFontSize } from "../../../utils/size";
@@ -22,8 +24,6 @@ import AppIcon from "../../ui/AppIcon";
 import { Button } from "../../ui/button";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import { SubscriptionProvider } from "@notesnook/core";
-import PremiumService from "../../../services/premium";
 const isGithubRelease = Config.GITHUB_RELEASE === "true";
 const INDEX_TO_PLAN = {
   1: "essential",
@@ -187,6 +187,17 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
               width: "100%"
             }}
             onPress={() => {
+              if (
+                pricingPlans.user?.subscription.plan ===
+                SubscriptionPlan.LEGACY_PRO
+              ) {
+                ToastManager.show({
+                  message: strings.cannotChangePlan(),
+                  context: "local"
+                });
+                return;
+              }
+
               if (isSubscribedOnWeb) {
                 ToastManager.show({
                   message: strings.changePlanOnWeb(),

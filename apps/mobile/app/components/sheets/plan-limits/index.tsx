@@ -84,6 +84,14 @@ export function PlanLimits() {
         <Button
           title={strings.changePlan()}
           onPress={() => {
+            if (user?.subscription?.plan === SubscriptionPlan.LEGACY_PRO) {
+              ToastManager.show({
+                message: strings.cannotChangePlan(),
+                context: "local"
+              });
+              return;
+            }
+
             if (
               user?.subscription.plan !== SubscriptionPlan.FREE &&
               user?.subscription.productId.includes("5year")

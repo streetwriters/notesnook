@@ -2588,5 +2588,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   specialOffer: () => t`Special Offer`,
   changePlanOnWeb: () =>
     t`You can change your subscription plan from the web app`,
-  announcement: () => t`ANNOUNCEMENT`
+  announcement: () => t`ANNOUNCEMENT`,
+  cannotChangePlan: () =>
+    t`Your current subscription does not allow changing plans`
 };

@@ -25,6 +25,7 @@ export default function useFeatureManager() {
     "fullOfflineMode"
   ]);
   const user = useUserStore((state) => state.user);
+  const plan = useUserStore((state) => state.user?.subscription?.plan);
 
   useEffect(() => {
     if (!user || !features) return;
@@ -97,7 +98,7 @@ export default function useFeatureManager() {
     return () => {
       unsub?.();
     };
-  }, [features]);
+  }, [features, plan]);
 
   return true;
 }

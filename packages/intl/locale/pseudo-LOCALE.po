@@ -7317,6 +7317,10 @@ msgstr ""
 msgid "Your current 2FA method is {method}"
 msgstr ""
 
+#: src/strings.ts:2593
+msgid "Your current subscription does not allow changing plans"
+msgstr ""
+
 #: src/strings.ts:1800
 msgid "Your data recovery key is basically a hashed version of your password (plus some random salt). It can be used to decrypt your data for re-encryption."
 msgstr ""
