@@ -55,7 +55,6 @@ export const Reminders = ({
 
   return (
     <>
-      <SelectionHeader id={route.name} items={reminders} type="reminder" />
       <Header
         renderedInRoute={route.name}
         title={strings.routes[route.name]()}
@@ -138,6 +137,8 @@ export const Reminders = ({
           alwaysVisible
         />
       </DelayLayout>
+
+      <SelectionHeader id={route.name} items={reminders} type="reminder" />
     </>
   );
 };

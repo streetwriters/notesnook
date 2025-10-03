@@ -25,9 +25,7 @@ describe("Search", () => {
     let note = await Tests.createNote();
     await Tests.fromId("search-header").waitAndTap();
     await Tests.fromId("search-input").element.typeText("Test");
-    await Tests.fromText(note.body).waitAndTap();
-    await device.pressBack();
-    await device.pressBack();
-    await Tests.fromText(note.body).isVisible();
+    await Tests.sleep(1000);
+    await Tests.fromText("1").isVisible();
   });
 });

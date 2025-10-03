@@ -49,7 +49,6 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
 
   return (
     <>
-      <SelectionHeader id={route.name} items={notes} type="note" />
       <Header
         renderedInRoute={route.name}
         title={strings.routes[route.name]()}
@@ -86,6 +85,7 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
           <FloatingButton onPress={openEditor} alwaysVisible />
         )}
       </DelayLayout>
+      <SelectionHeader id={route.name} items={notes} type="note" />
     </>
   );
 };

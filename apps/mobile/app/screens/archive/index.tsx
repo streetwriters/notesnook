@@ -47,7 +47,6 @@ export const Archive = ({ navigation, route }: NavigationProps<"Archive">) => {
 
   return (
     <>
-      <SelectionHeader id={route.name} items={archive} type="note" />
       <Header
         renderedInRoute={route.name}
         title={strings.routes[route.name]()}
@@ -81,6 +80,8 @@ export const Archive = ({ navigation, route }: NavigationProps<"Archive">) => {
           headerTitle={strings.routes.Archive()}
         />
       </DelayLayout>
+
+      <SelectionHeader id={route.name} items={archive} type="note" />
     </>
   );
 };

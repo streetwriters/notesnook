@@ -50,7 +50,6 @@ export const Favorites = ({
 
   return (
     <>
-      <SelectionHeader id={route.name} items={favorites} type="note" />
       <Header
         renderedInRoute={route.name}
         title={strings.routes[route.name]()}
@@ -84,6 +83,8 @@ export const Favorites = ({
           headerTitle={strings.routes.Favorites()}
         />
       </DelayLayout>
+
+      <SelectionHeader id={route.name} items={favorites} type="note" />
     </>
   );
 };
