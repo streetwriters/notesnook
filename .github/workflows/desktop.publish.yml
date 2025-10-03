@@ -402,6 +402,9 @@ jobs:
         run: |
           npm i --cpu arm64 sqlite-better-trigram
           npm i --cpu x64 sqlite-better-trigram
+
+          npm i --cpu arm64 sqlite3-fts5-html
+          npm i --cpu x64 sqlite3-fts5-html
         working-directory: ./apps/desktop
 
       - name: Build
