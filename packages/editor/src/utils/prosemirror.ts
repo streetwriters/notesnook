@@ -371,7 +371,7 @@ export function isClickWithinBounds(
       const yEnd = clientY <= y + hitArea.height;
 
       if (isRtl) {
-        xEnd = clientX <= x + hitArea.width;
+        xEnd = clientX <= right + hitArea.width;
         xStart = clientX >= right;
       }
 
@@ -385,7 +385,7 @@ export function isClickWithinBounds(
 
       if (isRtl) {
         xStart = clientX >= x;
-        xEnd = clientX <= x + width + hitArea.width;
+        xEnd = clientX <= x + hitArea.width;
       }
 
       return xStart && xEnd && yStart && yEnd;

@@ -714,6 +714,7 @@ p > *::selection {
 
   transform: rotate(0);
   transition: transform 250ms ease;
+  opacity: 1;
 }
 
 .ProseMirror div.callout > :first-child[dir="rtl"]::after {
@@ -840,7 +841,7 @@ del.diffdel {
 .ProseMirror h4[dir="rtl"]::before,
 .ProseMirror h5[dir="rtl"]::before,
 .ProseMirror h6[dir="rtl"]::before {
-  opacity: 0 !important;
+  display: none;
 }
 
 .ProseMirror h1[dir="rtl"]::after,
