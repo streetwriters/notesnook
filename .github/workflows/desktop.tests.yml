@@ -217,8 +217,7 @@ jobs:
         working-directory: ./apps/desktop
 
       - name: Build Electron wrapper
-        run: npx nx run release --project @notesnook/desktop
-        working-directory: ./apps/desktop
+        run: node scripts/execute.mjs @notesnook/desktop:release
 
       - name: Build app
         run: |
