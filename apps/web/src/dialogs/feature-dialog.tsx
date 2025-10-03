@@ -93,37 +93,14 @@ const features: Record<FeatureKeys, Feature> = {
         ]
       : [
           {
-            title: "Improved search UX",
+            title: "New pricing plans",
             subtitle:
-              "Searching for notes will now show exactly where the term occurs"
+              "We are changing our pricing to make more sense and be more flexible."
           },
           {
-            title: "Sortable search",
+            title: "Filters in search",
             subtitle:
-              "Search results are now sortable (just like notes, notebooks etc.)"
-          },
-          {
-            title: "Archive",
-            subtitle: (
-              <>
-                You can now archive your notes to hide them from the main list.
-              </>
-            )
-          },
-          {
-            title: "Integrated Notesnook Importer",
-            subtitle: (
-              <>
-                Notesnook Importer is now integrated directly into the app
-                allowing for faster and more seamless import of your notes. Just
-                drag and drop your notes from other note-taking apps and viola!
-              </>
-            )
-          },
-          {
-            title: "Set default tag",
-            subtitle:
-              "You can now set any tag as default and it'll automatically be applied whenever you create a note."
+              "Search now has some basic filters like content:, title:, tag:, color: etc. For the whole list of filters, read our docs."
           }
         ],
     cta: {
