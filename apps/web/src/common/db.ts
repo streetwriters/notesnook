@@ -30,7 +30,11 @@ import { createDialect } from "./sqlite";
 import { isFeatureSupported } from "../utils/feature-check";
 import { generatePassword } from "../utils/password-generator";
 import { deriveKey, useKeyStore } from "../interfaces/key-store";
-import { logManager } from "@notesnook/core";
+import {
+  logManager,
+  SubscriptionPlan,
+  SubscriptionStatus
+} from "@notesnook/core";
 import Config from "../utils/config";
 import { FileStorage } from "../interfaces/fs";
 
@@ -44,24 +48,15 @@ async function initializeDatabase(persistence: DatabasePersistence) {
     await useKeyStore.getState().setValue("databaseKey", databaseKey);
   }
 
-  // db.host({
-  //   API_HOST: "https://api.notesnook.com",
-  //   AUTH_HOST: "https://auth.streetwriters.co",
-  //   SSE_HOST: "https://events.streetwriters.co",
-  //   ISSUES_HOST: "https://issues.streetwriters.co",
-  //   MONOGRAPH_HOST: "https://monogr.ph",
-  //   SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co",
-  //   ...Config.get("serverUrls", {})
-  // });
-  const base = `http://localhost`;
   db.host({
-    API_HOST: `${base}:5264`,
-    AUTH_HOST: `${base}:8264`,
-    SSE_HOST: `${base}:7264`,
-    ISSUES_HOST: `${base}:2624`,
-    SUBSCRIPTIONS_HOST: `${base}:9264`,
-    MONOGRAPH_HOST: `${base}:6264`,
-    NOTESNOOK_HOST: `${base}:8788`
+    API_HOST: "https://api.notesnook.com",
+    AUTH_HOST: "https://auth.streetwriters.co",
+    SSE_HOST: "https://events.streetwriters.co",
+    ISSUES_HOST: "https://issues.streetwriters.co",
+    MONOGRAPH_HOST: "https://monogr.ph",
+    SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co",
+    NOTESNOOK_HOST: "https://notesnook.com",
+    ...Config.get("serverUrls", {})
   });
 
   const storage = new NNStorage(
@@ -143,6 +138,17 @@ async function initializeDatabase(persistence: DatabasePersistence) {
   }
 
   performance.mark("end:initializeDatabase");
+
+  if (IS_TESTING && "isPro" in window) {
+    await db.user.setUser({
+      // @ts-expect-error just for testing purposes
+      subscription: {
+        plan: SubscriptionPlan.PRO,
+        status: SubscriptionStatus.ACTIVE
+      }
+    });
+  }
+
   return db;
 }
 

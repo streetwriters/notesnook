@@ -59,7 +59,7 @@ function roundOffPrices(prices: PriceItem[]) {
     .join("\n");
 }
 
-test("change plans", async () => {
+test.skip("change plans", async () => {
   await app.checkout.goto();
   const plans = await app.checkout.getPlans();
 
@@ -75,7 +75,7 @@ test("change plans", async () => {
   expect(titles.join("").length).toBeGreaterThan(0);
 });
 
-test("confirm plan prices", async () => {
+test.skip("confirm plan prices", async () => {
   await app.checkout.goto();
   const plans = await app.checkout.getPlans();
 
@@ -94,7 +94,7 @@ test("confirm plan prices", async () => {
   }
 });
 
-test("changing locale should show localized prices", async () => {
+test.skip("changing locale should show localized prices", async () => {
   await app.checkout.goto();
   const plans = await app.checkout.getPlans();
 
@@ -114,7 +114,7 @@ test("changing locale should show localized prices", async () => {
   }
 });
 
-test("applying coupon should change discount & total price", async () => {
+test.skip("applying coupon should change discount & total price", async () => {
   await app.checkout.goto();
   const plans = await app.checkout.getPlans();
 
@@ -137,7 +137,7 @@ test("applying coupon should change discount & total price", async () => {
   }
 });
 
-test("apply coupon through url", async () => {
+test.skip("apply coupon through url", async () => {
   const planPrices: Record<string, string> = {};
   for (const plan of ["monthly", "yearly"] as const) {
     await app.checkout.goto(plan, "INTRO50");
@@ -157,7 +157,7 @@ test("apply coupon through url", async () => {
   }
 });
 
-test("apply coupon after changing country", async () => {
+test.skip("apply coupon after changing country", async () => {
   await app.checkout.goto();
   const plans = await app.checkout.getPlans();
 

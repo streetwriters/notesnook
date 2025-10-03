@@ -74,6 +74,7 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
 
   return (
     <BaseDialog
+      testId="upgrade-dialog"
       title={`Unlock this feature today`}
       description={`Upgrade to the ${metadata.title} plan to use this feature`}
       isOpen={true}

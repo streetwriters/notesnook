@@ -56,6 +56,10 @@ export class SettingsViewModel {
     await confirmDialog(this.page.locator(getTestId("confirm-dialog")));
 
     await this.page
+      .locator(getTestId("progress-dialog"))
+      .waitFor({ state: "hidden" });
+
+    await this.page
       .locator(getTestId("logged-in"))
       .waitFor({ state: "hidden" });
   }

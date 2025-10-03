@@ -57,6 +57,7 @@ function Plans() {
         <FlexScrollContainer>
           <Button
             variant="icon"
+            data-test-id="close-plans"
             sx={{
               position: "absolute",
               top: 5,

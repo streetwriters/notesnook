@@ -74,6 +74,8 @@ export class AuthModel {
       await this.submitButton.click();
     }
 
+    await this.page.locator(getTestId("close-plans")).click();
+
     await this.page
       .locator(getTestId("sync-status-synced"))
       .waitFor({ state: "visible" });

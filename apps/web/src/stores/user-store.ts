@@ -45,7 +45,7 @@ class UserStore extends BaseStore<UserStore> {
     });
 
     db.user.getUser().then((user) => {
-      if (!user) {
+      if (!user?.email) {
         this.set({ isLoggedIn: false });
         return;
       }
