@@ -64,7 +64,7 @@
     "eslint-plugin-header": "^3.1.1",
     "fdir": "^6.0.2",
     "listr2": "^8.2.3",
-    "nx": "^17.3.1",
+    "nx": "^21.6.3",
     "patch-package": "^7.0.0",
     "rxjs": "^7.8.1",
     "typescript": "^5.6.3",
