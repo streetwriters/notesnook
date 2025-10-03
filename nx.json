@@ -6,6 +6,7 @@
         "{projectRoot}/build",
         "{projectRoot}/dist",
         "{projectRoot}/languages",
+        "{projectRoot}/locales",
         "{projectRoot}/src/extensions/code-block/languages"
       ],
       "cache": true
