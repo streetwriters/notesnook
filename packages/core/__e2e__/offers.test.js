@@ -30,7 +30,7 @@ test("get offer code", async () => {
 
 test("get invalid offer code", async () => {
   hosts.SUBSCRIPTIONS_HOST = "https://subscriptions.streetwriters.co";
-  await expect(() => Offers.getCode("INVALIDOFFER", "android")).rejects.toThrow(
-    /Not found/i
+  await expect(Offers.getCode("INVALIDOFFER", "android")).rejects.toThrow(
+    /Request failed with status code: 404./i
   );
 });

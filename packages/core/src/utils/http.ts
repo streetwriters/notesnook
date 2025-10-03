@@ -176,12 +176,15 @@ async function handleResponse(response: Response) {
         throw new Error("Unauthorized.");
       } else
         throw new Error(
-          `Request failed with status code: ${response.status} ${response.statusText}.`
+          `Request failed with status code: ${response.status} ${
+            response.url
+          } ${await response.text()}.`
         );
     }
   } catch (e) {
     logger.error(e, "Error while sending request:", {
-      url: response.url
+      url: response.url,
+      body: response.bodyUsed ? undefined : await response.text()
     });
     throw e;
   }
