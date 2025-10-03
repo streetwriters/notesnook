@@ -442,6 +442,7 @@ const Tiptap = ({
           flexDirection: "column",
           maxWidth: "100vw"
         }}
+        spellCheck={!tab.session?.spellCheckDisabled}
         ref={editorRoot}
         onDoubleClick={onClickEmptyArea}
       >

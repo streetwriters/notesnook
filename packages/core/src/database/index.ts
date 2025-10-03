@@ -233,7 +233,8 @@ const BooleanProperties: Set<BooleanFields> = new Set([
   "remote",
   "synced",
   "isGeneratedTitle",
-  "archived"
+  "archived",
+  "spellcheck"
 ]);
 
 const DataMappers: Partial<Record<ItemType, (row: any) => void>> = {

@@ -41,7 +41,8 @@ const TOP_BAR_ITEMS: ActionId[] = [
   "publish",
   "local-only",
   "read-only",
-  "pin-to-notifications"
+  "pin-to-notifications",
+  "spell-check"
 ];
 
 const BOTTOM_BAR_ITEMS: ActionId[] = [
