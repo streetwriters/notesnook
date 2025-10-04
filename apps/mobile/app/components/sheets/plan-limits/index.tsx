@@ -35,9 +35,9 @@ export function PlanLimits() {
   }, []);
 
   const isCurrentPlatform =
-    (user?.subscription.provider === SubscriptionProvider.APPLE &&
+    (user?.subscription?.provider === SubscriptionProvider.APPLE &&
       Platform.OS === "ios") ||
-    (user?.subscription.provider === SubscriptionProvider.GOOGLE &&
+    (user?.subscription?.provider === SubscriptionProvider.GOOGLE &&
       Platform.OS === "android");
 
   return (
@@ -84,8 +84,8 @@ export function PlanLimits() {
         </View>
       ))}
 
-      {(user?.subscription.provider === SubscriptionProvider.PADDLE ||
-        user?.subscription.provider === SubscriptionProvider.STREETWRITERS ||
+      {(user?.subscription?.provider === SubscriptionProvider.PADDLE ||
+        user?.subscription?.provider === SubscriptionProvider.STREETWRITERS ||
         !isCurrentPlatform) &&
       PremiumService.get() ? null : (
         <Button

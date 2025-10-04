@@ -133,9 +133,9 @@ const SettingsUserSection = ({ item }) => {
   const total = user?.totalStorage || 0;
 
   const isCurrentPlatform =
-    (user?.subscription.provider === SubscriptionProvider.APPLE &&
+    (user?.subscription?.provider === SubscriptionProvider.APPLE &&
       Platform.OS === "ios") ||
-    (user?.subscription.provider === SubscriptionProvider.GOOGLE &&
+    (user?.subscription?.provider === SubscriptionProvider.GOOGLE &&
       Platform.OS === "android");
 
   return (
@@ -328,7 +328,7 @@ const SettingsUserSection = ({ item }) => {
                   }}
                 >
                   <Paragraph size={AppFontSize.sm}>
-                    {planToDisplayName(user.subscription.plan)}
+                    {planToDisplayName(user.subscription?.plan)}
                   </Paragraph>
                   <Paragraph
                     color={colors.secondary.paragraph}
@@ -339,14 +339,14 @@ const SettingsUserSection = ({ item }) => {
                   </Paragraph>
                 </TouchableOpacity>
 
-                {(user.subscription.provider === SubscriptionProvider.PADDLE ||
-                  user.subscription.provider ===
+                {(user.subscription?.provider === SubscriptionProvider.PADDLE ||
+                  user.subscription?.provider ===
                     SubscriptionProvider.STREETWRITERS ||
                   !isCurrentPlatform) &&
                 PremiumService.get() ? null : (
                   <Button
                     title={
-                      user.subscription.plan !== SubscriptionPlan.FREE
+                      user.subscription?.plan !== SubscriptionPlan.FREE
                         ? strings.changePlan()
                         : strings.upgradePlan()
                     }
@@ -362,8 +362,9 @@ const SettingsUserSection = ({ item }) => {
                       }
 
                       if (
-                        user.subscription.plan !== SubscriptionPlan.FREE &&
-                        user.subscription.productId.includes("5year")
+                        user.subscription?.plan !== SubscriptionPlan.FREE &&
+                        user.subscription?.productId &&
+                        user.subscription?.productId.includes("5year")
                       ) {
                         ToastManager.show({
                           message:
