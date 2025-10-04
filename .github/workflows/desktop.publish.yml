@@ -408,7 +408,7 @@ jobs:
         working-directory: ./apps/desktop
 
       - name: Build
-        run: npx nx run release --project @notesnook/desktop
+        run: node scripts/execute.mjs @notesnook/desktop:release
 
       - name: Publish
         env:
