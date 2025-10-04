@@ -18,12 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Database from "../api/index.js";
-import { ItemReference, Monograph, Vault } from "../types.js";
+import { Monograph } from "../types.js";
 import { ICollection } from "./collection.js";
 import { SQLCollection } from "../database/sql-collection.js";
 import { getId } from "../utils/id.js";
 import { isFalse } from "../database/index.js";
-import { sql } from "@streetwriters/kysely";
 
 export class Monographs implements ICollection {
   name = "monographs";
@@ -57,7 +56,7 @@ export class Monographs implements ICollection {
       ...monograph
     };
 
-    this.collection.upsert({
+    await this.collection.upsert({
       id,
       title: merged.title,
       datePublished: merged.datePublished,

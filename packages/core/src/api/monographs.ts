@@ -127,7 +127,6 @@ export class Monographs {
 
     const method = update ? http.patch.json : http.post.json;
     const deviceId = await this.db.kv().read("deviceId");
-    console.log("PUBLISHING", monograph);
     const { id, datePublished } = await method(
       `${Constants.API_HOST}/monographs?deviceId=${deviceId}`,
       monograph,
