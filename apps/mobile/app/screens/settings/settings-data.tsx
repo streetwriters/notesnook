@@ -99,9 +99,16 @@ export const settingsGroups: SettingSection[] = [
           const subscriptionProviderInfo =
             strings.subscriptionProviderInfo[user?.subscription?.provider];
 
+          const isCurrentPlatform =
+            (user.subscription.provider === SubscriptionProvider.APPLE &&
+              Platform.OS === "ios") ||
+            (user.subscription.provider === SubscriptionProvider.GOOGLE &&
+              Platform.OS === "android");
+
           if (
-            user.subscription?.provider === SubscriptionProvider.GOOGLE ||
-            user.subscription?.provider === SubscriptionProvider.APPLE
+            (user.subscription?.provider === SubscriptionProvider.GOOGLE ||
+              user.subscription?.provider === SubscriptionProvider.APPLE) &&
+            isCurrentPlatform
           ) {
             RNIap.deepLinkToSubscriptions({
               sku: user?.subscription.productId

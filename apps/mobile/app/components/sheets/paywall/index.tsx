@@ -3,7 +3,7 @@ import { SubscriptionPlan, SubscriptionProvider } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import { useEffect } from "react";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import Config from "react-native-config";
 import usePricingPlans, {
   PlanOverView
@@ -60,6 +60,12 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
         SubscriptionProvider.PADDLE) ||
     pricingPlans.user?.subscription.provider ===
       SubscriptionProvider.STREETWRITERS;
+
+  const isCurrentPlatform =
+    (pricingPlans.user?.subscription.provider === SubscriptionProvider.APPLE &&
+      Platform.OS === "ios") ||
+    (pricingPlans.user?.subscription.provider === SubscriptionProvider.GOOGLE &&
+      Platform.OS === "android");
 
   return !pricingPlans.currentPlan ? null : (
     <View
@@ -189,7 +195,8 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
             onPress={() => {
               if (
                 pricingPlans.user?.subscription.plan ===
-                SubscriptionPlan.LEGACY_PRO
+                  SubscriptionPlan.LEGACY_PRO ||
+                !isCurrentPlatform
               ) {
                 ToastManager.show({
                   message: strings.cannotChangePlan(),

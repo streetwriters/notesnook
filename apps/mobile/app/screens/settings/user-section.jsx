@@ -18,11 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { formatBytes } from "@notesnook/common";
-import {
-  SubscriptionPlan,
-  SubscriptionProvider,
-  SubscriptionStatus
-} from "@notesnook/core";
+import { SubscriptionPlan, SubscriptionProvider } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import { useNetInfo } from "@react-native-community/netinfo";
@@ -40,13 +36,13 @@ import { TimeSince } from "../../components/ui/time-since";
 import Paragraph from "../../components/ui/typography/paragraph";
 import { presentSheet, ToastManager } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
+import PremiumService from "../../services/premium";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SyncStatus, useUserStore } from "../../stores/use-user-store";
 import { planToDisplayName } from "../../utils/constants";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { SectionItem } from "./section-item";
-import PremiumService from "../../services/premium";
 
 export const getTimeLeft = (t2) => {
   let daysRemaining = dayjs(t2).diff(dayjs(), "days");
@@ -135,6 +131,12 @@ const SettingsUserSection = ({ item }) => {
   const userProfile = useUserStore((state) => state.profile);
   const used = user?.storageUsed || 0;
   const total = user?.totalStorage || 0;
+
+  const isCurrentPlatform =
+    (user.subscription.provider === SubscriptionProvider.APPLE &&
+      Platform.OS === "ios") ||
+    (user.subscription.provider === SubscriptionProvider.GOOGLE &&
+      Platform.OS === "android");
 
   return (
     <>
@@ -339,7 +341,8 @@ const SettingsUserSection = ({ item }) => {
 
                 {(user.subscription.provider === SubscriptionProvider.PADDLE ||
                   user.subscription.provider ===
-                    SubscriptionProvider.STREETWRITERS) &&
+                    SubscriptionProvider.STREETWRITERS ||
+                  !isCurrentPlatform) &&
                 PremiumService.get() ? null : (
                   <Button
                     title={
