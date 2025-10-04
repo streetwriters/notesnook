@@ -195,9 +195,9 @@ function getExtensionPath(extensionName: string, entryPoint: string) {
       ? "dylib"
       : "so";
   let loadablePath = path.join(
-    __dirname,
+    require.resolve(extensionName),
     "..",
-    "node_modules",
+    "..",
     packageName,
     `${entryPoint}.${extensionSuffix}`
   );
