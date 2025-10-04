@@ -25,7 +25,10 @@ import path from "path";
 import { fileURLToPath } from "url";
 import parser from "yargs-parser";
 
-const args = parser(process.argv, { alias: { force: ["-f"] } });
+const args = parser(process.argv, {
+  alias: { force: ["-f"], verbose: ["-v"] }
+});
+const isVerbose = process.env.CI || args.verbose;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const config = JSON.parse(
@@ -83,7 +86,7 @@ async function runScript(command, pkg) {
   return new Promise((resolve, reject) => {
     const child = spawn("npm", ["run", command], {
       cwd: pkg,
-      stdio: "inherit",
+      stdio: isVerbose ? "inherit" : "pipe",
       shell: true
     });
 
