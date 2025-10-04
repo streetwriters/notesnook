@@ -36,15 +36,13 @@ function Toggle(props) {
   } = props;
   const [isLoading, setIsLoading] = useState(false);
   const onClick = useCallback(async () => {
-    if (isToggled) {
-      setIsLoading(true);
-      try {
-        await onToggled();
-      } finally {
-        setIsLoading(false);
-      }
+    setIsLoading(true);
+    try {
+      await onToggled();
+    } finally {
+      setIsLoading(false);
     }
-  }, [onToggled, isToggled]);
+  }, [onToggled]);
 
   if (onlyIf === false) return null;
   return (
