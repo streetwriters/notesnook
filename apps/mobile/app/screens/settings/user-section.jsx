@@ -24,7 +24,7 @@ import { useThemeColors } from "@notesnook/theme";
 import { useNetInfo } from "@react-native-community/netinfo";
 import dayjs from "dayjs";
 import React from "react";
-import { Image, TouchableOpacity, View } from "react-native";
+import { Image, Platform, TouchableOpacity, View } from "react-native";
 import ImagePicker from "react-native-image-crop-picker";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
@@ -133,9 +133,9 @@ const SettingsUserSection = ({ item }) => {
   const total = user?.totalStorage || 0;
 
   const isCurrentPlatform =
-    (user.subscription.provider === SubscriptionProvider.APPLE &&
+    (user?.subscription.provider === SubscriptionProvider.APPLE &&
       Platform.OS === "ios") ||
-    (user.subscription.provider === SubscriptionProvider.GOOGLE &&
+    (user?.subscription.provider === SubscriptionProvider.GOOGLE &&
       Platform.OS === "android");
 
   return (
