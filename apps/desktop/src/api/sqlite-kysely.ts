@@ -123,13 +123,19 @@ export class SQLite {
       // fts5 API, we must wait decrypt the database before we can load
       // the extensions.
       if (!this.extensionsLoaded && (await this.isDatabaseReady())) {
-        const betterTrigram = require("sqlite-better-trigram");
-        const fts5Html = require("sqlite3-fts5-html");
-        betterTrigram.load(this.sqlite);
-        fts5Html.load(this.sqlite);
-        this.extensionsLoaded = true;
+        this.loadExtensions();
       }
     }
+  }
+
+  private loadExtensions() {
+    this.sqlite?.loadExtension(
+      getExtensionPath("sqlite-better-trigram", "better-trigram")
+    );
+    this.sqlite?.loadExtension(
+      getExtensionPath("sqlite3-fts5-html", "fts5-html")
+    );
+    this.extensionsLoaded = true;
   }
 
   async run<R>(
@@ -174,4 +180,35 @@ export class SQLite {
       return false;
     }
   }
+}
+
+function getExtensionPath(extensionName: string, entryPoint: string) {
+  const path = require("path");
+  const { statSync } = require("fs");
+
+  const os = process.platform === "win32" ? "windows" : process.platform;
+  const packageName = `${extensionName}-${os}-${process.arch}`;
+  const extensionSuffix =
+    process.platform === "win32"
+      ? "dll"
+      : process.platform === "darwin"
+      ? "dylib"
+      : "so";
+  let loadablePath = path.join(
+    __dirname,
+    "..",
+    "node_modules",
+    packageName,
+    `${entryPoint}.${extensionSuffix}`
+  );
+
+  if (loadablePath.includes(".asar"))
+    loadablePath = loadablePath
+      .replace("electron.asar", "app.asar")
+      .replace(".asar", ".asar.unpacked");
+
+  if (!statSync(loadablePath, { throwIfNoEntry: false })) {
+    throw new Error(`${extensionName} not found at ${loadablePath}.`);
+  }
+  return loadablePath;
 }

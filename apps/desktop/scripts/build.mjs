@@ -51,7 +51,7 @@ console.log("removed build folder");
 if (args.rebuild || !existsSync(path.join(webAppPath, "build"))) {
   console.log("rebuilding...");
   await exec(
-    "npx nx build:desktop @notesnook/web",
+    "node scripts/execute.mjs @notesnook/web:build:desktop",
     path.join(__dirname, "..", "..", "..")
   );
 }
