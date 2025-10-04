@@ -19,6 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { app } from "electron";
 import path from "path";
 
+const customVersion = process.env.CUSTOM_APP_VERSION;
+if (customVersion) {
+  app.getVersion = () => customVersion;
+  console.log("setting custom version:", customVersion);
+}
+
 if (process.env.CUSTOM_USER_DATA_DIR) {
   app.setPath(
     "appData",

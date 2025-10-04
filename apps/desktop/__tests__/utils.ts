@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { execSync } from "child_process";
-import { cp, readFile, writeFile } from "fs/promises";
+import { cp } from "fs/promises";
 import { fileURLToPath } from "node:url";
 import path, { join, resolve } from "path";
 import { _electron as electron } from "playwright";
@@ -59,7 +59,8 @@ export async function buildAndLaunchApp(
   });
   const { app, page, configPath, userDataDir } = await launchApp(
     executablePath,
-    productName
+    productName,
+    options?.version
   );
   const ctx: AppContext = {
     app,
@@ -70,7 +71,8 @@ export async function buildAndLaunchApp(
     relaunch: async () => {
       const { app, page, configPath, userDataDir } = await launchApp(
         executablePath,
-        productName
+        productName,
+        options?.version
       );
       ctx.app = app;
       ctx.page = page;
@@ -81,7 +83,11 @@ export async function buildAndLaunchApp(
   return ctx;
 }
 
-async function launchApp(executablePath: string, packageName: string) {
+async function launchApp(
+  executablePath: string,
+  packageName: string,
+  version?: string
+) {
   const userDataDir = resolve(
     __dirname,
     "..",
@@ -99,7 +105,12 @@ async function launchApp(executablePath: string, packageName: string) {
             APPIMAGE: "true"
           }
         : (process.env as Record<string, string>)),
-      CUSTOM_USER_DATA_DIR: userDataDir
+      CUSTOM_USER_DATA_DIR: userDataDir,
+      ...(version
+        ? {
+            CUSTOM_APP_VERSION: version
+          }
+        : {})
     }
   });
 
@@ -147,33 +158,18 @@ export async function buildApp(version?: string) {
   }
 }
 
-async function copyBuild({
-  version,
-  outputDir
-}: {
-  version?: string;
-  outputDir: string;
-}) {
+async function copyBuild({ outputDir }: { outputDir: string }) {
   return process.platform === "win32"
-    ? await makeBuildCopyWindows(outputDir, productName, version)
+    ? await makeBuildCopyWindows(outputDir, productName)
     : process.platform === "darwin"
-    ? await makeBuildCopyMacOS(outputDir, productName, version)
-    : await makeBuildCopyLinux(outputDir, productName, version);
+    ? await makeBuildCopyMacOS(outputDir, productName)
+    : await makeBuildCopyLinux(outputDir, productName);
 }
 
-async function makeBuildCopyLinux(
-  outputDir: string,
-  productName: string,
-  version?: string
-) {
+async function makeBuildCopyLinux(outputDir: string, productName: string) {
   const platformDir =
     process.arch === "arm64" ? "linux-arm64-unpacked" : "linux-unpacked";
-  const appDir = await makeBuildCopy(
-    outputDir,
-    platformDir,
-    "resources",
-    version
-  );
+  const appDir = await makeBuildCopy(outputDir, platformDir);
   return resolve(
     __dirname,
     "..",
@@ -182,34 +178,16 @@ async function makeBuildCopyLinux(
   );
 }
 
-async function makeBuildCopyWindows(
-  outputDir: string,
-  productName: string,
-  version?: string
-) {
+async function makeBuildCopyWindows(outputDir: string, productName: string) {
   const platformDir =
     process.arch === "arm64" ? "win-arm64-unpacked" : "win-unpacked";
-  const appDir = await makeBuildCopy(
-    outputDir,
-    platformDir,
-    "resources",
-    version
-  );
+  const appDir = await makeBuildCopy(outputDir, platformDir);
   return resolve(__dirname, "..", appDir, `${productName}.exe`);
 }
 
-async function makeBuildCopyMacOS(
-  outputDir: string,
-  productName: string,
-  version?: string
-) {
+async function makeBuildCopyMacOS(outputDir: string, productName: string) {
   const platformDir = process.arch === "arm64" ? "mac-arm64" : "mac";
-  const appDir = await makeBuildCopy(
-    outputDir,
-    platformDir,
-    join(`${productName}.app`, "Contents", "Resources"),
-    version
-  );
+  const appDir = await makeBuildCopy(outputDir, platformDir);
   return resolve(
     __dirname,
     "..",
@@ -221,12 +199,7 @@ async function makeBuildCopyMacOS(
   );
 }
 
-async function makeBuildCopy(
-  outputDir: string,
-  platformDir: string,
-  resourcesDir: string,
-  version?: string
-) {
+async function makeBuildCopy(outputDir: string, platformDir: string) {
   const appDir = outputDir;
   await cp(join(SOURCE_DIR, platformDir), outputDir, {
     recursive: true,
@@ -235,14 +208,6 @@ async function makeBuildCopy(
     dereference: false,
     force: true
   });
-
-  const packageJsonPath = join(appDir, resourcesDir, "app", "package.json");
-
-  const packageJson = JSON.parse(await readFile(packageJsonPath, "utf-8"));
-  if (version) {
-    packageJson.version = version;
-    await writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2));
-  }
 
   return appDir;
 }

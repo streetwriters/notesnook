@@ -63,7 +63,6 @@ const SheetWrapper = ({
   let width = dimensions.width > 600 ? 600 : 500;
   const isGestureNavigationEnabled =
     NotesnookModule.isGestureNavigationEnabled();
-
   const style = React.useMemo(() => {
     return {
       width: largeTablet || smallTablet ? width : "100%",
@@ -78,8 +77,10 @@ const SheetWrapper = ({
       ...getContainerBorder(colors.primary.border, 0.5),
       borderBottomWidth: 0,
       paddingBottom:
-        isGestureNavigationEnabled && Platform.OS === "android"
-          ? insets.bottom
+        Platform.OS === "android" && !insets.bottom
+          ? isGestureNavigationEnabled
+            ? 0
+            : 30
           : 0
     };
   }, [
@@ -164,10 +165,7 @@ const SheetWrapper = ({
         {bottomPadding ? (
           <View
             style={{
-              height:
-                Platform.OS === "ios" || insets.bottom !== 0
-                  ? insets.bottom
-                  : 20
+              height: insets.bottom !== 0 ? insets.bottom : 20
             }}
           />
         ) : null}

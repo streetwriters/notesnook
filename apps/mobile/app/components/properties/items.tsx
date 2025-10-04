@@ -371,8 +371,7 @@ export const Items = ({
                   style={{
                     flexDirection: "row",
                     paddingHorizontal: DefaultAppStyles.GAP,
-                    gap: 5,
-                    width: width
+                    gap: 5
                   }}
                 >
                   {item.map(renderTopBarItem)}

@@ -99,8 +99,8 @@ export class NoteHistory implements ICollection {
     return sessionId;
   }
 
-  private async cleanup(noteId: string) {
-    const limit = await this.db.options.maxNoteVersions();
+  private async cleanup(noteId: string, limit?: number) {
+    limit = limit || (await this.db.options.maxNoteVersions());
     if (!limit) return;
     const history = await this.db
       .sql()

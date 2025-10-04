@@ -187,12 +187,6 @@ const NotesPage = ({
 
   return (
     <>
-      <SelectionHeader
-        id={route.params?.item?.id || route.name}
-        items={notes}
-        type="note"
-        renderedInRoute={route.name}
-      />
       <Header
         renderedInRoute={route.name}
         title={
@@ -243,6 +237,12 @@ const NotesPage = ({
           />
         ) : null}
       </DelayLayout>
+      <SelectionHeader
+        id={route.params?.item?.id || route.name}
+        items={notes}
+        type="note"
+        renderedInRoute={route.name}
+      />
     </>
   );
 };

@@ -56,8 +56,10 @@ async function openLockedNote(pwd?: string) {
 }
 
 async function goToPrivacySecuritySettings() {
-  await Tests.navigate("Settings");
+  await Tests.openSideMenu();
+  await Tests.fromId("sidemenu-settings-icon").waitAndTap();
   await Tests.sleep(300);
+  await Tests.fromText("Settings").waitAndTap();
   await Tests.fromText("Vault").waitAndTap();
 }
 
@@ -91,6 +93,7 @@ describe("VAULT", () => {
     await Tests.fromText("Change").waitAndTap();
     await device.pressBack();
     await device.pressBack();
+    await device.pressBack();
     await Tests.sleep(500);
     await openLockedNote("2362");
   });
@@ -109,6 +112,7 @@ describe("VAULT", () => {
     await Tests.fromText("Create vault").isVisible();
     await device.pressBack();
     await device.pressBack();
+    await device.pressBack();
     await Tests.fromId(notesnook.listitem.menu).isVisible();
   });
 
@@ -125,6 +129,7 @@ describe("VAULT", () => {
     await Tests.fromText("Delete").waitAndTap();
     await Tests.sleep(300);
     await Tests.fromText("Create vault").isVisible();
+    await device.pressBack();
     await device.pressBack();
     await device.pressBack();
     await Tests.fromId(notesnook.listitem.menu).isNotVisible();

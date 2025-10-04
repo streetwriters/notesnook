@@ -300,7 +300,12 @@ const LinkNotebooks = (props: NavigationProps<"LinkNotebooks">) => {
       />
 
       {hasSelection ? (
-        <FloatingButton icon="check" alwaysVisible onPress={() => onSave()} />
+        <FloatingButton
+          testID="floating-save-button"
+          icon="check"
+          alwaysVisible
+          onPress={() => onSave()}
+        />
       ) : null}
     </SafeAreaView>
   );

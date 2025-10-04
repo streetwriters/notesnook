@@ -389,9 +389,8 @@ export class Notes implements ICollection {
     const tags = (await this.db.relations.to(note, "tag").resolve()).map(
       (tag) => tag.title
     );
-    const color = (await this.db.relations.to(note, "color").resolve(1)).at(
-      0
-    )?.title;
+    const color = (await this.db.relations.to(note, "color").resolve(1))[0]
+      ?.title;
 
     return options?.disableTemplate
       ? contentString

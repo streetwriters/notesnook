@@ -75,7 +75,7 @@ function PublishView(props: PublishViewProps) {
         }
       }
     })();
-  }, [publishId, isPublishing]);
+  }, [publishId, isPublishing, note.id]);
 
   useEffect(() => {
     const fileDownloadedEvent = EV.subscribe(
@@ -237,6 +237,7 @@ function PublishView(props: PublishViewProps) {
                 password
               });
               setPublishId(publishId);
+              onClose(true);
               showToast("success", strings.actions.published.note(1));
             } catch (e) {
               console.error(e);

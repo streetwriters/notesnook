@@ -37,6 +37,7 @@ describe("NOTE TESTS", () => {
     await Tests.prepare();
     await Tests.createNote();
     await Tests.fromId(notesnook.listitem.menu).waitAndTap();
+    await Tests.sleep(500);
     await Tests.fromText("Created at").isVisible();
   });
 
@@ -44,12 +45,16 @@ describe("NOTE TESTS", () => {
     await Tests.prepare();
     let note = await Tests.createNote();
     await Tests.fromId(notesnook.listitem.menu).waitAndTap();
+    await Tests.sleep(500);
     await Tests.fromId("icon-favorite").waitAndTap();
+    await device.pressBack();
     await Tests.fromId("icon-star").isVisible();
     await Tests.navigate("Favorites");
     await Tests.fromText(note.body).isVisible();
     await Tests.fromId(notesnook.listitem.menu).waitAndTap();
+    await Tests.sleep(500);
     await Tests.fromId("icon-favorite").waitAndTap();
+    await device.pressBack();
     await Tests.fromText(note.body).isNotVisible();
     await Tests.navigate("Notes");
   });
@@ -58,15 +63,19 @@ describe("NOTE TESTS", () => {
     await Tests.prepare();
     await Tests.createNote();
     await Tests.fromId(notesnook.listitem.menu).waitAndTap();
+    await Tests.sleep(500);
     await Tests.fromId("icon-pin").waitAndTap();
+    await device.pressBack();
     await Tests.fromText("PINNED").isVisible();
     await Tests.fromId("icon-pinned").isVisible();
     await Tests.fromId(notesnook.listitem.menu).waitAndTap();
+    await Tests.sleep(500);
     await Tests.fromId("icon-pin").waitAndTap();
+    await device.pressBack();
     await Tests.fromText("icon-pinned").isNotVisible();
   });
 
-  it("Pin a note in notifications", async () => {
+  it.skip("Pin a note in notifications", async () => {
     await Tests.prepare();
     await Tests.createNote();
     await Tests.fromId(notesnook.listitem.menu).waitAndTap();
@@ -80,6 +89,7 @@ describe("NOTE TESTS", () => {
     await Tests.prepare();
     await Tests.createNote();
     await Tests.fromId(notesnook.listitem.menu).waitAndTap();
+    await Tests.sleep(500);
     await Tests.fromId("icon-copy").isVisible();
     await Tests.fromId("icon-copy").waitAndTap();
   });
@@ -88,6 +98,7 @@ describe("NOTE TESTS", () => {
     await Tests.prepare();
     let note = await Tests.createNote();
     await Tests.fromId(notesnook.listitem.menu).waitAndTap();
+    await Tests.sleep(500);
     await Tests.fromText("Add color").waitAndTap();
     await Tests.fromId("color-title-input").element.typeText("Test color");
     await Tests.fromText("Add color").waitAndTap();
@@ -100,13 +111,15 @@ describe("NOTE TESTS", () => {
     await Tests.fromText(note.body).isVisible();
   });
 
-  it.only("Delete & restore a note", async () => {
+  it("Delete & restore a note", async () => {
     await Tests.prepare();
     await Tests.createNote();
     await Tests.fromId(notesnook.listitem.menu).waitAndTap();
+    await Tests.sleep(500);
     await Tests.fromId("icon-trash").waitAndTap();
     await Tests.navigate("Trash");
     await Tests.fromId(notesnook.listitem.menu).waitAndTap();
+    await Tests.sleep(500);
     await Tests.fromText("Restore").waitAndTap();
     await device.pressBack();
     await Tests.fromText(

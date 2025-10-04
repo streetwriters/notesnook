@@ -378,7 +378,7 @@ async function restoreWithProgress(
 }
 
 export async function verifyAccount() {
-  if (!(await db.user?.getUser())) return true;
+  if (!(await db.user?.getUser())?.email) return true;
   return await showPasswordDialog({
     title: strings.verifyItsYou(),
     subtitle: strings.enterAccountPasswordDesc(),

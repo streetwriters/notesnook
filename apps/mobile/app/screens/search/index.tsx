@@ -141,12 +141,6 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
 
   return (
     <>
-      <SelectionHeader
-        id={route.name}
-        items={results}
-        type={route.params?.type}
-        renderedInRoute={route.name}
-      />
       <SearchBar
         onChangeText={(query) => {
           clearTimeout(timer.current);
@@ -166,6 +160,12 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
           paragraph: searchStatus || strings.searchInRoute(route.params?.title),
           loading: strings.searchingFor(currentQuery.current as string)
         }}
+      />
+      <SelectionHeader
+        id={route.name}
+        items={results}
+        type={route.params?.type}
+        renderedInRoute={route.name}
       />
     </>
   );
