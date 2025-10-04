@@ -555,7 +555,8 @@ export type SubscriptionPlanId =
   | "essential"
   | "pro"
   | "believer"
-  | "education";
+  | "education"
+  | "legacyPro";
 
 export enum SubscriptionPlan {
   FREE = 0,
@@ -678,5 +679,7 @@ export function planToId(plan: SubscriptionPlan): SubscriptionPlanId {
       return "essential";
     case SubscriptionPlan.PRO:
       return "pro";
+    case SubscriptionPlan.LEGACY_PRO:
+      return "legacyPro";
   }
 }

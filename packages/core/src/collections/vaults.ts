@@ -73,8 +73,8 @@ export class Vaults implements ICollection {
    * This is temporary until we add proper support for multiple vaults
    * @deprecated
    */
-  async default() {
-    return (await this.all.items()).at(0);
+  async default(): Promise<Vault | undefined> {
+    return (await this.all.items())[0];
   }
 
   get all() {
