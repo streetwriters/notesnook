@@ -56,15 +56,16 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
 
   const isSubscribedOnWeb =
     (PremiumService.get() &&
-      pricingPlans.user?.subscription.provider ===
+      pricingPlans.user?.subscription?.provider ===
         SubscriptionProvider.PADDLE) ||
-    pricingPlans.user?.subscription.provider ===
+    pricingPlans.user?.subscription?.provider ===
       SubscriptionProvider.STREETWRITERS;
 
   const isCurrentPlatform =
-    (pricingPlans.user?.subscription.provider === SubscriptionProvider.APPLE &&
+    (pricingPlans.user?.subscription?.provider === SubscriptionProvider.APPLE &&
       Platform.OS === "ios") ||
-    (pricingPlans.user?.subscription.provider === SubscriptionProvider.GOOGLE &&
+    (pricingPlans.user?.subscription?.provider ===
+      SubscriptionProvider.GOOGLE &&
       Platform.OS === "android");
 
   return !pricingPlans.currentPlan ? null : (
