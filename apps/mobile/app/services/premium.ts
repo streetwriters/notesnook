@@ -217,7 +217,7 @@ const subscriptions = {
         try {
           let result = await fetch(
             __DEV__
-              ? "http://192.168.100.79:4264/apple/verify"
+              ? "https://payments.streetwriters.co/apple/verify"
               : "https://payments.streetwriters.co/apple/verify",
             requestData
           );

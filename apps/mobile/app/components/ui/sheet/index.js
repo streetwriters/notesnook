@@ -132,6 +132,7 @@ const SheetWrapper = ({
           width: 100,
           backgroundColor: colors.secondary.background
         }}
+        safeAreaInsets={insets}
         statusBarTranslucent
         drawUnderStatusBar={true}
         containerStyle={style}

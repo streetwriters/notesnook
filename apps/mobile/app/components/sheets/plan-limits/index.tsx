@@ -7,7 +7,7 @@ import {
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import { useEffect, useState } from "react";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import { ScrollView } from "react-native-actions-sheet";
 import { eSendEvent, ToastManager } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
@@ -33,6 +33,12 @@ export function PlanLimits() {
       })
       .catch((e) => console.log(e));
   }, []);
+
+  const isCurrentPlatform =
+    (user?.subscription.provider === SubscriptionProvider.APPLE &&
+      Platform.OS === "ios") ||
+    (user?.subscription.provider === SubscriptionProvider.GOOGLE &&
+      Platform.OS === "android");
 
   return (
     <ScrollView
@@ -79,7 +85,8 @@ export function PlanLimits() {
       ))}
 
       {(user?.subscription.provider === SubscriptionProvider.PADDLE ||
-        user?.subscription.provider === SubscriptionProvider.STREETWRITERS) &&
+        user?.subscription.provider === SubscriptionProvider.STREETWRITERS ||
+        !isCurrentPlatform) &&
       PremiumService.get() ? null : (
         <Button
           title={strings.changePlan()}
