@@ -413,27 +413,27 @@ function SortableWrapper(props: SortableWrapperProps) {
   );
 }
 
-type TreeNodeType = "group" | "item";
-type BaseTreeNode<Type extends TreeNodeType> = {
+export type TreeNodeType = "group" | "item";
+export type BaseTreeNode<Type extends TreeNodeType> = {
   type: Type;
   id: string;
   title: string;
   depth: number;
 };
 
-type Subgroup = BaseTreeNode<"group"> & {
+export type Subgroup = BaseTreeNode<"group"> & {
   collapsed?: boolean;
 };
 
-type Group = BaseTreeNode<"group">;
+export type Group = BaseTreeNode<"group">;
 
-type Item = BaseTreeNode<"item"> & {
+export type Item = BaseTreeNode<"item"> & {
   toolId: ToolId;
   icon: string;
   collapsed?: boolean;
 };
 
-type TreeNode = Group | Item | Subgroup;
+export type TreeNode = Group | Item | Subgroup;
 
 function flatten(tools: ToolbarGroupDefinition[], depth = 0): TreeNode[] {
   const nodes: TreeNode[] = [];
@@ -472,7 +472,7 @@ function unflatten(items: TreeNode[]): ToolbarDefinition {
   return tools;
 }
 
-function createGroup(config: Partial<Group>): Group {
+export function createGroup(config: Partial<Group>): Group {
   return {
     type: "group",
     id: getId(),
@@ -482,7 +482,7 @@ function createGroup(config: Partial<Group>): Group {
   };
 }
 
-function createItem(config: Partial<Item> & { toolId: ToolId }): Item {
+export function createItem(config: Partial<Item> & { toolId: ToolId }): Item {
   return {
     type: "item",
     id: getId(),
@@ -544,7 +544,11 @@ function canMoveGroup(
   return true;
 }
 
-function moveItem(items: TreeNode[], fromId: string, toId: string): TreeNode[] {
+export function moveItem(
+  items: TreeNode[],
+  fromId: string,
+  toId: string
+): TreeNode[] {
   const fromIndex = items.findIndex((i) => i.id === fromId);
   const toIndex = items.findIndex((i) => i.id === toId);
 
@@ -555,13 +559,14 @@ function moveItem(items: TreeNode[], fromId: string, toId: string): TreeNode[] {
 
   const movingToGroup = isGroup(toItem) || isSubgroup(toItem);
 
-  // we need to adjust the item depth according to where the item
-  // is going to be moved.
-  if (fromItem.depth !== toItem.depth) fromItem.depth = toItem.depth;
-
-  // if we are moving to the start of the group, we need to adjust the
-  // depth accordingly.
-  if (movingToGroup) fromItem.depth = toItem.depth + 1;
+  // calculate the correct depth based on where the item is being moved
+  if (movingToGroup) {
+    // if moving to a group/subgroup, set depth to group's depth + 1
+    fromItem.depth = toItem.depth + 1;
+  } else {
+    // if moving to another item, set depth to match the target item's depth
+    fromItem.depth = toItem.depth;
+  }
 
   const newArray = arrayMove(items, fromIndex, toIndex);
 
@@ -626,15 +631,15 @@ function isCollapsed(item: TreeNode, activeItem: TreeNode): boolean {
   return false;
 }
 
-function isSubgroup(item: TreeNode): item is Subgroup {
+export function isSubgroup(item: TreeNode): item is Subgroup {
   return item.type === "group" && item.depth > 0;
 }
 
-function isGroup(item: TreeNode): item is Group {
+export function isGroup(item: TreeNode): item is Group {
   return item.type === "group" && item.depth === 0;
 }
 
-function isItem(item: TreeNode): item is Item {
+export function isItem(item: TreeNode): item is Item {
   return item.type === "item";
 }
 
