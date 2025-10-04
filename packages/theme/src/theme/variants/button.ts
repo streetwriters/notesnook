@@ -48,7 +48,7 @@ export const createButtonVariant = (
   textOverflow: "ellipsis",
   whiteSpace: "nowrap",
 
-  transition: "transform 50ms ease-out",
+  transition: "transform 50ms ease-out, background 100ms ease-out",
   ":hover:not(:disabled):not(:active)": {
     bg: background,
     // filter: "brightness(90%)",
@@ -83,6 +83,17 @@ const secondary: ThemeUIStyleObject = createButtonVariant(
     active: { bg: "hover-secondary" }
   }
 );
+
+const tertiary: ThemeUIStyleObject = {
+  ...createButtonVariant("transparent", "paragraph", {
+    hover: { opacity: 0.8 },
+    active: { opacity: 1 }
+  }),
+  p: 0,
+  m: 0,
+  px: 0,
+  py: 0
+};
 
 const accent = createButtonVariant("accent", "accentForeground", {
   hover: { bg: alpha("accent", 0.9) },
@@ -138,6 +149,7 @@ const menuItem: ThemeUIStyleObject = {
 export const buttonVariants = {
   primary,
   secondary,
+  tertiary,
 
   accent,
   accentSecondary,

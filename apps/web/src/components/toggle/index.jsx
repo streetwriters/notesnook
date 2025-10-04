@@ -19,10 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useCallback, useState } from "react";
 import Tip from "../tip";
-import { isUserPremium } from "../../hooks/use-is-user-premium";
 import { Flex, Switch } from "@theme-ui/components";
 import { Loading } from "../icons";
-import { BuyDialog } from "../../dialogs/buy-dialog/buy-dialog";
 
 function Toggle(props) {
   const {
@@ -32,24 +30,19 @@ function Toggle(props) {
     isToggled,
     onToggled,
     onlyIf,
-    premium,
     testId,
     disabled,
     tip
   } = props;
   const [isLoading, setIsLoading] = useState(false);
   const onClick = useCallback(async () => {
-    if (isUserPremium() || !premium || isToggled) {
-      setIsLoading(true);
-      try {
-        await onToggled();
-      } finally {
-        setIsLoading(false);
-      }
-    } else {
-      await BuyDialog.show({});
+    setIsLoading(true);
+    try {
+      await onToggled();
+    } finally {
+      setIsLoading(false);
     }
-  }, [onToggled, premium, isToggled]);
+  }, [onToggled]);
 
   if (onlyIf === false) return null;
   return (

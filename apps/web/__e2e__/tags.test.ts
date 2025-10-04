@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { test, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
 import { Item } from "./models/types";
-import { NOTE, orderByOptions, sortByOptions } from "./utils";
+import { getTestId, NOTE, orderByOptions, sortByOptions } from "./utils";
 
 const TAG: Item = { title: "hello-world" };
 const EDITED_TAG: Item = { title: "hello-world-2" };
@@ -219,20 +219,22 @@ test(`sort tags`, async ({ page }, info) => {
   }
 });
 
-test("creating more than 5 tags shouldn't be possible on basic plan", async ({
+test("creating more than 50 tags shouldn't be possible on free plan", async ({
   page
-}) => {
-  await page.exposeBinding("isBasic", () => true);
+}, info) => {
+  info.setTimeout(2 * 60 * 1000);
   const app = new AppModel(page);
   await app.goto();
   const tags = await app.goToTags();
-  for (const tag of ["tag1", "tag2", "tag3", "tag4", "tag5"]) {
-    await tags.createItem({ title: tag });
+  for (let i = 0; i < 50; i++) {
+    await tags.createItem({ title: `tag${i}` });
   }
 
   const result = await Promise.race([
-    tags.createItem({ title: "tag6" }),
-    app.toasts.waitForToast("Upgrade to Notesnook Pro to create more tags.")
+    tags.createItem({ title: "tag50" }),
+    page
+      .waitForSelector(getTestId("upgrade-dialog"), { state: "visible" })
+      .then(() => true)
   ]);
   expect(result).toBe(true);
 });
@@ -240,6 +242,7 @@ test("creating more than 5 tags shouldn't be possible on basic plan", async ({
 test("when default tag is set, created note in notes context should have default tag", async ({
   page
 }) => {
+  await page.exposeBinding("isPro", () => true);
   const app = new AppModel(page);
   await app.goto();
   let tags = await app.goToTags();
@@ -258,6 +261,7 @@ test("when default tag is set, created note in notes context should have default
 test("when default tag is set, created note in other tag's context should not have default tag", async ({
   page
 }) => {
+  await page.exposeBinding("isPro", () => true);
   const app = new AppModel(page);
   await app.goto();
   let tags = await app.goToTags();
@@ -279,6 +283,7 @@ test("when default tag is set, created note in other tag's context should not ha
 test("when default tag is set, created note in notebooks context should have default tag", async ({
   page
 }) => {
+  await page.exposeBinding("isPro", () => true);
   const app = new AppModel(page);
   await app.goto();
   let tags = await app.goToTags();
@@ -299,6 +304,7 @@ test("when default tag is set, created note in notebooks context should have def
 test("when default tag is set, created note in colors context should have default tag", async ({
   page
 }) => {
+  await page.exposeBinding("isPro", () => true);
   const coloredNote = { title: "Red note", content: NOTE.content };
   const app = new AppModel(page);
   await app.goto();

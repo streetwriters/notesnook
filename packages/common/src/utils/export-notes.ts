@@ -25,8 +25,6 @@ import {
   ResolveInternalLink,
   isImage,
   isWebClip,
-  CHECK_IDS,
-  checkIsUserPremium,
   FilteredSelector,
   EMPTY_CONTENT
 } from "@notesnook/core";
@@ -66,18 +64,23 @@ export async function* exportNotes(
   }
 ) {
   const { format } = options;
-  if (format !== "txt" && !(await checkIsUserPremium(CHECK_IDS.noteExport)))
-    return;
 
   const pathTree = new PathTree();
   const notePathMap: Map<string, string[]> = new Map();
 
   for await (const note of notes
-    .fields(["notes.id", "notes.title"])
+    .fields(["notes.id", "notes.title", "notes.archived"])
     .iterate()) {
     const filename = `${sanitizeFilename(note.title || "Untitled", {
       replacement: "-"
     })}.${FORMAT_TO_EXT[format]}`;
+
+    if (note.archived) {
+      const archiveNotePath = join("_archive", filename);
+      notePathMap.set(note.id, [pathTree.add(archiveNotePath)]);
+      continue;
+    }
+
     const notebooks = await database.relations
       .to({ id: note.id, type: "note" }, "notebook")
       .get();
@@ -168,8 +171,6 @@ export async function* exportNote(
   }
 ) {
   const { format } = options;
-  if (format !== "txt" && !(await checkIsUserPremium(CHECK_IDS.noteExport)))
-    return;
 
   const attachmentsRoot = "attachments";
   const filename = sanitizeFilename(note.title || "Untitled", {

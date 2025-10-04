@@ -130,6 +130,7 @@ export class Notes implements ICollection {
       }
 
       if (!isUpdating || item.title === "") {
+        item.isGeneratedTitle = !Boolean(item.title);
         item.title =
           item.title ||
           formatTitle(
@@ -139,7 +140,6 @@ export class Notes implements ICollection {
             headlineTitle,
             this.totalNotes
           );
-        item.isGeneratedTitle = true;
       }
 
       const currentNoteTitleFields = await this.db
@@ -247,6 +247,13 @@ export class Notes implements ICollection {
           .where(isFalse("dateDeleted"))
           .where(isFalse("deleted"))
           .where(isFalse("archived")),
+      this.db.options?.batchSize
+    );
+  }
+
+  get exportable() {
+    return this.collection.createFilter<Note>(
+      (qb) => qb.where(isFalse("dateDeleted")).where(isFalse("deleted")),
       this.db.options?.batchSize
     );
   }
@@ -382,9 +389,8 @@ export class Notes implements ICollection {
     const tags = (await this.db.relations.to(note, "tag").resolve()).map(
       (tag) => tag.title
     );
-    const color = (await this.db.relations.to(note, "color").resolve(1)).at(
-      0
-    )?.title;
+    const color = (await this.db.relations.to(note, "color").resolve(1))[0]
+      ?.title;
 
     return options?.disableTemplate
       ? contentString

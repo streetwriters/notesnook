@@ -1,14 +1,13 @@
 {
   "name": "@notesnook/web",
   "description": "Your private note taking space",
-  "version": "3.2.4",
+  "version": "3.3.0",
   "private": true,
   "main": "./src/app.js",
   "homepage": "https://notesnook.com/",
   "repository": "https://github.com/streetwriters/notesnook",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@brixtol/currency-symbols": "^1.1.1",
     "@dnd-kit/core": "^6.1.0",
     "@dnd-kit/modifiers": "^7.0.0",
     "@dnd-kit/sortable": "^8.0.0",
@@ -32,6 +31,7 @@
     "@notesnook/themes-server": "file:../../servers/themes",
     "@notesnook/ui": "file:../../packages/ui",
     "@notesnook/web-clipper": "file:../../extensions/web-clipper",
+    "@paddle/paddle-js": "^1.4.2",
     "@react-pdf-viewer/core": "^3.12.0",
     "@react-pdf-viewer/toolbar": "^3.12.0",
     "@rehookify/datepicker": "^6.6.7",

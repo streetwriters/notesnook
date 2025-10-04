@@ -27,10 +27,6 @@ import { getStyle } from "./functions";
 import { DefaultAppStyles } from "../../utils/styles";
 
 export const Title = ({ text, style = {}, inline }) => {
-  const announcements = useMessageStore((state) => state.announcements);
-  let announcement = announcements.length > 0 ? announcements[0] : null;
-  const remove = useMessageStore((state) => state.remove);
-
   return inline ? (
     <View
       style={{
@@ -42,46 +38,21 @@ export const Title = ({ text, style = {}, inline }) => {
     >
       <Heading
         style={{
-          marginHorizontal: DefaultAppStyles.GAP,
+          paddingHorizontal: DefaultAppStyles.GAP,
           marginTop: DefaultAppStyles.GAP_VERTICAL,
           ...getStyle(style),
           textAlign: inline ? "left" : style?.textAlign,
           flexShrink: 1
         }}
-        numberOfLines={1}
         size={inline ? AppFontSize.md : AppFontSize.xl}
       >
         {inline ? text?.toUpperCase() : text}
       </Heading>
-
-      <Button
-        type="plain"
-        icon="close"
-        height={null}
-        onPress={() => {
-          remove(announcement.id);
-        }}
-        hitSlop={{
-          left: 15,
-          top: 10,
-          bottom: 10,
-          right: 0
-        }}
-        iconSize={24}
-        fontSize={AppFontSize.xs}
-        style={{
-          borderRadius: 100,
-          paddingVertical: 0,
-          paddingHorizontal: 0,
-          marginRight: 12,
-          zIndex: 10
-        }}
-      />
     </View>
   ) : (
     <Heading
       style={{
-        marginHorizontal: DefaultAppStyles.GAP,
+        paddingHorizontal: DefaultAppStyles.GAP,
         ...getStyle(style),
         marginTop: style?.marginTop || DefaultAppStyles.GAP_VERTICAL
       }}

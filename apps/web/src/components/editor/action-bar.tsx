@@ -272,6 +272,7 @@ const TabStrip = React.memo(function TabStrip() {
   const currentTab = useEditorStore((store) => store.activeTabId);
   const canGoBack = useEditorStore((store) => store.canGoBack);
   const canGoForward = useEditorStore((store) => store.canGoForward);
+  const isFocusMode = useAppStore((store) => store.isFocusMode);
 
   return (
     <Flex sx={{ flex: 1 }}>
@@ -399,6 +400,7 @@ const TabStrip = React.memo(function TabStrip() {
                   isActive={tab.id === currentTab}
                   isPinned={!!tab.pinned}
                   isLocked={isLockedSession(session)}
+                  isRevealInListDisabled={isFocusMode}
                   type={session.type}
                   onFocus={() => {
                     if (tab.id !== currentTab) {
@@ -471,6 +473,7 @@ type TabProps = {
   isPinned: boolean;
   isLocked: boolean;
   isUnsaved: boolean;
+  isRevealInListDisabled: boolean;
   type: SessionType;
   onFocus: () => void;
   onClose: () => void;
@@ -489,6 +492,7 @@ function Tab(props: TabProps) {
     isPinned,
     isLocked,
     isUnsaved,
+    isRevealInListDisabled,
     type,
     onFocus,
     onClose,
@@ -608,7 +612,8 @@ function Tab(props: TabProps) {
             title: strings.revealInList(),
             key: "reveal-in-list",
             onClick: onRevealInList,
-            isHidden: !onRevealInList
+            isHidden: !onRevealInList,
+            isDisabled: isRevealInListDisabled
           },
           { type: "separator", key: "sep2", isHidden: !onRevealInList },
           {

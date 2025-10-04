@@ -674,7 +674,10 @@ export default class Backup {
         }
       }
 
-      const collectionKey: CollectionName = itemTypeToCollectionKey[itemType];
+      const collectionKey: CollectionName =
+        itemTypeToCollectionKey[
+          itemType as keyof typeof itemTypeToCollectionKey
+        ];
       if (!collectionKey) continue;
 
       if (itemType === "color") {

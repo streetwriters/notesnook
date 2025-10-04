@@ -120,7 +120,6 @@ import {
   mdiPencil,
   mdiCheckboxMultipleBlankOutline,
   mdiCheckboxMultipleMarked,
-  mdiFormatFloatLeft,
   mdiMessageOutline,
   mdiVectorLink,
   mdiPinOutline
@@ -172,7 +171,6 @@ export const Icons = {
   imageDownload: mdiProgressDownload,
   imageFailed: mdiProgressAlert,
   imageSettings: mdiImageEditOutline,
-  imageFloat: mdiFormatFloatLeft,
   colorClear: mdiInvertColorsOff,
   save: mdiContentSaveOutline,
   copy: mdiClipboardOutline,

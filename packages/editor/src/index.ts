@@ -87,6 +87,7 @@ import { strings } from "@notesnook/intl";
 import { InlineCode } from "./extensions/inline-code/inline-code.js";
 import { FontLigature } from "./extensions/font-ligature/font-ligature.js";
 import { SearchResult } from "./extensions/search-result/search-result.js";
+import "simplebar-react/dist/simplebar.min.css";
 
 interface TiptapStorage {
   dateFormat?: DateTimeOptions["dateFormat"];
@@ -438,3 +439,4 @@ export {
 };
 export { replaceDateTime } from "./extensions/date-time/index.js";
 export type * from "./extension-imports.js";
+export { type Selection } from "@tiptap/pm/state";

@@ -18,7 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { formatBytes } from "@notesnook/common";
-import { User } from "@notesnook/core";
+import {
+  SubscriptionPlan,
+  SubscriptionProvider,
+  SubscriptionStatus,
+  User
+} from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import notifee from "@notifee/react-native";
 import Clipboard from "@react-native-clipboard/clipboard";
@@ -27,10 +32,9 @@ import React from "react";
 import { Appearance, Linking, Platform } from "react-native";
 import { getVersion } from "react-native-device-info";
 import * as RNIap from "react-native-iap";
-//@ts-ignore
 import { enabled } from "react-native-privacy-snapshot";
 import ScreenGuardModule from "react-native-screenguard";
-import { db } from "../../common/database";
+import { DatabaseLogger, db } from "../../common/database";
 import filesystem from "../../common/filesystem";
 import { presentDialog } from "../../components/dialog/functions";
 import { AppLockPassword } from "../../components/dialogs/applock-password";
@@ -57,7 +61,6 @@ import SettingsService from "../../services/settings";
 import Sync from "../../services/sync";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
-import { SUBSCRIPTION_STATUS } from "../../utils/constants";
 import { eCloseSheet, eOpenRecoveryKeyDialog } from "../../utils/events";
 import { NotesnookModule } from "../../utils/notesnook-module";
 import { sleep } from "../../utils/time";
@@ -78,53 +81,80 @@ export const settingsGroups: SettingSection[] = [
       {
         id: "subscription-status",
         useHook: () => useUserStore((state) => state.user),
-        hidden: (current) => !current,
+        hidden: (current) =>
+          !current ||
+          (current as User).subscription?.plan === SubscriptionPlan.FREE,
         name: (current) => {
           const user = (current as User) || useUserStore.getState().user;
-          if (!user) return strings.subscribeToPro();
-          const isBasic = user.subscription?.type === SUBSCRIPTION_STATUS.BASIC;
-          const isTrial = user.subscription?.type === SUBSCRIPTION_STATUS.TRIAL;
-          return isBasic || !user.subscription?.type
-            ? strings.subscribeToPro()
-            : isTrial
-            ? strings.trialStarted()
-            : strings.subDetails();
+          return (
+            strings.subscriptionProviderInfo[
+              user?.subscription?.provider
+            ].title() || "Unknown provider"
+          );
         },
-        type: "component",
-        component: "subscription",
-        icon: "crown",
+        icon: "credit-card",
+        modifer: () => {
+          const user = useUserStore.getState().user;
+          if (!user) return;
+          const subscriptionProviderInfo =
+            strings.subscriptionProviderInfo[user?.subscription?.provider];
+
+          const isCurrentPlatform =
+            (user.subscription.provider === SubscriptionProvider.APPLE &&
+              Platform.OS === "ios") ||
+            (user.subscription.provider === SubscriptionProvider.GOOGLE &&
+              Platform.OS === "android");
+
+          if (
+            (user.subscription?.provider === SubscriptionProvider.GOOGLE ||
+              user.subscription?.provider === SubscriptionProvider.APPLE) &&
+            isCurrentPlatform
+          ) {
+            RNIap.deepLinkToSubscriptions({
+              sku: user?.subscription.productId
+            });
+          } else {
+            presentSheet({
+              title: subscriptionProviderInfo.title(),
+              paragraph: subscriptionProviderInfo.desc()
+            });
+          }
+        },
         description: (current) => {
           const user = current as User;
           if (!user) return strings.neverHesitate();
           const subscriptionDaysLeft =
-            user &&
-            getTimeLeft(
-              parseInt(user.subscription?.expiry as unknown as string)
-            );
+            user && getTimeLeft(user.subscription?.expiry);
           const expiryDate = dayjs(user?.subscription?.expiry).format(
-            "MMMM D, YYYY"
+            "dddd, MMMM D, YYYY h:mm A"
           );
           const startDate = dayjs(user?.subscription?.start).format(
-            "MMMM D, YYYY"
+            "dddd, MMMM D, YYYY h:mm A"
           );
 
-          if (user.subscription.provider === 4) {
-            return strings.subEndsOn(expiryDate);
+          if (user.subscription.plan !== SubscriptionPlan.FREE) {
+            const status = user.subscription.status;
+            return status === SubscriptionStatus.TRIAL
+              ? strings.trialEndsOn(
+                  dayjs(user?.subscription?.start)
+                    .add(
+                      user?.subscription?.productId.includes("monthly") ? 7 : 14
+                    )
+                    .format("dddd, MMMM D, YYYY h:mm A")
+                )
+              : status === SubscriptionStatus.ACTIVE
+              ? strings.subRenewOn(expiryDate)
+              : status === SubscriptionStatus.CANCELED ||
+                status === SubscriptionStatus.PAUSED
+              ? strings.subEndsOn(expiryDate)
+              : status === SubscriptionStatus.EXPIRED
+              ? subscriptionDaysLeft.time < -3
+                ? strings.subEnded()
+                : strings.accountDowngradedIn(3)
+              : strings.neverHesitate();
           }
 
-          return user.subscription?.type === 2
-            ? strings.signedUpOn(startDate)
-            : user.subscription?.type === 1
-            ? strings.trialEndsOn(expiryDate)
-            : user.subscription?.type === 6
-            ? subscriptionDaysLeft.time < -3
-              ? strings.subEnded()
-              : strings.accountDowngradedIn(3)
-            : user.subscription?.type === 7
-            ? strings.subEndsOn(expiryDate)
-            : user.subscription?.type === 5
-            ? strings.subRenewOn(expiryDate)
-            : strings.neverHesitate();
+          return strings.neverHesitate();
         }
       },
       {
@@ -136,9 +166,7 @@ export const settingsGroups: SettingSection[] = [
         },
         useHook: () =>
           useUserStore(
-            (state) =>
-              state.user?.subscription.type == SUBSCRIPTION_STATUS.TRIAL ||
-              state.user?.subscription.type == SUBSCRIPTION_STATUS.BASIC
+            (state) => state.user?.subscription?.plan === SubscriptionPlan.FREE
           ),
         icon: "gift",
         modifer: () => {
@@ -227,7 +255,8 @@ export const settingsGroups: SettingSection[] = [
                 eSendEvent(eOpenRecoveryKeyDialog);
               });
             },
-            description: strings.saveDataRecoveryKeyDesc()
+            description: strings.saveDataRecoveryKeyDesc(),
+            icon: "key"
           },
           {
             id: "manage-attachments",
@@ -243,14 +272,16 @@ export const settingsGroups: SettingSection[] = [
             name: strings.changePassword(),
             type: "screen",
             description: strings.changePasswordDesc(),
-            component: "change-password"
+            component: "change-password",
+            icon: "form-textbox-password"
           },
           {
             id: "change-email",
             name: strings.changeEmail(),
             type: "screen",
             component: "change-email",
-            description: strings.changeEmailDesc()
+            description: strings.changeEmailDesc(),
+            icon: "at"
           },
           {
             id: "2fa-settings",
@@ -418,6 +449,7 @@ export const settingsGroups: SettingSection[] = [
                 paragraph: strings.deleteAccountDesc(),
                 positiveType: "errorShade",
                 input: true,
+                secureTextEntry: true,
                 inputPlaceholder: strings.enterAccountPassword(),
                 positiveText: strings.delete(),
                 positivePress: async (value) => {
@@ -425,16 +457,28 @@ export const settingsGroups: SettingSection[] = [
                     const verified = await db.user?.verifyPassword(value);
                     if (verified) {
                       setTimeout(async () => {
-                        startProgress({
-                          title: "Deleting account",
-                          paragraph: "Please wait while we delete your account"
-                        });
-                        Navigation.navigate("Notes");
-                        await db.user?.deleteUser(value);
-                        await BiometricService.resetCredentials();
-                        SettingsService.set({
-                          introCompleted: true
-                        });
+                        try {
+                          startProgress({
+                            title: "Deleting account",
+                            paragraph:
+                              "Please wait while we delete your account"
+                          });
+                          await db.user?.deleteUser(value);
+                          DatabaseLogger.info("User account deleted");
+                          Navigation.navigate("Notes");
+                          await BiometricService.resetCredentials();
+                          SettingsService.set({
+                            introCompleted: true
+                          });
+                        } catch (e) {
+                          endProgress();
+                          DatabaseLogger.error(e);
+                          ToastManager.error(
+                            e as Error,
+                            strings.failedToDeleteAccount(),
+                            "global"
+                          );
+                        }
                       }, 300);
                     } else {
                       ToastManager.show({
@@ -443,11 +487,7 @@ export const settingsGroups: SettingSection[] = [
                         context: "global"
                       });
                     }
-
-                    endProgress();
                   } catch (e) {
-                    endProgress();
-
                     ToastManager.error(
                       e as Error,
                       strings.failedToDeleteAccount(),
@@ -470,10 +510,12 @@ export const settingsGroups: SettingSection[] = [
         sections: [
           {
             id: "offline-mode",
+            icon: "download-multiple",
             name: strings.fullOfflineMode(),
             description: strings.fullOfflineModeDesc(),
             type: "switch",
             property: "offlineMode",
+            featureId: "fullOfflineMode",
             modifer: () => {
               const current = SettingsService.get().offlineMode;
               if (current) {
@@ -481,11 +523,9 @@ export const settingsGroups: SettingSection[] = [
                 db.fs().cancel("offline-mode");
                 return;
               }
-              PremiumService.verify(() => {
-                SettingsService.setProperty("offlineMode", true);
-                db.attachments.cacheAttachments().catch(() => {
-                  /* empty */
-                });
+              SettingsService.setProperty("offlineMode", true);
+              db.attachments.cacheAttachments().catch(() => {
+                /* empty */
               });
             }
           },
@@ -494,21 +534,26 @@ export const settingsGroups: SettingSection[] = [
             name: strings.disableAutoSync(),
             description: strings.disableAutoSyncDesc(),
             type: "switch",
-            property: "disableAutoSync"
+            property: "disableAutoSync",
+            featureId: "syncControls",
+            icon: "sync-off"
           },
           {
             id: "disable-realtime-sync",
             name: strings.disableRealtimeSync(),
             description: strings.disableRealtimeSyncDesc(),
             type: "switch",
-            property: "disableRealtimeSync"
+            property: "disableRealtimeSync",
+            featureId: "syncControls"
           },
           {
             id: "disable-sync",
             name: strings.disableSync(),
             description: strings.disableSyncDesc(),
             type: "switch",
-            property: "disableSync"
+            property: "disableSync",
+            featureId: "syncControls",
+            icon: "cloud-off-outline"
           },
           {
             id: "background-sync",
@@ -516,6 +561,7 @@ export const settingsGroups: SettingSection[] = [
             description: strings.backgroundSyncDesc(),
             type: "switch",
             property: "backgroundSync",
+            icon: "cloud-upload-outline",
             onChange: (value) => {
               if (value) {
                 BackgroundSync.start();
@@ -528,6 +574,7 @@ export const settingsGroups: SettingSection[] = [
             id: "pull-sync",
             name: strings.forcePullChanges(),
             description: strings.forcePullChangesDesc(),
+            icon: "download",
             modifer: () => {
               presentDialog({
                 title: strings.forcePullChanges(),
@@ -549,6 +596,7 @@ export const settingsGroups: SettingSection[] = [
             id: "push-sync",
             name: strings.forcePushChanges(),
             description: strings.forcePushChangesDesc(),
+            icon: "upload",
             modifer: () => {
               presentDialog({
                 title: strings.forcePushChanges(),
@@ -586,7 +634,8 @@ export const settingsGroups: SettingSection[] = [
             type: "screen",
             name: strings.themes(),
             description: strings.themesDesc(),
-            component: "theme-selector"
+            component: "theme-selector",
+            icon: "shape"
           },
           {
             id: "use-system-theme",
@@ -640,21 +689,24 @@ export const settingsGroups: SettingSection[] = [
             name: strings.dateFormat(),
             description: strings.dateFormatDesc(),
             type: "component",
-            component: "date-format-selector"
+            component: "date-format-selector",
+            icon: "calendar-blank"
           },
           {
             id: "time-format",
             name: strings.timeFormat(),
             description: strings.timeFormatDesc(),
             type: "component",
-            component: "time-format-selector"
+            component: "time-format-selector",
+            icon: "clock-digital"
           },
           {
             id: "clear-trash-interval",
             type: "component",
             name: strings.clearTrashInterval(),
             description: strings.clearTrashIntervalDesc(),
-            component: "trash-interval-selector"
+            component: "trash-interval-selector",
+            icon: "delete"
           },
           {
             id: "default-notebook",
@@ -667,14 +719,16 @@ export const settingsGroups: SettingSection[] = [
                 type: "success"
               });
             },
-            disabled: () => !db.settings.getDefaultNotebook()
+            disabled: () => !db.settings.getDefaultNotebook(),
+            icon: "notebook-minus"
           },
           {
             id: "disable-update-check",
             type: "switch",
             name: strings.autoUpdateCheck(),
             description: strings.autoUpdateCheckDesc(),
-            property: "checkForUpdates"
+            property: "checkForUpdates",
+            icon: "update"
           }
         ]
       },
@@ -749,7 +803,8 @@ export const settingsGroups: SettingSection[] = [
             name: strings.mardownShortcuts(),
             property: "markdownShortcuts",
             description: strings.mardownShortcutsDesc(),
-            type: "switch"
+            type: "switch",
+            featureId: "markdownShortcuts"
           }
         ]
       },
@@ -770,6 +825,7 @@ export const settingsGroups: SettingSection[] = [
       {
         id: "marketing-emails",
         type: "switch",
+        icon: "email-newsletter",
         name: strings.marketingEmails(),
         description: strings.marketingEmailsDesc(),
         modifer: async () => {
@@ -815,12 +871,10 @@ export const settingsGroups: SettingSection[] = [
             useHook: useVaultStatus,
             hidden: (current) => (current as VaultStatusType)?.exists,
             modifer: () => {
-              PremiumService.verify(() => {
-                openVault({
-                  item: {},
-                  novault: false,
-                  title: strings.createVault()
-                });
+              openVault({
+                item: {},
+                novault: false,
+                title: strings.createVault()
               });
             }
           },
@@ -926,6 +980,7 @@ export const settingsGroups: SettingSection[] = [
         type: "screen",
         description: strings.appLockDesc(),
         icon: "lock",
+        featureId: "appLock",
         sections: [
           {
             id: "app-lock-mode",
@@ -934,6 +989,7 @@ export const settingsGroups: SettingSection[] = [
             icon: "lock",
             type: "switch",
             property: "appLockEnabled",
+            featureId: "appLock",
             onChange: () => {
               SettingsService.set({
                 privacyScreen: true
@@ -1244,7 +1300,7 @@ export const settingsGroups: SettingSection[] = [
         description: strings.quickNoteNotificationDesc(),
         property: "notifNotes",
         icon: "form-textbox",
-        modifer: () => {
+        modifer: async () => {
           const settings = SettingsService.get();
           if (settings.notifNotes) {
             Notifications.unpinQuickNote();
@@ -1255,7 +1311,8 @@ export const settingsGroups: SettingSection[] = [
             notifNotes: !settings.notifNotes
           });
         },
-        hidden: () => Platform.OS !== "android"
+        hidden: () => Platform.OS !== "android",
+        featureId: "createNoteFromNotificationDrawer"
       },
       {
         id: "reminders",

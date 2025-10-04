@@ -30,7 +30,7 @@ import { ConfirmDialog } from "./confirm";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 import { getDeviceInfo } from "../utils/platform";
-import { isUserPremium } from "../hooks/use-is-user-premium";
+import { getSubscriptionInfo } from "./settings/components/user-profile";
 
 const PLACEHOLDERS = {
   title: strings.issueTitlePlaceholder(),
@@ -142,7 +142,7 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
           /
         </Text>
         <Text variant="subBody" mt={1}>
-          {getDeviceInfo([`Pro: ${isUserPremium()}`])
+          {getDeviceInfo([`Plan: ${getSubscriptionInfo().title}`])
             .split("\n")
             .map((t) => (
               <>
@@ -169,7 +169,7 @@ function showIssueReportedDialog({ url }: { url: string }) {
 
 const BODY_TEMPLATE = (body: string) => {
   const info = `**Device information:**\n${getDeviceInfo([
-    `Pro: ${isUserPremium()}`
+    `Plan: ${getSubscriptionInfo().title}`
   ])}`;
   if (!body) return info;
   return `${body}\n\n${info}`;

@@ -47,7 +47,6 @@ import { AddTagsDialog } from "../../dialogs/add-tags-dialog";
 import { ConfirmDialog } from "../../dialogs/confirm";
 import { CreateColorDialog } from "../../dialogs/create-color-dialog";
 import { MoveNoteDialog } from "../../dialogs/move-note-dialog";
-import { isUserPremium } from "../../hooks/use-is-user-premium";
 import { navigate } from "../../navigation";
 import { useEditorStore } from "../../stores/editor-store";
 import { useStore as useMonographStore } from "../../stores/monograph-store";
@@ -332,7 +331,6 @@ export const noteMenuItems: (
   ids?: string[],
   context?: { color?: Color; locked?: boolean }
 ) => MenuItem[] = (note, ids = [], context) => {
-  const isPro = isUserPremium();
   // const isSynced = db.notes.note(note.id)?.synced();
 
   return [
@@ -377,7 +375,6 @@ export const noteMenuItems: (
       //isDisabled: !isSynced,
       title: strings.lock(),
       isChecked: context?.locked,
-      isDisabled: !isPro,
       icon: Lock.path,
       onClick: async () => {
         const { unlock, lock } = store.get();
@@ -517,11 +514,7 @@ export const noteMenuItems: (
           title: format.title,
           tooltip: strings.exportAs(format.title),
           icon: format.icon.path,
-          isDisabled:
-            (format.type !== "txt" && !isPro) ||
-            (format.type === "pdf" && ids.length > 1),
-          // ? "Multiple notes cannot be exported as PDF."
-          // : false,
+          isDisabled: format.type === "pdf" && ids.length > 1,
           multiSelect: true,
           onClick: async () => {
             if (ids.length === 1) {

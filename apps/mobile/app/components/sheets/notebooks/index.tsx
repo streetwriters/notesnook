@@ -27,7 +27,8 @@ import NotebookScreen from "../../../screens/notebook";
 import {
   eSendEvent,
   eSubscribeEvent,
-  presentSheet
+  presentSheet,
+  ToastManager
 } from "../../../services/event-manager";
 import {
   createNotebookTreeStores,
@@ -44,6 +45,8 @@ import { NotebookItem } from "../../side-menu/notebook-item";
 import { IconButton } from "../../ui/icon-button";
 import Paragraph from "../../ui/typography/paragraph";
 import { AddNotebookSheet } from "../add-notebook";
+import { isFeatureAvailable } from "@notesnook/common";
+import PaywallSheet from "../paywall";
 
 const {
   useNotebookExpandedStore,
@@ -167,7 +170,21 @@ export const Notebooks = (props: {
             height: 30
           }}
           name="plus"
-          onPress={() => {
+          onPress={async () => {
+            const notebooksFeature = await isFeatureAvailable("notebooks");
+            if (!notebooksFeature.isAllowed) {
+              ToastManager.show({
+                message: notebooksFeature.error,
+                type: "info",
+                context: "local",
+                actionText: strings.upgrade(),
+                func: () => {
+                  ToastManager.hide();
+                  PaywallSheet.present(notebooksFeature);
+                }
+              });
+              return;
+            }
             AddNotebookSheet.present(undefined, props.rootNotebook, "local");
           }}
         />

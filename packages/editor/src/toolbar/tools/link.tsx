@@ -86,7 +86,8 @@ export function AddInternalLink(props: ToolProps) {
 
   return (
     <ToolButton
-      {...props}
+      icon={props.icon}
+      title={props.title}
       disabled={isActive}
       onClick={async () => {
         const link = await editor.storage.createInternalLink?.();
@@ -116,7 +117,8 @@ export function EditLink(props: ToolProps) {
   if (attrs && isInternalLink(attrs.href))
     return (
       <ToolButton
-        {...props}
+        icon={props.icon}
+        title={props.title}
         onClick={async () => {
           hide();
           const link = await editor.storage.createInternalLink?.();
@@ -143,7 +145,9 @@ export function EditLink(props: ToolProps) {
 
   return (
     <LinkTool
-      {...props}
+      editor={props.editor}
+      icon={props.icon}
+      title={props.title}
       isEditing
       onDone={(attributes) => {
         if (selectedNode.current)
@@ -176,7 +180,8 @@ export function RemoveLink(props: ToolProps) {
   if (!editor.isEditable) return null;
   return (
     <ToolButton
-      {...props}
+      icon={props.icon}
+      title={props.title}
       toggled={false}
       onClick={() => {
         if (selectedNode)
@@ -230,7 +235,8 @@ export function OpenLink(props: ToolProps) {
         {href}
       </Link>
       <ToolButton
-        {...props}
+        icon={props.icon}
+        title={props.title}
         toggled={false}
         onClick={() => {
           editor.storage.openLink?.(href);

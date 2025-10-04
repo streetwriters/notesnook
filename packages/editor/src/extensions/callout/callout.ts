@@ -27,6 +27,7 @@ import { Paragraph } from "../paragraph/index.js";
 import { Heading } from "../heading/index.js";
 import { TextSelection } from "@tiptap/pm/state";
 import { Fragment } from "@tiptap/pm/model";
+import { hasPermission } from "../../types.js";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -134,6 +135,8 @@ export const Callout = Node.create({
       setCallout:
         (attributes) =>
         ({ tr, state }) => {
+          if (!hasPermission("setCallout")) return false;
+
           const { selection } = state;
           const start = selection.from;
           const end = selection.to;
@@ -178,6 +181,7 @@ export const Callout = Node.create({
       new InputRule({
         find: CALLOUT_REGEX,
         handler: ({ state, range, match }) => {
+          if (!hasPermission("setCallout", true)) return null;
           if (match.length === 1) return null;
 
           const calloutType = (match[1] || "info") as CalloutType;

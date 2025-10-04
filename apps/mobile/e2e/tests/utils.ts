@@ -72,6 +72,7 @@ class Element {
 
 const Tests = {
   awaitLaunch: async () => {
+    await device.disableSynchronization();
     await waitFor(element(by.id(notesnook.ids.default.root)))
       .toBeVisible()
       //@ts-ignore
@@ -147,4 +148,181 @@ const Tests = {
   }
 };
 
-export { Element, Tests };
+class TestBuilder {
+  private steps: (() => Promise<void> | void)[] = [];
+  private result: any;
+  private savedResult: any;
+  constructor() {}
+
+  saveResult() {
+    return this.addStep(() => {
+      this.savedResult = this.result;
+    });
+  }
+
+  addStep(step: () => Promise<void> | void) {
+    this.steps.push(step);
+    return this;
+  }
+
+  awaitLaunch() {
+    return this.addStep(async () => {
+      await Tests.awaitLaunch();
+    });
+  }
+
+  wait(duration: number) {
+    return this.addStep(async () => {
+      await Tests.sleep(duration);
+    });
+  }
+
+  fromId(id: string) {
+    return this.addStep(() => {
+      this.result = Tests.fromId(id);
+    });
+  }
+
+  fromText(text: string) {
+    return this.addStep(() => {
+      this.result = Tests.fromText(text);
+    });
+  }
+
+  exitEditor() {
+    return this.addStep(async () => {
+      await Tests.exitEditor();
+    });
+  }
+
+  createNote(title?: string, body?: string) {
+    return this.addStep(async () => {
+      this.result = await Tests.createNote(title, body);
+    });
+  }
+
+  navigate(screen: RouteName | ({} & string)) {
+    return this.addStep(async () => {
+      await Tests.navigate(screen);
+    });
+  }
+
+  openSideMenu() {
+    return this.addStep(async () => {
+      await Tests.openSideMenu();
+    });
+  }
+
+  prepare() {
+    return this.addStep(async () => {
+      await Tests.prepare();
+    });
+  }
+
+  createNotebook(title = "Notebook 1", description = true) {
+    return this.addStep(async () => {
+      await Tests.createNotebook(title, description);
+    });
+  }
+
+  matchSnapshot(element: Element, name: string) {
+    return this.addStep(async () => {
+      await Tests.matchSnapshot(element, name);
+    });
+  }
+
+  isVisibleById(id: string, timeout?: number) {
+    return this.addStep(async () => {
+      const element = new Element("id", id);
+      await element.isVisible(timeout);
+    });
+  }
+
+  isVisibleByText(text: string, timeout?: number) {
+    return this.addStep(async () => {
+      const element = new Element("text", text);
+      await element.isVisible(timeout);
+    });
+  }
+
+  isNotVisibleById(id: string, timeout?: number) {
+    return this.addStep(async () => {
+      const element = new Element("id", id);
+      await element.isNotVisible(timeout);
+    });
+  }
+
+  isNotVisibleByText(text: string, timeout?: number) {
+    return this.addStep(async () => {
+      const element = new Element("text", text);
+      await element.isNotVisible(timeout);
+    });
+  }
+
+  waitAndTapById(id: string, timeout?: number) {
+    return this.addStep(async () => {
+      const element = new Element("id", id);
+      await element.waitAndTap(timeout);
+    });
+  }
+
+  waitAndTapByText(text: string, timeout?: number) {
+    return this.addStep(async () => {
+      const element = new Element("text", text);
+      await element.waitAndTap(timeout);
+    });
+  }
+
+  tapById(id: string, point?: Detox.Point2D) {
+    return this.addStep(async () => {
+      const element = new Element("id", id);
+      await element.tap(point);
+    });
+  }
+
+  tapByText(text: string, point?: Detox.Point2D) {
+    return this.addStep(async () => {
+      const element = new Element("text", text);
+      await element.tap(point);
+    });
+  }
+
+  processResult(callback: (result: any) => Promise<void>) {
+    return this.addStep(async () => {
+      if (this.savedResult) {
+        await callback(this.savedResult);
+      } else {
+        throw new Error("No result to process.");
+      }
+    });
+  }
+
+  typeTextById(id: string, text: string) {
+    return this.addStep(async () => {
+      await Element.fromId(id).element.typeText(text);
+    });
+  }
+
+  pressBack(count = 1) {
+    return this.addStep(async () => {
+      for (let i = 0; i < count; i++) {
+        await device.pressBack();
+      }
+    });
+  }
+
+  async run() {
+    for (const step of this.steps) {
+      const result = step.call(this);
+      if (result instanceof Promise) {
+        await result;
+      }
+    }
+    this.steps = []; // Clear steps after execution
+  }
+  static create() {
+    return new TestBuilder();
+  }
+}
+
+export { Element, Tests, TestBuilder };

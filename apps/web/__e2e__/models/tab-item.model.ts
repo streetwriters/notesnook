@@ -69,4 +69,9 @@ class TabContextMenuModel {
   async open() {
     await this.menu.open(this.tabLocator);
   }
+
+  async getRevealInListItem() {
+    await this.open();
+    return this.menu.getItem("reveal-in-list");
+  }
 }

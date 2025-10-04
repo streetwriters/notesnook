@@ -29,3 +29,4 @@ export * from "./export-notes.js";
 export * from "./dataurl.js";
 export * from "./tab-session-history.js";
 export * from "./keybindings.js";
+export * from "./is-feature-available.js";

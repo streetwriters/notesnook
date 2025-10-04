@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex } from "@theme-ui/components";
+import { Box, Flex } from "@theme-ui/components";
 import { ReactNodeView, ReactNodeViewProps } from "../react/index.js";
 import { Node as ProsemirrorNode } from "prosemirror-model";
 import { Editor } from "../../types.js";
@@ -40,6 +40,7 @@ import {
 import { DesktopOnly } from "../../components/responsive/index.js";
 import { TextDirections } from "../text-direction/index.js";
 import { strings } from "@notesnook/intl";
+import SimpleBar from "simplebar-react";
 
 export function TableComponent(props: ReactNodeViewProps) {
   const { editor, node, forwardRef } = props;
@@ -67,17 +68,22 @@ export function TableComponent(props: ReactNodeViewProps) {
           textDirection={textDirection}
         />
       </DesktopOnly>
-      <div className="tableWrapper" dir={textDirection}>
-        <table
-          ref={(ref) => {
-            forwardRef?.(ref);
-            tableRef.current = ref || undefined;
-          }}
+      <SimpleBar autoHide>
+        <Box
+          dir={textDirection}
+          sx={{ "& table": { width: "100% !important" } }}
         >
-          <colgroup ref={colgroupRef} />
-          {/* <tbody /> */}
-        </table>
-      </div>
+          <table
+            ref={(ref) => {
+              forwardRef?.(ref);
+              tableRef.current = ref || undefined;
+            }}
+          >
+            <colgroup ref={colgroupRef} />
+            {/* <tbody /> */}
+          </table>
+        </Box>
+      </SimpleBar>
     </>
   );
 }
@@ -181,7 +187,7 @@ function TableRowToolbar(props: TableToolbarProps) {
         flexWrap: "nowrap",
         borderRadius: "default",
         flexDirection: "column",
-        opacity: 0.3,
+        opacity: 0.4,
         ":hover": {
           opacity: 1
         }
@@ -231,9 +237,10 @@ function TableColumnToolbar(props: TableToolbarProps) {
         yOffset: 2
       });
 
-      columnToolsRef.current.style.left = `${
-        pos.left - (table.current.parentElement?.scrollLeft || 0)
-      }px`;
+      const scrollLeft =
+        table.current?.closest(".simplebar-content-wrapper")?.scrollLeft || 0;
+
+      columnToolsRef.current.style.left = `${pos.left - scrollLeft}px`;
       columnToolsRef.current.style.top = `${pos.top}px`;
     }
 
@@ -255,7 +262,7 @@ function TableColumnToolbar(props: TableToolbarProps) {
         bg: "background",
         flexWrap: "nowrap",
         borderRadius: "default",
-        opacity: 0.3,
+        opacity: 0.4,
         ":hover": {
           opacity: 1
         }

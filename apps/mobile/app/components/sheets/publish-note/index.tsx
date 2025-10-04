@@ -17,48 +17,69 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { hosts, Monograph, Note } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
+import { useThemeColors } from "@notesnook/theme";
 import Clipboard from "@react-native-clipboard/clipboard";
-import React, { useRef, useState } from "react";
-import { ActivityIndicator, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  ActivityIndicator,
+  TextInput,
+  TouchableOpacity,
+  View
+} from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import ToggleSwitch from "toggle-switch-react-native";
 import { db } from "../../../common/database";
+import { requestInAppReview } from "../../../services/app-review";
 import { presentSheet, ToastManager } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { useAttachmentStore } from "../../../stores/use-attachment-store";
-import { useThemeColors } from "@notesnook/theme";
 import { openLinkInBrowser } from "../../../utils/functions";
-import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
+import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
+import { DefaultAppStyles } from "../../../utils/styles";
 import DialogHeader from "../../dialog/dialog-header";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
 import Input from "../../ui/input";
-import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import { requestInAppReview } from "../../../services/app-review";
-import { hosts, Note } from "@notesnook/core";
-import { strings } from "@notesnook/intl";
-import { DefaultAppStyles } from "../../../utils/styles";
 
 const PublishNoteSheet = ({
-  note: item
+  note
 }: {
   note: Note;
   close?: (ctx?: string) => void;
 }) => {
   const { colors } = useThemeColors();
-
   const attachmentDownloads = useAttachmentStore((state) => state.downloading);
-  const downloading = attachmentDownloads?.[`monograph-${item.id}`];
+  const downloading = attachmentDownloads?.[`monograph-${note.id}`];
   const [selfDestruct, setSelfDestruct] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
-  const [note, setNote] = useState<Note | undefined>(item);
+  const [monograph, setMonograph] = useState<Monograph>();
   const [publishing, setPublishing] = useState(false);
-  const publishUrl =
-    note && `${hosts.MONOGRAPH_HOST}/${db.monographs.monograph(note?.id)}`;
-  const isPublished = note && db.monographs.isPublished(note?.id);
-  const pwdInput = useRef(null);
+  const publishUrl = monograph && `${hosts.MONOGRAPH_HOST}/${monograph?.id}`;
+  const isPublished = !!monograph;
+  const pwdInput = useRef<TextInput>(null);
   const passwordValue = useRef<string>();
+
+  useEffect(() => {
+    (async () => {
+      const monograph = await db.monographs.get(
+        db.monographs.monograph(note.id)
+      );
+      setMonograph(monograph);
+      if (monograph) {
+        setSelfDestruct(!!monograph?.selfDestruct);
+        if (monograph.password) {
+          passwordValue.current = await db.monographs.decryptPassword(
+            monograph?.password
+          );
+          setIsLocked(!!monograph?.password);
+        }
+      }
+    })();
+  }, []);
 
   const publishNote = async () => {
     if (publishing) return;
@@ -71,7 +92,8 @@ const PublishNoteSheet = ({
           selfDestruct: selfDestruct,
           password: isLocked ? passwordValue.current : undefined
         });
-        setNote(await db.notes.note(note.id));
+
+        setMonograph(await db.monographs.get(db.monographs.monograph(note.id)));
         Navigation.queueRoutesForUpdate();
         setPublishLoading(false);
       }
@@ -98,7 +120,7 @@ const PublishNoteSheet = ({
     try {
       if (note?.id) {
         await db.monographs.unpublish(note.id);
-        setNote(await db.notes.note(note.id));
+        setMonograph(undefined);
         Navigation.queueRoutesForUpdate();
         setPublishLoading(false);
       }
@@ -118,7 +140,8 @@ const PublishNoteSheet = ({
       style={{
         width: "100%",
         alignSelf: "center",
-        paddingHorizontal: DefaultAppStyles.GAP
+        paddingHorizontal: DefaultAppStyles.GAP,
+        gap: DefaultAppStyles.GAP_VERTICAL
       }}
     >
       <DialogHeader
@@ -218,37 +241,54 @@ const PublishNoteSheet = ({
             style={{
               flexDirection: "row",
               alignItems: "center",
-              marginBottom: DefaultAppStyles.GAP_VERTICAL,
               backgroundColor: colors.secondary.background,
-              paddingVertical: DefaultAppStyles.GAP_VERTICAL,
               borderRadius: defaultBorderRadius,
-              marginTop: DefaultAppStyles.GAP_VERTICAL
+              paddingHorizontal: DefaultAppStyles.GAP,
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL
             }}
           >
-            <IconButton
-              onPress={() => {
-                if (publishing) return;
-                setIsLocked(!isLocked);
-              }}
-              color={isLocked ? colors.selected.icon : colors.primary.icon}
-              size={AppFontSize.xl}
-              name={
-                isLocked
-                  ? "check-circle-outline"
-                  : "checkbox-blank-circle-outline"
-              }
-            />
-
             <View
               style={{
                 width: "100%",
                 flexShrink: 1
               }}
             >
-              <Heading size={AppFontSize.md}>
-                {strings.monographPassHeading()}
-              </Heading>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between"
+                }}
+              >
+                <Heading size={AppFontSize.md}>
+                  {strings.monographPassHeading()}
+                </Heading>
+                <ToggleSwitch
+                  isOn={isLocked}
+                  onColor={colors.primary.accent}
+                  offColor={colors.primary.icon}
+                  size="small"
+                  animationSpeed={150}
+                  onToggle={() => setIsLocked(!isLocked)}
+                />
+              </View>
+
               <Paragraph>{strings.monographPassDesc()}</Paragraph>
+
+              {isLocked ? (
+                <>
+                  <Input
+                    fwdRef={pwdInput}
+                    onChangeText={(value) => (passwordValue.current = value)}
+                    blurOnSubmit
+                    secureTextEntry
+                    defaultValue={passwordValue.current}
+                    placeholder={strings.enterPassword()}
+                    containerStyle={{
+                      marginTop: DefaultAppStyles.GAP_VERTICAL
+                    }}
+                  />
+                </>
+              ) : null}
             </View>
           </TouchableOpacity>
 
@@ -262,31 +302,35 @@ const PublishNoteSheet = ({
               alignItems: "center",
               backgroundColor: colors.secondary.background,
               paddingVertical: DefaultAppStyles.GAP_VERTICAL,
-              borderRadius: defaultBorderRadius
+              borderRadius: defaultBorderRadius,
+              paddingHorizontal: DefaultAppStyles.GAP
             }}
           >
-            <IconButton
-              onPress={() => {
-                setSelfDestruct(!selfDestruct);
-              }}
-              color={selfDestruct ? colors.selected.icon : colors.primary.icon}
-              size={AppFontSize.xl}
-              name={
-                selfDestruct
-                  ? "check-circle-outline"
-                  : "checkbox-blank-circle-outline"
-              }
-            />
-
             <View
               style={{
                 width: "100%",
                 flexShrink: 1
               }}
             >
-              <Heading size={AppFontSize.md}>
-                {strings.monographSelfDestructHeading()}
-              </Heading>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between"
+                }}
+              >
+                <Heading size={AppFontSize.md}>
+                  {strings.monographSelfDestructHeading()}
+                </Heading>
+                <ToggleSwitch
+                  isOn={selfDestruct}
+                  onColor={colors.primary.accent}
+                  offColor={colors.primary.icon}
+                  size="small"
+                  animationSpeed={150}
+                  onToggle={() => setSelfDestruct(!selfDestruct)}
+                />
+              </View>
+
               <Paragraph>{strings.monographSelfDestructDesc()}</Paragraph>
             </View>
           </TouchableOpacity>
@@ -294,56 +338,33 @@ const PublishNoteSheet = ({
           <View
             style={{
               width: "100%",
-              alignSelf: "center",
-              marginTop: DefaultAppStyles.GAP_VERTICAL
+              justifyContent: "center",
+              gap: DefaultAppStyles.GAP_VERTICAL
             }}
           >
-            {isLocked ? (
-              <>
-                <Input
-                  fwdRef={pwdInput}
-                  onChangeText={(value) => (passwordValue.current = value)}
-                  blurOnSubmit
-                  secureTextEntry
-                  defaultValue={passwordValue.current}
-                  placeholder={strings.enterPassword()}
-                />
-                <Seperator half />
-              </>
-            ) : null}
-
-            <View
+            <Button
+              onPress={publishNote}
               style={{
-                flexDirection: "row",
                 width: "100%",
-                justifyContent: "center"
+                borderRadius: defaultBorderRadius
               }}
-            >
-              {isPublished && (
-                <>
-                  <Button
-                    onPress={deletePublishedNote}
-                    fontSize={AppFontSize.md}
-                    type="error"
-                    title={strings.unpublish()}
-                    style={{
-                      width: "49%"
-                    }}
-                  />
-                </>
-              )}
-              <Seperator half />
-              <Button
-                onPress={publishNote}
-                fontSize={AppFontSize.md}
-                style={{
-                  width: isPublished ? "49%" : 250,
-                  borderRadius: isPublished ? 5 : 100
-                }}
-                type="accent"
-                title={isPublished ? strings.update() : strings.publish()}
-              />
-            </View>
+              type="accent"
+              title={isPublished ? strings.update() : strings.publish()}
+            />
+
+            {isPublished && (
+              <>
+                <Button
+                  onPress={deletePublishedNote}
+                  type="error"
+                  title={strings.unpublish()}
+                  style={{
+                    width: "100%",
+                    borderRadius: defaultBorderRadius
+                  }}
+                />
+              </>
+            )}
           </View>
         </>
       )}

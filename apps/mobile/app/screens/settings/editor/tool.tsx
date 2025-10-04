@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import * as React from "react";
 import { View } from "react-native";
 import { DraxDragWithReceiverEventData, DraxView } from "react-native-drax";
@@ -25,18 +26,18 @@ import { presentDialog } from "../../../components/dialog/functions";
 import { IconButton } from "../../../components/ui/icon-button";
 import { SvgView } from "../../../components/ui/svg";
 import Paragraph from "../../../components/ui/typography/paragraph";
-import { useThemeColors } from "@notesnook/theme";
 import { getElevationStyle } from "../../../utils/elevation";
-import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
+import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
 import { renderGroup } from "./common";
 import { DraggableItem, useDragState } from "./state";
-import { findToolById, getToolIcon } from "./toolbar-definition";
 import ToolSheet from "./tool-sheet";
+import { findToolById, getToolIcon } from "./toolbar-definition";
 
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { useIsFeatureAvailable } from "@notesnook/common";
 import type { ToolId } from "@notesnook/editor";
-import PremiumService from "../../../services/premium";
 import { strings } from "@notesnook/intl";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { ToastManager } from "../../../services/event-manager";
 import { DefaultAppStyles } from "../../../utils/styles";
 
 export const Tool = ({
@@ -70,6 +71,7 @@ export const Tool = ({
     isSubgroup || !tool
       ? null
       : getToolIcon(tool.icon as ToolId, colors.secondary.icon);
+  const featureAvailable = useIsFeatureAvailable("customToolbarPreset");
 
   const buttons = React.useCallback(() => {
     const btns = isSubgroup
@@ -77,8 +79,11 @@ export const Tool = ({
           {
             name: "minus",
             onPress: () => {
-              if (!PremiumService.get()) {
-                PremiumService.sheet("global");
+              if (!featureAvailable?.isAllowed) {
+                ToastManager.show({
+                  type: "info",
+                  message: featureAvailable?.error
+                });
                 return;
               }
               presentDialog({
@@ -86,7 +91,7 @@ export const Tool = ({
                 title: strings.deleteCollapsed(),
                 positiveText: strings.delete(),
                 paragraph: strings.deleteCollapsedDesc(),
-                positivePress: () => {
+                positivePress: async () => {
                   if (typeof groupIndex !== "number") return;
                   const _data = useDragState.getState().data.slice();
                   _data[groupIndex].splice(index, 1);
@@ -98,8 +103,11 @@ export const Tool = ({
           {
             name: "plus",
             onPress: () => {
-              if (!PremiumService.get()) {
-                PremiumService.sheet("global");
+              if (!featureAvailable?.isAllowed) {
+                ToastManager.show({
+                  type: "info",
+                  message: featureAvailable?.error
+                });
                 return;
               }
               ToolSheet.present({
@@ -115,8 +123,11 @@ export const Tool = ({
           {
             name: "minus",
             onPress: () => {
-              if (!PremiumService.get()) {
-                PremiumService.sheet("global");
+              if (!featureAvailable?.isAllowed) {
+                ToastManager.show({
+                  type: "info",
+                  message: featureAvailable?.error
+                });
                 return;
               }
               if (typeof groupIndex !== "number") return;
@@ -280,8 +291,11 @@ export const Tool = ({
   );
 
   const onDrop = (data: DraxDragWithReceiverEventData) => {
-    if (!PremiumService.get()) {
-      PremiumService.sheet("global");
+    if (!featureAvailable?.isAllowed) {
+      ToastManager.show({
+        type: "info",
+        message: featureAvailable?.error
+      });
       return;
     }
     const isDroppedAbove = data.receiver.receiveOffsetRatio.y < 0.5;

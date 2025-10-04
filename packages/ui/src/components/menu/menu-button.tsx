@@ -21,7 +21,7 @@ import { useRef } from "react";
 import { Flex, Text, Button } from "@theme-ui/components";
 import { Icon } from "../icon/index.js";
 import { MenuButtonItem, MenuItemComponentProps } from "./types.js";
-import { mdiCheck, mdiChevronRight } from "@mdi/js";
+import { mdiCheck, mdiChevronRight, mdiCrown, mdiLock } from "@mdi/js";
 
 type MenuButtonProps = {
   item: MenuButtonItem;
@@ -42,6 +42,7 @@ export function MenuButton(props: MenuButtonProps) {
     menu,
     modifier,
     styles,
+    premium,
     variant = "normal"
   } = item;
   const itemRef = useRef<HTMLButtonElement>(null);
@@ -97,11 +98,14 @@ export function MenuButton(props: MenuButtonProps) {
             {title}
           </Text>
         </Flex>
-        {isChecked || menu || modifier ? (
+        {isChecked || menu || modifier || premium ? (
           <Flex
-            sx={{ ml: 4, flexShrink: 0 }}
+            sx={{ ml: 4, flexShrink: 0, gap: 1 }}
             data-test-id={`toggle-state-${isChecked ? "on" : "off"}`}
           >
+            {premium && (
+              <Icon path={mdiCrown} size={"small"} color={"#e8b923"} />
+            )}
             {modifier && (
               <Text
                 as="span"

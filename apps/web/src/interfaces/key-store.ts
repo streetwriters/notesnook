@@ -270,12 +270,17 @@ class KeyStore extends BaseStore<KeyStore> {
       throw e;
     });
     if (options?.permanent) {
-      await this.resetCredentials();
-      await this.storeKey(key);
-      this.#key = undefined;
+      await this.disable();
     } else this.#key = key;
 
     this.set({ isLocked: false });
+  };
+
+  disable = async () => {
+    if (!this.#key) return;
+    await this.resetCredentials();
+    await this.storeKey(this.#key);
+    this.#key = undefined;
   };
 
   relock = () => {

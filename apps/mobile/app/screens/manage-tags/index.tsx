@@ -53,6 +53,7 @@ import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../utils/styles";
 import { Header } from "../../components/header";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
+import { isFeatureAvailable } from "@notesnook/common";
 
 async function updateInitialSelectionState(items: string[]) {
   const relations = await db.relations
@@ -152,11 +153,22 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
         v.and([v(`title`, "==", tag)])
       );
 
-      const id = exists
-        ? exists?.id
-        : await db.tags.add({
-            title: tag
+      let id = exists?.id;
+
+      if (!id) {
+        const tagsFeature = await isFeatureAvailable("tags");
+        if (!tagsFeature.isAllowed) {
+          ToastManager.show({
+            message: tagsFeature.error,
+            type: "info",
+            context: "local"
           });
+          return;
+        }
+        id = await db.tags.add({
+          title: tag
+        });
+      }
 
       if (id) {
         for (const noteId of ids) {

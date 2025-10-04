@@ -22,6 +22,7 @@ import { Tests } from "./utils";
 
 async function sortBy(sorting: string) {
   await Tests.fromId("icon-sort").waitAndTap();
+  await Tests.sleep(500);
   await Tests.fromText(sorting).waitAndTap();
   await device.pressBack();
 }
@@ -38,12 +39,12 @@ describe("Sort & filter", () => {
       .element(by.web.className("ProseMirror"))
       .typeText("Edited ", true);
     await device.pressBack();
-    await device.pressBack();
     await sortBy("Date created");
     await Tests.fromId(notesnook.listitem.menu).waitAndTap();
     await device.pressBack();
     await sortBy("Date edited");
     await Tests.fromId(notesnook.listitem.menu).waitAndTap();
+    await Tests.sleep(500);
     await device.pressBack();
   });
 

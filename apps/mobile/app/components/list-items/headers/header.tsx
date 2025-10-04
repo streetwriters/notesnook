@@ -44,9 +44,8 @@ export const Header = React.memo(
   }: ListHeaderProps) => {
     const { colors } = useThemeColors();
     const announcements = useMessageStore((state) => state.announcements);
-    const selectionMode = useSelectionStore((state) => state.selectionMode);
 
-    return selectionMode ? null : (
+    return (
       <>
         {announcements.length !== 0 && !noAnnouncement ? (
           <Announcement color={color || colors.primary.accent} />

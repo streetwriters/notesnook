@@ -20,40 +20,40 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useEffect, useState, useRef, useCallback } from "react";
 import { Flex } from "@theme-ui/components";
 import { Loader } from "../../components/loader";
-import {
-  CheckoutData,
-  CheckoutDataResponse,
-  CheckoutPrices,
-  PaddleEvent,
-  PaddleEvents,
-  Plan,
-  Price,
-  PricingInfo
-} from "./types";
+import { PaddleEvent, Plan, PricingInfo } from "./types";
 import { ScrollContainer } from "@notesnook/ui";
 import useMobile from "../../hooks/use-mobile";
-import { logger } from "../../utils/logger";
+import {
+  AvailablePaymentMethod,
+  CheckoutEventNames,
+  CheckoutOpenLineItem,
+  CheckoutEventsCustomerAddress,
+  CheckoutEventsData
+} from "@paddle/paddle-js";
 import { isFeatureSupported } from "../../utils/feature-check";
-import { isDev } from "./plans";
+import { formatPrice, IS_DEV } from "./helpers";
+import { CheckoutCustomerUserInfo } from "@paddle/paddle-js/types/checkout/customer";
+import { logger } from "../../utils/logger";
+import { Period } from "@notesnook/core";
 
-const VENDOR_ID = isDev ? 1506 : 128190;
-const PADDLE_ORIGIN = isDev
+export const SELLER_ID = IS_DEV ? 1506 : 128190;
+export const CLIENT_PADDLE_TOKEN = IS_DEV
+  ? "test_e29ab18724934c1d35a05a7d2cb"
+  : "live_251f65dc0ac5ac364e44817fe92";
+const PADDLE_ORIGIN = IS_DEV
   ? "https://sandbox-buy.paddle.com"
   : "https://buy.paddle.com";
-const SUBSCRIPTION_MANAGEMENT_URL = isDev
-  ? "https://sandbox-subscription-management.paddle.com"
-  : "https://subscription-management.paddle.com";
-const CHECKOUT_SERVICE_ORIGIN = isDev
+const CHECKOUT_SERVICE = IS_DEV
   ? "https://sandbox-checkout-service.paddle.com"
   : "https://checkout-service.paddle.com";
+const PADDLE_API = IS_DEV
+  ? "https://sandbox-api.paddle.com"
+  : "https://api.paddle.com";
 
-const SUBSCRIBED_EVENTS: PaddleEvents[] = [
-  PaddleEvents["Checkout.Loaded"],
-  PaddleEvents["Checkout.Coupon.Applied"],
-  PaddleEvents["Checkout.Coupon.Remove"],
-  PaddleEvents["Checkout.Location.Submit"],
-  PaddleEvents["Checkout.Complete"],
-  PaddleEvents["Checkout.Customer.Details"]
+const SUBSCRIBED_EVENTS: CheckoutEventNames[] = [
+  CheckoutEventNames.CHECKOUT_LOADED,
+  CheckoutEventNames.CHECKOUT_COMPLETED,
+  CheckoutEventNames.CHECKOUT_CUSTOMER_UPDATED
 ];
 
 type PaddleCheckoutProps = {
@@ -61,146 +61,103 @@ type PaddleCheckoutProps = {
   theme: "dark" | "light";
   plan: Plan;
   onPriceUpdated?: (pricingInfo: PricingInfo) => void;
-  onCouponApplied?: () => void;
   onCompleted?: () => void;
   coupon?: string;
 };
 export function PaddleCheckout(props: PaddleCheckoutProps) {
-  const {
-    plan,
-    onPriceUpdated,
-    coupon,
-    theme,
-    onCouponApplied,
-    onCompleted,
-    user
-  } = props;
+  const { plan, onPriceUpdated, coupon, onCompleted, user, theme } = props;
   const [isLoading, setIsLoading] = useState(true);
   const appliedCouponCode = useRef<string>();
-  const checkoutId = useRef<string>();
+  const checkoutDataRef = useRef<CheckoutEventsData>();
   const checkoutRef = useRef<HTMLIFrameElement>(null);
+  const addressRef = useRef<CheckoutEventsCustomerAddress | undefined>();
   const isMobile = useMobile();
 
   const reloadCheckout = useCallback(() => {
-    if (!checkoutRef.current) return;
+    if (!checkoutRef.current || !checkoutDataRef.current) return;
     setIsLoading(true);
-    checkoutRef.current.src = `${PADDLE_ORIGIN}/checkout/?checkout_id=${
-      checkoutId.current
-    }&display_mode=inline&apple_pay_enabled=${isFeatureSupported(
-      "applePaySupported"
-    )}`;
-  }, []);
-
-  const updatePrice = useCallback(
-    async (checkoutId: string, isInvalidCoupon?: boolean) => {
-      const checkoutData = await getCheckoutData(checkoutId);
-      if (!checkoutData) return;
-      const pricingInfo = getPricingInfo(plan, checkoutData);
-      pricingInfo.invalidCoupon = isInvalidCoupon;
-      if (onPriceUpdated) onPriceUpdated(pricingInfo);
-      return pricingInfo;
-    },
-    [onPriceUpdated, plan]
-  );
-
-  const updateCoupon = useCallback(
-    async (checkoutId: string) => {
-      if (
-        appliedCouponCode.current === coupon ||
-        !appliedCouponCode.current === !coupon
-      )
-        return false;
-      if (onCouponApplied) onCouponApplied();
-      const checkoutData = coupon
-        ? await applyCoupon(checkoutId, coupon).catch(() => false)
-        : await removeCoupon(checkoutId).catch(() => false);
-      if (!checkoutData) {
-        await updatePrice(checkoutId, true).catch(() => false);
-        return false;
-      }
-      appliedCouponCode.current = coupon;
-      return true;
-    },
-    [coupon, updatePrice, onCouponApplied]
-  );
+    checkoutRef.current.src = "about:blank";
+    checkoutRef.current.src = getCheckoutURL(checkoutDataRef.current.id, theme);
+  }, [theme]);
 
   useEffect(() => {
-    createCheckout({ plan, theme, user, coupon }).then((checkoutData) => {
-      if (!checkoutData) return;
-      const pricingInfo = getPricingInfo(plan, checkoutData);
-      if (onPriceUpdated) onPriceUpdated(pricingInfo);
-      appliedCouponCode.current = pricingInfo.coupon;
-      checkoutId.current = checkoutData.public_checkout_id;
-      reloadCheckout();
-    });
-  }, [plan, theme, user]);
+    if (checkoutDataRef.current) {
+      if (
+        coupon &&
+        (!checkoutDataRef.current.discount ||
+          checkoutDataRef.current.discount.code !== coupon)
+      ) {
+        applyCoupon(checkoutDataRef.current.id, coupon).then(() =>
+          reloadCheckout()
+        );
+      } else if (!coupon && checkoutDataRef.current.discount)
+        removeDiscount(
+          checkoutDataRef.current.id,
+          checkoutDataRef.current.discount.id
+        ).then(() => reloadCheckout());
+    } else {
+      createCheckout({ theme, user, coupon, plan }).then(
+        async (checkoutData) => {
+          if (!checkoutData) return;
+          const pricingInfo = getPricingInfo(checkoutData, {
+            currencyCode: checkoutData.currency_code,
+            period: plan.period,
+            discountCode: coupon,
+            countryCode: checkoutData.customer?.address?.country_code
+          });
+          if (!pricingInfo) return;
+
+          addressRef.current = checkoutData.customer?.address || undefined;
+          onPriceUpdated?.(pricingInfo);
+          appliedCouponCode.current = pricingInfo.coupon;
+          checkoutDataRef.current = checkoutData;
+          reloadCheckout();
+        }
+      );
+    }
+  }, [coupon, onPriceUpdated, plan, reloadCheckout, theme, user]);
 
   useEffect(() => {
     async function onMessage(ev: MessageEvent<PaddleEvent>) {
-      if (ev.origin !== PADDLE_ORIGIN) return;
+      if (ev.origin !== PADDLE_ORIGIN || !ev.data) return;
       logger.debug("Paddle event received", { data: ev.data });
-      const { event, event_name, callback_data } = ev.data;
-      const { checkout } = callback_data || {};
+      const { event_name, callback_data } = ev.data;
 
-      if (event === PaddleEvents["Checkout.RemoveSpinner"]) setIsLoading(false);
-
-      if (
-        !checkout ||
-        !checkout.id ||
-        (SUBSCRIBED_EVENTS.indexOf(event_name) === -1 &&
-          SUBSCRIBED_EVENTS.indexOf(event) === -1)
-      ) {
-        logger.debug("Ignoring paddle event", { event_name, event });
+      if (event_name === CheckoutEventNames.CHECKOUT_FAILED) {
+        setIsLoading(false);
         return;
       }
 
-      if (event_name === PaddleEvents["Checkout.Complete"]) {
+      if (!callback_data.data || SUBSCRIBED_EVENTS.indexOf(event_name) === -1) {
+        return;
+      }
+
+      if (event_name === CheckoutEventNames.CHECKOUT_COMPLETED) {
         onCompleted && onCompleted();
         return;
       }
 
-      if (event_name === PaddleEvents["Checkout.Loaded"]) {
+      if (event_name === CheckoutEventNames.CHECKOUT_LOADED) {
         setIsLoading(false);
       }
+      console.log(callback_data.data);
 
-      const pricingInfo = getPricingInfo(plan, {
-        public_checkout_id: checkout.id,
-        ip_geo_country_code: callback_data?.user?.country || "US",
-        items: [
-          {
-            prices: checkout.prices.customer.items,
-            recurring: {
-              prices: [checkout.recurring_prices.customer.items[0].recurring]
-            }
-          }
-        ]
+      addressRef.current = callback_data.data.customer?.address || undefined;
+      const pricingInfo = getPricingInfo(callback_data.data, {
+        period: plan.period,
+        currencyCode: callback_data.data.currency_code,
+        discountCode: coupon,
+        countryCode: callback_data.data.customer?.address?.country_code
       });
       if (onPriceUpdated) onPriceUpdated(pricingInfo);
       appliedCouponCode.current = pricingInfo.coupon;
-      checkoutId.current = checkout.id;
-
-      await updateCoupon(checkout.id);
+      checkoutDataRef.current = callback_data.data || checkoutDataRef.current;
     }
     window.addEventListener("message", onMessage, false);
     return () => {
       window.removeEventListener("message", onMessage, false);
     };
-  }, [
-    onPriceUpdated,
-    updatePrice,
-    plan,
-    onCompleted,
-    user.email,
-    reloadCheckout,
-    updateCoupon
-  ]);
-
-  useEffect(() => {
-    if (!checkoutId.current) return;
-    updateCoupon(checkoutId.current).then((result) => {
-      if (result) reloadCheckout();
-    });
-  }, [coupon]);
+  }, [onPriceUpdated, plan, coupon, onCompleted]);
 
   return (
     <ScrollContainer
@@ -223,13 +180,13 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
       ) : null}
       <Flex
         className="checkout-container"
-        sx={{ background: "background", overflow: "hidden", px: 30 }}
+        sx={{ background: "background", overflow: "hidden", px: [0, 30] }}
       >
         <iframe
           scrolling="no"
           frameBorder={"0"}
           ref={checkoutRef}
-          allow={`payment ${PADDLE_ORIGIN} ${SUBSCRIPTION_MANAGEMENT_URL};`}
+          allow={`payment`} // ${PADDLE_ORIGIN} ${SUBSCRIPTION_MANAGEMENT_URL};`}
           style={{
             //   padding: "0px 30px",
             height: "1000px",
@@ -246,105 +203,211 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
   );
 }
 
-function getCheckoutURL(params: {
+function getCheckoutURL(id: string, theme: PaddleCheckoutProps["theme"]) {
+  return `${PADDLE_ORIGIN}/checkout/${id}?display_mode=inline&variant=multi-page&display_mode_theme=${theme}&checkout_type=transaction-checkout&apple_pay_enabled=${isFeatureSupported(
+    "applePaySupported"
+  )}`;
+}
+
+type PriceOptions = {
+  period: Period;
+  currencyCode: string;
+  discountCode?: string;
+  countryCode?: string;
+};
+
+function getPricingInfo(
+  data: CheckoutEventsData,
+  options: PriceOptions
+): PricingInfo {
+  const isRecurringDiscount = !!data.recurring_totals?.discount;
+  const price = data.items[0];
+  const totals = price.trial_period
+    ? price.recurring_totals || price.totals
+    : price.totals;
+  return {
+    country: options.countryCode || "US",
+    period: options.period,
+    coupon: data.discount?.code,
+    invalidCoupon: !!options.discountCode && !data.discount,
+    discount:
+      data.totals.discount > 0
+        ? {
+            recurring: isRecurringDiscount,
+            type: "promo",
+            code: data.discount?.code,
+            amount: data.totals.discount
+          }
+        : undefined,
+    recurringPrice: data.recurring_totals
+      ? {
+          currency: data.currency_code,
+          id: price.price_id,
+          period: options.period,
+          subtotal: formatPrice(
+            data.recurring_totals.subtotal,
+            data.currency_code
+          ),
+          total: formatPrice(data.recurring_totals.total, data.currency_code),
+          tax: formatPrice(data.recurring_totals.tax, data.currency_code)
+        }
+      : undefined,
+    price: {
+      currency: data.currency_code,
+      id: price.price_id,
+      period: options.period,
+      subtotal: formatPrice(totals.subtotal, data.currency_code),
+      total: formatPrice(totals.total, data.currency_code),
+      tax: formatPrice(totals.tax, data.currency_code),
+      trial_period: price.trial_period
+        ? {
+            frequency: price.trial_period.frequency
+          }
+        : undefined
+    }
+  };
+}
+
+enum THEME {
+  LIGHT = "light",
+  DARK = "dark",
+  GREEN = "green"
+}
+enum DISPLAY_MODE {
+  OVERLAY = "overlay",
+  INLINE = "inline",
+  WIDE_OVERLAY = "wide-overlay"
+}
+interface CheckoutOutputAttributesProps {
+  customer?: CheckoutCustomerUserInfo & {
+    address?: Partial<CheckoutEventsCustomerAddress>;
+  };
+  custom_data?: string;
+  items?: InternalCheckoutOpenLineItem[];
+  customer_auth_token?: string;
+  discount_code?: string;
+  discount_id?: string;
+  transaction_id?: string;
+  settings?: {
+    locale?: string;
+    theme?: THEME;
+    success_url?: string;
+    allow_logout?: boolean;
+    show_add_discounts?: boolean;
+    allow_discount_removal?: boolean;
+    show_add_tax_id?: boolean;
+    frame_target?: string;
+    frame_initial_height?: number;
+    frame_style?: string;
+    display_mode?: DISPLAY_MODE;
+    source_page?: string;
+    allowed_payment_methods?: AvailablePaymentMethod[];
+  };
+  seller_id?: number | null;
+  client_token?: string;
+  apple_pay_enabled?: boolean;
+  checkout_initiated?: number;
+  "paddlejs-version"?: string | null;
+}
+
+type InternalCheckoutOpenLineItem = Omit<CheckoutOpenLineItem, "priceId"> & {
+  price_id?: string;
+};
+
+function getCheckoutSettings(
+  theme: PaddleCheckoutProps["theme"]
+): CheckoutOutputAttributesProps["settings"] {
+  return {
+    allow_discount_removal: true,
+    allowed_payment_methods: [
+      "apple_pay",
+      "card",
+      "google_pay",
+      "paypal",
+      "alipay",
+      "bancontact",
+      "ideal"
+    ],
+    display_mode: DISPLAY_MODE.INLINE,
+    allow_logout: false,
+    show_add_discounts: true,
+    theme: theme === "dark" ? THEME.DARK : THEME.LIGHT,
+    source_page: window.location.href
+  };
+}
+
+interface CheckoutDataResponse {
+  data: CheckoutEventsData & { ip_geo_country_code: string };
+}
+
+async function createCheckout(props: {
   plan: PaddleCheckoutProps["plan"];
-  theme: PaddleCheckoutProps["theme"];
   user: PaddleCheckoutProps["user"];
+  theme: PaddleCheckoutProps["theme"];
+  coupon?: PaddleCheckoutProps["coupon"];
 }) {
-  const { plan, theme, user } = params;
-  const BASE_URL = `${CHECKOUT_SERVICE_ORIGIN}/create/v2/checkout/product/${plan.id}`;
-  const queryParams = new URLSearchParams();
-  queryParams.set("product", plan.id);
-  queryParams.set("vendor", VENDOR_ID.toString());
-  queryParams.set("passthrough", JSON.stringify({ userId: user.id }));
-  queryParams.set("guest_email", user.email);
-  queryParams.set("quantity_variable", "0");
-  queryParams.set("disable_logout", "true");
-  queryParams.set("display_mode_theme", theme);
-  queryParams.set("display_mode", "inline");
-  queryParams.set(
-    "apple_pay_enabled",
-    JSON.stringify(isFeatureSupported("applePaySupported"))
-  );
-  queryParams.set("paddlejs-version", "2.0.81");
-  queryParams.set("checkout_initiated", new Date().getTime().toString());
-  queryParams.set("popup", "true");
-  queryParams.set("paddle_js", "true");
-  queryParams.set("is_popup", "true");
-  queryParams.set("parent_url", window.location.origin);
-  queryParams.set("parentURL", window.location.origin);
-  queryParams.set("referring_domain", window.location.hostname);
-  queryParams.set("locale", "en");
-  const fullURL = `${BASE_URL}?${queryParams.toString()}`;
-  return fullURL;
-}
-
-function getPricingInfo(plan: Plan, checkoutData: CheckoutData): PricingInfo {
-  const { prices, recurring } = checkoutData.items[0];
-  const price = prices[0];
-  const recurringPrice = recurring.prices[0];
-  const discount = price.discounts.length > 0 ? price.discounts[0] : undefined;
-  const isRecurringDiscount = recurringPrice.discounts.length > 0;
-
-  return {
-    country: checkoutData.ip_geo_country_code,
-    currency: price.currency,
-    discount: {
-      amount: discount?.gross_discount || 0,
-      recurring: isRecurringDiscount,
-      code: discount?.code,
-      type: "promo"
-    },
-    period: plan.period,
-    price: normalizeCheckoutPrice(price),
-    recurringPrice: normalizeCheckoutPrice(recurringPrice),
-    coupon: discount?.code
-  };
-}
-
-function normalizeCheckoutPrice(prices: CheckoutPrices): Price {
-  const price = prices.unit_price;
-  return {
-    gross: price.gross,
-    net: price.net,
-    tax: price.tax,
-    currency: prices.currency
-  };
-}
-
-async function applyCoupon(
-  checkoutId: string,
-  couponCode: string
-): Promise<CheckoutData | false> {
-  const url = ` ${CHECKOUT_SERVICE_ORIGIN}/checkout/${checkoutId}/coupon`;
-  const body = { data: { coupon_code: couponCode } };
-  const headers = new Headers();
-  headers.set("content-type", "application/json");
-  const response = await fetch(url, {
-    body: JSON.stringify(body),
-    headers,
-    method: "POST"
+  const { user, theme, coupon, plan } = props;
+  const response = await fetch(`${CHECKOUT_SERVICE}/transaction-checkout`, {
+    method: "POST",
+    body: JSON.stringify({
+      data: plan.transactionId
+        ? {
+            custom_data: JSON.stringify({ userId: user.id }),
+            transaction_id: plan.transactionId,
+            settings: getCheckoutSettings(theme)
+          }
+        : {
+            custom_data: JSON.stringify({ userId: user.id }),
+            customer: { email: user.email },
+            items: [{ price_id: plan.id, quantity: 1 }],
+            settings: getCheckoutSettings(theme)
+          }
+    }),
+    headers: {
+      "Content-Type": "application/json",
+      "paddle-clienttoken": CLIENT_PADDLE_TOKEN
+    }
   });
-
   if (!response.ok) return false;
+
   const json = (await response.json()) as CheckoutDataResponse;
-  return json.data;
+
+  let checkoutData = json.data;
+  if (plan.transactionId) return checkoutData;
+
+  const checkoutId = checkoutData.id;
+
+  checkoutData = await submitCustomerInfo(
+    checkoutId,
+    user.email,
+    json.data.ip_geo_country_code
+  )
+    .then((res) => (res ? res : checkoutData))
+    .catch(() => checkoutData);
+
+  if (coupon)
+    checkoutData = await applyCoupon(checkoutId, coupon)
+      .then((res) => (res ? res : checkoutData))
+      .catch(() => checkoutData);
+
+  return checkoutData;
 }
 
 async function submitCustomerInfo(
   checkoutId: string,
   email: string,
   country: string
-): Promise<CheckoutData | false> {
+): Promise<CheckoutDataResponse["data"] | false> {
   if (IS_TESTING) return false;
 
-  const url = ` ${CHECKOUT_SERVICE_ORIGIN}/checkout/${checkoutId}/customer-info`;
+  const url = `${CHECKOUT_SERVICE}/transaction-checkout/${checkoutId}/customer`;
   const body = {
     data: {
-      email,
-      country_code: country,
-      audience_optin: false,
-      postcode: "1123212"
+      customer: {
+        email,
+        marketing_consent: false,
+        address: { country_code: country, postal_code: "1123212" }
+      }
     }
   };
   const headers = new Headers();
@@ -361,55 +424,34 @@ async function submitCustomerInfo(
   return json.data;
 }
 
-async function removeCoupon(checkoutId: string): Promise<CheckoutData | false> {
-  const url = ` ${CHECKOUT_SERVICE_ORIGIN}/checkout/${checkoutId}/coupon`;
+async function applyCoupon(
+  checkoutId: string,
+  couponCode: string
+): Promise<CheckoutDataResponse["data"] | false> {
+  const url = `${CHECKOUT_SERVICE}/transaction-checkout/${checkoutId}/discount`;
+  const body = { data: { discount_code: couponCode } };
+  const headers = new Headers();
+  headers.set("content-type", "application/json");
+  const response = await fetch(url, {
+    body: JSON.stringify(body),
+    headers,
+    method: "PATCH"
+  });
 
+  if (!response.ok) return false;
+  const json = (await response.json()) as CheckoutDataResponse;
+  return json.data;
+}
+
+async function removeDiscount(
+  checkoutId: string,
+  discountId: string
+): Promise<CheckoutDataResponse["data"] | false> {
+  const url = `${CHECKOUT_SERVICE}/transaction-checkout/${checkoutId}/discount/${discountId}`;
   const response = await fetch(url, {
     method: "DELETE"
   });
   if (!response.ok) return false;
   const json = (await response.json()) as CheckoutDataResponse;
   return json.data;
-}
-
-async function getCheckoutData(
-  checkoutId: string
-): Promise<CheckoutData | undefined> {
-  const url = `${CHECKOUT_SERVICE_ORIGIN}/checkout/${checkoutId}`;
-  const response = await fetch(url);
-  if (!response.ok) return undefined;
-  const json = (await response.json()) as CheckoutDataResponse;
-  return json.data;
-}
-
-async function createCheckout(props: {
-  plan: PaddleCheckoutProps["plan"];
-  user: PaddleCheckoutProps["user"];
-  theme: PaddleCheckoutProps["theme"];
-  coupon?: PaddleCheckoutProps["coupon"];
-}) {
-  const { plan, user, theme, coupon } = props;
-  const url = getCheckoutURL({ plan, user, theme });
-  const response = await fetch(url);
-  if (!response.ok) return false;
-
-  const json = (await response.json()) as CheckoutDataResponse;
-
-  let checkoutData = json.data;
-  const checkoutId = checkoutData.public_checkout_id;
-
-  checkoutData = await submitCustomerInfo(
-    checkoutId,
-    user.email,
-    json.data.ip_geo_country_code
-  )
-    .then((res) => (res ? res : checkoutData))
-    .catch(() => checkoutData);
-
-  if (coupon)
-    checkoutData = await applyCoupon(checkoutId, coupon)
-      .then((res) => (res ? res : checkoutData))
-      .catch(() => checkoutData);
-
-  return checkoutData;
 }

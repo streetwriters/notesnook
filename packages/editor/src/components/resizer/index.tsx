@@ -32,7 +32,7 @@ type ResizerProps = {
   height?: number;
   handleColor?: SchemeColors;
   onResize: (width: number, height: number) => void;
-  onResizeStop: (width: number, height: number) => void;
+  onResizeStop?: (width: number, height: number) => void;
   style?: React.CSSProperties;
 };
 export function Resizer(props: PropsWithChildren<ResizerProps>) {
@@ -103,7 +103,7 @@ export function Resizer(props: PropsWithChildren<ResizerProps>) {
       }}
       onResizeStop={(_e, _direction, ref) => {
         try {
-          onResizeStop(ref.clientWidth, ref.clientHeight);
+          onResizeStop?.(ref.clientWidth, ref.clientHeight);
         } catch {
           // ignore
         }

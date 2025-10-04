@@ -28,7 +28,6 @@ import {
   View
 } from "react-native";
 import Editor from ".";
-import { PremiumToast } from "../../components/premium/premium-toast";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import useIsFloatingKeyboard from "../../hooks/use-is-floating-keyboard";
 import useKeyboard from "../../hooks/use-keyboard";
@@ -112,7 +111,6 @@ export const EditorWrapper = ({ widths }: { widths: any }) => {
           enabled={!floating}
           keyboardVerticalOffset={0}
         >
-          <PremiumToast key="toast" context="editor" offset={50 + insets.top} />
           <TextInput
             key="input"
             ref={textInput}

@@ -47,7 +47,12 @@ export const hosts = {
   ISSUES_HOST: isProduction()
     ? "https://issues.streetwriters.co"
     : "http://localhost:2624",
-  MONOGRAPH_HOST: isProduction() ? "https://monogr.ph" : "http://localhost:6264"
+  MONOGRAPH_HOST: isProduction()
+    ? "https://monogr.ph"
+    : "http://localhost:6264",
+  NOTESNOOK_HOST: isProduction()
+    ? "https://notesnook.com"
+    : "http://localhost:8787"
 };
 
 export default hosts;

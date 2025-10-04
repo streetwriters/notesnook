@@ -42,6 +42,7 @@ import {
   isTrashItem,
   Item,
   MaybeDeletedItem,
+  Monograph,
   Note,
   Notebook
 } from "../../types.js";
@@ -53,6 +54,7 @@ import {
 import { DownloadableFile } from "../../database/fs.js";
 import { SyncDevices } from "./devices.js";
 import { DefaultColors } from "../../collections/colors.js";
+import { Monographs } from "../monographs.js";
 
 enum LogLevel {
   /** Log level for very low severity diagnostic messages. */
@@ -231,7 +233,7 @@ class Sync {
   async fetch(deviceId: string, options: SyncOptions) {
     await this.checkConnection();
 
-    await this.connection?.invoke("RequestFetch", deviceId);
+    await this.connection?.invoke("RequestFetchV2", deviceId);
 
     if (this.conflictedNoteIds.length > 0) {
       await this.db
@@ -463,11 +465,24 @@ class Sync {
 
       return true;
     });
+
+    this.connection.on("SendMonographs", async (monographs) => {
+      if (this.connection?.state !== HubConnectionState.Connected) return false;
+
+      this.db.monographsCollection.collection.put(
+        monographs.map((m: Monograph) => ({
+          ...m,
+          type: "monograph"
+        }))
+      );
+
+      return true;
+    });
   }
 
   private async getKey() {
     const key = await this.db.user.getEncryptionKey();
-    if (!key || !key || !key) {
+    if (!key?.key) {
       this.logger.error(
         new Error("User encryption key not generated. Please relogin.")
       );

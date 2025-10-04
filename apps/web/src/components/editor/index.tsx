@@ -237,15 +237,25 @@ export default function TabsView() {
 }
 
 const MemoizedEditorView = React.memo(EditorView, (prev, next) => {
-  return (
+  const baseConditions =
     prev.session.id === next.session.id &&
     prev.session.type === next.session.type &&
     prev.session.needsHydration === next.session.needsHydration &&
     prev.session.activeBlockId === next.session.activeBlockId &&
-    prev.session.activeSearchResultIndex ===
-      next.session.activeSearchResultIndex &&
-    prev.session.nonce === next.session.nonce
-  );
+    prev.session.activeSearchResultId === next.session.activeSearchResultId &&
+    prev.session.nonce === next.session.nonce;
+
+  if (
+    "attachmentsLength" in prev.session &&
+    "attachmentsLength" in next.session
+  ) {
+    return (
+      baseConditions &&
+      prev.session.attachmentsLength === next.session.attachmentsLength
+    );
+  }
+
+  return baseConditions;
 });
 function EditorView({
   session
@@ -856,28 +866,29 @@ function useScrollToBlock(session: EditorSession) {
 }
 
 function useScrollToSearchResult(session: EditorSession) {
-  const index = useEditorStore(
-    (store) => store.getSession(session.id)?.activeSearchResultIndex
+  const id = useEditorStore(
+    (store) => store.getSession(session.id)?.activeSearchResultId
   );
 
   useEffect(() => {
-    if (index === undefined) return;
+    if (id === undefined) return;
     const scrollContainer = document.getElementById(
       `editorScroll_${session.id}`
     );
     scrollContainer?.closest(".active")?.classList.add("searching");
-    const elements = scrollContainer?.getElementsByTagName("nn-search-result");
+    const element = scrollContainer?.querySelector(`nn-search-result#${id}`);
     setTimeout(
       () =>
-        elements
-          ?.item(index)
-          ?.scrollIntoView({ block: "center", behavior: "instant" }),
+        element?.scrollIntoView({
+          block: "center",
+          behavior: "instant"
+        }),
       100
     );
     useEditorStore.getState().updateSession(session.id, [session.type], {
-      activeSearchResultIndex: undefined
+      activeSearchResultId: undefined
     });
-  }, [session.id, session.type, index]);
+  }, [session.id, session.type, id]);
 }
 
 function isFile(e: DragEvent) {

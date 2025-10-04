@@ -28,23 +28,21 @@ import {
   Plus,
   Minus,
   EditorNormalWidth,
-  TableOfContents,
   ExitFullscreen,
   Fullscreen,
   EditorFullWidth,
-  NormalMode
+  NormalMode,
+  Cross
 } from "../icons";
-import {
-  useEditorConfig,
-  useNoteStatistics,
-  useEditorManager
-} from "./manager";
+import { useEditorConfig, useNoteStatistics } from "./manager";
 import { getFormattedDate } from "@notesnook/common";
-import { MAX_AUTO_SAVEABLE_WORDS } from "./types";
+import { MAX_AUTO_SAVEABLE_WORDS, NoteStatistics } from "./types";
 import { strings } from "@notesnook/intl";
 import { EDITOR_ZOOM } from "./common";
 import { useWindowControls } from "../../hooks/use-window-controls";
 import { exitFullscreen } from "../../utils/fullscreen";
+import { useRef, useState } from "react";
+import { PopupPresenter } from "@notesnook/ui";
 
 const SAVE_STATE_ICON_MAP = {
   "-1": NotSaved,
@@ -54,11 +52,13 @@ const SAVE_STATE_ICON_MAP = {
 
 function EditorFooter() {
   const { isFullscreen } = useWindowControls();
-  const { words } = useNoteStatistics();
+  const statistics = useNoteStatistics();
   const session = useEditorStore((store) => store.getActiveSession());
   const { editorConfig, setEditorConfig } = useEditorConfig();
   const editorMargins = useEditorStore((store) => store.editorMargins);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
+  const [isStatisticsPopupOpen, setIsStatisticsPopupOpen] = useState(false);
+  const statisticsRef = useRef<HTMLButtonElement | null>(null);
 
   if (!session) return null;
 
@@ -169,7 +169,7 @@ function EditorFooter() {
           <Plus size={13} />
         </Button>
       </Flex>
-      {words.total > MAX_AUTO_SAVEABLE_WORDS ? (
+      {statistics.words.total > MAX_AUTO_SAVEABLE_WORDS ? (
         <Text
           className="selectable"
           variant="subBody"
@@ -178,15 +178,76 @@ function EditorFooter() {
           {strings.autoSaveOff()}
         </Text>
       ) : null}
-      <Text
+      <Button
         className="selectable"
         data-test-id="editor-word-count"
-        variant="subBody"
-        sx={{ color: "paragraph" }}
+        variant="statusitem"
+        ref={statisticsRef}
+        onClick={() => setIsStatisticsPopupOpen(true)}
       >
-        {strings.totalWords(words.total)}
-        {words.selected ? ` (${strings.selectedWords(words.selected)})` : ""}
-      </Text>
+        <Text variant="subBody" sx={{ color: "paragraph" }}>
+          {strings.totalWords(statistics.words.total)}
+          {statistics.words.selected
+            ? ` (${strings.selectedWords(statistics.words.selected)})`
+            : ""}
+        </Text>
+      </Button>
+      <PopupPresenter
+        isOpen={isStatisticsPopupOpen}
+        onClose={() => setIsStatisticsPopupOpen(false)}
+        position={{
+          isTargetAbsolute: true,
+          target: statisticsRef.current,
+          location: "top",
+          align: "center",
+          yOffset: 5
+        }}
+      >
+        <Flex
+          sx={{
+            width: ["100%", "fit-content"],
+            border: "1px solid",
+            borderColor: "border",
+            borderRadius: "dialog",
+            boxShadow: "0px 0px 15px 0px #00000011",
+            bg: "background-secondary",
+            flexDirection: "column",
+            gap: 2,
+            pt: 2,
+            justifyContent: "center"
+          }}
+        >
+          {Object.entries(statistics).map(([key, value]) => (
+            <Flex key={key} sx={{ justifyContent: "space-between", px: 4 }}>
+              <Text variant="body" sx={{ width: 100 }}>
+                {strings[key as keyof NoteStatistics]()}
+              </Text>
+              <Text
+                variant="body"
+                sx={{ color: "paragraph", fontWeight: "bold" }}
+              >
+                {value.total}
+                {value.selected ? (
+                  <span style={{ fontWeight: "normal" }}>
+                    {" "}
+                    ({value.selected} selected)
+                  </span>
+                ) : (
+                  ""
+                )}
+              </Text>
+            </Flex>
+          ))}
+          <Button
+            data-test-id="dialog-no"
+            onClick={() => setIsStatisticsPopupOpen(false)}
+            color="paragraph"
+            variant="icon"
+          >
+            <Cross size={12} />
+          </Button>
+        </Flex>
+      </PopupPresenter>
       {dateEdited > 0 ? (
         <Text
           className="selectable"

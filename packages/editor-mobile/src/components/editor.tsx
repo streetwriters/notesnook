@@ -111,10 +111,19 @@ const Tiptap = ({
 
   usePermissionHandler({
     claims: {
-      premium: settings.premium
+      callout: !!settings.features?.callout?.isAllowed,
+      outlineList: !!settings.features?.outlineList?.isAllowed,
+      taskList: !!settings.features?.taskList?.isAllowed
     },
-    onPermissionDenied: () => {
-      post(EditorEvents.pro, undefined, tabRef.current.id, tab.session?.noteId);
+    onPermissionDenied: (claim) => {
+      post(
+        EditorEvents.pro,
+        {
+          feature: claim
+        },
+        tabRef.current.id,
+        tab.session?.noteId
+      );
     }
   });
 

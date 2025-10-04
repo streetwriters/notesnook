@@ -47,7 +47,8 @@ import SettingsService from "../../services/settings";
 import { useRelationStore } from "../../stores/use-relation-store";
 import { AppFontSize, defaultBorderRadius } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
-import { getFormattedDate } from "@notesnook/common";
+import { getFormattedDate, useIsFeatureAvailable } from "@notesnook/common";
+import PaywallSheet from "../../components/sheets/paywall";
 
 const ReminderModes =
   Platform.OS === "ios"
@@ -107,6 +108,7 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [repeatFrequency, setRepeatFrequency] = useState(1);
   const referencedItem = reference ? (reference as Note) : null;
+  const recurringReminderFeature = useIsFeatureAvailable("recurringReminders");
 
   const title = useRef<string | undefined>(
     !reminder ? referencedItem?.title : reminder?.title
@@ -304,7 +306,14 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
                     : "plain"
                 }
                 onPress={() => {
-                  if (mode === "Repeat" && !PremiumService.get()) return;
+                  if (
+                    recurringReminderFeature &&
+                    !recurringReminderFeature?.isAllowed
+                  ) {
+                    PaywallSheet.present(recurringReminderFeature);
+                    return;
+                  }
+
                   setReminderMode(
                     ReminderModes[
                       mode as keyof typeof ReminderModes

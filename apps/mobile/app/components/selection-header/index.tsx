@@ -87,7 +87,7 @@ export const SelectionHeader = React.memo(
 
     const restoreItem = async () => {
       if (!selectedItemsList.length) return;
-      if ((await db.trash.restore(...selectedItemsList)) === false) return;
+      await db.trash.restore(...selectedItemsList);
       Navigation.queueRoutesForUpdate();
 
       clearSelection();

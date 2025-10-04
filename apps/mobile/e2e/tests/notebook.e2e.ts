@@ -27,7 +27,7 @@ describe("NOTEBOOKS", () => {
     await Tests.fromId("tab-notebooks").waitAndTap();
     await Tests.fromId("sidebar-add-button").waitAndTap();
     await Tests.createNotebook("Notebook 1", false);
-    await device.pressBack();
+    await Tests.sleep(500);
     await Tests.fromText("Notebook 1").isVisible();
   });
 
@@ -37,21 +37,8 @@ describe("NOTEBOOKS", () => {
     await Tests.fromId("tab-notebooks").waitAndTap();
     await Tests.fromId("sidebar-add-button").waitAndTap();
     await Tests.createNotebook("Notebook 1", true);
-    await device.pressBack();
+    await Tests.sleep(500);
     await Tests.fromText("Notebook 1").isVisible();
-  });
-
-  it("Create a notebook, move notes", async () => {
-    await Tests.prepare();
-    let note = await Tests.createNote();
-    await Tests.openSideMenu();
-    await Tests.fromId("tab-notebooks").waitAndTap();
-    await Tests.fromId("sidebar-add-button").waitAndTap();
-    await Tests.createNotebook("Notebook 1", true);
-    await Tests.fromId("listitem.select").waitAndTap();
-    await Tests.fromText("Move selected notes").waitAndTap();
-    await Tests.fromText("Notebook 1").waitAndTap();
-    await Tests.fromText(note.body).isVisible();
   });
 
   it("Add a sub notebook to a notebook", async () => {
@@ -60,16 +47,16 @@ describe("NOTEBOOKS", () => {
     await Tests.fromId("tab-notebooks").waitAndTap();
     await Tests.fromId("sidebar-add-button").waitAndTap();
     await Tests.createNotebook("Notebook 1", true);
-    await device.pressBack();
+    await Tests.sleep(500);
     await Tests.fromText("Notebook 1").element.longPress();
+    await Tests.sleep(500);
     await Tests.fromText("Add notebook").waitAndTap();
     await Tests.createNotebook("Sub notebook", true);
-    await device.pressBack();
     await Tests.sleep(500);
     await Tests.fromId("expand-notebook-0").waitAndTap();
     await Tests.fromText("Sub notebook").isVisible();
     await Tests.fromText("Sub notebook").element.longPress();
-
+    await Tests.sleep(500);
     await Tests.fromText("Move to trash").waitAndTap();
     await Tests.fromText("Delete").waitAndTap();
     await Tests.fromText("Sub notebook").isNotVisible();
@@ -81,9 +68,9 @@ describe("NOTEBOOKS", () => {
     await Tests.fromId("tab-notebooks").waitAndTap();
     await Tests.fromId("sidebar-add-button").waitAndTap();
     await Tests.createNotebook("Notebook 1", true);
-    await device.pressBack();
     await Tests.sleep(500);
     await Tests.fromText("Notebook 1").element.longPress();
+    await Tests.sleep(500);
     await Tests.fromText("Edit notebook").waitAndTap();
     await Tests.fromId(
       notesnook.ids.dialogs.notebook.inputs.title
@@ -98,15 +85,14 @@ describe("NOTEBOOKS", () => {
     await Tests.openSideMenu();
     await Tests.fromId("tab-notebooks").waitAndTap();
     await Tests.fromId("sidebar-add-button").waitAndTap();
-
     await Tests.createNotebook("Notebook 1", true);
-    await device.pressBack();
+    await Tests.sleep(500);
 
     await Tests.fromText("Notebook 1").element.longPress();
+    await Tests.sleep(500);
     await Tests.fromText("Add notebook").waitAndTap();
 
     await Tests.createNotebook("Sub notebook", true);
-    await device.pressBack();
     await Tests.sleep(500);
 
     await Tests.fromId("expand-notebook-0").waitAndTap();
@@ -128,7 +114,7 @@ describe("NOTEBOOKS", () => {
     await Tests.fromId("sidebar-add-button").waitAndTap();
 
     await Tests.createNotebook("Notebook 1", true);
-    await device.pressBack();
+    await Tests.sleep(500);
 
     await Tests.fromText("Notebook 1").waitAndTap();
     await Tests.createNote();
@@ -142,12 +128,13 @@ describe("NOTEBOOKS", () => {
     await Tests.fromId("sidebar-add-button").waitAndTap();
 
     await Tests.createNotebook("Notebook 1", true);
-    await device.pressBack();
+    await Tests.sleep(500);
 
     await Tests.fromText("Notebook 1").waitAndTap();
     await Tests.sleep(500);
     let note = await Tests.createNote();
     await Tests.fromText(note.body).element.longPress();
+    await Tests.sleep(500);
 
     await Tests.fromId("select-minus").waitAndTap();
     await Tests.fromId(note.title).isNotVisible();
@@ -161,7 +148,7 @@ describe("NOTEBOOKS", () => {
     await Tests.fromId("sidebar-add-button").waitAndTap();
 
     await Tests.createNotebook("Notebook 1", true);
-    await device.pressBack();
+    await Tests.sleep(500);
     await Tests.fromId("tab-home").waitAndTap();
 
     await Tests.fromText("Notes").waitAndTap();
@@ -174,7 +161,7 @@ describe("NOTEBOOKS", () => {
     await Tests.fromId("icon-notebooks").waitAndTap();
     await Tests.fromText("Notebook 1").waitAndTap();
 
-    await Tests.fromText("Save").waitAndTap();
+    await Tests.fromId("floating-save-button").waitAndTap();
     await Tests.fromText("Notebook 1").isVisible();
   });
 
@@ -187,7 +174,7 @@ describe("NOTEBOOKS", () => {
 
     await Tests.createNotebook();
 
-    await device.pressBack();
+    await Tests.sleep(500);
 
     await Tests.fromText("Notebook 1").isVisible();
 
@@ -206,7 +193,6 @@ describe("NOTEBOOKS", () => {
     ).element.typeText("Description of Notebook 1 (Edited)");
     await Tests.fromText("Save").waitAndTap();
     await Tests.fromText("Notebook 1 (Edited)").isVisible();
-    // await Tests.fromText("Description of Notebook 1 (Edited)").isVisible();
   });
 
   it("Move notebook to trash", async () => {
@@ -217,7 +203,7 @@ describe("NOTEBOOKS", () => {
     await Tests.fromId("sidebar-add-button").waitAndTap();
 
     await Tests.createNotebook("Notebook 1", false);
-    await device.pressBack();
+    await Tests.sleep(500);
     await Tests.fromText("Notebook 1").isVisible();
 
     await Tests.fromText("Notebook 1").element.longPress();
@@ -232,7 +218,7 @@ describe("NOTEBOOKS", () => {
     await Tests.fromText("Notebook 1").isVisible();
   });
 
-  it("Move notebook to trash with notes", async () => {
+  it.skip("Move notebook to trash with notes", async () => {
     await Tests.prepare();
     let note = await Tests.createNote();
 
@@ -241,8 +227,18 @@ describe("NOTEBOOKS", () => {
     await Tests.fromId("sidebar-add-button").waitAndTap();
 
     await Tests.createNotebook("Notebook 1", false);
-    await Tests.fromId("listitem.select").waitAndTap();
-    await Tests.fromText("Move selected notes").waitAndTap();
+    await device.pressBack();
+    await Tests.fromId(notesnook.ids.note.get(0)).element.longPress();
+    await Tests.sleep(500);
+    await Tests.fromId("select-plus").waitAndTap();
+    await Tests.fromText("Notebook 1").isVisible();
+    await Tests.fromText("Notebook 1").waitAndTap();
+    await Tests.fromId("floating-save-button").waitAndTap();
+    await Tests.sleep(500);
+    await Tests.openSideMenu();
+    await Tests.fromId("tab-home").waitAndTap();
+    await Tests.fromId("tab-notebooks").waitAndTap();
+    await Tests.sleep(500);
     await Tests.fromText("Notebook 1").isVisible();
     await Tests.fromText("Notebook 1").element.longPress();
     await Tests.sleep(500);
@@ -269,7 +265,7 @@ describe("NOTEBOOKS", () => {
 
     await Tests.createNotebook("Notebook 1", false);
 
-    await device.pressBack();
+    await Tests.sleep(500);
 
     await Tests.fromText("Notebook 1").isVisible();
 

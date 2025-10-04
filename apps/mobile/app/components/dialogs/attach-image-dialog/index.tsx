@@ -16,6 +16,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { useIsFeatureAvailable } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
+import { useThemeColors } from "@notesnook/theme";
 import React, { useState } from "react";
 import {
   Image,
@@ -25,15 +28,13 @@ import {
   View
 } from "react-native";
 import { Image as ImageType } from "react-native-image-crop-picker";
-import { useThemeColors } from "@notesnook/theme";
-import { presentSheet } from "../../../services/event-manager";
-import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
+import { presentSheet, ToastManager } from "../../../services/event-manager";
+import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
+import { DefaultAppStyles } from "../../../utils/styles";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
 import { Notice } from "../../ui/notice";
 import Paragraph from "../../ui/typography/paragraph";
-import { strings } from "@notesnook/intl";
-import { DefaultAppStyles } from "../../../utils/styles";
 
 export default function AttachImage({
   response,
@@ -44,6 +45,7 @@ export default function AttachImage({
   onAttach: ({ compress }: { compress: boolean }) => void;
   close: ((ctx?: string | undefined) => void) | undefined;
 }) {
+  const fullQualityImagesResult = useIsFeatureAvailable("fullQualityImages");
   const { colors } = useThemeColors();
   const [compress, setCompress] = useState(true);
 
@@ -104,21 +106,42 @@ export default function AttachImage({
           alignSelf: "center",
           marginBottom: DefaultAppStyles.GAP_VERTICAL,
           alignItems: "center",
-          width: "100%"
+          width: "100%",
+          opacity: fullQualityImagesResult?.isAllowed ? 1 : 0.5
         }}
         onPress={() => {
+          if (!fullQualityImagesResult?.isAllowed) {
+            ToastManager.show({
+              message: fullQualityImagesResult?.error,
+              type: "info",
+              context: "local"
+            });
+            return;
+          }
           setCompress(!compress);
         }}
       >
         <IconButton
           size={AppFontSize.lg}
           name={compress ? "checkbox-marked" : "checkbox-blank-outline"}
-          color={compress ? colors.primary.accent : colors.primary.icon}
+          color={
+            compress && fullQualityImagesResult?.isAllowed
+              ? colors.primary.accent
+              : colors.primary.icon
+          }
           style={{
             width: 25,
             height: 25
           }}
           onPress={() => {
+            if (!fullQualityImagesResult?.isAllowed) {
+              ToastManager.show({
+                message: fullQualityImagesResult?.error,
+                type: "info",
+                context: "local"
+              });
+              return;
+            }
             setCompress(!compress);
           }}
         />

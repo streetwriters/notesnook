@@ -53,7 +53,9 @@ export class Sanitizer {
     for (const key in item) {
       if (schema.has(key)) continue;
       if (process.env.NODE_ENV === "test")
-        throw new Error(`Found invalid key in item ${key} (${table})`);
+        throw new Error(
+          `Found invalid key in item ${key} (${table}) ${JSON.stringify(item)}`
+        );
       else
         this.logger.debug("Found invalid key in item", {
           table,

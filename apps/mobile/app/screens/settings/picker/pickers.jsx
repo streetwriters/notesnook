@@ -29,6 +29,8 @@ import { useUserStore } from "../../../stores/use-user-store";
 import { MenuItemsList } from "../../../utils/menu-items";
 import { verifyUserWithApplock } from "../functions";
 import { strings } from "@notesnook/intl";
+import { isFeatureAvailable } from "@notesnook/common";
+import PaywallSheet from "../../../components/sheets/paywall";
 
 export const FontPicker = createSettingsPicker({
   getValue: () => useSettingStore.getState().settings.defaultFontFamily,
@@ -42,7 +44,9 @@ export const FontPicker = createSettingsPicker({
   },
   getItemKey: (item) => item.id,
   options: getFonts(),
-  compareValue: (current, item) => current === item.id
+  compareValue: (current, item) => current === item.id,
+  isFeatureAvailable: () => true,
+  isOptionAvailable: () => true
 });
 
 export const HomePicker = createSettingsPicker({
@@ -61,7 +65,8 @@ export const HomePicker = createSettingsPicker({
   getItemKey: (item) => item.title,
   options: MenuItemsList.slice(0, MenuItemsList.length - 1),
   compareValue: (current, item) => current === item.title,
-  premium: true
+  isFeatureAvailable: () => true,
+  isOptionAvailable: () => true
 });
 
 export const SidebarTabPicker = createSettingsPicker({
@@ -80,7 +85,21 @@ export const SidebarTabPicker = createSettingsPicker({
   getItemKey: (item) => item,
   options: [0, 1, 2],
   compareValue: (current, item) => current === item,
-  premium: true
+  isFeatureAvailable: async () => {
+    const result = await isFeatureAvailable("defaultSidebarTab");
+    if (!result.isAllowed) {
+      ToastManager.show({
+        message: result.error,
+        type: "info",
+        actionText: strings.upgrade(),
+        func: () => {
+          PaywallSheet.present(result);
+        }
+      });
+    }
+    return result.isAllowed;
+  },
+  isOptionAvailable: () => true
 });
 
 export const TrashIntervalPicker = createSettingsPicker({
@@ -98,7 +117,21 @@ export const TrashIntervalPicker = createSettingsPicker({
   getItemKey: (item) => item.toString(),
   options: [-1, 1, 7, 30, 365],
   compareValue: (current, item) => current === item,
-  premium: true
+  isFeatureAvailable: () => true,
+  isOptionAvailable: async () => {
+    const disableTrashFeature = await isFeatureAvailable("disableTrashCleanup");
+    if (!disableTrashFeature.isAllowed) {
+      ToastManager.show({
+        message: disableTrashFeature.error,
+        type: "info",
+        actionText: strings.upgrade(),
+        func: () => {
+          PaywallSheet.present(disableTrashFeature);
+        }
+      });
+    }
+    return disableTrashFeature.isAllowed;
+  }
 });
 
 export const DateFormatPicker = createSettingsPicker({
@@ -114,7 +147,9 @@ export const DateFormatPicker = createSettingsPicker({
   },
   getItemKey: (item) => item,
   options: DATE_FORMATS,
-  compareValue: (current, item) => current === item
+  compareValue: (current, item) => current === item,
+  isFeatureAvailable: () => true,
+  isOptionAvailable: () => true
 });
 
 const TimeFormats = {
@@ -135,7 +170,9 @@ export const TimeFormatPicker = createSettingsPicker({
   },
   getItemKey: (item) => item,
   options: TIME_FORMATS,
-  compareValue: (current, item) => current === item
+  compareValue: (current, item) => current === item,
+  isFeatureAvailable: () => true,
+  isOptionAvailable: () => true
 });
 
 export const BackupReminderPicker = createSettingsPicker({
@@ -149,16 +186,14 @@ export const BackupReminderPicker = createSettingsPicker({
   getItemKey: (item) => item,
   options: ["useroff", "daily", "weekly", "monthly"],
   compareValue: (current, item) => current === item,
-  premium: true,
   requiresVerification: () => {
     return (
       !useSettingStore.getState().settings.encryptedBackup &&
       useUserStore.getState().user
     );
   },
-  onCheckOptionIsPremium: (item) => {
-    return item !== "useroff";
-  }
+  isFeatureAvailable: () => true,
+  isOptionAvailable: () => true
 });
 
 export const BackupWithAttachmentsReminderPicker = createSettingsPicker({
@@ -174,16 +209,14 @@ export const BackupWithAttachmentsReminderPicker = createSettingsPicker({
   getItemKey: (item) => item,
   options: ["never", "weekly", "monthly"],
   compareValue: (current, item) => current === item,
-  premium: true,
   requiresVerification: () => {
     return (
       !useSettingStore.getState().settings.encryptedBackup &&
       useUserStore.getState().user
     );
   },
-  onCheckOptionIsPremium: (item) => {
-    return item !== "never";
-  }
+  isFeatureAvailable: () => true,
+  isOptionAvailable: () => true
 });
 
 export const ApplockTimerPicker = createSettingsPicker({
@@ -205,5 +238,7 @@ export const ApplockTimerPicker = createSettingsPicker({
   compareValue: (current, item) => current === item,
   onVerify: () => {
     return verifyUserWithApplock();
-  }
+  },
+  isFeatureAvailable: () => true,
+  isOptionAvailable: () => true
 });

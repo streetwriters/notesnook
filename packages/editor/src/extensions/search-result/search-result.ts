@@ -26,6 +26,18 @@ export const SearchResult = Mark.create({
     return [{ tag: "nn-search-result" }];
   },
 
+  addAttributes() {
+    return {
+      id: {
+        default: null,
+        parseHTML: (element) => element.getAttribute("id"),
+        renderHTML: (attributes) => {
+          return attributes.id ? { id: attributes.id } : {};
+        }
+      }
+    };
+  },
+
   renderHTML({ HTMLAttributes }) {
     return [
       "nn-search-result",

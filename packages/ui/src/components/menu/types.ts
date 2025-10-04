@@ -51,6 +51,7 @@ export type MenuButtonItem = BaseMenuItem<"button"> & {
   isChecked?: boolean;
   modifier?: string;
   menu?: { title?: string; items: MenuItem[] };
+  premium?: boolean;
   variant?: "dangerous" | "normal";
 
   styles?: {

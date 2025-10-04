@@ -47,7 +47,11 @@ module.exports = {
   copyright: `Copyright © ${year} Streetwriters (Private) Limited`,
   artifactName: "notesnook_${os}_${arch}.${ext}",
   generateUpdatesFilesForAllChannels: true,
-  asar: false,
+  asar: true,
+  asarUnpack: [
+    "node_modules/sqlite-better-trigram-@(linux|darwin|windows)-${arch}/**/*",
+    "node_modules/sqlite3-fts5-html-@(linux|darwin|windows)-${arch}/**/*"
+  ],
   files: [
     "!*.chunk.js.map",
     "!*.chunk.js.LICENSE.txt",

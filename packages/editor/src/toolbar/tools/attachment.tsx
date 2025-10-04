@@ -48,7 +48,8 @@ export function DownloadAttachment(props: ToolProps) {
 
   return (
     <ToolButton
-      {...props}
+      icon={props.icon}
+      title={props.title}
       toggled={false}
       onClick={() => {
         const attachmentNode =
@@ -73,7 +74,8 @@ export function PreviewAttachment(props: ToolProps) {
 
   return (
     <ToolButton
-      {...props}
+      icon={props.icon}
+      title={props.title}
       toggled={false}
       onClick={() => {
         const attachmentNode =
@@ -91,7 +93,8 @@ export function RemoveAttachment(props: ToolProps) {
   const { editor } = props;
   return (
     <ToolButton
-      {...props}
+      icon={props.icon}
+      title={props.title}
       toggled={false}
       onClick={() => editor.chain().focus().removeAttachment().run()}
     />

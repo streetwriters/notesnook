@@ -21,7 +21,10 @@ import { ToolProps } from "../types.js";
 import { ToolButton } from "../components/tool-button.js";
 import { MoreTools } from "../components/more-tools.js";
 import { useToolbarLocation } from "../stores/toolbar-store.js";
-import { findSelectedNode, selectionToOffset } from "../../utils/prosemirror.js";
+import {
+  findSelectedNode,
+  selectionToOffset
+} from "../../utils/prosemirror.js";
 
 export function WebClipSettings(props: ToolProps) {
   const { editor } = props;
@@ -43,7 +46,8 @@ export function WebClipFullScreen(props: ToolProps) {
 
   return (
     <ToolButton
-      {...props}
+      icon={props.icon}
+      title={props.title}
       toggled={false}
       onClick={() => {
         const offset = selectionToOffset(editor.state);
@@ -68,7 +72,8 @@ export function WebClipOpenExternal(props: ToolProps) {
   const { editor } = props;
   return (
     <ToolButton
-      {...props}
+      icon={props.icon}
+      title={props.title}
       toggled={false}
       onClick={async () => {
         const offset = selectionToOffset(editor.state);
@@ -96,7 +101,8 @@ export function WebClipOpenSource(props: ToolProps) {
   const { editor } = props;
   return (
     <ToolButton
-      {...props}
+      icon={props.icon}
+      title={props.title}
       toggled={false}
       onClick={async () => {
         const node = findSelectedNode(editor, "webclip");

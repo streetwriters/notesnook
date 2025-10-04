@@ -57,6 +57,7 @@ function databaseTest(type: "memory" | "persistent" = "memory") {
     eventsource: EventSource,
     fs: FS,
     compressor: async () => Compressor,
+    maxNoteVersions: async () => 1000,
     sqliteOptions: {
       dialect: (name) =>
         new SqliteDialect({
