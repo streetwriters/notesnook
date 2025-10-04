@@ -77,9 +77,9 @@ const SheetWrapper = ({
       ...getContainerBorder(colors.primary.border, 0.5),
       borderBottomWidth: 0,
       paddingBottom:
-        Platform.OS === "android"
+        Platform.OS === "android" && !insets.bottom
           ? isGestureNavigationEnabled
-            ? insets.bottom
+            ? 0
             : 30
           : 0
     };
@@ -165,10 +165,7 @@ const SheetWrapper = ({
         {bottomPadding ? (
           <View
             style={{
-              height:
-                Platform.OS === "ios" || insets.bottom !== 0
-                  ? insets.bottom
-                  : 20
+              height: insets.bottom !== 0 ? insets.bottom : 20
             }}
           />
         ) : null}
