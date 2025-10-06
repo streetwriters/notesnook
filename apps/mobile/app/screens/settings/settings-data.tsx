@@ -100,9 +100,9 @@ export const settingsGroups: SettingSection[] = [
             strings.subscriptionProviderInfo[user?.subscription?.provider];
 
           const isCurrentPlatform =
-            (user.subscription.provider === SubscriptionProvider.APPLE &&
+            (user.subscription?.provider === SubscriptionProvider.APPLE &&
               Platform.OS === "ios") ||
-            (user.subscription.provider === SubscriptionProvider.GOOGLE &&
+            (user.subscription?.provider === SubscriptionProvider.GOOGLE &&
               Platform.OS === "android");
 
           if (
@@ -132,8 +132,8 @@ export const settingsGroups: SettingSection[] = [
             "dddd, MMMM D, YYYY h:mm A"
           );
 
-          if (user.subscription.plan !== SubscriptionPlan.FREE) {
-            const status = user.subscription.status;
+          if (user.subscription?.plan !== SubscriptionPlan.FREE) {
+            const status = user.subscription?.status;
             return status === SubscriptionStatus.TRIAL
               ? strings.trialEndsOn(
                   dayjs(user?.subscription?.start)
