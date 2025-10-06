@@ -171,7 +171,7 @@ class TestBuilder {
     });
   }
 
-  wait(duration: number) {
+  wait(duration = 500) {
     return this.addStep(async () => {
       await Tests.sleep(duration);
     });
@@ -280,6 +280,13 @@ class TestBuilder {
     });
   }
 
+  tapReturnKeyById(id: string) {
+    return this.addStep(async () => {
+      const element = new Element("id", id);
+      await element.element.tapReturnKey();
+    });
+  }
+
   tapByText(text: string, point?: Detox.Point2D) {
     return this.addStep(async () => {
       const element = new Element("text", text);
@@ -303,11 +310,31 @@ class TestBuilder {
     });
   }
 
+  clearTextById(id: string) {
+    return this.addStep(async () => {
+      await Element.fromId(id).element.clearText();
+    });
+  }
+
   pressBack(count = 1) {
     return this.addStep(async () => {
       for (let i = 0; i < count; i++) {
         await device.pressBack();
       }
+    });
+  }
+
+  longPressByText(text: string) {
+    return this.addStep(async () => {
+      const element = new Element("text", text);
+      await element.element.longPress();
+    });
+  }
+
+  longPressById(id: string) {
+    return this.addStep(async () => {
+      const element = new Element("id", id);
+      await element.element.longPress();
     });
   }
 
