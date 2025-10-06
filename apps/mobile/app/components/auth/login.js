@@ -19,14 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
+import { useRoute } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
-import {
-  ScrollView,
-  TouchableOpacity,
-  View,
-  useWindowDimensions
-} from "react-native";
+import { TouchableOpacity, View, useWindowDimensions } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { DDS } from "../../services/device-detection";
 import { eSendEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
@@ -47,8 +44,7 @@ import { hideAuth } from "./common";
 import { ForgotPassword } from "./forgot-password";
 import { AuthHeader } from "./header";
 import { useLogin } from "./use-login";
-import { useRoute } from "@react-navigation/native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import SettingsService from "../../services/settings";
 
 const LoginSteps = {
   emailAuth: 1,
@@ -81,7 +77,7 @@ export const Login = ({ changeMode }) => {
       }
     }, 5000);
 
-    if (!PremiumService.get()) {
+    if (!PremiumService.get() && !SettingsService.getProperty("serverUrls")) {
       Navigation.navigate("PayWall", {
         context: "signup",
         state: route.params.state,

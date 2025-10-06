@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
+import { useRoute } from "@react-navigation/native";
 import React, { useRef, useState } from "react";
 import { TouchableOpacity, View, useWindowDimensions } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -38,7 +39,6 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { AuthHeader } from "./header";
 import { SignupContext } from "./signup-context";
-import { useRoute } from "@react-navigation/native";
 
 const SignupSteps = {
   signup: 0,
@@ -91,11 +91,13 @@ export const Signup = ({ changeMode, welcome }) => {
       setLastSynced(await db.lastSynced());
       clearMessage();
       setEmailVerifyMessage();
-      Navigation.navigate("PayWall", {
-        canGoBack: false,
-        state: route.params.state,
-        context: "signup"
-      });
+      if (!SettingsService.getProperty("serverUrls")) {
+        Navigation.navigate("PayWall", {
+          canGoBack: false,
+          state: route.params.state,
+          context: "signup"
+        });
+      }
       return true;
     } catch (e) {
       setCurrentStep(SignupSteps.signup);

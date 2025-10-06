@@ -24,10 +24,11 @@ import { FlatList, View } from "react-native";
 import { DraxProvider, DraxScrollView } from "react-native-drax";
 import { db } from "../../common/database";
 import Navigation from "../../services/navigation";
+import SettingsService from "../../services/settings";
 import { useMenuStore } from "../../stores/use-menu-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useUserStore } from "../../stores/use-user-store";
-import { SUBSCRIPTION_STATUS } from "../../utils/constants";
+import { MenuItemsList } from "../../utils/menu-items";
 import { DefaultAppStyles } from "../../utils/styles";
 import ReorderableList from "../list/reorderable-list";
 import { MenuItemProperties } from "../sheets/menu-item-properties";
@@ -36,7 +37,6 @@ import { ColorSection } from "./color-section";
 import { MenuItem } from "./menu-item";
 import { PinnedSection } from "./pinned-section";
 import { SideMenuHeader } from "./side-menu-header";
-import { MenuItemsList } from "../../utils/menu-items";
 
 const pro = {
   title: strings.upgradePlan(),
@@ -140,9 +140,10 @@ export function SideMenuHome() {
           paddingVertical: DefaultAppStyles.GAP_VERTICAL
         }}
       >
-        {subscriptionType === SubscriptionPlan.FREE ||
-        !subscriptionType ||
-        !user ? (
+        {(subscriptionType === SubscriptionPlan.FREE ||
+          !subscriptionType ||
+          !user) &&
+        !SettingsService.getProperty("serverUrls") ? (
           <Button
             title={pro.title}
             style={{
