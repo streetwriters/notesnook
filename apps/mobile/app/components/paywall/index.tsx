@@ -60,6 +60,7 @@ import usePricingPlans, {
   PricingPlan
 } from "../../hooks/use-pricing-plans";
 import Navigation, { NavigationProps } from "../../services/navigation";
+import PremiumService from "../../services/premium";
 import { getElevationStyle } from "../../utils/elevation";
 import { openLinkInBrowser } from "../../utils/functions";
 import { AppFontSize, defaultBorderRadius } from "../../utils/size";
@@ -74,7 +75,6 @@ import { IconButton } from "../ui/icon-button";
 import { SvgView } from "../ui/svg";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import PremiumService from "../../services/premium";
 
 const Steps = {
   select: 1,
@@ -114,15 +114,8 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
           routeParams.state?.planId,
           routeParams.state?.productId
         );
-        console.log(
-          "selectPlan",
-          routeParams.state?.planId,
-          routeParams.state?.productId,
-          (pricingPlans.selectedProduct as any).productId
-        );
       }
       setStep(Steps.buy);
-      console.log("Buy step");
     }
   }, [routeParams.state]);
 
@@ -949,7 +942,6 @@ const PricingPlanCard = ({
       regionalDiscount?.sku ||
         `notesnook.${plan.id}.${annualBilling ? "yearly" : "monthly"}`
     ];
-  console.log(regionalDiscount?.sku);
   const price = pricingPlans?.getPrice(
     product as RNIap.Subscription,
     pricingPlans.hasTrialOffer(plan.id, product?.productId) ? 1 : 0,
@@ -962,6 +954,7 @@ const PricingPlanCard = ({
   );
 
   useEffect(() => {
+    if (pricingPlans?.isGithubRelease) return;
     pricingPlans
       ?.getRegionalDiscount(
         plan.id,
@@ -980,7 +973,7 @@ const PricingPlanCard = ({
     pricingPlans.isSubscribed();
 
   const isNotReady =
-    pricingPlans?.loadingPlans || (!price && !WebPlan?.price.gross);
+    pricingPlans?.loadingPlans || (!price && !WebPlan?.price?.gross);
 
   return (
     <TouchableOpacity
@@ -1112,7 +1105,7 @@ const PricingPlanCard = ({
         </View>
       </View>
 
-      {pricingPlans?.loadingPlans || (!price && !WebPlan?.price.gross) ? (
+      {pricingPlans?.loadingPlans || (!price && !WebPlan?.price?.gross) ? (
         <ActivityIndicator size="small" color={colors.primary.accent} />
       ) : (
         <View>
@@ -1120,7 +1113,7 @@ const PricingPlanCard = ({
             {isFreePlan
               ? "0.00"
               : price ||
-                `${WebPlan?.price.currency} ${WebPlan?.price.gross}`}{" "}
+                `${WebPlan?.price?.currency} ${WebPlan?.price?.gross}`}{" "}
             <Paragraph>/{strings.month()}</Paragraph>
           </Paragraph>
 

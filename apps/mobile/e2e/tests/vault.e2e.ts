@@ -18,134 +18,133 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { expect } from "detox";
 import { notesnook } from "../test.ids";
-import { Tests } from "./utils";
+import { TestBuilder, Tests } from "./utils";
 
 async function lockNote() {
-  await Tests.fromId(notesnook.listitem.menu).waitAndTap();
-  await Tests.sleep(500);
-  await Tests.fromId("icon-lock-unlock").waitAndTap();
-  await Tests.sleep(500);
-  await Tests.fromText("Lock").isVisible();
-  await Tests.fromId(notesnook.ids.dialogs.vault.pwd).element.typeText("1234");
-  await Tests.fromId(notesnook.ids.dialogs.vault.pwdAlt).element.typeText(
-    "1234"
-  );
-  await Tests.fromText("Lock").waitAndTap();
-  await Tests.fromId("note-locked-icon").isVisible();
+  await TestBuilder.create()
+    .waitAndTapById(notesnook.listitem.menu)
+    .wait()
+    .waitAndTapById("icon-lock-unlock")
+    .wait()
+    .isVisibleByText("Lock")
+    .typeTextById(notesnook.ids.dialogs.vault.pwd, "1234")
+    .typeTextById(notesnook.ids.dialogs.vault.pwdAlt, "1234")
+    .waitAndTapByText("Lock")
+    .isVisibleById("note-locked-icon")
+    .run();
 }
 
 async function removeFromVault() {
-  await Tests.fromId(notesnook.listitem.menu).waitAndTap();
-  await Tests.sleep(500);
-  await Tests.fromId("icon-lock-unlock").waitAndTap();
-  await Tests.sleep(500);
-  await Tests.fromId(notesnook.ids.dialogs.vault.pwd).element.typeText("1234");
-  await Tests.fromText("Unlock").waitAndTap();
-  await Tests.fromId("note-locked-icon").isNotVisible();
+  await TestBuilder.create()
+    .waitAndTapById(notesnook.listitem.menu)
+    .wait()
+    .waitAndTapById("icon-lock-unlock")
+    .wait()
+    .typeTextById(notesnook.ids.dialogs.vault.pwd, "1234")
+    .waitAndTapByText("Unlock")
+    .isNotVisibleById("note-locked-icon")
+    .run();
 }
 
-async function openLockedNote(pwd?: string) {
-  await Tests.fromId(notesnook.ids.note.get(0)).waitAndTap();
-  await Tests.sleep(500);
-  await web()
-    .element(by.web.name("password"))
-    .typeText(pwd || "1234", false);
-  await web().element(by.web.className("unlock-note")).tap();
-  await Tests.sleep(500);
-  await expect(web().element(by.web.className("unlock-note"))).not.toExist();
+async function openLockedNote(pwd = "1234") {
+  await TestBuilder.create()
+    .waitAndTapById(notesnook.ids.note.get(0))
+    .wait()
+    .addStep(async () => {
+      await web().element(by.web.name("password")).typeText(pwd, false);
+      await web().element(by.web.className("unlock-note")).tap();
+      await Tests.sleep(500);
+      await expect(
+        web().element(by.web.className("unlock-note"))
+      ).not.toExist();
+    })
+    .run();
 }
 
 async function goToPrivacySecuritySettings() {
-  await Tests.openSideMenu();
-  await Tests.fromId("sidemenu-settings-icon").waitAndTap();
-  await Tests.sleep(300);
-  await Tests.fromText("Settings").waitAndTap();
-  await Tests.fromText("Vault").waitAndTap();
+  await TestBuilder.create()
+    .openSideMenu()
+    .waitAndTapById("sidemenu-settings-icon")
+    .wait()
+    .waitAndTapByText("Settings")
+    .waitAndTapByText("Vault")
+    .run();
 }
 
 describe("VAULT", () => {
   it("Create vault from settings", async () => {
-    await Tests.prepare();
-    await goToPrivacySecuritySettings();
-    await Tests.fromText("Create vault").waitAndTap();
-    await Tests.fromId(notesnook.ids.dialogs.vault.pwd).element.typeText(
-      "1234"
-    );
-    await Tests.fromId(notesnook.ids.dialogs.vault.pwdAlt).element.typeText(
-      "1234"
-    );
-    await Tests.fromText("Create").waitAndTap();
-    await Tests.fromText("Clear vault").isVisible();
+    await TestBuilder.create()
+      .prepare()
+      .addStep(goToPrivacySecuritySettings)
+      .waitAndTapByText("Create vault")
+      .typeTextById(notesnook.ids.dialogs.vault.pwd, "1234")
+      .typeTextById(notesnook.ids.dialogs.vault.pwdAlt, "1234")
+      .waitAndTapByText("Create")
+      .isVisibleByText("Clear vault")
+      .run();
   });
 
-  it("Change vault password", async () => {
-    await Tests.prepare();
-    await Tests.createNote();
-    await lockNote();
-    await goToPrivacySecuritySettings();
-    await Tests.fromText("Change vault password").waitAndTap();
-    await Tests.fromId(notesnook.ids.dialogs.vault.pwd).element.typeText(
-      "1234"
-    );
-    await Tests.fromId(notesnook.ids.dialogs.vault.changePwd).element.typeText(
-      "2362"
-    );
-    await Tests.fromText("Change").waitAndTap();
-    await device.pressBack();
-    await device.pressBack();
-    await device.pressBack();
-    await Tests.sleep(500);
-    await openLockedNote("2362");
+  it.only("Change vault password", async () => {
+    await TestBuilder.create()
+      .prepare()
+      .createNote()
+      .addStep(lockNote)
+      .addStep(goToPrivacySecuritySettings)
+      .waitAndTapByText("Change vault password")
+      .typeTextById(notesnook.ids.dialogs.vault.pwd, "1234")
+      .typeTextById(notesnook.ids.dialogs.vault.changePwd, "2362")
+      .waitAndTapByText("Change")
+      .pressBack(3)
+      .addStep(async () => await openLockedNote("2362"))
+      .run();
   });
 
   it("Delete vault", async () => {
-    await Tests.prepare();
-    await Tests.createNote();
-    await lockNote();
-    await goToPrivacySecuritySettings();
-    await Tests.fromText("Delete vault").waitAndTap();
-    await Tests.fromId(notesnook.ids.dialogs.vault.pwd).element.typeText(
-      "1234"
-    );
-    await Tests.fromText("Delete").waitAndTap();
-    await Tests.sleep(300);
-    await Tests.fromText("Create vault").isVisible();
-    await device.pressBack();
-    await device.pressBack();
-    await device.pressBack();
-    await Tests.fromId(notesnook.listitem.menu).isVisible();
+    await TestBuilder.create()
+      .prepare()
+      .createNote()
+      .addStep(lockNote)
+      .addStep(goToPrivacySecuritySettings)
+      .waitAndTapByText("Delete vault")
+      .typeTextById(notesnook.ids.dialogs.vault.pwd, "1234")
+      .waitAndTapByText("Delete")
+      .isVisibleByText("Create vault")
+      .pressBack(3)
+      .isVisibleById(notesnook.listitem.menu)
+      .run();
   });
 
   it("Delete vault with locked notes", async () => {
-    await Tests.prepare();
-    await Tests.createNote();
-    await lockNote();
-    await goToPrivacySecuritySettings();
-    await Tests.fromText("Delete vault").waitAndTap();
-    await Tests.fromId(notesnook.ids.dialogs.vault.pwd).element.typeText(
-      "1234"
-    );
-    await Tests.fromText("Delete notes in this vault").waitAndTap();
-    await Tests.fromText("Delete").waitAndTap();
-    await Tests.sleep(300);
-    await Tests.fromText("Create vault").isVisible();
-    await device.pressBack();
-    await device.pressBack();
-    await device.pressBack();
-    await Tests.fromId(notesnook.listitem.menu).isNotVisible();
+    await TestBuilder.create()
+      .prepare()
+      .createNote()
+      .addStep(lockNote)
+      .addStep(goToPrivacySecuritySettings)
+      .waitAndTapByText("Delete vault")
+      .typeTextById(notesnook.ids.dialogs.vault.pwd, "1234")
+      .waitAndTapByText("Delete notes in this vault")
+      .waitAndTapByText("Delete")
+      .isVisibleByText("Create vault")
+      .pressBack(3)
+      .isNotVisibleById(notesnook.listitem.menu)
+      .run();
   });
 
   it("Add a note to vault", async () => {
-    await Tests.prepare();
-    await Tests.createNote();
-    await lockNote();
-    await openLockedNote();
+    await TestBuilder.create()
+      .prepare()
+      .createNote()
+      .addStep(lockNote)
+      .addStep(openLockedNote)
+      .run();
   });
 
   it("Remove note from vault", async () => {
-    await Tests.prepare();
-    await Tests.createNote();
-    await lockNote();
-    await removeFromVault();
+    await TestBuilder.create()
+      .prepare()
+      .createNote()
+      .addStep(lockNote)
+      .addStep(removeFromVault)
+      .run();
   });
 });

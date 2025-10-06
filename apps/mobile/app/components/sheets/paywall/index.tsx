@@ -15,6 +15,7 @@ import {
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import PremiumService from "../../../services/premium";
+import SettingsService from "../../../services/settings";
 import { useUserStore } from "../../../stores/use-user-store";
 import { eCloseSheet } from "../../../utils/events";
 import { AppFontSize } from "../../../utils/size";
@@ -37,7 +38,6 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
   const { colors } = useThemeColors();
   const pricingPlans = usePricingPlans();
   useEffect(() => {
-    console.log("PaywallSheet mounted with feature:", props.feature);
     ToastManager.hide();
     if (!props.feature.availableOn) return;
     const plan = pricingPlans.pricingPlans.find(
@@ -55,11 +55,11 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
   }, []);
 
   const isSubscribedOnWeb =
-    (PremiumService.get() &&
+    PremiumService.get() &&
+    (pricingPlans.user?.subscription?.provider ===
+      SubscriptionProvider.PADDLE ||
       pricingPlans.user?.subscription?.provider ===
-        SubscriptionProvider.PADDLE) ||
-    pricingPlans.user?.subscription?.provider ===
-      SubscriptionProvider.STREETWRITERS;
+        SubscriptionProvider.STREETWRITERS);
 
   const isCurrentPlatform =
     (pricingPlans.user?.subscription?.provider === SubscriptionProvider.APPLE &&
@@ -194,25 +194,28 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
               width: "100%"
             }}
             onPress={() => {
-              if (
-                pricingPlans.user?.subscription.plan ===
-                  SubscriptionPlan.LEGACY_PRO ||
-                !isCurrentPlatform
-              ) {
-                ToastManager.show({
-                  message: strings.cannotChangePlan(),
-                  context: "local"
-                });
-                return;
+              if (PremiumService.get()) {
+                if (
+                  pricingPlans.user?.subscription.plan ===
+                    SubscriptionPlan.LEGACY_PRO ||
+                  !isCurrentPlatform
+                ) {
+                  ToastManager.show({
+                    message: strings.cannotChangePlan(),
+                    context: "local"
+                  });
+                  return;
+                }
+
+                if (isSubscribedOnWeb) {
+                  ToastManager.show({
+                    message: strings.changePlanOnWeb(),
+                    context: "local"
+                  });
+                  return;
+                }
               }
 
-              if (isSubscribedOnWeb) {
-                ToastManager.show({
-                  message: strings.changePlanOnWeb(),
-                  context: "local"
-                });
-                return;
-              }
               eSendEvent(eCloseSheet);
               if (!useUserStore.getState().user) {
                 Navigation.navigate("Auth", {
@@ -256,6 +259,7 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
 }
 
 PaywallSheet.present = <Tid extends FeatureId>(feature: FeatureResult<Tid>) => {
+  if (SettingsService.getProperty("serverUrls")) return;
   presentSheet({
     component: <PaywallSheet feature={feature} />
   });
