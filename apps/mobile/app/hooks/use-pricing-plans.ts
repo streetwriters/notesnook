@@ -25,6 +25,7 @@ import { DatabaseLogger, db } from "../common/database";
 import PremiumService from "../services/premium";
 import { useSettingStore } from "../stores/use-setting-store";
 import { useUserStore } from "../stores/use-user-store";
+import SettingsService from "../services/settings";
 function numberWithCommas(x: string) {
   const parts = x.toString().split(".");
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -201,7 +202,7 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
     if (productId?.includes("5year")) return false;
     if (isGithubRelease) {
       if (
-        user?.subscription.trialsAvailed?.some(
+        user?.subscription?.trialsAvailed?.some(
           (plan) => plan === planIdToIndex(planId || currentPlan)
         )
       ) {
@@ -246,7 +247,10 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
       });
       setPlans([...pricingPlans]);
       setUserCanRequestTrial(hasTrialOffer());
-      if (Config.GITHUB_RELEASE === "true") {
+      if (
+        Config.GITHUB_RELEASE === "true" &&
+        !SettingsService.getProperty("serverUrls")
+      ) {
         try {
           const products = WebPlanCache || (await db.pricing.products());
           WebPlanCache = products;
@@ -264,7 +268,8 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
     if (!product) return;
 
     if (Platform.OS === "android") {
-      if (isGithubRelease)
+      if (isGithubRelease) {
+        if (!(product as Plan)?.price) return null;
         return `${(product as Plan).price.currency} ${
           (product as Plan).period === "yearly"
             ? ((product as Plan).price.gross / 12).toFixed(2)
@@ -272,6 +277,7 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
             ? ((product as Plan).price.gross / (12 * 5)).toFixed(2)
             : (product as Plan).price.gross
         }`;
+      }
 
       const pricingPhaseListItem =
         (product as RNIap.SubscriptionAndroid)?.subscriptionOfferDetails?.[0]
@@ -414,7 +420,7 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
     offerIndex: number
   ) => {
     if (isGithubRelease) {
-      return (product as Plan).period;
+      return (product as Plan)?.period;
     }
 
     if (Platform.OS === "android") {
@@ -444,7 +450,7 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
     if (isGithubRelease) {
       return {
         duration: 1,
-        type: (product as Plan).period
+        type: (product as Plan)?.period
       };
     }
 
@@ -591,7 +597,8 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
   ) => {
     if (!product) return null;
 
-    if (isGithubRelease)
+    if (isGithubRelease) {
+      if (!(product as Plan)?.price) return null;
       return `${(product as Plan).price.currency} ${
         (product as Plan).period === "yearly"
           ? ((product as Plan).price.gross / 12).toFixed(2)
@@ -599,6 +606,7 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
           ? ((product as Plan).price.gross / (12 * 5)).toFixed(2)
           : (product as Plan).price.gross
       }`;
+    }
 
     const androidPricingPhase = (product as RNIap.SubscriptionAndroid)
       ?.subscriptionOfferDetails?.[0].pricingPhases?.pricingPhaseList?.[

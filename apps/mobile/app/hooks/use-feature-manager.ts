@@ -85,6 +85,7 @@ export default function useFeatureManager() {
               negativeText: strings.cancel(),
               positivePress: async () => {
                 eSendEvent(eCloseSimpleDialog);
+                if (SettingsService.getProperty("serverUrls")) return;
                 Navigation.navigate("PayWall", {
                   context: "logged-in"
                 });
