@@ -430,8 +430,8 @@ function SortableWrapper(props: SortableWrapperProps) {
   );
 }
 
-export type TreeNodeType = "group" | "item";
-export type BaseTreeNode<Type extends TreeNodeType> = {
+type TreeNodeType = "group" | "item";
+type BaseTreeNode<Type extends TreeNodeType> = {
   type: Type;
   id: string;
   title: string;
@@ -489,7 +489,7 @@ function unflatten(items: TreeNode[]): ToolbarDefinition {
   return tools;
 }
 
-export function createGroup(config: Partial<Group>): Group {
+function createGroup(config: Partial<Group>): Group {
   return {
     type: "group",
     id: getId(),
@@ -499,7 +499,7 @@ export function createGroup(config: Partial<Group>): Group {
   };
 }
 
-export function createItem(config: Partial<Item> & { toolId: ToolId }): Item {
+function createItem(config: Partial<Item> & { toolId: ToolId }): Item {
   return {
     type: "item",
     id: getId(),
@@ -648,15 +648,15 @@ function isCollapsed(item: TreeNode, activeItem: TreeNode): boolean {
   return false;
 }
 
-export function isSubgroup(item: TreeNode): item is Subgroup {
+function isSubgroup(item: TreeNode): item is Subgroup {
   return item.type === "group" && item.depth > 0;
 }
 
-export function isGroup(item: TreeNode): item is Group {
+function isGroup(item: TreeNode): item is Group {
   return item.type === "group" && item.depth === 0;
 }
 
-export function isItem(item: TreeNode): item is Item {
+function isItem(item: TreeNode): item is Item {
   return item.type === "item";
 }
 
