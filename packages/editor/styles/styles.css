@@ -807,3 +807,10 @@ del.diffdel {
 .simplebar-content:before {
   content: "" !important;
 }
+.simplebar-content:after {
+  content: "" !important;
+}
+
+pre[class*="language-"] {
+  overflow: initial !important;
+}
