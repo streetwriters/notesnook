@@ -15,6 +15,7 @@ import {
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import PremiumService from "../../../services/premium";
+import SettingsService from "../../../services/settings";
 import { useUserStore } from "../../../stores/use-user-store";
 import { eCloseSheet } from "../../../utils/events";
 import { AppFontSize } from "../../../utils/size";
@@ -24,7 +25,6 @@ import AppIcon from "../../ui/AppIcon";
 import { Button } from "../../ui/button";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import SettingsService from "../../../services/settings";
 const isGithubRelease = Config.GITHUB_RELEASE === "true";
 const INDEX_TO_PLAN = {
   1: "essential",
@@ -38,7 +38,6 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
   const { colors } = useThemeColors();
   const pricingPlans = usePricingPlans();
   useEffect(() => {
-    console.log("PaywallSheet mounted with feature:", props.feature);
     ToastManager.hide();
     if (!props.feature.availableOn) return;
     const plan = pricingPlans.pricingPlans.find(
