@@ -18,74 +18,99 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { notesnook } from "../test.ids";
-import { Tests } from "./utils";
-
-async function sortBy(sorting: string) {
-  await Tests.fromId("icon-sort").waitAndTap();
-  await Tests.sleep(500);
-  await Tests.fromText(sorting).waitAndTap();
-  await device.pressBack();
-}
+import { TestBuilder } from "./utils";
 
 describe("Sort & filter", () => {
   it("Sort by date-edited/date-created", async () => {
-    await Tests.prepare();
-    let webview = web();
-    await Tests.createNote("Note 1", "Note 1");
-    await Tests.createNote("Note 2", "Note 2");
-    await Tests.fromText("Note 1").waitAndTap();
-    await webview.element(by.web.className("ProseMirror")).tap();
-    await webview
-      .element(by.web.className("ProseMirror"))
-      .typeText("Edited ", true);
-    await device.pressBack();
-    await sortBy("Date created");
-    await Tests.fromId(notesnook.listitem.menu).waitAndTap();
-    await device.pressBack();
-    await sortBy("Date edited");
-    await Tests.fromId(notesnook.listitem.menu).waitAndTap();
-    await Tests.sleep(500);
-    await device.pressBack();
+    await TestBuilder.create()
+      .prepare()
+      .createNote("Note 1", "Note 1")
+      .createNote("Note 2", "Note 2")
+      .waitAndTapByText("Note 1")
+      .addStep(async () => {
+        const webview = web();
+        await webview.element(by.web.className("ProseMirror")).tap();
+        await webview
+          .element(by.web.className("ProseMirror"))
+          .typeText("Edited ", true);
+      })
+      .pressBack()
+      .waitAndTapById("icon-sort")
+      .wait(500)
+      .waitAndTapByText("Date created")
+      .pressBack()
+      .waitAndTapById(notesnook.listitem.menu)
+      .pressBack()
+      .waitAndTapById("icon-sort")
+      .wait(500)
+      .waitAndTapByText("Date edited")
+      .pressBack()
+      .waitAndTapById(notesnook.listitem.menu)
+      .run();
   });
 
   it("Disable grouping", async () => {
-    await Tests.prepare();
-    await Tests.createNote("Note 1", "Note 1");
-    await sortBy("None");
-    await Tests.fromText("ALL").isVisible();
+    await TestBuilder.create()
+      .prepare()
+      .createNote("Note 1", "Note 1")
+      .waitAndTapById("icon-sort")
+      .wait(500)
+      .waitAndTapByText("None")
+      .pressBack()
+      .isVisibleByText("ALL")
+      .run();
   });
 
   it("Group by Abc", async () => {
-    await Tests.prepare();
-    await Tests.createNote("Note 1", "Note 1");
-    await sortBy("Abc");
-    await Tests.fromText("N").isVisible();
+    await TestBuilder.create()
+      .prepare()
+      .createNote("Note 1", "Note 1")
+      .waitAndTapById("icon-sort")
+      .wait(500)
+      .waitAndTapByText("Abc")
+      .pressBack()
+      .isVisibleByText("N")
+      .run();
   });
 
   it("Group by Year", async () => {
-    await Tests.prepare();
-    await Tests.createNote("Note 1", "Note 1");
-    await sortBy("Year");
+    await TestBuilder.create()
+      .prepare()
+      .createNote("Note 1", "Note 1")
+      .waitAndTapById("icon-sort")
+      .wait(500)
+      .waitAndTapByText("Year")
+      .run();
   });
 
   it("Group by Week", async () => {
-    await Tests.prepare();
-    await Tests.createNote("Note 1", "Note 1");
-    await sortBy("Week");
+    await TestBuilder.create()
+      .prepare()
+      .createNote("Note 1", "Note 1")
+      .waitAndTapById("icon-sort")
+      .wait(500)
+      .waitAndTapByText("Week")
+      .run();
   });
 
   it("Group by Month", async () => {
-    await Tests.prepare();
-    await Tests.createNote("Note 1", "Note 1");
-    await sortBy("Month");
+    await TestBuilder.create()
+      .prepare()
+      .createNote("Note 1", "Note 1")
+      .waitAndTapById("icon-sort")
+      .wait(500)
+      .waitAndTapByText("Month")
+      .run();
   });
 
   it("Compact mode", async () => {
-    await Tests.prepare();
-    await Tests.createNote("Note 1", "Note 1");
-    await Tests.fromId("icon-compact-mode").waitAndTap();
-    await Tests.fromText("Note 1").isNotVisible();
-    await Tests.fromId("icon-compact-mode").waitAndTap();
-    await Tests.fromText("Note 1").isVisible();
+    await TestBuilder.create()
+      .prepare()
+      .createNote("Note 1", "Note 1")
+      .waitAndTapById("icon-compact-mode")
+      .isNotVisibleByText("Note 1")
+      .waitAndTapById("icon-compact-mode")
+      .isVisibleByText("Note 1")
+      .run();
   });
 });

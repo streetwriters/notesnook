@@ -17,15 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Tests } from "./utils";
+import { TestBuilder } from "./utils";
 
 describe("Search", () => {
   it("Search for a note", async () => {
-    await Tests.prepare();
-    let note = await Tests.createNote();
-    await Tests.fromId("search-header").waitAndTap();
-    await Tests.fromId("search-input").element.typeText("Test");
-    await Tests.sleep(1000);
-    await Tests.fromText("1").isVisible();
+    await TestBuilder.create()
+      .prepare()
+      .createNote()
+      .waitAndTapById("search-header")
+      .typeTextById("search-input", "Test")
+      .wait(1000)
+      .isVisibleByText("1")
+      .run();
   });
 });
