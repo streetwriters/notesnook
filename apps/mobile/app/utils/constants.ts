@@ -71,6 +71,7 @@ export function planToDisplayName(plan: SubscriptionPlan): string {
       return strings.freePlan();
     case SubscriptionPlan.ESSENTIAL:
       return strings.essentialPlan();
+    case SubscriptionPlan.LEGACY_PRO:
     case SubscriptionPlan.PRO:
       return strings.proPlan();
     case SubscriptionPlan.BELIEVER:
