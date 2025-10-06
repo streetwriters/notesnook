@@ -87,6 +87,8 @@ export async function scheduleFullBackups() {
 }
 
 export async function shouldAddAutoBackupsDisabledNotice() {
+  if (isIgnored("autoBackupsOff")) return false;
+
   const user = await db.user.getUser();
   if (!user) return false;
 
