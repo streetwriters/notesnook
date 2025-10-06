@@ -1,0 +1,5 @@
+- We have launches new pricing plans, Essential, Pro and Believer
+- Free users can now upload attachments and create private vault
+- Minor bug fixes and improvements
+
+Thank you for using Notesnook!
