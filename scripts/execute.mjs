@@ -55,8 +55,8 @@ const rootPkg = readJson(path.join(root, "package.json"));
 const config = rootPkg.taskRunner || { projects: ["packages/*"], tasks: [] };
 const cachePath = path.join(root, ".taskcache");
 const [project, ...taskParts] = args.all
-  ? [null, ...args._.at(-1).split(":")]
-  : args._.at(-1).split(":");
+  ? [null, ...args._[0].split(":")]
+  : args._[0].split(":");
 const cmd = taskParts.join(":");
 const pkgCache = new Map();
 const depMemo = new Map();
@@ -166,7 +166,7 @@ async function runScript(command, pkg, opts) {
   try {
     await new Promise((resolve, reject) => {
       const verbose = opts.verbose || isVerbose;
-      const child = spawn("npm", ["run", command], {
+      const child = spawn("npm", ["run", command, ...(opts.args || [])], {
         cwd: pkg,
         stdio: verbose ? "inherit" : "pipe",
         shell: true
@@ -362,5 +362,5 @@ if (args.all) {
   await writeFile(tmp, JSON.stringify(cache));
   await rename(tmp, cachePath);
   console.timeEnd("Ready in");
-  await runScript(cmd, pkg.path, { verbose: true });
+  await runScript(cmd, pkg.path, { verbose: true, args: args._.slice(1) });
 }
