@@ -160,6 +160,14 @@ export class NNStorage implements IStorage {
     return NNCrypto.decryptMulti(key, items, "text");
   }
 
+  decryptAsymmetric(
+    keyPair: { publicKey: string; privateKey: string },
+    cipherData: Cipher<"base64">
+  ): Promise<string> {
+    cipherData.format = "base64";
+    return NNCrypto.decryptAsymmetric(keyPair, cipherData, "base64");
+  }
+
   /**
    * @deprecated
    */

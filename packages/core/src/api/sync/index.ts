@@ -49,6 +49,7 @@ import {
 import {
   SYNC_COLLECTIONS_MAP,
   SyncableItemType,
+  SyncInboxItem,
   SyncTransferItem
 } from "./types.js";
 import { DownloadableFile } from "../../database/fs.js";
@@ -233,7 +234,7 @@ class Sync {
   async fetch(deviceId: string, options: SyncOptions) {
     await this.checkConnection();
 
-    await this.connection?.invoke("RequestFetchV2", deviceId);
+    await this.connection?.invoke("RequestFetchV3", deviceId);
 
     if (this.conflictedNoteIds.length > 0) {
       await this.db
@@ -478,6 +479,19 @@ class Sync {
 
       return true;
     });
+
+    this.connection.on(
+      "SendInboxItems",
+      async (inboxItems: SyncInboxItem[]) => {
+        if (this.connection?.state !== HubConnectionState.Connected) {
+          return false;
+        }
+
+        await this.handleInboxItems(inboxItems);
+
+        return true;
+      }
+    );
   }
 
   private async getKey() {
@@ -515,6 +529,98 @@ class Sync {
         }
       }
     });
+  }
+
+  private async handleInboxItems(inboxItems: SyncInboxItem[]) {
+    for (const item of inboxItems) {
+      try {
+        if (await this.db.notes.exists(item.id)) {
+          this.logger.info("Inbox item already exists, skipping.", {
+            inboxItemId: item.id
+          });
+          continue;
+        }
+
+        const inboxKeys = await this.db.user.getInboxKeys();
+        if (!inboxKeys) continue;
+
+        const decryptedKey = await this.db.storage().decryptAsymmetric(
+          {
+            publicKey: inboxKeys.publicKey,
+            privateKey: inboxKeys.privateKey
+          },
+          {
+            alg: item.key.alg,
+            iv: "",
+            cipher: item.key.cipher,
+            format: "base64",
+            length: item.key.length,
+            salt: ""
+          }
+        );
+        const decryptedItem = await this.db.storage().decrypt(
+          { key: decryptedKey },
+          {
+            alg: item.alg,
+            iv: item.iv,
+            cipher: item.cipher,
+            format: "base64",
+            length: item.length,
+            salt: ""
+          }
+        );
+        const parsed = JSON.parse(decryptedItem) as {
+          title: string;
+          pinned?: boolean;
+          favorite?: boolean;
+          readonly?: boolean;
+          archived?: boolean;
+          notebookIds?: string[];
+          tagIds?: string[];
+          type: "note";
+          source: string;
+          version: 1;
+          content?: {
+            type: "html";
+            data: string;
+          };
+        };
+        if (parsed.type !== "note") {
+          continue;
+        }
+
+        await this.db.notes.add({
+          id: item.id,
+          title: parsed.title,
+          favorite: parsed.favorite,
+          pinned: parsed.pinned,
+          readonly: parsed.readonly,
+          content: {
+            data: parsed?.content?.data ?? "",
+            type: "tiptap"
+          }
+        });
+        if (parsed.archived !== undefined) {
+          await this.db.notes.archive(parsed.archived, item.id);
+        }
+        for (const notebookId of parsed.notebookIds || []) {
+          if (!(await this.db.notebooks.exists(notebookId))) continue;
+          await this.db.notes.addToNotebook(notebookId, item.id);
+        }
+        for (const tagId of parsed.tagIds || []) {
+          if (!(await this.db.tags.exists(tagId))) continue;
+          await this.db.relations.add(
+            { type: "tag", id: tagId },
+            { type: "note", id: item.id }
+          );
+        }
+      } catch (e) {
+        this.logger.error(e, "Failed to process inbox item.", {
+          inboxItem: item
+        });
+        continue;
+      }
+    }
   }
 }
 

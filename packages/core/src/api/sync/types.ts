@@ -48,3 +48,7 @@ export type SyncTransferItem = {
   items: SyncItem[];
   type: SyncableItemType;
 };
+
+export type SyncInboxItem = Omit<SyncItem, "format" | "salt"> & {
+  key: Omit<Cipher<"base64">, "format" | "salt" | "iv">;
+};

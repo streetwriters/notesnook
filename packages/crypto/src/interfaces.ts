@@ -61,6 +61,12 @@ export interface INNCrypto {
     outputFormat?: TOutputFormat
   ): Promise<Output<TOutputFormat>[]>;
 
+  decryptAsymmetric<TOutputFormat extends DataFormat>(
+    keyPair: { publicKey: string; privateKey: string },
+    cipherData: Cipher<DataFormat>,
+    outputFormat?: TOutputFormat
+  ): Promise<Output<TOutputFormat>>;
+
   hash(password: string, salt: string): Promise<string>;
 
   deriveKey(password: string, salt?: string): Promise<EncryptionKey>;

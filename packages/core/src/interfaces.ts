@@ -62,6 +62,10 @@ export interface IStorage {
     key: SerializedKey,
     items: Cipher<"base64">[]
   ): Promise<string[]>;
+  decryptAsymmetric(
+    keyPair: { publicKey: string; privateKey: string },
+    cipherData: Cipher<"base64">
+  ): Promise<string>;
   deriveCryptoKey(credentials: SerializedKey): Promise<void>;
   hash(
     password: string,

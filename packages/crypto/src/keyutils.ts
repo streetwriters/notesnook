@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ISodium } from "@notesnook/sodium";
+import { base64_variants, ISodium } from "@notesnook/sodium";
 import {
   EncryptionKey,
   EncryptionKeyPair,
@@ -92,6 +92,11 @@ export default class KeyUtils {
       return this.deriveKey(sodium, password, salt);
     } else if ("key" in input && !!input.salt && !!input.key) {
       return { key: sodium.from_base64(input.key), salt: input.salt };
+    } else if ("key" in input && !!input.key) {
+      return {
+        key: sodium.from_base64(input.key, base64_variants.URLSAFE_NO_PADDING),
+        salt: ""
+      };
     }
     throw new Error("Invalid input.");
   }

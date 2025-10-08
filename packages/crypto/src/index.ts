@@ -96,6 +96,20 @@ export class NNCrypto implements INNCrypto {
     return decryptedItems;
   }
 
+  async decryptAsymmetric<TOutputFormat extends DataFormat>(
+    keyPair: { publicKey: string; privateKey: string },
+    cipherData: Cipher<DataFormat>,
+    outputFormat: TOutputFormat = "text" as TOutputFormat
+  ): Promise<Output<TOutputFormat>> {
+    await this.init();
+    return Decryption.decryptAsymmetric(
+      this.sodium,
+      keyPair,
+      cipherData,
+      outputFormat
+    );
+  }
+
   async hash(password: string, salt: string): Promise<string> {
     await this.init();
     return Password.hash(this.sodium, password, salt);

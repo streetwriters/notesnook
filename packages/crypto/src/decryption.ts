@@ -55,7 +55,6 @@ export default class Decryption {
   ): Output<TOutputFormat> {
     if (!key.salt && cipherData.salt) key.salt = cipherData.salt;
     const encryptionKey = KeyUtils.transform(sodium, key);
-
     const input = this.transformInput(sodium, cipherData);
     const plaintext = sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
       null,
@@ -68,6 +67,28 @@ export default class Decryption {
     return (
       outputFormat === "base64"
         ? sodium.to_base64(plaintext, base64_variants.ORIGINAL)
+        : outputFormat === "text"
+        ? sodium.to_string(plaintext)
+        : plaintext
+    ) as Output<TOutputFormat>;
+  }
+
+  static decryptAsymmetric<TOutputFormat extends DataFormat>(
+    sodium: ISodium,
+    keyPair: { publicKey: string; privateKey: string },
+    cipherData: Cipher<DataFormat>,
+    outputFormat: TOutputFormat = "text" as TOutputFormat
+  ): Output<TOutputFormat> {
+    const input = this.transformInput(sodium, cipherData);
+    const plaintext = sodium.crypto_box_seal_open(
+      input,
+      sodium.from_base64(keyPair.publicKey),
+      sodium.from_base64(keyPair.privateKey)
+    );
+
+    return (
+      outputFormat === "base64"
+        ? sodium.to_base64(plaintext, base64_variants.URLSAFE_NO_PADDING)
         : outputFormat === "text"
         ? sodium.to_string(plaintext)
         : plaintext
