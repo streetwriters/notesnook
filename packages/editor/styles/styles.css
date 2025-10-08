@@ -714,6 +714,7 @@ p > *::selection {
 
   transform: rotate(0);
   transition: transform 250ms ease;
+  opacity: 1;
 }
 
 .ProseMirror div.callout > :first-child[dir="rtl"]::after {
@@ -798,6 +799,154 @@ del.diffdel {
 
 del.diffdel {
   text-decoration: none;
+}
+
+.ProseMirror h1,
+.ProseMirror h2,
+.ProseMirror h3,
+.ProseMirror h4,
+.ProseMirror h5,
+.ProseMirror h6 {
+  position: relative;
+}
+
+.ProseMirror h1::before,
+.ProseMirror h2::before,
+.ProseMirror h3::before,
+.ProseMirror h4::before,
+.ProseMirror h5::before,
+.ProseMirror h6::before {
+  position: absolute;
+  cursor: pointer;
+  content: "";
+  background-size: 18px;
+  width: 18px;
+  height: 18px;
+
+  background-color: var(--icon);
+  mask: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9IiM4ODg4ODgiIGQ9Ik03LjQxIDguNThMMTIgMTMuMTdsNC41OS00LjU5TDE4IDEwbC02IDZsLTYtNmwxLjQxLTEuNDJaIi8+PC9zdmc+)
+    no-repeat 50% 50%;
+  mask-size: cover;
+  border: 1px solid var(--background);
+
+  transform: rotate(0);
+  transition: transform 250ms ease, opacity 200ms ease;
+  left: -22px;
+  opacity: 0;
+}
+
+.ProseMirror h1[dir="rtl"]::before,
+.ProseMirror h2[dir="rtl"]::before,
+.ProseMirror h3[dir="rtl"]::before,
+.ProseMirror h4[dir="rtl"]::before,
+.ProseMirror h5[dir="rtl"]::before,
+.ProseMirror h6[dir="rtl"]::before {
+  display: none;
+}
+
+.ProseMirror h1[dir="rtl"]::after,
+.ProseMirror h2[dir="rtl"]::after,
+.ProseMirror h3[dir="rtl"]::after,
+.ProseMirror h4[dir="rtl"]::after,
+.ProseMirror h5[dir="rtl"]::after,
+.ProseMirror h6[dir="rtl"]::after {
+  position: absolute;
+  cursor: pointer;
+  content: "";
+  background-size: 18px;
+  width: 18px;
+  height: 18px;
+
+  background-color: var(--icon);
+  mask: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9IiM4ODg4ODgiIGQ9Ik03LjQxIDguNThMMTIgMTMuMTdsNC41OS00LjU5TDE4IDEwbC02IDZsLTYtNmwxLjQxLTEuNDJaIi8+PC9zdmc+)
+    no-repeat 50% 50%;
+  mask-size: cover;
+  border: 1px solid var(--background);
+
+  transform: rotate(0deg);
+  transition: transform 250ms ease, opacity 200ms ease;
+  right: -22px;
+  opacity: 0;
+}
+
+.ProseMirror h1::before,
+.ProseMirror h1::after {
+  top: 8px;
+}
+
+.ProseMirror h2::before,
+.ProseMirror h2::after
+ {
+  top: 3px;
+}
+
+.ProseMirror h3::before,
+.ProseMirror h3::after {
+  top: 0px;
+}
+
+.ProseMirror h4::before,
+.ProseMirror h4::after {
+  top: -1px; 
+}
+
+.ProseMirror h5::before,
+.ProseMirror h5::after {
+  top: -2px; 
+}
+
+.ProseMirror h6::before,
+.ProseMirror h6::after {
+  top: -4px; 
+}
+
+.ProseMirror h1[data-collapsed="true"]::before,
+.ProseMirror h2[data-collapsed="true"]::before,
+.ProseMirror h3[data-collapsed="true"]::before,
+.ProseMirror h4[data-collapsed="true"]::before,
+.ProseMirror h5[data-collapsed="true"]::before,
+.ProseMirror h6[data-collapsed="true"]::before {
+  transform: rotate(-90deg);
+  opacity: 1;
+}
+
+.ProseMirror h1[data-collapsed="true"]::after,
+.ProseMirror h2[data-collapsed="true"]::after,
+.ProseMirror h3[data-collapsed="true"]::after,
+.ProseMirror h4[data-collapsed="true"]::after,
+.ProseMirror h5[data-collapsed="true"]::after,
+.ProseMirror h6[data-collapsed="true"]::after {
+  transform: rotate(90deg);
+  opacity: 1;
+}
+
+
+.ProseMirror h1:hover::before,
+.ProseMirror h2:hover::before,
+.ProseMirror h3:hover::before,
+.ProseMirror h4:hover::before,
+.ProseMirror h5:hover::before,
+.ProseMirror h6:hover::before,
+.ProseMirror h1:hover::after,
+.ProseMirror h2:hover::after,
+.ProseMirror h3:hover::after,
+.ProseMirror h4:hover::after,
+.ProseMirror h5:hover::after,
+.ProseMirror h6:hover::after {
+  opacity: 1;
+}
+
+.ProseMirror div.callout h1::before,
+.ProseMirror div.callout h2::before,
+.ProseMirror div.callout h3::before,
+.ProseMirror div.callout h4::before,
+.ProseMirror div.callout h5::before,
+.ProseMirror div.callout h6::before {
+  display: none;
+}
+
+[data-hidden-under] {
+  display: none !important;
 }
 
 /* simplebar */

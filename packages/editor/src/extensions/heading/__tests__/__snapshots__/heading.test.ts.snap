@@ -1,0 +1,5 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`collapse heading > heading collapsed 1`] = `"<h1 data-collapsed="true">Main Heading</h1><p>paragraph.</p><h2>Subheading</h2><p>subheading paragraph</p><h1>Main heading 2</h1><p>paragraph another</p>"`;
+
+exports[`collapse heading > heading uncollapsed 1`] = `"<h1>Main Heading</h1><p>paragraph.</p><h2>Subheading</h2><p>subheading paragraph</p><h1>Main heading 2</h1><p>paragraph another</p>"`;
