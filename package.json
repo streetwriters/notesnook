@@ -5,7 +5,7 @@
     "prepare": "husky install && npm run bootstrap",
     "bootstrap": "node scripts/bootstrap.mjs",
     "clean": "node scripts/clean.mjs",
-    "build": "npm run tx -- build --all --exclude=mobile,web,editor-mobile,monograph,theme-builder",
+    "build": "npm run tx -- build --all --exclude=mobile,web,monograph,theme-builder,vericrypt",
     "build:web": "npm run tx web:build",
     "build:vericrypt": "npm run tx vericrypt:build",
     "build:test:web": "npm run tx web:build:test",
