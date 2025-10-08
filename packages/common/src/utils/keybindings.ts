@@ -222,7 +222,7 @@ export const tiptapKeys = {
     type: "tiptap"
   },
   insertParagraph: {
-    keys: "Mod-Shift-0",
+    keys: "Mod-Alt-0",
     description: "Insert paragraph",
     category: "Editor",
     type: "tiptap"
