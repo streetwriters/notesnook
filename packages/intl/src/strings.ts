@@ -243,8 +243,8 @@ export const strings = {
     collection: string;
     current: number;
   }) =>
-    t`Migrating ${progress ? `${progress?.collection}` : null} ${
-      progress ? `(${progress.current}/${progress.total}) ` : null
+    t`Migrating ${progress ? `${progress?.collection}` : ""} ${
+      progress ? `(${progress.current}/${progress.total}) ` : ""
     }... please wait`,
   migrationError: () =>
     t`An error occurred while migrating your data. You can logout of your account and try to relogin. However this is not recommended as it may result in some data loss if your data was not synced.`,
@@ -1791,7 +1791,7 @@ For example:
   ],
   shareWithFriendsDesc: () => t`Because where's the fun in nookin' alone?`,
   notebooksAllCaps: () => t`NOTEBOOKS`,
-  authenticatedAs: (email?: string) => t`Authenticated as ${email}`,
+  authenticatedAs: (email: string) => t`Authenticated as ${email}`,
   rememberedYourPassword: () => t`Remembered your password?`,
   chooseRecoveryMethod: () => t`Choose a recovery method`,
   chooseRecoveryMethodDesc: () => t`How do you want to recover your account?`,

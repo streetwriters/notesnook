@@ -68,20 +68,23 @@ test("editing the same note should create multiple history sessions", () =>
 
 test("restoring an old session should replace note's content", () =>
   noteTest({ ...TEST_NOTE, sessionId: Date.now() }).then(async ({ db, id }) => {
+    await delay(1000);
     let editedContent = {
       data: TEST_NOTE.content.data + "<p>Some new content</p>",
       type: "tiptap"
     };
 
+    const sessionId = `${Date.now() + 10000}`;
     await db.notes.add({
       id: id,
       content: editedContent,
-      sessionId: Date.now() + 10000
+      sessionId
     });
 
     const [, firstVersion] = await db.noteHistory
       .get(id)
       .items(undefined, { sortBy: "dateModified", sortDirection: "desc" });
+    expect(firstVersion.id).not.toBe(`${id}_${sessionId}`);
     await db.noteHistory.restore(firstVersion.id);
 
     const contentId = (await db.notes.note(id)).contentId;
@@ -138,15 +141,17 @@ test("return empty array if no history available", () =>
 
 test("auto clear sessions if they exceed the limit", () =>
   noteTest({ ...TEST_NOTE, sessionId: Date.now() }).then(async ({ db, id }) => {
+    await delay(1000);
     let editedContent = {
       data: TEST_NOTE.content.data + "<p>Some new content</p>",
       type: "tiptap"
     };
 
+    const sessionId = `${Date.now() + 10000}`;
     await db.notes.add({
       id: id,
       content: editedContent,
-      sessionId: `${Date.now() + 10000}`
+      sessionId
     });
 
     expect(await db.noteHistory.get(id).count()).toBe(2);
@@ -157,6 +162,7 @@ test("auto clear sessions if they exceed the limit", () =>
     expect(sessions).toHaveLength(1);
 
     const content = await db.noteHistory.content(sessions[0].id);
+    expect(sessions[0].id).toBe(`${id}_${sessionId}`);
     expect(content.data).toBe(editedContent.data);
   }));
 
