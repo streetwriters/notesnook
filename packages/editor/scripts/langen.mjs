@@ -23,15 +23,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 import fs from "fs";
+import { readFile } from "fs/promises";
 import path from "path";
 
 export async function langen(rootDirectory) {
-  const response = await fetch(
-    "https://github.com/PrismJS/prism/raw/master/components.json"
+  const json = JSON.parse(
+    await readFile(
+      path.join(rootDirectory, "node_modules", "prismjs", "components.json"),
+      "utf-8"
+    )
   );
-  if (!response.ok) return {};
-
-  const json = await response.json();
   let languages = [];
   for (const key in json.languages) {
     if (key === "meta") continue;

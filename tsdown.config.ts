@@ -17,15 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const path = require("path");
-module.exports = {
-  entry: ["./dist/index.global.js"],
-  mode: "production",
-  output: {
-    filename: "clipper.bundle.js",
-    path: path.resolve(
-      __dirname,
-      "../../apps/mobile/native/ios/extension.bundle"
-    )
+import { defineConfig } from "tsdown";
+
+export default defineConfig({
+  format: ["cjs", "esm"],
+  dts: {
+    tsgo: true
   }
-};
+});

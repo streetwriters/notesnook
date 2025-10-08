@@ -3775,8 +3775,8 @@ msgstr ""
 msgid "Merge cells"
 msgstr ""
 
-#. placeholder {0}: progress ? `${progress?.collection}` : null
-#. placeholder {1}: progress ? `(${progress.current}/${progress.total}) ` : null
+#. placeholder {0}: progress ? `${progress?.collection}` : ""
+#. placeholder {1}: progress ? `(${progress.current}/${progress.total}) ` : ""
 #: src/strings.ts:246
 msgid "Migrating {0} {1}... please wait"
 msgstr ""
