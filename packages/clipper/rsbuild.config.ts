@@ -17,12 +17,27 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { defineConfig } from "tsup";
+import { defineConfig } from "@rsbuild/core";
+import path from "path";
 
 export default defineConfig({
-  clean: true,
-  cjsInterop: true,
-  dts: true,
-  splitting: false,
-  format: ["cjs", "esm"]
+  source: {
+    entry: {
+      global: "./dist/index.global.js"
+    }
+  },
+  mode: "production",
+  output: {
+    target: "node",
+    cleanDistPath: false,
+    filename: {
+      js: "clipper.bundle.js"
+    },
+    distPath: {
+      root: path.resolve(
+        __dirname,
+        "../../apps/mobile/native/ios/extension.bundle"
+      )
+    }
+  }
 });

@@ -36,7 +36,7 @@
     "postbuild": "node scripts/postbuild.mjs",
     "prepublishOnly": "npm run build && npm run test",
     "postinstall": "patch-package",
-    "build": "tsup-node src/browser.ts src/node.ts",
+    "build": "tsdown src/browser.ts src/node.ts",
     "watch": "npm run build -- --watch"
   },
   "license": "GPL-3.0-or-later",

@@ -23,7 +23,7 @@ import {
   NotebookReference,
   Server,
   Clip
-} from "@notesnook/web-clipper/dist/common/bridge";
+} from "@notesnook/web-clipper/common/bridge.js";
 import { store as appstore } from "../stores/app-store";
 import { h } from "./html";
 import { sanitizeFilename } from "@notesnook/common";

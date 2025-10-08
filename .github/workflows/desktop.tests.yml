@@ -38,7 +38,7 @@ jobs:
           echo "NX_CLOUD_ACCESS_TOKEN=${{ secrets.NX_CLOUD_ACCESS_TOKEN }}" >> $GITHUB_ENV
 
       - name: Generate desktop build
-        run: npx nx build:desktop @notesnook/web
+        run: npm run tx @notesnook/web:build:desktop
 
       - name: Archive build artifact
         uses: actions/upload-artifact@v4
@@ -70,7 +70,7 @@ jobs:
           npm run bootstrap -- --scope=desktop
 
       - name: Build Electron wrapper
-        run: npx nx run release --project @notesnook/desktop
+        run: npm run tx @notesnook/desktop:release
         working-directory: ./apps/desktop
 
       - name: Build app
@@ -114,7 +114,7 @@ jobs:
           npm run bootstrap -- --scope=desktop
 
       - name: Build Electron wrapper
-        run: npx nx run release --project @notesnook/desktop
+        run: npm run tx @notesnook/desktop:release
         working-directory: ./apps/desktop
 
       - name: Build app
@@ -164,7 +164,7 @@ jobs:
         working-directory: ./apps/desktop
 
       - name: Build Electron wrapper
-        run: npx nx run release --project @notesnook/desktop
+        run: npm run tx @notesnook/desktop:release
         working-directory: ./apps/desktop
 
       - name: Build app
