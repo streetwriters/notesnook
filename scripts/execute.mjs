@@ -27,7 +27,6 @@ import { createHash } from "crypto";
 
 const args = { _: [], exclude: [], force: false, verbose: false, all: false };
 const shortFlags = { f: "force", v: "verbose", a: "all", e: "exclude" };
-const arrayFlags = { exclude: true };
 for (let i = 2; i < process.argv.length; i++) {
   const arg = process.argv[i];
   if (!arg.startsWith("-")) args._.push(arg);
@@ -35,12 +34,12 @@ for (let i = 2; i < process.argv.length; i++) {
     const isLong = arg.startsWith("--");
     const [key, value] = isLong ? arg.split("=") : [arg[1], null];
     const flag = isLong ? key.slice(2) : shortFlags[key];
-    if (arrayFlags[flag])
+    if (!args[flag]) args._.push(arg);
+    else if (Array.isArray(args[flag]))
       args[flag] = value
         ? value.split(",")
         : process.argv[++i]?.split(",") || [];
-    else if (flag && !!args[flag]) args[flag] = true;
-    else args._.push(arg);
+    else if (flag) args[flag] = true;
   }
 }
 
