@@ -38,10 +38,6 @@ jobs:
           npm ci --ignore-scripts --prefer-offline --no-audit
           npm run bootstrap -- --scope=editor
 
-      - name: Setup environment
-        run: |
-          echo "NX_CLOUD_ACCESS_TOKEN=${{ secrets.NX_CLOUD_ACCESS_TOKEN }}" >> $GITHUB_ENV
-
       - name: Build editor
         run: npm run tx @notesnook/editor:build
 
