@@ -28,6 +28,7 @@ import {
 import { useMemo } from "react";
 import { CodeBlock } from "../../extensions/code-block/index.js";
 import { strings } from "@notesnook/intl";
+import { keybindings } from "@notesnook/common";
 
 const defaultLevels = [1, 2, 3, 4, 5, 6] as const;
 
@@ -70,7 +71,7 @@ function toMenuItems(
     key: `heading-${level}`,
     title: toolbarLocation === "bottom" ? `H${level}` : strings.heading(level),
     isChecked: level === currentHeadingLevel,
-    modifier: `Mod-Alt-${level}`,
+    modifier: keybindings[`insertHeading${level}`].keys,
     onClick: () =>
       editor
         ?.chain()
@@ -84,7 +85,7 @@ function toMenuItems(
     type: "button",
     title: strings.paragraph(),
     isChecked: !currentHeadingLevel,
-    modifier: `Mod-Alt-0`,
+    modifier: keybindings.insertParagraph.keys,
     onClick: () => editor.chain().focus().setParagraph().run()
   };
   return [paragraph, ...menuItems];
