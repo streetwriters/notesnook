@@ -25,7 +25,7 @@ import { fileURLToPath } from "url";
 import { performance } from "perf_hooks";
 import { createHash } from "crypto";
 
-const args = { _: [], exclude: [] };
+const args = { _: [], exclude: [], force: false, verbose: false, all: false };
 const shortFlags = { f: "force", v: "verbose", a: "all", e: "exclude" };
 const arrayFlags = { exclude: true };
 for (let i = 2; i < process.argv.length; i++) {
@@ -39,7 +39,8 @@ for (let i = 2; i < process.argv.length; i++) {
       args[flag] = value
         ? value.split(",")
         : process.argv[++i]?.split(",") || [];
-    else if (flag) args[flag] = true;
+    else if (flag && !!args[flag]) args[flag] = true;
+    else args._.push(arg);
   }
 }
 
@@ -362,5 +363,8 @@ if (args.all) {
   await writeFile(tmp, JSON.stringify(cache));
   await rename(tmp, cachePath);
   console.timeEnd("Ready in");
-  await runScript(cmd, pkg.path, { verbose: true, args: args._.slice(1) });
+  await runScript(cmd, pkg.path, {
+    verbose: true,
+    args: ["--", ...args._.slice(1)]
+  });
 }
