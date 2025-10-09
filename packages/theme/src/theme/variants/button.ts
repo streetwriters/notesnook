@@ -42,21 +42,21 @@ export const createButtonVariant = (
 
   height: "min-content",
   px: 2,
-  py: "7.5px",
+  py: 1,
 
   overflow: "hidden",
   textOverflow: "ellipsis",
   whiteSpace: "nowrap",
 
-  transition: "transform 50ms ease-out",
+  transition: "transform 50ms ease-out, background 100ms ease-out",
   ":hover:not(:disabled):not(:active)": {
     bg: background,
-    filter: "brightness(90%)",
+    // filter: "brightness(90%)",
     ...states?.hover
   },
   ":active:not(:disabled)": {
     bg: background,
-    filter: "brightness(85%)",
+    // filter: "brightness(85%)",
     transform: "scale(0.98) !important",
     ...states?.hover,
     ...states?.active
@@ -70,12 +70,30 @@ export const createButtonVariant = (
   }
 });
 
-const primary = createButtonVariant();
+const primary = createButtonVariant("transparent", "paragraph", {
+  hover: { bg: "hover" },
+  active: { bg: "hover" }
+});
 
 const secondary: ThemeUIStyleObject = createButtonVariant(
   "background-secondary",
-  "paragraph"
+  "paragraph",
+  {
+    hover: { bg: "hover-secondary" },
+    active: { bg: "hover-secondary" }
+  }
 );
+
+const tertiary: ThemeUIStyleObject = {
+  ...createButtonVariant("transparent", "paragraph", {
+    hover: { opacity: 0.8 },
+    active: { opacity: 1 }
+  }),
+  p: 0,
+  m: 0,
+  px: 0,
+  py: 0
+};
 
 const accent = createButtonVariant("accent", "accentForeground", {
   hover: { bg: alpha("accent", 0.9) },
@@ -124,12 +142,14 @@ const menuItem: ThemeUIStyleObject = {
   ...createButtonVariant("transparent", "paragraph", {
     hover: { bg: "hover" }
   }),
+  px: 1,
   borderRadius: 0
 };
 
 export const buttonVariants = {
   primary,
   secondary,
+  tertiary,
 
   accent,
   accentSecondary,

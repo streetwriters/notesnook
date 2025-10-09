@@ -37,7 +37,8 @@ import {
   Attachment,
   getTableOfContents,
   getChangedNodes,
-  LinkAttributes
+  LinkAttributes,
+  type Selection
 } from "@notesnook/editor";
 import { Box, Flex } from "@theme-ui/components";
 import {
@@ -49,9 +50,8 @@ import {
 } from "react";
 import { IEditor, MAX_AUTO_SAVEABLE_WORDS } from "./types";
 import { useEditorConfig, useToolbarConfig, useEditorManager } from "./manager";
-import { useIsUserPremium } from "../../hooks/use-is-user-premium";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
-import { debounce } from "@notesnook/common";
+import { debounce, useAreFeaturesAvailable } from "@notesnook/common";
 import { ScopedThemeProvider } from "../theme-provider";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { writeToClipboard } from "../../utils/clipboard";
@@ -61,9 +61,10 @@ import Skeleton from "react-loading-skeleton";
 import useMobile from "../../hooks/use-mobile";
 import useTablet from "../../hooks/use-tablet";
 import { TimeFormat } from "@notesnook/core";
-import { BuyDialog } from "../../dialogs/buy-dialog";
 import { EDITOR_ZOOM } from "./common";
 import { ScrollContainer } from "@notesnook/ui";
+import { showFeatureNotAllowedToast } from "../../common/toasts";
+import { UpgradeDialog } from "../../dialogs/buy-dialog/upgrade-dialog";
 
 export type OnChangeHandler = (
   content: () => string,
@@ -104,21 +105,54 @@ type TipTapProps = {
   dateFormat: string;
   timeFormat: TimeFormat;
   markdownShortcuts: boolean;
+  fontLigatures: boolean;
 };
 
-function updateWordCount(id: string, content: () => Fragment) {
+function countCharacters(text: string) {
+  return text.length;
+}
+
+function countParagraphs(fragment: Fragment) {
+  let count = 0;
+  fragment.nodesBetween(0, fragment.size, (node) => {
+    if (node.type.name === "paragraph") {
+      count++;
+    }
+    return true;
+  });
+  return count;
+}
+
+function countSpaces(text: string) {
+  return (text.match(/ /g) || []).length;
+}
+
+function updateNoteStatistics(id: string, content: () => Fragment) {
   const fragment = content();
+  const documentText = fragment.textBetween(0, fragment.size, "\n", " ");
   useEditorManager.getState().updateEditor(id, {
     statistics: {
       words: {
-        total: countWords(fragment.textBetween(0, fragment.size, "\n", " ")),
+        total: countWords(documentText),
+        selected: 0
+      },
+      characters: {
+        total: countCharacters(removeNewlineCharacters(documentText)),
+        selected: 0
+      },
+      paragraphs: {
+        total: countParagraphs(fragment),
+        selected: 0
+      },
+      spaces: {
+        total: countSpaces(documentText),
         selected: 0
       }
     }
   });
 }
 
-const deferredUpdateWordCount = debounce(updateWordCount, 1000);
+const deferredUpdateNoteStatistics = debounce(updateNoteStatistics, 1000);
 
 function TipTap(props: TipTapProps) {
   const {
@@ -145,19 +179,36 @@ function TipTap(props: TipTapProps) {
     doubleSpacedLines,
     dateFormat,
     timeFormat,
-    markdownShortcuts
+    markdownShortcuts,
+    fontLigatures
   } = props;
 
-  const isUserPremium = useIsUserPremium();
   const autoSave = useRef(true);
   const { toolbarConfig } = useToolbarConfig();
 
+  const features = useAreFeaturesAvailable([
+    "callout",
+    "outlineList",
+    "taskList"
+  ]);
+
   usePermissionHandler({
     claims: {
-      premium: isUserPremium
+      callout: !!features?.callout?.isAllowed,
+      outlineList: !!features?.outlineList?.isAllowed,
+      taskList: !!features?.taskList?.isAllowed
     },
-    onPermissionDenied: (claim) => {
-      if (claim === "premium") BuyDialog.show({});
+    onPermissionDenied: (claim, silent) => {
+      if (silent) {
+        console.log(features, features?.[claim]);
+        if (features?.[claim]) showFeatureNotAllowedToast(features[claim]);
+        return;
+      }
+
+      if (features)
+        UpgradeDialog.show({
+          feature: features[claim]
+        });
     }
   });
 
@@ -193,6 +244,7 @@ function TipTap(props: TipTapProps) {
         }
       },
       enableInputRules: markdownShortcuts,
+      enableFontLigatures: fontLigatures,
       downloadOptions,
       doubleSpacedLines,
       dateFormat,
@@ -219,6 +271,18 @@ function TipTap(props: TipTapProps) {
             words: {
               total: totalWords,
               selected: 0
+            },
+            characters: {
+              total: countCharacters(editor.state.doc.textContent),
+              selected: 0
+            },
+            paragraphs: {
+              total: countParagraphs(editor.state.doc.content),
+              selected: 0
+            },
+            spaces: {
+              total: countSpaces(editor.state.doc.textContent),
+              selected: 0
             }
           },
           tableOfContents: getTableOfContents(editor.view.dom)
@@ -237,7 +301,7 @@ function TipTap(props: TipTapProps) {
 
         onContentChange?.();
 
-        deferredUpdateWordCount(id, () => editor.state.doc.content);
+        deferredUpdateNoteStatistics(id, () => editor.state.doc.content);
 
         const preventSave = transaction?.getMeta("preventSave") as boolean;
         const ignoreEdit = transaction.getMeta("ignoreEdit") as boolean;
@@ -271,22 +335,63 @@ function TipTap(props: TipTapProps) {
         useEditorManager.getState().updateEditor(id, (old) => {
           const oldSelected = old.statistics?.words?.selected;
           const oldWords = old.statistics?.words.total || 0;
-          if (isEmptySelection)
+          const oldParagraphs = old.statistics?.paragraphs.total || 0;
+          const oldSpaces = old.statistics?.spaces.total || 0;
+          const oldCharacters = old.statistics?.characters.total || 0;
+          if (isEmptySelection) {
             return oldSelected
               ? {
-                  statistics: { words: { total: oldWords, selected: 0 } }
+                  statistics: {
+                    words: { total: oldWords, selected: 0 },
+                    characters: {
+                      total: oldCharacters,
+                      selected: 0
+                    },
+                    paragraphs: {
+                      total: oldParagraphs,
+                      selected: 0
+                    },
+                    spaces: {
+                      total: oldSpaces,
+                      selected: 0
+                    }
+                  }
                 }
               : old;
+          }
 
-          const selectedWords = getSelectedWords(
+          const selectedText = editor.state.doc.textBetween(
+            transaction.selection.from,
+            transaction.selection.to,
+            "\n",
+            " "
+          );
+          const selectedWords = countWords(selectedText);
+          const selectedSpaces = countSpaces(selectedText);
+          const selectedParagraphs = getSelectedParagraphs(
             editor as Editor,
             transaction.selection
+          );
+          const selectedCharacters = countCharacters(
+            removeNewlineCharacters(selectedText)
           );
           return {
             statistics: {
               words: {
                 total: oldWords,
                 selected: selectedWords
+              },
+              characters: {
+                total: oldCharacters,
+                selected: selectedCharacters
+              },
+              paragraphs: {
+                total: oldParagraphs,
+                selected: selectedParagraphs
+              },
+              spaces: {
+                total: oldSpaces,
+                selected: selectedSpaces
               }
             }
           };
@@ -297,11 +402,12 @@ function TipTap(props: TipTapProps) {
       previewAttachment: onPreviewAttachment,
       createInternalLink: onInsertInternalLink,
       getAttachmentData: onGetAttachmentData,
-      openLink: (url) => {
+      openLink: (url, openInNewTab) => {
         const link = parseInternalLink(url);
         if (link && link.type === "note") {
           useEditorStore.getState().openSession(link.id, {
-            activeBlockId: link.params?.blockId || undefined
+            activeBlockId: link.params?.blockId || undefined,
+            openInNewTab: openInNewTab
           });
         } else window.open(url, "_blank");
       }
@@ -312,7 +418,8 @@ function TipTap(props: TipTapProps) {
     doubleSpacedLines,
     dateFormat,
     timeFormat,
-    markdownShortcuts
+    markdownShortcuts,
+    fontLigatures
   ]);
 
   const editor = useTiptap(
@@ -373,7 +480,7 @@ function TipTap(props: TipTapProps) {
         <ScrollContainer
           className="toolbarScroll"
           suppressScrollY
-          style={{ display: "flex" }}
+          style={{ display: "flex", overscrollBehavior: "contain" }}
           trackStyle={() => ({
             backgroundColor: "transparent",
             "--ms-track-size": "6px"
@@ -417,6 +524,7 @@ function TiptapWrapper(
       | "dateFormat"
       | "timeFormat"
       | "markdownShortcuts"
+      | "fontLigatures"
     >
   > & {
     isHydrating?: boolean;
@@ -434,6 +542,7 @@ function TiptapWrapper(
   const markdownShortcuts = useSettingsStore(
     (store) => store.markdownShortcuts
   );
+  const fontLigatures = useSettingsStore((store) => store.fontLigatures);
   const containerRef = useRef<HTMLDivElement>(null);
   const editorContainerRef = useRef<HTMLDivElement>();
   const { editorConfig, setEditorConfig } = useEditorConfig();
@@ -508,7 +617,7 @@ function TiptapWrapper(
       }}
     >
       <TipTap
-        key={`tiptap-${props.id}-${doubleSpacedLines}-${dateFormat}-${timeFormat}-${markdownShortcuts}`}
+        key={`tiptap-${props.id}-${doubleSpacedLines}-${dateFormat}-${timeFormat}-${markdownShortcuts}-${fontLigatures}`}
         {...props}
         isMobile={isMobile}
         isTablet={isTablet}
@@ -516,6 +625,7 @@ function TiptapWrapper(
         dateFormat={dateFormat}
         timeFormat={timeFormat}
         markdownShortcuts={markdownShortcuts}
+        fontLigatures={fontLigatures}
         onLoad={(editor) => {
           if (!isHydrating) {
             onLoad?.(editor);
@@ -612,12 +722,17 @@ function toIEditor(editor: Editor): IEditor {
   };
 }
 
-function getSelectedWords(
-  editor: Editor,
-  selection: { from: number; to: number; empty: boolean }
-): number {
-  const selectedText = selection.empty
-    ? ""
-    : editor.state.doc.textBetween(selection.from, selection.to, "\n", " ");
-  return countWords(selectedText);
+function getSelectedParagraphs(editor: Editor, selection: Selection): number {
+  let count = 0;
+  editor.state.doc.nodesBetween(selection.from, selection.to, (node) => {
+    if (node.type.name === "paragraph") {
+      count++;
+    }
+    return true;
+  });
+  return count;
+}
+
+function removeNewlineCharacters(text: string) {
+  return text.replaceAll(/\n/g, "");
 }

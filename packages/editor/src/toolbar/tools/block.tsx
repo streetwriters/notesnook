@@ -30,6 +30,7 @@ import { showPopup } from "../../components/popup-presenter/index.js";
 import { ImageUploadPopup } from "../popups/image-upload.js";
 import { Button } from "../../components/button.js";
 import { strings } from "@notesnook/intl";
+import { keybindings } from "@notesnook/common";
 
 export function InsertBlock(props: ToolProps) {
   const { editor } = props;
@@ -114,7 +115,7 @@ const codeblock = (editor: Editor): MenuItem => ({
   icon: Icons.codeblock,
   isChecked: editor.isActive("codeBlock"),
   onClick: () => editor.chain().focus().toggleCodeBlock().run(),
-  modifier: "Mod-Shift-C"
+  modifier: keybindings.toggleCodeBlock.keys
 });
 
 const blockquote = (editor: Editor): MenuItem => ({
@@ -124,7 +125,7 @@ const blockquote = (editor: Editor): MenuItem => ({
   icon: Icons.blockquote,
   isChecked: editor.isActive("blockQuote"),
   onClick: () => editor.chain().focus().toggleBlockquote().run(),
-  modifier: "Mod-Shift-B"
+  modifier: keybindings.insertBlockquote.keys
 });
 
 const mathblock = (editor: Editor): MenuItem => ({
@@ -134,7 +135,7 @@ const mathblock = (editor: Editor): MenuItem => ({
   icon: Icons.mathBlock,
   isChecked: editor.isActive("mathBlock"),
   onClick: () => editor.chain().focus().insertMathBlock().run(),
-  modifier: "Mod-Shift-M"
+  modifier: keybindings.insertMathBlock.keys
 });
 
 const callout = (editor: Editor): MenuItem => ({
@@ -181,7 +182,7 @@ const image = (editor: Editor, isMobile: boolean): MenuItem => ({
         title: strings.uploadFromDisk(),
         icon: Icons.upload,
         onClick: () => editor.storage.openAttachmentPicker?.("image"),
-        modifier: "Mod-Shift-I"
+        modifier: keybindings.addImage.keys
       },
       {
         key: "camera",
@@ -284,7 +285,7 @@ const attachment = (editor: Editor): MenuItem => ({
   icon: Icons.attachment,
   isChecked: editor.isActive("attachment"),
   onClick: () => editor.storage.openAttachmentPicker?.("file"),
-  modifier: "Mod-Shift-A"
+  modifier: keybindings.addAttachment.keys
 });
 
 const tasklist = (editor: Editor): MenuItem => ({
@@ -294,7 +295,7 @@ const tasklist = (editor: Editor): MenuItem => ({
   icon: Icons.checkbox,
   isChecked: editor.isActive("taskList"),
   onClick: () => editor.chain().focus().toggleTaskList().run(),
-  modifier: "Mod-Shift-T"
+  modifier: keybindings.toggleTaskList.keys
 });
 
 const outlinelist = (editor: Editor): MenuItem => ({
@@ -304,7 +305,7 @@ const outlinelist = (editor: Editor): MenuItem => ({
   icon: Icons.outlineList,
   isChecked: editor.isActive("outlineList"),
   onClick: () => editor.chain().focus().toggleOutlineList().run(),
-  modifier: "Mod-Shift-O"
+  modifier: keybindings.toggleOutlineList.keys
 });
 
 const uploadImageFromURLMobile = (editor: Editor): MenuItem => ({
@@ -321,12 +322,7 @@ const uploadImageFromURLMobile = (editor: Editor): MenuItem => ({
         component: ({ onClick }) => (
           <ImageUploadPopup
             onInsert={(image) => {
-              editor
-                .requestPermission("insertImage")
-                ?.chain()
-                .focus()
-                .insertImage(image)
-                .run();
+              editor?.chain().focus().insertImage(image).run();
               onClick?.();
             }}
             onClose={() => {
@@ -349,12 +345,7 @@ const uploadImageFromURL = (editor: Editor): MenuItem => ({
       popup: (hide) => (
         <ImageUploadPopup
           onInsert={(image) => {
-            editor
-              .requestPermission("insertImage")
-              ?.chain()
-              .focus()
-              .insertImage(image)
-              .run();
+            editor?.chain().focus().insertImage(image).run();
             hide();
           }}
           onClose={hide}

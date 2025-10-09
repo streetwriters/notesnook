@@ -32,6 +32,7 @@ import { Link as LinkNode } from "../../extensions/link/index.js";
 import { getMarkAttributes } from "@tiptap/core";
 import { useHoverPopupContext } from "../floating-menus/hover-popup/context.js";
 import { strings } from "@notesnook/intl";
+import { find } from "linkifyjs";
 
 export function LinkSettings(props: ToolProps) {
   const { editor } = props;
@@ -69,7 +70,11 @@ export function AddLink(props: ToolProps) {
           editor.state.selection.from,
           editor.state.selection.to
         );
-        return { title: selectedText, href: "" };
+        const href =
+          find(selectedText).find(
+            (item) => item.isLink && item.href === selectedText
+          )?.href ?? "";
+        return { title: selectedText, href };
       }}
     />
   );
@@ -81,7 +86,8 @@ export function AddInternalLink(props: ToolProps) {
 
   return (
     <ToolButton
-      {...props}
+      icon={props.icon}
+      title={props.title}
       disabled={isActive}
       onClick={async () => {
         const link = await editor.storage.createInternalLink?.();
@@ -111,7 +117,8 @@ export function EditLink(props: ToolProps) {
   if (attrs && isInternalLink(attrs.href))
     return (
       <ToolButton
-        {...props}
+        icon={props.icon}
+        title={props.title}
         onClick={async () => {
           hide();
           const link = await editor.storage.createInternalLink?.();
@@ -138,7 +145,9 @@ export function EditLink(props: ToolProps) {
 
   return (
     <LinkTool
-      {...props}
+      editor={props.editor}
+      icon={props.icon}
+      title={props.title}
       isEditing
       onDone={(attributes) => {
         if (selectedNode.current)
@@ -171,7 +180,8 @@ export function RemoveLink(props: ToolProps) {
   if (!editor.isEditable) return null;
   return (
     <ToolButton
-      {...props}
+      icon={props.icon}
+      title={props.title}
       toggled={false}
       onClick={() => {
         if (selectedNode)
@@ -196,6 +206,7 @@ export function OpenLink(props: ToolProps) {
   const link = node ? findMark(node, "link") : null;
   if (!link) return null;
   const href = link?.attrs.href;
+  if (!href) return null;
 
   return (
     <Flex sx={{ alignItems: "center" }}>
@@ -224,7 +235,8 @@ export function OpenLink(props: ToolProps) {
         {href}
       </Link>
       <ToolButton
-        {...props}
+        icon={props.icon}
+        title={props.title}
         toggled={false}
         onClick={() => {
           editor.storage.openLink?.(href);
@@ -245,6 +257,7 @@ export function CopyLink(props: ToolProps) {
   const link = node ? findMark(node, "link") : null;
   if (!link) return null;
   const href = link?.attrs.href;
+  if (!href) return null;
 
   return (
     <ToolButton

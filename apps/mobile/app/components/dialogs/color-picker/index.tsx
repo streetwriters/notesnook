@@ -34,6 +34,7 @@ import { Button } from "../../ui/button";
 import Input from "../../ui/input";
 import { Pressable } from "../../ui/pressable";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 const HEX_COLOR_REGEX_ALPHA =
   /^#(?:(?:[\da-fA-F]{3}){1,2}|(?:[\da-fA-F]{4}){1,2})$/;
@@ -105,16 +106,16 @@ const ColorPicker = ({
 
           <View
             style={{
-              paddingHorizontal: 12
+              paddingHorizontal: DefaultAppStyles.GAP
             }}
           >
             <View
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                paddingTop: 10,
-                columnGap: 10,
-                marginBottom: 10
+                paddingTop: DefaultAppStyles.GAP_VERTICAL,
+                columnGap: DefaultAppStyles.GAP_VERTICAL,
+                marginBottom: DefaultAppStyles.GAP_VERTICAL
               }}
             >
               <Input
@@ -155,7 +156,7 @@ const ColorPicker = ({
             <Button
               title={strings.addColor()}
               style={{
-                marginBottom: 10
+                marginBottom: DefaultAppStyles.GAP_VERTICAL
               }}
               onPress={async () => {
                 if (!selectedColor)

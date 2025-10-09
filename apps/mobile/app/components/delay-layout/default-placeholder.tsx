@@ -23,6 +23,8 @@ import { useMessageStore } from "../../stores/use-message-store";
 import { useThemeColors } from "@notesnook/theme";
 import { ColorValues } from "../../utils/colors";
 import { hexToRGBA } from "../../utils/colors";
+import { defaultBorderRadius } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const DefaultPlaceholder = ({ color }: { color: string }) => {
   const { colors } = useThemeColors();
@@ -40,7 +42,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
     <View
       style={{
         width: "100%",
-        paddingHorizontal: 12
+        paddingHorizontal: DefaultAppStyles.GAP
       }}
     >
       {hasAnnoucements ? (
@@ -51,7 +53,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
             borderRadius: 10,
             marginBottom: 20,
             backgroundColor: colors.secondary.background,
-            padding: 12
+            padding: DefaultAppStyles.GAP
           }}
         >
           <View
@@ -59,7 +61,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
               width: 150,
               height: 20,
               backgroundColor: colors.primary.hover,
-              borderRadius: 5,
+              borderRadius: defaultBorderRadius,
               marginBottom: 10
             }}
           />
@@ -68,7 +70,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
               width: 250,
               height: 14,
               backgroundColor: colors.primary.hover,
-              borderRadius: 5
+              borderRadius: defaultBorderRadius
             }}
           />
 
@@ -78,7 +80,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
               height: 15,
               backgroundColor: shadeColor,
               borderRadius: 3,
-              marginTop: 10
+              marginTop: DefaultAppStyles.GAP_VERTICAL
             }}
           />
         </View>
@@ -93,7 +95,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
             marginBottom: 20,
             flexDirection: "row",
             alignItems: "center",
-            paddingHorizontal: 20
+            paddingHorizontal: DefaultAppStyles.GAP
           }}
         >
           <View
@@ -111,7 +113,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
                 width: 150,
                 height: 12,
                 backgroundColor: colors.secondary.background,
-                borderRadius: 5,
+                borderRadius: defaultBorderRadius,
                 marginBottom: 10
               }}
             />
@@ -120,7 +122,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
                 width: 250,
                 height: 16,
                 backgroundColor: colors.secondary.background,
-                borderRadius: 5
+                borderRadius: defaultBorderRadius
               }}
             />
           </View>
@@ -134,7 +136,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
           backgroundColor: colors.secondary.background,
           borderRadius: 10,
           marginBottom: 20,
-          padding: 5,
+          padding: DefaultAppStyles.GAP_SMALL,
           justifyContent: "space-between",
           flexDirection: "row",
           alignItems: "center"
@@ -179,7 +181,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
           width: 200,
           height: 16,
           backgroundColor: colors.secondary.background,
-          borderRadius: 5
+          borderRadius: defaultBorderRadius
         }}
       />
       <View
@@ -187,15 +189,15 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
           width: "85%",
           height: 13,
           backgroundColor: colors.secondary.background,
-          borderRadius: 5,
-          marginTop: 10
+          borderRadius: defaultBorderRadius,
+          marginTop: DefaultAppStyles.GAP_VERTICAL
         }}
       />
 
       <View
         style={{
           flexDirection: "row",
-          marginTop: 10
+          marginTop: DefaultAppStyles.GAP_VERTICAL
         }}
       >
         <View
@@ -203,7 +205,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
             width: 50,
             height: 10,
             backgroundColor: colors.secondary.background,
-            borderRadius: 5
+            borderRadius: defaultBorderRadius
           }}
         />
         <View
@@ -211,7 +213,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
             width: 60,
             height: 10,
             backgroundColor: colors.secondary.background,
-            borderRadius: 5,
+            borderRadius: defaultBorderRadius,
             marginLeft: 10
           }}
         />

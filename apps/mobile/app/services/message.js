@@ -17,20 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import React from "react";
 import { Platform } from "react-native";
+import { AuthMode } from "../components/auth/common";
+import { Update } from "../components/sheets/update";
 import { verifyUser } from "../screens/settings/functions";
 import { useMessageStore } from "../stores/use-message-store";
-import {
-  eOpenLoginDialog,
-  eOpenRateDialog,
-  eOpenRecoveryKeyDialog
-} from "../utils/events";
+import { eOpenRateDialog, eOpenRecoveryKeyDialog } from "../utils/events";
 import { eSendEvent, presentSheet } from "./event-manager";
+import Navigation from "./navigation";
 import PremiumService from "./premium";
 import SettingsService from "./settings";
-import { Update } from "../components/sheets/update";
-import { strings } from "@notesnook/intl";
 
 const rateAppMessage = {
   visible: true,
@@ -82,7 +80,9 @@ const loginMessage = {
   message: strings.loginMessage(),
   actionText: strings.loginMessageActionText(),
   onPress: () => {
-    eSendEvent(eOpenLoginDialog);
+    Navigation.navigate("Auth", {
+      mode: AuthMode.login
+    });
   },
   data: {},
   icon: "account-outline",

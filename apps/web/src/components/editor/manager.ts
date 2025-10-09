@@ -40,7 +40,7 @@ class EditorManager extends BaseStore<EditorManager> {
   toolbarConfig?: ToolbarDefinition;
   editorConfig: EditorConfig = Config.get("editorConfig", {
     fontFamily: "sans-serif",
-    fontSize: 16,
+    fontSize: 14,
     zoom: EDITOR_ZOOM.DEFAULT
   });
   editors: Record<string, EditorContext> = {};
@@ -119,7 +119,10 @@ export function useNoteStatistics(): NoteStatistics {
     (store) =>
       (store.activeEditorId &&
         store.editors[store.activeEditorId]?.statistics) || {
-        words: { total: 0 }
+        words: { total: 0 },
+        characters: { total: 0 },
+        paragraphs: { total: 0 },
+        spaces: { total: 0 }
       }
   );
 }

@@ -19,7 +19,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { initTRPC } from "@trpc/server";
 import { z } from "zod";
-import { app, dialog, nativeTheme, Notification, shell } from "electron";
+import {
+  app,
+  dialog,
+  Menu,
+  MenuItem,
+  nativeImage,
+  nativeTheme,
+  Notification,
+  shell
+} from "electron";
 import { AutoLaunch } from "../utils/autolaunch";
 import { config, DesktopIntegration } from "../utils/config";
 import { bringToFront } from "../utils/bring-to-front";
@@ -29,10 +38,11 @@ import { dirname } from "path";
 import { resolvePath } from "../utils/resolve-path";
 import { observable } from "@trpc/server/observable";
 import { AssetManager } from "../utils/asset-manager";
-import { isFlatpak } from "../utils";
+import { isFlatpak, isSnap } from "../utils";
 import { setupDesktopIntegration } from "../utils/desktop-integration";
 import { rm } from "fs/promises";
 import { disableCustomDns, enableCustomDns } from "../utils/custom-dns";
+import type { MenuItem as NNMenuItem } from "@notesnook/ui";
 
 const t = initTRPC.create();
 
@@ -49,6 +59,7 @@ const NotificationOptions = z.object({
 
 export const osIntegrationRouter = t.router({
   isFlatpak: t.procedure.query(() => isFlatpak()),
+  isSnap: t.procedure.query(() => isSnap()),
 
   zoomFactor: t.procedure.query(() => config.zoomFactor),
   setZoomFactor: t.procedure.input(z.number()).mutation(({ input: factor }) => {
@@ -224,5 +235,63 @@ export const osIntegrationRouter = t.router({
         nativeTheme.off("updated", updated);
       };
     })
-  )
+  ),
+
+  showMenu: t.procedure
+    .input(
+      z.object({
+        menuItems: z.array(z.any())
+      })
+    )
+    .subscription(({ input: { menuItems } }) =>
+      observable<string[]>((emit) => {
+        const items = menuItems as NNMenuItem[];
+        const menu = new Menu();
+        for (const item of items) {
+          const menuItem = toMenuItem(item, (id) => emit.next(id));
+          if (menuItem) menu.append(menuItem);
+        }
+        if (menu.items.length > 0) menu.popup();
+        return () => {
+          menu.removeAllListeners();
+          menu.closePopup();
+        };
+      })
+    )
 });
+
+function toMenuItem(
+  item: NNMenuItem,
+  onClick: (id: string[]) => void,
+  parentKey?: string
+): MenuItem | undefined {
+  switch (item.type) {
+    case "lazy-loader":
+      return undefined;
+    case "separator":
+      return new MenuItem({ type: "separator" });
+    case "button": {
+      const submenu = item.menu ? new Menu() : undefined;
+      if (submenu && item.menu) {
+        for (const subitem of item.menu.items) {
+          const subMenuItem = toMenuItem(subitem, onClick, item.key);
+          if (subMenuItem) submenu.append(subMenuItem);
+        }
+      }
+
+      return new MenuItem({
+        label: item.title,
+        enabled: !item.isDisabled,
+        visible: !item.isHidden,
+        toolTip: item.tooltip,
+        sublabel: item.tooltip,
+        checked: item.isChecked,
+        type: submenu ? "submenu" : item.isChecked ? "checkbox" : "normal",
+        id: item.key,
+        submenu,
+        click: () => onClick(parentKey ? [parentKey, item.key] : [item.key]),
+        accelerator: item.modifier?.replace("Mod", "CommandOrControl")
+      });
+    }
+  }
+}

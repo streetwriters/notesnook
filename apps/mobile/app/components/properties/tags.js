@@ -17,17 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
+import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { db } from "../../common/database";
+import ManageTags from "../../screens/manage-tags";
 import { TaggedNotes } from "../../screens/notes/tagged";
-import { useThemeColors } from "@notesnook/theme";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 import { sleep } from "../../utils/time";
-import ManageTagsSheet from "../sheets/manage-tags";
 import { Button } from "../ui/button";
 import { ColorTags } from "./color-tags";
-import { strings } from "@notesnook/intl";
 
 export const Tags = ({ item, close }) => {
   const { colors } = useThemeColors();
@@ -35,11 +36,10 @@ export const Tags = ({ item, close }) => {
   return item.id ? (
     <View
       style={{
-        marginTop: 5,
         flexDirection: "row",
         flexWrap: "wrap",
         alignItems: "center",
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         alignSelf: "center",
         justifyContent: "space-between",
         width: "100%"
@@ -47,7 +47,8 @@ export const Tags = ({ item, close }) => {
     >
       <Button
         onPress={async () => {
-          ManageTagsSheet.present([item.id]);
+          ManageTags.present([item.id]);
+          close();
         }}
         buttonType={{
           text: colors.primary.accent
@@ -56,11 +57,10 @@ export const Tags = ({ item, close }) => {
         type="secondary"
         icon="plus"
         iconPosition="right"
-        height={30}
-        fontSize={SIZE.sm - 1}
+        fontSize={AppFontSize.xs}
         style={{
-          height: 35,
-          borderRadius: 100
+          paddingHorizontal: DefaultAppStyles.GAP_SMALL,
+          paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
         }}
       />
       <ColorTags item={item} />
@@ -86,7 +86,6 @@ export const TagStrip = ({ item, close }) => {
         flexDirection: "row",
         flexWrap: "wrap",
         alignItems: "center",
-        marginTop: 10,
         gap: 5
       }}
     >
@@ -107,17 +106,14 @@ const TagItem = ({ tag, close }) => {
 
   const style = {
     paddingHorizontal: 0,
-    borderRadius: 100,
-    marginTop: 0,
-    backgroundColor: "transparent"
+    paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
   };
   return (
     <Button
       onPress={onPress}
       title={"#" + tag.title}
       type="plain"
-      height={20}
-      fontSize={SIZE.xs}
+      fontSize={AppFontSize.xs}
       style={style}
       textStyle={{
         color: colors.secondary.paragraph

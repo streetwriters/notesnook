@@ -24,19 +24,17 @@ import { View } from "react-native";
 import { ScrollView } from "react-native-actions-sheet";
 import { db } from "../../common/database/index";
 import useTimer from "../../hooks/use-timer";
-import {
-  eSendEvent,
-  presentSheet,
-  ToastManager
-} from "../../services/event-manager";
-import { eCloseSheet } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { eSendEvent, ToastManager } from "../../services/event-manager";
+import { eCloseSimpleDialog } from "../../utils/events";
+import { AppFontSize } from "../../utils/size";
 import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
 import Input from "../ui/input";
 import { Pressable } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { DefaultAppStyles } from "../../utils/styles";
+import { presentDialog } from "../dialog/functions";
 
 const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
   const { colors } = useThemeColors();
@@ -45,7 +43,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
     method: mfaInfo?.primaryMethod,
     isPrimary: true
   });
-  const { seconds, start } = useTimer(currentMethod.method);
+  const { seconds, start, reset } = useTimer(currentMethod.method);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef();
   const [sending, setSending] = useState(false);
@@ -61,7 +59,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
       },
       (result) => {
         if (result) {
-          eSendEvent(eCloseSheet, "two_factor_verify");
+          eSendEvent(eCloseSimpleDialog, "two_factor_verify");
         }
         setLoading(false);
       }
@@ -132,6 +130,17 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
     <ScrollView
       keyboardShouldPersistTaps="handled"
       keyboardDismissMode="interactive"
+      style={{
+        width: "100%",
+        height: "100%",
+        backgroundColor: colors.primary.background,
+        paddingTop: 60
+      }}
+      onLayout={() => {
+        setTimeout(() => {
+          inputRef.current?.focus();
+        }, 500);
+      }}
     >
       <View
         style={{
@@ -202,13 +211,15 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
                 code.current = value;
                 //onNext();
               }}
+              cursorColor={colors.selected.accent}
+              selectionHandleColor={colors.selected.accent}
+              selectionColor={colors.selected.accent}
               onSubmitEditing={onNext}
-              caretHidden
+              height={60}
               inputStyle={{
-                fontSize: SIZE.lg,
-                height: 60,
+                fontSize: AppFontSize.lg,
                 textAlign: "center",
-                letterSpacing: 10,
+                letterSpacing: 7,
                 width: 250
               }}
               keyboardType={
@@ -216,10 +227,10 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
               }
               enablesReturnKeyAutomatically
               containerStyle={{
-                height: 60,
-                borderWidth: 0,
-                width: undefined,
                 minWidth: "50%"
+              }}
+              wrapperStyle={{
+                height: 60
               }}
             />
 
@@ -229,9 +240,15 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
               width={250}
               loading={loading}
               onPress={onNext}
-              style={{
-                borderRadius: 100
+            />
+            <Button
+              title={strings.cancel()}
+              type="secondaryAccented"
+              onPress={() => {
+                reset();
+                onCancel();
               }}
+              width={250}
             />
 
             <Button
@@ -240,13 +257,6 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
               ]()}
               type="plain"
               onPress={onRequestSecondaryMethod}
-              height={30}
-            />
-
-            <Button
-              title={strings.cancel()}
-              type="plain"
-              onPress={onCancel}
               height={30}
             />
           </>
@@ -262,8 +272,8 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
                   });
                 }}
                 style={{
-                  paddingHorizontal: 12,
-                  paddingVertical: 12,
+                  paddingHorizontal: DefaultAppStyles.GAP,
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL,
                   marginTop: 0,
                   flexDirection: "row",
                   borderRadius: 0,
@@ -275,8 +285,6 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
                 <IconButton
                   type="secondaryAccented"
                   style={{
-                    width: 40,
-                    height: 40,
                     marginRight: 10
                   }}
                   size={15}
@@ -288,7 +296,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
                     flexShrink: 1
                   }}
                 >
-                  <Paragraph size={SIZE.md}>{item.title}</Paragraph>
+                  <Paragraph size={AppFontSize.md}>{item.title}</Paragraph>
                 </View>
               </Pressable>
             ))}
@@ -300,7 +308,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
 };
 
 TwoFactorVerification.present = (onMfaLogin, data, onCancel, context) => {
-  presentSheet({
+  presentDialog({
     component: () => (
       <TwoFactorVerification
         onMfaLogin={onMfaLogin}
@@ -309,7 +317,9 @@ TwoFactorVerification.present = (onMfaLogin, data, onCancel, context) => {
       />
     ),
     context: context || "two_factor_verify",
-    disableClosing: true
+    disableClosing: true,
+    transparent: false,
+    statusBarTranslucent: true
   });
 };
 

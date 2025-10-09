@@ -24,12 +24,12 @@ import { store as appStore } from "../stores/app-store";
 import { Backup, User, Email, Warn, Icon } from "../components/icons";
 import dayjs from "dayjs";
 import { hardNavigate, hashNavigate } from "../navigation";
-import { isUserPremium } from "../hooks/use-is-user-premium";
 import { showToast } from "../utils/toast";
 import { TaskScheduler } from "../utils/task-scheduler";
 import { BuyDialog } from "../dialogs/buy-dialog";
 import { RecoveryKeyDialog } from "../dialogs/recovery-key-dialog";
 import { strings } from "@notesnook/intl";
+import { SettingsDialog } from "../dialogs/settings";
 
 export type NoticeType = "autoBackupsOff" | "login" | "email" | "recoverykey";
 
@@ -86,14 +86,14 @@ export async function scheduleFullBackups() {
   );
 }
 
-export function shouldAddAutoBackupsDisabledNotice() {
-  const backupInterval = Config.get("backupReminderOffset", 0);
-  if (!isUserPremium() && backupInterval) {
-    Config.set("backupReminderOffset", 0);
-    return true;
-  }
+export async function shouldAddAutoBackupsDisabledNotice() {
+  if (isIgnored("autoBackupsOff")) return false;
 
-  return false;
+  const user = await db.user.getUser();
+  if (!user) return false;
+
+  const backupInterval = Config.get("backupReminderOffset", 0);
+  return backupInterval === 0;
 }
 
 export async function shouldAddBackupNotice() {
@@ -144,7 +144,7 @@ export const NoticesData: Record<NoticeType, NoticeData> = {
     key: "autoBackupsOff",
     title: strings.automaticBackupsDisabled(),
     subtitle: strings.automaticBackupsDisabledDesc(),
-    action: () => BuyDialog.show({}),
+    action: () => SettingsDialog.show({ activeSection: "backup-export" }),
     dismissable: true,
     icon: Backup
   },
@@ -177,7 +177,7 @@ export const NoticesData: Record<NoticeType, NoticeData> = {
 export async function resetNotices() {
   const notices: Notice[] = [];
 
-  if (shouldAddAutoBackupsDisabledNotice()) {
+  if (await shouldAddAutoBackupsDisabledNotice()) {
     notices.push({ type: "autoBackupsOff", priority: 3 });
   }
   if (await shouldAddBackupNotice()) {
@@ -203,7 +203,7 @@ let openedToast: { hide: () => void } | null = null;
 async function saveBackup(mode: "full" | "partial" = "partial") {
   if (IS_DESKTOP_APP) {
     await createBackup({ noVerify: true, mode, background: true });
-  } else if (isUserPremium() && !IS_TESTING) {
+  } else if (!IS_TESTING) {
     if (openedToast !== null) return;
     openedToast = showToast(
       "success",

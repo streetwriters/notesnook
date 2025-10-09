@@ -17,19 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
+import { useThemeColors } from "@notesnook/theme";
 import React, { useState } from "react";
 import { LayoutAnimation, View } from "react-native";
 import { MMKV } from "../../common/database/mmkv";
 import { eSendEvent, presentSheet } from "../../services/event-manager";
-import { useThemeColors } from "@notesnook/theme";
 import { eCloseSheet } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import walkthroughs, { TStep } from "./walkthroughs";
-import { strings } from "@notesnook/intl";
 export const Walkthrough = ({
   steps,
   canSkip = true
@@ -51,13 +52,21 @@ export const Walkthrough = ({
       style={{
         justifyContent: "center",
         alignItems: "center",
-        padding: 12,
-        paddingBottom: 0
+        padding: DefaultAppStyles.GAP,
+        gap: DefaultAppStyles.GAP_VERTICAL
       }}
     >
       {step.walkthroughItem(colors)}
 
-      {step.title ? <Heading>{step.title}</Heading> : null}
+      {step.title ? (
+        <Heading
+          style={{
+            textAlign: "center"
+          }}
+        >
+          {step.title}
+        </Heading>
+      ) : null}
       {step.text ? (
         <Paragraph
           style={{
@@ -65,7 +74,7 @@ export const Walkthrough = ({
             alignSelf: "center",
             maxWidth: "80%"
           }}
-          size={SIZE.md}
+          size={AppFontSize.md}
         >
           {step.text}
         </Paragraph>
@@ -73,8 +82,7 @@ export const Walkthrough = ({
       {step.actionButton && (
         <Button
           style={{
-            height: 30,
-            marginTop: 10
+            height: 30
           }}
           textStyle={{
             textDecorationLine: "underline"
@@ -88,11 +96,6 @@ export const Walkthrough = ({
       )}
 
       <Button
-        style={{
-          borderRadius: 100,
-          height: 40,
-          marginTop: 20
-        }}
         onPress={async () => {
           switch (step.button?.type) {
             case "next":
@@ -113,8 +116,7 @@ export const Walkthrough = ({
       {canSkip ? (
         <Button
           style={{
-            height: 30,
-            marginTop: 10
+            paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
           }}
           textStyle={{
             textDecorationLine: "underline"
@@ -147,18 +149,18 @@ Walkthrough.init = async () => {
 };
 
 Walkthrough.present = async (
-  id: "notebooks" | "trialstarted" | "emailconfirmed" | "prouser",
+  id: "emailconfirmed" | "prouser",
   canSkip = true,
   nopersist?: boolean
 ) => {
-  if (!nopersist) {
-    if (!walkthroughState || Object.keys(walkthroughState).length === 0) {
-      await Walkthrough.init();
-    }
-    if (walkthroughState[id]) return;
-    Walkthrough.update(id);
-  }
-  const walkthrough = walkthroughs[id];
+  // if (!nopersist) {
+  //   if (!walkthroughState || Object.keys(walkthroughState).length === 0) {
+  //     await Walkthrough.init();
+  //   }
+  //   if (walkthroughState[id]) return;
+  //   Walkthrough.update(id);
+  // }
+  const walkthrough = walkthroughs[id]();
   if (!walkthrough) return;
   presentSheet({
     component: <Walkthrough canSkip={canSkip} steps={walkthrough.steps} />,

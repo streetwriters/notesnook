@@ -17,15 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
+import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Dimensions, TextInput, View } from "react-native";
-import {
-  addOrientationListener,
-  removeOrientationListener
-} from "react-native-orientation";
+import Orientation from "react-native-orientation-locker";
 import Pdf from "react-native-pdf";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import { MMKV } from "../../../common/database/mmkv";
 import downloadAttachment from "../../../common/filesystem/download-attachment";
+import { deleteCacheFileByPath, exists } from "../../../common/filesystem/io";
 import { cacheDir } from "../../../common/filesystem/utils";
 import { useAttachmentProgress } from "../../../hooks/use-attachment-progress";
 import useGlobalSafeAreaInsets from "../../../hooks/use-global-safe-area-insets";
@@ -33,8 +33,9 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../../services/event-manager";
-import { useThemeColors } from "@notesnook/theme";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
+import { DefaultAppStyles } from "../../../utils/styles";
+import { sleep } from "../../../utils/time";
 import { Dialog } from "../../dialog";
 import BaseDialog from "../../dialog/base-dialog";
 import { presentDialog } from "../../dialog/functions";
@@ -42,10 +43,6 @@ import SheetProvider from "../../sheet-provider";
 import { IconButton } from "../../ui/icon-button";
 import { ProgressBarComponent } from "../../ui/svg/lazy";
 import Paragraph from "../../ui/typography/paragraph";
-import { sleep } from "../../../utils/time";
-import { MMKV } from "../../../common/database/mmkv";
-import { deleteCacheFileByPath } from "../../../common/filesystem/io";
-import { strings } from "@notesnook/intl";
 
 const WIN_WIDTH = Dimensions.get("window").width;
 const WIN_HEIGHT = Dimensions.get("window").height;
@@ -98,24 +95,28 @@ const PDFPreview = () => {
   };
 
   useEffect(() => {
-    addOrientationListener(onOrientationChange);
+    Orientation.addDeviceOrientationListener(onOrientationChange);
     return () => {
-      removeOrientationListener(onOrientationChange);
+      Orientation.removeDeviceOrientationListener(onOrientationChange);
     };
   }, []);
 
   const open = useCallback(
     async (attachment) => {
       setVisible(true);
-      setLoading(true);
       setTimeout(async () => {
         setAttachment(attachment);
         let hash = attachment.hash;
         if (!hash) return;
+        if (!(await exists(hash))) setLoading(true);
         const uri = await downloadAttachment(hash, false, {
           silent: true,
           cache: true
         });
+        if (!(await exists(hash))) {
+          setVisible(false);
+          return;
+        }
         const path = `${cacheDir}/${uri}`;
         snapshotValue.current = snapshot.current;
         setPDFSource("file://" + path);
@@ -168,8 +169,7 @@ const PDFPreview = () => {
           }}
         >
           {loading ? (
-            <Animated.View
-              exiting={FadeOut}
+            <View
               style={{
                 flex: 1,
                 justifyContent: "center",
@@ -184,13 +184,13 @@ const PDFPreview = () => {
               />
               <Paragraph
                 style={{
-                  marginTop: 10
+                  marginTop: DefaultAppStyles.GAP_VERTICAL
                 }}
                 color={colors.static.white}
               >
                 {strings.loadingWithProgress(progress?.percent)}
               </Paragraph>
-            </Animated.View>
+            </View>
           ) : (
             <>
               <View
@@ -200,7 +200,7 @@ const PDFPreview = () => {
                   marginTop: insets.top,
                   flexDirection: "row",
                   justifyContent: "space-between",
-                  paddingHorizontal: 12,
+                  paddingHorizontal: DefaultAppStyles.GAP,
                   paddingLeft: 6
                 }}
               >
@@ -216,7 +216,7 @@ const PDFPreview = () => {
                     style={{
                       marginRight: 12
                     }}
-                    size={SIZE.xxl}
+                    size={AppFontSize.xxl}
                   />
                 </View>
 
@@ -272,49 +272,42 @@ const PDFPreview = () => {
                 </View>
               </View>
               {pdfSource ? (
-                <Animated.View
-                  style={{
-                    flex: 1
+                <Pdf
+                  source={{
+                    uri: pdfSource
                   }}
-                  entering={FadeIn}
-                >
-                  <Pdf
-                    source={{
-                      uri: pdfSource
-                    }}
-                    ref={pdfRef}
-                    onLoadComplete={(numberOfPages) => {
-                      setNumPages(numberOfPages);
-                    }}
-                    onPageChanged={(page) => {
-                      setCurrentPage(page);
-                      inputRef.current?.setNativeProps({
-                        text: page + ""
-                      });
-                      saveSnapshot({
-                        currentPage: page,
-                        scale: snapshot?.current?.scale
-                      });
-                    }}
-                    // scale={snapshotValue.current?.scale}
-                    // onScaleChanged={(scale) => {
-                    //   saveSnapshot({
-                    //     currentPage: snapshot?.current?.currentPage,
-                    //     scale: scale
-                    //   });
-                    // }}
-                    page={snapshotValue?.current?.currentPage}
-                    password={password}
-                    maxScale={6}
-                    onError={onError}
-                    onPressLink={(uri) => {}}
-                    style={{
-                      flex: 1,
-                      width: width,
-                      height: Dimensions.get("window").height
-                    }}
-                  />
-                </Animated.View>
+                  ref={pdfRef}
+                  onLoadComplete={(numberOfPages) => {
+                    setNumPages(numberOfPages);
+                  }}
+                  onPageChanged={(page) => {
+                    setCurrentPage(page);
+                    inputRef.current?.setNativeProps({
+                      text: page + ""
+                    });
+                    saveSnapshot({
+                      currentPage: page,
+                      scale: snapshot?.current?.scale
+                    });
+                  }}
+                  // scale={snapshotValue.current?.scale}
+                  // onScaleChanged={(scale) => {
+                  //   saveSnapshot({
+                  //     currentPage: snapshot?.current?.currentPage,
+                  //     scale: scale
+                  //   });
+                  // }}
+                  page={snapshotValue?.current?.currentPage}
+                  password={password}
+                  maxScale={6}
+                  onError={onError}
+                  onPressLink={(uri) => {}}
+                  style={{
+                    flex: 1,
+                    width: width,
+                    height: Dimensions.get("window").height
+                  }}
+                />
               ) : null}
             </>
           )}

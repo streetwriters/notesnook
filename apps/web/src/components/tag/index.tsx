@@ -19,38 +19,68 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import ListItem from "../list-item";
 import { navigate } from "../../navigation";
-import { Text } from "@theme-ui/components";
+import { Flex, Text } from "@theme-ui/components";
 import { store as appStore } from "../../stores/app-store";
 import { db } from "../../common/db";
-import { Edit, Shortcut, DeleteForver } from "../icons";
+import { Edit, Shortcut, DeleteForver, Tag as TagIcon } from "../icons";
 import { MenuItem } from "@notesnook/ui";
 import { Tag as TagType } from "@notesnook/core";
 import { handleDrop } from "../../common/drop-handler";
 import { EditTagDialog } from "../../dialogs/item-dialog";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
+import { useStore as useNoteStore } from "../../stores/note-store";
 import { Multiselect } from "../../common/multi-select";
 import { strings } from "@notesnook/intl";
+import {
+  createSetDefaultHomepageMenuItem,
+  withFeatureCheck
+} from "../../common";
+import { areFeaturesAvailable } from "@notesnook/common";
 
 type TagProps = { item: TagType; totalNotes: number };
 function Tag(props: TagProps) {
   const { item, totalNotes } = props;
-  const { id, title } = item;
+  const { id } = item;
+  const currentContext = useNoteStore((store) =>
+    store.context?.type === "tag" && store.context.id === id
+      ? store.contextNotes
+      : null
+  );
+  const isSelected = !!currentContext;
 
   return (
     <ListItem
       item={item}
       isCompact
+      isFocused={isSelected}
+      sx={{
+        borderRadius: "default",
+        mb: "small"
+      }}
       title={
-        <Text as="span" variant="body" data-test-id={`title`}>
-          <Text as="span" sx={{ color: "accent" }}>
-            {"#"}
+        <Flex
+          sx={{ alignItems: "center", justifyContent: "center", gap: "small" }}
+        >
+          <TagIcon size={14} color={isSelected ? "icon-selected" : "icon"} />
+          <Text
+            data-test-id={`title`}
+            variant={"body"}
+            color={isSelected ? "paragraph-selected" : "paragraph"}
+            sx={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              fontWeight: "body",
+              display: "block"
+            }}
+          >
+            {item.title}
           </Text>
-          {title}
-        </Text>
+        </Flex>
       }
       footer={
         <Text mt={1} variant="subBody">
-          {totalNotes}
+          {currentContext?.length || totalNotes}
         </Text>
       }
       onKeyPress={async (e) => {
@@ -58,6 +88,8 @@ function Tag(props: TagProps) {
           await Multiselect.deleteTags(
             useSelectionStore.getState().selectedItems
           );
+        } else if (e.key === "Enter") {
+          navigate(`/tags/${id}`);
         }
       }}
       menuItems={tagMenuItems}
@@ -73,10 +105,16 @@ function Tag(props: TagProps) {
 }
 export default Tag;
 
-export const tagMenuItems: (tag: TagType, ids?: string[]) => MenuItem[] = (
-  tag,
-  ids = []
-) => {
+export const tagMenuItems: (
+  tag: TagType,
+  ids?: string[]
+) => Promise<MenuItem[]> = async (tag, ids = []) => {
+  const defaultTag = db.settings.getDefaultTag();
+  const features = await areFeaturesAvailable([
+    "shortcuts",
+    "defaultNotebookAndTag",
+    "customHomepage"
+  ]);
   return [
     {
       type: "button",
@@ -87,12 +125,29 @@ export const tagMenuItems: (tag: TagType, ids?: string[]) => MenuItem[] = (
     },
     {
       type: "button",
+      key: "set-as-default",
+      title: strings.setAsDefault(),
+      isChecked: defaultTag === tag.id,
+      icon: TagIcon.path,
+      premium: !features.defaultNotebookAndTag.isAllowed,
+      onClick: withFeatureCheck(features.defaultNotebookAndTag, async () => {
+        const defaultTag = db.settings.getDefaultTag();
+        const isDefault = defaultTag === tag.id;
+        await db.settings.setDefaultTag(isDefault ? undefined : tag.id);
+      })
+    },
+    createSetDefaultHomepageMenuItem(tag.id, tag.type, features.customHomepage),
+    {
+      type: "button",
       key: "shortcut",
       title: db.shortcuts.exists(tag.id)
         ? strings.removeShortcut()
         : strings.addShortcut(),
       icon: Shortcut.path,
-      onClick: () => appStore.addToShortcuts(tag)
+      premium: !features.shortcuts.isAllowed,
+      onClick: withFeatureCheck(features.shortcuts, () =>
+        appStore.addToShortcuts(tag)
+      )
     },
     { key: "sep", type: "separator" },
     {

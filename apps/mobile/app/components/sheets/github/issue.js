@@ -28,13 +28,14 @@ import { ToastManager } from "../../../services/event-manager";
 import PremiumService from "../../../services/premium";
 import { useUserStore } from "../../../stores/use-user-store";
 import { openLinkInBrowser } from "../../../utils/functions";
-import { SIZE } from "../../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import DialogHeader from "../../dialog/dialog-header";
 import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 export const Issue = ({ defaultTitle, defaultBody, issueTitle }) => {
   const { colors } = useThemeColors();
@@ -69,6 +70,15 @@ Pro: ${PremiumService.get()}
 Logged in: ${user ? "yes" : "no"}`,
         userId: user?.id
       });
+      if (!issueUrl.current) {
+        setLoading(false);
+        ToastManager.show({
+          heading: "Failed to report issue on github",
+          type: "error",
+          context: "local"
+        });
+        return;
+      }
       setLoading(false);
       body.reset();
       title.reset();
@@ -85,7 +95,7 @@ Logged in: ${user ? "yes" : "no"}`,
   return (
     <View
       style={{
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         width: "100%"
       }}
     >
@@ -147,11 +157,11 @@ Logged in: ${user ? "yes" : "no"}`,
             style={{
               borderWidth: 1,
               borderColor: colors.primary.border,
-              borderRadius: 5,
-              padding: 12,
+              borderRadius: defaultBorderRadius,
+              padding: DefaultAppStyles.GAP,
               fontFamily: "OpenSans-Regular",
-              marginBottom: 10,
-              fontSize: SIZE.md,
+              marginBottom: DefaultAppStyles.GAP_VERTICAL,
+              fontSize: AppFontSize.md,
               color: colors.primary.heading
             }}
             placeholderTextColor={colors.primary.placeholder}
@@ -180,18 +190,18 @@ Logged in: ${user ? "yes" : "no"}`,
             style={{
               borderWidth: 1,
               borderColor: colors.primary.border,
-              borderRadius: 5,
-              padding: 12,
+              borderRadius: defaultBorderRadius,
+              padding: DefaultAppStyles.GAP,
               fontFamily: "OpenSans-Regular",
               maxHeight: 200,
-              fontSize: SIZE.sm,
+              fontSize: AppFontSize.sm,
               marginBottom: 2.5,
               color: colors.primary.paragraph
             }}
             placeholderTextColor={colors.primary.placeholder}
           />
           <Paragraph
-            size={SIZE.xs}
+            size={AppFontSize.xs}
             color={colors.secondary.paragraph}
           >{`App version: ${getVersion()} Platform: ${
             Platform.OS
@@ -208,16 +218,18 @@ Logged in: ${user ? "yes" : "no"}`,
 
           <Paragraph
             color={colors.secondary.paragraph}
-            size={SIZE.xs}
+            size={AppFontSize.xs}
             style={{
-              marginTop: 10,
+              marginTop: DefaultAppStyles.GAP_VERTICAL,
               textAlign: "center"
             }}
           >
             {strings.issueNotice[0]()}{" "}
             <Text
               onPress={() => {
-                Linking.openURL("https://github.com/streetwriters/notesnook/issues");
+                Linking.openURL(
+                  "https://github.com/streetwriters/notesnook/issues"
+                );
               }}
               style={{
                 textDecorationLine: "underline",

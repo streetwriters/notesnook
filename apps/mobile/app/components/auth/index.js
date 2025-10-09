@@ -18,35 +18,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useState } from "react";
-import { View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import { Toast } from "../toast";
-import { initialAuthMode } from "./common";
+import { AuthMode, initialAuthMode } from "./common";
 import { Login } from "./login";
 import { Signup } from "./signup";
-
-export const AuthMode = {
-  login: 0,
-  signup: 1,
-  welcomeSignup: 2,
-  trialSignup: 3
-};
+import { useThemeColors } from "@notesnook/theme";
 
 const Auth = ({ navigation, route }) => {
   const [currentAuthMode, setCurrentAuthMode] = useState(
     route?.params?.mode || AuthMode.login
   );
+  const { colors } = useThemeColors();
   initialAuthMode.current = route?.params.mode || AuthMode.login;
-  useNavigationFocus(navigation, {
-    onFocus: () => {
-      //tabBarRef?.current.lock();
-      initialAuthMode.current = route?.params.mode || AuthMode.login;
-    }
-  });
+  useNavigationFocus(navigation, {});
 
   return (
-    <View style={{ flex: 1 }}>
-      {currentAuthMode !== AuthMode.login ? (
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: colors.primary.background }}
+    >
+      {currentAuthMode !== AuthMode.login &&
+      currentAuthMode !== AuthMode.welcomeLogin ? (
         <Signup
           changeMode={(mode) => setCurrentAuthMode(mode)}
           trial={AuthMode.trialSignup === currentAuthMode}
@@ -60,7 +53,7 @@ const Auth = ({ navigation, route }) => {
       )}
 
       <Toast context="local" />
-    </View>
+    </SafeAreaView>
   );
 };
 

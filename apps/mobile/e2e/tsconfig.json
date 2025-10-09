@@ -1,0 +1,15 @@
+{
+  "extends": "../../../tsconfig",
+  "compilerOptions": {
+    "lib": ["es2017", "DOM", "DOM.Iterable"],
+    "allowJs": true,
+    "baseUrl": "../",
+    "rootDir": "../",
+    "jsx": "react-native",
+    "noEmit": true,
+    "types": ["node", "jest", "detox"],
+    "incremental": true,
+    "maxNodeModuleJsDepth": 5,
+    "downlevelIteration": true
+  }
+}

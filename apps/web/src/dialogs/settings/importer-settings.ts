@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { SettingsGroup } from "./types";
-import { Importer } from "./components/importer";
+import { Importer } from "../../components/importer";
 
 export const ImporterSettings: SettingsGroup[] = [
   {

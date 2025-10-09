@@ -29,11 +29,7 @@ import {
 } from "../utils/grouping.js";
 import { sql } from "@streetwriters/kysely";
 import { MAX_SQL_PARAMETERS } from "../database/sql-collection.js";
-import {
-  CHECK_IDS,
-  checkIsUserPremium,
-  FREE_NOTEBOOKS_LIMIT
-} from "../common.js";
+import { withSubNotebooks } from "./notebooks.js";
 
 export default class Trash {
   collections = ["notes", "notebooks"] as const;
@@ -55,7 +51,6 @@ export default class Trash {
 
   async init() {
     await this.buildCache();
-    await this.cleanup();
   }
 
   async buildCache() {
@@ -90,9 +85,16 @@ export default class Trash {
 
   async cleanup() {
     const duration = this.db.settings.getTrashCleanupInterval();
-    if (duration === -1 || !duration) return;
+    if (duration === -1 || !duration) {
+      await this.buildCache();
+      return;
+    }
 
-    const maxMs = dayjs().subtract(duration, "days").toDate().getTime();
+    const maxMs = dayjs()
+      .startOf("day")
+      .subtract(duration, "days")
+      .toDate()
+      .getTime();
     const expiredItems = await this.db
       .sql()
       .selectNoFrom((eb) => [
@@ -120,6 +122,7 @@ export default class Trash {
     );
 
     await this._delete(noteIds, notebookIds);
+    await this.buildCache();
   }
 
   async add(
@@ -197,13 +200,6 @@ export default class Trash {
     }
 
     if (notebookIds.length > 0) {
-      const notebooksLimitReached =
-        (await this.db.notebooks.all.count()) + notebookIds.length >
-        FREE_NOTEBOOKS_LIMIT;
-      const isUserPremium = await checkIsUserPremium(CHECK_IDS.notebookAdd);
-      if (notebooksLimitReached && !isUserPremium) {
-        return false;
-      }
       const ids = [...notebookIds, ...(await this.subNotebooks(notebookIds))];
       await this.db.notebooks.collection.update(ids, {
         type: "notebook",
@@ -235,6 +231,10 @@ export default class Trash {
       ...(await this.trashedNotes(this.cache.notes, deletedBy)),
       ...(await this.trashedNotebooks(this.cache.notebooks, deletedBy))
     ] as TrashItem[];
+  }
+
+  count() {
+    return this.cache.notes.length + this.cache.notebooks.length;
   }
 
   private async trashedNotes(
@@ -316,27 +316,11 @@ export default class Trash {
   }
 
   private async subNotebooks(notebookIds: string[]) {
-    const ids = await this.db
-      .sql()
-      .withRecursive(`subNotebooks(id)`, (eb) =>
-        eb
-          .selectFrom((eb) =>
-            sql<{ id: string }>`(VALUES ${sql.join(
-              notebookIds.map((id) => eb.parens(sql`${id}`))
-            )})`.as("notebookIds")
-          )
-          .selectAll()
-          .unionAll((eb) =>
-            eb
-              .selectFrom(["relations", "subNotebooks"])
-              .select("relations.toId as id")
-              .where("toType", "==", "notebook")
-              .where("fromType", "==", "notebook")
-              .whereRef("fromId", "==", "subNotebooks.id")
-              .where("toId", "not in", this.userDeletedCache.notebooks)
-              .$narrowType<{ id: string }>()
-          )
-      )
+    const ids = await withSubNotebooks(
+      this.db.sql(),
+      notebookIds,
+      this.userDeletedCache.notebooks
+    )
       .selectFrom("subNotebooks")
       .select("id")
       .where("id", "not in", notebookIds)

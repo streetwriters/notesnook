@@ -30,7 +30,7 @@
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@notesnook-importer/core": "^2.1.1",
+    "@notesnook-importer/core": "^2.2.2",
     "@notesnook/common": "file:../common",
     "@notesnook/intl": "file:../intl",
     "@notesnook/theme": "file:../theme",
@@ -79,6 +79,7 @@
     "react-colorful": "^5.6.1",
     "redent": "^4.0.0",
     "refractor": "^4.8.1",
+    "simplebar-react": "^3.3.2",
     "strip-indent": "^4.0.0",
     "unfurl.js": "^6.4.0"
   },
@@ -96,6 +97,7 @@
     "happy-dom": "16.0.1",
     "isomorphic-fetch": "^3.0.0",
     "nodemon": "^3.1.7",
+    "prismjs": "^1.30.0",
     "prosemirror-test-builder": "^1.1.1",
     "react": "18.3.1",
     "react-dom": "18.3.1",

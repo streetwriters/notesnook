@@ -19,27 +19,38 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useEffect, useImperativeHandle, useRef, useState } from "react";
 import { usePersistentState } from "../../hooks/use-persistent-state";
-import { ItemProps, Virtuoso, VirtuosoHandle } from "react-virtuoso";
+import {
+  Components,
+  ItemProps,
+  Virtuoso,
+  VirtuosoHandle
+} from "react-virtuoso";
 import { useKeyboardListNavigation } from "../../hooks/use-keyboard-list-navigation";
 import { CustomScrollbarsVirtualList, waitForElement } from "../list-container";
 
 export type VirtualizedTreeHandle<T> = {
   refresh: () => void;
-  refreshItem: (index: number, item?: T) => void;
+  resetAndRefresh: () => void;
+  refreshItem: (
+    index: number,
+    item?: T,
+    itemOptions?: { expand?: boolean }
+  ) => void;
 };
 export type TreeNode<T = any> = {
   id: string;
-  parentId: string;
+  parentId?: string;
   depth: number;
   hasChildren: boolean;
   data: T;
+  expanded?: boolean;
 };
 type ExpandedIds = Record<string, boolean>;
 type TreeViewProps<T> = {
   treeRef?: React.Ref<VirtualizedTreeHandle<T>> | null;
   rootId: string;
-  itemHeight: number;
-  getChildNodes: (id: string, depth: number) => Promise<TreeNode<T>[]>;
+  itemHeight?: number;
+  getChildNodes: (parent: TreeNode<T>) => Promise<TreeNode<T>[]>;
   renderItem: (props: {
     item: TreeNode<T>;
     index: number;
@@ -56,6 +67,9 @@ type TreeViewProps<T> = {
   bulkSelect?: (ids: string[]) => void;
   deselectAll?: () => void;
   isSelected?: (id: string) => boolean;
+  style?: React.CSSProperties;
+
+  Scroller?: Components["Scroller"];
 };
 export function VirtualizedTree<T>(props: TreeViewProps<T>) {
   const {
@@ -72,7 +86,8 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
     onSelect,
     deselectAll,
     bulkSelect,
-    testId
+    testId,
+    Scroller
   } = props;
   const [nodes, setNodes] = useState<TreeNode<T>[]>([]);
   const [expandedIds, setExpandedIds] = usePersistentState<ExpandedIds>(
@@ -85,14 +100,23 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
     treeRef,
     () => ({
       async refresh() {
-        const children = await getChildNodes(rootId, -1);
+        const { children } = await fetchChildren(
+          { id: rootId, depth: -1, data: {} as T, hasChildren: true },
+          expandedIds,
+          getChildNodes
+        );
         setNodes(children);
+        setExpandedIds(expandedIds);
       },
-      async refreshItem(index, item) {
+      async resetAndRefresh() {
+        setNodes([]);
+        await this.refresh();
+      },
+      async refreshItem(index, item, itemOptions) {
         const node = nodes[index];
         const removeIds: string[] = [node.id];
         for (const treeNode of nodes) {
-          if (removeIds.includes(treeNode.parentId)) {
+          if (treeNode.parentId && removeIds.includes(treeNode.parentId)) {
             removeIds.push(treeNode.id);
           }
         }
@@ -103,12 +127,19 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
           return;
         }
 
-        const children = await fetchChildren(
-          node.id,
-          node.depth,
+        const childNodes = await getChildNodes(node);
+        if (childNodes.length > 0 && itemOptions?.expand) {
+          expandedIds[node.id] = true;
+        }
+
+        const { children } = await fetchChildren(
+          node,
           expandedIds,
           getChildNodes
         );
+
+        const hasChildren = children.length > 0;
+
         filtered.splice(
           index,
           0,
@@ -116,11 +147,12 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
             id: node.id,
             data: item,
             depth: node.depth,
-            hasChildren: children.length > 0,
+            hasChildren: hasChildren,
             parentId: node.parentId
           },
           ...children
         );
+        setExpandedIds(expandedIds);
         setNodes(filtered);
       }
     }),
@@ -145,7 +177,7 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
       const ids =
         indices.length === nodes.length
           ? nodes.map((c) => c.id)
-          : (indices.map((i) => nodes[i].id).filter(Boolean) as string[]);
+          : (indices.map((i) => nodes[i]?.id).filter(Boolean) as string[]);
       bulkSelect?.(ids);
     },
     focusItemAt: (index) => {
@@ -168,68 +200,77 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
   });
 
   useEffect(() => {
-    fetchChildren(rootId, -1, expandedIds, getChildNodes).then(setNodes);
+    fetchChildren(
+      { depth: -1, id: rootId, data: {} as T, hasChildren: true },
+      expandedIds,
+      getChildNodes
+    ).then(({ children, expandedIds }) => {
+      setNodes(children);
+      setExpandedIds(expandedIds);
+    });
+    console.log("fetching");
   }, [rootId]);
-  console.log(expandedIds);
+
   return (
     <Virtuoso
       data-test-id={testId}
       ref={list}
-      data={nodes}
-      computeItemKey={(i, item) => item.id}
+      totalCount={nodes.length}
+      computeItemKey={(i) => nodes[i].id}
       fixedItemHeight={itemHeight}
       onKeyDown={(e) => onKeyDown(e.nativeEvent)}
       context={{
         onMouseUp
       }}
       components={{
-        Scroller: CustomScrollbarsVirtualList,
+        Scroller: (Scroller as any) || CustomScrollbarsVirtualList,
         Item: VirtuosoItem,
         EmptyPlaceholder: Placeholder
       }}
-      itemContent={(index, node) => (
-        <Node
-          item={node}
-          index={index}
-          expanded={expandedIds[node.id]}
-          collapse={() => {
-            if (!expandedIds[node.id]) return;
+      itemContent={(index) => {
+        const node = nodes[index];
+        return (
+          <Node
+            item={node}
+            index={index}
+            expanded={expandedIds[node.id]}
+            collapse={() => {
+              if (!expandedIds[node.id]) return;
 
-            const expanded = { ...expandedIds, [node.id]: false };
-            setNodes((tree) => {
-              const removeIds: string[] = [];
-              for (const treeNode of tree) {
-                if (
-                  treeNode.parentId === node.id ||
-                  removeIds.includes(treeNode.parentId)
-                ) {
-                  expanded[treeNode.id] = false;
-                  removeIds.push(treeNode.id);
+              const expanded = { ...expandedIds, [node.id]: false };
+              setNodes((tree) => {
+                const removeIds: string[] = [];
+                for (const treeNode of tree) {
+                  if (
+                    treeNode.parentId &&
+                    (treeNode.parentId === node.id ||
+                      removeIds.includes(treeNode.parentId))
+                  ) {
+                    removeIds.push(treeNode.id);
+                  }
                 }
-              }
-              return tree.filter((n) => !removeIds.includes(n.id));
-            });
-            setExpandedIds(expanded);
-          }}
-          expand={async () => {
-            if (expandedIds[node.id]) return;
+                return tree.filter((n) => !removeIds.includes(n.id));
+              });
+              setExpandedIds(expanded);
+            }}
+            expand={async () => {
+              if (expandedIds[node.id]) return;
 
-            setExpandedIds({ ...expandedIds, [node.id]: true });
-
-            const children = await fetchChildren(
-              node.id,
-              node.depth,
-              expandedIds,
-              getChildNodes
-            );
-            setNodes((tree) => {
-              const copy = tree.slice();
-              copy.splice(index + 1, 0, ...children);
-              return copy;
-            });
-          }}
-        />
-      )}
+              const { children } = await fetchChildren(
+                node,
+                expandedIds,
+                getChildNodes
+              );
+              setExpandedIds({ ...expandedIds, [node.id]: true });
+              setNodes((tree) => {
+                const copy = tree.slice();
+                copy.splice(index + 1, 0, ...children);
+                return copy;
+              });
+            }}
+          />
+        );
+      }}
     />
   );
 }
@@ -257,18 +298,22 @@ function VirtuosoItem({
 }
 
 async function fetchChildren<T>(
-  id: string,
-  depth: number,
+  node: TreeNode<T>,
   expandedIds: ExpandedIds,
-  getChildNodes: (id: string, depth: number) => Promise<TreeNode<T>[]>
+  getChildNodes: TreeViewProps<T>["getChildNodes"]
 ) {
-  const children = await getChildNodes(id, depth);
+  const children = await getChildNodes(node);
   for (let i = 0; i < children.length; i++) {
     const childNode = children[i];
-    if (expandedIds[childNode.id]) {
-      const nodes = await fetchChildren(
-        childNode.id,
-        childNode.depth,
+    if (
+      expandedIds[childNode.id] ||
+      (expandedIds[childNode.id] === undefined &&
+        childNode.expanded &&
+        childNode.hasChildren)
+    ) {
+      expandedIds[childNode.id] = true;
+      const { children: nodes } = await fetchChildren(
+        childNode,
         expandedIds,
         getChildNodes
       );
@@ -276,5 +321,5 @@ async function fetchChildren<T>(
       i += nodes.length;
     }
   }
-  return children;
+  return { children, expandedIds };
 }

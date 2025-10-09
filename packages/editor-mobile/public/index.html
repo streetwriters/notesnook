@@ -12,13 +12,13 @@
     <style>
       body {
         height: 100%;
-        font-family: "Open Sans";
+        font-family: "Inter";
       }
 
-      p {
-        font-family: "Open Sans";
-        /* color: var(--nn_primary_paragraph) ## TODO: use fixed color */
-      }
+      /* p { */
+      /* font-family: "Inter"; */
+      /* color: var(--nn_primary_paragraph) ## TODO: use fixed color */
+      /* } */
 
       ::selection {
         color: white;
@@ -33,9 +33,17 @@
         color: var(--nn_primary_placeholder) !important;
       }
 
+      .ProseMirror > :first-child {
+        margin-top: 0.4em !important;
+      }
+
       #root {
         height: 100%;
         display: flex;
+      }
+
+      #statusbar p {
+        font-family: "Inter";
       }
     </style>
     <meta name="description" content="Notesnook editor for mobile" />

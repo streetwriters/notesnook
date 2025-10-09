@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { CHECK_IDS, EV, EVENTS } from "../src/common.ts";
+import { EV, EVENTS } from "../src/common.ts";
 import { test, expect, vitest } from "vitest";
 import { login } from "./utils.js";
 import { databaseTest } from "../__tests__/utils/index.ts";
@@ -418,8 +418,8 @@ test(
   "issue: colors are not properly created if multiple notes are synced together",
   async (t) => {
     const [deviceA, deviceB] = await Promise.all([
-      initializeDevice("deviceA", [CHECK_IDS.noteColor]),
-      initializeDevice("deviceB", [CHECK_IDS.noteColor])
+      initializeDevice("deviceA"),
+      initializeDevice("deviceB")
     ]);
 
     t.onTestFinished(async () => {
@@ -476,16 +476,11 @@ test(
  * @param {string} id
  * @returns {Promise<Database>}
  */
-async function initializeDevice(id, capabilities = []) {
+async function initializeDevice(id) {
   // initialize(new NodeStorageInterface(), false);
 
   console.time(`Init ${id}`);
-  EV.subscribe(EVENTS.userCheckStatus, async (type) => {
-    return {
-      type,
-      result: capabilities.indexOf(type) > -1
-    };
-  });
+
   EV.subscribe(EVENTS.syncCheckStatus, async (type) => {
     return {
       type,

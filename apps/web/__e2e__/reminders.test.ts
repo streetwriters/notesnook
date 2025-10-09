@@ -53,20 +53,22 @@ test("adding a one-time reminder before current time should not be possible", as
   await app.goto();
   const reminders = await app.goToReminders();
 
-  await reminders.createReminder({
-    ...ONE_TIME_REMINDER,
-    date: 0
-  });
-
-  expect(
-    await app.toasts.waitForToast(
+  const result = await Promise.race([
+    reminders.createReminder({
+      ...ONE_TIME_REMINDER,
+      date: 0
+    }),
+    app.toasts.waitForToast(
       "Reminder time cannot be earlier than the current time."
     )
-  ).toBeTruthy();
+  ]);
+
+  expect(result).toBeTruthy();
 });
 
 for (const recurringMode of ["Daily", "Weekly", "Monthly"] as const) {
   test(`add a recurring reminder (${recurringMode})`, async ({ page }) => {
+    await page.exposeBinding("isPro", () => true);
     const app = new AppModel(page);
     await app.goto();
     const reminders = await app.goToReminders();
@@ -89,6 +91,8 @@ for (const recurringMode of ["Daily", "Weekly", "Monthly"] as const) {
 }
 
 test(`add a recurring reminder before current time`, async ({ page }) => {
+  await page.exposeBinding("isPro", () => true);
+
   const app = new AppModel(page);
   await app.goto();
   const reminders = await app.goToReminders();
@@ -171,6 +175,8 @@ test("enable a disabled reminder", async ({ page }) => {
 test("editing a weekly recurring reminder should not revert it to daily", async ({
   page
 }) => {
+  await page.exposeBinding("isPro", () => true);
+
   const RECURRING_REMINDER: Partial<Reminder> = {
     ...ONE_TIME_REMINDER,
     recurringMode: "week",

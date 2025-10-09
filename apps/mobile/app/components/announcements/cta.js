@@ -23,12 +23,12 @@ import { Linking, View } from "react-native";
 import { useThemeColors } from "@notesnook/theme";
 import { eSendEvent, presentSheet } from "../../services/event-manager";
 import { eCloseAnnouncementDialog } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { sleep } from "../../utils/time";
-import { PricingPlans } from "../premium/pricing-plans";
 import SheetProvider from "../sheet-provider";
 import { Button } from "../ui/button";
 import { allowedOnPlatform, getStyle } from "./functions";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const Cta = ({ actions, style = {}, color, inline }) => {
   const { colors } = useThemeColors();
@@ -44,26 +44,15 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
       Linking.openURL(item.data).catch(() => {
         /* empty */
       });
-    } else if (item.type === "promo") {
-      presentSheet({
-        component: (
-          <PricingPlans
-            marginTop={1}
-            promo={{
-              promoCode: item.data,
-              text: item.title
-            }}
-          />
-        )
-      });
     }
   };
   return (
     <View
       style={{
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         ...getStyle(style),
-        flexDirection: inline ? "row" : "column"
+        flexDirection: inline ? "row" : "column",
+        gap: DefaultAppStyles.GAP_SMALL
       }}
     >
       <SheetProvider context="premium_cta" />
@@ -75,7 +64,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
               <Button
                 key={item.title}
                 title={item.title}
-                fontSize={SIZE.sm}
+                fontSize={AppFontSize.sm}
                 type="transparent"
                 textStyle={{
                   textDecorationLine: "underline"
@@ -83,7 +72,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
                 onPress={() => onPress(item)}
                 bold
                 style={{
-                  height: 30,
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
                   alignSelf: "flex-start",
                   paddingHorizontal: 0
                 }}
@@ -95,15 +84,13 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
               <Button
                 key={item.title}
                 title={item.title}
-                fontSize={SIZE.sm}
+                fontSize={AppFontSize.sm}
                 type="plain"
                 onPress={() => onPress(item)}
-                width={null}
-                height={30}
                 style={{
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
                   alignSelf: "flex-start",
-                  paddingHorizontal: 0,
-                  marginLeft: 12
+                  paddingHorizontal: 0
                 }}
                 textStyle={{
                   textDecorationLine: "underline"
@@ -118,7 +105,6 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
               <Button
                 key={item.title}
                 title={item.title}
-                fontSize={SIZE.md}
                 buttonType={{
                   color: color ? color : colors.primary.accent,
                   text: color
@@ -128,10 +114,8 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
                   opacity: 1
                 }}
                 onPress={() => onPress(item)}
-                width={250}
                 style={{
-                  marginBottom: 5,
-                  borderRadius: 100
+                  width: "100%"
                 }}
               />
             ))}
@@ -141,14 +125,14 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
               <Button
                 key={item.title}
                 title={item.title}
-                fontSize={SIZE.xs}
+                fontSize={AppFontSize.xs}
                 type="plain"
                 onPress={() => onPress(item)}
                 width={null}
                 height={30}
                 style={{
                   minWidth: "50%",
-                  marginTop: 5
+                  width: "100%"
                 }}
                 textStyle={{
                   textDecorationLine: "underline"

@@ -46,6 +46,7 @@ import {
   ItemReferences,
   ItemType,
   MaybeDeletedItem,
+  Monograph,
   Note,
   Notebook,
   Relation,
@@ -90,6 +91,7 @@ export interface DatabaseSchema {
   sessioncontent: SQLiteItem<SessionContentItem>;
   shortcuts: SQLiteItem<Shortcut>;
   vaults: SQLiteItem<Vault>;
+  monographs: SQLiteItem<Monograph>;
 }
 
 export type RawDatabaseSchema = DatabaseSchema & {
@@ -231,7 +233,10 @@ const BooleanProperties: Set<BooleanFields> = new Set([
   "pinned",
   "readonly",
   "remote",
-  "synced"
+  "synced",
+  "isGeneratedTitle",
+  "archived",
+  "selfDestruct"
 ]);
 
 const DataMappers: Partial<Record<ItemType, (row: any) => void>> = {
@@ -264,6 +269,9 @@ const DataMappers: Partial<Record<ItemType, (row: any) => void>> = {
   },
   vault: (row) => {
     if (row.key) row.key = JSON.parse(row.key);
+  },
+  monograph: (row) => {
+    if (row.password) row.password = JSON.parse(row.password);
   }
 };
 

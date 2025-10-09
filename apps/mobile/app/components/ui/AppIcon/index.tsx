@@ -20,7 +20,7 @@ import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { ColorValue, TextProps } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 
 export interface IconProps extends TextProps {
   /**
@@ -48,6 +48,10 @@ export interface IconProps extends TextProps {
 export default function AppIcon(props: IconProps) {
   const { colors } = useThemeColors();
   return (
-    <Icon size={SIZE.md} color={colors.primary.icon} {...(props as any)} />
+    <Icon
+      size={AppFontSize.md}
+      color={colors.primary.icon}
+      {...(props as any)}
+    />
   );
 }

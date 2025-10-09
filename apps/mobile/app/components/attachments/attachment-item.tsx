@@ -25,13 +25,14 @@ import { TouchableOpacity, View } from "react-native";
 import { db } from "../../common/database";
 import { useAttachmentProgress } from "../../hooks/use-attachment-progress";
 import { useDBItem } from "../../hooks/use-db-item";
-import { SIZE } from "../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../utils/size";
 import { IconButton } from "../ui/icon-button";
 import { ProgressCircleComponent } from "../ui/svg/lazy";
 import Paragraph from "../ui/typography/paragraph";
 import Actions from "./actions";
 import { strings } from "@notesnook/intl";
 import { Pressable } from "../ui/pressable";
+import { DefaultAppStyles } from "../../utils/styles";
 
 function getFileExtension(filename: string) {
   const ext = /^.+\.([^.]+)$/.exec(filename);
@@ -76,8 +77,8 @@ export const AttachmentItem = ({
         flexDirection: "row",
         marginVertical: 5,
         justifyContent: "space-between",
-        padding: 12,
-        paddingVertical: 6,
+        padding: DefaultAppStyles.GAP,
+        paddingVertical: DefaultAppStyles.GAP_VERTICAL,
         minHeight: 45
       }}
     >
@@ -101,7 +102,7 @@ export const AttachmentItem = ({
                 paddingHorizontal: 2,
                 width: 30,
                 height: 30,
-                borderRadius: 5
+                borderRadius: defaultBorderRadius
               }}
             >
               <Paragraph
@@ -124,7 +125,7 @@ export const AttachmentItem = ({
               }}
             >
               <Paragraph
-                size={SIZE.sm}
+                size={AppFontSize.sm}
                 style={{
                   flexWrap: "wrap"
                 }}
@@ -136,7 +137,10 @@ export const AttachmentItem = ({
               </Paragraph>
 
               {!hideWhenNotDownloading ? (
-                <Paragraph color={colors.secondary.paragraph} size={SIZE.xxs}>
+                <Paragraph
+                  color={colors.secondary.paragraph}
+                  size={AppFontSize.xxs}
+                >
                   {strings.fileSize()}: {formatBytes(attachment.size)}
                 </Paragraph>
               ) : null}
@@ -159,7 +163,7 @@ export const AttachmentItem = ({
               }}
             >
               <ProgressCircleComponent
-                size={SIZE.xxl}
+                size={AppFontSize.xxl}
                 progress={
                   currentProgress?.value ? currentProgress?.value / 100 : 0
                 }

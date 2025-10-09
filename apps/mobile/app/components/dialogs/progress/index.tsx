@@ -21,7 +21,7 @@ import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect } from "react";
 import { View } from "react-native";
 import { eSendEvent, eSubscribeEvent } from "../../../services/event-manager";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { Dialog } from "../../dialog";
 import BaseDialog from "../../dialog/base-dialog";
 import DialogContainer from "../../dialog/dialog-container";
@@ -29,6 +29,7 @@ import { Button } from "../../ui/button";
 import { ProgressBarComponent } from "../../ui/svg/lazy";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 export type ProgressOptions = {
   progress?: string;
@@ -111,7 +112,7 @@ export default function Progress() {
     >
       <DialogContainer
         style={{
-          paddingHorizontal: 12,
+          paddingHorizontal: DefaultAppStyles.GAP,
           paddingBottom: 10
         }}
         noBorder={data?.fillBackground ? true : false}
@@ -121,7 +122,7 @@ export default function Progress() {
           style={{
             justifyContent: "center",
             alignItems: "center",
-            paddingHorizontal: 12,
+            paddingHorizontal: DefaultAppStyles.GAP,
             gap: 10,
             paddingBottom: 20
           }}
@@ -131,7 +132,7 @@ export default function Progress() {
               textAlign: "center"
             }}
             color={colors.primary.paragraph}
-            size={SIZE.lg}
+            size={AppFontSize.lg}
           >
             {data?.title}
           </Heading>
@@ -148,7 +149,7 @@ export default function Progress() {
             style={{
               flexDirection: "row",
               width: 100,
-              paddingVertical: 12
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             <ProgressBarComponent

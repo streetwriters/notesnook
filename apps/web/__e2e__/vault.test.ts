@@ -86,3 +86,42 @@ test("unlocking a note permanently should not show vault unlocked status", async
 
   await expect(vaultUnlockedStatus).toBeHidden();
 });
+
+test("clicking on vault unlocked status should lock the note", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note = await notes.createNote(NOTE);
+  await note?.contextMenu.lock(PASSWORD);
+  await note?.openLockedNote(PASSWORD);
+
+  expect(await note?.isLockedNotePasswordFieldVisible()).toBe(false);
+
+  const vaultUnlockedStatus = page.locator(getTestId("vault-unlocked"));
+  await vaultUnlockedStatus.waitFor({ state: "visible" });
+  await vaultUnlockedStatus.click();
+
+  expect(await note?.isLockedNotePasswordFieldVisible()).toBe(true);
+});
+
+test("clicking on vault unlocked status should lock the readonly note", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note = await notes.createNote(NOTE);
+  await note?.properties.readonly();
+  await note?.contextMenu.lock(PASSWORD);
+  await note?.openLockedNote(PASSWORD);
+
+  expect(await note?.isLockedNotePasswordFieldVisible()).toBe(false);
+
+  const vaultUnlockedStatus = page.locator(getTestId("vault-unlocked"));
+  await vaultUnlockedStatus.waitFor({ state: "visible" });
+  await vaultUnlockedStatus.click();
+
+  expect(await note?.isLockedNotePasswordFieldVisible()).toBe(true);
+});

@@ -37,8 +37,8 @@ const gitHash = (() => {
     return process.env.GIT_HASH || "gitless";
   }
 })();
-const appVersion = version.replaceAll(".", "").replace("-beta", "");
-const isBeta = version.endsWith("-beta");
+// const appVersion = version.replaceAll(".", "").replace("-beta", "");
+const isBeta = version.includes("-beta");
 const isTesting =
   process.env.TEST === "true" || process.env.NODE_ENV === "development";
 const isDesktop = process.env.PLATFORM === "desktop";
@@ -64,7 +64,8 @@ export default defineConfig({
         manualChunks: (id: string) => {
           if (
             (id.includes("/editor/languages/") ||
-              id.includes("/html/languages/")) &&
+              id.includes("/html/languages/") ||
+              id.includes("/refractor/lang/")) &&
             path.basename(id) !== "index.js"
           )
             return `code-lang-${path.basename(id, "js")}`;
@@ -76,7 +77,7 @@ export default defineConfig({
   define: {
     APP_TITLE: `"${isThemeBuilder ? "Notesnook Theme Builder" : "Notesnook"}"`,
     GIT_HASH: `"${gitHash}"`,
-    APP_VERSION: `"${appVersion}"`,
+    APP_VERSION: `"${version}"`,
     PUBLIC_URL: `"${process.env.PUBLIC_URL || ""}"`,
     IS_DESKTOP_APP: isDesktop,
     PLATFORM: `"${process.env.PLATFORM}"`,
@@ -152,7 +153,7 @@ export default defineConfig({
             mode: "production",
             workbox: { mode: "production" },
             injectManifest: {
-              globPatterns: ["**/*.{js,css,html,wasm}", "**/open-sans-*.woff2"],
+              globPatterns: ["**/*.{js,css,html,wasm}", "**/Inter-*.woff2"],
               globIgnores: [
                 "**/node_modules/**/*",
                 "**/code-lang-*.js",

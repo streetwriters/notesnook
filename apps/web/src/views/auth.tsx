@@ -201,7 +201,7 @@ export function HeadlessAuth(props: AuthProps) {
       performance.mark("load:auth");
       setIsReady(true);
     });
-  }, [route, openURL]);
+  }, [route]);
 
   if (!isReady) return <></>;
 
@@ -321,7 +321,7 @@ function LoginPassword(props: BaseAuthComponentProps<"login:password">) {
           Config.get("sessionExpired", false)
         );
         Config.set("sessionExpired", false);
-        openURL("/", { authenticated: true });
+        openURL("/plans", { authenticated: true });
       }}
     >
       {(form?: PasswordFormData) => (
@@ -379,7 +379,7 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
         }
 
         await userstore.signup(form);
-        openURL("/notes/#/welcome", { authenticated: true });
+        openURL("/plans", { authenticated: true });
       }}
     >
       {(form?: SignupFormData) => (
@@ -460,7 +460,7 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
       subtitle={
         <Flex bg="shade" p={1} sx={{ borderRadius: "default" }}>
           <Text as="span" sx={{ fontSize: "body", color: "accent" }}>
-            {strings.sessionExpiredDesc(user?.email as string)}
+            {strings.sessionExpiredDesc(user ? maskEmail(user.email) : "")}
           </Text>
         </Flex>
       }
@@ -492,6 +492,7 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
         placeholder={user ? maskEmail(user.email) : undefined}
         autoFocus
         disabled
+        required={false}
       />
       <Button
         data-test-id="auth-forgot-password"
@@ -974,10 +975,10 @@ function SubtitleWithAction(props: SubtitleWithActionProps) {
 export function AuthField(props: FieldProps) {
   return (
     <Field
+      required
       {...props}
       name={props.name || props.id}
       data-test-id={props["data-test-id"] || props.id}
-      required
       sx={{ mt: 2, width: "100%" }}
       styles={{
         // label: { fontWeight: "normal" },

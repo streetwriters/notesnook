@@ -37,12 +37,12 @@ import {
 import { WebViewMessageEvent } from "react-native-webview";
 import { DatabaseLogger, db } from "../../../common/database";
 import downloadAttachment from "../../../common/filesystem/download-attachment";
+import { AuthMode } from "../../../components/auth/common";
+import { Properties } from "../../../components/properties";
 import EditorTabs from "../../../components/sheets/editor-tabs";
 import { Issue } from "../../../components/sheets/github/issue";
 import LinkNote from "../../../components/sheets/link-note";
-import ManageTagsSheet from "../../../components/sheets/manage-tags";
 import { RelationsList } from "../../../components/sheets/relations-list";
-import ReminderSheet from "../../../components/sheets/reminder";
 import TableOfContents from "../../../components/sheets/toc";
 import { DDS } from "../../../services/device-detection";
 import {
@@ -66,18 +66,22 @@ import {
   eOnExitEditor,
   eOnLoadNote,
   eOpenFullscreenEditor,
-  eOpenLoginDialog,
   eOpenPremiumDialog,
   eOpenPublishNoteDialog,
   eUnlockWithBiometrics,
   eUnlockWithPassword
 } from "../../../utils/events";
 import { openLinkInBrowser } from "../../../utils/functions";
-import { tabBarRef } from "../../../utils/global-refs";
+import { fluidTabsRef } from "../../../utils/global-refs";
+import { sleep } from "../../../utils/time";
+import ManageTags from "../../manage-tags";
 import { useDragState } from "../../settings/editor/state";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { useTabStore } from "./use-tab-store";
 import { editorState, openInternalLink } from "./utils";
+import AddReminder from "../../add-reminder";
+import { isFeatureAvailable, useAreFeaturesAvailable } from "@notesnook/common";
+import PaywallSheet from "../../../components/sheets/paywall";
 
 const publishNote = async () => {
   const user = useUserStore.getState().user;
@@ -86,7 +90,9 @@ const publishNote = async () => {
       heading: strings.loginRequired(),
       context: "global",
       func: () => {
-        eSendEvent(eOpenLoginDialog);
+        Navigation.navigate("Auth", {
+          mode: AuthMode.login
+        });
       },
       actionText: "Login"
     });
@@ -128,11 +134,7 @@ const showActionsheet = async () => {
     .getNoteIdForTab(useTabStore.getState().currentTab!);
   if (noteId) {
     const note = await db.notes?.note(noteId);
-    if (editorState().isFocused || editorState().isFocused) {
-      editorState().isFocused = true;
-    }
-    const { Properties } = require("../../../components/properties/index.js");
-    Properties.present(note, ["Dark Mode"]);
+    Properties.present(note, false);
   } else {
     ToastManager.show({
       heading: strings.noNoteProperties(),
@@ -148,6 +150,11 @@ export const useEditorEvents = (
   editor: useEditorType,
   { readonly: editorPropReadonly, noHeader, noToolbar }: Partial<EditorProps>
 ) => {
+  const features = useAreFeaturesAvailable([
+    "callout",
+    "outlineList",
+    "taskList"
+  ]);
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const fullscreen = useSettingStore((state) => state.fullscreen);
   const corsProxy = useSettingStore((state) => state.settings.corsProxy);
@@ -157,7 +164,6 @@ export const useEditorEvents = (
     state.timeFormat
   ]);
   const handleBack = useRef<NativeEventSubscription>();
-  const isPremium = useUserStore((state) => state.premium);
   const { fontScale } = useWindowDimensions();
 
   const doubleSpacedLines = useSettingStore(
@@ -174,7 +180,6 @@ export const useEditorEvents = (
   );
 
   const tools = useDragState((state) => state.data);
-
   useEffect(() => {
     const handleKeyboardDidShow: KeyboardEventListener = () => {
       editor.commands.keyboardShown(true);
@@ -191,7 +196,6 @@ export const useEditorEvents = (
       subscriptions.forEach((subscription) => subscription.remove());
     };
   }, [editor.commands, editor.postMessage]);
-
   useEffect(() => {
     if (loading) return;
     if (typeof defaultFontFamily === "object") {
@@ -203,7 +207,7 @@ export const useEditorEvents = (
     editor.commands.setSettings({
       deviceMode: deviceMode || "mobile",
       fullscreen: fullscreen || false,
-      premium: isPremium,
+      premium: false,
       readonly: false,
       tools: tools || getDefaultPresets().default,
       noHeader: noHeader,
@@ -218,11 +222,11 @@ export const useEditorEvents = (
       dateFormat: db.settings?.getDateFormat(),
       timeFormat: db.settings?.getTimeFormat(),
       fontScale,
-      markdownShortcuts
+      markdownShortcuts,
+      features
     });
   }, [
     fullscreen,
-    isPremium,
     editor.loading,
     deviceMode,
     tools,
@@ -259,7 +263,7 @@ export const useEditorEvents = (
 
       if (deviceMode === "mobile") {
         editorState().movedAway = true;
-        tabBarRef.current?.goToPage(0);
+        fluidTabsRef.current?.goToPage("home");
       }
 
       setTimeout(() => {
@@ -269,7 +273,7 @@ export const useEditorEvents = (
   }, [editor, deviceMode, fullscreen]);
 
   const onHardwareBackPress = useCallback(() => {
-    if (tabBarRef.current?.page() === 2) {
+    if (fluidTabsRef.current?.page() === "editor") {
       onBackPress();
       return true;
     }
@@ -439,7 +443,23 @@ export const useEditorEvents = (
             referenceType: "reminder",
             relationType: "from",
             title: strings.dataTypesPluralCamelCase.reminder(),
-            onAdd: () => ReminderSheet.present(undefined, note, true)
+            onAdd: async () => {
+              const reminderFeature = await isFeatureAvailable(
+                "activeReminders"
+              );
+              if (!reminderFeature.isAllowed) {
+                ToastManager.show({
+                  type: "info",
+                  message: reminderFeature.error,
+                  actionText: strings.upgrade(),
+                  func: () => {
+                    PaywallSheet.present(reminderFeature);
+                  }
+                });
+                return;
+              }
+              AddReminder.present(undefined, note);
+            }
           });
           break;
         case EditorEvents.newtag:
@@ -450,7 +470,7 @@ export const useEditorEvents = (
             });
             return;
           }
-          ManageTagsSheet.present([noteId]);
+          ManageTags.present([noteId]);
           break;
         case EditorEvents.tag:
           if (editorMessage.value) {
@@ -527,7 +547,9 @@ export const useEditorEvents = (
           if (editor.state.current?.isFocused) {
             editor.state.current.isFocused = true;
           }
-          eSendEvent(eOpenPremiumDialog);
+          PaywallSheet.present(
+            await isFeatureAvailable(editorMessage.value.feature)
+          );
           break;
         case EditorEvents.monograph:
           publishNote();
@@ -615,6 +637,10 @@ export const useEditorEvents = (
           eSendEvent(eEditorTabFocused, editorMessage.tabId);
           if (!editor.state.current.initialLoadCalled) break;
           if (editorMessage.noteId) {
+            // Wait for next tick to ensure the tab is not changed.
+            await sleep(1);
+            if (useTabStore.getState().currentTab !== editorMessage.tabId)
+              return;
             if (!useSettingStore.getState().isAppLoading) {
               const note = await db.notes.note(editorMessage.noteId);
               if (note) {

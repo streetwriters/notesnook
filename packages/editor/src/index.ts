@@ -85,11 +85,14 @@ import { DiffHighlighter } from "./extensions/diff-highlighter/index.js";
 import { getChangedNodes } from "./utils/prosemirror.js";
 import { strings } from "@notesnook/intl";
 import { InlineCode } from "./extensions/inline-code/inline-code.js";
+import { FontLigature } from "./extensions/font-ligature/font-ligature.js";
+import { SearchResult } from "./extensions/search-result/search-result.js";
+import "simplebar-react/dist/simplebar.min.css";
 
 interface TiptapStorage {
   dateFormat?: DateTimeOptions["dateFormat"];
   timeFormat?: DateTimeOptions["timeFormat"];
-  openLink?: (url: string) => void;
+  openLink?: (url: string, openInNewTab?: boolean) => void;
   downloadAttachment?: (attachment: Attachment) => void;
   openAttachmentPicker?: (type: AttachmentType) => void;
   previewAttachment?: (attachment: Attachment) => void;
@@ -127,6 +130,7 @@ export type TiptapOptions = EditorOptions &
     downloadOptions?: DownloadOptions;
     isMobile?: boolean;
     doubleSpacedLines?: boolean;
+    enableFontLigatures?: boolean;
   } & {
     placeholder: string;
   };
@@ -151,6 +155,7 @@ const useTiptap = (
     isMobile,
     downloadOptions,
     editorProps,
+    enableFontLigatures,
     ...restOptions
   } = options;
 
@@ -233,7 +238,8 @@ const useTiptap = (
             newGroupDelay: 1000
           },
           dropcursor: {
-            class: "drop-cursor"
+            class: "drop-cursor",
+            width: 3
           },
           horizontalRule: false
         }),
@@ -326,7 +332,9 @@ const useTiptap = (
           irremovableNodesOnBackspace: [
             CodeBlock.name,
             TaskListNode.name,
-            Table.name
+            Table.name,
+            CheckList.name,
+            AttachmentNode.name
           ],
           escapableNodesIfAtDocumentStart: [
             CodeBlock.name,
@@ -355,7 +363,9 @@ const useTiptap = (
               wrapperNames: [CheckList.name]
             }
           ]
-        })
+        }),
+        FontLigature.configure({ enabled: enableFontLigatures }),
+        SearchResult.configure()
       ],
       onBeforeCreate: ({ editor }) => {
         editor.storage.dateFormat = dateFormat;
@@ -429,3 +439,4 @@ export {
 };
 export { replaceDateTime } from "./extensions/date-time/index.js";
 export type * from "./extension-imports.js";
+export { type Selection } from "@tiptap/pm/state";

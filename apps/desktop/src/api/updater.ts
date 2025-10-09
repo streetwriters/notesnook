@@ -23,6 +23,7 @@ import { CancellationToken, autoUpdater } from "electron-updater";
 import type { AppUpdaterEvents } from "electron-updater/out/AppUpdater";
 import { z } from "zod";
 import { config } from "../utils/config";
+import { app } from "electron";
 
 type UpdateInfo = { version: string };
 type Progress = { percent: number };
@@ -33,6 +34,7 @@ let downloadTimeout: NodeJS.Timeout | undefined = undefined;
 
 export const updaterRouter = t.router({
   autoUpdates: t.procedure.query(() => config.automaticUpdates),
+  releaseTrack: t.procedure.query(() => config.releaseTrack),
   install: t.procedure.query(() => autoUpdater.quitAndInstall()),
   download: t.procedure.query(async () => {
     if (cancellationToken) return;
@@ -67,7 +69,13 @@ export const updaterRouter = t.router({
     .mutation(({ input: { enabled } }) => {
       config.automaticUpdates = enabled;
     }),
-
+  changeReleaseTrack: t.procedure
+    .input(z.object({ track: z.string() }))
+    .mutation(({ input: { track } }) => {
+      config.releaseTrack = track;
+      app.relaunch();
+      app.exit();
+    }),
   onChecking: createSubscription("checking-for-update"),
   onDownloaded: createSubscription<"update-downloaded", UpdateInfo>(
     "update-downloaded"

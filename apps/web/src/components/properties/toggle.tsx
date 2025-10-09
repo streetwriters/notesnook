@@ -32,10 +32,7 @@ function Toggle(props: ToggleProps) {
 
   return (
     <Flex
-      py={2}
-      px={1}
       sx={{
-        borderBottom: "1px solid var(--separator)",
         cursor: "pointer",
         alignItems: "center",
         justifyContent: "space-between",
@@ -49,7 +46,6 @@ function Toggle(props: ToggleProps) {
       <Flex
         sx={{
           alignItems: "center",
-
           display: "flex"
         }}
         data-test-id={`toggle-state-${isOn ? "on" : "off"}`}
@@ -68,7 +64,12 @@ function Toggle(props: ToggleProps) {
         </Text>
       </Flex>
       <Switch
-        sx={{ m: 0, bg: isOn ? "accent" : "icon-secondary", flexShrink: 0 }}
+        sx={{
+          m: 0,
+          bg: isOn ? "accent" : "icon-secondary",
+          flexShrink: 0,
+          scale: 0.75
+        }}
         checked={isOn}
         onClick={(e) => e.stopPropagation()}
       />

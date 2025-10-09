@@ -20,10 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import { View } from "react-native";
 import { useThemeColors } from "@notesnook/theme";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import Paragraph from "../ui/typography/paragraph";
 import { getFormattedDate } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 export const DateMeta = ({ item }) => {
   const { colors } = useThemeColors();
 
@@ -44,13 +45,13 @@ export const DateMeta = ({ item }) => {
         style={{
           flexDirection: "row",
           justifyContent: "space-between",
-          paddingVertical: 3
+          paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL / 2
         }}
       >
-        <Paragraph size={SIZE.xs} color={colors.secondary.paragraph}>
+        <Paragraph size={AppFontSize.xs} color={colors.secondary.paragraph}>
           {strings.dateDescFromKey(key)}
         </Paragraph>
-        <Paragraph size={SIZE.xs} color={colors.secondary.paragraph}>
+        <Paragraph size={AppFontSize.xs} color={colors.secondary.paragraph}>
           {getFormattedDate(item[key], "date-time")}
         </Paragraph>
       </View>
@@ -59,11 +60,10 @@ export const DateMeta = ({ item }) => {
   return (
     <View
       style={{
-        paddingVertical: 5,
-        marginTop: 5,
         borderTopWidth: 1,
         borderTopColor: colors.primary.border,
-        paddingHorizontal: 12
+        paddingHorizontal: DefaultAppStyles.GAP,
+        paddingTop: DefaultAppStyles.GAP_VERTICAL_SMALL
       }}
     >
       {getDateMeta().map(renderItem)}

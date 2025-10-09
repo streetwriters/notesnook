@@ -36,6 +36,7 @@ import { Button } from "../ui/button";
 import Paragraph from "../ui/typography/paragraph";
 import { diff } from "diffblazer";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 
 /**
  *
@@ -158,7 +159,7 @@ export default function NotePreview({ session, content, note }) {
 
       <View
         style={{
-          paddingHorizontal: 12
+          paddingHorizontal: DefaultAppStyles.GAP
         }}
       >
         <Button
@@ -173,7 +174,7 @@ export default function NotePreview({ session, content, note }) {
           type="error"
           width="100%"
           style={{
-            marginTop: 12
+            marginTop: DefaultAppStyles.GAP_VERTICAL
           }}
         />
       </View>

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { sanitizeFilename } from "@notesnook/common";
+import { sanitizeFilename, useIsFeatureAvailable } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
 import { useThemeColors, VariantsWithStaticColors } from "@notesnook/theme";
 import Clipboard from "@react-native-clipboard/clipboard";
@@ -51,8 +51,10 @@ import {
 } from "../../services/event-manager";
 import { useUserStore } from "../../stores/use-user-store";
 import { eCloseSheet } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { sleep } from "../../utils/time";
+import { DefaultAppStyles } from "../../utils/styles";
+import PaywallSheet from "../../components/sheets/paywall";
 const mfaMethods: MFAMethod[] = [
   {
     id: "app",
@@ -97,6 +99,7 @@ type MFAStepProps = {
 export const MFAMethodsPickerStep = ({ recovery, onSuccess }: MFAStepProps) => {
   const { colors } = useThemeColors();
   const user = useUserStore((state) => state.user);
+  const featureAvailable = useIsFeatureAvailable("sms2FA");
 
   const getMethods = () => {
     if (!recovery) return mfaMethods;
@@ -115,13 +118,29 @@ export const MFAMethodsPickerStep = ({ recovery, onSuccess }: MFAStepProps) => {
         <Pressable
           key={item.title}
           onPress={() => {
+            if (
+              item.id === "sms" &&
+              featureAvailable &&
+              !featureAvailable?.isAllowed
+            ) {
+              ToastManager.show({
+                message: featureAvailable?.error,
+                type: "info",
+                context: "local",
+                actionText: strings.upgrade(),
+                func: () => {
+                  PaywallSheet.present(featureAvailable);
+                }
+              });
+              return;
+            }
             onSuccess && onSuccess(item);
           }}
           style={{
-            paddingHorizontal: 12,
-            paddingVertical: 12,
+            paddingHorizontal: DefaultAppStyles.GAP,
+            paddingVertical: DefaultAppStyles.GAP_VERTICAL,
             marginTop: 0,
-            marginBottom: 12,
+            marginBottom: DefaultAppStyles.GAP_VERTICAL,
             flexDirection: "row",
             borderRadius: 0,
             alignItems: "flex-start"
@@ -147,8 +166,8 @@ export const MFAMethodsPickerStep = ({ recovery, onSuccess }: MFAStepProps) => {
               flexShrink: 1
             }}
           >
-            <Heading size={SIZE.md}>{item.title}</Heading>
-            <Paragraph size={SIZE.sm}>{item.body}</Paragraph>
+            <Heading size={AppFontSize.md}>{item.title}</Heading>
+            <Paragraph size={AppFontSize.sm}>{item.body}</Paragraph>
           </View>
         </Pressable>
       ))}
@@ -273,7 +292,7 @@ export const MFASetup = ({
 
       <View
         style={{
-          paddingHorizontal: 12
+          paddingHorizontal: DefaultAppStyles.GAP
         }}
       >
         {loading ? (
@@ -349,7 +368,9 @@ export const MFASetup = ({
               }
             />
 
-            <Heading size={SIZE.md}>{strings.enterSixDigitCode()}</Heading>
+            <Heading size={AppFontSize.md}>
+              {strings.enterSixDigitCode()}
+            </Heading>
             <Paragraph>{codeHelpText[method?.id]}</Paragraph>
             <Seperator />
             <Input
@@ -360,7 +381,7 @@ export const MFASetup = ({
               keyboardType="numeric"
               onChangeText={(value) => (code.current = value)}
               inputStyle={{
-                fontSize: SIZE.lg,
+                fontSize: AppFontSize.lg,
                 height: 60,
                 textAlign: "center",
                 letterSpacing: 10,
@@ -381,7 +402,7 @@ export const MFASetup = ({
               loading={enabling}
               style={{
                 borderRadius: 100,
-                marginBottom: 10
+                marginBottom: DefaultAppStyles.GAP_VERTICAL
               }}
             />
 
@@ -473,7 +494,7 @@ export const MFARecoveryCodes = ({
                   marginVertical: 5,
                   fontFamily: "monospace"
                 }}
-                size={SIZE.lg}
+                size={AppFontSize.lg}
               >
                 {item}
               </Heading>
@@ -485,12 +506,11 @@ export const MFARecoveryCodes = ({
             style={{
               flexDirection: "row",
               justifyContent: "center",
-              marginBottom: 10
+              marginBottom: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             <Button
               title={strings.copyCodes()}
-              fontSize={SIZE.md}
               onPress={() => {
                 const codeString = codes.join("\n");
                 Clipboard.setString(codeString);
@@ -507,7 +527,6 @@ export const MFARecoveryCodes = ({
 
             <Button
               title={strings.saveToFile()}
-              fontSize={SIZE.md}
               onPress={async () => {
                 try {
                   let path;
@@ -560,7 +579,7 @@ export const MFARecoveryCodes = ({
             }}
             style={{
               borderRadius: 100,
-              marginBottom: 10
+              marginBottom: DefaultAppStyles.GAP_VERTICAL
             }}
           />
         </>
@@ -616,7 +635,7 @@ const MFASuccess = ({ recovery }: MFAStepProps) => {
         }}
         style={{
           borderRadius: 100,
-          marginBottom: 10
+          marginBottom: DefaultAppStyles.GAP_VERTICAL
         }}
       />
 

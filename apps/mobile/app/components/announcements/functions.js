@@ -28,6 +28,7 @@ import { List } from "./list";
 import { Photo } from "./photo";
 import { SubHeading } from "./subheading";
 import { Title } from "./title";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export function allowedOnPlatform(platforms) {
   if (!platforms) return true;
@@ -53,7 +54,7 @@ const Features = () => {
   return (
     <View
       style={{
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         alignItems: "center",
         width: "100%"
       }}

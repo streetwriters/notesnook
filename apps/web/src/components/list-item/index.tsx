@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Box, Flex, Text } from "@theme-ui/components";
+import { Flex, Text } from "@theme-ui/components";
 import { ThemeUIStyleObject } from "@theme-ui/css";
 import {
   store as selectionStore,
@@ -58,7 +58,11 @@ type ListItemProps<TItem extends Item, TContext> = {
   footer?: JSX.Element;
 
   context?: TContext;
-  menuItems?: (item: TItem, ids?: string[], context?: TContext) => MenuItem[];
+  menuItems?: (
+    item: TItem,
+    ids?: string[],
+    context?: TContext
+  ) => Promise<MenuItem[]> | MenuItem[];
 
   sx?: ThemeUIStyleObject;
 };
@@ -116,7 +120,7 @@ function ListItem<TItem extends Item, TContext>(
         }
         setDragData(e.dataTransfer, item.type, selectedItems);
       }}
-      onContextMenu={(e) => {
+      onContextMenu={async (e) => {
         e.preventDefault();
         e.stopPropagation();
 
@@ -127,7 +131,7 @@ function ListItem<TItem extends Item, TContext>(
           selectedItems = [];
           selectedItems.push(item.id);
         }
-        let menuItems = props.menuItems?.(item, selectedItems, context);
+        let menuItems = await props.menuItems?.(item, selectedItems, context);
 
         if (selectedItems.length > 1) {
           title = `${selectedItems.length} items selected`;
@@ -142,11 +146,9 @@ function ListItem<TItem extends Item, TContext>(
       }}
       tabIndex={-1}
       sx={{
-        pl: 1,
-        pr: 2,
-        py: 1,
-        mb: "1px",
-        height: "inherit",
+        px: 1,
+        py: isCompact ? 0 : 1,
+        height: isCompact ? 25 : "inherit",
         cursor: "pointer",
         position: "relative",
         overflow: "hidden",
@@ -157,9 +159,6 @@ function ListItem<TItem extends Item, TContext>(
         alignItems: isCompact ? "center" : undefined,
 
         opacity: isDisabled ? 0.7 : 1,
-
-        borderLeft: "5px solid",
-        borderLeftColor: isFocused ? accent : "transparent",
 
         backgroundColor: selected ? "background-selected" : background,
 
@@ -201,16 +200,14 @@ function ListItem<TItem extends Item, TContext>(
         <Text
           dir="auto"
           data-test-id={`title`}
-          variant={isCompact ? "body" : "subtitle"}
+          variant={"body"}
           sx={{
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-            fontWeight: isCompact ? "body" : "bold",
+            fontWeight: isCompact ? "body" : "medium",
             color:
-              selected && heading === "heading"
-                ? `${heading}-selected`
-                : heading,
+              selected && heading === "heading" ? `heading-selected` : heading,
             display: "block"
           }}
         >
@@ -227,6 +224,7 @@ function ListItem<TItem extends Item, TContext>(
           dir="auto"
           data-test-id={`description`}
           sx={{
+            mt: "small",
             color: selected ? "paragraph-selected" : "paragraph",
             lineHeight: `1.2rem`,
             overflow: "hidden",
@@ -241,15 +239,7 @@ function ListItem<TItem extends Item, TContext>(
           {props.body}
         </Text>
       )}
-      {props.footer ? (
-        <Box
-          ml={isCompact ? 1 : 0}
-          mt={isCompact ? 0 : 1}
-          sx={{ flexShrink: 0 }}
-        >
-          {props.footer}
-        </Box>
-      ) : null}
+      {props.footer ? <>{props.footer}</> : null}
     </Flex>
   );
 }

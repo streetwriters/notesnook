@@ -27,7 +27,6 @@ Notesnook is built using the following technologies:
 3. React Native — For mobile apps we are using React Native
 4. Electron — For desktop app
 5. NPM — listed here because we **don't** use Yarn or PNPM or XYZ across any of our projects.
-6. Nx — maintaining monorepos is hard but Nx makes it easier.
 
 > **Note: Each project in the monorepo contains its own architecture details which you can refer to.**
 
@@ -66,7 +65,7 @@ We take all queries, issues and bug reports that you might have. Feel free to as
 
 ## Additional Resources
 
-- [Migrating & Importing your data from other apps — Importer](https://importer.notesnook.com/)
+- [Migrating & Importing your data from other apps — Importer](https://help.notesnook.com/importing-notes)
 - [Privacy policy](https://notesnook.com/privacy) & [Terms of service](https://notesnook.com/terms)
 - [Verify Notesnook encryption claims yourself — Vericrypt](https://vericrypt.notesnook.com/)
 - [Why Notesnook requires an email address?](https://blog.notesnook.com/why-notesnook-requires-an-email-address/)

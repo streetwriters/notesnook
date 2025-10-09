@@ -24,37 +24,35 @@ import {
   useStore as useSettingStore
 } from "../../stores/setting-store";
 import dayjs from "dayjs";
-import { isUserPremium } from "../../hooks/use-is-user-premium";
 import { TimeFormat } from "@notesnook/core";
 import { TrashCleanupInterval } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
+import { checkFeature } from "../../common";
 
 export const BehaviourSettings: SettingsGroup[] = [
   {
     key: "general",
     section: "behaviour",
     header: strings.general(),
-    isHidden: () => !isUserPremium(),
     settings: [
       {
-        key: "default-homepage",
-        title: strings.homepage(),
-        description: strings.homepageDesc(),
-        keywords: ["welcome page", "default screen"],
+        key: "default-sidebar-tab",
+        title: strings.defaultSidebarTab(),
+        description: strings.defaultSidebarTabDesc(),
+        keywords: ["default sidebar tab"],
         onStateChange: (listener) =>
-          useSettingStore.subscribe((s) => s.homepage, listener),
+          useSettingStore.subscribe((s) => s.defaultSidebarTab, listener),
+        featureId: "defaultSidebarTab",
         components: [
           {
             type: "dropdown",
             onSelectionChanged: (value) =>
-              useSettingStore.getState().setHomepage(parseInt(value)),
-            selectedOption: () =>
-              useSettingStore.getState().homepage.toString(),
+              useSettingStore.getState().setDefaultSidebarTab(value as any),
+            selectedOption: () => useSettingStore.getState().defaultSidebarTab,
             options: [
-              { value: "0", title: strings.routes.Notes() },
-              { value: "1", title: strings.routes.Notebooks() },
-              { value: "2", title: strings.routes.Favorites() },
-              { value: "3", title: strings.routes.Tags() }
+              { value: "home", title: strings.routes.Notes() },
+              { value: "notebooks", title: strings.routes.Notebooks() },
+              { value: "tags", title: strings.routes.Tags() }
             ]
           }
         ]
@@ -69,8 +67,15 @@ export const BehaviourSettings: SettingsGroup[] = [
         components: [
           {
             type: "dropdown",
-            onSelectionChanged: (value) =>
-              useSettingStore.getState().setImageCompression(parseInt(value)),
+            onSelectionChanged: async (value) => {
+              if (
+                value === ImageCompressionOptions.DISABLE.toString() &&
+                !(await checkFeature("fullQualityImages"))
+              )
+                return;
+
+              useSettingStore.getState().setImageCompression(parseInt(value));
+            },
             selectedOption: () =>
               useSettingStore.getState().imageCompression.toString(),
             options: [
@@ -154,12 +159,19 @@ export const BehaviourSettings: SettingsGroup[] = [
         components: [
           {
             type: "dropdown",
-            onSelectionChanged: (value) =>
+            onSelectionChanged: async (value) => {
+              if (
+                value === "-1" &&
+                !(await checkFeature("disableTrashCleanup"))
+              )
+                return;
+
               useSettingStore
                 .getState()
                 .setTrashCleanupInterval(
                   parseInt(value) as TrashCleanupInterval
-                ),
+                );
+            },
             selectedOption: () =>
               useSettingStore.getState().trashCleanupInterval.toString(),
             options: [
@@ -167,7 +179,7 @@ export const BehaviourSettings: SettingsGroup[] = [
               { value: "7", title: strings.days(7) },
               { value: "30", title: strings.days(30) },
               { value: "365", title: strings.days(365) },
-              { value: "-1", title: strings.never(), premium: true }
+              { value: "-1", title: strings.never() }
             ]
           }
         ]
@@ -186,7 +198,9 @@ export const BehaviourSettings: SettingsGroup[] = [
         description: strings.automaticUpdatesDesc(),
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.autoUpdates, listener),
-        isHidden: () => useSettingStore.getState().isFlatpak,
+        isHidden: () =>
+          useSettingStore.getState().isFlatpak ||
+          useSettingStore.getState().isSnap,
         components: [
           {
             type: "toggle",

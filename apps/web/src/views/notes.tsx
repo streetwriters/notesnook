@@ -35,14 +35,19 @@ function Notes(props: NotesProps) {
   const context = useNotesStore((store) => store.context);
   const contextNotes = useNotesStore((store) => store.contextNotes);
   const refreshContext = useNotesStore((store) => store.refreshContext);
-  const type = context?.type === "favorite" ? "favorites" : "notes";
+  const type =
+    context?.type === "favorite"
+      ? "favorites"
+      : context?.type === "archive"
+      ? "archive"
+      : "notes";
   const isCompact = useNotesStore((store) => store.viewMode === "compact");
   const filteredItems = useSearch(
-    "notes",
-    (query) => {
+    context?.type === "notebook" ? "notebook" : "notes",
+    async (query, sortOptions) => {
       if (!context || !contextNotes) return;
       const notes = notesFromContext(context);
-      return db.lookup.notes(query, notes).sorted();
+      return await db.lookup.notesWithHighlighting(query, notes, sortOptions);
     },
     [context, contextNotes]
   );
@@ -50,17 +55,23 @@ function Notes(props: NotesProps) {
   if (!context || !contextNotes) return <ListLoader />;
   return (
     <ListContainer
+      type={type}
       group={type}
       refresh={refreshContext}
       compact={isCompact}
       context={context}
       items={filteredItems || contextNotes}
+      isSearching={!!filteredItems}
       onDrop={(e) => handleDrop(e.dataTransfer, context)}
       placeholder={
         <Placeholder
           context={
-            context.type === "favorite"
+            filteredItems
+              ? "search"
+              : context.type === "favorite"
               ? "favorites"
+              : context.type === "archive"
+              ? "archive"
               : context.type === "monographs"
               ? "monographs"
               : "notes"

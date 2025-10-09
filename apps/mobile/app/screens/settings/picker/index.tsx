@@ -27,9 +27,10 @@ import { Pressable } from "../../../components/ui/pressable";
 import Paragraph from "../../../components/ui/typography/paragraph";
 import PremiumService from "../../../services/premium";
 import { getColorLinearShade } from "../../../utils/colors";
-import { SIZE } from "../../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 import { verifyUser } from "../functions";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 interface PickerOptions<T> {
   getValue: () => T;
@@ -38,8 +39,8 @@ interface PickerOptions<T> {
   compareValue: (current: T, item: T) => boolean;
   getItemKey: (item: T) => string;
   options: T[];
-  premium?: boolean;
-  onCheckOptionIsPremium?: (item: T) => boolean;
+  isFeatureAvailable: () => Promise<boolean>;
+  isOptionAvailable: (item: T) => Promise<boolean>;
   requiresVerification?: () => boolean;
   onVerify?: () => Promise<boolean>;
 }
@@ -51,8 +52,8 @@ export function SettingsPicker<T>({
   compareValue,
   options,
   getItemKey,
-  premium,
-  onCheckOptionIsPremium = () => true,
+  isFeatureAvailable,
+  isOptionAvailable,
   requiresVerification = () => false,
   onVerify
 }: PickerOptions<T>) {
@@ -62,19 +63,10 @@ export function SettingsPicker<T>({
   const [currentValue, setCurrentValue] = useState(getValue());
 
   const onChange = async (item: T) => {
-    if (premium && onCheckOptionIsPremium?.(item)) {
-      await PremiumService.verify(
-        async () => {
-          menuRef.current?.hide();
-          await updateValue(item);
-          setCurrentValue(item);
-        },
-        async () => {
-          menuRef.current?.hide();
-          await sleep(300);
-          PremiumService.sheet();
-        }
-      );
+    if ((await isFeatureAvailable()) && (await isOptionAvailable(item))) {
+      menuRef.current?.hide();
+      await updateValue(item);
+      setCurrentValue(item);
       return;
     }
 
@@ -96,7 +88,7 @@ export function SettingsPicker<T>({
         ref={menuRef}
         animationDuration={200}
         style={{
-          borderRadius: 5,
+          borderRadius: defaultBorderRadius,
           backgroundColor: colors.primary.background,
           width: width,
           marginTop: 60,
@@ -114,21 +106,29 @@ export function SettingsPicker<T>({
         anchor={
           <Pressable
             onPress={async () => {
-              if (onVerify && !(await onVerify())) return;
+              if (
+                (onVerify && !(await onVerify())) ||
+                !(await isFeatureAvailable())
+              )
+                return;
               menuRef.current?.show();
             }}
             type="secondary"
             style={{
               flexDirection: "row",
               alignItems: "center",
-              marginTop: 10,
               width: "100%",
               justifyContent: "space-between",
-              padding: 12
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL,
+              paddingHorizontal: DefaultAppStyles.GAP
             }}
           >
             <Paragraph>{formatValue(currentValue)}</Paragraph>
-            <Icon color={colors.primary.icon} name="menu-down" size={SIZE.md} />
+            <Icon
+              color={colors.primary.icon}
+              name="menu-down"
+              size={AppFontSize.md}
+            />
           </Pressable>
         }
       >
@@ -155,7 +155,8 @@ export function SettingsPicker<T>({
               maxWidth: width
             }}
             textStyle={{
-              fontSize: SIZE.md,
+              fontSize: AppFontSize.sm,
+              fontFamily: "Inter-Regular",
               color: compareValue(currentValue, item)
                 ? colors.primary.accent
                 : colors.primary.paragraph

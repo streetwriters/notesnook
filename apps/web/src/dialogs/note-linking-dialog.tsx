@@ -27,15 +27,20 @@ import {
   VirtualizedGrouping,
   createInternalLink
 } from "@notesnook/core";
-import { VirtualizedList } from "../components/virtualized-list";
 import { Button, Flex, Text } from "@theme-ui/components";
-import { ScrollContainer } from "@notesnook/ui";
 import { LinkAttributes } from "@notesnook/editor";
-import { NoteResolvedData, ResolvedItem } from "@notesnook/common";
+import {
+  NoteResolvedData,
+  ResolvedItem,
+  useIsFeatureAvailable
+} from "@notesnook/common";
 import { Lock } from "../components/icons";
 import { ellipsize } from "@notesnook/core";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
+import { Virtuoso } from "react-virtuoso";
+import { CustomScrollbarsVirtualList } from "../components/list-container";
+import { UpgradeDialog } from "./buy-dialog/upgrade-dialog";
 
 export type NoteLinkingDialogProps = BaseDialogProps<LinkAttributes | false> & {
   attributes?: LinkAttributes;
@@ -52,6 +57,7 @@ export const NoteLinkingDialog = DialogManager.register(
     const [filteredBlocks, setFilteredBlocks] = useState<
       ContentBlock[] | undefined
     >();
+    const blockLinkingAvailability = useIsFeatureAvailable("blockLinking");
 
     return (
       <Dialog
@@ -83,7 +89,10 @@ export const NoteLinkingDialog = DialogManager.register(
         }}
         noScroll
       >
-        <Flex variant="columnFill" sx={{ mx: 3, overflow: "hidden" }}>
+        <Flex
+          variant="columnFill"
+          sx={{ mx: 3, overflow: "hidden", height: 500 }}
+        >
           {selectedNote ? (
             <>
               <Field
@@ -111,7 +120,7 @@ export const NoteLinkingDialog = DialogManager.register(
               />
               <Button
                 variant="accentSecondary"
-                sx={{ mt: 1, textAlign: "left" }}
+                sx={{ mt: 1, textAlign: "left", flexShrink: 0 }}
                 onClick={() => {
                   setSelectedNote(undefined);
                   setIsNoteLocked(false);
@@ -122,68 +131,91 @@ export const NoteLinkingDialog = DialogManager.register(
                 {strings.linkNoteSelectedNote()}: {selectedNote.title} (
                 {strings.clickToDeselect()})
               </Button>
-              {isNoteLocked ? (
-                <Text variant="body" sx={{ mt: 1 }}>
-                  {strings.noteLockedBlockLink()}
-                </Text>
-              ) : blocks.length <= 0 ? (
-                <Text variant="body" sx={{ mt: 1 }}>
-                  {strings.noBlocksOnNote()}
-                </Text>
-              ) : null}
-              <ScrollContainer>
-                <VirtualizedList
-                  items={filteredBlocks || blocks}
-                  estimatedSize={34}
-                  mode="dynamic"
-                  itemGap={5}
-                  getItemKey={(i) => blocks[i].id}
-                  mt={1}
-                  renderItem={({ item }) => (
-                    <Button
-                      variant="menuitem"
-                      sx={{
-                        p: 1,
-                        width: "100%",
-                        textAlign: "left",
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        borderBottom: "1px solid var(--border)"
-                      }}
-                      onClick={() => {
-                        props.onClose({
-                          title: selectedNote.title,
-                          href: createInternalLink("note", selectedNote.id, {
-                            blockId: item.id
-                          })
-                        });
-                      }}
-                    >
-                      <Text
-                        variant="body"
-                        sx={{ fontFamily: "monospace", whiteSpace: "pre-wrap" }}
-                      >
-                        {ellipsize(item.content, 200, "end").trim() ||
-                          strings.linkNoteEmptyBlock()}
-                      </Text>
-                      <Text
-                        variant="subBody"
+
+              {blockLinkingAvailability?.isAllowed ? (
+                <>
+                  {isNoteLocked ? (
+                    <Text variant="body" sx={{ mt: 1 }}>
+                      {strings.noteLockedBlockLink()}
+                    </Text>
+                  ) : blocks.length <= 0 ? (
+                    <Text variant="body" sx={{ mt: 1 }}>
+                      {strings.noBlocksOnNote()}
+                    </Text>
+                  ) : null}
+                  <Virtuoso
+                    style={{ height: "100%", width: "100%" }}
+                    components={{
+                      Scroller: CustomScrollbarsVirtualList
+                    }}
+                    data={filteredBlocks || blocks}
+                    context={{ items: filteredBlocks || blocks }}
+                    itemContent={(_, item) => (
+                      <Button
+                        variant="menuitem"
                         sx={{
-                          bg: "background-secondary",
-                          flexShrink: 0,
-                          p: "small",
-                          px: 1,
-                          borderRadius: "default",
-                          alignSelf: "flex-start"
+                          p: 1,
+                          width: "100%",
+                          textAlign: "left",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          borderBottom: "1px solid var(--border)"
+                        }}
+                        onClick={() => {
+                          props.onClose({
+                            title: selectedNote.title,
+                            href: createInternalLink("note", selectedNote.id, {
+                              blockId: item.id
+                            })
+                          });
                         }}
                       >
-                        {item.type.toUpperCase()}
-                      </Text>
-                    </Button>
-                  )}
-                />
-              </ScrollContainer>
+                        <Text
+                          variant="body"
+                          sx={{
+                            fontFamily: "monospace",
+                            whiteSpace: "pre-wrap"
+                          }}
+                        >
+                          {ellipsize(item.content, 200, "end").trim() ||
+                            strings.linkNoteEmptyBlock()}
+                        </Text>
+                        <Text
+                          variant="subBody"
+                          sx={{
+                            bg: "background-secondary",
+                            flexShrink: 0,
+                            p: "small",
+                            px: 1,
+                            borderRadius: "default",
+                            alignSelf: "flex-start"
+                          }}
+                        >
+                          {item.type.toUpperCase()}
+                        </Text>
+                      </Button>
+                    )}
+                  />
+                </>
+              ) : (
+                <Text variant="body" sx={{ mt: 1 }}>
+                  {blockLinkingAvailability?.error}{" "}
+                  <Button
+                    onClick={() =>
+                      blockLinkingAvailability
+                        ? UpgradeDialog.show({
+                            feature: blockLinkingAvailability
+                          })
+                        : null
+                    }
+                    variant="anchor"
+                  >
+                    Upgrade now
+                  </Button>
+                  .
+                </Text>
+              )}
             </>
           ) : (
             <>
@@ -203,14 +235,14 @@ export const NoteLinkingDialog = DialogManager.register(
                 }}
               />
               {notes && (
-                <ScrollContainer>
-                  <VirtualizedList
-                    items={notes.placeholders}
-                    estimatedSize={28}
-                    itemGap={5}
-                    getItemKey={notes.key}
-                    mt={1}
-                    renderItem={({ index }) => (
+                <Virtuoso
+                  data={notes.placeholders}
+                  components={{
+                    Scroller: CustomScrollbarsVirtualList
+                  }}
+                  style={{ height: "100%", width: "100%" }}
+                  itemContent={(index) => (
+                    <div style={{ height: 28 }}>
                       <ResolvedItem items={notes} index={index} type="note">
                         {({ item: note, data }) => (
                           <Button
@@ -239,9 +271,9 @@ export const NoteLinkingDialog = DialogManager.register(
                           </Button>
                         )}
                       </ResolvedItem>
-                    )}
-                  />
-                </ScrollContainer>
+                    </div>
+                  )}
+                />
               )}
             </>
           )}

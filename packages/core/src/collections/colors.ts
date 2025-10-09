@@ -24,7 +24,6 @@ import Database from "../api/index.js";
 import { sanitizeTag } from "./tags.js";
 import { SQLCollection } from "../database/sql-collection.js";
 import { isFalse } from "../database/index.js";
-import { CHECK_IDS, checkIsUserPremium } from "../common.js";
 
 export const DefaultColors: Record<string, string> = {
   red: "#f44336",
@@ -85,7 +84,6 @@ export class Colors implements ICollection {
       await this.collection.update([oldColor.id], item);
       return oldColor.id;
     }
-    if (!(await checkIsUserPremium(CHECK_IDS.noteColor))) return;
 
     const id = item.id || getId(item.dateCreated);
     await this.collection.upsert({
@@ -110,6 +108,12 @@ export class Colors implements ICollection {
       (qb) => qb.where(isFalse("deleted")),
       this.db.options?.batchSize
     );
+  }
+
+  async count(id: string) {
+    const color = await this.color(id);
+    if (!color) return;
+    return this.db.relations.from(color, "note").count();
   }
 
   async remove(...ids: string[]) {

@@ -108,10 +108,10 @@ const MARKDOWN_PATTERNS: MarkdownPattern[] = [
   { pattern: /\[:(.+?)\]/, score: 2, type: "footnote" },
 
   // Weak indicators
-  { pattern: /(?<!\*)\*\*[^*\n]+\*\*(?!\*)/m, score: 1, type: "bold" },
-  { pattern: /(?<!\*)\*[^*\n]+\*(?!\*)/m, score: 1, type: "italic" },
-  { pattern: /(?<!_)__[^_\n]+__(?!_)/m, score: 1, type: "boldUnderscore" },
-  { pattern: /(?<!_)_[^_\n]+_(?!_)/m, score: 1, type: "italicUnderscore" },
+  { pattern: /(^|[^*])\*\*([^*\n]+)\*\*(?!\*)/m, score: 1, type: "bold" },
+  { pattern: /(^|[^*])\*([^*\n]+)\*(?!\*)/m, score: 1, type: "italic" },
+  { pattern: /(^|[^_])__([^_\n]+)__(?!_)/m, score: 1, type: "boldUnderscore" },
+  { pattern: /(^|[^_])_([^_\n]+)_(?!_)/m, score: 1, type: "italicUnderscore" },
   { pattern: /`[^`\n]+`/m, score: 1, type: "inlineCode" },
   { pattern: /~~[^~\n]+~~/m, score: 1, type: "strikethrough" },
 

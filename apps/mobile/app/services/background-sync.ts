@@ -21,6 +21,7 @@ import { AppRegistry, AppState, Platform } from "react-native";
 import {
   beginBackgroundTask,
   endBackgroundTask
+  //@ts-ignore
 } from "react-native-begin-background-task";
 import { DatabaseLogger, db, setupDatabase } from "../common/database";
 import { deleteDCacheFiles } from "../common/filesystem/io";
@@ -112,7 +113,10 @@ async function onBackgroundSyncStarted() {
       useUserStore.getState().setSyncing(false);
     }
     await Notifications.setupReminders();
-
+    if (SettingsService.get().notifNotes) {
+      Notifications.pinQuickNote(false);
+    }
+    Notifications.restorePinnedNotes();
     NotePreviewWidget.updateNotes();
     deleteDCacheFiles();
     DatabaseLogger.info("BACKGROUND SYNC COMPLETE");
@@ -140,6 +144,8 @@ const onBoot = async () => {
     if (SettingsService.get().notifNotes) {
       Notifications.pinQuickNote(false);
     }
+    Notifications.restorePinnedNotes();
+    NotePreviewWidget.updateNotes();
     DatabaseLogger.info("BOOT TASK COMPLETE");
   } catch (e) {
     DatabaseLogger.error(e as Error);

@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import * as React from "react";
 import { View } from "react-native";
 import { DraxDragWithReceiverEventData, DraxView } from "react-native-drax";
@@ -24,17 +25,18 @@ import Animated, { Layout } from "react-native-reanimated";
 import { presentDialog } from "../../../components/dialog/functions";
 import { IconButton } from "../../../components/ui/icon-button";
 import Paragraph from "../../../components/ui/typography/paragraph";
-import { useThemeColors } from "@notesnook/theme";
 import { getElevationStyle } from "../../../utils/elevation";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { renderTool } from "./common";
 import { DraggableItem, useDragState } from "./state";
 import ToolSheet from "./tool-sheet";
 
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { useIsFeatureAvailable } from "@notesnook/common";
 import type { ToolId } from "@notesnook/editor";
-import PremiumService from "../../../services/premium";
 import { strings } from "@notesnook/intl";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { ToastManager } from "../../../services/event-manager";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 export const Group = ({
   item,
@@ -60,10 +62,14 @@ export const Group = ({
     width: 0
   });
   const { colors } = useThemeColors();
+  const featureAvailable = useIsFeatureAvailable("customToolbarPreset");
 
   const onDrop = (data: DraxDragWithReceiverEventData) => {
-    if (!PremiumService.get()) {
-      PremiumService.sheet("global");
+    if (!featureAvailable?.isAllowed) {
+      ToastManager.show({
+        type: "info",
+        message: featureAvailable?.error
+      });
       return;
     }
     const isDroppedAbove = data.receiver.receiveOffsetRatio.y < 0.5;
@@ -126,8 +132,11 @@ export const Group = ({
     {
       name: "minus",
       onPress: () => {
-        if (!PremiumService.get()) {
-          PremiumService.sheet("global");
+        if (!featureAvailable?.isAllowed) {
+          ToastManager.show({
+            type: "info",
+            message: featureAvailable?.error
+          });
           return;
         }
         presentDialog({
@@ -135,7 +144,7 @@ export const Group = ({
           title: strings.deleteGroup(),
           positiveText: strings.delete(),
           paragraph: strings.deleteGroupDesc(),
-          positivePress: () => {
+          positivePress: async () => {
             if (groupIndex === undefined) return;
             const _data = useDragState.getState().data.slice();
 
@@ -149,8 +158,11 @@ export const Group = ({
     {
       name: "plus",
       onPress: () => {
-        if (!PremiumService.get()) {
-          PremiumService.sheet("global");
+        if (!featureAvailable?.isAllowed) {
+          ToastManager.show({
+            type: "info",
+            message: featureAvailable?.error
+          });
           return;
         }
         ToolSheet.present({
@@ -176,7 +188,7 @@ export const Group = ({
             backgroundColor: colors.primary.background,
             borderRadius: 10,
             ...getElevationStyle(hover ? 5 : 0),
-            marginTop: isSubgroup ? 0 : 10
+            marginTop: isSubgroup ? 0 : DefaultAppStyles.GAP_VERTICAL
           }
         ]}
       >
@@ -196,13 +208,17 @@ export const Group = ({
                 alignItems: "center"
               }}
             >
-              <Icon size={SIZE.md} name="drag" color={colors.primary.icon} />
+              <Icon
+                size={AppFontSize.md}
+                name="drag"
+                color={colors.primary.icon}
+              />
               <Paragraph
                 style={{
                   marginLeft: 5
                 }}
                 color={colors.secondary.paragraph}
-                size={SIZE.xs}
+                size={AppFontSize.xs}
               >
                 {strings.group()}
               </Paragraph>
@@ -227,7 +243,7 @@ export const Group = ({
                   onPress={item.onPress}
                   name={item.name}
                   color={colors.primary.icon}
-                  size={SIZE.lg}
+                  size={AppFontSize.lg}
                 />
               ))}
             </View>
@@ -290,8 +306,10 @@ export const Group = ({
             dragged.type === "subgroup"
               ? colors.secondary.background
               : undefined,
-          marginTop: recievePosition === "above" ? 10 : 0,
-          marginBottom: recievePosition === "below" ? 10 : 0,
+          marginTop:
+            recievePosition === "above" ? DefaultAppStyles.GAP_VERTICAL : 0,
+          marginBottom:
+            recievePosition === "below" ? DefaultAppStyles.GAP_VERTICAL : 0,
           borderRadius: 10
         }}
         renderHoverContent={() => renderGroup(true)}

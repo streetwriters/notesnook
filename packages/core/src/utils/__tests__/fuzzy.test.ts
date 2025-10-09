@@ -37,7 +37,9 @@ describe("lookup.fuzzy", () => {
       }
     ];
     const query = "ems";
-    expect(fuzzy(query, items, { title: 1 })).toStrictEqual([items[2]]);
+    expect(fuzzy(query, items, (item) => item.id, { title: 1 })).toStrictEqual([
+      items[2]
+    ]);
   });
   describe("opts.prefix", () => {
     test("should prefix matched field with provided value when given", () => {
@@ -56,6 +58,7 @@ describe("lookup.fuzzy", () => {
         fuzzy(
           query,
           items,
+          (item) => item.id,
           { title: 1 },
           {
             prefix: "prefix-"
@@ -81,6 +84,7 @@ describe("lookup.fuzzy", () => {
         fuzzy(
           query,
           items,
+          (item) => item.id,
           { title: 1 },
           {
             suffix: "-suffix"

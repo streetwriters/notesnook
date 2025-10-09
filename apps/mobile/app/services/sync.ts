@@ -36,6 +36,7 @@ export const ignoredMessages = [
 ];
 let pendingSync: any = undefined;
 let syncTimer: NodeJS.Timeout;
+let lastSyncType = "full";
 
 const run = async (
   context = "global",
@@ -69,10 +70,12 @@ const run = async (
 
     if (!user || SettingsService.get().disableSync) {
       userstore.setSyncing(false);
-      initAfterSync();
+      initAfterSync(type != "send" ? "full" : "send");
       pendingSync = undefined;
       return onCompleted?.(SyncStatus.Failed);
     }
+
+    lastSyncType = type != "send" ? "full" : "send";
 
     let error: Error | undefined = undefined;
 
@@ -103,7 +106,6 @@ const run = async (
         }
       }
     } finally {
-      initAfterSync();
       userstore.setSyncing(
         false,
         error ? SyncStatus.Failed : SyncStatus.Passed
@@ -122,7 +124,8 @@ const run = async (
 };
 
 const Sync = {
-  run
+  run,
+  getLastSyncType: () => lastSyncType
 };
 
 export default Sync;

@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { forwardRef, useEffect, useRef, useState } from "react";
 import { Flex, Button } from "@theme-ui/components";
+import { SxProp } from "@theme-ui/core";
 import { Plus } from "../icons";
 import {
   useStore as useSelectionStore,
@@ -32,10 +33,11 @@ import {
 } from "./list-profiles";
 import Announcements from "../announcements";
 import { ListLoader } from "../loaders/list-loader";
-import ScrollContainer from "../scroll-container";
+import ScrollContainer, { ScrollContainerProps } from "../scroll-container";
 import { useKeyboardListNavigation } from "../../hooks/use-keyboard-list-navigation";
 import { VirtualizedGrouping, GroupingKey, Item } from "@notesnook/core";
 import {
+  Components,
   FlatScrollIntoViewLocation,
   ItemProps,
   ScrollerProps,
@@ -48,7 +50,7 @@ import { AppEventManager, AppEvents } from "../../common/app-events";
 
 export const CustomScrollbarsVirtualList = forwardRef<
   HTMLDivElement,
-  ScrollerProps
+  ScrollerProps & ScrollContainerProps
 >(function CustomScrollbarsVirtualList(props, ref) {
   return (
     <ScrollContainer
@@ -62,6 +64,7 @@ export const CustomScrollbarsVirtualList = forwardRef<
 });
 
 type ListContainerProps = {
+  type: GroupingKey;
   group?: GroupingKey;
   items: VirtualizedGrouping<Item>;
   compact?: boolean;
@@ -70,13 +73,27 @@ type ListContainerProps = {
   header?: JSX.Element;
   placeholder: JSX.Element;
   isLoading?: boolean;
+  isSearching?: boolean;
   onDrop?: (e: React.DragEvent<HTMLDivElement>) => void;
   button?: {
     onClick: () => void;
   };
-};
+  Scroller?: Components["Scroller"];
+} & SxProp;
 function ListContainer(props: ListContainerProps) {
-  const { group, items, context, refresh, header, button, compact } = props;
+  const {
+    type,
+    group,
+    items,
+    context,
+    refresh,
+    header,
+    button,
+    compact,
+    sx,
+    Scroller,
+    isSearching
+  } = props;
 
   const [focusedGroupIndex, setFocusedGroupIndex] = useState(-1);
 
@@ -96,7 +113,7 @@ function ListContainer(props: ListContainerProps) {
     let flashStartTimeout: NodeJS.Timeout;
     let flashEndTimeout: NodeJS.Timeout;
 
-    AppEventManager.subscribe(
+    const event = AppEventManager.subscribe(
       AppEvents.revealItemInList,
       async (id?: string) => {
         if (!id || !listRef.current) return;
@@ -117,16 +134,17 @@ function ListContainer(props: ListContainerProps) {
           noteItem.classList.add("flash");
           flashEndTimeout = setTimeout(() => {
             noteItem.classList.remove("flash");
-          }, 1000);
+          }, 2000);
         }, 500);
       }
     );
 
     return () => {
+      event.unsubscribe();
       clearTimeout(flashStartTimeout);
       clearTimeout(flashEndTimeout);
     };
-  }, []);
+  }, [items]);
 
   useEffect(() => {
     return () => {
@@ -180,7 +198,7 @@ function ListContainer(props: ListContainerProps) {
   return (
     <Flex
       variant="columnFill"
-      sx={{ overflow: "hidden" }}
+      sx={{ overflow: "hidden", ...sx }}
       onDragOver={(e) => e.preventDefault()}
       onDrop={props.onDrop}
     >
@@ -200,7 +218,7 @@ function ListContainer(props: ListContainerProps) {
           <Flex
             ref={listContainerRef}
             variant="columnFill"
-            data-test-id={`${group}-list`}
+            data-test-id={`${type}-list`}
           >
             <Virtuoso
               ref={listRef}
@@ -210,7 +228,7 @@ function ListContainer(props: ListContainerProps) {
               onBlur={() => setFocusedGroupIndex(-1)}
               onKeyDown={(e) => onKeyDown(e.nativeEvent)}
               components={{
-                Scroller: CustomScrollbarsVirtualList,
+                Scroller: Scroller || CustomScrollbarsVirtualList,
                 Item: VirtuosoItem,
                 Header: ListHeader
               }}
@@ -226,11 +244,14 @@ function ListContainer(props: ListContainerProps) {
                 focusGroup: setFocusedGroupIndex,
                 context,
                 compact,
-                onMouseUp
+                onMouseUp,
+                isSearching
               }}
-              itemContent={(index, _data, context) => (
-                <ItemRenderer context={context} index={index} />
-              )}
+              itemContent={(index, _data, context) =>
+                context ? (
+                  <ItemRenderer context={context} index={index} />
+                ) : null
+              }
             />
           </Flex>
         </>
@@ -276,6 +297,7 @@ type ListContext = {
   focusGroup: (index: number) => void;
   context?: Context;
   compact?: boolean;
+  isSearching?: boolean;
 
   onMouseUp: (e: MouseEvent, itemIndex: number) => void;
 };
@@ -295,8 +317,10 @@ function ItemRenderer({
     selectItems,
     scrollToIndex,
     context: itemContext,
-    compact
+    compact,
+    isSearching
   } = context;
+
   const resolvedItem = useResolvedItem({ index, items });
   if (!resolvedItem || !resolvedItem.item) {
     const placeholderData = getListItemPlaceholderData(group, compact);
@@ -334,6 +358,7 @@ function ItemRenderer({
       {resolvedItem.group && group ? (
         <GroupHeader
           groupingKey={group}
+          isSearching={isSearching}
           refresh={refresh}
           title={resolvedItem.group.title}
           isFocused={index === focusedGroupIndex}
@@ -370,7 +395,7 @@ function ItemRenderer({
         item={resolvedItem.item}
         data={resolvedItem.data}
         context={itemContext}
-        group={group}
+        group={isSearching ? "search" : group}
         compact={compact}
       />
     </>

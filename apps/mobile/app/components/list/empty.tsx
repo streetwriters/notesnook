@@ -19,12 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
-import { ActivityIndicator, useWindowDimensions, View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 import { notesnook } from "../../../e2e/test.ids";
-import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { TTip, useTip } from "../../services/tip-manager";
+import { RouteParams } from "../../stores/use-navigation-store";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { Tip } from "../tip";
 import { Button } from "../ui/button";
 import Seperator from "../ui/seperator";
@@ -46,7 +46,7 @@ type EmptyListProps = {
   title?: string;
   color?: string;
   dataType: string;
-  screen?: string;
+  screen?: keyof RouteParams;
 };
 
 export const Empty = React.memo(function Empty({
@@ -58,8 +58,6 @@ export const Empty = React.memo(function Empty({
   screen
 }: EmptyListProps) {
   const { colors } = useThemeColors();
-  const insets = useGlobalSafeAreaInsets();
-  const { height } = useWindowDimensions();
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
   );
@@ -74,7 +72,7 @@ export const Empty = React.memo(function Empty({
     <View
       style={[
         {
-          height: height - (140 + insets.top),
+          flex: 1,
           width: "80%",
           justifyContent: "center",
           alignSelf: "center"
@@ -98,18 +96,13 @@ export const Empty = React.memo(function Empty({
           {placeholder?.button && (
             <Button
               testID={notesnook.buttons.add}
-              type="accent"
+              type="secondaryAccented"
               title={placeholder?.button}
               iconPosition="right"
               icon="arrow-right"
               onPress={placeholder?.action}
-              buttonType={{
-                text: "white"
-              }}
               style={{
-                alignSelf: "flex-start",
-                borderRadius: 5,
-                height: 40
+                alignSelf: "flex-start"
               }}
             />
           )}
@@ -124,12 +117,12 @@ export const Empty = React.memo(function Empty({
             }}
           >
             <Heading>{placeholder?.title}</Heading>
-            <Paragraph size={SIZE.sm} textBreakStrategy="balanced">
+            <Paragraph size={AppFontSize.sm} textBreakStrategy="balanced">
               {placeholder?.loading}
             </Paragraph>
             <Seperator />
             <ActivityIndicator
-              size={SIZE.lg}
+              size={AppFontSize.lg}
               color={color || colors.primary.accent}
             />
           </View>

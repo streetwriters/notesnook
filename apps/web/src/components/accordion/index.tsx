@@ -45,11 +45,7 @@ export default function Accordion(
     containerSx,
     ...restProps
   } = props;
-  const [isContentHidden, setIsContentHidden] = useState(false);
-
-  useEffect(() => {
-    setIsContentHidden(isClosed);
-  }, [isClosed]);
+  const [isContentHidden, setIsContentHidden] = useState(isClosed);
 
   return (
     <Flex sx={{ flexDirection: "column", ...sx }} {...restProps}>

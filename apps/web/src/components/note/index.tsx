@@ -20,13 +20,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import {
   NoteResolvedData,
   exportContent,
+  getFormattedDate,
   getFormattedReminderTime
 } from "@notesnook/common";
 import {
   Color,
   Note as NoteType,
   Notebook as NotebookItem,
-  Tag,
+  Tag as TagType,
   createInternalLink,
   hosts,
   isReminderActive,
@@ -35,7 +36,7 @@ import {
 import { strings } from "@notesnook/intl";
 import { SchemeColors } from "@notesnook/theme";
 import { MenuItem } from "@notesnook/ui";
-import { Button, Flex, Text } from "@theme-ui/components";
+import { Flex, Text } from "@theme-ui/components";
 import React from "react";
 import { db } from "../../common/db";
 import { exportNote, exportNotes } from "../../common/export";
@@ -46,7 +47,6 @@ import { AddTagsDialog } from "../../dialogs/add-tags-dialog";
 import { ConfirmDialog } from "../../dialogs/confirm";
 import { CreateColorDialog } from "../../dialogs/create-color-dialog";
 import { MoveNoteDialog } from "../../dialogs/move-note-dialog";
-import { isUserPremium } from "../../hooks/use-is-user-premium";
 import { navigate } from "../../navigation";
 import { useEditorStore } from "../../stores/editor-store";
 import { useStore as useMonographStore } from "../../stores/monograph-store";
@@ -54,6 +54,7 @@ import { store } from "../../stores/note-store";
 import { store as selectionStore } from "../../stores/selection-store";
 import { store as tagStore } from "../../stores/tag-store";
 import { store as userstore } from "../../stores/user-store";
+import { store as appStore } from "../../stores/app-store";
 import { writeToClipboard } from "../../utils/clipboard";
 import { showToast } from "../../utils/toast";
 import IconTag from "../icon-tag";
@@ -61,6 +62,7 @@ import {
   AddReminder,
   AddToNotebook,
   Alert,
+  Archive,
   Attachment,
   AttachmentError,
   Circle,
@@ -89,7 +91,8 @@ import {
   SyncOff,
   Tag2,
   Tag as TagIcon,
-  Trash
+  Trash,
+  Update
 } from "../icons";
 import { Context } from "../list-container/types";
 import ListItem from "../list-item";
@@ -142,6 +145,11 @@ function Note(props: NoteProps) {
         heading: color ? primary : "heading",
         background: "background"
       }}
+      sx={{
+        borderLeft: isOpened ? "4px solid" : "none",
+        pl: isOpened ? "3px" : "7px",
+        borderLeftColor: isOpened ? primary : "transparent"
+      }}
       context={{ color, locked }}
       menuItems={noteMenuItems}
       onClick={() => useEditorStore.getState().openSession(note)}
@@ -149,35 +157,8 @@ function Note(props: NoteProps) {
         useEditorStore.getState().openSession(note, { openInNewTab: true })
       }
       header={
-        <Flex
-          sx={{ alignItems: "center", flexWrap: "wrap", gap: 1, mt: "small" }}
-        >
-          {context?.type !== "notebook" &&
-            notebooks?.items.map((notebook) => (
-              <IconTag
-                key={notebook.id}
-                onClick={() => {
-                  navigate(`/notebooks/${notebook.id}`);
-                }}
-                text={notebook.title}
-                icon={Notebook}
-              />
-            ))}
-          {reminder && isReminderActive(reminder) ? (
-            <IconTag
-              icon={Reminder}
-              text={getFormattedReminderTime(reminder, true)}
-              title={reminder.title}
-              styles={
-                isReminderToday(reminder)
-                  ? {
-                      icon: { color: primary },
-                      text: { color: primary }
-                    }
-                  : {}
-              }
-            />
-          ) : null}
+        <Flex sx={{ alignItems: "center", mb: 1 }}>
+          <Text variant="subBody">{getFormattedDate(date, "date")}</Text>
         </Flex>
       }
       footer={
@@ -186,7 +167,10 @@ function Note(props: NoteProps) {
             fontSize: "subBody",
             color: "paragraph-secondary",
             alignItems: "center",
-            gap: 1
+            gap: 1,
+            flexWrap: "wrap",
+            mt: "small",
+            flexShrink: 0
           }}
         >
           {compact ? (
@@ -203,12 +187,12 @@ function Note(props: NoteProps) {
 
               {note.localOnly && <SyncOff size={13} />}
 
-              <TimeAgo
+              {/* <TimeAgo
                 sx={{ flexShrink: 0 }}
                 locale="en_short"
                 live={true}
                 datetime={date}
-              />
+              /> */}
 
               {attachments?.total ? (
                 <Flex sx={{ alignItems: "center", justifyContent: "center" }}>
@@ -226,9 +210,7 @@ function Note(props: NoteProps) {
                 </Flex>
               ) : null}
 
-              {note.pinned && !props.context && (
-                <Pin size={13} color={primary} />
-              )}
+              {note.pinned && !props.context && <Pin size={13} />}
 
               {locked && <Lock size={13} data-test-id={`locked`} />}
 
@@ -240,28 +222,52 @@ function Note(props: NoteProps) {
 
               {tags?.items.map((tag) => {
                 return (
-                  <Button
-                    data-test-id={`tag-item`}
+                  <IconTag
+                    testId={`tag-item`}
                     key={tag.id}
-                    variant="anchor"
-                    title={strings.goToTag(tag.title)}
                     onClick={(e) => {
                       e.stopPropagation();
                       if (!tag.id)
                         return showToast("error", strings.tagNotFound());
+
+                      appStore.get().setNavigationTab("tags");
                       navigate(`/tags/${tag.id}`);
                     }}
-                    sx={{
-                      maxWidth: `calc(100% / ${tags.items.length})`,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      color: "var(--paragraph-secondary)"
-                    }}
-                  >
-                    #{tag.title}
-                  </Button>
+                    text={tag.title}
+                    title={strings.goToTag(tag.title)}
+                    icon={TagIcon}
+                  />
                 );
               })}
+
+              {context?.type !== "notebook" &&
+                notebooks?.items.map((notebook) => (
+                  <IconTag
+                    key={notebook.id}
+                    onClick={() => {
+                      appStore.get().setNavigationTab("notebooks");
+                      navigate(`/notebooks/${notebook.id}`);
+                    }}
+                    text={notebook.title}
+                    icon={Notebook}
+                  />
+                ))}
+
+              {reminder && isReminderActive(reminder) ? (
+                <IconTag
+                  icon={Reminder}
+                  text={getFormattedReminderTime(reminder, true)}
+                  title={reminder.title}
+                  styles={
+                    isReminderToday(reminder)
+                      ? {
+                          icon: { color: primary },
+                          text: { color: primary }
+                        }
+                      : {}
+                  }
+                />
+              ) : null}
             </>
           )}
         </Flex>
@@ -325,7 +331,6 @@ export const noteMenuItems: (
   ids?: string[],
   context?: { color?: Color; locked?: boolean }
 ) => MenuItem[] = (note, ids = [], context) => {
-  const isPro = isUserPremium();
   // const isSynced = db.notes.note(note.id)?.synced();
 
   return [
@@ -370,7 +375,6 @@ export const noteMenuItems: (
       //isDisabled: !isSynced,
       title: strings.lock(),
       isChecked: context?.locked,
-      isDisabled: !isPro,
       icon: Lock.path,
       onClick: async () => {
         const { unlock, lock } = store.get();
@@ -389,6 +393,15 @@ export const noteMenuItems: (
       onClick: async () => {
         await AddReminderDialog.show({ note });
       }
+    },
+    {
+      type: "button",
+      key: "archive",
+      title: strings.archive(),
+      isChecked: note.archived,
+      icon: Archive.path,
+      onClick: () => store.archive(!note.archived, ...ids),
+      multiSelect: true
     },
     { key: "sep1", type: "separator" },
     {
@@ -462,6 +475,15 @@ export const noteMenuItems: (
                 }
               },
               {
+                type: "button",
+                key: "update",
+                title: strings.update(),
+                icon: Update.path,
+                onClick: () => {
+                  showPublishView(note, "bottom");
+                }
+              },
+              {
                 type: "separator",
                 key: "sep"
               },
@@ -492,11 +514,7 @@ export const noteMenuItems: (
           title: format.title,
           tooltip: strings.exportAs(format.title),
           icon: format.icon.path,
-          isDisabled:
-            (format.type !== "txt" && !isPro) ||
-            (format.type === "pdf" && ids.length > 1),
-          // ? "Multiple notes cannot be exported as PDF."
-          // : false,
+          isDisabled: format.type === "pdf" && ids.length > 1,
           multiSelect: true,
           onClick: async () => {
             if (ids.length === 1) {
@@ -735,8 +753,8 @@ function tagsMenuItems(ids: string[]): MenuItem[] {
       type: "lazy-loader",
       key: "tags-lazy-loader",
       async items() {
-        const tags: Map<string, Tag> = new Map();
-        const tagShortcuts: Map<string, Tag> = new Map();
+        const tags: Map<string, TagType> = new Map();
+        const tagShortcuts: Map<string, TagType> = new Map();
 
         const linkedTags = await db.relations
           .to({ ids, type: "note" }, "tag")

@@ -9,6 +9,10 @@ Sharing a note with someone can be such a tedious task. You have to copy/downloa
 
 With Notesnook, you don't need to do that anymore. Monographs enable you to share your notes with anyone in a single click. Once a note is published as a monograph, you get a public URL which you can share with anyone. They don't need to download Notesnook or install any extra software — it's just like a blog, only simpler.
 
+> warn Size limit
+>
+> Currently, monographs are limited to 15 MB in size. This includes attachments as well. If you try to publish a note larger than 15 MB, you'll get an error.
+
 ## How to publish a note?
 
 # [Desktop/Web](#/tab/web)

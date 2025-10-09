@@ -162,6 +162,15 @@ function DiffViewer(props: DiffViewerProps) {
               <Copy size={18} />
               <Text ml={1}>{strings.saveACopy()}</Text>
             </Button>
+            <Button
+              variant="errorSecondary"
+              onClick={() => {
+                const { openSession } = useEditorStore.getState();
+                openSession(session.note.id, { force: true });
+              }}
+            >
+              {strings.close()}
+            </Button>
           </>
         ) : null}
       </Flex>

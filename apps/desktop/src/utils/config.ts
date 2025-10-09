@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { nativeTheme } from "electron";
 import { JSONStorage } from "./json-storage";
 import { z } from "zod";
+import { autoUpdater } from "electron-updater";
 
 export const DesktopIntegration = z.object({
   autoStart: z.boolean().optional(),
@@ -46,6 +47,9 @@ export const config = {
   automaticUpdates: true,
   proxyRules: "",
   customDns: true,
+  releaseTrack: autoUpdater.currentVersion.raw.includes("-beta")
+    ? "beta"
+    : "stable",
 
   backgroundColor: nativeTheme.themeSource === "dark" ? "#0f0f0f" : "#ffffff",
   windowControlsIconColor:

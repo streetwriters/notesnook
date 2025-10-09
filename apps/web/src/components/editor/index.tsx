@@ -44,6 +44,7 @@ import {
   useStore as useAppStore,
   store as appstore
 } from "../../stores/app-store";
+import { useStore as useSearchStore } from "../../stores/search-store";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { FlexScrollContainer } from "../scroll-container";
 import Tiptap, { OnChangeHandler } from "./tiptap";
@@ -74,6 +75,8 @@ import { strings } from "@notesnook/intl";
 import { onPageVisibilityChanged } from "../../utils/page-visibility";
 import { Pane, SplitPane } from "../split-pane";
 import { TITLE_BAR_HEIGHT } from "../title-bar";
+import { isMobile } from "../../hooks/use-mobile";
+import { isTablet } from "../../hooks/use-tablet";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
@@ -119,7 +122,8 @@ const deferredSave = debounceWithId(saveContent, 100);
 export default function TabsView() {
   const tabs = useEditorStore((store) => store.tabs);
   const documentPreview = useEditorStore((store) => store.documentPreview);
-  const activeTab = useEditorStore((store) => store.getActiveTab());
+  const activeTabId = useEditorStore((store) => store.activeTabId);
+  const activeSession = useEditorStore((store) => store.getActiveSession());
   const arePropertiesVisible = useEditorStore(
     (store) => store.arePropertiesVisible
   );
@@ -128,17 +132,6 @@ export default function TabsView() {
 
   return (
     <>
-      <Flex
-        className="editor-action-bar"
-        sx={{
-          zIndex: 2,
-          height: TITLE_BAR_HEIGHT,
-          borderBottom: "1px solid var(--border)"
-        }}
-      >
-        <EditorActionBar />
-      </Flex>
-
       <ScopedThemeProvider
         scope="editor"
         ref={dropRef}
@@ -150,7 +143,24 @@ export default function TabsView() {
           flexDirection: "column"
         }}
       >
-        <SplitPane direction="vertical" autoSaveId={"editor-panels"}>
+        <Flex
+          className="editor-action-bar"
+          sx={{
+            zIndex: 2,
+            height: TITLE_BAR_HEIGHT,
+            bg: "background-secondary"
+            // borderBottom: "1px solid var(--border)"
+          }}
+        >
+          <EditorActionBar />
+        </Flex>
+        <SplitPane
+          style={{
+            position: "relative"
+          }}
+          direction="vertical"
+          autoSaveId={"editor-panels"}
+        >
           <Pane id="editor-panel" className="editor-pane">
             {tabs.map((tab) => {
               const session = useEditorStore
@@ -158,7 +168,7 @@ export default function TabsView() {
                 .getSession(tab.sessionId);
               if (!session) return null;
               return (
-                <Freeze key={session.id} freeze={tab.id !== activeTab?.id}>
+                <Freeze key={session.id} freeze={tab.id !== activeTabId}>
                   {session.type === "locked" ? (
                     <UnlockNoteView session={session} />
                   ) : session.type === "conflicted" ||
@@ -209,28 +219,44 @@ export default function TabsView() {
             </Pane>
           ) : null}
 
-          {isTOCVisible && activeTab ? (
+          {isTOCVisible && activeSession ? (
             <Pane id="table-of-contents-pane" initialSize={300} minSize={300}>
-              <TableOfContents sessionId={activeTab.sessionId} />
+              <TableOfContents sessionId={activeSession.id} />
             </Pane>
           ) : null}
+          {arePropertiesVisible && activeSession && (
+            <Pane id="properties-pane" initialSize={250} minSize={250}>
+              <Properties sessionId={activeSession.id} />
+            </Pane>
+          )}
         </SplitPane>
         <DropZone overlayRef={overlayRef} />
-        {arePropertiesVisible && activeTab && (
-          <Properties sessionId={activeTab.sessionId} />
-        )}
       </ScopedThemeProvider>
     </>
   );
 }
 
-const MemoizedEditorView = React.memo(
-  EditorView,
-  (prev, next) =>
+const MemoizedEditorView = React.memo(EditorView, (prev, next) => {
+  const baseConditions =
     prev.session.id === next.session.id &&
     prev.session.type === next.session.type &&
-    prev.session.needsHydration === next.session.needsHydration
-);
+    prev.session.needsHydration === next.session.needsHydration &&
+    prev.session.activeBlockId === next.session.activeBlockId &&
+    prev.session.activeSearchResultId === next.session.activeSearchResultId &&
+    prev.session.nonce === next.session.nonce;
+
+  if (
+    "attachmentsLength" in prev.session &&
+    "attachmentsLength" in next.session
+  ) {
+    return (
+      baseConditions &&
+      prev.session.attachmentsLength === next.session.attachmentsLength
+    );
+  }
+
+  return baseConditions;
+});
 function EditorView({
   session
 }: {
@@ -243,7 +269,6 @@ function EditorView({
   const lastChangedTime = useRef<number>(0);
   const root = useRef<HTMLDivElement>(null);
 
-  const toggleProperties = useEditorStore((store) => store.toggleProperties);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const editor = useEditorManager((store) => store.editors[session.id]?.editor);
 
@@ -292,10 +317,18 @@ function EditorView({
   useLayoutEffect(() => {
     editor?.focus();
 
+    const unsub = useSearchStore.subscribe(
+      (store) => store.isSearching,
+      (value) => {
+        if (!value) element?.classList.remove("searching");
+      }
+    );
+
     const element = root.current;
-    element?.classList.add("active");
+    element?.classList.add("active", "searching");
     return () => {
-      element?.classList.remove("active");
+      element?.classList.remove("active", "searching");
+      unsub();
     };
   }, [editor]);
 
@@ -328,6 +361,7 @@ function EditorView({
           useEditorStore.setState({ documentPreview: preview })
         }
         onContentChange={() => (lastChangedTime.current = Date.now())}
+        onSelectionChange={() => root.current?.classList.remove("searching")}
         onSave={(content, ignoreEdit) => {
           const currentSession = useEditorStore
             .getState()
@@ -367,7 +401,6 @@ function EditorView({
         }}
         options={{
           readonly: session?.type === "readonly" || session?.type === "deleted",
-          onRequestFocus: () => toggleProperties(false),
           focusMode: isFocusMode
         }}
       />
@@ -442,6 +475,7 @@ type EditorProps = {
   nonce?: number;
   options?: EditorOptions;
   onContentChange?: () => void;
+  onSelectionChange?: () => void;
   onSave?: OnChangeHandler;
   onPreviewDocument?: (preview: DocumentPreview) => void;
 };
@@ -451,6 +485,7 @@ export function Editor(props: EditorProps) {
     session,
     content,
     onSave,
+    onSelectionChange,
     nonce,
     options,
     onContentChange,
@@ -466,6 +501,7 @@ export function Editor(props: EditorProps) {
   );
   const setEditorSaveState = useEditorStore((store) => store.setSaveState);
   useScrollToBlock(session);
+  useScrollToSearchResult(session);
 
   useEffect(() => {
     if (!autoSaveToast.show) {
@@ -521,9 +557,10 @@ export function Editor(props: EditorProps) {
           if (editor) restoreSelection(editor, id);
           restoreScrollPosition(session);
         }}
-        onSelectionChange={({ from, to }) =>
-          Config.set(`${id}:selection`, { from, to })
-        }
+        onSelectionChange={({ from, to }) => {
+          Config.set(`${id}:selection`, { from, to });
+          onSelectionChange?.();
+        }}
         onContentChange={onContentChange}
         onChange={onSave}
         onDownloadAttachment={(attachment) => saveAttachment(attachment.hash)}
@@ -661,7 +698,7 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
       const child = editorContainerRef.current?.getBoundingClientRect();
       if (!parent || !child || !editor || entries.length <= 0) return;
 
-      const CONTAINER_MARGIN = 30;
+      const CONTAINER_MARGIN = isMobile() || isTablet() ? 10 : 30;
       const negativeSpace = Math.abs(
         parent.left - child.left - CONTAINER_MARGIN
       );
@@ -828,6 +865,32 @@ function useScrollToBlock(session: EditorSession) {
   }, [session.id, session.type, blockId]);
 }
 
+function useScrollToSearchResult(session: EditorSession) {
+  const id = useEditorStore(
+    (store) => store.getSession(session.id)?.activeSearchResultId
+  );
+
+  useEffect(() => {
+    if (id === undefined) return;
+    const scrollContainer = document.getElementById(
+      `editorScroll_${session.id}`
+    );
+    scrollContainer?.closest(".active")?.classList.add("searching");
+    const element = scrollContainer?.querySelector(`nn-search-result#${id}`);
+    setTimeout(
+      () =>
+        element?.scrollIntoView({
+          block: "center",
+          behavior: "instant"
+        }),
+      100
+    );
+    useEditorStore.getState().updateSession(session.id, [session.type], {
+      activeSearchResultId: undefined
+    });
+  }, [session.id, session.type, id]);
+}
+
 function isFile(e: DragEvent) {
   return (
     e.dataTransfer &&
@@ -865,7 +928,7 @@ function restoreScrollPosition(session: EditorSession) {
 function restoreSelection(editor: IEditor, id: string) {
   setTimeout(() => {
     editor.focus({
-      position: Config.get(`${id}:selection`, { from: 0, to: 0 })
+      position: Config.get(`${id}:selection`)
     });
   });
 }

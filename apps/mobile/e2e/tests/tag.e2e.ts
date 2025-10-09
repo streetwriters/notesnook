@@ -18,78 +18,101 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { notesnook } from "../test.ids";
-import { Tests } from "./utils";
+import { TestBuilder } from "./utils";
 
 describe("Tags", () => {
+  it("Create a tag", async () => {
+    await TestBuilder.create()
+      .prepare()
+      .openSideMenu()
+      .waitAndTapById("tab-tags")
+      .isVisibleByText("No tags")
+      .waitAndTapById("sidebar-add-button")
+      .typeTextById("input-value", "testtag")
+      .waitAndTapByText("Add")
+      .isVisibleByText("testtag")
+      .run();
+  });
+
   it("Tag a note", async () => {
-    await Tests.prepare();
-    let note = await Tests.createNote();
-    await Tests.fromId(notesnook.listitem.menu).waitAndTap();
-    await Tests.sleep(500);
-    await Tests.fromText("Add tag").waitAndTap();
-    await Tests.fromId("tag-input").element.typeText("testtag");
-    await Tests.fromText('Add "#testtag"').waitAndTap();
-    await Tests.fromText("#testtag").isVisible();
-    await device.pressBack();
-    await device.pressBack();
-    await Tests.navigate("Tags");
-    await Tests.fromText("#testtag").waitAndTap();
-    await Tests.fromText(note.body).isVisible();
+    await TestBuilder.create()
+      .prepare()
+      .createNote()
+      .saveResult()
+      .waitAndTapById(notesnook.listitem.menu)
+      .wait(500)
+      .waitAndTapByText("Add tag")
+      .typeTextById("tag-input", "testtag")
+      .waitAndTapByText('Add "#testtag"')
+      .isVisibleByText("#testtag")
+      .pressBack(2)
+      .openSideMenu()
+      .waitAndTapById("tab-tags")
+      .waitAndTapByText("#testtag")
+      .processResult(async (note) => {
+        await TestBuilder.create().isVisibleByText(note.body).run();
+      })
+      .run();
   });
 
   it("Untag a note", async () => {
-    await Tests.prepare();
-    await Tests.createNote();
-    await Tests.fromId(notesnook.listitem.menu).waitAndTap();
-    await Tests.sleep(500);
-    await Tests.fromText("Add tag").waitAndTap();
-    await Tests.fromId("tag-input").element.typeText("testtag");
-    await Tests.fromText('Add "#testtag"').waitAndTap();
-    await Tests.fromText("#testtag").isVisible();
-    await Tests.fromText("#testtag").waitAndTap();
-    await device.pressBack();
-    await device.pressBack();
-    await Tests.fromText("#testtag").isNotVisible();
+    await TestBuilder.create()
+      .prepare()
+      .createNote()
+      .waitAndTapById(notesnook.listitem.menu)
+      .wait(500)
+      .waitAndTapByText("Add tag")
+      .typeTextById("tag-input", "testtag")
+      .waitAndTapByText('Add "#testtag"')
+      .isVisibleByText("#testtag")
+      .waitAndTapByText("#testtag")
+      .pressBack(2)
+      .isNotVisibleByText("#testtag")
+      .run();
   });
 
   it("Create shortcut of a tag", async () => {
-    await Tests.prepare();
-    await Tests.createNote();
-    await Tests.fromId(notesnook.listitem.menu).waitAndTap();
-    await Tests.sleep(500);
-    await Tests.fromText("Add tag").waitAndTap();
-    await Tests.fromId("tag-input").element.typeText("testtag");
-    await Tests.fromText('Add "#testtag"').waitAndTap();
-    await Tests.fromText("#testtag").isVisible();
-    await device.pressBack();
-    await device.pressBack();
-    await Tests.navigate("Tags");
-    await Tests.fromId(notesnook.ids.tag.menu).waitAndTap();
-    await Tests.sleep(500);
-    await Tests.fromText("Add shortcut").waitAndTap();
-    await Tests.fromId(notesnook.ids.default.header.buttons.left).waitAndTap();
-    await Tests.fromText("testtag").isVisible();
+    await TestBuilder.create()
+      .prepare()
+      .createNote()
+      .waitAndTapById(notesnook.listitem.menu)
+      .wait(500)
+      .waitAndTapByText("Add tag")
+      .typeTextById("tag-input", "testtag")
+      .waitAndTapByText('Add "#testtag"')
+      .isVisibleByText("#testtag")
+      .pressBack(2)
+      .openSideMenu()
+      .waitAndTapById("tab-tags")
+      .longPressByText("testtag")
+      .wait(500)
+      .waitAndTapByText("Add shortcut")
+      .waitAndTapById("tab-home")
+      .isVisibleByText("testtag")
+      .run();
   });
 
   it("Rename a tag", async () => {
-    await Tests.prepare();
-    await Tests.createNote();
-    await Tests.fromId(notesnook.listitem.menu).waitAndTap();
-    await Tests.sleep(500);
-    await Tests.fromText("Add tag").waitAndTap();
-    await Tests.fromId("tag-input").element.typeText("testtag");
-    await Tests.fromText('Add "#testtag"').waitAndTap();
-    await Tests.fromText("#testtag").isVisible();
-    await device.pressBack();
-    await device.pressBack();
-    await Tests.navigate("Tags");
-    await Tests.fromId(notesnook.ids.tag.menu).waitAndTap();
-    await Tests.sleep(500);
-    await Tests.fromText("Rename").waitAndTap();
-    await Tests.sleep(100);
-    await Tests.fromId("input-value").element.clearText();
-    await Tests.fromId("input-value").element.typeText("testtag_edited");
-    await Tests.fromText("Save").waitAndTap();
-    await Tests.fromText("#testtag_edited").isVisible();
+    await TestBuilder.create()
+      .prepare()
+      .createNote()
+      .waitAndTapById(notesnook.listitem.menu)
+      .wait(500)
+      .waitAndTapByText("Add tag")
+      .typeTextById("tag-input", "testtag")
+      .waitAndTapByText('Add "#testtag"')
+      .isVisibleByText("#testtag")
+      .pressBack(2)
+      .openSideMenu()
+      .waitAndTapById("tab-tags")
+      .longPressByText("testtag")
+      .wait(500)
+      .waitAndTapByText("Rename")
+      .wait(100)
+      .clearTextById("input-value")
+      .typeTextById("input-value", "testtag_edited")
+      .waitAndTapByText("Save")
+      .isVisibleByText("testtag_edited")
+      .run();
   });
 });

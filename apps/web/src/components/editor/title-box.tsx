@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { Textarea } from "@theme-ui/components";
-import { useEditorStore } from "../../stores/editor-store";
+import { SaveState, useEditorStore } from "../../stores/editor-store";
 import { debounceWithId } from "@notesnook/common";
 import { useEditorConfig, useEditorManager } from "./manager";
 import { getFontById } from "@notesnook/editor";
@@ -38,8 +38,11 @@ function TitleBox(props: TitleBoxProps) {
   const { readonly, id } = props;
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const pendingChanges = useRef(false);
-  // const id = useStore((store) => store.session.id);
   const sessionType = useEditorStore((store) => store.getSession(id)?.type);
+  const sessionTitle = useEditorStore((store) => {
+    const session = store.getSession(id, ["default"]);
+    return session?.note.isGeneratedTitle ? session.note.title : null;
+  });
   const { editorConfig } = useEditorConfig();
   const dateFormat = useSettingsStore((store) => store.dateFormat);
   const timeFormat = useSettingsStore((store) => store.timeFormat);
@@ -60,9 +63,9 @@ function TitleBox(props: TitleBoxProps) {
 
     withSelectionPersist(inputRef.current, (input) => {
       input.value = title || "";
-      resizeTextarea(input);
+      setTimeout(() => resizeTextarea(input));
     });
-  }, [sessionType, id]);
+  }, [sessionType, id, sessionTitle]);
 
   useEffect(() => {
     const { unsubscribe } = AppEventManager.subscribe(
@@ -106,6 +109,7 @@ function TitleBox(props: TitleBoxProps) {
       wrap="soft"
       rows={1}
       sx={{
+        m: 0,
         p: 0,
         fontFamily,
         fontSize: ["1.625em", "1.625em", "2.625em"],
@@ -153,15 +157,17 @@ export default React.memo(TitleBox, (prevProps, nextProps) => {
 
 function resizeTextarea(input: HTMLTextAreaElement) {
   input.style.height = "auto";
-  input.style.height = input.scrollHeight + "px";
+  requestAnimationFrame(() => {
+    input.style.height = input.scrollHeight + "px";
+  });
 }
 
-function onTitleChange(
+async function onTitleChange(
   noteId: string,
   title: string,
   pendingChanges: React.MutableRefObject<boolean>
 ) {
-  useEditorStore.getState().setTitle(noteId, title);
+  await useEditorStore.getState().setTitle(noteId, title);
   pendingChanges.current = false;
 }
 

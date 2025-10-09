@@ -58,6 +58,19 @@ test("search notes (remove diacritics)", () =>
     expect(filtered).toHaveLength(1);
   }));
 
+test("search notes (remove html tags)", () =>
+  noteTest({
+    content: {
+      type: "tiptap",
+      data: "<p block-id='1'>hello this is a word</p>"
+    }
+  }).then(async ({ db }) => {
+    await db.notes.add(TEST_NOTE);
+    expect(await db.lookup.notes("block").ids()).toHaveLength(0);
+    expect(await db.lookup.notes("hello").ids()).toHaveLength(2);
+    expect(await db.lookup.notes("word").ids()).toHaveLength(1);
+  }));
+
 test("search notes with a locked note", () =>
   noteTest({
     content: content

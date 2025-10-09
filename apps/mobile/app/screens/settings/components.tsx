@@ -18,12 +18,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { ReactElement } from "react";
+import { View } from "react-native";
 import { AttachmentDialog } from "../../components/attachments";
-import { AccentColorPicker } from "./appearance";
+import { ChangePassword } from "../../components/auth/change-password";
+import { DefaultAppStyles } from "../../utils/styles";
+import { AttachmentGroupProgress } from "./attachment-group-progress";
+import { ChangeEmail } from "./change-email";
 import DebugLogs from "./debug";
 import { ConfigureToolbar } from "./editor/configure-toolbar";
 import { Licenses } from "./licenses";
-import { AttachmentGroupProgress } from "./attachment-group-progress";
 import {
   ApplockTimerPicker,
   BackupReminderPicker,
@@ -31,22 +34,19 @@ import {
   DateFormatPicker,
   FontPicker,
   HomePicker,
+  SidebarTabPicker,
   TimeFormatPicker,
   TrashIntervalPicker
 } from "./picker/pickers";
 import { RestoreBackup } from "./restore-backup";
 import { ServersConfiguration } from "./server-config";
 import SoundPicker from "./sound-picker";
-import { Subscription } from "./subscription";
 import ThemeSelector from "./theme-selector";
 import { TitleFormat } from "./title-format";
-import { View } from "react-native";
 
 export const components: { [name: string]: ReactElement } = {
-  colorpicker: <AccentColorPicker />,
   homeselector: <HomePicker />,
   autobackups: <BackupReminderPicker />,
-  subscription: <Subscription />,
   configuretoolbar: <ConfigureToolbar />,
   "debug-logs": <DebugLogs />,
   "sound-picker": <SoundPicker />,
@@ -63,8 +63,11 @@ export const components: { [name: string]: ReactElement } = {
   "server-config": <ServersConfiguration />,
   "attachments-manager": <AttachmentDialog note={undefined} isSheet={false} />,
   "offline-mode-progress": (
-    <View style={{ paddingHorizontal: 12 }}>
+    <View style={{ paddingHorizontal: DefaultAppStyles.GAP }}>
       <AttachmentGroupProgress groupId="offline-mode" />
     </View>
-  )
+  ),
+  "sidebar-tab-selector": <SidebarTabPicker />,
+  "change-password": <ChangePassword />,
+  "change-email": <ChangeEmail />
 };

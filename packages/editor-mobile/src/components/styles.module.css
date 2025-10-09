@@ -50,14 +50,15 @@
   z-index: 999;
   list-style: none;
   user-select: none;
-  padding: 0px;
   font-family: sans-serif;
   font-size: 0.95em;
   border: 1px solid var(--nn_primary_border);
   box-shadow: 1px 1px 20px 1px rgba(0, 0, 0, 0.1);
-  border-radius: 6px;
+  border-radius: 8px;
   background-color: var(--nn_secondary_background);
-  min-width: 12rem;
+  min-width: 13rem;
+  padding: 0 !important;
+
 }
 
 .menuOpening {
@@ -73,10 +74,11 @@
 .menuItem {
   cursor: pointer;
   border-radius: 0;
-  padding: 1rem 0.6rem !important;
+  padding: 0.5rem 0.6rem !important;
   color: var(--nn_primary_paragraph);
-  font-family: "Open Sans";
-  padding: 12px 6px;
+  font-family: "Inter";
+  font-size: 0.9em;
+  flex-wrap: nowrap;
 }
 
 .menuItemHover {

@@ -35,7 +35,7 @@ export interface ThemeStore extends State {
 
 export function changeSystemBarColors() {
   const change = () => {
-    let currTheme =
+    const currTheme =
       useThemeStore.getState().colorScheme === "dark"
         ? SettingsService.getProperty("darkTheme")
         : SettingsService.getProperty("lighTheme");
@@ -43,7 +43,7 @@ export function changeSystemBarColors() {
     const isDark = useThemeStore.getState().colorScheme === "dark";
     changeNavigationBarColor(
       currTheme.scopes.base.primary.background,
-      isDark,
+      !isDark,
       false
     );
     StatusBar.setBackgroundColor("transparent" as any);

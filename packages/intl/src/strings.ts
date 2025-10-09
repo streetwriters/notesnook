@@ -58,7 +58,7 @@ export const strings = {
   note: () => t`Note`,
   notes: (count: number) =>
     plural(count, {
-      one: `note`,
+      one: `# note`,
       other: `# notes`
     }),
   downloading: () => t`Downloading`,
@@ -243,8 +243,8 @@ export const strings = {
     collection: string;
     current: number;
   }) =>
-    t`Migrating ${progress ? `${progress?.collection}` : null} ${
-      progress ? `(${progress.current}/${progress.total}) ` : null
+    t`Migrating ${progress ? `${progress?.collection}` : ""} ${
+      progress ? `(${progress.current}/${progress.total}) ` : ""
     }... please wait`,
   migrationError: () =>
     t`An error occurred while migrating your data. You can logout of your account and try to relogin. However this is not recommended as it may result in some data loss if your data was not synced.`,
@@ -384,11 +384,12 @@ export const strings = {
       other: `v${version} has been released`
     }),
   readReleaseNotes: () => t`Read full release notes on Github`,
-  beta: () => t`BETA`,
   settings: () => t`Settings`,
   notLoggedIn: () => t`Not logged in`,
+  loggedInAs: (email: string) => t`Logged in as ${email}`,
   never: () => t`Never`,
   syncing: () => t`Syncing`,
+  syncNow: () => t`Sync now`,
   syncFailed: () => t`Sync failed`,
   synced: () => t`Synced`,
   offline: () => t`Offline`,
@@ -403,6 +404,11 @@ export const strings = {
   loggingOutDesc: () => t`Please wait while we log you out.`,
   by: () => t`By`,
   noResultsForSearch: (query: string) => t`No results found for "${query}"`,
+  results: (count: number) =>
+    plural(count, {
+      one: "1 result",
+      other: `# results`
+    }),
   noThemesFound: () => t`No themes found`,
   errorLoadingThemes: () => t`Error loading themes`,
   loadingThemes: () => t`Loading themes...`,
@@ -438,7 +444,7 @@ $headline$: Use starting line of the note as title.`,
     }),
 
   createVault: () => t`Create vault`,
-  createVaultDesc: () => t`A vault stores your notes in a encrypted storage.`,
+  createVaultDesc: () => t`A vault stores your notes in an encrypted storage.`,
   vaultFingerprintUnlock: () => t`Vault fingerprint unlock`,
   revokeVaultFingerprintUnlock: () => t`Revoke vault fingerprint unlock`,
   changeVaultPassword: () => t`Change vault password`,
@@ -453,7 +459,8 @@ $headline$: Use starting line of the note as title.`,
   selectNotebooksDesc: () => t`Select notebooks you want to add note(s) to.`,
   selectNotebooksDesktopDesc: (keyboardShortcut: string) =>
     t`Use ${keyboardShortcut}+click to select multiple notebooks`,
-  enableMultiSelect: () => t`Tap and hold to enable multi-select.`,
+  enableMultiSelect: () =>
+    t`You can also link a note to multiple Notebooks. Tap and hold any notebook to enable multi-select.`,
   changeEmail: () => t`Change email address`,
   changeEmailDesc: () =>
     t`Your account email will be changed without affecting your subscription or any other settings.`,
@@ -634,6 +641,8 @@ $headline$: Use starting line of the note as title.`,
   newOld: () => t`New - old`,
   latestFirst: () => t`Latest first`,
   earliestFirst: () => t`Earliest first`,
+  mostRelevantFirst: () => t`Most relevant first`,
+  leastRelevantFirst: () => t`Least relevant first`,
   aToZ: () => t`A to Z`,
   zToA: () => t`Z to A`,
   title: () => t`Title`,
@@ -643,7 +652,8 @@ $headline$: Use starting line of the note as title.`,
     dateCreated: () => t`Date created`,
     title: () => t`Title`,
     dueDate: () => t`Due date`,
-    dateDeleted: () => t`Date deleted`
+    dateDeleted: () => t`Date deleted`,
+    relevance: () => t`Relevance`
   },
   groupByStrings: {
     default: () => t`Default`,
@@ -894,6 +904,7 @@ $headline$: Use starting line of the note as title.`,
   notePreparingForShare: () => t`Preparing note for share`,
   removeFromNotebook: () => t`Remove from notebook`,
   attachments: () => t`Attachments`,
+  attachedFiles: () => t`Attached files`,
   history: () => t`History`,
   copyLink: () => t`Copy link`,
   linkCopied: () => t`Link copied`,
@@ -912,8 +923,8 @@ $headline$: Use starting line of the note as title.`,
   duplicate: () => t`Duplicate`,
   remindMe: () => t`Remind me`,
   published: () => t`Published`,
-  unpinFromNotifications: () => t`Unpin from notifications`,
-  pinToNotifications: () => t`Pin to notifications`,
+  unpinFromNotifications: () => t`Unpin notification`,
+  pinToNotifications: () => t`Pin notification`,
   linkNotebooks: () => t`Link notebooks`,
   unlinkFromAll: () => t`Unlink from all`,
   removeFromAll: () => t`Remove from all`,
@@ -929,10 +940,10 @@ $headline$: Use starting line of the note as title.`,
   encryptingAttachmentDesc: (name = "attachment") =>
     t`Please wait while we encrypt ${name} for upload.`,
   fileTooLarge: () => t`File too big`,
-  fileTooLargeDesc: (sizeInMB: number) =>
-    t`File size should be less than ${sizeInMB}MB`,
-  imageTooLarge: (sizeInMB: number) =>
-    t`Image size should be less than ${sizeInMB}MB`,
+  fileTooLargeDesc: (sizeInMB: string) =>
+    t`File size should be less than ${sizeInMB}`,
+  imageTooLarge: (sizeInMB: string) =>
+    t`Image size should be less than ${sizeInMB}`,
   failToOpen: () => t`Failed to open`,
   fileMismatch: () => t`File mismatch`,
   noNoteProperties: () => t`Start writing to create a new note`,
@@ -945,6 +956,7 @@ $headline$: Use starting line of the note as title.`,
   yourNotebooks: () => t`Your notebooks`,
   yourReminders: () => t`Your reminders`,
   yourMonographs: () => t`Your monographs`,
+  yourArchive: () => t`Your archive`,
   favoritesEmpty: () => t`You have not favorited any notes yet`,
   notesEmpty: () => t`You have not created any notes yet`,
   tagsEmpty: () => t`You have not added any tags yet`,
@@ -957,6 +969,7 @@ $headline$: Use starting line of the note as title.`,
   loadingNotebooks: () => t`Loading your notebooks`,
   loadingReminders: () => t`Loading your reminders`,
   loadingMonographs: () => t`Loading your monographs`,
+  loadingArchive: () => t`Loading your archive`,
   addFirstNote: () => t`Add your first note`,
   addFirstNotebook: () => t`Add your first notebook`,
   setReminder: () => t`Set a reminder`,
@@ -1280,6 +1293,9 @@ $headline$: Use starting line of the note as title.`,
   roadmapDesc: () => t`See what the future of Notesnook is going to be like.`,
   checkForUpdates: () => t`Check for updates`,
   checkForUpdatesDesc: () => t`Check for new version of Notesnook`,
+  autoUpdateCheck: () => t`Check for updates automatically`,
+  autoUpdateCheckDesc: () =>
+    t`Check for new version of the app available on app launch`,
   appVersion: () => t`App version`,
   defaultSound: () => t`Default sound`,
   subNotSupported: () =>
@@ -1509,7 +1525,8 @@ For example:
     Editor: () => t`Editor`,
     Home: () => t`Home`,
     Search: () => t`Search`,
-    Monographs: () => t`Monographs`
+    Monographs: () => t`Monographs`,
+    Archive: () => t`Archive`
   },
   searchInRoute: (
     routeName: keyof typeof SEARCH_IN_ROUTE_STRINGS | ({} & string)
@@ -1774,7 +1791,7 @@ For example:
   ],
   shareWithFriendsDesc: () => t`Because where's the fun in nookin' alone?`,
   notebooksAllCaps: () => t`NOTEBOOKS`,
-  authenticatedAs: (email?: string) => t`Authenticated as ${email}`,
+  authenticatedAs: (email: string) => t`Authenticated as ${email}`,
   rememberedYourPassword: () => t`Remembered your password?`,
   chooseRecoveryMethod: () => t`Choose a recovery method`,
   chooseRecoveryMethodDesc: () => t`How do you want to recover your account?`,
@@ -1986,7 +2003,7 @@ All attachments will be downloaded & cached again on access.
   couldNotClearTrash: () => t`Could not clear trash.`,
   automaticBackupsDisabled: () => t`Automatic backups disabled`,
   automaticBackupsDisabledDesc: () =>
-    t`Please upgrade to Pro to enable automatic backups.`,
+    t`Please enable automatic backups to avoid losing important data.`,
   default: () => t`Default`,
   minimal: () => t`Minimal`,
   custom: () => t`Custom`,
@@ -2228,6 +2245,8 @@ Use this if changes from other devices are not appearing on this device. This wi
   copyLinkText: () => t`Copy link text`,
   copyImage: () => t`Copy image`,
   paste: () => t`Paste`,
+  pasteAndMatchStyle: () => t`Paste and match style`,
+  pasteWithoutFormatting: () => t`Paste without formatting`,
   configure: () => t`Configure`,
   usingOfficialInstance: () => t`Using official Notesnook instance`,
   usingInstance: (instance: string, version: string) =>
@@ -2288,7 +2307,6 @@ Use this if changes from other devices are not appearing on this device. This wi
   // alignCenter: () => t`Align center`,
   alignLeft: () => t`Align left`,
   alignRight: () => t`Align right`,
-  imageFloat: () => t`Float image`,
   imageProperties: () => t`Image properties`,
   previewAttachment: () => t`Preview attachment`,
   more: () => t`More`,
@@ -2434,5 +2452,143 @@ Use this if changes from other devices are not appearing on this device. This wi
   actionsForNotebook: (title: string) => t`Actions for notebook: ${title}`,
   actionsForTag: (title: string) => t`Actions for tag: ${title}`,
   recents: () => t`Recents`,
-  removeFromRecents: () => t`Remove from recents`
+  removeFromRecents: () => t`Remove from recents`,
+  releaseTrack: () => t`Release track`,
+  releaseTrackDesc: () => t`Select the release track for Notesnook.`,
+  stable: () => t`Stable`,
+  beta: () => t`Beta`,
+  zoom: () => t`Zoom`,
+  toggleFocusMode: () => t`Toggle focus mode`,
+  fontLigatures: () => t`Font ligatures`,
+  fontLigaturesDesc: () =>
+    t`Enable ligatures for common symbols like →, ←, etc`,
+  expandSidebar: () => t`Expand sidebar`,
+  viewAllLimits: () => `View all limits`,
+  freePlan: () => t`Free plan`,
+  proPlan: () => t`Pro plan`,
+  essentialPlan: () => t`Essential plan`,
+  believerPlan: () => t`Believer plan`,
+  storage: () => t`Storage`,
+  used: () => t`used`,
+  editProfile: () => t`Edit profile`,
+  linkNotes: () => t`Link notes`,
+  linkingNotesTo: (title: string) => t`Select notes to link to "${title}"`,
+  addToNotebook: () => t`Add to notebook`,
+  notebookAdded: () => t`Notebook added`,
+  addNotes: () => t`Add notes`,
+  setAsHomepage: () => t`Set as homepage`,
+  defaultSidebarTab: () => t`Default sidebar tab`,
+  defaultSidebarTabDesc: () => t`Select the default sidebar tab`,
+  unsetAsHomepage: () => t`Reset homepage`,
+  archive: () => t`Archive`,
+  yourArchiveIsEmpty: () => t`Your archive is empty`,
+  unarchive: () => t`Unarchive`,
+  moveNotebookDesc: () =>
+    t`Select a notebook to move this notebook into, or unselect to move it to the root level.`,
+  words: () => t`Words`,
+  characters: () => t`Characters`,
+  paragraphs: () => t`Paragraphs`,
+  noNotebooksSelectedToMove: () => t`No notebooks selected to move`,
+  scrollToTop: () => t`Scroll to top`,
+  scrollToBottom: () => t`Scroll to bottom`,
+  emailConfirmedDesc: () =>
+    t`Your email has been confirmed. You can now securely sync your encrypted notes across all devices.`,
+  charactersCount: (count: number) => t`${count} characters`,
+  iAlreadyHaveAnAccount: () => t`I already have an account`,
+  upgradePlan: () => t`Upgrade plan`,
+  upgrade: () => t`Upgrade`,
+  checkoutFaqs: [
+    {
+      question: () => t`What happens to my data if I switch plans?`,
+      answer: () =>
+        t`Your data remains 100% accessible regardless of what plan you are on. That includes your notes, notebooks, attachments, and anything else you might have created.`
+    },
+    {
+      question: () =>
+        t`Why do you need my credit card details for a free trial?`,
+      answer: () =>
+        t`We require credit card details to fight abuse and to make it seamless for you to upgrade. Your credit card is NOT charged until your free trial ends and your subscription starts. You will be notified via email of the upcoming charge before your trial ends.`
+    },
+    {
+      question: () => t`Can I cancel my free trial anytime?`,
+      answer: () =>
+        t`Yes, you can cancel your trial anytime. No questions asked.`
+    },
+    {
+      question: () => t`What is your refund policy?`,
+      answer: () =>
+        t`For a monthly subscription, you can get a refund within 7 days of purchase. For a yearly subscription, we offer a full refund within 14 days of purchase. For a 5 year subscription, you can request a refund within 30 days of purchase.`
+    }
+  ],
+  upgradePlanTo: (plan: string) =>
+    t`Upgrade plan to ${plan} to use this feature.`,
+  tryItForFree: () => t`Try it for free`,
+  getThisAndSoMuchMore: () => t`Get this and so much more:`,
+  cloudSpace: () => t`cloud storage space for storing images and files.`,
+  appLockFeatureBenefit: () =>
+    t`for locking your notes as soon as app enters background`,
+  advancedNoteTaking: [
+    () => t`Use advanced note taking features like`,
+    () => t`tables, outlines, block level note linking`,
+    () => t`and much more.`
+  ],
+  cancelAnytime: () => t`Cancel anytime.`,
+  googleReminderTrial: () =>
+    t`Google will remind you 2 days before your trial ends.`,
+  exploreAllPlans: () => t`Explore all plans`,
+  tryPlanForFree: (plan: string) => t`Try ${plan} for free`,
+  plan: (plan: string) => t`${plan} plan`,
+  notesnookPlans: [() => t`Notesnook`, () => t`Plans`],
+  readyToTakeNextStep: () =>
+    t`Ready to take the next step on your private note taking journey?`,
+  percentOff: (discount: string) => `${discount}% off`,
+  recommendedByPrivacyGuides: () => t`Recommended by Privacy Guides`,
+  featuredOn: () => t`Featured on`,
+  comparePlans: () => t`Compare plans`,
+  faqs: () => t`FAQs`,
+  thankYouForSubscribing: () => t`Thank you for subscribing`,
+  settingUpPlan: () =>
+    t`We’re setting up your plan right now. We’ll notify you as soon as everything is ready.`,
+  hdImages: () => t`hdImages`,
+  billedAnnually: (price: string) => t`billed annually at ${price}`,
+  billedMonthly: (price: string) => t`billed monthly at ${price}`,
+  dueToday: () => t`Due today`,
+  daysFree: (days: string) => t`${days} days free`,
+  due: (date: string) => t`Due ${date}`,
+  "5yearPlanConditions": () => [
+    t`One time purchase, no auto-renewal`,
+    t`Pay once and use for 5 years`
+  ],
+  trialPlanConditions: [
+    (duration: number) => t`Free ${duration} day trial, cancel any time`,
+    () => t`Google will remind you before your trial ends`
+  ],
+  purchase: () => t`Purchase`,
+  subscribe: () => t`Subscribe`,
+  subscribeAndStartTrial: () => t`Subscribe and start free trial`,
+  oneTimePurchase: () => t`This is a one time purchase, no subscription.`,
+  cancelAnytimeAlt: () => t`Cancel anytime, subscription auto-renews.`,
+  subTerms: [
+    () => t`By joining you agree to our`,
+    () => t`privacy policy`,
+    () => t`and`,
+    () => t`terms of use.`
+  ],
+  bestValue: () => t`Best value`,
+  planLimits: () => t`Plan limits`,
+  unlimited: () => t`Unlimited`,
+  fiveYearPlan: () => t`5 year plan (One time purchase)`,
+  educationPlan: () => t`Education plan`,
+  welcomeToPlan: (plan: string) => t`Welcome to Notesnook ${plan}`,
+  thankYouForPurchase: () => t`Thank you for the purchase`,
+  changePlan: () => t`Change plan`,
+  contactSupportToChangePlan: () =>
+    t`You have made a one time purchase. To change your plan please contact support.`,
+  alreadySubscribed: () => t`You are already subscribed to this plan.`,
+  specialOffer: () => t`Special Offer`,
+  changePlanOnWeb: () =>
+    t`You can change your subscription plan from the web app`,
+  announcement: () => t`ANNOUNCEMENT`,
+  cannotChangePlan: () =>
+    t`Your current subscription does not allow changing plans`
 };

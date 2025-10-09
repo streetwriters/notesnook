@@ -34,7 +34,7 @@ export function FontSize(props: ToolProps) {
   const defaultFontSize = useToolbarStore((store) => store.fontSize);
   const { fontSize } = editor.getAttributes("textStyle");
   const fontSizeAsNumber = useRefValue(
-    fontSize ? parseInt(fontSize.replace("px", "")) || 16 : defaultFontSize
+    fontSize ? parseInt(fontSize.replace("px", "")) || 14 : defaultFontSize
   );
 
   const decreaseFontSize = useCallback(() => {

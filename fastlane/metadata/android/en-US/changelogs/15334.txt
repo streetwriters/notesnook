@@ -1,0 +1,4 @@
+- Add scroll to top/bottom in editor
+- Minor bug fixes and improvements
+
+Thank you for using Notesnook!

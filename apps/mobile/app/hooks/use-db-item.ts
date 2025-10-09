@@ -19,13 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import {
   Attachment,
   Color,
+  HistorySession,
   Note,
   Notebook,
   Reminder,
   Shortcut,
   Tag,
-  VirtualizedGrouping,
-  HistorySession
+  VirtualizedGrouping
 } from "@notesnook/core";
 import React, { useEffect, useRef, useState } from "react";
 import { db } from "../common/database";
@@ -34,8 +34,8 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../services/event-manager";
-import { eDBItemUpdate } from "../utils/events";
 import { useSettingStore } from "../stores/use-setting-store";
+import { eDBItemUpdate } from "../utils/events";
 
 type ItemTypeKey = {
   note: Note;
@@ -55,7 +55,8 @@ function isValidIdOrIndex(idOrIndex?: string | number) {
 export const useDBItem = <T extends keyof ItemTypeKey>(
   idOrIndex?: string | number,
   type?: T,
-  items?: VirtualizedGrouping<ItemTypeKey[T]>
+  items?: VirtualizedGrouping<ItemTypeKey[T]>,
+  onItemUpdated?: (item?: ItemTypeKey[T]) => void
 ): [ItemTypeKey[T] | undefined, () => void] => {
   const [item, setItem] = useState<ItemTypeKey[T]>();
   const itemIdRef = useRef<string>();
@@ -67,15 +68,15 @@ export const useDBItem = <T extends keyof ItemTypeKey>(
   }
 
   useEffect(() => {
-    const onUpdateItem = (itemId?: string) => {
+    const onUpdateItem = async (itemId?: string) => {
       if (typeof itemId === "string" && itemId !== itemIdRef.current) return;
       if (!isValidIdOrIndex(idOrIndex)) return;
 
       if (items && typeof idOrIndex === "number") {
-        items.item(idOrIndex).then((item) => {
-          setItem(item.item);
-          itemIdRef.current = item.item?.id;
-        });
+        const item = (await items.item(idOrIndex))?.item;
+        setItem(item);
+        itemIdRef.current = item?.id;
+        onItemUpdated?.(item);
       } else {
         if (!(db as any)[type + "s"][type]) {
           console.warn(
@@ -83,12 +84,12 @@ export const useDBItem = <T extends keyof ItemTypeKey>(
             `db.${type}s.${type}(id: string)`
           );
         } else {
-          (db as any)[type + "s"]
-            ?.[type]?.(idOrIndex as string)
-            .then((item: ItemTypeKey[T]) => {
-              setItem(item);
-              itemIdRef.current = item.id;
-            });
+          const item = await (db as any)[type + "s"]?.[type]?.(
+            idOrIndex as string
+          );
+          setItem(item);
+          itemIdRef.current = item.id;
+          onItemUpdated?.(item);
         }
       }
     };
@@ -110,7 +111,7 @@ export const useDBItem = <T extends keyof ItemTypeKey>(
     return () => {
       eUnSubscribeEvent(eDBItemUpdate, onUpdateItem);
     };
-  }, [idOrIndex, type, items]);
+  }, [idOrIndex, type, items, onItemUpdated]);
 
   return [
     isValidIdOrIndex(idOrIndex) ? (item as ItemTypeKey[T]) : undefined,

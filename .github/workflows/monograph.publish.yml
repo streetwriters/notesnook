@@ -39,13 +39,13 @@ jobs:
           echo ::set-output name=app_version::$(cat package.json | jq -r .version)
 
       - name: Generate build
-        run: npx nx build @notesnook/monograph
+        run: npm run tx @notesnook/monograph:build
 
       # Setup Buildx
       - name: Docker Setup Buildx
         uses: docker/setup-buildx-action@v3
         with:
-          platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v8
+          platforms: linux/amd64,linux/arm64
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -77,7 +77,7 @@ jobs:
           context: apps/monograph
           file: apps/monograph/Dockerfile
           push: true
-          platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v8
+          platforms: linux/amd64,linux/arm64
           tags: streetwriters/monograph:${{ steps.package_metadata.outputs.app_version }},streetwriters/monograph:latest
           cache-from: streetwriters/monograph:latest
 

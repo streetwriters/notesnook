@@ -17,7 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-type ASTNode = QueryNode | PhraseNode | OperatorNode;
+import dayjs from "dayjs";
+import { servicesVersion } from "typescript";
+
+type ASTNode = QueryNode | PhraseNode | OperatorNode | FieldPhraseNode;
 
 type QueryNode = {
   type: "query";
@@ -29,24 +32,104 @@ type PhraseNode = {
   value: string[];
 };
 
+type FieldPhraseNode = {
+  type: "field_phrase";
+  field: string;
+  value: QueryNode;
+};
+
 type OperatorNode = {
   type: "AND" | "OR" | "NOT";
 };
 
-const INVALID_CHARS = /[:<>./\\()$&=#!\-+~§@^?,;'"[\]{}|]/;
+const SUPPORTED_FIELDS = {
+  title: (ast) => {
+    const node =
+      ast.find((a) => a.type === "field_phrase" && a.field === "title") ||
+      ast.find((a) => a.type === "query");
+    return node && serializeQuery(node);
+  },
+  content: (ast) => {
+    const node =
+      ast.find((a) => a.type === "field_phrase" && a.field === "content") ||
+      ast.find((a) => a.type === "query");
+    return node && serializeQuery(node);
+  },
+
+  // array
+  tag: (ast) => parseArrayField("tag", ast),
+  color: (ast) => parseArrayField("color", ast),
+
+  // date
+  edited_before: (ast) => parseDateField("edited_before", ast),
+  edited_after: (ast) => parseDateField("edited_after", ast),
+  created_before: (ast) => parseDateField("created_before", ast),
+  created_after: (ast) => parseDateField("created_after", ast),
+
+  // boolean
+  pinned: (ast) => parseBooleanField("pinned", ast),
+  locked: (ast) => parseBooleanField("locked", ast),
+  readonly: (ast) => parseBooleanField("readonly", ast),
+  favorite: (ast) => parseBooleanField("favorite", ast),
+  archived: (ast) => parseBooleanField("archived", ast),
+  tagged: (ast) => parseBooleanField("tagged", ast),
+  colored: (ast) => parseBooleanField("colored", ast),
+  in_notebook: (ast) => parseBooleanField("in_notebook", ast)
+} satisfies Record<string, (ast: (QueryNode | FieldPhraseNode)[]) => unknown>;
+
+function isFieldSupported(field: string) {
+  return field in SUPPORTED_FIELDS;
+}
+
+function parseBooleanField(
+  field: string,
+  ast: (QueryNode | FieldPhraseNode)[]
+): boolean | null {
+  const node = ast.find(
+    (a): a is FieldPhraseNode => a.type === "field_phrase" && a.field === field
+  );
+  const sql = node ? generateSQL(node.value) : "";
+  return sql === "false" ? false : sql === "true" ? true : null;
+}
+
+function parseArrayField(
+  field: string,
+  ast: (QueryNode | FieldPhraseNode)[]
+): string[] | null {
+  const values = ast
+    .filter(
+      (a): a is FieldPhraseNode =>
+        a.type === "field_phrase" && a.field === field
+    )
+    .map((a) => generateSQL(a.value));
+  return values.length > 0 ? values : null;
+}
+
+function parseDateField(
+  field: string,
+  ast: (QueryNode | FieldPhraseNode)[]
+): number | null {
+  const node = ast.find(
+    (a): a is FieldPhraseNode => a.type === "field_phrase" && a.field === field
+  );
+  const date = node ? dayjs(generateSQL(node.value)) : null;
+  return date?.isValid() ? date.toDate().getTime() : null;
+}
+
+const INVALID_QUERY_REGEX = /[!"#$%&'()*+,\-./:;<>=?@[\\\]^_`{|}~§]/;
 function escapeSQLString(str: string): string {
   if (str.startsWith('"') && str.endsWith('"')) {
     const innerStr = str.slice(1, -1).replace(/"/g, '""');
     return `"${innerStr}"`;
   }
 
-  const isInvalidChar = INVALID_CHARS.test(str);
+  const hasInvalidSymbol = INVALID_QUERY_REGEX.test(str);
   const isWildcard =
     str.startsWith("*") ||
     str.endsWith("*") ||
     str.startsWith("%") ||
     str.endsWith("%");
-  if (isInvalidChar || isWildcard) {
+  if (hasInvalidSymbol || isWildcard) {
     return `"${str}"`;
   }
 
@@ -63,10 +146,13 @@ function escapeSQLString(str: string): string {
   return str.replace(/"/g, '""');
 }
 
-function tokenize(query: string): string[] {
-  const tokens: string[] = [];
+function tokenizeWithFields(
+  query: string
+): Array<{ field?: string; token: string }> {
+  const tokens: Array<{ field?: string; token: string }> = [];
   let buffer = "";
   let isQuoted = false;
+  let currentField: string | undefined = undefined;
 
   for (let i = 0; i < query.length; ++i) {
     const char = query[i];
@@ -75,19 +161,51 @@ function tokenize(query: string): string[] {
     }
     if (char === " " && !isQuoted) {
       if (buffer.length > 0) {
-        tokens.push(buffer);
+        tokens.push({ field: currentField, token: buffer });
         buffer = "";
+      }
+    } else if (char === ":" && !isQuoted) {
+      // Check for field
+      const maybeField = buffer.trim().toLowerCase();
+      if (isFieldSupported(maybeField)) {
+        currentField = maybeField;
+        buffer = "";
+      } else {
+        buffer += char;
       }
     } else {
       buffer += char;
     }
   }
-  if (buffer.length > 0) tokens.push(buffer);
+  if (buffer.length > 0) tokens.push({ field: currentField, token: buffer });
 
   return tokens;
 }
 
-function parseTokens(tokens: string[]): QueryNode {
+// Helper: group tokens by field
+function groupTokensByField(tokens: Array<{ field?: string; token: string }>) {
+  const groups: Array<{ field?: string; tokens: string[] }> = [];
+  let currentField: string | undefined = undefined;
+  let currentTokens: string[] = [];
+
+  for (const { field, token } of tokens) {
+    if (field !== currentField) {
+      if (currentTokens.length > 0) {
+        groups.push({ field: currentField, tokens: currentTokens });
+        currentTokens = [];
+      }
+      currentField = field;
+    }
+    currentTokens.push(token);
+  }
+  if (currentTokens.length > 0) {
+    groups.push({ field: currentField, tokens: currentTokens });
+  }
+  return groups;
+}
+
+// Parse a group of tokens into a QueryNode (handles boolean ops, etc)
+function parseTokensToQueryNode(tokens: string[]): QueryNode {
   const ast: QueryNode = { type: "query", children: [] };
   let currentPhrase: string[] = [];
 
@@ -102,15 +220,13 @@ function parseTokens(tokens: string[]): QueryNode {
       currentPhrase.push(token);
     }
   }
-
   if (currentPhrase.length > 0) {
     ast.children.push({ type: "phrase", value: currentPhrase });
   }
-
   return ast;
 }
 
-function transformAST(ast: QueryNode): QueryNode {
+function transformQueryNode(ast: QueryNode): QueryNode {
   const transformedAST: QueryNode = { ...ast, children: [] };
   let lastWasPhrase = false;
 
@@ -150,35 +266,7 @@ function generateSQL(ast: QueryNode): string {
   return ast.children
     .map((child) => {
       if (child.type === "phrase") {
-        const result: string[] = [];
-        for (const value of child.value) {
-          if (value.length === 1 || value.length === 2) {
-            result.push(`(">${value}"`, "OR", value, "OR", `"${value}<")`);
-            result.push("AND");
-            continue;
-          } else if (
-            value.length === 3 &&
-            value[0] === '"' &&
-            value[2] === '"' &&
-            !["<", ">"].includes(value[1])
-          ) {
-            result.push(
-              `(">${value[1]}"`,
-              "OR",
-              value,
-              "OR",
-              `"${value[1]}<")`
-            );
-            result.push("AND");
-            continue;
-          }
-
-          result.push(value);
-          result.push("AND");
-        }
-        result.pop();
-        return result.join(" ");
-        // return child.value.join(" AND ");
+        return child.value.filter((v) => v.length >= 3).join(" AND ");
       }
       if (child.type === "AND" || child.type === "OR" || child.type === "NOT") {
         return child.type;
@@ -188,6 +276,106 @@ function generateSQL(ast: QueryNode): string {
     .join(" ");
 }
 
-export function transformQuery(query: string): string {
-  return generateSQL(transformAST(parseTokens(tokenize(query))));
+// Main transformer: returns (QueryNode | FieldPhraseNode)[]
+export function transformQuery(query: string): {
+  [K in keyof typeof SUPPORTED_FIELDS]?: ReturnType<
+    (typeof SUPPORTED_FIELDS)[K]
+  >;
+} & { filters: number } {
+  const tokens = tokenizeWithFields(query);
+  const groups = groupTokensByField(tokens);
+
+  const ast = groups.map((group) => {
+    const node = parseTokensToQueryNode(group.tokens);
+    const transformedNode = transformQueryNode(node);
+    if (group.field) {
+      return {
+        type: "field_phrase",
+        field: group.field,
+        value: transformedNode
+      } as FieldPhraseNode;
+    } else {
+      return transformedNode;
+    }
+  });
+
+  let filters = 0;
+  const fields = Object.fromEntries(
+    Object.entries(SUPPORTED_FIELDS).map(([key, field]) => {
+      const value = field(ast);
+      if (
+        value !== null &&
+        value !== undefined &&
+        !["content", "title"].includes(key)
+      )
+        filters++;
+      return [key, value];
+    })
+  );
+  return { ...fields, filters };
+}
+
+function serializeQuery(node: QueryNode | FieldPhraseNode) {
+  return {
+    query: generateSQL(node.type === "query" ? node : node.value),
+    tokens: tokenizeAst(node.type === "query" ? node : node.value)
+  };
+}
+
+export interface QueryTokens {
+  andTokens: string[];
+  orTokens: string[];
+  notTokens: string[];
+}
+
+function tokenizeAst(ast: QueryNode): QueryTokens {
+  const result: QueryTokens = {
+    andTokens: [],
+    orTokens: [],
+    notTokens: []
+  };
+
+  let isNextNot = false;
+  let isNextOr = false;
+
+  for (let i = 0; i < ast.children.length; i++) {
+    const node = ast.children[i];
+
+    if (node.type === "NOT") {
+      isNextNot = true;
+      continue;
+    }
+
+    if (node.type === "OR") {
+      isNextOr = true;
+      continue;
+    }
+
+    if (node.type === "phrase") {
+      // Handle each word in the phrase
+      for (const word of node.value) {
+        if (
+          result.orTokens.includes(word) ||
+          result.andTokens.includes(word) ||
+          result.notTokens.includes(word)
+        ) {
+          isNextOr = false;
+          isNextNot = false;
+          continue;
+        }
+        if (isNextOr) {
+          result.orTokens.push(word);
+        } else if (isNextNot) {
+          result.notTokens.push(word);
+        } else {
+          result.andTokens.push(word);
+        }
+      }
+
+      isNextOr = false;
+      isNextNot = false;
+    }
+  }
+
+  return result;
 }

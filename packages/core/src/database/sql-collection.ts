@@ -530,8 +530,7 @@ export class FilteredSelector<T extends Item> {
     if (options.groupBy === "abc") fields.push("title");
     else if (options.sortBy === "title" && options.groupBy !== "none")
       fields.push("dateCreated");
-    else if (options.sortBy !== "dueDate")
-      // && options.sortBy !== "relevance")
+    else if (options.sortBy !== "dueDate" && options.sortBy !== "relevance")
       fields.push(options.sortBy);
 
     return Array.from(
@@ -610,10 +609,10 @@ export class FilteredSelector<T extends Item> {
     sanitizeSortOptions(this.type, options);
 
     const sortBy: Set<SortOptions["sortBy"]> = new Set();
+    sortBy.add(options.sortBy);
     if (options.groupBy === "abc") sortBy.add("title");
     else if (options.sortBy === "title" && options.groupBy !== "none")
       sortBy.add("dateCreated");
-    sortBy.add(options.sortBy);
 
     return <T>(
       qb: SelectQueryBuilder<DatabaseSchema, keyof DatabaseSchema, T>
@@ -649,8 +648,8 @@ export class FilteredSelector<T extends Item> {
                   (qb) => qb.parens(createUpcomingReminderTimeQuery()),
                   options.sortDirection
                 );
-            } // if (item !== "relevance")
-            else qb = qb.orderBy(item, options.sortDirection);
+            } else if (item !== "relevance")
+              qb = qb.orderBy(item, options.sortDirection);
             continue;
           }
 
@@ -702,7 +701,8 @@ const VALID_SORT_OPTIONS: Record<
   sessioncontent: [],
   settings: [],
   shortcuts: [],
-  vaults: []
+  vaults: [],
+  monographs: []
 };
 
 function sanitizeSortOptions(type: keyof DatabaseSchema, options: SortOptions) {

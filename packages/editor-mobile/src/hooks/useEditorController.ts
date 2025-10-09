@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Editor, scrollIntoViewById } from "@notesnook/editor";
+import { keepLastLineInView } from "@notesnook/editor/extensions/keep-in-view/keep-in-view.js";
 import { strings } from "@notesnook/intl";
 import {
   ThemeDefinition,
@@ -66,38 +67,12 @@ type Timers = {
   scroll: NodeJS.Timeout | null;
 };
 
-function isInViewport(element: any) {
-  const rect = element.getBoundingClientRect();
-  return (
-    rect.top >= 0 &&
-    rect.left >= 0 &&
-    rect.bottom <=
-      (window.innerHeight || document.documentElement.clientHeight) &&
-    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-  );
-}
-
 function scrollIntoView(editor: Editor) {
+  if (__PLATFORM__ == "android") return;
   setTimeout(() => {
-    try {
-      const node = editor?.state.selection.$from;
-      const dom = node ? editor?.view?.domAtPos?.(node.pos) : null;
-      let domNode = dom?.node;
-
-      if (domNode) {
-        if (domNode.nodeType === Node.TEXT_NODE && domNode.parentNode) {
-          domNode = domNode.parentNode;
-        }
-        if (isInViewport(domNode)) return;
-        (domNode as HTMLElement).scrollIntoView({
-          behavior: "smooth",
-          block: "end"
-        });
-      }
-    } catch (e) {
-      /* empty */
-    }
-  }, 100);
+    if (!editor.isFocused) return;
+    keepLastLineInView(editor);
+  }, 1);
 }
 
 export type EditorController = {
@@ -126,20 +101,25 @@ export type EditorController = {
   passwordInputRef: MutableRefObject<HTMLInputElement | null>;
   focusPassInput: () => void;
   blurPassInput: () => void;
+  scrollToSearchResult: (index: number) => void;
+  getContentDiv: () => HTMLElement | null;
 };
 export function useEditorController({
   update,
   getTableOfContents,
   scrollTo,
-  scrollTop
+  scrollTop,
+  getContentDiv
 }: {
   update: (
     scrollTop?: number,
-    selection?: { to: number; from: number }
+    selection?: { to: number; from: number },
+    searchResultIndex?: number
   ) => void;
   getTableOfContents: () => any[];
   scrollTo: (top: number) => void;
   scrollTop: () => number;
+  getContentDiv: () => HTMLElement | null;
 }): EditorController {
   const passwordInputRef = useRef<HTMLInputElement | null>(null);
   const tab = useTabContext();
@@ -385,7 +365,7 @@ export function useEditorController({
           htmlContentRef.current = value.data;
           logger("info", "LOADING NOTE HTML");
           if (!editor) break;
-          update(value.scrollTop, value.selection);
+          update(value.scrollTop, value.selection, value.searchResultIndex);
           setTimeout(() => {
             countWords(0);
           }, 300);
@@ -474,9 +454,23 @@ export function useEditorController({
     });
   };
 
+  const scrollToSearchResult = useCallback((index: number) => {
+    const marks = document.getElementsByTagName("nn-search-result");
+    if (marks.length > index) {
+      const mark = marks[index];
+      if (mark) {
+        mark.scrollIntoView({
+          behavior: "instant",
+          block: "start"
+        });
+      }
+    }
+  }, []);
+
   return {
     getTableOfContents: getTableOfContents,
     scrollIntoView: (id: string) => scrollIntoViewById(id),
+    scrollToSearchResult: scrollToSearchResult,
     contentChange,
     selectionChange,
     titleChange,
@@ -496,6 +490,7 @@ export function useEditorController({
     countWords,
     copyToClipboard,
     getAttachmentData,
+    getContentDiv,
     updateTab: () => {
       // When the tab is focused, we apply any updates to content that were recieved when
       // the tab was not focused.

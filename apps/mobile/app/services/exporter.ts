@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
+//@ts-ignore
 import RNHTMLtoPDF from "react-native-html-to-pdf-lite";
 import * as ScopedStorage from "react-native-scoped-storage";
 import { zip } from "react-native-zip-archive";
@@ -37,6 +38,7 @@ import filesystem from "../common/filesystem";
 import downloadAttachment from "../common/filesystem/download-attachment";
 import { cacheDir } from "../common/filesystem/utils";
 import { unlockVault } from "../utils/unlock-vault";
+import { useUserStore } from "../stores/use-user-store";
 
 const FolderNames: { [name: string]: string } = {
   txt: "Text",
@@ -51,7 +53,15 @@ async function getPath(type: string) {
     (await filesystem.checkAndCreateDir(`/exported/${type}/`));
 
   if (Platform.OS === "android") {
+    useUserStore.setState({
+      disableAppLockRequests: true
+    });
     const file = await ScopedStorage.openDocumentTree(true);
+    setTimeout(() => {
+      useUserStore.setState({
+        disableAppLockRequests: false
+      });
+    }, 1000);
     if (!file) return;
     path = file.uri;
   }

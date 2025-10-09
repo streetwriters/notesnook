@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { db } from "../common/db";
 import createStore from "../common/store";
 import { store as appStore } from "./app-store";
+import { store as trashStore } from "./trash-store";
 import Vault from "../common/vault";
 import BaseStore from ".";
 import Config from "../utils/config";
@@ -52,7 +53,7 @@ class NoteStore extends BaseStore<NoteStore> {
   refreshContext = async () => {
     const context = this.get().context;
     if (!context) return;
-    await this.setContext(context);
+    await this.setContext({ ...context });
   };
 
   setContext = async (context?: Context) => {
@@ -61,7 +62,11 @@ class NoteStore extends BaseStore<NoteStore> {
       contextNotes: context
         ? await notesFromContext(context).grouped(
             db.settings.getGroupOptions(
-              context.type === "favorite" ? "favorites" : "notes"
+              context.type === "favorite"
+                ? "favorites"
+                : context.type === "archive"
+                ? "archive"
+                : "notes"
             )
           )
         : undefined
@@ -71,6 +76,7 @@ class NoteStore extends BaseStore<NoteStore> {
   delete = async (...ids: string[]) => {
     await db.notes.moveToTrash(...ids);
     await this.refresh();
+    await trashStore.refresh();
   };
 
   pin = async (state: boolean, ...ids: string[]) => {
@@ -80,6 +86,11 @@ class NoteStore extends BaseStore<NoteStore> {
 
   favorite = async (state: boolean, ...ids: string[]) => {
     await db.notes.favorite(state, ...ids);
+    await this.refresh();
+  };
+
+  archive = async (state: boolean, ...ids: string[]) => {
+    await db.notes.archive(state, ...ids);
     await this.refresh();
   };
 
@@ -139,6 +150,8 @@ export function notesFromContext(context: Context) {
         .selector;
     case "favorite":
       return db.notes.favorites;
+    case "archive":
+      return db.notes.archived;
     case "monographs":
       return db.monographs.all;
   }

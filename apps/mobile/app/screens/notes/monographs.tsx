@@ -67,3 +67,4 @@ Monographs.navigate = (canGoBack?: boolean) => {
     title: strings.dataTypesPluralCamelCase.monograph()
   });
 };
+export default Monographs;

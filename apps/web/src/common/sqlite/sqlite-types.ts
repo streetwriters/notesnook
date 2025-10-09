@@ -725,6 +725,12 @@ export interface SQLiteAPI {
   open_v2(zFilename: string, iFlags?: number, zVfs?: string): Promise<number>;
 
   /**
+   * Register and init extensions.
+   * @param db database pointer
+   */
+  register_extensions(db: number): Promise<void>;
+
+  /**
    * Compile an SQL statement
    *
    * SQL is provided as a pointer in WASM memory, so the utility functions

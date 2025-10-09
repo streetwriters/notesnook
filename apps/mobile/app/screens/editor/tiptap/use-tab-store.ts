@@ -98,7 +98,7 @@ class TabSessionStorage {
 
   static get(id: string): TabSessionItem | null {
     if (!id) return null;
-    return TabSessionStorage.storage.getMap(id);
+    return TabSessionStorage.storage.getMap(id) || null;
   }
 
   static set(id: string, session: TabSessionItem): void {

@@ -18,99 +18,135 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { notesnook } from "../test.ids";
-import { Tests } from "./utils";
+import { TestBuilder } from "./utils";
 
 describe("NOTE TESTS", () => {
   it("Create a note in editor", async () => {
-    await Tests.prepare();
-    await Tests.createNote();
+    await TestBuilder.create().prepare().createNote().run();
   });
 
   it("Open and close a note", async () => {
-    await Tests.prepare();
-    await Tests.createNote();
-    await Tests.fromId(notesnook.ids.note.get(0)).waitAndTap();
-    await Tests.exitEditor();
+    await TestBuilder.create()
+      .prepare()
+      .createNote()
+      .waitAndTapById(notesnook.ids.note.get(0))
+      .exitEditor()
+      .run();
   });
 
   it("Notes properties should show", async () => {
-    await Tests.prepare();
-    await Tests.createNote();
-    await Tests.fromId(notesnook.listitem.menu).waitAndTap();
-    await Tests.fromText("Created at").isVisible();
+    await TestBuilder.create()
+      .prepare()
+      .createNote()
+      .waitAndTapById(notesnook.listitem.menu)
+      .wait(500)
+      .isVisibleByText("Created at")
+      .run();
   });
 
   it("Favorite and unfavorite a note", async () => {
-    await Tests.prepare();
-    let note = await Tests.createNote();
-    await Tests.fromId(notesnook.listitem.menu).waitAndTap();
-    await Tests.fromId("icon-favorite").waitAndTap();
-    await Tests.fromId("icon-star").isVisible();
-    await Tests.navigate("Favorites");
-    await Tests.fromText(note.body).isVisible();
-    await Tests.fromId(notesnook.listitem.menu).waitAndTap();
-    await Tests.fromId("icon-favorite").waitAndTap();
-    await Tests.fromText(note.body).isNotVisible();
-    await Tests.navigate("Notes");
+    await TestBuilder.create()
+      .prepare()
+      .createNote()
+      .saveResult()
+      .waitAndTapById(notesnook.listitem.menu)
+      .wait(500)
+      .waitAndTapById("icon-favorite")
+      .pressBack()
+      .isVisibleById("icon-star")
+      .navigate("Favorites")
+      .processResult(async (note) => {
+        await TestBuilder.create()
+          .isVisibleByText(note.body)
+          .waitAndTapById(notesnook.listitem.menu)
+          .wait(500)
+          .waitAndTapById("icon-favorite")
+          .pressBack()
+          .isNotVisibleByText(note.body)
+          .navigate("Notes")
+          .run();
+      })
+      .run();
   });
 
   it("Pin a note to top", async () => {
-    await Tests.prepare();
-    await Tests.createNote();
-    await Tests.fromId(notesnook.listitem.menu).waitAndTap();
-    await Tests.fromId("icon-pin").waitAndTap();
-    await Tests.fromText("Pinned").isVisible();
-    await Tests.fromId("icon-pinned").isVisible();
-    await Tests.fromId(notesnook.listitem.menu).waitAndTap();
-    await Tests.fromId("icon-pin").waitAndTap();
-    await Tests.fromText("icon-pinned").isNotVisible();
+    await TestBuilder.create()
+      .prepare()
+      .createNote()
+      .waitAndTapById(notesnook.listitem.menu)
+      .wait(500)
+      .waitAndTapById("icon-pin")
+      .pressBack()
+      .isVisibleByText("PINNED")
+      .isVisibleById("icon-pinned")
+      .waitAndTapById(notesnook.listitem.menu)
+      .wait(500)
+      .waitAndTapById("icon-pin")
+      .pressBack()
+      .isNotVisibleByText("icon-pinned")
+      .run();
   });
 
   it.skip("Pin a note in notifications", async () => {
-    await Tests.prepare();
-    await Tests.createNote();
-    await Tests.fromId(notesnook.listitem.menu).waitAndTap();
-    await Tests.fromId("icon-pin-to-notifications").waitAndTap();
-    await Tests.fromText("Unpin from notifications").isVisible();
-    await Tests.fromId("icon-pin-to-notifications").waitAndTap();
-    await Tests.fromText("Pin to notifications").isVisible();
+    await TestBuilder.create()
+      .prepare()
+      .createNote()
+      .waitAndTapById(notesnook.listitem.menu)
+      .waitAndTapById("icon-pin-to-notifications")
+      .isVisibleByText("Unpin from notifications")
+      .waitAndTapById("icon-pin-to-notifications")
+      .isVisibleByText("Pin to notifications")
+      .run();
   });
 
   it("Copy note", async () => {
-    await Tests.prepare();
-    await Tests.createNote();
-    await Tests.fromId(notesnook.listitem.menu).waitAndTap();
-    await Tests.fromId("icon-copy").isVisible();
-    await Tests.fromId("icon-copy").waitAndTap();
+    await TestBuilder.create()
+      .prepare()
+      .createNote()
+      .waitAndTapById(notesnook.listitem.menu)
+      .wait(500)
+      .isVisibleById("icon-copy")
+      .waitAndTapById("icon-copy")
+      .run();
   });
 
   it("Assign colors to a note", async () => {
-    await Tests.prepare();
-    let note = await Tests.createNote();
-    await Tests.fromId(notesnook.listitem.menu).waitAndTap();
-    await Tests.fromText("Add color").waitAndTap();
-    await Tests.fromId("color-title-input").element.typeText("Test color");
-    await Tests.fromText("Add color").waitAndTap();
-    await Tests.fromId("icon-check").isVisible();
-    await Tests.fromId("icon-color-#efefef").waitAndTap();
-    await Tests.fromId("icon-check").isNotVisible();
-    await Tests.fromId("icon-color-#efefef").waitAndTap();
-    await device.pressBack();
-    await Tests.navigate("Test color");
-    await Tests.fromText(note.body).isVisible();
+    await TestBuilder.create()
+      .prepare()
+      .createNote()
+      .saveResult()
+      .waitAndTapById(notesnook.listitem.menu)
+      .wait(500)
+      .waitAndTapByText("Add color")
+      .typeTextById("color-title-input", "Test color")
+      .waitAndTapByText("Add color")
+      .isVisibleById("icon-check")
+      .waitAndTapById("icon-color-#efefef")
+      .isNotVisibleById("icon-check")
+      .waitAndTapById("icon-color-#efefef")
+      .pressBack()
+      .navigate("Test color")
+      .processResult(async (note) => {
+        await TestBuilder.create().isVisibleByText(note.body).run();
+      })
+      .run();
   });
 
   it("Delete & restore a note", async () => {
-    await Tests.prepare();
-    await Tests.createNote();
-    await Tests.fromId(notesnook.listitem.menu).waitAndTap();
-    await Tests.fromId("icon-trash").waitAndTap();
-    await Tests.navigate("Trash");
-    await Tests.fromId(notesnook.listitem.menu).waitAndTap();
-    await Tests.fromText("Restore").waitAndTap();
-    await device.pressBack();
-    await Tests.fromText(
-      "Test note description that is very long and should not fit in text."
-    ).isVisible();
+    await TestBuilder.create()
+      .prepare()
+      .createNote()
+      .waitAndTapById(notesnook.listitem.menu)
+      .wait(500)
+      .waitAndTapById("icon-trash")
+      .navigate("Trash")
+      .waitAndTapById(notesnook.listitem.menu)
+      .wait(500)
+      .waitAndTapByText("Restore")
+      .pressBack()
+      .isVisibleByText(
+        "Test note description that is very long and should not fit in text."
+      )
+      .run();
   });
 });

@@ -1,0 +1,4 @@
+- Fix crash on device boot on android 15 devices
+- Minor bug fixes and improvements
+
+Thank you for using Notesnook!

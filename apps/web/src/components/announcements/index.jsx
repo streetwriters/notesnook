@@ -33,7 +33,7 @@ function Announcements() {
   const dismiss = useAnnouncementStore((store) => store.dismiss);
   const announcement = announcements[0];
 
-  if (!announcement) return <Notice />;
+  if (!announcement) return null;
   return (
     <Flex
       mx={1}

@@ -26,15 +26,17 @@ import {
 import {
   getPopupContainer,
   getPopupRoot,
-  getToolbarElement,
-  unmountPopupRoot
+  getToolbarElement
 } from "../../toolbar/utils/dom.js";
 import {
   useIsMobile,
   useToolbarStore
 } from "../../toolbar/stores/toolbar-store.js";
 import React from "react";
-import { ResponsivePresenter, ResponsivePresenterProps } from "../responsive/index.js";
+import {
+  ResponsivePresenter,
+  ResponsivePresenterProps
+} from "../responsive/index.js";
 
 export type PopupWrapperProps = UsePopupHandlerOptions & {
   autoCloseOnUnmount?: boolean;
@@ -106,11 +108,12 @@ type ShowPopupOptions = {
 export function showPopup(options: ShowPopupOptions) {
   const { popup, ...props } = options;
 
+  const root = getPopupRoot();
   function hide() {
-    unmountPopupRoot();
+    root.unmount();
   }
 
-  getPopupRoot().render(
+  root.render(
     <ResponsivePresenter
       isOpen
       position={{

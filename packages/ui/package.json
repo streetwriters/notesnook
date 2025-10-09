@@ -46,7 +46,7 @@
     "react-dom": ">=18"
   },
   "scripts": {
-    "build": "tsup-node src/index.ts",
+    "build": "tsdown src/index.ts",
     "prepublishOnly": "npm run build",
     "watch": "npm run build -- --watch"
   }

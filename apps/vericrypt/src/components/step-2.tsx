@@ -18,13 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { Flex, Text, Image, Input } from "@theme-ui/components";
 import { StepContainer } from "./step-container";
-import DevtoolsApplicationTab from "../assets/screenshots/devtools_application_tab.png";
-import DevtoolsSelectDB from "../assets/screenshots/devtools_select_db.png";
-import DevtoolsSalt from "../assets/screenshots/devtools_salt.png";
+import DevtoolsCopySaltChrome from "../assets/screenshots/devtools_copy_salt.png";
 
-import DevtoolsFirefoxStorageTab from "../assets/screenshots/firefox/firefox_storage_tab.png";
-import DevtoolsSelectDBFirefox from "../assets/screenshots//firefox/firefox_keyvalue_pairs.png";
-import DevtoolsSaltFirefox from "../assets/screenshots/firefox/firefox_user_object.png";
+import DevtoolsCopySaltFirefox from "../assets/screenshots/firefox/firefox_copy_salt.png";
 
 import { Accordion } from "./accordion";
 import { getCombo } from "../utils/keycombos";
@@ -45,36 +41,21 @@ const steps = {
       Press <KeyCombo combo={getCombo("chromium", "developerTools")} /> to open
       Developer Tools.
     </>,
-    <Flex key="switch-to-application-tab" sx={{ flexDirection: "column" }}>
-      <Text as="p">
-        Switch to the <Code text="Application" /> tab.
-      </Text>
-      <Image src={DevtoolsApplicationTab} width={300} sx={{ mt: 1 }} />
-    </Flex>,
-    <>
-      From the side menu, expand <Code text="IndexedDB" /> which is under the
-      Storage heading.
-    </>,
-    `You'll see a number of databases . Expand the one that starts with "Notesnook".`,
-
-    <Flex key="click-on-keyvaluepairs" sx={{ flexDirection: "column" }}>
-      <Text as="p">
-        Click on <Code text="keyvaluepairs" />.
-      </Text>
-      <Image src={DevtoolsSelectDB} width={200} sx={{ mt: 1 }} />
-    </Flex>,
-    <>
-      On the right panel, you&apos;ll see an input with the placeholder
-      &quot;Start from key&quot; at the top. Type <Code text="user" /> in that
-      input.
-    </>,
-    `At the top of the list, you'll see an entry with key "user". Expand the value.`,
+    <Text key="switch-to-network-tab" as="p">
+      Switch to the <Code text="Network" /> tab.
+    </Text>,
+    <Text key="toggle-xhr-filter" as="p">
+      Make sure you have the <Code text="Fetch/XHR" /> filter toggled.
+    </Text>,
+    <Text key="refresh-the-tab" as="p">
+      Refresh the tab so you can see all the network requests.
+    </Text>,
     <Flex key="key-named-salt" sx={{ flexDirection: "column" }}>
-      <Text as="p">
-        You&apos;ll see a key named <Code text="salt" />. Copy the value against
-        it.
-      </Text>
-      <Image src={DevtoolsSalt} width={400} sx={{ mt: 1 }} />
+      <Text as="p">Follow the steps as shown in the image:</Text>
+      <Image src={DevtoolsCopySaltChrome} width={"100%"} sx={{ mt: 1 }} />
+    </Flex>,
+    <Flex key="copy-salt" sx={{ flexDirection: "column" }}>
+      <Text as="p">Copy the salt and paste it below.</Text>
     </Flex>
   ],
   firefox: [
@@ -83,38 +64,21 @@ const steps = {
       Press <KeyCombo combo={getCombo("firefox", "developerTools")} /> to open
       Developer Tools.
     </>,
-    <Flex key="switch-to-storage-tab" sx={{ flexDirection: "column" }}>
-      <Text as="p">
-        Switch to the <Code text="Storage" /> tab.
-      </Text>
-      <Image src={DevtoolsFirefoxStorageTab} width={300} sx={{ mt: 1 }} />
-    </Flex>,
-    <>
-      From the side menu, expand <Code text="IndexedDB" /> which is under the
-      Storage heading.
-    </>,
-    `You'll see a number of databases . Expand the one that starts with "Notesnook".`,
-
-    <Flex key="click-on-keyvaluepairs" sx={{ flexDirection: "column" }}>
-      <Text as="p">
-        Click on <Code text="keyvaluepairs" />.
-      </Text>
-      <Image src={DevtoolsSelectDBFirefox} width={200} sx={{ mt: 1 }} />
-    </Flex>,
-    <>
-      On the right panel, you&apos;ll see an input with the placeholder
-      &quot;Start from key&quot; at the top. Type <Code text="user" /> in that
-      input. If you don&apos;t see the &apos;user&apos; object, scroll to end
-      using <Code text="Page down" /> key in key-value pair list and then search
-      again.
-    </>,
-    `At the top of the list, you'll see an entry with key "user". Expand the value.`,
+    <Text key="switch-to-network-tab" as="p">
+      Switch to the <Code text="Network" /> tab.
+    </Text>,
+    <Text key="toggle-xhr-filter" as="p">
+      Make sure you have the <Code text="XHR" /> filter toggled.
+    </Text>,
+    <Text key="refresh-the-tab" as="p">
+      Refresh the tab so you can see all the network requests.
+    </Text>,
     <Flex key="key-named-salt" sx={{ flexDirection: "column" }}>
-      <Text as="p">
-        You&apos;ll see a key named <Code text="salt" />. Right click and copy
-        the value against it.
-      </Text>
-      <Image src={DevtoolsSaltFirefox} width={400} sx={{ mt: 1 }} />
+      <Text as="p">Follow the steps as shown in the image:</Text>
+      <Image src={DevtoolsCopySaltFirefox} width={"100%"} sx={{ mt: 1 }} />
+    </Flex>,
+    <Flex key="copy-salt" sx={{ flexDirection: "column" }}>
+      <Text as="p">Copy the salt and paste it below.</Text>
     </Flex>
   ]
 };

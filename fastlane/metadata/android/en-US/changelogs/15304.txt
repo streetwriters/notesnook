@@ -1,0 +1,5 @@
+- Fix toolbar hidden behing keyboard on android 15 and 16
+- Fix sync performance issues
+- Minor bug fixes and improvements
+
+Thank you for using Notesnook!

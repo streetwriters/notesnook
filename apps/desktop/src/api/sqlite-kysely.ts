@@ -33,6 +33,8 @@ export class SQLite {
   initialized = false;
   preparedStatements: Map<string, Statement<unknown[]>> = new Map();
   retryCounter: Record<string, number> = {};
+  extensionsLoaded = false;
+
   constructor() {
     console.log("new sqlite worker");
   }
@@ -46,8 +48,6 @@ export class SQLite {
     this.sqlite = require("better-sqlite3-multiple-ciphers")(
       filePath
     ).unsafeMode(true);
-    const betterTrigram = require("sqlite-better-trigram");
-    betterTrigram.load(this.sqlite);
   }
 
   /**
@@ -115,7 +115,27 @@ export class SQLite {
     } catch (e) {
       if (e instanceof Error) e.message += ` (query: ${sql})`;
       throw e;
+    } finally {
+      // Since SQLite 3.48.0 (SQLite3MC v2.0.2) it's not possible to load fts5
+      // extensions before database has been decrypting. This is because
+      // executing a `SELECT` now accesses the underlying databases resulting in
+      // an error. Since FTS5 extensions depend on `SELECT fts5` to load the
+      // fts5 API, we must wait decrypt the database before we can load
+      // the extensions.
+      if (!this.extensionsLoaded && (await this.isDatabaseReady())) {
+        this.loadExtensions();
+      }
     }
+  }
+
+  private loadExtensions() {
+    this.sqlite?.loadExtension(
+      getExtensionPath("sqlite-better-trigram", "better-trigram")
+    );
+    this.sqlite?.loadExtension(
+      getExtensionPath("sqlite3-fts5-html", "fts5-html")
+    );
+    this.extensionsLoaded = true;
   }
 
   async run<R>(
@@ -142,4 +162,53 @@ export class SQLite {
       retryDelay: 500
     });
   }
+
+  /**
+   * This just executes `SELECT 1` on the database to make sure its ready.
+   * On an encrypted database, this will fail until `PRAGMA key` has been
+   * called.
+   */
+  private async isDatabaseReady() {
+    // return this.exec(`SELECT 1;`)
+    //   .then(() => true)
+    //   .catch(() => false);
+    if (!this.sqlite) return false;
+    try {
+      this.sqlite.prepare(`SELECT 1;`).run();
+      return true;
+    } catch {
+      return false;
+    }
+  }
+}
+
+function getExtensionPath(extensionName: string, entryPoint: string) {
+  const path = require("path");
+  const { statSync } = require("fs");
+
+  const os = process.platform === "win32" ? "windows" : process.platform;
+  const packageName = `${extensionName}-${os}-${process.arch}`;
+  const extensionSuffix =
+    process.platform === "win32"
+      ? "dll"
+      : process.platform === "darwin"
+      ? "dylib"
+      : "so";
+  let loadablePath = path.join(
+    require.resolve(extensionName),
+    "..",
+    "..",
+    packageName,
+    `${entryPoint}.${extensionSuffix}`
+  );
+
+  if (loadablePath.includes(".asar"))
+    loadablePath = loadablePath
+      .replace("electron.asar", "app.asar")
+      .replace(".asar", ".asar.unpacked");
+
+  if (!statSync(loadablePath, { throwIfNoEntry: false })) {
+    throw new Error(`${extensionName} not found at ${loadablePath}.`);
+  }
+  return loadablePath;
 }

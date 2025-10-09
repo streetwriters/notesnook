@@ -42,6 +42,7 @@ import { ProgressBarComponent } from "../../ui/svg/lazy";
 import Paragraph from "../../ui/typography/paragraph";
 import { Issue } from "../github/issue";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 export const makeError = (stack: string, component: string) => `
 
@@ -125,7 +126,7 @@ export default function Migrate() {
   return (
     <View
       style={{
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         paddingTop: 12,
         height: "100%",
         alignItems: "center",
@@ -152,8 +153,8 @@ export default function Migrate() {
           >
             <Paragraph
               style={{
-                marginTop: 5,
-                marginBottom: 10,
+                marginTop: DefaultAppStyles.GAP_VERTICAL,
+                marginBottom: DefaultAppStyles.GAP_VERTICAL,
                 textAlign: "center"
               }}
             >
@@ -183,7 +184,7 @@ export default function Migrate() {
         <>
           <Paragraph
             style={{
-              marginTop: 20,
+              marginTop: DefaultAppStyles.GAP,
               textAlign: "center"
             }}
           >
@@ -193,7 +194,7 @@ export default function Migrate() {
           {reset ? (
             <Paragraph
               style={{
-                marginTop: 10,
+                marginTop: DefaultAppStyles.GAP_VERTICAL,
                 textAlign: "center"
               }}
             >
@@ -212,7 +213,7 @@ export default function Migrate() {
               style={{
                 borderRadius: 100,
                 height: 45,
-                marginTop: 10
+                marginTop: DefaultAppStyles.GAP_VERTICAL
               }}
             />
           )}
@@ -226,7 +227,7 @@ export default function Migrate() {
           style={{
             borderRadius: 100,
             height: 45,
-            marginTop: 20
+            marginTop: DefaultAppStyles.GAP
           }}
         />
       )}

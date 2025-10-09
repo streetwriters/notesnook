@@ -23,19 +23,16 @@ The following steps will help you quickly import your notes from Evernote into N
 
 Once you have all the .ENEX files containing your Evernote notes, its time to import them into Notesnook.
 
-1. Go to [https://importer.notesnook.com/](https://importer.notesnook.com/) and select Evernote from the list of apps.
+1. Open the Notesnook app (web or desktop)
+2. Go to `Settings > Notesnook Importer` and select Evernote from the list of apps.
    ![](/static/evernote-importer/4.png)
-2. Drop (or select) the `.enex` files you exported earlier from Evernote, and click the "Start processing" button.
+3. Drop (or select) the `.enex` files you exported earlier from Evernote, and click the "Start processing" button.
    ![](/static/evernote-importer/5.png)
-3. Once the Importer finishes processing your files, download the .zip file.
-   ![](/static/import-ready.png)
-4. After you have downloaded the `.zip` file, [go to the Notesnook Web App](https://app.notesnook.com/) > Settings > Notesnook Importer. Select the .zip you downloaded earlier and click "Start import" button.
-   ![](/static/import-zip-app.png)
-5. Once importing completes you should see all your notes in Notesnook. If you face any issues during importing, feel free to [report them on GitHub](https://github.com/streetwriters/notesnook-importer).
+4. Once the importing completes you should see all your notes in Notesnook. If you face any issues during importing, feel free to [report them on GitHub](https://github.com/streetwriters/notesnook-importer).
 
 ## Supported formats
 
-Notesnook Importer is one of the most robust Evernote importers around supporting almost 100% of Evernote formats. Here's a list of everything that can (or can't be) imported into Notesnook:
+Notesnook Importer is one of the most robust Evernote importers, supporting almost 100% of Evernote formats. Here's a list of everything that can (or can't be) imported into Notesnook:
 
 - [x] Attachments
 - [x] Web clips (full page, screenshot, bookmark, article, & simplified article are all supported)
@@ -44,6 +41,6 @@ Notesnook Importer is one of the most robust Evernote importers around supportin
 - [x] Images
 - [x] Rich text (bold, italic, lists etc.)
 - [ ] Reminders
-- [ ] Internal note links
+- [x] Internal note links
 - [x] Notebooks
 - [x] Tags

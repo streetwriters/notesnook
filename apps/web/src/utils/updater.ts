@@ -73,13 +73,19 @@ export async function installUpdate() {
   else {
     const registrations =
       (await navigator.serviceWorker?.getRegistrations()) || [];
-    let reload = false;
     for (const registration of registrations) {
       if (registration.waiting) {
+        registration.waiting.addEventListener("statechange", () => {
+          const worker =
+            registration.active ||
+            registration.waiting ||
+            registration.installing;
+          if (worker?.state === "activated") {
+            window.location.reload();
+          }
+        });
         registration.waiting.postMessage({ type: "SKIP_WAITING" });
-        reload = true;
       }
     }
-    if (reload) window.location.reload();
   }
 }

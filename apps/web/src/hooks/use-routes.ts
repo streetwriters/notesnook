@@ -20,34 +20,48 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useLocation } from "wouter";
 import makeMatcher from "wouter/matcher";
 import { navigate, getHomeRoute } from "../navigation";
-import { Params, Routes } from "../navigation/types";
+import { Params, RouteResult, Routes } from "../navigation/types";
+import { useEffect, useState } from "react";
 
 export default function useRoutes<T extends string>(
   routes: Routes<T>,
   options?: {
-    hooks?: { beforeNavigate: (location: string) => void };
+    hooks?: { beforeNavigate: (location: string) => boolean };
     fallbackRoute?: string;
   }
 ) {
   const [location] = useLocation();
-  const matcher = makeMatcher();
+  const [result, setResult] = useState<RouteResult>();
 
-  if (location === "/") navigate(getHomeRoute());
+  useEffect(() => {
+    (async function () {
+      const matcher = makeMatcher();
 
-  options?.hooks?.beforeNavigate(location);
+      if (
+        options?.hooks?.beforeNavigate &&
+        !options?.hooks?.beforeNavigate(location)
+      )
+        return;
 
-  for (const key in routes) {
-    const [match, params] = matcher(key, location);
-    if (match) {
-      const result = routes[key]((params as Params<typeof key>) || {});
-      if (!result) break;
-      return [result, location] as const;
-    }
-  }
-  if (!options) return [] as const;
-  const { fallbackRoute } = options;
-  if (fallbackRoute) {
-    navigate(fallbackRoute);
-  }
-  return [] as const;
+      for (const key in routes) {
+        const [match, params] = matcher(key, location);
+        if (match) {
+          const result = await routes[key](
+            (params as Params<typeof key>) || {}
+          );
+          if (!result) break;
+          setResult(result);
+          return;
+        }
+      }
+
+      if (!options) return;
+      const { fallbackRoute } = options;
+      if (fallbackRoute) {
+        navigate(fallbackRoute);
+      }
+    })();
+  }, [location]);
+
+  return result ? ([result, location] as const) : [];
 }

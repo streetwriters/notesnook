@@ -20,31 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { expect, test } from "@playwright/test";
 import { AppModel } from "./models/app.model";
 import { NotesViewModel } from "./models/notes-view.model";
-import { getTestId } from "./utils";
 
 for (const item of [
   { id: "notebooks", title: "Notebooks" },
   { id: "tags", title: "Tags" }
 ]) {
-  test(`drag & hover over ${item.id} should navigate inside`, async ({
-    page
-  }) => {
-    const app = new AppModel(page);
-    await app.goto();
-    const notes = await app.goToNotes();
-    const note = await notes.createNote({
-      title: `Test note`
-    });
-    const navigationItem = await app.navigation.findItem(item.title);
-
-    await note?.locator.hover();
-    await page.mouse.down();
-    await navigationItem?.locator.hover();
-    await navigationItem?.locator.hover();
-    await page.waitForTimeout(1000);
-
-    await expect(app.routeHeader).toHaveText(item.title);
-  });
+  test.skip(`drag & hover over ${item.id} should navigate inside`, () => {});
 }
 
 test(`drag & drop note over Favorites should make the note favorite`, async ({
@@ -85,24 +66,20 @@ test(`drag & drop note over a notebook should get assigned to the notebook`, asy
 }) => {
   const app = new AppModel(page);
   await app.goto();
-  const notebooks = await app.goToNotebooks();
-  const notebook = await notebooks.createNotebook({ title: "Test notebook" });
   const notes = await app.goToNotes();
   const note = await notes.createNote({
     title: `Test note`
   });
-  const navigationItem = await app.navigation.findItem("Notebooks");
+  const notebooks = await app.goToNotebooks();
+  const notebook = await notebooks.createNotebook({ title: "Test notebook" });
 
   await note?.locator.hover();
   await page.mouse.down();
-  await navigationItem?.locator.hover();
-  await navigationItem?.locator.hover();
-  await page.waitForTimeout(1000);
   await notebook?.locator.hover();
   await notebook?.locator.hover();
   await page.mouse.up();
 
-  const { notes: notebookNotes } = (await notebook?.openNotebook()) || {};
+  const notebookNotes = await notebook?.openNotebook();
   expect(await notebookNotes?.findNote({ title: "Test note" })).toBeDefined();
 });
 
@@ -111,19 +88,15 @@ test(`drag & drop note over a tag should get assigned to the tag`, async ({
 }) => {
   const app = new AppModel(page);
   await app.goto();
-  const tags = await app.goToTags();
-  const tag = await tags.createItem({ title: "Tag" });
   const notes = await app.goToNotes();
   const note = await notes.createNote({
     title: `Test note`
   });
-  const navigationItem = await app.navigation.findItem("Tags");
+  const tags = await app.goToTags();
+  const tag = await tags.createItem({ title: "Tag" });
 
   await note?.locator.hover();
   await page.mouse.down();
-  await navigationItem?.locator.hover();
-  await navigationItem?.locator.hover();
-  await page.waitForTimeout(1000);
   await tag?.locator.hover();
   await tag?.locator.hover();
   await page.mouse.up();
@@ -185,25 +158,20 @@ test(`drag & drop note over a nested notebook should get assigned to the noteboo
 }) => {
   const app = new AppModel(page);
   await app.goto();
-  const notebooks = await app.goToNotebooks();
-  const notebook = await notebooks.createNotebook({
-    title: "Test notebook",
-    subNotebooks: [{ title: "Nested notebook" }]
-  });
-  const nestedNotebook = await (
-    await notebook?.openNotebook()
-  )?.subNotebooks.createNotebook({ title: "Nested notebook" });
   const notes = await app.goToNotes();
   const note = await notes.createNote({
     title: `Test note`
   });
-  const navigationItem = await app.navigation.findItem("Notebooks");
+  const notebooks = await app.goToNotebooks();
+  const notebook = await notebooks.createNotebook({
+    title: "Test notebook"
+  });
+  const nestedNotebook = await notebook?.createSubnotebook({
+    title: "Nested notebook"
+  });
 
   await note?.locator.hover();
   await page.mouse.down();
-  await navigationItem?.locator.hover();
-  await navigationItem?.locator.hover();
-  await page.waitForTimeout(1000);
   await nestedNotebook?.locator.hover();
   await nestedNotebook?.locator.hover();
   await page.mouse.up();
@@ -211,47 +179,4 @@ test(`drag & drop note over a nested notebook should get assigned to the noteboo
   await nestedNotebook?.click();
   const notebookNotes = new NotesViewModel(page, "notebook", "notes");
   expect(await notebookNotes?.findNote({ title: "Test note" })).toBeDefined();
-});
-
-test(`drag & hover over a nested notebook should navigate inside`, async ({
-  page
-}) => {
-  const app = new AppModel(page);
-  await app.goto();
-  const notebooks = await app.goToNotebooks();
-  const notebook = await notebooks.createNotebook({
-    title: "Test notebook",
-    subNotebooks: [{ title: "Nested notebook" }]
-  });
-  const nestedNotebook = await (
-    await notebook?.openNotebook()
-  )?.subNotebooks.createNotebook({ title: "Nested notebook" });
-  const notes = await app.goToNotes();
-  const note = await notes.createNote({
-    title: `Test note`
-  });
-  const navigationItem = await app.navigation.findItem("Notebooks");
-  await navigationItem?.click();
-  await navigationItem?.click();
-  await app.goToNotes();
-
-  await note?.locator.hover();
-  await page.mouse.down();
-  await navigationItem?.locator.hover();
-  await navigationItem?.locator.hover();
-  await page.waitForTimeout(1000);
-  await notebook?.locator.hover();
-  await notebook?.locator.hover();
-  await page.waitForTimeout(1000);
-  await nestedNotebook?.locator.hover();
-  await nestedNotebook?.locator.hover();
-  await page.waitForTimeout(1000);
-  await page.keyboard.press("Escape");
-
-  expect(
-    await page
-      .locator(getTestId("notebook-header"))
-      .locator(getTestId("notebook-title"))
-      .textContent()
-  ).toBe("Nested notebook");
 });

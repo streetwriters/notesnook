@@ -93,19 +93,17 @@ export class EditorModel {
   }
 
   async waitForUnloading() {
-    await this.page.waitForURL(/#\/notes\/?.+\/create/gm);
     await this.searchButton.isDisabled();
     await this.page
       .locator(".active")
-      .locator(getTestId("tags"))
-      .waitFor({ state: "hidden" });
+      .locator(getTestId("editor-tag-input"))
+      .isDisabled();
     await this.dateEditedText.waitFor({ state: "hidden" });
     await this.wordCountText.waitFor();
     await this.waitForLoading("", "");
   }
 
   async waitForSaving() {
-    await this.page.waitForURL(/#\/notes\/?.+\/edit/gm);
     await this.page.locator(".active").locator(getTestId("tags")).waitFor();
     await this.searchButton.waitFor();
     await this.wordCountText.waitFor();
@@ -113,7 +111,7 @@ export class EditorModel {
 
   async isUnloaded() {
     return (
-      (await this.tagInput.isHidden()) &&
+      (await this.tagInput.isDisabled()) &&
       (await this.enterFullscreenButton.isHidden()) &&
       (await this.dateEditedText.isHidden())
     );

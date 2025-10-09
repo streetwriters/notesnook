@@ -28,6 +28,7 @@ import {
 } from "../../../services/event-manager";
 import { useState } from "react";
 import { eCloseLoading, eOpenLoading } from "../../../utils/events";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 export const LoadingDialog = () => {
   const { colors } = useThemeColors();
@@ -67,7 +68,7 @@ export const LoadingDialog = () => {
           style={{
             flexDirection: "row",
             width: 100,
-            marginTop: 15
+            marginTop: DefaultAppStyles.GAP
           }}
         >
           <ProgressBarComponent

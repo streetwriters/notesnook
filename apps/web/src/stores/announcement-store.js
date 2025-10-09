@@ -21,10 +21,9 @@ import createStore from "../common/store";
 import { db } from "../common/db";
 import BaseStore from "./index";
 import Config from "../utils/config";
-import { isUserPremium } from "../hooks/use-is-user-premium";
-import { SUBSCRIPTION_STATUS } from "../common/constants";
+import { isUserSubscribed } from "../hooks/use-is-user-premium";
 import { appVersion } from "../utils/version";
-import { findItemAndDelete } from "@notesnook/core";
+import { findItemAndDelete, SubscriptionStatus } from "@notesnook/core";
 
 /**
  * @extends {BaseStore<AnnouncementStore>}
@@ -97,15 +96,12 @@ async function shouldShowAnnouncement(announcement) {
   if (!show) return false;
 
   const user = await db.user.getUser();
-  const subStatus = user?.subscription?.type;
   show = announcement.userTypes.some((userType) => {
     switch (userType) {
-      case "pro":
-        return isUserPremium(user);
+      case "subscribed":
+        return isUserSubscribed(user);
       case "trial":
-        return subStatus === SUBSCRIPTION_STATUS.TRIAL;
-      case "trialExpired":
-        return subStatus === SUBSCRIPTION_STATUS.BASIC;
+        return user?.subscription?.status === SubscriptionStatus.TRIAL;
       case "loggedOut":
         return !user;
       case "loggedIn":
@@ -114,8 +110,6 @@ async function shouldShowAnnouncement(announcement) {
         return user && !user.isEmailConfirmed;
       case "verified":
         return user && user.isEmailConfirmed;
-      case "proExpired":
-        return subStatus === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED;
       case "any":
       default:
         return true;

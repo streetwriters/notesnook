@@ -20,6 +20,7 @@ import "isomorphic-fetch";
 import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
+import { existsSync } from "fs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -36,6 +37,8 @@ async function main() {
   await mkdir(THEMES_DIRECTORY, { recursive: true });
 
   for (const themeId of DEFAULT_THEMES) {
+    const themePath = path.join(THEMES_DIRECTORY, `${themeId}.json`);
+    if (existsSync(themePath)) continue;
     console.log("Getting", themeId);
 
     const BASE_URL = `https://raw.githubusercontent.com/streetwriters/notesnook-themes/main/themes/${themeId}/v${THEME_COMPATIBILITY_VERSION}`;

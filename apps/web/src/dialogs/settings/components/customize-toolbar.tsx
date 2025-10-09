@@ -48,7 +48,6 @@ import { CSS } from "@dnd-kit/utilities";
 import { createPortal } from "react-dom";
 import { getId } from "@notesnook/core";
 import { Label } from "@theme-ui/components";
-import { db } from "../../../common/db";
 import { useToolbarConfig } from "../../../components/editor/manager";
 import {
   getAllPresets,
@@ -56,15 +55,15 @@ import {
   getPreset,
   getPresetTools,
   Preset,
-  PresetId
+  PresetId,
+  setToolbarPreset
 } from "../../../common/toolbar-config";
 import { showToast } from "../../../utils/toast";
-import { isUserPremium } from "../../../hooks/use-is-user-premium";
 import { Pro } from "../../../components/icons";
-
 import { Icon } from "@notesnook/ui";
-import { CURRENT_TOOLBAR_VERSION } from "@notesnook/common";
+import { useIsFeatureAvailable } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
+import { checkFeature } from "../../../common";
 
 export function CustomizeToolbar() {
   const sensors = useSensors(
@@ -77,6 +76,7 @@ export function CustomizeToolbar() {
   const [activeItem, setActiveItem] = useState<TreeNode>();
   const [currentPreset, setCurrentPreset] = useState<Preset>();
   const { setToolbarConfig } = useToolbarConfig();
+  const customToolbarPreset = useIsFeatureAvailable("customToolbarPreset");
 
   useEffect(() => {
     if (!currentPreset) return;
@@ -97,13 +97,7 @@ export function CustomizeToolbar() {
     (async () => {
       if (!currentPreset) return;
       const tools = unflatten(items).slice(0, -1);
-
-      await db.settings.setToolbarConfig("desktop", {
-        version: CURRENT_TOOLBAR_VERSION,
-        preset: currentPreset.id,
-        config: currentPreset.id === "custom" ? tools : undefined
-      });
-
+      await setToolbarPreset(currentPreset.id, tools);
       setToolbarConfig(tools);
     })();
   }, [items]);
@@ -131,18 +125,12 @@ export function CustomizeToolbar() {
                 value={preset.id}
                 checked={preset.id === currentPreset.id}
                 defaultChecked={preset.id === currentPreset.id}
-                disabled={preset.id === "custom" && !isUserPremium()}
+                disabled={
+                  preset.id === "custom" && !customToolbarPreset?.isAllowed
+                }
                 style={{ accentColor: "var(--accent)" }}
                 onChange={async (e) => {
                   const { value } = e.target;
-                  if (preset.id === "custom" && !isUserPremium()) {
-                    showToast(
-                      "info",
-                      strings.upgradeToProToUseFeature("customPresets")
-                    );
-                    return;
-                  }
-                  console.log("CHANGE PRESET", value);
                   setCurrentPreset(getPreset(value as PresetId));
                 }}
               />
@@ -155,8 +143,8 @@ export function CustomizeToolbar() {
               >
                 {preset.title}
               </span>
-              {preset.id === "custom" && !isUserPremium() ? (
-                <Pro color="accent" size={18} sx={{ ml: 1 }} />
+              {preset.id === "custom" && !customToolbarPreset?.isAllowed ? (
+                <Pro color="orange" size={18} sx={{ ml: 1 }} />
               ) : null}
             </Label>
           ))}
@@ -184,15 +172,10 @@ export function CustomizeToolbar() {
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
-        cancelDrop={() => {
-          if (!isUserPremium()) {
-            showToast(
-              "error",
-              strings.upgradeToProToUseFeature("customizeToolbar")
-            );
-            return true;
-          }
-          return false;
+        cancelDrop={async () => {
+          return (
+            !customToolbarPreset || !(await checkFeature(customToolbarPreset))
+          );
         }}
         onDragStart={(event) => {
           if (currentPreset.id !== "custom") {
@@ -680,7 +663,8 @@ type ResolvedGroup = {
 };
 function getGroup(items: TreeNode[], groupId: string): ResolvedGroup | null {
   const index = items.findIndex((item) => item.id === groupId);
-  const group = items[index];
+  const group = items.at(index);
+  if (!group) return null;
   if (!isGroup(group) && !isSubgroup(group)) return null;
 
   const nextGroupIndex = items.findIndex(

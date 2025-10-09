@@ -26,10 +26,14 @@ import { Notice } from "../../../components/ui/notice";
 import Paragraph from "../../../components/ui/typography/paragraph";
 import PremiumService from "../../../services/premium";
 import { useThemeColors } from "@notesnook/theme";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { Group } from "./group";
 import { DragState, useDragState } from "./state";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
+import { isFeatureAvailable } from "@notesnook/common";
+import { ToastManager } from "../../../services/event-manager";
+import PaywallSheet from "../../../components/sheets/paywall";
 export const ConfigureToolbar = () => {
   const data = useDragState((state) => state.data);
   const preset = useDragState((state) => state.preset);
@@ -50,16 +54,16 @@ export const ConfigureToolbar = () => {
       >
         <View
           style={{
-            paddingVertical: 12
+            paddingVertical: DefaultAppStyles.GAP_VERTICAL
           }}
         >
           <Notice text={strings.configureToolbarNotice()} type="information" />
 
           <Paragraph
             style={{
-              marginTop: 10
+              marginTop: DefaultAppStyles.GAP_VERTICAL
             }}
-            size={SIZE.xs}
+            size={AppFontSize.xs}
             color={colors.secondary.paragraph}
           >
             {strings.presets()}
@@ -70,7 +74,7 @@ export const ConfigureToolbar = () => {
               flexDirection: "row",
               flexWrap: "wrap",
               width: "100%",
-              marginTop: 10
+              marginTop: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             {[
@@ -92,20 +96,31 @@ export const ConfigureToolbar = () => {
                 type={preset === item.id ? "accent" : "secondaryAccented"}
                 style={{
                   borderRadius: 100,
-                  height: 35,
-                  marginRight: 10
+                  marginRight: 10,
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
                 }}
                 proTag={item.pro}
-                onPress={() => {
-                  if (item.id === "custom" && !PremiumService.get()) {
-                    PremiumService.sheet("global");
-                    return;
+                onPress={async () => {
+                  if (item.id === "custom") {
+                    const customToolbarPresetFeature = await isFeatureAvailable(
+                      "customToolbarPreset"
+                    );
+                    if (!customToolbarPresetFeature.isAllowed) {
+                      ToastManager.show({
+                        message: customToolbarPresetFeature.error,
+                        type: "info",
+                        actionText: strings.upgrade(),
+                        func: () =>
+                          PaywallSheet.present(customToolbarPresetFeature)
+                      });
+                      return;
+                    }
                   }
                   useDragState
                     .getState()
                     .setPreset(item.id as DragState["preset"]);
                 }}
-                fontSize={SIZE.sm - 1}
+                fontSize={AppFontSize.sm - 1}
                 key={item.name}
                 title={item.name}
               />
@@ -148,7 +163,7 @@ export const ConfigureToolbar = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 12,
+    paddingHorizontal: DefaultAppStyles.GAP,
     width: "100%"
   }
 });

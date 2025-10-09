@@ -49,13 +49,14 @@ import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
 import { ToastManager, presentSheet } from "../../services/event-manager";
 import { useThemeStore } from "../../stores/use-theme-store";
-import { SIZE } from "../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../utils/size";
 import { getElevationStyle } from "../../utils/elevation";
 import { MenuItemsList } from "../../utils/menu-items";
 import { IconButton } from "../../components/ui/icon-button";
 import { Pressable } from "../../components/ui/pressable";
 import { getColorLinearShade } from "../../utils/colors";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 
 const THEME_SERVER_URL = "https://themes-api.notesnook.com";
 //@ts-ignore
@@ -131,8 +132,8 @@ function ThemeSelector() {
           activeOpacity={0.9}
           style={{
             borderRadius: 10,
-            padding: 6,
-            marginBottom: 10,
+            padding: DefaultAppStyles.GAP_SMALL,
+            marginBottom: DefaultAppStyles.GAP_VERTICAL,
             flexShrink: 1,
             marginHorizontal: 10
           }}
@@ -144,7 +145,7 @@ function ThemeSelector() {
               height: 200,
               width: "100%",
               borderRadius: 10,
-              marginBottom: 10,
+              marginBottom: DefaultAppStyles.GAP_VERTICAL,
               overflow: "hidden",
               flexDirection: "row",
               justifyContent: "space-between",
@@ -156,14 +157,14 @@ function ThemeSelector() {
                 height: "100%",
                 width: "49.5%",
                 backgroundColor: colors.navigationMenu.background,
-                padding: 5,
+                padding: DefaultAppStyles.GAP_SMALL,
                 paddingVertical: 3,
-                borderRadius: 5
+                borderRadius: defaultBorderRadius
               }}
             >
               {MenuItemsList.map((item, index) => (
                 <View
-                  key={item.name}
+                  key={item.id}
                   style={{
                     height: 12,
                     width: "100%",
@@ -209,7 +210,7 @@ function ThemeSelector() {
                 height: "100%",
                 width: "49.5%",
                 backgroundColor: colors.list.background,
-                borderRadius: 5,
+                borderRadius: defaultBorderRadius,
                 paddingHorizontal: 2,
                 paddingRight: 6
               }}
@@ -251,7 +252,7 @@ function ThemeSelector() {
                 width: "100%",
                 alignItems: "flex-end",
                 justifyContent: "flex-end",
-                marginTop: 6,
+                marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL,
                 position: "absolute",
                 bottom: 6,
                 right: 6,
@@ -287,22 +288,25 @@ function ThemeSelector() {
                 }}
                 style={{
                   borderRadius: 100,
-                  paddingHorizontal: 12,
+                  paddingHorizontal: DefaultAppStyles.GAP,
                   alignSelf: "flex-end",
                   borderColor:
                     item.colorScheme === "dark"
                       ? getColorLinearShade("#000000", 0.1, true)
                       : getColorLinearShade("#f0f0f0", 0.1, true)
                 }}
-                fontSize={SIZE.xxs}
+                fontSize={AppFontSize.xxs}
               />
             </View>
           </View>
 
-          <Heading size={SIZE.sm} color={themeColors.primary.heading}>
+          <Heading size={AppFontSize.sm} color={themeColors.primary.heading}>
             {item.name}
           </Heading>
-          <Paragraph size={SIZE.xs} color={themeColors.secondary?.paragraph}>
+          <Paragraph
+            size={AppFontSize.xs}
+            color={themeColors.secondary?.paragraph}
+          >
             {strings.by()} {item.authors?.[0].name}
           </Paragraph>
         </TouchableOpacity>
@@ -343,9 +347,9 @@ function ThemeSelector() {
       >
         <View
           style={{
-            paddingHorizontal: 12,
-            marginBottom: 12,
-            paddingTop: 12
+            paddingHorizontal: DefaultAppStyles.GAP,
+            marginBottom: DefaultAppStyles.GAP_VERTICAL,
+            paddingTop: DefaultAppStyles.GAP_VERTICAL
           }}
         >
           <Input onChangeText={onSearch} placeholder={strings.searchThemes()} />
@@ -353,41 +357,45 @@ function ThemeSelector() {
           <View
             style={{
               flexDirection: "row",
-              justifyContent: "space-between"
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+              gap: 10
             }}
           >
             <View
               style={{
-                flexDirection: "row",
-                columnGap: 10
+                flexDirection: "row"
               }}
             >
               <Button
-                height={30}
-                style={{ borderRadius: 100, minWidth: 60 }}
+                style={{
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
+                }}
                 type={
                   colorScheme === "" || !colorScheme ? "accent" : "secondary"
                 }
                 title={strings.all()}
-                fontSize={SIZE.xs}
+                fontSize={AppFontSize.xs}
                 onPress={() => {
                   setColorScheme("");
                 }}
               />
               <Button
-                style={{ borderRadius: 100, minWidth: 60 }}
-                height={30}
+                style={{
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
+                }}
                 type={colorScheme === "dark" ? "accent" : "secondary"}
                 title={strings.dark()}
-                fontSize={SIZE.xs}
+                fontSize={AppFontSize.xs}
                 onPress={() => {
                   setColorScheme("dark");
                 }}
               />
               <Button
-                style={{ borderRadius: 100, minWidth: 60 }}
-                height={30}
-                fontSize={SIZE.xs}
+                style={{
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
+                }}
+                fontSize={AppFontSize.xs}
                 type={colorScheme === "light" ? "accent" : "secondary"}
                 title={strings.light()}
                 onPress={() => {
@@ -398,11 +406,12 @@ function ThemeSelector() {
 
             <Button
               title={strings.loadFromFile()}
-              style={{ borderRadius: 100, minWidth: 60 }}
-              height={30}
+              style={{
+                paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
+              }}
               type={"secondaryAccented"}
               icon="folder"
-              fontSize={SIZE.xs}
+              fontSize={AppFontSize.xs}
               onPress={() => {
                 DocumentPicker.pickSingle({
                   allowMultiSelection: false
@@ -557,14 +566,15 @@ const ThemeSetter = ({
     <>
       <View
         style={{
-          paddingHorizontal: 12
+          paddingHorizontal: DefaultAppStyles.GAP
         }}
       >
         <View
           style={{
             borderRadius: 10,
-            marginBottom: 12,
-            padding: 12
+            marginBottom: DefaultAppStyles.GAP_VERTICAL,
+            paddingHorizontal: DefaultAppStyles.GAP,
+            paddingVertical: DefaultAppStyles.GAP_VERTICAL
           }}
         >
           <View
@@ -573,9 +583,9 @@ const ThemeSetter = ({
               justifyContent: "center",
               alignItems: "center",
               backgroundColor: colors?.accent + "20",
-              padding: 12,
+              padding: DefaultAppStyles.GAP,
               borderRadius: 15,
-              marginBottom: 12
+              marginBottom: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             <View
@@ -586,7 +596,7 @@ const ThemeSetter = ({
                 height: 200,
                 width: "100%",
                 borderRadius: 10,
-                marginBottom: 10,
+                marginBottom: DefaultAppStyles.GAP_VERTICAL,
                 overflow: "hidden",
                 flexDirection: "row",
                 justifyContent: "space-between",
@@ -599,14 +609,14 @@ const ThemeSetter = ({
                   height: "100%",
                   width: "49.5%",
                   backgroundColor: colors?.navigationMenu.background,
-                  padding: 5,
+                  padding: DefaultAppStyles.GAP_SMALL,
                   paddingVertical: 3,
-                  borderRadius: 5
+                  borderRadius: defaultBorderRadius
                 }}
               >
                 {MenuItemsList.map((item, index) => (
                   <View
-                    key={item.name}
+                    key={item.id}
                     style={{
                       height: 12,
                       width: "100%",
@@ -653,7 +663,7 @@ const ThemeSetter = ({
                   height: "100%",
                   width: "49.5%",
                   backgroundColor: colors?.list.background,
-                  borderRadius: 5,
+                  borderRadius: defaultBorderRadius,
                   paddingHorizontal: 2,
                   paddingRight: 6
                 }}
@@ -692,7 +702,10 @@ const ThemeSetter = ({
             </View>
           </View>
 
-          <Heading size={SIZE.md} color={themeColors.colors.primary.heading}>
+          <Heading
+            size={AppFontSize.md}
+            color={themeColors.colors.primary.heading}
+          >
             {theme.name}
           </Heading>
           <Paragraph color={themeColors.colors.primary.paragraph}>
@@ -700,27 +713,27 @@ const ThemeSetter = ({
           </Paragraph>
 
           <Paragraph
-            size={SIZE.xs}
+            size={AppFontSize.xs}
             color={themeColors.colors.secondary.paragraph}
           >
             {strings.by()} {theme.authors?.[0]?.name}
           </Paragraph>
           <View
             style={{
-              marginTop: 5,
+              marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL,
               flexDirection: "column",
               rowGap: 3
             }}
           >
             <Paragraph
-              size={SIZE.xs}
+              size={AppFontSize.xs}
               color={themeColors.colors.secondary.paragraph}
             >
               ${strings.version()} {theme.version}
             </Paragraph>
 
             <Paragraph
-              size={SIZE.xs}
+              size={AppFontSize.xs}
               color={themeColors.colors.secondary.paragraph}
             >
               {theme.license}
@@ -733,7 +746,7 @@ const ThemeSetter = ({
                 }}
               >
                 <Paragraph
-                  size={SIZE.xs}
+                  size={AppFontSize.xs}
                   color={themeColors.colors.secondary.accent}
                   onPress={() => {
                     Linking.openURL(theme.homepage as string);
@@ -749,23 +762,25 @@ const ThemeSetter = ({
         {darkTheme.id === theme.id || lightTheme.id === theme.id ? (
           <Pressable
             onPress={applyTheme}
-            type="secondaryAccented"
+            type="accent"
             style={{
-              paddingVertical: 12
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL
             }}
           >
-            <Heading color={colors.accentForeground} size={SIZE.md}>
+            <Heading color={colors.accentForeground} size={AppFontSize.md}>
               {darkTheme.id === theme.id
                 ? strings.appliedDark()
                 : strings.appliedLight()}
             </Heading>
-            <Paragraph size={SIZE.xs}>({strings.tapToApplyAgain()})</Paragraph>
+            <Paragraph color={colors.accentForeground} size={AppFontSize.xs}>
+              ({strings.tapToApplyAgain()})
+            </Paragraph>
           </Pressable>
         ) : (
           <Button
             style={{
               width: "100%",
-              marginBottom: 10
+              marginBottom: DefaultAppStyles.GAP_VERTICAL
             }}
             onPress={applyTheme}
             title={

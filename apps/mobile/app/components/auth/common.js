@@ -20,23 +20,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { createRef } from "react";
 import { eSendEvent } from "../../services/event-manager";
 import { eCloseLoginDialog } from "../../utils/events";
+import Navigation from "../../services/navigation";
+export const AuthMode = {
+  login: 0,
+  signup: 1,
+  welcomeSignup: 2,
+  welcomeLogin: 3,
+  trialSignup: 4
+};
 
 export const initialAuthMode = createRef(0);
-export function hideAuth() {
+export function hideAuth(context) {
   eSendEvent(eCloseLoginDialog);
-
-  // if (initialAuthMode.current === 2) {
-  //   Navigation.replace(
-  //     {
-  //       name: 'Notes'
-  //     },
-  //     {
-  //       menu: true
-  //     }
-  //   );
-  // } else {
-  //   Navigation.goBack();
-  // }
-
-  // tabBarRef.current?.unlock();
+  if (
+    initialAuthMode.current === AuthMode.welcomeSignup ||
+    initialAuthMode.current === AuthMode.welcomeLogin ||
+    context === "intro"
+  ) {
+    Navigation.replace("FluidPanelsView");
+    setTimeout(() => {
+      Navigation.resetRootState();
+    }, 1000);
+  } else {
+    Navigation.goBack();
+  }
 }

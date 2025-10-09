@@ -35,6 +35,8 @@ import { useThemeColors } from "@notesnook/theme";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { db } from "../../common/database";
 import { i18n } from "@lingui/core";
+import { defaultBorderRadius } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 
 const onShouldStartLoadWithRequest = (request: ShouldStartLoadRequest) => {
   if (request.url.includes("https")) {
@@ -197,7 +199,7 @@ export function ReadonlyEditor(props: {
             style={{
               width: "100%",
               backgroundColor: colors.primary.background,
-              borderRadius: 5,
+              borderRadius: defaultBorderRadius,
               height: "100%",
               alignItems: "flex-start",
               paddingTop: insets.top
@@ -205,7 +207,7 @@ export function ReadonlyEditor(props: {
           >
             <View
               style={{
-                paddingHorizontal: 12,
+                paddingHorizontal: DefaultAppStyles.GAP,
                 width: "100%",
                 alignItems: "flex-start"
               }}
@@ -215,7 +217,7 @@ export function ReadonlyEditor(props: {
                   height: 25,
                   width: "100%",
                   backgroundColor: colors.secondary.background,
-                  borderRadius: 5
+                  borderRadius: defaultBorderRadius
                 }}
               />
 
@@ -223,7 +225,7 @@ export function ReadonlyEditor(props: {
                 style={{
                   height: 12,
                   width: "100%",
-                  marginTop: 10,
+                  marginTop: DefaultAppStyles.GAP_VERTICAL,
                   flexDirection: "row"
                 }}
               >
@@ -232,7 +234,7 @@ export function ReadonlyEditor(props: {
                     height: 12,
                     width: 60,
                     backgroundColor: colors.secondary.background,
-                    borderRadius: 5,
+                    borderRadius: defaultBorderRadius,
                     marginRight: 10
                   }}
                 />
@@ -241,7 +243,7 @@ export function ReadonlyEditor(props: {
                     height: 12,
                     width: 60,
                     backgroundColor: colors.secondary.background,
-                    borderRadius: 5,
+                    borderRadius: defaultBorderRadius,
                     marginRight: 10
                   }}
                 />
@@ -250,7 +252,7 @@ export function ReadonlyEditor(props: {
                     height: 12,
                     width: 60,
                     backgroundColor: colors.secondary.background,
-                    borderRadius: 5,
+                    borderRadius: defaultBorderRadius,
                     marginRight: 10
                   }}
                 />
@@ -261,8 +263,8 @@ export function ReadonlyEditor(props: {
                   height: 16,
                   width: "100%",
                   backgroundColor: colors.secondary.background,
-                  borderRadius: 5,
-                  marginTop: 10
+                  borderRadius: defaultBorderRadius,
+                  marginTop: DefaultAppStyles.GAP_VERTICAL
                 }}
               />
 
@@ -271,8 +273,8 @@ export function ReadonlyEditor(props: {
                   height: 16,
                   width: "100%",
                   backgroundColor: colors.secondary.background,
-                  borderRadius: 5,
-                  marginTop: 10
+                  borderRadius: defaultBorderRadius,
+                  marginTop: DefaultAppStyles.GAP_VERTICAL
                 }}
               />
 
@@ -281,8 +283,8 @@ export function ReadonlyEditor(props: {
                   height: 16,
                   width: 200,
                   backgroundColor: colors.secondary.background,
-                  borderRadius: 5,
-                  marginTop: 10
+                  borderRadius: defaultBorderRadius,
+                  marginTop: DefaultAppStyles.GAP_VERTICAL
                 }}
               />
             </View>

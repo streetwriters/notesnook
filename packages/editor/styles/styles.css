@@ -12,7 +12,7 @@
 }
 
 .ProseMirror span.math-inline {
-  font-family: KaTeX_Main, Times New Roman, serif; 
+  font-family: KaTeX_Main, Times New Roman, serif;
 }
 
 .ProseMirror {
@@ -42,7 +42,7 @@
   margin-block: 0px;
   cursor: pointer;
   position: relative;
-  background-color: var(--border);
+  background-color: var(--separator);
   width: 100%;
   height: 5px;
   margin-top: 4px;
@@ -111,19 +111,18 @@
   filter: brightness(70%);
 }
 
-.ProseMirror p {
-  margin-bottom: 0px;
-  font-family: inherit;
+.ProseMirror > p[data-spacing="double"],
+.ProseMirror div.callout > p[data-spacing="double"],
+.ProseMirror blockquote > p[data-spacing="double"] {
+ margin-top: 1em;
+ /* By default double spaced paragraphs have no bottom margin */
+ margin-bottom: 0px;
 }
 
-.ProseMirror > p[data-spacing="double"] {
-  margin-top: 1em;
-  margin-bottom: 1em;
-}
-
-.ProseMirror > p[data-spacing="single"] {
-  margin-top: 0px;
-  margin-bottom: 0px;
+/* Remove all margins for single spaced paragraphs */
+.ProseMirror p[data-spacing="single"] {
+ margin-top: 0px;
+ margin-bottom: 0px;
 }
 
 .ProseMirror > div.codeblock-view-content-wrap,
@@ -230,7 +229,7 @@ img.ProseMirror-separator {
   border: 1px solid var(--border);
   box-sizing: border-box;
   min-width: 1em;
-  padding: 3px 5px;
+  padding: 7px 9px;
   position: relative;
   vertical-align: top;
 }
@@ -245,6 +244,7 @@ img.ProseMirror-separator {
 }
 
 .ProseMirror table th {
+  background-color: var(--background-secondary);
   font-weight: bold;
   text-align: left;
 }
@@ -276,11 +276,6 @@ img.ProseMirror-separator {
   margin: 0;
 }
 
-.tableWrapper {
-  /* padding: 1rem 0; */
-  overflow-x: auto;
-}
-
 .resize-cursor {
   cursor: ew-resize;
   cursor: col-resize;
@@ -291,7 +286,8 @@ img.ProseMirror-separator {
 }
 
 .search-result.selected,
-.search-result.selected::selection {
+.search-result.selected::selection,
+.searching nn-search-result {
   background-color: var(--accent-secondary) !important;
   color: var(--accentForeground-secondary) !important;
 }
@@ -546,7 +542,7 @@ p > *::selection {
 
 .outline-list > li > :first-child::before {
   position: absolute;
-  top: 3px;
+  top: 0px;
   cursor: pointer;
   content: "";
   background-size: 18px;
@@ -601,11 +597,11 @@ p > *::selection {
   pointer-events: none;
 }
 
-.ProseMirror > p[data-spacing="double"] .resizer {
+.ProseMirror > p[data-spacing="double"] .image-container {
   margin-bottom: 1em;
 }
 
-.ProseMirror > p[data-spacing="single"] .resizer {
+.ProseMirror > p[data-spacing="single"] .image-container {
   margin-top: 1em !important;
   margin-bottom: 1em;
 }
@@ -658,8 +654,8 @@ p > *::selection {
   flex: 0 0 auto;
   margin-right: 0.5rem;
   user-select: none;
-  height: 18px;
-  width: 18px;
+  height: 1rem;
+  width: 1rem;
   accent-color: var(--accent);
 }
 
@@ -672,7 +668,7 @@ p > *::selection {
     height: 21px;
     width: 21px;
   }
-  
+
   .ProseMirror ul.simple-checklist > li > div {
     margin-top: 2px;
   }
@@ -690,6 +686,9 @@ p > *::selection {
   margin-bottom: 1em;
 }
 
+.ProseMirror div.callout > :first-child + * {
+  margin-top: 1em !important;
+}
 
 .ProseMirror div.callout > :first-child {
   margin: 0px;
@@ -699,7 +698,7 @@ p > *::selection {
 
 .ProseMirror div.callout > :first-child::after {
   position: absolute;
-  top: 3px;
+  top: 0px;
   right: 0px;
   cursor: pointer;
   content: "";
@@ -799,4 +798,12 @@ del.diffdel {
 
 del.diffdel {
   text-decoration: none;
+}
+
+/* simplebar */
+.simplebar-track {
+  height: 9px !important;
+}
+.simplebar-content:before {
+  content: "" !important;
 }

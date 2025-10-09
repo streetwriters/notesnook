@@ -59,6 +59,14 @@ const directoryTree = {
     crypto: {
       "package.json": ["packages", "crypto", "package.json"],
       "package-lock.json": ["packages", "crypto", "package-lock.json"]
+    },
+    ui: {
+      "package.json": ["packages", "ui", "package.json"],
+      "package-lock.json": ["packages", "ui", "package-lock.json"]
+    },
+    theme: {
+      "package.json": ["packages", "theme", "package.json"],
+      "package-lock.json": ["packages", "theme", "package-lock.json"]
     }
   }
 };
@@ -114,6 +122,14 @@ const lockfiles = [
   {
     name: "crypto",
     path: path.join(TEMP_FOLDER, "packages", "crypto", "package-lock.json")
+  },
+  {
+    name: "ui",
+    path: path.join(TEMP_FOLDER, "packages", "ui", "package-lock.json")
+  },
+  {
+    name: "theme",
+    path: path.join(TEMP_FOLDER, "packages", "theme", "package-lock.json")
   }
 ];
 

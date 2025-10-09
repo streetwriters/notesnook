@@ -30,7 +30,7 @@ export class NotebooksViewModel extends BaseViewModel {
   constructor(page: Page) {
     super(page, "notebooks", "notebooks");
     this.createButton = page
-      .locator(getTestId("notebooks-action-button"))
+      .locator(getTestId("create-notebook-button"))
       .first();
   }
 
@@ -45,7 +45,7 @@ export class NotebooksViewModel extends BaseViewModel {
 
   async findNotebook(notebook: Partial<Notebook>) {
     for await (const item of this.iterateItems()) {
-      const notebookModel = new NotebookItemModel(item);
+      const notebookModel = new NotebookItemModel(item, this);
       if ((await notebookModel.getTitle()) === notebook.title)
         return notebookModel;
     }

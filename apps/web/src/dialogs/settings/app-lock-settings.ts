@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { strings } from "@notesnook/intl";
-import { verifyAccount } from "../../common";
+import { checkFeature, verifyAccount } from "../../common";
 import { Checkmark } from "../../components/icons";
 import { showPasswordDialog } from "../../dialogs/password-dialog";
 import {
@@ -49,6 +49,7 @@ export const AppLockSettings: SettingsGroup[] = [
         title: "Enable app lock",
         onStateChange: (listener) =>
           useKeyStore.subscribe((s) => s.credentials, listener),
+        featureId: "appLock",
         components: [
           {
             type: "toggle",

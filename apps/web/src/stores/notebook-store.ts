@@ -36,7 +36,7 @@ class NotebookStore extends BaseStore<NotebookStore> {
   };
 
   refresh = async () => {
-    const notebooks = await db.notebooks.roots.grouped(
+    const notebooks = await db.notebooks.roots.sorted(
       db.settings.getGroupOptions("notebooks")
     );
     this.set({ notebooks });

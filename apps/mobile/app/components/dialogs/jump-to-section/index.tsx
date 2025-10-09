@@ -39,10 +39,11 @@ import {
   eOpenJumpToDialog,
   eScrollEvent
 } from "../../../utils/events";
-import { SIZE } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import BaseDialog from "../../dialog/base-dialog";
 import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 const JumpToSectionDialog = () => {
   const scrollRef = useRef<RefObject<FlatList>>();
@@ -152,13 +153,13 @@ const JumpToSectionDialog = () => {
           maxHeight: "65%",
           borderRadius: 10,
           alignSelf: "center",
-          padding: 10,
+          padding: DefaultAppStyles.GAP_SMALL,
           paddingTop: 30
         }}
       >
         {loading ? (
           <ActivityIndicator
-            size={SIZE.lg}
+            size={AppFontSize.lg}
             color={colors.primary.accent}
             style={{
               marginBottom: 20
@@ -188,15 +189,15 @@ const JumpToSectionDialog = () => {
                     style={{
                       minWidth: "20%",
                       width: null,
-                      paddingHorizontal: 12,
+                      paddingHorizontal: DefaultAppStyles.GAP,
                       margin: 5,
                       borderRadius: 100,
-                      height: 30,
+                      paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
                       marginVertical: 10
                     }}
                   >
                     <Paragraph
-                      size={SIZE.sm}
+                      size={AppFontSize.sm}
                       color={
                         currentIndex === index
                           ? colors.static.white

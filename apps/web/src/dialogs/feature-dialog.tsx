@@ -93,28 +93,14 @@ const features: Record<FeatureKeys, Feature> = {
         ]
       : [
           {
-            title: "Command palette",
-            subtitle: (
-              <>
-                You can now quickly execute commands like navigation, actions on
-                notes, notebooks etc. just by pressing{" "}
-                <Code text="Ctrl/Cmd+K" />. This will open a command palette
-                where you can fuzzy search for commands and execute them.
-              </>
-            )
+            title: "New pricing plans",
+            subtitle:
+              "We are changing our pricing to make more sense and be more flexible."
           },
           {
-            title: "Quick open",
-            subtitle: (
-              <>
-                You can also open the command palette in quick open mode by
-                pressing <Code text="Ctrl/Cmd+P" />. This will open a command
-                palette where you can fuzzy search for your notes, notebooks,
-                tags, etc. and quickly open them by pressing{" "}
-                <Code text="Enter" />. Try it out and let us know what you
-                think!
-              </>
-            )
+            title: "Filters in search",
+            subtitle:
+              "Search now has some basic filters like content:, title:, tag:, color: etc. For the whole list of filters, read our docs."
           }
         ],
     cta: {

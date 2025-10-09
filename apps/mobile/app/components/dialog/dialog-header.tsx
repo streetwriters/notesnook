@@ -20,23 +20,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import { Text, View, ViewStyle } from "react-native";
 import { useThemeColors } from "@notesnook/theme";
-import { SIZE } from "../../utils/size";
-import { Button } from "../ui/button";
+import { AppFontSize } from "../../utils/size";
+import { Button, ButtonProps } from "../ui/button";
 import { PressableProps } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { DefaultAppStyles } from "../../utils/styles";
 
 type DialogHeaderProps = {
   icon?: string;
   title?: string;
   paragraph?: string;
-  button?: {
-    onPress?: () => void;
-    loading?: boolean;
-    title?: string;
-    type?: PressableProps["type"];
-    icon?: string;
-  };
+  button?: ButtonProps;
   paragraphColor?: string;
   padding?: number;
   centered?: boolean;
@@ -82,7 +77,7 @@ const DialogHeader = ({
           >
             <Heading
               style={{ textAlign: centered ? "center" : "left" }}
-              size={SIZE.lg}
+              size={AppFontSize.lg}
             >
               {title}{" "}
               {titlePart ? (
@@ -94,17 +89,14 @@ const DialogHeader = ({
 
             {button ? (
               <Button
-                onPress={button.onPress}
                 style={{
                   borderRadius: 100,
-                  paddingHorizontal: 12
+                  paddingHorizontal: DefaultAppStyles.GAP
                 }}
-                loading={button.loading}
                 fontSize={13}
-                title={button.title}
-                icon={button.icon}
                 type={button.type || "secondary"}
                 height={30}
+                {...button}
               />
             ) : null}
           </View>

@@ -32,12 +32,15 @@ import {
   Notebook as NotebookIcon,
   Note as NoteIcon,
   Reminder as ReminderIcon,
-  Tag as TagIcon
+  Tag as TagIcon,
+  FocusMode,
+  NormalMode
 } from "../../components/icons";
 import { trashMenuItems } from "../../components/trash-item";
 import { hashNavigate, navigate } from "../../navigation";
 import { useEditorStore } from "../../stores/editor-store";
 import { useStore as useNoteStore } from "../../stores/note-store";
+import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { AttachmentsDialog } from "../attachments-dialog";
 import { CreateColorDialog } from "../create-color-dialog";
@@ -47,6 +50,7 @@ import { notebookMenuItems } from "../../components/notebook";
 import { tagMenuItems } from "../../components/tag";
 import { useEditorManager } from "../../components/editor/manager";
 import Config from "../../utils/config";
+import { KeyboardShortcutsDialog } from "../keyboard-shortcuts-dialog";
 
 export interface BaseCommand {
   id: string;
@@ -69,8 +73,14 @@ export const commandActions = {
   command: (command: Command) => getCommandById(command.id)?.action(command),
   note: (command: Command, options?: { openInNewTab?: boolean }) =>
     useEditorStore.getState().openSession(command.id, options),
-  notebook: (command: Command) => navigate(`/notebooks/${command.id}`),
-  tag: (command: Command) => navigate(`/tags/${command.id}`),
+  notebook: (command: Command) => {
+    useAppStore.getState().setNavigationTab("notebooks");
+    navigate(`/notebooks/${command.id}`);
+  },
+  tag: (command: Command) => {
+    useAppStore.getState().setNavigationTab("tags");
+    navigate(`/tags/${command.id}`);
+  },
   reminder: (command: Command) => hashNavigate(`/reminders/${command.id}/edit`)
 };
 
@@ -89,7 +99,10 @@ const staticCommands: Command[] = [
     id: "notes",
     title: strings.dataTypesPluralCamelCase.note(),
     icon: ArrowTopRight,
-    action: () => navigate("/"),
+    action: () => {
+      useAppStore.getState().setNavigationTab("home");
+      navigate("/");
+    },
     group: strings.navigate(),
     type: "command"
   },
@@ -97,7 +110,7 @@ const staticCommands: Command[] = [
     id: "notebooks",
     title: strings.dataTypesPluralCamelCase.notebook(),
     icon: ArrowTopRight,
-    action: () => navigate("/notebooks"),
+    action: () => useAppStore.getState().setNavigationTab("notebooks"),
     group: strings.navigate(),
     type: "command"
   },
@@ -105,7 +118,7 @@ const staticCommands: Command[] = [
     id: "tags",
     title: strings.dataTypesPluralCamelCase.tag(),
     icon: ArrowTopRight,
-    action: () => navigate("/tags"),
+    action: () => useAppStore.getState().setNavigationTab("tags"),
     group: strings.navigate(),
     type: "command"
   },
@@ -113,7 +126,10 @@ const staticCommands: Command[] = [
     id: "favorites",
     title: strings.dataTypesPluralCamelCase.favorite(),
     icon: ArrowTopRight,
-    action: () => navigate("/favorites"),
+    action: () => {
+      useAppStore.getState().setNavigationTab("home");
+      navigate("/favorites");
+    },
     group: strings.navigate(),
     type: "command"
   },
@@ -121,7 +137,10 @@ const staticCommands: Command[] = [
     id: "reminders",
     title: strings.dataTypesPluralCamelCase.reminder(),
     icon: ArrowTopRight,
-    action: () => navigate("/reminders"),
+    action: () => {
+      useAppStore.getState().setNavigationTab("home");
+      navigate("/reminders");
+    },
     group: strings.navigate(),
     type: "command"
   },
@@ -129,7 +148,10 @@ const staticCommands: Command[] = [
     id: "monographs",
     title: strings.dataTypesPluralCamelCase.monograph(),
     icon: ArrowTopRight,
-    action: () => navigate("/monographs"),
+    action: () => {
+      useAppStore.getState().setNavigationTab("home");
+      navigate("/monographs");
+    },
     group: strings.navigate(),
     type: "command"
   },
@@ -137,7 +159,10 @@ const staticCommands: Command[] = [
     id: "trash",
     title: strings.trash(),
     icon: ArrowTopRight,
-    action: () => navigate("/trash"),
+    action: () => {
+      useAppStore.getState().setNavigationTab("home");
+      navigate("/trash");
+    },
     group: strings.navigate(),
     type: "command"
   },
@@ -154,6 +179,14 @@ const staticCommands: Command[] = [
     title: strings.helpAndSupport(),
     icon: ArrowTopRight,
     action: () => (window.location.href = "https://help.notesnook.com"),
+    group: strings.navigate(),
+    type: "command"
+  },
+  {
+    id: "keyboard-shortcuts",
+    title: "Keyboard shortcuts",
+    icon: ArrowTopRight,
+    action: () => KeyboardShortcutsDialog.show({}),
     group: strings.navigate(),
     type: "command"
   },
@@ -234,7 +267,10 @@ export async function getDefaultCommands(): Promise<Command[]> {
 }
 
 export function getCommandById(id: string): Command | undefined {
-  return staticCommands.find((command) => command.id === id);
+  return (
+    staticCommands.find((command) => command.id === id) ||
+    getEditorCommands().find((command) => command.id === id)
+  );
 }
 
 export async function resolveRecentCommand(
@@ -320,7 +356,10 @@ async function getActiveNotebookCommands() {
 
   const commands: Command[] = [];
 
-  const menuItems = notebookMenuItems(notebook, [notebook.id]);
+  const parentId = await db.notebooks.parentId(notebook.id);
+  const menuItems = await notebookMenuItems(notebook, [notebook.id], {
+    isRoot: !parentId
+  });
   for (const menuItem of menuItems) {
     commands.push(...menuItemToCommands(menuItem, group, "active-notebook"));
   }
@@ -336,7 +375,7 @@ async function getActiveTagCommands() {
   const group = strings.actionsForTag(tag.title);
   const commands: Command[] = [];
 
-  const menuItems = tagMenuItems(tag, [tag.id]);
+  const menuItems = await tagMenuItems(tag, [tag.id]);
   for (const menuItem of menuItems) {
     commands.push(...menuItemToCommands(menuItem, group, "active-tag"));
   }
@@ -348,6 +387,7 @@ function getEditorCommands(): Command[] {
   const session = useEditorStore.getState().getActiveSession();
   if (!session) return [];
   const editor = useEditorManager.getState().editors[session.id];
+  const isFocusMode = useAppStore.getState().isFocusMode;
 
   const commands: Command[] = [
     {
@@ -436,6 +476,15 @@ function getEditorCommands(): Command[] {
       type: "command"
     });
   }
+
+  commands.push({
+    id: "toggle-focus-mode",
+    title: strings.toggleFocusMode(),
+    icon: isFocusMode ? FocusMode : NormalMode,
+    action: () => useAppStore.getState().toggleFocusMode(),
+    group: strings.editor(),
+    type: "command"
+  });
 
   return commands;
 }

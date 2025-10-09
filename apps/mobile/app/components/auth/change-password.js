@@ -17,25 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import React, { useRef, useState } from "react";
 import { View } from "react-native";
 import { db } from "../../common/database";
-import {
-  eSendEvent,
-  presentSheet,
-  ToastManager
-} from "../../services/event-manager";
+import BackupService from "../../services/backup";
+import { eSendEvent, ToastManager } from "../../services/event-manager";
+import Navigation from "../../services/navigation";
 import { useUserStore } from "../../stores/use-user-store";
-import { eCloseSheet, eOpenRecoveryKeyDialog } from "../../utils/events";
-import DialogHeader from "../dialog/dialog-header";
+import { eOpenRecoveryKeyDialog } from "../../utils/events";
+import { DefaultAppStyles } from "../../utils/styles";
+import { Dialog } from "../dialog";
 import { Button } from "../ui/button";
 import Input from "../ui/input";
 import { Notice } from "../ui/notice";
-import Seperator from "../ui/seperator";
-import { Dialog } from "../dialog";
-import BackupService from "../../services/backup";
-import { sleep } from "../../utils/time";
-import { strings } from "@notesnook/intl";
 
 export const ChangePassword = () => {
   const passwordInputRef = useRef();
@@ -84,8 +79,7 @@ export const ChangePassword = () => {
         context: "global"
       });
       setLoading(false);
-      eSendEvent(eCloseSheet);
-      await sleep(300);
+      Navigation.goBack();
       eSendEvent(eOpenRecoveryKeyDialog);
     } catch (e) {
       setLoading(false);
@@ -103,13 +97,10 @@ export const ChangePassword = () => {
     <View
       style={{
         width: "100%",
-        padding: 12
+        padding: DefaultAppStyles.GAP
       }}
     >
       <Dialog context="change-password-dialog" />
-      <DialogHeader title={strings.changePassword()} />
-      <Seperator />
-
       <Input
         fwdRef={oldPasswordInputRef}
         onChangeText={(value) => {
@@ -148,7 +139,7 @@ export const ChangePassword = () => {
 
       <Button
         style={{
-          marginTop: 10,
+          marginTop: DefaultAppStyles.GAP_VERTICAL,
           width: "100%"
         }}
         loading={loading}
@@ -158,10 +149,4 @@ export const ChangePassword = () => {
       />
     </View>
   );
-};
-
-ChangePassword.present = () => {
-  presentSheet({
-    component: <ChangePassword />
-  });
 };

@@ -137,6 +137,7 @@ export async function deleteFile(
 
 export async function clearFileStorage() {
   try {
+    await createCacheDir();
     const files = await RNFetchBlob.fs.ls(cacheDir);
     const oldCache = await RNFetchBlob.fs.ls(cacheDirOld);
 
@@ -221,6 +222,7 @@ export async function deleteCacheFileByName(name: string) {
 }
 
 export async function deleteDCacheFiles() {
+  await createCacheDir();
   const files = await RNFetchBlob.fs.ls(cacheDir);
   for (const file of files) {
     if (file.includes("_dcache") || file.startsWith("NN_")) {
@@ -229,6 +231,26 @@ export async function deleteDCacheFiles() {
       });
     }
   }
+}
+
+export async function getCachePathForFile(filename: string) {
+  const path = `${cacheDir}/${filename}`;
+
+  const iosAppGroup =
+    Platform.OS === "ios"
+      ? await (RNFetchBlob.fs as any).pathForAppGroup(IOS_APPGROUPID)
+      : null;
+  const appGroupPath = `${iosAppGroup}/${filename}`;
+
+  const exists = await RNFetchBlob.fs.exists(path);
+
+  // Check if file is present in app group path.
+  let existsInAppGroup = false;
+  if (!exists && Platform.OS === "ios") {
+    existsInAppGroup = await RNFetchBlob.fs.exists(appGroupPath);
+  }
+
+  return existsInAppGroup ? appGroupPath : path;
 }
 
 export async function exists(filename: string) {

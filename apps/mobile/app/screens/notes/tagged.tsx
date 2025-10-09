@@ -69,3 +69,5 @@ TaggedNotes.navigate = (item: Tag, canGoBack?: boolean) => {
     title: item.title
   });
 };
+
+export default TaggedNotes;

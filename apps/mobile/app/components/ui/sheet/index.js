@@ -23,12 +23,10 @@ import { Platform, View } from "react-native";
 import ActionSheet from "react-native-actions-sheet";
 import useGlobalSafeAreaInsets from "../../../hooks/use-global-safe-area-insets";
 import { useSettingStore } from "../../../stores/use-setting-store";
-import { PremiumToast } from "../../premium/premium-toast";
-import { Toast } from "../../toast";
-import { useAppState } from "../../../hooks/use-app-state";
-import SettingsService from "../../../services/settings";
 import { useUserStore } from "../../../stores/use-user-store";
 import { getContainerBorder } from "../../../utils/colors";
+import { NotesnookModule } from "../../../utils/notesnook-module";
+import { Toast } from "../../toast";
 
 /**
  *
@@ -63,28 +61,35 @@ const SheetWrapper = ({
   const locked = useUserStore((state) => state.appLocked);
 
   let width = dimensions.width > 600 ? 600 : 500;
-
+  const isGestureNavigationEnabled =
+    NotesnookModule.isGestureNavigationEnabled();
   const style = React.useMemo(() => {
     return {
       width: largeTablet || smallTablet ? width : "100%",
       backgroundColor: colors.primary.background,
       zIndex: 10,
       paddingTop: 5,
-      paddingBottom: 0,
       borderTopRightRadius: 15,
       borderTopLeftRadius: 15,
       alignSelf: "center",
       borderBottomRightRadius: 0,
       borderBottomLeftRadius: 0,
       ...getContainerBorder(colors.primary.border, 0.5),
-      borderBottomWidth: 0
+      borderBottomWidth: 0,
+      paddingBottom:
+        Platform.OS === "android" && !insets.bottom
+          ? isGestureNavigationEnabled
+            ? 0
+            : 30
+          : 0
     };
   }, [
     colors.primary.background,
     colors.primary.border,
     largeTablet,
     smallTablet,
-    width
+    width,
+    insets.bottom
   ]);
 
   const _onOpen = () => {
@@ -127,6 +132,7 @@ const SheetWrapper = ({
           width: 100,
           backgroundColor: colors.secondary.background
         }}
+        safeAreaInsets={insets}
         statusBarTranslucent
         drawUnderStatusBar={true}
         containerStyle={style}
@@ -151,11 +157,6 @@ const SheetWrapper = ({
         ExtraOverlayComponent={
           <>
             {overlay}
-            <PremiumToast
-              context="sheet"
-              close={() => fwdRef?.current?.hide()}
-              offset={50}
-            />
             <Toast context="local" />
           </>
         }
@@ -165,10 +166,7 @@ const SheetWrapper = ({
         {bottomPadding ? (
           <View
             style={{
-              height:
-                Platform.OS === "ios" && insets.bottom !== 0
-                  ? insets.bottom + 5
-                  : 20
+              height: insets.bottom !== 0 ? insets.bottom : 20
             }}
           />
         ) : null}

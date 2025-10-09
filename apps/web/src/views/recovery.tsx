@@ -31,6 +31,7 @@ import { ErrorText } from "../components/error-text";
 import { EVENTS, User } from "@notesnook/core";
 import { RecoveryKeyDialog } from "../dialogs/recovery-key-dialog";
 import { strings } from "@notesnook/intl";
+import { useKeyStore } from "../interfaces/key-store";
 
 type RecoveryMethodType = "key" | "backup" | "reset";
 type RecoveryMethodsFormData = Record<string, unknown>;
@@ -352,7 +353,9 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
 
         const user = await db.user.getUser();
         if (!user) throw new Error(strings.notLoggedIn());
-        await db.storage().write(`_uk_@${user.email}@_k`, form.recoveryKey);
+        await useKeyStore
+          .getState()
+          .setValue("userEncryptionKey", form.recoveryKey);
         await db.sync({ type: "fetch", force: true });
         navigate("backup");
       }}

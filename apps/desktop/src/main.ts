@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import "./overrides";
 import { app, BrowserWindow, nativeTheme, shell } from "electron";
 import { isDevelopment } from "./utils";
 import { registerProtocol, PROTOCOL_URL } from "./utils/protocol";
@@ -85,6 +86,8 @@ async function createWindow() {
   const mainWindowState = new WindowState({});
   const mainWindow = new BrowserWindow({
     show: !cliOptions.hidden,
+    paintWhenInitiallyHidden: cliOptions.hidden,
+    skipTaskbar: cliOptions.hidden,
     x: mainWindowState.x,
     y: mainWindowState.y,
     width: mainWindowState.width,
@@ -101,7 +104,10 @@ async function createWindow() {
     ...(config.desktopSettings.nativeTitlebar
       ? {}
       : {
-          titleBarStyle: process.platform === "win32" || process.platform === "darwin" ? "hidden" : "default",
+          titleBarStyle:
+            process.platform === "win32" || process.platform === "darwin"
+              ? "hidden"
+              : "default",
           frame: process.platform === "win32" || process.platform === "darwin",
           titleBarOverlay: {
             height: 37,
@@ -142,6 +148,11 @@ async function createWindow() {
   await AssetManager.loadIcons();
   setupDesktopIntegration(config.desktopSettings);
 
+  mainWindow.webContents.session.setPermissionRequestHandler(
+    (webContents, permission, callback) => {
+      callback(permission === "geolocation" ? false : true);
+    }
+  );
   mainWindow.webContents.session.setSpellCheckerDictionaryDownloadURL(
     "http://dictionaries.notesnook.com/"
   );

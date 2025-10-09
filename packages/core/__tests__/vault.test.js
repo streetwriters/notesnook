@@ -34,12 +34,12 @@ test("create vault", () =>
 test("lock vault", () =>
   databaseTest().then(async (db) => {
     await expect(db.vault.create("password")).resolves.toBe(true);
-    expect(db.vault.lock()).resolves.toBe(true);
+    await expect(db.vault.lock()).resolves.toBe(true);
   }));
 
 test("lock non-existent vault", () =>
   databaseTest().then(async (db) => {
-    expect(db.vault.lock()).resolves.toBe(true);
+    await expect(db.vault.lock()).resolves.toBe(true);
   }));
 
 test("unlock vault", () =>

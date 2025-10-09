@@ -28,7 +28,6 @@ import {
   View
 } from "react-native";
 import Editor from ".";
-import { PremiumToast } from "../../components/premium/premium-toast";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import useIsFloatingKeyboard from "../../hooks/use-is-floating-keyboard";
 import useKeyboard from "../../hooks/use-keyboard";
@@ -96,21 +95,22 @@ export const EditorWrapper = ({ widths }: { widths: any }) => {
         minHeight: "100%",
         backgroundColor: toolBarColors.primary.background,
         borderLeftWidth: DDS.isTab ? 1 : 0,
-        borderLeftColor: DDS.isTab ? colors.secondary.background : "transparent"
+        borderLeftColor: DDS.isTab
+          ? colors.secondary.background
+          : "transparent",
+        paddingBottom: insets.bottom
       }}
     >
       {loading || !introCompleted ? null : (
         <KeyboardAvoidingViewIOS
           behavior="padding"
           style={{
-            marginBottom: getMarginBottom(),
             backgroundColor: colors.primary.background,
             flex: 1
           }}
           enabled={!floating}
           keyboardVerticalOffset={0}
         >
-          <PremiumToast key="toast" context="editor" offset={50 + insets.top} />
           <TextInput
             key="input"
             ref={textInput}
@@ -123,3 +123,5 @@ export const EditorWrapper = ({ widths }: { widths: any }) => {
     </View>
   );
 };
+
+export default EditorWrapper;

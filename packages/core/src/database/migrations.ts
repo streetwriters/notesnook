@@ -21,6 +21,7 @@ import {
   ColumnBuilderCallback,
   CreateTableBuilder,
   ExpressionBuilder,
+  Kysely,
   Migration,
   MigrationProvider,
   sql
@@ -358,30 +359,50 @@ export class NNMigrationProvider implements MigrationProvider {
         }
       },
       "7": {
+        async up() {}
+      },
+      "8": {
         async up(db) {
-          await db.transaction().execute(async (tx) => {
-            await tx.schema.dropTable("content_fts").execute();
-            await tx.schema.dropTable("notes_fts").execute();
-
-            await createFTS5Table(
-              "notes_fts",
-              [{ name: "id" }, { name: "title" }],
-              {
-                contentTable: "notes",
-                tokenizer: ["porter", "better_trigram", "remove_diacritics 1"]
-              }
-            ).execute(tx);
-
-            await createFTS5Table(
-              "content_fts",
-              [{ name: "id" }, { name: "noteId" }, { name: "data" }],
-              {
-                contentTable: "content",
-                tokenizer: ["porter", "better_trigram", "remove_diacritics 1"]
-              }
-            ).execute(tx);
-          });
-          await rebuildSearchIndex(db);
+          await db.schema
+            .alterTable("notes")
+            .addColumn("isGeneratedTitle", "boolean")
+            .execute();
+        }
+      },
+      "9": {
+        async up(db) {
+          await db.schema
+            .alterTable("notes")
+            .addColumn("archived", "boolean")
+            .execute();
+        }
+      },
+      // changing the migrations name scheme from here because
+      // apparently, Kysley runs migrations in alphanumeric order.
+      // To ensure things keep running smoothly, we are now moving
+      // to a date-based migration name but since any number is smaller
+      // than 9, we have to use "a" in the beginning.
+      "a-2025-05-16": {
+        async up() {}
+      },
+      "a-2025-05-17": {
+        async up() {}
+      },
+      "a-2025-06-04": {
+        async up(db) {
+          await runFTSTablesMigrations(db);
+        }
+      },
+      "a-2025-07-30": {
+        async up(db) {
+          await db.schema
+            .createTable("monographs")
+            .$call(addBaseColumns)
+            .addColumn("datePublished", "integer")
+            .addColumn("title", "text", COLLATE_NOCASE)
+            .addColumn("selfDestruct", "boolean")
+            .addColumn("password", "text")
+            .execute();
         }
       }
     };
@@ -444,4 +465,26 @@ function createFTS5Table(
   ]);
 
   return sql`CREATE VIRTUAL TABLE ${sql.raw(name)} USING fts5(${args})`;
+}
+
+async function runFTSTablesMigrations(db: Kysely<any>) {
+  await db.transaction().execute(async (tx) => {
+    await tx.schema.dropTable("content_fts").execute();
+    await tx.schema.dropTable("notes_fts").execute();
+
+    await createFTS5Table("notes_fts", [{ name: "id" }, { name: "title" }], {
+      contentTable: "notes",
+      tokenizer: ["better_trigram", "remove_diacritics 1"]
+    }).execute(tx);
+
+    await createFTS5Table(
+      "content_fts",
+      [{ name: "id" }, { name: "noteId" }, { name: "data" }],
+      {
+        contentTable: "content",
+        tokenizer: ["html", "better_trigram", "remove_diacritics 1"]
+      }
+    ).execute(tx);
+  });
+  await rebuildSearchIndex(db);
 }

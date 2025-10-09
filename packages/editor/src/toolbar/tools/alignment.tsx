@@ -28,12 +28,13 @@ type AlignmentToolProps = ToolProps & {
   alignment: Alignment;
 };
 function AlignmentTool(props: AlignmentToolProps) {
-  const { editor, alignment, ...toolProps } = props;
+  const { editor, alignment } = props;
   const alignmentRef = useRefValue(alignment);
 
   return (
     <ToolButton
-      {...toolProps}
+      icon={props.icon}
+      title={props.title}
       onClick={() => {
         editor.chain().focus().setTextAlign(alignmentRef.current).run();
       }}

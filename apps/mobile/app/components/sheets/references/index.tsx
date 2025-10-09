@@ -34,14 +34,15 @@ import { useDBItem, useNoteLocked } from "../../../hooks/use-db-item";
 import { eSendEvent, presentSheet } from "../../../services/event-manager";
 import { useRelationStore } from "../../../stores/use-relation-store";
 import { eOnLoadNote } from "../../../utils/events";
-import { tabBarRef } from "../../../utils/global-refs";
-import { SIZE } from "../../../utils/size";
+import { fluidTabsRef } from "../../../utils/global-refs";
+import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import SheetProvider from "../../sheet-provider";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
 import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 export const useExpandedStore = create<{
   expanded: {
@@ -80,7 +81,7 @@ const ListBlockItem = ({
         paddingLeft: 35,
         justifyContent: "flex-start",
         minHeight: 45,
-        paddingHorizontal: 12
+        paddingHorizontal: DefaultAppStyles.GAP
       }}
     >
       <View
@@ -106,7 +107,7 @@ const ListBlockItem = ({
 
         <View
           style={{
-            borderRadius: 5,
+            borderRadius: defaultBorderRadius,
             backgroundColor: colors.secondary.background,
             width: 25,
             height: 25,
@@ -114,7 +115,7 @@ const ListBlockItem = ({
             justifyContent: "center"
           }}
         >
-          <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
+          <Paragraph color={colors.secondary.paragraph} size={AppFontSize.xs}>
             {item.type.toUpperCase()}
           </Paragraph>
         </View>
@@ -327,7 +328,7 @@ const ListNoteItem = ({
         }}
       >
         <IconButton
-          size={SIZE.xl}
+          size={AppFontSize.xl}
           onPress={() => {
             if (!item?.id) return;
             useExpandedStore.getState().setExpanded(item?.id);
@@ -354,7 +355,10 @@ const ListNoteItem = ({
           }}
         >
           {loading ? (
-            <ActivityIndicator color={colors.primary.accent} size={SIZE.lg} />
+            <ActivityIndicator
+              color={colors.primary.accent}
+              size={AppFontSize.lg}
+            />
           ) : (
             <>
               {listType === "linkedNotes" ? (
@@ -423,7 +427,7 @@ export const ReferencesList = ({ item, close }: ReferencesListProps) => {
             item: note,
             blockId: blockId
           });
-          tabBarRef.current?.goToPage(1);
+          fluidTabsRef.current?.goToPage("editor");
           close?.();
         }}
         reference={item as Note}
@@ -492,9 +496,9 @@ export const ReferencesList = ({ item, close }: ReferencesListProps) => {
       ) : (
         <View
           style={{
-            paddingHorizontal: 12,
+            paddingHorizontal: DefaultAppStyles.GAP,
             flex: 1,
-            marginTop: 10
+            marginTop: DefaultAppStyles.GAP_VERTICAL
           }}
         >
           <FlashList

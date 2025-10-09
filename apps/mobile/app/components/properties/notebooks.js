@@ -25,11 +25,12 @@ import { db } from "../../common/database";
 import NotebookScreen from "../../screens/notebook";
 import { eSendEvent, presentSheet } from "../../services/event-manager";
 import { eClearEditor } from "../../utils/events";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import { Pressable } from "../ui/pressable";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export default function Notebooks({ note, close, full }) {
   const { colors } = useThemeColors();
@@ -59,12 +60,12 @@ export default function Notebooks({ note, close, full }) {
       type={full ? "transparent" : "secondary"}
       style={{
         justifyContent: "flex-start",
-        paddingHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         flexDirection: "row",
         alignItems: "center",
         flexShrink: 1,
         flexGrow: 1,
-        padding: 6,
+        padding: DefaultAppStyles.GAP_SMALL,
         borderRadius: 10,
         minHeight: 42
       }}
@@ -72,7 +73,7 @@ export default function Notebooks({ note, close, full }) {
       <Icon
         name="book-outline"
         color={colors.primary.accent}
-        size={SIZE.sm}
+        size={AppFontSize.sm}
         style={{
           marginRight: 5
         }}
@@ -82,7 +83,7 @@ export default function Notebooks({ note, close, full }) {
         style={{
           maxWidth: "50%"
         }}
-        size={SIZE.sm}
+        size={AppFontSize.sm}
       >
         {item.title}
       </Heading>
@@ -92,40 +93,46 @@ export default function Notebooks({ note, close, full }) {
   return noteNotebooks.length === 0 ? null : (
     <View
       style={{
-        width: "100%",
-        borderRadius: 10,
-        marginTop: 6
+        paddingHorizontal: DefaultAppStyles.GAP
       }}
     >
-      {full
-        ? noteNotebooks.map(renderItem)
-        : noteNotebooks.slice(0, 1).map(renderItem)}
+      <View
+        style={{
+          width: "100%",
+          borderRadius: 10,
+          marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL
+        }}
+      >
+        {full
+          ? noteNotebooks.map(renderItem)
+          : noteNotebooks.slice(0, 1).map(renderItem)}
 
-      {noteNotebooks.length > 1 && !full ? (
-        <Button
-          title={strings.viewAllLinkedNotebooks()}
-          fontSize={SIZE.xs}
-          style={{
-            alignSelf: "flex-end",
-            marginRight: 12,
-            paddingHorizontal: 0,
-            backgroundColor: "transparent"
-          }}
-          type="plain"
-          textStyle={{
-            textDecorationLine: "underline"
-          }}
-          height={20}
-          onPress={() => {
-            presentSheet({
-              context: "properties",
-              component: (ref, close) => (
-                <Notebooks note={note} close={close} full={true} />
-              )
-            });
-          }}
-        />
-      ) : undefined}
+        {noteNotebooks.length > 1 && !full ? (
+          <Button
+            title={strings.viewAllLinkedNotebooks()}
+            fontSize={AppFontSize.xs}
+            style={{
+              alignSelf: "flex-end",
+              marginRight: 12,
+              paddingHorizontal: 0,
+              backgroundColor: "transparent"
+            }}
+            type="plain"
+            textStyle={{
+              textDecorationLine: "underline"
+            }}
+            height={20}
+            onPress={() => {
+              presentSheet({
+                context: "properties",
+                component: (ref, close) => (
+                  <Notebooks note={note} close={close} full={true} />
+                )
+              });
+            }}
+          />
+        ) : undefined}
+      </View>
     </View>
   );
 }

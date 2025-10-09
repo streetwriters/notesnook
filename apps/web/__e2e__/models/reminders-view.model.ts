@@ -30,7 +30,7 @@ export class RemindersViewModel extends BaseViewModel {
   constructor(page: Page) {
     super(page, "reminders", "reminders");
     this.createButton = page
-      .locator(getTestId("reminders-action-button"))
+      .locator(getTestId("create-reminder-button"))
       .first();
   }
 

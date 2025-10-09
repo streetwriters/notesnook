@@ -61,87 +61,101 @@ export function TaskItemComponent(
   }, [editor, checked, updateAttributes, node]);
 
   return (
-    <>
-      {editor.isEditable && (
+    <Flex
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        width: "100%",
+        justifyContent: "space-between"
+      }}
+    >
+      <Flex
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          maxWidth: "95%",
+          flexGrow: 1
+        }}
+      >
+        {editor.isEditable && (
+          <Icon
+            className="dragHandle"
+            draggable="true"
+            // NOTE: Turning this off somehow makes drag/drop stop working
+            // properly on touch devices.
+            // contentEditable={false}
+            data-drag-handle
+            path={Icons.dragHandle}
+            sx={{
+              opacity: [1, 1, 0],
+              alignSelf: "start",
+              bg: "transparent",
+              cursor: "grab",
+              mr: "0.2rem",
+              fontFamily: "inherit",
+              marginTop: "0.065rem"
+            }}
+            size={isMobile ? "2.46ch" : "2.22ch"}
+          />
+        )}
         <Icon
-          className="dragHandle"
-          draggable="true"
-          // NOTE: Turning this off somehow makes drag/drop stop working
-          // properly on touch devices.
-          // contentEditable={false}
-          data-drag-handle
-          path={Icons.dragHandle}
+          path={checked ? Icons.check : ""}
+          stroke="1px"
+          contentEditable={false}
+          tabIndex={1}
           sx={{
-            opacity: [1, 1, 0],
+            border: "2px solid",
+            borderColor: checked ? "accent" : "icon",
+            borderRadius: "default",
             alignSelf: "start",
-            bg: "transparent",
-            mt: isMobile ? "0.20ch" : "0.36ch",
-            cursor: "grab",
-            mx: 1,
-            fontFamily: "inherit"
+            p: "1px",
+            marginInlineEnd: 1,
+            cursor: editor.isEditable ? "pointer" : "unset",
+            ":hover": isMobile
+              ? undefined
+              : {
+                  borderColor: "accent"
+                },
+            fontFamily: "inherit",
+            marginTop: "0.13rem"
           }}
-          size={isMobile ? "2.46ch" : "2.22ch"}
-        />
-      )}
-      <Icon
-        path={checked ? Icons.check : ""}
-        stroke="1px"
-        contentEditable={false}
-        tabIndex={1}
-        sx={{
-          border: "2px solid",
-          borderColor: checked ? "accent" : "icon",
-          borderRadius: "default",
-          alignSelf: "start",
-          p: "1px",
-          mt: isMobile ? "0.20ch" : "0.36ch",
-          marginInlineEnd: 1,
-          cursor: editor.isEditable ? "pointer" : "unset",
-          ":hover": isMobile
-            ? undefined
-            : {
-                borderColor: "accent"
-              },
-          fontFamily: "inherit"
-        }}
-        onMouseDown={(e) => {
-          if (globalThis.keyboardShown) {
-            e.preventDefault();
-          }
-          toggle();
-        }}
-        onTouchEnd={(e) => {
-          if (globalThis["keyboardShown"] || isiOS) {
-            e.preventDefault();
+          onMouseDown={(e) => {
+            if (globalThis.keyboardShown) {
+              e.preventDefault();
+            }
             toggle();
-          }
-        }}
-        color={checked ? "accent" : "icon"}
-        size={isMobile ? "1.70ch" : "1.46ch"}
-      />
+          }}
+          onTouchEnd={(e) => {
+            if (globalThis["keyboardShown"] || isiOS) {
+              e.preventDefault();
+              toggle();
+            }
+          }}
+          color={checked ? "accent" : "icon"}
+          size={isMobile ? "1.70ch" : "1.36ch"}
+        />
 
-      <Box
-        ref={forwardRef}
-        sx={{
-          "> .taskitem-content-wrapper > p": {
-            textDecorationLine: checked ? "line-through" : "none",
-            opacity: checked ? 0.8 : 1
-          },
-          flex: 1,
-          mt: ["3px", "3px", 0],
-          ml: ["2px", "2px", 0]
-        }}
-      />
+        <Box
+          ref={forwardRef}
+          sx={{
+            "> .taskitem-content-wrapper > p": {
+              textDecorationLine: checked ? "line-through" : "none",
+              opacity: checked ? 0.8 : 1
+            },
+            flex: 1,
+            mt: ["3px", "3px", 0],
+            ml: ["2px", "2px", 0]
+          }}
+        />
+      </Flex>
       <DesktopOnly>
         <Flex
           className="taskItemTools"
           sx={{
             bg: "background",
             opacity: 0,
-            position: "absolute",
-            top: 1,
-            right: 0,
-            alignItems: "center"
+            alignSelf: "flex-start",
+            marginTop: "0.16rem"
           }}
         >
           {editor.isEditable && (
@@ -171,6 +185,6 @@ export function TaskItemComponent(
           )}
         </Flex>
       </DesktopOnly>
-    </>
+    </Flex>
   );
 }

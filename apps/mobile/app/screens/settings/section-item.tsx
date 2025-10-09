@@ -26,21 +26,34 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, TextInput, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+//@ts-ignore
+import { FeatureResult, useIsFeatureAvailable } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
 import ToggleSwitch from "toggle-switch-react-native";
+import PaywallSheet from "../../components/sheets/paywall";
 import { IconButton } from "../../components/ui/icon-button";
 import Input from "../../components/ui/input";
 import { Pressable } from "../../components/ui/pressable";
 import Seperator from "../../components/ui/seperator";
+import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
+import { ToastManager } from "../../services/event-manager";
 import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { SettingStore, useSettingStore } from "../../stores/use-setting-store";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 import { components } from "./components";
 import { RouteParams, SettingSection } from "./types";
+import AppIcon from "../../components/ui/AppIcon";
 
 const _SectionItem = ({ item }: { item: SettingSection }) => {
   const { colors } = useThemeColors();
+  const isFeatureAvailable = item.featureId
+    ? useIsFeatureAvailable(item.featureId)
+    : ({
+        isAllowed: true
+      } as FeatureResult);
   const [settings, itemProperty] = useSettingStore((state) => [
     state.settings,
     item.property ? state.settings[item.property] : null
@@ -57,6 +70,8 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
   const [loading, setLoading] = useState(false);
 
   const onChangeSettings = async () => {
+    if (isDisabled) return;
+    if (!checkIsFeatureAvailable()) return;
     if (loading) return;
     if (item.onVerify && !(await item.onVerify())) return;
     if (item.modifer) {
@@ -108,24 +123,38 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
 
   useEffect(() => {
     setIsHidden(item.hidden && item.hidden(item.property || current));
-    setIsDisabled(item.disabled && item.disabled(item.property || current));
-  }, [current, item, itemProperty]);
+    setIsDisabled(
+      !isFeatureAvailable?.isAllowed ||
+        (item.disabled && item.disabled(item.property || current))
+    );
+  }, [current, item, itemProperty, isFeatureAvailable?.isAllowed]);
+
+  const checkIsFeatureAvailable = React.useCallback(() => {
+    if (!isFeatureAvailable) return false;
+    if (isFeatureAvailable && !isFeatureAvailable?.isAllowed) {
+      PaywallSheet.present(isFeatureAvailable);
+      return false;
+    }
+
+    return true;
+  }, [isFeatureAvailable]);
 
   return isHidden ? null : (
     <Pressable
-      disabled={item.type === "component" || isDisabled}
+      disabled={item.type === "component"}
       style={{
         width: "100%",
         alignItems: "center",
-        padding: 12,
+        padding: DefaultAppStyles.GAP,
         flexDirection: "row",
         justifyContent: "space-between",
-        paddingVertical: 20,
-        opacity: isDisabled ? 0.5 : 1,
+        paddingVertical: DefaultAppStyles.GAP,
         borderRadius: 0,
+        overflow: "hidden",
         ...styles
       }}
       onPress={async () => {
+        if (!checkIsFeatureAvailable()) return;
         if (isDisabled) return;
         switch (item.type) {
           case "screen":
@@ -149,6 +178,27 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
         }
       }}
     >
+      {!isFeatureAvailable?.isAllowed ? (
+        <View
+          style={{
+            width: 35,
+            height: 35,
+            borderRadius: 100,
+            backgroundColor: colors.primary.accent,
+            justifyContent: "center",
+            alignItems: "center",
+            position: "absolute",
+            bottom: -8,
+            right: -8
+          }}
+        >
+          <AppIcon
+            color={colors.static.orange}
+            size={AppFontSize.md}
+            name="crown"
+          />
+        </View>
+      ) : null}
       <View
         style={{
           flexDirection: "row",
@@ -188,16 +238,17 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
             paddingRight: item.type === "switch" ? 10 : 0
           }}
         >
-          <Paragraph
+          <Heading
             color={
               item.type === "danger"
                 ? colors.error.paragraph
                 : colors.primary.heading
             }
-            size={SIZE.md + 1}
+            size={AppFontSize.sm}
           >
             {typeof item.name === "function" ? item.name(current) : item.name}
-          </Paragraph>
+          </Heading>
+
           {!!item.description && (
             <Paragraph
               color={
@@ -205,7 +256,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                   ? colors.error.paragraph
                   : colors.primary.paragraph
               }
-              size={SIZE.sm}
+              size={AppFontSize.sm}
             >
               {typeof item.description === "function"
                 ? item.description(current)
@@ -236,7 +287,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                 });
                 item.inputProperties?.onSubmitEditing?.(text as any);
               }}
-              containerStyle={{ marginTop: 12 }}
+              containerStyle={{ marginTop: DefaultAppStyles.GAP_VERTICAL }}
               fwdRef={inputRef}
               onLayout={() => {
                 inputRef?.current?.setNativeProps({
@@ -255,13 +306,14 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                marginTop: 12
+                marginTop: DefaultAppStyles.GAP_VERTICAL
               }}
             >
               <IconButton
                 name="minus"
                 color={colors.primary.icon}
                 onPress={() => {
+                  if (!checkIsFeatureAvailable()) return;
                   if (isDisabled) return;
                   const rawValue = SettingsService.get()[
                     item.property as keyof SettingStore["settings"]
@@ -277,7 +329,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                     updateInput(nextValue);
                   }
                 }}
-                size={SIZE.xl}
+                size={AppFontSize.xl}
               />
               <Input
                 {...item.inputProperties}
@@ -292,12 +344,17 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                 }}
                 keyboardType="decimal-pad"
                 containerStyle={{
-                  width: 65
+                  width: 60
+                }}
+                inputStyle={{
+                  width: 60,
+                  textAlign: "center"
                 }}
                 wrapperStyle={{
-                  maxWidth: 65,
+                  maxWidth: 60,
+                  flexGrow: 0,
                   marginBottom: 0,
-                  marginHorizontal: 6
+                  marginHorizontal: DefaultAppStyles.GAP_SMALL
                 }}
                 fwdRef={inputRef}
                 onLayout={() => {
@@ -311,6 +368,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                 name="plus"
                 color={colors.primary.icon}
                 onPress={() => {
+                  if (!checkIsFeatureAvailable()) return;
                   if (isDisabled) return;
                   const rawValue = SettingsService.get()[
                     item.property as keyof SettingStore["settings"]
@@ -326,7 +384,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                     updateInput(nextValue);
                   }
                 }}
-                size={SIZE.xl}
+                size={AppFontSize.xl}
               />
             </View>
           )}
@@ -341,7 +399,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
               : settings[item?.property as never]
           }
           onColor={colors.primary.accent}
-          offColor={colors.secondary.icon}
+          offColor={colors.primary.icon}
           size="small"
           animationSpeed={150}
           onToggle={onChangeSettings}
@@ -349,7 +407,10 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
       )}
 
       {loading ? (
-        <ActivityIndicator size={SIZE.xxl} color={colors.primary.accent} />
+        <ActivityIndicator
+          size={AppFontSize.xxl}
+          color={colors.primary.accent}
+        />
       ) : null}
     </Pressable>
   );

@@ -17,37 +17,35 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 /* eslint-disable no-inner-declarations */
+import { useAreFeaturesAvailable } from "@notesnook/common";
 import {
-  Color,
   createInternalLink,
+  Item,
   ItemReference,
   Note,
-  Notebook,
-  Reminder,
-  Tag,
-  TrashItem,
   VAULT_ERRORS
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
+import { useThemeColors } from "@notesnook/theme";
 import { DisplayedNotification } from "@notifee/react-native";
 import Clipboard from "@react-native-clipboard/clipboard";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { InteractionManager, Platform } from "react-native";
 import Share from "react-native-share";
 import { DatabaseLogger, db } from "../common/database";
 import { AttachmentDialog } from "../components/attachments";
+import { AuthMode } from "../components/auth/common";
 import { presentDialog } from "../components/dialog/functions";
 import NoteHistory from "../components/note-history";
 import { AddNotebookSheet } from "../components/sheets/add-notebook";
-import MoveNoteSheet from "../components/sheets/add-to";
 import ExportNotesSheet from "../components/sheets/export-notes";
-import { MoveNotebookSheet } from "../components/sheets/move-notebook";
-import { MoveNotes } from "../components/sheets/move-notes/movenote";
+import PaywallSheet from "../components/sheets/paywall";
 import PublishNoteSheet from "../components/sheets/publish-note";
 import { ReferencesList } from "../components/sheets/references";
 import { RelationsList } from "../components/sheets/relations-list/index";
-import ReminderSheet from "../components/sheets/reminder";
 import { useSideBarDraggingStore } from "../components/side-menu/dragging-store";
+import { ButtonProps } from "../components/ui/button";
+import AddReminder from "../screens/add-reminder";
 import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
 import {
   eSendEvent,
@@ -58,24 +56,111 @@ import {
 } from "../services/event-manager";
 import Navigation from "../services/navigation";
 import Notifications from "../services/notifications";
+import SettingsService from "../services/settings";
+import { useArchivedStore } from "../stores/use-archived-store";
 import { useMenuStore } from "../stores/use-menu-store";
 import useNavigationStore from "../stores/use-navigation-store";
 import { useRelationStore } from "../stores/use-relation-store";
 import { useSelectionStore } from "../stores/use-selection-store";
+import { useSettingStore } from "../stores/use-setting-store";
 import { useTagStore } from "../stores/use-tag-store";
 import { useUserStore } from "../stores/use-user-store";
-import { eOpenLoginDialog, eUpdateNoteInEditor } from "../utils/events";
+import { eUpdateNoteInEditor } from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { convertNoteToText } from "../utils/note-to-text";
 import { sleep } from "../utils/time";
 
+export type ActionId =
+  | "select"
+  | "archive"
+  | "restore"
+  | "delete"
+  | "reorder"
+  | "rename-tag"
+  | "rename-color"
+  | "pin"
+  | "add-shortcut"
+  | "rename-notebook"
+  | "add-notebook"
+  | "edit-notebook"
+  | "default-notebook"
+  | "move-notes"
+  | "move-notebook"
+  | "disable-reminder"
+  | "edit-reminder"
+  | "delete-reminder"
+  | "delete"
+  | "delete-trash"
+  | "add-reminder"
+  | "copy"
+  | "share"
+  | "read-only"
+  | "local-only"
+  | "duplicate"
+  | "add-note"
+  | "attachments"
+  | "history"
+  | "copy-link"
+  | "reminders"
+  | "lock-unlock"
+  | "publish"
+  | "export"
+  | "notebooks"
+  | "add-tag"
+  | "references"
+  | "pin-to-notifications"
+  | "favorite"
+  | "remove-from-notebook"
+  | "trash"
+  | "default-homepage"
+  | "default-tag";
+
+export type Action = {
+  id: ActionId;
+  title: string;
+  icon: string;
+  onPress: () => void;
+  isToggle?: boolean;
+  checked?: boolean;
+  pro?: boolean;
+  hidden?: boolean;
+  activeColor?: string;
+  type?: ButtonProps["type"];
+  locked?: boolean;
+};
+
+function isNotePinnedInNotifications(item: Item) {
+  const pinned = Notifications.getPinnedNotes();
+  if (!pinned || pinned.length === 0) {
+    return undefined;
+  }
+  const index = pinned.findIndex((notif) => notif.id === item.id);
+  if (index !== -1) {
+    return pinned[index];
+  }
+  return undefined;
+}
+
 export const useActions = ({
   close,
-  item
+  item: propItem,
+  customActionHandlers
 }: {
-  item: Note | Notebook | Reminder | Tag | Color | TrashItem;
+  item: Item;
   close: () => void;
+  customActionHandlers?: Record<ActionId, () => void>;
 }) => {
+  const features = useAreFeaturesAvailable([
+    "defaultNotebookAndTag",
+    "activeReminders",
+    "pinNoteInNotification",
+    "shortcuts",
+    "notebooks",
+    "customizableSidebar",
+    "customHomepage"
+  ]);
+  const [item, setItem] = useState(propItem);
+  const { colors } = useThemeColors();
   const setMenuPins = useMenuStore((state) => state.setMenuPins);
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(
     db.shortcuts.exists(item.id)
@@ -83,15 +168,21 @@ export const useActions = ({
   const processingId = useRef<"shareNote" | "copyContent">();
   const user = useUserStore((state) => state.user);
   const [notifPinned, setNotifPinned] = useState<DisplayedNotification>();
-
   const [defaultNotebook, setDefaultNotebook] = useState(
     db.settings.getDefaultNotebook()
   );
+  const [defaultTag, setDefaultTag] = useState(db.settings.getDefaultTag());
+
   const [noteInCurrentNotebook, setNoteInCurrentNotebook] = useState(false);
+  const [locked, setLocked] = useState(false);
+  const isHomepage = useSettingStore(
+    (state) =>
+      state.settings.homepageV2?.type === item.type &&
+      state.settings.homepageV2?.id === item.id
+  );
 
   const isPublished =
     item.type === "note" && db.monographs.isPublished(item.id);
-  const [locked, setLocked] = useState(false);
 
   useEffect(() => {
     if (item.type === "note") {
@@ -99,48 +190,43 @@ export const useActions = ({
     }
   }, [item]);
 
-  const checkNotifPinned = useCallback(() => {
-    const pinned = Notifications.getPinnedNotes();
-
-    if (!pinned || pinned.length === 0) {
-      setNotifPinned(undefined);
-      return;
-    }
-    const index = pinned.findIndex((notif) => notif.id === item.id);
-    if (index !== -1) {
-      setNotifPinned(pinned[index]);
-    } else {
-      setNotifPinned(undefined);
-    }
-  }, [item.id]);
-
   useEffect(() => {
     if (item.type !== "note") return;
-    checkNotifPinned();
+    setNotifPinned(isNotePinnedInNotifications(item));
     setIsPinnedToMenu(db.shortcuts.exists(item.id));
-  }, [checkNotifPinned, item]);
-
-  const onUpdate = useCallback(
-    async (type: string) => {
-      if (type === "unpin") {
-        await Notifications.get();
-        checkNotifPinned();
-      }
-    },
-    [checkNotifPinned]
-  );
+  }, [item]);
 
   useEffect(() => {
-    const sub = eSubscribeEvent(Notifications.Events.onUpdate, onUpdate);
+    const { currentRoute, focusedRouteId } = useNavigationStore.getState();
+    if (item.type !== "note" || currentRoute !== "Notebook" || !focusedRouteId)
+      return;
+
+    !!db.relations
+      .to(item, "notebook")
+      .selector.find((v) => v("id", "==", focusedRouteId))
+      .then((notebook) => {
+        setNoteInCurrentNotebook(!!notebook);
+      });
+  }, [item]);
+
+  useEffect(() => {
+    const sub = eSubscribeEvent(
+      Notifications.Events.onUpdate,
+      async (type: string) => {
+        if (type === "unpin") {
+          await Notifications.get();
+          setNotifPinned(isNotePinnedInNotifications(item));
+        }
+      }
+    );
     return () => {
       sub?.unsubscribe();
     };
-  }, [item, onUpdate]);
+  }, [item]);
 
   async function restoreTrashItem() {
-    if (!checkItemSynced()) return;
     close();
-    if ((await db.trash.restore(item.id)) === false) return;
+    await db.trash.restore(item.id);
     Navigation.queueRoutesForUpdate();
     const type = item.type === "trash" ? item.itemType : item.type;
     ToastManager.show({
@@ -154,19 +240,15 @@ export const useActions = ({
 
   async function pinItem() {
     if (!item.id) return;
-    close();
     if (item.type === "note") {
       await db.notes.pin(!item?.pinned, item.id);
+      setItem((await db.notes.note(item.id)) as Item);
     } else if (item.type === "notebook") {
       await db.notebooks.pin(!item?.pinned, item.id);
+      setItem((await db.notebooks.notebook(item.id)) as Item);
     }
-
     Navigation.queueRoutesForUpdate();
   }
-
-  const checkItemSynced = () => {
-    return true;
-  };
 
   async function createMenuShortcut() {
     if (item.type !== "notebook" && item.type !== "tag") return;
@@ -176,6 +258,18 @@ export const useActions = ({
       if (isPinnedToMenu) {
         await db.shortcuts.remove(item.id);
       } else {
+        if (features && !features?.shortcuts.isAllowed) {
+          ToastManager.show({
+            message: features?.shortcuts.error,
+            type: "info",
+            context: "local",
+            actionText: strings.upgrade(),
+            func: () => {
+              PaywallSheet.present(features?.shortcuts);
+            }
+          });
+          return;
+        }
         await db.shortcuts.add({
           itemId: item.id,
           itemType: item.type
@@ -299,7 +393,6 @@ export const useActions = ({
 
   async function deleteTrashItem() {
     if (item.type !== "trash") return;
-    if (!checkItemSynced()) return;
     close();
     await sleep(300);
     presentDialog({
@@ -323,42 +416,14 @@ export const useActions = ({
     });
   }
 
-  const actions: {
-    id: string;
-    title: string;
-    icon: string;
-    func: () => void;
-    close?: boolean;
-    check?: boolean;
-    on?: boolean;
-    pro?: boolean;
-    switch?: boolean;
-    hidden?: boolean;
-    type?: string;
-    color?: string;
-  }[] = [
-    // {
-    //   id: "ReferencedIn",
-    //   title: "References",
-    //   icon: "link",
-    //   func: async () => {
-    //     close();
-    //     RelationsList.present({
-    //       reference: item,
-    //       referenceType: "note",
-    //       title: "Referenced in",
-    //       relationType: "to",
-    //     });
-    //   }
-    // }
-  ];
+  const actions: Action[] = [];
 
   if (item.type === "tag") {
     actions.push({
       id: "rename-tag",
       title: strings.rename(),
       icon: "square-edit-outline",
-      func: renameTag
+      onPress: renameTag
     });
   }
 
@@ -367,19 +432,32 @@ export const useActions = ({
       id: "rename-color",
       title: strings.rename(),
       icon: "square-edit-outline",
-      func: renameColor
+      onPress: renameColor
     });
 
     actions.push({
       id: "reorder",
       title: strings.reorder(),
       icon: "sort-ascending",
-      func: () => {
+      onPress: async () => {
+        if (features && !features.customizableSidebar.isAllowed) {
+          ToastManager.show({
+            message: features.customizableSidebar.error,
+            type: "info",
+            context: "local",
+            actionText: strings.upgrade(),
+            func: () => {
+              PaywallSheet.present(features.customizableSidebar);
+            }
+          });
+          return;
+        }
         useSideBarDraggingStore.setState({
           dragging: true
         });
         close();
-      }
+      },
+      locked: !features?.customizableSidebar.isAllowed
     });
   }
 
@@ -391,7 +469,7 @@ export const useActions = ({
           ? strings.turnOffReminder()
           : strings.turnOnReminder(),
         icon: !item.disabled ? "bell-off-outline" : "bell",
-        func: async () => {
+        onPress: async () => {
           close();
           await db.reminders.add({
             ...item,
@@ -406,10 +484,10 @@ export const useActions = ({
         id: "edit-reminder",
         title: strings.editReminder(),
         icon: "pencil",
-        func: async () => {
-          ReminderSheet.present(item);
-        },
-        close: false
+        onPress: async () => {
+          AddReminder.present(item);
+          close();
+        }
       }
     );
   }
@@ -420,28 +498,65 @@ export const useActions = ({
         id: "restore",
         title: strings.restore(),
         icon: "delete-restore",
-        func: restoreTrashItem
+        onPress: restoreTrashItem
       },
       {
         id: "delete",
         title: strings.delete(),
         icon: "delete",
-        func: deleteTrashItem
+        onPress: deleteTrashItem
       }
     );
   }
 
   if (item.type === "tag" || item.type === "notebook") {
-    actions.push({
-      id: "add-shortcut",
-      title: isPinnedToMenu ? strings.removeShortcut() : strings.addShortcut(),
-      icon: isPinnedToMenu ? "link-variant-remove" : "link-variant",
-      func: createMenuShortcut,
-      close: false,
-      check: true,
-      on: isPinnedToMenu,
-      pro: true
-    });
+    actions.push(
+      {
+        id: "add-shortcut",
+        title: isPinnedToMenu
+          ? strings.removeShortcut()
+          : strings.addShortcut(),
+        icon: isPinnedToMenu ? "link-variant-remove" : "link-variant",
+        onPress: createMenuShortcut,
+        isToggle: true,
+        checked: isPinnedToMenu,
+        activeColor: colors.error.paragraph
+      },
+      {
+        id: "default-tag",
+        title:
+          defaultTag === item.id
+            ? strings.removeAsDefault()
+            : strings.setAsDefault(),
+        hidden: item.type !== "tag",
+        icon: "pound",
+        onPress: async () => {
+          if (defaultTag === item.id) {
+            await db.settings.setDefaultTag(undefined);
+            setDefaultTag(undefined);
+          } else {
+            if (features && !features.defaultNotebookAndTag.isAllowed) {
+              ToastManager.show({
+                message: features.defaultNotebookAndTag.error,
+                type: "info",
+                context: "local",
+                actionText: strings.upgrade(),
+                func: () => {
+                  PaywallSheet.present(features.defaultNotebookAndTag);
+                }
+              });
+              return;
+            }
+
+            await db.settings.setDefaultTag(item.id);
+            setDefaultTag(item.id);
+          }
+          close();
+        },
+        checked: defaultTag === item.id,
+        locked: !features?.defaultNotebookAndTag.isAllowed
+      }
+    );
   }
 
   if (item.type === "notebook") {
@@ -450,15 +565,33 @@ export const useActions = ({
         id: "add-notebook",
         title: strings.addNotebook(),
         icon: "plus",
-        func: async () => {
+        onPress: async () => {
+          if (features && !features.notebooks.isAllowed) {
+            ToastManager.show({
+              message: features.notebooks.error,
+              type: "info",
+              context: "local",
+              actionText: strings.upgrade(),
+              func: () => {
+                ToastManager.hide();
+                PaywallSheet.present(features.notebooks);
+              }
+            });
+            return;
+          }
+          close();
+          await sleep(300);
           AddNotebookSheet.present(undefined, item);
-        }
+        },
+        locked: !features?.notebooks.isAllowed
       },
       {
         id: "edit-notebook",
         title: strings.editNotebook(),
         icon: "square-edit-outline",
-        func: async () => {
+        onPress: async () => {
+          close();
+          await sleep(300);
           AddNotebookSheet.present(item);
         }
       },
@@ -470,11 +603,24 @@ export const useActions = ({
             : strings.setAsDefault(),
         hidden: item.type !== "notebook",
         icon: "notebook",
-        func: async () => {
+        onPress: async () => {
           if (defaultNotebook === item.id) {
             await db.settings.setDefaultNotebook(undefined);
             setDefaultNotebook(undefined);
           } else {
+            if (features && !features.defaultNotebookAndTag.isAllowed) {
+              ToastManager.show({
+                message: features.defaultNotebookAndTag.error,
+                type: "info",
+                context: "local",
+                actionText: strings.upgrade(),
+                func: () => {
+                  PaywallSheet.present(features.defaultNotebookAndTag);
+                }
+              });
+              return;
+            }
+
             const notebook = {
               id: item.id
             };
@@ -483,23 +629,31 @@ export const useActions = ({
           }
           close();
         },
-        on: defaultNotebook === item.id
+        checked: defaultNotebook === item.id,
+
+        locked: !features?.defaultNotebookAndTag.isAllowed
       },
       {
         id: "move-notes",
-        title: strings.moveNotes(),
+        title: strings.addNotes(),
         hidden: item.type !== "notebook",
         icon: "text",
-        func: () => {
-          MoveNotes.present(item);
+        onPress: () => {
+          close();
+          Navigation.navigate("MoveNotes", {
+            notebook: item
+          });
         }
       },
       {
         id: "move-notebook",
         title: strings.moveNotebookFix(),
         icon: "arrow-right-bold-box-outline",
-        func: () => {
-          MoveNotebookSheet.present([item]);
+        onPress: () => {
+          close();
+          Navigation.navigate("MoveNotebook", {
+            selectedNotebooks: [item]
+          });
         }
       }
     );
@@ -510,11 +664,48 @@ export const useActions = ({
       id: "pin",
       title: item.pinned ? strings.unpin() : strings.pin(),
       icon: item.pinned ? "pin-off-outline" : "pin-outline",
-      func: pinItem,
-      close: false,
-      check: true,
-      on: item.pinned,
+      onPress: pinItem,
+      isToggle: true,
+      checked: item.pinned,
       pro: true
+    });
+  }
+
+  if (
+    item.type === "notebook" ||
+    item.type === "tag" ||
+    item.type === "color"
+  ) {
+    actions.push({
+      id: "default-homepage",
+      title: isHomepage ? strings.unsetAsHomepage() : strings.setAsHomepage(),
+      icon: "home-outline",
+      isToggle: true,
+      checked: isHomepage,
+      onPress: async () => {
+        if (features && !features?.customHomepage.isAllowed) {
+          ToastManager.show({
+            message: features?.customHomepage.error,
+            type: "info",
+            context: "local",
+            actionText: strings.upgrade(),
+            func: () => {
+              PaywallSheet.present(features?.customHomepage);
+            }
+          });
+          return;
+        }
+
+        SettingsService.setProperty(
+          "homepageV2",
+          isHomepage
+            ? undefined
+            : {
+                id: item.id,
+                type: item.type
+              }
+        );
+      }
     });
   }
 
@@ -535,10 +726,10 @@ export const useActions = ({
     }
 
     async function toggleLocalOnly() {
-      if (!checkItemSynced() || !user) return;
+      if (!user) return;
       await db.notes.localOnly(!(item as Note).localOnly, item?.id);
+      setItem((await db.notes.note(item.id)) as Item);
       Navigation.queueRoutesForUpdate();
-      close();
     }
 
     const toggleReadyOnlyMode = async () => {
@@ -551,12 +742,11 @@ export const useActions = ({
           }
         });
       });
+      setItem((await db.notes.note(item.id)) as Item);
       Navigation.queueRoutesForUpdate();
-      close();
     };
 
     const duplicateNote = async () => {
-      if (!checkItemSynced()) return;
       await db.notes.duplicate(item.id);
       Navigation.queueRoutesForUpdate();
       close();
@@ -572,24 +762,39 @@ export const useActions = ({
     }
 
     function addTo() {
-      MoveNoteSheet.present(item as Note);
+      Navigation.navigate("LinkNotebooks", {
+        noteIds: [item.id]
+      });
+      close();
+      //MoveNoteSheet.present(item as Note);
     }
 
     async function addToFavorites() {
       if (!item.id || item.type !== "note") return;
-      close();
       await db.notes.favorite(!item.favorite, item.id);
+      setItem((await db.notes.note(item.id)) as Item);
       Navigation.queueRoutesForUpdate();
     }
 
     async function pinToNotifications() {
-      if (!checkItemSynced()) return;
-      if (Platform.OS === "ios") return;
+      if (features && !features?.pinNoteInNotification.isAllowed) {
+        ToastManager.show({
+          message: features?.pinNoteInNotification.error,
+          type: "info",
+          actionText: strings.upgrade(),
+          context: "local",
+          func: () => {
+            PaywallSheet.present(features?.pinNoteInNotification);
+          }
+        });
+        return;
+      }
 
       if (notifPinned) {
-        Notifications.remove(item.id);
+        await Notifications.remove(item.id);
+        await sleep(500);
         await Notifications.get();
-        checkNotifPinned();
+        setNotifPinned(isNotePinnedInNotifications(item));
         return;
       }
       if (locked) {
@@ -600,29 +805,22 @@ export const useActions = ({
         });
         return;
       }
-      const text = await convertNoteToText(item as Note, true);
-      const html = (text || "").replace(/\n/g, "<br />");
-      await Notifications.displayNotification({
-        title: item.title,
-        message: (item as Note).headline || text || "",
-        subtitle: "",
-        bigText: html,
-        ongoing: true,
-        actions: ["UNPIN"],
-        id: item.id
-      });
+
+      await Notifications.pinNote(item.id);
+      await sleep(500);
       await Notifications.get();
-      checkNotifPinned();
+      setNotifPinned(isNotePinnedInNotifications(item));
     }
 
     async function publishNote() {
-      if (!checkItemSynced()) return;
       if (!user) {
         ToastManager.show({
           heading: strings.loginRequired(),
           context: "local",
           func: () => {
-            eSendEvent(eOpenLoginDialog);
+            Navigation.navigate("Auth", {
+              mode: AuthMode.login
+            });
           },
           actionText: "Login"
         });
@@ -657,7 +855,6 @@ export const useActions = ({
           });
           return;
         }
-        if (!checkItemSynced()) return;
         if (locked) {
           close();
           await sleep(300);
@@ -687,8 +884,6 @@ export const useActions = ({
 
     async function addToVault() {
       if (item.type !== "note") return;
-
-      if (!checkItemSynced()) return;
       if (locked) {
         close();
         await sleep(300);
@@ -709,10 +904,10 @@ export const useActions = ({
           Navigation.queueRoutesForUpdate();
           eSendEvent(eUpdateNoteInEditor, item, true);
         }
-      } catch (e: any) {
+      } catch (e: unknown) {
         close();
         await sleep(300);
-        switch (e.message) {
+        switch ((e as Error).message) {
           case VAULT_ERRORS.noVault:
             openVault({
               item: item,
@@ -775,37 +970,36 @@ export const useActions = ({
         id: "favorite",
         title: !item.favorite ? strings.favorite() : strings.unfavorite(),
         icon: item.favorite ? "star-off" : "star-outline",
-        func: addToFavorites,
-        close: false,
-        check: true,
-        on: item.favorite,
+        onPress: addToFavorites,
+        isToggle: true,
+        checked: item.favorite,
         pro: true,
-        color: "orange"
+        activeColor: "orange"
       },
       {
         id: "remove-from-notebook",
         title: strings.removeFromNotebook(),
         hidden: noteInCurrentNotebook,
         icon: "minus-circle-outline",
-        func: removeNoteFromNotebook
+        onPress: removeNoteFromNotebook
       },
       {
         id: "attachments",
-        title: strings.attachments(),
+        title: strings.attachedFiles(),
         icon: "attachment",
-        func: showAttachments
+        onPress: showAttachments
       },
       {
         id: "history",
         title: strings.history(),
         icon: "history",
-        func: openHistory
+        onPress: openHistory
       },
       {
         id: "copy-link",
         title: strings.copyLink(),
         icon: "link",
-        func: () => {
+        onPress: () => {
           Clipboard.setString(createInternalLink("note", item.id));
           ToastManager.show({
             heading: strings.linkCopied(),
@@ -819,149 +1013,178 @@ export const useActions = ({
         id: "reminders",
         title: strings.dataTypesPluralCamelCase.reminder(),
         icon: "clock-outline",
-        func: async () => {
+        onPress: async () => {
           RelationsList.present({
             reference: item,
             referenceType: "reminder",
             relationType: "from",
             title: strings.dataTypesPluralCamelCase.reminder(),
-            onAdd: () => ReminderSheet.present(undefined, item, true),
+            onAdd: async () => {
+              if (features && !features.activeReminders.isAllowed) {
+                ToastManager.show({
+                  type: "info",
+                  message: features.activeReminders.error,
+                  actionText: strings.upgrade(),
+                  func: () => {
+                    PaywallSheet.present(features.activeReminders);
+                  }
+                });
+              }
+              AddReminder.present(undefined, item);
+              close();
+            },
             button: {
-              title: strings.add(),
-              type: "accent",
-              onPress: () => ReminderSheet.present(undefined, item, true),
-              icon: "plus"
+              type: "plain",
+              onPress: async () => {
+                if (features && !features.activeReminders.isAllowed) {
+                  ToastManager.show({
+                    type: "info",
+                    message: features.activeReminders.error,
+                    actionText: strings.upgrade(),
+                    func: () => {
+                      PaywallSheet.present(features.activeReminders);
+                    }
+                  });
+                  return;
+                }
+                AddReminder.present(undefined, item);
+                close();
+              },
+              icon: "plus",
+              iconSize: 20
             }
           });
         },
-        close: false
+        locked: !features?.activeReminders.isAllowed
       },
 
       {
         id: "copy",
         title: strings.copy(),
         icon: "content-copy",
-        func: copyContent
+        onPress: copyContent
       },
       {
         id: "share",
         title: strings.share(),
         icon: "share-variant",
-        func: shareNote
+        onPress: shareNote
       },
       {
         id: "read-only",
         title: strings.readOnly(),
         icon: "pencil-lock",
-        func: toggleReadyOnlyMode,
-        on: item.readonly
+        onPress: toggleReadyOnlyMode,
+        checked: item.readonly
       },
       {
         id: "local-only",
         title: strings.syncOff(),
         icon: "sync-off",
-        func: toggleLocalOnly,
-        on: item.localOnly
+        onPress: toggleLocalOnly,
+        checked: item.localOnly
       },
       {
         id: "duplicate",
         title: strings.duplicate(),
         icon: "content-duplicate",
-        func: duplicateNote
+        onPress: duplicateNote
       },
 
       {
         id: "add-reminder",
         title: strings.remindMe(),
         icon: "clock-plus-outline",
-        func: () => {
-          ReminderSheet.present(undefined, { id: item.id, type: "note" });
-        },
-        close: true
+        onPress: () => {
+          close();
+          AddReminder.present(undefined, item);
+        }
       },
       {
         id: "lock-unlock",
         title: locked ? strings.unlock() : strings.lock(),
         icon: locked ? "lock-open-outline" : "key-outline",
-        func: addToVault,
-        on: locked
+        onPress: addToVault,
+        checked: locked
       },
       {
         id: "publish",
         title: isPublished ? strings.published() : strings.publish(),
         icon: "cloud-upload-outline",
-        on: isPublished,
-        func: publishNote
+        checked: isPublished,
+        onPress: publishNote
       },
 
       {
         id: "export",
         title: strings.export(),
         icon: "export",
-        func: exportNote
-      },
-
-      {
-        id: "pin-to-notifications",
-        title: notifPinned
-          ? strings.unpinFromNotifications()
-          : strings.pinToNotifications(),
-        icon: "message-badge-outline",
-        on: !!notifPinned,
-        func: pinToNotifications
+        onPress: exportNote
       },
 
       {
         id: "notebooks",
-        title: strings.linkNotebooks(),
+        title: strings.addToNotebook(),
         icon: "book-outline",
-        func: addTo
+        onPress: addTo
       },
       {
         id: "add-tag",
         title: strings.addTags(),
         icon: "pound",
-        func: addTo
+        onPress: addTo
       },
       {
         id: "references",
         title: strings.references(),
         icon: "vector-link",
-        func: () => {
+        onPress: () => {
           ReferencesList.present({
             reference: item as ItemReference
           });
         }
+      },
+      {
+        id: "archive",
+        title: !item.archived ? strings.archive() : strings.unarchive(),
+        icon: "archive",
+        onPress: async () => {
+          db.notes.archive(!item.archived, item.id);
+          setItem((await db.notes.note(item.id)) as Item);
+          Navigation.queueRoutesForUpdate();
+          useArchivedStore.getState().refresh();
+        },
+        checked: item.archived,
+        isToggle: true
       }
     );
+
+    if (Platform.OS === "android") {
+      actions.push({
+        id: "pin-to-notifications",
+        title: notifPinned
+          ? strings.unpinFromNotifications()
+          : strings.pinToNotifications(),
+        icon: "message-badge-outline",
+        checked: !!notifPinned,
+        onPress: pinToNotifications,
+        locked: !features?.pinNoteInNotification.isAllowed
+      });
+    }
   }
 
-  useEffect(() => {
-    const { currentRoute, focusedRouteId } = useNavigationStore.getState();
-    if (item.type !== "note" || currentRoute !== "Notebook" || !focusedRouteId)
-      return;
-
-    !!db.relations
-      .to(item, "notebook")
-      .selector.find((v) => v("id", "==", focusedRouteId))
-      .then((notebook) => {
-        setNoteInCurrentNotebook(!!notebook);
-      });
-  }, [item]);
-
-  actions.push({
-    id: "trash",
-    title:
-      item.type !== "notebook" && item.type !== "note"
-        ? strings.doActions.delete.unknown(
-            item.type === "trash" ? item.itemType : item.type,
-            1
-          )
-        : strings.moveToTrash(),
-    icon: "delete-outline",
-    type: "error",
-    func: deleteItem
-  });
+  if (item.type != "trash") {
+    actions.push({
+      id: "trash",
+      title:
+        item.type !== "notebook" && item.type !== "note"
+          ? strings.doActions.delete.unknown(item.type, 1)
+          : strings.moveToTrash(),
+      icon: "delete-outline",
+      type: "error",
+      onPress: deleteItem
+    });
+  }
 
   return actions;
 };

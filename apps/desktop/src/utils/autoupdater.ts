@@ -20,19 +20,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { autoUpdater } from "electron-updater";
 import { config } from "./config";
 
-const CHANNEL = autoUpdater.currentVersion.raw.endsWith("-beta")
-  ? "beta"
-  : "latest";
 async function configureAutoUpdater() {
+  const releaseTrack =
+    config.releaseTrack === "stable" ? "latest" : config.releaseTrack;
   autoUpdater.setFeedURL({
     provider: "generic",
-    url: `https://notesnook.com/api/v1/releases/${process.platform}/${CHANNEL}`,
+    url: `https://notesnook.com/api/v1/releases/${process.platform}/${releaseTrack}`,
     useMultipleRangeRequest: false,
-    channel: CHANNEL
+    channel: releaseTrack
   });
 
   autoUpdater.autoDownload = config.automaticUpdates;
-  autoUpdater.allowDowngrade = false;
+  autoUpdater.allowDowngrade =
+    // only allow downgrade if the current version is a prerelease
+    // and the user has changed the release track to stable
+    config.releaseTrack === "stable" &&
+    autoUpdater.currentVersion.prerelease.length > 0;
   autoUpdater.allowPrerelease = false;
   autoUpdater.autoInstallOnAppQuit = true;
   autoUpdater.disableWebInstaller = true;

@@ -18,19 +18,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import { SIZE } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import Paragraph from "../ui/typography/paragraph";
 import { getStyle } from "./functions";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const Description = ({ text, style = {}, inline }) => {
   return (
     <Paragraph
       style={{
-        marginHorizontal: 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
         ...getStyle(style),
         textAlign: inline ? "left" : style?.textAlign
       }}
-      size={inline ? SIZE.sm : SIZE.md}
+      size={AppFontSize.sm}
     >
       {text}
     </Paragraph>

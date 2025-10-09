@@ -17,35 +17,37 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Item, Note, VirtualizedGrouping } from "@notesnook/core";
+import {
+  FilteredSelector,
+  Item,
+  Note,
+  VirtualizedGrouping
+} from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import React, { useEffect, useRef, useState } from "react";
 import { DatabaseLogger, db } from "../../common/database";
 import List from "../../components/list";
 import SelectionHeader from "../../components/selection-header";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
-import {
-  ToastManager,
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} from "../../services/event-manager";
+import { ToastManager, eSubscribeEvent } from "../../services/event-manager";
 import { NavigationProps } from "../../services/navigation";
 import useNavigationStore from "../../stores/use-navigation-store";
-import { eOnRefreshSearch } from "../../utils/events";
+import { eGroupOptionsUpdated, eOnRefreshSearch } from "../../utils/events";
 import { SearchBar } from "./search-bar";
-import { FilteredSelector } from "@notesnook/core";
-import { strings } from "@notesnook/intl";
 export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
   const [results, setResults] = useState<VirtualizedGrouping<Item>>();
   const [loading, setLoading] = useState(false);
   const [searchStatus, setSearchStatus] = useState<string>();
   const currentQuery = useRef<string>();
   const timer = useRef<NodeJS.Timeout>();
-  const isFocused = useNavigationFocus(navigation, {
+  useNavigationFocus(navigation, {
     onFocus: (prev) => {
       useNavigationStore.getState().setFocusedRouteId(route.name);
       return !prev?.current;
     },
-    onBlur: () => false
+    onBlur: () => {
+      return false;
+    }
   });
 
   const onSearch = React.useCallback(
@@ -60,32 +62,35 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
       try {
         setLoading(true);
         let results: VirtualizedGrouping<Item> | undefined;
-
+        const groupOptions = db.settings.getGroupOptions("search");
         switch (route.params.type) {
           case "note":
-            results = await db.lookup
-              .notes(query, route.params.items as FilteredSelector<Note>)
-              .sorted();
+            results = await db.lookup.notesWithHighlighting(
+              query,
+              route.params.items as FilteredSelector<Note>,
+              groupOptions
+            );
+
             break;
           case "notebook":
-            results = await db.lookup.notebooks(query).sorted();
+            results = await db.lookup.notebooks(query).sorted(groupOptions);
             break;
           case "tag":
-            results = await db.lookup.tags(query).sorted();
+            results = await db.lookup.tags(query).sorted(groupOptions);
             break;
           case "reminder":
-            results = await db.lookup.reminders(query).sorted();
+            results = await db.lookup.reminders(query).sorted(groupOptions);
             break;
           case "trash":
-            results = await db.lookup.trash(query).sorted();
+            results = await db.lookup.trash(query).sorted(groupOptions);
             break;
           case "attachment":
-            results = await db.lookup.attachments(query).sorted();
+            results = await db.lookup.attachments(query).sorted(groupOptions);
             break;
           default:
             results = undefined;
         }
-
+        if (currentQuery.current !== query) return;
         if (!results) {
           setSearchStatus(strings.noResultsFound(query));
           setLoading(false);
@@ -97,6 +102,7 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
         );
         if (currentQuery.current !== query) return;
         await results.item(0);
+        if (currentQuery.current !== query) return;
         setResults(results);
         if (results.placeholders?.length === 0) {
           setSearchStatus(strings.noResultsFound(query));
@@ -118,26 +124,29 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
         onSearch(currentQuery.current);
       }
     };
-    eSubscribeEvent(eOnRefreshSearch, onRefreshSearch);
+
+    const subs = [
+      eSubscribeEvent(eGroupOptionsUpdated, (groupType) => {
+        if (groupType === "search") {
+          onSearch(currentQuery.current);
+        }
+      }),
+      eSubscribeEvent(eOnRefreshSearch, onRefreshSearch)
+    ];
+
     return () => {
-      eUnSubscribeEvent(eOnRefreshSearch, onRefreshSearch);
+      subs.forEach((sub) => sub?.unsubscribe());
     };
   }, [onSearch, route.params?.type]);
 
   return (
     <>
-      <SelectionHeader
-        id={route.name}
-        items={results}
-        type={route.params?.type}
-        renderedInRoute={route.name}
-      />
       <SearchBar
         onChangeText={(query) => {
           clearTimeout(timer.current);
           timer.current = setTimeout(() => {
             onSearch(query);
-          }, 300);
+          }, 500);
         }}
         loading={loading}
       />
@@ -152,6 +161,14 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
           loading: strings.searchingFor(currentQuery.current as string)
         }}
       />
+      <SelectionHeader
+        id={route.name}
+        items={results}
+        type={route.params?.type}
+        renderedInRoute={route.name}
+      />
     </>
   );
 };
+
+export default Search;

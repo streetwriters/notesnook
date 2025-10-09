@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import React from "react";
 import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
@@ -29,7 +30,6 @@ import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useNotes } from "../../stores/use-notes-store";
 import { openEditor } from "../notes/common";
-import { strings } from "@notesnook/intl";
 
 export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
   const [notes, loading] = useNotes();
@@ -49,7 +49,6 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
 
   return (
     <>
-      <SelectionHeader id={route.name} items={notes} type="note" />
       <Header
         renderedInRoute={route.name}
         title={strings.routes[route.name]()}
@@ -66,6 +65,7 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
         id={route.name}
         onPressDefaultRightButton={openEditor}
       />
+
       <DelayLayout wait={loading}>
         <List
           data={notes}
@@ -82,9 +82,10 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
           }}
         />
         {!notes || !notes.placeholders?.length ? null : (
-          <FloatingButton onPress={openEditor} />
+          <FloatingButton onPress={openEditor} alwaysVisible />
         )}
       </DelayLayout>
+      <SelectionHeader id={route.name} items={notes} type="note" />
     </>
   );
 };

@@ -21,17 +21,14 @@ import { StepContainer } from "./step-container";
 import DevtoolsRequestsFilter from "../assets/screenshots/devtools_requests_filter.png";
 import DevtoolsRequestsWS from "../assets/screenshots/devtools_requests_ws.png";
 import DevtoolsRequestsWSMessages from "../assets/screenshots/devtools_requests_ws_messages.png";
-import DevtoolsRequestsWSMessagesSelect from "../assets/screenshots/devtools_requests_ws_messages_select.png";
 import DevtoolsRequestsWSMessagesCopy from "../assets/screenshots/devtools_requests_ws_messages_copy.png";
 
-// Firefox does not support extracting raw WebSocket response data yet.
-// Once it does we can start using these.
-// import FirefoxDevtoolsRequestsWS from "../assets/screenshots/firefox/devtools_requests_ws.png";
-// import FirefoxDevtoolsRequestsFilter from "../assets/screenshots/firefox/devtools_requests_filter.png";
-// import FirefoxDevtoolsRequestsWSResponse from "../assets/screenshots/firefox/devtools_requests_ws_response.png";
-// import FirefoxDevtoolsRequestsWSResponseSizeColumn from "../assets/screenshots/firefox/devtools_requests_ws_response_sizecolumn.png";
-// import FirefoxDevtoolsRequestsWSMessagesSelect from "../assets/screenshots/firefox/devtools_requests_ws_messages_select.png";
-// import FirefoxDevtoolsRequestsWSMessagesCopy from "../assets/screenshots/firefox/devtools_requests_ws_messages_copy.png";
+import FirefoxDevtoolsRequestsWS from "../assets/screenshots/firefox/devtools_requests_ws.png";
+import FirefoxDevtoolsRequestsFilter from "../assets/screenshots/firefox/devtools_requests_filter.png";
+import FirefoxDevtoolsRequestsWSResponse from "../assets/screenshots/firefox/devtools_requests_ws_response.png";
+import FirefoxDevtoolsRequestsWSResponseSizeColumn from "../assets/screenshots/firefox/devtools_requests_ws_response_sizecolumn.png";
+import FirefoxDevtoolsRequestsWSMessagesSelect from "../assets/screenshots/firefox/devtools_requests_ws_messages_select.png";
+import FirefoxDevtoolsRequestsWSMessagesCopy from "../assets/screenshots/firefox/devtools_requests_ws_messages_copy.png";
 
 import { Accordion } from "./accordion";
 import { getCombo } from "../utils/keycombos";
@@ -41,7 +38,7 @@ import { Code } from "./code";
 import { useState, useEffect } from "react";
 import { ErrorsList } from "./errors-list";
 import { getSourceUrl } from "../utils/links";
-import { MessagePackHubProtocol } from "@microsoft/signalr-protocol-msgpack";
+import { JsonHubProtocol } from "@microsoft/signalr";
 
 type PasteEncryptedDataProps = {
   onEncryptedDataPasted: (data?: SyncRequestBody) => void;
@@ -95,7 +92,7 @@ const steps = {
       websocket request that happens on startup).
     </>,
     <>
-      Wait until a request starting with <Code text="sync?access_token=" /> pops
+      Wait until a request starting with <Code text="v2?access_token=" /> pops
       up. It&apos;ll probably be the only one popping up and might take a bit so
       don&apos;t panic if you don&apos;t see anything.
     </>,
@@ -107,118 +104,107 @@ const steps = {
       <Image src={DevtoolsRequestsWSMessages} width={400} sx={{ mt: 1 }} />
     </Flex>,
     <>
-      At this point, you will a list of Binary messages. None of these will
-      appear really useful. This is normal.
+      At this point, you will a list of JSON messages. None of these will appear
+      really useful. This is normal.
     </>,
     <>
       Now try editing one of your notes and syncing. (Make sure to keep the{" "}
       <Code text="Network" /> tab open.)
     </>,
-    <Flex key="new-binary-messages" sx={{ flexDirection: "column" }}>
+    <Text key="new-json-messages" as="p">
+      You will see a bunch of new <Code text="JSON Messages" /> appear in the
+      list. Find the one with the largest <Code text="Length" />.
+    </Text>,
+    <Flex key="copy-json-message" sx={{ flexDirection: "column" }}>
       <Text as="p">
-        You will see a bunch of new <Code text="Binary Messages" /> appear in
-        the list. Find the one with the largest Length (in KBs). Also make sure
-        the output type is set to <Code text="Base64" /> as in the screenshot
-        below.
+        Right click on the message and click <Code text="Copy message" />
       </Text>
       <Image
-        src={DevtoolsRequestsWSMessagesSelect}
-        width={700}
-        sx={{ mt: 1, maxWidth: "95%" }}
+        src={DevtoolsRequestsWSMessagesCopy}
+        width={"100%"}
+        sx={{ mt: 1 }}
       />
     </Flex>,
-    <Flex key="click-copy-button" sx={{ flexDirection: "column" }}>
-      <Text as="p">Click on the copy button to copy the payload.</Text>
-      <Image src={DevtoolsRequestsWSMessagesCopy} width={200} sx={{ mt: 1 }} />
+    <>Paste it below to see the decrypted data.</>
+  ],
+  firefox: [
+    "Focus the Notesnook tab in your browser.",
+    <>
+      Press <KeyCombo combo={getCombo("firefox", "developerTools")} /> to open
+      Developer Tools.
+    </>,
+    <>
+      Switch to the <Code text="Network" /> tab.
+    </>,
+    <Flex key="toggle-ws" sx={{ flexDirection: "column" }}>
+      <Text as="p">
+        Make sure you have <Code text="WS" /> toggled instead of{" "}
+        <Code text="Fetch/XHR" />
+      </Text>
+      <Image src={FirefoxDevtoolsRequestsWS} width={400} sx={{ mt: 1 }} />
+    </Flex>,
+    <Flex key="type-sync-in-filter" sx={{ flexDirection: "column" }}>
+      <Text as="p">
+        In the filter input, type <Code text="sync" /> to filter out sync
+        requests.
+      </Text>
+      <Image src={FirefoxDevtoolsRequestsFilter} width={400} sx={{ mt: 1 }} />
+    </Flex>,
+    <>
+      <b>Refresh the page by pressing F5</b> (this is done so we can capture the
+      websocket request that happens on startup).
+    </>,
+    <>
+      Wait until a request starting with <Code text="v2?access_token=" /> pops
+      up. It&apos;ll probably be the only one popping up and might take a bit so
+      don&apos;t panic if you don&apos;t see anything.
+    </>,
+    <>Left-click on this request to open its details.</>,
+    <Flex key="switch-to-response-tab" sx={{ flexDirection: "column" }}>
+      <Text as="p">
+        Switch to the <Code text="Response" /> tab.
+      </Text>
+      <Image
+        src={FirefoxDevtoolsRequestsWSResponse}
+        width={400}
+        sx={{ mt: 1 }}
+      />
+    </Flex>,
+    <>
+      At this point, you will a list of JSON messages. None of these will appear
+      really useful. This is normal.
+    </>,
+    <Flex key="enable-size-column" sx={{ flexDirection: "column" }}>
+      <Text as="p">
+        To help in finding the right request, <Code text="Right click" /> on the
+        table header &amp; enable the <Code text="Size" /> column.
+      </Text>
+      <Image
+        src={FirefoxDevtoolsRequestsWSResponseSizeColumn}
+        width={300}
+        sx={{ mt: 1 }}
+      />
+    </Flex>,
+    <>
+      Now try editing one of your notes and syncing. (Make sure to keep the{" "}
+      <Code text="Network" /> tab open.)
+    </>,
+    <Text key="new-json-messages" as="p">
+      You will see a bunch of new items appear in the table. Find the one with
+      the largest Length (in KBs).
+    </Text>,
+    <Flex key="copy-json-message" sx={{ flexDirection: "column" }}>
+      <Text as="p">
+        Right-click on the item &amp; click on <Code text="Copy Message" />
+      </Text>
+      <Image
+        src={FirefoxDevtoolsRequestsWSMessagesCopy}
+        width={400}
+        sx={{ mt: 1 }}
+      />
     </Flex>,
     <> Paste it below to see the decrypted data.</>
-  ],
-  firefox: []
-  // firefox: [
-  //   "Focus the Notesnook tab in your browser.",
-  //   <>
-  //     Press <KeyCombo combo={getCombo("firefox", "developerTools")} /> to open
-  //     Developer Tools.
-  //   </>,
-  //   <>
-  //     Switch to the <Code text="Network" /> tab.
-  //   </>,
-  //   <Flex sx={{ flexDirection: "column" }}>
-  // <Text as="p">
-  //   Make sure you have <Code text="WS" /> toggled instead of{" "}
-  //   <Code text="Fetch/XHR" />
-  // </Text>
-  //     <Image src={FirefoxDevtoolsRequestsWS} width={400} sx={{ mt: 1 }} />
-  //   </Flex>,
-  //   <Flex sx={{ flexDirection: "column" }}>
-  //     <Text as="p">
-  //       In the filter input, type <Code text="sync" /> to filter out sync
-  //       requests.
-  //     </Text>
-  //     <Image src={FirefoxDevtoolsRequestsFilter} width={400} sx={{ mt: 1 }} />
-  //   </Flex>,
-  //   <>
-  //     <b>Refresh the page by pressing F5</b> (this is done so we can capture the
-  //     websocket request that happens on startup).
-  //   </>,
-  //   <>
-  //     Wait until a request starting with <Code text="sync?access_token=" /> pops
-  //     up. It'll probably be the only one popping up and might take a bit so
-  //     don't panic if you don't see anything.
-  //   </>,
-  //   <>Left-click on this request to open its details.</>,
-  //   <Flex sx={{ flexDirection: "column" }}>
-  //     <Text as="p">
-  //       Switch to the <Code text="Response" /> tab.
-  //     </Text>
-  //     <Image
-  //       src={FirefoxDevtoolsRequestsWSResponse}
-  //       width={400}
-  //       sx={{ mt: 1 }}
-  //     />
-  //   </Flex>,
-  //   <>
-  //     At this point, you will a list of Binary messages. None of these will
-  //     appear really useful. This is normal.
-  //   </>,
-  //   <Flex sx={{ flexDirection: "column" }}>
-  //     <Text as="p">
-  //       To help in finding the right request, <Code text="Right click" /> on the
-  //       table header &amp; enable the <Code text="Size" /> column.
-  //     </Text>
-  //     <Image
-  //       src={FirefoxDevtoolsRequestsWSResponseSizeColumn}
-  //       width={300}
-  //       sx={{ mt: 1 }}
-  //     />
-  //   </Flex>,
-  //   <>
-  //     Now try editing one of your notes and syncing. (Make sure to keep the{" "}
-  //     <Code text="Network" /> tab open.)
-  //   </>,
-  //   <Flex sx={{ flexDirection: "column" }}>
-  //     <Text as="p">
-  //       You will see a bunch of new items appear in the table. Find the one with
-  //       the largest Length (in KBs).
-  //     </Text>
-  //     <Image
-  //       src={FirefoxDevtoolsRequestsWSMessagesSelect}
-  //       width={700}
-  //       sx={{ mt: 1, maxWidth: "95%" }}
-  //     />
-  //   </Flex>,
-  //   <Flex sx={{ flexDirection: "column" }}>
-  //     <Text as="p">
-  //       Right-click on the item &amp; click on <Code text="Copy Message" />
-  //     </Text>
-  //     <Image
-  //       src={FirefoxDevtoolsRequestsWSMessagesCopy}
-  //       width={400}
-  //       sx={{ mt: 1 }}
-  //     />
-  //   </Flex>,
-  //   <> Paste it below to see the decrypted data.</>,
-  // ],
+  ]
 };
 
 const isChromium = Platform.name === "Chrome";
@@ -226,7 +212,7 @@ const isFirefox = Platform.name === "Firefox";
 const instructions = isChromium
   ? steps.chromium
   : isFirefox
-  ? steps.chromium
+  ? steps.firefox
   : null;
 
 export function PasteEncryptedData(props: PasteEncryptedDataProps) {
@@ -257,16 +243,6 @@ export function PasteEncryptedData(props: PasteEncryptedDataProps) {
           borderRadius: "default"
         }}
       >
-        {!isChromium && (
-          <Flex sx={{ bg: "errorBg", p: 1 }}>
-            <Text as="p" variant="body" sx={{ color: "error" }}>
-              Currently Firefox does not support pasting raw data from the
-              WebSocket response view.{" "}
-              <b>Please use a Chromium-based browser</b> for grabbing the
-              necessary data.
-            </Text>
-          </Flex>
-        )}
         <Text variant="body" sx={{ mx: 2 }}>
           To make this whole process verifiable &amp; trustworthy, we need to
           extract the raw data that Notesnook sends to its servers during sync.
@@ -295,11 +271,11 @@ export function PasteEncryptedData(props: PasteEncryptedDataProps) {
         onChange={(e) => {
           try {
             setError(undefined);
-            const base64Data = e.target.value;
+            const jsonData = e.target.value;
 
-            const protocol = new MessagePackHubProtocol();
+            const protocol = new JsonHubProtocol();
             const messages = protocol
-              .parseMessages(toArrayBuffer(base64Data), {
+              .parseMessages(jsonData, {
                 log: console.log
               })
               .filter((m) => m.type === 1);
@@ -317,17 +293,16 @@ export function PasteEncryptedData(props: PasteEncryptedDataProps) {
             };
             for (const message of messages) {
               if (message.type === 1) {
-                const { items, types } = message.arguments[0] as {
-                  items?: string[];
-                  types?: string[];
+                const { items, type } = message.arguments[1] as {
+                  items?: EncryptedSyncItem[];
+                  type?: string;
                 };
-                if (!items || !types) continue;
+                if (!items || !type) continue;
 
-                for (let i = 0; i < types.length; ++i) {
-                  const itemType = types[i];
-                  const item = JSON.parse(items[i]) as EncryptedSyncItem;
+                for (let i = 0; i < items.length; ++i) {
+                  const item = items[i] as EncryptedSyncItem;
 
-                  switch (itemType) {
+                  switch (type) {
                     case "note":
                       syncData.notes.push(item);
                       break;

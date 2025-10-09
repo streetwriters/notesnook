@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { createRoot, Root } from "react-dom/client";
+import { createRoot } from "react-dom/client";
 
 export function getToolbarElement() {
   return (
@@ -48,13 +48,9 @@ export function getEditorDOM() {
     getEditorContainer()) as HTMLElement; // ProseMirror
 }
 
-let popupRoot: Root | undefined = undefined;
 export function getPopupRoot() {
-  if (!popupRoot) popupRoot = createRoot(getPopupContainer());
-  return popupRoot;
-}
-
-export function unmountPopupRoot() {
-  if (popupRoot) popupRoot.unmount();
-  popupRoot = undefined;
+  const container = getPopupContainer();
+  const div = document.createElement("div");
+  container.appendChild(div);
+  return createRoot(div);
 }

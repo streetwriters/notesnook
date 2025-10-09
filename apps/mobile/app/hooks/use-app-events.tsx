@@ -17,11 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { isFeatureAvailable } from "@notesnook/common";
 import {
   EV,
   EVENTS,
   EventManagerSubscription,
   SYNC_CHECK_IDS,
+  SubscriptionPlan,
   SyncStatusEvent,
   User
 } from "@notesnook/core";
@@ -40,7 +42,6 @@ import {
   NativeModules,
   Platform
 } from "react-native";
-import RNBootSplash from "react-native-bootsplash";
 import { checkVersion } from "react-native-check-version";
 import Config from "react-native-config";
 import * as RNIap from "react-native-iap";
@@ -50,8 +51,9 @@ import { MMKV } from "../common/database/mmkv";
 import { endProgress, startProgress } from "../components/dialogs/progress";
 import Migrate from "../components/sheets/migrate";
 import NewFeature from "../components/sheets/new-feature";
-import ReminderSheet from "../components/sheets/reminder";
+import PaywallSheet from "../components/sheets/paywall";
 import { Walkthrough } from "../components/walkthroughs";
+import AddReminder from "../screens/add-reminder";
 import {
   resetTabStore,
   useTabStore
@@ -59,8 +61,7 @@ import {
 import {
   clearAppState,
   editorController,
-  editorState,
-  setAppState
+  editorState
 } from "../screens/editor/tiptap/utils";
 import { useDragState } from "../screens/settings/editor/state";
 import BackupService from "../services/backup";
@@ -84,12 +85,11 @@ import Notifications from "../services/notifications";
 import PremiumService from "../services/premium";
 import SettingsService from "../services/settings";
 import Sync from "../services/sync";
-import { clearAllStores, initAfterSync } from "../stores";
+import { clearAllStores, initAfterSync, initialize } from "../stores";
 import { refreshAllStores } from "../stores/create-db-collection-store";
 import { useAttachmentStore } from "../stores/use-attachment-store";
 import { useMessageStore } from "../stores/use-message-store";
 import { useSettingStore } from "../stores/use-setting-store";
-import { changeSystemBarColors } from "../stores/use-theme-store";
 import { SyncStatus, useUserStore } from "../stores/use-user-store";
 import { updateStatusBarColor } from "../utils/colors";
 import { BETA } from "../utils/constants";
@@ -103,9 +103,10 @@ import {
   refreshNotesPage
 } from "../utils/events";
 import { getGithubVersion } from "../utils/github-version";
-import { tabBarRef } from "../utils/global-refs";
+import { fluidTabsRef } from "../utils/global-refs";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { sleep } from "../utils/time";
+import useFeatureManager from "./use-feature-manager";
 
 const onCheckSyncStatus = async (type: SyncStatusEvent) => {
   const { disableSync, disableAutoSync } = SettingsService.get();
@@ -168,7 +169,7 @@ const onAppOpenedFromURL = async (event: { url: string }) => {
       clearAppState();
       editorState().movedAway = false;
       eSendEvent(eOnLoadNote, { newNote: true });
-      tabBarRef.current?.goToPage(1, false);
+      fluidTabsRef.current?.goToPage("editor", false);
       return;
     } else if (url.startsWith("https://notesnook.com/open_note")) {
       const id = new URL(url).searchParams.get("id");
@@ -178,17 +179,29 @@ const onAppOpenedFromURL = async (event: { url: string }) => {
           eSendEvent(eOnLoadNote, {
             item: note
           });
-          tabBarRef.current?.goToPage(1, false);
+          fluidTabsRef.current?.goToPage("editor", false);
         }
       }
     } else if (url.startsWith("https://notesnook.com/open_reminder")) {
       const id = new URL(url).searchParams.get("id");
       if (id) {
         const reminder = await db.reminders.reminder(id);
-        if (reminder) ReminderSheet.present(reminder);
+        if (reminder) AddReminder.present(reminder);
       }
     } else if (url.startsWith("https://notesnook.com/new_reminder")) {
-      ReminderSheet.present();
+      const reminderFeature = await isFeatureAvailable("activeReminders");
+      if (!reminderFeature.isAllowed) {
+        ToastManager.show({
+          type: "info",
+          message: reminderFeature.error,
+          actionText: strings.upgrade(),
+          func: () => {
+            PaywallSheet.present(reminderFeature);
+          }
+        });
+        return;
+      }
+      AddReminder.present();
     }
   } catch (e) {
     console.error(e);
@@ -212,12 +225,23 @@ const onUserEmailVerified = async () => {
 const onUserSubscriptionStatusChanged = async (
   subscription: User["subscription"]
 ) => {
-  if (!PremiumService.get() && subscription.type === 5) {
+  if (
+    subscription &&
+    subscription.plan !== SubscriptionPlan.FREE &&
+    subscription.plan !== useUserStore.getState().user?.subscription?.plan
+  ) {
     PremiumService.subscriptions.clear();
+    useUserStore.setState({
+      user: {
+        ...(useUserStore.getState().user as User),
+        subscription: subscription
+      }
+    });
     Walkthrough.present("prouser", false, true);
   }
   await PremiumService.setPremiumStatus();
   useMessageStore.getState().setAnnouncement();
+  useUserStore.getState().setUser(await db.user.fetchUser());
 };
 
 const onRequestPartialSync = async (
@@ -267,7 +291,7 @@ async function checkForShareExtensionLaunchedInBackground() {
       }
       eSendEvent(refreshNotesPage);
       MMKV.removeItem("notesAddedFromIntent");
-      initAfterSync();
+      initAfterSync("full");
       eSendEvent(refreshNotesPage);
     }
 
@@ -301,6 +325,7 @@ async function saveEditorState() {
 const onSuccessfulSubscription = async (
   subscription: RNIap.ProductPurchase | RNIap.SubscriptionPurchase
 ) => {
+  if (Platform.OS === "android") return;
   await PremiumService.subscriptions.set(subscription);
   await PremiumService.subscriptions.verify(subscription);
 };
@@ -321,6 +346,9 @@ const doAppLoadActions = async () => {
     eSendEvent(eLoginSessionExpired);
     return;
   }
+
+  await useMessageStore.getState().setAnnouncement();
+
   notifee.setBadgeCount(0);
 
   if (!(await db.user.getUser())) {
@@ -328,11 +356,9 @@ const doAppLoadActions = async () => {
     return;
   }
 
-  await useMessageStore.getState().setAnnouncement();
   if (NewFeature.present()) return;
   if (await checkAppUpdateAvailable()) return;
   if (await checkForRateAppRequest()) return;
-  if (await PremiumService.getRemainingTrialDaysStatus()) return;
   if (SettingsService.get().introCompleted) {
     useMessageStore.subscribe((state) => {
       const dialogs = state.dialogs;
@@ -344,8 +370,15 @@ const doAppLoadActions = async () => {
 };
 
 const checkAppUpdateAvailable = async () => {
-  if (__DEV__ || Config.isTesting === "true" || Config.FDROID_BUILD || BETA)
+  if (
+    __DEV__ ||
+    Config.isTesting === "true" ||
+    Config.FDROID_BUILD ||
+    BETA ||
+    !SettingsService.getProperty("checkForUpdates")
+  )
     return;
+
   try {
     const version =
       Config.GITHUB_RELEASE === "true"
@@ -392,13 +425,11 @@ const IsDatabaseMigrationRequired = () => {
 const initializeDatabase = async (password?: string) => {
   if (useUserStore.getState().appLocked) return;
   if (!db.isInitialized) {
-    RNBootSplash.hide({ fade: false });
-    changeSystemBarColors();
-
     DatabaseLogger.info("Initializing database");
     try {
       await setupDatabase(password);
       await db.init();
+      initialize();
       Sync.run();
     } catch (e) {
       DatabaseLogger.error(e as Error);
@@ -409,12 +440,13 @@ const initializeDatabase = async (password?: string) => {
   if (IsDatabaseMigrationRequired()) return;
 
   if (db.isInitialized) {
+    useSettingStore.getState().setAppLoading(false);
     Notifications.setupReminders(true);
     if (SettingsService.get().notifNotes) {
       Notifications.pinQuickNote(false);
     }
-    useSettingStore.getState().setAppLoading(false);
     DatabaseLogger.info("Database initialized");
+    Notifications.restorePinnedNotes();
   }
   Walkthrough.init();
 };
@@ -427,7 +459,7 @@ export const useAppEvents = () => {
     state.appLocked,
     state.syncing
   ]);
-
+  useFeatureManager();
   const syncedOnLaunch = useRef(false);
   const refValues = useRef<
     Partial<{
@@ -442,7 +474,7 @@ export const useAppEvents = () => {
   >({});
 
   const onSyncComplete = useCallback(async () => {
-    initAfterSync();
+    initAfterSync(Sync.getLastSyncType() as "full" | "send");
     setLastSynced(await db.lastSynced());
     eSendEvent(eCloseSheet, "sync_progress");
   }, [setLastSynced]);
@@ -603,7 +635,6 @@ export const useAppEvents = () => {
       EV.subscribe(EVENTS.userLoggedOut, onLogout),
       EV.subscribe(EVENTS.userEmailConfirmed, onUserEmailVerified),
       EV.subscribe(EVENTS.userSessionExpired, onUserSessionExpired),
-      EV.subscribe(EVENTS.userCheckStatus, PremiumService.onUserStatusCheck),
       EV.subscribe(
         EVENTS.userSubscriptionUpdated,
         onUserSubscriptionStatusChanged
@@ -720,7 +751,8 @@ export const useAppEvents = () => {
           SettingsService.canLockAppInBackground() &&
           !useSettingStore.getState().requestBiometrics &&
           !useUserStore.getState().appLocked &&
-          !useUserStore.getState().disableAppLockRequests
+          !useUserStore.getState().disableAppLockRequests &&
+          !useSettingStore.getState().appDidEnterBackgroundForAction
         ) {
           if (SettingsService.shouldLockAppOnEnterForeground()) {
             DatabaseLogger.log(`AppEvents: Locking app on enter background`);

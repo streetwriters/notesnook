@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { StackActions } from "@react-navigation/native";
+import { NavigationHelpers, StackActions } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useFavoriteStore } from "../stores/use-favorite-store";
 import useNavigationStore, {
@@ -31,8 +31,13 @@ import { useReminderStore } from "../stores/use-reminder-store";
 import { useTagStore } from "../stores/use-tag-store";
 import { useTrashStore } from "../stores/use-trash-store";
 import { eOnRefreshSearch, eUpdateNotebookRoute } from "../utils/events";
-import { rootNavigatorRef, tabBarRef } from "../utils/global-refs";
+import {
+  appNavigatorRef,
+  fluidTabsRef,
+  rootNavigatorRef
+} from "../utils/global-refs";
 import { eSendEvent } from "./event-manager";
+import { useArchivedStore } from "../stores/use-archived-store";
 
 /**
  * Routes that should be updated on focus
@@ -59,7 +64,14 @@ const routeNames = {
   AppLock: "AppLock",
   Login: "Login",
   Signup: "Signup",
-  Reminders: "Reminders"
+  Reminders: "Reminders",
+  MoveNotebook: "MoveNotebook",
+  LinkNotebooks: "LinkNotebooks",
+  MoveNotes: "MoveNotes",
+  Archive: "Archive",
+  ManageTags: "ManageTags",
+  AddReminder: "AddReminder",
+  PayWall: "PayWall"
 };
 
 export type NavigationProps<T extends RouteName> = NativeStackScreenProps<
@@ -85,7 +97,8 @@ const routeUpdateFunctions: {
   TopicNotes: (params) => eSendEvent("TopicNotes", params),
   Monographs: (params) => eSendEvent("Monographs", params),
   Reminders: () => useReminderStore.getState().refresh(),
-  Search: () => eSendEvent(eOnRefreshSearch)
+  Search: () => eSendEvent(eOnRefreshSearch),
+  Archive: () => useArchivedStore.getState().refresh()
 };
 
 function clearRouteFromQueue(routeName: RouteName) {
@@ -122,6 +135,7 @@ function queueRoutesForUpdate(...routesToUpdate: RouteName[]) {
 }
 
 function navigate<T extends RouteName>(screen: T, params?: RouteParams[T]) {
+  console.log(`Navigation.navigate ${screen} route`);
   rootNavigatorRef.current?.navigate(screen as any, params);
 }
 
@@ -130,22 +144,53 @@ function goBack() {
 }
 
 function push<T extends RouteName>(screen: T, params: RouteParams[T]) {
+  console.log(`Navigation.push ${screen} route`);
   rootNavigatorRef.current?.dispatch(StackActions.push(screen as any, params));
 }
 
 function replace<T extends RouteName>(screen: T, params: RouteParams[T]) {
-  rootNavigatorRef.current?.dispatch(StackActions.replace(screen, params));
+  console.log(`Navigation.replace ${screen} route`);
+  rootNavigatorRef.current?.dispatch(
+    StackActions.replace(screen as string, params)
+  );
 }
 
 function popToTop() {
-  rootNavigatorRef.current?.dispatch(StackActions.popToTop());
+  console.log(`Navigation.popToTop`);
+  appNavigatorRef.current?.dispatch(StackActions.popToTop());
 }
 
 function openDrawer() {
-  tabBarRef.current?.openDrawer();
+  fluidTabsRef.current?.openDrawer();
 }
 function closeDrawer() {
-  tabBarRef.current?.closeDrawer();
+  fluidTabsRef.current?.closeDrawer();
+}
+
+function resetRootState(
+  _state?: ReturnType<NavigationHelpers<any, any>["getState"]>
+) {
+  const state = _state || rootNavigatorRef.getState();
+  const focusedRoute = state.routes[state.index];
+
+  if (state.routes.length < 2) return;
+
+  const routes = state.routes.filter(
+    (route) =>
+      (route.name !== "Auth" && route.name !== "Welcome") ||
+      route.key === focusedRoute.key
+  );
+
+  if (routes.length === state.routes.length) return;
+  if (routes.length === 0) {
+    routes.push(focusedRoute);
+  }
+  const newIndex = routes.findIndex((route) => route.key === focusedRoute.key);
+  rootNavigatorRef.reset({
+    ...state,
+    routes: routes,
+    index: newIndex
+  });
 }
 
 const Navigation = {
@@ -159,7 +204,8 @@ const Navigation = {
   queueRoutesForUpdate,
   routeNeedsUpdate,
   routeNames,
-  routeUpdateFunctions
+  routeUpdateFunctions,
+  resetRootState
 };
 
 export default Navigation;

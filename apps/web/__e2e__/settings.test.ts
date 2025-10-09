@@ -62,6 +62,8 @@ test("do not ask for image compression during image upload when 'Image Compressi
 test("do not ask for image compression during image upload when 'Image Compression' setting is 'Disable'", async ({
   page
 }) => {
+  await page.exposeBinding("isPro", () => true);
+
   const app = new AppModel(page);
   await app.goto();
   const settings = await app.goToSettings();

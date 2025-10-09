@@ -39,16 +39,15 @@ export const Filler = ({ item, color }: { item: Item; color?: string }) => {
       style={{
         position: "absolute",
         width: "110%",
-        height: "150%",
-        backgroundColor: colors.selected.background,
-        borderLeftWidth: 5,
-        borderLeftColor: isEditingNote
-          ? color
-            ? color
-            : colors.selected.accent
-          : "transparent"
+        height: "100%",
+        backgroundColor: colors.selected.accent
+        // borderLeftWidth: 5,
+        // borderLeftColor: isEditingNote
+        //   ? color
+        //     ? color
+        //     : colors.selected.accent
+        //   : "transparent"
       }}
-      collapsable={false}
     />
   ) : null;
 };

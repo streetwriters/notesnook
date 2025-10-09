@@ -11,4 +11,5 @@ nx-cloud.env
 site
 node_modules.backup
 .nx
-*.patch
+/*.patch
+.taskcache

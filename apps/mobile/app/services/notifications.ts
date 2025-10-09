@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { getFormattedReminderTime } from "@notesnook/common";
 import { isReminderActive, Reminder } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import notifee, {
@@ -36,6 +37,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { encodeNonAsciiHTML } from "entities";
 import { Platform } from "react-native";
 import { db, setupDatabase } from "../common/database";
+import { MMKV } from "../common/database/mmkv";
 import { presentDialog } from "../components/dialog/functions";
 import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
 import { editorState } from "../screens/editor/tiptap/utils";
@@ -44,7 +46,7 @@ import { useReminderStore } from "../stores/use-reminder-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { useUserStore } from "../stores/use-user-store";
 import { eOnLoadNote } from "../utils/events";
-import { tabBarRef } from "../utils/global-refs";
+import { fluidTabsRef } from "../utils/global-refs";
 import { convertNoteToText } from "../utils/note-to-text";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { sleep } from "../utils/time";
@@ -52,7 +54,6 @@ import { DDS } from "./device-detection";
 import { eSendEvent } from "./event-manager";
 import Navigation from "./navigation";
 import SettingsService from "./settings";
-import { getFormattedReminderTime } from "@notesnook/common";
 
 let pinned: DisplayedNotification[] = [];
 
@@ -347,7 +348,7 @@ async function scheduleNotification(
           title: title,
           message: description || "",
           ongoing: true,
-          subtitle: description || "",
+          // subtitle: description || "",
           actions: [strings.unpin()]
         });
       }
@@ -395,7 +396,7 @@ async function scheduleNotification(
             payload: payload || "",
             dateModified: reminder.dateModified + ""
           },
-          subtitle: !description ? undefined : description,
+          // subtitle: !description ? undefined : description,
           android: {
             channelId: await getChannelId(priority),
             smallIcon: "ic_stat_name",
@@ -440,7 +441,7 @@ async function loadNote(id: string, jump: boolean) {
   const note = await db.notes.note(id);
   if (!note) return;
   if (!DDS.isTab && jump) {
-    tabBarRef.current?.goToPage(1);
+    fluidTabsRef.current?.goToPage("editor");
   }
   NotesnookModule.setAppState(
     JSON.stringify({
@@ -453,7 +454,7 @@ async function loadNote(id: string, jump: boolean) {
   const tab = useTabStore.getState().getTabForNote(id);
   if (useTabStore.getState().currentTab !== tab) {
     eSendEvent(eOnLoadNote, {
-      note: note
+      item: note
     });
   }
 }
@@ -883,13 +884,6 @@ function init() {
   notifee.onForegroundEvent(onEvent);
 }
 
-async function remove(id: string) {
-  await notifee.cancelNotification(id);
-  get().then(() => {
-    eSendEvent("onUpdate", "unpin");
-  });
-}
-
 async function pinQuickNote(launch: boolean) {
   useUserStore.setState({
     disableAppLockRequests: true
@@ -922,8 +916,21 @@ async function pinQuickNote(launch: boolean) {
  * A function that checks if reminders need to be reconfigured &
  * reschedules them if anything has changed.
  */
+
 async function setupReminders(checkNeedsScheduling = false) {
   const reminders = ((await db.reminders?.all.items()) as Reminder[]) || [];
+  let notificationsCancelled = false;
+  if (Platform.OS === "android") {
+    // If the API level has changed, cancel all notifications.
+    // This is to ensure that the app does not crash on Android 14+.
+    const API_LEVEL = MMKV.getInt("android_apiLevel");
+    if (API_LEVEL !== (Platform.Version as number)) {
+      await notifee.cancelAllNotifications();
+      notificationsCancelled = true;
+      MMKV.setInt("android_apiLevel", Platform.Version as number);
+    }
+  }
+
   const triggers = await notifee.getTriggerNotifications();
   for (const reminder of reminders) {
     if (reminder.mode === "permanent") {
@@ -933,19 +940,21 @@ async function setupReminders(checkNeedsScheduling = false) {
     // Skip reminders that are not repeating and their trigger date is in past.
     if (reminder.mode === "once" && dayjs().isAfter(reminder.date)) continue;
 
-    const pending = triggers.filter((t) =>
-      t.notification.id?.startsWith(reminder.id)
-    );
+    if (!notificationsCancelled) {
+      const pending = triggers.filter((t) =>
+        t.notification.id?.startsWith(reminder.id)
+      );
 
-    let needsReschedule = pending.length === 0 ? true : false;
-    if (!needsReschedule) {
-      needsReschedule = pending[0].notification.data?.dateModified
-        ? parseInt(pending[0].notification.data?.dateModified as string) <
-          reminder.dateModified
-        : true;
+      let needsReschedule = pending.length === 0 ? true : false;
+      if (!needsReschedule) {
+        needsReschedule = pending[0].notification.data?.dateModified
+          ? parseInt(pending[0].notification.data?.dateModified as string) <
+            reminder.dateModified
+          : true;
+      }
+
+      if (!needsReschedule && checkNeedsScheduling) continue;
     }
-
-    if (!needsReschedule && checkNeedsScheduling) continue;
 
     await scheduleNotification(reminder);
   }
@@ -969,11 +978,49 @@ async function setupReminders(checkNeedsScheduling = false) {
   updateRemindersForWidget();
 }
 
+class PinnedNotesStorage {
+  static storageKey = "nn::pinnedNoteIds";
+  static get() {
+    const items = MMKV.getArray<string>(PinnedNotesStorage.storageKey);
+    if (!items) return [];
+    return items;
+  }
+
+  static add(id: string) {
+    const items = PinnedNotesStorage.get();
+    if (items.indexOf(id) === -1) {
+      items.push(id);
+      MMKV.setArray(PinnedNotesStorage.storageKey, items);
+    }
+  }
+
+  static remove(id: string) {
+    const items = PinnedNotesStorage.get();
+    const index = items.indexOf(id);
+    if (index > -1) {
+      items.splice(index, 1);
+      MMKV.setArray(PinnedNotesStorage.storageKey, items);
+    }
+  }
+
+  static clear() {
+    MMKV.removeItem(PinnedNotesStorage.storageKey);
+  }
+}
+
+async function remove(id: string) {
+  await notifee.cancelNotification(id);
+  PinnedNotesStorage.remove(id);
+  get().then(() => {
+    eSendEvent("onUpdate", "unpin");
+  });
+}
+
 async function pinNote(id: string) {
   try {
     const note = await db.notes.note(id as string);
     if (!note) return;
-
+    PinnedNotesStorage.add(id);
     let text = await convertNoteToText(note, true);
     if (!text) text = "";
     const html = text.replace(/\n/g, "<br />");
@@ -990,6 +1037,21 @@ async function pinNote(id: string) {
     /* empty */
   }
 }
+
+async function restorePinnedNotes() {
+  const pinnedNotes = PinnedNotesStorage.get();
+  for (const id of pinnedNotes) {
+    pinNote(id);
+  }
+}
+
+async function clearPinnedNotes() {
+  const pinnedNotes = PinnedNotesStorage.get();
+  for (const id of pinnedNotes) {
+    remove(id);
+  }
+}
+
 const Events = {
   onUpdate: "onUpdate"
 };
@@ -999,6 +1061,7 @@ const Notifications = {
   displayNotification,
   clearAll,
   remove,
+  clearPinnedNotes,
   get,
   getPinnedNotes,
   pinQuickNote,
@@ -1013,7 +1076,8 @@ const Notifications = {
   isNotePinned,
   pinNote,
   Events,
-  updateRemindersForWidget
+  updateRemindersForWidget,
+  restorePinnedNotes
 };
 
 export default Notifications;

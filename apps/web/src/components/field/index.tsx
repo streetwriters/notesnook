@@ -25,11 +25,13 @@ import { PasswordVisible, PasswordInvisible, Icon } from "../icons";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 
 type Action = {
+  id?: string;
   testId?: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   disabled?: boolean;
   icon?: Icon;
   component?: JSX.Element;
+  hidden?: boolean;
 };
 export type FieldProps = InputProps & {
   label?: string;
@@ -64,8 +66,14 @@ function Field(props: FieldProps) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const colorScheme = useThemeStore((state) => state.colorScheme);
   const [isValid, setIsValid] = useState(true);
-  const rightActions = props.rightActions || (action ? [action] : []);
-  const leftActions = props.leftActions || [];
+  const rightActions = props.rightActions
+    ? props.rightActions.filter((a) => !a.hidden)
+    : action && !action.hidden
+    ? [action]
+    : [];
+  const leftActions = props.leftActions
+    ? props.leftActions.filter((a) => !a.hidden)
+    : [];
 
   return (
     <Flex
@@ -146,7 +154,7 @@ function Field(props: FieldProps) {
           </Flex>
         )}
 
-        {rightActions.length > 0 ? (
+        {leftActions.length > 0 ? (
           <Flex
             sx={{
               position: "absolute",
@@ -160,6 +168,7 @@ function Field(props: FieldProps) {
           >
             {leftActions.map((action) => (
               <Button
+                id={action.id}
                 key={action.testId}
                 type="button"
                 variant={"secondary"}
@@ -189,6 +198,7 @@ function Field(props: FieldProps) {
         ) : null}
         {rightActions.length > 0 ? (
           <Flex
+            className="rightActions"
             sx={{
               position: "absolute",
               top: 0,
@@ -201,6 +211,7 @@ function Field(props: FieldProps) {
           >
             {rightActions.map((action) => (
               <Button
+                id={action.id}
                 key={action.testId}
                 type="button"
                 variant={"secondary"}
@@ -222,7 +233,7 @@ function Field(props: FieldProps) {
                 {action.component ? (
                   action.component
                 ) : action.icon ? (
-                  <action.icon size={20} />
+                  <action.icon size={16} />
                 ) : null}
               </Button>
             ))}

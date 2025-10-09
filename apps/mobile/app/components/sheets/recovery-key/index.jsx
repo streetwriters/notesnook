@@ -36,7 +36,7 @@ import {
 import { clearMessage } from "../../../services/message";
 import SettingsService from "../../../services/settings";
 import { eOpenRecoveryKeyDialog } from "../../../utils/events";
-import { SIZE } from "../../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 import DialogHeader from "../../dialog/dialog-header";
 import { Button } from "../../ui/button";
@@ -44,6 +44,7 @@ import Seperator from "../../ui/seperator";
 import SheetWrapper from "../../ui/sheet";
 import { QRCode } from "../../ui/svg/lazy";
 import Paragraph from "../../ui/typography/paragraph";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 class RecoveryKeySheet extends React.Component {
   constructor(props) {
@@ -223,7 +224,7 @@ class RecoveryKeySheet extends React.Component {
             width: "100%",
             backgroundColor: colors.primary.background,
             justifyContent: "space-between",
-            paddingHorizontal: 12,
+            paddingHorizontal: DefaultAppStyles.GAP,
             borderRadius: 10,
             paddingTop: 10
           }}
@@ -235,14 +236,14 @@ class RecoveryKeySheet extends React.Component {
 
           <View
             style={{
-              borderRadius: 5,
-              padding: 12,
-              marginTop: 10
+              borderRadius: defaultBorderRadius,
+              padding: DefaultAppStyles.GAP,
+              marginTop: DefaultAppStyles.GAP_VERTICAL
             }}
           >
             <Paragraph
               color={colors.primary.paragraph}
-              size={SIZE.sm}
+              size={AppFontSize.sm}
               numberOfLines={2}
               selectable
               style={{
@@ -294,7 +295,6 @@ class RecoveryKeySheet extends React.Component {
             title={strings.copyToClipboard()}
             width="100%"
             type="secondaryAccented"
-            fontSize={SIZE.md}
           />
           <Seperator />
           <Button
@@ -302,7 +302,6 @@ class RecoveryKeySheet extends React.Component {
             onPress={this.saveQRCODE}
             width="100%"
             type="secondaryAccented"
-            fontSize={SIZE.md}
             icon="qrcode"
           />
           <Seperator />
@@ -312,7 +311,6 @@ class RecoveryKeySheet extends React.Component {
             width="100%"
             type="secondaryAccented"
             icon="text"
-            fontSize={SIZE.md}
           />
           <Seperator />
 
@@ -322,13 +320,12 @@ class RecoveryKeySheet extends React.Component {
             width="100%"
             type="secondaryAccented"
             icon="cloud"
-            fontSize={SIZE.md}
           />
           <Seperator />
 
           <Paragraph
             color={colors.secondary.paragraph}
-            size={SIZE.sm}
+            size={AppFontSize.sm}
             numberOfLines={2}
             style={{
               width: "100%",
@@ -343,7 +340,6 @@ class RecoveryKeySheet extends React.Component {
             title={strings.done()}
             width="100%"
             type="error"
-            fontSize={SIZE.md}
             onPress={this.close}
           />
         </View>

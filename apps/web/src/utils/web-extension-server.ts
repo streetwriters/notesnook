@@ -23,8 +23,7 @@ import {
   NotebookReference,
   Server,
   Clip
-} from "@notesnook/web-clipper/dist/common/bridge";
-import { isUserPremium } from "../hooks/use-is-user-premium";
+} from "@notesnook/web-clipper/common/bridge.js";
 import { store as appstore } from "../stores/app-store";
 import { h } from "./html";
 import { sanitizeFilename } from "@notesnook/common";
@@ -39,7 +38,7 @@ export class WebExtensionServer implements Server {
     const user = await db.user.getUser();
     const theme = colorScheme === "dark" ? darkTheme : lightTheme;
     if (!user) return { pro: false, theme };
-    return { email: user.email, pro: isUserPremium(user), theme };
+    return { email: user.email, pro: true, theme };
   }
 
   async getNotes(): Promise<ItemReference[] | undefined> {

@@ -40,3 +40,10 @@ test("save toolbar config", () =>
     await db.settings.setToolbarConfig("mobile", toolbarConfig);
     expect(db.settings.getToolbarConfig("mobile")).toMatchObject(toolbarConfig);
   }));
+
+test("save trash cleanup interval", () =>
+  databaseTest().then(async (db) => {
+    const interval = 7;
+    await db.settings.setTrashCleanupInterval(interval);
+    expect(db.settings.getTrashCleanupInterval()).toBe(interval);
+  }));

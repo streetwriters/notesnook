@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import React, { useEffect } from "react";
+import React from "react";
 import { View } from "react-native";
 import { KeyboardAwareFlatList } from "react-native-keyboard-aware-scroll-view";
 import Animated, { FadeInDown } from "react-native-reanimated";
@@ -26,7 +26,6 @@ import DelayLayout from "../../components/delay-layout";
 import { Header } from "../../components/header";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import useNavigationStore from "../../stores/use-navigation-store";
-import { tabBarRef } from "../../utils/global-refs";
 import { components } from "./components";
 import { SectionItem } from "./section-item";
 import { RouteParams, SettingSection } from "./types";
@@ -42,16 +41,10 @@ const Group = ({
 }: NativeStackScreenProps<RouteParams, "SettingsGroup">) => {
   useNavigationFocus(navigation, {
     onFocus: () => {
-      tabBarRef.current?.lock();
       useNavigationStore.getState().setFocusedRouteId("Settings");
       return false;
     }
   });
-  useEffect(() => {
-    return () => {
-      tabBarRef.current?.unlock();
-    };
-  }, []);
   const renderItem = ({ item }: { item: SettingSection; index: number }) => (
     <SectionItem item={item} />
   );
@@ -66,7 +59,7 @@ const Group = ({
           id="Settings"
         />
       )}
-      <DelayLayout type="settings" delay={1}>
+      <DelayLayout type="settings" delay={0}>
         <View
           style={{
             flex: 1
@@ -75,7 +68,6 @@ const Group = ({
           {route.params.component ? components[route.params.component] : null}
           {route.params.sections ? (
             <AnimatedKeyboardAvoidingFlatList
-              entering={FadeInDown}
               data={route.params.sections}
               keyExtractor={keyExtractor}
               renderItem={renderItem}

@@ -31,6 +31,8 @@ import { tmpdir } from "os";
 import { getId } from "../../src/utils/id.js";
 import { existsSync, mkdirSync } from "fs";
 import * as betterTrigram from "sqlite-better-trigram";
+import * as fts5Html from "sqlite3-fts5-html";
+import { getLoadablePath } from "sqlite-regex";
 
 const TEST_NOTEBOOK: Partial<Notebook> = {
   title: "Test Notebook",
@@ -55,6 +57,7 @@ function databaseTest(type: "memory" | "persistent" = "memory") {
     eventsource: EventSource,
     fs: FS,
     compressor: async () => Compressor,
+    maxNoteVersions: async () => 1000,
     sqliteOptions: {
       dialect: (name) =>
         new SqliteDialect({
@@ -65,6 +68,8 @@ function databaseTest(type: "memory" | "persistent" = "memory") {
     batchSize: 500
   });
   betterTrigram.load(betterSqliteDb);
+  fts5Html.load(betterSqliteDb);
+  betterSqliteDb.loadExtension(getLoadablePath());
   return db.init().then(() => db);
 }
 

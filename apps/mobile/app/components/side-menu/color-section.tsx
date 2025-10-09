@@ -18,22 +18,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Color } from "@notesnook/core";
-import { useThemeColors } from "@notesnook/theme";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { View } from "react-native";
 import { db } from "../../common/database";
 import { ColoredNotes } from "../../screens/notes/colored";
 import Navigation from "../../services/navigation";
 import { useMenuStore } from "../../stores/use-menu-store";
-import useNavigationStore from "../../stores/use-navigation-store";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { SIZE, normalize } from "../../utils/size";
+import { SideMenuItem } from "../../utils/menu-items";
 import ReorderableList from "../list/reorderable-list";
 import { Properties } from "../properties";
-import { Pressable } from "../ui/pressable";
-import Heading from "../ui/typography/heading";
-import Paragraph from "../ui/typography/paragraph";
 import { useSideBarDraggingStore } from "./dragging-store";
+import { MenuItem } from "./menu-item";
 
 export const ColorSection = React.memo(
   function ColorSection() {
@@ -54,6 +50,54 @@ export const ColorSection = React.memo(
       }
     }, [loading, setColorNotes]);
 
+    const onPress = React.useCallback((item: SideMenuItem) => {
+      ColoredNotes.navigate(item.data as Color, false);
+      setImmediate(() => {
+        Navigation.closeDrawer();
+      });
+    }, []);
+
+    const onLongPress = React.useCallback((item: SideMenuItem) => {
+      if (useSideBarDraggingStore.getState().dragging) return;
+      Properties.present(item.data as Color);
+    }, []);
+
+    const renderIcon = React.useCallback((item: SideMenuItem, size: number) => {
+      return (
+        <View
+          style={{
+            width: size,
+            height: size,
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+        >
+          <View
+            style={{
+              width: size - 5,
+              height: size - 5,
+              backgroundColor: (item.data as Color).colorCode,
+              borderRadius: 100
+            }}
+          />
+        </View>
+      );
+    }, []);
+
+    const menuItems = useMemo(
+      () =>
+        colorNotes.map((item) => ({
+          id: item.id,
+          title: item.title,
+          icon: "circle",
+          dataType: "color",
+          data: item,
+          onPress: onPress,
+          onLongPress: onLongPress
+        })) as SideMenuItem[],
+      [colorNotes, onPress, onLongPress]
+    );
+
     return (
       <ReorderableList
         onListOrderChanged={(data) => {
@@ -66,103 +110,16 @@ export const ColorSection = React.memo(
         itemOrder={order}
         hiddenItems={hiddensItems}
         alwaysBounceVertical={false}
-        data={colorNotes}
+        data={menuItems}
         style={{
           width: "100%"
         }}
         showsVerticalScrollIndicator={false}
         renderDraggableItem={({ item }) => {
-          return <ColorItem key={item.id} item={item} />;
+          return <MenuItem item={item} renderIcon={renderIcon} />;
         }}
       />
     );
   },
   () => true
-);
-
-const ColorItem = React.memo(
-  function ColorItem({ item }: { item: Color }) {
-    const { colors, isDark } = useThemeColors();
-    const isFocused = useNavigationStore(
-      (state) => state.focusedRouteId === item.id
-    );
-
-    const onPress = (item: Color) => {
-      ColoredNotes.navigate(item, false);
-
-      setImmediate(() => {
-        Navigation.closeDrawer();
-      });
-    };
-
-    const onLongPress = () => {
-      if (useSideBarDraggingStore.getState().dragging) return;
-      Properties.present(item);
-    };
-
-    return (
-      <Pressable
-        customColor={isFocused ? "rgba(0,0,0,0.04)" : "transparent"}
-        onLongPress={onLongPress}
-        customSelectedColor={item.colorCode}
-        customAlpha={!isDark ? -0.02 : 0.02}
-        customOpacity={0.12}
-        onPress={() => onPress(item)}
-        style={{
-          width: "100%",
-          alignSelf: "center",
-          borderRadius: 5,
-          flexDirection: "row",
-          paddingHorizontal: 8,
-          justifyContent: "space-between",
-          alignItems: "center",
-          height: normalize(50),
-          marginBottom: 5
-        }}
-      >
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center"
-          }}
-        >
-          <View
-            style={{
-              width: 30,
-              justifyContent: "center",
-              alignItems: "flex-start"
-            }}
-          >
-            <View
-              style={{
-                width: SIZE.lg - 2,
-                height: SIZE.lg - 2,
-                backgroundColor: item.colorCode,
-                borderRadius: 100,
-                justifyContent: "center",
-                marginRight: 10
-              }}
-            />
-          </View>
-          {isFocused ? (
-            <Heading color={colors.selected.heading} size={SIZE.md}>
-              {item.title}
-            </Heading>
-          ) : (
-            <Paragraph color={colors.primary.paragraph} size={SIZE.md}>
-              {item.title}
-            </Paragraph>
-          )}
-        </View>
-      </Pressable>
-    );
-  },
-  (prev, next) => {
-    if (!next.item) return false;
-    if (prev.item?.title !== next.item.title) return false;
-    if (prev.item?.dateModified !== next.item?.dateModified) return false;
-    if (prev.item?.id !== next.item?.id) return false;
-
-    return true;
-  }
 );

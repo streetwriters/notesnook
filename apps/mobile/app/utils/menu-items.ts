@@ -17,51 +17,78 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { Item, ItemType } from "@notesnook/core";
 import { Monographs } from "../screens/notes/monographs";
-export const MenuItemsList = [
+import Navigation from "../services/navigation";
+
+export type SideMenuItem = {
+  dataType?: ItemType | "monograph";
+  data?: Item;
+  title: string;
+  id: string;
+  icon: string;
+  onPress?: (item: SideMenuItem) => void;
+  onLongPress?: (item: SideMenuItem) => void;
+  type: string;
+};
+
+export const MenuItemsList: SideMenuItem[] = [
   {
-    id: "notes",
-    name: "Notes",
-    icon: "home-variant-outline",
-    close: true
+    dataType: "note",
+    id: "Notes",
+    title: "Notes",
+    icon: "note-outline",
+    type: "side-menu-item"
   },
+  // {
+  //   dataType: "notebook",
+  //   id: "Notebooks",
+  //   title: "Notebooks",
+  //   icon: "book-outline"
+  // },
   {
-    id: "notebooks",
-    name: "Notebooks",
-    icon: "book-outline",
-    close: true
-  },
-  {
-    id: "favorites",
-    name: "Favorites",
+    dataType: "note",
+    id: "Favorites",
+    title: "Favorites",
     icon: "star-outline",
-    close: true
+    type: "side-menu-item"
   },
+  // {
+  //   dataType: "tag",
+  //   id: "Tags",
+  //   title: "Tags",
+  //   icon: "pound"
+  // },
   {
-    id: "tags",
-    name: "Tags",
-    icon: "pound",
-    close: true
-  },
-  {
-    id: "reminders",
-    name: "Reminders",
+    dataType: "reminder",
+    id: "Reminders",
+    title: "Reminders",
     icon: "bell",
-    close: true
+    type: "side-menu-item"
   },
   {
-    id: "monographs",
-    name: "Monographs",
+    dataType: "monograph",
+    id: "Monographs",
+    title: "Monographs",
     icon: "text-box-multiple-outline",
-    close: true,
-    func: () => {
+    onPress: () => {
+      Navigation.closeDrawer();
       Monographs.navigate();
-    }
+    },
+    type: "side-menu-item"
   },
   {
-    id: "trash",
-    name: "Trash",
+    dataType: "note",
+    id: "Archive",
+    title: "Archive",
+    icon: "archive",
+    type: "side-menu-item"
+  },
+  {
+    dataType: "note",
+    id: "Trash",
+    title: "Trash",
     icon: "delete-outline",
-    close: true
+    type: "side-menu-item"
   }
 ];

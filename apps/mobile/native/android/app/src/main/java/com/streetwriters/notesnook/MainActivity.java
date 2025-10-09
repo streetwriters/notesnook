@@ -3,8 +3,16 @@ package com.streetwriters.notesnook;
 import com.facebook.react.ReactActivity;
 import android.content.Intent;
 import android.content.res.Configuration;
+import androidx.core.graphics.Insets;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.webkit.WebView;
+
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
 import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactActivityDelegate;
@@ -22,6 +30,20 @@ public class MainActivity extends ReactActivity {
     try {
       startService(new Intent(getBaseContext(), OnClearFromRecentService.class));
     } catch (Exception ignored) {}
+
+    if (Build.VERSION.SDK_INT >= 35) {
+      final View rootView = findViewById(android.R.id.content);
+      ViewCompat.setOnApplyWindowInsetsListener(rootView, (v, insets) -> {
+        Insets innerPadding = insets.getInsets(WindowInsetsCompat.Type.ime());
+        rootView.setPadding(
+                innerPadding.left,
+                innerPadding.top,
+                innerPadding.right,
+                innerPadding.bottom
+        );
+        return insets;
+      });
+    }
   }
 
   /**

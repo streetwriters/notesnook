@@ -23,6 +23,7 @@ import { Text, TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useDBItem } from "../app/hooks/use-db-item";
 import { useShareStore } from "./store";
+import { defaultBorderRadius } from "../app/utils/size";
 
 export const AddNotebooks = ({ onPress }) => {
   const { colors } = useThemeColors();
@@ -39,7 +40,7 @@ export const AddNotebooks = ({ onPress }) => {
         borderWidth: 1,
         borderColor: colors.secondary.background,
         justifyContent: "center",
-        borderRadius: 5,
+        borderRadius: defaultBorderRadius,
         marginBottom: 10,
         paddingVertical: 10,
         paddingTop: 5

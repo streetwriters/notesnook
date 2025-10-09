@@ -17,22 +17,33 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Tests } from "./utils";
+import { TestBuilder } from "./utils";
 
 describe("APP LAUNCH AND NAVIGATION", () => {
   it("App should launch successfully & hide welcome screen", async () => {
-    await Tests.prepare();
+    await TestBuilder.create().prepare().run();
   });
 
   it("Basic navigation should work", async () => {
-    await Tests.prepare();
-    await Tests.navigate("Notebooks");
-    await Tests.navigate("Favorites");
-    await Tests.navigate("Trash");
-    await Tests.navigate("Tags");
-    await Tests.navigate("Settings");
-    await Tests.navigate("Monographs");
-    await Tests.navigate("Reminders");
-    await Tests.navigate("Notes");
+    await TestBuilder.create()
+      .prepare()
+      .navigate("Favorites")
+      .navigate("Reminders")
+      .navigate("Monographs")
+      .navigate("Trash")
+      .openSideMenu()
+      .waitAndTapById("sidemenu-settings-icon")
+      .wait(500)
+      .waitAndTapByText("Settings")
+      .isVisibleByText("Settings")
+      .pressBack(1)
+      .tapById("tab-notebooks")
+      .isVisibleByText("No notebooks")
+      .tapById("tab-tags")
+      .isVisibleByText("No tags")
+      .tapById("tab-home")
+      .tapByText("Notes")
+      .isVisibleByText("Search in Notes")
+      .run();
   });
 });

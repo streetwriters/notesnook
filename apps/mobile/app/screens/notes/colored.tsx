@@ -68,3 +68,5 @@ ColoredNotes.navigate = (item: Color, canGoBack: boolean) => {
     title: toCamelCase(item.title)
   });
 };
+
+export default ColoredNotes;

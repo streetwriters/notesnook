@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { createPersistedStore } from "../common/store";
 import { useStore as useNoteStore } from "./note-store";
 import { store as appStore } from "./app-store";
-import { store as settingStore } from "./setting-store";
+import { useStore as useSettingStore } from "./setting-store";
 import { db } from "../common/db";
 import BaseStore from ".";
 import { EV, EVENTS } from "@notesnook/core";
@@ -44,15 +44,16 @@ import { getId } from "@notesnook/core";
 import { PersistStorage } from "zustand/middleware";
 import {
   getFormattedHistorySessionDate,
+  isFeatureAvailable,
   TabHistory,
   TabSessionHistory
 } from "@notesnook/common";
 import { isCipher } from "@notesnook/core";
-import { hashNavigate } from "../navigation";
 import { AppEventManager, AppEvents } from "../common/app-events";
 import Vault from "../common/vault";
 import { Mutex } from "async-mutex";
 import { useEditorManager } from "../components/editor/manager";
+import { Context } from "../components/list-container/types";
 
 export enum SaveState {
   NotSaved = -1,
@@ -84,6 +85,14 @@ export type BaseEditorSession = {
    * The id of block to scroll to after opening the session successfully.
    */
   activeBlockId?: string;
+  /**
+   * The id of search result to scroll to after opening the session successfully.
+   */
+  activeSearchResultId?: string;
+  /**
+   * Used for force refreshing a session.
+   */
+  nonce?: number;
 };
 
 export type LockedEditorSession = BaseEditorSession & {
@@ -98,6 +107,7 @@ export type ReadonlyEditorSession = BaseEditorSession & {
   color?: string;
   tags?: Tag[];
   locked?: boolean;
+  attachmentsLength?: number;
 };
 
 export type DeletedEditorSession = BaseEditorSession & {
@@ -165,7 +175,8 @@ export type DocumentPreview = {
 export function isLockedSession(session: EditorSession): boolean {
   return (
     session.type === "locked" ||
-    (session.type === "default" && !!session.locked) ||
+    ((session.type === "default" || session.type === "readonly") &&
+      !!session.locked) ||
     ("content" in session &&
       !!session.content &&
       "locked" in session.content &&
@@ -229,6 +240,15 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   init = () => {
+    useSettingStore.subscribe(
+      (s) => s.hideNoteTitle,
+      (state) => {
+        setDocumentTitle(
+          state ? this.get().getActiveSession()?.title : undefined
+        );
+      }
+    );
+
     EV.subscribe(EVENTS.userLoggedOut, () => {
       const { closeTabs, tabs } = this.get();
       closeTabs(...tabs.map((s) => s.id));
@@ -333,7 +353,8 @@ class EditorStore extends BaseStore<EditorStore> {
     db.eventManager.subscribe(
       EVENTS.databaseUpdated,
       async (event: DatabaseUpdatedEvent) => {
-        const { sessions, openSession, closeTabs, updateSession } = this.get();
+        const { sessions, openSession, closeTabs, updateSession, tabs } =
+          this.get();
         const clearIds: string[] = [];
         if (event.collection === "notes") {
           // when a note is permanently deleted from trash
@@ -342,7 +363,9 @@ class EditorStore extends BaseStore<EditorStore> {
               ...sessions
                 .filter(
                   (session) =>
-                    "note" in session && event.ids.includes(session.note.id)
+                    "note" in session &&
+                    event.ids.includes(session.note.id) &&
+                    tabs.some((tab) => tab.sessionId === session.id)
                 )
                 .map((s) => s.tabId)
             );
@@ -367,7 +390,11 @@ class EditorStore extends BaseStore<EditorStore> {
                 session.type !== "deleted" &&
                 event.item.type === "trash"
               ) {
-                clearIds.push(session.tabId);
+                for (const tab of tabs) {
+                  if (tab.sessionId === session.id) {
+                    clearIds.push(session.tabId);
+                  }
+                }
               } else {
                 updateSession(session.id, [session.type], (session) => {
                   session.note.pinned =
@@ -376,6 +403,8 @@ class EditorStore extends BaseStore<EditorStore> {
                     event.item.localOnly ?? session.note.localOnly;
                   session.note.favorite =
                     event.item.favorite ?? session.note.favorite;
+                  session.note.archived =
+                    event.item.archived ?? session.note.archived;
                   session.note.dateEdited =
                     event.item.dateEdited ?? session.note.dateEdited;
                 });
@@ -547,8 +576,6 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   activateSession = (id?: string, activeBlockId?: string, silent?: boolean) => {
-    if (!id) hashNavigate(`/`, { replace: true, notify: false });
-
     const session = this.get().sessions.find((s) => s.id === id);
     if (!session) id = undefined;
 
@@ -559,7 +586,7 @@ class EditorStore extends BaseStore<EditorStore> {
 
     if (
       id &&
-      !settingStore.get().hideNoteTitle &&
+      !useSettingStore.getState().hideNoteTitle &&
       session &&
       "note" in session
     ) {
@@ -567,12 +594,6 @@ class EditorStore extends BaseStore<EditorStore> {
     } else setDocumentTitle();
 
     AppEventManager.publish(AppEvents.toggleEditor, true);
-
-    if (id) {
-      if (session?.type === "new")
-        hashNavigate(`/notes/${id}/create`, { replace: true, notify: false });
-      else hashNavigate(`/notes/${id}/edit`, { replace: true, notify: false });
-    }
 
     if (activeBlockId && session)
       this.updateSession(session.id, [session.type], {
@@ -659,6 +680,8 @@ class EditorStore extends BaseStore<EditorStore> {
       activeBlockId?: string;
       silent?: boolean;
       openInNewTab?: boolean;
+      rawContent?: string;
+      activeSearchResultId?: string;
     } = {}
   ): Promise<void> => {
     const {
@@ -675,9 +698,12 @@ class EditorStore extends BaseStore<EditorStore> {
     const noteId = typeof noteOrId === "string" ? noteOrId : noteOrId.id;
     const oldTabForNote = options.force ? null : getTabsForNote(noteId).at(0);
     const activeTab = getActiveTab();
+    const isReactivatingTab =
+      options.force && getTabsForNote(noteId).some((t) => t.id === activeTabId);
     const tabId =
       // if a tab is pinned then always open a new tab.
-      options.openInNewTab || activeTab?.pinned
+      options.openInNewTab ||
+      (activeTab?.pinned && !oldTabForNote && !isReactivatingTab)
         ? addTab(getId())
         : oldTabForNote?.id || activeTabId || addTab(getId());
 
@@ -748,7 +774,7 @@ class EditorStore extends BaseStore<EditorStore> {
           activeBlockId: options.activeBlockId,
           tabId
         },
-        options.silent
+        options
       );
     } else if (isLocked && note.type !== "trash") {
       this.addSession(
@@ -759,7 +785,7 @@ class EditorStore extends BaseStore<EditorStore> {
           activeBlockId: options.activeBlockId,
           tabId
         },
-        options.silent
+        options
       );
     } else {
       const content = note.contentId
@@ -779,9 +805,10 @@ class EditorStore extends BaseStore<EditorStore> {
             id: sessionId,
             content,
             activeBlockId: options.activeBlockId,
+            activeSearchResultId: options.activeSearchResultId,
             tabId
           },
-          options.silent
+          options
         );
       } else {
         const attachmentsLength = await db.attachments
@@ -795,13 +822,18 @@ class EditorStore extends BaseStore<EditorStore> {
               type: "readonly",
               note,
               id: sessionId,
-              content,
+              content:
+                options.rawContent && content
+                  ? { data: options.rawContent, type: content.type }
+                  : content,
               color: colors[0]?.fromId,
               tags,
               activeBlockId: options.activeBlockId,
-              tabId
+              activeSearchResultId: options.activeSearchResultId,
+              tabId,
+              attachmentsLength
             },
-            options.silent
+            options
           );
         } else {
           this.addSession(
@@ -814,15 +846,31 @@ class EditorStore extends BaseStore<EditorStore> {
               attachmentsLength,
               tags,
               color: colors[0]?.fromId,
-              content,
+              content:
+                options.rawContent && content
+                  ? { ...content, data: options.rawContent }
+                  : content,
               activeBlockId: options.activeBlockId,
+              activeSearchResultId: options.activeSearchResultId,
               tabId
             },
-            options.silent
+            options
           );
         }
       }
     }
+  };
+
+  openSessionInTab = async (noteId: string, tabId: string) => {
+    const { tabs } = this.get();
+    const tab = tabs.find((t) => t.id === tabId);
+    if (!tab) {
+      this.openSession(noteId, { openInNewTab: true });
+      return;
+    }
+
+    this.focusTab(tabId);
+    this.openSession(noteId, { force: true });
   };
 
   focusNextTab = () => {
@@ -841,6 +889,16 @@ class EditorStore extends BaseStore<EditorStore> {
     const index = tabs.findIndex((s) => s.id === activeTabId);
     if (index === -1) return;
     return this.focusTab(tabs[index === 0 ? tabs.length - 1 : index - 1].id);
+  };
+
+  focusLastActiveTab = () => {
+    const { tabs, history, focusTab } = this.get();
+    if (tabs.length < 2 || history.length < 2) return;
+
+    const previousTab = history.at(-2);
+    if (!previousTab) return;
+
+    focusTab(previousTab);
   };
 
   goBack = async () => {
@@ -892,15 +950,20 @@ class EditorStore extends BaseStore<EditorStore> {
     }
   };
 
-  addSession = (session: EditorSession, silent = false) => {
+  addSession = (
+    session: EditorSession,
+    options?: { force?: boolean; silent?: boolean }
+  ) => {
     this.set((state) => {
       const index = state.sessions.findIndex((s) => s.id === session.id);
       if (index > -1) {
+        if (options?.force)
+          session.nonce = (state.sessions[index]?.nonce || 0) + 1;
         state.sessions[index] = session;
       } else state.sessions.push(session);
     });
 
-    this.activateSession(session.id, undefined, silent);
+    this.activateSession(session.id, undefined, options?.silent);
   };
 
   saveSession = async (
@@ -910,8 +973,8 @@ class EditorStore extends BaseStore<EditorStore> {
       ignoreEdit?: boolean;
     }
   ) => {
-    const currentSession = this.getSession(id, ["new", "default"]);
-    if (!currentSession) return;
+    const session = this.getSession(id, ["new", "default"]);
+    if (!session) return;
 
     // do not allow saving of readonly session
     if (partial.note?.readonly) return;
@@ -919,6 +982,13 @@ class EditorStore extends BaseStore<EditorStore> {
     await saveMutex.runExclusive(async () => {
       this.setSaveState(id, 0);
       try {
+        // Get session again as it might have changed to default.
+        const currentSession =
+          session.type === "new"
+            ? this.getSession(id, ["new", "default"])
+            : session;
+
+        if (!currentSession) return;
         const sessionId = getSessionId(currentSession);
         let noteId =
           "note" in currentSession ? currentSession.note.id : partial.note?.id;
@@ -959,20 +1029,9 @@ class EditorStore extends BaseStore<EditorStore> {
 
         if (currentSession.type === "new") {
           const context = useNoteStore.getState().context;
-          if (context) {
-            const { type } = context;
-            if (type === "notebook")
-              await db.notes.addToNotebook(context.id, note.id);
-            else if (type === "color" || type === "tag")
-              await db.relations.add(
-                { type, id: context.id },
-                { id: note.id, type: "note" }
-              );
-          } else {
-            const defaultNotebook = db.settings.getDefaultNotebook();
-            if (defaultNotebook)
-              await db.notes.addToNotebook(defaultNotebook, note.id);
-          }
+          await addNotebook(note, context);
+          await addTag(note, context);
+          await addColor(note, context);
         }
 
         const attachmentsLength = await db.attachments
@@ -1025,7 +1084,7 @@ class EditorStore extends BaseStore<EditorStore> {
         }
 
         setDocumentTitle(
-          settingStore.get().hideNoteTitle ? undefined : note.title
+          useSettingStore.getState().hideNoteTitle ? undefined : note.title
         );
         this.setSaveState(id, SaveState.Saved);
       } catch (err) {
@@ -1038,8 +1097,8 @@ class EditorStore extends BaseStore<EditorStore> {
         this.setSaveState(id, SaveState.NotSaved);
         console.error(err);
         if (err instanceof Error) logger.error(err);
-        if (isLockedSession(currentSession) && "note" in currentSession) {
-          this.get().openSession(currentSession.note, { force: true });
+        if (isLockedSession(session) && "note" in session) {
+          this.get().openSession(session.note, { force: true });
         }
       }
     });
@@ -1092,6 +1151,15 @@ class EditorStore extends BaseStore<EditorStore> {
   closeAllTabs = () => {
     const { tabs } = this.get();
     this.closeTabs(...tabs.map((t) => t.id));
+  };
+
+  closeNotes = (...noteIds: string[]) => {
+    const { getTabsForNote, closeTabs } = this.get();
+    const tabs = noteIds
+      .map((id) => getTabsForNote(id))
+      .flat()
+      .map((t) => t.id);
+    closeTabs(...tabs);
   };
 
   closeTabs = (...ids: string[]) => {
@@ -1154,18 +1222,21 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   toggleProperties = (toggleState?: boolean) => {
-    this.set(
-      (state) =>
-        (state.arePropertiesVisible =
-          toggleState !== undefined ? toggleState : !state.arePropertiesVisible)
-    );
+    this.set((state) => {
+      state.arePropertiesVisible =
+        toggleState !== undefined ? toggleState : !state.arePropertiesVisible;
+    });
+    this.toggleTableOfContents(false);
   };
 
   toggleTableOfContents = (toggleState?: boolean) => {
-    const { isTOCVisible } = this.get();
+    const { isTOCVisible, arePropertiesVisible } = this.get();
     const isTOCVisibleState =
       toggleState !== undefined ? toggleState : !isTOCVisible;
-    this.set({ isTOCVisible: isTOCVisibleState });
+    this.set({
+      isTOCVisible: isTOCVisibleState,
+      arePropertiesVisible: isTOCVisibleState ? false : arePropertiesVisible
+    });
     Config.set("editor:toc", isTOCVisibleState);
   };
 
@@ -1222,7 +1293,7 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   pinTab = (tabId: string) => {
-    const { tabs: _tabs, activeTabId } = this.get();
+    const { tabs: _tabs } = this.get();
     const tabs = _tabs.slice();
     const index = tabs.findIndex((t) => t.id === tabId);
     if (index === -1) return;
@@ -1303,4 +1374,48 @@ async function waitForSync() {
   return new Promise((resolve) => {
     db.eventManager.subscribe(EVENTS.syncCompleted, resolve, true);
   });
+}
+
+async function addNotebook(note: Note, context?: Context) {
+  const defaultNotebook = db.settings.getDefaultNotebook();
+  if (
+    context?.type !== "notebook" &&
+    defaultNotebook &&
+    !(await isFeatureAvailable("defaultNotebookAndTag")).isAllowed
+  )
+    return;
+
+  const notebookId =
+    context?.type === "notebook" ? context.id : defaultNotebook;
+  if (!notebookId) return;
+
+  await db.notes.addToNotebook(notebookId, note.id);
+}
+
+async function addTag(note: Note, context?: Context) {
+  const defaultTag = db.settings.getDefaultTag();
+  if (
+    context?.type !== "tag" &&
+    defaultTag &&
+    !(await isFeatureAvailable("defaultNotebookAndTag")).isAllowed
+  )
+    return;
+
+  const tagId = context?.type === "tag" ? context.id : defaultTag;
+  if (!tagId) return;
+
+  await db.relations.add(
+    { type: "tag", id: tagId },
+    { type: "note", id: note.id }
+  );
+}
+
+async function addColor(note: Note, context?: Context) {
+  const colorId = context && context.type === "color" ? context.id : undefined;
+  if (!colorId) return;
+
+  await db.relations.add(
+    { type: "color", id: colorId },
+    { type: "note", id: note.id }
+  );
 }

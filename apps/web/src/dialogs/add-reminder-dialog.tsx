@@ -26,17 +26,17 @@ import { useRef, useState } from "react";
 import { db } from "../common/db";
 import { useStore } from "../stores/reminder-store";
 import { showToast } from "../utils/toast";
-import { useIsUserPremium } from "../hooks/use-is-user-premium";
 import { Calendar, Pro } from "../components/icons";
 import { usePersistentState } from "../hooks/use-persistent-state";
 import { DayPicker } from "../components/day-picker";
 import { PopupPresenter } from "@notesnook/ui";
 import { useStore as useThemeStore } from "../stores/theme-store";
-import { getFormattedDate } from "@notesnook/common";
+import { getFormattedDate, useIsFeatureAvailable } from "@notesnook/common";
 import { MONTHS_FULL, getTimeFormat } from "@notesnook/core";
 import { Note, Reminder } from "@notesnook/core";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
+import { checkFeature } from "../common";
 
 dayjs.extend(customParseFormat);
 
@@ -74,8 +74,7 @@ const modes = [
   },
   {
     id: Modes.REPEAT,
-    title: "Repeat",
-    premium: true
+    title: "Repeat"
   }
 ];
 const priorities = [
@@ -140,9 +139,9 @@ export const AddReminderDialog = DialogManager.register(
     );
     const [showCalendar, setShowCalendar] = useState(false);
     const refresh = useStore((state) => state.refresh);
-    const isUserPremium = useIsUserPremium();
     const theme = useThemeStore((store) => store.colorScheme);
     const dateInputRef = useRef<HTMLInputElement>(null);
+    const repeatModeAvailability = useIsFeatureAvailable("recurringReminders");
 
     const repeatsDaily =
       (selectedDays.length === 7 && recurringMode === RecurringModes.WEEK) ||
@@ -156,6 +155,7 @@ export const AddReminderDialog = DialogManager.register(
         testId="add-reminder-dialog"
         onClose={() => props.onClose(false)}
         sx={{ fontFamily: "body" }}
+        width={600}
         positiveButton={{
           text: reminder ? strings.save() : strings.add(),
           disabled:
@@ -248,17 +248,18 @@ export const AddReminderDialog = DialogManager.register(
                 name="mode"
                 defaultChecked={m.id === Modes.ONCE}
                 checked={m.id === mode}
-                disabled={m.premium && !isUserPremium}
+                disabled={
+                  m.id === "repeat" && !repeatModeAvailability?.isAllowed
+                }
                 sx={{ color: m.id === mode ? "accent" : "icon" }}
-                onChange={() => {
-                  if (m.premium && !isUserPremium) return;
+                onChange={async () => {
                   setMode(m.id);
                   setRecurringMode(RecurringModes.DAY);
                   setSelectedDays([]);
                 }}
               />
               {strings.reminderModes(m.id)}
-              {m.premium && !isUserPremium && (
+              {m.id === "repeat" && !repeatModeAvailability?.isAllowed && (
                 <Pro size={18} color="accent" sx={{ ml: 1 }} />
               )}
             </Label>
@@ -507,6 +508,10 @@ export const AddReminderDialog = DialogManager.register(
         )}
       </Dialog>
     );
+  },
+  {
+    onBeforeOpen: (props) =>
+      props.reminder ? true : checkFeature("activeReminders")
   }
 );
 
