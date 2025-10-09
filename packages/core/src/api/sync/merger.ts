@@ -181,7 +181,7 @@ export async function handleInboxItems(
           cipher: item.cipher,
           format: "base64",
           length: item.length,
-          salt: ""
+          salt: item.salt
         }
       );
       const parsed = JSON.parse(decryptedItem) as ParsedInboxItem;
