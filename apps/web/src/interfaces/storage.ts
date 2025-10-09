@@ -25,7 +25,12 @@ import {
   IKVStore
 } from "./key-value";
 import { NNCrypto } from "./nncrypto";
-import type { Cipher, SerializedKey } from "@notesnook/crypto";
+import type {
+  AsymmetricCipher,
+  Cipher,
+  SerializedKey,
+  SerializedKeyPair
+} from "@notesnook/crypto";
 import { isFeatureSupported } from "../utils/feature-check";
 import { IKeyStore } from "./key-store";
 import { User } from "@notesnook/core";
@@ -161,8 +166,8 @@ export class NNStorage implements IStorage {
   }
 
   decryptAsymmetric(
-    keyPair: { publicKey: string; privateKey: string },
-    cipherData: Cipher<"base64">
+    keyPair: SerializedKeyPair,
+    cipherData: AsymmetricCipher<"base64">
   ): Promise<string> {
     cipherData.format = "base64";
     return NNCrypto.decryptAsymmetric(keyPair, cipherData, "base64");

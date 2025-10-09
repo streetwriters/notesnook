@@ -52,3 +52,20 @@ export type SyncTransferItem = {
 export type SyncInboxItem = Omit<SyncItem, "format" | "salt"> & {
   key: Omit<Cipher<"base64">, "format" | "salt" | "iv">;
 };
+
+export type ParsedInboxItem = {
+  title: string;
+  pinned?: boolean;
+  favorite?: boolean;
+  readonly?: boolean;
+  archived?: boolean;
+  notebookIds?: string[];
+  tagIds?: string[];
+  type: "note";
+  source: string;
+  version: 1;
+  content?: {
+    type: "html";
+    data: string;
+  };
+};

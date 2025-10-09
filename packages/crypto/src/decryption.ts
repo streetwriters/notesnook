@@ -19,12 +19,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { base64_variants, ISodium } from "@notesnook/sodium";
 import KeyUtils from "./keyutils.js";
-import { Cipher, Output, DataFormat, SerializedKey } from "./types.js";
+import {
+  Cipher,
+  Output,
+  DataFormat,
+  SerializedKey,
+  SerializedKeyPair,
+  AsymmetricCipher
+} from "./types.js";
 
 export default class Decryption {
   private static transformInput(
     sodium: ISodium,
-    cipherData: Cipher<DataFormat>
+    cipherData: Cipher<DataFormat> | AsymmetricCipher<DataFormat>
   ): Uint8Array {
     let input: Uint8Array | null = null;
     if (
@@ -75,8 +82,8 @@ export default class Decryption {
 
   static decryptAsymmetric<TOutputFormat extends DataFormat>(
     sodium: ISodium,
-    keyPair: { publicKey: string; privateKey: string },
-    cipherData: Cipher<DataFormat>,
+    keyPair: SerializedKeyPair,
+    cipherData: AsymmetricCipher<DataFormat>,
     outputFormat: TOutputFormat = "text" as TOutputFormat
   ): Output<TOutputFormat> {
     const input = this.transformInput(sodium, cipherData);

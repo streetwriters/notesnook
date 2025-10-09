@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import {
+  AsymmetricCipher,
   Cipher,
   DataFormat,
   SerializedKey,
@@ -63,8 +64,8 @@ export interface IStorage {
     items: Cipher<"base64">[]
   ): Promise<string[]>;
   decryptAsymmetric(
-    keyPair: { publicKey: string; privateKey: string },
-    cipherData: Cipher<"base64">
+    keyPair: SerializedKeyPair,
+    cipherData: AsymmetricCipher<"base64">
   ): Promise<string>;
   deriveCryptoKey(credentials: SerializedKey): Promise<void>;
   hash(

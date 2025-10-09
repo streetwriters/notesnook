@@ -31,7 +31,8 @@ import {
   DataFormat,
   SerializedKey,
   SerializedKeyPair,
-  EncryptionKeyPair
+  EncryptionKeyPair,
+  AsymmetricCipher
 } from "./types.js";
 
 export class NNCrypto implements INNCrypto {
@@ -97,8 +98,8 @@ export class NNCrypto implements INNCrypto {
   }
 
   async decryptAsymmetric<TOutputFormat extends DataFormat>(
-    keyPair: { publicKey: string; privateKey: string },
-    cipherData: Cipher<DataFormat>,
+    keyPair: SerializedKeyPair,
+    cipherData: AsymmetricCipher<DataFormat>,
     outputFormat: TOutputFormat = "text" as TOutputFormat
   ): Promise<Output<TOutputFormat>> {
     await this.init();
