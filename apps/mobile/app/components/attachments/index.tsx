@@ -65,7 +65,7 @@ type RecheckerProgress = {
   filter: string;
 };
 
-interface RecheckerState extends State {
+interface RecheckerState {
   progress: {
     [key: string]: RecheckerProgress;
   };
@@ -135,9 +135,9 @@ export const AttachmentDialog = ({
   const { colors } = useThemeColors();
   const [attachments, setAttachments] =
     useState<VirtualizedGrouping<Attachment>>();
-  const attachmentSearchValue = useRef<string>();
+  const attachmentSearchValue = useRef<string>(undefined);
   const [loading, setLoading] = useState(true);
-  const searchTimer = useRef<NodeJS.Timeout>();
+  const searchTimer = useRef<NodeJS.Timeout>(undefined);
   const [currentFilter, setCurrentFilter] = useState("all");
   const rechecker = useRechecker((state) =>
     note ? state.progress[note.id] || {} : state.progress.all

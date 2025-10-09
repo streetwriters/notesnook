@@ -165,7 +165,7 @@ export const useActions = ({
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(
     db.shortcuts.exists(item.id)
   );
-  const processingId = useRef<"shareNote" | "copyContent">();
+  const processingId = useRef<"shareNote" | "copyContent">(undefined);
   const user = useUserStore((state) => state.user);
   const [notifPinned, setNotifPinned] = useState<DisplayedNotification>();
   const [defaultNotebook, setDefaultNotebook] = useState(

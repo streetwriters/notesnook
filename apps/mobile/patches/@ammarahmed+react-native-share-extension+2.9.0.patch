@@ -1,0 +1,36 @@
+diff --git a/node_modules/@ammarahmed/react-native-share-extension/android/src/main/java/chat/rocket/rnshareextension/ShareModule.kt b/node_modules/@ammarahmed/react-native-share-extension/android/src/main/java/chat/rocket/rnshareextension/ShareModule.kt
+index e7a681c..d3338e3 100644
+--- a/node_modules/@ammarahmed/react-native-share-extension/android/src/main/java/chat/rocket/rnshareextension/ShareModule.kt
++++ b/node_modules/@ammarahmed/react-native-share-extension/android/src/main/java/chat/rocket/rnshareextension/ShareModule.kt
+@@ -20,10 +20,10 @@ class ShareModule(reactContext: ReactApplicationContext?) :
+     override fun getName() = "ReactNativeShareExtension"
+ 
+     @ReactMethod
+-    fun close() = currentActivity?.finish()
++    fun close() = reactApplicationContext.currentActivity?.finish()
+ 
+     @ReactMethod
+-    fun data(promise: Promise) = promise.resolve(processIntent(currentActivity))
++    fun data(promise: Promise) = promise.resolve(processIntent(reactApplicationContext.currentActivity))
+ 
+     private fun processIntent(activity: Activity?): WritableArray {
+ 
+diff --git a/node_modules/@ammarahmed/react-native-share-extension/index.d.ts b/node_modules/@ammarahmed/react-native-share-extension/index.d.ts
+deleted file mode 100644
+index dec5cd7..0000000
+--- a/node_modules/@ammarahmed/react-native-share-extension/index.d.ts
++++ /dev/null
+@@ -1,13 +0,0 @@
+-declare module "react-native" {
+-  export namespace NativeModules {
+-    export namespace ReactNativeShareExtension {
+-      function data(): {
+-        type: string;
+-        value: string;
+-        [name: string]: string;
+-      }[] | undefined;
+-      function close(): void;
+-      function openURL(url: string): void;
+-    }
+-  }
+-}

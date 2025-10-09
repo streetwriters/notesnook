@@ -170,12 +170,12 @@ export const useEditor = (
   const saveCount = useRef(0);
   const lastContentChangeTime = useRef<Record<string, number>>({});
   const lock = useRef(false);
-  const currentLoadingNoteId = useRef<string>();
-  const lastTabFocused = useRef<string>();
+  const currentLoadingNoteId = useRef<string>(undefined);
+  const lastTabFocused = useRef<string>(undefined);
 
   const localTabState = useRef<LocalTabState>(new LocalTabState());
 
-  const blockIdRef = useRef<string>();
+  const blockIdRef = useRef<string>(undefined);
   const postMessage = useCallback(
     async <T>(type: string, data: T, tabId?: string, waitFor = 300) =>
       await post(

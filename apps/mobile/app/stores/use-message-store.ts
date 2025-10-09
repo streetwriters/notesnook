@@ -17,14 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { SubscriptionPlan, SubscriptionStatus, User } from "@notesnook/core";
+import { SubscriptionStatus, User } from "@notesnook/core";
 import { Platform } from "react-native";
 import { getVersion } from "react-native-device-info";
-import create, { State } from "zustand";
+import { create } from "zustand";
 import { db } from "../common/database";
 import { MMKV } from "../common/database/mmkv";
 import PremiumService from "../services/premium";
-export interface MessageStore extends State {
+export interface MessageStore {
   message: Message;
   setMessage: (message: Message) => void;
   announcements: Announcement[];

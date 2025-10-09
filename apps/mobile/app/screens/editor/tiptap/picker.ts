@@ -21,13 +21,14 @@ import Sodium from "@ammarahmed/react-native-sodium";
 import { isFeatureAvailable } from "@notesnook/common";
 import { isImage } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
+import DocumentPicker, {
+  DocumentPickerOptions,
+  DocumentPickerResponse,
+  keepLocalCopy
+} from "@react-native-documents/picker";
 import { basename } from "pathe";
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
-import DocumentPicker, {
-  DocumentPickerOptions,
-  DocumentPickerResponse
-} from "react-native-document-picker";
 import { Image, openCamera, openPicker } from "react-native-image-crop-picker";
 import { DatabaseLogger, db } from "../../../common/database";
 import filesystem from "../../../common/filesystem";
@@ -48,7 +49,7 @@ import { editorController, editorState } from "./utils";
 const showEncryptionSheet = (file: DocumentPickerResponse) => {
   presentSheet({
     title: strings.encryptingAttachment(),
-    paragraph: strings.encryptingAttachmentDesc(file.name),
+    paragraph: strings.encryptingAttachmentDesc(file.name || ""),
     icon: "attachment"
   });
 };
@@ -71,26 +72,35 @@ type PickerOptions = {
 
 const file = async (fileOptions: PickerOptions) => {
   try {
-    const options: DocumentPickerOptions<"ios"> = {
+    const options: DocumentPickerOptions = {
       mode: "import",
       allowMultiSelection: false
     };
-    if (Platform.OS === "ios") {
-      options.copyTo = "cachesDirectory";
-    }
     await db.attachments.generateKey();
 
     let file;
+    let fileCopyUri;
+    let fileName;
     try {
       useSettingStore.getState().setAppDidEnterBackgroundForAction(true);
-      file = await DocumentPicker.pick(options);
+      file = (await DocumentPicker.pick(options))[0];
+      fileName = file.name ?? "attachment_" + Date.now();
+      const result = await keepLocalCopy({
+        files: [
+          {
+            uri: file.uri,
+            fileName: fileName
+          }
+        ],
+        destination: "cachesDirectory"
+      });
+      fileCopyUri = result[0];
     } catch (e) {
       return;
     }
 
-    file = file[0];
-
-    let uri = Platform.OS === "ios" ? file.fileCopyUri || file.uri : file.uri;
+    let uri =
+      Platform.OS === "ios" ? fileCopyUri.sourceUri || file.uri : file.uri;
 
     const featureResult = await isFeatureAvailable("fileSize", file.size || 0);
     if (!featureResult.isAllowed) {
@@ -101,10 +111,10 @@ const file = async (fileOptions: PickerOptions) => {
       });
     }
 
-    if (file.copyError) {
+    if (fileCopyUri.status === "error") {
       ToastManager.show({
         heading: strings.failToOpen(),
-        message: file.copyError,
+        message: "Error copying file",
         type: "error",
         context: "global"
       });
@@ -122,7 +132,7 @@ const file = async (fileOptions: PickerOptions) => {
         uri,
         hash,
         file.type || "application/octet-stream",
-        file.name,
+        fileName,
         fileOptions
       ))
     ) {
@@ -139,7 +149,7 @@ const file = async (fileOptions: PickerOptions) => {
         editorController.current?.commands.insertImage(
           {
             hash: hash,
-            filename: file.name,
+            filename: fileName,
             mime: file.type || "application/octet-stream",
             size: file.size || 0,
             dataurl: (await db.attachments.read(hash, "base64")) as string,
@@ -151,7 +161,7 @@ const file = async (fileOptions: PickerOptions) => {
         editorController.current?.commands.insertAttachment(
           {
             hash: hash,
-            filename: file.name,
+            filename: fileName,
             mime: file.type || "application/octet-stream",
             size: file.size || 0,
             type: "file"

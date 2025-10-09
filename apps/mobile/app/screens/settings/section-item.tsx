@@ -26,9 +26,8 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, TextInput, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-//@ts-ignore
 import { FeatureResult, useIsFeatureAvailable } from "@notesnook/common";
-import { strings } from "@notesnook/intl";
+//@ts-ignore
 import ToggleSwitch from "toggle-switch-react-native";
 import PaywallSheet from "../../components/sheets/paywall";
 import { IconButton } from "../../components/ui/icon-button";
@@ -37,7 +36,6 @@ import { Pressable } from "../../components/ui/pressable";
 import Seperator from "../../components/ui/seperator";
 import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
-import { ToastManager } from "../../services/event-manager";
 import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { SettingStore, useSettingStore } from "../../stores/use-setting-store";

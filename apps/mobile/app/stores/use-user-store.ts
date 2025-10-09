@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Profile, User } from "@notesnook/core";
-import create, { State } from "zustand";
+import { create } from "zustand";
 
 export enum SyncStatus {
   Passed,
@@ -26,7 +26,7 @@ export enum SyncStatus {
   Never
 }
 
-export interface UserStore extends State {
+export interface UserStore {
   user: User | null | undefined;
   premium: boolean;
   lastSynced: string | number;

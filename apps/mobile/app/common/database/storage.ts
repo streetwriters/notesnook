@@ -139,6 +139,9 @@ export const Storage: IStorage = {
   getAllKeys(): Promise<string[]> {
     return DefaultStorage.getAllKeys();
   },
+  generateCryptoKeyPair: async () => {
+    throw new Error("Not implemented");
+  },
   hash,
   getCryptoKey,
   encrypt,

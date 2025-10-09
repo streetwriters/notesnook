@@ -29,7 +29,7 @@ import {
   TrashItem
 } from "@notesnook/core";
 import { ParamListBase } from "@react-navigation/core";
-import create, { State } from "zustand";
+import { create } from "zustand";
 
 export type GenericRouteParam = {
   canGoBack?: boolean;
@@ -123,7 +123,7 @@ export type HeaderRightButton = {
   onPress: () => void;
 };
 
-interface NavigationStore extends State {
+interface NavigationStore {
   currentRoute: RouteName;
   canGoBack?: boolean;
   focusedRouteId?: string;

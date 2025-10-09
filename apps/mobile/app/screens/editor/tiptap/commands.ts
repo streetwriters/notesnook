@@ -35,7 +35,10 @@ import { getResponse, randId, textInput } from "./utils";
 
 type Action = { job: string; id: string };
 
-async function call(webview: RefObject<WebView | undefined>, action?: Action) {
+async function call(
+  webview: RefObject<WebView | undefined | null>,
+  action?: Action
+) {
   if (!webview.current || !action) return;
   setImmediate(() => webview.current?.injectJavaScript(action.job));
   const response = await getResponse(action.id);
@@ -64,7 +67,7 @@ const fn = (fn: string, name?: string) => {
 class Commands {
   ref = createRef<WebView | undefined>();
   previousSettings: Partial<Settings> | null;
-  constructor(ref: RefObject<WebView>) {
+  constructor(ref: RefObject<WebView | null>) {
     this.ref = ref;
     this.previousSettings = null;
   }

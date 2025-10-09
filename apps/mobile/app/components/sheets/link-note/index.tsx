@@ -118,8 +118,8 @@ const ListBlockItem = ({
           {item?.content.length > 200
             ? item?.content.slice(0, 200) + "..."
             : !item.content || item.content.trim() === ""
-            ? strings.linkNoteEmptyBlock()
-            : item.content}
+              ? strings.linkNoteEmptyBlock()
+              : item.content}
         </Paragraph>
 
         <View
@@ -149,12 +149,12 @@ export default function LinkNote(props: {
 }) {
   const blockLinking = useIsFeatureAvailable("blockLinking");
   const { colors } = useThemeColors();
-  const query = useRef<string>();
+  const query = useRef<string>(undefined);
   const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
   const nodesRef = useRef<ContentBlock[]>([]);
   const [nodes, setNodes] = useState<ContentBlock[]>([]);
 
-  const inputRef = useRef<TextInput>();
+  const inputRef = useRef<TextInput>(null);
 
   const [selectedNote, setSelectedNote] = useState<Note>();
   const [selectedNodeId, setSelectedNodeId] = useState<string>();

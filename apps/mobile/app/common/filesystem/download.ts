@@ -115,7 +115,13 @@ export async function downloadFile(
       .progress(async (recieved, total) => {
         useAttachmentStore
           .getState()
-          .setProgress(0, total, filename, recieved, "download");
+          .setProgress(
+            0,
+            parseInt(total),
+            filename,
+            parseInt(recieved),
+            "download"
+          );
 
         DatabaseLogger.log(`Downloading: ${filename}, ${recieved}/${total}`);
       });

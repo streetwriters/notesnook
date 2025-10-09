@@ -50,8 +50,8 @@ export const SideMenuNotebooks = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { colors } = useThemeColors();
   const [filteredNotebooks, setFilteredNotebooks] = React.useState(notebooks);
-  const searchTimer = React.useRef<NodeJS.Timeout>();
-  const lastQuery = React.useRef<string>();
+  const searchTimer = React.useRef<NodeJS.Timeout>(undefined);
+  const lastQuery = React.useRef<string>(undefined);
   const loadRootNotebooks = React.useCallback(async () => {
     if (!filteredNotebooks) return;
     const _notebooks: Notebook[] = [];

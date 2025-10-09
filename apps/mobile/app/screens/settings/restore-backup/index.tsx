@@ -24,7 +24,7 @@ import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, Platform, View } from "react-native";
 import RNFetchBlob, { ReactNativeBlobUtilStat } from "react-native-blob-util";
-import DocumentPicker from "react-native-document-picker";
+import DocumentPicker, { keepLocalCopy } from "@react-native-documents/picker";
 import * as ScopedStorage from "react-native-scoped-storage";
 import { unzip } from "react-native-zip-archive";
 import { DatabaseLogger, db } from "../../../common/database";
@@ -357,9 +357,23 @@ export const RestoreBackup = () => {
                     useUserStore.setState({
                       disableAppLockRequests: true
                     });
-                    const file = await DocumentPicker.pickSingle({
-                      copyTo: "cachesDirectory"
+                    const file = await DocumentPicker.pick();
+
+                    const fileCopy = await keepLocalCopy({
+                      destination: "cachesDirectory",
+                      files: [
+                        {
+                          uri: file[0].uri,
+                          fileName:
+                            file[0].name ?? `backup_restore_${Date.now()}`
+                        }
+                      ]
                     });
+
+                    if (fileCopy[0].status === "error") {
+                      ToastManager.error(new Error("File copy error"));
+                      return;
+                    }
 
                     setTimeout(() => {
                       useUserStore.setState({
@@ -370,8 +384,8 @@ export const RestoreBackup = () => {
                     restoreBackup({
                       uri:
                         Platform.OS === "android"
-                          ? (("file://" + file.fileCopyUri) as string)
-                          : (file.fileCopyUri as string),
+                          ? (("file://" + fileCopy[0].sourceUri) as string)
+                          : (fileCopy[0].sourceUri as string),
                       deleteFile: true
                     });
                   },

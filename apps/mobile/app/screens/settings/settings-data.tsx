@@ -32,6 +32,7 @@ import React from "react";
 import { Appearance, Linking, Platform } from "react-native";
 import { getVersion } from "react-native-device-info";
 import * as RNIap from "react-native-iap";
+//@ts-ignore
 import { enabled } from "react-native-privacy-snapshot";
 import ScreenGuardModule from "react-native-screenguard";
 import { DatabaseLogger, db } from "../../common/database";
@@ -143,15 +144,15 @@ export const settingsGroups: SettingSection[] = [
                     .format("dddd, MMMM D, YYYY h:mm A")
                 )
               : status === SubscriptionStatus.ACTIVE
-              ? strings.subRenewOn(expiryDate)
-              : status === SubscriptionStatus.CANCELED ||
-                status === SubscriptionStatus.PAUSED
-              ? strings.subEndsOn(expiryDate)
-              : status === SubscriptionStatus.EXPIRED
-              ? subscriptionDaysLeft.time < -3
-                ? strings.subEnded()
-                : strings.accountDowngradedIn(3)
-              : strings.neverHesitate();
+                ? strings.subRenewOn(expiryDate)
+                : status === SubscriptionStatus.CANCELED ||
+                    status === SubscriptionStatus.PAUSED
+                  ? strings.subEndsOn(expiryDate)
+                  : status === SubscriptionStatus.EXPIRED
+                    ? subscriptionDaysLeft.time < -3
+                      ? strings.subEnded()
+                      : strings.accountDowngradedIn(3)
+                    : strings.neverHesitate();
           }
 
           return strings.neverHesitate();

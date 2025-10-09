@@ -56,7 +56,7 @@ function confirmDeleteAllNotes(
       title: strings.doActions.delete.notebook(items.length),
       positiveText: strings.delete(),
       negativeText: strings.cancel(),
-      positivePress: (_inputValue, value) => {
+      positivePress: async (_inputValue, value) => {
         setTimeout(() => {
           resolve({ delete: true, deleteNotes: value });
         });
@@ -157,7 +157,7 @@ export const deleteItems = async (
       heading: message,
       type: "success",
       func: async () => {
-        if ((await db.trash.restore(...deletedIds)) === false) return;
+        await db.trash.restore(...deletedIds);
         Navigation.queueRoutesForUpdate();
         useMenuStore.getState().setMenuPins();
         useMenuStore.getState().setColorNotes();

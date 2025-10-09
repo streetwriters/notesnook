@@ -4,7 +4,7 @@ artifacts/
 #
 .DS_Store
 
-native/android/app/src/main/assets/
+android/app/src/main/assets/
 *Issues.md
 build_cache/
 #
@@ -16,11 +16,12 @@ build_cache/
 .cxx/
 *.keystore
 !debug.keystore
+.kotlin/
 
 # Xcode
 #
-native/ios/Pods
-native/ios/DerivedData
+ios/Pods
+ios/DerivedData
 build/
 *.pbxuser
 !default.pbxuser
@@ -39,7 +40,7 @@ DerivedData
 *.xcuserstate
 *.hprof
 **/.xcode.env.local
-native/cache
+cache
 # Android/IntelliJ
 #
 rn-build-deps/
@@ -69,7 +70,7 @@ buck-out/
 */fastlane/report.xml
 */fastlane/Preview.html
 */fastlane/screenshots
-native/vendor
+vendor
 
 # Bundle artifact
 *.jsbundle

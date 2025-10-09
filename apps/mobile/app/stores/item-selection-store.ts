@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { Item } from "@notesnook/core";
-import create, { State } from "zustand";
+import { create } from "zustand";
 
 export type SelectionState = "intermediate" | "selected" | "deselected";
 export type ItemSelection = Record<string, SelectionState | undefined>;
-export interface SelectionStore extends State {
+export interface SelectionStore {
   selection: ItemSelection;
   setSelection: (state: ItemSelection) => void;
   multiSelect: boolean;

@@ -57,7 +57,7 @@ type ListProps = {
 
 export default function List(props: ListProps) {
   const { colors } = useThemeColors();
-  const scrollRef = useRef();
+  const scrollRef = useRef(null);
   const [notesListMode, notebooksListMode] = useSettingStore((state) => [
     state.settings.notesListMode,
     state.settings.notebooksListMode
@@ -72,10 +72,10 @@ export default function List(props: ListProps) {
     props.renderedInRoute === "Notes"
       ? "home"
       : props.renderedInRoute === "Favorites"
-      ? "favorites"
-      : props.renderedInRoute === "Trash" || props.dataType === "trash"
-      ? "trash"
-      : `${props.dataType}s`;
+        ? "favorites"
+        : props.renderedInRoute === "Trash" || props.dataType === "trash"
+          ? "trash"
+          : `${props.dataType}s`;
 
   const groupOptions = useGroupOptions(groupType);
 

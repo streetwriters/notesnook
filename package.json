@@ -72,7 +72,7 @@
   },
   "license": "GPL-3.0-or-later",
   "volta": {
-    "node": "20.12.0"
+    "node": "20.19.5"
   },
   "taskRunner": {
     "projects": [

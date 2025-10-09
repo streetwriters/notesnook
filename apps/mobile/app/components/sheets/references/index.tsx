@@ -28,7 +28,7 @@ import { useThemeColors } from "@notesnook/theme";
 import React, { MutableRefObject, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
-import create from "zustand";
+import { create } from "zustand";
 import { db } from "../../../common/database";
 import { useDBItem, useNoteLocked } from "../../../hooks/use-db-item";
 import { eSendEvent, presentSheet } from "../../../services/event-manager";
@@ -101,8 +101,8 @@ const ListBlockItem = ({
           {item?.content.length > 200
             ? item?.content.slice(0, 200) + "..."
             : !item.content || item.content.trim() === ""
-            ? strings.linkNoteEmptyBlock()
-            : item.content}
+              ? strings.linkNoteEmptyBlock()
+              : item.content}
         </Paragraph>
 
         <View
@@ -401,7 +401,7 @@ export const ReferencesList = ({ item, close }: ReferencesListProps) => {
   const { colors } = useThemeColors();
   const [items, setItems] = useState<VirtualizedGrouping<Note>>();
   const hasNoRelations = !items || items?.placeholders?.length === 0;
-  const internalLinks = useRef<InternalLink<"note">[]>();
+  const internalLinks = useRef<InternalLink<"note">[]>([]);
 
   useEffect(() => {
     db.relations?.[tab === 0 ? "from" : "to"]?.(

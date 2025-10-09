@@ -188,8 +188,8 @@ export const SideMenuTags = () => {
   const { colors } = useThemeColors();
   const [filteredTags, setFilteredTags] = React.useState(tags);
   const [loading, setLoading] = React.useState(true);
-  const searchTimer = React.useRef<NodeJS.Timeout>();
-  const lastQuery = React.useRef<string>();
+  const searchTimer = React.useRef<NodeJS.Timeout>(undefined);
+  const lastQuery = React.useRef<string>(undefined);
 
   useEffect(() => {
     useSideMenuTagsSelectionStore.setState({

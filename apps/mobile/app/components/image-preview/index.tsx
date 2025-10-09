@@ -46,7 +46,7 @@ const ImagePreview = () => {
   const [visible, setVisible] = useState(false);
   const [image, setImage] = useState<string>();
   const [loading, setLoading] = useState(false);
-  const imageRef = useRef<ImageAttributes>();
+  const imageRef = useRef<ImageAttributes>(null);
   const insets = useGlobalSafeAreaInsets();
   const [showHeader, setShowHeader] = useState(true);
 
