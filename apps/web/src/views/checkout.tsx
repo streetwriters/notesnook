@@ -119,7 +119,7 @@ function Checkout() {
 
   useEffect(() => {
     if (currentStep === 2) {
-      var event = EV.subscribe(EVENTS.userSubscriptionUpdated, () => {
+      const event = EV.subscribe(EVENTS.userSubscriptionUpdated, () => {
         hardNavigate("/notes#/welcome");
       });
       return () => {
