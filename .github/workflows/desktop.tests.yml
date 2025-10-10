@@ -67,7 +67,6 @@ jobs:
 
       - name: Build Electron wrapper
         run: npm run tx @notesnook/desktop:release
-        working-directory: ./apps/desktop
 
       - name: Build app
         run: |
@@ -111,7 +110,6 @@ jobs:
 
       - name: Build Electron wrapper
         run: npm run tx @notesnook/desktop:release
-        working-directory: ./apps/desktop
 
       - name: Build app
         run: |
@@ -161,7 +159,6 @@ jobs:
 
       - name: Build Electron wrapper
         run: npm run tx @notesnook/desktop:release
-        working-directory: ./apps/desktop
 
       - name: Build app
         run: |
