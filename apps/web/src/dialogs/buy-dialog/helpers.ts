@@ -50,7 +50,6 @@ const TRIAL_PERIODS: Record<Period, number> = {
 };
 
 export function toPricingInfo(plan: Plan, user: User | undefined): PricingInfo {
-  console.log("TO PRICING INFO", plan);
   return {
     country: plan.country,
     period: plan.period,
@@ -58,9 +57,9 @@ export function toPricingInfo(plan: Plan, user: User | undefined): PricingInfo {
       currency: plan.currency,
       id: plan.id,
       period: plan.period,
-      subtotal: formatPrice(plan.price.gross, plan.currency),
+      subtotal: formatPrice(plan.price.net, plan.currency),
       tax: formatPrice(plan.price.tax, plan.currency),
-      total: formatPrice(plan.price.net, plan.currency),
+      total: formatPrice(plan.price.gross, plan.currency),
       trial_period: isTrialAvailableForPlan(plan.plan, user)
         ? {
             frequency: TRIAL_PERIODS[plan.period]
@@ -74,9 +73,9 @@ export function toPricingInfo(plan: Plan, user: User | undefined): PricingInfo {
           currency: plan.currency,
           id: plan.id,
           period: plan.period,
-          subtotal: formatPrice(plan.price.gross, plan.currency),
+          subtotal: formatPrice(plan.price.net, plan.currency),
           tax: formatPrice(plan.price.tax, plan.currency),
-          total: formatPrice(plan.price.net, plan.currency)
+          total: formatPrice(plan.price.gross, plan.currency)
         }
       : undefined
   };
