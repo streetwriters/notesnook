@@ -69,10 +69,7 @@ export function TableComponent(props: ReactNodeViewProps) {
         />
       </DesktopOnly>
       <SimpleBar autoHide>
-        <Box
-          dir={textDirection}
-          sx={{ "& table": { width: "100% !important" } }}
-        >
+        <Box dir={textDirection}>
           <table
             ref={(ref) => {
               forwardRef?.(ref);
