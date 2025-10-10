@@ -51,6 +51,7 @@ import {
 import { IEditor, MAX_AUTO_SAVEABLE_WORDS } from "./types";
 import { useEditorConfig, useToolbarConfig, useEditorManager } from "./manager";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
+import { useStore as useUserStore } from "../../stores/user-store";
 import { debounce, useAreFeaturesAvailable } from "@notesnook/common";
 import { ScopedThemeProvider } from "../theme-provider";
 import { useStore as useThemeStore } from "../../stores/theme-store";
@@ -185,7 +186,6 @@ function TipTap(props: TipTapProps) {
 
   const autoSave = useRef(true);
   const { toolbarConfig } = useToolbarConfig();
-
   const features = useAreFeaturesAvailable([
     "callout",
     "outlineList",
@@ -410,7 +410,8 @@ function TipTap(props: TipTapProps) {
             openInNewTab: openInNewTab
           });
         } else window.open(url, "_blank");
-      }
+      },
+      isLoggedIn: () => useUserStore.getState().isLoggedIn
     };
   }, [
     content,

@@ -44,6 +44,7 @@ import {
   useStore as useAppStore,
   store as appstore
 } from "../../stores/app-store";
+import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useSearchStore } from "../../stores/search-store";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { FlexScrollContainer } from "../scroll-container";
@@ -77,6 +78,7 @@ import { Pane, SplitPane } from "../split-pane";
 import { TITLE_BAR_HEIGHT } from "../title-bar";
 import { isMobile } from "../../hooks/use-mobile";
 import { isTablet } from "../../hooks/use-tablet";
+import { ConfirmDialog } from "../../dialogs/confirm";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
@@ -604,6 +606,15 @@ export function Editor(props: EditorProps) {
           }
         }}
         onInsertAttachment={async (type) => {
+          if (!useUserStore.getState().isLoggedIn) {
+            ConfirmDialog.show({
+              title: strings.notLoggedIn(),
+              message: strings.loginToUploadAttachments(),
+              positiveButtonText: strings.okay()
+            });
+            return;
+          }
+
           const mime = type === "file" ? "*/*" : "image/*";
           const attachments = await insertAttachments(mime);
           const editor = useEditorManager.getState().getEditor(id)?.editor;

@@ -53,7 +53,7 @@ export function InsertBlock(props: ToolProps) {
       isMobile ? embedMobile(editor) : embedDesktop(editor),
       table(editor)
     ];
-  }, [editor, isMobile]);
+  }, [editor, isMobile, editor.storage.isLoggedIn?.()]);
 
   return (
     <>
@@ -189,7 +189,7 @@ const image = (editor: Editor, isMobile: boolean): MenuItem => ({
         type: "button",
         title: strings.takePhotoUsingCamera(),
         icon: Icons.camera,
-        isHidden: !isMobile,
+        isHidden: !isMobile || !editor.storage.isLoggedIn?.(),
         onClick: () => editor.storage.openAttachmentPicker?.("camera")
       },
       isMobile ? uploadImageFromURLMobile(editor) : uploadImageFromURL(editor)
@@ -313,6 +313,7 @@ const uploadImageFromURLMobile = (editor: Editor): MenuItem => ({
   type: "button",
   title: strings.attachImageFromURL(),
   icon: Icons.link,
+  isHidden: !editor.storage.isLoggedIn?.(),
   menu: {
     title: strings.attachImageFromURL(),
     items: [
@@ -340,6 +341,7 @@ const uploadImageFromURL = (editor: Editor): MenuItem => ({
   type: "button",
   title: strings.attachImageFromURL(),
   icon: Icons.link,
+  isHidden: !editor.storage.isLoggedIn?.(),
   onClick: () => {
     showPopup({
       popup: (hide) => (
