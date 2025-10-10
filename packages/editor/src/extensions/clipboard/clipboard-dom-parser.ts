@@ -42,7 +42,7 @@ export class ClipboardDOMParser extends ProsemirrorDOMParser {
       convertGoogleDocsChecklist(dom);
       formatCodeblocks(dom);
       convertBrToSingleSpacedParagraphs(dom);
-      removeImages(dom);
+      removePremiumFeatures(dom);
       removeBlockId(dom);
     }
     return super.parseSlice(dom, options);
@@ -53,7 +53,7 @@ export class ClipboardDOMParser extends ProsemirrorDOMParser {
       convertGoogleDocsChecklist(dom);
       formatCodeblocks(dom);
       convertBrToSingleSpacedParagraphs(dom);
-      removeImages(dom);
+      removePremiumFeatures(dom);
       removeBlockId(dom);
     }
     return super.parse(dom, options);
@@ -154,11 +154,29 @@ export function convertGoogleDocsChecklist(dom: HTMLElement | Document) {
   }
 }
 
-export function removeImages(dom: HTMLElement | Document) {
-  let canInsertImages: boolean | null = null;
-  for (const img of dom.querySelectorAll(`img`)) {
-    canInsertImages = canInsertImages ?? hasPermission("insertImage");
-    if (!canInsertImages) img.remove();
+const premiumFeatures = [
+  {
+    selector: "div.callout",
+    permission: "setCallout"
+  },
+  {
+    selector: 'ul[data-type="outlineList"]',
+    permission: "toggleOutlineList"
+  },
+  {
+    selector: "ul.checklist",
+    permission: "toggleTaskList"
+  }
+] as const;
+
+function removePremiumFeatures(dom: HTMLElement | Document) {
+  for (const feature of premiumFeatures) {
+    const elements = dom.querySelectorAll(feature.selector);
+    if (elements.length === 0) continue;
+
+    if (!hasPermission(feature.permission)) {
+      elements.forEach((element) => element.remove());
+    }
   }
 }
 
