@@ -570,7 +570,7 @@ export function Editor(props: EditorProps) {
         onChange={onSave}
         onDownloadAttachment={(attachment) => saveAttachment(attachment.hash)}
         onPreviewAttachment={async (data) => {
-          const { hash, type } = data;
+          const { hash, type, mime } = data;
           const attachment = await db.attachments.attachment(hash);
           if (attachment && type === "image") {
             await previewImageAttachment(attachment);
