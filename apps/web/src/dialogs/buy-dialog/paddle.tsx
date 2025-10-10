@@ -245,7 +245,7 @@ function getPricingInfo(
           id: price.price_id,
           period: options.period,
           subtotal: formatPrice(
-            data.recurring_totals.subtotal,
+            data.recurring_totals.subtotal - data.recurring_totals.discount,
             data.currency_code
           ),
           total: formatPrice(data.recurring_totals.total, data.currency_code),
@@ -256,7 +256,10 @@ function getPricingInfo(
       currency: data.currency_code,
       id: price.price_id,
       period: options.period,
-      subtotal: formatPrice(totals.subtotal, data.currency_code),
+      subtotal: formatPrice(
+        totals.subtotal - totals.discount,
+        data.currency_code
+      ),
       total: formatPrice(totals.total, data.currency_code),
       tax: formatPrice(totals.tax, data.currency_code),
       trial_period: price.trial_period
