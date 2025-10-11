@@ -24,17 +24,15 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.37.1",
+    "@rsbuild/core": "^1.5.16",
+    "@rsbuild/plugin-react": "^1.4.1",
     "@types/react": "^18.2.39",
-    "@types/react-dom": "^18.2.17",
-    "react-scripts": "^5.0.1"
+    "@types/react-dom": "^18.2.17"
   },
   "scripts": {
-    "start": "DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=true BROWSER=none react-scripts start",
-    "build": "DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=true BROWSER=none react-scripts build",
-    "postbuild": "bun run scripts/build.mjs",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "postinstall": "patch-package"
+    "start": "DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=true BROWSER=none rsbuild start",
+    "build": "DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=true BROWSER=none rsbuild build",
+    "postbuild": "bun run scripts/build.mjs"
   },
   "homepage": ".",
   "browserslist": {
@@ -48,14 +46,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "nx": {
-    "targets": {
-      "build": {
-        "outputs": [
-          "{projectRoot}/build.bundle"
-        ]
-      }
-    }
   }
 }

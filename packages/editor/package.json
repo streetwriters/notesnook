@@ -74,7 +74,7 @@
     "nanoid": "5.0.7",
     "prism-themes": "^1.9.0",
     "prosemirror-codemark": "^0.4.2",
-    "prosemirror-view": "1.34.2",
+    "prosemirror-view": "1.41.3",
     "re-resizable": "^6.9.18",
     "react-colorful": "^5.6.1",
     "redent": "^4.0.0",
@@ -122,7 +122,6 @@
     "postbuild": "bun run ./scripts/postbuild.mjs",
     "start": "bun run watch",
     "prepublishOnly": "bun run build && bun run test",
-    "postinstall": "patch-package",
     "build": "bun run ../../scripts/build.mjs",
     "watch": "nodemon -V --watch src --watch styles/styles.css -i src/extensions/code-block/languages/index.ts --ext ts,tsx,css --exec bun run build"
   },
@@ -130,5 +129,15 @@
     "type": "git",
     "url": "git://github.com/streetwriters/notesnook.git",
     "directory": "packages/editor"
+  },
+  "overrides": {
+    "prosemirror-view": "1.41.3"
+  },
+  "patchedDependencies": {
+    "prosemirror-view@1.41.3": "patches/prosemirror-view@1.41.3.patch",
+    "prosemirror-model@1.25.3": "patches/prosemirror-model@1.25.3.patch",
+    "@tiptap/core@2.6.6": "patches/@tiptap%2Fcore@2.6.6.patch",
+    "@tiptap/extension-list-keymap@2.6.6": "patches/@tiptap%2Fextension-list-keymap@2.6.6.patch",
+    "katex@0.16.11": "patches/katex@0.16.11.patch"
   }
 }

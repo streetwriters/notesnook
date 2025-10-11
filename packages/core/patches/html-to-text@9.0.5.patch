@@ -1,7 +1,7 @@
-diff --git a/node_modules/html-to-text/lib/html-to-text.cjs b/node_modules/html-to-text/lib/html-to-text.cjs
+diff --git a/lib/html-to-text.cjs b/lib/html-to-text.cjs
 index 6bcef9d..99203a1 100644
---- a/node_modules/html-to-text/lib/html-to-text.cjs
-+++ b/node_modules/html-to-text/lib/html-to-text.cjs
+--- a/lib/html-to-text.cjs
++++ b/lib/html-to-text.cjs
 @@ -1240,6 +1240,7 @@ function recursiveWalk (walk, dom, builder) {
        case 'tag': {
          const tagDefinition = builder.picker.pick1(elem);
@@ -10,10 +10,10 @@ index 6bcef9d..99203a1 100644
          format(elem, walk, builder, tagDefinition.options || {});
          break;
        }
-diff --git a/node_modules/html-to-text/lib/html-to-text.mjs b/node_modules/html-to-text/lib/html-to-text.mjs
+diff --git a/lib/html-to-text.mjs b/lib/html-to-text.mjs
 index e42ff85..6659bbc 100644
---- a/node_modules/html-to-text/lib/html-to-text.mjs
-+++ b/node_modules/html-to-text/lib/html-to-text.mjs
+--- a/lib/html-to-text.mjs
++++ b/lib/html-to-text.mjs
 @@ -1232,6 +1232,7 @@ function recursiveWalk (walk, dom, builder) {
        case 'tag': {
          const tagDefinition = builder.picker.pick1(elem);

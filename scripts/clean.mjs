@@ -20,10 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import fs from "fs/promises";
 import { existsSync } from "fs";
 import path from "path";
-import { findPackages, readConfig, runTasks } from "./utils.mjs";
-
-const config = readConfig();
-const allPackages = await findPackages(config.projects);
+import { allPackages, runTasks } from "./utils.mjs";
 
 const tasks = [];
 for (const pkg of allPackages) {

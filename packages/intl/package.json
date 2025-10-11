@@ -27,8 +27,7 @@
     "compile": "lingui compile --typescript",
     "build-locale": "bun scripts/generate-strings.mjs && bun run extract && bun run compile",
     "build": "bun run build-locale && bunx vite build && bun run scripts/postbuild.mjs",
-    "watch": "nodemon --watch scripts/ --watch src --ext ts,mjs --exec \"bun run build\"",
-    "postinstall": "patch-package"
+    "watch": "nodemon --watch scripts/ --watch src --ext ts,mjs --exec \"bun run build\""
   },
   "devDependencies": {
     "@lingui/cli": "5.5.1",
@@ -47,5 +46,8 @@
   "peerDependencies": {
     "@lingui/macro": "*",
     "react": ">=18"
+  },
+  "patchedDependencies": {
+    "@lingui/cli@5.5.1": "patches/@lingui%2Fcli@5.5.1.patch"
   }
 }

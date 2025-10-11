@@ -18,6 +18,9 @@
       },
     },
   },
+  "patchedDependencies": {
+    "libsodium-sumo@0.7.15": "patches/libsodium-sumo@0.7.15.patch",
+  },
   "packages": {
     "@arrows/array": ["@arrows/array@1.4.1", "", { "dependencies": { "@arrows/composition": "^1.2.2" } }, "sha512-MGYS8xi3c4tTy1ivhrVntFvufoNzje0PchjEz6G/SsWRgUKxL4tKwS6iPdO8vsaJYldagAeWMd5KRD0aX3Q39g=="],
 

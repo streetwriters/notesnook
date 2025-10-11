@@ -18,7 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { FunctionComponent, SyntheticEvent } from "react";
-import { NodeView, Decoration, DecorationSource } from "prosemirror-view";
+import {
+  NodeView,
+  Decoration,
+  DecorationSource,
+  ViewMutationRecord
+} from "prosemirror-view";
 import { Node as PMNode, Slice } from "prosemirror-model";
 import { NodeSelection } from "prosemirror-state";
 import { PortalProviderAPI } from "./react-portal-provider.js";
@@ -29,19 +34,11 @@ import {
   ContentDOM
 } from "./types.js";
 import { Editor, NodeViewRendererProps } from "@tiptap/core";
-import { __serializeForClipboard, EditorView } from "prosemirror-view";
+import { EditorView } from "prosemirror-view";
 import { EmotionThemeProvider } from "@notesnook/theme";
 import { isAndroid, isiOS } from "../../utils/platform.js";
 import { useToolbarStore } from "../../toolbar/stores/toolbar-store.js";
 
-// This is hacky workaround to manually handle serialization when
-// drag/dropping on mobile devices.
-declare module "prosemirror-view" {
-  export function __serializeForClipboard(
-    view: EditorView,
-    slice: Slice
-  ): { dom: HTMLElement; text: string };
-}
 const portalProviderAPI = new PortalProviderAPI();
 export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
   private domRef!: HTMLElement;
@@ -394,9 +391,7 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
     return true;
   }
 
-  ignoreMutation(
-    mutation: MutationRecord | { type: "selection"; target: Element }
-  ) {
+  ignoreMutation(mutation: ViewMutationRecord) {
     if (!this.dom || !this.contentDOM) {
       return true;
     }
@@ -495,7 +490,7 @@ function forceHandleDrag(event: DragEvent, editor: Editor) {
   if (!event.dataTransfer) return;
   const { view } = editor;
   const slice = view.state.selection.content();
-  const { dom, text } = __serializeForClipboard(view, slice);
+  const { dom, text } = view.serializeForClipboard(slice);
 
   event.dataTransfer.clearData();
   event.dataTransfer.setData("Text", text);

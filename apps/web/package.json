@@ -135,8 +135,7 @@
     "build:beta": "PLATFORM=web BETA=true vite build",
     "build:desktop": "PLATFORM=desktop vite build",
     "analyze": "ANALYZING=true PLATFORM=web vite build",
-    "test": "playwright test -u",
-    "postinstall": "patch-package"
+    "test": "playwright test -u"
   },
   "browserslist": {
     "production": [

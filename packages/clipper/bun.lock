@@ -16,6 +16,9 @@
       },
     },
   },
+  "patchedDependencies": {
+    "css-what@6.1.0": "patches/css-what@6.1.0.patch",
+  },
   "packages": {
     "@emnapi/core": ["@emnapi/core@1.5.0", "", { "dependencies": { "@emnapi/wasi-threads": "1.1.0", "tslib": "^2.4.0" } }, "sha512-sbP8GzB1WDzacS8fgNPpHlp6C9VZe+SJP3F90W9rLemaQj2PzIuTEl1qDOYQf58YIpyjViI24y9aPWCjEzY2cg=="],
 

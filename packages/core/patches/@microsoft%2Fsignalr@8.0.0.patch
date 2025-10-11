@@ -1,7 +1,7 @@
-diff --git a/node_modules/@microsoft/signalr/dist/browser/signalr.js b/node_modules/@microsoft/signalr/dist/browser/signalr.js
+diff --git a/dist/browser/signalr.js b/dist/browser/signalr.js
 index 86f7968..9bc9745 100644
---- a/node_modules/@microsoft/signalr/dist/browser/signalr.js
-+++ b/node_modules/@microsoft/signalr/dist/browser/signalr.js
+--- a/dist/browser/signalr.js
++++ b/dist/browser/signalr.js
 @@ -347,7 +347,7 @@ class Platform {
      // Node apps shouldn't have a window object, but WebWorkers don't either
      // so we need to check for both WebWorker and window
@@ -11,10 +11,10 @@ index 86f7968..9bc9745 100644
      }
  }
  /** @private */
-diff --git a/node_modules/@microsoft/signalr/dist/cjs/Utils.js b/node_modules/@microsoft/signalr/dist/cjs/Utils.js
+diff --git a/dist/cjs/Utils.js b/dist/cjs/Utils.js
 index 2db55f7..228d318 100644
---- a/node_modules/@microsoft/signalr/dist/cjs/Utils.js
-+++ b/node_modules/@microsoft/signalr/dist/cjs/Utils.js
+--- a/dist/cjs/Utils.js
++++ b/dist/cjs/Utils.js
 @@ -45,7 +45,7 @@ class Platform {
      // Node apps shouldn't have a window object, but WebWorkers don't either
      // so we need to check for both WebWorker and window
@@ -24,10 +24,10 @@ index 2db55f7..228d318 100644
      }
  }
  exports.Platform = Platform;
-diff --git a/node_modules/@microsoft/signalr/dist/esm/Utils.js b/node_modules/@microsoft/signalr/dist/esm/Utils.js
+diff --git a/dist/esm/Utils.js b/dist/esm/Utils.js
 index a8962ee..2fd2558 100644
---- a/node_modules/@microsoft/signalr/dist/esm/Utils.js
-+++ b/node_modules/@microsoft/signalr/dist/esm/Utils.js
+--- a/dist/esm/Utils.js
++++ b/dist/esm/Utils.js
 @@ -41,7 +41,7 @@ export class Platform {
      // Node apps shouldn't have a window object, but WebWorkers don't either
      // so we need to check for both WebWorker and window
@@ -37,10 +37,10 @@ index a8962ee..2fd2558 100644
      }
  }
  /** @private */
-diff --git a/node_modules/@microsoft/signalr/dist/webworker/signalr.js b/node_modules/@microsoft/signalr/dist/webworker/signalr.js
+diff --git a/dist/webworker/signalr.js b/dist/webworker/signalr.js
 index 86f7968..9bc9745 100644
---- a/node_modules/@microsoft/signalr/dist/webworker/signalr.js
-+++ b/node_modules/@microsoft/signalr/dist/webworker/signalr.js
+--- a/dist/webworker/signalr.js
++++ b/dist/webworker/signalr.js
 @@ -347,7 +347,7 @@ class Platform {
      // Node apps shouldn't have a window object, but WebWorkers don't either
      // so we need to check for both WebWorker and window

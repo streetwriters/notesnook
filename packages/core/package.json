@@ -54,7 +54,6 @@
     "ws": "^8.13.0"
   },
   "scripts": {
-    "postinstall": "patch-package",
     "prebuild": "bun run scripts/prebuild.mjs",
     "pretest": "bun run scripts/prebuild.mjs",
     "pretest:e2e": "bun run scripts/prebuild.mjs",
@@ -96,5 +95,9 @@
   },
   "trustedDependencies": [
     "better-sqlite3-multiple-ciphers"
-  ]
+  ],
+  "patchedDependencies": {
+    "@microsoft/signalr@8.0.0": "patches/@microsoft%2Fsignalr@8.0.0.patch",
+    "html-to-text@9.0.5.patch": "patches/html-to-text@9.0.5.patch"
+  }
 }
