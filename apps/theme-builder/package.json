@@ -37,8 +37,8 @@
     "@theme-ui/core@>0": "0.14.7"
   },
   "scripts": {
-    "start": "cross-env PLATFORM=web THEME_BUILDER=true vite -c ../web/vite.config.ts",
-    "build": "cross-env PLATFORM=web THEME_BUILDER=true vite -c ../web/vite.config.ts build"
+    "start": "PLATFORM=web THEME_BUILDER=true vite -c ../web/vite.config.ts",
+    "build": "PLATFORM=web THEME_BUILDER=true vite -c ../web/vite.config.ts build"
   },
   "browserslist": {
     "production": [

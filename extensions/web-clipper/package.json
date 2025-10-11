@@ -48,10 +48,10 @@
     "zustand": "4.5.5"
   },
   "scripts": {
-    "build:firefox": "cross-env MANIFEST_VERSION=2 bun run build-utils/build.js",
-    "build:chrome": "cross-env MANIFEST_VERSION=3 bun run build-utils/build.js",
-    "dev:chrome": "cross-env MANIFEST_VERSION=3 bun run build-utils/dev.js",
-    "dev:firefox": "cross-env MANIFEST_VERSION=2 bun run build-utils/dev.js",
+    "build:firefox": "MANIFEST_VERSION=2 bun run build-utils/build.js",
+    "build:chrome": "MANIFEST_VERSION=3 bun run build-utils/build.js",
+    "dev:chrome": "MANIFEST_VERSION=3 bun run build-utils/dev.js",
+    "dev:firefox": "MANIFEST_VERSION=2 bun run build-utils/dev.js",
     "build": "bun run ../../scripts/build.mjs"
   },
   "browserslist": {

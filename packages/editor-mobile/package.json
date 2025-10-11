@@ -29,8 +29,8 @@
     "react-scripts": "^5.0.1"
   },
   "scripts": {
-    "start": "cross-env DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=true  BROWSER=none react-scripts start",
-    "build": "cross-env DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=true  BROWSER=none react-scripts build",
+    "start": "DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=true BROWSER=none react-scripts start",
+    "build": "DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=true BROWSER=none react-scripts build",
     "postbuild": "bun run scripts/build.mjs",
     "test": "react-scripts test",
     "eject": "react-scripts eject",

@@ -58,7 +58,7 @@
     "prebuild": "bun run scripts/prebuild.mjs",
     "pretest": "bun run scripts/prebuild.mjs",
     "pretest:e2e": "bun run scripts/prebuild.mjs",
-    "test:e2e": "cross-env IS_E2E=true vitest run",
+    "test:e2e": "IS_E2E=true vitest run",
     "test": "vitest run",
     "build": "bun run ../../scripts/build.mjs",
     "prepublishOnly": "bun run build",

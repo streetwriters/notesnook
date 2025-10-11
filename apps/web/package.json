@@ -127,14 +127,14 @@
     "workbox-strategies": "^7.3.0"
   },
   "scripts": {
-    "start": "cross-env PLATFORM=web vite",
-    "start:desktop": "cross-env PLATFORM=desktop vite",
+    "start": "PLATFORM=web vite",
+    "start:desktop": "PLATFORM=desktop vite",
     "start:test": "serve -s build/ -p 3000",
-    "build": "cross-env PLATFORM=web vite build",
-    "build:test": "cross-env PLATFORM=web TEST=true vite build",
-    "build:beta": "cross-env PLATFORM=web BETA=true vite build",
-    "build:desktop": "cross-env PLATFORM=desktop vite build",
-    "analyze": "cross-env ANALYZING=true PLATFORM=web vite build",
+    "build": "PLATFORM=web vite build",
+    "build:test": "PLATFORM=web TEST=true vite build",
+    "build:beta": "PLATFORM=web BETA=true vite build",
+    "build:desktop": "PLATFORM=desktop vite build",
+    "analyze": "ANALYZING=true PLATFORM=web vite build",
     "test": "playwright test -u",
     "postinstall": "patch-package"
   },

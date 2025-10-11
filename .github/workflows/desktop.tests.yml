@@ -214,7 +214,7 @@ jobs:
 
       - name: Build app
         run: |
-          bunx cross-env NOTESNOOK_STAGING=true bunx electron-builder --config=electron-builder.config.js --win --dir --arm64 --x64
+          bun exec "NOTESNOOK_STAGING=true bunx electron-builder --config=electron-builder.config.js --win --dir --arm64 --x64"
         working-directory: ./apps/desktop
 
       - name: Run tests
