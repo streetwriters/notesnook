@@ -49,7 +49,9 @@ import {
   crypto_secretstream_xchacha20poly1305_TAG_MESSAGE,
   crypto_box_keypair as sodium_native_crypto_box_keypair,
   crypto_box_PUBLICKEYBYTES,
-  crypto_box_SECRETKEYBYTES
+  crypto_box_SECRETKEYBYTES,
+  crypto_box_seal_open as sodium_native_crypto_box_seal_open,
+  crypto_box_SEALBYTES
 } from "sodium-native";
 import { Buffer } from "node:buffer";
 import { base64_variants, ISodium } from "./types";
@@ -377,6 +379,38 @@ function crypto_box_keypair(
   }
 }
 
+function crypto_box_seal_open(
+  ciphertext: string | Uint8Array,
+  publicKey: Uint8Array,
+  privateKey: Uint8Array,
+  outputFormat?: Uint8ArrayOutputFormat | null
+): Uint8Array;
+function crypto_box_seal_open(
+  ciphertext: string | Uint8Array,
+  publicKey: Uint8Array,
+  privateKey: Uint8Array,
+  outputFormat: StringOutputFormat
+): string;
+function crypto_box_seal_open(
+  ciphertext: string | Uint8Array,
+  publicKey: Uint8Array,
+  privateKey: Uint8Array,
+  outputFormat?: StringOutputFormat | Uint8ArrayOutputFormat | null
+): string | Uint8Array {
+  const cipher = toBuffer(ciphertext);
+  return wrap(
+    cipher.byteLength - crypto_box_SEALBYTES,
+    (message) =>
+      sodium_native_crypto_box_seal_open(
+        message,
+        cipher,
+        toBuffer(publicKey),
+        toBuffer(privateKey)
+      ),
+    outputFormat
+  );
+}
+
 function randombytes_buf(
   length: number,
   outputFormat?: Uint8ArrayOutputFormat | null
@@ -593,6 +627,9 @@ export class Sodium implements ISodium {
   }
   get crypto_box_keypair() {
     return crypto_box_keypair;
+  }
+  get crypto_box_seal_open() {
+    return crypto_box_seal_open;
   }
 }
 
