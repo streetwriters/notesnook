@@ -40,7 +40,7 @@ export async function findPackages(projects, root) {
   return pkgs;
 }
 
-export async function findDependencies(packagePath, { includeSelf }) {
+export async function findDependencies(packagePath, { includeSelf } = {}) {
   const key = path.resolve(packagePath);
   if (depMemo.has(key)) return Array.from(depMemo.get(key));
   const pkg = readPackage(packagePath);
