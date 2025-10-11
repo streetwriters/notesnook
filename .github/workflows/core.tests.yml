@@ -44,8 +44,8 @@ jobs:
 
       - name: Prepare environment
         run: |
-          npm ci --ignore-scripts --prefer-offline --no-audit
-          npm run bootstrap -- --scope=core
+          bun ci
+          bun run bootstrap -- --scope=core
       - name: Add environment variables
         run: |
           echo "USER_EMAIL=${{ secrets.USER_EMAIL }}" >> $GITHUB_ENV
@@ -54,4 +54,4 @@ jobs:
           echo "USER_HASHED_PASSWORD=${{ secrets.USER_HASHED_PASSWORD }}" >> $GITHUB_ENV
 
       - name: Run all @notesnook/core tests
-        run: npm run tx @notesnook/core:test:e2e
+        run: bun tx @notesnook/core:test:e2e

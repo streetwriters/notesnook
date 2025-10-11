@@ -30,11 +30,11 @@ jobs:
 
       - name: Install packages
         run: |
-          npm ci --ignore-scripts --prefer-offline --no-audit
-          npm run bootstrap -- --scope=web
+          bun ci
+          bun run bootstrap -- --scope=web
 
       - name: Generate desktop build
-        run: npm run tx @notesnook/web:build:desktop
+        run: bun tx @notesnook/web:build:desktop
 
       - name: Archive build artifact
         uses: actions/upload-artifact@v4
@@ -62,15 +62,15 @@ jobs:
 
       - name: Install packages
         run: |
-          npm ci --ignore-scripts --prefer-offline --no-audit
-          npm run bootstrap -- --scope=desktop
+          bun ci
+          bun run bootstrap -- --scope=desktop
 
       - name: Build Electron wrapper
-        run: npm run tx @notesnook/desktop:release
+        run: bun tx @notesnook/desktop:release
 
       - name: Build app
         run: |
-          yarn electron-builder --config=electron-builder.config.js --mac --dir --x64
+          bun electron-builder --config=electron-builder.config.js --mac --dir --x64
         working-directory: ./apps/desktop
 
       - name: Run tests x64
@@ -105,15 +105,15 @@ jobs:
 
       - name: Install packages
         run: |
-          npm ci --ignore-scripts --prefer-offline --no-audit
-          npm run bootstrap -- --scope=desktop
+          bun ci
+          bun run bootstrap -- --scope=desktop
 
       - name: Build Electron wrapper
-        run: npm run tx @notesnook/desktop:release
+        run: bun tx @notesnook/desktop:release
 
       - name: Build app
         run: |
-          yarn electron-builder --config=electron-builder.config.js --mac --dir --arm64
+          bun electron-builder --config=electron-builder.config.js --mac --dir --arm64
         working-directory: ./apps/desktop
 
       - name: Run tests arm64
@@ -148,8 +148,8 @@ jobs:
 
       - name: Install packages
         run: |
-          npm ci --ignore-scripts --prefer-offline --no-audit
-          npm run bootstrap -- --scope=desktop
+          bun ci
+          bun run bootstrap -- --scope=desktop
 
       - name: Install sqlite-better-trigram for all arch
         run: |
@@ -158,11 +158,11 @@ jobs:
         working-directory: ./apps/desktop
 
       - name: Build Electron wrapper
-        run: npm run tx @notesnook/desktop:release
+        run: bun tx @notesnook/desktop:release
 
       - name: Build app
         run: |
-          yarn electron-builder --config=electron-builder.config.js --linux --dir --arm64 --x64
+          bun electron-builder --config=electron-builder.config.js --linux --dir --arm64 --x64
         working-directory: ./apps/desktop
 
       - name: Run tests
@@ -197,8 +197,8 @@ jobs:
 
       - name: Install packages
         run: |
-          npm ci --ignore-scripts --prefer-offline --no-audit
-          npm run bootstrap -- --scope=desktop
+          bun ci
+          bun run bootstrap -- --scope=desktop
 
       - name: Install sqlite-better-trigram for all arch
         run: |
@@ -214,7 +214,7 @@ jobs:
 
       - name: Build app
         run: |
-          npx cross-env NOTESNOOK_STAGING=true yarn electron-builder --config=electron-builder.config.js --win --dir --arm64 --x64
+          bunx cross-env NOTESNOOK_STAGING=true bunx electron-builder --config=electron-builder.config.js --win --dir --arm64 --x64
         working-directory: ./apps/desktop
 
       - name: Run tests

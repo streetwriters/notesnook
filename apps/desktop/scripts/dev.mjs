@@ -55,13 +55,11 @@ async function onChange(first) {
   if (first) {
     await fs.rm("./build/", { force: true, recursive: true });
 
-    await exec("npm rebuild electron --verbose --foreground-scripts");
-
-    await exec("yarn electron-builder install-app-deps");
+    await exec("bun electron-builder install-app-deps");
   }
 
-  await exec(`yarn run bundle`);
-  await exec(`yarn run build`);
+  await exec(`bun run bundle`);
+  await exec(`bun run build`);
 
   if (await isBundleSame()) {
     console.log("Bundle is same. Doing nothing.");
@@ -70,7 +68,7 @@ async function onChange(first) {
 
   if (first) {
     await spawnAndWaitUntil(
-      ["npm", "run", "start:desktop"],
+      ["bun", "run", "start:desktop"],
       path.join(__dirname, "..", "..", "web"),
       (data) => data.includes("Network: use --host to expose")
     );

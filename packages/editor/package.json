@@ -31,10 +31,10 @@
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "@notesnook-importer/core": "^2.2.2",
-    "@notesnook/common": "file:../common",
-    "@notesnook/intl": "file:../intl",
-    "@notesnook/theme": "file:../theme",
-    "@notesnook/ui": "file:../ui",
+    "@notesnook/common": "link:@notesnook/common",
+    "@notesnook/intl": "link:@notesnook/intl",
+    "@notesnook/theme": "link:@notesnook/theme",
+    "@notesnook/ui": "link:@notesnook/ui",
     "@social-embed/lib": "^0.1.0-next.7",
     "@tiptap/core": "2.6.6",
     "@tiptap/extension-blockquote": "^2.6.6",
@@ -118,13 +118,13 @@
   },
   "scripts": {
     "test": "vitest run",
-    "prebuild": "node ./scripts/build.mjs",
-    "postbuild": "node ./scripts/postbuild.mjs",
-    "start": "npm run watch",
-    "prepublishOnly": "npm run build && npm run test",
+    "prebuild": "bun run ./scripts/build.mjs",
+    "postbuild": "bun run ./scripts/postbuild.mjs",
+    "start": "bun run watch",
+    "prepublishOnly": "bun run build && bun run test",
     "postinstall": "patch-package",
-    "build": "node ../../scripts/build.mjs",
-    "watch": "nodemon -V --watch src --watch styles/styles.css -i src/extensions/code-block/languages/index.ts --ext ts,tsx,css --exec npm run build"
+    "build": "bun run ../../scripts/build.mjs",
+    "watch": "nodemon -V --watch src --watch styles/styles.css -i src/extensions/code-block/languages/index.ts --ext ts,tsx,css --exec bun run build"
   },
   "repository": {
     "type": "git",

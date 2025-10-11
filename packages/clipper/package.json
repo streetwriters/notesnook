@@ -22,8 +22,8 @@
     "url": "git+https://github.com/streetwriters/notesnook.git"
   },
   "scripts": {
-    "build": "tsc && npx rsbuild build",
-    "prepublishOnly": "npm run build",
+    "build": "tsc && bunx rsbuild build",
+    "prepublishOnly": "bun run build",
     "test": "playwright test",
     "postinstall": "patch-package",
     "watch": "tsc --watch"

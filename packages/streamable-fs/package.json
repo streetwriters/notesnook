@@ -17,12 +17,12 @@
   },
   "scripts": {
     "build": "tsdown src/index.ts",
-    "prepublishOnly": "npm run build",
-    "watch": "npm run build -- --watch"
+    "prepublishOnly": "bun run build",
+    "watch": "bun run build -- --watch"
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@notesnook/crypto": "file:../crypto"
+    "@notesnook/crypto": "link:@notesnook/crypto"
   },
   "devDependencies": {
     "@types/localforage": "^0.0.34"

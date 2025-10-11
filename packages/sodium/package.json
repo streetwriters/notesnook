@@ -32,12 +32,12 @@
   },
   "scripts": {
     "test": "vitest run",
-    "bench": "ts-node benches/bench.ts",
-    "postbuild": "node scripts/postbuild.mjs",
-    "prepublishOnly": "npm run build && npm run test",
+    "bench": "bun run benches/bench.ts",
+    "postbuild": "bun run scripts/postbuild.mjs",
+    "prepublishOnly": "bun run build && bun run test",
     "postinstall": "patch-package",
     "build": "tsdown src/browser.ts src/node.ts",
-    "watch": "npm run build -- --watch"
+    "watch": "bun run build -- --watch"
   },
   "license": "GPL-3.0-or-later",
   "repository": {

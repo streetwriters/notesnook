@@ -46,11 +46,11 @@ jobs:
 
       - name: Install packages
         run: |
-          npm ci --ignore-scripts --prefer-offline --no-audit
-          npm run bootstrap -- --scope=web
+          bun ci
+          bun run bootstrap -- --scope=web
 
       - name: Generate test build
-        run: npm run build:test:web
+        run: bun run build:test:web
 
       - name: Archive build artifact
         uses: actions/upload-artifact@v4
@@ -81,8 +81,8 @@ jobs:
 
       - name: Install packages
         run: |
-          npm ci --ignore-scripts --prefer-offline --no-audit
-          npm install -D @playwright/test otplib dayjs @zip.js/zip.js
+          bun ci
+          bun add -D @playwright/test otplib dayjs @zip.js/zip.js
 
       - name: Validate build extraction
         run: ls -ld ./apps/web/build/index.html

@@ -16,23 +16,21 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import glob from "fast-glob";
+
 import fs from "fs/promises";
 import { existsSync } from "fs";
 import path from "path";
-import { Listr } from "listr2";
+import { findPackages, readConfig, runTasks } from "./utils.mjs";
 
-const allPackages = await glob(["packages/**", "apps/**", "extensions/**"], {
-  deep: 1,
-  onlyDirectories: true
-});
+const config = readConfig();
+const allPackages = await findPackages(config.projects);
 
-const tasks = new Listr([], { concurrent: 8, exitOnError: false });
+const tasks = [];
 for (const pkg of allPackages) {
   for (const dirname of ["node_modules", "dist", "build", "out"]) {
     const dir = path.join(pkg, dirname);
     if (existsSync(dir))
-      tasks.add({
+      tasks.push({
         title: "Cleaning " + dir,
         task: () => fs.rm(dir, { recursive: true, force: true })
       });
@@ -40,5 +38,5 @@ for (const pkg of allPackages) {
 }
 
 console.time("Took");
-await tasks.run();
+await runTasks(tasks, { concurrent: 8, exitOnError: false });
 console.timeEnd("Took");

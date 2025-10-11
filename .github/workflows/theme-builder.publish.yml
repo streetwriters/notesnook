@@ -15,8 +15,8 @@ jobs:
 
       - name: Install packages
         run: |
-          npm ci --ignore-scripts --prefer-offline --no-audit
-          npm run bootstrap -- --scope=themebuilder
+          bun ci
+          bun run bootstrap -- --scope=themebuilder
 
       - name: Setup environment
         run: |
@@ -24,7 +24,7 @@ jobs:
           echo "CLOUDFLARE_API_TOKEN=${{ secrets.CLOUDFLARE_API_TOKEN }}" >> $GITHUB_ENV
 
       - name: Generate build
-        run: npm run build:theme-builder
+        run: bun run build:theme-builder
 
       - name: Publish to Cloudflare Pages
-        run: npx --yes wrangler pages deploy --project-name=notesnook-theme-builder ./apps/theme-builder/build/
+        run: bunx --silent wrangler pages deploy --project-name=notesnook-theme-builder ./apps/theme-builder/build/

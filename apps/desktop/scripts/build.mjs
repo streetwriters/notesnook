@@ -51,7 +51,7 @@ console.log("removed build folder");
 if (args.rebuild || !existsSync(path.join(webAppPath, "build"))) {
   console.log("rebuilding...");
   await exec(
-    "node scripts/execute.mjs @notesnook/web:build:desktop",
+    "bun tx @notesnook/web:build:desktop",
     path.join(__dirname, "..", "..", "..")
   );
 }
@@ -64,18 +64,18 @@ await fs.cp(path.join(webAppPath, "build"), path.join(root, "build"), {
 });
 
 if (args.variant === "mas") {
-  await exec(`yarn run bundle:mas --outdir=${path.join(root, "build")}`);
+  await exec(`bun run bundle:mas --outdir=${path.join(root, "build")}`);
 } else {
-  await exec(`yarn run bundle --outdir=${path.join(root, "build")}`);
+  await exec(`bun run bundle --outdir=${path.join(root, "build")}`);
 }
 
 if (!skipTscBuild) {
-  await exec(`yarn run build`);
+  await exec(`bun run build`);
 }
 
 if (args.run) {
   await exec(
-    `yarn electron-builder --dir --${process.arch} --config=electron-builder.config.js`
+    `bun electron-builder --dir --${process.arch} --config=electron-builder.config.js`
   );
   if (process.platform === "win32") {
     await exec(`.\\output\\win-unpacked\\Notesnook.exe`);
