@@ -25,8 +25,8 @@ jobs:
 
       - name: Install packages
         run: |
-          npm ci --ignore-scripts --prefer-offline --no-audit
-          npm run bootstrap -- --scope=web
+          bun ci
+          bun run bootstrap -- --scope=web
 
       - name: Setup environment
         run: |
@@ -35,18 +35,18 @@ jobs:
 
       - name: Generate build (stable)
         if: ${{ inputs.release-track == 'stable' }}
-        run: npm run build:web
+        run: bun run build:web
 
       - name: Publish to Cloudflare Pages (stable)
         if: ${{ inputs.release-track == 'stable' }}
         working-directory: ./apps/web
-        run: npx --yes wrangler pages deploy --project-name=notesnook-app ./build/
+        run: bunx --silent wrangler pages deploy --project-name=notesnook-app ./build/
 
       - name: Generate build (beta)
         if: ${{ inputs.release-track == 'beta' }}
-        run: npm run build:beta:web
+        run: bun run build:beta:web
 
       - name: Publish to Cloudflare Pages (beta)
         if: ${{ inputs.release-track == 'beta' }}
         working-directory: ./apps/web
-        run: npx --yes wrangler pages deploy --branch=beta --project-name=notesnook-app-beta ./build/
+        run: bunx --silent wrangler pages deploy --branch=beta --project-name=notesnook-app-beta ./build/

@@ -27,15 +27,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { exec } from "child_process";
 import path from "path";
 import { readFile, writeFile, cp, rm } from "fs/promises";
-import glob from "fast-glob";
-import parser from "yargs-parser";
-import { Listr } from "listr2";
 import { existsSync } from "fs";
+import { parseArgs } from "util";
+import { findPackages, runTasks } from "./utils.mjs";
 
-const args = parser(process.argv, { alias: { scope: ["s"], version: ["v"] } });
-const allPackages = await glob("packages/*", {
-  onlyDirectories: true
+const { values: args } = parseArgs({
+  args: process.argv,
+  options: {
+    scope: {
+      type: "string",
+      short: "s"
+    },
+    version: {
+      type: "string",
+      short: "v"
+    }
+  }
 });
+const allPackages = await findPackages(["packages/*"]);
 
 if (!args.version) throw new Error("version is required.");
 
@@ -84,7 +93,7 @@ async function publishPackages(dependencies) {
 }
 
 async function performTasks(title, { dependencies, concurrency }, action) {
-  const tasks = new Listr(
+  await runTasks(
     dependencies.map((dep) => ({
       task: (_, task) => action(dep, task),
       title: title + " " + dep
@@ -94,8 +103,6 @@ async function performTasks(title, { dependencies, concurrency }, action) {
       exitOnError: true
     }
   );
-
-  await tasks.run();
 
   if (tasks.errors.length > 0) throw new Error("Failed.");
 }

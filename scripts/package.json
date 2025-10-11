@@ -1,0 +1,7 @@
+{
+  "name": "@notesnook/scripts",
+  "version": "1.0.0",
+  "bin": {
+    "tx": "execute.mjs"
+  }
+}

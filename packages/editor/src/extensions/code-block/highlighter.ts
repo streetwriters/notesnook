@@ -24,7 +24,7 @@ import {
   findParentNodeClosestToPos,
   NodeWithPos
 } from "@tiptap/core";
-import { Root, refractor } from "refractor/lib/core.js";
+import { RefractorRoot, refractor } from "refractor/lib/core.js";
 import { RootContent } from "hast";
 import { ReplaceAroundStep, ReplaceStep } from "prosemirror-transform";
 import { toCaretPosition, toCodeLines } from "./utils.js";
@@ -60,7 +60,7 @@ function parseNodes(
   }, [] as { text: string; classes: string[] }[]);
 }
 
-function getHighlightNodes(result: Root) {
+function getHighlightNodes(result: RefractorRoot) {
   return result.children || [];
 }
 

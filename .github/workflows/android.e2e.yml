@@ -29,8 +29,8 @@ jobs:
 
       - name: Install node modules
         run: |
-          npm ci --ignore-scripts --prefer-offline --no-audit
-          npm run bootstrap -- --scope=mobile
+          bun ci
+          bun run bootstrap -- --scope=mobile
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3

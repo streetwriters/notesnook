@@ -1,0 +1,15 @@
+diff --git a/dist/api/pseudoLocalize.js b/dist/api/pseudoLocalize.js
+index fa44b2bc99c2774df3966723858eb30408e3d69b..cd28728d0a8baafef80b3e5c078265d8683fe37e 100644
+--- a/dist/api/pseudoLocalize.js
++++ b/dist/api/pseudoLocalize.js
+@@ -49,8 +49,8 @@ function default_1(message) {
+     message = addDelimitersVariables(message);
+     message = (0, pseudolocale_1.default)(message, {
+         delimiter,
+-        prepend: "",
+-        append: "",
++        prepend: "[!!",
++        append: "!!]",
+     });
+     return removeDelimiters(message);
+ }

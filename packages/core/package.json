@@ -23,7 +23,7 @@
     "url": "git://github.com/streetwriters/notesnook-core.git"
   },
   "devDependencies": {
-    "@notesnook/crypto": "file:../crypto",
+    "@notesnook/crypto": "link:@notesnook/crypto",
     "@types/better-sqlite3": "^7.6.5",
     "@types/event-source-polyfill": "1.0.5",
     "@types/html-to-text": "^9.0.0",
@@ -54,21 +54,20 @@
     "ws": "^8.13.0"
   },
   "scripts": {
-    "postinstall": "patch-package",
-    "prebuild": "node scripts/prebuild.mjs",
-    "pretest": "node scripts/prebuild.mjs",
-    "pretest:e2e": "node scripts/prebuild.mjs",
-    "test:e2e": "cross-env IS_E2E=true vitest run",
+    "prebuild": "bun run scripts/prebuild.mjs",
+    "pretest": "bun run scripts/prebuild.mjs",
+    "pretest:e2e": "bun run scripts/prebuild.mjs",
+    "test:e2e": "IS_E2E=true vitest run",
     "test": "vitest run",
-    "build": "node ../../scripts/build.mjs",
-    "prepublishOnly": "npm run build",
-    "watch": "npm run build -- --watch"
+    "build": "bun run ../../scripts/build.mjs",
+    "prepublishOnly": "bun run build",
+    "watch": "bun run build -- --watch"
   },
   "dependencies": {
     "@leeoniya/ufuzzy": "^1.0.10",
     "@microsoft/signalr": "^8.0.0",
-    "@notesnook/intl": "file:../intl",
-    "@notesnook/logger": "file:../logger",
+    "@notesnook/intl": "link:@notesnook/intl",
+    "@notesnook/logger": "link:@notesnook/logger",
     "@readme/data-urls": "^3.0.0",
     "@streetwriters/kysely": "^0.27.4",
     "@streetwriters/showdown": "^3.0.9-alpha",
@@ -93,5 +92,12 @@
   },
   "overrides": {
     "htmlparser2": "^10.0.0"
+  },
+  "trustedDependencies": [
+    "better-sqlite3-multiple-ciphers"
+  ],
+  "patchedDependencies": {
+    "@microsoft/signalr@8.0.0": "patches/@microsoft%2Fsignalr@8.0.0.patch",
+    "html-to-text@9.0.5.patch": "patches/html-to-text@9.0.5.patch"
   }
 }

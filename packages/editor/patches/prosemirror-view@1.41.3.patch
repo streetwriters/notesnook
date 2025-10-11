@@ -1,0 +1,46 @@
+diff --git a/dist/index.cjs b/dist/index.cjs
+index 8c8948eceeb9d8af1779f5bda31bd7a88dafebd7..bceee1aaf01d5b8c6c8ca45b05e3636a882b0804 100644
+--- a/dist/index.cjs
++++ b/dist/index.cjs
+@@ -999,8 +999,8 @@ var ViewDesc = function () {
+       if (!(force || brKludge && safari) && isEquivalentPosition(anchorDOM.node, anchorDOM.offset, selRange.anchorNode, selRange.anchorOffset) && isEquivalentPosition(headDOM.node, headDOM.offset, selRange.focusNode, selRange.focusOffset)) return;
+       var domSelExtended = false;
+       if ((domSel.extend || anchor == head) && !(brKludge && gecko)) {
+-        domSel.collapse(anchorDOM.node, anchorDOM.offset);
+         try {
++          domSel.collapse(anchorDOM.node, anchorDOM.offset);
+           if (anchor != head) domSel.extend(headDOM.node, headDOM.offset);
+           domSelExtended = true;
+         } catch (_) {}
+@@ -3532,7 +3532,7 @@ editHandlers.drop = function (view, _event) {
+     });
+     tr.setSelection(selectionBetween(view, $pos, tr.doc.resolve(end)));
+   }
+-  view.focus();
++  if (!dragging || !dragging.nodeView) view.focus();
+   view.dispatch(tr.setMeta("uiEvent", "drop"));
+ };
+ handlers.focus = function (view) {
+diff --git a/dist/index.js b/dist/index.js
+index 08aa138d630f9e40e6f314ab54f35a0f81fd3e3a..f3a5ed220c7495e4a3ceb8282f243d4c496c5b98 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -1073,8 +1073,8 @@ class ViewDesc {
+         // browsers support it yet.
+         let domSelExtended = false;
+         if ((domSel.extend || anchor == head) && !(brKludge && gecko)) {
+-            domSel.collapse(anchorDOM.node, anchorDOM.offset);
+             try {
++                domSel.collapse(anchorDOM.node, anchorDOM.offset);
+                 if (anchor != head)
+                     domSel.extend(headDOM.node, headDOM.offset);
+                 domSelExtended = true;
+@@ -3787,7 +3787,7 @@ editHandlers.drop = (view, _event) => {
+         tr.mapping.maps[tr.mapping.maps.length - 1].forEach((_from, _to, _newFrom, newTo) => end = newTo);
+         tr.setSelection(selectionBetween(view, $pos, tr.doc.resolve(end)));
+     }
+-    view.focus();
++    if (!dragging || !dragging.nodeView) view.focus();
+     view.dispatch(tr.setMeta("uiEvent", "drop"));
+ };
+ handlers.focus = view => {

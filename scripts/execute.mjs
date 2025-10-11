@@ -1,3 +1,4 @@
+#!/usr/bin/env bun
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
@@ -18,50 +19,57 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { spawn } from "child_process";
-import { existsSync, readFileSync } from "fs";
-import { glob, readFile, rename, stat, writeFile } from "fs/promises";
+import { existsSync } from "fs";
+import { readdir, readFile, rename, stat, writeFile } from "fs/promises";
 import path from "path";
-import { fileURLToPath } from "url";
 import { performance } from "perf_hooks";
 import { createHash } from "crypto";
+import {
+  allPackages,
+  config,
+  findDependencies,
+  findPackages,
+  readConfig,
+  readJson,
+  readPackage,
+  root
+} from "./utils.mjs";
+import { parseArgs } from "util";
 
-const args = { _: [], exclude: [], force: false, verbose: false, all: false };
-const shortFlags = { f: "force", v: "verbose", a: "all", e: "exclude" };
-for (let i = 2; i < process.argv.length; i++) {
-  const arg = process.argv[i];
-  if (!arg.startsWith("-")) args._.push(arg);
-  else {
-    const isLong = arg.startsWith("--");
-    const [key, value] = isLong ? arg.split("=") : [arg[1], null];
-    const flag = isLong ? key.slice(2) : shortFlags[key];
-    if (!args[flag]) args._.push(arg);
-    else if (Array.isArray(args[flag]))
-      args[flag] = value
-        ? value.split(",")
-        : process.argv[++i]?.split(",") || [];
-    else if (flag) args[flag] = true;
-  }
-}
-
-if (!args._.length) {
+let { values: args, positionals } = parseArgs({
+  options: {
+    exclude: {
+      type: "string",
+      short: "e"
+    },
+    verbose: {
+      type: "boolean",
+      short: "v"
+    },
+    all: {
+      type: "boolean",
+      short: "a"
+    },
+    force: {
+      type: "boolean",
+      short: "f"
+    }
+  },
+  allowPositionals: true
+});
+args.exclude = args.exclude?.split(",");
+if (!positionals.length) {
   console.error("Missing required argument: package:task");
   process.exit(1);
 }
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const root = path.join(__dirname, "..");
 const isVerbose = !!(process.env.CI || args.verbose);
-const rootPkg = readJson(path.join(root, "package.json"));
-const config = rootPkg.taskRunner || { projects: ["packages/*"], tasks: [] };
 const cachePath = path.join(root, ".taskcache");
 const [project, ...taskParts] = args.all
-  ? [null, ...args._[0].split(":")]
-  : args._[0].split(":");
+  ? [null, ...positionals[0].split(":")]
+  : positionals[0].split(":");
 const cmd = taskParts.join(":");
-const pkgCache = new Map();
-const depMemo = new Map();
 
-const allPkgs = await findPkgs();
 const task = config.tasks?.find((t) => t.commands?.includes(cmd));
 if (!task) {
   console.error(`Task "${cmd}" not found in taskRunner config.`);
@@ -71,7 +79,7 @@ if (!task) {
 const resolvedPkgs = (
   await Promise.all(
     task.dependencies.flatMap((dep) =>
-      allPkgs.map((pkg) => resolvePkg(dep, pkg))
+      allPackages.map((pkg) => resolvePkg(dep, pkg))
     )
   )
 ).filter(Boolean);
@@ -83,24 +91,8 @@ try {
   if (isVerbose) console.warn("Failed to parse .taskcache");
 }
 
-function readPkg(pkgPath) {
-  const key = path.resolve(pkgPath);
-  if (pkgCache.has(key)) return pkgCache.get(key);
-  try {
-    const json = readJson(path.join(pkgPath, "package.json"));
-    pkgCache.set(key, json);
-    return json;
-  } catch {
-    return null;
-  }
-}
-
-function readJson(jsonPath) {
-  return JSON.parse(readFileSync(jsonPath, "utf-8"));
-}
-
 function getPkgName(pkgPath) {
-  return readPkg(pkgPath)?.name || path.basename(pkgPath);
+  return readPackage(pkgPath)?.name || path.basename(pkgPath);
 }
 
 function isPkg(path, name) {
@@ -108,50 +100,13 @@ function isPkg(path, name) {
   return pkgName === name || pkgName.endsWith(`/${name}`);
 }
 
-async function findPkgs() {
-  const pkgs = [];
-  for await (const entry of glob(config.projects)) {
-    const pkgPath = path.join(root, entry);
-    if (existsSync(path.join(pkgPath, "package.json")))
-      pkgs.push(path.resolve(pkgPath));
-  }
-  return pkgs;
-}
-
-function filterDeps(base, deps) {
-  if (!deps) return [];
-  let filteredDeps = [];
-  for (const [key, value] of Object.entries(deps))
-    if (key.startsWith("@notesnook/") && value?.startsWith("file:"))
-      filteredDeps.push(path.resolve(base, value.slice(5)));
-  return filteredDeps;
-}
-
-async function findDeps(scope) {
-  const key = path.resolve(scope);
-  if (depMemo.has(key)) return depMemo.get(key);
-  const pkg = readPkg(scope);
-  if (!pkg) {
-    depMemo.set(key, []);
-    return [];
-  }
-  const deps = new Set(
-    filterDeps(scope, { ...pkg.dependencies, ...pkg.devDependencies })
-  );
-  for (const d of deps) for (const c of await findDeps(d)) deps.add(c);
-
-  const result = Array.from(deps);
-  depMemo.set(key, result);
-  return result;
-}
-
 async function resolvePkg(command, pkgPath) {
-  const json = readPkg(pkgPath);
+  const json = readPackage(pkgPath);
   if (!json?.scripts?.[command]) return null;
-  const deps = await findDeps(pkgPath);
+  const deps = await findDependencies(pkgPath);
   const taskDeps = {};
   for (const dep of deps) {
-    if (readPkg(dep)?.scripts?.[command]) {
+    if (readPackage(dep)?.scripts?.[command]) {
       taskDeps[command] = taskDeps[command] || [];
       taskDeps[command].push(dep);
     }
@@ -166,11 +121,15 @@ async function runScript(command, pkg, opts) {
   try {
     await new Promise((resolve, reject) => {
       const verbose = opts.verbose || isVerbose;
-      const child = spawn("npm", ["run", command, ...(opts.args || [])], {
-        cwd: pkg,
-        stdio: verbose ? "inherit" : "pipe",
-        shell: true
-      });
+      const child = spawn(
+        "bun",
+        ["--bun", "run", command, ...(opts.args || [])],
+        {
+          cwd: pkg,
+          stdio: verbose ? "inherit" : "pipe",
+          shell: true
+        }
+      );
       let output = "";
       if (!verbose && child.stdout) {
         child.stdout.on("data", (data) => (output += data));
@@ -261,11 +220,11 @@ const exclusions = new Set([
 
 async function computeChecksumFast(dir) {
   const hash = createHash("sha256");
-  for await (const entry of glob(`${dir}/**/**`, {
-    withFileTypes: true,
-    exclude: (entry) => exclusions.has(entry.name)
+
+  for (const entry of await readdir(dir, {
+    withFileTypes: true
   })) {
-    if (entry.isFile()) {
+    if (entry.isFile() && !exclusions.has(entry.name)) {
       const fullPath = path.join(entry.parentPath, entry.name);
       const fileStat = await stat(fullPath).catch(() => null);
       if (!fileStat) continue;
@@ -280,11 +239,11 @@ async function computeChecksumFast(dir) {
 async function computeChecksumSlow(dir) {
   const hash = createHash("sha256");
   const files = [];
-  for await (const entry of glob(`${dir}/**/**`, {
-    withFileTypes: true,
-    exclude: (entry) => exclusions.has(entry.name)
+  for (const entry of await readdir(dir, {
+    withFileTypes: true
   })) {
-    if (entry.isFile()) files.push(path.join(entry.parentPath, entry.name));
+    if (entry.isFile() && !exclusions.has(entry.name))
+      files.push(path.join(entry.parentPath, entry.name));
   }
   files.sort();
   for (const file of files) {
@@ -304,7 +263,7 @@ function findKeyInObject(obj, key) {
 }
 
 function getBuildFolder(pkgPath) {
-  const pkg = readPkg(pkgPath);
+  const pkg = readPackage(pkgPath);
   if (!pkg) return null;
   let artifact =
     pkg.main ||
@@ -364,6 +323,6 @@ if (args.all) {
   console.timeEnd("Ready in");
   await runScript(cmd, pkg.path, {
     verbose: true,
-    args: ["--", ...args._.slice(1)]
+    args: ["--", ...positionals.slice(1)]
   });
 }

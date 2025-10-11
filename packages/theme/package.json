@@ -53,10 +53,10 @@
     "zustand": ">=4"
   },
   "scripts": {
-    "prebuild": "node ./scripts/prebuild.mjs",
-    "generate": "node ./scripts/schema-generator.mjs",
-    "build": "node ../../scripts/build.mjs",
-    "prepublishOnly": "npm run build",
-    "watch": "npm run build -- --watch"
+    "prebuild": "bun run ./scripts/prebuild.mjs",
+    "generate": "bun run ./scripts/schema-generator.mjs",
+    "build": "bun run ../../scripts/build.mjs",
+    "prepublishOnly": "bun run build",
+    "watch": "bun run build -- --watch"
   }
 }

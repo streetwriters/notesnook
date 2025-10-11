@@ -24,17 +24,17 @@ jobs:
 
       - name: Install packages
         run: |
-          npm ci --ignore-scripts --prefer-offline --no-audit
-          npm run bootstrap -- --scope=web
+          bun ci
+          bun run bootstrap -- --scope=web
 
       - name: Build
-        run: npm run build:web
+        run: bun run build:web
 
       - name: Install Playwright Browsers
-        run: npx playwright install chromium --with-deps
+        run: bunx playwright install chromium --with-deps
         working-directory: apps/web
 
       - name: Run benchmarks
         id: benchmark
-        run: node __bench__/app.bench.mjs
+        run: bun run __bench__/app.bench.mjs
         working-directory: apps/web

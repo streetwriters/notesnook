@@ -22,10 +22,9 @@
     "url": "git+https://github.com/streetwriters/notesnook.git"
   },
   "scripts": {
-    "build": "tsc && npx rsbuild build",
-    "prepublishOnly": "npm run build",
+    "build": "tsc && bunx rsbuild build",
+    "prepublishOnly": "bun run build",
     "test": "playwright test",
-    "postinstall": "patch-package",
     "watch": "tsc --watch"
   },
   "bugs": {
@@ -36,5 +35,8 @@
     "css-what": "6.1.0",
     "hyperapp": "^2.0.22",
     "specificity": "^0.4.1"
+  },
+  "patchedDependencies": {
+    "css-what@6.1.0": "patches/css-what@6.1.0.patch"
   }
 }

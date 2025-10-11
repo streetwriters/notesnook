@@ -1,0 +1,14 @@
+{
+  "lockfileVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "@notesnook/crypto",
+      "dependencies": {
+        "@notesnook/sodium": "link:@notesnook/sodium",
+      },
+    },
+  },
+  "packages": {
+    "@notesnook/sodium": ["@notesnook/sodium@link:@notesnook/sodium", {}],
+  }
+}

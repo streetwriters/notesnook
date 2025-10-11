@@ -20,7 +20,7 @@
     "url": "git://github.com/streetwriters/notesnook.git"
   },
   "dependencies": {
-    "@notesnook/theme": "file:../theme"
+    "@notesnook/theme": "link:@notesnook/theme"
   },
   "devDependencies": {
     "mac-scrollbar": "0.13.6",
@@ -47,7 +47,7 @@
   },
   "scripts": {
     "build": "tsdown src/index.ts",
-    "prepublishOnly": "npm run build",
-    "watch": "npm run build -- --watch"
+    "prepublishOnly": "bun run build",
+    "watch": "bun run build -- --watch"
   }
 }

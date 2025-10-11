@@ -2,7 +2,7 @@
   "name": "@notesnook/docs-help",
   "version": "1.0.0",
   "scripts": {
-    "document-keyboard-shortcuts": "node scripts/document-keyboard-shortcuts.mjs"
+    "document-keyboard-shortcuts": "bun run scripts/document-keyboard-shortcuts.mjs"
   },
   "repository": {
     "type": "git",
@@ -20,6 +20,6 @@
   },
   "homepage": "https://github.com/streetwriters/notesnook#readme",
   "devDependencies": {
-    "@notesnook/common": "file:../../packages/common"
+    "@notesnook/common": "link:@notesnook/common"
   }
 }
