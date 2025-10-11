@@ -2,7 +2,7 @@
   "name": "notesnook",
   "private": true,
   "scripts": {
-    "install": "bun run scripts/prepare.mjs",
+    "prepare": "bun run scripts/prepare.mjs",
     "bootstrap": "bun run scripts/bootstrap.mjs",
     "clean": "bun run scripts/clean.mjs",
     "build": "tx build --all --exclude=mobile,web,monograph,theme-builder,vericrypt",
@@ -61,7 +61,7 @@
     "prettier": "^2.8.8",
     "serve": "^14.0.1",
     "tsdown": "^0.15.6",
-    "@notesnook/scripts": "link:@notesnook/scripts"
+    "@notesnook/scripts": "file:./scripts"
   },
   "dependencies": {
     "patch-package": "^7.0.0",

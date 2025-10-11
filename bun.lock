@@ -8,7 +8,7 @@
         "typescript": "^5.6.3",
       },
       "devDependencies": {
-        "@notesnook/scripts": "link:@notesnook/scripts",
+        "@notesnook/scripts": "file:./scripts",
         "@types/node": "^18.7.13",
         "@typescript-eslint/eslint-plugin": "^5.59.9",
         "@typescript-eslint/parser": "^5.59.9",
@@ -301,7 +301,7 @@
 
     "@nodelib/fs.walk": ["@nodelib/fs.walk@1.2.8", "", { "dependencies": { "@nodelib/fs.scandir": "2.1.5", "fastq": "^1.6.0" } }, "sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg=="],
 
-    "@notesnook/scripts": ["@notesnook/scripts@link:@notesnook/scripts", { "bin": { "tx": "execute.mjs" } }],
+    "@notesnook/scripts": ["@notesnook/scripts@file:scripts", { "bin": { "tx": "execute.mjs" } }],
 
     "@oxc-project/types": ["@oxc-project/types@0.94.0", "", {}, "sha512-+UgQT/4o59cZfH6Cp7G0hwmqEQ0wE+AdIwhikdwnhWI9Dp8CgSY081+Q3O67/wq3VJu8mgUEB93J9EHHn70fOw=="],
 
