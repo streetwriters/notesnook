@@ -28,7 +28,7 @@ import type {
   ThemeMetadata,
   ThemesRouter
 } from "@notesnook/themes-server";
-import DocumentPicker from "@react-native-documents/picker";
+import { pick } from "@react-native-documents/picker";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { MasonryFlashList } from "@shopify/flash-list";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -413,7 +413,7 @@ function ThemeSelector() {
               icon="folder"
               fontSize={AppFontSize.xs}
               onPress={() => {
-                DocumentPicker.pick({
+                pick({
                   allowMultiSelection: false
                 }).then((r) => {
                   fetch(r[0].uri).then(async (response) => {

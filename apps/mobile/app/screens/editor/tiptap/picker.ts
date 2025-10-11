@@ -21,7 +21,8 @@ import Sodium from "@ammarahmed/react-native-sodium";
 import { isFeatureAvailable } from "@notesnook/common";
 import { isImage } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import DocumentPicker, {
+import {
+  pick as pickFile,
   DocumentPickerOptions,
   DocumentPickerResponse,
   keepLocalCopy
@@ -83,7 +84,7 @@ const file = async (fileOptions: PickerOptions) => {
     let fileName;
     try {
       useSettingStore.getState().setAppDidEnterBackgroundForAction(true);
-      file = (await DocumentPicker.pick(options))[0];
+      file = (await pickFile(options))[0];
       fileName = file.name ?? "attachment_" + Date.now();
       const result = await keepLocalCopy({
         files: [

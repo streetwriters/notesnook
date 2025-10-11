@@ -24,7 +24,7 @@ import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, Platform, View } from "react-native";
 import RNFetchBlob, { ReactNativeBlobUtilStat } from "react-native-blob-util";
-import DocumentPicker, { keepLocalCopy } from "@react-native-documents/picker";
+import { pick, keepLocalCopy } from "@react-native-documents/picker";
 import * as ScopedStorage from "react-native-scoped-storage";
 import { unzip } from "react-native-zip-archive";
 import { DatabaseLogger, db } from "../../../common/database";
@@ -357,7 +357,7 @@ export const RestoreBackup = () => {
                     useUserStore.setState({
                       disableAppLockRequests: true
                     });
-                    const file = await DocumentPicker.pick();
+                    const file = await pick();
 
                     const fileCopy = await keepLocalCopy({
                       destination: "cachesDirectory",
