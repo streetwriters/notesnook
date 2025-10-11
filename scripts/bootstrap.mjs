@@ -61,7 +61,10 @@ if (IS_BOOTSTRAP_ALL) {
     new Set(
       (
         await Promise.all(
-          allPackages.map(async (scope) => await findDependencies(scope))
+          allPackages.map(
+            async (scope) =>
+              await findDependencies(scope, { includeSelf: true })
+          )
         )
       ).flat()
     ).values()
@@ -69,7 +72,9 @@ if (IS_BOOTSTRAP_ALL) {
 
   await bootstrapPackages(dependencies);
 } else {
-  const dependencies = await findDependencies(scopes[args.scope]);
+  const dependencies = await findDependencies(scopes[args.scope], {
+    includeSelf: true
+  });
   await bootstrapPackages(dependencies);
 }
 

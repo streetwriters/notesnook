@@ -40,7 +40,7 @@ export async function findPackages(projects, root) {
   return pkgs;
 }
 
-export async function findDependencies(packagePath) {
+export async function findDependencies(packagePath, { includeSelf }) {
   const key = path.resolve(packagePath);
   if (depMemo.has(key)) return Array.from(depMemo.get(key));
   const pkg = readPackage(packagePath);
@@ -52,9 +52,10 @@ export async function findDependencies(packagePath) {
     filterDependencies({ ...pkg.dependencies, ...pkg.devDependencies })
   );
   for (const dep of dependencies)
-    for (const c of await findDependencies(dep)) dependencies.add(c);
+    for (const c of await findDependencies(dep, { includeSelf }))
+      dependencies.add(c);
 
-  dependencies.add(path.resolve(packagePath));
+  if (includeSelf) dependencies.add(path.resolve(packagePath));
   depMemo.set(key, dependencies);
   return Array.from(dependencies);
 }
