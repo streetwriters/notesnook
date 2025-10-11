@@ -17,17 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { exec, execSync } from "child_process";
-import { glob, readFile } from "fs/promises";
+import { execSync } from "child_process";
+import { readFile } from "fs/promises";
 import path from "path";
 import os from "os";
-import {
-  findDependencies,
-  findPackages,
-  readConfig,
-  readJson,
-  runTasks
-} from "./utils.mjs";
+import { findDependencies, allPackages } from "./utils.mjs";
 import { parseArgs } from "util";
 
 const { values: args } = parseArgs({
@@ -45,7 +39,6 @@ const { values: args } = parseArgs({
 });
 const IS_CI = process.env.CI;
 const THREADS = Math.max(4, process.env.THREADS || os.cpus().length / 2);
-const config = readConfig();
 const scopes = {
   mobile: "apps/mobile",
   web: "apps/web",
@@ -63,7 +56,6 @@ if (args.scope && !scopes[args.scope])
 
 const IS_BOOTSTRAP_ALL = !args.scope;
 
-const allPackages = await findPackages(config.projects);
 if (IS_BOOTSTRAP_ALL) {
   const dependencies = Array.from(
     new Set(
