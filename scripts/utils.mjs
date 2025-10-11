@@ -40,23 +40,23 @@ export async function findPackages(projects, root) {
   return pkgs;
 }
 
-export async function findDependencies(scope) {
-  const key = path.resolve(scope);
-  if (depMemo.has(key)) return depMemo.get(key);
-  const pkg = readPackage(scope);
+export async function findDependencies(packagePath) {
+  const key = path.resolve(packagePath);
+  if (depMemo.has(key)) return Array.from(depMemo.get(key));
+  const pkg = readPackage(packagePath);
   if (!pkg) {
     depMemo.set(key, []);
     return [];
   }
-  const deps = new Set(
+  const dependencies = new Set(
     filterDependencies({ ...pkg.dependencies, ...pkg.devDependencies })
   );
-  for (const dep of deps)
-    for (const c of await findDependencies(dep)) deps.add(c);
+  for (const dep of dependencies)
+    for (const c of await findDependencies(dep)) dependencies.add(c);
 
-  const result = Array.from(deps);
-  depMemo.set(key, result);
-  return result;
+  dependencies.add(path.resolve(packagePath));
+  depMemo.set(key, dependencies);
+  return Array.from(dependencies);
 }
 
 function filterDependencies(deps) {
