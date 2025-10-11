@@ -1,12 +1,9 @@
 import { execSync } from "child_process";
-import { findPackages, readConfig, readJson } from "./utils.mjs";
+import { allPackages, readJson } from "./utils.mjs";
 import path from "path";
 import { writeFile } from "fs/promises";
 
-const config = readConfig();
-
-const allPkgs = await findPackages(config.projects);
-for (const pkg of allPkgs) {
+for (const pkg of allPackages) {
   execSync("bun link", { cwd: pkg });
   const json = readJson(path.join(pkg, "package.json"));
   for (const key of ["dependencies", "devDependencies"]) {
@@ -18,7 +15,7 @@ for (const pkg of allPkgs) {
   }
   await writeFile(
     path.join(pkg, "package.json"),
-    JSON.stringify(json, null, 2)
+    JSON.stringify(json, null, 2) + "\n"
   );
 }
 

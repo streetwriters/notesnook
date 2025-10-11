@@ -2,7 +2,7 @@
   "name": "notesnook",
   "private": true,
   "scripts": {
-    "prepare": "bun run scripts/prepare.mjs",
+    "preinstall": "bun run scripts/prepare.mjs",
     "bootstrap": "bun run scripts/bootstrap.mjs",
     "clean": "bun run scripts/clean.mjs",
     "build": "tx build --all --exclude=mobile,web,monograph,theme-builder,vericrypt",
