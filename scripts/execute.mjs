@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
@@ -19,10 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { spawn } from "child_process";
-import { existsSync, readFileSync } from "fs";
-import { glob, readdir, readFile, rename, stat, writeFile } from "fs/promises";
+import { existsSync } from "fs";
+import { readdir, readFile, rename, stat, writeFile } from "fs/promises";
 import path from "path";
-import { fileURLToPath } from "url";
 import { performance } from "perf_hooks";
 import { createHash } from "crypto";
 import {
