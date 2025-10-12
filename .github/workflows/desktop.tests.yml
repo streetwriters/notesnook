@@ -74,7 +74,7 @@ jobs:
         working-directory: ./apps/desktop
 
       - name: Run tests x64
-        run: npm run test
+        run: bun run test
         working-directory: ./apps/desktop
 
       - name: Upload test results
@@ -117,7 +117,7 @@ jobs:
         working-directory: ./apps/desktop
 
       - name: Run tests arm64
-        run: npm run test
+        run: bun run test
         working-directory: ./apps/desktop
 
       - name: Upload test results
@@ -153,8 +153,8 @@ jobs:
 
       - name: Install sqlite-better-trigram for all arch
         run: |
-          npm i --cpu arm64 sqlite-better-trigram
-          npm i --cpu x64 sqlite-better-trigram
+          bun i --cpu arm64 sqlite-better-trigram
+          bun i --cpu x64 sqlite-better-trigram
         working-directory: ./apps/desktop
 
       - name: Build Electron wrapper
@@ -166,7 +166,7 @@ jobs:
         working-directory: ./apps/desktop
 
       - name: Run tests
-        run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" -- npm run test
+        run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" -- bun run test
         working-directory: ./apps/desktop
 
       - name: Upload test results
@@ -202,11 +202,11 @@ jobs:
 
       - name: Install sqlite-better-trigram for all arch
         run: |
-          npm i --cpu arm64 sqlite-better-trigram
-          npm i --cpu x64 sqlite-better-trigram
+          bun i --cpu arm64 sqlite-better-trigram
+          bun i --cpu x64 sqlite-better-trigram
 
-          npm i --cpu arm64 sqlite3-fts5-html
-          npm i --cpu x64 sqlite3-fts5-html
+          bun i --cpu arm64 sqlite3-fts5-html
+          bun i --cpu x64 sqlite3-fts5-html
         working-directory: ./apps/desktop
 
       - name: Build Electron wrapper
@@ -218,7 +218,7 @@ jobs:
         working-directory: ./apps/desktop
 
       - name: Run tests
-        run: npm run test
+        run: bun run test
         working-directory: ./apps/desktop
 
       - name: Upload test results
