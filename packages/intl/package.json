@@ -24,7 +24,7 @@
   },
   "scripts": {
     "extract": "lingui extract --clean --overwrite",
-    "compile": "lingui compile --typescript",
+    "compile": "lingui compile",
     "build-locale": "bun scripts/generate-strings.mjs && bun run extract && bun run compile",
     "build": "bun run build-locale && bunx vite build && bun run scripts/postbuild.mjs",
     "watch": "nodemon --watch scripts/ --watch src --ext ts,mjs --exec \"bun run build\""
