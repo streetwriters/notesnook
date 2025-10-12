@@ -19,9 +19,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { readFile } from "fs/promises";
 import path from "path";
-import parser from "yargs-parser";
+import { parseArgs } from "util";
 
-const args = parser(process.argv, { alias: { scope: ["s"] } });
+const { values: args } = parseArgs({
+  options: {
+    scope: {
+      type: "string",
+      short: "s"
+    }
+  }
+});
 const scopes = {
   mobile: "apps/mobile",
   web: "apps/web",

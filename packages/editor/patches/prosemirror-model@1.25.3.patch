@@ -1,0 +1,46 @@
+diff --git a/dist/index.cjs b/dist/index.cjs
+index b34cd59f3cda71520f18494aad17e01a0f800421..aea0154df64d7d0fc69039ee0a52a45d54ad545f 100644
+--- a/dist/index.cjs
++++ b/dist/index.cjs
+@@ -95,6 +95,7 @@ var Fragment = function () {
+       var nodeStart = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+       var parent = arguments.length > 4 ? arguments[4] : undefined;
+       for (var i = 0, pos = 0; pos < to; i++) {
++        if (i >= this.content.length) break;
+         var child = this.content[i],
+           end = pos + child.nodeSize;
+         if (end > from && f(child, nodeStart + pos, parent || null, i) !== false && child.content.size) {
+@@ -2834,7 +2835,7 @@ function _renderSpec(doc, structure, xmlNS, blockArraysIn) {
+   var tagName = structure[0],
+     suspicious;
+   if (typeof tagName != "string") throw new RangeError("Invalid array passed to renderSpec");
+-  if (blockArraysIn && (suspicious = suspiciousAttributes(blockArraysIn)) && suspicious.indexOf(structure) > -1) throw new RangeError("Using an array from an attribute object as a DOM spec. This may be an attempted cross site scripting attack.");
++  // if (blockArraysIn && (suspicious = suspiciousAttributes(blockArraysIn)) && suspicious.indexOf(structure) > -1) throw new RangeError("Using an array from an attribute object as a DOM spec. This may be an attempted cross site scripting attack.");
+   var space = tagName.indexOf(" ");
+   if (space > 0) {
+     xmlNS = tagName.slice(0, space);
+diff --git a/dist/index.js b/dist/index.js
+index c933a50adf002f81f88312ce53ba3ccee49f86d6..a82807398a9273ff6611f4b598f92daa0ce2b069 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -84,6 +84,7 @@ class Fragment {
+     */
+     nodesBetween(from, to, f, nodeStart = 0, parent) {
+         for (let i = 0, pos = 0; pos < to; i++) {
++            if (i >= this.content.length) break;
+             let child = this.content[i], end = pos + child.nodeSize;
+             if (end > from && f(child, nodeStart + pos, parent || null, i) !== false && child.content.size) {
+                 let start = pos + 1;
+@@ -3406,9 +3407,9 @@ function renderSpec(doc, structure, xmlNS, blockArraysIn) {
+     let tagName = structure[0], suspicious;
+     if (typeof tagName != "string")
+         throw new RangeError("Invalid array passed to renderSpec");
+-    if (blockArraysIn && (suspicious = suspiciousAttributes(blockArraysIn)) &&
+-        suspicious.indexOf(structure) > -1)
+-        throw new RangeError("Using an array from an attribute object as a DOM spec. This may be an attempted cross site scripting attack.");
++    // if (blockArraysIn && (suspicious = suspiciousAttributes(blockArraysIn)) &&
++    //     suspicious.indexOf(structure) > -1)
++    //     throw new RangeError("Using an array from an attribute object as a DOM spec. This may be an attempted cross site scripting attack.");
+     let space = tagName.indexOf(" ");
+     if (space > 0) {
+         xmlNS = tagName.slice(0, space);

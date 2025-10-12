@@ -28,7 +28,7 @@ import {
   Driver
 } from "@streetwriters/kysely";
 import { desktop } from "../desktop-bridge";
-import Worker from "./sqlite.worker.desktop.ts?worker";
+// import Worker from "./sqlite.worker.desktop.ts?worker";
 import type { SQLiteWorker } from "./sqlite.worker.desktop";
 import { wrap, Remote } from "comlink";
 import { Mutex } from "async-mutex";
@@ -37,7 +37,9 @@ import { DialectOptions } from ".";
 class SqliteDriver implements Driver {
   connection?: DatabaseConnection;
   private connectionMutex = new Mutex();
-  worker: Remote<SQLiteWorker> = wrap<SQLiteWorker>(new Worker());
+  worker: Remote<SQLiteWorker> = wrap<SQLiteWorker>(
+    new Worker(new URL("./sqlite.worker.desktop.ts", import.meta.url))
+  );
   constructor(private readonly config: { name: string }) {}
 
   async init(): Promise<void> {

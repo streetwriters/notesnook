@@ -23,7 +23,7 @@ const IS_CI = !!process.env.CI;
 
 const config: PlaywrightTestConfig = {
   webServer: {
-    command: "npm run start",
+    command: "bun run start",
     port: 3000,
     timeout: 60 * 1000,
     reuseExistingServer: false

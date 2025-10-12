@@ -19,11 +19,11 @@
   },
   "scripts": {
     "build": "tsdown src/index.ts",
-    "prepublishOnly": "npm run build",
-    "watch": "npm run build -- --watch"
+    "prepublishOnly": "bun run build",
+    "watch": "bun run build -- --watch"
   },
   "dependencies": {
-    "@notesnook/sodium": "file:../sodium"
+    "@notesnook/sodium": "link:@notesnook/sodium"
   },
   "devDependencies": {},
   "repository": {

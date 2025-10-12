@@ -31,8 +31,8 @@
     "@emotion/react": "11.11.1",
     "@mdi/js": "7.4.47",
     "@mdi/react": "1.6.1",
-    "@notesnook/clipper": "file:../../packages/clipper",
-    "@notesnook/theme": "file:../../packages/theme",
+    "@notesnook/clipper": "link:@notesnook/clipper",
+    "@notesnook/theme": "link:@notesnook/theme",
     "@theme-ui/components": "0.16.1",
     "@theme-ui/core": "0.16.1",
     "comlink": "^4.3.1",
@@ -48,11 +48,11 @@
     "zustand": "4.5.5"
   },
   "scripts": {
-    "build:firefox": "cross-env MANIFEST_VERSION=2 node build-utils/build.js",
-    "build:chrome": "cross-env MANIFEST_VERSION=3 node build-utils/build.js",
-    "dev:chrome": "cross-env MANIFEST_VERSION=3 node build-utils/dev.js",
-    "dev:firefox": "cross-env MANIFEST_VERSION=2 node build-utils/dev.js",
-    "build": "node ../../scripts/build.mjs"
+    "build:firefox": "MANIFEST_VERSION=2 bun run build-utils/build.js",
+    "build:chrome": "MANIFEST_VERSION=3 bun run build-utils/build.js",
+    "dev:chrome": "MANIFEST_VERSION=3 bun run build-utils/dev.js",
+    "dev:firefox": "MANIFEST_VERSION=2 bun run build-utils/dev.js",
+    "build": "bun run ../../scripts/build.mjs"
   },
   "browserslist": {
     "production": [

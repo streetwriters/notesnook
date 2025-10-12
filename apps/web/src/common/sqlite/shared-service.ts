@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import SharedWorker from "./shared-service.worker.ts?sharedworker";
+// import SharedWorker from "./shared-service.worker.ts?sharedworker";
 import { Mutex } from "async-mutex";
 
 const sharedWorker = globalThis.SharedWorker
-  ? new SharedWorker({
+  ? new SharedWorker(new URL("./shared-service.worker.ts", import.meta.url), {
       name: "SharedService"
     })
   : null;

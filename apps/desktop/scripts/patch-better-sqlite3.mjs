@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { execSync } from "child_process";
 import { readFile, rm, writeFile } from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";

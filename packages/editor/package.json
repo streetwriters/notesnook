@@ -31,10 +31,10 @@
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "@notesnook-importer/core": "^2.2.2",
-    "@notesnook/common": "file:../common",
-    "@notesnook/intl": "file:../intl",
-    "@notesnook/theme": "file:../theme",
-    "@notesnook/ui": "file:../ui",
+    "@notesnook/common": "link:@notesnook/common",
+    "@notesnook/intl": "link:@notesnook/intl",
+    "@notesnook/theme": "link:@notesnook/theme",
+    "@notesnook/ui": "link:@notesnook/ui",
     "@social-embed/lib": "^0.1.0-next.7",
     "@tiptap/core": "2.6.6",
     "@tiptap/extension-blockquote": "^2.6.6",
@@ -74,7 +74,7 @@
     "nanoid": "5.0.7",
     "prism-themes": "^1.9.0",
     "prosemirror-codemark": "^0.4.2",
-    "prosemirror-view": "1.34.2",
+    "prosemirror-view": "1.41.3",
     "re-resizable": "^6.9.18",
     "react-colorful": "^5.6.1",
     "redent": "^4.0.0",
@@ -118,17 +118,26 @@
   },
   "scripts": {
     "test": "vitest run",
-    "prebuild": "node ./scripts/build.mjs",
-    "postbuild": "node ./scripts/postbuild.mjs",
-    "start": "npm run watch",
-    "prepublishOnly": "npm run build && npm run test",
-    "postinstall": "patch-package",
-    "build": "node ../../scripts/build.mjs",
-    "watch": "nodemon -V --watch src --watch styles/styles.css -i src/extensions/code-block/languages/index.ts --ext ts,tsx,css --exec npm run build"
+    "prebuild": "bun run ./scripts/build.mjs",
+    "postbuild": "bun run ./scripts/postbuild.mjs",
+    "start": "bun run watch",
+    "prepublishOnly": "bun run build && bun run test",
+    "build": "bun run ../../scripts/build.mjs",
+    "watch": "nodemon -V --watch src --watch styles/styles.css -i src/extensions/code-block/languages/index.ts --ext ts,tsx,css --exec bun run build"
   },
   "repository": {
     "type": "git",
     "url": "git://github.com/streetwriters/notesnook.git",
     "directory": "packages/editor"
+  },
+  "overrides": {
+    "prosemirror-view": "1.41.3"
+  },
+  "patchedDependencies": {
+    "prosemirror-view@1.41.3": "patches/prosemirror-view@1.41.3.patch",
+    "prosemirror-model@1.25.3": "patches/prosemirror-model@1.25.3.patch",
+    "@tiptap/core@2.6.6": "patches/@tiptap%2Fcore@2.6.6.patch",
+    "@tiptap/extension-list-keymap@2.6.6": "patches/@tiptap%2Fextension-list-keymap@2.6.6.patch",
+    "katex@0.16.11": "patches/katex@0.16.11.patch"
   }
 }

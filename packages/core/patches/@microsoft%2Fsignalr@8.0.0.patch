@@ -1,0 +1,52 @@
+diff --git a/dist/browser/signalr.js b/dist/browser/signalr.js
+index 86f7968..9bc9745 100644
+--- a/dist/browser/signalr.js
++++ b/dist/browser/signalr.js
+@@ -347,7 +347,7 @@ class Platform {
+     // Node apps shouldn't have a window object, but WebWorkers don't either
+     // so we need to check for both WebWorker and window
+     static get isNode() {
+-        return typeof process !== "undefined" && process.release && process.release.name === "node";
++        return typeof process !== "undefined" && process.release && process.release.name === "node" && process.type !== "renderer";
+     }
+ }
+ /** @private */
+diff --git a/dist/cjs/Utils.js b/dist/cjs/Utils.js
+index 2db55f7..228d318 100644
+--- a/dist/cjs/Utils.js
++++ b/dist/cjs/Utils.js
+@@ -45,7 +45,7 @@ class Platform {
+     // Node apps shouldn't have a window object, but WebWorkers don't either
+     // so we need to check for both WebWorker and window
+     static get isNode() {
+-        return typeof process !== "undefined" && process.release && process.release.name === "node";
++        return typeof process !== "undefined" && process.release && process.release.name === "node" && process.type !== "renderer";
+     }
+ }
+ exports.Platform = Platform;
+diff --git a/dist/esm/Utils.js b/dist/esm/Utils.js
+index a8962ee..2fd2558 100644
+--- a/dist/esm/Utils.js
++++ b/dist/esm/Utils.js
+@@ -41,7 +41,7 @@ export class Platform {
+     // Node apps shouldn't have a window object, but WebWorkers don't either
+     // so we need to check for both WebWorker and window
+     static get isNode() {
+-        return typeof process !== "undefined" && process.release && process.release.name === "node";
++        return typeof process !== "undefined" && process.release && process.release.name === "node" && process.type !== "renderer";
+     }
+ }
+ /** @private */
+diff --git a/dist/webworker/signalr.js b/dist/webworker/signalr.js
+index 86f7968..9bc9745 100644
+--- a/dist/webworker/signalr.js
++++ b/dist/webworker/signalr.js
+@@ -347,7 +347,7 @@ class Platform {
+     // Node apps shouldn't have a window object, but WebWorkers don't either
+     // so we need to check for both WebWorker and window
+     static get isNode() {
+-        return typeof process !== "undefined" && process.release && process.release.name === "node";
++        return typeof process !== "undefined" && process.release && process.release.name === "node" && process.type !== "renderer";
+     }
+ }
+ /** @private */

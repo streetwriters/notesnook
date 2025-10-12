@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import NetworkCheckWorker from "./network-check.worker.ts?worker";
+// import NetworkCheckWorker from "./network-check.worker.ts?worker";
 import type { NetworkCheck as NetworkWorker } from "./network-check.worker";
 import { wrap, Remote } from "comlink";
 
@@ -26,7 +26,9 @@ export class NetworkCheck {
   private network!: Remote<NetworkWorker>;
 
   constructor() {
-    this.worker = new NetworkCheckWorker();
+    this.worker = new Worker(
+      new URL("./network-check.worker.ts", import.meta.url)
+    );
     this.network = wrap<NetworkWorker>(this.worker);
   }
 

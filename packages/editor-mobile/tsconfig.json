@@ -1,13 +1,11 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "../../tsconfig",
   "compilerOptions": {
     "lib": ["dom", "dom.iterable", "esnext"],
-    "jsx": "react-jsx",
-    "noEmit": true,
     "allowJs": true,
-    "moduleResolution": "nodenext",
-    "module": "nodenext"
+    "jsx": "react-jsx",
+    "moduleResolution": "Bundler",
+    "noEmit": true
   },
-  "include": ["src/"]
+  "include": ["src", "__e2e__"]
 }

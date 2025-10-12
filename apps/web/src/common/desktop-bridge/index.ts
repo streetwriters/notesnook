@@ -19,8 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { createWriteStream } from "../../utils/stream-saver";
 import { type desktop as bridge } from "./index.desktop";
+console.log("NOT DESKTOP!");
 
 export const desktop: typeof bridge | undefined = undefined;
 export function createWritableStream(filename: string) {
   return createWriteStream(filename);
 }
+export const PATHS: Record<string, string> | undefined = undefined;

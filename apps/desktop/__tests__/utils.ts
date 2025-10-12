@@ -139,7 +139,7 @@ export async function buildApp(version?: string) {
     ];
     if (version) args.push(`--c.extraMetadata.version=${version}`);
     try {
-      execSync(`npx ${args.join(" ")}`, {
+      execSync(`bun ${args.join(" ")}`, {
         stdio: IS_DEBUG ? "inherit" : "ignore",
         env: {
           ...process.env,

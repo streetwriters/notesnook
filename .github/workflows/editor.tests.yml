@@ -35,11 +35,11 @@ jobs:
 
       - name: Install packages
         run: |
-          npm ci --ignore-scripts --prefer-offline --no-audit
-          npm run bootstrap -- --scope=editor
+          bun ci
+          bun run bootstrap -- --scope=editor
 
       - name: Build editor
-        run: npm run tx @notesnook/editor:build
+        run: bun tx @notesnook/editor:build
 
       - name: Run all @notesnook/editor tests
-        run: npm run tx @notesnook/editor:test
+        run: bun tx @notesnook/editor:test

@@ -55,27 +55,27 @@ jobs:
 
       - name: Install packages
         run: |
-          npm ci --ignore-scripts --prefer-offline --no-audit
-          npm run bootstrap -- --scope=web
-          npm run bootstrap -- --scope=desktop
+          bun ci
+          bun run bootstrap -- --scope=web
+          bun run bootstrap -- --scope=desktop
 
       - name: Install sqlite-better-trigram for all arch
         run: |
-          npm i --cpu arm64 sqlite-better-trigram
-          npm i --cpu x64 sqlite-better-trigram
+          bun i --cpu arm64 sqlite-better-trigram
+          bun i --cpu x64 sqlite-better-trigram
         working-directory: ./apps/desktop
 
       - name: Generate desktop build (stable)
         if: ${{ inputs.release-track == 'stable' }}
-        run: npm run tx @notesnook/web:build:desktop
+        run: bun tx @notesnook/web:build:desktop
 
       - name: Generate desktop build (beta)
         if: ${{ inputs.release-track == 'beta' }}
-        run: BETA=true npm run tx @notesnook/web:build:desktop
+        run: BETA=true bun tx @notesnook/web:build:desktop
 
       - name: Build desktop bundle
         working-directory: ./apps/desktop
-        run: npm run bundle
+        run: bun run bundle
 
       - name: Archive build artifact
         uses: actions/upload-artifact@v4
@@ -115,7 +115,7 @@ jobs:
           cd /tmp/flatpak-builder-tools/node
           pipx install .
           cd -
-          node scripts/generate-sources.mjs
+          bun run scripts/generate-sources.mjs
 
       - name: Upload flatpak sources
         uses: softprops/action-gh-release@v1
@@ -176,13 +176,13 @@ jobs:
 
       - name: Install packages
         run: |
-          npm ci --ignore-scripts --prefer-offline --no-audit
-          npm run bootstrap -- --scope=desktop
+          bun ci
+          bun run bootstrap -- --scope=desktop
 
       - name: Install sqlite-better-trigram for all arch
         run: |
-          npm i --cpu arm64 sqlite-better-trigram
-          npm i --cpu x64 sqlite-better-trigram
+          bun i --cpu arm64 sqlite-better-trigram
+          bun i --cpu x64 sqlite-better-trigram
         working-directory: ./apps/desktop
 
       - name: Install provisioning profile
@@ -195,7 +195,7 @@ jobs:
           CSC_LINK: ${{ secrets.mac_certs }}
           CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
         run: |
-          npm run tx @notesnook/desktop:release -- --variant=mas
+          bun tx @notesnook/desktop:release -- --variant=mas
           cd apps/desktop
           yarn electron-builder --config=electron-builder.config.js --mac mas --universal -p never
 
@@ -208,7 +208,7 @@ jobs:
           APPLE_API_KEY_ID: ${{ secrets.api_key_id }}
           APPLE_API_ISSUER: ${{ secrets.api_key_issuer_id }}
         run: |
-          npm run tx @notesnook/desktop:release
+          bun tx @notesnook/desktop:release
           cd apps/desktop
           if [ ${{ inputs.publish-github }} == true ]; then
             yarn electron-builder --config=electron-builder.config.js --mac zip dmg --arm64 --x64 -p always
@@ -258,16 +258,16 @@ jobs:
 
       - name: Install packages
         run: |
-          npm ci --ignore-scripts --prefer-offline --no-audit
-          npm run bootstrap -- --scope=desktop
+          bun ci
+          bun run bootstrap -- --scope=desktop
 
       - name: Install sqlite-better-trigram for all arch
         run: |
-          npm i --cpu x64 sqlite-better-trigram
+          bun i --cpu x64 sqlite-better-trigram
         working-directory: ./apps/desktop
 
       - name: Build Electron wrapper
-        run: npm run tx @notesnook/desktop:release
+        run: bun tx @notesnook/desktop:release
 
       - name: Build snap
         if: inputs.publish-snap
@@ -325,16 +325,16 @@ jobs:
 
       - name: Install packages
         run: |
-          npm ci --ignore-scripts --prefer-offline --no-audit
-          npm run bootstrap -- --scope=desktop
+          bun ci
+          bun run bootstrap -- --scope=desktop
 
       - name: Install sqlite-better-trigram for all arch
         run: |
-          npm i --cpu arm64 sqlite-better-trigram
+          bun i --cpu arm64 sqlite-better-trigram
         working-directory: ./apps/desktop
 
       - name: Build Electron wrapper
-        run: npm run tx @notesnook/desktop:release
+        run: bun tx @notesnook/desktop:release
 
       # - name: Build snap
       #   if: inputs.publish-snap
@@ -389,20 +389,20 @@ jobs:
 
       - name: Install packages
         run: |
-          npm ci --ignore-scripts --prefer-offline --no-audit
-          npm run bootstrap -- --scope=desktop
+          bun ci
+          bun run bootstrap -- --scope=desktop
 
       - name: Install sqlite-better-trigram for all arch
         run: |
-          npm i --cpu arm64 sqlite-better-trigram
-          npm i --cpu x64 sqlite-better-trigram
+          bun i --cpu arm64 sqlite-better-trigram
+          bun i --cpu x64 sqlite-better-trigram
 
-          npm i --cpu arm64 sqlite3-fts5-html
-          npm i --cpu x64 sqlite3-fts5-html
+          bun i --cpu arm64 sqlite3-fts5-html
+          bun i --cpu x64 sqlite3-fts5-html
         working-directory: ./apps/desktop
 
       - name: Build
-        run: node scripts/execute.mjs @notesnook/desktop:release
+        run: bun tx @notesnook/desktop:release
 
       - name: Publish
         env:

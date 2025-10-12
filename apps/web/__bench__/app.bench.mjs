@@ -57,7 +57,7 @@ const TESTS = [
 const serverKillSignal = new AbortController();
 async function startServer() {
   return new Promise((resolve, reject) => {
-    const server = spawn("npx", ["serve", "-s", "build"], {
+    const server = spawn("bunx", ["serve", "-s", "build"], {
       signal: serverKillSignal.signal
     });
 

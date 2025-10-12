@@ -25,11 +25,12 @@ import { strings } from "@notesnook/intl";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useUserStore } from "../../stores/user-store";
-import { desktop } from "../../common/desktop-bridge";
-import { PATHS } from "@notesnook/desktop";
+import { desktop, PATHS } from "../../common/desktop-bridge";
 
 const getDesktopBackupsDirectoryPath = () =>
-  useSettingStore.getState().backupStorageLocation || PATHS.backupsDirectory;
+  useSettingStore.getState().backupStorageLocation ||
+  PATHS?.backupsDirectory ||
+  "";
 
 export const BackupExportSettings: SettingsGroup[] = [
   {

@@ -23,13 +23,16 @@ import type {
   QueryResult
 } from "@streetwriters/kysely";
 import { CompiledQuery } from "@streetwriters/kysely";
-import Worker from "./sqlite.worker.ts?worker";
+// import Worker from "./sqlite.worker.ts?worker";
 import type { SQLiteWorker } from "./sqlite.worker";
-import SQLiteSyncURI from "./wa-sqlite.wasm?url";
-import SQLiteAsyncURI from "./wa-sqlite-async.wasm?url";
+// import SQLiteSyncURI from "./wa-sqlite.wasm?url";
+// import SQLiteAsyncURI from "./wa-sqlite-async.wasm?url";
 import { Mutex } from "async-mutex";
 import { SharedService } from "./shared-service";
 import { Remote, wrap } from "comlink";
+
+const SQLiteSyncURI = new URL("./wa-sqlite.wasm", import.meta.url).href;
+const SQLiteAsyncURI = new URL("./wa-sqlite-async.wasm", import.meta.url).href;
 
 type Config = {
   dbName: string;
@@ -90,7 +93,9 @@ export class WaSqliteWorkerMultipleTabDriver implements Driver {
           console.log("initializing worker");
           this.needsInitialization = true;
 
-          const worker = new Worker();
+          const worker = new Worker(
+            new URL("./sqlite.worker.ts", import.meta.url)
+          );
           worker.addEventListener(
             "message",
             (event) =>
@@ -235,8 +240,10 @@ export class WaSqliteWorkerSingleTabDriver implements Driver {
   constructor(private readonly config: Config) {
     console.log("single tab driver", config.dbName);
     this.worker = wrap<SQLiteWorker>(
-      new Worker({ name: config.dbName })
-    ) 
+      new Worker(new URL("./sqlite.worker.ts", import.meta.url), {
+        name: config.dbName
+      })
+    );
   }
 
   async init(): Promise<void> {

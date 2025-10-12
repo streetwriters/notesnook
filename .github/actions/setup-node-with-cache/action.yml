@@ -1,29 +1,9 @@
-name: "Setup node with cache action"
-description: "Setups node with cache"
+name: "Setup bun"
+description: "Setups bun"
 
 runs:
   using: "composite"
   steps:
-    - name: Setup Node
-      uses: actions/setup-node@v4
+    - uses: oven-sh/setup-bun@v2
       with:
-        node-version: 22.x
-        cache: "npm"
-        cache-dependency-path: |
-          package-lock.json
-          apps/mobile/package-lock.json
-          apps/desktop/package-lock.json
-          apps/web/package-lock.json
-          apps/monograph/package-lock.json
-          apps/theme-builder/package-lock.json
-          extensions/web-clipper/package-lock.json
-          packages/core/package-lock.json
-          packages/crypto/package-lock.json
-          packages/sodium/package-lock.json
-          packages/clipper/package-lock.json
-          packages/editor-mobile/package-lock.json
-          packages/editor/package-lock.json
-          packages/logger/package-lock.json
-          packages/streamable-fs/package-lock.json
-          packages/theme/package-lock.json
-          packages/intl/package-lock.json
+        bun-version: latest
