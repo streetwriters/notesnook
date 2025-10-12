@@ -37,10 +37,9 @@ import {
 import { showToast } from "../utils/toast";
 import { readFile, showFilePicker } from "../utils/file-picker";
 import { logger } from "../utils/logger";
-import { PATHS } from "@notesnook/desktop";
 import { TaskManager } from "./task-manager";
 import { EVENTS } from "@notesnook/core";
-import { createWritableStream } from "./desktop-bridge";
+import { createWritableStream, PATHS } from "./desktop-bridge";
 import { FeatureDialog, FeatureKeys } from "../dialogs/feature-dialog";
 import { User } from "@notesnook/core";
 import { LegacyBackupFile } from "@notesnook/core";
@@ -126,7 +125,10 @@ export async function createBackup(
     })}-${new Date().getSeconds()}${mode === "full" ? "-full" : ""}`,
     { replacement: "-" }
   );
-  const directory = Config.get("backupStorageLocation", PATHS.backupsDirectory);
+  const directory = Config.get(
+    "backupStorageLocation",
+    PATHS?.backupsDirectory
+  );
   const ext = "nnbackupz";
   const filePath = IS_DESKTOP_APP
     ? `${directory}/${filename}.${ext}`

@@ -20,14 +20,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { createTRPCProxyClient } from "@trpc/client";
 import { ipcLink } from "electron-trpc/renderer";
 import type { AppRouter } from "@notesnook/desktop";
+import { PATHS } from "@notesnook/desktop";
 import { AppEventManager, AppEvents } from "../app-events";
 import { TaskScheduler } from "../../utils/task-scheduler";
 import { checkForUpdate } from "../../utils/updater";
 import { showToast } from "../../utils/toast";
 
+console.log("DESKTOP!");
 export const desktop = createTRPCProxyClient<AppRouter>({
   links: [ipcLink()]
 });
+export { PATHS };
 
 attachListeners();
 function attachListeners() {

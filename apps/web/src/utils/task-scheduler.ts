@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import TaskSchedulerWorker from "./task-scheduler.worker.ts?worker";
+// import TaskSchedulerWorker from "./task-scheduler.worker.ts?worker";
 import type {
   TaskScheduler as TaskSchedulerType,
   TaskSchedulerEvent
@@ -83,6 +83,6 @@ export class TaskScheduler {
 function init() {
   if (worker) return;
 
-  worker = new TaskSchedulerWorker();
+  worker = new Worker(new URL("./task-scheduler.worker.ts", import.meta.url));
   if (worker) scheduler = wrap<TaskSchedulerType>(worker);
 }

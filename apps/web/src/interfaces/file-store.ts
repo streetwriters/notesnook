@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { IFileStorage, File } from "@notesnook/streamable-fs";
 import { IndexedDBKVStore } from "./key-value";
-import OriginPrivateFileStoreWorker from "./opfs.worker?worker";
+// import OriginPrivateFileStoreWorker from "./opfs.worker?worker";
 import { OriginPrivateFileStoreWorkerType } from "./opfs.worker";
 import { transfer, wrap } from "comlink";
 
@@ -151,7 +151,7 @@ export class CacheStorageFileStore implements IFileStorage {
 
 export class OriginPrivateFileSystem implements IFileStorage {
   private readonly worker = wrap<OriginPrivateFileStoreWorkerType>(
-    new OriginPrivateFileStoreWorker()
+    new Worker(new URL("./opfs.worker.ts", import.meta.url))
   );
   private created = false;
   constructor(private readonly name: string) {

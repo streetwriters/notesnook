@@ -55,6 +55,8 @@ async function onChange(first) {
   if (first) {
     await fs.rm("./build/", { force: true, recursive: true });
 
+    await exec("npm rebuild electron --foreground-scripts --verbose");
+
     await exec("bun electron-builder install-app-deps");
   }
 
@@ -68,9 +70,9 @@ async function onChange(first) {
 
   if (first) {
     await spawnAndWaitUntil(
-      ["bun", "run", "start:desktop"],
+      ["yarn", "run", "start:desktop"],
       path.join(__dirname, "..", "..", "web"),
-      (data) => data.includes("Network: use --host to expose")
+      (data) => data.includes("built in")
     );
   }
 
@@ -80,7 +82,7 @@ async function onChange(first) {
   }
 
   execAsync(
-    "yarn",
+    "bun",
     ["electron", path.join("build", "electron.js")],
     true,
     cleanup

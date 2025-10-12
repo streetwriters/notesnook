@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { DesktopIntegration, PATHS } from "@notesnook/desktop";
+import type { DesktopIntegration } from "@notesnook/desktop";
 import { db } from "../common/db";
-import { desktop } from "../common/desktop-bridge";
+import { desktop, PATHS } from "../common/desktop-bridge";
 import createStore from "../common/store";
 import Config from "../utils/config";
 import BaseStore from "./index";
@@ -53,7 +53,7 @@ class SettingStore extends BaseStore<SettingStore> {
   fullBackupReminderOffset = Config.get("fullBackupReminderOffset", 0);
   backupStorageLocation = Config.get(
     "backupStorageLocation",
-    PATHS.backupsDirectory
+    PATHS?.backupsDirectory
   );
   doubleSpacedParagraphs = Config.get("doubleSpacedLines", true);
   markdownShortcuts = Config.get("markdownShortcuts", false);

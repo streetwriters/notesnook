@@ -18,10 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { INNCrypto } from "@notesnook/crypto";
-import CryptoWorker from "./nncrypto.worker?worker";
+// import CryptoWorker from "./nncrypto.worker?worker";
 import { wrap } from "comlink";
 
-export const NNCrypto = wrap<INNCrypto>(new CryptoWorker()) as INNCrypto;
+export const NNCrypto = wrap<INNCrypto>(
+  new Worker(new URL("./nncrypto.worker.ts", import.meta.url))
+) as INNCrypto;
 // TODO: disable until we fix the `pull failed` errors for good.
 // IS_DESKTOP_APP && window.NativeNNCrypto
 //   ? new window.NativeNNCrypto()
