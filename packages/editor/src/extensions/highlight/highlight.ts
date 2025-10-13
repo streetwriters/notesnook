@@ -105,8 +105,8 @@ export const Highlight = Extension.create<HighlightOptions>({
 
   addKeyboardShortcuts() {
     return {
-      [tiptapKeys.toggleHighlight.keys[0]]: () => this.editor.commands.toggleHighlight(getCurrentHighlightColor()),
-      [tiptapKeys.toggleHighlight.keys[1]]: () => this.editor.commands.toggleHighlight(getCurrentHighlightColor())
+      [tiptapKeys.toggleHighlight.keys]: () =>
+        this.editor.commands.toggleHighlight(getCurrentHighlightColor())
     };
   }
 });
