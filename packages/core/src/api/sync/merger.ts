@@ -188,6 +188,9 @@ export async function handleInboxItems(
       if (parsed.type !== "note") {
         continue;
       }
+      if (parsed.version !== 1) {
+        continue;
+      }
 
       await db.notes.add({
         id: item.id,
