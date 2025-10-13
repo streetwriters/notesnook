@@ -21,7 +21,13 @@ import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  Linking,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native";
 import Config from "react-native-config";
 import * as RNIap from "react-native-iap";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -60,27 +66,17 @@ export const BuyPlan = (props: {
   return checkoutUrl ? (
     <View
       style={{
-        flex: 1
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        gap: DefaultAppStyles.GAP_VERTICAL
       }}
     >
-      <WebView
-        source={{
-          uri: checkoutUrl
-        }}
-        onMessage={(message) => {
-          try {
-            const data = JSON.parse(message.nativeEvent.data);
-            if (data.success) {
-              pricingPlans.finish();
-            }
-          } catch (e) {}
-        }}
-        domStorageEnabled
-        javaScriptEnabled
-        cacheEnabled
-        enabled
-        style={{
-          flex: 1
+      <Paragraph>{strings.finishPurchaseInBrowser()}</Paragraph>
+      <Button
+        title={strings.goBack()}
+        onPress={() => {
+          setCheckoutUrl(undefined);
         }}
       />
     </View>
@@ -245,12 +241,14 @@ export const BuyPlan = (props: {
           }
           onPress={async () => {
             if (isGithubRelease) {
-              setCheckoutUrl(
-                await db.subscriptions.checkoutUrl(
-                  (pricingPlans.selectedProduct as Plan).plan,
-                  (pricingPlans.selectedProduct as Plan).period
-                )
+              const url = await db.subscriptions.checkoutUrl(
+                (pricingPlans.selectedProduct as Plan).plan,
+                (pricingPlans.selectedProduct as Plan).period
               );
+              if (url) {
+                setCheckoutUrl(url);
+                Linking.openURL(url);
+              }
               return;
             }
 

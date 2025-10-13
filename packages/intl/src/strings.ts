@@ -2590,5 +2590,7 @@ Use this if changes from other devices are not appearing on this device. This wi
     t`You can change your subscription plan from the web app`,
   announcement: () => t`ANNOUNCEMENT`,
   cannotChangePlan: () =>
-    t`Your current subscription does not allow changing plans`
+    t`Your current subscription does not allow changing plans`,
+  finishPurchaseInBrowser: () => t`Finish your purchase in the browser.`,
+  goBack: () => t`Go back`
 };
