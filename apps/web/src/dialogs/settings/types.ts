@@ -41,7 +41,8 @@ export type SectionKeys =
   | "legal"
   | "developer"
   | "about"
-  | "inbox";
+  | "inbox"
+  | "circle";
 
 export type SectionGroupKeys =
   | "account"
