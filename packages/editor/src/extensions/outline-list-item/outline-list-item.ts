@@ -52,7 +52,7 @@ export const OutlineListItem = Node.create<ListItemOptions>({
     };
   },
 
-  content: "paragraph+ list?",
+  content: "paragraph+ (image* | list?)",
 
   defining: true,
 
