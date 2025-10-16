@@ -103,8 +103,6 @@ export const CheckListItem = Node.create<CheckListItemOptions>({
 
   addNodeView() {
     return ({ node, getPos, editor }) => {
-      const isNested = node.lastChild?.type.name === CheckList.name;
-
       const li = document.createElement("li");
       if (node.attrs.checked) li.classList.add("checked");
       else li.classList.remove("checked");

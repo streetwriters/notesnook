@@ -646,6 +646,16 @@ p > *::selection {
   transform: rotate(90deg);
 }
 
+.simple-checklist[dir="rtl"] li::after {
+  left: unset;
+  right: -24px;
+}
+
+.simple-checklist[dir="rtl"] li.checked::before {
+  left: unset;
+  right: -22px;
+}
+
 [dir="rtl"] .taskItemTools { right: unset; left: 0 }
 
 /* Check list */
