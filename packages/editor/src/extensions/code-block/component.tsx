@@ -59,7 +59,11 @@ export function CodeblockComponent(
           overflow: "hidden"
         }}
       >
-        <SimpleBar>
+        <SimpleBar
+          style={{
+            backgroundColor: "var(--background-secondary)"
+          }}
+        >
           <div>
             <Text
               ref={(ref) => {
