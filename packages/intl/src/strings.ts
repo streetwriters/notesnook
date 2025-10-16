@@ -2590,5 +2590,13 @@ Use this if changes from other devices are not appearing on this device. This wi
     t`You can change your subscription plan from the web app`,
   announcement: () => t`ANNOUNCEMENT`,
   cannotChangePlan: () =>
-    t`Your current subscription does not allow changing plans`
+    t`Your current subscription does not allow changing plans`,
+  redeemCode: () => t`Redeem code`,
+  notesnookCircle: () => t`Notesnook Circle`,
+  notesnookCircleDesc: () =>
+    t`Get special discounts for services included in Notesnook Circle`,
+  trialUserCircleNotice: () =>
+    `Notesnook Circle is reserved for active Pro members. You’ll get full access after your trial period is over and your subscription is confirmed.`,
+  freeUserCircleNotice: () =>
+    t`The Notesnook Circle is exclusive to Pro members. Upgrade to Pro and unlock special discounts, perks, and partner offers!`
 };

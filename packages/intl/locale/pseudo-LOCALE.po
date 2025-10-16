@@ -2986,6 +2986,10 @@ msgstr ""
 msgid "Get Pro"
 msgstr ""
 
+#: src/strings.ts:2597
+msgid "Get special discounts for services included in Notesnook Circle"
+msgstr ""
+
 #: src/strings.ts:562
 msgid "Get started"
 msgstr ""
@@ -4197,6 +4201,10 @@ msgstr ""
 msgid "Notesnook"
 msgstr ""
 
+#: src/strings.ts:2595
+msgid "Notesnook Circle"
+msgstr ""
+
 #: src/strings.ts:2066
 msgid "Notesnook encrypts everything offline before syncing to your other devices. This means that no one can read your notes except you. Not even us."
 msgstr ""
@@ -4978,6 +4986,10 @@ msgstr ""
 
 #: src/strings.ts:2434
 msgid "Redeem"
+msgstr ""
+
+#: src/strings.ts:2594
+msgid "Redeem code"
 msgstr ""
 
 #: src/strings.ts:2431
@@ -6324,6 +6336,10 @@ msgstr ""
 
 #: src/strings.ts:231
 msgid "The information above will be publically available at"
+msgstr ""
+
+#: src/strings.ts:2601
+msgid "The Notesnook Circle is exclusive to Pro members. Upgrade to Pro and unlock special discounts, perks, and partner offers!"
 msgstr ""
 
 #: src/strings.ts:2081
