@@ -105,6 +105,7 @@ interface TiptapStorage {
         attachment: Pick<Attachment, "hash" | "type">
       ) => Promise<string | undefined>)
     | undefined;
+  isLoggedIn?: () => boolean;
 }
 
 declare module "@tiptap/core" {
@@ -150,6 +151,7 @@ const useTiptap = (
     timeFormat,
     copyToClipboard,
     createInternalLink,
+    isLoggedIn,
 
     doubleSpacedLines = true,
     isMobile,
@@ -370,6 +372,7 @@ const useTiptap = (
       onBeforeCreate: ({ editor }) => {
         editor.storage.dateFormat = dateFormat;
         editor.storage.timeFormat = timeFormat;
+        editor.storage.isLoggedIn = isLoggedIn;
 
         editor.storage.openLink = openLink;
         editor.storage.downloadAttachment = downloadAttachment;
@@ -395,7 +398,8 @@ const useTiptap = (
       timeFormat,
       editorProps,
       copyToClipboard,
-      createInternalLink
+      createInternalLink,
+      isLoggedIn
     ]
   );
 
