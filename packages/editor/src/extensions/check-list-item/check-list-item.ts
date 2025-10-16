@@ -17,8 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { keybindings } from "@notesnook/common";
-import { KeyboardShortcutCommand, mergeAttributes, Node } from "@tiptap/core";
+import {
+  findParentNodeClosestToPos,
+  KeyboardShortcutCommand,
+  mergeAttributes,
+  Node
+} from "@tiptap/core";
 import { Node as ProseMirrorNode } from "@tiptap/pm/model";
+import { CheckList } from "../check-list/check-list";
 
 export interface CheckListItemOptions {
   onReadOnlyChecked?: (node: ProseMirrorNode, checked: boolean) => boolean;
@@ -97,98 +103,78 @@ export const CheckListItem = Node.create<CheckListItemOptions>({
 
   addNodeView() {
     return ({ node, getPos, editor }) => {
-      const listItem = document.createElement("li");
-      const checkboxWrapper = document.createElement("div");
-      const content = document.createElement("div");
+      const isNested = node.lastChild?.type.name === CheckList.name;
 
-      checkboxWrapper.contentEditable = "false";
-      checkboxWrapper.className = "checkbox-wrapper";
-      checkboxWrapper.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-          <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/>
-        </svg>
-      `;
+      const li = document.createElement("li");
+      if (node.attrs.checked) li.classList.add("checked");
+      else li.classList.remove("checked");
 
-      content.className = "checklist-item-content";
+      function onClick(e: MouseEvent | TouchEvent) {
+        if (e instanceof MouseEvent && e.button !== 0) return;
+        if (!(e.target instanceof HTMLElement)) return;
 
-      checkboxWrapper.addEventListener("mousedown", (event) => {
-        if (globalThis.keyboardShown) {
-          event.preventDefault();
+        const pos = typeof getPos === "function" ? getPos() : 0;
+        if (typeof pos !== "number") return;
+        const resolvedPos = editor.state.doc.resolve(pos);
+
+        const { x, y, right } = li.getBoundingClientRect();
+
+        const clientX =
+          e instanceof MouseEvent ? e.clientX : e.touches[0].clientX;
+
+        const clientY =
+          e instanceof MouseEvent ? e.clientY : e.touches[0].clientY;
+
+        const hitArea = { width: 40, height: 40 };
+
+        const isRtl =
+          e.target.dir === "rtl" ||
+          findParentNodeClosestToPos(
+            resolvedPos,
+            (node) => !!node.attrs.textDirection
+          )?.node.attrs.textDirection === "rtl";
+
+        let xStart = clientX >= x - hitArea.width;
+        let xEnd = clientX <= x;
+        const yStart = clientY >= y;
+        const yEnd = clientY <= y + hitArea.height;
+
+        if (isRtl) {
+          xEnd = clientX <= right + hitArea.width;
+          xStart = clientX >= right;
         }
-      });
 
-      checkboxWrapper.addEventListener("click", (event) => {
-        event.preventDefault();
-
-        const isChecked = checkboxWrapper.classList.contains("checked");
-
-        // if the editor isn't editable and we don't have a handler for
-        // readonly checks we have to undo the latest change
-        if (!editor.isEditable && !this.options.onReadOnlyChecked) {
-          return;
+        if (xStart && xEnd && yStart && yEnd) {
+          e.preventDefault();
+          editor.commands.command(({ tr }) => {
+            tr.setNodeAttribute(
+              pos,
+              "checked",
+              !li.classList.contains("checked")
+            );
+            return true;
+          });
         }
-
-        if (editor.isEditable && typeof getPos === "function") {
-          editor
-            .chain()
-            .command(({ tr }) => {
-              const position = getPos();
-              const currentNode = tr.doc.nodeAt(position);
-
-              tr.setNodeMarkup(position, undefined, {
-                ...currentNode?.attrs,
-                checked: !isChecked
-              });
-
-              return true;
-            })
-            .run();
-        }
-        if (!editor.isEditable && this.options.onReadOnlyChecked) {
-          // Reset state if onReadOnlyChecked returns false
-          if (!this.options.onReadOnlyChecked(node, !isChecked)) {
-            return;
-          }
-        }
-      });
-
-      if (node.attrs.checked) {
-        checkboxWrapper.classList.add("checked");
-        listItem.dataset.checked = node.attrs.checked;
       }
 
-      listItem.append(checkboxWrapper, content);
+      li.onmousedown = onClick;
+      li.ontouchstart = onClick;
 
       return {
-        dom: listItem,
-        contentDOM: content,
+        dom: li,
+        contentDOM: li,
         update: (updatedNode) => {
           if (updatedNode.type !== this.type) {
             return false;
           }
+          const isNested = updatedNode.lastChild?.type.name === CheckList.name;
 
-          listItem.dataset.checked = updatedNode.attrs.checked;
-          if (updatedNode.attrs.checked) {
-            checkboxWrapper.classList.add("checked");
-          } else {
-            checkboxWrapper.classList.remove("checked");
-          }
+          if (updatedNode.attrs.checked) li.classList.add("checked");
+          else li.classList.remove("checked");
 
           return true;
         }
       };
     };
   }
-
-  // addInputRules() {
-  //   return [
-  //     wrappingInputRule({
-  //       find: inputRegex,
-  //       type: this.type,
-  //       getAttributes: (match) => ({
-  //         checked: match[match.length - 1] === "x"
-  //       })
-  //     })
-  //   ];
-  // }
 });
