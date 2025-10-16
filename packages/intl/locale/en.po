@@ -3004,10 +3004,6 @@ msgstr "Get Priority support"
 msgid "Get Pro"
 msgstr "Get Pro"
 
-#: src/strings.ts:2597
-msgid "Get special discounts for services included in Notesnook Circle"
-msgstr "Get special discounts for services included in Notesnook Circle"
-
 #: src/strings.ts:562
 msgid "Get started"
 msgstr "Get started"
@@ -4221,9 +4217,13 @@ msgstr "notes imported"
 msgid "Notesnook"
 msgstr "Notesnook"
 
-#: src/strings.ts:2595
+#: src/strings.ts:2596
 msgid "Notesnook Circle"
 msgstr "Notesnook Circle"
+
+#: src/strings.ts:2598
+msgid "Notesnook Circle brings together trusted partners who share our commitment to privacy, transparency, and user freedom."
+msgstr "Notesnook Circle brings together trusted partners who share our commitment to privacy, transparency, and user freedom."
 
 #: src/strings.ts:2066
 msgid "Notesnook encrypts everything offline before syncing to your other devices. This means that no one can read your notes except you. Not even us."
@@ -5014,7 +5014,7 @@ msgstr "Recovery successful!"
 msgid "Redeem"
 msgstr "Redeem"
 
-#: src/strings.ts:2594
+#: src/strings.ts:2595
 msgid "Redeem code"
 msgstr "Redeem code"
 
@@ -6379,9 +6379,9 @@ msgstr "The {title} at {url} is not compatible with this client."
 msgid "The information above will be publically available at"
 msgstr "The information above will be publically available at"
 
-#: src/strings.ts:2601
-msgid "The Notesnook Circle is exclusive to Pro members. Upgrade to Pro and unlock special discounts, perks, and partner offers!"
-msgstr "The Notesnook Circle is exclusive to Pro members. Upgrade to Pro and unlock special discounts, perks, and partner offers!"
+#: src/strings.ts:2602
+msgid "The Notesnook Circle is exclusive to subscribers!"
+msgstr "The Notesnook Circle is exclusive to subscribers!"
 
 #: src/strings.ts:2081
 msgid "The password/pin for unlocking the app."
@@ -6779,6 +6779,10 @@ msgstr "Upgrade to Notesnook Pro to create more tags."
 #: src/strings.ts:748
 msgid "Upgrade to Pro"
 msgstr "Upgrade to Pro"
+
+#: src/strings.ts:2594
+msgid "Upgrade to redeem"
+msgstr "Upgrade to redeem"
 
 #: src/strings.ts:509
 msgid "Upload"

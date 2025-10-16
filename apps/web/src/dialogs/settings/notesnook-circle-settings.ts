@@ -17,20 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import { CirclePartners } from "./components/circle-partners";
 import { SettingsGroup } from "./types";
 
 export const NotesnookCircleSettings: SettingsGroup[] = [
   {
-    header: "Notesnook Circle",
+    header: strings.notesnookCircle(),
     key: "notesnook-circle",
     section: "circle",
     settings: [
       {
         key: "partners",
         title: "",
-        description:
-          "Notesnook Circle brings together trusted partners who share our commitment to privacy, transparency, and user freedom.",
+        description: strings.notesnookCircleDesc(),
         components: [
           {
             type: "custom",

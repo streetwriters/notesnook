@@ -2591,12 +2591,13 @@ Use this if changes from other devices are not appearing on this device. This wi
   announcement: () => t`ANNOUNCEMENT`,
   cannotChangePlan: () =>
     t`Your current subscription does not allow changing plans`,
+  upgradeToRedeem: () => t`Upgrade to redeem`,
   redeemCode: () => t`Redeem code`,
   notesnookCircle: () => t`Notesnook Circle`,
   notesnookCircleDesc: () =>
-    t`Get special discounts for services included in Notesnook Circle`,
+    t`Notesnook Circle brings together trusted partners who share our commitment to privacy, transparency, and user freedom.`,
   trialUserCircleNotice: () =>
-    `Notesnook Circle is reserved for active Pro members. You’ll get full access after your trial period is over and your subscription is confirmed.`,
+    `Notesnook Circle is reserved for members with an active subscription. You'll get full access after your trial period is over and your subscription is confirmed.`,
   freeUserCircleNotice: () =>
-    t`The Notesnook Circle is exclusive to Pro members. Upgrade to Pro and unlock special discounts, perks, and partner offers!`
+    t`The Notesnook Circle is exclusive to subscribers!`
 };

@@ -28,6 +28,7 @@ import { ErrorText } from "../../../components/error-text";
 import { useStore as useUserStore } from "../../../stores/user-store";
 import { SubscriptionPlan, SubscriptionStatus } from "@notesnook/core";
 import { BuyDialog } from "../../buy-dialog";
+import { strings } from "@notesnook/intl";
 
 export function CirclePartners() {
   const partners = usePromise(() => db.circle.partners(), []);
@@ -36,10 +37,13 @@ export function CirclePartners() {
     code: string;
   }>();
   const subscription = useUserStore((store) => store.user?.subscription);
-  const canRedeem =
-    subscription?.plan !== SubscriptionPlan.FREE &&
-    subscription?.status !== SubscriptionStatus.TRIAL &&
-    subscription?.status !== SubscriptionStatus.EXPIRED;
+
+  const isFree =
+    !subscription ||
+    subscription?.plan === SubscriptionPlan.FREE ||
+    subscription?.status === SubscriptionStatus.EXPIRED;
+  const isTrial = subscription?.status === SubscriptionStatus.TRIAL;
+  const canRedeem = !isFree && !isTrial;
 
   return (
     <>
@@ -73,7 +77,14 @@ export function CirclePartners() {
               <Text variant="body" sx={{ whiteSpace: "pre-wrap" }}>
                 {partner.shortDescription}
               </Text>
-              <Text variant="subBody" sx={{ fontStyle: "italic" }}>
+              <Text
+                variant="subBody"
+                sx={{
+                  fontStyle: "italic",
+                  color: "accent",
+                  textAlign: "center"
+                }}
+              >
                 {partner.offerDescription}
               </Text>
               {redeemedCode?.partnerId === partner.id ? (
@@ -126,12 +137,16 @@ export function CirclePartners() {
               ) : (
                 <Button
                   variant="accent"
-                  sx={{ mt: 2 }}
+                  sx={{ mt: 1 }}
                   onClick={async () => {
-                    if (!canRedeem) {
-                      BuyDialog.show({});
-                      return;
+                    if (isFree) return BuyDialog.show({});
+                    if (isTrial) {
+                      return showToast(
+                        "error",
+                        strings.trialUserCircleNotice()
+                      );
                     }
+                    if (!canRedeem) return;
                     const result = await db.circle
                       .redeem(partner.id)
                       .catch((e) => {
@@ -146,7 +161,7 @@ export function CirclePartners() {
                     }
                   }}
                 >
-                  {canRedeem ? "Upgrade to redeem" : "Redeem code"}
+                  {isFree ? strings.upgradeToRedeem() : strings.redeemCode()}
                 </Button>
               )}
             </Flex>
