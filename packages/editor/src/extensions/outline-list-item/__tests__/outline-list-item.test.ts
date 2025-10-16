@@ -20,53 +20,51 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import {
   createEditor,
   h,
-  p,
+  li,
   outlineList,
   outlineListItem
 } from "../../../../test-utils/index.js";
-import { test, expect, describe } from "vitest";
-import { ImageNode } from "../index.js";
+import { test, expect, describe, beforeAll, vi } from "vitest";
 import { OutlineList } from "../../outline-list/outline-list.js";
-import { OutlineListItem } from "../../outline-list-item/outline-list-item.js";
+import { OutlineListItem } from "../outline-list-item.js";
+import { CodeBlock } from "../../code-block/code-block.js";
 
-describe("migration", () => {
-  test(`inline image in paragraph`, async () => {
-    const el = p(["hello", h("img", [], { src: "image.png" }), "world"]);
-    const {
-      builder: { image },
-      editor
-    } = createEditor({
-      initialContent: el.outerHTML,
-      extensions: {
-        image: ImageNode.configure({})
-      }
-    });
-
-    expect(editor.getJSON()).toMatchSnapshot();
+describe("outline list item", () => {
+  beforeAll(() => {
+    vi.mock("nanoid", () => ({
+      nanoid: () => "test-id-123456"
+    }));
   });
 
-  test(`inline image in outline list`, async () => {
+  test(`code block in outline list item`, async () => {
+    const subList = outlineList(
+      outlineListItem(["sub item 2"]),
+      outlineListItem(["sub item 3"])
+    );
+    const listItemWithCodeBlock = li(
+      [
+        h("p", ["hello"]),
+        h("pre", [h("code", ["const x = 1;"])]),
+        h("p", ["world"]),
+        subList
+      ],
+      { "data-type": "outlineListItem" }
+    );
     const el = outlineList(
       outlineListItem(["item 1"]),
-      outlineListItem(
-        ["hello", h("img", [], { src: "image.png" }), "world"],
-        outlineList(
-          outlineListItem(["sub item 2"]),
-          outlineListItem(["sub item 3"])
-        )
-      ),
+      listItemWithCodeBlock,
       outlineListItem(["item 4"])
     );
 
     const {
-      builder: { image },
+      builder: { codeBlock },
       editor
     } = createEditor({
       initialContent: el.outerHTML,
       extensions: {
         outlineList: OutlineList,
         outlineListItem: OutlineListItem,
-        image: ImageNode
+        codeBlock: CodeBlock
       }
     });
 
