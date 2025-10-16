@@ -76,6 +76,14 @@
   margin-bottom: 5px;
 }
 
+.ProseMirror li:last-of-type {
+  margin-bottom: 0px;
+}
+
+.ProseMirror li:first-of-type {
+  margin-top: 5px;
+}
+
 .ProseMirror ul.tasklist-content-wrapper {
   padding-left: 0px;
 }
@@ -638,40 +646,71 @@ p > *::selection {
   transform: rotate(90deg);
 }
 
+.simple-checklist[dir="rtl"] li::after {
+  left: unset;
+  right: -24px;
+}
+
+.simple-checklist[dir="rtl"] li.checked::before {
+  left: unset;
+  right: -22px;
+}
+
 [dir="rtl"] .taskItemTools { right: unset; left: 0 }
 
 /* Check list */
 .ProseMirror ul.simple-checklist {
   list-style: none;
-  padding: 0;
+  margin-block: 0px !important;
+  padding-inline: 0px !important;
+  padding-inline-start: 24px !important;
 }
 
-.ProseMirror ul.simple-checklist > li {
-  display: flex;
+.ProseMirror li.nested > ul.simple-checklist {
+  padding-inline-start: 15px !important;
 }
 
-.ProseMirror ul.simple-checklist > li input {
-  flex: 0 0 auto;
-  margin-right: 0.5rem;
-  user-select: none;
-  height: 1rem;
-  width: 1rem;
-  accent-color: var(--accent);
+.simple-checklist li {
+  position: relative;
 }
 
-.ProseMirror ul.simple-checklist > li > div {
-  flex: 1 1 auto;
+.simple-checklist > li::after {
+  position: absolute;
+  top: 0px;
+  cursor: pointer;
+  content: "";
+  background-size: 18px;
+  width: 14px;
+  height: 14px;
+
+  border: 2px solid var(--icon);
+  border-radius: 5px;
+  left: -24px;
 }
 
-@media screen and (max-width: 480px) {
-  .ProseMirror ul.simple-checklist > li  > input {
-    height: 21px;
-    width: 21px;
-  }
+.simple-checklist > li.checked::after {
+  border: 2px solid var(--accent);
+}
 
-  .ProseMirror ul.simple-checklist > li > div {
-    margin-top: 2px;
-  }
+.simple-checklist > li.checked::before {
+  position: absolute;
+  top: 2px;
+  cursor: pointer;
+  content: "";
+  background-size: 18px;
+  width: 14px;
+  height: 14px;
+  left: -22px;
+
+  background-color: var(--accent);
+  mask: url(data:image/svg+xml;base64,ICA8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDI0IDI0Ij4KICAgIDxwYXRoIGQ9Ik0yMSw3TDksMTlMMy41LDEzLjVMNC45MSwxMi4wOUw5LDE2LjE3TDE5LjU5LDUuNTlMMjEsN1oiLz4KICA8L3N2Zz4K)
+    no-repeat 50% 50%;
+  mask-size: cover;
+}
+
+.simple-checklist > li.checked > p {
+  opacity: 0.8;
+  text-decoration-line: line-through;
 }
 
 /* Callout */

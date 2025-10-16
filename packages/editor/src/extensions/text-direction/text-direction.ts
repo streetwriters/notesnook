@@ -30,6 +30,7 @@ const TEXT_DIRECTION_TYPES = [
   "orderedList",
   "bulletList",
   "outlineList",
+  "checkList",
   "taskList",
   "table",
   "blockquote",
