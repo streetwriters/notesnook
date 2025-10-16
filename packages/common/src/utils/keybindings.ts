@@ -409,6 +409,18 @@ export const tiptapKeys = {
     description: "Toggle text color",
     category: "Editor",
     type: "tiptap"
+  },
+  moveLineUp: {
+    keys: "Alt-ArrowUp",
+    description: "Move line up",
+    category: "Editor",
+    type: "tiptap"
+  },
+  moveLineDown: {
+    keys: "Alt-ArrowDown",
+    description: "Move line down",
+    category: "Editor",
+    type: "tiptap"
   }
 } satisfies Record<string, TipTapKey>;
 
@@ -466,6 +478,8 @@ export function formatKey(key: string, isMac = false, separator = " ") {
     .replace(/\bright\b/gi, "→")
     .replace(/\bleft\b/gi, "←")
     .replace(/\benter\b/gi, "↵")
+    .replace(/\barrowup\b/gi, "↑")
+    .replace(/\barrowdown\b/gi, "↓")
     .replace(/\b\w\b/gi, (e) => e.toUpperCase())
     .trim();
 }
