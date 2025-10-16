@@ -25,6 +25,7 @@ import {
 import { findParentNodeOfTypeClosestToPos } from "../../utils/prosemirror.js";
 import { OutlineList } from "../outline-list/outline-list.js";
 import { keybindings, tiptapKeys } from "@notesnook/common";
+import { Paragraph } from "../paragraph/paragraph.js";
 
 export interface ListItemOptions {
   HTMLAttributes: Record<string, unknown>;
@@ -52,13 +53,14 @@ export const OutlineListItem = Node.create<ListItemOptions>({
     };
   },
 
-  content: "paragraph+ list?",
+  content: "block+",
 
   defining: true,
 
   parseHTML() {
     return [
       {
+        priority: 100,
         tag: `li[data-type="${this.name}"]`
       }
     ];
@@ -92,21 +94,37 @@ export const OutlineListItem = Node.create<ListItemOptions>({
           return true;
         });
       },
-      Enter: () => {
-        // const subList = findSublist(editor, this.type);
-        // if (!subList) return this.editor.commands.splitListItem(this.name);
-
-        // const { isCollapsed, subListPos } = subList;
-
-        // if (isCollapsed) {
-        //   return this.editor.commands.toggleOutlineCollapse(subListPos, false);
-        // }
+      Enter: ({ editor }) => {
+        const { $anchor } = editor.state.selection;
+        if (
+          $anchor.parent.type.name !== Paragraph.name ||
+          ($anchor.parent.type.name === Paragraph.name &&
+            $anchor.node($anchor.depth - 1)?.type.name !== this.type.name)
+        )
+          return false;
 
         return this.editor.commands.splitListItem(this.name);
       },
-      Tab: () => this.editor.commands.sinkListItem(this.name),
-      [keybindings.liftListItem.keys]: () =>
-        this.editor.commands.liftListItem(this.name)
+      Tab: ({ editor }) => {
+        const { $anchor } = editor.state.selection;
+        if (
+          $anchor.parent.type.name !== Paragraph.name ||
+          ($anchor.parent.type.name === Paragraph.name &&
+            $anchor.node($anchor.depth - 1)?.type.name !== this.type.name)
+        )
+          return false;
+        return this.editor.commands.sinkListItem(this.name);
+      },
+      [keybindings.liftListItem.keys]: ({ editor }) => {
+        const { $anchor } = editor.state.selection;
+        if (
+          $anchor.parent.type.name !== Paragraph.name ||
+          ($anchor.parent.type.name === Paragraph.name &&
+            $anchor.node($anchor.depth - 1)?.type.name !== this.type.name)
+        )
+          return false;
+        return this.editor.commands.liftListItem(this.name);
+      }
     };
   },
 
@@ -124,7 +142,7 @@ export const OutlineListItem = Node.create<ListItemOptions>({
 
       function onClick(e: MouseEvent | TouchEvent) {
         if (e instanceof MouseEvent && e.button !== 0) return;
-        if (!(e.target instanceof HTMLParagraphElement)) return;
+        if (!(e.target instanceof HTMLElement)) return;
         if (!li.classList.contains("nested")) return;
 
         const pos = typeof getPos === "function" ? getPos() : 0;
