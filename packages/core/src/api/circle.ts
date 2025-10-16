@@ -21,7 +21,7 @@ import hosts from "../utils/constants.js";
 import http from "../utils/http.js";
 import Database from "./index.js";
 
-type CirclePartner = {
+export type CirclePartner = {
   id: string;
   name: string;
   url: string;
