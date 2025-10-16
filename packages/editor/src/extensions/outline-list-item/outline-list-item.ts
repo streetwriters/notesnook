@@ -52,13 +52,14 @@ export const OutlineListItem = Node.create<ListItemOptions>({
     };
   },
 
-  content: "paragraph+ (image* | list?)",
+  content: "block+",
 
   defining: true,
 
   parseHTML() {
     return [
       {
+        priority: 100,
         tag: `li[data-type="${this.name}"]`
       }
     ];
