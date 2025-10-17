@@ -704,8 +704,10 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
       );
 
       requestAnimationFrame(() => {
-        editor.style.marginLeft = `-${negativeSpace}px`;
-        editor.style.marginRight = `-${negativeSpace}px`;
+        if (!isMobile() && !isTablet()) {
+          editor.style.marginLeft = `-${negativeSpace}px`;
+          editor.style.marginRight = `-${negativeSpace}px`;
+        }
         editor.style.paddingLeft = `${negativeSpace}px`;
         editor.style.paddingRight = `${negativeSpace}px`;
       });

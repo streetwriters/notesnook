@@ -27,6 +27,7 @@ import {
   MaybeDeletedItem,
   isDeleted
 } from "../../types.js";
+import { ParsedInboxItem, SyncInboxItem } from "./types.js";
 
 const THRESHOLD = process.env.NODE_ENV === "test" ? 6 * 1000 : 60 * 1000;
 class Merger {
@@ -144,5 +145,83 @@ export function isContentConflicted(
     return "conflict";
   } else if (!isResolved) {
     return "merge";
+  }
+}
+
+export async function handleInboxItems(
+  inboxItems: SyncInboxItem[],
+  db: Database
+) {
+  const inboxKeys = await db.user.getInboxKeys();
+  if (!inboxKeys) {
+    logger.error("No inbox keys found, cannot process inbox items.");
+    return;
+  }
+
+  for (const item of inboxItems) {
+    try {
+      if (await db.notes.exists(item.id)) {
+        logger.info("Inbox item already exists, skipping.", {
+          inboxItemId: item.id
+        });
+        continue;
+      }
+
+      const decryptedKey = await db.storage().decryptAsymmetric(inboxKeys, {
+        alg: item.key.alg,
+        cipher: item.key.cipher,
+        format: "base64",
+        length: item.key.length
+      });
+      const decryptedItem = await db.storage().decrypt(
+        { key: decryptedKey },
+        {
+          alg: item.alg,
+          iv: item.iv,
+          cipher: item.cipher,
+          format: "base64",
+          length: item.length,
+          salt: item.salt
+        }
+      );
+      const parsed = JSON.parse(decryptedItem) as ParsedInboxItem;
+      if (parsed.type !== "note") {
+        continue;
+      }
+      if (parsed.version !== 1) {
+        continue;
+      }
+
+      await db.notes.add({
+        id: item.id,
+        title: parsed.title,
+        favorite: parsed.favorite,
+        pinned: parsed.pinned,
+        readonly: parsed.readonly,
+        content: {
+          data: parsed?.content?.data ?? "",
+          type: "tiptap"
+        }
+      });
+      if (parsed.archived !== undefined) {
+        await db.notes.archive(parsed.archived, item.id);
+      }
+      for (const notebookId of parsed.notebookIds || []) {
+        if (!(await db.notebooks.exists(notebookId))) continue;
+        await db.notes.addToNotebook(notebookId, item.id);
+      }
+      for (const tagId of parsed.tagIds || []) {
+        if (!(await db.tags.exists(tagId))) continue;
+        await db.relations.add(
+          { type: "tag", id: tagId },
+          { type: "note", id: item.id }
+        );
+      }
+    } catch (e) {
+      logger.error(e, "Failed to process inbox item.", {
+        inboxItem: item
+      });
+      continue;
+    }
   }
 }

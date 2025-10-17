@@ -388,6 +388,12 @@ export const tiptapKeys = {
     description: "Underline",
     category: "Editor",
     type: "tiptap"
+  },
+  toggleHighlight: {
+    keys: "Mod-Alt-h",
+    description: "Toggle highlight",
+    category: "Editor",
+    type: "tiptap"
   }
 } satisfies Record<string, TipTapKey>;
 

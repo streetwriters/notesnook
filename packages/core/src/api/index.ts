@@ -82,6 +82,7 @@ import { NNMigrationProvider } from "../database/migrations.js";
 import { ConfigStorage } from "../database/config.js";
 import { LazyPromise } from "../utils/lazy-promise.js";
 import { InboxApiKeys } from "./inbox-api-keys.js";
+import { Circle } from "./circle.js";
 
 type EventSourceConstructor = new (
   uri: string,
@@ -192,6 +193,7 @@ class Database {
   tokenManager = new TokenManager(this.kv);
   mfa = new MFAManager(this.tokenManager);
   subscriptions = new Subscriptions(this);
+  circle = new Circle(this);
   offers = Offers;
   debug = new Debug();
   pricing = Pricing;
