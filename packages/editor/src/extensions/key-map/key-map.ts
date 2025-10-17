@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Editor, Extension } from "@tiptap/core";
+import { Editor, Extension, findParentNodeClosestToPos } from "@tiptap/core";
 import { isInTable } from "@tiptap/pm/tables";
 import { CodeBlock } from "../code-block/index.js";
 import { showLinkPopup } from "../../toolbar/popups/link-popup.js";
@@ -28,6 +28,7 @@ import { Fragment, Node, Slice } from "@tiptap/pm/model";
 import { ReplaceStep } from "@tiptap/pm/transform";
 import { Selection } from "@tiptap/pm/state";
 import { Callout } from "../callout/callout.js";
+import { Blockquote } from "../blockquote/blockquote.js";
 
 export const KeyMap = Extension.create({
   name: "key-map",
@@ -78,10 +79,20 @@ export const KeyMap = Extension.create({
         return true;
       },
       [tiptapKeys.moveLineUp.keys]: ({ editor }) => {
-        return moveNode(editor, "up");
+        try {
+          return moveNode(editor, "up");
+        } catch (e) {
+          console.error("Error moving node up:", e);
+          return false;
+        }
       },
       [tiptapKeys.moveLineDown.keys]: ({ editor }) => {
-        return moveNode(editor, "down");
+        try {
+          return moveNode(editor, "down");
+        } catch (e) {
+          console.error("Error moving node down:", e);
+          return false;
+        }
       }
     };
   }
@@ -115,9 +126,41 @@ function moveNode(editor: Editor, dir: "up" | "down") {
   let targetType = $from.node().type;
   let currentResolved = findParentNodeOfType(targetType)(state.selection);
 
-  // when in list, move the list item
   if (isListActive(editor)) {
-    targetType = $from.node($from.depth - 1).type;
+    const currentNode = $from.node();
+    const parentNode = $from.node($from.depth - 1);
+    const isFirstParagraph =
+      currentNode.type.name === "paragraph" &&
+      parentNode.firstChild === currentNode;
+
+    // move the entire list item
+    if (isFirstParagraph) {
+      targetType = $from.node($from.depth - 1).type;
+      if (
+        targetType.name === Callout.name ||
+        targetType.name === Blockquote.name
+      ) {
+        targetType = $from.node($from.depth - 2).type;
+      }
+    }
+
+    currentResolved = findParentNodeOfType(targetType)(state.selection);
+  }
+
+  if (
+    findParentNodeClosestToPos($from, (node) => node.type.name === Callout.name)
+  ) {
+    const currentNode = $from.node();
+    const parentNode = $from.node($from.depth - 1);
+    const isFirstHeading =
+      currentNode.type.name === "heading" &&
+      parentNode.firstChild === currentNode;
+
+    // move the entire callout
+    if (isFirstHeading) {
+      targetType = $from.node($from.depth - 1).type;
+    }
+
     currentResolved = findParentNodeOfType(targetType)(state.selection);
   }
 
