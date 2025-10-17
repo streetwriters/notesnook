@@ -2831,6 +2831,10 @@ msgstr ""
 msgid "Filter languages"
 msgstr ""
 
+#: src/strings.ts:2594
+msgid "Finish your purchase in the browser."
+msgstr ""
+
 #: src/strings.ts:1668
 msgid "Fix it"
 msgstr ""
@@ -3008,6 +3012,10 @@ msgstr ""
 
 #: src/strings.ts:2161
 msgid "GNU GENERAL PUBLIC LICENSE Version 3"
+msgstr ""
+
+#: src/strings.ts:2595
+msgid "Go back"
 msgstr ""
 
 #: src/strings.ts:2445

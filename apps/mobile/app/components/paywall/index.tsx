@@ -919,7 +919,6 @@ const ReviewItem = (props: {
     </View>
   );
 };
-
 const PricingPlanCard = ({
   plan,
   pricingPlans,
@@ -932,7 +931,6 @@ const PricingPlanCard = ({
   setStep: (step: number) => void;
 }) => {
   const { colors } = useThemeColors();
-  const isFreePlan = plan.id === "free";
   const [regionalDiscount, setRegionaDiscount] = useState<SKUResponse>();
   const { width } = useWindowDimensions();
   const isTablet = width > 600;
@@ -996,8 +994,8 @@ const PricingPlanCard = ({
                   : "monthly"
               }`
             : pricingPlans.isGithubRelease
-            ? (WebPlan?.period as string)
-            : (product?.productId as string)
+              ? (WebPlan?.period as string)
+              : (product?.productId as string)
         );
         setStep(Steps.buy);
       }}
@@ -1110,24 +1108,21 @@ const PricingPlanCard = ({
       ) : (
         <View>
           <Paragraph size={AppFontSize.lg}>
-            {isFreePlan
-              ? "0.00"
-              : price ||
-                `${WebPlan?.price?.currency} ${WebPlan?.price?.gross}`}{" "}
+            {price || `${WebPlan?.price?.currency} ${WebPlan?.price?.gross}`}{" "}
             <Paragraph>/{strings.month()}</Paragraph>
           </Paragraph>
 
-          {isFreePlan || !product ? null : (
+          {!product && !WebPlan ? null : (
             <Paragraph color={colors.secondary.paragraph} size={AppFontSize.xs}>
               {annualBilling
                 ? strings.billedAnnually(
                     pricingPlans?.getStandardPrice(
-                      product as RNIap.Subscription
+                      (product as RNIap.Subscription) || (WebPlan as Plan)
                     ) as string
                   )
                 : strings.billedMonthly(
                     pricingPlans?.getStandardPrice(
-                      product as RNIap.Subscription
+                      (product as RNIap.Subscription) || (WebPlan as Plan)
                     ) as string
                   )}
             </Paragraph>
