@@ -36,6 +36,7 @@ import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../../utils/styles";
+import Config from "react-native-config";
 
 export const Issue = ({ defaultTitle, defaultBody, issueTitle }) => {
   const { colors } = useThemeColors();
@@ -67,7 +68,8 @@ App version: ${getVersion()}
 Platform: ${Platform.OS}
 Device: ${getBrand() || ""}-${getModel() || ""}-${getSystemVersion() || ""}
 Pro: ${PremiumService.get()}
-Logged in: ${user ? "yes" : "no"}`,
+Logged in: ${user ? "yes" : "no"}
+Github Release: ${Config.GITHUB_RELEASE === "true" ? "Yes" : "No"}`,
         userId: user?.id
       });
       if (!issueUrl.current) {
