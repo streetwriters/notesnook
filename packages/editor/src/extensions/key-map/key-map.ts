@@ -112,31 +112,13 @@ function moveNode(editor: Editor, dir: "up" | "down") {
 
   const { $from } = state.selection;
 
-  let currentResolved;
-  let targetType;
+  let targetType = $from.node().type;
+  let currentResolved = findParentNodeOfType(targetType)(state.selection);
 
-  const outlineListItem = findParentNodeOfType(
-    editor.schema.nodes.outlineListItem
-  )(state.selection);
-  const taskItem = findParentNodeOfType(editor.schema.nodes.taskItem)(
-    state.selection
-  );
-  const listItem = findParentNodeOfType(editor.schema.nodes.listItem)(
-    state.selection
-  );
-  if (outlineListItem) {
-    currentResolved = outlineListItem;
-    targetType = editor.schema.nodes.outlineListItem;
-  } else if (taskItem) {
-    currentResolved = taskItem;
-    targetType = editor.schema.nodes.taskItem;
-  } else if (listItem) {
-    currentResolved = listItem;
-    targetType = editor.schema.nodes.listItem;
-  } else {
-    const type = $from.node().type;
-    currentResolved = findParentNodeOfType(type)(state.selection);
-    targetType = type;
+  // when in list, move the list item
+  if (isListActive(editor)) {
+    targetType = $from.node($from.depth - 1).type;
+    currentResolved = findParentNodeOfType(targetType)(state.selection);
   }
 
   if (!currentResolved) {
@@ -149,17 +131,6 @@ function moveNode(editor: Editor, dir: "up" | "down") {
   const parentPos = $from.start(parentDepth);
 
   if (currentNode.type !== targetType) {
-    return false;
-  }
-
-  if (
-    (targetType === editor.schema.nodes.outlineListItem &&
-      parent.type.name !== "outlineList") ||
-    (targetType === editor.schema.nodes.taskItem &&
-      parent.type.name !== "taskList") ||
-    (targetType === editor.schema.nodes.listItem &&
-      !["bulletList", "orderedList"].includes(parent.type.name))
-  ) {
     return false;
   }
 
