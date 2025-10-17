@@ -272,9 +272,9 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
         if (!(product as Plan)?.price) return null;
         return `${(product as Plan).price.currency} ${
           (product as Plan).period === "yearly"
-            ? ((product as Plan).price.gross / 12).toFixed(2)
+            ? (product as Plan).price.gross
             : (product as Plan).period === "5-year"
-            ? ((product as Plan).price.gross / (12 * 5)).toFixed(2)
+            ? (product as Plan).price.gross
             : (product as Plan).price.gross
         }`;
       }

@@ -74,6 +74,13 @@ export const BuyPlan = (props: {
     >
       <Paragraph>{strings.finishPurchaseInBrowser()}</Paragraph>
       <Button
+        title={strings.next()}
+        type="accent"
+        onPress={() => {
+          pricingPlans.finish();
+        }}
+      />
+      <Button
         title={strings.goBack()}
         onPress={() => {
           setCheckoutUrl(undefined);
