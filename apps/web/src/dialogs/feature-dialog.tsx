@@ -93,14 +93,14 @@ const features: Record<FeatureKeys, Feature> = {
         ]
       : [
           {
-            title: "New pricing plans",
+            title: "Introducing Notesnook Circle",
             subtitle:
-              "We are changing our pricing to make more sense and be more flexible."
+              "Notesnook Circle brings together trusted partners who share our commitment to privacy, transparency, and user freedom. Subscribed users gain access to special discounts, and other benefits. To see if you are eligible, go to Settings > Notesnook Circle."
           },
           {
-            title: "Filters in search",
+            title: "Improved outline list",
             subtitle:
-              "Search now has some basic filters like content:, title:, tag:, color: etc. For the whole list of filters, read our docs."
+              "Outline list now supports all types of blocks including images, callouts, tables, code blocks, and more!"
           }
         ],
     cta: {
