@@ -59,10 +59,10 @@ const SheetWrapper = ({
   const insets = useGlobalSafeAreaInsets();
   const lockEvents = useRef(false);
   const locked = useUserStore((state) => state.appLocked);
-
   let width = dimensions.width > 600 ? 600 : 500;
   const isGestureNavigationEnabled =
     NotesnookModule.isGestureNavigationEnabled();
+  const bottomInsets = insets.bottom || (isGestureNavigationEnabled ? 20 : 49);
   const style = React.useMemo(() => {
     return {
       width: largeTablet || smallTablet ? width : "100%",
@@ -77,7 +77,7 @@ const SheetWrapper = ({
       ...getContainerBorder(colors.primary.border, 0.5),
       borderBottomWidth: 0,
       paddingBottom:
-        Platform.OS === "android" && !insets.bottom
+        Platform.OS === "android" && !bottomInsets
           ? isGestureNavigationEnabled
             ? 0
             : 30
@@ -132,12 +132,10 @@ const SheetWrapper = ({
           width: 100,
           backgroundColor: colors.secondary.background
         }}
-        safeAreaInsets={insets}
         statusBarTranslucent
         drawUnderStatusBar={true}
         containerStyle={style}
         gestureEnabled={gestureEnabled}
-        initialOffsetFromBottom={1}
         onPositionChanged={onHasReachedTop}
         closeOnTouchBackdrop={closeOnTouchBackdrop}
         keyboardHandlerEnabled={
@@ -146,14 +144,9 @@ const SheetWrapper = ({
         closeOnPressBack={closeOnTouchBackdrop}
         indicatorColor={colors.secondary.background}
         onOpen={_onOpen}
-        keyboardDismissMode="none"
         enableGesturesInScrollView={enableGesturesInScrollView}
         defaultOverlayOpacity={overlayOpacity}
         overlayColor={colors.primary.backdrop}
-        keyboardShouldPersistTaps="always"
-        openAnimationConfig={{
-          friction: 9
-        }}
         ExtraOverlayComponent={
           <>
             {overlay}
@@ -163,10 +156,11 @@ const SheetWrapper = ({
         onClose={_onClose}
       >
         {children}
+
         {bottomPadding ? (
           <View
             style={{
-              height: insets.bottom !== 0 ? insets.bottom : 20
+              height: bottomInsets
             }}
           />
         ) : null}

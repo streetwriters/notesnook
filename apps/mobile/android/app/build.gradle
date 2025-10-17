@@ -246,12 +246,12 @@ task copyEditorBundle(type: Copy) {
 }
 
 task copyPlainEditorBundle(type: Copy) {
-    from '.../ios/extension.bundle'
+    from '.../../ios/extension.bundle'
     into './src/main/assets'
 }
 
 task copyFontFiles(type: Copy) {
-    from '../fonts'
+    from '../../fonts'
     into './src/main/assets/fonts'
 }
 
