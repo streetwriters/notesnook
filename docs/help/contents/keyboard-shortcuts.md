@@ -48,7 +48,7 @@ The following keyboard shortcuts will help you navigate Notesnook faster.
 | Insert date and time with timezone | Ctrl Alt Z | Ctrl Alt Z | ⌘ ⌥ Z |
 | Increase font size | Ctrl [ | Ctrl [ | ⌘ [ |
 | Decrease font size | Ctrl ] | Ctrl ] | ⌘ ] |
-| Insert paragraph | Ctrl ⇧ 0 | Ctrl ⇧ 0 | ⌘ ⇧ 0 |
+| Insert paragraph | Ctrl Alt 0 | Ctrl Alt 0 | ⌘ ⌥ 0 |
 | Insert heading 1 | Ctrl Alt 1 | Ctrl Alt 1 | ⌘ ⌥ 1 |
 | Insert heading 2 | Ctrl Alt 2 | Ctrl Alt 2 | ⌘ ⌥ 2 |
 | Insert heading 3 | Ctrl Alt 3 | Ctrl Alt 3 | ⌘ ⌥ 3 |
@@ -76,3 +76,5 @@ The following keyboard shortcuts will help you navigate Notesnook faster.
 | Text align left | Ctrl ⇧ L | Ctrl ⇧ L | ⌘ ⇧ L |
 | Text align right | Ctrl ⇧ R | Ctrl ⇧ R | ⌘ ⇧ R |
 | Underline | Ctrl U | Ctrl U | ⌘ U |
+| Move line up | Alt ↑ | Alt ↑ | ⌥ ↑ |
+| Move line down | Alt ↓ | Alt ↓ | ⌥ ↓ |
