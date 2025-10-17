@@ -131,39 +131,6 @@ export const ImageNode = Node.create<ImageOptions>({
         getAttrs(node) {
           if (node.querySelectorAll("img").length <= 0) return false;
           return null;
-        },
-        getContent: (dom, schema) => {
-          const wrapper = document.createElement("div");
-          let buffer = "";
-
-          const flushBuffer = () => {
-            if (buffer.trim().length > 0) {
-              const pEl = document.createElement("p");
-              pEl.innerHTML = buffer;
-              wrapper.appendChild(pEl);
-              buffer = "";
-            }
-          };
-
-          for (const child of dom.childNodes) {
-            if (
-              child.nodeType === globalThis.Node.ELEMENT_NODE &&
-              (child as HTMLElement).tagName === "IMG"
-            ) {
-              flushBuffer();
-              wrapper.appendChild(child);
-            } else {
-              if (child.nodeType === globalThis.Node.ELEMENT_NODE) {
-                buffer += (child as HTMLElement).outerHTML;
-              } else if (child.nodeType === globalThis.Node.TEXT_NODE) {
-                buffer += child.textContent;
-              }
-            }
-          }
-          flushBuffer();
-
-          const parser = DOMParser.fromSchema(schema);
-          return parser.parse(wrapper).content;
         }
       },
       {
