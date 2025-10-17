@@ -2599,5 +2599,5 @@ Use this if changes from other devices are not appearing on this device. This wi
   trialUserCircleNotice: () =>
     `Notesnook Circle is reserved for members with an active subscription. You'll get full access after your trial period is over and your subscription is confirmed.`,
   freeUserCircleNotice: () =>
-    t`The Notesnook Circle is exclusive to subscribers!`
+    t`The Notesnook Circle is exclusive to subscribers. Please consider subscribing to gain access to Notesnook Circle and enjoy additional benefits.`
 };

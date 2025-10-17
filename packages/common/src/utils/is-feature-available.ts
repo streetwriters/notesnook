@@ -447,6 +447,17 @@ const features = {
       believer: createLimit(true),
       legacyPro: createLimit(true)
     }
+  }),
+  notesnookCircle: createFeature({
+    id: "notesnookCircle",
+    title: "Notesnook Circle",
+    availability: {
+      free: createLimit(false),
+      essential: createLimit(true),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
+    }
   })
 };
 

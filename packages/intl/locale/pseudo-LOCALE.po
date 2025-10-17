@@ -6339,7 +6339,7 @@ msgid "The information above will be publically available at"
 msgstr ""
 
 #: src/strings.ts:2602
-msgid "The Notesnook Circle is exclusive to subscribers!"
+msgid "The Notesnook Circle is exclusive to subscribers. Please consider subscribing to gain access to Notesnook Circle and enjoy additional benefits."
 msgstr ""
 
 #: src/strings.ts:2081
