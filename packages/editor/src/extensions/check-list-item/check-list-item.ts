@@ -24,7 +24,7 @@ import {
   Node
 } from "@tiptap/core";
 import { Node as ProseMirrorNode } from "@tiptap/pm/model";
-import { CheckList } from "../check-list/check-list";
+import { CheckList } from "../check-list/check-list.js";
 
 export interface CheckListItemOptions {
   onReadOnlyChecked?: (node: ProseMirrorNode, checked: boolean) => boolean;

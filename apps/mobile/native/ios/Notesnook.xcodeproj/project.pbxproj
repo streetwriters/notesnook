@@ -17,14 +17,15 @@
 		2E4BF736C2EB268ED3FD9C29 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = B5216B66C0B4A91C0A69128B /* PrivacyInfo.xcprivacy */; };
 		6510E6D72877215700DACAA9 /* build.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6510E6D62877215700DACAA9 /* build.bundle */; };
 		6515C42F2580AA3000E83E39 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6515C42E2580AA2F00E83E39 /* StoreKit.framework */; };
-		6517B7C12B6838EB0079FF37 /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6517B7BE2B6838EB0079FF37 /* OpenSans-Regular.ttf */; };
-		6517B7C22B6838EB0079FF37 /* OpenSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6517B7BF2B6838EB0079FF37 /* OpenSans-SemiBold.ttf */; };
-		6517B7C32B6838EB0079FF37 /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6517B7C02B6838EB0079FF37 /* OpenSans-Bold.ttf */; };
 		6529A13E279BC4C70048D4A8 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6529A13D279BC4C70048D4A8 /* BootSplash.storyboard */; };
-		656835812BB29A9800144BAB /* OpenSans-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 656835802BB29A8300144BAB /* OpenSans-Italic.ttf */; };
-		6569927F2C5754F10041CD41 /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6517B7C02B6838EB0079FF37 /* OpenSans-Bold.ttf */; };
-		656992802C5754F10041CD41 /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6517B7BE2B6838EB0079FF37 /* OpenSans-Regular.ttf */; };
-		656992812C5754F10041CD41 /* OpenSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6517B7BF2B6838EB0079FF37 /* OpenSans-SemiBold.ttf */; };
+		653F4DFC2EA35F99009A42A2 /* Inter-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 653F4DF92EA35F99009A42A2 /* Inter-Italic.ttf */; };
+		653F4DFD2EA35F99009A42A2 /* Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 653F4DFA2EA35F99009A42A2 /* Inter-Regular.ttf */; };
+		653F4DFE2EA35F99009A42A2 /* Inter-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 653F4DF82EA35F99009A42A2 /* Inter-Bold.ttf */; };
+		653F4DFF2EA35F99009A42A2 /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 653F4DFB2EA35F99009A42A2 /* Inter-SemiBold.ttf */; };
+		653F4E002EA35F99009A42A2 /* Inter-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 653F4DF92EA35F99009A42A2 /* Inter-Italic.ttf */; };
+		653F4E012EA35F99009A42A2 /* Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 653F4DFA2EA35F99009A42A2 /* Inter-Regular.ttf */; };
+		653F4E022EA35F99009A42A2 /* Inter-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 653F4DF82EA35F99009A42A2 /* Inter-Bold.ttf */; };
+		653F4E032EA35F99009A42A2 /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 653F4DFB2EA35F99009A42A2 /* Inter-SemiBold.ttf */; };
 		6593E4A3281C345400492C50 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6593E4A2281C345400492C50 /* AppDelegate.mm */; };
 		659BE46725E11A5100E05671 /* notesnook-text.png in Resources */ = {isa = PBXBuildFile; fileRef = 659BE46625E11A5100E05671 /* notesnook-text.png */; };
 		65AA857925E6DDEC00772A01 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65AA857825E6DDEC00772A01 /* WidgetKit.framework */; };
@@ -117,12 +118,12 @@
 		4C4AF691C324D95337F2FB0A /* libPods-Make Note.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Make Note.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6510E6D62877215700DACAA9 /* build.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = build.bundle; path = "../../../../packages/editor-mobile/build.bundle"; sourceTree = "<group>"; };
 		6515C42E2580AA2F00E83E39 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
-		6517B7BE2B6838EB0079FF37 /* OpenSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "OpenSans-Regular.ttf"; path = "../../../../packages/editor-mobile/public/fonts/OpenSans-Regular.ttf"; sourceTree = "<group>"; };
-		6517B7BF2B6838EB0079FF37 /* OpenSans-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "OpenSans-SemiBold.ttf"; path = "../../../../packages/editor-mobile/public/fonts/OpenSans-SemiBold.ttf"; sourceTree = "<group>"; };
-		6517B7C02B6838EB0079FF37 /* OpenSans-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "OpenSans-Bold.ttf"; path = "../../../../packages/editor-mobile/public/fonts/OpenSans-Bold.ttf"; sourceTree = "<group>"; };
 		6529A13D279BC4C70048D4A8 /* BootSplash.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = BootSplash.storyboard; path = Notesnook/BootSplash.storyboard; sourceTree = "<group>"; };
 		6529D2B0257B4A2900B49BC3 /* NotesnookDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = NotesnookDebug.entitlements; path = Notesnook/NotesnookDebug.entitlements; sourceTree = "<group>"; };
-		656835802BB29A8300144BAB /* OpenSans-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "OpenSans-Italic.ttf"; path = "../../../../packages/editor-mobile/public/fonts/OpenSans-Italic.ttf"; sourceTree = "<group>"; };
+		653F4DF82EA35F99009A42A2 /* Inter-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Inter-Bold.ttf"; path = "/Users/ammarahmed/Work/Projects/apps/notesnook/packages/editor-mobile/public/fonts/Inter-Bold.ttf"; sourceTree = "<absolute>"; };
+		653F4DF92EA35F99009A42A2 /* Inter-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Inter-Italic.ttf"; path = "/Users/ammarahmed/Work/Projects/apps/notesnook/packages/editor-mobile/public/fonts/Inter-Italic.ttf"; sourceTree = "<absolute>"; };
+		653F4DFA2EA35F99009A42A2 /* Inter-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Inter-Regular.ttf"; path = "/Users/ammarahmed/Work/Projects/apps/notesnook/packages/editor-mobile/public/fonts/Inter-Regular.ttf"; sourceTree = "<absolute>"; };
+		653F4DFB2EA35F99009A42A2 /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Inter-SemiBold.ttf"; path = "/Users/ammarahmed/Work/Projects/apps/notesnook/packages/editor-mobile/public/fonts/Inter-SemiBold.ttf"; sourceTree = "<absolute>"; };
 		6593E4A2281C345400492C50 /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = Notesnook/AppDelegate.mm; sourceTree = "<group>"; };
 		659BE46625E11A5100E05671 /* notesnook-text.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "notesnook-text.png"; path = "Notesnook/Images.xcassets/notesnook-text.png"; sourceTree = "<group>"; };
 		65A7F34F255689AD00699170 /* Notesnook.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Notesnook.entitlements; path = Notesnook/Notesnook.entitlements; sourceTree = "<group>"; };
@@ -303,10 +304,10 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				656835802BB29A8300144BAB /* OpenSans-Italic.ttf */,
-				6517B7C02B6838EB0079FF37 /* OpenSans-Bold.ttf */,
-				6517B7BE2B6838EB0079FF37 /* OpenSans-Regular.ttf */,
-				6517B7BF2B6838EB0079FF37 /* OpenSans-SemiBold.ttf */,
+				653F4DF82EA35F99009A42A2 /* Inter-Bold.ttf */,
+				653F4DF92EA35F99009A42A2 /* Inter-Italic.ttf */,
+				653F4DFA2EA35F99009A42A2 /* Inter-Regular.ttf */,
+				653F4DFB2EA35F99009A42A2 /* Inter-SemiBold.ttf */,
 				65C400DD2A80B68D00AA3DF5 /* MaterialCommunityIcons.ttf */,
 				65C149862A61151B005C40F1 /* extension.bundle */,
 				6510E6D62877215700DACAA9 /* build.bundle */,
@@ -555,14 +556,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				656835812BB29A9800144BAB /* OpenSans-Italic.ttf in Resources */,
 				65C400DE2A80B68D00AA3DF5 /* MaterialCommunityIcons.ttf in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				6517B7C32B6838EB0079FF37 /* OpenSans-Bold.ttf in Resources */,
-				6517B7C22B6838EB0079FF37 /* OpenSans-SemiBold.ttf in Resources */,
 				6529A13E279BC4C70048D4A8 /* BootSplash.storyboard in Resources */,
 				6510E6D72877215700DACAA9 /* build.bundle in Resources */,
-				6517B7C12B6838EB0079FF37 /* OpenSans-Regular.ttf in Resources */,
+				653F4E002EA35F99009A42A2 /* Inter-Italic.ttf in Resources */,
+				653F4E012EA35F99009A42A2 /* Inter-Regular.ttf in Resources */,
+				653F4E022EA35F99009A42A2 /* Inter-Bold.ttf in Resources */,
+				653F4E032EA35F99009A42A2 /* Inter-SemiBold.ttf in Resources */,
 				659BE46725E11A5100E05671 /* notesnook-text.png in Resources */,
 				E7F9D56665C2F19F4A97BF49 /* PrivacyInfo.xcprivacy in Resources */,
 			);
@@ -596,10 +597,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6569927F2C5754F10041CD41 /* OpenSans-Bold.ttf in Resources */,
-				656992802C5754F10041CD41 /* OpenSans-Regular.ttf in Resources */,
-				656992812C5754F10041CD41 /* OpenSans-SemiBold.ttf in Resources */,
 				65C400DF2A80B6B600AA3DF5 /* MaterialCommunityIcons.ttf in Resources */,
+				653F4DFC2EA35F99009A42A2 /* Inter-Italic.ttf in Resources */,
+				653F4DFD2EA35F99009A42A2 /* Inter-Regular.ttf in Resources */,
+				653F4DFE2EA35F99009A42A2 /* Inter-Bold.ttf in Resources */,
+				653F4DFF2EA35F99009A42A2 /* Inter-SemiBold.ttf in Resources */,
 				65C149872A61151B005C40F1 /* extension.bundle in Resources */,
 				65B5014725A672B200E2D264 /* MainInterface.storyboard in Resources */,
 			);
@@ -1089,7 +1091,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2151;
+				CURRENT_PROJECT_VERSION = 2152;
 				DEVELOPMENT_TEAM = 53CWBG3QUC;
 				ENABLE_BITCODE = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -1163,7 +1165,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.3.3;
+				MARKETING_VERSION = 3.3.4;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1194,7 +1196,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2151;
+				CURRENT_PROJECT_VERSION = 2152;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 53CWBG3QUC;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -1268,7 +1270,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.3.3;
+				MARKETING_VERSION = 3.3.4;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -1427,7 +1429,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2151;
+				CURRENT_PROJECT_VERSION = 2152;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 53CWBG3QUC;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -1439,7 +1441,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.3.3;
+				MARKETING_VERSION = 3.3.4;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook.notewidget;
@@ -1470,7 +1472,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2151;
+				CURRENT_PROJECT_VERSION = 2152;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 53CWBG3QUC;
@@ -1483,7 +1485,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.3.3;
+				MARKETING_VERSION = 3.3.4;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook.notewidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1513,7 +1515,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Make Note/Make Note.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2151;
+				CURRENT_PROJECT_VERSION = 2152;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 53CWBG3QUC;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -1587,14 +1589,14 @@
 					"\"$(PODS_ROOT)/Headers/Private/React-Core\"",
 				);
 				INFOPLIST_FILE = "Make Note/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift$(inherited)";
-				MARKETING_VERSION = 3.3.3;
+				MARKETING_VERSION = 3.3.4;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook.share;
@@ -1625,7 +1627,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2151;
+				CURRENT_PROJECT_VERSION = 2152;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 53CWBG3QUC;
@@ -1700,14 +1702,14 @@
 					"\"$(PODS_ROOT)/Headers/Private/React-Core\"",
 				);
 				INFOPLIST_FILE = "Make Note/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift$(inherited)";
-				MARKETING_VERSION = 3.3.3;
+				MARKETING_VERSION = 3.3.4;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook.share;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1784,10 +1786,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
@@ -1852,10 +1851,7 @@
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;

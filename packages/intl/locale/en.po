@@ -2842,7 +2842,7 @@ msgstr "Filter attachments by filename, type or hash"
 msgid "Filter languages"
 msgstr "Filter languages"
 
-#: src/strings.ts:2603
+#: src/strings.ts:2594
 msgid "Finish your purchase in the browser."
 msgstr "Finish your purchase in the browser."
 
@@ -3032,7 +3032,7 @@ msgstr "Getting recovery codes"
 msgid "GNU GENERAL PUBLIC LICENSE Version 3"
 msgstr "GNU GENERAL PUBLIC LICENSE Version 3"
 
-#: src/strings.ts:2604
+#: src/strings.ts:2595
 msgid "Go back"
 msgstr "Go back"
 
