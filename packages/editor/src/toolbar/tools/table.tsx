@@ -41,8 +41,6 @@ import { useToolbarLocation } from "../stores/toolbar-store.js";
 import { showPopup } from "../../components/popup-presenter/index.js";
 import { useRefValue } from "../../hooks/use-ref-value.js";
 import { strings } from "@notesnook/intl";
-import { selectedRect } from "@tiptap/pm/tables";
-import { TextSelection } from "@tiptap/pm/state";
 
 export function TableSettings(props: ToolProps) {
   const { editor } = props;
