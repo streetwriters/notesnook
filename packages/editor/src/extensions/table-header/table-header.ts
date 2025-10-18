@@ -17,18 +17,50 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import TipTapTableHeader from "@tiptap/extension-table-header";
-import { addStyleAttribute } from "../table-cell/utils.js";
+import { mergeAttributes, Node } from "@tiptap/core";
+import { addTableCellAttributes } from "../table-cell/table-cell.js";
 
-export const TableHeader = TipTapTableHeader.extend({
-  addAttributes() {
+export interface TableHeaderOptions {
+  /**
+   * The HTML attributes for a table header node.
+   * @default {}
+   * @example { class: 'foo' }
+   */
+  HTMLAttributes: Record<string, any>;
+}
+
+/**
+ * This extension allows you to create table headers.
+ * @see https://www.tiptap.dev/api/nodes/table-header
+ */
+export const TableHeader = Node.create<TableHeaderOptions>({
+  name: "tableHeader",
+
+  addOptions() {
     return {
-      ...this.parent?.(),
-      backgroundColor: addStyleAttribute("backgroundColor", "background-color"),
-      color: addStyleAttribute("color", "color"),
-      borderWidth: addStyleAttribute("borderWidth", "border-width", "px"),
-      borderStyle: addStyleAttribute("borderStyle", "border-style"),
-      borderColor: addStyleAttribute("borderColor", "border-color")
+      HTMLAttributes: {}
     };
+  },
+
+  content: "block+",
+
+  addAttributes() {
+    return addTableCellAttributes();
+  },
+
+  tableRole: "header_cell",
+
+  isolating: true,
+
+  parseHTML() {
+    return [{ tag: "th" }];
+  },
+
+  renderHTML({ HTMLAttributes }) {
+    return [
+      "th",
+      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+      0
+    ];
   }
 });

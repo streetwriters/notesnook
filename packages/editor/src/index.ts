@@ -285,7 +285,10 @@ const useTiptap = (
         Table.configure({
           resizable: true,
           allowTableNodeSelection: true,
-          cellMinWidth: 50
+          cellMinWidth: 20,
+          defaultCellAttrs: {
+            colwidth: [100]
+          }
         }),
         Clipboard,
         TableRow,
