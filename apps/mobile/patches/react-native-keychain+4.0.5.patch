@@ -1,0 +1,34 @@
+diff --git a/node_modules/react-native-keychain/android/build.gradle b/node_modules/react-native-keychain/android/build.gradle
+index bd2fe04..4964b6f 100755
+--- a/node_modules/react-native-keychain/android/build.gradle
++++ b/node_modules/react-native-keychain/android/build.gradle
+@@ -2,21 +2,6 @@ def safeExtGet(prop, fallback) {
+     rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+ }
+ 
+-buildscript {
+-    // The Android Gradle plugin is only required when opening the android folder stand-alone.
+-    // This avoids unnecessary downloads and potential conflicts when the library is included as a
+-    // module dependency in an application project.
+-    if (project == rootProject) {
+-        repositories {
+-            google()
+-            jcenter()
+-        }
+-        dependencies {
+-            classpath 'com.android.tools.build:gradle:3.5.3'
+-        }
+-    }
+-}
+-
+ apply plugin: 'com.android.library'
+ 
+ android {
+@@ -44,7 +29,6 @@ repositories {
+         url "$rootDir/../node_modules/jsc-android/dist"
+     }
+     google()
+-    jcenter()
+ }
+ 
+ dependencies {
