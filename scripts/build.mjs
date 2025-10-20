@@ -67,7 +67,7 @@ await Promise.all([
     IS_WATCH ? "--watch" : ""
   ),
   cmd(
-    TSCGO,
+    TSC,
     "--emitDeclarationOnly",
     "--outDir",
     "dist/types",

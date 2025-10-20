@@ -43,7 +43,7 @@ export default function TiptapEditorWrapper(props: {
             sx={{
               display: props.settings.noToolbar ? "none" : "flex",
               overflowY: "hidden",
-              minHeight: "40px",
+              minHeight: "45px",
               ...(globalThis.__PLATFORM__ === "ios" && {
                 position: "absolute",
                 bottom: 0,

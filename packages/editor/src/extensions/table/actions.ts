@@ -166,13 +166,12 @@ function selectRow(
 ) {
   const rect = selectedRect(state);
   const currentCellIndex = rect.map.width * (rect.bottom - 1) + rect.right;
-  const rowIndex = Math.floor(currentCellIndex / rect.map.width);
-  const nextRowIndex = direction === "prev" ? rowIndex - 1 : rowIndex + 1;
-  tr.setSelection(
-    new TextSelection(
-      tr.doc.resolve(rect.map.positionAt(nextRowIndex, rect.right, rect.table))
-    )
-  );
+  const nextCellIndex =
+    direction === "prev"
+      ? currentCellIndex - rect.map.width
+      : currentCellIndex + rect.map.width;
+  const pos = rect.map.map[nextCellIndex - 1];
+  tr.setSelection(new TextSelection(tr.doc.resolve(rect.tableStart + pos + 1)));
   return true;
 }
 
@@ -182,16 +181,11 @@ function selectColumn(
   direction: "prev" | "next"
 ) {
   const rect = selectedRect(state);
-  const columnIndex = rect.right;
-  const nextColumnIndex =
-    direction === "prev" ? columnIndex - 1 : columnIndex + 1;
   const currentCellIndex = rect.map.width * (rect.bottom - 1) + rect.right;
-  const rowIndex = Math.floor(currentCellIndex / rect.map.width);
-  tr.setSelection(
-    new TextSelection(
-      tr.doc.resolve(rect.map.positionAt(rowIndex, nextColumnIndex, rect.table))
-    )
-  );
+  const nextCellIndex =
+    direction === "prev" ? currentCellIndex - 1 : currentCellIndex + 1;
+  const pos = rect.map.map[nextCellIndex - 1];
+  tr.setSelection(new TextSelection(tr.doc.resolve(rect.tableStart + pos + 1)));
   return true;
 }
 

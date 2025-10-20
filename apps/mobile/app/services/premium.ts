@@ -58,6 +58,7 @@ async function setPremiumStatus() {
 
 async function loadProductsAndSubs() {
   try {
+    if (Config.GITHUB_RELEASE === "true") throw new Error("Github release");
     if (!subs || subs.length === 0) {
       subs = await RNIap.getSubscriptions({
         skus: itemSkus

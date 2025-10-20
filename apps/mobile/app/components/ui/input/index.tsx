@@ -239,7 +239,7 @@ const Input = ({
     flexShrink: 1,
     paddingBottom: DefaultAppStyles.GAP_VERTICAL - 4,
     paddingTop: DefaultAppStyles.GAP_VERTICAL - 4,
-    fontFamily: "OpenSans-Regular",
+    fontFamily: "Inter-Regular",
     ...(inputStyle as ViewStyle)
   };
 

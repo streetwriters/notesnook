@@ -84,7 +84,7 @@ export const SearchBar = ({
           testID="search-input"
           style={{
             fontSize: AppFontSize.sm,
-            fontFamily: "OpenSans-Regular",
+            fontFamily: "Inter-Regular",
             flexGrow: 1,
             color: colors.primary.paragraph,
             paddingTop: 0,
