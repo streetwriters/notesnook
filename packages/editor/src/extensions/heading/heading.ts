@@ -23,9 +23,10 @@ import {
   textblockTypeInputRule
 } from "@tiptap/core";
 import { Heading as TiptapHeading } from "@tiptap/extension-heading";
-import { isClickWithinBounds } from "../../utils/prosemirror";
+import { isClickWithinBounds } from "../../utils/prosemirror.js";
 import { Selection, Transaction } from "@tiptap/pm/state";
 import { Node } from "@tiptap/pm/model";
+import { useToolbarStore } from "../../toolbar/stores/toolbar-store.js";
 
 const COLLAPSIBLE_BLOCK_TYPES = [
   "paragraph",
@@ -184,7 +185,13 @@ export const Heading = TiptapHeading.extend({
         );
         if (calloutAncestor) return;
 
-        if (isClickWithinBounds(e, resolvedPos, "left")) {
+        if (
+          isClickWithinBounds(
+            e,
+            resolvedPos,
+            useToolbarStore.getState().isMobile ? "right" : "left"
+          )
+        ) {
           e.preventDefault();
           e.stopImmediatePropagation();
 

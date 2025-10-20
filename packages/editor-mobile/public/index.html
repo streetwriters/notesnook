@@ -45,6 +45,88 @@
       #statusbar p {
         font-family: "Inter";
       }
+
+      .ProseMirror h1,
+      .ProseMirror h2,
+      .ProseMirror h3,
+      .ProseMirror h4,
+      .ProseMirror h5,
+      .ProseMirror h6 {
+        padding-right: 35px;
+      }
+
+      .ProseMirror h1::before,
+      .ProseMirror h2::before {
+        width: 25px !important;
+        height: 25px !important;
+        background-size: 25 !important;
+      }
+
+      .ProseMirror h3::before,
+      .ProseMirror h4::before {
+        width: 22px !important;
+        height: 22px !important;
+        background-size: 22 !important;
+      }
+
+      .ProseMirror h5::before,
+      .ProseMirror h6::before {
+        width: 20px !important;
+        height: 20px !important;
+        background-size: 20 !important;
+      }
+
+      .ProseMirror h1::before,
+      .ProseMirror h2::before,
+      .ProseMirror h3::before,
+      .ProseMirror h4::before,
+      .ProseMirror h5::before,
+      .ProseMirror h6::before {
+        right: 10px !important;
+        left: unset !important;
+        opacity: 1 !important;
+      }
+
+      .ProseMirror h1[dir="rtl"]::after,
+      .ProseMirror h2[dir="rtl"]::after,
+      .ProseMirror h3[dir="rtl"]::after,
+      .ProseMirror h4[dir="rtl"]::after,
+      .ProseMirror h5[dir="rtl"]::after,
+      .ProseMirror h6[dir="rtl"]::after {
+        left: 10px !important;
+        right: unset !important;
+        opacity: 1 !important;
+      }
+
+      .ProseMirror h1[dir="rtl"],
+      .ProseMirror h2[dir="rtl"],
+      .ProseMirror h3[dir="rtl"],
+      .ProseMirror h4[dir="rtl"],
+      .ProseMirror h5[dir="rtl"],
+      .ProseMirror h6[dir="rtl"] {
+        padding-right: 0px;
+        padding-left: 35px;
+      }
+
+      .ProseMirror h1[data-collapsed="true"]::before,
+      .ProseMirror h2[data-collapsed="true"]::before,
+      .ProseMirror h3[data-collapsed="true"]::before,
+      .ProseMirror h4[data-collapsed="true"]::before,
+      .ProseMirror h5[data-collapsed="true"]::before,
+      .ProseMirror h6[data-collapsed="true"]::before {
+        transform: rotate(90deg) !important;
+        opacity: 1;
+      }
+
+      .ProseMirror h1[data-collapsed="true"]::after,
+      .ProseMirror h2[data-collapsed="true"]::after,
+      .ProseMirror h3[data-collapsed="true"]::after,
+      .ProseMirror h4[data-collapsed="true"]::after,
+      .ProseMirror h5[data-collapsed="true"]::after,
+      .ProseMirror h6[data-collapsed="true"]::after {
+        transform: rotate(-90deg) !important;
+        opacity: 1;
+      }
     </style>
     <meta name="description" content="Notesnook editor for mobile" />
     <!--
