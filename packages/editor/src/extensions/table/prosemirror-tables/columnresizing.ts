@@ -87,15 +87,6 @@ export function columnResizing({
       };
     },
     props: {
-      attributes: (state): Record<string, string> => {
-        const pluginState = columnResizingPluginKey.getState(state);
-        return pluginState &&
-          pluginState.activeHandle > -1 &&
-          pluginState.dragging
-          ? { class: "dragging" }
-          : {};
-      },
-
       handleDOMEvents: {
         touchstart: (view, event) => {
           handleMouseDown(view, event, cellMinWidth, defaultCellMinWidth);
@@ -213,7 +204,8 @@ function handleMouseDown(
     }
 
     if (pluginState?.dragging) {
-      (view as any).domObserver.connectSelection();
+      if (event instanceof TouchEvent)
+        (view as any).domObserver.connectSelection();
       updateColumnWidth(
         view,
         pluginState.activeHandle,
@@ -232,7 +224,8 @@ function handleMouseDown(
     const clientX = getClientX(event);
     if (clientX === null) return;
     if (pluginState.dragging) {
-      (view as any).domObserver.disconnectSelection();
+      if (event instanceof TouchEvent)
+        (view as any).domObserver.disconnectSelection();
       const dragged = draggedWidth(pluginState.dragging, clientX, cellMinWidth);
       displayColumnWidth(
         view,
@@ -277,15 +270,6 @@ function currentColWidth(
         parts--;
       }
   return domWidth / parts;
-}
-
-function domCellAround(target: HTMLElement | null): HTMLElement | null {
-  while (target && target.nodeName != "TD" && target.nodeName != "TH")
-    target =
-      target.classList && target.classList.contains("ProseMirror")
-        ? null
-        : (target.parentNode as HTMLElement);
-  return target;
 }
 
 function edgeCell(
