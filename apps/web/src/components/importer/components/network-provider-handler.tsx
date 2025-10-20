@@ -19,8 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
   INetworkProvider,
-  OneNote,
-  OneNoteSettings,
   ProviderSettings,
   transform
 } from "@notesnook-importer/core";
@@ -46,17 +44,7 @@ function getProviderSettings(
   provider: INetworkProvider<ProviderSettings>,
   settings: ProviderSettings
 ) {
-  if (provider instanceof OneNote) {
-    return {
-      ...settings,
-      cache: false,
-      clientId: "6c32bdbd-c6c6-4cda-bcf0-0c8ec17e5804",
-      redirectUri:
-        process.env.NODE_ENV === "development"
-          ? "http://localhost:3000"
-          : "https://app.notesnook.com"
-    } as OneNoteSettings;
-  }
+  return settings;
 }
 
 export function NetworkProviderHandler(props: NetworkProviderHandlerProps) {
