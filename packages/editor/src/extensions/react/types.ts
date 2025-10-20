@@ -54,7 +54,7 @@ export type ReactNodeViewProps<TAttributes = Attrs> = {
 };
 
 export type ReactNodeViewOptions<P> = {
-  props?: P;
+  props?: Partial<P>;
   component?: React.ComponentType<P>;
   componentKey?: (node: PMNode) => string;
   shouldUpdate?: ShouldUpdate;

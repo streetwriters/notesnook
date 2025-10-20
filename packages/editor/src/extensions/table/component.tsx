@@ -42,8 +42,10 @@ import { strings } from "@notesnook/intl";
 import SimpleBar from "simplebar-react";
 import { updateColumnsOnResize } from "./prosemirror-tables/tableview.js";
 
-export function TableComponent(props: ReactNodeViewProps) {
-  const { editor, node, forwardRef } = props;
+export function TableComponent(
+  props: ReactNodeViewProps & { cellMinWidth: number }
+) {
+  const { editor, node, forwardRef, cellMinWidth } = props;
   const colgroupRef = useRef<HTMLTableColElement>(null);
   const tableRef = useRef<HTMLTableElement>();
   const { textDirection } = node.attrs;
@@ -121,10 +123,12 @@ export function TableComponent(props: ReactNodeViewProps) {
 
 export function TableNodeView(editor: TiptapEditor) {
   class TableNode
-    extends ReactNodeView<ReactNodeViewProps<unknown>>
+    extends ReactNodeView<
+      ReactNodeViewProps<unknown> & { cellMinWidth: number }
+    >
     implements NodeView
   {
-    constructor(node: ProsemirrorNode) {
+    constructor(node: ProsemirrorNode, cellMinWidth: number) {
       super(
         node,
         editor,
