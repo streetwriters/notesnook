@@ -19,6 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import "@tiptap/extension-text-style";
 import { Extension } from "@tiptap/core";
+import { config } from "../../utils/config.js";
+import { tiptapKeys } from "@notesnook/common";
 
 export interface HighlightOptions {
   types: string[];
@@ -99,11 +101,16 @@ export const Highlight = Extension.create<HighlightOptions>({
             .run();
         }
     };
-  }
+  },
 
-  // addKeyboardShortcuts() {
-  //   return {
-  //     "Mod-Shift-h": () => this.editor.commands.toggleHighlight(),
-  //   };
-  // },
+  addKeyboardShortcuts() {
+    return {
+      [tiptapKeys.toggleHighlight.keys]: () =>
+        this.editor.commands.toggleHighlight(getCurrentHighlightColor())
+    };
+  }
 });
+
+function getCurrentHighlightColor() {
+  return config.get<"string">("highlight") || "yellow";
+}

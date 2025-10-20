@@ -43,6 +43,7 @@ import { ServersConfiguration } from "./server-config";
 import SoundPicker from "./sound-picker";
 import ThemeSelector from "./theme-selector";
 import { TitleFormat } from "./title-format";
+import { NotesnookCircle } from "./notesnook-circle";
 
 export const components: { [name: string]: ReactElement } = {
   homeselector: <HomePicker />,
@@ -69,5 +70,6 @@ export const components: { [name: string]: ReactElement } = {
   ),
   "sidebar-tab-selector": <SidebarTabPicker />,
   "change-password": <ChangePassword />,
-  "change-email": <ChangeEmail />
+  "change-email": <ChangeEmail />,
+  "notesnook-circle": <NotesnookCircle />
 };

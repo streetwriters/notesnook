@@ -121,6 +121,9 @@ export class Sodium implements ISodium {
   get crypto_box_keypair() {
     return sodium.crypto_box_keypair;
   }
+  get crypto_box_seal_open() {
+    return sodium.crypto_box_seal_open;
+  }
 }
 
 function convertVariant(variant: base64_variants): sodium.base64_variants {

@@ -30,6 +30,7 @@ import { CodeBlockAttributes } from "./code-block.js";
 import Languages from "./languages.json";
 import { useThemeEngineStore } from "@notesnook/theme";
 import { strings } from "@notesnook/intl";
+import SimpleBar from "simplebar-react";
 
 export function CodeblockComponent(
   props: ReactNodeViewProps<CodeBlockAttributes>
@@ -58,45 +59,53 @@ export function CodeblockComponent(
           overflow: "hidden"
         }}
       >
-        <Text
-          ref={(ref) => {
-            elementRef.current = ref ?? undefined;
-            forwardRef?.(ref);
+        <SimpleBar
+          style={{
+            backgroundColor: "var(--background-secondary)"
           }}
-          autoCorrect="off"
-          autoCapitalize="none"
-          css={theme.codeBlockCSS}
-          sx={{
-            pre: {
-              fontFamily: "inherit !important",
-              tabSize: "inherit !important",
-              // background: "transparent !important",
-              padding: "10px !important",
-              margin: "0px !important",
-              width: "100%",
-              borderRadius: `0px !important`,
+        >
+          <div>
+            <Text
+              ref={(ref) => {
+                elementRef.current = ref ?? undefined;
+                forwardRef?.(ref);
+              }}
+              autoCorrect="off"
+              autoCapitalize="none"
+              css={theme.codeBlockCSS}
+              sx={{
+                pre: {
+                  fontFamily: "inherit !important",
+                  tabSize: "inherit !important",
+                  // background: "transparent !important",
+                  padding: "10px !important",
+                  margin: "0px !important",
+                  width: "100%",
+                  borderRadius: `0px !important`,
 
-              "::selection,*::selection": {
-                bg: "background-selected",
-                color: "inherit"
-              },
-              "::-moz-selection,*::-moz-selection": {
-                bg: "background-selected",
-                color: "inherit"
-              }
-            },
-            fontFamily: "monospace",
-            whiteSpace: "pre", // TODO !important
-            tabSize: 1,
-            position: "relative",
-            lineHeight: "20px",
-            // bg: "var(--background-secondary)",
-            // color: "white",
-            overflowX: "hidden",
-            display: "flex"
-          }}
-          spellCheck={false}
-        />
+                  "::selection,*::selection": {
+                    bg: "background-selected",
+                    color: "inherit"
+                  },
+                  "::-moz-selection,*::-moz-selection": {
+                    bg: "background-selected",
+                    color: "inherit"
+                  }
+                },
+                fontFamily: "monospace",
+                whiteSpace: "pre", // TODO !important
+                tabSize: 1,
+                position: "relative",
+                lineHeight: "20px",
+                // bg: "var(--background-secondary)",
+                // color: "white",
+                // overflowX: "hidden",
+                display: "flex"
+              }}
+              spellCheck={false}
+            />
+          </div>
+        </SimpleBar>
         <Flex
           ref={toolbarRef}
           contentEditable={false}

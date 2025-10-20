@@ -22,7 +22,10 @@ import {
   mergeAttributes,
   findParentNodeClosestToPos
 } from "@tiptap/core";
-import { findParentNodeOfTypeClosestToPos } from "../../utils/prosemirror.js";
+import {
+  findParentNodeOfTypeClosestToPos,
+  isClickWithinBounds
+} from "../../utils/prosemirror.js";
 import { OutlineList } from "../outline-list/outline-list.js";
 import { keybindings, tiptapKeys } from "@notesnook/common";
 import { Paragraph } from "../paragraph/paragraph.js";
@@ -53,7 +56,7 @@ export const OutlineListItem = Node.create<ListItemOptions>({
     };
   },
 
-  content: "block+",
+  content: "paragraph block*",
 
   defining: true,
 
@@ -147,36 +150,9 @@ export const OutlineListItem = Node.create<ListItemOptions>({
 
         const pos = typeof getPos === "function" ? getPos() : 0;
         if (typeof pos !== "number") return;
+
         const resolvedPos = editor.state.doc.resolve(pos);
-
-        const { x, y, right } = li.getBoundingClientRect();
-
-        const clientX =
-          e instanceof MouseEvent ? e.clientX : e.touches[0].clientX;
-
-        const clientY =
-          e instanceof MouseEvent ? e.clientY : e.touches[0].clientY;
-
-        const hitArea = { width: 40, height: 40 };
-
-        const isRtl =
-          e.target.dir === "rtl" ||
-          findParentNodeClosestToPos(
-            resolvedPos,
-            (node) => !!node.attrs.textDirection
-          )?.node.attrs.textDirection === "rtl";
-
-        let xStart = clientX >= x - hitArea.width;
-        let xEnd = clientX <= x;
-        const yStart = clientY >= y;
-        const yEnd = clientY <= y + hitArea.height;
-
-        if (isRtl) {
-          xEnd = clientX <= right + hitArea.width;
-          xStart = clientX >= right;
-        }
-
-        if (xStart && xEnd && yStart && yEnd) {
+        if (isClickWithinBounds(e, resolvedPos, "left")) {
           e.preventDefault();
           editor.commands.command(({ tr }) => {
             tr.setNodeAttribute(

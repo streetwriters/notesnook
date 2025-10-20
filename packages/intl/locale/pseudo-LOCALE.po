@@ -4205,6 +4205,14 @@ msgstr ""
 msgid "Notesnook"
 msgstr ""
 
+#: src/strings.ts:2596
+msgid "Notesnook Circle"
+msgstr ""
+
+#: src/strings.ts:2598
+msgid "Notesnook Circle brings together trusted partners who share our commitment to privacy, transparency, and user freedom."
+msgstr ""
+
 #: src/strings.ts:2066
 msgid "Notesnook encrypts everything offline before syncing to your other devices. This means that no one can read your notes except you. Not even us."
 msgstr ""
@@ -4986,6 +4994,10 @@ msgstr ""
 
 #: src/strings.ts:2434
 msgid "Redeem"
+msgstr ""
+
+#: src/strings.ts:2595
+msgid "Redeem code"
 msgstr ""
 
 #: src/strings.ts:2431
@@ -6334,6 +6346,10 @@ msgstr ""
 msgid "The information above will be publically available at"
 msgstr ""
 
+#: src/strings.ts:2602
+msgid "The Notesnook Circle is exclusive to subscribers. Please consider subscribing to gain access to Notesnook Circle and enjoy additional benefits."
+msgstr ""
+
 #: src/strings.ts:2081
 msgid "The password/pin for unlocking the app."
 msgstr ""
@@ -6729,6 +6745,10 @@ msgstr ""
 
 #: src/strings.ts:748
 msgid "Upgrade to Pro"
+msgstr ""
+
+#: src/strings.ts:2594
+msgid "Upgrade to redeem"
 msgstr ""
 
 #: src/strings.ts:509

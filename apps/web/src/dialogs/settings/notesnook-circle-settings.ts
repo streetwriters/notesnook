@@ -17,28 +17,27 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { createRef } from "react";
-import { eSendEvent } from "../../services/event-manager";
-import { eCloseLoginDialog } from "../../utils/events";
-import Navigation from "../../services/navigation";
-export const AuthMode = {
-  login: 0,
-  signup: 1,
-  welcomeSignup: 2,
-  welcomeLogin: 3,
-  trialSignup: 4
-};
+import { strings } from "@notesnook/intl";
+import { CirclePartners } from "./components/circle-partners";
+import { SettingsGroup } from "./types";
 
-export const initialAuthMode = createRef(0);
-export function hideAuth(context) {
-  eSendEvent(eCloseLoginDialog);
-  if (
-    initialAuthMode.current === AuthMode.welcomeSignup ||
-    initialAuthMode.current === AuthMode.welcomeLogin ||
-    context === "intro"
-  ) {
-    Navigation.replace("FluidPanelsView");
-  } else {
-    Navigation.goBack();
+export const NotesnookCircleSettings: SettingsGroup[] = [
+  {
+    header: strings.notesnookCircle(),
+    key: "notesnook-circle",
+    section: "circle",
+    settings: [
+      {
+        key: "partners",
+        title: "",
+        description: strings.notesnookCircleDesc(),
+        components: [
+          {
+            type: "custom",
+            component: CirclePartners
+          }
+        ]
+      }
+    ]
   }
-}
+];
