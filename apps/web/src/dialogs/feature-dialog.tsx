@@ -93,14 +93,14 @@ const features: Record<FeatureKeys, Feature> = {
         ]
       : [
           {
-            title: "New pricing plans",
+            title: "Notesnook Circle",
             subtitle:
-              "We are changing our pricing to make more sense and be more flexible."
+              "Notesnook Circle brings together trusted partners who share our commitment to privacy, transparency, and user freedom. As a member you get exclusive discounts and offers from our partners. Check it out in Settings > Notesnook Circle."
           },
           {
-            title: "Filters in search",
+            title: "Collapsible headings",
             subtitle:
-              "Search now has some basic filters like content:, title:, tag:, color: etc. For the whole list of filters, read our docs."
+              "You can now collapse and expand headings in your notes. This makes it easier to manage large notes and focus on specific sections."
           }
         ],
     cta: {
