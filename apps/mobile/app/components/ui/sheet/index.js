@@ -132,7 +132,10 @@ const SheetWrapper = ({
           width: 100,
           backgroundColor: colors.secondary.background
         }}
-        safeAreaInsets={insets}
+        safeAreaInsets={{
+          ...insets,
+          bottom: Platform.OS === "android" ? 0 : insets.bottom
+        }}
         statusBarTranslucent
         drawUnderStatusBar={true}
         containerStyle={style}

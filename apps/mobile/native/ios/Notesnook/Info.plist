@@ -71,7 +71,6 @@
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
-		 <!-- Do not change NSAllowsArbitraryLoads to true, or you will risk app rejection! -->
 		<key>NSAllowsArbitraryLoads</key>
 		<false/>
 		<key>NSAllowsLocalNetworking</key>
@@ -89,9 +88,10 @@
 	<string>group.org.streetwriters.notesnook</string>
 	<key>UIAppFonts</key>
 	<array>
-		<string>OpenSans-Italic.ttf</string>
-		<string>OpenSans-SemiBold.ttf</string>
-		<string>OpenSans-Regular.ttf</string>
+		<string>Inter-Italic.ttf</string>
+		<string>Inter-SemiBold.ttf</string>
+		<string>Inter-Regular.ttf</string>
+		<string>Inter-Bold.ttf</string>
 		<string>MaterialCommunityIcons.ttf</string>
 	</array>
 	<key>UIApplicationSceneManifest</key>

@@ -244,7 +244,7 @@ const PDFPreview = () => {
                       textAlign: "center",
                       marginRight: 4,
                       borderRadius: 3,
-                      fontFamily: "OpenSans-Regular"
+                      fontFamily: "Inter-Regular"
                     }}
                     selectTextOnFocus
                     keyboardType="decimal-pad"

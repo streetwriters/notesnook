@@ -661,7 +661,6 @@ p > *::selection {
 /* Check list */
 .ProseMirror ul.simple-checklist {
   list-style: none;
-  margin-block: 0px !important;
   padding-inline: 0px !important;
   padding-inline-start: 24px !important;
 }
