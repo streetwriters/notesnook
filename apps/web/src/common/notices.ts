@@ -89,9 +89,6 @@ export async function scheduleFullBackups() {
 export async function shouldAddAutoBackupsDisabledNotice() {
   if (isIgnored("autoBackupsOff")) return false;
 
-  const user = await db.user.getUser();
-  if (!user) return false;
-
   const backupInterval = Config.get("backupReminderOffset", 0);
   return backupInterval === 0;
 }
@@ -201,9 +198,11 @@ function isIgnored(key: keyof typeof NoticesData) {
 
 let openedToast: { hide: () => void } | null = null;
 async function saveBackup(mode: "full" | "partial" = "partial") {
+  if (IS_TESTING) return;
+
   if (IS_DESKTOP_APP) {
     await createBackup({ noVerify: true, mode, background: true });
-  } else if (!IS_TESTING) {
+  } else {
     if (openedToast !== null) return;
     openedToast = showToast(
       "success",

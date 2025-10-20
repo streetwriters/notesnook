@@ -23,11 +23,7 @@ import { useStore as useUserStore } from "./stores/user-store";
 import { useEditorStore } from "./stores/editor-store";
 import { useStore as useAnnouncementStore } from "./stores/announcement-store";
 import { useStore as useSettingStore } from "./stores/setting-store";
-import {
-  resetNotices,
-  scheduleBackups,
-  scheduleFullBackups
-} from "./common/notices";
+import { scheduleBackups, scheduleFullBackups } from "./common/notices";
 import { introduceFeatures, resetFeatures } from "./common";
 import { AppEventManager, AppEvents } from "./common/app-events";
 import { db } from "./common/db";
@@ -63,7 +59,7 @@ export default function AppEffects() {
         await refreshNavItems();
         await updateLastSynced();
         await initUser();
-        await resetNotices();
+        // await resetNotices();
         setIsVaultCreated(await db.vault.exists());
 
         await FeatureDialog.show({ featureName: "highlights" });
