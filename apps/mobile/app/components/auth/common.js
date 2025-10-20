@@ -38,9 +38,6 @@ export function hideAuth(context) {
     context === "intro"
   ) {
     Navigation.replace("FluidPanelsView");
-    setTimeout(() => {
-      Navigation.resetRootState();
-    }, 1000);
   } else {
     Navigation.goBack();
   }

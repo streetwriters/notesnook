@@ -258,12 +258,14 @@ export const RootNavigation = () => {
     (state) => state.settings.introCompleted
   );
   const clearSelection = useSelectionStore((state) => state.clearSelection);
+  const resetTimer = React.useRef<NodeJS.Timeout>(undefined);
   const onStateChange = React.useCallback(
     (state: any) => {
       if (useSelectionStore.getState().selectionMode) {
         clearSelection();
       }
-      setTimeout(() => {
+      clearTimeout(resetTimer.current);
+      resetTimer.current = setTimeout(() => {
         Navigation.resetRootState(state);
       }, 1000);
       hideAllTooltips();
