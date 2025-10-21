@@ -2842,6 +2842,10 @@ msgstr "Filter attachments by filename, type or hash"
 msgid "Filter languages"
 msgstr "Filter languages"
 
+#: src/strings.ts:2594
+msgid "Finish your purchase in the browser."
+msgstr "Finish your purchase in the browser."
+
 #: src/strings.ts:1668
 msgid "Fix it"
 msgstr "Fix it"
@@ -3027,6 +3031,10 @@ msgstr "Getting recovery codes"
 #: src/strings.ts:2161
 msgid "GNU GENERAL PUBLIC LICENSE Version 3"
 msgstr "GNU GENERAL PUBLIC LICENSE Version 3"
+
+#: src/strings.ts:2595
+msgid "Go back"
+msgstr "Go back"
 
 #: src/strings.ts:2445
 msgid "Go back in tab"
@@ -3795,8 +3803,8 @@ msgstr "Member since {date}"
 msgid "Merge cells"
 msgstr "Merge cells"
 
-#. placeholder {0}: progress ? `${progress?.collection}` : null
-#. placeholder {1}: progress ? `(${progress.current}/${progress.total}) ` : null
+#. placeholder {0}: progress ? `${progress?.collection}` : ""
+#. placeholder {1}: progress ? `(${progress.current}/${progress.total}) ` : ""
 #: src/strings.ts:246
 msgid "Migrating {0} {1}... please wait"
 msgstr "Migrating {0} {1}... please wait"
@@ -4216,6 +4224,14 @@ msgstr "notes imported"
 #: src/strings.ts:2541
 msgid "Notesnook"
 msgstr "Notesnook"
+
+#: src/strings.ts:2596
+msgid "Notesnook Circle"
+msgstr "Notesnook Circle"
+
+#: src/strings.ts:2598
+msgid "Notesnook Circle brings together trusted partners who share our commitment to privacy, transparency, and user freedom."
+msgstr "Notesnook Circle brings together trusted partners who share our commitment to privacy, transparency, and user freedom."
 
 #: src/strings.ts:2066
 msgid "Notesnook encrypts everything offline before syncing to your other devices. This means that no one can read your notes except you. Not even us."
@@ -5005,6 +5021,10 @@ msgstr "Recovery successful!"
 #: src/strings.ts:2434
 msgid "Redeem"
 msgstr "Redeem"
+
+#: src/strings.ts:2595
+msgid "Redeem code"
+msgstr "Redeem code"
 
 #: src/strings.ts:2431
 msgid "Redeem gift code"
@@ -6367,6 +6387,10 @@ msgstr "The {title} at {url} is not compatible with this client."
 msgid "The information above will be publically available at"
 msgstr "The information above will be publically available at"
 
+#: src/strings.ts:2602
+msgid "The Notesnook Circle is exclusive to subscribers. Please consider subscribing to gain access to Notesnook Circle and enjoy additional benefits."
+msgstr "The Notesnook Circle is exclusive to subscribers. Please consider subscribing to gain access to Notesnook Circle and enjoy additional benefits."
+
 #: src/strings.ts:2081
 msgid "The password/pin for unlocking the app."
 msgstr "The password/pin for unlocking the app."
@@ -6763,6 +6787,10 @@ msgstr "Upgrade to Notesnook Pro to create more tags."
 #: src/strings.ts:748
 msgid "Upgrade to Pro"
 msgstr "Upgrade to Pro"
+
+#: src/strings.ts:2594
+msgid "Upgrade to redeem"
+msgstr "Upgrade to redeem"
 
 #: src/strings.ts:509
 msgid "Upload"

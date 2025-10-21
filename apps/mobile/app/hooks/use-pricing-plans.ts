@@ -270,11 +270,13 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
     if (Platform.OS === "android") {
       if (isGithubRelease) {
         if (!(product as Plan)?.price) return null;
-        return `${(product as Plan).price.currency} ${
+        return `${
+          (product as Plan).currencySymbol || (product as Plan).currency
+        } ${
           (product as Plan).period === "yearly"
-            ? ((product as Plan).price.gross / 12).toFixed(2)
+            ? (product as Plan).price.gross
             : (product as Plan).period === "5-year"
-              ? ((product as Plan).price.gross / (12 * 5)).toFixed(2)
+              ? (product as Plan).price.gross
               : (product as Plan).price.gross
         }`;
       }
@@ -599,7 +601,9 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
 
     if (isGithubRelease) {
       if (!(product as Plan)?.price) return null;
-      return `${(product as Plan).price.currency} ${
+      return `${
+        (product as Plan).currencySymbol || (product as Plan).currency
+      } ${
         (product as Plan).period === "yearly"
           ? ((product as Plan).price.gross / 12).toFixed(2)
           : (product as Plan).period === "5-year"

@@ -47,7 +47,12 @@ function Payments() {
       if (_ptxn) {
         paddle.Checkout.open({
           transactionId: _ptxn,
-          settings: { displayMode: "overlay" }
+          settings: {
+            displayMode: "overlay",
+            allowDiscountRemoval: true,
+            showAddDiscounts: true,
+            showAddTaxId: true
+          }
         });
       } else if (priceId) {
         paddle.Checkout.open({

@@ -39,6 +39,7 @@ export * from "./api/debug.js";
 export * from "./api/monographs.js";
 export * from "./api/subscriptions.js";
 export * from "./api/pricing.js";
+export * from "./api/circle.js";
 export { VAULT_ERRORS } from "./api/vault.js";
 export type { SyncOptions } from "./api/sync/index.js";
 export { sanitizeTag } from "./collections/tags.js";

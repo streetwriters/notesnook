@@ -29,7 +29,7 @@ import { store as reminderStore } from "./reminder-store";
 import { store as settingStore } from "./setting-store";
 import BaseStore from "./index";
 import { showToast } from "../utils/toast";
-import { Notice, resetNotices } from "../common/notices";
+import { Notice } from "../common/notices";
 import { EV, EVENTS, SYNC_CHECK_IDS, SyncOptions } from "@notesnook/core";
 import { logger } from "../utils/logger";
 import Config from "../utils/config";
@@ -173,7 +173,7 @@ class AppStore extends BaseStore<AppStore> {
     logger.measure("refreshing app");
 
     await this.updateLastSynced();
-    await resetNotices();
+    // await resetNotices();
     await noteStore.refresh();
     await notebookStore.refresh();
     await reminderStore.refresh();

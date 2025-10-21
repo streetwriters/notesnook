@@ -39,7 +39,8 @@ import {
   Servers,
   ShieldLock,
   Sync,
-  Inbox
+  Inbox,
+  CircleEmpty
 } from "../../components/icons";
 import NavigationItem from "../../components/navigation-menu/navigation-item";
 import { FlexScrollContainer } from "../../components/scroll-container";
@@ -80,6 +81,7 @@ import { strings } from "@notesnook/intl";
 import { mdToHtml } from "../../utils/md";
 import { InboxSettings } from "./inbox-settings";
 import { withFeatureCheck } from "../../common";
+import { NotesnookCircleSettings } from "./notesnook-circle-settings";
 
 type SettingsDialogProps = BaseDialogProps<false> & {
   activeSection?: SectionKeys;
@@ -107,6 +109,12 @@ const sectionGroups: SectionGroup[] = [
         key: "sync",
         title: strings.sync(),
         icon: Sync,
+        isHidden: () => !useUserStore.getState().isLoggedIn
+      },
+      {
+        key: "circle",
+        title: "Notesnook Circle",
+        icon: CircleEmpty,
         isHidden: () => !useUserStore.getState().isLoggedIn
       },
       {
@@ -185,7 +193,8 @@ const SettingsGroups = [
   ...AboutSettings,
   ...SubscriptionSettings,
   ...ServersSettings,
-  ...InboxSettings
+  ...InboxSettings,
+  ...NotesnookCircleSettings
 ];
 
 // Thoughts:

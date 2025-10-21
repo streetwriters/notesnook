@@ -53,8 +53,8 @@ async function initializeDatabase(persistence: DatabasePersistence) {
     AUTH_HOST: "https://auth.streetwriters.co",
     SSE_HOST: "https://events.streetwriters.co",
     ISSUES_HOST: "https://issues.streetwriters.co",
-    MONOGRAPH_HOST: "https://monogr.ph",
     SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co",
+    MONOGRAPH_HOST: "https://monogr.ph",
     NOTESNOOK_HOST: "https://notesnook.com",
     ...Config.get("serverUrls", {})
   });

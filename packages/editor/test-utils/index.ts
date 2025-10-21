@@ -92,3 +92,19 @@ export const p = elem("p");
 export function text(text: string) {
   return document.createTextNode(text);
 }
+
+export function outlineList(...children: HTMLLIElement[]) {
+  return ul(children, { "data-type": "outlineList" });
+}
+
+export function outlineListItem(
+  paragraphChildren: (string | HTMLElement)[],
+  subList?: HTMLUListElement
+) {
+  const children: HTMLElement[] = [h("p", paragraphChildren)];
+  if (subList) children.push(subList);
+
+  return li(children, {
+    "data-type": "outlineListItem"
+  });
+}

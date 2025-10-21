@@ -19,7 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import ShareExtension from "@ammarahmed/react-native-share-extension";
 import { getPreviewData } from "@flyerhq/react-native-link-preview";
-import { formatBytes } from "@notesnook/common";
+import {
+  formatBytes,
+  isFeatureAvailable,
+  useIsFeatureAvailable
+} from "@notesnook/common";
 import { isImage } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -119,6 +123,7 @@ const ShareView = () => {
   const noteTitle = useRef("");
   const [loading, setLoading] = useState(false);
   const [loadingExtension, setLoadingExtension] = useState(true);
+  const fullQualityImages = useIsFeatureAvailable("fullQualityImages");
   const [rawData, setRawData] = useState({
     type: null,
     value: null
@@ -160,6 +165,12 @@ const ShareView = () => {
       keyboardDidHide?.remove();
     };
   }, []);
+
+  useEffect(() => {
+    if (!fullQualityImages?.isAllowed) {
+      setCompress(true);
+    }
+  }, [fullQualityImages]);
 
   const showLinkPreview = async (note, link) => {
     let _note = note;
@@ -223,14 +234,14 @@ const ShareView = () => {
             }
           } else {
             const user = await db.user.getUser();
-            if (user && user.subscription.type !== 0) {
-              if (
-                (isImage(item.type) && item.size > IMAGE_SIZE_LIMIT) ||
-                (!isImage(item.type) && item.size > FILE_SIZE_LIMIT)
-              ) {
+            if (user) {
+              const feature = await isFeatureAvailable(
+                "fileSize",
+                item.size || 0
+              );
+              if (!feature.isAllowed) {
                 continue;
               }
-
               setRawFiles((files) => {
                 const index = files.findIndex(
                   (file) => file.name === item.name
@@ -632,7 +643,9 @@ const ShareView = () => {
                           marginTop: 6
                         }}
                         onPress={() => {
-                          setCompress(!compress);
+                          if (fullQualityImages?.isAllowed) {
+                            setCompress(!compress);
+                          }
                         }}
                       >
                         <Icon
@@ -643,7 +656,7 @@ const ShareView = () => {
                               : "checkbox-blank-outline"
                           }
                           color={
-                            compress
+                            compress && fullQualityImages?.isAllowed
                               ? colors.primary.accent
                               : colors.primary.icon
                           }

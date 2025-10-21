@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/mobile",
-  "version": "3.3.2",
+  "version": "3.3.5",
   "private": true,
   "license": "GPL-3.0-or-later",
   "scripts": {
@@ -145,7 +145,8 @@
     "toggle-switch-react-native": "3.2.0",
     "url": "^0.11.0",
     "validator": "^13.5.2",
-    "zustand": "^4.5.5"
+    "zustand": "^4.5.5",
+    "react-async-hook": "^4.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.27.1",

@@ -38,26 +38,33 @@ export class ExportStream extends TransformStream<
           return;
         }
         if (item.type === "attachment") {
-          report({ text: `Downloading attachment: ${item.path}` });
-          await db
-            .fs()
-            .downloadFile("exports", item.data.hash, item.data.chunkSize);
-          const key = await db.attachments.decryptKey(item.data.key);
-          if (!key) return;
-          const stream = await streamingDecryptFile(item.data.hash, {
-            key,
-            iv: item.data.iv,
-            name: item.data.filename,
-            type: item.data.mimeType,
-            isUploaded: !!item.data.dateUploaded
-          });
+          try {
+            report({ text: `Downloading attachment: ${item.path}` });
+            await db
+              .fs()
+              .downloadFile("exports", item.data.hash, item.data.chunkSize);
+            const key = await db.attachments.decryptKey(item.data.key);
+            if (!key) return;
+            const stream = await streamingDecryptFile(item.data.hash, {
+              key,
+              iv: item.data.iv,
+              name: item.data.filename,
+              type: item.data.mimeType,
+              isUploaded: !!item.data.dateUploaded
+            });
 
-          if (!stream) return;
-          controller.enqueue({ ...item, data: stream });
-          report({
-            current: this.progress++,
-            text: `Saving attachment: ${item.path}`
-          });
+            if (!stream) return;
+            controller.enqueue({ ...item, data: stream });
+            report({
+              current: this.progress++,
+              text: `Saving attachment: ${item.path}`
+            });
+          } catch (e) {
+            if (e instanceof Error) {
+              e.message = `Failed to export attachment: ${item.path}. ${e.message}`;
+              handleError(e);
+            }
+          }
         } else {
           controller.enqueue(item);
           report({

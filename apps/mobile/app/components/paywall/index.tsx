@@ -920,7 +920,6 @@ const ReviewItem = (props: {
     </View>
   );
 };
-
 const PricingPlanCard = ({
   plan,
   pricingPlans,
@@ -933,7 +932,6 @@ const PricingPlanCard = ({
   setStep: (step: number) => void;
 }) => {
   const { colors } = useThemeColors();
-  const isFreePlan = plan.id === "free";
   const [regionalDiscount, setRegionaDiscount] = useState<SKUResponse>();
   const { width } = useWindowDimensions();
   const isTablet = width > 600;
@@ -943,19 +941,22 @@ const PricingPlanCard = ({
       regionalDiscount?.sku ||
         `notesnook.${plan.id}.${annualBilling ? "yearly" : "monthly"}`
     ];
-  const price = pricingPlans?.getPrice(
-    product as RNIap.Subscription,
-    pricingPlans.hasTrialOffer(plan.id, product?.productId) ? 1 : 0,
-    annualBilling
-  );
 
   const WebPlan = pricingPlans?.getWebPlan(
     plan.id,
     annualBilling ? "yearly" : "monthly"
   );
 
+  const price = pricingPlans?.getPrice(
+    pricingPlans.isGithubRelease && WebPlan
+      ? WebPlan
+      : (product as RNIap.Subscription),
+    pricingPlans.hasTrialOffer(plan.id, product?.productId) ? 1 : 0,
+    annualBilling
+  );
+
   useEffect(() => {
-    if (pricingPlans?.isGithubRelease) return;
+    if (pricingPlans?.isGithubRelease || !annualBilling) return;
     pricingPlans
       ?.getRegionalDiscount(
         plan.id,
@@ -966,7 +967,13 @@ const PricingPlanCard = ({
       .then((value) => {
         setRegionaDiscount(value);
       });
-  }, []);
+  }, [annualBilling]);
+
+  useEffect(() => {
+    if (!annualBilling) {
+      setRegionaDiscount(undefined);
+    }
+  }, [annualBilling]);
 
   const isSubscribed =
     product?.productId &&
@@ -1111,24 +1118,21 @@ const PricingPlanCard = ({
       ) : (
         <View>
           <Paragraph size={AppFontSize.lg}>
-            {isFreePlan
-              ? "0.00"
-              : price ||
-                `${WebPlan?.price?.currency} ${WebPlan?.price?.gross}`}{" "}
+            {price || `${WebPlan?.price?.currency} ${WebPlan?.price?.gross}`}{" "}
             <Paragraph>/{strings.month()}</Paragraph>
           </Paragraph>
 
-          {isFreePlan || !product ? null : (
+          {!product && !WebPlan ? null : (
             <Paragraph color={colors.secondary.paragraph} size={AppFontSize.xs}>
               {annualBilling
                 ? strings.billedAnnually(
                     pricingPlans?.getStandardPrice(
-                      product as RNIap.Subscription
+                      (product || WebPlan) as any
                     ) as string
                   )
                 : strings.billedMonthly(
                     pricingPlans?.getStandardPrice(
-                      product as RNIap.Subscription
+                      (product || WebPlan) as any
                     ) as string
                   )}
             </Paragraph>

@@ -18,189 +18,352 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { spawn } from "child_process";
-import { fdir } from "fdir";
-import { existsSync, readFileSync, writeFileSync } from "fs";
-import { readFile } from "fs/promises";
+import { existsSync, readFileSync } from "fs";
+import { glob, readFile, rename, stat, writeFile } from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
-import parser from "yargs-parser";
+import { performance } from "perf_hooks";
+import { createHash } from "crypto";
 
-const args = parser(process.argv, {
-  alias: { force: ["-f"], verbose: ["-v"] }
-});
-const isVerbose = process.env.CI || args.verbose;
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const config = JSON.parse(
-  readFileSync(path.join(__dirname, "..", "package.json"), "utf-8")
-).taskRunner;
-const cache = JSON.parse(
-  existsSync(path.join(__dirname, "..", ".taskcache"))
-    ? readFileSync(path.join(__dirname, "..", ".taskcache"), "utf-8")
-    : "{}"
-);
-
-let [project, ...taskParts] = process.argv.slice(2)[0].split(":");
-const task = taskParts.join(":");
-
-const allPackages = (
-  await new fdir()
-    .onlyDirs()
-    .withMaxDepth(2)
-    .glob(...config.projects)
-    .crawl(".")
-    .withPromise()
-).slice(4);
-
-for (const pkg of allPackages) {
-  if (isPackage(pkg, project)) {
-    project = pkg;
-    break;
+const args = { _: [], exclude: [], force: false, verbose: false, all: false };
+const shortFlags = { f: "force", v: "verbose", a: "all", e: "exclude" };
+for (let i = 2; i < process.argv.length; i++) {
+  const arg = process.argv[i];
+  if (!arg.startsWith("-")) args._.push(arg);
+  else {
+    const isLong = arg.startsWith("--");
+    const [key, value] = isLong ? arg.split("=") : [arg[1], null];
+    const flag = isLong ? key.slice(2) : shortFlags[key];
+    if (!args[flag]) args._.push(arg);
+    else if (Array.isArray(args[flag]))
+      args[flag] = value
+        ? value.split(",")
+        : process.argv[++i]?.split(",") || [];
+    else if (flag) args[flag] = true;
   }
 }
 
-const pipeline = await buildExecutionPipeline(
-  config.taskDependencies[task],
-  project
-);
-console.log("Found", pipeline.length, "dependencies to run.");
-for (const item of pipeline) {
-  const checksum = await computeDirectoryChecksum(item.dep);
-  if (checksum === cache[item.dep + ":" + item.cmd]) continue;
-
-  await runScript(item.cmd, item.dep);
-
-  cache[item.dep + ":" + item.cmd] = checksum;
+if (!args._.length) {
+  console.error("Missing required argument: package:task");
+  process.exit(1);
 }
 
-await runScript(task, project);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const root = path.join(__dirname, "..");
+const isVerbose = !!(process.env.CI || args.verbose);
+const rootPkg = readJson(path.join(root, "package.json"));
+const config = rootPkg.taskRunner || { projects: ["packages/*"], tasks: [] };
+const cachePath = path.join(root, ".taskcache");
+const [project, ...taskParts] = args.all
+  ? [null, ...args._[0].split(":")]
+  : args._[0].split(":");
+const cmd = taskParts.join(":");
+const pkgCache = new Map();
+const depMemo = new Map();
 
-writeFileSync(
-  path.join(__dirname, "..", ".taskcache"),
-  JSON.stringify(cache, null, 2)
-);
-
-async function runScript(command, pkg) {
-  console.log(`Running "${command}" for ${pkg}`);
-
-  return new Promise((resolve, reject) => {
-    const child = spawn("npm", ["run", command], {
-      cwd: pkg,
-      stdio: isVerbose ? "inherit" : "pipe",
-      shell: true
-    });
-
-    child.on("exit", (code) => {
-      if (code === 0) {
-        resolve();
-      } else {
-        reject(new Error(`Command failed with exit code ${code}`));
-      }
-    });
-
-    child.on("error", (err) => {
-      reject(err);
-    });
-  });
+const allPkgs = await findPkgs();
+const task = config.tasks?.find((t) => t.commands?.includes(cmd));
+if (!task) {
+  console.error(`Task "${cmd}" not found in taskRunner config.`);
+  process.exit(1);
 }
 
-async function buildExecutionPipeline(commands, pkg) {
-  if (commands.length === 0) return [];
+const resolvedPkgs = (
+  await Promise.all(
+    task.dependencies.flatMap((dep) =>
+      allPkgs.map((pkg) => resolvePkg(dep, pkg))
+    )
+  )
+).filter(Boolean);
 
-  const executionPipeline = [];
-  const deps = await findDependencies(pkg);
-  for (const dep of deps) {
-    if (executionPipeline.some((item) => item.dep === dep)) continue;
-
-    const pipeline = await buildExecutionPipeline(commands, dep);
-    for (const item of pipeline) {
-      if (executionPipeline.some((i) => i.dep === item.dep)) continue;
-      executionPipeline.push(item);
-    }
-
-    const json = JSON.parse(
-      readFileSync(path.join(dep, "package.json"), "utf-8")
-    );
-    for (const cmd of commands) {
-      if (json.scripts && json.scripts[cmd]) {
-        executionPipeline.push({
-          cmd,
-          dep
-        });
-        break;
-      }
-    }
-  }
-
-  return executionPipeline;
+let cache = {};
+try {
+  cache = existsSync(cachePath) ? readJson(cachePath) : {};
+} catch {
+  if (isVerbose) console.warn("Failed to parse .taskcache");
 }
 
-function isPackage(pkg, name) {
-  const json = JSON.parse(
-    readFileSync(path.join(pkg, "package.json"), "utf-8")
-  );
-  return json.name === name;
-}
-
-async function findDependencies(scope) {
+function readPkg(pkgPath) {
+  const key = path.resolve(pkgPath);
+  if (pkgCache.has(key)) return pkgCache.get(key);
   try {
-    const packageJsonPath = path.join(scope, "package.json");
-    const packageJson = JSON.parse(await readFile(packageJsonPath, "utf-8"));
+    const json = readJson(path.join(pkgPath, "package.json"));
+    pkgCache.set(key, json);
+    return json;
+  } catch {
+    return null;
+  }
+}
 
-    const dependencies = new Set([
-      ...filterDependencies(scope, packageJson.dependencies),
-      ...filterDependencies(scope, packageJson.devDependencies),
-      ...filterDependencies(scope, packageJson.optionalDependencies),
-      ...filterDependencies(scope, packageJson.peerDependencies)
-    ]);
+function readJson(jsonPath) {
+  return JSON.parse(readFileSync(jsonPath, "utf-8"));
+}
 
-    for (const dependency of dependencies) {
-      (await findDependencies(dependency)).forEach((v) => dependencies.add(v));
-    }
+function getPkgName(pkgPath) {
+  return readPkg(pkgPath)?.name || path.basename(pkgPath);
+}
 
-    return Array.from(dependencies.values());
-  } catch (e) {
-    console.error("Failed to find dependencies for", scope, "Error:", e);
+function isPkg(path, name) {
+  const pkgName = getPkgName(path);
+  return pkgName === name || pkgName.endsWith(`/${name}`);
+}
+
+async function findPkgs() {
+  const pkgs = [];
+  for await (const entry of glob(config.projects)) {
+    const pkgPath = path.join(root, entry);
+    if (existsSync(path.join(pkgPath, "package.json")))
+      pkgs.push(path.resolve(pkgPath));
+  }
+  return pkgs;
+}
+
+function filterDeps(base, deps) {
+  if (!deps) return [];
+  let filteredDeps = [];
+  for (const [key, value] of Object.entries(deps))
+    if (key.startsWith("@notesnook/") && value?.startsWith("file:"))
+      filteredDeps.push(path.resolve(base, value.slice(5)));
+  return filteredDeps;
+}
+
+async function findDeps(scope) {
+  const key = path.resolve(scope);
+  if (depMemo.has(key)) return depMemo.get(key);
+  const pkg = readPkg(scope);
+  if (!pkg) {
+    depMemo.set(key, []);
     return [];
   }
+  const deps = new Set(
+    filterDeps(scope, { ...pkg.dependencies, ...pkg.devDependencies })
+  );
+  for (const d of deps) for (const c of await findDeps(d)) deps.add(c);
+
+  const result = Array.from(deps);
+  depMemo.set(key, result);
+  return result;
 }
 
-function filterDependencies(basePath, dependencies) {
-  if (!dependencies) return [];
-  return Object.entries(dependencies)
-    .filter(
-      ([key, value]) =>
-        key.startsWith("@notesnook/") || value.startsWith("file:")
-    )
-    .map(([_, value]) =>
-      path.resolve(path.join(basePath, value.replace("file:", "")))
-    );
-}
-
-async function computeDirectoryChecksum(dir) {
-  const exclusions = [
-    "node_modules",
-    ".git",
-    "dist",
-    "build",
-    "out",
-    "locales",
-    "coverage"
-  ];
-  const crypto = await import("crypto");
-  const hash = crypto.createHash("sha256");
-  const files = (
-    await new fdir()
-      .withFullPaths()
-      .exclude((dir) => exclusions.some((ex) => dir.includes(ex)))
-      .crawl(path.join(dir))
-      .withPromise()
-  ).sort();
-
-  for (const filePath of files) {
-    const fileBuffer = await readFile(filePath);
-    hash.update(fileBuffer);
+async function resolvePkg(command, pkgPath) {
+  const json = readPkg(pkgPath);
+  if (!json?.scripts?.[command]) return null;
+  const deps = await findDeps(pkgPath);
+  const taskDeps = {};
+  for (const dep of deps) {
+    if (readPkg(dep)?.scripts?.[command]) {
+      taskDeps[command] = taskDeps[command] || [];
+      taskDeps[command].push(dep);
+    }
   }
+  return { path: pkgPath, cmd: command, taskDependencies: taskDeps };
+}
 
+async function runScript(command, pkg, opts) {
+  opts = opts || {};
+  const start = performance.now();
+  const name = getPkgName(pkg);
+  try {
+    await new Promise((resolve, reject) => {
+      const verbose = opts.verbose || isVerbose;
+      const child = spawn("npm", ["run", command, ...(opts.args || [])], {
+        cwd: pkg,
+        stdio: verbose ? "inherit" : "pipe",
+        shell: true
+      });
+      let output = "";
+      if (!verbose && child.stdout) {
+        child.stdout.on("data", (data) => (output += data));
+        child.stderr.on("data", (data) => (output += data));
+      }
+      child.once("exit", (code) =>
+        code === 0
+          ? resolve()
+          : reject(new Error(`Exit code ${code}${output ? "\n" + output : ""}`))
+      );
+      child.once("error", reject);
+    });
+    console.log(
+      `${name}:${command} took ${(performance.now() - start).toFixed(0)}ms`
+    );
+  } catch (err) {
+    console.error(`${name}:${command} failed:`, err.message);
+    throw err;
+  }
+}
+
+function normalizePath(pathStr) {
+  return path.resolve(pathStr).replace(/\/$/, "");
+}
+
+async function toBatches(pkgs, cmd) {
+  const batches = [pkgs.filter((pkg) => !pkg.taskDependencies[cmd]?.length)];
+  const remaining = pkgs
+    .filter((pkg) => !!pkg.taskDependencies[cmd]?.length)
+    .slice();
+
+  while (remaining.length > 0) {
+    const batch = [];
+    for (const pkg of remaining.slice()) {
+      if (
+        pkg.taskDependencies[cmd].every((dep) =>
+          batches.some((batch) =>
+            batch.some(
+              (batchPkg) => normalizePath(dep) === normalizePath(batchPkg.path)
+            )
+          )
+        )
+      ) {
+        batch.push(pkg);
+        remaining.splice(remaining.indexOf(pkg), 1);
+      }
+    }
+    if (!batch.length) throw new Error("Cyclic dependencies detected");
+    batches.push(batch);
+  }
+  return batches;
+}
+
+async function resolveRecursive(cmd, pkg, visited) {
+  visited = visited || new Set();
+  const result = [];
+  const resolved = await resolvePkg(cmd, pkg);
+  if (!resolved) return [];
+  const rp = path.resolve(pkg);
+  if (visited.has(rp)) return [];
+  visited.add(rp);
+  for (const dep of resolved.taskDependencies[cmd] || []) {
+    for (const resolved of await resolveRecursive(cmd, dep, visited)) {
+      if (!result.some((pkg) => pkg.path === resolved.path))
+        result.push(resolved);
+    }
+  }
+  result.push(resolved);
+  return result;
+}
+
+const exclusions = new Set([
+  "node_modules",
+  ".git",
+  "dist",
+  "build",
+  "out",
+  "locales",
+  "coverage",
+  "__e2e__",
+  "__mocks__",
+  "__tests__",
+  "__benches__",
+  "scripts",
+  "test-artifacts",
+  "output"
+]);
+
+async function computeChecksumFast(dir) {
+  const hash = createHash("sha256");
+  for await (const entry of glob(`${dir}/**/**`, {
+    withFileTypes: true,
+    exclude: (entry) => exclusions.has(entry.name)
+  })) {
+    if (entry.isFile()) {
+      const fullPath = path.join(entry.parentPath, entry.name);
+      const fileStat = await stat(fullPath).catch(() => null);
+      if (!fileStat) continue;
+      hash.update(fullPath);
+      hash.update(fileStat.mtimeMs.toString());
+      hash.update(fileStat.size.toString());
+    }
+  }
   return hash.digest("hex");
+}
+
+async function computeChecksumSlow(dir) {
+  const hash = createHash("sha256");
+  const files = [];
+  for await (const entry of glob(`${dir}/**/**`, {
+    withFileTypes: true,
+    exclude: (entry) => exclusions.has(entry.name)
+  })) {
+    if (entry.isFile()) files.push(path.join(entry.parentPath, entry.name));
+  }
+  files.sort();
+  for (const file of files) {
+    hash.update(path.relative(dir, file));
+    hash.update(await readFile(file).catch(() => ""));
+  }
+  return hash.digest("hex");
+}
+
+function findKeyInObject(obj, key) {
+  if (!obj || typeof obj !== "object" || Array.isArray(obj)) return;
+  if (key in obj) return obj[key];
+  for (const value of Object.values(obj)) {
+    const found = findKeyInObject(value, key);
+    if (found) return found;
+  }
+}
+
+function getBuildFolder(pkgPath) {
+  const pkg = readPkg(pkgPath);
+  if (!pkg) return null;
+  let artifact =
+    pkg.main ||
+    pkg.module ||
+    pkg.types ||
+    pkg.typings ||
+    findKeyInObject(pkg.exports, "default") ||
+    findKeyInObject(pkg.exports, "types");
+  if (!artifact) return null;
+  const dir = path.join(pkgPath, artifact.replace(/^\.\//, "").split("/")[0]);
+  return existsSync(dir) ? dir : null;
+}
+
+if (args.all) {
+  console.time("Took");
+  for (const dep of task.dependencies) {
+    for (const batch of await toBatches(resolvedPkgs, dep)) {
+      await Promise.all(
+        batch
+          .filter((pkg) => !args.exclude.some((name) => isPkg(pkg.path, name)))
+          .map((task) => runScript(task.cmd, task.path))
+      );
+    }
+  }
+  console.timeEnd("Took");
+} else {
+  console.time("Ready in");
+  const pkg = resolvedPkgs.find((candidate) => isPkg(candidate.path, project));
+  if (!pkg) {
+    console.error(`Package "${project}" not found.`);
+    process.exit(1);
+  }
+  for (const dep of task.dependencies) {
+    for (const batch of await toBatches(
+      await resolveRecursive(dep, pkg.path),
+      dep
+    )) {
+      await Promise.all(
+        batch.map(async (item) => {
+          if (item.path === pkg.path) return;
+          const hasBuild = !!getBuildFolder(item.path);
+          const key = item.path + ":" + item.cmd;
+          const [fast, slow] = cache[key]?.split("|") || [];
+          const fastHash = await computeChecksumFast(item.path);
+          if (hasBuild && !args.force && fast === fastHash) return;
+          const slowHash = await computeChecksumSlow(item.path);
+          if (hasBuild && !args.force && slow === slowHash) return;
+          await runScript(item.cmd, item.path);
+          cache[key] = `${fastHash}|${slowHash}`;
+        })
+      );
+    }
+  }
+  const tmp = cachePath + ".tmp";
+  await writeFile(tmp, JSON.stringify(cache));
+  await rename(tmp, cachePath);
+  console.timeEnd("Ready in");
+  await runScript(cmd, pkg.path, {
+    verbose: true,
+    args: ["--", ...args._.slice(1)]
+  });
 }

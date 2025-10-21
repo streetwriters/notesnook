@@ -616,6 +616,14 @@ export const settingsGroups: SettingSection[] = [
             }
           }
         ]
+      },
+      {
+        id: "notesnook-circle",
+        name: strings.notesnookCircle(),
+        icon: "circle-outline",
+        type: "screen",
+        description: strings.notesnookCircleDesc(),
+        component: "notesnook-circle"
       }
     ]
   },

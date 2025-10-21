@@ -25,7 +25,7 @@ jobs:
           npm run bootstrap -- --scope=mobile
 
       - name: Build packages
-        run: npx nx run @notesnook/mobile:build
+        run: npm run tx @notesnook/mobile:build
 
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2.11

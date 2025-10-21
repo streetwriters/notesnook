@@ -243,8 +243,8 @@ export const strings = {
     collection: string;
     current: number;
   }) =>
-    t`Migrating ${progress ? `${progress?.collection}` : null} ${
-      progress ? `(${progress.current}/${progress.total}) ` : null
+    t`Migrating ${progress ? `${progress?.collection}` : ""} ${
+      progress ? `(${progress.current}/${progress.total}) ` : ""
     }... please wait`,
   migrationError: () =>
     t`An error occurred while migrating your data. You can logout of your account and try to relogin. However this is not recommended as it may result in some data loss if your data was not synced.`,
@@ -1791,7 +1791,7 @@ For example:
   ],
   shareWithFriendsDesc: () => t`Because where's the fun in nookin' alone?`,
   notebooksAllCaps: () => t`NOTEBOOKS`,
-  authenticatedAs: (email?: string) => t`Authenticated as ${email}`,
+  authenticatedAs: (email: string) => t`Authenticated as ${email}`,
   rememberedYourPassword: () => t`Remembered your password?`,
   chooseRecoveryMethod: () => t`Choose a recovery method`,
   chooseRecoveryMethodDesc: () => t`How do you want to recover your account?`,
@@ -2590,5 +2590,16 @@ Use this if changes from other devices are not appearing on this device. This wi
     t`You can change your subscription plan from the web app`,
   announcement: () => t`ANNOUNCEMENT`,
   cannotChangePlan: () =>
-    t`Your current subscription does not allow changing plans`
+    t`Your current subscription does not allow changing plans`,
+  upgradeToRedeem: () => t`Upgrade to redeem`,
+  redeemCode: () => t`Redeem code`,
+  notesnookCircle: () => t`Notesnook Circle`,
+  notesnookCircleDesc: () =>
+    t`Notesnook Circle brings together trusted partners who share our commitment to privacy, transparency, and user freedom.`,
+  trialUserCircleNotice: () =>
+    `Notesnook Circle is reserved for members with an active subscription. You'll get full access after your trial period is over and your subscription is confirmed.`,
+  freeUserCircleNotice: () =>
+    t`The Notesnook Circle is exclusive to subscribers. Please consider subscribing to gain access to Notesnook Circle and enjoy additional benefits.`,
+  finishPurchaseInBrowser: () => t`Finish your purchase in the browser.`,
+  goBack: () => t`Go back`
 };

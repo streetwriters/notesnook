@@ -33,12 +33,8 @@ jobs:
           npm ci --ignore-scripts --prefer-offline --no-audit
           npm run bootstrap -- --scope=web
 
-      - name: Setup environment
-        run: |
-          echo "NX_CLOUD_ACCESS_TOKEN=${{ secrets.NX_CLOUD_ACCESS_TOKEN }}" >> $GITHUB_ENV
-
       - name: Generate desktop build
-        run: npx nx build:desktop @notesnook/web
+        run: npm run tx @notesnook/web:build:desktop
 
       - name: Archive build artifact
         uses: actions/upload-artifact@v4
@@ -70,8 +66,7 @@ jobs:
           npm run bootstrap -- --scope=desktop
 
       - name: Build Electron wrapper
-        run: npx nx run release --project @notesnook/desktop
-        working-directory: ./apps/desktop
+        run: npm run tx @notesnook/desktop:release
 
       - name: Build app
         run: |
@@ -114,8 +109,7 @@ jobs:
           npm run bootstrap -- --scope=desktop
 
       - name: Build Electron wrapper
-        run: npx nx run release --project @notesnook/desktop
-        working-directory: ./apps/desktop
+        run: npm run tx @notesnook/desktop:release
 
       - name: Build app
         run: |
@@ -164,8 +158,7 @@ jobs:
         working-directory: ./apps/desktop
 
       - name: Build Electron wrapper
-        run: npx nx run release --project @notesnook/desktop
-        working-directory: ./apps/desktop
+        run: npm run tx @notesnook/desktop:release
 
       - name: Build app
         run: |

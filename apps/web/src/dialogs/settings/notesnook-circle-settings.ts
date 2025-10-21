@@ -17,15 +17,27 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const path = require("path");
-module.exports = {
-  entry: ["./dist/index.global.js"],
-  mode: "production",
-  output: {
-    filename: "clipper.bundle.js",
-    path: path.resolve(
-      __dirname,
-      "../../apps/mobile/native/ios/extension.bundle"
-    )
+import { strings } from "@notesnook/intl";
+import { CirclePartners } from "./components/circle-partners";
+import { SettingsGroup } from "./types";
+
+export const NotesnookCircleSettings: SettingsGroup[] = [
+  {
+    header: strings.notesnookCircle(),
+    key: "notesnook-circle",
+    section: "circle",
+    settings: [
+      {
+        key: "partners",
+        title: "",
+        description: strings.notesnookCircleDesc(),
+        components: [
+          {
+            type: "custom",
+            component: CirclePartners
+          }
+        ]
+      }
+    ]
   }
-};
+];

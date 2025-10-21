@@ -222,7 +222,7 @@ export const tiptapKeys = {
     type: "tiptap"
   },
   insertParagraph: {
-    keys: "Mod-Shift-0",
+    keys: "Mod-Alt-0",
     description: "Insert paragraph",
     category: "Editor",
     type: "tiptap"
@@ -386,6 +386,12 @@ export const tiptapKeys = {
   underline: {
     keys: "Mod-u",
     description: "Underline",
+    category: "Editor",
+    type: "tiptap"
+  },
+  toggleHighlight: {
+    keys: "Mod-Alt-h",
+    description: "Toggle highlight",
     category: "Editor",
     type: "tiptap"
   }

@@ -118,6 +118,10 @@
 		6515C42E2580AA2F00E83E39 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		6529A13D279BC4C70048D4A8 /* BootSplash.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = BootSplash.storyboard; path = Notesnook/BootSplash.storyboard; sourceTree = "<group>"; };
 		6529D2B0257B4A2900B49BC3 /* NotesnookDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = NotesnookDebug.entitlements; path = Notesnook/NotesnookDebug.entitlements; sourceTree = "<group>"; };
+		653F4E042EA3887C009A42A2 /* Inter-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Inter-Bold.ttf"; path = "../../../packages/editor-mobile/public/fonts/Inter-Bold.ttf"; sourceTree = SOURCE_ROOT; };
+		653F4E052EA3887C009A42A2 /* Inter-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Inter-Italic.ttf"; path = "../../../packages/editor-mobile/public/fonts/Inter-Italic.ttf"; sourceTree = SOURCE_ROOT; };
+		653F4E062EA3887C009A42A2 /* Inter-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Inter-Regular.ttf"; path = "../../../packages/editor-mobile/public/fonts/Inter-Regular.ttf"; sourceTree = SOURCE_ROOT; };
+		653F4E072EA3887C009A42A2 /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Inter-SemiBold.ttf"; path = "../../../packages/editor-mobile/public/fonts/Inter-SemiBold.ttf"; sourceTree = SOURCE_ROOT; };
 		6593E4A2281C345400492C50 /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = Notesnook/AppDelegate.mm; sourceTree = "<group>"; };
 		659BE46625E11A5100E05671 /* notesnook-text.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "notesnook-text.png"; path = "Notesnook/Images.xcassets/notesnook-text.png"; sourceTree = "<group>"; };
 		65A7F34F255689AD00699170 /* Notesnook.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Notesnook.entitlements; path = Notesnook/Notesnook.entitlements; sourceTree = "<group>"; };
@@ -134,9 +138,6 @@
 		65B501AA25A6733400E2D264 /* Make Note.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Make Note.entitlements"; sourceTree = "<group>"; };
 		65B5020125A6756700E2D264 /* Make Note-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Make Note-Bridging-Header.h"; sourceTree = "<group>"; };
 		65B5020225A6756700E2D264 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
-		65BD1CF82E9793110079C0A9 /* Inter-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Inter-Bold.ttf"; path = "/Users/ammarahmed/Work/Projects/apps/notesnook/packages/editor-mobile/public/fonts/Inter-Bold.ttf"; sourceTree = "<absolute>"; };
-		65BD1CF92E9793110079C0A9 /* Inter-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Inter-Regular.ttf"; path = "/Users/ammarahmed/Work/Projects/apps/notesnook/packages/editor-mobile/public/fonts/Inter-Regular.ttf"; sourceTree = "<absolute>"; };
-		65BD1CFA2E9793110079C0A9 /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Inter-SemiBold.ttf"; path = "/Users/ammarahmed/Work/Projects/apps/notesnook/packages/editor-mobile/public/fonts/Inter-SemiBold.ttf"; sourceTree = "<absolute>"; };
 		65C149862A61151B005C40F1 /* extension.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = extension.bundle; sourceTree = "<group>"; };
 		65C400DD2A80B68D00AA3DF5 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = MaterialCommunityIcons.ttf; path = ../fonts/MaterialCommunityIcons.ttf; sourceTree = "<group>"; };
 		65E03409257B9FF100793428 /* Notesnook-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Notesnook-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -300,9 +301,10 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				65BD1CF82E9793110079C0A9 /* Inter-Bold.ttf */,
-				65BD1CF92E9793110079C0A9 /* Inter-Regular.ttf */,
-				65BD1CFA2E9793110079C0A9 /* Inter-SemiBold.ttf */,
+				653F4E042EA3887C009A42A2 /* Inter-Bold.ttf */,
+				653F4E052EA3887C009A42A2 /* Inter-Italic.ttf */,
+				653F4E062EA3887C009A42A2 /* Inter-Regular.ttf */,
+				653F4E072EA3887C009A42A2 /* Inter-SemiBold.ttf */,
 				65C400DD2A80B68D00AA3DF5 /* MaterialCommunityIcons.ttf */,
 				65C149862A61151B005C40F1 /* extension.bundle */,
 				6510E6D62877215700DACAA9 /* build.bundle */,
@@ -554,6 +556,10 @@
 				6529A13E279BC4C70048D4A8 /* BootSplash.storyboard in Resources */,
 				6510E6D72877215700DACAA9 /* build.bundle in Resources */,
 				659BE46725E11A5100E05671 /* notesnook-text.png in Resources */,
+				653F4E0C2EA3887C009A42A2 /* Inter-Bold.ttf in Resources */,
+				653F4E0D2EA3887C009A42A2 /* Inter-Italic.ttf in Resources */,
+				653F4E0E2EA3887C009A42A2 /* Inter-SemiBold.ttf in Resources */,
+				653F4E0F2EA3887C009A42A2 /* Inter-Regular.ttf in Resources */,
 				E7F9D56665C2F19F4A97BF49 /* PrivacyInfo.xcprivacy in Resources */,
 				65BD1CFB2E9793110079C0A9 /* Inter-SemiBold.ttf in Resources */,
 				65BD1CFC2E9793110079C0A9 /* Inter-Bold.ttf in Resources */,
@@ -589,10 +595,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				65BD1CFE2E9793110079C0A9 /* Inter-SemiBold.ttf in Resources */,
-				65BD1CFF2E9793110079C0A9 /* Inter-Bold.ttf in Resources */,
-				65BD1D002E9793110079C0A9 /* Inter-Regular.ttf in Resources */,
 				65C400DF2A80B6B600AA3DF5 /* MaterialCommunityIcons.ttf in Resources */,
+				653F4E082EA3887C009A42A2 /* Inter-Bold.ttf in Resources */,
+				653F4E092EA3887C009A42A2 /* Inter-Italic.ttf in Resources */,
+				653F4E0A2EA3887C009A42A2 /* Inter-SemiBold.ttf in Resources */,
+				653F4E0B2EA3887C009A42A2 /* Inter-Regular.ttf in Resources */,
 				65C149872A61151B005C40F1 /* extension.bundle in Resources */,
 				65B5014725A672B200E2D264 /* MainInterface.storyboard in Resources */,
 			);
@@ -1073,7 +1080,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2150;
+				CURRENT_PROJECT_VERSION = 2153;
 				DEVELOPMENT_TEAM = 53CWBG3QUC;
 				ENABLE_BITCODE = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -1148,7 +1155,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.3.2;
+				MARKETING_VERSION = 3.3.5;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1179,7 +1186,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2150;
+				CURRENT_PROJECT_VERSION = 2153;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 53CWBG3QUC;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -1254,7 +1261,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.3.2;
+				MARKETING_VERSION = 3.3.5;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -1415,7 +1422,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2150;
+				CURRENT_PROJECT_VERSION = 2153;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 53CWBG3QUC;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -1427,7 +1434,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.3.2;
+				MARKETING_VERSION = 3.3.5;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook.notewidget;
@@ -1458,7 +1465,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2150;
+				CURRENT_PROJECT_VERSION = 2153;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 53CWBG3QUC;
@@ -1471,7 +1478,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.3.2;
+				MARKETING_VERSION = 3.3.5;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook.notewidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1501,7 +1508,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Make Note/Make Note.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2150;
+				CURRENT_PROJECT_VERSION = 2153;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 53CWBG3QUC;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -1582,7 +1589,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift$(inherited)";
-				MARKETING_VERSION = 3.3.2;
+				MARKETING_VERSION = 3.3.5;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook.share;
@@ -1613,7 +1620,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2150;
+				CURRENT_PROJECT_VERSION = 2153;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 53CWBG3QUC;
@@ -1695,7 +1702,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift$(inherited)";
-				MARKETING_VERSION = 3.3.2;
+				MARKETING_VERSION = 3.3.5;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook.share;
 				PRODUCT_NAME = "$(TARGET_NAME)";

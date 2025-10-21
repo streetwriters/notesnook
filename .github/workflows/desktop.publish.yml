@@ -65,17 +65,13 @@ jobs:
           npm i --cpu x64 sqlite-better-trigram
         working-directory: ./apps/desktop
 
-      - name: Setup environment
-        run: |
-          echo "NX_CLOUD_ACCESS_TOKEN=${{ secrets.NX_CLOUD_ACCESS_TOKEN }}" >> $GITHUB_ENV
-
       - name: Generate desktop build (stable)
         if: ${{ inputs.release-track == 'stable' }}
-        run: npx nx build:desktop @notesnook/web
+        run: npm run tx @notesnook/web:build:desktop
 
       - name: Generate desktop build (beta)
         if: ${{ inputs.release-track == 'beta' }}
-        run: BETA=true npx nx build:desktop @notesnook/web
+        run: BETA=true npm run tx @notesnook/web:build:desktop
 
       - name: Build desktop bundle
         working-directory: ./apps/desktop
@@ -199,9 +195,9 @@ jobs:
           CSC_LINK: ${{ secrets.mac_certs }}
           CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
         run: |
-          npx nx run release --project @notesnook/desktop -- --variant=mas
+          npm run tx @notesnook/desktop:release -- --variant=mas
+          cd apps/desktop
           yarn electron-builder --config=electron-builder.config.js --mac mas --universal -p never
-        working-directory: ./apps/desktop
 
       - name: Build zip and dmg
         env:
@@ -212,13 +208,13 @@ jobs:
           APPLE_API_KEY_ID: ${{ secrets.api_key_id }}
           APPLE_API_ISSUER: ${{ secrets.api_key_issuer_id }}
         run: |
-          npx nx run release --project @notesnook/desktop
+          npm run tx @notesnook/desktop:release
+          cd apps/desktop
           if [ ${{ inputs.publish-github }} == true ]; then
             yarn electron-builder --config=electron-builder.config.js --mac zip dmg --arm64 --x64 -p always
           else
             yarn electron-builder --config=electron-builder.config.js --mac zip dmg --arm64 --x64 -p never
           fi
-        working-directory: ./apps/desktop
 
       - name: Deploy to Testflight
         if: inputs.publish-apple && steps.appstore.outputs.app-version-latest != steps.app_metadata.outputs.app_version
@@ -271,8 +267,7 @@ jobs:
         working-directory: ./apps/desktop
 
       - name: Build Electron wrapper
-        run: npx nx run release --project @notesnook/desktop
-        working-directory: ./apps/desktop
+        run: npm run tx @notesnook/desktop:release
 
       - name: Build snap
         if: inputs.publish-snap
@@ -339,8 +334,7 @@ jobs:
         working-directory: ./apps/desktop
 
       - name: Build Electron wrapper
-        run: npx nx run release --project @notesnook/desktop
-        working-directory: ./apps/desktop
+        run: npm run tx @notesnook/desktop:release
 
       # - name: Build snap
       #   if: inputs.publish-snap
