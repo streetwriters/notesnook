@@ -4,10 +4,10 @@ import { AppRegistry, Platform } from "react-native";
 import "react-native-get-random-values";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import "./globals";
-import "app/common/logger/index";
+import "./app/common/logger/index";
 
 const ShareProvider = () => {
-  NotesnookShare = require("app/share/index").default;
+  NotesnookShare = require("./app/share/index").default;
   return Platform.OS === "ios" ? (
     <SafeAreaProvider>
       <NotesnookShare />
