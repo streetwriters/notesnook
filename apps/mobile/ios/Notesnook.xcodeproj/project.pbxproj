@@ -18,6 +18,14 @@
 		6510E6D72877215700DACAA9 /* build.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6510E6D62877215700DACAA9 /* build.bundle */; };
 		6515C42F2580AA3000E83E39 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6515C42E2580AA2F00E83E39 /* StoreKit.framework */; };
 		6529A13E279BC4C70048D4A8 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6529A13D279BC4C70048D4A8 /* BootSplash.storyboard */; };
+		659201D82EA78265006B16DB /* Inter-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 653F4E042EA3887C009A42A2 /* Inter-Bold.ttf */; };
+		659201D92EA78265006B16DB /* Inter-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 653F4E052EA3887C009A42A2 /* Inter-Italic.ttf */; };
+		659201DA2EA78265006B16DB /* Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 653F4E062EA3887C009A42A2 /* Inter-Regular.ttf */; };
+		659201DB2EA78265006B16DB /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 653F4E072EA3887C009A42A2 /* Inter-SemiBold.ttf */; };
+		659201DC2EA7826D006B16DB /* Inter-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 653F4E042EA3887C009A42A2 /* Inter-Bold.ttf */; };
+		659201DD2EA7826D006B16DB /* Inter-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 653F4E052EA3887C009A42A2 /* Inter-Italic.ttf */; };
+		659201DE2EA7826D006B16DB /* Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 653F4E062EA3887C009A42A2 /* Inter-Regular.ttf */; };
+		659201DF2EA7826D006B16DB /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 653F4E072EA3887C009A42A2 /* Inter-SemiBold.ttf */; };
 		6593E4A3281C345400492C50 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6593E4A2281C345400492C50 /* AppDelegate.mm */; };
 		659BE46725E11A5100E05671 /* notesnook-text.png in Resources */ = {isa = PBXBuildFile; fileRef = 659BE46625E11A5100E05671 /* notesnook-text.png */; };
 		65AA857925E6DDEC00772A01 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65AA857825E6DDEC00772A01 /* WidgetKit.framework */; };
@@ -29,12 +37,6 @@
 		65B5014725A672B200E2D264 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 65B5014525A672B200E2D264 /* MainInterface.storyboard */; };
 		65B5014B25A672B200E2D264 /* Make Note.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 65B5014025A672B200E2D264 /* Make Note.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		65B5020325A6756700E2D264 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B5020225A6756700E2D264 /* File.swift */; };
-		65BD1CFB2E9793110079C0A9 /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 65BD1CFA2E9793110079C0A9 /* Inter-SemiBold.ttf */; };
-		65BD1CFC2E9793110079C0A9 /* Inter-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 65BD1CF82E9793110079C0A9 /* Inter-Bold.ttf */; };
-		65BD1CFD2E9793110079C0A9 /* Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 65BD1CF92E9793110079C0A9 /* Inter-Regular.ttf */; };
-		65BD1CFE2E9793110079C0A9 /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 65BD1CFA2E9793110079C0A9 /* Inter-SemiBold.ttf */; };
-		65BD1CFF2E9793110079C0A9 /* Inter-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 65BD1CF82E9793110079C0A9 /* Inter-Bold.ttf */; };
-		65BD1D002E9793110079C0A9 /* Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 65BD1CF92E9793110079C0A9 /* Inter-Regular.ttf */; };
 		65C149872A61151B005C40F1 /* extension.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 65C149862A61151B005C40F1 /* extension.bundle */; };
 		65C400DE2A80B68D00AA3DF5 /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 65C400DD2A80B68D00AA3DF5 /* MaterialCommunityIcons.ttf */; };
 		65C400DF2A80B6B600AA3DF5 /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 65C400DD2A80B68D00AA3DF5 /* MaterialCommunityIcons.ttf */; };
@@ -551,19 +553,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				659201D82EA78265006B16DB /* Inter-Bold.ttf in Resources */,
+				659201D92EA78265006B16DB /* Inter-Italic.ttf in Resources */,
+				659201DA2EA78265006B16DB /* Inter-Regular.ttf in Resources */,
+				659201DB2EA78265006B16DB /* Inter-SemiBold.ttf in Resources */,
 				65C400DE2A80B68D00AA3DF5 /* MaterialCommunityIcons.ttf in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				6529A13E279BC4C70048D4A8 /* BootSplash.storyboard in Resources */,
 				6510E6D72877215700DACAA9 /* build.bundle in Resources */,
 				659BE46725E11A5100E05671 /* notesnook-text.png in Resources */,
-				653F4E0C2EA3887C009A42A2 /* Inter-Bold.ttf in Resources */,
-				653F4E0D2EA3887C009A42A2 /* Inter-Italic.ttf in Resources */,
-				653F4E0E2EA3887C009A42A2 /* Inter-SemiBold.ttf in Resources */,
-				653F4E0F2EA3887C009A42A2 /* Inter-Regular.ttf in Resources */,
 				E7F9D56665C2F19F4A97BF49 /* PrivacyInfo.xcprivacy in Resources */,
-				65BD1CFB2E9793110079C0A9 /* Inter-SemiBold.ttf in Resources */,
-				65BD1CFC2E9793110079C0A9 /* Inter-Bold.ttf in Resources */,
-				65BD1CFD2E9793110079C0A9 /* Inter-Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -595,11 +594,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				659201DC2EA7826D006B16DB /* Inter-Bold.ttf in Resources */,
+				659201DD2EA7826D006B16DB /* Inter-Italic.ttf in Resources */,
+				659201DE2EA7826D006B16DB /* Inter-Regular.ttf in Resources */,
+				659201DF2EA7826D006B16DB /* Inter-SemiBold.ttf in Resources */,
 				65C400DF2A80B6B600AA3DF5 /* MaterialCommunityIcons.ttf in Resources */,
-				653F4E082EA3887C009A42A2 /* Inter-Bold.ttf in Resources */,
-				653F4E092EA3887C009A42A2 /* Inter-Italic.ttf in Resources */,
-				653F4E0A2EA3887C009A42A2 /* Inter-SemiBold.ttf in Resources */,
-				653F4E0B2EA3887C009A42A2 /* Inter-Regular.ttf in Resources */,
 				65C149872A61151B005C40F1 /* extension.bundle in Resources */,
 				65B5014725A672B200E2D264 /* MainInterface.storyboard in Resources */,
 			);
@@ -1779,10 +1778,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
@@ -1847,10 +1843,7 @@
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
