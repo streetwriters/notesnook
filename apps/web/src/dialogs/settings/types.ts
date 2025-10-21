@@ -20,29 +20,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { FeatureId } from "@notesnook/common";
 import { Icon } from "../../components/icons";
 
-export type SectionKeys =
-  | "profile"
-  | "auth"
-  | "subscription"
-  | "sync"
-  | "appearance"
-  | "behaviour"
-  | "desktop"
-  | "notifications"
-  | "servers"
-  | "editor"
-  | "backup-export"
-  | "export"
-  | "importer"
-  | "vault"
-  | "app-lock"
-  | "privacy"
-  | "support"
-  | "legal"
-  | "developer"
-  | "about"
-  | "inbox"
-  | "circle";
+const SectionKeys = [
+  "profile",
+  "auth",
+  "subscription",
+  "sync",
+  "appearance",
+  "behaviour",
+  "desktop",
+  "notifications",
+  "servers",
+  "editor",
+  "backup-export",
+  "export",
+  "importer",
+  "vault",
+  "app-lock",
+  "privacy",
+  "support",
+  "legal",
+  "developer",
+  "about",
+  "inbox",
+  "circle"
+] as const;
+
+export type SectionKeys = (typeof SectionKeys)[number];
 
 export type SectionGroupKeys =
   | "account"
@@ -153,3 +156,7 @@ export type TextInputSettingComponent = BaseSettingComponent<"input"> & {
 export type CustomSettingComponent = BaseSettingComponent<"custom"> & {
   component: () => JSX.Element | null;
 };
+
+export function isSectionKey(key: string): key is SectionKeys {
+  return SectionKeys.includes(key as SectionKeys);
+}

@@ -82,6 +82,7 @@ import { mdToHtml } from "../../utils/md";
 import { InboxSettings } from "./inbox-settings";
 import { withFeatureCheck } from "../../common";
 import { NotesnookCircleSettings } from "./notesnook-circle-settings";
+import { hashNavigate } from "../../navigation";
 
 type SettingsDialogProps = BaseDialogProps<false> & {
   activeSection?: SectionKeys;
@@ -270,6 +271,12 @@ function SettingsSideBar(props: SettingsSideBarProps) {
   const { onNavigate, activeSection } = props;
   const [route, setRoute] = useState<SectionKeys>(activeSection || "profile");
   useUserStore((store) => store.isLoggedIn);
+
+  useEffect(() => {
+    hashNavigate(`/settings/${route}`, {
+      notify: false
+    });
+  }, [route, activeSection]);
 
   return (
     <FlexScrollContainer
