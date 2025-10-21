@@ -2,13 +2,13 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>com.transistorsoft.fetch</string>
 		<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	</array>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -87,7 +87,7 @@
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Add photos from gallery to your note.</string>
 	<key>RCTNewArchEnabled</key>
-	<false/>
+	<true/>
 	<key>ReactNativeQuickSQLite_AppGroup</key>
 	<string>group.org.streetwriters.notesnook</string>
 	<key>UIAppFonts</key>

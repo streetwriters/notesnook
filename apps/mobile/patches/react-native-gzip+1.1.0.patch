@@ -1,0 +1,36 @@
+diff --git a/node_modules/react-native-gzip/ios/Gzip.h b/node_modules/react-native-gzip/ios/Gzip.h
+index 45b39a3..cc47ac6 100644
+--- a/node_modules/react-native-gzip/ios/Gzip.h
++++ b/node_modules/react-native-gzip/ios/Gzip.h
+@@ -1,12 +1,6 @@
+-
+-#ifdef RCT_NEW_ARCH_ENABLED
+-#import "RNGzipSpec.h"
+-
+-@interface Gzip : NSObject <NativeGzipSpec>
+-#else
+ #import <React/RCTBridgeModule.h>
+ 
+ @interface Gzip : NSObject <RCTBridgeModule>
+-#endif
++
+ 
+ @end
+diff --git a/node_modules/react-native-gzip/ios/Gzip.mm b/node_modules/react-native-gzip/ios/Gzip.mm
+index b79ded4..24ae6e2 100644
+--- a/node_modules/react-native-gzip/ios/Gzip.mm
++++ b/node_modules/react-native-gzip/ios/Gzip.mm
+@@ -24,13 +24,4 @@ @implementation Gzip
+   resolve([[_data gzippedData] base64String]);
+ }
+ 
+-// Don't compile this code when we build for the old architecture.
+-#ifdef RCT_NEW_ARCH_ENABLED
+-- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+-    (const facebook::react::ObjCTurboModule::InitParams &)params
+-{
+-    return std::make_shared<facebook::react::NativeGzipSpecJSI>(params);
+-}
+-#endif
+-
+ @end

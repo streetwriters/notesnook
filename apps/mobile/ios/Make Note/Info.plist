@@ -55,7 +55,7 @@
 		<string>com.apple.share-services</string>
 	</dict>
 	<key>RCTNewArchEnabled</key>
-	<false/>
+	<true/>
 	<key>ReactNativeQuickSQLite_AppGroup</key>
 	<string>group.org.streetwriters.notesnook</string>
 	<key>UIAppFonts</key>

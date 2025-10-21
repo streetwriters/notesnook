@@ -38,6 +38,6 @@
 		<string>com.apple.share-services</string>
 	</dict>
 	<key>RCTNewArchEnabled</key>
-	<false/>
+	<true/>
 </dict>
 </plist>
