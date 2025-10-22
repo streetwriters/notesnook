@@ -55,7 +55,7 @@ type PeriodMetadata = { title: string; refundDays: number };
 export const PERIOD_METADATA: Record<Period, PeriodMetadata> = {
   monthly: {
     title: strings.monthly(),
-    refundDays: 7
+    refundDays: 14
   },
   yearly: {
     title: strings.yearly(),
@@ -63,7 +63,7 @@ export const PERIOD_METADATA: Record<Period, PeriodMetadata> = {
   },
   "5-year": {
     title: "5 year",
-    refundDays: 30
+    refundDays: 14
   }
 };
 

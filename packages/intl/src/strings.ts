@@ -2517,7 +2517,7 @@ Use this if changes from other devices are not appearing on this device. This wi
     {
       question: () => t`What is your refund policy?`,
       answer: () =>
-        t`For a monthly subscription, you can get a refund within 7 days of purchase. For a yearly subscription, we offer a full refund within 14 days of purchase. For a 5 year subscription, you can request a refund within 30 days of purchase.`
+        t`You can claim a refund within 14 days of purchasing your subscription.`
     }
   ],
   upgradePlanTo: (plan: string) =>
