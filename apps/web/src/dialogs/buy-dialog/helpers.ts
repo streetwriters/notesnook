@@ -46,7 +46,7 @@ export const FEATURE_HIGHLIGHTS = [
 const TRIAL_PERIODS: Record<Period, number> = {
   yearly: 14,
   monthly: 7,
-  "5-year": 30
+  "5-year": 14
 };
 
 export function toPricingInfo(plan: Plan, user: User | undefined): PricingInfo {
