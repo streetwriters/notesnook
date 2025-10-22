@@ -53,6 +53,7 @@ const IGNORED_NATIVE_PACKAGES = [
   "canvas",
   // optional dependency only used on Node.js platform
   "@azure/msal-node-runtime",
+  "react-native-quick-sqlite",
   // not needed on mobile
   ...(args.scope === "mobile" ? ["esbuild"] : [])
 ];
