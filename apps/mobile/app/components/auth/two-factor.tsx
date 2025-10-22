@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { View } from "react-native";
+import { TextInput, View } from "react-native";
 import { ScrollView } from "react-native-actions-sheet";
 import { db } from "../../common/database/index";
 import useTimer from "../../hooks/use-timer";
@@ -36,20 +36,44 @@ import Paragraph from "../ui/typography/paragraph";
 import { DefaultAppStyles } from "../../utils/styles";
 import { presentDialog } from "../dialog/functions";
 
-const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
+type MFAInfo = {
+  primaryMethod: string;
+  secondaryMethod: string;
+  token: string;
+};
+
+const TwoFactorVerification = ({
+  onMfaLogin,
+  mfaInfo,
+  onCancel
+}: {
+  onMfaLogin: (
+    login: {
+      method: string;
+      code: string;
+    },
+    callback: (result: any) => void
+  ) => Promise<void>;
+  mfaInfo: MFAInfo;
+  onCancel: () => void;
+}) => {
   const { colors } = useThemeColors();
-  const code = useRef();
-  const [currentMethod, setCurrentMethod] = useState({
+  const code = useRef<string>(undefined);
+  const [currentMethod, setCurrentMethod] = useState<{
+    isPrimary: boolean;
+    method: string | null;
+  }>({
     method: mfaInfo?.primaryMethod,
     isPrimary: true
   });
-  const { seconds, start, reset } = useTimer(currentMethod.method);
+  const { seconds, start, reset } = useTimer(currentMethod.method!);
   const [loading, setLoading] = useState(false);
-  const inputRef = useRef();
+  const inputRef = useRef<TextInput>(null);
   const [sending, setSending] = useState(false);
 
   const onNext = async () => {
-    if (!code.current || code.current.length < 6) return;
+    if (!code.current || code.current.length < 6 || !currentMethod.method)
+      return;
     setLoading(true);
     inputRef.current?.blur();
     await onMfaLogin(
@@ -106,25 +130,24 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
     );
   };
 
+  const onSendCode = useCallback(async () => {
+    if (seconds || sending) return;
+    setSending(true);
+    try {
+      await db.mfa.sendCode(currentMethod.method as "sms" | "email");
+      start(60);
+      setSending(false);
+    } catch (e) {
+      setSending(false);
+      ToastManager.error(e as Error, "Error sending 2FA Code", "local");
+    }
+  }, [currentMethod.method, mfaInfo.token, seconds, sending, start]);
+
   useEffect(() => {
     if (currentMethod.method === "sms" || currentMethod.method === "email") {
       onSendCode();
     }
   }, [currentMethod.method, onSendCode]);
-
-  const onSendCode = useCallback(async () => {
-    if (seconds || sending) return;
-    // TODO
-    setSending(true);
-    try {
-      await db.mfa.sendCode(currentMethod.method, mfaInfo.token);
-      start(60);
-      setSending(false);
-    } catch (e) {
-      setSending(false);
-      ToastManager.error(e, "Error sending 2FA Code", "local");
-    }
-  }, [currentMethod.method, mfaInfo.token, seconds, sending, start]);
 
   return (
     <ScrollView
@@ -171,8 +194,11 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
             textAlign: "center"
           }}
         >
-          {strings["2faCodeHelpText"][currentMethod.method]?.() ||
-            strings.select2faCodeHelpText()}
+          {currentMethod.method
+            ? strings["2faCodeHelpText"][
+                currentMethod.method as keyof (typeof strings)["2faCodeHelpText"]
+              ]?.() || strings.select2faCodeHelpText()
+            : strings.select2faCodeHelpText()}
         </Paragraph>
 
         {currentMethod.method === "sms" || currentMethod.method === "email" ? (
@@ -184,7 +210,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
                 ? ""
                 : `${
                     seconds
-                      ? strings.resend2faCode(seconds)
+                      ? strings.resend2faCode(`${seconds}`)
                       : strings.sendCode()
                   }`
             }
@@ -209,7 +235,6 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
               textAlign="center"
               onChangeText={(value) => {
                 code.current = value;
-                //onNext();
               }}
               cursorColor={colors.selected.accent}
               selectionHandleColor={colors.selected.accent}
@@ -253,7 +278,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
 
             <Button
               title={strings["2faCodeSecondaryMethodText"][
-                currentMethod.method
+                currentMethod.method as keyof (typeof strings)["2faCodeSecondaryMethodText"]
               ]()}
               type="plain"
               onPress={onRequestSecondaryMethod}
@@ -307,7 +332,18 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
   );
 };
 
-TwoFactorVerification.present = (onMfaLogin, data, onCancel, context) => {
+TwoFactorVerification.present = (
+  onMfaLogin: (
+    login: {
+      method: string;
+      code: string;
+    },
+    callback: (result: any) => void
+  ) => Promise<void>,
+  data: MFAInfo,
+  onCancel: () => void,
+  context?: string
+) => {
   presentDialog({
     component: () => (
       <TwoFactorVerification
@@ -317,7 +353,6 @@ TwoFactorVerification.present = (onMfaLogin, data, onCancel, context) => {
       />
     ),
     context: context || "two_factor_verify",
-    disableClosing: true,
     transparent: false,
     statusBarTranslucent: true
   });

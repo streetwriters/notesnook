@@ -19,9 +19,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import { useRoute } from "@react-navigation/native";
+import { RouteProp, useRoute } from "@react-navigation/native";
 import React, { useRef, useState } from "react";
-import { TouchableOpacity, View, useWindowDimensions } from "react-native";
+import {
+  TextInput,
+  TouchableOpacity,
+  View,
+  useWindowDimensions
+} from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
@@ -39,6 +44,8 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { AuthHeader } from "./header";
 import { SignupContext } from "./signup-context";
+import { RouteParams } from "../../stores/use-navigation-store";
+import SettingsService from "../../services/settings";
 
 const SignupSteps = {
   signup: 0,
@@ -46,22 +53,28 @@ const SignupSteps = {
   createAccount: 2
 };
 
-export const Signup = ({ changeMode, welcome }) => {
+export const Signup = ({
+  changeMode,
+  welcome
+}: {
+  changeMode: (mode: number) => void;
+  welcome: boolean;
+}) => {
   const [currentStep, setCurrentStep] = useState(SignupSteps.signup);
   const { colors } = useThemeColors();
-  const email = useRef();
-  const emailInputRef = useRef();
-  const passwordInputRef = useRef();
-  const password = useRef();
-  const confirmPasswordInputRef = useRef();
-  const confirmPassword = useRef();
+  const email = useRef<string>(undefined);
+  const emailInputRef = useRef<TextInput>(null);
+  const passwordInputRef = useRef<TextInput>(null);
+  const password = useRef<string>(undefined);
+  const confirmPasswordInputRef = useRef<TextInput>(null);
+  const confirmPassword = useRef<string>(undefined);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const setUser = useUserStore((state) => state.setUser);
   const setLastSynced = useUserStore((state) => state.setLastSynced);
   const { width, height } = useWindowDimensions();
   const isTablet = width > 600;
-  const route = useRoute();
+  const route = useRoute<RouteProp<RouteParams, "Auth">>();
 
   const validateInfo = () => {
     if (!password.current || !email.current || !confirmPassword.current) {
@@ -85,7 +98,7 @@ export const Signup = ({ changeMode, welcome }) => {
     setLoading(true);
     try {
       setCurrentStep(SignupSteps.createAccount);
-      await db.user.signup(email.current.toLowerCase(), password.current);
+      await db.user.signup(email.current!.toLowerCase(), password.current!);
       let user = await db.user.getUser();
       setUser(user);
       setLastSynced(await db.lastSynced());
@@ -104,7 +117,7 @@ export const Signup = ({ changeMode, welcome }) => {
       setLoading(false);
       ToastManager.show({
         heading: strings.signupFailed(),
-        message: e.message,
+        message: (e as Error).message,
         type: "error",
         context: "local"
       });
@@ -150,11 +163,11 @@ export const Signup = ({ changeMode, welcome }) => {
                   borderBottomWidth: 0.8,
                   borderBottomColor: colors.primary.border,
                   alignSelf: isTablet ? "center" : undefined,
-                  borderWidth: isTablet ? 1 : null,
-                  borderColor: isTablet ? colors.primary.border : null,
-                  borderRadius: isTablet ? 20 : null,
-                  marginTop: isTablet ? 50 : null,
-                  width: !isTablet ? null : "50%",
+                  borderWidth: isTablet ? 1 : undefined,
+                  borderColor: isTablet ? colors.primary.border : undefined,
+                  borderRadius: isTablet ? 20 : undefined,
+                  marginTop: isTablet ? 50 : undefined,
+                  width: !isTablet ? undefined : "50%",
                   minHeight: height * 0.25
                 }}
               >
@@ -265,10 +278,12 @@ export const Signup = ({ changeMode, welcome }) => {
                   autoCorrect={false}
                   blurOnSubmit={false}
                   validationType="confirmPassword"
-                  customValidator={() => password.current}
+                  customValidator={() => password.current!}
                   placeholder={strings.confirmPassword()}
                   marginBottom={12}
-                  onSubmit={signup}
+                  onSubmit={() => {
+                    signup();
+                  }}
                 />
 
                 <Button
@@ -325,7 +340,7 @@ export const Signup = ({ changeMode, welcome }) => {
                   <Paragraph
                     size={AppFontSize.xxs}
                     onPress={() => {
-                      openLinkInBrowser("https://notesnook.com/tos", colors);
+                      openLinkInBrowser("https://notesnook.com/tos");
                     }}
                     style={{
                       textDecorationLine: "underline"
@@ -339,10 +354,7 @@ export const Signup = ({ changeMode, welcome }) => {
                   <Paragraph
                     size={AppFontSize.xxs}
                     onPress={() => {
-                      openLinkInBrowser(
-                        "https://notesnook.com/privacy",
-                        colors
-                      );
+                      openLinkInBrowser("https://notesnook.com/privacy");
                     }}
                     style={{
                       textDecorationLine: "underline"

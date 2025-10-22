@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { AnnouncementDialog } from "../announcements";
-import AuthModal from "../auth/auth-modal";
 import { SessionExpired } from "../auth/session-expired";
 import { Dialog } from "../dialog";
 import { AppLockPassword } from "../dialogs/applock-password";
@@ -44,7 +43,6 @@ const DialogProvider = () => {
       <AppLockPassword />
       <LoadingDialog />
       <Dialog context="global" />
-      <AuthModal colors={colors} />
       <MergeConflicts />
       <RecoveryKeySheet colors={colors} />
       <SheetProvider />

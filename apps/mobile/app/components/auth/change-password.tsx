@@ -31,12 +31,13 @@ import { Dialog } from "../dialog";
 import { Button } from "../ui/button";
 import Input from "../ui/input";
 import { Notice } from "../ui/notice";
+import { TextInput } from "react-native-gesture-handler";
 
 export const ChangePassword = () => {
-  const passwordInputRef = useRef();
-  const password = useRef();
-  const oldPasswordInputRef = useRef();
-  const oldPassword = useRef();
+  const passwordInputRef = useRef<TextInput>(null);
+  const password = useRef<string>(undefined);
+  const oldPasswordInputRef = useRef<TextInput>(null);
+  const oldPassword = useRef<string>(undefined);
 
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -85,7 +86,7 @@ export const ChangePassword = () => {
       setLoading(false);
       ToastManager.show({
         heading: strings.passwordChangeFailed(),
-        message: e.message,
+        message: (e as Error).message,
         type: "error",
         context: "local"
       });

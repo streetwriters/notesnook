@@ -25,8 +25,9 @@ import { AuthMode, initialAuthMode } from "./common";
 import { Login } from "./login";
 import { Signup } from "./signup";
 import { useThemeColors } from "@notesnook/theme";
+import { NavigationProps } from "../../services/navigation";
 
-const Auth = ({ navigation, route }) => {
+const Auth = ({ navigation, route }: NavigationProps<"Auth">) => {
   const [currentAuthMode, setCurrentAuthMode] = useState(
     route?.params?.mode || AuthMode.login
   );
@@ -42,14 +43,10 @@ const Auth = ({ navigation, route }) => {
       currentAuthMode !== AuthMode.welcomeLogin ? (
         <Signup
           changeMode={(mode) => setCurrentAuthMode(mode)}
-          trial={AuthMode.trialSignup === currentAuthMode}
           welcome={initialAuthMode.current === AuthMode.welcomeSignup}
         />
       ) : (
-        <Login
-          welcome={initialAuthMode.current}
-          changeMode={(mode) => setCurrentAuthMode(mode)}
-        />
+        <Login changeMode={(mode) => setCurrentAuthMode(mode)} />
       )}
 
       <Toast context="local" />

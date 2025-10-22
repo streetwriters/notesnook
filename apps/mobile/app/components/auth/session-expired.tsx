@@ -83,19 +83,12 @@ export const SessionExpired = () => {
       });
     } catch (e) {
       ToastManager.show({
-        heading: e.message,
+        heading: (e as Error).message,
         type: "error",
         context: "local"
       });
     }
   };
-
-  useEffect(() => {
-    const sub = eSubscribeEvent(eLoginSessionExpired, open);
-    return () => {
-      sub.unsubscribe?.();
-    };
-  }, [visible, open]);
 
   const open = React.useCallback(async () => {
     try {
@@ -132,6 +125,13 @@ export const SessionExpired = () => {
       });
     }
   }, [email]);
+
+  useEffect(() => {
+    const sub = eSubscribeEvent(eLoginSessionExpired, open);
+    return () => {
+      sub?.unsubscribe?.();
+    };
+  }, [visible, open]);
 
   return (
     visible && (
@@ -191,7 +191,9 @@ export const SessionExpired = () => {
                 textAlign: "center"
               }}
             >
-              {strings.sessionExpiredDesc(getObfuscatedEmail(email.current))}
+              {strings.sessionExpiredDesc(
+                getObfuscatedEmail(email.current as string)
+              )}
             </Paragraph>
           </View>
 
@@ -208,7 +210,9 @@ export const SessionExpired = () => {
               autoCapitalize="none"
               autoCorrect={false}
               placeholder={strings.password()}
-              onSubmit={() => login()}
+              onSubmit={() => {
+                login();
+              }}
             />
           ) : null}
 

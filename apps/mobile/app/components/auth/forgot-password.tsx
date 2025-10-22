@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useRef, useState } from "react";
-import { View } from "react-native";
+import { TextInput, View } from "react-native";
 import ActionSheet from "react-native-actions-sheet";
 import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
@@ -37,8 +37,8 @@ import { DefaultAppStyles } from "../../utils/styles";
 
 export const ForgotPassword = () => {
   const { colors } = useThemeColors("sheet");
-  const email = useRef();
-  const emailInputRef = useRef();
+  const email = useRef<string>(undefined);
+  const emailInputRef = useRef<TextInput>(null);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -57,7 +57,7 @@ export const ForgotPassword = () => {
       let lastRecoveryEmailTime = SettingsService.get().lastRecoveryEmailTime;
       if (
         lastRecoveryEmailTime &&
-        Date.now() - JSON.parse(lastRecoveryEmailTime) < 60000 * 3
+        Date.now() - lastRecoveryEmailTime < 60000 * 3
       ) {
         throw new Error(strings.pleaseWaitBeforeSendEmail());
       }
@@ -78,7 +78,7 @@ export const ForgotPassword = () => {
       setLoading(false);
       ToastManager.show({
         heading: strings.recoveryEmailFailed(),
-        message: e.message,
+        message: (e as Error).message,
         type: "error",
         context: "local"
       });
@@ -93,7 +93,6 @@ export const ForgotPassword = () => {
           setSent(false);
           setLoading(false);
         }}
-        keyboardShouldPersistTaps="always"
         onOpen={() => {
           emailInputRef.current?.setNativeProps({
             text: email.current
