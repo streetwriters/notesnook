@@ -23,6 +23,7 @@ import { View } from "react-native";
 import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
 import { hideAuth } from "./common";
+import { AuthParams } from "../../stores/use-navigation-store";
 export const AuthHeader = (props: { welcome?: boolean }) => {
   const { colors } = useThemeColors();
   const route = useRoute();
@@ -47,7 +48,7 @@ export const AuthHeader = (props: { welcome?: boolean }) => {
           <IconButton
             name="arrow-left"
             onPress={() => {
-              hideAuth((route.params as any)?.context);
+              hideAuth((route.params as AuthParams)?.context);
             }}
             color={colors.primary.paragraph}
           />
