@@ -32,7 +32,7 @@ const outerProps =
       } as ModalProps)
     : {};
 
-const NotesnookShare = ({ quicknote = false }) => {
+const NotesnookShare = () => {
   const [render, setRender] = useState(false);
   useEffect(() => {
     setTimeout(() => {

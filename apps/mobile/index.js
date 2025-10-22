@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import NetInfo from "@react-native-community/netinfo";
 import React from "react";
-import { AppRegistry, LogBox, Platform } from "react-native";
+import { AppRegistry, LogBox } from "react-native";
 import Config from "react-native-config";
 import "react-native-get-random-values";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -53,12 +53,10 @@ AppRegistry.registerComponent(
 
 const ShareProvider = () => {
   let NotesnookShare = require("./app/share/index").default;
-  return Platform.OS === "ios" ? (
+  return (
     <SafeAreaProvider>
-      <NotesnookShare quicknote={false} />
+      <NotesnookShare />
     </SafeAreaProvider>
-  ) : (
-    <NotesnookShare quicknote={false} />
   );
 };
 

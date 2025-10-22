@@ -37,7 +37,6 @@ import {
   Keyboard,
   KeyboardEvent,
   Platform,
-  SafeAreaView,
   ScrollView,
   Text,
   TextInput,
@@ -46,7 +45,11 @@ import {
   useWindowDimensions
 } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import {
+  SafeAreaProvider,
+  SafeAreaView,
+  useSafeAreaInsets
+} from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import isURL from "validator/lib/isURL";
 import { DatabaseLogger, db } from "../common/database";
@@ -66,6 +69,7 @@ import { HtmlLoadingWebViewAgent, fetchHandle } from "./fetch-webview";
 import { Search } from "./search";
 import { initDatabase, useShareStore } from "./store";
 import { isTablet } from "react-native-device-info";
+import { NotesnookModule } from "../utils/notesnook-module";
 
 const getLinkPreview = (url: string) => {
   return getPreviewData(url, 5000);
@@ -135,6 +139,7 @@ declare global {
 
 const ShareView = () => {
   const { colors } = useThemeColors();
+  const gesturesEnabled = NotesnookModule.isGestureNavigationEnabled();
   const appendNoteId = useShareStore((state) => state.appendNote);
   const [note, setNote] = useState({ ...defaultNote });
   const noteContent = useRef<string>(undefined);
@@ -156,7 +161,7 @@ const ShareView = () => {
     "appendNote" | "selectTags" | "selectNotebooks" | null
   >(null);
   const [rawFiles, setRawFiles] = useState<ShareItem[]>([]);
-
+  const insets = useSafeAreaInsets();
   const [kh, setKh] = useState(0);
   const [compress, setCompress] = useState(true);
   globalThis["IS_SHARE_EXTENSION"] = true;
@@ -436,10 +441,13 @@ const ShareView = () => {
     <SafeAreaView
       style={{
         width: width > 500 ? 500 : width,
-        height: height - kh,
+        height: "100%",
         alignSelf: "center",
         justifyContent: "flex-end",
-        overflow: "hidden"
+        overflow: "hidden",
+        paddingBottom: kh
+          ? kh - (insets.bottom || (gesturesEnabled ? 25 : 50))
+          : 0
       }}
     >
       {loadingPage ? <HtmlLoadingWebViewAgent /> : null}

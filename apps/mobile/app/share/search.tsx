@@ -44,6 +44,7 @@ import { useNotebook } from "../hooks/use-notebook";
 import { getElevationStyle } from "../utils/elevation";
 import { initDatabase, useShareStore } from "./store";
 import { devNull } from "node:os";
+import { DefaultAppStyles } from "../utils/styles";
 
 export const useNotebookExpandedStore = create<{
   expanded: {
@@ -64,7 +65,6 @@ export const useNotebookExpandedStore = create<{
 const SearchSetters = {
   appendNote: (id: string) => {
     useShareStore.getState().setAppendNote(id);
-    close();
   },
   selectNotebooks: (id: string) => {
     const selectedNotebooks = [...useShareStore.getState().selectedNotebooks];
@@ -163,64 +163,51 @@ const NotebookItem = ({
       onPress={() => onSelectItem()}
       style={{
         flexDirection: "column",
-        justifyContent: "center"
+        justifyContent: "center",
+        paddingVertical: DefaultAppStyles.GAP_VERTICAL,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.primary.border
       }}
     >
       <View
         style={{
           flexDirection: "row",
-          paddingHorizontal: 12,
-          height: 40,
+          paddingHorizontal: DefaultAppStyles.GAP,
           alignItems: "center"
         }}
       >
-        {nestedNotebooks?.placeholders.length ? (
-          <TouchableOpacity
-            style={{
-              width: 35,
-              height: 35,
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-            onPress={() => {
-              if (!notebook) return;
-              useNotebookExpandedStore.getState().setExpanded(notebook.id);
-            }}
-            activeOpacity={1}
-          >
-            <Icon
-              size={20}
-              color={colors.primary.icon}
-              name={isExpanded ? "chevron-down" : "chevron-right"}
-            />
-          </TouchableOpacity>
-        ) : (
-          <View
-            style={{
-              width: 35,
-              height: 30,
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          />
-        )}
-
-        <Icon
-          name={
-            !isSelected
-              ? "checkbox-blank-circle-outline"
-              : "check-circle-outline"
-          }
+        <TouchableOpacity
           style={{
-            marginRight: 10
+            width: 35,
+            height: 35,
+            justifyContent: "center",
+            alignItems: "center"
           }}
-          size={20}
-          color={isSelected ? colors.primary.accent : colors.secondary.icon}
-        />
+          onPress={() => {
+            if (!notebook || !nestedNotebooks?.placeholders.length) return;
+            useNotebookExpandedStore.getState().setExpanded(notebook.id);
+          }}
+          activeOpacity={1}
+        >
+          <Icon
+            size={20}
+            color={colors.primary.icon}
+            name={
+              !nestedNotebooks?.placeholders.length
+                ? "book-outline"
+                : isExpanded
+                  ? "chevron-down"
+                  : "chevron-right"
+            }
+          />
+        </TouchableOpacity>
 
         <View
           style={{
-            flexDirection: "column"
+            flexDirection: "row",
+            justifyContent: "space-between",
+            flex: 1,
+            alignItems: "center"
           }}
         >
           <Paragraph
@@ -232,6 +219,14 @@ const NotebookItem = ({
           >
             {notebook.title}
           </Paragraph>
+          <Icon
+            name={isSelected ? "checkbox-outline" : "checkbox-blank-outline"}
+            style={{
+              marginRight: 10
+            }}
+            size={20}
+            color={isSelected ? colors.primary.accent : colors.secondary.icon}
+          />
         </View>
       </View>
 
@@ -301,32 +296,18 @@ const ListItem = ({
         borderBottomWidth: 1,
         borderBottomColor: colors.primary.border,
         justifyContent: "center",
-        paddingVertical: 12,
-        minHeight: 45
+        paddingVertical: DefaultAppStyles.GAP_VERTICAL
       }}
     >
       {!item ? null : (
         <View
           style={{
             flexDirection: "row",
-            paddingHorizontal: 12
+            paddingHorizontal: DefaultAppStyles.GAP,
+            flex: 1,
+            justifyContent: "space-between"
           }}
         >
-          {item.type !== "note" ? (
-            <Icon
-              name={
-                !isSelected
-                  ? "checkbox-blank-circle-outline"
-                  : "check-circle-outline"
-              }
-              style={{
-                marginRight: 10
-              }}
-              size={20}
-              color={isSelected ? colors.primary.accent : colors.secondary.icon}
-            />
-          ) : null}
-
           <View
             style={{
               flexDirection: "column"
@@ -343,6 +324,17 @@ const ListItem = ({
               {item.title}
             </Paragraph>
           </View>
+
+          {item.type !== "note" ? (
+            <Icon
+              name={isSelected ? "checkbox-outline" : "checkbox-blank-outline"}
+              style={{
+                marginRight: 10
+              }}
+              size={20}
+              color={isSelected ? colors.primary.accent : colors.secondary.icon}
+            />
+          ) : null}
         </View>
       )}
     </TouchableOpacity>
@@ -421,7 +413,7 @@ export const Search = ({
     <View
       style={{
         position: "absolute",
-        top: Platform.OS === "android" ? 20 : 0,
+        top: Platform.OS === "android" ? 50 : 0,
         backgroundColor: colors.primary.background,
         borderRadius: 10,
         width: "95%",
@@ -438,10 +430,11 @@ export const Search = ({
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          paddingHorizontal: 16,
+          paddingHorizontal: DefaultAppStyles.GAP,
           paddingTop: 6,
-          marginBottom: 10,
-          height: 50
+          height: 50,
+          borderBottomWidth: 1,
+          borderBottomColor: colors.primary.border
         }}
       >
         <Icon
@@ -487,7 +480,7 @@ export const Search = ({
           <TouchableOpacity
             style={{
               flexDirection: "row",
-              paddingHorizontal: 12,
+              paddingHorizontal: DefaultAppStyles.GAP,
               height: 40,
               alignItems: "center"
             }}

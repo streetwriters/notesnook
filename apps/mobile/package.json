@@ -30,7 +30,7 @@
     "@ammarahmed/react-native-background-fetch": "^4.2.2",
     "@ammarahmed/react-native-eventsource": "1.1.0",
     "@ammarahmed/react-native-fingerprint-scanner": "^5.0.1",
-    "@ammarahmed/react-native-share-extension": "^2.9.3",
+    "@ammarahmed/react-native-share-extension": "^2.9.5",
     "@ammarahmed/react-native-sodium": "^1.6.8",
     "@azure/core-asynciterator-polyfill": "^1.0.2",
     "@bam.tech/react-native-image-resizer": "3.0.11",
