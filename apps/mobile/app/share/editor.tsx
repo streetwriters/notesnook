@@ -16,16 +16,22 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { Note, NoteContent } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import React, {
+  RefObject,
   useCallback,
   useEffect,
   useLayoutEffect,
   useRef,
   useState
 } from "react";
-import { Linking, Platform, TextInput, View } from "react-native";
+import { Linking, Platform, TextInput, View, ViewStyle } from "react-native";
 import { WebView } from "react-native-webview";
+import {
+  ShouldStartLoadRequest,
+  WebViewMessageEvent
+} from "react-native-webview/lib/WebViewTypes";
 import { eSubscribeEvent, eUnSubscribeEvent } from "../services/event-manager";
 import { eOnLoadNote } from "../utils/events";
 import { defaultBorderRadius } from "../utils/size";
@@ -42,7 +48,11 @@ export const EDITOR_URI = __DEV__
   ? EditorMobileSourceUrl
   : EditorMobileSourceUrl;
 
-export async function post(ref, type, value = null) {
+export async function post(
+  ref: RefObject<any>,
+  type: string,
+  value: any = null
+) {
   const message = {
     type,
     value
@@ -51,17 +61,25 @@ export async function post(ref, type, value = null) {
 }
 
 const useEditor = () => {
-  const ref = useRef();
+  const ref = useRef<WebView>(null);
   const { colors } = useThemeColors("editor");
-  const currentNote = useRef();
+  const currentNote = useRef<
+    Note & {
+      content: NoteContent<false>;
+    }
+  >(undefined);
 
   const postMessage = useCallback(
-    async (type, data) => post(ref, type, data),
+    async (type: string, data: any) => post(ref, type, data),
     []
   );
 
   const loadNote = useCallback(
-    (note) => {
+    (
+      note: Note & {
+        content: NoteContent<false>;
+      }
+    ) => {
       postMessage("html", note.content.data);
       currentNote.current = note;
     },
@@ -104,8 +122,11 @@ const useEditor = () => {
   return { ref, onLoad, currentNote };
 };
 
-const useEditorEvents = (editor, onChange) => {
-  const onMessage = (event) => {
+const useEditorEvents = (
+  editor: ReturnType<typeof useEditor>,
+  onChange: (data: string) => void
+) => {
+  const onMessage = (event: WebViewMessageEvent) => {
     const data = event.nativeEvent.data;
     const editorMessage = JSON.parse(data);
 
@@ -118,7 +139,7 @@ const useEditorEvents = (editor, onChange) => {
   return onMessage;
 };
 
-const onShouldStartLoadWithRequest = (request) => {
+const onShouldStartLoadWithRequest = (request: ShouldStartLoadRequest) => {
   if (request.url.includes("https")) {
     if (Platform.OS === "ios" && !request.isTopFrame) return true;
     Linking.openURL(request.url);
@@ -128,7 +149,7 @@ const onShouldStartLoadWithRequest = (request) => {
   }
 };
 
-const style = {
+const style: ViewStyle = {
   height: "100%",
   maxHeight: "100%",
   width: "100%",
@@ -136,32 +157,46 @@ const style = {
   backgroundColor: "transparent"
 };
 
-export const Editor = ({ onChange, onLoad, editorRef }) => {
+export type EditorRef = {
+  focus: () => void;
+};
+
+export const Editor = ({
+  onChange,
+  onLoad,
+  editorRef
+}: {
+  onChange: (data: string) => void;
+  onLoad: () => void;
+  editorRef: RefObject<EditorRef | null>;
+}) => {
   const { colors } = useThemeColors();
   const editor = useEditor();
-  const inputRef = useRef();
+  const inputRef = useRef<TextInput>(null);
   const onMessage = useEditorEvents(editor, onChange);
   const [loading, setLoading] = useState(true);
   useLayoutEffect(() => {
     onLoad?.();
   }, [onLoad]);
 
-  if (editorRef) {
-    editorRef.current = {
-      focus: () => {
-        setTimeout(() => {
-          inputRef.current?.focus();
-          editor.ref.current?.injectJavaScript(`(() => {
+  useEffect(() => {
+    if (editorRef) {
+      editorRef.current = {
+        focus: () => {
+          setTimeout(() => {
+            inputRef.current?.focus();
+            editor.ref.current?.injectJavaScript(`(() => {
             const editor = document.getElementById('editor');
             if (editor) {
               editor.focus();
             }
           })();`);
-          editor.ref?.current?.requestFocus();
-        });
-      }
-    };
-  }
+            editor.ref?.current?.requestFocus();
+          });
+        }
+      };
+    }
+  }, []);
 
   return (
     <View

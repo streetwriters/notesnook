@@ -27,18 +27,20 @@ import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import WebView from "react-native-webview";
 import { Config } from "./store";
-import { db } from "../common/database";
-import { SUBSCRIPTION_STATUS } from "../utils/constants";
 
-export const fetchHandle = createRef();
+export const fetchHandle = createRef<{
+  processUrl: (url: string) => Promise<string | null>;
+}>();
+
 export const HtmlLoadingWebViewAgent = React.memo(
   () => {
-    const [source, setSource] = useState(null);
-    const [clipper, setClipper] = useState(null);
-    const loadHandler = useRef();
-    const htmlHandler = useRef();
-    const webview = useRef();
-    const premium = useRef(false);
+    const [source, setSource] = useState<string | null>(null);
+    const [clipper, setClipper] = useState<string | null>(null);
+    const loadHandler = useRef<((result?: boolean | null) => void) | null>(
+      null
+    );
+    const htmlHandler = useRef<((html: string | null) => void) | null>(null);
+    const webview = useRef<any>(null);
     const corsProxy = Config.corsProxy;
 
     useImperativeHandle(
@@ -71,12 +73,6 @@ export const HtmlLoadingWebViewAgent = React.memo(
 
     useEffect(() => {
       (async () => {
-        const user = await db.user.getUser();
-        const subscriptionStatus =
-          user?.subscription?.type || SUBSCRIPTION_STATUS.BASIC;
-        premium.current =
-          user && subscriptionStatus !== SUBSCRIPTION_STATUS.BASIC;
-
         const clipperPath =
           Platform.OS === "ios"
             ? RNFetchBlob.fs.dirs.MainBundleDir +
@@ -107,7 +103,7 @@ export const HtmlLoadingWebViewAgent = React.memo(
         }}
         useSharedProcessPool={false}
         pointerEvents="none"
-        onMessage={(event) => {
+        onMessage={(event: any) => {
           try {
             const data = JSON.parse(event.nativeEvent.data);
             if (data && data.type === "html") {
@@ -123,7 +119,7 @@ export const HtmlLoadingWebViewAgent = React.memo(
             console.log("Error handling webview message", e);
           }
         }}
-        injectedJavaScriptBeforeContentLoaded={script(clipper, premium.current)}
+        injectedJavaScriptBeforeContentLoaded={script(clipper!, corsProxy)}
         onError={() => {
           console.log("Error loading page");
           loadHandler.current?.();
@@ -137,7 +133,7 @@ export const HtmlLoadingWebViewAgent = React.memo(
   () => true
 );
 
-const script = (clipper, pro) => `
+const script = (clipper: string, corsProxy?: string): string => `
 ${clipper}
 
 function postMessage(type, value) {
@@ -158,10 +154,10 @@ function postMessage(type, value) {
         postMessage("error", globalThis.Clipper.clipPage);
       } else {
         globalThis.Clipper.clipPage(document,false, {
-          images: ${pro},
+          images: true,
           inlineImages: false,
           styles: false,
-          corsProxy: undefined
+          corsProxy: ${corsProxy ? `"${corsProxy}"` : `undefined`}
         }).then(result => {
           postMessage("html", result);
         }).catch(e => {

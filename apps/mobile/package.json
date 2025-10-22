@@ -30,7 +30,7 @@
     "@ammarahmed/react-native-background-fetch": "^4.2.2",
     "@ammarahmed/react-native-eventsource": "1.1.0",
     "@ammarahmed/react-native-fingerprint-scanner": "^5.0.1",
-    "@ammarahmed/react-native-share-extension": "^2.9.1",
+    "@ammarahmed/react-native-share-extension": "^2.9.3",
     "@ammarahmed/react-native-sodium": "^1.6.8",
     "@azure/core-asynciterator-polyfill": "^1.0.2",
     "@bam.tech/react-native-image-resizer": "3.0.11",
@@ -85,6 +85,7 @@
     "phone": "^3.1.14",
     "qclone": "^1.2.0",
     "react": "19.1.1",
+    "react-async-hook": "^4.0.0",
     "react-native": "0.82.0",
     "react-native-actions-sheet": "0.9.7",
     "react-native-actions-shortcuts": "^1.0.1",
@@ -145,8 +146,7 @@
     "toggle-switch-react-native": "3.2.0",
     "url": "^0.11.0",
     "validator": "^13.5.2",
-    "zustand": "^4.5.5",
-    "react-async-hook": "^4.0.0"
+    "zustand": "^4.5.5"
   },
   "devDependencies": {
     "@babel/core": "^7.27.1",

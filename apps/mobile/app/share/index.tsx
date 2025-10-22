@@ -18,19 +18,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { ScopedThemeProvider } from "@notesnook/theme";
-import React, { Fragment, useEffect, useState } from "react";
-import { Modal, Platform } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Modal, ModalProps, Platform } from "react-native";
 import ShareView from "./share";
 import "./store";
 
-const Wrapper = Platform.OS === "android" ? Modal : Fragment;
 const outerProps =
   Platform.OS === "android"
-    ? {
+    ? ({
         animationType: "fade",
         transparent: true,
         visible: true
-      }
+      } as ModalProps)
     : {};
 
 const NotesnookShare = ({ quicknote = false }) => {
@@ -42,10 +41,12 @@ const NotesnookShare = ({ quicknote = false }) => {
   }, []);
   return (
     <ScopedThemeProvider value="base">
-      {!render ? null : (
-        <Wrapper {...outerProps}>
-          <ShareView quicknote={quicknote} />
-        </Wrapper>
+      {!render ? null : Platform.OS === "android" ? (
+        <Modal {...outerProps}>
+          <ShareView />
+        </Modal>
+      ) : (
+        <ShareView />
       )}
     </ScopedThemeProvider>
   );

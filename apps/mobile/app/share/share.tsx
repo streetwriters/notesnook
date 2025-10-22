@@ -17,7 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import ShareExtension from "@ammarahmed/react-native-share-extension";
+import ShareExtension, {
+  ShareItem
+} from "@ammarahmed/react-native-share-extension";
 import { getPreviewData } from "@flyerhq/react-native-link-preview";
 import {
   formatBytes,
@@ -33,6 +35,7 @@ import {
   Dimensions,
   Image,
   Keyboard,
+  KeyboardEvent,
   Platform,
   SafeAreaView,
   ScrollView,
@@ -53,21 +56,21 @@ import Heading from "../components/ui/typography/heading";
 import Paragraph from "../components/ui/typography/paragraph";
 import { useDBItem } from "../hooks/use-db-item";
 import { eSendEvent } from "../services/event-manager";
-import { FILE_SIZE_LIMIT, IMAGE_SIZE_LIMIT } from "../utils/constants";
 import { eOnLoadNote } from "../utils/events";
 import { NoteBundle } from "../utils/note-bundle";
 import { defaultBorderRadius, AppFontSize } from "../utils/size";
 import { AddNotebooks } from "./add-notebooks";
 import { AddTags } from "./add-tags";
-import { Editor } from "./editor";
+import { Editor, EditorRef } from "./editor";
 import { HtmlLoadingWebViewAgent, fetchHandle } from "./fetch-webview";
 import { Search } from "./search";
 import { initDatabase, useShareStore } from "./store";
+import { isTablet } from "react-native-device-info";
 
-const getLinkPreview = (url) => {
+const getLinkPreview = (url: string) => {
   return getPreviewData(url, 5000);
 };
-async function sanitizeHtml(site) {
+async function sanitizeHtml(site: string) {
   try {
     let html = await fetchHandle.current?.processUrl(site);
     return html;
@@ -76,11 +79,11 @@ async function sanitizeHtml(site) {
   }
 }
 
-function makeHtmlFromUrl(url) {
+function makeHtmlFromUrl(url: string) {
   return `<a href='${url}' target='_blank'>${url}</a>`;
 }
 
-function makeHtmlFromPlainText(text) {
+function makeHtmlFromPlainText(text: string) {
   if (!text) return "";
 
   return `<p>${text
@@ -88,12 +91,22 @@ function makeHtmlFromPlainText(text) {
     .replace(/(?:\r\n|\r|\n)/g, "</p><p>")}</p>`;
 }
 
-let defaultNote = {
-  title: null,
-  id: null,
+type DefaultNote = {
+  title?: string;
+  id?: string;
+  sessionId?: number;
+  content: {
+    type: "tiptap";
+    data?: string;
+  };
+};
+
+let defaultNote: DefaultNote = {
+  title: "",
+  id: undefined,
   content: {
     type: "tiptap",
-    data: null
+    data: ""
   }
 };
 
@@ -115,32 +128,39 @@ const modes = {
   }
 };
 
+declare global {
+  var IS_SHARE_EXTENSION: boolean;
+  var IS_MAIN_APP_RUNNING: boolean;
+}
+
 const ShareView = () => {
   const { colors } = useThemeColors();
   const appendNoteId = useShareStore((state) => state.appendNote);
   const [note, setNote] = useState({ ...defaultNote });
-  const noteContent = useRef("");
-  const noteTitle = useRef("");
+  const noteContent = useRef<string>(undefined);
+  const noteTitle = useRef<string>(undefined);
   const [loading, setLoading] = useState(false);
   const [loadingExtension, setLoadingExtension] = useState(true);
   const fullQualityImages = useIsFeatureAvailable("fullQualityImages");
-  const [rawData, setRawData] = useState({
-    type: null,
-    value: null
-  });
-  const inputRef = useRef(null);
+  const [rawData, setRawData] = useState<{
+    type?: string;
+    value?: string;
+  }>({});
+  const inputRef = useRef<TextInput>(null);
   const [mode, setMode] = useState(1);
   const keyboardHeight = useRef(0);
   const { width, height } = useWindowDimensions();
   const [loadingPage, setLoadingPage] = useState(false);
-  const editorRef = useRef();
-  const [searchMode, setSearchMode] = useState(null);
-  const [rawFiles, setRawFiles] = useState([]);
+  const editorRef = useRef<EditorRef>(null);
+  const [searchMode, setSearchMode] = useState<
+    "appendNote" | "selectTags" | "selectNotebooks" | null
+  >(null);
+  const [rawFiles, setRawFiles] = useState<ShareItem[]>([]);
 
   const [kh, setKh] = useState(0);
   const [compress, setCompress] = useState(true);
   globalThis["IS_SHARE_EXTENSION"] = true;
-  const onKeyboardDidShow = (event) => {
+  const onKeyboardDidShow = (event: KeyboardEvent) => {
     let height = Dimensions.get("screen").height - event.endCoordinates.screenY;
     keyboardHeight.current = height;
     setKh(height);
@@ -172,7 +192,7 @@ const ShareView = () => {
     }
   }, [fullQualityImages]);
 
-  const showLinkPreview = async (note, link) => {
+  const showLinkPreview = async (note: DefaultNote, link: string) => {
     let _note = note;
     _note.content.data = makeHtmlFromUrl(link);
     try {
@@ -184,20 +204,33 @@ const ShareView = () => {
     return note;
   };
 
+  const onLoad = useCallback(() => {
+    console.log(noteContent.current, "current...");
+    eSendEvent(eOnLoadNote + "shareEditor", {
+      id: null,
+      content: {
+        type: "tiptap",
+        data: noteContent.current
+      },
+      forced: true
+    });
+  }, []);
+
   const loadData = useCallback(
-    async (isEditor) => {
+    async (isEditor: boolean) => {
       try {
         if (noteContent.current) {
           onLoad();
           return;
         }
-        defaultNote.content.data = null;
+        defaultNote.content.data = undefined;
         setNote({ ...defaultNote });
         const data = await ShareExtension.data();
 
         if (!data || data.length === 0) {
           setRawData({
-            value: ""
+            value: "",
+            type: "text"
           });
           if (isEditor) {
             setTimeout(() => {
@@ -257,7 +290,6 @@ const ShareView = () => {
           }
         }
         onLoad();
-
         setNote({ ...note });
       } catch (e) {
         console.error(e);
@@ -266,24 +298,12 @@ const ShareView = () => {
     [onLoad]
   );
 
-  const onLoad = useCallback(() => {
-    console.log(noteContent.current, "current...");
-    eSendEvent(eOnLoadNote + "shareEditor", {
-      id: null,
-      content: {
-        type: "tiptap",
-        data: noteContent.current
-      },
-      forced: true
-    });
-  }, []);
-
   useEffect(() => {
     (async () => {
       try {
         await initDatabase();
         setLoadingExtension(false);
-        loadData();
+        loadData(false);
         useShareStore.getState().restore();
       } catch (e) {
         DatabaseLogger.error(e);
@@ -306,22 +326,23 @@ const ShareView = () => {
 
     let noteData;
     if (appendNoteId) {
-      if (!(await db.notes.exists(appendNoteId))) {
+      const note = await db.notes.note(appendNoteId);
+      if (!note) {
         useShareStore.getState().setAppendNote(null);
         Alert.alert("The note you are trying to append to has been deleted.");
         setLoading(false);
         return;
       }
 
-      const note = await db.notes.note(appendNoteId);
-      let rawContent = await db.content.get(note.contentId);
-
+      let rawContent = note.contentId
+        ? await db.content.get(note.contentId)
+        : null;
       noteData = {
         content: {
           data: (rawContent?.data || "") + "<br/>" + noteContent.current,
           type: "tiptap"
         },
-        id: note.id,
+        id: note?.id,
         sessionId: Date.now()
       };
     } else {
@@ -354,28 +375,30 @@ const ShareView = () => {
     setLoading(false);
   };
 
-  const changeMode = async (m) => {
-    setMode(m);
+  const changeMode = async (value: number) => {
+    setMode(value);
 
     setLoading(true);
     try {
-      if (m === 2) {
+      if (value === 2) {
         setLoadingPage(true);
         setTimeout(async () => {
-          let html = await sanitizeHtml(rawData.value);
-          noteContent.current = html;
+          let html = await sanitizeHtml(rawData?.value || "");
+          noteContent.current = html || "";
           setLoadingPage(false);
           onLoad();
           setNote((note) => {
-            note.content.data = html;
+            note.content.data = html || "";
             return { ...note };
           });
         }, 300);
       } else {
         setLoadingPage(false);
-        let html = isURL(rawData.value)
-          ? makeHtmlFromUrl(rawData.value)
-          : makeHtmlFromPlainText(rawData.value);
+        let html = !rawData.value
+          ? ""
+          : isURL(rawData?.value)
+            ? makeHtmlFromUrl(rawData?.value)
+            : makeHtmlFromPlainText(rawData?.value);
         setNote((note) => {
           note.content.data = html;
           noteContent.current = html;
@@ -395,7 +418,7 @@ const ShareView = () => {
     loadData(true);
   }, [loadData]);
 
-  const onRemoveFile = (item) => {
+  const onRemoveFile = (item: ShareItem) => {
     const index = rawFiles.findIndex((file) => file.name === item.name);
     if (index > -1) {
       setRawFiles((state) => {
@@ -529,7 +552,7 @@ const ShareView = () => {
                       defaultValue={noteTitle.current}
                       blurOnSubmit={false}
                       onSubmitEditing={() => {
-                        editorRef.current.focus();
+                        editorRef.current?.focus();
                       }}
                     />
                   )}
@@ -584,9 +607,6 @@ const ShareView = () => {
                           <TouchableOpacity
                             activeOpacity={0.9}
                             key={item.name}
-                            source={{
-                              uri: `file://${item.value}`
-                            }}
                             onPress={() => onRemoveFile(item)}
                             style={{
                               borderRadius: defaultBorderRadius,
@@ -599,7 +619,6 @@ const ShareView = () => {
                               paddingHorizontal: 8,
                               marginRight: 6
                             }}
-                            resizeMode="cover"
                           >
                             <Icon
                               color={colors.primary.icon}
@@ -838,7 +857,7 @@ const ShareView = () => {
 
             <View
               style={{
-                height: Platform.isPad ? 150 : Platform.OS === "ios" ? 110 : 0
+                height: isTablet() ? 150 : Platform.OS === "ios" ? 110 : 0
               }}
             />
           </View>
@@ -848,7 +867,13 @@ const ShareView = () => {
   );
 };
 
-const AppendNote = ({ id, onLoad }) => {
+const AppendNote = ({
+  id,
+  onLoad
+}: {
+  id: string;
+  onLoad: (title: string) => void;
+}) => {
   const { colors } = useThemeColors();
   const [item] = useDBItem(id, "note");
 
