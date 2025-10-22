@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment } from "react";
 import { View } from "react-native";
-import { allowedPlatforms } from "../../stores/use-message-store";
+import { allowedPlatforms, BodyItem } from "../../stores/use-message-store";
 import { ProFeatures } from "../dialogs/result/pro-features";
 import { Body } from "./body";
 import { Cta } from "./cta";
@@ -30,7 +30,7 @@ import { SubHeading } from "./subheading";
 import { Title } from "./title";
 import { DefaultAppStyles } from "../../utils/styles";
 
-export function allowedOnPlatform(platforms) {
+export function allowedOnPlatform(platforms: string[]) {
   if (!platforms) return true;
   return platforms.some((platform) => allowedPlatforms.indexOf(platform) > -1);
 }
@@ -41,11 +41,15 @@ export const margins = {
   2: 20
 };
 
-export const getStyle = (style) => {
+export const getStyle = (style: BodyItem["style"]) => {
   if (!style) return {};
   return {
-    marginTop: margins[style.marginTop] || 0,
-    marginBottom: margins[style.marginBottom] || 0,
+    marginTop: style.marginTop
+      ? margins[style.marginTop as keyof typeof margins] || 0
+      : 0,
+    marginBottom: style.marginBottom
+      ? margins[style.marginBottom as keyof typeof margins] || 0
+      : 0,
     textAlign: style.textAlign || "left"
   };
 };
@@ -76,16 +80,25 @@ const renderItems = {
   callToActions: Cta
 };
 
-export const renderItem = ({ item, index, color, inline }) => {
-  const Item = renderItems[item.type] || Fragment;
+export const renderItem = ({
+  item,
+  index,
+  inline
+}: {
+  item: BodyItem;
+  index: number;
+  inline?: boolean;
+}) => {
+  const Item = renderItems[item.type as keyof typeof renderItems] || Fragment;
 
   return (
     <Item
       key={item.text || item.src || item.type}
-      {...item}
+      item={item}
       index={index}
-      color={color}
       inline={inline}
     />
   );
 };
+
+export type BodyItemProps = { item: BodyItem; index: number; inline?: boolean };

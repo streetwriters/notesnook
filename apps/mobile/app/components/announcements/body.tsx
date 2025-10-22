@@ -18,43 +18,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import { View } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import Paragraph from "../ui/typography/paragraph";
-import { getStyle } from "./functions";
+import { BodyItemProps, getStyle } from "./functions";
 import { DefaultAppStyles } from "../../utils/styles";
 
-export const List = ({ items, listType, style = {} }) => {
+export const Body = (props: BodyItemProps) => {
   return (
-    <View
+    <Paragraph
       style={{
         paddingHorizontal: DefaultAppStyles.GAP,
-        paddingLeft: listType === "ordered" ? 25 : 25,
-        ...getStyle(style)
+        ...getStyle(props.item.style)
       }}
     >
-      {items.map((item, index) => (
-        <View
-          key={item.text}
-          style={{
-            paddingVertical: DefaultAppStyles.GAP_VERTICAL,
-            flexDirection: "row"
-          }}
-        >
-          {listType === "ordered" ? (
-            <Paragraph
-              style={{
-                marginRight: 5
-              }}
-            >
-              {index + 1}.
-            </Paragraph>
-          ) : (
-            <Icon size={20} name="circle-small" />
-          )}
-          <Paragraph>{item.text}</Paragraph>
-        </View>
-      ))}
-    </View>
+      {props.item.text}
+    </Paragraph>
   );
 };

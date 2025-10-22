@@ -19,18 +19,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react";
 import { Image } from "react-native";
-import { getStyle } from "./functions";
+import { BodyItemProps, getStyle } from "./functions";
 
-export const Photo = ({ src, style = {} }) => {
-  return src ? (
+export const Photo = (props: BodyItemProps) => {
+  return props.item.src ? (
     <Image
-      source={{ uri: src }}
+      source={{ uri: props.item.src }}
       resizeMode="cover"
       style={{
         width: "100%",
         height: 200,
         alignSelf: "center",
-        ...getStyle(style)
+        ...getStyle(props.item.style)
       }}
     />
   ) : null;

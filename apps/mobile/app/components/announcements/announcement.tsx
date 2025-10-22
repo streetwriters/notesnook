@@ -30,7 +30,7 @@ import { AppFontSize } from "../../utils/size";
 import { Button } from "../ui/button";
 import { strings } from "@notesnook/intl";
 
-export const Announcement = ({ color }) => {
+export const Announcement = () => {
   const { colors } = useThemeColors();
   const [announcements, remove] = useMessageStore((state) => [
     state.announcements,
@@ -82,7 +82,6 @@ export const Announcement = ({ color }) => {
             <Button
               type="plain"
               icon="close"
-              height={null}
               onPress={() => {
                 remove(announcement.id);
               }}
@@ -102,7 +101,6 @@ export const Announcement = ({ color }) => {
               renderItem({
                 item: item,
                 index: index,
-                color: colors[color],
                 inline: true
               })
             )}

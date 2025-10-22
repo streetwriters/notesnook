@@ -24,7 +24,7 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
-import { useMessageStore } from "../../stores/use-message-store";
+import { Announcement, useMessageStore } from "../../stores/use-message-store";
 import { useThemeColors } from "@notesnook/theme";
 import {
   eCloseAnnouncementDialog,
@@ -97,8 +97,23 @@ import { DefaultAppStyles } from "../../utils/styles";
 export const AnnouncementDialog = () => {
   const { colors } = useThemeColors();
   const [visible, setVisible] = useState(false);
-  const [info, setInfo] = useState();
+  const [info, setInfo] = useState<Announcement | undefined>(undefined);
   const remove = useMessageStore((state) => state.remove);
+
+  const open = (data: Announcement) => {
+    setInfo(data);
+    setImmediate(() => {
+      setVisible(true);
+    });
+  };
+
+  const close = useCallback(() => {
+    if (visible) {
+      if (info?.id) remove(info?.id);
+      setInfo(undefined);
+      setVisible(false);
+    }
+  }, [info?.id, remove, visible]);
 
   useEffect(() => {
     eSubscribeEvent(eOpenAnnouncementDialog, open);
@@ -108,21 +123,6 @@ export const AnnouncementDialog = () => {
       eUnSubscribeEvent(eCloseAnnouncementDialog, close);
     };
   }, [close, visible]);
-
-  const open = (data) => {
-    setInfo(data);
-    setImmediate(() => {
-      setVisible(true);
-    });
-  };
-
-  const close = useCallback(() => {
-    if (visible) {
-      remove(info?.id);
-      setInfo(null);
-      setVisible(false);
-    }
-  }, [info?.id, remove, visible]);
 
   return (
     <BaseDialog

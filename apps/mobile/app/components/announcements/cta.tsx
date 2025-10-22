@@ -19,24 +19,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react";
 import { Linking, View } from "react-native";
-//import SettingsBackupAndRestore from '../../screens/settings/backup-restore';
 import { useThemeColors } from "@notesnook/theme";
-import { eSendEvent, presentSheet } from "../../services/event-manager";
+import { eSendEvent } from "../../services/event-manager";
 import { eCloseAnnouncementDialog } from "../../utils/events";
 import { AppFontSize } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import SheetProvider from "../sheet-provider";
 import { Button } from "../ui/button";
-import { allowedOnPlatform, getStyle } from "./functions";
+import { allowedOnPlatform, BodyItemProps, getStyle } from "./functions";
 import { DefaultAppStyles } from "../../utils/styles";
+import { Action } from "../../stores/use-message-store";
 
-export const Cta = ({ actions, style = {}, color, inline }) => {
+export const Cta = (props: BodyItemProps) => {
   const { colors } = useThemeColors();
   let buttons =
-    actions.filter((item) => allowedOnPlatform(item.platforms)) || [];
+    props.item.actions.filter((item) => allowedOnPlatform(item.platforms)) ||
+    [];
 
-  const onPress = async (item) => {
-    if (!inline) {
+  const onPress = async (item: Action) => {
+    if (!props.inline) {
       eSendEvent(eCloseAnnouncementDialog);
       await sleep(500);
     }
@@ -50,14 +51,14 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
     <View
       style={{
         paddingHorizontal: DefaultAppStyles.GAP,
-        ...getStyle(style),
-        flexDirection: inline ? "row" : "column",
+        ...getStyle(props.item.style),
+        flexDirection: props.inline ? "row" : "column",
         gap: DefaultAppStyles.GAP_SMALL
       }}
     >
       <SheetProvider context="premium_cta" />
 
-      {inline ? (
+      {props.inline ? (
         <>
           {buttons.length > 0 &&
             buttons.slice(0, 1).map((item) => (
@@ -106,11 +107,9 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
                 key={item.title}
                 title={item.title}
                 buttonType={{
-                  color: color ? color : colors.primary.accent,
-                  text: color
-                    ? colors.static.white
-                    : colors.primary.accentForeground,
-                  selected: color ? color : colors.primary.accent,
+                  color: colors.primary.accent,
+                  text: colors.primary.accentForeground,
+                  selected: colors.primary.accent,
                   opacity: 1
                 }}
                 onPress={() => onPress(item)}

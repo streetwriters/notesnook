@@ -18,19 +18,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import Paragraph from "../ui/typography/paragraph";
-import { getStyle } from "./functions";
+import { AppFontSize } from "../../utils/size";
+import Heading from "../ui/typography/heading";
+import { BodyItemProps, getStyle } from "./functions";
 import { DefaultAppStyles } from "../../utils/styles";
 
-export const Body = ({ text, style = {} }) => {
+export const SubHeading = (props: BodyItemProps) => {
   return (
-    <Paragraph
+    <Heading
+      size={AppFontSize.md + 2}
       style={{
-        paddingHorizontal: DefaultAppStyles.GAP,
-        ...getStyle(style)
+        marginHorizontal: DefaultAppStyles.GAP,
+        ...getStyle(props.item.style)
       }}
     >
-      {text}
-    </Paragraph>
+      {props.item.text}
+    </Heading>
   );
 };

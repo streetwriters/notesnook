@@ -19,21 +19,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react";
 import { AppFontSize } from "../../utils/size";
-import Heading from "../ui/typography/heading";
-import { getStyle } from "./functions";
+import Paragraph from "../ui/typography/paragraph";
+import { BodyItemProps, getStyle } from "./functions";
 import { DefaultAppStyles } from "../../utils/styles";
 
-export const SubHeading = ({ text, style = {} }) => {
+export const Description = (props: BodyItemProps) => {
   return (
-    <Heading
-      size={AppFontSize.md + 2}
+    <Paragraph
       style={{
-        marginHorizontal: DefaultAppStyles.GAP,
-        marginTop: DefaultAppStyles.GAP_VERTICAL,
-        ...getStyle(style)
+        paddingHorizontal: DefaultAppStyles.GAP,
+        ...getStyle(props.item.style),
+        textAlign: props.inline ? "left" : props.item.style?.textAlign
       }}
+      size={AppFontSize.sm}
     >
-      {text}
-    </Heading>
+      {props.item.text}
+    </Paragraph>
   );
 };

@@ -67,11 +67,14 @@ export type BodyItem = {
     | "shapes";
   src?: string;
   caption?: string;
+  actions: Action[];
   text?: string;
   style?: Style;
   items?: Array<{
     text?: string;
   }>;
+  listType: "ordered" | "unordered";
+  platforms: string[];
 };
 
 export type Announcement = {
