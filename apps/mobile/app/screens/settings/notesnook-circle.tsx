@@ -2,7 +2,8 @@ import { CirclePartner, SubscriptionStatus } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import Clipboard from "@react-native-clipboard/clipboard";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useAsync } from "react-async-hook";
 import {
   ActivityIndicator,
   Image,
@@ -13,6 +14,7 @@ import {
 import { db } from "../../common/database";
 import AppIcon from "../../components/ui/AppIcon";
 import { Button } from "../../components/ui/button";
+import { Notice } from "../../components/ui/notice";
 import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
 import { ToastManager } from "../../services/event-manager";
@@ -21,8 +23,8 @@ import PremiumService from "../../services/premium";
 import { useUserStore } from "../../stores/use-user-store";
 import { AppFontSize, defaultBorderRadius } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
-import { useAsync } from "react-async-hook";
-import { Notice } from "../../components/ui/notice";
+import { openLinkInBrowser } from "../../utils/functions";
+import { Pressable } from "../../components/ui/pressable";
 
 export const NotesnookCircle = () => {
   const user = useUserStore((state) => state.user);
@@ -156,32 +158,53 @@ const Partner = ({
               }}
             />
           ) : (
-            <TouchableOpacity
-              style={{
-                backgroundColor: colors.secondary.background,
-                borderRadius: defaultBorderRadius,
-                alignItems: "center",
-                justifyContent: "center",
-                padding: DefaultAppStyles.GAP_SMALL,
-                borderWidth: 0.5,
-                borderColor: colors.secondary.border,
-                flexDirection: "row",
-                gap: DefaultAppStyles.GAP_SMALL
-              }}
-              activeOpacity={0.9}
-              onPress={() => {
-                Clipboard.setString(code);
-              }}
-            >
-              <Paragraph
-                size={AppFontSize.lg}
-                color={colors.secondary.paragraph}
+            <>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: colors.secondary.background,
+                  borderRadius: defaultBorderRadius,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: DefaultAppStyles.GAP_SMALL,
+                  borderWidth: 0.5,
+                  borderColor: colors.secondary.border,
+                  flexDirection: "row",
+                  gap: DefaultAppStyles.GAP_SMALL
+                }}
+                activeOpacity={0.9}
+                onPress={() => {
+                  Clipboard.setString(code);
+                }}
               >
-                {code}
-              </Paragraph>
+                <Paragraph
+                  size={AppFontSize.lg}
+                  color={colors.secondary.paragraph}
+                >
+                  {code}
+                </Paragraph>
 
-              <AppIcon name="content-copy" />
-            </TouchableOpacity>
+                <AppIcon name="content-copy" />
+              </TouchableOpacity>
+
+              {item.codeRedeemUrl ? (
+                <Pressable
+                  onPress={() => {
+                    if (item.codeRedeemUrl) {
+                      openLinkInBrowser(
+                        item.codeRedeemUrl.replace("{{code}}", code)
+                      );
+                    }
+                  }}
+                >
+                  <Paragraph
+                    color={colors.secondary.paragraph}
+                    size={AppFontSize.xxs}
+                  >
+                    {strings.clickToDirectlyClaimPromo()}
+                  </Paragraph>
+                </Pressable>
+              ) : null}
+            </>
           )}
         </>
       ) : null}
