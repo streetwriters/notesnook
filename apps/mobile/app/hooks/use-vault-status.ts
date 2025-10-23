@@ -21,6 +21,7 @@ import React, { useCallback, useEffect } from "react";
 import { db } from "../common/database";
 import BiometricService from "../services/biometrics";
 import { eSubscribeEvent, eUnSubscribeEvent } from "../services/event-manager";
+import { useSettingStore } from "../stores/use-setting-store";
 
 const VaultStatusDefaults = {
   exists: false,
@@ -36,6 +37,7 @@ export type VaultStatusType = {
 
 export const useVaultStatus = () => {
   const [vaultStatus, setVaultStatus] = React.useState(VaultStatusDefaults);
+  const isAppLoading = useSettingStore((state) => state.isAppLoading);
 
   const checkVaultStatus = useCallback(() => {
     db.vault?.exists().then(async (exists) => {
@@ -50,12 +52,13 @@ export const useVaultStatus = () => {
   }, []);
 
   useEffect(() => {
+    if (isAppLoading) return;
     checkVaultStatus();
     eSubscribeEvent("vaultUpdated", () => checkVaultStatus());
     return () => {
       eUnSubscribeEvent("vaultUpdated", () => checkVaultStatus());
     };
-  }, [checkVaultStatus]);
+  }, [checkVaultStatus, isAppLoading]);
 
   return vaultStatus;
 };
