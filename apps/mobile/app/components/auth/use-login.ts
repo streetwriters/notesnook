@@ -99,7 +99,7 @@ export const useLogin = (
                   callback && callback(false);
                 } catch (e) {
                   callback && callback(false);
-                  if (e.message === "invalid_grant") {
+                  if ((e as Error).message === "invalid_grant") {
                     eSendEvent(eCloseSimpleDialog, "two_factor_verify");
                     setLoading(false);
                     setStep(LoginSteps.emailAuth);

@@ -73,6 +73,11 @@ jobs:
       - name: CCache Stats Before Build
         run: ccache -sv
 
+      - name: Check for typescript errors
+        run: |
+          cd apps/mobile
+          npx tsc --noEmit
+
       - name: Build unsigned app bundle
         run: yarn release:android:bundle
 

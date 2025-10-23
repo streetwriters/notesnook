@@ -64,6 +64,11 @@ jobs:
           bundle install
           RCT_NEW_ARCH_ENABLED=0 bundle exec pod install
 
+      - name: Check for typescript errors
+        run: |
+          cd apps/mobile
+          npx tsc --noEmit
+
       - name: CCache Stats Before Build
         run: ccache -sv
 

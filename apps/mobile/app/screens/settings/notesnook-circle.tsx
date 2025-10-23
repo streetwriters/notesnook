@@ -2,7 +2,8 @@ import { CirclePartner, SubscriptionStatus } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import Clipboard from "@react-native-clipboard/clipboard";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useAsync } from "react-async-hook";
 import {
   ActivityIndicator,
   Image,
@@ -13,6 +14,7 @@ import {
 import { db } from "../../common/database";
 import AppIcon from "../../components/ui/AppIcon";
 import { Button } from "../../components/ui/button";
+import { Notice } from "../../components/ui/notice";
 import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
 import { ToastManager } from "../../services/event-manager";
@@ -21,8 +23,6 @@ import PremiumService from "../../services/premium";
 import { useUserStore } from "../../stores/use-user-store";
 import { AppFontSize, defaultBorderRadius } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
-import { useAsync } from "react-async-hook";
-import { Notice } from "../../components/ui/notice";
 
 export const NotesnookCircle = () => {
   const user = useUserStore((state) => state.user);

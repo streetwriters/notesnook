@@ -136,6 +136,12 @@ export const Storage: IStorage = {
   clear(): Promise<void> {
     return DefaultStorage.clear();
   },
+  generateCryptoKeyPair() {
+    throw new Error("Not implemented");
+  },
+  decryptAsymmetric() {
+    throw new Error("Not implemented");
+  },
   getAllKeys(): Promise<string[]> {
     return DefaultStorage.getAllKeys();
   },
