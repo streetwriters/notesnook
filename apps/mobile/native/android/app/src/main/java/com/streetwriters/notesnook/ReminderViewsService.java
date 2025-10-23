@@ -75,7 +75,7 @@ class ReminderRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactor
         final Intent fillInIntent = new Intent();
         final Bundle extras = new Bundle();
         extras.putString(ReminderViewsService.OpenReminderId, reminder.getId());
-        fillInIntent.setData(Uri.parse("https://notesnook.com/open_reminder?id=" + reminder.getId()));
+        fillInIntent.setData(Uri.parse("https://app.notesnook.com/open_reminder?id=" + reminder.getId()));
         fillInIntent.putExtra(RCTNNativeModule.IntentType, "OpenReminder");
         fillInIntent.putExtras(extras);
         views.setOnClickFillInIntent(R.id.reminder_item_btn, fillInIntent);
