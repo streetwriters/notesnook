@@ -2601,5 +2601,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   freeUserCircleNotice: () =>
     t`The Notesnook Circle is exclusive to subscribers. Please consider subscribing to gain access to Notesnook Circle and enjoy additional benefits.`,
   finishPurchaseInBrowser: () => t`Finish your purchase in the browser.`,
-  goBack: () => t`Go back`
+  goBack: () => t`Go back`,
+  clickToDirectlyClaimPromo: () =>
+    t`Click here to directly claim the promotion.`
 };
