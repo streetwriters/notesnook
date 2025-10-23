@@ -39,6 +39,7 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { AuthHeader } from "./header";
 import { SignupContext } from "./signup-context";
+import SettingsService from "../../services/settings";
 
 const SignupSteps = {
   signup: 0,

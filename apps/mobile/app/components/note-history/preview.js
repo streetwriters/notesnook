@@ -117,7 +117,8 @@ export default function NotePreview({ session, content, note }) {
       {!session?.locked && !locked ? (
         <View
           style={{
-            flex: 1
+            flex: 1,
+            backgroundColor: colors.primary.background
           }}
         >
           <ReadonlyEditor

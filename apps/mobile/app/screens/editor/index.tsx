@@ -61,6 +61,7 @@ import {
 import { fluidTabsRef } from "../../utils/global-refs";
 import { strings } from "@notesnook/intl";
 import { i18n } from "@lingui/core";
+import { useVaultStatus } from "../../hooks/use-vault-status";
 
 const style: ViewStyle = {
   height: "100%",
@@ -197,6 +198,7 @@ const Editor = React.memo(
 export default Editor;
 
 const useLockedNoteHandler = () => {
+  const vaultStatus = useVaultStatus();
   const tab = useTabStore((state) => state.getTab(state.currentTab));
   const tabRef = useRef(tab);
   tabRef.current = tab;
@@ -217,15 +219,13 @@ const useLockedNoteHandler = () => {
 
   useEffect(() => {
     (async () => {
-      const biometry = await BiometricService.isBiometryAvailable();
-      const fingerprint = await BiometricService.hasInternetCredentials();
       useTabStore.setState({
-        biometryAvailable: !!biometry,
-        biometryEnrolled: !!fingerprint
+        biometryAvailable: !!vaultStatus.isBiometryAvailable,
+        biometryEnrolled: !!vaultStatus.biometryEnrolled
       });
       syncTabs("biometry");
     })();
-  }, [tab?.id]);
+  }, [tab?.id, vaultStatus.biometryEnrolled, vaultStatus.isBiometryAvailable]);
 
   useEffect(() => {
     const unlockWithBiometrics = async () => {
