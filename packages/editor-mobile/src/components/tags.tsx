@@ -55,7 +55,6 @@ function Tags(props: { settings: Settings; loading?: boolean }) {
       style={{
         display: "flex",
         alignItems: "center",
-        minHeight: "25px",
         opacity: props.loading ? 0 : 1,
         gap: 6
       }}
