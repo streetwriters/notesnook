@@ -94,7 +94,9 @@ export async function encryptDatabaseKeyWithPassword(appLockPassword: string) {
 }
 
 export async function restoreDatabaseKeyToKeyChain(appLockPassword: string) {
-  const databaseKeyCipher: Cipher = CipherStorage.getMap(DB_KEY_CIPHER);
+  const databaseKeyCipher: Cipher = CipherStorage.getMap(
+    DB_KEY_CIPHER
+  ) as Cipher;
   const databaseKey = (await decrypt(
     {
       password: appLockPassword
@@ -135,7 +137,9 @@ export async function clearAppLockVerificationCipher() {
 
 export async function validateAppLockPassword(appLockPassword: string) {
   try {
-    const appLockCipher: Cipher = CipherStorage.getMap(APPLOCK_CIPHER);
+    const appLockCipher: Cipher = CipherStorage.getMap(
+      APPLOCK_CIPHER
+    ) as Cipher;
     if (!appLockCipher) return true;
     const key = await Sodium.deriveKey(appLockPassword, appLockCipher.salt);
     const decrypted = await decrypt(key, appLockCipher);
@@ -159,7 +163,9 @@ export function clearDatabaseKey() {
 export async function getDatabaseKey(appLockPassword?: string) {
   if (DB_KEY) return DB_KEY;
   if (appLockPassword) {
-    const databaseKeyCipher: Cipher = CipherStorage.getMap("databaseKeyCipher");
+    const databaseKeyCipher: Cipher = CipherStorage.getMap(
+      "databaseKeyCipher"
+    ) as Cipher;
     const databaseKey = await decrypt(
       {
         password: appLockPassword
@@ -293,7 +299,7 @@ export async function deriveCryptoKey(data: SerializedKey) {
 
 export async function getCryptoKey() {
   try {
-    const keyCipher: Cipher = MMKV.getMap(USER_KEY_CIPHER);
+    const keyCipher: Cipher = MMKV.getMap(USER_KEY_CIPHER) as Cipher;
     if (!keyCipher) {
       DatabaseLogger.info("User key cipher is null");
       return undefined;

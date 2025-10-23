@@ -35,29 +35,35 @@ import SheetProvider from "../sheet-provider";
 import RateAppSheet from "../sheets/rate-app";
 import RecoveryKeySheet from "../sheets/recovery-key";
 import Progress from "../dialogs/progress";
+import { useSettingStore } from "../../stores/use-setting-store";
 
 const DialogProvider = () => {
   const { colors } = useThemeColors();
+  const isAppLoading = useSettingStore((state) => state.isAppLoading);
 
   return (
     <>
       <AppLockPassword />
       <LoadingDialog />
-      <Dialog context="global" />
-      <AuthModal colors={colors} />
-      <MergeConflicts />
-      <RecoveryKeySheet colors={colors} />
       <SheetProvider />
       <SheetProvider context="sync_progress" />
-      <ResultDialog />
-      <VaultDialog colors={colors} />
-      <RateAppSheet />
-      <ImagePreview />
-      <AnnouncementDialog />
-      <SessionExpired />
-      <PDFPreview />
-      <JumpToSectionDialog />
+      <Dialog context="global" />
       <Progress />
+
+      {isAppLoading ? null : (
+        <>
+          <MergeConflicts />
+          <RecoveryKeySheet colors={colors} />
+          <ResultDialog />
+          <VaultDialog colors={colors} />
+          <RateAppSheet />
+          <ImagePreview />
+          <AnnouncementDialog />
+          <SessionExpired />
+          <PDFPreview />
+          <JumpToSectionDialog />
+        </>
+      )}
     </>
   );
 };

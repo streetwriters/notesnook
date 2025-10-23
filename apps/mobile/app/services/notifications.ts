@@ -580,7 +580,7 @@ function openSettingsDialog(context: string) {
       positivePress:
         Platform.OS === "ios"
           ? undefined
-          : () => {
+          : async () => {
               resolve(true);
             },
       onClose: () => {

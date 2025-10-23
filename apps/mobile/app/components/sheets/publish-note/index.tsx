@@ -29,6 +29,7 @@ import {
   View
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+//@ts-ignore
 import ToggleSwitch from "toggle-switch-react-native";
 import { db } from "../../../common/database";
 import { requestInAppReview } from "../../../services/app-review";
