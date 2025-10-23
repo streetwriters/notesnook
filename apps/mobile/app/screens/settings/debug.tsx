@@ -185,7 +185,7 @@ export default function DebugLogs() {
       paragraph: strings.clearLogsConfirmation(currentLog.key),
       negativeText: strings.cancel(),
       positiveText: strings.clear(),
-      positivePress: () => {
+      positivePress: async () => {
         const index = logs.findIndex((l) => (l.key = currentLog.key));
         logManager?.delete(currentLog.key);
         if (logs.length > 1) {
