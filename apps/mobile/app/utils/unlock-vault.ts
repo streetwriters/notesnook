@@ -27,18 +27,20 @@ let unlockPromise: Promise<any> | undefined = undefined;
 export async function unlockVault({
   context,
   title,
-  paragraph
+  paragraph,
+  requirePassword
 }: {
   context?: string;
   title: string;
   paragraph: string;
+  requirePassword?: boolean;
 }) {
   if (unlockPromise) {
     return unlockPromise;
   }
   unlockPromise = new Promise(async (resolve) => {
     const result = await (async () => {
-      if (db.vault.unlocked) return true;
+      if (db.vault.unlocked && !requirePassword) return true;
       const biometry = await BiometricService.isBiometryAvailable();
       const fingerprint = await BiometricService.hasInternetCredentials();
       if (biometry && fingerprint) {

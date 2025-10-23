@@ -33,6 +33,7 @@ import { useNotebookStore } from "../stores/use-notebook-store";
 import { useRelationStore } from "../stores/use-relation-store";
 import { useTagStore } from "../stores/use-tag-store";
 import { eUpdateNoteInEditor } from "./events";
+import { unlockVault } from "./unlock-vault";
 
 export function getObfuscatedEmail(email: string) {
   if (!email) return "";
@@ -56,7 +57,7 @@ function confirmDeleteAllNotes(
       title: strings.doActions.delete.notebook(items.length),
       positiveText: strings.delete(),
       negativeText: strings.cancel(),
-      positivePress: (_inputValue, value) => {
+      positivePress: async (_inputValue, value) => {
         setTimeout(() => {
           resolve({ delete: true, deleteNotes: value });
         });
@@ -98,6 +99,30 @@ export const deleteItems = async (
     await db.reminders.remove(...itemIds);
     useRelationStore.getState().update();
   } else if (type === "note") {
+    let someNotesLocked = false;
+
+    for (const id of itemIds) {
+      if (
+        await db.vaults.itemExists({
+          id: id,
+          type: "note"
+        })
+      ) {
+        someNotesLocked = true;
+        break;
+      }
+    }
+
+    if (someNotesLocked) {
+      const unlocked = await unlockVault({
+        title: strings.unlockVault(),
+        paragraph: strings.unlockVaultDesc(),
+        context: "global",
+        requirePassword: true
+      });
+      if (!unlocked) return;
+    }
+
     for (const id of itemIds) {
       if (db.monographs.isPublished(id)) {
         ToastManager.show({
@@ -108,6 +133,7 @@ export const deleteItems = async (
         });
         continue;
       }
+
       await db.notes.moveToTrash(id);
 
       eSendEvent(
@@ -157,7 +183,7 @@ export const deleteItems = async (
       heading: message,
       type: "success",
       func: async () => {
-        if ((await db.trash.restore(...deletedIds)) === false) return;
+        await db.trash.restore(...deletedIds);
         Navigation.queueRoutesForUpdate();
         useMenuStore.getState().setMenuPins();
         useMenuStore.getState().setColorNotes();
