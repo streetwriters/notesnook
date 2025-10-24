@@ -421,19 +421,19 @@ type BaseTreeNode<Type extends TreeNodeType> = {
   depth: number;
 };
 
-type Subgroup = BaseTreeNode<"group"> & {
+export type Subgroup = BaseTreeNode<"group"> & {
   collapsed?: boolean;
 };
 
-type Group = BaseTreeNode<"group">;
+export type Group = BaseTreeNode<"group">;
 
-type Item = BaseTreeNode<"item"> & {
+export type Item = BaseTreeNode<"item"> & {
   toolId: ToolId;
   icon: string;
   collapsed?: boolean;
 };
 
-type TreeNode = Group | Item | Subgroup;
+export type TreeNode = Group | Item | Subgroup;
 
 function flatten(tools: ToolbarGroupDefinition[], depth = 0): TreeNode[] {
   const nodes: TreeNode[] = [];
@@ -544,7 +544,11 @@ function canMoveGroup(
   return true;
 }
 
-function moveItem(items: TreeNode[], fromId: string, toId: string): TreeNode[] {
+export function moveItem(
+  items: TreeNode[],
+  fromId: string,
+  toId: string
+): TreeNode[] {
   const fromIndex = items.findIndex((i) => i.id === fromId);
   const toIndex = items.findIndex((i) => i.id === toId);
 
@@ -555,13 +559,14 @@ function moveItem(items: TreeNode[], fromId: string, toId: string): TreeNode[] {
 
   const movingToGroup = isGroup(toItem) || isSubgroup(toItem);
 
-  // we need to adjust the item depth according to where the item
-  // is going to be moved.
-  if (fromItem.depth !== toItem.depth) fromItem.depth = toItem.depth;
-
-  // if we are moving to the start of the group, we need to adjust the
-  // depth accordingly.
-  if (movingToGroup) fromItem.depth = toItem.depth + 1;
+  // calculate the correct depth based on where the item is being moved
+  if (movingToGroup) {
+    // if moving to a group/subgroup, set depth to group's depth + 1
+    fromItem.depth = toItem.depth + 1;
+  } else {
+    // if moving to another item, set depth to match the target item's depth
+    fromItem.depth = toItem.depth;
+  }
 
   const newArray = arrayMove(items, fromIndex, toIndex);
 
