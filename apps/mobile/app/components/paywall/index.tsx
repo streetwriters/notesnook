@@ -44,6 +44,7 @@ import Config from "react-native-config";
 import * as RNIap from "react-native-iap";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+//@ts-ignore
 import ToggleSwitch from "toggle-switch-react-native";
 import {
   ANDROID_POLICE_SVG,
