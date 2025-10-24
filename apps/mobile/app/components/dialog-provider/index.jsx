@@ -26,7 +26,6 @@ import { AppLockPassword } from "../dialogs/applock-password";
 import JumpToSectionDialog from "../dialogs/jump-to-section";
 import { LoadingDialog } from "../dialogs/loading";
 import PDFPreview from "../dialogs/pdf-preview";
-import ResultDialog from "../dialogs/result";
 import { VaultDialog } from "../dialogs/vault";
 import ImagePreview from "../image-preview";
 import MergeConflicts from "../merge-conflicts";
@@ -53,7 +52,6 @@ const DialogProvider = () => {
         <>
           <MergeConflicts />
           <RecoveryKeySheet colors={colors} />
-          <ResultDialog />
           <VaultDialog colors={colors} />
           <RateAppSheet />
           <ImagePreview />

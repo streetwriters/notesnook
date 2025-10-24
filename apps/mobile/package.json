@@ -149,11 +149,11 @@
     "zustand": "^4.5.5"
   },
   "devDependencies": {
-    "@babel/core": "^7.27.1",
-    "@babel/eslint-parser": "^7.16.5",
+    "@babel/core": "^7.28.5",
+    "@babel/eslint-parser": "^7.28.5",
     "@babel/plugin-transform-unicode-property-regex": "^7.27.1",
-    "@babel/preset-env": "^7.27.2",
-    "@babel/runtime": "^7.27.1",
+    "@babel/preset-env": "^7.28.5",
+    "@babel/runtime": "^7.28.4",
     "@callstack/repack-plugin-reanimated": "^5.2.1",
     "@react-native-community/cli": "20.0.0",
     "@react-native-community/cli-platform-android": "20.0.0",

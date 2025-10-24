@@ -22,8 +22,6 @@ mergedConfig.resolver = {
   sourceExts: ["jsx", "js", "ts", "tsx", "cjs", "json"],
   nodeModulesPaths,
   extraNodeModules: {
-    react: path.join(__dirname, "node_modules/react"),
-    "react-dom": path.join(__dirname, "node_modules/react-dom"),
     "@notesnook": path.join(__dirname, "../../packages"),
     "@notifee/react-native": path.join(
       __dirname,
@@ -73,21 +71,8 @@ mergedConfig.resolver = {
     }
 
     if (moduleName === "@streetwriters/kysely") {
-      // Resolve react package from mobile app's node_modules folder always.
-      return {
-        filePath: path.resolve(
-          path.join(
-            __dirname,
-            "node_modules",
-            "@streetwriters",
-            "kysely",
-            "dist",
-            "cjs",
-            "index.js"
-          )
-        ),
-        type: "sourceFile"
-      };
+      const result = require.resolve(moduleName); // gets CommonJS version
+      return context.resolveRequest(context, result, platform);
     }
     return context.resolveRequest(context, moduleName, platform);
   }

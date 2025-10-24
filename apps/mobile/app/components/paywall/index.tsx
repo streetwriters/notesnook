@@ -744,6 +744,7 @@ const ComparePlans = React.memo(
           {["Features", "Free", "Essential", "Pro", "Believer"].map(
             (plan, index) => (
               <View
+                key={plan}
                 style={{
                   width: index === 0 ? 150 : 120,
                   paddingHorizontal: 16,
@@ -763,7 +764,7 @@ const ComparePlans = React.memo(
         {getFeaturesTable().map((item, keyIndex) => {
           return (
             <View
-              key={keyIndex + "feature-item"}
+              key={`${item[0] + item[1]}`}
               style={{
                 flexDirection: "row",
                 alignItems: "center",
@@ -833,6 +834,7 @@ const ComparePlans = React.memo(
           {["features", "free", "essential", "pro", "believer"].map(
             (plan, index) => (
               <View
+                key={plan + "btn"}
                 style={{
                   width: index === 0 ? 150 : 120,
                   paddingHorizontal: 16,

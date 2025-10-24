@@ -50,18 +50,6 @@ module.exports = (env) => {
 
   return {
     mode,
-    cache: mode === "production" ? false : true,
-    experiments: {
-      parallelCodeSplitting: true,
-      cache: {
-        type: "persistent",
-        buildDependencies: [
-          __filename,
-          path.join(__dirname, "package-lock.json"),
-          path.join(__dirname, "scripts", "optimize-fonts.mjs")
-        ]
-      }
-    },
     /**
      * This should be always `false`, since the Source Map configuration is done
      * by `SourceMapDevToolPlugin`.
@@ -106,10 +94,8 @@ module.exports = (env) => {
         "html-to-text": path.join(__dirname, "node_modules/html-to-text"),
         leac: path.join(__dirname, "node_modules/leac"),
         parseley: path.join(__dirname, "node_modules/parseley"),
-        htmlparser2: path.join(__dirname, "node_modules/htmlparser2"),
         selderee: path.join(__dirname, "node_modules/selderee"),
         minimist: path.join(__dirname, "node_modules/minimist"),
-        entities: path.join(__dirname, "node_modules/entities"),
         deepmerge: path.join(__dirname, "node_modules/deepmerge"),
         "@selderee/plugin-htmlparser2": path.join(
           __dirname,

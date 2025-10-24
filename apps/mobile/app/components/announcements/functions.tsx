@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { Fragment } from "react";
 import { View } from "react-native";
 import { allowedPlatforms, BodyItem } from "../../stores/use-message-store";
-import { ProFeatures } from "../dialogs/result/pro-features";
+import { DefaultAppStyles } from "../../utils/styles";
 import { Body } from "./body";
 import { Cta } from "./cta";
 import { Description } from "./description";
@@ -28,7 +28,6 @@ import { List } from "./list";
 import { Photo } from "./photo";
 import { SubHeading } from "./subheading";
 import { Title } from "./title";
-import { DefaultAppStyles } from "../../utils/styles";
 
 export function allowedOnPlatform(platforms: string[]) {
   if (!platforms) return true;
@@ -62,9 +61,7 @@ const Features = () => {
         alignItems: "center",
         width: "100%"
       }}
-    >
-      <ProFeatures />
-    </View>
+    ></View>
   );
 };
 

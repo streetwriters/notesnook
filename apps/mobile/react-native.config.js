@@ -1,6 +1,6 @@
 const isGithubRelease = false;
 const config = {
-  // commands: require("@callstack/repack/commands/rspack")
+  commands: require("@callstack/repack/commands/rspack")
 };
 
 if (!config.dependencies) config.dependencies = {};
