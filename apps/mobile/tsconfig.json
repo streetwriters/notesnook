@@ -18,9 +18,7 @@
       ],
       "@notesnook/editor/dist/cjs/toolbar/icons": [
         "../../packages/editor/dist/cjs/toolbar/icons.js"
-      ],
-      "@types/react": ["./node_modules/@types/react"],
-      "react": ["./node_modules/react"]
+      ]
     }
   },
   "exclude": ["e2e", "android", "ios", "node_modules", "patches", "fonts"]
