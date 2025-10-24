@@ -82,6 +82,7 @@ import { editorState, openInternalLink } from "./utils";
 import AddReminder from "../../add-reminder";
 import { isFeatureAvailable, useAreFeaturesAvailable } from "@notesnook/common";
 import PaywallSheet from "../../../components/sheets/paywall";
+import useNavigationStore from "../../../stores/use-navigation-store";
 
 const publishNote = async () => {
   const user = useUserStore.getState().user;
@@ -274,7 +275,15 @@ export const useEditorEvents = (
 
   const onHardwareBackPress = useCallback(() => {
     if (fluidTabsRef.current?.page() === "editor") {
-      onBackPress();
+      if (
+        useNavigationStore.getState().currentRoute === "ManageTags" ||
+        useNavigationStore.getState().currentRoute === "LinkNotebooks" ||
+        useNavigationStore.getState().currentRoute === "AddReminder"
+      ) {
+        Navigation.goBack();
+      } else {
+        onBackPress();
+      }
       return true;
     }
   }, [onBackPress]);

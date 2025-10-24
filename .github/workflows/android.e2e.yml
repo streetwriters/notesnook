@@ -47,6 +47,11 @@ jobs:
       - name: Install Detox CLI
         run: npm install detox-cli --global
 
+      - name: Check for typescript errors
+        run: |
+          cd apps/mobile
+          npx tsc --noEmit
+
       - name: Detox build
         run: |
           yarn build:android

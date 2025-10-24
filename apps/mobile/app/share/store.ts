@@ -89,7 +89,6 @@ export const useShareStore = create<ShareStore>((set) => ({
     let appendNote = MMKV.getString(StorageKeys.appendNote);
     let selectedNotebooks = MMKV.getString(StorageKeys.selectedNotebooks);
     let selectedTags = MMKV.getString(StorageKeys.selectedTag);
-    appendNote = appendNote;
     set({
       appendNote: appendNote,
       selectedNotebooks: selectedNotebooks ? JSON.parse(selectedNotebooks) : [],

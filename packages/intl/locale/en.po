@@ -1580,6 +1580,10 @@ msgstr ""
 "\n"
 "**Only use this for troubleshooting purposes. If you are having persistent issues, it is recommended that you reach out to us via support@streetwriters.co so we can help you resolve it permanently.**"
 
+#: src/strings.ts:2606
+msgid "Click here to directly claim the promotion."
+msgstr "Click here to directly claim the promotion."
+
 #: src/strings.ts:239
 msgid "Click to deselect"
 msgstr "Click to deselect"

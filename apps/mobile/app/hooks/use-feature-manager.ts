@@ -69,36 +69,6 @@ export default function useFeatureManager() {
         db.settings.setDefaultTag(undefined);
       }
     }
-    const isAppLocked = useUserStore.getState().appLocked;
-    let unsub: () => void;
-
-    if (isAppLocked) {
-      unsub = useUserStore.subscribe((state) => {
-        if (!state.appLocked && !features?.appLock?.isAllowed) {
-          unsub();
-          SettingsService.setProperty("appLockEnabled", false);
-          setTimeout(() => {
-            presentDialog({
-              title: "App Lock Disabled",
-              paragraph: features?.appLock?.error,
-              positiveText: strings.upgrade(),
-              negativeText: strings.cancel(),
-              positivePress: async () => {
-                eSendEvent(eCloseSimpleDialog);
-                if (SettingsService.getProperty("serverUrls")) return;
-                Navigation.navigate("PayWall", {
-                  context: "logged-in"
-                });
-              }
-            });
-          }, 1000);
-        }
-      });
-    }
-
-    return () => {
-      unsub?.();
-    };
   }, [features, plan]);
 
   return true;

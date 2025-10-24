@@ -30,6 +30,7 @@ import { FeatureResult, useIsFeatureAvailable } from "@notesnook/common";
 //@ts-ignore
 import ToggleSwitch from "toggle-switch-react-native";
 import PaywallSheet from "../../components/sheets/paywall";
+import AppIcon from "../../components/ui/AppIcon";
 import { IconButton } from "../../components/ui/icon-button";
 import Input from "../../components/ui/input";
 import { Pressable } from "../../components/ui/pressable";
@@ -43,7 +44,6 @@ import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { components } from "./components";
 import { RouteParams, SettingSection } from "./types";
-import AppIcon from "../../components/ui/AppIcon";
 
 const _SectionItem = ({ item }: { item: SettingSection }) => {
   const { colors } = useThemeColors();

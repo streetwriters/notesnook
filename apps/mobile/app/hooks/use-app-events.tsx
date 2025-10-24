@@ -171,7 +171,7 @@ const onAppOpenedFromURL = async (event: { url: string }) => {
       eSendEvent(eOnLoadNote, { newNote: true });
       fluidTabsRef.current?.goToPage("editor", false);
       return;
-    } else if (url.startsWith("https://notesnook.com/open_note")) {
+    } else if (url.startsWith("https://app.notesnook.com/open_note")) {
       const id = new URL(url).searchParams.get("id");
       if (id) {
         const note = await db.notes.note(id);
@@ -182,13 +182,13 @@ const onAppOpenedFromURL = async (event: { url: string }) => {
           fluidTabsRef.current?.goToPage("editor", false);
         }
       }
-    } else if (url.startsWith("https://notesnook.com/open_reminder")) {
+    } else if (url.startsWith("https://app.notesnook.com/open_reminder")) {
       const id = new URL(url).searchParams.get("id");
       if (id) {
         const reminder = await db.reminders.reminder(id);
         if (reminder) AddReminder.present(reminder);
       }
-    } else if (url.startsWith("https://notesnook.com/new_reminder")) {
+    } else if (url.startsWith("https://app.notesnook.com/new_reminder")) {
       const reminderFeature = await isFeatureAvailable("activeReminders");
       if (!reminderFeature.isAllowed) {
         ToastManager.show({
@@ -780,13 +780,11 @@ export const useAppEvents = () => {
     if (!isAppLoading && !appLocked) {
       setTimeout(() => {
         sub = AppState.addEventListener("change", onAppStateChanged);
-        if (
-          refValues.current.initialUrl &&
-          !refValues.current.initialUrl?.includes("open_note")
-        ) {
+        if (refValues.current.initialUrl) {
           onAppOpenedFromURL({
             url: refValues.current.initialUrl!
           });
+          refValues.current.initialUrl = undefined;
         }
       }, 1000);
 

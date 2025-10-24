@@ -49,6 +49,7 @@ import { AppFontSize, defaultBorderRadius } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { getFormattedDate, useIsFeatureAvailable } from "@notesnook/common";
 import PaywallSheet from "../../components/sheets/paywall";
+import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 
 const ReminderModes =
   Platform.OS === "ios"
@@ -89,6 +90,7 @@ const ReminderNotificationModes = {
 
 export default function AddReminder(props: NavigationProps<"AddReminder">) {
   const { reminder, reference } = props.route.params;
+  useNavigationFocus(props.navigation, { focusOnInit: true });
   const { colors, isDark } = useThemeColors();
   const [reminderMode, setReminderMode] = useState<Reminder["mode"]>(
     reminder?.mode || "once"

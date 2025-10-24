@@ -77,26 +77,19 @@ function StatusBar({
     fontSize: 12,
     color: "var(--nn_secondary_paragraph)",
     paddingBottom: 0,
+    fontFamily: "Inter",
     userSelect: "none"
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        height: "25px",
-        alignItems: "center"
+    <p
+      onMouseDown={(e) => {
+        setShowChars(!showChars);
       }}
+      style={paragraphStyle}
     >
-      <p
-        onMouseDown={(e) => {
-          setShowChars(!showChars);
-        }}
-        style={paragraphStyle}
-      >
-        {showChars ? strings.charactersCount(chars) : words}
-      </p>
-    </div>
+      {showChars ? strings.charactersCount(chars) : words}
+    </p>
   );
 }
 
