@@ -466,22 +466,24 @@ export function Main() {
           disabled={isClipping}
           onClick={async () => {
             if (
-              clipperState === ClipperState.Idle ||
-              clipperState === ClipperState.Error
+              clipMode !== "bookmark" &&
+              (clipperState === ClipperState.Idle ||
+                clipperState === ClipperState.Error)
             ) {
               await startClip();
               return;
             }
 
-            const isBookmark = clipMode === "bookmark";
-            const data = isBookmark
-              ? {
-                  data: `<a href="${url}">${title}</a>`
-                }
-              : clipData;
+            if (!title || !clipArea || !clipMode || !url) return;
 
-            if (!data || !clipData || !title || !clipArea || !clipMode || !url)
-              return;
+            const data =
+              clipMode === "bookmark"
+                ? {
+                    data: createBookmark(url, title)
+                  }
+                : clipData;
+
+            if (!data) return;
 
             const notesnook = await connectApi(false);
             if (!notesnook) {
@@ -588,4 +590,12 @@ export async function clip(
     area,
     settings
   });
+}
+
+function createBookmark(url: string, title: string) {
+  const a = document.createElement("a");
+  a.setAttribute("href", url);
+  a.setAttribute("title", title);
+  a.innerText = title;
+  return a.outerHTML;
 }
