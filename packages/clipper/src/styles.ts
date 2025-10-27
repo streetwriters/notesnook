@@ -103,7 +103,7 @@ export async function addStylesToHead(
       const result = await downloadStylesheet(href, options);
       if (!result) continue;
       const cssStylesheet = new CSSStyleSheet();
-      cssStylesheet.replace(result.innerHTML);
+      await cssStylesheet.replace(result.innerHTML);
       await inlineBackgroundImages(cssStylesheet, options);
       const toAppend = rulesToStyleNode(cssStylesheet.cssRules);
       head.appendChild(toAppend);
