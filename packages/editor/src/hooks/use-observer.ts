@@ -49,8 +49,7 @@ export function useObserver<T extends Element = Element>({
 
     const options = {
       root: ref.current.closest(".ms-container"),
-      rootMargin: rootMargin,
-      threshold: threshold
+      rootMargin: rootMargin
     };
 
     observer.current = new IntersectionObserver((entries) => {

@@ -26,10 +26,7 @@ import { DesktopOnly } from "../../components/responsive/index.js";
 import { Icon } from "@notesnook/ui";
 import { Icons } from "../../toolbar/icons.js";
 import { ToolbarGroup } from "../../toolbar/components/toolbar-group.js";
-import {
-  useIsMobile,
-  useToolbarStore
-} from "../../toolbar/stores/toolbar-store.js";
+import { useToolbarStore } from "../../toolbar/stores/toolbar-store.js";
 import { Resizer } from "../../components/resizer/index.js";
 import {
   corsify,
@@ -121,7 +118,7 @@ export function ImageComponent(
           enabled={editor.isEditable}
           selected={selected}
           width={size.width}
-          height={size.height}
+          height={bloburl || src ? undefined : size.height}
           onResize={(width, height) => {
             setResizing({ width, height });
           }}
