@@ -112,8 +112,8 @@ export class WebExtensionServer implements Server {
     content +=
       clip.mode === "bookmark"
         ? h("div", [
-            h("hr"),
-            h("p", [`Date bookmarked: ${getFormattedDate(Date.now())}`])
+            h("p", [`Date bookmarked: ${getFormattedDate(Date.now())}`]),
+            h("hr")
           ]).innerHTML
         : h("div", [
             h("hr"),
