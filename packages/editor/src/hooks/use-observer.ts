@@ -45,21 +45,18 @@ export function useObserver<T extends Element = Element>({
   );
 
   useEffect(() => {
+    if (!ref.current) return;
+
     const options = {
-      root: null,
-      rootMargin: rootMargin,
-      threshold: threshold
+      root: ref.current.closest(".ms-container"),
+      rootMargin: rootMargin
     };
 
     observer.current = new IntersectionObserver((entries) => {
       updateInView(entries[0].isIntersecting);
     }, options);
-  });
 
-  useEffect(() => {
-    if (ref.current) {
-      observer?.current?.observe(ref.current);
-    }
+    observer.current.observe(ref.current);
 
     const reference = ref.current;
 
@@ -69,7 +66,7 @@ export function useObserver<T extends Element = Element>({
         observer.current?.disconnect();
       }
     };
-  });
+  }, [rootMargin, threshold, updateInView]);
 
   return { inView, ref };
 }
