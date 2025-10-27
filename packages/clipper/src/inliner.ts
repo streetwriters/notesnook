@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { FetchOptions, fetchResource } from "./fetch.js";
+import { constructUrl, FetchOptions, fetchResource } from "./fetch.js";
 import { isDataUrl, resolveUrl, escape } from "./utils.js";
 
 const URL_REGEX = /url\(['"]?([^'"]+?)['"]?\)/g;
@@ -40,32 +40,37 @@ async function inline(
   string: string,
   url: string,
   options?: FetchOptions,
-  baseUrl?: string
+  baseUrl?: string,
+  onlyResolve?: boolean
 ) {
-  url = baseUrl ? resolveUrl(url, baseUrl) : url;
-  const dataUrl = await fetchResource(url, options);
-  // const dataUrl = dataAsUrl(data, mimeType(url));
-  return string.replace(urlAsRegex(url), "$1" + dataUrl + "$3");
-}
-
-function urlAsRegex(urlValue: string) {
-  return new RegExp("(url\\(['\"]?)(" + escape(urlValue) + ")(['\"]?\\))", "g");
+  const resolvedUrl = baseUrl ? resolveUrl(url, baseUrl) : url;
+  const dataUrl = onlyResolve
+    ? constructUrl(resolvedUrl, options)
+    : await fetchResource(resolvedUrl, options).catch(() =>
+        constructUrl(resolvedUrl, options)
+      );
+  return string.replace(url, dataUrl || resolvedUrl);
 }
 
 async function inlineAll(
   string: string,
   options?: FetchOptions,
-  baseUrl?: string
+  baseUrl?: string,
+  onlyResolve?: boolean
 ) {
   if (!shouldProcess(string)) return string;
 
   const urls = readUrls(string);
 
-  let prefix = string;
   for (const url of urls) {
-    prefix = await inline(prefix, url, options, baseUrl);
+    string = await inline(string, url, options, baseUrl, onlyResolve).catch(
+      (e) => {
+        console.error(e);
+        return string;
+      }
+    );
   }
-  return prefix;
+  return string;
 }
 
 export { shouldProcess, inlineAll, readUrls };
