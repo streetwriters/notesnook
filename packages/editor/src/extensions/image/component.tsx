@@ -57,7 +57,6 @@ export function ImageComponent(
   } | null>(null);
   const controllerRef = useRef(new AbortController());
 
-  const isMobile = useIsMobile();
   const { inView, ref: imageRef } = useObserver<HTMLImageElement>({
     threshold: 0.2,
     once: true
