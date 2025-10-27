@@ -26,6 +26,7 @@ import { Heading as TiptapHeading } from "@tiptap/extension-heading";
 import { isClickWithinBounds } from "../../utils/prosemirror.js";
 import { Selection, Transaction } from "@tiptap/pm/state";
 import { Node } from "@tiptap/pm/model";
+import { Plugin, PluginKey } from "@tiptap/pm/state";
 import { useToolbarStore } from "../../toolbar/stores/toolbar-store.js";
 
 const COLLAPSIBLE_BLOCK_TYPES = [
@@ -72,13 +73,14 @@ export const Heading = TiptapHeading.extend({
             return false;
           }
 
-          const { textAlign, textDirection } =
+          const { textAlign, textDirection, collapsed } =
             state.selection.$from.parent.attrs;
 
           return commands.setNode(this.name, {
             ...attributes,
             textAlign,
-            textDirection
+            textDirection,
+            collapsed
           });
         }
     };
@@ -151,10 +153,10 @@ export const Heading = TiptapHeading.extend({
         find: HEADING_REGEX,
         type: this.type,
         getAttributes: (match) => {
-          const { textAlign, textDirection } =
+          const { textAlign, textDirection, collapsed } =
             this.editor.state.selection.$from.parent?.attrs || {};
           const level = match[1].length;
-          return { level, textAlign, textDirection };
+          return { level, textAlign, textDirection, collapsed };
         }
       })
     ];
@@ -252,6 +254,53 @@ export const Heading = TiptapHeading.extend({
         }
       };
     };
+  },
+
+  addProseMirrorPlugins() {
+    return [headingUpdatePlugin];
+  }
+});
+
+const headingUpdatePlugin = new Plugin({
+  key: new PluginKey("headingUpdate"),
+  appendTransaction(transactions, oldState, newState) {
+    const tr = newState.tr;
+    let modified = false;
+
+    transactions.forEach((transaction) => {
+      if (!transaction.docChanged) return;
+
+      const oldDoc = oldState.doc;
+      const newDoc = newState.doc;
+
+      newDoc.descendants((newNode, pos) => {
+        if (newNode.type.name === "heading") {
+          const oldNode = oldDoc.nodeAt(pos);
+          if (
+            oldNode &&
+            oldNode.type.name === "heading" &&
+            oldNode.attrs.level !== newNode.attrs.level
+          ) {
+            // Update all nodes with hiddenUnder reference to new heading
+            newDoc.descendants((node, nodePos) => {
+              if (
+                COLLAPSIBLE_BLOCK_TYPES.includes(node.type.name) &&
+                node.attrs.hiddenUnder === oldNode.attrs.blockId
+              ) {
+                tr.setNodeAttribute(
+                  nodePos,
+                  "hiddenUnder",
+                  newNode.attrs.blockId
+                );
+                modified = true;
+              }
+            });
+          }
+        }
+      });
+    });
+
+    return modified ? tr : null;
   }
 });
 
