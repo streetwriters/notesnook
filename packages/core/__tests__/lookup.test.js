@@ -139,3 +139,18 @@ test("search reminders", () =>
     const descriptionSearch = await db.lookup.reminders("please do").ids();
     expect(descriptionSearch).toHaveLength(1);
   }));
+
+describe("notesWithHighlighting", () => {
+  test.only("search notes with parentheses in query should load the item", () =>
+    noteTest({
+      title: "(with parantheses)"
+    }).then(async ({ db }) => {
+      await db.notes.add(TEST_NOTE);
+      const filtered = await db.lookup.notesWithHighlighting(
+        "(with parantheses)",
+        db.notes.all
+      );
+      const item = await filtered.item(0);
+      expect(item.item).toBeDefined();
+    }));
+});
