@@ -219,6 +219,7 @@ function TableRowToolbar(props: TableToolbarProps) {
 function TableColumnToolbar(props: TableToolbarProps) {
   const { editor, table } = props;
   const columnToolsRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     function onSelectionUpdate() {
@@ -245,8 +246,9 @@ function TableColumnToolbar(props: TableToolbarProps) {
         yOffset: 2
       });
 
-      const scrollLeft =
-        table.current?.closest(".simplebar-content-wrapper")?.scrollLeft || 0;
+      const scrollLeft = isMobile
+        ? table.current.parentElement?.parentElement?.scrollLeft || 0
+        : table.current?.closest(".simplebar-content-wrapper")?.scrollLeft || 0;
 
       columnToolsRef.current.style.left = `${pos.left - scrollLeft}px`;
       columnToolsRef.current.style.top = `${pos.top}px`;
@@ -256,7 +258,7 @@ function TableColumnToolbar(props: TableToolbarProps) {
     return () => {
       editor.off("selectionUpdate", onSelectionUpdate);
     };
-  }, []);
+  }, [isMobile]);
 
   return (
     <Flex
