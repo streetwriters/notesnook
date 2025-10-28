@@ -52,17 +52,6 @@ locale.then(({ default: locale }) => {
 });
 setI18nGlobal(i18n);
 
-if (app.runningUnderARM64Translation) {
-  console.log("App is running under ARM64 translation");
-  dialog.showMessageBoxSync({
-    message:
-      "Notesnook detected that it is running under ARM64 translation. For the best performance, please download the ARM64 build of Notesnook from our website.",
-    type: "warning",
-    buttons: ["Okay"],
-    title: "Degraded Performance Warning"
-  });
-}
-
 // only run a single instance
 if (!MAC_APP_STORE && !app.requestSingleInstanceLock()) {
   console.log("Another instance is already running!");
@@ -192,6 +181,17 @@ async function createWindow() {
 
 app.once("ready", async () => {
   console.info("App ready. Opening window.");
+
+  if (app.runningUnderARM64Translation) {
+    console.log("App is running under ARM64 translation");
+    dialog.showMessageBoxSync({
+      message:
+        "Notesnook detected that it is running under ARM64 translation. For the best performance, please download the ARM64 build of Notesnook from our website.",
+      type: "warning",
+      buttons: ["Okay"],
+      title: "Degraded Performance Warning"
+    });
+  }
 
   if (config.customDns) enableCustomDns();
   else disableCustomDns();
