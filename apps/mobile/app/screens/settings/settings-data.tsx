@@ -82,15 +82,22 @@ export const settingsGroups: SettingSection[] = [
       {
         id: "subscription-status",
         useHook: () => useUserStore((state) => state.user),
-        hidden: (current) =>
-          !current ||
-          (current as User).subscription?.plan === SubscriptionPlan.FREE,
+        hidden: (current) => {
+          const user = current as User;
+          return (
+            !user ||
+            !user.subscription ||
+            user.subscription.provider === undefined ||
+            !strings.subscriptionProviderInfo[user?.subscription?.provider] ||
+            user.subscription?.plan === SubscriptionPlan.FREE
+          );
+        },
         name: (current) => {
           const user = (current as User) || useUserStore.getState().user;
           return (
             strings.subscriptionProviderInfo[
               user?.subscription?.provider
-            ].title() || "Unknown provider"
+            ]?.title() || `Unknown provider id: ${user?.subscription?.provider}`
           );
         },
         icon: "credit-card",
@@ -99,6 +106,8 @@ export const settingsGroups: SettingSection[] = [
           if (!user) return;
           const subscriptionProviderInfo =
             strings.subscriptionProviderInfo[user?.subscription?.provider];
+
+          if (!subscriptionProviderInfo) return;
 
           const isCurrentPlatform =
             (user.subscription?.provider === SubscriptionProvider.APPLE &&
