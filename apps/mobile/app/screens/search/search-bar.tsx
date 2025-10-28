@@ -108,6 +108,7 @@ export const SearchBar = ({
             name="close"
             size={AppFontSize.xxl}
             top={10}
+            testID="clear-search"
             bottom={10}
             onPress={() => {
               inputRef.current?.clear();
