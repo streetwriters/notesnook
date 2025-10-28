@@ -154,6 +154,7 @@ export const OutlineListItem = Node.create<ListItemOptions>({
         const resolvedPos = editor.state.doc.resolve(pos);
         if (isClickWithinBounds(e, resolvedPos, "left")) {
           e.preventDefault();
+          e.stopImmediatePropagation();
           editor.commands.command(({ tr }) => {
             tr.setNodeAttribute(
               pos,
