@@ -165,6 +165,7 @@ export const useEditorEvents = (
     state.timeFormat
   ]);
   const handleBack = useRef<NativeEventSubscription>();
+  const loggedIn = useUserStore((state) => !!state.user);
   const { fontScale } = useWindowDimensions();
 
   const doubleSpacedLines = useSettingStore(
@@ -224,7 +225,8 @@ export const useEditorEvents = (
       timeFormat: db.settings?.getTimeFormat(),
       fontScale,
       markdownShortcuts,
-      features
+      features,
+      loggedIn
     });
   }, [
     fullscreen,
@@ -242,7 +244,8 @@ export const useEditorEvents = (
     timeFormat,
     loading,
     fontScale,
-    markdownShortcuts
+    markdownShortcuts,
+    loggedIn
   ]);
 
   const onBackPress = useCallback(async () => {
@@ -556,9 +559,17 @@ export const useEditorEvents = (
           if (editor.state.current?.isFocused) {
             editor.state.current.isFocused = true;
           }
-          PaywallSheet.present(
-            await isFeatureAvailable(editorMessage.value.feature)
-          );
+          if (editorMessage.value.feature === "insertAttachment") {
+            ToastManager.show({
+              type: "info",
+              message: strings.loginRequired()
+            });
+          } else {
+            PaywallSheet.present(
+              await isFeatureAvailable(editorMessage.value.feature)
+            );
+          }
+
           break;
         case EditorEvents.monograph:
           publishNote();

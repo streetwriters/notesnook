@@ -53,6 +53,7 @@ export type Settings = {
   fontScale: number;
   markdownShortcuts: boolean;
   features: Record<any, any>;
+  loggedIn: boolean;
 };
 
 /* eslint-disable no-var */

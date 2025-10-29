@@ -113,7 +113,8 @@ const Tiptap = ({
     claims: {
       callout: !!settings.features?.callout?.isAllowed,
       outlineList: !!settings.features?.outlineList?.isAllowed,
-      taskList: !!settings.features?.taskList?.isAllowed
+      taskList: !!settings.features?.taskList?.isAllowed,
+      insertAttachment: settings.loggedIn
     },
     onPermissionDenied: (claim) => {
       post(
