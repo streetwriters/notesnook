@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Box, Flex, Embed } from "@theme-ui/components";
-import { useRef, useState } from "react";
+import { Box, Flex } from "@theme-ui/components";
+import { useState } from "react";
 import { EmbedAlignmentOptions, EmbedAttributes } from "./embed.js";
 import { ReactNodeViewProps } from "../react/index.js";
 import { DesktopOnly } from "../../components/responsive/index.js";
@@ -26,14 +26,15 @@ import { ToolbarGroup } from "../../toolbar/components/toolbar-group.js";
 import { Icons } from "../../toolbar/index.js";
 import { Icon } from "@notesnook/ui";
 import { Resizer } from "../../components/resizer/index.js";
+import { useThemeEngineStore } from "@notesnook/theme";
 
 export function EmbedComponent(
   props: ReactNodeViewProps<EmbedAttributes & EmbedAlignmentOptions>
 ) {
   const { editor, updateAttributes, selected, node } = props;
   const [isLoading, setIsLoading] = useState(true);
-  const embedRef = useRef<HTMLIFrameElement>(null);
-  const { src, width, textDirection } = node.attrs;
+  const { src, width, height, textDirection } = node.attrs;
+  const theme = useThemeEngineStore((store) => store.theme);
 
   let align = node.attrs.align;
   if (!align) align = textDirection ? "right" : "left";
@@ -43,7 +44,13 @@ export function EmbedComponent(
       sx={{
         justifyContent:
           align === "center" ? "center" : align === "left" ? "start" : "end",
-        position: "relative"
+        position: "relative",
+        "& iframe": {
+          border: selected
+            ? "2px solid var(--accent)"
+            : "2px solid transparent",
+          borderRadius: "default"
+        }
       }}
     >
       <Resizer
@@ -51,6 +58,8 @@ export function EmbedComponent(
         enabled={editor.isEditable}
         selected={selected}
         width={width}
+        height={height}
+        lockAspectRation={false}
         onResize={(width, height) => {
           updateAttributes(
             {
@@ -113,21 +122,16 @@ export function EmbedComponent(
             )}
           </DesktopOnly>
         </Box>
-        <Embed
-          ref={embedRef}
-          src={src}
+        <iframe
+          {...(isTwitterX(src)
+            ? {
+                srcDoc: tweetToEmbed(src, theme.colorScheme === "dark")
+              }
+            : { src })}
           width={"100%"}
           height={"100%"}
           sandbox={getSandboxFeatures(src)}
-          sx={{
-            bg: "var(--background-secondary)",
-            border: selected
-              ? "2px solid var(--accent)"
-              : "2px solid transparent",
-            borderRadius: "default"
-          }}
           onLoad={() => setIsLoading(false)}
-          {...props}
         />
         {isLoading && (
           <Flex
@@ -167,4 +171,25 @@ function getSandboxFeatures(src: string) {
     // ignore
   }
   return features.join(" ");
+}
+
+function isTwitterX(src: string) {
+  try {
+    const url = new URL(src);
+    return (
+      url.hostname === "twitter.com" ||
+      url.hostname === "x.com" ||
+      url.hostname.endsWith(".twitter.com") ||
+      url.hostname.endsWith(".x.com")
+    );
+  } catch {
+    return false;
+  }
+}
+
+function tweetToEmbed(src: string, isDarkTheme: boolean) {
+  src = src.replaceAll("x.com", "twitter.com");
+  return `<blockquote class="twitter-tweet" data-dnt="true" ${
+    isDarkTheme ? 'data-theme="dark"' : ""
+  }><p lang="en" dir="ltr"><a href="${src}?ref_src=twsrc%5Etfw"></a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> `;
 }
