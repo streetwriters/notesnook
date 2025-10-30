@@ -30,7 +30,8 @@ export type PermissionHandlerOptions = {
 const ClaimsMap = {
   callout: ["setCallout"] as (keyof UnionCommands)[],
   outlineList: ["toggleOutlineList"] as (keyof UnionCommands)[],
-  taskList: ["toggleTaskList"] as (keyof UnionCommands)[]
+  taskList: ["toggleTaskList"] as (keyof UnionCommands)[],
+  insertAttachment: ["insertAttachment"] as (keyof UnionCommands)[]
 };
 
 export function usePermissionHandler(options: PermissionHandlerOptions) {

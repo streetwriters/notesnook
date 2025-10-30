@@ -34,7 +34,8 @@ const initialState = {
   fontFamily: "sans-serif",
   fontSize: 16,
   timeFormat: "12-hour",
-  dateFormat: "DD-MM-YYYY"
+  dateFormat: "DD-MM-YYYY",
+  loggedIn: false
 };
 
 global.settingsController = {

@@ -89,14 +89,14 @@ export const Heading = TiptapHeading.extend({
       {
         types: COLLAPSIBLE_BLOCK_TYPES,
         attributes: {
-          hiddenUnder: {
-            default: null,
+          hidden: {
+            default: false,
             keepOnSplit: false,
-            parseHTML: (element) => element.dataset.hiddenUnder || null,
+            parseHTML: (element) => element.dataset.hidden === "true",
             renderHTML: (attributes) => {
-              if (!attributes.hiddenUnder) return {};
+              if (!attributes.hidden) return {};
               return {
-                "data-hidden-under": attributes.hiddenUnder
+                "data-hidden": attributes.hidden === true
               };
             }
           }
@@ -200,16 +200,9 @@ export const Heading = TiptapHeading.extend({
             if (currentNode && currentNode.type.name === "heading") {
               const shouldCollapse = !currentNode.attrs.collapsed;
               const headingLevel = currentNode.attrs.level;
-              const headingId = currentNode.attrs.blockId;
 
               tr.setNodeAttribute(pos, "collapsed", shouldCollapse);
-              toggleNodesUnderHeading(
-                tr,
-                pos,
-                headingLevel,
-                shouldCollapse,
-                headingId
-              );
+              toggleNodesUnderHeading(tr, pos, headingLevel, shouldCollapse);
             }
             return true;
           });
@@ -234,9 +227,9 @@ export const Heading = TiptapHeading.extend({
           if (updatedNode.attrs.collapsed) heading.dataset.collapsed = "true";
           else delete heading.dataset.collapsed;
 
-          if (updatedNode.attrs.hiddenUnder)
-            heading.dataset.hiddenUnder = updatedNode.attrs.hiddenUnder;
-          else delete heading.dataset.hiddenUnder;
+          if (updatedNode.attrs.hidden)
+            heading.dataset.hidden = updatedNode.attrs.hidden;
+          else delete heading.dataset.hidden;
 
           if (updatedNode.attrs.textAlign)
             heading.style.textAlign =
@@ -259,8 +252,7 @@ function toggleNodesUnderHeading(
   tr: Transaction,
   headingPos: number,
   headingLevel: number,
-  isCollapsing: boolean,
-  headingId: string
+  isCollapsing: boolean
 ) {
   const { doc } = tr;
   const headingNode = doc.nodeAt(headingPos);
@@ -269,6 +261,8 @@ function toggleNodesUnderHeading(
   let nextPos = headingPos + headingNode.nodeSize;
   const cursorPos = tr.selection.from;
   let shouldMoveCursor = false;
+  let insideCollapsedHeading = false;
+  let nestedHeadingLevel: number | null = null;
 
   while (nextPos < doc.content.size) {
     const nextNode = doc.nodeAt(nextPos);
@@ -289,15 +283,33 @@ function toggleNodesUnderHeading(
       shouldMoveCursor = true;
     }
 
+    const currentPos = nextPos;
+    nextPos += nextNode.nodeSize;
+
     if (COLLAPSIBLE_BLOCK_TYPES.includes(nextNode.type.name)) {
-      if (isCollapsing && typeof nextNode.attrs.hiddenUnder !== "string") {
-        tr.setNodeAttribute(nextPos, "hiddenUnder", headingId);
-      } else if (!isCollapsing && nextNode.attrs.hiddenUnder === headingId) {
-        tr.setNodeAttribute(nextPos, "hiddenUnder", null);
+      if (isCollapsing) {
+        tr.setNodeAttribute(currentPos, "hidden", true);
+      } else {
+        if (insideCollapsedHeading) {
+          if (
+            nextNode.type.name === "heading" &&
+            nestedHeadingLevel !== null &&
+            nextNode.attrs.level <= nestedHeadingLevel
+          ) {
+            insideCollapsedHeading = false;
+            nestedHeadingLevel = null;
+          } else {
+            continue;
+          }
+        }
+
+        tr.setNodeAttribute(currentPos, "hidden", false);
+        if (nextNode.type.name === "heading" && nextNode.attrs.collapsed) {
+          insideCollapsedHeading = true;
+          nestedHeadingLevel = nextNode.attrs.level;
+        }
       }
     }
-
-    nextPos += nextNode.nodeSize;
   }
 
   if (shouldMoveCursor) {

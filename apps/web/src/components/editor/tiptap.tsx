@@ -51,6 +51,7 @@ import {
 import { IEditor, MAX_AUTO_SAVEABLE_WORDS } from "./types";
 import { useEditorConfig, useToolbarConfig, useEditorManager } from "./manager";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
+import { useStore as useUserStore } from "../../stores/user-store";
 import { debounce, useAreFeaturesAvailable } from "@notesnook/common";
 import { ScopedThemeProvider } from "../theme-provider";
 import { useStore as useThemeStore } from "../../stores/theme-store";
@@ -65,6 +66,8 @@ import { EDITOR_ZOOM } from "./common";
 import { ScrollContainer } from "@notesnook/ui";
 import { showFeatureNotAllowedToast } from "../../common/toasts";
 import { UpgradeDialog } from "../../dialogs/buy-dialog/upgrade-dialog";
+import { ConfirmDialog } from "../../dialogs/confirm";
+import { strings } from "@notesnook/intl";
 
 export type OnChangeHandler = (
   content: () => string,
@@ -185,7 +188,6 @@ function TipTap(props: TipTapProps) {
 
   const autoSave = useRef(true);
   const { toolbarConfig } = useToolbarConfig();
-
   const features = useAreFeaturesAvailable([
     "callout",
     "outlineList",
@@ -196,9 +198,19 @@ function TipTap(props: TipTapProps) {
     claims: {
       callout: !!features?.callout?.isAllowed,
       outlineList: !!features?.outlineList?.isAllowed,
-      taskList: !!features?.taskList?.isAllowed
+      taskList: !!features?.taskList?.isAllowed,
+      insertAttachment: !!useUserStore.getState().isLoggedIn
     },
     onPermissionDenied: (claim, silent) => {
+      if (claim === "insertAttachment") {
+        ConfirmDialog.show({
+          title: strings.notLoggedIn(),
+          message: strings.loginToUploadAttachments(),
+          positiveButtonText: strings.okay()
+        });
+        return;
+      }
+
       if (silent) {
         console.log(features, features?.[claim]);
         if (features?.[claim]) showFeatureNotAllowedToast(features[claim]);

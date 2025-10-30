@@ -3699,6 +3699,10 @@ msgstr "Login successful"
 msgid "Login to encrypt and sync notes"
 msgstr "Login to encrypt and sync notes"
 
+#: src/strings.ts:2608
+msgid "Login to upload attachments. [Read more](https://help.notesnook.com/faqs/login-to-upload-attachments)"
+msgstr "Login to upload attachments. [Read more](https://help.notesnook.com/faqs/login-to-upload-attachments)"
+
 #: src/strings.ts:541
 msgid "Login to your account"
 msgstr "Login to your account"

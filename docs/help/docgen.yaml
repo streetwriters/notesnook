@@ -84,3 +84,4 @@ navigation:
     children:
       - path: faqs/what-are-merge-conflicts.md
       - path: faqs/is-there-an-eta.md
+      - paht: faqs/login-to-upload-attachments.md
