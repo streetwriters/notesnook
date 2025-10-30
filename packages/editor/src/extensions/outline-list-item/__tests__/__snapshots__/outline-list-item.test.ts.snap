@@ -128,3 +128,5 @@ exports[`outline list item > code block in outline list item 1`] = `
   "type": "doc",
 }
 `;
+
+exports[`outline list item > inline image as first child in the old outline list item 1`] = `"<ul data-type="outlineList"><li data-type="outlineListItem"><p data-spacing="double">item 1</p></li><li data-type="outlineListItem"><p data-spacing="double"></p><img src="image.png" data-aspect-ratio="1"></li></ul>"`;

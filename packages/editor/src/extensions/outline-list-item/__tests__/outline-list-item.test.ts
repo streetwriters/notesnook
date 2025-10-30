@@ -28,6 +28,8 @@ import { test, expect, describe, beforeAll, vi } from "vitest";
 import { OutlineList } from "../../outline-list/outline-list.js";
 import { OutlineListItem } from "../outline-list-item.js";
 import { CodeBlock } from "../../code-block/code-block.js";
+import { Paragraph } from "../../paragraph/paragraph.js";
+import { ImageNode } from "../../image/image.js";
 
 describe("outline list item", () => {
   beforeAll(() => {
@@ -69,5 +71,31 @@ describe("outline list item", () => {
     });
 
     expect(editor.getJSON()).toMatchSnapshot();
+  });
+
+  /**
+   * Two changes happened:
+   * 1. Images were converted from inline nodes to block nodes (https://github.com/streetwriters/notesnook/pull/8563)
+   * 2. Outline list item's `content` schema was changed from `paragraph + list?`  to `block+` to `paragraph block*` (https://github.com/streetwriters/notesnook/pull/8772 and https://github.com/streetwriters/notesnook/commit/0b943d8ecdf04fd7d996fd0a4b1d62ec9569f071)
+   *
+   * In the old editor, it was possible to have an inline image as the first item in the outline list item, but based on the new schema it is not possible anymore. So the editor should insert an empty paragraph before the image.
+   */
+  test("inline image as first child in the old outline list item", async () => {
+    const el = outlineList(
+      outlineListItem(["item 1"]),
+      outlineListItem([h("img", [], { src: "image.png" })])
+    );
+
+    const { editor } = createEditor({
+      initialContent: el.outerHTML,
+      extensions: {
+        outlineList: OutlineList,
+        outlineListItem: OutlineListItem,
+        paragraph: Paragraph,
+        image: ImageNode
+      }
+    });
+
+    expect(editor.getHTML()).toMatchSnapshot();
   });
 });
