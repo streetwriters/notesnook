@@ -125,10 +125,10 @@ export class MathView implements NodeView, ICursorPosObserver {
     if (options.className) this.dom.classList.add(options.className);
     this.dom.classList.add("math-node");
 
-    if (node.attrs.hiddenUnder) {
-      this.dom.dataset.hiddenUnder = node.attrs.hiddenUnder;
+    if (node.attrs.hidden) {
+      this.dom.dataset.hidden = node.attrs.hidden;
     } else {
-      delete this.dom.dataset.hiddenUnder;
+      delete this.dom.dataset.hidden;
     }
 
     this._mathRenderElt = document.createElement("span");
