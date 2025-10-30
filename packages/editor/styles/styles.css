@@ -978,7 +978,7 @@ del.diffdel {
   display: none;
 }
 
-[data-hidden-under] {
+[data-hidden="true"] {
   display: none !important;
 }
 
