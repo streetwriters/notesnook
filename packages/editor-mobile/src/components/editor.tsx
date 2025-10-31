@@ -582,7 +582,8 @@ const Tiptap = ({
                   alignItems: "center",
                   padding: "0px 16px",
                   paddingBottom: "3px",
-                  boxSizing: "border-box"
+                  boxSizing: "border-box",
+                  minHeight: "28px"
                 }}
               >
                 <StatusBar
