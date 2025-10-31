@@ -24,7 +24,7 @@ import {
 } from "@tiptap/core";
 import { Heading as TiptapHeading } from "@tiptap/extension-heading";
 import { isClickWithinBounds } from "../../utils/prosemirror.js";
-import { Selection, Transaction } from "@tiptap/pm/state";
+import { Plugin, PluginKey, Selection, Transaction } from "@tiptap/pm/state";
 import { Node } from "@tiptap/pm/model";
 import { useToolbarStore } from "../../toolbar/stores/toolbar-store.js";
 
@@ -72,13 +72,14 @@ export const Heading = TiptapHeading.extend({
             return false;
           }
 
-          const { textAlign, textDirection } =
+          const { textAlign, textDirection, collapsed } =
             state.selection.$from.parent.attrs;
 
           return commands.setNode(this.name, {
             ...attributes,
             textAlign,
-            textDirection
+            textDirection,
+            collapsed
           });
         }
     };
@@ -151,13 +152,17 @@ export const Heading = TiptapHeading.extend({
         find: HEADING_REGEX,
         type: this.type,
         getAttributes: (match) => {
-          const { textAlign, textDirection } =
+          const { textAlign, textDirection, collapsed } =
             this.editor.state.selection.$from.parent?.attrs || {};
           const level = match[1].length;
-          return { level, textAlign, textDirection };
+          return { level, textAlign, textDirection, collapsed };
         }
       })
     ];
+  },
+
+  addProseMirrorPlugins() {
+    return [headingUpdatePlugin];
   },
 
   addNodeView() {
@@ -344,3 +349,43 @@ function findEndOfCollapsedSection(
 
   return nextPos;
 }
+
+const headingUpdatePlugin = new Plugin({
+  key: new PluginKey("headingUpdate"),
+  appendTransaction(transactions, oldState, newState) {
+    const hasDocChanges = transactions.some(
+      (transaction) => transaction.docChanged
+    );
+    if (!hasDocChanges) return null;
+
+    const tr = newState.tr;
+    const oldDoc = oldState.doc;
+    const newDoc = newState.doc;
+    let modified = false;
+
+    newDoc.descendants((newNode, pos) => {
+      if (newNode.type.name === "heading") {
+        const oldNode = oldDoc.nodeAt(pos);
+        if (
+          oldNode &&
+          oldNode.type.name === "heading" &&
+          oldNode.attrs.level !== newNode.attrs.level
+        ) {
+          /**
+           * if the level of a collapsed heading is changed,
+           * we need to reset visibility of all the nodes under it as there
+           * might be a heading of same or higher level previously
+           * hidden under this heading
+           */
+          if (newNode.attrs.collapsed) {
+            toggleNodesUnderHeading(tr, pos, oldNode.attrs.level, false);
+            toggleNodesUnderHeading(tr, pos, newNode.attrs.level, true);
+            modified = true;
+          }
+        }
+      }
+    });
+
+    return modified ? tr : null;
+  }
+});
