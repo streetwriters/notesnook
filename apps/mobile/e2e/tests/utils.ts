@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { expect as jestExpect } from "@jest/globals";
 import { device as _device, expect } from "detox";
 import { readFileSync } from "fs";
+//@ts-ignore
 import { toMatchImageSnapshot } from "jest-image-snapshot";
 import type { RouteName } from "../../app/stores/use-navigation-store";
 import { notesnook } from "../test.ids";
