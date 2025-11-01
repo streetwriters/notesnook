@@ -106,7 +106,7 @@
     "react-native-gzip": "1.1.0",
     "react-native-html-to-pdf-lite": "^0.9.1",
     "react-native-iap": "^13.0.4",
-    "react-native-image-crop-picker": "0.40.2",
+    "react-native-image-crop-picker": "0.51.1",
     "react-native-image-zoom-viewer": "^3.0.1",
     "react-native-in-app-review": "4.4.2",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
