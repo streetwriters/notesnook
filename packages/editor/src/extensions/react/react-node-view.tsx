@@ -112,10 +112,10 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
       return;
     }
 
-    if (this.node.attrs.hiddenUnder) {
-      this.domRef.dataset.hiddenUnder = this.node.attrs.hiddenUnder;
+    if (this.node.attrs.hidden) {
+      this.domRef.dataset.hidden = this.node.attrs.hidden;
     } else {
-      delete this.domRef.dataset.hiddenUnder;
+      delete this.domRef.dataset.hidden;
     }
 
     portalProviderAPI.render(this.Component, this.domRef);

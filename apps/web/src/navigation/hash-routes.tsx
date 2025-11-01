@@ -33,6 +33,7 @@ import {
 import { FeatureDialog } from "../dialogs/feature-dialog";
 import { CreateTagDialog } from "../dialogs/item-dialog";
 import { OnboardingDialog } from "../dialogs/onboarding-dialog";
+import { isSectionKey, SectionKeys } from "../dialogs/settings/types";
 
 const hashroutes = defineHashRoutes({
   "/": () => {},
@@ -68,6 +69,11 @@ const hashroutes = defineHashRoutes({
   },
   "/settings": () => {
     SettingsDialog.show({}).then(afterAction);
+  },
+  "/settings/:section": ({ section }) => {
+    SettingsDialog.show(
+      isSectionKey(section) ? { activeSection: section as SectionKeys } : {}
+    ).then(afterAction);
   }
 });
 

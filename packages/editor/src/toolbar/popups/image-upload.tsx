@@ -25,6 +25,7 @@ import { Popup } from "../components/popup.js";
 import { downloadImage, toDataURL } from "../../utils/downloader.js";
 import { useToolbarStore } from "../stores/toolbar-store.js";
 import { strings } from "@notesnook/intl";
+import { hasPermission } from "../../types.js";
 
 export type ImageUploadPopupProps = {
   onInsert: (image: Partial<ImageAttributes>) => void;
@@ -46,6 +47,10 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
         title: strings.insert(),
         disabled: !url,
         onClick: async () => {
+          if (!hasPermission("insertAttachment")) {
+            return false;
+          }
+
           setIsDownloading(true);
           setError(undefined);
 

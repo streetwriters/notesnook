@@ -555,7 +555,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
           compareCaretPosition(prev.caretPosition, next.caretPosition) ||
           prev.language !== next.language ||
           prev.indentType !== next.indentType ||
-          prev.hiddenUnder !== next.hiddenUnder
+          prev.hidden !== next.hidden
         );
       }
     });

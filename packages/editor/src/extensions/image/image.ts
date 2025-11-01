@@ -28,7 +28,7 @@ import { createNodeView } from "../react/index.js";
 import { TextDirections } from "../text-direction/index.js";
 import { ImageComponent } from "./component.js";
 import { tiptapKeys } from "@notesnook/common";
-import { DOMParser } from "@tiptap/pm/model";
+import { hasPermission } from "../../types.js";
 
 export interface ImageOptions {
   inline: boolean;
@@ -159,6 +159,10 @@ export const ImageNode = Node.create<ImageOptions>({
       insertImage:
         (options) =>
         ({ commands, state }) => {
+          if (!hasPermission("insertAttachment")) {
+            return false;
+          }
+
           const { $from } = state.selection;
           const maybeImageNode = state.doc.nodeAt($from.pos);
           if (maybeImageNode?.type === this.type) {

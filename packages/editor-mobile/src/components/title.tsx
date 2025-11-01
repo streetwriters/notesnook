@@ -73,9 +73,10 @@ function Title({
 
   useEffect(() => {
     if (!loading) {
+      resizeTextarea();
       setTimeout(() => {
         resizeTextarea();
-      }, 300);
+      }, 100);
     }
   }, [loading, resizeTextarea]);
 
@@ -153,6 +154,9 @@ function Title({
           }
         }}
         onPaste={() => {
+          resizeTextarea();
+        }}
+        onCut={() => {
           resizeTextarea();
         }}
         placeholder={titlePlaceholder}

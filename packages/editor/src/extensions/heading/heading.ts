@@ -24,7 +24,7 @@ import {
 } from "@tiptap/core";
 import { Heading as TiptapHeading } from "@tiptap/extension-heading";
 import { isClickWithinBounds } from "../../utils/prosemirror.js";
-import { Selection, Transaction } from "@tiptap/pm/state";
+import { Plugin, PluginKey, Selection, Transaction } from "@tiptap/pm/state";
 import { Node } from "@tiptap/pm/model";
 import { useToolbarStore } from "../../toolbar/stores/toolbar-store.js";
 
@@ -72,13 +72,14 @@ export const Heading = TiptapHeading.extend({
             return false;
           }
 
-          const { textAlign, textDirection } =
+          const { textAlign, textDirection, collapsed } =
             state.selection.$from.parent.attrs;
 
           return commands.setNode(this.name, {
             ...attributes,
             textAlign,
-            textDirection
+            textDirection,
+            collapsed
           });
         }
     };
@@ -89,14 +90,14 @@ export const Heading = TiptapHeading.extend({
       {
         types: COLLAPSIBLE_BLOCK_TYPES,
         attributes: {
-          hiddenUnder: {
-            default: null,
+          hidden: {
+            default: false,
             keepOnSplit: false,
-            parseHTML: (element) => element.dataset.hiddenUnder || null,
+            parseHTML: (element) => element.dataset.hidden === "true",
             renderHTML: (attributes) => {
-              if (!attributes.hiddenUnder) return {};
+              if (!attributes.hidden) return {};
               return {
-                "data-hidden-under": attributes.hiddenUnder
+                "data-hidden": attributes.hidden === true
               };
             }
           }
@@ -151,13 +152,17 @@ export const Heading = TiptapHeading.extend({
         find: HEADING_REGEX,
         type: this.type,
         getAttributes: (match) => {
-          const { textAlign, textDirection } =
+          const { textAlign, textDirection, collapsed } =
             this.editor.state.selection.$from.parent?.attrs || {};
           const level = match[1].length;
-          return { level, textAlign, textDirection };
+          return { level, textAlign, textDirection, collapsed };
         }
       })
     ];
+  },
+
+  addProseMirrorPlugins() {
+    return [headingUpdatePlugin];
   },
 
   addNodeView() {
@@ -200,16 +205,9 @@ export const Heading = TiptapHeading.extend({
             if (currentNode && currentNode.type.name === "heading") {
               const shouldCollapse = !currentNode.attrs.collapsed;
               const headingLevel = currentNode.attrs.level;
-              const headingId = currentNode.attrs.blockId;
 
               tr.setNodeAttribute(pos, "collapsed", shouldCollapse);
-              toggleNodesUnderHeading(
-                tr,
-                pos,
-                headingLevel,
-                shouldCollapse,
-                headingId
-              );
+              toggleNodesUnderHeading(tr, pos, headingLevel, shouldCollapse);
             }
             return true;
           });
@@ -234,9 +232,9 @@ export const Heading = TiptapHeading.extend({
           if (updatedNode.attrs.collapsed) heading.dataset.collapsed = "true";
           else delete heading.dataset.collapsed;
 
-          if (updatedNode.attrs.hiddenUnder)
-            heading.dataset.hiddenUnder = updatedNode.attrs.hiddenUnder;
-          else delete heading.dataset.hiddenUnder;
+          if (updatedNode.attrs.hidden)
+            heading.dataset.hidden = updatedNode.attrs.hidden;
+          else delete heading.dataset.hidden;
 
           if (updatedNode.attrs.textAlign)
             heading.style.textAlign =
@@ -259,8 +257,7 @@ function toggleNodesUnderHeading(
   tr: Transaction,
   headingPos: number,
   headingLevel: number,
-  isCollapsing: boolean,
-  headingId: string
+  isCollapsing: boolean
 ) {
   const { doc } = tr;
   const headingNode = doc.nodeAt(headingPos);
@@ -269,6 +266,8 @@ function toggleNodesUnderHeading(
   let nextPos = headingPos + headingNode.nodeSize;
   const cursorPos = tr.selection.from;
   let shouldMoveCursor = false;
+  let insideCollapsedHeading = false;
+  let nestedHeadingLevel: number | null = null;
 
   while (nextPos < doc.content.size) {
     const nextNode = doc.nodeAt(nextPos);
@@ -289,15 +288,33 @@ function toggleNodesUnderHeading(
       shouldMoveCursor = true;
     }
 
+    const currentPos = nextPos;
+    nextPos += nextNode.nodeSize;
+
     if (COLLAPSIBLE_BLOCK_TYPES.includes(nextNode.type.name)) {
-      if (isCollapsing && typeof nextNode.attrs.hiddenUnder !== "string") {
-        tr.setNodeAttribute(nextPos, "hiddenUnder", headingId);
-      } else if (!isCollapsing && nextNode.attrs.hiddenUnder === headingId) {
-        tr.setNodeAttribute(nextPos, "hiddenUnder", null);
+      if (isCollapsing) {
+        tr.setNodeAttribute(currentPos, "hidden", true);
+      } else {
+        if (insideCollapsedHeading) {
+          if (
+            nextNode.type.name === "heading" &&
+            nestedHeadingLevel !== null &&
+            nextNode.attrs.level <= nestedHeadingLevel
+          ) {
+            insideCollapsedHeading = false;
+            nestedHeadingLevel = null;
+          } else {
+            continue;
+          }
+        }
+
+        tr.setNodeAttribute(currentPos, "hidden", false);
+        if (nextNode.type.name === "heading" && nextNode.attrs.collapsed) {
+          insideCollapsedHeading = true;
+          nestedHeadingLevel = nextNode.attrs.level;
+        }
       }
     }
-
-    nextPos += nextNode.nodeSize;
   }
 
   if (shouldMoveCursor) {
@@ -332,3 +349,43 @@ function findEndOfCollapsedSection(
 
   return nextPos;
 }
+
+const headingUpdatePlugin = new Plugin({
+  key: new PluginKey("headingUpdate"),
+  appendTransaction(transactions, oldState, newState) {
+    const hasDocChanges = transactions.some(
+      (transaction) => transaction.docChanged
+    );
+    if (!hasDocChanges) return null;
+
+    const tr = newState.tr;
+    const oldDoc = oldState.doc;
+    const newDoc = newState.doc;
+    let modified = false;
+
+    newDoc.descendants((newNode, pos) => {
+      if (newNode.type.name === "heading") {
+        const oldNode = oldDoc.nodeAt(pos);
+        if (
+          oldNode &&
+          oldNode.type.name === "heading" &&
+          oldNode.attrs.level !== newNode.attrs.level
+        ) {
+          /**
+           * if the level of a collapsed heading is changed,
+           * we need to reset visibility of all the nodes under it as there
+           * might be a heading of same or higher level previously
+           * hidden under this heading
+           */
+          if (newNode.attrs.collapsed) {
+            toggleNodesUnderHeading(tr, pos, oldNode.attrs.level, false);
+            toggleNodesUnderHeading(tr, pos, newNode.attrs.level, true);
+            modified = true;
+          }
+        }
+      }
+    });
+
+    return modified ? tr : null;
+  }
+});

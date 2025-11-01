@@ -113,7 +113,8 @@ const Tiptap = ({
     claims: {
       callout: !!settings.features?.callout?.isAllowed,
       outlineList: !!settings.features?.outlineList?.isAllowed,
-      taskList: !!settings.features?.taskList?.isAllowed
+      taskList: !!settings.features?.taskList?.isAllowed,
+      insertAttachment: settings.loggedIn
     },
     onPermissionDenied: (claim) => {
       post(
@@ -581,7 +582,8 @@ const Tiptap = ({
                   alignItems: "center",
                   padding: "0px 16px",
                   paddingBottom: "3px",
-                  boxSizing: "border-box"
+                  boxSizing: "border-box",
+                  minHeight: "28px"
                 }}
               >
                 <StatusBar

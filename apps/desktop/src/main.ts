@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import "./overrides";
-import { app, BrowserWindow, nativeTheme, shell } from "electron";
+import { app, BrowserWindow, nativeTheme, shell, dialog } from "electron";
 import { isDevelopment } from "./utils";
 import { registerProtocol, PROTOCOL_URL } from "./utils/protocol";
 import { configureAutoUpdater } from "./utils/autoupdater";
@@ -181,6 +181,17 @@ async function createWindow() {
 
 app.once("ready", async () => {
   console.info("App ready. Opening window.");
+
+  if (app.runningUnderARM64Translation) {
+    console.log("App is running under ARM64 translation");
+    dialog.showMessageBoxSync({
+      message:
+        "Notesnook detected that it is running under ARM64 translation. For the best performance, please download the ARM64 build of Notesnook from our website.",
+      type: "warning",
+      buttons: ["Okay"],
+      title: "Degraded Performance Warning"
+    });
+  }
 
   if (config.customDns) enableCustomDns();
   else disableCustomDns();

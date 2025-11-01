@@ -774,7 +774,7 @@ const ShareView = () => {
                   </Paragraph>
                   {rawData.value && isURL(rawData.value) ? (
                     <Button
-                      type={mode === 2 ? "inverted" : "transparent"}
+                      type={mode === 2 ? "inverted" : "plain"}
                       icon={mode === 2 ? "radiobox-marked" : "radiobox-blank"}
                       onPress={() => changeMode(2)}
                       title={modes[2].title}
@@ -785,9 +785,9 @@ const ShareView = () => {
                     />
                   ) : null}
                   <Button
-                    type={mode === 1 ? "inverted" : "transparent"}
+                    type={mode === 1 ? "inverted" : "plain"}
                     icon={mode === 1 ? "radiobox-marked" : "radiobox-blank"}
-                    onPress={() => changeMode(2)}
+                    onPress={() => changeMode(1)}
                     title={modes[1].title}
                     height={30}
                     style={{

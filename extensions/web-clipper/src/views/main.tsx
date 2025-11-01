@@ -69,6 +69,11 @@ const clipAreas: { name: string; id: ClipArea; icon: string }[] = [
 const clipModes: { name: string; id: ClipMode; icon: string; pro?: boolean }[] =
   [
     {
+      name: "Bookmark",
+      id: "bookmark",
+      icon: Icons.bookmark
+    },
+    {
       name: "Simplified",
       id: "simplified",
       icon: Icons.simplified
@@ -87,6 +92,20 @@ const clipModes: { name: string; id: ClipMode; icon: string; pro?: boolean }[] =
     }
   ];
 
+enum ClipperState {
+  Idle = "idle",
+  Clipping = "clipping",
+  Clipped = "clipped",
+  Error = "error"
+}
+
+const clipperButtonLabelMap: Record<ClipperState, string> = {
+  [ClipperState.Clipping]: "Clipping...",
+  [ClipperState.Clipped]: "Save clip",
+  [ClipperState.Error]: "Retry Clip",
+  [ClipperState.Idle]: "Start clip"
+};
+
 export function Main() {
   const [error, setError] = useState<string>();
   // const [colorMode, setColorMode] = useColorMode();
@@ -98,7 +117,6 @@ export function Main() {
   const [title, setTitle] = useState<string>();
   const [hasPermission, setHasPermission] = useState<boolean>(false);
   const [url, setUrl] = useState<string>();
-  const [clipNonce, setClipNonce] = useState(0);
   const [clipMode, setClipMode] = usePersistentState<ClipMode>(
     "clipMode",
     "simplified"
@@ -107,10 +125,12 @@ export function Main() {
     "clipArea",
     "article"
   );
-  const [isClipping, setIsClipping] = useState(false);
   const [note, setNote] = usePersistentState<ItemReference>("note");
   const [refs, setRefs] = usePersistentState<SelectedReference[]>("refs", []);
   const [clipData, setClipData] = useState<ClipData>();
+  const [clipperState, setClipperState] = useState<ClipperState>(
+    ClipperState.Idle
+  );
   const pageTitle = useRef<string>();
 
   useEffect(() => {
@@ -129,7 +149,6 @@ export function Main() {
 
   useEffect(() => {
     (async () => {
-      if (!clipArea || !clipMode) return;
       if (
         !isPremium &&
         (clipMode === "complete" || clipMode === "screenshot")
@@ -137,25 +156,8 @@ export function Main() {
         setClipMode("simplified");
         return;
       }
-
-      try {
-        setIsClipping(true);
-        setClipData(
-          await clip(clipArea, clipMode, {
-            ...DEFAULT_SETTINGS,
-            ...settings,
-            images: isPremium,
-            inlineImages: isPremium
-          })
-        );
-      } catch (e) {
-        console.error(e);
-        if (e instanceof Error) setError(e.message);
-      } finally {
-        setIsClipping(false);
-      }
     })();
-  }, [isPremium, clipArea, clipMode, clipNonce]);
+  }, [isPremium, clipArea, clipMode]);
 
   useEffect(() => {
     (async () => {
@@ -167,6 +169,32 @@ export function Main() {
       );
     })();
   }, [settings]);
+
+  async function startClip() {
+    if (!clipArea || !clipMode || clipMode === "bookmark") return;
+
+    try {
+      setError(undefined);
+      setClipperState(ClipperState.Clipping);
+      setClipData(
+        await clip(clipArea, clipMode, {
+          ...DEFAULT_SETTINGS,
+          ...settings,
+          images: isPremium,
+          inlineImages: isPremium
+        })
+      );
+      setClipperState(ClipperState.Clipped);
+    } catch (e) {
+      console.error(e);
+      if (e instanceof Error) {
+        setError(e.message);
+      }
+      setClipperState(ClipperState.Error);
+    }
+  }
+
+  const isClipping = clipperState === ClipperState.Clipping;
 
   if (!hasPermission && !!settings?.corsProxy) {
     return (
@@ -241,10 +269,15 @@ export function Main() {
             key={item.id}
             variant="icon"
             onClick={() => {
+              setError(undefined);
+              setClipperState(ClipperState.Idle);
               setClipArea(item.id);
-              setClipNonce((s) => ++s);
             }}
-            disabled={isClipping}
+            disabled={
+              isClipping ||
+              clipperState === ClipperState.Clipped ||
+              clipMode === "bookmark"
+            }
             sx={{
               display: "flex",
               borderRadius: "default",
@@ -283,10 +316,15 @@ export function Main() {
             key={item.id}
             variant="icon"
             onClick={() => {
+              setError(undefined);
+              setClipperState(ClipperState.Idle);
               setClipMode(item.id);
-              setClipNonce((s) => ++s);
             }}
-            disabled={isClipping || (item.pro && !isPremium)}
+            disabled={
+              isClipping ||
+              clipperState === ClipperState.Clipped ||
+              (item.pro && !isPremium)
+            }
             sx={{
               display: "flex",
               borderRadius: "default",
@@ -313,33 +351,58 @@ export function Main() {
           </Button>
         ))}
 
-        {clipData && clipData.data && !isClipping && (
-          <Text
-            variant="body"
-            sx={{
-              mt: 1,
-              bg: "shade",
-              color: "accent",
-              p: 1,
-              border: "1px solid var(--accent)",
-              borderRadius: "default",
-              cursor: "pointer",
-              ":hover": {
-                filter: "brightness(80%)"
-              }
-            }}
-            onClick={async () => {
-              const winUrl = URL.createObjectURL(
-                new Blob(["\ufeff", clipData.data], { type: "text/html" })
-              );
-              await browser.windows.create({
-                url: winUrl
-              });
-            }}
-          >
-            Clip done. Click here to preview.
-          </Text>
-        )}
+        {clipMode !== "bookmark" &&
+          clipData &&
+          clipData.data &&
+          !isClipping && (
+            <Flex sx={{ gap: 1, justifyContent: "space-between" }}>
+              <Text
+                variant="body"
+                sx={{
+                  flex: 1,
+                  mt: 1,
+                  bg: "shade",
+                  color: "accent",
+                  p: 1,
+                  border: "1px solid var(--accent)",
+                  borderRadius: "default",
+                  cursor: "pointer",
+                  ":hover": {
+                    filter: "brightness(80%)"
+                  }
+                }}
+                onClick={async () => {
+                  const winUrl = URL.createObjectURL(
+                    new Blob(["\ufeff", clipData.data], { type: "text/html" })
+                  );
+                  await browser.windows.create({
+                    url: winUrl
+                  });
+                }}
+              >
+                Clip done. Click here to preview.
+              </Text>
+              <Text
+                variant="body"
+                sx={{
+                  mt: 1,
+                  bg: "background-secondary",
+                  p: 1,
+                  borderRadius: "default",
+                  cursor: "pointer",
+                  ":hover": {
+                    filter: "brightness(80%)"
+                  }
+                }}
+                onClick={async () => {
+                  setClipData(undefined);
+                  setClipperState(ClipperState.Idle);
+                }}
+              >
+                Discard
+              </Text>
+            </Flex>
+          )}
 
         {error && (
           <Text
@@ -357,7 +420,7 @@ export function Main() {
               }
             }}
             onClick={async () => {
-              setClipNonce((s) => ++s);
+              await startClip();
             }}
           >
             {ERROR_MAP[error] || error}
@@ -400,9 +463,27 @@ export function Main() {
         <Button
           variant="accent"
           sx={{ mt: 1 }}
-          disabled={!clipData}
+          disabled={isClipping}
           onClick={async () => {
-            if (!clipData || !title || !clipArea || !clipMode || !url) return;
+            if (
+              clipMode !== "bookmark" &&
+              (clipperState === ClipperState.Idle ||
+                clipperState === ClipperState.Error)
+            ) {
+              await startClip();
+              return;
+            }
+
+            if (!title || !clipArea || !clipMode || !url) return;
+
+            const data =
+              clipMode === "bookmark"
+                ? {
+                    data: createBookmark(url, title)
+                  }
+                : clipData;
+
+            if (!data) return;
 
             const notesnook = await connectApi(false);
             if (!notesnook) {
@@ -417,7 +498,7 @@ export function Main() {
               note,
               refs,
               pageTitle: pageTitle.current,
-              ...clipData
+              ...data
             });
 
             setClipData(undefined);
@@ -433,7 +514,9 @@ export function Main() {
             window.close();
           }}
         >
-          Save clip
+          {clipMode === "bookmark"
+            ? "Save bookmark"
+            : clipperButtonLabelMap[clipperState]}
         </Button>
 
         <Flex
@@ -507,4 +590,12 @@ export async function clip(
     area,
     settings
   });
+}
+
+function createBookmark(url: string, title: string) {
+  const a = document.createElement("a");
+  a.setAttribute("href", url);
+  a.setAttribute("title", title);
+  a.innerText = title;
+  return a.outerHTML;
 }

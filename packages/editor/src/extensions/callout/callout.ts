@@ -258,10 +258,10 @@ export const Callout = Node.create({
       container.onmousedown = onClick;
       container.ontouchstart = onClick;
 
-      if (node.attrs.hiddenUnder) {
-        container.dataset.hiddenUnder = node.attrs.hiddenUnder;
+      if (node.attrs.hidden) {
+        container.dataset.hidden = node.attrs.hidden;
       } else {
-        delete container.dataset.hiddenUnder;
+        delete container.dataset.hidden;
       }
 
       return {
@@ -275,9 +275,9 @@ export const Callout = Node.create({
           if (updatedNode.attrs.collapsed) container.classList.add("collapsed");
           else container.classList.remove("collapsed");
 
-          if (updatedNode.attrs.hiddenUnder)
-            container.dataset.hiddenUnder = updatedNode.attrs.hiddenUnder;
-          else delete container.dataset.hiddenUnder;
+          if (updatedNode.attrs.hidden)
+            container.dataset.hidden = updatedNode.attrs.hidden;
+          else delete container.dataset.hidden;
 
           return true;
         }

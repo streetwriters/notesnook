@@ -2603,5 +2603,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   finishPurchaseInBrowser: () => t`Finish your purchase in the browser.`,
   goBack: () => t`Go back`,
   clickToDirectlyClaimPromo: () =>
-    t`Click here to directly claim the promotion.`
+    t`Click here to directly claim the promotion.`,
+  loginToUploadAttachments: () =>
+    t`Login to upload attachments. [Read more](https://help.notesnook.com/faqs/login-to-upload-attachments)`
 };
