@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { IconButton } from "../../components/ui/icon-button";
@@ -36,6 +36,7 @@ export const SearchBar = ({
   onChangeText: (value: string) => void;
   loading?: boolean;
 }) => {
+  const [clearButton, setClearButton] = useState(false);
   const selectionMode = useSelectionStore((state) => state.selectionMode);
   const isFocused = useNavigationStore(
     (state) => state.focusedRouteId === "Search"
@@ -45,6 +46,7 @@ export const SearchBar = ({
   const inputRef = useRef<TextInput>(null);
   const _onChangeText = (value: string) => {
     onChangeText(value);
+    setClearButton(!!value);
   };
 
   return selectionMode && isFocused ? null : (
@@ -100,6 +102,23 @@ export const SearchBar = ({
           autoCorrect={false}
           placeholderTextColor={colors.primary.placeholder}
         />
+
+        {clearButton ? (
+          <IconButton
+            name="close"
+            size={AppFontSize.xxl}
+            top={10}
+            testID="clear-search"
+            bottom={10}
+            onPress={() => {
+              inputRef.current?.clear();
+              onChangeText("");
+              setClearButton(false);
+            }}
+            color={colors.primary.paragraph}
+            type="plain"
+          />
+        ) : null}
       </View>
     </View>
   );

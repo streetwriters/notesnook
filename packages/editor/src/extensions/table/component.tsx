@@ -22,7 +22,7 @@ import { ReactNodeView, ReactNodeViewProps } from "../react/index.js";
 import { Node as ProsemirrorNode } from "prosemirror-model";
 import { Editor } from "../../types.js";
 import { Editor as TiptapEditor } from "@tiptap/core";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { updateColumnsOnResize } from "@tiptap/pm/tables";
 import { EditorView, NodeView } from "prosemirror-view";
 import {
@@ -32,7 +32,7 @@ import {
   TableProperties
 } from "../../toolbar/tools/table.js";
 import { getToolDefinition } from "../../toolbar/tool-definitions.js";
-import { getPosition } from "@notesnook/ui";
+import { getPosition, ScrollContainer } from "@notesnook/ui";
 import {
   findSelectedDOMNode,
   hasSameAttributes
@@ -41,18 +41,36 @@ import { DesktopOnly } from "../../components/responsive/index.js";
 import { TextDirections } from "../text-direction/index.js";
 import { strings } from "@notesnook/intl";
 import SimpleBar from "simplebar-react";
+import { useIsMobile } from "../../toolbar/stores/toolbar-store.js";
 
 export function TableComponent(props: ReactNodeViewProps) {
   const { editor, node, forwardRef } = props;
   const colgroupRef = useRef<HTMLTableColElement>(null);
   const tableRef = useRef<HTMLTableElement>();
   const { textDirection } = node.attrs;
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (!colgroupRef.current || !tableRef.current) return;
 
     updateColumnsOnResize(node, colgroupRef.current, tableRef.current, 50);
   }, [node]);
+
+  const renderScrollContent = useCallback(() => {
+    return (
+      <div dir={textDirection}>
+        <table
+          ref={(ref) => {
+            forwardRef?.(ref);
+            tableRef.current = ref || undefined;
+          }}
+        >
+          <colgroup ref={colgroupRef} />
+          {/* <tbody /> */}
+        </table>
+      </div>
+    );
+  }, [forwardRef, textDirection]);
 
   return (
     <>
@@ -68,19 +86,12 @@ export function TableComponent(props: ReactNodeViewProps) {
           textDirection={textDirection}
         />
       </DesktopOnly>
-      <SimpleBar autoHide>
-        <Box dir={textDirection}>
-          <table
-            ref={(ref) => {
-              forwardRef?.(ref);
-              tableRef.current = ref || undefined;
-            }}
-          >
-            <colgroup ref={colgroupRef} />
-            {/* <tbody /> */}
-          </table>
-        </Box>
-      </SimpleBar>
+
+      {isMobile ? (
+        <ScrollContainer>{renderScrollContent()}</ScrollContainer>
+      ) : (
+        <SimpleBar>{renderScrollContent()}</SimpleBar>
+      )}
     </>
   );
 }
@@ -208,6 +219,7 @@ function TableRowToolbar(props: TableToolbarProps) {
 function TableColumnToolbar(props: TableToolbarProps) {
   const { editor, table } = props;
   const columnToolsRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     function onSelectionUpdate() {
@@ -234,8 +246,9 @@ function TableColumnToolbar(props: TableToolbarProps) {
         yOffset: 2
       });
 
-      const scrollLeft =
-        table.current?.closest(".simplebar-content-wrapper")?.scrollLeft || 0;
+      const scrollLeft = isMobile
+        ? table.current.parentElement?.parentElement?.scrollLeft || 0
+        : table.current?.closest(".simplebar-content-wrapper")?.scrollLeft || 0;
 
       columnToolsRef.current.style.left = `${pos.left - scrollLeft}px`;
       columnToolsRef.current.style.top = `${pos.top}px`;
@@ -245,7 +258,7 @@ function TableColumnToolbar(props: TableToolbarProps) {
     return () => {
       editor.off("selectionUpdate", onSelectionUpdate);
     };
-  }, []);
+  }, [isMobile]);
 
   return (
     <Flex

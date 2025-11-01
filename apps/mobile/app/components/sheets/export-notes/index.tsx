@@ -39,9 +39,7 @@ import {
   presentSheet
 } from "../../../services/event-manager";
 import Exporter from "../../../services/exporter";
-import PremiumService from "../../../services/premium";
 import { useSettingStore } from "../../../stores/use-setting-store";
-import { useUserStore } from "../../../stores/use-user-store";
 import { getElevationStyle } from "../../../utils/elevation";
 import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
 import { DefaultAppStyles } from "../../../utils/styles";
@@ -83,7 +81,6 @@ const ExportNotesSheet = ({
     type: "pdf" | "txt" | "md" | "html" | "md-frontmatter"
   ) => {
     if (exporting) return;
-    if (!PremiumService.get() && type !== "txt") return;
     setExporting(true);
     update?.({ disableClosing: true } as PresentSheetOptions);
     setComplete(false);
@@ -145,8 +142,7 @@ const ExportNotesSheet = ({
         await exportNoteAs("txt");
       },
       icon: "card-text",
-      id: notesnook.ids.dialogs.export.text,
-      pro: true
+      id: notesnook.ids.dialogs.export.text
     },
     {
       title: "HTML",
@@ -194,8 +190,7 @@ const ExportNotesSheet = ({
                   paddingVertical: DefaultAppStyles.GAP_VERTICAL,
                   justifyContent: "flex-start",
                   borderRadius: 0,
-                  paddingHorizontal: DefaultAppStyles.GAP,
-                  opacity: item.pro ? 1 : 0.5
+                  paddingHorizontal: DefaultAppStyles.GAP
                 }}
               >
                 <View

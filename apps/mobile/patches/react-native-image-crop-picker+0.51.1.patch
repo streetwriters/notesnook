@@ -1,0 +1,28 @@
+diff --git a/node_modules/react-native-image-crop-picker/android/src/main/java/com/reactnative/ivpusic/imagepicker/ImageCropPicker.java b/node_modules/react-native-image-crop-picker/android/src/main/java/com/reactnative/ivpusic/imagepicker/ImageCropPicker.java
+index b9c494e..34ef800 100644
+--- a/node_modules/react-native-image-crop-picker/android/src/main/java/com/reactnative/ivpusic/imagepicker/ImageCropPicker.java
++++ b/node_modules/react-native-image-crop-picker/android/src/main/java/com/reactnative/ivpusic/imagepicker/ImageCropPicker.java
+@@ -679,6 +679,7 @@ class ImageCropPicker implements ActivityEventListener {
+         image.putInt("size", (int) new File(compressedImagePath).length());
+         image.putString("modificationDate", String.valueOf(modificationDate));
+         image.putString("filename", new File(path).getName());
++        image.putString("sourceURL", path);
+ 
+         if (includeBase64) {
+             image.putString("data", getBase64StringFromFile(compressedImagePath));
+diff --git a/node_modules/react-native-image-crop-picker/ios/src/ImageCropPicker.mm b/node_modules/react-native-image-crop-picker/ios/src/ImageCropPicker.mm
+index 354ad09..622f779 100644
+--- a/node_modules/react-native-image-crop-picker/ios/src/ImageCropPicker.mm
++++ b/node_modules/react-native-image-crop-picker/ios/src/ImageCropPicker.mm
+@@ -603,7 +603,10 @@ - (void)qb_imagePickerController:(QBImagePickerController *)imagePickerControlle
+                                     Boolean isKnownMimeType = [mimeType length] > 0;
+                                     
+                                     ImageResult *imageResult = [[ImageResult alloc] init];
+-                                    if (isLossless && useOriginalWidth && useOriginalHeight && isKnownMimeType && !forceJpg) {
++
++                                    Boolean isHeicOrHeif = [mimeType isEqualToString:@"image/heic"] || [mimeType isEqualToString:@"image/heif"];
++
++                                    if (isLossless && useOriginalWidth && useOriginalHeight && isKnownMimeType && !forceJpg && !isHeicOrHeif) {
+                                         // Use original, unmodified image
+                                         imageResult.data = imageData;
+                                         imageResult.width = @(imgT.size.width);
