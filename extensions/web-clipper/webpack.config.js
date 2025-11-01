@@ -138,7 +138,8 @@ var options = {
   plugins: [
     new CleanWebpackPlugin({
       verbose: false,
-      dangerouslyAllowCleanPatternsOutsideProject: true
+      dangerouslyAllowCleanPatternsOutsideProject: true,
+      dry: false
     }),
     new webpack.ProgressPlugin(),
     // expose and write the allowed env vars on the compiled bundle

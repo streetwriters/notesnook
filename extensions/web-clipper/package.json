@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/web-clipper",
-  "version": "0.3.4",
+  "version": "0.4.0",
   "private": true,
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
@@ -105,7 +105,7 @@
     "style-loader": "^3.3.1",
     "terser-webpack-plugin": "^5.3.1",
     "ts-loader": "^9.2.6",
-    "web-ext": "^7.6.2",
+    "web-ext": "^7.12.0",
     "webpack": "5.88.2",
     "webpack-cli": "5.1.4",
     "webpack-dev-server": "^4.7.4"
