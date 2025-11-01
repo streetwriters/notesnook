@@ -1273,11 +1273,11 @@ PODS:
     - React-Core
   - react-native-keep-awake (1.3.1):
     - React-Core
-  - react-native-mmkv-storage (0.11.2):
+  - react-native-mmkv-storage (12.0.0):
     - DoubleConversion
     - glog
     - hermes-engine
-    - MMKV (~> 1.3.9)
+    - MMKV (~> 1.3.14)
     - RCT-Folly (= 2024.11.18.00)
     - RCTRequired
     - RCTTypeSafety
@@ -1372,7 +1372,7 @@ PODS:
   - react-native-screenguard (1.0.0):
     - React-Core
     - SDWebImage (~> 5.11.1)
-  - react-native-share-extension (2.9.0):
+  - react-native-share-extension (2.9.5):
     - React
   - react-native-sodium (1.6.5):
     - React
@@ -1770,15 +1770,53 @@ PODS:
     - Yoga
   - RNIap (12.16.2):
     - React-Core
-  - RNImageCropPicker (0.40.2):
+  - RNImageCropPicker (0.51.1):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.11.18.00)
+    - RCTRequired
+    - RCTTypeSafety
     - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-NativeModulesApple
+    - React-RCTFabric
     - React-RCTImage
-    - RNImageCropPicker/QBImagePickerController (= 0.40.2)
-    - TOCropViewController
-  - RNImageCropPicker/QBImagePickerController (0.40.2):
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - RNImageCropPicker/QBImagePickerController (= 0.51.1)
+    - TOCropViewController (~> 2.8.0)
+    - Yoga
+  - RNImageCropPicker/QBImagePickerController (0.51.1):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.11.18.00)
+    - RCTRequired
+    - RCTTypeSafety
     - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-NativeModulesApple
+    - React-RCTFabric
     - React-RCTImage
-    - TOCropViewController
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - TOCropViewController (~> 2.8.0)
+    - Yoga
   - RNKeychain (4.0.5):
     - React
   - RNNotifee (7.4.9):
@@ -1975,7 +2013,7 @@ PODS:
   - SwiftyRSA (1.7.0):
     - SwiftyRSA/ObjC (= 1.7.0)
   - SwiftyRSA/ObjC (1.7.0)
-  - TOCropViewController (2.7.4)
+  - TOCropViewController (2.8.0)
   - toolbar-android (0.2.1):
     - React
   - Yoga (0.0.0)
@@ -2425,7 +2463,7 @@ SPEC CHECKSUMS:
   react-native-image-resizer: 24c5d06fae2176dc0caed4b6396e02befb44064a
   react-native-in-app-review: b3d1eed3d1596ebf6539804778272c4c65e4a400
   react-native-keep-awake: 03b74eebe4f2bb5e8478fc8f420651a92463b6f8
-  react-native-mmkv-storage: 51c33c6f6678d67061059cce8189a57c3e47192e
+  react-native-mmkv-storage: 935d661dc3913a41be70d041aa3ff860d6aa4873
   react-native-netinfo: 66c9ac0d0ae92a57a9ed99ab8a75429740700c73
   react-native-notification-sounds: ce106d58df0dd384bccbd2e84fb53accab7cc068
   react-native-orientation-locker: cc6f357b289a2e0dd2210fea0c52cb8e0727fdaa
@@ -2434,7 +2472,7 @@ SPEC CHECKSUMS:
   react-native-quick-sqlite: 1bfc7f1e9acbe9a5aa5c4cc81712e9bde3ab7672
   react-native-safe-area-context: 9d72abf6d8473da73033b597090a80b709c0b2f1
   react-native-screenguard: 82437eeb0086a90b5e5d7e54130bb04fb406373e
-  react-native-share-extension: bcb7e466390a9e50c742f4b1019d6f181aedd7ad
+  react-native-share-extension: fdc6aaab51591a2d445df239c446aaa3a99658ec
   react-native-sodium: 285eec063e4232cb67347ef6a434b85e588d38cb
   react-native-theme-switch-animation: d90fe2de0d9e87a63cd6235d98cba6e7054e9a10
   react-native-webview: 079eca50edf657503318b66687dadfb903731aa8
@@ -2479,7 +2517,7 @@ SPEC CHECKSUMS:
   RNFlashList: ff5a0b3113c4cda0eaf4b94df8572ccad3c40fd5
   RNGestureHandler: 92e89a04cd0d1c77f383a55d14c15e7f423f4c00
   RNIap: f94647b3a3dbd5fa08ad7ed847eb588aa5fe95fe
-  RNImageCropPicker: 30d770b383d84e1067d82ea7b5ed4fff851bbbb2
+  RNImageCropPicker: aa81bda9f887e20542b569938cde5ce50a4ec404
   RNKeychain: ffd0513e676445c637410b47249460cbf56bc9cb
   RNNotifee: dabf3cdd7bfd9340bb84358cc78f635af4bc80e2
   RNPrivacySnapshot: ccad3a548338c2f526bb7b1789af3fb0618b7d1d
@@ -2495,7 +2533,7 @@ SPEC CHECKSUMS:
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
   SwiftyRSA: 8c6dd1ea7db1b8dc4fb517a202f88bb1354bc2c6
-  TOCropViewController: 80b8985ad794298fb69d3341de183f33d1853654
+  TOCropViewController: 797deaf39c90e6e9ddd848d88817f6b9a8a09888
   toolbar-android: c426ed5bd3dcccfed20fd79533efc0d1ae0ef018
   Yoga: 31a098f74c16780569aebd614a0f37a907de0189
 
