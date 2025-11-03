@@ -141,7 +141,7 @@ test("search reminders", () =>
   }));
 
 describe("notesWithHighlighting", () => {
-  test.only("search notes with parentheses in query should load the item", () =>
+  test("search notes with parentheses in query should load the item", () =>
     noteTest({
       title: "(with parantheses)"
     }).then(async ({ db }) => {
