@@ -16,18 +16,22 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { LegendList } from "@legendapp/list";
 import {
+  ContentBlock,
   InternalLink,
+  ItemReference,
+  Note,
   TextSlice,
   VirtualizedGrouping,
   createInternalLink,
   highlightInternalLinks
 } from "@notesnook/core";
-import { ContentBlock, ItemReference, Note } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { MutableRefObject, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
-import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
+import { ScrollView } from "react-native-actions-sheet";
 import { create } from "zustand";
 import { db } from "../../../common/database";
 import { useDBItem, useNoteLocked } from "../../../hooks/use-db-item";
@@ -35,14 +39,13 @@ import { eSendEvent, presentSheet } from "../../../services/event-manager";
 import { useRelationStore } from "../../../stores/use-relation-store";
 import { eOnLoadNote } from "../../../utils/events";
 import { fluidTabsRef } from "../../../utils/global-refs";
-import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
+import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
+import { DefaultAppStyles } from "../../../utils/styles";
 import SheetProvider from "../../sheet-provider";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
 import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
-import { strings } from "@notesnook/intl";
-import { DefaultAppStyles } from "../../../utils/styles";
 
 export const useExpandedStore = create<{
   expanded: {
@@ -501,9 +504,10 @@ export const ReferencesList = ({ item, close }: ReferencesListProps) => {
             marginTop: DefaultAppStyles.GAP_VERTICAL
           }}
         >
-          <FlashList
+          <LegendList
+            renderScrollComponent={(props) => <ScrollView {...props} />}
             bounces={false}
-            data={items.placeholders}
+            data={items.placeholders || []}
             renderItem={renderNote}
           />
         </View>

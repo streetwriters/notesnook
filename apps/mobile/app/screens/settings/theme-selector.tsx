@@ -30,7 +30,6 @@ import type {
 } from "@notesnook/themes-server";
 import { pick } from "@react-native-documents/picker";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { MasonryFlashList } from "@shopify/flash-list";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 import { createTRPCReact } from "@trpc/react-query";
@@ -57,6 +56,7 @@ import { Pressable } from "../../components/ui/pressable";
 import { getColorLinearShade } from "../../utils/colors";
 import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../utils/styles";
+import { LegendList } from "@legendapp/list";
 
 const THEME_SERVER_URL = "https://themes-api.notesnook.com";
 //@ts-ignore
@@ -431,7 +431,7 @@ function ThemeSelector() {
           </View>
         </View>
 
-        <MasonryFlashList
+        <LegendList
           numColumns={2}
           data={[
             ...(colorScheme === "dark" || (searchQuery && searchQuery !== "")

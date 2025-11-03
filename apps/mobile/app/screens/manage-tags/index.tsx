@@ -32,7 +32,6 @@ import React, {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TextInput, View, useWindowDimensions } from "react-native";
 import { ActionSheetRef } from "react-native-actions-sheet";
-import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import { useDBItem } from "../../hooks/use-db-item";
@@ -54,6 +53,7 @@ import { DefaultAppStyles } from "../../utils/styles";
 import { Header } from "../../components/header";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import { isFeatureAvailable } from "@notesnook/common";
+import { LegendList } from "@legendapp/list";
 
 async function updateInitialSelectionState(items: string[]) {
   const relations = await db.relations
@@ -323,8 +323,8 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
             height: "100%"
           }}
         >
-          <FlashList
-            data={tags?.placeholders}
+          <LegendList
+            data={tags?.placeholders || []}
             keyboardShouldPersistTaps
             keyboardDismissMode="interactive"
             estimatedItemSize={50}
@@ -414,15 +414,15 @@ const TagItem = ({
             selection === "selected"
               ? "check-circle-outline"
               : selection === "intermediate"
-              ? "minus-circle-outline"
-              : "checkbox-blank-circle-outline"
+                ? "minus-circle-outline"
+                : "checkbox-blank-circle-outline"
           }
           name={
             selection === "selected"
               ? "check-circle-outline"
               : selection === "intermediate"
-              ? "minus-circle-outline"
-              : "checkbox-blank-circle-outline"
+                ? "minus-circle-outline"
+                : "checkbox-blank-circle-outline"
           }
         />
       )}

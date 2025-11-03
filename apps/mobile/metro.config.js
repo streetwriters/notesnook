@@ -40,6 +40,11 @@ mergedConfig.resolver = {
       };
     }
 
+    if (moduleName === "@tanstack/query-core") {
+      const result = require.resolve(moduleName); // gets CommonJS version
+      return context.resolveRequest(context, result, platform);
+    }
+
     if (moduleName === "@notesnook/core") {
       const result = require.resolve(moduleName); // gets CommonJS version
       return context.resolveRequest(context, result, platform);
