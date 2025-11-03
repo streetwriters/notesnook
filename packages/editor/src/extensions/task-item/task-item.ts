@@ -21,6 +21,7 @@ import { mergeAttributes } from "@tiptap/core";
 import { TaskItem } from "@tiptap/extension-task-item";
 import { TaskItemComponent } from "./component.js";
 import { createNodeView } from "../react/index.js";
+import { ensureLeadingParagraph } from "../../utils/prosemirror.js";
 
 export type TaskItemAttributes = {
   checked: boolean;
@@ -56,7 +57,8 @@ export const TaskItemNode = TaskItem.extend({
     return [
       {
         tag: ".checklist > li",
-        priority: 51
+        priority: 100,
+        getContent: ensureLeadingParagraph
       }
     ];
   },
