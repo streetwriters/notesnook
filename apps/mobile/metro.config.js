@@ -40,6 +40,26 @@ mergedConfig.resolver = {
       };
     }
 
+    if (moduleName === "@notesnook/core") {
+      const result = require.resolve(moduleName); // gets CommonJS version
+      return context.resolveRequest(context, result, platform);
+    }
+
+    if (moduleName === "@notesnook/common") {
+      const result = require.resolve(moduleName); // gets CommonJS version
+      return context.resolveRequest(context, result, platform);
+    }
+
+    if (moduleName === "@notesnook/logger") {
+      const result = require.resolve(moduleName); // gets CommonJS version
+      return context.resolveRequest(context, result, platform);
+    }
+
+    if (moduleName === "@notesnook/theme") {
+      const result = require.resolve(moduleName); // gets CommonJS version
+      return context.resolveRequest(context, result, platform);
+    }
+
     if (moduleName.includes("zustand")) {
       const result = require.resolve(moduleName); // gets CommonJS version
       return context.resolveRequest(context, result, platform);
