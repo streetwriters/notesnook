@@ -365,6 +365,8 @@ const headingUpdatePlugin = new Plugin({
 
     newDoc.descendants((newNode, pos) => {
       if (newNode.type.name === "heading") {
+        if (pos >= oldDoc.content.size) return;
+
         const oldNode = oldDoc.nodeAt(pos);
         if (
           oldNode &&
