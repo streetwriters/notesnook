@@ -33,6 +33,14 @@ export interface MessageStore {
   remove: (id: string) => void;
 }
 
+export type MessageId =
+  | "rate-app"
+  | "log-in"
+  | "recovery-key"
+  | "confirm-email"
+  | "app-update"
+  | "none";
+
 export type Message = {
   visible: boolean;
   message: string | null;
@@ -40,7 +48,8 @@ export type Message = {
   onPress: () => void;
   data: object;
   icon: string;
-  type?: string;
+  type: "error" | "normal";
+  id: MessageId;
 };
 
 export type Action = {
@@ -97,7 +106,8 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
     onPress: () => null,
     data: {},
     icon: "account-outline",
-    type: ""
+    type: "normal",
+    id: "none"
   },
   setMessage: (message) => {
     set({ message: { ...message } });
