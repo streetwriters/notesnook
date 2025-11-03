@@ -1,0 +1,3 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`check list item > inline image as first child in check list item 1`] = `"<ul class="simple-checklist"><li class="simple-checklist--item"><p data-spacing="double">item 1</p></li><li class="simple-checklist--item"><p data-spacing="double"></p><img src="image.png" data-aspect-ratio="1"></li></ul>"`;

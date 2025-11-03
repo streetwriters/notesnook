@@ -24,12 +24,12 @@ import {
 } from "@tiptap/core";
 import {
   findParentNodeOfTypeClosestToPos,
-  isClickWithinBounds
+  isClickWithinBounds,
+  ensureLeadingParagraph
 } from "../../utils/prosemirror.js";
 import { OutlineList } from "../outline-list/outline-list.js";
 import { keybindings, tiptapKeys } from "@notesnook/common";
 import { Paragraph } from "../paragraph/paragraph.js";
-import { DOMParser } from "@tiptap/pm/model";
 
 export interface ListItemOptions {
   HTMLAttributes: Record<string, unknown>;
@@ -66,17 +66,7 @@ export const OutlineListItem = Node.create<ListItemOptions>({
       {
         priority: 100,
         tag: `li[data-type="${this.name}"]`,
-        getContent: (node, schema) => {
-          const parser = DOMParser.fromSchema(schema);
-          const fragment = parser.parse(node).content;
-          const firstNode = fragment.firstChild;
-          if (firstNode && firstNode.type.name !== "paragraph") {
-            const emptyParagraph = schema.nodes.paragraph.create();
-            return fragment.addToStart(emptyParagraph);
-          }
-
-          return fragment;
-        }
+        getContent: ensureLeadingParagraph
       }
     ];
   },
