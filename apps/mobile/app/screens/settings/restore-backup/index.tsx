@@ -329,6 +329,7 @@ export const RestoreBackup = () => {
         });
 
       setFiles(files);
+      setLoading(false);
       BACKUP_FILES_CACHE.splice(0, BACKUP_FILES_CACHE.length, ...files);
       setLoading(false);
     } catch (e) {
