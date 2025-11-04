@@ -322,6 +322,7 @@ export const RestoreBackup = () => {
         });
 
       setFiles(files);
+      setLoading(false);
       BACKUP_FILES_CACHE.splice(0, BACKUP_FILES_CACHE.length, ...files);
     } catch (e) {
       e;
@@ -519,7 +520,11 @@ const BackupItem = ({
         paddingVertical: DefaultAppStyles.GAP_VERTICAL
       }}
     >
-      <View>
+      <View
+        style={{
+          flexShrink: 1
+        }}
+      >
         <Paragraph size={AppFontSize.sm}>{itemName}</Paragraph>
         <Paragraph
           size={AppFontSize.xs}
