@@ -31,7 +31,10 @@ import {
   NodeType,
   ResolvedPos,
   Attrs,
-  Slice
+  Slice,
+  DOMParser,
+  Schema,
+  Fragment
 } from "prosemirror-model";
 import { EditorState, Selection, Transaction } from "prosemirror-state";
 import TextStyle from "@tiptap/extension-text-style";
@@ -393,4 +396,17 @@ export function isClickWithinBounds(
     default:
       return false;
   }
+}
+
+export function ensureLeadingParagraph(node: Node, schema: Schema): Fragment {
+  const parser = DOMParser.fromSchema(schema);
+  const fragment = parser.parse(node).content;
+  const firstNode = fragment.firstChild;
+
+  if (firstNode && firstNode.type.name !== "paragraph") {
+    const emptyParagraph = schema.nodes.paragraph.create();
+    return fragment.addToStart(emptyParagraph);
+  }
+
+  return fragment;
 }

@@ -17,52 +17,39 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { createEditor, h, ul, li } from "../../../../test-utils/index.js";
+import {
+  createEditor,
+  taskItem,
+  taskList
+} from "../../../../test-utils/index.js";
 import { test, expect } from "vitest";
 import { TaskListNode } from "../index.js";
 import { TaskItemNode } from "../../task-item/index.js";
 import { p, eq } from "prosemirror-test-builder";
 import { countCheckedItems, deleteCheckedItems, sortList } from "../utils.js";
 
-function taskList(...children: HTMLLIElement[]) {
-  return ul(children, { class: "checklist" });
-}
-
-function taskItem(
-  text: string,
-  attr: { checked?: boolean } = {},
-  subList?: HTMLUListElement
-) {
-  const children: HTMLElement[] = [h("p", [text])];
-  if (subList) children.push(subList);
-
-  return li(children, {
-    class: "checklist--item " + (attr.checked ? "checked" : "")
-  });
-}
-
 const NESTED_TASK_LIST = taskList(
-  taskItem("Task item 1", { checked: true }),
-  taskItem("Task item 2"),
+  taskItem(["Task item 1"], { checked: true }),
+  taskItem(["Task item 2"]),
   taskItem(
-    "Task item 3",
+    ["Task item 3"],
     { checked: false },
     taskList(
-      taskItem("Task item 4", { checked: true }),
-      taskItem("Task item 5"),
+      taskItem(["Task item 4"], { checked: true }),
+      taskItem(["Task item 5"]),
       taskItem(
-        "Task item 6",
+        ["Task item 6"],
         { checked: false },
         taskList(
-          taskItem("Task item 7", { checked: true }),
-          taskItem("Task item 8", { checked: true }),
+          taskItem(["Task item 7"], { checked: true }),
+          taskItem(["Task item 8"], { checked: true }),
           taskItem(
-            "Task item 9",
+            ["Task item 9"],
             { checked: false },
             taskList(
-              taskItem("Task item 10", { checked: true }),
-              taskItem("Task item 11", { checked: true }),
-              taskItem("Task item 12")
+              taskItem(["Task item 10"], { checked: true }),
+              taskItem(["Task item 11"], { checked: true }),
+              taskItem(["Task item 12"])
             )
           )
         )
@@ -99,8 +86,8 @@ test(`count items in a task list`, async () => {
 test(`delete checked items in a task list`, async () => {
   const { editor } = createEditor({
     initialContent: taskList(
-      taskItem("Task item 1", { checked: true }),
-      taskItem("Task item 2")
+      taskItem(["Task item 1"], { checked: true }),
+      taskItem(["Task item 2"])
     ).outerHTML,
     extensions: {
       taskItem: TaskItemNode.configure({ nested: true }),
@@ -132,15 +119,15 @@ test(`delete checked items in a nested task list`, async () => {
 test(`delete checked items in a task list with no checked items should do nothing`, async () => {
   const { editor } = createEditor({
     initialContent: taskList(
-      taskItem("Task item 1", { checked: false }),
-      taskItem("Task item 2"),
+      taskItem(["Task item 1"], { checked: false }),
+      taskItem(["Task item 2"]),
       taskItem(
-        "Task item 3",
+        ["Task item 3"],
         { checked: false },
         taskList(
-          taskItem("Task item 4", { checked: false }),
-          taskItem("Task item 5"),
-          taskItem("Task item 6", { checked: false })
+          taskItem(["Task item 4"], { checked: false }),
+          taskItem(["Task item 5"]),
+          taskItem(["Task item 6"], { checked: false })
         )
       )
     ).outerHTML,
@@ -172,8 +159,10 @@ test(`sort checked items to the bottom of the task list`, async () => {
 
 test(`sorting a task list with no checked items should do nothing`, async () => {
   const { editor } = createEditor({
-    initialContent: taskList(taskItem("Task item 1"), taskItem("Task item 2"))
-      .outerHTML,
+    initialContent: taskList(
+      taskItem(["Task item 1"]),
+      taskItem(["Task item 2"])
+    ).outerHTML,
     extensions: {
       taskItem: TaskItemNode.configure({ nested: true }),
       taskList: TaskListNode

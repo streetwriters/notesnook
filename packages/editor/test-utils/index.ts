@@ -108,3 +108,36 @@ export function outlineListItem(
     "data-type": "outlineListItem"
   });
 }
+
+export function taskList(...children: HTMLLIElement[]) {
+  return ul(children, { class: "checklist" });
+}
+
+export function taskItem(
+  paragraphChildren: (string | HTMLElement)[],
+  attr: { checked?: boolean } = {},
+  subList?: HTMLUListElement
+) {
+  const children: HTMLElement[] = [h("p", paragraphChildren)];
+  if (subList) children.push(subList);
+
+  return li(children, {
+    class: "checklist--item " + (attr.checked ? "checked" : "")
+  });
+}
+
+export function checkList(...children: HTMLLIElement[]) {
+  return ul(children, { class: "simple-checklist" });
+}
+
+export function checkListItem(
+  paragraphChildren: (string | HTMLElement)[],
+  subList?: HTMLUListElement
+) {
+  const children: HTMLElement[] = [h("p", paragraphChildren)];
+  if (subList) children.push(subList);
+
+  return li(children, {
+    class: "simple-checklist--item "
+  });
+}

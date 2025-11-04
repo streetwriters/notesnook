@@ -25,6 +25,7 @@ import {
 } from "@tiptap/core";
 import { Node as ProseMirrorNode } from "@tiptap/pm/model";
 import { CheckList } from "../check-list/check-list.js";
+import { ensureLeadingParagraph } from "../../utils/prosemirror.js";
 
 export interface CheckListItemOptions {
   onReadOnlyChecked?: (node: ProseMirrorNode, checked: boolean) => boolean;
@@ -67,7 +68,8 @@ export const CheckListItem = Node.create<CheckListItemOptions>({
     return [
       {
         tag: `li.simple-checklist--item`,
-        priority: 51
+        priority: 51,
+        getContent: ensureLeadingParagraph
       }
     ];
   },
