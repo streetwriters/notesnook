@@ -62,6 +62,7 @@ export class Monographs implements ICollection {
       datePublished: merged.datePublished,
       selfDestruct: merged.selfDestruct,
       password: merged.password,
+      viewCount: merged.viewCount || 0,
       type: "monograph"
     });
   }

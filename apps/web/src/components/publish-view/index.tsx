@@ -45,6 +45,7 @@ function PublishView(props: PublishViewProps) {
   );
   const [isPasswordProtected, setIsPasswordProtected] = useState(false);
   const [selfDestruct, setSelfDestruct] = useState(false);
+  const [viewCount, setViewCount] = useState<number | undefined>();
   const [isPublishing, setIsPublishing] = useState(false);
   const [processingStatus, setProcessingStatus] = useState<{
     total?: number;
@@ -64,6 +65,7 @@ function PublishView(props: PublishViewProps) {
         setPublishId(monographId);
         setIsPasswordProtected(!!monograph.password);
         setSelfDestruct(!!monograph.selfDestruct);
+        setViewCount(monograph.viewCount);
 
         if (monograph.password) {
           const password = await db.monographs.decryptPassword(
@@ -140,12 +142,38 @@ function PublishView(props: PublishViewProps) {
                   overflow: "hidden"
                 }}
               >
-                <Text
-                  variant="body"
-                  sx={{ fontWeight: "bold", color: "paragraph" }}
+                <Flex
+                  sx={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between"
+                  }}
                 >
-                  {strings.publishedAt()}
-                </Text>
+                  <Text
+                    variant="body"
+                    sx={{ fontWeight: "bold", color: "paragraph" }}
+                  >
+                    {strings.publishedAt()}
+                  </Text>
+                  {typeof viewCount === "number" && (
+                    <Text
+                      variant="subBody"
+                      sx={{
+                        bg: "var(--background-secondary)",
+                        color: "accent",
+                        px: 1,
+                        py: 0.7,
+                        borderRadius: "default",
+                        fontSize: "subBody",
+                        fontWeight: "bold",
+                        border: "1px solid",
+                        borderColor: "accent"
+                      }}
+                    >
+                      {strings.views(viewCount)}
+                    </Text>
+                  )}
+                </Flex>
                 <Flex
                   sx={{
                     bg: "var(--background-secondary)",
