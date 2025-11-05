@@ -24,7 +24,7 @@ export const ListItem = TiptapListItem.extend({
   parseHTML() {
     return [
       {
-        priority: 100,
+        priority: 50,
         tag: `li`,
         getContent: ensureLeadingParagraph
       }
