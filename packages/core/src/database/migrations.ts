@@ -404,6 +404,14 @@ export class NNMigrationProvider implements MigrationProvider {
             .addColumn("password", "text")
             .execute();
         }
+      },
+      "a-2025-11-05": {
+        async up(db) {
+          await db.schema
+            .alterTable("monographs")
+            .addColumn("viewCount", "integer")
+            .execute();
+        }
       }
     };
   }

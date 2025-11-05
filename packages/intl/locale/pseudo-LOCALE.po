@@ -96,6 +96,10 @@ msgstr ""
 msgid "{count, plural, one {1 result} other {# results}}"
 msgstr ""
 
+#: src/strings.ts:2610
+msgid "{count, plural, one {1 view} other {# views}}"
+msgstr ""
+
 #: generated/action-confirmations.ts:32
 msgid "{count, plural, one {Are you sure you want to delete this attachment?} other {Are you sure you to delete these attachments?}}"
 msgstr ""
