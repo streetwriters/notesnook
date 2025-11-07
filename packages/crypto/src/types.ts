@@ -30,11 +30,6 @@ export type Cipher<TFormat extends DataFormat> = {
   length: number;
 };
 
-export type AsymmetricCipher<TFormat extends DataFormat> = Omit<
-  Cipher<TFormat>,
-  "iv" | "salt"
->;
-
 export type Output<TFormat extends DataFormat> =
   TFormat extends StringOutputFormat ? string : Uint8Array;
 export type Input<TFormat extends DataFormat> = Output<TFormat>;

@@ -492,9 +492,35 @@ class UserManager {
   }
 
   async getInboxKeys() {
-    return this.getUserKey("inboxKeys", {
-      generateKey: () => this.db.crypto().generateCryptoKeyPair(),
-      errorContext: "inbox encryption keys"
+    return this.getUserKey<SerializedKeyPair>({
+      getCache: () => this.cachedInboxKeys,
+      setCache: (key) => {
+        this.cachedInboxKeys = key;
+      },
+      userProperty: "inboxKeys",
+      generateKey: () => this.db.crypto().generatePGPKeyPair(),
+      errorContext: "inbox encryption keys",
+      encrypt: async (keys, userEncryptionKey) => {
+        const encryptedPrivateKey = await this.db
+          .storage()
+          .encrypt(userEncryptionKey, JSON.stringify(keys.privateKey));
+        return {
+          inboxKeys: {
+            public: keys.publicKey,
+            private: encryptedPrivateKey
+          }
+        };
+      },
+      decrypt: async (user, userEncryptionKey) => {
+        if (!user.inboxKeys) throw new Error("Inbox keys not found");
+        const decryptedPrivateKey = await this.db
+          .storage()
+          .decrypt(userEncryptionKey, user.inboxKeys.private);
+        return {
+          publicKey: user.inboxKeys.public,
+          privateKey: JSON.parse(decryptedPrivateKey)
+        };
+      }
     });
   }
 
@@ -519,6 +545,23 @@ class UserManager {
     );
 
     await this.setUser({ ...user, inboxKeys: undefined });
+  }
+
+  async saveInboxKeys(keys: SerializedKeyPair) {
+    this.cachedInboxKeys = keys;
+
+    const userEncryptionKey = await this.getEncryptionKey();
+    if (!userEncryptionKey) return;
+
+    const updatePayload = {
+      inboxKeys: {
+        public: keys.publicKey,
+        private: await this.db
+          .storage()
+          .encrypt(userEncryptionKey, JSON.stringify(keys.privateKey))
+      }
+    };
+    await this.updateUser(updatePayload);
   }
 
   async sendVerificationEmail(newEmail?: string) {
