@@ -96,7 +96,7 @@ import {
 } from "../icons";
 import { Context } from "../list-container/types";
 import ListItem from "../list-item";
-import { showPublishView } from "../publish-view";
+import { PublishDialog } from "../publish-view";
 import TimeAgo from "../time-ago";
 
 type NoteProps = NoteResolvedData & {
@@ -480,7 +480,7 @@ export const noteMenuItems: (
                 title: strings.update(),
                 icon: Update.path,
                 onClick: () => {
-                  showPublishView(note, "bottom");
+                  PublishDialog.show({ note });
                 }
               },
               {
@@ -499,7 +499,7 @@ export const noteMenuItems: (
             ]
           }
         : undefined,
-      onClick: () => showPublishView(note, "bottom")
+      onClick: () => PublishDialog.show({ note })
     },
     {
       type: "button",

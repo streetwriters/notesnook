@@ -96,10 +96,6 @@ msgstr ""
 msgid "{count, plural, one {1 result} other {# results}}"
 msgstr ""
 
-#: src/strings.ts:2610
-msgid "{count, plural, one {1 view} other {# views}}"
-msgstr ""
-
 #: generated/action-confirmations.ts:32
 msgid "{count, plural, one {Are you sure you want to delete this attachment?} other {Are you sure you to delete these attachments?}}"
 msgstr ""
@@ -1593,7 +1589,7 @@ msgstr ""
 msgid "Click to reset {title}"
 msgstr ""
 
-#: src/strings.ts:2614
+#: src/strings.ts:2610
 msgid "Click to update"
 msgstr ""
 
@@ -4088,6 +4084,10 @@ msgstr ""
 msgid "No one can view this {type} except you."
 msgstr ""
 
+#: src/strings.ts:2611
+msgid "No password"
+msgstr ""
+
 #: src/strings.ts:279
 msgid "No references found of this note"
 msgstr ""
@@ -4850,6 +4850,10 @@ msgstr ""
 
 #: src/strings.ts:486
 msgid "Publish note"
+msgstr ""
+
+#: src/strings.ts:2612
+msgid "Publish to the web"
 msgstr ""
 
 #: src/strings.ts:488
@@ -6987,6 +6991,10 @@ msgstr ""
 
 #: src/strings.ts:1061
 msgid "View your recovery codes to recover your account in case you lose access to your two-factor authentication methods."
+msgstr ""
+
+#: src/strings.ts:2609
+msgid "Views"
 msgstr ""
 
 #: src/strings.ts:416
