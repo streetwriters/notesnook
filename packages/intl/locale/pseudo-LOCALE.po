@@ -1593,6 +1593,10 @@ msgstr ""
 msgid "Click to reset {title}"
 msgstr ""
 
+#: src/strings.ts:2614
+msgid "Click to update"
+msgstr ""
+
 #: src/strings.ts:1380
 msgid "Close"
 msgstr ""

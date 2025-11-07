@@ -2610,5 +2610,6 @@ Use this if changes from other devices are not appearing on this device. This wi
     plural(count, {
       one: `1 view`,
       other: `# views`
-    })
+    }),
+  clickToUpdate: () => t`Click to update`
 };
