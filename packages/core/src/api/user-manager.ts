@@ -533,7 +533,7 @@ class UserManager {
         this.cachedInboxKeys = key;
       },
       userProperty: "inboxKeys",
-      generateKey: () => this.db.crypto().generateCryptoKeyPair(),
+      generateKey: () => this.db.crypto().generatePGPKeyPair(),
       errorContext: "inbox encryption keys",
       encrypt: async (keys, userEncryptionKey) => {
         const encryptedPrivateKey = await this.db
@@ -582,6 +582,23 @@ class UserManager {
     );
 
     await this.setUser({ ...user, inboxKeys: undefined });
+  }
+
+  async saveInboxKeys(keys: SerializedKeyPair) {
+    this.cachedInboxKeys = keys;
+
+    const userEncryptionKey = await this.getEncryptionKey();
+    if (!userEncryptionKey) return;
+
+    const updatePayload = {
+      inboxKeys: {
+        public: keys.publicKey,
+        private: await this.db
+          .storage()
+          .encrypt(userEncryptionKey, JSON.stringify(keys.privateKey))
+      }
+    };
+    await this.updateUser(updatePayload);
   }
 
   async sendVerificationEmail(newEmail?: string) {

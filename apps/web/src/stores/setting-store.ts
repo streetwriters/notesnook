@@ -27,6 +27,8 @@ import { TimeFormat, DayFormat, WeekFormat } from "@notesnook/core";
 import { Profile, TrashCleanupInterval } from "@notesnook/core";
 import { showToast } from "../utils/toast";
 import { ConfirmDialog } from "../dialogs/confirm";
+import * as openpgp from "openpgp";
+import { InboxPGPKeysDialog } from "../dialogs/inbox-pgp-keys-dialog";
 
 export const HostIds = [
   "API_HOST",
@@ -294,17 +296,14 @@ class SettingStore extends BaseStore<SettingStore> {
 
     try {
       if (isInboxEnabled) {
-        const inboxTokens = await db.inboxApiKeys.get();
-        if (inboxTokens && inboxTokens.length > 0) {
-          const ok = await ConfirmDialog.show({
-            title: "Disable Inbox API",
-            message:
-              "Disabling will revoke all existing API keys, they will no longer work. Are you sure?",
-            positiveButtonText: "Yes",
-            negativeButtonText: "No"
-          });
-          if (!ok) return;
-        }
+        const ok = await ConfirmDialog.show({
+          title: "Disable Inbox API",
+          message:
+            "Disabling will delete all your unsynced inbox items. Additionally, disabling will revoke all existing API keys, they will no longer work. Are you sure?",
+          positiveButtonText: "Yes",
+          negativeButtonText: "No"
+        });
+        if (!ok) return;
 
         await db.user.discardInboxKeys();
         this.set({ isInboxEnabled: false });
@@ -312,8 +311,10 @@ class SettingStore extends BaseStore<SettingStore> {
         return;
       }
 
-      await db.user.getInboxKeys();
-      this.set({ isInboxEnabled: true });
+      const ok = await InboxPGPKeysDialog.show({ keys: null });
+      if (ok) {
+        this.set({ isInboxEnabled: true });
+      }
     } catch (e) {
       if (e instanceof Error) {
         showToast("error", e.message);
