@@ -27,7 +27,7 @@ import { db } from "../../common/db";
 import { writeText } from "clipboard-polyfill";
 import { ScopedThemeProvider } from "../theme-provider";
 import { showToast } from "../../utils/toast";
-import { EV, EVENTS, hosts } from "@notesnook/core";
+import { EV, EVENTS, hosts, MonographStats } from "@notesnook/core";
 import { useStore } from "../../stores/monograph-store";
 import ReactModal from "react-modal";
 import { DialogButton } from "../dialog";
@@ -45,7 +45,7 @@ function PublishView(props: PublishViewProps) {
   );
   const [isPasswordProtected, setIsPasswordProtected] = useState(false);
   const [selfDestruct, setSelfDestruct] = useState(false);
-  const [viewCount, setViewCount] = useState<number | undefined>();
+  const [stats, setStats] = useState<MonographStats | undefined>();
   const [isPublishing, setIsPublishing] = useState(false);
   const [processingStatus, setProcessingStatus] = useState<{
     total?: number;
@@ -65,7 +65,9 @@ function PublishView(props: PublishViewProps) {
         setPublishId(monographId);
         setIsPasswordProtected(!!monograph.password);
         setSelfDestruct(!!monograph.selfDestruct);
-        setViewCount(monograph.viewCount);
+
+        const stats = await db.monographs.stats(monographId);
+        setStats(stats);
 
         if (monograph.password) {
           const password = await db.monographs.decryptPassword(
@@ -155,7 +157,7 @@ function PublishView(props: PublishViewProps) {
                   >
                     {strings.publishedAt()}
                   </Text>
-                  {typeof viewCount === "number" && (
+                  {typeof stats?.viewCount === "number" && (
                     <Text
                       variant="subBody"
                       sx={{
@@ -167,10 +169,18 @@ function PublishView(props: PublishViewProps) {
                         fontSize: "subBody",
                         fontWeight: "bold",
                         border: "1px solid",
-                        borderColor: "accent"
+                        borderColor: "accent",
+                        cursor: "pointer"
+                      }}
+                      title={`${strings.views(
+                        stats.viewCount
+                      )} (${strings.clickToUpdate()})`}
+                      onClick={async () => {
+                        const stats = await db.monographs.stats(publishId);
+                        setStats(stats);
                       }}
                     >
-                      {strings.views(viewCount)}
+                      {strings.views(stats.viewCount)}
                     </Text>
                   )}
                 </Flex>
