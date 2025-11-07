@@ -187,24 +187,11 @@ export async function handleInboxItems(
         continue;
       }
 
-      const decryptedKey = await db.storage().decryptAsymmetric(inboxKeys, {
-        alg: item.key.alg,
-        cipher: item.key.cipher,
-        format: "base64",
-        length: item.key.length
-      });
-      const decryptedItem = await db.storage().decrypt(
-        { key: decryptedKey },
-        {
-          alg: item.alg,
-          iv: item.iv,
-          cipher: item.cipher,
-          format: "base64",
-          length: item.length,
-          salt: item.salt
-        }
-      );
+      const decryptedItem = await db
+        .storage()
+        .decryptPGPMessage(inboxKeys.privateKey, item.cipher);
       const parsed = JSON.parse(decryptedItem) as ParsedInboxItem;
+
       if (parsed.type !== "note") {
         continue;
       }
