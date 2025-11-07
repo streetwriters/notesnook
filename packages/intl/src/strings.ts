@@ -2606,10 +2606,8 @@ Use this if changes from other devices are not appearing on this device. This wi
     t`Click here to directly claim the promotion.`,
   loginToUploadAttachments: () =>
     t`Login to upload attachments. [Read more](https://help.notesnook.com/faqs/login-to-upload-attachments)`,
-  views: (count: number) =>
-    plural(count, {
-      one: `1 view`,
-      other: `# views`
-    }),
-  clickToUpdate: () => t`Click to update`
+  views: () => t`Views`,
+  clickToUpdate: () => t`Click to update`,
+  noPassword: () => t`No password`,
+  publishToTheWeb: () => t`Publish to the web`
 };
