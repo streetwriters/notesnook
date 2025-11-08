@@ -437,6 +437,17 @@ const features = {
       legacyPro: createLimit(true)
     }
   }),
+  monographAnalytics: createFeature({
+    id: "monographAnalytics",
+    title: "Monographs analytics",
+    availability: {
+      free: createLimit(false),
+      essential: createLimit(false),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
+    }
+  }),
   sms2FA: createFeature({
     id: "sms2FA",
     title: "2FA via SMS",
