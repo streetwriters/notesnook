@@ -23,15 +23,20 @@ import { Loading, Refresh } from "../icons";
 import { db } from "../../common/db";
 import { writeText } from "clipboard-polyfill";
 import { showToast } from "../../utils/toast";
-import { EV, EVENTS, hosts, Monograph, MonographStats } from "@notesnook/core";
+import { EV, EVENTS, hosts, MonographAnalytics } from "@notesnook/core";
 import { useStore } from "../../stores/monograph-store";
 import { Note } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { getFormattedDate, usePromise } from "@notesnook/common";
+import {
+  getFormattedDate,
+  useIsFeatureAvailable,
+  usePromise
+} from "@notesnook/common";
 import { createRoot, Root } from "react-dom/client";
 import { PopupPresenter } from "@notesnook/ui";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import Dialog from "../../components/dialog";
+import { UpgradeDialog } from "../../dialogs/buy-dialog/upgrade-dialog";
 
 type PublishViewProps = {
   note: Note;
@@ -43,11 +48,11 @@ function PublishView(props: PublishViewProps) {
   const [selfDestruct, setSelfDestruct] = useState(
     props.monograph?.selfDestruct
   );
-  const [stats, setStats] = useState<MonographStats>(
-    props.monograph?.stats || { viewCount: 0 }
+  const [analytics, setAnalytics] = useState<MonographAnalytics>(
+    props.monograph?.analytics || { totalViews: 0 }
   );
   const [status, setStatus] = useState<{
-    action: "publish" | "unpublish" | "stats";
+    action: "publish" | "unpublish" | "analytics";
   }>();
   const [processingStatus, setProcessingStatus] = useState<{
     total?: number;
@@ -57,6 +62,7 @@ function PublishView(props: PublishViewProps) {
   const publishNote = useStore((store) => store.publish);
   const unpublishNote = useStore((store) => store.unpublish);
   const [monograph, setMonograph] = useState(props.monograph);
+  const monographAnalytics = useIsFeatureAvailable("monographAnalytics");
 
   useEffect(() => {
     const fileDownloadedEvent = EV.subscribe(
@@ -144,25 +150,43 @@ function PublishView(props: PublishViewProps) {
             }}
           >
             <Text variant="body">{strings.views()}</Text>
-            <Flex sx={{ alignItems: "center", gap: 1 }}>
-              <Text variant="body" sx={{ color: "paragraph-secondary" }}>
-                {stats.viewCount}
-              </Text>
+            {monographAnalytics?.isAllowed ? (
+              <Flex sx={{ alignItems: "center", gap: 1 }}>
+                <Text
+                  variant="body"
+                  sx={{
+                    color: "paragraph-secondary"
+                  }}
+                >
+                  {analytics.totalViews}
+                </Text>
+                <Button
+                  variant="tertiary"
+                  onClick={async () => {
+                    try {
+                      setStatus({ action: "analytics" });
+                      const analytics = await db.monographs.analytics(
+                        monograph?.id
+                      );
+                      setAnalytics(analytics);
+                    } finally {
+                      setStatus(undefined);
+                    }
+                  }}
+                >
+                  <Refresh size={14} rotate={status?.action === "analytics"} />
+                </Button>
+              </Flex>
+            ) : monographAnalytics ? (
               <Button
-                variant="tertiary"
-                onClick={async () => {
-                  try {
-                    setStatus({ action: "stats" });
-                    const stats = await db.monographs.stats(monograph?.id);
-                    setStats(stats);
-                  } finally {
-                    setStatus(undefined);
-                  }
-                }}
+                variant="anchor"
+                onClick={() =>
+                  UpgradeDialog.show({ feature: monographAnalytics })
+                }
               >
-                <Refresh size={14} rotate={status?.action === "stats"} />
+                {strings.upgrade()}
               </Button>
-            </Flex>
+            ) : null}
           </Flex>
         ) : null}
         <Flex
@@ -396,7 +420,7 @@ type ResolvedMonograph = {
   id: string;
   selfDestruct: boolean;
   publishedAt?: number;
-  stats: MonographStats;
+  analytics: MonographAnalytics;
   password?: string;
 };
 
@@ -409,7 +433,7 @@ async function resolveMonograph(
     id: monographId,
     selfDestruct: !!monograph.selfDestruct,
     publishedAt: monograph.datePublished,
-    stats: await db.monographs.stats(monographId),
+    analytics: await db.monographs.analytics(monographId),
     password: monograph.password
       ? await db.monographs.decryptPassword(monograph.password)
       : undefined
