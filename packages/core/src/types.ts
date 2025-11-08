@@ -498,7 +498,6 @@ export interface Monograph extends BaseItem<"monograph"> {
   datePublished: number;
   selfDestruct: boolean;
   password?: Cipher<"base64">;
-  viewCount?: number;
 }
 
 export type Match = {
