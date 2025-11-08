@@ -122,8 +122,7 @@ function PublishView(props: PublishViewProps) {
         sx={{
           flexDirection: "column",
           border: "1px solid var(--border)",
-          borderRadius: "default",
-          "& div:not(:last-child)": { borderBottom: "1px solid var(--border)" }
+          borderRadius: "default"
         }}
       >
         {monograph?.publishedAt ? (
