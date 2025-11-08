@@ -191,12 +191,16 @@ export class Monographs {
     return this.db.storage().decrypt(monographPasswordsKey, password);
   }
 
-  async analytics(monographId: string) {
-    const token = await this.db.tokenManager.getAccessToken();
-    const analytics = (await http.get(
-      `${Constants.API_HOST}/monographs/${monographId}/analytics`,
-      token
-    )) as MonographAnalytics;
-    return analytics;
+  async analytics(monographId: string): Promise<MonographAnalytics> {
+    try {
+      const token = await this.db.tokenManager.getAccessToken();
+      const analytics = (await http.get(
+        `${Constants.API_HOST}/monographs/${monographId}/analytics`,
+        token
+      )) as MonographAnalytics;
+      return analytics;
+    } catch {
+      return { totalViews: 0 };
+    }
   }
 }
