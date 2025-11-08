@@ -121,23 +121,24 @@ export class ResizeState {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const state = this;
     const action = tr.getMeta(columnResizingPluginKey);
+    const decorations = tr.docChanged
+      ? state.decorations.map(tr.mapping, tr.doc)
+      : state.decorations;
     if (action && action.setHandle != null)
-      return new ResizeState(
-        action.setHandle,
-        false,
-        state.decorations.map(tr.mapping, tr.doc)
-      );
+      return new ResizeState(action.setHandle, false, decorations);
     if (action && action.setDragging !== undefined)
       return new ResizeState(
         state.activeHandle,
         action.setDragging,
-        state.decorations.map(tr.mapping, tr.doc)
+        decorations
       );
     if (action && action.setDecorations !== undefined) {
       return new ResizeState(
         state.activeHandle,
         state.dragging,
-        action.setDecorations.map(tr.mapping, tr.doc)
+        tr.docChanged
+          ? action.setDecorations.map(tr.mapping, tr.doc)
+          : action.setDecorations
       );
     }
     if (state.activeHandle > -1 && tr.docChanged) {
@@ -145,11 +146,7 @@ export class ResizeState {
       if (!pointsAtCell(tr.doc.resolve(handle))) {
         handle = -1;
       }
-      return new ResizeState(
-        handle,
-        state.dragging,
-        state.decorations.map(tr.mapping, tr.doc)
-      );
+      return new ResizeState(handle, state.dragging, decorations);
     }
     return state;
   }
@@ -330,7 +327,7 @@ function updateColumnWidth(
       ? attrs.colwidth.slice()
       : zeroes(attrs.colspan);
     colwidth[index] = width;
-    tr.setNodeMarkup(start + pos, null, { ...attrs, colwidth: colwidth });
+    tr.setNodeAttribute(start + pos, "colwidth", colwidth);
   }
   if (tr.docChanged) view.dispatch(tr);
 }
