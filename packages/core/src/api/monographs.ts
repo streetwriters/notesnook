@@ -37,6 +37,9 @@ type EncryptedMonograph = MonographApiRequestBase & {
 type MonographApiRequest = (UnencryptedMonograph | EncryptedMonograph) & {
   userId: string;
 };
+export type MonographAnalytics = {
+  totalViews: number;
+};
 
 export type PublishOptions = { password?: string; selfDestruct?: boolean };
 export class Monographs {
@@ -186,5 +189,18 @@ export class Monographs {
     const monographPasswordsKey = await this.db.user.getMonographPasswordsKey();
     if (!monographPasswordsKey) return "";
     return this.db.storage().decrypt(monographPasswordsKey, password);
+  }
+
+  async analytics(monographId: string): Promise<MonographAnalytics> {
+    try {
+      const token = await this.db.tokenManager.getAccessToken();
+      const analytics = (await http.get(
+        `${Constants.API_HOST}/monographs/${monographId}/analytics`,
+        token
+      )) as MonographAnalytics;
+      return analytics;
+    } catch {
+      return { totalViews: 0 };
+    }
   }
 }

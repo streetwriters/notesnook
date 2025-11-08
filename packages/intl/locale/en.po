@@ -1600,6 +1600,10 @@ msgstr "Click to remove"
 msgid "Click to reset {title}"
 msgstr "Click to reset {title}"
 
+#: src/strings.ts:2610
+msgid "Click to update"
+msgstr "Click to update"
+
 #: src/strings.ts:1380
 msgid "Close"
 msgstr "Close"
@@ -4100,6 +4104,10 @@ msgstr "No notebooks selected to move"
 msgid "No one can view this {type} except you."
 msgstr "No one can view this {type} except you."
 
+#: src/strings.ts:2611
+msgid "No password"
+msgstr "No password"
+
 #: src/strings.ts:279
 msgid "No references found of this note"
 msgstr "No references found of this note"
@@ -4869,6 +4877,10 @@ msgstr "Publish"
 #: src/strings.ts:486
 msgid "Publish note"
 msgstr "Publish note"
+
+#: src/strings.ts:2612
+msgid "Publish to the web"
+msgstr "Publish to the web"
 
 #: src/strings.ts:488
 msgid "Publish your note to share it with others. You can set a password to protect it."
@@ -7029,6 +7041,10 @@ msgstr "View source code"
 #: src/strings.ts:1061
 msgid "View your recovery codes to recover your account in case you lose access to your two-factor authentication methods."
 msgstr "View your recovery codes to recover your account in case you lose access to your two-factor authentication methods."
+
+#: src/strings.ts:2609
+msgid "Views"
+msgstr "Views"
 
 #: src/strings.ts:416
 msgid "Visit homepage"

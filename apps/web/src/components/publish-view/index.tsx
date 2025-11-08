@@ -18,34 +18,39 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useRef, useState } from "react";
-import ReactDOM from "react-dom";
-import { Flex, Text, Button, Link } from "@theme-ui/components";
-import { Copy } from "../icons";
-import Toggle from "../toggle";
-import Field from "../field";
+import { Flex, Text, Button, Link, Switch, Input } from "@theme-ui/components";
+import { Loading, Refresh } from "../icons";
 import { db } from "../../common/db";
 import { writeText } from "clipboard-polyfill";
-import { ScopedThemeProvider } from "../theme-provider";
 import { showToast } from "../../utils/toast";
-import { EV, EVENTS, hosts } from "@notesnook/core";
+import { EV, EVENTS, hosts, MonographAnalytics } from "@notesnook/core";
 import { useStore } from "../../stores/monograph-store";
-import ReactModal from "react-modal";
-import { DialogButton } from "../dialog";
 import { Note } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
+import {
+  getFormattedDate,
+  useIsFeatureAvailable,
+  usePromise
+} from "@notesnook/common";
+import { createRoot, Root } from "react-dom/client";
+import { PopupPresenter } from "@notesnook/ui";
+import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
+import Dialog from "../../components/dialog";
+import { UpgradeDialog } from "../../dialogs/buy-dialog/upgrade-dialog";
 
 type PublishViewProps = {
   note: Note;
+  monograph?: ResolvedMonograph;
   onClose: (result: boolean) => void;
 };
 function PublishView(props: PublishViewProps) {
   const { note, onClose } = props;
-  const [publishId, setPublishId] = useState<string | undefined>(
-    db.monographs.monograph(note.id)
+  const [selfDestruct, setSelfDestruct] = useState(
+    props.monograph?.selfDestruct
   );
-  const [isPasswordProtected, setIsPasswordProtected] = useState(false);
-  const [selfDestruct, setSelfDestruct] = useState(false);
-  const [isPublishing, setIsPublishing] = useState(false);
+  const [status, setStatus] = useState<{
+    action: "publish" | "unpublish" | "analytics";
+  }>();
   const [processingStatus, setProcessingStatus] = useState<{
     total?: number;
     current: number;
@@ -53,29 +58,12 @@ function PublishView(props: PublishViewProps) {
   const passwordInput = useRef<HTMLInputElement>(null);
   const publishNote = useStore((store) => store.publish);
   const unpublishNote = useStore((store) => store.unpublish);
-
-  useEffect(() => {
-    if (!publishId) return;
-    (async () => {
-      const monographId = db.monographs.monograph(note.id);
-      if (monographId) {
-        const monograph = await db.monographs.get(monographId);
-        if (!monograph) return;
-        setPublishId(monographId);
-        setIsPasswordProtected(!!monograph.password);
-        setSelfDestruct(!!monograph.selfDestruct);
-
-        if (monograph.password) {
-          const password = await db.monographs.decryptPassword(
-            monograph.password
-          );
-          if (passwordInput.current) {
-            passwordInput.current.value = password;
-          }
-        }
-      }
-    })();
-  }, [publishId, isPublishing, note.id]);
+  const [monograph, setMonograph] = useState(props.monograph);
+  const monographAnalytics = useIsFeatureAvailable("monographAnalytics");
+  const analytics = usePromise(async () => {
+    if (!monographAnalytics?.isAllowed || !monograph) return { totalViews: 0 };
+    return await db.monographs.analytics(monograph?.id);
+  }, [monograph?.id, monographAnalytics]);
 
   useEffect(() => {
     const fileDownloadedEvent = EV.subscribe(
@@ -93,175 +81,182 @@ function PublishView(props: PublishViewProps) {
   }, [note.id]);
 
   return (
-    <ScopedThemeProvider
-      scope="dialog"
-      injectCssVars
-      sx={{
-        width: ["100%", 350, 350],
-        border: "1px solid",
-        borderColor: "border",
-        borderRadius: "dialog",
-        flexDirection: "column",
-        overflow: "hidden"
-      }}
-      bg="background"
-    >
-      <Flex p={2} sx={{ flexDirection: "column" }}>
-        <Text
-          variant="body"
-          sx={{ fontSize: "title", fontWeight: "bold", color: "accent" }}
+    <>
+      {monograph?.id ? (
+        <Flex
+          sx={{
+            border: "1px solid var(--border)",
+            borderRadius: "default",
+            alignItems: "center",
+            justifyContent: "space-between"
+          }}
         >
-          {note.title}
-        </Text>
-        {isPublishing ? (
-          <Flex
-            my={50}
+          <Link
+            variant="text.body"
+            as="a"
+            target="_blank"
+            href={`${hosts.MONOGRAPH_HOST}/${monograph?.id}`}
             sx={{
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center"
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              textDecoration: "none",
+              overflow: "hidden",
+              px: 1
             }}
           >
-            <Text>{strings.pleaseWait()}...</Text>
-            {processingStatus && (
-              <Text variant="subBody" mt={1}>
-                {strings.downloadingImages()} ({processingStatus.current}/
-                {processingStatus.total})
-              </Text>
-            )}
+            {`${hosts.MONOGRAPH_HOST}/${monograph?.id}`}
+          </Link>
+          <Button
+            variant="secondary"
+            className="copyPublishLink"
+            sx={{ flexShrink: 0, m: 0 }}
+            onClick={() => {
+              writeText(`${hosts.MONOGRAPH_HOST}/${monograph?.id}`);
+            }}
+          >
+            {strings.copy()}
+          </Button>
+        </Flex>
+      ) : null}
+      <Flex
+        sx={{
+          flexDirection: "column",
+          border: "1px solid var(--border)",
+          borderRadius: "default"
+        }}
+      >
+        {monograph?.publishedAt ? (
+          <Flex
+            sx={{
+              alignItems: "center",
+              justifyContent: "space-between",
+              px: 1,
+              height: 30
+            }}
+          >
+            <Text variant="body">{strings.publishedAt()}</Text>
+            <Text variant="body" sx={{ color: "paragraph-secondary" }}>
+              {getFormattedDate(monograph?.publishedAt, "date-time")}
+            </Text>
           </Flex>
-        ) : (
-          <>
-            {publishId ? (
-              <Flex
-                mt={1}
-                sx={{
-                  flexDirection: "column",
-                  overflow: "hidden"
-                }}
-              >
-                <Text
-                  variant="body"
-                  sx={{ fontWeight: "bold", color: "paragraph" }}
-                >
-                  {strings.publishedAt()}
-                </Text>
-                <Flex
-                  sx={{
-                    bg: "var(--background-secondary)",
-                    mt: 1,
-                    p: 1,
-                    borderRadius: "default",
-                    alignItems: "center",
-                    justifyContent: "center"
-                  }}
-                >
-                  <Link
-                    variant="text.body"
-                    as="a"
-                    target="_blank"
-                    href={`${hosts.MONOGRAPH_HOST}/${publishId}`}
+        ) : null}
+        {monograph?.id ? (
+          <Flex
+            sx={{
+              alignItems: "center",
+              justifyContent: "space-between",
+              px: 1,
+              height: 30
+            }}
+          >
+            <Text variant="body">{strings.views()}</Text>
+            {monographAnalytics?.isAllowed ? (
+              analytics.status === "fulfilled" ? (
+                <Flex sx={{ alignItems: "center", gap: 1 }}>
+                  <Text
+                    variant="body"
                     sx={{
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                      textDecoration: "none",
-                      overflow: "hidden",
-                      mr: 2
+                      color: "paragraph-secondary"
                     }}
                   >
-                    {`${hosts.MONOGRAPH_HOST}/${publishId}`}
-                  </Link>
+                    {analytics.value.totalViews}
+                  </Text>
                   <Button
-                    variant="anchor"
-                    className="copyPublishLink"
-                    onClick={() => {
-                      writeText(`${hosts.MONOGRAPH_HOST}/${publishId}`);
+                    variant="tertiary"
+                    onClick={async () => {
+                      try {
+                        setStatus({ action: "analytics" });
+                        analytics.refresh();
+                      } finally {
+                        setStatus(undefined);
+                      }
                     }}
                   >
-                    <Copy size={20} color="accent" />
+                    <Refresh
+                      size={14}
+                      rotate={status?.action === "analytics"}
+                    />
                   </Button>
                 </Flex>
-              </Flex>
-            ) : (
-              <Text
-                variant="body"
-                sx={{
-                  color: "paragraph"
-                }}
+              ) : (
+                <Loading size={14} />
+              )
+            ) : monographAnalytics ? (
+              <Button
+                variant="anchor"
+                onClick={() =>
+                  UpgradeDialog.show({ feature: monographAnalytics })
+                }
               >
-                {strings.monographDesc()}
-              </Text>
-            )}
-            <Toggle
-              title={strings.monographSelfDestructHeading()}
-              tip={strings.monographSelfDestructDesc()}
-              isToggled={selfDestruct}
-              onToggled={() => setSelfDestruct((s) => !s)}
-            />
-            <Toggle
-              title={strings.monographPassHeading()}
-              tip={strings.monographPassDesc()}
-              isToggled={isPasswordProtected}
-              onToggled={() => setIsPasswordProtected((s) => !s)}
-            />
-            {isPasswordProtected && (
-              <Field
-                inputRef={passwordInput}
-                autoFocus
-                type="password"
-                id="publishPassword"
-                placeholder={strings.enterPassword()}
-                required
-                sx={{ my: 1 }}
-              />
-            )}
-          </>
-        )}
+                {strings.upgrade()}
+              </Button>
+            ) : null}
+          </Flex>
+        ) : null}
+        <Flex
+          sx={{
+            alignItems: "center",
+            justifyContent: "space-between",
+            cursor: "pointer",
+            px: 1,
+            height: 30,
+
+            "& label": { width: "auto", flexShrink: 0 }
+          }}
+          onClick={() => setSelfDestruct((s) => !s)}
+          title={strings.monographSelfDestructDesc()}
+        >
+          <Text variant="body">{strings.monographSelfDestructHeading()}</Text>
+          <Switch
+            sx={{
+              m: 0,
+              bg: selfDestruct ? "accent" : "icon-secondary",
+              flexShrink: 0,
+              scale: 0.75
+            }}
+            checked={selfDestruct}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </Flex>
+
+        <Flex
+          sx={{
+            alignItems: "center",
+            justifyContent: "space-between",
+            px: 1,
+            height: 30,
+
+            "& label": { width: "auto", flexShrink: 0 }
+          }}
+          title={strings.monographPassDesc()}
+        >
+          <Text variant="body">{strings.monographPassHeading()}</Text>
+          <Input
+            ref={passwordInput}
+            type="password"
+            variant="clean"
+            placeholder={strings.noPassword()}
+            defaultValue={monograph?.password}
+            sx={{ textAlign: "right", p: 0 }}
+          />
+        </Flex>
       </Flex>
 
       <Flex
-        bg="var(--background-secondary)"
-        p={1}
-        px={2}
-        sx={{ alignItems: "center", justifyContent: "end" }}
+        sx={{
+          flexDirection: "column",
+          border: "1px solid var(--border)",
+          borderRadius: "default",
+          overflow: "hidden"
+        }}
       >
-        <DialogButton
-          color="accent"
-          onClick={async () => {
-            try {
-              setIsPublishing(true);
-              const password = passwordInput.current?.value;
-
-              const publishId = await publishNote(note.id, {
-                selfDestruct,
-                password
-              });
-              setPublishId(publishId);
-              onClose(true);
-              showToast("success", strings.actions.published.note(1));
-            } catch (e) {
-              console.error(e);
-              showToast(
-                "error",
-                `${strings.actionErrors.published.note(1)}: ${
-                  (e as Error).message
-                }`
-              );
-            } finally {
-              setIsPublishing(false);
-            }
-          }}
-          loading={isPublishing}
-          text={publishId ? strings.update() : strings.publish()}
-        />
-        {publishId && (
-          <DialogButton
-            color="red"
+        {monograph?.id && (
+          <Button
+            variant="errorSecondary"
             onClick={async () => {
               try {
-                setIsPublishing(true);
+                setStatus({ action: "unpublish" });
                 await unpublishNote(note.id);
-                setPublishId(undefined);
                 onClose(true);
                 showToast("success", strings.actions.unpublished.note(1));
               } catch (e) {
@@ -272,74 +267,177 @@ function PublishView(props: PublishViewProps) {
                     (e as Error).message
                 );
               } finally {
-                setIsPublishing(false);
+                setStatus(undefined);
               }
             }}
-            text={"Unpublish"}
-          />
+            sx={{ textAlign: "left", borderRadius: "none" }}
+            disabled={!!status}
+          >
+            {status?.action === "unpublish" ? (
+              <Loading size={16} />
+            ) : (
+              strings.unpublish()
+            )}
+          </Button>
         )}
+        <Button
+          variant={monograph?.id ? "secondary" : "accentSecondary"}
+          onClick={async () => {
+            try {
+              setStatus({ action: "publish" });
+              const password = passwordInput.current?.value;
 
-        <DialogButton
-          data-test-id="dialog-no"
-          onClick={() => {
-            onClose(false);
+              await publishNote(note.id, {
+                selfDestruct,
+                password
+              });
+              setMonograph(await resolveMonograph(note.id));
+              showToast("success", strings.actions.published.note(1));
+            } catch (e) {
+              console.error(e);
+              showToast(
+                "error",
+                `${strings.actionErrors.published.note(1)}: ${
+                  (e as Error).message
+                }`
+              );
+            } finally {
+              setStatus(undefined);
+            }
           }}
-          color="paragraph"
-          text="Cancel"
-        />
+          sx={{ textAlign: "left", borderRadius: "none" }}
+          disabled={!!status}
+        >
+          {status?.action === "publish" ? (
+            <Loading size={16} />
+          ) : monograph?.id ? (
+            strings.update()
+          ) : (
+            strings.publish()
+          )}
+        </Button>
       </Flex>
-    </ScopedThemeProvider>
+      {processingStatus ? (
+        <Text variant="subBody">
+          {strings.downloadingImages()} {processingStatus.current}/
+          {processingStatus.total || "?"}
+        </Text>
+      ) : null}
+    </>
   );
 }
 
 export default PublishView;
 
-export function showPublishView(note: Note, location = "top") {
-  const root = document.getElementById("dialogContainer");
+let root: Root | null = null;
 
-  if (root) {
-    return new Promise((resolve) => {
-      const perform = (result: boolean) => {
-        ReactDOM.unmountComponentAtNode(root);
-        closePublishView();
-        resolve(result);
-      };
-      ReactDOM.render(
-        <ReactModal
-          isOpen
-          onRequestClose={() => perform(false)}
-          preventScroll={false}
-          shouldCloseOnOverlayClick
-          shouldCloseOnEsc
-          shouldFocusAfterRender
-          shouldReturnFocusAfterClose
-          style={{
-            overlay: { backgroundColor: "transparent", zIndex: 999 },
-            content: {
-              padding: 0,
-              top: location === "top" ? 60 : undefined,
-              right: location === "top" ? 10 : undefined,
-              bottom: location === "bottom" ? 0 : undefined,
-              left: location === "bottom" ? 0 : undefined,
-              background: "transparent",
-              border: "none",
-              borderRadius: 0,
-              boxShadow: "0px 0px 15px 0px #00000011"
-            }
-          }}
-        >
-          <PublishView note={note} onClose={perform} />
-        </ReactModal>,
-        root
-      );
-    });
-  }
-  return Promise.reject("No element with id 'dialogContainer'");
+function close() {
+  root?.unmount();
+  root = null;
 }
 
-function closePublishView() {
-  const root = document.getElementById("dialogContainer");
-  if (root) {
-    root.innerHTML = "";
-  }
+export async function showPublishView(note: Note, target?: HTMLElement) {
+  const rootElement = document.getElementById("dialogContainer");
+  if (!rootElement) return;
+
+  if (root) return close();
+
+  const monograph = await resolveMonograph(note.id);
+
+  root = createRoot(rootElement);
+  root.render(
+    <PopupPresenter
+      isOpen
+      onClose={() => close()}
+      position={{
+        target,
+        location: "below",
+        isTargetAbsolute: true,
+        yOffset: 10,
+        xOffset: -10
+      }}
+      sx={{
+        boxShadow: "0px 0px 15px 0px #00000011"
+      }}
+      scope="dialog"
+    >
+      <Flex
+        p={2}
+        sx={{
+          flexDirection: "column",
+          gap: 1,
+          bg: "background",
+          width: ["100%", 350, 350],
+          border: "1px solid",
+          borderColor: "border",
+          borderRadius: "dialog",
+          overflow: "hidden"
+        }}
+      >
+        <Text variant="subtitle">{strings.publishToTheWeb()}</Text>
+        <Text variant="subBody">{strings.monographDesc()}</Text>
+        <PublishView
+          note={note}
+          monograph={monograph}
+          onClose={() => close()}
+        />
+      </Flex>
+    </PopupPresenter>
+  );
+}
+
+export const PublishDialog = DialogManager.register(function PublishDialog(
+  props: BaseDialogProps<boolean> & { note: Note }
+) {
+  const monograph = usePromise(
+    () => resolveMonograph(props.note.id),
+    [props.note.id]
+  );
+
+  if (monograph.status !== "fulfilled") return null;
+  return (
+    <Dialog
+      isOpen={true}
+      title={strings.publishToTheWeb()}
+      description={strings.monographDesc()}
+      width={400}
+      onClose={() => props.onClose(false)}
+    >
+      <Flex
+        sx={{
+          flexDirection: "column",
+          gap: 1,
+          mb: 3
+        }}
+      >
+        <PublishView
+          note={props.note}
+          monograph={monograph.value}
+          onClose={props.onClose}
+        />
+      </Flex>
+    </Dialog>
+  );
+});
+
+type ResolvedMonograph = {
+  id: string;
+  selfDestruct: boolean;
+  publishedAt?: number;
+  password?: string;
+};
+
+async function resolveMonograph(
+  monographId: string
+): Promise<ResolvedMonograph | undefined> {
+  const monograph = await db.monographs.get(monographId);
+  if (!monograph) return;
+  return {
+    id: monographId,
+    selfDestruct: !!monograph.selfDestruct,
+    publishedAt: monograph.datePublished,
+    password: monograph.password
+      ? await db.monographs.decryptPassword(monograph.password)
+      : undefined
+  };
 }
