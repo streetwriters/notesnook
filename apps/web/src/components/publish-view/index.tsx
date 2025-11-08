@@ -48,9 +48,6 @@ function PublishView(props: PublishViewProps) {
   const [selfDestruct, setSelfDestruct] = useState(
     props.monograph?.selfDestruct
   );
-  const [analytics, setAnalytics] = useState<MonographAnalytics>(
-    props.monograph?.analytics || { totalViews: 0 }
-  );
   const [status, setStatus] = useState<{
     action: "publish" | "unpublish" | "analytics";
   }>();
@@ -63,6 +60,10 @@ function PublishView(props: PublishViewProps) {
   const unpublishNote = useStore((store) => store.unpublish);
   const [monograph, setMonograph] = useState(props.monograph);
   const monographAnalytics = useIsFeatureAvailable("monographAnalytics");
+  const analytics = usePromise(async () => {
+    if (!monographAnalytics?.isAllowed || !monograph) return { totalViews: 0 };
+    return await db.monographs.analytics(monograph?.id);
+  }, [monograph?.id, monographAnalytics]);
 
   useEffect(() => {
     const fileDownloadedEvent = EV.subscribe(
@@ -151,32 +152,36 @@ function PublishView(props: PublishViewProps) {
           >
             <Text variant="body">{strings.views()}</Text>
             {monographAnalytics?.isAllowed ? (
-              <Flex sx={{ alignItems: "center", gap: 1 }}>
-                <Text
-                  variant="body"
-                  sx={{
-                    color: "paragraph-secondary"
-                  }}
-                >
-                  {analytics.totalViews}
-                </Text>
-                <Button
-                  variant="tertiary"
-                  onClick={async () => {
-                    try {
-                      setStatus({ action: "analytics" });
-                      const analytics = await db.monographs.analytics(
-                        monograph?.id
-                      );
-                      setAnalytics(analytics);
-                    } finally {
-                      setStatus(undefined);
-                    }
-                  }}
-                >
-                  <Refresh size={14} rotate={status?.action === "analytics"} />
-                </Button>
-              </Flex>
+              analytics.status === "fulfilled" ? (
+                <Flex sx={{ alignItems: "center", gap: 1 }}>
+                  <Text
+                    variant="body"
+                    sx={{
+                      color: "paragraph-secondary"
+                    }}
+                  >
+                    {analytics.value.totalViews}
+                  </Text>
+                  <Button
+                    variant="tertiary"
+                    onClick={async () => {
+                      try {
+                        setStatus({ action: "analytics" });
+                        analytics.refresh();
+                      } finally {
+                        setStatus(undefined);
+                      }
+                    }}
+                  >
+                    <Refresh
+                      size={14}
+                      rotate={status?.action === "analytics"}
+                    />
+                  </Button>
+                </Flex>
+              ) : (
+                <Loading size={14} />
+              )
             ) : monographAnalytics ? (
               <Button
                 variant="anchor"
@@ -420,7 +425,6 @@ type ResolvedMonograph = {
   id: string;
   selfDestruct: boolean;
   publishedAt?: number;
-  analytics: MonographAnalytics;
   password?: string;
 };
 
@@ -433,7 +437,6 @@ async function resolveMonograph(
     id: monographId,
     selfDestruct: !!monograph.selfDestruct,
     publishedAt: monograph.datePublished,
-    analytics: await db.monographs.analytics(monographId),
     password: monograph.password
       ? await db.monographs.decryptPassword(monograph.password)
       : undefined
