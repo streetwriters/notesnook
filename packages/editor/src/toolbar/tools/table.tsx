@@ -88,6 +88,7 @@ export function RowProperties(props: ToolProps) {
       <ToolButton
         icon={props.icon}
         title={props.title}
+        variant={props.variant}
         buttonRef={buttonRef}
         toggled={isMenuOpen}
         onClick={() => setIsMenuOpen(true)}
@@ -132,6 +133,7 @@ export function ColumnProperties(props: ToolProps) {
       <ToolButton
         icon={props.icon}
         title={props.title}
+        variant={props.variant}
         buttonRef={buttonRef}
         toggled={isMenuOpen}
         onClick={() => setIsMenuOpen(true)}
@@ -182,6 +184,7 @@ export function TableProperties(props: ToolProps) {
       <ToolButton
         icon={props.icon}
         title={props.title}
+        variant={props.variant}
         buttonRef={buttonRef}
         toggled={isMenuOpen}
         onClick={() => setIsMenuOpen(true)}
