@@ -110,9 +110,9 @@ function TitleBox(props: TitleBoxProps) {
       rows={1}
       sx={{
         m: 0,
-        p: 0,
+        p: "0.3em 0 0.1em",
         fontFamily,
-        fontSize: ["1.625em", "1.625em", "2.625em"],
+        fontSize: ["1.625em", "1.625em", "1.8em"],
         fontWeight: "heading",
         width: "100%",
         fieldSizing: "content",
