@@ -71,10 +71,10 @@ export function columnResizing({
           };
         }
 
-        return new ResizeState(false, DecorationSet.empty);
+        return { dragging: false, decorations: DecorationSet.empty };
       },
       apply(tr, prev, _, state) {
-        return prev.apply(tr, state, showResizeHandleOnSelection);
+        return createResizeState(tr, state, prev, showResizeHandleOnSelection);
       }
     },
     props: {
@@ -98,42 +98,43 @@ export function columnResizing({
   return plugin;
 }
 
-/**
- * @public
- */
-export class ResizeState {
-  constructor(
-    public dragging: Dragging | false,
-    public decorations: DecorationSet
-  ) {}
+type ResizeState = {
+  dragging: Dragging | false;
+  decorations: DecorationSet;
+};
 
-  apply(
-    tr: Transaction,
-    state: EditorState,
-    showResizeHandleOnSelection: boolean
-  ): ResizeState {
-    const action = tr.getMeta(columnResizingPluginKey);
-    this.decorations = tr.docChanged
-      ? this.decorations.map(tr.mapping, tr.doc)
-      : this.decorations;
+function createResizeState(
+  tr: Transaction,
+  state: EditorState,
+  prevState: ResizeState,
+  showResizeHandleOnSelection: boolean
+): ResizeState {
+  const action = tr.getMeta(columnResizingPluginKey);
+  const copy: ResizeState = { ...prevState };
+  copy.decorations = tr.docChanged
+    ? copy.decorations.map(tr.mapping, tr.doc)
+    : copy.decorations;
 
-    if (!this.dragging) {
-      const cell = edgeCell(state, state.selection.from, "right");
+  if (!copy.dragging) {
+    const cell = edgeCell(state, state.selection.from, "right");
+    if (cell === -1) {
+      copy.decorations = DecorationSet.empty;
+    } else {
       const handles = createColumnResizeHandles(
         state,
         cell,
-        this,
+        prevState,
         showResizeHandleOnSelection
       );
       if (handles) {
-        this.decorations = handles;
+        copy.decorations = handles;
       }
     }
-
-    if (action && action.setDragging !== undefined)
-      this.dragging = action.setDragging;
-    return this;
   }
+
+  if (action && action.setDragging !== undefined)
+    copy.dragging = action.setDragging;
+  return copy;
 }
 
 function handleMouseDown(
@@ -185,14 +186,13 @@ function handleMouseDown(
     win.removeEventListener("touchcancel", finish);
     win.removeEventListener("touchmove", move);
 
-    const pluginState = columnResizingPluginKey.getState(view.state);
-
     const clientX = getClientX(event);
     if (clientX === null) {
       console.log("No clientX on finish", event);
       return;
     }
 
+    const pluginState = columnResizingPluginKey.getState(view.state);
     if (pluginState?.dragging) {
       if (event instanceof TouchEvent)
         (view as any).domObserver.connectSelection();
@@ -209,13 +209,10 @@ function handleMouseDown(
 
   function move(event: MouseEvent | TouchEvent): void {
     if (event instanceof MouseEvent && !event.which) return finish(event);
-    const pluginState = columnResizingPluginKey.getState(view.state);
-    if (!pluginState) return;
     const clientX = getClientX(event);
     if (clientX === null) return;
-    if (pluginState.dragging) {
-      if (event instanceof TouchEvent)
-        (view as any).domObserver.disconnectSelection();
+    const pluginState = columnResizingPluginKey.getState(view.state);
+    if (pluginState?.dragging) {
       const dragged = draggedWidth(pluginState.dragging, clientX, cellMinWidth);
       displayColumnWidth(view, activeHandle, dragged, defaultCellMinWidth);
     }
@@ -229,6 +226,8 @@ function handleMouseDown(
   win.addEventListener("touchcancel", finish);
   win.addEventListener("touchmove", move);
   event.preventDefault();
+  if (event instanceof TouchEvent)
+    (view as any).domObserver.disconnectSelection();
   return true;
 }
 

@@ -115,19 +115,17 @@ export function TableComponent(
         </SimpleBar>
       </DesktopOnly>
       <MobileOnly>
-        <ScrollContainer>
-          <div dir={textDirection}>
-            <table
-              ref={(ref) => {
-                forwardRef?.(ref);
-                tableRef.current = ref || undefined;
-              }}
-            >
-              <colgroup ref={colgroupRef} />
-              {/* <tbody /> */}
-            </table>
-          </div>
-        </ScrollContainer>
+        <div dir={textDirection}>
+          <table
+            ref={(ref) => {
+              forwardRef?.(ref);
+              tableRef.current = ref || undefined;
+            }}
+          >
+            <colgroup ref={colgroupRef} />
+            {/* <tbody /> */}
+          </table>
+        </div>
       </MobileOnly>
     </>
   );
