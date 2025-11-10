@@ -3,14 +3,13 @@ import { EditorState, Plugin, PluginKey, Transaction } from "prosemirror-state";
 import {
   Decoration,
   DecorationSet,
-  DecorationSource,
   EditorView,
   NodeView
 } from "prosemirror-view";
 import { tableNodeTypes } from "./schema.js";
 import { TableMap } from "./tablemap.js";
 import { TableView, updateColumnsOnResize } from "./tableview.js";
-import { cellAround, CellAttrs, getClientX, pointsAtCell } from "./util.js";
+import { cellAround, CellAttrs, getClientX } from "./util.js";
 
 /**
  * @public
@@ -23,7 +22,6 @@ export const columnResizingPluginKey = new PluginKey<ResizeState>(
  * @public
  */
 export type ColumnResizingOptions = {
-  handleWidth?: number;
   /**
    * Minimum width of a cell /column. The column cannot be resized smaller than this.
    */
@@ -32,7 +30,6 @@ export type ColumnResizingOptions = {
    * The default minWidth of a cell / column when it doesn't have an explicit width (i.e.: it has not been resized manually)
    */
   defaultCellMinWidth?: number;
-  lastColumnResizable?: boolean;
   /**
    * A custom node view for the rendering table nodes. By default, the plugin
    * uses the {@link TableView} class. You can explicitly set this to `null` to
@@ -45,6 +42,7 @@ export type ColumnResizingOptions = {
         view: EditorView
       ) => NodeView)
     | null;
+  showResizeHandleOnSelection?: boolean;
 };
 
 /**
@@ -56,11 +54,10 @@ export type Dragging = { startX: number; startWidth: number };
  * @public
  */
 export function columnResizing({
-  handleWidth = 5,
   cellMinWidth = 25,
   defaultCellMinWidth = 100,
   View = TableView,
-  lastColumnResizable = true
+  showResizeHandleOnSelection = false
 }: ColumnResizingOptions = {}): Plugin {
   const plugin = new Plugin<ResizeState>({
     key: columnResizingPluginKey,
@@ -73,18 +70,12 @@ export function columnResizing({
             return new View(node, defaultCellMinWidth, view);
           };
         }
-        return new ResizeState(-1, false, DecorationSet.empty);
+
+        return new ResizeState(false, DecorationSet.empty);
       },
-      apply(tr, prev) {
-        return prev.apply(tr);
+      apply(tr, prev, _, state) {
+        return prev.apply(tr, state, showResizeHandleOnSelection);
       }
-    },
-    view() {
-      return {
-        update(view) {
-          showResizeHandle(view, lastColumnResizable);
-        }
-      };
     },
     props: {
       handleDOMEvents: {
@@ -112,43 +103,36 @@ export function columnResizing({
  */
 export class ResizeState {
   constructor(
-    public activeHandle: number,
     public dragging: Dragging | false,
-    public decorations: DecorationSource
+    public decorations: DecorationSet
   ) {}
 
-  apply(tr: Transaction): ResizeState {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const state = this;
+  apply(
+    tr: Transaction,
+    state: EditorState,
+    showResizeHandleOnSelection: boolean
+  ): ResizeState {
     const action = tr.getMeta(columnResizingPluginKey);
-    const decorations = tr.docChanged
-      ? state.decorations.map(tr.mapping, tr.doc)
-      : state.decorations;
-    if (action && action.setHandle != null)
-      return new ResizeState(action.setHandle, false, decorations);
-    if (action && action.setDragging !== undefined)
-      return new ResizeState(
-        state.activeHandle,
-        action.setDragging,
-        decorations
+    this.decorations = tr.docChanged
+      ? this.decorations.map(tr.mapping, tr.doc)
+      : this.decorations;
+
+    if (!this.dragging) {
+      const cell = edgeCell(state, state.selection.from, "right");
+      const handles = createColumnResizeHandles(
+        state,
+        cell,
+        this,
+        showResizeHandleOnSelection
       );
-    if (action && action.setDecorations !== undefined) {
-      return new ResizeState(
-        state.activeHandle,
-        state.dragging,
-        tr.docChanged
-          ? action.setDecorations.map(tr.mapping, tr.doc)
-          : action.setDecorations
-      );
-    }
-    if (state.activeHandle > -1 && tr.docChanged) {
-      let handle = tr.mapping.map(state.activeHandle, -1);
-      if (!pointsAtCell(tr.doc.resolve(handle))) {
-        handle = -1;
+      if (handles) {
+        this.decorations = handles;
       }
-      return new ResizeState(handle, state.dragging, decorations);
     }
-    return state;
+
+    if (action && action.setDragging !== undefined)
+      this.dragging = action.setDragging;
+    return this;
   }
 }
 
@@ -163,8 +147,7 @@ function handleMouseDown(
   const win = view.dom.ownerDocument.defaultView ?? window;
 
   const pluginState = columnResizingPluginKey.getState(view.state);
-  if (!pluginState || pluginState.activeHandle == -1 || pluginState.dragging)
-    return false;
+  if (!pluginState || pluginState.dragging) return false;
 
   if (
     event.target instanceof HTMLElement &&
@@ -177,8 +160,18 @@ function handleMouseDown(
   const clientX = getClientX(event);
   if (clientX === null) return false;
 
-  const cell = view.state.doc.nodeAt(pluginState.activeHandle)!;
-  const width = currentColWidth(view, pluginState.activeHandle, cell.attrs);
+  const activeHandle = edgeCell(
+    view.state,
+    view.posAtDOM(event.target as Node, 0),
+    "right"
+  );
+  const cell = view.state.doc.nodeAt(activeHandle);
+  if (!cell) {
+    console.log("No cell at handle");
+    return false;
+  }
+
+  const width = currentColWidth(view, activeHandle, cell.attrs);
   view.dispatch(
     view.state.tr.setMeta(columnResizingPluginKey, {
       setDragging: { startX: clientX, startWidth: width }
@@ -205,7 +198,7 @@ function handleMouseDown(
         (view as any).domObserver.connectSelection();
       updateColumnWidth(
         view,
-        pluginState.activeHandle,
+        activeHandle,
         draggedWidth(pluginState.dragging, clientX, cellMinWidth)
       );
       view.dispatch(
@@ -224,21 +217,11 @@ function handleMouseDown(
       if (event instanceof TouchEvent)
         (view as any).domObserver.disconnectSelection();
       const dragged = draggedWidth(pluginState.dragging, clientX, cellMinWidth);
-      displayColumnWidth(
-        view,
-        pluginState.activeHandle,
-        dragged,
-        defaultCellMinWidth
-      );
+      displayColumnWidth(view, activeHandle, dragged, defaultCellMinWidth);
     }
   }
 
-  displayColumnWidth(
-    view,
-    pluginState.activeHandle,
-    width,
-    defaultCellMinWidth
-  );
+  displayColumnWidth(view, activeHandle, width, defaultCellMinWidth);
 
   win.addEventListener("mouseup", finish);
   win.addEventListener("mousemove", move);
@@ -270,11 +253,11 @@ function currentColWidth(
 }
 
 function edgeCell(
-  view: EditorView,
+  state: EditorState,
   pos: number,
   side: "left" | "right"
 ): number {
-  const $cell = cellAround(view.state.doc.resolve(pos));
+  const $cell = cellAround(state.doc.resolve(pos));
   if (!$cell) return -1;
   if (side == "right") return $cell.pos;
   const map = TableMap.get($cell.node(-1)),
@@ -290,17 +273,6 @@ function draggedWidth(
 ): number {
   const offset = clientX - dragging.startX;
   return Math.max(resizeMinWidth, dragging.startWidth + offset);
-}
-
-function updateHandle(view: EditorView, value: number): void {
-  view.dispatch(
-    view.state.tr.setMeta(columnResizingPluginKey, { setHandle: value })
-  );
-  view.dispatch(
-    view.state.tr.setMeta(columnResizingPluginKey, {
-      setDecorations: handleDecorations(view.state, value)
-    })
-  );
 }
 
 function updateColumnWidth(
@@ -365,82 +337,82 @@ function zeroes(n: number): 0[] {
   return Array(n).fill(0);
 }
 
-export function handleDecorations(
+export function createColumnResizeHandles(
   state: EditorState,
-  cell: number
-): DecorationSet {
-  if (cell === -1) return DecorationSet.empty;
+  activeCellPos: number,
+  resizeState: ResizeState,
+  showResizeHandleOnSelection: boolean
+): DecorationSet | null {
+  if (activeCellPos === -1) return null;
   const decorations = [];
-  const $cell = state.doc.resolve(cell);
-  const table = $cell.node(-1);
-  if (!table) {
-    return DecorationSet.empty;
-  }
+  const activeCell = state.doc.resolve(activeCellPos);
+  const table = activeCell.node(-1);
+  if (!table) return null;
+
   const map = TableMap.get(table);
-  const start = $cell.start(-1);
-  const col =
-    map.colCount($cell.pos - start) + $cell.nodeAfter!.attrs.colspan - 1;
-  const cellIndex = map.map.indexOf($cell.pos - start);
-  for (let row = 0; row < map.height; row++) {
-    const index = col + row * map.width;
-    // For positions that have either a different cell or the end
-    // of the table to their right, and either the top of the table or
-    // a different cell above them, add a decoration
-    if (
-      (col == map.width - 1 || map.map[index] != map.map[index + 1]) &&
-      (row == 0 || map.map[index] != map.map[index - map.width])
-    ) {
-      const cellPos = map.map[index];
-      const pos = start + cellPos + table.nodeAt(cellPos)!.nodeSize - 1;
-      const dom = document.createElement("div");
-      dom.className = "column-resize-handle";
-      if (cellIndex === index) dom.classList.add("active");
-      if (columnResizingPluginKey.getState(state)?.dragging) {
-        // decorations.push(
-        //   Decoration.node(
-        //     start + cellPos,
-        //     start + cellPos + table.nodeAt(cellPos)!.nodeSize,
-        //     {
-        //       class: "column-resize-dragging"
-        //     }
-        //   )
-        // );
-        //  dom.classList.add("dragging");
-      }
-      decorations.push(Decoration.widget(pos, dom));
+  const start = activeCell.start(-1);
+  const totalCells = map.height * map.width;
+  const cellIndex = map.map.indexOf(activeCell.pos - start);
+
+  const oldDecorations = resizeState.decorations.find();
+  if (oldDecorations.length === totalCells) {
+    const activeCellDecoration = oldDecorations.find(
+      (c) => c.spec.index === cellIndex
+    );
+    if (!activeCellDecoration?.spec.active && showResizeHandleOnSelection) {
+      const oldActiveIndex = oldDecorations.findIndex((d) => d.spec.active);
+      const oldActive = oldDecorations[oldActiveIndex];
+      if (oldActive)
+        oldDecorations[oldActiveIndex] = Decoration.widget(
+          oldActive.from,
+          createResizeHandle(false),
+          {
+            active: false,
+            index: oldActive.spec.index
+          }
+        );
+
+      oldDecorations[cellIndex] = Decoration.widget(
+        oldDecorations[cellIndex].from,
+        createResizeHandle(true),
+        {
+          active: true,
+          index: cellIndex
+        }
+      );
+
+      return DecorationSet.create(state.doc, oldDecorations);
     }
+
+    return null;
+  }
+
+  for (let i = 0; i < totalCells; i++) {
+    const cellPos = map.map[i];
+    const pos = start + cellPos + table.nodeAt(cellPos)!.nodeSize - 1;
+    decorations.push(
+      Decoration.widget(
+        pos,
+        createResizeHandle(showResizeHandleOnSelection && cellIndex === i),
+        {
+          active: showResizeHandleOnSelection && cellIndex === i,
+          index: i
+        }
+      )
+    );
   }
   return DecorationSet.create(state.doc, decorations);
 }
 
-function showResizeHandle(
-  view: EditorView,
-  lastColumnResizable?: boolean
-): void {
-  if (!view.editable) return;
-
-  const pluginState = columnResizingPluginKey.getState(view.state);
-  if (!pluginState) return;
-
-  if (!pluginState.dragging) {
-    let cell = edgeCell(view, view.state.selection.from, "right");
-    if (cell != pluginState.activeHandle) {
-      if (!lastColumnResizable && cell !== -1) {
-        const $cell = view.state.doc.resolve(cell);
-        const table = $cell.node(-1);
-        const map = TableMap.get(table);
-        const tableStart = $cell.start(-1);
-        const col =
-          map.colCount($cell.pos - tableStart) +
-          $cell.nodeAfter!.attrs.colspan -
-          1;
-
-        if (col == map.width - 1) {
-          return;
-        }
-      }
-
-      updateHandle(view, cell);
-    }
-  }
+function createResizeHandle(active: boolean) {
+  const dom = document.createElement("div");
+  dom.className = "column-resize-handle";
+  if (active) dom.classList.add("active");
+  dom.onmouseenter = () => {
+    dom.classList.add("active");
+  };
+  dom.onmouseleave = () => {
+    dom.classList.remove("active");
+  };
+  return dom;
 }

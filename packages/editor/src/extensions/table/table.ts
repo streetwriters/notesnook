@@ -68,18 +68,13 @@ export interface TableOptions {
   resizable: boolean;
 
   /**
-   * The width of the resize handle.
-   * @default 5
-   * @example 10
-   */
-  handleWidth: number;
-
-  /**
    * The minimum width of a cell.
    * @default 25
    * @example 50
    */
   cellMinWidth: number;
+
+  showResizeHandleOnSelection: boolean;
 
   /**
    * The node view to render the table.
@@ -92,13 +87,6 @@ export interface TableOptions {
         view: EditorView
       ) => NodeView)
     | null;
-
-  /**
-   * Enables the resizing of the last column.
-   * @default true
-   * @example false
-   */
-  lastColumnResizable: boolean;
 
   /**
    * Allow table node selection.
@@ -288,9 +276,8 @@ export const Table = Node.create<TableOptions>({
     return {
       HTMLAttributes: {},
       resizable: false,
-      handleWidth: 5,
+      showResizeHandleOnSelection: false,
       cellMinWidth: 25,
-      lastColumnResizable: true,
       allowTableNodeSelection: false,
       defaultCellAttrs: {}
     };
@@ -496,10 +483,10 @@ export const Table = Node.create<TableOptions>({
       ...(isResizable
         ? [
             columnResizing({
-              handleWidth: this.options.handleWidth,
               cellMinWidth: this.options.cellMinWidth,
               View: TableNodeView(this.editor),
-              lastColumnResizable: this.options.lastColumnResizable
+              showResizeHandleOnSelection:
+                this.options.showResizeHandleOnSelection
             })
           ]
         : [tiptapTableView(this.options.cellMinWidth)]),

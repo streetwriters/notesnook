@@ -286,6 +286,7 @@ const useTiptap = (
           resizable: true,
           allowTableNodeSelection: true,
           cellMinWidth: 20,
+          showResizeHandleOnSelection: isMobile,
           defaultCellAttrs: {
             colwidth: [100]
           }
@@ -388,6 +389,7 @@ const useTiptap = (
       parseOptions: { preserveWhitespace: true }
     }),
     [
+      isMobile,
       previewAttachment,
       downloadAttachment,
       openAttachmentPicker,
