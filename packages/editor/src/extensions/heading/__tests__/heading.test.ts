@@ -18,8 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { test, expect } from "vitest";
-import { createEditor } from "../../../../test-utils/index.js";
+import { createEditor, h } from "../../../../test-utils/index.js";
 import { Heading } from "../heading.js";
+import { Editor } from "@tiptap/core";
 
 test("collapse heading", () => {
   const { editor } = createEditor({
@@ -52,3 +53,59 @@ test("collapse heading", () => {
 
   expect(editor.getHTML()).toMatchSnapshot("heading uncollapsed");
 });
+
+test("replacing collapsed heading with another heading level should not unhide content", () => {
+  const el = h("div", [
+    h("h1", ["A collapsed heading"], { "data-collapsed": "true" }),
+    h("p", ["Hidden paragraph"], { "data-hidden": "true" })
+  ]);
+  const { editor } = createEditor({
+    extensions: {
+      heading: Heading.configure({ levels: [1, 2, 3, 4, 5, 6] })
+    },
+    initialContent: el.outerHTML
+  });
+
+  editor.commands.setTextSelection(0);
+  editor.commands.setHeading({ level: 2 });
+
+  expect(editor.getHTML()).toMatchSnapshot();
+});
+
+const nodes: { name: string; setNode: (editor: Editor) => void }[] = [
+  {
+    name: "paragraph",
+    setNode: (editor) => editor.commands.setParagraph()
+  },
+  {
+    name: "codeBlock",
+    setNode: (editor) => editor.commands.setCodeBlock()
+  },
+  {
+    name: "bulletList",
+    setNode: (editor) => editor.commands.toggleList("bulletList", "listItem")
+  },
+  {
+    name: "blockquote",
+    setNode: (editor) => editor.commands.toggleBlockquote()
+  }
+];
+for (const { name, setNode } of nodes) {
+  test(`replacing collapsed heading with another node (${name}) should unhide content`, () => {
+    const el = h("div", [
+      h("h1", ["A collpased heading"], { "data-collapsed": "true" }),
+      h("p", ["Hidden paragraph"], { "data-hidden": "true" })
+    ]);
+    const { editor } = createEditor({
+      extensions: {
+        heading: Heading.configure({ levels: [1, 2, 3, 4, 5, 6] })
+      },
+      initialContent: el.outerHTML
+    });
+
+    editor.commands.setTextSelection(0);
+    setNode(editor);
+
+    expect(editor.getHTML()).toMatchSnapshot();
+  });
+}
