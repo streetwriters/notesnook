@@ -411,11 +411,6 @@ export class NNMigrationProvider implements MigrationProvider {
             .alterTable("notes")
             .addColumn("spellcheck", "boolean", (c) => c.defaultTo(true))
             .execute();
-          await db
-            .updateTable("notes")
-            .set({ spellcheck: true })
-            .where("spellcheck", "is", null)
-            .execute();
         }
       }
     };
