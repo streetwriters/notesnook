@@ -184,11 +184,14 @@ export const Heading = TiptapHeading.extend({
         if (typeof pos !== "number") return;
 
         const resolvedPos = editor.state.doc.resolve(pos);
-        const calloutAncestor = findParentNodeClosestToPos(
-          resolvedPos,
-          (node) => node.type.name === "callout"
-        );
-        if (calloutAncestor) return;
+        const forbiddenParents = ["callout", "table"];
+        if (
+          findParentNodeClosestToPos(resolvedPos, (node) =>
+            forbiddenParents.includes(node.type.name)
+          )
+        ) {
+          return;
+        }
 
         if (
           isClickWithinBounds(
