@@ -666,6 +666,15 @@ class UserManager {
         usesFallback: await this.usesFallbackPWHash(old_password)
       });
 
+    // retrieve user keys before deriving a new encryption key
+    const oldUserKeys = {
+      attachmentsKey: await this.getAttachmentsKey(),
+      monographPasswordsKey: await this.getMonographPasswordsKey(),
+      inboxKeys: (await this.hasInboxKeys())
+        ? await this.getInboxKeys()
+        : undefined
+    } as const;
+
     await this.db.storage().deriveCryptoKey({
       password: new_password,
       salt
@@ -678,27 +687,33 @@ class UserManager {
     const userEncryptionKey = await this.getEncryptionKey();
     if (userEncryptionKey) {
       const updateUserPayload: Partial<User> = {};
-      const attachmentsKey = await this.getAttachmentsKey();
-      if (attachmentsKey) {
+      if (oldUserKeys.attachmentsKey) {
         user.attachmentsKey = await this.db
           .storage()
-          .encrypt(userEncryptionKey, JSON.stringify(attachmentsKey));
+          .encrypt(
+            userEncryptionKey,
+            JSON.stringify(oldUserKeys.attachmentsKey)
+          );
         updateUserPayload.attachmentsKey = user.attachmentsKey;
       }
-      const monographPasswordsKey = await this.getMonographPasswordsKey();
-      if (monographPasswordsKey) {
+      if (oldUserKeys.monographPasswordsKey) {
         user.monographPasswordsKey = await this.db
           .storage()
-          .encrypt(userEncryptionKey, JSON.stringify(monographPasswordsKey));
+          .encrypt(
+            userEncryptionKey,
+            JSON.stringify(oldUserKeys.monographPasswordsKey)
+          );
         updateUserPayload.monographPasswordsKey = user.monographPasswordsKey;
       }
-      const inboxKeys = await this.getInboxKeys();
-      if (inboxKeys) {
+      if (oldUserKeys.inboxKeys) {
         user.inboxKeys = {
-          public: inboxKeys.publicKey,
+          public: oldUserKeys.inboxKeys.publicKey,
           private: await this.db
             .storage()
-            .encrypt(userEncryptionKey, JSON.stringify(inboxKeys.privateKey))
+            .encrypt(
+              userEncryptionKey,
+              JSON.stringify(oldUserKeys.inboxKeys.privateKey)
+            )
         };
         updateUserPayload.inboxKeys = user.inboxKeys;
       }
