@@ -142,7 +142,6 @@ export const Signup = ({
               minHeight: "90%"
             }}
             nestedScrollEnabled
-            enableAutomaticScroll={false}
             keyboardShouldPersistTaps="handled"
           >
             <View

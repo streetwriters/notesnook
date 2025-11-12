@@ -120,7 +120,7 @@ export const Login = ({
           minHeight: "90%"
         }}
         nestedScrollEnabled
-        enableAutomaticScroll={false}
+        enableAutomaticScroll={true}
         keyboardShouldPersistTaps="handled"
       >
         <View
