@@ -227,6 +227,7 @@ function TipTap(props: TipTapProps) {
   const oldNonce = useRef<number>();
 
   const tiptapOptions = useMemo<Partial<TiptapOptions>>(() => {
+    console.log("rerender tiptap: content", content, content?.());
     return {
       editorProps: {
         handleKeyDown(_, event) {
