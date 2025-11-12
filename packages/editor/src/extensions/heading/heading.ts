@@ -162,7 +162,7 @@ export const Heading = TiptapHeading.extend({
   },
 
   addProseMirrorPlugins() {
-    return [headingUpdatePlugin];
+    return [headingUnderTablesMigration, headingUpdatePlugin];
   },
 
   addNodeView() {
@@ -388,6 +388,38 @@ const headingUpdatePlugin = new Plugin({
             modified = true;
           }
         }
+      }
+    });
+
+    return modified ? tr : null;
+  }
+});
+
+const headingUnderTablesMigration = new Plugin({
+  key: new PluginKey("headingUnderTablesMigration"),
+
+  appendTransaction(_, __, newState) {
+    const tr = newState.tr;
+    let modified = false;
+
+    newState.doc.descendants((node, pos) => {
+      if (node.type.name === "table") {
+        node.descendants((childNode, childPos) => {
+          const absolutePos = pos + childPos + 1;
+
+          if (childNode.type.name === "heading" && childNode.attrs.collapsed) {
+            tr.setNodeAttribute(absolutePos, "collapsed", false);
+            modified = true;
+          }
+
+          if (
+            COLLAPSIBLE_BLOCK_TYPES.includes(childNode.type.name) &&
+            childNode.attrs.hidden
+          ) {
+            tr.setNodeAttribute(absolutePos, "hidden", false);
+            modified = true;
+          }
+        });
       }
     });
 
