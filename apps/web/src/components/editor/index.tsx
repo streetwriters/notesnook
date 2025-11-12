@@ -335,6 +335,11 @@ function EditorView({
   }, [editor]);
 
   const getContent = useCallback(() => {
+    console.log(
+      "rerender session.content.data",
+      session.id,
+      session.content?.data
+    );
     return session.content?.data;
   }, [session.content?.data]);
 
@@ -378,6 +383,10 @@ function EditorView({
 
           const currentSessionId = session.id;
           const data = content();
+          console.log("session.content.data before", {
+            content: data,
+            session: session.content?.data
+          });
           for (const session of sessions) {
             if (
               session?.type !== "default" &&
@@ -387,7 +396,10 @@ function EditorView({
               continue;
             if (!session.content) session.content = { type: "tiptap", data };
             else session.content.data = data;
-
+            console.log("session.content.data after", {
+              content: data,
+              session: session.content?.data
+            });
             // update content in other tabs
             if (session.id !== currentSessionId) {
               const editor = useEditorManager.getState().getEditor(session.id);
