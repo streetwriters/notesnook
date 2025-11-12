@@ -338,7 +338,7 @@ img.ProseMirror-separator {
 
 .ProseMirror blockquote {
   border-inline-start: 5px solid var(--border);
-  padding-inline-start: 15px;
+  padding-inline-start: 18px;
 }
 
 @media screen and (max-width: 480px) {
