@@ -62,6 +62,7 @@ import { fluidTabsRef } from "../../utils/global-refs";
 import { strings } from "@notesnook/intl";
 import { i18n } from "@lingui/core";
 import { useVaultStatus } from "../../hooks/use-vault-status";
+import { useSettingStore } from "../../stores/use-setting-store";
 
 const style: ViewStyle = {
   height: "100%",
@@ -231,7 +232,6 @@ const useLockedNoteHandler = () => {
     const unlockWithBiometrics = async () => {
       try {
         if (!tabRef.current?.session?.noteLocked || !tabRef.current) return;
-        console.log("Trying to unlock with biometrics...");
         const credentials = await BiometricService.getCredentials(
           "Unlock note",
           "Unlock note to open it in editor."
@@ -320,12 +320,16 @@ const useLockedNoteHandler = () => {
       }
     };
 
-    const unlock = () => {
+    const unlock = (forced?: boolean) => {
+      const isMovedAway =
+        useSettingStore.getState().deviceMode !== "mobile"
+          ? false
+          : editorState().movedAway;
       if (
-        (tabRef.current?.session?.locked,
+        tabRef.current?.session?.locked &&
         useTabStore.getState().biometryAvailable &&
-          useTabStore.getState().biometryEnrolled &&
-          !editorState().movedAway)
+        useTabStore.getState().biometryEnrolled &&
+        (!isMovedAway || forced)
       ) {
         setTimeout(() => {
           unlockWithBiometrics();
@@ -344,13 +348,15 @@ const useLockedNoteHandler = () => {
     const subs = [
       eSubscribeEvent(eUnlockNote, unlock),
       eSubscribeEvent(eUnlockWithBiometrics, () => {
-        unlock();
+        unlock(true);
       }),
       eSubscribeEvent(eUnlockWithPassword, onSubmit)
     ];
+
     if (
       tabRef.current?.session?.locked &&
-      fluidTabsRef.current?.page() === "editor"
+      (fluidTabsRef.current?.page() === "editor" ||
+        useSettingStore.getState().deviceMode !== "mobile")
     ) {
       unlock();
     }
