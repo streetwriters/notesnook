@@ -91,7 +91,10 @@ export const Heading = TiptapHeading.extend({
           hidden: {
             default: false,
             keepOnSplit: false,
-            parseHTML: (element) => element.dataset.hidden === "true",
+            parseHTML: (element) => {
+              migrateEmptyCollapsedHeading(element);
+              return element.dataset.hidden === "true";
+            },
             renderHTML: (attributes) => {
               if (!attributes.hidden) return {};
               return {
@@ -160,7 +163,7 @@ export const Heading = TiptapHeading.extend({
   },
 
   addProseMirrorPlugins() {
-    return [headingUpdatePlugin, emptyCollapsedHeadingsMigrationPlugin];
+    return [headingUpdatePlugin];
   },
 
   addNodeView() {
@@ -391,24 +394,87 @@ const headingUpdatePlugin = new Plugin({
   }
 });
 
-const emptyCollapsedHeadingsMigrationPlugin = new Plugin({
-  key: new PluginKey("emptyCollapsedHeadingsMigration"),
+function migrateEmptyCollapsedHeading(element: HTMLElement) {
+  let current: Element | null = element;
+  let parentHeading: HTMLElement | null = null;
+  let parentHeadingLevel: number | null = null;
 
-  appendTransaction(_, newState) {
-    const tr = newState.tr;
-    let modified = false;
+  while (current) {
+    if (current.tagName.match(/^H[1-6]$/)) {
+      const level = parseInt(current.tagName[1]);
+      const isCollapsed = current.getAttribute("data-collapsed") === "true";
+      const isEmpty = current.textContent === "";
 
-    newState.doc.descendants((node, pos) => {
-      if (node.type.name === "heading" && node.attrs.collapsed) {
-        const isEmpty = node.content.size === 0;
-        if (isEmpty) {
-          tr.setNodeAttribute(pos, "collapsed", false);
-          toggleNodesUnderHeading(tr, pos, node.attrs.level, false);
-          modified = true;
-        }
+      if (isCollapsed && isEmpty) {
+        parentHeading = current as HTMLElement;
+        parentHeadingLevel = level;
+        break;
+      } else if (isCollapsed) {
+        break;
       }
-    });
-
-    return modified ? tr : null;
+    }
+    current = current.previousElementSibling;
   }
-});
+
+  if (parentHeading === null || parentHeadingLevel === null) return;
+
+  parentHeading.removeAttribute("data-collapsed");
+
+  // if there's a collapsed heading with greater level before parentHeading, then we can skip data-hidden migration
+  let beforeParent = parentHeading.previousElementSibling;
+  while (beforeParent) {
+    if (beforeParent.tagName.match(/^H[1-6]$/)) {
+      const level = parseInt(beforeParent.tagName[1]);
+      const isCollapsed =
+        beforeParent.getAttribute("data-collapsed") === "true";
+
+      if (level < parentHeadingLevel && isCollapsed) {
+        return;
+      }
+
+      if (level <= parentHeadingLevel) {
+        break;
+      }
+    }
+    beforeParent = beforeParent.previousElementSibling;
+  }
+
+  let nextElement = parentHeading.nextElementSibling;
+  let insideCollapsedHeading = false;
+  let nestedHeadingLevel: number | null = null;
+
+  while (nextElement) {
+    const isHeading = nextElement.tagName.match(/^H[1-6]$/);
+    if (isHeading) {
+      const level = parseInt(nextElement.tagName[1]);
+      if (level <= parentHeadingLevel) {
+        break;
+      }
+    }
+
+    if (insideCollapsedHeading) {
+      if (
+        isHeading &&
+        nestedHeadingLevel !== null &&
+        parseInt(nextElement.tagName[1]) <= nestedHeadingLevel
+      ) {
+        insideCollapsedHeading = false;
+        nestedHeadingLevel = null;
+      } else {
+        nextElement = nextElement.nextElementSibling;
+        continue;
+      }
+    }
+
+    if (nextElement.hasAttribute("data-hidden")) {
+      nextElement.removeAttribute("data-hidden");
+    }
+
+    if (isHeading && nextElement.getAttribute("data-collapsed") === "true") {
+      insideCollapsedHeading = true;
+      nestedHeadingLevel = parseInt(nextElement.tagName[1]);
+    }
+
+    nextElement = nextElement.nextElementSibling;
+  }
+}
