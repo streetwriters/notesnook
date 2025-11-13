@@ -360,7 +360,7 @@ function EditorView({
       <div className="dialogContainer" />
       <Editor
         id={session.id}
-        nonce={1}
+        nonce={session.nonce}
         content={getContent}
         session={session}
         onPreviewDocument={(preview) =>
