@@ -870,163 +870,108 @@ del.diffdel {
   text-decoration: none;
 }
 
-.ProseMirror h1,
-.ProseMirror h2,
-.ProseMirror h3,
-.ProseMirror h4,
-.ProseMirror h5,
-.ProseMirror h6 {
-  position: relative;
-}
-
-.ProseMirror h1::before,
-.ProseMirror h2::before,
-.ProseMirror h3::before,
-.ProseMirror h4::before,
-.ProseMirror h5::before,
-.ProseMirror h6::before {
-  position: absolute;
+.ProseMirror h1 .heading-collapse-icon,
+.ProseMirror h2 .heading-collapse-icon,
+.ProseMirror h3 .heading-collapse-icon,
+.ProseMirror h4 .heading-collapse-icon,
+.ProseMirror h5 .heading-collapse-icon,
+.ProseMirror h6 .heading-collapse-icon {
+  display: inline-block;
+  vertical-align: middle;
   cursor: pointer;
-  content: "";
   background-size: 18px;
   width: 18px;
   height: 18px;
+  margin-inline-start: 8px;
 
   background-color: var(--icon);
   mask: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9IiM4ODg4ODgiIGQ9Ik03LjQxIDguNThMMTIgMTMuMTdsNC41OS00LjU5TDE4IDEwbC02IDZsLTYtNmwxLjQxLTEuNDJaIi8+PC9zdmc+)
     no-repeat 50% 50%;
   mask-size: cover;
-  border: 1px solid var(--background);
 
   transform: rotate(0);
   transition: transform 250ms ease, opacity 200ms ease;
-  left: -22px;
   opacity: 0;
+  user-select: none;
 }
 
-.ProseMirror h1[dir="rtl"]::before,
-.ProseMirror h2[dir="rtl"]::before,
-.ProseMirror h3[dir="rtl"]::before,
-.ProseMirror h4[dir="rtl"]::before,
-.ProseMirror h5[dir="rtl"]::before,
-.ProseMirror h6[dir="rtl"]::before {
-  display: none;
-}
-
-.ProseMirror h1[dir="rtl"]::after,
-.ProseMirror h2[dir="rtl"]::after,
-.ProseMirror h3[dir="rtl"]::after,
-.ProseMirror h4[dir="rtl"]::after,
-.ProseMirror h5[dir="rtl"]::after,
-.ProseMirror h6[dir="rtl"]::after {
-  position: absolute;
-  cursor: pointer;
-  content: "";
-  background-size: 18px;
+.ProseMirror h1 .heading-collapse-icon {
   width: 18px;
   height: 18px;
-
-  background-color: var(--icon);
-  mask: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9IiM4ODg4ODgiIGQ9Ik03LjQxIDguNThMMTIgMTMuMTdsNC41OS00LjU5TDE4IDEwbC02IDZsLTYtNmwxLjQxLTEuNDJaIi8+PC9zdmc+)
-    no-repeat 50% 50%;
-  mask-size: cover;
-  border: 1px solid var(--background);
-
-  transform: rotate(0deg);
-  transition: transform 250ms ease, opacity 200ms ease;
-  right: -22px;
-  opacity: 0;
 }
 
-.ProseMirror h1::before,
-.ProseMirror h1::after {
-  top: 8px;
+.ProseMirror h2 .heading-collapse-icon {
+  width: 16px;
+  height: 16px;
 }
 
-.ProseMirror h2::before,
-.ProseMirror h2::after
- {
-  top: 3px;
+.ProseMirror h3 .heading-collapse-icon {
+  width: 15px;
+  height: 15px;
 }
 
-.ProseMirror h3::before,
-.ProseMirror h3::after {
-  top: 0px;
+.ProseMirror h4 .heading-collapse-icon {
+  width: 14px;
+  height: 14px;
 }
 
-.ProseMirror h4::before,
-.ProseMirror h4::after {
-  top: -1px; 
+.ProseMirror h5 .heading-collapse-icon {
+  width: 13px;
+  height: 13px;
 }
 
-.ProseMirror h5::before,
-.ProseMirror h5::after {
-  top: -2px; 
+.ProseMirror h6 .heading-collapse-icon {
+  width: 12px;
+  height: 12px;
 }
 
-.ProseMirror h6::before,
-.ProseMirror h6::after {
-  top: -4px; 
-}
 
-.ProseMirror h1[data-collapsed="true"]::before,
-.ProseMirror h2[data-collapsed="true"]::before,
-.ProseMirror h3[data-collapsed="true"]::before,
-.ProseMirror h4[data-collapsed="true"]::before,
-.ProseMirror h5[data-collapsed="true"]::before,
-.ProseMirror h6[data-collapsed="true"]::before {
+.ProseMirror h1[data-collapsed="true"] .heading-collapse-icon,
+.ProseMirror h2[data-collapsed="true"] .heading-collapse-icon,
+.ProseMirror h3[data-collapsed="true"] .heading-collapse-icon,
+.ProseMirror h4[data-collapsed="true"] .heading-collapse-icon,
+.ProseMirror h5[data-collapsed="true"] .heading-collapse-icon,
+.ProseMirror h6[data-collapsed="true"] .heading-collapse-icon {
   transform: rotate(-90deg);
   opacity: 1;
 }
 
-.ProseMirror h1[data-collapsed="true"]::after,
-.ProseMirror h2[data-collapsed="true"]::after,
-.ProseMirror h3[data-collapsed="true"]::after,
-.ProseMirror h4[data-collapsed="true"]::after,
-.ProseMirror h5[data-collapsed="true"]::after,
-.ProseMirror h6[data-collapsed="true"]::after {
+.ProseMirror h1[data-collapsed="true"][dir="rtl"] .heading-collapse-icon,
+.ProseMirror h2[data-collapsed="true"][dir="rtl"] .heading-collapse-icon,
+.ProseMirror h3[data-collapsed="true"][dir="rtl"] .heading-collapse-icon,
+.ProseMirror h4[data-collapsed="true"][dir="rtl"] .heading-collapse-icon,
+.ProseMirror h5[data-collapsed="true"][dir="rtl"] .heading-collapse-icon,
+.ProseMirror h6[data-collapsed="true"][dir="rtl"] .heading-collapse-icon {
   transform: rotate(90deg);
   opacity: 1;
 }
 
-
-.ProseMirror h1:hover::before,
-.ProseMirror h2:hover::before,
-.ProseMirror h3:hover::before,
-.ProseMirror h4:hover::before,
-.ProseMirror h5:hover::before,
-.ProseMirror h6:hover::before,
-.ProseMirror h1:hover::after,
-.ProseMirror h2:hover::after,
-.ProseMirror h3:hover::after,
-.ProseMirror h4:hover::after,
-.ProseMirror h5:hover::after,
-.ProseMirror h6:hover::after {
+.ProseMirror h1:hover .heading-collapse-icon,
+.ProseMirror h2:hover .heading-collapse-icon,
+.ProseMirror h3:hover .heading-collapse-icon,
+.ProseMirror h4:hover .heading-collapse-icon,
+.ProseMirror h5:hover .heading-collapse-icon,
+.ProseMirror h6:hover .heading-collapse-icon {
   opacity: 1;
 }
 
-.ProseMirror div.callout h1::before,
-.ProseMirror div.callout h2::before,
-.ProseMirror div.callout h3::before,
-.ProseMirror div.callout h4::before,
-.ProseMirror div.callout h5::before,
-.ProseMirror div.callout h6::before {
+.ProseMirror div.callout h1 .heading-collapse-icon,
+.ProseMirror div.callout h2 .heading-collapse-icon,
+.ProseMirror div.callout h3 .heading-collapse-icon,
+.ProseMirror div.callout h4 .heading-collapse-icon,
+.ProseMirror div.callout h5 .heading-collapse-icon,
+.ProseMirror div.callout h6 .heading-collapse-icon {
   display: none;
 }
 
-.ProseMirror table h1::before,
-.ProseMirror table h2::before,
-.ProseMirror table h3::before,
-.ProseMirror table h4::before,
-.ProseMirror table h5::before,
-.ProseMirror table h6::before,
-.ProseMirror table h1::after,
-.ProseMirror table h2::after,
-.ProseMirror table h3::after,
-.ProseMirror table h4::after,
-.ProseMirror table h5::after,
-.ProseMirror table h6::after {
-  display: none;
+/* hide collapse icon when heading is empty (only contains trailing break) */
+.ProseMirror h1:has(> span > br.ProseMirror-trailingBreak:only-child) .heading-collapse-icon,
+.ProseMirror h2:has(> span > br.ProseMirror-trailingBreak:only-child) .heading-collapse-icon,
+.ProseMirror h3:has(> span > br.ProseMirror-trailingBreak:only-child) .heading-collapse-icon,
+.ProseMirror h4:has(> span > br.ProseMirror-trailingBreak:only-child) .heading-collapse-icon,
+.ProseMirror h5:has(> span > br.ProseMirror-trailingBreak:only-child) .heading-collapse-icon,
+.ProseMirror h6:has(> span > br.ProseMirror-trailingBreak:only-child) .heading-collapse-icon {
+  display: none !important;
 }
 
 [data-hidden="true"] {

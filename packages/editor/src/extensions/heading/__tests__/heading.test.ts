@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { test, expect } from "vitest";
-import { createEditor } from "../../../../test-utils/index.js";
+import { createEditor, h1, p, h } from "../../../../test-utils/index.js";
 import { Heading } from "../heading.js";
 
 test("collapse heading", () => {
@@ -51,4 +51,25 @@ test("collapse heading", () => {
   });
 
   expect(editor.getHTML()).toMatchSnapshot("heading uncollapsed");
+});
+
+/**
+ * prior to this test, empty collapsed headings were allowed, but now they are not
+ * so we need to test that all such headings are migrated to uncollapsed state
+ */
+test("collapsed empty heading should uncollapse", async () => {
+  const el = h("div", [
+    h1([""], { "data-collapsed": "true" }),
+    p(["Some paragraph"], { "data-hidden": "true" })
+  ]);
+  const { editor } = createEditor({
+    initialContent: el.outerHTML,
+    extensions: {
+      heading: Heading.configure({ levels: [1, 2, 3, 4, 5, 6] })
+    }
+  });
+
+  await new Promise((resolve) => setTimeout(resolve, 0));
+
+  expect(editor.getHTML()).toMatchSnapshot();
 });

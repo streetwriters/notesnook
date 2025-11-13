@@ -88,6 +88,7 @@ function elem<K extends keyof HTMLElementTagNameMap>(tag: K) {
 export const ul = elem("ul");
 export const li = elem("li");
 export const p = elem("p");
+export const h1 = elem("h1");
 
 export function text(text: string) {
   return document.createTextNode(text);
