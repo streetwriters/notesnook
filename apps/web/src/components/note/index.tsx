@@ -421,16 +421,6 @@ export const noteMenuItems: (
       onClick: () => store.archive(!note.archived, ...ids),
       multiSelect: true
     },
-    {
-      type: "button",
-      key: "spellcheck",
-      title: strings.spellCheck(),
-      isChecked: note.spellcheck,
-      icon: SpellCheck.path,
-      isHidden: IS_DESKTOP_APP && !useSpellChecker.getState().enabled,
-      onClick: () => store.spellcheck(!note.spellcheck, ...ids),
-      multiSelect: true
-    },
     { key: "sep1", type: "separator" },
     {
       type: "button",
