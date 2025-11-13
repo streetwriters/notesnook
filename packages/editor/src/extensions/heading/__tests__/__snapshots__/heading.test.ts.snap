@@ -4,4 +4,10 @@ exports[`collapse heading > heading collapsed 1`] = `"<h1 data-collapsed="true">
 
 exports[`collapse heading > heading uncollapsed 1`] = `"<h1>Main Heading</h1><p>paragraph.</p><h2>Subheading</h2><p>subheading paragraph</p><h1>Main heading 2</h1><p>paragraph another</p>"`;
 
-exports[`collapsed empty heading should uncollapse 1`] = `"<h1></h1><p>Some paragraph</p>"`;
+exports[`collapsed empty heading should uncollapse: case 1 1`] = `"<h1></h1><p>paragraph</p>"`;
+
+exports[`collapsed empty heading should uncollapse: case 2 1`] = `"<h1 data-collapsed="true">heading 1</h1><p data-hidden="true">paragraph</p><h2 data-hidden="true"></h2><p data-hidden="true">paragraph 2</p><h3 data-hidden="true" data-collapsed="true">heading 3</h3><p data-hidden="true">paragraph 3</p>"`;
+
+exports[`collapsed empty heading should uncollapse: case 3 1`] = `"<h1></h1><p>paragraph</p><h2 data-collapsed="true">heading 2.1</h2><p data-hidden="true">paragraph</p><h2 data-collapsed="true">heading 2.2</h2><p data-hidden="true">paragraph</p>"`;
+
+exports[`collapsed empty heading should uncollapse: case 4 1`] = `"<h2 data-collapsed="true">heading 2</h2><p data-hidden="true">paragraph</p><h2></h2><p>paragraph</p><h3 data-collapsed="true">heading 3</h3><p data-hidden="true">paragraph</p>"`;

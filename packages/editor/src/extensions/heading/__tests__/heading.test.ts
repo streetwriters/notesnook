@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { test, expect } from "vitest";
 import { createEditor, h1, p, h } from "../../../../test-utils/index.js";
 import { Heading } from "../heading.js";
+import { h2 } from "prosemirror-test-builder";
 
 test("collapse heading", () => {
   const { editor } = createEditor({
@@ -57,19 +58,53 @@ test("collapse heading", () => {
  * prior to this test, empty collapsed headings were allowed, but now they are not
  * so we need to test that all such headings are migrated to uncollapsed state
  */
-test("collapsed empty heading should uncollapse", async () => {
-  const el = h("div", [
+const elements = [
+  h("div", [
     h1([""], { "data-collapsed": "true" }),
-    p(["Some paragraph"], { "data-hidden": "true" })
-  ]);
-  const { editor } = createEditor({
-    initialContent: el.outerHTML,
-    extensions: {
-      heading: Heading.configure({ levels: [1, 2, 3, 4, 5, 6] })
-    }
+    p(["paragraph"], { "data-hidden": "true" })
+  ]),
+  h("div", [
+    h1(["heading 1"], { "data-collapsed": "true" }),
+    p(["paragraph"], { "data-hidden": "true" }),
+    h("h2", [""], { "data-collapsed": "true", "data-hidden": "true" }),
+    p(["paragraph 2"], { "data-hidden": "true" }),
+    h("h3", ["heading 3"], { "data-collapsed": "true", "data-hidden": "true" }),
+    p(["paragraph 3"], { "data-hidden": "true" })
+  ]),
+  h("div", [
+    h1([""], { "data-collapsed": "true" }),
+    p(["paragraph"], { "data-hidden": "true" }),
+    h("h2", ["heading 2.1"], {
+      "data-collapsed": "true",
+      "data-hidden": "true"
+    }),
+    p(["paragraph"], { "data-hidden": "true" }),
+    h("h2", ["heading 2.2"], {
+      "data-collapsed": "true",
+      "data-hidden": "true"
+    }),
+    p(["paragraph"], { "data-hidden": "true" })
+  ]),
+  h("div", [
+    h("h2", ["heading 2"], { "data-collapsed": "true" }),
+    p(["paragraph"], { "data-hidden": "true" }),
+    h("h2", [""], { "data-collapsed": "true" }),
+    p(["paragraph"], { "data-hidden": "true" }),
+    h("h3", ["heading 3"], { "data-collapsed": "true", "data-hidden": "true" }),
+    p(["paragraph"], { "data-hidden": "true" })
+  ])
+];
+for (const [index, el] of elements.entries()) {
+  test(`collapsed empty heading should uncollapse: case ${
+    index + 1
+  }`, async () => {
+    const { editor } = createEditor({
+      initialContent: el.outerHTML,
+      extensions: {
+        heading: Heading.configure({ levels: [1, 2, 3, 4, 5, 6] })
+      }
+    });
+
+    expect(editor.getHTML()).toMatchSnapshot();
   });
-
-  await new Promise((resolve) => setTimeout(resolve, 0));
-
-  expect(editor.getHTML()).toMatchSnapshot();
-});
+}
