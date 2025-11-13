@@ -26,7 +26,7 @@ import BaseStore from ".";
 import Config from "../utils/config";
 import { Note, VirtualizedGrouping } from "@notesnook/core";
 import { Context } from "../components/list-container/types";
-import { AppEventManager, AppEvents } from "../common/app-events";
+import { useEditorStore } from "./editor-store";
 
 type ViewMode = "detailed" | "compact";
 class NoteStore extends BaseStore<NoteStore> {
@@ -98,11 +98,7 @@ class NoteStore extends BaseStore<NoteStore> {
   spellcheck = async (state: boolean, ...ids: string[]) => {
     await db.notes.spellcheck(state, ...ids);
     await this.refresh();
-
-    AppEventManager.publish(AppEvents.spellcheckUpdated, {
-      noteIds: ids,
-      spellcheck: state
-    });
+    useEditorStore.getState().refreshSessionWithNoteIds(ids);
   };
 
   unlock = async (id: string) => {

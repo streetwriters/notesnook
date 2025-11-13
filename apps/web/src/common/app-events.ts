@@ -41,6 +41,5 @@ export const AppEvents = {
   revealItemInList: "list:revealItem",
 
   toggleSideMenu: "app:openSideMenu",
-  toggleEditor: "app:toggleEditor",
-  spellcheckUpdated: "spellcheck:updated",
+  toggleEditor: "app:toggleEditor"
 };

@@ -95,30 +95,8 @@ function TitleBox(props: TitleBoxProps) {
       }
     );
 
-    const { unsubscribe: unsubscribeSpellcheckUpdatedEvent } =
-      AppEventManager.subscribe(
-        AppEvents.spellcheckUpdated,
-        ({ noteIds, spellcheck }) => {
-          const sessions = useEditorStore.getState().sessions;
-          const sessionsToUpdate: string[] = [];
-          for (const session of sessions) {
-            if ("note" in session && noteIds.includes(session.note.id)) {
-              sessionsToUpdate.push(session.id);
-            }
-          }
-          for (const sessionId of sessionsToUpdate) {
-            const sessionTitleBox = document.querySelector(
-              `#editor-title[data-session-id="${sessionId}"]`
-            ) as HTMLTextAreaElement;
-            if (!sessionTitleBox) continue;
-            sessionTitleBox.spellcheck = spellcheck;
-          }
-        }
-      );
-
     return () => {
       unsubscribe();
-      unsubscribeSpellcheckUpdatedEvent();
     };
   }, [id]);
 

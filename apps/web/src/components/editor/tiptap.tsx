@@ -617,24 +617,10 @@ function TiptapWrapper(
   }, [editorConfig.zoom]);
 
   useEffect(() => {
-    const { unsubscribe } = AppEventManager.subscribe(
-      AppEvents.spellcheckUpdated,
-      ({ noteIds, spellcheck }) => {
-        const session = useEditorStore.getState().getSession(props.id);
-        if (
-          session &&
-          "note" in session &&
-          noteIds.includes(session.note.id) &&
-          editorContainerRef.current
-        ) {
-          editorContainerRef.current.spellcheck = spellcheck;
-        }
-      }
-    );
-    return () => {
-      unsubscribe();
-    };
-  }, []);
+    if (editorContainerRef.current) {
+      editorContainerRef.current.spellcheck = props.spellcheck === true;
+    }
+  }, [props.spellcheck]);
 
   return (
     <Flex
