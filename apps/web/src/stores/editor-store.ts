@@ -1324,6 +1324,20 @@ class EditorStore extends BaseStore<EditorStore> {
     sessionId = sessionId || tab?.sessionId;
     if (sessionId) this.rehydrateSession(sessionId);
   };
+
+  refreshSessionWithNoteIds = (noteIds: string[]) => {
+    this.set((state) => {
+      state.sessions = state.sessions.map((session) => {
+        if ("note" in session && noteIds.includes(session.note.id)) {
+          return {
+            ...session,
+            nonce: (session.nonce || 0) + 1
+          };
+        }
+        return session;
+      });
+    });
+  };
 }
 
 const useEditorStore = createPersistedStore(EditorStore, {
