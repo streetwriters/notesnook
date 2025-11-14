@@ -91,10 +91,7 @@ export const Heading = TiptapHeading.extend({
           hidden: {
             default: false,
             keepOnSplit: false,
-            parseHTML: (element) => {
-              migrateEmptyCollapsedHeading(element);
-              return element.dataset.hidden === "true";
-            },
+            parseHTML: (element) => element.dataset.hidden === "true",
             renderHTML: (attributes) => {
               if (!attributes.hidden) return {};
               return {
@@ -393,88 +390,3 @@ const headingUpdatePlugin = new Plugin({
     return modified ? tr : null;
   }
 });
-
-function migrateEmptyCollapsedHeading(element: HTMLElement) {
-  let current: Element | null = element;
-  let parentHeading: HTMLElement | null = null;
-  let parentHeadingLevel: number | null = null;
-
-  while (current) {
-    if (current.tagName.match(/^H[1-6]$/)) {
-      const level = parseInt(current.tagName[1]);
-      const isCollapsed = current.getAttribute("data-collapsed") === "true";
-      const isEmpty = current.textContent === "";
-
-      if (isCollapsed && isEmpty) {
-        parentHeading = current as HTMLElement;
-        parentHeadingLevel = level;
-        break;
-      } else if (isCollapsed) {
-        break;
-      }
-    }
-    current = current.previousElementSibling;
-  }
-
-  if (parentHeading === null || parentHeadingLevel === null) return;
-
-  parentHeading.removeAttribute("data-collapsed");
-
-  // if there's a collapsed heading with greater level before parentHeading, then we can skip data-hidden migration
-  let beforeParent = parentHeading.previousElementSibling;
-  while (beforeParent) {
-    if (beforeParent.tagName.match(/^H[1-6]$/)) {
-      const level = parseInt(beforeParent.tagName[1]);
-      const isCollapsed =
-        beforeParent.getAttribute("data-collapsed") === "true";
-
-      if (level < parentHeadingLevel && isCollapsed) {
-        return;
-      }
-
-      if (level <= parentHeadingLevel) {
-        break;
-      }
-    }
-    beforeParent = beforeParent.previousElementSibling;
-  }
-
-  let nextElement = parentHeading.nextElementSibling;
-  let insideCollapsedHeading = false;
-  let nestedHeadingLevel: number | null = null;
-
-  while (nextElement) {
-    const isHeading = nextElement.tagName.match(/^H[1-6]$/);
-    if (isHeading) {
-      const level = parseInt(nextElement.tagName[1]);
-      if (level <= parentHeadingLevel) {
-        break;
-      }
-    }
-
-    if (insideCollapsedHeading) {
-      if (
-        isHeading &&
-        nestedHeadingLevel !== null &&
-        parseInt(nextElement.tagName[1]) <= nestedHeadingLevel
-      ) {
-        insideCollapsedHeading = false;
-        nestedHeadingLevel = null;
-      } else {
-        nextElement = nextElement.nextElementSibling;
-        continue;
-      }
-    }
-
-    if (nextElement.hasAttribute("data-hidden")) {
-      nextElement.removeAttribute("data-hidden");
-    }
-
-    if (isHeading && nextElement.getAttribute("data-collapsed") === "true") {
-      insideCollapsedHeading = true;
-      nestedHeadingLevel = parseInt(nextElement.tagName[1]);
-    }
-
-    nextElement = nextElement.nextElementSibling;
-  }
-}
