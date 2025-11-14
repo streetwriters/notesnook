@@ -166,7 +166,7 @@ export const Heading = TiptapHeading.extend({
   addNodeView() {
     return ({ node, getPos, editor, HTMLAttributes }) => {
       const heading = document.createElement(`h${node.attrs.level}`);
-      const contentWrapper = document.createElement("span");
+      const contentWrapper = document.createElement("div");
       const icon = document.createElement("span");
 
       icon.className = "heading-collapse-icon";

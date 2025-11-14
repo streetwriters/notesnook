@@ -834,6 +834,16 @@ del.diffdel {
   text-decoration: none;
 }
 
+.ProseMirror h1 ,
+.ProseMirror h2 ,
+.ProseMirror h3 ,
+.ProseMirror h4 ,
+.ProseMirror h5 ,
+.ProseMirror h6 {
+  display: flex;
+  align-items: center;
+}
+
 .ProseMirror h1 .heading-collapse-icon,
 .ProseMirror h2 .heading-collapse-icon,
 .ProseMirror h3 .heading-collapse-icon,
@@ -929,13 +939,24 @@ del.diffdel {
 }
 
 /* hide collapse icon when heading is empty (only contains trailing break) */
-.ProseMirror h1:has(> span > br.ProseMirror-trailingBreak:only-child) .heading-collapse-icon,
-.ProseMirror h2:has(> span > br.ProseMirror-trailingBreak:only-child) .heading-collapse-icon,
-.ProseMirror h3:has(> span > br.ProseMirror-trailingBreak:only-child) .heading-collapse-icon,
-.ProseMirror h4:has(> span > br.ProseMirror-trailingBreak:only-child) .heading-collapse-icon,
-.ProseMirror h5:has(> span > br.ProseMirror-trailingBreak:only-child) .heading-collapse-icon,
-.ProseMirror h6:has(> span > br.ProseMirror-trailingBreak:only-child) .heading-collapse-icon {
+.ProseMirror h1:has(> div > br.ProseMirror-trailingBreak:only-child) .heading-collapse-icon,
+.ProseMirror h2:has(> div > br.ProseMirror-trailingBreak:only-child) .heading-collapse-icon,
+.ProseMirror h3:has(> div  > br.ProseMirror-trailingBreak:only-child) .heading-collapse-icon,
+.ProseMirror h4:has(> div > br.ProseMirror-trailingBreak:only-child) .heading-collapse-icon,
+.ProseMirror h5:has(> div > br.ProseMirror-trailingBreak:only-child) .heading-collapse-icon,
+.ProseMirror h6:has(> div > br.ProseMirror-trailingBreak:only-child) .heading-collapse-icon {
   display: none !important;
+}
+
+@media screen and (max-width: 768px) {
+  .ProseMirror h1 .heading-collapse-icon,
+  .ProseMirror h2 .heading-collapse-icon,
+  .ProseMirror h3 .heading-collapse-icon,
+  .ProseMirror h4 .heading-collapse-icon,
+  .ProseMirror h5 .heading-collapse-icon,
+  .ProseMirror h6 .heading-collapse-icon {
+    opacity: 1 !important;
+  }
 }
 
 [data-hidden="true"] {
@@ -956,3 +977,4 @@ del.diffdel {
 pre[class*="language-"] {
   overflow: initial !important;
 }
+
