@@ -166,8 +166,11 @@ export const Heading = TiptapHeading.extend({
   addNodeView() {
     return ({ node, getPos, editor, HTMLAttributes }) => {
       const heading = document.createElement(`h${node.attrs.level}`);
-      const contentWrapper = document.createElement("span");
+      const contentWrapper = document.createElement("div");
       const icon = document.createElement("span");
+
+      // providing a minWidth so that empty headings show the blinking cursor
+      contentWrapper.style.minWidth = "1px";
 
       icon.className = "heading-collapse-icon";
       icon.contentEditable = "false";
