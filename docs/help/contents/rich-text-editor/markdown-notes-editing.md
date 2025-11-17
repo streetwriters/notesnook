@@ -27,6 +27,7 @@ Notesnook supports the following (Markdown) shortcuts in the editor:
 | Codeblock           | \`\`\`javascript<br>function hello() { }<br>\`\`\`                    |
 | Math block          | $$$<br>2 + 2 = 4<br>$$$                                               |
 | Current Date        | `/date`                                                               |
+| Current Day         | `/day`                                                                |
 | Date Time           | `/time`                                                               |
 | Current Date & Time | `/now`                                                                |
 | Current Date & Time with timezone | `/nowz`                                                 |
