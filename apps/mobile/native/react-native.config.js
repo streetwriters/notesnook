@@ -1,7 +1,7 @@
 
 const isGithubRelease = false;
 const config = {
-  commands: require('@callstack/repack/commands/rspack'),
+  // commands: require('@callstack/repack/commands/rspack'),
   project: {
     android: {
       sourceDir: './android'

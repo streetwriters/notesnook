@@ -5,6 +5,7 @@
 #import "RNShortcuts.h"
 #import "RNBootSplash.h"
 #import <ReactAppDependencyProvider/RCTAppDependencyProvider.h>
+#import "RNFileUploader.h"
 
 @implementation AppDelegate
 
@@ -58,6 +59,10 @@
   [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView]; // ⬅️ initialize the splash screen
 
   return rootView;
+}
+
+- (void)application:(UIApplication *)application handleEventsForBackgroundURLSession:(NSString *)identifier completionHandler:(void (^)())completionHandler {
+  [RNFileUploader setCompletionHandlerWithIdentifier:identifier completionHandler:completionHandler];
 }
 
 @end
