@@ -615,6 +615,14 @@ export type User = {
   };
 };
 
+export type UserSession = {
+  sessionKey: string;
+  createdAt: number;
+  isCurrentDevice: boolean;
+  browser?: string;
+  platform?: string;
+};
+
 export type Profile = {
   fullName?: string;
   profilePicture?: string;
