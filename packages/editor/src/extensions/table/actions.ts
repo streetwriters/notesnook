@@ -18,9 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Editor } from "@tiptap/core";
-import { selectedRect, TableRect } from "@tiptap/pm/tables";
 import { EditorState, TextSelection, Transaction } from "prosemirror-state";
 import { Node } from "prosemirror-model";
+import { selectedRect, TableRect } from "./prosemirror-tables/commands.js";
 
 type TableCell = {
   cell: Node;
