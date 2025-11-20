@@ -9,7 +9,7 @@
     "react": "18.2.0"
   },
 "dependencies": {
-    "@ammarahmed/react-native-upload": "^6.21.0",
+    "@ammarahmed/react-native-upload": "^6.26.0",
     "@ammarahmed/notifee-react-native": "7.4.9",
     "@callstack/repack": "~5.1.2",
     "@bam.tech/react-native-image-resizer": "3.0.11",

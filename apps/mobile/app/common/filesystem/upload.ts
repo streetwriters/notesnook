@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { RequestOptions } from "@notesnook/core";
+import { isImage, RequestOptions } from "@notesnook/core";
 import { PermissionsAndroid, Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import { ToastManager } from "../../services/event-manager";
@@ -78,6 +78,8 @@ export async function uploadFile(
       return true;
     }
 
+    let attachmentInfo = await db.attachments.attachment(filename);
+
     DatabaseLogger.info(
       `Starting upload of ${filename} at path: ${fileInfo.path}`
     );
@@ -103,7 +105,24 @@ export async function uploadFile(
         ...headers,
         "content-type": "application/octet-stream"
       },
-      appGroup: IOS_APPGROUPID
+      appGroup: IOS_APPGROUPID,
+      notification: {
+        filename:
+          attachmentInfo && isImage(attachmentInfo?.mimeType)
+            ? "image"
+            : attachmentInfo?.filename || "file",
+        enabled: true,
+        enableRingTone: true,
+        autoClear: true,
+        onProgressTitle: `Uploading ${attachmentInfo?.filename || "file"}`,
+        onCancelledTitle: "Upload cancelled",
+        onProgressMessage: "Uploading file",
+        onErrorTitle: "Uploading failed",
+        onErrorMessage: "Uploading failed",
+        onCancelledMessage: "Cancelled",
+        onCompleteTitle: "Upload complete",
+        onCompleteMessage: "Uploading"
+      }
     }).onChange((event) => {
       switch (event.status) {
         case "running":
@@ -148,9 +167,9 @@ export async function uploadFile(
         }, info: ${JSON.stringify(result.error)}`
       );
     }
-    const attachment = await db.attachments.attachment(filename);
-    if (!attachment) return false;
-    await checkUpload(filename, requestOptions.chunkSize, attachment.size);
+    attachmentInfo = await db.attachments.attachment(filename);
+    if (!attachmentInfo) return false;
+    await checkUpload(filename, requestOptions.chunkSize, attachmentInfo.size);
     DatabaseLogger.info(`File upload status: ${filename}, ${status}`);
     return uploaded;
   } catch (e) {
