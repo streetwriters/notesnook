@@ -22,13 +22,23 @@ import { showPopup } from "../../../components/popup-presenter/index.js";
 import { Editor } from "../../../types.js";
 import { FloatingMenuProps } from "../types.js";
 import { LinkHoverPopupHandler } from "./link.js";
+import { CommentHoverPopupHandler } from "./comment.js";
 import { HoverPopupContextProvider } from "./context.js";
 
 export type HoverPopupProps = {
   editor: Editor;
 };
 
-const handlers = [LinkHoverPopupHandler];
+type HoverPopupHandler = {
+  isActive: (element: HTMLElement) => boolean;
+  popup: (props: HoverPopupProps) => React.ReactNode;
+  openOnClick?: boolean;
+};
+
+const handlers: HoverPopupHandler[] = [
+  LinkHoverPopupHandler,
+  CommentHoverPopupHandler
+];
 
 const HOVER_TIMEOUT = 1000;
 
@@ -59,29 +69,11 @@ export function HoverPopupHandler(props: FloatingMenuProps) {
 
         clearTimeout(hoverTimeoutId.current);
       }
-      function onMouseOver(e: MouseEvent) {
-        if (
-          !e.target ||
-          !(e.target instanceof HTMLElement) ||
-          e.target.classList.contains("ProseMirror")
-        )
-          return;
 
-        const element = e.target;
-
-        if (activePopup.current) {
-          const isOutsideEditor = !element.closest(".ProseMirror");
-          const isInsidePopup = element.closest(".popup-presenter-portal");
-          const isActiveElement = activePopup.current.element === element;
-          if (isInsidePopup) return;
-
-          if (isOutsideEditor || !isActiveElement) {
-            activePopup.current.hide();
-            activePopup.current = undefined;
-            return;
-          }
-        }
-
+      function showPopupForElement(
+        element: HTMLElement,
+        timeout: number = HOVER_TIMEOUT
+      ) {
         clearTimeout(hoverTimeoutId.current);
 
         hoverTimeoutId.current = setTimeout(
@@ -125,20 +117,79 @@ export function HoverPopupHandler(props: FloatingMenuProps) {
                 align: "start",
                 location: "top",
                 isTargetAbsolute: true,
-                yOffset: -10,
+                yOffset: 0,
                 xOffset: -30
               }
             });
             activePopup.current = { element, hide: hidePopup };
           },
-          HOVER_TIMEOUT,
+          timeout,
           {}
         );
       }
+
+      function onClick(e: MouseEvent) {
+        if (
+          !e.target ||
+          !(e.target instanceof HTMLElement) ||
+          e.target.classList.contains("ProseMirror")
+        )
+          return;
+
+        const element = e.target;
+
+        const handler = handlers.find((h) => h.isActive(element));
+        if (!handler?.openOnClick) return;
+
+        if (activePopup.current?.element === element) return;
+
+        if (activePopup.current) {
+          activePopup.current.hide();
+          activePopup.current = undefined;
+        }
+
+        showPopupForElement(element, 0);
+      }
+
+      function onMouseOver(e: MouseEvent) {
+        if (
+          !e.target ||
+          !(e.target instanceof HTMLElement) ||
+          e.target.classList.contains("ProseMirror")
+        )
+          return;
+
+        const element = e.target;
+
+        if (activePopup.current) {
+          const isOutsideEditor = !element.closest(".ProseMirror");
+          const isInsidePopup = element.closest(".popup-presenter-portal");
+          const isActiveElement = activePopup.current.element === element;
+          if (isInsidePopup) return;
+
+          if (isOutsideEditor) {
+            activePopup.current.hide();
+            activePopup.current = undefined;
+            return;
+          }
+
+          if (!isActiveElement) {
+            activePopup.current.hide();
+            activePopup.current = undefined;
+          } else {
+            return;
+          }
+        }
+
+        showPopupForElement(element);
+      }
+
       window.addEventListener("mouseover", onMouseOver);
+      window.addEventListener("click", onClick);
       window.addEventListener("contextmenu", onContextMenu);
       return () => {
         window.removeEventListener("mouseover", onMouseOver);
+        window.removeEventListener("click", onClick);
         window.removeEventListener("contextmenu", onContextMenu);
       };
     },

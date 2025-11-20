@@ -99,6 +99,17 @@
   cursor: pointer;
 }
 
+.ProseMirror span.comment-highlight {
+  text-decoration: underline;
+  text-decoration-style: dashed;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+}
+
+.ProseMirror span.comment-highlight:hover {
+  text-decoration-style: solid;
+}
+
 .ProseMirror a[href^="nn://"]::before {
   display: inline-block;
   cursor: pointer;
