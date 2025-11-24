@@ -342,14 +342,15 @@ const onSubscriptionError = async (error: RNIap.PurchaseError) => {
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
 
 const setAppMessage = async () => {
-  await useMessageStore.getState().setAnnouncement();
-  if (await checkAppUpdateAvailable()) return;
   const user = await db.user.getUser();
   if (!user) {
     setLoginMessage();
     return;
   }
-  if (!user?.isEmailConfirmed) setEmailVerifyMessage();
+  if (!user?.isEmailConfirmed) {
+    setEmailVerifyMessage();
+    return;
+  }
   if (await checkForRateAppRequest()) return;
   if (
     user?.isEmailConfirmed &&
@@ -357,7 +358,10 @@ const setAppMessage = async () => {
     !useMessageStore.getState().message?.visible
   ) {
     setRecoveryKeyMessage();
+    return;
   }
+  useMessageStore.getState().setAnnouncement();
+  checkAppUpdateAvailable();
 };
 
 const doAppLoadActions = async () => {
@@ -437,7 +441,6 @@ const initializeDatabase = async (password?: string) => {
     try {
       await setupDatabase(password);
       await db.init();
-      initialize();
       Sync.run();
     } catch (e) {
       DatabaseLogger.error(e as Error);
