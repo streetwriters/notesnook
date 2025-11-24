@@ -214,7 +214,7 @@ export const Heading = TiptapHeading.extend({
       }
 
       icon.onmousedown = onIconClick;
-      icon.ontouchstart = onIconClick;
+      icon.ontouchend = onIconClick;
 
       heading.appendChild(contentWrapper);
       heading.appendChild(icon);
