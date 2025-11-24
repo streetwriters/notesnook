@@ -41,6 +41,7 @@ import useNavigationStore, {
 } from "../../stores/use-navigation-store";
 import { setOnFirstSave } from "./common";
 import { strings } from "@notesnook/intl";
+import { useSettingStore } from "../../stores/use-setting-store";
 
 export interface RouteProps<T extends RouteName> extends NavigationProps<T> {
   get: (
@@ -83,6 +84,7 @@ const NotesPage = ({
       ? (params.current?.item as Color)?.colorCode
       : undefined;
   const updateOnFocus = useRef(false);
+  const isAppLoading = useSettingStore((state) => state.isAppLoading);
   const isFocused = useNavigationFocus(navigation, {
     onFocus: (prev) => {
       if (updateOnFocus.current) {
@@ -118,6 +120,7 @@ const NotesPage = ({
 
   const onRequestUpdate = React.useCallback(
     async (data?: NotesScreenParams) => {
+      if (useSettingStore.getState().isAppLoading) return;
       if (
         params.current.item.id &&
         useNavigationStore.getState().focusedRouteId !==
@@ -164,6 +167,7 @@ const NotesPage = ({
   );
 
   useEffect(() => {
+    if (isAppLoading) return;
     if (loadingNotes) {
       get(params.current, true)
         .then(async (items) => {
@@ -175,7 +179,7 @@ const NotesPage = ({
           setLoadingNotes(false);
         });
     }
-  }, [loadingNotes, get]);
+  }, [loadingNotes, get, isAppLoading]);
 
   useEffect(() => {
     eSubscribeEvent(route.name, onRequestUpdate);

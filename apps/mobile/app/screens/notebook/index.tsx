@@ -40,10 +40,12 @@ import { openEditor, setOnFirstSave } from "../notes/common";
 import { View } from "react-native";
 import { DefaultAppStyles } from "../../utils/styles";
 import { Notebooks } from "../../components/sheets/notebooks";
+import { useSettingStore } from "../../stores/use-setting-store";
 
 const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
   const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
   const params = useRef<NotebookScreenParams>(route?.params);
+  const isAppLoading = useSettingStore((state) => state.isAppLoading);
   const [loading, setLoading] = useState(true);
   const updateOnFocus = useRef(false);
   const [breadcrumbs, setBreadcrumbs] = useState<
@@ -81,6 +83,7 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
 
   const onRequestUpdate = React.useCallback(
     async (data?: NotebookScreenParams) => {
+      if (useSettingStore.getState().isAppLoading) return;
       if (
         useNavigationStore.getState().focusedRouteId !==
           params.current.item.id &&
@@ -135,12 +138,13 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
   );
 
   useEffect(() => {
+    if (isAppLoading) return;
     onRequestUpdate(params.current);
     const sub = eSubscribeEvent(eUpdateNotebookRoute, onRequestUpdate);
     return () => {
       sub?.unsubscribe();
     };
-  }, [onRequestUpdate]);
+  }, [onRequestUpdate, isAppLoading]);
 
   useEffect(() => {
     return () => {
