@@ -23,10 +23,8 @@ import {
   textblockTypeInputRule
 } from "@tiptap/core";
 import { Heading as TiptapHeading } from "@tiptap/extension-heading";
-import { isClickWithinBounds } from "../../utils/prosemirror.js";
 import { Plugin, PluginKey, Selection, Transaction } from "@tiptap/pm/state";
 import { Node } from "@tiptap/pm/model";
-import { useToolbarStore } from "../../toolbar/stores/toolbar-store.js";
 
 const COLLAPSIBLE_BLOCK_TYPES = [
   "paragraph",
@@ -168,6 +166,14 @@ export const Heading = TiptapHeading.extend({
   addNodeView() {
     return ({ node, getPos, editor, HTMLAttributes }) => {
       const heading = document.createElement(`h${node.attrs.level}`);
+      const contentWrapper = document.createElement("div");
+      const icon = document.createElement("span");
+
+      // providing a minWidth so that empty headings show the blinking cursor
+      contentWrapper.style.minWidth = "1px";
+
+      icon.className = "heading-collapse-icon";
+      icon.contentEditable = "false";
 
       for (const attr in HTMLAttributes) {
         heading.setAttribute(attr, HTMLAttributes[attr]);
@@ -176,15 +182,16 @@ export const Heading = TiptapHeading.extend({
       if (node.attrs.collapsed) heading.dataset.collapsed = "true";
       else delete heading.dataset.collapsed;
 
-      function onClick(e: MouseEvent | TouchEvent) {
-        if (e instanceof MouseEvent && e.button !== 0) return;
-        if (!(e.target instanceof HTMLHeadingElement)) return;
+      function onIconClick(e: MouseEvent | TouchEvent) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
 
         const pos = typeof getPos === "function" ? getPos() : 0;
         if (typeof pos !== "number") return;
 
         const resolvedPos = editor.state.doc.resolve(pos);
-        const forbiddenParents = ["callout", "table"];
+        const forbiddenParents = ["callout"];
         if (
           findParentNodeClosestToPos(resolvedPos, (node) =>
             forbiddenParents.includes(node.type.name)
@@ -193,36 +200,28 @@ export const Heading = TiptapHeading.extend({
           return;
         }
 
-        if (
-          isClickWithinBounds(
-            e,
-            resolvedPos,
-            useToolbarStore.getState().isMobile ? "right" : "left"
-          )
-        ) {
-          e.preventDefault();
-          e.stopImmediatePropagation();
+        editor.commands.command(({ tr }) => {
+          const currentNode = tr.doc.nodeAt(pos);
+          if (currentNode && currentNode.type.name === "heading") {
+            const shouldCollapse = !currentNode.attrs.collapsed;
+            const headingLevel = currentNode.attrs.level;
 
-          editor.commands.command(({ tr }) => {
-            const currentNode = tr.doc.nodeAt(pos);
-            if (currentNode && currentNode.type.name === "heading") {
-              const shouldCollapse = !currentNode.attrs.collapsed;
-              const headingLevel = currentNode.attrs.level;
-
-              tr.setNodeAttribute(pos, "collapsed", shouldCollapse);
-              toggleNodesUnderHeading(tr, pos, headingLevel, shouldCollapse);
-            }
-            return true;
-          });
-        }
+            tr.setNodeAttribute(pos, "collapsed", shouldCollapse);
+            toggleNodesUnderHeading(tr, pos, headingLevel, shouldCollapse);
+          }
+          return true;
+        });
       }
 
-      heading.onmousedown = onClick;
-      heading.ontouchstart = onClick;
+      icon.onmousedown = onIconClick;
+      icon.ontouchend = onIconClick;
+
+      heading.appendChild(contentWrapper);
+      heading.appendChild(icon);
 
       return {
         dom: heading,
-        contentDOM: heading,
+        contentDOM: contentWrapper,
         update: (updatedNode) => {
           if (updatedNode.type !== this.type) {
             return false;
