@@ -41,6 +41,7 @@ import { View } from "react-native";
 import { DefaultAppStyles } from "../../utils/styles";
 import { Notebooks } from "../../components/sheets/notebooks";
 import { useSettingStore } from "../../stores/use-setting-store";
+import { rootNavigatorRef } from "../../utils/global-refs";
 
 const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
   const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
@@ -109,7 +110,6 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
       }
 
       if (data) params.current = data;
-      params.current.title = params.current.item.title;
 
       try {
         const notebook = await db.notebooks?.notebook(
@@ -127,7 +127,11 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
           await notes.item(0, resolveItems);
           syncWithNavigation();
         } else {
-          Navigation.goBack();
+          if (rootNavigatorRef.canGoBack()) {
+            Navigation.goBack();
+          } else {
+            Navigation.navigate("Notes");
+          }
         }
         setLoading(false);
       } catch (e) {
@@ -190,7 +194,7 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
           }}
           id={params.current.item?.id}
           renderedInRoute="Notebook"
-          headerTitle={params.current.title}
+          headerTitle={params.current.item.title}
           loading={loading}
           CustomLisHeader={
             <NotebookHeader
@@ -254,7 +258,6 @@ NotebookScreen.navigate = async (item: Notebook, canGoBack?: boolean) => {
   const { currentRoute, focusedRouteId } = useNavigationStore.getState();
   if (currentRoute === "Notebooks") {
     Navigation.push("Notebook", {
-      title: item.title,
       item: item,
       canGoBack
     });
@@ -278,7 +281,6 @@ NotebookScreen.navigate = async (item: Notebook, canGoBack?: boolean) => {
     } else {
       // Push a new route
       Navigation.push("Notebook", {
-        title: item.title,
         item: item,
         canGoBack
       });
@@ -286,7 +288,6 @@ NotebookScreen.navigate = async (item: Notebook, canGoBack?: boolean) => {
   } else {
     // Push a new route anyways
     Navigation.push("Notebook", {
-      title: item.title,
       item: item,
       canGoBack
     });

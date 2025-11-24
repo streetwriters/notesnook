@@ -21,7 +21,6 @@ import { useThemeColors } from "@notesnook/theme";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as React from "react";
-import { db } from "../common/database";
 import { hideAllTooltips } from "../hooks/use-tooltip";
 import SettingsService from "../services/settings";
 import useNavigationStore, {
@@ -33,6 +32,7 @@ import { rootNavigatorRef } from "../utils/global-refs";
 import Navigation from "../services/navigation";
 import { isFeatureAvailable } from "@notesnook/common";
 import { useStoredValue } from "../hooks/use-stored-state";
+import { db } from "../common/database";
 
 const RootStack = createNativeStackNavigator();
 const AppStack = createNativeStackNavigator();
@@ -64,8 +64,11 @@ const AppNavigation = React.memo(
         ? DEFAULT_HOME
         : undefined
     );
-
     const loading = useSettingStore((state) => state.isAppLoading);
+
+    if (!home.value && !homepageV2) {
+      home.value = DEFAULT_HOME;
+    }
 
     React.useEffect(() => {
       if (!homepageV2 || loading) return;
@@ -76,67 +79,70 @@ const AppNavigation = React.memo(
             SettingsService.setProperty("homepageV2", undefined);
           }
         });
-        switch (homepageV2.type) {
-          case "notebook":
-            {
-              const notebook = await db.notebooks.notebook(homepageV2.id);
-              if (notebook) {
+
+        if (!home.value) {
+          switch (homepageV2.type) {
+            case "notebook":
+              {
+                const notebook = await db.notebooks.notebook(homepageV2.id);
+                if (notebook) {
+                  home.value = {
+                    name: "Notebook",
+                    params: {
+                      item: notebook,
+                      id: notebook.id,
+                      title: notebook.title
+                    }
+                  };
+                  return;
+                }
+              }
+              break;
+            case "color": {
+              const color = await db.colors.color(homepageV2.id);
+              if (color) {
                 home.value = {
-                  name: "Notebook",
+                  name: "ColoredNotes",
                   params: {
-                    item: notebook,
-                    id: notebook.id,
-                    title: notebook.title
+                    item: color,
+                    id: color.id,
+                    title: color.title
                   }
                 };
                 return;
               }
-            }
-            break;
-          case "color": {
-            const color = await db.colors.color(homepageV2.id);
-            if (color) {
-              home.value = {
-                name: "ColoredNotes",
-                params: {
-                  item: color,
-                  id: color.id,
-                  title: color.title
-                }
-              };
-              return;
-            }
 
-            break;
-          }
-          case "tag": {
-            const tag = await db.tags.tag(homepageV2.id);
-            if (tag) {
-              home.value = {
-                name: "TaggedNotes",
-                params: {
-                  item: tag,
-                  id: tag.id,
-                  title: tag.title
-                }
-              };
+              break;
+            }
+            case "tag": {
+              const tag = await db.tags.tag(homepageV2.id);
+              if (tag) {
+                home.value = {
+                  name: "TaggedNotes",
+                  params: {
+                    item: tag,
+                    id: tag.id,
+                    title: tag.title
+                  }
+                };
+                return;
+              }
+              break;
+            }
+            case "default":
+              {
+                home.value = DEFAULT_HOME;
+              }
               return;
-            }
-            break;
           }
-          case "default":
-            {
-              home.value = DEFAULT_HOME;
-            }
-            return;
+
+          home.value = undefined;
+          setTimeout(() => {
+            home.value = DEFAULT_HOME;
+          });
         }
-
-        home.value = undefined;
-        setTimeout(() => {
-          home.value = DEFAULT_HOME;
-        });
       })();
-    }, [homepageV2, loading]);
+    }, [homepageV2, loading, home.value]);
 
     React.useEffect(() => {
       if (!home) return;

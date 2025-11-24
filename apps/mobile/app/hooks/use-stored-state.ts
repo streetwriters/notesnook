@@ -44,6 +44,17 @@ export function useStoredValue<T>(
     },
     reset() {
       MMKV.removeItem(refKey);
+      setValue(initialValue);
     }
   };
+}
+
+export function resetStoredState(forKey: string, value?: any) {
+  if (value) {
+    MMKV.setMap(`storedState:${forKey}`, {
+      value: value
+    });
+  } else {
+    MMKV.removeItem(`storedState:${forKey}`);
+  }
 }

@@ -42,6 +42,7 @@ import useNavigationStore, {
 import { setOnFirstSave } from "./common";
 import { strings } from "@notesnook/intl";
 import { useSettingStore } from "../../stores/use-setting-store";
+import { rootNavigatorRef } from "../../utils/global-refs";
 
 export interface RouteProps<T extends RouteName> extends NavigationProps<T> {
   get: (
@@ -146,12 +147,15 @@ const NotesPage = ({
           ](params.current.item.id);
 
           if (!item) {
-            Navigation.goBack();
+            if (rootNavigatorRef.canGoBack()) {
+              Navigation.goBack();
+            } else {
+              Navigation.navigate("Notes");
+            }
             return;
           }
 
           params.current.item = item;
-          params.current.title = item.title;
         }
 
         if (notes.placeholders.length === 0) setLoadingNotes(false);

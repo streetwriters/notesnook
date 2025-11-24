@@ -37,13 +37,11 @@ export type GenericRouteParam = {
 
 export type NotebookScreenParams = {
   item: Notebook;
-  title: string;
   canGoBack?: boolean;
 };
 
 export type NotesScreenParams = {
   item: Note | Notebook | Tag | Color | TrashItem | Reminder;
-  title: string;
   canGoBack?: boolean;
 };
 
