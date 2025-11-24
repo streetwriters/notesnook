@@ -207,7 +207,7 @@ export const Heading = TiptapHeading.extend({
             const headingLevel = currentNode.attrs.level;
 
             tr.setNodeAttribute(pos, "collapsed", shouldCollapse);
-            toggleNodesUnderHeading(tr, pos, headingLevel, shouldCollapse);
+            toggleNodesUnderPos(tr, pos, headingLevel, shouldCollapse);
           }
           return true;
         });
@@ -255,17 +255,17 @@ export const Heading = TiptapHeading.extend({
   }
 });
 
-function toggleNodesUnderHeading(
+function toggleNodesUnderPos(
   tr: Transaction,
-  headingPos: number,
+  pos: number,
   headingLevel: number,
   isCollapsing: boolean
 ) {
   const { doc } = tr;
-  const headingNode = doc.nodeAt(headingPos);
-  if (!headingNode || headingNode.type.name !== "heading") return;
+  const node = doc.nodeAt(pos);
+  if (!node) return;
 
-  let nextPos = headingPos + headingNode.nodeSize;
+  let nextPos = pos + node.nodeSize;
   const cursorPos = tr.selection.from;
   let shouldMoveCursor = false;
   let insideCollapsedHeading = false;
@@ -320,8 +320,8 @@ function toggleNodesUnderHeading(
   }
 
   if (shouldMoveCursor) {
-    const headingEndPos = headingPos + headingNode.nodeSize - 1;
-    tr.setSelection(Selection.near(tr.doc.resolve(headingEndPos)));
+    const endPos = pos + node.nodeSize - 1;
+    tr.setSelection(Selection.near(tr.doc.resolve(endPos)));
   }
 }
 
@@ -366,26 +366,27 @@ const headingUpdatePlugin = new Plugin({
     let modified = false;
 
     newDoc.descendants((newNode, pos) => {
-      if (newNode.type.name === "heading") {
-        if (pos >= oldDoc.content.size) return;
+      if (pos >= oldDoc.content.size) return;
 
-        const oldNode = oldDoc.nodeAt(pos);
-        if (
-          oldNode &&
-          oldNode.type.name === "heading" &&
-          oldNode.attrs.level !== newNode.attrs.level
-        ) {
-          /**
-           * if the level of a collapsed heading is changed,
-           * we need to reset visibility of all the nodes under it as there
-           * might be a heading of same or higher level previously
-           * hidden under this heading
-           */
-          if (newNode.attrs.collapsed) {
-            toggleNodesUnderHeading(tr, pos, oldNode.attrs.level, false);
-            toggleNodesUnderHeading(tr, pos, newNode.attrs.level, true);
-            modified = true;
-          }
+      const oldNode = oldDoc.nodeAt(pos);
+      if (
+        oldNode &&
+        oldNode.type.name === "heading" &&
+        oldNode.attrs.level !== newNode.attrs.level
+      ) {
+        /**
+         * if the level of a collapsed heading is changed,
+         * we need to reset visibility of all the nodes under it as there
+         * might be a heading of same or higher level previously
+         * hidden under this heading
+         */
+        if (newNode.type.name === "heading" && newNode.attrs.collapsed) {
+          toggleNodesUnderPos(tr, pos, oldNode.attrs.level, false);
+          toggleNodesUnderPos(tr, pos, newNode.attrs.level, true);
+          modified = true;
+        } else if (newNode.type.name !== "heading" && oldNode.attrs.collapsed) {
+          toggleNodesUnderPos(tr, pos, oldNode.attrs.level, false);
+          modified = true;
         }
       }
     });
