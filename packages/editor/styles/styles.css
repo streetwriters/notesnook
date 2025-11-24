@@ -707,6 +707,10 @@ p > *::selection {
   mask-size: cover;
 }
 
+.simple-checklist > li.checked p {
+  opacity: 0.8;
+}
+
 /* Callout */
 .ProseMirror div.callout {
   padding: 15px;
