@@ -70,7 +70,6 @@ export const Tags = ({ item, close }) => {
 
 export const TagStrip = ({ item, close }) => {
   const [tags, setTags] = useState([]);
-
   useEffect(() => {
     db.relations
       .to(item, "tag")
@@ -78,7 +77,7 @@ export const TagStrip = ({ item, close }) => {
       .then((tags) => {
         setTags(tags);
       });
-  });
+  }, []);
 
   return tags?.length > 0 ? (
     <View

@@ -34,14 +34,14 @@ import { DefaultAppStyles } from "../../utils/styles";
 
 export default function Notebooks({ note, close, full }) {
   const { colors } = useThemeColors();
-  async function getNotebooks() {
-    let filteredNotebooks = await db.relations.to(note, "notebook").resolve();
-    return filteredNotebooks || [];
-  }
   const [noteNotebooks, setNoteNotebooks] = useState([]);
   useEffect(() => {
+    async function getNotebooks() {
+      let filteredNotebooks = await db.relations.to(note, "notebook").resolve();
+      return filteredNotebooks || [];
+    }
     getNotebooks().then((notebooks) => setNoteNotebooks(notebooks));
-  });
+  }, []);
 
   const navigateNotebook = async (id) => {
     let item = await db.notebooks.notebook(id);
