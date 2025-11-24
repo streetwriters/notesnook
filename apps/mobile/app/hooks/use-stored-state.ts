@@ -38,7 +38,7 @@ export function useStoredValue<T>(
       cancelAnimationFrame(frameRef.current);
       frameRef.current = requestAnimationFrame(() => {
         MMKV.setMap(refKey, {
-          value: value
+          value: next
         });
       });
     },
