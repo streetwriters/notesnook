@@ -93,6 +93,7 @@ export const FluidPanelsView = React.memo(
     const insets = useGlobalSafeAreaInsets();
     const animatedOpacity = useSharedValue(0);
     const animatedTranslateY = useSharedValue(-9999);
+
     const overlayRef = useRef<Animated.View>(null);
     const [orientation, setOrientation] = useState<OrientationType>(
       Orientation.getInitialOrientation()
@@ -243,8 +244,8 @@ export const FluidPanelsView = React.memo(
                 current === "tablet"
                   ? size.width * 0.48
                   : current === "smallTablet"
-                  ? size.width - valueLimiter(size.width * 0.4, 300, 450)
-                  : size.width,
+                    ? size.width - valueLimiter(size.width * 0.4, 300, 450)
+                    : size.width,
               zIndex: null,
               paddingHorizontal: 0
             }
@@ -294,8 +295,8 @@ export const FluidPanelsView = React.memo(
         const nextDeviceMode = DDS.isLargeTablet()
           ? "tablet"
           : DDS.isSmallTab
-          ? "smallTablet"
-          : "mobile";
+            ? "smallTablet"
+            : "mobile";
 
         setDeviceMode(nextDeviceMode, size);
       },
@@ -498,13 +499,17 @@ export const FluidPanelsView = React.memo(
                   />
                 ) : null}
 
-                <SafeAreaView
+                <View
                   style={{
-                    flex: 1
+                    flex: 1,
+                    paddingTop: insets.top,
+                    paddingBottom: insets.bottom,
+                    paddingLeft: insets.left,
+                    paddingRight: insets.right
                   }}
                 >
                   <AppNavigationStack />
-                </SafeAreaView>
+                </View>
               </ScopedThemeProvider>
             </View>
 
