@@ -54,10 +54,10 @@
   border: 1px solid var(--border);
   color: var(--paragraph-secondary);
   border-radius: 5px;
-  padding: 0px 5px 0px 5px;
+  padding: 2px 5px 2px 5px;
   font-family: ui-monospace, SFMono-Regular, SF Mono, Consolas, Liberation Mono,
     Menlo, monospace !important;
-  font-size: 10pt !important;
+  font-size: 85%;
 }
 
 .ProseMirror code > span {
