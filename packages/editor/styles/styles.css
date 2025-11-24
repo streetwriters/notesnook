@@ -316,6 +316,31 @@ img.ProseMirror-separator {
 .ProseMirror table p {
   margin: 0;
 }
+
+.ProseMirror td > h1:first-child,
+.ProseMirror td > h2:first-child,
+.ProseMirror td > h3:first-child,
+.ProseMirror td > h4:first-child,
+.ProseMirror td > h5:first-child,
+.ProseMirror td > h6:first-child {
+  margin-top: 0;
+}
+
+.ProseMirror td > ol,
+.ProseMirror td > ul {
+  padding-left: 20px;
+  margin-top: 0;
+}
+
+.ProseMirror td > blockquote {
+  margin-left: 0;
+  margin-top: 0;
+}
+
+.ProseMirror td > blockquote > :first-child  {
+  margin-top: 0;
+}
+
 /* 
 .resize-cursor {
 
