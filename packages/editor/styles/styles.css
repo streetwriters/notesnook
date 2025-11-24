@@ -52,7 +52,7 @@
 .ProseMirror p code {
   background-color: var(--background-secondary);
   border: 1px solid var(--border);
-  color: var(--accent);
+  color: var(--paragraph-secondary);
   border-radius: 5px;
   padding: 0px 5px 0px 5px;
   font-family: ui-monospace, SFMono-Regular, SF Mono, Consolas, Liberation Mono,
