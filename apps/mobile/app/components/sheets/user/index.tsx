@@ -165,6 +165,8 @@ export const UserSheet = () => {
               message: strings.notLoggedIn(),
               actionText: strings.loginMessageActionText(),
               icon: "account-outline",
+              id: "log-in",
+              type: "normal",
               onPress: () => {
                 ref.current?.hide();
                 Navigation.navigate("Auth", {
