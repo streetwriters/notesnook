@@ -903,6 +903,25 @@ del.diffdel {
 .ProseMirror h6 {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
+}
+
+.ProseMirror h1.text-align-center,
+.ProseMirror h2.text-align-center,
+.ProseMirror h3.text-align-center,
+.ProseMirror h4.text-align-center,
+.ProseMirror h5.text-align-center,
+.ProseMirror h6.text-align-center {
+  justify-content: center;
+}
+
+.ProseMirror h1.text-align-right,
+.ProseMirror h2.text-align-right,
+.ProseMirror h3.text-align-right,
+.ProseMirror h4.text-align-right,
+.ProseMirror h5.text-align-right,
+.ProseMirror h6.text-align-right {
+  justify-content: flex-end;
 }
 
 .ProseMirror h1 .heading-collapse-icon,

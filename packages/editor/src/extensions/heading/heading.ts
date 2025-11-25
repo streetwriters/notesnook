@@ -178,6 +178,7 @@ export const Heading = TiptapHeading.extend({
       for (const attr in HTMLAttributes) {
         heading.setAttribute(attr, HTMLAttributes[attr]);
       }
+      addTextAlignClass(heading, node.attrs.textAlign);
 
       if (node.attrs.collapsed) heading.dataset.collapsed = "true";
       else delete heading.dataset.collapsed;
@@ -238,11 +239,13 @@ export const Heading = TiptapHeading.extend({
             heading.dataset.hidden = updatedNode.attrs.hidden;
           else delete heading.dataset.hidden;
 
-          if (updatedNode.attrs.textAlign)
+          if (updatedNode.attrs.textAlign) {
             heading.style.textAlign =
               updatedNode.attrs.textAlign === "left"
                 ? ""
                 : updatedNode.attrs.textAlign;
+            addTextAlignClass(heading, updatedNode.attrs.textAlign);
+          }
 
           if (updatedNode.attrs.textDirection)
             heading.dir = updatedNode.attrs.textDirection;
@@ -394,3 +397,17 @@ const headingUpdatePlugin = new Plugin({
     return modified ? tr : null;
   }
 });
+
+function addTextAlignClass(el: HTMLElement, textAlign: string) {
+  el.classList.remove("text-align-center", "text-align-right");
+  switch (textAlign) {
+    case "center":
+    case "right":
+      el.classList.add(`text-align-${textAlign}`);
+      break;
+    case "left":
+    case "justify":
+    default:
+      break;
+  }
+}
