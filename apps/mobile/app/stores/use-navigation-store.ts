@@ -29,7 +29,7 @@ import {
   TrashItem
 } from "@notesnook/core";
 import { ParamListBase } from "@react-navigation/core";
-import create, { State } from "zustand";
+import { create } from "zustand";
 
 export type GenericRouteParam = {
   canGoBack?: boolean;
@@ -37,13 +37,11 @@ export type GenericRouteParam = {
 
 export type NotebookScreenParams = {
   item: Notebook;
-  title: string;
   canGoBack?: boolean;
 };
 
 export type NotesScreenParams = {
   item: Note | Notebook | Tag | Color | TrashItem | Reminder;
-  title: string;
   canGoBack?: boolean;
 };
 
@@ -123,7 +121,7 @@ export type HeaderRightButton = {
   onPress: () => void;
 };
 
-interface NavigationStore extends State {
+interface NavigationStore {
   currentRoute: RouteName;
   canGoBack?: boolean;
   focusedRouteId?: string;

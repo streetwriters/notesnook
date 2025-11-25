@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect } from "react";
 import { View } from "react-native";
-import { UseBoundStore } from "zustand";
+import { StoreApi, UseBoundStore } from "zustand";
 import { useTotalNotes } from "../../hooks/use-db-item";
 import {
   eSubscribeEvent,
@@ -59,7 +59,7 @@ export const NotebookItem = ({
   selected?: boolean;
   focused?: boolean;
   selectionEnabled?: boolean;
-  selectionStore: UseBoundStore<SelectionStore>;
+  selectionStore: UseBoundStore<StoreApi<SelectionStore>>;
   onItemUpdate: (id?: string) => void;
   onPress?: () => void;
   onLongPress?: () => void;
@@ -98,8 +98,8 @@ export const NotebookItem = ({
           item.depth === 0
             ? undefined
             : item.depth < 6
-            ? 15 * item.depth
-            : 15 * 5,
+              ? 15 * item.depth
+              : 15 * 5,
         width: "100%",
         marginTop: 2
       }}
@@ -187,8 +187,8 @@ export const NotebookItem = ({
               !item.hasChildren || disableExpand
                 ? "book-outline"
                 : expanded
-                ? "chevron-down"
-                : "chevron-right"
+                  ? "chevron-down"
+                  : "chevron-right"
             }
           />
 

@@ -69,6 +69,7 @@ import { eUpdateNoteInEditor } from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { convertNoteToText } from "../utils/note-to-text";
 import { sleep } from "../utils/time";
+import { resetStoredState } from "./use-stored-state";
 
 export type ActionId =
   | "select"
@@ -165,7 +166,7 @@ export const useActions = ({
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(
     db.shortcuts.exists(item.id)
   );
-  const processingId = useRef<"shareNote" | "copyContent">();
+  const processingId = useRef<"shareNote" | "copyContent">(undefined);
   const user = useUserStore((state) => state.user);
   const [notifPinned, setNotifPinned] = useState<DisplayedNotification>();
   const [defaultNotebook, setDefaultNotebook] = useState(
@@ -703,6 +704,26 @@ export const useActions = ({
             : {
                 id: item.id,
                 type: item.type
+              }
+        );
+
+        resetStoredState(
+          "app-home-navigtion-key",
+          isHomepage
+            ? undefined
+            : {
+                name:
+                  item.type === "notebook"
+                    ? "Notebook"
+                    : item.type === "tag"
+                      ? "TaggedNotes"
+                      : item.type === "color"
+                        ? "ColorNotes"
+                        : undefined,
+                params: {
+                  item: item,
+                  id: item.id
+                }
               }
         );
       }

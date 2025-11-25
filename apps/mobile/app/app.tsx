@@ -132,7 +132,9 @@ export const withTheme = (Element: (props: any) => JSX.Element) => {
 
       const listener = Appearance.addChangeListener(({ colorScheme }) => {
         if (colorScheme && SettingsService.getProperty("useSystemTheme")) {
-          useThemeStore.getState().setColorScheme(colorScheme);
+          useThemeStore
+            .getState()
+            .setColorScheme(colorScheme as "light" | "dark");
         }
       });
       return () => {

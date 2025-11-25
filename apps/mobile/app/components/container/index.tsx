@@ -30,7 +30,7 @@ export const Container = ({ children }: PropsWithChildren) => {
   const [height, setHeight] = useState(0);
   const windowHeightRef = useRef(Dimensions.get("window").height);
   const { height: windowHeight } = useWindowDimensions();
-  const timerRef = useRef<NodeJS.Timeout>();
+  const timerRef = useRef<NodeJS.Timeout>(undefined);
   useEffect(() => {
     if (windowHeight !== windowHeightRef.current) {
       setHeight(0);

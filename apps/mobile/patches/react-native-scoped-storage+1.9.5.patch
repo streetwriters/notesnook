@@ -1,0 +1,14 @@
+diff --git a/node_modules/react-native-scoped-storage/android/build.gradle b/node_modules/react-native-scoped-storage/android/build.gradle
+index 9a59b70..806235f 100644
+--- a/node_modules/react-native-scoped-storage/android/build.gradle
++++ b/node_modules/react-native-scoped-storage/android/build.gradle
+@@ -4,8 +4,8 @@ def safeExtGet(prop, fallback) {
+ 
+ buildscript {
+   repositories {
+-    jcenter()
+     google()
++    mavenCentral()
+     maven {
+       url 'https://maven.google.com'
+     }

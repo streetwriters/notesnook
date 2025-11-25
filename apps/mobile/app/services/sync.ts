@@ -80,16 +80,10 @@ const run = async (
     let error: Error | undefined = undefined;
 
     try {
-      await BackgroundSync.doInBackground(async () => {
-        try {
-          await db.sync({
-            type: type,
-            force: forced,
-            offlineMode: SettingsService.get().offlineMode
-          });
-        } catch (e) {
-          error = e as Error;
-        }
+      await db.sync({
+        type: type,
+        force: forced,
+        offlineMode: SettingsService.get().offlineMode
       });
 
       if (error) throw error;

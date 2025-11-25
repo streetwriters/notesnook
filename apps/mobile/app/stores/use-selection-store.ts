@@ -18,9 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { ItemType } from "@notesnook/core";
-import create, { State } from "zustand";
+import { create } from "zustand";
 
-export interface SelectionStore extends State {
+export interface SelectionStore {
   selectedItemsList: Array<string>;
   selectionMode?: ItemType;
   setAll: (all: Array<string>) => void;

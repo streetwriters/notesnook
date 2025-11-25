@@ -206,12 +206,12 @@ const font = Font.create(await readFile(ICON_FONT_PATH), {
   hinting: true
 });
 
-if (!existsSync(path.join(ROOT_DIR, "native", "fonts"))) {
-  await mkdir(path.join(ROOT_DIR, "native", "fonts"));
+if (!existsSync(path.join(ROOT_DIR, "fonts"))) {
+  await mkdir(path.join(ROOT_DIR, "fonts"));
 }
 
 await writeFile(
-  path.join(ROOT_DIR, "native", "fonts", "MaterialCommunityIcons.ttf"),
+  path.join(ROOT_DIR, "fonts", "MaterialCommunityIcons.ttf"),
   font.write({ type: "ttf", hinting: true })
 );
 

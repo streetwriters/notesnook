@@ -72,8 +72,8 @@ export async function setupDatabase(password?: string) {
       ({
         compress: Gzip.deflate,
         decompress: Gzip.inflate
-      } as ICompressor),
-    batchSize: 100,
+      }) as ICompressor,
+    batchSize: 50,
     sqliteOptions: {
       dialect: (name) => ({
         createDriver: () => {

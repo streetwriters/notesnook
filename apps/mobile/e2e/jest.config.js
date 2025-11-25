@@ -14,7 +14,7 @@ module.exports = {
     "\\.tsx?$": "ts-jest",
     "^.+\\.(js|jsx)$": [
       "babel-jest",
-      { configFile: "../native/babel.config.js" }
+      { configFile: require.resolve("../babel.config.js") }
     ]
   },
   verbose: true

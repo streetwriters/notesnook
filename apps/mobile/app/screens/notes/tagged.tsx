@@ -65,8 +65,7 @@ TaggedNotes.navigate = (item: Tag, canGoBack?: boolean) => {
 
   Navigation.push<"TaggedNotes">("TaggedNotes", {
     item: item,
-    canGoBack,
-    title: item.title
+    canGoBack
   });
 };
 
