@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
   callOrReturn,
+  Editor,
   getExtensionField,
   mergeAttributes,
   Node,
@@ -30,7 +31,6 @@ import { EditorView, NodeView } from "@tiptap/pm/view";
 import { createColGroup } from "./utilities/createColGroup.js";
 import { createTable } from "./utilities/createTable.js";
 import { deleteTableWhenAllCellsSelected } from "./utilities/deleteTableWhenAllCellsSelected.js";
-import { TableView } from "./TableView.js";
 import { TableNodeView } from "./component.js";
 import {
   addColumnAfter,
@@ -477,7 +477,7 @@ export const Table = Node.create<TableOptions>({
   },
 
   addProseMirrorPlugins() {
-    const isResizable = this.options.resizable && this.editor.isEditable;
+    const isResizable = this.options.resizable;
 
     return [
       ...(isResizable
@@ -489,7 +489,7 @@ export const Table = Node.create<TableOptions>({
                 this.options.showResizeHandleOnSelection
             })
           ]
-        : [tiptapTableView(this.options.cellMinWidth)]),
+        : [tiptapTableView(this.editor, this.options.cellMinWidth)]),
       tableEditing({
         allowTableNodeSelection: this.options.allowTableNodeSelection
       })
@@ -512,11 +512,16 @@ export const Table = Node.create<TableOptions>({
 });
 
 const TiptapTableViewPluginKey = new PluginKey("TiptapTableView");
-function tiptapTableView(cellMinWidth: number): Plugin {
+function tiptapTableView(editor: Editor, cellMinWidth: number): Plugin {
   return new Plugin({
     key: TiptapTableViewPluginKey,
     props: {
-      nodeViews: { [Table.name]: (node) => new TableView(node, cellMinWidth) }
+      nodeViews: {
+        [Table.name]: (node, view) => {
+          const View = TableNodeView(editor);
+          return new View(node, cellMinWidth, view);
+        }
+      }
     }
   });
 }
