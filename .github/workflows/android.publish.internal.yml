@@ -31,7 +31,23 @@ jobs:
           npm run bootstrap -- --scope=mobile
 
       - name: Make Gradlew Executable
-        run: cd apps/mobile/native/android && chmod +x ./gradlew
+        run: cd apps/mobile/android && chmod +x ./gradlew
+
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          # this might remove tools that are actually needed,
+          # if set to "true" but frees about 6 GB
+          tool-cache: false
+
+          # all of these default to true, but feel free to set to
+          # "false" if necessary for your workflow
+          android: false
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
 
       - name: Install CCache
         uses: hendrikmuhs/ccache-action@v1.2.11
@@ -89,7 +105,7 @@ jobs:
         id: sign_app
         uses: r0adkll/sign-android-release@master
         with:
-          releaseDirectory: apps/mobile/native/android/app/build/outputs/bundle/release
+          releaseDirectory: apps/mobile/android/app/build/outputs/bundle/release
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
           alias: ${{ secrets.ALIAS }}
           keyStorePassword: ${{ secrets.KEY_PASSWORD }}
@@ -104,7 +120,7 @@ jobs:
         id: sign_apk
         uses: r0adkll/sign-android-release@master
         with:
-          releaseDirectory: apps/mobile/native/android/app/build/outputs/apk/release
+          releaseDirectory: apps/mobile/android/app/build/outputs/apk/release
           signingKeyBase64: ${{ secrets.PUBLIC_SIGNING_KEY }}
           alias: ${{ secrets.PUBLIC_ALIAS }}
           keyStorePassword: ${{ secrets.PUBLIC_KEY_PASSWORD }}
@@ -114,7 +130,7 @@ jobs:
 
       - name: Rename apk files
         run: |
-          cd apps/mobile/native/android/app/build/outputs/apk/release/
+          cd apps/mobile/android/app/build/outputs/apk/release/
           mv app-arm64-v8a-release-unsigned-signed.apk notesnook-arm64-v8a.apk
           mv app-armeabi-v7a-release-unsigned-signed.apk notesnook-armeabi-v7a.apk
           mv app-x86-release-unsigned-signed.apk notesnook-x86.apk
@@ -135,7 +151,7 @@ jobs:
           releaseFiles: ${{steps.sign_app.outputs.signedReleaseFile}}
           track: beta
           status: completed
-          whatsNewDirectory: apps/mobile/native/android/releasenotes/
+          whatsNewDirectory: apps/mobile/android/releasenotes/
 
       - name: Create release draft on Github
         uses: softprops/action-gh-release@v1
@@ -146,10 +162,10 @@ jobs:
           repository: streetwriters/notesnook
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
-            apps/mobile/native/android/app/build/outputs/apk/release/notesnook-arm64-v8a.apk
-            apps/mobile/native/android/app/build/outputs/apk/release/notesnook-armeabi-v7a.apk
-            apps/mobile/native/android/app/build/outputs/apk/release/notesnook-x86.apk
-            apps/mobile/native/android/app/build/outputs/apk/release/notesnook-x86_64.apk
+            apps/mobile/android/app/build/outputs/apk/release/notesnook-arm64-v8a.apk
+            apps/mobile/android/app/build/outputs/apk/release/notesnook-armeabi-v7a.apk
+            apps/mobile/android/app/build/outputs/apk/release/notesnook-x86.apk
+            apps/mobile/android/app/build/outputs/apk/release/notesnook-x86_64.apk
             ${{steps.sign_app.outputs.signedReleaseFile}}
 
       - name: Upload sourcemaps
@@ -157,5 +173,5 @@ jobs:
         with:
           name: sourcemaps
           path: |
-            apps/mobile/native/android/app/build/**/*.map
+            apps/mobile/android/app/build/**/*.map
             packages/editor-mobile/sourcemaps/*.map
