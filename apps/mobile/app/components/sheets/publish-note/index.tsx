@@ -45,6 +45,25 @@ import { IconButton } from "../../ui/icon-button";
 import Input from "../../ui/input";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { useAsync } from "react-async-hook";
+import { isFeatureAvailable, useIsFeatureAvailable } from "@notesnook/common";
+
+async function fetchMonographData(noteId: string) {
+  const monographId = db.monographs.monograph(noteId);
+  const monograph = monographId
+    ? await db.monographs.get(monographId)
+    : undefined;
+  const analyticsFeature = await isFeatureAvailable("monographAnalytics");
+  const analytics =
+    monographId && analyticsFeature
+      ? await db.monographs.analytics(monographId)
+      : undefined;
+  return {
+    monograph,
+    monographId,
+    analytics
+  };
+}
 
 const PublishNoteSheet = ({
   note
@@ -56,20 +75,20 @@ const PublishNoteSheet = ({
   const attachmentDownloads = useAttachmentStore((state) => state.downloading);
   const downloading = attachmentDownloads?.[`monograph-${note.id}`];
   const [selfDestruct, setSelfDestruct] = useState(false);
+  const isFeatureAvailable = useIsFeatureAvailable("monographAnalytics");
   const [isLocked, setIsLocked] = useState(false);
-  const [monograph, setMonograph] = useState<Monograph>();
   const [publishing, setPublishing] = useState(false);
-  const publishUrl = monograph && `${hosts.MONOGRAPH_HOST}/${monograph?.id}`;
-  const isPublished = !!monograph;
   const pwdInput = useRef<TextInput>(null);
   const passwordValue = useRef<string>(undefined);
+  const monographData = useAsync(async () => {
+    return fetchMonographData(note?.id);
+  }, []);
+  const monograph = monographData.result?.monograph;
+  const publishUrl = monograph && `${hosts.MONOGRAPH_HOST}/${monograph?.id}`;
+  const isPublished = db.monographs.monograph(note?.id);
 
   useEffect(() => {
     (async () => {
-      const monograph = await db.monographs.get(
-        db.monographs.monograph(note.id)
-      );
-      setMonograph(monograph);
       if (monograph) {
         setSelfDestruct(!!monograph?.selfDestruct);
         if (monograph.password) {
@@ -80,7 +99,7 @@ const PublishNoteSheet = ({
         }
       }
     })();
-  }, []);
+  }, [monograph]);
 
   const publishNote = async () => {
     if (publishing) return;
@@ -94,7 +113,7 @@ const PublishNoteSheet = ({
           password: isLocked ? passwordValue.current : undefined
         });
 
-        setMonograph(await db.monographs.get(db.monographs.monograph(note.id)));
+        await monographData.execute();
         Navigation.queueRoutesForUpdate();
         setPublishLoading(false);
       }
@@ -121,7 +140,7 @@ const PublishNoteSheet = ({
     try {
       if (note?.id) {
         await db.monographs.unpublish(note.id);
-        setMonograph(undefined);
+        monographData.execute();
         Navigation.queueRoutesForUpdate();
         setPublishLoading(false);
       }
@@ -145,12 +164,15 @@ const PublishNoteSheet = ({
         gap: DefaultAppStyles.GAP_VERTICAL
       }}
     >
-      <DialogHeader
-        title={strings.publishNote()}
-        paragraph={strings.publishNoteDesc()}
-      />
+      {isPublished &&
+      (monographData?.result?.monograph || monographData?.loading) ? null : (
+        <DialogHeader
+          title={strings.publishNote()}
+          paragraph={strings.publishNoteDesc()}
+        />
+      )}
 
-      {publishing ? (
+      {publishing || monographData.loading ? (
         <View
           style={{
             justifyContent: "center",
@@ -176,7 +198,14 @@ const PublishNoteSheet = ({
       ) : (
         <>
           {isPublished && publishUrl ? (
-            <View
+            <TouchableOpacity
+              onPress={async () => {
+                try {
+                  await openLinkInBrowser(publishUrl);
+                } catch (e) {
+                  console.error(e);
+                }
+              }}
               style={{
                 flexDirection: "row",
                 alignItems: "center",
@@ -198,23 +227,6 @@ const PublishNoteSheet = ({
                 <Paragraph size={AppFontSize.sm} numberOfLines={1}>
                   {publishUrl}
                 </Paragraph>
-                <Paragraph
-                  onPress={async () => {
-                    try {
-                      await openLinkInBrowser(publishUrl);
-                    } catch (e) {
-                      console.error(e);
-                    }
-                  }}
-                  size={AppFontSize.xs}
-                  style={{
-                    marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL,
-                    color: colors.primary.paragraph
-                  }}
-                >
-                  <Icon color={colors.primary.accent} name="open-in-new" />{" "}
-                  {strings.openInBrowser()}
-                </Paragraph>
               </View>
 
               <IconButton
@@ -230,7 +242,7 @@ const PublishNoteSheet = ({
                 size={AppFontSize.lg}
                 name="content-copy"
               />
-            </View>
+            </TouchableOpacity>
           ) : null}
 
           <TouchableOpacity
@@ -260,9 +272,9 @@ const PublishNoteSheet = ({
                   justifyContent: "space-between"
                 }}
               >
-                <Heading size={AppFontSize.md}>
+                <Paragraph size={AppFontSize.sm}>
                   {strings.monographPassHeading()}
-                </Heading>
+                </Paragraph>
                 <ToggleSwitch
                   isOn={isLocked}
                   onColor={colors.primary.accent}
@@ -273,7 +285,7 @@ const PublishNoteSheet = ({
                 />
               </View>
 
-              <Paragraph>{strings.monographPassDesc()}</Paragraph>
+              {/* <Paragraph>{strings.monographPassDesc()}</Paragraph> */}
 
               {isLocked ? (
                 <>
@@ -319,9 +331,9 @@ const PublishNoteSheet = ({
                   justifyContent: "space-between"
                 }}
               >
-                <Heading size={AppFontSize.md}>
+                <Paragraph size={AppFontSize.sm}>
                   {strings.monographSelfDestructHeading()}
-                </Heading>
+                </Paragraph>
                 <ToggleSwitch
                   isOn={selfDestruct}
                   onColor={colors.primary.accent}
@@ -332,9 +344,41 @@ const PublishNoteSheet = ({
                 />
               </View>
 
-              <Paragraph>{strings.monographSelfDestructDesc()}</Paragraph>
+              {/* <Paragraph>{strings.monographSelfDestructDesc()}</Paragraph> */}
             </View>
           </TouchableOpacity>
+
+          {isFeatureAvailable?.isAllowed ? (
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                backgroundColor: colors.secondary.background,
+                paddingVertical: DefaultAppStyles.GAP_VERTICAL,
+                borderRadius: defaultBorderRadius,
+                paddingHorizontal: DefaultAppStyles.GAP
+              }}
+            >
+              <View
+                style={{
+                  width: "100%",
+                  flexShrink: 1
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between"
+                  }}
+                >
+                  <Paragraph size={AppFontSize.sm}>{strings.views()}</Paragraph>
+                  <Paragraph>
+                    {monographData?.result?.analytics?.totalViews || 0}
+                  </Paragraph>
+                </View>
+              </View>
+            </View>
+          ) : null}
 
           <View
             style={{

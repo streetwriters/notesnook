@@ -68,7 +68,6 @@ const SheetWrapper = ({
       width: largeTablet || smallTablet ? width : "100%",
       backgroundColor: colors.primary.background,
       zIndex: 10,
-      paddingTop: 5,
       borderTopRightRadius: 15,
       borderTopLeftRadius: 15,
       alignSelf: "center",
