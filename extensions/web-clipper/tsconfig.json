@@ -3,7 +3,8 @@
   "compilerOptions": {
     "lib": ["dom", "dom.iterable", "esnext"],
     "jsx": "react-jsx",
-    "outDir": "./dist"
+    "noEmit": true,
+    "resolveJsonModule": true
   },
-  "include": ["src", "global.d.ts"]
+  "include": ["src", "global.d.ts", "build-utils"]
 }

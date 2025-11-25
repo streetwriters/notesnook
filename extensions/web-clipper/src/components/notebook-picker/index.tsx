@@ -16,15 +16,25 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { useState } from "react";
-import { Flex } from "@theme-ui/components";
-import { FilteredList } from "../filtered-list";
+import { useEffect, useRef, useState } from "react";
+import { Button, Flex, Text } from "@theme-ui/components";
 import { NotebookReference, SelectedReference } from "../../common/bridge";
 import { Icons } from "../icons";
 import { useAppStore } from "../../stores/app-store";
 import { Picker } from "../picker";
 import { InlineTag } from "../inline-tag";
 import { CheckListItem } from "../check-list-item";
+import { FilteredList } from "@notesnook/web/src/components/filtered-list";
+import Field from "@notesnook/web/src/components/field";
+import { strings } from "@notesnook/intl";
+import { db } from "../../common/db";
+import {
+  TreeNode,
+  VirtualizedTree,
+  VirtualizedTreeHandle
+} from "@notesnook/web/src/components/virtualized-tree";
+import { NotebookItem } from "@notesnook/web/src/dialogs/move-note-dialog";
+import { Notebook } from "@notesnook/core";
 
 type NotebookPickerProps = {
   selectedItems: SelectedReference[];
@@ -33,10 +43,18 @@ type NotebookPickerProps = {
 export const NotebookPicker = (props: NotebookPickerProps) => {
   const { onSelected } = props;
 
+  const treeRef = useRef<VirtualizedTreeHandle<Notebook>>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedItems, setSelectedItems] = useState<SelectedReference[]>(
     props.selectedItems
   );
+  const [notebooks, setNotebooks] = useState<string[]>([]);
+
+  useEffect(() => {
+    db.notebooks.roots
+      .ids(db.settings.getGroupOptions("notebooks"))
+      .then((ids) => setNotebooks(ids));
+  }, []);
 
   const close = () => {
     setModalVisible(false);
@@ -90,92 +108,121 @@ export const NotebookPicker = (props: NotebookPickerProps) => {
         }}
         isOpen={modalVisible}
       >
-        <FilteredList
-          getAll={() => useAppStore.getState().notebooks}
-          filter={(items, query) =>
-            items.filter((item) => item.title.toLowerCase().indexOf(query) > -1)
-          }
-          itemName="notebook"
-          placeholder={"Search for a notebook"}
-          refreshItems={() => useAppStore.getState().notebooks}
-          renderItem={(item) => (
-            <Notebook
-              notebook={item}
-              isSelected={
-                !!selectedItems.find(
-                  (n) => n.id === item.id && n.type === "notebook"
-                )
-              }
-              onSelected={(ref) => {
-                setSelectedItems((items) => {
-                  const copy = items.slice();
-                  const index = copy.findIndex(
-                    (n) => n.id === ref.id && n.type === ref.type
-                  );
-                  if (index > -1) {
-                    copy.splice(index, 1);
-                  } else {
-                    copy.push(ref);
+        <Flex
+          id="subnotebooks"
+          variant="columnFill"
+          sx={{
+            height: "80vh"
+          }}
+        >
+          <Field
+            autoFocus
+            sx={{ m: 0, mb: 2 }}
+            styles={{
+              input: { p: "7.5px" }
+            }}
+            placeholder={strings.searchNotebooks()}
+            onChange={async (e) => {
+              const query = e.target.value.trim();
+              const ids = await (query
+                ? db.lookup.notebooks(query).ids()
+                : db.notebooks.roots.ids(
+                    db.settings.getGroupOptions("notebooks")
+                  ));
+              setNotebooks(ids);
+            }}
+          />
+          {notebooks.length > 0 ? (
+            <>
+              <VirtualizedTree
+                rootId={"root"}
+                itemHeight={30}
+                treeRef={treeRef}
+                getChildNodes={async ({ id, depth }) => {
+                  const nodes: TreeNode<Notebook>[] = [];
+                  if (id === "root") {
+                    for (const id of notebooks) {
+                      const notebook = (await db.notebooks.notebook(id))!;
+                      const children = await db.relations
+                        .from(notebook, "notebook")
+                        .count();
+                      nodes.push({
+                        data: notebook,
+                        depth: depth + 1,
+                        hasChildren: children > 0,
+                        id,
+                        parentId: "root"
+                      });
+                    }
+                    return nodes;
                   }
-                  return copy;
-                });
+
+                  const subNotebooks = await db.relations
+                    .from({ type: "notebook", id }, "notebook")
+                    .resolve();
+
+                  for (const notebook of subNotebooks) {
+                    const hasChildren =
+                      (await db.relations.from(notebook, "notebook").count()) >
+                      0;
+                    nodes.push({
+                      parentId: id,
+                      id: notebook.id,
+                      data: notebook,
+                      depth: depth + 1,
+                      hasChildren
+                    });
+                  }
+
+                  return nodes;
+                }}
+                renderItem={({ item, expanded, index, collapse, expand }) => (
+                  <NotebookItem
+                    notebook={item.data}
+                    depth={item.depth}
+                    isExpandable={item.hasChildren}
+                    isExpanded={expanded}
+                    toggle={expanded ? collapse : expand}
+                    onCreateItem={() => {
+                      treeRef.current?.refreshItem(index, item.data, {
+                        expand: true
+                      });
+                    }}
+                  />
+                )}
+              />
+            </>
+          ) : (
+            <Flex
+              sx={{
+                my: 2,
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center"
               }}
-            />
+            >
+              <Text variant="body">{strings.notebooksEmpty()}</Text>
+              <Button
+                data-test-id="add-new-notebook"
+                variant="secondary"
+                sx={{ mt: 2 }}
+                onClick={
+                  () => {}
+                  // AddNotebookDialog.show({}).then((res) =>
+                  //   res
+                  //     ? db.notebooks.roots
+                  //         .ids(db.settings.getGroupOptions("notebooks"))
+                  //         .then((ids) => setNotebooks(ids))
+                  //     : null
+                  // )
+                }
+              >
+                {strings.addNotebook()}
+              </Button>
+            </Flex>
           )}
-        />
+        </Flex>
       </Picker>
     </>
   );
 };
-
-type NotebookProps = {
-  notebook: NotebookReference;
-  isSelected: boolean;
-  onSelected: (notebook: SelectedReference) => void;
-};
-function Notebook(props: NotebookProps) {
-  const { notebook, isSelected, onSelected } = props;
-
-  return (
-    <Flex
-      sx={{
-        flexDirection: "column",
-        overflow: "hidden"
-      }}
-    >
-      <CheckListItem
-        title={notebook.title}
-        isSelected={isSelected}
-        onSelected={() => {
-          onSelected({
-            id: notebook.id,
-            title: notebook.title,
-            type: "notebook"
-          });
-        }}
-      />
-
-      {/* <FilteredList
-        getAll={() => notebook.topics}
-        itemName="topic"
-        placeholder={"Search for a topic"}
-        refreshItems={() => notebook.topics}
-        renderItem={(topic) => (
-          <CheckListItem
-            title={topic.title}
-            isSelected={isTopicSelected(topic)}
-            indentLevel={1}
-            onSelected={() => {
-              onSelected({
-                id: topic.id,
-                title: topic.title,
-                type: "topic",
-                parentId: notebook.id
-              });
-            }}
-          />
-        )}
-      /> */}
-    </Flex>
-  );
-}

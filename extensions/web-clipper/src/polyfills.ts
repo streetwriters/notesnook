@@ -16,16 +16,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import create from "zustand";
 
-interface AppStore {
-  route: string;
-  navigate(route: string): void;
-}
-
-export const useAppStore = create<AppStore>((set) => ({
-  route: "/login",
-  navigate(route) {
-    set({ route });
-  }
-}));
+import { Buffer } from "buffer";
+window.Buffer = Buffer;

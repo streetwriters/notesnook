@@ -83,8 +83,12 @@ var options = {
   module: {
     rules: [
       {
+        test: /\.wasm$/,
+        type: "asset/resource" // ensures wasm is emitted as a file
+      },
+      {
         // look for .css or .scss files
-        test: /\.(css|scss)$/,
+        test: /\.(css)$/,
         // in the `src` directory
         use: [
           {
@@ -92,12 +96,6 @@ var options = {
           },
           {
             loader: "css-loader"
-          },
-          {
-            loader: "sass-loader",
-            options: {
-              sourceMap: true
-            }
           }
         ]
       },
@@ -133,7 +131,11 @@ var options = {
     alias: alias,
     extensions: fileExtensions
       .map((extension) => "." + extension)
-      .concat([".js", ".jsx", ".ts", ".tsx", ".css"])
+      .concat([".js", ".jsx", ".ts", ".tsx", ".css"]),
+    fallback: {
+      crypto: false,
+      url: false
+    }
   },
   plugins: [
     new CleanWebpackPlugin({

@@ -16,16 +16,44 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import create from "zustand";
 
-interface AppStore {
-  route: string;
-  navigate(route: string): void;
-}
+import type { QueryResult } from "@streetwriters/kysely";
 
-export const useAppStore = create<AppStore>((set) => ({
-  route: "/login",
-  navigate(route) {
-    set({ route });
-  }
-}));
+export type Promisable<T> = T | Promise<T>;
+
+export type RunMode = "exec" | "query" | "raw";
+
+export type MainMsg =
+  | {
+      type: "run";
+      mode: RunMode;
+      sql: string;
+      parameters?: readonly unknown[];
+    }
+  | {
+      type: "close";
+    }
+  | {
+      type: "init";
+      url?: string;
+      dbName: string;
+    };
+
+export type WorkerMsg = {
+  [K in keyof Events]: {
+    type: K;
+    data: Events[K];
+    err: unknown;
+  };
+}[keyof Events];
+type Events = {
+  run: QueryResult<any> | null;
+  init: null;
+  close: null;
+};
+export type EventWithError = {
+  [K in keyof Events]: {
+    data: Events[K];
+    err: unknown;
+  };
+};

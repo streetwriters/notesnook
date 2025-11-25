@@ -2,7 +2,6 @@
   "extends": "../../tsconfig",
   "compilerOptions": {
     "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
     "jsx": "react-jsx",
     "moduleResolution": "Bundler",
     "noEmit": true

@@ -43,7 +43,8 @@ import {
   mdiCircleOutline,
   mdiBookOutline,
   mdiBookmarkOutline,
-  mdiPound
+  mdiPound,
+  mdiSync
 } from "@mdi/js";
 
 export const Icons = {
@@ -78,6 +79,7 @@ export const Icons = {
   notebook: mdiBookOutline,
   topic: mdiBookmarkOutline,
   tag: mdiPound,
+  sync: mdiSync,
 
   none: "",
   back: mdiArrowLeft

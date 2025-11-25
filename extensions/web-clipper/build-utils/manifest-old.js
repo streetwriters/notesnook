@@ -19,18 +19,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 const { version } = require("../package.json");
 
 const ICONS = {
-  16: "16x16.png",
-  32: "32x32.png",
-  48: "48x48.png",
-  64: "64x64.png",
-  128: "128x128.png",
-  256: "256x256.png"
+  16: "assets/16x16.png",
+  32: "assets/32x32.png",
+  48: "assets/48x48.png",
+  64: "assets/64x64.png",
+  128: "assets/128x128.png",
+  256: "assets/256x256.png"
 };
-const BACKGROUND_SCRIPT = "background.bundle.js";
 const ACTION = {
   default_icon: ICONS,
   default_title: "Notesnook Web Clipper",
-  default_popup: "popup.html"
+  default_popup: "public/index.html"
 };
 
 const nnHost =
@@ -60,8 +59,20 @@ const v2 = {
   },
   manifest_version: 2,
   background: {
-    scripts: [BACKGROUND_SCRIPT]
+    scripts: ["src/background.ts"]
   },
+  content_scripts: [
+    {
+      matches: ["<all_urls>"],
+      js: ["src/content-scripts/all.ts"],
+      run_at: "document_end"
+    },
+    {
+      matches: [nnHost, v3nnHost],
+      js: ["src/content-scripts/nn.ts"],
+      run_at: "document_end"
+    }
+  ],
   browser_action: ACTION
 };
 
@@ -72,12 +83,37 @@ const v3 = {
   optional_host_permissions: ["http://*/*", "https://*/*"],
   manifest_version: 3,
   background: {
-    service_worker: BACKGROUND_SCRIPT
+    service_worker: "src/background.ts",
+    type: "module"
   },
+  content_scripts: [
+    {
+      matches: ["<all_urls>"],
+      js: ["src/content-scripts/all.ts"]
+    },
+    {
+      matches: [nnHost],
+      js: ["src/content-scripts/nn.ts"]
+    }
+  ],
+  content_security_policy: {
+    extension_pages: "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
+  },
+  web_accessible_resources: [
+    {
+      resources: ["*.wasm"],
+      matches: ["<all_urls>"]
+    }
+  ],
   action: ACTION
 };
 
+function getManifest(version) {
+  return version === "2" ? v2 : v3;
+}
+
 module.exports = {
   v2,
-  v3
+  v3,
+  getManifest
 };

@@ -34,10 +34,11 @@ import {
 import { usePersistentState } from "../hooks/use-persistent-state";
 import { deleteClip, getClip } from "../utils/storage";
 import { useAppStore } from "../stores/app-store";
-import { connectApi } from "../api";
 import { FlexScrollContainer } from "../components/scroll-container";
 import { DEFAULT_SETTINGS, SETTINGS_KEY } from "./settings";
 import type { Config } from "@notesnook/clipper/dist/types";
+import { useStore as useNNAppStore } from "@notesnook/web/src/stores/app-store";
+import { db } from "../common/db";
 
 const ERROR_MAP: Record<string, string> = {
   "Could not establish connection. Receiving end does not exist.":
@@ -110,9 +111,10 @@ export function Main() {
   const [error, setError] = useState<string>();
   // const [colorMode, setColorMode] = useColorMode();
 
-  const isPremium = useAppStore((s) => s.user?.pro);
   const navigate = useAppStore((s) => s.navigate);
 
+  const sync = useNNAppStore((store) => store.sync);
+  const syncStatus = useNNAppStore((store) => store.syncStatus);
   const [settings] = usePersistentState<Config>(SETTINGS_KEY, DEFAULT_SETTINGS);
   const [title, setTitle] = useState<string>();
   const [hasPermission, setHasPermission] = useState<boolean>(false);
@@ -125,7 +127,7 @@ export function Main() {
     "clipArea",
     "article"
   );
-  const [note, setNote] = usePersistentState<ItemReference>("note");
+  const [note, setNote] = usePersistentState<ItemReference | undefined>("note");
   const [refs, setRefs] = usePersistentState<SelectedReference[]>("refs", []);
   const [clipData, setClipData] = useState<ClipData>();
   const [clipperState, setClipperState] = useState<ClipperState>(
@@ -149,15 +151,12 @@ export function Main() {
 
   useEffect(() => {
     (async () => {
-      if (
-        !isPremium &&
-        (clipMode === "complete" || clipMode === "screenshot")
-      ) {
+      if (clipMode === "complete" || clipMode === "screenshot") {
         setClipMode("simplified");
         return;
       }
     })();
-  }, [isPremium, clipArea, clipMode]);
+  }, [clipArea, clipMode]);
 
   useEffect(() => {
     (async () => {
@@ -180,8 +179,8 @@ export function Main() {
         await clip(clipArea, clipMode, {
           ...DEFAULT_SETTINGS,
           ...settings,
-          images: isPremium,
-          inlineImages: isPremium
+          images: true,
+          inlineImages: true
         })
       );
       setClipperState(ClipperState.Clipped);
@@ -320,11 +319,7 @@ export function Main() {
               setClipperState(ClipperState.Idle);
               setClipMode(item.id);
             }}
-            disabled={
-              isClipping ||
-              clipperState === ClipperState.Clipped ||
-              (item.pro && !isPremium)
-            }
+            disabled={isClipping || clipperState === ClipperState.Clipped}
             sx={{
               display: "flex",
               borderRadius: "default",
@@ -451,7 +446,7 @@ export function Main() {
             )}
             <NotebookPicker
               selectedItems={refs?.filter((r) => r.type === "notebook") || []}
-              onSelected={(items) => setRefs(items)}
+              onSelected={(items) => setRefs(items || [])}
             />
             <Box sx={{ mt: 1 }} />
             <TagPicker
@@ -485,21 +480,21 @@ export function Main() {
 
             if (!data) return;
 
-            const notesnook = await connectApi(false);
-            if (!notesnook) {
-              setError("You are not connected to Notesnook.");
-              return;
-            }
-            await notesnook.saveClip({
-              url,
-              title,
-              area: clipArea,
-              mode: clipMode,
-              note,
-              refs,
-              pageTitle: pageTitle.current,
-              ...data
-            });
+            // const notesnook = await connectApi(false);
+            // if (!notesnook) {
+            //   setError("You are not connected to Notesnook.");
+            //   return;
+            // }
+            // await notesnook.saveClip({
+            //   url,
+            //   title,
+            //   area: clipArea,
+            //   mode: clipMode,
+            //   note,
+            //   refs,
+            //   pageTitle: pageTitle.current,
+            //   ...data
+            // });
 
             setClipData(undefined);
 
@@ -535,6 +530,21 @@ export function Main() {
             }}
           >
             <Icon path={Icons.settings} size={16} />
+          </Button>
+          <Button
+            variant="icon"
+            sx={{ p: 1 }}
+            onClick={async () => {
+              console.log(await db.user.getUser());
+              await sync();
+            }}
+          >
+            <Icon
+              path={Icons.sync}
+              rotate={syncStatus.key === "syncing"}
+              size={16}
+            />
+            {syncStatus.progress ? <Text>(${syncStatus.progress})</Text> : null}
           </Button>
         </Flex>
       </Flex>

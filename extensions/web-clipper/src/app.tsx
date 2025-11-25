@@ -27,27 +27,35 @@ import {
   useThemeEngineStore
 } from "@notesnook/theme";
 import { Global, css } from "@emotion/react";
+import { useStore as useUserStore } from "@notesnook/web/src/stores/user-store";
+import AppEffects from "@notesnook/web/src/app-effects";
 
 export function App() {
-  const isLoggedIn = useAppStore((s) => s.isLoggedIn);
-  const user = useAppStore((s) => s.user);
+  // const isLoggedIn = useUserStore((store) => store.isLoggedIn);
+  // const isLoggedIn = useAppStore((s) => s.isLoggedIn);
+  // const user = useAppStore((s) => s.user);
   const route = useAppStore((s) => s.route);
   const navigate = useAppStore((s) => s.navigate);
   const theme = useThemeEngineStore((store) => store.theme);
 
   useEffect(() => {
-    if (!isLoggedIn) {
-      navigate("/login");
-    } else navigate("/");
-  }, [isLoggedIn]);
-
-  useEffect(() => {
-    if (user && user.theme) {
-      document.body.style.backgroundColor =
-        user.theme.scopes.base.primary.background;
-      useThemeEngineStore.getState().setTheme(user.theme);
+    async function main() {
+      await useUserStore.getState().init();
+      const { isLoggedIn } = useUserStore.getState();
+      if (!isLoggedIn) {
+        navigate("/login");
+      } else navigate("/");
     }
-  }, [user]);
+    main();
+  }, []);
+
+  // useEffect(() => {
+  //   if (user && user.theme) {
+  //     document.body.style.backgroundColor =
+  //       user.theme.scopes.base.primary.background;
+  //     useThemeEngineStore.getState().setTheme(user.theme);
+  //   }
+  // }, [user]);
   const cssTheme = useMemo(() => themeToCSS(theme), [theme]);
 
   return (
@@ -57,6 +65,7 @@ export function App() {
           ${cssTheme}
         `}
       />
+      <AppEffects />
       <EmotionThemeProvider scope="base" injectCssVars>
         {(() => {
           switch (route) {

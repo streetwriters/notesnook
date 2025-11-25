@@ -16,15 +16,23 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { useState } from "react";
-import { Flex } from "@theme-ui/components";
-import { FilteredList } from "../filtered-list";
+import { useEffect, useState } from "react";
+import { Flex, Text } from "@theme-ui/components";
 import { Icons } from "../icons";
-import { useAppStore } from "../../stores/app-store";
 import { Picker } from "../picker";
 import { InlineTag } from "../inline-tag";
-import { CheckListItem } from "../check-list-item";
 import { SelectedReference } from "../../common/bridge";
+import { FilteredList } from "@notesnook/web/src/components/filtered-list";
+import { Tag, VirtualizedGrouping } from "@notesnook/core";
+import { db } from "../../common/db";
+import { strings } from "@notesnook/intl";
+import { checkFeature } from "@notesnook/web/src/common";
+import {
+  SelectedCheck,
+  selectMultiple,
+  useSelectionStore
+} from "@notesnook/web/src/dialogs/move-note-dialog";
+import { ResolvedItem } from "@notesnook/common";
 
 type TagPickerProps = {
   selectedTags: SelectedReference[];
@@ -34,6 +42,24 @@ export const TagPicker = (props: TagPickerProps) => {
   const { selectedTags, onSelected } = props;
 
   const [modalVisible, setModalVisible] = useState(false);
+  const [tags, setTags] = useState<VirtualizedGrouping<Tag> | undefined>();
+
+  useEffect(() => {
+    (async function () {
+      if (!tags) {
+        setTags(await db.tags.all.grouped(db.settings.getGroupOptions("tags")));
+        return;
+      }
+
+      useSelectionStore.getState().setSelected(
+        selectedTags.map((t) => ({
+          id: t.id,
+          new: false,
+          op: "add"
+        }))
+      );
+    })();
+  }, []);
 
   const close = () => {
     setModalVisible(false);
@@ -87,35 +113,78 @@ export const TagPicker = (props: TagPickerProps) => {
         }}
         isOpen={modalVisible}
       >
-        <FilteredList
-          getAll={() => useAppStore.getState().tags}
-          filter={(items, query) =>
-            items.filter((item) => item.title.toLowerCase().indexOf(query) > -1)
-          }
-          itemName="tag"
-          placeholder={"Search for a tag"}
-          refreshItems={() => useAppStore.getState().tags}
-          renderItem={(tag) => (
-            <CheckListItem
-              title={`#${tag.title}`}
-              onSelected={() => {
-                const copy = selectedTags.slice();
-                const index = copy.findIndex(
-                  (c) => c.type === "tag" && c.id === tag.id
-                );
-                if (index <= -1) copy.push({ ...tag, type: "tag" });
-                else copy.splice(index, 1);
-                onSelected(copy);
-              }}
-              isSelected={
-                selectedTags.findIndex(
-                  (s) => s.type === "tag" && s.id === tag.id
-                ) > -1
-              }
-            />
-          )}
-        />
+        {tags && (
+          <FilteredList
+            getItemKey={(index) => tags.key(index)}
+            mode="fixed"
+            estimatedSize={30}
+            items={tags.placeholders}
+            sx={{ mt: 2 }}
+            itemGap={5}
+            placeholders={{
+              empty: strings.addATag(),
+              filter: strings.searchForTags()
+            }}
+            filter={async (query) => {
+              setTags(
+                query
+                  ? await db.lookup.tags(query).sorted()
+                  : await db.tags.all.grouped(
+                      db.settings.getGroupOptions("tags")
+                    )
+              );
+            }}
+            onCreateNewItem={async (title) => {
+              if (!(await checkFeature("tags", { type: "toast" }))) return;
+
+              const tagId = await db.tags.add({ title });
+              if (!tagId) return;
+              setTags(
+                await db.tags.all.grouped(db.settings.getGroupOptions("tags"))
+              );
+              const { selected, setSelected } = useSelectionStore.getState();
+              setSelected([...selected, { id: tagId, new: true, op: "add" }]);
+            }}
+            renderItem={({ index }) => {
+              return (
+                <ResolvedItem key={index} type="tag" items={tags} index={index}>
+                  {({ item }) => <TagItem tag={item} />}
+                </ResolvedItem>
+              );
+            }}
+          />
+        )}
       </Picker>
     </>
   );
 };
+
+function TagItem(props: { tag: Tag }) {
+  const { tag } = props;
+
+  return (
+    <Flex
+      as="li"
+      data-test-id="tag"
+      sx={{
+        cursor: "pointer",
+        justifyContent: "space-between",
+        alignItems: "center",
+        bg: "var(--background-secondary)",
+        borderRadius: "default",
+        p: 1
+      }}
+      onClick={() => {
+        const { selected, setSelected } = useSelectionStore.getState();
+        setSelected(selectMultiple(tag, selected));
+      }}
+    >
+      <Flex sx={{ alignItems: "center" }}>
+        <SelectedCheck size={18} item={tag} />
+        <Text className="title" data-test-id="tag-title" variant="body">
+          #{tag.title}
+        </Text>
+      </Flex>
+    </Flex>
+  );
+}

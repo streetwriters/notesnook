@@ -16,15 +16,18 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Flex, Text } from "@theme-ui/components";
-import { FilteredList } from "../filtered-list";
 import { ItemReference } from "../../common/bridge";
 import { Icon } from "../icons/icon";
 import { Icons } from "../icons";
-import { useAppStore } from "../../stores/app-store";
 import { Picker } from "../picker";
 import { CheckListItem } from "../check-list-item";
+import { FilteredList } from "@notesnook/web/src/components/filtered-list";
+import { Note, VirtualizedGrouping } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
+import { db } from "../../common/db";
+import { ResolvedItem } from "@notesnook/common";
 
 type NotePickerProps = {
   selectedNote?: ItemReference;
@@ -34,8 +37,20 @@ export const NotePicker = (props: NotePickerProps) => {
   const { selectedNote, onSelected } = props;
 
   const [modalVisible, setModalVisible] = useState(false);
-  const notes = useAppStore((s) => s.notes);
 
+  const [notes, setNotes] = useState<VirtualizedGrouping<Note> | undefined>();
+
+  useEffect(() => {
+    (async function () {
+      if (!notes) {
+        setNotes(
+          await db.notes.all.grouped(db.settings.getGroupOptions("notes"))
+        );
+      }
+    })();
+  }, []);
+
+  console.log(notes);
   const close = () => {
     setModalVisible(false);
   };
@@ -97,25 +112,51 @@ export const NotePicker = (props: NotePickerProps) => {
       </Flex>
 
       <Picker onClose={close} onDone={close} isOpen={modalVisible}>
-        <FilteredList
-          getAll={() => notes}
-          filter={(items, query) =>
-            items.filter((i) => i.title.toLowerCase().indexOf(query) > -1)
-          }
-          itemName="note"
-          placeholder={"Search for a note"}
-          refreshItems={() => notes}
-          renderItem={(note) => (
-            <CheckListItem
-              title={note.title}
-              onSelected={() => {
-                onSelected(note);
-                close();
-              }}
-              isSelected={selectedNote?.id === note.id}
-            />
-          )}
-        />
+        {notes && (
+          <FilteredList
+            getItemKey={(index) => notes.key(index)}
+            mode="fixed"
+            estimatedSize={30}
+            items={notes.placeholders}
+            sx={{ mt: 2 }}
+            itemGap={5}
+            placeholders={{
+              empty: strings.notesEmpty(),
+              filter: strings.searchANote()
+            }}
+            filter={async (query) => {
+              setNotes(
+                query
+                  ? await db.lookup.notes(query).sorted()
+                  : await db.notes.all.grouped(
+                      db.settings.getGroupOptions("notes")
+                    )
+              );
+            }}
+            onCreateNewItem={async () => {}}
+            renderItem={({ index }) => {
+              console.log("Rendering note at index:", index);
+              return (
+                <ResolvedItem
+                  key={index}
+                  type="note"
+                  items={notes}
+                  index={index}
+                >
+                  {({ item }) => (
+                    <CheckListItem
+                      title={item.title}
+                      onSelected={() => {
+                        onSelected({ id: item.id, title: item.title });
+                      }}
+                      isSelected={selectedNote?.id === item.id}
+                    />
+                  )}
+                </ResolvedItem>
+              );
+            }}
+          />
+        )}
       </Picker>
     </>
   );
