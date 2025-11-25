@@ -135,7 +135,7 @@ export class Monographs {
 
     const method = update ? http.patch.json : http.post.json;
     const deviceId = await this.db.kv().read("deviceId");
-    const { id, datePublished } = await method(
+    const { id, datePublished, publishUrl } = await method(
       `${Constants.API_HOST}/monographs?deviceId=${deviceId}`,
       monograph,
       token
@@ -147,7 +147,8 @@ export class Monographs {
       title: monograph.title,
       selfDestruct: monograph.selfDestruct,
       datePublished: datePublished,
-      password: monograph.password
+      password: monograph.password,
+      publishUrl: publishUrl
     });
     return id;
   }
@@ -206,6 +207,20 @@ export class Monographs {
       return analytics;
     } catch {
       return { totalViews: 0 };
+    }
+  }
+
+  async publishUrl(monographId: string): Promise<string> {
+    try {
+      const token = await this.db.tokenManager.getAccessToken();
+      const { publishUrl } = (await http.get(
+        `${Constants.API_HOST}/monographs/${monographId}/publish-url`,
+        token
+      )) as { publishUrl: string };
+      return publishUrl;
+    } catch {
+      const monograph = await this.get(monographId);
+      return monograph?.publishUrl || "";
     }
   }
 }
