@@ -78,6 +78,9 @@ jobs:
           cd apps/mobile
           npx tsc --noEmit
 
+      - name: Remove debug keystore
+        run: rm -rf apps/mobile/android/app/debug.keystore
+
       - name: Build unsigned app bundle
         run: yarn release:android:bundle
 
