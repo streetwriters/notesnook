@@ -23,7 +23,7 @@ import { Loading, Refresh } from "../icons";
 import { db } from "../../common/db";
 import { writeText } from "clipboard-polyfill";
 import { showToast } from "../../utils/toast";
-import { EV, EVENTS, hosts, MonographAnalytics } from "@notesnook/core";
+import { EV, EVENTS, hosts } from "@notesnook/core";
 import { useStore } from "../../stores/monograph-store";
 import { Note } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
@@ -65,6 +65,9 @@ function PublishView(props: PublishViewProps) {
     if (!monographAnalytics?.isAllowed || !monograph) return { totalViews: 0 };
     return await db.monographs.analytics(monograph?.id);
   }, [monograph?.id, monographAnalytics]);
+  const publishUrl = usePromise(async () => {
+    return await db.monographs.publishUrl(note.id);
+  }, [monograph?.id, monograph?.publishUrl]);
 
   useEffect(() => {
     const fileDownloadedEvent = EV.subscribe(
@@ -96,23 +99,29 @@ function PublishView(props: PublishViewProps) {
             variant="text.body"
             as="a"
             target="_blank"
-            href={`${hosts.MONOGRAPH_HOST}/${monograph?.id}`}
+            href={publishUrl.status === "fulfilled" ? publishUrl.value : "#"}
             sx={{
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
               textDecoration: "none",
               overflow: "hidden",
-              px: 1
+              px: 1,
+              opacity: publishUrl.status === "fulfilled" ? 1 : 0.8
             }}
           >
-            {`${hosts.MONOGRAPH_HOST}/${monograph?.id}`}
+            {publishUrl.status === "fulfilled"
+              ? publishUrl.value
+              : monograph?.publishUrl}
           </Link>
           <Button
             variant="secondary"
             className="copyPublishLink"
             sx={{ flexShrink: 0, m: 0 }}
+            disabled={publishUrl.status !== "fulfilled"}
             onClick={() => {
-              writeText(`${hosts.MONOGRAPH_HOST}/${monograph?.id}`);
+              if (publishUrl.status !== "fulfilled") return;
+
+              writeText(publishUrl.value);
             }}
           >
             {strings.copy()}
@@ -453,6 +462,7 @@ type ResolvedMonograph = {
   publishedAt?: number;
   password?: string;
   title: string;
+  publishUrl?: string;
 };
 
 async function resolveMonograph(
@@ -463,6 +473,7 @@ async function resolveMonograph(
   return {
     id: monographId,
     selfDestruct: !!monograph.selfDestruct,
+    publishUrl: monograph.publishUrl,
     publishedAt: monograph.datePublished,
     title: monograph.title,
     password: monograph.password
