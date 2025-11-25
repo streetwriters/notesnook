@@ -319,7 +319,7 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
         <View
           style={{
             width: "100%",
-            flexGrow: 1,
+            flex: 1,
             height: "100%"
           }}
         >
