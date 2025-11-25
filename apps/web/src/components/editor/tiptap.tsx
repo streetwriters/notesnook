@@ -118,7 +118,7 @@ function countCharacters(text: string) {
 function countParagraphs(fragment: Fragment) {
   let count = 0;
   fragment.nodesBetween(0, fragment.size, (node) => {
-    if (node.type.name === "paragraph") {
+    if (node.type.name === "paragraph" && node.content.size > 0) {
       count++;
     }
     return true;
@@ -737,7 +737,7 @@ function toIEditor(editor: Editor): IEditor {
 function getSelectedParagraphs(editor: Editor, selection: Selection): number {
   let count = 0;
   editor.state.doc.nodesBetween(selection.from, selection.to, (node) => {
-    if (node.type.name === "paragraph") {
+    if (node.type.name === "paragraph" && node.content.size > 0) {
       count++;
     }
     return true;

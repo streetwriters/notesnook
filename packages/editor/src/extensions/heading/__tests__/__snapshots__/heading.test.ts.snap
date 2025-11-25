@@ -3,3 +3,13 @@
 exports[`collapse heading > heading collapsed 1`] = `"<h1 data-collapsed="true">Main Heading</h1><p>paragraph.</p><h2>Subheading</h2><p>subheading paragraph</p><h1>Main heading 2</h1><p>paragraph another</p>"`;
 
 exports[`collapse heading > heading uncollapsed 1`] = `"<h1>Main Heading</h1><p>paragraph.</p><h2>Subheading</h2><p>subheading paragraph</p><h1>Main heading 2</h1><p>paragraph another</p>"`;
+
+exports[`replacing collapsed heading with another heading level should not unhide content 1`] = `"<h2 data-collapsed="true">A collapsed heading</h2><p data-hidden="true">Hidden paragraph</p>"`;
+
+exports[`replacing collapsed heading with another node (blockquote) should unhide content 1`] = `"<blockquote><h1 data-collapsed="true">A collpased heading</h1></blockquote><p>Hidden paragraph</p>"`;
+
+exports[`replacing collapsed heading with another node (bulletList) should unhide content 1`] = `"<ul><li><p>A collpased heading</p></li></ul><p>Hidden paragraph</p>"`;
+
+exports[`replacing collapsed heading with another node (codeBlock) should unhide content 1`] = `"<pre><code>A collpased heading</code></pre><p>Hidden paragraph</p>"`;
+
+exports[`replacing collapsed heading with another node (paragraph) should unhide content 1`] = `"<p>A collpased heading</p><p>Hidden paragraph</p>"`;

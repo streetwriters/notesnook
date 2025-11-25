@@ -91,18 +91,7 @@ const features: Record<FeatureKeys, Feature> = {
             )
           }
         ]
-      : [
-          {
-            title: "Notesnook Circle",
-            subtitle:
-              "Notesnook Circle brings together trusted partners who share our commitment to privacy, transparency, and user freedom. As a member you get exclusive discounts and offers from our partners. Check it out in Settings > Notesnook Circle."
-          },
-          {
-            title: "Collapsible headings",
-            subtitle:
-              "You can now collapse and expand headings in your notes. This makes it easier to manage large notes and focus on specific sections."
-          }
-        ],
+      : [],
     cta: {
       title: strings.gotIt(),
       icon: Checkmark,

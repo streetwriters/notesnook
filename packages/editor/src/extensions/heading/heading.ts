@@ -23,10 +23,8 @@ import {
   textblockTypeInputRule
 } from "@tiptap/core";
 import { Heading as TiptapHeading } from "@tiptap/extension-heading";
-import { isClickWithinBounds } from "../../utils/prosemirror.js";
 import { Plugin, PluginKey, Selection, Transaction } from "@tiptap/pm/state";
 import { Node } from "@tiptap/pm/model";
-import { useToolbarStore } from "../../toolbar/stores/toolbar-store.js";
 
 const COLLAPSIBLE_BLOCK_TYPES = [
   "paragraph",
@@ -168,6 +166,14 @@ export const Heading = TiptapHeading.extend({
   addNodeView() {
     return ({ node, getPos, editor, HTMLAttributes }) => {
       const heading = document.createElement(`h${node.attrs.level}`);
+      const contentWrapper = document.createElement("div");
+      const icon = document.createElement("span");
+
+      // providing a minWidth so that empty headings show the blinking cursor
+      contentWrapper.style.minWidth = "1px";
+
+      icon.className = "heading-collapse-icon";
+      icon.contentEditable = "false";
 
       for (const attr in HTMLAttributes) {
         heading.setAttribute(attr, HTMLAttributes[attr]);
@@ -176,50 +182,46 @@ export const Heading = TiptapHeading.extend({
       if (node.attrs.collapsed) heading.dataset.collapsed = "true";
       else delete heading.dataset.collapsed;
 
-      function onClick(e: MouseEvent | TouchEvent) {
-        if (e instanceof MouseEvent && e.button !== 0) return;
-        if (!(e.target instanceof HTMLHeadingElement)) return;
+      function onIconClick(e: MouseEvent | TouchEvent) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
 
         const pos = typeof getPos === "function" ? getPos() : 0;
         if (typeof pos !== "number") return;
 
         const resolvedPos = editor.state.doc.resolve(pos);
-        const calloutAncestor = findParentNodeClosestToPos(
-          resolvedPos,
-          (node) => node.type.name === "callout"
-        );
-        if (calloutAncestor) return;
-
+        const forbiddenParents = ["callout"];
         if (
-          isClickWithinBounds(
-            e,
-            resolvedPos,
-            useToolbarStore.getState().isMobile ? "right" : "left"
+          findParentNodeClosestToPos(resolvedPos, (node) =>
+            forbiddenParents.includes(node.type.name)
           )
         ) {
-          e.preventDefault();
-          e.stopImmediatePropagation();
-
-          editor.commands.command(({ tr }) => {
-            const currentNode = tr.doc.nodeAt(pos);
-            if (currentNode && currentNode.type.name === "heading") {
-              const shouldCollapse = !currentNode.attrs.collapsed;
-              const headingLevel = currentNode.attrs.level;
-
-              tr.setNodeAttribute(pos, "collapsed", shouldCollapse);
-              toggleNodesUnderHeading(tr, pos, headingLevel, shouldCollapse);
-            }
-            return true;
-          });
+          return;
         }
+
+        editor.commands.command(({ tr }) => {
+          const currentNode = tr.doc.nodeAt(pos);
+          if (currentNode && currentNode.type.name === "heading") {
+            const shouldCollapse = !currentNode.attrs.collapsed;
+            const headingLevel = currentNode.attrs.level;
+
+            tr.setNodeAttribute(pos, "collapsed", shouldCollapse);
+            toggleNodesUnderPos(tr, pos, headingLevel, shouldCollapse);
+          }
+          return true;
+        });
       }
 
-      heading.onmousedown = onClick;
-      heading.ontouchstart = onClick;
+      icon.onmousedown = onIconClick;
+      icon.ontouchend = onIconClick;
+
+      heading.appendChild(contentWrapper);
+      heading.appendChild(icon);
 
       return {
         dom: heading,
-        contentDOM: heading,
+        contentDOM: contentWrapper,
         update: (updatedNode) => {
           if (updatedNode.type !== this.type) {
             return false;
@@ -253,17 +255,17 @@ export const Heading = TiptapHeading.extend({
   }
 });
 
-function toggleNodesUnderHeading(
+function toggleNodesUnderPos(
   tr: Transaction,
-  headingPos: number,
+  pos: number,
   headingLevel: number,
   isCollapsing: boolean
 ) {
   const { doc } = tr;
-  const headingNode = doc.nodeAt(headingPos);
-  if (!headingNode || headingNode.type.name !== "heading") return;
+  const node = doc.nodeAt(pos);
+  if (!node) return;
 
-  let nextPos = headingPos + headingNode.nodeSize;
+  let nextPos = pos + node.nodeSize;
   const cursorPos = tr.selection.from;
   let shouldMoveCursor = false;
   let insideCollapsedHeading = false;
@@ -318,8 +320,8 @@ function toggleNodesUnderHeading(
   }
 
   if (shouldMoveCursor) {
-    const headingEndPos = headingPos + headingNode.nodeSize - 1;
-    tr.setSelection(Selection.near(tr.doc.resolve(headingEndPos)));
+    const endPos = pos + node.nodeSize - 1;
+    tr.setSelection(Selection.near(tr.doc.resolve(endPos)));
   }
 }
 
@@ -364,26 +366,27 @@ const headingUpdatePlugin = new Plugin({
     let modified = false;
 
     newDoc.descendants((newNode, pos) => {
-      if (newNode.type.name === "heading") {
-        if (pos >= oldDoc.content.size) return;
+      if (pos >= oldDoc.content.size) return;
 
-        const oldNode = oldDoc.nodeAt(pos);
-        if (
-          oldNode &&
-          oldNode.type.name === "heading" &&
-          oldNode.attrs.level !== newNode.attrs.level
-        ) {
-          /**
-           * if the level of a collapsed heading is changed,
-           * we need to reset visibility of all the nodes under it as there
-           * might be a heading of same or higher level previously
-           * hidden under this heading
-           */
-          if (newNode.attrs.collapsed) {
-            toggleNodesUnderHeading(tr, pos, oldNode.attrs.level, false);
-            toggleNodesUnderHeading(tr, pos, newNode.attrs.level, true);
-            modified = true;
-          }
+      const oldNode = oldDoc.nodeAt(pos);
+      if (
+        oldNode &&
+        oldNode.type.name === "heading" &&
+        oldNode.attrs.level !== newNode.attrs.level
+      ) {
+        /**
+         * if the level of a collapsed heading is changed,
+         * we need to reset visibility of all the nodes under it as there
+         * might be a heading of same or higher level previously
+         * hidden under this heading
+         */
+        if (newNode.type.name === "heading" && newNode.attrs.collapsed) {
+          toggleNodesUnderPos(tr, pos, oldNode.attrs.level, false);
+          toggleNodesUnderPos(tr, pos, newNode.attrs.level, true);
+          modified = true;
+        } else if (newNode.type.name !== "heading" && oldNode.attrs.collapsed) {
+          toggleNodesUnderPos(tr, pos, oldNode.attrs.level, false);
+          modified = true;
         }
       }
     });
