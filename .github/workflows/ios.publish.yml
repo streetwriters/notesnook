@@ -30,7 +30,7 @@ jobs:
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2.11
         with:
-          key: ${{ runner.os }}-ccache-${{ hashFiles(format('apps/mobile/native/ios/Podfile.lock')) }}
+          key: ${{ runner.os }}-ccache-${{ hashFiles(format('apps/mobile/ios/Podfile.lock')) }}
           max-size: 1500M
           restore-keys: |
             ${{ runner.os }}-ccache-
@@ -55,12 +55,12 @@ jobs:
         uses: actions/cache@v3
         id: pods-cache
         with:
-          path: apps/mobile/native/ios/Pods
-          key: ${{ runner.os }}-pods-${{ hashFiles('apps/mobile/native/ios/Podfile.lock') }}
+          path: apps/mobile/ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('apps/mobile/ios/Podfile.lock') }}
 
       - name: Install Pods
         run: |
-          cd apps/mobile/native/ios
+          cd apps/mobile/ios
           bundle install
           RCT_NEW_ARCH_ENABLED=0 bundle exec pod install
 
@@ -79,9 +79,9 @@ jobs:
           bundle-identifier: org.streetwriters.notesnook
           scheme: Notesnook
           configuration: "Release"
-          export-options: apps/mobile/native/ios/ExportOptions.plist
-          project-path: apps/mobile/native/ios/Notesnook.xcodeproj
-          workspace-path: apps/mobile/native/ios/Notesnook.xcworkspace
+          export-options: apps/mobile/ios/ExportOptions.plist
+          project-path: apps/mobile/ios/Notesnook.xcodeproj
+          workspace-path: apps/mobile/ios/Notesnook.xcworkspace
           update-targets: |
             Notesnook
             Make Note
@@ -117,5 +117,5 @@ jobs:
           name: Notesnook.zip
           path: |
             Notesnook.ipa
-            apps/mobile/native/ios/**/*.map
+            apps/mobile/ios/**/*.map
             packages/editor-mobile/sourcemaps/*.map
