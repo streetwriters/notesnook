@@ -160,6 +160,7 @@ export default function NoteHistory({
           renderScrollComponent={(props) => <ScrollView {...props} />}
           data={history?.placeholders || []}
           estimatedItemSize={55}
+          extraData={history}
           ListEmptyComponent={
             <View
               style={{

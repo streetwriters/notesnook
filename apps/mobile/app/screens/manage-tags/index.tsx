@@ -257,14 +257,16 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
         width: "100%",
         alignSelf: "center",
         backgroundColor: colors.primary.background,
-        gap: DefaultAppStyles.GAP_VERTICAL
+        gap: DefaultAppStyles.GAP_VERTICAL,
+        flex: 1
       }}
     >
       <Header title={strings.manageTags()} canGoBack />
 
       <View
         style={{
-          paddingHorizontal: DefaultAppStyles.GAP
+          paddingHorizontal: DefaultAppStyles.GAP,
+          flex: 1
         }}
       >
         <Input
@@ -318,13 +320,12 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
 
         <View
           style={{
-            width: "100%",
-            flex: 1,
-            height: "100%"
+            flex: 1
           }}
         >
           <LegendList
             data={tags?.placeholders || []}
+            extraData={tags}
             keyboardShouldPersistTaps
             keyboardDismissMode="interactive"
             estimatedItemSize={50}
@@ -380,7 +381,7 @@ const TagItem = ({
     tag?.id ? state.selection[tag?.id] : false
   );
 
-  return !tag ? null : (
+  return (
     <Pressable
       key={tag?.id}
       style={{

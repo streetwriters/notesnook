@@ -545,6 +545,7 @@ export const AttachmentDialog = ({
           }
           estimatedItemSize={50}
           data={loading ? [] : attachments?.placeholders || []}
+          extraData={attachments}
           renderItem={renderItem}
         />
       </View>

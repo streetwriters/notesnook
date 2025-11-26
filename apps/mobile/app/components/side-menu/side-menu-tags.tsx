@@ -258,6 +258,7 @@ export const SideMenuTags = () => {
         <>
           <LegendList
             data={filteredTags?.placeholders || []}
+            extraData={filteredTags}
             bounces={false}
             estimatedItemSize={35}
             bouncesZoom={false}

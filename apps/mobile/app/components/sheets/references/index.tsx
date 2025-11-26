@@ -508,6 +508,7 @@ export const ReferencesList = ({ item, close }: ReferencesListProps) => {
             renderScrollComponent={(props) => <ScrollView {...props} />}
             bounces={false}
             data={items.placeholders || []}
+            extraData={items}
             renderItem={renderNote}
           />
         </View>
