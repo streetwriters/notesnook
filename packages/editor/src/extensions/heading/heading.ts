@@ -23,8 +23,11 @@ import {
   textblockTypeInputRule
 } from "@tiptap/core";
 import { Heading as TiptapHeading } from "@tiptap/extension-heading";
+import { isClickWithinBounds } from "../../utils/prosemirror.js";
 import { Plugin, PluginKey, Selection, Transaction } from "@tiptap/pm/state";
 import { Node } from "@tiptap/pm/model";
+import { useToolbarStore } from "../../toolbar/stores/toolbar-store.js";
+import { Decoration, DecorationSet } from "prosemirror-view";
 
 const COLLAPSIBLE_BLOCK_TYPES = [
   "paragraph",
@@ -166,63 +169,82 @@ export const Heading = TiptapHeading.extend({
   addNodeView() {
     return ({ node, getPos, editor, HTMLAttributes }) => {
       const heading = document.createElement(`h${node.attrs.level}`);
-      const contentWrapper = document.createElement("div");
-      const icon = document.createElement("span");
-
-      // providing a minWidth so that empty headings show the blinking cursor
-      contentWrapper.style.minWidth = "1px";
-
-      icon.className = "heading-collapse-icon";
-      icon.contentEditable = "false";
 
       for (const attr in HTMLAttributes) {
         heading.setAttribute(attr, HTMLAttributes[attr]);
       }
-      addTextAlignClass(heading, node.attrs.textAlign);
 
       if (node.attrs.collapsed) heading.dataset.collapsed = "true";
       else delete heading.dataset.collapsed;
 
-      function onIconClick(e: MouseEvent | TouchEvent) {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
+      if (node.attrs.hidden) heading.dataset.hidden = node.attrs.hidden;
+      else delete heading.dataset.hidden;
 
-        const pos = typeof getPos === "function" ? getPos() : 0;
-        if (typeof pos !== "number") return;
-
-        const resolvedPos = editor.state.doc.resolve(pos);
-        const forbiddenParents = ["callout"];
-        if (
-          findParentNodeClosestToPos(resolvedPos, (node) =>
-            forbiddenParents.includes(node.type.name)
-          )
-        ) {
+      function onClick(e: MouseEvent | TouchEvent) {
+        if (e instanceof MouseEvent && e.button !== 0) return;
+        if (!(e.target instanceof HTMLHeadingElement) || !e.target.lastChild)
           return;
+        if (typeof getPos === "boolean") return;
+
+        const pos = getPos();
+        const clientX =
+          e instanceof MouseEvent ? e.clientX : e.touches[0].clientX;
+        const clientY =
+          e instanceof MouseEvent ? e.clientY : e.touches[0].clientY;
+        const isRtl =
+          e.target.dir === "rtl" ||
+          findParentNodeClosestToPos(
+            editor.state.doc.resolve(pos),
+            (node) => !!node.attrs.textDirection
+          )?.node.attrs.textDirection === "rtl";
+
+        const range = document.createRange();
+        range.selectNodeContents(e.target);
+
+        const hitArea = { height: 40, width: 40 };
+
+        const rects = range.getClientRects();
+        const lines = rectsToLines(rects);
+        const lastLine = lines[lines.length - 1];
+        if (!lastLine) return;
+        const targetRect = isRtl ? lastLine[0] : lastLine[lastLine.length - 1];
+
+        const { x, y, width } = targetRect;
+
+        let xStart = clientX >= x + width;
+        let xEnd = clientX <= x + width + hitArea.width;
+        const yStart = clientY >= y;
+        const yEnd = clientY <= y + hitArea.height;
+
+        if (isRtl) {
+          xStart = clientX >= x - hitArea.width;
+          xEnd = clientX <= x;
         }
 
-        editor.commands.command(({ tr }) => {
-          const currentNode = tr.doc.nodeAt(pos);
-          if (currentNode && currentNode.type.name === "heading") {
-            const shouldCollapse = !currentNode.attrs.collapsed;
-            const headingLevel = currentNode.attrs.level;
+        if (xStart && xEnd && yStart && yEnd) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
 
-            tr.setNodeAttribute(pos, "collapsed", shouldCollapse);
-            toggleNodesUnderPos(tr, pos, headingLevel, shouldCollapse);
-          }
-          return true;
-        });
+          editor.commands.command(({ tr }) => {
+            const currentNode = tr.doc.nodeAt(pos);
+            if (currentNode && currentNode.type.name === "heading") {
+              const shouldCollapse = !currentNode.attrs.collapsed;
+              const headingLevel = currentNode.attrs.level;
+
+              tr.setNodeAttribute(pos, "collapsed", shouldCollapse);
+              toggleNodesUnderPos(tr, pos, headingLevel, shouldCollapse);
+            }
+            return true;
+          });
+        }
       }
 
-      icon.onmousedown = onIconClick;
-      icon.ontouchend = onIconClick;
-
-      heading.appendChild(contentWrapper);
-      heading.appendChild(icon);
+      heading.onmousedown = onClick;
+      heading.ontouchstart = onClick;
 
       return {
         dom: heading,
-        contentDOM: contentWrapper,
+        contentDOM: heading,
         update: (updatedNode) => {
           if (updatedNode.type !== this.type) {
             return false;
@@ -239,13 +261,11 @@ export const Heading = TiptapHeading.extend({
             heading.dataset.hidden = updatedNode.attrs.hidden;
           else delete heading.dataset.hidden;
 
-          if (updatedNode.attrs.textAlign) {
+          if (updatedNode.attrs.textAlign)
             heading.style.textAlign =
               updatedNode.attrs.textAlign === "left"
                 ? ""
                 : updatedNode.attrs.textAlign;
-            addTextAlignClass(heading, updatedNode.attrs.textAlign);
-          }
 
           if (updatedNode.attrs.textDirection)
             heading.dir = updatedNode.attrs.textDirection;
@@ -398,16 +418,29 @@ const headingUpdatePlugin = new Plugin({
   }
 });
 
-function addTextAlignClass(el: HTMLElement, textAlign: string) {
-  el.classList.remove("text-align-center", "text-align-right");
-  switch (textAlign) {
-    case "center":
-    case "right":
-      el.classList.add(`text-align-${textAlign}`);
-      break;
-    case "left":
-    case "justify":
-    default:
-      break;
+function rectsToLines(rects: DOMRectList) {
+  const lines: DOMRect[][] = [];
+
+  outer: for (const rect of rects) {
+    if (rect.width === 0 || rect.height === 0) continue;
+
+    for (const line of lines) {
+      const lastRect = line[line.length - 1];
+      // Check if rects are on the same line by checking vertical overlap
+      // This handles cases where text has different font sizes on the same line
+      const rectBottom = rect.top + rect.height;
+      const lastRectBottom = lastRect.top + lastRect.height;
+      const overlapTop = Math.max(rect.top, lastRect.top);
+      const overlapBottom = Math.min(rectBottom, lastRectBottom);
+      const hasVerticalOverlap = overlapBottom > overlapTop;
+
+      if (hasVerticalOverlap) {
+        line.push(rect);
+        continue outer;
+      }
+    }
+
+    lines.push([rect]);
   }
+  return lines;
 }
