@@ -92,7 +92,11 @@ export async function exportNotes(
       const { createZipStream } = await import("../utils/streams/zip-stream");
 
       const errors: Error[] = [];
-      const exportStream = new ExportStream(report, (e) => errors.push(e));
+      const exportStream = new ExportStream(
+        report,
+        (e) => errors.push(e),
+        await notes.count()
+      );
       await fromAsyncIterator(
         _exportNotes(notes, { format, unlockVault: Vault.unlockVault })
       )

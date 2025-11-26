@@ -28,8 +28,13 @@ export class ExportStream extends TransformStream<
 > {
   progress = 0;
   constructor(
-    report: (progress: { text: string; current?: number }) => void,
-    handleError: (error: Error) => void
+    report: (progress: {
+      text: string;
+      current?: number;
+      total?: number;
+    }) => void,
+    handleError: (error: Error) => void,
+    totalItems?: number
   ) {
     super({
       transform: async (item, controller) => {
@@ -69,7 +74,8 @@ export class ExportStream extends TransformStream<
           controller.enqueue(item);
           report({
             current: this.progress++,
-            text: `Exporting note: ${item.path}`
+            text: `Exporting note: ${item.path}`,
+            total: totalItems
           });
         }
       }
