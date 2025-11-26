@@ -43,7 +43,6 @@ import { useDBItem, useNoteLocked } from "../hooks/use-db-item";
 import { useNotebook } from "../hooks/use-notebook";
 import { getElevationStyle } from "../utils/elevation";
 import { initDatabase, useShareStore } from "./store";
-import { devNull } from "node:os";
 import { DefaultAppStyles } from "../utils/styles";
 
 export const useNotebookExpandedStore = create<{
@@ -212,6 +211,7 @@ const NotebookItem = ({
         >
           <Paragraph
             numberOfLines={1}
+            allowFontScaling={false}
             style={{
               color: colors.primary.paragraph,
               fontSize: 15
@@ -224,6 +224,7 @@ const NotebookItem = ({
             style={{
               marginRight: 10
             }}
+            allowFontScaling={false}
             size={20}
             color={isSelected ? colors.primary.accent : colors.secondary.icon}
           />
@@ -315,6 +316,7 @@ const ListItem = ({
           >
             <Paragraph
               numberOfLines={1}
+              allowFontScaling={false}
               style={{
                 color: colors.primary.paragraph,
                 fontSize: 15
@@ -331,6 +333,7 @@ const ListItem = ({
               style={{
                 marginRight: 10
               }}
+              allowFontScaling={false}
               size={20}
               color={isSelected ? colors.primary.accent : colors.secondary.icon}
             />
@@ -454,6 +457,7 @@ export const Search = ({
             fontSize: 16,
             flex: 1
           }}
+          allowFontScaling={false}
           onChangeText={(value) => {
             setSearchKeyword(value);
             onSearch();
@@ -502,6 +506,7 @@ export const Search = ({
                 color: colors.primary.paragraph,
                 fontSize: 15
               }}
+              allowFontScaling={false}
             >
               Add #{searchKeyword}
             </Paragraph>
@@ -528,6 +533,7 @@ export const Search = ({
                 style={{
                   color: colors.secondary.icon
                 }}
+                allowFontScaling={false}
               >
                 {searchKeyword
                   ? `No results found for "${searchKeyword}"`

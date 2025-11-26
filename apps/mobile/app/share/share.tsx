@@ -153,7 +153,7 @@ const ShareView = () => {
   }>({});
   const inputRef = useRef<TextInput>(null);
   const [mode, setMode] = useState(1);
-  const keyboardHeight = useRef(0);
+  const keyboardHeightRef = useRef(0);
   const { width, height } = useWindowDimensions();
   const [loadingPage, setLoadingPage] = useState(false);
   const editorRef = useRef<EditorRef>(null);
@@ -162,18 +162,18 @@ const ShareView = () => {
   >(null);
   const [rawFiles, setRawFiles] = useState<ShareItem[]>([]);
   const insets = useSafeAreaInsets();
-  const [kh, setKh] = useState(0);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [compress, setCompress] = useState(true);
   globalThis["IS_SHARE_EXTENSION"] = true;
   const onKeyboardDidShow = (event: KeyboardEvent) => {
     let height = Dimensions.get("screen").height - event.endCoordinates.screenY;
-    keyboardHeight.current = height;
-    setKh(height);
+    keyboardHeightRef.current = height;
+    setKeyboardHeight(height);
   };
 
   const onKeyboardDidHide = () => {
-    keyboardHeight.current = 0;
-    setKh(0);
+    keyboardHeightRef.current = 0;
+    setKeyboardHeight(0);
   };
 
   useEffect(() => {
@@ -438,16 +438,20 @@ const ShareView = () => {
   const WrapperView = Platform.OS === "android" ? View : ScrollView;
 
   return loadingExtension ? null : (
-    <SafeAreaView
+    <View
       style={{
         width: width > 500 ? 500 : width,
         height: "100%",
         alignSelf: "center",
         justifyContent: "flex-end",
         overflow: "hidden",
-        paddingBottom: kh
-          ? kh - (insets.bottom || (gesturesEnabled ? 25 : 50))
-          : 0
+        paddingTop: insets.top,
+        paddingLeft: insets.left,
+        paddingRight: insets.right,
+        paddingBottom:
+          Platform.OS === "android" && keyboardHeight
+            ? keyboardHeight - (insets.bottom || (gesturesEnabled ? 25 : 50))
+            : 0
       }}
     >
       {loadingPage ? <HtmlLoadingWebViewAgent /> : null}
@@ -480,7 +484,7 @@ const ShareView = () => {
 
       {searchMode ? (
         <Search
-          getKeyboardHeight={() => keyboardHeight.current}
+          getKeyboardHeight={() => keyboardHeightRef.current}
           mode={searchMode}
           close={() => {
             setSearchMode(null);
@@ -538,6 +542,7 @@ const ShareView = () => {
                         paddingBottom: 0,
                         paddingTop: 0
                       }}
+                      allowFontScaling={false}
                     >
                       Save note
                     </Heading>
@@ -545,6 +550,7 @@ const ShareView = () => {
                     <TextInput
                       placeholder="Enter note title"
                       ref={inputRef}
+                      allowFontScaling={false}
                       style={{
                         flexShrink: 1,
                         flexGrow: 1,
@@ -569,6 +575,7 @@ const ShareView = () => {
                     type="accent"
                     loading={loading}
                     onPress={onPress}
+                    allowFontScaling={false}
                   />
                 </View>
 
@@ -583,6 +590,7 @@ const ShareView = () => {
                     <Paragraph
                       style={{ marginBottom: 6 }}
                       color={colors.primary.paragraph}
+                      allowFontScaling={false}
                     >
                       Attaching {rawFiles.length} file(s):
                     </Paragraph>
@@ -637,6 +645,7 @@ const ShareView = () => {
                             <Paragraph
                               size={AppFontSize.xs}
                               color={colors.primary.paragraph}
+                              allowFontScaling={false}
                               style={{
                                 marginLeft: 4,
                                 paddingRight: 8
@@ -653,6 +662,7 @@ const ShareView = () => {
                     <Paragraph
                       color={colors.secondary.paragraph}
                       size={AppFontSize.xs}
+                      allowFontScaling={false}
                       style={{
                         marginTop: 6
                       }}
@@ -682,6 +692,7 @@ const ShareView = () => {
                               ? "checkbox-marked"
                               : "checkbox-blank-outline"
                           }
+                          allowFontScaling={false}
                           color={
                             compress && fullQualityImages?.isAllowed
                               ? colors.primary.accent
@@ -695,6 +706,7 @@ const ShareView = () => {
                             marginLeft: 3,
                             fontSize: 12
                           }}
+                          allowFontScaling={false}
                         >
                           Compress image(s) (recommended)
                         </Text>
@@ -769,6 +781,7 @@ const ShareView = () => {
                     style={{
                       marginRight: 10
                     }}
+                    allowFontScaling={false}
                   >
                     Clip Mode:
                   </Paragraph>
@@ -779,6 +792,7 @@ const ShareView = () => {
                       onPress={() => changeMode(2)}
                       title={modes[2].title}
                       height={30}
+                      allowFontScaling={false}
                       style={{
                         paddingHorizontal: 6
                       }}
@@ -788,6 +802,7 @@ const ShareView = () => {
                     type={mode === 1 ? "inverted" : "plain"}
                     icon={mode === 1 ? "radiobox-marked" : "radiobox-blank"}
                     onPress={() => changeMode(1)}
+                    allowFontScaling={false}
                     title={modes[1].title}
                     height={30}
                     style={{
@@ -817,6 +832,7 @@ const ShareView = () => {
                 }}
                 type={!appendNoteId ? "transparent" : "plain"}
                 title="New note"
+                allowFontScaling={false}
                 style={{
                   paddingHorizontal: 12,
                   height: 45,
@@ -833,6 +849,7 @@ const ShareView = () => {
                 onPress={() => {
                   setSearchMode("appendNote");
                 }}
+                allowFontScaling={false}
                 type={appendNoteId ? "transparent" : "plain"}
                 title={`Append to a note`}
                 style={{
@@ -871,7 +888,7 @@ const ShareView = () => {
           </View>
         </ScrollView>
       </WrapperView>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -895,6 +912,7 @@ const AppendNote = ({
     <Paragraph
       size={AppFontSize.xs}
       color={colors.secondary.paragraph}
+      allowFontScaling={false}
       style={{
         paddingHorizontal: 12,
         marginBottom: 10,
@@ -908,6 +926,7 @@ const AppendNote = ({
           color: colors.primary.accent,
           fontWeight: "bold"
         }}
+        allowFontScaling={false}
       >
         {`"${item.title}"`}
       </Paragraph>{" "}

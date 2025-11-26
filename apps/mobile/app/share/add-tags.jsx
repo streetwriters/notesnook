@@ -57,6 +57,7 @@ export const AddTags = ({ onPress }) => {
               style={{
                 marginRight: 10
               }}
+              allowFontScaling={false}
               color={colors.secondary.icon}
             />
             <Text
@@ -64,6 +65,7 @@ export const AddTags = ({ onPress }) => {
                 color: colors.secondary.icon,
                 fontSize: 15
               }}
+              allowFontScaling={false}
             >
               Add tags
             </Text>
@@ -91,6 +93,7 @@ export const AddTags = ({ onPress }) => {
               backgroundColor: colors.secondary.background,
               paddingVertical: 5
             }}
+            allowFontScaling={false}
             onPress={() => {
               onPress();
             }}
@@ -120,6 +123,7 @@ const TagItem = ({ tagId }) => {
         backgroundColor: colors.secondary.background,
         paddingVertical: 5
       }}
+      allowFontScaling={false}
       onPress={() => {
         const index = tagIds.indexOf(tagId);
         const selectedTags = tagIds.slice();

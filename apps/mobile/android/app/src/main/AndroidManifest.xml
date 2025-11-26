@@ -166,7 +166,6 @@
             android:exported="true"
             android:label="@string/title_activity_share"
             android:noHistory="true"
-            android:screenOrientation="unspecified"
             android:taskAffinity=""
             android:theme="@style/AppThemeB"
             android:windowSoftInputMode="adjustResize">

@@ -34,7 +34,7 @@ target 'Notesnook' do
     # Upcoming versions of React Native may rely on get_default_flags(), but
     # we make it explicit here to aid in the React Native upgrade process.
     :hermes_enabled => true,
-    :fabric_enabled => false,
+    :fabric_enabled => true,
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
@@ -42,57 +42,20 @@ target 'Notesnook' do
 
     # Pods for testing
   end
-end
 
-# for share extension
-target 'Make Note' do
-
-  use_react_native!(
+  target 'Make Note' do
+    use_react_native!(
     :path => rn_path,
     # Hermes is now enabled by default. Disable by setting this flag to false.
     # Upcoming versions of React Native may rely on get_default_flags(), but
     # we make it explicit here to aid in the React Native upgrade process.
     :hermes_enabled => true,
-    :fabric_enabled => false,
-    # Enables Flipper.
-    #
-    # Note that if you have use_frameworks! enabled, Flipper will not work and
-    # you should disable the next line.
-    # :flipper_configuration => flipper_config,
-    # An absolute path to your application root.
+    :fabric_enabled => true,
     :app_path => "#{Pod::Config.instance.installation_root}/.."
-  )
-  # Link only required libraries in share extension manually
-  pod 'react-native-blob-util', :path => '../node_modules/react-native-blob-util'
-  pod 'react-native-share-extension', :path => '../node_modules/@ammarahmed/react-native-share-extension'
-  pod 'react-native-sodium', :path => '../node_modules/@ammarahmed/react-native-sodium'
-  pod 'react-native-gzip', :path => '../node_modules/react-native-gzip'
-  pod 'react-native-mmkv-storage', :path => '../node_modules/react-native-mmkv-storage'
-  pod 'react-native-webview', :path => '../node_modules/react-native-webview'
-  pod 'RNKeychain' , :path => '../node_modules/react-native-keychain'
-  pod 'react-native-netinfo', :path => '../node_modules/@react-native-community/netinfo'
-  pod 'react-native-safe-area-context', :path => '../node_modules/react-native-safe-area-context'
-  pod 'react-native-get-random-values', :path => '../node_modules/react-native-get-random-values'
-  pod 'callstack-repack', :path => '../node_modules/@callstack/repack'
-  pod 'RNSecureRandom', :path => '../node_modules/react-native-securerandom'
-  pod "RNCClipboard", :path => '../node_modules/@react-native-clipboard/clipboard'
-  pod "react-native-quick-sqlite", :path =>  '../node_modules/react-native-quick-sqlite'
-  pod "RNDeviceInfo", :path =>  '../node_modules/react-native-device-info'
-  pod "RNPrivacySnapshot", :path =>  '../node_modules/react-native-privacy-snapshot'
-  pod "react-native-theme-switch-animation", :path => '../node_modules/react-native-theme-switch-animation'
-  pod "react-native-image-resizer", :path => '../node_modules/@bam.tech/react-native-image-resizer'
-end
-
-
-target 'Notesnook-tvOS' do
-  # Pods for Notesnook-tvOS
-
-  target 'Notesnook-tvOSTests' do
-    inherit! :search_paths
-    # Pods for testing
+    )
+    inherit! :complete
   end
 end
-
 
 post_install do |installer|
   react_native_post_install(

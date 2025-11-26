@@ -64,6 +64,7 @@ export const AddNotebooks = ({ onPress }) => {
               color={colors.secondary.icon}
             />
             <Text
+              allowFontScaling={false}
               style={{
                 color: colors.secondary.icon,
                 fontSize: 15
@@ -86,6 +87,7 @@ export const AddNotebooks = ({ onPress }) => {
           ))}
 
           <Text
+            allowFontScaling={false}
             style={{
               color: colors.primary.accent,
               marginRight: 5,
@@ -132,6 +134,7 @@ const NotebookItem = ({ id }) => {
         selectedNotebooks.splice(index, 1);
         useShareStore.getState().setSelectedNotebooks(selectedNotebooks);
       }}
+      allowFontScaling={false}
       key={item.id}
     >
       <Icon name={"notebook-outline"} size={15} /> {item.title}

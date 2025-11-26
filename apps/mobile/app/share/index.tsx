@@ -19,18 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { ScopedThemeProvider } from "@notesnook/theme";
 import React, { useEffect, useState } from "react";
-import { Modal, ModalProps, Platform } from "react-native";
 import ShareView from "./share";
 import "./store";
-
-const outerProps =
-  Platform.OS === "android"
-    ? ({
-        animationType: "fade",
-        transparent: true,
-        visible: true
-      } as ModalProps)
-    : {};
 
 const NotesnookShare = () => {
   const [render, setRender] = useState(false);
@@ -41,13 +31,7 @@ const NotesnookShare = () => {
   }, []);
   return (
     <ScopedThemeProvider value="base">
-      {!render ? null : Platform.OS === "android" ? (
-        <Modal {...outerProps}>
-          <ShareView />
-        </Modal>
-      ) : (
-        <ShareView />
-      )}
+      {!render ? null : <ShareView />}
     </ScopedThemeProvider>
   );
 };
