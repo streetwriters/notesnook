@@ -145,8 +145,6 @@ export default function List(props: ListProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const ListView = LegendList;
-
   return (
     <>
       <View
@@ -154,11 +152,12 @@ export default function List(props: ListProps) {
           flex: 1
         }}
       >
-        <ListView
+        <LegendList
           ref={scrollRef}
           contentContainerStyle={{
             flexGrow: 1
           }}
+          extraData={props.data}
           testID={notesnook.list.id}
           data={props.data?.placeholders || []}
           renderScrollComponent={
