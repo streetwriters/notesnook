@@ -383,7 +383,6 @@ const TagItem = ({
 
   return (
     <Pressable
-      key={tag?.id}
       style={{
         flexDirection: "row",
         marginVertical: 5,
