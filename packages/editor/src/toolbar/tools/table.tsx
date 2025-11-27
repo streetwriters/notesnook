@@ -41,8 +41,6 @@ import { useToolbarLocation } from "../stores/toolbar-store.js";
 import { showPopup } from "../../components/popup-presenter/index.js";
 import { useRefValue } from "../../hooks/use-ref-value.js";
 import { strings } from "@notesnook/intl";
-import { selectedRect } from "@tiptap/pm/tables";
-import { TextSelection } from "@tiptap/pm/state";
 
 export function TableSettings(props: ToolProps) {
   const { editor } = props;
@@ -90,6 +88,7 @@ export function RowProperties(props: ToolProps) {
       <ToolButton
         icon={props.icon}
         title={props.title}
+        variant={props.variant}
         buttonRef={buttonRef}
         toggled={isMenuOpen}
         onClick={() => setIsMenuOpen(true)}
@@ -134,6 +133,7 @@ export function ColumnProperties(props: ToolProps) {
       <ToolButton
         icon={props.icon}
         title={props.title}
+        variant={props.variant}
         buttonRef={buttonRef}
         toggled={isMenuOpen}
         onClick={() => setIsMenuOpen(true)}
@@ -184,6 +184,7 @@ export function TableProperties(props: ToolProps) {
       <ToolButton
         icon={props.icon}
         title={props.title}
+        variant={props.variant}
         buttonRef={buttonRef}
         toggled={isMenuOpen}
         onClick={() => setIsMenuOpen(true)}

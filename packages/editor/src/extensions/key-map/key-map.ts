@@ -18,11 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Extension } from "@tiptap/core";
-import { isInTable } from "@tiptap/pm/tables";
 import { CodeBlock } from "../code-block/index.js";
 import { showLinkPopup } from "../../toolbar/popups/link-popup.js";
 import { isListActive } from "../../utils/list.js";
 import { tiptapKeys } from "@notesnook/common";
+import { isInTable } from "../table/prosemirror-tables/util.js";
 
 export const KeyMap = Extension.create({
   name: "key-map",
