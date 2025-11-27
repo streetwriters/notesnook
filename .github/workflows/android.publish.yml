@@ -124,7 +124,7 @@ jobs:
 
       - name: Get app version
         id: package-version
-        uses: martinbeentjes/npm-get-version-action@master
+        uses: saionaro/extract-package-version@master
         with:
           path: apps/mobile
 

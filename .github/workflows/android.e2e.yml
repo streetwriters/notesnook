@@ -55,13 +55,13 @@ jobs:
       - name: Detox build
         run: |
           yarn build:android
-          ls apps/mobile/native/android/app/build/outputs/apk
-          ls apps/mobile/native/android/app/build/outputs/apk/release
+          ls apps/mobile/android/app/build/outputs/apk
+          ls apps/mobile/android/app/build/outputs/apk/release
 
       - name: Get device name
         id: device
         run: |
-          AVD_NAME=$(node -p "require('./apps/mobile/native/.detoxrc.js').devices.emulator.device.avdName")
+          AVD_NAME=$(node -p "require('./apps/mobile/.detoxrc.js').devices.emulator.device.avdName")
           echo "AVD_NAME=$AVD_NAME" >> $GITHUB_OUTPUT
 
       - name: AVD cache
