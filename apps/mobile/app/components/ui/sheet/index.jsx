@@ -42,7 +42,7 @@ const SheetWrapper = ({
   closeOnTouchBackdrop = true,
   onHasReachedTop,
   overlay,
-  overlayOpacity = 0.3,
+  overlayOpacity = 0.7,
   enableGesturesInScrollView = false,
   bottomPadding = true,
   keyboardHandlerDisabled
