@@ -63,12 +63,12 @@ const {
 
 export const MoveNotebook = (props: NavigationProps<"MoveNotebook">) => {
   const selectedNotebooks = props.route.params.selectedNotebooks;
-  const searchTimer = useRef<NodeJS.Timeout>();
+  const searchTimer = useRef<NodeJS.Timeout>(undefined);
   const [notebooks, loading] = useNotebooks();
   const { colors } = useThemeColors();
   useNavigationFocus(props.navigation, { focusOnInit: true });
   const tree = useNotebookTreeStore((state) => state.tree);
-  const lastQuery = React.useRef<string>();
+  const lastQuery = React.useRef<string>(undefined);
   const [filteredNotebooks, setFilteredNotebooks] = React.useState(notebooks);
   const [filteredTree, setFilteredTree] = React.useState<TreeItem[]>([]);
   const [moveToTopEnabled, setMoveToTopEnabled] = useState(false);
@@ -242,9 +242,8 @@ export const MoveNotebook = (props: NavigationProps<"MoveNotebook">) => {
               button={{
                 icon: "plus",
                 onPress: async () => {
-                  const notebooksFeature = await isFeatureAvailable(
-                    "notebooks"
-                  );
+                  const notebooksFeature =
+                    await isFeatureAvailable("notebooks");
                   if (!notebooksFeature.isAllowed) {
                     ToastManager.show({
                       message: notebooksFeature.error,

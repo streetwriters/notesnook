@@ -38,8 +38,8 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
   const [results, setResults] = useState<VirtualizedGrouping<Item>>();
   const [loading, setLoading] = useState(false);
   const [searchStatus, setSearchStatus] = useState<string>();
-  const currentQuery = useRef<string>();
-  const timer = useRef<NodeJS.Timeout>();
+  const currentQuery = useRef<string>(undefined);
+  const timer = useRef<NodeJS.Timeout>(undefined);
   useNavigationFocus(navigation, {
     onFocus: (prev) => {
       useNavigationStore.getState().setFocusedRouteId(route.name);

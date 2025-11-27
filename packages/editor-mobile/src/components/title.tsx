@@ -108,6 +108,7 @@ function Title({
       <textarea
         ref={titleRef}
         className={styles.titleBar}
+        id="editor-title"
         rows={1}
         contentEditable={!readonly}
         disabled={readonly}

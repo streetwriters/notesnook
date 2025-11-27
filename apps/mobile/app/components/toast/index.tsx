@@ -46,7 +46,7 @@ import { DefaultAppStyles } from "../../utils/styles";
 export const Toast = ({ context = "global" }) => {
   const { colors, isDark } = useThemeColors();
   const [toastOptions, setToastOptions] = useState<ToastOptions | undefined>();
-  const hideTimeout = useRef<NodeJS.Timeout | undefined>();
+  const hideTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
   const insets = useGlobalSafeAreaInsets();
   const [visible, setVisible] = useState(false);
   const toastMessages = useRef<ToastOptions[]>([]);
@@ -158,22 +158,22 @@ export const Toast = ({ context = "global" }) => {
               toastOptions.icon
                 ? toastOptions.icon
                 : toastOptions.type === "success"
-                ? "check"
-                : toastOptions.type === "info"
-                ? "information"
-                : "close"
+                  ? "check"
+                  : toastOptions.type === "info"
+                    ? "information"
+                    : "close"
             }
             size={isFullToastMessage ? AppFontSize.xxxl : AppFontSize.xl}
             color={
               toastOptions?.icon
                 ? toastOptions?.icon
                 : toastOptions.type === "error"
-                ? colors.error.icon
-                : toastOptions.type === "info"
-                ? isDark
-                  ? colors.static.white
-                  : colors.static.black
-                : colors.success.icon
+                  ? colors.error.icon
+                  : toastOptions.type === "info"
+                    ? isDark
+                      ? colors.static.white
+                      : colors.static.black
+                    : colors.success.icon
             }
           />
 

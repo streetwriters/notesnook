@@ -42,8 +42,17 @@ export interface GithubRelease {
   reactions: unknown;
   discussion_url: string;
 }
-
-export const getGithubVersion = async () => {
+export type GithubVersionInfo = {
+  version: string | null;
+  releasedAt: string;
+  notes: string;
+  body: string;
+  url: string;
+  lastChecked: string;
+  needsUpdate: boolean;
+  current: string;
+};
+export const getGithubVersion = async (): Promise<GithubVersionInfo | null> => {
   const url = `https://api.github.com/repos/streetwriters/notesnook/releases`;
   let res;
   try {

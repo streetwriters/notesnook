@@ -59,7 +59,7 @@ export function makeSessionId(id?: string) {
 }
 
 export async function isEditorLoaded(
-  ref: RefObject<WebView>,
+  ref: RefObject<WebView | null>,
   sessionId: string,
   tabId: string
 ) {
@@ -67,7 +67,7 @@ export async function isEditorLoaded(
 }
 
 export async function post<T>(
-  ref: RefObject<WebView>,
+  ref: RefObject<WebView | null>,
   sessionId: string,
   tabId: string,
   type: string,

@@ -46,7 +46,7 @@ import Paragraph from "../../ui/typography/paragraph";
 import { DefaultAppStyles } from "../../../utils/styles";
 
 const JumpToSectionDialog = () => {
-  const scrollRef = useRef<RefObject<FlatList>>();
+  const scrollRef = useRef<RefObject<FlatList>>(undefined);
   const [data, setData] = useState<VirtualizedGrouping<Item>>();
   const { colors } = useThemeColors();
   const notes = data;

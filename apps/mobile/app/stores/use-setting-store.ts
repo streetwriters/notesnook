@@ -22,7 +22,7 @@ import Config from "react-native-config";
 import { Sound } from "react-native-notification-sounds";
 import { initialWindowMetrics } from "react-native-safe-area-context";
 import { FileType } from "react-native-scoped-storage";
-import create, { State } from "zustand";
+import { create } from "zustand";
 import { ThemeDark, ThemeLight, ThemeDefinition } from "@notesnook/theme";
 import { Reminder } from "@notesnook/core";
 export const HostIds = [
@@ -113,7 +113,7 @@ type Insets = {
   bottom: number;
 };
 
-export interface SettingStore extends State {
+export interface SettingStore {
   settings: Settings;
   fullscreen: boolean;
   deviceMode: string | null;

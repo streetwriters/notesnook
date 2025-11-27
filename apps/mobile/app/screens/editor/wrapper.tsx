@@ -48,7 +48,7 @@ export const EditorWrapper = ({ widths }: { widths: any }) => {
     (state) => state.settings.introCompleted
   );
   const keyboard = useKeyboard();
-  const prevState = useRef<AppStateStatus>();
+  const prevState = useRef<AppStateStatus>(undefined);
 
   const onAppStateChanged = async (state: AppStateStatus) => {
     if (!prevState.current) {

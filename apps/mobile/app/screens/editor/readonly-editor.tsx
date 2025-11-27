@@ -66,7 +66,7 @@ export function ReadonlyEditor(props: {
   const editorRef = useRef<WebView>(null);
   const [loading, setLoading] = useState(true);
   const insets = useGlobalSafeAreaInsets();
-  const noteId = useRef<string>();
+  const noteId = useRef<string>(undefined);
   const onMessage = (event: WebViewMessageEvent) => {
     const data = event.nativeEvent.data;
     const editorMessage = JSON.parse(data) as EditorMessage<any>;

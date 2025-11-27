@@ -31,7 +31,7 @@ function getSecondsLeft(id?: string) {
 const useTimer = (initialId?: string) => {
   const [id, setId] = useState(initialId);
   const [seconds, setSeconds] = useState(getSecondsLeft(id));
-  const interval = useRef<NodeJS.Timer>();
+  const interval = useRef<NodeJS.Timeout>(undefined);
 
   const start = (sec: number, currentId = id) => {
     if (!currentId) return;

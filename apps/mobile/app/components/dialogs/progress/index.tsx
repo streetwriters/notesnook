@@ -50,7 +50,7 @@ export default function Progress() {
   const { colors } = useThemeColors();
   const [progress, setProgress] = React.useState<string | undefined>();
   const [visible, setVisible] = React.useState(false);
-  const cancelCallback = React.useRef<() => void>();
+  const cancelCallback = React.useRef<() => void>(undefined);
   const [data, setData] = React.useState<{
     title?: string;
     paragraph?: string;

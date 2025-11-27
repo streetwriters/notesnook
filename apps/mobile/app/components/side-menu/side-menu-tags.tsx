@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Tag, VirtualizedGrouping } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import { FlashList } from "@shopify/flash-list";
 import React, { useEffect } from "react";
 import { TextInput, View } from "react-native";
 import { DatabaseLogger, db } from "../../common/database";
@@ -38,6 +37,7 @@ import Paragraph from "../ui/typography/paragraph";
 import { SideMenuHeader } from "./side-menu-header";
 import { SideMenuListEmpty } from "./side-menu-list-empty";
 import { useSideMenuTagsSelectionStore } from "./stores";
+import { LegendList, LegendListRenderItemProps } from "@legendapp/list";
 
 const TagItem = (props: {
   tags: VirtualizedGrouping<Tag>;
@@ -188,8 +188,8 @@ export const SideMenuTags = () => {
   const { colors } = useThemeColors();
   const [filteredTags, setFilteredTags] = React.useState(tags);
   const [loading, setLoading] = React.useState(true);
-  const searchTimer = React.useRef<NodeJS.Timeout>();
-  const lastQuery = React.useRef<string>();
+  const searchTimer = React.useRef<NodeJS.Timeout>(undefined);
+  const lastQuery = React.useRef<string>(undefined);
 
   useEffect(() => {
     useSideMenuTagsSelectionStore.setState({
@@ -237,7 +237,7 @@ export const SideMenuTags = () => {
   }, [updateTags, isLoading]);
 
   const renderItem = React.useCallback(
-    (info: { index: number }) => {
+    (info: LegendListRenderItemProps<any, any>) => {
       return <TagItem id={info.index} tags={filteredTags!} />;
     },
     [filteredTags]
@@ -256,8 +256,9 @@ export const SideMenuTags = () => {
         />
       ) : (
         <>
-          <FlashList
-            data={filteredTags?.placeholders}
+          <LegendList
+            data={filteredTags?.placeholders || []}
+            extraData={filteredTags}
             bounces={false}
             estimatedItemSize={35}
             bouncesZoom={false}
