@@ -406,6 +406,18 @@ export const tiptapKeys = {
     description: "Move line down",
     category: "Editor",
     type: "tiptap"
+  },
+  moveNodeUp: {
+    keys: "Alt-Shift-ArrowUp",
+    description: "Move parent node up",
+    category: "Editor",
+    type: "tiptap"
+  },
+  moveNodeDown: {
+    keys: "Alt-Shift-ArrowDown",
+    description: "Move parent node down",
+    category: "Editor",
+    type: "tiptap"
   }
 } satisfies Record<string, TipTapKey>;
 

@@ -32,6 +32,12 @@ import { ReplaceStep } from "@tiptap/pm/transform";
 import { Selection } from "@tiptap/pm/state";
 import { Callout } from "../callout/callout.js";
 import { Blockquote } from "../blockquote/blockquote.js";
+import { Table } from "../table/table.js";
+import { BulletList } from "../bullet-list/bullet-list.js";
+import OrderedList from "@tiptap/extension-ordered-list";
+import { TaskListNode } from "../task-list/task-list.js";
+import { CheckList } from "../check-list/check-list.js";
+import { OutlineList } from "../outline-list/outline-list.js";
 
 export const KeyMap = Extension.create({
   name: "key-map",
@@ -83,7 +89,7 @@ export const KeyMap = Extension.create({
       },
       [tiptapKeys.moveLineUp.keys]: ({ editor }) => {
         try {
-          return moveNode(editor, "up");
+          return moveNode(editor, "up", "itself");
         } catch (e) {
           console.error("Error moving node up:", e);
           return false;
@@ -91,7 +97,23 @@ export const KeyMap = Extension.create({
       },
       [tiptapKeys.moveLineDown.keys]: ({ editor }) => {
         try {
-          return moveNode(editor, "down");
+          return moveNode(editor, "down", "itself");
+        } catch (e) {
+          console.error("Error moving node down:", e);
+          return false;
+        }
+      },
+      [tiptapKeys.moveNodeUp.keys]: ({ editor }) => {
+        try {
+          return moveNode(editor, "up", "parent");
+        } catch (e) {
+          console.error("Error moving node up:", e);
+          return false;
+        }
+      },
+      [tiptapKeys.moveNodeDown.keys]: ({ editor }) => {
+        try {
+          return moveNode(editor, "down", "parent");
         } catch (e) {
           console.error("Error moving node down:", e);
           return false;
@@ -116,8 +138,13 @@ function mapChildren<T>(
 
 /**
  * implementation inspired from https://discuss.prosemirror.net/t/keymap-to-move-a-line/3645/5
+ * @param mode - "itself" | "parent"  - whether to move the current node itself or its immediate valid parent node
  */
-function moveNode(editor: Editor, dir: "up" | "down") {
+function moveNode(
+  editor: Editor,
+  dir: "up" | "down",
+  mode: "itself" | "parent"
+) {
   const isDown = dir === "down";
   const { state } = editor;
   if (!state.selection.empty) {
@@ -129,42 +156,67 @@ function moveNode(editor: Editor, dir: "up" | "down") {
   let targetType = $from.node().type;
   let currentResolved = findParentNodeOfType(targetType)(state.selection);
 
-  if (isListActive(editor)) {
-    const currentNode = $from.node();
-    const parentNode = $from.node($from.depth - 1);
-    const isFirstParagraph =
-      currentNode.type.name === "paragraph" &&
-      parentNode.firstChild === currentNode;
+  if (mode === "parent") {
+    const validParents = [
+      Callout.name,
+      Table.name,
+      BulletList.name,
+      OrderedList.name,
+      TaskListNode.name,
+      CheckList.name,
+      OutlineList.name,
+      Blockquote.name
+    ];
+    const parent = findParentNodeClosestToPos($from, (node) =>
+      validParents.includes(node.type.name)
+    );
+    if (parent) {
+      targetType = parent.node.type;
+      currentResolved = findParentNodeOfType(targetType)(state.selection);
+    } else {
+      currentResolved = undefined;
+    }
+  } else {
+    if (isListActive(editor)) {
+      const currentNode = $from.node();
+      const parentNode = $from.node($from.depth - 1);
+      const isFirstParagraph =
+        currentNode.type.name === "paragraph" &&
+        parentNode.firstChild === currentNode;
 
-    // move the entire list item
-    if (isFirstParagraph) {
-      targetType = $from.node($from.depth - 1).type;
-      if (
-        targetType.name === Callout.name ||
-        targetType.name === Blockquote.name
-      ) {
-        targetType = $from.node($from.depth - 2).type;
+      // move the entire list item
+      if (isFirstParagraph) {
+        targetType = $from.node($from.depth - 1).type;
+        if (
+          targetType.name === Callout.name ||
+          targetType.name === Blockquote.name
+        ) {
+          targetType = $from.node($from.depth - 2).type;
+        }
       }
+
+      currentResolved = findParentNodeOfType(targetType)(state.selection);
     }
 
-    currentResolved = findParentNodeOfType(targetType)(state.selection);
-  }
+    if (
+      findParentNodeClosestToPos(
+        $from,
+        (node) => node.type.name === Callout.name
+      )
+    ) {
+      const currentNode = $from.node();
+      const parentNode = $from.node($from.depth - 1);
+      const isFirstHeading =
+        currentNode.type.name === "heading" &&
+        parentNode.firstChild === currentNode;
 
-  if (
-    findParentNodeClosestToPos($from, (node) => node.type.name === Callout.name)
-  ) {
-    const currentNode = $from.node();
-    const parentNode = $from.node($from.depth - 1);
-    const isFirstHeading =
-      currentNode.type.name === "heading" &&
-      parentNode.firstChild === currentNode;
+      // move the entire callout
+      if (isFirstHeading) {
+        targetType = $from.node($from.depth - 1).type;
+      }
 
-    // move the entire callout
-    if (isFirstHeading) {
-      targetType = $from.node($from.depth - 1).type;
+      currentResolved = findParentNodeOfType(targetType)(state.selection);
     }
-
-    currentResolved = findParentNodeOfType(targetType)(state.selection);
   }
 
   if (!currentResolved) {

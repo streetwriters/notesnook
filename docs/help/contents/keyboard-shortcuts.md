@@ -79,3 +79,5 @@ The following keyboard shortcuts will help you navigate Notesnook faster.
 | Toggle highlight | Ctrl Alt H | Ctrl Alt H | ⌘ ⌥ H |
 | Move line up | Alt ↑ | Alt ↑ | ⌥ ↑ |
 | Move line down | Alt ↓ | Alt ↓ | ⌥ ↓ |
+| Move parent node up | Alt ⇧ ↑ | Alt ⇧ ↑ | ⌥ ⇧ ↑ |
+| Move parent node down | Alt ⇧ ↓ | Alt ⇧ ↓ | ⌥ ⇧ ↓ |
