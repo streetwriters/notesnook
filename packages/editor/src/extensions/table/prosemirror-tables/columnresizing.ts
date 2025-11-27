@@ -143,8 +143,6 @@ function handleMouseDown(
   cellMinWidth: number,
   defaultCellMinWidth: number
 ): boolean {
-  if (!view.editable) return false;
-
   const win = view.dom.ownerDocument.defaultView ?? window;
 
   const pluginState = columnResizingPluginKey.getState(view.state);

@@ -90,16 +90,20 @@ export function TableComponent(
   return (
     <>
       <DesktopOnly>
-        <TableRowToolbar
-          editor={editor}
-          table={tableRef}
-          textDirection={textDirection}
-        />
-        <TableColumnToolbar
-          editor={editor}
-          table={tableRef}
-          textDirection={textDirection}
-        />
+        {editor.isEditable ? (
+          <>
+            <TableRowToolbar
+              editor={editor}
+              table={tableRef}
+              textDirection={textDirection}
+            />
+            <TableColumnToolbar
+              editor={editor}
+              table={tableRef}
+              textDirection={textDirection}
+            />
+          </>
+        ) : null}
         <SimpleBar autoHide style={{ overflowY: "hidden" }}>
           <div dir={textDirection}>
             <table
