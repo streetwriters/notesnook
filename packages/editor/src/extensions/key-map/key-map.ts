@@ -25,11 +25,15 @@ import { tiptapKeys } from "@notesnook/common";
 import { isInTable } from "../table/prosemirror-tables/util.js";
 import { config } from "../../utils/config.js";
 import { DEFAULT_COLORS } from "../../toolbar/tools/colors.js";
-import { findParentNodeOfType } from "../../utils/prosemirror.js";
+import {
+  findParentNodeClosestToPos,
+  findParentNodeOfType
+} from "../../utils/prosemirror.js";
 import { Fragment, Node, Slice } from "@tiptap/pm/model";
 import { ReplaceStep } from "@tiptap/pm/transform";
 import { Selection } from "@tiptap/pm/state";
 import { Callout } from "../callout/callout.js";
+import { Blockquote } from "../blockquote/blockquote.js";
 
 export const KeyMap = Extension.create({
   name: "key-map",
@@ -85,10 +89,20 @@ export const KeyMap = Extension.create({
         return editor.commands.toggleMark("textStyle", { color });
       },
       [tiptapKeys.moveLineUp.keys]: ({ editor }) => {
-        return moveNode(editor, "up");
+        try {
+          return moveNode(editor, "up");
+        } catch (e) {
+          console.error("Error moving node up:", e);
+          return false;
+        }
       },
       [tiptapKeys.moveLineDown.keys]: ({ editor }) => {
-        return moveNode(editor, "down");
+        try {
+          return moveNode(editor, "down");
+        } catch (e) {
+          console.error("Error moving node down:", e);
+          return false;
+        }
       }
     };
   }
@@ -119,31 +133,45 @@ function moveNode(editor: Editor, dir: "up" | "down") {
 
   const { $from } = state.selection;
 
-  let currentResolved;
-  let targetType;
+  let targetType = $from.node().type;
+  let currentResolved = findParentNodeOfType(targetType)(state.selection);
 
-  const outlineListItem = findParentNodeOfType(
-    editor.schema.nodes.outlineListItem
-  )(state.selection);
-  const taskItem = findParentNodeOfType(editor.schema.nodes.taskItem)(
-    state.selection
-  );
-  const listItem = findParentNodeOfType(editor.schema.nodes.listItem)(
-    state.selection
-  );
-  if (outlineListItem) {
-    currentResolved = outlineListItem;
-    targetType = editor.schema.nodes.outlineListItem;
-  } else if (taskItem) {
-    currentResolved = taskItem;
-    targetType = editor.schema.nodes.taskItem;
-  } else if (listItem) {
-    currentResolved = listItem;
-    targetType = editor.schema.nodes.listItem;
-  } else {
-    const type = $from.node().type;
-    currentResolved = findParentNodeOfType(type)(state.selection);
-    targetType = type;
+  if (isListActive(editor)) {
+    const currentNode = $from.node();
+    const parentNode = $from.node($from.depth - 1);
+    const isFirstParagraph =
+      currentNode.type.name === "paragraph" &&
+      parentNode.firstChild === currentNode;
+
+    // move the entire list item
+    if (isFirstParagraph) {
+      targetType = $from.node($from.depth - 1).type;
+      if (
+        targetType.name === Callout.name ||
+        targetType.name === Blockquote.name
+      ) {
+        targetType = $from.node($from.depth - 2).type;
+      }
+    }
+
+    currentResolved = findParentNodeOfType(targetType)(state.selection);
+  }
+
+  if (
+    findParentNodeClosestToPos($from, (node) => node.type.name === Callout.name)
+  ) {
+    const currentNode = $from.node();
+    const parentNode = $from.node($from.depth - 1);
+    const isFirstHeading =
+      currentNode.type.name === "heading" &&
+      parentNode.firstChild === currentNode;
+
+    // move the entire callout
+    if (isFirstHeading) {
+      targetType = $from.node($from.depth - 1).type;
+    }
+
+    currentResolved = findParentNodeOfType(targetType)(state.selection);
   }
 
   if (!currentResolved) {
@@ -156,17 +184,6 @@ function moveNode(editor: Editor, dir: "up" | "down") {
   const parentPos = $from.start(parentDepth);
 
   if (currentNode.type !== targetType) {
-    return false;
-  }
-
-  if (
-    (targetType === editor.schema.nodes.outlineListItem &&
-      parent.type.name !== "outlineList") ||
-    (targetType === editor.schema.nodes.taskItem &&
-      parent.type.name !== "taskList") ||
-    (targetType === editor.schema.nodes.listItem &&
-      !["bulletList", "orderedList"].includes(parent.type.name))
-  ) {
     return false;
   }
 
