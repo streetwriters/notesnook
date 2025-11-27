@@ -112,7 +112,7 @@
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-keychain": "4.0.5",
     "react-native-material-menu": "^2.0.0",
-    "react-native-mmkv-storage": "^0.11.2",
+    "react-native-mmkv-storage": "^12.0.0",
     "react-native-modal-datetime-picker": "14.0.0",
     "react-native-navigation-bar-color": "2.0.2",
     "react-native-notification-sounds": "0.5.5",
