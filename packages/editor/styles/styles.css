@@ -27,10 +27,6 @@
   pointer-events: none;
 }
 
-.ProseMirror p code {
-  background-color: var(--background-secondary);
-}
-
 .ProseMirror:first-child {
   margin-top: 10px;
 }
@@ -54,13 +50,14 @@
 }
 
 .ProseMirror p code {
-  background-color: var(--background);
+  background-color: var(--background-secondary);
   border: 1px solid var(--border);
+  color: var(--paragraph-secondary);
   border-radius: 5px;
-  padding: 3px 5px 0px 5px;
+  padding: 2px 5px 2px 5px;
   font-family: ui-monospace, SFMono-Regular, SF Mono, Consolas, Liberation Mono,
     Menlo, monospace !important;
-  font-size: 10pt !important;
+  font-size: 85%;
 }
 
 .ProseMirror code > span {
