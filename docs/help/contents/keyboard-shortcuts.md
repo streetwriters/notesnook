@@ -81,3 +81,5 @@ The following keyboard shortcuts will help you navigate Notesnook faster.
 | Toggle text color | Ctrl Alt C | Ctrl Alt C | ⌘ ⌥ C |
 | Move line up | Alt ↑ | Alt ↑ | ⌥ ↑ |
 | Move line down | Alt ↓ | Alt ↓ | ⌥ ↓ |
+| Move parent node up | Alt ⇧ ↑ | Alt ⇧ ↑ | ⌥ ⇧ ↑ |
+| Move parent node down | Alt ⇧ ↓ | Alt ⇧ ↓ | ⌥ ⇧ ↓ |
