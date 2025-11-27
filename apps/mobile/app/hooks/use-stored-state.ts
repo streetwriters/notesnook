@@ -38,12 +38,23 @@ export function useStoredValue<T>(
       cancelAnimationFrame(frameRef.current);
       frameRef.current = requestAnimationFrame(() => {
         MMKV.setMap(refKey, {
-          value: value
+          value: next
         });
       });
     },
     reset() {
       MMKV.removeItem(refKey);
+      setValue(initialValue);
     }
   };
+}
+
+export function resetStoredState(forKey: string, value?: any) {
+  if (value) {
+    MMKV.setMap(`storedState:${forKey}`, {
+      value: value
+    });
+  } else {
+    MMKV.removeItem(`storedState:${forKey}`);
+  }
 }

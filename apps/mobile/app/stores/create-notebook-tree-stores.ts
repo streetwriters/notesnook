@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { Notebook } from "@notesnook/core";
-import create from "zustand";
+import { create } from "zustand";
 import { persist, StateStorage } from "zustand/middleware";
 import { db } from "../common/database";
 import { MMKV } from "../common/database/mmkv";
@@ -204,12 +204,15 @@ export function createNotebookTreeStores(
     selectionEnabled
   );
 
-  const useNotebookExpandedStore = create<{
-    expanded: {
-      [id: string]: boolean;
-    };
-    setExpanded: (id: string) => void;
-  }>(
+  const useNotebookExpandedStore = create<
+    {
+      expanded: {
+        [id: string]: boolean;
+      };
+      setExpanded: (id: string) => void;
+    },
+    any
+  >(
     persist(
       (set, get) => ({
         expanded: {

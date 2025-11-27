@@ -15,6 +15,49 @@ describe("NOTE TESTS", () => {
       .run();
   });
 
+  it("Note history is created", async () => {
+    await TestBuilder.create()
+      .prepare()
+      .createNote("Test note", "This is a test note")
+      .waitAndTapById(notesnook.listitem.menu)
+      .wait()
+      .waitAndTapById("icon-history")
+      .isNotVisibleByText("No note history available for this device.")
+      .run();
+  });
+
+  it("Duplicate note", async () => {
+    await TestBuilder.create()
+      .prepare()
+      .createNote("Test note", "This is a test note")
+      .waitAndTapById(notesnook.listitem.menu)
+      .wait()
+      .waitAndTapById("icon-duplicate")
+      .isVisibleByText("Test note (Copy)")
+      .run();
+  });
+
+  it("Archive a note", async () => {
+    await TestBuilder.create()
+      .prepare()
+      .createNote("Test note")
+      .saveResult()
+      .waitAndTapById(notesnook.listitem.menu)
+      .wait(500)
+      .waitAndTapById("icon-archive")
+      .pressBack()
+      .navigate("Archive")
+      .isVisibleByText("Test note")
+      .waitAndTapById(notesnook.listitem.menu)
+      .wait(500)
+      .waitAndTapById("icon-archive")
+      .pressBack()
+      .isNotVisibleByText("Test note")
+      .navigate("Notes")
+      .isVisibleByText("Test note")
+      .run();
+  });
+
   it("Notes properties should show", async () => {
     await TestBuilder.create()
       .prepare()

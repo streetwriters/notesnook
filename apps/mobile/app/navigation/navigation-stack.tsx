@@ -21,7 +21,6 @@ import { useThemeColors } from "@notesnook/theme";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as React from "react";
-import { db } from "../common/database";
 import { hideAllTooltips } from "../hooks/use-tooltip";
 import SettingsService from "../services/settings";
 import useNavigationStore, {
@@ -31,10 +30,19 @@ import { useSelectionStore } from "../stores/use-selection-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { rootNavigatorRef } from "../utils/global-refs";
 import Navigation from "../services/navigation";
-import { useIsFeatureAvailable } from "@notesnook/common";
+import { isFeatureAvailable } from "@notesnook/common";
+import { useStoredValue } from "../hooks/use-stored-state";
+import { db } from "../common/database";
 
 const RootStack = createNativeStackNavigator();
 const AppStack = createNativeStackNavigator();
+const DEFAULT_HOME: {
+  name: string;
+  params: any;
+} = {
+  name: "Notes",
+  params: undefined
+};
 
 let Notes: any = null;
 let Notebook: any = null;
@@ -48,101 +56,107 @@ let ColoredNotes: any = null;
 let Archive: any = null;
 const AppNavigation = React.memo(
   () => {
-    const customHomepageFeature = useIsFeatureAvailable("customHomepage");
     const { colors } = useThemeColors();
-    const [home, setHome] = React.useState<{
-      name: string;
-      params: any;
-    }>();
-    const homepageV2 = SettingsService.get().homepageV2;
+    const homepageV2 = useSettingStore((state) => state.settings.homepageV2);
+    const home = useStoredValue(
+      "app-home-navigtion-key",
+      !homepageV2 || homepageV2.id === DEFAULT_HOME.name
+        ? DEFAULT_HOME
+        : undefined
+    );
     const loading = useSettingStore((state) => state.isAppLoading);
 
-    React.useEffect(() => {
-      (async () => {
-        if (loading) return;
-        if (!homepageV2 || !customHomepageFeature?.isAllowed) {
-          setHome({
-            name: "Notes",
-            params: undefined
-          });
-          return;
-        }
+    if (!home.value && !homepageV2) {
+      home.value = DEFAULT_HOME;
+    }
 
-        switch (homepageV2.type) {
-          case "notebook":
-            {
-              const notebook = await db.notebooks.notebook(homepageV2.id);
-              if (notebook) {
-                setHome({
-                  name: "Notebook",
+    React.useEffect(() => {
+      if (!homepageV2 || loading) return;
+      (async () => {
+        isFeatureAvailable("customHomepage").then((value) => {
+          if (!value.isAllowed) {
+            home.value = DEFAULT_HOME;
+            SettingsService.setProperty("homepageV2", undefined);
+          }
+        });
+
+        if (!home.value) {
+          switch (homepageV2.type) {
+            case "notebook":
+              {
+                const notebook = await db.notebooks.notebook(homepageV2.id);
+                if (notebook) {
+                  home.value = {
+                    name: "Notebook",
+                    params: {
+                      item: notebook,
+                      id: notebook.id,
+                      title: notebook.title
+                    }
+                  };
+                  return;
+                }
+              }
+              break;
+            case "color": {
+              const color = await db.colors.color(homepageV2.id);
+              if (color) {
+                home.value = {
+                  name: "ColoredNotes",
                   params: {
-                    item: notebook,
-                    id: notebook.id,
-                    title: notebook.title
+                    item: color,
+                    id: color.id,
+                    title: color.title
                   }
-                });
+                };
                 return;
               }
-            }
-            break;
-          case "color": {
-            const color = await db.colors.color(homepageV2.id);
-            if (color) {
-              setHome({
-                name: "ColoredNotes",
-                params: {
-                  item: color,
-                  id: color.id,
-                  title: color.title
-                }
-              });
-              return;
-            }
 
-            break;
-          }
-          case "tag": {
-            const tag = await db.tags.tag(homepageV2.id);
-            if (tag) {
-              setHome({
-                name: "TaggedNotes",
-                params: {
-                  item: tag,
-                  id: tag.id,
-                  title: tag.title
-                }
-              });
+              break;
+            }
+            case "tag": {
+              const tag = await db.tags.tag(homepageV2.id);
+              if (tag) {
+                home.value = {
+                  name: "TaggedNotes",
+                  params: {
+                    item: tag,
+                    id: tag.id,
+                    title: tag.title
+                  }
+                };
+                return;
+              }
+              break;
+            }
+            case "default":
+              {
+                home.value = DEFAULT_HOME;
+              }
               return;
-            }
-            break;
           }
-          case "default":
-            {
-              setHome({
-                name: homepageV2.id,
-                params: undefined
-              });
-            }
-            return;
+
+          home.value = undefined;
+          setTimeout(() => {
+            home.value = DEFAULT_HOME;
+          });
         }
-
-        setHome({
-          name: "Notes",
-          params: undefined
-        });
       })();
-    }, [homepageV2, loading]);
+    }, [homepageV2, loading, home.value]);
 
     React.useEffect(() => {
-      useNavigationStore.getState().update(home?.name as keyof RouteParams);
+      if (!home) return;
       useNavigationStore
         .getState()
-        .setFocusedRouteId(home?.params?.id || home?.name);
+        .update(home.value?.name as keyof RouteParams);
+      useNavigationStore
+        .getState()
+        .setFocusedRouteId(home.value?.params?.id || home.value?.name);
     }, [home]);
 
-    return !home ? null : (
+    return !home.value ? null : (
       <AppStack.Navigator
-        initialRouteName={home.name}
+        initialRouteName={home.value?.name}
         screenOptions={{
           headerShown: false,
           animation: "none",
@@ -182,7 +196,9 @@ const AppNavigation = React.memo(
               TaggedNotes || require("../screens/notes/tagged").default;
             return TaggedNotes;
           }}
-          initialParams={home.name === "TaggedNotes" ? home.params : undefined}
+          initialParams={
+            home.value?.name === "TaggedNotes" ? home.value?.params : undefined
+          }
         />
 
         <AppStack.Screen
@@ -192,7 +208,9 @@ const AppNavigation = React.memo(
               ColoredNotes || require("../screens/notes/colored").default;
             return ColoredNotes;
           }}
-          initialParams={home.name === "ColoredNotes" ? home.params : undefined}
+          initialParams={
+            home.value?.name === "ColoredNotes" ? home.value?.params : undefined
+          }
         />
 
         <AppStack.Screen
@@ -226,7 +244,9 @@ const AppNavigation = React.memo(
             Notebook = Notebook || require("../screens/notebook").default;
             return Notebook;
           }}
-          initialParams={home.name === "Notebook" ? home.params : undefined}
+          initialParams={
+            home.value?.name === "Notebook" ? home.value?.params : undefined
+          }
         />
 
         <AppStack.Screen

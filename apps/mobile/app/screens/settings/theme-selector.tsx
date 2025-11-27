@@ -28,9 +28,8 @@ import type {
   ThemeMetadata,
   ThemesRouter
 } from "@notesnook/themes-server";
-import DocumentPicker from "react-native-document-picker";
+import { pick } from "@react-native-documents/picker";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { MasonryFlashList } from "@shopify/flash-list";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 import { createTRPCReact } from "@trpc/react-query";
@@ -57,6 +56,7 @@ import { Pressable } from "../../components/ui/pressable";
 import { getColorLinearShade } from "../../utils/colors";
 import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../utils/styles";
+import { LegendList } from "@legendapp/list";
 
 const THEME_SERVER_URL = "https://themes-api.notesnook.com";
 //@ts-ignore
@@ -413,10 +413,10 @@ function ThemeSelector() {
               icon="folder"
               fontSize={AppFontSize.xs}
               onPress={() => {
-                DocumentPicker.pickSingle({
+                pick({
                   allowMultiSelection: false
                 }).then((r) => {
-                  fetch(r.uri).then(async (response) => {
+                  fetch(r[0].uri).then(async (response) => {
                     const json = await response.json();
                     const result = validateTheme(json);
                     if (result.error) {
@@ -431,7 +431,7 @@ function ThemeSelector() {
           </View>
         </View>
 
-        <MasonryFlashList
+        <LegendList
           numColumns={2}
           data={[
             ...(colorScheme === "dark" || (searchQuery && searchQuery !== "")

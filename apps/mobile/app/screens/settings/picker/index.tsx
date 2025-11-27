@@ -58,7 +58,7 @@ export function SettingsPicker<T>({
   onVerify
 }: PickerOptions<T>) {
   const { colors, isDark } = useThemeColors("contextMenu");
-  const menuRef = useRef<any>();
+  const menuRef = useRef<any>(null);
   const [width, setWidth] = useState(0);
   const [currentValue, setCurrentValue] = useState(getValue());
 

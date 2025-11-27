@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/no-var-requires */
+import { isFeatureAvailable, useAreFeaturesAvailable } from "@notesnook/common";
 import { ItemReference } from "@notesnook/core";
 import type { Attachment } from "@notesnook/editor";
 import { EditorEvents } from "@notesnook/editor-mobile/src/utils/editor-events";
@@ -42,6 +43,7 @@ import { Properties } from "../../../components/properties";
 import EditorTabs from "../../../components/sheets/editor-tabs";
 import { Issue } from "../../../components/sheets/github/issue";
 import LinkNote from "../../../components/sheets/link-note";
+import PaywallSheet from "../../../components/sheets/paywall";
 import { RelationsList } from "../../../components/sheets/relations-list";
 import TableOfContents from "../../../components/sheets/toc";
 import { DDS } from "../../../services/device-detection";
@@ -54,6 +56,7 @@ import {
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import SettingsService from "../../../services/settings";
+import useNavigationStore from "../../../stores/use-navigation-store";
 import { useRelationStore } from "../../../stores/use-relation-store";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { useTagStore } from "../../../stores/use-tag-store";
@@ -66,7 +69,6 @@ import {
   eOnExitEditor,
   eOnLoadNote,
   eOpenFullscreenEditor,
-  eOpenPremiumDialog,
   eOpenPublishNoteDialog,
   eUnlockWithBiometrics,
   eUnlockWithPassword
@@ -74,15 +76,12 @@ import {
 import { openLinkInBrowser } from "../../../utils/functions";
 import { fluidTabsRef } from "../../../utils/global-refs";
 import { sleep } from "../../../utils/time";
+import AddReminder from "../../add-reminder";
 import ManageTags from "../../manage-tags";
 import { useDragState } from "../../settings/editor/state";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { useTabStore } from "./use-tab-store";
 import { editorState, openInternalLink } from "./utils";
-import AddReminder from "../../add-reminder";
-import { isFeatureAvailable, useAreFeaturesAvailable } from "@notesnook/common";
-import PaywallSheet from "../../../components/sheets/paywall";
-import useNavigationStore from "../../../stores/use-navigation-store";
 
 const publishNote = async () => {
   const user = useUserStore.getState().user;
@@ -164,7 +163,7 @@ export const useEditorEvents = (
     state.dateFormat,
     state.timeFormat
   ]);
-  const handleBack = useRef<NativeEventSubscription>();
+  const handleBack = useRef<NativeEventSubscription>(undefined);
   const loggedIn = useUserStore((state) => !!state.user);
   const { fontScale } = useWindowDimensions();
 
@@ -456,9 +455,8 @@ export const useEditorEvents = (
             relationType: "from",
             title: strings.dataTypesPluralCamelCase.reminder(),
             onAdd: async () => {
-              const reminderFeature = await isFeatureAvailable(
-                "activeReminders"
-              );
+              const reminderFeature =
+                await isFeatureAvailable("activeReminders");
               if (!reminderFeature.isAllowed) {
                 ToastManager.show({
                   type: "info",

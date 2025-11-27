@@ -53,7 +53,7 @@ export const hideAllTooltips = async () => {
  */
 const useTooltip = () => {
   const { colors, isDark } = useThemeColors();
-  const parent = useRef();
+  const parent = useRef(undefined);
   const keyboard = useKeyboard();
 
   useEffect(() => {

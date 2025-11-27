@@ -94,9 +94,7 @@ export async function encryptDatabaseKeyWithPassword(appLockPassword: string) {
 }
 
 export async function restoreDatabaseKeyToKeyChain(appLockPassword: string) {
-  const databaseKeyCipher: Cipher = CipherStorage.getMap(
-    DB_KEY_CIPHER
-  ) as Cipher;
+  const databaseKeyCipher = CipherStorage.getMap(DB_KEY_CIPHER) as Cipher;
   const databaseKey = (await decrypt(
     {
       password: appLockPassword
@@ -207,9 +205,8 @@ export async function getDatabaseKey(appLockPassword?: string) {
   }
 
   if (await Keychain.hasInternetCredentials("notesnook")) {
-    const userKeyCredentials = await Keychain.getInternetCredentials(
-      "notesnook"
-    );
+    const userKeyCredentials =
+      await Keychain.getInternetCredentials("notesnook");
 
     if (userKeyCredentials) {
       const userKeyCipher: Cipher = (await encrypt(

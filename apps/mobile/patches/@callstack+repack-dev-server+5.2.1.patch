@@ -1,0 +1,13 @@
+diff --git a/node_modules/@callstack/repack-dev-server/dist/createServer.js b/node_modules/@callstack/repack-dev-server/dist/createServer.js
+index 4e8baba..3d6d16e 100644
+--- a/node_modules/@callstack/repack-dev-server/dist/createServer.js
++++ b/node_modules/@callstack/repack-dev-server/dist/createServer.js
+@@ -101,7 +101,7 @@ export async function createServer(config) {
+                 handleDeviceMessage: () => { },
+                 handleDebuggerMessage: (msg) => {
+                     if (msg.method === 'Network.loadNetworkResource') {
+-                        connection.device.sendMessage(msg);
++                        // connection.device.sendMessage(msg);
+                         return true;
+                     }
+                 },

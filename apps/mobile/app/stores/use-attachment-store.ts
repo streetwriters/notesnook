@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import create from "zustand";
+import { create } from "zustand";
 import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
 import { editorController } from "../screens/editor/tiptap/utils";
 

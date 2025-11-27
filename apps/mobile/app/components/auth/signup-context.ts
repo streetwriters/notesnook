@@ -19,9 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { useContext } from "react";
 
 export const SignupContext = React.createContext<{
-  signup?: () => Promise<boolean>;
+  signup: () => Promise<boolean | undefined>;
 }>({
-  signup: undefined
+  signup: async () => {
+    return false;
+  }
 });
 
 export const useSignupContext = () => useContext(SignupContext);

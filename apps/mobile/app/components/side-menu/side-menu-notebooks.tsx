@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Notebook } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import { FlashList } from "@shopify/flash-list";
 import React, { useEffect, useState } from "react";
 import { TextInput, View } from "react-native";
 import { db } from "../../common/database";
@@ -40,6 +39,7 @@ import {
   useSideMenuNotebookSelectionStore,
   useSideMenuNotebookTreeStore
 } from "./stores";
+import { LegendList } from "@legendapp/list";
 useSideMenuNotebookSelectionStore.setState({
   multiSelect: true
 });
@@ -50,8 +50,8 @@ export const SideMenuNotebooks = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { colors } = useThemeColors();
   const [filteredNotebooks, setFilteredNotebooks] = React.useState(notebooks);
-  const searchTimer = React.useRef<NodeJS.Timeout>();
-  const lastQuery = React.useRef<string>();
+  const searchTimer = React.useRef<NodeJS.Timeout>(undefined);
+  const lastQuery = React.useRef<string>(undefined);
   const loadRootNotebooks = React.useCallback(async () => {
     if (!filteredNotebooks) return;
     const _notebooks: Notebook[] = [];
@@ -145,12 +145,11 @@ export const SideMenuNotebooks = () => {
         />
       ) : (
         <>
-          <FlashList
+          <LegendList
             data={tree}
             bounces={false}
             bouncesZoom={false}
             overScrollMode="never"
-            // keyExtractor={(item,) => item.notebook.id}
             estimatedItemSize={30}
             ListHeaderComponent={
               <View

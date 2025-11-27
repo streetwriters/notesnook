@@ -51,7 +51,7 @@ const ColorPicker = ({
   const [selectedColor, setSelectedColor] = useState<string>();
   const { colors } = useThemeColors();
   const inputRef = useRef<TextInput>(null);
-  const title = useRef<string>();
+  const title = useRef<string>(undefined);
   const colorRef = useStoredRef("color-ref", "#f0f0f0");
 
   return (

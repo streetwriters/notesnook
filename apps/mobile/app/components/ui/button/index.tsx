@@ -55,6 +55,7 @@ export interface ButtonProps extends PressableProps {
   iconColor?: ColorValue;
   iconStyle?: TextStyle;
   proTag?: boolean;
+  allowFontScaling?: boolean;
 }
 export const Button = ({
   height = 45,
@@ -79,6 +80,7 @@ export const Button = ({
   fwdRef,
   proTag,
   iconStyle,
+  allowFontScaling = true,
   ...restProps
 }: ButtonProps) => {
   const { text } = useButton({
@@ -138,7 +140,7 @@ export const Button = ({
       {icon && !loading && iconPosition === "left" ? (
         <Icon
           name={icon}
-          allowFontScaling
+          allowFontScaling={allowFontScaling}
           style={[{ marginRight: 0 }, iconStyle as any]}
           color={iconColor || buttonType?.text || textColor}
           size={iconSize}
@@ -150,6 +152,7 @@ export const Button = ({
           color={textColor as string}
           size={fontSize}
           numberOfLines={1}
+          allowFontScaling={allowFontScaling}
           style={[
             {
               marginLeft: icon || (loading && iconPosition === "left") ? 5 : 0,

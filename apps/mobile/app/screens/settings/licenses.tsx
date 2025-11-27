@@ -16,15 +16,16 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { LegendList } from "@legendapp/list";
+import { useThemeColors } from "@notesnook/theme";
 import React from "react";
-import { LICENSES } from "./license-data";
-import { FlatList, Linking, Platform } from "react-native";
+import { Linking, Platform } from "react-native";
 import { Pressable } from "../../components/ui/pressable";
 import Heading from "../../components/ui/typography/heading";
-import { AppFontSize } from "../../utils/size";
-import { useThemeColors } from "@notesnook/theme";
 import Paragraph from "../../components/ui/typography/paragraph";
+import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
+import { LICENSES } from "./license-data";
 
 type LicenseEntry = {
   name: string;
@@ -69,7 +70,7 @@ export const Licenses = () => {
     [colors.primary.border]
   );
   return (
-    <FlatList
+    <LegendList
       data={items}
       style={{
         width: "100%"

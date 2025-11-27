@@ -1,0 +1,89 @@
+# Resolve react_native_pods.rb with node to allow for hoisting
+require Pod::Executable.execute_command('node', ['-p',
+  'require.resolve(
+    "react-native/scripts/react_native_pods.rb",
+    {paths: [process.argv[1]]},
+  )', __dir__]).strip
+
+platform :ios, min_ios_version_supported
+prepare_react_native_project!
+
+linkage = ENV['USE_FRAMEWORKS']
+if linkage != nil
+  Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
+  use_frameworks! :linkage => linkage.to_sym
+end
+
+
+pod 'Base64'
+pod 'SexyTooltip',:git => 'https://github.com/ammarahm-ed/SexyTooltip.git'
+pod 'MMKV'
+
+rn_path = nil
+node_modules_path = nil
+
+target 'Notesnook' do
+
+  config = use_native_modules!
+  rn_path = config[:reactNativePath]
+  node_modules_path = File.expand_path('../node_modules', File.dirname(rn_path))
+
+  use_react_native!(
+    :path => rn_path,
+    # Hermes is now enabled by default. Disable by setting this flag to false.
+    # Upcoming versions of React Native may rely on get_default_flags(), but
+    # we make it explicit here to aid in the React Native upgrade process.
+    :hermes_enabled => true,
+    :fabric_enabled => true,
+    :app_path => "#{Pod::Config.instance.installation_root}/.."
+  )
+
+  target 'NotesnookTests' do
+
+    # Pods for testing
+  end
+
+  target 'Make Note' do
+    use_react_native!(
+    :path => rn_path,
+    # Hermes is now enabled by default. Disable by setting this flag to false.
+    # Upcoming versions of React Native may rely on get_default_flags(), but
+    # we make it explicit here to aid in the React Native upgrade process.
+    :hermes_enabled => true,
+    :fabric_enabled => true,
+    :app_path => "#{Pod::Config.instance.installation_root}/.."
+    )
+    inherit! :complete
+  end
+end
+
+post_install do |installer|
+  react_native_post_install(
+      installer,
+      react_native_path = rn_path,
+      # Set `mac_catalyst_enabled` to `true` in order to apply patches
+      # necessary for Mac Catalyst builds
+      :mac_catalyst_enabled => false,
+      # :ccache_enabled => true
+    )
+  installer.pods_project.targets.each do |target|
+  target.build_configurations.each do |config|
+      config.build_settings['APPLICATION_EXTENSION_API_ONLY'] = 'NO'
+      config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
+    end
+  end
+  installer.pods_project.targets.each do |target|
+    if target.name == "react-native-quick-sqlite" then
+      target.build_configurations.each do |config|
+        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] = 'SQLITE_CORE=1 SQLITE_ENABLE_FTS5=1 SQLITE3MC_OMIT_AES_HARDWARE_SUPPORT=1 HAVE_CIPHER_AES_128_CBC=0 HAVE_CIPHER_AES_256_CBC=0 HAVE_CIPHER_SQLCIPHER=0 HAVE_CIPHER_RC4=0 HAVE_CIPHER_CHACHA20=1 SQLITE_OMIT_PROGRESS_CALLBACK=1 SQLITE_MAX_EXPR_DEPTH=0 SQLITE_OMIT_DEPRECATED=1 SQLITE_LIKE_DOESNT_MATCH_BLOBS=1 SQLITE_DQS=0 SQLITE_DEFAULT_MEMSTATUS=0 SQLITE_USE_ALLOCA=1 SQLITE_ENABLE_REGEXP=1'
+      end
+    end
+  end
+  installer.pods_project.targets.each do |target|
+        if target.respond_to?(:product_type) and target.product_type == "com.apple.product-type.bundle"
+          target.build_configurations.each do |config|
+              config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+          end
+        end
+      end
+end

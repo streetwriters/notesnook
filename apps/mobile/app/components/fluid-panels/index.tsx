@@ -67,7 +67,7 @@ export interface TabsRef {
   page: () => FluidTabPage;
   setScrollEnabled: () => true;
   isDrawerOpen: () => boolean;
-  node: RefObject<Animated.View>;
+  node: RefObject<Animated.View | null>;
   tabChangedFromSwipeAction: SharedValue<boolean>;
 }
 
