@@ -707,6 +707,10 @@ p > *::selection {
   mask-size: cover;
 }
 
+.simple-checklist > li.checked p {
+  opacity: 0.8;
+}
+
 /* Callout */
 .ProseMirror div.callout {
   padding: 15px;
@@ -975,6 +979,21 @@ del.diffdel {
 .ProseMirror div.callout h4::before,
 .ProseMirror div.callout h5::before,
 .ProseMirror div.callout h6::before {
+  display: none;
+}
+
+.ProseMirror table h1::before,
+.ProseMirror table h2::before,
+.ProseMirror table h3::before,
+.ProseMirror table h4::before,
+.ProseMirror table h5::before,
+.ProseMirror table h6::before,
+.ProseMirror table h1::after,
+.ProseMirror table h2::after,
+.ProseMirror table h3::after,
+.ProseMirror table h4::after,
+.ProseMirror table h5::after,
+.ProseMirror table h6::after {
   display: none;
 }
 

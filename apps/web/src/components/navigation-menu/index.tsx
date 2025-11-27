@@ -506,6 +506,8 @@ function RouteItem({
               ? "trash"
               : item.path === "/favorites"
               ? "favorites"
+              : item.path == "/archive"
+              ? "archive"
               : undefined
         });
       }}
