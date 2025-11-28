@@ -64,3 +64,6 @@
 -keep class com.google.gson.reflect.TypeToken { *; }
 -keep class * extends com.google.gson.reflect.TypeToken
 -keep class com.streetwriters.notesnook.datatypes.* { *; }
+
+-keep class net.gotev.uploadservice.* { *; }
+-keep class kotlinx.parcelize.* { *; }
