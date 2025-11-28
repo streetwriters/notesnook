@@ -4,6 +4,7 @@
 #import "RNShortcuts.h"
 #import "RNBootSplash.h"
 #import <ReactAppDependencyProvider/RCTAppDependencyProvider.h>
+#import "RNFileUploader.h"
 
 @interface ReactNativeDelegate : RCTDefaultReactNativeFactoryDelegate
 @end
@@ -77,6 +78,10 @@
 
 - (void)customizeRootView:(RCTRootView *)rootView {
   [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView]; // ⬅️ initialize the splash screen
+}
+
+- (void)application:(UIApplication *)application handleEventsForBackgroundURLSession:(NSString *)identifier completionHandler:(void (^)())completionHandler {
+  [RNFileUploader setCompletionHandlerWithIdentifier:identifier completionHandler:completionHandler];
 }
 
 @end

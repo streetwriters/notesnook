@@ -205,7 +205,9 @@ const camera = async (options: PickerOptions) => {
           options
         );
       })
-      .catch((e) => {});
+      .catch((e) => {
+        console.log(e);
+      });
   } catch (e) {
     ToastManager.show({
       heading: (e as Error).message,
