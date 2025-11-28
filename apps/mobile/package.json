@@ -32,7 +32,7 @@
     "@ammarahmed/react-native-fingerprint-scanner": "^5.0.1",
     "@ammarahmed/react-native-share-extension": "^2.9.5",
     "@ammarahmed/react-native-sodium": "^1.6.8",
-    "@ammarahmed/react-native-upload": "^6.27.0",
+    "@ammarahmed/react-native-upload": "^6.28.0",
     "@azure/core-asynciterator-polyfill": "^1.0.2",
     "@bam.tech/react-native-image-resizer": "3.0.11",
     "@callstack/repack": "~5.2.1",
