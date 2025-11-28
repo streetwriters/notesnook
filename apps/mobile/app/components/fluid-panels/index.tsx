@@ -31,6 +31,7 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   runOnJS,
   SharedValue,
+  SnappySpringConfig,
   useAnimatedReaction,
   useAnimatedStyle,
   useSharedValue,
@@ -354,13 +355,9 @@ export const FluidPanels = forwardRef<TabsRef, TabProps>(function FluidTabs(
       const finalValue = isSwipeLeft
         ? translateX.value - velocityX / 40.0
         : translateX.value + velocityX / 40.0;
-
       const animationConfig: WithSpringConfig = {
-        velocity: velocityX,
-        mass: 0.5,
-        overshootClamping: true,
-        damping: 800,
-        stiffness: 800
+        velocity: velocityX / 10,
+        ...SnappySpringConfig
       };
 
       if (finalValue < homePosition) {

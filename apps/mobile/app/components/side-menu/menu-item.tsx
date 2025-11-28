@@ -110,9 +110,9 @@ function _MenuItem({
         canGoBack: false
       });
     }
-    setImmediate(() => {
+    setTimeout(() => {
       Navigation.closeDrawer();
-    });
+    }, 32);
   };
 
   return (
@@ -154,8 +154,8 @@ function _MenuItem({
               item.icon === "crown"
                 ? colors.static.yellow
                 : isFocused
-                ? colors.selected.icon
-                : colors.secondary.icon
+                  ? colors.selected.icon
+                  : colors.secondary.icon
             }
             size={AppFontSize.md}
           />

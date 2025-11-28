@@ -251,6 +251,7 @@ const ShareView = () => {
             setRawData(item);
             if (isURL(item.value)) {
               note = await showLinkPreview(note, item.value);
+              noteTitle.current = note.title;
             } else {
               note.content.data = makeHtmlFromPlainText(item.value);
             }
@@ -261,9 +262,6 @@ const ShareView = () => {
               if (key.includes("TITLE") || key.includes("SUBJECT")) {
                 note.title = item[key];
                 noteTitle.current = note.title;
-                inputRef.current?.setNativeProps?.({
-                  text: noteTitle.current
-                });
               }
               if (key.includes("TEXT") && !note.content.data) {
                 note.content.data = item[key];
@@ -294,6 +292,10 @@ const ShareView = () => {
             }
           }
         }
+
+        inputRef.current?.setNativeProps?.({
+          text: noteTitle.current
+        });
         onLoad();
         setNote({ ...note });
       } catch (e) {
@@ -308,7 +310,6 @@ const ShareView = () => {
       try {
         await initDatabase();
         setLoadingExtension(false);
-        loadData(false);
         useShareStore.getState().restore();
       } catch (e) {
         DatabaseLogger.error(e);
