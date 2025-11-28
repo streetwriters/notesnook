@@ -23,6 +23,8 @@ import { showLinkPopup } from "../../toolbar/popups/link-popup.js";
 import { isListActive } from "../../utils/list.js";
 import { tiptapKeys } from "@notesnook/common";
 import { isInTable } from "../table/prosemirror-tables/util.js";
+import { config } from "../../utils/config.js";
+import { DEFAULT_COLORS } from "../../toolbar/tools/colors.js";
 
 export const KeyMap = Extension.create({
   name: "key-map",
@@ -71,6 +73,11 @@ export const KeyMap = Extension.create({
       [tiptapKeys.insertLink.keys]: ({ editor }) => {
         showLinkPopup(editor);
         return true;
+      },
+      [tiptapKeys.toggleTextColor.keys]: ({ editor }) => {
+        const color =
+          config.get<"string">("textColor") || DEFAULT_COLORS.text[0];
+        return editor.commands.toggleMark("textStyle", { color });
       }
     };
   }
