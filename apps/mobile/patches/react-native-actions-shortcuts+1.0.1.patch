@@ -1,3 +1,22 @@
+diff --git a/node_modules/react-native-actions-shortcuts/android/.settings/org.eclipse.buildship.core.prefs b/node_modules/react-native-actions-shortcuts/android/.settings/org.eclipse.buildship.core.prefs
+deleted file mode 100644
+index 8c253d6..0000000
+--- a/node_modules/react-native-actions-shortcuts/android/.settings/org.eclipse.buildship.core.prefs
++++ /dev/null
+@@ -1,13 +0,0 @@
+-arguments=
+-auto.sync=false
+-build.scans.enabled=false
+-connection.gradle.distribution=GRADLE_DISTRIBUTION(VERSION(6.0))
+-connection.project.dir=
+-eclipse.preferences.version=1
+-gradle.user.home=
+-java.home=/Library/Java/JavaVirtualMachines/jdk1.8.0_144.jdk/Contents/Home
+-jvm.arguments=
+-offline.mode=false
+-override.workspace.settings=true
+-show.console.view=true
+-show.executions.view=true
 diff --git a/node_modules/react-native-actions-shortcuts/android/build.gradle b/node_modules/react-native-actions-shortcuts/android/build.gradle
 index 19bd311..642ddbc 100644
 --- a/node_modules/react-native-actions-shortcuts/android/build.gradle
@@ -3788,7 +3807,7 @@ index b438823..ba03915 100644
          }
  
 diff --git a/node_modules/react-native-actions-shortcuts/android/src/main/java/com/reactnativeshortcuts/ShortcutsModule.kt b/node_modules/react-native-actions-shortcuts/android/src/main/java/com/reactnativeshortcuts/ShortcutsModule.kt
-index ec847cc..a4686a0 100644
+index ec847cc..f101793 100644
 --- a/node_modules/react-native-actions-shortcuts/android/src/main/java/com/reactnativeshortcuts/ShortcutsModule.kt
 +++ b/node_modules/react-native-actions-shortcuts/android/src/main/java/com/reactnativeshortcuts/ShortcutsModule.kt
 @@ -28,18 +28,18 @@ class ShortcutsModule(reactContext: ReactApplicationContext) :
@@ -3853,7 +3872,7 @@ index ec847cc..a4686a0 100644
          shortcutManager?.removeAllDynamicShortcuts()
      }
  
-@@ -145,6 +145,19 @@ class ShortcutsModule(reactContext: ReactApplicationContext) :
+@@ -145,6 +145,17 @@ class ShortcutsModule(reactContext: ReactApplicationContext) :
      fun isSupported(): Boolean {
          return Build.VERSION.SDK_INT >= 25
      }
@@ -3863,9 +3882,7 @@ index ec847cc..a4686a0 100644
 +        requestCode: Int,
 +        resultCode: Int,
 +        data: Intent?
-+    ) {
-+        TODO("Not yet implemented")
-+    }
++    ) {}
 +
 +    override fun onNewIntent(intent: Intent) {
 +        emitEvent(intent)
