@@ -21,6 +21,8 @@ import {
   createEditor,
   h,
   p,
+  ul,
+  li,
   outlineList,
   outlineListItem
 } from "../../../../test-utils/index.js";
@@ -28,6 +30,8 @@ import { test, expect, describe } from "vitest";
 import { KeyMap } from "../key-map.js";
 import { OutlineList } from "../../outline-list/outline-list.js";
 import { OutlineListItem } from "../../outline-list-item/outline-list-item.js";
+import { BulletList } from "../../bullet-list/bullet-list.js";
+import { ListItem } from "../../list-item/list-item.js";
 
 describe("key-map", () => {
   test("move paragraph up", async () => {
@@ -134,5 +138,35 @@ describe("key-map", () => {
       outlineListItem(["item 3"])
     ).outerHTML;
     expect(editor.getHTML()).toBe(expectedHTML);
+  });
+
+  test("move entire bullet list down", async () => {
+    const el = h("div", [
+      p(["para 1"]),
+      ul([li([p(["list item 1"])]), li([p(["list item 2"])])]),
+      p(["para 2"])
+    ]);
+    const editorElement = h("div");
+    const { editor } = createEditor({
+      element: editorElement,
+      initialContent: el.innerHTML,
+      extensions: {
+        KeyMap: KeyMap,
+        bulletList: BulletList,
+        listItem: ListItem
+      }
+    });
+
+    editor.commands.setTextSelection({ from: 10, to: 10 });
+    const event = new KeyboardEvent("keydown", {
+      key: "ArrowDown",
+      altKey: true,
+      shiftKey: true
+    });
+    editor.view.dom.dispatchEvent(event);
+
+    expect(editor.getHTML()).toBe(
+      `<p>para 1</p><p>para 2</p><ul><li><p>list item 1</p></li><li><p>list item 2</p></li></ul>`
+    );
   });
 });
