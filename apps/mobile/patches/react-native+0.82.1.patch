@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-native/Libraries/Components/Keyboard/KeyboardAvoidingView.js b/node_modules/react-native/Libraries/Components/Keyboard/KeyboardAvoidingView.js
+index 6eca156..5a42107 100644
+--- a/node_modules/react-native/Libraries/Components/Keyboard/KeyboardAvoidingView.js
++++ b/node_modules/react-native/Libraries/Components/Keyboard/KeyboardAvoidingView.js
+@@ -208,7 +208,7 @@ class KeyboardAvoidingView extends React.Component<
+       ];
+     } else {
+       this._subscriptions = [
+-        Keyboard.addListener('keyboardDidHide', this._onKeyboardChange),
++        Keyboard.addListener('keyboardDidHide', this._onKeyboardHide),
+         Keyboard.addListener('keyboardDidShow', this._onKeyboardChange),
+       ];
+     }
