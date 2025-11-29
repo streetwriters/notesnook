@@ -41,7 +41,7 @@ type ColorToolProps = ToolProps & {
   type: ColorType;
 };
 
-const DEFAULT_COLORS: Record<ColorType, string[]> = {
+export const DEFAULT_COLORS: Record<ColorType, string[]> = {
   background: [
     "#b0bec5", // Neutralized pink
     "#a1887f", // Neutralized purple
