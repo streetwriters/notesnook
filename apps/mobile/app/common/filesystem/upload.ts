@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { RequestOptions } from "@notesnook/core";
-import { Platform } from "react-native";
+import { isImage, RequestOptions } from "@notesnook/core";
+import { PermissionsAndroid, Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import { ToastManager } from "../../services/event-manager";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
@@ -31,6 +31,7 @@ import {
   FileSizeResult,
   getUploadedFileSize
 } from "./utils";
+import Upload from "@ammarahmed/react-native-upload";
 
 export async function uploadFile(
   filename: string,
@@ -64,47 +65,87 @@ export async function uploadFile(
       );
     }
 
-    const fileSize = (await RNFetchBlob.fs.stat(filePath)).size;
+    const fileInfo = await RNFetchBlob.fs.stat(filePath);
 
     const remoteFileSize = await getUploadedFileSize(filename);
     if (remoteFileSize === FileSizeResult.Error) return false;
 
-    if (remoteFileSize > FileSizeResult.Empty && remoteFileSize === fileSize) {
+    if (
+      remoteFileSize > FileSizeResult.Empty &&
+      remoteFileSize === fileInfo.size
+    ) {
       DatabaseLogger.log(`File ${filename} is already uploaded.`);
       return true;
     }
 
-    DatabaseLogger.info(`Starting upload: ${filename}`);
+    let attachmentInfo = await db.attachments.attachment(filename);
 
-    const uploadRequest = RNFetchBlob.config({
-      //@ts-ignore
-      IOSBackgroundTask: !globalThis["IS_SHARE_EXTENSION"]
-    })
-      .fetch(
-        "PUT",
-        url,
-        {
-          ...headers,
-          "content-type": ""
-        },
-        RNFetchBlob.wrap(filePath)
-      )
-      .uploadProgress((sent, total) => {
-        useAttachmentStore
-          .getState()
-          .setProgress(sent, total, filename, 0, "upload");
-        DatabaseLogger.info(
-          `File upload progress: ${filename}, ${sent}/${total}`
-        );
-      });
+    DatabaseLogger.info(
+      `Starting upload of ${filename} at path: ${fileInfo.path} ${fileInfo.size}`
+    );
 
+    if (Platform.OS === "android") {
+      const status = await PermissionsAndroid.request(
+        "android.permission.POST_NOTIFICATIONS"
+      );
+      if (status !== "granted") {
+        ToastManager.show({
+          message: `The permission to show file upload notification was disallowed by the user.`,
+          type: "info"
+        });
+      }
+    }
+
+    const upload = Upload.create({
+      customUploadId: filename,
+      path: Platform.OS === "ios" ? "file://" + fileInfo.path : fileInfo.path,
+      url: url,
+      method: "PUT",
+      headers: {
+        ...headers,
+        "content-type": "application/octet-stream"
+      },
+      appGroup: IOS_APPGROUPID,
+      notification: {
+        filename:
+          attachmentInfo && isImage(attachmentInfo?.mimeType)
+            ? "image"
+            : attachmentInfo?.filename || "file",
+        enabled: true,
+        enableRingTone: true,
+        autoClear: true
+      }
+    }).onChange((event) => {
+      switch (event.status) {
+        case "running":
+        case "pending":
+          useAttachmentStore
+            .getState()
+            .setProgress(
+              event.uploadedBytes || 0,
+              event.totalBytes || fileInfo.size,
+              filename,
+              0,
+              "upload"
+            );
+          DatabaseLogger.info(
+            `File upload progress: ${filename}, ${event.uploadedBytes}/${
+              event.totalBytes || fileInfo.size
+            }`
+          );
+          break;
+        case "completed":
+          console.log("Upload completed");
+          break;
+      }
+    });
+    const result = await upload.start();
     cancelToken.cancel = async () => {
       useAttachmentStore.getState().remove(filename);
-      uploadRequest.cancel();
+      upload.cancel();
     };
 
-    const uploadResponse = await uploadRequest;
-    const status = uploadResponse.info().status;
+    const status = result.responseCode || 0;
     const uploaded = status >= 200 && status < 300;
 
     useAttachmentStore.getState().remove(filename);
@@ -114,12 +155,12 @@ export async function uploadFile(
       throw new Error(
         `${status}, name: ${fileInfo.filename}, length: ${
           fileInfo.size
-        }, info: ${JSON.stringify(uploadResponse.info())}`
+        }, info: ${JSON.stringify(result.error)}`
       );
     }
-    const attachment = await db.attachments.attachment(filename);
-    if (!attachment) return false;
-    await checkUpload(filename, requestOptions.chunkSize, attachment.size);
+    attachmentInfo = await db.attachments.attachment(filename);
+    if (!attachmentInfo) return false;
+    await checkUpload(filename, requestOptions.chunkSize, attachmentInfo.size);
     DatabaseLogger.info(`File upload status: ${filename}, ${status}`);
     return uploaded;
   } catch (e) {

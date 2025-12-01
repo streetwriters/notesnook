@@ -82,9 +82,6 @@ export const EditorWrapper = ({ widths }: { widths: any }) => {
     return 0;
   };
 
-  const KeyboardAvoidingViewIOS =
-    Platform.OS === "ios" ? KeyboardAvoidingView : View;
-
   return (
     <View
       testID="editor-wrapper"
@@ -98,11 +95,12 @@ export const EditorWrapper = ({ widths }: { widths: any }) => {
         borderLeftColor: DDS.isTab
           ? colors.secondary.background
           : "transparent",
-        paddingBottom: insets.bottom
+        paddingBottom:
+          Platform.OS === "android" ? insets.bottom + 10 : insets.bottom
       }}
     >
       {loading || !introCompleted ? null : (
-        <KeyboardAvoidingViewIOS
+        <KeyboardAvoidingView
           behavior="padding"
           style={{
             backgroundColor: colors.primary.background,
@@ -118,7 +116,7 @@ export const EditorWrapper = ({ widths }: { widths: any }) => {
             blurOnSubmit={false}
           />
           <Editor key="editor" withController={true} />
-        </KeyboardAvoidingViewIOS>
+        </KeyboardAvoidingView>
       )}
     </View>
   );

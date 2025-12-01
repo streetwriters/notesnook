@@ -1887,7 +1887,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - react-native-document-picker (10.1.7):
+  - react-native-document-picker (11.0.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -1969,14 +1969,14 @@ PODS:
     - React-Core
     - React-RCTFabric
     - ReactCommon/turbomodule/core
-  - react-native-mmkv-storage (0.11.2):
+  - react-native-mmkv-storage (12.0.0):
     - boost
     - DoubleConversion
     - fast_float
     - fmt
     - glog
     - hermes-engine
-    - MMKV (~> 1.3.9)
+    - MMKV (~> 1.3.14)
     - RCT-Folly
     - RCT-Folly/Fabric
     - RCTRequired
@@ -2244,6 +2244,8 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
+  - react-native-upload (6.27.0):
+    - React
   - react-native-webview (13.16.0):
     - boost
     - DoubleConversion
@@ -3462,6 +3464,7 @@ DEPENDENCIES:
   - "react-native-share-extension (from `../node_modules/@ammarahmed/react-native-share-extension`)"
   - "react-native-sodium (from `../node_modules/@ammarahmed/react-native-sodium`)"
   - react-native-theme-switch-animation (from `../node_modules/react-native-theme-switch-animation`)
+  - "react-native-upload (from `../node_modules/@ammarahmed/react-native-upload`)"
   - react-native-webview (from `../node_modules/react-native-webview`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-oscompat (from `../node_modules/react-native/ReactCommon/oscompat`)
@@ -3675,6 +3678,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@ammarahmed/react-native-sodium"
   react-native-theme-switch-animation:
     :path: "../node_modules/react-native-theme-switch-animation"
+  react-native-upload:
+    :path: "../node_modules/@ammarahmed/react-native-upload"
   react-native-webview:
     :path: "../node_modules/react-native-webview"
   React-NativeModulesApple:
@@ -3855,7 +3860,7 @@ SPEC CHECKSUMS:
   react-native-blob-util: 7946b7e13acf0da5e849dc2f73fcfebe1d981699
   react-native-config: 963b5efabc864cf69412e54b5de49b6a23e4af03
   react-native-date-picker: 4f4f40f6e65798038bb4b1bff47890c2be69c2e6
-  react-native-document-picker: 1734eb0aa3dbd1cd7bf1b105936f9b55031ae616
+  react-native-document-picker: 254467fec90f263dfc4828210daf3e8baa4fcb81
   react-native-fingerprint-scanner: d5e143a361f3f01858e9c45141ddcabc4fd57055
   react-native-get-random-values: d16467cf726c618e9c7a8c3c39c31faa2244bbba
   react-native-gzip: 794e0e964a0d9e1dfd1773fee938adb4d4310e26
@@ -3863,7 +3868,7 @@ SPEC CHECKSUMS:
   react-native-image-resizer: 290b045c34c69db7574e4d08aadfc4abe1ff5a99
   react-native-in-app-review: 1516ba69d60d58053b7eb3aaaf8d2a5a74af8b57
   react-native-keep-awake: a351e6f67006b47f316ae2b17ee8ee69386167f4
-  react-native-mmkv-storage: b7ce5a5eb3d3bfddcf2df127671abba6ef3d76ae
+  react-native-mmkv-storage: 31b7b155e690339f5a25cfe56d5e2f68dee4f066
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
   react-native-notification-sounds: ce106d58df0dd384bccbd2e84fb53accab7cc068
   react-native-orientation-locker: cc6f357b289a2e0dd2210fea0c52cb8e0727fdaa
@@ -3875,6 +3880,7 @@ SPEC CHECKSUMS:
   react-native-share-extension: fdc6aaab51591a2d445df239c446aaa3a99658ec
   react-native-sodium: 066f76e46c9be13e9260521e3fa994937c4cdab4
   react-native-theme-switch-animation: 449d6db7a760f55740505e7403ae8061debc9a7e
+  react-native-upload: f0198bb4db00ff7dae14904ad59da470550be075
   react-native-webview: 654f794a7686b47491cf43aa67f7f428bea00eed
   React-NativeModulesApple: 46690a0fe94ec28fc6fc686ec797b911d251ded0
   React-oscompat: 95875e81f5d4b3c7b2c888d5bd2c9d83450d8bdb
