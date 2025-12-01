@@ -22,7 +22,6 @@ import OrderedList from "@tiptap/extension-ordered-list";
 import { Fragment, Node, Slice } from "@tiptap/pm/model";
 import { Selection } from "@tiptap/pm/state";
 import { ReplaceStep } from "@tiptap/pm/transform";
-import { isListActive } from "../../utils/list.js";
 import {
   findParentNodeClosestToPos,
   findParentNodeOfType
@@ -34,9 +33,12 @@ import { CheckList } from "../check-list/check-list.js";
 import { OutlineList } from "../outline-list/outline-list.js";
 import { Table } from "../table/table.js";
 import { TaskListNode } from "../task-list/task-list.js";
+import { ListItem } from "../list-item/list-item.js";
+import { CheckListItem } from "../check-list-item/check-list-item.js";
+import { TaskItemNode } from "../task-item/task-item.js";
+import { OutlineListItem } from "../outline-list-item/outline-list-item.js";
 
 type ResolvedNode = {
-  pos: number;
   start: number;
   depth: number;
   node: Node;
@@ -55,68 +57,65 @@ function mapChildren<T>(
   return array;
 }
 
-function resolveNode(editor: Editor) {
+const listItems = [
+  ListItem.name,
+  CheckListItem.name,
+  TaskItemNode.name,
+  OutlineListItem.name
+];
+
+function resolveNode(editor: Editor): ResolvedNode | undefined {
   const { state } = editor;
   const { $from } = state.selection;
 
-  let targetType = $from.node().type;
-  let currentResolved = findParentNodeOfType(targetType)(state.selection);
+  const currentNode = $from.node();
+  const parentNode = $from.node($from.depth - 1);
+  let targetType = currentNode.type;
+  let currentResolved: ResolvedNode | undefined = {
+    start: $from.start(),
+    depth: $from.depth,
+    node: currentNode
+  };
 
-  if (isListActive(editor)) {
-    const currentNode = $from.node();
-    const parentNode = $from.node($from.depth - 1);
+  if (listItems.includes(parentNode.type.name)) {
     const isFirstParagraph =
       currentNode.type.name === "paragraph" &&
       parentNode.firstChild === currentNode;
 
-    // move the entire list item
     if (isFirstParagraph) {
-      targetType = $from.node($from.depth - 1).type;
-      if (
-        targetType.name === Callout.name ||
-        targetType.name === Blockquote.name
-      ) {
-        targetType = $from.node($from.depth - 2).type;
-      }
+      targetType = parentNode.type;
+      currentResolved = findParentNodeOfType(targetType)(state.selection);
     }
-
-    currentResolved = findParentNodeOfType(targetType)(state.selection);
   }
 
-  if (
-    findParentNodeClosestToPos($from, (node) => node.type.name === Callout.name)
-  ) {
-    const currentNode = $from.node();
-    const parentNode = $from.node($from.depth - 1);
+  if (parentNode.type.name === Callout.name) {
     const isFirstHeading =
       currentNode.type.name === "heading" &&
       parentNode.firstChild === currentNode;
 
-    // move the entire callout
     if (isFirstHeading) {
-      targetType = $from.node($from.depth - 1).type;
+      targetType = parentNode.type;
+      currentResolved = findParentNodeOfType(targetType)(state.selection);
     }
-
-    currentResolved = findParentNodeOfType(targetType)(state.selection);
   }
 
   return currentResolved;
 }
 
-function resolveParentNode(editor: Editor) {
+const validParents = [
+  Callout.name,
+  Table.name,
+  BulletList.name,
+  OrderedList.name,
+  TaskListNode.name,
+  CheckList.name,
+  OutlineList.name,
+  Blockquote.name
+];
+
+function resolveParentNode(editor: Editor): ResolvedNode | undefined {
   const { state } = editor;
   const { $from } = state.selection;
-
-  const validParents = [
-    Callout.name,
-    Table.name,
-    BulletList.name,
-    OrderedList.name,
-    TaskListNode.name,
-    CheckList.name,
-    OutlineList.name,
-    Blockquote.name
-  ];
 
   const parent = findParentNodeClosestToPos($from, (node) =>
     validParents.includes(node.type.name)
@@ -124,8 +123,11 @@ function resolveParentNode(editor: Editor) {
 
   if (!parent) return undefined;
 
-  const targetType = parent.node.type;
-  return findParentNodeOfType(targetType)(state.selection);
+  return {
+    start: parent.start,
+    depth: parent.depth,
+    node: parent.node
+  };
 }
 
 function swapNodeWithSibling(
