@@ -6,7 +6,7 @@ import com.facebook.react.ReactApplication
 import com.facebook.react.ReactHost
 import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import com.facebook.react.ReactNativeApplicationEntryPoint.loadReactNative
- 
+import org.wonday.orientation.OrientationActivityLifecycle;
 class MainApplication : Application(), ReactApplication {
     override val reactHost: ReactHost by lazy {
     getDefaultReactHost(
@@ -22,6 +22,7 @@ class MainApplication : Application(), ReactApplication {
  
   override fun onCreate() {
     super.onCreate()
+      registerActivityLifecycleCallbacks(OrientationActivityLifecycle.getInstance());
     loadReactNative(this)
   }
 }
