@@ -111,7 +111,6 @@ export const FluidPanels = forwardRef<TabsRef, TabProps>(function FluidTabs(
   const containerWidth = widths
     ? widths.sidebar + widths.list + widths.editor
     : dimensions.width;
-
   const drawerPosition = 0;
   const homePosition = widths.sidebar;
   const editorPosition = widths.sidebar + widths.list;
@@ -440,15 +439,7 @@ export const FluidPanels = forwardRef<TabsRef, TabProps>(function FluidTabs(
             width: containerWidth,
             flexDirection: "row"
           },
-          deviceMode === "tablet"
-            ? {
-                transform: [
-                  {
-                    translateX: 0
-                  }
-                ]
-              }
-            : animatedStyles
+          animatedStyles
         ]}
       >
         {children}
