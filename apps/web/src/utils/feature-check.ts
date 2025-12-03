@@ -22,8 +22,27 @@ const FEATURE_CHECKS = {
   cache: false,
   indexedDB: false,
   clonableCryptoKey: false,
-  applePaySupported: false
+  applePaySupported: false,
+  transferableStreams: false
 };
+
+export function isTransferableStreamsSupported() {
+  try {
+    const readable = new ReadableStream({
+      pull(controller) {
+        controller.enqueue(new Uint8Array([1, 2, 3]));
+        controller.close();
+      }
+    });
+    window.postMessage(readable, [readable]);
+    FEATURE_CHECKS.transferableStreams = true;
+    return true;
+  } catch {
+    console.log("Transferable streams not supported");
+    FEATURE_CHECKS.transferableStreams = false;
+    return false;
+  }
+}
 
 async function isApplePaySupported() {
   try {
@@ -99,6 +118,7 @@ async function isCryptoKeyClonable() {
 
 export async function initializeFeatureChecks() {
   await Promise.allSettled([
+    isTransferableStreamsSupported(),
     isOPFSSupported(),
     isCacheSupported(),
     isIndexedDBSupported(),

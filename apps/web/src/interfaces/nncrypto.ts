@@ -20,8 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { INNCrypto } from "@notesnook/crypto";
 import CryptoWorker from "./nncrypto.worker?worker";
 import { wrap } from "comlink";
+import { NNCrypto as NNCryptoSync } from "@notesnook/crypto";
+import { isTransferableStreamsSupported } from "../utils/feature-check";
 
-export const NNCrypto = wrap<INNCrypto>(new CryptoWorker()) as INNCrypto;
+export const NNCrypto = isTransferableStreamsSupported()
+  ? (wrap<INNCrypto>(new CryptoWorker()) as INNCrypto)
+  : new NNCryptoSync();
 // TODO: disable until we fix the `pull failed` errors for good.
 // IS_DESKTOP_APP && window.NativeNNCrypto
 //   ? new window.NativeNNCrypto()
