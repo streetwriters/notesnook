@@ -198,7 +198,7 @@ export function handleMouseDown(
     // cell selection to be created).
     setCellSelection($anchor, startEvent);
     startEvent.preventDefault();
-  } else if (startEvent instanceof TouchEvent) {
+  } else if (isTouchEvent(startEvent)) {
     const selectedCell = view.domAtPos(view.state.selection.from).node;
     if (startDOMCell?.contains(selectedCell)) {
       $anchor = cellUnderMouse(view, startEvent);
@@ -312,4 +312,8 @@ function cellUnderMouse(
   });
   if (!mousePos) return null;
   return mousePos ? cellAround(view.state.doc.resolve(mousePos.pos)) : null;
+}
+
+function isTouchEvent(event: Event): event is TouchEvent {
+  return "TouchEvent" in window && event instanceof TouchEvent;
 }
