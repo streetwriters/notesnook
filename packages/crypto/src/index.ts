@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ISodium, Sodium } from "@notesnook/sodium";
+import { ISodium } from "@notesnook/sodium";
 import Decryption from "./decryption.js";
 import Encryption from "./encryption.js";
 import { INNCrypto } from "./interfaces.js";
@@ -37,10 +37,11 @@ import {
 
 export class NNCrypto implements INNCrypto {
   private isReady = false;
-  private sodium: ISodium = new Sodium();
+  private sodium!: ISodium;
 
   private async init() {
     if (this.isReady) return;
+    this.sodium = new (await import("@notesnook/sodium")).Sodium();
     await this.sodium.initialize();
     this.isReady = true;
   }

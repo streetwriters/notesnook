@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { base64_variants, ISodium } from "@notesnook/sodium";
-import KeyUtils from "./keyutils.js";
+import { ISodium } from "@notesnook/sodium";
+import KeyUtils, { base64_variants } from "./keyutils.js";
 import {
   Cipher,
   Output,
