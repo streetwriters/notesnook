@@ -70,7 +70,7 @@ export async function downloadFile(
       throw new Error(error);
     }
 
-    const totalChunks = Math.ceil(size / chunkSize);
+    const totalChunks = Math.ceil(size / (chunkSize + ABYTES));
     const decryptedLength = size - totalChunks * ABYTES;
 
     if (attachment && attachment.size !== decryptedLength) {

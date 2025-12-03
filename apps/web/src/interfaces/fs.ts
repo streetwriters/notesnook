@@ -454,7 +454,7 @@ export async function checkUpload(
   expectedSize: number
 ) {
   const size = await getUploadedFileSize(filename);
-  const totalChunks = Math.ceil(size / chunkSize);
+  const totalChunks = Math.ceil(size / (chunkSize + ABYTES));
   const decryptedLength = size - totalChunks * ABYTES;
   const error =
     size === 0
@@ -520,7 +520,7 @@ async function downloadFile(
       throw new Error(error);
     }
 
-    const totalChunks = Math.ceil(size / chunkSize);
+    const totalChunks = Math.ceil(size / (chunkSize + ABYTES));
     const decryptedLength = size - totalChunks * ABYTES;
     if (attachment && attachment.size !== decryptedLength) {
       const error = `File length mismatch. Expected ${attachment.size} but got ${decryptedLength} bytes. Please upload this file again from the attachment manager. (File hash: ${filename})`;

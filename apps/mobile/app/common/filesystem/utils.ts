@@ -155,7 +155,7 @@ export async function checkUpload(
   expectedSize: number
 ) {
   const size = await getUploadedFileSize(filename);
-  const totalChunks = Math.ceil(size / chunkSize);
+  const totalChunks = Math.ceil(size / (chunkSize + ABYTES));
   const decryptedLength = size - totalChunks * ABYTES;
   const error =
     size === 0
