@@ -226,11 +226,13 @@ export default function TabsView() {
               <TableOfContents sessionId={activeSession.id} />
             </Pane>
           ) : null}
-          {arePropertiesVisible && activeSession && (
-            <Pane id="properties-pane" initialSize={250} minSize={250}>
-              <Properties sessionId={activeSession.id} />
-            </Pane>
-          )}
+          {arePropertiesVisible &&
+            activeSession &&
+            activeSession.type !== "new" && (
+              <Pane id="properties-pane" initialSize={250} minSize={250}>
+                <Properties sessionId={activeSession.id} />
+              </Pane>
+            )}
         </SplitPane>
         <DropZone overlayRef={overlayRef} />
       </ScopedThemeProvider>
