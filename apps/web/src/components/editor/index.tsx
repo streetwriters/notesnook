@@ -56,7 +56,7 @@ import { useEditorManager } from "./manager";
 import { saveAttachment, downloadAttachment } from "../../common/attachments";
 import { EV, EVENTS } from "@notesnook/core";
 import { db } from "../../common/db";
-import Titlebox from "./title-box";
+import Titlebox, { resizeTextarea } from "./title-box";
 import Config from "../../utils/config";
 import { ScopedThemeProvider } from "../theme-provider";
 import { Lightbox } from "../lightbox";
@@ -711,19 +711,27 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
       const child = editorContainerRef.current?.getBoundingClientRect();
       if (!parent || !child || !editor || entries.length <= 0) return;
 
-      const CONTAINER_MARGIN = isMobile() || isTablet() ? 10 : 30;
+      const CONTAINER_MARGIN = isMobile() || isTablet() ? 30 : 50;
       const negativeSpace = Math.abs(
         parent.left - child.left - CONTAINER_MARGIN
       );
 
       requestAnimationFrame(() => {
         if (!isMobile() && !isTablet()) {
-          editor.style.marginLeft = `-${negativeSpace}px`;
-          editor.style.marginRight = `-${negativeSpace}px`;
+          editor.style.marginLeft = `-${negativeSpace - 10}px`;
+          editor.style.marginRight = `-${negativeSpace - 10}px`;
+        } else {
+          editor.style.marginLeft = ``;
+          editor.style.marginRight = ``;
         }
         editor.style.paddingLeft = `${negativeSpace}px`;
         editor.style.paddingRight = `${negativeSpace}px`;
       });
+
+      const editorTitle = document.querySelector("#editor-title");
+      if (editorTitle instanceof HTMLTextAreaElement) {
+        resizeTextarea(editorTitle);
+      }
     }
     const observer = new ResizeObserver(debounce(onResize, 500));
     observer.observe(editorScrollRef.current);
