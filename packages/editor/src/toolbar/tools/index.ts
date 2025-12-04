@@ -96,6 +96,7 @@ import {
   OpenLink,
   CopyLink
 } from "./link.js";
+import { AddComment, ViewComment } from "./comment.js";
 import {
   WebClipFullScreen,
   WebClipSettings,
@@ -121,6 +122,8 @@ const tools = {
   copyLink: CopyLink,
   linkSettings: LinkSettings,
   openLink: OpenLink,
+  addComment: AddComment,
+  viewComment: ViewComment,
   insertBlock: InsertBlock,
   numberedList: NumberedList,
   bulletList: BulletList,

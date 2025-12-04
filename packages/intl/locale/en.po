@@ -699,6 +699,10 @@ msgstr "Add a tag"
 msgid "Add color"
 msgstr "Add color"
 
+#: src/strings.ts:2609
+msgid "Add comment"
+msgstr "Add comment"
+
 #: src/strings.ts:894
 msgid "Add notebook"
 msgstr "Add notebook"
@@ -2101,6 +2105,10 @@ msgstr "Delete collapsed section"
 msgid "Delete column"
 msgstr "Delete column"
 
+#: src/strings.ts:2612
+msgid "Delete comment"
+msgstr "Delete comment"
+
 #: src/strings.ts:1313
 msgid "Delete group"
 msgstr "Delete group"
@@ -2357,6 +2365,10 @@ msgstr "Easy access"
 #: src/strings.ts:1776
 msgid "Edit"
 msgstr "Edit"
+
+#: src/strings.ts:2610
+msgid "Edit comment"
+msgstr "Edit comment"
 
 #: src/strings.ts:526
 msgid "Edit internal link"
@@ -5425,6 +5437,10 @@ msgstr "Save account recovery key"
 msgid "Save and continue"
 msgstr "Save and continue"
 
+#: src/strings.ts:2614
+msgid "Save comment"
+msgstr "Save comment"
+
 #: src/strings.ts:1047
 msgid "Save data recovery key"
 msgstr "Save data recovery key"
@@ -7014,6 +7030,10 @@ msgstr "View all linked notebooks"
 msgid "View and share debug logs"
 msgstr "View and share debug logs"
 
+#: src/strings.ts:2611
+msgid "View comment"
+msgstr "View comment"
+
 #: src/strings.ts:1746
 msgid "View receipt"
 msgstr "View receipt"
@@ -7146,6 +7166,10 @@ msgstr "Words"
 #: src/strings.ts:2411
 msgid "Work & Office"
 msgstr "Work & Office"
+
+#: src/strings.ts:2613
+msgid "Write a comment..."
+msgstr "Write a comment..."
 
 #: src/strings.ts:822
 msgid "Write notes with freedom, no spying, no tracking."

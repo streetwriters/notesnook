@@ -23,6 +23,7 @@ import { CodeBlock } from "../code-block/index.js";
 import { showLinkPopup } from "../../toolbar/popups/link-popup.js";
 import { isListActive } from "../../utils/list.js";
 import { tiptapKeys } from "@notesnook/common";
+import { showCommentPopup } from "../../toolbar/popups/comment-popup.js";
 
 export const KeyMap = Extension.create({
   name: "key-map",
@@ -70,6 +71,10 @@ export const KeyMap = Extension.create({
       },
       [tiptapKeys.insertLink.keys]: ({ editor }) => {
         showLinkPopup(editor);
+        return true;
+      },
+      [tiptapKeys.insertComment.keys]: ({ editor }) => {
+        showCommentPopup(editor);
         return true;
       }
     };
