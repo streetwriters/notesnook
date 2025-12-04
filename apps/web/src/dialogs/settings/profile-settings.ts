@@ -35,6 +35,7 @@ import { EmailChangeDialog } from "../email-change-dialog";
 import { RecoveryKeyDialog } from "../recovery-key-dialog";
 import { UserProfile } from "./components/user-profile";
 import { SettingsGroup } from "./types";
+import { UserSessionsDialog } from "../user-sessions-dialog";
 
 export const ProfileSettings: SettingsGroup[] = [
   {
@@ -131,6 +132,21 @@ export const ProfileSettings: SettingsGroup[] = [
     },
     isHidden: () => !useUserStore.getState().isLoggedIn,
     settings: [
+      {
+        key: "login-sessions",
+        title: strings.loginSessions(),
+        description: strings.loginSessionsDesc(),
+        components: [
+          {
+            type: "button",
+            title: strings.viewSessions(),
+            variant: "secondary",
+            action: async () => {
+              await UserSessionsDialog.show({});
+            }
+          }
+        ]
+      },
       {
         key: "logout",
         title: strings.logout(),
