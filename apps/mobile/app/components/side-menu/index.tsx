@@ -58,6 +58,7 @@ import { Button } from "../ui/button";
 import SettingsService from "../../services/settings";
 import { isFeatureAvailable } from "@notesnook/common";
 import PaywallSheet from "../sheets/paywall";
+import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 const renderScene = SceneMap({
   home: SideMenuHome,
   notebooks: SideMenuNotebooks,
@@ -68,6 +69,7 @@ const renderScene = SceneMap({
 export const SideMenu = React.memo(
   function SideMenu() {
     const { colors } = useThemeColors();
+    const insets = useGlobalSafeAreaInsets();
     const [index, setIndex] = React.useState(
       SettingsService.getProperty("defaultSidebarTab")
     );
@@ -87,10 +89,13 @@ export const SideMenu = React.memo(
     ]);
 
     return (
-      <SafeAreaView
+      <View
         style={{
           flex: 1,
-          backgroundColor: colors.primary.background
+          backgroundColor: colors.primary.background,
+          paddingTop: insets.top,
+          paddingBottom: insets.bottom,
+          paddingLeft: insets.left
         }}
       >
         <TabView
@@ -103,7 +108,7 @@ export const SideMenu = React.memo(
           animationEnabled={false}
           lazy
         />
-      </SafeAreaView>
+      </View>
     );
   },
   () => true
@@ -351,9 +356,8 @@ const TabBar = (
                       color={colors.primary.icon}
                       onPress={async () => {
                         if (props.navigationState.index === 1) {
-                          const notebooksFeature = await isFeatureAvailable(
-                            "notebooks"
-                          );
+                          const notebooksFeature =
+                            await isFeatureAvailable("notebooks");
                           if (!notebooksFeature.isAllowed) {
                             PaywallSheet.present(notebooksFeature);
                             return;

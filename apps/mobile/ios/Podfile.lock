@@ -2244,7 +2244,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - react-native-upload (6.27.0):
+  - react-native-upload (6.28.0):
     - React
   - react-native-webview (13.16.0):
     - boost
@@ -3880,7 +3880,7 @@ SPEC CHECKSUMS:
   react-native-share-extension: fdc6aaab51591a2d445df239c446aaa3a99658ec
   react-native-sodium: 066f76e46c9be13e9260521e3fa994937c4cdab4
   react-native-theme-switch-animation: 449d6db7a760f55740505e7403ae8061debc9a7e
-  react-native-upload: f0198bb4db00ff7dae14904ad59da470550be075
+  react-native-upload: ddf12a152c62fcafa202ef0404d3d46333a6a6a6
   react-native-webview: 654f794a7686b47491cf43aa67f7f428bea00eed
   React-NativeModulesApple: 46690a0fe94ec28fc6fc686ec797b911d251ded0
   React-oscompat: 95875e81f5d4b3c7b2c888d5bd2c9d83450d8bdb

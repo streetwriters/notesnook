@@ -20,7 +20,7 @@ import com.zoontek.rnbootsplash.RNBootSplash;
 
 public class MainActivity extends ReactActivity {
   @Override
-    protected void onCreate(Bundle savedInstanceState) {
+  protected void onCreate(Bundle savedInstanceState) {
     RNBootSplash.init(this, R.style.BootTheme);
 
     super.onCreate(null);
@@ -60,20 +60,20 @@ public class MainActivity extends ReactActivity {
             DefaultNewArchitectureEntryPoint.getFabricEnabled());
   }
 
-@Override
-public void onNewIntent(Intent intent) {
-  super.onNewIntent(intent);
-  setIntent(intent);
-}
+  @Override
+  public void onNewIntent(Intent intent) {
+    super.onNewIntent(intent);
+    setIntent(intent);
+  }
 
-@Override
-public void onConfigurationChanged(Configuration newConfig) {
-  super.onConfigurationChanged(newConfig);
-  getReactInstanceManager().onConfigurationChanged(this, newConfig);
-  Intent intent = new Intent("onConfigurationChanged");
-  intent.putExtra("newConfig", newConfig);
-  this.sendBroadcast(intent);
-}
+  @Override
+  public void onConfigurationChanged(Configuration newConfig) {
+    super.onConfigurationChanged(newConfig);
+    getReactHost().onConfigurationChanged(this);
+    Intent intent = new Intent("onConfigurationChanged");
+    intent.putExtra("newConfig", newConfig);
+    this.sendBroadcast(intent);
+  }
 
   @Override
   protected String getMainComponentName() {
