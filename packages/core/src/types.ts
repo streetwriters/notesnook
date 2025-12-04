@@ -683,3 +683,30 @@ export function planToId(plan: SubscriptionPlan): SubscriptionPlanId {
       return "legacyPro";
   }
 }
+
+export type NoteStats = {
+  noteIds: string[];
+  totalNotes: number;
+  mostNotesCreatedInMonth: { month: number; count: number } | null;
+  mostNotesCreatedInDay: string | null;
+  noteWithMostEdits: { id: string; title: string; editCount: number } | null;
+};
+
+export type OrganizationStats = {
+  totalNotebooks: number;
+  totalTags: number;
+  mostUsedTags: { id: string; title: string; noteCount: number }[];
+  mostActiveNotebooks: { id: string; title: string; noteCount: number }[];
+  totalColors: number;
+  favoritedNotes: number;
+  archivedNotes: number;
+};
+
+export type AttachmentStats = {
+  totalAttachments: number;
+  totalStorageUsed: number;
+  largestAttachment: { id: string; filename: string; size: number } | null;
+  mostCommonFileType: string | null;
+};
+
+export type WrappedStats = NoteStats & OrganizationStats & AttachmentStats;

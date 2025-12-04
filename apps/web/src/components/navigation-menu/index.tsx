@@ -803,6 +803,14 @@ function NavigationDropdown() {
             },
             {
               type: "button",
+              title: "Wrapped",
+              key: "wrapped",
+              onClick: () => {
+                hardNavigate("/wrapped");
+              }
+            },
+            {
+              type: "button",
               title: strings.toggleDarkLightMode(),
               key: "toggle-theme-mode",
               icon: theme === "dark" ? LightMode.path : DarkMode.path,

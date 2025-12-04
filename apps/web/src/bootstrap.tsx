@@ -55,6 +55,9 @@ const routes = {
   "/plans": {
     component: () => import("./views/plans")
   },
+  "/wrapped": {
+    component: () => import("./views/wrapped")
+  },
   "/checkout": {
     component: () => import("./views/checkout")
   },

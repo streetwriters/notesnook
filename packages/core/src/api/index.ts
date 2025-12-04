@@ -83,6 +83,7 @@ import { ConfigStorage } from "../database/config.js";
 import { LazyPromise } from "../utils/lazy-promise.js";
 import { InboxApiKeys } from "./inbox-api-keys.js";
 import { Circle } from "./circle.js";
+import { Wrapped } from "./wrapped.js";
 
 type EventSourceConstructor = new (
   uri: string,
@@ -223,6 +224,8 @@ class Database {
   settings = new Settings(this);
 
   inboxApiKeys = new InboxApiKeys(this, this.tokenManager);
+
+  wrapped = new Wrapped(this);
 
   /**
    * @deprecated only kept here for migration purposes
