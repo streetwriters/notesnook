@@ -33,6 +33,7 @@
     "start:editor-mobile": "npm run tx editor-mobile:start",
     "start:editor": "npm run tx editor:start",
     "start:server:themes": "npm run tx themes-server:start",
+    "build:server:themes": "npm run tx themes-server:build",
     "build:intl": "npm run tx intl:build",
     "start:intl": "npm run tx intl:start",
     "prettier": "npx prettier . --write",
