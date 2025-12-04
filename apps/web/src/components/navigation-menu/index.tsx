@@ -97,7 +97,6 @@ import { strings } from "@notesnook/intl";
 import Tags from "../../views/tags";
 import { Notebooks } from "../../views/notebooks";
 import { UserProfile } from "../../dialogs/settings/components/user-profile";
-import { SUBSCRIPTION_STATUS } from "../../common/constants";
 import {
   checkFeature,
   createSetDefaultHomepageMenuItem,
@@ -105,7 +104,6 @@ import {
   withFeatureCheck
 } from "../../common";
 import { TabItem } from "./tab-item";
-import Notice from "../notice";
 import { Freeze } from "react-freeze";
 import { CREATE_BUTTON_MAP } from "../../common";
 import { useStore as useNotebookStore } from "../../stores/notebook-store";
@@ -118,6 +116,7 @@ import {
   useIsFeatureAvailable
 } from "@notesnook/common";
 import { isUserSubscribed } from "../../hooks/use-is-user-premium";
+import { shouldShowWrapped } from "../../utils/should-show-wrapped";
 
 type Route = {
   id: "notes" | "favorites" | "reminders" | "monographs" | "trash" | "archive";
@@ -449,7 +448,17 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
           </FlexScrollContainer>
         </Freeze>
       </Flex>
-      {currentTab.id === "home" && !isCollapsed ? <Notice /> : null}
+      {currentTab.id === "home" && !isCollapsed && shouldShowWrapped() ? (
+        <Button
+          variant="accent"
+          sx={{ m: 2 }}
+          onClick={() => {
+            hardNavigate("/wrapped");
+          }}
+        >
+          🎉 Wrapped {new Date().getFullYear()}
+        </Button>
+      ) : null}
     </ScopedThemeProvider>
   );
 }
