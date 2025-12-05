@@ -153,7 +153,7 @@ export function Notebook(props: NotebookProps) {
             variant={"body"}
             color={isOpened ? "paragraph-selected" : "paragraph"}
             sx={{
-              whiteSpace: "nowrap",
+              whiteSpace: "pre",
               overflow: "hidden",
               textOverflow: "ellipsis",
               fontWeight: "body",
