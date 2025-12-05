@@ -67,7 +67,7 @@ function Tag(props: TagProps) {
             variant={"body"}
             color={isSelected ? "paragraph-selected" : "paragraph"}
             sx={{
-              whiteSpace: "nowrap",
+              whiteSpace: "pre-wrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
               fontWeight: "body",

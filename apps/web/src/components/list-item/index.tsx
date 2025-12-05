@@ -202,7 +202,7 @@ function ListItem<TItem extends Item, TContext>(
           data-test-id={`title`}
           variant={"body"}
           sx={{
-            whiteSpace: "nowrap",
+            whiteSpace: "pre-wrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
             fontWeight: isCompact ? "body" : "medium",
