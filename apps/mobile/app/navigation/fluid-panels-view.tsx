@@ -108,13 +108,11 @@ export const FluidPanelsView = React.memo(
       }
     });
 
-    console.log(orientation);
-
     useEffect(() => {
       if (!appLoading) {
         setTimeout(() => {
           setIsLoading(false);
-        }, 500);
+        }, 200);
       }
     }, [appLoading]);
 
@@ -226,9 +224,12 @@ export const FluidPanelsView = React.memo(
                 editorState().movedAway === false &&
                 useTabStore.getState().getCurrentNoteId()
               ) {
-                fluidTabsRef.current?.goToIndex(2, false);
+                fluidTabsRef.current?.goToPage("editor", false);
               } else {
-                fluidTabsRef.current?.goToIndex(1, false);
+                fluidTabsRef.current?.goToPage(
+                  fluidTabsRef.current?.page(),
+                  false
+                );
               }
               break;
           }
@@ -239,6 +240,7 @@ export const FluidPanelsView = React.memo(
 
     const checkDeviceType = React.useCallback(
       (size: { width: number; height: number }) => {
+        if (DDS.width === size.width && orientation === DDS.orientation) return;
         DDS.setSize(size, orientation);
         const nextDeviceMode = DDS.isLargeTablet()
           ? "tablet"
