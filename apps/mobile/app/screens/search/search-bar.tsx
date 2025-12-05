@@ -58,7 +58,6 @@ export const SearchBar = ({
     >
       <View
         style={{
-          marginTop: DefaultAppStyles.GAP_SMALL,
           flexDirection: "row",
           alignItems: "center",
           width: "100%",
