@@ -2609,5 +2609,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   views: () => t`Views`,
   clickToUpdate: () => t`Click to update`,
   noPassword: () => t`No password`,
-  publishToTheWeb: () => t`Publish to the web`
+  publishToTheWeb: () => t`Publish to the web`,
+  lineHeight: () => t`Line height`,
+  lineHeightDesc: () => t`Adjust the line height of the editor`
 };

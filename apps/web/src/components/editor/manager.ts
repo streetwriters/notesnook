@@ -24,9 +24,15 @@ import BaseStore from "../../stores";
 import type { TOCItem, ToolbarDefinition } from "@notesnook/editor";
 import Config from "../../utils/config";
 import { getCurrentPreset } from "../../common/toolbar-config";
-import { EDITOR_ZOOM } from "./common";
+import { EDITOR_LINE_HEIGHT, EDITOR_ZOOM } from "./common";
 
-type EditorConfig = { fontFamily: string; fontSize: number; zoom: number };
+type EditorConfig = {
+  fontFamily: string;
+  fontSize: number;
+  zoom: number;
+  lineHeight: number;
+};
+
 type EditorContext = {
   editor?: IEditor;
   canUndo?: boolean;
@@ -41,7 +47,8 @@ class EditorManager extends BaseStore<EditorManager> {
   editorConfig: EditorConfig = Config.get("editorConfig", {
     fontFamily: "sans-serif",
     fontSize: 14,
-    zoom: EDITOR_ZOOM.DEFAULT
+    zoom: EDITOR_ZOOM.DEFAULT,
+    lineHeight: EDITOR_LINE_HEIGHT.DEFAULT
   });
   editors: Record<string, EditorContext> = {};
 
