@@ -201,7 +201,7 @@ export const FluidPanelsView = React.memo(
       (current: string | null, size: { width: number; height: number }) => {
         setDeviceModeState(current);
 
-        if (fullscreen && current !== "mobile") {
+        if (fullscreen && current === "mobile") {
           eSendEvent(eCloseFullscreenEditor, current);
         }
 
@@ -214,8 +214,6 @@ export const FluidPanelsView = React.memo(
             case "smallTablet":
               if (!fullscreen) {
                 fluidTabsRef.current?.closeDrawer(false);
-              } else {
-                fluidTabsRef.current?.openDrawer(false);
               }
               break;
             case "mobile":
@@ -233,7 +231,7 @@ export const FluidPanelsView = React.memo(
               }
               break;
           }
-        }, 400);
+        }, 0);
       },
       [deviceMode, fullscreen, setDeviceModeState]
     );
