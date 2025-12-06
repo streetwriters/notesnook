@@ -88,7 +88,7 @@
     "react": "19.1.1",
     "react-async-hook": "^4.0.0",
     "react-native": "0.82.1",
-    "react-native-actions-sheet": "^10.0.0-alpha.13",
+    "react-native-actions-sheet": "^10.1.0",
     "react-native-actions-shortcuts": "^1.0.1",
     "react-native-background-actions": "^2.6.6",
     "react-native-begin-background-task": "github:blockfirm/react-native-begin-background-task",
