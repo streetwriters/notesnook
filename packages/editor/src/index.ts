@@ -87,6 +87,7 @@ import { strings } from "@notesnook/intl";
 import { InlineCode } from "./extensions/inline-code/inline-code.js";
 import { FontLigature } from "./extensions/font-ligature/font-ligature.js";
 import { SearchResult } from "./extensions/search-result/search-result.js";
+import { NodeViewSelectionNotifier } from "./extensions/react/plugin.js";
 import "simplebar-react/dist/simplebar.min.css";
 
 interface TiptapStorage {
@@ -190,6 +191,7 @@ const useTiptap = (
       },
       extensions: [
         ...CoreExtensions,
+        NodeViewSelectionNotifier,
         SearchReplace.configure({
           onStartSearch: (term, isReplacing) => {
             useEditorSearchStore.setState({

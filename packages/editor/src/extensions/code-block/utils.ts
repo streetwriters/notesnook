@@ -71,11 +71,12 @@ export function toCodeLines(code: string, pos: number): CodeLine[] {
 }
 
 export function toCaretPosition(
+  name: string,
   selection: Selection,
   lines?: CodeLine[]
 ): CaretPosition | undefined {
   const { $from, $to, $head } = selection;
-  if ($from.parent.type.name !== "codeblock") return;
+  if ($from.parent.type.name !== name) return;
   lines = lines || getLines($from.parent);
 
   for (const line of lines) {

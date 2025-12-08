@@ -53,6 +53,9 @@ export type ReactNodeViewProps<TAttributes = Attrs> = {
   selected: boolean;
 };
 
+export type SelectionBasedReactNodeViewProps<TAttributes = Attrs> =
+  ReactNodeViewProps<TAttributes>;
+
 export type ReactNodeViewOptions<P> = {
   props?: Partial<P>;
   component?: React.ComponentType<P>;

@@ -38,7 +38,7 @@ import Languages from "./languages.json";
 import { CaretPosition, CodeLine } from "./utils.js";
 import { tiptapKeys } from "@notesnook/common";
 
-interface Indent {
+export interface Indent {
   type: "tab" | "space";
   amount: number;
 }
@@ -324,7 +324,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
         if (this.options.exitOnTripleEnter && exitOnTripleEnter(editor, $from))
           return true;
 
-        const indentation = parseIndentation($from.parent);
+        const indentation = parseIndentation($from.parent, this.name);
 
         if (indentation) return indentOnEnter(editor, $from, indentation);
         return false;
@@ -373,7 +373,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
           return false;
         }
 
-        const indentation = parseIndentation($from.parent);
+        const indentation = parseIndentation($from.parent, this.name);
         if (!indentation) return false;
 
         const indentToken = indent(indentation);
@@ -405,7 +405,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
         if ($from.parent.type !== this.type) {
           return false;
         }
-        const indentation = parseIndentation($from.parent);
+        const indentation = parseIndentation($from.parent, this.name);
         if (!indentation) return false;
 
         const { lines } = $from.parent.attrs as CodeBlockAttributes;
@@ -478,7 +478,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
 
             const indent = fixIndentation(
               text,
-              parseIndentation(view.state.selection.$from.parent)
+              parseIndentation(view.state.selection.$from.parent, this.name)
             );
 
             const { tr } = view.state;
@@ -562,7 +562,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
   }
 });
 
-function exitOnTripleEnter(editor: Editor, $from: ResolvedPos) {
+export function exitOnTripleEnter(editor: Editor, $from: ResolvedPos) {
   const isAtEnd = $from.parentOffset === $from.parent.nodeSize - 2;
   const endsWithDoubleNewline = $from.parent.textContent.endsWith("\n\n");
 
@@ -581,7 +581,11 @@ function exitOnTripleEnter(editor: Editor, $from: ResolvedPos) {
     .run();
 }
 
-function indentOnEnter(editor: Editor, $from: ResolvedPos, options: Indent) {
+export function indentOnEnter(
+  editor: Editor,
+  $from: ResolvedPos,
+  options: Indent
+) {
   const { indentation, newline } = getNewline($from, options) || {};
   if (!newline) return false;
 
@@ -608,7 +612,7 @@ function getNewline($from: ResolvedPos, options: Indent) {
   };
 }
 
-function getSelectedLines(lines: CodeLine[], selection: Selection) {
+export function getSelectedLines(lines: CodeLine[], selection: Selection) {
   const { $from, $to } = selection;
   return lines.filter(
     (line) =>
@@ -618,8 +622,11 @@ function getSelectedLines(lines: CodeLine[], selection: Selection) {
   );
 }
 
-function parseIndentation(node: ProsemirrorNode): Indent | undefined {
-  if (node.type.name !== CodeBlock.name) return undefined;
+export function parseIndentation(
+  node: ProsemirrorNode,
+  name: string
+): Indent | undefined {
+  if (node.type.name !== name) return undefined;
 
   const { indentType, indentLength } = node.attrs;
   return {
@@ -636,12 +643,12 @@ function inRange(x: number, a: number, b: number) {
   return x >= a && x <= b;
 }
 
-function indent(options: Indent) {
+export function indent(options: Indent) {
   const char = options.type === "space" ? " " : "\t";
   return char.repeat(options.amount);
 }
 
-function compareCaretPosition(
+export function compareCaretPosition(
   prev: CaretPosition | undefined,
   next: CaretPosition | undefined
 ): boolean {
@@ -655,7 +662,7 @@ function compareCaretPosition(
 /**
  * Persist selection between transaction steps
  */
-function withSelection(
+export function withSelection(
   tr: Transaction,
   callback: (tr: Transaction) => void
 ): boolean {
