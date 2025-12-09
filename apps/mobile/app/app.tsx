@@ -51,8 +51,9 @@ const { appLockEnabled, appLockMode } = SettingsService.get();
 if (appLockEnabled || appLockMode !== "none") {
   useUserStore.getState().lockApp(true);
 }
-
-RNBootSplash.hide();
+RNBootSplash.hide({
+  fade: true
+});
 const App = (props: { configureMode: "note-preview" }) => {
   useAppEvents();
   //@ts-ignore

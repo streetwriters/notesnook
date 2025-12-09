@@ -32,19 +32,6 @@ public class MainActivity extends ReactActivity {
       startService(new Intent(getBaseContext(), OnClearFromRecentService.class));
     } catch (Exception ignored) {}
 
-    if (Build.VERSION.SDK_INT >= 35) {
-      final View rootView = findViewById(android.R.id.content);
-      ViewCompat.setOnApplyWindowInsetsListener(rootView, (v, insets) -> {
-        Insets innerPadding = insets.getInsets(WindowInsetsCompat.Type.ime());
-        rootView.setPadding(
-                innerPadding.left,
-                innerPadding.top,
-                innerPadding.right,
-                innerPadding.bottom
-        );
-        return insets;
-      });
-    }
   }
 
   /**

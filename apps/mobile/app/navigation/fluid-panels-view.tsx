@@ -108,13 +108,11 @@ export const FluidPanelsView = React.memo(
       }
     });
 
-    console.log(orientation);
-
     useEffect(() => {
       if (!appLoading) {
         setTimeout(() => {
           setIsLoading(false);
-        }, 500);
+        }, 200);
       }
     }, [appLoading]);
 
@@ -203,7 +201,7 @@ export const FluidPanelsView = React.memo(
       (current: string | null, size: { width: number; height: number }) => {
         setDeviceModeState(current);
 
-        if (fullscreen && current !== "mobile") {
+        if (fullscreen && current === "mobile") {
           eSendEvent(eCloseFullscreenEditor, current);
         }
 
@@ -216,8 +214,6 @@ export const FluidPanelsView = React.memo(
             case "smallTablet":
               if (!fullscreen) {
                 fluidTabsRef.current?.closeDrawer(false);
-              } else {
-                fluidTabsRef.current?.openDrawer(false);
               }
               break;
             case "mobile":
@@ -226,19 +222,23 @@ export const FluidPanelsView = React.memo(
                 editorState().movedAway === false &&
                 useTabStore.getState().getCurrentNoteId()
               ) {
-                fluidTabsRef.current?.goToIndex(2, false);
+                fluidTabsRef.current?.goToPage("editor", false);
               } else {
-                fluidTabsRef.current?.goToIndex(1, false);
+                fluidTabsRef.current?.goToPage(
+                  fluidTabsRef.current?.page(),
+                  false
+                );
               }
               break;
           }
-        }, 400);
+        }, 0);
       },
       [deviceMode, fullscreen, setDeviceModeState]
     );
 
     const checkDeviceType = React.useCallback(
       (size: { width: number; height: number }) => {
+        if (DDS.width === size.width && orientation === DDS.orientation) return;
         DDS.setSize(size, orientation);
         const nextDeviceMode = DDS.isLargeTablet()
           ? "tablet"
