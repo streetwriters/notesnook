@@ -26,9 +26,13 @@ type CloneNodeOptions = {
 
 export function cloneNode(node: HTMLElement, options: CloneNodeOptions) {
   node = node.cloneNode(true) as HTMLElement;
+  const images = node.querySelectorAll("img");
   if (!options.images) {
-    const images = node.getElementsByTagName("img");
     for (const image of images) image.remove();
+  } else {
+    for (const image of images) {
+      image.src = image.currentSrc;
+    }
   }
 
   if (!options.styles) {
