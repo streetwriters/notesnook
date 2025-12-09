@@ -34,10 +34,7 @@ export default defineConfig({
       js: "clipper.bundle.js"
     },
     distPath: {
-      root: path.resolve(
-        __dirname,
-        "../../apps/mobile/native/ios/extension.bundle"
-      )
+      root: path.resolve(__dirname, "../../apps/mobile/ios/extension.bundle")
     }
   }
 });
