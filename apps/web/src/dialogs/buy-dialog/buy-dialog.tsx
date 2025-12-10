@@ -147,7 +147,7 @@ export const BuyDialog = DialogManager.register(function BuyDialog(
             </Text>
           </Flex>
           <PlansList
-            selectedPlan={user?.subscription.productId}
+            selectedPlan={user?.subscription?.productId}
             recommendedPlan={SubscriptionPlan.PRO}
             onPlanSelected={(plan) => selectPlan(plan)}
           />

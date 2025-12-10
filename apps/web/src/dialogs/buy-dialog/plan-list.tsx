@@ -42,7 +42,7 @@ import { useStore as useUserStore } from "../../stores/user-store";
 import { getCurrencySymbol } from "../../common/currencies";
 
 type PlansListProps = {
-  selectedPlan?: string;
+  selectedPlan?: string | null;
   loadAllPlans?: boolean;
   ignoreTrial?: boolean;
   recommendedPlan?: SubscriptionPlan;
