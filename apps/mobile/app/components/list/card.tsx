@@ -43,7 +43,7 @@ export const Card = ({
   const fontScale = Dimensions.get("window").fontScale;
 
   return !messageBoardState.visible ||
-    (announcements && announcements.length) ? null : (
+    (announcements && announcements.length && !customMessage) ? null : (
     <View
       style={{
         width: "100%",
