@@ -352,7 +352,7 @@ const ProductItem = (props: {
     props.pricingPlans.isSubscribed() &&
     (props.pricingPlans.user?.subscription?.productId ===
       (product as RNIap.Subscription)?.productId ||
-      props.pricingPlans.user?.subscription?.productId.startsWith(
+      props.pricingPlans.user?.subscription?.productId?.startsWith(
         (product as RNIap.Subscription)?.productId
       ) ||
       props.pricingPlans.user?.subscription?.productId ===

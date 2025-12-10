@@ -103,7 +103,7 @@ export function PlanLimits() {
 
             if (
               user?.subscription.plan !== SubscriptionPlan.FREE &&
-              user?.subscription.productId.includes("5year")
+              user?.subscription.productId?.includes("5year")
             ) {
               ToastManager.show({
                 message:

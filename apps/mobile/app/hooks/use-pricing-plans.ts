@@ -660,9 +660,25 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
     }
   }
 
+  function isSubscribedToPlan(planId: string) {
+    if (!PremiumService.get()) return false;
+    return user?.subscription?.productId?.includes(planId);
+  }
+
+  function isSubscribedToProduct(productId: string) {
+    if (!PremiumService.get()) return false;
+    return (
+      user?.subscription?.productId &&
+      (user?.subscription?.productId === productId ||
+        user?.subscription?.productId?.startsWith(productId))
+    );
+  }
+
   return {
     currentPlan: pricingPlans.find((p) => p.id === currentPlan),
     pricingPlans: plans,
+    isSubscribedToPlan,
+    isSubscribedToProduct,
     getStandardPrice: getLocalizedPrice,
     loadingPlans,
     loading,
