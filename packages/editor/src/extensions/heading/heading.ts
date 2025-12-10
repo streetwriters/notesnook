@@ -23,11 +23,9 @@ import {
   textblockTypeInputRule
 } from "@tiptap/core";
 import { Heading as TiptapHeading } from "@tiptap/extension-heading";
-import { isClickWithinBounds } from "../../utils/prosemirror.js";
-import { Plugin, PluginKey, Selection, Transaction } from "@tiptap/pm/state";
 import { Node } from "@tiptap/pm/model";
-import { useToolbarStore } from "../../toolbar/stores/toolbar-store.js";
-import { Decoration, DecorationSet } from "prosemirror-view";
+import { Plugin, PluginKey, Selection, Transaction } from "@tiptap/pm/state";
+import { Callout } from "../callout/callout.js";
 
 const COLLAPSIBLE_BLOCK_TYPES = [
   "paragraph",
@@ -187,6 +185,17 @@ export const Heading = TiptapHeading.extend({
         if (typeof getPos === "boolean") return;
 
         const pos = getPos();
+        const resolvedPos = editor.state.doc.resolve(pos);
+
+        const callout = findParentNodeClosestToPos(
+          resolvedPos,
+          (node) => node.type.name === Callout.name
+        );
+        // the first callout heading's collapsibility is handled by callout itself
+        if (callout?.node.firstChild === node) {
+          return;
+        }
+
         const clientX =
           e instanceof MouseEvent ? e.clientX : e.touches[0].clientX;
         const clientY =
@@ -194,7 +203,7 @@ export const Heading = TiptapHeading.extend({
         const isRtl =
           e.target.dir === "rtl" ||
           findParentNodeClosestToPos(
-            editor.state.doc.resolve(pos),
+            resolvedPos,
             (node) => !!node.attrs.textDirection
           )?.node.attrs.textDirection === "rtl";
 
