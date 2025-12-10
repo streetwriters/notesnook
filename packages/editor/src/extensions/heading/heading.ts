@@ -44,7 +44,8 @@ const COLLAPSIBLE_BLOCK_TYPES = [
   "outlineList",
   "mathBlock",
   "webclip",
-  "embed"
+  "embed",
+  "horizontalRule"
 ];
 
 const HEADING_REGEX = /^(#{1,6})\s$/;
