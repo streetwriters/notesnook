@@ -335,6 +335,12 @@ export const tiptapKeys = {
     category: "Editor",
     type: "tiptap"
   },
+  openSearchAndReplace: {
+    keys: "Mod-Alt-f",
+    description: "Open search and replace",
+    category: "Editor",
+    type: "tiptap"
+  },
   toggleStrike: {
     keys: "Mod-Shift-S",
     description: "Toggle strike",

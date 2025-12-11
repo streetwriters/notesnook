@@ -191,11 +191,12 @@ const useTiptap = (
       extensions: [
         ...CoreExtensions,
         SearchReplace.configure({
-          onStartSearch: (term) => {
+          onStartSearch: (term, isReplacing) => {
             useEditorSearchStore.setState({
               isSearching: true,
               searchTerm: term,
-              focusNonce: Math.random()
+              focusNonce: Math.random(),
+              isReplacing: isReplacing
             });
             return true;
           },
