@@ -33,7 +33,7 @@ type DispatchFn = (tr: Transaction) => void;
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     searchreplace: {
-      startSearch: () => ReturnType;
+      startSearch: (isReplacing?: boolean) => ReturnType;
       endSearch: () => ReturnType;
       search: (term: string, options?: SearchSettings) => ReturnType;
       moveToNextResult: () => ReturnType;
@@ -51,7 +51,7 @@ interface Result {
 
 interface SearchOptions {
   searchResultClass: string;
-  onStartSearch: (term?: string) => boolean;
+  onStartSearch: (term?: string, isReplacing?: boolean) => boolean;
   onEndSearch: () => boolean;
 }
 
@@ -242,7 +242,7 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
   addCommands() {
     return {
       startSearch:
-        () =>
+        (isReplacing) =>
         ({ state, commands }) => {
           const term = !state.selection.empty
             ? state.doc.textBetween(
@@ -252,7 +252,7 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
             : undefined;
           if (term) commands.search(term);
 
-          return this.options.onStartSearch(term);
+          return this.options.onStartSearch(term, isReplacing);
         },
       endSearch:
         () =>
@@ -357,6 +357,8 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
     return {
       [tiptapKeys.openSearch.keys]: ({ editor }) =>
         editor.commands.startSearch(),
+      [tiptapKeys.openSearchAndReplace.keys]: ({ editor }) =>
+        editor.commands.startSearch(true),
       Escape: ({ editor }) => editor.commands.endSearch()
     };
   },
