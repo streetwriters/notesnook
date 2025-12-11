@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { SubscriptionPlan } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
+import dayjs from "dayjs";
 import React from "react";
 import { FlatList, View } from "react-native";
 import { DraxProvider, DraxScrollView } from "react-native-drax";
@@ -140,19 +141,35 @@ export function SideMenuHome() {
           paddingVertical: DefaultAppStyles.GAP_VERTICAL
         }}
       >
-        {(subscriptionType === SubscriptionPlan.FREE ||
-          !subscriptionType ||
-          !user) &&
-        !SettingsService.getProperty("serverUrls") ? (
+        {dayjs().month() !== 11 ? (
+          <>
+            {(subscriptionType === SubscriptionPlan.FREE ||
+              !subscriptionType ||
+              !user) &&
+            !SettingsService.getProperty("serverUrls") ? (
+              <Button
+                title={pro.title}
+                style={{
+                  width: "100%"
+                }}
+                type="accent"
+                onPress={pro.onPress}
+              />
+            ) : null}
+          </>
+        ) : (
           <Button
-            title={pro.title}
+            title={`Wrapped ${dayjs().year()} 🎉`}
             style={{
               width: "100%"
             }}
-            type="accent"
-            onPress={pro.onPress}
+            bold
+            type="secondaryAccented"
+            onPress={() => {
+              Navigation.navigate("Wrapped");
+            }}
           />
-        ) : null}
+        )}
       </View>
     </View>
   );

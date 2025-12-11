@@ -273,6 +273,7 @@ let Settings: any = null;
 let ManageTags: any = null;
 let AddReminder: any = null;
 let PayWall: any = null;
+let Wrapped: any = null;
 export const RootNavigation = () => {
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
@@ -382,6 +383,14 @@ export const RootNavigation = () => {
           getComponent={() => {
             PayWall = PayWall || require("../components/paywall").default;
             return PayWall;
+          }}
+        />
+
+        <RootStack.Screen
+          name="Wrapped"
+          getComponent={() => {
+            Wrapped = Wrapped || require("../screens/wrapped").default;
+            return Wrapped;
           }}
         />
       </RootStack.Navigator>
