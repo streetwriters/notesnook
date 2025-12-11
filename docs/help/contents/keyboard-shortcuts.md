@@ -67,6 +67,7 @@ The following keyboard shortcuts will help you navigate Notesnook faster.
 | Toggle outline list | Ctrl ⇧ O | Ctrl ⇧ O | ⌘ ⇧ O |
 | Toggle outline list expand | Ctrl Space | Ctrl Space | ⌘ Space |
 | Open search | Ctrl F | Ctrl F | ⌘ F |
+| Open search and replace | Ctrl Alt F | Ctrl Alt F | ⌘ ⌥ F |
 | Toggle strike | Ctrl ⇧ S | Ctrl ⇧ S | ⌘ ⇧ S |
 | Toggle subscript | Ctrl , | Ctrl , | ⌘ , |
 | Toggle superscript | Ctrl . | Ctrl . | ⌘ . |
