@@ -112,6 +112,7 @@ export interface RouteParams extends ParamListBase {
     context: "signup" | "logged-in" | "logged-out" | "subscribed";
     state?: BillingState;
   };
+  Wrapped: GenericRouteParam;
 }
 
 export type RouteName = keyof RouteParams;
