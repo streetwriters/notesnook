@@ -850,17 +850,27 @@ function useDragOverlay() {
       e.preventDefault();
     }
 
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        hideOverlay();
+      }
+    }
+
     dropElement.addEventListener("dragenter", showOverlay);
     overlay.addEventListener("drop", hideOverlay);
     overlay.addEventListener("dragenter", allowDrag);
     overlay.addEventListener("dragover", allowDrag);
     overlay.addEventListener("dragleave", hideOverlay);
+    overlay.addEventListener("click", hideOverlay);
+    document.addEventListener("keydown", handleKeyDown);
     return () => {
       dropElement.removeEventListener("dragenter", showOverlay);
       overlay.removeEventListener("drop", hideOverlay);
       overlay.removeEventListener("dragenter", allowDrag);
       overlay.removeEventListener("dragover", allowDrag);
       overlay.removeEventListener("dragleave", hideOverlay);
+      overlay.removeEventListener("click", hideOverlay);
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
 
