@@ -324,7 +324,9 @@ export const Signup = ({
 
               <View
                 style={{
-                  paddingHorizontal: DefaultAppStyles.GAP
+                  paddingHorizontal: DefaultAppStyles.GAP,
+                  width: DDS.isTab ? "50%" : "100%",
+                  alignSelf: "center"
                 }}
               >
                 <Paragraph

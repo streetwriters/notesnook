@@ -44,6 +44,8 @@ import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
+import { useSettingStore } from "../../stores/use-setting-store";
+import { useStoredRef } from "../../hooks/use-stored-ref";
 
 function formatNumber(num: number) {
   if (num >= 1000000) {
@@ -604,7 +606,8 @@ function SummarySlide({
     <Slide width={width}>
       <ScrollView
         contentContainerStyle={{
-          paddingBottom: 50
+          paddingBottom: 50,
+          maxWidth: 500
         }}
       >
         <ViewShot
@@ -652,6 +655,7 @@ function SummarySlide({
                 >
                   {Object.keys(stats.monthlyStats).map((item) => (
                     <View
+                      key={item}
                       style={{
                         flexGrow: 1,
                         alignItems: "center"
@@ -763,6 +767,7 @@ function SummarySlide({
                   }
                 ].map((item) => (
                   <View
+                    key={item.title}
                     style={{
                       backgroundColor: colors.secondary.background,
                       padding: DefaultAppStyles.GAP_SMALL,
@@ -905,6 +910,7 @@ function SummarySlide({
           type="secondaryAccented"
           onPress={async () => {
             const path = await viewShotRef.current?.capture?.();
+            console.log(path, "shared path");
             Share.open({
               url: path
             }).catch(() => {});
@@ -924,9 +930,16 @@ export const Wrapped = ({ navigation, route }: NavigationProps<"Wrapped">) => {
   const { width } = useWindowDimensions();
   const [loading, setLoading] = useState(true);
   const [wrapped, setWrapped] = useState<WrappedStats | null>(null);
+  const wrappedRef = useStoredRef<WrappedStats | null>(
+    "wrapped-" + dayjs().year(),
+    null
+  );
   const [showPresentation, setShowPresentation] = useState(false);
   const [messageIndex, setMessageIndex] = useState(0);
   const insets = useGlobalSafeAreaInsets();
+  const dimensions = useSettingStore((state) => state.dimensions);
+  const [slides, setSlides] = useState<React.ReactNode[]>([]);
+
   useNavigationFocus(navigation, { focusOnInit: true });
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -941,151 +954,101 @@ export const Wrapped = ({ navigation, route }: NavigationProps<"Wrapped">) => {
     };
   }, [loading]);
 
-  async function loadWrapped() {
-    setLoading(true);
-    try {
-      const wrappedData = await db.wrapped.get();
-      setWrapped(wrappedData);
-      setShowPresentation(true);
-    } catch (error) {
-      console.error("Error loading wrapped:", error);
-    } finally {
-      setLoading(false);
-    }
-  }
-
   useEffect(() => {
+    async function loadWrapped() {
+      setLoading(true);
+      try {
+        if (!wrappedRef.current) {
+          wrappedRef.current = await db.wrapped.get();
+          console.log("CACHE NOT FOUND");
+        }
+        setWrapped(wrappedRef.current);
+        console.log("WRAP LOADED");
+        setShowPresentation(true);
+        setSlides(() => {
+          const slides: React.ReactNode[] = [];
+          if (!wrappedRef.current) return [];
+          const wrapped = wrappedRef.current as WrappedStats;
+
+          slides.push(<WelcomeSlide key="welcome" width={width} />);
+          slides.push(
+            <TotalNotesSlide
+              key="total-notes"
+              count={wrapped.totalNotes}
+              width={width}
+            />
+          );
+
+          if (wrapped.totalWords > 0) {
+            slides.push(
+              <TotalWordsSlide
+                key="total-words"
+                count={wrapped.totalWords}
+                width={width}
+              />
+            );
+          }
+
+          if (
+            wrapped.mostNotesCreatedInMonth ||
+            wrapped.mostNotesCreatedInDay
+          ) {
+            slides.push(
+              <ActivityStatsSlide
+                key="activity"
+                mostNotesCreatedInMonth={wrapped.mostNotesCreatedInMonth}
+                mostNotesCreatedInDay={wrapped.mostNotesCreatedInDay}
+                width={width}
+              />
+            );
+          }
+
+          // if (wrapped.mostUsedTags && wrapped.mostUsedTags.length > 0) {
+          //   slides.push(
+          //     <MostUsedTagsSlide
+          //       key="tags"
+          //       tags={wrapped.mostUsedTags}
+          //       totalTags={wrapped.totalTags}
+          //       width={width}
+          //     />
+          //   );
+          // }
+
+          // if (wrapped.mostActiveNotebooks && wrapped.mostActiveNotebooks.length > 0) {
+          //   slides.push(
+          //     <MostActiveNotebooksSlide
+          //       key="notebooks"
+          //       notebooks={wrapped.mostActiveNotebooks}
+          //       totalNotebooks={wrapped.totalNotebooks}
+          //       width={width}
+          //     />
+          //   );
+          // }
+
+          // if (wrapped.totalAttachments > 0) {
+          //   slides.push(
+          //     <AttachmentsSlide
+          //       key="attachments"
+          //       totalAttachments={wrapped.totalAttachments}
+          //       totalStorageUsed={wrapped.totalStorageUsed}
+          //       width={width}
+          //     />
+          //   );
+          // }
+
+          slides.push(
+            <SummarySlide key="summary" stats={wrapped} width={width} />
+          );
+          return slides;
+        });
+      } catch (error) {
+        console.error("Error loading wrapped:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
     loadWrapped();
   }, []);
-
-  // Build slides array
-  const slides: React.ReactNode[] = [];
-  if (wrapped && showPresentation) {
-    slides.push(<WelcomeSlide key="welcome" width={width} />);
-    slides.push(
-      <TotalNotesSlide
-        key="total-notes"
-        count={wrapped.totalNotes}
-        width={width}
-      />
-    );
-
-    if (wrapped.totalWords > 0) {
-      slides.push(
-        <TotalWordsSlide
-          key="total-words"
-          count={wrapped.totalWords}
-          width={width}
-        />
-      );
-    }
-
-    if (wrapped.mostNotesCreatedInMonth || wrapped.mostNotesCreatedInDay) {
-      slides.push(
-        <ActivityStatsSlide
-          key="activity"
-          mostNotesCreatedInMonth={wrapped.mostNotesCreatedInMonth}
-          mostNotesCreatedInDay={wrapped.mostNotesCreatedInDay}
-          width={width}
-        />
-      );
-    }
-
-    // if (wrapped.mostUsedTags && wrapped.mostUsedTags.length > 0) {
-    //   slides.push(
-    //     <MostUsedTagsSlide
-    //       key="tags"
-    //       tags={wrapped.mostUsedTags}
-    //       totalTags={wrapped.totalTags}
-    //       width={width}
-    //     />
-    //   );
-    // }
-
-    // if (wrapped.mostActiveNotebooks && wrapped.mostActiveNotebooks.length > 0) {
-    //   slides.push(
-    //     <MostActiveNotebooksSlide
-    //       key="notebooks"
-    //       notebooks={wrapped.mostActiveNotebooks}
-    //       totalNotebooks={wrapped.totalNotebooks}
-    //       width={width}
-    //     />
-    //   );
-    // }
-
-    // if (wrapped.totalAttachments > 0) {
-    //   slides.push(
-    //     <AttachmentsSlide
-    //       key="attachments"
-    //       totalAttachments={wrapped.totalAttachments}
-    //       totalStorageUsed={wrapped.totalStorageUsed}
-    //       width={width}
-    //     />
-    //   );
-    // }
-
-    slides.push(<SummarySlide key="summary" stats={wrapped} width={width} />);
-  }
-
-  if (showPresentation && wrapped) {
-    return (
-      <SafeAreaView
-        style={{
-          flex: 1,
-          backgroundColor: colors.primary.background
-        }}
-      >
-        <View
-          style={{
-            position: "absolute",
-            top: insets.top + 5,
-            right: DefaultAppStyles.GAP,
-            zIndex: 1000
-          }}
-        >
-          <IconButton
-            name="close"
-            color={colors.primary.icon}
-            type="secondary"
-            onPress={() => {
-              setShowPresentation(false);
-              Navigation.goBack();
-            }}
-          />
-        </View>
-
-        <PolkadotBackground
-          width={Dimensions.get("window").width}
-          height={Dimensions.get("window").height}
-          dotColor={colors.primary.icon}
-          opacity={0.5}
-        />
-        <SwiperFlatList
-          autoplay={false}
-          index={0}
-          showPagination={true}
-          paginationActiveColor={colors.primary.accent}
-          paginationStyleItem={{
-            width: 10,
-            height: 5,
-            marginRight: 4,
-            marginLeft: 4
-          }}
-          paginationDefaultColor={colors.primary.border}
-          paginationStyle={{
-            marginBottom: insets.bottom + 12,
-            backgroundColor: colors.primary.background,
-            borderRadius: 100,
-            paddingHorizontal: 12,
-            paddingVertical: DefaultAppStyles.GAP_VERTICAL,
-            alignItems: "center"
-          }}
-          data={slides}
-          renderItem={({ item }) => item}
-        />
-      </SafeAreaView>
-    );
-  }
 
   return (
     <SafeAreaView
@@ -1095,38 +1058,86 @@ export const Wrapped = ({ navigation, route }: NavigationProps<"Wrapped">) => {
       }}
     >
       <PolkadotBackground
-        width={Dimensions.get("window").width}
-        height={Dimensions.get("window").height}
-        dotColor={colors.primary.icon}
-        opacity={0.5}
+        width={dimensions.width}
+        height={dimensions.height}
+        dotColor={colors.primary.separator}
+        spacing={40}
+        opacity={1}
       />
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          paddingHorizontal: DefaultAppStyles.GAP
-        }}
-      >
-        <View
-          style={{
-            alignItems: "center",
-            gap: DefaultAppStyles.GAP_VERTICAL
-          }}
-        >
-          <ActivityIndicator size="large" color={colors.primary.accent} />
-          <Paragraph
+
+      {showPresentation && wrapped ? (
+        <>
+          <View
             style={{
-              fontSize: AppFontSize.lg,
-              textAlign: "center",
-              color: colors.secondary.paragraph,
-              marginTop: 20
+              position: "absolute",
+              top: insets.top + 5,
+              right: DefaultAppStyles.GAP,
+              zIndex: 1000
             }}
           >
-            {loadingMessages[messageIndex]}
-          </Paragraph>
+            <IconButton
+              name="close"
+              color={colors.primary.icon}
+              type="secondary"
+              onPress={() => {
+                setShowPresentation(false);
+                Navigation.goBack();
+              }}
+            />
+          </View>
+          <SwiperFlatList
+            autoplay={false}
+            index={0}
+            showPagination={true}
+            paginationActiveColor={colors.primary.accent}
+            paginationStyleItem={{
+              width: 10,
+              height: 5,
+              marginRight: 4,
+              marginLeft: 4
+            }}
+            paginationDefaultColor={colors.primary.border}
+            paginationStyle={{
+              marginBottom: insets.bottom + 12,
+              backgroundColor: colors.primary.background,
+              borderRadius: 100,
+              paddingHorizontal: 12,
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL,
+              alignItems: "center"
+            }}
+            data={slides}
+            renderItem={({ item }) => item}
+          />
+        </>
+      ) : (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            paddingHorizontal: DefaultAppStyles.GAP
+          }}
+        >
+          <View
+            style={{
+              alignItems: "center",
+              gap: DefaultAppStyles.GAP_VERTICAL
+            }}
+          >
+            <ActivityIndicator size="large" color={colors.primary.accent} />
+            <Paragraph
+              style={{
+                fontSize: AppFontSize.lg,
+                textAlign: "center",
+                color: colors.secondary.paragraph,
+                marginTop: 20
+              }}
+            >
+              {loadingMessages[messageIndex]}
+            </Paragraph>
+          </View>
         </View>
-      </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -1134,10 +1145,10 @@ export const Wrapped = ({ navigation, route }: NavigationProps<"Wrapped">) => {
 export function PolkadotBackground({
   width,
   height,
-  spacing = 20,
+  spacing = 50,
   dotSize = 3,
-  dotColor = "#E5E5E5",
-  opacity = 0.3
+  dotColor = "#ececec",
+  opacity = 0.1
 }: {
   width: number;
   height: number;
@@ -1162,6 +1173,7 @@ export function PolkadotBackground({
           opacity: opacity
         }
       ]}
+      pointerEvents="none"
     >
       {Array.from({ length: rows }).map((_, row) =>
         Array.from({ length: cols }).map((_, col) => (
@@ -1175,7 +1187,7 @@ export function PolkadotBackground({
               height: dotSize,
               borderRadius: dotSize / 2,
               backgroundColor: dotColor,
-              opacity: 0.3
+              opacity: 1
             }}
           />
         ))
@@ -1183,9 +1195,5 @@ export function PolkadotBackground({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { overflow: "hidden", position: "absolute" }
-});
 
 export default Wrapped;

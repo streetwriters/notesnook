@@ -2246,6 +2246,34 @@ PODS:
     - Yoga
   - react-native-upload (6.28.0):
     - React
+  - react-native-view-shot (4.0.3):
+    - boost
+    - DoubleConversion
+    - fast_float
+    - fmt
+    - glog
+    - hermes-engine
+    - RCT-Folly
+    - RCT-Folly/Fabric
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - SocketRocket
+    - Yoga
   - react-native-webview (13.16.0):
     - boost
     - DoubleConversion
@@ -3465,6 +3493,7 @@ DEPENDENCIES:
   - "react-native-sodium (from `../node_modules/@ammarahmed/react-native-sodium`)"
   - react-native-theme-switch-animation (from `../node_modules/react-native-theme-switch-animation`)
   - "react-native-upload (from `../node_modules/@ammarahmed/react-native-upload`)"
+  - react-native-view-shot (from `../node_modules/react-native-view-shot`)
   - react-native-webview (from `../node_modules/react-native-webview`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-oscompat (from `../node_modules/react-native/ReactCommon/oscompat`)
@@ -3680,6 +3709,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-theme-switch-animation"
   react-native-upload:
     :path: "../node_modules/@ammarahmed/react-native-upload"
+  react-native-view-shot:
+    :path: "../node_modules/react-native-view-shot"
   react-native-webview:
     :path: "../node_modules/react-native-webview"
   React-NativeModulesApple:
@@ -3881,6 +3912,7 @@ SPEC CHECKSUMS:
   react-native-sodium: 066f76e46c9be13e9260521e3fa994937c4cdab4
   react-native-theme-switch-animation: 449d6db7a760f55740505e7403ae8061debc9a7e
   react-native-upload: ddf12a152c62fcafa202ef0404d3d46333a6a6a6
+  react-native-view-shot: 6c008e58f4720de58370848201c5d4a082c6d4ca
   react-native-webview: 654f794a7686b47491cf43aa67f7f428bea00eed
   React-NativeModulesApple: 46690a0fe94ec28fc6fc686ec797b911d251ded0
   React-oscompat: 95875e81f5d4b3c7b2c888d5bd2c9d83450d8bdb
