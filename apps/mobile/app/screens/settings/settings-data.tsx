@@ -118,7 +118,8 @@ export const settingsGroups: SettingSection[] = [
           if (
             (user.subscription?.provider === SubscriptionProvider.GOOGLE ||
               user.subscription?.provider === SubscriptionProvider.APPLE) &&
-            isCurrentPlatform
+            isCurrentPlatform &&
+            user?.subscription?.productId
           ) {
             RNIap.deepLinkToSubscriptions({
               sku: user?.subscription.productId
@@ -142,13 +143,18 @@ export const settingsGroups: SettingSection[] = [
             "dddd, MMMM D, YYYY h:mm A"
           );
 
-          if (user.subscription?.plan !== SubscriptionPlan.FREE) {
+          if (
+            user.subscription?.plan !== SubscriptionPlan.FREE &&
+            user.subscription?.productId
+          ) {
             const status = user.subscription?.status;
             return status === SubscriptionStatus.TRIAL
               ? strings.trialEndsOn(
                   dayjs(user?.subscription?.start)
                     .add(
-                      user?.subscription?.productId.includes("monthly") ? 7 : 14
+                      user?.subscription?.productId?.includes("monthly")
+                        ? 7
+                        : 14
                     )
                     .format("dddd, MMMM D, YYYY h:mm A")
                 )

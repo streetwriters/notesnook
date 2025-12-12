@@ -992,7 +992,7 @@ const PricingPlanCard = ({
           PremiumService.get() &&
           (pricingPlans?.user?.subscription?.productId ===
             (product as RNIap.Subscription)?.productId ||
-            pricingPlans?.user?.subscription?.productId.startsWith(
+            pricingPlans?.user?.subscription?.productId?.startsWith(
               (product as RNIap.Subscription)?.productId
             ));
         pricingPlans?.selectPlan(
