@@ -22,7 +22,7 @@ import { useEffect, useRef } from "react";
 import { Button } from "../../components/button";
 import { useTimer } from "../../hooks/use-timer";
 import { SelectionBasedReactNodeViewProps } from "../react/types";
-import { MathBlock, MathBlockAttributes } from "./math-block";
+import { MathBlockAttributes } from "./math-block";
 import { loadKatex } from "./plugin/renderers/katex";
 import { useThemeEngineStore } from "@notesnook/theme";
 import SimpleBar from "simplebar-react";
@@ -32,34 +32,37 @@ export function MathBlockComponent(
   props: SelectionBasedReactNodeViewProps<MathBlockAttributes>
 ) {
   const { editor, node, forwardRef, getPos } = props;
-  const { indentLength, indentType, caretPosition } = node.attrs;
+  const { caretPosition } = node.attrs;
 
-  const isActive = editor.isActive(MathBlock.name);
-  const elementRef = useRef<HTMLElement>();
-  const codeElementRef = useRef<HTMLElement>();
-  const toolbarRef = useRef<HTMLDivElement>(null);
+  const pos = getPos();
+  const { from, to } = editor.state.selection;
+  const isActive = from >= pos && to < pos + node.nodeSize;
+  const mathRendererRef = useRef<HTMLElement>();
+  const mathInputElementRef = useRef<HTMLElement>();
   const theme = useThemeEngineStore((store) => store.theme);
   const { enabled, start } = useTimer(1000);
 
-  console.log("Rerendering MathBlockComponent", isActive);
   useEffect(() => {
-    if (isActive) return;
     (async function () {
       const pos = getPos();
       const node = editor.state.doc.nodeAt(pos);
       const text = node?.textContent;
 
-      if (text && elementRef.current) {
-        const katex = await loadKatex();
+      if (mathRendererRef.current) {
+        if (text && text.trim()) {
+          const katex = await loadKatex();
 
-        elementRef.current.innerHTML = katex.renderToString(text, {
-          displayMode: true,
-          globalGroup: true,
-          throwOnError: false
-        });
+          mathRendererRef.current.innerHTML = katex.renderToString(text, {
+            displayMode: true,
+            globalGroup: true,
+            throwOnError: false
+          });
+        } else {
+          mathRendererRef.current.innerHTML = "";
+        }
       }
     })();
-  }, [isActive]);
+  }, [isActive, node.textContent]);
 
   return (
     <>
@@ -68,7 +71,7 @@ export function MathBlockComponent(
           flexDirection: "column",
           borderRadius: "default",
           overflow: "hidden",
-          ...(isActive ? {} : { height: "1px", width: 0, visibility: "hidden" })
+          display: isActive ? "flex" : "none"
         }}
       >
         <SimpleBar
@@ -79,7 +82,7 @@ export function MathBlockComponent(
           <div>
             <Text
               ref={(ref) => {
-                codeElementRef.current = ref ?? undefined;
+                mathInputElementRef.current = ref ?? undefined;
                 forwardRef?.(ref);
               }}
               autoCorrect="off"
@@ -89,7 +92,6 @@ export function MathBlockComponent(
                 pre: {
                   fontFamily: "inherit !important",
                   tabSize: "inherit !important",
-                  // background: "transparent !important",
                   padding: "10px !important",
                   margin: "0px !important",
                   width: "100%",
@@ -105,13 +107,10 @@ export function MathBlockComponent(
                   }
                 },
                 fontFamily: "monospace",
-                whiteSpace: "pre", // TODO !important
+                whiteSpace: "pre",
                 tabSize: 1,
                 position: "relative",
                 lineHeight: "20px",
-                // bg: "var(--background-secondary)",
-                // color: "white",
-                // overflowX: "hidden",
                 display: "flex"
               }}
               spellCheck={false}
@@ -119,7 +118,6 @@ export function MathBlockComponent(
           </div>
         </SimpleBar>
         <Flex
-          ref={toolbarRef}
           contentEditable={false}
           sx={{
             bg: "var(--background-secondary)",
@@ -136,29 +134,6 @@ export function MathBlockComponent(
                 : ""}
             </Text>
           ) : null}
-
-          <Button
-            variant={"icon"}
-            sx={{
-              p: 1,
-              opacity: "1 !important"
-            }}
-            title={strings.toggleIndentationMode()}
-            disabled={!editor.isEditable}
-            onClick={() => {
-              if (!editor.isEditable) return;
-              editor.commands.changeCodeBlockIndentation({
-                type: indentType === "space" ? "tab" : "space",
-                amount: indentLength
-              });
-            }}
-          >
-            <Text variant={"subBody"}>
-              {indentType === "space" ? strings.spaces() : strings.tabs()}:{" "}
-              {indentLength}
-            </Text>
-          </Button>
-
           <Button
             variant={"icon"}
             sx={{
@@ -191,7 +166,7 @@ export function MathBlockComponent(
               onClick={() => {
                 editor.storage.copyToClipboard?.(
                   node.textContent,
-                  codeElementRef?.current?.innerHTML
+                  mathInputElementRef?.current?.innerHTML
                 );
                 start();
               }}
@@ -208,7 +183,18 @@ export function MathBlockComponent(
           ) : null}
         </Flex>
       </Flex>
-      <Box contentEditable={false} ref={elementRef} />
+      {node.textContent && node.textContent.trim() && (
+        <SimpleBar
+          style={{
+            borderRadius: "5px",
+            paddingInline: "5px",
+            border: isActive ? "1px solid var(--border)" : "none",
+            marginTop: isActive ? "8px" : "0px"
+          }}
+        >
+          <Box contentEditable={false} ref={mathRendererRef} />
+        </SimpleBar>
+      )}
     </>
   );
 }

@@ -53,9 +53,31 @@ export type MathBlockAttributes = {
   caretPosition?: CaretPosition;
 };
 
+export interface MathBlockOptions {
+  /**
+   * Define whether the node should be exited on triple enter.
+   * Defaults to `true`.
+   */
+  exitOnTripleEnter: boolean;
+  /**
+   * Define whether the node should be exited on arrow down if there is no node after it.
+   * Defaults to `true`.
+   */
+  exitOnArrowDown: boolean;
+  /**
+   * Define whether the node should be exited on arrow up if there is no node before it.
+   * Defaults to `true`.
+   */
+  exitOnArrowUp: boolean;
+  /**
+   * Custom HTML attributes that should be added to the rendered HTML tag.
+   */
+  HTMLAttributes: Record<string, unknown>;
+}
+
 // simple inputrule for block math
 const REGEX_BLOCK_MATH_DOLLARS = /\$\$\$\s+$/; //new RegExp("\$\$\s+$", "i");
-export const MathBlock = Node.create({
+export const MathBlock = Node.create<MathBlockOptions>({
   name: "mathBlock",
   group: "block math",
   content: "text*", // important!
@@ -63,6 +85,15 @@ export const MathBlock = Node.create({
   code: true,
   draggable: false,
   marks: "",
+
+  addOptions() {
+    return {
+      exitOnTripleEnter: true,
+      exitOnArrowDown: true,
+      exitOnArrowUp: true,
+      HTMLAttributes: {}
+    };
+  },
 
   addAttributes() {
     return {
@@ -189,7 +220,6 @@ export const MathBlock = Node.create({
         if (indentation) return indentOnEnter(editor, $from, indentation);
         return false;
       },
-
       // exit node on arrow up
       ArrowUp: ({ editor }) => {
         if (!this.options.exitOnArrowUp) {
@@ -198,18 +228,29 @@ export const MathBlock = Node.create({
 
         const { state } = editor;
         const { selection } = state;
-        const { $anchor, empty } = selection;
+        const { $anchor, empty, $from } = selection;
 
         if (!empty || $anchor.parent.type !== this.type) {
           return false;
         }
 
-        const isAtStart = $anchor.pos === 1;
-        if (!isAtStart) {
+        const isAtStartOfNode = $from.parentOffset === 0;
+        if (!isAtStartOfNode) {
           return false;
         }
 
-        return editor.commands.insertContentAt(0, "<p></p>");
+        const before = $from.before();
+        if (before === undefined) {
+          return false;
+        }
+
+        const nodeBefore = state.doc.nodeAt(before);
+        if (nodeBefore) {
+          editor.commands.setNodeSelection($from.before());
+          return false;
+        }
+
+        return editor.commands.exitCode();
       },
       // exit node on arrow down
       ArrowDown: ({ editor }) => {
@@ -359,7 +400,7 @@ export const MathBlock = Node.create({
   addNodeView() {
     return createSelectionBasedNodeView(MathBlockComponent, {
       contentDOMFactory: () => {
-        const content = document.createElement("div");
+        const content = document.createElement("pre");
         content.classList.add("node-content-wrapper");
         content.style.whiteSpace = "pre";
         // caret is not visible if content element width is 0px

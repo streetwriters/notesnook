@@ -132,7 +132,8 @@
 
 .ProseMirror > div.codeblock-view-content-wrap,
 .ProseMirror > div.taskList-view-content-wrap,
-.ProseMirror > div.math-block.math-node {
+.ProseMirror > div.math-block.math-node,
+.ProseMirror > div.mathBlock-view-content-wrap {
   margin-top: 1em;
   margin-bottom: 1em;
 }
