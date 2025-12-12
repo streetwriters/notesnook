@@ -425,6 +425,37 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
             })
           )
           .run();
+      },
+      ArrowUp: ({ editor }) => {
+        if (!this.options.exitOnArrowUp) {
+          return false;
+        }
+
+        const { state } = editor;
+        const { selection } = state;
+        const { $anchor, empty, $from } = selection;
+
+        if (!empty || $anchor.parent.type !== this.type) {
+          return false;
+        }
+
+        const isAtStartOfNode = $from.parentOffset === 0;
+        if (!isAtStartOfNode) {
+          return false;
+        }
+
+        const before = $from.before();
+        if (before === undefined) {
+          return false;
+        }
+
+        const nodeBefore = state.doc.nodeAt(before);
+        if (nodeBefore) {
+          editor.commands.setNodeSelection($from.before());
+          return false;
+        }
+
+        return editor.commands.exitCode();
       }
     };
   },
