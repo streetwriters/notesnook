@@ -11,5 +11,5 @@
     "cache": true,
     "cacheStrategy": "content"
   },
-  "git.rebaseWhenSync": true
+  "git.rebaseWhenSync": false
 }
