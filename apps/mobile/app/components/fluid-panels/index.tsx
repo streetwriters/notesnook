@@ -354,8 +354,9 @@ export const FluidPanels = forwardRef<TabsRef, TabProps>(function FluidTabs(
       const finalValue = isSwipeLeft
         ? translateX.value - velocityX / 40.0
         : translateX.value + velocityX / 40.0;
+      const velocity = velocityX / 5000;
       const animationConfig: WithSpringConfig = {
-        velocity: velocityX / 10,
+        velocity: velocity,
         ...SnappySpringConfig
       };
 
