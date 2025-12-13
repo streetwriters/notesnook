@@ -17,23 +17,29 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { ScopedThemeProvider, useThemeColors } from "@notesnook/theme";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React from "react";
+import { View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import useNavigationStore from "../../stores/use-navigation-store";
-import { ScopedThemeProvider, useThemeColors } from "@notesnook/theme";
 import Group from "./group";
 import Home from "./home";
 import { RouteParams } from "./types";
-import { SafeAreaView } from "react-native-safe-area-context";
 const SettingsStack = createNativeStackNavigator<RouteParams>();
 
 export const Settings = () => {
   const { colors } = useThemeColors();
+  const insets = useSafeAreaInsets();
   return (
-    <SafeAreaView
+    <View
       style={{
         flex: 1,
-        backgroundColor: colors.primary.background
+        backgroundColor: colors.primary.background,
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
+        paddingLeft: insets.left,
+        paddingRight: insets.right
       }}
     >
       <ScopedThemeProvider value="list">
@@ -58,7 +64,7 @@ export const Settings = () => {
           <SettingsStack.Screen name="SettingsGroup" component={Group} />
         </SettingsStack.Navigator>
       </ScopedThemeProvider>
-    </SafeAreaView>
+    </View>
   );
 };
 

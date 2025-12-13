@@ -59,7 +59,7 @@ const Home = ({
         hasSearch={false}
         id="Settings"
       />
-      <DelayLayout delay={0} type="settings">
+      <DelayLayout type="settings">
         <LegendList
           data={settingsGroups}
           keyExtractor={keyExtractor}

@@ -104,15 +104,12 @@ function _MenuItem({
   const _onPress = () => {
     if (useSideBarDraggingStore.getState().dragging) return;
     if (item.onPress) return item.onPress(item);
-
+    Navigation.closeDrawer();
     if (useNavigationStore.getState().currentRoute !== item.id) {
       Navigation.navigate(item.id as keyof RouteParams, {
         canGoBack: false
       });
     }
-    setTimeout(() => {
-      Navigation.closeDrawer();
-    }, 32);
   };
 
   return (

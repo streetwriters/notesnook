@@ -72,10 +72,8 @@ export const MenuItemsList: SideMenuItem[] = [
     title: "Monographs",
     icon: "text-box-multiple-outline",
     onPress: () => {
+      Navigation.closeDrawer();
       Monographs.navigate();
-      setTimeout(() => {
-        Navigation.closeDrawer();
-      }, 32);
     },
     type: "side-menu-item"
   },
