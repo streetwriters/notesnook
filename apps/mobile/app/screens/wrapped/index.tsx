@@ -930,10 +930,7 @@ export const Wrapped = ({ navigation, route }: NavigationProps<"Wrapped">) => {
   const { width } = useWindowDimensions();
   const [loading, setLoading] = useState(true);
   const [wrapped, setWrapped] = useState<WrappedStats | null>(null);
-  const wrappedRef = useStoredRef<WrappedStats | null>(
-    "wrapped-" + dayjs().year(),
-    null
-  );
+  const wrappedRef = useRef<WrappedStats | null>(null);
   const [showPresentation, setShowPresentation] = useState(false);
   const [messageIndex, setMessageIndex] = useState(0);
   const insets = useGlobalSafeAreaInsets();
@@ -958,18 +955,11 @@ export const Wrapped = ({ navigation, route }: NavigationProps<"Wrapped">) => {
     async function loadWrapped() {
       setLoading(true);
       try {
-        if (!wrappedRef.current) {
-          wrappedRef.current = await db.wrapped.get();
-          console.log("CACHE NOT FOUND");
-        }
-        setWrapped(wrappedRef.current);
-        console.log("WRAP LOADED");
+        const wrapped = await db.wrapped.get();
+        setWrapped(wrapped);
         setShowPresentation(true);
         setSlides(() => {
           const slides: React.ReactNode[] = [];
-          if (!wrappedRef.current) return [];
-          const wrapped = wrappedRef.current as WrappedStats;
-
           slides.push(<WelcomeSlide key="welcome" width={width} />);
           slides.push(
             <TotalNotesSlide
