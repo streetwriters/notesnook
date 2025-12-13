@@ -926,15 +926,13 @@ function SummarySlide({
 
 // Main Wrapped Component
 export const Wrapped = ({ navigation, route }: NavigationProps<"Wrapped">) => {
-  const { colors } = useThemeColors();
+  const { colors, isDark } = useThemeColors();
   const { width } = useWindowDimensions();
   const [loading, setLoading] = useState(true);
   const [wrapped, setWrapped] = useState<WrappedStats | null>(null);
-  const wrappedRef = useRef<WrappedStats | null>(null);
   const [showPresentation, setShowPresentation] = useState(false);
   const [messageIndex, setMessageIndex] = useState(0);
   const insets = useGlobalSafeAreaInsets();
-  const dimensions = useSettingStore((state) => state.dimensions);
   const [slides, setSlides] = useState<React.ReactNode[]>([]);
 
   useNavigationFocus(navigation, { focusOnInit: true });
@@ -1047,14 +1045,6 @@ export const Wrapped = ({ navigation, route }: NavigationProps<"Wrapped">) => {
         backgroundColor: colors.primary.background
       }}
     >
-      <PolkadotBackground
-        width={dimensions.width}
-        height={dimensions.height}
-        dotColor={colors.primary.separator}
-        spacing={40}
-        opacity={1}
-      />
-
       {showPresentation && wrapped ? (
         <>
           <View
@@ -1131,59 +1121,4 @@ export const Wrapped = ({ navigation, route }: NavigationProps<"Wrapped">) => {
     </SafeAreaView>
   );
 };
-
-export function PolkadotBackground({
-  width,
-  height,
-  spacing = 50,
-  dotSize = 3,
-  dotColor = "#ececec",
-  opacity = 0.1
-}: {
-  width: number;
-  height: number;
-  spacing?: number;
-  dotSize?: number;
-  dotColor?: string;
-  opacity: number;
-}) {
-  const { colors } = useThemeColors();
-
-  // Create a simple dot pattern using absolute positioned views
-  const rows = Math.ceil(height / spacing);
-  const cols = Math.ceil(width / spacing);
-
-  return (
-    <View
-      style={[
-        StyleSheet.absoluteFill,
-        {
-          backgroundColor: colors.primary.background,
-          overflow: "hidden",
-          opacity: opacity
-        }
-      ]}
-      pointerEvents="none"
-    >
-      {Array.from({ length: rows }).map((_, row) =>
-        Array.from({ length: cols }).map((_, col) => (
-          <View
-            key={`${row}-${col}`}
-            style={{
-              position: "absolute",
-              left: col * spacing,
-              top: row * spacing,
-              width: dotSize,
-              height: dotSize,
-              borderRadius: dotSize / 2,
-              backgroundColor: dotColor,
-              opacity: 1
-            }}
-          />
-        ))
-      )}
-    </View>
-  );
-}
-
 export default Wrapped;
