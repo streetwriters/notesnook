@@ -36,9 +36,11 @@ const VISIBLE_STYLES = {
 };
 
 export function InlineMathComponent(props: SelectionBasedReactNodeViewProps) {
-  const { editor, getPos, forwardRef } = props;
+  const { editor, node, getPos, forwardRef } = props;
   const elementRef = useRef<HTMLDivElement>(null);
-  const isActive = editor.isActive(MathInline.name);
+  const pos = getPos();
+  const { from, to } = editor.state.selection;
+  const isActive = from >= pos && to < pos + node.nodeSize;
 
   useEffect(() => {
     if (isActive) return;
@@ -72,7 +74,13 @@ export function InlineMathComponent(props: SelectionBasedReactNodeViewProps) {
             : HIDDEN_STYLES)
         }}
       >
-        <Text as="span" ref={forwardRef} />
+        <Text
+          as="span"
+          ref={forwardRef}
+          sx={{
+            div: { display: "inline" }
+          }}
+        />
       </Text>
       <Text
         as="span"
