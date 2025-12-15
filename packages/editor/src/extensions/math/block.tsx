@@ -192,7 +192,7 @@ export function MathBlockComponent(
             marginTop: isActive ? "8px" : "0px"
           }}
         >
-          <Box contentEditable={false} ref={mathRendererRef} />
+          <Box ref={mathRendererRef} />
         </SimpleBar>
       )}
     </>
