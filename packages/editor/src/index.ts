@@ -26,6 +26,7 @@ import CharacterCount from "@tiptap/extension-character-count";
 import Color from "@tiptap/extension-color";
 import HorizontalRule from "@tiptap/extension-horizontal-rule";
 import { Link, LinkAttributes } from "./extensions/link/index.js";
+import { Comment } from "./extensions/comment/index.js";
 import Placeholder from "@tiptap/extension-placeholder";
 import Subscript from "@tiptap/extension-subscript";
 import Superscript from "@tiptap/extension-superscript";
@@ -282,6 +283,7 @@ const useTiptap = (
           autolink: false,
           linkOnPaste: true
         }),
+        Comment.configure({}),
         Table.configure({
           resizable: true,
           allowTableNodeSelection: true,

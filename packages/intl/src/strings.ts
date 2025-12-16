@@ -2605,5 +2605,11 @@ Use this if changes from other devices are not appearing on this device. This wi
   clickToDirectlyClaimPromo: () =>
     t`Click here to directly claim the promotion.`,
   loginToUploadAttachments: () =>
-    t`Login to upload attachments. [Read more](https://help.notesnook.com/faqs/login-to-upload-attachments)`
+    t`Login to upload attachments. [Read more](https://help.notesnook.com/faqs/login-to-upload-attachments)`,
+  addComment: () => t`Add comment`,
+  editComment: () => t`Edit comment`,
+  viewComment: () => t`View comment`,
+  deleteComment: () => t`Delete comment`,
+  writeComment: () => t`Write a comment...`,
+  saveComment: () => t`Save comment`
 };

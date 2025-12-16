@@ -699,6 +699,10 @@ msgstr ""
 msgid "Add color"
 msgstr ""
 
+#: src/strings.ts:2609
+msgid "Add comment"
+msgstr ""
+
 #: src/strings.ts:894
 msgid "Add notebook"
 msgstr ""
@@ -2090,6 +2094,10 @@ msgstr ""
 msgid "Delete column"
 msgstr ""
 
+#: src/strings.ts:2612
+msgid "Delete comment"
+msgstr ""
+
 #: src/strings.ts:1313
 msgid "Delete group"
 msgstr ""
@@ -2345,6 +2353,10 @@ msgstr ""
 
 #: src/strings.ts:1776
 msgid "Edit"
+msgstr ""
+
+#: src/strings.ts:2610
+msgid "Edit comment"
 msgstr ""
 
 #: src/strings.ts:526
@@ -5399,6 +5411,10 @@ msgstr ""
 msgid "Save and continue"
 msgstr ""
 
+#: src/strings.ts:2614
+msgid "Save comment"
+msgstr ""
+
 #: src/strings.ts:1047
 msgid "Save data recovery key"
 msgstr ""
@@ -6965,6 +6981,10 @@ msgstr ""
 msgid "View and share debug logs"
 msgstr ""
 
+#: src/strings.ts:2611
+msgid "View comment"
+msgstr ""
+
 #: src/strings.ts:1746
 msgid "View receipt"
 msgstr ""
@@ -7096,6 +7116,10 @@ msgstr ""
 
 #: src/strings.ts:2411
 msgid "Work & Office"
+msgstr ""
+
+#: src/strings.ts:2613
+msgid "Write a comment..."
 msgstr ""
 
 #: src/strings.ts:822

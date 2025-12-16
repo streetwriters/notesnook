@@ -75,6 +75,15 @@ const tools: Record<ToolId, ToolDefinition> = {
     title: strings.linkSettings(),
     conditional: true
   },
+  addComment: {
+    icon: "comment",
+    title: strings.addComment()
+  },
+  viewComment: {
+    icon: "comment",
+    title: strings.viewComment(),
+    conditional: true
+  },
   code: {
     icon: "code",
     title: strings.code()
@@ -413,7 +422,7 @@ const defaultPresets: Record<"default" | "minimal", ToolbarDefinition> = {
     ["fontSize"],
     ["headings", "fontFamily"],
     ["checkList", "numberedList", "bulletList"],
-    ["addLink", "addInternalLink"],
+    ["addLink", "addInternalLink", "addComment"],
     ["alignment", "textDirection"],
     ["clearformatting"]
   ],
