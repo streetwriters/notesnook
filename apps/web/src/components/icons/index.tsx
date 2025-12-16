@@ -231,7 +231,8 @@ import {
   mdiNotePlus,
   mdiNoteEditOutline,
   mdiArrowUp,
-  mdiInbox
+  mdiInbox,
+  mdiMonitor
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
@@ -586,3 +587,4 @@ export const ExpandSidebar = createIcon(mdiArrowCollapseRight);
 export const HamburgerMenu = createIcon(mdiMenu);
 export const ArrowUp = createIcon(mdiArrowUp);
 export const Inbox = createIcon(mdiInbox);
+export const Monitor = createIcon(mdiMonitor);

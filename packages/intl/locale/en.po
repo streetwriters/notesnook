@@ -2737,6 +2737,10 @@ msgstr "Failed to download file"
 msgid "Failed to install theme."
 msgstr "Failed to install theme."
 
+#: src/strings.ts:2613
+msgid "Failed to log out session."
+msgstr "Failed to log out session."
+
 #: src/strings.ts:947
 msgid "Failed to open"
 msgstr "Failed to open"
@@ -3690,6 +3694,10 @@ msgstr "Login failed"
 #: src/strings.ts:901
 msgid "Login required"
 msgstr "Login required"
+
+#: src/strings.ts:2609
+msgid "Login sessions"
+msgstr "Login sessions"
 
 #: src/strings.ts:778
 msgid "Login successful"
@@ -5778,6 +5786,10 @@ msgstr "Servers configuration"
 msgid "Session expired"
 msgstr "Session expired"
 
+#: src/strings.ts:2612
+msgid "Session logged out"
+msgstr "Session logged out"
+
 #: src/strings.ts:2190
 msgid "Sessions"
 msgstr "Sessions"
@@ -7010,6 +7022,10 @@ msgstr "Videos"
 msgid "View all linked notebooks"
 msgstr "View all linked notebooks"
 
+#: src/strings.ts:2610
+msgid "View and manage your active login sessions."
+msgstr "View and manage your active login sessions."
+
 #: src/strings.ts:1269
 msgid "View and share debug logs"
 msgstr "View and share debug logs"
@@ -7021,6 +7037,10 @@ msgstr "View receipt"
 #: src/strings.ts:1059
 msgid "View recovery codes"
 msgstr "View recovery codes"
+
+#: src/strings.ts:2611
+msgid "View sessions"
+msgstr "View sessions"
 
 #: src/strings.ts:2151
 msgid "View source code"

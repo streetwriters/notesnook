@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { User } from "../types.js";
+import { User, UserSession } from "../types.js";
 import http from "../utils/http.js";
 import constants from "../utils/constants.js";
 import TokenManager from "./token-manager.js";
@@ -243,10 +243,10 @@ class UserManager {
     EV.publish(EVENTS.userLoggedIn, user);
   }
 
-  async getSessions() {
+  async getSessions(): Promise<UserSession[]> {
     const token = await this.tokenManager.getAccessToken();
-    if (!token) return;
-    await http.get(`${constants.AUTH_HOST}/account/sessions`, token);
+    if (!token) return [];
+    return await http.get(`${constants.AUTH_HOST}/account/sessions`, token);
   }
 
   async clearSessions(all = false) {
@@ -284,6 +284,17 @@ class UserManager {
       EV.publish(EVENTS.userLoggedOut, reason);
       EV.publish(EVENTS.appRefreshRequested);
     }
+  }
+
+  async logoutSession(sessionKey: string) {
+    const token = await this.tokenManager.getAccessToken();
+    if (!token) return [];
+
+    await http.post(
+      `${constants.AUTH_HOST}/account/clear-session`,
+      { sessionKey },
+      token
+    );
   }
 
   setUser(user: User) {
