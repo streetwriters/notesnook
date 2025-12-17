@@ -217,12 +217,12 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
           position: "absolute",
           bottom: 20,
           right: 20,
-          gap: DefaultAppStyles.GAP_VERTICAL,
           alignItems: "center"
         }}
       >
         <FloatingButton
           icon="file-tree"
+          testID="notebookTreeSheet"
           size="small"
           onPress={() => {
             Notebooks.present(params.current.item);
@@ -230,7 +230,8 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
           style={{
             position: "relative",
             right: 0,
-            bottom: 5
+            bottom: 0,
+            paddingBottom: 10
           }}
         />
         <FloatingButton
@@ -238,6 +239,7 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
           alwaysVisible
           style={{
             position: "relative",
+            paddingTop: 10,
             right: 0,
             bottom: 0
           }}

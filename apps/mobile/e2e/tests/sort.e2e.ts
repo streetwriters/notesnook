@@ -34,7 +34,7 @@ describe("Sort & filter", () => {
           .element(by.web.className("ProseMirror"))
           .typeText("Edited ", true);
       })
-      .pressBack()
+      .pressBack(2)
       .waitAndTapById("icon-sort")
       .wait(500)
       .waitAndTapByText("Date created")

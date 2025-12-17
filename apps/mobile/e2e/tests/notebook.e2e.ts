@@ -121,7 +121,7 @@ describe("NOTEBOOKS", () => {
       .run();
   });
 
-  it.only("Remove note from notebook", async () => {
+  it("Remove note from notebook", async () => {
     await TestBuilder.create()
       .prepare()
       .openSideMenu()
@@ -138,7 +138,8 @@ describe("NOTEBOOKS", () => {
           .longPressByText(note.body)
           .wait(500)
           .waitAndTapById("select-minus")
-          .isNotVisibleById(note.title)
+          .wait(500)
+          .isNotVisibleByText(note.body)
           .run();
       })
       .run();
@@ -199,6 +200,7 @@ describe("NOTEBOOKS", () => {
       .longPressByText("Notebook 1")
       .wait(500)
       .waitAndTapByText("Move to trash")
+      .wait(500)
       .waitAndTapByText("Delete")
       .waitAndTapById("tab-home")
       .waitAndTapByText("Trash")

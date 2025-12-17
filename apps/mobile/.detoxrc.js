@@ -47,7 +47,7 @@ module.exports = {
     simulator: {
       type: "ios.simulator",
       device: {
-        type: "iPhone 12"
+        type: "iPhone 17 Pro Max"
       }
     },
     attached: {
@@ -59,7 +59,7 @@ module.exports = {
     emulator: {
       type: "android.emulator",
       device: {
-        avdName: "Pixel_5_API_34"
+        avdName: "Pixel_5_API_36"
       }
     }
   },

@@ -96,22 +96,22 @@ export class VaultDialog extends Component {
     this.title = !this.state.novault
       ? strings.createVault()
       : this.state.fingerprintAccess
-      ? strings.vaultFingerprintUnlock()
-      : this.state.revokeFingerprintAccess
-      ? strings.revokeVaultFingerprintUnlock()
-      : this.state.changePassword
-      ? strings.changeVaultPassword()
-      : this.state.noteLocked
-      ? this.state.deleteNote
-        ? strings.deleteNote()
-        : this.state.share
-        ? strings.shareNote()
-        : this.state.copyNote
-        ? strings.copyNote()
-        : this.state.goToEditor
-        ? strings.goToEditor()
-        : strings.goToEditor()
-      : strings.lockNote();
+        ? strings.vaultFingerprintUnlock()
+        : this.state.revokeFingerprintAccess
+          ? strings.revokeVaultFingerprintUnlock()
+          : this.state.changePassword
+            ? strings.changeVaultPassword()
+            : this.state.noteLocked
+              ? this.state.deleteNote
+                ? strings.deleteNote()
+                : this.state.share
+                  ? strings.shareNote()
+                  : this.state.copyNote
+                    ? strings.copyNote()
+                    : this.state.goToEditor
+                      ? strings.goToEditor()
+                      : strings.goToEditor()
+              : strings.lockNote();
   }
 
   componentDidMount() {
@@ -337,12 +337,13 @@ export class VaultDialog extends Component {
             );
           });
         }
-
         eSendEvent("vaultUpdated");
         this.setState({
           loading: false
         });
-        this.close();
+        setTimeout(() => {
+          this.close();
+        }, 100);
       } else {
         ToastManager.show({
           heading: strings.passwordIncorrect(),
@@ -353,9 +354,6 @@ export class VaultDialog extends Component {
     } catch (e) {
       console.error(e);
     }
-    this.setState({
-      loading: false
-    });
   };
 
   clearVault = async () => {
@@ -874,24 +872,24 @@ export class VaultDialog extends Component {
               deleteVault
                 ? strings.delete()
                 : clearVault
-                ? strings.clear()
-                : fingerprintAccess
-                ? strings.enable()
-                : this.state.revokeFingerprintAccess
-                ? strings.revoke()
-                : changePassword
-                ? strings.change()
-                : this.state.noteLocked
-                ? deleteNote
-                  ? strings.delete()
-                  : share
-                  ? strings.share()
-                  : goToEditor
-                  ? strings.open()
-                  : strings.unlock()
-                : !note.id
-                ? strings.create()
-                : strings.lock()
+                  ? strings.clear()
+                  : fingerprintAccess
+                    ? strings.enable()
+                    : this.state.revokeFingerprintAccess
+                      ? strings.revoke()
+                      : changePassword
+                        ? strings.change()
+                        : this.state.noteLocked
+                          ? deleteNote
+                            ? strings.delete()
+                            : share
+                              ? strings.share()
+                              : goToEditor
+                                ? strings.open()
+                                : strings.unlock()
+                          : !note.id
+                            ? strings.create()
+                            : strings.lock()
             }
           />
         </View>

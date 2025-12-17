@@ -84,7 +84,7 @@ describe("VAULT", () => {
       .run();
   });
 
-  it.only("Change vault password", async () => {
+  it("Change vault password", async () => {
     await TestBuilder.create()
       .prepare()
       .createNote()
@@ -94,7 +94,7 @@ describe("VAULT", () => {
       .typeTextById(notesnook.ids.dialogs.vault.pwd, "1234")
       .typeTextById(notesnook.ids.dialogs.vault.changePwd, "2362")
       .waitAndTapByText("Change")
-      .pressBack(3)
+      .pressBack(4)
       .addStep(async () => await openLockedNote("2362"))
       .run();
   });

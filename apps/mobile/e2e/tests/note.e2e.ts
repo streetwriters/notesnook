@@ -134,7 +134,7 @@ describe("NOTE TESTS", () => {
       .run();
   });
 
-  it("Assign colors to a note", async () => {
+  it.only("Assign colors to a note", async () => {
     await TestBuilder.create()
       .prepare()
       .createNote()
