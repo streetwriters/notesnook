@@ -87,7 +87,7 @@
   "devDependencies": {
     "@babel/core": "7.22.5",
     "@cloudflare/workers-types": "^4.20250224.0",
-    "@playwright/test": "1.48.2",
+    "@playwright/test": "1.57.0",
     "@swc/plugin-react-remove-properties": "^6.0.2",
     "@trpc/server": "10.45.2",
     "@types/babel__core": "^7.20.1",
