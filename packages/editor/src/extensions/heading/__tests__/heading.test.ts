@@ -109,3 +109,19 @@ for (const { name, setNode } of nodes) {
     expect(editor.getHTML()).toMatchSnapshot();
   });
 }
+
+test("empty heading should have empty class", () => {
+  const { editor } = createEditor({
+    extensions: {
+      heading: Heading.configure({ levels: [1, 2, 3, 4, 5, 6] })
+    },
+    initialContent: "<h1></h1>"
+  });
+
+  const headingElement = editor.view.dom.querySelector("h1");
+  expect(headingElement?.classList.contains("empty")).toBe(true);
+
+  editor.commands.setTextSelection(0);
+  editor.commands.insertContent("Some content");
+  expect(headingElement?.classList.contains("empty")).toBe(false);
+});

@@ -956,12 +956,12 @@ del.diffdel {
   opacity: 1;
 }
 
-.ProseMirror h1.is-empty::after,
-.ProseMirror h2.is-empty::after,
-.ProseMirror h3.is-empty::after,
-.ProseMirror h4.is-empty::after,
-.ProseMirror h5.is-empty::after,
-.ProseMirror h6.is-empty::after {
+.ProseMirror h1.empty::after,
+.ProseMirror h2.empty::after,
+.ProseMirror h3.empty::after,
+.ProseMirror h4.empty::after,
+.ProseMirror h5.empty::after,
+.ProseMirror h6.empty::after {
   display: none !important;
 }
 
