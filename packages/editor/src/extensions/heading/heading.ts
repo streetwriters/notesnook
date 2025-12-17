@@ -173,6 +173,10 @@ export const Heading = TiptapHeading.extend({
         heading.setAttribute(attr, HTMLAttributes[attr]);
       }
 
+      if (node.textContent === "") {
+        heading.classList.add("empty");
+      }
+
       if (node.attrs.collapsed) heading.dataset.collapsed = "true";
       else delete heading.dataset.collapsed;
 
@@ -262,6 +266,12 @@ export const Heading = TiptapHeading.extend({
 
           if (updatedNode.attrs.level !== node.attrs.level) {
             return false;
+          }
+
+          if (updatedNode.textContent === "") {
+            heading.classList.add("empty");
+          } else {
+            heading.classList.remove("empty");
           }
 
           if (updatedNode.attrs.collapsed) heading.dataset.collapsed = "true";
