@@ -604,7 +604,7 @@ export type User = {
     cancelURL: string | null;
     expiry: number;
     trialExpiry?: number;
-    productId: string;
+    productId: string | null;
     provider: SubscriptionProvider;
     start: number;
     plan: SubscriptionPlan;
