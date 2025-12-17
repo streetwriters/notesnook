@@ -590,6 +590,21 @@ function AttachmentsSlide({
   );
 }
 
+const MONTHS_IN_ORDER = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December"
+];
+
 // Summary Slide
 function SummarySlide({
   stats,
@@ -653,7 +668,7 @@ function SummarySlide({
                     gap: 10
                   }}
                 >
-                  {Object.keys(stats.monthlyStats).map((item) => (
+                  {MONTHS_IN_ORDER.map((item) => (
                     <View
                       key={item}
                       style={{
@@ -663,7 +678,10 @@ function SummarySlide({
                     >
                       <View
                         style={{
-                          backgroundColor: colors.primary.accent,
+                          backgroundColor:
+                            stats.monthlyStats[item] === maxCount
+                              ? colors.primary.accent
+                              : colors.primary.icon,
                           height:
                             maxCount > 0
                               ? (stats.monthlyStats[item] / maxCount) * 100
