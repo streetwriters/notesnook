@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ISodium, base64_variants } from "@notesnook/sodium";
-import KeyUtils from "./keyutils.js";
+import { ISodium } from "@notesnook/sodium";
+import KeyUtils, { base64_variants } from "./keyutils.js";
 import { Chunk, Cipher, Input, DataFormat, SerializedKey } from "./types.js";
 
 const encoder = new TextEncoder();

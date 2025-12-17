@@ -20,7 +20,6 @@ import dayjs from "dayjs";
 import React, { RefObject, useEffect, useState } from "react";
 import { View } from "react-native";
 import { ActionSheetRef, ScrollView } from "react-native-actions-sheet";
-import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../../common/database";
 import {
@@ -180,7 +179,6 @@ export default function ReminderNotify({
           </Paragraph>
           <List
             data={references}
-            CustomListComponent={FlashList}
             loading={false}
             dataType="note"
             isRenderedInActionSheet={true}

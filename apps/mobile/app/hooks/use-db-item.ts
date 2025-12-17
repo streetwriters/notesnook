@@ -59,8 +59,8 @@ export const useDBItem = <T extends keyof ItemTypeKey>(
   onItemUpdated?: (item?: ItemTypeKey[T]) => void
 ): [ItemTypeKey[T] | undefined, () => void] => {
   const [item, setItem] = useState<ItemTypeKey[T]>();
-  const itemIdRef = useRef<string>();
-  const prevIdOrIndexRef = useRef<string | number>();
+  const itemIdRef = useRef<string>(undefined);
+  const prevIdOrIndexRef = useRef<string | number>(undefined);
 
   if (prevIdOrIndexRef.current !== idOrIndex) {
     itemIdRef.current = undefined;

@@ -335,6 +335,12 @@ export const tiptapKeys = {
     category: "Editor",
     type: "tiptap"
   },
+  openSearchAndReplace: {
+    keys: "Mod-Alt-f",
+    description: "Open search and replace",
+    category: "Editor",
+    type: "tiptap"
+  },
   toggleStrike: {
     keys: "Mod-Shift-S",
     description: "Toggle strike",
@@ -392,6 +398,12 @@ export const tiptapKeys = {
   toggleHighlight: {
     keys: "Mod-Alt-h",
     description: "Toggle highlight",
+    category: "Editor",
+    type: "tiptap"
+  },
+  toggleTextColor: {
+    keys: "Mod-Alt-c",
+    description: "Toggle text color",
     category: "Editor",
     type: "tiptap"
   }

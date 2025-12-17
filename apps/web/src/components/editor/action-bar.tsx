@@ -91,7 +91,7 @@ type ToolButton = {
   hidden?: boolean;
   hideOnMobile?: boolean;
   toggled?: boolean;
-  onClick: () => void;
+  onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 };
 
 export function EditorActionBar() {
@@ -147,11 +147,15 @@ export function EditorActionBar() {
       enabled:
         activeSession &&
         (activeSession.type === "default" || activeSession.type === "readonly"),
-      onClick: () =>
-        activeSession &&
-        (activeSession.type === "default" ||
-          activeSession.type === "readonly") &&
-        showPublishView(activeSession.note, "top")
+      onClick: (e) => {
+        if (
+          !activeSession ||
+          (activeSession.type !== "default" &&
+            activeSession.type !== "readonly")
+        )
+          return;
+        showPublishView(activeSession.note, e.target as HTMLElement);
+      }
     },
     {
       title: strings.toc(),

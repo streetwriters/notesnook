@@ -64,8 +64,7 @@ ColoredNotes.navigate = (item: Color, canGoBack: boolean) => {
 
   Navigation.push<"ColoredNotes">("ColoredNotes", {
     item: item,
-    canGoBack,
-    title: toCamelCase(item.title)
+    canGoBack
   });
 };
 

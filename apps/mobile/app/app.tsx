@@ -51,8 +51,9 @@ const { appLockEnabled, appLockMode } = SettingsService.get();
 if (appLockEnabled || appLockMode !== "none") {
   useUserStore.getState().lockApp(true);
 }
-
-RNBootSplash.hide();
+RNBootSplash.hide({
+  fade: true
+});
 const App = (props: { configureMode: "note-preview" }) => {
   useAppEvents();
   //@ts-ignore
@@ -132,7 +133,9 @@ export const withTheme = (Element: (props: any) => JSX.Element) => {
 
       const listener = Appearance.addChangeListener(({ colorScheme }) => {
         if (colorScheme && SettingsService.getProperty("useSystemTheme")) {
-          useThemeStore.getState().setColorScheme(colorScheme);
+          useThemeStore
+            .getState()
+            .setColorScheme(colorScheme as "light" | "dark");
         }
       });
       return () => {

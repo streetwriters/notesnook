@@ -17,13 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { base64_variants, ISodium } from "@notesnook/sodium";
+import { ISodium } from "@notesnook/sodium";
 import {
   EncryptionKey,
   EncryptionKeyPair,
   SerializedKey,
   SerializedKeyPair
 } from "./types.js";
+
+export enum base64_variants {
+  ORIGINAL = 1,
+  ORIGINAL_NO_PADDING = 3,
+  URLSAFE = 5,
+  URLSAFE_NO_PADDING = 7
+}
 
 export default class KeyUtils {
   static deriveKey(

@@ -191,11 +191,12 @@ const useTiptap = (
       extensions: [
         ...CoreExtensions,
         SearchReplace.configure({
-          onStartSearch: (term) => {
+          onStartSearch: (term, isReplacing) => {
             useEditorSearchStore.setState({
               isSearching: true,
               searchTerm: term,
-              focusNonce: Math.random()
+              focusNonce: Math.random(),
+              isReplacing: isReplacing
             });
             return true;
           },
@@ -285,7 +286,11 @@ const useTiptap = (
         Table.configure({
           resizable: true,
           allowTableNodeSelection: true,
-          cellMinWidth: 50
+          cellMinWidth: 20,
+          showResizeHandleOnSelection: isMobile,
+          defaultCellAttrs: {
+            colwidth: [100]
+          }
         }),
         Clipboard,
         TableRow,
@@ -385,6 +390,7 @@ const useTiptap = (
       parseOptions: { preserveWhitespace: true }
     }),
     [
+      isMobile,
       previewAttachment,
       downloadAttachment,
       openAttachmentPicker,

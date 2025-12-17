@@ -41,6 +41,8 @@ import useNavigationStore, {
 } from "../../stores/use-navigation-store";
 import { setOnFirstSave } from "./common";
 import { strings } from "@notesnook/intl";
+import { useSettingStore } from "../../stores/use-setting-store";
+import { rootNavigatorRef } from "../../utils/global-refs";
 
 export interface RouteProps<T extends RouteName> extends NavigationProps<T> {
   get: (
@@ -83,6 +85,7 @@ const NotesPage = ({
       ? (params.current?.item as Color)?.colorCode
       : undefined;
   const updateOnFocus = useRef(false);
+  const isAppLoading = useSettingStore((state) => state.isAppLoading);
   const isFocused = useNavigationFocus(navigation, {
     onFocus: (prev) => {
       if (updateOnFocus.current) {
@@ -118,6 +121,7 @@ const NotesPage = ({
 
   const onRequestUpdate = React.useCallback(
     async (data?: NotesScreenParams) => {
+      if (useSettingStore.getState().isAppLoading) return;
       if (
         params.current.item.id &&
         useNavigationStore.getState().focusedRouteId !==
@@ -143,12 +147,15 @@ const NotesPage = ({
           ](params.current.item.id);
 
           if (!item) {
-            Navigation.goBack();
+            if (rootNavigatorRef.canGoBack()) {
+              Navigation.goBack();
+            } else {
+              Navigation.navigate("Notes");
+            }
             return;
           }
 
           params.current.item = item;
-          params.current.title = item.title;
         }
 
         if (notes.placeholders.length === 0) setLoadingNotes(false);
@@ -164,6 +171,7 @@ const NotesPage = ({
   );
 
   useEffect(() => {
+    if (isAppLoading) return;
     if (loadingNotes) {
       get(params.current, true)
         .then(async (items) => {
@@ -175,7 +183,7 @@ const NotesPage = ({
           setLoadingNotes(false);
         });
     }
-  }, [loadingNotes, get]);
+  }, [loadingNotes, get, isAppLoading]);
 
   useEffect(() => {
     eSubscribeEvent(route.name, onRequestUpdate);

@@ -93,14 +93,23 @@ const features: Record<FeatureKeys, Feature> = {
         ]
       : [
           {
-            title: "Notesnook Circle",
+            title: "Wrapped 2025",
             subtitle:
-              "Notesnook Circle brings together trusted partners who share our commitment to privacy, transparency, and user freedom. As a member you get exclusive discounts and offers from our partners. Check it out in Settings > Notesnook Circle."
+              "Notesnook Wrapped 2025 is your personal recap of the year you spent with Notesnook. Available throughout December and accessible from the sidebar, it highlights your activity, stats and how you used Notesnook this year."
           },
           {
-            title: "Collapsible headings",
+            title: "Monograph analytics",
             subtitle:
-              "You can now collapse and expand headings in your notes. This makes it easier to manage large notes and focus on specific sections."
+              "Pro users can now see view count analytics for monographs."
+          },
+          {
+            title: "Twitter/X embed support",
+            subtitle: "Simply paste the post URL in the Insert Embed dialog."
+          },
+          {
+            title: "New keyboard shortcuts",
+            subtitle:
+              "Use Ctrl/Cmd + Alt/Option + F to open search/replace in the editor. We have also added Ctrl/Cmd + Alt/Option + C for toggling text color."
           }
         ],
     cta: {

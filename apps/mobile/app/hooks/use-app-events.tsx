@@ -341,24 +341,36 @@ const onSubscriptionError = async (error: RNIap.PurchaseError) => {
 
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
 
+const setAppMessage = async () => {
+  const user = await db.user.getUser();
+  if (!user) {
+    setLoginMessage();
+    return;
+  }
+  if (!user?.isEmailConfirmed) {
+    setEmailVerifyMessage();
+    return;
+  }
+  if (await checkForRateAppRequest()) return;
+  if (
+    user?.isEmailConfirmed &&
+    !SettingsService.get().recoveryKeySaved &&
+    !useMessageStore.getState().message?.visible
+  ) {
+    setRecoveryKeyMessage();
+    return;
+  }
+  useMessageStore.getState().setAnnouncement();
+  checkAppUpdateAvailable();
+};
+
 const doAppLoadActions = async () => {
   if (SettingsService.get().sessionExpired) {
     eSendEvent(eLoginSessionExpired);
     return;
   }
-
-  await useMessageStore.getState().setAnnouncement();
-
   notifee.setBadgeCount(0);
-
-  if (!(await db.user.getUser())) {
-    setLoginMessage();
-    return;
-  }
-
   if (NewFeature.present()) return;
-  if (await checkAppUpdateAvailable()) return;
-  if (await checkForRateAppRequest()) return;
   if (SettingsService.get().introCompleted) {
     useMessageStore.subscribe((state) => {
       const dialogs = state.dialogs;
@@ -401,7 +413,7 @@ const checkForRateAppRequest = async () => {
     !useMessageStore.getState().message?.visible
   ) {
     setRateAppMessage();
-    return false;
+    return true;
   }
   return false;
 };
@@ -429,7 +441,6 @@ const initializeDatabase = async (password?: string) => {
     try {
       await setupDatabase(password);
       await db.init();
-      initialize();
       Sync.run();
     } catch (e) {
       DatabaseLogger.error(e as Error);
@@ -440,6 +451,7 @@ const initializeDatabase = async (password?: string) => {
   if (IsDatabaseMigrationRequired()) return;
 
   if (db.isInitialized) {
+    await setAppMessage();
     useSettingStore.getState().setAppLoading(false);
     Notifications.setupReminders(true);
     if (SettingsService.get().notifNotes) {
@@ -584,8 +596,6 @@ export const useAppEvents = () => {
           syncedOnLaunch.current = true;
           return;
         }
-
-        clearMessage();
         subscribeToPurchaseListeners();
         if (!isLogin) {
           user = await db.user.fetchUser();
@@ -594,6 +604,11 @@ export const useAppEvents = () => {
           SettingsService.set({
             encryptedBackup: true
           });
+        }
+
+        if (useMessageStore.getState().message.id === "log-in") {
+          clearMessage();
+          setAppMessage();
         }
 
         await PremiumService.setPremiumStatus();
@@ -608,16 +623,6 @@ export const useAppEvents = () => {
       } catch (e) {
         ToastManager.error(e as Error, "Error updating user", "global");
       }
-
-      user = await db.user.getUser();
-      if (
-        user?.isEmailConfirmed &&
-        !SettingsService.get().recoveryKeySaved &&
-        !useMessageStore.getState().message?.visible
-      ) {
-        setRecoveryKeyMessage();
-      }
-      if (!user?.isEmailConfirmed) setEmailVerifyMessage();
 
       syncedOnLaunch.current = true;
       if (!isLogin) {

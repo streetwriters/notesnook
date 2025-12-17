@@ -36,7 +36,6 @@ import { getElevationStyle } from "../../utils/elevation";
 import { AppFontSize, normalize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { hexToRGBA, RGB_Linear_Shade } from "../../utils/colors";
-import useKeyboard from "../../hooks/use-keyboard";
 
 interface FloatingButtonProps {
   onPress: () => void;
@@ -120,14 +119,16 @@ const FloatingButton = ({
       style={[
         {
           position: "absolute",
-          right: position === "right" ? DefaultAppStyles.GAP : undefined,
-          left: position === "left" ? DefaultAppStyles.GAP : undefined,
-          bottom: 20,
+          right: position === "right" ? DefaultAppStyles.GAP - 7 : undefined,
+          left: position === "left" ? DefaultAppStyles.GAP - 7 : undefined,
+          bottom: 15,
           zIndex: 10,
+          padding: 15,
           ...style
         },
         animatedStyle
       ]}
+      pointerEvents="box-none"
     >
       <TouchableOpacity
         testID={testID || notesnook.buttons.add}
@@ -160,10 +161,10 @@ const FloatingButton = ({
               icon
                 ? icon
                 : route.name === "Notebooks"
-                ? "notebook-plus"
-                : route.name === "Trash"
-                ? "delete"
-                : "plus"
+                  ? "notebook-plus"
+                  : route.name === "Trash"
+                    ? "delete"
+                    : "plus"
             }
             color={color || colors.primary.accent}
             size={size === "small" ? AppFontSize.xl : AppFontSize.xxxl}

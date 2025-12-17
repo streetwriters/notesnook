@@ -27,10 +27,6 @@
   pointer-events: none;
 }
 
-.ProseMirror p code {
-  background-color: var(--background-secondary);
-}
-
 .ProseMirror:first-child {
   margin-top: 10px;
 }
@@ -54,13 +50,14 @@
 }
 
 .ProseMirror p code {
-  background-color: var(--background);
+  background-color: var(--background-secondary);
   border: 1px solid var(--border);
+  color: var(--paragraph-secondary);
   border-radius: 5px;
-  padding: 3px 5px 0px 5px;
+  padding: 2px 5px 2px 5px;
   font-family: ui-monospace, SFMono-Regular, SF Mono, Consolas, Liberation Mono,
     Menlo, monospace !important;
-  font-size: 10pt !important;
+  font-size: 85%;
 }
 
 .ProseMirror code > span {
@@ -228,7 +225,7 @@ img.ProseMirror-separator {
 .ProseMirror table {
   border-collapse: collapse;
   margin: 0;
-  overflow: hidden;
+  overflow-y: hidden;
   table-layout: fixed;
 }
 
@@ -240,10 +237,6 @@ img.ProseMirror-separator {
   padding: 7px 9px;
   position: relative;
   vertical-align: top;
-}
-
-.ProseMirror table .selectedCell {
-  border-color: var(--accent);
 }
 
 .ProseMirror table td > *,
@@ -258,8 +251,9 @@ img.ProseMirror-separator {
 }
 
 .ProseMirror table .selectedCell:after {
-  background: var(--accent);
   content: "";
+  background: var(--shade);
+  box-shadow: inset 0px 0px 0px 1px var(--accent);
   left: 0;
   right: 0;
   top: 0;
@@ -267,27 +261,87 @@ img.ProseMirror-separator {
   pointer-events: none;
   position: absolute;
   z-index: 2;
-  opacity: 0.2;
 }
 
 .ProseMirror table .column-resize-handle {
-  background-color: var(--accent);
+  background-color: transparent;
   bottom: -2px;
   position: absolute;
-  right: 0px;
-  pointer-events: none;
+  right: -5px;
   top: 0;
-  width: 5px;
+  width: 10px;
+  
+  cursor: ew-resize;
+  cursor: col-resize;
+  z-index: 999;
+}
+
+.ProseMirror table .column-resize-handle.active::before {
+  position: absolute;
+  content: "";
+  top: calc(50% - 11px);
+  left: -4px;
+
+  width: 16px;
+  height: 18px;
+
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  
+  cursor: ew-resize;
+  cursor: col-resize;
+}
+
+.ProseMirror table .column-resize-handle.active::after {
+  position: absolute;
+  content: "";
+  top: calc(50% - 10px);
+  left: -4px;
+
+  background-size: 16px;
+  background-color: var(--icon);
+  width: 18px;
+  height: 18px;
+  mask: url(https://api.iconify.design/ic:round-drag-indicator.svg) no-repeat 50% 50%;
+  mask-size: cover;
+
+  cursor: ew-resize;
+  cursor: col-resize;
 }
 
 .ProseMirror table p {
   margin: 0;
 }
 
-.resize-cursor {
-  cursor: ew-resize;
-  cursor: col-resize;
+.ProseMirror td > h1:first-child,
+.ProseMirror td > h2:first-child,
+.ProseMirror td > h3:first-child,
+.ProseMirror td > h4:first-child,
+.ProseMirror td > h5:first-child,
+.ProseMirror td > h6:first-child {
+  margin-top: 0;
 }
+
+.ProseMirror td > ol,
+.ProseMirror td > ul {
+  padding-left: 20px;
+  margin-top: 0;
+}
+
+.ProseMirror td > blockquote {
+  margin-left: 0;
+  margin-top: 0;
+}
+
+.ProseMirror td > blockquote > :first-child  {
+  margin-top: 0;
+}
+
+/* 
+.resize-cursor {
+
+} */
 
 .drop-cursor {
   background-color: var(--paragraph, var(--nn_primary_paragraph)) !important;
@@ -707,9 +761,10 @@ p > *::selection {
   mask-size: cover;
 }
 
-.simple-checklist > li.checked p {
+.simple-checklist > li.checked > :not(.simple-checklist) {
   opacity: 0.8;
 }
+
 
 /* Callout */
 .ProseMirror div.callout {
@@ -838,113 +893,48 @@ del.diffdel {
   text-decoration: none;
 }
 
-.ProseMirror h1,
-.ProseMirror h2,
-.ProseMirror h3,
-.ProseMirror h4,
-.ProseMirror h5,
-.ProseMirror h6 {
-  position: relative;
-}
-
-.ProseMirror h1::before,
-.ProseMirror h2::before,
-.ProseMirror h3::before,
-.ProseMirror h4::before,
-.ProseMirror h5::before,
-.ProseMirror h6::before {
-  position: absolute;
+.ProseMirror h1::after,
+.ProseMirror h2::after,
+.ProseMirror h3::after,
+.ProseMirror h4::after,
+.ProseMirror h5::after,
+.ProseMirror h6::after {
+  display: inline-block;
   cursor: pointer;
   content: "";
-  background-size: 18px;
-  width: 18px;
-  height: 18px;
+  background-size: var(--icon-size, 18px);
+  width: var(--icon-size, 18px);
+  height: var(--icon-size, 18px);
 
   background-color: var(--icon);
   mask: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9IiM4ODg4ODgiIGQ9Ik03LjQxIDguNThMMTIgMTMuMTdsNC41OS00LjU5TDE4IDEwbC02IDZsLTYtNmwxLjQxLTEuNDJaIi8+PC9zdmc+)
     no-repeat 50% 50%;
   mask-size: cover;
-  border: 1px solid var(--background);
 
   transform: rotate(0);
   transition: transform 250ms ease, opacity 200ms ease;
-  left: -22px;
   opacity: 0;
+  vertical-align: middle;
 }
 
-.ProseMirror h1[dir="rtl"]::before,
-.ProseMirror h2[dir="rtl"]::before,
-.ProseMirror h3[dir="rtl"]::before,
-.ProseMirror h4[dir="rtl"]::before,
-.ProseMirror h5[dir="rtl"]::before,
-.ProseMirror h6[dir="rtl"]::before {
-  display: none;
+.ProseMirror h2::after {
+  --icon-size: 16px;
 }
 
-.ProseMirror h1[dir="rtl"]::after,
-.ProseMirror h2[dir="rtl"]::after,
-.ProseMirror h3[dir="rtl"]::after,
-.ProseMirror h4[dir="rtl"]::after,
-.ProseMirror h5[dir="rtl"]::after,
-.ProseMirror h6[dir="rtl"]::after {
-  position: absolute;
-  cursor: pointer;
-  content: "";
-  background-size: 18px;
-  width: 18px;
-  height: 18px;
-
-  background-color: var(--icon);
-  mask: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9IiM4ODg4ODgiIGQ9Ik03LjQxIDguNThMMTIgMTMuMTdsNC41OS00LjU5TDE4IDEwbC02IDZsLTYtNmwxLjQxLTEuNDJaIi8+PC9zdmc+)
-    no-repeat 50% 50%;
-  mask-size: cover;
-  border: 1px solid var(--background);
-
-  transform: rotate(0deg);
-  transition: transform 250ms ease, opacity 200ms ease;
-  right: -22px;
-  opacity: 0;
-}
-
-.ProseMirror h1::before,
-.ProseMirror h1::after {
-  top: 8px;
-}
-
-.ProseMirror h2::before,
-.ProseMirror h2::after
- {
-  top: 3px;
-}
-
-.ProseMirror h3::before,
 .ProseMirror h3::after {
-  top: 0px;
+  --icon-size: 14px;
 }
 
-.ProseMirror h4::before,
 .ProseMirror h4::after {
-  top: -1px; 
+  --icon-size: 14px;
 }
 
-.ProseMirror h5::before,
 .ProseMirror h5::after {
-  top: -2px; 
+  --icon-size: 14px;
 }
 
-.ProseMirror h6::before,
 .ProseMirror h6::after {
-  top: -4px; 
-}
-
-.ProseMirror h1[data-collapsed="true"]::before,
-.ProseMirror h2[data-collapsed="true"]::before,
-.ProseMirror h3[data-collapsed="true"]::before,
-.ProseMirror h4[data-collapsed="true"]::before,
-.ProseMirror h5[data-collapsed="true"]::before,
-.ProseMirror h6[data-collapsed="true"]::before {
-  transform: rotate(-90deg);
-  opacity: 1;
+  --icon-size: 11px;
 }
 
 .ProseMirror h1[data-collapsed="true"]::after,
@@ -953,17 +943,10 @@ del.diffdel {
 .ProseMirror h4[data-collapsed="true"]::after,
 .ProseMirror h5[data-collapsed="true"]::after,
 .ProseMirror h6[data-collapsed="true"]::after {
-  transform: rotate(90deg);
+  transform: rotate(-90deg);
   opacity: 1;
 }
 
-
-.ProseMirror h1:hover::before,
-.ProseMirror h2:hover::before,
-.ProseMirror h3:hover::before,
-.ProseMirror h4:hover::before,
-.ProseMirror h5:hover::before,
-.ProseMirror h6:hover::before,
 .ProseMirror h1:hover::after,
 .ProseMirror h2:hover::after,
 .ProseMirror h3:hover::after,
@@ -973,28 +956,24 @@ del.diffdel {
   opacity: 1;
 }
 
-.ProseMirror div.callout h1::before,
-.ProseMirror div.callout h2::before,
-.ProseMirror div.callout h3::before,
-.ProseMirror div.callout h4::before,
-.ProseMirror div.callout h5::before,
-.ProseMirror div.callout h6::before {
-  display: none;
+.ProseMirror h1.empty::after,
+.ProseMirror h2.empty::after,
+.ProseMirror h3.empty::after,
+.ProseMirror h4.empty::after,
+.ProseMirror h5.empty::after,
+.ProseMirror h6.empty::after {
+  display: none !important;
 }
 
-.ProseMirror table h1::before,
-.ProseMirror table h2::before,
-.ProseMirror table h3::before,
-.ProseMirror table h4::before,
-.ProseMirror table h5::before,
-.ProseMirror table h6::before,
-.ProseMirror table h1::after,
-.ProseMirror table h2::after,
-.ProseMirror table h3::after,
-.ProseMirror table h4::after,
-.ProseMirror table h5::after,
-.ProseMirror table h6::after {
-  display: none;
+@media screen and (max-width: 768px) {
+  .ProseMirror h1::after,
+  .ProseMirror h2::after,
+  .ProseMirror h3::after,
+  .ProseMirror h4::after,
+  .ProseMirror h5::after,
+  .ProseMirror h6::after {
+    opacity: 1 !important;
+  }
 }
 
 [data-hidden="true"] {
@@ -1015,3 +994,4 @@ del.diffdel {
 pre[class*="language-"] {
   overflow: initial !important;
 }
+

@@ -67,16 +67,16 @@ type ListItemWrapperProps<TItem = Item> = {
 export function ListItemWrapper(props: ListItemWrapperProps) {
   const { items, group, isSheet, index, groupOptions } = props;
   const [item, setItem] = useState<Item>();
-  const tags = useRef<TagsWithDateEdited>();
-  const notebooks = useRef<NotebooksWithDateEdited>();
-  const reminder = useRef<Reminder>();
-  const color = useRef<Color>();
+  const tags = useRef<TagsWithDateEdited>(undefined);
+  const notebooks = useRef<NotebooksWithDateEdited>(undefined);
+  const reminder = useRef<Reminder>(undefined);
+  const color = useRef<Color>(undefined);
   const totalNotes = useRef<number>(0);
   const attachmentsCount = useRef(0);
   const [groupHeader, setGroupHeader] = useState<GroupHeader>();
-  const previousIndex = useRef<number>();
-  const refreshTimeout = useRef<NodeJS.Timeout>();
-  const currentItemId = useRef<string>();
+  const previousIndex = useRef<number>(undefined);
+  const refreshTimeout = useRef<NodeJS.Timeout>(undefined);
+  const currentItemId = useRef<string>(undefined);
   const locked = useRef(false);
   const compactMode = useIsCompactModeEnabled(props.dataType as ItemType);
 

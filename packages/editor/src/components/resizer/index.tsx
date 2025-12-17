@@ -34,6 +34,7 @@ type ResizerProps = {
   onResize: (width: number, height: number) => void;
   onResizeStop?: (width: number, height: number) => void;
   style?: React.CSSProperties;
+  lockAspectRation?: boolean;
 };
 export function Resizer(props: PropsWithChildren<ResizerProps>) {
   const {
@@ -45,7 +46,8 @@ export function Resizer(props: PropsWithChildren<ResizerProps>) {
     height,
     children,
     handleColor,
-    style
+    style,
+    lockAspectRation = true
   } = props;
 
   if (!enabled)
@@ -109,7 +111,7 @@ export function Resizer(props: PropsWithChildren<ResizerProps>) {
         }
       }}
       onResizeStart={(e) => e.preventDefault()}
-      lockAspectRatio={true}
+      lockAspectRatio={lockAspectRation}
     >
       {children}
     </Resizable>

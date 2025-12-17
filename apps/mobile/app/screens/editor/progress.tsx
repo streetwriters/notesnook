@@ -37,7 +37,7 @@ export const ProgressBar = () => {
   const attachmentProgress = useAttachmentStore((state) => state.progress);
   const [progress, setProgress] = useState(0);
   const [visible, setVisible] = useState(false);
-  const timer = useRef<NodeJS.Timeout>();
+  const timer = useRef<NodeJS.Timeout>(undefined);
   const insets = useGlobalSafeAreaInsets();
   const [width, setWidth] = useState(0);
 

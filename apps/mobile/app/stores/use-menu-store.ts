@@ -24,10 +24,10 @@ import {
   SideBarSection,
   Tag
 } from "@notesnook/core";
-import create, { State } from "zustand";
+import { create } from "zustand";
 import { db } from "../common/database";
 
-export interface MenuStore extends State {
+export interface MenuStore {
   menuPins: (Notebook | Tag)[];
   colorNotes: Color[];
   setMenuPins: () => void;

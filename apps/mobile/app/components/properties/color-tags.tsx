@@ -17,11 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { LegendList } from "@legendapp/list";
+import { useIsFeatureAvailable } from "@notesnook/common";
 import { Color, Note } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useState } from "react";
 import { View } from "react-native";
-import { FlashList } from "@shopify/flash-list";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../e2e/test.ids";
 import { db } from "../../common/database";
@@ -32,14 +34,11 @@ import { useRelationStore } from "../../stores/use-relation-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { refreshNotesPage } from "../../utils/events";
 import { AppFontSize } from "../../utils/size";
-import ColorPicker from "../dialogs/color-picker";
-import { Button } from "../ui/button";
-import NativeTooltip from "../../utils/tooltip";
-import { Pressable } from "../ui/pressable";
-import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../utils/styles";
-import { isFeatureAvailable, useIsFeatureAvailable } from "@notesnook/common";
+import ColorPicker from "../dialogs/color-picker";
 import PaywallSheet from "../sheets/paywall";
+import { Button } from "../ui/button";
+import { Pressable } from "../ui/pressable";
 
 const ColorItem = ({ item, note }: { item: Color; note: Note }) => {
   const { colors } = useThemeColors();
@@ -171,7 +170,7 @@ export const ColorTags = ({ item }: { item: Note }) => {
             }}
           />
         ) : (
-          <FlashList
+          <LegendList
             data={colorNotes}
             estimatedItemSize={30}
             horizontal

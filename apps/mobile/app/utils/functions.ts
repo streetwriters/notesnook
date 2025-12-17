@@ -35,6 +35,10 @@ import { useTagStore } from "../stores/use-tag-store";
 import { eUpdateNoteInEditor } from "./events";
 import { unlockVault } from "./unlock-vault";
 
+export const valueLimiter = (value: number, min: number, max: number) => {
+  return value < min ? min : value > max ? max : value;
+};
+
 export function getObfuscatedEmail(email: string) {
   if (!email) return "";
   const [username, provider] = email.split("@");

@@ -29,7 +29,7 @@ import { DefaultAppStyles } from "../../utils/styles";
 
 export const TitleFormat = () => {
   const [titleFormat] = useState(db.settings.getTitleFormat());
-  const inputRef = useRef<TextInput>();
+  const inputRef = useRef<TextInput>(null);
   const { colors } = useThemeColors();
 
   return (

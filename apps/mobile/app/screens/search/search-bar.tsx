@@ -23,7 +23,6 @@ import React, { useRef, useState } from "react";
 import { View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { IconButton } from "../../components/ui/icon-button";
-import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import Navigation from "../../services/navigation";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
@@ -41,7 +40,6 @@ export const SearchBar = ({
   const isFocused = useNavigationStore(
     (state) => state.focusedRouteId === "Search"
   );
-  const insets = useGlobalSafeAreaInsets();
   const { colors } = useThemeColors();
   const inputRef = useRef<TextInput>(null);
   const _onChangeText = (value: string) => {
@@ -58,7 +56,6 @@ export const SearchBar = ({
     >
       <View
         style={{
-          marginTop: DefaultAppStyles.GAP_SMALL,
           flexDirection: "row",
           alignItems: "center",
           width: "100%",

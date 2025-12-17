@@ -92,7 +92,7 @@ const NoteItem = (props: {
 export const NotePreviewConfigure = () => {
   const [items, setItems] = useState<VirtualizedGrouping<Note>>();
   const loading = useSettingStore((state) => state.isAppLoading);
-  const bounceRef = React.useRef<NodeJS.Timeout>();
+  const bounceRef = React.useRef<NodeJS.Timeout>(undefined);
   const { colors } = useThemeColors();
   const insets = useGlobalSafeAreaInsets();
 

@@ -31,6 +31,7 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   runOnJS,
   SharedValue,
+  SnappySpringConfig,
   useAnimatedReaction,
   useAnimatedStyle,
   useSharedValue,
@@ -67,7 +68,7 @@ export interface TabsRef {
   page: () => FluidTabPage;
   setScrollEnabled: () => true;
   isDrawerOpen: () => boolean;
-  node: RefObject<Animated.View>;
+  node: RefObject<Animated.View | null>;
   tabChangedFromSwipeAction: SharedValue<boolean>;
 }
 
@@ -110,7 +111,6 @@ export const FluidPanels = forwardRef<TabsRef, TabProps>(function FluidTabs(
   const containerWidth = widths
     ? widths.sidebar + widths.list + widths.editor
     : dimensions.width;
-
   const drawerPosition = 0;
   const homePosition = widths.sidebar;
   const editorPosition = widths.sidebar + widths.list;
@@ -354,13 +354,10 @@ export const FluidPanels = forwardRef<TabsRef, TabProps>(function FluidTabs(
       const finalValue = isSwipeLeft
         ? translateX.value - velocityX / 40.0
         : translateX.value + velocityX / 40.0;
-
+      const velocity = velocityX / 5000;
       const animationConfig: WithSpringConfig = {
-        velocity: velocityX,
-        mass: 0.5,
-        overshootClamping: true,
-        damping: 800,
-        stiffness: 800
+        velocity: velocity,
+        ...SnappySpringConfig
       };
 
       if (finalValue < homePosition) {
@@ -443,15 +440,7 @@ export const FluidPanels = forwardRef<TabsRef, TabProps>(function FluidTabs(
             width: containerWidth,
             flexDirection: "row"
           },
-          deviceMode === "tablet"
-            ? {
-                transform: [
-                  {
-                    translateX: 0
-                  }
-                ]
-              }
-            : animatedStyles
+          animatedStyles
         ]}
       >
         {children}

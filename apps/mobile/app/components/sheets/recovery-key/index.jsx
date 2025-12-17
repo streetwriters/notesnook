@@ -96,12 +96,6 @@ class RecoveryKeySheet extends React.Component {
       recoveryKeySaved: true
     });
     clearMessage();
-    // if (this.signup) {
-    //   this.signup = false;
-    //   setTimeout(() => {
-    //     eSendEvent(eOpenResultDialog);
-    //   }, 500);
-    // }
   };
   async componentDidMount() {
     eSubscribeEvent(eOpenRecoveryKeyDialog, this.open);

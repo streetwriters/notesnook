@@ -17,14 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { SubscriptionPlan, SubscriptionStatus, User } from "@notesnook/core";
+import { SubscriptionStatus, User } from "@notesnook/core";
 import { Platform } from "react-native";
 import { getVersion } from "react-native-device-info";
-import create, { State } from "zustand";
+import { create } from "zustand";
 import { db } from "../common/database";
 import { MMKV } from "../common/database/mmkv";
 import PremiumService from "../services/premium";
-export interface MessageStore extends State {
+export interface MessageStore {
   message: Message;
   setMessage: (message: Message) => void;
   announcements: Announcement[];
@@ -33,6 +33,14 @@ export interface MessageStore extends State {
   remove: (id: string) => void;
 }
 
+export type MessageId =
+  | "rate-app"
+  | "log-in"
+  | "recovery-key"
+  | "confirm-email"
+  | "app-update"
+  | "none";
+
 export type Message = {
   visible: boolean;
   message: string | null;
@@ -40,7 +48,8 @@ export type Message = {
   onPress: () => void;
   data: object;
   icon: string;
-  type?: string;
+  type: "error" | "normal";
+  id: MessageId;
 };
 
 export type Action = {
@@ -67,11 +76,14 @@ export type BodyItem = {
     | "shapes";
   src?: string;
   caption?: string;
+  actions: Action[];
   text?: string;
   style?: Style;
   items?: Array<{
     text?: string;
   }>;
+  listType: "ordered" | "unordered";
+  platforms: string[];
 };
 
 export type Announcement = {
@@ -94,7 +106,8 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
     onPress: () => null,
     data: {},
     icon: "account-outline",
-    type: ""
+    type: "normal",
+    id: "none"
   },
   setMessage: (message) => {
     set({ message: { ...message } });

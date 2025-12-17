@@ -43,8 +43,8 @@ export const useLogin = (
   const [loading, setLoading] = useState(false);
   const setUser = useUserStore((state) => state.setUser);
   const [step, setStep] = useState(LoginSteps.emailAuth);
-  const email = useRef<string>();
-  const password = useRef<string>();
+  const email = useRef<string>(undefined);
+  const password = useRef<string>(undefined);
   const emailInputRef = useRef<TextInput>(null);
   const passwordInputRef = useRef<TextInput>(null);
 

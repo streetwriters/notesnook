@@ -32,7 +32,10 @@ const testvars = {
 
 class Element {
   element: Detox.NativeElement;
-  constructor(public type: "id" | "text", public value: string) {
+  constructor(
+    public type: "id" | "text",
+    public value: string
+  ) {
     if (type == "id") {
       this.element = element(by.id(value)).atIndex(0);
     } else {
@@ -92,14 +95,17 @@ const Tests = {
     await _device.pressBack();
     await _device.pressBack();
   },
-  async createNote(_title?: string, _body?: string) {
-    let title = _title || "Test note description that ";
+  async createNote(title?: string, _body?: string) {
     let body =
       _body ||
       "Test note description that is very long and should not fit in text.";
     await Tests.fromId(notesnook.buttons.add).tap();
+    if (title) {
+      await web().element(by.web.id("editor-title")).focus();
+      await web().element(by.web.id("editor-title")).typeText(title, false);
+    }
     await expect(web().element(by.web.className("ProseMirror"))).toExist();
-    // await web().element(by.web.className("ProseMirror")).tap();
+    await web().element(by.web.className("ProseMirror")).focus();
     await web().element(by.web.className("ProseMirror")).typeText(body, true);
     await Tests.exitEditor();
     await Tests.fromText(body).isVisible();
@@ -132,6 +138,7 @@ const Tests = {
     );
     await titleInput.isVisible();
     await titleInput.element.typeText(title);
+    await Tests.sleep(1000);
     if (description) {
       await Tests.fromId(
         notesnook.ids.dialogs.notebook.inputs.description

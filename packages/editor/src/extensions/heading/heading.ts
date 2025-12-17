@@ -23,10 +23,9 @@ import {
   textblockTypeInputRule
 } from "@tiptap/core";
 import { Heading as TiptapHeading } from "@tiptap/extension-heading";
-import { isClickWithinBounds } from "../../utils/prosemirror.js";
-import { Plugin, PluginKey, Selection, Transaction } from "@tiptap/pm/state";
 import { Node } from "@tiptap/pm/model";
-import { useToolbarStore } from "../../toolbar/stores/toolbar-store.js";
+import { Plugin, PluginKey, Selection, Transaction } from "@tiptap/pm/state";
+import { Callout } from "../callout/callout.js";
 
 const COLLAPSIBLE_BLOCK_TYPES = [
   "paragraph",
@@ -43,7 +42,8 @@ const COLLAPSIBLE_BLOCK_TYPES = [
   "outlineList",
   "mathBlock",
   "webclip",
-  "embed"
+  "embed",
+  "horizontalRule"
 ];
 
 const HEADING_REGEX = /^(#{1,6})\s$/;
@@ -173,33 +173,69 @@ export const Heading = TiptapHeading.extend({
         heading.setAttribute(attr, HTMLAttributes[attr]);
       }
 
+      if (node.textContent === "") {
+        heading.classList.add("empty");
+      }
+
       if (node.attrs.collapsed) heading.dataset.collapsed = "true";
       else delete heading.dataset.collapsed;
 
+      if (node.attrs.hidden) heading.dataset.hidden = node.attrs.hidden;
+      else delete heading.dataset.hidden;
+
       function onClick(e: MouseEvent | TouchEvent) {
         if (e instanceof MouseEvent && e.button !== 0) return;
-        if (!(e.target instanceof HTMLHeadingElement)) return;
+        if (!(e.target instanceof HTMLHeadingElement) || !e.target.lastChild)
+          return;
+        if (typeof getPos === "boolean") return;
 
-        const pos = typeof getPos === "function" ? getPos() : 0;
-        if (typeof pos !== "number") return;
-
+        const pos = getPos();
         const resolvedPos = editor.state.doc.resolve(pos);
-        const forbiddenParents = ["callout", "table"];
-        if (
-          findParentNodeClosestToPos(resolvedPos, (node) =>
-            forbiddenParents.includes(node.type.name)
-          )
-        ) {
+
+        const callout = findParentNodeClosestToPos(
+          resolvedPos,
+          (node) => node.type.name === Callout.name
+        );
+        // the first callout heading's collapsibility is handled by callout itself
+        if (callout?.node.firstChild === node) {
           return;
         }
 
-        if (
-          isClickWithinBounds(
-            e,
+        const clientX =
+          e instanceof MouseEvent ? e.clientX : e.touches[0].clientX;
+        const clientY =
+          e instanceof MouseEvent ? e.clientY : e.touches[0].clientY;
+        const isRtl =
+          e.target.dir === "rtl" ||
+          findParentNodeClosestToPos(
             resolvedPos,
-            useToolbarStore.getState().isMobile ? "right" : "left"
-          )
-        ) {
+            (node) => !!node.attrs.textDirection
+          )?.node.attrs.textDirection === "rtl";
+
+        const range = document.createRange();
+        range.selectNodeContents(e.target);
+
+        const hitArea = { height: 40, width: 40 };
+
+        const rects = range.getClientRects();
+        const lines = rectsToLines(rects);
+        const lastLine = lines[lines.length - 1];
+        if (!lastLine) return;
+        const targetRect = isRtl ? lastLine[0] : lastLine[lastLine.length - 1];
+
+        const { x, y, width } = targetRect;
+
+        let xStart = clientX >= x + width;
+        let xEnd = clientX <= x + width + hitArea.width;
+        const yStart = clientY >= y;
+        const yEnd = clientY <= y + hitArea.height;
+
+        if (isRtl) {
+          xStart = clientX >= x - hitArea.width;
+          xEnd = clientX <= x;
+        }
+
+        if (xStart && xEnd && yStart && yEnd) {
           e.preventDefault();
           e.stopImmediatePropagation();
 
@@ -210,7 +246,7 @@ export const Heading = TiptapHeading.extend({
               const headingLevel = currentNode.attrs.level;
 
               tr.setNodeAttribute(pos, "collapsed", shouldCollapse);
-              toggleNodesUnderHeading(tr, pos, headingLevel, shouldCollapse);
+              toggleNodesUnderPos(tr, pos, headingLevel, shouldCollapse);
             }
             return true;
           });
@@ -230,6 +266,12 @@ export const Heading = TiptapHeading.extend({
 
           if (updatedNode.attrs.level !== node.attrs.level) {
             return false;
+          }
+
+          if (updatedNode.textContent === "") {
+            heading.classList.add("empty");
+          } else {
+            heading.classList.remove("empty");
           }
 
           if (updatedNode.attrs.collapsed) heading.dataset.collapsed = "true";
@@ -256,17 +298,17 @@ export const Heading = TiptapHeading.extend({
   }
 });
 
-function toggleNodesUnderHeading(
+function toggleNodesUnderPos(
   tr: Transaction,
-  headingPos: number,
+  pos: number,
   headingLevel: number,
   isCollapsing: boolean
 ) {
   const { doc } = tr;
-  const headingNode = doc.nodeAt(headingPos);
-  if (!headingNode || headingNode.type.name !== "heading") return;
+  const node = doc.nodeAt(pos);
+  if (!node) return;
 
-  let nextPos = headingPos + headingNode.nodeSize;
+  let nextPos = pos + node.nodeSize;
   const cursorPos = tr.selection.from;
   let shouldMoveCursor = false;
   let insideCollapsedHeading = false;
@@ -321,8 +363,8 @@ function toggleNodesUnderHeading(
   }
 
   if (shouldMoveCursor) {
-    const headingEndPos = headingPos + headingNode.nodeSize - 1;
-    tr.setSelection(Selection.near(tr.doc.resolve(headingEndPos)));
+    const endPos = pos + node.nodeSize - 1;
+    tr.setSelection(Selection.near(tr.doc.resolve(endPos)));
   }
 }
 
@@ -367,26 +409,27 @@ const headingUpdatePlugin = new Plugin({
     let modified = false;
 
     newDoc.descendants((newNode, pos) => {
-      if (newNode.type.name === "heading") {
-        if (pos >= oldDoc.content.size) return;
+      if (pos >= oldDoc.content.size) return;
 
-        const oldNode = oldDoc.nodeAt(pos);
-        if (
-          oldNode &&
-          oldNode.type.name === "heading" &&
-          oldNode.attrs.level !== newNode.attrs.level
-        ) {
-          /**
-           * if the level of a collapsed heading is changed,
-           * we need to reset visibility of all the nodes under it as there
-           * might be a heading of same or higher level previously
-           * hidden under this heading
-           */
-          if (newNode.attrs.collapsed) {
-            toggleNodesUnderHeading(tr, pos, oldNode.attrs.level, false);
-            toggleNodesUnderHeading(tr, pos, newNode.attrs.level, true);
-            modified = true;
-          }
+      const oldNode = oldDoc.nodeAt(pos);
+      if (
+        oldNode &&
+        oldNode.type.name === "heading" &&
+        oldNode.attrs.level !== newNode.attrs.level
+      ) {
+        /**
+         * if the level of a collapsed heading is changed,
+         * we need to reset visibility of all the nodes under it as there
+         * might be a heading of same or higher level previously
+         * hidden under this heading
+         */
+        if (newNode.type.name === "heading" && newNode.attrs.collapsed) {
+          toggleNodesUnderPos(tr, pos, oldNode.attrs.level, false);
+          toggleNodesUnderPos(tr, pos, newNode.attrs.level, true);
+          modified = true;
+        } else if (newNode.type.name !== "heading" && oldNode.attrs.collapsed) {
+          toggleNodesUnderPos(tr, pos, oldNode.attrs.level, false);
+          modified = true;
         }
       }
     });
@@ -394,3 +437,30 @@ const headingUpdatePlugin = new Plugin({
     return modified ? tr : null;
   }
 });
+
+function rectsToLines(rects: DOMRectList) {
+  const lines: DOMRect[][] = [];
+
+  outer: for (const rect of rects) {
+    if (rect.width === 0 || rect.height === 0) continue;
+
+    for (const line of lines) {
+      const lastRect = line[line.length - 1];
+      // Check if rects are on the same line by checking vertical overlap
+      // This handles cases where text has different font sizes on the same line
+      const rectBottom = rect.top + rect.height;
+      const lastRectBottom = lastRect.top + lastRect.height;
+      const overlapTop = Math.max(rect.top, lastRect.top);
+      const overlapBottom = Math.min(rectBottom, lastRectBottom);
+      const hasVerticalOverlap = overlapBottom > overlapTop;
+
+      if (hasVerticalOverlap) {
+        line.push(rect);
+        continue outer;
+      }
+    }
+
+    lines.push([rect]);
+  }
+  return lines;
+}

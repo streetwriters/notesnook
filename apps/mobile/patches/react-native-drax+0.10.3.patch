@@ -1,0 +1,52 @@
+diff --git a/node_modules/react-native-drax/build/DraxList.js b/node_modules/react-native-drax/build/DraxList.js
+index 456c190..f8b2c06 100644
+--- a/node_modules/react-native-drax/build/DraxList.js
++++ b/node_modules/react-native-drax/build/DraxList.js
+@@ -177,7 +177,7 @@ const DraxListUnforwarded = (props, forwardedRef) => {
+     // Set FlatList and node handle refs.
+     const setFlatListRefs = (0, react_1.useCallback)((ref) => {
+         flatListRef.current = ref;
+-        nodeHandleRef.current = ref && (0, react_native_1.findNodeHandle)(ref);
++        nodeHandleRef.current = ref && ref._listRef._scrollRef;
+         if (forwardedRef) {
+             if (typeof forwardedRef === 'function') {
+                 forwardedRef(ref);
+diff --git a/node_modules/react-native-drax/build/DraxProvider.js b/node_modules/react-native-drax/build/DraxProvider.js
+index 7b62fc2..1f29e1d 100644
+--- a/node_modules/react-native-drax/build/DraxProvider.js
++++ b/node_modules/react-native-drax/build/DraxProvider.js
+@@ -626,7 +626,7 @@ const DraxProvider = ({ debug = false, style = styles.provider, children, }) =>
+         }
+     });
+     const setRootNodeHandleRef = (0, react_1.useCallback)((ref) => {
+-        rootNodeHandleRef.current = ref && (0, react_native_1.findNodeHandle)(ref);
++        rootNodeHandleRef.current = ref
+     }, []);
+     return (react_1.default.createElement(DraxContext_1.DraxContext.Provider, { value: contextValue },
+         react_1.default.createElement(react_native_1.View, { style: style, ref: setRootNodeHandleRef },
+diff --git a/node_modules/react-native-drax/build/DraxScrollView.js b/node_modules/react-native-drax/build/DraxScrollView.js
+index c7847ab..77f5e72 100644
+--- a/node_modules/react-native-drax/build/DraxScrollView.js
++++ b/node_modules/react-native-drax/build/DraxScrollView.js
+@@ -168,7 +168,7 @@ const DraxScrollViewUnforwarded = (props, forwardedRef) => {
+     // Set the ScrollView and node handle refs.
+     const setScrollViewRefs = (0, react_1.useCallback)((ref) => {
+         scrollRef.current = ref;
+-        nodeHandleRef.current = ref && (0, react_native_1.findNodeHandle)(ref);
++        nodeHandleRef.current = ref;
+         if (forwardedRef) {
+             if (typeof forwardedRef === 'function') {
+                 forwardedRef(ref);
+diff --git a/node_modules/react-native-drax/build/DraxView.js b/node_modules/react-native-drax/build/DraxView.js
+index 07bc812..96a8284 100644
+--- a/node_modules/react-native-drax/build/DraxView.js
++++ b/node_modules/react-native-drax/build/DraxView.js
+@@ -408,7 +408,7 @@ const DraxView = ({ onDragStart, onDrag, onDragEnter, onDragOver, onDragExit, on
+     ]);
+     const setViewRefs = (0, react_1.useCallback)((ref) => {
+         viewRef.current = ref;
+-        nodeHandleRef.current = ref && (0, react_native_1.findNodeHandle)(ref);
++        nodeHandleRef.current = ref;
+     }, []);
+     return (react_1.default.createElement(react_native_gesture_handler_1.LongPressGestureHandler, { maxDist: Number.MAX_SAFE_INTEGER, shouldCancelWhenOutside: false, minDurationMs: longPressDelay, onHandlerStateChange: onHandlerStateChange, onGestureEvent: onGestureEvent /* Workaround incorrect typings. */, enabled: draggable },
+         react_1.default.createElement(react_native_1.Animated.View, { ...props, style: combinedStyle, ref: setViewRefs, onLayout: onLayout, collapsable: false }, renderedChildren)));

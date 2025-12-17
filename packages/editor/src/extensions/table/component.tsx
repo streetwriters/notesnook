@@ -23,7 +23,6 @@ import { Node as ProsemirrorNode } from "prosemirror-model";
 import { Editor } from "../../types.js";
 import { Editor as TiptapEditor } from "@tiptap/core";
 import { useCallback, useEffect, useRef } from "react";
-import { updateColumnsOnResize } from "@tiptap/pm/tables";
 import { EditorView, NodeView } from "prosemirror-view";
 import {
   InsertColumnRight,
@@ -37,14 +36,17 @@ import {
   findSelectedDOMNode,
   hasSameAttributes
 } from "../../utils/prosemirror.js";
-import { DesktopOnly } from "../../components/responsive/index.js";
+import { DesktopOnly, MobileOnly } from "../../components/responsive/index.js";
 import { TextDirections } from "../text-direction/index.js";
 import { strings } from "@notesnook/intl";
 import SimpleBar from "simplebar-react";
 import { useIsMobile } from "../../toolbar/stores/toolbar-store.js";
+import { updateColumnsOnResize } from "./prosemirror-tables/tableview.js";
 
-export function TableComponent(props: ReactNodeViewProps) {
-  const { editor, node, forwardRef } = props;
+export function TableComponent(
+  props: ReactNodeViewProps & { cellMinWidth: number }
+) {
+  const { editor, node, forwardRef, cellMinWidth } = props;
   const colgroupRef = useRef<HTMLTableColElement>(null);
   const tableRef = useRef<HTMLTableElement>();
   const { textDirection } = node.attrs;
@@ -53,65 +55,108 @@ export function TableComponent(props: ReactNodeViewProps) {
   useEffect(() => {
     if (!colgroupRef.current || !tableRef.current) return;
 
-    updateColumnsOnResize(node, colgroupRef.current, tableRef.current, 50);
-  }, [node]);
-
-  const renderScrollContent = useCallback(() => {
-    return (
-      <div dir={textDirection}>
-        <table
-          ref={(ref) => {
-            forwardRef?.(ref);
-            tableRef.current = ref || undefined;
-          }}
-        >
-          <colgroup ref={colgroupRef} />
-          {/* <tbody /> */}
-        </table>
-      </div>
+    updateColumnsOnResize(
+      node,
+      colgroupRef.current,
+      tableRef.current,
+      cellMinWidth
     );
-  }, [forwardRef, textDirection]);
+  }, [node, cellMinWidth]);
+
+  // useEffect(() => {
+  //   function transactionListener({
+  //     editor
+  //   }: {
+  //     transaction: Transaction;
+  //     editor: TiptapEditor;
+  //   }) {
+  //     if (!colgroupRef.current || !tableRef.current) return;
+
+  //     const cellsInRow = tableRef.current?.rows[0]?.cells.length || 0;
+  //     if (colgroupRef.current?.childElementCount !== cellsInRow)
+  //       updateColumns(
+  //         selectedRect(editor.state).table,
+  //         colgroupRef.current,
+  //         tableRef.current,
+  //         cellMinWidth
+  //       );
+  //   }
+  //   editor.on("transaction", transactionListener);
+  //   return () => {
+  //     editor.off("transaction", transactionListener);
+  //   };
+  // }, []);
 
   return (
     <>
       <DesktopOnly>
-        <TableRowToolbar
-          editor={editor}
-          table={tableRef}
-          textDirection={textDirection}
-        />
-        <TableColumnToolbar
-          editor={editor}
-          table={tableRef}
-          textDirection={textDirection}
-        />
+        {editor.isEditable ? (
+          <>
+            <TableRowToolbar
+              editor={editor}
+              table={tableRef}
+              textDirection={textDirection}
+            />
+            <TableColumnToolbar
+              editor={editor}
+              table={tableRef}
+              textDirection={textDirection}
+            />
+          </>
+        ) : null}
+        <SimpleBar autoHide style={{ overflowY: "hidden" }}>
+          <div dir={textDirection}>
+            <table
+              ref={(ref) => {
+                forwardRef?.(ref);
+                tableRef.current = ref || undefined;
+              }}
+            >
+              <colgroup ref={colgroupRef} />
+              {/* <tbody /> */}
+            </table>
+          </div>
+        </SimpleBar>
       </DesktopOnly>
-
-      {isMobile ? (
-        <ScrollContainer>{renderScrollContent()}</ScrollContainer>
-      ) : (
-        <SimpleBar>{renderScrollContent()}</SimpleBar>
-      )}
+      <MobileOnly>
+        <div dir={textDirection}>
+          <table
+            ref={(ref) => {
+              forwardRef?.(ref);
+              tableRef.current = ref || undefined;
+            }}
+          >
+            <colgroup ref={colgroupRef} />
+            {/* <tbody /> */}
+          </table>
+        </div>
+      </MobileOnly>
     </>
   );
 }
 
 export function TableNodeView(editor: TiptapEditor) {
   class TableNode
-    extends ReactNodeView<ReactNodeViewProps<unknown>>
+    extends ReactNodeView<
+      ReactNodeViewProps<unknown> & { cellMinWidth: number }
+    >
     implements NodeView
   {
-    constructor(node: ProsemirrorNode) {
+    constructor(node: ProsemirrorNode, cellMinWidth: number) {
       super(
         node,
         editor,
         () => 0, // todo
         {
           component: TableComponent,
+          props: { cellMinWidth },
+          forceEnableSelection: true,
           shouldUpdate: (prev, next) => {
             return (
               !hasSameAttributes(prev.attrs, next.attrs) ||
-              prev.childCount !== next.childCount
+              prev.childCount !== next.childCount ||
+              // compare columns
+              prev.firstChild?.childCount !== next.firstChild?.childCount
             );
           },
           contentDOMFactory: () => {
@@ -194,6 +239,7 @@ function TableRowToolbar(props: TableToolbarProps) {
         bg: "background",
         flexWrap: "nowrap",
         borderRadius: "default",
+        border: "1px solid var(--border)",
         flexDirection: "column",
         opacity: 0.4,
         ":hover": {
@@ -272,6 +318,7 @@ function TableColumnToolbar(props: TableToolbarProps) {
         bg: "background",
         flexWrap: "nowrap",
         borderRadius: "default",
+        border: "1px solid var(--border)",
         opacity: 0.4,
         ":hover": {
           opacity: 1

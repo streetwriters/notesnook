@@ -28,9 +28,8 @@ import type {
   ThemeMetadata,
   ThemesRouter
 } from "@notesnook/themes-server";
-import DocumentPicker from "react-native-document-picker";
+import { keepLocalCopy, pick } from "@react-native-documents/picker";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { MasonryFlashList } from "@shopify/flash-list";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 import { createTRPCReact } from "@trpc/react-query";
@@ -57,6 +56,8 @@ import { Pressable } from "../../components/ui/pressable";
 import { getColorLinearShade } from "../../utils/colors";
 import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../utils/styles";
+import { LegendList } from "@legendapp/list";
+import ReactNativeBlobUtil from "react-native-blob-util";
 
 const THEME_SERVER_URL = "https://themes-api.notesnook.com";
 //@ts-ignore
@@ -412,26 +413,45 @@ function ThemeSelector() {
               type={"secondaryAccented"}
               icon="folder"
               fontSize={AppFontSize.xs}
-              onPress={() => {
-                DocumentPicker.pickSingle({
-                  allowMultiSelection: false
-                }).then((r) => {
-                  fetch(r.uri).then(async (response) => {
-                    const json = await response.json();
-                    const result = validateTheme(json);
-                    if (result.error) {
-                      ToastManager.error(new Error(result.error));
-                      return;
-                    }
-                    select(json, true);
+              onPress={async () => {
+                try {
+                  const pickResponse = await pick({
+                    allowMultiSelection: false
                   });
-                });
+                  const copiedFile = await keepLocalCopy({
+                    destination: "cachesDirectory",
+                    files: [
+                      {
+                        uri: pickResponse[0].uri,
+                        fileName: pickResponse[0].name || "theme.json"
+                      }
+                    ]
+                  });
+                  if (copiedFile[0].status !== "success") return;
+
+                  const themeJson = await ReactNativeBlobUtil.fs.readFile(
+                    copiedFile[0].localUri,
+                    "utf8"
+                  );
+                  ReactNativeBlobUtil.fs
+                    .unlink(copiedFile[0].localUri)
+                    .catch(() => {});
+                  const json = JSON.parse(themeJson);
+                  const result = validateTheme(json);
+                  if (result.error) {
+                    ToastManager.error(new Error(result.error));
+                    return;
+                  }
+                  select(json, true);
+                } catch (e) {
+                  ToastManager.error(e as Error);
+                }
               }}
             />
           </View>
         </View>
 
-        <MasonryFlashList
+        <LegendList
           numColumns={2}
           data={[
             ...(colorScheme === "dark" || (searchQuery && searchQuery !== "")

@@ -104,15 +104,12 @@ function _MenuItem({
   const _onPress = () => {
     if (useSideBarDraggingStore.getState().dragging) return;
     if (item.onPress) return item.onPress(item);
-
+    Navigation.closeDrawer();
     if (useNavigationStore.getState().currentRoute !== item.id) {
       Navigation.navigate(item.id as keyof RouteParams, {
         canGoBack: false
       });
     }
-    setImmediate(() => {
-      Navigation.closeDrawer();
-    });
   };
 
   return (
@@ -154,8 +151,8 @@ function _MenuItem({
               item.icon === "crown"
                 ? colors.static.yellow
                 : isFocused
-                ? colors.selected.icon
-                : colors.secondary.icon
+                  ? colors.selected.icon
+                  : colors.secondary.icon
             }
             size={AppFontSize.md}
           />

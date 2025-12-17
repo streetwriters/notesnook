@@ -22,7 +22,6 @@ import { useThemeColors } from "@notesnook/theme";
 import React, { RefObject, useEffect, useState } from "react";
 import { View } from "react-native";
 import { ActionSheetRef } from "react-native-actions-sheet";
-import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../../common/database";
 import {
@@ -31,13 +30,12 @@ import {
 } from "../../../services/event-manager";
 import { useRelationStore } from "../../../stores/use-relation-store";
 import { AppFontSize } from "../../../utils/size";
+import { DefaultAppStyles } from "../../../utils/styles";
 import DialogHeader from "../../dialog/dialog-header";
 import List from "../../list";
 import SheetProvider from "../../sheet-provider";
 import { Button, ButtonProps } from "../../ui/button";
-import { PressableProps } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
-import { DefaultAppStyles } from "../../../utils/styles";
 
 type RelationsListProps = {
   actionSheetRef: RefObject<ActionSheetRef>;
@@ -66,9 +64,7 @@ export const RelationsList = ({
 }: RelationsListProps) => {
   const updater = useRelationStore((state) => state.updater);
   const { colors } = useThemeColors();
-
   const [items, setItems] = useState<VirtualizedGrouping<Item>>();
-
   const hasNoRelations = !items || items?.placeholders?.length === 0;
 
   useEffect(() => {
@@ -124,7 +120,6 @@ export const RelationsList = ({
       ) : (
         <List
           data={items}
-          CustomListComponent={FlashList}
           loading={false}
           dataType={referenceType as any}
           isRenderedInActionSheet={true}

@@ -26,7 +26,7 @@ import { useEffect, useRef, useState } from "react";
 function useRotator<T>(data: T[], interval = 3000): T | null {
   //@ts-ignore Added sample() method to Array.prototype to get random value.
   const [current, setCurrent] = useState<T>(data.sample());
-  const intervalRef = useRef<NodeJS.Timer>();
+  const intervalRef = useRef<NodeJS.Timeout>(undefined);
 
   useEffect(() => {
     intervalRef.current = setInterval(() => {
