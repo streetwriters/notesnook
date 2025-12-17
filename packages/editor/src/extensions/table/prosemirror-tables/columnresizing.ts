@@ -1,3 +1,22 @@
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2023 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 import { Attrs, Node as ProsemirrorNode } from "prosemirror-model";
 import { EditorState, Plugin, PluginKey, Transaction } from "prosemirror-state";
 import {
@@ -9,7 +28,7 @@ import {
 import { tableNodeTypes } from "./schema.js";
 import { TableMap } from "./tablemap.js";
 import { TableView, updateColumnsOnResize } from "./tableview.js";
-import { cellAround, CellAttrs, getClientX } from "./util.js";
+import { cellAround, CellAttrs, getClientX, isTouchEvent } from "./util.js";
 
 /**
  * @public
@@ -192,8 +211,7 @@ function handleMouseDown(
 
     const pluginState = columnResizingPluginKey.getState(view.state);
     if (pluginState?.dragging) {
-      if (event instanceof TouchEvent)
-        (view as any).domObserver.connectSelection();
+      if (isTouchEvent(event)) (view as any).domObserver.connectSelection();
       updateColumnWidth(
         view,
         activeHandle,
@@ -224,8 +242,7 @@ function handleMouseDown(
   win.addEventListener("touchcancel", finish);
   win.addEventListener("touchmove", move);
   event.preventDefault();
-  if (event instanceof TouchEvent)
-    (view as any).domObserver.disconnectSelection();
+  if (isTouchEvent(event)) (view as any).domObserver.disconnectSelection();
   return true;
 }
 
