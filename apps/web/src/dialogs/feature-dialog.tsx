@@ -91,7 +91,27 @@ const features: Record<FeatureKeys, Feature> = {
             )
           }
         ]
-      : [],
+      : [
+          {
+            title: "Wrapped 2025",
+            subtitle:
+              "Notesnook Wrapped 2025 is your personal recap of the year you spent with Notesnook. Available throughout December and accessible from the sidebar, it highlights your activity, stats and how you used Notesnook this year."
+          },
+          {
+            title: "Monograph analytics",
+            subtitle:
+              "Pro users can now see view count analytics for monographs."
+          },
+          {
+            title: "Twitter/X embed support",
+            subtitle: "Simply paste the post URL in the Insert Embed dialog."
+          },
+          {
+            title: "New keyboard shortcuts",
+            subtitle:
+              "Use Ctrl/Cmd + Alt/Option + F to open search/replace in the editor. We have also added Ctrl/Cmd + Alt/Option + C for toggling text color."
+          }
+        ],
     cta: {
       title: strings.gotIt(),
       icon: Checkmark,
