@@ -23,7 +23,7 @@ module.exports = function (api, opts) {
     });
   }
 
-  env.plugins.push("react-native-reanimated/plugin");
+  env.plugins.push("react-native-worklets/plugin");
 
   api.cache(true);
   return env;
