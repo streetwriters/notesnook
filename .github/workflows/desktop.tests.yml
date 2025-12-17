@@ -45,7 +45,7 @@ jobs:
   test-macos-x64:
     name: Test macOS x64
     needs: build
-    runs-on: macos-13
+    runs-on: macos-15-intel
 
     steps:
       - name: Check out Git repository
