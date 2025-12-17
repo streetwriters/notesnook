@@ -1,5 +1,21 @@
-// This file defines a number of helpers for wiring up user input to
-// table-related functionality.
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2023 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import { keydownHandler } from "prosemirror-keymap";
 import { Fragment, ResolvedPos, Slice } from "prosemirror-model";
@@ -23,6 +39,7 @@ import {
   getClientY,
   inSameTable,
   isInTable,
+  isTouchEvent,
   nextCell,
   selectionCell,
   tableEditingKey
@@ -312,8 +329,4 @@ function cellUnderMouse(
   });
   if (!mousePos) return null;
   return mousePos ? cellAround(view.state.doc.resolve(mousePos.pos)) : null;
-}
-
-function isTouchEvent(event: Event): event is TouchEvent {
-  return "TouchEvent" in window && event instanceof TouchEvent;
 }
