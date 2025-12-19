@@ -1,0 +1,5 @@
+- Get an overview of your year with Notesnook with Wrapped 2025
+- Cell selection and column resizing in tables
+- Bug fixes and minor improvements
+
+Thank you for using Notesnook!

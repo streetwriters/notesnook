@@ -24,9 +24,7 @@ import dayjs from "dayjs";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
-  Dimensions,
   ScrollView,
-  StyleSheet,
   useWindowDimensions,
   View
 } from "react-native";
@@ -44,8 +42,6 @@ import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
-import { useSettingStore } from "../../stores/use-setting-store";
-import { useStoredRef } from "../../hooks/use-stored-ref";
 
 function formatNumber(num: number) {
   if (num >= 1000000) {
@@ -635,7 +631,8 @@ function SummarySlide({
         >
           <View
             style={{
-              padding: DefaultAppStyles.GAP
+              padding: DefaultAppStyles.GAP,
+              backgroundColor: colors.primary.background
             }}
           >
             <Heading

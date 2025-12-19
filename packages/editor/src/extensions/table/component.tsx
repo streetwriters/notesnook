@@ -119,7 +119,15 @@ export function TableComponent(
         </SimpleBar>
       </DesktopOnly>
       <MobileOnly>
-        <div dir={textDirection}>
+        <div
+          dir={textDirection}
+          style={{
+            overflowY: "hidden",
+            overflowX: "auto",
+            WebkitOverflowScrolling: "touch",
+            maxWidth: "100%"
+          }}
+        >
           <table
             ref={(ref) => {
               forwardRef?.(ref);
