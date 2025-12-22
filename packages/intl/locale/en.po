@@ -735,6 +735,10 @@ msgstr "Add tags to multiple notes at once"
 msgid "Add to dictionary"
 msgstr "Add to dictionary"
 
+#: src/strings.ts:2613
+msgid "Add to home"
+msgstr "Add to home"
+
 #: src/strings.ts:2476
 msgid "Add to notebook"
 msgstr "Add to notebook"

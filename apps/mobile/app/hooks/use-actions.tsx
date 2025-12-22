@@ -23,6 +23,7 @@ import {
   Item,
   ItemReference,
   Note,
+  Notebook,
   VAULT_ERRORS
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
@@ -70,6 +71,7 @@ import { deleteItems } from "../utils/functions";
 import { convertNoteToText } from "../utils/note-to-text";
 import { sleep } from "../utils/time";
 import { resetStoredState } from "./use-stored-state";
+import { NotesnookModule } from "../utils/notesnook-module";
 
 export type ActionId =
   | "select"
@@ -114,7 +116,8 @@ export type ActionId =
   | "remove-from-notebook"
   | "trash"
   | "default-homepage"
-  | "default-tag";
+  | "default-tag"
+  | "launcher-shortcut";
 
 export type Action = {
   id: ActionId;
@@ -1204,6 +1207,26 @@ export const useActions = ({
       icon: "delete-outline",
       type: "error",
       onPress: deleteItem
+    });
+  }
+
+  if (
+    Platform.OS === "android" &&
+    (item.type === "tag" || item.type === "note" || item.type === "notebook")
+  ) {
+    actions.push({
+      id: "launcher-shortcut",
+      title: strings.addToHome(),
+      icon: "cellphone-arrow-down",
+      onPress: async () => {
+        const added = await NotesnookModule.addShortcut(
+          item.id,
+          item.type,
+          item.title,
+          (item as Note).headline || (item as Notebook).description || ""
+        );
+        console.log(added);
+      }
     });
   }
 

@@ -41,6 +41,19 @@ interface NotesnookModuleInterface {
   updateWidgetNote: (noteId: string, data: string) => void;
   updateReminderWidget: () => void;
   isGestureNavigationEnabled: () => boolean;
+  addShortcut: (
+    id: string,
+    type: "note" | "notebook" | "tag",
+    title: string,
+    description?: string
+  ) => Promise<boolean>;
+  removeShortcut: (id: string) => Promise<boolean>;
+  updateShortcut: (
+    id: string,
+    title: string,
+    description?: string
+  ) => Promise<boolean>;
+  removeAllShortcuts: () => Promise<boolean>;
 }
 
 export const NotesnookModule: NotesnookModuleInterface = Platform.select({
@@ -61,7 +74,11 @@ export const NotesnookModule: NotesnookModuleInterface = Platform.select({
     hasWidgetNote: () => {},
     updateWidgetNote: () => {},
     updateReminderWidget: () => {},
-    isGestureNavigationEnabled: () => true
+    isGestureNavigationEnabled: () => true,
+    addShortcut: () => Promise.resolve(false),
+    removeShortcut: () => Promise.resolve(false),
+    updateShortcut: () => Promise.resolve(false),
+    removeAllShortcuts: () => Promise.resolve(false)
   },
   android: NativeModules.NNativeModule
 });

@@ -6,7 +6,14 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ShortcutInfo;
+import android.content.pm.ShortcutManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
+import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -237,6 +244,179 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    public void addShortcut(final String id, final String type, final String title, final String description, Promise promise) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            promise.reject("UNSUPPORTED", "Pinned launcher shortcuts require Android 8.0 or higher");
+            return;
+        }
 
+        try {
+            ShortcutManager shortcutManager = mContext.getSystemService(ShortcutManager.class);
+            if (shortcutManager == null) {
+                promise.reject("ERROR", "ShortcutManager not available");
+                return;
+            }
+
+            String uri = "https://app.notesnook.com/open_" + type + "?id=" + id;
+            Intent intent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(uri));
+            intent.setPackage(mContext.getPackageName());
+
+            Icon icon = createLetterIcon(type, title);
+
+            ShortcutInfo shortcut = new ShortcutInfo.Builder(mContext, id)
+                    .setShortLabel(title)
+                    .setLongLabel(description != null && !description.isEmpty() ? description : title)
+                    .setIcon(icon)
+                    .setIntent(intent)
+                    .build();
+
+            shortcutManager.requestPinShortcut(shortcut, null);
+            promise.resolve(true);
+        } catch (Exception e) {
+            promise.reject("ERROR", e.getMessage());
+        }
+    }
+
+    @ReactMethod
+    public void removeShortcut(final String id, Promise promise) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            promise.reject("UNSUPPORTED", "Pinned launcher shortcuts require Android 8.0 or higher");
+            return;
+        }
+
+        try {
+            ShortcutManager shortcutManager = mContext.getSystemService(ShortcutManager.class);
+            if (shortcutManager == null) {
+                promise.reject("ERROR", "ShortcutManager not available");
+                return;
+            }
+
+            shortcutManager.disableShortcuts(java.util.Collections.singletonList(id));
+            promise.resolve(true);
+        } catch (Exception e) {
+            promise.reject("ERROR", e.getMessage());
+        }
+    }
+
+    @ReactMethod
+    public void updateShortcut(final String id, final String title, final String description, Promise promise) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            promise.reject("UNSUPPORTED", "Pinned launcher shortcuts require Android 8.0 or higher");
+            return;
+        }
+
+        try {
+            ShortcutManager shortcutManager = mContext.getSystemService(ShortcutManager.class);
+            if (shortcutManager == null) {
+                promise.reject("ERROR", "ShortcutManager not available");
+                return;
+            }
+
+            // Get existing shortcut to preserve icon and intent
+            List<ShortcutInfo> shortcuts = shortcutManager.getPinnedShortcuts();
+            ShortcutInfo existingShortcut = null;
+            for (ShortcutInfo s : shortcuts) {
+                if (s.getId().equals(id)) {
+                    existingShortcut = s;
+                    break;
+                }
+            }
+
+            if (existingShortcut == null) {
+                promise.reject("NOT_FOUND", "Shortcut not found");
+                return;
+            }
+
+            ShortcutInfo updatedShortcut = new ShortcutInfo.Builder(mContext, id)
+                    .setShortLabel(title)
+                    .setLongLabel(description != null && !description.isEmpty() ? description : title)
+                    .setIntent(existingShortcut.getIntent())
+                    .build();
+
+            shortcutManager.updateShortcuts(java.util.Collections.singletonList(updatedShortcut));
+            promise.resolve(true);
+        } catch (Exception e) {
+            promise.reject("ERROR", e.getMessage());
+        }
+    }
+
+    @ReactMethod
+    public void removeAllShortcuts(Promise promise) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            promise.reject("UNSUPPORTED", "Pinned launcher shortcuts require Android 8.0 or higher");
+            return;
+        }
+
+        try {
+            ShortcutManager shortcutManager = mContext.getSystemService(ShortcutManager.class);
+            if (shortcutManager == null) {
+                promise.reject("ERROR", "ShortcutManager not available");
+                return;
+            }
+
+            List<ShortcutInfo> pinnedShortcuts = shortcutManager.getPinnedShortcuts();
+            if (!pinnedShortcuts.isEmpty()) {
+                List<String> ids = new ArrayList<>();
+                for (ShortcutInfo shortcut : pinnedShortcuts) {
+                    ids.add(shortcut.getId());
+                }
+                shortcutManager.disableShortcuts(ids);
+            }
+            promise.resolve(true);
+        } catch (Exception e) {
+            promise.reject("ERROR", e.getMessage());
+        }
+    }
+
+    private Icon createLetterIcon(String type, String title) {
+
+        String letter = type.contains("tag") ? "#" : title != null && !title.isEmpty()
+                ? title.substring(0, 1).toUpperCase()
+                : "?";
+        int color = getColorForLetter(letter);
+        
+        if (type.equals("notebook")) return Icon.createWithResource(mContext, R.drawable.ic_notebook);
+        // Use a larger canvas and fill it completely to avoid white borders from launcher masking.
+        int iconSize = 256;
+        Bitmap bitmap = Bitmap.createBitmap(iconSize, iconSize, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+
+
+
+        Paint textPaint = new Paint();
+        textPaint.setColor(color);
+        textPaint.setTextSize(130);
+        textPaint.setAntiAlias(true);
+        textPaint.setTextAlign(Paint.Align.CENTER);
+        textPaint.setTypeface(android.graphics.Typeface.create(android.graphics.Typeface.DEFAULT, android.graphics.Typeface.BOLD));
+
+        float x = iconSize / 2f;
+        float y = (iconSize / 2f) - ((textPaint.descent() + textPaint.ascent()) / 2f);
+
+        canvas.drawText(letter, x, y, textPaint);
+
+        return Icon.createWithBitmap(bitmap);
+    }
+
+    private int getColorForLetter(String letter) {
+        int[] colors = {
+            0xFF1976D2, // Blue
+            0xFFD32F2F, // Red
+            0xFF388E3C, // Green
+            0xFFF57C00, // Orange
+            0xFF7B1FA2, // Purple
+            0xFF0097A7, // Cyan
+            0xFFC2185B, // Pink
+            0xFF455A64, // Blue Grey
+            0xFF6A1B9A, // Deep Purple
+            0xFF00796B, // Teal
+            0xFF512DA8, // Indigo
+            0xFF1565C0  // Dark Blue
+        };
+        
+        int hash = Math.abs(letter.hashCode());
+        return colors[hash % colors.length];
+    }
 
 }

@@ -57,6 +57,7 @@ const BOTTOM_BAR_ITEMS: ActionId[] = [
   "export",
   "copy-link",
   "duplicate",
+  "launcher-shortcut",
   "trash"
 ];
 
@@ -76,6 +77,7 @@ const COLUMN_BAR_ITEMS: ActionId[] = [
   "reorder",
   "rename-color",
   "rename-tag",
+  "launcher-shortcut",
   "restore",
   "trash",
   "delete"
@@ -170,15 +172,15 @@ export const Items = ({
               DDS.isTab
                 ? AppFontSize.xxl
                 : shouldShrink
-                ? AppFontSize.xxl
-                : AppFontSize.lg
+                  ? AppFontSize.xxl
+                  : AppFontSize.lg
             }
             color={
               item.checked
                 ? item.activeColor || colors.primary.accent
                 : item.id.match(/(delete|trash)/g)
-                ? colors.error.icon
-                : colors.secondary.icon
+                  ? colors.error.icon
+                  : colors.secondary.icon
             }
           />
         </Pressable>
@@ -209,8 +211,8 @@ export const Items = ({
           text: item.checked
             ? item.activeColor || colors.primary.accent
             : item.id === "delete" || item.id === "trash"
-            ? colors.error.paragraph
-            : colors.primary.paragraph
+              ? colors.error.paragraph
+              : colors.primary.paragraph
         }}
         testID={"icon-" + item.id}
         onPress={item.onPress}
@@ -274,8 +276,8 @@ export const Items = ({
                 item.checked
                   ? item.activeColor || colors.primary.accent
                   : item.id === "delete" || item.id === "trash"
-                  ? colors.error.icon
-                  : colors.secondary.icon
+                    ? colors.error.icon
+                    : colors.secondary.icon
               }
             />
 

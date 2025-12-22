@@ -171,7 +171,7 @@ const onAppOpenedFromURL = async (event: { url: string }) => {
       eSendEvent(eOnLoadNote, { newNote: true });
       fluidTabsRef.current?.goToPage("editor", false);
       return;
-    } else if (url.startsWith("https://app.notesnook.com/open_note")) {
+    } else if (url.startsWith("https://app.notesnook.com/open_note?")) {
       const id = new URL(url).searchParams.get("id");
       if (id) {
         const note = await db.notes.note(id);
@@ -180,6 +180,26 @@ const onAppOpenedFromURL = async (event: { url: string }) => {
             item: note
           });
           fluidTabsRef.current?.goToPage("editor", false);
+        }
+      }
+    } else if (url.startsWith("https://app.notesnook.com/open_notebook?")) {
+      const id = new URL(url).searchParams.get("id");
+      if (id) {
+        const notebook = await db.notebooks.notebook(id);
+        if (notebook) {
+          Navigation.navigate("Notebook", {
+            item: notebook
+          });
+        }
+      }
+    } else if (url.startsWith("https://app.notesnook.com/open_tag?")) {
+      const id = new URL(url).searchParams.get("id");
+      if (id) {
+        const tag = await db.tags.tag(id);
+        if (tag) {
+          Navigation.navigate("TaggedNotes", {
+            item: tag
+          });
         }
       }
     } else if (url.startsWith("https://app.notesnook.com/open_reminder")) {
@@ -774,23 +794,21 @@ export const useAppEvents = () => {
       }
     };
 
-    if (!refValues.current.initialUrl) {
-      Linking.getInitialURL().then((url) => {
-        if (url) {
-          refValues.current.initialUrl = url;
-        }
-      });
-    }
     let sub: NativeEventSubscription;
     if (!isAppLoading && !appLocked) {
+      if (!refValues.current.initialUrl) {
+        Linking.getInitialURL().then((url) => {
+          if (url) {
+            refValues.current.initialUrl = url;
+            onAppOpenedFromURL({
+              url: refValues.current.initialUrl!
+            });
+          }
+        });
+      }
+
       setTimeout(() => {
         sub = AppState.addEventListener("change", onAppStateChanged);
-        if (refValues.current.initialUrl) {
-          onAppOpenedFromURL({
-            url: refValues.current.initialUrl!
-          });
-          refValues.current.initialUrl = undefined;
-        }
       }, 1000);
 
       refValues.current.removeInternetStateListener = NetInfo.addEventListener(

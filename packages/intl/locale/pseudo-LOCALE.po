@@ -735,6 +735,10 @@ msgstr ""
 msgid "Add to dictionary"
 msgstr ""
 
+#: src/strings.ts:2613
+msgid "Add to home"
+msgstr ""
+
 #: src/strings.ts:2476
 msgid "Add to notebook"
 msgstr ""
