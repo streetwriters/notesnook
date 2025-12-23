@@ -176,6 +176,7 @@ const onAppOpenedFromURL = async (event: { url: string }) => {
       if (id) {
         const note = await db.notes.note(id);
         if (note) {
+          editorState().initialLoadCalled = true;
           eSendEvent(eOnLoadNote, {
             item: note
           });

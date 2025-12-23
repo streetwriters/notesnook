@@ -664,7 +664,8 @@ export const useEditorEvents = (
               if (note) {
                 eSendEvent(eOnLoadNote, {
                   item: note,
-                  tabId: editorMessage.tabId
+                  tabId: editorMessage.tabId,
+                  loadedFromEditor: true
                 });
               }
             } else {
@@ -675,7 +676,8 @@ export const useEditorEvents = (
                   if (note) {
                     eSendEvent(eOnLoadNote, {
                       item: note,
-                      tabId: editorMessage.tabId
+                      tabId: editorMessage.tabId,
+                      loadedFromEditor: true
                     });
                   }
                 }

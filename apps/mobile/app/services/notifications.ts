@@ -438,6 +438,7 @@ async function scheduleNotification(
 
 async function loadNote(id: string, jump: boolean) {
   if (!id || id === "notesnook_note_input") return;
+  editorState().initialLoadCalled = true;
   const note = await db.notes.note(id);
   if (!note) return;
   if (!DDS.isTab && jump) {
