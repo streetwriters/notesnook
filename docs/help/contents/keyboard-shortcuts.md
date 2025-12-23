@@ -79,3 +79,7 @@ The following keyboard shortcuts will help you navigate Notesnook faster.
 | Underline | Ctrl U | Ctrl U | ⌘ U |
 | Toggle highlight | Ctrl Alt H | Ctrl Alt H | ⌘ ⌥ H |
 | Toggle text color | Ctrl Alt C | Ctrl Alt C | ⌘ ⌥ C |
+| Move line up | Alt ↑ | Alt ↑ | ⌥ ↑ |
+| Move line down | Alt ↓ | Alt ↓ | ⌥ ↓ |
+| Move parent node up | Alt ⇧ ↑ | Alt ⇧ ↑ | ⌥ ⇧ ↑ |
+| Move parent node down | Alt ⇧ ↓ | Alt ⇧ ↓ | ⌥ ⇧ ↓ |

@@ -17,14 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { tiptapKeys } from "@notesnook/common";
 import { Extension } from "@tiptap/core";
-import { CodeBlock } from "../code-block/index.js";
 import { showLinkPopup } from "../../toolbar/popups/link-popup.js";
 import { isListActive } from "../../utils/list.js";
-import { tiptapKeys } from "@notesnook/common";
+import { CodeBlock } from "../code-block/index.js";
 import { isInTable } from "../table/prosemirror-tables/util.js";
 import { config } from "../../utils/config.js";
 import { DEFAULT_COLORS } from "../../toolbar/tools/colors.js";
+import {
+  moveNodeUp,
+  moveNodeDown,
+  moveParentUp,
+  moveParentDown
+} from "./move-node.js";
 
 export const KeyMap = Extension.create({
   name: "key-map",
@@ -78,6 +84,38 @@ export const KeyMap = Extension.create({
         const color =
           config.get<"string">("textColor") || DEFAULT_COLORS.text[0];
         return editor.commands.toggleMark("textStyle", { color });
+      },
+      [tiptapKeys.moveLineUp.keys]: ({ editor }) => {
+        try {
+          return moveNodeUp(editor);
+        } catch (e) {
+          console.error("Error moving node up:", e);
+          return false;
+        }
+      },
+      [tiptapKeys.moveLineDown.keys]: ({ editor }) => {
+        try {
+          return moveNodeDown(editor);
+        } catch (e) {
+          console.error("Error moving node down:", e);
+          return false;
+        }
+      },
+      [tiptapKeys.moveNodeUp.keys]: ({ editor }) => {
+        try {
+          return moveParentUp(editor);
+        } catch (e) {
+          console.error("Error moving node up:", e);
+          return false;
+        }
+      },
+      [tiptapKeys.moveNodeDown.keys]: ({ editor }) => {
+        try {
+          return moveParentDown(editor);
+        } catch (e) {
+          console.error("Error moving node down:", e);
+          return false;
+        }
       }
     };
   }
