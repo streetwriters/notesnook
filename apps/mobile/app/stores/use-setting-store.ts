@@ -136,6 +136,7 @@ export interface SettingStore {
   dateFormat: string;
   dbPassword?: string;
   isOldAppLock: () => boolean;
+  initialUrl: string | null;
 }
 
 const { width, height } = Dimensions.get("window");
@@ -236,5 +237,6 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
   },
   insets: initialWindowMetrics?.insets
     ? initialWindowMetrics.insets
-    : { top: 0, right: 0, left: 0, bottom: 0 }
+    : { top: 0, right: 0, left: 0, bottom: 0 },
+  initialUrl: null
 }));

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { resolveItems } from "@notesnook/common";
-import { VirtualizedGrouping } from "@notesnook/core";
+import { Tag, VirtualizedGrouping } from "@notesnook/core";
 import { Color, Note } from "@notesnook/core";
 import React, { useEffect, useRef, useState } from "react";
 import { db } from "../../common/database";
@@ -76,14 +76,12 @@ const NotesPage = ({
   const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
   const [loadingNotes, setLoadingNotes] = useState(true);
   const isMonograph = route.name === "Monographs";
-  const title =
-    params.current?.item.type === "tag"
-      ? "#" + params.current?.item.title
-      : params.current?.item.title;
+  const [item, setItem] = useState<Tag | Color | undefined>(
+    params.current.item
+  );
+  const title = item?.type === "tag" ? "#" + item?.title : item?.title;
   const accentColor =
-    route.name === "ColoredNotes"
-      ? (params.current?.item as Color)?.colorCode
-      : undefined;
+    route.name === "ColoredNotes" ? (item as Color)?.colorCode : undefined;
   const updateOnFocus = useRef(false);
   const isAppLoading = useSettingStore((state) => state.isAppLoading);
   const isFocused = useNavigationFocus(navigation, {
@@ -107,31 +105,30 @@ const NotesPage = ({
   });
 
   const syncWithNavigation = React.useCallback(() => {
-    const { item } = params.current;
-    useNavigationStore
-      .getState()
-      .setFocusedRouteId(params?.current?.item?.id || route.name);
+    const { id } = params.current;
+    useNavigationStore.getState().setFocusedRouteId(id || route.name);
 
     !isMonograph &&
       setOnFirstSave({
         type: getItemType(route.name),
-        id: item.id
+        id: id
       });
   }, [isMonograph, route.name]);
 
   const onRequestUpdate = React.useCallback(
     async (data?: NotesScreenParams) => {
       if (useSettingStore.getState().isAppLoading) return;
+
       if (
-        params.current.item.id &&
-        useNavigationStore.getState().focusedRouteId !==
-          params.current.item.id &&
+        params.current.id &&
+        useNavigationStore.getState().focusedRouteId !== params.current.id &&
         !data
       ) {
         updateOnFocus.current = false;
         return;
       }
-      const isNew = data && data?.item?.id !== params.current?.item?.id;
+
+      const isNew = data && data?.id !== params.current?.id;
       if (data) params.current = data;
 
       try {
@@ -142,9 +139,9 @@ const NotesPage = ({
         )) as VirtualizedGrouping<Note>;
 
         if (route.name === "TaggedNotes" || route.name === "ColoredNotes") {
-          const item = await (db as any)[params.current.item.type + "s"][
-            params.current.item.type
-          ](params.current.item.id);
+          const item = await (db as any)[params.current.type + "s"][
+            params.current.type
+          ](params.current.id);
 
           if (!item) {
             if (rootNavigatorRef.canGoBack()) {
@@ -154,7 +151,7 @@ const NotesPage = ({
             }
             return;
           }
-
+          setItem(item);
           params.current.item = item;
         }
 
@@ -173,15 +170,7 @@ const NotesPage = ({
   useEffect(() => {
     if (isAppLoading) return;
     if (loadingNotes) {
-      get(params.current, true)
-        .then(async (items) => {
-          setNotes(items as VirtualizedGrouping<Note>);
-          await (items as VirtualizedGrouping<Note>).item(0, resolveItems);
-          setLoadingNotes(false);
-        })
-        .catch((e) => {
-          setLoadingNotes(false);
-        });
+      onRequestUpdate(params.current);
     }
   }, [loadingNotes, get, isAppLoading]);
 
@@ -202,19 +191,18 @@ const NotesPage = ({
         }
         canGoBack={params?.current?.canGoBack}
         hasSearch={true}
-        id={
-          route.name === "Monographs" ? "Monographs" : params?.current.item?.id
-        }
+        id={route.name === "Monographs" ? "Monographs" : params?.current?.id}
         onSearch={() => {
+          if (!item) return;
           const selector =
             route.name === "Monographs"
               ? db.monographs.all
-              : db.relations.from(params.current.item, "note").selector;
+              : db.relations.from(item, "note").selector;
 
           Navigation.push("Search", {
             placeholder: strings.searchInRoute(title || route.name),
             type: "note",
-            title: title,
+            title: title!,
             route: route.name,
             items: selector
           });
@@ -229,7 +217,7 @@ const NotesPage = ({
           onRefresh={onRequestUpdate}
           loading={false}
           renderedInRoute={route.name}
-          id={params.current.item?.id}
+          id={params.current?.id}
           headerTitle={title || "Monographs"}
           customAccentColor={accentColor}
           placeholder={placeholder}
@@ -246,7 +234,7 @@ const NotesPage = ({
         ) : null}
       </DelayLayout>
       <SelectionHeader
-        id={route.params?.item?.id || route.name}
+        id={route.params?.id || route.name}
         items={notes}
         type="note"
         renderedInRoute={route.name}

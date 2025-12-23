@@ -709,26 +709,6 @@ export const useActions = ({
                 type: item.type
               }
         );
-
-        resetStoredState(
-          "app-home-navigtion-key",
-          isHomepage
-            ? undefined
-            : {
-                name:
-                  item.type === "notebook"
-                    ? "Notebook"
-                    : item.type === "tag"
-                      ? "TaggedNotes"
-                      : item.type === "color"
-                        ? "ColorNotes"
-                        : undefined,
-                params: {
-                  item: item,
-                  id: item.id
-                }
-              }
-        );
       }
     });
   }

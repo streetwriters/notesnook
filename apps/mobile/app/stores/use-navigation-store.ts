@@ -25,8 +25,7 @@ import {
   Note,
   Notebook,
   Reminder,
-  Tag,
-  TrashItem
+  Tag
 } from "@notesnook/core";
 import { ParamListBase } from "@react-navigation/core";
 import { create } from "zustand";
@@ -36,12 +35,15 @@ export type GenericRouteParam = {
 };
 
 export type NotebookScreenParams = {
-  item: Notebook;
+  id: string;
+  item?: Notebook;
   canGoBack?: boolean;
 };
 
 export type NotesScreenParams = {
-  item: Note | Notebook | Tag | Color | TrashItem | Reminder;
+  type: "tag" | "color" | "monograph";
+  id: string;
+  item?: Tag | Color;
   canGoBack?: boolean;
 };
 
