@@ -2004,7 +2004,7 @@ PODS:
     - React
   - react-native-orientation-locker (1.7.0):
     - React-Core
-  - react-native-pager-view (6.9.1):
+  - react-native-pager-view (8.0.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -2031,6 +2031,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - SocketRocket
+    - SwiftUIIntrospect (~> 1.0)
     - Yoga
   - react-native-pdf (6.7.7):
     - boost
@@ -3413,6 +3414,7 @@ PODS:
     - pop (~> 1.0)
   - SocketRocket (0.7.1)
   - SSZipArchive (2.4.3)
+  - SwiftUIIntrospect (1.3.0)
   - SwiftyRSA (1.7.0):
     - SwiftyRSA/ObjC (= 1.7.0)
   - SwiftyRSA/ObjC (1.7.0)
@@ -3568,6 +3570,7 @@ SPEC REPOS:
     - SDWebImage
     - SocketRocket
     - SSZipArchive
+    - SwiftUIIntrospect
     - SwiftyRSA
     - TOCropViewController
 
@@ -3903,7 +3906,7 @@ SPEC CHECKSUMS:
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
   react-native-notification-sounds: ce106d58df0dd384bccbd2e84fb53accab7cc068
   react-native-orientation-locker: cc6f357b289a2e0dd2210fea0c52cb8e0727fdaa
-  react-native-pager-view: a0516effb17ca5120ac2113bfd21b91130ad5748
+  react-native-pager-view: d7d2aa47f54343bf55fdcee3973503dd27c2bd37
   react-native-pdf: c586da0d19c14e6d859e62bf957851687fba0f25
   react-native-quick-sqlite: 1ed8d3db1e22a8604d006be69f06053382e93bb0
   react-native-safe-area-context: c6e2edd1c1da07bdce287fa9d9e60c5f7b514616
@@ -3973,6 +3976,7 @@ SPEC CHECKSUMS:
   SexyTooltip: 5c9b4dec52bfb317938cb0488efd9da3717bb6fd
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
+  SwiftUIIntrospect: fee9aa07293ee280373a591e1824e8ddc869ba5d
   SwiftyRSA: 8c6dd1ea7db1b8dc4fb517a202f88bb1354bc2c6
   TOCropViewController: 797deaf39c90e6e9ddd848d88817f6b9a8a09888
   toolbar-android: c426ed5bd3dcccfed20fd79533efc0d1ae0ef018
