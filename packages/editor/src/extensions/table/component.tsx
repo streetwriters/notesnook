@@ -39,7 +39,6 @@ import {
 import { DesktopOnly, MobileOnly } from "../../components/responsive/index.js";
 import { TextDirections } from "../text-direction/index.js";
 import { strings } from "@notesnook/intl";
-import SimpleBar from "simplebar-react";
 import { useIsMobile } from "../../toolbar/stores/toolbar-store.js";
 import { updateColumnsOnResize } from "./prosemirror-tables/tableview.js";
 
@@ -104,19 +103,21 @@ export function TableComponent(
             />
           </>
         ) : null}
-        <SimpleBar autoHide style={{ overflowY: "hidden" }}>
-          <div dir={textDirection}>
-            <table
-              ref={(ref) => {
-                forwardRef?.(ref);
-                tableRef.current = ref || undefined;
-              }}
-            >
-              <colgroup ref={colgroupRef} />
-              {/* <tbody /> */}
-            </table>
-          </div>
-        </SimpleBar>
+        <div
+          dir={textDirection}
+          className="scroll-bar"
+          style={{ overflowY: "hidden" }}
+        >
+          <table
+            ref={(ref) => {
+              forwardRef?.(ref);
+              tableRef.current = ref || undefined;
+            }}
+          >
+            <colgroup ref={colgroupRef} />
+            {/* <tbody /> */}
+          </table>
+        </div>
       </DesktopOnly>
       <MobileOnly>
         <div

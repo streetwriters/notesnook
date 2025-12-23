@@ -545,6 +545,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
             languageDefinition?.filename ?? languageDefinition?.title ?? "xyz"
           }`.replace(/\s/, "-")
         );
+        content.classList.add("scroll-bar")
         content.style.whiteSpace = "pre";
         // caret is not visible if content element width is 0px
         content.style.minWidth = "20px";
