@@ -168,7 +168,7 @@ function handleMouseDown(
   if (!pluginState || pluginState.dragging) return false;
 
   if (
-    event.target instanceof HTMLElement &&
+    event.target instanceof Element &&
     event.target.closest(".column-resize-handle") == null
   ) {
     console.log("No handle target");
