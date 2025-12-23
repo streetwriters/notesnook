@@ -388,7 +388,7 @@ function convertHtmlToTxt(html: string, wrap = true) {
     selectors: [
       { selector: "table", format: "dataTable" },
       { selector: "ul.checklist", format: "taskList" },
-      { selector: "ul.simple-checklist", format: "checkList" },
+      { selector: "ul.simple-checklist", format: "taskList" },
       { selector: "p", format: "paragraph" },
       { selector: `a[href^="nn://"]`, format: "internalLink" }
     ],
