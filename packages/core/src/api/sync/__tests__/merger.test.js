@@ -209,7 +209,7 @@ describe.concurrent("merge content", (test) => {
               type: "tiptap",
               data: "Remote",
               noteId,
-              dateEdited: Date.now() - 3000,
+              dateEdited: Date.now() - 300,
               dateModified: Date.now()
             },
             {
@@ -217,7 +217,7 @@ describe.concurrent("merge content", (test) => {
               data: "Local",
               noteId,
               dateEdited: Date.now(),
-              dateModified: Date.now() - 6000
+              dateModified: Date.now() - 600
             }
           );
 
@@ -236,8 +236,8 @@ describe.concurrent("merge content", (test) => {
               type: "tiptap",
               data: "Remote",
               noteId,
-              dateEdited: Date.now() - 3000,
-              dateModified: Date.now() - 6000
+              dateEdited: Date.now() - 300,
+              dateModified: Date.now() - 600
             },
             {
               type: "tiptap",
