@@ -19,6 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { NativeModules, Platform } from "react-native";
 
+export type ShortcutInfo = {
+  id: string;
+  title: string;
+  description: string;
+  type: "note" | "notebook" | "tag";
+};
+
 interface NotesnookModuleInterface {
   getActivityName: () => Promise<string>;
   setBackgroundColor: (color: string) => void;
@@ -54,6 +61,7 @@ interface NotesnookModuleInterface {
     description?: string
   ) => Promise<boolean>;
   removeAllShortcuts: () => Promise<boolean>;
+  getAllShortcuts: () => Promise<ShortcutInfo[]>;
 }
 
 export const NotesnookModule: NotesnookModuleInterface = Platform.select({
@@ -78,7 +86,8 @@ export const NotesnookModule: NotesnookModuleInterface = Platform.select({
     addShortcut: () => Promise.resolve(false),
     removeShortcut: () => Promise.resolve(false),
     updateShortcut: () => Promise.resolve(false),
-    removeAllShortcuts: () => Promise.resolve(false)
+    removeAllShortcuts: () => Promise.resolve(false),
+    getAllShortcuts: () => Promise.resolve([])
   },
   android: NativeModules.NNativeModule
 });

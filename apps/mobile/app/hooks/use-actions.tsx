@@ -300,7 +300,6 @@ export const useActions = ({
             id: item.id,
             title: value
           });
-
           eSendEvent(Navigation.routeNames.TaggedNotes);
           InteractionManager.runAfterInteractions(() => {
             useTagStore.getState().refresh();
@@ -1199,13 +1198,14 @@ export const useActions = ({
       title: strings.addToHome(),
       icon: "cellphone-arrow-down",
       onPress: async () => {
-        const added = await NotesnookModule.addShortcut(
-          item.id,
-          item.type,
-          item.title,
-          (item as Note).headline || (item as Notebook).description || ""
-        );
-        console.log(added);
+        try {
+          await NotesnookModule.addShortcut(
+            item.id,
+            item.type,
+            item.title,
+            (item as Note).headline || (item as Notebook).description || ""
+          );
+        } catch (e) {}
       }
     });
   }

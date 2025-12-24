@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 
 public class RCTNNativeModule extends ReactContextBaseJavaModule {
@@ -263,11 +264,11 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
             intent.setPackage(mContext.getPackageName());
 
             Icon icon = createLetterIcon(type, title);
-
             ShortcutInfo shortcut = new ShortcutInfo.Builder(mContext, id)
                     .setShortLabel(title)
                     .setLongLabel(description != null && !description.isEmpty() ? description : title)
                     .setIcon(icon)
+                    .setCategories(Set.of(type))
                     .setIntent(intent)
                     .build();
 
@@ -324,7 +325,6 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
             }
 
             if (existingShortcut == null) {
-                promise.reject("NOT_FOUND", "Shortcut not found");
                 return;
             }
 
@@ -367,6 +367,41 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
         } catch (Exception e) {
             promise.reject("ERROR", e.getMessage());
         }
+    }
+
+    @ReactMethod
+    public void getAllShortcuts(Promise promise) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            return;
+        }
+        ShortcutManager shortcutManager = mContext.getSystemService(ShortcutManager.class);
+        WritableArray shortcuts = Arguments.createArray();
+        List<ShortcutInfo> infos = shortcutManager.getPinnedShortcuts();
+
+        for (ShortcutInfo info: infos) {
+            WritableMap data = Arguments.createMap();
+            data.putString("id", info.getId());
+            if (info.getShortLabel() != null) {
+                data.putString("title", info.getShortLabel().toString());
+            }
+
+            if (info.getLongLabel() != null) {
+                data.putString("description", info.getLongLabel().toString());
+            }
+
+
+            if (!Objects.requireNonNull(info.getCategories()).isEmpty()) {
+                if (info.getCategories().contains("note")) {
+                    data.putString("type", "note");
+                } else if (info.getCategories().contains("notebook")) {
+                    data.putString("type", "notebook");
+                } else if (info.getCategories().contains("tag")) {
+                    data.putString("type", "tag");
+                }
+            }
+            shortcuts.pushMap(data);
+        }
+        promise.resolve(shortcuts);
     }
 
     private Icon createLetterIcon(String type, String title) {
