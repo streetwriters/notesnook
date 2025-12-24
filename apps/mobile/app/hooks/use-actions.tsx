@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* eslint-disable no-inner-declarations */
 import { useAreFeaturesAvailable } from "@notesnook/common";
 import {
+  Color,
   createInternalLink,
   Item,
   ItemReference,
@@ -1191,7 +1192,10 @@ export const useActions = ({
 
   if (
     Platform.OS === "android" &&
-    (item.type === "tag" || item.type === "note" || item.type === "notebook")
+    (item.type === "tag" ||
+      item.type === "note" ||
+      item.type === "notebook" ||
+      item.type === "color")
   ) {
     actions.push({
       id: "launcher-shortcut",
@@ -1203,7 +1207,8 @@ export const useActions = ({
             item.id,
             item.type,
             item.title,
-            (item as Note).headline || (item as Notebook).description || ""
+            (item as Note).headline || (item as Notebook).description || "",
+            (item as Color).colorCode
           );
         } catch (e) {}
       }

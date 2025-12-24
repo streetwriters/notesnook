@@ -87,6 +87,18 @@ const AppNavigation = React.memo(
             });
             return;
           }
+        } else if (url?.startsWith("https://app.notesnook.com/open_color?")) {
+          const id = new URL(url).searchParams.get("id");
+          if (id) {
+            setHome({
+              name: "ColoredNotes",
+              params: {
+                type: "color",
+                id: id
+              }
+            });
+            return;
+          }
         }
       }
 

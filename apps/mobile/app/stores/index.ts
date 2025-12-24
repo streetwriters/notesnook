@@ -47,6 +47,7 @@ async function syncShortcuts(result: ShortcutInfo[]) {
             } else if (note.title !== shortcut.title) {
               NotesnookModule.updateShortcut(
                 shortcut.id,
+                "note",
                 note.title,
                 note.headline
               );
@@ -61,6 +62,7 @@ async function syncShortcuts(result: ShortcutInfo[]) {
             } else if (notebook.title !== shortcut.title) {
               NotesnookModule.updateShortcut(
                 shortcut.id,
+                "notebook",
                 notebook.title,
                 notebook.description
               );
@@ -73,7 +75,28 @@ async function syncShortcuts(result: ShortcutInfo[]) {
             if (!tag) {
               NotesnookModule.removeShortcut(shortcut.id);
             } else if (tag.title !== shortcut.title) {
-              NotesnookModule.updateShortcut(shortcut.id, tag.title, tag.title);
+              NotesnookModule.updateShortcut(
+                shortcut.id,
+                "tag",
+                tag.title,
+                tag.title
+              );
+            }
+          }
+          break;
+        case "color":
+          {
+            const color = await db.colors.color(shortcut.id);
+            if (!color) {
+              NotesnookModule.removeShortcut(shortcut.id);
+            } else if (color.title !== shortcut.title) {
+              NotesnookModule.updateShortcut(
+                shortcut.id,
+                "color",
+                color.title,
+                color.title,
+                color.colorCode
+              );
             }
           }
           break;

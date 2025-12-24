@@ -23,7 +23,7 @@ export type ShortcutInfo = {
   id: string;
   title: string;
   description: string;
-  type: "note" | "notebook" | "tag";
+  type: "note" | "notebook" | "tag" | "color";
 };
 
 interface NotesnookModuleInterface {
@@ -50,15 +50,18 @@ interface NotesnookModuleInterface {
   isGestureNavigationEnabled: () => boolean;
   addShortcut: (
     id: string,
-    type: "note" | "notebook" | "tag",
+    type: "note" | "notebook" | "tag" | "color",
     title: string,
-    description?: string
+    description?: string,
+    color?: string
   ) => Promise<boolean>;
   removeShortcut: (id: string) => Promise<boolean>;
   updateShortcut: (
     id: string,
+    type: "note" | "notebook" | "tag" | "color",
     title: string,
-    description?: string
+    description?: string,
+    color?: string
   ) => Promise<boolean>;
   removeAllShortcuts: () => Promise<boolean>;
   getAllShortcuts: () => Promise<ShortcutInfo[]>;

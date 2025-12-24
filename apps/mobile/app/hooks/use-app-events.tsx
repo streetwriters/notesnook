@@ -216,6 +216,22 @@ const onAppOpenedFromURL = async (event: {
           });
         }
       }
+    } else if (
+      url.startsWith("https://app.notesnook.com/open_color?") &&
+      !event.isInitialUrl
+    ) {
+      const id = new URL(url).searchParams.get("id");
+      if (id) {
+        const color = await db.colors.color(id);
+        if (color) {
+          Navigation.navigate("ColoredNotes", {
+            type: "color",
+            id: color.id,
+            item: color,
+            canGoBack: true
+          });
+        }
+      }
     } else if (url.startsWith("https://app.notesnook.com/open_reminder")) {
       const id = new URL(url).searchParams.get("id");
       if (id) {

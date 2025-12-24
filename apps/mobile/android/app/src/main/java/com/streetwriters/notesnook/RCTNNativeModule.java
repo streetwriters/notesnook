@@ -246,7 +246,7 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void addShortcut(final String id, final String type, final String title, final String description, Promise promise) {
+    public void addShortcut(final String id, final String type, final String title, final String description, final String color, Promise promise) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             promise.reject("UNSUPPORTED", "Pinned launcher shortcuts require Android 8.0 or higher");
             return;
@@ -263,7 +263,7 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
             Intent intent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(uri));
             intent.setPackage(mContext.getPackageName());
 
-            Icon icon = createLetterIcon(type, title);
+            Icon icon = createLetterIcon(type, title, color);
             ShortcutInfo shortcut = new ShortcutInfo.Builder(mContext, id)
                     .setShortLabel(title)
                     .setLongLabel(description != null && !description.isEmpty() ? description : title)
@@ -301,7 +301,7 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void updateShortcut(final String id, final String title, final String description, Promise promise) {
+    public void updateShortcut(final String id, final String type, final String title, final String description,final String color, Promise promise) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             promise.reject("UNSUPPORTED", "Pinned launcher shortcuts require Android 8.0 or higher");
             return;
@@ -327,9 +327,10 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
             if (existingShortcut == null) {
                 return;
             }
-
+            Icon icon = createLetterIcon(type, title, color);
             ShortcutInfo updatedShortcut = new ShortcutInfo.Builder(mContext, id)
                     .setShortLabel(title)
+                    .setIcon(icon)
                     .setLongLabel(description != null && !description.isEmpty() ? description : title)
                     .setIntent(existingShortcut.getIntent())
                     .build();
@@ -397,6 +398,8 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
                     data.putString("type", "notebook");
                 } else if (info.getCategories().contains("tag")) {
                     data.putString("type", "tag");
+                } else if (info.getCategories().contains("color")) {
+                    data.putString("type", "color");
                 }
             }
             shortcuts.pushMap(data);
@@ -404,12 +407,12 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
         promise.resolve(shortcuts);
     }
 
-    private Icon createLetterIcon(String type, String title) {
+    private Icon createLetterIcon(String type, String title, String colorCode) {
 
         String letter = type.contains("tag") ? "#" : title != null && !title.isEmpty()
                 ? title.substring(0, 1).toUpperCase()
                 : "?";
-        int color = getColorForLetter(letter);
+        int color = type.equals("color") ? Color.parseColor(colorCode) : getColorForLetter(letter);
         
         if (type.equals("notebook")) return Icon.createWithResource(mContext, R.drawable.ic_notebook);
         // Use a larger canvas and fill it completely to avoid white borders from launcher masking.
@@ -417,19 +420,24 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
         Bitmap bitmap = Bitmap.createBitmap(iconSize, iconSize, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
 
+        if (type.equals("color")) {
+            Paint backgroundPaint = new Paint();
+            backgroundPaint.setColor(color);
+            backgroundPaint.setAntiAlias(true);
+            canvas.drawCircle(iconSize / 2, iconSize / 2, iconSize/2, backgroundPaint);
+        } else {
+            Paint textPaint = new Paint();
+            textPaint.setColor(color);
+            textPaint.setTextSize(130);
+            textPaint.setAntiAlias(true);
+            textPaint.setTextAlign(Paint.Align.CENTER);
+            textPaint.setTypeface(android.graphics.Typeface.create(android.graphics.Typeface.DEFAULT, android.graphics.Typeface.BOLD));
 
+            float x = iconSize / 2f;
+            float y = (iconSize / 2f) - ((textPaint.descent() + textPaint.ascent()) / 2f);
 
-        Paint textPaint = new Paint();
-        textPaint.setColor(color);
-        textPaint.setTextSize(130);
-        textPaint.setAntiAlias(true);
-        textPaint.setTextAlign(Paint.Align.CENTER);
-        textPaint.setTypeface(android.graphics.Typeface.create(android.graphics.Typeface.DEFAULT, android.graphics.Typeface.BOLD));
-
-        float x = iconSize / 2f;
-        float y = (iconSize / 2f) - ((textPaint.descent() + textPaint.ascent()) / 2f);
-
-        canvas.drawText(letter, x, y, textPaint);
+            canvas.drawText(letter, x, y, textPaint);
+        }
 
         return Icon.createWithBitmap(bitmap);
     }
