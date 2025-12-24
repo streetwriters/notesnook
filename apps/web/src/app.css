@@ -2,7 +2,8 @@
 .titlebarLogo,
 .theme-scope-titleBar,
 .navigation-menu-header,
-.route-container-header {
+.route-container-header,
+.desktop-drag-region {
   -webkit-app-region: drag;
 }
 

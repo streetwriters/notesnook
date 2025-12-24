@@ -98,6 +98,15 @@ function AuthContainer(props) {
         }}
       >
         <Box
+          className="desktop-drag-region"
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            height: "50%"
+          }}
+        />
+        <Box
           as="svg"
           version="1.1"
           viewBox="0 0 1920 1080"
