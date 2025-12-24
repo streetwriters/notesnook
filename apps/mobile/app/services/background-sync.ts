@@ -114,7 +114,7 @@ async function onBackgroundSyncStarted() {
     }
     await Notifications.setupReminders();
     if (SettingsService.get().notifNotes) {
-      Notifications.pinQuickNote(false);
+      Notifications.pinQuickNote();
     }
     Notifications.restorePinnedNotes();
     NotePreviewWidget.updateNotes();
@@ -142,7 +142,7 @@ const onBoot = async () => {
 
     await Notifications.setupReminders();
     if (SettingsService.get().notifNotes) {
-      Notifications.pinQuickNote(false);
+      Notifications.pinQuickNote();
     }
     Notifications.restorePinnedNotes();
     NotePreviewWidget.updateNotes();

@@ -109,6 +109,15 @@ async function initDatabase() {
 const onEvent = async ({ type, detail }: Event) => {
   await initDatabase();
   const { notification, pressAction, input } = detail;
+  if (
+    type === EventType.DISMISSED &&
+    Platform.OS === "android" &&
+    notification?.id === "notesnook_note_input" &&
+    SettingsService.getProperty("notifNotes")
+  ) {
+    pinQuickNote();
+  }
+
   if (type === EventType.DELIVERED && Platform.OS === "android") {
     if (notification?.id) {
       const reminder = await db.reminders?.reminder(
@@ -503,7 +512,8 @@ async function displayNotification({
   ongoing,
   reply_placeholder_text,
   reply_button_text,
-  id
+  id,
+  channelId = "default"
 }: {
   title?: string;
   message: string;
@@ -514,6 +524,7 @@ async function displayNotification({
   reply_placeholder_text?: string;
   reply_button_text?: string;
   id?: string;
+  channelId?: "silent" | "vibrate" | "urgent" | "default";
 }) {
   useUserStore.setState({
     disableAppLockRequests: true
@@ -538,7 +549,7 @@ async function displayNotification({
         ongoing: ongoing,
         smallIcon: "ic_stat_name",
         localOnly: true,
-        channelId: await getChannelId("default"),
+        channelId: await getChannelId(channelId),
         autoCancel: false,
         pressAction: {
           id: "default",
@@ -885,7 +896,7 @@ function init() {
   notifee.onForegroundEvent(onEvent);
 }
 
-async function pinQuickNote(launch: boolean) {
+async function pinQuickNote() {
   useUserStore.setState({
     disableAppLockRequests: true
   });
@@ -897,14 +908,13 @@ async function pinQuickNote(launch: boolean) {
     return;
   }
   get().then((items) => {
-    const notification = items.filter((n) => n.id === "notesnook_note_input");
-    if (notification && launch) {
-      return;
-    }
+    const notification = items.find((n) => n.id === "notesnook_note_input");
+    if (notification) return;
     displayNotification({
       title: strings.quickNoteTitle(),
       message: strings.quickNoteContent(),
       ongoing: true,
+      channelId: "silent",
       actions: ["ReplyInput", strings.hide()],
       reply_button_text: strings.takeNote(),
       reply_placeholder_text: strings.quickNotePlaceholder(),
@@ -1031,6 +1041,7 @@ async function pinNote(id: string) {
       subtitle: "",
       bigText: html,
       ongoing: true,
+      channelId: "silent",
       actions: [strings.unpin()],
       id: note.id
     });
@@ -1041,9 +1052,13 @@ async function pinNote(id: string) {
 
 async function restorePinnedNotes() {
   const pinnedNotes = PinnedNotesStorage.get();
-  for (const id of pinnedNotes) {
-    pinNote(id);
-  }
+  Notifications.get().then(() => {
+    for (const id of pinnedNotes) {
+      if (!isNotePinned(id)) {
+        pinNote(id);
+      }
+    }
+  });
 }
 
 async function clearPinnedNotes() {
