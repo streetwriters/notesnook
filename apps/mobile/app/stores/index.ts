@@ -126,7 +126,12 @@ export function initAfterSync(type: "full" | "send" = "send") {
   Notifications.setupReminders(true);
   NotePreviewWidget.updateNotes();
   eSendEvent(eAfterSync);
-  NotesnookModule.getAllShortcuts().then(syncShortcuts);
+
+  NotesnookModule.getAllShortcuts()
+    .then(syncShortcuts)
+    .catch((e) => {
+      DatabaseLogger.log(e);
+    });
 }
 
 export async function initialize() {}
