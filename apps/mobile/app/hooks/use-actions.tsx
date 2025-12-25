@@ -162,7 +162,8 @@ export const useActions = ({
     "shortcuts",
     "notebooks",
     "customizableSidebar",
-    "customHomepage"
+    "customHomepage",
+    "androidLauncherShortcuts"
   ]);
   const [item, setItem] = useState(propItem);
   const { colors } = useThemeColors();
@@ -1201,7 +1202,21 @@ export const useActions = ({
       id: "launcher-shortcut",
       title: strings.addToHome(),
       icon: "cellphone-arrow-down",
+      locked: !features?.androidLauncherShortcuts.isAllowed,
       onPress: async () => {
+        if (features && !features?.androidLauncherShortcuts.isAllowed) {
+          ToastManager.show({
+            message: features?.androidLauncherShortcuts.error,
+            type: "info",
+            actionText: strings.upgrade(),
+            context: "local",
+            func: () => {
+              PaywallSheet.present(features?.androidLauncherShortcuts);
+            }
+          });
+          return;
+        }
+
         try {
           await NotesnookModule.addShortcut(
             item.id,
