@@ -155,39 +155,8 @@ module.exports = (env) => {
           type: "javascript/auto"
         },
         ...Repack.getAssetTransformRules({
-          inline: true
-        }),
-
-        /**
-         * This loader handles all static assets (images, video, audio and others), so that you can
-         * use (reference) them inside your application.
-         *
-         * If you wan to handle specific asset type manually, filter out the extension
-         * from `ASSET_EXTENSIONS`, for example:
-         * ```
-         * Repack.ASSET_EXTENSIONS.filter((ext) => ext !== 'svg')
-         * ```
-         */
-        {
-          test: Repack.getAssetExtensionsRegExp(
-            Repack.ASSET_EXTENSIONS.filter((ext) => ext !== "svg")
-          ),
-          use: {
-            loader: "@callstack/repack/assets-loader"
-          }
-        },
-        {
-          test: /\.svg$/,
-          use: [
-            {
-              loader: "@svgr/webpack",
-              options: {
-                native: true,
-                dimensions: false
-              }
-            }
-          ]
-        }
+          inline: false
+        })
       ]
     },
     plugins: [
