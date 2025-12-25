@@ -508,9 +508,17 @@ export const useEditor = (
       newTab?: boolean;
       refresh?: boolean;
       searchResultIndex?: number;
+      loadedFromEditor?: boolean;
     }) => {
       loadNoteMutex.runExclusive(async () => {
-        if (!event) return;
+        if (
+          !event ||
+          (event.loadedFromEditor &&
+            event.item &&
+            event.item?.id !== useTabStore.getState().getCurrentNoteId())
+        ) {
+          return;
+        }
         if (event.blockId) {
           blockIdRef.current = event.blockId;
         }
@@ -719,6 +727,7 @@ export const useEditor = (
           }, 300);
         }
         postMessage(NativeEvents.theme, theme);
+        console.log("load finished", event.item?.id);
       });
     },
     [
