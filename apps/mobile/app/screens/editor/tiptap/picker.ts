@@ -22,10 +22,10 @@ import { isFeatureAvailable } from "@notesnook/common";
 import { isImage } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import {
-  pick as pickFile,
   DocumentPickerOptions,
-  DocumentPickerResponse,
-  keepLocalCopy
+  keepLocalCopy,
+  KeepLocalCopyResponse,
+  pick as pickFile
 } from "@react-native-documents/picker";
 import { basename } from "pathe";
 import { Platform } from "react-native";
@@ -35,25 +35,12 @@ import { DatabaseLogger, db } from "../../../common/database";
 import filesystem from "../../../common/filesystem";
 import { compressToFile } from "../../../common/filesystem/compress";
 import AttachImage from "../../../components/dialogs/attach-image-dialog";
-import {
-  ToastManager,
-  eSendEvent,
-  presentSheet
-} from "../../../services/event-manager";
+import { ToastManager } from "../../../services/event-manager";
 import PremiumService from "../../../services/premium";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { useUserStore } from "../../../stores/use-user-store";
-import { eCloseSheet } from "../../../utils/events";
 import { useTabStore } from "./use-tab-store";
 import { editorController, editorState } from "./utils";
-
-const showEncryptionSheet = (file: DocumentPickerResponse) => {
-  presentSheet({
-    title: strings.encryptingAttachment(),
-    paragraph: strings.encryptingAttachmentDesc(file.name || ""),
-    icon: "attachment"
-  });
-};
 
 const santizeUri = (uri: string) => {
   uri = decodeURI(uri);
@@ -80,7 +67,7 @@ const file = async (fileOptions: PickerOptions) => {
     await db.attachments.generateKey();
 
     let file;
-    let fileCopyUri;
+    let fileCopyUri: KeepLocalCopyResponse[0];
     let fileName;
     try {
       useSettingStore.getState().setAppDidEnterBackgroundForAction(true);
@@ -97,11 +84,9 @@ const file = async (fileOptions: PickerOptions) => {
       });
       fileCopyUri = result[0];
     } catch (e) {
+      DatabaseLogger.error(e as Error, "Error picking file");
       return;
     }
-
-    let uri =
-      Platform.OS === "ios" ? fileCopyUri.sourceUri || file.uri : file.uri;
 
     const featureResult = await isFeatureAvailable("fileSize", file.size || 0);
     if (!featureResult.isAllowed) {
@@ -122,8 +107,8 @@ const file = async (fileOptions: PickerOptions) => {
       return;
     }
 
+    let uri = fileCopyUri.localUri;
     uri = Platform.OS === "ios" ? santizeUri(uri) : uri;
-    showEncryptionSheet(file);
     const hash = await Sodium.hashFile({
       uri: uri,
       type: "url"
@@ -139,7 +124,8 @@ const file = async (fileOptions: PickerOptions) => {
     ) {
       throw new Error("Failed to attach file");
     }
-    if (Platform.OS === "ios") await RNFetchBlob.fs.unlink(uri);
+
+    await RNFetchBlob.fs.unlink(uri);
 
     if (
       fileOptions.tabId !== undefined &&
@@ -173,10 +159,7 @@ const file = async (fileOptions: PickerOptions) => {
     } else {
       throw new Error("Failed to attach file, no tabId is set");
     }
-
-    eSendEvent(eCloseSheet);
   } catch (e) {
-    eSendEvent(eCloseSheet);
     ToastManager.show({
       heading: (e as Error).message,
       type: "error",

@@ -367,7 +367,6 @@ export const RestoreBackup = () => {
                 disableAppLockRequests: true
               });
               const file = await pick();
-
               const fileCopy = await keepLocalCopy({
                 destination: "cachesDirectory",
                 files: [
@@ -390,10 +389,7 @@ export const RestoreBackup = () => {
               }, 1000);
 
               restoreBackup({
-                uri:
-                  Platform.OS === "android"
-                    ? (("file://" + fileCopy[0].sourceUri) as string)
-                    : (fileCopy[0].sourceUri as string),
+                uri: fileCopy[0].localUri,
                 deleteFile: true
               });
             },
