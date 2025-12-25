@@ -1088,7 +1088,10 @@ export const useEditor = (
 
     if (!state.current?.initialLoadCalled) {
       const url = await Linking.getInitialURL();
-      let noteId = url && new URL(url).searchParams.get("id");
+      let noteId =
+        url &&
+        url.startsWith("https://app.notesnook.com/open_note?") &&
+        new URL(url).searchParams.get("id");
       if (noteId) {
         const note = await db.notes?.note(noteId);
         fluidTabsRef.current?.goToPage("editor");

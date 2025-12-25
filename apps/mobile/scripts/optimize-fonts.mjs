@@ -115,7 +115,8 @@ const EXTRA_ICON_NAMES = [
   "update",
   "notebook-minus",
   "calendar-blank",
-  "email-newsletter"
+  "email-newsletter",
+  "cellphone-arrow-down"
 ];
 
 const __filename = fileURLToPath(import.meta.url);

@@ -469,6 +469,17 @@ const features = {
       believer: createLimit(true),
       legacyPro: createLimit(true)
     }
+  }),
+  androidLauncherShortcuts: createFeature({
+    id: "androidLauncherShortcuts",
+    title: "Android Launcher Shortcuts",
+    availability: {
+      free: createLimit(false),
+      essential: createLimit(false),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
+    }
   })
 };
 

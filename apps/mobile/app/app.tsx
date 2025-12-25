@@ -24,7 +24,7 @@ import {
   useThemeEngineStore
 } from "@notesnook/theme";
 import React, { useEffect } from "react";
-import { Appearance, I18nManager, StatusBar } from "react-native";
+import { Appearance, I18nManager, Linking, StatusBar } from "react-native";
 import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -43,7 +43,7 @@ import { changeSystemBarColors, useThemeStore } from "./stores/use-theme-store";
 import { useUserStore } from "./stores/use-user-store";
 import RNBootSplash from "react-native-bootsplash";
 import AppLocked from "./components/app-lock";
-
+import { useSettingStore } from "./stores/use-setting-store";
 I18nManager.allowRTL(false);
 I18nManager.forceRTL(false);
 I18nManager.swapLeftAndRightInRTL(false);
@@ -54,13 +54,18 @@ if (appLockEnabled || appLockMode !== "none") {
 RNBootSplash.hide({
   fade: true
 });
+Linking.getInitialURL().then((url) => {
+  useSettingStore.setState({
+    initialUrl: url
+  });
+});
 const App = (props: { configureMode: "note-preview" }) => {
   useAppEvents();
   //@ts-ignore
   globalThis["IS_MAIN_APP_RUNNING"] = true;
   useEffect(() => {
-    changeSystemBarColors();
     SettingsService.onFirstLaunch();
+    changeSystemBarColors();
     setTimeout(async () => {
       await Notifications.get();
       if (SettingsService.get().notifNotes) {

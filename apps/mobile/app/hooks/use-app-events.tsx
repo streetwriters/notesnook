@@ -85,7 +85,7 @@ import Notifications from "../services/notifications";
 import PremiumService from "../services/premium";
 import SettingsService from "../services/settings";
 import Sync from "../services/sync";
-import { clearAllStores, initAfterSync, initialize } from "../stores";
+import { clearAllStores, initAfterSync } from "../stores";
 import { refreshAllStores } from "../stores/create-db-collection-store";
 import { useAttachmentStore } from "../stores/use-attachment-store";
 import { useMessageStore } from "../stores/use-message-store";
@@ -159,7 +159,10 @@ const onUserSessionExpired = async () => {
   eSendEvent(eLoginSessionExpired);
 };
 
-const onAppOpenedFromURL = async (event: { url: string }) => {
+const onAppOpenedFromURL = async (event: {
+  url: string;
+  isInitialUrl?: boolean;
+}) => {
   const url = event.url;
 
   try {
@@ -171,7 +174,7 @@ const onAppOpenedFromURL = async (event: { url: string }) => {
       eSendEvent(eOnLoadNote, { newNote: true });
       fluidTabsRef.current?.goToPage("editor", false);
       return;
-    } else if (url.startsWith("https://app.notesnook.com/open_note")) {
+    } else if (url.startsWith("https://app.notesnook.com/open_note?")) {
       const id = new URL(url).searchParams.get("id");
       if (id) {
         const note = await db.notes.note(id);
@@ -180,6 +183,53 @@ const onAppOpenedFromURL = async (event: { url: string }) => {
             item: note
           });
           fluidTabsRef.current?.goToPage("editor", false);
+        }
+      }
+    } else if (
+      url.startsWith("https://app.notesnook.com/open_notebook?") &&
+      !event.isInitialUrl
+    ) {
+      const id = new URL(url).searchParams.get("id");
+      if (id) {
+        const notebook = await db.notebooks.notebook(id);
+        if (notebook) {
+          Navigation.navigate("Notebook", {
+            id: notebook.id,
+            canGoBack: true,
+            item: notebook
+          });
+        }
+      }
+    } else if (
+      url.startsWith("https://app.notesnook.com/open_tag?") &&
+      !event.isInitialUrl
+    ) {
+      const id = new URL(url).searchParams.get("id");
+      if (id) {
+        const tag = await db.tags.tag(id);
+        if (tag) {
+          Navigation.navigate("TaggedNotes", {
+            type: "tag",
+            id: tag.id,
+            item: tag,
+            canGoBack: true
+          });
+        }
+      }
+    } else if (
+      url.startsWith("https://app.notesnook.com/open_color?") &&
+      !event.isInitialUrl
+    ) {
+      const id = new URL(url).searchParams.get("id");
+      if (id) {
+        const color = await db.colors.color(id);
+        if (color) {
+          Navigation.navigate("ColoredNotes", {
+            type: "color",
+            id: color.id,
+            item: color,
+            canGoBack: true
+          });
         }
       }
     } else if (url.startsWith("https://app.notesnook.com/open_reminder")) {
@@ -464,7 +514,10 @@ const initializeDatabase = async (password?: string) => {
 };
 
 export const useAppEvents = () => {
-  const isAppLoading = useSettingStore((state) => state.isAppLoading);
+  const [isAppLoading, initialUrl] = useSettingStore((state) => [
+    state.isAppLoading,
+    state.initialUrl
+  ]);
   const [setLastSynced, setUser, appLocked, syncing] = useUserStore((state) => [
     state.setLastSynced,
     state.setUser,
@@ -508,6 +561,15 @@ export const useAppEvents = () => {
       subscriptions.forEach((sub) => sub?.unsubscribe?.());
     };
   }, [isAppLoading, onSyncComplete]);
+
+  useEffect(() => {
+    if (initialUrl) {
+      onAppOpenedFromURL({
+        url: initialUrl!,
+        isInitialUrl: true
+      });
+    }
+  }, [initialUrl]);
 
   const subscribeToPurchaseListeners = useCallback(async () => {
     if (Platform.OS === "android") {
@@ -774,23 +836,10 @@ export const useAppEvents = () => {
       }
     };
 
-    if (!refValues.current.initialUrl) {
-      Linking.getInitialURL().then((url) => {
-        if (url) {
-          refValues.current.initialUrl = url;
-        }
-      });
-    }
     let sub: NativeEventSubscription;
     if (!isAppLoading && !appLocked) {
       setTimeout(() => {
         sub = AppState.addEventListener("change", onAppStateChanged);
-        if (refValues.current.initialUrl) {
-          onAppOpenedFromURL({
-            url: refValues.current.initialUrl!
-          });
-          refValues.current.initialUrl = undefined;
-        }
       }, 1000);
 
       refValues.current.removeInternetStateListener = NetInfo.addEventListener(

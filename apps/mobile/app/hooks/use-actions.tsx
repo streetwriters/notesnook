@@ -19,10 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* eslint-disable no-inner-declarations */
 import { useAreFeaturesAvailable } from "@notesnook/common";
 import {
+  Color,
   createInternalLink,
   Item,
   ItemReference,
   Note,
+  Notebook,
   VAULT_ERRORS
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
@@ -70,6 +72,7 @@ import { deleteItems } from "../utils/functions";
 import { convertNoteToText } from "../utils/note-to-text";
 import { sleep } from "../utils/time";
 import { resetStoredState } from "./use-stored-state";
+import { NotesnookModule } from "../utils/notesnook-module";
 
 export type ActionId =
   | "select"
@@ -114,7 +117,8 @@ export type ActionId =
   | "remove-from-notebook"
   | "trash"
   | "default-homepage"
-  | "default-tag";
+  | "default-tag"
+  | "launcher-shortcut";
 
 export type Action = {
   id: ActionId;
@@ -158,7 +162,8 @@ export const useActions = ({
     "shortcuts",
     "notebooks",
     "customizableSidebar",
-    "customHomepage"
+    "customHomepage",
+    "androidLauncherShortcuts"
   ]);
   const [item, setItem] = useState(propItem);
   const { colors } = useThemeColors();
@@ -297,7 +302,6 @@ export const useActions = ({
             id: item.id,
             title: value
           });
-
           eSendEvent(Navigation.routeNames.TaggedNotes);
           InteractionManager.runAfterInteractions(() => {
             useTagStore.getState().refresh();
@@ -704,26 +708,6 @@ export const useActions = ({
             : {
                 id: item.id,
                 type: item.type
-              }
-        );
-
-        resetStoredState(
-          "app-home-navigtion-key",
-          isHomepage
-            ? undefined
-            : {
-                name:
-                  item.type === "notebook"
-                    ? "Notebook"
-                    : item.type === "tag"
-                      ? "TaggedNotes"
-                      : item.type === "color"
-                        ? "ColorNotes"
-                        : undefined,
-                params: {
-                  item: item,
-                  id: item.id
-                }
               }
         );
       }
@@ -1204,6 +1188,45 @@ export const useActions = ({
       icon: "delete-outline",
       type: "error",
       onPress: deleteItem
+    });
+  }
+
+  if (
+    Platform.OS === "android" &&
+    (item.type === "tag" ||
+      item.type === "note" ||
+      item.type === "notebook" ||
+      item.type === "color")
+  ) {
+    actions.push({
+      id: "launcher-shortcut",
+      title: strings.addToHome(),
+      icon: "cellphone-arrow-down",
+      locked: !features?.androidLauncherShortcuts.isAllowed,
+      onPress: async () => {
+        if (features && !features?.androidLauncherShortcuts.isAllowed) {
+          ToastManager.show({
+            message: features?.androidLauncherShortcuts.error,
+            type: "info",
+            actionText: strings.upgrade(),
+            context: "local",
+            func: () => {
+              PaywallSheet.present(features?.androidLauncherShortcuts);
+            }
+          });
+          return;
+        }
+
+        try {
+          await NotesnookModule.addShortcut(
+            item.id,
+            item.type,
+            item.title,
+            (item as Note).headline || (item as Notebook).description || "",
+            (item as Color).colorCode
+          );
+        } catch (e) {}
+      }
     });
   }
 
