@@ -222,15 +222,21 @@ export async function deleteCacheFileByName(name: string) {
 }
 
 export async function deleteDCacheFiles() {
-  await createCacheDir();
-  const files = await RNFetchBlob.fs.ls(cacheDir);
-  for (const file of files) {
-    if (file.includes("_dcache") || file.startsWith("NN_")) {
-      await RNFetchBlob.fs.unlink(file).catch(() => {
-        /* empty */
-      });
+  try {
+    await createCacheDir();
+    const files = await RNFetchBlob.fs.ls(cacheDir);
+    for (const file of files) {
+      if (
+        file.includes("_dcache") ||
+        file.startsWith("NN_") ||
+        file.endsWith(".pdf")
+      ) {
+        await RNFetchBlob.fs.unlink(file).catch(() => {
+          /* empty */
+        });
+      }
     }
-  }
+  } catch (e) {}
 }
 
 export async function getCachePathForFile(filename: string) {
