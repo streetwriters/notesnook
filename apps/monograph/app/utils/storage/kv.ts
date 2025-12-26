@@ -18,10 +18,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import WorkersKVREST from "@sagi.io/workers-kv";
+import { readSecrets } from "../env";
 
-const cfAccountId = process.env.CLOUDFLARE_ACCOUNT_ID!;
-const cfAuthToken = process.env.CLOUDFLARE_AUTH_TOKEN!;
-const namespaceId = process.env.CLOUDFLARE_KV_NAMESPACE_ID!;
+const env = readSecrets([
+  "CLOUDFLARE_ACCOUNT_ID",
+  "CLOUDFLARE_AUTH_TOKEN",
+  "CLOUDFLARE_KV_NAMESPACE_ID"
+]);
+const cfAccountId = env.CLOUDFLARE_ACCOUNT_ID;
+const cfAuthToken = env.CLOUDFLARE_AUTH_TOKEN;
+const namespaceId = env.CLOUDFLARE_KV_NAMESPACE_ID;
 
 if (!cfAccountId || !cfAuthToken || !namespaceId)
   throw new Error(
