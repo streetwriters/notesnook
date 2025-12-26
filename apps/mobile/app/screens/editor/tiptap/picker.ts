@@ -41,12 +41,7 @@ import { useSettingStore } from "../../../stores/use-setting-store";
 import { useUserStore } from "../../../stores/use-user-store";
 import { useTabStore } from "./use-tab-store";
 import { editorController, editorState } from "./utils";
-
-const santizeUri = (uri: string) => {
-  uri = decodeURI(uri);
-  uri = Platform.OS === "ios" ? uri.replace("file:///", "/") : uri;
-  return uri;
-};
+import { santizeUri } from "../../../common/filesystem/utils";
 
 type PickerOptions = {
   noteId?: string;
@@ -107,8 +102,7 @@ const file = async (fileOptions: PickerOptions) => {
       return;
     }
 
-    let uri = fileCopyUri.localUri;
-    uri = Platform.OS === "ios" ? santizeUri(uri) : uri;
+    let uri = santizeUri(fileCopyUri.localUri);
     const hash = await Sodium.hashFile({
       uri: uri,
       type: "url"
