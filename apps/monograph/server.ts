@@ -31,10 +31,10 @@ const remix = createRequestHandler(
   build as unknown as ServerBuild,
   Bun.env.NODE_ENV
 );
-process.env.PORT = process.env.PORT || "3000";
 
 export default {
-  port: process.env.PORT,
+  port: process.env.PORT || "3000",
+  hostname: process.env.HOST || "localhost",
   async fetch(request) {
     // First we need to send handle static files
     const { pathname } = new URL(request.url);
