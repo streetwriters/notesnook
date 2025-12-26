@@ -1329,7 +1329,7 @@ export const settingsGroups: SettingSection[] = [
           if (settings.notifNotes) {
             Notifications.unpinQuickNote();
           } else {
-            Notifications.pinQuickNote(false);
+            Notifications.pinQuickNote();
           }
           SettingsService.set({
             notifNotes: !settings.notifNotes

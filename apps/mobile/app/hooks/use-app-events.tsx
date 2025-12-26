@@ -107,6 +107,7 @@ import { fluidTabsRef } from "../utils/global-refs";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { sleep } from "../utils/time";
 import useFeatureManager from "./use-feature-manager";
+import { deleteDCacheFiles } from "../common/filesystem/io";
 
 const onCheckSyncStatus = async (type: SyncStatusEvent) => {
   const { disableSync, disableAutoSync } = SettingsService.get();
@@ -179,6 +180,7 @@ const onAppOpenedFromURL = async (event: {
       if (id) {
         const note = await db.notes.note(id);
         if (note) {
+          editorState().initialLoadCalled = true;
           eSendEvent(eOnLoadNote, {
             item: note
           });
@@ -504,11 +506,9 @@ const initializeDatabase = async (password?: string) => {
     await setAppMessage();
     useSettingStore.getState().setAppLoading(false);
     Notifications.setupReminders(true);
-    if (SettingsService.get().notifNotes) {
-      Notifications.pinQuickNote(false);
-    }
     DatabaseLogger.info("Database initialized");
     Notifications.restorePinnedNotes();
+    deleteDCacheFiles();
   }
   Walkthrough.init();
 };

@@ -76,11 +76,11 @@ async function getCredentials(title?: string, description?: string) {
     const options = Platform.select({
       ios: {
         fallbackEnabled: false,
-        description: description
+        description: description || title || "Unlock"
       },
       android: {
         title: title,
-        description: description,
+        description: description || "Unlock",
         deviceCredentialAllowed: false
       }
     });
@@ -132,11 +132,11 @@ async function validateUser(title: string, description?: string) {
       Platform.select({
         ios: {
           fallbackEnabled: false,
-          description: title
+          description: title || "Unlock"
         },
         android: {
           title: title,
-          description: description,
+          description: description || "Unlock",
           deviceCredentialAllowed: false
         }
       }) as AuthenticateIOS

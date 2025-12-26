@@ -69,7 +69,7 @@ const App = (props: { configureMode: "note-preview" }) => {
     setTimeout(async () => {
       await Notifications.get();
       if (SettingsService.get().notifNotes) {
-        Notifications.pinQuickNote(true);
+        Notifications.pinQuickNote();
       }
       TipManager.init();
     }, 100);
