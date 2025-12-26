@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/mobile",
-  "version": "3.3.11",
+  "version": "3.3.12",
   "private": true,
   "license": "GPL-3.0-or-later",
   "scripts": {
@@ -26,7 +26,7 @@
     "react": "19.1.1"
   },
   "dependencies": {
-    "@ammarahmed/notifee-react-native": "^7.4.10",
+    "@ammarahmed/notifee-react-native": "^7.4.11",
     "@ammarahmed/react-native-background-fetch": "^4.2.2",
     "@ammarahmed/react-native-eventsource": "1.1.0",
     "@ammarahmed/react-native-fingerprint-scanner": "^5.0.1",
