@@ -16,6 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { LegendList } from "@legendapp/list";
+import { strings } from "@notesnook/intl";
 import {
   THEME_COMPATIBILITY_VERSION,
   ThemeDefinition,
@@ -29,7 +31,6 @@ import type {
   ThemesRouter
 } from "@notesnook/themes-server";
 import { keepLocalCopy, pick } from "@react-native-documents/picker";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 import { createTRPCReact } from "@trpc/react-query";
@@ -40,24 +41,24 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import ReactNativeBlobUtil from "react-native-blob-util";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { DatabaseLogger, db } from "../../common/database";
+import { santizeUri } from "../../common/filesystem/utils";
 import SheetProvider from "../../components/sheet-provider";
 import { Button } from "../../components/ui/button";
+import { IconButton } from "../../components/ui/icon-button";
 import Input from "../../components/ui/input";
+import { Pressable } from "../../components/ui/pressable";
 import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
 import { ToastManager, presentSheet } from "../../services/event-manager";
 import { useThemeStore } from "../../stores/use-theme-store";
-import { defaultBorderRadius, AppFontSize } from "../../utils/size";
+import { getColorLinearShade } from "../../utils/colors";
 import { getElevationStyle } from "../../utils/elevation";
 import { MenuItemsList } from "../../utils/menu-items";
-import { IconButton } from "../../components/ui/icon-button";
-import { Pressable } from "../../components/ui/pressable";
-import { getColorLinearShade } from "../../utils/colors";
-import { strings } from "@notesnook/intl";
+import { AppFontSize, defaultBorderRadius } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
-import { LegendList } from "@legendapp/list";
-import ReactNativeBlobUtil from "react-native-blob-util";
 
 const THEME_SERVER_URL = "https://themes-api.notesnook.com";
 //@ts-ignore
@@ -429,12 +430,16 @@ function ThemeSelector() {
                   });
                   if (copiedFile[0].status !== "success") return;
 
+                  const themeJsonCopiedPath = santizeUri(
+                    copiedFile[0].localUri
+                  );
+
                   const themeJson = await ReactNativeBlobUtil.fs.readFile(
-                    copiedFile[0].localUri,
+                    themeJsonCopiedPath,
                     "utf8"
                   );
                   ReactNativeBlobUtil.fs
-                    .unlink(copiedFile[0].localUri)
+                    .unlink(themeJsonCopiedPath)
                     .catch(() => {});
                   const json = JSON.parse(themeJson);
                   const result = validateTheme(json);

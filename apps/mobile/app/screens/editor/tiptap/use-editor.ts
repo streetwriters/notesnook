@@ -677,7 +677,7 @@ export const useEditor = (
           state.current.currentlyEditing = true;
           if (!tabLocked) {
             await loadContent(item);
-          } else {
+          } else if (fluidTabsRef.current?.page() === "editor") {
             commands.focus(tabId!);
           }
 

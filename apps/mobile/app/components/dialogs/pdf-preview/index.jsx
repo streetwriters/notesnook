@@ -23,6 +23,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Dimensions, TextInput, View } from "react-native";
 import Orientation from "react-native-orientation-locker";
 import Pdf from "react-native-pdf";
+import FileViewer from "react-native-file-viewer";
 import { MMKV } from "../../../common/database/mmkv";
 import downloadAttachment from "../../../common/filesystem/download-attachment";
 import { deleteCacheFileByPath, exists } from "../../../common/filesystem/io";
@@ -43,6 +44,7 @@ import SheetProvider from "../../sheet-provider";
 import { IconButton } from "../../ui/icon-button";
 import { ProgressBarComponent } from "../../ui/svg/lazy";
 import Paragraph from "../../ui/typography/paragraph";
+import ReactNativeBlobUtil from "react-native-blob-util";
 
 const WIN_WIDTH = Dimensions.get("window").width;
 const WIN_HEIGHT = Dimensions.get("window").height;
@@ -117,8 +119,11 @@ const PDFPreview = () => {
           setVisible(false);
           return;
         }
-        const path = `${cacheDir}/${uri}`;
+        let path = `${cacheDir}/${attachment.filename}`;
         snapshotValue.current = snapshot.current;
+        await ReactNativeBlobUtil.fs
+          .mv(`${cacheDir}/${uri}`, path)
+          .catch(console.log);
         setPDFSource("file://" + path);
         setLoading(false);
       }, 100);
@@ -127,7 +132,7 @@ const PDFPreview = () => {
   );
 
   const close = () => {
-    deleteCacheFileByPath(pdfSource);
+    deleteCacheFileByPath(pdfSource.replace("file://", ""));
     setPDFSource(null);
     setVisible(false);
     setPassword("");
@@ -157,7 +162,12 @@ const PDFPreview = () => {
 
   return (
     visible && (
-      <BaseDialog animation="fade" visible={true} onRequestClose={close}>
+      <BaseDialog
+        animation="fade"
+        visible={true}
+        onRequestClose={close}
+        useSafeArea={false}
+      >
         <SheetProvider context={attachment?.hash} />
         <Dialog context={attachment?.hash} />
 
@@ -223,50 +233,63 @@ const PDFPreview = () => {
                 <View
                   style={{
                     flexDirection: "row",
-                    alignItems: "center",
-                    marginRight: 12
+                    gap: DefaultAppStyles.GAP_SMALL
                   }}
                 >
-                  <TextInput
-                    ref={inputRef}
-                    defaultValue={currentPage + ""}
+                  <View
                     style={{
-                      color: colors.primary.paragraph,
-                      padding: 0,
-                      paddingTop: 0,
-                      paddingBottom: 0,
-                      marginTop: 0,
-                      marginBottom: 0,
-                      paddingVertical: 0,
-                      height: 25,
-                      backgroundColor: colors.secondary.background,
-                      width: 40,
-                      textAlign: "center",
-                      marginRight: 4,
-                      borderRadius: 3,
-                      fontFamily: "Inter-Regular"
+                      flexDirection: "row",
+                      alignItems: "center"
                     }}
-                    selectTextOnFocus
-                    keyboardType="decimal-pad"
-                    onSubmitEditing={(event) => {
-                      setCurrentPage(event.nativeEvent.text);
-                      pdfRef.current?.setPage(parseInt(event.nativeEvent.text));
-                    }}
-                    blurOnSubmit
-                  />
-                  <Paragraph color={colors.static.white}>/{numPages}</Paragraph>
-                </View>
-
-                <View
-                  style={{
-                    flexDirection: "row"
-                  }}
-                >
+                  >
+                    <TextInput
+                      ref={inputRef}
+                      defaultValue={currentPage + ""}
+                      style={{
+                        color: colors.primary.paragraph,
+                        padding: 0,
+                        paddingTop: 0,
+                        paddingBottom: 0,
+                        marginTop: 0,
+                        marginBottom: 0,
+                        paddingVertical: 0,
+                        height: 25,
+                        backgroundColor: colors.secondary.background,
+                        width: 40,
+                        textAlign: "center",
+                        marginRight: 4,
+                        borderRadius: 3,
+                        fontFamily: "Inter-Regular"
+                      }}
+                      selectTextOnFocus
+                      keyboardType="decimal-pad"
+                      onSubmitEditing={(event) => {
+                        setCurrentPage(event.nativeEvent.text);
+                        pdfRef.current?.setPage(
+                          parseInt(event.nativeEvent.text)
+                        );
+                      }}
+                      blurOnSubmit
+                    />
+                    <Paragraph color={colors.static.white}>
+                      /{numPages}
+                    </Paragraph>
+                  </View>
                   <IconButton
                     color={colors.static.white}
                     name="download"
                     onPress={() => {
                       downloadAttachment(attachment.hash, false);
+                    }}
+                  />
+                  <IconButton
+                    color={colors.static.white}
+                    name="open-in-new"
+                    onPress={() => {
+                      FileViewer.open(pdfSource, {
+                        showOpenWithDialog: true,
+                        showAppsSuggestions: true
+                      });
                     }}
                   />
                 </View>
