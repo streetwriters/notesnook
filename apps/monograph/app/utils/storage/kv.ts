@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import WorkersKVREST from "@sagi.io/workers-kv";
-import { readSecrets } from "../env";
+import { readSecrets } from "../secrets";
 
 const env = readSecrets([
   "CLOUDFLARE_ACCOUNT_ID",
