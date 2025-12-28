@@ -59,8 +59,6 @@ class Merger {
       isDeleted(remoteItem) ||
       remoteItem.type !== "tiptap" ||
       localItem.type !== "tiptap" ||
-      localItem.locked ||
-      remoteItem.locked ||
       !localItem.data ||
       !remoteItem.data
     ) {
