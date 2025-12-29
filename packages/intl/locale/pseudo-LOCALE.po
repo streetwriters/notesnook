@@ -2577,10 +2577,6 @@ msgstr ""
 msgid "Enter the recovery code to continue logging in"
 msgstr ""
 
-#: src/strings.ts:2613
-msgid "Enter title"
-msgstr ""
-
 #: src/strings.ts:1492
 msgid "Enter verification code sent to your new email"
 msgstr ""
