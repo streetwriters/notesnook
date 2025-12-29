@@ -463,9 +463,11 @@ async function loadNote(id: string, jump: boolean) {
 
   const tab = useTabStore.getState().getTabForNote(id);
   if (useTabStore.getState().currentTab !== tab) {
-    eSendEvent(eOnLoadNote, {
-      item: note
-    });
+    setTimeout(() => {
+      eSendEvent(eOnLoadNote, {
+        item: note
+      });
+    }, 300);
   }
 }
 
