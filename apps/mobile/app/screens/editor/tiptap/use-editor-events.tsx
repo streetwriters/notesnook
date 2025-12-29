@@ -159,10 +159,13 @@ export const useEditorEvents = (
   const fullscreen = useSettingStore((state) => state.fullscreen);
   const corsProxy = useSettingStore((state) => state.settings.corsProxy);
   const loading = useSettingStore((state) => state.isAppLoading);
-  const [dateFormat, timeFormat] = useSettingStore((state) => [
-    state.dateFormat,
-    state.timeFormat
-  ]);
+  const [dateFormat, timeFormat, defaultLineHeight] = useSettingStore(
+    (state) => [
+      state.dateFormat,
+      state.timeFormat,
+      state.settings.defaultLineHeight
+    ]
+  );
   const handleBack = useRef<NativeEventSubscription>(undefined);
   const loggedIn = useUserStore((state) => !!state.user);
   const { fontScale } = useWindowDimensions();
@@ -225,7 +228,8 @@ export const useEditorEvents = (
       fontScale,
       markdownShortcuts,
       features,
-      loggedIn
+      loggedIn,
+      defaultLineHeight
     });
   }, [
     fullscreen,
@@ -244,7 +248,8 @@ export const useEditorEvents = (
     loading,
     fontScale,
     markdownShortcuts,
-    loggedIn
+    loggedIn,
+    defaultLineHeight
   ]);
 
   const onBackPress = useCallback(async () => {
