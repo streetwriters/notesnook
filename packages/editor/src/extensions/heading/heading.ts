@@ -26,6 +26,7 @@ import { Heading as TiptapHeading } from "@tiptap/extension-heading";
 import { Node } from "@tiptap/pm/model";
 import { Plugin, PluginKey, Selection, Transaction } from "@tiptap/pm/state";
 import { Callout } from "../callout/callout.js";
+import { changedDescendants } from "../../utils/prosemirror.js";
 
 const COLLAPSIBLE_BLOCK_TYPES = [
   "paragraph",
@@ -408,12 +409,10 @@ const headingUpdatePlugin = new Plugin({
     const newDoc = newState.doc;
     let modified = false;
 
-    newDoc.descendants((newNode, pos) => {
-      if (pos >= oldDoc.content.size) return;
+    function check(newNode: Node, pos: number, oldNode?: Node) {
+      if (!oldNode) return;
 
-      const oldNode = oldDoc.nodeAt(pos);
       if (
-        oldNode &&
         oldNode.type.name === "heading" &&
         oldNode.attrs.level !== newNode.attrs.level
       ) {
@@ -432,7 +431,9 @@ const headingUpdatePlugin = new Plugin({
           modified = true;
         }
       }
-    });
+    }
+
+    changedDescendants(oldDoc, newDoc, 0, check);
 
     return modified ? tr : null;
   }

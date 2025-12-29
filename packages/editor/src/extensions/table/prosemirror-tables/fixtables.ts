@@ -8,43 +8,12 @@ import { EditorState, PluginKey, Transaction } from "prosemirror-state";
 import { tableNodeTypes, TableRole } from "./schema.js";
 import { TableMap } from "./tablemap.js";
 import { CellAttrs, removeColSpan } from "./util.js";
+import { changedDescendants } from "../../../utils/prosemirror.js";
 
 /**
  * @public
  */
 export const fixTablesKey = new PluginKey<{ fixTables: boolean }>("fix-tables");
-
-/**
- * Helper for iterating through the nodes in a document that changed
- * compared to the given previous document. Useful for avoiding
- * duplicate work on each transaction.
- *
- * @public
- */
-function changedDescendants(
-  old: Node,
-  cur: Node,
-  offset: number,
-  f: (node: Node, pos: number) => void
-): void {
-  const oldSize = old.childCount,
-    curSize = cur.childCount;
-  outer: for (let i = 0, j = 0; i < curSize; i++) {
-    const child = cur.child(i);
-    for (let scan = j, e = Math.min(oldSize, i + 3); scan < e; scan++) {
-      if (old.child(scan) == child) {
-        j = scan + 1;
-        offset += child.nodeSize;
-        continue outer;
-      }
-    }
-    f(child, offset);
-    if (j < oldSize && old.child(j).sameMarkup(child))
-      changedDescendants(old.child(j), child, offset + 1, f);
-    else child.nodesBetween(0, child.content.size, f, offset + 1);
-    offset += child.nodeSize;
-  }
-}
 
 /**
  * Inspect all tables in the given state's document and return a
