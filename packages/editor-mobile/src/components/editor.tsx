@@ -242,6 +242,7 @@ const Tiptap = ({
       },
       dateFormat: settings.dateFormat,
       timeFormat: settings.timeFormat as "12-hour" | "24-hour" | undefined,
+      dayFormat: settings.dayFormat,
       enableInputRules: settings.markdownShortcuts
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

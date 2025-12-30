@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import type { ToolbarGroupDefinition } from "@notesnook/editor";
 import { useEditor } from "./use-editor";
 import { FeatureId, FeatureResult } from "@notesnook/common";
+import { DayFormat } from "@notesnook/core";
 export type useEditorType = ReturnType<typeof useEditor>;
 
 export type EditorState = {
@@ -61,6 +62,7 @@ export type Settings = {
   features: Record<any, any>;
   loggedIn: boolean;
   defaultLineHeight: number;
+  dayFormat: DayFormat;
 };
 
 export type EditorProps = {
