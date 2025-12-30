@@ -2004,35 +2004,6 @@ PODS:
     - React
   - react-native-orientation-locker (1.7.0):
     - React-Core
-  - react-native-pager-view (8.0.0):
-    - boost
-    - DoubleConversion
-    - fast_float
-    - fmt
-    - glog
-    - hermes-engine
-    - RCT-Folly
-    - RCT-Folly/Fabric
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Core
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-jsi
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-renderercss
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - SocketRocket
-    - SwiftUIIntrospect (~> 1.0)
-    - Yoga
   - react-native-pdf (7.0.3):
     - boost
     - DoubleConversion
@@ -3062,10 +3033,10 @@ PODS:
     - Yoga
   - RNKeychain (4.0.5):
     - React
-  - RNNotifee (7.4.10):
+  - RNNotifee (7.4.11):
     - React-Core
-    - RNNotifee/NotifeeCore (= 7.4.10)
-  - RNNotifee/NotifeeCore (7.4.10):
+    - RNNotifee/NotifeeCore (= 7.4.11)
+  - RNNotifee/NotifeeCore (7.4.11):
     - React-Core
   - RNPrivacySnapshot (1.0.0):
     - React-Core
@@ -3161,7 +3132,7 @@ PODS:
     - RNWorklets
     - SocketRocket
     - Yoga
-  - RNScreens (4.18.0):
+  - RNScreens (4.19.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -3188,10 +3159,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNScreens/common (= 4.18.0)
+    - RNScreens/common (= 4.19.0)
     - SocketRocket
     - Yoga
-  - RNScreens/common (4.18.0):
+  - RNScreens/common (4.19.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -3414,7 +3385,6 @@ PODS:
     - pop (~> 1.0)
   - SocketRocket (0.7.1)
   - SSZipArchive (2.4.3)
-  - SwiftUIIntrospect (1.3.0)
   - SwiftyRSA (1.7.0):
     - SwiftyRSA/ObjC (= 1.7.0)
   - SwiftyRSA/ObjC (1.7.0)
@@ -3486,7 +3456,6 @@ DEPENDENCIES:
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-notification-sounds (from `../node_modules/react-native-notification-sounds`)
   - react-native-orientation-locker (from `../node_modules/react-native-orientation-locker`)
-  - react-native-pager-view (from `../node_modules/react-native-pager-view`)
   - react-native-pdf (from `../node_modules/react-native-pdf`)
   - react-native-quick-sqlite (from `../node_modules/react-native-quick-sqlite`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
@@ -3570,7 +3539,6 @@ SPEC REPOS:
     - SDWebImage
     - SocketRocket
     - SSZipArchive
-    - SwiftUIIntrospect
     - SwiftyRSA
     - TOCropViewController
 
@@ -3694,8 +3662,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-notification-sounds"
   react-native-orientation-locker:
     :path: "../node_modules/react-native-orientation-locker"
-  react-native-pager-view:
-    :path: "../node_modules/react-native-pager-view"
   react-native-pdf:
     :path: "../node_modules/react-native-pdf"
   react-native-quick-sqlite:
@@ -3906,7 +3872,6 @@ SPEC CHECKSUMS:
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
   react-native-notification-sounds: ce106d58df0dd384bccbd2e84fb53accab7cc068
   react-native-orientation-locker: cc6f357b289a2e0dd2210fea0c52cb8e0727fdaa
-  react-native-pager-view: d7d2aa47f54343bf55fdcee3973503dd27c2bd37
   react-native-pdf: edc236298f13f1609e42d41e45b8b6ea88ed10f9
   react-native-quick-sqlite: 1ed8d3db1e22a8604d006be69f06053382e93bb0
   react-native-safe-area-context: c6e2edd1c1da07bdce287fa9d9e60c5f7b514616
@@ -3962,10 +3927,10 @@ SPEC CHECKSUMS:
   RNIap: 61f183ac917792fae42b0326b1bef33598c1adf6
   RNImageCropPicker: 5fd4ceaead64d8c53c787e4e559004f97bc76df7
   RNKeychain: ffd0513e676445c637410b47249460cbf56bc9cb
-  RNNotifee: 3840cc81add9954a5dec040f96442498f3f95d7b
+  RNNotifee: c4827fa2cec60ab634d62bafdb5cf57cd2999d54
   RNPrivacySnapshot: ccad3a548338c2f526bb7b1789af3fb0618b7d1d
   RNReanimated: f1868b36f4b2b52a0ed00062cfda69506f75eaee
-  RNScreens: d821082c6dd1cb397cc0c98b026eeafaa68be479
+  RNScreens: ffbb0296608eb3560de641a711bbdb663ed1f6b4
   RNSecureRandom: b64d263529492a6897e236a22a2c4249aa1b53dc
   RNShare: 5d39a36f2d3d9a6c9344bfb3232c8ed607924a35
   RNSVG: 8c0bbfa480a24b24468f1c76bd852a4aac3178e6
@@ -3976,7 +3941,6 @@ SPEC CHECKSUMS:
   SexyTooltip: 5c9b4dec52bfb317938cb0488efd9da3717bb6fd
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
-  SwiftUIIntrospect: fee9aa07293ee280373a591e1824e8ddc869ba5d
   SwiftyRSA: 8c6dd1ea7db1b8dc4fb517a202f88bb1354bc2c6
   TOCropViewController: 797deaf39c90e6e9ddd848d88817f6b9a8a09888
   toolbar-android: c426ed5bd3dcccfed20fd79533efc0d1ae0ef018
