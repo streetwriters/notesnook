@@ -62,9 +62,9 @@ class Collector {
         const ciphers = await this.db
           .storage()
           .encryptMulti(key, syncableItems);
-        const items = toPushItem(ids, ciphers);
-        if (!items) continue;
-        yield { items, type: itemType };
+        const items = toSyncItem(ids, ciphers);
+        if (!items.length) continue;
+        yield { items, type: itemType, count: items.length };
 
         await this.db
           .sql()
@@ -88,15 +88,17 @@ class Collector {
 }
 export default Collector;
 
-function toPushItem(ids: string[], ciphers: Cipher<"base64">[]) {
+function toSyncItem(ids: string[], ciphers: Cipher<"base64">[]) {
   if (ids.length !== ciphers.length)
     throw new Error("ids.length must be equal to ciphers.length");
 
   const items: SyncItem[] = [];
   for (let i = 0; i < ids.length; ++i) {
     const id = ids[i];
-    const cipher = ciphers[i];
-    items.push({ ...cipher, v: CURRENT_DATABASE_VERSION, id });
+    const cipher = ciphers[i] as SyncItem;
+    cipher.v = CURRENT_DATABASE_VERSION;
+    cipher.id = id;
+    items.push(cipher);
   }
   return items;
 }

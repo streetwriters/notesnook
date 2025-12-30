@@ -58,22 +58,25 @@ class UserStore extends BaseStore<UserStore> {
 
     if (Config.get("sessionExpired")) return;
 
-    EV.subscribe(EVENTS.userSubscriptionUpdated, (subscription) => {
-      const wasSubscribed = isUserSubscribed();
-      this.refreshUser();
-      this.set((state) => {
-        if (!state.user) return;
-        state.user.subscription = subscription;
-      });
-      if (!wasSubscribed && isUserSubscribed()) OnboardingDialog.show({});
-      resetFeatures();
-    });
+    db.eventManager.subscribe(
+      EVENTS.userSubscriptionUpdated,
+      (subscription) => {
+        const wasSubscribed = isUserSubscribed();
+        this.refreshUser();
+        this.set((state) => {
+          if (!state.user) return;
+          state.user.subscription = subscription;
+        });
+        if (!wasSubscribed && isUserSubscribed()) OnboardingDialog.show({});
+        resetFeatures();
+      }
+    );
 
-    EV.subscribe(EVENTS.userEmailConfirmed, () => {
+    db.eventManager.subscribe(EVENTS.userEmailConfirmed, () => {
       hashNavigate("/confirmed");
     });
 
-    EV.subscribe(EVENTS.userLoggedOut, async (reason) => {
+    db.eventManager.subscribe(EVENTS.userLoggedOut, async (reason) => {
       this.set((state) => {
         state.user = undefined;
         state.isLoggedIn = false;

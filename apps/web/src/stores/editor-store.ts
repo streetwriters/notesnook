@@ -249,7 +249,7 @@ class EditorStore extends BaseStore<EditorStore> {
       }
     );
 
-    EV.subscribe(EVENTS.userLoggedOut, () => {
+    db.eventManager.subscribe(EVENTS.userLoggedOut, () => {
       const { closeTabs, tabs } = this.get();
       closeTabs(...tabs.map((s) => s.id));
     });
