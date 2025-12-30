@@ -2613,5 +2613,6 @@ Use this if changes from other devices are not appearing on this device. This wi
   addToHome: () => t`Add to home`,
   clickToSave: () => t`Click to save`,
   lineHeight: () => t`Line height`,
-  lineHeightDesc: () => t`Adjust the line height of the editor`
+  lineHeightDesc: () => t`Adjust the line height of the editor`,
+  enterTitle: () => t`Enter title`
 };

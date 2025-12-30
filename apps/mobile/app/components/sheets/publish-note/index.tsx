@@ -78,12 +78,15 @@ const PublishNoteSheet = ({
   const isFeatureAvailable = useIsFeatureAvailable("monographAnalytics");
   const [isLocked, setIsLocked] = useState(false);
   const [publishing, setPublishing] = useState(false);
+  const customTitle = useRef<string>("");
   const pwdInput = useRef<TextInput>(null);
+  const titleInput = useRef<TextInput>(null);
   const passwordValue = useRef<string>(undefined);
   const monographData = useAsync(async () => {
     return fetchMonographData(note?.id);
   }, []);
   const monograph = monographData.result?.monograph;
+  customTitle.current = monograph?.title || note.title || "";
   const publishUrl = monograph && `${hosts.MONOGRAPH_HOST}/${monograph?.id}`;
   const isPublished = db.monographs.monograph(note?.id);
 
@@ -108,7 +111,7 @@ const PublishNoteSheet = ({
     try {
       if (note?.id) {
         if (isLocked && !passwordValue.current) return;
-        await db.monographs.publish(note.id, {
+        await db.monographs.publish(note.id, customTitle.current, {
           selfDestruct: selfDestruct,
           password: isLocked ? passwordValue.current : undefined
         });
@@ -129,7 +132,6 @@ const PublishNoteSheet = ({
 
     setPublishLoading(false);
   };
-
   const setPublishLoading = (value: boolean) => {
     setPublishing(value);
   };
@@ -244,6 +246,13 @@ const PublishNoteSheet = ({
               />
             </TouchableOpacity>
           ) : null}
+
+          <Input
+            fwdRef={titleInput}
+            onChangeText={(value) => (customTitle.current = value)}
+            defaultValue={customTitle.current}
+            placeholder={strings.noteTitle()}
+          />
 
           <TouchableOpacity
             onPress={() => {
