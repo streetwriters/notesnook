@@ -27,6 +27,7 @@ import { Node } from "@tiptap/pm/model";
 import { Plugin, PluginKey, Selection, Transaction } from "@tiptap/pm/state";
 import { Callout } from "../callout/callout.js";
 import { changedDescendants } from "../../utils/prosemirror.js";
+import { BatchAttributeStep } from "./batch-attribute-step.js";
 
 const COLLAPSIBLE_BLOCK_TYPES = [
   "paragraph",
@@ -305,6 +306,8 @@ function toggleNodesUnderPos(
   headingLevel: number,
   isCollapsing: boolean
 ) {
+  console.time("heading-toggle - total");
+  console.time("heading-toggle - setup");
   const { doc } = tr;
   const node = doc.nodeAt(pos);
   if (!node) return;
@@ -314,6 +317,11 @@ function toggleNodesUnderPos(
   let shouldMoveCursor = false;
   let insideCollapsedHeading = false;
   let nestedHeadingLevel: number | null = null;
+
+  const updates: { pos: number; attrName: string; value: any }[] = [];
+
+  console.timeEnd("heading-toggle - setup");
+  console.time("heading-toggle - traverse and collect");
 
   while (nextPos < doc.content.size) {
     const nextNode = doc.nodeAt(nextPos);
@@ -339,7 +347,7 @@ function toggleNodesUnderPos(
 
     if (COLLAPSIBLE_BLOCK_TYPES.includes(nextNode.type.name)) {
       if (isCollapsing) {
-        tr.setNodeAttribute(currentPos, "hidden", true);
+        updates.push({ pos: currentPos, attrName: "hidden", value: true });
       } else {
         if (insideCollapsedHeading) {
           if (
@@ -354,7 +362,7 @@ function toggleNodesUnderPos(
           }
         }
 
-        tr.setNodeAttribute(currentPos, "hidden", false);
+        updates.push({ pos: currentPos, attrName: "hidden", value: false });
         if (nextNode.type.name === "heading" && nextNode.attrs.collapsed) {
           insideCollapsedHeading = true;
           nestedHeadingLevel = nextNode.attrs.level;
@@ -363,10 +371,23 @@ function toggleNodesUnderPos(
     }
   }
 
+  console.timeEnd("heading-toggle - traverse and collect");
+  console.log(`heading-toggle - collected ${updates.length} updates`);
+
+  if (updates.length > 0) {
+    console.time("heading-toggle - apply batch step");
+    tr.step(new BatchAttributeStep(updates));
+    console.timeEnd("heading-toggle - apply batch step");
+  }
+
   if (shouldMoveCursor) {
+    console.time("heading-toggle - move cursor");
     const endPos = pos + node.nodeSize - 1;
     tr.setSelection(Selection.near(tr.doc.resolve(endPos)));
+    console.timeEnd("heading-toggle - move cursor");
   }
+
+  console.timeEnd("heading-toggle - total");
 }
 
 function findEndOfCollapsedSection(
