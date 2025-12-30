@@ -60,6 +60,7 @@ export type Settings = {
   markdownShortcuts: boolean;
   features: Record<any, any>;
   loggedIn: boolean;
+  defaultLineHeight: number;
 };
 
 export type EditorProps = {

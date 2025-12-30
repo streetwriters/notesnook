@@ -71,6 +71,7 @@ import { verifyUser, verifyUserWithApplock } from "./functions";
 import { logoutUser } from "./logout";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
+import { EDITOR_LINE_HEIGHT } from "../../utils/constants";
 
 export const settingsGroups: SettingSection[] = [
   {
@@ -811,9 +812,18 @@ export const settingsGroups: SettingSection[] = [
             name: strings.defaultFontFamily(),
             description: strings.defaultFontFamilyDesc(),
             type: "component",
-            icon: "format-font",
             property: "defaultFontFamily",
             component: "font-selector"
+          },
+          {
+            id: "default-line-height",
+            name: strings.lineHeight(),
+            description: strings.lineHeightDesc(),
+            type: "input-selector",
+            property: "defaultLineHeight",
+            icon: "format-line-spacing",
+            minInputValue: EDITOR_LINE_HEIGHT.MIN,
+            maxInputValue: EDITOR_LINE_HEIGHT.MAX
           },
           {
             id: "title-format",

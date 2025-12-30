@@ -116,7 +116,8 @@ const EXTRA_ICON_NAMES = [
   "notebook-minus",
   "calendar-blank",
   "email-newsletter",
-  "cellphone-arrow-down"
+  "cellphone-arrow-down",
+  "format-line-spacing"
 ];
 
 const __filename = fileURLToPath(import.meta.url);

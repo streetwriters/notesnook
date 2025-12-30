@@ -881,7 +881,8 @@ const Tiptap = ({
 
           <div
             style={{
-              display: tab.session?.locked ? "none" : "block"
+              display: tab.session?.locked ? "none" : "block",
+              lineHeight: settings.defaultLineHeight
             }}
             ref={contentPlaceholderRef}
             className="theme-scope-editor"

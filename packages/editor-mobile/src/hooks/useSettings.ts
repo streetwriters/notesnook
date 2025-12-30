@@ -22,7 +22,7 @@ import { useState } from "react";
 import { Settings } from "../utils";
 
 const settingsJson = localStorage.getItem("editorSettings");
-const initialState = {
+const initialState: Partial<Settings> = {
   fullscreen: false,
   deviceMode: "mobile",
   premium: false,
@@ -35,7 +35,8 @@ const initialState = {
   fontSize: 16,
   timeFormat: "12-hour",
   dateFormat: "DD-MM-YYYY",
-  loggedIn: false
+  loggedIn: false,
+  defaultLineHeight: 1.2
 };
 
 global.settingsController = {

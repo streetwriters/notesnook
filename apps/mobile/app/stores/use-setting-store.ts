@@ -25,6 +25,8 @@ import { FileType } from "react-native-scoped-storage";
 import { create } from "zustand";
 import { ThemeDark, ThemeLight, ThemeDefinition } from "@notesnook/theme";
 import { Reminder } from "@notesnook/core";
+import { EDITOR_LINE_HEIGHT } from "../utils/constants";
+
 export const HostIds = [
   "API_HOST",
   "AUTH_HOST",
@@ -99,6 +101,7 @@ export type Settings = {
   serverUrls?: Record<HostId, string>;
   defaultSidebarTab: number;
   checkForUpdates?: boolean;
+  defaultLineHeight: number;
 };
 
 type DimensionsType = {
@@ -199,7 +202,8 @@ export const defaultSettings: SettingStore["settings"] = {
   backupType: "partial",
   fullBackupReminder: "never",
   lastFullBackupDate: 0,
-  checkForUpdates: true
+  checkForUpdates: true,
+  defaultLineHeight: EDITOR_LINE_HEIGHT.DEFAULT
 };
 
 export const useSettingStore = create<SettingStore>((set, get) => ({
