@@ -39,7 +39,16 @@ export function Header() {
       >
         <span style={{ color: "var(--accent)" }}>Mono</span>graph
       </Text>
-      <Button variant="accent">Publish a note</Button>
+      <Button
+        as="a"
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        href="https://app.notesnook.com/"
+        target="_blank"
+        variant="accent"
+      >
+        Publish a note
+      </Button>
     </Flex>
   );
 }

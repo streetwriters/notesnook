@@ -72,7 +72,23 @@ export function BaseThemeProvider(
 
   return (
     <>
-      <EmotionThemeProvider {...restProps} scope={scope}>
+      <EmotionThemeProvider
+        {...restProps}
+        theme={{
+          fontSizes: {
+            heading: "24px",
+            subheading: "20px",
+            input: "12px",
+            title: "16px",
+            subtitle: "14px",
+            body: "14px",
+            subBody: "12px",
+            menu: "12px",
+            code: "14px"
+          }
+        }}
+        scope={scope}
+      >
         {children}
       </EmotionThemeProvider>
     </>

@@ -139,7 +139,7 @@ const ChatItem = ({
     >
       <Flex
         sx={{
-          backgroundColor: incoming ? "background-secondary" : "shade",
+          backgroundColor: incoming ? "background" : "shade",
           borderRadius: 10,
           p: 2,
           pb: 1,
@@ -147,7 +147,7 @@ const ChatItem = ({
           maxWidth: "70%"
         }}
       >
-        <Text sx={{ fontSize: "13px", color: "paragraph" }}>{message}</Text>
+        <Text sx={{ fontSize: "subBody", color: "paragraph" }}>{message}</Text>
         <Timer time={time} />
       </Flex>
     </Flex>
