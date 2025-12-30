@@ -751,7 +751,7 @@ msgstr ""
 msgid "Add your first notebook"
 msgstr ""
 
-#: src/strings.ts:2615
+#: src/strings.ts:2616
 msgid "Adjust the line height of the editor"
 msgstr ""
 
@@ -3526,7 +3526,7 @@ msgstr ""
 msgid "Line {line}, Column {column}"
 msgstr ""
 
-#: src/strings.ts:2614
+#: src/strings.ts:2615
 msgid "Line height"
 msgstr ""
 
