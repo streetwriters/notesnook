@@ -136,7 +136,7 @@ function PublishView(props: PublishViewProps) {
             "& label": { width: "auto", flexShrink: 0 }
           }}
         >
-          <Text variant="body">{strings.title()} *</Text>
+          <Text variant="body">{strings.title()}</Text>
           <Input
             ref={titleInput}
             type="text"
