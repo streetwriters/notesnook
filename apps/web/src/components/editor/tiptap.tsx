@@ -478,21 +478,6 @@ function TipTap(props: TipTapProps) {
     };
   }, []);
 
-  useEffect(() => {
-    const { unsubscribe } = AppEventManager.subscribe(
-      AppEvents.saveEditor,
-      () => {
-        onChange?.(
-          () => getHTMLFromFragment(editor.state.doc.content, editor.schema),
-          false
-        );
-      }
-    );
-    return () => {
-      unsubscribe();
-    };
-  }, []);
-
   return (
     <>
       <ScopedThemeProvider

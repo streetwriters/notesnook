@@ -34,7 +34,11 @@ import {
   NormalMode,
   Cross
 } from "../icons";
-import { useEditorConfig, useNoteStatistics } from "./manager";
+import {
+  useEditorConfig,
+  useEditorManager,
+  useNoteStatistics
+} from "./manager";
 import { getFormattedDate } from "@notesnook/common";
 import { MAX_AUTO_SAVEABLE_WORDS, NoteStatistics } from "./types";
 import { strings } from "@notesnook/intl";
@@ -43,7 +47,7 @@ import { useWindowControls } from "../../hooks/use-window-controls";
 import { exitFullscreen } from "../../utils/fullscreen";
 import { useRef, useState } from "react";
 import { PopupPresenter } from "@notesnook/ui";
-import { AppEventManager, AppEvents } from "../../common/app-events";
+import { saveContent } from "./index";
 
 const SAVE_STATE_ICON_MAP = {
   "-1": NotSaved,
@@ -289,7 +293,10 @@ function EditorFooter() {
           }}
           onClick={() => {
             if (saveState === SaveState.NotSaved) {
-              AppEventManager.publish(AppEvents.saveEditor);
+              const { activeEditorId, getEditor } = useEditorManager.getState();
+              const editor = getEditor(activeEditorId || "")?.editor;
+              if (!editor) return;
+              saveContent(session.id, false, editor.getContent());
             }
           }}
         />

@@ -83,6 +83,7 @@ import useTablet from "../../hooks/use-tablet";
 import { isMac } from "../../utils/platform";
 import { CREATE_BUTTON_MAP } from "../../common";
 import { getDragData } from "../../utils/data-transfer";
+import { saveContent } from "./index";
 
 type ToolButton = {
   title: string;
@@ -406,6 +407,13 @@ const TabStrip = React.memo(function TabStrip() {
                   isLocked={isLockedSession(session)}
                   isRevealInListDisabled={isFocusMode}
                   type={session.type}
+                  onSave={() => {
+                    const { activeEditorId, getEditor } =
+                      useEditorManager.getState();
+                    const editor = getEditor(activeEditorId || "")?.editor;
+                    if (!editor) return;
+                    saveContent(session.id, false, editor.getContent());
+                  }}
                   onFocus={() => {
                     if (tab.id !== currentTab) {
                       useEditorStore.getState().activateSession(tab.sessionId);
@@ -486,6 +494,7 @@ type TabProps = {
   onCloseToTheLeft: () => void;
   onCloseAll: () => void;
   onPin: () => void;
+  onSave: () => void;
   onRevealInList?: () => void;
 };
 function Tab(props: TabProps) {
@@ -505,7 +514,8 @@ function Tab(props: TabProps) {
     onCloseToTheRight,
     onCloseToTheLeft,
     onRevealInList,
-    onPin
+    onPin,
+    onSave
   } = props;
   const Icon = isLocked
     ? type === "locked"
@@ -584,9 +594,7 @@ function Tab(props: TabProps) {
             type: "button",
             title: strings.save(),
             key: "save",
-            onClick: () => {
-              AppEventManager.publish(AppEvents.saveEditor);
-            },
+            onClick: onSave,
             isHidden: !isUnsaved
           },
           { type: "separator", key: "sep0", isHidden: !isUnsaved },
