@@ -84,7 +84,7 @@ const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
 const autoSaveToast = { show: true, hide: () => {} };
 
-async function saveContent(
+export async function saveContent(
   noteId: string,
   ignoreEdit: boolean,
   content: string
