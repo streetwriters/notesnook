@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { test, expect } from "vitest";
+import { test, expect, describe } from "vitest";
 import { createEditor, h } from "../../../../test-utils/index.js";
 import { Heading } from "../heading.js";
 import { Editor } from "@tiptap/core";
@@ -124,4 +124,23 @@ test("empty heading should have empty class", () => {
   editor.commands.setTextSelection(0);
   editor.commands.insertContent("Some content");
   expect(headingElement?.classList.contains("empty")).toBe(false);
+});
+
+test("converting collapsed heading to lower level should unhide higher level headings", () => {
+  const el = h("div", [
+    h("h1", ["Level 1 (to be changed)"], { "data-collapsed": "true" }),
+    h("h2", ["Level 2"], { "data-hidden": "true", "data-collapsed": "true" }),
+    h("p", ["Paragraph under level 2"], { "data-hidden": "true" })
+  ]);
+  const { editor } = createEditor({
+    extensions: {
+      heading: Heading.configure({ levels: [1, 2, 3, 4, 5, 6] })
+    },
+    initialContent: el.outerHTML
+  });
+
+  editor.commands.setTextSelection(0);
+  editor.commands.setHeading({ level: 3 });
+
+  expect(editor.getHTML()).toMatchSnapshot();
 });
