@@ -26,7 +26,10 @@ import { Heading as TiptapHeading } from "@tiptap/extension-heading";
 import { Node } from "@tiptap/pm/model";
 import { Plugin, PluginKey, Selection, Transaction } from "@tiptap/pm/state";
 import { Callout } from "../callout/callout.js";
-import { changedDescendants } from "../../utils/prosemirror.js";
+import {
+  changedDescendants,
+  findParentNodeOfTypeClosestToPos
+} from "../../utils/prosemirror.js";
 import { BatchAttributeStep } from "./batch-attribute-step.js";
 
 const COLLAPSIBLE_BLOCK_TYPES = [
@@ -306,8 +309,6 @@ function toggleNodesUnderPos(
   headingLevel: number,
   isCollapsing: boolean
 ) {
-  console.time("heading-toggle - total");
-  console.time("heading-toggle - setup");
   const { doc } = tr;
   const node = doc.nodeAt(pos);
   if (!node) return;
@@ -317,11 +318,7 @@ function toggleNodesUnderPos(
   let shouldMoveCursor = false;
   let insideCollapsedHeading = false;
   let nestedHeadingLevel: number | null = null;
-
   const updates: { pos: number; attrName: string; value: any }[] = [];
-
-  console.timeEnd("heading-toggle - setup");
-  console.time("heading-toggle - traverse and collect");
 
   while (nextPos < doc.content.size) {
     const nextNode = doc.nodeAt(nextPos);
@@ -371,23 +368,14 @@ function toggleNodesUnderPos(
     }
   }
 
-  console.timeEnd("heading-toggle - traverse and collect");
-  console.log(`heading-toggle - collected ${updates.length} updates`);
-
   if (updates.length > 0) {
-    console.time("heading-toggle - apply batch step");
     tr.step(new BatchAttributeStep(updates));
-    console.timeEnd("heading-toggle - apply batch step");
   }
 
   if (shouldMoveCursor) {
-    console.time("heading-toggle - move cursor");
     const endPos = pos + node.nodeSize - 1;
     tr.setSelection(Selection.near(tr.doc.resolve(endPos)));
-    console.timeEnd("heading-toggle - move cursor");
   }
-
-  console.timeEnd("heading-toggle - total");
 }
 
 function findEndOfCollapsedSection(
@@ -434,23 +422,36 @@ const headingUpdatePlugin = new Plugin({
       if (!oldNode) return;
 
       if (
-        oldNode.type.name === "heading" &&
-        oldNode.attrs.level !== newNode.attrs.level
+        oldNode.type.name !== "heading" ||
+        oldNode.attrs.level === newNode.attrs.level
       ) {
-        /**
-         * if the level of a collapsed heading is changed,
-         * we need to reset visibility of all the nodes under it as there
-         * might be a heading of same or higher level previously
-         * hidden under this heading
-         */
-        if (newNode.type.name === "heading" && newNode.attrs.collapsed) {
-          toggleNodesUnderPos(tr, pos, oldNode.attrs.level, false);
-          toggleNodesUnderPos(tr, pos, newNode.attrs.level, true);
-          modified = true;
-        } else if (newNode.type.name !== "heading" && oldNode.attrs.collapsed) {
-          toggleNodesUnderPos(tr, pos, oldNode.attrs.level, false);
-          modified = true;
+        return;
+      }
+
+      /**
+       * if the level of a collapsed heading is changed,
+       * we need to reset visibility of all the nodes under it as there
+       * might be a heading of same or higher level previously
+       * hidden under this heading
+       */
+      if (newNode.type.name === "heading" && newNode.attrs.collapsed) {
+        toggleNodesUnderPos(tr, pos, oldNode.attrs.level, false);
+        toggleNodesUnderPos(tr, pos, newNode.attrs.level, true);
+        modified = true;
+        return;
+      }
+
+      if (newNode.type.name !== "heading" && oldNode.attrs.collapsed) {
+        if (
+          newNode.type.name === "text" &&
+          findParentNodeOfTypeClosestToPos(newDoc.resolve(pos), oldNode.type)
+            ?.node === oldNode
+        ) {
+          return;
         }
+
+        toggleNodesUnderPos(tr, pos, oldNode.attrs.level, false);
+        modified = true;
       }
     }
 
