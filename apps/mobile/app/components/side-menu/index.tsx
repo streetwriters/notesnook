@@ -21,15 +21,6 @@ import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  NavigationState,
-  Route,
-  SceneMap,
-  SceneRendererProps,
-  TabDescriptor,
-  TabView
-} from "react-native-tab-view";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import { useGroupOptions } from "../../hooks/use-group-options";
@@ -59,7 +50,104 @@ import SettingsService from "../../services/settings";
 import { isFeatureAvailable } from "@notesnook/common";
 import PaywallSheet from "../sheets/paywall";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
-const renderScene = SceneMap({
+
+/**
+ * Simple Tab View Implementation for the Side bar
+ */
+type SimpleRoute = {
+  key: string;
+  title?: string;
+};
+
+type SimpleNavigationState = {
+  index: number;
+  routes: SimpleRoute[];
+};
+
+type SimpleTabBarProps = {
+  navigationState: SimpleNavigationState;
+  jumpTo: (key: string) => void;
+};
+
+type SimpleTabViewProps = {
+  navigationState: SimpleNavigationState;
+  renderScene: ({ route }: { route: SimpleRoute }) => React.ReactNode;
+  renderTabBar?: (props: SimpleTabBarProps) => React.ReactNode;
+  onIndexChange?: (index: number) => void;
+};
+
+const createSceneMap = (
+  scenes: Record<string, React.ComponentType<any>>
+): ((props: { route: SimpleRoute }) => React.ReactNode) => {
+  return ({ route }: { route: SimpleRoute }) => {
+    const SceneComponent = scenes[route.key];
+    if (!SceneComponent) return null;
+    return <SceneComponent />;
+  };
+};
+
+const SimpleTabView = ({
+  navigationState,
+  renderScene,
+  renderTabBar,
+  onIndexChange
+}: SimpleTabViewProps) => {
+  const loadedKeysRef = React.useRef(new Set<string>());
+  const scenesRef = React.useRef(new Map<string, React.ReactNode>());
+  const jumpTo = React.useCallback(
+    (key: string) => {
+      const nextIndex = navigationState.routes.findIndex(
+        (route) => route.key === key
+      );
+      if (nextIndex !== -1 && nextIndex !== navigationState.index) {
+        onIndexChange?.(nextIndex);
+      }
+    },
+    [navigationState.index, navigationState.routes, onIndexChange]
+  );
+
+  const activeKey = navigationState.routes[navigationState.index]?.key;
+  if (activeKey && !loadedKeysRef.current.has(activeKey)) {
+    loadedKeysRef.current.add(activeKey);
+  }
+
+  const getSceneForRoute = React.useCallback(
+    (route: SimpleRoute) => {
+      const cached = scenesRef.current.get(route.key);
+      if (cached) return cached;
+      const created = renderScene({ route });
+      scenesRef.current.set(route.key, created);
+      return created;
+    },
+    [renderScene]
+  );
+
+  return (
+    <View style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}>
+        {navigationState.routes.map((route, routeIndex) => (
+          <View
+            key={route.key}
+            style={{
+              flex: 1,
+              display: navigationState.index === routeIndex ? "flex" : "none"
+            }}
+          >
+            {loadedKeysRef.current.has(route.key)
+              ? getSceneForRoute(route)
+              : navigationState.index === routeIndex
+                ? getSceneForRoute(route)
+                : null}
+          </View>
+        ))}
+      </View>
+
+      {renderTabBar ? renderTabBar({ navigationState, jumpTo }) : null}
+    </View>
+  );
+};
+
+const renderScene = createSceneMap({
   home: SideMenuHome,
   notebooks: SideMenuNotebooks,
   tags: SideMenuTags,
@@ -73,7 +161,7 @@ export const SideMenu = React.memo(
     const [index, setIndex] = React.useState(
       SettingsService.getProperty("defaultSidebarTab")
     );
-    const [routes] = React.useState<Route[]>([
+    const [routes] = React.useState<SimpleRoute[]>([
       {
         key: "home",
         title: "Home"
@@ -98,15 +186,11 @@ export const SideMenu = React.memo(
           paddingLeft: insets.left
         }}
       >
-        <TabView
+        <SimpleTabView
           navigationState={{ index, routes }}
           renderTabBar={(props) => <TabBar {...props} />}
-          tabBarPosition="bottom"
           renderScene={renderScene}
           onIndexChange={setIndex}
-          swipeEnabled={false}
-          animationEnabled={false}
-          lazy
         />
       </View>
     );
@@ -114,12 +198,7 @@ export const SideMenu = React.memo(
   () => true
 );
 
-const TabBar = (
-  props: SceneRendererProps & {
-    navigationState: NavigationState<Route>;
-    options: Record<string, TabDescriptor<Route>> | undefined;
-  }
-) => {
+const TabBar = (props: SimpleTabBarProps) => {
   const dragging = useSideBarDraggingStore((state) => state.dragging);
   const { colors, isDark } = useThemeColors();
   const groupOptions = useGroupOptions(
