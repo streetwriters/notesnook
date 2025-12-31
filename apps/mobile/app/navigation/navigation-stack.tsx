@@ -62,95 +62,98 @@ const AppNavigation = React.memo(
     >(undefined);
 
     React.useEffect(() => {
-      if (useSettingStore.getState().initialUrl) {
-        const url = useSettingStore.getState().initialUrl;
-        if (url?.startsWith("https://app.notesnook.com/open_notebook?")) {
-          const id = new URL(url).searchParams.get("id");
-          if (id) {
-            setHome({
-              name: "Notebook",
-              params: {
-                id: id
-              }
-            });
-            return;
-          }
-        } else if (url?.startsWith("https://app.notesnook.com/open_tag?")) {
-          const id = new URL(url).searchParams.get("id");
-          if (id) {
-            setHome({
-              name: "TaggedNotes",
-              params: {
-                type: "tag",
-                id: id
-              }
-            });
-            return;
-          }
-        } else if (url?.startsWith("https://app.notesnook.com/open_color?")) {
-          const id = new URL(url).searchParams.get("id");
-          if (id) {
-            setHome({
-              name: "ColoredNotes",
-              params: {
-                type: "color",
-                id: id
-              }
-            });
-            return;
+      if (!home) {
+        if (useSettingStore.getState().initialUrl) {
+          const url = useSettingStore.getState().initialUrl;
+          if (url?.startsWith("https://app.notesnook.com/open_notebook?")) {
+            const id = new URL(url).searchParams.get("id");
+            if (id) {
+              setHome({
+                name: "Notebook",
+                params: {
+                  id: id
+                }
+              });
+              return;
+            }
+          } else if (url?.startsWith("https://app.notesnook.com/open_tag?")) {
+            const id = new URL(url).searchParams.get("id");
+            if (id) {
+              setHome({
+                name: "TaggedNotes",
+                params: {
+                  type: "tag",
+                  id: id
+                }
+              });
+              return;
+            }
+          } else if (url?.startsWith("https://app.notesnook.com/open_color?")) {
+            const id = new URL(url).searchParams.get("id");
+            if (id) {
+              setHome({
+                name: "ColoredNotes",
+                params: {
+                  type: "color",
+                  id: id
+                }
+              });
+              return;
+            }
           }
         }
-      }
 
-      if (homepageV2) {
-        switch (homepageV2.type) {
-          case "notebook": {
-            setHome({
-              name: "Notebook",
-              params: {
-                id: homepageV2.id
-              }
-            });
-            return;
+        if (homepageV2) {
+          switch (homepageV2.type) {
+            case "notebook": {
+              setHome({
+                name: "Notebook",
+                params: {
+                  id: homepageV2.id
+                }
+              });
+              return;
+            }
+            case "color": {
+              setHome({
+                name: "ColoredNotes",
+                params: {
+                  type: "color",
+                  id: homepageV2.id
+                }
+              });
+              return;
+            }
+            case "tag": {
+              setHome({
+                name: "TaggedNotes",
+                params: {
+                  type: "tag",
+                  id: homepageV2.id
+                }
+              });
+              return;
+            }
+            case "default":
+              setHome({
+                name: homepageV2.id,
+                params: undefined
+              });
+              return;
           }
-          case "color": {
-            setHome({
-              name: "ColoredNotes",
-              params: {
-                type: "color",
-                id: homepageV2.id
-              }
-            });
-            return;
-          }
-          case "tag": {
-            setHome({
-              name: "TaggedNotes",
-              params: {
-                type: "tag",
-                id: homepageV2.id
-              }
-            });
-            return;
-          }
-          case "default":
-            setHome(DEFAULT_HOME);
-            return;
+        } else {
+          setHome(DEFAULT_HOME);
         }
-      } else {
-        setHome(DEFAULT_HOME);
       }
     }, []);
 
     React.useEffect(() => {
       if (!homepageV2 || loading) return;
-      (async () => {
-        isFeatureAvailable("customHomepage").then((value) => {
-          if (!value.isAllowed) {
-            SettingsService.setProperty("homepageV2", undefined);
-          }
-        });
-      })();
+      isFeatureAvailable("customHomepage").then((value) => {
+        if (!value.isAllowed) {
+          SettingsService.setProperty("homepageV2", undefined);
+        }
+      });
     }, [homepageV2, loading]);
 
     React.useEffect(() => {
