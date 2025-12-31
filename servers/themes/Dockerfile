@@ -29,7 +29,4 @@ WORKDIR /app
 # Copy server files from previous stage
 COPY --from=build /app/servers/themes/dist ./dist
 
-# Set default values for environment variables
-ENV THEMES_REPO_URL="https://github.com/streetwriters/notesnook-themes.git"
-
 CMD ["node", "dist/server.mjs"]
