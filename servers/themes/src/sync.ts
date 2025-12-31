@@ -17,14 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { execSync } from "child_process";
-import fs from "fs";
+import fs from "node:fs";
 import { readdir, readFile } from "fs/promises";
 import path from "path";
-import {
-  InstallsCounter,
-  THEMES_REPO_URL,
-  THEME_REPO_DIR_PATH
-} from "./constants";
+import { THEMES_REPO_URL, THEME_REPO_DIR_PATH } from "./constants";
 import { insertMultiple } from "@orama/orama";
 import { initializeDatabase } from "./orama";
 import {
@@ -70,7 +66,6 @@ async function generateThemesMetadata() {
 
   const THEMES_PATH = path.join(THEME_REPO_DIR_PATH, "themes");
   const themes = await readdir(THEMES_PATH);
-  const counts = await InstallsCounter.counts();
 
   for (const themeId of themes) {
     for (const version of THEME_COMPATIBILITY_VERSIONS) {
@@ -96,7 +91,7 @@ async function generateThemesMetadata() {
         ...theme,
         sourceURL: `https://github.com/streetwriters/notesnook-themes/tree/main/themes/${themeId}/v${version}/`,
         codeBlockCSS,
-        totalInstalls: counts[theme.id]?.length || 0,
+        totalInstalls: 0,
         previewColors: getPreviewColors(theme)
       });
     }

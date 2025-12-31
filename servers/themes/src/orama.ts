@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Orama, SearchParams, create, search } from "@orama/orama";
 import { CompiledThemeDefinition, ThemeMetadata } from "./sync";
 import { ThemeQuerySchema } from "./schemas";
+import { InstallsCounter } from "./constants";
 
 export let ThemesDatabase: Orama | null = null;
 export async function initializeDatabase(): Promise<Orama> {
@@ -89,13 +90,16 @@ export async function getThemes(query: (typeof ThemeQuerySchema)["_type"]) {
     }
   }
   const results = await search(ThemesDatabase!, searchParams);
-  const themes = results.hits.map((hit) => {
-    return {
-      ...(hit.document as CompiledThemeDefinition),
+  const themes: ThemeMetadata[] = [];
+  for (const hit of results.hits) {
+    const theme = hit.document as CompiledThemeDefinition;
+    themes.push({
+      ...theme,
       scopes: undefined,
-      codeBlockCSS: undefined
-    } as ThemeMetadata;
-  });
+      codeBlockCSS: undefined,
+      totalInstalls: await InstallsCounter.counts(theme.id)
+    } as ThemeMetadata);
+  }
 
   return {
     themes,

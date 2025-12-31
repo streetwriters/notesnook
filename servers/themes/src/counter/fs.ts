@@ -18,21 +18,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { readFile, writeFile } from "fs/promises";
-import path from "path";
 import { Mutex } from "async-mutex";
 
 type Counts = Record<string, string[]>;
-export class Counter {
+export class FsCounter {
   private path: string;
   private readonly mutex: Mutex;
-  constructor(id: string, baseDirectory: string) {
-    this.path = path.join(baseDirectory, `${id}.json`);
+  constructor(id: string) {
+    this.path = id;
     this.mutex = new Mutex();
   }
 
   async increment(key: string, uid: string) {
     await this.mutex.runExclusive(async () => {
-      const counts = await this.counts();
+      const counts = await this.all();
       counts[key] = counts[key] || [];
       if (counts[key].includes(uid)) return;
       counts[key].push(uid);
@@ -44,7 +43,13 @@ export class Counter {
     await writeFile(this.path, JSON.stringify(counts));
   }
 
-  async counts(): Promise<Counts> {
+  counts(key: string): Promise<number> {
+    return this.all().then((counts) => {
+      return (counts[key] || []).length;
+    });
+  }
+
+  private async all(): Promise<Counts> {
     try {
       return JSON.parse(await readFile(this.path, "utf-8"));
     } catch {

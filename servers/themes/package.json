@@ -13,6 +13,7 @@
   "dependencies": {
     "@notesnook/theme": "file:../../packages/theme",
     "@orama/orama": "^1.0.8",
+    "@sagi.io/workers-kv": "^0.0.15",
     "@trpc/server": "10.45.2",
     "async-mutex": "0.5.0",
     "cors": "^2.8.5",
