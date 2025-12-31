@@ -85,6 +85,7 @@ export function SideMenuHome() {
             keyboardDismissMode="interactive"
             keyboardShouldPersistTaps="handled"
             keyExtractor={() => "scroll-items"}
+            bounces={false}
             renderItem={() => (
               <>
                 <ReorderableList
