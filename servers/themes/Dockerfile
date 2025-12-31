@@ -19,7 +19,7 @@ RUN --mount=type=cache,target=/root/.npm npm run bootstrap -- --scope=themes
 RUN npm run build:server:themes
 
 # Production stage
-FROM node:22.20.0-alpine AS production
+FROM oven/bun:1.3.5-alpine AS production
 
 # Install git to pull the themes repo
 RUN --mount=type=cache,target=/var/cache/apk,sharing=locked apk add --update git
@@ -29,4 +29,4 @@ WORKDIR /app
 # Copy server files from previous stage
 COPY --from=build /app/servers/themes/dist ./dist
 
-CMD ["node", "dist/server.mjs"]
+CMD ["bun", "run", "dist/server.mjs"]
