@@ -5,22 +5,25 @@
   "private": "true",
   "main": "src/index.ts",
   "scripts": {
-    "start": "vite-node -w src/server.ts"
+    "start": "vite-node -w src/server.ts",
+    "build": "esbuild src/server.ts --bundle --platform=node --sourcemap --format=esm --outfile=dist/server.mjs"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@notesnook/theme": "file:../../packages/theme",
     "@orama/orama": "^1.0.8",
+    "@sagi.io/workers-kv": "^0.0.15",
     "@trpc/server": "10.45.2",
     "async-mutex": "0.5.0",
     "cors": "^2.8.5",
+    "react": "18.3.1",
     "util": "^0.12.5",
     "zod": "3.23.8"
   },
   "devDependencies": {
-    "@notesnook/theme": "file:../../packages/theme",
     "@types/cors": "^2.8.13",
-    "react": "18.3.1",
+    "esbuild": "0.21.5",
     "vite-node": "2.1.8"
   }
 }
