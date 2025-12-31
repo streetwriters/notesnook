@@ -63,7 +63,7 @@ jobs:
         id: push
         uses: docker/build-push-action@v6
         with:
-          context: servers/themes
+          context: .
           file: servers/themes/Dockerfile
           push: true
           platforms: linux/amd64,linux/arm64
