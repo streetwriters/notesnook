@@ -27,8 +27,9 @@ const server = createHTTPServer({
   router: ThemesAPI
 });
 const PORT = parseInt(process.env.PORT || "9000");
-server.listen(PORT);
-console.log(`Server started successfully on: http://localhost:${PORT}/`);
+const HOST = process.env.HOST || "localhost";
+server.listen(PORT, HOST);
+console.log(`Server started successfully on: http://${HOST}:${PORT}/`);
 
 syncThemes();
 
