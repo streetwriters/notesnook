@@ -2609,5 +2609,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   views: () => t`Views`,
   clickToUpdate: () => t`Click to update`,
   noPassword: () => t`No password`,
-  publishToTheWeb: () => t`Publish to the web`
+  publishToTheWeb: () => t`Publish to the web`,
+  trialOnGoing: (trialExpiryDate: string) =>
+    t`Your free trial is on-going. Your subscription will start on ${trialExpiryDate}`
 };
