@@ -17,24 +17,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { createHTTPServer } from "@trpc/server/adapters/standalone";
-import { ThemesAPI } from "./api";
-import { syncThemes } from "./sync";
-import cors from "cors";
+import { readFileSync } from "node:fs";
 
-const server = createHTTPServer({
-  middleware: cors(),
-  router: ThemesAPI
-});
-const PORT = parseInt(process.env.PORT || "9000");
-const HOST = process.env.HOST || "localhost";
-server.listen(PORT, HOST);
-console.log(`Server started successfully on: http://${HOST}:${PORT}/`);
+export function readSecrets<T extends string>(
+  names: T[]
+): Record<T, string | undefined> {
+  const result: Record<T, string | undefined> = {} as Record<
+    T,
+    string | undefined
+  >;
+  for (const name of names) result[name] = readSecret(name);
+  return result;
+}
 
-syncThemes();
-
-if (import.meta.hot) {
-  import.meta.hot.on("vite:beforeFullReload", () => {
-    server.server.close();
-  });
+export function readSecret(name: string): string | undefined {
+  const value = process.env[name];
+  if (value) return value;
+  const file = process.env[`${name}_FILE`];
+  if (file) {
+    return readFileSync(file, "utf-8");
+  }
 }
