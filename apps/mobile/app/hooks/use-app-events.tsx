@@ -505,6 +505,7 @@ const initializeDatabase = async (password?: string) => {
   if (db.isInitialized) {
     await setAppMessage();
     useSettingStore.getState().setAppLoading(false);
+    useSettingStore.getState().refresh();
     Notifications.setupReminders(true);
     DatabaseLogger.info("Database initialized");
     Notifications.restorePinnedNotes();

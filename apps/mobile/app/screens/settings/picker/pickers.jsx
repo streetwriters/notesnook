@@ -32,6 +32,12 @@ import { strings } from "@notesnook/intl";
 import { isFeatureAvailable } from "@notesnook/common";
 import PaywallSheet from "../../../components/sheets/paywall";
 
+const DAY_FORMATS = ["short", "long"];
+const DayFormatFormats = {
+  short: "ddd",
+  long: "dddd"
+};
+
 export const FontPicker = createSettingsPicker({
   getValue: () => useSettingStore.getState().settings.defaultFontFamily,
   updateValue: (item) => {
@@ -111,8 +117,8 @@ export const TrashIntervalPicker = createSettingsPicker({
     return item === -1
       ? strings.never()
       : item === 1
-      ? strings.reminderRecurringMode.day()
-      : strings.days(item);
+        ? strings.reminderRecurringMode.day()
+        : strings.days(item);
   },
   getItemKey: (item) => item.toString(),
   options: [-1, 1, 7, 30, 365],
@@ -147,6 +153,24 @@ export const DateFormatPicker = createSettingsPicker({
   },
   getItemKey: (item) => item,
   options: DATE_FORMATS,
+  compareValue: (current, item) => current === item,
+  isFeatureAvailable: () => true,
+  isOptionAvailable: () => true
+});
+
+export const DayFormatPicker = createSettingsPicker({
+  getValue: () => db.settings.getDayFormat(),
+  updateValue: (item) => {
+    db.settings.setDayFormat(item);
+    useSettingStore.setState({
+      dayFormat: item
+    });
+  },
+  formatValue: (item) => {
+    return `${strings.dayFormat()} (${dayjs().format(DayFormatFormats[item])})`;
+  },
+  getItemKey: (item) => item,
+  options: DAY_FORMATS,
   compareValue: (current, item) => current === item,
   isFeatureAvailable: () => true,
   isOptionAvailable: () => true
@@ -228,10 +252,10 @@ export const ApplockTimerPicker = createSettingsPicker({
     return item === -1
       ? strings.never()
       : item === 0 || item === undefined
-      ? strings.immediately()
-      : item === 1
-      ? strings.minutes(1)
-      : strings.minutes(item);
+        ? strings.immediately()
+        : item === 1
+          ? strings.minutes(1)
+          : strings.minutes(item);
   },
   getItemKey: (item) => item.toString(),
   options: [-1, 0, 1, 5, 15, 30],

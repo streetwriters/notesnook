@@ -55,6 +55,7 @@ export type Settings = {
   features: Record<any, any>;
   loggedIn: boolean;
   defaultLineHeight: number;
+  dayFormat: "short" | "long";
 };
 
 /* eslint-disable no-var */

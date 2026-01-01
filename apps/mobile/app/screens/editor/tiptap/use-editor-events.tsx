@@ -159,13 +159,13 @@ export const useEditorEvents = (
   const fullscreen = useSettingStore((state) => state.fullscreen);
   const corsProxy = useSettingStore((state) => state.settings.corsProxy);
   const loading = useSettingStore((state) => state.isAppLoading);
-  const [dateFormat, timeFormat, defaultLineHeight] = useSettingStore(
-    (state) => [
+  const [dateFormat, timeFormat, defaultLineHeight, dayFormat] =
+    useSettingStore((state) => [
       state.dateFormat,
       state.timeFormat,
-      state.settings.defaultLineHeight
-    ]
-  );
+      state.settings.defaultLineHeight,
+      state.dayFormat
+    ]);
   const handleBack = useRef<NativeEventSubscription>(undefined);
   const loggedIn = useUserStore((state) => !!state.user);
   const { fontScale } = useWindowDimensions();
@@ -225,6 +225,7 @@ export const useEditorEvents = (
       fontFamily: SettingsService.get().defaultFontFamily,
       dateFormat: db.settings?.getDateFormat(),
       timeFormat: db.settings?.getTimeFormat(),
+      dayFormat: db.settings?.getDayFormat(),
       fontScale,
       markdownShortcuts,
       features,
@@ -245,6 +246,7 @@ export const useEditorEvents = (
     defaultFontFamily,
     dateFormat,
     timeFormat,
+    dayFormat,
     loading,
     fontScale,
     markdownShortcuts,

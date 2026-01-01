@@ -24,9 +24,9 @@ import { initialWindowMetrics } from "react-native-safe-area-context";
 import { FileType } from "react-native-scoped-storage";
 import { create } from "zustand";
 import { ThemeDark, ThemeLight, ThemeDefinition } from "@notesnook/theme";
-import { Reminder } from "@notesnook/core";
 import { EDITOR_LINE_HEIGHT } from "../utils/constants";
-
+import { DayFormat, Reminder } from "@notesnook/core";
+import { db } from "../common/database";
 export const HostIds = [
   "API_HOST",
   "AUTH_HOST",
@@ -137,9 +137,11 @@ export interface SettingStore {
   setInsets: (insets: Insets) => void;
   timeFormat: string;
   dateFormat: string;
+  dayFormat: DayFormat;
   dbPassword?: string;
   isOldAppLock: () => boolean;
   initialUrl: string | null;
+  refresh: () => void;
 }
 
 const { width, height } = Dimensions.get("window");
@@ -226,6 +228,7 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
   setInsets: (insets) => set({ insets }),
   timeFormat: "12-hour",
   dateFormat: "DD-MM-YYYY",
+  dayFormat: "short",
   setAppDidEnterBackgroundForAction: (value: boolean) => {
     set({
       appDidEnterBackgroundForAction: value
@@ -242,5 +245,12 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
   insets: initialWindowMetrics?.insets
     ? initialWindowMetrics.insets
     : { top: 0, right: 0, left: 0, bottom: 0 },
-  initialUrl: null
+  initialUrl: null,
+  refresh: () => {
+    set({
+      dayFormat: db.settings.getDayFormat(),
+      timeFormat: db.settings.getTimeFormat(),
+      dateFormat: db.settings?.getTimeFormat()
+    });
+  }
 }));

@@ -24,7 +24,7 @@ import {
   useStore as useSettingStore
 } from "../../stores/setting-store";
 import dayjs from "dayjs";
-import { TimeFormat } from "@notesnook/core";
+import { TimeFormat, DayFormat } from "@notesnook/core";
 import { TrashCleanupInterval } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { checkFeature } from "../../common";
@@ -138,6 +138,26 @@ export const BehaviourSettings: SettingsGroup[] = [
             options: [
               { value: "12-hour", title: "12h" },
               { value: "24-hour", title: "24h" }
+            ]
+          }
+        ]
+      },
+      {
+        key: "day-format",
+        title: strings.dayFormat(),
+        description: strings.dayFormatDesc(),
+        keywords: [],
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => s.dayFormat, listener),
+        components: [
+          {
+            type: "dropdown",
+            onSelectionChanged: (value) =>
+              useSettingStore.getState().setDayFormat(value as DayFormat),
+            selectedOption: () => useSettingStore.getState().dayFormat,
+            options: [
+              { value: "short", title: "Short (Mon, Tue)" },
+              { value: "long", title: "Long (Monday, Tuesday)" }
             ]
           }
         ]

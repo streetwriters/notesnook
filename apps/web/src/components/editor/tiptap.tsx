@@ -57,7 +57,7 @@ import { ScopedThemeProvider } from "../theme-provider";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { writeToClipboard } from "../../utils/clipboard";
 import { useEditorStore } from "../../stores/editor-store";
-import { parseInternalLink } from "@notesnook/core";
+import { DayFormat, parseInternalLink } from "@notesnook/core";
 import Skeleton from "react-loading-skeleton";
 import useMobile from "../../hooks/use-mobile";
 import useTablet from "../../hooks/use-tablet";
@@ -108,6 +108,7 @@ type TipTapProps = {
   doubleSpacedLines: boolean;
   dateFormat: string;
   timeFormat: TimeFormat;
+  dayFormat: DayFormat;
   markdownShortcuts: boolean;
   fontLigatures: boolean;
 };
@@ -183,6 +184,7 @@ function TipTap(props: TipTapProps) {
     doubleSpacedLines,
     dateFormat,
     timeFormat,
+    dayFormat,
     markdownShortcuts,
     fontLigatures
   } = props;
@@ -262,6 +264,7 @@ function TipTap(props: TipTapProps) {
       doubleSpacedLines,
       dateFormat,
       timeFormat,
+      dayFormat,
       element: editorContainer(),
       editable: !readonly,
       content: content?.(),
@@ -431,6 +434,7 @@ function TipTap(props: TipTapProps) {
     doubleSpacedLines,
     dateFormat,
     timeFormat,
+    dayFormat,
     markdownShortcuts,
     fontLigatures
   ]);
@@ -536,6 +540,7 @@ function TiptapWrapper(
       | "doubleSpacedLines"
       | "dateFormat"
       | "timeFormat"
+      | "dayFormat"
       | "markdownShortcuts"
       | "fontLigatures"
     >
@@ -552,6 +557,7 @@ function TiptapWrapper(
   );
   const dateFormat = useSettingsStore((store) => store.dateFormat);
   const timeFormat = useSettingsStore((store) => store.timeFormat);
+  const dayFormat = useSettingsStore((store) => store.dayFormat);
   const markdownShortcuts = useSettingsStore(
     (store) => store.markdownShortcuts
   );
@@ -631,13 +637,14 @@ function TiptapWrapper(
       }}
     >
       <TipTap
-        key={`tiptap-${props.id}-${doubleSpacedLines}-${dateFormat}-${timeFormat}-${markdownShortcuts}-${fontLigatures}`}
+        key={`tiptap-${props.id}-${doubleSpacedLines}-${dateFormat}-${timeFormat}-${dayFormat}-${markdownShortcuts}-${fontLigatures}`}
         {...props}
         isMobile={isMobile}
         isTablet={isTablet}
         doubleSpacedLines={doubleSpacedLines}
         dateFormat={dateFormat}
         timeFormat={timeFormat}
+        dayFormat={dayFormat}
         markdownShortcuts={markdownShortcuts}
         fontLigatures={fontLigatures}
         onLoad={(editor) => {

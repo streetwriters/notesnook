@@ -718,6 +718,14 @@ export const settingsGroups: SettingSection[] = [
             icon: "calendar-blank"
           },
           {
+            id: "day-format",
+            name: strings.dayFormat(),
+            description: strings.dayFormatDesc(),
+            type: "component",
+            component: "day-format-selector",
+            icon: "calendar-today"
+          },
+          {
             id: "time-format",
             name: strings.timeFormat(),
             description: strings.timeFormatDesc(),
