@@ -143,21 +143,20 @@ export const settingsGroups: SettingSection[] = [
             "dddd, MMMM D, YYYY h:mm A"
           );
 
+          const trialEndDate = dayjs(user?.subscription?.start)
+            .add(
+              user?.subscription?.productId?.includes("monthly") ? 7 : 14,
+              "day"
+            )
+            .format("dddd, MMMM D, YYYY h:mm A");
+
           if (
             user.subscription?.plan !== SubscriptionPlan.FREE &&
             user.subscription?.productId
           ) {
             const status = user.subscription?.status;
             return status === SubscriptionStatus.TRIAL
-              ? strings.trialEndsOn(
-                  dayjs(user?.subscription?.start)
-                    .add(
-                      user?.subscription?.productId?.includes("monthly")
-                        ? 7
-                        : 14
-                    )
-                    .format("dddd, MMMM D, YYYY h:mm A")
-                )
+              ? strings.trialOnGoing(trialEndDate)
               : status === SubscriptionStatus.ACTIVE
                 ? strings.subRenewOn(expiryDate)
                 : status === SubscriptionStatus.CANCELED ||
