@@ -56,7 +56,7 @@ import { useEditorManager } from "./manager";
 import { saveAttachment, downloadAttachment } from "../../common/attachments";
 import { EV, EVENTS } from "@notesnook/core";
 import { db } from "../../common/db";
-import Titlebox from "./title-box";
+import Titlebox, { resizeTextarea } from "./title-box";
 import Config from "../../utils/config";
 import { ScopedThemeProvider } from "../theme-provider";
 import { Lightbox } from "../lightbox";
@@ -77,7 +77,6 @@ import { onPageVisibilityChanged } from "../../utils/page-visibility";
 import { Pane, SplitPane } from "../split-pane";
 import { TITLE_BAR_HEIGHT } from "../title-bar";
 import { isMobile } from "../../hooks/use-mobile";
-import { isTablet } from "../../hooks/use-tablet";
 import { ConfirmDialog } from "../../dialogs/confirm";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
@@ -711,19 +710,25 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
       const child = editorContainerRef.current?.getBoundingClientRect();
       if (!parent || !child || !editor || entries.length <= 0) return;
 
-      const CONTAINER_MARGIN = isMobile() || isTablet() ? 10 : 30;
+      const CONTAINER_MARGIN = isMobile() ? 10 : 30;
       const negativeSpace = Math.abs(
         parent.left - child.left - CONTAINER_MARGIN
       );
 
       requestAnimationFrame(() => {
-        if (!isMobile() && !isTablet()) {
+        if (!isMobile()) {
           editor.style.marginLeft = `-${negativeSpace}px`;
           editor.style.marginRight = `-${negativeSpace}px`;
+
+          editor.style.paddingLeft = `${negativeSpace}px`;
+          editor.style.paddingRight = `${negativeSpace}px`;
         }
-        editor.style.paddingLeft = `${negativeSpace}px`;
-        editor.style.paddingRight = `${negativeSpace}px`;
       });
+
+      const editorTitle = document.querySelector("#editor-title");
+      if (editorTitle instanceof HTMLTextAreaElement) {
+        resizeTextarea(editorTitle);
+      }
     }
     const observer = new ResizeObserver(debounce(onResize, 500));
     observer.observe(editorScrollRef.current);
@@ -761,8 +766,8 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
             maxWidth: editorMargins ? "min(100%, 850px)" : "auto",
             width: "100%"
           }}
-          pl={[2, 2, 6]}
-          pr={[2, 2, 6]}
+          pl={[2, 6]}
+          pr={[2, 6]}
           onClick={onRequestFocus}
         >
           {children}

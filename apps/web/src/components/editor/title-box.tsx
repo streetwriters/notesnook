@@ -155,7 +155,7 @@ export default React.memo(TitleBox, (prevProps, nextProps) => {
   return prevProps.readonly === nextProps.readonly;
 });
 
-function resizeTextarea(input: HTMLTextAreaElement) {
+export function resizeTextarea(input: HTMLTextAreaElement) {
   input.style.height = "auto";
   requestAnimationFrame(() => {
     input.style.height = input.scrollHeight + "px";
