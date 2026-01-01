@@ -30,7 +30,7 @@ import {
   changedDescendants,
   findParentNodeOfTypeClosestToPos
 } from "../../utils/prosemirror.js";
-import { BatchAttributeStep } from "./batch-attribute-step.js";
+import { AttributeUpdate, BatchAttributeStep } from "./batch-attribute-step.js";
 
 const COLLAPSIBLE_BLOCK_TYPES = [
   "paragraph",
@@ -318,7 +318,7 @@ function toggleNodesUnderPos(
   let shouldMoveCursor = false;
   let insideCollapsedHeading = false;
   let nestedHeadingLevel: number | null = null;
-  const updates: { pos: number; attrName: string; value: any }[] = [];
+  const updates: AttributeUpdate[] = [];
 
   while (nextPos < doc.content.size) {
     const nextNode = doc.nodeAt(nextPos);

@@ -21,7 +21,7 @@ import { Step, StepResult } from "@tiptap/pm/transform";
 import { Node, Schema, Fragment } from "@tiptap/pm/model";
 import { Mapping } from "@tiptap/pm/transform";
 
-interface AttributeUpdate {
+export interface AttributeUpdate {
   pos: number;
   attrName: string;
   value: any;
