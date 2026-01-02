@@ -34,7 +34,8 @@ import {
   Slice,
   DOMParser,
   Schema,
-  Fragment
+  Fragment,
+  Node
 } from "prosemirror-model";
 import { EditorState, Selection, Transaction } from "prosemirror-state";
 import TextStyle from "@tiptap/extension-text-style";
@@ -409,4 +410,43 @@ export function ensureLeadingParagraph(node: Node, schema: Schema): Fragment {
   }
 
   return fragment;
+}
+
+/**
+ * Helper for iterating through the nodes in a document that changed
+ * compared to the given previous document. Useful for avoiding
+ * duplicate work on each transaction.
+ *
+ * @public
+ */
+export function changedDescendants(
+  old: Node,
+  cur: Node,
+  offset: number,
+  f: (newNode: Node, pos: number, oldNode?: Node) => void
+): void {
+  const oldSize = old.childCount,
+    curSize = cur.childCount;
+  outer: for (let i = 0, j = 0; i < curSize; i++) {
+    const child = cur.child(i);
+    for (let scan = j, e = Math.min(oldSize, i + 3); scan < e; scan++) {
+      if (old.child(scan) == child) {
+        j = scan + 1;
+        offset += child.nodeSize;
+        continue outer;
+      }
+    }
+    f(child, offset, i < oldSize ? old.child(i) : undefined);
+    if (j < oldSize && old.child(j).sameMarkup(child)) {
+      changedDescendants(old.child(j), child, offset + 1, f);
+    } else {
+      child.nodesBetween(
+        0,
+        child.content.size,
+        f as (node: Node, pos: number) => void,
+        offset + 1
+      );
+    }
+    offset += child.nodeSize;
+  }
 }
