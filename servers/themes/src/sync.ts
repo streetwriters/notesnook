@@ -20,7 +20,11 @@ import { execSync } from "child_process";
 import fs from "node:fs";
 import { readdir, readFile } from "fs/promises";
 import path from "path";
-import { THEMES_REPO_URL, THEME_REPO_DIR_PATH } from "./constants";
+import {
+  InstallsCounter,
+  THEMES_REPO_URL,
+  THEME_REPO_DIR_PATH
+} from "./constants";
 import { insertMultiple } from "@orama/orama";
 import { initializeDatabase } from "./orama";
 import {
@@ -95,6 +99,12 @@ async function generateThemesMetadata() {
         previewColors: getPreviewColors(theme)
       });
     }
+  }
+  const installs = await InstallsCounter.counts(
+    themeDefinitions.map((t) => t.id)
+  );
+  for (const theme of themeDefinitions) {
+    theme.totalInstalls = installs[theme.id] || 0;
   }
   await insertMultiple(db, themeDefinitions);
   console.log("Metadata generated and cached.");

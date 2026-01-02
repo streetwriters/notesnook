@@ -18,59 +18,82 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Mutex } from "async-mutex";
-import WorkersKVREST from "@sagi.io/workers-kv";
+import { Cloudflare } from "cloudflare";
 
+type WorkersKVRESTConfig = {
+  cfAccountId: string;
+  cfAuthToken: string;
+  namespaceId: string;
+};
 export class KVCounter {
-  private readonly kv: WorkersKVREST;
+  private readonly client: Cloudflare;
   private readonly mutex: Mutex;
-  constructor(config: {
-    cfAccountId: string;
-    cfAuthToken: string;
-    namespaceId: string;
-  }) {
+  constructor(private readonly config: WorkersKVRESTConfig) {
     this.mutex = new Mutex();
-    this.kv = new WorkersKVREST(config);
+    this.client = new Cloudflare({
+      apiToken: this.config.cfAuthToken
+    });
   }
 
   async increment(key: string, uid: string) {
     await this.mutex.runExclusive(async () => {
-      const existing = await read<string[]>(this.kv, key, []);
-      await write(this.kv, key, Array.from(new Set([...existing, uid])));
+      const installs = await readMulti(this.client, this.config, [key]);
+      const existing = installs[key] || [];
+      await write(
+        this.client,
+        this.config,
+        key,
+        Array.from(new Set([...existing, uid]))
+      );
     });
   }
 
-  async counts(key: string): Promise<number> {
-    const installs = await read<string[]>(this.kv, key, []);
-    return installs.length;
-  }
-}
-
-async function read<T>(
-  kv: WorkersKVREST,
-  key: string,
-  fallback: T
-): Promise<T> {
-  try {
-    const response = await kv.readKey({
-      key
-    });
-    if (typeof response === "object" && !response.success) {
-      // console.error("failed:", response.errors);
-      return fallback;
+  async counts(keys: string[]): Promise<Record<string, number>> {
+    const result: Record<string, number> = {};
+    const installs = await readMulti(this.client, this.config, keys);
+    for (const [key, value] of Object.entries(installs)) {
+      result[key] = value.length;
     }
-    return (
-      JSON.parse(typeof response === "string" ? response : response.result) ||
-      fallback
-    );
-  } catch (e) {
-    // console.error(e);
-    return fallback;
+    return result;
   }
 }
 
-async function write<T>(kv: WorkersKVREST, key: string, data: T) {
-  await kv.writeKey({
-    key,
-    value: JSON.stringify(data)
+async function readMulti(
+  client: Cloudflare,
+  config: WorkersKVRESTConfig,
+  keys: string[]
+): Promise<Record<string, string[]>> {
+  try {
+    const response = await client.kv.namespaces.bulkGet(config.namespaceId, {
+      account_id: config.cfAccountId,
+      keys,
+      type: "json",
+      withMetadata: false
+    });
+    const result: Record<string, string[]> = {};
+    for (const [key, value] of Object.entries(response?.values || {})) {
+      result[key] = value;
+    }
+    return result;
+  } catch (e) {
+    console.error(e);
+    return {};
+  }
+}
+
+function write<T>(
+  client: Cloudflare,
+  config: WorkersKVRESTConfig,
+  key: string,
+  data: T
+) {
+  return client.kv.namespaces.bulkUpdate(config.namespaceId, {
+    account_id: config.cfAccountId,
+    body: [
+      {
+        key,
+        value: JSON.stringify(data)
+      }
+    ]
   });
 }
