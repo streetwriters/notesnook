@@ -43,10 +43,13 @@ export class FsCounter {
     await writeFile(this.path, JSON.stringify(counts));
   }
 
-  counts(key: string): Promise<number> {
-    return this.all().then((counts) => {
-      return (counts[key] || []).length;
-    });
+  async counts(keys: string[]): Promise<Record<string, number>> {
+    const all = await this.all();
+    const result: Record<string, number> = {};
+    for (const key of keys) {
+      result[key] = (all[key] || []).length;
+    }
+    return result;
   }
 
   private async all(): Promise<Counts> {
