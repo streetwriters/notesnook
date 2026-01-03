@@ -30,12 +30,13 @@ export class FsCounter {
   }
 
   async increment(key: string, uid: string) {
-    await this.mutex.runExclusive(async () => {
+    return await this.mutex.runExclusive(async () => {
       const counts = await this.all();
       counts[key] = counts[key] || [];
-      if (counts[key].includes(uid)) return;
+      if (counts[key].includes(uid)) return counts[key].length;
       counts[key].push(uid);
       await this.save(counts);
+      return counts[key].length;
     });
   }
 

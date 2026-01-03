@@ -28,6 +28,7 @@ type WorkersKVRESTConfig = {
 export class KVCounter {
   private readonly client: Cloudflare;
   private readonly mutex: Mutex;
+  private installs: Record<string, string[]> = {};
   constructor(private readonly config: WorkersKVRESTConfig) {
     this.mutex = new Mutex();
     this.client = new Cloudflare({
@@ -36,15 +37,12 @@ export class KVCounter {
   }
 
   async increment(key: string, uid: string) {
-    await this.mutex.runExclusive(async () => {
-      const installs = await readMulti(this.client, this.config, [key]);
-      const existing = installs[key] || [];
-      await write(
-        this.client,
-        this.config,
-        key,
-        Array.from(new Set([...existing, uid]))
-      );
+    return await this.mutex.runExclusive(async () => {
+      const existing = this.installs[key] || [];
+      const installsSet = Array.from(new Set([...existing, uid]));
+      await write(this.client, this.config, key, installsSet);
+      this.installs[key] = installsSet;
+      return installsSet.length;
     });
   }
 
@@ -54,6 +52,7 @@ export class KVCounter {
     for (const [key, value] of Object.entries(installs)) {
       result[key] = value.length;
     }
+    this.installs = installs;
     return result;
   }
 }
@@ -87,13 +86,8 @@ function write<T>(
   key: string,
   data: T
 ) {
-  return client.kv.namespaces.bulkUpdate(config.namespaceId, {
+  return client.kv.namespaces.values.update(config.namespaceId, key + "_test", {
     account_id: config.cfAccountId,
-    body: [
-      {
-        key,
-        value: JSON.stringify(data)
-      }
-    ]
+    value: JSON.stringify(data)
   });
 }
