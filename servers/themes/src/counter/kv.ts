@@ -86,7 +86,7 @@ function write<T>(
   key: string,
   data: T
 ) {
-  return client.kv.namespaces.values.update(config.namespaceId, key + "_test", {
+  return client.kv.namespaces.values.update(config.namespaceId, key, {
     account_id: config.cfAccountId,
     value: JSON.stringify(data)
   });
