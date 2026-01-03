@@ -29,7 +29,7 @@ import { desktop } from "./common/desktop-bridge";
 import { useKeyStore } from "./interfaces/key-store";
 import Config from "./utils/config";
 import { usePromise } from "@notesnook/common";
-import { AuthProps } from "./views/auth";
+import { AuthProps, isAuthRouteActive } from "./views/auth";
 import { loadDatabase } from "./hooks/use-database";
 import AppLock from "./views/app-lock";
 import { Text } from "@theme-ui/components";
@@ -58,7 +58,7 @@ export async function startApp(children?: React.ReactNode) {
 
     root.render(
       <>
-        <TitleBar />
+        <TitleBar force={isAuthRouteActive()} />
         <ErrorBoundary>
           <GlobalErrorHandler>
             <BaseThemeProvider
