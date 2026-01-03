@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { z } from "zod";
 import { InstallsCounter } from "./constants";
-import { findTheme, getThemes } from "./orama";
+import { findTheme, getThemes, updateTotalInstalls } from "./orama";
 import { syncThemes } from "./sync";
 import { publicProcedure, router } from "./trpc";
 import { THEME_COMPATIBILITY_VERSION } from "@notesnook/theme";
@@ -41,7 +41,12 @@ export const ThemesAPI = router({
       const theme = await findTheme(id, compatibilityVersion);
       if (!theme) return;
 
-      if (userId) await InstallsCounter.increment(theme.id, userId);
+      if (userId) {
+        updateTotalInstalls(
+          theme,
+          await InstallsCounter.increment(theme.id, userId)
+        );
+      }
       return theme;
     }),
   updateTheme: publicProcedure
