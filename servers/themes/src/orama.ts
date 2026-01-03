@@ -30,7 +30,8 @@ export async function initializeDatabase(): Promise<Orama> {
       colorScheme: "string",
       compatibilityVersion: "number",
       description: "string",
-      tags: "string[]"
+      tags: "string[]",
+      totalInstalls: "number"
     },
     id: "notesnook-themes"
   });
@@ -60,6 +61,10 @@ export async function getThemes(query: (typeof ThemeQuerySchema)["_type"]) {
   const count = query.limit;
 
   const searchParams: SearchParams = {
+    sortBy: {
+      property: "totalInstalls",
+      order: "DESC"
+    },
     where: {
       compatibilityVersion: {
         eq: query.compatibilityVersion
