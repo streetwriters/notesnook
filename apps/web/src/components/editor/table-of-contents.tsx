@@ -201,7 +201,14 @@ function TableOfContents(props: TableOfContentsProps) {
                     {item.hasChildren ? (
                       <Button
                         variant="secondary"
-                        sx={{ bg: "transparent", p: 0, borderRadius: 100 }}
+                        sx={{
+                          bg: "transparent",
+                          p: 0,
+                          borderRadius: 100,
+                          width: 14,
+                          height: 14,
+                          flexShrink: 0
+                        }}
                         onClick={(e) => {
                           e.stopPropagation();
                           expanded ? collapse() : expand();
@@ -214,7 +221,17 @@ function TableOfContents(props: TableOfContentsProps) {
                         )}
                       </Button>
                     ) : (
-                      <Circle size={5} color="icon-secondary" />
+                      <Flex
+                        sx={{
+                          width: 14,
+                          height: 14,
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0
+                        }}
+                      >
+                        <Circle size={5} color="icon-secondary" />
+                      </Flex>
                     )}
                     {item.data.title}
                   </Button>
