@@ -178,6 +178,7 @@ export class Notes implements ICollection {
           conflicted: item.conflicted,
           readonly: item.readonly,
 
+          dateCreated: item.dateCreated,
           dateEdited: item.dateEdited || dateEdited,
 
           isGeneratedTitle: item.isGeneratedTitle

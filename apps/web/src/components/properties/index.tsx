@@ -45,6 +45,7 @@ import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useAttachmentStore } from "../../stores/attachment-store";
 import { store as noteStore } from "../../stores/note-store";
 import Toggle from "./toggle";
+import { NoteDateCreatedEditor } from "./note-date-created-editor";
 import ScrollContainer from "../scroll-container";
 import {
   getFormattedDate,
@@ -212,13 +213,22 @@ function EditorProperties(props: EditorPropertiesProps) {
                     >
                       {item.label}
                     </Text>
-                    <Text
-                      className="selectable"
-                      variant="subBody"
-                      sx={{ fontSize: "body", flexShrink: 0 }}
-                    >
-                      {item.value(session.note[item.key])}
-                    </Text>
+                    {item.key === "dateCreated" ? (
+                      <NoteDateCreatedEditor
+                        noteId={session.note.id}
+                        dateCreated={session.note.dateCreated}
+                        dateEdited={session.note.dateEdited}
+                        displayValue={item.value(session.note[item.key])}
+                      />
+                    ) : (
+                      <Text
+                        className="selectable"
+                        variant="subBody"
+                        sx={{ fontSize: "body", flexShrink: 0 }}
+                      >
+                        {item.value(session.note[item.key])}
+                      </Text>
+                    )}
                   </Flex>
                 ))}
                 {session.type === "deleted" ||

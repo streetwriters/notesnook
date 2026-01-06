@@ -121,6 +121,11 @@ class NoteStore extends BaseStore<NoteStore> {
     await this.refresh();
   };
 
+  updateDateCreated = async (id: string, dateCreated: number) => {
+    await db.notes.add({ id, dateCreated });
+    await this.refresh();
+  };
+
   setColor = async (colorId: string, isChecked: boolean, ...ids: string[]) => {
     await db.relations.to({ type: "note", ids }, "color").unlink();
     if (!isChecked) {
