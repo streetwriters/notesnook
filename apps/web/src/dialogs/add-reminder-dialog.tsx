@@ -38,6 +38,7 @@ import { Note, Reminder } from "@notesnook/core";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 import { checkFeature } from "../common";
+import { setTimeOnly, setDateOnly } from "../utils/date-time";
 
 dayjs.extend(customParseFormat);
 
@@ -520,18 +521,8 @@ export const AddReminderDialog = DialogManager.register(
   }
 );
 
-function setTimeOnly(str: string, date: dayjs.Dayjs) {
-  const value = dayjs(str, timeFormat(), true);
-  return date.hour(value.hour()).minute(value.minute());
-}
-
 function timeFormat() {
   return getTimeFormat(db.settings.getTimeFormat());
-}
-
-function setDateOnly(str: string, date: dayjs.Dayjs) {
-  const value = dayjs(str, db.settings.getDateFormat(), true);
-  return date.year(value.year()).month(value.month()).date(value.date());
 }
 
 function getSelectedDaysText(
