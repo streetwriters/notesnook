@@ -772,3 +772,11 @@ test("archived note shouldn't be in favorites", () =>
     await db.notes.archive(true, id);
     expect(await db.notes.favorites.count()).toBe(0);
   }));
+
+test("edit note's created date", () =>
+  noteTest().then(async ({ db, id }) => {
+    const date = new Date("2020-01-01T10:00:00Z");
+    await db.notes.add({ id, dateCreated: date.valueOf() });
+    const note = await db.notes.note(id);
+    expect(note?.dateCreated).toBe(date.valueOf());
+  }));
