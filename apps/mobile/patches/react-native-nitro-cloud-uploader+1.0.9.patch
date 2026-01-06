@@ -1,0 +1,83 @@
+diff --git a/node_modules/react-native-nitro-cloud-uploader/android/src/main/AndroidManifest.xml b/node_modules/react-native-nitro-cloud-uploader/android/src/main/AndroidManifest.xml
+index 9ea903a..e023649 100644
+--- a/node_modules/react-native-nitro-cloud-uploader/android/src/main/AndroidManifest.xml
++++ b/node_modules/react-native-nitro-cloud-uploader/android/src/main/AndroidManifest.xml
+@@ -11,7 +11,7 @@
+ 
+     <!-- Required for background uploads -->
+     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
++    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+ 
+     <!-- Keep CPU awake during uploads -->
+     <uses-permission android:name="android.permission.WAKE_LOCK" />
+diff --git a/node_modules/react-native-nitro-cloud-uploader/android/src/main/java/com/margelo/nitro/nitroclouduploader/NitroCloudUploader.kt b/node_modules/react-native-nitro-cloud-uploader/android/src/main/java/com/margelo/nitro/nitroclouduploader/NitroCloudUploader.kt
+index f93d4dc..f95a537 100644
+--- a/node_modules/react-native-nitro-cloud-uploader/android/src/main/java/com/margelo/nitro/nitroclouduploader/NitroCloudUploader.kt
++++ b/node_modules/react-native-nitro-cloud-uploader/android/src/main/java/com/margelo/nitro/nitroclouduploader/NitroCloudUploader.kt
+@@ -388,7 +388,7 @@ class NitroCloudUploader(
+                     )
+                     
+                     if (shouldNotify) {
+-                        showNotification(uploadId, 100, "Upload complete!", isComplete = true)
++//                        showNotification(uploadId, 100, "Upload complete!", isComplete = true)
+                     }
+                     
+                     // ✅ Stop foreground service on success
+@@ -414,7 +414,7 @@ class NitroCloudUploader(
+                     println("❌ Upload failed: ${e.message}")
+                     
+                     if (shouldNotify) {
+-                        showNotification(uploadId, -1, "Upload failed", isComplete = true)
++//                        showNotification(uploadId, -1, "Upload failed", isComplete = true)
+                     }
+                     
+                     // ✅ Stop foreground service on failure
+@@ -458,7 +458,7 @@ class NitroCloudUploader(
+             )
+ 
+             if (shouldNotify) {
+-                showNotification(uploadId, 0, "Starting upload...")
++//                showNotification(uploadId, 0, "Starting upload...")
+             }
+ 
+         } catch (e: Exception) {
+@@ -672,7 +672,7 @@ class NitroCloudUploader(
+ 
+                 if (showNotification) {
+                     val progressPercent = (progress * 100).toInt()
+-                    showNotification(uploadId, progressPercent, "Uploading... ${progressPercent}%")
++//                    showNotification(uploadId, progressPercent, "Uploading... ${progressPercent}%")
+                     
+                     // ✅ Update foreground service notification
+                     val ctx = appContext  // Cache to avoid smart cast issues
+diff --git a/node_modules/react-native-nitro-cloud-uploader/android/src/main/java/com/margelo/nitro/nitroclouduploader/UploadForegroundService.kt b/node_modules/react-native-nitro-cloud-uploader/android/src/main/java/com/margelo/nitro/nitroclouduploader/UploadForegroundService.kt
+index 466c212..e261329 100644
+--- a/node_modules/react-native-nitro-cloud-uploader/android/src/main/java/com/margelo/nitro/nitroclouduploader/UploadForegroundService.kt
++++ b/node_modules/react-native-nitro-cloud-uploader/android/src/main/java/com/margelo/nitro/nitroclouduploader/UploadForegroundService.kt
+@@ -134,7 +134,7 @@ class UploadForegroundService : Service() {
+                 startForeground(
+                     NOTIFICATION_ID,
+                     notification,
+-                    ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
++                    ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+                 )
+             } else {
+                 startForeground(NOTIFICATION_ID, notification)
+@@ -165,6 +165,7 @@ class UploadForegroundService : Service() {
+ 
+         isServiceStarted = false
+         stopForeground(STOP_FOREGROUND_REMOVE)
++        notificationManager.cancel(NOTIFICATION_ID);
+         stopSelf()
+         println("✅ Foreground service stopped")
+     }
+@@ -201,7 +202,7 @@ class UploadForegroundService : Service() {
+         }
+ 
+         val builder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+-            .setContentTitle("Cloud Uploader")
++            .setContentTitle("Uploading file")
+             .setContentText(message)
+             .setSmallIcon(android.R.drawable.stat_sys_upload)
+             .setPriority(NotificationCompat.PRIORITY_LOW)
