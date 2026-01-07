@@ -21,6 +21,9 @@ import { Editor } from "@tiptap/core";
 import { EditorState, TextSelection, Transaction } from "prosemirror-state";
 import { Node } from "prosemirror-model";
 import { selectedRect, TableRect } from "./prosemirror-tables/commands.js";
+import { saveAs } from "file-saver";
+import { unparse, parse } from "papaparse";
+import { hasPermission } from "../../types.js";
 
 type TableCell = {
   cell: Node;
@@ -189,11 +192,70 @@ function selectColumn(
   return true;
 }
 
+function escapeCell(cell: string): string {
+  return (cell || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function importCsvToTable(csvText: string, editor: Editor) {
+  const result = parse(csvText, {
+    skipEmptyLines: true
+  });
+  if (!result.data || result.data.length === 0) return "";
+
+  const rows = result.data as string[][];
+  let tableHTML = "<table>";
+
+  if (rows.length > 0) {
+    tableHTML += "<thead><tr>";
+    for (const cell of rows[0]) {
+      tableHTML += `<th><p>${escapeCell(cell)}</p></th>`;
+    }
+    tableHTML += "</tr></thead>";
+  }
+
+  tableHTML += "<tbody>";
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows[i];
+    tableHTML += "<tr>";
+    for (const cell of row) {
+      tableHTML += `<td><p>${escapeCell(cell)}</p></td>`;
+    }
+    tableHTML += "</tr>";
+  }
+  tableHTML += "</tbody></table>";
+
+  editor.chain().focus().insertContent(tableHTML).run();
+}
+
+function exportToCSV(editor?: Editor) {
+  if (!hasPermission("exportTableAsCsv")) return;
+  if (!editor) return;
+
+  const rect = selectedRect(editor.state);
+
+  const rows: string[][] = [];
+  rect.table.forEach((node) => {
+    const row: string[] = [];
+    node.forEach((cell) => row.push(cell.textContent));
+    rows.push(row);
+  });
+
+  saveAs(new Blob([new TextEncoder().encode(unparse(rows))]), "table.csv");
+}
+
 export {
   moveColumnLeft,
   moveColumnRight,
   moveRowDown,
   moveRowUp,
   selectRow,
-  selectColumn
+  selectColumn,
+  exportToCSV,
+  escapeCell,
+  importCsvToTable
 };
