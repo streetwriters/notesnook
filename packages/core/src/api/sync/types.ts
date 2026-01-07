@@ -47,6 +47,7 @@ export const SYNC_ITEM_TYPES = Object.keys(
 export type SyncTransferItem = {
   items: SyncItem[];
   type: SyncableItemType;
+  count: number;
 };
 
 export type SyncInboxItem = Omit<SyncItem, "format"> & {

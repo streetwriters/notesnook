@@ -166,7 +166,7 @@ class Sync {
     this.autoSync = new AutoSync(db, 1000);
     this.devices = new SyncDevices(db.kv, db.tokenManager);
 
-    EV.subscribe(EVENTS.userLoggedOut, async () => {
+    db.eventManager.subscribe(EVENTS.userLoggedOut, async () => {
       await this.connection?.stop();
       this.autoSync.stop();
     });
@@ -285,7 +285,7 @@ class Sync {
         );
       }
     }
-    if (done > 0) await this.connection?.send("PushCompleted");
+    if (done > 0) await this.connection?.send("PushCompletedV2", deviceId);
     return true;
   }
 
@@ -332,8 +332,13 @@ class Sync {
   /**
    * @private
    */
-  async onPushCompleted() {
-    this.db.eventManager.publish(EVENTS.databaseSyncRequested, true, false);
+  async onPushCompleted(deviceId: string) {
+    this.db.eventManager.publish(
+      EVENTS.databaseSyncRequested,
+      true,
+      false,
+      deviceId
+    );
   }
 
   async processChunk(
@@ -442,7 +447,9 @@ class Sync {
       .withHubProtocol(new JsonHubProtocol())
       .build();
     this.connection.serverTimeoutInMilliseconds = 60 * 1000 * 5;
-    this.connection.on("PushCompleted", () => this.onPushCompleted());
+    this.connection.on("PushCompletedV2", (deviceId: string) =>
+      this.onPushCompleted(deviceId)
+    );
     this.connection.on("SendVaultKey", async (vaultKey) => {
       if (this.connection?.state !== HubConnectionState.Connected) return false;
 

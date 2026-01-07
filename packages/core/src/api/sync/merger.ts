@@ -29,7 +29,7 @@ import {
 } from "../../types.js";
 import { ParsedInboxItem, SyncInboxItem } from "./types.js";
 
-const THRESHOLD = process.env.NODE_ENV === "test" ? 6 * 1000 : 60 * 1000;
+const THRESHOLD = process.env.NODE_ENV === "test" ? 2 * 1000 : 60 * 1000;
 class Merger {
   logger = logger.scope("Merger");
   constructor(private readonly db: Database) {}
