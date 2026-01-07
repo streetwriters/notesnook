@@ -491,6 +491,28 @@ const features = {
       believer: createLimit(true),
       legacyPro: createLimit(true)
     }
+  }),
+  exportTableAsCsv: createFeature({
+    id: "exportTableAsCsv",
+    title: "Export table as CSV",
+    availability: {
+      free: createLimit(false),
+      essential: createLimit(true),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
+    }
+  }),
+  importCsvToTable: createFeature({
+    id: "importCsvToTable",
+    title: "Import CSV to table",
+    availability: {
+      free: createLimit(false),
+      essential: createLimit(true),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
+    }
   })
 };
 

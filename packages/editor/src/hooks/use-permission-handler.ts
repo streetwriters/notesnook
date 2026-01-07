@@ -31,7 +31,9 @@ const ClaimsMap = {
   callout: ["setCallout"] as (keyof UnionCommands)[],
   outlineList: ["toggleOutlineList"] as (keyof UnionCommands)[],
   taskList: ["toggleTaskList"] as (keyof UnionCommands)[],
-  insertAttachment: ["insertAttachment"] as (keyof UnionCommands)[]
+  insertAttachment: ["insertAttachment"] as (keyof UnionCommands)[],
+  exportTableAsCsv: ["exportTableAsCsv"] as (keyof UnionCommands)[],
+  importCsvToTable: ["importCsvToTable"] as (keyof UnionCommands)[]
 };
 
 export function usePermissionHandler(options: PermissionHandlerOptions) {

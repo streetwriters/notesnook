@@ -244,6 +244,16 @@ declare module "@tiptap/core" {
         anchorCell: number;
         headCell?: number;
       }) => ReturnType;
+
+      /**
+       * Export the current table as a CSV file
+       */
+      exportTableAsCsv: () => ReturnType;
+
+      /**
+       * Import a CSV file into a new table at the current position
+       */
+      importCsvToTable: () => ReturnType;
     };
   }
 

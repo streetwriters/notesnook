@@ -2718,6 +2718,10 @@ msgstr ""
 msgid "Export as{0}"
 msgstr ""
 
+#: src/strings.ts:2623
+msgid "Export CSV"
+msgstr ""
+
 #: src/strings.ts:1385
 msgid "Export notes as PDF, Markdown and HTML with Notesnook Pro"
 msgstr ""
@@ -3318,6 +3322,10 @@ msgstr ""
 
 #: src/strings.ts:1751
 msgid "Import completed"
+msgstr ""
+
+#: src/strings.ts:2624
+msgid "Import CSV"
 msgstr ""
 
 #: src/strings.ts:1766

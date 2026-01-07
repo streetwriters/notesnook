@@ -2629,5 +2629,7 @@ Use this if changes from other devices are not appearing on this device. This wi
     t`The incoming note could not be unlocked with the provided password. Enter the correct password for the incoming note`,
   setExpiry: () => t`Set expiry`,
   unsetExpiry: () => t`Unset expiry`,
-  expiryDate: () => t`Expiry date`
+  expiryDate: () => t`Expiry date`,
+  exportCsv: () => t`Export CSV`,
+  importCsv: () => t`Import CSV`
 };

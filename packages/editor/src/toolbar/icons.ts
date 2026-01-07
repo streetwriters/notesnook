@@ -122,7 +122,8 @@ import {
   mdiCheckboxMultipleMarked,
   mdiMessageOutline,
   mdiVectorLink,
-  mdiPinOutline
+  mdiPinOutline,
+  mdiFileDelimitedOutline
 } from "@mdi/js";
 
 export const Icons = {
@@ -235,6 +236,7 @@ export const Icons = {
   heading: mdiFormatHeaderPound,
   indent: mdiFormatIndentIncrease,
   outdent: mdiFormatIndentDecrease,
+  csv: mdiFileDelimitedOutline,
 
   plus: mdiPlus,
   minus: mdiMinus,
