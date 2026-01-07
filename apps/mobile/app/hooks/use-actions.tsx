@@ -32,7 +32,7 @@ import { useThemeColors } from "@notesnook/theme";
 import { DisplayedNotification } from "@notifee/react-native";
 import Clipboard from "@react-native-clipboard/clipboard";
 import React, { useEffect, useRef, useState } from "react";
-import { InteractionManager, Platform } from "react-native";
+import { InteractionManager, Platform, View } from "react-native";
 import Share from "react-native-share";
 import { DatabaseLogger, db } from "../common/database";
 import { AttachmentDialog } from "../components/attachments";
@@ -46,9 +46,10 @@ import PublishNoteSheet from "../components/sheets/publish-note";
 import { ReferencesList } from "../components/sheets/references";
 import { RelationsList } from "../components/sheets/relations-list/index";
 import { useSideBarDraggingStore } from "../components/side-menu/dragging-store";
-import { ButtonProps } from "../components/ui/button";
+import { Button, ButtonProps } from "../components/ui/button";
 import AddReminder from "../screens/add-reminder";
 import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
+import DatePicker from "react-native-date-picker";
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -73,6 +74,14 @@ import { convertNoteToText } from "../utils/note-to-text";
 import { sleep } from "../utils/time";
 import { resetStoredState } from "./use-stored-state";
 import { NotesnookModule } from "../utils/notesnook-module";
+import RNDateTimePicker, {
+  DateTimePickerAndroid
+} from "@react-native-community/datetimepicker";
+import DateTimePicker from "react-native-modal-datetime-picker";
+import dayjs from "dayjs";
+import { defaultBorderRadius } from "../utils/size";
+import { DefaultAppStyles } from "../utils/styles";
+import DatePickerComponent from "../components/date-picker";
 
 export type ActionId =
   | "select"
@@ -118,7 +127,8 @@ export type ActionId =
   | "trash"
   | "default-homepage"
   | "default-tag"
-  | "launcher-shortcut";
+  | "launcher-shortcut"
+  | "expiry-date";
 
 export type Action = {
   id: ActionId;
@@ -166,7 +176,7 @@ export const useActions = ({
     "androidLauncherShortcuts"
   ]);
   const [item, setItem] = useState(propItem);
-  const { colors } = useThemeColors();
+  const { colors, isDark } = useThemeColors();
   const setMenuPins = useMenuStore((state) => state.setMenuPins);
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(
     db.shortcuts.exists(item.id)
@@ -1161,6 +1171,31 @@ export const useActions = ({
         },
         checked: item.archived,
         isToggle: true
+      },
+      {
+        id: "expiry-date",
+        title: item.expiryDate ? strings.unsetExpirt() : strings.setExpiry(),
+        icon: item.expiryDate ? "bomb-off" : "bomb",
+        onPress: async () => {
+          if (item.expiryDate) {
+            await db.notes.setExpiryDate(null, item.id);
+            setItem((await db.notes.note(item.id)) as Item);
+          } else {
+            presentDialog({
+              context: "properties",
+              component: (close) => (
+                <DatePickerComponent
+                  onCancel={() => close?.()}
+                  onConfirm={async (date) => {
+                    close?.();
+                    await db.notes.setExpiryDate(date.getTime(), item.id);
+                    setItem((await db.notes.note(item.id)) as Item);
+                  }}
+                />
+              )
+            });
+          }
+        }
       }
     );
 

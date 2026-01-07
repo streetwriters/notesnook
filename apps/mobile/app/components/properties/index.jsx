@@ -39,6 +39,7 @@ import { DateMeta } from "./date-meta";
 import { Items } from "./items";
 import Notebooks from "./notebooks";
 import { TagStrip, Tags } from "./tags";
+import { Dialog } from "../dialog";
 
 const Line = ({ top = 6, bottom = 6 }) => {
   const { colors } = useThemeColors();
@@ -203,6 +204,7 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
             />
           ) : null}
           <SheetProvider context="properties" />
+          <Dialog context="properties" />
         </View>
       )}
     />
