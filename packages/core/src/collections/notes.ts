@@ -527,4 +527,25 @@ export class Notes implements ICollection {
       "internalLinks"
     ).internalLinks;
   }
+
+  async clearExpiredNotes() {
+    const expiredItems = await this.db
+      .sql()
+      .selectNoFrom((eb) =>
+        eb
+          .selectFrom("notes")
+          .where("type", "!=", "trash")
+          .where("expiryDate", "<", Date.now())
+          .select("id")
+          .as("noteId")
+      )
+      .execute();
+
+    if (expiredItems.length) {
+      const toDelete = expiredItems
+        .map((item) => item.noteId)
+        .filter((item) => item != null);
+      this._delete(true, ...toDelete);
+    }
+  }
 }
