@@ -29,7 +29,8 @@ import {
   moveRowDown as moveRowDownAction,
   moveRowUp as moveRowUpAction,
   selectColumn,
-  selectRow
+  selectRow,
+  exportToCSV as exportToCsvAction
 } from "../../extensions/table/actions.js";
 import { MoreTools } from "../components/more-tools.js";
 import { menuButtonToTool, toolToMenuButton } from "./utils.js";
@@ -173,7 +174,8 @@ export function TableProperties(props: ToolProps) {
       splitCells(editor),
       cellProperties(editor),
       { type: "separator", key: "tableSeperator" },
-      deleteTable(editor)
+      deleteTable(editor),
+      exportToCSV(editor)
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
@@ -412,6 +414,11 @@ const cellProperties = (editor: Editor): MenuButtonItem => ({
   }
 });
 
+const exportToCSV = (editor: Editor): MenuButtonItem => ({
+  ...toolToMenuButton(getToolDefinition("exportToCSV")),
+  onClick: () => exportToCsvAction(editor)
+});
+
 export const InsertColumnLeft = menuButtonToTool(insertColumnLeft);
 export const InsertColumnRight = menuButtonToTool(insertColumnRight);
 export const MoveColumnLeft = menuButtonToTool(moveColumnLeft);
@@ -425,3 +432,4 @@ export const MoveRowUp = menuButtonToTool(moveRowUp);
 export const MoveRowDown = menuButtonToTool(moveRowDown);
 export const DeleteRow = menuButtonToTool(deleteRow);
 export const DeleteTable = menuButtonToTool(deleteTable);
+export const ExportToCSV = menuButtonToTool(exportToCSV);
