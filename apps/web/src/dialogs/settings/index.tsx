@@ -580,23 +580,12 @@ function SettingItem(props: { item: Setting }) {
                 );
               case "input":
                 return component.inputType === "number" ? (
-                  <Input
-                    type={"number"}
+                  <NumberInput
                     min={component.min}
                     max={component.max}
                     step={component.step}
                     defaultValue={component.defaultValue()}
-                    sx={{ width: 80, mr: 1 }}
-                    onChange={debounce((e) => {
-                      let value = e.target.valueAsNumber;
-                      value =
-                        Number.isNaN(value) || value < component.min
-                          ? component.min
-                          : value > component.max
-                          ? component.max
-                          : value;
-                      component.onChange(value);
-                    }, 500)}
+                    onChange={(value) => component.onChange(value)}
                   />
                 ) : (
                   <Input
@@ -663,5 +652,62 @@ export function SelectComponent(props: Omit<DropdownSettingComponent, "type">) {
         </option>
       ))}
     </select>
+  );
+}
+
+type NumberInputProps = {
+  min: number;
+  max: number;
+  step?: number;
+  defaultValue: number;
+  onChange: (value: number) => void;
+};
+
+function NumberInput({
+  min,
+  max,
+  step,
+  defaultValue,
+  onChange
+}: NumberInputProps) {
+  const [isInputValid, setIsInputValid] = useState(true);
+
+  return (
+    <Flex sx={{ flexDirection: "column", alignItems: "flex-end" }}>
+      <Input
+        type={"number"}
+        min={min}
+        max={max}
+        step={step}
+        defaultValue={defaultValue}
+        sx={{
+          width: 80,
+          mr: 1,
+          outline: isInputValid
+            ? undefined
+            : "2px solid var(--accent-error) !important"
+        }}
+        onChange={debounce((e) => {
+          let value = e.target.valueAsNumber;
+          const isValid = !Number.isNaN(value) && value >= min && value <= max;
+          setIsInputValid(isValid);
+          value =
+            Number.isNaN(value) || value < min
+              ? min
+              : value > max
+              ? max
+              : value;
+          onChange(value);
+        }, 500)}
+      />
+      {!isInputValid && (
+        <Text
+          variant="subBody"
+          sx={{ fontSize: 11, color: "error", mt: 1, mr: 1 }}
+        >
+          {strings.valueMustBeBetween(min, max)}
+        </Text>
+      )}
+    </Flex>
   );
 }
