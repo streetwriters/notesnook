@@ -30,12 +30,13 @@ export class FsCounter {
   }
 
   async increment(key: string, uid: string) {
-    await this.mutex.runExclusive(async () => {
+    return await this.mutex.runExclusive(async () => {
       const counts = await this.all();
       counts[key] = counts[key] || [];
-      if (counts[key].includes(uid)) return;
+      if (counts[key].includes(uid)) return counts[key].length;
       counts[key].push(uid);
       await this.save(counts);
+      return counts[key].length;
     });
   }
 
@@ -43,10 +44,13 @@ export class FsCounter {
     await writeFile(this.path, JSON.stringify(counts));
   }
 
-  counts(key: string): Promise<number> {
-    return this.all().then((counts) => {
-      return (counts[key] || []).length;
-    });
+  async counts(keys: string[]): Promise<Record<string, number>> {
+    const all = await this.all();
+    const result: Record<string, number> = {};
+    for (const key of keys) {
+      result[key] = (all[key] || []).length;
+    }
+    return result;
   }
 
   private async all(): Promise<Counts> {

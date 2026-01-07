@@ -16,10 +16,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { Orama, SearchParams, create, search } from "@orama/orama";
+import { Orama, SearchParams, create, search, update } from "@orama/orama";
 import { CompiledThemeDefinition, ThemeMetadata } from "./sync";
 import { ThemeQuerySchema } from "./schemas";
-import { InstallsCounter } from "./constants";
 
 export let ThemesDatabase: Orama | null = null;
 export async function initializeDatabase(): Promise<Orama> {
@@ -31,7 +30,8 @@ export async function initializeDatabase(): Promise<Orama> {
       colorScheme: "string",
       compatibilityVersion: "number",
       description: "string",
-      tags: "string[]"
+      tags: "string[]",
+      totalInstalls: "number"
     },
     id: "notesnook-themes"
   });
@@ -54,6 +54,14 @@ export async function findTheme(
   return results.hits[0].document as CompiledThemeDefinition;
 }
 
+export async function updateTotalInstalls(
+  theme: CompiledThemeDefinition,
+  totalInstalls: number
+) {
+  if (!ThemesDatabase) await initializeDatabase();
+  await update(ThemesDatabase!, theme.id, { ...theme, totalInstalls });
+}
+
 export async function getThemes(query: (typeof ThemeQuerySchema)["_type"]) {
   if (!ThemesDatabase) await initializeDatabase();
 
@@ -61,6 +69,10 @@ export async function getThemes(query: (typeof ThemeQuerySchema)["_type"]) {
   const count = query.limit;
 
   const searchParams: SearchParams = {
+    sortBy: {
+      property: "totalInstalls",
+      order: "DESC"
+    },
     where: {
       compatibilityVersion: {
         eq: query.compatibilityVersion
@@ -96,8 +108,7 @@ export async function getThemes(query: (typeof ThemeQuerySchema)["_type"]) {
     themes.push({
       ...theme,
       scopes: undefined,
-      codeBlockCSS: undefined,
-      totalInstalls: await InstallsCounter.counts(theme.id)
+      codeBlockCSS: undefined
     } as ThemeMetadata);
   }
 

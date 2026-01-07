@@ -2617,5 +2617,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   lineHeightDesc: () => t`Adjust the line height of the editor`,
   enterTitle: () => t`Enter title`,
   dayFormat: () => t`Day format`,
-  dayFormatDesc: () => t`Choose how day is displayed in the app`
+  dayFormatDesc: () => t`Choose how day is displayed in the app`,
+  trialOnGoing: (trialExpiryDate: string) =>
+    t`Your free trial is on-going. Your subscription will start on ${trialExpiryDate}`
 };

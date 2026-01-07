@@ -7444,6 +7444,10 @@ msgstr ""
 
 #: src/strings.ts:1403
 msgid "Your free trial is ending soon"
+msgstr "<<<<<<< HEAD"
+
+#: src/strings.ts:2622
+msgid "Your free trial is on-going. Your subscription will start on {trialExpiryDate}"
 msgstr ""
 
 #: src/strings.ts:1778

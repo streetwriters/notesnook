@@ -7501,6 +7501,10 @@ msgstr "Your free trial has started"
 msgid "Your free trial is ending soon"
 msgstr "Your free trial is ending soon"
 
+#: src/strings.ts:2622
+msgid "Your free trial is on-going. Your subscription will start on {trialExpiryDate}"
+msgstr "Your free trial is on-going. Your subscription will start on {trialExpiryDate}"
+
 #: src/strings.ts:1778
 msgid "Your full name"
 msgstr "Your full name"
