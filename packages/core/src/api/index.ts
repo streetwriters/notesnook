@@ -344,7 +344,7 @@ class Database {
     await this.monographsCollection.init();
 
     await this.trash.init();
-    await this.notes.clearExpiredNotes();
+    await this.notes.deleteExpiredNotes();
 
     // legacy collections
     await this.legacyTags.init();

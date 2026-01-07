@@ -341,6 +341,11 @@ export class Notes implements ICollection {
       deleteItems(this.cache.archived, ...ids);
     }
   }
+
+  async setExpiryDate(date: number | null, ...ids: string[]) {
+    await this.collection.update(ids, { expiryDate: date });
+  }
+
   readonly(state: boolean, ...ids: string[]) {
     return this.collection.update(ids, { readonly: state });
   }
@@ -528,7 +533,7 @@ export class Notes implements ICollection {
     ).internalLinks;
   }
 
-  async clearExpiredNotes() {
+  async deleteExpiredNotes() {
     const expiredItems = await this.db
       .sql()
       .selectNoFrom((eb) =>
