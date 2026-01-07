@@ -108,6 +108,8 @@ import { NotesnookModule } from "../utils/notesnook-module";
 import { sleep } from "../utils/time";
 import useFeatureManager from "./use-feature-manager";
 import { deleteDCacheFiles } from "../common/filesystem/io";
+import dayjs from "dayjs";
+import { useRelationStore } from "../stores/use-relation-store";
 
 const onCheckSyncStatus = async (type: SyncStatusEvent) => {
   const { disableSync, disableAutoSync } = SettingsService.get();
@@ -486,6 +488,22 @@ const IsDatabaseMigrationRequired = () => {
   return true;
 };
 
+let timer: NodeJS.Timeout | null = null;
+let initialDate = dayjs().date();
+async function expiringNotesTimer() {
+  if (timer != null) clearTimeout(timer);
+  initialDate = dayjs().date();
+  timer = setInterval(() => {
+    if (dayjs().date() != initialDate) {
+      DatabaseLogger.info("Deleting expired notes");
+      db.notes.deleteExpiredNotes();
+      Navigation.queueRoutesForUpdate();
+      useRelationStore.getState().update();
+      initialDate = dayjs().date();
+    }
+  }, 1000 * 60);
+}
+
 const initializeDatabase = async (password?: string) => {
   if (useUserStore.getState().appLocked) return;
   if (!db.isInitialized) {
@@ -509,6 +527,7 @@ const initializeDatabase = async (password?: string) => {
     Notifications.setupReminders(true);
     DatabaseLogger.info("Database initialized");
     Notifications.restorePinnedNotes();
+    expiringNotesTimer();
     deleteDCacheFiles();
   }
   Walkthrough.init();
@@ -787,6 +806,7 @@ export const useAppEvents = () => {
       if (state === "active") {
         notifee.setBadgeCount(0);
         updateStatusBarColor();
+        expiringNotesTimer();
         checkAutoBackup();
         Sync.run("global", false, "full");
         reconnectSSE();

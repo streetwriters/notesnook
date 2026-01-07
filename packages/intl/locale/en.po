@@ -5854,6 +5854,10 @@ msgstr "Set as light theme"
 msgid "Set automatic trash cleanup interval from Settings > Behaviour > Clean trash interval."
 msgstr "Set automatic trash cleanup interval from Settings > Behaviour > Clean trash interval."
 
+#: src/strings.ts:2630
+msgid "Set expiry"
+msgstr "Set expiry"
+
 #: src/strings.ts:1310
 msgid "Set full name"
 msgstr "Set full name"
@@ -6806,6 +6810,10 @@ msgstr "Unpublish notes to delete them"
 #: src/strings.ts:2086
 msgid "Unregister"
 msgstr "Unregister"
+
+#: src/strings.ts:2631
+msgid "Unset expirt"
+msgstr "Unset expirt"
 
 #: src/strings.ts:210
 #: src/strings.ts:2360

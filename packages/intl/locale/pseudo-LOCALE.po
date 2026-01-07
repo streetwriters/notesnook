@@ -5828,6 +5828,10 @@ msgstr ""
 msgid "Set automatic trash cleanup interval from Settings > Behaviour > Clean trash interval."
 msgstr ""
 
+#: src/strings.ts:2630
+msgid "Set expiry"
+msgstr ""
+
 #: src/strings.ts:1310
 msgid "Set full name"
 msgstr ""
@@ -6764,6 +6768,10 @@ msgstr ""
 
 #: src/strings.ts:2086
 msgid "Unregister"
+msgstr ""
+
+#: src/strings.ts:2631
+msgid "Unset expirt"
 msgstr ""
 
 #: src/strings.ts:210
