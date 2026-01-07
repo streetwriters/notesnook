@@ -28,7 +28,7 @@ type WorkersKVRESTConfig = {
 export class KVCounter {
   private readonly client: Cloudflare;
   private readonly mutex: Mutex;
-  private installs: Record<string, string[]> = {};
+  private installs: Record<string, string[] | null> = {};
   constructor(private readonly config: WorkersKVRESTConfig) {
     this.mutex = new Mutex();
     this.client = new Cloudflare({
@@ -50,7 +50,7 @@ export class KVCounter {
     const result: Record<string, number> = {};
     const installs = await readMulti(this.client, this.config, keys);
     for (const [key, value] of Object.entries(installs)) {
-      result[key] = value.length;
+      result[key] = value?.length ?? 0;
     }
     this.installs = installs;
     return result;
@@ -61,7 +61,7 @@ async function readMulti(
   client: Cloudflare,
   config: WorkersKVRESTConfig,
   keys: string[]
-): Promise<Record<string, string[]>> {
+): Promise<Record<string, string[] | null>> {
   try {
     const response = await client.kv.namespaces.bulkGet(config.namespaceId, {
       account_id: config.cfAccountId,
