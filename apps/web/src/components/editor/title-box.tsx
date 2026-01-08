@@ -43,6 +43,10 @@ function TitleBox(props: TitleBoxProps) {
     const session = store.getSession(id, ["default"]);
     return session?.note.isGeneratedTitle ? session.note.title : null;
   });
+  const sessionSpellcheck = useEditorStore((store) => {
+    const session = store.getSession(id);
+    return session && "note" in session && session?.note.spellcheck;
+  });
   const { editorConfig } = useEditorConfig();
   const dateFormat = useSettingsStore((store) => store.dateFormat);
   const timeFormat = useSettingsStore((store) => store.timeFormat);
@@ -102,9 +106,11 @@ function TitleBox(props: TitleBoxProps) {
       variant="clean"
       id="editor-title"
       data-test-id="editor-title"
+      data-session-id={id}
       className="editorTitle"
       placeholder={strings.noteTitle()}
       readOnly={readonly}
+      spellCheck={sessionSpellcheck}
       dir="auto"
       wrap="soft"
       rows={1}

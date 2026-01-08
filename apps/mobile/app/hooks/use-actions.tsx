@@ -118,7 +118,8 @@ export type ActionId =
   | "trash"
   | "default-homepage"
   | "default-tag"
-  | "launcher-shortcut";
+  | "launcher-shortcut"
+  | "spell-check";
 
 export type Action = {
   id: ActionId;
@@ -980,6 +981,28 @@ export const useActions = ({
         checked: item.favorite,
         pro: true,
         activeColor: "orange"
+      },
+      {
+        id: "spell-check",
+        title: strings.spellCheck(),
+        icon: "spellcheck",
+        isToggle: true,
+        checked: item.spellcheck,
+        onPress: async () => {
+          db.notes.spellcheck(!item.spellcheck, item.id);
+          const note = await db.notes.note(item.id);
+          if (note) {
+            setItem(note);
+            const tabs = useTabStore.getState().getTabsForNote(note.id);
+            tabs.forEach((tab) => {
+              useTabStore.getState().updateTab(tab.id, {
+                session: {
+                  spellCheckDisabled: !note.spellcheck
+                }
+              });
+            });
+          }
+        }
       },
       {
         id: "remove-from-notebook",

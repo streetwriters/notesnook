@@ -85,6 +85,7 @@ import {
   Readonly,
   Reminder,
   RemoveShortcutLink,
+  SpellCheck,
   Star,
   StarOutline,
   Sync,

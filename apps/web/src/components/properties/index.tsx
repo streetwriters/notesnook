@@ -32,7 +32,8 @@ import {
   LinkedTo,
   ReferencedIn as ReferencedInIcon,
   Note as NoteIcon,
-  Archive
+  Archive,
+  SpellCheck
 } from "../icons";
 import { Box, Button, Flex, Text, FlexProps } from "@theme-ui/components";
 import {
@@ -69,6 +70,7 @@ import { VirtualizedTable } from "../virtualized-table";
 import { TextSlice } from "@notesnook/core";
 import { TITLE_BAR_HEIGHT } from "../title-bar";
 import { strings } from "@notesnook/intl";
+import { useSpellChecker } from "../../hooks/use-spell-checker";
 
 const tools = [
   { key: "pin", property: "pinned", icon: Pin, label: strings.pin() },
@@ -96,6 +98,13 @@ const tools = [
     icon: SyncOff,
     label: strings.disableSync(),
     property: "localOnly"
+  },
+  {
+    key: "spellcheck",
+    icon: SpellCheck,
+    label: strings.spellCheck(),
+    property: "spellcheck",
+    isHidden: () => IS_DESKTOP_APP && !useSpellChecker.getState().enabled
   }
 ] as const;
 
@@ -123,6 +132,7 @@ type EditorPropertiesProps = {
 };
 function EditorProperties(props: EditorPropertiesProps) {
   const toggleProperties = useEditorStore((store) => store.toggleProperties);
+  useSpellChecker((store) => store.enabled);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const session = useEditorStore((store) =>
     store.getSession(props.sessionId, [
@@ -178,19 +188,21 @@ function EditorProperties(props: EditorPropertiesProps) {
                 {session.type === "deleted" ||
                 session.type === "diff" ? null : (
                   <>
-                    {tools.map((tool) => (
-                      <Toggle
-                        {...tool}
-                        key={tool.key}
-                        isOn={
-                          tool.property === "locked"
-                            ? "locked" in session && !!session.locked
-                            : !!session.note[tool.property]
-                        }
-                        onToggle={() => changeToggleState(tool.key, session)}
-                        testId={`properties-${tool.key}`}
-                      />
-                    ))}
+                    {tools.map((tool) =>
+                      "isHidden" in tool && tool.isHidden() ? null : (
+                        <Toggle
+                          {...tool}
+                          key={tool.key}
+                          isOn={
+                            tool.property === "locked"
+                              ? "locked" in session && !!session.locked
+                              : !!session.note[tool.property]
+                          }
+                          onToggle={() => changeToggleState(tool.key, session)}
+                          testId={`properties-${tool.key}`}
+                        />
+                      )
+                    )}
                   </>
                 )}
 
@@ -847,7 +859,14 @@ export function Section({
 }
 
 function changeToggleState(
-  prop: "lock" | "readonly" | "local-only" | "pin" | "favorite" | "archive",
+  prop:
+    | "lock"
+    | "readonly"
+    | "local-only"
+    | "pin"
+    | "favorite"
+    | "archive"
+    | "spellcheck",
   session: ReadonlyEditorSession | DefaultEditorSession
 ) {
   const {
@@ -856,7 +875,8 @@ function changeToggleState(
     localOnly,
     pinned,
     favorite,
-    archived
+    archived,
+    spellcheck
   } = session.note;
   if (!sessionId) return;
   switch (prop) {
@@ -874,6 +894,8 @@ function changeToggleState(
       return noteStore.favorite(!favorite, sessionId);
     case "archive":
       return noteStore.archive(!archived, sessionId);
+    case "spellcheck":
+      return noteStore.spellcheck(!spellcheck, sessionId);
     default:
       return;
   }

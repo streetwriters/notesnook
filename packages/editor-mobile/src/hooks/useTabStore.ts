@@ -35,6 +35,7 @@ export type TabItem = {
     noteLocked?: boolean;
     scrollTop?: number;
     selection?: { to: number; from: number };
+    spellCheckDisabled: boolean;
   };
   pinned?: boolean;
   needsRefresh?: boolean;
@@ -59,7 +60,8 @@ export const useTabStore = create(
         {
           id: "679da59a3924d4bd56d16d3f",
           session: {
-            id: "679da5a5667a16db2353a062"
+            id: "679da5a5667a16db2353a062",
+            spellCheckDisabled: false
           }
         }
       ],

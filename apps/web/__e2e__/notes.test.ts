@@ -447,3 +447,17 @@ test("archived note shouldn't appear in search results", async ({ page }) => {
   const searchedNote = await notes.findNote(NOTE);
   expect(searchedNote).toBeUndefined();
 });
+
+test("spellcheck should be enabled by default for new notes", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+
+  const note = await notes.createNote(NOTE);
+
+  expect(note).toBeDefined();
+  expect(await note?.contextMenu.isSpellcheckEnabled()).toBe(true);
+  expect(await note?.properties.isSpellcheckEnabled()).toBe(true);
+});
