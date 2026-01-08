@@ -20,7 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { EV, EVENTS } from "../src/common.ts";
 import { test, expect, vitest } from "vitest";
 import { login } from "./utils.js";
-import { databaseTest } from "../__tests__/utils/index.ts";
+import { databaseTest, delay } from "../__tests__/utils/index.ts";
+import dayjs from "dayjs";
 
 const TEST_TIMEOUT = 60 * 1000;
 
@@ -467,6 +468,59 @@ test(
     expect(
       noteIds.every((id) => purpleNotes.findIndex((p) => p.id === id) > -1)
     ).toBe(true);
+  },
+  TEST_TIMEOUT
+);
+
+test.only(
+  "test expiring notes auto delete from device B (offline) while device A changes expiryDate val",
+  async (t) => {
+    const [deviceA, deviceB] = await Promise.all([
+      initializeDevice("deviceA"),
+      initializeDevice("deviceB")
+    ]);
+
+    t.onTestFinished(async () => {
+      console.log(`${t.task.name} log out`);
+      await cleanup(deviceA, deviceB);
+    });
+
+    const noteId = await deviceA.notes.add({
+      content: {
+        type: "tiptap",
+        data: `<p>Test</p>`
+      }
+    });
+    await deviceA.notes.setExpiryDate(
+      dayjs().add(3, "second").toDate().getTime(),
+      noteId
+    );
+
+    await deviceA.sync({ type: "full" });
+    await delay(1000);
+    await deviceB.sync({ type: "full" });
+
+    expect(await deviceA.notes.note(noteId)).toBeTruthy();
+    expect(await deviceB.notes.note(noteId)).toBeTruthy();
+
+    await delay(3000);
+
+    await deviceB.notes.deleteExpiredNotes();
+
+    await delay(1000);
+
+    await deviceA.notes.setExpiryDate(null, noteId);
+
+    expect(await deviceA.notes.note(noteId)).toBeTruthy();
+    expect(await deviceB.notes.note(noteId)).toBeFalsy();
+
+    await deviceA.sync({ type: "full" });
+    await delay(1000);
+    await deviceB.sync({ type: "full" });
+    await delay(1000);
+
+    expect(await deviceA.notes.note(noteId)).toBeTruthy();
+    expect(await deviceB.notes.note(noteId)).toBeTruthy();
   },
   TEST_TIMEOUT
 );

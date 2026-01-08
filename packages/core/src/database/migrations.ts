@@ -409,7 +409,7 @@ export class NNMigrationProvider implements MigrationProvider {
         async up(db) {
           await db.schema
             .alterTable("notes")
-            .addColumn("expiryDate", "integer")
+            .addColumn("expiryDate", "text")
             .execute();
         }
       }
