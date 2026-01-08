@@ -41,6 +41,7 @@ import { SQLCollection } from "../database/sql-collection.js";
 import { isFalse } from "../database/index.js";
 import { logger } from "../logger.js";
 import { addItems, deleteItems } from "../utils/array.js";
+import { sql } from "@streetwriters/kysely";
 
 export type ExportOptions = {
   format: "html" | "md" | "txt" | "md-frontmatter";
@@ -343,7 +344,12 @@ export class Notes implements ICollection {
   }
 
   async setExpiryDate(date: number | null, ...ids: string[]) {
-    await this.collection.update(ids, { expiryDate: date });
+    await this.collection.update(ids, {
+      expiryDate: {
+        dateModified: Date.now(),
+        value: date
+      }
+    });
   }
 
   readonly(state: boolean, ...ids: string[]) {
@@ -540,7 +546,11 @@ export class Notes implements ICollection {
         eb
           .selectFrom("notes")
           .where("type", "!=", "trash")
-          .where("expiryDate", "<", Date.now())
+          .where(
+            sql.raw("json_extract(expiryDate, '$.value')"),
+            "<",
+            Date.now()
+          )
           .select("id")
           .as("noteId")
       )
@@ -550,7 +560,7 @@ export class Notes implements ICollection {
       const toDelete = expiredItems
         .map((item) => item.noteId)
         .filter((item) => item != null);
-      this._delete(true, ...toDelete);
+      await this.db.trash.add("note", toDelete, "expired");
     }
   }
 }
