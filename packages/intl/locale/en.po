@@ -1502,6 +1502,10 @@ msgstr "Choose how time is displayed in the app"
 msgid "Choose how you want to secure your notes locally."
 msgstr "Choose how you want to secure your notes locally."
 
+#: src/strings.ts:2625
+msgid "Choose what day to display as the first day of the week"
+msgstr "Choose what day to display as the first day of the week"
+
 #: src/strings.ts:1228
 msgid "Choose where to save your backups"
 msgstr "Choose where to save your backups"
@@ -7139,6 +7143,10 @@ msgstr "Wednesday"
 #: src/strings.ts:664
 msgid "Week"
 msgstr "Week"
+
+#: src/strings.ts:2623
+msgid "Week format"
+msgstr "Week format"
 
 #: src/strings.ts:168
 #: src/strings.ts:1569

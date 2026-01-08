@@ -23,7 +23,7 @@ import { desktop } from "../common/desktop-bridge";
 import createStore from "../common/store";
 import Config from "../utils/config";
 import BaseStore from "./index";
-import { TimeFormat, DayFormat } from "@notesnook/core";
+import { TimeFormat, DayFormat, WeekFormat } from "@notesnook/core";
 import { Profile, TrashCleanupInterval } from "@notesnook/core";
 import { showToast } from "../utils/toast";
 import { ConfirmDialog } from "../dialogs/confirm";
@@ -69,6 +69,7 @@ class SettingStore extends BaseStore<SettingStore> {
   dateFormat = "DD-MM-YYYY";
   timeFormat: TimeFormat = "12-hour";
   dayFormat: DayFormat = "short";
+  weekFormat: WeekFormat = "Sun";
   titleFormat = "Note $date$ $time$";
   profile?: Profile;
 
@@ -96,6 +97,7 @@ class SettingStore extends BaseStore<SettingStore> {
     this.set({
       dateFormat: db.settings.getDateFormat(),
       timeFormat: db.settings.getTimeFormat(),
+      weekFormat: db.settings.getWeekFormat(),
       dayFormat: db.settings.getDayFormat(),
       titleFormat: db.settings.getTitleFormat(),
       trashCleanupInterval: db.settings.getTrashCleanupInterval(),
@@ -126,6 +128,11 @@ class SettingStore extends BaseStore<SettingStore> {
   setDayFormat = async (dayFormat: DayFormat) => {
     await db.settings.setDayFormat(dayFormat);
     this.set({ dayFormat });
+  };
+
+  setWeekFormat = async (weekFormat: WeekFormat) => {
+    await db.settings.setWeekFormat(weekFormat);
+    this.set({ weekFormat });
   };
 
   setTitleFormat = async (titleFormat: string) => {
