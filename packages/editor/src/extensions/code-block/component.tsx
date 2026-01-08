@@ -31,6 +31,7 @@ import Languages from "./languages.json";
 import { useThemeEngineStore } from "@notesnook/theme";
 import { strings } from "@notesnook/intl";
 import SimpleBar from "simplebar-react";
+import { config } from "../../utils/config.js";
 
 export function CodeblockComponent(
   props: ReactNodeViewProps<CodeBlockAttributes>
@@ -224,6 +225,10 @@ export function CodeblockComponent(
         <LanguageSelector
           selectedLanguage={languageDefinition?.filename || "Plaintext"}
           onLanguageSelected={(language) => {
+            config.set(
+              "codeBlockLanguage",
+              Languages.find((l) => l.filename === language)
+            );
             updateAttributes(
               { language },
               { addToHistory: true, preventUpdate: false }
@@ -305,7 +310,6 @@ function LanguageSelector(props: LanguageSelectorProps) {
               variant={"menuitem"}
               sx={{
                 textAlign: "left",
-                py: 1,
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center"
