@@ -273,6 +273,9 @@ const DataMappers: Partial<Record<ItemType, (row: any) => void>> = {
   },
   monograph: (row) => {
     if (row.password) row.password = JSON.parse(row.password);
+  },
+  trash: (row) => {
+    if (row.expiryDate) row.expiryDate = JSON.parse(row.expiryDate);
   }
 };
 
