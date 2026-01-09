@@ -489,10 +489,16 @@ const IsDatabaseMigrationRequired = () => {
 };
 
 let timer: NodeJS.Timeout | null = null;
-let initialDate = dayjs().date();
+let initialDate = -1;
 async function expiringNotesTimer() {
-  if (timer != null) clearTimeout(timer);
-  initialDate = dayjs().date();
+  if (timer != null) clearInterval(timer);
+
+  if (initialDate === -1) {
+    DatabaseLogger.info("Deleting expired notes at startup");
+    db.notes.deleteExpiredNotes();
+    initialDate = dayjs().date();
+  }
+
   timer = setInterval(() => {
     if (dayjs().date() != initialDate) {
       DatabaseLogger.info("Deleting expired notes");
