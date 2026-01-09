@@ -41,6 +41,7 @@ import { SQLCollection } from "../database/sql-collection.js";
 import { isFalse } from "../database/index.js";
 import { logger } from "../logger.js";
 import { addItems, deleteItems } from "../utils/array.js";
+import { sql } from "@streetwriters/kysely";
 
 export type ExportOptions = {
   format: "html" | "md" | "txt" | "md-frontmatter";
@@ -340,6 +341,16 @@ export class Notes implements ICollection {
       deleteItems(this.cache.archived, ...ids);
     }
   }
+
+  async setExpiryDate(date: number | null, ...ids: string[]) {
+    await this.collection.update(ids, {
+      expiryDate: {
+        dateModified: Date.now(),
+        value: date
+      }
+    });
+  }
+
   readonly(state: boolean, ...ids: string[]) {
     return this.collection.update(ids, { readonly: state });
   }
@@ -525,5 +536,30 @@ export class Notes implements ICollection {
     return (await getContentFromData(content.type, content.data)).extract(
       "internalLinks"
     ).internalLinks;
+  }
+
+  async deleteExpiredNotes() {
+    const expiredItems = await this.db
+      .sql()
+      .selectNoFrom((eb) =>
+        eb
+          .selectFrom("notes")
+          .where("type", "!=", "trash")
+          .where(
+            sql.raw("json_extract(expiryDate, '$.value')"),
+            "<",
+            Date.now()
+          )
+          .select("id")
+          .as("noteId")
+      )
+      .execute();
+
+    if (expiredItems.length) {
+      const toDelete = expiredItems
+        .map((item) => item.noteId)
+        .filter((item) => item != null);
+      await this.db.trash.add("note", toDelete, "expired");
+    }
   }
 }

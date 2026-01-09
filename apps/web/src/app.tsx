@@ -48,7 +48,6 @@ import { getFontSizes } from "@notesnook/theme/theme/font/fontsize.js";
 import { useWindowControls } from "./hooks/use-window-controls";
 import { STATUS_BAR_HEIGHT } from "./common/constants";
 import { NavigationEvents } from "./navigation";
-import { db } from "./common/db";
 
 new WebExtensionRelay();
 
@@ -143,10 +142,6 @@ function DesktopAppContents() {
   const isListPaneVisible = useStore((store) => store.isListPaneVisible);
   const isTablet = useTablet();
   const navPane = useRef<SplitPaneImperativeHandle>(null);
-
-  useEffect(() => {
-    (async () => {})();
-  }, []);
 
   useEffect(() => {
     if (isTablet) navPane.current?.collapse(0);

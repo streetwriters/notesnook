@@ -35,6 +35,7 @@ import { desktop } from "./common/desktop-bridge";
 import { FeatureDialog } from "./dialogs/feature-dialog";
 import { AnnouncementDialog } from "./dialogs/announcement-dialog";
 import { logger } from "./utils/logger";
+import { TaskScheduler } from "./utils/task-scheduler";
 
 export default function AppEffects() {
   const refreshNavItems = useStore((store) => store.refreshNavItems);
@@ -68,6 +69,8 @@ export default function AppEffects() {
         if (useSettingStore.getState().isFullOfflineMode)
           // NOTE: we deliberately don't await here because we don't want to pause execution.
           db.attachments.cacheAttachments().catch(logger.error);
+
+        await scheduleExpiredNotesDeletion();
       })();
     },
     [
@@ -234,4 +237,11 @@ function getProcessingStatusFromType(type: ProcessingType) {
     default:
       return [];
   }
+}
+
+async function scheduleExpiredNotesDeletion() {
+  await TaskScheduler.stop("delete-expired-notes");
+  TaskScheduler.register("delete-expired-notes", "0 0 * * *", async () => {
+    await db.notes.deleteExpiredNotes();
+  });
 }

@@ -209,6 +209,10 @@ export interface Note extends BaseItem<"note"> {
 
   isGeneratedTitle?: boolean;
   archived?: boolean;
+  expiryDate: {
+    dateModified: number;
+    value: number | null;
+  };
 }
 
 export interface Notebook extends BaseItem<"notebook"> {
@@ -541,7 +545,7 @@ export type BaseTrashItem<TItem extends BaseItem<"note" | "notebook">> =
     /**
      * deletedBy tells who deleted this specific item.
      */
-    deletedBy: "user" | "app";
+    deletedBy: "user" | "app" | "expired";
     /**
      * @deprecated
      */

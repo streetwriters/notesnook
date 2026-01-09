@@ -245,7 +245,7 @@ test("deleting a notebook should not re-delete already deleted subnotebooks", ()
     await db.notebooks.moveToTrash(child3);
     await db.notebooks.moveToTrash(parent);
 
-    const trash = await db.trash.all("user");
+    const trash = await db.trash.all(["user", "expired"]);
     expect(trash.some((a) => a.id === child3)).toBe(true);
     expect(trash.some((a) => a.id === parent)).toBe(true);
     expect(trash.some((a) => a.id === child2)).toBe(false);
@@ -356,7 +356,7 @@ test("permanently deleting a notebook should not delete independently deleted su
 
     await db.trash.delete(parent);
 
-    const trash = await db.trash.all("user");
+    const trash = await db.trash.all(["user", "expired"]);
     expect(trash.some((a) => a.id === child3)).toBe(true);
     expect(trash.some((a) => a.id === parent)).toBe(false);
     expect(trash.some((a) => a.id === child2)).toBe(false);

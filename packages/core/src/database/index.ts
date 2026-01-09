@@ -242,6 +242,7 @@ const BooleanProperties: Set<BooleanFields> = new Set([
 const DataMappers: Partial<Record<ItemType, (row: any) => void>> = {
   note: (row) => {
     row.conflicted = row.conflicted === 1;
+    if (row.expiryDate) row.expiryDate = JSON.parse(row.expiryDate);
   },
   reminder: (row) => {
     if (row.selectedDays) row.selectedDays = JSON.parse(row.selectedDays);
@@ -272,6 +273,9 @@ const DataMappers: Partial<Record<ItemType, (row: any) => void>> = {
   },
   monograph: (row) => {
     if (row.password) row.password = JSON.parse(row.password);
+  },
+  trash: (row) => {
+    if (row.expiryDate) row.expiryDate = JSON.parse(row.expiryDate);
   }
 };
 
