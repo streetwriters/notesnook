@@ -24,9 +24,9 @@ import { initialWindowMetrics } from "react-native-safe-area-context";
 import { FileType } from "react-native-scoped-storage";
 import { create } from "zustand";
 import { ThemeDark, ThemeLight, ThemeDefinition } from "@notesnook/theme";
-import { EDITOR_LINE_HEIGHT } from "../utils/constants";
-import { DayFormat, Reminder } from "@notesnook/core";
+import { DayFormat, WeekFormat, Reminder } from "@notesnook/core";
 import { db } from "../common/database";
+import { EDITOR_LINE_HEIGHT } from "../utils/constants";
 export const HostIds = [
   "API_HOST",
   "AUTH_HOST",
@@ -138,6 +138,7 @@ export interface SettingStore {
   timeFormat: string;
   dateFormat: string;
   dayFormat: DayFormat;
+  weekFormat: WeekFormat;
   dbPassword?: string;
   isOldAppLock: () => boolean;
   initialUrl: string | null;
@@ -229,6 +230,7 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
   timeFormat: "12-hour",
   dateFormat: "DD-MM-YYYY",
   dayFormat: "short",
+  weekFormat: "Sun",
   setAppDidEnterBackgroundForAction: (value: boolean) => {
     set({
       appDidEnterBackgroundForAction: value
@@ -250,7 +252,8 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
     set({
       dayFormat: db.settings.getDayFormat(),
       timeFormat: db.settings.getTimeFormat(),
-      dateFormat: db.settings?.getTimeFormat()
+      dateFormat: db.settings?.getTimeFormat(),
+      weekFormat: db.settings.getWeekFormat()
     });
   }
 }));

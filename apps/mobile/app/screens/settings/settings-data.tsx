@@ -725,6 +725,14 @@ export const settingsGroups: SettingSection[] = [
             icon: "calendar-today"
           },
           {
+            id: "week-format",
+            name: strings.weekFormat(),
+            description: strings.weekFormatDesc(),
+            type: "component",
+            component: "week-format-selector",
+            icon: "calendar"
+          },
+          {
             id: "time-format",
             name: strings.timeFormat(),
             description: strings.timeFormatDesc(),
@@ -819,6 +827,7 @@ export const settingsGroups: SettingSection[] = [
             name: strings.defaultFontFamily(),
             description: strings.defaultFontFamilyDesc(),
             type: "component",
+            icon: "format-font",
             property: "defaultFontFamily",
             component: "font-selector"
           },
