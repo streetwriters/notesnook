@@ -55,18 +55,16 @@ class Merger {
       localItem.itemType === "note" &&
       localItem.deletedBy === "expired"
     ) {
-      const remoteNote = remoteItem;
-      const localNote = localItem;
       if (
-        remoteNote.expiryDate.dateModified > localNote.expiryDate.dateModified
+        remoteItem.expiryDate.dateModified > localItem.expiryDate.dateModified
       ) {
-        localNote.expiryDate = remoteNote.expiryDate;
-        (localNote as unknown as Note).type = "note";
-        (localNote as unknown as Note).deletedBy = null;
-        (localNote as unknown as Note).dateDeleted = null;
-        (localNote as unknown as Note).itemType = null;
+        localItem.expiryDate = remoteItem.expiryDate;
+        (localItem as unknown as Note).type = "note";
+        (localItem as unknown as Note).deletedBy = null;
+        (localItem as unknown as Note).dateDeleted = null;
+        (localItem as unknown as Note).itemType = null;
 
-        return localNote;
+        return localItem;
       }
     }
   }

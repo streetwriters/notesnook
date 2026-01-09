@@ -901,13 +901,13 @@ test.only(
     expect(await deviceA.notes.note(noteId)).toBeTruthy();
     expect(await deviceB.notes.note(noteId)).toBeTruthy();
 
+    await deviceA.notes.setExpiryDate(null, noteId);
+
     await delay(3000);
 
     await deviceB.notes.deleteExpiredNotes();
 
     await delay(1000);
-
-    await deviceA.notes.setExpiryDate(null, noteId);
 
     expect(await deviceA.notes.note(noteId)).toBeTruthy();
     expect(await deviceB.notes.note(noteId)).toBeFalsy();
