@@ -37,21 +37,43 @@ import Paragraph from "../ui/typography/paragraph";
 import { diff } from "diffblazer";
 import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../utils/styles";
+import {
+  HistorySession,
+  isEncryptedContent,
+  Note,
+  NoteContent,
+  SessionContentItem,
+  TrashOrItem
+} from "@notesnook/core";
 
 /**
  *
  * @param {any} param0
  * @returns
  */
-export default function NotePreview({ session, content, note }) {
+export default function NotePreview({
+  session,
+  content,
+  note
+}: {
+  session: HistorySession & { session: string };
+  content:
+    | Partial<
+        NoteContent<boolean> & {
+          title: string;
+        }
+      >
+    | undefined;
+  note: TrashOrItem<Note>;
+}) {
   const { colors } = useThemeColors();
   const [locked, setLocked] = useState(false);
 
   async function restore() {
     if (note && note.type === "trash") {
-      if ((await db.trash.restore(note.id)) === false) return;
+      await db.trash.restore(note.id);
       Navigation.queueRoutesForUpdate();
-      useSelectionStore.getState().setSelectionMode(false);
+      useSelectionStore.getState().setSelectionMode();
       ToastManager.show({
         heading: strings.noteRestored(),
         type: "success"
@@ -91,15 +113,17 @@ export default function NotePreview({ session, content, note }) {
       negativeText: strings.cancel(),
       context: "local",
       positivePress: async () => {
-        await db.trash.delete(note.id);
-        useTrashStore.getState().refresh();
-        useSelectionStore.getState().setSelectionMode(false);
-        ToastManager.show({
-          heading: strings.noteDeleted(),
-          type: "success",
-          context: "local"
-        });
-        eSendEvent(eCloseSheet);
+        if (note) {
+          await db.trash.delete(note.id);
+          useTrashStore.getState().refresh();
+          useSelectionStore.getState().setSelectionMode();
+          ToastManager.show({
+            heading: strings.noteDeleted(),
+            type: "success",
+            context: "local"
+          });
+          eSendEvent(eCloseSheet);
+        }
       },
       positiveType: "error"
     });
@@ -113,8 +137,11 @@ export default function NotePreview({ session, content, note }) {
       }}
     >
       <Dialog context="local" />
-      <DialogHeader padding={12} title={note?.title || session?.session} />
-      {!session?.locked && !locked ? (
+      <DialogHeader
+        padding={12}
+        title={content?.title || note.title || session?.session}
+      />
+      {!session?.locked && !locked && content?.data ? (
         <View
           style={{
             flex: 1,
@@ -125,17 +152,27 @@ export default function NotePreview({ session, content, note }) {
             editorId="historyPreview"
             onLoad={async (loadContent) => {
               try {
-                if (content.data) {
-                  const _note = note || (await db.notes.note(session?.noteId));
-                  const currentContent = await db.content.get(_note.contentId);
-                  loadContent({
-                    data: diff(currentContent.data, content.data),
-                    id: _note.id
-                  });
+                if (content?.data) {
+                  const currentContent = note?.contentId
+                    ? await db.content.get(note.contentId)
+                    : undefined;
+
+                  if (
+                    currentContent?.data &&
+                    !isEncryptedContent(currentContent)
+                  ) {
+                    loadContent({
+                      data: diff(
+                        currentContent?.data || "<p></p>",
+                        content.data as string
+                      ),
+                      id: session?.noteId
+                    });
+                  }
                 }
               } catch (e) {
                 ToastManager.error(
-                  e,
+                  e as Error,
                   "Failed to load history preview",
                   "local"
                 );
@@ -153,7 +190,9 @@ export default function NotePreview({ session, content, note }) {
           }}
         >
           <Paragraph color={colors.secondary.paragraph}>
-            {strings.encryptedNoteHistoryNotice()}
+            {!content?.data
+              ? strings.noContent()
+              : strings.encryptedNoteHistoryNotice()}
           </Paragraph>
         </View>
       )}
