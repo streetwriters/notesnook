@@ -199,3 +199,43 @@ test("locking an old note should clear its history", () =>
       expect(await db.noteHistory.get(id).count()).toBe(0);
     }
   ));
+
+test("note history item can be created by setting note title", () =>
+  noteTest({ title: "Test note", sessionId: "notesession" }).then(
+    async ({ db, id }) => {
+      expect(await db.noteHistory.get(id).count()).toBe(1);
+      const history = await db.noteHistory.get(id);
+      const items = await history.items();
+      const content = await db.noteHistory.sessionContent.get(
+        items[0].sessionContentId
+      );
+      expect(content.title).toBe("Test note");
+    }
+  ));
+
+test("note history item can be created by setting note title and content both", () =>
+  noteTest({ title: "Test note", ...TEST_NOTE, sessionId: "notesession" }).then(
+    async ({ db, id }) => {
+      expect(await db.noteHistory.get(id).count()).toBe(1);
+      const history = db.noteHistory.get(id);
+      const items = await history.items();
+      const content = await db.noteHistory.sessionContent.get(
+        items[0].sessionContentId
+      );
+      expect(await db.noteHistory.sessionContent.collection.count()).toBe(1);
+      expect(content.data).toBe(TEST_NOTE.content.data);
+      expect(content.title).toBe("Test note");
+      await db.notes.add({
+        id: id,
+        content: TEST_NOTE.content
+      });
+      expect(content.data).toBe(TEST_NOTE.content.data);
+      expect(content.title).toBe("Test note");
+      await db.notes.add({
+        id: id,
+        title: "Test note"
+      });
+      expect(content.data).toBe(TEST_NOTE.content.data);
+      expect(content.title).toBe("Test note");
+    }
+  ));
