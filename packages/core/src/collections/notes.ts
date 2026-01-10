@@ -205,6 +205,13 @@ export class Notes implements ICollection {
         });
         this.totalNotes++;
       }
+
+      if (item.sessionId) {
+        await this.db.noteHistory.add(item.sessionId, {
+          title: item.title,
+          noteId: id
+        });
+      }
     });
     return id;
   }

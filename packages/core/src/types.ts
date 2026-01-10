@@ -433,6 +433,7 @@ export interface SessionContentItem extends BaseItem<"sessioncontent"> {
   compressed: boolean;
   localOnly: boolean;
   locked: boolean;
+  title: string;
 }
 
 export type TrashCleanupInterval = 1 | 7 | 30 | 365 | -1;

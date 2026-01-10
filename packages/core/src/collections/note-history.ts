@@ -74,13 +74,19 @@ export class NoteHistory implements ICollection {
 
   async add(
     sessionId: string,
-    content: NoteContent<boolean> & { noteId: string; locked: boolean }
+    content: Partial<NoteContent<boolean>> & {
+      noteId: string;
+      locked?: boolean;
+      title?: string;
+    }
   ) {
     const { noteId, locked } = content;
     sessionId = `${noteId}_${sessionId}`;
 
     if (await this.collection.exists(sessionId)) {
-      await this.collection.update([sessionId], { locked });
+      await this.collection.update([sessionId], {
+        locked
+      });
     } else {
       await this.collection.upsert({
         type: "session",
@@ -93,7 +99,9 @@ export class NoteHistory implements ICollection {
         locked
       });
     }
+
     await this.sessionContent.add(sessionId, content, locked);
+
     await this.cleanup(noteId);
 
     return sessionId;
@@ -189,7 +197,7 @@ export class NoteHistory implements ICollection {
         data: content.data,
         type: content.type
       });
-    } else if (content.data && !isCipher(content.data)) {
+    } else if (content.data && content.type && !isCipher(content.data)) {
       await this.db.notes.add({
         id: session.noteId,
         sessionId: `${Date.now()}`,
