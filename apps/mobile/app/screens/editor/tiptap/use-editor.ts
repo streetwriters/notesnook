@@ -298,7 +298,8 @@ export const useEditor = (
           return;
         }
 
-        if (isContentInvalid(data) && id) {
+        if (!title && isContentInvalid(data) && id) {
+          console.log("new editor session", title, isContentInvalid(data), id);
           // Create a new history session if recieved empty or invalid content
           // To ensure that history is preserved for correct content.
           currentSessionHistoryId = editorSessionHistory.newSession(id);
@@ -311,6 +312,8 @@ export const useEditor = (
           id,
           sessionId: `${currentSessionHistoryId}`
         };
+
+        console.log(noteData.sessionId);
 
         noteData.title = title;
 
