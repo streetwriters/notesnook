@@ -44,7 +44,7 @@ export class SessionContent implements ICollection {
 
   async add<TLocked extends boolean>(
     sessionId: string,
-    content: Partial<NoteContent<TLocked>> & { title?: string },
+    content: Partial<NoteContent<TLocked>> & { title?: string; noteId: string },
     locked?: TLocked
   ) {
     if (!sessionId || !content) return;
@@ -52,8 +52,10 @@ export class SessionContent implements ICollection {
     //   locked || isCipher(content.data)
     //     ? content.data
     //     :  await this.db.compressor().compress(content.data);
-
     const sessionContentItemId = makeSessionContentId(sessionId);
+    const sessionContentExists = await this.collection.exists(
+      sessionContentItemId
+    );
     const sessionItem: Partial<SessionContentItem> = {
       type: "sessioncontent",
       id: sessionContentItemId,
@@ -67,13 +69,29 @@ export class SessionContent implements ICollection {
     if (content.data && content.type) {
       sessionItem.data = content.data;
       sessionItem.contentType = content.type;
+
+      if (typeof content.title !== "string" && !sessionContentExists) {
+        const note = await this.db.notes.note(content.noteId);
+        sessionItem.title = note?.title;
+      }
     }
 
     if (content.title) {
       sessionItem.title = content.title;
+
+      if (!content.data && !content.type && !sessionContentExists) {
+        const note = await this.db.notes.note(content.noteId);
+        if (note?.contentId) {
+          const noteContent = await this.db.content.get(note?.contentId);
+          if (noteContent) {
+            sessionItem.data = noteContent?.data;
+            sessionItem.contentType = noteContent?.type;
+          }
+        }
+      }
     }
 
-    if (await this.collection.exists(sessionContentItemId)) {
+    if (sessionContentExists) {
       this.collection.update([sessionContentItemId], sessionItem);
     } else {
       await this.collection.upsert(sessionItem as SessionContentItem);
