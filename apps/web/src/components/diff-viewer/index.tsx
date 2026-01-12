@@ -105,11 +105,16 @@ function DiffViewer(props: DiffViewerProps) {
           whiteSpace: "nowrap",
           overflow: "hidden",
           textOverflow: "ellipsis",
-          textAlign: "center"
+          textAlign: "center",
+          paddingTop: 10
         }}
-      >
-        {session.note.title}
-      </Text>
+        dangerouslySetInnerHTML={{
+          __html:
+            session.type === "diff"
+              ? diff(session.oldContentTitle || "", session.note.title)
+              : session.note.title
+        }}
+      ></Text>
       <Flex mt={1} sx={{ alignSelf: "center", justifySelf: "center" }}>
         {session.type === "diff" ? (
           <>

@@ -145,6 +145,7 @@ export type DiffEditorSession = BaseEditorSession & {
   note: Note;
   content: ContentItem;
   historySessionId: string;
+  oldContentTitle?: string;
 };
 
 export type EditorSession =
@@ -658,9 +659,10 @@ class EditorStore extends BaseStore<EditorStore> {
       note,
       tabId,
       title: label,
+      oldContentTitle: oldContent.title,
       historySessionId: session.id,
       content: {
-        type: oldContent.type,
+        type: oldContent.type || "tiptap",
         dateCreated: session.dateCreated,
         dateEdited: session.dateModified,
         dateModified: session.dateModified,
@@ -670,7 +672,7 @@ class EditorStore extends BaseStore<EditorStore> {
         conflicted: currentContent,
         ...(isCipher(oldContent.data)
           ? { locked: true, data: oldContent.data }
-          : { locked: false, data: oldContent.data })
+          : { locked: false, data: oldContent.data || "" })
       }
     });
   };
