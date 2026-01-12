@@ -222,7 +222,7 @@ test("note history item can be created by setting note title and content both", 
     expect(await db.noteHistory.get(id).count()).toBe(1);
     const history = db.noteHistory.get(id);
     const items = await history.items();
-    const content = await db.noteHistory.sessionContent.get(
+    let content = await db.noteHistory.sessionContent.get(
       items[0].sessionContentId
     );
     expect(await db.noteHistory.collection.count()).toBe(1);
@@ -233,6 +233,12 @@ test("note history item can be created by setting note title and content both", 
       content: TEST_NOTE.content,
       sessionId: "notesession"
     });
+
+    expect(await db.noteHistory.collection.count()).toBe(1);
+    content = await db.noteHistory.sessionContent.get(
+      items[0].sessionContentId
+    );
+
     expect(content.data).toBe(TEST_NOTE.content.data);
     expect(content.title).toBe("Test note");
     await db.notes.add({
@@ -240,6 +246,13 @@ test("note history item can be created by setting note title and content both", 
       title: "Test note",
       sessionId: "notesession"
     });
+
+    expect(await db.noteHistory.collection.count()).toBe(1);
+    content = await db.noteHistory.sessionContent.get(
+      items[0].sessionContentId
+    );
+    console.log(content);
+
     expect(content.data).toBe(TEST_NOTE.content.data);
     expect(content.title).toBe("Test note");
   }));
