@@ -30,7 +30,10 @@ import {
   changedDescendants,
   findParentNodeOfTypeClosestToPos
 } from "../../utils/prosemirror.js";
-import { AttributeUpdate, BatchAttributeStep } from "./batch-attribute-step.js";
+import {
+  AttributeUpdate,
+  BatchAttributeStep
+} from "../../utils/batch-attribute-step.js";
 
 const COLLAPSIBLE_BLOCK_TYPES = [
   "paragraph",
