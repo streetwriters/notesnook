@@ -163,7 +163,6 @@ export function EditorActionBar() {
       icon: TableOfContents,
       enabled:
         activeSession &&
-        activeSession.type !== "new" &&
         activeSession.type !== "locked" &&
         activeSession.type !== "diff" &&
         activeSession.type !== "conflicted",
