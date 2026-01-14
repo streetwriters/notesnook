@@ -27,7 +27,7 @@ import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../utils/styles";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { db } from "../../common/database";
-import { Item } from "@notesnook/core";
+import { Item, Note } from "@notesnook/core";
 import AppIcon from "../ui/AppIcon";
 export const DateMeta = ({ item }: { item: Item }) => {
   const { colors, isDark } = useThemeColors();
@@ -67,9 +67,13 @@ export const DateMeta = ({ item }: { item: Item }) => {
         <Paragraph
           size={AppFontSize.xs}
           color={colors.secondary.paragraph}
-          onPress={() => {
-            setIsDatePickerVisible(true);
-          }}
+          onPress={
+            item.type !== "note"
+              ? undefined
+              : () => {
+                  setIsDatePickerVisible(true);
+                }
+          }
         >
           {getFormattedDate(
             key === "dateCreated"
@@ -77,7 +81,7 @@ export const DateMeta = ({ item }: { item: Item }) => {
               : (item[key as keyof Item] as string),
             "date-time"
           )}
-          {key === "dateCreated" ? (
+          {key === "dateCreated" && item.type === "note" ? (
             <>
               {" "}
               <AppIcon name="pencil" size={AppFontSize.md} />
@@ -89,24 +93,28 @@ export const DateMeta = ({ item }: { item: Item }) => {
 
   return (
     <>
-      <DateTimePickerModal
-        isVisible={isDatePickerVisible}
-        mode="datetime"
-        onConfirm={async (date: Date) => {
-          await db.notes.add({
-            id: item.id,
-            dateCreated: date.getTime()
-          });
-          setDateCreated(date.getTime());
-          setIsDatePickerVisible(false);
-        }}
-        onCancel={() => {
-          setIsDatePickerVisible(false);
-        }}
-        isDarkModeEnabled={isDark}
-        is24Hour={db.settings.getTimeFormat() === "24-hour"}
-        date={new Date(dateCreated)}
-      />
+      {item.type === "note" ? (
+        <DateTimePickerModal
+          isVisible={isDatePickerVisible}
+          mode="datetime"
+          onConfirm={async (date: Date) => {
+            await db.notes.add({
+              id: item.id,
+              dateCreated: date.getTime()
+            });
+            setDateCreated(date.getTime());
+            setIsDatePickerVisible(false);
+          }}
+          onCancel={() => {
+            setIsDatePickerVisible(false);
+          }}
+          maximumDate={new Date((item as Note).dateEdited)}
+          isDarkModeEnabled={isDark}
+          is24Hour={db.settings.getTimeFormat() === "24-hour"}
+          date={new Date(dateCreated)}
+        />
+      ) : null}
+
       <View
         style={{
           borderTopWidth: 1,
