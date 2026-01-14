@@ -42,9 +42,9 @@ import { DDS } from "../../services/device-detection";
 import { ToastManager } from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import Notifications from "../../services/notifications";
-import PremiumService from "../../services/premium";
 import SettingsService from "../../services/settings";
 import { useRelationStore } from "../../stores/use-relation-store";
+import { useSettingStore } from "../../stores/use-setting-store";
 import { AppFontSize, defaultBorderRadius } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { getFormattedDate, useIsFeatureAvailable } from "@notesnook/common";
@@ -70,7 +70,8 @@ const RecurringModes = {
   Year: "year"
 };
 
-const WeekDays = new Array(7).fill(true);
+const WeekDays = [0, 1, 2, 3, 4, 5, 6];
+const WeekDaysMon = [1, 2, 3, 4, 5, 6, 0];
 const MonthDays = new Array(31).fill(true);
 const WeekDayNames = {
   0: "Sunday",
@@ -92,6 +93,7 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
   const { reminder, reference } = props.route.params;
   useNavigationFocus(props.navigation, { focusOnInit: true });
   const { colors, isDark } = useThemeColors();
+  const weekFormat = useSettingStore((state) => state.weekFormat);
   const [reminderMode, setReminderMode] = useState<Reminder["mode"]>(
     reminder?.mode || "once"
   );
@@ -151,7 +153,7 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
         const isSecondLast = index === selectedDays.length - 2;
         const joinWith = isSecondLast ? " & " : isLast ? "" : ", ";
         return recurringMode === RecurringModes.Week
-          ? WeekDayNames[day as keyof typeof WeekDayNames] + joinWith
+          ? strings.weekDayNames[day as keyof typeof WeekDayNames]() + joinWith
           : `${day}${nth(day)} ${joinWith}`;
       })
       .join("");
@@ -390,37 +392,39 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
                 recurringMode === RecurringModes.Year
                   ? null
                   : recurringMode === RecurringModes.Week
-                    ? WeekDays.map((item, index) => (
-                        <Button
-                          key={strings.weekDayNamesShort[
-                            index as keyof typeof strings.weekDayNamesShort
-                          ]()}
-                          title={strings.weekDayNamesShort[
-                            index as keyof typeof strings.weekDayNamesShort
-                          ]()}
-                          type={
-                            selectedDays.indexOf(index) > -1
-                              ? "selected"
-                              : "plain"
-                          }
-                          fontSize={AppFontSize.xs}
-                          style={{
-                            height: 40,
-                            borderRadius: 100,
-                            marginRight: 10
-                          }}
-                          onPress={() => {
-                            setSelectedDays((days) => {
-                              if (days.indexOf(index) > -1) {
-                                days.splice(days.indexOf(index), 1);
+                    ? (weekFormat === "Mon" ? WeekDaysMon : WeekDays).map(
+                        (item) => (
+                          <Button
+                            key={strings.weekDayNamesShort[
+                              item as keyof typeof strings.weekDayNamesShort
+                            ]()}
+                            title={strings.weekDayNamesShort[
+                              item as keyof typeof strings.weekDayNamesShort
+                            ]()}
+                            type={
+                              selectedDays.indexOf(item) > -1
+                                ? "selected"
+                                : "plain"
+                            }
+                            fontSize={AppFontSize.xs}
+                            style={{
+                              height: 40,
+                              borderRadius: 100,
+                              marginRight: 10
+                            }}
+                            onPress={() => {
+                              setSelectedDays((days) => {
+                                if (days.indexOf(item) > -1) {
+                                  days.splice(days.indexOf(item), 1);
+                                  return [...days];
+                                }
+                                days.push(item);
                                 return [...days];
-                              }
-                              days.push(index);
-                              return [...days];
-                            });
-                          }}
-                        />
-                      ))
+                              });
+                            }}
+                          />
+                        )
+                      )
                     : MonthDays.map((item, index) => (
                         <Button
                           key={index + "monthday"}
@@ -468,6 +472,7 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
                 onConfirm={handleConfirm}
                 onCancel={hideDatePicker}
                 isDarkModeEnabled={isDark}
+                firstDayOfWeek={weekFormat === "Mon" ? 1 : 0}
                 is24Hour={db.settings.getTimeFormat() === "24-hour"}
                 date={date || new Date(Date.now())}
               />

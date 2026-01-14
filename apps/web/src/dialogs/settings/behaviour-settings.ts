@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { DATE_FORMATS } from "@notesnook/core";
+import { DATE_FORMATS, WeekFormat } from "@notesnook/core";
 import { SettingsGroup } from "./types";
 import {
   ImageCompressionOptions,
@@ -158,6 +158,26 @@ export const BehaviourSettings: SettingsGroup[] = [
             options: [
               { value: "short", title: "Short (Mon, Tue)" },
               { value: "long", title: "Long (Monday, Tuesday)" }
+            ]
+          }
+        ]
+      },
+      {
+        key: "week-format",
+        title: strings.weekFormat(),
+        description: strings.weekFormatDesc(),
+        keywords: [],
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => s.weekFormat, listener),
+        components: [
+          {
+            type: "dropdown",
+            onSelectionChanged: (value) =>
+              useSettingStore.getState().setWeekFormat(value as WeekFormat),
+            selectedOption: () => useSettingStore.getState().weekFormat,
+            options: [
+              { value: "Sun", title: "Sunday" },
+              { value: "Mon", title: "Monday" }
             ]
           }
         ]

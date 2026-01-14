@@ -25,6 +25,7 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useRef, useState } from "react";
 import { db } from "../common/db";
 import { useStore } from "../stores/reminder-store";
+import { useStore as useSettingsStore } from "../stores/setting-store";
 import { showToast } from "../utils/toast";
 import { Calendar, Pro } from "../components/icons";
 import { usePersistentState } from "../hooks/use-persistent-state";
@@ -67,6 +68,8 @@ const RecurringModes = {
 } as const;
 
 const WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const WEEK_DAYS_MON = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
 const modes = [
   {
     id: Modes.ONCE,
@@ -118,6 +121,8 @@ export const AddReminderDialog = DialogManager.register(
   function AddReminderDialog(props: AddReminderDialogProps) {
     const { reminder, note } = props;
 
+    const weekFormat = useSettingsStore((store) => store.weekFormat);
+    const weekDays = weekFormat === "Sun" ? WEEK_DAYS : WEEK_DAYS_MON;
     const [selectedDays, setSelectedDays] = useState<number[]>(
       reminder?.selectedDays ?? []
     );
@@ -348,7 +353,7 @@ export const AddReminderDialog = DialogManager.register(
                           : "paragraph"
                       }}
                     >
-                      {mode.id === "week" ? WEEK_DAYS[i] : day}
+                      {mode.id === "week" ? weekDays[i] : day}
                     </Button>
                   ))}
                 </Box>
@@ -497,7 +502,7 @@ export const AddReminderDialog = DialogManager.register(
               : strings.reminderRepeatStrings.repeats(
                   1,
                   recurringMode,
-                  getSelectedDaysText(selectedDays, recurringMode),
+                  getSelectedDaysText(selectedDays, recurringMode, weekDays),
                   date.format(timeFormat())
                 )}
           </Text>
@@ -531,7 +536,8 @@ function setDateOnly(str: string, date: dayjs.Dayjs) {
 
 function getSelectedDaysText(
   selectedDays: number[],
-  recurringMode: ValueOf<typeof RecurringModes>
+  recurringMode: ValueOf<typeof RecurringModes>,
+  weekDays: typeof WEEK_DAYS | typeof WEEK_DAYS_MON
 ) {
   const text = selectedDays
     .sort((a, b) => a - b)
@@ -540,7 +546,7 @@ function getSelectedDaysText(
       const isSecondLast = index === selectedDays.length - 2;
       const joinWith = isSecondLast ? " & " : isLast ? "" : ", ";
       return recurringMode === RecurringModes.WEEK
-        ? WEEK_DAYS[day] + joinWith
+        ? weekDays[day] + joinWith
         : `${day}${nth(day)} ${joinWith}`;
     })
     .join("");

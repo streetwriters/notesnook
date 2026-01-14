@@ -38,6 +38,12 @@ const DayFormatFormats = {
   long: "dddd"
 };
 
+const WEEK_FORMATS = ["Sun", "Mon"];
+const WeekFormatNames = {
+  Sun: "Sunday",
+  Mon: "Monday"
+};
+
 export const FontPicker = createSettingsPicker({
   getValue: () => useSettingStore.getState().settings.defaultFontFamily,
   updateValue: (item) => {
@@ -171,6 +177,24 @@ export const DayFormatPicker = createSettingsPicker({
   },
   getItemKey: (item) => item,
   options: DAY_FORMATS,
+  compareValue: (current, item) => current === item,
+  isFeatureAvailable: () => true,
+  isOptionAvailable: () => true
+});
+
+export const WeekFormatPicker = createSettingsPicker({
+  getValue: () => db.settings.getWeekFormat(),
+  updateValue: (item) => {
+    db.settings.setWeekFormat(item);
+    useSettingStore.setState({
+      weekFormat: item
+    });
+  },
+  formatValue: (item) => {
+    return `${WeekFormatNames[item]}`;
+  },
+  getItemKey: (item) => item,
+  options: WEEK_FORMATS,
   compareValue: (current, item) => current === item,
   isFeatureAvailable: () => true,
   isOptionAvailable: () => true

@@ -22,6 +22,7 @@ import { isCipher } from "./utils/index.js";
 
 export type TimeFormat = "12-hour" | "24-hour";
 export type DayFormat = "short" | "long";
+export type WeekFormat = "Sun" | "Mon";
 
 export type SortOptions = {
   sortBy:
@@ -474,6 +475,7 @@ export type SettingItemMap = {
   titleFormat: string;
   timeFormat: TimeFormat;
   dayFormat: DayFormat;
+  weekFormat: WeekFormat;
   dateFormat: string;
   defaultNotebook: string | undefined;
   defaultTag: string | undefined;
