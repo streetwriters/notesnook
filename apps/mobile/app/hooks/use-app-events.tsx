@@ -700,10 +700,10 @@ export const useAppEvents = () => {
       EV.subscribe(EVENTS.syncCheckStatus, onCheckSyncStatus),
       EV.subscribe(EVENTS.syncAborted, onSyncAborted),
       EV.subscribe(EVENTS.appRefreshRequested, onSyncComplete),
-      EV.subscribe(EVENTS.userLoggedOut, onLogout),
-      EV.subscribe(EVENTS.userEmailConfirmed, onUserEmailVerified),
+      db.eventManager.subscribe(EVENTS.userLoggedOut, onLogout),
+      db.eventManager.subscribe(EVENTS.userEmailConfirmed, onUserEmailVerified),
       EV.subscribe(EVENTS.userSessionExpired, onUserSessionExpired),
-      EV.subscribe(
+      db.eventManager.subscribe(
         EVENTS.userSubscriptionUpdated,
         onUserSubscriptionStatusChanged
       ),

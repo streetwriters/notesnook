@@ -288,15 +288,16 @@ class Database {
         "options not specified. Did you forget to call db.setup()?"
       );
 
-    EV.subscribeMulti(
-      [EVENTS.userLoggedIn, EVENTS.userFetched, EVENTS.tokenRefreshed],
+    this.eventManager.subscribeMulti(
+      [EVENTS.userLoggedIn, EVENTS.userFetched],
       this.connectSSE,
       this
     );
+    EV.subscribe(EVENTS.tokenRefreshed, () => this.connectSSE());
     EV.subscribe(EVENTS.attachmentDeleted, async (attachment: Attachment) => {
       await this.fs().cancel(attachment.hash);
     });
-    EV.subscribe(EVENTS.userLoggedOut, async () => {
+    this.eventManager.subscribe(EVENTS.userLoggedOut, async () => {
       await this.monographs.clear();
       await this.fs().clear();
       this.disconnectSSE();
@@ -388,11 +389,11 @@ class Database {
       });
 
       this.eventSource.onopen = async () => {
-        console.log("SSE: opened channel successfully!");
+        logger.log("SSE: opened channel successfully!");
       };
 
       this.eventSource.onerror = function (error) {
-        console.log("SSE: error:", error);
+        logger.error(error, "SSE: error");
       };
 
       this.eventSource.onmessage = async (event) => {
@@ -405,7 +406,7 @@ class Database {
               if (!user) break;
               user.subscription = data;
               await this.user.setUser(user);
-              EV.publish(EVENTS.userSubscriptionUpdated, data);
+              this.eventManager.publish(EVENTS.userSubscriptionUpdated, data);
               await this.tokenManager._refreshToken(true);
               break;
             }
@@ -416,15 +417,12 @@ class Database {
             case "emailConfirmed": {
               await this.tokenManager._refreshToken(true);
               await this.user.fetchUser();
-              EV.publish(EVENTS.userEmailConfirmed);
+              this.eventManager.publish(EVENTS.userEmailConfirmed);
               break;
-            }
-            case "triggerSync": {
-              await this.sync({ type: "fetch" });
             }
           }
         } catch (e) {
-          console.log("SSE: Unsupported message. Message = ", event.data);
+          logger.error("SSE: Unsupported message. Message = ", event.data);
           return;
         }
       };
