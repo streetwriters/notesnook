@@ -239,15 +239,15 @@ export class NotePropertiesModel extends BaseProperties {
     const editIcon = this.page.locator(getTestId("edit-date-created"));
     await editIcon.click();
 
-    const editDateCreatedPopup = this.page.locator(
-      getTestId("edit-date-created-popup")
+    const editDateCreatedDialog = this.page.locator(
+      getTestId("edit-note-creation-date-dialog")
     );
-    await editDateCreatedPopup.waitFor({ state: "visible" });
+    await editDateCreatedDialog.waitFor({ state: "visible" });
 
-    const dateInput = editDateCreatedPopup.locator(
+    const dateInput = editDateCreatedDialog.locator(
       getTestId("date-created-input")
     );
-    const timeInput = editDateCreatedPopup.locator(
+    const timeInput = editDateCreatedDialog.locator(
       getTestId("time-created-input")
     );
 
@@ -255,7 +255,7 @@ export class NotePropertiesModel extends BaseProperties {
     await dateInput.fill(dayjs(date).format("DD-MM-YYYY"));
     await timeInput.fill(dayjs(date).format("hh:mm A"));
 
-    await editDateCreatedPopup.locator(getTestId("save-date-created")).click();
+    await confirmDialog(editDateCreatedDialog);
 
     await this.close();
   }
