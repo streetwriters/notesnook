@@ -2622,5 +2622,7 @@ Use this if changes from other devices are not appearing on this device. This wi
     t`Your free trial is on-going. Your subscription will start on ${trialExpiryDate}`,
   weekFormat: () => t`Week format`,
   weekFormatDesc: () =>
-    t`Choose what day to display as the first day of the week`
+    t`Choose what day to display as the first day of the week`,
+  valueMustBeBetween: (min: number, max: number) =>
+    t`Value must be between ${min} and ${max}`
 };

@@ -6988,6 +6988,10 @@ msgstr "Using official Notesnook instance"
 msgid "v{version} available"
 msgstr "v{version} available"
 
+#: src/strings.ts:2627
+msgid "Value must be between {min} and {max}"
+msgstr "Value must be between {min} and {max}"
+
 #: src/strings.ts:1171
 msgid "Vault"
 msgstr "Vault"
