@@ -604,7 +604,7 @@ p > *::selection {
 
 .outline-list > li::before {
   position: absolute;
-  top: 0px;
+  top: calc((1lh - 18px) / 2);
   cursor: pointer;
   content: "";
   background-size: 18px;
@@ -729,7 +729,7 @@ p > *::selection {
 
 .simple-checklist > li::after {
   position: absolute;
-  top: 0px;
+  top: calc((1lh - 18px) / 2);
   cursor: pointer;
   content: "";
   background-size: 18px;
@@ -747,7 +747,7 @@ p > *::selection {
 
 .simple-checklist > li.checked::before {
   position: absolute;
-  top: 2px;
+  top: calc((1lh - 14px) / 2);
   cursor: pointer;
   content: "";
   background-size: 18px;
@@ -790,7 +790,7 @@ p > *::selection {
 
 .ProseMirror div.callout > :first-child::after {
   position: absolute;
-  top: 0px;
+  top: calc((1lh - 18px) / 2);
   right: 0px;
   cursor: pointer;
   content: "";

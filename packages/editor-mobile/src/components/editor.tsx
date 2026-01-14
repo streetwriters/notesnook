@@ -882,8 +882,7 @@ const Tiptap = ({
 
           <div
             style={{
-              display: tab.session?.locked ? "none" : "block",
-              lineHeight: settings.defaultLineHeight
+              display: tab.session?.locked ? "none" : "block"
             }}
             ref={contentPlaceholderRef}
             className="theme-scope-editor"
@@ -947,6 +946,7 @@ const TiptapProvider = (): JSX.Element => {
     editorContainer.style.padding = "0px 16px";
     editorContainer.style.color = colors.primary.paragraph;
     editorContainer.style.fontSize = `${settings.fontSize}px`;
+    editorContainer.style.lineHeight = `${settings.defaultLineHeight}`;
     editorContainer.style.fontFamily =
       getFontById(settings.fontFamily)?.font || "sans-serif";
     contentRef.current = editorContainer;
@@ -966,8 +966,9 @@ const TiptapProvider = (): JSX.Element => {
       contentRef.current.style.fontSize = `${settings.fontSize}px`;
       contentRef.current.style.fontFamily =
         getFontById(settings.fontFamily)?.font || "sans-serif";
+      contentRef.current.style.lineHeight = `${settings.defaultLineHeight}`;
     }
-  }, [settings.fontSize, settings.fontFamily]);
+  }, [settings.fontSize, settings.fontFamily, settings.defaultLineHeight]);
 
   return <Tiptap settings={settings} getContentDiv={getContentDiv} />;
 };
