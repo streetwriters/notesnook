@@ -1837,7 +1837,7 @@ For example:
   incomingNote: () => t`Incoming note`,
   description: () => t`Description`,
   date: () => t`Date`,
-  month: () => t`month`,
+  month: () => t`Month`,
   day: () => t`Day`,
   time: () => t`Time`,
   encryptionKey: () => t`Encryption key`,

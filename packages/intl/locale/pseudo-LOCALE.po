@@ -3887,11 +3887,8 @@ msgstr ""
 msgid "Monographs enable you to share your notes in a secure and private way."
 msgstr ""
 
-#: src/strings.ts:1840
-msgid "month"
-msgstr ""
-
 #: src/strings.ts:665
+#: src/strings.ts:1840
 msgid "Month"
 msgstr ""
 

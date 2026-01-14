@@ -362,7 +362,7 @@ export const AddReminderDialog = DialogManager.register(
           </Flex>
         ) : null}
 
-        <Flex sx={{ gap: 2, overflowX: "auto", mt: 2 }}>
+        <Flex sx={{ gap: 2, overflowX: "auto", mt: 2, alignItems: "self-end" }}>
           {mode === Modes.ONCE ? (
             <>
               <Field

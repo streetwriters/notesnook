@@ -3907,11 +3907,8 @@ msgstr "Monographs can be encrypted with a secret key and shared with anyone."
 msgid "Monographs enable you to share your notes in a secure and private way."
 msgstr "Monographs enable you to share your notes in a secure and private way."
 
-#: src/strings.ts:1840
-msgid "month"
-msgstr "month"
-
 #: src/strings.ts:665
+#: src/strings.ts:1840
 msgid "Month"
 msgstr "Month"
 
