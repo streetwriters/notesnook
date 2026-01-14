@@ -6398,6 +6398,10 @@ msgstr ""
 msgid "The {title} at {url} is not compatible with this client."
 msgstr ""
 
+#: src/strings.ts:2629
+msgid "The incoming note could not be unlocked with the provided password. Enter the correct password for the incoming note"
+msgstr ""
+
 #: src/strings.ts:231
 msgid "The information above will be publically available at"
 msgstr ""
@@ -6695,6 +6699,10 @@ msgstr ""
 
 #: src/strings.ts:157
 msgid "Unlock"
+msgstr ""
+
+#: src/strings.ts:2627
+msgid "Unlock incoming note"
 msgstr ""
 
 #: src/strings.ts:1383

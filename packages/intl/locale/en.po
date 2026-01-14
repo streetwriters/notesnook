@@ -6439,6 +6439,10 @@ msgstr "Thank you. You are the proof that privacy always comes first."
 msgid "The {title} at {url} is not compatible with this client."
 msgstr "The {title} at {url} is not compatible with this client."
 
+#: src/strings.ts:2629
+msgid "The incoming note could not be unlocked with the provided password. Enter the correct password for the incoming note"
+msgstr "The incoming note could not be unlocked with the provided password. Enter the correct password for the incoming note"
+
 #: src/strings.ts:231
 msgid "The information above will be publically available at"
 msgstr "The information above will be publically available at"
@@ -6737,6 +6741,10 @@ msgstr "Unlink notebook"
 #: src/strings.ts:157
 msgid "Unlock"
 msgstr "Unlock"
+
+#: src/strings.ts:2627
+msgid "Unlock incoming note"
+msgstr "Unlock incoming note"
 
 #: src/strings.ts:1383
 msgid "Unlock more colors with Notesnook Pro"

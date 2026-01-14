@@ -2623,5 +2623,8 @@ Use this if changes from other devices are not appearing on this device. This wi
   weekFormat: () => t`Week format`,
   weekFormatDesc: () =>
     t`Choose what day to display as the first day of the week`,
-  editCreationDate: () => t`Edit creation date`
+  editCreationDate: () => t`Edit creation date`,
+  unlockIncomingNote: () => t`Unlock incoming note`,
+  unlockIncomingNoteDesc: () =>
+    t`The incoming note could not be unlocked with the provided password. Enter the correct password for the incoming note`
 };
