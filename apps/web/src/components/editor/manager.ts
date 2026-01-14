@@ -50,7 +50,7 @@ class EditorManager extends BaseStore<EditorManager> {
     zoom: EDITOR_ZOOM.DEFAULT,
     lineHeight: EDITOR_LINE_HEIGHT.DEFAULT
   });
-  editors: Record<string, EditorContext> = {};
+  editors: Record<string, EditorContext | undefined> = {};
 
   getEditor = (id: string): EditorContext | undefined => {
     return this.get().editors[id];

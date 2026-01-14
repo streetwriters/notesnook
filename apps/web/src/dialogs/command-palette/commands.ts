@@ -432,7 +432,7 @@ function getEditorCommands(): Command[] {
     }
   ];
 
-  if (session.type !== "readonly" && (editor.canUndo || editor.canRedo)) {
+  if (session.type !== "readonly" && (editor?.canUndo || editor?.canRedo)) {
     commands.push(
       {
         id: "undo",
