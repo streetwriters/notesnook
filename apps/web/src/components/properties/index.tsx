@@ -24,7 +24,6 @@ import {
   Unlock,
   Readonly,
   SyncOff,
-  ArrowLeft,
   Circle,
   Checkmark,
   ChevronDown,
@@ -32,9 +31,10 @@ import {
   LinkedTo,
   ReferencedIn as ReferencedInIcon,
   Note as NoteIcon,
-  Archive
+  Archive,
+  Edit
 } from "../icons";
-import { Box, Button, Flex, Text, FlexProps } from "@theme-ui/components";
+import { Button, Flex, Text, FlexProps } from "@theme-ui/components";
 import {
   useEditorStore,
   ReadonlyEditorSession,
@@ -45,12 +45,12 @@ import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useAttachmentStore } from "../../stores/attachment-store";
 import { store as noteStore } from "../../stores/note-store";
 import Toggle from "./toggle";
+import { EditNoteCreationDateDialog } from "../../dialogs/edit-note-creation-date-dialog";
 import ScrollContainer from "../scroll-container";
 import {
   getFormattedDate,
   usePromise,
   ResolvedItem,
-  useResolvedItem,
   useUnresolvedItem
 } from "@notesnook/common";
 import { ScopedThemeProvider } from "../theme-provider";
@@ -59,7 +59,6 @@ import { VirtualizedList } from "../virtualized-list";
 import { SessionItem } from "../session-item";
 import {
   ContentBlock,
-  InternalLink,
   Note,
   VirtualizedGrouping,
   createInternalLink,
@@ -67,7 +66,6 @@ import {
 } from "@notesnook/core";
 import { VirtualizedTable } from "../virtualized-table";
 import { TextSlice } from "@notesnook/core";
-import { TITLE_BAR_HEIGHT } from "../title-bar";
 import { strings } from "@notesnook/intl";
 
 const tools = [
@@ -212,13 +210,39 @@ function EditorProperties(props: EditorPropertiesProps) {
                     >
                       {item.label}
                     </Text>
-                    <Text
-                      className="selectable"
-                      variant="subBody"
-                      sx={{ fontSize: "body", flexShrink: 0 }}
-                    >
-                      {item.value(session.note[item.key])}
-                    </Text>
+
+                    {item.key === "dateCreated" ? (
+                      <Flex sx={{ alignItems: "center", gap: 1 }}>
+                        <Text
+                          data-test-id="date-created"
+                          className="selectable"
+                          variant="subBody"
+                          sx={{ fontSize: "body", flexShrink: 0 }}
+                        >
+                          {item.value(session.note[item.key])}
+                        </Text>
+                        <Edit
+                          size={14}
+                          sx={{ cursor: "pointer", color: "icon" }}
+                          onClick={() => {
+                            EditNoteCreationDateDialog.show({
+                              noteId: session.note.id,
+                              dateCreated: session.note.dateCreated,
+                              dateEdited: session.note.dateEdited
+                            });
+                          }}
+                          data-test-id="edit-date-created"
+                        />
+                      </Flex>
+                    ) : (
+                      <Text
+                        className="selectable"
+                        variant="subBody"
+                        sx={{ fontSize: "body", flexShrink: 0 }}
+                      >
+                        {item.value(session.note[item.key])}
+                      </Text>
+                    )}
                   </Flex>
                 ))}
                 {session.type === "deleted" ||

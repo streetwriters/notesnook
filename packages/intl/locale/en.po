@@ -2386,6 +2386,10 @@ msgstr "Easy access"
 msgid "Edit"
 msgstr "Edit"
 
+#: src/strings.ts:2626
+msgid "Edit creation date"
+msgstr "Edit creation date"
+
 #: src/strings.ts:527
 msgid "Edit internal link"
 msgstr "Edit internal link"

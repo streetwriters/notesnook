@@ -30,6 +30,7 @@ import {
   iterateList
 } from "./utils";
 import { SessionHistoryItemModel } from "./session-history-item-model";
+import dayjs from "dayjs";
 
 abstract class BaseProperties {
   protected readonly page: Page;
@@ -221,6 +222,42 @@ export class NotePropertiesModel extends BaseProperties {
     }
     await this.close();
     return history;
+  }
+
+  async getDateCreated() {
+    await this.open();
+    const dateCreated = await this.generalSection
+      .locator(getTestId("date-created"))
+      .textContent();
+    await this.close();
+    return dateCreated;
+  }
+
+  async editDateCreated(newDateCreated: number) {
+    await this.open();
+
+    const editIcon = this.page.locator(getTestId("edit-date-created"));
+    await editIcon.click();
+
+    const editDateCreatedDialog = this.page.locator(
+      getTestId("edit-note-creation-date-dialog")
+    );
+    await editDateCreatedDialog.waitFor({ state: "visible" });
+
+    const dateInput = editDateCreatedDialog.locator(
+      getTestId("date-created-input")
+    );
+    const timeInput = editDateCreatedDialog.locator(
+      getTestId("time-created-input")
+    );
+
+    const date = new Date(newDateCreated);
+    await dateInput.fill(dayjs(date).format("DD-MM-YYYY"));
+    await timeInput.fill(dayjs(date).format("hh:mm A"));
+
+    await confirmDialog(editDateCreatedDialog);
+
+    await this.close();
   }
 }
 
