@@ -32,7 +32,12 @@ type PdfPreviewDialogProps = BaseDialogProps<boolean> & {
 export const PdfPreviewDialog = DialogManager.register(
   function PdfPreviewDialog({ onClose, url, hash }: PdfPreviewDialogProps) {
     return (
-      <Dialog isOpen={true} width="70%" onClose={() => onClose(false)}>
+      <Dialog
+        isOpen={true}
+        width="100%"
+        height="100%"
+        onClose={() => onClose(false)}
+      >
         <Suspense fallback={<Loading />}>
           <PdfPreview
             fileUrl={url}
