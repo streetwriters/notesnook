@@ -31,6 +31,7 @@ import {
   moveParentUp,
   moveParentDown
 } from "./move-node.js";
+import { toggleNodesUnderPos } from "../heading/heading.js";
 
 export const KeyMap = Extension.create({
   name: "key-map",
@@ -116,6 +117,25 @@ export const KeyMap = Extension.create({
           console.error("Error moving node down:", e);
           return false;
         }
+      },
+      [tiptapKeys.clearCurrentLine.keys]: ({ editor }) => {
+        const { $from } = editor.state.selection;
+        const currentNode = $from.node();
+
+        if (
+          currentNode.type.name === "heading" &&
+          currentNode.attrs.collapsed === true
+        ) {
+          return editor.commands.command(({ tr }) => {
+            const headingPos = $from.before();
+            tr.setNodeAttribute(headingPos, "collapsed", false);
+            toggleNodesUnderPos(tr, headingPos, currentNode.attrs.level, false);
+            tr.deleteRange(headingPos, headingPos + currentNode.nodeSize);
+            return true;
+          });
+        }
+
+        return editor.commands.deleteNode(currentNode.type);
       }
     };
   }

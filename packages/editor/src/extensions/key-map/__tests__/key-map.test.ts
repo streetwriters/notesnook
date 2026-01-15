@@ -32,6 +32,7 @@ import { OutlineList } from "../../outline-list/outline-list.js";
 import { OutlineListItem } from "../../outline-list-item/outline-list-item.js";
 import { BulletList } from "../../bullet-list/bullet-list.js";
 import { ListItem } from "../../list-item/list-item.js";
+import { Heading } from "../../heading/heading.js";
 
 describe("key-map", () => {
   test("move paragraph up", async () => {
@@ -168,5 +169,30 @@ describe("key-map", () => {
     expect(editor.getHTML()).toBe(
       `<p>para 1</p><p>para 2</p><ul><li><p>list item 1</p></li><li><p>list item 2</p></li></ul>`
     );
+  });
+
+  test("clearing collapsed heading should clear heading and unhide content", async () => {
+    const el = h("div", [
+      h("h1", ["Collapsed heading"], { "data-collapsed": "true" }),
+      p(["Hidden content"], { "data-hidden": "true" })
+    ]);
+    const editorElement = h("div");
+    const { editor } = createEditor({
+      element: editorElement,
+      initialContent: el.innerHTML,
+      extensions: {
+        KeyMap: KeyMap,
+        Heading: Heading.configure({ levels: [1, 2, 3, 4, 5, 6] })
+      }
+    });
+
+    editor.commands.setTextSelection(5);
+    const event = new KeyboardEvent("keydown", {
+      key: "l",
+      ctrlKey: true
+    });
+    editor.view.dom.dispatchEvent(event);
+
+    expect(editor.getHTML()).toBe(`<p>Hidden content</p>`);
   });
 });

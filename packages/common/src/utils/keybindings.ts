@@ -433,6 +433,12 @@ export const tiptapKeys = {
     description: "Move parent node down",
     category: "Editor",
     type: "tiptap"
+  },
+  clearCurrentLine: {
+    keys: "Mod-l",
+    description: "Clear current line",
+    category: "Editor",
+    type: "tiptap"
   }
 } satisfies Record<string, TipTapKey>;
 

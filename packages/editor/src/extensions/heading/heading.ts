@@ -306,7 +306,7 @@ export const Heading = TiptapHeading.extend({
   }
 });
 
-function toggleNodesUnderPos(
+export function toggleNodesUnderPos(
   tr: Transaction,
   pos: number,
   headingLevel: number,
