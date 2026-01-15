@@ -24,7 +24,6 @@ import { databaseTest, delay } from "../__tests__/utils/index.ts";
 import http from "../src/utils/http.ts";
 import Constants from "../src/utils/constants.ts";
 import { writeFileSync } from "node:fs";
-import dayjs from "dayjs";
 
 const TEST_TIMEOUT = 60 * 1000;
 const testOptions = { concurrent: true, timeout: TEST_TIMEOUT };
@@ -785,6 +784,59 @@ test("stress: super concurrent sync", testOptions, async (t) => {
   }
 });
 
+test(
+  "test expiring notes auto delete from device B (offline) while device A changes expiryDate val",
+  async (t) => {
+    const [deviceA, deviceB] = await Promise.all([
+      initializeDevice("deviceA"),
+      initializeDevice("deviceB")
+    ]);
+
+    t.onTestFinished(async () => {
+      console.log(`${t.task.name} log out`);
+      await cleanup(deviceA, deviceB);
+    });
+
+    const noteId = await deviceA.notes.add({
+      content: {
+        type: "tiptap",
+        data: `<p>Test</p>`
+      }
+    });
+    await deviceA.notes.setExpiryDate(
+      dayjs().add(3, "second").toDate().getTime(),
+      noteId
+    );
+
+    await deviceA.sync({ type: "full" });
+    await delay(1000);
+    await deviceB.sync({ type: "full" });
+
+    expect(await deviceA.notes.note(noteId)).toBeTruthy();
+    expect(await deviceB.notes.note(noteId)).toBeTruthy();
+
+    await delay(3000);
+
+    await deviceB.notes.deleteExpiredNotes();
+
+    await delay(1000);
+
+    await deviceA.notes.setExpiryDate(null, noteId);
+
+    expect(await deviceA.notes.note(noteId)).toBeTruthy();
+    expect(await deviceB.notes.note(noteId)).toBeFalsy();
+
+    await deviceA.sync({ type: "full" });
+    await delay(1000);
+    await deviceB.sync({ type: "full" });
+    await delay(1000);
+
+    expect(await deviceA.notes.note(noteId)).toBeTruthy();
+    expect(await deviceB.notes.note(noteId)).toBeTruthy();
+  },
+  TEST_TIMEOUT
+);
+
 /**
  *
  * @param {string} id
@@ -869,56 +921,3 @@ function syncAndWait(deviceA, deviceB, force = false) {
     deviceA.sync({ type: "full", force }).catch(reject);
   });
 }
-
-test.only(
-  "test expiring notes auto delete from device B (offline) while device A changes expiryDate val",
-  async (t) => {
-    const [deviceA, deviceB] = await Promise.all([
-      initializeDevice("deviceA"),
-      initializeDevice("deviceB")
-    ]);
-
-    t.onTestFinished(async () => {
-      console.log(`${t.task.name} log out`);
-      await cleanup(deviceA, deviceB);
-    });
-
-    const noteId = await deviceA.notes.add({
-      content: {
-        type: "tiptap",
-        data: `<p>Test</p>`
-      }
-    });
-    await deviceA.notes.setExpiryDate(
-      dayjs().add(3, "second").toDate().getTime(),
-      noteId
-    );
-
-    await deviceA.sync({ type: "full" });
-    await delay(1000);
-    await deviceB.sync({ type: "full" });
-
-    expect(await deviceA.notes.note(noteId)).toBeTruthy();
-    expect(await deviceB.notes.note(noteId)).toBeTruthy();
-
-    await deviceA.notes.setExpiryDate(null, noteId);
-
-    await delay(3000);
-
-    await deviceB.notes.deleteExpiredNotes();
-
-    await delay(1000);
-
-    expect(await deviceA.notes.note(noteId)).toBeTruthy();
-    expect(await deviceB.notes.note(noteId)).toBeFalsy();
-
-    await deviceA.sync({ type: "full" });
-    await delay(1000);
-    await deviceB.sync({ type: "full" });
-    await delay(1000);
-
-    expect(await deviceA.notes.note(noteId)).toBeTruthy();
-    expect(await deviceB.notes.note(noteId)).toBeTruthy();
-  },
-  TEST_TIMEOUT
-);
