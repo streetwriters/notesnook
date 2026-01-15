@@ -25,7 +25,6 @@ import {
   formatTitle
 } from "../utils/title-format.js";
 import { clone } from "../utils/clone.js";
-import { Tiptap } from "../content-types/tiptap.js";
 import { EMPTY_CONTENT } from "./content.js";
 import { buildFromTemplate } from "../utils/templates/index.js";
 import {
@@ -542,25 +541,17 @@ export class Notes implements ICollection {
   async deleteExpiredNotes() {
     const expiredItems = await this.db
       .sql()
-      .selectNoFrom((eb) =>
-        eb
-          .selectFrom("notes")
-          .where("type", "!=", "trash")
-          .where(
-            sql.raw("json_extract(expiryDate, '$.value')"),
-            "<",
-            Date.now()
-          )
-          .select("id")
-          .as("noteId")
-      )
+      .selectFrom("notes")
+      .where("type", "!=", "trash")
+      .where(sql`expiryDate ->> '$.value'`, "<", Date.now())
+      .select("id as noteId")
       .execute();
 
-    if (expiredItems.length) {
-      const toDelete = expiredItems
-        .map((item) => item.noteId)
-        .filter((item) => item != null);
-      await this.db.trash.add("note", toDelete, "expired");
-    }
+    if (!expiredItems.length) return;
+
+    const toDelete = expiredItems
+      .map((item) => item.noteId)
+      .filter((item) => item != null);
+    await this.db.trash.add("note", toDelete, "expired");
   }
 }
