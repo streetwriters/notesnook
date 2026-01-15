@@ -62,6 +62,7 @@ import { showFeatureNotAllowedToast } from "./toasts";
 import { UpgradeDialog } from "../dialogs/buy-dialog/upgrade-dialog";
 import { setToolbarPreset } from "./toolbar-config";
 import { useKeyStore } from "../interfaces/key-store";
+import { TaskScheduler } from "../utils/task-scheduler";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
@@ -559,4 +560,11 @@ export async function resetFeatures() {
     db.settings.setDefaultNotebook(undefined);
     db.settings.setDefaultTag(undefined);
   }
+}
+
+export async function scheduleExpiredNotesDeletion() {
+  await TaskScheduler.stop("delete-expired-notes");
+  TaskScheduler.register("delete-expired-notes", "0 0 * * *", async () => {
+    await db.notes.deleteExpiredNotes();
+  });
 }
