@@ -29,10 +29,6 @@ import { Resizer } from "../../components/resizer/index.js";
 import { useThemeEngineStore } from "@notesnook/theme";
 import { useToolbarStore } from "../../toolbar/stores/toolbar-store.js";
 
-function isYoutubeEmbed(url: string) {
-  return url.includes("youtube.com/embed/");
-}
-
 export function EmbedComponent(
   props: ReactNodeViewProps<EmbedAttributes & EmbedAlignmentOptions>
 ) {
@@ -134,7 +130,8 @@ export function EmbedComponent(
                 srcDoc: tweetToEmbed(src, theme.colorScheme === "dark")
               }
             : {
-                src: isYoutubeEmbed(src) ? `${corsHost}/${src}` : src
+                src:
+                  isYouTubeEmbed(src) && corsHost ? `${corsHost}/${src}` : src
               })}
           width={"100%"}
           height={"100%"}
@@ -179,6 +176,18 @@ function getSandboxFeatures(src: string) {
     // ignore
   }
   return features.join(" ");
+}
+
+function isYouTubeEmbed(urlString: string) {
+  const url = new URL(urlString);
+  return (
+    (url.hostname === "www.youtube.com" ||
+      url.hostname === "youtube.com" ||
+      url.hostname === "m.youtube.com" ||
+      url.hostname === "www.youtube-nocookie.com" ||
+      url.hostname === "youtube-nocookie.com") &&
+    url.pathname.startsWith("/embed/")
+  );
 }
 
 function isTwitterX(src: string) {
