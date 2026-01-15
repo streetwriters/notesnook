@@ -62,7 +62,8 @@ export function TableSettings(props: ToolProps) {
         "rowProperties",
         "deleteRow",
         "deleteColumn",
-        "deleteTable"
+        "deleteTable",
+        "exportToCSV"
       ]}
     />
   );

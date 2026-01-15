@@ -98,6 +98,7 @@ interface TiptapStorage {
   openAttachmentPicker?: (type: AttachmentType) => void;
   previewAttachment?: (attachment: Attachment) => void;
   copyToClipboard?: (text: string, html?: string) => void;
+  downloadCsvTable?: (csv: string) => void;
   createInternalLink?: (
     attributes?: LinkAttributes
   ) => Promise<LinkAttributes | undefined>;
@@ -152,7 +153,7 @@ const useTiptap = (
     dayFormat,
     copyToClipboard,
     createInternalLink,
-
+    downloadCsvTable,
     doubleSpacedLines = true,
     isMobile,
     downloadOptions,
@@ -386,6 +387,7 @@ const useTiptap = (
         editor.storage.copyToClipboard = copyToClipboard;
         editor.storage.createInternalLink = createInternalLink;
         editor.storage.getAttachmentData = getAttachmentData;
+        editor.storage.downloadCsvTable = downloadCsvTable;
 
         if (onBeforeCreate) onBeforeCreate({ editor });
       },

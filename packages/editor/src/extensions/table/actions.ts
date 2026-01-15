@@ -24,6 +24,7 @@ import { selectedRect, TableRect } from "./prosemirror-tables/commands.js";
 import { saveAs } from "file-saver";
 import { unparse, parse } from "papaparse";
 import { hasPermission } from "../../types.js";
+import { useToolbarStore } from "../../toolbar/stores/toolbar-store.js";
 
 type TableCell = {
   cell: Node;
@@ -244,8 +245,12 @@ function exportToCSV(editor?: Editor) {
     node.forEach((cell) => row.push(cell.textContent));
     rows.push(row);
   });
-
-  saveAs(new Blob([new TextEncoder().encode(unparse(rows))]), "table.csv");
+  const csv = unparse(rows);
+  if (useToolbarStore.getState().isMobile) {
+    editor.storage.downloadCsvTable?.(csv);
+  } else {
+    saveAs(new Blob([new TextEncoder().encode(csv)]), "table.csv");
+  }
 }
 
 export {

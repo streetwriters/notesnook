@@ -28,11 +28,13 @@ import { getDefaultPresets } from "@notesnook/editor/dist/cjs/toolbar/tool-defin
 import { strings } from "@notesnook/intl";
 import Clipboard from "@react-native-clipboard/clipboard";
 import React, { useCallback, useEffect, useRef } from "react";
+import * as ScopedStorage from "react-native-scoped-storage";
 import {
   BackHandler,
   Keyboard,
   KeyboardEventListener,
   NativeEventSubscription,
+  Platform,
   useWindowDimensions
 } from "react-native";
 import { WebViewMessageEvent } from "react-native-webview";
@@ -82,6 +84,9 @@ import { useDragState } from "../../settings/editor/state";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { useTabStore } from "./use-tab-store";
 import { editorState, openInternalLink } from "./utils";
+import filesystem from "../../../common/filesystem";
+import ReactNativeBlobUtil from "react-native-blob-util";
+import { ShareComponent } from "../../../components/sheets/export-notes/share";
 
 const publishNote = async () => {
   const user = useUserStore.getState().user;
@@ -153,7 +158,9 @@ export const useEditorEvents = (
   const features = useAreFeaturesAvailable([
     "callout",
     "outlineList",
-    "taskList"
+    "taskList",
+    "importCsvToTable",
+    "exportTableAsCsv"
   ]);
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const fullscreen = useSettingStore((state) => state.fullscreen);
@@ -738,6 +745,62 @@ export const useEditorEvents = (
               Navigation.queueRoutesForUpdate();
             });
           }
+          break;
+        }
+        case EditorEvents.downloadCsv: {
+          try {
+            const csv = editorMessage.value;
+            let filePath: string;
+            let fileName: string;
+            if (Platform.OS === "android") {
+              let file = await ScopedStorage.createDocument(
+                "table.csv",
+                "text/csv",
+                csv,
+                "utf8"
+              );
+              if (!file) return;
+              filePath = file.path || file.uri;
+              fileName = file.name;
+            } else {
+              const path = await filesystem.checkAndCreateDir("/");
+              let possibleFileName = "table.csv";
+              let counter = 1;
+
+              // Check if file exists and find available filename
+              while (
+                await ReactNativeBlobUtil.fs.exists(path + possibleFileName)
+              ) {
+                possibleFileName = `table (${counter}).csv`;
+                counter++;
+              }
+              await ReactNativeBlobUtil.fs.writeFile(
+                path + possibleFileName,
+                csv,
+                "utf8"
+              );
+              filePath = path + possibleFileName;
+              fileName = possibleFileName;
+            }
+
+            await sleep(500);
+            presentSheet({
+              title: "Table saved to csv",
+              paragraph: strings.fileSaved(fileName, Platform.OS),
+              icon: "download",
+              context: "global",
+              component: (
+                <ShareComponent uri={filePath} name={fileName} padding={12} />
+              )
+            });
+          } catch (e) {
+            ToastManager.show({
+              type: "info",
+              message: "Could not save table to csv"
+            });
+            DatabaseLogger.error(e as Error);
+          }
+
           break;
         }
 
