@@ -965,6 +965,10 @@ del.diffdel {
   display: none !important;
 }
 
+.ProseMirror div.callout > :is(h1, h2, h3, h4, h5, h6):first-child.empty::after {
+  display: inline-block !important;
+}
+
 @media screen and (max-width: 768px) {
   .ProseMirror h1::after,
   .ProseMirror h2::after,
