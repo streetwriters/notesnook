@@ -39,7 +39,7 @@ const LINUX_AUTOSTART_DIRECTORY_PATH = path.join(
   "autostart"
 );
 
-const STARTUP_ARGS = ["--hidden"];
+const HIDDEN_ARG = "--hidden";
 
 export class AutoLaunch {
   static enable(hidden: boolean) {
@@ -54,13 +54,13 @@ export class AutoLaunch {
       );
     } else {
       const loginItemSettings = app.getLoginItemSettings({
-        args: STARTUP_ARGS
+        args: hidden ? [HIDDEN_ARG] : undefined
       });
       if (loginItemSettings.openAtLogin) return;
       app.setLoginItemSettings({
         openAtLogin: true,
         openAsHidden: hidden,
-        args: STARTUP_ARGS
+        args: hidden ? [HIDDEN_ARG] : undefined
       });
     }
   }
