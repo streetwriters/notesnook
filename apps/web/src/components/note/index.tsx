@@ -73,10 +73,12 @@ import {
   AttachmentError,
   Calendar,
   Circle,
+  Close,
   Colors,
   Copy,
   Destruct,
   Duplicate,
+  Edit,
   Export,
   HTML,
   InternalLink,
@@ -108,6 +110,9 @@ import { PublishDialog } from "../publish-view";
 import TimeAgo from "../time-ago";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import Dialog from "../dialog";
+import { setDateOnly } from "../../utils/date-time";
+
+dayjs.extend(customParseFormat);
 
 type NoteProps = NoteResolvedData & {
   item: NoteType;
@@ -189,19 +194,8 @@ function Note(props: NoteProps) {
               {locked && <Lock size={11} data-test-id={`locked`} />}
               {note.favorite && <Star color={primary} size={15} />}
               {note.readonly && <Readonly size={15} />}
-              {note.expiryDate && (
-                <IconTag
-                  icon={Destruct}
-                  text={getFormattedDate(note.expiryDate, "date")}
-                  styles={
-                    lessThanOneDayRemaining(note.expiryDate)
-                      ? {
-                          text: { color: "var(--accent-error)" }
-                        }
-                      : {}
-                  }
-                />
-              )}
+              {note.expiryDate?.value ? <Destruct size={13} /> : null}
+
               <TimeAgo live={true} datetime={date} locale="short" />
             </>
           ) : (
@@ -292,19 +286,12 @@ function Note(props: NoteProps) {
                 />
               ) : null}
 
-              {note.expiryDate ? (
+              {note.expiryDate?.value && (
                 <IconTag
                   icon={Destruct}
-                  text={getFormattedDate(note.expiryDate, "date")}
-                  styles={
-                    lessThanOneDayRemaining(note.expiryDate)
-                      ? {
-                          text: { color: "var(--icon-error)" }
-                        }
-                      : {}
-                  }
+                  text={getFormattedDate(note.expiryDate.value, "date")}
                 />
-              ) : null}
+              )}
             </>
           )}
         </Flex>
@@ -373,7 +360,6 @@ export const noteMenuItems: (
   context?: { color?: Color; locked?: boolean }
 ) => MenuItem[] = (note, ids = [], context) => {
   // const isSynced = db.notes.note(note.id)?.synced();
-
   return [
     {
       type: "button",
@@ -654,74 +640,51 @@ export const noteMenuItems: (
       onClick: () => Multiselect.moveNotesToTrash(ids, ids.length > 1),
       multiSelect: true
     },
-    {
-      type: "button",
-      key: "expiry-date",
-      title: note.expiryDate ? "Change expiry" : "Set expiry",
-      icon: Destruct.path,
-      onClick: () => {},
-      menu: {
-        items: [
-          {
-            type: "button",
-            key: "1day",
-            title: "1 day",
-            onClick: async () => {
-              const expiryDate = Date.now() + 24 * 60 * 60 * 1000;
-              await db.notes.setExpiryDate(expiryDate, ...ids);
-              store.refresh();
-              showToast("success", "Note will expire in 1 day");
-            }
-          },
-          {
-            type: "button",
-            key: "7days",
-            title: "7 days",
-            onClick: async () => {
-              const expiryDate = Date.now() + 7 * 24 * 60 * 60 * 1000;
-              await db.notes.setExpiryDate(expiryDate, ...ids);
-              store.refresh();
-              showToast("success", "Note will expire in 7 days");
-            }
-          },
-          {
-            type: "button",
-            key: "30days",
-            title: "30 days",
-            onClick: async () => {
-              const expiryDate = Date.now() + 30 * 24 * 60 * 60 * 1000;
-              await db.notes.setExpiryDate(expiryDate, ...ids);
-              store.refresh();
-              showToast("success", "Note will expire in 30 days");
-            }
-          },
-          {
-            type: "button",
-            key: "custom",
-            title: "Custom",
-            onClick: async () => {
-              await CustomExpiryDateDialog.show({
-                noteIds: ids
-              });
-            }
-          },
-          ...(note.expiryDate
-            ? [
-                {
-                  type: "button" as const,
-                  key: "remove-expiry",
-                  title: "Remove expiry date",
-                  onClick: async () => {
-                    await db.notes.setExpiryDate(null, ...ids);
-                    store.refresh();
-                    showToast("success", "Expiry date removed");
-                  }
-                }
-              ]
-            : [])
-        ]
-      }
-    }
+    note.expiryDate?.value
+      ? {
+          type: "button",
+          key: "expiry-date",
+          title: strings.expiryDate(),
+          icon: Destruct.path,
+          menu: {
+            items: [
+              {
+                type: "button",
+                key: "change",
+                title: strings.change(),
+                onClick: async () => {
+                  await NoteExpiryDateDialog.show({
+                    noteId: note.id,
+                    expiryDate: note.expiryDate?.value
+                  });
+                },
+                icon: Edit.path
+              },
+              {
+                type: "button",
+                key: "remove",
+                title: strings.remove(),
+                onClick: async () => {
+                  await db.notes.setExpiryDate(null, ...ids);
+                  store.refresh();
+                  showToast("success", "Expiry date removed");
+                },
+                icon: Close.path
+              }
+            ]
+          }
+        }
+      : {
+          type: "button",
+          key: "expiry-date",
+          title: strings.setExpiry(),
+          icon: Destruct.path,
+          onClick: async () => {
+            await NoteExpiryDateDialog.show({
+              noteId: note.id
+            });
+          }
+        }
   ];
 };
 
@@ -958,16 +921,17 @@ async function copyNote(noteId: string, format: "md" | "txt") {
   }
 }
 
-dayjs.extend(customParseFormat);
-
-type CustomExpiryDateDialogProps = BaseDialogProps<boolean> & {
-  noteIds: string[];
+type NoteExpiryDateDialogProps = BaseDialogProps<boolean> & {
+  noteId: string;
+  expiryDate?: number | null;
 };
 
-const CustomExpiryDateDialog = DialogManager.register(
-  function CustomExpiryDateDialog(props: CustomExpiryDateDialogProps) {
-    const { onClose, noteIds } = props;
-    const [date, setDate] = useState(dayjs().add(7, "day"));
+const NoteExpiryDateDialog = DialogManager.register(
+  function NoteExpiryDateDialog(props: NoteExpiryDateDialogProps) {
+    const { onClose, noteId, expiryDate } = props;
+    const [date, setDate] = useState(
+      expiryDate ? dayjs(expiryDate) : dayjs().add(7, "day")
+    );
     const [showCalendar, setShowCalendar] = useState(false);
     const dateInputRef = useRef<HTMLInputElement>(null);
     const theme = useThemeStore((store) => store.colorScheme);
@@ -985,9 +949,9 @@ const CustomExpiryDateDialog = DialogManager.register(
               showToast("error", "Expiry date must be in the future");
               return;
             }
-            await db.notes.setExpiryDate(date.valueOf(), ...noteIds);
+            await db.notes.setExpiryDate(date.valueOf(), noteId);
             store.refresh();
-            showToast("success", "Custom expiry date set");
+            showToast("success", "Expiry date set");
             onClose(true);
           }
         }}
@@ -1049,8 +1013,3 @@ const CustomExpiryDateDialog = DialogManager.register(
     );
   }
 );
-
-function setDateOnly(str: string, date: dayjs.Dayjs) {
-  const value = dayjs(str, db.settings.getDateFormat(), true);
-  return date.year(value.year()).month(value.month()).date(value.date());
-}

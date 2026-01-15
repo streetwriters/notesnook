@@ -2628,5 +2628,6 @@ Use this if changes from other devices are not appearing on this device. This wi
   unlockIncomingNoteDesc: () =>
     t`The incoming note could not be unlocked with the provided password. Enter the correct password for the incoming note`,
   setExpiry: () => t`Set expiry`,
-  unsetExpirt: () => t`Unset expirt`
+  unsetExpiry: () => t`Unset expiry`,
+  expiryDate: () => t`Expiry date`
 };

@@ -2700,6 +2700,10 @@ msgstr "Expand sidebar"
 msgid "Experience the next level of private note taking\""
 msgstr "Experience the next level of private note taking\""
 
+#: src/strings.ts:2632
+msgid "Expiry date"
+msgstr "Expiry date"
+
 #: src/strings.ts:2539
 msgid "Explore all plans"
 msgstr "Explore all plans"
@@ -6812,8 +6816,8 @@ msgid "Unregister"
 msgstr "Unregister"
 
 #: src/strings.ts:2631
-msgid "Unset expirt"
-msgstr "Unset expirt"
+msgid "Unset expiry"
+msgstr "Unset expiry"
 
 #: src/strings.ts:210
 #: src/strings.ts:2360

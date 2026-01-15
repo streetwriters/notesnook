@@ -1167,7 +1167,7 @@ export const useActions = ({
       },
       {
         id: "expiry-date",
-        title: item.expiryDate ? strings.unsetExpirt() : strings.setExpiry(),
+        title: item.expiryDate ? strings.unsetExpiry() : strings.setExpiry(),
         icon: item.expiryDate ? "bomb-off" : "bomb",
         locked: features?.expiringNotes?.isAllowed,
         onPress: async () => {
