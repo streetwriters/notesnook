@@ -18,10 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import {
+  FeatureResult,
   NoteResolvedData,
   exportContent,
   getFormattedDate,
-  getFormattedReminderTime
+  getFormattedReminderTime,
+  isFeatureAvailable
 } from "@notesnook/common";
 import {
   Color,
@@ -111,6 +113,7 @@ import TimeAgo from "../time-ago";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import Dialog from "../dialog";
 import { setDateOnly } from "../../utils/date-time";
+import { withFeatureCheck } from "../../common";
 
 dayjs.extend(customParseFormat);
 
@@ -675,18 +678,33 @@ export const noteMenuItems: (
           }
         }
       : {
-          type: "button",
-          key: "expiry-date",
-          title: strings.setExpiry(),
-          icon: Destruct.path,
-          onClick: async () => {
-            await NoteExpiryDateDialog.show({
-              noteId: note.id
-            });
+          type: "lazy-loader",
+          key: "lazy-load-expiry-date",
+          items: async () => {
+            const feature = await isFeatureAvailable("expiringNotes");
+            return [await setExpiryDateMenuItem(note.id, feature)];
           }
         }
   ];
 };
+
+async function setExpiryDateMenuItem(
+  noteId: string,
+  feature: FeatureResult<"expiringNotes">
+) {
+  return {
+    type: "button",
+    key: "expiry-date",
+    title: strings.setExpiry(),
+    icon: Destruct.path,
+    premium: !feature.isAllowed,
+    onClick: withFeatureCheck(feature, async () => {
+      await NoteExpiryDateDialog.show({
+        noteId
+      });
+    })
+  };
+}
 
 function colorsToMenuItems(
   noteColor: Color | undefined,
