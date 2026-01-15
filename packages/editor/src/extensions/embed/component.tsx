@@ -27,6 +27,11 @@ import { Icons } from "../../toolbar/index.js";
 import { Icon } from "@notesnook/ui";
 import { Resizer } from "../../components/resizer/index.js";
 import { useThemeEngineStore } from "@notesnook/theme";
+import { useToolbarStore } from "../../toolbar/stores/toolbar-store.js";
+
+function isYoutubeEmbed(url: string) {
+  return url.includes("youtube.com/embed/");
+}
 
 export function EmbedComponent(
   props: ReactNodeViewProps<EmbedAttributes & EmbedAlignmentOptions>
@@ -35,6 +40,7 @@ export function EmbedComponent(
   const [isLoading, setIsLoading] = useState(true);
   const { src, width, height, textDirection } = node.attrs;
   const theme = useThemeEngineStore((store) => store.theme);
+  const corsHost = useToolbarStore((store) => store.downloadOptions?.corsHost);
 
   let align = node.attrs.align;
   if (!align) align = textDirection ? "right" : "left";
@@ -127,7 +133,9 @@ export function EmbedComponent(
             ? {
                 srcDoc: tweetToEmbed(src, theme.colorScheme === "dark")
               }
-            : { src })}
+            : {
+                src: isYoutubeEmbed(src) ? `${corsHost}/${src}` : src
+              })}
           width={"100%"}
           height={"100%"}
           sandbox={getSandboxFeatures(src)}
