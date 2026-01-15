@@ -411,6 +411,11 @@ export class NNMigrationProvider implements MigrationProvider {
             .alterTable("notes")
             .addColumn("expiryDate", "text")
             .execute();
+          await db.schema
+            .createIndex("note_expiry_date")
+            .on("notes")
+            .expression(sql`expiryDate ->> '$.value'`)
+            .execute();
         }
       }
     };
