@@ -1,8 +1,11 @@
-- Add notebooks, tags and colors to Home Screen Shortcuts
-- Fixed large file uploads
-- You can now change day format and use /day in notes
-- Add Setting to change default editor line height
-- You can now set a custom title for monographs
-- Bug fixes and minor improvements
+- Add title and date clipped to web clips
+- Configure Week to start from Sunday or Monday
+- Change Note's creation date from properties
+- Set expiry date for notes for auto-deletion
+- Fix tag and notebook properties cannot be accessed from shortcuts
+- Fix editor features remain locked after login
+- Temporarily disable password changing and forgot password features
+- Note history now includes note title changes
+- Other minor bug fixes and improvements
 
 Thank you for using Notesnook!
