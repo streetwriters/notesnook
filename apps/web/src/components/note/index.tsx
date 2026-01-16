@@ -18,12 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import {
-  FeatureResult,
   NoteResolvedData,
+  areFeaturesAvailable,
   exportContent,
   getFormattedDate,
-  getFormattedReminderTime,
-  isFeatureAvailable
+  getFormattedReminderTime
 } from "@notesnook/common";
 import {
   Color,
@@ -305,7 +304,8 @@ export default React.memo(Note, function (prevProps, nextProps) {
     prevProps.attachments?.failed === nextProps.attachments?.failed &&
     prevProps.attachments?.total === nextProps.attachments?.total &&
     prevProps.locked === nextProps.locked &&
-    prevProps.color?.id === nextProps.color?.id
+    prevProps.color?.id === nextProps.color?.id &&
+    prevItem.expiryDate?.value === nextItem.expiryDate?.value
   );
 });
 
@@ -346,8 +346,9 @@ export const noteMenuItems: (
   note: NoteType,
   ids?: string[],
   context?: { color?: Color; locked?: boolean }
-) => MenuItem[] = (note, ids = [], context) => {
+) => Promise<MenuItem[]> = async (note, ids = [], context) => {
   // const isSynced = db.notes.note(note.id)?.synced();
+  const features = await areFeaturesAvailable(["expiringNotes"]);
   return [
     {
       type: "button",
@@ -618,16 +619,6 @@ export const noteMenuItems: (
       multiSelect: true
     },
     { key: "sep3", type: "separator" },
-    {
-      type: "button",
-      key: "movetotrash",
-      title: strings.moveToTrash(),
-      variant: "dangerous",
-      icon: Trash.path,
-      isDisabled: ids.length === 1 && db.monographs.isPublished(note.id),
-      onClick: () => Multiselect.moveNotesToTrash(ids, ids.length > 1),
-      multiSelect: true
-    },
     note.expiryDate?.value
       ? {
           type: "button",
@@ -663,33 +654,29 @@ export const noteMenuItems: (
           }
         }
       : {
-          type: "lazy-loader",
-          key: "lazy-load-expiry-date",
-          items: async () => {
-            const feature = await isFeatureAvailable("expiringNotes");
-            return [await setExpiryDateMenuItem(note.id, feature)];
+          type: "button",
+          key: "expiry-date",
+          title: strings.setExpiry(),
+          icon: Destruct.path,
+          premium: !features.expiringNotes.isAllowed,
+          onClick: async () => {
+            await NoteExpiryDateDialog.show({
+              noteId: note.id
+            });
           }
-        }
+        },
+    {
+      type: "button",
+      key: "movetotrash",
+      title: strings.moveToTrash(),
+      variant: "dangerous",
+      icon: Trash.path,
+      isDisabled: ids.length === 1 && db.monographs.isPublished(note.id),
+      onClick: () => Multiselect.moveNotesToTrash(ids, ids.length > 1),
+      multiSelect: true
+    }
   ];
 };
-
-async function setExpiryDateMenuItem(
-  noteId: string,
-  feature: FeatureResult<"expiringNotes">
-): Promise<MenuItem> {
-  return {
-    type: "button",
-    key: "expiry-date",
-    title: strings.setExpiry(),
-    icon: Destruct.path,
-    premium: !feature.isAllowed,
-    onClick: withFeatureCheck(feature, async () => {
-      await NoteExpiryDateDialog.show({
-        noteId
-      });
-    })
-  };
-}
 
 function colorsToMenuItems(
   noteColor: Color | undefined,
