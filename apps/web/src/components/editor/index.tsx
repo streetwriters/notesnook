@@ -26,7 +26,6 @@ import React, {
   useLayoutEffect,
   useCallback
 } from "react";
-import ReactDOM from "react-dom";
 import { Box, Button, Flex, Progress, Text } from "@theme-ui/components";
 import Properties from "../properties";
 import {
@@ -53,13 +52,16 @@ import Header from "./header";
 import { Attachment } from "../icons";
 import { attachFiles, AttachmentProgress, insertAttachments } from "./picker";
 import { useEditorManager } from "./manager";
-import { saveAttachment, downloadAttachment } from "../../common/attachments";
+import {
+  saveAttachment,
+  downloadAttachment,
+  previewImageAttachment
+} from "../../common/attachments";
 import { EV, EVENTS } from "@notesnook/core";
 import { db } from "../../common/db";
 import Titlebox, { resizeTextarea } from "./title-box";
 import Config from "../../utils/config";
 import { ScopedThemeProvider } from "../theme-provider";
-import { Lightbox } from "../lightbox";
 import { showToast } from "../../utils/toast";
 import { Item, MaybeDeletedItem, isDeleted } from "@notesnook/core";
 import { debounce, debounceWithId } from "@notesnook/common";
@@ -571,24 +573,7 @@ export function Editor(props: EditorProps) {
           const { hash, type } = data;
           const attachment = await db.attachments.attachment(hash);
           if (attachment && type === "image") {
-            const container = document.getElementById("dialogContainer");
-            if (!(container instanceof HTMLElement)) return;
-
-            const dataurl = await downloadAttachment(hash, "base64", id);
-            if (!dataurl)
-              return showToast("error", strings.imagePreviewFailed());
-
-            ReactDOM.render(
-              <ScopedThemeProvider>
-                <Lightbox
-                  image={dataurl}
-                  onClose={() => {
-                    ReactDOM.unmountComponentAtNode(container);
-                  }}
-                />
-              </ScopedThemeProvider>,
-              container
-            );
+            await previewImageAttachment(attachment);
           } else if (
             attachment &&
             onPreviewDocument &&
