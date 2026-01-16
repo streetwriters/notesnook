@@ -47,7 +47,7 @@ const HistoryItem = ({
 }: {
   index: number;
   items?: VirtualizedGrouping<HistorySession>;
-  note?: Note;
+  note: Note;
 }) => {
   const [item] = useDBItem(index, "noteHistory", items);
   const { colors } = useThemeColors();
@@ -73,6 +73,7 @@ const HistoryItem = ({
             session: getDate(item.dateCreated, item.dateModified)
           }}
           content={content}
+          note={note}
         />
       ),
       context: "note_history"
@@ -135,7 +136,7 @@ export default function NoteHistory({
 
   const renderItem = useCallback(
     ({ index }: { index: number }) => (
-      <HistoryItem index={index} items={history} />
+      <HistoryItem index={index} items={history} note={note} />
     ),
     [history]
   );

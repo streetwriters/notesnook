@@ -298,7 +298,7 @@ export const useEditor = (
           return;
         }
 
-        if (isContentInvalid(data) && id) {
+        if (!title && isContentInvalid(data) && id) {
           // Create a new history session if recieved empty or invalid content
           // To ensure that history is preserved for correct content.
           currentSessionHistoryId = editorSessionHistory.newSession(id);

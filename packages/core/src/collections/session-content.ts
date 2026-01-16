@@ -44,30 +44,63 @@ export class SessionContent implements ICollection {
 
   async add<TLocked extends boolean>(
     sessionId: string,
-    content: NoteContent<TLocked>,
-    locked: TLocked
+    content: Partial<NoteContent<TLocked>> & { title?: string; noteId: string },
+    locked?: TLocked
   ) {
     if (!sessionId || !content) return;
     // const data =
     //   locked || isCipher(content.data)
     //     ? content.data
     //     :  await this.db.compressor().compress(content.data);
-    await this.collection.upsert({
+    const sessionContentItemId = makeSessionContentId(sessionId);
+    const sessionContentExists = await this.collection.exists(
+      sessionContentItemId
+    );
+    const sessionItem: Partial<SessionContentItem> = {
       type: "sessioncontent",
-      id: makeSessionContentId(sessionId),
-      data: content.data,
-      contentType: content.type,
+      id: sessionContentItemId,
       compressed: false,
       localOnly: true,
-      locked,
+      locked: locked || false,
       dateCreated: Date.now(),
       dateModified: Date.now()
-    });
+    };
+
+    if (content.data && content.type) {
+      sessionItem.data = content.data;
+      sessionItem.contentType = content.type;
+
+      if (typeof content.title !== "string" && !sessionContentExists) {
+        const note = await this.db.notes.note(content.noteId);
+        sessionItem.title = note?.title;
+      }
+    }
+
+    if (content.title) {
+      sessionItem.title = content.title;
+
+      if (!content.data && !content.type && !sessionContentExists) {
+        const note = await this.db.notes.note(content.noteId);
+        if (note?.contentId) {
+          const noteContent = await this.db.content.get(note?.contentId);
+          if (noteContent) {
+            sessionItem.data = noteContent?.data;
+            sessionItem.contentType = noteContent?.type;
+          }
+        }
+      }
+    }
+
+    if (sessionContentExists) {
+      this.collection.update([sessionContentItemId], sessionItem);
+    } else {
+      await this.collection.upsert(sessionItem as SessionContentItem);
+    }
   }
 
   async get(
     sessionContentId: string
-  ): Promise<NoteContent<boolean> | undefined> {
+  ): Promise<Partial<NoteContent<boolean> & { title: string }> | undefined> {
     const session = await this.collection.get(sessionContentId);
     if (!session || isDeleted(session)) return;
 
@@ -90,7 +123,8 @@ export class SessionContent implements ICollection {
         session.compressed && !isCipher(session.data)
           ? await compressor.decompress(session.data)
           : session.data,
-      type: session.contentType
+      type: session.contentType,
+      title: session.title
     };
   }
 

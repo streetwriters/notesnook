@@ -414,7 +414,14 @@ export class NNMigrationProvider implements MigrationProvider {
           await db.schema
             .createIndex("note_expiry_date")
             .on("notes")
-            .expression(sql`expiryDate ->> '$.value'`)
+            .expression(sql`expiryDate ->> '$.value'`);
+        }
+      },
+      "a-2026-01-09": {
+        async up(db) {
+          await db.schema
+            .alterTable("sessioncontent")
+            .addColumn("title", "text")
             .execute();
         }
       }
