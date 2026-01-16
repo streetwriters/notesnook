@@ -155,6 +155,7 @@ export const useEditorEvents = (
     "outlineList",
     "taskList"
   ]);
+
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const fullscreen = useSettingStore((state) => state.fullscreen);
   const corsProxy = useSettingStore((state) => state.settings.corsProxy);
@@ -244,7 +245,8 @@ export const useEditorEvents = (
     loading,
     fontScale,
     markdownShortcuts,
-    loggedIn
+    loggedIn,
+    features
   ]);
 
   const onBackPress = useCallback(async () => {
