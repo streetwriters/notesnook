@@ -497,7 +497,7 @@ const features = {
     title: "Export table as CSV",
     availability: {
       free: createLimit(false),
-      essential: createLimit(true),
+      essential: createLimit(false),
       pro: createLimit(true),
       believer: createLimit(true),
       legacyPro: createLimit(true)
@@ -508,7 +508,7 @@ const features = {
     title: "Import CSV to table",
     availability: {
       free: createLimit(false),
-      essential: createLimit(true),
+      essential: createLimit(false),
       pro: createLimit(true),
       believer: createLimit(true),
       legacyPro: createLimit(true)
