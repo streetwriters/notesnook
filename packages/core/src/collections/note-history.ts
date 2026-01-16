@@ -206,10 +206,7 @@ export class NoteHistory implements ICollection {
           title: content.title
         });
       }
-    } else if (
-      (content.data && content.type && !isCipher(content.data)) ||
-      content.title
-    ) {
+    } else {
       const note: Partial<
         Note & {
           content: NoteContent<false>;
@@ -220,12 +217,13 @@ export class NoteHistory implements ICollection {
         sessionId: `${Date.now()}`
       };
 
-      if (content.data && content.type && !isCipher(content.data)) {
-        note.content = {
-          data: content.data,
-          type: content.type
-        };
-      }
+      note.content =
+        content.data && content.type && !isCipher(content.data)
+          ? {
+              data: content.data,
+              type: content.type
+            }
+          : { data: "<p></p>", type: "tiptap" };
 
       if (content.title) {
         note.title = content.title;
