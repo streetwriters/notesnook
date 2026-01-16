@@ -69,8 +69,9 @@ export function PreviewAttachment(props: ToolProps) {
     findSelectedNode(editor, "attachment") || findSelectedNode(editor, "image");
   const attachment = (attachmentNode?.attrs || {}) as Attachment;
 
-  if (!editor.isActive("image") && !canPreviewAttachment(attachment))
+  if (!editor.isActive("image") && !canPreviewAttachment(attachment)) {
     return null;
+  }
 
   return (
     <ToolButton
@@ -102,7 +103,7 @@ export function RemoveAttachment(props: ToolProps) {
 }
 
 const previewableFileExtensions = ["pdf"];
-const previewableMimeTypes = ["application/pdf"];
+const previewableMimeTypes = ["application/pdf", "image/"];
 
 function canPreviewAttachment(attachment: Attachment) {
   if (!attachment) return false;
