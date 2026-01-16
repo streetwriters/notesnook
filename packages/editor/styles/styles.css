@@ -991,11 +991,35 @@ del.diffdel {
 .simplebar-content:before {
   content: "" !important;
 }
-.simplebar-content:after {
-  content: "" !important;
+
+.scroll-bar {
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
 }
 
-pre[class*="language-"] {
-  overflow: initial !important;
+.scroll-bar:hover {
+  scrollbar-color: var(--border) transparent;
 }
 
+.scroll-bar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.scroll-bar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll-bar::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  transition: background-color 0.2s ease;
+}
+
+.scroll-bar::-webkit-scrollbar-thumb:hover,
+.scroll-bar::-webkit-scrollbar-thumb:active {
+  background-color: var(--border);
+}
