@@ -33,6 +33,7 @@ import AppIcon from "../ui/AppIcon";
 import { Button } from "../ui/button";
 import { Pressable } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
+import { Dialog } from "../dialog";
 
 const TOP_BAR_ITEMS: ActionId[] = [
   "pin",
@@ -58,6 +59,7 @@ const BOTTOM_BAR_ITEMS: ActionId[] = [
   "copy-link",
   "duplicate",
   "launcher-shortcut",
+  "expiry-date",
   "trash"
 ];
 

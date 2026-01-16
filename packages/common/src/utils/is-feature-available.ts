@@ -480,6 +480,17 @@ const features = {
       believer: createLimit(true),
       legacyPro: createLimit(true)
     }
+  }),
+  expiringNotes: createFeature({
+    id: "expiringNotes",
+    title: "Expiring notes",
+    availability: {
+      free: createLimit(false),
+      essential: createLimit(false),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
+    }
   })
 };
 

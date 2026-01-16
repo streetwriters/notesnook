@@ -223,12 +223,8 @@ import {
   mdiNoteRemoveOutline,
   mdiTabPlus,
   mdiRadar,
-  mdiLinkBoxOutline,
   mdiHistory,
-  mdiArrowCollapseLeft,
   mdiArrowCollapseRight,
-  mdiHamburger,
-  mdiNotePlus,
   mdiNoteEditOutline,
   mdiArrowUp,
   mdiInbox

@@ -26,7 +26,6 @@ import dayjs from "dayjs";
 import { hardNavigate, hashNavigate } from "../navigation";
 import { showToast } from "../utils/toast";
 import { TaskScheduler } from "../utils/task-scheduler";
-import { BuyDialog } from "../dialogs/buy-dialog";
 import { RecoveryKeyDialog } from "../dialogs/recovery-key-dialog";
 import { strings } from "@notesnook/intl";
 import { SettingsDialog } from "../dialogs/settings";

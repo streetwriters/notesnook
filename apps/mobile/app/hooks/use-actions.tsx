@@ -32,7 +32,7 @@ import { useThemeColors } from "@notesnook/theme";
 import { DisplayedNotification } from "@notifee/react-native";
 import Clipboard from "@react-native-clipboard/clipboard";
 import React, { useEffect, useRef, useState } from "react";
-import { InteractionManager, Platform } from "react-native";
+import { InteractionManager, Platform, View } from "react-native";
 import Share from "react-native-share";
 import { DatabaseLogger, db } from "../common/database";
 import { AttachmentDialog } from "../components/attachments";
@@ -71,8 +71,9 @@ import { eUpdateNoteInEditor } from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { convertNoteToText } from "../utils/note-to-text";
 import { sleep } from "../utils/time";
-import { resetStoredState } from "./use-stored-state";
 import { NotesnookModule } from "../utils/notesnook-module";
+
+import DatePickerComponent from "../components/date-picker";
 
 export type ActionId =
   | "select"
@@ -118,7 +119,8 @@ export type ActionId =
   | "trash"
   | "default-homepage"
   | "default-tag"
-  | "launcher-shortcut";
+  | "launcher-shortcut"
+  | "expiry-date";
 
 export type Action = {
   id: ActionId;
@@ -163,10 +165,11 @@ export const useActions = ({
     "notebooks",
     "customizableSidebar",
     "customHomepage",
-    "androidLauncherShortcuts"
+    "androidLauncherShortcuts",
+    "expiringNotes"
   ]);
   const [item, setItem] = useState(propItem);
-  const { colors } = useThemeColors();
+  const { colors, isDark } = useThemeColors();
   const setMenuPins = useMenuStore((state) => state.setMenuPins);
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(
     db.shortcuts.exists(item.id)
@@ -1161,6 +1164,45 @@ export const useActions = ({
         },
         checked: item.archived,
         isToggle: true
+      },
+      {
+        id: "expiry-date",
+        title: item.expiryDate ? strings.unsetExpiry() : strings.setExpiry(),
+        icon: item.expiryDate ? "bomb-off" : "bomb",
+        locked: features?.expiringNotes?.isAllowed,
+        onPress: async () => {
+          if (item.expiryDate) {
+            await db.notes.setExpiryDate(null, item.id);
+            setItem((await db.notes.note(item.id)) as Item);
+          } else {
+            if (features && !features?.expiringNotes.isAllowed) {
+              ToastManager.show({
+                message: features?.expiringNotes.error,
+                type: "info",
+                actionText: strings.upgrade(),
+                context: "local",
+                func: () => {
+                  PaywallSheet.present(features?.expiringNotes);
+                }
+              });
+              return;
+            }
+
+            presentDialog({
+              context: "properties",
+              component: (close) => (
+                <DatePickerComponent
+                  onCancel={() => close?.()}
+                  onConfirm={async (date) => {
+                    close?.();
+                    await db.notes.setExpiryDate(date.getTime(), item.id);
+                    setItem((await db.notes.note(item.id)) as Item);
+                  }}
+                />
+              )
+            });
+          }
+        }
       }
     );
 
