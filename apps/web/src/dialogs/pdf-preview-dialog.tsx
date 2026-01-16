@@ -36,6 +36,10 @@ export const PdfPreviewDialog = DialogManager.register(
         isOpen={true}
         width="100%"
         height="100%"
+        noScroll
+        sx={{
+          py: 1
+        }}
         onClose={() => onClose(false)}
       >
         <Suspense fallback={<Loading />}>
