@@ -167,6 +167,11 @@ const ShareView = () => {
   globalThis["IS_SHARE_EXTENSION"] = true;
   const onKeyboardDidShow = (event: KeyboardEvent) => {
     let height = Dimensions.get("screen").height - event.endCoordinates.screenY;
+    if (height < 100) {
+      setKeyboardHeight(0);
+      keyboardHeightRef.current = 0;
+      return;
+    }
     keyboardHeightRef.current = height;
     setKeyboardHeight(height);
   };
@@ -448,11 +453,7 @@ const ShareView = () => {
         overflow: "hidden",
         paddingTop: insets.top,
         paddingLeft: insets.left,
-        paddingRight: insets.right,
-        paddingBottom:
-          Platform.OS === "android" && keyboardHeight
-            ? keyboardHeight - (insets.bottom || (gesturesEnabled ? 25 : 50))
-            : 0
+        paddingRight: insets.right
       }}
     >
       {loadingPage ? <HtmlLoadingWebViewAgent /> : null}
@@ -500,7 +501,11 @@ const ShareView = () => {
           display: searchMode ? "none" : "flex",
           borderTopRightRadius: Platform.OS === "ios" ? 10 : 15,
           borderTopLeftRadius: Platform.OS === "ios" ? 10 : 15,
-          maxHeight: Platform.OS === "android" ? undefined : "100%"
+          maxHeight: Platform.OS === "android" ? undefined : "100%",
+          paddingBottom:
+            Platform.OS === "android" && keyboardHeight
+              ? keyboardHeight
+              : insets.bottom
         }}
       >
         <ScrollView>
