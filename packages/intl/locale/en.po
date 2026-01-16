@@ -2729,7 +2729,7 @@ msgstr "Export all notes as pdf, markdown, html or text in a single zip file"
 msgid "Export as{0}"
 msgstr "Export as{0}"
 
-#: src/strings.ts:2623
+#: src/strings.ts:2633
 msgid "Export CSV"
 msgstr "Export CSV"
 
@@ -3344,7 +3344,7 @@ msgstr "Import & export"
 msgid "Import completed"
 msgstr "Import completed"
 
-#: src/strings.ts:2624
+#: src/strings.ts:2634
 msgid "Import CSV"
 msgstr "Import CSV"
 

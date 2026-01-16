@@ -2718,7 +2718,7 @@ msgstr ""
 msgid "Export as{0}"
 msgstr ""
 
-#: src/strings.ts:2623
+#: src/strings.ts:2633
 msgid "Export CSV"
 msgstr ""
 
@@ -3324,7 +3324,7 @@ msgstr ""
 msgid "Import completed"
 msgstr ""
 
-#: src/strings.ts:2624
+#: src/strings.ts:2634
 msgid "Import CSV"
 msgstr ""
 
