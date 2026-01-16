@@ -350,6 +350,11 @@ const tools: Record<ToolId, ToolDefinition> = {
     icon: "indent",
     title: strings.indent(),
     conditional: true
+  },
+  exportToCSV: {
+    icon: "csv",
+    title: strings.exportCsv(),
+    conditional: true
   }
 };
 

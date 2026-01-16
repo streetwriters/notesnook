@@ -2729,6 +2729,10 @@ msgstr "Export all notes as pdf, markdown, html or text in a single zip file"
 msgid "Export as{0}"
 msgstr "Export as{0}"
 
+#: src/strings.ts:2633
+msgid "Export CSV"
+msgstr "Export CSV"
+
 #: src/strings.ts:1385
 msgid "Export notes as PDF, Markdown and HTML with Notesnook Pro"
 msgstr "Export notes as PDF, Markdown and HTML with Notesnook Pro"
@@ -3339,6 +3343,10 @@ msgstr "Import & export"
 #: src/strings.ts:1751
 msgid "Import completed"
 msgstr "Import completed"
+
+#: src/strings.ts:2634
+msgid "Import CSV"
+msgstr "Import CSV"
 
 #: src/strings.ts:1766
 msgid "import guide"

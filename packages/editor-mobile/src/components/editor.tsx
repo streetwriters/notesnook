@@ -114,6 +114,8 @@ const Tiptap = ({
       callout: !!settings.features?.callout?.isAllowed,
       outlineList: !!settings.features?.outlineList?.isAllowed,
       taskList: !!settings.features?.taskList?.isAllowed,
+      importCsvToTable: !!settings.features?.importCsvToTable?.isAllowed,
+      exportTableAsCsv: !!settings.features?.exportTableAsCsv?.isAllowed,
       insertAttachment: settings.loggedIn
     },
     onPermissionDenied: (claim) => {
@@ -164,6 +166,10 @@ const Tiptap = ({
         return postAsyncWithTimeout(EditorEvents.createInternalLink, {
           attributes
         });
+      },
+      downloadCsvTable: (csv) => {
+        console.log("download csv");
+        post("editor-events:download-csv", csv);
       },
       element: getContentDiv(),
       editable: !tab.session?.readonly,
