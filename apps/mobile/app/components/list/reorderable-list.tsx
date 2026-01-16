@@ -131,7 +131,7 @@ function ReorderableList<T extends { id: string }>({
     ]
   );
 
-  function getOrderedItems() {
+  const getOrderedItems = React.useCallback(() => {
     if (!customizableSidebarFeature?.isAllowed) return data;
     const items: T[] = [];
     itemOrderState.forEach((id) => {
@@ -142,7 +142,7 @@ function ReorderableList<T extends { id: string }>({
 
     items.push(...data.filter((i) => !itemOrderState.includes(i.id)));
     return items;
-  }
+  }, [data, customizableSidebarFeature?.isAllowed]);
 
   return (
     <View style={styles.container}>
