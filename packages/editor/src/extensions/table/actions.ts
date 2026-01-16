@@ -25,6 +25,8 @@ import { saveAs } from "file-saver";
 import { unparse, parse } from "papaparse";
 import { hasPermission } from "../../types.js";
 import { useToolbarStore } from "../../toolbar/stores/toolbar-store.js";
+import { getTableNodeTypes } from "./utilities/getTableNodeTypes.js";
+import { createCell } from "./utilities/createCell.js";
 
 type TableCell = {
   cell: Node;
@@ -193,44 +195,34 @@ function selectColumn(
   return true;
 }
 
-function escapeCell(cell: string): string {
-  return (cell || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
 function importCsvToTable(csvText: string, editor: Editor) {
-  const result = parse(csvText, {
+  const result = parse<string[]>(csvText, {
     skipEmptyLines: true
   });
   if (!result.data || result.data.length === 0) return "";
 
-  const rows = result.data as string[][];
-  let tableHTML = "<table>";
+  const { schema } = editor.state;
+  const types = getTableNodeTypes(schema);
 
-  if (rows.length > 0) {
-    tableHTML += "<thead><tr>";
-    for (const cell of rows[0]) {
-      tableHTML += `<th><p>${escapeCell(cell)}</p></th>`;
-    }
-    tableHTML += "</tr></thead>";
-  }
+  const tableRows = result.data.map((row, rowIndex) => {
+    const isHeaderRow = rowIndex === 0;
+    const cellType = isHeaderRow ? types.header_cell : types.cell;
 
-  tableHTML += "<tbody>";
-  for (let i = 1; i < rows.length; i++) {
-    const row = rows[i];
-    tableHTML += "<tr>";
-    for (const cell of row) {
-      tableHTML += `<td><p>${escapeCell(cell)}</p></td>`;
-    }
-    tableHTML += "</tr>";
-  }
-  tableHTML += "</tbody></table>";
+    const cells = row
+      .map((cellText) => {
+        const paragraphNode = cellText
+          ? schema.nodes.paragraph.create(null, schema.text(cellText))
+          : schema.nodes.paragraph.create();
+        return createCell(cellType, paragraphNode);
+      })
+      .filter((cell): cell is Node => cell != null);
 
-  editor.chain().focus().insertContent(tableHTML).run();
+    return types.row.createChecked(null, cells);
+  });
+
+  const tableNode = types.table.createChecked(null, tableRows);
+
+  editor.chain().focus().insertContent(tableNode.toJSON()).run();
 }
 
 function exportToCSV(editor?: Editor) {
@@ -261,6 +253,5 @@ export {
   selectRow,
   selectColumn,
   exportToCSV,
-  escapeCell,
   importCsvToTable
 };
