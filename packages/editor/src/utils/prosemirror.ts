@@ -34,8 +34,7 @@ import {
   Slice,
   DOMParser,
   Schema,
-  Fragment,
-  Node
+  Fragment
 } from "prosemirror-model";
 import { EditorState, Selection, Transaction } from "prosemirror-state";
 import TextStyle from "@tiptap/extension-text-style";
@@ -420,10 +419,10 @@ export function ensureLeadingParagraph(node: Node, schema: Schema): Fragment {
  * @public
  */
 export function changedDescendants(
-  old: Node,
-  cur: Node,
+  old: ProsemirrorNode,
+  cur: ProsemirrorNode,
   offset: number,
-  f: (newNode: Node, pos: number, oldNode?: Node) => void
+  f: (newNode: ProsemirrorNode, pos: number, oldNode?: ProsemirrorNode) => void
 ): void {
   const oldSize = old.childCount,
     curSize = cur.childCount;
@@ -443,7 +442,7 @@ export function changedDescendants(
       child.nodesBetween(
         0,
         child.content.size,
-        f as (node: Node, pos: number) => void,
+        f as (node: ProsemirrorNode, pos: number) => void,
         offset + 1
       );
     }

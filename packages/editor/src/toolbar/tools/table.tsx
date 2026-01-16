@@ -175,8 +175,8 @@ export function TableProperties(props: ToolProps) {
       splitCells(editor),
       cellProperties(editor),
       { type: "separator", key: "tableSeperator" },
-      deleteTable(editor),
-      exportToCSV(editor)
+      exportToCSV(editor),
+      deleteTable(editor)
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
