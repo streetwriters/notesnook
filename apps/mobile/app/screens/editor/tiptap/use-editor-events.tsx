@@ -162,6 +162,7 @@ export const useEditorEvents = (
     "importCsvToTable",
     "exportTableAsCsv"
   ]);
+
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const fullscreen = useSettingStore((state) => state.fullscreen);
   const corsProxy = useSettingStore((state) => state.settings.corsProxy);
@@ -258,7 +259,8 @@ export const useEditorEvents = (
     fontScale,
     markdownShortcuts,
     loggedIn,
-    defaultLineHeight
+    defaultLineHeight,
+    features
   ]);
 
   const onBackPress = useCallback(async () => {
