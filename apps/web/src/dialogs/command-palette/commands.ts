@@ -328,7 +328,7 @@ async function getActiveNoteCommands(): Promise<Command[]> {
 
   const menuItems =
     note.type !== "trash"
-      ? noteMenuItems(note, [note.id], {
+      ? await noteMenuItems(note, [note.id], {
           locked: !!(
             await db
               .sql()
