@@ -563,6 +563,7 @@ export async function resetFeatures() {
 }
 
 export async function scheduleExpiredNotesDeletion() {
+  await db.notes.deleteExpiredNotes();
   await TaskScheduler.stop("delete-expired-notes");
   TaskScheduler.register("delete-expired-notes", "0 0 * * *", async () => {
     await db.notes.deleteExpiredNotes();
