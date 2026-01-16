@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 /* eslint-disable no-inner-declarations */
-import { useAreFeaturesAvailable } from "@notesnook/common";
+import { isFeatureAvailable, useAreFeaturesAvailable } from "@notesnook/common";
 import {
   Color,
   createInternalLink,
@@ -67,11 +67,10 @@ import { useSelectionStore } from "../stores/use-selection-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { useTagStore } from "../stores/use-tag-store";
 import { useUserStore } from "../stores/use-user-store";
-import { eUpdateNoteInEditor } from "../utils/events";
+import { eCloseSheet, eUpdateNoteInEditor } from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { convertNoteToText } from "../utils/note-to-text";
 import { sleep } from "../utils/time";
-import { resetStoredState } from "./use-stored-state";
 import { NotesnookModule } from "../utils/notesnook-module";
 
 export type ActionId =
@@ -132,6 +131,31 @@ export type Action = {
   activeColor?: string;
   type?: ButtonProps["type"];
   locked?: boolean;
+};
+
+export const Default_Drag_Action: Action = {
+  id: "reorder",
+  title: strings.reorder(),
+  icon: "sort-ascending",
+  onPress: async () => {
+    const feature = await isFeatureAvailable("customizableSidebar");
+    if (feature && !feature.isAllowed) {
+      ToastManager.show({
+        message: feature.error,
+        type: "info",
+        context: "local",
+        actionText: strings.upgrade(),
+        func: () => {
+          PaywallSheet.present(feature);
+        }
+      });
+      return;
+    }
+    useSideBarDraggingStore.setState({
+      dragging: true
+    });
+    eSendEvent(eCloseSheet);
+  }
 };
 
 function isNotePinnedInNotifications(item: Item) {
@@ -438,31 +462,6 @@ export const useActions = ({
       title: strings.rename(),
       icon: "square-edit-outline",
       onPress: renameColor
-    });
-
-    actions.push({
-      id: "reorder",
-      title: strings.reorder(),
-      icon: "sort-ascending",
-      onPress: async () => {
-        if (features && !features.customizableSidebar.isAllowed) {
-          ToastManager.show({
-            message: features.customizableSidebar.error,
-            type: "info",
-            context: "local",
-            actionText: strings.upgrade(),
-            func: () => {
-              PaywallSheet.present(features.customizableSidebar);
-            }
-          });
-          return;
-        }
-        useSideBarDraggingStore.setState({
-          dragging: true
-        });
-        close();
-      },
-      locked: !features?.customizableSidebar.isAllowed
     });
   }
 
@@ -949,7 +948,7 @@ export const useActions = ({
             copyNote: true,
             novault: true,
             locked: true,
-            item: item,
+            item: item as Note,
             title: strings.copyNote()
           });
         } else {
