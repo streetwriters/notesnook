@@ -144,8 +144,8 @@ export type DiffEditorSession = BaseEditorSession & {
   type: "diff";
   note: Note;
   content: ContentItem;
+  oldTitle?: string;
   historySessionId: string;
-  oldContentTitle?: string;
 };
 
 export type EditorSession =
@@ -620,12 +620,13 @@ class EditorStore extends BaseStore<EditorStore> {
   openDiffSession = async (noteId: string, sessionId: string) => {
     const session = await db.noteHistory.session(sessionId);
     const note = await db.notes.note(noteId);
-    if (!session || !note || !note.contentId) return;
+    if (!session || !note) return;
 
-    const currentContent = await db.content.get(note.contentId);
+    const currentContent = note.contentId
+      ? await db.content.get(note.contentId)
+      : undefined;
     const oldContent = await db.noteHistory.content(session.id);
-
-    if (!oldContent || !currentContent) return;
+    if (!oldContent) return;
 
     const {
       getSession,
@@ -659,7 +660,7 @@ class EditorStore extends BaseStore<EditorStore> {
       note,
       tabId,
       title: label,
-      oldContentTitle: oldContent.title,
+      oldTitle: oldContent.title,
       historySessionId: session.id,
       content: {
         type: oldContent.type || "tiptap",
@@ -1356,7 +1357,7 @@ const useEditorStore = createPersistedStore(EditorStore, {
     }, [] as EditorSession[])
   }),
   storage: db.config() as PersistStorage<Partial<EditorStore>>
-});
+}) as ReturnType<typeof createPersistedStore<EditorStore>>;
 export { useEditorStore, SESSION_STATES };
 
 const MILLISECONDS_IN_A_MINUTE = 60 * 1000;
