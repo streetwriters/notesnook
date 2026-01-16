@@ -37,7 +37,7 @@ import { Pressable } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
 import { useSideBarDraggingStore } from "./dragging-store";
 
-function _MenuItem({
+export function MenuItem({
   item,
   index,
   testID,
@@ -179,12 +179,3 @@ function _MenuItem({
     </Pressable>
   );
 }
-
-export const MenuItem = React.memo(_MenuItem, (prev, next) => {
-  if (
-    prev.item.id !== next.item.id &&
-    prev.item.data?.dateModified !== next.item.data?.dateModified
-  )
-    return false;
-  return true;
-});

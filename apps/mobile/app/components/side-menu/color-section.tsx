@@ -30,6 +30,7 @@ import ReorderableList from "../list/reorderable-list";
 import { Properties } from "../properties";
 import { useSideBarDraggingStore } from "./dragging-store";
 import { MenuItem } from "./menu-item";
+import { Default_Drag_Action } from "../../hooks/use-actions";
 
 export const ColorSection = React.memo(
   function ColorSection() {
@@ -59,7 +60,7 @@ export const ColorSection = React.memo(
 
     const onLongPress = React.useCallback((item: SideMenuItem) => {
       if (useSideBarDraggingStore.getState().dragging) return;
-      Properties.present(item.data as Color);
+      Properties.present(item.data as Color, false, [Default_Drag_Action]);
     }, []);
 
     const renderIcon = React.useCallback((item: SideMenuItem, size: number) => {
