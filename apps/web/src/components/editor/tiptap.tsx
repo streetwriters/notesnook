@@ -198,6 +198,7 @@ function TipTap(props: TipTapProps) {
     "exportTableAsCsv",
     "importCsvToTable"
   ]);
+  const defaultTextDirection = useEditorConfig().editorConfig.textDirection;
 
   usePermissionHandler({
     claims: {
@@ -430,7 +431,8 @@ function TipTap(props: TipTapProps) {
             openInNewTab: openInNewTab
           });
         } else window.open(url, "_blank");
-      }
+      },
+      defaultTextDirection: defaultTextDirection === "ltr" ? undefined : "rtl"
     };
   }, [
     content,
@@ -440,7 +442,8 @@ function TipTap(props: TipTapProps) {
     timeFormat,
     dayFormat,
     markdownShortcuts,
-    fontLigatures
+    fontLigatures,
+    defaultTextDirection
   ]);
 
   const editor = useTiptap(
