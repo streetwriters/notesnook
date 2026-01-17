@@ -96,10 +96,7 @@ export const hotkeys = {
     type: "hotkeys"
   },
   openCommandPalette: {
-    keys: normalizeKeys({
-      desktop: ["ctrl+shift+p"],
-      web: ["ctrl+shift+p", "ctrl+shift+:"]
-    }),
+    keys: normalizeKeys(["ctrl+shift+p", "ctrl+shift+:"]),
     description: "Command palette",
     category: "Navigation",
     type: "hotkeys"
