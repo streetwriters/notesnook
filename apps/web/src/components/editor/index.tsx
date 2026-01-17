@@ -229,7 +229,8 @@ export default function TabsView() {
           ) : null}
           {arePropertiesVisible &&
             activeSession &&
-            activeSession.type !== "new" && (
+            activeSession.type !== "new" &&
+            activeSession.type !== "locked" && (
               <Pane id="properties-pane" initialSize={250} minSize={250}>
                 <Properties sessionId={activeSession.id} />
               </Pane>
