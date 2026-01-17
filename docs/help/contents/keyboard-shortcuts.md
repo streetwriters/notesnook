@@ -22,7 +22,7 @@ The following keyboard shortcuts will help you navigate Notesnook faster.
 | --- | --- | --- | --- |
 | Next tab | Ctrl Alt → / Ctrl Alt ⇧ → | Ctrl tab | ⌘ tab |
 | Previous tab | Ctrl Alt ← / Ctrl Alt ⇧ ← | Ctrl ⇧ tab | ⌘ ⇧ tab |
-| Command palette | Ctrl ⇧ P / Ctrl ⇧ : | Ctrl ⇧ P | ⌘ ⇧ P |
+| Command palette | Ctrl ⇧ P / Ctrl ⇧ : | Ctrl ⇧ P / Ctrl ⇧ : | ⌘ ⇧ P / ⌘ ⇧ : |
 | Quick open | Ctrl P | Ctrl P | ⌘ P |
 | New tab | - | Ctrl T | ⌘ T |
 | Close active tab | - | Ctrl W | ⌘ W |
