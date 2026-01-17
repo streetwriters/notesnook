@@ -749,7 +749,7 @@ msgstr ""
 
 #: src/strings.ts:975
 msgid "Add your first notebook"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2617
 msgid "Adjust the line height of the editor"
@@ -1603,7 +1603,7 @@ msgstr ""
 
 #: src/strings.ts:2392
 msgid "Click to reset {title}"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2615
 msgid "Click to save"
@@ -2591,7 +2591,7 @@ msgstr ""
 
 #: src/strings.ts:120
 msgid "Enter the recovery code to continue logging in"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2618
 msgid "Enter title"
@@ -3556,7 +3556,7 @@ msgstr ""
 
 #: src/strings.ts:2356
 msgid "Line {line}, Column {column}"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2616
 msgid "Line height"
@@ -7488,7 +7488,7 @@ msgstr ""
 
 #: src/strings.ts:1403
 msgid "Your free trial is ending soon"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2622
 msgid "Your free trial is on-going. Your subscription will start on {trialExpiryDate}"
