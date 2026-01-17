@@ -56,7 +56,7 @@ export default function NotePreview({
   content,
   note
 }: {
-  session: HistorySession & { session: string };
+  session?: HistorySession & { session: string };
   content:
     | Partial<
         NoteContent<boolean> & {
@@ -81,24 +81,26 @@ export default function NotePreview({
       eSendEvent(eCloseSheet);
       return;
     }
-    await db.noteHistory.restore(session.id);
-    if (useTabStore.getState().hasTabForNote(session?.noteId)) {
-      const note = editorController.current.note.current[session?.noteId];
-      if (note) {
-        eSendEvent(eOnLoadNote, {
-          item: note,
-          forced: true
-        });
+    if (session) {
+      await db.noteHistory.restore(session.id);
+      if (useTabStore.getState().hasTabForNote(session?.noteId)) {
+        const note = editorController.current.note.current[session?.noteId];
+        if (note) {
+          eSendEvent(eOnLoadNote, {
+            item: note,
+            forced: true
+          });
+        }
       }
-    }
-    eSendEvent(eCloseSheet, "note_history");
-    eSendEvent(eCloseSheet);
-    Navigation.queueRoutesForUpdate();
+      eSendEvent(eCloseSheet, "note_history");
+      eSendEvent(eCloseSheet);
+      Navigation.queueRoutesForUpdate();
 
-    ToastManager.show({
-      heading: strings.noteRestoredFromHistory(),
-      type: "success"
-    });
+      ToastManager.show({
+        heading: strings.noteRestoredFromHistory(),
+        type: "success"
+      });
+    }
   }
 
   useEffect(() => {
@@ -166,7 +168,7 @@ export default function NotePreview({
                         currentContent?.data || "<p></p>",
                         content.data as string
                       ),
-                      id: session?.noteId
+                      id: session?.noteId || note.id
                     });
                   }
                 }

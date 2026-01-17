@@ -929,7 +929,6 @@ export const settingsGroups: SettingSection[] = [
             hidden: (current) => (current as VaultStatusType)?.exists,
             modifer: () => {
               openVault({
-                item: {},
                 novault: false,
                 title: strings.createVault()
               });
@@ -943,7 +942,6 @@ export const settingsGroups: SettingSection[] = [
             hidden: (current) => !(current as VaultStatusType)?.exists,
             modifer: () =>
               openVault({
-                item: {},
                 changePassword: true,
                 novault: true,
                 title: strings.changeVaultPassword()
@@ -957,7 +955,6 @@ export const settingsGroups: SettingSection[] = [
             hidden: (current) => !(current as VaultStatusType)?.exists,
             modifer: () => {
               openVault({
-                item: {},
                 clearVault: true,
                 novault: true,
                 title: strings.clearVault() + "?"
@@ -972,7 +969,6 @@ export const settingsGroups: SettingSection[] = [
             hidden: (current) => !(current as VaultStatusType)?.exists,
             modifer: () => {
               openVault({
-                item: {},
                 deleteVault: true,
                 novault: true,
                 title: strings.deleteVault() + "?"
@@ -994,7 +990,6 @@ export const settingsGroups: SettingSection[] = [
             modifer: (current) => {
               const _current = current as VaultStatusType;
               openVault({
-                item: {},
                 fingerprintAccess: !_current.biometryEnrolled,
                 revokeFingerprintAccess: _current.biometryEnrolled,
                 novault: true,
