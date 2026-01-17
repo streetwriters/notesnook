@@ -292,7 +292,9 @@ const useTiptap = (
             colwidth: [100]
           }
         }),
-        Clipboard,
+        Clipboard.configure({
+          parseMarkdownOnPaste: options.enableInputRules
+        }),
         TableRow,
         TableCell,
         TableHeader,
