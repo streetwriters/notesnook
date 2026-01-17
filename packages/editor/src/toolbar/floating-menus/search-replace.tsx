@@ -29,9 +29,14 @@ export function SearchReplaceFloatingMenu(props: FloatingMenuProps) {
   const isSearching = useEditorSearchStore((store) => store.isSearching);
 
   useLayoutEffect(() => {
-    const { searchTerm, ...options } = useEditorSearchStore.getState();
-    if (!options.isSearching) editor.commands.endSearch();
-    else editor.commands.search(searchTerm, options);
+    // defer search to ensure editor is fully initialized
+    const timeoutId = setTimeout(() => {
+      const { searchTerm, ...options } = useEditorSearchStore.getState();
+      if (!options.isSearching) editor.commands.endSearch();
+      else editor.commands.search(searchTerm, options);
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
   }, []);
 
   return (
