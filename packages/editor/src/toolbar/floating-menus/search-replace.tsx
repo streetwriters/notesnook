@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useLayoutEffect } from "react";
 import { FloatingMenuProps } from "./types.js";
 import { SearchReplacePopup } from "../popups/search-replace.js";
 import { ResponsivePresenter } from "../../components/responsive/index.js";
@@ -27,17 +26,6 @@ import { useEditorSearchStore } from "../stores/search-store.js";
 export function SearchReplaceFloatingMenu(props: FloatingMenuProps) {
   const { editor } = props;
   const isSearching = useEditorSearchStore((store) => store.isSearching);
-
-  useLayoutEffect(() => {
-    // defer search to ensure editor is fully initialized
-    const timeoutId = setTimeout(() => {
-      const { searchTerm, ...options } = useEditorSearchStore.getState();
-      if (!options.isSearching) editor.commands.endSearch();
-      else editor.commands.search(searchTerm, options);
-    }, 0);
-
-    return () => clearTimeout(timeoutId);
-  }, []);
 
   return (
     <ResponsivePresenter
