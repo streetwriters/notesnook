@@ -326,8 +326,8 @@ export function createIsReminderActiveQuery(now = "now") {
   return sql`IIF(
     (disabled IS NULL OR disabled = 0)
     AND (mode != 'once'
-      OR datetime(date / 1000, 'unixepoch', 'localtime') > datetime(${now})
+      OR datetime(date / 1000, 'unixepoch', 'localtime') > datetime(${now}, 'localtime')
       OR (snoozeUntil IS NOT NULL
-        AND datetime(snoozeUntil / 1000, 'unixepoch', 'localtime') > datetime(${now}))
+        AND datetime(snoozeUntil / 1000, 'unixepoch', 'localtime') > datetime(${now}, 'localtime'))
     ), 1, 0)`.$castTo<boolean>();
 }
