@@ -28,7 +28,8 @@ Once you have all the .ENEX files containing your Evernote notes, its time to im
    ![](/static/evernote-importer/4.png)
 3. Drop (or select) the `.enex` files you exported earlier from Evernote, and click the "Start processing" button.
    ![](/static/evernote-importer/5.png)
-4. Once the importing completes you should see all your notes in Notesnook. If you face any issues during importing, feel free to [report them on GitHub](https://github.com/streetwriters/notesnook-importer).
+4. (Optional) Since Notesnook does not support nested tags, nested tags imported from Evernote will not work as expected. Instead, you can convert nested tags into notebooks in Notesnook. To do this, enable the “Convert nested tags to notebooks” toggle and specify a nested tag separator character (such as `/` or `_`). Before importing, you’ll need to manually rename your nested tags in Evernote (either through the Evernote UI or by editing the `.enex` file) so that the full tag hierarchy is represented using the chosen separator character.
+5. Once the importing completes you should see all your notes in Notesnook. If you face any issues during importing, feel free to [report them on GitHub](https://github.com/streetwriters/notesnook-importer).
 
 ## Supported formats
 

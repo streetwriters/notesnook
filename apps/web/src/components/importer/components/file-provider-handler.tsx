@@ -25,7 +25,7 @@ import {
 } from "@notesnook-importer/core";
 import { formatBytes } from "@notesnook/common";
 import { ScrollContainer } from "@notesnook/ui";
-import { Button, Flex, Input, Text } from "@theme-ui/components";
+import { Button, Flex, Input, Switch, Text } from "@theme-ui/components";
 import { xxhash64 } from "hash-wasm";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
@@ -53,6 +53,9 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
   });
   const [totalNoteCount, setTotalNoteCount] = useState(0);
   const [_, setCounter] = useState<number>(0);
+  const [nestedTagSeparator, setNestedTagSeparator] = useState<
+    string | undefined
+  >(undefined);
   const logs = useRef<string[]>([]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -103,6 +106,10 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
       },
       reporter: () => {
         setTotalNoteCount(++totalNotes);
+      },
+      // @ts-expect-error update importer package
+      options: {
+        nestedTagToNotebookSeparator: nestedTagSeparator
       }
     };
 
@@ -224,6 +231,51 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
           </Text>
         </Text>
       </Flex>
+
+      {provider.name.toLowerCase() === "evernote" && files.length > 0 && (
+        <>
+          <Flex
+            sx={{
+              alignItems: "center",
+              mt: 2,
+              justifyContent: "space-between",
+              "& > label": { width: "auto" }
+            }}
+          >
+            <Text variant="body" sx={{ fontWeight: "bold" }}>
+              Convert nested tags to notebooks
+            </Text>
+            <Switch
+              sx={{
+                m: 0,
+                background:
+                  nestedTagSeparator !== undefined ? "accent" : "icon-secondary"
+              }}
+              onChange={() =>
+                setNestedTagSeparator((s) => (s ? undefined : "/"))
+              }
+              checked={nestedTagSeparator !== undefined}
+            />
+          </Flex>
+          {nestedTagSeparator !== undefined && (
+            <Flex
+              sx={{
+                alignItems: "center",
+                justifyContent: "space-between",
+                mt: 1
+              }}
+            >
+              <Text variant="body">Nested tag separator</Text>
+              <Input
+                type={"text"}
+                defaultValue={"/"}
+                sx={{ width: 50, padding: 2, height: 25 }}
+                onChange={(e) => setNestedTagSeparator(e.target.value)}
+              />
+            </Flex>
+          )}
+        </>
+      )}
       {files.length > 0 ? (
         <Accordion
           isClosed
