@@ -294,7 +294,9 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
               tr.mapping.map(to)
             )
           );
-          scrollIntoView();
+
+          const domNode = this.editor.view.domAtPos(from).node;
+          scrollIntoView(domNode);
 
           this.storage.selectedIndex = nextIndex;
           tr.setMeta("selectedIndex", nextIndex);
@@ -319,7 +321,9 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
               tr.mapping.map(to)
             )
           );
-          scrollIntoView();
+
+          const domNode = this.editor.view.domAtPos(from).node;
+          scrollIntoView(domNode);
 
           this.storage.selectedIndex = prevIndex;
           tr.setMeta("selectedIndex", prevIndex);
@@ -472,14 +476,13 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
   }
 });
 
-function scrollIntoView() {
+function scrollIntoView(domNode: Node) {
   setTimeout(() => {
-    const domNode = document.querySelector(".search-result.selected");
-    if (!(domNode instanceof HTMLElement)) return;
-
-    domNode.scrollIntoView({
-      behavior: "instant",
-      block: "center"
-    });
+    if ("scrollIntoView" in domNode) {
+      (domNode as Element).scrollIntoView({
+        behavior: "instant",
+        block: "center"
+      });
+    }
   });
 }
