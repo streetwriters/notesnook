@@ -2118,6 +2118,10 @@ msgstr ""
 msgid "Delete column"
 msgstr ""
 
+#: src/strings.ts:2636
+msgid "Delete data"
+msgstr ""
+
 #: src/strings.ts:1314
 msgid "Delete group"
 msgstr ""

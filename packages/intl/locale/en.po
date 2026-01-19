@@ -2129,6 +2129,10 @@ msgstr "Delete collapsed section"
 msgid "Delete column"
 msgstr "Delete column"
 
+#: src/strings.ts:2636
+msgid "Delete data"
+msgstr "Delete data"
+
 #: src/strings.ts:1314
 msgid "Delete group"
 msgstr "Delete group"
