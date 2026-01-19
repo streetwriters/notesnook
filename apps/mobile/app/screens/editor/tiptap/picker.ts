@@ -126,30 +126,16 @@ const file = async (fileOptions: PickerOptions) => {
       useTabStore.getState().getNoteIdForTab(fileOptions.tabId) ===
         fileOptions.noteId
     ) {
-      if (isImage(file.type || "application/octet-stream")) {
-        editorController.current?.commands.insertImage(
-          {
-            hash: hash,
-            filename: fileName,
-            mime: file.type || "application/octet-stream",
-            size: file.size || 0,
-            dataurl: (await db.attachments.read(hash, "base64")) as string,
-            type: "image"
-          },
-          fileOptions.tabId
-        );
-      } else {
-        editorController.current?.commands.insertAttachment(
-          {
-            hash: hash,
-            filename: fileName,
-            mime: file.type || "application/octet-stream",
-            size: file.size || 0,
-            type: "file"
-          },
-          fileOptions.tabId
-        );
-      }
+      editorController.current?.commands.insertAttachment(
+        {
+          hash: hash,
+          filename: fileName,
+          mime: file.type || "application/octet-stream",
+          size: file.size || 0,
+          type: "file"
+        },
+        fileOptions.tabId
+      );
     } else {
       throw new Error("Failed to attach file, no tabId is set");
     }
