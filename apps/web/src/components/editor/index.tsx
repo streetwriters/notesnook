@@ -572,7 +572,7 @@ export function Editor(props: EditorProps) {
         onPreviewAttachment={async (data) => {
           const { hash, type, mime } = data;
           const attachment = await db.attachments.attachment(hash);
-          if (attachment && type === "image") {
+          if (attachment && mime.startsWith("image/")) {
             await previewImageAttachment(attachment);
           } else if (
             attachment &&
