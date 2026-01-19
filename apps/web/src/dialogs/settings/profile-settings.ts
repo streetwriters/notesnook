@@ -107,9 +107,17 @@ export const ProfileSettings: SettingsGroup[] = [
             variant: "error",
             title: strings.deleteData(),
             action: async () => {
-              Config.clear();
-              await db.reset();
-              window.location.reload();
+              const ok = await ConfirmDialog.show({
+                title: strings.deleteData(),
+                message: strings.deleteAccountDesc(),
+                positiveButtonText: strings.yes(),
+                negativeButtonText: strings.no()
+              });
+              if (ok) {
+                Config.clear();
+                await db.reset();
+                window.location.reload();
+              }
             }
           }
         ]
