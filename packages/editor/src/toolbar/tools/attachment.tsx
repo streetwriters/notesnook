@@ -69,9 +69,8 @@ export function PreviewAttachment(props: ToolProps) {
     findSelectedNode(editor, "attachment") || findSelectedNode(editor, "image");
   const attachment = (attachmentNode?.attrs || {}) as Attachment;
 
-  if (!editor.isActive("image") && !canPreviewAttachment(attachment)) {
+  if (!editor.isActive("image") && !canPreviewAttachment(attachment))
     return null;
-  }
 
   return (
     <ToolButton

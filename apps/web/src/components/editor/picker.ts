@@ -90,9 +90,7 @@ export async function attachFiles(
   const documents = files.filter((f) => !f.type.startsWith("image/"));
   const attachments: Attachment[] = [];
   for (const file of [...images, ...documents]) {
-    const attachment = skipSpecialImageHandling
-      ? await pickFile(file)
-      : file.type.startsWith("image/")
+    const attachment = !skipSpecialImageHandling && file.type.startsWith("image/")
       ? await pickImage(file)
       : await pickFile(file);
     if (!attachment) continue;
