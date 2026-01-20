@@ -252,14 +252,16 @@ const NoteItem = ({
                 {reminder ? (
                   <ReminderTime
                     reminder={reminder}
-                    disabled
                     color={color?.colorCode}
                     textStyle={{
-                      fontSize: AppFontSize.xxxs
+                      fontSize: AppFontSize.xxs
                     }}
-                    iconSize={AppFontSize.xxxs}
+                    short
+                    iconSize={AppFontSize.xxs}
                     style={{
-                      height: "auto"
+                      justifyContent: "flex-start",
+                      paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL / 2,
+                      alignSelf: "flex-start"
                     }}
                   />
                 ) : null}

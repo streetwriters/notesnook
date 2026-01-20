@@ -39,7 +39,7 @@ import Input from "../../components/ui/input";
 import { ReminderTime } from "../../components/ui/reminder-time";
 import Paragraph from "../../components/ui/typography/paragraph";
 import { DDS } from "../../services/device-detection";
-import { ToastManager } from "../../services/event-manager";
+import { eSendEvent, ToastManager } from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import Notifications from "../../services/notifications";
 import SettingsService from "../../services/settings";
@@ -47,9 +47,18 @@ import { useRelationStore } from "../../stores/use-relation-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { AppFontSize, defaultBorderRadius } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
-import { getFormattedDate, useIsFeatureAvailable } from "@notesnook/common";
+import {
+  getFormattedDate,
+  useIsFeatureAvailable,
+  usePromise
+} from "@notesnook/common";
 import PaywallSheet from "../../components/sheets/paywall";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
+import { Pressable } from "../../components/ui/pressable";
+import { TimeSince } from "../../components/ui/time-since";
+import Heading from "../../components/ui/typography/heading";
+import { eOnLoadNote } from "../../utils/events";
+import { fluidTabsRef } from "../../utils/global-refs";
 
 const ReminderModes =
   Platform.OS === "ios"
@@ -123,6 +132,15 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
   const titleRef = useRef<TextInput>(null);
   const descriptionRef = useRef<TextInput>(null);
   const timer = useRef<NodeJS.Timeout>(undefined);
+  const referencedNotes = usePromise(
+    () =>
+      reminder?.id
+        ? db.relations
+            .to({ id: reminder.id, type: "reminder" }, "note")
+            .resolve()
+        : null,
+    [reminder?.id]
+  );
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -245,6 +263,9 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
             marginBottom: DDS.isTab ? 25 : undefined,
             paddingHorizontal: DefaultAppStyles.GAP
           }}
+          contentContainerStyle={{
+            gap: DefaultAppStyles.GAP_VERTICAL
+          }}
           keyboardDismissMode="interactive"
           keyboardShouldPersistTaps="handled"
         >
@@ -279,15 +300,11 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
               paddingVertical: DefaultAppStyles.GAP_VERTICAL
             }}
             height={80}
-            wrapperStyle={{
-              marginBottom: DefaultAppStyles.GAP_VERTICAL
-            }}
           />
 
           <ScrollView
             style={{
-              flexDirection: "row",
-              marginBottom: DefaultAppStyles.GAP_VERTICAL
+              flexDirection: "row"
             }}
             horizontal
           >
@@ -343,8 +360,7 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
               style={{
                 backgroundColor: colors.secondary.background,
                 padding: DefaultAppStyles.GAP,
-                borderRadius: defaultBorderRadius,
-                marginBottom: DefaultAppStyles.GAP_VERTICAL
+                borderRadius: defaultBorderRadius
               }}
             >
               <View
@@ -462,7 +478,6 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
                 width: "100%",
                 flexDirection: "column",
                 justifyContent: "center",
-                marginBottom: DefaultAppStyles.GAP_VERTICAL,
                 alignItems: "center"
               }}
             >
@@ -521,10 +536,8 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
               style={{
                 borderRadius: defaultBorderRadius,
                 flexDirection: "row",
-                paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
                 alignItems: "center",
-                justifyContent: "flex-start",
-                marginBottom: DefaultAppStyles.GAP_VERTICAL
+                justifyContent: "flex-start"
               }}
             >
               <>
@@ -560,22 +573,10 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
             </View>
           )}
 
-          <ReminderTime
-            reminder={reminder}
-            style={{
-              width: "100%",
-              justifyContent: "flex-start",
-              borderWidth: 0,
-              paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
-              alignSelf: "flex-start"
-            }}
-          />
-
           {reminderMode === ReminderModes.Permanent ? null : (
             <ScrollView
               style={{
                 flexDirection: "row",
-                marginTop: DefaultAppStyles.GAP_VERTICAL,
                 height: 50
               }}
               horizontal
@@ -620,6 +621,60 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
               ))}
             </ScrollView>
           )}
+
+          <ReminderTime
+            reminder={reminder}
+            style={{
+              width: "100%",
+              justifyContent: "flex-start",
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
+              alignSelf: "flex-start"
+            }}
+          />
+
+          {referencedNotes &&
+          referencedNotes.status === "fulfilled" &&
+          referencedNotes.value !== null &&
+          referencedNotes.value?.length > 0 ? (
+            <View
+              style={{
+                gap: DefaultAppStyles.GAP_VERTICAL
+              }}
+            >
+              <Heading size={AppFontSize.md}>{strings.referencedIn()}</Heading>
+              {referencedNotes.value.map((item) => (
+                <Pressable
+                  style={{
+                    justifyContent: "space-between",
+                    flexDirection: "row",
+                    paddingHorizontal: DefaultAppStyles.GAP,
+                    paddingVertical: DefaultAppStyles.GAP_VERTICAL
+                  }}
+                  onPress={() => {
+                    Navigation.navigate("FluidPanelsView");
+                    fluidTabsRef.current?.goToPage("editor");
+                    eSendEvent(eOnLoadNote, {
+                      item: item
+                    });
+                  }}
+                  type="secondary"
+                >
+                  <Paragraph>{item.title}</Paragraph>
+                  <TimeSince
+                    style={{
+                      fontSize: AppFontSize.xxs,
+                      color: colors.secondary.paragraph,
+                      marginRight: 6
+                    }}
+                    time={item.dateEdited}
+                    updateFrequency={
+                      Date.now() - item.dateEdited < 60000 ? 2000 : 60000
+                    }
+                  />
+                </Pressable>
+              ))}
+            </View>
+          ) : null}
         </ScrollView>
       </KeyboardViewIOS>
     </SafeAreaView>
