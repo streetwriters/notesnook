@@ -177,6 +177,7 @@ export class Notes implements ICollection {
           localOnly: item.localOnly,
           conflicted: item.conflicted,
           readonly: item.readonly,
+          archived: item.archived,
 
           dateCreated: item.dateCreated,
           dateEdited: item.dateEdited || dateEdited,
@@ -197,6 +198,7 @@ export class Notes implements ICollection {
           localOnly: item.localOnly,
           conflicted: item.conflicted,
           readonly: item.readonly,
+          archived: item.archived,
 
           dateCreated: item.dateCreated || Date.now(),
           dateEdited: item.dateEdited || dateEdited || Date.now(),
@@ -432,9 +434,7 @@ export class Notes implements ICollection {
       const duplicateId = await this.db.notes.add({
         ...clone(note),
         id: undefined,
-        readonly: false,
-        favorite: false,
-        pinned: false,
+        isGeneratedTitle: false,
         contentId: undefined,
         title: note.title + " (Copy)",
         dateEdited: undefined,
