@@ -1,39 +1,39 @@
 ---
-title: Clipping your first webpage with web clipper
-description: Clip web pages & save interesting things you find on the web with Notesnook web clipper in a private & secure way.
+title: Clipping your first web page with Web Clipper
+description: Clip web pages & save interesting things you find on the web with Notesnook Web Clipper in a private & secure way.
 ---
 
-# Clipping your first webpage with web clipper
+# Clipping your first web page with Web Clipper
 
-## Connecting the with the web app
+## Connecting to the web app
 
-Before you can clip pages, you must connect the web clipper with the Notesnook web app. The web clipper works completely offline and relies on the web app to sync & save your clips.
+Before you can clip pages, you must connect the web clipper to the Notesnook web app. The web clipper works completely offline and relies on the web app to sync & save your clips.
 
 1. Activate the web clipper by clicking on the Notesnook icon in your browser toolbar
 
-   > info Pin the Notesnook Web Clipper to toolbar
+   > info Pin the Notesnook Web Clipper to the toolbar
    >
    > Modern browsers group all extensions under their Extensions dropdown by default. It is recommended that you `Pin to toolbar` the Notesnook Web Clipper.
    >
    > # [Chrome](#/tab/chrome)
    >
-   > ![How to pin the Notesnook Web Clipper to toolbar in Chrome](/static/web-clipper/chrome-pin-to-toolbar.gif)
+   > ![How to pin the Notesnook Web Clipper to the toolbar in Chrome](/static/web-clipper/chrome-pin-to-toolbar.gif)
    >
    > # [Firefox](#/tab/firefox)
    >
-   > ![How to pin the Notesnook Web Clipper to toolbar in Firefox](/static/web-clipper/firefox-pin-to-toolbar.gif)
+   > ![How to pin the Notesnook Web Clipper to the toolbar in Firefox](/static/web-clipper/firefox-pin-to-toolbar.gif)
    >
    > ***
 
 2. Click on `Connect to Notesnook`
-3. Notesnook web app will open in a new tab in the background. Wait a few seconds and the web clipper should automatically connect.
+3. The Notesnook web app will open in a new tab in the background. Wait a few seconds, and the web clipper should automatically connect.
    > error What to do if the web clipper doesn't connect?
    >
    > There are a few things you can do to troubleshoot:
    >
-   > 1. Make sure you are logged in on the Notesnook web app
-   > 2. Make sure you have the Notesnook web app opened in the background
-   > 3. The web clipper doesn't yet support multiple browser windows so make sure there aren't any additional browser windows opened in the background.
+   > 1. Make sure you are logged in to the Notesnook web app
+   > 2. Make sure you have the Notesnook web app open in the background
+   > 3. The web clipper doesn't yet support multiple browser windows, so make sure there aren't any additional browser windows open in the background.
    > 4. Try restarting the browser
 
 ## Selecting the clipping area
@@ -44,11 +44,11 @@ The [web clipper](https://notesnook.com/notesnook-web-clipper) provides a few op
 
 ### Full page
 
-The `Full page` mode clips the web page from top to bottom including every possible detail. This mode is also the largest in size & consequently takes longer to clip.
+The `Full page` mode clips the web page from top to bottom, including every possible detail. This mode is also the largest in size & consequently takes longer to clip.
 
 ### Article
 
-The `Article` mode is best for blogs & articles on the web because it tries to finds the "content" part of the page using a couple of heuristics. It works similar to Firefox's Reader Mode.
+The `Article` mode is best for blogs & articles on the web because it tries to find the "content" part of the page using a couple of heuristics. It works similarly to Firefox's Reader Mode.
 
 ### Visible area
 
@@ -65,8 +65,8 @@ The `Selected nodes` mode allows you to select exactly which nodes you want to c
    > info
    >
    > The web clipper stacks all the selected nodes vertically during final processing.
-4. Clicking again on the selected nodes will deselect them.
-5. Once you are done, click on the Clip button
+4. Clicking on the selected nodes again will deselect them.
+5. Once you are done, click on the `Clip` button
 6. Activate the Notesnook Web Clipper and save your clip.
 
 ## Selecting the clipping mode
@@ -75,11 +75,11 @@ The clipping mode controls how the final clip should look.
 
 ### Bookmark
 
-`Bookmark` mode saves only the URL of the page along with the title. It is best suited to save pages for later reading/reference.
+`Bookmark` mode saves only the URL of the page along with the title. It is best suited for saving pages for later reading/reference.
 
 ### Simplified
 
-`Simplified` mode doesn't include any styles. It is best suited for long-form content such as articles & blogs. All clips in `Simplified` mode are saved directly as is i.e. they do not appear as web clip embeds in the Notesnook editor.
+`Simplified` mode doesn't include any styles. It is best suited for long-form content such as articles & blogs. All clips in `Simplified` mode are saved directly as-is, i.e., they do not appear as web clip embeds in the Notesnook editor.
 
 ### Screenshot
 
@@ -87,7 +87,7 @@ The clipping mode controls how the final clip should look.
 >
 > `Screenshot` mode is only available to Pro users
 
-`Screenshot` mode includes all the styles + images but the final result is saved as an image i.e. it is non-interactive.
+`Screenshot` mode includes all the styles + images, but the final result is saved as an image, i.e., it is non-interactive.
 
 ### Complete with styles
 
@@ -95,7 +95,7 @@ The clipping mode controls how the final clip should look.
 >
 > `Complete with styles` mode is only available to Pro users
 
-`Complete with styles` mode saves all images, styles & everything on the page to retain the maximum amount of information. The final result appears as an embed in the Notesnook editor which is full interactive.
+`Complete with styles` mode saves all images, styles & everything on the page to retain the maximum amount of information. The final result appears as an embed in the Notesnook editor, which is fully interactive.
 
 ![](/static/web-clipper/web-clip-embed.gif)
 
@@ -107,7 +107,7 @@ Notesnook Web Clipper offers 3 easy ways to organize your web clips (all of whic
 
 ### [Append to note](#/tab/append-to-note)
 
-You can choose to append your web clip to an existing note and it'll be automatically added at the bottom of that note:
+You can choose to append your web clip to an existing note, and it'll be automatically added at the bottom of that note:
 
 1. Click on `Select a note to append to`
 2. Select the note you want to append to
