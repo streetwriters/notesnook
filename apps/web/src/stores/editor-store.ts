@@ -286,6 +286,7 @@ class EditorStore extends BaseStore<EditorStore> {
         const clearIds: string[] = [];
         for (const session of sessions) {
           if (session.type === "new") continue;
+          if (session.note.id !== item.id) continue;
           const noteId = isDeleted(item)
             ? null
             : item.type === "note"
