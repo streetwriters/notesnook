@@ -286,15 +286,7 @@ class EditorStore extends BaseStore<EditorStore> {
         const clearIds: string[] = [];
         for (const session of sessions) {
           if (session.type === "new") continue;
-          if (session.note.id !== item.id) continue;
-          const noteId = isDeleted(item)
-            ? null
-            : item.type === "note"
-            ? item.id
-            : item.type === "tiptap"
-            ? item.noteId
-            : null;
-          if (noteId && session.note.id !== noteId) continue;
+          if (session.note.id !== item.id && session.note.contentId !== item.id) continue;
           if (isDeleted(item) || isTrashItem(item))
             clearIds.push(session.tabId);
           // if a note becomes conflicted, reopen the session
