@@ -2632,5 +2632,66 @@ Use this if changes from other devices are not appearing on this device. This wi
   expiryDate: () => t`Expiry date`,
   exportCsv: () => t`Export CSV`,
   importCsv: () => t`Import CSV`,
-  noContent: () => t`This note is empty`
+  noContent: () => t`This note is empty`,
+  inboxAPI: () => t`Inbox API`,
+  inboxAPIDesc: () =>
+    t`Share things to Notesbook from anywhere using the Inbox API`,
+  enableInboxAPI: () => t`Enable Inbox API`,
+  enableInboxAPIDesc: () => t`Enable/Disable Inbox API`,
+  manageInboxKeys: () => t`Inbox Keys`,
+  manageInboxKeysDesc: () =>
+    t`View and edit your inbox public/private key pair`,
+  disableInboxAPI: () => t`Disable Inbox API`,
+  disableInboxAPIDesc: () =>
+    t`Disabling will delete all your unsynced inbox items. Additionally, disabling will revoke all existing API keys, they will no longer work. Are you sure?`,
+  addKey: () => t`Add key`,
+  viewAPIKeys: () => t`API Keys`,
+  viewAPIKeysDesc: () => t`View and manage inbox API keys`,
+  createApiKey: () => t`Create API Key`,
+  keyName: () => t`Key name`,
+  exampleKeyName: () => t`e.g., Todo integration`,
+  expiresIn: () => t`Expires in`,
+  enterKeyName: () => t`Please enter a key name`,
+  apiKeyCreatedSuccessfully: () => t`API key created successfully`,
+  failedToCreateApiKey: (message: string) =>
+    t`Failed to create API key${message ? `: ${message}` : ""}`,
+  creating: () => t`Creating...`,
+  expiryOneDay: () => t`1 day`,
+  expiryOneWeek: () => t`1 week`,
+  expiryOneMonth: () => t`1 month`,
+  expiryOneYear: () => t`1 year`,
+  loadingApiKeys: () => t`Loading API keys...`,
+  failedToLoadApiKeys: () => t`Failed to load API keys. Please try again.`,
+  retry: () => t`Retry`,
+  createFirstApiKey: () => t`Create your first api key to get started.`,
+  createKey: () => t`Create Key`,
+  ok: () => t`OK`,
+  apiKeysLimitReached: () => t`API Keys Limit Reached`,
+  apiKeysLimitReachedMessage: () =>
+    t`Cannot create more than 10 api keys at a time. Please revoke some existing keys before creating new ones.`,
+  authenticateToViewApiKey: () => t`Authenticate to view API key`,
+  enterPasswordToViewApiKey: () =>
+    t`Please enter your account password to view this API key.`,
+  authenticate: () => t`Authenticate`,
+  invalidPassword: () => t`Invalid password`,
+  apiKeyCopiedToClipboard: () => t`API key copied to clipboard`,
+  failedToCopyToClipboard: () => t`Failed to copy to clipboard`,
+  revokeInboxApiKey: (name: string) => t`Revoke Inbox API Key - ${name}`,
+  revokeApiKeyConfirmation: (name: string) =>
+    t`Are you sure you want to revoke the key "${name}"? All inbox actions using this key will stop working immediately.`,
+  apiKeyRevoked: () => t`API key revoked`,
+  failedToRevokeApiKey: () => t`Failed to revoke API key`,
+  lastUsedOn: () => t`Last used on`,
+  neverUsed: () => t`Never used`,
+  createdOn: () => t`Created on`,
+  neverExpires: () => t`Never expires`,
+  expired: () => t`Expired`,
+  expiresOn: () => t`Expires on`,
+  changingInboxPgpKeysNotice: () =>
+    t`Changing Inbox PGP keys will delete all your unsynced inbox items.`,
+  publicKey: () => t`Public Key:`,
+  privateKey: () => t`Private Key:`,
+  invalidPgpKeyPair: () =>
+    t`Invalid PGP key pair. Please check your keys and try again.`,
+  inboxKeysSaved: () => t`Inbox keys saved`
 };

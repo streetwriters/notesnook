@@ -203,21 +203,21 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
           flexShrink: 1
         }}
       >
-        <View
-          style={{
-            width: 40,
-            height: 40,
-            justifyContent: "center",
-            alignItems: "center",
-            marginRight: 12,
-            backgroundColor:
-              item.component === "colorpicker"
-                ? colors.primary.accent
-                : undefined,
-            borderRadius: 100
-          }}
-        >
-          {!!item.icon && (
+        {item.icon ? (
+          <View
+            style={{
+              width: 40,
+              height: 40,
+              justifyContent: "center",
+              alignItems: "center",
+              marginRight: 12,
+              backgroundColor:
+                item.component === "colorpicker"
+                  ? colors.primary.accent
+                  : undefined,
+              borderRadius: 100
+            }}
+          >
             <Icon
               color={
                 item.type === "danger"
@@ -227,25 +227,28 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
               name={item.icon}
               size={30}
             />
-          )}
-        </View>
+          </View>
+        ) : null}
 
         <View
           style={{
             flexShrink: 1,
-            paddingRight: item.type === "switch" ? 10 : 0
+            paddingRight: item.type === "switch" ? 10 : 0,
+            flex: item.type === "component" ? 1 : 0
           }}
         >
-          <Heading
-            color={
-              item.type === "danger"
-                ? colors.error.paragraph
-                : colors.primary.heading
-            }
-            size={AppFontSize.sm}
-          >
-            {typeof item.name === "function" ? item.name(current) : item.name}
-          </Heading>
+          {item.name ? (
+            <Heading
+              color={
+                item.type === "danger"
+                  ? colors.error.paragraph
+                  : colors.primary.heading
+              }
+              size={AppFontSize.sm}
+            >
+              {typeof item.name === "function" ? item.name(current) : item.name}
+            </Heading>
+          ) : null}
 
           {!!item.description && (
             <Paragraph

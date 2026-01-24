@@ -607,6 +607,22 @@ msgstr "{words, plural, other {# selected}}"
 msgid "#notesnook"
 msgstr "#notesnook"
 
+#: src/strings.ts:2659
+msgid "1 day"
+msgstr "1 day"
+
+#: src/strings.ts:2661
+msgid "1 month"
+msgstr "1 month"
+
+#: src/strings.ts:2660
+msgid "1 week"
+msgstr "1 week"
+
+#: src/strings.ts:2662
+msgid "1 year"
+msgstr "1 year"
+
 #: src/strings.ts:1583
 msgid "12-hour"
 msgstr "12-hour"
@@ -698,6 +714,10 @@ msgstr "Add a tag"
 #: src/strings.ts:557
 msgid "Add color"
 msgstr "Add color"
+
+#: src/strings.ts:2647
+msgid "Add key"
+msgstr "Add key"
 
 #: src/strings.ts:895
 msgid "Add notebook"
@@ -871,6 +891,26 @@ msgstr "and we will manually confirm your account."
 msgid "ANNOUNCEMENT"
 msgstr "ANNOUNCEMENT"
 
+#: src/strings.ts:2677
+msgid "API key copied to clipboard"
+msgstr "API key copied to clipboard"
+
+#: src/strings.ts:2655
+msgid "API key created successfully"
+msgstr "API key created successfully"
+
+#: src/strings.ts:2682
+msgid "API key revoked"
+msgstr "API key revoked"
+
+#: src/strings.ts:2648
+msgid "API Keys"
+msgstr "API Keys"
+
+#: src/strings.ts:2669
+msgid "API Keys Limit Reached"
+msgstr "API Keys Limit Reached"
+
 #: src/strings.ts:252
 msgid "App data has been cleared. Kindly relaunch the app to login again."
 msgstr "App data has been cleared. Kindly relaunch the app to login again."
@@ -950,6 +990,10 @@ msgstr "Are you sure you want to remove your name?"
 msgid "Are you sure you want to remove your profile picture?"
 msgstr "Are you sure you want to remove your profile picture?"
 
+#: src/strings.ts:2681
+msgid "Are you sure you want to revoke the key \"{name}\"? All inbox actions using this key will stop working immediately."
+msgstr "Are you sure you want to revoke the key \"{name}\"? All inbox actions using this key will stop working immediately."
+
 #: src/strings.ts:1323
 msgid "Are you sure?"
 msgstr "Are you sure?"
@@ -1027,6 +1071,14 @@ msgstr "Audios"
 #: src/strings.ts:1626
 msgid "Auth server"
 msgstr "Auth server"
+
+#: src/strings.ts:2675
+msgid "Authenticate"
+msgstr "Authenticate"
+
+#: src/strings.ts:2672
+msgid "Authenticate to view API key"
+msgstr "Authenticate to view API key"
 
 #: src/strings.ts:1795
 msgid "Authenticated as {email}"
@@ -1309,6 +1361,10 @@ msgstr "Cancel subscription"
 msgid "Cancel upload"
 msgstr "Cancel upload"
 
+#: src/strings.ts:2671
+msgid "Cannot create more than 10 api keys at a time. Please revoke some existing keys before creating new ones."
+msgstr "Cannot create more than 10 api keys at a time. Please revoke some existing keys before creating new ones."
+
 #: src/strings.ts:2301
 msgid "Cell background color"
 msgstr "Cell background color"
@@ -1409,6 +1465,10 @@ msgstr "Change your primary two-factor authentication method"
 #: src/strings.ts:1089
 msgid "Changes from other devices won't be updated in the editor in real-time."
 msgstr "Changes from other devices won't be updated in the editor in real-time."
+
+#: src/strings.ts:2691
+msgid "Changing Inbox PGP keys will delete all your unsynced inbox items."
+msgstr "Changing Inbox PGP keys will delete all your unsynced inbox items."
 
 #: src/strings.ts:734
 msgid "Changing password is an irreversible process. You will be logged out from all your devices. Please make sure you do not close the app while your password is changing and have good internet connection."
@@ -1886,6 +1946,14 @@ msgstr "Create a shortcut"
 msgid "Create account"
 msgstr "Create account"
 
+#: src/strings.ts:2650
+msgid "Create API Key"
+msgstr "Create API Key"
+
+#: src/strings.ts:2667
+msgid "Create Key"
+msgstr "Create Key"
+
 #: src/strings.ts:581
 msgid "Create link"
 msgstr "Create link"
@@ -1914,14 +1982,26 @@ msgstr "Create vault"
 msgid "Create your account"
 msgstr "Create your account"
 
+#: src/strings.ts:2666
+msgid "Create your first api key to get started."
+msgstr "Create your first api key to get started."
+
 #: src/strings.ts:2229
 msgid "Created at"
 msgstr "Created at"
+
+#: src/strings.ts:2686
+msgid "Created on"
+msgstr "Created on"
 
 #. placeholder {0}: type === "full" ? " full" : ""
 #: src/strings.ts:1344
 msgid "Creating a{0} backup"
 msgstr "Creating a{0} backup"
+
+#: src/strings.ts:2658
+msgid "Creating..."
+msgstr "Creating..."
 
 #: src/strings.ts:2049
 msgid "Credentials"
@@ -2197,6 +2277,10 @@ msgstr "Disable auto sync"
 msgid "Disable editor margins"
 msgstr "Disable editor margins"
 
+#: src/strings.ts:2644
+msgid "Disable Inbox API"
+msgstr "Disable Inbox API"
+
 #: src/strings.ts:1087
 msgid "Disable realtime sync"
 msgstr "Disable realtime sync"
@@ -2208,6 +2292,10 @@ msgstr "Disable sync"
 #: src/strings.ts:165
 msgid "Disabled"
 msgstr "Disabled"
+
+#: src/strings.ts:2646
+msgid "Disabling will delete all your unsynced inbox items. Additionally, disabling will revoke all existing API keys, they will no longer work. Are you sure?"
+msgstr "Disabling will delete all your unsynced inbox items. Additionally, disabling will revoke all existing API keys, they will no longer work. Are you sure?"
 
 #: src/strings.ts:565
 msgid "Discard"
@@ -2374,6 +2462,10 @@ msgstr "Due today"
 msgid "Duplicate"
 msgstr "Duplicate"
 
+#: src/strings.ts:2652
+msgid "e.g., Todo integration"
+msgstr "e.g., Todo integration"
+
 #: src/strings.ts:644
 msgid "Earliest first"
 msgstr "Earliest first"
@@ -2476,6 +2568,10 @@ msgstr "Enable app lock"
 msgid "Enable editor margins"
 msgstr "Enable editor margins"
 
+#: src/strings.ts:2639
+msgid "Enable Inbox API"
+msgstr "Enable Inbox API"
+
 #: src/strings.ts:2465
 msgid "Enable ligatures for common symbols like →, ←, etc"
 msgstr "Enable ligatures for common symbols like →, ←, etc"
@@ -2491,6 +2587,10 @@ msgstr "Enable spell checker"
 #: src/strings.ts:496
 msgid "Enable two-factor authentication to add an extra layer of security to your account."
 msgstr "Enable two-factor authentication to add an extra layer of security to your account."
+
+#: src/strings.ts:2640
+msgid "Enable/Disable Inbox API"
+msgstr "Enable/Disable Inbox API"
 
 #: src/strings.ts:1234
 msgid "Encrypt your backups for added security"
@@ -2700,6 +2800,18 @@ msgstr "Expand sidebar"
 msgid "Experience the next level of private note taking\""
 msgstr "Experience the next level of private note taking\""
 
+#: src/strings.ts:2688
+msgid "Expired"
+msgstr "Expired"
+
+#: src/strings.ts:2653
+msgid "Expires in"
+msgstr "Expires in"
+
+#: src/strings.ts:2689
+msgid "Expires on"
+msgstr "Expires on"
+
 #: src/strings.ts:2632
 msgid "Expiry date"
 msgstr "Expiry date"
@@ -2761,6 +2873,15 @@ msgstr "Failed"
 msgid "Failed to copy note"
 msgstr "Failed to copy note"
 
+#: src/strings.ts:2678
+msgid "Failed to copy to clipboard"
+msgstr "Failed to copy to clipboard"
+
+#. placeholder {0}: message ? `: ${message}` : ""
+#: src/strings.ts:2657
+msgid "Failed to create API key{0}"
+msgstr "Failed to create API key{0}"
+
 #: src/strings.ts:1560
 msgid "Failed to decrypt backup"
 msgstr "Failed to decrypt backup"
@@ -2781,6 +2902,10 @@ msgstr "Failed to download file"
 msgid "Failed to install theme."
 msgstr "Failed to install theme."
 
+#: src/strings.ts:2664
+msgid "Failed to load API keys. Please try again."
+msgstr "Failed to load API keys. Please try again."
+
 #: src/strings.ts:948
 msgid "Failed to open"
 msgstr "Failed to open"
@@ -2796,6 +2921,10 @@ msgstr "Failed to register task"
 #: src/strings.ts:804
 msgid "Failed to resolve download url"
 msgstr "Failed to resolve download url"
+
+#: src/strings.ts:2683
+msgid "Failed to revoke API key"
+msgstr "Failed to revoke API key"
 
 #: src/strings.ts:773
 msgid "Failed to send recovery email"
@@ -3352,6 +3481,18 @@ msgstr "Import CSV"
 msgid "import guide"
 msgstr "import guide"
 
+#: src/strings.ts:2636
+msgid "Inbox API"
+msgstr "Inbox API"
+
+#: src/strings.ts:2641
+msgid "Inbox Keys"
+msgstr "Inbox Keys"
+
+#: src/strings.ts:2696
+msgid "Inbox keys saved"
+msgstr "Inbox keys saved"
+
 #: src/strings.ts:174
 msgid "Incoming"
 msgstr "Incoming"
@@ -3431,6 +3572,14 @@ msgstr "Invalid CORS proxy url"
 #: src/strings.ts:1482
 msgid "Invalid email"
 msgstr "Invalid email"
+
+#: src/strings.ts:2676
+msgid "Invalid password"
+msgstr "Invalid password"
+
+#: src/strings.ts:2695
+msgid "Invalid PGP key pair. Please check your keys and try again."
+msgstr "Invalid PGP key pair. Please check your keys and try again."
 
 #: src/strings.ts:224
 msgid "Issue created"
@@ -3514,6 +3663,10 @@ msgstr "Keep open"
 msgid "Keep your data safe"
 msgstr "Keep your data safe"
 
+#: src/strings.ts:2651
+msgid "Key name"
+msgstr "Key name"
+
 #: src/strings.ts:2128
 msgid "Languages"
 msgstr "Languages"
@@ -3521,6 +3674,10 @@ msgstr "Languages"
 #: src/strings.ts:2230
 msgid "Last edited at"
 msgstr "Last edited at"
+
+#: src/strings.ts:2684
+msgid "Last used on"
+msgstr "Last used on"
 
 #: src/strings.ts:590
 msgid "Later"
@@ -3646,6 +3803,10 @@ msgstr "Loading"
 #: src/strings.ts:146
 msgid "Loading {0}, please wait..."
 msgstr "Loading {0}, please wait..."
+
+#: src/strings.ts:2663
+msgid "Loading API keys..."
+msgstr "Loading API keys..."
 
 #: src/strings.ts:1664
 msgid "Loading editor. Please wait..."
@@ -4012,6 +4173,10 @@ msgstr "Never"
 msgid "Never ask again"
 msgstr "Never ask again"
 
+#: src/strings.ts:2687
+msgid "Never expires"
+msgstr "Never expires"
+
 #: src/strings.ts:1037
 msgid "Never hesitate to choose privacy"
 msgstr "Never hesitate to choose privacy"
@@ -4019,6 +4184,10 @@ msgstr "Never hesitate to choose privacy"
 #: src/strings.ts:672
 msgid "Never show again"
 msgstr "Never show again"
+
+#: src/strings.ts:2685
+msgid "Never used"
+msgstr "Never used"
 
 #: src/strings.ts:642
 msgid "New - old"
@@ -4357,6 +4526,10 @@ msgstr "Off"
 msgid "Offline"
 msgstr "Offline"
 
+#: src/strings.ts:2668
+msgid "OK"
+msgstr "OK"
+
 #: src/strings.ts:2227
 msgid "Okay"
 msgstr "Okay"
@@ -4628,6 +4801,10 @@ msgstr "Please download a backup of your data as your account will be cleared be
 msgid "Please enable automatic backups to avoid losing important data."
 msgstr "Please enable automatic backups to avoid losing important data."
 
+#: src/strings.ts:2654
+msgid "Please enter a key name"
+msgstr "Please enter a key name"
+
 #: src/strings.ts:1512
 msgid "Please enter a valid email address"
 msgstr "Please enter a valid email address"
@@ -4663,6 +4840,10 @@ msgstr "Please enter the password to unlock this note"
 #: src/strings.ts:1862
 msgid "Please enter the password to view this version"
 msgstr "Please enter the password to view this version"
+
+#: src/strings.ts:2674
+msgid "Please enter your account password to view this API key."
+msgstr "Please enter your account password to view this API key."
 
 #: src/strings.ts:1021
 msgid "Please enter your app lock password to continue"
@@ -4870,6 +5051,10 @@ msgstr "Privacy Policy. "
 msgid "private analytics and bug reports."
 msgstr "private analytics and bug reports."
 
+#: src/strings.ts:2693
+msgid "Private Key:"
+msgstr "Private Key:"
+
 #: src/strings.ts:821
 msgid "Private."
 msgstr "Private."
@@ -4917,6 +5102,10 @@ msgstr "Protect your notes"
 #: src/strings.ts:2181
 msgid "Proxy"
 msgstr "Proxy"
+
+#: src/strings.ts:2692
+msgid "Public Key:"
+msgstr "Public Key:"
 
 #: src/strings.ts:486
 msgid "Publish"
@@ -5409,6 +5598,10 @@ msgstr "Resubscribe from Playstore"
 msgid "Resubscribe to Pro"
 msgstr "Resubscribe to Pro"
 
+#: src/strings.ts:2665
+msgid "Retry"
+msgstr "Retry"
+
 #: src/strings.ts:513
 msgid "Reupload"
 msgstr "Reupload"
@@ -5424,6 +5617,10 @@ msgstr "Revoke"
 #: src/strings.ts:1179
 msgid "Revoke biometric unlocking"
 msgstr "Revoke biometric unlocking"
+
+#: src/strings.ts:2679
+msgid "Revoke Inbox API Key - {name}"
+msgstr "Revoke Inbox API Key - {name}"
 
 #: src/strings.ts:450
 msgid "Revoke vault fingerprint unlock"
@@ -5975,6 +6172,10 @@ msgstr "Share note"
 #: src/strings.ts:1787
 msgid "Share Notesnook with friends!"
 msgstr "Share Notesnook with friends!"
+
+#: src/strings.ts:2638
+msgid "Share things to Notesbook from anywhere using the Inbox API"
+msgstr "Share things to Notesbook from anywhere using the Inbox API"
 
 #: src/strings.ts:594
 msgid "Share to cloud"
@@ -7091,6 +7292,14 @@ msgstr "Videos"
 #: src/strings.ts:570
 msgid "View all linked notebooks"
 msgstr "View all linked notebooks"
+
+#: src/strings.ts:2643
+msgid "View and edit your inbox public/private key pair"
+msgstr "View and edit your inbox public/private key pair"
+
+#: src/strings.ts:2649
+msgid "View and manage inbox API keys"
+msgstr "View and manage inbox API keys"
 
 #: src/strings.ts:1270
 msgid "View and share debug logs"
