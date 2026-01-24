@@ -31,6 +31,7 @@ import {
   generateCryptoKeyFallback
 } from "./encryption";
 import { MMKV } from "./mmkv";
+import OpenPGP from "react-native-fast-openpgp";
 
 export class KV {
   storage: MMKVInstance;
@@ -136,11 +137,30 @@ export const Storage: IStorage = {
   clear(): Promise<void> {
     return DefaultStorage.clear();
   },
-  generateCryptoKeyPair() {
-    throw new Error("Not implemented");
+  async generatePGPKeyPair() {
+    const keys = await OpenPGP.generate({
+      name: "NN",
+      email: "NN@NN.NN"
+    });
+    return { publicKey: keys.publicKey, privateKey: keys.privateKey };
   },
-  decryptAsymmetric() {
-    throw new Error("Not implemented");
+  async validatePGPKeyPair(keys) {
+    try {
+      const dummyData = JSON.stringify({
+        favorite: true,
+        title: "Hello world"
+      });
+      const encrypted = await OpenPGP.encrypt(dummyData, keys.publicKey);
+      const decrypted = await OpenPGP.decrypt(encrypted, keys.privateKey, "");
+
+      return decrypted === dummyData;
+    } catch (e) {
+      console.error("PGP key pair validation error:", e);
+      return false;
+    }
+  },
+  async decryptPGPMessage(privateKeyArmored, encryptedMessage) {
+    return await OpenPGP.decrypt(encryptedMessage, privateKeyArmored, "");
   },
   getAllKeys(): Promise<string[]> {
     return DefaultStorage.getAllKeys();

@@ -81,6 +81,7 @@ import { MMKV } from "../../common/database/mmkv";
 import { resetTabStore } from "../editor/tiptap/use-tab-store";
 import { clearAllStores } from "../../stores";
 import { refreshAllStores } from "../../stores/create-db-collection-store";
+import { useSettingStore } from "../../stores/use-setting-store";
 
 export const settingsGroups: SettingSection[] = [
   {
@@ -686,6 +687,63 @@ export const settingsGroups: SettingSection[] = [
         type: "screen",
         description: strings.notesnookCircleDesc(),
         component: "notesnook-circle"
+      },
+      {
+        id: "inbox-api",
+        name: strings.inboxAPI(),
+        icon: "inbox",
+        type: "screen",
+        description: strings.inboxAPIDesc(),
+        sections: [
+          {
+            id: "toggle-inbox-api",
+            name: strings.enableInboxAPI(),
+            description: strings.enableInboxAPIDesc(),
+            type: "switch",
+            useHook: () => useSettingStore((state) => state.inboxEnabled),
+            getter: (current) => current,
+            modifer: async (current) => {
+              if (current) {
+                presentDialog({
+                  title: strings.disableInboxAPI(),
+                  paragraph: strings.disableInboxAPIDesc(),
+                  positiveText: strings.disable(),
+                  positivePress: async () => {
+                    await db.user.discardInboxKeys();
+                    useSettingStore.setState({
+                      inboxEnabled: false
+                    });
+                    return true;
+                  }
+                });
+                return;
+              }
+
+              try {
+                await db.user.getInboxKeys();
+                useSettingStore.setState({
+                  inboxEnabled: true
+                });
+              } catch (e) {
+                console.log(e);
+              }
+            }
+          },
+          {
+            id: "manage-inbox-keys",
+            name: strings.manageInboxKeys(),
+            description: strings.manageInboxKeysDesc(),
+            type: "screen",
+            component: "manage-inbox-keys"
+          },
+          {
+            id: "inbox-keys",
+            name: strings.viewAPIKeys(),
+            description: strings.viewAPIKeysDesc(),
+            type: "screen",
+            component: "inbox-keys"
+          }
+        ]
       }
     ]
   },
