@@ -143,6 +143,7 @@ export interface SettingStore {
   isOldAppLock: () => boolean;
   initialUrl: string | null;
   refresh: () => void;
+  inboxEnabled: boolean;
 }
 
 const { width, height } = Dimensions.get("window");
@@ -248,12 +249,14 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
     ? initialWindowMetrics.insets
     : { top: 0, right: 0, left: 0, bottom: 0 },
   initialUrl: null,
-  refresh: () => {
+  refresh: async () => {
     set({
       dayFormat: db.settings.getDayFormat(),
       timeFormat: db.settings.getTimeFormat(),
       dateFormat: db.settings?.getTimeFormat(),
-      weekFormat: db.settings.getWeekFormat()
+      weekFormat: db.settings.getWeekFormat(),
+      inboxEnabled: await db.user.hasInboxKeys()
     });
-  }
+  },
+  inboxEnabled: false
 }));

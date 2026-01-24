@@ -100,6 +100,7 @@
     "react-native-device-info": "^14.1.1",
     "react-native-drax": "^0.10.2",
     "react-native-exit-app": "github:ammarahm-ed/react-native-exit-app",
+    "react-native-fast-openpgp": "^2.9.3",
     "react-native-file-viewer": "^2.1.1",
     "react-native-format-currency": "0.0.5",
     "react-native-gesture-handler": "2.28.0",

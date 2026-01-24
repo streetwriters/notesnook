@@ -46,6 +46,7 @@ import SoundPicker from "./sound-picker";
 import ThemeSelector from "./theme-selector";
 import { TitleFormat } from "./title-format";
 import { NotesnookCircle } from "./notesnook-circle";
+import { ManageInboxKeys, InboxKeysList } from "./manage-inbox-keys";
 
 export const components: { [name: string]: ReactElement } = {
   homeselector: <HomePicker />,
@@ -75,5 +76,7 @@ export const components: { [name: string]: ReactElement } = {
   "sidebar-tab-selector": <SidebarTabPicker />,
   "change-password": <ChangePassword />,
   "change-email": <ChangeEmail />,
-  "notesnook-circle": <NotesnookCircle />
+  "notesnook-circle": <NotesnookCircle />,
+  "manage-inbox-keys": <ManageInboxKeys />,
+  "inbox-keys": <InboxKeysList />
 };

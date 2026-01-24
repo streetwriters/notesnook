@@ -48,7 +48,6 @@ export const Notice = ({
     <View
       style={{
         paddingHorizontal: DefaultAppStyles.GAP,
-        paddingLeft: 5,
         paddingVertical: DefaultAppStyles.GAP_VERTICAL,
         flexDirection: "row",
         backgroundColor: colors.secondary.background,
@@ -63,6 +62,9 @@ export const Notice = ({
         size={isSmall ? AppFontSize.md + 2 : AppFontSize.xxl}
         name={type}
         color={type === "alert" ? colors.error.icon : colors.primary.accent}
+        style={{
+          marginTop: isSmall ? 3 : 5
+        }}
       />
       <Paragraph
         style={{
