@@ -1169,7 +1169,7 @@ export const useActions = ({
         id: "expiry-date",
         title: item.expiryDate ? strings.unsetExpiry() : strings.setExpiry(),
         icon: item.expiryDate ? "bomb-off" : "bomb",
-        locked: features?.expiringNotes?.isAllowed,
+        locked: !features?.expiringNotes?.isAllowed,
         onPress: async () => {
           if (item.expiryDate) {
             await db.notes.setExpiryDate(null, item.id);
