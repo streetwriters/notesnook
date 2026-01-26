@@ -156,6 +156,28 @@ export const EditorSettings: SettingsGroup[] = [
             toggle: () => useSettingStore.getState().toggleFontLigatures()
           }
         ]
+      },
+      {
+        key: "text-direction",
+        title: strings.textDirection(),
+        description: strings.textDirectionDesc(),
+        onStateChange: (listener) =>
+          onEditorConfigChange((c) => c.textDirection, listener),
+        components: [
+          {
+            type: "dropdown",
+            options: [
+              { value: "ltr", title: "LTR" },
+              { value: "rtl", title: "RTL" }
+            ],
+            selectedOption: () => editorConfig().textDirection,
+            onSelectionChanged: (value) => {
+              useEditorManager
+                .getState()
+                .setEditorConfig({ textDirection: value as "ltr" | "rtl" });
+            }
+          }
+        ]
       }
     ]
   },

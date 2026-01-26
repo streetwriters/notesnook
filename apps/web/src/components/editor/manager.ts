@@ -31,6 +31,7 @@ type EditorConfig = {
   fontSize: number;
   zoom: number;
   lineHeight: number;
+  textDirection: "ltr" | "rtl";
 };
 
 type EditorContext = {
@@ -48,7 +49,8 @@ class EditorManager extends BaseStore<EditorManager> {
     fontFamily: "sans-serif",
     fontSize: 14,
     zoom: EDITOR_ZOOM.DEFAULT,
-    lineHeight: EDITOR_LINE_HEIGHT.DEFAULT
+    lineHeight: EDITOR_LINE_HEIGHT.DEFAULT,
+    textDirection: "ltr"
   });
   editors: Record<string, EditorContext | undefined> = {};
 

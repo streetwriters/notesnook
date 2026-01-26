@@ -23,7 +23,7 @@ import { Paragraph } from "../paragraph/index.js";
 import { Node as ProsemirrorNode } from "@tiptap/pm/model";
 import { isListActive } from "../../utils/list.js";
 
-export type TextDirections = undefined | "rtl";
+export type TextDirections = undefined | "rtl" | "ltr";
 const TEXT_DIRECTION_TYPES = [
   "paragraph",
   "heading",
@@ -90,13 +90,15 @@ export const TextDirection = Extension.create<TextDirectionOptions>({
             // NOTE: for some reason setting this to undefined breaks enter behaviour
             // on Android for some keyboards (GBoard etc.). Empty string works fine.
             default: this.options.defaultDirection || "",
-            parseHTML: (element) => (element.dir === "rtl" ? "rtl" : undefined),
+            parseHTML: (element) =>
+              element.dir === "rtl"
+                ? "rtl"
+                : element.dir === "ltr"
+                ? "ltr"
+                : undefined,
             keepOnSplit: true,
             renderHTML: (attributes) => {
-              if (
-                !attributes.textDirection ||
-                attributes.textDirection !== "rtl"
-              ) {
+              if (!attributes.textDirection) {
                 return {};
               }
 
