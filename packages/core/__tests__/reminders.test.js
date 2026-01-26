@@ -28,7 +28,10 @@ import MockDate from "mockdate";
 import { describe, afterAll, beforeEach, test, expect } from "vitest";
 import { databaseTest } from "./utils/index.ts";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc.js";
 import assert from "assert";
+
+dayjs.extend(utc);
 
 describe("format reminder time", () => {
   afterAll(() => {
@@ -371,10 +374,10 @@ async function compareReminder(reminder) {
     .sql()
     .selectFrom("reminders")
     .select([
-      createUpcomingReminderTimeQuery(dayjs().format("YYYY-MM-DDTHH:mm")).as(
-        "dueDate"
-      ),
-      createIsReminderActiveQuery(dayjs().format("YYYY-MM-DDTHH:mm")).as(
+      createUpcomingReminderTimeQuery(
+        dayjs().utc().format("YYYY-MM-DDTHH:mm")
+      ).as("dueDate"),
+      createIsReminderActiveQuery(dayjs.utc().format("YYYY-MM-DDTHH:mm")).as(
         "isActive"
       ),
       "id"

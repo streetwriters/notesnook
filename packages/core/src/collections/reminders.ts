@@ -278,9 +278,9 @@ export function isReminderActive(reminder: Reminder) {
 
 export function createUpcomingReminderTimeQuery(unix = "now") {
   const time = sql`time(date / 1000, 'unixepoch', 'localtime')`;
-  const dateNow = sql`date(${unix})`;
+  const dateNow = sql`date(${unix}, 'localtime')`;
   const dateTime = sql`datetime(${dateNow} || ${time})`;
-  const dateTimeNow = sql`datetime(${unix})`;
+  const dateTimeNow = sql`datetime(${unix}, 'localtime')`;
   const weekDayNow = sql`CAST(strftime('%w', ${dateNow}) AS INTEGER)`;
   const monthDayNow = sql`CAST(strftime('%d', ${dateNow}) AS INTEGER)`;
   const lastSelectedDay = sql`(SELECT MAX(value) FROM json_each(selectedDays))`;
