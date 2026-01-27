@@ -113,7 +113,7 @@ jobs:
           keyStorePassword: ${{ secrets.KEY_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
         env:
-          BUILD_TOOLS_VERSION: "33.0.0"
+          BUILD_TOOLS_VERSION: "36.0.0"
 
       - name: Build apks for Github release
         run: yarn release:android
@@ -128,7 +128,7 @@ jobs:
           keyStorePassword: ${{ secrets.PUBLIC_KEY_PASSWORD }}
           keyPassword: ${{ secrets.PUBLIC_KEY_PASSWORD }}
         env:
-          BUILD_TOOLS_VERSION: "33.0.0"
+          BUILD_TOOLS_VERSION: "36.0.0"
 
       - name: Rename apk files
         run: |
