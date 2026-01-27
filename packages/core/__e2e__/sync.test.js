@@ -24,6 +24,7 @@ import { databaseTest, delay } from "../__tests__/utils/index.ts";
 import http from "../src/utils/http.ts";
 import Constants from "../src/utils/constants.ts";
 import { writeFileSync } from "node:fs";
+import dayjs from "dayjs";
 
 const TEST_TIMEOUT = 60 * 1000;
 const testOptions = { concurrent: true, timeout: TEST_TIMEOUT };
@@ -560,7 +561,10 @@ test(
     });
 
     // publish on device A
-    const monographId = await deviceA.monographs.publish(noteId);
+    const monographId = await deviceA.monographs.publish(
+      noteId,
+      "Monograph note"
+    );
     expect(monographId).toBeTruthy();
 
     // deviceB fetches the monograph
@@ -595,9 +599,13 @@ test(
     });
 
     // publish with selfDestruct
-    const monographId = await deviceA.monographs.publish(noteId, {
-      selfDestruct: true
-    });
+    const monographId = await deviceA.monographs.publish(
+      noteId,
+      "Self destruct monograph",
+      {
+        selfDestruct: true
+      }
+    );
     expect(monographId).toBeTruthy();
 
     // ensure all devices know it's published
@@ -649,10 +657,14 @@ test(
     });
 
     // publish with password and selfDestruct on device A
-    const monographId = await deviceA.monographs.publish(noteId, {
-      password,
-      selfDestruct: true
-    });
+    const monographId = await deviceA.monographs.publish(
+      noteId,
+      "Protected monograph",
+      {
+        password,
+        selfDestruct: true
+      }
+    );
     expect(monographId).toBeTruthy();
 
     // deviceB fetches the monograph
