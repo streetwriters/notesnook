@@ -1,0 +1,5 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ctrl+space should collapse/expand callout when cursor is in first heading 1`] = `"<div data-callout-type="info" class="collapsed callout"><h4>INFO</h4><p>This is the callout content.</p></div>"`;
+
+exports[`ctrl+space should collapse/expand callout when cursor is in first heading 2`] = `"<div data-callout-type="info" class="callout"><h4>INFO</h4><p>This is the callout content.</p></div>"`;

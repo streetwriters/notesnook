@@ -126,6 +126,37 @@ export const Heading = TiptapHeading.extend({
         }),
         {}
       ),
+      [tiptapKeys.toggleNodeExpand.keys]: ({ editor }) => {
+        const { selection } = editor.state;
+        const { $from, empty } = selection;
+
+        if (!empty) return false;
+        if ($from.parent.type.name !== this.name) return false;
+
+        const headingPos = $from.before();
+        const headingNode = editor.state.doc.nodeAt(headingPos);
+        if (!headingNode || headingNode.type.name !== this.name) return false;
+
+        // the first callout heading's collapsibility is handled by callout itself
+        const callout = findParentNodeClosestToPos(
+          $from,
+          (node) => node.type.name === Callout.name
+        );
+        if (callout?.node.firstChild === headingNode) return false;
+
+        const isCollapsed = headingNode.attrs.collapsed;
+
+        return editor.commands.command(({ tr }) => {
+          tr.setNodeAttribute(headingPos, "collapsed", !isCollapsed);
+          toggleNodesUnderPos(
+            tr,
+            headingPos,
+            headingNode.attrs.level,
+            !isCollapsed
+          );
+          return true;
+        });
+      },
       Enter: ({ editor }) => {
         const { state, commands } = editor;
         const { $from } = state.selection;
