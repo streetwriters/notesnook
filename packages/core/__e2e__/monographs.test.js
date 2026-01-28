@@ -94,7 +94,7 @@ test(
       await login(db);
       await db.monographs.refresh();
 
-      await db.monographs.publish(id);
+      await db.monographs.publish(id, "mono");
       expect(await db.monographs.all.has(id)).toBeTruthy();
 
       await db.monographs.unpublish(id);

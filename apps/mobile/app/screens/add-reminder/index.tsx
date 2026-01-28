@@ -73,15 +73,6 @@ const RecurringModes = {
 const WeekDays = [0, 1, 2, 3, 4, 5, 6];
 const WeekDaysMon = [1, 2, 3, 4, 5, 6, 0];
 const MonthDays = new Array(31).fill(true);
-const WeekDayNames = {
-  0: "Sunday",
-  1: "Monday",
-  2: "Tuesday",
-  3: "Wednesday",
-  4: "Thursday",
-  5: "Friday",
-  6: "Saturday"
-};
 
 const ReminderNotificationModes = {
   Silent: "silent",
@@ -153,7 +144,8 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
         const isSecondLast = index === selectedDays.length - 2;
         const joinWith = isSecondLast ? " & " : isLast ? "" : ", ";
         return recurringMode === RecurringModes.Week
-          ? strings.weekDayNames[day as keyof typeof WeekDayNames]() + joinWith
+          ? strings.weekDayNames[day as keyof typeof strings.weekDayNames]() +
+              joinWith
           : `${day}${nth(day)} ${joinWith}`;
       })
       .join("");

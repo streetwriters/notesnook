@@ -314,7 +314,7 @@ test("restoring an old session should replace note's content and title", () =>
     }
   ));
 
-test.only("note history item has consistent note and title data between sessions", () =>
+test("note history item has consistent note and title data between sessions", () =>
   noteTest({
     ...TEST_NOTE,
     title: "Test note",
