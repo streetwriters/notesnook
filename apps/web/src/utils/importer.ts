@@ -48,6 +48,9 @@ const colorMap: Record<string, string | undefined> = {
   yellow: "#FFC107"
 };
 
+/**
+ * TODO: add support for trashed notes and reminders
+ */
 export async function importNote(note: Note) {
   const encryptedAttachmentFieldsMap = await processAttachments(
     note.attachments
