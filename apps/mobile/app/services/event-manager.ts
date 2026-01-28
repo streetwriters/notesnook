@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { EventHandler, EventManager } from "@notesnook/core";
+import { EventHandler, EventManager, Note, NoteContent } from "@notesnook/core";
 import Clipboard from "@react-native-clipboard/clipboard";
 import { RefObject } from "react";
 import { ActionSheetRef } from "react-native-actions-sheet";
@@ -32,8 +32,8 @@ import {
 } from "../utils/events";
 import { strings } from "@notesnook/intl";
 
-type Vault = {
-  item: unknown;
+export type Vault = {
+  item: Note;
   novault: boolean;
   title: string;
   description: string;
@@ -48,6 +48,14 @@ type Vault = {
   clearVault: boolean;
   deleteVault: boolean;
   copyNote: boolean;
+  customActionTitle: string;
+  customActionParagraph: string;
+  onUnlock: (
+    item: Note & {
+      content?: NoteContent<false>;
+    },
+    password: string
+  ) => void;
 };
 
 type NoteEdit = {

@@ -278,9 +278,9 @@ export function isReminderActive(reminder: Reminder) {
 
 export function createUpcomingReminderTimeQuery(unix = "now") {
   const time = sql`time(date / 1000, 'unixepoch', 'localtime')`;
-  const dateNow = sql`date(${unix})`;
+  const dateNow = sql`date(${unix}, 'localtime')`;
   const dateTime = sql`datetime(${dateNow} || ${time})`;
-  const dateTimeNow = sql`datetime(${unix})`;
+  const dateTimeNow = sql`datetime(${unix}, 'localtime')`;
   const weekDayNow = sql`CAST(strftime('%w', ${dateNow}) AS INTEGER)`;
   const monthDayNow = sql`CAST(strftime('%d', ${dateNow}) AS INTEGER)`;
   const lastSelectedDay = sql`(SELECT MAX(value) FROM json_each(selectedDays))`;
@@ -326,8 +326,8 @@ export function createIsReminderActiveQuery(now = "now") {
   return sql`IIF(
     (disabled IS NULL OR disabled = 0)
     AND (mode != 'once'
-      OR datetime(date / 1000, 'unixepoch', 'localtime') > datetime(${now})
+      OR datetime(date / 1000, 'unixepoch', 'localtime') > datetime(${now}, 'localtime')
       OR (snoozeUntil IS NOT NULL
-        AND datetime(snoozeUntil / 1000, 'unixepoch', 'localtime') > datetime(${now}))
+        AND datetime(snoozeUntil / 1000, 'unixepoch', 'localtime') > datetime(${now}, 'localtime'))
     ), 1, 0)`.$castTo<boolean>();
 }

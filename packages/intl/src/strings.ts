@@ -422,7 +422,8 @@ $time$: Current time.
 $timestamp$: Full date and time without any spaces or other symbols.
 (e.g 202305261253).
 $count$: Number of notes + 1.
-$headline$: Use starting line of the note as title.`,
+$headline$: Use starting line of the note as title.
+$day$: Current day (eg. Monday)`,
   setYourName: () => t`Set your name`,
   presets: () => t`PRESETS`,
   group: () => t`GROUP`,
@@ -2610,6 +2611,26 @@ Use this if changes from other devices are not appearing on this device. This wi
   clickToUpdate: () => t`Click to update`,
   noPassword: () => t`No password`,
   publishToTheWeb: () => t`Publish to the web`,
+  addToHome: () => t`Add to home`,
+  clickToSave: () => t`Click to save`,
+  lineHeight: () => t`Line height`,
+  lineHeightDesc: () => t`Adjust the line height of the editor`,
+  enterTitle: () => t`Enter title`,
+  dayFormat: () => t`Day format`,
+  dayFormatDesc: () => t`Choose how day is displayed in the app`,
   trialOnGoing: (trialExpiryDate: string) =>
-    t`Your free trial is on-going. Your subscription will start on ${trialExpiryDate}`
+    t`Your free trial is on-going. Your subscription will start on ${trialExpiryDate}`,
+  weekFormat: () => t`Week format`,
+  weekFormatDesc: () =>
+    t`Choose what day to display as the first day of the week`,
+  editCreationDate: () => t`Edit creation date`,
+  unlockIncomingNote: () => t`Unlock incoming note`,
+  unlockIncomingNoteDesc: () =>
+    t`The incoming note could not be unlocked with the provided password. Enter the correct password for the incoming note`,
+  setExpiry: () => t`Set expiry`,
+  unsetExpiry: () => t`Unset expiry`,
+  expiryDate: () => t`Expiry date`,
+  exportCsv: () => t`Export CSV`,
+  importCsv: () => t`Import CSV`,
+  noContent: () => t`This note is empty`
 };

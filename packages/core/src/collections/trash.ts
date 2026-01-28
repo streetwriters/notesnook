@@ -75,7 +75,8 @@ export default class Trash {
     for (const { id, itemType, deletedBy } of result) {
       if (itemType === "note") {
         this.cache.notes.push(id);
-        if (deletedBy === "user") this.userDeletedCache.notes.push(id);
+        if (deletedBy === "user" || deletedBy === "expired")
+          this.userDeletedCache.notes.push(id);
       } else if (itemType === "notebook") {
         this.cache.notebooks.push(id);
         if (deletedBy === "user") this.userDeletedCache.notebooks.push(id);
@@ -138,7 +139,8 @@ export default class Trash {
         deletedBy
       });
       this.cache.notes.push(...ids);
-      if (deletedBy === "user") this.userDeletedCache.notes.push(...ids);
+      if (deletedBy === "user" || deletedBy === "expired")
+        this.userDeletedCache.notes.push(...ids);
     } else if (type === "notebook") {
       await this.db.notebooks.collection.update(ids, {
         type: "trash",
@@ -226,7 +228,7 @@ export default class Trash {
   //   } else return true;
   // }
 
-  async all(deletedBy?: TrashItem["deletedBy"]) {
+  async all(deletedBy?: TrashItem["deletedBy"][]) {
     return [
       ...(await this.trashedNotes(this.cache.notes, deletedBy)),
       ...(await this.trashedNotebooks(this.cache.notebooks, deletedBy))
@@ -239,7 +241,7 @@ export default class Trash {
 
   private async trashedNotes(
     ids: string[],
-    deletedBy?: TrashItem["deletedBy"]
+    deletedBy?: TrashItem["deletedBy"][]
   ) {
     if (ids.length <= 0) return [];
     return (await this.db
@@ -247,14 +249,14 @@ export default class Trash {
       .selectFrom("notes")
       .where("type", "==", "trash")
       .where("id", "in", ids)
-      .$if(!!deletedBy, (eb) => eb.where("deletedBy", "==", deletedBy))
+      .$if(!!deletedBy, (eb) => eb.where("deletedBy", "in", deletedBy))
       .selectAll()
       .execute()) as TrashItem[];
   }
 
   private async trashedNotebooks(
     ids: string[],
-    deletedBy?: TrashItem["deletedBy"]
+    deletedBy?: TrashItem["deletedBy"][]
   ) {
     if (ids.length <= 0) return [];
     return (await this.db
@@ -262,7 +264,7 @@ export default class Trash {
       .selectFrom("notebooks")
       .where("type", "==", "trash")
       .where("id", "in", ids)
-      .$if(!!deletedBy, (eb) => eb.where("deletedBy", "==", deletedBy))
+      .$if(!!deletedBy, (eb) => eb.where("deletedBy", "in", deletedBy))
       .selectAll()
       .execute()) as TrashItem[];
   }

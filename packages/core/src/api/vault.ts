@@ -57,7 +57,7 @@ export default class Vault {
 
   constructor(private readonly db: Database) {
     this.password = undefined;
-    EV.subscribe(EVENTS.userLoggedOut, () => {
+    db.eventManager.subscribe(EVENTS.userLoggedOut, () => {
       this.password = undefined;
     });
   }

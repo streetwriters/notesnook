@@ -25,7 +25,6 @@ import {
   formatTitle
 } from "../utils/title-format.js";
 import { clone } from "../utils/clone.js";
-import { Tiptap } from "../content-types/tiptap.js";
 import { EMPTY_CONTENT } from "./content.js";
 import { buildFromTemplate } from "../utils/templates/index.js";
 import {
@@ -41,6 +40,7 @@ import { SQLCollection } from "../database/sql-collection.js";
 import { isFalse } from "../database/index.js";
 import { logger } from "../logger.js";
 import { addItems, deleteItems } from "../utils/array.js";
+import { sql } from "@streetwriters/kysely";
 
 export type ExportOptions = {
   format: "html" | "md" | "txt" | "md-frontmatter";
@@ -137,6 +137,7 @@ export class Notes implements ICollection {
             this.db.settings.getTitleFormat(),
             this.db.settings.getDateFormat(),
             this.db.settings.getTimeFormat(),
+            this.db.settings.getDayFormat(),
             headlineTitle,
             this.totalNotes
           );
@@ -177,6 +178,7 @@ export class Notes implements ICollection {
           conflicted: item.conflicted,
           readonly: item.readonly,
 
+          dateCreated: item.dateCreated,
           dateEdited: item.dateEdited || dateEdited,
 
           isGeneratedTitle: item.isGeneratedTitle
@@ -202,6 +204,13 @@ export class Notes implements ICollection {
           isGeneratedTitle: item.isGeneratedTitle
         });
         this.totalNotes++;
+      }
+
+      if (item.sessionId && typeof item.title === "string") {
+        await this.db.noteHistory.add(item.sessionId, {
+          title: item.title,
+          noteId: id
+        });
       }
     });
     return id;
@@ -339,6 +348,16 @@ export class Notes implements ICollection {
       deleteItems(this.cache.archived, ...ids);
     }
   }
+
+  async setExpiryDate(date: number | null, ...ids: string[]) {
+    await this.collection.update(ids, {
+      expiryDate: {
+        dateModified: Date.now(),
+        value: date
+      }
+    });
+  }
+
   readonly(state: boolean, ...ids: string[]) {
     return this.collection.update(ids, { readonly: state });
   }
@@ -524,5 +543,22 @@ export class Notes implements ICollection {
     return (await getContentFromData(content.type, content.data)).extract(
       "internalLinks"
     ).internalLinks;
+  }
+
+  async deleteExpiredNotes() {
+    const expiredItems = await this.db
+      .sql()
+      .selectFrom("notes")
+      .where("type", "!=", "trash")
+      .where(sql`expiryDate ->> '$.value'`, "<", Date.now())
+      .select("id as noteId")
+      .execute();
+
+    if (!expiredItems.length) return;
+
+    const toDelete = expiredItems
+      .map((item) => item.noteId)
+      .filter((item) => item != null);
+    await this.db.trash.add("note", toDelete, "expired");
   }
 }

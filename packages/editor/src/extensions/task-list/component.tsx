@@ -130,7 +130,8 @@ export function TaskListComponent(
               e.target.value = replaceDateTime(
                 e.target.value,
                 editor.storage.dateFormat,
-                editor.storage.timeFormat
+                editor.storage.timeFormat,
+                editor.storage.dayFormat
               );
               updateAttributes(
                 { title: e.target.value },

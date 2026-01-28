@@ -22,8 +22,6 @@ import Dialog from "../components/dialog";
 import { getHomeRoute, hardNavigate } from "../navigation";
 import { appVersion } from "../utils/version";
 import Config from "../utils/config";
-
-import { useEffect } from "react";
 import { ArrowRight, Checkmark, Icon, Warn } from "../components/icons";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
@@ -93,23 +91,34 @@ const features: Record<FeatureKeys, Feature> = {
         ]
       : [
           {
-            title: "Wrapped 2025",
+            title: "Import/export tables as CSV",
             subtitle:
-              "Notesnook Wrapped 2025 is your personal recap of the year you spent with Notesnook. Available throughout December and accessible from the sidebar, it highlights your activity, stats and how you used Notesnook this year."
+              "You can now import and export CSV files as tables directly in the editor."
           },
           {
-            title: "Monograph analytics",
+            title: "Customizable monograph title",
             subtitle:
-              "Pro users can now see view count analytics for monographs."
+              "You can now set a custom title for your monographs different from the note title."
           },
           {
-            title: "Twitter/X embed support",
-            subtitle: "Simply paste the post URL in the Insert Embed dialog."
+            title: "Expiring notes",
+            subtitle:
+              "Set an expiration date for your notes after which they will be automatically moved to trash."
           },
           {
-            title: "New keyboard shortcuts",
+            title: "Change note's created date",
             subtitle:
-              "Use Ctrl/Cmd + Alt/Option + F to open search/replace in the editor. We have also added Ctrl/Cmd + Alt/Option + C for toggling text color."
+              "You can now change a note's created date from the note properties panel."
+          },
+          {
+            title: "Customizable line height",
+            subtitle:
+              "You can now customize the line height in the editor from Settings > Editor."
+          },
+          {
+            title: "Change week starting day",
+            subtitle:
+              "You can now change the starting day of the week from Settings > Behaviour."
           }
         ],
     cta: {

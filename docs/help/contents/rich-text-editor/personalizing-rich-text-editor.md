@@ -28,6 +28,8 @@ Go to `Settings` > `Editor` > `Title format` to customize the title formatting.
 
 **$date$**: Today's date
 
+**$day$**: Today's day name
+
 **$time$**: The current time
 
 **$count$**: Current note count + 1

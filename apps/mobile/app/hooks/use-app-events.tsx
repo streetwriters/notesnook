@@ -85,7 +85,7 @@ import Notifications from "../services/notifications";
 import PremiumService from "../services/premium";
 import SettingsService from "../services/settings";
 import Sync from "../services/sync";
-import { clearAllStores, initAfterSync, initialize } from "../stores";
+import { clearAllStores, initAfterSync } from "../stores";
 import { refreshAllStores } from "../stores/create-db-collection-store";
 import { useAttachmentStore } from "../stores/use-attachment-store";
 import { useMessageStore } from "../stores/use-message-store";
@@ -108,6 +108,8 @@ import { NotesnookModule } from "../utils/notesnook-module";
 import { sleep } from "../utils/time";
 import useFeatureManager from "./use-feature-manager";
 import { deleteDCacheFiles } from "../common/filesystem/io";
+import dayjs from "dayjs";
+import { useRelationStore } from "../stores/use-relation-store";
 
 const onCheckSyncStatus = async (type: SyncStatusEvent) => {
   const { disableSync, disableAutoSync } = SettingsService.get();
@@ -160,7 +162,10 @@ const onUserSessionExpired = async () => {
   eSendEvent(eLoginSessionExpired);
 };
 
-const onAppOpenedFromURL = async (event: { url: string }) => {
+const onAppOpenedFromURL = async (event: {
+  url: string;
+  isInitialUrl?: boolean;
+}) => {
   const url = event.url;
 
   try {
@@ -172,7 +177,7 @@ const onAppOpenedFromURL = async (event: { url: string }) => {
       eSendEvent(eOnLoadNote, { newNote: true });
       fluidTabsRef.current?.goToPage("editor", false);
       return;
-    } else if (url.startsWith("https://app.notesnook.com/open_note")) {
+    } else if (url.startsWith("https://app.notesnook.com/open_note?")) {
       const id = new URL(url).searchParams.get("id");
       if (id) {
         const note = await db.notes.note(id);
@@ -182,6 +187,53 @@ const onAppOpenedFromURL = async (event: { url: string }) => {
             item: note
           });
           fluidTabsRef.current?.goToPage("editor", false);
+        }
+      }
+    } else if (
+      url.startsWith("https://app.notesnook.com/open_notebook?") &&
+      !event.isInitialUrl
+    ) {
+      const id = new URL(url).searchParams.get("id");
+      if (id) {
+        const notebook = await db.notebooks.notebook(id);
+        if (notebook) {
+          Navigation.navigate("Notebook", {
+            id: notebook.id,
+            canGoBack: true,
+            item: notebook
+          });
+        }
+      }
+    } else if (
+      url.startsWith("https://app.notesnook.com/open_tag?") &&
+      !event.isInitialUrl
+    ) {
+      const id = new URL(url).searchParams.get("id");
+      if (id) {
+        const tag = await db.tags.tag(id);
+        if (tag) {
+          Navigation.navigate("TaggedNotes", {
+            type: "tag",
+            id: tag.id,
+            item: tag,
+            canGoBack: true
+          });
+        }
+      }
+    } else if (
+      url.startsWith("https://app.notesnook.com/open_color?") &&
+      !event.isInitialUrl
+    ) {
+      const id = new URL(url).searchParams.get("id");
+      if (id) {
+        const color = await db.colors.color(id);
+        if (color) {
+          Navigation.navigate("ColoredNotes", {
+            type: "color",
+            id: color.id,
+            item: color,
+            canGoBack: true
+          });
         }
       }
     } else if (url.startsWith("https://app.notesnook.com/open_reminder")) {
@@ -436,6 +488,28 @@ const IsDatabaseMigrationRequired = () => {
   return true;
 };
 
+let timer: NodeJS.Timeout | null = null;
+let initialDate = -1;
+async function expiringNotesTimer() {
+  if (timer != null) clearInterval(timer);
+
+  if (initialDate === -1) {
+    DatabaseLogger.info("Deleting expired notes at startup");
+    db.notes.deleteExpiredNotes();
+    initialDate = dayjs().date();
+  }
+
+  timer = setInterval(() => {
+    if (dayjs().date() != initialDate) {
+      DatabaseLogger.info("Deleting expired notes");
+      db.notes.deleteExpiredNotes();
+      Navigation.queueRoutesForUpdate();
+      useRelationStore.getState().update();
+      initialDate = dayjs().date();
+    }
+  }, 1000 * 60);
+}
+
 const initializeDatabase = async (password?: string) => {
   if (useUserStore.getState().appLocked) return;
   if (!db.isInitialized) {
@@ -455,16 +529,21 @@ const initializeDatabase = async (password?: string) => {
   if (db.isInitialized) {
     await setAppMessage();
     useSettingStore.getState().setAppLoading(false);
+    useSettingStore.getState().refresh();
     Notifications.setupReminders(true);
     DatabaseLogger.info("Database initialized");
     Notifications.restorePinnedNotes();
+    expiringNotesTimer();
     deleteDCacheFiles();
   }
   Walkthrough.init();
 };
 
 export const useAppEvents = () => {
-  const isAppLoading = useSettingStore((state) => state.isAppLoading);
+  const [isAppLoading, initialUrl] = useSettingStore((state) => [
+    state.isAppLoading,
+    state.initialUrl
+  ]);
   const [setLastSynced, setUser, appLocked, syncing] = useUserStore((state) => [
     state.setLastSynced,
     state.setUser,
@@ -508,6 +587,15 @@ export const useAppEvents = () => {
       subscriptions.forEach((sub) => sub?.unsubscribe?.());
     };
   }, [isAppLoading, onSyncComplete]);
+
+  useEffect(() => {
+    if (initialUrl) {
+      onAppOpenedFromURL({
+        url: initialUrl!,
+        isInitialUrl: true
+      });
+    }
+  }, [initialUrl]);
 
   const subscribeToPurchaseListeners = useCallback(async () => {
     if (Platform.OS === "android") {
@@ -637,10 +725,10 @@ export const useAppEvents = () => {
       EV.subscribe(EVENTS.syncCheckStatus, onCheckSyncStatus),
       EV.subscribe(EVENTS.syncAborted, onSyncAborted),
       EV.subscribe(EVENTS.appRefreshRequested, onSyncComplete),
-      EV.subscribe(EVENTS.userLoggedOut, onLogout),
-      EV.subscribe(EVENTS.userEmailConfirmed, onUserEmailVerified),
+      db.eventManager.subscribe(EVENTS.userLoggedOut, onLogout),
+      db.eventManager.subscribe(EVENTS.userEmailConfirmed, onUserEmailVerified),
       EV.subscribe(EVENTS.userSessionExpired, onUserSessionExpired),
-      EV.subscribe(
+      db.eventManager.subscribe(
         EVENTS.userSubscriptionUpdated,
         onUserSubscriptionStatusChanged
       ),
@@ -724,6 +812,7 @@ export const useAppEvents = () => {
       if (state === "active") {
         notifee.setBadgeCount(0);
         updateStatusBarColor();
+        expiringNotesTimer();
         checkAutoBackup();
         Sync.run("global", false, "full");
         reconnectSSE();
@@ -774,23 +863,10 @@ export const useAppEvents = () => {
       }
     };
 
-    if (!refValues.current.initialUrl) {
-      Linking.getInitialURL().then((url) => {
-        if (url) {
-          refValues.current.initialUrl = url;
-        }
-      });
-    }
     let sub: NativeEventSubscription;
     if (!isAppLoading && !appLocked) {
       setTimeout(() => {
         sub = AppState.addEventListener("change", onAppStateChanged);
-        if (refValues.current.initialUrl) {
-          onAppOpenedFromURL({
-            url: refValues.current.initialUrl!
-          });
-          refValues.current.initialUrl = undefined;
-        }
       }, 1000);
 
       refValues.current.removeInternetStateListener = NetInfo.addEventListener(

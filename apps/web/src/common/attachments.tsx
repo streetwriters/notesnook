@@ -22,6 +22,10 @@ import { logger } from "../utils/logger";
 import { showToast } from "../utils/toast";
 import { db } from "./db";
 import { checkUpload, decryptFile, saveFile } from "../interfaces/fs";
+import { ScopedThemeProvider } from "../components/theme-provider";
+import { Lightbox } from "../components/lightbox";
+import ReactDOM from "react-dom";
+import { Attachment } from "@notesnook/core";
 
 async function download(hash: string, groupId?: string) {
   const attachment = await db.attachments.attachment(hash);
@@ -126,4 +130,30 @@ export async function checkAttachment(hash: string) {
     return { failed: reason };
   }
   return { success: true };
+}
+
+export async function previewImageAttachment(attachment: Attachment) {
+  const container = document.getElementById("dialogContainer");
+  if (!(container instanceof HTMLElement)) return;
+
+  const dataurl = await downloadAttachment(
+    attachment.hash,
+    "base64",
+    attachment.id
+  );
+  if (!dataurl) {
+    return showToast("error", strings.imagePreviewFailed());
+  }
+
+  ReactDOM.render(
+    <ScopedThemeProvider>
+      <Lightbox
+        image={dataurl}
+        onClose={() => {
+          ReactDOM.unmountComponentAtNode(container);
+        }}
+      />
+    </ScopedThemeProvider>,
+    container
+  );
 }

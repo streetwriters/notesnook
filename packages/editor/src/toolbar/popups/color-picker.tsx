@@ -30,6 +30,7 @@ import { Popup } from "../components/popup.js";
 import { SchemeColors } from "@notesnook/theme";
 import { Editor } from "../../types.js";
 import { strings } from "@notesnook/intl";
+import { useToolbarStore } from "../stores/toolbar-store.js";
 
 type ColorPickerProps = {
   editor: Editor;
@@ -171,13 +172,18 @@ export function ColorPicker(props: ColorPickerProps) {
         ) : null}
         <Flex>
           <Flex
-            className="hide-scrollbar"
+            className={
+              useToolbarStore.getState().isMobile
+                ? "hide-scrollbar"
+                : "scroll-bar"
+            }
             sx={{
               flex: 1,
               p: 1,
               overflowX: ["auto", "hidden"],
               flexWrap: ["nowrap", "wrap"],
-              overflowY: ["hidden", "auto"]
+              overflowY: ["hidden", "auto"],
+              maxHeight: 200
             }}
           >
             {!deleteMode && (

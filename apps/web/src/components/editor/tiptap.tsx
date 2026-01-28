@@ -57,7 +57,7 @@ import { ScopedThemeProvider } from "../theme-provider";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { writeToClipboard } from "../../utils/clipboard";
 import { useEditorStore } from "../../stores/editor-store";
-import { parseInternalLink } from "@notesnook/core";
+import { DayFormat, parseInternalLink } from "@notesnook/core";
 import Skeleton from "react-loading-skeleton";
 import useMobile from "../../hooks/use-mobile";
 import useTablet from "../../hooks/use-tablet";
@@ -68,6 +68,7 @@ import { showFeatureNotAllowedToast } from "../../common/toasts";
 import { UpgradeDialog } from "../../dialogs/buy-dialog/upgrade-dialog";
 import { ConfirmDialog } from "../../dialogs/confirm";
 import { strings } from "@notesnook/intl";
+import { AppEventManager, AppEvents } from "../../common/app-events";
 
 export type OnChangeHandler = (
   content: () => string,
@@ -107,6 +108,7 @@ type TipTapProps = {
   doubleSpacedLines: boolean;
   dateFormat: string;
   timeFormat: TimeFormat;
+  dayFormat: DayFormat;
   markdownShortcuts: boolean;
   fontLigatures: boolean;
 };
@@ -182,6 +184,7 @@ function TipTap(props: TipTapProps) {
     doubleSpacedLines,
     dateFormat,
     timeFormat,
+    dayFormat,
     markdownShortcuts,
     fontLigatures
   } = props;
@@ -191,7 +194,9 @@ function TipTap(props: TipTapProps) {
   const features = useAreFeaturesAvailable([
     "callout",
     "outlineList",
-    "taskList"
+    "taskList",
+    "exportTableAsCsv",
+    "importCsvToTable"
   ]);
 
   usePermissionHandler({
@@ -199,7 +204,9 @@ function TipTap(props: TipTapProps) {
       callout: !!features?.callout?.isAllowed,
       outlineList: !!features?.outlineList?.isAllowed,
       taskList: !!features?.taskList?.isAllowed,
-      insertAttachment: !!useUserStore.getState().isLoggedIn
+      insertAttachment: !!useUserStore.getState().isLoggedIn,
+      exportTableAsCsv: !!features?.exportTableAsCsv?.isAllowed,
+      importCsvToTable: !!features?.importCsvToTable?.isAllowed
     },
     onPermissionDenied: (claim, silent) => {
       if (claim === "insertAttachment") {
@@ -261,6 +268,7 @@ function TipTap(props: TipTapProps) {
       doubleSpacedLines,
       dateFormat,
       timeFormat,
+      dayFormat,
       element: editorContainer(),
       editable: !readonly,
       content: content?.(),
@@ -430,6 +438,7 @@ function TipTap(props: TipTapProps) {
     doubleSpacedLines,
     dateFormat,
     timeFormat,
+    dayFormat,
     markdownShortcuts,
     fontLigatures
   ]);
@@ -535,6 +544,7 @@ function TiptapWrapper(
       | "doubleSpacedLines"
       | "dateFormat"
       | "timeFormat"
+      | "dayFormat"
       | "markdownShortcuts"
       | "fontLigatures"
     >
@@ -551,6 +561,7 @@ function TiptapWrapper(
   );
   const dateFormat = useSettingsStore((store) => store.dateFormat);
   const timeFormat = useSettingsStore((store) => store.timeFormat);
+  const dayFormat = useSettingsStore((store) => store.dayFormat);
   const markdownShortcuts = useSettingsStore(
     (store) => store.markdownShortcuts
   );
@@ -623,19 +634,21 @@ function TiptapWrapper(
         ".tiptap.ProseMirror": { pb: 150 },
         ".editor-container": {
           opacity: isHydrating ? 0 : 1,
-          zoom: editorConfig.zoom + "%"
+          zoom: editorConfig.zoom + "%",
+          lineHeight: editorConfig.lineHeight
         },
         ".editor-loading-container.hidden": { display: "none" }
       }}
     >
       <TipTap
-        key={`tiptap-${props.id}-${doubleSpacedLines}-${dateFormat}-${timeFormat}-${markdownShortcuts}-${fontLigatures}`}
+        key={`tiptap-${props.id}-${doubleSpacedLines}-${dateFormat}-${timeFormat}-${dayFormat}-${markdownShortcuts}-${fontLigatures}`}
         {...props}
         isMobile={isMobile}
         isTablet={isTablet}
         doubleSpacedLines={doubleSpacedLines}
         dateFormat={dateFormat}
         timeFormat={timeFormat}
+        dayFormat={dayFormat}
         markdownShortcuts={markdownShortcuts}
         fontLigatures={fontLigatures}
         onLoad={(editor) => {

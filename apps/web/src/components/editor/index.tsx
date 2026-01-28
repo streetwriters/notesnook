@@ -26,7 +26,6 @@ import React, {
   useLayoutEffect,
   useCallback
 } from "react";
-import ReactDOM from "react-dom";
 import { Box, Button, Flex, Progress, Text } from "@theme-ui/components";
 import Properties from "../properties";
 import {
@@ -53,13 +52,16 @@ import Header from "./header";
 import { Attachment } from "../icons";
 import { attachFiles, AttachmentProgress, insertAttachments } from "./picker";
 import { useEditorManager } from "./manager";
-import { saveAttachment, downloadAttachment } from "../../common/attachments";
+import {
+  saveAttachment,
+  downloadAttachment,
+  previewImageAttachment
+} from "../../common/attachments";
 import { EV, EVENTS } from "@notesnook/core";
 import { db } from "../../common/db";
-import Titlebox from "./title-box";
+import Titlebox, { resizeTextarea } from "./title-box";
 import Config from "../../utils/config";
 import { ScopedThemeProvider } from "../theme-provider";
-import { Lightbox } from "../lightbox";
 import { showToast } from "../../utils/toast";
 import { Item, MaybeDeletedItem, isDeleted } from "@notesnook/core";
 import { debounce, debounceWithId } from "@notesnook/common";
@@ -77,14 +79,13 @@ import { onPageVisibilityChanged } from "../../utils/page-visibility";
 import { Pane, SplitPane } from "../split-pane";
 import { TITLE_BAR_HEIGHT } from "../title-bar";
 import { isMobile } from "../../hooks/use-mobile";
-import { isTablet } from "../../hooks/use-tablet";
 import { ConfirmDialog } from "../../dialogs/confirm";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
 const autoSaveToast = { show: true, hide: () => {} };
 
-async function saveContent(
+export async function saveContent(
   noteId: string,
   ignoreEdit: boolean,
   content: string
@@ -572,24 +573,7 @@ export function Editor(props: EditorProps) {
           const { hash, type } = data;
           const attachment = await db.attachments.attachment(hash);
           if (attachment && type === "image") {
-            const container = document.getElementById("dialogContainer");
-            if (!(container instanceof HTMLElement)) return;
-
-            const dataurl = await downloadAttachment(hash, "base64", id);
-            if (!dataurl)
-              return showToast("error", strings.imagePreviewFailed());
-
-            ReactDOM.render(
-              <ScopedThemeProvider>
-                <Lightbox
-                  image={dataurl}
-                  onClose={() => {
-                    ReactDOM.unmountComponentAtNode(container);
-                  }}
-                />
-              </ScopedThemeProvider>,
-              container
-            );
+            await previewImageAttachment(attachment);
           } else if (
             attachment &&
             onPreviewDocument &&
@@ -711,19 +695,25 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
       const child = editorContainerRef.current?.getBoundingClientRect();
       if (!parent || !child || !editor || entries.length <= 0) return;
 
-      const CONTAINER_MARGIN = isMobile() || isTablet() ? 10 : 30;
+      const CONTAINER_MARGIN = isMobile() ? 10 : 30;
       const negativeSpace = Math.abs(
         parent.left - child.left - CONTAINER_MARGIN
       );
 
       requestAnimationFrame(() => {
-        if (!isMobile() && !isTablet()) {
+        if (!isMobile()) {
           editor.style.marginLeft = `-${negativeSpace}px`;
           editor.style.marginRight = `-${negativeSpace}px`;
+
+          editor.style.paddingLeft = `${negativeSpace}px`;
+          editor.style.paddingRight = `${negativeSpace}px`;
         }
-        editor.style.paddingLeft = `${negativeSpace}px`;
-        editor.style.paddingRight = `${negativeSpace}px`;
       });
+
+      const editorTitle = document.querySelector("#editor-title");
+      if (editorTitle instanceof HTMLTextAreaElement) {
+        resizeTextarea(editorTitle);
+      }
     }
     const observer = new ResizeObserver(debounce(onResize, 500));
     observer.observe(editorScrollRef.current);
@@ -761,8 +751,8 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
             maxWidth: editorMargins ? "min(100%, 850px)" : "auto",
             width: "100%"
           }}
-          pl={[2, 2, 6]}
-          pr={[2, 2, 6]}
+          pl={[2, 6]}
+          pr={[2, 6]}
           onClick={onRequestFocus}
         >
           {children}

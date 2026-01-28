@@ -21,6 +21,12 @@ import { Editor } from "@tiptap/core";
 import { EditorState, TextSelection, Transaction } from "prosemirror-state";
 import { Node } from "prosemirror-model";
 import { selectedRect, TableRect } from "./prosemirror-tables/commands.js";
+import { saveAs } from "file-saver";
+import { unparse, parse } from "papaparse";
+import { hasPermission } from "../../types.js";
+import { useToolbarStore } from "../../toolbar/stores/toolbar-store.js";
+import { getTableNodeTypes } from "./utilities/getTableNodeTypes.js";
+import { createCell } from "./utilities/createCell.js";
 
 type TableCell = {
   cell: Node;
@@ -189,11 +195,63 @@ function selectColumn(
   return true;
 }
 
+function importCsvToTable(csvText: string, editor: Editor) {
+  const result = parse<string[]>(csvText, {
+    skipEmptyLines: true
+  });
+  if (!result.data || result.data.length === 0) return "";
+
+  const { schema } = editor.state;
+  const types = getTableNodeTypes(schema);
+
+  const tableRows = result.data.map((row, rowIndex) => {
+    const isHeaderRow = rowIndex === 0;
+    const cellType = isHeaderRow ? types.header_cell : types.cell;
+
+    const cells = row
+      .map((cellText) => {
+        const paragraphNode = cellText
+          ? schema.nodes.paragraph.create(null, schema.text(cellText))
+          : schema.nodes.paragraph.create();
+        return createCell(cellType, paragraphNode);
+      })
+      .filter((cell): cell is Node => cell != null);
+
+    return types.row.createChecked(null, cells);
+  });
+
+  const tableNode = types.table.createChecked(null, tableRows);
+
+  editor.chain().focus().insertContent(tableNode.toJSON()).run();
+}
+
+function exportToCSV(editor?: Editor) {
+  if (!hasPermission("exportTableAsCsv")) return;
+  if (!editor) return;
+
+  const rect = selectedRect(editor.state);
+
+  const rows: string[][] = [];
+  rect.table.forEach((node) => {
+    const row: string[] = [];
+    node.forEach((cell) => row.push(cell.textContent));
+    rows.push(row);
+  });
+  const csv = unparse(rows);
+  if (useToolbarStore.getState().isMobile) {
+    editor.storage.downloadCsvTable?.(csv);
+  } else {
+    saveAs(new Blob([new TextEncoder().encode(csv)]), "table.csv");
+  }
+}
+
 export {
   moveColumnLeft,
   moveColumnRight,
   moveRowDown,
   moveRowUp,
   selectRow,
-  selectColumn
+  selectColumn,
+  exportToCSV,
+  importCsvToTable
 };

@@ -17,12 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 /* eslint-disable no-inner-declarations */
-import { useAreFeaturesAvailable } from "@notesnook/common";
+import { isFeatureAvailable, useAreFeaturesAvailable } from "@notesnook/common";
 import {
+  Color,
   createInternalLink,
   Item,
   ItemReference,
   Note,
+  Notebook,
   VAULT_ERRORS
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
@@ -30,7 +32,7 @@ import { useThemeColors } from "@notesnook/theme";
 import { DisplayedNotification } from "@notifee/react-native";
 import Clipboard from "@react-native-clipboard/clipboard";
 import React, { useEffect, useRef, useState } from "react";
-import { InteractionManager, Platform } from "react-native";
+import { InteractionManager, Platform, View } from "react-native";
 import Share from "react-native-share";
 import { DatabaseLogger, db } from "../common/database";
 import { AttachmentDialog } from "../components/attachments";
@@ -65,11 +67,13 @@ import { useSelectionStore } from "../stores/use-selection-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { useTagStore } from "../stores/use-tag-store";
 import { useUserStore } from "../stores/use-user-store";
-import { eUpdateNoteInEditor } from "../utils/events";
+import { eCloseSheet, eUpdateNoteInEditor } from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { convertNoteToText } from "../utils/note-to-text";
 import { sleep } from "../utils/time";
-import { resetStoredState } from "./use-stored-state";
+import { NotesnookModule } from "../utils/notesnook-module";
+
+import DatePickerComponent from "../components/date-picker";
 
 export type ActionId =
   | "select"
@@ -114,7 +118,9 @@ export type ActionId =
   | "remove-from-notebook"
   | "trash"
   | "default-homepage"
-  | "default-tag";
+  | "default-tag"
+  | "launcher-shortcut"
+  | "expiry-date";
 
 export type Action = {
   id: ActionId;
@@ -128,6 +134,31 @@ export type Action = {
   activeColor?: string;
   type?: ButtonProps["type"];
   locked?: boolean;
+};
+
+export const Default_Drag_Action: Action = {
+  id: "reorder",
+  title: strings.reorder(),
+  icon: "sort-ascending",
+  onPress: async () => {
+    const feature = await isFeatureAvailable("customizableSidebar");
+    if (feature && !feature.isAllowed) {
+      ToastManager.show({
+        message: feature.error,
+        type: "info",
+        context: "local",
+        actionText: strings.upgrade(),
+        func: () => {
+          PaywallSheet.present(feature);
+        }
+      });
+      return;
+    }
+    useSideBarDraggingStore.setState({
+      dragging: true
+    });
+    eSendEvent(eCloseSheet);
+  }
 };
 
 function isNotePinnedInNotifications(item: Item) {
@@ -158,10 +189,12 @@ export const useActions = ({
     "shortcuts",
     "notebooks",
     "customizableSidebar",
-    "customHomepage"
+    "customHomepage",
+    "androidLauncherShortcuts",
+    "expiringNotes"
   ]);
   const [item, setItem] = useState(propItem);
-  const { colors } = useThemeColors();
+  const { colors, isDark } = useThemeColors();
   const setMenuPins = useMenuStore((state) => state.setMenuPins);
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(
     db.shortcuts.exists(item.id)
@@ -297,7 +330,6 @@ export const useActions = ({
             id: item.id,
             title: value
           });
-
           eSendEvent(Navigation.routeNames.TaggedNotes);
           InteractionManager.runAfterInteractions(() => {
             useTagStore.getState().refresh();
@@ -434,31 +466,6 @@ export const useActions = ({
       title: strings.rename(),
       icon: "square-edit-outline",
       onPress: renameColor
-    });
-
-    actions.push({
-      id: "reorder",
-      title: strings.reorder(),
-      icon: "sort-ascending",
-      onPress: async () => {
-        if (features && !features.customizableSidebar.isAllowed) {
-          ToastManager.show({
-            message: features.customizableSidebar.error,
-            type: "info",
-            context: "local",
-            actionText: strings.upgrade(),
-            func: () => {
-              PaywallSheet.present(features.customizableSidebar);
-            }
-          });
-          return;
-        }
-        useSideBarDraggingStore.setState({
-          dragging: true
-        });
-        close();
-      },
-      locked: !features?.customizableSidebar.isAllowed
     });
   }
 
@@ -706,26 +713,6 @@ export const useActions = ({
                 type: item.type
               }
         );
-
-        resetStoredState(
-          "app-home-navigtion-key",
-          isHomepage
-            ? undefined
-            : {
-                name:
-                  item.type === "notebook"
-                    ? "Notebook"
-                    : item.type === "tag"
-                      ? "TaggedNotes"
-                      : item.type === "color"
-                        ? "ColorNotes"
-                        : undefined,
-                params: {
-                  item: item,
-                  id: item.id
-                }
-              }
-        );
       }
     });
   }
@@ -965,7 +952,7 @@ export const useActions = ({
             copyNote: true,
             novault: true,
             locked: true,
-            item: item,
+            item: item as Note,
             title: strings.copyNote()
           });
         } else {
@@ -1177,6 +1164,45 @@ export const useActions = ({
         },
         checked: item.archived,
         isToggle: true
+      },
+      {
+        id: "expiry-date",
+        title: item.expiryDate ? strings.unsetExpiry() : strings.setExpiry(),
+        icon: item.expiryDate ? "bomb-off" : "bomb",
+        locked: !features?.expiringNotes?.isAllowed,
+        onPress: async () => {
+          if (item.expiryDate) {
+            await db.notes.setExpiryDate(null, item.id);
+            setItem((await db.notes.note(item.id)) as Item);
+          } else {
+            if (features && !features?.expiringNotes.isAllowed) {
+              ToastManager.show({
+                message: features?.expiringNotes.error,
+                type: "info",
+                actionText: strings.upgrade(),
+                context: "local",
+                func: () => {
+                  PaywallSheet.present(features?.expiringNotes);
+                }
+              });
+              return;
+            }
+
+            presentDialog({
+              context: "properties",
+              component: (close) => (
+                <DatePickerComponent
+                  onCancel={() => close?.()}
+                  onConfirm={async (date) => {
+                    close?.();
+                    await db.notes.setExpiryDate(date.getTime(), item.id);
+                    setItem((await db.notes.note(item.id)) as Item);
+                  }}
+                />
+              )
+            });
+          }
+        }
       }
     );
 
@@ -1204,6 +1230,45 @@ export const useActions = ({
       icon: "delete-outline",
       type: "error",
       onPress: deleteItem
+    });
+  }
+
+  if (
+    Platform.OS === "android" &&
+    (item.type === "tag" ||
+      item.type === "note" ||
+      item.type === "notebook" ||
+      item.type === "color")
+  ) {
+    actions.push({
+      id: "launcher-shortcut",
+      title: strings.addToHome(),
+      icon: "cellphone-arrow-down",
+      locked: !features?.androidLauncherShortcuts.isAllowed,
+      onPress: async () => {
+        if (features && !features?.androidLauncherShortcuts.isAllowed) {
+          ToastManager.show({
+            message: features?.androidLauncherShortcuts.error,
+            type: "info",
+            actionText: strings.upgrade(),
+            context: "local",
+            func: () => {
+              PaywallSheet.present(features?.androidLauncherShortcuts);
+            }
+          });
+          return;
+        }
+
+        try {
+          await NotesnookModule.addShortcut(
+            item.id,
+            item.type,
+            item.title,
+            (item as Note).headline || (item as Notebook).description || "",
+            (item as Color).colorCode
+          );
+        } catch (e) {}
+      }
     });
   }
 

@@ -25,11 +25,12 @@ import {
   ContentItem,
   Item,
   MaybeDeletedItem,
+  Note,
   isDeleted
 } from "../../types.js";
 import { ParsedInboxItem, SyncInboxItem } from "./types.js";
 
-const THRESHOLD = process.env.NODE_ENV === "test" ? 6 * 1000 : 60 * 1000;
+const THRESHOLD = process.env.NODE_ENV === "test" ? 2 * 1000 : 60 * 1000;
 class Merger {
   logger = logger.scope("Merger");
   constructor(private readonly db: Database) {}
@@ -45,6 +46,27 @@ class Merger {
     if (!localItem || remoteItem.dateModified > localItem.dateModified) {
       return remoteItem;
     }
+
+    if (
+      !remoteItem.deleted &&
+      remoteItem.type === "note" &&
+      !localItem.deleted &&
+      localItem.type === "trash" &&
+      localItem.itemType === "note" &&
+      localItem.deletedBy === "expired"
+    ) {
+      if (
+        remoteItem.expiryDate.dateModified > localItem.expiryDate.dateModified
+      ) {
+        localItem.expiryDate = remoteItem.expiryDate;
+        (localItem as unknown as Note).type = "note";
+        (localItem as unknown as Note).deletedBy = null;
+        (localItem as unknown as Note).dateDeleted = null;
+        (localItem as unknown as Note).itemType = null;
+
+        return localItem;
+      }
+    }
   }
 
   mergeContent(
@@ -59,8 +81,6 @@ class Merger {
       isDeleted(remoteItem) ||
       remoteItem.type !== "tiptap" ||
       localItem.type !== "tiptap" ||
-      localItem.locked ||
-      remoteItem.locked ||
       !localItem.data ||
       !remoteItem.data
     ) {

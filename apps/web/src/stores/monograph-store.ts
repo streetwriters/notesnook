@@ -33,8 +33,8 @@ class MonographStore extends BaseStore<MonographStore> {
     this.set({ monographs: grouping });
   };
 
-  publish = async (noteId: string, opts: PublishOptions) => {
-    const publishId = await db.monographs.publish(noteId, opts);
+  publish = async (noteId: string, title: string, opts: PublishOptions) => {
+    const publishId = await db.monographs.publish(noteId, title, opts);
     await this.get().refresh();
     await noteStore.refreshContext();
     return publishId;

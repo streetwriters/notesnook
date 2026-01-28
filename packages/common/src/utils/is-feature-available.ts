@@ -469,6 +469,50 @@ const features = {
       believer: createLimit(true),
       legacyPro: createLimit(true)
     }
+  }),
+  androidLauncherShortcuts: createFeature({
+    id: "androidLauncherShortcuts",
+    title: "Android Launcher Shortcuts",
+    availability: {
+      free: createLimit(false),
+      essential: createLimit(false),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
+    }
+  }),
+  expiringNotes: createFeature({
+    id: "expiringNotes",
+    title: "Expiring notes",
+    availability: {
+      free: createLimit(false),
+      essential: createLimit(false),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
+    }
+  }),
+  exportTableAsCsv: createFeature({
+    id: "exportTableAsCsv",
+    title: "Export table as CSV",
+    availability: {
+      free: createLimit(false),
+      essential: createLimit(false),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
+    }
+  }),
+  importCsvToTable: createFeature({
+    id: "importCsvToTable",
+    title: "Import CSV to table",
+    availability: {
+      free: createLimit(false),
+      essential: createLimit(false),
+      pro: createLimit(true),
+      believer: createLimit(true),
+      legacyPro: createLimit(true)
+    }
   })
 };
 

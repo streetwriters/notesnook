@@ -21,6 +21,8 @@ import { Cipher } from "@notesnook/crypto";
 import { isCipher } from "./utils/index.js";
 
 export type TimeFormat = "12-hour" | "24-hour";
+export type DayFormat = "short" | "long";
+export type WeekFormat = "Sun" | "Mon";
 
 export type SortOptions = {
   sortBy:
@@ -208,6 +210,10 @@ export interface Note extends BaseItem<"note"> {
 
   isGeneratedTitle?: boolean;
   archived?: boolean;
+  expiryDate: {
+    dateModified: number;
+    value: number | null;
+  };
 }
 
 export interface Notebook extends BaseItem<"notebook"> {
@@ -427,6 +433,7 @@ export interface SessionContentItem extends BaseItem<"sessioncontent"> {
   compressed: boolean;
   localOnly: boolean;
   locked: boolean;
+  title: string;
 }
 
 export type TrashCleanupInterval = 1 | 7 | 30 | 365 | -1;
@@ -472,6 +479,8 @@ export type SettingItemMap = {
   trashCleanupInterval: TrashCleanupInterval;
   titleFormat: string;
   timeFormat: TimeFormat;
+  dayFormat: DayFormat;
+  weekFormat: WeekFormat;
   dateFormat: string;
   defaultNotebook: string | undefined;
   defaultTag: string | undefined;
@@ -539,7 +548,7 @@ export type BaseTrashItem<TItem extends BaseItem<"note" | "notebook">> =
     /**
      * deletedBy tells who deleted this specific item.
      */
-    deletedBy: "user" | "app";
+    deletedBy: "user" | "app" | "expired";
     /**
      * @deprecated
      */

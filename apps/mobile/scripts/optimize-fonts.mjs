@@ -115,7 +115,13 @@ const EXTRA_ICON_NAMES = [
   "update",
   "notebook-minus",
   "calendar-blank",
-  "email-newsletter"
+  "email-newsletter",
+  "cellphone-arrow-down",
+  "format-line-spacing",
+  "calendar-today",
+  "bomb",
+  "bomb-off",
+  "cancel"
 ];
 
 const __filename = fileURLToPath(import.meta.url);

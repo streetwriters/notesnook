@@ -54,6 +54,8 @@ export type Settings = {
   markdownShortcuts: boolean;
   features: Record<any, any>;
   loggedIn: boolean;
+  defaultLineHeight: number;
+  dayFormat: "short" | "long";
 };
 
 /* eslint-disable no-var */

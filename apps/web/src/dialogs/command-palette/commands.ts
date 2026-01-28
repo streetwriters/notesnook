@@ -328,7 +328,7 @@ async function getActiveNoteCommands(): Promise<Command[]> {
 
   const menuItems =
     note.type !== "trash"
-      ? noteMenuItems(note, [note.id], {
+      ? await noteMenuItems(note, [note.id], {
           locked: !!(
             await db
               .sql()
@@ -432,7 +432,7 @@ function getEditorCommands(): Command[] {
     }
   ];
 
-  if (session.type !== "readonly" && (editor.canUndo || editor.canRedo)) {
+  if (session.type !== "readonly" && (editor?.canUndo || editor?.canRedo)) {
     commands.push(
       {
         id: "undo",

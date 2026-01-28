@@ -24,7 +24,11 @@ import { useEditorStore } from "./stores/editor-store";
 import { useStore as useAnnouncementStore } from "./stores/announcement-store";
 import { useStore as useSettingStore } from "./stores/setting-store";
 import { scheduleBackups, scheduleFullBackups } from "./common/notices";
-import { introduceFeatures, resetFeatures } from "./common";
+import {
+  introduceFeatures,
+  resetFeatures,
+  scheduleExpiredNotesDeletion
+} from "./common";
 import { AppEventManager, AppEvents } from "./common/app-events";
 import { db } from "./common/db";
 import { EV, EVENTS } from "@notesnook/core";
@@ -65,6 +69,7 @@ export default function AppEffects() {
         await FeatureDialog.show({ featureName: "highlights" });
         await scheduleBackups();
         await scheduleFullBackups();
+        await scheduleExpiredNotesDeletion();
         if (useSettingStore.getState().isFullOfflineMode)
           // NOTE: we deliberately don't await here because we don't want to pause execution.
           db.attachments.cacheAttachments().catch(logger.error);

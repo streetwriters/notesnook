@@ -192,7 +192,7 @@ class UserManager {
           salt: user.salt
         });
       }
-      EV.publish(EVENTS.userLoggedIn, user);
+      this.db.eventManager.publish(EVENTS.userLoggedIn, user);
     } catch (e) {
       await this.tokenManager.saveToken(token);
       throw e;
@@ -240,7 +240,7 @@ class UserManager {
     await this.db.setLastSynced(0);
     await this.db.syncer.devices.register();
 
-    EV.publish(EVENTS.userLoggedIn, user);
+    this.db.eventManager.publish(EVENTS.userLoggedIn, user);
   }
 
   async getSessions() {
@@ -281,8 +281,8 @@ class UserManager {
       this.cachedAttachmentKey = undefined;
       this.cachedInboxKeys = undefined;
       await this.db.reset();
-      EV.publish(EVENTS.userLoggedOut, reason);
-      EV.publish(EVENTS.appRefreshRequested);
+      this.db.eventManager.publish(EVENTS.userLoggedOut, reason);
+      this.db.eventManager.publish(EVENTS.appRefreshRequested);
     }
   }
 
@@ -345,6 +345,7 @@ class UserManager {
   }
 
   async fetchUser(): Promise<User | undefined> {
+    const oldUser = await this.getUser();
     try {
       const token = await this.tokenManager.getAccessToken();
       if (!token) return;
@@ -353,7 +354,6 @@ class UserManager {
         token
       );
       if (user) {
-        const oldUser = await this.getUser();
         await this.setUser(user);
         if (
           oldUser &&
@@ -362,18 +362,21 @@ class UserManager {
             oldUser.subscription.provider !== user.subscription.provider)
         ) {
           await this.tokenManager._refreshToken(true);
-          EV.publish(EVENTS.userSubscriptionUpdated, user.subscription);
+          this.db.eventManager.publish(
+            EVENTS.userSubscriptionUpdated,
+            user.subscription
+          );
         }
         if (oldUser && !oldUser.isEmailConfirmed && user.isEmailConfirmed)
-          EV.publish(EVENTS.userEmailConfirmed);
-        EV.publish(EVENTS.userFetched, user);
+          this.db.eventManager.publish(EVENTS.userEmailConfirmed);
+        this.db.eventManager.publish(EVENTS.userFetched, user);
         return user;
       } else {
-        return await this.getUser();
+        return oldUser;
       }
     } catch (e) {
       logger.error(e, "Error fetching user");
-      return await this.getUser();
+      return oldUser;
     }
   }
 
@@ -559,7 +562,7 @@ class UserManager {
   async hasInboxKeys() {
     if (this.cachedInboxKeys) return true;
 
-    let user = await this.getUser();
+    const user = await this.getUser();
     if (!user) return false;
 
     return !!user.inboxKeys;

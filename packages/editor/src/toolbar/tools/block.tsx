@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { ToolProps } from "../types.js";
-import { Editor } from "../../types.js";
+import { Editor, hasPermission } from "../../types.js";
 import { Icons } from "../icons.js";
 import { useMemo, useRef, useState } from "react";
 import { EmbedPopup } from "../popups/embed-popup.js";
@@ -31,6 +31,7 @@ import { ImageUploadPopup } from "../popups/image-upload.js";
 import { Button } from "../../components/button.js";
 import { strings } from "@notesnook/intl";
 import { keybindings } from "@notesnook/common";
+import { importCsvToTable } from "../../extensions/table/actions.js";
 
 export function InsertBlock(props: ToolProps) {
   const { editor } = props;
@@ -205,6 +206,36 @@ const table = (editor: Editor): MenuItem => ({
   menu: {
     title: strings.insertTable(),
     items: [
+      {
+        key: "import-csv",
+        type: "button",
+        title: strings.importCsv(),
+        icon: Icons.csv,
+        onClick: async () => {
+          if (!hasPermission("importCsvToTable")) return;
+
+          const input = document.createElement("input");
+          input.type = "file";
+          input.accept = ".csv,text/csv";
+          input.onchange = async (e) => {
+            const file = (e.target as HTMLInputElement).files?.[0];
+            if (!file) return;
+
+            try {
+              const text = await file.text();
+              importCsvToTable(text, editor);
+            } catch (error) {
+              console.error("Error importing CSV:", error);
+            }
+          };
+
+          input.click();
+        }
+      },
+      {
+        key: "sep",
+        type: "separator"
+      },
       {
         key: "table-size-selector",
         type: "popup",

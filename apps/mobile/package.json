@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/mobile",
-  "version": "3.3.12",
+  "version": "3.3.13",
   "private": true,
   "license": "GPL-3.0-or-later",
   "scripts": {
@@ -32,7 +32,7 @@
     "@ammarahmed/react-native-fingerprint-scanner": "^5.0.1",
     "@ammarahmed/react-native-share-extension": "^2.9.5",
     "@ammarahmed/react-native-sodium": "^1.6.8",
-    "@ammarahmed/react-native-upload": "^6.29.0",
+    "@ammarahmed/react-native-upload": "^6.31.0",
     "@azure/core-asynciterator-polyfill": "^1.0.2",
     "@bam.tech/react-native-image-resizer": "3.0.11",
     "@callstack/repack": "~5.2.1",
@@ -116,6 +116,8 @@
     "react-native-mmkv-storage": "^12.0.1",
     "react-native-modal-datetime-picker": "14.0.0",
     "react-native-navigation-bar-color": "2.0.2",
+    "react-native-nitro-cloud-uploader": "^1.0.9",
+    "react-native-nitro-modules": "^0.32.0",
     "react-native-notification-sounds": "0.5.5",
     "react-native-orientation-locker": "^1.7.0",
     "react-native-pdf": "^7.0.3",

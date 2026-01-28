@@ -71,6 +71,7 @@ import { verifyUser, verifyUserWithApplock } from "./functions";
 import { logoutUser } from "./logout";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
+import { EDITOR_LINE_HEIGHT } from "../../utils/constants";
 
 export const settingsGroups: SettingSection[] = [
   {
@@ -285,10 +286,17 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "change-password",
             name: strings.changePassword(),
-            type: "screen",
+            // type: "screen",
             description: strings.changePasswordDesc(),
-            component: "change-password",
-            icon: "form-textbox-password"
+            // component: "change-password",
+            icon: "form-textbox-password",
+            modifer: () => {
+              ToastManager.show({
+                type: "info",
+                message:
+                  "Password changing has been disabled temporarily to address some issues faced by users. It will be enabled again once the issues have resolved."
+              });
+            }
           },
           {
             id: "change-email",
@@ -716,6 +724,22 @@ export const settingsGroups: SettingSection[] = [
             icon: "calendar-blank"
           },
           {
+            id: "day-format",
+            name: strings.dayFormat(),
+            description: strings.dayFormatDesc(),
+            type: "component",
+            component: "day-format-selector",
+            icon: "calendar-today"
+          },
+          {
+            id: "week-format",
+            name: strings.weekFormat(),
+            description: strings.weekFormatDesc(),
+            type: "component",
+            component: "week-format-selector",
+            icon: "calendar"
+          },
+          {
             id: "time-format",
             name: strings.timeFormat(),
             description: strings.timeFormatDesc(),
@@ -815,6 +839,16 @@ export const settingsGroups: SettingSection[] = [
             component: "font-selector"
           },
           {
+            id: "default-line-height",
+            name: strings.lineHeight(),
+            description: strings.lineHeightDesc(),
+            type: "input-selector",
+            property: "defaultLineHeight",
+            icon: "format-line-spacing",
+            minInputValue: EDITOR_LINE_HEIGHT.MIN,
+            maxInputValue: EDITOR_LINE_HEIGHT.MAX
+          },
+          {
             id: "title-format",
             name: strings.titleFormat(),
             component: "title-format",
@@ -895,7 +929,6 @@ export const settingsGroups: SettingSection[] = [
             hidden: (current) => (current as VaultStatusType)?.exists,
             modifer: () => {
               openVault({
-                item: {},
                 novault: false,
                 title: strings.createVault()
               });
@@ -909,7 +942,6 @@ export const settingsGroups: SettingSection[] = [
             hidden: (current) => !(current as VaultStatusType)?.exists,
             modifer: () =>
               openVault({
-                item: {},
                 changePassword: true,
                 novault: true,
                 title: strings.changeVaultPassword()
@@ -923,7 +955,6 @@ export const settingsGroups: SettingSection[] = [
             hidden: (current) => !(current as VaultStatusType)?.exists,
             modifer: () => {
               openVault({
-                item: {},
                 clearVault: true,
                 novault: true,
                 title: strings.clearVault() + "?"
@@ -938,7 +969,6 @@ export const settingsGroups: SettingSection[] = [
             hidden: (current) => !(current as VaultStatusType)?.exists,
             modifer: () => {
               openVault({
-                item: {},
                 deleteVault: true,
                 novault: true,
                 title: strings.deleteVault() + "?"
@@ -960,7 +990,6 @@ export const settingsGroups: SettingSection[] = [
             modifer: (current) => {
               const _current = current as VaultStatusType;
               openVault({
-                item: {},
                 fingerprintAccess: !_current.biometryEnrolled,
                 revokeFingerprintAccess: _current.biometryEnrolled,
                 novault: true,

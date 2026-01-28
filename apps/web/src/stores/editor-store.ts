@@ -144,6 +144,7 @@ export type DiffEditorSession = BaseEditorSession & {
   type: "diff";
   note: Note;
   content: ContentItem;
+  oldTitle?: string;
   historySessionId: string;
 };
 
@@ -249,7 +250,7 @@ class EditorStore extends BaseStore<EditorStore> {
       }
     );
 
-    EV.subscribe(EVENTS.userLoggedOut, () => {
+    db.eventManager.subscribe(EVENTS.userLoggedOut, () => {
       const { closeTabs, tabs } = this.get();
       closeTabs(...tabs.map((s) => s.id));
     });
@@ -405,6 +406,8 @@ class EditorStore extends BaseStore<EditorStore> {
                     event.item.favorite ?? session.note.favorite;
                   session.note.archived =
                     event.item.archived ?? session.note.archived;
+                  session.note.dateCreated =
+                    event.item.dateCreated ?? session.note.dateCreated;
                   session.note.dateEdited =
                     event.item.dateEdited ?? session.note.dateEdited;
                 });
@@ -617,12 +620,13 @@ class EditorStore extends BaseStore<EditorStore> {
   openDiffSession = async (noteId: string, sessionId: string) => {
     const session = await db.noteHistory.session(sessionId);
     const note = await db.notes.note(noteId);
-    if (!session || !note || !note.contentId) return;
+    if (!session || !note) return;
 
-    const currentContent = await db.content.get(note.contentId);
+    const currentContent = note.contentId
+      ? await db.content.get(note.contentId)
+      : undefined;
     const oldContent = await db.noteHistory.content(session.id);
-
-    if (!oldContent || !currentContent) return;
+    if (!oldContent) return;
 
     const {
       getSession,
@@ -656,9 +660,10 @@ class EditorStore extends BaseStore<EditorStore> {
       note,
       tabId,
       title: label,
+      oldTitle: oldContent.title,
       historySessionId: session.id,
       content: {
-        type: oldContent.type,
+        type: oldContent.type || "tiptap",
         dateCreated: session.dateCreated,
         dateEdited: session.dateModified,
         dateModified: session.dateModified,
@@ -668,7 +673,7 @@ class EditorStore extends BaseStore<EditorStore> {
         conflicted: currentContent,
         ...(isCipher(oldContent.data)
           ? { locked: true, data: oldContent.data }
-          : { locked: false, data: oldContent.data })
+          : { locked: false, data: oldContent.data || "" })
       }
     });
   };
@@ -748,12 +753,7 @@ class EditorStore extends BaseStore<EditorStore> {
         ? await db.content.get(note.contentId)
         : undefined;
 
-      if (
-        !content ||
-        content.locked ||
-        !content.conflicted ||
-        note.type === "trash"
-      ) {
+      if (!content || !content.conflicted || note.type === "trash") {
         note.conflicted = false;
         await db.notes.add({ id: note.id, conflicted: false });
         if (content?.locked) {
@@ -1357,7 +1357,7 @@ const useEditorStore = createPersistedStore(EditorStore, {
     }, [] as EditorSession[])
   }),
   storage: db.config() as PersistStorage<Partial<EditorStore>>
-});
+}) as ReturnType<typeof createPersistedStore<EditorStore>>;
 export { useEditorStore, SESSION_STATES };
 
 const MILLISECONDS_IN_A_MINUTE = 60 * 1000;

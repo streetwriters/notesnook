@@ -27,6 +27,7 @@ import { Icons } from "../../toolbar/index.js";
 import { Icon } from "@notesnook/ui";
 import { Resizer } from "../../components/resizer/index.js";
 import { useThemeEngineStore } from "@notesnook/theme";
+import { useToolbarStore } from "../../toolbar/stores/toolbar-store.js";
 
 export function EmbedComponent(
   props: ReactNodeViewProps<EmbedAttributes & EmbedAlignmentOptions>
@@ -35,6 +36,7 @@ export function EmbedComponent(
   const [isLoading, setIsLoading] = useState(true);
   const { src, width, height, textDirection } = node.attrs;
   const theme = useThemeEngineStore((store) => store.theme);
+  const corsHost = useToolbarStore((store) => store.downloadOptions?.corsHost);
 
   let align = node.attrs.align;
   if (!align) align = textDirection ? "right" : "left";
@@ -127,7 +129,10 @@ export function EmbedComponent(
             ? {
                 srcDoc: tweetToEmbed(src, theme.colorScheme === "dark")
               }
-            : { src })}
+            : {
+                src:
+                  isYouTubeEmbed(src) && corsHost ? `${corsHost}/${src}` : src
+              })}
           width={"100%"}
           height={"100%"}
           sandbox={getSandboxFeatures(src)}
@@ -171,6 +176,18 @@ function getSandboxFeatures(src: string) {
     // ignore
   }
   return features.join(" ");
+}
+
+function isYouTubeEmbed(urlString: string) {
+  const url = new URL(urlString);
+  return (
+    (url.hostname === "www.youtube.com" ||
+      url.hostname === "youtube.com" ||
+      url.hostname === "m.youtube.com" ||
+      url.hostname === "www.youtube-nocookie.com" ||
+      url.hostname === "youtube-nocookie.com") &&
+    url.pathname.startsWith("/embed/")
+  );
 }
 
 function isTwitterX(src: string) {

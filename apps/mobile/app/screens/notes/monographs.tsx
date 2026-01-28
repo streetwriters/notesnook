@@ -62,7 +62,8 @@ Monographs.get = async (params?: NotesScreenParams, grouped = true) => {
 
 Monographs.navigate = (canGoBack?: boolean) => {
   Navigation.navigate<"Monographs">("Monographs", {
-    item: { type: "monograph" } as any,
+    type: "monograph",
+    id: "monograph",
     canGoBack: canGoBack as boolean
   });
 };

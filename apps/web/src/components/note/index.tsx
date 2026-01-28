@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
   NoteResolvedData,
+  areFeaturesAvailable,
   exportContent,
   getFormattedDate,
   getFormattedReminderTime
@@ -66,9 +67,12 @@ import {
   Attachment,
   AttachmentError,
   Circle,
+  Close,
   Colors,
   Copy,
+  Destruct,
   Duplicate,
+  Edit,
   Export,
   HTML,
   InternalLink,
@@ -98,6 +102,8 @@ import { Context } from "../list-container/types";
 import ListItem from "../list-item";
 import { PublishDialog } from "../publish-view";
 import TimeAgo from "../time-ago";
+import { NoteExpiryDateDialog } from "../../dialogs/note-expiry-date-dialog";
+import { withFeatureCheck } from "../../common";
 
 type NoteProps = NoteResolvedData & {
   item: NoteType;
@@ -179,6 +185,8 @@ function Note(props: NoteProps) {
               {locked && <Lock size={11} data-test-id={`locked`} />}
               {note.favorite && <Star color={primary} size={15} />}
               {note.readonly && <Readonly size={15} />}
+              {note.expiryDate?.value ? <Destruct size={13} /> : null}
+
               <TimeAgo live={true} datetime={date} locale="short" />
             </>
           ) : (
@@ -268,6 +276,13 @@ function Note(props: NoteProps) {
                   }
                 />
               ) : null}
+
+              {note.expiryDate?.value && (
+                <IconTag
+                  icon={Destruct}
+                  text={getFormattedDate(note.expiryDate.value, "date")}
+                />
+              )}
             </>
           )}
         </Flex>
@@ -289,7 +304,8 @@ export default React.memo(Note, function (prevProps, nextProps) {
     prevProps.attachments?.failed === nextProps.attachments?.failed &&
     prevProps.attachments?.total === nextProps.attachments?.total &&
     prevProps.locked === nextProps.locked &&
-    prevProps.color?.id === nextProps.color?.id
+    prevProps.color?.id === nextProps.color?.id &&
+    prevItem.expiryDate?.value === nextItem.expiryDate?.value
   );
 });
 
@@ -330,9 +346,9 @@ export const noteMenuItems: (
   note: NoteType,
   ids?: string[],
   context?: { color?: Color; locked?: boolean }
-) => MenuItem[] = (note, ids = [], context) => {
+) => Promise<MenuItem[]> = async (note, ids = [], context) => {
   // const isSynced = db.notes.note(note.id)?.synced();
-
+  const features = await areFeaturesAvailable(["expiringNotes"]);
   return [
     {
       type: "button",
@@ -603,6 +619,52 @@ export const noteMenuItems: (
       multiSelect: true
     },
     { key: "sep3", type: "separator" },
+    note.expiryDate?.value
+      ? {
+          type: "button",
+          key: "expiry-date",
+          title: strings.expiryDate(),
+          icon: Destruct.path,
+          menu: {
+            items: [
+              {
+                type: "button",
+                key: "change",
+                title: strings.change(),
+                onClick: async () => {
+                  await NoteExpiryDateDialog.show({
+                    noteId: note.id,
+                    expiryDate: note.expiryDate?.value
+                  });
+                },
+                icon: Edit.path
+              },
+              {
+                type: "button",
+                key: "remove",
+                title: strings.remove(),
+                onClick: async () => {
+                  await db.notes.setExpiryDate(null, ...ids);
+                  store.refresh();
+                  showToast("success", "Expiry date removed");
+                },
+                icon: Close.path
+              }
+            ]
+          }
+        }
+      : {
+          type: "button",
+          key: "expiry-date",
+          title: strings.setExpiry(),
+          icon: Destruct.path,
+          premium: !features.expiringNotes.isAllowed,
+          onClick: async () => {
+            await NoteExpiryDateDialog.show({
+              noteId: note.id
+            });
+          }
+        },
     {
       type: "button",
       key: "movetotrash",

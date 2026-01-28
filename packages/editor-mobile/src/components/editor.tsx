@@ -114,6 +114,8 @@ const Tiptap = ({
       callout: !!settings.features?.callout?.isAllowed,
       outlineList: !!settings.features?.outlineList?.isAllowed,
       taskList: !!settings.features?.taskList?.isAllowed,
+      importCsvToTable: !!settings.features?.importCsvToTable?.isAllowed,
+      exportTableAsCsv: !!settings.features?.exportTableAsCsv?.isAllowed,
       insertAttachment: settings.loggedIn
     },
     onPermissionDenied: (claim) => {
@@ -164,6 +166,10 @@ const Tiptap = ({
         return postAsyncWithTimeout(EditorEvents.createInternalLink, {
           attributes
         });
+      },
+      downloadCsvTable: (csv) => {
+        console.log("download csv");
+        post("editor-events:download-csv", csv);
       },
       element: getContentDiv(),
       editable: !tab.session?.readonly,
@@ -242,6 +248,7 @@ const Tiptap = ({
       },
       dateFormat: settings.dateFormat,
       timeFormat: settings.timeFormat as "12-hour" | "24-hour" | undefined,
+      dayFormat: settings.dayFormat,
       enableInputRules: settings.markdownShortcuts
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -945,6 +952,7 @@ const TiptapProvider = (): JSX.Element => {
     editorContainer.style.padding = "0px 16px";
     editorContainer.style.color = colors.primary.paragraph;
     editorContainer.style.fontSize = `${settings.fontSize}px`;
+    editorContainer.style.lineHeight = `${settings.defaultLineHeight}`;
     editorContainer.style.fontFamily =
       getFontById(settings.fontFamily)?.font || "sans-serif";
     contentRef.current = editorContainer;
@@ -964,8 +972,9 @@ const TiptapProvider = (): JSX.Element => {
       contentRef.current.style.fontSize = `${settings.fontSize}px`;
       contentRef.current.style.fontFamily =
         getFontById(settings.fontFamily)?.font || "sans-serif";
+      contentRef.current.style.lineHeight = `${settings.defaultLineHeight}`;
     }
-  }, [settings.fontSize, settings.fontFamily]);
+  }, [settings.fontSize, settings.fontFamily, settings.defaultLineHeight]);
 
   return <Tiptap settings={settings} getContentDiv={getContentDiv} />;
 };

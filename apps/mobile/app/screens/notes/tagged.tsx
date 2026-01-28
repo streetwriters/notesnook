@@ -46,11 +46,13 @@ export const TaggedNotes = ({
 
 TaggedNotes.get = async (params: NotesScreenParams, grouped = true) => {
   if (!grouped) {
-    return await db.relations.from(params.item, "note").resolve();
+    return await db.relations
+      .from({ id: params.id, type: "tag" }, "note")
+      .resolve();
   }
 
   return await db.relations
-    .from(params.item, "note")
+    .from({ id: params.id, type: "tag" }, "note")
     .selector.grouped(db.settings.getGroupOptions("notes"));
 };
 
@@ -64,8 +66,10 @@ TaggedNotes.navigate = (item: Tag, canGoBack?: boolean) => {
   }
 
   Navigation.push<"TaggedNotes">("TaggedNotes", {
-    item: item,
-    canGoBack
+    id: item.id,
+    type: "tag",
+    canGoBack,
+    item: item
   });
 };
 
