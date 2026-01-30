@@ -151,8 +151,8 @@ export function MenuItem({
               item.icon === "crown"
                 ? colors.static.yellow
                 : isFocused
-                ? colors.selected.icon
-                : colors.secondary.icon
+                  ? colors.selected.icon
+                  : colors.secondary.icon
             }
             size={AppFontSize.md}
           />

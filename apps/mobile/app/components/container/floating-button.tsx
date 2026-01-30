@@ -161,10 +161,10 @@ const FloatingButton = ({
               icon
                 ? icon
                 : route.name === "Notebooks"
-                ? "notebook-plus"
-                : route.name === "Trash"
-                ? "delete"
-                : "plus"
+                  ? "notebook-plus"
+                  : route.name === "Trash"
+                    ? "delete"
+                    : "plus"
             }
             color={color || colors.primary.accent}
             size={size === "small" ? AppFontSize.xl : AppFontSize.xxxl}

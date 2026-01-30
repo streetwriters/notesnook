@@ -471,9 +471,8 @@ export const useEditorEvents = (
             relationType: "from",
             title: strings.dataTypesPluralCamelCase.reminder(),
             onAdd: async () => {
-              const reminderFeature = await isFeatureAvailable(
-                "activeReminders"
-              );
+              const reminderFeature =
+                await isFeatureAvailable("activeReminders");
               if (!reminderFeature.isAllowed) {
                 ToastManager.show({
                   type: "info",

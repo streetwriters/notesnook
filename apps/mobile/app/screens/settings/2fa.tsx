@@ -322,8 +322,8 @@ export const MFASetup = ({
                 method?.id === "email"
                   ? user?.email
                   : method?.id === "app"
-                  ? authenticatorDetails?.sharedKey || ""
-                  : undefined
+                    ? authenticatorDetails?.sharedKey || ""
+                    : undefined
               }
               multiline={method.id === "app"}
               onChangeText={(value) => {
@@ -356,12 +356,12 @@ export const MFASetup = ({
                       sending
                         ? null
                         : method.id === "app"
-                        ? strings.copy()
-                        : `${
-                            seconds
-                              ? strings.resendCode(seconds as number)
-                              : strings.sendCode()
-                          }`
+                          ? strings.copy()
+                          : `${
+                              seconds
+                                ? strings.resendCode(seconds as number)
+                                : strings.sendCode()
+                            }`
                     }
                   />
                 )

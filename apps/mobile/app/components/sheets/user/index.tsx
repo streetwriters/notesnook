@@ -114,8 +114,8 @@ export const UserSheet = () => {
                           progress ? `(${progress.current})` : ""
                         }`
                       : lastSyncStatus === SyncStatus.Failed
-                      ? strings.syncFailed()
-                      : strings.synced()}{" "}
+                        ? strings.syncFailed()
+                        : strings.synced()}{" "}
                     {!syncing ? (
                       <TimeSince
                         style={{
@@ -139,8 +139,8 @@ export const UserSheet = () => {
                     !user || lastSyncStatus === SyncStatus.Failed
                       ? colors.error.icon
                       : isOffline
-                      ? colors.static.orange
-                      : colors.success.icon
+                        ? colors.static.orange
+                        : colors.success.icon
                   }
                 />
               </Paragraph>

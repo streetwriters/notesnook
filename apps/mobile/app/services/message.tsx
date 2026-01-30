@@ -146,7 +146,7 @@ const updateAvailableMessage = (
     icon: "update",
     type: "normal",
     id: "app-update"
-  } as Message);
+  }) as Message;
 
 export function setUpdateAvailableMessage(
   version: GithubVersionInfo | CheckVersionResponse

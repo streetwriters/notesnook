@@ -1,3 +1,18 @@
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+Copyright (C) 2023 Streetwriters (Private) Limited
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 import { initTRPC } from "@trpc/server";
 import { observable } from "@trpc/server/observable";
 import { BrowserWindow } from "electron";
@@ -25,16 +40,6 @@ export const windowRouter = t.router({
         route = `/notes/${input.noteId}/edit`; // Adjust based on router logic
       }
 
-      // We need to handle the route mapping similar to createURL in main/window-manager
-      // For now, let's pass a custom path or parameters.
-      // The WindowManager.createWindow accepts a path.
-      // Let's update createURL logic in our head: it takes a path.
-
-      // If we pass a full hash path like "#/notes/id", the URL constructor might handle it if we pass it as part of the base?
-      // No, createURL takes a path argument.
-
-      // Let's change the input to be more flexible.
-      // Let's change the input to be more flexible.
       windowManager.createWindow(
         {},
         {

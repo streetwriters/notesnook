@@ -419,8 +419,8 @@ const ShareView = () => {
         let html = !rawData.value
           ? ""
           : isURL(rawData?.value)
-          ? makeHtmlFromUrl(rawData?.value)
-          : makeHtmlFromPlainText(rawData?.value);
+            ? makeHtmlFromUrl(rawData?.value)
+            : makeHtmlFromPlainText(rawData?.value);
         setNote((note) => {
           note.content.data = html;
           noteContent.current = html;

@@ -72,7 +72,7 @@ export async function setupDatabase(password?: string) {
       ({
         compress: Gzip.deflate,
         decompress: Gzip.inflate
-      } as ICompressor),
+      }) as ICompressor,
     batchSize: 50,
     sqliteOptions: {
       dialect: (name) => ({

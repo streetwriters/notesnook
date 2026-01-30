@@ -192,8 +192,8 @@ export const Login = ({
                   ? "50%"
                   : "49.99%"
                 : focused
-                ? "100%"
-                : "99.9%",
+                  ? "100%"
+                  : "99.9%",
               backgroundColor: colors.primary.background,
               alignSelf: "center",
               paddingHorizontal: DDS.isTab ? 0 : DefaultAppStyles.GAP,

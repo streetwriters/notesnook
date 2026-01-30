@@ -237,9 +237,8 @@ const LinkNotebooks = (props: NavigationProps<"LinkNotebooks">) => {
               button={{
                 icon: "plus",
                 onPress: async () => {
-                  const notebooksFeature = await isFeatureAvailable(
-                    "notebooks"
-                  );
+                  const notebooksFeature =
+                    await isFeatureAvailable("notebooks");
                   if (!notebooksFeature.isAllowed) {
                     ToastManager.show({
                       message: notebooksFeature.error,
@@ -388,8 +387,8 @@ const NotebookItemWrapper = React.memo(
                 !selected
                   ? "selected"
                   : !state.initialState[item.notebook.id]
-                  ? undefined
-                  : "deselected"
+                    ? undefined
+                    : "deselected"
               );
           }}
           canDisableSelectionMode={false}

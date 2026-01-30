@@ -205,9 +205,8 @@ export async function getDatabaseKey(appLockPassword?: string) {
   }
 
   if (await Keychain.hasInternetCredentials("notesnook")) {
-    const userKeyCredentials = await Keychain.getInternetCredentials(
-      "notesnook"
-    );
+    const userKeyCredentials =
+      await Keychain.getInternetCredentials("notesnook");
 
     if (userKeyCredentials) {
       const userKeyCipher: Cipher = (await encrypt(

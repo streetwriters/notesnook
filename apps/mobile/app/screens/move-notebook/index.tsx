@@ -242,9 +242,8 @@ export const MoveNotebook = (props: NavigationProps<"MoveNotebook">) => {
               button={{
                 icon: "plus",
                 onPress: async () => {
-                  const notebooksFeature = await isFeatureAvailable(
-                    "notebooks"
-                  );
+                  const notebooksFeature =
+                    await isFeatureAvailable("notebooks");
                   if (!notebooksFeature.isAllowed) {
                     ToastManager.show({
                       message: notebooksFeature.error,

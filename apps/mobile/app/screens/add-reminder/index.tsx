@@ -384,17 +384,45 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
                 recurringMode === RecurringModes.Year
                   ? null
                   : recurringMode === RecurringModes.Week
-                  ? (weekFormat === "Mon" ? WeekDaysMon : WeekDays).map(
-                      (item) => (
+                    ? (weekFormat === "Mon" ? WeekDaysMon : WeekDays).map(
+                        (item) => (
+                          <Button
+                            key={strings.weekDayNamesShort[
+                              item as keyof typeof strings.weekDayNamesShort
+                            ]()}
+                            title={strings.weekDayNamesShort[
+                              item as keyof typeof strings.weekDayNamesShort
+                            ]()}
+                            type={
+                              selectedDays.indexOf(item) > -1
+                                ? "selected"
+                                : "plain"
+                            }
+                            fontSize={AppFontSize.xs}
+                            style={{
+                              height: 40,
+                              borderRadius: 100,
+                              marginRight: 10
+                            }}
+                            onPress={() => {
+                              setSelectedDays((days) => {
+                                if (days.indexOf(item) > -1) {
+                                  days.splice(days.indexOf(item), 1);
+                                  return [...days];
+                                }
+                                days.push(item);
+                                return [...days];
+                              });
+                            }}
+                          />
+                        )
+                      )
+                    : MonthDays.map((item, index) => (
                         <Button
-                          key={strings.weekDayNamesShort[
-                            item as keyof typeof strings.weekDayNamesShort
-                          ]()}
-                          title={strings.weekDayNamesShort[
-                            item as keyof typeof strings.weekDayNamesShort
-                          ]()}
+                          key={index + "monthday"}
+                          title={index + 1 + ""}
                           type={
-                            selectedDays.indexOf(item) > -1
+                            selectedDays.indexOf(index + 1) > -1
                               ? "selected"
                               : "plain"
                           }
@@ -406,44 +434,16 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
                           }}
                           onPress={() => {
                             setSelectedDays((days) => {
-                              if (days.indexOf(item) > -1) {
-                                days.splice(days.indexOf(item), 1);
+                              if (days.indexOf(index + 1) > -1) {
+                                days.splice(days.indexOf(index + 1), 1);
                                 return [...days];
                               }
-                              days.push(item);
+                              days.push(index + 1);
                               return [...days];
                             });
                           }}
                         />
-                      )
-                    )
-                  : MonthDays.map((item, index) => (
-                      <Button
-                        key={index + "monthday"}
-                        title={index + 1 + ""}
-                        type={
-                          selectedDays.indexOf(index + 1) > -1
-                            ? "selected"
-                            : "plain"
-                        }
-                        fontSize={AppFontSize.xs}
-                        style={{
-                          height: 40,
-                          borderRadius: 100,
-                          marginRight: 10
-                        }}
-                        onPress={() => {
-                          setSelectedDays((days) => {
-                            if (days.indexOf(index + 1) > -1) {
-                              days.splice(days.indexOf(index + 1), 1);
-                              return [...days];
-                            }
-                            days.push(index + 1);
-                            return [...days];
-                          });
-                        }}
-                      />
-                    ))}
+                      ))}
               </ScrollView>
             </View>
           ) : null}
@@ -529,24 +529,24 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
                         dayjs(date).format("hh:mm A")
                       )
                     : recurringMode === RecurringModes.Year
-                    ? strings.reminderRepeatStrings.year(
-                        dayjs(date).format("dddd, MMMM D, h:mm A")
-                      )
-                    : selectedDays.length === 7 &&
-                      recurringMode === RecurringModes.Week
-                    ? strings.reminderRepeatStrings.week.daily(
-                        dayjs(date).format("hh:mm A")
-                      )
-                    : selectedDays.length === 0
-                    ? strings.reminderRepeatStrings[
-                        recurringMode as "week" | "month"
-                      ].selectDays()
-                    : strings.reminderRepeatStrings.repeats(
-                        repeatFrequency,
-                        recurringMode as string,
-                        getSelectedDaysText(selectedDays),
-                        dayjs(date).format("hh:mm A")
-                      )}
+                      ? strings.reminderRepeatStrings.year(
+                          dayjs(date).format("dddd, MMMM D, h:mm A")
+                        )
+                      : selectedDays.length === 7 &&
+                          recurringMode === RecurringModes.Week
+                        ? strings.reminderRepeatStrings.week.daily(
+                            dayjs(date).format("hh:mm A")
+                          )
+                        : selectedDays.length === 0
+                          ? strings.reminderRepeatStrings[
+                              recurringMode as "week" | "month"
+                            ].selectDays()
+                          : strings.reminderRepeatStrings.repeats(
+                              repeatFrequency,
+                              recurringMode as string,
+                              getSelectedDaysText(selectedDays),
+                              dayjs(date).format("hh:mm A")
+                            )}
                 </Paragraph>
               </>
             </View>
@@ -586,8 +586,8 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
                     mode === "Silent"
                       ? "minus-circle"
                       : mode === "Vibrate"
-                      ? "vibrate"
-                      : "volume-high"
+                        ? "vibrate"
+                        : "volume-high"
                   }
                   fontSize={AppFontSize.xs}
                   height={35}

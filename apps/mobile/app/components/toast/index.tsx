@@ -158,22 +158,22 @@ export const Toast = ({ context = "global" }) => {
               toastOptions.icon
                 ? toastOptions.icon
                 : toastOptions.type === "success"
-                ? "check"
-                : toastOptions.type === "info"
-                ? "information"
-                : "close"
+                  ? "check"
+                  : toastOptions.type === "info"
+                    ? "information"
+                    : "close"
             }
             size={isFullToastMessage ? AppFontSize.xxxl : AppFontSize.xl}
             color={
               toastOptions?.icon
                 ? toastOptions?.icon
                 : toastOptions.type === "error"
-                ? colors.error.icon
-                : toastOptions.type === "info"
-                ? isDark
-                  ? colors.static.white
-                  : colors.static.black
-                : colors.success.icon
+                  ? colors.error.icon
+                  : toastOptions.type === "info"
+                    ? isDark
+                      ? colors.static.white
+                      : colors.static.black
+                    : colors.success.icon
             }
           />
 
