@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, PropsWithChildren } from "react";
+import { useEffect, PropsWithChildren, useCallback } from "react";
 import {
   PositionOptions,
   PopupPresenterProps,
@@ -37,11 +37,13 @@ import {
   ResponsivePresenter,
   ResponsivePresenterProps
 } from "../responsive/index.js";
+import { useEditorId } from "../../toolbar/stores/editor-id-context.js";
 
 export type PopupWrapperProps = UsePopupHandlerOptions & {
   autoCloseOnUnmount?: boolean;
   position: PositionOptions;
 } & Partial<Omit<PopupPresenterProps, "onClose" | "isOpen">>;
+
 export function PopupWrapper(props: PropsWithChildren<PopupWrapperProps>) {
   const { id, position, children, autoCloseOnUnmount, ...presenterProps } =
     props;
@@ -51,14 +53,14 @@ export function PopupWrapper(props: PropsWithChildren<PopupWrapperProps>) {
   useEffect(() => {
     if (!autoCloseOnUnmount) return;
     return () => {
-      closePopup(id);
+      closePopup();
     };
-  }, [autoCloseOnUnmount, id, closePopup]);
+  }, [autoCloseOnUnmount, closePopup]);
 
   return (
     <PopupPresenter
       key={id}
-      onClose={() => closePopup(id)}
+      onClose={closePopup}
       position={position}
       blocking
       focusOnRender
@@ -79,13 +81,22 @@ type UsePopupHandlerOptions = {
   onClosed?: () => void;
 };
 export function usePopupHandler(options: UsePopupHandlerOptions) {
-  const { id, onClosed, group } = options;
+  const { id: rawId, onClosed, group: rawGroup } = options;
+  const editorId = useEditorId();
+  const isMobile = useIsMobile();
+  const id = editorId ? `${editorId}:${rawId}` : rawId;
+
   const openedPopups = useToolbarStore((store) => store.openedPopups);
   const closePopup = useToolbarStore((store) => store.closePopup);
   const closePopupGroup = useToolbarStore((store) => store.closePopupGroup);
 
   const isPopupOpen = typeof openedPopups[id] === "object";
   const isPopupDefined = typeof openedPopups[id] !== "undefined";
+  const group = isMobile
+    ? "mobile"
+    : editorId
+    ? `${editorId}:${rawGroup}`
+    : rawGroup;
 
   useEffect(() => {
     // we don't want to close the popup just when it is about to open.
@@ -99,7 +110,11 @@ export function usePopupHandler(options: UsePopupHandlerOptions) {
     }
   }, [onClosed, isPopupOpen, closePopupGroup, id, group]);
 
-  return { isPopupOpen, closePopup };
+  const close = useCallback(() => {
+    closePopup(id);
+  }, [closePopup, id]);
+
+  return { isPopupOpen, closePopup: close };
 }
 
 type ShowPopupOptions = {
