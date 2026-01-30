@@ -519,6 +519,7 @@ function TipTap(props: TipTapProps) {
           <Toolbar
             editor={editor}
             location={"top"}
+            editorId={id}
             sx={{
               flexWrap: "unset",
               overflowX: "unset"

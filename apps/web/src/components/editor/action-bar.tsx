@@ -60,7 +60,8 @@ import {
   KeyboardSensor,
   DragOverlay,
   MeasuringStrategy,
-  MouseSensor
+  MouseSensor,
+  useDroppable
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -87,7 +88,7 @@ import { saveContent } from "./index";
 
 type ToolButton = {
   title: string;
-  icon: Icon;
+  icon: Icon | React.FC<{ size: number }>;
   enabled?: boolean;
   hidden?: boolean;
   hideOnMobile?: boolean;
@@ -95,11 +96,76 @@ type ToolButton = {
   onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 };
 
-export function EditorActionBar() {
+const Remove = ({ size }: { size: number }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M5 12H19"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+const Square = ({ size }: { size: number }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <rect
+      x="3"
+      y="3"
+      width="18"
+      height="18"
+      rx="2"
+      stroke="currentColor"
+      strokeWidth="2"
+    />
+  </svg>
+);
+
+const Clone = ({ size }: { size: number }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M2 11V4.2C2 3.0799 2 2.51984 2.21799 2.09202C2.40973 1.71569 2.71569 1.40973 3.09202 1.21799C3.51984 1 4.0799 1 5.2 1H13"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <rect
+      x="6"
+      y="5"
+      width="16"
+      height="16"
+      rx="2"
+      stroke="currentColor"
+      strokeWidth="2"
+    />
+  </svg>
+);
+
+export function EditorActionBar({ groupId }: { groupId: string }) {
   const { isMaximized, isFullscreen, hasNativeWindowControls } =
     useWindowControls();
   const isFocusMode = useAppStore((store) => store.isFocusMode);
-  const activeTab = useEditorStore((store) => store.getActiveTab());
+  const activeTab = useEditorStore((store) => store.getActiveTab(groupId));
   const activeSession = useEditorStore((store) =>
     activeTab ? store.getSession(activeTab.sessionId) : undefined
   );
@@ -117,14 +183,29 @@ export function EditorActionBar() {
     "note" in activeSession &&
     db.monographs.isPublished(activeSession.note.id);
   const isMobile = useMobile();
+  const groupsCount = useEditorStore((store) => store.groups.length);
   const isTablet = useTablet();
 
   const tools: ToolButton[] = [
     {
+      title: "Split",
+      icon: Clone,
+      enabled: true,
+      onClick: () => useEditorStore.getState().splitGroup(),
+      hidden: isMobile
+    },
+    {
+      title: strings.close(),
+      icon: Cross,
+      enabled: groupsCount > 1,
+      onClick: () => useEditorStore.getState().closeGroup(groupId),
+      hidden: isMobile || groupsCount === 1
+    },
+    {
       title: strings.newTab(),
       icon: NewTab,
       enabled: true,
-      onClick: () => useEditorStore.getState().addTab()
+      onClick: () => useEditorStore.getState().addTab(undefined, groupId)
     },
     {
       title: strings.undo(),
@@ -221,7 +302,7 @@ export function EditorActionBar() {
           </Button>
         </Flex>
       ) : (
-        <TabStrip />
+        <TabStrip groupId={groupId} />
       )}
       <Flex
         sx={{
@@ -237,13 +318,13 @@ export function EditorActionBar() {
           flexShrink: 0
         }}
       >
-        {tools.map((tool) => (
+        {tools.map((tool, index) => (
           <Button
             data-test-id={tool.title}
             disabled={!tool.enabled}
             variant={tool.title === "Close" ? "error" : "secondary"}
             title={tool.title}
-            key={tool.title}
+            key={`${tool.title}-${index}`}
             sx={{
               p: 1,
               alignItems: "center",
@@ -270,16 +351,29 @@ export function EditorActionBar() {
   );
 }
 
-const TabStrip = React.memo(function TabStrip() {
+const TabStrip = React.memo(function TabStrip({
+  groupId
+}: {
+  groupId: string;
+}) {
   useEditorStore((store) => store.getActiveSession()); // otherwise the tab title won't update on opening a note
-  const tabs = useEditorStore((store) => store.tabs);
-  const currentTab = useEditorStore((store) => store.activeTabId);
+  const tabs = useEditorStore((store) =>
+    store.tabs.filter((t) => t && t.groupId === groupId)
+  );
+  const currentTab = useEditorStore(
+    (store) => store.getGroup(groupId)?.activeTabId
+  );
   const canGoBack = useEditorStore((store) => store.canGoBack);
   const canGoForward = useEditorStore((store) => store.canGoForward);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
+  const activeGroupId = useEditorStore((store) => store.activeGroupId);
+  const isGroupFocused = activeGroupId === groupId;
 
   return (
-    <Flex sx={{ flex: 1 }}>
+    <Flex
+      sx={{ flex: 1 }}
+      onClick={() => useEditorStore.getState().focusGroup(groupId)}
+    >
       <Flex
         sx={{
           px: 1,
@@ -293,6 +387,7 @@ const TabStrip = React.memo(function TabStrip() {
         <Button
           variant="accent"
           {...CREATE_BUTTON_MAP.notes}
+          onClick={() => useEditorStore.getState().newSession(groupId)}
           data-test-id={`create-new-note`}
           sx={{
             p: 1,
@@ -344,7 +439,7 @@ const TabStrip = React.memo(function TabStrip() {
           }}
           onDoubleClick={async (e) => {
             e.stopPropagation();
-            useEditorStore.getState().addTab();
+            useEditorStore.getState().addTab(undefined, groupId);
           }}
           onDragOver={(e) => {
             e.preventDefault();
@@ -363,23 +458,8 @@ const TabStrip = React.memo(function TabStrip() {
         >
           <ReorderableList
             items={tabs}
-            moveItem={(from, to) => {
-              if (from === to) return;
-              const tabs = useEditorStore.getState().tabs.slice();
-              const isToPinned = tabs[to].pinned;
-              const [fromTab] = tabs.splice(from, 1);
-
-              // if the tab where this tab is being dropped is pinned,
-              // let's pin our tab too.
-              if (isToPinned) {
-                fromTab.pinned = true;
-              }
-              // unpin the tab if it is moved.
-              else if (fromTab.pinned) fromTab.pinned = false;
-
-              tabs.splice(to, 0, fromTab);
-              useEditorStore.setState({ tabs });
-            }}
+            groupId={groupId}
+            moveItem={() => {}} // Removed usage in child
             renderItem={({ item: tab, index: i }) => {
               const session = useEditorStore
                 .getState()
@@ -402,20 +482,23 @@ const TabStrip = React.memo(function TabStrip() {
                   }
                   isUnsaved={isUnsaved}
                   isActive={tab.id === currentTab}
+                  isGroupFocused={isGroupFocused}
                   isPinned={!!tab.pinned}
                   isLocked={isLockedSession(session)}
                   isRevealInListDisabled={isFocusMode}
                   type={session.type}
                   onSave={() => {
-                    const { activeEditorId, getEditor } =
+                    const { getEditor } =
                       useEditorManager.getState();
-                    const editor = getEditor(activeEditorId || "")?.editor;
+                    const editor = getEditor(session.id)?.editor;
                     if (!editor) return;
                     saveContent(session.id, false, editor.getContent());
                   }}
                   onFocus={() => {
                     if (tab.id !== currentTab) {
-                      useEditorStore.getState().activateSession(tab.sessionId);
+                      useEditorStore.getState().focusTab(tab.id);
+                    } else {
+                      useEditorStore.getState().focusGroup(groupId);
                     }
                   }}
                   onClose={() => useEditorStore.getState().closeTabs(tab.id)}
@@ -495,8 +578,9 @@ type TabProps = {
   onPin: () => void;
   onSave: () => void;
   onRevealInList?: () => void;
+  isGroupFocused?: boolean;
 };
-function Tab(props: TabProps) {
+export function Tab(props: TabProps) {
   const {
     id,
     title,
@@ -514,7 +598,8 @@ function Tab(props: TabProps) {
     onCloseToTheLeft,
     onRevealInList,
     onPin,
-    onSave
+    onSave,
+    isGroupFocused
   } = props;
   const Icon = isLocked
     ? type === "locked"
@@ -567,7 +652,9 @@ function Tab(props: TabProps) {
         pl: 2,
         borderRight: "1px solid var(--border)",
         borderBottom: isActive
-          ? "1px solid transparent"
+          ? isGroupFocused
+            ? "2px solid var(--accent)"
+            : "2px solid var(--border-hover)"
           : "1px solid var(--border)",
         ":last-of-type": { borderRight: 0 },
 
@@ -724,60 +811,22 @@ type ReorderableListProps<T> = {
 };
 
 function ReorderableList<T extends { id: string }>(
-  props: ReorderableListProps<T>
+  props: ReorderableListProps<T> & { groupId: string }
 ) {
-  const { items, renderItem: Item, moveItem } = props;
-  const sensors = useSensors(
-    useSensor(MouseSensor, {
-      activationConstraint: {
-        distance: 10
-      }
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates
-    })
-  );
-  const [activeItem, setActiveItem] = useState<T>();
+  const { items, renderItem: Item, groupId } = props;
+  const { setNodeRef } = useDroppable({ id: groupId });
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      // onDragCancel={(event) => {}}
-      onDragStart={(event) => {
-        setActiveItem(items.find((i) => i.id === event.active.id));
-      }}
-      onDragEnd={(event) => {
-        const { active, over } = event;
-
-        const overId = over?.id as string;
-        if (overId && active.id !== overId) {
-          const transitionItems = items.slice();
-          const newIndex = transitionItems.findIndex((i) => i.id === overId);
-          const oldIndex = transitionItems.findIndex((i) => i.id === active.id);
-          moveItem(oldIndex, newIndex);
-        }
-        setActiveItem(undefined);
-      }}
-      measuring={{
-        droppable: { strategy: MeasuringStrategy.Always }
-      }}
-      modifiers={[restrictToHorizontalAxis]}
+    <SortableContext
+      id={groupId}
+      items={items}
+      strategy={horizontalListSortingStrategy}
     >
-      <SortableContext items={items} strategy={horizontalListSortingStrategy}>
+      <div ref={setNodeRef} style={{ display: "flex", flexDirection: "row", height: "100%", flex: 1 }}>
         {items.map((item, index) => (
           <Item key={item.id} item={item} index={index} />
         ))}
-
-        <DragOverlay
-          dropAnimation={{
-            duration: 500,
-            easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)"
-          }}
-        >
-          {activeItem && <Item item={activeItem} index={0} />}
-        </DragOverlay>
-      </SortableContext>
-    </DndContext>
+      </div>
+    </SortableContext>
   );
 }

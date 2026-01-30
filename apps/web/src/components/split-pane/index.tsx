@@ -199,6 +199,15 @@ export const SplitPane = React.forwardRef<
       for (let i = 0; i < panes.current.length; ++i) {
         const pane = panes.current[i];
         if (!pane) continue;
+        
+        // If there is only one pane, remove the calculated styles so it fills the container
+        if (normalized.length === 1) {
+          pane.style.removeProperty(sizeName);
+          pane.style.removeProperty(splitPos);
+          pane.classList.remove("collapsed");
+          continue;
+        }
+
         const size = normalized[i];
         const sashPos = sashPosSizes.current[i];
         const limits = paneSizes.current[i];
@@ -428,7 +437,7 @@ export const SplitPane = React.forwardRef<
           </Pane>
         );
       })}
-      {new Array(childrenLength - 1).fill(0).map((_, index) => (
+      {new Array(Math.max(0, childrenLength - 1)).fill(0).map((_, index) => (
         <Sash
           key={index}
           sashRef={(e) => (sashes.current[index] = e)}
@@ -475,11 +484,21 @@ function normalizeSizes(
     return size;
   });
 
-  if (count > 0 || curSum > wrapSize) {
-    const average = (wrapSize - curSum) / count;
+  // Handle panes with undefined initial sizes
+  if (count > 0) {
+    const average = Math.max(0, (wrapSize - curSum) / count);
     return res.map((size, index) => {
       const initialSize = panes[index].initialSize;
       return initialSize === Infinity ? average : size;
+    });
+  }
+
+  // Handle overflow: scale all panes proportionally to fit
+  if (curSum > wrapSize && curSum > 0) {
+    const scale = wrapSize / curSum;
+    return res.map((size, index) => {
+      const min = panes[index].min;
+      return Math.max(min, size * scale);
     });
   }
 

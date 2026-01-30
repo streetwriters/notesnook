@@ -414,15 +414,15 @@ const TagItem = ({
             selection === "selected"
               ? "check-circle-outline"
               : selection === "intermediate"
-                ? "minus-circle-outline"
-                : "checkbox-blank-circle-outline"
+              ? "minus-circle-outline"
+              : "checkbox-blank-circle-outline"
           }
           name={
             selection === "selected"
               ? "check-circle-outline"
               : selection === "intermediate"
-                ? "minus-circle-outline"
-                : "checkbox-blank-circle-outline"
+              ? "minus-circle-outline"
+              : "checkbox-blank-circle-outline"
           }
         />
       )}

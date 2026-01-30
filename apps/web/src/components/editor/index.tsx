@@ -37,7 +37,9 @@ import {
   ReadonlyEditorSession,
   EditorSession,
   DocumentPreview,
-  LockedEditorSession
+  LockedEditorSession,
+  isLockedSession,
+  TabItem
 } from "../../stores/editor-store";
 import {
   useStore as useAppStore,
@@ -71,7 +73,20 @@ import DiffViewer from "../diff-viewer";
 import TableOfContents from "./table-of-contents";
 import { scrollIntoViewById } from "@notesnook/editor";
 import { IEditor } from "./types";
-import { EditorActionBar } from "./action-bar";
+import { EditorActionBar, Tab } from "./action-bar";
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverEvent,
+  DragOverlay,
+  DragStartEvent,
+  KeyboardSensor,
+  MouseSensor,
+  closestCenter,
+  useSensor,
+  useSensors
+} from "@dnd-kit/core";
+import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { logger } from "../../utils/logger";
 import { NoteLinkingDialog } from "../../dialogs/note-linking-dialog";
 import { strings } from "@notesnook/intl";
@@ -122,22 +137,147 @@ export async function saveContent(
 }
 const deferredSave = debounceWithId(saveContent, 100);
 
+const SessionItem = React.memo(
+  ({ tab, activeTabId }: { tab: TabItem; activeTabId?: string }) => {
+    const session = useEditorStore((store) => store.getSession(tab.sessionId));
+    if (!session) return null;
+
+    return (
+      <Freeze key={session.id} freeze={tab.id !== activeTabId}>
+        {session.type === "locked" ? (
+          <UnlockNoteView session={session} />
+        ) : session.type === "conflicted" || session.type === "diff" ? (
+          <DiffViewer session={session} />
+        ) : (
+          <MemoizedEditorView session={session} />
+        )}
+      </Freeze>
+    );
+  }
+);
+
 export default function TabsView() {
   const tabs = useEditorStore((store) => store.tabs);
+  const groups = useEditorStore((store) => store.groups);
   const documentPreview = useEditorStore((store) => store.documentPreview);
-  const activeTabId = useEditorStore((store) => store.activeTabId);
   const activeSession = useEditorStore((store) => store.getActiveSession());
   const arePropertiesVisible = useEditorStore(
     (store) => store.arePropertiesVisible
   );
+
+
   const isTOCVisible = useEditorStore((store) => store.isTOCVisible);
-  const [dropRef, overlayRef] = useDragOverlay();
+
+  const sensors = useSensors(
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 10
+      }
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates
+    })
+  );
+
+  const [activeDragTabId, setActiveDragTabId] = useState<string | null>(null);
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveDragTabId(event.active.id as string);
+  };
+
+  const handleDragOver = (event: DragOverEvent) => {
+    const { active, over } = event;
+    if (!over) return;
+
+    const activeId = active.id as string;
+    const overId = over.id as string;
+
+    if (activeId === overId) return;
+
+    // Find the tab and its current group
+    const tabs = useEditorStore.getState().tabs;
+    const activeTab = tabs.find((t) => t && t.id === activeId);
+    if (!activeTab) return;
+
+    // Determine target group
+    let targetGroupId: string | undefined;
+    
+    // Check if over is a group (droppable)
+    if (groups.some((g) => g.id === overId)) {
+      targetGroupId = overId;
+    } else {
+      // Check if over is a tab
+      const overTab = tabs.find((t) => t && t.id === overId);
+      if (overTab) targetGroupId = overTab.groupId;
+    }
+
+    if (targetGroupId && targetGroupId !== activeTab.groupId) {
+      // Moving to a different group
+      // We insert at the end if dropping on empty group, or try to infer index.
+      // For onDragOver, simplicity is key. Dnd-kit + Sortable often handles the visual sort if items connect.
+      // But since we are manually controlling state:
+      useEditorStore.getState().moveTab(activeId, targetGroupId);
+    }
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveDragTabId(null);
+    if (!over) return;
+
+    const activeId = active.id as string;
+    const overId = over.id as string;
+
+    if (activeId === overId) return;
+
+    const tabs = useEditorStore.getState().tabs;
+    const activeTab = tabs.find((t) => t && t.id === activeId);
+    if (!activeTab) return;
+
+    let targetGroupId = activeTab.groupId;
+    let newIndex: number | undefined;
+
+    // Determine context
+    if (groups.some((g) => g.id === overId)) {
+       targetGroupId = overId;
+       // Dropped on group container directly (likely empty or at end)
+       // We can just append (default behavior of moveTab if index undefined)
+    } else {
+      const overTab = tabs.find((t) => t && t.id === overId);
+      if (overTab) {
+        targetGroupId = overTab.groupId;
+        // Calculate index in the target group
+        const targetTabs = tabs.filter(
+          (t) => t && t.groupId === targetGroupId
+        );
+        newIndex = targetTabs.findIndex((t) => t && t.id === overId);
+         
+         // Adjust index based on direction if needed, but Sortable usually gives us 'over' as the item being displaced.
+         // editor-store.moveTab inserts AT the new index.
+         
+       }
+    }
+
+    useEditorStore.getState().moveTab(activeId, targetGroupId, newIndex);
+  };
+
+  const activeTabForOverlay = activeDragTabId
+    ? tabs.find((t) => t && t.id === activeDragTabId)
+    : null;
+  const activeSessionForOverlay = activeTabForOverlay
+    ? useEditorStore.getState().getSession(activeTabForOverlay.sessionId)
+    : null;
 
   return (
-    <>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
+      onDragEnd={handleDragEnd}
+    >
       <ScopedThemeProvider
         scope="editor"
-        ref={dropRef}
         sx={{
           bg: "background",
           flex: 1,
@@ -146,17 +286,6 @@ export default function TabsView() {
           flexDirection: "column"
         }}
       >
-        <Flex
-          className="editor-action-bar"
-          sx={{
-            zIndex: 2,
-            height: TITLE_BAR_HEIGHT,
-            bg: "background-secondary"
-            // borderBottom: "1px solid var(--border)"
-          }}
-        >
-          <EditorActionBar />
-        </Flex>
         <SplitPane
           style={{
             position: "relative"
@@ -164,29 +293,52 @@ export default function TabsView() {
           direction="vertical"
           autoSaveId={"editor-panels"}
         >
-          <Pane id="editor-panel" className="editor-pane">
-            {tabs.map((tab) => {
-              const session = useEditorStore
-                .getState()
-                .getSession(tab.sessionId);
-              if (!session) return null;
-              return (
-                <Freeze key={session.id} freeze={tab.id !== activeTabId}>
-                  {session.type === "locked" ? (
-                    <UnlockNoteView session={session} />
-                  ) : session.type === "conflicted" ||
-                    session.type === "diff" ? (
-                    <DiffViewer session={session} />
-                  ) : (
-                    <MemoizedEditorView session={session} />
-                  )}
-                </Freeze>
-              );
-            })}
+          <Pane id="editor-panel" className="editor-pane" minSize={300}>
+            <SplitPane
+              direction="horizontal"
+              autoSaveId={"editor-groups-v3"}
+              style={{ position: "relative", height: "100%", flex: 1 }}
+            >
+              {groups.map((group) => (
+                <Pane
+                  key={group.id}
+                  id={group.id}
+                  minSize={200}
+                  initialSize="50%"
+                  style={{ display: "flex", flexDirection: "column" }}
+                >
+                  <Flex
+                    className="editor-action-bar"
+                    sx={{
+                      zIndex: 2,
+                      height: TITLE_BAR_HEIGHT,
+                      bg: "background-secondary",
+                      borderBottom: "1px solid var(--border)",
+                      flexShrink: 0
+                    }}
+                  >
+                    <EditorActionBar groupId={group.id} />
+                  </Flex>
+                  <Box
+                    sx={{ flex: 1, position: "relative", overflow: "hidden" }}
+                  >
+                    {tabs
+                      .filter((t) => t && t.groupId === group.id)
+                      .map((tab) => (
+                        <SessionItem
+                          key={tab.id}
+                          tab={tab}
+                          activeTabId={group.activeTabId}
+                        />
+                      ))}
+                  </Box>
+                </Pane>
+              ))}
+            </SplitPane>
           </Pane>
 
           {documentPreview ? (
-            <Pane id="pdf-preview-panel" initialSize={435} minSize={435}>
+            <Pane id="pdf-preview-panel" initialSize="30%" minSize={200}>
               <ScopedThemeProvider
                 scope="editorSidebar"
                 id="editorSidebar"
@@ -223,21 +375,51 @@ export default function TabsView() {
           ) : null}
 
           {isTOCVisible && activeSession ? (
-            <Pane id="table-of-contents-pane" initialSize={300} minSize={300}>
-              <TableOfContents sessionId={activeSession.id} />
-            </Pane>
+             <Pane id="toc-panel" initialSize={250} minSize={200}>
+               <TableOfContents sessionId={activeSession.id} />
+             </Pane>
           ) : null}
-          {arePropertiesVisible &&
-            activeSession &&
-            activeSession.type !== "new" && (
-              <Pane id="properties-pane" initialSize={250} minSize={250}>
-                <Properties sessionId={activeSession.id} />
-              </Pane>
-            )}
+
+          {arePropertiesVisible && activeSession ? (
+             <Pane id="properties-panel" initialSize={300} minSize={250}>
+               <Properties sessionId={activeSession.id} />
+             </Pane>
+          ) : null}
+         
         </SplitPane>
-        <DropZone overlayRef={overlayRef} />
+
+        <DragOverlay>
+          {activeTabForOverlay && activeSessionForOverlay ? (
+            <Tab
+              id={activeTabForOverlay.id}
+              title={
+                activeSessionForOverlay.title ||
+                ("note" in activeSessionForOverlay
+                  ? activeSessionForOverlay.note.title
+                  : strings.untitled())
+              }
+              isActive={true}
+              isPinned={!!activeTabForOverlay.pinned}
+              isLocked={isLockedSession(activeSessionForOverlay)}
+              isUnsaved={
+                activeSessionForOverlay.type === "default" &&
+                activeSessionForOverlay.saveState === SaveState.NotSaved
+              }
+              isRevealInListDisabled={false}
+              type={activeSessionForOverlay.type}
+              onFocus={() => {}}
+              onClose={() => {}}
+              onCloseAll={() => {}}
+              onCloseOthers={() => {}}
+              onCloseToTheRight={() => {}}
+              onCloseToTheLeft={() => {}}
+              onPin={() => {}}
+              onSave={() => {}}
+            />
+          ) : null}
+        </DragOverlay>
       </ScopedThemeProvider>
-    </>
+    </DndContext>
   );
 }
 
@@ -404,9 +586,15 @@ function EditorView({
           });
           deferredSave(session.id, session.id, ignoreEdit, data);
         }}
+        onFocus={() => {
+          useEditorStore.getState().focusTab(session.tabId);
+        }}
         options={{
           readonly: session?.type === "readonly" || session?.type === "deleted",
-          focusMode: isFocusMode
+          focusMode: isFocusMode,
+          onRequestFocus: () => {
+            useEditorStore.getState().focusTab(session.tabId);
+          }
         }}
       />
     </Flex>
@@ -482,6 +670,7 @@ type EditorProps = {
   onContentChange?: () => void;
   onSelectionChange?: () => void;
   onSave?: OnChangeHandler;
+  onFocus?: () => void;
   onPreviewDocument?: (preview: DocumentPreview) => void;
 };
 export function Editor(props: EditorProps) {
@@ -494,7 +683,8 @@ export function Editor(props: EditorProps) {
     nonce,
     options,
     onContentChange,
-    onPreviewDocument
+    onPreviewDocument,
+    onFocus
   } = props;
   const { readonly, headless } = options || {
     headless: false,
@@ -568,6 +758,7 @@ export function Editor(props: EditorProps) {
         }}
         onContentChange={onContentChange}
         onChange={onSave}
+        onFocus={onFocus}
         onDownloadAttachment={(attachment) => saveAttachment(attachment.hash)}
         onPreviewAttachment={async (data) => {
           const { hash, type } = data;

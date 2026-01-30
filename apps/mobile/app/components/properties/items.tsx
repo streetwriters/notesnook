@@ -174,15 +174,15 @@ export const Items = ({
               DDS.isTab
                 ? AppFontSize.xxl
                 : shouldShrink
-                  ? AppFontSize.xxl
-                  : AppFontSize.lg
+                ? AppFontSize.xxl
+                : AppFontSize.lg
             }
             color={
               item.checked
                 ? item.activeColor || colors.primary.accent
                 : item.id.match(/(delete|trash)/g)
-                  ? colors.error.icon
-                  : colors.secondary.icon
+                ? colors.error.icon
+                : colors.secondary.icon
             }
           />
         </Pressable>
@@ -213,8 +213,8 @@ export const Items = ({
           text: item.checked
             ? item.activeColor || colors.primary.accent
             : item.id === "delete" || item.id === "trash"
-              ? colors.error.paragraph
-              : colors.primary.paragraph
+            ? colors.error.paragraph
+            : colors.primary.paragraph
         }}
         testID={"icon-" + item.id}
         onPress={item.onPress}
@@ -278,8 +278,8 @@ export const Items = ({
                 item.checked
                   ? item.activeColor || colors.primary.accent
                   : item.id === "delete" || item.id === "trash"
-                    ? colors.error.icon
-                    : colors.secondary.icon
+                  ? colors.error.icon
+                  : colors.secondary.icon
               }
             />
 

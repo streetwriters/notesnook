@@ -34,6 +34,7 @@ import {
   useToolbarStore
 } from "./stores/toolbar-store.js";
 import { ToolbarDefinition } from "./types.js";
+import { EditorIdProvider } from "./stores/editor-id-context.js";
 
 type ToolbarProps = FlexProps & {
   editor: Editor;
@@ -41,6 +42,7 @@ type ToolbarProps = FlexProps & {
   tools?: ToolbarDefinition;
   defaultFontFamily: string;
   defaultFontSize: number;
+  editorId?: string;
 };
 
 export function Toolbar(props: ToolbarProps) {
@@ -50,6 +52,7 @@ export function Toolbar(props: ToolbarProps) {
     tools = getDefaultPresets().default,
     defaultFontFamily,
     defaultFontSize,
+    editorId,
     sx,
     className = "",
     ...flexProps
@@ -87,7 +90,7 @@ export function Toolbar(props: ToolbarProps) {
     setDefaultFontSize
   ]);
 
-  return (
+  const content = (
     <>
       <Flex
         className={["editor-toolbar", className].join(" ")}
@@ -118,5 +121,11 @@ export function Toolbar(props: ToolbarProps) {
       </Flex>
       <EditorFloatingMenus editor={editor} />
     </>
+  );
+
+  return editorId ? (
+    <EditorIdProvider editorId={editorId}>{content}</EditorIdProvider>
+  ) : (
+    content
   );
 }

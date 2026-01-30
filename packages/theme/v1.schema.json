@@ -51,10 +51,7 @@
         },
         "colorScheme": {
           "type": "string",
-          "enum": [
-            "light",
-            "dark"
-          ],
+          "enum": ["light", "dark"],
           "description": "Whether the theme has a dark color scheme or light."
         },
         "tags": {
@@ -109,9 +106,7 @@
           "description": "Website or support page of the author."
         }
       },
-      "required": [
-        "name"
-      ],
+      "required": ["name"],
       "additionalProperties": false
     },
     "ThemeScopes": {
@@ -158,9 +153,7 @@
           "description": "Scope for all the bottom sheets shown in the app. This scope only applies on the mobile clients & the mobile version of the web app."
         }
       },
-      "required": [
-        "base"
-      ],
+      "required": ["base"],
       "additionalProperties": false
     },
     "Variants<true>": {

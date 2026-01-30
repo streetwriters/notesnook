@@ -46,6 +46,10 @@ export const ToolButton = React.memo(
       sx,
       buttonRef,
       variant = "normal",
+      // @ts-ignore
+      parentGroup,
+      // @ts-ignore
+      popupId,
       ...buttonProps
     } = props;
     const isMobile = useIsMobile();

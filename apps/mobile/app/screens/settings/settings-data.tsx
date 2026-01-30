@@ -159,15 +159,15 @@ export const settingsGroups: SettingSection[] = [
             return status === SubscriptionStatus.TRIAL
               ? strings.trialOnGoing(trialEndDate)
               : status === SubscriptionStatus.ACTIVE
-                ? strings.subRenewOn(expiryDate)
-                : status === SubscriptionStatus.CANCELED ||
-                    status === SubscriptionStatus.PAUSED
-                  ? strings.subEndsOn(expiryDate)
-                  : status === SubscriptionStatus.EXPIRED
-                    ? subscriptionDaysLeft.time < -3
-                      ? strings.subEnded()
-                      : strings.accountDowngradedIn(3)
-                    : strings.neverHesitate();
+              ? strings.subRenewOn(expiryDate)
+              : status === SubscriptionStatus.CANCELED ||
+                status === SubscriptionStatus.PAUSED
+              ? strings.subEndsOn(expiryDate)
+              : status === SubscriptionStatus.EXPIRED
+              ? subscriptionDaysLeft.time < -3
+                ? strings.subEnded()
+                : strings.accountDowngradedIn(3)
+              : strings.neverHesitate();
           }
 
           return strings.neverHesitate();

@@ -1006,8 +1006,8 @@ const PricingPlanCard = ({
                   : "monthly"
               }`
             : pricingPlans.isGithubRelease
-              ? (WebPlan?.period as string)
-              : (product?.productId as string)
+            ? (WebPlan?.period as string)
+            : (product?.productId as string)
         );
         setStep(Steps.buy);
       }}

@@ -239,8 +239,8 @@ const AppLocked = () => {
             deviceMode !== "mobile"
               ? "50%"
               : Platform.OS == "ios"
-                ? "95%"
-                : "100%",
+              ? "95%"
+              : "100%",
           paddingHorizontal: 12,
           marginBottom: 30,
           marginTop: 15,

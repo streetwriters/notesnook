@@ -32,10 +32,7 @@ const testvars = {
 
 class Element {
   element: Detox.NativeElement;
-  constructor(
-    public type: "id" | "text",
-    public value: string
-  ) {
+  constructor(public type: "id" | "text", public value: string) {
     if (type == "id") {
       this.element = element(by.id(value)).atIndex(0);
     } else {

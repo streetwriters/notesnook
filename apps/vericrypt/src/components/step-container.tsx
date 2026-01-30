@@ -31,7 +31,7 @@ export function StepContainer({
         p: 4,
         borderRadius: "default",
         bg: "background",
-        ...sx,
+        ...sx
       }}
       {...restProps}
     >

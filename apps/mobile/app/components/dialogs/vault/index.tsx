@@ -972,26 +972,26 @@ export const VaultDialog: React.FC = () => {
             shouldDeleteVault
               ? strings.delete()
               : shouldClearVault
-                ? strings.clear()
-                : fingerprintAccess
-                  ? strings.enable()
-                  : state.revokeFingerprintAccess
-                    ? strings.revoke()
-                    : changePassword
-                      ? strings.change()
-                      : customAction && customActionTitle
-                        ? customActionTitle
-                        : state.noteLocked
-                          ? shouldDeleteNote
-                            ? strings.delete()
-                            : share
-                              ? strings.share()
-                              : goToEditor
-                                ? strings.open()
-                                : strings.unlock()
-                          : !note?.id
-                            ? strings.create()
-                            : strings.lock()
+              ? strings.clear()
+              : fingerprintAccess
+              ? strings.enable()
+              : state.revokeFingerprintAccess
+              ? strings.revoke()
+              : changePassword
+              ? strings.change()
+              : customAction && customActionTitle
+              ? customActionTitle
+              : state.noteLocked
+              ? shouldDeleteNote
+                ? strings.delete()
+                : share
+                ? strings.share()
+                : goToEditor
+                ? strings.open()
+                : strings.unlock()
+              : !note?.id
+              ? strings.create()
+              : strings.lock()
           }
         />
       </View>

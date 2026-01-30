@@ -68,10 +68,16 @@ enum SESSION_STATES {
   conflicted
 }
 
-type TabItem = {
+export type TabItem = {
   id: string;
   sessionId: string;
+  groupId: string;
   pinned?: boolean;
+};
+
+export type EditorGroup = {
+  id: string;
+  activeTabId?: string;
 };
 
 export type BaseEditorSession = {
@@ -206,8 +212,9 @@ const saveMutex = new Mutex();
 
 class EditorStore extends BaseStore<EditorStore> {
   tabs: TabItem[] = [];
+  groups: EditorGroup[] = [{ id: "main" }];
+  activeGroupId = "main";
   tabHistory: TabHistory = {};
-  activeTabId: string | undefined;
   canGoBack = false;
   canGoForward = false;
   sessions: EditorSession[] = [];
@@ -218,16 +225,25 @@ class EditorStore extends BaseStore<EditorStore> {
   editorMargins = Config.get("editor:margins", true);
   history: string[] = [];
 
+  getActiveGroup = () => {
+    const { groups, activeGroupId } = this.get();
+    return groups.find((g) => g && g.id === activeGroupId) || groups[0];
+  };
+
+  getGroup = (groupId: string) => {
+    return this.get().groups.find((g) => g.id === groupId);
+  };
+
   getSession = <T extends SessionType[]>(id: string, types?: T) => {
     return this.get().sessions.find(
       (s): s is SessionTypeMap[T[number]] =>
-        s.id === id && (!types || types.includes(s.type))
+        s && s.id === id && (!types || types.includes(s.type))
     );
   };
 
   getSessionsForNote = (noteId: string) => {
     return this.get().sessions.filter(
-      (s) => "note" in s && s.note.id === noteId
+      (s) => s && "note" in s && s.note.id === noteId
     );
   };
 
@@ -235,7 +251,8 @@ class EditorStore extends BaseStore<EditorStore> {
     const { tabs, sessions } = this.get();
     return tabs.filter((t) =>
       sessions.some(
-        (s) => t.sessionId === s.id && "note" in s && s.note.id === noteId
+        (s) =>
+          t && s && t.sessionId === s.id && "note" in s && s.note.id === noteId
       )
     );
   };
@@ -252,7 +269,7 @@ class EditorStore extends BaseStore<EditorStore> {
 
     db.eventManager.subscribe(EVENTS.userLoggedOut, () => {
       const { closeTabs, tabs } = this.get();
-      closeTabs(...tabs.map((s) => s.id));
+      closeTabs(...tabs.filter((t) => !!t).map((s) => s.id));
     });
 
     EV.subscribe(EVENTS.vaultLocked, () => {
@@ -529,21 +546,50 @@ class EditorStore extends BaseStore<EditorStore> {
       }
     );
 
-    const { rehydrateSession, activeTabId, newSession } = this.get();
-    if (activeTabId) {
-      const tab = this.get().tabs.find((t) => t.id === activeTabId);
-      if (!tab) return;
-      rehydrateSession(tab.sessionId);
-    } else newSession();
+    const { rehydrateSession, activeGroupId, newSession, groups } = this.get();
+    if (groups.length === 0) {
+      // Migrate old state or Init
+      const { tabs, activeTabId } = this.get() as any;
+      if (tabs && tabs.length > 0) {
+        this.set({
+          groups: [{ id: "main", activeTabId: activeTabId }],
+          tabs: tabs.map((t: any) => ({ ...t, groupId: "main" }))
+        });
+      } else {
+        this.set({
+          groups: [{ id: "main" }]
+        });
+      }
+    }
+
+    // Clean up corrupted state
+    this.set((state) => ({
+      tabs: state.tabs.filter((t) => !!t),
+      groups: state.groups.filter((g) => !!g),
+      sessions: state.sessions.filter((s) => !!s)
+    }));
+
+    const { groups: currentGroups } = this.get();
+    for (const group of currentGroups) {
+      if (group && group.activeTabId) {
+        const tab = this.get().tabs.find(
+          (t) => t && t.id === group.activeTabId
+        );
+        if (tab) rehydrateSession(tab.sessionId, true);
+      }
+    }
+
+    const currentGroup = this.get().getActiveGroup();
+    if (!currentGroup?.activeTabId) newSession();
   };
 
-  private rehydrateSession = (sessionId: string) => {
+  private rehydrateSession = (sessionId: string, silent: boolean = false) => {
     const { openSession, openDiffSession, getSession, activateSession } =
       this.get();
 
     const session = getSession(sessionId);
     if (session?.type === "new") {
-      activateSession(session.id);
+      activateSession(session.id, undefined, silent);
       return;
     }
     if (!session || !session.needsHydration) return;
@@ -552,7 +598,9 @@ class EditorStore extends BaseStore<EditorStore> {
       openDiffSession(session.note.id, session.historySessionId);
     else
       openSession(session.note.id, {
-        force: true
+        force: true,
+        silent,
+        tabId: session.tabId
       });
   };
 
@@ -604,15 +652,19 @@ class EditorStore extends BaseStore<EditorStore> {
       });
 
     if (session?.tabId) {
-      const { tabs, activeTabId } = this.get();
-      const index = tabs.findIndex((t) => t.id === session.tabId);
+      const { tabs } = this.get();
+      const tabIndex = tabs.findIndex((t) => t && t.id === session.tabId);
       // no need to focus tab if the same session is already open
+      const tab = tabs[tabIndex];
+      const group = this.get().getGroup(tab.groupId);
+
       if (
-        index === -1 ||
-        (activeTabId === session.tabId && tabs[index].sessionId === session.id)
+        tabIndex === -1 ||
+        (group?.activeTabId === session.tabId &&
+          tabs[tabIndex].sessionId === session.id)
       )
         return;
-      this.set((state) => (state.tabs[index].sessionId = session.id));
+      this.set((state) => (state.tabs[tabIndex].sessionId = session.id));
       if (!silent) this.focusTab(session.tabId, session.id);
     }
   };
@@ -628,18 +680,11 @@ class EditorStore extends BaseStore<EditorStore> {
     const oldContent = await db.noteHistory.content(session.id);
     if (!oldContent) return;
 
-    const {
-      getSession,
-      addSession,
-      sessions,
-      activeTabId,
-      getActiveTab,
-      tabs
-    } = this.get();
+    const { getSession, addSession, sessions, getActiveTab, tabs } = this.get();
 
     const tabId = getActiveTab()?.pinned
       ? this.addTab(getId())
-      : activeTabId || this.addTab(getId());
+      : getActiveTab()?.id || this.addTab(getId());
     const tab = tabs.find((t) => t.id === tabId);
     const activeSession = tab && getSession(tab.sessionId);
     const oldSession = sessions.find(
@@ -687,6 +732,7 @@ class EditorStore extends BaseStore<EditorStore> {
       openInNewTab?: boolean;
       rawContent?: string;
       activeSearchResultId?: string;
+      tabId?: string;
     } = {}
   ): Promise<void> => {
     const {
@@ -694,25 +740,30 @@ class EditorStore extends BaseStore<EditorStore> {
       sessions,
       tabs,
       activateSession,
-      activeTabId,
       getActiveTab,
       rehydrateSession,
       getTabsForNote,
       addTab
     } = this.get();
     const noteId = typeof noteOrId === "string" ? noteOrId : noteOrId.id;
-    const oldTabForNote = options.force ? null : getTabsForNote(noteId).at(0);
+    const activeGroupId = this.get().activeGroupId;
+    const oldTabForNote = options.force
+      ? null
+      : getTabsForNote(noteId).find((t) => t.groupId === activeGroupId);
     const activeTab = getActiveTab();
     const isReactivatingTab =
-      options.force && getTabsForNote(noteId).some((t) => t.id === activeTabId);
+      !options.tabId &&
+      options.force &&
+      getTabsForNote(noteId).some((t) => t.id === activeTab?.id);
     const tabId =
+      options.tabId ||
       // if a tab is pinned then always open a new tab.
-      options.openInNewTab ||
+      (options.openInNewTab ||
       (activeTab?.pinned && !oldTabForNote && !isReactivatingTab)
         ? addTab(getId())
-        : oldTabForNote?.id || activeTabId || addTab(getId());
+        : oldTabForNote?.id || activeTab?.id || addTab(getId()));
 
-    const tab = tabs.find((t) => t.id === tabId);
+    const tab = tabs.find((t) => t && t.id === tabId);
     const activeSession = tab && getSession(tab.sessionId);
     const noteAlreadyOpened =
       activeSession &&
@@ -874,7 +925,8 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   focusNextTab = () => {
-    const { tabs, activeTabId } = this.get();
+    const { tabs, getActiveGroup } = this.get();
+    const activeTabId = getActiveGroup()?.activeTabId;
     if (tabs.length <= 1) return;
 
     const index = tabs.findIndex((s) => s.id === activeTabId);
@@ -883,7 +935,8 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   focusPreviousTab = () => {
-    const { tabs, activeTabId } = this.get();
+    const { tabs, getActiveGroup } = this.get();
+    const activeTabId = getActiveGroup()?.activeTabId;
     if (tabs.length <= 1) return;
 
     const index = tabs.findIndex((s) => s.id === activeTabId);
@@ -902,7 +955,7 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   goBack = async () => {
-    const activeTabId = this.get().activeTabId;
+    const activeTabId = this.get().getActiveGroup()?.activeTabId;
     if (!activeTabId || !tabSessionHistory.canGoBack(activeTabId)) return;
     const sessionId = tabSessionHistory.back(activeTabId);
     if (!sessionId) return;
@@ -912,7 +965,7 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   goForward = async () => {
-    const activeTabId = this.get().activeTabId;
+    const activeTabId = this.get().getActiveGroup()?.activeTabId;
     if (!activeTabId || !tabSessionHistory.canGoForward(activeTabId)) return;
     const sessionId = tabSessionHistory.forward(activeTabId);
     if (!sessionId) return;
@@ -1123,10 +1176,11 @@ class EditorStore extends BaseStore<EditorStore> {
     }
   };
 
-  newSession = () => {
-    const { activeTabId, activateSession, getActiveTab } = this.get();
-    if (!activeTabId || getActiveTab()?.pinned) {
-      this.addTab();
+  newSession = (groupId?: string) => {
+    const { activateSession, getActiveTab, addTab } = this.get();
+    const activeTabId = getActiveTab(groupId)?.id;
+    if (!activeTabId || getActiveTab(groupId)?.pinned) {
+      this.addTab(undefined, groupId);
       return;
     }
 
@@ -1137,20 +1191,21 @@ class EditorStore extends BaseStore<EditorStore> {
     this.addSession({
       type: "new",
       id: sessionId,
-      tabId: activeTabId,
+      tabId: activeTabId, // Use the correct activeTabId for the group
       saveState: SaveState.NotSaved
     });
   };
 
   closeActiveTab = () => {
-    const { activeTabId } = this.get();
+    const { getActiveGroup } = this.get();
+    const activeTabId = getActiveGroup()?.activeTabId;
     if (!activeTabId) return;
     this.closeTabs(activeTabId);
   };
 
   closeAllTabs = () => {
     const { tabs } = this.get();
-    this.closeTabs(...tabs.map((t) => t.id));
+    this.closeTabs(...tabs.filter((t) => !!t).map((t) => t.id));
   };
 
   closeNotes = (...noteIds: string[]) => {
@@ -1167,6 +1222,7 @@ class EditorStore extends BaseStore<EditorStore> {
       const tabs: TabItem[] = [];
       for (let i = 0; i < state.tabs.length; ++i) {
         const tab = state.tabs[i];
+        if (!tab) continue;
         if (!ids.includes(tab.id)) {
           tabs.push(tab);
           continue;
@@ -1192,7 +1248,20 @@ class EditorStore extends BaseStore<EditorStore> {
 
     const { history, tabs } = this.get();
     this.focusTab(history.pop());
-    if (tabs.length === 0) this.addTab();
+    const remainingTabs = this.get().tabs;
+    if (remainingTabs.length === 0) this.addTab();
+    else if (
+      this.get().groups.some(
+        (g) => !remainingTabs.find((t) => t.groupId === g.id)
+      )
+    ) {
+      // Ensure every group has at least one tab
+      this.get().groups.forEach((group) => {
+        if (!remainingTabs.find((t) => t.groupId === group.id)) {
+          this.addTab(undefined, group.id);
+        }
+      });
+    }
   };
 
   setTitle = (id: string, title: string) => {
@@ -1248,9 +1317,10 @@ class EditorStore extends BaseStore<EditorStore> {
     Config.set("editor:margins", editorMarginsState);
   };
 
-  getActiveTab = () => {
-    const activeTabId = this.get().activeTabId;
-    return this.get().tabs.find((t) => t.id === activeTabId);
+  getActiveTab = (groupId?: string) => {
+    const id = groupId || this.get().activeGroupId;
+    const group = this.get().groups.find((g) => g && g.id === id);
+    return this.get().tabs.find((t) => t && t.id === group?.activeTabId);
   };
 
   getActiveNote = () => {
@@ -1272,13 +1342,20 @@ class EditorStore extends BaseStore<EditorStore> {
       return session as SessionTypeMap[T[number]];
   };
 
-  addTab = (sessionId?: string) => {
+  addTab = (sessionId?: string, groupId?: string) => {
     const id = getId();
     const newSessionId = sessionId || tabSessionHistory.add(id);
+    const targetGroupId = groupId || this.get().activeGroupId;
+
     this.set((state) => {
+      // Ensure group exists (safeguard)
+      if (!state.groups.some((g) => g.id === targetGroupId)) {
+        state.groups.push({ id: targetGroupId });
+      }
       state.tabs.push({
         id,
-        sessionId: newSessionId
+        sessionId: newSessionId,
+        groupId: targetGroupId
       });
     });
     if (!sessionId)
@@ -1308,19 +1385,117 @@ class EditorStore extends BaseStore<EditorStore> {
   focusTab = (tabId: string | undefined, sessionId?: string) => {
     if (!tabId) return;
 
-    const { history } = this.get();
+    const { history, tabs } = this.get();
     if (history.includes(tabId)) history.splice(history.indexOf(tabId), 1);
     history.push(tabId);
 
-    const tab = this.get().tabs.find((t) => t.id === tabId);
-    this.set({
-      activeTabId: tabId,
-      canGoBack: !tab?.pinned && tabSessionHistory.canGoBack(tabId),
-      canGoForward: !tab?.pinned && tabSessionHistory.canGoForward(tabId)
+    const tab = tabs.find((t) => t && t.id === tabId);
+    if (!tab) return;
+
+    this.set((state) => {
+      const groupIndex = state.groups.findIndex(
+        (g) => g && g.id === tab.groupId
+      );
+      if (groupIndex !== -1) {
+        state.groups[groupIndex].activeTabId = tabId;
+        state.activeGroupId = tab.groupId;
+      }
+      state.canGoBack = !tab?.pinned && tabSessionHistory.canGoBack(tabId);
+      state.canGoForward =
+        !tab?.pinned && tabSessionHistory.canGoForward(tabId);
     });
 
     sessionId = sessionId || tab?.sessionId;
-    if (sessionId) this.rehydrateSession(sessionId);
+    if (sessionId) this.rehydrateSession(sessionId, true);
+  };
+
+  splitGroup = () => {
+    const currentGroup = this.get().getActiveGroup();
+    const newGroupId = getId();
+    this.set((state) => {
+      state.groups.push({ id: newGroupId });
+      state.activeGroupId = newGroupId;
+    });
+    this.addTab(undefined, newGroupId);
+  };
+
+  closeGroup = (groupId: string) => {
+    const { groups } = this.get();
+    if (groups.length <= 1) return; // Don't close the last group
+
+    // Close all tabs in this group
+    const tabs = this.get().tabs.filter((t) => t && t.groupId === groupId);
+    this.closeTabs(...tabs.map((t) => t.id));
+
+    this.set((state) => {
+      state.groups = state.groups.filter((g) => g.id !== groupId);
+      if (state.activeGroupId === groupId) {
+        state.activeGroupId = state.groups[0].id;
+      }
+    });
+  };
+
+  focusGroup = (groupId: string) => {
+    this.set({ activeGroupId: groupId });
+  };
+
+  moveTab = (tabId: string, targetGroupId: string, newIndex?: number) => {
+    this.set((state) => {
+      const tabIndex = state.tabs.findIndex((t) => t && t.id === tabId);
+      if (tabIndex === -1) return;
+
+      const tab = state.tabs[tabIndex];
+      const oldGroupId = tab.groupId;
+
+      // Remove from old location
+      state.tabs.splice(tabIndex, 1);
+      tab.groupId = targetGroupId;
+
+      // Calculate target index
+      const targetTabs = state.tabs.filter(
+        (t) => t && t.groupId === targetGroupId
+      );
+      let globalInsertIndex = state.tabs.length;
+
+      if (typeof newIndex === "number") {
+        // Find the global index corresponding to the local group index
+        const tabAtNewIndex = targetTabs[newIndex];
+        if (tabAtNewIndex) {
+          globalInsertIndex = state.tabs.findIndex(
+            (t) => t && t.id === tabAtNewIndex.id
+          );
+        } else if (targetTabs.length > 0) {
+          // Insert after the last tab of the group if index is out of bounds
+          const lastTab = targetTabs[targetTabs.length - 1];
+          globalInsertIndex =
+            state.tabs.findIndex((t) => t && t.id === lastTab.id) + 1;
+        }
+      }
+
+      state.tabs.splice(globalInsertIndex, 0, tab);
+
+      // Update active tab if moving to a new group and it was active, or just because
+      if (oldGroupId !== targetGroupId) {
+        // 1. Handle old group focus
+        const oldGroup = state.groups.find((g) => g.id === oldGroupId);
+        if (oldGroup && oldGroup.activeTabId === tab.id) {
+          const remainingTabs = state.tabs.filter(
+            (t) => t && t.groupId === oldGroupId
+          );
+          oldGroup.activeTabId =
+            remainingTabs.length > 0
+              ? remainingTabs[remainingTabs.length - 1].id
+              : undefined;
+        }
+
+        // 2. Handle new group focus and app focus
+        const targetGroup = state.groups.find((g) => g.id === targetGroupId);
+        if (targetGroup) {
+          targetGroup.activeTabId = tab.id;
+          state.activeGroupId = targetGroupId;
+        }
+      }
+    });
   };
 }
 
@@ -1330,8 +1505,9 @@ const useEditorStore = createPersistedStore(EditorStore, {
     history: state.history,
     arePropertiesVisible: state.arePropertiesVisible,
     editorMargins: state.editorMargins,
+    groups: state.groups,
+    activeGroupId: state.activeGroupId,
     tabs: state.tabs,
-    activeTabId: state.activeTabId,
     tabHistory: state.tabHistory,
     canGoBack: state.canGoBack,
     canGoForward: state.canGoForward,
@@ -1356,7 +1532,17 @@ const useEditorStore = createPersistedStore(EditorStore, {
       return sessions;
     }, [] as EditorSession[])
   }),
-  storage: db.config() as PersistStorage<Partial<EditorStore>>
+  storage: db.config() as PersistStorage<Partial<EditorStore>>,
+  onRehydrateStorage: () => (state) => {
+    if (!state) return;
+    if (!state.groups || state.groups.length === 0) {
+      state.groups = [{ id: "main" }];
+      state.activeGroupId = "main";
+      if (state.tabs) {
+        state.tabs.forEach((t) => (t.groupId = "main"));
+      }
+    }
+  }
 }) as ReturnType<typeof createPersistedStore<EditorStore>>;
 export { useEditorStore, SESSION_STATES };
 

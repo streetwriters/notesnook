@@ -195,8 +195,8 @@ const NotebookItem = ({
               !nestedNotebooks?.placeholders.length
                 ? "book-outline"
                 : isExpanded
-                  ? "chevron-down"
-                  : "chevron-right"
+                ? "chevron-down"
+                : "chevron-right"
             }
           />
         </TouchableOpacity>
@@ -538,10 +538,10 @@ export const Search = ({
                 {searchKeyword
                   ? `No results found for "${searchKeyword}"`
                   : mode === "appendNote"
-                    ? "No notes"
-                    : mode === "selectTags"
-                      ? "No tags"
-                      : "No notebooks"}
+                  ? "No notes"
+                  : mode === "selectTags"
+                  ? "No tags"
+                  : "No notebooks"}
               </Text>
             </View>
           }

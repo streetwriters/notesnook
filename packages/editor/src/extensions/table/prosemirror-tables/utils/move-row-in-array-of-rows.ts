@@ -7,7 +7,7 @@ export function moveRowInArrayOfRows<T>(
   rows: T[],
   indexesOrigin: number[],
   indexesTarget: number[],
-  directionOverride: -1 | 1 | 0,
+  directionOverride: -1 | 1 | 0
 ): T[] {
   const direction = indexesOrigin[0] > indexesTarget[0] ? -1 : 1;
 

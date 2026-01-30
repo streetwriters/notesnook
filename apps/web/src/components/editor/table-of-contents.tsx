@@ -171,8 +171,7 @@ function TableOfContents(props: TableOfContentsProps) {
                   return nodes;
                 }}
                 renderItem={({ item, collapse, expand, expanded }) => (
-                  <Button
-                    variant="menuitem"
+                  <Flex
                     key={item.id}
                     id={`toc-${item.id}`}
                     sx={{
@@ -185,8 +184,12 @@ function TableOfContents(props: TableOfContentsProps) {
                       marginLeft: `${
                         item.depth === 0 ? 0 : 5 + 10 * item.depth
                       }px`,
+                      cursor: "pointer",
                       px: 1,
                       py: 1,
+                      ":hover": {
+                        bg: "action.hover"
+                      },
                       "&.active": {
                         color: "accent-selected"
                       },
@@ -234,7 +237,7 @@ function TableOfContents(props: TableOfContentsProps) {
                       </Flex>
                     )}
                     {item.data.title}
-                  </Button>
+                  </Flex>
                 )}
               ></VirtualizedTree>
             )}

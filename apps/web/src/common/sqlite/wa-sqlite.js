@@ -1,162 +1,3497 @@
-
 var Module = (() => {
   var _scriptDir = import.meta.url;
-  
-  return (
-function(config) {
-  var Module = config || {};
 
+  return function (config) {
+    var Module = config || {};
 
-var a;a||(a=typeof Module !== 'undefined' ? Module : {});var aa,ba;a.ready=new Promise(function(b,c){aa=b;ba=c});var ca=Object.assign({},a),da="./this.program",fa=(b,c)=>{throw c;},ha="object"==typeof window,ia="function"==typeof importScripts,m="",ja;
-if(ha||ia)ia?m=self.location.href:"undefined"!=typeof document&&document.currentScript&&(m=document.currentScript.src),_scriptDir&&(m=_scriptDir),0!==m.indexOf("blob:")?m=m.substr(0,m.replace(/[?#].*/,"").lastIndexOf("/")+1):m="",ia&&(ja=b=>{var c=new XMLHttpRequest;c.open("GET",b,!1);c.responseType="arraybuffer";c.send(null);return new Uint8Array(c.response)});var ka=a.print||console.log.bind(console),t=a.printErr||console.warn.bind(console);Object.assign(a,ca);ca=null;a.thisProgram&&(da=a.thisProgram);
-a.quit&&(fa=a.quit);var la;a.wasmBinary&&(la=a.wasmBinary);var noExitRuntime=a.noExitRuntime||!0;"object"!=typeof WebAssembly&&u("no native wasm support detected");var ma,na=!1,oa="undefined"!=typeof TextDecoder?new TextDecoder("utf8"):void 0;
-function pa(b,c,d){var e=c+d;for(d=c;b[d]&&!(d>=e);)++d;if(16<d-c&&b.buffer&&oa)return oa.decode(b.subarray(c,d));for(e="";c<d;){var f=b[c++];if(f&128){var g=b[c++]&63;if(192==(f&224))e+=String.fromCharCode((f&31)<<6|g);else{var h=b[c++]&63;f=224==(f&240)?(f&15)<<12|g<<6|h:(f&7)<<18|g<<12|h<<6|b[c++]&63;65536>f?e+=String.fromCharCode(f):(f-=65536,e+=String.fromCharCode(55296|f>>10,56320|f&1023))}}else e+=String.fromCharCode(f)}return e}function v(b,c){return b?pa(x,b,c):""}
-function qa(b,c,d,e){if(!(0<e))return 0;var f=d;e=d+e-1;for(var g=0;g<b.length;++g){var h=b.charCodeAt(g);if(55296<=h&&57343>=h){var p=b.charCodeAt(++g);h=65536+((h&1023)<<10)|p&1023}if(127>=h){if(d>=e)break;c[d++]=h}else{if(2047>=h){if(d+1>=e)break;c[d++]=192|h>>6}else{if(65535>=h){if(d+2>=e)break;c[d++]=224|h>>12}else{if(d+3>=e)break;c[d++]=240|h>>18;c[d++]=128|h>>12&63}c[d++]=128|h>>6&63}c[d++]=128|h&63}}c[d]=0;return d-f}function ra(b,c,d){return qa(b,x,c,d)}
-function sa(b){for(var c=0,d=0;d<b.length;++d){var e=b.charCodeAt(d);127>=e?c++:2047>=e?c+=2:55296<=e&&57343>=e?(c+=4,++d):c+=3}return c}var y,x,A,ta,B,C,ua,va;function wa(){var b=ma.buffer;a.HEAP8=y=new Int8Array(b);a.HEAP16=A=new Int16Array(b);a.HEAP32=B=new Int32Array(b);a.HEAPU8=x=new Uint8Array(b);a.HEAPU16=ta=new Uint16Array(b);a.HEAPU32=C=new Uint32Array(b);a.HEAPF32=ua=new Float32Array(b);a.HEAPF64=va=new Float64Array(b)}var E,xa=[],ya=[],za=[],Aa=[];
-function Ba(){var b=a.preRun.shift();xa.unshift(b)}var F=0,Ca=null,Da=null;function u(b){if(a.onAbort)a.onAbort(b);b="Aborted("+b+")";t(b);na=!0;b=new WebAssembly.RuntimeError(b+". Build with -sASSERTIONS for more info.");ba(b);throw b;}function Ea(){return I.startsWith("data:application/octet-stream;base64,")}var I;if(a.locateFile){if(I="wa-sqlite.wasm",!Ea()){var Fa=I;I=a.locateFile?a.locateFile(Fa,m):m+Fa}}else I=(new URL("wa-sqlite.wasm",import.meta.url)).href;
-function Ga(){var b=I;try{if(b==I&&la)return new Uint8Array(la);if(ja)return ja(b);throw"both async and sync fetching of the wasm failed";}catch(c){u(c)}}function Ha(){return la||!ha&&!ia||"function"!=typeof fetch?Promise.resolve().then(function(){return Ga()}):fetch(I,{credentials:"same-origin"}).then(function(b){if(!b.ok)throw"failed to load wasm binary file at '"+I+"'";return b.arrayBuffer()}).catch(function(){return Ga()})}var K,L;
-function Ia(b){this.name="ExitStatus";this.message="Program terminated with exit("+b+")";this.status=b}function Ja(b){for(;0<b.length;)b.shift()(a)}function M(b,c="i8"){c.endsWith("*")&&(c="*");switch(c){case "i1":return y[b>>0];case "i8":return y[b>>0];case "i16":return A[b>>1];case "i32":return B[b>>2];case "i64":return B[b>>2];case "float":return ua[b>>2];case "double":return va[b>>3];case "*":return C[b>>2];default:u("invalid type for getValue: "+c)}return null}
-function N(b,c,d="i8"){d.endsWith("*")&&(d="*");switch(d){case "i1":y[b>>0]=c;break;case "i8":y[b>>0]=c;break;case "i16":A[b>>1]=c;break;case "i32":B[b>>2]=c;break;case "i64":L=[c>>>0,(K=c,1<=+Math.abs(K)?0<K?(Math.min(+Math.floor(K/4294967296),4294967295)|0)>>>0:~~+Math.ceil((K-+(~~K>>>0))/4294967296)>>>0:0)];B[b>>2]=L[0];B[b+4>>2]=L[1];break;case "float":ua[b>>2]=c;break;case "double":va[b>>3]=c;break;case "*":C[b>>2]=c;break;default:u("invalid type for setValue: "+d)}}
-var Ka=(b,c)=>{for(var d=0,e=b.length-1;0<=e;e--){var f=b[e];"."===f?b.splice(e,1):".."===f?(b.splice(e,1),d++):d&&(b.splice(e,1),d--)}if(c)for(;d;d--)b.unshift("..");return b},O=b=>{var c="/"===b.charAt(0),d="/"===b.substr(-1);(b=Ka(b.split("/").filter(e=>!!e),!c).join("/"))||c||(b=".");b&&d&&(b+="/");return(c?"/":"")+b},La=b=>{var c=/^(\/?|)([\s\S]*?)((?:\.{1,2}|[^\/]+?|)(\.[^.\/]*|))(?:[\/]*)$/.exec(b).slice(1);b=c[0];c=c[1];if(!b&&!c)return".";c&&(c=c.substr(0,c.length-1));return b+c},Ma=b=>{if("/"===
-b)return"/";b=O(b);b=b.replace(/\/$/,"");var c=b.lastIndexOf("/");return-1===c?b:b.substr(c+1)};function Na(){if("object"==typeof crypto&&"function"==typeof crypto.getRandomValues){var b=new Uint8Array(1);return()=>{crypto.getRandomValues(b);return b[0]}}return()=>u("randomDevice")}
-function Oa(){for(var b="",c=!1,d=arguments.length-1;-1<=d&&!c;d--){c=0<=d?arguments[d]:"/";if("string"!=typeof c)throw new TypeError("Arguments to path.resolve must be strings");if(!c)return"";b=c+"/"+b;c="/"===c.charAt(0)}b=Ka(b.split("/").filter(e=>!!e),!c).join("/");return(c?"/":"")+b||"."}function Pa(b,c,d){d=Array(0<d?d:sa(b)+1);b=qa(b,d,0,d.length);c&&(d.length=b);return d}var Qa=[];function Ra(b,c){Qa[b]={input:[],Of:[],$f:c};Sa(b,Ta)}
-var Ta={open:function(b){var c=Qa[b.node.cg];if(!c)throw new P(43);b.Pf=c;b.seekable=!1},close:function(b){b.Pf.$f.Xf(b.Pf)},Xf:function(b){b.Pf.$f.Xf(b.Pf)},read:function(b,c,d,e){if(!b.Pf||!b.Pf.$f.ug)throw new P(60);for(var f=0,g=0;g<e;g++){try{var h=b.Pf.$f.ug(b.Pf)}catch(p){throw new P(29);}if(void 0===h&&0===f)throw new P(6);if(null===h||void 0===h)break;f++;c[d+g]=h}f&&(b.node.timestamp=Date.now());return f},write:function(b,c,d,e){if(!b.Pf||!b.Pf.$f.ng)throw new P(60);try{for(var f=0;f<e;f++)b.Pf.$f.ng(b.Pf,
-c[d+f])}catch(g){throw new P(29);}e&&(b.node.timestamp=Date.now());return f}},Ua={ug:function(b){if(!b.input.length){var c=null;"undefined"!=typeof window&&"function"==typeof window.prompt?(c=window.prompt("Input: "),null!==c&&(c+="\n")):"function"==typeof readline&&(c=readline(),null!==c&&(c+="\n"));if(!c)return null;b.input=Pa(c,!0)}return b.input.shift()},ng:function(b,c){null===c||10===c?(ka(pa(b.Of,0)),b.Of=[]):0!=c&&b.Of.push(c)},Xf:function(b){b.Of&&0<b.Of.length&&(ka(pa(b.Of,0)),b.Of=[])}},
-Va={ng:function(b,c){null===c||10===c?(t(pa(b.Of,0)),b.Of=[]):0!=c&&b.Of.push(c)},Xf:function(b){b.Of&&0<b.Of.length&&(t(pa(b.Of,0)),b.Of=[])}},Q={Rf:null,Sf:function(){return Q.createNode(null,"/",16895,0)},createNode:function(b,c,d,e){if(24576===(d&61440)||4096===(d&61440))throw new P(63);Q.Rf||(Q.Rf={dir:{node:{Qf:Q.If.Qf,Nf:Q.If.Nf,ag:Q.If.ag,fg:Q.If.fg,zg:Q.If.zg,kg:Q.If.kg,ig:Q.If.ig,yg:Q.If.yg,jg:Q.If.jg},stream:{Wf:Q.Jf.Wf}},file:{node:{Qf:Q.If.Qf,Nf:Q.If.Nf},stream:{Wf:Q.Jf.Wf,read:Q.Jf.read,
-write:Q.Jf.write,qg:Q.Jf.qg,gg:Q.Jf.gg,hg:Q.Jf.hg}},link:{node:{Qf:Q.If.Qf,Nf:Q.If.Nf,dg:Q.If.dg},stream:{}},rg:{node:{Qf:Q.If.Qf,Nf:Q.If.Nf},stream:Wa}});d=Xa(b,c,d,e);16384===(d.mode&61440)?(d.If=Q.Rf.dir.node,d.Jf=Q.Rf.dir.stream,d.Kf={}):32768===(d.mode&61440)?(d.If=Q.Rf.file.node,d.Jf=Q.Rf.file.stream,d.Mf=0,d.Kf=null):40960===(d.mode&61440)?(d.If=Q.Rf.link.node,d.Jf=Q.Rf.link.stream):8192===(d.mode&61440)&&(d.If=Q.Rf.rg.node,d.Jf=Q.Rf.rg.stream);d.timestamp=Date.now();b&&(b.Kf[c]=d,b.timestamp=
-d.timestamp);return d},Pg:function(b){return b.Kf?b.Kf.subarray?b.Kf.subarray(0,b.Mf):new Uint8Array(b.Kf):new Uint8Array(0)},sg:function(b,c){var d=b.Kf?b.Kf.length:0;d>=c||(c=Math.max(c,d*(1048576>d?2:1.125)>>>0),0!=d&&(c=Math.max(c,256)),d=b.Kf,b.Kf=new Uint8Array(c),0<b.Mf&&b.Kf.set(d.subarray(0,b.Mf),0))},Mg:function(b,c){if(b.Mf!=c)if(0==c)b.Kf=null,b.Mf=0;else{var d=b.Kf;b.Kf=new Uint8Array(c);d&&b.Kf.set(d.subarray(0,Math.min(c,b.Mf)));b.Mf=c}},If:{Qf:function(b){var c={};c.Fg=8192===(b.mode&
-61440)?b.id:1;c.mg=b.id;c.mode=b.mode;c.Kg=1;c.uid=0;c.Hg=0;c.cg=b.cg;16384===(b.mode&61440)?c.size=4096:32768===(b.mode&61440)?c.size=b.Mf:40960===(b.mode&61440)?c.size=b.link.length:c.size=0;c.Bg=new Date(b.timestamp);c.Jg=new Date(b.timestamp);c.Eg=new Date(b.timestamp);c.Cg=4096;c.Dg=Math.ceil(c.size/c.Cg);return c},Nf:function(b,c){void 0!==c.mode&&(b.mode=c.mode);void 0!==c.timestamp&&(b.timestamp=c.timestamp);void 0!==c.size&&Q.Mg(b,c.size)},ag:function(){throw Ya[44];},fg:function(b,c,d,e){return Q.createNode(b,
-c,d,e)},zg:function(b,c,d){if(16384===(b.mode&61440)){try{var e=R(c,d)}catch(g){}if(e)for(var f in e.Kf)throw new P(55);}delete b.parent.Kf[b.name];b.parent.timestamp=Date.now();b.name=d;c.Kf[d]=b;c.timestamp=b.parent.timestamp;b.parent=c},kg:function(b,c){delete b.Kf[c];b.timestamp=Date.now()},ig:function(b,c){var d=R(b,c),e;for(e in d.Kf)throw new P(55);delete b.Kf[c];b.timestamp=Date.now()},yg:function(b){var c=[".",".."],d;for(d in b.Kf)b.Kf.hasOwnProperty(d)&&c.push(d);return c},jg:function(b,
-c,d){b=Q.createNode(b,c,41471,0);b.link=d;return b},dg:function(b){if(40960!==(b.mode&61440))throw new P(28);return b.link}},Jf:{read:function(b,c,d,e,f){var g=b.node.Kf;if(f>=b.node.Mf)return 0;b=Math.min(b.node.Mf-f,e);if(8<b&&g.subarray)c.set(g.subarray(f,f+b),d);else for(e=0;e<b;e++)c[d+e]=g[f+e];return b},write:function(b,c,d,e,f,g){c.buffer===y.buffer&&(g=!1);if(!e)return 0;b=b.node;b.timestamp=Date.now();if(c.subarray&&(!b.Kf||b.Kf.subarray)){if(g)return b.Kf=c.subarray(d,d+e),b.Mf=e;if(0===
-b.Mf&&0===f)return b.Kf=c.slice(d,d+e),b.Mf=e;if(f+e<=b.Mf)return b.Kf.set(c.subarray(d,d+e),f),e}Q.sg(b,f+e);if(b.Kf.subarray&&c.subarray)b.Kf.set(c.subarray(d,d+e),f);else for(g=0;g<e;g++)b.Kf[f+g]=c[d+g];b.Mf=Math.max(b.Mf,f+e);return e},Wf:function(b,c,d){1===d?c+=b.position:2===d&&32768===(b.node.mode&61440)&&(c+=b.node.Mf);if(0>c)throw new P(28);return c},qg:function(b,c,d){Q.sg(b.node,c+d);b.node.Mf=Math.max(b.node.Mf,c+d)},gg:function(b,c,d,e,f){if(32768!==(b.node.mode&61440))throw new P(43);
-b=b.node.Kf;if(f&2||b.buffer!==y.buffer){if(0<d||d+c<b.length)b.subarray?b=b.subarray(d,d+c):b=Array.prototype.slice.call(b,d,d+c);d=!0;c=65536*Math.ceil(c/65536);(f=Za(65536,c))?(x.fill(0,f,f+c),c=f):c=0;if(!c)throw new P(48);y.set(b,c)}else d=!1,c=b.byteOffset;return{Lg:c,Ag:d}},hg:function(b,c,d,e){Q.Jf.write(b,c,0,e,d,!1);return 0}}},$a=null,ab={},S=[],bb=1,T=null,cb=!0,P=null,Ya={},V=(b,c={})=>{b=Oa(b);if(!b)return{path:"",node:null};c=Object.assign({tg:!0,og:0},c);if(8<c.og)throw new P(32);
-b=b.split("/").filter(h=>!!h);for(var d=$a,e="/",f=0;f<b.length;f++){var g=f===b.length-1;if(g&&c.parent)break;d=R(d,b[f]);e=O(e+"/"+b[f]);d.Yf&&(!g||g&&c.tg)&&(d=d.Yf.root);if(!g||c.Vf)for(g=0;40960===(d.mode&61440);)if(d=db(e),e=Oa(La(e),d),d=V(e,{og:c.og+1}).node,40<g++)throw new P(32);}return{path:e,node:d}},eb=b=>{for(var c;;){if(b===b.parent)return b=b.Sf.wg,c?"/"!==b[b.length-1]?b+"/"+c:b+c:b;c=c?b.name+"/"+c:b.name;b=b.parent}},fb=(b,c)=>{for(var d=0,e=0;e<c.length;e++)d=(d<<5)-d+c.charCodeAt(e)|
-0;return(b+d>>>0)%T.length},gb=b=>{var c=fb(b.parent.id,b.name);if(T[c]===b)T[c]=b.Zf;else for(c=T[c];c;){if(c.Zf===b){c.Zf=b.Zf;break}c=c.Zf}},R=(b,c)=>{var d;if(d=(d=hb(b,"x"))?d:b.If.ag?0:2)throw new P(d,b);for(d=T[fb(b.id,c)];d;d=d.Zf){var e=d.name;if(d.parent.id===b.id&&e===c)return d}return b.If.ag(b,c)},Xa=(b,c,d,e)=>{b=new ib(b,c,d,e);c=fb(b.parent.id,b.name);b.Zf=T[c];return T[c]=b},jb={r:0,"r+":2,w:577,"w+":578,a:1089,"a+":1090},kb=b=>{var c=["r","w","rw"][b&3];b&512&&(c+="w");return c},
-hb=(b,c)=>{if(cb)return 0;if(!c.includes("r")||b.mode&292){if(c.includes("w")&&!(b.mode&146)||c.includes("x")&&!(b.mode&73))return 2}else return 2;return 0},lb=(b,c)=>{try{return R(b,c),20}catch(d){}return hb(b,"wx")},mb=(b,c,d)=>{try{var e=R(b,c)}catch(f){return f.Lf}if(b=hb(b,"wx"))return b;if(d){if(16384!==(e.mode&61440))return 54;if(e===e.parent||"/"===eb(e))return 10}else if(16384===(e.mode&61440))return 31;return 0},nb=(b=0)=>{for(;4096>=b;b++)if(!S[b])return b;throw new P(33);},pb=(b,c)=>{ob||
-(ob=function(){this.eg={}},ob.prototype={},Object.defineProperties(ob.prototype,{object:{get:function(){return this.node},set:function(d){this.node=d}},flags:{get:function(){return this.eg.flags},set:function(d){this.eg.flags=d}},position:{get:function(){return this.eg.position},set:function(d){this.eg.position=d}}}));b=Object.assign(new ob,b);c=nb(c);b.Tf=c;return S[c]=b},Wa={open:b=>{b.Jf=ab[b.node.cg].Jf;b.Jf.open&&b.Jf.open(b)},Wf:()=>{throw new P(70);}},Sa=(b,c)=>{ab[b]={Jf:c}},qb=(b,c)=>{var d=
-"/"===c,e=!c;if(d&&$a)throw new P(10);if(!d&&!e){var f=V(c,{tg:!1});c=f.path;f=f.node;if(f.Yf)throw new P(10);if(16384!==(f.mode&61440))throw new P(54);}c={type:b,Qg:{},wg:c,Ig:[]};b=b.Sf(c);b.Sf=c;c.root=b;d?$a=b:f&&(f.Yf=c,f.Sf&&f.Sf.Ig.push(c))},rb=(b,c,d)=>{var e=V(b,{parent:!0}).node;b=Ma(b);if(!b||"."===b||".."===b)throw new P(28);var f=lb(e,b);if(f)throw new P(f);if(!e.If.fg)throw new P(63);return e.If.fg(e,b,c,d)},W=(b,c)=>rb(b,(void 0!==c?c:511)&1023|16384,0),sb=(b,c,d)=>{"undefined"==typeof d&&
-(d=c,c=438);rb(b,c|8192,d)},tb=(b,c)=>{if(!Oa(b))throw new P(44);var d=V(c,{parent:!0}).node;if(!d)throw new P(44);c=Ma(c);var e=lb(d,c);if(e)throw new P(e);if(!d.If.jg)throw new P(63);d.If.jg(d,c,b)},ub=b=>{var c=V(b,{parent:!0}).node;b=Ma(b);var d=R(c,b),e=mb(c,b,!0);if(e)throw new P(e);if(!c.If.ig)throw new P(63);if(d.Yf)throw new P(10);c.If.ig(c,b);gb(d)},db=b=>{b=V(b).node;if(!b)throw new P(44);if(!b.If.dg)throw new P(28);return Oa(eb(b.parent),b.If.dg(b))},vb=(b,c)=>{b=V(b,{Vf:!c}).node;if(!b)throw new P(44);
-if(!b.If.Qf)throw new P(63);return b.If.Qf(b)},wb=b=>vb(b,!0),xb=(b,c)=>{b="string"==typeof b?V(b,{Vf:!0}).node:b;if(!b.If.Nf)throw new P(63);b.If.Nf(b,{mode:c&4095|b.mode&-4096,timestamp:Date.now()})},yb=(b,c)=>{if(0>c)throw new P(28);b="string"==typeof b?V(b,{Vf:!0}).node:b;if(!b.If.Nf)throw new P(63);if(16384===(b.mode&61440))throw new P(31);if(32768!==(b.mode&61440))throw new P(28);var d=hb(b,"w");if(d)throw new P(d);b.If.Nf(b,{size:c,timestamp:Date.now()})},Ab=(b,c,d)=>{if(""===b)throw new P(44);
-if("string"==typeof c){var e=jb[c];if("undefined"==typeof e)throw Error("Unknown file open mode: "+c);c=e}d=c&64?("undefined"==typeof d?438:d)&4095|32768:0;if("object"==typeof b)var f=b;else{b=O(b);try{f=V(b,{Vf:!(c&131072)}).node}catch(g){}}e=!1;if(c&64)if(f){if(c&128)throw new P(20);}else f=rb(b,d,0),e=!0;if(!f)throw new P(44);8192===(f.mode&61440)&&(c&=-513);if(c&65536&&16384!==(f.mode&61440))throw new P(54);if(!e&&(d=f?40960===(f.mode&61440)?32:16384===(f.mode&61440)&&("r"!==kb(c)||c&512)?31:
-hb(f,kb(c)):44))throw new P(d);c&512&&!e&&yb(f,0);c&=-131713;f=pb({node:f,path:eb(f),flags:c,seekable:!0,position:0,Jf:f.Jf,Og:[],error:!1});f.Jf.open&&f.Jf.open(f);!a.logReadFiles||c&1||(zb||(zb={}),b in zb||(zb[b]=1));return f},Bb=(b,c,d)=>{if(null===b.Tf)throw new P(8);if(!b.seekable||!b.Jf.Wf)throw new P(70);if(0!=d&&1!=d&&2!=d)throw new P(28);b.position=b.Jf.Wf(b,c,d);b.Og=[]},Cb=()=>{P||(P=function(b,c){this.node=c;this.Ng=function(d){this.Lf=d};this.Ng(b);this.message="FS error"},P.prototype=
-Error(),P.prototype.constructor=P,[44].forEach(b=>{Ya[b]=new P(b);Ya[b].stack="<generic error, no stack>"}))},Db,Eb=(b,c)=>{var d=0;b&&(d|=365);c&&(d|=146);return d},Gb=(b,c,d)=>{b=O("/dev/"+b);var e=Eb(!!c,!!d);Fb||(Fb=64);var f=Fb++<<8|0;Sa(f,{open:g=>{g.seekable=!1},close:()=>{d&&d.buffer&&d.buffer.length&&d(10)},read:(g,h,p,l)=>{for(var k=0,n=0;n<l;n++){try{var q=c()}catch(r){throw new P(29);}if(void 0===q&&0===k)throw new P(6);if(null===q||void 0===q)break;k++;h[p+n]=q}k&&(g.node.timestamp=Date.now());
-return k},write:(g,h,p,l)=>{for(var k=0;k<l;k++)try{d(h[p+k])}catch(n){throw new P(29);}l&&(g.node.timestamp=Date.now());return k}});sb(b,e,f)},Fb,X={},ob,zb;function Hb(b,c,d){if("/"===c.charAt(0))return c;b=-100===b?"/":Y(b).path;if(0==c.length){if(!d)throw new P(44);return b}return O(b+"/"+c)}
-function Ib(b,c,d){try{var e=b(c)}catch(g){if(g&&g.node&&O(c)!==O(eb(g.node)))return-54;throw g;}B[d>>2]=e.Fg;B[d+8>>2]=e.mg;B[d+12>>2]=e.mode;C[d+16>>2]=e.Kg;B[d+20>>2]=e.uid;B[d+24>>2]=e.Hg;B[d+28>>2]=e.cg;L=[e.size>>>0,(K=e.size,1<=+Math.abs(K)?0<K?(Math.min(+Math.floor(K/4294967296),4294967295)|0)>>>0:~~+Math.ceil((K-+(~~K>>>0))/4294967296)>>>0:0)];B[d+40>>2]=L[0];B[d+44>>2]=L[1];B[d+48>>2]=4096;B[d+52>>2]=e.Dg;b=e.Bg.getTime();c=e.Jg.getTime();var f=e.Eg.getTime();L=[Math.floor(b/1E3)>>>0,(K=
-Math.floor(b/1E3),1<=+Math.abs(K)?0<K?(Math.min(+Math.floor(K/4294967296),4294967295)|0)>>>0:~~+Math.ceil((K-+(~~K>>>0))/4294967296)>>>0:0)];B[d+56>>2]=L[0];B[d+60>>2]=L[1];C[d+64>>2]=b%1E3*1E3;L=[Math.floor(c/1E3)>>>0,(K=Math.floor(c/1E3),1<=+Math.abs(K)?0<K?(Math.min(+Math.floor(K/4294967296),4294967295)|0)>>>0:~~+Math.ceil((K-+(~~K>>>0))/4294967296)>>>0:0)];B[d+72>>2]=L[0];B[d+76>>2]=L[1];C[d+80>>2]=c%1E3*1E3;L=[Math.floor(f/1E3)>>>0,(K=Math.floor(f/1E3),1<=+Math.abs(K)?0<K?(Math.min(+Math.floor(K/
-4294967296),4294967295)|0)>>>0:~~+Math.ceil((K-+(~~K>>>0))/4294967296)>>>0:0)];B[d+88>>2]=L[0];B[d+92>>2]=L[1];C[d+96>>2]=f%1E3*1E3;L=[e.mg>>>0,(K=e.mg,1<=+Math.abs(K)?0<K?(Math.min(+Math.floor(K/4294967296),4294967295)|0)>>>0:~~+Math.ceil((K-+(~~K>>>0))/4294967296)>>>0:0)];B[d+104>>2]=L[0];B[d+108>>2]=L[1];return 0}var Jb=void 0;function Kb(){Jb+=4;return B[Jb-4>>2]}function Y(b){b=S[b];if(!b)throw new P(8);return b}function Lb(b){return C[b>>2]+4294967296*B[b+4>>2]}
-var Mb=[0,31,60,91,121,152,182,213,244,274,305,335],Nb=[0,31,59,90,120,151,181,212,243,273,304,334];function Ob(b){var c=sa(b)+1,d=Pb(c);d&&qa(b,y,d,c);return d}var Qb={};
-function Rb(){if(!Sb){var b={USER:"web_user",LOGNAME:"web_user",PATH:"/",PWD:"/",HOME:"/home/web_user",LANG:("object"==typeof navigator&&navigator.languages&&navigator.languages[0]||"C").replace("-","_")+".UTF-8",_:da||"./this.program"},c;for(c in Qb)void 0===Qb[c]?delete b[c]:b[c]=Qb[c];var d=[];for(c in b)d.push(c+"="+b[c]);Sb=d}return Sb}var Sb;function Tb(b,c){Tb.xg||(Tb.xg=Na());for(var d=0;d<c;d++)y[b+d>>0]=Tb.xg();return 0}function Ub(){}function Vb(){}function Wb(){}function Xb(){}
-function Yb(){}function Zb(){}function $b(){}function ac(){}function bc(){}function cc(){}function dc(){}function ec(){}function fc(){}function gc(){}function hc(){}function ic(){}function jc(){}function kc(){}function lc(){}function mc(){}function nc(){}function oc(){}function pc(){}function qc(){}function rc(){}function sc(){}function tc(){}function uc(){}function vc(){}function wc(){}function xc(){}function yc(){}function zc(){}function Ac(){}function Bc(){}function Cc(){}function Dc(){}
-function Ec(){}function Fc(){}var Gc=void 0,Hc=[];function Ic(b,c){y.set(b,c)}function Z(b,c,d,e){var f={string:k=>{var n=0;if(null!==k&&void 0!==k&&0!==k){var q=(k.length<<2)+1;n=Jc(q);ra(k,n,q)}return n},array:k=>{var n=Jc(k.length);Ic(k,n);return n}};b=a["_"+b];var g=[],h=0;if(e)for(var p=0;p<e.length;p++){var l=f[d[p]];l?(0===h&&(h=Kc()),g[p]=l(e[p])):g[p]=e[p]}d=b.apply(null,g);return d=function(k){0!==h&&Lc(h);return"string"===c?v(k):"boolean"===c?!!k:k}(d)}
-var Mc="undefined"!=typeof TextDecoder?new TextDecoder("utf-16le"):void 0;function ib(b,c,d,e){b||(b=this);this.parent=b;this.Sf=b.Sf;this.Yf=null;this.id=bb++;this.name=c;this.mode=d;this.If={};this.Jf={};this.cg=e}Object.defineProperties(ib.prototype,{read:{get:function(){return 365===(this.mode&365)},set:function(b){b?this.mode|=365:this.mode&=-366}},write:{get:function(){return 146===(this.mode&146)},set:function(b){b?this.mode|=146:this.mode&=-147}}});Cb();T=Array(4096);qb(Q,"/");W("/tmp");W("/home");
-W("/home/web_user");(()=>{W("/dev");Sa(259,{read:()=>0,write:(c,d,e,f)=>f});sb("/dev/null",259);Ra(1280,Ua);Ra(1536,Va);sb("/dev/tty",1280);sb("/dev/tty1",1536);var b=Na();Gb("random",b);Gb("urandom",b);W("/dev/shm");W("/dev/shm/tmp")})();(()=>{W("/proc");var b=W("/proc/self");W("/proc/self/fd");qb({Sf:()=>{var c=Xa(b,"fd",16895,73);c.If={ag:(d,e)=>{var f=S[+e];if(!f)throw new P(8);d={parent:null,Sf:{wg:"fake"},If:{dg:()=>f.path}};return d.parent=d}};return c}},"/proc/self/fd")})();
-(function(){const b=new Map;a.setAuthorizer=function(c,d,e){d?b.set(c,{f:d,pg:e}):b.delete(c);return Z("set_authorizer","number",["number"],[c])};Ub=function(c,d,e,f,g,h){if(b.has(c)){const {f:p,pg:l}=b.get(c);return p(l,d,e?v(e):null,f?v(f):null,g?v(g):null,h?v(h):null)}return 0}})();
-(function(){const b=new Map,c=new Map;a.createFunction=function(d,e,f,g,h,p){const l=b.size;b.set(l,{f:p,Uf:h});return Z("create_function","number","number string number number number number".split(" "),[d,e,f,g,l,0])};a.createAggregate=function(d,e,f,g,h,p,l){const k=b.size;b.set(k,{step:p,Gg:l,Uf:h});return Z("create_function","number","number string number number number number".split(" "),[d,e,f,g,k,1])};a.getFunctionUserData=function(d){return c.get(d)};Wb=function(d,e,f,g){d=b.get(d);c.set(e,
-d.Uf);d.f(e,new Uint32Array(x.buffer,g,f));c.delete(e)};Yb=function(d,e,f,g){d=b.get(d);c.set(e,d.Uf);d.step(e,new Uint32Array(x.buffer,g,f));c.delete(e)};Vb=function(d,e){d=b.get(d);c.set(e,d.Uf);d.Gg(e);c.delete(e)}})();(function(){const b=new Map;a.progressHandler=function(c,d,e,f){e?b.set(c,{f:e,pg:f}):b.delete(c);return Z("progress_handler",null,["number","number"],[c,d])};Xb=function(c){if(b.has(c)){const {f:d,pg:e}=b.get(c);return d(e)}return 0}})();
-(function(){function b(l,k){const n=`get${l}`,q=`set${l}`;return new Proxy(new DataView(x.buffer,k,"Int32"===l?4:8),{get(r,w){if(w===n)return function(z,G){if(!G)throw Error("must be little endian");return r[w](z,G)};if(w===q)return function(z,G,D){if(!D)throw Error("must be little endian");return r[w](z,G,D)};if("string"===typeof w&&w.match(/^(get)|(set)/))throw Error("invalid type");return r[w]}})}const c="object"===typeof Asyncify,d=new Map,e=new Map,f=new Map,g=c?new Set:null,h=c?new Set:null,
-p=new Map;oc=function(l,k,n,q){p.set(v(l),{size:k,bg:Array.from(new Uint32Array(x.buffer,q,n))})};a.createModule=function(l,k,n,q){c&&(n.handleAsync=Asyncify.vg);const r=d.size;d.set(r,{module:n,Uf:q});q=0;n.xCreate&&(q|=1);n.xConnect&&(q|=2);n.xBestIndex&&(q|=4);n.xDisconnect&&(q|=8);n.xDestroy&&(q|=16);n.xOpen&&(q|=32);n.xClose&&(q|=64);n.xFilter&&(q|=128);n.xNext&&(q|=256);n.xEof&&(q|=512);n.xColumn&&(q|=1024);n.xRowid&&(q|=2048);n.xUpdate&&(q|=4096);n.xBegin&&(q|=8192);n.xSync&&(q|=16384);n.xCommit&&
-(q|=32768);n.xRollback&&(q|=65536);n.xFindFunction&&(q|=131072);n.xRename&&(q|=262144);return Z("create_module","number",["number","string","number","number"],[l,k,r,q])};ec=function(l,k,n,q,r,w){k=d.get(k);e.set(r,k);if(c){g.delete(r);for(const z of g)e.delete(z)}q=Array.from(new Uint32Array(x.buffer,q,n)).map(z=>v(z));return k.module.xCreate(l,k.Uf,q,r,b("Int32",w))};dc=function(l,k,n,q,r,w){k=d.get(k);e.set(r,k);if(c){g.delete(r);for(const z of g)e.delete(z)}q=Array.from(new Uint32Array(x.buffer,
-q,n)).map(z=>v(z));return k.module.xConnect(l,k.Uf,q,r,b("Int32",w))};$b=function(l,k){var n=e.get(l),q=p.get("sqlite3_index_info").bg;const r={};r.nConstraint=M(k+q[0],"i32");r.aConstraint=[];var w=M(k+q[1],"*"),z=p.get("sqlite3_index_constraint").size;for(var G=0;G<r.nConstraint;++G){var D=r.aConstraint,J=D.push,H=w+G*z,ea=p.get("sqlite3_index_constraint").bg,U={};U.iColumn=M(H+ea[0],"i32");U.op=M(H+ea[1],"i8");U.usable=!!M(H+ea[2],"i8");J.call(D,U)}r.nOrderBy=M(k+q[2],"i32");r.aOrderBy=[];w=M(k+
-q[3],"*");z=p.get("sqlite3_index_orderby").size;for(G=0;G<r.nOrderBy;++G)D=r.aOrderBy,J=D.push,H=w+G*z,ea=p.get("sqlite3_index_orderby").bg,U={},U.iColumn=M(H+ea[0],"i32"),U.desc=!!M(H+ea[1],"i8"),J.call(D,U);r.aConstraintUsage=[];for(w=0;w<r.nConstraint;++w)r.aConstraintUsage.push({argvIndex:0,omit:!1});r.idxNum=M(k+q[5],"i32");r.idxStr=null;r.orderByConsumed=!!M(k+q[8],"i8");r.estimatedCost=M(k+q[9],"double");r.estimatedRows=M(k+q[10],"i32");r.idxFlags=M(k+q[11],"i32");r.colUsed=M(k+q[12],"i32");
-l=n.module.xBestIndex(l,r);n=p.get("sqlite3_index_info").bg;q=M(k+n[4],"*");w=p.get("sqlite3_index_constraint_usage").size;for(J=0;J<r.nConstraint;++J)z=q+J*w,D=r.aConstraintUsage[J],H=p.get("sqlite3_index_constraint_usage").bg,N(z+H[0],D.argvIndex,"i32"),N(z+H[1],D.omit?1:0,"i8");N(k+n[5],r.idxNum,"i32");"string"===typeof r.idxStr&&(q=sa(r.idxStr),w=Z("sqlite3_malloc","number",["number"],[q+1]),ra(r.idxStr,w,q+1),N(k+n[6],w,"*"),N(k+n[7],1,"i32"));N(k+n[8],r.orderByConsumed,"i32");N(k+n[9],r.estimatedCost,
-"double");N(k+n[10],r.estimatedRows,"i32");N(k+n[11],r.idxFlags,"i32");return l};gc=function(l){const k=e.get(l);c?g.add(l):e.delete(l);return k.module.xDisconnect(l)};fc=function(l){const k=e.get(l);c?g.add(l):e.delete(l);return k.module.xDestroy(l)};kc=function(l,k){const n=e.get(l);f.set(k,n);if(c){h.delete(k);for(const q of h)f.delete(q)}return n.module.xOpen(l,k)};ac=function(l){const k=f.get(l);c?h.add(l):f.delete(l);return k.module.xClose(l)};hc=function(l){return f.get(l).module.xEof(l)?1:
-0};ic=function(l,k,n,q,r){const w=f.get(l);n=n?v(n):null;r=new Uint32Array(x.buffer,r,q);return w.module.xFilter(l,k,n,r)};jc=function(l){return f.get(l).module.xNext(l)};bc=function(l,k,n){return f.get(l).module.xColumn(l,k,n)};nc=function(l,k){return f.get(l).module.xRowid(l,b("BigInt64",k))};qc=function(l,k,n,q){const r=e.get(l);n=new Uint32Array(x.buffer,n,k);return r.module.xUpdate(l,n,b("BigInt64",q))};Zb=function(l){return e.get(l).module.xBegin(l)};pc=function(l){return e.get(l).module.xSync(l)};
-cc=function(l){return e.get(l).module.xCommit(l)};mc=function(l){return e.get(l).module.xRollback(l)};lc=function(l,k){const n=e.get(l);k=v(k);return n.module.xRename(l,k)}})();
-(function(){function b(g,h){const p=`get${g}`,l=`set${g}`;return new Proxy(new DataView(x.buffer,h,"Int32"===g?4:8),{get(k,n){if(n===p)return function(q,r){if(!r)throw Error("must be little endian");return k[n](q,r)};if(n===l)return function(q,r,w){if(!w)throw Error("must be little endian");return k[n](q,r,w)};if("string"===typeof n&&n.match(/^(get)|(set)/))throw Error("invalid type");return k[n]}})}const c="object"===typeof Asyncify;c&&(a.handleAsync=Asyncify.vg);const d=new Map,e=new Map;a.registerVFS=
-function(g,h){if(Z("sqlite3_vfs_find","number",["string"],[g.name]))throw Error(`VFS '${g.name}' already registered`);c&&(g.handleAsync=Asyncify.vg);var p=g.mxPathName??64;const l=a._malloc(4);h=Z("register_vfs","number",["string","number","number","number"],[g.name,p,h?1:0,l]);h||(p=M(l,"*"),d.set(p,g));a._free(l);return h};const f=c?new Set:null;tc=function(g){const h=e.get(g);c?f.add(g):e.delete(g);return h.xClose(g)};Ac=function(g,h,p,l,k){return e.get(g).xRead(g,x.subarray(h,h+p),4294967296*
-k+l+(0>l?2**32:0))};Fc=function(g,h,p,l,k){return e.get(g).xWrite(g,x.subarray(h,h+p),4294967296*k+l+(0>l?2**32:0))};Dc=function(g,h,p){return e.get(g).xTruncate(g,4294967296*p+h+(0>h?2**32:0))};Cc=function(g,h){return e.get(g).xSync(g,h)};xc=function(g,h){const p=e.get(g);h=b("BigInt64",h);return p.xFileSize(g,h)};yc=function(g,h){return e.get(g).xLock(g,h)};Ec=function(g,h){return e.get(g).xUnlock(g,h)};sc=function(g,h){const p=e.get(g);h=b("Int32",h);return p.xCheckReservedLock(g,h)};wc=function(g,
-h,p){const l=e.get(g);p=new DataView(x.buffer,p);return l.xFileControl(g,h,p)};Bc=function(g){return e.get(g).xSectorSize(g)};vc=function(g){return e.get(g).xDeviceCharacteristics(g)};zc=function(g,h,p,l,k){g=d.get(g);e.set(p,g);if(c){f.delete(p);for(var n of f)e.delete(n)}n=null;if(l&64){n=1;const q=[];for(;n;){const r=x[h++];if(r)q.push(r);else switch(x[h]||(n=null),n){case 1:q.push(63);n=2;break;case 2:q.push(61);n=3;break;case 3:q.push(38),n=2}}n=(new TextDecoder).decode(new Uint8Array(q))}else h&&
-(n=v(h));k=b("Int32",k);return g.xOpen(n,p,l,k)};uc=function(g,h,p){return d.get(g).xDelete(v(h),p)};rc=function(g,h,p,l){g=d.get(g);l=b("Int32",l);return g.xAccess(v(h),p,l)}})();
-var Oc={a:function(b,c,d,e){u("Assertion failed: "+v(b)+", at: "+[c?v(c):"unknown filename",d,e?v(e):"unknown function"])},L:function(b,c){try{return b=v(b),xb(b,c),0}catch(d){if("undefined"==typeof X||!(d instanceof P))throw d;return-d.Lf}},Q:function(b,c,d){try{c=v(c);c=Hb(b,c);if(d&-8)return-28;var e=V(c,{Vf:!0}).node;if(!e)return-44;b="";d&4&&(b+="r");d&2&&(b+="w");d&1&&(b+="x");return b&&hb(e,b)?-2:0}catch(f){if("undefined"==typeof X||!(f instanceof P))throw f;return-f.Lf}},M:function(b,c){try{var d=
-S[b];if(!d)throw new P(8);xb(d.node,c);return 0}catch(e){if("undefined"==typeof X||!(e instanceof P))throw e;return-e.Lf}},K:function(b){try{var c=S[b];if(!c)throw new P(8);var d=c.node;var e="string"==typeof d?V(d,{Vf:!0}).node:d;if(!e.If.Nf)throw new P(63);e.If.Nf(e,{timestamp:Date.now()});return 0}catch(f){if("undefined"==typeof X||!(f instanceof P))throw f;return-f.Lf}},b:function(b,c,d){Jb=d;try{var e=Y(b);switch(c){case 0:var f=Kb();return 0>f?-28:pb(e,f).Tf;case 1:case 2:return 0;case 3:return e.flags;
-case 4:return f=Kb(),e.flags|=f,0;case 5:return f=Kb(),A[f+0>>1]=2,0;case 6:case 7:return 0;case 16:case 8:return-28;case 9:return B[Nc()>>2]=28,-1;default:return-28}}catch(g){if("undefined"==typeof X||!(g instanceof P))throw g;return-g.Lf}},J:function(b,c){try{var d=Y(b);return Ib(vb,d.path,c)}catch(e){if("undefined"==typeof X||!(e instanceof P))throw e;return-e.Lf}},j:function(b,c,d){try{c=d+2097152>>>0<4194305-!!c?(c>>>0)+4294967296*d:NaN;if(isNaN(c))return-61;var e=S[b];if(!e)throw new P(8);if(0===
-(e.flags&2097155))throw new P(28);yb(e.node,c);return 0}catch(f){if("undefined"==typeof X||!(f instanceof P))throw f;return-f.Lf}},D:function(b,c){try{if(0===c)return-28;var d=sa("/")+1;if(c<d)return-68;ra("/",b,c);return d}catch(e){if("undefined"==typeof X||!(e instanceof P))throw e;return-e.Lf}},G:function(b,c){try{return b=v(b),Ib(wb,b,c)}catch(d){if("undefined"==typeof X||!(d instanceof P))throw d;return-d.Lf}},A:function(b,c,d){try{return c=v(c),c=Hb(b,c),c=O(c),"/"===c[c.length-1]&&(c=c.substr(0,
-c.length-1)),W(c,d),0}catch(e){if("undefined"==typeof X||!(e instanceof P))throw e;return-e.Lf}},F:function(b,c,d,e){try{c=v(c);var f=e&256;c=Hb(b,c,e&4096);return Ib(f?wb:vb,c,d)}catch(g){if("undefined"==typeof X||!(g instanceof P))throw g;return-g.Lf}},w:function(b,c,d,e){Jb=e;try{c=v(c);c=Hb(b,c);var f=e?Kb():0;return Ab(c,d,f).Tf}catch(g){if("undefined"==typeof X||!(g instanceof P))throw g;return-g.Lf}},u:function(b,c,d,e){try{c=v(c);c=Hb(b,c);if(0>=e)return-28;var f=db(c),g=Math.min(e,sa(f)),
-h=y[d+g];ra(f,d,e+1);y[d+g]=h;return g}catch(p){if("undefined"==typeof X||!(p instanceof P))throw p;return-p.Lf}},t:function(b){try{return b=v(b),ub(b),0}catch(c){if("undefined"==typeof X||!(c instanceof P))throw c;return-c.Lf}},H:function(b,c){try{return b=v(b),Ib(vb,b,c)}catch(d){if("undefined"==typeof X||!(d instanceof P))throw d;return-d.Lf}},r:function(b,c,d){try{c=v(c);c=Hb(b,c);if(0===d){b=c;var e=V(b,{parent:!0}).node;if(!e)throw new P(44);var f=Ma(b),g=R(e,f),h=mb(e,f,!1);if(h)throw new P(h);
-if(!e.If.kg)throw new P(63);if(g.Yf)throw new P(10);e.If.kg(e,f);gb(g)}else 512===d?ub(c):u("Invalid flags passed to unlinkat");return 0}catch(p){if("undefined"==typeof X||!(p instanceof P))throw p;return-p.Lf}},q:function(b,c,d){try{c=v(c);c=Hb(b,c,!0);if(d){var e=Lb(d),f=B[d+8>>2];g=1E3*e+f/1E6;d+=16;e=Lb(d);f=B[d+8>>2];h=1E3*e+f/1E6}else var g=Date.now(),h=g;b=g;var p=V(c,{Vf:!0}).node;p.If.Nf(p,{timestamp:Math.max(b,h)});return 0}catch(l){if("undefined"==typeof X||!(l instanceof P))throw l;return-l.Lf}},
-N:function(b,c){b=new Date(1E3*Lb(b));B[c>>2]=b.getSeconds();B[c+4>>2]=b.getMinutes();B[c+8>>2]=b.getHours();B[c+12>>2]=b.getDate();B[c+16>>2]=b.getMonth();B[c+20>>2]=b.getFullYear()-1900;B[c+24>>2]=b.getDay();var d=b.getFullYear();B[c+28>>2]=(0!==d%4||0===d%100&&0!==d%400?Nb:Mb)[b.getMonth()]+b.getDate()-1|0;B[c+36>>2]=-(60*b.getTimezoneOffset());d=(new Date(b.getFullYear(),6,1)).getTimezoneOffset();var e=(new Date(b.getFullYear(),0,1)).getTimezoneOffset();B[c+32>>2]=(d!=e&&b.getTimezoneOffset()==
-Math.min(e,d))|0},y:function(b,c,d,e,f,g,h){try{var p=Y(e);if(0!==(c&2)&&0===(d&2)&&2!==(p.flags&2097155))throw new P(2);if(1===(p.flags&2097155))throw new P(2);if(!p.Jf.gg)throw new P(43);var l=p.Jf.gg(p,b,f,c,d);var k=l.Lg;B[g>>2]=l.Ag;C[h>>2]=k;return 0}catch(n){if("undefined"==typeof X||!(n instanceof P))throw n;return-n.Lf}},z:function(b,c,d,e,f,g){try{var h=Y(f);if(d&2){if(32768!==(h.node.mode&61440))throw new P(43);e&2||h.Jf.hg&&h.Jf.hg(h,x.slice(b,b+c),g,c,e)}}catch(p){if("undefined"==typeof X||
-!(p instanceof P))throw p;return-p.Lf}},O:function(b,c,d){function e(l){return(l=l.toTimeString().match(/\(([A-Za-z ]+)\)$/))?l[1]:"GMT"}var f=(new Date).getFullYear(),g=new Date(f,0,1),h=new Date(f,6,1);f=g.getTimezoneOffset();var p=h.getTimezoneOffset();C[b>>2]=60*Math.max(f,p);B[c>>2]=Number(f!=p);b=e(g);c=e(h);b=Ob(b);c=Ob(c);p<f?(C[d>>2]=b,C[d+4>>2]=c):(C[d>>2]=c,C[d+4>>2]=b)},ta:function(){u("")},e:function(){return Date.now()},d:()=>performance.now(),o:function(b){var c=x.length;b>>>=0;if(2147483648<
-b)return!1;for(var d=1;4>=d;d*=2){var e=c*(1+.2/d);e=Math.min(e,b+100663296);var f=Math,g=f.min;e=Math.max(b,e);e+=(65536-e%65536)%65536;a:{var h=ma.buffer;try{ma.grow(g.call(f,2147483648,e)-h.byteLength+65535>>>16);wa();var p=1;break a}catch(l){}p=void 0}if(p)return!0}return!1},B:function(b,c){var d=0;Rb().forEach(function(e,f){var g=c+d;f=C[b+4*f>>2]=g;for(g=0;g<e.length;++g)y[f++>>0]=e.charCodeAt(g);y[f>>0]=0;d+=e.length+1});return 0},C:function(b,c){var d=Rb();C[b>>2]=d.length;var e=0;d.forEach(function(f){e+=
-f.length+1});C[c>>2]=e;return 0},f:function(b){try{var c=Y(b);if(null===c.Tf)throw new P(8);c.lg&&(c.lg=null);try{c.Jf.close&&c.Jf.close(c)}catch(d){throw d;}finally{S[c.Tf]=null}c.Tf=null;return 0}catch(d){if("undefined"==typeof X||!(d instanceof P))throw d;return d.Lf}},p:function(b,c){try{var d=Y(b);y[c>>0]=d.Pf?2:16384===(d.mode&61440)?3:40960===(d.mode&61440)?7:4;return 0}catch(e){if("undefined"==typeof X||!(e instanceof P))throw e;return e.Lf}},v:function(b,c,d,e){try{a:{var f=Y(b);b=c;for(var g,
-h=c=0;h<d;h++){var p=C[b>>2],l=C[b+4>>2];b+=8;var k=f,n=p,q=l,r=g,w=y;if(0>q||0>r)throw new P(28);if(null===k.Tf)throw new P(8);if(1===(k.flags&2097155))throw new P(8);if(16384===(k.node.mode&61440))throw new P(31);if(!k.Jf.read)throw new P(28);var z="undefined"!=typeof r;if(!z)r=k.position;else if(!k.seekable)throw new P(70);var G=k.Jf.read(k,w,n,q,r);z||(k.position+=G);var D=G;if(0>D){var J=-1;break a}c+=D;if(D<l)break;"undefined"!==typeof g&&(g+=D)}J=c}C[e>>2]=J;return 0}catch(H){if("undefined"==
-typeof X||!(H instanceof P))throw H;return H.Lf}},i:function(b,c,d,e,f){try{c=d+2097152>>>0<4194305-!!c?(c>>>0)+4294967296*d:NaN;if(isNaN(c))return 61;var g=Y(b);Bb(g,c,e);L=[g.position>>>0,(K=g.position,1<=+Math.abs(K)?0<K?(Math.min(+Math.floor(K/4294967296),4294967295)|0)>>>0:~~+Math.ceil((K-+(~~K>>>0))/4294967296)>>>0:0)];B[f>>2]=L[0];B[f+4>>2]=L[1];g.lg&&0===c&&0===e&&(g.lg=null);return 0}catch(h){if("undefined"==typeof X||!(h instanceof P))throw h;return h.Lf}},E:function(b){try{var c=Y(b);return c.Jf&&
-c.Jf.Xf?c.Jf.Xf(c):0}catch(d){if("undefined"==typeof X||!(d instanceof P))throw d;return d.Lf}},s:function(b,c,d,e){try{a:{var f=Y(b);b=c;for(var g,h=c=0;h<d;h++){var p=C[b>>2],l=C[b+4>>2];b+=8;var k=f,n=p,q=l,r=g,w=y;if(0>q||0>r)throw new P(28);if(null===k.Tf)throw new P(8);if(0===(k.flags&2097155))throw new P(8);if(16384===(k.node.mode&61440))throw new P(31);if(!k.Jf.write)throw new P(28);k.seekable&&k.flags&1024&&Bb(k,0,2);var z="undefined"!=typeof r;if(!z)r=k.position;else if(!k.seekable)throw new P(70);
-var G=k.Jf.write(k,w,n,q,r,void 0);z||(k.position+=G);var D=G;if(0>D){var J=-1;break a}c+=D;"undefined"!==typeof g&&(g+=D)}J=c}C[e>>2]=J;return 0}catch(H){if("undefined"==typeof X||!(H instanceof P))throw H;return H.Lf}},sa:Tb,_:Ub,x:Vb,P:Wb,ca:Xb,I:Yb,ka:Zb,m:$b,ra:ac,na:bc,ia:cc,ea:dc,fa:ec,g:fc,h:gc,oa:hc,qa:ic,pa:jc,da:kc,ga:lc,ha:mc,ma:nc,c:oc,ja:pc,la:qc,aa:rc,V:sc,$:tc,ba:uc,S:vc,U:wc,Y:xc,X:yc,R:zc,n:Ac,T:Bc,Z:Cc,k:Dc,W:Ec,l:Fc};
-(function(){function b(f){a.asm=f.exports;ma=a.asm.ua;wa();E=a.asm.Cf;ya.unshift(a.asm.va);F--;a.monitorRunDependencies&&a.monitorRunDependencies(F);0==F&&(null!==Ca&&(clearInterval(Ca),Ca=null),Da&&(f=Da,Da=null,f()))}function c(f){b(f.instance)}function d(f){return Ha().then(function(g){return WebAssembly.instantiate(g,e)}).then(function(g){return g}).then(f,function(g){t("failed to asynchronously prepare wasm: "+g);u(g)})}var e={a:Oc};F++;a.monitorRunDependencies&&a.monitorRunDependencies(F);if(a.instantiateWasm)try{return a.instantiateWasm(e,
-b)}catch(f){t("Module.instantiateWasm callback failed with error: "+f),ba(f)}(function(){return la||"function"!=typeof WebAssembly.instantiateStreaming||Ea()||"function"!=typeof fetch?d(c):fetch(I,{credentials:"same-origin"}).then(function(f){return WebAssembly.instantiateStreaming(f,e).then(c,function(g){t("wasm streaming compile failed: "+g);t("falling back to ArrayBuffer instantiation");return d(c)})})})().catch(ba);return{}})();
-a.___wasm_call_ctors=function(){return(a.___wasm_call_ctors=a.asm.va).apply(null,arguments)};a._sqlite3_status64=function(){return(a._sqlite3_status64=a.asm.wa).apply(null,arguments)};a._sqlite3_status=function(){return(a._sqlite3_status=a.asm.xa).apply(null,arguments)};a._sqlite3_db_status=function(){return(a._sqlite3_db_status=a.asm.ya).apply(null,arguments)};a._sqlite3_msize=function(){return(a._sqlite3_msize=a.asm.za).apply(null,arguments)};
-a._sqlite3_vfs_find=function(){return(a._sqlite3_vfs_find=a.asm.Aa).apply(null,arguments)};a._sqlite3_vfs_register=function(){return(a._sqlite3_vfs_register=a.asm.Ba).apply(null,arguments)};a._sqlite3_vfs_unregister=function(){return(a._sqlite3_vfs_unregister=a.asm.Ca).apply(null,arguments)};a._sqlite3_release_memory=function(){return(a._sqlite3_release_memory=a.asm.Da).apply(null,arguments)};a._sqlite3_soft_heap_limit64=function(){return(a._sqlite3_soft_heap_limit64=a.asm.Ea).apply(null,arguments)};
-a._sqlite3_memory_used=function(){return(a._sqlite3_memory_used=a.asm.Fa).apply(null,arguments)};a._sqlite3_hard_heap_limit64=function(){return(a._sqlite3_hard_heap_limit64=a.asm.Ga).apply(null,arguments)};a._sqlite3_memory_highwater=function(){return(a._sqlite3_memory_highwater=a.asm.Ha).apply(null,arguments)};a._sqlite3_malloc=function(){return(a._sqlite3_malloc=a.asm.Ia).apply(null,arguments)};a._sqlite3_malloc64=function(){return(a._sqlite3_malloc64=a.asm.Ja).apply(null,arguments)};
-a._sqlite3_free=function(){return(a._sqlite3_free=a.asm.Ka).apply(null,arguments)};a._sqlite3_realloc=function(){return(a._sqlite3_realloc=a.asm.La).apply(null,arguments)};a._sqlite3_realloc64=function(){return(a._sqlite3_realloc64=a.asm.Ma).apply(null,arguments)};a._sqlite3_str_vappendf=function(){return(a._sqlite3_str_vappendf=a.asm.Na).apply(null,arguments)};a._sqlite3_str_append=function(){return(a._sqlite3_str_append=a.asm.Oa).apply(null,arguments)};
-a._sqlite3_str_appendchar=function(){return(a._sqlite3_str_appendchar=a.asm.Pa).apply(null,arguments)};a._sqlite3_str_appendall=function(){return(a._sqlite3_str_appendall=a.asm.Qa).apply(null,arguments)};a._sqlite3_str_appendf=function(){return(a._sqlite3_str_appendf=a.asm.Ra).apply(null,arguments)};a._sqlite3_str_finish=function(){return(a._sqlite3_str_finish=a.asm.Sa).apply(null,arguments)};a._sqlite3_str_errcode=function(){return(a._sqlite3_str_errcode=a.asm.Ta).apply(null,arguments)};
-a._sqlite3_str_length=function(){return(a._sqlite3_str_length=a.asm.Ua).apply(null,arguments)};a._sqlite3_str_value=function(){return(a._sqlite3_str_value=a.asm.Va).apply(null,arguments)};a._sqlite3_str_reset=function(){return(a._sqlite3_str_reset=a.asm.Wa).apply(null,arguments)};a._sqlite3_str_new=function(){return(a._sqlite3_str_new=a.asm.Xa).apply(null,arguments)};a._sqlite3_vmprintf=function(){return(a._sqlite3_vmprintf=a.asm.Ya).apply(null,arguments)};
-a._sqlite3_mprintf=function(){return(a._sqlite3_mprintf=a.asm.Za).apply(null,arguments)};a._sqlite3_vsnprintf=function(){return(a._sqlite3_vsnprintf=a.asm._a).apply(null,arguments)};a._sqlite3_snprintf=function(){return(a._sqlite3_snprintf=a.asm.$a).apply(null,arguments)};a._sqlite3_log=function(){return(a._sqlite3_log=a.asm.ab).apply(null,arguments)};a._sqlite3_randomness=function(){return(a._sqlite3_randomness=a.asm.bb).apply(null,arguments)};
-a._sqlite3_stricmp=function(){return(a._sqlite3_stricmp=a.asm.cb).apply(null,arguments)};a._sqlite3_strnicmp=function(){return(a._sqlite3_strnicmp=a.asm.db).apply(null,arguments)};a._sqlite3_os_init=function(){return(a._sqlite3_os_init=a.asm.eb).apply(null,arguments)};a._sqlite3_os_end=function(){return(a._sqlite3_os_end=a.asm.fb).apply(null,arguments)};a._sqlite3_serialize=function(){return(a._sqlite3_serialize=a.asm.gb).apply(null,arguments)};
-a._sqlite3_prepare_v2=function(){return(a._sqlite3_prepare_v2=a.asm.hb).apply(null,arguments)};a._sqlite3_step=function(){return(a._sqlite3_step=a.asm.ib).apply(null,arguments)};a._sqlite3_column_int64=function(){return(a._sqlite3_column_int64=a.asm.jb).apply(null,arguments)};a._sqlite3_reset=function(){return(a._sqlite3_reset=a.asm.kb).apply(null,arguments)};a._sqlite3_exec=function(){return(a._sqlite3_exec=a.asm.lb).apply(null,arguments)};
-a._sqlite3_column_int=function(){return(a._sqlite3_column_int=a.asm.mb).apply(null,arguments)};a._sqlite3_finalize=function(){return(a._sqlite3_finalize=a.asm.nb).apply(null,arguments)};a._sqlite3_deserialize=function(){return(a._sqlite3_deserialize=a.asm.ob).apply(null,arguments)};a._sqlite3_database_file_object=function(){return(a._sqlite3_database_file_object=a.asm.pb).apply(null,arguments)};a._sqlite3_backup_init=function(){return(a._sqlite3_backup_init=a.asm.qb).apply(null,arguments)};
-a._sqlite3_backup_step=function(){return(a._sqlite3_backup_step=a.asm.rb).apply(null,arguments)};a._sqlite3_backup_finish=function(){return(a._sqlite3_backup_finish=a.asm.sb).apply(null,arguments)};a._sqlite3_backup_remaining=function(){return(a._sqlite3_backup_remaining=a.asm.tb).apply(null,arguments)};a._sqlite3_backup_pagecount=function(){return(a._sqlite3_backup_pagecount=a.asm.ub).apply(null,arguments)};
-a._sqlite3_clear_bindings=function(){return(a._sqlite3_clear_bindings=a.asm.vb).apply(null,arguments)};a._sqlite3_value_blob=function(){return(a._sqlite3_value_blob=a.asm.wb).apply(null,arguments)};a._sqlite3_value_text=function(){return(a._sqlite3_value_text=a.asm.xb).apply(null,arguments)};a._sqlite3_value_bytes=function(){return(a._sqlite3_value_bytes=a.asm.yb).apply(null,arguments)};a._sqlite3_value_bytes16=function(){return(a._sqlite3_value_bytes16=a.asm.zb).apply(null,arguments)};
-a._sqlite3_value_double=function(){return(a._sqlite3_value_double=a.asm.Ab).apply(null,arguments)};a._sqlite3_value_int=function(){return(a._sqlite3_value_int=a.asm.Bb).apply(null,arguments)};a._sqlite3_value_int64=function(){return(a._sqlite3_value_int64=a.asm.Cb).apply(null,arguments)};a._sqlite3_value_subtype=function(){return(a._sqlite3_value_subtype=a.asm.Db).apply(null,arguments)};a._sqlite3_value_pointer=function(){return(a._sqlite3_value_pointer=a.asm.Eb).apply(null,arguments)};
-a._sqlite3_value_text16=function(){return(a._sqlite3_value_text16=a.asm.Fb).apply(null,arguments)};a._sqlite3_value_text16be=function(){return(a._sqlite3_value_text16be=a.asm.Gb).apply(null,arguments)};a._sqlite3_value_text16le=function(){return(a._sqlite3_value_text16le=a.asm.Hb).apply(null,arguments)};a._sqlite3_value_type=function(){return(a._sqlite3_value_type=a.asm.Ib).apply(null,arguments)};a._sqlite3_value_encoding=function(){return(a._sqlite3_value_encoding=a.asm.Jb).apply(null,arguments)};
-a._sqlite3_value_nochange=function(){return(a._sqlite3_value_nochange=a.asm.Kb).apply(null,arguments)};a._sqlite3_value_frombind=function(){return(a._sqlite3_value_frombind=a.asm.Lb).apply(null,arguments)};a._sqlite3_value_dup=function(){return(a._sqlite3_value_dup=a.asm.Mb).apply(null,arguments)};a._sqlite3_value_free=function(){return(a._sqlite3_value_free=a.asm.Nb).apply(null,arguments)};a._sqlite3_result_blob=function(){return(a._sqlite3_result_blob=a.asm.Ob).apply(null,arguments)};
-a._sqlite3_result_blob64=function(){return(a._sqlite3_result_blob64=a.asm.Pb).apply(null,arguments)};a._sqlite3_result_double=function(){return(a._sqlite3_result_double=a.asm.Qb).apply(null,arguments)};a._sqlite3_result_error=function(){return(a._sqlite3_result_error=a.asm.Rb).apply(null,arguments)};a._sqlite3_result_error16=function(){return(a._sqlite3_result_error16=a.asm.Sb).apply(null,arguments)};a._sqlite3_result_int=function(){return(a._sqlite3_result_int=a.asm.Tb).apply(null,arguments)};
-a._sqlite3_result_int64=function(){return(a._sqlite3_result_int64=a.asm.Ub).apply(null,arguments)};a._sqlite3_result_null=function(){return(a._sqlite3_result_null=a.asm.Vb).apply(null,arguments)};a._sqlite3_result_pointer=function(){return(a._sqlite3_result_pointer=a.asm.Wb).apply(null,arguments)};a._sqlite3_result_subtype=function(){return(a._sqlite3_result_subtype=a.asm.Xb).apply(null,arguments)};a._sqlite3_result_text=function(){return(a._sqlite3_result_text=a.asm.Yb).apply(null,arguments)};
-a._sqlite3_result_text64=function(){return(a._sqlite3_result_text64=a.asm.Zb).apply(null,arguments)};a._sqlite3_result_text16=function(){return(a._sqlite3_result_text16=a.asm._b).apply(null,arguments)};a._sqlite3_result_text16be=function(){return(a._sqlite3_result_text16be=a.asm.$b).apply(null,arguments)};a._sqlite3_result_text16le=function(){return(a._sqlite3_result_text16le=a.asm.ac).apply(null,arguments)};a._sqlite3_result_value=function(){return(a._sqlite3_result_value=a.asm.bc).apply(null,arguments)};
-a._sqlite3_result_error_toobig=function(){return(a._sqlite3_result_error_toobig=a.asm.cc).apply(null,arguments)};a._sqlite3_result_zeroblob=function(){return(a._sqlite3_result_zeroblob=a.asm.dc).apply(null,arguments)};a._sqlite3_result_zeroblob64=function(){return(a._sqlite3_result_zeroblob64=a.asm.ec).apply(null,arguments)};a._sqlite3_result_error_code=function(){return(a._sqlite3_result_error_code=a.asm.fc).apply(null,arguments)};
-a._sqlite3_result_error_nomem=function(){return(a._sqlite3_result_error_nomem=a.asm.gc).apply(null,arguments)};a._sqlite3_user_data=function(){return(a._sqlite3_user_data=a.asm.hc).apply(null,arguments)};a._sqlite3_context_db_handle=function(){return(a._sqlite3_context_db_handle=a.asm.ic).apply(null,arguments)};a._sqlite3_vtab_nochange=function(){return(a._sqlite3_vtab_nochange=a.asm.jc).apply(null,arguments)};
-a._sqlite3_vtab_in_first=function(){return(a._sqlite3_vtab_in_first=a.asm.kc).apply(null,arguments)};a._sqlite3_vtab_in_next=function(){return(a._sqlite3_vtab_in_next=a.asm.lc).apply(null,arguments)};a._sqlite3_aggregate_context=function(){return(a._sqlite3_aggregate_context=a.asm.mc).apply(null,arguments)};a._sqlite3_get_auxdata=function(){return(a._sqlite3_get_auxdata=a.asm.nc).apply(null,arguments)};a._sqlite3_set_auxdata=function(){return(a._sqlite3_set_auxdata=a.asm.oc).apply(null,arguments)};
-a._sqlite3_column_count=function(){return(a._sqlite3_column_count=a.asm.pc).apply(null,arguments)};a._sqlite3_data_count=function(){return(a._sqlite3_data_count=a.asm.qc).apply(null,arguments)};a._sqlite3_column_blob=function(){return(a._sqlite3_column_blob=a.asm.rc).apply(null,arguments)};a._sqlite3_column_bytes=function(){return(a._sqlite3_column_bytes=a.asm.sc).apply(null,arguments)};a._sqlite3_column_bytes16=function(){return(a._sqlite3_column_bytes16=a.asm.tc).apply(null,arguments)};
-a._sqlite3_column_double=function(){return(a._sqlite3_column_double=a.asm.uc).apply(null,arguments)};a._sqlite3_column_text=function(){return(a._sqlite3_column_text=a.asm.vc).apply(null,arguments)};a._sqlite3_column_value=function(){return(a._sqlite3_column_value=a.asm.wc).apply(null,arguments)};a._sqlite3_column_text16=function(){return(a._sqlite3_column_text16=a.asm.xc).apply(null,arguments)};a._sqlite3_column_type=function(){return(a._sqlite3_column_type=a.asm.yc).apply(null,arguments)};
-a._sqlite3_column_name=function(){return(a._sqlite3_column_name=a.asm.zc).apply(null,arguments)};a._sqlite3_column_name16=function(){return(a._sqlite3_column_name16=a.asm.Ac).apply(null,arguments)};a._sqlite3_bind_blob=function(){return(a._sqlite3_bind_blob=a.asm.Bc).apply(null,arguments)};a._sqlite3_bind_blob64=function(){return(a._sqlite3_bind_blob64=a.asm.Cc).apply(null,arguments)};a._sqlite3_bind_double=function(){return(a._sqlite3_bind_double=a.asm.Dc).apply(null,arguments)};
-a._sqlite3_bind_int=function(){return(a._sqlite3_bind_int=a.asm.Ec).apply(null,arguments)};a._sqlite3_bind_int64=function(){return(a._sqlite3_bind_int64=a.asm.Fc).apply(null,arguments)};a._sqlite3_bind_null=function(){return(a._sqlite3_bind_null=a.asm.Gc).apply(null,arguments)};a._sqlite3_bind_pointer=function(){return(a._sqlite3_bind_pointer=a.asm.Hc).apply(null,arguments)};a._sqlite3_bind_text=function(){return(a._sqlite3_bind_text=a.asm.Ic).apply(null,arguments)};
-a._sqlite3_bind_text64=function(){return(a._sqlite3_bind_text64=a.asm.Jc).apply(null,arguments)};a._sqlite3_bind_text16=function(){return(a._sqlite3_bind_text16=a.asm.Kc).apply(null,arguments)};a._sqlite3_bind_value=function(){return(a._sqlite3_bind_value=a.asm.Lc).apply(null,arguments)};a._sqlite3_bind_zeroblob=function(){return(a._sqlite3_bind_zeroblob=a.asm.Mc).apply(null,arguments)};a._sqlite3_bind_zeroblob64=function(){return(a._sqlite3_bind_zeroblob64=a.asm.Nc).apply(null,arguments)};
-a._sqlite3_bind_parameter_count=function(){return(a._sqlite3_bind_parameter_count=a.asm.Oc).apply(null,arguments)};a._sqlite3_bind_parameter_name=function(){return(a._sqlite3_bind_parameter_name=a.asm.Pc).apply(null,arguments)};a._sqlite3_bind_parameter_index=function(){return(a._sqlite3_bind_parameter_index=a.asm.Qc).apply(null,arguments)};a._sqlite3_db_handle=function(){return(a._sqlite3_db_handle=a.asm.Rc).apply(null,arguments)};
-a._sqlite3_stmt_readonly=function(){return(a._sqlite3_stmt_readonly=a.asm.Sc).apply(null,arguments)};a._sqlite3_stmt_isexplain=function(){return(a._sqlite3_stmt_isexplain=a.asm.Tc).apply(null,arguments)};a._sqlite3_stmt_explain=function(){return(a._sqlite3_stmt_explain=a.asm.Uc).apply(null,arguments)};a._sqlite3_stmt_busy=function(){return(a._sqlite3_stmt_busy=a.asm.Vc).apply(null,arguments)};a._sqlite3_next_stmt=function(){return(a._sqlite3_next_stmt=a.asm.Wc).apply(null,arguments)};
-a._sqlite3_stmt_status=function(){return(a._sqlite3_stmt_status=a.asm.Xc).apply(null,arguments)};a._sqlite3_sql=function(){return(a._sqlite3_sql=a.asm.Yc).apply(null,arguments)};a._sqlite3_expanded_sql=function(){return(a._sqlite3_expanded_sql=a.asm.Zc).apply(null,arguments)};a._sqlite3_value_numeric_type=function(){return(a._sqlite3_value_numeric_type=a.asm._c).apply(null,arguments)};a._sqlite3_blob_open=function(){return(a._sqlite3_blob_open=a.asm.$c).apply(null,arguments)};
-a._sqlite3_blob_close=function(){return(a._sqlite3_blob_close=a.asm.ad).apply(null,arguments)};a._sqlite3_blob_read=function(){return(a._sqlite3_blob_read=a.asm.bd).apply(null,arguments)};a._sqlite3_blob_write=function(){return(a._sqlite3_blob_write=a.asm.cd).apply(null,arguments)};a._sqlite3_blob_bytes=function(){return(a._sqlite3_blob_bytes=a.asm.dd).apply(null,arguments)};a._sqlite3_blob_reopen=function(){return(a._sqlite3_blob_reopen=a.asm.ed).apply(null,arguments)};
-a._sqlite3_set_authorizer=function(){return(a._sqlite3_set_authorizer=a.asm.fd).apply(null,arguments)};a._sqlite3_strglob=function(){return(a._sqlite3_strglob=a.asm.gd).apply(null,arguments)};a._sqlite3_strlike=function(){return(a._sqlite3_strlike=a.asm.hd).apply(null,arguments)};a._sqlite3_errmsg=function(){return(a._sqlite3_errmsg=a.asm.id).apply(null,arguments)};a._sqlite3_auto_extension=function(){return(a._sqlite3_auto_extension=a.asm.jd).apply(null,arguments)};
-a._sqlite3_cancel_auto_extension=function(){return(a._sqlite3_cancel_auto_extension=a.asm.kd).apply(null,arguments)};a._sqlite3_reset_auto_extension=function(){return(a._sqlite3_reset_auto_extension=a.asm.ld).apply(null,arguments)};a._sqlite3_prepare=function(){return(a._sqlite3_prepare=a.asm.md).apply(null,arguments)};a._sqlite3_prepare_v3=function(){return(a._sqlite3_prepare_v3=a.asm.nd).apply(null,arguments)};a._sqlite3_prepare16=function(){return(a._sqlite3_prepare16=a.asm.od).apply(null,arguments)};
-a._sqlite3_prepare16_v2=function(){return(a._sqlite3_prepare16_v2=a.asm.pd).apply(null,arguments)};a._sqlite3_prepare16_v3=function(){return(a._sqlite3_prepare16_v3=a.asm.qd).apply(null,arguments)};a._sqlite3_get_table=function(){return(a._sqlite3_get_table=a.asm.rd).apply(null,arguments)};a._sqlite3_free_table=function(){return(a._sqlite3_free_table=a.asm.sd).apply(null,arguments)};a._sqlite3_create_module=function(){return(a._sqlite3_create_module=a.asm.td).apply(null,arguments)};
-a._sqlite3_create_module_v2=function(){return(a._sqlite3_create_module_v2=a.asm.ud).apply(null,arguments)};a._sqlite3_drop_modules=function(){return(a._sqlite3_drop_modules=a.asm.vd).apply(null,arguments)};a._sqlite3_declare_vtab=function(){return(a._sqlite3_declare_vtab=a.asm.wd).apply(null,arguments)};a._sqlite3_vtab_on_conflict=function(){return(a._sqlite3_vtab_on_conflict=a.asm.xd).apply(null,arguments)};a._sqlite3_vtab_config=function(){return(a._sqlite3_vtab_config=a.asm.yd).apply(null,arguments)};
-a._sqlite3_vtab_collation=function(){return(a._sqlite3_vtab_collation=a.asm.zd).apply(null,arguments)};a._sqlite3_vtab_in=function(){return(a._sqlite3_vtab_in=a.asm.Ad).apply(null,arguments)};a._sqlite3_vtab_rhs_value=function(){return(a._sqlite3_vtab_rhs_value=a.asm.Bd).apply(null,arguments)};a._sqlite3_vtab_distinct=function(){return(a._sqlite3_vtab_distinct=a.asm.Cd).apply(null,arguments)};a._sqlite3_keyword_name=function(){return(a._sqlite3_keyword_name=a.asm.Dd).apply(null,arguments)};
-a._sqlite3_keyword_count=function(){return(a._sqlite3_keyword_count=a.asm.Ed).apply(null,arguments)};a._sqlite3_keyword_check=function(){return(a._sqlite3_keyword_check=a.asm.Fd).apply(null,arguments)};a._sqlite3_complete=function(){return(a._sqlite3_complete=a.asm.Gd).apply(null,arguments)};a._sqlite3_complete16=function(){return(a._sqlite3_complete16=a.asm.Hd).apply(null,arguments)};a._sqlite3_libversion=function(){return(a._sqlite3_libversion=a.asm.Id).apply(null,arguments)};
-a._sqlite3_libversion_number=function(){return(a._sqlite3_libversion_number=a.asm.Jd).apply(null,arguments)};a._sqlite3_threadsafe=function(){return(a._sqlite3_threadsafe=a.asm.Kd).apply(null,arguments)};a._sqlite3_initialize=function(){return(a._sqlite3_initialize=a.asm.Ld).apply(null,arguments)};a._sqlite3_shutdown=function(){return(a._sqlite3_shutdown=a.asm.Md).apply(null,arguments)};a._sqlite3_config=function(){return(a._sqlite3_config=a.asm.Nd).apply(null,arguments)};
-a._sqlite3_db_mutex=function(){return(a._sqlite3_db_mutex=a.asm.Od).apply(null,arguments)};a._sqlite3_db_release_memory=function(){return(a._sqlite3_db_release_memory=a.asm.Pd).apply(null,arguments)};a._sqlite3_db_cacheflush=function(){return(a._sqlite3_db_cacheflush=a.asm.Qd).apply(null,arguments)};a._sqlite3_db_config=function(){return(a._sqlite3_db_config=a.asm.Rd).apply(null,arguments)};a._sqlite3_last_insert_rowid=function(){return(a._sqlite3_last_insert_rowid=a.asm.Sd).apply(null,arguments)};
-a._sqlite3_set_last_insert_rowid=function(){return(a._sqlite3_set_last_insert_rowid=a.asm.Td).apply(null,arguments)};a._sqlite3_changes64=function(){return(a._sqlite3_changes64=a.asm.Ud).apply(null,arguments)};a._sqlite3_changes=function(){return(a._sqlite3_changes=a.asm.Vd).apply(null,arguments)};a._sqlite3_total_changes64=function(){return(a._sqlite3_total_changes64=a.asm.Wd).apply(null,arguments)};a._sqlite3_total_changes=function(){return(a._sqlite3_total_changes=a.asm.Xd).apply(null,arguments)};
-a._sqlite3_txn_state=function(){return(a._sqlite3_txn_state=a.asm.Yd).apply(null,arguments)};a._sqlite3_close=function(){return(a._sqlite3_close=a.asm.Zd).apply(null,arguments)};a._sqlite3_close_v2=function(){return(a._sqlite3_close_v2=a.asm._d).apply(null,arguments)};a._sqlite3_busy_handler=function(){return(a._sqlite3_busy_handler=a.asm.$d).apply(null,arguments)};a._sqlite3_progress_handler=function(){return(a._sqlite3_progress_handler=a.asm.ae).apply(null,arguments)};
-a._sqlite3_busy_timeout=function(){return(a._sqlite3_busy_timeout=a.asm.be).apply(null,arguments)};a._sqlite3_interrupt=function(){return(a._sqlite3_interrupt=a.asm.ce).apply(null,arguments)};a._sqlite3_is_interrupted=function(){return(a._sqlite3_is_interrupted=a.asm.de).apply(null,arguments)};a._sqlite3_create_function=function(){return(a._sqlite3_create_function=a.asm.ee).apply(null,arguments)};a._sqlite3_create_function_v2=function(){return(a._sqlite3_create_function_v2=a.asm.fe).apply(null,arguments)};
-a._sqlite3_create_window_function=function(){return(a._sqlite3_create_window_function=a.asm.ge).apply(null,arguments)};a._sqlite3_create_function16=function(){return(a._sqlite3_create_function16=a.asm.he).apply(null,arguments)};a._sqlite3_overload_function=function(){return(a._sqlite3_overload_function=a.asm.ie).apply(null,arguments)};a._sqlite3_trace_v2=function(){return(a._sqlite3_trace_v2=a.asm.je).apply(null,arguments)};
-a._sqlite3_commit_hook=function(){return(a._sqlite3_commit_hook=a.asm.ke).apply(null,arguments)};a._sqlite3_update_hook=function(){return(a._sqlite3_update_hook=a.asm.le).apply(null,arguments)};a._sqlite3_rollback_hook=function(){return(a._sqlite3_rollback_hook=a.asm.me).apply(null,arguments)};a._sqlite3_autovacuum_pages=function(){return(a._sqlite3_autovacuum_pages=a.asm.ne).apply(null,arguments)};
-a._sqlite3_wal_autocheckpoint=function(){return(a._sqlite3_wal_autocheckpoint=a.asm.oe).apply(null,arguments)};a._sqlite3_wal_hook=function(){return(a._sqlite3_wal_hook=a.asm.pe).apply(null,arguments)};a._sqlite3_wal_checkpoint_v2=function(){return(a._sqlite3_wal_checkpoint_v2=a.asm.qe).apply(null,arguments)};a._sqlite3_wal_checkpoint=function(){return(a._sqlite3_wal_checkpoint=a.asm.re).apply(null,arguments)};
-a._sqlite3_error_offset=function(){return(a._sqlite3_error_offset=a.asm.se).apply(null,arguments)};a._sqlite3_errmsg16=function(){return(a._sqlite3_errmsg16=a.asm.te).apply(null,arguments)};a._sqlite3_errcode=function(){return(a._sqlite3_errcode=a.asm.ue).apply(null,arguments)};a._sqlite3_extended_errcode=function(){return(a._sqlite3_extended_errcode=a.asm.ve).apply(null,arguments)};a._sqlite3_system_errno=function(){return(a._sqlite3_system_errno=a.asm.we).apply(null,arguments)};
-a._sqlite3_errstr=function(){return(a._sqlite3_errstr=a.asm.xe).apply(null,arguments)};a._sqlite3_limit=function(){return(a._sqlite3_limit=a.asm.ye).apply(null,arguments)};a._sqlite3_open=function(){return(a._sqlite3_open=a.asm.ze).apply(null,arguments)};a._sqlite3_open_v2=function(){return(a._sqlite3_open_v2=a.asm.Ae).apply(null,arguments)};a._sqlite3_open16=function(){return(a._sqlite3_open16=a.asm.Be).apply(null,arguments)};
-a._sqlite3_create_collation=function(){return(a._sqlite3_create_collation=a.asm.Ce).apply(null,arguments)};a._sqlite3_create_collation_v2=function(){return(a._sqlite3_create_collation_v2=a.asm.De).apply(null,arguments)};a._sqlite3_create_collation16=function(){return(a._sqlite3_create_collation16=a.asm.Ee).apply(null,arguments)};a._sqlite3_collation_needed=function(){return(a._sqlite3_collation_needed=a.asm.Fe).apply(null,arguments)};
-a._sqlite3_collation_needed16=function(){return(a._sqlite3_collation_needed16=a.asm.Ge).apply(null,arguments)};a._sqlite3_get_clientdata=function(){return(a._sqlite3_get_clientdata=a.asm.He).apply(null,arguments)};a._sqlite3_set_clientdata=function(){return(a._sqlite3_set_clientdata=a.asm.Ie).apply(null,arguments)};a._sqlite3_get_autocommit=function(){return(a._sqlite3_get_autocommit=a.asm.Je).apply(null,arguments)};
-a._sqlite3_table_column_metadata=function(){return(a._sqlite3_table_column_metadata=a.asm.Ke).apply(null,arguments)};a._sqlite3_sleep=function(){return(a._sqlite3_sleep=a.asm.Le).apply(null,arguments)};a._sqlite3_extended_result_codes=function(){return(a._sqlite3_extended_result_codes=a.asm.Me).apply(null,arguments)};a._sqlite3_file_control=function(){return(a._sqlite3_file_control=a.asm.Ne).apply(null,arguments)};
-a._sqlite3_test_control=function(){return(a._sqlite3_test_control=a.asm.Oe).apply(null,arguments)};a._sqlite3_create_filename=function(){return(a._sqlite3_create_filename=a.asm.Pe).apply(null,arguments)};a._sqlite3_free_filename=function(){return(a._sqlite3_free_filename=a.asm.Qe).apply(null,arguments)};a._sqlite3_uri_parameter=function(){return(a._sqlite3_uri_parameter=a.asm.Re).apply(null,arguments)};a._sqlite3_uri_key=function(){return(a._sqlite3_uri_key=a.asm.Se).apply(null,arguments)};
-a._sqlite3_uri_boolean=function(){return(a._sqlite3_uri_boolean=a.asm.Te).apply(null,arguments)};a._sqlite3_uri_int64=function(){return(a._sqlite3_uri_int64=a.asm.Ue).apply(null,arguments)};a._sqlite3_filename_database=function(){return(a._sqlite3_filename_database=a.asm.Ve).apply(null,arguments)};a._sqlite3_filename_journal=function(){return(a._sqlite3_filename_journal=a.asm.We).apply(null,arguments)};a._sqlite3_filename_wal=function(){return(a._sqlite3_filename_wal=a.asm.Xe).apply(null,arguments)};
-a._sqlite3_db_name=function(){return(a._sqlite3_db_name=a.asm.Ye).apply(null,arguments)};a._sqlite3_db_filename=function(){return(a._sqlite3_db_filename=a.asm.Ze).apply(null,arguments)};a._sqlite3_db_readonly=function(){return(a._sqlite3_db_readonly=a.asm._e).apply(null,arguments)};a._sqlite3_compileoption_used=function(){return(a._sqlite3_compileoption_used=a.asm.$e).apply(null,arguments)};a._sqlite3_compileoption_get=function(){return(a._sqlite3_compileoption_get=a.asm.af).apply(null,arguments)};
-a._sqlite3_sourceid=function(){return(a._sqlite3_sourceid=a.asm.bf).apply(null,arguments)};var Nc=a.___errno_location=function(){return(Nc=a.___errno_location=a.asm.cf).apply(null,arguments)};a._sqlite3mc_config=function(){return(a._sqlite3mc_config=a.asm.df).apply(null,arguments)};a._sqlite3mc_cipher_count=function(){return(a._sqlite3mc_cipher_count=a.asm.ef).apply(null,arguments)};a._sqlite3mc_cipher_index=function(){return(a._sqlite3mc_cipher_index=a.asm.ff).apply(null,arguments)};
-a._sqlite3mc_cipher_name=function(){return(a._sqlite3mc_cipher_name=a.asm.gf).apply(null,arguments)};a._sqlite3mc_config_cipher=function(){return(a._sqlite3mc_config_cipher=a.asm.hf).apply(null,arguments)};a._sqlite3mc_codec_data=function(){return(a._sqlite3mc_codec_data=a.asm.jf).apply(null,arguments)};a._sqlite3_key=function(){return(a._sqlite3_key=a.asm.kf).apply(null,arguments)};a._sqlite3_key_v2=function(){return(a._sqlite3_key_v2=a.asm.lf).apply(null,arguments)};
-a._sqlite3_rekey_v2=function(){return(a._sqlite3_rekey_v2=a.asm.mf).apply(null,arguments)};a._sqlite3_rekey=function(){return(a._sqlite3_rekey=a.asm.nf).apply(null,arguments)};a._sqlite3_regexp_init=function(){return(a._sqlite3_regexp_init=a.asm.of).apply(null,arguments)};a._sqlite3mc_register_cipher=function(){return(a._sqlite3mc_register_cipher=a.asm.pf).apply(null,arguments)};var Pb=a._malloc=function(){return(Pb=a._malloc=a.asm.qf).apply(null,arguments)};
-a._free=function(){return(a._free=a.asm.rf).apply(null,arguments)};a._RegisterExtensionFunctions=function(){return(a._RegisterExtensionFunctions=a.asm.sf).apply(null,arguments)};a._sqlite3Fts5BetterTrigramInit=function(){return(a._sqlite3Fts5BetterTrigramInit=a.asm.tf).apply(null,arguments)};a._sqlite3Fts5HtmlInit=function(){return(a._sqlite3Fts5HtmlInit=a.asm.uf).apply(null,arguments)};a._set_authorizer=function(){return(a._set_authorizer=a.asm.vf).apply(null,arguments)};
-a._create_function=function(){return(a._create_function=a.asm.wf).apply(null,arguments)};a._create_module=function(){return(a._create_module=a.asm.xf).apply(null,arguments)};a._progress_handler=function(){return(a._progress_handler=a.asm.yf).apply(null,arguments)};a._register_vfs=function(){return(a._register_vfs=a.asm.zf).apply(null,arguments)};a._getSqliteFree=function(){return(a._getSqliteFree=a.asm.Af).apply(null,arguments)};a._main=function(){return(a._main=a.asm.Bf).apply(null,arguments)};
-var Za=a._emscripten_builtin_memalign=function(){return(Za=a._emscripten_builtin_memalign=a.asm.Df).apply(null,arguments)},Pc=a.getTempRet0=function(){return(Pc=a.getTempRet0=a.asm.Ef).apply(null,arguments)},Kc=a.stackSave=function(){return(Kc=a.stackSave=a.asm.Ff).apply(null,arguments)},Lc=a.stackRestore=function(){return(Lc=a.stackRestore=a.asm.Gf).apply(null,arguments)},Jc=a.stackAlloc=function(){return(Jc=a.stackAlloc=a.asm.Hf).apply(null,arguments)};a._sqlite3_version=60912;a.UTF8ToString=v;
-a.stringToUTF8=ra;a.lengthBytesUTF8=sa;a.getTempRet0=Pc;a.ccall=Z;a.cwrap=function(b,c,d,e){d=d||[];var f=d.every(g=>"number"===g||"boolean"===g);return"string"!==c&&f&&!e?a["_"+b]:function(){return Z(b,c,d,arguments,e)}};
-a.addFunction=function(b,c){if(!Gc){Gc=new WeakMap;var d=E.length;if(Gc)for(var e=0;e<0+d;e++){var f=E.get(e);f&&Gc.set(f,e)}}if(Gc.has(b))return Gc.get(b);if(Hc.length)d=Hc.pop();else{try{E.grow(1)}catch(p){if(!(p instanceof RangeError))throw p;throw"Unable to grow wasm table. Set ALLOW_TABLE_GROWTH.";}d=E.length-1}try{E.set(d,b)}catch(p){if(!(p instanceof TypeError))throw p;if("function"==typeof WebAssembly.Function){e=WebAssembly.Function;f={i:"i32",j:"i32",f:"f32",d:"f64",p:"i32"};for(var g={parameters:[],
-results:"v"==c[0]?[]:[f[c[0]]]},h=1;h<c.length;++h)g.parameters.push(f[c[h]]),"j"===c[h]&&g.parameters.push("i32");c=new e(g,b)}else{e=[1];f=c.slice(0,1);c=c.slice(1);g={i:127,p:127,j:126,f:125,d:124};e.push(96);h=c.length;128>h?e.push(h):e.push(h%128|128,h>>7);for(h=0;h<c.length;++h)e.push(g[c[h]]);"v"==f?e.push(0):e.push(1,g[f]);c=[0,97,115,109,1,0,0,0,1];f=e.length;128>f?c.push(f):c.push(f%128|128,f>>7);c.push.apply(c,e);c.push(2,7,1,1,101,1,102,0,0,7,5,1,1,102,0,0);c=new WebAssembly.Module(new Uint8Array(c));
-c=(new WebAssembly.Instance(c,{e:{f:b}})).exports.f}E.set(d,c)}Gc.set(b,d);return d};a.setValue=N;a.getValue=M;a.intArrayFromString=Pa;a.intArrayToString=function(b){for(var c=[],d=0;d<b.length;d++){var e=b[d];255<e&&(e&=255);c.push(String.fromCharCode(e))}return c.join("")};a.AsciiToString=function(b){for(var c="";;){var d=x[b++>>0];if(!d)return c;c+=String.fromCharCode(d)}};
-a.UTF16ToString=function(b,c){var d=b>>1;for(var e=d+c/2;!(d>=e)&&ta[d];)++d;d<<=1;if(32<d-b&&Mc)return Mc.decode(x.subarray(b,d));d="";for(e=0;!(e>=c/2);++e){var f=A[b+2*e>>1];if(0==f)break;d+=String.fromCharCode(f)}return d};a.stringToUTF16=function(b,c,d){void 0===d&&(d=2147483647);if(2>d)return 0;d-=2;var e=c;d=d<2*b.length?d/2:b.length;for(var f=0;f<d;++f)A[c>>1]=b.charCodeAt(f),c+=2;A[c>>1]=0;return c-e};
-a.UTF32ToString=function(b,c){for(var d=0,e="";!(d>=c/4);){var f=B[b+4*d>>2];if(0==f)break;++d;65536<=f?(f-=65536,e+=String.fromCharCode(55296|f>>10,56320|f&1023)):e+=String.fromCharCode(f)}return e};a.stringToUTF32=function(b,c,d){void 0===d&&(d=2147483647);if(4>d)return 0;var e=c;d=e+d-4;for(var f=0;f<b.length;++f){var g=b.charCodeAt(f);if(55296<=g&&57343>=g){var h=b.charCodeAt(++f);g=65536+((g&1023)<<10)|h&1023}B[c>>2]=g;c+=4;if(c+4>d)break}B[c>>2]=0;return c-e};a.writeArrayToMemory=Ic;var Qc;
-Da=function Rc(){Qc||Sc();Qc||(Da=Rc)};
-function Sc(){function b(){if(!Qc&&(Qc=!0,a.calledRun=!0,!na)){a.noFSInit||Db||(Db=!0,Cb(),a.stdin=a.stdin,a.stdout=a.stdout,a.stderr=a.stderr,a.stdin?Gb("stdin",a.stdin):tb("/dev/tty","/dev/stdin"),a.stdout?Gb("stdout",null,a.stdout):tb("/dev/tty","/dev/stdout"),a.stderr?Gb("stderr",null,a.stderr):tb("/dev/tty1","/dev/stderr"),Ab("/dev/stdin",0),Ab("/dev/stdout",1),Ab("/dev/stderr",1));cb=!1;Ja(ya);Ja(za);aa(a);if(a.onRuntimeInitialized)a.onRuntimeInitialized();if(Tc){var c=a._main;try{var d=c(0,
-0);if(!noExitRuntime){if(a.onExit)a.onExit(d);na=!0}fa(d,new Ia(d))}catch(e){e instanceof Ia||"unwind"==e||fa(1,e)}}if(a.postRun)for("function"==typeof a.postRun&&(a.postRun=[a.postRun]);a.postRun.length;)c=a.postRun.shift(),Aa.unshift(c);Ja(Aa)}}if(!(0<F)){if(a.preRun)for("function"==typeof a.preRun&&(a.preRun=[a.preRun]);a.preRun.length;)Ba();Ja(xa);0<F||(a.setStatus?(a.setStatus("Running..."),setTimeout(function(){setTimeout(function(){a.setStatus("")},1);b()},1)):b())}}
-if(a.preInit)for("function"==typeof a.preInit&&(a.preInit=[a.preInit]);0<a.preInit.length;)a.preInit.pop()();var Tc=!0;a.noInitialRun&&(Tc=!1);Sc();
+    var a;
+    a || (a = typeof Module !== "undefined" ? Module : {});
+    var aa, ba;
+    a.ready = new Promise(function (b, c) {
+      aa = b;
+      ba = c;
+    });
+    var ca = Object.assign({}, a),
+      da = "./this.program",
+      fa = (b, c) => {
+        throw c;
+      },
+      ha = "object" == typeof window,
+      ia = "function" == typeof importScripts,
+      m = "",
+      ja;
+    if (ha || ia)
+      ia
+        ? (m = self.location.href)
+        : "undefined" != typeof document &&
+          document.currentScript &&
+          (m = document.currentScript.src),
+        _scriptDir && (m = _scriptDir),
+        0 !== m.indexOf("blob:")
+          ? (m = m.substr(0, m.replace(/[?#].*/, "").lastIndexOf("/") + 1))
+          : (m = ""),
+        ia &&
+          (ja = (b) => {
+            var c = new XMLHttpRequest();
+            c.open("GET", b, !1);
+            c.responseType = "arraybuffer";
+            c.send(null);
+            return new Uint8Array(c.response);
+          });
+    var ka = a.print || console.log.bind(console),
+      t = a.printErr || console.warn.bind(console);
+    Object.assign(a, ca);
+    ca = null;
+    a.thisProgram && (da = a.thisProgram);
+    a.quit && (fa = a.quit);
+    var la;
+    a.wasmBinary && (la = a.wasmBinary);
+    var noExitRuntime = a.noExitRuntime || !0;
+    "object" != typeof WebAssembly && u("no native wasm support detected");
+    var ma,
+      na = !1,
+      oa = "undefined" != typeof TextDecoder ? new TextDecoder("utf8") : void 0;
+    function pa(b, c, d) {
+      var e = c + d;
+      for (d = c; b[d] && !(d >= e); ) ++d;
+      if (16 < d - c && b.buffer && oa) return oa.decode(b.subarray(c, d));
+      for (e = ""; c < d; ) {
+        var f = b[c++];
+        if (f & 128) {
+          var g = b[c++] & 63;
+          if (192 == (f & 224)) e += String.fromCharCode(((f & 31) << 6) | g);
+          else {
+            var h = b[c++] & 63;
+            f =
+              224 == (f & 240)
+                ? ((f & 15) << 12) | (g << 6) | h
+                : ((f & 7) << 18) | (g << 12) | (h << 6) | (b[c++] & 63);
+            65536 > f
+              ? (e += String.fromCharCode(f))
+              : ((f -= 65536),
+                (e += String.fromCharCode(
+                  55296 | (f >> 10),
+                  56320 | (f & 1023)
+                )));
+          }
+        } else e += String.fromCharCode(f);
+      }
+      return e;
+    }
+    function v(b, c) {
+      return b ? pa(x, b, c) : "";
+    }
+    function qa(b, c, d, e) {
+      if (!(0 < e)) return 0;
+      var f = d;
+      e = d + e - 1;
+      for (var g = 0; g < b.length; ++g) {
+        var h = b.charCodeAt(g);
+        if (55296 <= h && 57343 >= h) {
+          var p = b.charCodeAt(++g);
+          h = (65536 + ((h & 1023) << 10)) | (p & 1023);
+        }
+        if (127 >= h) {
+          if (d >= e) break;
+          c[d++] = h;
+        } else {
+          if (2047 >= h) {
+            if (d + 1 >= e) break;
+            c[d++] = 192 | (h >> 6);
+          } else {
+            if (65535 >= h) {
+              if (d + 2 >= e) break;
+              c[d++] = 224 | (h >> 12);
+            } else {
+              if (d + 3 >= e) break;
+              c[d++] = 240 | (h >> 18);
+              c[d++] = 128 | ((h >> 12) & 63);
+            }
+            c[d++] = 128 | ((h >> 6) & 63);
+          }
+          c[d++] = 128 | (h & 63);
+        }
+      }
+      c[d] = 0;
+      return d - f;
+    }
+    function ra(b, c, d) {
+      return qa(b, x, c, d);
+    }
+    function sa(b) {
+      for (var c = 0, d = 0; d < b.length; ++d) {
+        var e = b.charCodeAt(d);
+        127 >= e
+          ? c++
+          : 2047 >= e
+          ? (c += 2)
+          : 55296 <= e && 57343 >= e
+          ? ((c += 4), ++d)
+          : (c += 3);
+      }
+      return c;
+    }
+    var y, x, A, ta, B, C, ua, va;
+    function wa() {
+      var b = ma.buffer;
+      a.HEAP8 = y = new Int8Array(b);
+      a.HEAP16 = A = new Int16Array(b);
+      a.HEAP32 = B = new Int32Array(b);
+      a.HEAPU8 = x = new Uint8Array(b);
+      a.HEAPU16 = ta = new Uint16Array(b);
+      a.HEAPU32 = C = new Uint32Array(b);
+      a.HEAPF32 = ua = new Float32Array(b);
+      a.HEAPF64 = va = new Float64Array(b);
+    }
+    var E,
+      xa = [],
+      ya = [],
+      za = [],
+      Aa = [];
+    function Ba() {
+      var b = a.preRun.shift();
+      xa.unshift(b);
+    }
+    var F = 0,
+      Ca = null,
+      Da = null;
+    function u(b) {
+      if (a.onAbort) a.onAbort(b);
+      b = "Aborted(" + b + ")";
+      t(b);
+      na = !0;
+      b = new WebAssembly.RuntimeError(
+        b + ". Build with -sASSERTIONS for more info."
+      );
+      ba(b);
+      throw b;
+    }
+    function Ea() {
+      return I.startsWith("data:application/octet-stream;base64,");
+    }
+    var I;
+    if (a.locateFile) {
+      if (((I = "wa-sqlite.wasm"), !Ea())) {
+        var Fa = I;
+        I = a.locateFile ? a.locateFile(Fa, m) : m + Fa;
+      }
+    } else I = new URL("wa-sqlite.wasm", import.meta.url).href;
+    function Ga() {
+      var b = I;
+      try {
+        if (b == I && la) return new Uint8Array(la);
+        if (ja) return ja(b);
+        throw "both async and sync fetching of the wasm failed";
+      } catch (c) {
+        u(c);
+      }
+    }
+    function Ha() {
+      return la || (!ha && !ia) || "function" != typeof fetch
+        ? Promise.resolve().then(function () {
+            return Ga();
+          })
+        : fetch(I, { credentials: "same-origin" })
+            .then(function (b) {
+              if (!b.ok) throw "failed to load wasm binary file at '" + I + "'";
+              return b.arrayBuffer();
+            })
+            .catch(function () {
+              return Ga();
+            });
+    }
+    var K, L;
+    function Ia(b) {
+      this.name = "ExitStatus";
+      this.message = "Program terminated with exit(" + b + ")";
+      this.status = b;
+    }
+    function Ja(b) {
+      for (; 0 < b.length; ) b.shift()(a);
+    }
+    function M(b, c = "i8") {
+      c.endsWith("*") && (c = "*");
+      switch (c) {
+        case "i1":
+          return y[b >> 0];
+        case "i8":
+          return y[b >> 0];
+        case "i16":
+          return A[b >> 1];
+        case "i32":
+          return B[b >> 2];
+        case "i64":
+          return B[b >> 2];
+        case "float":
+          return ua[b >> 2];
+        case "double":
+          return va[b >> 3];
+        case "*":
+          return C[b >> 2];
+        default:
+          u("invalid type for getValue: " + c);
+      }
+      return null;
+    }
+    function N(b, c, d = "i8") {
+      d.endsWith("*") && (d = "*");
+      switch (d) {
+        case "i1":
+          y[b >> 0] = c;
+          break;
+        case "i8":
+          y[b >> 0] = c;
+          break;
+        case "i16":
+          A[b >> 1] = c;
+          break;
+        case "i32":
+          B[b >> 2] = c;
+          break;
+        case "i64":
+          L = [
+            c >>> 0,
+            ((K = c),
+            1 <= +Math.abs(K)
+              ? 0 < K
+                ? (Math.min(+Math.floor(K / 4294967296), 4294967295) | 0) >>> 0
+                : ~~+Math.ceil((K - +(~~K >>> 0)) / 4294967296) >>> 0
+              : 0)
+          ];
+          B[b >> 2] = L[0];
+          B[(b + 4) >> 2] = L[1];
+          break;
+        case "float":
+          ua[b >> 2] = c;
+          break;
+        case "double":
+          va[b >> 3] = c;
+          break;
+        case "*":
+          C[b >> 2] = c;
+          break;
+        default:
+          u("invalid type for setValue: " + d);
+      }
+    }
+    var Ka = (b, c) => {
+        for (var d = 0, e = b.length - 1; 0 <= e; e--) {
+          var f = b[e];
+          "." === f
+            ? b.splice(e, 1)
+            : ".." === f
+            ? (b.splice(e, 1), d++)
+            : d && (b.splice(e, 1), d--);
+        }
+        if (c) for (; d; d--) b.unshift("..");
+        return b;
+      },
+      O = (b) => {
+        var c = "/" === b.charAt(0),
+          d = "/" === b.substr(-1);
+        (b = Ka(
+          b.split("/").filter((e) => !!e),
+          !c
+        ).join("/")) ||
+          c ||
+          (b = ".");
+        b && d && (b += "/");
+        return (c ? "/" : "") + b;
+      },
+      La = (b) => {
+        var c = /^(\/?|)([\s\S]*?)((?:\.{1,2}|[^\/]+?|)(\.[^.\/]*|))(?:[\/]*)$/
+          .exec(b)
+          .slice(1);
+        b = c[0];
+        c = c[1];
+        if (!b && !c) return ".";
+        c && (c = c.substr(0, c.length - 1));
+        return b + c;
+      },
+      Ma = (b) => {
+        if ("/" === b) return "/";
+        b = O(b);
+        b = b.replace(/\/$/, "");
+        var c = b.lastIndexOf("/");
+        return -1 === c ? b : b.substr(c + 1);
+      };
+    function Na() {
+      if (
+        "object" == typeof crypto &&
+        "function" == typeof crypto.getRandomValues
+      ) {
+        var b = new Uint8Array(1);
+        return () => {
+          crypto.getRandomValues(b);
+          return b[0];
+        };
+      }
+      return () => u("randomDevice");
+    }
+    function Oa() {
+      for (var b = "", c = !1, d = arguments.length - 1; -1 <= d && !c; d--) {
+        c = 0 <= d ? arguments[d] : "/";
+        if ("string" != typeof c)
+          throw new TypeError("Arguments to path.resolve must be strings");
+        if (!c) return "";
+        b = c + "/" + b;
+        c = "/" === c.charAt(0);
+      }
+      b = Ka(
+        b.split("/").filter((e) => !!e),
+        !c
+      ).join("/");
+      return (c ? "/" : "") + b || ".";
+    }
+    function Pa(b, c, d) {
+      d = Array(0 < d ? d : sa(b) + 1);
+      b = qa(b, d, 0, d.length);
+      c && (d.length = b);
+      return d;
+    }
+    var Qa = [];
+    function Ra(b, c) {
+      Qa[b] = { input: [], Of: [], $f: c };
+      Sa(b, Ta);
+    }
+    var Ta = {
+        open: function (b) {
+          var c = Qa[b.node.cg];
+          if (!c) throw new P(43);
+          b.Pf = c;
+          b.seekable = !1;
+        },
+        close: function (b) {
+          b.Pf.$f.Xf(b.Pf);
+        },
+        Xf: function (b) {
+          b.Pf.$f.Xf(b.Pf);
+        },
+        read: function (b, c, d, e) {
+          if (!b.Pf || !b.Pf.$f.ug) throw new P(60);
+          for (var f = 0, g = 0; g < e; g++) {
+            try {
+              var h = b.Pf.$f.ug(b.Pf);
+            } catch (p) {
+              throw new P(29);
+            }
+            if (void 0 === h && 0 === f) throw new P(6);
+            if (null === h || void 0 === h) break;
+            f++;
+            c[d + g] = h;
+          }
+          f && (b.node.timestamp = Date.now());
+          return f;
+        },
+        write: function (b, c, d, e) {
+          if (!b.Pf || !b.Pf.$f.ng) throw new P(60);
+          try {
+            for (var f = 0; f < e; f++) b.Pf.$f.ng(b.Pf, c[d + f]);
+          } catch (g) {
+            throw new P(29);
+          }
+          e && (b.node.timestamp = Date.now());
+          return f;
+        }
+      },
+      Ua = {
+        ug: function (b) {
+          if (!b.input.length) {
+            var c = null;
+            "undefined" != typeof window && "function" == typeof window.prompt
+              ? ((c = window.prompt("Input: ")), null !== c && (c += "\n"))
+              : "function" == typeof readline &&
+                ((c = readline()), null !== c && (c += "\n"));
+            if (!c) return null;
+            b.input = Pa(c, !0);
+          }
+          return b.input.shift();
+        },
+        ng: function (b, c) {
+          null === c || 10 === c
+            ? (ka(pa(b.Of, 0)), (b.Of = []))
+            : 0 != c && b.Of.push(c);
+        },
+        Xf: function (b) {
+          b.Of && 0 < b.Of.length && (ka(pa(b.Of, 0)), (b.Of = []));
+        }
+      },
+      Va = {
+        ng: function (b, c) {
+          null === c || 10 === c
+            ? (t(pa(b.Of, 0)), (b.Of = []))
+            : 0 != c && b.Of.push(c);
+        },
+        Xf: function (b) {
+          b.Of && 0 < b.Of.length && (t(pa(b.Of, 0)), (b.Of = []));
+        }
+      },
+      Q = {
+        Rf: null,
+        Sf: function () {
+          return Q.createNode(null, "/", 16895, 0);
+        },
+        createNode: function (b, c, d, e) {
+          if (24576 === (d & 61440) || 4096 === (d & 61440)) throw new P(63);
+          Q.Rf ||
+            (Q.Rf = {
+              dir: {
+                node: {
+                  Qf: Q.If.Qf,
+                  Nf: Q.If.Nf,
+                  ag: Q.If.ag,
+                  fg: Q.If.fg,
+                  zg: Q.If.zg,
+                  kg: Q.If.kg,
+                  ig: Q.If.ig,
+                  yg: Q.If.yg,
+                  jg: Q.If.jg
+                },
+                stream: { Wf: Q.Jf.Wf }
+              },
+              file: {
+                node: { Qf: Q.If.Qf, Nf: Q.If.Nf },
+                stream: {
+                  Wf: Q.Jf.Wf,
+                  read: Q.Jf.read,
+                  write: Q.Jf.write,
+                  qg: Q.Jf.qg,
+                  gg: Q.Jf.gg,
+                  hg: Q.Jf.hg
+                }
+              },
+              link: {
+                node: { Qf: Q.If.Qf, Nf: Q.If.Nf, dg: Q.If.dg },
+                stream: {}
+              },
+              rg: { node: { Qf: Q.If.Qf, Nf: Q.If.Nf }, stream: Wa }
+            });
+          d = Xa(b, c, d, e);
+          16384 === (d.mode & 61440)
+            ? ((d.If = Q.Rf.dir.node), (d.Jf = Q.Rf.dir.stream), (d.Kf = {}))
+            : 32768 === (d.mode & 61440)
+            ? ((d.If = Q.Rf.file.node),
+              (d.Jf = Q.Rf.file.stream),
+              (d.Mf = 0),
+              (d.Kf = null))
+            : 40960 === (d.mode & 61440)
+            ? ((d.If = Q.Rf.link.node), (d.Jf = Q.Rf.link.stream))
+            : 8192 === (d.mode & 61440) &&
+              ((d.If = Q.Rf.rg.node), (d.Jf = Q.Rf.rg.stream));
+          d.timestamp = Date.now();
+          b && ((b.Kf[c] = d), (b.timestamp = d.timestamp));
+          return d;
+        },
+        Pg: function (b) {
+          return b.Kf
+            ? b.Kf.subarray
+              ? b.Kf.subarray(0, b.Mf)
+              : new Uint8Array(b.Kf)
+            : new Uint8Array(0);
+        },
+        sg: function (b, c) {
+          var d = b.Kf ? b.Kf.length : 0;
+          d >= c ||
+            ((c = Math.max(c, (d * (1048576 > d ? 2 : 1.125)) >>> 0)),
+            0 != d && (c = Math.max(c, 256)),
+            (d = b.Kf),
+            (b.Kf = new Uint8Array(c)),
+            0 < b.Mf && b.Kf.set(d.subarray(0, b.Mf), 0));
+        },
+        Mg: function (b, c) {
+          if (b.Mf != c)
+            if (0 == c) (b.Kf = null), (b.Mf = 0);
+            else {
+              var d = b.Kf;
+              b.Kf = new Uint8Array(c);
+              d && b.Kf.set(d.subarray(0, Math.min(c, b.Mf)));
+              b.Mf = c;
+            }
+        },
+        If: {
+          Qf: function (b) {
+            var c = {};
+            c.Fg = 8192 === (b.mode & 61440) ? b.id : 1;
+            c.mg = b.id;
+            c.mode = b.mode;
+            c.Kg = 1;
+            c.uid = 0;
+            c.Hg = 0;
+            c.cg = b.cg;
+            16384 === (b.mode & 61440)
+              ? (c.size = 4096)
+              : 32768 === (b.mode & 61440)
+              ? (c.size = b.Mf)
+              : 40960 === (b.mode & 61440)
+              ? (c.size = b.link.length)
+              : (c.size = 0);
+            c.Bg = new Date(b.timestamp);
+            c.Jg = new Date(b.timestamp);
+            c.Eg = new Date(b.timestamp);
+            c.Cg = 4096;
+            c.Dg = Math.ceil(c.size / c.Cg);
+            return c;
+          },
+          Nf: function (b, c) {
+            void 0 !== c.mode && (b.mode = c.mode);
+            void 0 !== c.timestamp && (b.timestamp = c.timestamp);
+            void 0 !== c.size && Q.Mg(b, c.size);
+          },
+          ag: function () {
+            throw Ya[44];
+          },
+          fg: function (b, c, d, e) {
+            return Q.createNode(b, c, d, e);
+          },
+          zg: function (b, c, d) {
+            if (16384 === (b.mode & 61440)) {
+              try {
+                var e = R(c, d);
+              } catch (g) {}
+              if (e) for (var f in e.Kf) throw new P(55);
+            }
+            delete b.parent.Kf[b.name];
+            b.parent.timestamp = Date.now();
+            b.name = d;
+            c.Kf[d] = b;
+            c.timestamp = b.parent.timestamp;
+            b.parent = c;
+          },
+          kg: function (b, c) {
+            delete b.Kf[c];
+            b.timestamp = Date.now();
+          },
+          ig: function (b, c) {
+            var d = R(b, c),
+              e;
+            for (e in d.Kf) throw new P(55);
+            delete b.Kf[c];
+            b.timestamp = Date.now();
+          },
+          yg: function (b) {
+            var c = [".", ".."],
+              d;
+            for (d in b.Kf) b.Kf.hasOwnProperty(d) && c.push(d);
+            return c;
+          },
+          jg: function (b, c, d) {
+            b = Q.createNode(b, c, 41471, 0);
+            b.link = d;
+            return b;
+          },
+          dg: function (b) {
+            if (40960 !== (b.mode & 61440)) throw new P(28);
+            return b.link;
+          }
+        },
+        Jf: {
+          read: function (b, c, d, e, f) {
+            var g = b.node.Kf;
+            if (f >= b.node.Mf) return 0;
+            b = Math.min(b.node.Mf - f, e);
+            if (8 < b && g.subarray) c.set(g.subarray(f, f + b), d);
+            else for (e = 0; e < b; e++) c[d + e] = g[f + e];
+            return b;
+          },
+          write: function (b, c, d, e, f, g) {
+            c.buffer === y.buffer && (g = !1);
+            if (!e) return 0;
+            b = b.node;
+            b.timestamp = Date.now();
+            if (c.subarray && (!b.Kf || b.Kf.subarray)) {
+              if (g) return (b.Kf = c.subarray(d, d + e)), (b.Mf = e);
+              if (0 === b.Mf && 0 === f)
+                return (b.Kf = c.slice(d, d + e)), (b.Mf = e);
+              if (f + e <= b.Mf) return b.Kf.set(c.subarray(d, d + e), f), e;
+            }
+            Q.sg(b, f + e);
+            if (b.Kf.subarray && c.subarray) b.Kf.set(c.subarray(d, d + e), f);
+            else for (g = 0; g < e; g++) b.Kf[f + g] = c[d + g];
+            b.Mf = Math.max(b.Mf, f + e);
+            return e;
+          },
+          Wf: function (b, c, d) {
+            1 === d
+              ? (c += b.position)
+              : 2 === d && 32768 === (b.node.mode & 61440) && (c += b.node.Mf);
+            if (0 > c) throw new P(28);
+            return c;
+          },
+          qg: function (b, c, d) {
+            Q.sg(b.node, c + d);
+            b.node.Mf = Math.max(b.node.Mf, c + d);
+          },
+          gg: function (b, c, d, e, f) {
+            if (32768 !== (b.node.mode & 61440)) throw new P(43);
+            b = b.node.Kf;
+            if (f & 2 || b.buffer !== y.buffer) {
+              if (0 < d || d + c < b.length)
+                b.subarray
+                  ? (b = b.subarray(d, d + c))
+                  : (b = Array.prototype.slice.call(b, d, d + c));
+              d = !0;
+              c = 65536 * Math.ceil(c / 65536);
+              (f = Za(65536, c)) ? (x.fill(0, f, f + c), (c = f)) : (c = 0);
+              if (!c) throw new P(48);
+              y.set(b, c);
+            } else (d = !1), (c = b.byteOffset);
+            return { Lg: c, Ag: d };
+          },
+          hg: function (b, c, d, e) {
+            Q.Jf.write(b, c, 0, e, d, !1);
+            return 0;
+          }
+        }
+      },
+      $a = null,
+      ab = {},
+      S = [],
+      bb = 1,
+      T = null,
+      cb = !0,
+      P = null,
+      Ya = {},
+      V = (b, c = {}) => {
+        b = Oa(b);
+        if (!b) return { path: "", node: null };
+        c = Object.assign({ tg: !0, og: 0 }, c);
+        if (8 < c.og) throw new P(32);
+        b = b.split("/").filter((h) => !!h);
+        for (var d = $a, e = "/", f = 0; f < b.length; f++) {
+          var g = f === b.length - 1;
+          if (g && c.parent) break;
+          d = R(d, b[f]);
+          e = O(e + "/" + b[f]);
+          d.Yf && (!g || (g && c.tg)) && (d = d.Yf.root);
+          if (!g || c.Vf)
+            for (g = 0; 40960 === (d.mode & 61440); )
+              if (
+                ((d = db(e)),
+                (e = Oa(La(e), d)),
+                (d = V(e, { og: c.og + 1 }).node),
+                40 < g++)
+              )
+                throw new P(32);
+        }
+        return { path: e, node: d };
+      },
+      eb = (b) => {
+        for (var c; ; ) {
+          if (b === b.parent)
+            return (
+              (b = b.Sf.wg),
+              c ? ("/" !== b[b.length - 1] ? b + "/" + c : b + c) : b
+            );
+          c = c ? b.name + "/" + c : b.name;
+          b = b.parent;
+        }
+      },
+      fb = (b, c) => {
+        for (var d = 0, e = 0; e < c.length; e++)
+          d = ((d << 5) - d + c.charCodeAt(e)) | 0;
+        return ((b + d) >>> 0) % T.length;
+      },
+      gb = (b) => {
+        var c = fb(b.parent.id, b.name);
+        if (T[c] === b) T[c] = b.Zf;
+        else
+          for (c = T[c]; c; ) {
+            if (c.Zf === b) {
+              c.Zf = b.Zf;
+              break;
+            }
+            c = c.Zf;
+          }
+      },
+      R = (b, c) => {
+        var d;
+        if ((d = (d = hb(b, "x")) ? d : b.If.ag ? 0 : 2)) throw new P(d, b);
+        for (d = T[fb(b.id, c)]; d; d = d.Zf) {
+          var e = d.name;
+          if (d.parent.id === b.id && e === c) return d;
+        }
+        return b.If.ag(b, c);
+      },
+      Xa = (b, c, d, e) => {
+        b = new ib(b, c, d, e);
+        c = fb(b.parent.id, b.name);
+        b.Zf = T[c];
+        return (T[c] = b);
+      },
+      jb = { r: 0, "r+": 2, w: 577, "w+": 578, a: 1089, "a+": 1090 },
+      kb = (b) => {
+        var c = ["r", "w", "rw"][b & 3];
+        b & 512 && (c += "w");
+        return c;
+      },
+      hb = (b, c) => {
+        if (cb) return 0;
+        if (!c.includes("r") || b.mode & 292) {
+          if (
+            (c.includes("w") && !(b.mode & 146)) ||
+            (c.includes("x") && !(b.mode & 73))
+          )
+            return 2;
+        } else return 2;
+        return 0;
+      },
+      lb = (b, c) => {
+        try {
+          return R(b, c), 20;
+        } catch (d) {}
+        return hb(b, "wx");
+      },
+      mb = (b, c, d) => {
+        try {
+          var e = R(b, c);
+        } catch (f) {
+          return f.Lf;
+        }
+        if ((b = hb(b, "wx"))) return b;
+        if (d) {
+          if (16384 !== (e.mode & 61440)) return 54;
+          if (e === e.parent || "/" === eb(e)) return 10;
+        } else if (16384 === (e.mode & 61440)) return 31;
+        return 0;
+      },
+      nb = (b = 0) => {
+        for (; 4096 >= b; b++) if (!S[b]) return b;
+        throw new P(33);
+      },
+      pb = (b, c) => {
+        ob ||
+          ((ob = function () {
+            this.eg = {};
+          }),
+          (ob.prototype = {}),
+          Object.defineProperties(ob.prototype, {
+            object: {
+              get: function () {
+                return this.node;
+              },
+              set: function (d) {
+                this.node = d;
+              }
+            },
+            flags: {
+              get: function () {
+                return this.eg.flags;
+              },
+              set: function (d) {
+                this.eg.flags = d;
+              }
+            },
+            position: {
+              get: function () {
+                return this.eg.position;
+              },
+              set: function (d) {
+                this.eg.position = d;
+              }
+            }
+          }));
+        b = Object.assign(new ob(), b);
+        c = nb(c);
+        b.Tf = c;
+        return (S[c] = b);
+      },
+      Wa = {
+        open: (b) => {
+          b.Jf = ab[b.node.cg].Jf;
+          b.Jf.open && b.Jf.open(b);
+        },
+        Wf: () => {
+          throw new P(70);
+        }
+      },
+      Sa = (b, c) => {
+        ab[b] = { Jf: c };
+      },
+      qb = (b, c) => {
+        var d = "/" === c,
+          e = !c;
+        if (d && $a) throw new P(10);
+        if (!d && !e) {
+          var f = V(c, { tg: !1 });
+          c = f.path;
+          f = f.node;
+          if (f.Yf) throw new P(10);
+          if (16384 !== (f.mode & 61440)) throw new P(54);
+        }
+        c = { type: b, Qg: {}, wg: c, Ig: [] };
+        b = b.Sf(c);
+        b.Sf = c;
+        c.root = b;
+        d ? ($a = b) : f && ((f.Yf = c), f.Sf && f.Sf.Ig.push(c));
+      },
+      rb = (b, c, d) => {
+        var e = V(b, { parent: !0 }).node;
+        b = Ma(b);
+        if (!b || "." === b || ".." === b) throw new P(28);
+        var f = lb(e, b);
+        if (f) throw new P(f);
+        if (!e.If.fg) throw new P(63);
+        return e.If.fg(e, b, c, d);
+      },
+      W = (b, c) => rb(b, ((void 0 !== c ? c : 511) & 1023) | 16384, 0),
+      sb = (b, c, d) => {
+        "undefined" == typeof d && ((d = c), (c = 438));
+        rb(b, c | 8192, d);
+      },
+      tb = (b, c) => {
+        if (!Oa(b)) throw new P(44);
+        var d = V(c, { parent: !0 }).node;
+        if (!d) throw new P(44);
+        c = Ma(c);
+        var e = lb(d, c);
+        if (e) throw new P(e);
+        if (!d.If.jg) throw new P(63);
+        d.If.jg(d, c, b);
+      },
+      ub = (b) => {
+        var c = V(b, { parent: !0 }).node;
+        b = Ma(b);
+        var d = R(c, b),
+          e = mb(c, b, !0);
+        if (e) throw new P(e);
+        if (!c.If.ig) throw new P(63);
+        if (d.Yf) throw new P(10);
+        c.If.ig(c, b);
+        gb(d);
+      },
+      db = (b) => {
+        b = V(b).node;
+        if (!b) throw new P(44);
+        if (!b.If.dg) throw new P(28);
+        return Oa(eb(b.parent), b.If.dg(b));
+      },
+      vb = (b, c) => {
+        b = V(b, { Vf: !c }).node;
+        if (!b) throw new P(44);
+        if (!b.If.Qf) throw new P(63);
+        return b.If.Qf(b);
+      },
+      wb = (b) => vb(b, !0),
+      xb = (b, c) => {
+        b = "string" == typeof b ? V(b, { Vf: !0 }).node : b;
+        if (!b.If.Nf) throw new P(63);
+        b.If.Nf(b, {
+          mode: (c & 4095) | (b.mode & -4096),
+          timestamp: Date.now()
+        });
+      },
+      yb = (b, c) => {
+        if (0 > c) throw new P(28);
+        b = "string" == typeof b ? V(b, { Vf: !0 }).node : b;
+        if (!b.If.Nf) throw new P(63);
+        if (16384 === (b.mode & 61440)) throw new P(31);
+        if (32768 !== (b.mode & 61440)) throw new P(28);
+        var d = hb(b, "w");
+        if (d) throw new P(d);
+        b.If.Nf(b, { size: c, timestamp: Date.now() });
+      },
+      Ab = (b, c, d) => {
+        if ("" === b) throw new P(44);
+        if ("string" == typeof c) {
+          var e = jb[c];
+          if ("undefined" == typeof e)
+            throw Error("Unknown file open mode: " + c);
+          c = e;
+        }
+        d = c & 64 ? (("undefined" == typeof d ? 438 : d) & 4095) | 32768 : 0;
+        if ("object" == typeof b) var f = b;
+        else {
+          b = O(b);
+          try {
+            f = V(b, { Vf: !(c & 131072) }).node;
+          } catch (g) {}
+        }
+        e = !1;
+        if (c & 64)
+          if (f) {
+            if (c & 128) throw new P(20);
+          } else (f = rb(b, d, 0)), (e = !0);
+        if (!f) throw new P(44);
+        8192 === (f.mode & 61440) && (c &= -513);
+        if (c & 65536 && 16384 !== (f.mode & 61440)) throw new P(54);
+        if (
+          !e &&
+          (d = f
+            ? 40960 === (f.mode & 61440)
+              ? 32
+              : 16384 === (f.mode & 61440) && ("r" !== kb(c) || c & 512)
+              ? 31
+              : hb(f, kb(c))
+            : 44)
+        )
+          throw new P(d);
+        c & 512 && !e && yb(f, 0);
+        c &= -131713;
+        f = pb({
+          node: f,
+          path: eb(f),
+          flags: c,
+          seekable: !0,
+          position: 0,
+          Jf: f.Jf,
+          Og: [],
+          error: !1
+        });
+        f.Jf.open && f.Jf.open(f);
+        !a.logReadFiles || c & 1 || (zb || (zb = {}), b in zb || (zb[b] = 1));
+        return f;
+      },
+      Bb = (b, c, d) => {
+        if (null === b.Tf) throw new P(8);
+        if (!b.seekable || !b.Jf.Wf) throw new P(70);
+        if (0 != d && 1 != d && 2 != d) throw new P(28);
+        b.position = b.Jf.Wf(b, c, d);
+        b.Og = [];
+      },
+      Cb = () => {
+        P ||
+          ((P = function (b, c) {
+            this.node = c;
+            this.Ng = function (d) {
+              this.Lf = d;
+            };
+            this.Ng(b);
+            this.message = "FS error";
+          }),
+          (P.prototype = Error()),
+          (P.prototype.constructor = P),
+          [44].forEach((b) => {
+            Ya[b] = new P(b);
+            Ya[b].stack = "<generic error, no stack>";
+          }));
+      },
+      Db,
+      Eb = (b, c) => {
+        var d = 0;
+        b && (d |= 365);
+        c && (d |= 146);
+        return d;
+      },
+      Gb = (b, c, d) => {
+        b = O("/dev/" + b);
+        var e = Eb(!!c, !!d);
+        Fb || (Fb = 64);
+        var f = (Fb++ << 8) | 0;
+        Sa(f, {
+          open: (g) => {
+            g.seekable = !1;
+          },
+          close: () => {
+            d && d.buffer && d.buffer.length && d(10);
+          },
+          read: (g, h, p, l) => {
+            for (var k = 0, n = 0; n < l; n++) {
+              try {
+                var q = c();
+              } catch (r) {
+                throw new P(29);
+              }
+              if (void 0 === q && 0 === k) throw new P(6);
+              if (null === q || void 0 === q) break;
+              k++;
+              h[p + n] = q;
+            }
+            k && (g.node.timestamp = Date.now());
+            return k;
+          },
+          write: (g, h, p, l) => {
+            for (var k = 0; k < l; k++)
+              try {
+                d(h[p + k]);
+              } catch (n) {
+                throw new P(29);
+              }
+            l && (g.node.timestamp = Date.now());
+            return k;
+          }
+        });
+        sb(b, e, f);
+      },
+      Fb,
+      X = {},
+      ob,
+      zb;
+    function Hb(b, c, d) {
+      if ("/" === c.charAt(0)) return c;
+      b = -100 === b ? "/" : Y(b).path;
+      if (0 == c.length) {
+        if (!d) throw new P(44);
+        return b;
+      }
+      return O(b + "/" + c);
+    }
+    function Ib(b, c, d) {
+      try {
+        var e = b(c);
+      } catch (g) {
+        if (g && g.node && O(c) !== O(eb(g.node))) return -54;
+        throw g;
+      }
+      B[d >> 2] = e.Fg;
+      B[(d + 8) >> 2] = e.mg;
+      B[(d + 12) >> 2] = e.mode;
+      C[(d + 16) >> 2] = e.Kg;
+      B[(d + 20) >> 2] = e.uid;
+      B[(d + 24) >> 2] = e.Hg;
+      B[(d + 28) >> 2] = e.cg;
+      L = [
+        e.size >>> 0,
+        ((K = e.size),
+        1 <= +Math.abs(K)
+          ? 0 < K
+            ? (Math.min(+Math.floor(K / 4294967296), 4294967295) | 0) >>> 0
+            : ~~+Math.ceil((K - +(~~K >>> 0)) / 4294967296) >>> 0
+          : 0)
+      ];
+      B[(d + 40) >> 2] = L[0];
+      B[(d + 44) >> 2] = L[1];
+      B[(d + 48) >> 2] = 4096;
+      B[(d + 52) >> 2] = e.Dg;
+      b = e.Bg.getTime();
+      c = e.Jg.getTime();
+      var f = e.Eg.getTime();
+      L = [
+        Math.floor(b / 1e3) >>> 0,
+        ((K = Math.floor(b / 1e3)),
+        1 <= +Math.abs(K)
+          ? 0 < K
+            ? (Math.min(+Math.floor(K / 4294967296), 4294967295) | 0) >>> 0
+            : ~~+Math.ceil((K - +(~~K >>> 0)) / 4294967296) >>> 0
+          : 0)
+      ];
+      B[(d + 56) >> 2] = L[0];
+      B[(d + 60) >> 2] = L[1];
+      C[(d + 64) >> 2] = (b % 1e3) * 1e3;
+      L = [
+        Math.floor(c / 1e3) >>> 0,
+        ((K = Math.floor(c / 1e3)),
+        1 <= +Math.abs(K)
+          ? 0 < K
+            ? (Math.min(+Math.floor(K / 4294967296), 4294967295) | 0) >>> 0
+            : ~~+Math.ceil((K - +(~~K >>> 0)) / 4294967296) >>> 0
+          : 0)
+      ];
+      B[(d + 72) >> 2] = L[0];
+      B[(d + 76) >> 2] = L[1];
+      C[(d + 80) >> 2] = (c % 1e3) * 1e3;
+      L = [
+        Math.floor(f / 1e3) >>> 0,
+        ((K = Math.floor(f / 1e3)),
+        1 <= +Math.abs(K)
+          ? 0 < K
+            ? (Math.min(+Math.floor(K / 4294967296), 4294967295) | 0) >>> 0
+            : ~~+Math.ceil((K - +(~~K >>> 0)) / 4294967296) >>> 0
+          : 0)
+      ];
+      B[(d + 88) >> 2] = L[0];
+      B[(d + 92) >> 2] = L[1];
+      C[(d + 96) >> 2] = (f % 1e3) * 1e3;
+      L = [
+        e.mg >>> 0,
+        ((K = e.mg),
+        1 <= +Math.abs(K)
+          ? 0 < K
+            ? (Math.min(+Math.floor(K / 4294967296), 4294967295) | 0) >>> 0
+            : ~~+Math.ceil((K - +(~~K >>> 0)) / 4294967296) >>> 0
+          : 0)
+      ];
+      B[(d + 104) >> 2] = L[0];
+      B[(d + 108) >> 2] = L[1];
+      return 0;
+    }
+    var Jb = void 0;
+    function Kb() {
+      Jb += 4;
+      return B[(Jb - 4) >> 2];
+    }
+    function Y(b) {
+      b = S[b];
+      if (!b) throw new P(8);
+      return b;
+    }
+    function Lb(b) {
+      return C[b >> 2] + 4294967296 * B[(b + 4) >> 2];
+    }
+    var Mb = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335],
+      Nb = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+    function Ob(b) {
+      var c = sa(b) + 1,
+        d = Pb(c);
+      d && qa(b, y, d, c);
+      return d;
+    }
+    var Qb = {};
+    function Rb() {
+      if (!Sb) {
+        var b = {
+            USER: "web_user",
+            LOGNAME: "web_user",
+            PATH: "/",
+            PWD: "/",
+            HOME: "/home/web_user",
+            LANG:
+              (
+                ("object" == typeof navigator &&
+                  navigator.languages &&
+                  navigator.languages[0]) ||
+                "C"
+              ).replace("-", "_") + ".UTF-8",
+            _: da || "./this.program"
+          },
+          c;
+        for (c in Qb) void 0 === Qb[c] ? delete b[c] : (b[c] = Qb[c]);
+        var d = [];
+        for (c in b) d.push(c + "=" + b[c]);
+        Sb = d;
+      }
+      return Sb;
+    }
+    var Sb;
+    function Tb(b, c) {
+      Tb.xg || (Tb.xg = Na());
+      for (var d = 0; d < c; d++) y[(b + d) >> 0] = Tb.xg();
+      return 0;
+    }
+    function Ub() {}
+    function Vb() {}
+    function Wb() {}
+    function Xb() {}
+    function Yb() {}
+    function Zb() {}
+    function $b() {}
+    function ac() {}
+    function bc() {}
+    function cc() {}
+    function dc() {}
+    function ec() {}
+    function fc() {}
+    function gc() {}
+    function hc() {}
+    function ic() {}
+    function jc() {}
+    function kc() {}
+    function lc() {}
+    function mc() {}
+    function nc() {}
+    function oc() {}
+    function pc() {}
+    function qc() {}
+    function rc() {}
+    function sc() {}
+    function tc() {}
+    function uc() {}
+    function vc() {}
+    function wc() {}
+    function xc() {}
+    function yc() {}
+    function zc() {}
+    function Ac() {}
+    function Bc() {}
+    function Cc() {}
+    function Dc() {}
+    function Ec() {}
+    function Fc() {}
+    var Gc = void 0,
+      Hc = [];
+    function Ic(b, c) {
+      y.set(b, c);
+    }
+    function Z(b, c, d, e) {
+      var f = {
+        string: (k) => {
+          var n = 0;
+          if (null !== k && void 0 !== k && 0 !== k) {
+            var q = (k.length << 2) + 1;
+            n = Jc(q);
+            ra(k, n, q);
+          }
+          return n;
+        },
+        array: (k) => {
+          var n = Jc(k.length);
+          Ic(k, n);
+          return n;
+        }
+      };
+      b = a["_" + b];
+      var g = [],
+        h = 0;
+      if (e)
+        for (var p = 0; p < e.length; p++) {
+          var l = f[d[p]];
+          l ? (0 === h && (h = Kc()), (g[p] = l(e[p]))) : (g[p] = e[p]);
+        }
+      d = b.apply(null, g);
+      return (d = (function (k) {
+        0 !== h && Lc(h);
+        return "string" === c ? v(k) : "boolean" === c ? !!k : k;
+      })(d));
+    }
+    var Mc =
+      "undefined" != typeof TextDecoder ? new TextDecoder("utf-16le") : void 0;
+    function ib(b, c, d, e) {
+      b || (b = this);
+      this.parent = b;
+      this.Sf = b.Sf;
+      this.Yf = null;
+      this.id = bb++;
+      this.name = c;
+      this.mode = d;
+      this.If = {};
+      this.Jf = {};
+      this.cg = e;
+    }
+    Object.defineProperties(ib.prototype, {
+      read: {
+        get: function () {
+          return 365 === (this.mode & 365);
+        },
+        set: function (b) {
+          b ? (this.mode |= 365) : (this.mode &= -366);
+        }
+      },
+      write: {
+        get: function () {
+          return 146 === (this.mode & 146);
+        },
+        set: function (b) {
+          b ? (this.mode |= 146) : (this.mode &= -147);
+        }
+      }
+    });
+    Cb();
+    T = Array(4096);
+    qb(Q, "/");
+    W("/tmp");
+    W("/home");
+    W("/home/web_user");
+    (() => {
+      W("/dev");
+      Sa(259, { read: () => 0, write: (c, d, e, f) => f });
+      sb("/dev/null", 259);
+      Ra(1280, Ua);
+      Ra(1536, Va);
+      sb("/dev/tty", 1280);
+      sb("/dev/tty1", 1536);
+      var b = Na();
+      Gb("random", b);
+      Gb("urandom", b);
+      W("/dev/shm");
+      W("/dev/shm/tmp");
+    })();
+    (() => {
+      W("/proc");
+      var b = W("/proc/self");
+      W("/proc/self/fd");
+      qb(
+        {
+          Sf: () => {
+            var c = Xa(b, "fd", 16895, 73);
+            c.If = {
+              ag: (d, e) => {
+                var f = S[+e];
+                if (!f) throw new P(8);
+                d = {
+                  parent: null,
+                  Sf: { wg: "fake" },
+                  If: { dg: () => f.path }
+                };
+                return (d.parent = d);
+              }
+            };
+            return c;
+          }
+        },
+        "/proc/self/fd"
+      );
+    })();
+    (function () {
+      const b = new Map();
+      a.setAuthorizer = function (c, d, e) {
+        d ? b.set(c, { f: d, pg: e }) : b.delete(c);
+        return Z("set_authorizer", "number", ["number"], [c]);
+      };
+      Ub = function (c, d, e, f, g, h) {
+        if (b.has(c)) {
+          const { f: p, pg: l } = b.get(c);
+          return p(
+            l,
+            d,
+            e ? v(e) : null,
+            f ? v(f) : null,
+            g ? v(g) : null,
+            h ? v(h) : null
+          );
+        }
+        return 0;
+      };
+    })();
+    (function () {
+      const b = new Map(),
+        c = new Map();
+      a.createFunction = function (d, e, f, g, h, p) {
+        const l = b.size;
+        b.set(l, { f: p, Uf: h });
+        return Z(
+          "create_function",
+          "number",
+          "number string number number number number".split(" "),
+          [d, e, f, g, l, 0]
+        );
+      };
+      a.createAggregate = function (d, e, f, g, h, p, l) {
+        const k = b.size;
+        b.set(k, { step: p, Gg: l, Uf: h });
+        return Z(
+          "create_function",
+          "number",
+          "number string number number number number".split(" "),
+          [d, e, f, g, k, 1]
+        );
+      };
+      a.getFunctionUserData = function (d) {
+        return c.get(d);
+      };
+      Wb = function (d, e, f, g) {
+        d = b.get(d);
+        c.set(e, d.Uf);
+        d.f(e, new Uint32Array(x.buffer, g, f));
+        c.delete(e);
+      };
+      Yb = function (d, e, f, g) {
+        d = b.get(d);
+        c.set(e, d.Uf);
+        d.step(e, new Uint32Array(x.buffer, g, f));
+        c.delete(e);
+      };
+      Vb = function (d, e) {
+        d = b.get(d);
+        c.set(e, d.Uf);
+        d.Gg(e);
+        c.delete(e);
+      };
+    })();
+    (function () {
+      const b = new Map();
+      a.progressHandler = function (c, d, e, f) {
+        e ? b.set(c, { f: e, pg: f }) : b.delete(c);
+        return Z("progress_handler", null, ["number", "number"], [c, d]);
+      };
+      Xb = function (c) {
+        if (b.has(c)) {
+          const { f: d, pg: e } = b.get(c);
+          return d(e);
+        }
+        return 0;
+      };
+    })();
+    (function () {
+      function b(l, k) {
+        const n = `get${l}`,
+          q = `set${l}`;
+        return new Proxy(new DataView(x.buffer, k, "Int32" === l ? 4 : 8), {
+          get(r, w) {
+            if (w === n)
+              return function (z, G) {
+                if (!G) throw Error("must be little endian");
+                return r[w](z, G);
+              };
+            if (w === q)
+              return function (z, G, D) {
+                if (!D) throw Error("must be little endian");
+                return r[w](z, G, D);
+              };
+            if ("string" === typeof w && w.match(/^(get)|(set)/))
+              throw Error("invalid type");
+            return r[w];
+          }
+        });
+      }
+      const c = "object" === typeof Asyncify,
+        d = new Map(),
+        e = new Map(),
+        f = new Map(),
+        g = c ? new Set() : null,
+        h = c ? new Set() : null,
+        p = new Map();
+      oc = function (l, k, n, q) {
+        p.set(v(l), {
+          size: k,
+          bg: Array.from(new Uint32Array(x.buffer, q, n))
+        });
+      };
+      a.createModule = function (l, k, n, q) {
+        c && (n.handleAsync = Asyncify.vg);
+        const r = d.size;
+        d.set(r, { module: n, Uf: q });
+        q = 0;
+        n.xCreate && (q |= 1);
+        n.xConnect && (q |= 2);
+        n.xBestIndex && (q |= 4);
+        n.xDisconnect && (q |= 8);
+        n.xDestroy && (q |= 16);
+        n.xOpen && (q |= 32);
+        n.xClose && (q |= 64);
+        n.xFilter && (q |= 128);
+        n.xNext && (q |= 256);
+        n.xEof && (q |= 512);
+        n.xColumn && (q |= 1024);
+        n.xRowid && (q |= 2048);
+        n.xUpdate && (q |= 4096);
+        n.xBegin && (q |= 8192);
+        n.xSync && (q |= 16384);
+        n.xCommit && (q |= 32768);
+        n.xRollback && (q |= 65536);
+        n.xFindFunction && (q |= 131072);
+        n.xRename && (q |= 262144);
+        return Z(
+          "create_module",
+          "number",
+          ["number", "string", "number", "number"],
+          [l, k, r, q]
+        );
+      };
+      ec = function (l, k, n, q, r, w) {
+        k = d.get(k);
+        e.set(r, k);
+        if (c) {
+          g.delete(r);
+          for (const z of g) e.delete(z);
+        }
+        q = Array.from(new Uint32Array(x.buffer, q, n)).map((z) => v(z));
+        return k.module.xCreate(l, k.Uf, q, r, b("Int32", w));
+      };
+      dc = function (l, k, n, q, r, w) {
+        k = d.get(k);
+        e.set(r, k);
+        if (c) {
+          g.delete(r);
+          for (const z of g) e.delete(z);
+        }
+        q = Array.from(new Uint32Array(x.buffer, q, n)).map((z) => v(z));
+        return k.module.xConnect(l, k.Uf, q, r, b("Int32", w));
+      };
+      $b = function (l, k) {
+        var n = e.get(l),
+          q = p.get("sqlite3_index_info").bg;
+        const r = {};
+        r.nConstraint = M(k + q[0], "i32");
+        r.aConstraint = [];
+        var w = M(k + q[1], "*"),
+          z = p.get("sqlite3_index_constraint").size;
+        for (var G = 0; G < r.nConstraint; ++G) {
+          var D = r.aConstraint,
+            J = D.push,
+            H = w + G * z,
+            ea = p.get("sqlite3_index_constraint").bg,
+            U = {};
+          U.iColumn = M(H + ea[0], "i32");
+          U.op = M(H + ea[1], "i8");
+          U.usable = !!M(H + ea[2], "i8");
+          J.call(D, U);
+        }
+        r.nOrderBy = M(k + q[2], "i32");
+        r.aOrderBy = [];
+        w = M(k + q[3], "*");
+        z = p.get("sqlite3_index_orderby").size;
+        for (G = 0; G < r.nOrderBy; ++G)
+          (D = r.aOrderBy),
+            (J = D.push),
+            (H = w + G * z),
+            (ea = p.get("sqlite3_index_orderby").bg),
+            (U = {}),
+            (U.iColumn = M(H + ea[0], "i32")),
+            (U.desc = !!M(H + ea[1], "i8")),
+            J.call(D, U);
+        r.aConstraintUsage = [];
+        for (w = 0; w < r.nConstraint; ++w)
+          r.aConstraintUsage.push({ argvIndex: 0, omit: !1 });
+        r.idxNum = M(k + q[5], "i32");
+        r.idxStr = null;
+        r.orderByConsumed = !!M(k + q[8], "i8");
+        r.estimatedCost = M(k + q[9], "double");
+        r.estimatedRows = M(k + q[10], "i32");
+        r.idxFlags = M(k + q[11], "i32");
+        r.colUsed = M(k + q[12], "i32");
+        l = n.module.xBestIndex(l, r);
+        n = p.get("sqlite3_index_info").bg;
+        q = M(k + n[4], "*");
+        w = p.get("sqlite3_index_constraint_usage").size;
+        for (J = 0; J < r.nConstraint; ++J)
+          (z = q + J * w),
+            (D = r.aConstraintUsage[J]),
+            (H = p.get("sqlite3_index_constraint_usage").bg),
+            N(z + H[0], D.argvIndex, "i32"),
+            N(z + H[1], D.omit ? 1 : 0, "i8");
+        N(k + n[5], r.idxNum, "i32");
+        "string" === typeof r.idxStr &&
+          ((q = sa(r.idxStr)),
+          (w = Z("sqlite3_malloc", "number", ["number"], [q + 1])),
+          ra(r.idxStr, w, q + 1),
+          N(k + n[6], w, "*"),
+          N(k + n[7], 1, "i32"));
+        N(k + n[8], r.orderByConsumed, "i32");
+        N(k + n[9], r.estimatedCost, "double");
+        N(k + n[10], r.estimatedRows, "i32");
+        N(k + n[11], r.idxFlags, "i32");
+        return l;
+      };
+      gc = function (l) {
+        const k = e.get(l);
+        c ? g.add(l) : e.delete(l);
+        return k.module.xDisconnect(l);
+      };
+      fc = function (l) {
+        const k = e.get(l);
+        c ? g.add(l) : e.delete(l);
+        return k.module.xDestroy(l);
+      };
+      kc = function (l, k) {
+        const n = e.get(l);
+        f.set(k, n);
+        if (c) {
+          h.delete(k);
+          for (const q of h) f.delete(q);
+        }
+        return n.module.xOpen(l, k);
+      };
+      ac = function (l) {
+        const k = f.get(l);
+        c ? h.add(l) : f.delete(l);
+        return k.module.xClose(l);
+      };
+      hc = function (l) {
+        return f.get(l).module.xEof(l) ? 1 : 0;
+      };
+      ic = function (l, k, n, q, r) {
+        const w = f.get(l);
+        n = n ? v(n) : null;
+        r = new Uint32Array(x.buffer, r, q);
+        return w.module.xFilter(l, k, n, r);
+      };
+      jc = function (l) {
+        return f.get(l).module.xNext(l);
+      };
+      bc = function (l, k, n) {
+        return f.get(l).module.xColumn(l, k, n);
+      };
+      nc = function (l, k) {
+        return f.get(l).module.xRowid(l, b("BigInt64", k));
+      };
+      qc = function (l, k, n, q) {
+        const r = e.get(l);
+        n = new Uint32Array(x.buffer, n, k);
+        return r.module.xUpdate(l, n, b("BigInt64", q));
+      };
+      Zb = function (l) {
+        return e.get(l).module.xBegin(l);
+      };
+      pc = function (l) {
+        return e.get(l).module.xSync(l);
+      };
+      cc = function (l) {
+        return e.get(l).module.xCommit(l);
+      };
+      mc = function (l) {
+        return e.get(l).module.xRollback(l);
+      };
+      lc = function (l, k) {
+        const n = e.get(l);
+        k = v(k);
+        return n.module.xRename(l, k);
+      };
+    })();
+    (function () {
+      function b(g, h) {
+        const p = `get${g}`,
+          l = `set${g}`;
+        return new Proxy(new DataView(x.buffer, h, "Int32" === g ? 4 : 8), {
+          get(k, n) {
+            if (n === p)
+              return function (q, r) {
+                if (!r) throw Error("must be little endian");
+                return k[n](q, r);
+              };
+            if (n === l)
+              return function (q, r, w) {
+                if (!w) throw Error("must be little endian");
+                return k[n](q, r, w);
+              };
+            if ("string" === typeof n && n.match(/^(get)|(set)/))
+              throw Error("invalid type");
+            return k[n];
+          }
+        });
+      }
+      const c = "object" === typeof Asyncify;
+      c && (a.handleAsync = Asyncify.vg);
+      const d = new Map(),
+        e = new Map();
+      a.registerVFS = function (g, h) {
+        if (Z("sqlite3_vfs_find", "number", ["string"], [g.name]))
+          throw Error(`VFS '${g.name}' already registered`);
+        c && (g.handleAsync = Asyncify.vg);
+        var p = g.mxPathName ?? 64;
+        const l = a._malloc(4);
+        h = Z(
+          "register_vfs",
+          "number",
+          ["string", "number", "number", "number"],
+          [g.name, p, h ? 1 : 0, l]
+        );
+        h || ((p = M(l, "*")), d.set(p, g));
+        a._free(l);
+        return h;
+      };
+      const f = c ? new Set() : null;
+      tc = function (g) {
+        const h = e.get(g);
+        c ? f.add(g) : e.delete(g);
+        return h.xClose(g);
+      };
+      Ac = function (g, h, p, l, k) {
+        return e
+          .get(g)
+          .xRead(
+            g,
+            x.subarray(h, h + p),
+            4294967296 * k + l + (0 > l ? 2 ** 32 : 0)
+          );
+      };
+      Fc = function (g, h, p, l, k) {
+        return e
+          .get(g)
+          .xWrite(
+            g,
+            x.subarray(h, h + p),
+            4294967296 * k + l + (0 > l ? 2 ** 32 : 0)
+          );
+      };
+      Dc = function (g, h, p) {
+        return e
+          .get(g)
+          .xTruncate(g, 4294967296 * p + h + (0 > h ? 2 ** 32 : 0));
+      };
+      Cc = function (g, h) {
+        return e.get(g).xSync(g, h);
+      };
+      xc = function (g, h) {
+        const p = e.get(g);
+        h = b("BigInt64", h);
+        return p.xFileSize(g, h);
+      };
+      yc = function (g, h) {
+        return e.get(g).xLock(g, h);
+      };
+      Ec = function (g, h) {
+        return e.get(g).xUnlock(g, h);
+      };
+      sc = function (g, h) {
+        const p = e.get(g);
+        h = b("Int32", h);
+        return p.xCheckReservedLock(g, h);
+      };
+      wc = function (g, h, p) {
+        const l = e.get(g);
+        p = new DataView(x.buffer, p);
+        return l.xFileControl(g, h, p);
+      };
+      Bc = function (g) {
+        return e.get(g).xSectorSize(g);
+      };
+      vc = function (g) {
+        return e.get(g).xDeviceCharacteristics(g);
+      };
+      zc = function (g, h, p, l, k) {
+        g = d.get(g);
+        e.set(p, g);
+        if (c) {
+          f.delete(p);
+          for (var n of f) e.delete(n);
+        }
+        n = null;
+        if (l & 64) {
+          n = 1;
+          const q = [];
+          for (; n; ) {
+            const r = x[h++];
+            if (r) q.push(r);
+            else
+              switch ((x[h] || (n = null), n)) {
+                case 1:
+                  q.push(63);
+                  n = 2;
+                  break;
+                case 2:
+                  q.push(61);
+                  n = 3;
+                  break;
+                case 3:
+                  q.push(38), (n = 2);
+              }
+          }
+          n = new TextDecoder().decode(new Uint8Array(q));
+        } else h && (n = v(h));
+        k = b("Int32", k);
+        return g.xOpen(n, p, l, k);
+      };
+      uc = function (g, h, p) {
+        return d.get(g).xDelete(v(h), p);
+      };
+      rc = function (g, h, p, l) {
+        g = d.get(g);
+        l = b("Int32", l);
+        return g.xAccess(v(h), p, l);
+      };
+    })();
+    var Oc = {
+      a: function (b, c, d, e) {
+        u(
+          "Assertion failed: " +
+            v(b) +
+            ", at: " +
+            [c ? v(c) : "unknown filename", d, e ? v(e) : "unknown function"]
+        );
+      },
+      L: function (b, c) {
+        try {
+          return (b = v(b)), xb(b, c), 0;
+        } catch (d) {
+          if ("undefined" == typeof X || !(d instanceof P)) throw d;
+          return -d.Lf;
+        }
+      },
+      Q: function (b, c, d) {
+        try {
+          c = v(c);
+          c = Hb(b, c);
+          if (d & -8) return -28;
+          var e = V(c, { Vf: !0 }).node;
+          if (!e) return -44;
+          b = "";
+          d & 4 && (b += "r");
+          d & 2 && (b += "w");
+          d & 1 && (b += "x");
+          return b && hb(e, b) ? -2 : 0;
+        } catch (f) {
+          if ("undefined" == typeof X || !(f instanceof P)) throw f;
+          return -f.Lf;
+        }
+      },
+      M: function (b, c) {
+        try {
+          var d = S[b];
+          if (!d) throw new P(8);
+          xb(d.node, c);
+          return 0;
+        } catch (e) {
+          if ("undefined" == typeof X || !(e instanceof P)) throw e;
+          return -e.Lf;
+        }
+      },
+      K: function (b) {
+        try {
+          var c = S[b];
+          if (!c) throw new P(8);
+          var d = c.node;
+          var e = "string" == typeof d ? V(d, { Vf: !0 }).node : d;
+          if (!e.If.Nf) throw new P(63);
+          e.If.Nf(e, { timestamp: Date.now() });
+          return 0;
+        } catch (f) {
+          if ("undefined" == typeof X || !(f instanceof P)) throw f;
+          return -f.Lf;
+        }
+      },
+      b: function (b, c, d) {
+        Jb = d;
+        try {
+          var e = Y(b);
+          switch (c) {
+            case 0:
+              var f = Kb();
+              return 0 > f ? -28 : pb(e, f).Tf;
+            case 1:
+            case 2:
+              return 0;
+            case 3:
+              return e.flags;
+            case 4:
+              return (f = Kb()), (e.flags |= f), 0;
+            case 5:
+              return (f = Kb()), (A[(f + 0) >> 1] = 2), 0;
+            case 6:
+            case 7:
+              return 0;
+            case 16:
+            case 8:
+              return -28;
+            case 9:
+              return (B[Nc() >> 2] = 28), -1;
+            default:
+              return -28;
+          }
+        } catch (g) {
+          if ("undefined" == typeof X || !(g instanceof P)) throw g;
+          return -g.Lf;
+        }
+      },
+      J: function (b, c) {
+        try {
+          var d = Y(b);
+          return Ib(vb, d.path, c);
+        } catch (e) {
+          if ("undefined" == typeof X || !(e instanceof P)) throw e;
+          return -e.Lf;
+        }
+      },
+      j: function (b, c, d) {
+        try {
+          c =
+            (d + 2097152) >>> 0 < 4194305 - !!c
+              ? (c >>> 0) + 4294967296 * d
+              : NaN;
+          if (isNaN(c)) return -61;
+          var e = S[b];
+          if (!e) throw new P(8);
+          if (0 === (e.flags & 2097155)) throw new P(28);
+          yb(e.node, c);
+          return 0;
+        } catch (f) {
+          if ("undefined" == typeof X || !(f instanceof P)) throw f;
+          return -f.Lf;
+        }
+      },
+      D: function (b, c) {
+        try {
+          if (0 === c) return -28;
+          var d = sa("/") + 1;
+          if (c < d) return -68;
+          ra("/", b, c);
+          return d;
+        } catch (e) {
+          if ("undefined" == typeof X || !(e instanceof P)) throw e;
+          return -e.Lf;
+        }
+      },
+      G: function (b, c) {
+        try {
+          return (b = v(b)), Ib(wb, b, c);
+        } catch (d) {
+          if ("undefined" == typeof X || !(d instanceof P)) throw d;
+          return -d.Lf;
+        }
+      },
+      A: function (b, c, d) {
+        try {
+          return (
+            (c = v(c)),
+            (c = Hb(b, c)),
+            (c = O(c)),
+            "/" === c[c.length - 1] && (c = c.substr(0, c.length - 1)),
+            W(c, d),
+            0
+          );
+        } catch (e) {
+          if ("undefined" == typeof X || !(e instanceof P)) throw e;
+          return -e.Lf;
+        }
+      },
+      F: function (b, c, d, e) {
+        try {
+          c = v(c);
+          var f = e & 256;
+          c = Hb(b, c, e & 4096);
+          return Ib(f ? wb : vb, c, d);
+        } catch (g) {
+          if ("undefined" == typeof X || !(g instanceof P)) throw g;
+          return -g.Lf;
+        }
+      },
+      w: function (b, c, d, e) {
+        Jb = e;
+        try {
+          c = v(c);
+          c = Hb(b, c);
+          var f = e ? Kb() : 0;
+          return Ab(c, d, f).Tf;
+        } catch (g) {
+          if ("undefined" == typeof X || !(g instanceof P)) throw g;
+          return -g.Lf;
+        }
+      },
+      u: function (b, c, d, e) {
+        try {
+          c = v(c);
+          c = Hb(b, c);
+          if (0 >= e) return -28;
+          var f = db(c),
+            g = Math.min(e, sa(f)),
+            h = y[d + g];
+          ra(f, d, e + 1);
+          y[d + g] = h;
+          return g;
+        } catch (p) {
+          if ("undefined" == typeof X || !(p instanceof P)) throw p;
+          return -p.Lf;
+        }
+      },
+      t: function (b) {
+        try {
+          return (b = v(b)), ub(b), 0;
+        } catch (c) {
+          if ("undefined" == typeof X || !(c instanceof P)) throw c;
+          return -c.Lf;
+        }
+      },
+      H: function (b, c) {
+        try {
+          return (b = v(b)), Ib(vb, b, c);
+        } catch (d) {
+          if ("undefined" == typeof X || !(d instanceof P)) throw d;
+          return -d.Lf;
+        }
+      },
+      r: function (b, c, d) {
+        try {
+          c = v(c);
+          c = Hb(b, c);
+          if (0 === d) {
+            b = c;
+            var e = V(b, { parent: !0 }).node;
+            if (!e) throw new P(44);
+            var f = Ma(b),
+              g = R(e, f),
+              h = mb(e, f, !1);
+            if (h) throw new P(h);
+            if (!e.If.kg) throw new P(63);
+            if (g.Yf) throw new P(10);
+            e.If.kg(e, f);
+            gb(g);
+          } else 512 === d ? ub(c) : u("Invalid flags passed to unlinkat");
+          return 0;
+        } catch (p) {
+          if ("undefined" == typeof X || !(p instanceof P)) throw p;
+          return -p.Lf;
+        }
+      },
+      q: function (b, c, d) {
+        try {
+          c = v(c);
+          c = Hb(b, c, !0);
+          if (d) {
+            var e = Lb(d),
+              f = B[(d + 8) >> 2];
+            g = 1e3 * e + f / 1e6;
+            d += 16;
+            e = Lb(d);
+            f = B[(d + 8) >> 2];
+            h = 1e3 * e + f / 1e6;
+          } else
+            var g = Date.now(),
+              h = g;
+          b = g;
+          var p = V(c, { Vf: !0 }).node;
+          p.If.Nf(p, { timestamp: Math.max(b, h) });
+          return 0;
+        } catch (l) {
+          if ("undefined" == typeof X || !(l instanceof P)) throw l;
+          return -l.Lf;
+        }
+      },
+      N: function (b, c) {
+        b = new Date(1e3 * Lb(b));
+        B[c >> 2] = b.getSeconds();
+        B[(c + 4) >> 2] = b.getMinutes();
+        B[(c + 8) >> 2] = b.getHours();
+        B[(c + 12) >> 2] = b.getDate();
+        B[(c + 16) >> 2] = b.getMonth();
+        B[(c + 20) >> 2] = b.getFullYear() - 1900;
+        B[(c + 24) >> 2] = b.getDay();
+        var d = b.getFullYear();
+        B[(c + 28) >> 2] =
+          ((0 !== d % 4 || (0 === d % 100 && 0 !== d % 400) ? Nb : Mb)[
+            b.getMonth()
+          ] +
+            b.getDate() -
+            1) |
+          0;
+        B[(c + 36) >> 2] = -(60 * b.getTimezoneOffset());
+        d = new Date(b.getFullYear(), 6, 1).getTimezoneOffset();
+        var e = new Date(b.getFullYear(), 0, 1).getTimezoneOffset();
+        B[(c + 32) >> 2] =
+          (d != e && b.getTimezoneOffset() == Math.min(e, d)) | 0;
+      },
+      y: function (b, c, d, e, f, g, h) {
+        try {
+          var p = Y(e);
+          if (0 !== (c & 2) && 0 === (d & 2) && 2 !== (p.flags & 2097155))
+            throw new P(2);
+          if (1 === (p.flags & 2097155)) throw new P(2);
+          if (!p.Jf.gg) throw new P(43);
+          var l = p.Jf.gg(p, b, f, c, d);
+          var k = l.Lg;
+          B[g >> 2] = l.Ag;
+          C[h >> 2] = k;
+          return 0;
+        } catch (n) {
+          if ("undefined" == typeof X || !(n instanceof P)) throw n;
+          return -n.Lf;
+        }
+      },
+      z: function (b, c, d, e, f, g) {
+        try {
+          var h = Y(f);
+          if (d & 2) {
+            if (32768 !== (h.node.mode & 61440)) throw new P(43);
+            e & 2 || (h.Jf.hg && h.Jf.hg(h, x.slice(b, b + c), g, c, e));
+          }
+        } catch (p) {
+          if ("undefined" == typeof X || !(p instanceof P)) throw p;
+          return -p.Lf;
+        }
+      },
+      O: function (b, c, d) {
+        function e(l) {
+          return (l = l.toTimeString().match(/\(([A-Za-z ]+)\)$/))
+            ? l[1]
+            : "GMT";
+        }
+        var f = new Date().getFullYear(),
+          g = new Date(f, 0, 1),
+          h = new Date(f, 6, 1);
+        f = g.getTimezoneOffset();
+        var p = h.getTimezoneOffset();
+        C[b >> 2] = 60 * Math.max(f, p);
+        B[c >> 2] = Number(f != p);
+        b = e(g);
+        c = e(h);
+        b = Ob(b);
+        c = Ob(c);
+        p < f
+          ? ((C[d >> 2] = b), (C[(d + 4) >> 2] = c))
+          : ((C[d >> 2] = c), (C[(d + 4) >> 2] = b));
+      },
+      ta: function () {
+        u("");
+      },
+      e: function () {
+        return Date.now();
+      },
+      d: () => performance.now(),
+      o: function (b) {
+        var c = x.length;
+        b >>>= 0;
+        if (2147483648 < b) return !1;
+        for (var d = 1; 4 >= d; d *= 2) {
+          var e = c * (1 + 0.2 / d);
+          e = Math.min(e, b + 100663296);
+          var f = Math,
+            g = f.min;
+          e = Math.max(b, e);
+          e += (65536 - (e % 65536)) % 65536;
+          a: {
+            var h = ma.buffer;
+            try {
+              ma.grow((g.call(f, 2147483648, e) - h.byteLength + 65535) >>> 16);
+              wa();
+              var p = 1;
+              break a;
+            } catch (l) {}
+            p = void 0;
+          }
+          if (p) return !0;
+        }
+        return !1;
+      },
+      B: function (b, c) {
+        var d = 0;
+        Rb().forEach(function (e, f) {
+          var g = c + d;
+          f = C[(b + 4 * f) >> 2] = g;
+          for (g = 0; g < e.length; ++g) y[f++ >> 0] = e.charCodeAt(g);
+          y[f >> 0] = 0;
+          d += e.length + 1;
+        });
+        return 0;
+      },
+      C: function (b, c) {
+        var d = Rb();
+        C[b >> 2] = d.length;
+        var e = 0;
+        d.forEach(function (f) {
+          e += f.length + 1;
+        });
+        C[c >> 2] = e;
+        return 0;
+      },
+      f: function (b) {
+        try {
+          var c = Y(b);
+          if (null === c.Tf) throw new P(8);
+          c.lg && (c.lg = null);
+          try {
+            c.Jf.close && c.Jf.close(c);
+          } catch (d) {
+            throw d;
+          } finally {
+            S[c.Tf] = null;
+          }
+          c.Tf = null;
+          return 0;
+        } catch (d) {
+          if ("undefined" == typeof X || !(d instanceof P)) throw d;
+          return d.Lf;
+        }
+      },
+      p: function (b, c) {
+        try {
+          var d = Y(b);
+          y[c >> 0] = d.Pf
+            ? 2
+            : 16384 === (d.mode & 61440)
+            ? 3
+            : 40960 === (d.mode & 61440)
+            ? 7
+            : 4;
+          return 0;
+        } catch (e) {
+          if ("undefined" == typeof X || !(e instanceof P)) throw e;
+          return e.Lf;
+        }
+      },
+      v: function (b, c, d, e) {
+        try {
+          a: {
+            var f = Y(b);
+            b = c;
+            for (var g, h = (c = 0); h < d; h++) {
+              var p = C[b >> 2],
+                l = C[(b + 4) >> 2];
+              b += 8;
+              var k = f,
+                n = p,
+                q = l,
+                r = g,
+                w = y;
+              if (0 > q || 0 > r) throw new P(28);
+              if (null === k.Tf) throw new P(8);
+              if (1 === (k.flags & 2097155)) throw new P(8);
+              if (16384 === (k.node.mode & 61440)) throw new P(31);
+              if (!k.Jf.read) throw new P(28);
+              var z = "undefined" != typeof r;
+              if (!z) r = k.position;
+              else if (!k.seekable) throw new P(70);
+              var G = k.Jf.read(k, w, n, q, r);
+              z || (k.position += G);
+              var D = G;
+              if (0 > D) {
+                var J = -1;
+                break a;
+              }
+              c += D;
+              if (D < l) break;
+              "undefined" !== typeof g && (g += D);
+            }
+            J = c;
+          }
+          C[e >> 2] = J;
+          return 0;
+        } catch (H) {
+          if ("undefined" == typeof X || !(H instanceof P)) throw H;
+          return H.Lf;
+        }
+      },
+      i: function (b, c, d, e, f) {
+        try {
+          c =
+            (d + 2097152) >>> 0 < 4194305 - !!c
+              ? (c >>> 0) + 4294967296 * d
+              : NaN;
+          if (isNaN(c)) return 61;
+          var g = Y(b);
+          Bb(g, c, e);
+          L = [
+            g.position >>> 0,
+            ((K = g.position),
+            1 <= +Math.abs(K)
+              ? 0 < K
+                ? (Math.min(+Math.floor(K / 4294967296), 4294967295) | 0) >>> 0
+                : ~~+Math.ceil((K - +(~~K >>> 0)) / 4294967296) >>> 0
+              : 0)
+          ];
+          B[f >> 2] = L[0];
+          B[(f + 4) >> 2] = L[1];
+          g.lg && 0 === c && 0 === e && (g.lg = null);
+          return 0;
+        } catch (h) {
+          if ("undefined" == typeof X || !(h instanceof P)) throw h;
+          return h.Lf;
+        }
+      },
+      E: function (b) {
+        try {
+          var c = Y(b);
+          return c.Jf && c.Jf.Xf ? c.Jf.Xf(c) : 0;
+        } catch (d) {
+          if ("undefined" == typeof X || !(d instanceof P)) throw d;
+          return d.Lf;
+        }
+      },
+      s: function (b, c, d, e) {
+        try {
+          a: {
+            var f = Y(b);
+            b = c;
+            for (var g, h = (c = 0); h < d; h++) {
+              var p = C[b >> 2],
+                l = C[(b + 4) >> 2];
+              b += 8;
+              var k = f,
+                n = p,
+                q = l,
+                r = g,
+                w = y;
+              if (0 > q || 0 > r) throw new P(28);
+              if (null === k.Tf) throw new P(8);
+              if (0 === (k.flags & 2097155)) throw new P(8);
+              if (16384 === (k.node.mode & 61440)) throw new P(31);
+              if (!k.Jf.write) throw new P(28);
+              k.seekable && k.flags & 1024 && Bb(k, 0, 2);
+              var z = "undefined" != typeof r;
+              if (!z) r = k.position;
+              else if (!k.seekable) throw new P(70);
+              var G = k.Jf.write(k, w, n, q, r, void 0);
+              z || (k.position += G);
+              var D = G;
+              if (0 > D) {
+                var J = -1;
+                break a;
+              }
+              c += D;
+              "undefined" !== typeof g && (g += D);
+            }
+            J = c;
+          }
+          C[e >> 2] = J;
+          return 0;
+        } catch (H) {
+          if ("undefined" == typeof X || !(H instanceof P)) throw H;
+          return H.Lf;
+        }
+      },
+      sa: Tb,
+      _: Ub,
+      x: Vb,
+      P: Wb,
+      ca: Xb,
+      I: Yb,
+      ka: Zb,
+      m: $b,
+      ra: ac,
+      na: bc,
+      ia: cc,
+      ea: dc,
+      fa: ec,
+      g: fc,
+      h: gc,
+      oa: hc,
+      qa: ic,
+      pa: jc,
+      da: kc,
+      ga: lc,
+      ha: mc,
+      ma: nc,
+      c: oc,
+      ja: pc,
+      la: qc,
+      aa: rc,
+      V: sc,
+      $: tc,
+      ba: uc,
+      S: vc,
+      U: wc,
+      Y: xc,
+      X: yc,
+      R: zc,
+      n: Ac,
+      T: Bc,
+      Z: Cc,
+      k: Dc,
+      W: Ec,
+      l: Fc
+    };
+    (function () {
+      function b(f) {
+        a.asm = f.exports;
+        ma = a.asm.ua;
+        wa();
+        E = a.asm.Cf;
+        ya.unshift(a.asm.va);
+        F--;
+        a.monitorRunDependencies && a.monitorRunDependencies(F);
+        0 == F &&
+          (null !== Ca && (clearInterval(Ca), (Ca = null)),
+          Da && ((f = Da), (Da = null), f()));
+      }
+      function c(f) {
+        b(f.instance);
+      }
+      function d(f) {
+        return Ha()
+          .then(function (g) {
+            return WebAssembly.instantiate(g, e);
+          })
+          .then(function (g) {
+            return g;
+          })
+          .then(f, function (g) {
+            t("failed to asynchronously prepare wasm: " + g);
+            u(g);
+          });
+      }
+      var e = { a: Oc };
+      F++;
+      a.monitorRunDependencies && a.monitorRunDependencies(F);
+      if (a.instantiateWasm)
+        try {
+          return a.instantiateWasm(e, b);
+        } catch (f) {
+          t("Module.instantiateWasm callback failed with error: " + f), ba(f);
+        }
+      (function () {
+        return la ||
+          "function" != typeof WebAssembly.instantiateStreaming ||
+          Ea() ||
+          "function" != typeof fetch
+          ? d(c)
+          : fetch(I, { credentials: "same-origin" }).then(function (f) {
+              return WebAssembly.instantiateStreaming(f, e).then(
+                c,
+                function (g) {
+                  t("wasm streaming compile failed: " + g);
+                  t("falling back to ArrayBuffer instantiation");
+                  return d(c);
+                }
+              );
+            });
+      })().catch(ba);
+      return {};
+    })();
+    a.___wasm_call_ctors = function () {
+      return (a.___wasm_call_ctors = a.asm.va).apply(null, arguments);
+    };
+    a._sqlite3_status64 = function () {
+      return (a._sqlite3_status64 = a.asm.wa).apply(null, arguments);
+    };
+    a._sqlite3_status = function () {
+      return (a._sqlite3_status = a.asm.xa).apply(null, arguments);
+    };
+    a._sqlite3_db_status = function () {
+      return (a._sqlite3_db_status = a.asm.ya).apply(null, arguments);
+    };
+    a._sqlite3_msize = function () {
+      return (a._sqlite3_msize = a.asm.za).apply(null, arguments);
+    };
+    a._sqlite3_vfs_find = function () {
+      return (a._sqlite3_vfs_find = a.asm.Aa).apply(null, arguments);
+    };
+    a._sqlite3_vfs_register = function () {
+      return (a._sqlite3_vfs_register = a.asm.Ba).apply(null, arguments);
+    };
+    a._sqlite3_vfs_unregister = function () {
+      return (a._sqlite3_vfs_unregister = a.asm.Ca).apply(null, arguments);
+    };
+    a._sqlite3_release_memory = function () {
+      return (a._sqlite3_release_memory = a.asm.Da).apply(null, arguments);
+    };
+    a._sqlite3_soft_heap_limit64 = function () {
+      return (a._sqlite3_soft_heap_limit64 = a.asm.Ea).apply(null, arguments);
+    };
+    a._sqlite3_memory_used = function () {
+      return (a._sqlite3_memory_used = a.asm.Fa).apply(null, arguments);
+    };
+    a._sqlite3_hard_heap_limit64 = function () {
+      return (a._sqlite3_hard_heap_limit64 = a.asm.Ga).apply(null, arguments);
+    };
+    a._sqlite3_memory_highwater = function () {
+      return (a._sqlite3_memory_highwater = a.asm.Ha).apply(null, arguments);
+    };
+    a._sqlite3_malloc = function () {
+      return (a._sqlite3_malloc = a.asm.Ia).apply(null, arguments);
+    };
+    a._sqlite3_malloc64 = function () {
+      return (a._sqlite3_malloc64 = a.asm.Ja).apply(null, arguments);
+    };
+    a._sqlite3_free = function () {
+      return (a._sqlite3_free = a.asm.Ka).apply(null, arguments);
+    };
+    a._sqlite3_realloc = function () {
+      return (a._sqlite3_realloc = a.asm.La).apply(null, arguments);
+    };
+    a._sqlite3_realloc64 = function () {
+      return (a._sqlite3_realloc64 = a.asm.Ma).apply(null, arguments);
+    };
+    a._sqlite3_str_vappendf = function () {
+      return (a._sqlite3_str_vappendf = a.asm.Na).apply(null, arguments);
+    };
+    a._sqlite3_str_append = function () {
+      return (a._sqlite3_str_append = a.asm.Oa).apply(null, arguments);
+    };
+    a._sqlite3_str_appendchar = function () {
+      return (a._sqlite3_str_appendchar = a.asm.Pa).apply(null, arguments);
+    };
+    a._sqlite3_str_appendall = function () {
+      return (a._sqlite3_str_appendall = a.asm.Qa).apply(null, arguments);
+    };
+    a._sqlite3_str_appendf = function () {
+      return (a._sqlite3_str_appendf = a.asm.Ra).apply(null, arguments);
+    };
+    a._sqlite3_str_finish = function () {
+      return (a._sqlite3_str_finish = a.asm.Sa).apply(null, arguments);
+    };
+    a._sqlite3_str_errcode = function () {
+      return (a._sqlite3_str_errcode = a.asm.Ta).apply(null, arguments);
+    };
+    a._sqlite3_str_length = function () {
+      return (a._sqlite3_str_length = a.asm.Ua).apply(null, arguments);
+    };
+    a._sqlite3_str_value = function () {
+      return (a._sqlite3_str_value = a.asm.Va).apply(null, arguments);
+    };
+    a._sqlite3_str_reset = function () {
+      return (a._sqlite3_str_reset = a.asm.Wa).apply(null, arguments);
+    };
+    a._sqlite3_str_new = function () {
+      return (a._sqlite3_str_new = a.asm.Xa).apply(null, arguments);
+    };
+    a._sqlite3_vmprintf = function () {
+      return (a._sqlite3_vmprintf = a.asm.Ya).apply(null, arguments);
+    };
+    a._sqlite3_mprintf = function () {
+      return (a._sqlite3_mprintf = a.asm.Za).apply(null, arguments);
+    };
+    a._sqlite3_vsnprintf = function () {
+      return (a._sqlite3_vsnprintf = a.asm._a).apply(null, arguments);
+    };
+    a._sqlite3_snprintf = function () {
+      return (a._sqlite3_snprintf = a.asm.$a).apply(null, arguments);
+    };
+    a._sqlite3_log = function () {
+      return (a._sqlite3_log = a.asm.ab).apply(null, arguments);
+    };
+    a._sqlite3_randomness = function () {
+      return (a._sqlite3_randomness = a.asm.bb).apply(null, arguments);
+    };
+    a._sqlite3_stricmp = function () {
+      return (a._sqlite3_stricmp = a.asm.cb).apply(null, arguments);
+    };
+    a._sqlite3_strnicmp = function () {
+      return (a._sqlite3_strnicmp = a.asm.db).apply(null, arguments);
+    };
+    a._sqlite3_os_init = function () {
+      return (a._sqlite3_os_init = a.asm.eb).apply(null, arguments);
+    };
+    a._sqlite3_os_end = function () {
+      return (a._sqlite3_os_end = a.asm.fb).apply(null, arguments);
+    };
+    a._sqlite3_serialize = function () {
+      return (a._sqlite3_serialize = a.asm.gb).apply(null, arguments);
+    };
+    a._sqlite3_prepare_v2 = function () {
+      return (a._sqlite3_prepare_v2 = a.asm.hb).apply(null, arguments);
+    };
+    a._sqlite3_step = function () {
+      return (a._sqlite3_step = a.asm.ib).apply(null, arguments);
+    };
+    a._sqlite3_column_int64 = function () {
+      return (a._sqlite3_column_int64 = a.asm.jb).apply(null, arguments);
+    };
+    a._sqlite3_reset = function () {
+      return (a._sqlite3_reset = a.asm.kb).apply(null, arguments);
+    };
+    a._sqlite3_exec = function () {
+      return (a._sqlite3_exec = a.asm.lb).apply(null, arguments);
+    };
+    a._sqlite3_column_int = function () {
+      return (a._sqlite3_column_int = a.asm.mb).apply(null, arguments);
+    };
+    a._sqlite3_finalize = function () {
+      return (a._sqlite3_finalize = a.asm.nb).apply(null, arguments);
+    };
+    a._sqlite3_deserialize = function () {
+      return (a._sqlite3_deserialize = a.asm.ob).apply(null, arguments);
+    };
+    a._sqlite3_database_file_object = function () {
+      return (a._sqlite3_database_file_object = a.asm.pb).apply(
+        null,
+        arguments
+      );
+    };
+    a._sqlite3_backup_init = function () {
+      return (a._sqlite3_backup_init = a.asm.qb).apply(null, arguments);
+    };
+    a._sqlite3_backup_step = function () {
+      return (a._sqlite3_backup_step = a.asm.rb).apply(null, arguments);
+    };
+    a._sqlite3_backup_finish = function () {
+      return (a._sqlite3_backup_finish = a.asm.sb).apply(null, arguments);
+    };
+    a._sqlite3_backup_remaining = function () {
+      return (a._sqlite3_backup_remaining = a.asm.tb).apply(null, arguments);
+    };
+    a._sqlite3_backup_pagecount = function () {
+      return (a._sqlite3_backup_pagecount = a.asm.ub).apply(null, arguments);
+    };
+    a._sqlite3_clear_bindings = function () {
+      return (a._sqlite3_clear_bindings = a.asm.vb).apply(null, arguments);
+    };
+    a._sqlite3_value_blob = function () {
+      return (a._sqlite3_value_blob = a.asm.wb).apply(null, arguments);
+    };
+    a._sqlite3_value_text = function () {
+      return (a._sqlite3_value_text = a.asm.xb).apply(null, arguments);
+    };
+    a._sqlite3_value_bytes = function () {
+      return (a._sqlite3_value_bytes = a.asm.yb).apply(null, arguments);
+    };
+    a._sqlite3_value_bytes16 = function () {
+      return (a._sqlite3_value_bytes16 = a.asm.zb).apply(null, arguments);
+    };
+    a._sqlite3_value_double = function () {
+      return (a._sqlite3_value_double = a.asm.Ab).apply(null, arguments);
+    };
+    a._sqlite3_value_int = function () {
+      return (a._sqlite3_value_int = a.asm.Bb).apply(null, arguments);
+    };
+    a._sqlite3_value_int64 = function () {
+      return (a._sqlite3_value_int64 = a.asm.Cb).apply(null, arguments);
+    };
+    a._sqlite3_value_subtype = function () {
+      return (a._sqlite3_value_subtype = a.asm.Db).apply(null, arguments);
+    };
+    a._sqlite3_value_pointer = function () {
+      return (a._sqlite3_value_pointer = a.asm.Eb).apply(null, arguments);
+    };
+    a._sqlite3_value_text16 = function () {
+      return (a._sqlite3_value_text16 = a.asm.Fb).apply(null, arguments);
+    };
+    a._sqlite3_value_text16be = function () {
+      return (a._sqlite3_value_text16be = a.asm.Gb).apply(null, arguments);
+    };
+    a._sqlite3_value_text16le = function () {
+      return (a._sqlite3_value_text16le = a.asm.Hb).apply(null, arguments);
+    };
+    a._sqlite3_value_type = function () {
+      return (a._sqlite3_value_type = a.asm.Ib).apply(null, arguments);
+    };
+    a._sqlite3_value_encoding = function () {
+      return (a._sqlite3_value_encoding = a.asm.Jb).apply(null, arguments);
+    };
+    a._sqlite3_value_nochange = function () {
+      return (a._sqlite3_value_nochange = a.asm.Kb).apply(null, arguments);
+    };
+    a._sqlite3_value_frombind = function () {
+      return (a._sqlite3_value_frombind = a.asm.Lb).apply(null, arguments);
+    };
+    a._sqlite3_value_dup = function () {
+      return (a._sqlite3_value_dup = a.asm.Mb).apply(null, arguments);
+    };
+    a._sqlite3_value_free = function () {
+      return (a._sqlite3_value_free = a.asm.Nb).apply(null, arguments);
+    };
+    a._sqlite3_result_blob = function () {
+      return (a._sqlite3_result_blob = a.asm.Ob).apply(null, arguments);
+    };
+    a._sqlite3_result_blob64 = function () {
+      return (a._sqlite3_result_blob64 = a.asm.Pb).apply(null, arguments);
+    };
+    a._sqlite3_result_double = function () {
+      return (a._sqlite3_result_double = a.asm.Qb).apply(null, arguments);
+    };
+    a._sqlite3_result_error = function () {
+      return (a._sqlite3_result_error = a.asm.Rb).apply(null, arguments);
+    };
+    a._sqlite3_result_error16 = function () {
+      return (a._sqlite3_result_error16 = a.asm.Sb).apply(null, arguments);
+    };
+    a._sqlite3_result_int = function () {
+      return (a._sqlite3_result_int = a.asm.Tb).apply(null, arguments);
+    };
+    a._sqlite3_result_int64 = function () {
+      return (a._sqlite3_result_int64 = a.asm.Ub).apply(null, arguments);
+    };
+    a._sqlite3_result_null = function () {
+      return (a._sqlite3_result_null = a.asm.Vb).apply(null, arguments);
+    };
+    a._sqlite3_result_pointer = function () {
+      return (a._sqlite3_result_pointer = a.asm.Wb).apply(null, arguments);
+    };
+    a._sqlite3_result_subtype = function () {
+      return (a._sqlite3_result_subtype = a.asm.Xb).apply(null, arguments);
+    };
+    a._sqlite3_result_text = function () {
+      return (a._sqlite3_result_text = a.asm.Yb).apply(null, arguments);
+    };
+    a._sqlite3_result_text64 = function () {
+      return (a._sqlite3_result_text64 = a.asm.Zb).apply(null, arguments);
+    };
+    a._sqlite3_result_text16 = function () {
+      return (a._sqlite3_result_text16 = a.asm._b).apply(null, arguments);
+    };
+    a._sqlite3_result_text16be = function () {
+      return (a._sqlite3_result_text16be = a.asm.$b).apply(null, arguments);
+    };
+    a._sqlite3_result_text16le = function () {
+      return (a._sqlite3_result_text16le = a.asm.ac).apply(null, arguments);
+    };
+    a._sqlite3_result_value = function () {
+      return (a._sqlite3_result_value = a.asm.bc).apply(null, arguments);
+    };
+    a._sqlite3_result_error_toobig = function () {
+      return (a._sqlite3_result_error_toobig = a.asm.cc).apply(null, arguments);
+    };
+    a._sqlite3_result_zeroblob = function () {
+      return (a._sqlite3_result_zeroblob = a.asm.dc).apply(null, arguments);
+    };
+    a._sqlite3_result_zeroblob64 = function () {
+      return (a._sqlite3_result_zeroblob64 = a.asm.ec).apply(null, arguments);
+    };
+    a._sqlite3_result_error_code = function () {
+      return (a._sqlite3_result_error_code = a.asm.fc).apply(null, arguments);
+    };
+    a._sqlite3_result_error_nomem = function () {
+      return (a._sqlite3_result_error_nomem = a.asm.gc).apply(null, arguments);
+    };
+    a._sqlite3_user_data = function () {
+      return (a._sqlite3_user_data = a.asm.hc).apply(null, arguments);
+    };
+    a._sqlite3_context_db_handle = function () {
+      return (a._sqlite3_context_db_handle = a.asm.ic).apply(null, arguments);
+    };
+    a._sqlite3_vtab_nochange = function () {
+      return (a._sqlite3_vtab_nochange = a.asm.jc).apply(null, arguments);
+    };
+    a._sqlite3_vtab_in_first = function () {
+      return (a._sqlite3_vtab_in_first = a.asm.kc).apply(null, arguments);
+    };
+    a._sqlite3_vtab_in_next = function () {
+      return (a._sqlite3_vtab_in_next = a.asm.lc).apply(null, arguments);
+    };
+    a._sqlite3_aggregate_context = function () {
+      return (a._sqlite3_aggregate_context = a.asm.mc).apply(null, arguments);
+    };
+    a._sqlite3_get_auxdata = function () {
+      return (a._sqlite3_get_auxdata = a.asm.nc).apply(null, arguments);
+    };
+    a._sqlite3_set_auxdata = function () {
+      return (a._sqlite3_set_auxdata = a.asm.oc).apply(null, arguments);
+    };
+    a._sqlite3_column_count = function () {
+      return (a._sqlite3_column_count = a.asm.pc).apply(null, arguments);
+    };
+    a._sqlite3_data_count = function () {
+      return (a._sqlite3_data_count = a.asm.qc).apply(null, arguments);
+    };
+    a._sqlite3_column_blob = function () {
+      return (a._sqlite3_column_blob = a.asm.rc).apply(null, arguments);
+    };
+    a._sqlite3_column_bytes = function () {
+      return (a._sqlite3_column_bytes = a.asm.sc).apply(null, arguments);
+    };
+    a._sqlite3_column_bytes16 = function () {
+      return (a._sqlite3_column_bytes16 = a.asm.tc).apply(null, arguments);
+    };
+    a._sqlite3_column_double = function () {
+      return (a._sqlite3_column_double = a.asm.uc).apply(null, arguments);
+    };
+    a._sqlite3_column_text = function () {
+      return (a._sqlite3_column_text = a.asm.vc).apply(null, arguments);
+    };
+    a._sqlite3_column_value = function () {
+      return (a._sqlite3_column_value = a.asm.wc).apply(null, arguments);
+    };
+    a._sqlite3_column_text16 = function () {
+      return (a._sqlite3_column_text16 = a.asm.xc).apply(null, arguments);
+    };
+    a._sqlite3_column_type = function () {
+      return (a._sqlite3_column_type = a.asm.yc).apply(null, arguments);
+    };
+    a._sqlite3_column_name = function () {
+      return (a._sqlite3_column_name = a.asm.zc).apply(null, arguments);
+    };
+    a._sqlite3_column_name16 = function () {
+      return (a._sqlite3_column_name16 = a.asm.Ac).apply(null, arguments);
+    };
+    a._sqlite3_bind_blob = function () {
+      return (a._sqlite3_bind_blob = a.asm.Bc).apply(null, arguments);
+    };
+    a._sqlite3_bind_blob64 = function () {
+      return (a._sqlite3_bind_blob64 = a.asm.Cc).apply(null, arguments);
+    };
+    a._sqlite3_bind_double = function () {
+      return (a._sqlite3_bind_double = a.asm.Dc).apply(null, arguments);
+    };
+    a._sqlite3_bind_int = function () {
+      return (a._sqlite3_bind_int = a.asm.Ec).apply(null, arguments);
+    };
+    a._sqlite3_bind_int64 = function () {
+      return (a._sqlite3_bind_int64 = a.asm.Fc).apply(null, arguments);
+    };
+    a._sqlite3_bind_null = function () {
+      return (a._sqlite3_bind_null = a.asm.Gc).apply(null, arguments);
+    };
+    a._sqlite3_bind_pointer = function () {
+      return (a._sqlite3_bind_pointer = a.asm.Hc).apply(null, arguments);
+    };
+    a._sqlite3_bind_text = function () {
+      return (a._sqlite3_bind_text = a.asm.Ic).apply(null, arguments);
+    };
+    a._sqlite3_bind_text64 = function () {
+      return (a._sqlite3_bind_text64 = a.asm.Jc).apply(null, arguments);
+    };
+    a._sqlite3_bind_text16 = function () {
+      return (a._sqlite3_bind_text16 = a.asm.Kc).apply(null, arguments);
+    };
+    a._sqlite3_bind_value = function () {
+      return (a._sqlite3_bind_value = a.asm.Lc).apply(null, arguments);
+    };
+    a._sqlite3_bind_zeroblob = function () {
+      return (a._sqlite3_bind_zeroblob = a.asm.Mc).apply(null, arguments);
+    };
+    a._sqlite3_bind_zeroblob64 = function () {
+      return (a._sqlite3_bind_zeroblob64 = a.asm.Nc).apply(null, arguments);
+    };
+    a._sqlite3_bind_parameter_count = function () {
+      return (a._sqlite3_bind_parameter_count = a.asm.Oc).apply(
+        null,
+        arguments
+      );
+    };
+    a._sqlite3_bind_parameter_name = function () {
+      return (a._sqlite3_bind_parameter_name = a.asm.Pc).apply(null, arguments);
+    };
+    a._sqlite3_bind_parameter_index = function () {
+      return (a._sqlite3_bind_parameter_index = a.asm.Qc).apply(
+        null,
+        arguments
+      );
+    };
+    a._sqlite3_db_handle = function () {
+      return (a._sqlite3_db_handle = a.asm.Rc).apply(null, arguments);
+    };
+    a._sqlite3_stmt_readonly = function () {
+      return (a._sqlite3_stmt_readonly = a.asm.Sc).apply(null, arguments);
+    };
+    a._sqlite3_stmt_isexplain = function () {
+      return (a._sqlite3_stmt_isexplain = a.asm.Tc).apply(null, arguments);
+    };
+    a._sqlite3_stmt_explain = function () {
+      return (a._sqlite3_stmt_explain = a.asm.Uc).apply(null, arguments);
+    };
+    a._sqlite3_stmt_busy = function () {
+      return (a._sqlite3_stmt_busy = a.asm.Vc).apply(null, arguments);
+    };
+    a._sqlite3_next_stmt = function () {
+      return (a._sqlite3_next_stmt = a.asm.Wc).apply(null, arguments);
+    };
+    a._sqlite3_stmt_status = function () {
+      return (a._sqlite3_stmt_status = a.asm.Xc).apply(null, arguments);
+    };
+    a._sqlite3_sql = function () {
+      return (a._sqlite3_sql = a.asm.Yc).apply(null, arguments);
+    };
+    a._sqlite3_expanded_sql = function () {
+      return (a._sqlite3_expanded_sql = a.asm.Zc).apply(null, arguments);
+    };
+    a._sqlite3_value_numeric_type = function () {
+      return (a._sqlite3_value_numeric_type = a.asm._c).apply(null, arguments);
+    };
+    a._sqlite3_blob_open = function () {
+      return (a._sqlite3_blob_open = a.asm.$c).apply(null, arguments);
+    };
+    a._sqlite3_blob_close = function () {
+      return (a._sqlite3_blob_close = a.asm.ad).apply(null, arguments);
+    };
+    a._sqlite3_blob_read = function () {
+      return (a._sqlite3_blob_read = a.asm.bd).apply(null, arguments);
+    };
+    a._sqlite3_blob_write = function () {
+      return (a._sqlite3_blob_write = a.asm.cd).apply(null, arguments);
+    };
+    a._sqlite3_blob_bytes = function () {
+      return (a._sqlite3_blob_bytes = a.asm.dd).apply(null, arguments);
+    };
+    a._sqlite3_blob_reopen = function () {
+      return (a._sqlite3_blob_reopen = a.asm.ed).apply(null, arguments);
+    };
+    a._sqlite3_set_authorizer = function () {
+      return (a._sqlite3_set_authorizer = a.asm.fd).apply(null, arguments);
+    };
+    a._sqlite3_strglob = function () {
+      return (a._sqlite3_strglob = a.asm.gd).apply(null, arguments);
+    };
+    a._sqlite3_strlike = function () {
+      return (a._sqlite3_strlike = a.asm.hd).apply(null, arguments);
+    };
+    a._sqlite3_errmsg = function () {
+      return (a._sqlite3_errmsg = a.asm.id).apply(null, arguments);
+    };
+    a._sqlite3_auto_extension = function () {
+      return (a._sqlite3_auto_extension = a.asm.jd).apply(null, arguments);
+    };
+    a._sqlite3_cancel_auto_extension = function () {
+      return (a._sqlite3_cancel_auto_extension = a.asm.kd).apply(
+        null,
+        arguments
+      );
+    };
+    a._sqlite3_reset_auto_extension = function () {
+      return (a._sqlite3_reset_auto_extension = a.asm.ld).apply(
+        null,
+        arguments
+      );
+    };
+    a._sqlite3_prepare = function () {
+      return (a._sqlite3_prepare = a.asm.md).apply(null, arguments);
+    };
+    a._sqlite3_prepare_v3 = function () {
+      return (a._sqlite3_prepare_v3 = a.asm.nd).apply(null, arguments);
+    };
+    a._sqlite3_prepare16 = function () {
+      return (a._sqlite3_prepare16 = a.asm.od).apply(null, arguments);
+    };
+    a._sqlite3_prepare16_v2 = function () {
+      return (a._sqlite3_prepare16_v2 = a.asm.pd).apply(null, arguments);
+    };
+    a._sqlite3_prepare16_v3 = function () {
+      return (a._sqlite3_prepare16_v3 = a.asm.qd).apply(null, arguments);
+    };
+    a._sqlite3_get_table = function () {
+      return (a._sqlite3_get_table = a.asm.rd).apply(null, arguments);
+    };
+    a._sqlite3_free_table = function () {
+      return (a._sqlite3_free_table = a.asm.sd).apply(null, arguments);
+    };
+    a._sqlite3_create_module = function () {
+      return (a._sqlite3_create_module = a.asm.td).apply(null, arguments);
+    };
+    a._sqlite3_create_module_v2 = function () {
+      return (a._sqlite3_create_module_v2 = a.asm.ud).apply(null, arguments);
+    };
+    a._sqlite3_drop_modules = function () {
+      return (a._sqlite3_drop_modules = a.asm.vd).apply(null, arguments);
+    };
+    a._sqlite3_declare_vtab = function () {
+      return (a._sqlite3_declare_vtab = a.asm.wd).apply(null, arguments);
+    };
+    a._sqlite3_vtab_on_conflict = function () {
+      return (a._sqlite3_vtab_on_conflict = a.asm.xd).apply(null, arguments);
+    };
+    a._sqlite3_vtab_config = function () {
+      return (a._sqlite3_vtab_config = a.asm.yd).apply(null, arguments);
+    };
+    a._sqlite3_vtab_collation = function () {
+      return (a._sqlite3_vtab_collation = a.asm.zd).apply(null, arguments);
+    };
+    a._sqlite3_vtab_in = function () {
+      return (a._sqlite3_vtab_in = a.asm.Ad).apply(null, arguments);
+    };
+    a._sqlite3_vtab_rhs_value = function () {
+      return (a._sqlite3_vtab_rhs_value = a.asm.Bd).apply(null, arguments);
+    };
+    a._sqlite3_vtab_distinct = function () {
+      return (a._sqlite3_vtab_distinct = a.asm.Cd).apply(null, arguments);
+    };
+    a._sqlite3_keyword_name = function () {
+      return (a._sqlite3_keyword_name = a.asm.Dd).apply(null, arguments);
+    };
+    a._sqlite3_keyword_count = function () {
+      return (a._sqlite3_keyword_count = a.asm.Ed).apply(null, arguments);
+    };
+    a._sqlite3_keyword_check = function () {
+      return (a._sqlite3_keyword_check = a.asm.Fd).apply(null, arguments);
+    };
+    a._sqlite3_complete = function () {
+      return (a._sqlite3_complete = a.asm.Gd).apply(null, arguments);
+    };
+    a._sqlite3_complete16 = function () {
+      return (a._sqlite3_complete16 = a.asm.Hd).apply(null, arguments);
+    };
+    a._sqlite3_libversion = function () {
+      return (a._sqlite3_libversion = a.asm.Id).apply(null, arguments);
+    };
+    a._sqlite3_libversion_number = function () {
+      return (a._sqlite3_libversion_number = a.asm.Jd).apply(null, arguments);
+    };
+    a._sqlite3_threadsafe = function () {
+      return (a._sqlite3_threadsafe = a.asm.Kd).apply(null, arguments);
+    };
+    a._sqlite3_initialize = function () {
+      return (a._sqlite3_initialize = a.asm.Ld).apply(null, arguments);
+    };
+    a._sqlite3_shutdown = function () {
+      return (a._sqlite3_shutdown = a.asm.Md).apply(null, arguments);
+    };
+    a._sqlite3_config = function () {
+      return (a._sqlite3_config = a.asm.Nd).apply(null, arguments);
+    };
+    a._sqlite3_db_mutex = function () {
+      return (a._sqlite3_db_mutex = a.asm.Od).apply(null, arguments);
+    };
+    a._sqlite3_db_release_memory = function () {
+      return (a._sqlite3_db_release_memory = a.asm.Pd).apply(null, arguments);
+    };
+    a._sqlite3_db_cacheflush = function () {
+      return (a._sqlite3_db_cacheflush = a.asm.Qd).apply(null, arguments);
+    };
+    a._sqlite3_db_config = function () {
+      return (a._sqlite3_db_config = a.asm.Rd).apply(null, arguments);
+    };
+    a._sqlite3_last_insert_rowid = function () {
+      return (a._sqlite3_last_insert_rowid = a.asm.Sd).apply(null, arguments);
+    };
+    a._sqlite3_set_last_insert_rowid = function () {
+      return (a._sqlite3_set_last_insert_rowid = a.asm.Td).apply(
+        null,
+        arguments
+      );
+    };
+    a._sqlite3_changes64 = function () {
+      return (a._sqlite3_changes64 = a.asm.Ud).apply(null, arguments);
+    };
+    a._sqlite3_changes = function () {
+      return (a._sqlite3_changes = a.asm.Vd).apply(null, arguments);
+    };
+    a._sqlite3_total_changes64 = function () {
+      return (a._sqlite3_total_changes64 = a.asm.Wd).apply(null, arguments);
+    };
+    a._sqlite3_total_changes = function () {
+      return (a._sqlite3_total_changes = a.asm.Xd).apply(null, arguments);
+    };
+    a._sqlite3_txn_state = function () {
+      return (a._sqlite3_txn_state = a.asm.Yd).apply(null, arguments);
+    };
+    a._sqlite3_close = function () {
+      return (a._sqlite3_close = a.asm.Zd).apply(null, arguments);
+    };
+    a._sqlite3_close_v2 = function () {
+      return (a._sqlite3_close_v2 = a.asm._d).apply(null, arguments);
+    };
+    a._sqlite3_busy_handler = function () {
+      return (a._sqlite3_busy_handler = a.asm.$d).apply(null, arguments);
+    };
+    a._sqlite3_progress_handler = function () {
+      return (a._sqlite3_progress_handler = a.asm.ae).apply(null, arguments);
+    };
+    a._sqlite3_busy_timeout = function () {
+      return (a._sqlite3_busy_timeout = a.asm.be).apply(null, arguments);
+    };
+    a._sqlite3_interrupt = function () {
+      return (a._sqlite3_interrupt = a.asm.ce).apply(null, arguments);
+    };
+    a._sqlite3_is_interrupted = function () {
+      return (a._sqlite3_is_interrupted = a.asm.de).apply(null, arguments);
+    };
+    a._sqlite3_create_function = function () {
+      return (a._sqlite3_create_function = a.asm.ee).apply(null, arguments);
+    };
+    a._sqlite3_create_function_v2 = function () {
+      return (a._sqlite3_create_function_v2 = a.asm.fe).apply(null, arguments);
+    };
+    a._sqlite3_create_window_function = function () {
+      return (a._sqlite3_create_window_function = a.asm.ge).apply(
+        null,
+        arguments
+      );
+    };
+    a._sqlite3_create_function16 = function () {
+      return (a._sqlite3_create_function16 = a.asm.he).apply(null, arguments);
+    };
+    a._sqlite3_overload_function = function () {
+      return (a._sqlite3_overload_function = a.asm.ie).apply(null, arguments);
+    };
+    a._sqlite3_trace_v2 = function () {
+      return (a._sqlite3_trace_v2 = a.asm.je).apply(null, arguments);
+    };
+    a._sqlite3_commit_hook = function () {
+      return (a._sqlite3_commit_hook = a.asm.ke).apply(null, arguments);
+    };
+    a._sqlite3_update_hook = function () {
+      return (a._sqlite3_update_hook = a.asm.le).apply(null, arguments);
+    };
+    a._sqlite3_rollback_hook = function () {
+      return (a._sqlite3_rollback_hook = a.asm.me).apply(null, arguments);
+    };
+    a._sqlite3_autovacuum_pages = function () {
+      return (a._sqlite3_autovacuum_pages = a.asm.ne).apply(null, arguments);
+    };
+    a._sqlite3_wal_autocheckpoint = function () {
+      return (a._sqlite3_wal_autocheckpoint = a.asm.oe).apply(null, arguments);
+    };
+    a._sqlite3_wal_hook = function () {
+      return (a._sqlite3_wal_hook = a.asm.pe).apply(null, arguments);
+    };
+    a._sqlite3_wal_checkpoint_v2 = function () {
+      return (a._sqlite3_wal_checkpoint_v2 = a.asm.qe).apply(null, arguments);
+    };
+    a._sqlite3_wal_checkpoint = function () {
+      return (a._sqlite3_wal_checkpoint = a.asm.re).apply(null, arguments);
+    };
+    a._sqlite3_error_offset = function () {
+      return (a._sqlite3_error_offset = a.asm.se).apply(null, arguments);
+    };
+    a._sqlite3_errmsg16 = function () {
+      return (a._sqlite3_errmsg16 = a.asm.te).apply(null, arguments);
+    };
+    a._sqlite3_errcode = function () {
+      return (a._sqlite3_errcode = a.asm.ue).apply(null, arguments);
+    };
+    a._sqlite3_extended_errcode = function () {
+      return (a._sqlite3_extended_errcode = a.asm.ve).apply(null, arguments);
+    };
+    a._sqlite3_system_errno = function () {
+      return (a._sqlite3_system_errno = a.asm.we).apply(null, arguments);
+    };
+    a._sqlite3_errstr = function () {
+      return (a._sqlite3_errstr = a.asm.xe).apply(null, arguments);
+    };
+    a._sqlite3_limit = function () {
+      return (a._sqlite3_limit = a.asm.ye).apply(null, arguments);
+    };
+    a._sqlite3_open = function () {
+      return (a._sqlite3_open = a.asm.ze).apply(null, arguments);
+    };
+    a._sqlite3_open_v2 = function () {
+      return (a._sqlite3_open_v2 = a.asm.Ae).apply(null, arguments);
+    };
+    a._sqlite3_open16 = function () {
+      return (a._sqlite3_open16 = a.asm.Be).apply(null, arguments);
+    };
+    a._sqlite3_create_collation = function () {
+      return (a._sqlite3_create_collation = a.asm.Ce).apply(null, arguments);
+    };
+    a._sqlite3_create_collation_v2 = function () {
+      return (a._sqlite3_create_collation_v2 = a.asm.De).apply(null, arguments);
+    };
+    a._sqlite3_create_collation16 = function () {
+      return (a._sqlite3_create_collation16 = a.asm.Ee).apply(null, arguments);
+    };
+    a._sqlite3_collation_needed = function () {
+      return (a._sqlite3_collation_needed = a.asm.Fe).apply(null, arguments);
+    };
+    a._sqlite3_collation_needed16 = function () {
+      return (a._sqlite3_collation_needed16 = a.asm.Ge).apply(null, arguments);
+    };
+    a._sqlite3_get_clientdata = function () {
+      return (a._sqlite3_get_clientdata = a.asm.He).apply(null, arguments);
+    };
+    a._sqlite3_set_clientdata = function () {
+      return (a._sqlite3_set_clientdata = a.asm.Ie).apply(null, arguments);
+    };
+    a._sqlite3_get_autocommit = function () {
+      return (a._sqlite3_get_autocommit = a.asm.Je).apply(null, arguments);
+    };
+    a._sqlite3_table_column_metadata = function () {
+      return (a._sqlite3_table_column_metadata = a.asm.Ke).apply(
+        null,
+        arguments
+      );
+    };
+    a._sqlite3_sleep = function () {
+      return (a._sqlite3_sleep = a.asm.Le).apply(null, arguments);
+    };
+    a._sqlite3_extended_result_codes = function () {
+      return (a._sqlite3_extended_result_codes = a.asm.Me).apply(
+        null,
+        arguments
+      );
+    };
+    a._sqlite3_file_control = function () {
+      return (a._sqlite3_file_control = a.asm.Ne).apply(null, arguments);
+    };
+    a._sqlite3_test_control = function () {
+      return (a._sqlite3_test_control = a.asm.Oe).apply(null, arguments);
+    };
+    a._sqlite3_create_filename = function () {
+      return (a._sqlite3_create_filename = a.asm.Pe).apply(null, arguments);
+    };
+    a._sqlite3_free_filename = function () {
+      return (a._sqlite3_free_filename = a.asm.Qe).apply(null, arguments);
+    };
+    a._sqlite3_uri_parameter = function () {
+      return (a._sqlite3_uri_parameter = a.asm.Re).apply(null, arguments);
+    };
+    a._sqlite3_uri_key = function () {
+      return (a._sqlite3_uri_key = a.asm.Se).apply(null, arguments);
+    };
+    a._sqlite3_uri_boolean = function () {
+      return (a._sqlite3_uri_boolean = a.asm.Te).apply(null, arguments);
+    };
+    a._sqlite3_uri_int64 = function () {
+      return (a._sqlite3_uri_int64 = a.asm.Ue).apply(null, arguments);
+    };
+    a._sqlite3_filename_database = function () {
+      return (a._sqlite3_filename_database = a.asm.Ve).apply(null, arguments);
+    };
+    a._sqlite3_filename_journal = function () {
+      return (a._sqlite3_filename_journal = a.asm.We).apply(null, arguments);
+    };
+    a._sqlite3_filename_wal = function () {
+      return (a._sqlite3_filename_wal = a.asm.Xe).apply(null, arguments);
+    };
+    a._sqlite3_db_name = function () {
+      return (a._sqlite3_db_name = a.asm.Ye).apply(null, arguments);
+    };
+    a._sqlite3_db_filename = function () {
+      return (a._sqlite3_db_filename = a.asm.Ze).apply(null, arguments);
+    };
+    a._sqlite3_db_readonly = function () {
+      return (a._sqlite3_db_readonly = a.asm._e).apply(null, arguments);
+    };
+    a._sqlite3_compileoption_used = function () {
+      return (a._sqlite3_compileoption_used = a.asm.$e).apply(null, arguments);
+    };
+    a._sqlite3_compileoption_get = function () {
+      return (a._sqlite3_compileoption_get = a.asm.af).apply(null, arguments);
+    };
+    a._sqlite3_sourceid = function () {
+      return (a._sqlite3_sourceid = a.asm.bf).apply(null, arguments);
+    };
+    var Nc = (a.___errno_location = function () {
+      return (Nc = a.___errno_location = a.asm.cf).apply(null, arguments);
+    });
+    a._sqlite3mc_config = function () {
+      return (a._sqlite3mc_config = a.asm.df).apply(null, arguments);
+    };
+    a._sqlite3mc_cipher_count = function () {
+      return (a._sqlite3mc_cipher_count = a.asm.ef).apply(null, arguments);
+    };
+    a._sqlite3mc_cipher_index = function () {
+      return (a._sqlite3mc_cipher_index = a.asm.ff).apply(null, arguments);
+    };
+    a._sqlite3mc_cipher_name = function () {
+      return (a._sqlite3mc_cipher_name = a.asm.gf).apply(null, arguments);
+    };
+    a._sqlite3mc_config_cipher = function () {
+      return (a._sqlite3mc_config_cipher = a.asm.hf).apply(null, arguments);
+    };
+    a._sqlite3mc_codec_data = function () {
+      return (a._sqlite3mc_codec_data = a.asm.jf).apply(null, arguments);
+    };
+    a._sqlite3_key = function () {
+      return (a._sqlite3_key = a.asm.kf).apply(null, arguments);
+    };
+    a._sqlite3_key_v2 = function () {
+      return (a._sqlite3_key_v2 = a.asm.lf).apply(null, arguments);
+    };
+    a._sqlite3_rekey_v2 = function () {
+      return (a._sqlite3_rekey_v2 = a.asm.mf).apply(null, arguments);
+    };
+    a._sqlite3_rekey = function () {
+      return (a._sqlite3_rekey = a.asm.nf).apply(null, arguments);
+    };
+    a._sqlite3_regexp_init = function () {
+      return (a._sqlite3_regexp_init = a.asm.of).apply(null, arguments);
+    };
+    a._sqlite3mc_register_cipher = function () {
+      return (a._sqlite3mc_register_cipher = a.asm.pf).apply(null, arguments);
+    };
+    var Pb = (a._malloc = function () {
+      return (Pb = a._malloc = a.asm.qf).apply(null, arguments);
+    });
+    a._free = function () {
+      return (a._free = a.asm.rf).apply(null, arguments);
+    };
+    a._RegisterExtensionFunctions = function () {
+      return (a._RegisterExtensionFunctions = a.asm.sf).apply(null, arguments);
+    };
+    a._sqlite3Fts5BetterTrigramInit = function () {
+      return (a._sqlite3Fts5BetterTrigramInit = a.asm.tf).apply(
+        null,
+        arguments
+      );
+    };
+    a._sqlite3Fts5HtmlInit = function () {
+      return (a._sqlite3Fts5HtmlInit = a.asm.uf).apply(null, arguments);
+    };
+    a._set_authorizer = function () {
+      return (a._set_authorizer = a.asm.vf).apply(null, arguments);
+    };
+    a._create_function = function () {
+      return (a._create_function = a.asm.wf).apply(null, arguments);
+    };
+    a._create_module = function () {
+      return (a._create_module = a.asm.xf).apply(null, arguments);
+    };
+    a._progress_handler = function () {
+      return (a._progress_handler = a.asm.yf).apply(null, arguments);
+    };
+    a._register_vfs = function () {
+      return (a._register_vfs = a.asm.zf).apply(null, arguments);
+    };
+    a._getSqliteFree = function () {
+      return (a._getSqliteFree = a.asm.Af).apply(null, arguments);
+    };
+    a._main = function () {
+      return (a._main = a.asm.Bf).apply(null, arguments);
+    };
+    var Za = (a._emscripten_builtin_memalign = function () {
+        return (Za = a._emscripten_builtin_memalign = a.asm.Df).apply(
+          null,
+          arguments
+        );
+      }),
+      Pc = (a.getTempRet0 = function () {
+        return (Pc = a.getTempRet0 = a.asm.Ef).apply(null, arguments);
+      }),
+      Kc = (a.stackSave = function () {
+        return (Kc = a.stackSave = a.asm.Ff).apply(null, arguments);
+      }),
+      Lc = (a.stackRestore = function () {
+        return (Lc = a.stackRestore = a.asm.Gf).apply(null, arguments);
+      }),
+      Jc = (a.stackAlloc = function () {
+        return (Jc = a.stackAlloc = a.asm.Hf).apply(null, arguments);
+      });
+    a._sqlite3_version = 60912;
+    a.UTF8ToString = v;
+    a.stringToUTF8 = ra;
+    a.lengthBytesUTF8 = sa;
+    a.getTempRet0 = Pc;
+    a.ccall = Z;
+    a.cwrap = function (b, c, d, e) {
+      d = d || [];
+      var f = d.every((g) => "number" === g || "boolean" === g);
+      return "string" !== c && f && !e
+        ? a["_" + b]
+        : function () {
+            return Z(b, c, d, arguments, e);
+          };
+    };
+    a.addFunction = function (b, c) {
+      if (!Gc) {
+        Gc = new WeakMap();
+        var d = E.length;
+        if (Gc)
+          for (var e = 0; e < 0 + d; e++) {
+            var f = E.get(e);
+            f && Gc.set(f, e);
+          }
+      }
+      if (Gc.has(b)) return Gc.get(b);
+      if (Hc.length) d = Hc.pop();
+      else {
+        try {
+          E.grow(1);
+        } catch (p) {
+          if (!(p instanceof RangeError)) throw p;
+          throw "Unable to grow wasm table. Set ALLOW_TABLE_GROWTH.";
+        }
+        d = E.length - 1;
+      }
+      try {
+        E.set(d, b);
+      } catch (p) {
+        if (!(p instanceof TypeError)) throw p;
+        if ("function" == typeof WebAssembly.Function) {
+          e = WebAssembly.Function;
+          f = { i: "i32", j: "i32", f: "f32", d: "f64", p: "i32" };
+          for (
+            var g = { parameters: [], results: "v" == c[0] ? [] : [f[c[0]]] },
+              h = 1;
+            h < c.length;
+            ++h
+          )
+            g.parameters.push(f[c[h]]),
+              "j" === c[h] && g.parameters.push("i32");
+          c = new e(g, b);
+        } else {
+          e = [1];
+          f = c.slice(0, 1);
+          c = c.slice(1);
+          g = { i: 127, p: 127, j: 126, f: 125, d: 124 };
+          e.push(96);
+          h = c.length;
+          128 > h ? e.push(h) : e.push(h % 128 | 128, h >> 7);
+          for (h = 0; h < c.length; ++h) e.push(g[c[h]]);
+          "v" == f ? e.push(0) : e.push(1, g[f]);
+          c = [0, 97, 115, 109, 1, 0, 0, 0, 1];
+          f = e.length;
+          128 > f ? c.push(f) : c.push(f % 128 | 128, f >> 7);
+          c.push.apply(c, e);
+          c.push(2, 7, 1, 1, 101, 1, 102, 0, 0, 7, 5, 1, 1, 102, 0, 0);
+          c = new WebAssembly.Module(new Uint8Array(c));
+          c = new WebAssembly.Instance(c, { e: { f: b } }).exports.f;
+        }
+        E.set(d, c);
+      }
+      Gc.set(b, d);
+      return d;
+    };
+    a.setValue = N;
+    a.getValue = M;
+    a.intArrayFromString = Pa;
+    a.intArrayToString = function (b) {
+      for (var c = [], d = 0; d < b.length; d++) {
+        var e = b[d];
+        255 < e && (e &= 255);
+        c.push(String.fromCharCode(e));
+      }
+      return c.join("");
+    };
+    a.AsciiToString = function (b) {
+      for (var c = ""; ; ) {
+        var d = x[b++ >> 0];
+        if (!d) return c;
+        c += String.fromCharCode(d);
+      }
+    };
+    a.UTF16ToString = function (b, c) {
+      var d = b >> 1;
+      for (var e = d + c / 2; !(d >= e) && ta[d]; ) ++d;
+      d <<= 1;
+      if (32 < d - b && Mc) return Mc.decode(x.subarray(b, d));
+      d = "";
+      for (e = 0; !(e >= c / 2); ++e) {
+        var f = A[(b + 2 * e) >> 1];
+        if (0 == f) break;
+        d += String.fromCharCode(f);
+      }
+      return d;
+    };
+    a.stringToUTF16 = function (b, c, d) {
+      void 0 === d && (d = 2147483647);
+      if (2 > d) return 0;
+      d -= 2;
+      var e = c;
+      d = d < 2 * b.length ? d / 2 : b.length;
+      for (var f = 0; f < d; ++f) (A[c >> 1] = b.charCodeAt(f)), (c += 2);
+      A[c >> 1] = 0;
+      return c - e;
+    };
+    a.UTF32ToString = function (b, c) {
+      for (var d = 0, e = ""; !(d >= c / 4); ) {
+        var f = B[(b + 4 * d) >> 2];
+        if (0 == f) break;
+        ++d;
+        65536 <= f
+          ? ((f -= 65536),
+            (e += String.fromCharCode(55296 | (f >> 10), 56320 | (f & 1023))))
+          : (e += String.fromCharCode(f));
+      }
+      return e;
+    };
+    a.stringToUTF32 = function (b, c, d) {
+      void 0 === d && (d = 2147483647);
+      if (4 > d) return 0;
+      var e = c;
+      d = e + d - 4;
+      for (var f = 0; f < b.length; ++f) {
+        var g = b.charCodeAt(f);
+        if (55296 <= g && 57343 >= g) {
+          var h = b.charCodeAt(++f);
+          g = (65536 + ((g & 1023) << 10)) | (h & 1023);
+        }
+        B[c >> 2] = g;
+        c += 4;
+        if (c + 4 > d) break;
+      }
+      B[c >> 2] = 0;
+      return c - e;
+    };
+    a.writeArrayToMemory = Ic;
+    var Qc;
+    Da = function Rc() {
+      Qc || Sc();
+      Qc || (Da = Rc);
+    };
+    function Sc() {
+      function b() {
+        if (!Qc && ((Qc = !0), (a.calledRun = !0), !na)) {
+          a.noFSInit ||
+            Db ||
+            ((Db = !0),
+            Cb(),
+            (a.stdin = a.stdin),
+            (a.stdout = a.stdout),
+            (a.stderr = a.stderr),
+            a.stdin ? Gb("stdin", a.stdin) : tb("/dev/tty", "/dev/stdin"),
+            a.stdout
+              ? Gb("stdout", null, a.stdout)
+              : tb("/dev/tty", "/dev/stdout"),
+            a.stderr
+              ? Gb("stderr", null, a.stderr)
+              : tb("/dev/tty1", "/dev/stderr"),
+            Ab("/dev/stdin", 0),
+            Ab("/dev/stdout", 1),
+            Ab("/dev/stderr", 1));
+          cb = !1;
+          Ja(ya);
+          Ja(za);
+          aa(a);
+          if (a.onRuntimeInitialized) a.onRuntimeInitialized();
+          if (Tc) {
+            var c = a._main;
+            try {
+              var d = c(0, 0);
+              if (!noExitRuntime) {
+                if (a.onExit) a.onExit(d);
+                na = !0;
+              }
+              fa(d, new Ia(d));
+            } catch (e) {
+              e instanceof Ia || "unwind" == e || fa(1, e);
+            }
+          }
+          if (a.postRun)
+            for (
+              "function" == typeof a.postRun && (a.postRun = [a.postRun]);
+              a.postRun.length;
 
+            )
+              (c = a.postRun.shift()), Aa.unshift(c);
+          Ja(Aa);
+        }
+      }
+      if (!(0 < F)) {
+        if (a.preRun)
+          for (
+            "function" == typeof a.preRun && (a.preRun = [a.preRun]);
+            a.preRun.length;
 
-  return Module.ready
-}
-);
+          )
+            Ba();
+        Ja(xa);
+        0 < F ||
+          (a.setStatus
+            ? (a.setStatus("Running..."),
+              setTimeout(function () {
+                setTimeout(function () {
+                  a.setStatus("");
+                }, 1);
+                b();
+              }, 1))
+            : b());
+      }
+    }
+    if (a.preInit)
+      for (
+        "function" == typeof a.preInit && (a.preInit = [a.preInit]);
+        0 < a.preInit.length;
+
+      )
+        a.preInit.pop()();
+    var Tc = !0;
+    a.noInitialRun && (Tc = !1);
+    Sc();
+
+    return Module.ready;
+  };
 })();
 export default Module;
