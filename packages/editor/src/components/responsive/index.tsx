@@ -56,6 +56,7 @@ export type ResponsivePresenterProps = MenuPresenterProps &
   PopupPresenterProps & {
     mobile?: PopupType;
     desktop?: PopupType;
+    shouldCloseOnOverlayClick?: boolean;
   };
 
 export function ResponsivePresenter(

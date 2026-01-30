@@ -111,8 +111,11 @@ export const SplitPane = React.forwardRef<
     [direction]
   );
 
+  const prevIds = useRef<string[]>([]);
+
   const updatePaneLimitSizes = useCallback(
     (children: React.ReactNode) => {
+      const currentIds: string[] = [];
       paneSizes.current =
         childrenToArray(children).map((childNode) => {
           const limits: PaneOptions = {
@@ -123,52 +126,73 @@ export const SplitPane = React.forwardRef<
             initialSize: Infinity,
             collapsed: false
           };
-          if (React.isValidElement(childNode) && childNode.type === Pane) {
+          if (React.isValidElement(childNode)) {
             const { minSize, maxSize, snapSize, initialSize, id, collapsed } =
               childNode.props as IPaneConfigs;
+            if (id) currentIds.push(id);
             limits.min = assertsSize(minSize, wrapSize.current, 0);
             limits.max = assertsSize(maxSize, wrapSize.current);
             limits.snap = assertsSize(snapSize, wrapSize.current, 0);
             limits.initialSize = assertsSize(initialSize, wrapSize.current);
 
-            Object.defineProperty(limits, "collapsed", {
-              get() {
-                return Config.get(`${autoSaveKey}-${id}:collapsed`, collapsed);
-              },
-              set(v) {
-                if (v == null) Config.remove(`${autoSaveKey}-${id}:collapsed`);
-                else Config.set(`${autoSaveKey}-${id}:collapsed`, v);
-              }
-            });
-            Object.defineProperty(limits, "size", {
-              get() {
-                return Config.get(
-                  `${autoSaveKey}-${id}`,
-                  assertsSize(initialSize, wrapSize.current)
-                );
-              },
-              set(v) {
-                if (v === null || v === undefined || v === Infinity)
-                  Config.remove(`${autoSaveKey}-${id}`);
-                else Config.set(`${autoSaveKey}-${id}`, v);
-              }
-            });
-            Object.defineProperty(limits, "expandedSize", {
-              get() {
-                return Config.get(
-                  `${autoSaveKey}-${id}:expandedSize`,
-                  assertsSize(initialSize, wrapSize.current)
-                );
-              },
-              set(v) {
-                if (v === null || v === undefined || v === Infinity)
-                  Config.remove(`${autoSaveKey}-${id}:expandedSize`);
-                else Config.set(`${autoSaveKey}-${id}:expandedSize`, v);
-              }
-            });
+            if (autoSaveKey && id) {
+              Object.defineProperty(limits, "collapsed", {
+                get() {
+                  return Config.get(
+                    `${autoSaveKey}-${id}:collapsed`,
+                    collapsed
+                  );
+                },
+                set(v) {
+                  if (v == null)
+                    Config.remove(`${autoSaveKey}-${id}:collapsed`);
+                  else Config.set(`${autoSaveKey}-${id}:collapsed`, v);
+                }
+              });
+              Object.defineProperty(limits, "size", {
+                get() {
+                  return Config.get(
+                    `${autoSaveKey}-${id}`,
+                    assertsSize(initialSize, wrapSize.current)
+                  );
+                },
+                set(v) {
+                  if (v === null || v === undefined || v === Infinity)
+                    Config.remove(`${autoSaveKey}-${id}`);
+                  else Config.set(`${autoSaveKey}-${id}`, v);
+                }
+              });
+              Object.defineProperty(limits, "expandedSize", {
+                get() {
+                  return Config.get(
+                    `${autoSaveKey}-${id}:expandedSize`,
+                    assertsSize(initialSize, wrapSize.current)
+                  );
+                },
+                set(v) {
+                  if (v === null || v === undefined || v === Infinity)
+                    Config.remove(`${autoSaveKey}-${id}:expandedSize`);
+                  else Config.set(`${autoSaveKey}-${id}:expandedSize`, v);
+                }
+              });
+            } else {
+              limits.collapsed = collapsed || false;
+              limits.size = assertsSize(initialSize, wrapSize.current);
+            }
           }
           return limits;
         }) || [];
+
+        // Cleanup removed IDs
+        if (autoSaveKey) {
+          const removedIds = prevIds.current.filter(id => !currentIds.includes(id));
+          for (const id of removedIds) {
+            Config.remove(`${autoSaveKey}-${id}`);
+            Config.remove(`${autoSaveKey}-${id}:collapsed`);
+            Config.remove(`${autoSaveKey}-${id}:expandedSize`);
+          }
+        }
+        prevIds.current = currentIds;
     },
     [autoSaveKey]
   );
@@ -183,6 +207,8 @@ export const SplitPane = React.forwardRef<
     updatePaneLimitSizes(children);
     setSizes(paneSizes.current, wrapSize.current, true);
   }, [children, childrenLength]);
+
+  const lastNotifiedSizes = useRef<number[]>([]);
 
   const setSizes = useCallback(
     function setSizes(
@@ -199,7 +225,7 @@ export const SplitPane = React.forwardRef<
       for (let i = 0; i < panes.current.length; ++i) {
         const pane = panes.current[i];
         if (!pane) continue;
-        
+
         // If there is only one pane, remove the calculated styles so it fills the container
         if (normalized.length === 1) {
           pane.style.removeProperty(sizeName);
@@ -230,7 +256,15 @@ export const SplitPane = React.forwardRef<
         limits.size = normalized[index];
       });
 
-      if (notify) onChange(normalized);
+      if (notify) {
+        const sizesChanged = normalized.some(
+          (s, i) => Math.abs(s - (lastNotifiedSizes.current[i] || 0)) > 0.1
+        );
+        if (sizesChanged) {
+          lastNotifiedSizes.current = normalized;
+          onChange(normalized);
+        }
+      }
     },
     [children, onChange, sizeName, splitPos, resizerSize]
   );
@@ -245,7 +279,7 @@ export const SplitPane = React.forwardRef<
       const newSize = entry.contentRect ? entry.contentRect[sizeName] : 0;
 
       const delta = newSize - wrapSize.current;
-      if (delta === 0) return;
+      if (delta === 0 || newSize === 0) return;
 
       // TODO: responsiveness
       // const nextSizes = [...sizes.current];
@@ -267,8 +301,10 @@ export const SplitPane = React.forwardRef<
       //   nextSizes[i] += delta;
       // }
 
-      wrapSize.current = newSize;
-      setSizes(paneSizes.current, wrapSize.current);
+      window.requestAnimationFrame(() => {
+        wrapSize.current = newSize;
+        setSizes(paneSizes.current, wrapSize.current);
+      });
     });
     resizeObserver.observe(wrapper.current);
     return () => {
@@ -371,7 +407,10 @@ export const SplitPane = React.forwardRef<
       // keep the next pane size in the min-max range
       nextPane.nextSize = Math.min(
         nextPane.max,
-        Math.max(nextPane.min, (nextPane.nextSize || nextPane.size) - distanceX)
+        Math.max(
+          nextPane.min,
+          (nextPane.nextSize || nextPane.size) - distanceX
+        )
       );
 
       // snapping logic
@@ -419,9 +458,7 @@ export const SplitPane = React.forwardRef<
       {...others}
     >
       {childrenToArray(children).map((childNode, childIndex) => {
-        const isPane = React.isValidElement(childNode)
-          ? childNode.type === Pane
-          : false;
+        const isPane = React.isValidElement(childNode);
         const paneProps =
           isPane && React.isValidElement(childNode) ? childNode.props : {};
 
@@ -479,8 +516,22 @@ function normalizeSizes(
   let curSum = 0;
   const res = childrenToArray(children).map((_, index) => {
     const initialSize = panes[index].initialSize;
-    const size = panes[index].collapsed ? panes[index].min : panes[index].size;
-    initialSize === Infinity ? count++ : (curSum += size);
+
+    // Recovery logic for Auto panes (like editor-pane) stuck at 0/collapsed
+    if (initialSize === Infinity) {
+      if (panes[index].collapsed) {
+        panes[index].collapsed = false;
+      }
+      if (panes[index].size === 0) {
+        panes[index].size = Infinity;
+      }
+    }
+
+    let size = panes[index].collapsed ? panes[index].min : panes[index].size;
+    if (size === 0 && initialSize === Infinity) {
+      size = Infinity;
+    }
+    size === Infinity ? count++ : (curSum += size);
     return size;
   });
 
@@ -494,11 +545,12 @@ function normalizeSizes(
   }
 
   // Handle overflow: scale all panes proportionally to fit
-  if (curSum > wrapSize && curSum > 0) {
+  if (curSum > 0 && Math.abs(curSum - wrapSize) > 0.1) {
     const scale = wrapSize / curSum;
     return res.map((size, index) => {
       const min = panes[index].min;
-      return Math.max(min, size * scale);
+      const max = panes[index].max;
+      return Math.min(max, Math.max(min, size * scale));
     });
   }
 

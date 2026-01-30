@@ -18,27 +18,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import "./overrides";
-import { app, BrowserWindow, nativeTheme, shell, dialog } from "electron";
+import { app, nativeTheme, dialog } from "electron";
 import { isDevelopment } from "./utils";
-import { registerProtocol, PROTOCOL_URL } from "./utils/protocol";
+import { registerProtocol } from "./utils/protocol";
 import { configureAutoUpdater } from "./utils/autoupdater";
-import { getBackgroundColor, getTheme, setTheme } from "./utils/theme";
-import { setupMenu } from "./utils/menu";
-import { WindowState } from "./utils/window-state";
-import { setupJumplist } from "./utils/jumplist";
+import { getTheme, setTheme } from "./utils/theme";
 import { setupTray } from "./utils/tray";
-import { CLIOptions, parseArguments } from "./cli";
+import { parseArguments } from "./cli";
 import { AssetManager } from "./utils/asset-manager";
-import { createIPCHandler } from "electron-trpc/main";
-import { router, api } from "./api";
 import { config } from "./utils/config";
 import path from "path";
 import { bringToFront } from "./utils/bring-to-front";
 import { bridge } from "./api/bridge";
-import { setupDesktopIntegration } from "./utils/desktop-integration";
 import { disableCustomDns, enableCustomDns } from "./utils/custom-dns";
 import { Messages, setI18nGlobal } from "@notesnook/intl";
 import { i18n } from "@lingui/core";
+import { windowManager } from "./utils/window-manager";
+import { setupJumplist } from "./utils/jumplist";
 
 const locale =
   process.env.NODE_ENV === "development"
@@ -79,106 +75,6 @@ process.on("unhandledRejection", (reason) => {
 
 app.commandLine.appendSwitch("lang", "en-US");
 
-async function createWindow() {
-  const cliOptions = await parseArguments(process.argv);
-  setTheme(getTheme());
-
-  const mainWindowState = new WindowState({});
-  const mainWindow = new BrowserWindow({
-    show: !cliOptions.hidden,
-    paintWhenInitiallyHidden: cliOptions.hidden,
-    skipTaskbar: cliOptions.hidden,
-    x: mainWindowState.x,
-    y: mainWindowState.y,
-    width: mainWindowState.width,
-    height: mainWindowState.height,
-    darkTheme: getTheme() === "dark",
-    backgroundColor: getBackgroundColor(),
-    opacity: 0,
-    autoHideMenuBar: false,
-    icon: AssetManager.appIcon({
-      size: 512,
-      format: process.platform === "win32" ? "ico" : "png"
-    }),
-
-    ...(config.desktopSettings.nativeTitlebar
-      ? {}
-      : {
-          titleBarStyle:
-            process.platform === "win32" || process.platform === "darwin"
-              ? "hidden"
-              : "default",
-          frame: process.platform === "win32" || process.platform === "darwin",
-          titleBarOverlay: {
-            height: 37,
-            color: "#00000000",
-            symbolColor: config.windowControlsIconColor
-          },
-          trafficLightPosition: {
-            x: 16,
-            y: 12
-          }
-        }),
-
-    webPreferences: {
-      zoomFactor: config.zoomFactor,
-      nodeIntegration: true,
-      contextIsolation: false,
-      nodeIntegrationInWorker: true,
-      spellcheck: config.isSpellCheckerEnabled,
-      preload: __dirname + "/preload.js"
-    }
-  });
-
-  createIPCHandler({ router, windows: [mainWindow] });
-  globalThis.window = mainWindow;
-  mainWindow.setMenuBarVisibility(false);
-  mainWindowState.manage(mainWindow);
-
-  if (cliOptions.hidden && !config.desktopSettings.minimizeToSystemTray)
-    mainWindow.minimize();
-
-  await mainWindow.webContents.loadURL(`${createURL(cliOptions, "/")}`);
-  mainWindow.setOpacity(1);
-
-  if (config.privacyMode) {
-    await api.integration.setPrivacyMode({ enabled: config.privacyMode });
-  }
-
-  await AssetManager.loadIcons();
-  setupDesktopIntegration(config.desktopSettings);
-
-  mainWindow.webContents.session.setPermissionRequestHandler(
-    (webContents, permission, callback) => {
-      callback(permission === "geolocation" ? false : true);
-    }
-  );
-  mainWindow.webContents.session.setSpellCheckerDictionaryDownloadURL(
-    "http://dictionaries.notesnook.com/"
-  );
-  mainWindow.webContents.session.setProxy({ proxyRules: config.proxyRules });
-
-  mainWindow.once("closed", () => {
-    globalThis.window = null;
-  });
-
-  setupMenu();
-  setupJumplist();
-
-  if (isDevelopment())
-    mainWindow.webContents.openDevTools({ mode: "bottom", activate: true });
-
-  mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url);
-    return { action: "deny" };
-  });
-
-  nativeTheme.on("updated", () => {
-    setupTray();
-    setupJumplist();
-  });
-}
-
 app.once("ready", async () => {
   console.info("App ready. Opening window.");
 
@@ -197,7 +93,12 @@ app.once("ready", async () => {
   else disableCustomDns();
 
   if (!isDevelopment()) registerProtocol();
-  await createWindow();
+
+  const cliOptions = await parseArguments(process.argv);
+  setTheme(getTheme());
+  await AssetManager.loadIcons();
+
+  await windowManager.createMainWindow(cliOptions);
   configureAutoUpdater();
 });
 
@@ -208,7 +109,7 @@ app.once("window-all-closed", () => {
 });
 
 app.on("second-instance", async (_ev, argv) => {
-  if (!globalThis.window) return;
+  if (!windowManager.getMainWindow()) return;
   const cliOptions = await parseArguments(argv);
   if (cliOptions.note) bridge.onCreateItem("note");
   if (cliOptions.notebook) bridge.onCreateItem("notebook");
@@ -216,23 +117,14 @@ app.on("second-instance", async (_ev, argv) => {
   bringToFront();
 });
 
-app.on("activate", () => {
-  if (globalThis.window === null) {
-    createWindow();
+app.on("activate", async () => {
+  if (windowManager.getMainWindow() === null) {
+    const cliOptions = await parseArguments(process.argv);
+    await windowManager.createMainWindow(cliOptions);
   }
 });
 
-function createURL(options: CLIOptions, path = "/") {
-  const url = new URL(isDevelopment() ? "http://localhost:3000" : PROTOCOL_URL);
-
-  url.pathname = path;
-  if (options.note === true) url.hash = "/notes/create/1";
-  else if (options.notebook === true) url.hash = "/notebooks/create";
-  else if (options.reminder === true) url.hash = "/reminders/create";
-  else if (typeof options.note === "string")
-    url.hash = `/notes/${options.note}/edit`;
-  else if (typeof options.notebook === "string")
-    url.hash = `/notebooks/${options.notebook}`;
-
-  return url;
-}
+nativeTheme.on("updated", () => {
+  setupTray();
+  setupJumplist();
+});

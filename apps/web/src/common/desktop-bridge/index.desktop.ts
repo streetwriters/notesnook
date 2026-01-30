@@ -17,17 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { createTRPCProxyClient } from "@trpc/client";
+import { CreateTRPCProxyClient, createTRPCProxyClient } from "@trpc/client";
 import { ipcLink } from "electron-trpc/renderer";
 import type { AppRouter } from "@notesnook/desktop";
 import { AppEventManager, AppEvents } from "../app-events";
+import { EVENTS } from "@notesnook/core";
+import { useEditorStore as editorStore } from "../../stores/editor-store";
+import { db } from "../db";
+import { debounce } from "@notesnook/common";
 import { TaskScheduler } from "../../utils/task-scheduler";
 import { checkForUpdate } from "../../utils/updater";
 import { showToast } from "../../utils/toast";
 
-export const desktop = createTRPCProxyClient<AppRouter>({
-  links: [ipcLink()]
-});
+export const desktop: CreateTRPCProxyClient<AppRouter> =
+  createTRPCProxyClient<AppRouter>({
+    links: [ipcLink()]
+  });
 
 attachListeners();
 function attachListeners() {
@@ -65,6 +70,46 @@ function attachListeners() {
 
   TaskScheduler.register("updateCheck", "0 0 */12 * * * *", () => {
     checkForUpdate();
+  });
+
+  const handleDbChange = debounce(async () => {
+    AppEventManager.publish(EVENTS.appRefreshRequested);
+
+    // Check if active editor needs update
+    const session = editorStore.getState().getActiveSession();
+    if (session && "note" in session && session.note.id) {
+      try {
+        const note = await db.notes.note(session.note.id);
+        if (
+          note &&
+          note.contentId &&
+          note.dateModified > session.note.dateModified
+        ) {
+          console.log(
+            "External change detected for current note, reloading...",
+            note.id
+          );
+          const content = await db.content.get(note.contentId);
+          if (content) {
+            db.eventManager.publish(EVENTS.syncItemMerged, {
+              ...content,
+              type: "tiptap",
+              noteId: note.id
+            });
+            db.eventManager.publish(EVENTS.syncItemMerged, {
+              ...note,
+              type: "note"
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Failed to sync external change:", error);
+      }
+    }
+  }, 500);
+
+  desktop.db.onDbChange.subscribe(undefined, {
+    onData: () => handleDbChange()
   });
 }
 

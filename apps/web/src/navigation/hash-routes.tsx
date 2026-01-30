@@ -46,6 +46,11 @@ const hashroutes = defineHashRoutes({
   "/notebooks/:notebookId/edit": ({ notebookId }) => {
     EditNotebookDialog.show({ notebookId })?.then(afterAction);
   },
+  "/notes/:noteId/edit": ({ noteId }) => {
+    import("../stores/editor-store").then(({ useEditorStore }) => {
+      useEditorStore.getState().openSession(noteId);
+    });
+  },
   "/reminders/create": () => {
     AddReminderDialog.show({}).then(afterAction);
   },

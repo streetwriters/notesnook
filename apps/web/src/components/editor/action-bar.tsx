@@ -40,7 +40,10 @@ import {
   TableOfContents,
   Trash,
   Undo,
-  Unlock
+  Unlock,
+  VerticalSplit,
+  HorizontalSplit,
+  MoreVertical
 } from "../icons";
 import { ScrollContainer } from "@notesnook/ui";
 import {
@@ -186,43 +189,25 @@ export function EditorActionBar({ groupId }: { groupId: string }) {
   const groupsCount = useEditorStore((store) => store.groups.length);
   const isTablet = useTablet();
 
-  const tools: ToolButton[] = [
+  const [width, setWidth] = useState(1000);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setWidth(entry.contentRect.width);
+      }
+    });
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  const collapsed = width < 550;
+
+  const collapsibleTools: ToolButton[] = [
     {
-      title: "Split",
-      icon: Clone,
-      enabled: true,
-      onClick: () => useEditorStore.getState().splitGroup(),
-      hidden: isMobile
-    },
-    {
-      title: strings.close(),
-      icon: Cross,
-      enabled: groupsCount > 1,
-      onClick: () => useEditorStore.getState().closeGroup(groupId),
-      hidden: isMobile || groupsCount === 1
-    },
-    {
-      title: strings.newTab(),
-      icon: NewTab,
-      enabled: true,
-      onClick: () => useEditorStore.getState().addTab(undefined, groupId)
-    },
-    {
-      title: strings.undo(),
-      icon: Undo,
-      enabled: editorManager?.canUndo,
-      onClick: () => editorManager?.editor?.undo(),
-      hidden: activeSession?.type === "readonly"
-    },
-    {
-      title: strings.redo(),
-      icon: Redo,
-      enabled: editorManager?.canRedo,
-      onClick: () => editorManager?.editor?.redo(),
-      hidden: activeSession?.type === "readonly"
-    },
-    {
-      title: isNotePublished ? strings.published() : strings.publish(),
+      title: isNotePublished ? "Published" : "Publish",
       icon: isNotePublished ? Published : Publish,
       hidden: !isLoggedIn,
       hideOnMobile: true,
@@ -240,18 +225,7 @@ export function EditorActionBar({ groupId }: { groupId: string }) {
       }
     },
     {
-      title: strings.toc(),
-      icon: TableOfContents,
-      enabled:
-        activeSession &&
-        activeSession.type !== "locked" &&
-        activeSession.type !== "diff" &&
-        activeSession.type !== "conflicted",
-      onClick: () => useEditorStore.getState().toggleTableOfContents(),
-      toggled: isTOCVisible
-    },
-    {
-      title: strings.search(),
+      title: "Search",
       icon: Search,
       enabled:
         activeSession &&
@@ -262,7 +236,18 @@ export function EditorActionBar({ groupId }: { groupId: string }) {
       onClick: () => editorManager?.editor?.startSearch()
     },
     {
-      title: strings.properties(),
+      title: "Table of Contents",
+      icon: TableOfContents,
+      enabled:
+        activeSession &&
+        activeSession.type !== "locked" &&
+        activeSession.type !== "diff" &&
+        activeSession.type !== "conflicted",
+      onClick: () => useEditorStore.getState().toggleTableOfContents(),
+      toggled: isTOCVisible
+    },
+    {
+      title: "Properties",
       icon: Properties,
       enabled:
         activeSession &&
@@ -273,6 +258,84 @@ export function EditorActionBar({ groupId }: { groupId: string }) {
       onClick: () => useEditorStore.getState().toggleProperties(),
       toggled: arePropertiesVisible
     },
+    {
+      title: "Split Right",
+      icon: VerticalSplit,
+      enabled: true,
+      onClick: () => useEditorStore.getState().splitGroup("vertical", groupId),
+      hidden: isMobile
+    },
+    {
+      title: "Split Down",
+      icon: HorizontalSplit,
+      enabled: true,
+      onClick: () => useEditorStore.getState().splitGroup("horizontal", groupId),
+      hidden: isMobile
+    },
+    {
+      title: "Close",
+      icon: Cross,
+      enabled: groupsCount > 1,
+      onClick: () => useEditorStore.getState().closeGroup(groupId),
+      hidden: isMobile || groupsCount === 1
+    }
+  ];
+
+  const tools: ToolButton[] = [
+    {
+      title: "New Tab",
+      icon: NewTab,
+      enabled: true,
+      onClick: () => useEditorStore.getState().addTab(undefined, groupId)
+    },
+    {
+      title: "Undo",
+      icon: Undo,
+      enabled: editorManager?.canUndo,
+      onClick: () => editorManager?.editor?.undo(),
+      hidden: activeSession?.type === "readonly"
+    },
+    {
+      title: "Redo",
+      icon: Redo,
+      enabled: editorManager?.canRedo,
+      onClick: () => editorManager?.editor?.redo(),
+      hidden: activeSession?.type === "readonly"
+    },
+    ...(collapsed
+      ? [
+          {
+            title: "Menu",
+            icon: MoreVertical,
+            enabled: true,
+            onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+              Menu.openMenu(
+                collapsibleTools
+                  .filter((t) => {
+                    const isHidden =
+                      typeof t.hidden === "boolean" ? t.hidden : false;
+                    return !isHidden;
+                  })
+                  .map((t) => ({
+                    type: "button",
+                    title: t.title,
+                    key: t.title,
+                    icon: (t.icon as any).path, // Use the path string instead of the component
+                    onClick: () =>
+                      t.onClick(
+                        e as unknown as React.MouseEvent<
+                          HTMLButtonElement,
+                          MouseEvent
+                        >
+                      ),
+                    isChecked: t.toggled,
+                    isDisabled: !t.enabled
+                  }))
+              );
+            }
+          }
+        ]
+      : collapsibleTools),
     ...getWindowControls(
       hasNativeWindowControls,
       isFullscreen,
@@ -283,7 +346,15 @@ export function EditorActionBar({ groupId }: { groupId: string }) {
   ];
 
   return (
-    <>
+    <Flex
+      ref={containerRef}
+      sx={{
+        width: "100%",
+        height: "100%",
+        // alignItems: "center", // Removed to allow children (like TabStrip) to stretch
+        overflow: "hidden"
+      }}
+    >
       {isMobile ? (
         <Flex sx={{ flex: 1 }}>
           <Button
@@ -347,7 +418,7 @@ export function EditorActionBar({ groupId }: { groupId: string }) {
           </Button>
         ))}
       </Flex>
-    </>
+    </Flex>
   );
 }
 
@@ -390,7 +461,7 @@ const TabStrip = React.memo(function TabStrip({
           onClick={() => useEditorStore.getState().newSession(groupId)}
           data-test-id={`create-new-note`}
           sx={{
-            p: 1,
+            p: "3px",
             borderRadius: "100%",
             mr: "small"
           }}
@@ -546,6 +617,19 @@ const TabStrip = React.memo(function TabStrip({
                           )
                       : undefined
                   }
+                  onOpenInNewWindow={
+                    "note" in session && IS_DESKTOP_APP
+                      ? () => {
+                          import("../../common/desktop-bridge").then(
+                            ({ desktop }) => {
+                              desktop?.window.open.mutate({
+                                noteId: session.note.id
+                              });
+                            }
+                          );
+                        }
+                      : undefined
+                  }
                   onPin={() => useEditorStore.getState().pinTab(tab.id)}
                 />
               );
@@ -578,6 +662,7 @@ type TabProps = {
   onPin: () => void;
   onSave: () => void;
   onRevealInList?: () => void;
+  onOpenInNewWindow?: () => void;
   isGroupFocused?: boolean;
 };
 export function Tab(props: TabProps) {
@@ -599,6 +684,7 @@ export function Tab(props: TabProps) {
     onRevealInList,
     onPin,
     onSave,
+    onOpenInNewWindow,
     isGroupFocused
   } = props;
   const Icon = isLocked
@@ -724,6 +810,13 @@ export function Tab(props: TabProps) {
             isDisabled: isRevealInListDisabled
           },
           { type: "separator", key: "sep2", isHidden: !onRevealInList },
+          {
+            type: "button",
+            title: strings.openInNewWindow(),
+            key: "open-in-new-window",
+            onClick: onOpenInNewWindow,
+            isHidden: !onOpenInNewWindow
+          },
           {
             type: "button",
             key: "pin",

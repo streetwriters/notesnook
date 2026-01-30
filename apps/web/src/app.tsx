@@ -48,6 +48,7 @@ import { getFontSizes } from "@notesnook/theme/theme/font/fontsize.js";
 import { useWindowControls } from "./hooks/use-window-controls";
 import { STATUS_BAR_HEIGHT } from "./common/constants";
 import { NavigationEvents } from "./navigation";
+import { AppDnDContext } from "./components/app-dnd-context";
 
 new WebExtensionRelay();
 
@@ -59,6 +60,8 @@ function App() {
   const hasNativeTitlebar =
     useSettingStore.getState().desktopIntegrationSettings?.nativeTitlebar;
   console.timeEnd("loading app");
+  const isSingleNote =
+    new URLSearchParams(window.location.search).get("singleNote") === "true";
 
   useEffect(() => {
     if (isMobile) {
@@ -87,7 +90,8 @@ function App() {
             .mobile-nav-pane .theme-scope-navigationMenu {
               padding-top: env(titlebar-area-height) !important;
             }
-            .editor-pane:first-of-type .editor-action-bar,
+            #editor-panel > div:first-of-type > .editor-action-bar,
+            .app-focus-mode #editor-panel > .react-split:first-of-type .react-split__pane:first-of-type > div > .editor-action-bar,
             .mobile-editor-pane.pane-active .editor-action-bar,
             .mobile-list-pane.pane-active .route-container-header {
                 padding-left: 80px;
@@ -142,11 +146,14 @@ function DesktopAppContents() {
   const isListPaneVisible = useStore((store) => store.isListPaneVisible);
   const isTablet = useTablet();
   const navPane = useRef<SplitPaneImperativeHandle>(null);
+  const isSingleNote =
+    new URLSearchParams(window.location.search).get("singleNote") === "true";
 
   useEffect(() => {
+    if (isSingleNote) return;
     if (isTablet) navPane.current?.collapse(0);
     else if (navPane.current?.isCollapsed(0)) navPane.current?.expand(0);
-  }, [isTablet]);
+  }, [isTablet, isSingleNote]);
 
   useEffect(() => {
     const event = AppEventManager.subscribe(
@@ -171,6 +178,7 @@ function DesktopAppContents() {
   }, []);
 
   useEffect(() => {
+    if (isSingleNote) return;
     if (isListPaneVisible) {
       if (navPane.current?.hasExpandedSize(1)) {
         navPane.current?.expand(1);
@@ -180,84 +188,86 @@ function DesktopAppContents() {
     } else {
       navPane.current?.collapse(1);
     }
-  }, [isListPaneVisible]);
+  }, [isListPaneVisible, isSingleNote]);
 
   return (
     <>
-      <Flex
-        variant="rowFill"
-        sx={{
-          overflow: "hidden"
-        }}
-      >
-        <SplitPane
-          className="global-split-pane"
-          ref={navPane}
-          autoSaveId="global-panel-group"
-          direction="vertical"
-          onChange={(sizes) => {
-            useStore.setState({
-              isNavPaneCollapsed: sizes[0] <= 70,
-              isListPaneVisible: sizes[1] > 5 // we keep a 5px margin just to be safe
-            });
+      <AppDnDContext>
+        <Flex
+          variant="rowFill"
+          sx={{
+            overflow: "hidden"
           }}
         >
-          {isFocusMode ? null : (
-            <Pane
-              id="nav-pane"
-              initialSize={isTablet ? 0 : 250}
-              className={`nav-pane`}
-              snapSize={150}
-              minSize={50}
-              maxSize={isTablet ? 0 : 500}
-              style={{
-                overflow: "initial",
-                zIndex: 3
-              }}
-            >
-              <NavigationMenu onExpand={() => navPane.current?.reset(0)} />
-            </Pane>
-          )}
-          {isFocusMode ? null : (
-            <Pane
-              id="list-pane"
-              initialSize={380}
-              style={{ flex: 1, display: "flex" }}
-              snapSize={120}
-              maxSize={1000}
-              className="list-pane"
-            >
-              <ScopedThemeProvider
-                className="listMenu"
-                scope="list"
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  flex: 1,
-                  bg: "background",
-                  borderRight: "1px solid var(--separator)"
-                }}
-              >
-                <CachedRouter />
-              </ScopedThemeProvider>
-            </Pane>
-          )}
-          <Pane
-            id="editor-pane"
-            className="editor-pane"
-            style={{
-              flex: 1,
-              display: "flex",
-              backgroundColor: "var(--background)",
-              overflow: "hidden",
-              flexDirection: "column"
+          <SplitPane
+            className="global-split-pane"
+            ref={navPane}
+            autoSaveId="global-panel-group"
+            direction="vertical"
+            onChange={(sizes) => {
+              useStore.setState({
+                isNavPaneCollapsed: sizes[0] <= 70,
+                isListPaneVisible: sizes[1] > 5 // we keep a 5px margin just to be safe
+              });
             }}
           >
-            {<HashRouter />}
-          </Pane>
-        </SplitPane>
-      </Flex>
-      <StatusBar />
+            {isFocusMode || isSingleNote ? null : (
+              <Pane
+                id="nav-pane"
+                initialSize={isTablet ? 0 : 250}
+                className={`nav-pane`}
+                snapSize={150}
+                minSize={50}
+                maxSize={isTablet ? 0 : 500}
+                style={{
+                  overflow: "initial",
+                  zIndex: 3
+                }}
+              >
+                <NavigationMenu onExpand={() => navPane.current?.reset(0)} />
+              </Pane>
+            )}
+            {isFocusMode || isSingleNote ? null : (
+              <Pane
+                id="list-pane"
+                initialSize={380}
+                style={{ flex: 1, display: "flex" }}
+                snapSize={120}
+                maxSize={1000}
+                className="list-pane"
+              >
+                <ScopedThemeProvider
+                  className="listMenu"
+                  scope="list"
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    flex: 1,
+                    bg: "background",
+                    borderRight: "1px solid var(--separator)"
+                  }}
+                >
+                  <CachedRouter />
+                </ScopedThemeProvider>
+              </Pane>
+            )}
+            <Pane
+              id="editor-pane"
+              className="editor-pane"
+              style={{
+                flex: 1,
+                display: "flex",
+                backgroundColor: "var(--background)",
+                overflow: "hidden",
+                flexDirection: "column"
+              }}
+            >
+              {<HashRouter />}
+            </Pane>
+          </SplitPane>
+        </Flex>
+      </AppDnDContext>
+      {isSingleNote ? null : <StatusBar />}
     </>
   );
 }

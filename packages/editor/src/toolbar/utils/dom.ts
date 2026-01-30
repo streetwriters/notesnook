@@ -19,10 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { createRoot } from "react-dom/client";
 
-export function getToolbarElement() {
+export function getToolbarElement(editorId?: string) {
   return (
-    (document.querySelector(".active .editor-toolbar") as HTMLElement) ||
-    undefined
+    (document.querySelector(
+      editorId
+        ? `.editor-toolbar[data-editor-id="${editorId}"]`
+        : ".active .editor-toolbar"
+    ) as HTMLElement) || undefined
   );
 }
 

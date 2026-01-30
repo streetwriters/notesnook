@@ -27,7 +27,7 @@ import React, {
   useCallback
 } from "react";
 import { Box, Button, Flex, Progress, Text } from "@theme-ui/components";
-import Properties from "../properties";
+import Properties, { Section } from "../properties";
 import {
   useEditorStore,
   SaveState,
@@ -39,7 +39,9 @@ import {
   DocumentPreview,
   LockedEditorSession,
   isLockedSession,
-  TabItem
+  TabItem,
+  EditorGroup,
+  LayoutNode
 } from "../../stores/editor-store";
 import {
   useStore as useAppStore,
@@ -80,11 +82,7 @@ import {
   DragOverEvent,
   DragOverlay,
   DragStartEvent,
-  KeyboardSensor,
-  MouseSensor,
-  closestCenter,
-  useSensor,
-  useSensors
+  useDndMonitor
 } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { logger } from "../../utils/logger";
@@ -97,6 +95,7 @@ import { isMobile } from "../../hooks/use-mobile";
 import { ConfirmDialog } from "../../dialogs/confirm";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
+import { DropZoneOverlay } from "./drop-zone";
 
 const autoSaveToast = { show: true, hide: () => {} };
 
@@ -137,145 +136,181 @@ export async function saveContent(
 }
 const deferredSave = debounceWithId(saveContent, 100);
 
+const MemoizedEditorView = React.memo(EditorView, (prev, next) => {
+  const baseConditions =
+    prev.session.id === next.session.id &&
+    prev.session.type === next.session.type &&
+    prev.session.needsHydration === next.session.needsHydration &&
+    prev.session.activeBlockId === next.session.activeBlockId &&
+    prev.session.activeSearchResultId === next.session.activeSearchResultId &&
+    prev.session.nonce === next.session.nonce;
+
+  if (
+    "attachmentsLength" in prev.session &&
+    "attachmentsLength" in next.session
+  ) {
+    return (
+      baseConditions &&
+      prev.session.attachmentsLength === next.session.attachmentsLength
+    );
+  }
+
+  return baseConditions;
+});
+
+
+
 const SessionItem = React.memo(
-  ({ tab, activeTabId }: { tab: TabItem; activeTabId?: string }) => {
+  ({
+    tab,
+    activeTabId
+  }: {
+    tab: TabItem;
+    activeTabId: string;
+  }) => {
     const session = useEditorStore((store) => store.getSession(tab.sessionId));
     if (!session) return null;
 
+    const isActive = tab.id === activeTabId;
+
     return (
-      <Freeze key={session.id} freeze={tab.id !== activeTabId}>
-        {session.type === "locked" ? (
-          <UnlockNoteView session={session} />
-        ) : session.type === "conflicted" || session.type === "diff" ? (
-          <DiffViewer session={session} />
-        ) : (
-          <MemoizedEditorView session={session} />
-        )}
+      <Freeze key={session.id} freeze={!isActive}>
+        <Box
+          sx={{
+            display: isActive ? "flex" : "none",
+            height: "100%",
+            flex: 1,
+            flexDirection: "column"
+          }}
+        >
+          {session.type === "locked" ? (
+            <UnlockNoteView session={session} />
+          ) : session.type === "conflicted" || session.type === "diff" ? (
+            <DiffViewer session={session} />
+          ) : (
+            <MemoizedEditorView session={session} />
+          )}
+        </Box>
       </Freeze>
     );
   }
 );
 
 export default function TabsView() {
-  const tabs = useEditorStore((store) => store.tabs);
-  const groups = useEditorStore((store) => store.groups);
-  const documentPreview = useEditorStore((store) => store.documentPreview);
-  const activeSession = useEditorStore((store) => store.getActiveSession());
-  const arePropertiesVisible = useEditorStore(
-    (store) => store.arePropertiesVisible
-  );
+  const {
+    groups,
+    tabs,
+    arePropertiesVisible,
+    documentPreview,
+    isTOCVisible,
+    getActiveSession,
+    layout,
+    activeGroupId: activeGroup
+  } = useEditorStore();
 
+  const isSingleNote =
+    new URLSearchParams(window.location.search).get("singleNote") === "true";
 
-  const isTOCVisible = useEditorStore((store) => store.isTOCVisible);
-
-  const sensors = useSensors(
-    useSensor(MouseSensor, {
-      activationConstraint: {
-        distance: 10
-      }
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates
-    })
-  );
+  const effectiveLayout =
+    isSingleNote && activeGroup
+      ? ({
+          id: "root-layout",
+          type: "group",
+          groupId: activeGroup
+        } as LayoutNode)
+      : layout;
 
   const [activeDragTabId, setActiveDragTabId] = useState<string | null>(null);
 
-  const handleDragStart = (event: DragStartEvent) => {
-    setActiveDragTabId(event.active.id as string);
-  };
+  useDndMonitor({
+    onDragStart: (event) => {
+        if (event.active.id) setActiveDragTabId(event.active.id as string);
+    },
+    onDragEnd: () => {
+        setActiveDragTabId(null);
+    },
+    onDragCancel: () => {
+        setActiveDragTabId(null);
+    }
+  });
 
-  const handleDragOver = (event: DragOverEvent) => {
-    const { active, over } = event;
-    if (!over) return;
+  const renderLayoutNode = (
+    node: LayoutNode,
+    groups: EditorGroup[],
+    tabs: TabItem[],
+    isDragging: boolean,
+    activeGroup?: EditorGroup
+  ) => {
+    if (!node) return null;
 
-    const activeId = active.id as string;
-    const overId = over.id as string;
+    if (node.type === "group") {
+      const group = groups.find((g) => g && g.id === node.groupId);
+      if (!group) return null;
+      return (
+        <Flex
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+            width: "100%",
+            position: "relative"
+          }}
+        >
+          <DropZoneOverlay groupId={group.id} visible={isDragging} />
+          <Flex
+            className="editor-action-bar"
+            sx={{
+              zIndex: 2,
+              height: TITLE_BAR_HEIGHT,
+              bg: "background-secondary",
+              borderBottom: "1px solid var(--border)",
+              flexShrink: 0
+            }}
+          >
+            <EditorActionBar groupId={group.id} />
+          </Flex>
+          <Box sx={{ flex: 1, position: "relative", overflow: "hidden" }}>
+            {tabs
+              .filter((t) => t && t.groupId === group.id)
+              .map((tab) => (
+                <SessionItem
+                  key={tab.id}
+                  tab={tab}
+                  activeTabId={group.activeTabId || ""}
 
-    if (activeId === overId) return;
-
-    // Find the tab and its current group
-    const tabs = useEditorStore.getState().tabs;
-    const activeTab = tabs.find((t) => t && t.id === activeId);
-    if (!activeTab) return;
-
-    // Determine target group
-    let targetGroupId: string | undefined;
-    
-    // Check if over is a group (droppable)
-    if (groups.some((g) => g.id === overId)) {
-      targetGroupId = overId;
-    } else {
-      // Check if over is a tab
-      const overTab = tabs.find((t) => t && t.id === overId);
-      if (overTab) targetGroupId = overTab.groupId;
+                />
+              ))}
+          </Box>
+        </Flex>
+      );
     }
 
-    if (targetGroupId && targetGroupId !== activeTab.groupId) {
-      // Moving to a different group
-      // We insert at the end if dropping on empty group, or try to infer index.
-      // For onDragOver, simplicity is key. Dnd-kit + Sortable often handles the visual sort if items connect.
-      // But since we are manually controlling state:
-      useEditorStore.getState().moveTab(activeId, targetGroupId);
-    }
+    return (
+      <SplitPane
+        direction={node.direction || "vertical"}
+        style={{ position: "relative", height: "100%", flex: 1 }}
+        onChange={(sizes) => useEditorStore.getState().resizeNode(node.id, sizes)}
+      >
+        {node.children?.map((child) => (
+          <Pane
+            key={child.id}
+            id={child.id}
+            minSize={child.type === "group" ? 200 : 100}
+            initialSize={child.size as any}
+            style={{ display: "flex", flexDirection: "column" }}
+          >
+            {renderLayoutNode(child, groups, tabs, isDragging, activeGroup)}
+          </Pane>
+        ))}
+      </SplitPane>
+    );
   };
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    setActiveDragTabId(null);
-    if (!over) return;
+  const activeSession = getActiveSession();
 
-    const activeId = active.id as string;
-    const overId = over.id as string;
-
-    if (activeId === overId) return;
-
-    const tabs = useEditorStore.getState().tabs;
-    const activeTab = tabs.find((t) => t && t.id === activeId);
-    if (!activeTab) return;
-
-    let targetGroupId = activeTab.groupId;
-    let newIndex: number | undefined;
-
-    // Determine context
-    if (groups.some((g) => g.id === overId)) {
-       targetGroupId = overId;
-       // Dropped on group container directly (likely empty or at end)
-       // We can just append (default behavior of moveTab if index undefined)
-    } else {
-      const overTab = tabs.find((t) => t && t.id === overId);
-      if (overTab) {
-        targetGroupId = overTab.groupId;
-        // Calculate index in the target group
-        const targetTabs = tabs.filter(
-          (t) => t && t.groupId === targetGroupId
-        );
-        newIndex = targetTabs.findIndex((t) => t && t.id === overId);
-         
-         // Adjust index based on direction if needed, but Sortable usually gives us 'over' as the item being displaced.
-         // editor-store.moveTab inserts AT the new index.
-         
-       }
-    }
-
-    useEditorStore.getState().moveTab(activeId, targetGroupId, newIndex);
-  };
-
-  const activeTabForOverlay = activeDragTabId
-    ? tabs.find((t) => t && t.id === activeDragTabId)
-    : null;
-  const activeSessionForOverlay = activeTabForOverlay
-    ? useEditorStore.getState().getSession(activeTabForOverlay.sessionId)
-    : null;
+  if (!layout) return null;
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragStart={handleDragStart}
-      onDragOver={handleDragOver}
-      onDragEnd={handleDragEnd}
-    >
       <ScopedThemeProvider
         scope="editor"
         sx={{
@@ -294,47 +329,13 @@ export default function TabsView() {
           autoSaveId={"editor-panels"}
         >
           <Pane id="editor-panel" className="editor-pane" minSize={300}>
-            <SplitPane
-              direction="horizontal"
-              autoSaveId={"editor-groups-v3"}
-              style={{ position: "relative", height: "100%", flex: 1 }}
-            >
-              {groups.map((group) => (
-                <Pane
-                  key={group.id}
-                  id={group.id}
-                  minSize={200}
-                  initialSize="50%"
-                  style={{ display: "flex", flexDirection: "column" }}
-                >
-                  <Flex
-                    className="editor-action-bar"
-                    sx={{
-                      zIndex: 2,
-                      height: TITLE_BAR_HEIGHT,
-                      bg: "background-secondary",
-                      borderBottom: "1px solid var(--border)",
-                      flexShrink: 0
-                    }}
-                  >
-                    <EditorActionBar groupId={group.id} />
-                  </Flex>
-                  <Box
-                    sx={{ flex: 1, position: "relative", overflow: "hidden" }}
-                  >
-                    {tabs
-                      .filter((t) => t && t.groupId === group.id)
-                      .map((tab) => (
-                        <SessionItem
-                          key={tab.id}
-                          tab={tab}
-                          activeTabId={group.activeTabId}
-                        />
-                      ))}
-                  </Box>
-                </Pane>
-              ))}
-            </SplitPane>
+            {renderLayoutNode(
+              effectiveLayout,
+              groups,
+              tabs,
+              !!activeDragTabId,
+              groups.find(g => g.id === activeGroup)
+            )}
           </Pane>
 
           {documentPreview ? (
@@ -357,15 +358,20 @@ export default function TabsView() {
                       <DownloadAttachmentProgress hash={documentPreview.hash} />
                     }
                   >
-                    <PDFPreview
-                      fileUrl={documentPreview.url}
-                      hash={documentPreview.hash}
-                      onClose={() =>
-                        useEditorStore.setState({
-                          documentPreview: undefined
-                        })
-                      }
-                    />
+                    <Section
+                      title={documentPreview.title}
+                      sx={{ height: "100%" }}
+                    >
+                      <PDFPreview
+                        fileUrl={documentPreview.url}
+                        hash={documentPreview.hash}
+                        onClose={() =>
+                          useEditorStore.setState({
+                            documentPreview: undefined
+                          })
+                        }
+                      />
+                    </Section>
                   </Suspense>
                 ) : (
                   <DownloadAttachmentProgress hash={documentPreview.hash} />
@@ -388,62 +394,13 @@ export default function TabsView() {
          
         </SplitPane>
 
-        <DragOverlay>
-          {activeTabForOverlay && activeSessionForOverlay ? (
-            <Tab
-              id={activeTabForOverlay.id}
-              title={
-                activeSessionForOverlay.title ||
-                ("note" in activeSessionForOverlay
-                  ? activeSessionForOverlay.note.title
-                  : strings.untitled())
-              }
-              isActive={true}
-              isPinned={!!activeTabForOverlay.pinned}
-              isLocked={isLockedSession(activeSessionForOverlay)}
-              isUnsaved={
-                activeSessionForOverlay.type === "default" &&
-                activeSessionForOverlay.saveState === SaveState.NotSaved
-              }
-              isRevealInListDisabled={false}
-              type={activeSessionForOverlay.type}
-              onFocus={() => {}}
-              onClose={() => {}}
-              onCloseAll={() => {}}
-              onCloseOthers={() => {}}
-              onCloseToTheRight={() => {}}
-              onCloseToTheLeft={() => {}}
-              onPin={() => {}}
-              onSave={() => {}}
-            />
-          ) : null}
-        </DragOverlay>
       </ScopedThemeProvider>
-    </DndContext>
   );
 }
 
-const MemoizedEditorView = React.memo(EditorView, (prev, next) => {
-  const baseConditions =
-    prev.session.id === next.session.id &&
-    prev.session.type === next.session.type &&
-    prev.session.needsHydration === next.session.needsHydration &&
-    prev.session.activeBlockId === next.session.activeBlockId &&
-    prev.session.activeSearchResultId === next.session.activeSearchResultId &&
-    prev.session.nonce === next.session.nonce;
 
-  if (
-    "attachmentsLength" in prev.session &&
-    "attachmentsLength" in next.session
-  ) {
-    return (
-      baseConditions &&
-      prev.session.attachmentsLength === next.session.attachmentsLength
-    );
-  }
 
-  return baseConditions;
-});
+
 function EditorView({
   session
 }: {
@@ -771,13 +728,17 @@ export function Editor(props: EditorProps) {
             type === "file" &&
             attachment.mimeType.startsWith("application/pdf")
           ) {
-            onPreviewDocument({ hash });
+            onPreviewDocument({ hash, title: attachment.filename });
             const blob = await downloadAttachment(hash, "blob", id);
             if (!blob) {
               useEditorStore.setState({ documentPreview: undefined });
               return;
             }
-            onPreviewDocument({ url: URL.createObjectURL(blob), hash });
+            onPreviewDocument({
+              url: URL.createObjectURL(blob),
+              hash,
+              title: attachment.filename
+            });
           } else {
             showToast("error", strings.attachmentPreviewFailed());
           }

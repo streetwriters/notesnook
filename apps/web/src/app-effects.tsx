@@ -55,10 +55,21 @@ export default function AppEffects() {
 
   useEffect(
     function initializeApp() {
-      initStore();
+      const isSingleNote =
+        new URLSearchParams(window.location.search).get("singleNote") ===
+        "true";
+
+      if (!isSingleNote) initStore();
       initEditorStore();
 
       (async function () {
+        if (isSingleNote) {
+          useStore.setState({ isAutoSyncEnabled: false });
+          await initUser();
+          setIsVaultCreated(await db.vault.exists());
+          return;
+        }
+
         await resetFeatures();
         await refreshNavItems();
         await updateLastSynced();

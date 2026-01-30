@@ -235,6 +235,7 @@ function TipTap(props: TipTapProps) {
 
   const tiptapOptions = useMemo<Partial<TiptapOptions>>(() => {
     return {
+      id,
       editorProps: {
         handleKeyDown(_, event) {
           if ((event.ctrlKey || event.metaKey) && event.key === "s") {

@@ -80,6 +80,15 @@ export type EditorGroup = {
   activeTabId?: string;
 };
 
+export type LayoutNode = {
+  id: string;
+  type: "group" | "split";
+  direction?: "vertical" | "horizontal";
+  children?: LayoutNode[];
+  groupId?: string;
+  size?: number | string;
+};
+
 export type BaseEditorSession = {
   tabId: string;
 
@@ -177,6 +186,7 @@ type SessionTypeMap = {
 export type DocumentPreview = {
   url?: string;
   hash: string;
+  title?: string;
 };
 
 export function isLockedSession(session: EditorSession): boolean {
@@ -213,6 +223,11 @@ const saveMutex = new Mutex();
 class EditorStore extends BaseStore<EditorStore> {
   tabs: TabItem[] = [];
   groups: EditorGroup[] = [{ id: "main" }];
+  layout: LayoutNode = {
+    id: "root-layout",
+    type: "group",
+    groupId: "main"
+  };
   activeGroupId = "main";
   tabHistory: TabHistory = {};
   canGoBack = false;
@@ -258,6 +273,23 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   init = () => {
+    const isSingleNote =
+      new URLSearchParams(window.location.search).get("singleNote") === "true";
+
+    if (isSingleNote) {
+      this.set({
+        tabs: [],
+        groups: [{ id: "main" }],
+        layout: {
+          id: "root-layout",
+          type: "group",
+          groupId: "main"
+        },
+        activeGroupId: "main",
+        sessions: []
+      });
+    }
+
     useSettingStore.subscribe(
       (s) => s.hideNoteTitle,
       (state) => {
@@ -546,20 +578,59 @@ class EditorStore extends BaseStore<EditorStore> {
       }
     );
 
-    const { rehydrateSession, activeGroupId, newSession, groups } = this.get();
+    const { rehydrateSession, activeGroupId, newSession, groups, layout } =
+      this.get();
     if (groups.length === 0) {
       // Migrate old state or Init
       const { tabs, activeTabId } = this.get() as any;
       if (tabs && tabs.length > 0) {
         this.set({
           groups: [{ id: "main", activeTabId: activeTabId }],
-          tabs: tabs.map((t: any) => ({ ...t, groupId: "main" }))
+          tabs: tabs.map((t: any) => ({ ...t, groupId: "main" })),
+          layout: {
+            id: "root-layout",
+            type: "group",
+            groupId: "main"
+          }
         });
       } else {
         this.set({
-          groups: [{ id: "main" }]
+          groups: [{ id: "main" }],
+          layout: {
+            id: "root-layout",
+            type: "group",
+            groupId: "main"
+          }
         });
       }
+    } else if (layout && layout.type === "group" && groups.length > 1) {
+      // Migrate existing horizontal groups to layout tree
+      this.set({
+        layout: {
+          id: "root-layout",
+          type: "split",
+          direction: "vertical", // Existing groups are side-by-side (Vertical Sash)
+          children: groups.map((g) => ({
+            id: g.id,
+            type: "group",
+            groupId: g.id
+          }))
+        }
+      });
+    } else if (!layout && groups.length > 0) {
+      // Missing layout but have groups (e.g. during upgrade)
+      this.set({
+        layout: {
+          id: "root-layout",
+          type: groups.length > 1 ? "split" : "group",
+          direction: "vertical",
+          groupId: groups.length === 1 ? groups[0].id : undefined,
+          children:
+            groups.length > 1
+              ? groups.map((g) => ({ id: g.id, type: "group", groupId: g.id }))
+              : undefined
+        }
+      });
     }
 
     // Clean up corrupted state
@@ -724,33 +795,34 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   openSession = async (
-    noteOrId: string | Note | BaseTrashItem<Note>,
+    noteOrId: Note | string | BaseTrashItem<Note>,
     options: {
       force?: boolean;
-      activeBlockId?: string;
-      silent?: boolean;
+      newTab?: boolean;
       openInNewTab?: boolean;
-      rawContent?: string;
+      activeBlockId?: string;
       activeSearchResultId?: string;
+      rawContent?: string;
+      silent?: boolean;
       tabId?: string;
     } = {}
-  ): Promise<void> => {
+  ): Promise<string | undefined> => {
     const {
-      getSession,
       sessions,
-      tabs,
       activateSession,
-      getActiveTab,
       rehydrateSession,
+      addTab,
+      tabs,
       getTabsForNote,
-      addTab
+      getSession
     } = this.get();
     const noteId = typeof noteOrId === "string" ? noteOrId : noteOrId.id;
+    if (!noteId) return;
     const activeGroupId = this.get().activeGroupId;
     const oldTabForNote = options.force
       ? null
       : getTabsForNote(noteId).find((t) => t.groupId === activeGroupId);
-    const activeTab = getActiveTab();
+    const activeTab = this.get().getActiveTab();
     const isReactivatingTab =
       !options.tabId &&
       options.force &&
@@ -774,9 +846,10 @@ class EditorStore extends BaseStore<EditorStore> {
       // and then wants to open the note in the same tab again.
       activeSession.type !== "diff";
     if (noteAlreadyOpened && !options.force) {
-      return activeSession.needsHydration
+      activeSession.needsHydration
         ? rehydrateSession(activeSession.id)
         : activateSession(activeSession.id, options.activeBlockId);
+      return activeSession.id;
     }
 
     if (activeSession && "note" in activeSession)
@@ -910,6 +983,7 @@ class EditorStore extends BaseStore<EditorStore> {
         }
       }
     }
+    return sessionId;
   };
 
   openSessionInTab = async (noteId: string, tabId: string) => {
@@ -1258,7 +1332,12 @@ class EditorStore extends BaseStore<EditorStore> {
       // Ensure every group has at least one tab
       this.get().groups.forEach((group) => {
         if (!remainingTabs.find((t) => t.groupId === group.id)) {
-          this.addTab(undefined, group.id);
+          // if there is more than one group, close the group
+          if (this.get().groups.length > 1) {
+            this.closeGroup(group.id);
+          } else {
+            this.addTab(undefined, group.id);
+          }
         }
       });
     }
@@ -1409,14 +1488,80 @@ class EditorStore extends BaseStore<EditorStore> {
     if (sessionId) this.rehydrateSession(sessionId, true);
   };
 
-  splitGroup = () => {
-    const currentGroup = this.get().getActiveGroup();
+  splitGroup = (
+    direction: "vertical" | "horizontal" = "vertical",
+    groupId?: string,
+    tabIdToMove?: string,
+    position: "before" | "after" = "after"
+  ) => {
+    const { activeGroupId } = this.get();
+    const targetGroupId = groupId || activeGroupId;
     const newGroupId = getId();
+
     this.set((state) => {
       state.groups.push({ id: newGroupId });
       state.activeGroupId = newGroupId;
+
+      const hasGroup = (node: LayoutNode, id: string): boolean => {
+        if (node.type === "group") return node.groupId === id;
+        return node.children?.some((c) => hasGroup(c, id)) || false;
+      };
+
+      const findAndSplit = (node: LayoutNode): LayoutNode => {
+        if (node.type === "group" && node.groupId === targetGroupId) {
+          const newGroupNode = {
+            id: newGroupId,
+            type: "group" as const,
+            groupId: newGroupId
+          };
+          return {
+            id: getId(),
+            type: "split",
+            direction,
+            children:
+              position === "after"
+                ? [{ ...node }, newGroupNode]
+                : [newGroupNode, { ...node }]
+          };
+        }
+        if (node.type === "split" && node.children) {
+          const index = node.children.findIndex(
+            (c) =>
+              (c.type === "group" && c.groupId === targetGroupId) ||
+              (c.type === "split" && hasGroup(c, targetGroupId))
+          );
+
+          if (index !== -1) {
+            if (node.direction === direction) {
+              node.children.splice(
+                position === "after" ? index + 1 : index,
+                0,
+                {
+                  id: newGroupId,
+                  type: "group",
+                  groupId: newGroupId
+                }
+              );
+
+              // reset sizes so they get redistributed evenly
+              for (const child of node.children) {
+                delete child.size;
+              }
+            } else {
+              node.children[index] = findAndSplit(node.children[index]);
+            }
+          }
+        }
+        return node;
+      };
+
+      state.layout = findAndSplit(state.layout);
     });
-    this.addTab(undefined, newGroupId);
+    if (tabIdToMove) {
+      this.moveTab(tabIdToMove, newGroupId);
+    } else {
+      this.addTab(undefined, newGroupId);
+    }
   };
 
   closeGroup = (groupId: string) => {
@@ -1425,18 +1570,60 @@ class EditorStore extends BaseStore<EditorStore> {
 
     // Close all tabs in this group
     const tabs = this.get().tabs.filter((t) => t && t.groupId === groupId);
-    this.closeTabs(...tabs.map((t) => t.id));
+    if (tabs.length > 0) this.closeTabs(...tabs.map((t) => t.id));
 
     this.set((state) => {
       state.groups = state.groups.filter((g) => g.id !== groupId);
       if (state.activeGroupId === groupId) {
         state.activeGroupId = state.groups[0].id;
       }
+
+      const removeFromLayout = (node: LayoutNode): LayoutNode | null => {
+        if (node.type === "group") {
+          return node.groupId === groupId ? null : node;
+        }
+        if (node.type === "split" && node.children) {
+          node.children = node.children
+            .map(removeFromLayout)
+            .filter((n) => n !== null) as LayoutNode[];
+
+          if (node.children.length === 1) {
+            return node.children[0];
+          }
+          if (node.children.length === 0) {
+            return null;
+          }
+        }
+        return node;
+      };
+
+      const newLayout = removeFromLayout(state.layout);
+      if (newLayout) state.layout = newLayout;
     });
   };
 
   focusGroup = (groupId: string) => {
     this.set({ activeGroupId: groupId });
+  };
+
+  resizeNode = (id: string, sizes: number[]) => {
+    this.set((state) => {
+      const setSizes = (node: LayoutNode) => {
+        if (node.id === id && node.children) {
+          const totalSize = sizes.reduce((acc, size) => acc + size, 0);
+          node.children.forEach((child, index) => {
+            child.size = `${((sizes[index] / totalSize) * 100).toFixed(2)}%`;
+          });
+          return true;
+        } else if (node.children) {
+          for (const child of node.children) {
+            if (setSizes(child)) return true;
+          }
+        }
+        return false;
+      };
+      setSizes(state.layout);
+    });
   };
 
   moveTab = (tabId: string, targetGroupId: string, newIndex?: number) => {
@@ -1494,6 +1681,36 @@ class EditorStore extends BaseStore<EditorStore> {
           targetGroup.activeTabId = tab.id;
           state.activeGroupId = targetGroupId;
         }
+
+        // 3. Cleanup old group if empty
+        const remainingTabsInOldGroup = state.tabs.filter(
+          (t) => t && t.groupId === oldGroupId
+        );
+        if (remainingTabsInOldGroup.length === 0 && state.groups.length > 1) {
+          state.groups = state.groups.filter((g) => g.id !== oldGroupId);
+
+          const removeFromLayout = (node: LayoutNode): LayoutNode | null => {
+            if (node.type === "group") {
+              return node.groupId === oldGroupId ? null : node;
+            }
+            if (node.type === "split" && node.children) {
+              node.children = node.children
+                .map(removeFromLayout)
+                .filter((n) => n !== null) as LayoutNode[];
+
+              if (node.children.length === 1) {
+                return node.children[0];
+              }
+              if (node.children.length === 0) {
+                return null;
+              }
+            }
+            return node;
+          };
+
+          const newLayout = removeFromLayout(state.layout);
+          if (newLayout) state.layout = newLayout;
+        }
       }
     });
   };
@@ -1506,6 +1723,7 @@ const useEditorStore = createPersistedStore(EditorStore, {
     arePropertiesVisible: state.arePropertiesVisible,
     editorMargins: state.editorMargins,
     groups: state.groups,
+    layout: state.layout,
     activeGroupId: state.activeGroupId,
     tabs: state.tabs,
     tabHistory: state.tabHistory,

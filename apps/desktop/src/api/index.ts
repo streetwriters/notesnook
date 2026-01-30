@@ -25,6 +25,7 @@ import { updaterRouter } from "./updater";
 import { bridgeRouter } from "./bridge";
 import { safeStorageRouter } from "./safe-storage";
 import { windowRouter } from "./window";
+import { dbRouter } from "./db";
 
 const t = initTRPC.create();
 
@@ -35,7 +36,8 @@ export const router = t.router({
   updater: updaterRouter,
   bridge: bridgeRouter,
   safeStorage: safeStorageRouter,
-  window: windowRouter
+  window: windowRouter,
+  db: dbRouter
 });
 
 export const api = router.createCaller({});

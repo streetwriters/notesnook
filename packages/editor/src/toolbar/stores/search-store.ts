@@ -34,7 +34,13 @@ export interface SearchState extends SearchSettings {
   isExpanded: boolean;
 }
 
-export const useEditorSearchStore = create<SearchState>(() => ({
+export interface MultiEditorSearchState {
+  editors: Record<string, SearchState | undefined>;
+  getSearchState: (editorId: string) => SearchState;
+  setSearchState: (editorId: string, state: Partial<SearchState>) => void;
+}
+
+const defaultState: SearchState = {
   focusNonce: 0,
   isSearching: false,
   searchTerm: "",
@@ -44,4 +50,24 @@ export const useEditorSearchStore = create<SearchState>(() => ({
   matchWholeWord: false,
   isExpanded: false,
   isReplacing: false
-}));
+};
+
+export const useEditorSearchStore = create<MultiEditorSearchState>(
+  (set, get) => ({
+    editors: {},
+    getSearchState: (editorId: string) => {
+      return get().editors[editorId] || defaultState;
+    },
+    setSearchState: (editorId: string, state: Partial<SearchState>) => {
+      set((prev) => ({
+        editors: {
+          ...prev.editors,
+          [editorId]: {
+            ...(prev.editors[editorId] || defaultState),
+            ...state
+          }
+        }
+      }));
+    }
+  })
+);
