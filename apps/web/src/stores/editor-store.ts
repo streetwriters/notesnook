@@ -1630,7 +1630,7 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   moveTab = (tabId: string, targetGroupId: string, newIndex?: number) => {
-    const tab = this.get().tabs.find((t) => t.id === tabId);
+    const tab = this.get().tabs.find((t) => t && t.id === tabId);
     const sessionId = tab?.sessionId;
 
     this.set((state) => {
