@@ -256,7 +256,6 @@ export default function TabsView() {
             position: "relative"
           }}
         >
-          <DropZoneOverlay groupId={group.id} visible={isDragging} />
           <Flex
             className="editor-action-bar"
             sx={{
@@ -270,6 +269,7 @@ export default function TabsView() {
             <EditorActionBar groupId={group.id} />
           </Flex>
           <Box sx={{ flex: 1, position: "relative", overflow: "hidden" }}>
+            <DropZoneOverlay groupId={group.id} visible={isDragging} />
             {tabs
               .filter((t) => t && t.groupId === group.id)
               .map((tab) => (

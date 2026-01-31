@@ -103,5 +103,20 @@ export const windowRouter = t.router({
         win.removeListener("enter-html-full-screen", enterFullscreen);
       };
     });
+  }),
+  startDragSession: t.procedure
+    .input(
+      z.object({
+        title: z.string(),
+        colors: z
+          .object({ bg: z.string(), fg: z.string(), border: z.string() })
+          .optional()
+      })
+    )
+    .mutation(({ input }) => {
+      windowManager.startDragSession(input.title, input.colors);
+    }),
+  endDragSession: t.procedure.mutation(() => {
+    windowManager.endDragSession();
   })
 });

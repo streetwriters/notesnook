@@ -138,7 +138,7 @@ function Note(props: NoteProps) {
   });
 
   const style = transform ? {
-    transform: CSS.Translate.toString(transform),
+    transform: (typeof IS_DESKTOP_APP !== 'undefined' && IS_DESKTOP_APP) ? undefined : CSS.Translate.toString(transform),
   } : undefined;
 
   return (

@@ -1,4 +1,4 @@
-import { BrowserWindow, app, shell } from "electron";
+import { BrowserWindow, app, shell, screen } from "electron";
 import { WindowState } from "./window-state";
 import { AssetManager } from "./asset-manager";
 import { config } from "./config";
@@ -18,6 +18,8 @@ export class WindowManager {
   private mainWindow: BrowserWindow | null = null;
   private ipcHandler: any = null;
   private noteWindows = new Map<string, BrowserWindow>();
+  private dragWindow: BrowserWindow | null = null;
+  private dragInterval: NodeJS.Timeout | null = null;
 
   constructor() {}
 
@@ -208,6 +210,122 @@ export class WindowManager {
       url.hash = `/notebooks/${options.notebook}`;
 
     return url;
+  }
+
+  startDragSession(
+    title: string,
+    colors: { bg: string; fg: string; border: string } = {
+      bg: getTheme() === "dark" ? "#333" : "#fff",
+      fg: getTheme() === "dark" ? "#fff" : "#000",
+      border: getTheme() === "dark" ? "#555" : "#ccc"
+    }
+  ) {
+    if (this.dragWindow) {
+      this.endDragSession();
+    }
+
+    const cursor = screen.getCursorScreenPoint();
+    const width = 200;
+    const height = 45;
+
+    this.dragWindow = new BrowserWindow({
+      x: Math.round(cursor.x - width / 2),
+      y: Math.round(cursor.y - height / 2),
+      width,
+      height,
+      frame: false,
+      transparent: true,
+      alwaysOnTop: true,
+      skipTaskbar: true,
+      hasShadow: false,
+      focusable: false,
+      resizable: false,
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true
+      }
+    });
+
+    this.dragWindow.on("ready-to-show", () => {
+      this.dragWindow?.showInactive();
+    });
+
+    this.dragWindow.setAlwaysOnTop(true, "screen-saver");
+
+    const safeTitle = title.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+    const html = `
+      <html>
+        <body style="background: transparent; margin: 0; padding: 4px; height: 100vh; display: flex; align-items: center; box-sizing: border-box; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+          <div style="
+            background: ${colors.bg};
+            color: ${colors.fg};
+            border: 1px solid ${colors.border || "transparent"};
+            border-radius: 8px;
+            padding: 0 12px;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            height: 36px;
+            width: 100%;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+          ">
+            ${safeTitle}
+          </div>
+        </body>
+      </html>
+    `;
+
+    // We use a simple data URL for the drag image
+    this.dragWindow.loadURL(
+      `data:text/html;charset=utf-8,${encodeURIComponent(html)}`
+    );
+
+    this.dragWindow.setIgnoreMouseEvents(true);
+
+    this.dragInterval = setInterval(() => {
+      if (!this.dragWindow || this.dragWindow.isDestroyed()) {
+        this.endDragSession();
+        return;
+      }
+
+      const point = screen.getCursorScreenPoint();
+      try {
+        this.dragWindow.setPosition(
+          Math.round(point.x - width / 2),
+          Math.round(point.y - height / 2)
+        );
+      } catch (e) {
+        // console.error("[WindowManager] Error setting position:", e);
+      }
+
+      // Check if we are over any of our app windows
+      const mainWin = this.getMainWindow();
+      if (mainWin && !mainWin.isDestroyed()) {
+        const bounds = mainWin.getBounds();
+        // Use isOverMain if needed for other logic, but for now we just ensuring visibility
+        if (!this.dragWindow.isVisible()) {
+          this.dragWindow.showInactive();
+        }
+      }
+    }, 16); // ~60fps
+  }
+
+  endDragSession() {
+    if (this.dragInterval) {
+      clearInterval(this.dragInterval);
+      this.dragInterval = null;
+    }
+
+    if (this.dragWindow) {
+      if (!this.dragWindow.isDestroyed()) {
+        this.dragWindow.destroy();
+      }
+      this.dragWindow = null;
+    }
   }
 }
 

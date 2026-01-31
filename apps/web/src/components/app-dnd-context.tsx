@@ -11,7 +11,10 @@ import {
   closestCenter,
   useSensor,
   useSensors,
-  useDndMonitor
+  useDndMonitor,
+  CollisionDetection,
+  pointerWithin,
+  rectIntersection
 } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { useEditorStore, SaveState, isLockedSession } from "../stores/editor-store";
@@ -47,13 +50,74 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
     const activeId = event.active.id as string;
     setActiveDragId(activeId);
 
+    let title = "Item";
     if (activeId.startsWith("note::")) {
       setDragType("note");
       const noteId = activeId.split("::")[1];
       const note = await db.notes.note(noteId);
-      if (note) setDraggedNote(note);
+      if (note) {
+        setDraggedNote(note);
+        title = note.title;
+      }
     } else {
       setDragType("tab");
+      const tab = tabs.find((t) => t && t.id === activeId);
+      if (tab) {
+         const session = getActiveSession(); // This might be wrong, we need session of the tab
+         const actualSession = useEditorStore.getState().getSession(tab.sessionId);
+         if (actualSession) title = actualSession.title || "Untitled";
+      }
+    }
+
+    if (typeof IS_DESKTOP_APP !== 'undefined' && IS_DESKTOP_APP) {
+      import("../common/desktop-bridge").then(({ desktop }) => {
+        const rootStyle = window.getComputedStyle(document.documentElement);
+        const el = document.querySelector(".tab.active") || document.querySelector(".tab") || document.body;
+        const style = window.getComputedStyle(el);
+        
+        const bg =
+          style.getPropertyValue("--theme-ui-colors-background") ||
+          rootStyle.getPropertyValue("--theme-ui-colors-background") ||
+          style.backgroundColor;
+          
+        const fg =
+          style.color ||
+          style.getPropertyValue("--theme-ui-colors-paragraph-selected") ||
+          rootStyle.getPropertyValue("--theme-ui-colors-text");
+          
+        const border =
+          style.borderColor ||
+          rootStyle.getPropertyValue("--theme-ui-colors-border") ||
+          style.getPropertyValue("--border");
+
+        const isDark = (color: string) => {
+           if (color.startsWith('#')) {
+               const r = parseInt(color.substring(1, 3), 16);
+               const g = parseInt(color.substring(3, 5), 16);
+               const b = parseInt(color.substring(5, 7), 16);
+               return (r * 299 + g * 587 + b * 114) / 1000 < 128;
+           }
+           if (color.startsWith('rgb')) {
+               const [r, g, b] = color.match(/\d+/g)?.map(Number) || [0, 0, 0];
+               return (r * 299 + g * 587 + b * 114) / 1000 < 128;
+           }
+           return false; // Assume light
+        };
+
+        const finalBg = bg.startsWith('var') ? rootStyle.getPropertyValue(bg.replace(/var\((.*)\)/, '$1')) : bg;
+        // If extracted FG is essentially black but BG is dark, force white.
+        let finalFg = fg.startsWith('var') ? rootStyle.getPropertyValue(fg.replace(/var\((.*)\)/, '$1')) : fg;
+        
+        // Simple check: if fg is dark and bg is dark, default to white.
+        if (isDark(finalBg) && isDark(finalFg)) {
+            finalFg = '#ffffff';
+        }
+
+        desktop?.window.startDragSession.mutate({
+          title,
+          colors: { bg, fg: finalFg, border }
+        });
+      });
     }
   };
 
@@ -102,6 +166,12 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
     setActiveDragId(null);
     setDragType(null);
     setDraggedNote(null);
+
+    if (typeof IS_DESKTOP_APP !== 'undefined' && IS_DESKTOP_APP) {
+      import("../common/desktop-bridge").then(({ desktop }) => {
+        desktop?.window.endDragSession.mutate();
+      });
+    }
     
     // Handle Tear-out (Global for both Tabs and Notes)
     if (typeof IS_DESKTOP_APP !== 'undefined' && IS_DESKTOP_APP) {
@@ -201,7 +271,7 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
         const overTab = tabs.find((t) => t && t.id === overId);
         if (overTab) {
            targetGroupId = overTab.groupId;
-           const targetTabs = tabs.filter(t => t.groupId === targetGroupId);
+           const targetTabs = tabs.filter(t => t && t.groupId === targetGroupId);
            newIndex = targetTabs.findIndex(t => t.id === overId);
         }
      }
@@ -285,10 +355,40 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
     ? useEditorStore.getState().getSession(activeTabForOverlay.sessionId)
     : null;
 
+  const customCollisionDetection: CollisionDetection = (args) => {
+    // 1. First, check if the pointer is strictly *inside* any droppable container
+    const pointerCollisions = pointerWithin(args);
+
+    // 2. If we found collisions with the pointer, return them.
+    // This ensures that "Drop Zones" (which we want to be strict) only activate
+    // when the cursor is actually inside them.
+    if (pointerCollisions.length > 0) {
+      return pointerCollisions;
+    }
+
+    // 3. If the pointer is NOT inside any container, we might still want to
+    // find the closest container for things like Tab reordering (magnetic feel).
+    // EXCEPT for Drop Zones, which should effectively "disappear" if not hovered.
+
+    // Filter out Drop Zones from the candidates
+    const fallbackCandidates = args.droppableContainers.filter((container) => {
+      // Assuming Drop Zones have "::" in their ID (e.g., "groupId::left")
+      // and Tabs/Notes don't (or we want different behavior for them).
+      // Verify this assumption with your ID naming scheme.
+      return !container.id.toString().includes("::");
+    });
+
+    // 4. Run closestCenter on the filtered candidates
+    return closestCenter({
+      ...args,
+      droppableContainers: fallbackCandidates
+    });
+  };
+
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={closestCenter}
+      collisionDetection={customCollisionDetection}
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
@@ -297,11 +397,17 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
          setActiveDragId(null);
          setDragType(null);
          setDraggedNote(null);
+         
+         if (typeof IS_DESKTOP_APP !== 'undefined' && IS_DESKTOP_APP) {
+            import("../common/desktop-bridge").then(({ desktop }) => {
+              desktop?.window.endDragSession.mutate();
+            });
+         }
       }}
     >
       {children}
       <DragOverlay>
-         {dragType === "tab" && activeTabForOverlay && activeSessionForOverlay ? (
+         {dragType === "tab" && activeTabForOverlay && activeSessionForOverlay && !(typeof IS_DESKTOP_APP !== 'undefined' && IS_DESKTOP_APP) ? (
              <ScopedThemeProvider scope="editor" sx={{ bg: "background" }}>
                 <Tab
                   id={activeTabForOverlay.id}
@@ -323,7 +429,7 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
                 />
              </ScopedThemeProvider>
          ) : null}
-         {dragType === "note" && draggedNote ? (
+         {dragType === "note" && draggedNote && !(typeof IS_DESKTOP_APP !== 'undefined' && IS_DESKTOP_APP) ? (
              <ScopedThemeProvider scope="list" sx={{ bg: "background", p: 2, borderRadius: 8, boxShadow: "0 0 10px rgba(0,0,0,0.2)", width: 300 }}>
                  <div style={{fontWeight: "bold"}}>{draggedNote.title}</div>
              </ScopedThemeProvider>
