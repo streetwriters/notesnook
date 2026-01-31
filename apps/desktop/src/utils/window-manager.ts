@@ -13,6 +13,8 @@ import { PROTOCOL_URL } from "./protocol";
 import path from "path";
 import { getBackgroundColor, getTheme } from "./theme";
 
+import { JSONStorage } from "./json-storage";
+
 export class WindowManager {
   private windows: Set<BrowserWindow> = new Set();
   private mainWindow: BrowserWindow | null = null;
@@ -21,7 +23,49 @@ export class WindowManager {
   private dragWindow: BrowserWindow | null = null;
   private dragInterval: NodeJS.Timeout | null = null;
 
-  constructor() {}
+  constructor() {
+    // Save session on app quit
+    app.on("before-quit", () => {
+      this.saveSession();
+    });
+  }
+
+  saveSession() {
+    const sessionData: any[] = [];
+    this.noteWindows.forEach((win, noteId) => {
+      if (!win.isDestroyed()) {
+        const bounds = win.getBounds();
+        sessionData.push({
+          type: "note",
+          noteId,
+          bounds
+        });
+      }
+    });
+    JSONStorage.set("appSession", sessionData);
+  }
+
+  async restoreSession() {
+    const sessionData = JSONStorage.get<any[]>("appSession", []);
+    if (sessionData && Array.isArray(sessionData)) {
+      for (const winData of sessionData) {
+        if (winData.type === "note" && winData.noteId) {
+          this.createWindow(
+            {
+              ...winData.bounds,
+              hidden: false
+            },
+            {
+              note: winData.noteId,
+              notebook: false,
+              reminder: false,
+              hidden: false
+            }
+          );
+        }
+      }
+    }
+  }
 
   getMainWindow() {
     return this.mainWindow;
@@ -50,6 +94,8 @@ export class WindowManager {
     // Initial setup for main window
     setupMenu();
     setupJumplist();
+
+    this.restoreSession();
 
     return win;
   }
