@@ -238,7 +238,8 @@ export default function TabsView() {
     node: LayoutNode,
     groups: EditorGroup[],
     tabs: TabItem[],
-    isDragging: boolean,
+
+    activeDragTabId: string | null,
     activeGroup?: EditorGroup
   ) => {
     if (!node) return null;
@@ -269,7 +270,17 @@ export default function TabsView() {
             <EditorActionBar groupId={group.id} />
           </Flex>
           <Box sx={{ flex: 1, position: "relative", overflow: "hidden" }}>
-            <DropZoneOverlay groupId={group.id} visible={isDragging} />
+            <DropZoneOverlay
+              groupId={group.id}
+              visible={(() => {
+                if (!activeDragTabId) return false;
+                const groupTabs = tabs.filter((t) => t && t.groupId === group.id);
+                const isDraggingFromThisGroup = groupTabs.some(
+                  (t) => t.id === activeDragTabId
+                );
+                return !isDraggingFromThisGroup || groupTabs.length > 1;
+              })()}
+            />
             {tabs
               .filter((t) => t && t.groupId === group.id)
               .map((tab) => (
@@ -287,6 +298,7 @@ export default function TabsView() {
 
     return (
       <SplitPane
+        key={node.id}
         direction={node.direction || "vertical"}
         style={{ position: "relative", height: "100%", flex: 1 }}
         onChange={(sizes) => useEditorStore.getState().resizeNode(node.id, sizes)}
@@ -299,7 +311,7 @@ export default function TabsView() {
             initialSize={child.size as any}
             style={{ display: "flex", flexDirection: "column" }}
           >
-            {renderLayoutNode(child, groups, tabs, isDragging, activeGroup)}
+            {renderLayoutNode(child, groups, tabs, activeDragTabId, activeGroup)}
           </Pane>
         ))}
       </SplitPane>
@@ -333,7 +345,7 @@ export default function TabsView() {
               effectiveLayout,
               groups,
               tabs,
-              !!activeDragTabId,
+              activeDragTabId,
               groups.find(g => g.id === activeGroup)
             )}
           </Pane>

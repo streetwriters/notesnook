@@ -1516,15 +1516,22 @@ class EditorStore extends BaseStore<EditorStore> {
             id: newGroupId,
             type: "group" as const,
             groupId: newGroupId
+            // size undefined for auto-layout
           };
+
+          // Clone node but strip size to allow auto-layout and regenerate ID to prevent component reuse issues
+          const { size: _s, id: _id, ...restNode } = node;
+          const originalNode = { ...restNode, id: getId() };
+
           return {
             id: getId(),
             type: "split",
             direction,
+            size: node.size, // inherit size in the parent layout
             children:
               position === "after"
-                ? [{ ...node }, newGroupNode]
-                : [newGroupNode, { ...node }]
+                ? [originalNode, newGroupNode]
+                : [newGroupNode, originalNode]
           };
         }
         if (node.type === "split" && node.children) {
@@ -1575,34 +1582,7 @@ class EditorStore extends BaseStore<EditorStore> {
     const tabs = this.get().tabs.filter((t) => t && t.groupId === groupId);
     if (tabs.length > 0) this.closeTabs(...tabs.map((t) => t.id));
 
-    this.set((state) => {
-      state.groups = state.groups.filter((g) => g.id !== groupId);
-      if (state.activeGroupId === groupId) {
-        state.activeGroupId = state.groups[0].id;
-      }
-
-      const removeFromLayout = (node: LayoutNode): LayoutNode | null => {
-        if (node.type === "group") {
-          return node.groupId === groupId ? null : node;
-        }
-        if (node.type === "split" && node.children) {
-          node.children = node.children
-            .map(removeFromLayout)
-            .filter((n) => n !== null) as LayoutNode[];
-
-          if (node.children.length === 1) {
-            return node.children[0];
-          }
-          if (node.children.length === 0) {
-            return null;
-          }
-        }
-        return node;
-      };
-
-      const newLayout = removeFromLayout(state.layout);
-      if (newLayout) state.layout = newLayout;
-    });
+    this.removeGroup(groupId);
   };
 
   focusGroup = (groupId: string) => {
@@ -1626,6 +1606,57 @@ class EditorStore extends BaseStore<EditorStore> {
         return false;
       };
       setSizes(state.layout);
+    });
+  };
+
+  removeGroup = (groupId: string) => {
+    this.set((state) => {
+      // 1. Remove from groups list
+      state.groups = state.groups.filter((g) => g && g.id !== groupId);
+
+      // 2. Update active group if needed
+      if (state.activeGroupId === groupId) {
+        state.activeGroupId =
+          state.groups.length > 0 ? state.groups[0].id : state.activeGroupId;
+      }
+
+      // 3. Remove from layout tree
+      const removeFromLayout = (node: LayoutNode): LayoutNode | null => {
+        if (node.type === "group") {
+          return node.groupId === groupId ? null : node;
+        }
+        if (node.type === "split" && node.children) {
+          node.children = node.children
+            .map(removeFromLayout)
+            .filter((n) => n !== null) as LayoutNode[];
+
+          if (node.children.length === 0) {
+            return null;
+          }
+          if (node.children.length === 1) {
+            const child = node.children[0];
+            // If the parent had a size (was part of a split), the child should inherit it
+            // because it is taking the parent's place in the structure.
+            if (node.size) {
+              child.size = node.size;
+            }
+            return child;
+          }
+        }
+        return node;
+      };
+
+      const newLayout = removeFromLayout(state.layout);
+      if (newLayout) {
+        state.layout = newLayout;
+      } else if (state.groups.length > 0) {
+        // Fallback: This shouldn't happen if groups > 0, but just in case layout became null
+        state.layout = {
+          id: "root-layout",
+          type: "group",
+          groupId: state.groups[0].id
+        };
+      }
     });
   };
 
@@ -1694,33 +1725,33 @@ class EditorStore extends BaseStore<EditorStore> {
         const remainingTabsInOldGroup = state.tabs.filter(
           (t) => t && t.groupId === oldGroupId
         );
+
         if (remainingTabsInOldGroup.length === 0 && state.groups.length > 1) {
-          state.groups = state.groups.filter((g) => g && g.id !== oldGroupId);
-
-          const removeFromLayout = (node: LayoutNode): LayoutNode | null => {
-            if (node.type === "group") {
-              return node.groupId === oldGroupId ? null : node;
-            }
-            if (node.type === "split" && node.children) {
-              node.children = node.children
-                .map(removeFromLayout)
-                .filter((n) => n !== null) as LayoutNode[];
-
-              if (node.children.length === 1) {
-                return node.children[0];
-              }
-              if (node.children.length === 0) {
-                return null;
-              }
-            }
-            return node;
-          };
-
-          const newLayout = removeFromLayout(state.layout);
-          if (newLayout) state.layout = newLayout;
         }
       }
     });
+
+    if (tab && tab.groupId !== targetGroupId) {
+      // Check if old group is empty
+      // We can just rely on the store state now.
+      // The `oldGroupId` variable is available from closure.
+      const currentGroups = this.get().groups;
+      if (tab && tab.groupId !== targetGroupId) {
+        // Check if old group is empty
+        // We can just rely on the store state now.
+        const oldGroupId = tab.groupId;
+        const currentGroups = this.get().groups;
+        const groupExists = currentGroups.some((g) => g.id === oldGroupId);
+        if (groupExists) {
+          const remainingTabs = this.get().tabs.filter(
+            (t) => t && t.groupId === oldGroupId
+          );
+          if (remainingTabs.length === 0 && currentGroups.length > 1) {
+            this.removeGroup(oldGroupId);
+          }
+        }
+      }
+    }
     if (sessionId) this.rehydrateSession(sessionId, true);
   };
 }
