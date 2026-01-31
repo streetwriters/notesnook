@@ -11,10 +11,8 @@ import {
   closestCenter,
   useSensor,
   useSensors,
-  useDndMonitor,
   CollisionDetection,
-  pointerWithin,
-  rectIntersection
+  pointerWithin
 } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { useEditorStore, SaveState, isLockedSession } from "../stores/editor-store";
@@ -105,47 +103,27 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
 
     if (typeof IS_DESKTOP_APP !== 'undefined' && IS_DESKTOP_APP) {
       import("../common/desktop-bridge").then(({ desktop }) => {
-        const rootStyle = window.getComputedStyle(document.documentElement);
-        const el = document.querySelector(".tab.active") || document.querySelector(".tab") || document.body;
-        const style = window.getComputedStyle(el);
-        
+        const themeEl = document.querySelector(".theme-scope-base") || document.documentElement;
+        const style = window.getComputedStyle(themeEl);
+
         const bg =
-          style.getPropertyValue("--theme-ui-colors-background") ||
-          rootStyle.getPropertyValue("--theme-ui-colors-background") ||
+          style.getPropertyValue("--background") ||
           style.backgroundColor;
-          
+
         const fg =
-          style.color ||
-          style.getPropertyValue("--theme-ui-colors-paragraph-selected") ||
-          rootStyle.getPropertyValue("--theme-ui-colors-text");
-          
+          style.getPropertyValue("--paragraph") ||
+          style.color;
+
         const border =
-          style.borderColor ||
-          rootStyle.getPropertyValue("--theme-ui-colors-border") ||
-          style.getPropertyValue("--border");
+          style.getPropertyValue("--border") ||
+          style.borderColor;
 
-        const isDark = (color: string) => {
-           if (color.startsWith('#')) {
-               const r = parseInt(color.substring(1, 3), 16);
-               const g = parseInt(color.substring(3, 5), 16);
-               const b = parseInt(color.substring(5, 7), 16);
-               return (r * 299 + g * 587 + b * 114) / 1000 < 128;
-           }
-           if (color.startsWith('rgb')) {
-               const [r, g, b] = color.match(/\d+/g)?.map(Number) || [0, 0, 0];
-               return (r * 299 + g * 587 + b * 114) / 1000 < 128;
-           }
-           return false; // Assume light
-        };
-
-        const finalBg = bg.startsWith('var') ? rootStyle.getPropertyValue(bg.replace(/var\((.*)\)/, '$1')) : bg;
-        // If extracted FG is essentially black but BG is dark, force white.
-        let finalFg = fg.startsWith('var') ? rootStyle.getPropertyValue(fg.replace(/var\((.*)\)/, '$1')) : fg;
-        
-        // Simple check: if fg is dark and bg is dark, default to white.
-        if (isDark(finalBg) && isDark(finalFg)) {
-            finalFg = '#ffffff';
-        }
+        // Ensure we don't end up with transparent colors if variables are missing
+        const finalBg =
+          bg === "transparent" || bg === "rgba(0, 0, 0, 0)" || !bg
+            ? "#ffffff"
+            : bg;
+        const finalFg = fg || "#000000";
 
         desktop?.window.startDragSession.mutate({
           title,
