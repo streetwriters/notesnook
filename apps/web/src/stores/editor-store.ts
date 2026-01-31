@@ -1670,7 +1670,7 @@ class EditorStore extends BaseStore<EditorStore> {
       // Update active tab if moving to a new group and it was active, or just because
       if (oldGroupId !== targetGroupId) {
         // 1. Handle old group focus
-        const oldGroup = state.groups.find((g) => g.id === oldGroupId);
+        const oldGroup = state.groups.find((g) => g && g.id === oldGroupId);
         if (oldGroup && oldGroup.activeTabId === tab.id) {
           const remainingTabs = state.tabs.filter(
             (t) => t && t.groupId === oldGroupId
@@ -1682,7 +1682,9 @@ class EditorStore extends BaseStore<EditorStore> {
         }
 
         // 2. Handle new group focus and app focus
-        const targetGroup = state.groups.find((g) => g.id === targetGroupId);
+        const targetGroup = state.groups.find(
+          (g) => g && g.id === targetGroupId
+        );
         if (targetGroup) {
           targetGroup.activeTabId = tab.id;
           state.activeGroupId = targetGroupId;
@@ -1693,7 +1695,7 @@ class EditorStore extends BaseStore<EditorStore> {
           (t) => t && t.groupId === oldGroupId
         );
         if (remainingTabsInOldGroup.length === 0 && state.groups.length > 1) {
-          state.groups = state.groups.filter((g) => g.id !== oldGroupId);
+          state.groups = state.groups.filter((g) => g && g.id !== oldGroupId);
 
           const removeFromLayout = (node: LayoutNode): LayoutNode | null => {
             if (node.type === "group") {
