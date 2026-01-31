@@ -276,7 +276,7 @@ class EditorStore extends BaseStore<EditorStore> {
     const isSingleNote =
       new URLSearchParams(window.location.search).get("singleNote") === "true";
 
-    if (isSingleNote) {
+    if (isSingleNote && this.get().sessions.length === 0) {
       this.set({
         tabs: [],
         groups: [{ id: "main" }],
@@ -578,14 +578,15 @@ class EditorStore extends BaseStore<EditorStore> {
       }
     );
 
-    const { rehydrateSession, activeGroupId, newSession, groups, layout } =
-      this.get();
+    const { rehydrateSession, newSession, groups, layout } = this.get();
     if (groups.length === 0) {
       // Migrate old state or Init
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { tabs, activeTabId } = this.get() as any;
       if (tabs && tabs.length > 0) {
         this.set({
           groups: [{ id: "main", activeTabId: activeTabId }],
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           tabs: tabs.map((t: any) => ({ ...t, groupId: "main" })),
           layout: {
             id: "root-layout",
@@ -654,7 +655,7 @@ class EditorStore extends BaseStore<EditorStore> {
     if (!currentGroup?.activeTabId) newSession();
   };
 
-  private rehydrateSession = (sessionId: string, silent: boolean = false) => {
+  private rehydrateSession = (sessionId: string, silent = false) => {
     const { openSession, openDiffSession, getSession, activateSession } =
       this.get();
 
@@ -691,6 +692,7 @@ class EditorStore extends BaseStore<EditorStore> {
       if (typeof partial === "function") partial(session);
       else {
         for (const key in partial) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           session[key] = partial[key] as any;
         }
       }
@@ -1176,6 +1178,7 @@ class EditorStore extends BaseStore<EditorStore> {
         } else {
           // update any conflicted session that has the same content opened
           if (partial.content) {
+            const content = partial.content;
             this.set((state) => {
               const session = state.sessions.find(
                 (s): s is ConflictedEditorSession =>
@@ -1186,7 +1189,7 @@ class EditorStore extends BaseStore<EditorStore> {
                     currentSession.note.dateEdited
               );
               if (!session || !session.content?.conflicted) return;
-              session.content.conflicted.data = partial.content!.data;
+              session.content.conflicted.data = content.data;
               session.content.conflicted.dateEdited = note.dateEdited;
             });
           }
@@ -1251,7 +1254,7 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   newSession = (groupId?: string) => {
-    const { activateSession, getActiveTab, addTab } = this.get();
+    const { activateSession, getActiveTab } = this.get();
     const activeTabId = getActiveTab(groupId)?.id;
     if (!activeTabId || getActiveTab(groupId)?.pinned) {
       this.addTab(undefined, groupId);
@@ -1320,7 +1323,7 @@ class EditorStore extends BaseStore<EditorStore> {
       state.tabs = tabs;
     });
 
-    const { history, tabs } = this.get();
+    const { history } = this.get();
     this.focusTab(history.pop());
     const remainingTabs = this.get().tabs;
     if (remainingTabs.length === 0) this.addTab();
@@ -1627,6 +1630,9 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   moveTab = (tabId: string, targetGroupId: string, newIndex?: number) => {
+    const tab = this.get().tabs.find((t) => t.id === tabId);
+    const sessionId = tab?.sessionId;
+
     this.set((state) => {
       const tabIndex = state.tabs.findIndex((t) => t && t.id === tabId);
       if (tabIndex === -1) return;
@@ -1713,11 +1719,18 @@ class EditorStore extends BaseStore<EditorStore> {
         }
       }
     });
+    if (sessionId) this.rehydrateSession(sessionId, true);
   };
 }
 
+const searchParams = new URLSearchParams(window.location.search);
+const windowSessionId = searchParams.get("windowSessionId");
+
 const useEditorStore = createPersistedStore(EditorStore, {
-  name: "editor-sessions-v2",
+  name:
+    !windowSessionId || windowSessionId === "main"
+      ? "editor-sessions-v2"
+      : `editor-sessions-v2-${windowSessionId}`,
   partialize: (state) => ({
     history: state.history,
     arePropertiesVisible: state.arePropertiesVisible,
