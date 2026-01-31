@@ -31,7 +31,8 @@
   font-display: swap;
   font-style: italic;
   font-weight: 500;
-  src: local("Inter"), url(./fonts/Inter-MediumItalic.ttf) format("truetype");
+  src: local("Inter"),
+    url(./fonts/Inter-MediumItalic.ttf) format("truetype");
 }
 
 /* open-sans-600 - latin */
@@ -49,7 +50,8 @@
   font-display: swap;
   font-style: italic;
   font-weight: 600;
-  src: local("Inter"), url(./fonts/Inter-SemiBoldItalic.ttf) format("truetype");
+  src: local("Inter"),
+    url(./fonts/Inter-SemiBoldItalic.ttf) format("truetype");
 }
 
 /* open-sans-700 - latin */
@@ -67,5 +69,6 @@
   font-display: swap;
   font-style: italic;
   font-weight: 700;
-  src: local("Inter"), url(./fonts/Inter-BoldItalic.ttf) format("truetype");
+  src: local("Inter"),
+    url(./fonts/Inter-BoldItalic.ttf) format("truetype");
 }

@@ -234,7 +234,9 @@ export class WaSqliteWorkerSingleTabDriver implements Driver {
 
   constructor(private readonly config: Config) {
     console.log("single tab driver", config.dbName);
-    this.worker = wrap<SQLiteWorker>(new Worker({ name: config.dbName }));
+    this.worker = wrap<SQLiteWorker>(
+      new Worker({ name: config.dbName })
+    ) 
   }
 
   async init(): Promise<void> {

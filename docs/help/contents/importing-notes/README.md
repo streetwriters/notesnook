@@ -8,7 +8,7 @@ Notesnook supports importing from most of the popular note apps and common expor
 
 ## Try it out
 
-You can try out the importer by opening the web or desktop app and going to `Settings > Notesnook Importer`.
+You can try out the importer by opening the web or desktop app and going to   `Settings > Notesnook Importer`.
 
 ## Supported note apps and formats
 

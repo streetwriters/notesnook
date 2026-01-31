@@ -13,4 +13,3 @@ node_modules.backup
 .nx
 /*.patch
 .taskcache
-AGENTS.md
