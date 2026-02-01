@@ -1326,8 +1326,15 @@ class EditorStore extends BaseStore<EditorStore> {
     const { history } = this.get();
     this.focusTab(history.pop());
     const remainingTabs = this.get().tabs;
-    if (remainingTabs.length === 0) this.addTab();
-    else if (
+    if (remainingTabs.length === 0) {
+      if (
+        new URLSearchParams(window.location.search).get("singleNote") === "true"
+      ) {
+        window.close();
+      } else {
+        this.addTab();
+      }
+    } else if (
       this.get().groups.some(
         (g) => !remainingTabs.find((t) => t.groupId === g.id)
       )
