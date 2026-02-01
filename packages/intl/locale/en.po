@@ -1354,6 +1354,10 @@ msgstr "Change app lock pin"
 msgid "Change backup directory"
 msgstr "Change backup directory"
 
+#: src/strings.ts:2637
+msgid "Change default text direction to LTR or RTL"
+msgstr "Change default text direction to LTR or RTL"
+
 #: src/strings.ts:465
 msgid "Change email address"
 msgstr "Change email address"
@@ -6424,6 +6428,7 @@ msgid "Text color"
 msgstr "Text color"
 
 #: src/strings.ts:2280
+#: src/strings.ts:2636
 msgid "Text direction"
 msgstr "Text direction"
 

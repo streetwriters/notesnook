@@ -1354,6 +1354,10 @@ msgstr ""
 msgid "Change backup directory"
 msgstr ""
 
+#: src/strings.ts:2637
+msgid "Change default text direction to LTR or RTL"
+msgstr ""
+
 #: src/strings.ts:465
 msgid "Change email address"
 msgstr ""
@@ -6383,6 +6387,7 @@ msgid "Text color"
 msgstr ""
 
 #: src/strings.ts:2280
+#: src/strings.ts:2636
 msgid "Text direction"
 msgstr ""
 

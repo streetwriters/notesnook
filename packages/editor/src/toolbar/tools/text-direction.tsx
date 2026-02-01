@@ -51,9 +51,10 @@ export function TextDirection(props: ToolProps) {
   const { editor } = props;
   const textDirection = getTextDirection(editor);
 
-  const newTextDirection: TextDirections = textDirection ? undefined : "rtl";
+  const newTextDirection: TextDirections =
+    textDirection === "rtl" ? "ltr" : "rtl";
 
-  const icon: IconNames = textDirection ? "rtl" : "ltr";
+  const icon: IconNames = textDirection === "rtl" ? "rtl" : "ltr";
 
   return (
     <TextDirectionTool direction={newTextDirection} {...props} icon={icon} />

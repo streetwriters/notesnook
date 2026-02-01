@@ -64,7 +64,9 @@ import { Table } from "./extensions/table/index.js";
 import TableCell from "./extensions/table-cell/index.js";
 import { TaskItemNode } from "./extensions/task-item/index.js";
 import { TaskListNode } from "./extensions/task-list/index.js";
-import TextDirection from "./extensions/text-direction/index.js";
+import TextDirection, {
+  TextDirections
+} from "./extensions/text-direction/index.js";
 import { WebClipNode, WebClipOptions } from "./extensions/web-clip/index.js";
 import { useEditor } from "./hooks/use-editor.js";
 import { usePermissionHandler } from "./hooks/use-permission-handler.js";
@@ -132,6 +134,7 @@ export type TiptapOptions = EditorOptions &
     isMobile?: boolean;
     doubleSpacedLines?: boolean;
     enableFontLigatures?: boolean;
+    defaultTextDirection: TextDirections;
   } & {
     placeholder: string;
   };
@@ -158,6 +161,7 @@ const useTiptap = (
     downloadOptions,
     editorProps,
     enableFontLigatures,
+    defaultTextDirection,
     ...restOptions
   } = options;
 
@@ -272,7 +276,9 @@ const useTiptap = (
         Subscript,
         Superscript,
         FontSize,
-        TextDirection,
+        TextDirection.configure({
+          defaultDirection: defaultTextDirection
+        }),
         FontFamily,
         BulletList.configure({ keepMarks: true, keepAttributes: true }),
         OrderedList.configure({ keepMarks: true, keepAttributes: true }),
