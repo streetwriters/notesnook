@@ -233,8 +233,8 @@ export class WindowManager {
           }),
       webPreferences: {
         zoomFactor: config.zoomFactor,
-        nodeIntegration: true,
-        contextIsolation: false,
+        nodeIntegration: false,
+        contextIsolation: true,
         nodeIntegrationInWorker: true,
         spellcheck: config.isSpellCheckerEnabled,
         preload: path.join(__dirname, "preload.js")

@@ -34,6 +34,10 @@ export type ToolButtonProps = ButtonProps & {
   toggled?: boolean;
   buttonRef?: React.RefObject<HTMLButtonElement>;
   variant?: ToolButtonVariant;
+  conditional?: boolean;
+  force?: boolean;
+  parentGroup?: string;
+  popupId?: string;
 };
 export const ToolButton = React.memo(
   function ToolButton(props: ToolButtonProps) {
@@ -48,8 +52,9 @@ export const ToolButton = React.memo(
       variant = "normal",
       // @ts-ignore
       parentGroup,
-      // @ts-ignore
       popupId,
+      force,
+      conditional,
       ...buttonProps
     } = props;
     const isMobile = useIsMobile();

@@ -194,6 +194,7 @@ export interface DatabaseCollection<T, IsAsync extends boolean> {
   stream(
     chunkSize: number
   ): IsAsync extends true ? AsyncIterableIterator<T> : IterableIterator<T>;
+  invalidateCache?(): void | Promise<void>;
 }
 
 export type DatabaseAccessor<TSchema = DatabaseSchema> = () =>
