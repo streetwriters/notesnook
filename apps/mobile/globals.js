@@ -9,6 +9,9 @@ import "./app/common/logger/index";
 import { setI18nGlobal } from "@notesnook/intl";
 import { i18n } from "@lingui/core";
 import Config from "react-native-config";
+import OpenPGP from "react-native-fast-openpgp";
+
+OpenPGP.useJSI = false;
 
 let domParser;
 Object.defineProperty(global, "DOMParser", {

@@ -26,7 +26,6 @@ import {
 } from "./key-value";
 import { NNCrypto } from "./nncrypto";
 import type {
-  AsymmetricCipher,
   Cipher,
   SerializedKey,
   SerializedKeyPair
@@ -34,6 +33,7 @@ import type {
 import { isFeatureSupported } from "../utils/feature-check";
 import { IKeyStore } from "./key-store";
 import { User } from "@notesnook/core";
+import * as openpgp from "openpgp";
 
 type EncryptedKey = { iv: Uint8Array; cipher: BufferSource };
 export type DatabasePersistence = "memory" | "db";
@@ -133,8 +133,44 @@ export class NNStorage implements IStorage {
     return await NNCrypto.exportKey(password, salt);
   }
 
-  async generateCryptoKeyPair() {
-    return await NNCrypto.exportKeyPair();
+  async generatePGPKeyPair(): Promise<SerializedKeyPair> {
+    const keys = await openpgp.generateKey({
+      userIDs: [{ name: "NN", email: "NN@NN.NN" }]
+    });
+    return { publicKey: keys.publicKey, privateKey: keys.privateKey };
+  }
+
+  async validatePGPKeyPair(keys: SerializedKeyPair): Promise<boolean> {
+    try {
+      const dummyData = JSON.stringify({
+        favorite: true,
+        title: "Hello world"
+      });
+
+      const publicKey = await openpgp.readKey({ armoredKey: keys.publicKey });
+      const encrypted = await openpgp.encrypt({
+        message: await openpgp.createMessage({
+          text: dummyData
+        }),
+        encryptionKeys: publicKey
+      });
+
+      const message = await openpgp.readMessage({
+        armoredMessage: encrypted
+      });
+      const privateKey = await openpgp.readPrivateKey({
+        armoredKey: keys.privateKey
+      });
+      const decrypted = await openpgp.decrypt({
+        message,
+        decryptionKeys: privateKey
+      });
+
+      return decrypted.data === dummyData;
+    } catch (e) {
+      console.error("PGP key pair validation error:", e);
+      return false;
+    }
   }
 
   async hash(password: string, email: string): Promise<string> {
@@ -165,12 +201,21 @@ export class NNStorage implements IStorage {
     return NNCrypto.decryptMulti(key, items, "text");
   }
 
-  decryptAsymmetric(
-    keyPair: SerializedKeyPair,
-    cipherData: AsymmetricCipher<"base64">
+  async decryptPGPMessage(
+    privateKeyArmored: string,
+    encryptedMessage: string
   ): Promise<string> {
-    cipherData.format = "base64";
-    return NNCrypto.decryptAsymmetric(keyPair, cipherData, "base64");
+    const message = await openpgp.readMessage({
+      armoredMessage: encryptedMessage
+    });
+    const privateKey = await openpgp.readPrivateKey({
+      armoredKey: privateKeyArmored
+    });
+    const decrypted = await openpgp.decrypt({
+      message,
+      decryptionKeys: privateKey
+    });
+    return decrypted.data;
   }
 
   /**

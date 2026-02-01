@@ -30,8 +30,8 @@ export class Crypto {
     return await this.storage().generateCryptoKey(password);
   }
 
-  async generateCryptoKeyPair() {
-    return await this.storage().generateCryptoKeyPair();
+  async generatePGPKeyPair() {
+    return await this.storage().generatePGPKeyPair();
   }
 }
 

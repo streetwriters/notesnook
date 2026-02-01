@@ -50,8 +50,11 @@ export type SyncTransferItem = {
   count: number;
 };
 
-export type SyncInboxItem = Omit<SyncItem, "format"> & {
-  key: Omit<Cipher<"base64">, "format" | "salt" | "iv">;
+export type SyncInboxItem = {
+  id: string;
+  v: number;
+  cipher: string;
+  alg: string;
 };
 
 export type ParsedInboxItem = {

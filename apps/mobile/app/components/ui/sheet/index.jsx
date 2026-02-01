@@ -155,14 +155,6 @@ const SheetWrapper = ({
         onClose={_onClose}
       >
         {children}
-
-        {bottomPadding ? (
-          <View
-            style={{
-              height: bottomInsets
-            }}
-          />
-        ) : null}
       </ActionSheet>
     </ScopedThemeProvider>
   );
