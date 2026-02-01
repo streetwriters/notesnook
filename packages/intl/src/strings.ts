@@ -799,10 +799,6 @@ $day$: Current day (eg. Monday)`,
   fileVerificationFailed: () => t`Uploaded file verification failed.`,
   fileLengthError: () =>
     t`File length is 0. Please upload this file again from the attachment manager.`,
-  generateThumbnails: () => t`Generate thumbnails`,
-  generateThumbnailsDesc: () =>
-    t`Automatically generate thumbnails for notes with images`,
-  showThumbnail: () => t`Show thumbnail`,
   fileLengthMismatch: (expectedSize: number, currentSize: number) =>
     t`File length mismatch. Expected ${expectedSize} but got ${currentSize} bytes. Please upload this file again from the attachment manager.`,
   failedToResolvedDownloadUrl: () => t`Failed to resolve download url`,
@@ -2636,5 +2632,9 @@ Use this if changes from other devices are not appearing on this device. This wi
   expiryDate: () => t`Expiry date`,
   exportCsv: () => t`Export CSV`,
   importCsv: () => t`Import CSV`,
-  noContent: () => t`This note is empty`
+  noContent: () => t`This note is empty`,
+  generateThumbnails: () => t`Generate thumbnails`,
+  generateThumbnailsDesc: () =>
+    t`Automatically generate thumbnails for notes with images`,
+  showThumbnail: () => t`Show thumbnail`
 };
