@@ -425,6 +425,22 @@ export class NNMigrationProvider implements MigrationProvider {
             .addColumn("title", "text")
             .execute();
         }
+      },
+      "a-2026-02-01": {
+        async up(db) {
+          await db.schema
+            .alterTable("notes")
+            .addColumn("thumbnail", "text")
+            .execute();
+        }
+      },
+      "a-2026-02-02": {
+        async up(db) {
+          await db.schema
+            .alterTable("notes")
+            .addColumn("showThumbnail", "boolean")
+            .execute();
+        }
       }
     };
   }

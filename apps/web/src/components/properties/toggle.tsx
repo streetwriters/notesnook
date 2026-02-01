@@ -26,22 +26,25 @@ type ToggleProps = {
   onToggle: (toggleState: boolean) => void;
   isOn: boolean;
   testId?: string;
+  disabled?: boolean;
 };
 function Toggle(props: ToggleProps) {
-  const { icon: ToggleIcon, label, onToggle, isOn } = props;
+  const { icon: ToggleIcon, label, onToggle, isOn, disabled } = props;
 
   return (
     <Flex
       sx={{
-        cursor: "pointer",
+        cursor: disabled ? "default" : "pointer",
         alignItems: "center",
         justifyContent: "space-between",
         gap: 1,
+        opacity: disabled ? 0.5 : 1,
+        pointerEvents: disabled ? "none" : "auto",
 
         "& label": { width: "auto", flexShrink: 0 }
       }}
       data-test-id={props.testId}
-      onClick={() => onToggle(!isOn)}
+      onClick={() => !disabled && onToggle(!isOn)}
     >
       <Flex
         sx={{

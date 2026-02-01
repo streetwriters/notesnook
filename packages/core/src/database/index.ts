@@ -236,7 +236,8 @@ const BooleanProperties: Set<BooleanFields> = new Set([
   "synced",
   "isGeneratedTitle",
   "archived",
-  "selfDestruct"
+  "selfDestruct",
+  "showThumbnail"
 ]);
 
 const DataMappers: Partial<Record<ItemType, (row: any) => void>> = {
@@ -437,7 +438,11 @@ export class SqliteBooleanPlugin implements KyselyPlugin {
 
       for (const key in row) {
         if (BooleanProperties.has(key as BooleanFields)) {
-          row[key] = row[key] === 1;
+          if (key === "showThumbnail" && row[key] == null) {
+            row[key] = true;
+          } else {
+            row[key] = row[key] === 1;
+          }
         }
       }
 

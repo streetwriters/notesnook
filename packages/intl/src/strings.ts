@@ -799,6 +799,10 @@ $day$: Current day (eg. Monday)`,
   fileVerificationFailed: () => t`Uploaded file verification failed.`,
   fileLengthError: () =>
     t`File length is 0. Please upload this file again from the attachment manager.`,
+  generateThumbnails: () => t`Generate thumbnails`,
+  generateThumbnailsDesc: () =>
+    t`Automatically generate thumbnails for notes with images`,
+  showThumbnail: () => t`Show thumbnail`,
   fileLengthMismatch: (expectedSize: number, currentSize: number) =>
     t`File length mismatch. Expected ${expectedSize} but got ${currentSize} bytes. Please upload this file again from the attachment manager.`,
   failedToResolvedDownloadUrl: () => t`Failed to resolve download url`,

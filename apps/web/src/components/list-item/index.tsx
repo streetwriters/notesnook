@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Text } from "@theme-ui/components";
+import { Flex, Text, Box } from "@theme-ui/components";
 import { ThemeUIStyleObject } from "@theme-ui/css";
 import {
   store as selectionStore,
@@ -54,6 +54,7 @@ type ListItemProps<TItem extends Item, TContext> = {
 
   title: string | JSX.Element;
   header?: JSX.Element;
+  thumbnail?: JSX.Element;
   body?: JSX.Element | string;
   footer?: JSX.Element;
 
@@ -154,11 +155,16 @@ function ListItem<TItem extends Item, TContext>(
         overflow: "hidden",
         maxWidth: "100%",
 
-        flexDirection: isCompact ? "row" : "column",
-        justifyContent: isCompact ? "space-between" : "center",
+        flexDirection: isCompact ? "row" : "row",
+        justifyContent: isCompact ? "space-between" : undefined,
         alignItems: isCompact ? "center" : undefined,
 
         opacity: isDisabled ? 0.7 : 1,
+
+        "@container (max-width: 265px)": {
+          flexDirection: isCompact ? "row" : "column-reverse",
+          alignItems: isCompact ? "center" : "normal"
+        },
 
         backgroundColor: selected ? "background-selected" : background,
 
@@ -194,52 +200,102 @@ function ListItem<TItem extends Item, TContext>(
       }}
       data-test-id={`list-item`}
     >
-      {!isCompact && props.header}
+      <Box
+        sx={{
+          flex: 1,
+          minWidth: 0,
+          display: "flex",
+          flexDirection: "column",
+          width: "100%"
+        }}
+      >
+        {!isCompact && props.header}
 
-      {typeof props.title === "string" ? (
-        <Text
-          dir="auto"
-          data-test-id={`title`}
-          variant={"body"}
-          sx={{
-            whiteSpace: "pre",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            fontWeight: isCompact ? "body" : "medium",
-            color:
-              selected && heading === "heading" ? `heading-selected` : heading,
-            display: "block"
-          }}
-        >
-          {props.title}
-        </Text>
-      ) : (
-        props.title
-      )}
+        {typeof props.title === "string" ? (
+          <Text
+            dir="auto"
+            data-test-id={`title`}
+            variant={"body"}
+            sx={{
+              whiteSpace: "pre",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              fontWeight: isCompact ? "body" : "medium",
+              color:
+                selected
+                  ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    (theme: any) => theme.colors[`heading-selected`] || heading
+                  : heading,
+              display: "block",
+              fontSize: isCompact ? undefined : "14px"
+            }}
+          >
+            {props.title}
+          </Text>
+        ) : (
+          props.title
+        )}
 
-      {!isCompact && props.body && (
-        <Text
-          as="p"
-          variant="body"
-          dir="auto"
-          data-test-id={`description`}
-          sx={{
-            mt: "small",
-            color: selected ? "paragraph-selected" : "paragraph",
-            lineHeight: `1.2rem`,
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "pre-wrap",
-            position: "relative",
-            display: "-webkit-box",
-            WebkitLineClamp: 4,
-            WebkitBoxOrient: "vertical"
-          }}
-        >
-          {props.body}
-        </Text>
-      )}
-      {props.footer ? <>{props.footer}</> : null}
+        {!isCompact && props.body && (
+          <Text
+            as="p"
+            variant="body"
+            dir="auto"
+            data-test-id={`description`}
+            sx={{
+              mt: "small",
+              color: selected ? "paragraph-selected" : "paragraph",
+              lineHeight: `1.2rem`,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "pre-wrap",
+              position: "relative",
+              display: "-webkit-box",
+              WebkitLineClamp: 4,
+              WebkitBoxOrient: "vertical"
+            }}
+          >
+            {props.body}
+          </Text>
+        )}
+        {props.footer ? <>{props.footer}</> : null}
+      </Box>
+
+      {props.thumbnail &&
+        !isCompact &&
+        (item.type !== "note" ||
+          (item as any).showThumbnail === undefined ||
+          (item as any).showThumbnail) && (
+          <Box
+            sx={{
+              ml: 2,
+              width: 80,
+              height: 80,
+              minWidth: 80,
+              borderRadius: "default",
+              overflow: "hidden",
+              alignSelf: "flex-start",
+              bg: "action",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            "@container (max-width: 265px)": {
+              width: "100%",
+              height: "auto",
+              maxHeight: "150px",
+              mb: 2,
+              ml: 0,
+              "& > img": {
+                  height: "auto !important",
+                  // @ts-expect-error theme-ui types are strict
+                  objectFit: "contain !important"
+                }
+              }
+            }}
+          >
+            {props.thumbnail}
+          </Box>
+        )}
     </Flex>
   );
 }

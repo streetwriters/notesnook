@@ -158,6 +158,34 @@ export class Tiptap {
     }).transform(this.data);
   }
 
+  getFirstImageHash() {
+    let hash: string | undefined;
+    new HTMLParser({
+      ontag: (name, attr) => {
+        if (hash) return;
+        if (name === "img" && attr[ATTRIBUTES.hash]) {
+          hash = attr[ATTRIBUTES.hash];
+        }
+      }
+    }).parse(this.data);
+    return hash;
+  }
+
+  getFirstImage() {
+    let hash: string | undefined;
+    let src: string | undefined;
+    new HTMLParser({
+      ontag: (name, attr) => {
+        if (src || hash) return;
+        if (name === "img") {
+          hash = attr[ATTRIBUTES.hash];
+          src = attr[ATTRIBUTES.src];
+        }
+      }
+    }).parse(this.data);
+    return { hash, src };
+  }
+
   async resolveAttachments(resolve: ResolveAttachments) {
     const attachments: Record<string, Record<string, string>> = {};
     const document = parseDocument(this.data);
