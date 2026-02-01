@@ -1663,6 +1663,7 @@ class EditorStore extends BaseStore<EditorStore> {
   moveTab = (tabId: string, targetGroupId: string, newIndex?: number) => {
     const tab = this.get().tabs.find((t) => t && t.id === tabId);
     const sessionId = tab?.sessionId;
+    let newActiveSessionId: string | undefined;
 
     this.set((state) => {
       const tabIndex = state.tabs.findIndex((t) => t && t.id === tabId);
@@ -1706,10 +1707,13 @@ class EditorStore extends BaseStore<EditorStore> {
           const remainingTabs = state.tabs.filter(
             (t) => t && t.groupId === oldGroupId
           );
-          oldGroup.activeTabId =
-            remainingTabs.length > 0
-              ? remainingTabs[remainingTabs.length - 1].id
-              : undefined;
+          if (remainingTabs.length > 0) {
+            const newActiveTab = remainingTabs[remainingTabs.length - 1];
+            oldGroup.activeTabId = newActiveTab.id;
+            newActiveSessionId = newActiveTab.sessionId;
+          } else {
+            oldGroup.activeTabId = undefined;
+          }
         }
 
         // 2. Handle new group focus and app focus
@@ -1753,6 +1757,7 @@ class EditorStore extends BaseStore<EditorStore> {
       }
     }
     if (sessionId) this.rehydrateSession(sessionId, true);
+    if (newActiveSessionId) this.rehydrateSession(newActiveSessionId, true);
   };
 }
 
