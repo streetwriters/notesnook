@@ -102,7 +102,7 @@ export function RemoveAttachment(props: ToolProps) {
 }
 
 const previewableFileExtensions = ["pdf"];
-const previewableMimeTypes = ["application/pdf"];
+const previewableMimeTypes = ["application/pdf", "image/"];
 
 function canPreviewAttachment(attachment: Attachment) {
   if (!attachment) return false;

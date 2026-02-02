@@ -42,10 +42,13 @@ export async function insertAttachments(type = "*/*") {
     multiple: true
   });
   if (!files) return;
-  return await attachFiles(files);
+  return await attachFiles(files, type === "*/*");
 }
 
-export async function attachFiles(files: File[]) {
+export async function attachFiles(
+  files: File[],
+  skipSpecialImageHandling = false
+) {
   let images = files.filter((f) => f.type.startsWith("image/"));
   const imageCompressionConfig = Config.get<ImageCompressionOptions>(
     "imageCompression",
@@ -87,7 +90,7 @@ export async function attachFiles(files: File[]) {
   const documents = files.filter((f) => !f.type.startsWith("image/"));
   const attachments: Attachment[] = [];
   for (const file of [...images, ...documents]) {
-    const attachment = file.type.startsWith("image/")
+    const attachment = !skipSpecialImageHandling && file.type.startsWith("image/")
       ? await pickImage(file)
       : await pickFile(file);
     if (!attachment) continue;
