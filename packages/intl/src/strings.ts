@@ -154,7 +154,6 @@ export const strings = {
   delete: () => t`Delete`,
   share: () => t`Share`,
   open: () => t`Open`,
-  openInNewWindow: () => t`Open in new window`,
   unlock: () => t`Unlock`,
   create: () => t`Create`,
   lock: () => t`Lock`,
@@ -2634,5 +2633,6 @@ Use this if changes from other devices are not appearing on this device. This wi
   expiryDate: () => t`Expiry date`,
   exportCsv: () => t`Export CSV`,
   importCsv: () => t`Import CSV`,
-  noContent: () => t`This note is empty`
+  noContent: () => t`This note is empty`,
+  openInNewWindow: () => t`Open in new window`
 };
