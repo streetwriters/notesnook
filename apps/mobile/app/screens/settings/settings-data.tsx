@@ -62,7 +62,11 @@ import SettingsService from "../../services/settings";
 import Sync from "../../services/sync";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
-import { eCloseSheet, eOpenRecoveryKeyDialog } from "../../utils/events";
+import {
+  eAfterSync,
+  eCloseSheet,
+  eOpenRecoveryKeyDialog
+} from "../../utils/events";
 import { NotesnookModule } from "../../utils/notesnook-module";
 import { sleep } from "../../utils/time";
 import { MFARecoveryCodes, MFASheet } from "./2fa";
@@ -72,8 +76,49 @@ import { logoutUser } from "./logout";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
 import { EDITOR_LINE_HEIGHT } from "../../utils/constants";
+import { MMKV } from "../../common/database/mmkv";
+import { resetTabStore } from "../editor/tiptap/use-tab-store";
+import { clearAllStores } from "../../stores";
+import { refreshAllStores } from "../../stores/create-db-collection-store";
 
 export const settingsGroups: SettingSection[] = [
+  {
+    id: "account-local",
+    name: strings.account(),
+    useHook: () => useUserStore((state) => state.user),
+    hidden: (current) => !!current,
+    sections: [
+      {
+        id: "delete-data",
+        name: strings.deleteData(),
+        description: strings.deleteAccountDesc(),
+        modifer: () => {
+          presentDialog({
+            title: strings.deleteData(),
+            paragraph: strings.irreverisibleAction(),
+            positiveType: "errorShade",
+            positiveText: "Delete data",
+            positivePress: async () => {
+              await PremiumService.setPremiumStatus();
+              await BiometricService.resetCredentials();
+              MMKV.clearStore();
+              resetTabStore();
+              clearAllStores();
+              Navigation.queueRoutesForUpdate();
+              SettingsService.resetSettings();
+              db.reset();
+
+              setImmediate(() => {
+                refreshAllStores();
+                eSendEvent(eAfterSync);
+              });
+              return true;
+            }
+          });
+        }
+      }
+    ]
+  },
   {
     id: "account",
     name: strings.account(),

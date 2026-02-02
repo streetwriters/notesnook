@@ -94,6 +94,7 @@ import { SyncStatus, useUserStore } from "../stores/use-user-store";
 import { updateStatusBarColor } from "../utils/colors";
 import { BETA } from "../utils/constants";
 import {
+  eAfterSync,
   eCloseSheet,
   eEditorReset,
   eLoginSessionExpired,
@@ -332,6 +333,7 @@ const onLogout = async (reason: string) => {
   SettingsService.resetSettings();
   useUserStore.getState().setUser(null);
   useUserStore.getState().setSyncing(false);
+  eSendEvent(eAfterSync);
 };
 
 async function checkForShareExtensionLaunchedInBackground() {
