@@ -53,6 +53,9 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
   });
   const [totalNoteCount, setTotalNoteCount] = useState(0);
   const [_, setCounter] = useState<number>(0);
+  const [colornotePassword, setColornotePassword] = useState<
+    string | undefined
+  >(undefined);
   const logs = useRef<string[]>([]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -103,6 +106,9 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
       },
       reporter: () => {
         setTotalNoteCount(++totalNotes);
+      },
+      options: {
+        colornote: { password: colornotePassword }
       }
     };
 
@@ -224,6 +230,25 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
           </Text>
         </Text>
       </Flex>
+
+      {files.length > 0 && provider.id === "colornote" && (
+        <Flex
+          sx={{
+            alignItems: "center",
+            justifyContent: "space-between",
+            mt: 1
+          }}
+        >
+          <Text variant="body">Colornote password</Text>
+          <Input
+            placeholder="Backup password e.g '0000'"
+            type={"text"}
+            sx={{ width: 200, padding: 2, height: 25 }}
+            onChange={(e) => setColornotePassword(e.target.value)}
+          />
+        </Flex>
+      )}
+
       {files.length > 0 ? (
         <Accordion
           isClosed
