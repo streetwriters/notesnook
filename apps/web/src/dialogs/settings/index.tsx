@@ -581,6 +581,7 @@ function SettingItem(props: { item: Setting }) {
               case "input":
                 return component.inputType === "number" ? (
                   <Input
+                    key={component.defaultValue()}
                     type={"number"}
                     min={component.min}
                     max={component.max}
@@ -597,6 +598,16 @@ function SettingItem(props: { item: Setting }) {
                           : value;
                       component.onChange(value);
                     }, 500)}
+                    onBlur={(e) => {
+                      let value = e.target.valueAsNumber;
+                      value =
+                        Number.isNaN(value) || value < component.min
+                          ? component.min
+                          : value > component.max
+                          ? component.max
+                          : value;
+                      component.onChange(value);
+                    }}
                   />
                 ) : (
                   <Input
@@ -607,6 +618,7 @@ function SettingItem(props: { item: Setting }) {
                       (e) => component.onChange(e.target.value),
                       500
                     )}
+                    onBlur={(e) => component.onChange(e.target.value)}
                   />
                 );
               case "icon":
