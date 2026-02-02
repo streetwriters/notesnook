@@ -647,7 +647,6 @@ $day$: Current day (eg. Monday)`,
   aToZ: () => t`A to Z`,
   zToA: () => t`Z to A`,
   title: () => t`Title`,
-  menu: () => t`Menu`,
   sortByStrings: {
     dateModified: () => t`Date modified`,
     dateEdited: () => t`Date edited`,
