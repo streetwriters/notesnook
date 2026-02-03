@@ -167,14 +167,16 @@ const ColorPicker = ({
                   );
                 if (!title.current)
                   return ToastManager.error(
-                    new Error(strings.allFieldsRequired())
+                    new Error(strings.allFieldsRequired()),
+                    "color-picker"
                   );
                 const exists = await db.colors.all.find((v) =>
                   v.and([v(`colorCode`, "==", selectedColor)])
                 );
                 if (exists)
                   return ToastManager.error(
-                    new Error(strings.colorExists(selectedColor))
+                    new Error(strings.colorExists(selectedColor)),
+                    "color-picker"
                   );
                 const id = await db.colors.add({
                   title: title.current,
