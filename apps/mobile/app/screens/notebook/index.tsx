@@ -193,11 +193,13 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
           headerTitle={notebook?.title}
           loading={loading}
           CustomLisHeader={
-            <NotebookHeader
-              breadcrumbs={breadcrumbs}
-              notebook={notebook!}
-              totalNotes={notes?.placeholders.length || 0}
-            />
+            notebook ? (
+              <NotebookHeader
+                breadcrumbs={breadcrumbs}
+                notebook={notebook}
+                totalNotes={notes?.placeholders.length || 0}
+              />
+            ) : undefined
           }
           placeholder={{
             title: notebook?.title!,
