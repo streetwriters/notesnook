@@ -67,36 +67,7 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
       }
     }
 
-    if (typeof IS_DESKTOP_APP !== 'undefined' && IS_DESKTOP_APP) {
-      import("../common/desktop-bridge").then(({ desktop }) => {
-        const themeEl = document.querySelector(".theme-scope-base") || document.documentElement;
-        const style = window.getComputedStyle(themeEl);
 
-        const bg =
-          style.getPropertyValue("--background") ||
-          style.backgroundColor;
-
-        const fg =
-          style.getPropertyValue("--paragraph") ||
-          style.color;
-
-        const border =
-          style.getPropertyValue("--border") ||
-          style.borderColor;
-
-        // Ensure we don't end up with transparent colors if variables are missing
-        const finalBg =
-          bg === "transparent" || bg === "rgba(0, 0, 0, 0)" || !bg
-            ? "#ffffff"
-            : bg;
-        const finalFg = fg || "#000000";
-
-        desktop?.window.startDragSession.mutate({
-          title,
-          colors: { bg, fg: finalFg, border }
-        });
-      });
-    }
   };
 
   const handleDragOver = (event: DragOverEvent) => {
@@ -145,34 +116,9 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
     setDragType(null);
     setDraggedNote(null);
 
-    if (typeof IS_DESKTOP_APP !== 'undefined' && IS_DESKTOP_APP) {
-      import("../common/desktop-bridge").then(({ desktop }) => {
-        desktop?.window.endDragSession.mutate();
-      });
-    }
+
     
-    // Handle Tear-out (Global for both Tabs and Notes)
-    if (typeof IS_DESKTOP_APP !== 'undefined' && IS_DESKTOP_APP) {
-      const activator = event.activatorEvent as MouseEvent;
-      // MouseEvent might be missing on some sensors, but PointerSensor usually provides it.
-       if (activator && activator.clientX !== undefined) {
-          const { clientX: startX, clientY: startY } = activator;
-          const { x: dx, y: dy } = event.delta;
-          const finalX = startX + dx;
-          const finalY = startY + dy;
 
-          const isOutside = 
-            finalX < 0 ||
-            finalX > window.innerWidth ||
-            finalY < 0 ||
-            finalY > window.innerHeight;
-
-          if (isOutside) {
-            handleTearOut(activeId, dragType);
-            return;
-          }
-       }
-    }
 
     if (!over) return;
     const overId = over.id as string;
@@ -184,38 +130,7 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const handleTearOut = (activeId: string, type: "tab" | "note" | null) => {
-    let noteId: string | undefined;
-    
-    if (type === "tab") {
-       const tab = tabs.find((t) => t && t.id === activeId);
-       if (!tab) return;
-       const session = useEditorStore.getState().getSession(tab.sessionId);
-       if (session && "note" in session) noteId = session.note.id;
-       else if (session && session.type === "new") {
-           // Handle new note
-             import("../common/desktop-bridge").then(({ desktop }) => {
-                desktop?.window.open.mutate({ create: true });
-                const state = useEditorStore.getState();
-                // Close logic...
-                state.closeTabs(activeId);
-             });
-             return;
-       }
-    } else if (type === "note") {
-       noteId = activeId.split("::")[1];
-    }
 
-    if (noteId) {
-       import("../common/desktop-bridge").then(({ desktop }) => {
-          desktop?.window.open.mutate({ noteId });
-          if (type === "tab") {
-             const tab = tabs.find((t) => t && t.id === activeId);
-             if (tab) useEditorStore.getState().closeTabs(activeId);
-          }
-       });
-    }
-  };
 
   const handleTabDragEnd = (activeId: string, overId: string) => {
      if (activeId === overId) return;
@@ -370,22 +285,14 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
-      onDragCancel={(e) => {
-         // Copy cancellation logic (tear out) here too if needed
+         // Copy cancellation logic if needed
          setActiveDragId(null);
          setDragType(null);
          setDraggedNote(null);
-         
-         if (typeof IS_DESKTOP_APP !== 'undefined' && IS_DESKTOP_APP) {
-            import("../common/desktop-bridge").then(({ desktop }) => {
-              desktop?.window.endDragSession.mutate();
-            });
-         }
-      }}
     >
       {children}
       <DragOverlay>
-         {dragType === "tab" && activeTabForOverlay && activeSessionForOverlay && !(typeof IS_DESKTOP_APP !== 'undefined' && IS_DESKTOP_APP) ? (
+         {dragType === "tab" && activeTabForOverlay && activeSessionForOverlay ? (
              <ScopedThemeProvider scope="editor" sx={{ bg: "background" }}>
                 <Tab
                   id={activeTabForOverlay.id}
@@ -404,10 +311,11 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
                   onCloseToTheLeft={() => {}}
                   onPin={() => {}}
                   onSave={() => {}}
+                  onPin={() => {}}
                 />
              </ScopedThemeProvider>
          ) : null}
-         {dragType === "note" && draggedNote && !(typeof IS_DESKTOP_APP !== 'undefined' && IS_DESKTOP_APP) ? (
+         {dragType === "note" && draggedNote ? (
              <ScopedThemeProvider scope="list" sx={{ bg: "background", p: 2, borderRadius: 8, boxShadow: "0 0 10px rgba(0,0,0,0.2)", width: 300 }}>
                  <div style={{fontWeight: "bold"}}>{draggedNote.title}</div>
              </ScopedThemeProvider>
