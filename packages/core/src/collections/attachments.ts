@@ -574,6 +574,14 @@ export class Attachments implements ICollection {
       );
     return this.key;
   }
+
+  async removeOrphaned() {
+    for await (const attachment of this.db.attachments.orphaned.iterate()) {
+      try {
+        await this.db.attachments.remove(attachment.hash, false);
+      } catch (error) {}
+    }
+  }
 }
 
 export function getOutputType(attachment: Attachment): DataFormat {
