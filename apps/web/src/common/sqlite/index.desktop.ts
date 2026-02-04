@@ -28,26 +28,31 @@ import {
   Driver
 } from "@streetwriters/kysely";
 import { desktop } from "../desktop-bridge";
+import Worker from "./sqlite.worker.desktop.ts?worker";
+import type { SQLiteWorker } from "./sqlite.worker.desktop";
+import { wrap, Remote } from "comlink";
 import { Mutex } from "async-mutex";
 import { DialectOptions } from ".";
 
 class SqliteDriver implements Driver {
   connection?: DatabaseConnection;
   private connectionMutex = new Mutex();
-  connectionId?: string;
-
+  worker: Remote<SQLiteWorker> = wrap<SQLiteWorker>(new Worker());
   constructor(private readonly config: { name: string }) {}
 
   async init(): Promise<void> {
     const path = await desktop!.integration.resolvePath.query({
       filePath: `userData/${this.config.name}.sql`
     });
-    this.connectionId = await desktop!.db.connect.mutate({ filePath: path });
-    this.connection = new SqliteWorkerConnection(this.connectionId);
+    await this.worker.open(path);
+    this.connection = new SqliteWorkerConnection(this.worker);
   }
 
   async acquireConnection(): Promise<DatabaseConnection> {
     if (!this.connection) throw new Error("Driver not initialized.");
+
+    // SQLite only has one single connection. We use a mutex here to wait
+    // until the single connection has been released.
     await this.connectionMutex.waitForUnlock();
     await this.connectionMutex.acquire();
     return this.connection;
@@ -70,26 +75,19 @@ class SqliteDriver implements Driver {
   }
 
   async destroy(): Promise<void> {
-    if (this.connectionId) {
-      await desktop!.db.close.mutate({ connectionId: this.connectionId });
-    }
+    await this.worker.close();
   }
 
   async delete() {
-    // Check if we need to close first? available in destroy
-    if (this.connectionId) {
-      await desktop!.db.close.mutate({ connectionId: this.connectionId });
-    }
-    // We might need an API to delete the file via Node, but previously it used the worker.
-    // Ideally we should add a delete method to dbRouter or use integration.
-    // For now let's assume manual deletion or skip if not critical for this bug fix.
-    // Actually `sqlService` has delete method? No, but `SQLite` class has.
-    // Let's rely on manual cleanup or add delete later.
+    const path = await desktop!.integration.resolvePath.query({
+      filePath: `userData/${this.config.name}.sql`
+    });
+    await this.worker.delete(path);
   }
 }
 
 class SqliteWorkerConnection implements DatabaseConnection {
-  constructor(private readonly connectionId: string) {}
+  constructor(private readonly worker: Remote<SQLiteWorker>) {}
 
   streamQuery<R>(): AsyncIterableIterator<QueryResult<R>> {
     throw new Error("wasqlite driver doesn't support streaming");
@@ -99,11 +97,7 @@ class SqliteWorkerConnection implements DatabaseConnection {
     compiledQuery: CompiledQuery<unknown>
   ): Promise<QueryResult<R>> {
     const { parameters, sql } = compiledQuery;
-    return desktop!.db.exec.mutate({
-      connectionId: this.connectionId,
-      sql,
-      parameters: parameters as any
-    }) as unknown as QueryResult<R>;
+    return this.worker.run(sql, parameters as any) as unknown as QueryResult<R>;
   }
 }
 
