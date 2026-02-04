@@ -327,34 +327,6 @@ export class WindowManager {
       this.dragWindow = null;
     }
   }
-  handleExternalDrop(
-    payload: {
-      x: number;
-      y: number;
-      type: "tab" | "note";
-      id: string;
-    },
-    excludeWindowId: number
-  ) {
-    const { x, y } = payload;
-    for (const window of this.getWindows()) {
-      if (window.isDestroyed() || window.id === excludeWindowId) continue;
-      const bounds = window.getBounds();
-      if (
-        x >= bounds.x &&
-        x <= bounds.x + bounds.width &&
-        y >= bounds.y &&
-        y <= bounds.y + bounds.height
-      ) {
-        if (!this.ipcHandler) return { handled: false };
-
-        // Let's send the event to that window
-        window.webContents.send("app:external-drop", payload);
-        return { handled: true };
-      }
-    }
-    return { handled: false };
-  }
 }
 
 export const windowManager = new WindowManager();

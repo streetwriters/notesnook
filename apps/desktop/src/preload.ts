@@ -27,9 +27,6 @@ declare global {
   var os: () => "mas" | ReturnType<typeof platform>;
   var electronTRPC: any;
   // var NativeNNCrypto: (new () => NNCrypto) | undefined;
-  var appEvents: {
-    onExternalDrop: (callback: (payload: any) => void) => void;
-  };
 }
 
 process.once("loaded", async () => {
@@ -40,14 +37,6 @@ process.once("loaded", async () => {
       ipcRenderer.on(ELECTRON_TRPC_CHANNEL, (_event, args) => callback(args))
   };
   globalThis.electronTRPC = electronTRPC;
-  globalThis.appEvents = {
-    onExternalDrop: (callback: any) => {
-      const subscription = (_event: any, args: any) => callback(args);
-      ipcRenderer.on("app:external-drop", subscription);
-      return () =>
-        ipcRenderer.removeListener("app:external-drop", subscription);
-    }
-  };
 });
 
 // globalThis.NativeNNCrypto = require("@notesnook/crypto").NNCrypto;

@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import {
   DndContext,
   DragEndEvent,
@@ -44,36 +44,6 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
   const [dragType, setDragType] = useState<"tab" | "note" | null>(null);
   const [draggedNote, setDraggedNote] = useState<Note | null>(null);
 
-  const cleanupRef = useRef<(() => void) | undefined>();
-
-  useEffect(() => {
-    if (typeof IS_DESKTOP_APP !== 'undefined' && IS_DESKTOP_APP) {
-      const handleExternalDrop = async (event: any, payload: any) => {
-        const { type, id } = payload;
-        if (type === "tab" || type === "note") {
-             const noteId = id.includes("::") ? id.split("::")[1] : id;
-             if (noteId && noteId !== "new") {
-                 useEditorStore.getState().openSession(noteId, { openInNewTab: true });
-             } else if (noteId === "new") {
-                 useEditorStore.getState().newSession();
-             }
-        }
-      };
-
-      import("../common/desktop-bridge").then(({ desktop }) => {
-         if (cleanupRef.current) cleanupRef.current();
-         // @ts-ignore
-         const cleanup = window.appEvents?.onExternalDrop((payload: any) => {
-             handleExternalDrop(null, payload);
-         });
-         cleanupRef.current = cleanup;
-      });
-    }
-    return () => {
-        if (cleanupRef.current) cleanupRef.current();
-    };
-  }, []);
-
   const handleDragStart = async (event: DragStartEvent) => {
     const activeId = event.active.id as string;
     setActiveDragId(activeId);
@@ -92,12 +62,8 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
       const tab = tabs.find((t) => t && t.id === activeId);
       if (tab) {
          const session = getActiveSession(); // This might be wrong, we need session of the tab
-          const actualSession = useEditorStore.getState().getSession(tab.sessionId);
-          if (actualSession) {
-            if (actualSession.title) title = actualSession.title;
-            else if ("note" in actualSession) title = actualSession.note.title;
-            else title = "Untitled";
-          }
+         const actualSession = useEditorStore.getState().getSession(tab.sessionId);
+         if (actualSession) title = actualSession.title || "Untitled";
       }
     }
 
@@ -190,12 +156,10 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
       const activator = event.activatorEvent as MouseEvent;
       // MouseEvent might be missing on some sensors, but PointerSensor usually provides it.
        if (activator && activator.clientX !== undefined) {
-          const { clientX: startX, clientY: startY, screenX: startScreenX, screenY: startScreenY } = activator;
+          const { clientX: startX, clientY: startY } = activator;
           const { x: dx, y: dy } = event.delta;
           const finalX = startX + dx;
           const finalY = startY + dy;
-          const finalScreenX = startScreenX + dx;
-          const finalScreenY = startScreenY + dy;
 
           const isOutside = 
             finalX < 0 ||
@@ -204,7 +168,7 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
             finalY > window.innerHeight;
 
           if (isOutside) {
-            handleTearOut(activeId, dragType, { x: finalScreenX, y: finalScreenY });
+            handleTearOut(activeId, dragType);
             return;
           }
        }
@@ -220,27 +184,9 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const handleTearOut = (activeId: string, type: "tab" | "note" | null, screenCoords?: { x: number; y: number }) => {
+  const handleTearOut = (activeId: string, type: "tab" | "note" | null) => {
     let noteId: string | undefined;
     
-    const handleInternalDrop = (type: "tab" | "note", id: string, noteId?: string | null) => {
-       import("../common/desktop-bridge").then(async ({ desktop }) => {
-          if (screenCoords && desktop) {
-             const result: any = await desktop.window.checkInternalDrop.mutate({
-                x: screenCoords.x,
-                y: screenCoords.y,
-                type: type,
-                id: noteId || id // Pass noteId if available, otherwise id (which shouldn't happen for tabs now)
-             });
-             if (result?.handled) {
-                if (type === "tab") useEditorStore.getState().closeTabs(activeId);
-                return true;
-             }
-          }
-          return false;
-       });
-    }
-
     if (type === "tab") {
        const tab = tabs.find((t) => t && t.id === activeId);
        if (!tab) return;
@@ -248,25 +194,11 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
        if (session && "note" in session) noteId = session.note.id;
        else if (session && session.type === "new") {
            // Handle new note
-             import("../common/desktop-bridge").then(async ({ desktop }) => {
-                if (screenCoords && desktop) {
-                   const result: any = await desktop.window.checkInternalDrop.mutate({
-                      x: screenCoords.x,
-                      y: screenCoords.y,
-                      type: "tab",
-                      id: "new" // Special case for new note? Or just let it tear out?
-                   });
-                   // If dropped externally on another window, we probably want to create a new note THERE?
-                   // detailed logic: if dropped on another window, maybe we should just "move" the clean new tab?
-                   // For now, let's keep it simple: New tabs only tear out to new windows or stay put.
-                   if (result?.handled) {
-                      useEditorStore.getState().closeTabs(activeId);
-                      return;
-                   }
-                }
-
+             import("../common/desktop-bridge").then(({ desktop }) => {
                 desktop?.window.open.mutate({ create: true });
-                useEditorStore.getState().closeTabs(activeId);
+                const state = useEditorStore.getState();
+                // Close logic...
+                state.closeTabs(activeId);
              });
              return;
        }
@@ -275,20 +207,7 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
     }
 
     if (noteId) {
-       import("../common/desktop-bridge").then(async ({ desktop }) => {
-          if (screenCoords && desktop) {
-             const result: any = await desktop.window.checkInternalDrop.mutate({
-                x: screenCoords.x,
-                y: screenCoords.y,
-                type: type || "note",
-                id: noteId!
-             });
-             if (result?.handled) {
-               if (type === "tab") useEditorStore.getState().closeTabs(activeId);
-               return;
-             }
-          }
-
+       import("../common/desktop-bridge").then(({ desktop }) => {
           desktop?.window.open.mutate({ noteId });
           if (type === "tab") {
              const tab = tabs.find((t) => t && t.id === activeId);

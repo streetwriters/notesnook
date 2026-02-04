@@ -118,17 +118,5 @@ export const windowRouter = t.router({
     }),
   endDragSession: t.procedure.mutation(() => {
     windowManager.endDragSession();
-  }),
-  checkInternalDrop: t.procedure
-    .input(
-      z.object({
-        x: z.number(),
-        y: z.number(),
-        type: z.enum(["tab", "note"]),
-        id: z.string()
-      })
-    )
-    .mutation(({ input, ctx }) => {
-      return windowManager.handleExternalDrop(input, ctx.window.id);
-    })
+  })
 });
