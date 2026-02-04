@@ -121,8 +121,10 @@ export default class Trash {
       },
       { noteIds: [] as string[], notebookIds: [] as string[] }
     );
-
     await this._delete(noteIds, notebookIds);
+
+    await this.db.attachments.removeOrphaned();
+
     await this.buildCache();
   }
 
