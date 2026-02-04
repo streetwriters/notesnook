@@ -1761,14 +1761,8 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 }
 
-const searchParams = new URLSearchParams(window.location.search);
-const windowSessionId = searchParams.get("windowSessionId");
-
 const useEditorStore = createPersistedStore(EditorStore, {
-  name:
-    !windowSessionId || windowSessionId === "main"
-      ? "editor-sessions-v2"
-      : `editor-sessions-v2-${windowSessionId}`,
+  name: "editor-sessions-v2",
   partialize: (state) => ({
     history: state.history,
     arePropertiesVisible: state.arePropertiesVisible,

@@ -1,28 +1,10 @@
-/*
-This file is part of the Notesnook project (https://notesnook.com/)
-
-Copyright (C) 2023 Streetwriters (Private) Limited
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
 import { BrowserWindow, app, shell, screen } from "electron";
 import { WindowState } from "./window-state";
 import { AssetManager } from "./asset-manager";
 import { config } from "./config";
 import { createIPCHandler } from "electron-trpc/main";
-import { router } from "../api";
+import { router, api } from "../api";
+import { setupDesktopIntegration } from "./desktop-integration";
 import { setupMenu } from "./menu";
 import { setupJumplist } from "./jumplist";
 import { isDevelopment } from ".";
@@ -30,34 +12,16 @@ import { CLIOptions } from "../cli";
 import { PROTOCOL_URL } from "./protocol";
 import path from "path";
 import { getBackgroundColor, getTheme } from "./theme";
-import { randomUUID } from "crypto";
 
 import { JSONStorage } from "./json-storage";
-
-type NoteSessionData = {
-  type: "note";
-  noteId: string;
-  bounds: Electron.Rectangle;
-};
-
-type WindowSessionData = {
-  type: "window";
-  sessionId: string;
-  noteId?: string;
-  bounds: Electron.Rectangle;
-};
-
-type SessionData = NoteSessionData | WindowSessionData;
 
 export class WindowManager {
   private windows: Set<BrowserWindow> = new Set();
   private mainWindow: BrowserWindow | null = null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private ipcHandler: any = null;
   private noteWindows = new Map<string, BrowserWindow>();
   private dragWindow: BrowserWindow | null = null;
   private dragInterval: NodeJS.Timeout | null = null;
-  private windowSessions = new Map<number, string>();
 
   constructor() {
     // Save session on app quit
@@ -67,40 +31,25 @@ export class WindowManager {
   }
 
   saveSession() {
-    const sessionData: SessionData[] = [];
-    this.windows.forEach((win) => {
-      // Don't save main window session as it's handled separately
-      // Don't save destroyed windows
-      if (win !== this.mainWindow && !win.isDestroyed()) {
+    const sessionData: any[] = [];
+    this.noteWindows.forEach((win, noteId) => {
+      if (!win.isDestroyed()) {
         const bounds = win.getBounds();
-        const sessionId = this.windowSessions.get(win.id);
-        if (sessionId) {
-          let noteId: string | undefined;
-          for (const [id, w] of this.noteWindows.entries()) {
-            if (w === win) {
-              noteId = id;
-              break;
-            }
-          }
-
-          sessionData.push({
-            type: "window",
-            sessionId,
-            noteId,
-            bounds
-          });
-        }
+        sessionData.push({
+          type: "note",
+          noteId,
+          bounds
+        });
       }
     });
     JSONStorage.set("appSession", sessionData);
   }
 
   async restoreSession() {
-    const sessionData = JSONStorage.get<SessionData[]>("appSession", []);
+    const sessionData = JSONStorage.get<any[]>("appSession", []);
     if (sessionData && Array.isArray(sessionData)) {
       for (const winData of sessionData) {
         if (winData.type === "note" && winData.noteId) {
-          // Legacy support for old session data
           this.createWindow(
             {
               ...winData.bounds,
@@ -112,21 +61,6 @@ export class WindowManager {
               reminder: false,
               hidden: false
             }
-          );
-        } else if (winData.type === "window" && winData.sessionId) {
-          this.createWindow(
-            {
-              ...winData.bounds,
-              hidden: false
-            },
-            {
-              note: winData.noteId || false,
-              notebook: false,
-              reminder: false,
-              hidden: false
-            },
-            "/",
-            winData.sessionId
           );
         }
       }
@@ -151,9 +85,7 @@ export class WindowManager {
         height: mainWindowState.height,
         hidden: cliOptions.hidden
       },
-      cliOptions,
-      "/",
-      "main"
+      cliOptions
     );
 
     this.mainWindow = win;
@@ -184,8 +116,7 @@ export class WindowManager {
       reminder: false,
       hidden: false
     },
-    routePath = "/",
-    sessionId?: string
+    routePath = "/"
   ) {
     if (typeof cliOptions.note === "string") {
       const existingWindow = this.noteWindows.get(cliOptions.note);
@@ -245,8 +176,6 @@ export class WindowManager {
     if (typeof cliOptions.note === "string") {
       this.noteWindows.set(cliOptions.note, win);
     }
-    const finalSessionId = sessionId || randomUUID();
-    this.windowSessions.set(win.id, finalSessionId);
 
     if (!this.ipcHandler) {
       this.ipcHandler = createIPCHandler({
@@ -266,7 +195,6 @@ export class WindowManager {
     }
 
     const url = this.createURL(cliOptions, routePath);
-    url.searchParams.append("windowSessionId", finalSessionId);
     win.webContents.loadURL(url.toString());
 
     win.webContents.on("did-finish-load", () => {
@@ -294,7 +222,6 @@ export class WindowManager {
       if (typeof cliOptions.note === "string") {
         this.noteWindows.delete(cliOptions.note);
       }
-      this.windowSessions.delete(win.id);
       if (win === this.mainWindow) {
         this.mainWindow = null;
       }
@@ -424,6 +351,7 @@ export class WindowManager {
       // Check if we are over any of our app windows
       const mainWin = this.getMainWindow();
       if (mainWin && !mainWin.isDestroyed()) {
+        const bounds = mainWin.getBounds();
         // Use isOverMain if needed for other logic, but for now we just ensuring visibility
         if (!this.dragWindow.isVisible()) {
           this.dragWindow.showInactive();
