@@ -21,9 +21,12 @@ import { AppEventManager, AppEvents } from "../common/app-events";
 import { desktop } from "../common/desktop-bridge";
 import { appVersion, getServiceWorkerVersion } from "./version";
 
-export async function checkForUpdate() {
-  if (IS_DESKTOP_APP) await desktop?.updater.check.query().catch(console.error);
-  else {
+export async function checkForUpdate(checkOnDesktop = true) {
+  if (IS_DESKTOP_APP && checkOnDesktop) {
+    await desktop?.updater.check.query().catch(console.error);
+  }
+
+  if (!IS_DESKTOP_APP) {
     AppEventManager.publish(AppEvents.checkingForUpdate);
 
     const registrations =

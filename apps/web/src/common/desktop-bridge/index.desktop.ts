@@ -24,6 +24,7 @@ import { AppEventManager, AppEvents } from "../app-events";
 import { TaskScheduler } from "../../utils/task-scheduler";
 import { checkForUpdate } from "../../utils/updater";
 import { showToast } from "../../utils/toast";
+import { store as settingStore } from "../../stores/setting-store";
 
 export const desktop = createTRPCProxyClient<AppRouter>({
   links: [ipcLink()]
@@ -64,7 +65,7 @@ function attachListeners() {
   );
 
   TaskScheduler.register("updateCheck", "0 0 */12 * * * *", () => {
-    checkForUpdate();
+    checkForUpdate(settingStore.get().autoUpdates);
   });
 }
 

@@ -18,11 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect } from "react";
-
 import { checkForUpdate } from "../utils/updater";
 import { AppEventManager, AppEvents } from "../common/app-events";
 import BaseStore from "../stores";
 import createStore from "../common/store";
+import { store as settingStore } from "../stores/setting-store";
 
 type CompletedUpdateStatus = { type: "completed"; version: string };
 type DownloadingUpdateStatus = { type: "downloading"; progress: number };
@@ -104,7 +104,7 @@ export function useAutoUpdater() {
     );
 
     checkingForUpdate();
-    checkForUpdate().catch(console.error);
+    checkForUpdate(settingStore.get().autoUpdates).catch(console.error);
 
     return () => {
       checkingForUpdateEvent.unsubscribe();
