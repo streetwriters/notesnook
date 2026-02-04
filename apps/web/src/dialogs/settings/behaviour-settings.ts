@@ -94,6 +94,21 @@ export const BehaviourSettings: SettingsGroup[] = [
             ]
           }
         ]
+      },
+      {
+        key: "generate-thumbnails",
+        title: strings.generateThumbnails(),
+        description: strings.generateThumbnailsDesc(),
+        keywords: ["thumbnails", "preview", "images"],
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => s.generateThumbnails, listener),
+        components: [
+          {
+            type: "toggle",
+            isToggled: () => useSettingStore.getState().generateThumbnails,
+            toggle: () => useSettingStore.getState().toggleGenerateThumbnails()
+          }
+        ]
       }
     ]
   },

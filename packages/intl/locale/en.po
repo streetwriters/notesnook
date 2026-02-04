@@ -1093,6 +1093,10 @@ msgstr "Automatically clear trash after a certain period of time"
 msgid "Automatically download & install updates in the background without prompting first."
 msgstr "Automatically download & install updates in the background without prompting first."
 
+#: src/strings.ts:2638
+msgid "Automatically generate thumbnails for notes with images"
+msgstr "Automatically generate thumbnails for notes with images"
+
 #: src/strings.ts:1191
 msgid "Automatically lock the app after a certain period"
 msgstr "Automatically lock the app after a certain period"
@@ -3023,6 +3027,10 @@ msgstr "Full screen"
 #: src/strings.ts:2092
 msgid "General"
 msgstr "General"
+
+#: src/strings.ts:2636
+msgid "Generate thumbnails"
+msgstr "Generate thumbnails"
 
 #: src/strings.ts:1268
 msgid "Get helpful debug info about the app to help us find bugs."
@@ -5999,6 +6007,10 @@ msgstr "shortcuts"
 #: src/strings.ts:324
 msgid "Shortcuts"
 msgstr "Shortcuts"
+
+#: src/strings.ts:2639
+msgid "Show thumbnail"
+msgstr "Show thumbnail"
 
 #: src/strings.ts:96
 msgid "Sign up"

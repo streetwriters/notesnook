@@ -19,6 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { ContentType } from "../types.js";
 
+export type { Tiptap } from "./tiptap.js";
+
 export async function getContentFromData(type: ContentType, data: string) {
   switch (type) {
     case "tiptap": {

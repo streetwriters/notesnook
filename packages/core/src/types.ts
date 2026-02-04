@@ -178,6 +178,8 @@ export interface Note extends BaseItem<"note"> {
   title: string;
   headline?: string;
   contentId?: string;
+  thumbnail?: string;
+  showThumbnail?: boolean;
 
   /**
    * @deprecated only kept here for migration purposes.
