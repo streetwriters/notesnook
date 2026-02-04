@@ -285,10 +285,6 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
-         // Copy cancellation logic if needed
-         setActiveDragId(null);
-         setDragType(null);
-         setDraggedNote(null);
     >
       {children}
       <DragOverlay>
