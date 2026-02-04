@@ -73,19 +73,6 @@ function attachListeners() {
   });
 
   const handleDbChange = debounce(async () => {
-    // Invalidate cache for all cached collections
-    // This is required because we don't know what changed
-    // and we want to make sure we show the latest data
-    if (db.notes.invalidateCache) db.notes.invalidateCache();
-
-    // The following collections do not currently have a local cache to invalidate.
-    // Kept here for future-proofing and consistency.
-    // if (db.notebooks.invalidateCache) db.notebooks.invalidateCache();
-    // if (db.tags.invalidateCache) db.tags.invalidateCache();
-    // if (db.content.invalidateCache) db.content.invalidateCache();
-    // if (db.reminders.invalidateCache) db.reminders.invalidateCache();
-    // if (db.attachments.invalidateCache) db.attachments.invalidateCache();
-
     AppEventManager.publish(EVENTS.appRefreshRequested);
 
     // Check if active editor needs update
@@ -141,7 +128,16 @@ export async function createWritableStream(path: string) {
       filePath: path
     });
     if (!resolvedPath) throw new Error("invalid path.");
-    return await window.electronFS.createWritableStream(resolvedPath);
+    const { mkdirSync, createWriteStream }: typeof import("fs") = require("fs");
+    const { dirname }: typeof import("path") = require("path");
+    const { Writable } = require("stream");
+
+    mkdirSync(dirname(resolvedPath), { recursive: true });
+    return new WritableStream(
+      Writable.toWeb(
+        createWriteStream(resolvedPath, { encoding: "utf-8" })
+      ).getWriter()
+    );
   } catch (ex) {
     console.error(ex);
     if (ex instanceof Error) showToast("error", ex.message);

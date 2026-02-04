@@ -26,21 +26,11 @@ import { platform } from "os";
 declare global {
   var os: () => "mas" | ReturnType<typeof platform>;
   var electronTRPC: any;
-  var electronFS: {
-    createWritableStream: (
-      path: string
-    ) => Promise<WritableStreamDefaultWriter<any>>;
-  };
   // var NativeNNCrypto: (new () => NNCrypto) | undefined;
   var appEvents: {
     onExternalDrop: (callback: (payload: any) => void) => void;
   };
 }
-
-import { contextBridge } from "electron";
-import { createWriteStream, mkdirSync } from "fs";
-import { dirname } from "path";
-import { Writable } from "stream";
 
 process.once("loaded", async () => {
   const electronTRPC = {
@@ -49,30 +39,16 @@ process.once("loaded", async () => {
     onMessage: (callback: any) =>
       ipcRenderer.on(ELECTRON_TRPC_CHANNEL, (_event, args) => callback(args))
   };
-
-  contextBridge.exposeInMainWorld("electronTRPC", electronTRPC);
-
-  contextBridge.exposeInMainWorld("appEvents", {
+  globalThis.electronTRPC = electronTRPC;
+  globalThis.appEvents = {
     onExternalDrop: (callback: any) => {
       const subscription = (_event: any, args: any) => callback(args);
       ipcRenderer.on("app:external-drop", subscription);
       return () =>
         ipcRenderer.removeListener("app:external-drop", subscription);
     }
-  });
-
-  contextBridge.exposeInMainWorld("electronFS", {
-    createWritableStream: async (path: string) => {
-      mkdirSync(dirname(path), { recursive: true });
-      return new WritableStream(
-        Writable.toWeb(
-          createWriteStream(path, { encoding: "utf-8" })
-        ).getWriter()
-      );
-    }
-  });
-
-  contextBridge.exposeInMainWorld("os", () =>
-    MAC_APP_STORE ? "mas" : platform()
-  );
+  };
 });
+
+// globalThis.NativeNNCrypto = require("@notesnook/crypto").NNCrypto;
+globalThis.os = () => (MAC_APP_STORE ? "mas" : platform());

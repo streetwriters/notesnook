@@ -66,13 +66,6 @@ export class Content implements ICollection {
     await this.collection.init();
   }
 
-  /**
-   * Required to satisfy the ICollection interface.
-   * This collection does not currently maintain a local cache that needs invalidation,
-   * but the method must exist for type safety when iterating over all collections.
-   */
-  invalidateCache() {}
-
   async add(content: Partial<ContentItem>) {
     if (typeof content.data === "object") {
       if ("data" in content.data && typeof content.data.data === "string")

@@ -42,13 +42,6 @@ export class Tags implements ICollection {
     return this.collection.init();
   }
 
-  /**
-   * Required to satisfy the ICollection interface.
-   * This collection does not currently maintain a local cache that needs invalidation,
-   * but the method must exist for type safety when iterating over all collections.
-   */
-  invalidateCache() {}
-
   tag(id: string) {
     return this.collection.get(id);
   }

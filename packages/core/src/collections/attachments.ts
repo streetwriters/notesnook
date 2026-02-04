@@ -104,13 +104,6 @@ export class Attachments implements ICollection {
     await this.collection.init();
   }
 
-  /**
-   * Required to satisfy the ICollection interface.
-   * This collection does not currently maintain a local cache that needs invalidation,
-   * but the method must exist for type safety when iterating over all collections.
-   */
-  invalidateCache() {}
-
   async add(
     item: Partial<
       Omit<Attachment, "key" | "encryptionKey"> & {

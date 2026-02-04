@@ -35,6 +35,7 @@ export class SQLCachedCollection<
 {
   private collection: SQLCollection<TCollectionType, T>;
   private cache = new Map<string, MaybeDeletedItem<T> | undefined>();
+  // private cachedItems?: T[];
 
   constructor(
     sql: DatabaseAccessor,
@@ -58,7 +59,17 @@ export class SQLCachedCollection<
     await this.collection.init();
     const records = await this.collection.records([]);
     this.cache = new Map(Object.entries(records));
+    // const data = await this.collection.indexer.readMulti(
+    //   this.collection.indexer.indices
+    // );
+    // this.cache = new Map(data);
   }
+
+  // async add(item: MaybeDeletedItem<T>) {
+  //   await this.collection.addItem(item);
+  //   this.cache.set(item.id, item);
+  //   this.invalidateCache();
+  // }
 
   async clear() {
     await this.collection.clear();
@@ -168,7 +179,60 @@ export class SQLCachedCollection<
     return this.collection.unsyncedCount();
   }
 
-  invalidateCache() {
-    this.cache.clear();
-  }
+  // has(id: string) {
+  //   return this.cache.has(id);
+  // }
+
+  // count() {
+  //   return this.cache.size;
+  // }
+
+  // get(id: string) {
+  //   const item = this.cache.get(id);
+  //   if (!item || isDeleted(item)) return;
+  //   return item;
+  // }
+
+  // getRaw(id: string) {
+  //   const item = this.cache.get(id);
+  //   return item;
+  // }
+
+  // raw() {
+  //   return Array.from(this.cache.values());
+  // }
+
+  // items(map?: (item: T) => T | undefined) {
+  //   if (this.cachedItems && this.cachedItems.length === this.cache.size)
+  //     return this.cachedItems;
+
+  //   this.cachedItems = [];
+  //   this.cache.forEach((value) => {
+  //     if (isDeleted(value)) return;
+  //     const mapped = map ? map(value) : value;
+  //     if (!mapped) return;
+  //     this.cachedItems?.push(mapped);
+  //   });
+  //   this.cachedItems.sort((a, b) => b.dateCreated - a.dateCreated);
+  //   return this.cachedItems;
+  // }
+
+  // async setItems(items: (MaybeDeletedItem<T> | undefined)[]) {
+  //   await this.collection.setItems(items);
+  // for (const item of items) {
+  //   if (item) {
+  //     this.cache.set(item.id, item);
+  //   }
+  // }
+
+  //   this.invalidateCache();
+  // }
+
+  // *iterateSync(chunkSize: number) {
+  //   yield* chunkedIterate(Array.from(this.cache.values()), chunkSize);
+  // }
+
+  // invalidateCache() {
+  //   this.cachedItems = undefined;
+  // }
 }
