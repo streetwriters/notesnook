@@ -20,5 +20,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 export interface ICollection {
   name: string;
   init(): Promise<void>;
-  invalidateCache?(): void | Promise<void>;
 }
