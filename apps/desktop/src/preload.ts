@@ -31,6 +31,9 @@ import { ELECTRON_TRPC_CHANNEL } from "electron-trpc/main";
 // import type { NNCrypto } from "@notesnook/crypto";
 import { ipcRenderer } from "electron";
 import { platform } from "os";
+import { createWriteStream, mkdirSync } from "fs";
+import { dirname } from "path";
+import { Writable } from "stream";
 
 declare global {
   var os: () => "mas" | ReturnType<typeof platform>;
@@ -49,11 +52,6 @@ declare global {
     onExternalDrop: (callback: (payload: any) => void) => void;
   };
 }
-
-import { contextBridge } from "electron";
-import { createWriteStream, mkdirSync } from "fs";
-import { dirname } from "path";
-import { Writable } from "stream";
 
 process.once("loaded", async () => {
   const electronTRPC = {
