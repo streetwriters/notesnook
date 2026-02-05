@@ -41,9 +41,7 @@ declare global {
 
   // file system stream writer for renderer to support secure file writes
   var electronFS: {
-    createWritableStream: (
-      path: string
-    ) => Promise<WritableStreamDefaultWriter<any>>;
+    createWritableStream: (path: string) => Promise<WritableStream<any>>;
   };
   // var NativeNNCrypto: (new () => NNCrypto) | undefined;
 
@@ -63,6 +61,7 @@ process.once("loaded", async () => {
 
   globalThis.electronTRPC = electronTRPC;
 
+  // globalThis.NativeNNCrypto = require("@notesnook/crypto").NNCrypto;
   globalThis.appEvents = {
     onExternalDrop: (callback: any) => {
       const subscription = (_event: any, args: any) => callback(args);
