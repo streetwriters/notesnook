@@ -24,7 +24,7 @@ import {
   MOBILE_STATIC_TOOLBAR_GROUPS,
   READONLY_MOBILE_STATIC_TOOLBAR_GROUPS
 } from "./tool-definitions.js";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Editor } from "../types.js";
 import { ToolbarGroup } from "./components/toolbar-group.js";
 import { EditorFloatingMenus } from "./floating-menus/index.js";
@@ -34,6 +34,7 @@ import {
   useToolbarStore
 } from "./stores/toolbar-store.js";
 import { ToolbarDefinition } from "./types.js";
+import { EditorIdProvider } from "./stores/editor-id-context.js";
 
 type ToolbarProps = FlexProps & {
   editor: Editor;
@@ -41,6 +42,7 @@ type ToolbarProps = FlexProps & {
   tools?: ToolbarDefinition;
   defaultFontFamily: string;
   defaultFontSize: number;
+  editorId?: string;
 };
 
 export function Toolbar(props: ToolbarProps) {
@@ -50,10 +52,12 @@ export function Toolbar(props: ToolbarProps) {
     tools = getDefaultPresets().default,
     defaultFontFamily,
     defaultFontSize,
+    editorId,
     sx,
     className = "",
     ...flexProps
   } = props;
+  const toolbarRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
   const toolbarTools = useMemo(
     () =>
@@ -87,9 +91,10 @@ export function Toolbar(props: ToolbarProps) {
     setDefaultFontSize
   ]);
 
-  return (
+  const content = (
     <>
       <Flex
+        ref={toolbarRef}
         className={["editor-toolbar", className].join(" ")}
         sx={{
           flexWrap: isMobile ? "nowrap" : "wrap",
@@ -99,6 +104,7 @@ export function Toolbar(props: ToolbarProps) {
           ...sx
         }}
         {...flexProps}
+        data-editor-id={editorId}
       >
         {toolbarTools.map((tools) => {
           return (
@@ -116,7 +122,18 @@ export function Toolbar(props: ToolbarProps) {
           );
         })}
       </Flex>
-      <EditorFloatingMenus editor={editor} />
+      <EditorFloatingMenus
+        editor={editor}
+        toolbarRef={toolbarRef}
+        editorId={editorId}
+      />
     </>
+  );
+
+  return editorId ? (
+    // Provide the editorId to all child components (popups, menus, buttons) for scoping.
+    <EditorIdProvider editorId={editorId}>{content}</EditorIdProvider>
+  ) : (
+    content
   );
 }

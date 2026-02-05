@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Field from "../components/field";
 import Dialog from "../components/dialog";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { db } from "../common/db";
 import {
   ContentBlock,
@@ -38,7 +38,7 @@ import { Lock } from "../components/icons";
 import { ellipsize } from "@notesnook/core";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
-import { Virtuoso } from "react-virtuoso";
+import { Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { CustomScrollbarsVirtualList } from "../components/list-container";
 import { UpgradeDialog } from "./buy-dialog/upgrade-dialog";
 
@@ -58,6 +58,78 @@ export const NoteLinkingDialog = DialogManager.register(
       ContentBlock[] | undefined
     >();
     const blockLinkingAvailability = useIsFeatureAvailable("blockLinking");
+    const [selectedIndex, setSelectedIndex] = useState(0);
+    const virtuosoRef = useRef<VirtuosoHandle>(null);
+
+    useEffect(() => {
+      setSelectedIndex(0);
+      virtuosoRef.current?.scrollToIndex({ index: 0 });
+    }, [notes, filteredBlocks]);
+
+    useEffect(() => {
+      if (
+        selectedIndex >= 0 &&
+        virtuosoRef.current &&
+        // Ensure index is within bounds
+        ((selectedNote &&
+          selectedIndex < (filteredBlocks || blocks).length) ||
+          (!selectedNote &&
+            notes &&
+            selectedIndex < notes.placeholders.length))
+      ) {
+        virtuosoRef.current.scrollIntoView({
+          index: selectedIndex,
+          behavior: "auto"
+        });
+      }
+    }, [selectedIndex, selectedNote, notes, filteredBlocks, blocks]);
+
+    const handleKeyDown = async (e: React.KeyboardEvent) => {
+      if (selectedNote) {
+        const items = filteredBlocks || blocks;
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          setSelectedIndex((prev) => Math.min(prev + 1, items.length - 1));
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          setSelectedIndex((prev) => Math.max(prev - 1, 0));
+        } else if (e.key === "Enter") {
+          e.preventDefault();
+          const item = items[selectedIndex];
+          if (item) {
+            props.onClose({
+              title: selectedNote.title,
+              href: createInternalLink("note", selectedNote.id, {
+                blockId: item.id
+              })
+            });
+          }
+        }
+      } else {
+        if (!notes) return;
+        const items = notes.placeholders;
+
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          setSelectedIndex((prev) => Math.min(prev + 1, items.length - 1));
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          setSelectedIndex((prev) => Math.max(prev - 1, 0));
+        } else if (e.key === "Enter") {
+          e.preventDefault();
+          await notes.item(selectedIndex); // Ensure item is loaded
+          const cached = notes.cacheItem(selectedIndex);
+          if (cached && cached.item) {
+            const note = cached.item;
+            setSelectedNote(note);
+            // Check if data is available and has locked property, otherwise fallback to false
+            const data = cached.data as NoteResolvedData | undefined;
+            setIsNoteLocked(!!data?.locked);
+            setBlocks(await db.notes.contentBlocks(note.id));
+          }
+        }
+      }
+    };
 
     return (
       <Dialog
@@ -99,6 +171,7 @@ export const NoteLinkingDialog = DialogManager.register(
                 autoFocus
                 placeholder={strings.searchSectionToLinkPlaceholder()}
                 sx={{ mx: 0 }}
+                onKeyDown={handleKeyDown}
                 onChange={async (e) => {
                   const query = e.target.value.trim().toLowerCase();
                   if (!query) {
@@ -144,15 +217,17 @@ export const NoteLinkingDialog = DialogManager.register(
                     </Text>
                   ) : null}
                   <Virtuoso
+                    ref={virtuosoRef}
                     style={{ height: "100%", width: "100%" }}
                     components={{
                       Scroller: CustomScrollbarsVirtualList
                     }}
                     data={filteredBlocks || blocks}
                     context={{ items: filteredBlocks || blocks }}
-                    itemContent={(_, item) => (
+                    itemContent={(index, item) => (
                       <Button
                         variant="menuitem"
+                        className={index === selectedIndex ? "active" : ""}
                         sx={{
                           p: 1,
                           width: "100%",
@@ -160,7 +235,11 @@ export const NoteLinkingDialog = DialogManager.register(
                           display: "flex",
                           justifyContent: "space-between",
                           alignItems: "center",
-                          borderBottom: "1px solid var(--border)"
+                          borderBottom: "1px solid var(--border)",
+                          bg:
+                            index === selectedIndex
+                              ? "background-selected"
+                              : "transparent"
                         }}
                         onClick={() => {
                           props.onClose({
@@ -223,6 +302,7 @@ export const NoteLinkingDialog = DialogManager.register(
                 autoFocus
                 placeholder={strings.searchNoteToLinkPlaceholder()}
                 sx={{ mx: 0 }}
+                onKeyDown={handleKeyDown}
                 onChange={async (e) => {
                   const query = e.target.value.trim();
                   setNotes(
@@ -236,6 +316,7 @@ export const NoteLinkingDialog = DialogManager.register(
               />
               {notes && (
                 <Virtuoso
+                  ref={virtuosoRef}
                   data={notes.placeholders}
                   components={{
                     Scroller: CustomScrollbarsVirtualList
@@ -247,6 +328,7 @@ export const NoteLinkingDialog = DialogManager.register(
                         {({ item: note, data }) => (
                           <Button
                             variant="menuitem"
+                            className={index === selectedIndex ? "active" : ""}
                             sx={{
                               p: 1,
                               width: "100%",
@@ -254,7 +336,11 @@ export const NoteLinkingDialog = DialogManager.register(
                               display: "flex",
                               alignItems: "center",
                               gap: 1,
-                              borderBottom: "1px solid var(--border)"
+                              borderBottom: "1px solid var(--border)",
+                              bg:
+                                index === selectedIndex
+                                  ? "background-selected"
+                                  : "transparent"
                             }}
                             onClick={async () => {
                               setSelectedNote(note);

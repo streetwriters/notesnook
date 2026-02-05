@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { create } from "zustand";
 import { DownloadOptions } from "../../utils/downloader.js";
 import { useCallback } from "react";
+import { useEditorId } from "./editor-id-context.js";
 
 export type ToolbarLocation = "top" | "bottom";
 
@@ -115,7 +116,12 @@ export function usePopupManager(options: {
   group: string;
   parent?: string;
 }) {
-  const { id, parent } = options;
+  const editorId = useEditorId();
+  const { id: rawId, parent: rawParent } = options;
+  // Prefix IDs with editorId to scope popups per-editor
+  const id = editorId ? `${editorId}:${rawId}` : rawId;
+  const parent = rawParent && editorId ? `${editorId}:${rawParent}` : rawParent;
+
   const openedPopups = useToolbarStore((store) => store.openedPopups);
   const openPopup = useToolbarStore((store) => store.openPopup);
   const closePopup = useToolbarStore((store) => store.closePopup);
@@ -125,7 +131,11 @@ export function usePopupManager(options: {
   const isPinned =
     typeof openedPopups[id] === "object" &&
     (!!openedPopups[id]?.pinned || isChildPinned(openedPopups, id));
-  const group = isMobile ? "mobile" : options.group;
+  const group = isMobile
+    ? "mobile"
+    : editorId
+    ? `${editorId}:${options.group}`
+    : options.group;
 
   const open = useCallback(() => {
     closePopupGroup(group, [id, parent || ""]);

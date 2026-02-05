@@ -235,6 +235,7 @@ function TipTap(props: TipTapProps) {
 
   const tiptapOptions = useMemo<Partial<TiptapOptions>>(() => {
     return {
+      id,
       editorProps: {
         handleKeyDown(_, event) {
           if ((event.ctrlKey || event.metaKey) && event.key === "s") {
@@ -519,6 +520,7 @@ function TipTap(props: TipTapProps) {
           <Toolbar
             editor={editor}
             location={"top"}
+            editorId={id}
             sx={{
               flexWrap: "unset",
               overflowX: "unset"
