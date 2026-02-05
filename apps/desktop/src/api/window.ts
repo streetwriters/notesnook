@@ -17,15 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/*
-ABOUTME: This router handles window management operations.
-1. We now use `initTRPC.context<{ window: BrowserWindow }>()` instead of `initTRPC.create()`.
-   This allows us to access the SPECIFIC window instance (`ctx.window`) calling the procedure,
-   which is crucial for multi-window applications where `globalThis.window` (the main window)
-   is insufficient.
-2. We integrated `windowManager` to handle complex window creation and drag/drop logic.
-*/
-
 import { initTRPC } from "@trpc/server";
 import { observable } from "@trpc/server/observable";
 import { dragManager } from "../utils/window-manager";
@@ -47,43 +38,47 @@ export const windowRouter = t.router({
   fullscreen: t.procedure.query(() => globalThis.window?.isFullScreen()),
   onWindowStateChanged: t.procedure.subscription(() => {
     return observable<{ maximized: boolean; fullscreen: boolean }>((emit) => {
-      const win = globalThis.window;
-
       function listener() {
         emit.next({
-          maximized: !!win?.isMaximized(),
-          fullscreen: !!win?.isFullScreen()
+          maximized: !!globalThis.window?.isMaximized(),
+          fullscreen: !!globalThis.window?.isFullScreen()
         });
       }
       function enterFullscreen() {
         emit.next({
-          maximized: !!win?.isMaximized(),
+          maximized: !!globalThis.window?.isMaximized(),
           fullscreen: true
         });
       }
       function leaveFullscreen() {
         emit.next({
-          maximized: !!win?.isMaximized(),
+          maximized: !!globalThis.window?.isMaximized(),
           fullscreen: false
         });
       }
-      win?.addListener("maximize", listener);
-      win?.addListener("minimize", listener);
-      win?.addListener("unmaximize", listener);
-      win?.addListener("restore", listener);
-      win?.addListener("enter-full-screen", enterFullscreen);
-      win?.addListener("leave-full-screen", leaveFullscreen);
-      win?.addListener("leave-html-full-screen", leaveFullscreen);
-      win?.addListener("enter-html-full-screen", enterFullscreen);
+      globalThis.window?.addListener("maximize", listener);
+      globalThis.window?.addListener("minimize", listener);
+      globalThis.window?.addListener("unmaximize", listener);
+      globalThis.window?.addListener("restore", listener);
+      globalThis.window?.addListener("enter-full-screen", enterFullscreen);
+      globalThis.window?.addListener("leave-full-screen", leaveFullscreen);
+      globalThis.window?.addListener("leave-html-full-screen", leaveFullscreen);
+      globalThis.window?.addListener("enter-html-full-screen", enterFullscreen);
       return () => {
-        win?.removeListener("maximize", listener);
-        win?.removeListener("minimize", listener);
-        win?.removeListener("unmaximize", listener);
-        win?.removeListener("restore", listener);
-        win?.removeListener("enter-full-screen", enterFullscreen);
-        win?.removeListener("leave-full-screen", leaveFullscreen);
-        win?.removeListener("leave-html-full-screen", leaveFullscreen);
-        win?.removeListener("enter-html-full-screen", enterFullscreen);
+        globalThis.window?.removeListener("maximize", listener);
+        globalThis.window?.removeListener("minimize", listener);
+        globalThis.window?.removeListener("unmaximize", listener);
+        globalThis.window?.removeListener("restore", listener);
+        globalThis.window?.removeListener("enter-full-screen", enterFullscreen);
+        globalThis.window?.removeListener("leave-full-screen", leaveFullscreen);
+        globalThis.window?.removeListener(
+          "leave-html-full-screen",
+          leaveFullscreen
+        );
+        globalThis.window?.removeListener(
+          "enter-html-full-screen",
+          enterFullscreen
+        );
       };
     });
   }),

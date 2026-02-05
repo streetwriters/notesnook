@@ -264,9 +264,6 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
                       return;
                    }
                 }
-
-                // desktop?.window.open.mutate({ create: true });
-                // useEditorStore.getState().closeTabs(activeId);
              });
              return;
        }
@@ -289,10 +286,8 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
              }
           }
 
-          // desktop?.window.open.mutate({ noteId });
           if (type === "tab") {
              const tab = tabs.find((t) => t && t.id === activeId);
-             // if (tab) useEditorStore.getState().closeTabs(activeId);
           }
        });
     }
@@ -414,6 +409,10 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
     ? useEditorStore.getState().getSession(activeTabForOverlay.sessionId)
     : null;
 
+  // Custom collision detection implementation.
+  // Rationale: We need to differentiate between "strict" Drop Zones (like dropping a tab *between* panes)
+  // and "loose" containers (like reordering tabs within a list).
+  // Standard closestCenter is insufficient because it doesn't handle the "gaps" between strict zones well.
   const customCollisionDetection: CollisionDetection = (args) => {
     // 1. First, check if the pointer is strictly *inside* any droppable container
     const pointerCollisions = pointerWithin(args);

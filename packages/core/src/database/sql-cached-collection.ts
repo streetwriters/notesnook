@@ -60,9 +60,14 @@ export class SQLCachedCollection<
     await this.refreshCache();
   }
 
+  // Reloads all records from the underlying SQL collection into memory.
   async refreshCache() {
     const records = await this.collection.records([]);
     this.cache = new Map(Object.entries(records));
+    // const data = await this.collection.indexer.readMulti(
+    //   this.collection.indexer.indices
+    // );
+    // this.cache = new Map(data);
   }
 
   // async add(item: MaybeDeletedItem<T>) {

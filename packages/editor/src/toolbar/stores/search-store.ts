@@ -34,6 +34,7 @@ export interface SearchState extends SearchSettings {
   isExpanded: boolean;
 }
 
+// Refactored to support independent search states for multiple editors (split panes).
 export interface MultiEditorSearchState {
   editors: Record<string, SearchState | undefined>;
   getSearchState: (editorId: string) => SearchState;

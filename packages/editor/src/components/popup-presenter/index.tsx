@@ -84,7 +84,10 @@ export function usePopupHandler(options: UsePopupHandlerOptions) {
   const { id: rawId, onClosed, group: rawGroup } = options;
   const editorId = useEditorId();
   const isMobile = useIsMobile();
+  // Scope the popup ID to the current editor instance (if any).
+  // This allows multiple split panes to have their own independent popups (e.g. search bars).
   const id = editorId ? `${editorId}:${rawId}` : rawId;
+
 
   const openedPopups = useToolbarStore((store) => store.openedPopups);
   const closePopup = useToolbarStore((store) => store.closePopup);
@@ -92,6 +95,7 @@ export function usePopupHandler(options: UsePopupHandlerOptions) {
 
   const isPopupOpen = typeof openedPopups[id] === "object";
   const isPopupDefined = typeof openedPopups[id] !== "undefined";
+  // Also scope the popup group so closing a group in one pane doesn't close it in another.
   const group = isMobile
     ? "mobile"
     : editorId

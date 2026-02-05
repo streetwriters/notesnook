@@ -72,19 +72,12 @@ function attachListeners() {
     checkForUpdate();
   });
 
+  // Debounced handler to listen for database changes from the main process.
+  // This ensures the UI stays in sync when changes happen outside the current window (e.g., sync, other windows).
   const handleDbChange = debounce(async () => {
-    // Invalidate cache for all cached collections
     // This is required because we don't know what changed
     // and we want to make sure we show the latest data
-    if (db.notes.invalidateCache) db.notes.invalidateCache();
-
-    // The following collections do not currently have a local cache to invalidate.
-    // Kept here for future-proofing and consistency.
-    // if (db.notebooks.invalidateCache) db.notebooks.invalidateCache();
-    // if (db.tags.invalidateCache) db.tags.invalidateCache();
-    // if (db.content.invalidateCache) db.content.invalidateCache();
-    // if (db.reminders.invalidateCache) db.reminders.invalidateCache();
-    // if (db.attachments.invalidateCache) db.attachments.invalidateCache();
+    await db.notes.buildCache();
 
     AppEventManager.publish(EVENTS.appRefreshRequested);
 

@@ -1597,6 +1597,7 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   resizeNode = (id: string, sizes: number[]) => {
+    // Updates the relative sizes of panes in the split layout tree.
     this.set((state) => {
       const setSizes = (node: LayoutNode) => {
         if (node.id === id && node.children) {
@@ -1617,6 +1618,7 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   removeGroup = (groupId: string) => {
+    // Removes a pane (group) and recursively cleans up the layout tree (merging splits if needed).
     this.set((state) => {
       // 1. Remove from groups list
       state.groups = state.groups.filter((g) => g && g.id !== groupId);
@@ -1668,6 +1670,8 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   moveTab = (tabId: string, targetGroupId: string, newIndex?: number) => {
+    // Handles dragging tabs between different panes (groups).
+    // Updates the tab's groupId and handles reordering.
     const tab = this.get().tabs.find((t) => t && t.id === tabId);
     const sessionId = tab?.sessionId;
     let newActiveSessionId: string | undefined;
@@ -1771,6 +1775,9 @@ class EditorStore extends BaseStore<EditorStore> {
 const searchParams = new URLSearchParams(window.location.search);
 const windowSessionId = searchParams.get("windowSessionId");
 
+// Persistence updated to support:
+// 1. Multiple windows (via windowSessionId).
+// 2. Split panes state (groups, layout, activeGroupId).
 const useEditorStore = createPersistedStore(EditorStore, {
   name:
     !windowSessionId || windowSessionId === "main"

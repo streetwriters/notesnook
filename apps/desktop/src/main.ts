@@ -17,21 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/*
-ABOUTME: Entry point for the Electron main process.
-1. Removal of `createWindow()`:
-   - In master, `main.ts` handled window creation directly.
-   - We moved this logic to `WindowManager` (in `utils/window-manager.ts`) to support
-     split-pane functionality cleanly (and multiple windows for future proofing).
-   - Instead of a single `globalThis.window`, we now manage a collection of windows.
-2. IPC Handler Delegation:
-   - `createIPCHandler` setup has been moved. `WindowManager` now attaches IPC handlers
-   - to each new window it creates, ensuring all windows have access to the API.
-3. Event Handling:
-   - Events like `activate` and `second-instance` now delegate to `windowManager`
-   - instead of directly manipulating a global window variable.
-*/
-
 import "./overrides";
 import { app, BrowserWindow, nativeTheme, shell, dialog } from "electron";
 import { isDevelopment } from "./utils";

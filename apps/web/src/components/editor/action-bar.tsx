@@ -422,12 +422,19 @@ export function EditorActionBar({ groupId }: { groupId: string }) {
   );
 }
 
+export type TabStripProps = {
+  // groupId is required to identify which split pane this TabStrip belongs to.
+  groupId: string;
+};
+
 const TabStrip = React.memo(function TabStrip({
   groupId
 }: {
   groupId: string;
 }) {
   useEditorStore((store) => store.getActiveSession()); // otherwise the tab title won't update on opening a note
+  // Filter tabs to only show those belonging to the current group/sidebar.
+  // This is essential for the Split Panes feature where each pane has its own set of tabs.
   const tabs = useEditorStore((store) =>
     store.tabs.filter((t) => t && t.groupId === groupId)
   );
@@ -527,6 +534,10 @@ const TabStrip = React.memo(function TabStrip({
           }}
           data-test-id="tabs"
         >
+          {/* 
+            Removed local DndContext as this list is now part of the global drag context 
+            managed by AppDndContext for cross-pane dragging support.
+          */}
           <ReorderableList
             items={tabs}
             groupId={groupId}

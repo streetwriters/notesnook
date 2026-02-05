@@ -46,6 +46,8 @@ const hashroutes = defineHashRoutes({
   "/notebooks/:notebookId/edit": ({ notebookId }) => {
     EditNotebookDialog.show({ notebookId })?.then(afterAction);
   },
+  // Route to open a specific note in the editor directly via URL/hash.
+  // Useful for external links or multi-window navigation.
   "/notes/:noteId/edit": ({ noteId }) => {
     import("../stores/editor-store").then(({ useEditorStore }) => {
       useEditorStore.getState().openSession(noteId);

@@ -80,10 +80,6 @@ export class Notes implements ICollection {
     this.cache.archived = archived;
   }
 
-  async invalidateCache() {
-    await this.buildCache();
-  }
-
   async add(
     item: Partial<Note & { content: NoteContent<false>; sessionId: string }>
   ): Promise<string> {

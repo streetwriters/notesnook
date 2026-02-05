@@ -131,6 +131,7 @@ export function Toolbar(props: ToolbarProps) {
   );
 
   return editorId ? (
+    // Provide the editorId to all child components (popups, menus, buttons) for scoping.
     <EditorIdProvider editorId={editorId}>{content}</EditorIdProvider>
   ) : (
     content
