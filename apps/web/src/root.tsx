@@ -105,9 +105,6 @@ function RouteWrapper(props: {
       setIsMigrating(name === "notesnook")
     );
     EV.subscribe(EVENTS.migrationFinished, () => setIsMigrating(false));
-    return () => {
-      EV.unsubscribeAll();
-    };
   }, []);
 
   const result = usePromise(async () => {
