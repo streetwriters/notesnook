@@ -684,8 +684,6 @@ export const useEditor = (
           lastContentChangeTime.current[item.id] = item.dateEdited;
           currentNotes.current[item.id] = item;
 
-          if (!currentNotes.current[item.id]) return;
-
           editorSessionHistory.newSession(item.id);
 
           await commands.setStatus(
@@ -1104,6 +1102,8 @@ export const useEditor = (
       if (noteId) {
         const note = await db.notes?.note(noteId);
         fluidTabsRef.current?.goToPage("editor");
+        loadNoteMutex.cancel();
+        loadNoteMutex.release();
         if (note) {
           loadNote({
             item: note
@@ -1111,6 +1111,8 @@ export const useEditor = (
         }
       } else {
         noteId = useTabStore.getState().getCurrentNoteId() || null;
+        loadNoteMutex.cancel();
+        loadNoteMutex.release();
         if (!noteId) {
           loadNote({ newNote: true });
           if (fluidTabsRef.current?.page() === "editor") {
