@@ -48,6 +48,7 @@ import { getFontSizes } from "@notesnook/theme/theme/font/fontsize.js";
 import { useWindowControls } from "./hooks/use-window-controls";
 import { STATUS_BAR_HEIGHT } from "./common/constants";
 import { NavigationEvents } from "./navigation";
+// [CHANGE]: New import for Drag and Drop context
 import { AppDnDContext } from "./components/app-dnd-context";
 
 new WebExtensionRelay();
@@ -60,8 +61,6 @@ function App() {
   const hasNativeTitlebar =
     useSettingStore.getState().desktopIntegrationSettings?.nativeTitlebar;
   console.timeEnd("loading app");
-  const isSingleNote =
-    new URLSearchParams(window.location.search).get("singleNote") === "true";
 
   useEffect(() => {
     if (isMobile) {
@@ -90,6 +89,7 @@ function App() {
             .mobile-nav-pane .theme-scope-navigationMenu {
               padding-top: env(titlebar-area-height) !important;
             }
+            // [CHANGE]: Updated selector to handle split panes and focus mode correctly
             #editor-panel > div:first-of-type > .editor-action-bar,
             .app-focus-mode #editor-panel > .react-split:first-of-type .react-split__pane:first-of-type > div > .editor-action-bar,
             .mobile-editor-pane.pane-active .editor-action-bar,
@@ -146,14 +146,11 @@ function DesktopAppContents() {
   const isListPaneVisible = useStore((store) => store.isListPaneVisible);
   const isTablet = useTablet();
   const navPane = useRef<SplitPaneImperativeHandle>(null);
-  const isSingleNote =
-    new URLSearchParams(window.location.search).get("singleNote") === "true";
 
   useEffect(() => {
-    if (isSingleNote) return;
     if (isTablet) navPane.current?.collapse(0);
     else if (navPane.current?.isCollapsed(0)) navPane.current?.expand(0);
-  }, [isTablet, isSingleNote]);
+  }, [isTablet]);
 
   useEffect(() => {
     const event = AppEventManager.subscribe(
@@ -178,7 +175,6 @@ function DesktopAppContents() {
   }, []);
 
   useEffect(() => {
-    if (isSingleNote) return;
     if (isListPaneVisible) {
       if (navPane.current?.hasExpandedSize(1)) {
         navPane.current?.expand(1);
@@ -188,10 +184,11 @@ function DesktopAppContents() {
     } else {
       navPane.current?.collapse(1);
     }
-  }, [isListPaneVisible, isSingleNote]);
+  }, [isListPaneVisible]);
 
   return (
     <>
+      {/* [CHANGE]: Wrapped DesktopAppContents in AppDnDContext to enable drag and drop features */}
       <AppDnDContext>
         <Flex
           variant="rowFill"
@@ -211,7 +208,7 @@ function DesktopAppContents() {
               });
             }}
           >
-            {isFocusMode || isSingleNote ? null : (
+            {isFocusMode ? null : (
               <Pane
                 id="nav-pane"
                 initialSize={isTablet ? 0 : 250}
@@ -227,7 +224,7 @@ function DesktopAppContents() {
                 <NavigationMenu onExpand={() => navPane.current?.reset(0)} />
               </Pane>
             )}
-            {isFocusMode || isSingleNote ? null : (
+            {isFocusMode ? null : (
               <Pane
                 id="list-pane"
                 initialSize={380}
@@ -267,7 +264,7 @@ function DesktopAppContents() {
           </SplitPane>
         </Flex>
       </AppDnDContext>
-      {isSingleNote ? null : <StatusBar />}
+      <StatusBar />
     </>
   );
 }

@@ -17,24 +17,43 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/*
+ABOUTME: Entry point for the Electron main process.
+1. Removal of `createWindow()`:
+   - In master, `main.ts` handled window creation directly.
+   - We moved this logic to `WindowManager` (in `utils/window-manager.ts`) to support
+     split-pane functionality cleanly (and multiple windows for future proofing).
+   - Instead of a single `globalThis.window`, we now manage a collection of windows.
+2. IPC Handler Delegation:
+   - `createIPCHandler` setup has been moved. `WindowManager` now attaches IPC handlers
+   - to each new window it creates, ensuring all windows have access to the API.
+3. Event Handling:
+   - Events like `activate` and `second-instance` now delegate to `windowManager`
+   - instead of directly manipulating a global window variable.
+*/
+
 import "./overrides";
-import { app, nativeTheme, dialog } from "electron";
+import { app, BrowserWindow, nativeTheme, shell, dialog } from "electron";
 import { isDevelopment } from "./utils";
-import { registerProtocol } from "./utils/protocol";
+import { registerProtocol, PROTOCOL_URL } from "./utils/protocol";
 import { configureAutoUpdater } from "./utils/autoupdater";
-import { getTheme, setTheme } from "./utils/theme";
+import { getBackgroundColor, getTheme, setTheme } from "./utils/theme";
+import { setupMenu } from "./utils/menu";
+import { WindowState } from "./utils/window-state";
+import { setupJumplist } from "./utils/jumplist";
 import { setupTray } from "./utils/tray";
-import { parseArguments } from "./cli";
+import { CLIOptions, parseArguments } from "./cli";
 import { AssetManager } from "./utils/asset-manager";
+import { createIPCHandler } from "electron-trpc/main";
+import { router, api } from "./api";
 import { config } from "./utils/config";
 import path from "path";
 import { bringToFront } from "./utils/bring-to-front";
 import { bridge } from "./api/bridge";
+import { setupDesktopIntegration } from "./utils/desktop-integration";
 import { disableCustomDns, enableCustomDns } from "./utils/custom-dns";
 import { Messages, setI18nGlobal } from "@notesnook/intl";
 import { i18n } from "@lingui/core";
-import { windowManager } from "./utils/window-manager";
-import { setupJumplist } from "./utils/jumplist";
 
 const locale =
   process.env.NODE_ENV === "development"
@@ -75,6 +94,106 @@ process.on("unhandledRejection", (reason) => {
 
 app.commandLine.appendSwitch("lang", "en-US");
 
+async function createWindow() {
+  const cliOptions = await parseArguments(process.argv);
+  setTheme(getTheme());
+
+  const mainWindowState = new WindowState({});
+  const mainWindow = new BrowserWindow({
+    show: !cliOptions.hidden,
+    paintWhenInitiallyHidden: cliOptions.hidden,
+    skipTaskbar: cliOptions.hidden,
+    x: mainWindowState.x,
+    y: mainWindowState.y,
+    width: mainWindowState.width,
+    height: mainWindowState.height,
+    darkTheme: getTheme() === "dark",
+    backgroundColor: getBackgroundColor(),
+    opacity: 0,
+    autoHideMenuBar: false,
+    icon: AssetManager.appIcon({
+      size: 512,
+      format: process.platform === "win32" ? "ico" : "png"
+    }),
+
+    ...(config.desktopSettings.nativeTitlebar
+      ? {}
+      : {
+          titleBarStyle:
+            process.platform === "win32" || process.platform === "darwin"
+              ? "hidden"
+              : "default",
+          frame: process.platform === "win32" || process.platform === "darwin",
+          titleBarOverlay: {
+            height: 37,
+            color: "#00000000",
+            symbolColor: config.windowControlsIconColor
+          },
+          trafficLightPosition: {
+            x: 16,
+            y: 12
+          }
+        }),
+
+    webPreferences: {
+      zoomFactor: config.zoomFactor,
+      nodeIntegration: true,
+      contextIsolation: false,
+      nodeIntegrationInWorker: true,
+      spellcheck: config.isSpellCheckerEnabled,
+      preload: __dirname + "/preload.js"
+    }
+  });
+
+  createIPCHandler({ router, windows: [mainWindow] });
+  globalThis.window = mainWindow;
+  mainWindow.setMenuBarVisibility(false);
+  mainWindowState.manage(mainWindow);
+
+  if (cliOptions.hidden && !config.desktopSettings.minimizeToSystemTray)
+    mainWindow.minimize();
+
+  await mainWindow.webContents.loadURL(`${createURL(cliOptions, "/")}`);
+  mainWindow.setOpacity(1);
+
+  if (config.privacyMode) {
+    await api.integration.setPrivacyMode({ enabled: config.privacyMode });
+  }
+
+  await AssetManager.loadIcons();
+  setupDesktopIntegration(config.desktopSettings);
+
+  mainWindow.webContents.session.setPermissionRequestHandler(
+    (webContents, permission, callback) => {
+      callback(permission === "geolocation" ? false : true);
+    }
+  );
+  mainWindow.webContents.session.setSpellCheckerDictionaryDownloadURL(
+    "http://dictionaries.notesnook.com/"
+  );
+  mainWindow.webContents.session.setProxy({ proxyRules: config.proxyRules });
+
+  mainWindow.once("closed", () => {
+    globalThis.window = null;
+  });
+
+  setupMenu();
+  setupJumplist();
+
+  if (isDevelopment())
+    mainWindow.webContents.openDevTools({ mode: "bottom", activate: true });
+
+  mainWindow.webContents.setWindowOpenHandler((details) => {
+    shell.openExternal(details.url);
+    return { action: "deny" };
+  });
+
+  nativeTheme.on("updated", () => {
+    setupTray();
+    setupJumplist();
+  });
+}
+
 app.once("ready", async () => {
   console.info("App ready. Opening window.");
 
@@ -93,12 +212,7 @@ app.once("ready", async () => {
   else disableCustomDns();
 
   if (!isDevelopment()) registerProtocol();
-
-  const cliOptions = await parseArguments(process.argv);
-  setTheme(getTheme());
-  await AssetManager.loadIcons();
-
-  await windowManager.createMainWindow(cliOptions);
+  await createWindow();
   configureAutoUpdater();
 });
 
@@ -109,7 +223,7 @@ app.once("window-all-closed", () => {
 });
 
 app.on("second-instance", async (_ev, argv) => {
-  if (!windowManager.getMainWindow()) return;
+  if (!globalThis.window) return;
   const cliOptions = await parseArguments(argv);
   if (cliOptions.note) bridge.onCreateItem("note");
   if (cliOptions.notebook) bridge.onCreateItem("notebook");
@@ -117,14 +231,23 @@ app.on("second-instance", async (_ev, argv) => {
   bringToFront();
 });
 
-app.on("activate", async () => {
-  if (windowManager.getMainWindow() === null) {
-    const cliOptions = await parseArguments(process.argv);
-    await windowManager.createMainWindow(cliOptions);
+app.on("activate", () => {
+  if (globalThis.window === null) {
+    createWindow();
   }
 });
 
-nativeTheme.on("updated", () => {
-  setupTray();
-  setupJumplist();
-});
+function createURL(options: CLIOptions, path = "/") {
+  const url = new URL(isDevelopment() ? "http://localhost:3000" : PROTOCOL_URL);
+
+  url.pathname = path;
+  if (options.note === true) url.hash = "/notes/create/1";
+  else if (options.notebook === true) url.hash = "/notebooks/create";
+  else if (options.reminder === true) url.hash = "/reminders/create";
+  else if (typeof options.note === "string")
+    url.hash = `/notes/${options.note}/edit`;
+  else if (typeof options.notebook === "string")
+    url.hash = `/notebooks/${options.notebook}`;
+
+  return url;
+}

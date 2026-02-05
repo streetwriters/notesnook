@@ -4409,10 +4409,6 @@ msgstr "Open in browser to manage subscription"
 msgid "Open in new tab"
 msgstr "Open in new tab"
 
-#: src/strings.ts:2636
-msgid "Open in new window"
-msgstr "Open in new window"
-
 #: src/strings.ts:579
 msgid "Open issue"
 msgstr "Open issue"

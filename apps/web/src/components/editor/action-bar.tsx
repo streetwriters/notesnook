@@ -617,19 +617,7 @@ const TabStrip = React.memo(function TabStrip({
                           )
                       : undefined
                   }
-                  onOpenInNewWindow={
-                    "note" in session && IS_DESKTOP_APP
-                      ? () => {
-                          import("../../common/desktop-bridge").then(
-                            ({ desktop }) => {
-                              desktop?.window.open.mutate({
-                                noteId: session.note.id
-                              });
-                            }
-                          );
-                        }
-                      : undefined
-                  }
+                  onOpenInNewWindow={undefined}
                   onPin={() => useEditorStore.getState().pinTab(tab.id)}
                 />
               );

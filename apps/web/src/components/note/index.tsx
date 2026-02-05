@@ -371,23 +371,6 @@ export const noteMenuItems: (
       onClick: () =>
         useEditorStore.getState().openSession(note.id, { openInNewTab: true })
     },
-    ...(IS_DESKTOP_APP
-      ? [
-          {
-            type: "button",
-            key: "openinnewwindow",
-            title: strings.openInNewWindow(),
-            icon: OpenInNew.path,
-            onClick: () => {
-              import("../../common/desktop-bridge").then(({ desktop }) => {
-                desktop?.window.open.mutate({
-                  noteId: note.id
-                });
-              });
-            }
-          }
-        ]
-      : ([] as any)),
     {
       type: "button",
       key: "pin",

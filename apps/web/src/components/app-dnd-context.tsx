@@ -265,8 +265,8 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
                    }
                 }
 
-                desktop?.window.open.mutate({ create: true });
-                useEditorStore.getState().closeTabs(activeId);
+                // desktop?.window.open.mutate({ create: true });
+                // useEditorStore.getState().closeTabs(activeId);
              });
              return;
        }
@@ -289,10 +289,10 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
              }
           }
 
-          desktop?.window.open.mutate({ noteId });
+          // desktop?.window.open.mutate({ noteId });
           if (type === "tab") {
              const tab = tabs.find((t) => t && t.id === activeId);
-             if (tab) useEditorStore.getState().closeTabs(activeId);
+             // if (tab) useEditorStore.getState().closeTabs(activeId);
           }
        });
     }

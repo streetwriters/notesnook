@@ -120,10 +120,6 @@ function attachListeners() {
       }
     }
   }, 500);
-
-  desktop.db.onDbChange.subscribe(undefined, {
-    onData: () => handleDbChange()
-  });
 }
 
 function attachListener(event: string) {
@@ -141,6 +137,9 @@ export async function createWritableStream(path: string) {
       filePath: path
     });
     if (!resolvedPath) throw new Error("invalid path.");
+    // We utilize the electronFS bridge (exposed via preload) to create streams
+    // from the renderer process. This avoids enabling nodeIntegration and follows
+    // security best practices.
     return await window.electronFS.createWritableStream(resolvedPath);
   } catch (ex) {
     console.error(ex);

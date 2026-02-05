@@ -4383,10 +4383,6 @@ msgstr ""
 msgid "Open in new tab"
 msgstr ""
 
-#: src/strings.ts:2636
-msgid "Open in new window"
-msgstr ""
-
 #: src/strings.ts:579
 msgid "Open issue"
 msgstr ""

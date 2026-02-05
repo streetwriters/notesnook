@@ -33,7 +33,6 @@ export type PopupPresenterProps = {
   scope?: keyof ThemeScopes;
   isMobile?: boolean;
   container?: HTMLElement;
-  shouldCloseOnOverlayClick?: boolean;
 } & BoxProps;
 
 function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
@@ -47,7 +46,6 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
     scope,
     isMobile,
     container,
-    shouldCloseOnOverlayClick = true,
     ...restProps
   } = props;
 
@@ -148,7 +146,7 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
       parentSelector={() => container || document.body}
       shouldCloseOnEsc
       shouldReturnFocusAfterClose
-      shouldCloseOnOverlayClick={shouldCloseOnOverlayClick}
+      shouldCloseOnOverlayClick
       shouldFocusAfterRender={focusOnRender}
       ariaHideApp={blocking}
       preventScroll={blocking}
@@ -164,11 +162,9 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
       }}
       onAfterClose={() => observerRef.current?.disconnect()}
       overlayElement={(props, contentEl) => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { shouldCloseOnOverlayClick, ...rest } = props as any;
         return (
           <Box
-            {...rest}
+            {...props}
             style={{
               ...props.style,
               position: !blocking ? "initial" : "fixed",
@@ -190,37 +186,33 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
           </Box>
         );
       }}
-      contentElement={(props, children) => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { shouldCloseOnOverlayClick, ...rest } = props as any;
-        return (
-          <Box
-            {...rest}
-            style={{}}
-            // TODO onMouseDown={(e) => {
-            //   console.log(e);
-            // }}
-            sx={{
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              display: "flex",
-              width: "fit-content",
-              height: "fit-content",
-              position: "fixed",
-              backgroundColor: undefined,
-              padding: 0,
-              zIndex: 999,
-              outline: 0,
-              opacity: `1 !important`,
-              isolation: "isolate"
-            }}
-          >
-            {children}
-          </Box>
-        );
-      }}
+      contentElement={(props, children) => (
+        <Box
+          {...props}
+          style={{}}
+          // TODO onMouseDown={(e) => {
+          //   console.log(e);
+          // }}
+          sx={{
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: "flex",
+            width: "fit-content",
+            height: "fit-content",
+            position: "fixed",
+            backgroundColor: undefined,
+            padding: 0,
+            zIndex: 999,
+            outline: 0,
+            opacity: `1 !important`,
+            isolation: "isolate"
+          }}
+        >
+          {children}
+        </Box>
+      )}
       style={{
         content: {},
         overlay: {
