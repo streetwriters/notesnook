@@ -185,7 +185,8 @@ export default function TabsView() {
             })}
           </Pane>
 
-          {documentPreview ? (
+          {documentPreview &&
+          useEditorStore.getState().getActiveSession()?.type !== "locked" ? (
             <Pane id="pdf-preview-panel" initialSize={435} minSize={435}>
               <ScopedThemeProvider
                 scope="editorSidebar"
@@ -574,7 +575,9 @@ export function Editor(props: EditorProps) {
           const { hash, type, mime } = data;
           const attachment = await db.attachments.attachment(hash);
           if (attachment && mime.startsWith("image/")) {
-            await previewImageAttachment(attachment);
+            await previewImageAttachment(attachment, {
+              closeOnVaultLock: true
+            });
           } else if (
             attachment &&
             onPreviewDocument &&

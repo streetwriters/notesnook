@@ -25,7 +25,18 @@ import { checkUpload, decryptFile, saveFile } from "../interfaces/fs";
 import { ScopedThemeProvider } from "../components/theme-provider";
 import { Lightbox } from "../components/lightbox";
 import ReactDOM from "react-dom";
-import { Attachment } from "@notesnook/core";
+import { Attachment, EV, EVENTS } from "@notesnook/core";
+
+let currentPreviewContainer: HTMLElement | null = null;
+let shouldCloseOnVaultLock = false;
+
+EV.subscribe(EVENTS.vaultLocked, () => {
+  if (currentPreviewContainer && shouldCloseOnVaultLock) {
+    ReactDOM.unmountComponentAtNode(currentPreviewContainer);
+    currentPreviewContainer = null;
+    shouldCloseOnVaultLock = false;
+  }
+});
 
 async function download(hash: string, groupId?: string) {
   const attachment = await db.attachments.attachment(hash);
@@ -132,7 +143,10 @@ export async function checkAttachment(hash: string) {
   return { success: true };
 }
 
-export async function previewImageAttachment(attachment: Attachment) {
+export async function previewImageAttachment(
+  attachment: Attachment,
+  options?: { closeOnVaultLock?: boolean }
+) {
   const container = document.getElementById("dialogContainer");
   if (!(container instanceof HTMLElement)) return;
 
@@ -145,12 +159,17 @@ export async function previewImageAttachment(attachment: Attachment) {
     return showToast("error", strings.imagePreviewFailed());
   }
 
+  currentPreviewContainer = container;
+  shouldCloseOnVaultLock = options?.closeOnVaultLock || false;
+
   ReactDOM.render(
     <ScopedThemeProvider>
       <Lightbox
         image={dataurl}
         onClose={() => {
           ReactDOM.unmountComponentAtNode(container);
+          currentPreviewContainer = null;
+          shouldCloseOnVaultLock = false;
         }}
       />
     </ScopedThemeProvider>,
