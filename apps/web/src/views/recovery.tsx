@@ -25,7 +25,6 @@ import { Loader } from "../components/loader";
 import { showToast } from "../utils/toast";
 import AuthContainer from "../components/auth-container";
 import { AuthField, SubmitButton } from "./auth";
-import { createBackup, restoreBackupFile, selectBackupFile } from "../common";
 import Config from "../utils/config";
 import { ErrorText } from "../components/error-text";
 import { EVENTS, User } from "@notesnook/core";
@@ -33,18 +32,14 @@ import { RecoveryKeyDialog } from "../dialogs/recovery-key-dialog";
 import { strings } from "@notesnook/intl";
 import { useKeyStore } from "../interfaces/key-store";
 
-type RecoveryMethodType = "key" | "backup" | "reset";
+type RecoveryMethodType = "key" | "reset";
 type RecoveryMethodsFormData = Record<string, unknown>;
 
 type RecoveryKeyFormData = {
   recoveryKey: string;
 };
 
-type BackupFileFormData = {
-  backupFile: File;
-};
-
-type NewPasswordFormData = BackupFileFormData & {
+type NewPasswordFormData = {
   userResetRequired?: boolean;
   password: string;
   confirmPassword: string;
@@ -53,9 +48,7 @@ type NewPasswordFormData = BackupFileFormData & {
 type RecoveryFormData = {
   methods: RecoveryMethodsFormData;
   "method:key": RecoveryKeyFormData;
-  "method:backup": BackupFileFormData;
   "method:reset": NewPasswordFormData;
-  backup: RecoveryMethodsFormData;
   new: NewPasswordFormData;
   final: RecoveryMethodsFormData;
 };
@@ -73,9 +66,7 @@ type BaseRecoveryComponentProps<TRoute extends RecoveryRoutes> = {
 type RecoveryRoutes =
   | "methods"
   | "method:key"
-  | "method:backup"
   | "method:reset"
-  | "backup"
   | "new"
   | "final";
 type RecoveryProps = { route: RecoveryRoutes };
@@ -92,10 +83,6 @@ function getRouteComponent<TRoute extends RecoveryRoutes>(
       return RecoveryMethods as RecoveryComponent<TRoute>;
     case "method:key":
       return RecoveryKeyMethod as RecoveryComponent<TRoute>;
-    case "method:backup":
-      return BackupFileMethod as RecoveryComponent<TRoute>;
-    case "backup":
-      return BackupData as RecoveryComponent<TRoute>;
     case "method:reset":
     case "new":
       return NewPassword as RecoveryComponent<TRoute>;
@@ -108,9 +95,7 @@ function getRouteComponent<TRoute extends RecoveryRoutes>(
 const routePaths: Record<RecoveryRoutes, string> = {
   methods: "/account/recovery/methods",
   "method:key": "/account/recovery/method/key",
-  "method:backup": "/account/recovery/method/backup",
   "method:reset": "/account/recovery/method/reset",
-  backup: "/account/recovery/backup",
   new: "/account/recovery/new",
   final: "/account/recovery/final"
 };
@@ -241,12 +226,6 @@ const recoveryMethods: RecoveryMethod[] = [
     description: () => strings.recoveryKeyMethodDesc()
   },
   {
-    type: "backup",
-    testId: "step-backup",
-    title: () => strings.backupFileMethod(),
-    description: () => strings.backupFileMethodDesc()
-  },
-  {
     type: "reset",
     testId: "step-reset-account",
     title: () => strings.clearDataAndResetMethod(),
@@ -356,8 +335,7 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
         await useKeyStore
           .getState()
           .setValue("userEncryptionKey", form.recoveryKey);
-        await db.sync({ type: "fetch", force: true });
-        navigate("backup");
+        navigate("new", {});
       }}
     >
       <AuthField
@@ -379,86 +357,6 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
       >
         {strings.dontHaveRecoveryKey()}
       </Button>
-    </RecoveryForm>
-  );
-}
-
-function BackupFileMethod(props: BaseRecoveryComponentProps<"method:backup">) {
-  const { navigate } = props;
-  const [backupFile, setBackupFile] =
-    useState<BackupFileFormData["backupFile"]>();
-
-  useEffect(() => {
-    if (!backupFile) return;
-    const backupFileInput = document.getElementById("backupFile");
-    if (!(backupFileInput instanceof HTMLInputElement)) return;
-    backupFileInput.value = backupFile?.name;
-  }, [backupFile]);
-
-  return (
-    <RecoveryForm
-      testId="step-backup-file"
-      type="method:backup"
-      title={strings.accountRecovery()}
-      subtitle={
-        <ErrorText
-          sx={{ fontSize: "body" }}
-          error={strings.backupFileRecoveryError()}
-        />
-      }
-      onSubmit={async () => {
-        navigate("new", { backupFile, userResetRequired: true });
-      }}
-    >
-      <AuthField
-        id="backupFile"
-        type="text"
-        label={strings.selectBackupFile()}
-        helpText={strings.backupFileHelpText()}
-        autoComplete="none"
-        autoFocus
-        disabled
-        action={{
-          component: <Text variant={"body"}>{strings.browse()}</Text>,
-          onClick: async () => {
-            setBackupFile(await selectBackupFile());
-          }
-        }}
-      />
-      <SubmitButton text={strings.startAccountRecovery()} />
-
-      <Button
-        type="button"
-        mt={4}
-        variant={"anchor"}
-        onClick={() => navigate("methods")}
-        sx={{ color: "paragraph" }}
-      >
-        {strings.dontHaveBackupFile()}
-      </Button>
-    </RecoveryForm>
-  );
-}
-
-function BackupData(props: BaseRecoveryComponentProps<"backup">) {
-  const { navigate } = props;
-
-  return (
-    <RecoveryForm
-      testId="step-backup-data"
-      type="backup"
-      title={strings.backupYourData()}
-      subtitle={strings.backupYourDataDesc()}
-      loading={{
-        title: strings.backingUpData() + "...",
-        subtitle: strings.backingUpDataWait()
-      }}
-      onSubmit={async () => {
-        await createBackup({ rescueMode: true, mode: "full" });
-        navigate("new");
-      }}
-    >
-      <SubmitButton text={strings.downloadBackupFile()} />
     </RecoveryForm>
   );
 }
@@ -497,11 +395,6 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
 
         if (!(await db.user.resetPassword(form.password)))
           throw new Error("Could not reset account password.");
-
-        if (formData?.backupFile) {
-          await restoreBackupFile(formData?.backupFile);
-          await db.sync({ type: "full", force: true });
-        }
 
         navigate("final");
       }}

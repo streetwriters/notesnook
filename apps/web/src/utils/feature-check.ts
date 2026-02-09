@@ -34,11 +34,11 @@ export function isTransferableStreamsSupported() {
         controller.close();
       }
     });
-    window.postMessage(readable, [readable]);
+    window.postMessage(readable, window.location.origin, [readable]);
     FEATURE_CHECKS.transferableStreams = true;
     return true;
-  } catch {
-    console.log("Transferable streams not supported");
+  } catch (e) {
+    console.log("Transferable streams not supported", e);
     FEATURE_CHECKS.transferableStreams = false;
     return false;
   }

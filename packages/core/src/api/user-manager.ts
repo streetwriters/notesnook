@@ -628,58 +628,61 @@ class UserManager {
     if (!new_password) throw new Error("New password is required.");
 
     data.encryptionKey = data.encryptionKey || (await this.getMasterKey());
-    if (!data.encryptionKey)
-      throw new Error("User encryption key not generated.");
-
-    const newMasterKey = await this.db
-      .storage()
-      .generateCryptoKey(new_password, salt);
 
     const updateUserPayload: Partial<User> = {};
-    if (user.attachmentsKey) {
-      updateUserPayload.attachmentsKey = await this.keyManager.rewrapKey(
-        user.attachmentsKey,
-        data.encryptionKey,
-        newMasterKey
-      );
-    }
-    if (user.monographPasswordsKey) {
-      updateUserPayload.monographPasswordsKey = await this.keyManager.rewrapKey(
-        user.monographPasswordsKey,
-        data.encryptionKey,
-        newMasterKey
-      );
-    }
-    if (user.inboxKeys) {
-      updateUserPayload.inboxKeys = await this.keyManager.rewrapKey(
-        user.inboxKeys,
-        data.encryptionKey,
-        newMasterKey
-      );
-    }
-
-    if (user.legacyDataEncryptionKey)
-      updateUserPayload.legacyDataEncryptionKey =
-        await this.keyManager.rewrapKey(
-          user.legacyDataEncryptionKey,
+    console.log(
+      "Has encryption key",
+      !!data.encryptionKey,
+      await this.getMasterKey()
+    );
+    if (data.encryptionKey) {
+      const newMasterKey = await this.db
+        .storage()
+        .generateCryptoKey(new_password, salt);
+      if (user.attachmentsKey) {
+        updateUserPayload.attachmentsKey = await this.keyManager.rewrapKey(
+          user.attachmentsKey,
           data.encryptionKey,
           newMasterKey
         );
-    if (user.dataEncryptionKey)
-      updateUserPayload.dataEncryptionKey = await this.keyManager.rewrapKey(
-        user.dataEncryptionKey,
-        data.encryptionKey,
-        newMasterKey
-      );
-    else {
-      updateUserPayload.dataEncryptionKey = await this.keyManager.wrapKey(
-        await this.db.crypto().generateRandomKey(),
-        newMasterKey
-      );
-      updateUserPayload.legacyDataEncryptionKey = await this.keyManager.wrapKey(
-        data.encryptionKey,
-        newMasterKey
-      );
+      }
+      if (user.monographPasswordsKey) {
+        updateUserPayload.monographPasswordsKey =
+          await this.keyManager.rewrapKey(
+            user.monographPasswordsKey,
+            data.encryptionKey,
+            newMasterKey
+          );
+      }
+      if (user.inboxKeys) {
+        updateUserPayload.inboxKeys = await this.keyManager.rewrapKey(
+          user.inboxKeys,
+          data.encryptionKey,
+          newMasterKey
+        );
+      }
+
+      if (user.legacyDataEncryptionKey)
+        updateUserPayload.legacyDataEncryptionKey =
+          await this.keyManager.rewrapKey(
+            user.legacyDataEncryptionKey,
+            data.encryptionKey,
+            newMasterKey
+          );
+      if (user.dataEncryptionKey)
+        updateUserPayload.dataEncryptionKey = await this.keyManager.rewrapKey(
+          user.dataEncryptionKey,
+          data.encryptionKey,
+          newMasterKey
+        );
+      else {
+        updateUserPayload.dataEncryptionKey = await this.keyManager.wrapKey(
+          await this.db.crypto().generateRandomKey(),
+          newMasterKey
+        );
+        updateUserPayload.legacyDataEncryptionKey =
+          await this.keyManager.wrapKey(data.encryptionKey, newMasterKey);
+      }
     }
 
     await http.patch.json(
