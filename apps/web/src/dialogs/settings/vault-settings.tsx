@@ -42,11 +42,26 @@ export const VaultSettings: SettingsGroup[] = [
             type: "button",
             title: strings.create(),
             action: () => {
-              Vault.createVault().then((res) => {
-                useAppStore.getState().setIsVaultCreated(res);
-              });
+              Vault.createVault();
             },
             variant: "secondary"
+          }
+        ]
+      },
+      {
+        key: "keep-note-unlocked",
+        title: strings.keepNoteUnlocked(),
+        description: strings.keepNoteUnlockedDesc(),
+        isHidden: () => !useAppStore.getState().isVaultCreated,
+        onStateChange: (listener) =>
+          useAppStore.subscribe((s) => s.isVaultCreated, listener),
+        components: [
+          {
+            type: "toggle",
+            isToggled: () => useAppStore.getState().keepVaultNotesUnlocked,
+            toggle: () => {
+              useAppStore.getState().toggleKeepVaultNotesUnlocked();
+            }
           }
         ]
       },

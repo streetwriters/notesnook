@@ -777,16 +777,37 @@ class EditorStore extends BaseStore<EditorStore> {
         options
       );
     } else if (isLocked && note.type !== "trash") {
-      this.addSession(
-        {
-          type: "locked",
-          id: sessionId,
-          note,
-          activeBlockId: options.activeBlockId,
-          tabId
-        },
-        options
-      );
+      if (
+        appStore.get().keepVaultNotesUnlocked &&
+        db.vault.isNoteOpened(note.id)
+      ) {
+        const tags = await db.notes.tags(note.id);
+        const noteFromVault = await db.vault.open(note.id);
+        if (noteFromVault) {
+          this.addSession({
+            type: note.readonly ? "readonly" : "default",
+            locked: true,
+            id: sessionId,
+            note: noteFromVault,
+            saveState: SaveState.Saved,
+            sessionId: `${Date.now()}`,
+            tags: tags,
+            tabId: tabId,
+            content: noteFromVault.content
+          });
+        }
+      } else {
+        this.addSession(
+          {
+            type: "locked",
+            id: sessionId,
+            note,
+            activeBlockId: options.activeBlockId,
+            tabId
+          },
+          options
+        );
+      }
     } else {
       const content = note.contentId
         ? await db.content.get(note.contentId)
