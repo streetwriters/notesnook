@@ -206,7 +206,13 @@ function isTwitterX(src: string) {
 
 function tweetToEmbed(src: string, isDarkTheme: boolean) {
   src = src.replaceAll("x.com", "twitter.com");
+
+  const anchor = document.createElement("a");
+  anchor.href = `${src}?ref_src=twsrc%5Etfw`;
+
   return `<blockquote class="twitter-tweet" data-dnt="true" ${
     isDarkTheme ? 'data-theme="dark"' : ""
-  }><p lang="en" dir="ltr"><a href="${src}?ref_src=twsrc%5Etfw"></a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> `;
+  }><p lang="en" dir="ltr">${
+    anchor.outerHTML
+  }</p></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> `;
 }
