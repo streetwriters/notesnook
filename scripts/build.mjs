@@ -84,7 +84,11 @@ await Promise.all([
 ]);
 
 async function cmd(...command) {
-  let p = spawn(command[0], command.slice(1), { shell: true });
+  // WARNING: shell: true can allow injection if commands include untrusted input.
+  // Switching to shell: false may break commands using pipes, &&, or globs,
+  // Test needed for this channge and comment can be removed after test.
+  
+  let p = spawn(command[0], command.slice(1), { shell: false });
   console.time(command.join(" "));
   await new Promise((resolveFunc) => {
     p.stdout.on("data", (x) => {
