@@ -69,7 +69,7 @@ function getDecorations({
   defaultLanguage
 }: {
   block: NodeWithPos;
-  defaultLanguage: string | null | undefined;
+  defaultLanguage: () => string | null | undefined;
 }) {
   const decorations: Decoration[] = [];
   const languages = refractor.listLanguages();
@@ -77,7 +77,7 @@ function getDecorations({
   const { node, pos } = block;
   const code = node.textContent;
 
-  const language = node.attrs.language || defaultLanguage;
+  const language = node.attrs.language || defaultLanguage();
   const nodes = languages.includes(language)
     ? getHighlightNodes(refractor.highlight(code, language))
     : null;
@@ -107,7 +107,7 @@ export function HighlighterPlugin({
   defaultLanguage
 }: {
   name: string;
-  defaultLanguage: string | null | undefined;
+  defaultLanguage: () => string | null | undefined;
 }) {
   const HIGHLIGHTER_PLUGIN_KEY = new PluginKey<HighlighterState>("highlighter");
   const HIGHLIGHTED_BLOCKS: Set<string> = new Set();

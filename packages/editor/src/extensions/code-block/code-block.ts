@@ -37,6 +37,7 @@ import { nanoid } from "nanoid";
 import Languages from "./languages.json";
 import { CaretPosition, CodeLine } from "./utils.js";
 import { tiptapKeys } from "@notesnook/common";
+import { config } from "../../utils/config.js";
 
 interface Indent {
   type: "tab" | "space";
@@ -243,7 +244,11 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
             const text = state.doc.textBetween(from, to, "\n");
             tr.replaceSelectionWith(
               this.type.create(
-                { ...attributes, id: createCodeblockId() },
+                {
+                  language: defaultLanguage(),
+                  ...attributes,
+                  id: createCodeblockId()
+                },
                 text ? state.schema.text(text) : null
               )
             );
@@ -435,7 +440,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
         find: backtickInputRegex,
         type: this.type,
         getAttributes: (match) => ({
-          language: match[1],
+          language: match[1] ?? defaultLanguage(),
           id: createCodeblockId()
         })
       }),
@@ -443,7 +448,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
         find: tildeInputRegex,
         type: this.type,
         getAttributes: (match) => ({
-          language: match[1],
+          language: match[1] ?? defaultLanguage(),
           id: createCodeblockId()
         })
       })
@@ -455,7 +460,6 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
       // this plugin creates a code block for pasted content from VS Code
       // we can also detect the copied code language
       new Plugin({
-        key: new PluginKey("codeBlockVSCodeHandler"),
         props: {
           handlePaste: (view, event) => {
             if (!event.clipboardData) {
@@ -505,7 +509,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
                 tr.replaceSelectionWith(
                   this.type.create({
                     id: createCodeblockId(),
-                    language,
+                    language: language || "Plaintext",
                     indentType: indent.type,
                     indentLength: indent.amount
                   })
@@ -526,7 +530,10 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
           }
         }
       }),
-      HighlighterPlugin({ name: this.name, defaultLanguage: "txt" })
+      HighlighterPlugin({
+        name: this.name,
+        defaultLanguage
+      })
     ];
   },
 
@@ -545,7 +552,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
             languageDefinition?.filename ?? languageDefinition?.title ?? "xyz"
           }`.replace(/\s/, "-")
         );
-        content.classList.add("scroll-bar")
+        content.classList.add("scroll-bar");
         content.style.whiteSpace = "pre";
         // caret is not visible if content element width is 0px
         content.style.minWidth = "20px";
@@ -732,4 +739,8 @@ export function inferLanguage(node: Element) {
 
 function createCodeblockId() {
   return `codeblock-${nanoid(12)}`;
+}
+
+function defaultLanguage() {
+  return config.get<string>("codeBlockLanguage", "Plaintext");
 }
