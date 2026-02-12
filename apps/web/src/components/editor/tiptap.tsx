@@ -631,7 +631,7 @@ function TiptapWrapper(
       sx={{
         flex: 1,
         flexDirection: "column",
-        ".tiptap.ProseMirror": { pb: 150 },
+        ".tiptap.ProseMirror": { height: "100%" },
         ".editor-container": {
           opacity: isHydrating ? 0 : 1,
           zoom: editorConfig.zoom + "%",
