@@ -87,7 +87,7 @@ class SettingStore extends BaseStore<SettingStore> {
     ImageCompressionOptions.ASK_EVERY_TIME
   );
   desktopIntegrationSettings?: DesktopIntegration;
-  autoUpdates = true;
+  autoUpdates = false;
   isFlatpak = false;
   isSnap = false;
   proxyRules?: string;
