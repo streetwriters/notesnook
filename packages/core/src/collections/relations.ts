@@ -397,7 +397,8 @@ class RelationsArray<TType extends keyof RelatableTable> {
           )
           .$if(
             !!this.types?.includes("note" as TType) &&
-              this.db.notes.cache.archived.length > 0,
+              this.db.notes.cache.archived.length > 0 &&
+              this.reference.type !== "attachment",
             (b) => b.where("fromId", "not in", this.db.notes.cache.archived)
           )
           .$if(
