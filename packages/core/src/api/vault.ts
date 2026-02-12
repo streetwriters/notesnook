@@ -23,6 +23,7 @@ import { EV, EVENTS } from "../common.js";
 import { isCipher } from "../utils/crypto.js";
 import { Note, NoteContent } from "../types.js";
 import { logger } from "../logger.js";
+import { addItem } from "../utils/array.js";
 
 export const VAULT_ERRORS = {
   noVault: "ERR_NO_VAULT",
@@ -35,6 +36,7 @@ export default class Vault {
   private vaultPassword?: string;
   private erasureTimeout = 0;
   private key = "svvaads1212#2123";
+  private openedNotes: string[] = [];
 
   private get password() {
     return this.vaultPassword;
@@ -66,6 +68,10 @@ export default class Vault {
     return !!this.vaultPassword;
   }
 
+  isNoteOpened(noteId: string) {
+    return this.openedNotes.includes(noteId);
+  }
+
   async create(password: string) {
     const vaultKey = await this.getKey();
     if (!vaultKey || !isCipher(vaultKey)) {
@@ -80,6 +86,7 @@ export default class Vault {
 
   async lock() {
     this.password = undefined;
+    this.openedNotes = [];
     EV.publish(EVENTS.vaultLocked);
     return true;
   }
@@ -201,6 +208,8 @@ export default class Vault {
       password || this.password,
       false
     );
+
+    addItem(this.openedNotes, noteId);
 
     if (password) {
       this.password = password;

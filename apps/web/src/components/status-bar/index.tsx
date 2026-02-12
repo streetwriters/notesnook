@@ -204,7 +204,7 @@ function StatusBar() {
               }}
               data-test-id="vault-unlocked"
             >
-              <Unlock size={10} />
+              <Unlock size={12} />
               <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
                 {strings.vaultUnlocked()}
               </Text>

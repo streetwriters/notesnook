@@ -2633,5 +2633,8 @@ Use this if changes from other devices are not appearing on this device. This wi
   exportCsv: () => t`Export CSV`,
   importCsv: () => t`Import CSV`,
   noContent: () => t`This note is empty`,
-  deleteData: () => t`Delete data`
+  deleteData: () => t`Delete data`,
+  keepNoteUnlocked: () => t`Keep note unlocked`,
+  keepNoteUnlockedDesc: () =>
+    t`Keep a vault note unlocked once it is opened. Note will be locked back once vault is locked.`
 };
