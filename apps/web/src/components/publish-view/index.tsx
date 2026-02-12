@@ -61,13 +61,10 @@ function PublishView(props: PublishViewProps) {
   const unpublishNote = useStore((store) => store.unpublish);
   const [monograph, setMonograph] = useState(props.monograph);
   const monographAnalytics = useIsFeatureAvailable("monographAnalytics");
-  const analytics = usePromise(async () => {
-    if (!monographAnalytics?.isAllowed || !monograph) return { totalViews: 0 };
-    return await db.monographs.analytics(monograph?.id);
-  }, [monograph?.id, monographAnalytics]);
-  const publishUrl = usePromise(async () => {
-    return await db.monographs.publishUrl(note.id);
-  }, [monograph?.id, monograph?.publishUrl]);
+  const publishInfo = usePromise(async () => {
+    if (!monograph) return { publishUrl: "", analytics: { totalViews: 0 } };
+    return await db.monographs.publishInfo(monograph.id);
+  }, [monograph?.id]);
 
   useEffect(() => {
     const fileDownloadedEvent = EV.subscribe(
@@ -99,29 +96,29 @@ function PublishView(props: PublishViewProps) {
             variant="text.body"
             as="a"
             target="_blank"
-            href={publishUrl.status === "fulfilled" ? publishUrl.value : "#"}
+            href={publishInfo.status === "fulfilled" ? publishInfo.value.publishUrl : "#"}
             sx={{
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
               textDecoration: "none",
               overflow: "hidden",
               px: 1,
-              opacity: publishUrl.status === "fulfilled" ? 1 : 0.8
+              opacity: publishInfo.status === "fulfilled" ? 1 : 0.8
             }}
           >
-            {publishUrl.status === "fulfilled"
-              ? publishUrl.value
+            {publishInfo.status === "fulfilled"
+              ? publishInfo.value.publishUrl
               : monograph?.publishUrl}
           </Link>
           <Button
             variant="secondary"
             className="copyPublishLink"
             sx={{ flexShrink: 0, m: 0 }}
-            disabled={publishUrl.status !== "fulfilled"}
+            disabled={publishInfo.status !== "fulfilled"}
             onClick={() => {
-              if (publishUrl.status !== "fulfilled") return;
+              if (publishInfo.status !== "fulfilled") return;
 
-              writeText(publishUrl.value);
+              writeText(publishInfo.value.publishUrl);
             }}
           >
             {strings.copy()}
@@ -181,7 +178,7 @@ function PublishView(props: PublishViewProps) {
           >
             <Text variant="body">{strings.views()}</Text>
             {monographAnalytics?.isAllowed ? (
-              analytics.status === "fulfilled" ? (
+              publishInfo.status === "fulfilled" ? (
                 <Flex sx={{ alignItems: "center", gap: 1 }}>
                   <Text
                     variant="body"
@@ -189,14 +186,14 @@ function PublishView(props: PublishViewProps) {
                       color: "paragraph-secondary"
                     }}
                   >
-                    {analytics.value.totalViews}
+                    {publishInfo.value.analytics.totalViews}
                   </Text>
                   <Button
                     variant="tertiary"
                     onClick={async () => {
                       try {
                         setStatus({ action: "analytics" });
-                        analytics.refresh();
+                        publishInfo.refresh();
                       } finally {
                         setStatus(undefined);
                       }
