@@ -26,7 +26,6 @@ import React, {
   useLayoutEffect,
   useCallback
 } from "react";
-import ReactDOM from "react-dom";
 import { Box, Button, Flex, Progress, Text } from "@theme-ui/components";
 import Properties from "../properties";
 import {
@@ -44,6 +43,7 @@ import {
   useStore as useAppStore,
   store as appstore
 } from "../../stores/app-store";
+import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useSearchStore } from "../../stores/search-store";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { FlexScrollContainer } from "../scroll-container";
@@ -52,13 +52,16 @@ import Header from "./header";
 import { Attachment } from "../icons";
 import { attachFiles, AttachmentProgress, insertAttachments } from "./picker";
 import { useEditorManager } from "./manager";
-import { saveAttachment, downloadAttachment } from "../../common/attachments";
+import {
+  saveAttachment,
+  downloadAttachment,
+  previewImageAttachment
+} from "../../common/attachments";
 import { EV, EVENTS } from "@notesnook/core";
 import { db } from "../../common/db";
-import Titlebox from "./title-box";
+import Titlebox, { resizeTextarea } from "./title-box";
 import Config from "../../utils/config";
 import { ScopedThemeProvider } from "../theme-provider";
-import { Lightbox } from "../lightbox";
 import { showToast } from "../../utils/toast";
 import { Item, MaybeDeletedItem, isDeleted } from "@notesnook/core";
 import { debounce, debounceWithId } from "@notesnook/common";
@@ -76,13 +79,13 @@ import { onPageVisibilityChanged } from "../../utils/page-visibility";
 import { Pane, SplitPane } from "../split-pane";
 import { TITLE_BAR_HEIGHT } from "../title-bar";
 import { isMobile } from "../../hooks/use-mobile";
-import { isTablet } from "../../hooks/use-tablet";
+import { ConfirmDialog } from "../../dialogs/confirm";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
 const autoSaveToast = { show: true, hide: () => {} };
 
-async function saveContent(
+export async function saveContent(
   noteId: string,
   ignoreEdit: boolean,
   content: string
@@ -224,11 +227,14 @@ export default function TabsView() {
               <TableOfContents sessionId={activeSession.id} />
             </Pane>
           ) : null}
-          {arePropertiesVisible && activeSession && (
-            <Pane id="properties-pane" initialSize={250} minSize={250}>
-              <Properties sessionId={activeSession.id} />
-            </Pane>
-          )}
+          {arePropertiesVisible &&
+            activeSession &&
+            activeSession.type !== "new" &&
+            activeSession.type !== "locked" && (
+              <Pane id="properties-pane" initialSize={250} minSize={250}>
+                <Properties sessionId={activeSession.id} />
+              </Pane>
+            )}
         </SplitPane>
         <DropZone overlayRef={overlayRef} />
       </ScopedThemeProvider>
@@ -237,14 +243,25 @@ export default function TabsView() {
 }
 
 const MemoizedEditorView = React.memo(EditorView, (prev, next) => {
-  return (
+  const baseConditions =
     prev.session.id === next.session.id &&
     prev.session.type === next.session.type &&
     prev.session.needsHydration === next.session.needsHydration &&
     prev.session.activeBlockId === next.session.activeBlockId &&
-    prev.session.activeSearchResultIndex ===
-      next.session.activeSearchResultIndex
-  );
+    prev.session.activeSearchResultId === next.session.activeSearchResultId &&
+    prev.session.nonce === next.session.nonce;
+
+  if (
+    "attachmentsLength" in prev.session &&
+    "attachmentsLength" in next.session
+  ) {
+    return (
+      baseConditions &&
+      prev.session.attachmentsLength === next.session.attachmentsLength
+    );
+  }
+
+  return baseConditions;
 });
 function EditorView({
   session
@@ -554,27 +571,10 @@ export function Editor(props: EditorProps) {
         onChange={onSave}
         onDownloadAttachment={(attachment) => saveAttachment(attachment.hash)}
         onPreviewAttachment={async (data) => {
-          const { hash, type } = data;
+          const { hash, type, mime } = data;
           const attachment = await db.attachments.attachment(hash);
-          if (attachment && type === "image") {
-            const container = document.getElementById("dialogContainer");
-            if (!(container instanceof HTMLElement)) return;
-
-            const dataurl = await downloadAttachment(hash, "base64", id);
-            if (!dataurl)
-              return showToast("error", strings.imagePreviewFailed());
-
-            ReactDOM.render(
-              <ScopedThemeProvider>
-                <Lightbox
-                  image={dataurl}
-                  onClose={() => {
-                    ReactDOM.unmountComponentAtNode(container);
-                  }}
-                />
-              </ScopedThemeProvider>,
-              container
-            );
+          if (attachment && mime.startsWith("image/")) {
+            await previewImageAttachment(attachment);
           } else if (
             attachment &&
             onPreviewDocument &&
@@ -593,6 +593,15 @@ export function Editor(props: EditorProps) {
           }
         }}
         onInsertAttachment={async (type) => {
+          if (!useUserStore.getState().isLoggedIn) {
+            ConfirmDialog.show({
+              title: strings.notLoggedIn(),
+              message: strings.loginToUploadAttachments(),
+              positiveButtonText: strings.okay()
+            });
+            return;
+          }
+
           const mime = type === "file" ? "*/*" : "image/*";
           const attachments = await insertAttachments(mime);
           const editor = useEditorManager.getState().getEditor(id)?.editor;
@@ -687,17 +696,25 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
       const child = editorContainerRef.current?.getBoundingClientRect();
       if (!parent || !child || !editor || entries.length <= 0) return;
 
-      const CONTAINER_MARGIN = isMobile() || isTablet() ? 10 : 30;
+      const CONTAINER_MARGIN = isMobile() ? 10 : 30;
       const negativeSpace = Math.abs(
         parent.left - child.left - CONTAINER_MARGIN
       );
 
       requestAnimationFrame(() => {
-        editor.style.marginLeft = `-${negativeSpace}px`;
-        editor.style.marginRight = `-${negativeSpace}px`;
-        editor.style.paddingLeft = `${negativeSpace}px`;
-        editor.style.paddingRight = `${negativeSpace}px`;
+        if (!isMobile()) {
+          editor.style.marginLeft = `-${negativeSpace}px`;
+          editor.style.marginRight = `-${negativeSpace}px`;
+
+          editor.style.paddingLeft = `${negativeSpace}px`;
+          editor.style.paddingRight = `${negativeSpace}px`;
+        }
       });
+
+      const editorTitle = document.querySelector("#editor-title");
+      if (editorTitle instanceof HTMLTextAreaElement) {
+        resizeTextarea(editorTitle);
+      }
     }
     const observer = new ResizeObserver(debounce(onResize, 500));
     observer.observe(editorScrollRef.current);
@@ -735,8 +752,8 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
             maxWidth: editorMargins ? "min(100%, 850px)" : "auto",
             width: "100%"
           }}
-          pl={[2, 2, 6]}
-          pr={[2, 2, 6]}
+          pl={[2, 6]}
+          pr={[2, 6]}
           onClick={onRequestFocus}
         >
           {children}
@@ -824,17 +841,27 @@ function useDragOverlay() {
       e.preventDefault();
     }
 
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        hideOverlay();
+      }
+    }
+
     dropElement.addEventListener("dragenter", showOverlay);
     overlay.addEventListener("drop", hideOverlay);
     overlay.addEventListener("dragenter", allowDrag);
     overlay.addEventListener("dragover", allowDrag);
     overlay.addEventListener("dragleave", hideOverlay);
+    overlay.addEventListener("click", hideOverlay);
+    document.addEventListener("keydown", handleKeyDown);
     return () => {
       dropElement.removeEventListener("dragenter", showOverlay);
       overlay.removeEventListener("drop", hideOverlay);
       overlay.removeEventListener("dragenter", allowDrag);
       overlay.removeEventListener("dragover", allowDrag);
       overlay.removeEventListener("dragleave", hideOverlay);
+      overlay.removeEventListener("click", hideOverlay);
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
 
@@ -855,28 +882,29 @@ function useScrollToBlock(session: EditorSession) {
 }
 
 function useScrollToSearchResult(session: EditorSession) {
-  const index = useEditorStore(
-    (store) => store.getSession(session.id)?.activeSearchResultIndex
+  const id = useEditorStore(
+    (store) => store.getSession(session.id)?.activeSearchResultId
   );
 
   useEffect(() => {
-    if (index === undefined) return;
+    if (id === undefined) return;
     const scrollContainer = document.getElementById(
       `editorScroll_${session.id}`
     );
     scrollContainer?.closest(".active")?.classList.add("searching");
-    const elements = scrollContainer?.getElementsByTagName("nn-search-result");
+    const element = scrollContainer?.querySelector(`nn-search-result#${id}`);
     setTimeout(
       () =>
-        elements
-          ?.item(index)
-          ?.scrollIntoView({ block: "center", behavior: "instant" }),
+        element?.scrollIntoView({
+          block: "center",
+          behavior: "instant"
+        }),
       100
     );
     useEditorStore.getState().updateSession(session.id, [session.type], {
-      activeSearchResultIndex: undefined
+      activeSearchResultId: undefined
     });
-  }, [session.id, session.type, index]);
+  }, [session.id, session.type, id]);
 }
 
 function isFile(e: DragEvent) {

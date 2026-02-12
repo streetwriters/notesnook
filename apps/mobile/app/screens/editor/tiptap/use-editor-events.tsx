@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/no-var-requires */
+import { isFeatureAvailable, useAreFeaturesAvailable } from "@notesnook/common";
 import { ItemReference } from "@notesnook/core";
 import type { Attachment } from "@notesnook/editor";
 import { EditorEvents } from "@notesnook/editor-mobile/src/utils/editor-events";
@@ -27,22 +28,25 @@ import { getDefaultPresets } from "@notesnook/editor/dist/cjs/toolbar/tool-defin
 import { strings } from "@notesnook/intl";
 import Clipboard from "@react-native-clipboard/clipboard";
 import React, { useCallback, useEffect, useRef } from "react";
+import * as ScopedStorage from "react-native-scoped-storage";
 import {
   BackHandler,
   Keyboard,
   KeyboardEventListener,
   NativeEventSubscription,
+  Platform,
   useWindowDimensions
 } from "react-native";
 import { WebViewMessageEvent } from "react-native-webview";
 import { DatabaseLogger, db } from "../../../common/database";
 import downloadAttachment from "../../../common/filesystem/download-attachment";
 import { AuthMode } from "../../../components/auth/common";
+import { Properties } from "../../../components/properties";
 import EditorTabs from "../../../components/sheets/editor-tabs";
 import { Issue } from "../../../components/sheets/github/issue";
 import LinkNote from "../../../components/sheets/link-note";
+import PaywallSheet from "../../../components/sheets/paywall";
 import { RelationsList } from "../../../components/sheets/relations-list";
-import ReminderSheet from "../../../components/sheets/reminder";
 import TableOfContents from "../../../components/sheets/toc";
 import { DDS } from "../../../services/device-detection";
 import {
@@ -54,6 +58,7 @@ import {
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import SettingsService from "../../../services/settings";
+import useNavigationStore from "../../../stores/use-navigation-store";
 import { useRelationStore } from "../../../stores/use-relation-store";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { useTagStore } from "../../../stores/use-tag-store";
@@ -66,20 +71,22 @@ import {
   eOnExitEditor,
   eOnLoadNote,
   eOpenFullscreenEditor,
-  eOpenPremiumDialog,
   eOpenPublishNoteDialog,
   eUnlockWithBiometrics,
   eUnlockWithPassword
 } from "../../../utils/events";
 import { openLinkInBrowser } from "../../../utils/functions";
 import { fluidTabsRef } from "../../../utils/global-refs";
+import { sleep } from "../../../utils/time";
+import AddReminder from "../../add-reminder";
+import ManageTags from "../../manage-tags";
 import { useDragState } from "../../settings/editor/state";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { useTabStore } from "./use-tab-store";
 import { editorState, openInternalLink } from "./utils";
-import { Properties } from "../../../components/properties";
-import { sleep } from "../../../utils/time";
-import ManageTags from "../../manage-tags";
+import filesystem from "../../../common/filesystem";
+import ReactNativeBlobUtil from "react-native-blob-util";
+import { ShareComponent } from "../../../components/sheets/export-notes/share";
 
 const publishNote = async () => {
   const user = useUserStore.getState().user;
@@ -131,7 +138,6 @@ const showActionsheet = async () => {
     .getState()
     .getNoteIdForTab(useTabStore.getState().currentTab!);
   if (noteId) {
-    console.log("OPEN NOTE");
     const note = await db.notes?.note(noteId);
     Properties.present(note, false);
   } else {
@@ -149,16 +155,27 @@ export const useEditorEvents = (
   editor: useEditorType,
   { readonly: editorPropReadonly, noHeader, noToolbar }: Partial<EditorProps>
 ) => {
+  const features = useAreFeaturesAvailable([
+    "callout",
+    "outlineList",
+    "taskList",
+    "importCsvToTable",
+    "exportTableAsCsv"
+  ]);
+
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const fullscreen = useSettingStore((state) => state.fullscreen);
   const corsProxy = useSettingStore((state) => state.settings.corsProxy);
   const loading = useSettingStore((state) => state.isAppLoading);
-  const [dateFormat, timeFormat] = useSettingStore((state) => [
-    state.dateFormat,
-    state.timeFormat
-  ]);
-  const handleBack = useRef<NativeEventSubscription>();
-  const isPremium = useUserStore((state) => state.premium);
+  const [dateFormat, timeFormat, defaultLineHeight, dayFormat] =
+    useSettingStore((state) => [
+      state.dateFormat,
+      state.timeFormat,
+      state.settings.defaultLineHeight,
+      state.dayFormat
+    ]);
+  const handleBack = useRef<NativeEventSubscription>(undefined);
+  const loggedIn = useUserStore((state) => !!state.user);
   const { fontScale } = useWindowDimensions();
 
   const doubleSpacedLines = useSettingStore(
@@ -202,7 +219,7 @@ export const useEditorEvents = (
     editor.commands.setSettings({
       deviceMode: deviceMode || "mobile",
       fullscreen: fullscreen || false,
-      premium: isPremium,
+      premium: false,
       readonly: false,
       tools: tools || getDefaultPresets().default,
       noHeader: noHeader,
@@ -216,12 +233,15 @@ export const useEditorEvents = (
       fontFamily: SettingsService.get().defaultFontFamily,
       dateFormat: db.settings?.getDateFormat(),
       timeFormat: db.settings?.getTimeFormat(),
+      dayFormat: db.settings?.getDayFormat(),
       fontScale,
-      markdownShortcuts
+      markdownShortcuts,
+      features,
+      loggedIn,
+      defaultLineHeight
     });
   }, [
     fullscreen,
-    isPremium,
     editor.loading,
     deviceMode,
     tools,
@@ -234,9 +254,13 @@ export const useEditorEvents = (
     defaultFontFamily,
     dateFormat,
     timeFormat,
+    dayFormat,
     loading,
     fontScale,
-    markdownShortcuts
+    markdownShortcuts,
+    loggedIn,
+    defaultLineHeight,
+    features
   ]);
 
   const onBackPress = useCallback(async () => {
@@ -269,7 +293,15 @@ export const useEditorEvents = (
 
   const onHardwareBackPress = useCallback(() => {
     if (fluidTabsRef.current?.page() === "editor") {
-      onBackPress();
+      if (
+        useNavigationStore.getState().currentRoute === "ManageTags" ||
+        useNavigationStore.getState().currentRoute === "LinkNotebooks" ||
+        useNavigationStore.getState().currentRoute === "AddReminder"
+      ) {
+        Navigation.goBack();
+      } else {
+        onBackPress();
+      }
       return true;
     }
   }, [onBackPress]);
@@ -438,7 +470,22 @@ export const useEditorEvents = (
             referenceType: "reminder",
             relationType: "from",
             title: strings.dataTypesPluralCamelCase.reminder(),
-            onAdd: () => ReminderSheet.present(undefined, note, true)
+            onAdd: async () => {
+              const reminderFeature =
+                await isFeatureAvailable("activeReminders");
+              if (!reminderFeature.isAllowed) {
+                ToastManager.show({
+                  type: "info",
+                  message: reminderFeature.error,
+                  actionText: strings.upgrade(),
+                  func: () => {
+                    PaywallSheet.present(reminderFeature);
+                  }
+                });
+                return;
+              }
+              AddReminder.present(undefined, note);
+            }
           });
           break;
         case EditorEvents.newtag:
@@ -526,7 +573,17 @@ export const useEditorEvents = (
           if (editor.state.current?.isFocused) {
             editor.state.current.isFocused = true;
           }
-          eSendEvent(eOpenPremiumDialog);
+          if (editorMessage.value.feature === "insertAttachment") {
+            ToastManager.show({
+              type: "info",
+              message: strings.loginRequired()
+            });
+          } else {
+            PaywallSheet.present(
+              await isFeatureAvailable(editorMessage.value.feature)
+            );
+          }
+
           break;
         case EditorEvents.monograph:
           publishNote();
@@ -623,7 +680,8 @@ export const useEditorEvents = (
               if (note) {
                 eSendEvent(eOnLoadNote, {
                   item: note,
-                  tabId: editorMessage.tabId
+                  tabId: editorMessage.tabId,
+                  loadedFromEditor: true
                 });
               }
             } else {
@@ -634,7 +692,8 @@ export const useEditorEvents = (
                   if (note) {
                     eSendEvent(eOnLoadNote, {
                       item: note,
-                      tabId: editorMessage.tabId
+                      tabId: editorMessage.tabId,
+                      loadedFromEditor: true
                     });
                   }
                 }
@@ -688,6 +747,62 @@ export const useEditorEvents = (
               Navigation.queueRoutesForUpdate();
             });
           }
+          break;
+        }
+        case EditorEvents.downloadCsv: {
+          try {
+            const csv = editorMessage.value;
+            let filePath: string;
+            let fileName: string;
+            if (Platform.OS === "android") {
+              let file = await ScopedStorage.createDocument(
+                "table.csv",
+                "text/csv",
+                csv,
+                "utf8"
+              );
+              if (!file) return;
+              filePath = file.path || file.uri;
+              fileName = file.name;
+            } else {
+              const path = await filesystem.checkAndCreateDir("/");
+              let possibleFileName = "table.csv";
+              let counter = 1;
+
+              // Check if file exists and find available filename
+              while (
+                await ReactNativeBlobUtil.fs.exists(path + possibleFileName)
+              ) {
+                possibleFileName = `table (${counter}).csv`;
+                counter++;
+              }
+              await ReactNativeBlobUtil.fs.writeFile(
+                path + possibleFileName,
+                csv,
+                "utf8"
+              );
+              filePath = path + possibleFileName;
+              fileName = possibleFileName;
+            }
+
+            await sleep(500);
+            presentSheet({
+              title: "Table saved to csv",
+              paragraph: strings.fileSaved(fileName, Platform.OS),
+              icon: "download",
+              context: "global",
+              component: (
+                <ShareComponent uri={filePath} name={fileName} padding={12} />
+              )
+            });
+          } catch (e) {
+            ToastManager.show({
+              type: "info",
+              message: "Could not save table to csv"
+            });
+            DatabaseLogger.error(e as Error);
+          }
+
           break;
         }
 

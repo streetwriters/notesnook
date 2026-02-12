@@ -19,6 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { NativeModules, Platform } from "react-native";
 
+export type ShortcutInfo = {
+  id: string;
+  title: string;
+  description: string;
+  type: "note" | "notebook" | "tag" | "color";
+};
+
 interface NotesnookModuleInterface {
   getActivityName: () => Promise<string>;
   setBackgroundColor: (color: string) => void;
@@ -40,6 +47,24 @@ interface NotesnookModuleInterface {
   hasWidgetNote: (noteId: string) => Promise<boolean>;
   updateWidgetNote: (noteId: string, data: string) => void;
   updateReminderWidget: () => void;
+  isGestureNavigationEnabled: () => boolean;
+  addShortcut: (
+    id: string,
+    type: "note" | "notebook" | "tag" | "color",
+    title: string,
+    description?: string,
+    color?: string
+  ) => Promise<boolean>;
+  removeShortcut: (id: string) => Promise<boolean>;
+  updateShortcut: (
+    id: string,
+    type: "note" | "notebook" | "tag" | "color",
+    title: string,
+    description?: string,
+    color?: string
+  ) => Promise<boolean>;
+  removeAllShortcuts: () => Promise<boolean>;
+  getAllShortcuts: () => Promise<ShortcutInfo[]>;
 }
 
 export const NotesnookModule: NotesnookModuleInterface = Platform.select({
@@ -59,7 +84,13 @@ export const NotesnookModule: NotesnookModuleInterface = Platform.select({
     getWidgetNotes: () => {},
     hasWidgetNote: () => {},
     updateWidgetNote: () => {},
-    updateReminderWidget: () => {}
+    updateReminderWidget: () => {},
+    isGestureNavigationEnabled: () => true,
+    addShortcut: () => Promise.resolve(false),
+    removeShortcut: () => Promise.resolve(false),
+    updateShortcut: () => Promise.resolve(false),
+    removeAllShortcuts: () => Promise.resolve(false),
+    getAllShortcuts: () => Promise.resolve([])
   },
   android: NativeModules.NNativeModule
 });

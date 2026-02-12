@@ -17,12 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { db } from "../common/database";
+import { DatabaseLogger, db } from "../common/database";
 import { eSendEvent } from "../services/event-manager";
 import Navigation from "../services/navigation";
 import { NotePreviewWidget } from "../services/note-preview-widget";
 import Notifications from "../services/notifications";
 import { eAfterSync } from "../utils/events";
+import { NotesnookModule, ShortcutInfo } from "../utils/notesnook-module";
 import { useFavoriteStore } from "./use-favorite-store";
 import { useMenuStore } from "./use-menu-store";
 import { useMonographStore } from "./use-monograph-store";
@@ -33,6 +34,81 @@ import { useReminderStore } from "./use-reminder-store";
 import { useTagStore } from "./use-tag-store";
 import { useTrashStore } from "./use-trash-store";
 import { useUserStore } from "./use-user-store";
+
+async function syncShortcuts(result: ShortcutInfo[]) {
+  try {
+    for (let shortcut of result) {
+      switch (shortcut.type) {
+        case "note":
+          {
+            const note = await db.notes.note(shortcut.id);
+            if (!note) {
+              NotesnookModule.removeShortcut(shortcut.id);
+            } else if (note.title !== shortcut.title) {
+              NotesnookModule.updateShortcut(
+                shortcut.id,
+                "note",
+                note.title,
+                note.headline
+              );
+            }
+          }
+          break;
+        case "notebook":
+          {
+            const notebook = await db.notebooks.notebook(shortcut.id);
+            if (!notebook) {
+              NotesnookModule.removeShortcut(shortcut.id);
+            } else if (notebook.title !== shortcut.title) {
+              NotesnookModule.updateShortcut(
+                shortcut.id,
+                "notebook",
+                notebook.title,
+                notebook.description
+              );
+            }
+          }
+          break;
+        case "tag":
+          {
+            const tag = await db.tags.tag(shortcut.id);
+            if (!tag) {
+              NotesnookModule.removeShortcut(shortcut.id);
+            } else if (tag.title !== shortcut.title) {
+              NotesnookModule.updateShortcut(
+                shortcut.id,
+                "tag",
+                tag.title,
+                tag.title
+              );
+            }
+          }
+          break;
+        case "color":
+          {
+            const color = await db.colors.color(shortcut.id);
+            if (!color) {
+              NotesnookModule.removeShortcut(shortcut.id);
+            } else if (color.title !== shortcut.title) {
+              NotesnookModule.updateShortcut(
+                shortcut.id,
+                "color",
+                color.title,
+                color.title,
+                color.colorCode
+              );
+            }
+          }
+          break;
+      }
+    }
+  } catch (e) {
+    DatabaseLogger.error(
+      e as Error,
+      "Error while syncing homescreen shortcuts"
+    );
+  }
+}
 
 export function initAfterSync(type: "full" | "send" = "send") {
   if (type === "full") {
@@ -45,10 +121,17 @@ export function initAfterSync(type: "full" | "send" = "send") {
     useUserStore.setState({
       profile: db.settings.getProfile()
     });
-    eSendEvent(eAfterSync);
   }
+
   Notifications.setupReminders(true);
   NotePreviewWidget.updateNotes();
+  eSendEvent(eAfterSync);
+
+  NotesnookModule.getAllShortcuts()
+    .then(syncShortcuts)
+    .catch((e) => {
+      DatabaseLogger.log(e);
+    });
 }
 
 export async function initialize() {}

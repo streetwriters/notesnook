@@ -107,10 +107,12 @@ function generateTableOfContents() {
 
 export const MonographPage = ({
   monograph,
-  encodedKey
+  encodedKey,
+  apiHost
 }: {
   monograph: Monograph;
   encodedKey?: string;
+  apiHost: string;
 }) => {
   const [reportDialogVisible, setReportDialogVisible] = useState(false);
   const [tableOfContents, setTableOfContents] = useState<TableOfContent[]>([]);
@@ -227,7 +229,7 @@ export const MonographPage = ({
           )}
           <Image
             sx={{ display: "none" }}
-            src={`https://api.notesnook.com/monographs/${monograph.id}/view`}
+            src={`${apiHost}/monographs/${monograph.id}/view`}
           />
         </Flex>
       </Box>

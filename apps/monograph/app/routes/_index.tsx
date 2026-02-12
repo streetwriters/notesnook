@@ -127,6 +127,7 @@ export default function Monograph() {
           mt={6}
         >
           <ButtonLink
+            as="a"
             variant="accent"
             href="https://app.notesnook.com/"
             target="_blank"
@@ -134,6 +135,7 @@ export default function Monograph() {
             Publish a note
           </ButtonLink>
           <ButtonLink
+            as="a"
             variant="secondary"
             sx={{
               bg: "background-secondary",
@@ -182,7 +184,7 @@ export default function Monograph() {
           >
             <Icon path={feature.Icon} color="var(--accent)" size={42} />
             <Text variant="heading">{feature.name}</Text>
-            <Text>{feature.body}</Text>
+            <Text variant="body">{feature.body}</Text>
           </Flex>
         ))}
       </Box>

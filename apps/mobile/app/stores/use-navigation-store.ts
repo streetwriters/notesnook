@@ -25,23 +25,25 @@ import {
   Note,
   Notebook,
   Reminder,
-  Tag,
-  TrashItem
+  Tag
 } from "@notesnook/core";
 import { ParamListBase } from "@react-navigation/core";
-import create, { State } from "zustand";
+import { create } from "zustand";
 
-export type GenericRouteParam = undefined;
+export type GenericRouteParam = {
+  canGoBack?: boolean;
+};
 
 export type NotebookScreenParams = {
-  item: Notebook;
-  title: string;
+  id: string;
+  item?: Notebook;
   canGoBack?: boolean;
 };
 
 export type NotesScreenParams = {
-  item: Note | Notebook | Tag | Color | TrashItem | Reminder;
-  title: string;
+  type: "tag" | "color" | "monograph";
+  id: string;
+  item?: Tag | Color;
   canGoBack?: boolean;
 };
 
@@ -52,6 +54,14 @@ export type AppLockRouteParams = {
 
 export type AuthParams = {
   mode: number;
+  context?: "intro";
+  state?: BillingState;
+};
+
+export type BillingState = {
+  productId?: string;
+  planId?: string;
+  billingType?: "annual" | "monthly";
 };
 
 export interface RouteParams extends ParamListBase {
@@ -94,6 +104,17 @@ export interface RouteParams extends ParamListBase {
   ManageTags: {
     ids?: string[];
   };
+  AddReminder: {
+    reminder?: Reminder;
+    reference?: Note;
+  };
+  Intro: GenericRouteParam;
+  PayWall: {
+    canGoBack?: boolean;
+    context: "signup" | "logged-in" | "logged-out" | "subscribed";
+    state?: BillingState;
+  };
+  Wrapped: GenericRouteParam;
 }
 
 export type RouteName = keyof RouteParams;
@@ -103,7 +124,7 @@ export type HeaderRightButton = {
   onPress: () => void;
 };
 
-interface NavigationStore extends State {
+interface NavigationStore {
   currentRoute: RouteName;
   canGoBack?: boolean;
   focusedRouteId?: string;

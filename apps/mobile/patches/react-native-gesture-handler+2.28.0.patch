@@ -1,0 +1,12 @@
+diff --git a/node_modules/react-native-gesture-handler/android/build.gradle b/node_modules/react-native-gesture-handler/android/build.gradle
+index ac149a0..37f620c 100644
+--- a/node_modules/react-native-gesture-handler/android/build.gradle
++++ b/node_modules/react-native-gesture-handler/android/build.gradle
+@@ -187,6 +187,7 @@ android {
+         exclude "**/libreactnative.so"
+         exclude "**/libjsi.so"
+         exclude "**/libc++_shared.so"
++        exclude "**/libfbjni.so"
+     }
+ 
+     sourceSets.main {

@@ -92,11 +92,13 @@ import { SearchResult } from "./extensions/search-result/search-result.js";
 interface TiptapStorage {
   dateFormat?: DateTimeOptions["dateFormat"];
   timeFormat?: DateTimeOptions["timeFormat"];
+  dayFormat?: DateTimeOptions["dayFormat"];
   openLink?: (url: string, openInNewTab?: boolean) => void;
   downloadAttachment?: (attachment: Attachment) => void;
   openAttachmentPicker?: (type: AttachmentType) => void;
   previewAttachment?: (attachment: Attachment) => void;
   copyToClipboard?: (text: string, html?: string) => void;
+  downloadCsvTable?: (csv: string) => void;
   createInternalLink?: (
     attributes?: LinkAttributes
   ) => Promise<LinkAttributes | undefined>;
@@ -149,9 +151,10 @@ const useTiptap = (
     onBeforeCreate,
     dateFormat,
     timeFormat,
+    dayFormat,
     copyToClipboard,
     createInternalLink,
-
+    downloadCsvTable,
     doubleSpacedLines = true,
     isMobile,
     downloadOptions,
@@ -192,11 +195,12 @@ const useTiptap = (
       extensions: [
         ...CoreExtensions,
         SearchReplace.configure({
-          onStartSearch: (term) => {
+          onStartSearch: (term, isReplacing) => {
             useEditorSearchStore.setState({
               isSearching: true,
               searchTerm: term,
-              focusNonce: Math.random()
+              focusNonce: Math.random(),
+              isReplacing: isReplacing
             });
             return true;
           },
@@ -286,7 +290,11 @@ const useTiptap = (
         Table.configure({
           resizable: true,
           allowTableNodeSelection: true,
-          cellMinWidth: 50
+          cellMinWidth: 20,
+          showResizeHandleOnSelection: isMobile,
+          defaultCellAttrs: {
+            colwidth: [100]
+          }
         }),
         Clipboard,
         TableRow,
@@ -318,7 +326,7 @@ const useTiptap = (
         KeepInView.configure({
           scrollIntoViewOnWindowResize: !isMobile
         }),
-        DateTime.configure({ dateFormat, timeFormat }),
+        DateTime.configure({ dateFormat, timeFormat, dayFormat }),
         KeyMap,
         WebClipNode,
         AudioNode,
@@ -372,6 +380,7 @@ const useTiptap = (
       onBeforeCreate: ({ editor }) => {
         editor.storage.dateFormat = dateFormat;
         editor.storage.timeFormat = timeFormat;
+        editor.storage.dayFormat = dayFormat;
 
         editor.storage.openLink = openLink;
         editor.storage.downloadAttachment = downloadAttachment;
@@ -380,6 +389,7 @@ const useTiptap = (
         editor.storage.copyToClipboard = copyToClipboard;
         editor.storage.createInternalLink = createInternalLink;
         editor.storage.getAttachmentData = getAttachmentData;
+        editor.storage.downloadCsvTable = downloadCsvTable;
 
         if (onBeforeCreate) onBeforeCreate({ editor });
       },
@@ -387,6 +397,7 @@ const useTiptap = (
       parseOptions: { preserveWhitespace: true }
     }),
     [
+      isMobile,
       previewAttachment,
       downloadAttachment,
       openAttachmentPicker,
@@ -441,3 +452,4 @@ export {
 };
 export { replaceDateTime } from "./extensions/date-time/index.js";
 export type * from "./extension-imports.js";
+export { type Selection } from "@tiptap/pm/state";

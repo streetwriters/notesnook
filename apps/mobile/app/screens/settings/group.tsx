@@ -59,7 +59,7 @@ const Group = ({
           id="Settings"
         />
       )}
-      <DelayLayout type="settings" delay={0}>
+      <DelayLayout type="settings">
         <View
           style={{
             flex: 1

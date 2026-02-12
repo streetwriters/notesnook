@@ -20,6 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Extension } from "@tiptap/core";
 import { Plugin } from "@tiptap/pm/state";
 import { nanoid } from "nanoid";
+import {
+  AttributeUpdate,
+  BatchAttributeStep
+} from "../../utils/batch-attribute-step.js";
 
 const NESTED_BLOCK_ID_TYPES = ["callout"];
 const BLOCK_ID_TYPES = [
@@ -74,24 +78,33 @@ export const BlockId = Extension.create({
           const isDocChanged = transactions.some((tr) => tr.docChanged);
           if (!isDocChanged) return null;
 
-          let updated = false;
+          const blockIds = new Set<string>();
+          const updates: AttributeUpdate[] = [];
           const { tr } = newState;
+
           tr.doc.forEach(function addBlockId(n, offset) {
             if (!n.isBlock || !BLOCK_ID_TYPES.includes(n.type.name)) return;
-            if (!n.attrs.blockId) {
-              const id = nanoid(8);
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore we can't use tr.setNodeMarkup as that creates
-              // a new transaction for every single node update causing
-              // significant performance issues
-              n.attrs.blockId = id;
-              updated = true;
+
+            const currentId = n.attrs.blockId;
+            const shouldUpdateId = !currentId || blockIds.has(currentId);
+            const finalId = shouldUpdateId ? nanoid(8) : currentId;
+
+            if (shouldUpdateId) {
+              updates.push({
+                pos: offset,
+                attrName: "blockId",
+                value: finalId
+              });
             }
+
+            blockIds.add(finalId);
 
             if (NESTED_BLOCK_ID_TYPES.includes(n.type.name))
               n.forEach((n, pos) => addBlockId(n, offset + pos + 1));
           });
-          if (updated) {
+
+          if (updates.length > 0) {
+            tr.step(new BatchAttributeStep(updates));
             tr.setMeta("ignoreEdit", true);
             return tr;
           }

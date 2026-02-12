@@ -113,7 +113,10 @@ async function onBackgroundSyncStarted() {
       useUserStore.getState().setSyncing(false);
     }
     await Notifications.setupReminders();
-
+    if (SettingsService.get().notifNotes) {
+      Notifications.pinQuickNote();
+    }
+    Notifications.restorePinnedNotes();
     NotePreviewWidget.updateNotes();
     deleteDCacheFiles();
     DatabaseLogger.info("BACKGROUND SYNC COMPLETE");
@@ -139,9 +142,10 @@ const onBoot = async () => {
 
     await Notifications.setupReminders();
     if (SettingsService.get().notifNotes) {
-      Notifications.pinQuickNote(false);
+      Notifications.pinQuickNote();
     }
     Notifications.restorePinnedNotes();
+    NotePreviewWidget.updateNotes();
     DatabaseLogger.info("BOOT TASK COMPLETE");
   } catch (e) {
     DatabaseLogger.error(e as Error);

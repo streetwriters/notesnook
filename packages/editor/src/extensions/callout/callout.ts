@@ -16,7 +16,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { getParentAttributes } from "../../utils/prosemirror.js";
+import {
+  getParentAttributes,
+  isClickWithinBounds
+} from "../../utils/prosemirror.js";
 import {
   InputRule,
   Node,
@@ -27,6 +30,7 @@ import { Paragraph } from "../paragraph/index.js";
 import { Heading } from "../heading/index.js";
 import { TextSelection } from "@tiptap/pm/state";
 import { Fragment } from "@tiptap/pm/model";
+import { hasPermission } from "../../types.js";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -134,6 +138,8 @@ export const Callout = Node.create({
       setCallout:
         (attributes) =>
         ({ tr, state }) => {
+          if (!hasPermission("setCallout")) return false;
+
           const { selection } = state;
           const start = selection.from;
           const end = selection.to;
@@ -178,6 +184,7 @@ export const Callout = Node.create({
       new InputRule({
         find: CALLOUT_REGEX,
         handler: ({ state, range, match }) => {
+          if (!hasPermission("setCallout", true)) return null;
           if (match.length === 1) return null;
 
           const calloutType = (match[1] || "info") as CalloutType;
@@ -231,37 +238,9 @@ export const Callout = Node.create({
 
         const pos = typeof getPos === "function" ? getPos() : 0;
         if (typeof pos !== "number") return;
+
         const resolvedPos = editor.state.doc.resolve(pos);
-
-        const { x, y, width } = e.target.getBoundingClientRect();
-
-        const clientX =
-          e instanceof MouseEvent ? e.clientX : e.touches[0].clientX;
-
-        const clientY =
-          e instanceof MouseEvent ? e.clientY : e.touches[0].clientY;
-
-        const hitArea = { width: 40, height: 40 };
-
-        const isRtl =
-          e.target.dir === "rtl" ||
-          findParentNodeClosestToPos(
-            resolvedPos,
-            (node) => !!node.attrs.textDirection
-          )?.node.attrs.textDirection === "rtl";
-
-        let xEnd = clientX <= x + width;
-        let xStart = clientX >= x + width - hitArea.width;
-
-        const yStart = clientY >= y;
-        const yEnd = clientY <= y + hitArea.height;
-
-        if (isRtl) {
-          xStart = clientX >= x;
-          xEnd = clientX <= x + hitArea.width;
-        }
-
-        if (xStart && xEnd && yStart && yEnd) {
+        if (isClickWithinBounds(e, resolvedPos, "right")) {
           e.preventDefault();
           e.stopImmediatePropagation();
 
@@ -279,6 +258,12 @@ export const Callout = Node.create({
       container.onmousedown = onClick;
       container.ontouchstart = onClick;
 
+      if (node.attrs.hidden) {
+        container.dataset.hidden = node.attrs.hidden;
+      } else {
+        delete container.dataset.hidden;
+      }
+
       return {
         dom: container,
         contentDOM: container,
@@ -289,6 +274,10 @@ export const Callout = Node.create({
 
           if (updatedNode.attrs.collapsed) container.classList.add("collapsed");
           else container.classList.remove("collapsed");
+
+          if (updatedNode.attrs.hidden)
+            container.dataset.hidden = updatedNode.attrs.hidden;
+          else delete container.dataset.hidden;
 
           return true;
         }

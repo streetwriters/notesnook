@@ -29,11 +29,7 @@ import {
 } from "../utils/grouping.js";
 import { sql } from "@streetwriters/kysely";
 import { MAX_SQL_PARAMETERS } from "../database/sql-collection.js";
-import {
-  CHECK_IDS,
-  checkIsUserPremium,
-  FREE_NOTEBOOKS_LIMIT
-} from "../common.js";
+import { withSubNotebooks } from "./notebooks.js";
 
 export default class Trash {
   collections = ["notes", "notebooks"] as const;
@@ -79,7 +75,8 @@ export default class Trash {
     for (const { id, itemType, deletedBy } of result) {
       if (itemType === "note") {
         this.cache.notes.push(id);
-        if (deletedBy === "user") this.userDeletedCache.notes.push(id);
+        if (deletedBy === "user" || deletedBy === "expired")
+          this.userDeletedCache.notes.push(id);
       } else if (itemType === "notebook") {
         this.cache.notebooks.push(id);
         if (deletedBy === "user") this.userDeletedCache.notebooks.push(id);
@@ -89,7 +86,10 @@ export default class Trash {
 
   async cleanup() {
     const duration = this.db.settings.getTrashCleanupInterval();
-    if (duration === -1 || !duration) return;
+    if (duration === -1 || !duration) {
+      await this.buildCache();
+      return;
+    }
 
     const maxMs = dayjs()
       .startOf("day")
@@ -139,7 +139,8 @@ export default class Trash {
         deletedBy
       });
       this.cache.notes.push(...ids);
-      if (deletedBy === "user") this.userDeletedCache.notes.push(...ids);
+      if (deletedBy === "user" || deletedBy === "expired")
+        this.userDeletedCache.notes.push(...ids);
     } else if (type === "notebook") {
       await this.db.notebooks.collection.update(ids, {
         type: "trash",
@@ -201,13 +202,6 @@ export default class Trash {
     }
 
     if (notebookIds.length > 0) {
-      const notebooksLimitReached =
-        (await this.db.notebooks.all.count()) + notebookIds.length >
-        FREE_NOTEBOOKS_LIMIT;
-      const isUserPremium = await checkIsUserPremium(CHECK_IDS.notebookAdd);
-      if (notebooksLimitReached && !isUserPremium) {
-        return false;
-      }
       const ids = [...notebookIds, ...(await this.subNotebooks(notebookIds))];
       await this.db.notebooks.collection.update(ids, {
         type: "notebook",
@@ -234,7 +228,7 @@ export default class Trash {
   //   } else return true;
   // }
 
-  async all(deletedBy?: TrashItem["deletedBy"]) {
+  async all(deletedBy?: TrashItem["deletedBy"][]) {
     return [
       ...(await this.trashedNotes(this.cache.notes, deletedBy)),
       ...(await this.trashedNotebooks(this.cache.notebooks, deletedBy))
@@ -247,7 +241,7 @@ export default class Trash {
 
   private async trashedNotes(
     ids: string[],
-    deletedBy?: TrashItem["deletedBy"]
+    deletedBy?: TrashItem["deletedBy"][]
   ) {
     if (ids.length <= 0) return [];
     return (await this.db
@@ -255,14 +249,14 @@ export default class Trash {
       .selectFrom("notes")
       .where("type", "==", "trash")
       .where("id", "in", ids)
-      .$if(!!deletedBy, (eb) => eb.where("deletedBy", "==", deletedBy))
+      .$if(!!deletedBy, (eb) => eb.where("deletedBy", "in", deletedBy))
       .selectAll()
       .execute()) as TrashItem[];
   }
 
   private async trashedNotebooks(
     ids: string[],
-    deletedBy?: TrashItem["deletedBy"]
+    deletedBy?: TrashItem["deletedBy"][]
   ) {
     if (ids.length <= 0) return [];
     return (await this.db
@@ -270,7 +264,7 @@ export default class Trash {
       .selectFrom("notebooks")
       .where("type", "==", "trash")
       .where("id", "in", ids)
-      .$if(!!deletedBy, (eb) => eb.where("deletedBy", "==", deletedBy))
+      .$if(!!deletedBy, (eb) => eb.where("deletedBy", "in", deletedBy))
       .selectAll()
       .execute()) as TrashItem[];
   }
@@ -324,27 +318,11 @@ export default class Trash {
   }
 
   private async subNotebooks(notebookIds: string[]) {
-    const ids = await this.db
-      .sql()
-      .withRecursive(`subNotebooks(id)`, (eb) =>
-        eb
-          .selectFrom((eb) =>
-            sql<{ id: string }>`(VALUES ${sql.join(
-              notebookIds.map((id) => eb.parens(sql`${id}`))
-            )})`.as("notebookIds")
-          )
-          .selectAll()
-          .unionAll((eb) =>
-            eb
-              .selectFrom(["relations", "subNotebooks"])
-              .select("relations.toId as id")
-              .where("toType", "==", "notebook")
-              .where("fromType", "==", "notebook")
-              .whereRef("fromId", "==", "subNotebooks.id")
-              .where("toId", "not in", this.userDeletedCache.notebooks)
-              .$narrowType<{ id: string }>()
-          )
-      )
+    const ids = await withSubNotebooks(
+      this.db.sql(),
+      notebookIds,
+      this.userDeletedCache.notebooks
+    )
       .selectFrom("subNotebooks")
       .select("id")
       .where("id", "not in", notebookIds)

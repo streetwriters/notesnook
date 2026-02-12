@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { store as noteStore } from "../stores/note-store";
+import { store as trashStore } from "../stores/trash-store";
 import { store as notebookStore } from "../stores/notebook-store";
 import { store as attachmentStore } from "../stores/attachment-store";
 import { store as reminderStore } from "../stores/reminder-store";
@@ -27,8 +28,13 @@ import { db } from "./db";
 import { showToast } from "../utils/toast";
 import Vault from "./vault";
 import { TaskManager } from "./task-manager";
-import { ConfirmDialog, showMultiDeleteConfirmation } from "../dialogs/confirm";
+import {
+  ConfirmDialog,
+  showMultiDeleteConfirmation,
+  showMultiPermanentDeleteConfirmation
+} from "../dialogs/confirm";
 import { strings } from "@notesnook/intl";
+import { checkFeature } from ".";
 
 async function moveNotesToTrash(ids: string[], confirm = true) {
   if (confirm && !(await showMultiDeleteConfirmation(ids.length))) return;
@@ -76,15 +82,8 @@ async function moveNotebooksToTrash(ids: string[]) {
 
   if (!result) return;
 
-  if (result.deleteContainingNotes) {
-    await Multiselect.moveNotesToTrash(
-      Array.from(
-        new Set(
-          (await Promise.all(ids.map((id) => db.notebooks.notes(id)))).flat()
-        )
-      ),
-      false
-    );
+  if (result.checks?.deleteContainingNotes) {
+    await Multiselect.moveNotesToTrash(await db.notebooks.notes(...ids), false);
   }
 
   await TaskManager.startTask({
@@ -182,10 +181,58 @@ async function deleteTags(ids: string[]) {
   showToast("success", strings.actions.deleted.tag(ids.length));
 }
 
+async function restoreItemsFromTrash(ids: string[]) {
+  if (!ids.length) return;
+
+  const notebookIds = ids.filter((id) => db.trash.cache.notebooks.includes(id));
+  if (
+    !(await checkFeature("notebooks", {
+      value: (await db.notebooks.all.count()) + notebookIds.length
+    }))
+  )
+    return;
+
+  await TaskManager.startTask({
+    type: "status",
+    id: "restoreItems",
+    title: strings.inProgressActions.restoring.item(ids.length),
+    action: async (report) => {
+      report({
+        text: strings.inProgressActions.restoring.item(ids.length)
+      });
+      await trashStore.restore(...ids);
+    }
+  });
+
+  showToast("success", strings.actions.restored.item(ids.length));
+}
+
+async function deleteItemsFromTrash(ids: string[]) {
+  if (!ids.length) return;
+
+  if (!(await showMultiPermanentDeleteConfirmation(ids.length))) return;
+
+  await TaskManager.startTask({
+    type: "status",
+    id: "restoreItems",
+    title: strings.inProgressActions.permanentlyDeleting.item(ids.length),
+    action: async (report) => {
+      report({
+        text: strings.inProgressActions.permanentlyDeleting.item(ids.length)
+      });
+      await trashStore.delete(...ids);
+    }
+  });
+
+  showToast("success", strings.actions.permanentlyDeleted.item(ids.length));
+}
+
 export const Multiselect = {
   moveRemindersToTrash,
   moveNotebooksToTrash,
   moveNotesToTrash,
   deleteAttachments,
-  deleteTags
+  deleteTags,
+  restoreItemsFromTrash,
+  deleteItemsFromTrash
 };

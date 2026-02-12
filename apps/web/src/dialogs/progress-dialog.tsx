@@ -54,6 +54,7 @@ export const ProgressDialog = DialogManager.register(function ProgressDialog<T>(
   return (
     <Dialog
       isOpen={true}
+      testId="progress-dialog"
       title={props.title}
       description={props.subtitle}
       onClose={() => {}}

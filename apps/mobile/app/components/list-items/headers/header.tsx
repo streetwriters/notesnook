@@ -19,12 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
-import { View } from "react-native";
 import { useMessageStore } from "../../../stores/use-message-store";
-import { useSelectionStore } from "../../../stores/use-selection-store";
+import { RouteParams } from "../../../stores/use-navigation-store";
 import { Announcement } from "../../announcements/announcement";
 import { Card } from "../../list/card";
-import { RouteParams } from "../../../stores/use-navigation-store";
 
 export type ListHeaderProps = {
   noAnnouncement?: boolean;
@@ -44,12 +42,11 @@ export const Header = React.memo(
   }: ListHeaderProps) => {
     const { colors } = useThemeColors();
     const announcements = useMessageStore((state) => state.announcements);
-    const selectionMode = useSelectionStore((state) => state.selectionMode);
 
-    return selectionMode ? null : (
+    return (
       <>
         {announcements.length !== 0 && !noAnnouncement ? (
-          <Announcement color={color || colors.primary.accent} />
+          <Announcement />
         ) : (screen as any) === "Search" ? null : !shouldShow ? (
           <>
             {messageCard ? (

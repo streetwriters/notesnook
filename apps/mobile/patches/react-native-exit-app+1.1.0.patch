@@ -1,0 +1,19 @@
+diff --git a/node_modules/react-native-exit-app/android/build.gradle b/node_modules/react-native-exit-app/android/build.gradle
+index 9e38d30..35689c5 100644
+--- a/node_modules/react-native-exit-app/android/build.gradle
++++ b/node_modules/react-native-exit-app/android/build.gradle
+@@ -1,14 +1,3 @@
+-buildscript {
+-    repositories {
+-        jcenter()
+-        google()
+-    }
+-
+-    dependencies {
+-        classpath 'com.android.tools.build:gradle:3.1.4'
+-    }
+-}
+-
+ def safeExtGet(prop, fallback) {
+     rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+ }

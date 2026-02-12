@@ -36,6 +36,7 @@ import Migrations from "./migrations.js";
 import UserManager from "./user-manager.js";
 import http from "../utils/http.js";
 import { Monographs } from "./monographs.js";
+import { Monographs as MonographsCollection } from "../collections/monographs.js";
 import { Offers } from "./offers.js";
 import { Attachments } from "../collections/attachments.js";
 import { Debug } from "./debug.js";
@@ -80,6 +81,9 @@ import { createTriggers, dropTriggers } from "../database/triggers.js";
 import { NNMigrationProvider } from "../database/migrations.js";
 import { ConfigStorage } from "../database/config.js";
 import { LazyPromise } from "../utils/lazy-promise.js";
+import { InboxApiKeys } from "./inbox-api-keys.js";
+import { Circle } from "./circle.js";
+import { Wrapped } from "./wrapped.js";
 
 type EventSourceConstructor = new (
   uri: string,
@@ -91,6 +95,7 @@ type Options = {
   eventsource?: EventSourceConstructor;
   fs: IFileStorage;
   compressor: () => Promise<ICompressor>;
+  maxNoteVersions: () => Promise<number | undefined>;
   batchSize: number;
 };
 
@@ -188,7 +193,8 @@ class Database {
 
   tokenManager = new TokenManager(this.kv);
   mfa = new MFAManager(this.tokenManager);
-  subscriptions = new Subscriptions(this.tokenManager);
+  subscriptions = new Subscriptions(this);
+  circle = new Circle(this);
   offers = Offers;
   debug = new Debug();
   pricing = Pricing;
@@ -203,6 +209,7 @@ class Database {
   trash = new Trash(this);
   sanitizer = new Sanitizer(this.sql);
 
+  monographsCollection = new MonographsCollection(this);
   notebooks = new Notebooks(this);
   tags = new Tags(this);
   colors = new Colors(this);
@@ -215,6 +222,10 @@ class Database {
   notes = new Notes(this);
   vaults = new Vaults(this);
   settings = new Settings(this);
+
+  inboxApiKeys = new InboxApiKeys(this, this.tokenManager);
+
+  wrapped = new Wrapped(this);
 
   /**
    * @deprecated only kept here for migration purposes
@@ -277,15 +288,16 @@ class Database {
         "options not specified. Did you forget to call db.setup()?"
       );
 
-    EV.subscribeMulti(
-      [EVENTS.userLoggedIn, EVENTS.userFetched, EVENTS.tokenRefreshed],
+    this.eventManager.subscribeMulti(
+      [EVENTS.userLoggedIn, EVENTS.userFetched],
       this.connectSSE,
       this
     );
+    EV.subscribe(EVENTS.tokenRefreshed, () => this.connectSSE());
     EV.subscribe(EVENTS.attachmentDeleted, async (attachment: Attachment) => {
       await this.fs().cancel(attachment.hash);
     });
-    EV.subscribe(EVENTS.userLoggedOut, async () => {
+    this.eventManager.subscribe(EVENTS.userLoggedOut, async () => {
       await this.monographs.clear();
       await this.fs().clear();
       this.disconnectSSE();
@@ -329,6 +341,7 @@ class Database {
     await this.relations.init();
     await this.notes.init();
     await this.vaults.init();
+    await this.monographsCollection.init();
 
     await this.trash.init();
 
@@ -376,11 +389,11 @@ class Database {
       });
 
       this.eventSource.onopen = async () => {
-        console.log("SSE: opened channel successfully!");
+        logger.log("SSE: opened channel successfully!");
       };
 
       this.eventSource.onerror = function (error) {
-        console.log("SSE: error:", error);
+        logger.error(error, "SSE: error");
       };
 
       this.eventSource.onmessage = async (event) => {
@@ -393,7 +406,7 @@ class Database {
               if (!user) break;
               user.subscription = data;
               await this.user.setUser(user);
-              EV.publish(EVENTS.userSubscriptionUpdated, data);
+              this.eventManager.publish(EVENTS.userSubscriptionUpdated, data);
               await this.tokenManager._refreshToken(true);
               break;
             }
@@ -404,12 +417,12 @@ class Database {
             case "emailConfirmed": {
               await this.tokenManager._refreshToken(true);
               await this.user.fetchUser();
-              EV.publish(EVENTS.userEmailConfirmed);
+              this.eventManager.publish(EVENTS.userEmailConfirmed);
               break;
             }
           }
         } catch (e) {
-          console.log("SSE: Unsupported message. Message = ", event.data);
+          logger.error("SSE: Unsupported message. Message = ", event.data);
           return;
         }
       };
@@ -440,6 +453,7 @@ class Database {
       hosts.SUBSCRIPTIONS_HOST || Hosts.SUBSCRIPTIONS_HOST;
     Hosts.ISSUES_HOST = hosts.ISSUES_HOST || Hosts.ISSUES_HOST;
     Hosts.MONOGRAPH_HOST = hosts.MONOGRAPH_HOST || Hosts.MONOGRAPH_HOST;
+    Hosts.NOTESNOOK_HOST = hosts.NOTESNOOK_HOST || Hosts.NOTESNOOK_HOST;
   }
 
   version() {

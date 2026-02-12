@@ -50,8 +50,10 @@ import {
 } from "../../utils/notebooks";
 import { DefaultAppStyles } from "../../utils/styles";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
-import { eSendEvent } from "../../services/event-manager";
+import { eSendEvent, ToastManager } from "../../services/event-manager";
 import { eUpdateNotebookRoute } from "../../utils/events";
+import { isFeatureAvailable } from "@notesnook/common";
+import PaywallSheet from "../../components/sheets/paywall";
 
 const {
   useNotebookExpandedStore,
@@ -61,12 +63,12 @@ const {
 
 export const MoveNotebook = (props: NavigationProps<"MoveNotebook">) => {
   const selectedNotebooks = props.route.params.selectedNotebooks;
-  const searchTimer = useRef<NodeJS.Timeout>();
+  const searchTimer = useRef<NodeJS.Timeout>(undefined);
   const [notebooks, loading] = useNotebooks();
   const { colors } = useThemeColors();
   useNavigationFocus(props.navigation, { focusOnInit: true });
   const tree = useNotebookTreeStore((state) => state.tree);
-  const lastQuery = React.useRef<string>();
+  const lastQuery = React.useRef<string>(undefined);
   const [filteredNotebooks, setFilteredNotebooks] = React.useState(notebooks);
   const [filteredTree, setFilteredTree] = React.useState<TreeItem[]>([]);
   const [moveToTopEnabled, setMoveToTopEnabled] = useState(false);
@@ -239,7 +241,22 @@ export const MoveNotebook = (props: NavigationProps<"MoveNotebook">) => {
               }}
               button={{
                 icon: "plus",
-                onPress: () => {
+                onPress: async () => {
+                  const notebooksFeature =
+                    await isFeatureAvailable("notebooks");
+                  if (!notebooksFeature.isAllowed) {
+                    ToastManager.show({
+                      message: notebooksFeature.error,
+                      type: "info",
+                      context: "local",
+                      actionText: strings.upgrade(),
+                      func: () => {
+                        ToastManager.hide();
+                        PaywallSheet.present(notebooksFeature);
+                      }
+                    });
+                    return;
+                  }
                   AddNotebookSheet.present(
                     undefined,
                     undefined,
@@ -328,6 +345,8 @@ const NotebookItemWrapper = React.memo(
     const expanded = useNotebookExpandedStore(
       (state) => state.expanded[item.notebook.id]
     );
+    const disableExpand = useNotebookTreeStore((state) => state.isSearching);
+
     const selectionEnabled = useNotebookSelectionStore(
       (state) => state.enabled
     );
@@ -378,13 +397,28 @@ const NotebookItemWrapper = React.memo(
               useNotebookTreeStore.getState().removeChildren(item.notebook.id);
             }
           }}
+          disableExpand={disableExpand}
           selected={selected}
           selectionEnabled={selectionEnabled}
           selectionStore={useNotebookSelectionStore}
           onItemUpdate={onItemUpdate}
           focused={false}
           onPress={onPress}
-          onAddNotebook={() => {
+          onAddNotebook={async () => {
+            const notebooksFeature = await isFeatureAvailable("notebooks");
+            if (!notebooksFeature.isAllowed) {
+              ToastManager.show({
+                message: notebooksFeature.error,
+                type: "info",
+                context: "local",
+                actionText: strings.upgrade(),
+                func: () => {
+                  ToastManager.hide();
+                  PaywallSheet.present(notebooksFeature);
+                }
+              });
+              return;
+            }
             AddNotebookSheet.present(
               undefined,
               item.notebook,

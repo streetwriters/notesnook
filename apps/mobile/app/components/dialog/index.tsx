@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { TextInput, View, ViewStyle } from "react-native";
@@ -130,9 +129,17 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
 
   return visible && dialogInfo ? (
     <BaseDialog
-      statusBarTranslucent={false}
+      statusBarTranslucent={
+        dialogInfo.statusBarTranslucent === undefined
+          ? false
+          : dialogInfo.statusBarTranslucent
+      }
       bounce={!dialogInfo.input}
       closeOnTouch={!dialogInfo.disableBackdropClosing}
+      background={dialogInfo.background}
+      transparent={
+        dialogInfo.transparent === undefined ? true : dialogInfo.transparent
+      }
       onShow={async () => {
         if (dialogInfo.input) {
           inputRef.current?.setNativeProps({

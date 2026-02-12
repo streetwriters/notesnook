@@ -28,6 +28,7 @@ import { store as appStore } from "../stores/app-store";
 import { db } from "../common/db";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
+import { checkFeature } from "../common";
 
 type AddNotebookDialogProps = BaseDialogProps<boolean> & {
   parentId?: string;
@@ -118,6 +119,9 @@ export const AddNotebookDialog = DialogManager.register(
         />
       </Dialog>
     );
+  },
+  {
+    onBeforeOpen: (props) => (props.edit ? true : checkFeature("notebooks"))
   }
 );
 

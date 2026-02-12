@@ -83,6 +83,7 @@ import useTablet from "../../hooks/use-tablet";
 import { isMac } from "../../utils/platform";
 import { CREATE_BUTTON_MAP } from "../../common";
 import { getDragData } from "../../utils/data-transfer";
+import { saveContent } from "./index";
 
 type ToolButton = {
   title: string;
@@ -91,7 +92,7 @@ type ToolButton = {
   hidden?: boolean;
   hideOnMobile?: boolean;
   toggled?: boolean;
-  onClick: () => void;
+  onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 };
 
 export function EditorActionBar() {
@@ -147,18 +148,21 @@ export function EditorActionBar() {
       enabled:
         activeSession &&
         (activeSession.type === "default" || activeSession.type === "readonly"),
-      onClick: () =>
-        activeSession &&
-        (activeSession.type === "default" ||
-          activeSession.type === "readonly") &&
-        showPublishView(activeSession.note, "top")
+      onClick: (e) => {
+        if (
+          !activeSession ||
+          (activeSession.type !== "default" &&
+            activeSession.type !== "readonly")
+        )
+          return;
+        showPublishView(activeSession.note, e.target as HTMLElement);
+      }
     },
     {
       title: strings.toc(),
       icon: TableOfContents,
       enabled:
         activeSession &&
-        activeSession.type !== "new" &&
         activeSession.type !== "locked" &&
         activeSession.type !== "diff" &&
         activeSession.type !== "conflicted",
@@ -272,6 +276,7 @@ const TabStrip = React.memo(function TabStrip() {
   const currentTab = useEditorStore((store) => store.activeTabId);
   const canGoBack = useEditorStore((store) => store.canGoBack);
   const canGoForward = useEditorStore((store) => store.canGoForward);
+  const isFocusMode = useAppStore((store) => store.isFocusMode);
 
   return (
     <Flex sx={{ flex: 1 }}>
@@ -399,7 +404,15 @@ const TabStrip = React.memo(function TabStrip() {
                   isActive={tab.id === currentTab}
                   isPinned={!!tab.pinned}
                   isLocked={isLockedSession(session)}
+                  isRevealInListDisabled={isFocusMode}
                   type={session.type}
+                  onSave={() => {
+                    const { activeEditorId, getEditor } =
+                      useEditorManager.getState();
+                    const editor = getEditor(activeEditorId || "")?.editor;
+                    if (!editor) return;
+                    saveContent(session.id, false, editor.getContent());
+                  }}
                   onFocus={() => {
                     if (tab.id !== currentTab) {
                       useEditorStore.getState().activateSession(tab.sessionId);
@@ -471,6 +484,7 @@ type TabProps = {
   isPinned: boolean;
   isLocked: boolean;
   isUnsaved: boolean;
+  isRevealInListDisabled: boolean;
   type: SessionType;
   onFocus: () => void;
   onClose: () => void;
@@ -479,6 +493,7 @@ type TabProps = {
   onCloseToTheLeft: () => void;
   onCloseAll: () => void;
   onPin: () => void;
+  onSave: () => void;
   onRevealInList?: () => void;
 };
 function Tab(props: TabProps) {
@@ -489,6 +504,7 @@ function Tab(props: TabProps) {
     isPinned,
     isLocked,
     isUnsaved,
+    isRevealInListDisabled,
     type,
     onFocus,
     onClose,
@@ -497,7 +513,8 @@ function Tab(props: TabProps) {
     onCloseToTheRight,
     onCloseToTheLeft,
     onRevealInList,
-    onPin
+    onPin,
+    onSave
   } = props;
   const Icon = isLocked
     ? type === "locked"
@@ -574,6 +591,14 @@ function Tab(props: TabProps) {
         Menu.openMenu([
           {
             type: "button",
+            title: strings.save(),
+            key: "save",
+            onClick: onSave,
+            isHidden: !isUnsaved
+          },
+          { type: "separator", key: "sep0", isHidden: !isUnsaved },
+          {
+            type: "button",
             title: strings.close(),
             key: "close",
             onClick: onClose
@@ -602,13 +627,14 @@ function Tab(props: TabProps) {
             key: "close-all",
             onClick: onCloseAll
           },
-          { type: "separator", key: "sep" },
+          { type: "separator", key: "sep1" },
           {
             type: "button",
             title: strings.revealInList(),
             key: "reveal-in-list",
             onClick: onRevealInList,
-            isHidden: !onRevealInList
+            isHidden: !onRevealInList,
+            isDisabled: isRevealInListDisabled
           },
           { type: "separator", key: "sep2", isHidden: !onRevealInList },
           {

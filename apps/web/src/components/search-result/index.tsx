@@ -19,9 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { HighlightedResult } from "@notesnook/core";
 import { Button, Flex, Text } from "@theme-ui/components";
-import React, { useState } from "react";
+import React, { Fragment, useState } from "react";
 import { useEditorStore } from "../../stores/editor-store";
-
+import { useStore as useNoteStore } from "../../stores/note-store";
 import ListItem from "../list-item";
 import { ChevronDown, ChevronRight } from "../icons";
 import { noteMenuItems } from "../note";
@@ -38,6 +38,7 @@ function SearchResult(props: SearchResultProps) {
   const isOpened = useEditorStore((store) => store.isNoteOpen(item.id));
   const isExpandable = item.content.length > 0;
   const [isExpanded, setIsExpanded] = useState(isExpandable);
+  const isCompact = useNoteStore((store) => store.viewMode === "compact");
 
   if (!item.title.length && !item.content.length) return null;
   return (
@@ -60,7 +61,7 @@ function SearchResult(props: SearchResultProps) {
         }}
         title={
           <Flex sx={{ alignItems: "center", gap: "small" }}>
-            {isExpandable ? (
+            {isExpandable && !isCompact ? (
               <Button
                 variant="secondary"
                 sx={{
@@ -102,7 +103,7 @@ function SearchResult(props: SearchResultProps) {
                   whiteSpace: "nowrap",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
-                  fontWeight: "bold",
+                  fontWeight: isCompact ? "bold" : "bolder",
                   display: "block",
                   ".match": {
                     bg: "accent-secondary",
@@ -111,11 +112,11 @@ function SearchResult(props: SearchResultProps) {
                 }}
               >
                 {item.title.map((match) => (
-                  <>
+                  <Fragment key={match.id}>
                     <span>{match.prefix}</span>
                     <span className="match">{match.match}</span>
                     {match.suffix ? <span>{match.suffix}</span> : null}
-                  </>
+                  </Fragment>
                 ))}
               </Text>
 
@@ -134,7 +135,7 @@ function SearchResult(props: SearchResultProps) {
           mx: 1
         }}
       />
-      {isExpanded
+      {isExpanded && !isCompact
         ? item.content.map((match, index) => (
             <ListItem
               key={`${item.id}${index}`}
@@ -145,14 +146,14 @@ function SearchResult(props: SearchResultProps) {
                 useEditorStore.getState().openSession(item.id, {
                   rawContent: item.rawContent,
                   force: true,
-                  activeSearchResultIndex: findSelectedMatchIndex(item, index)
+                  activeSearchResultId: match[0].id
                 });
               }}
               onMiddleClick={() => {
                 useEditorStore.getState().openSession(item.id, {
                   openInNewTab: true,
                   rawContent: item.rawContent,
-                  activeSearchResultIndex: findSelectedMatchIndex(item, index)
+                  activeSearchResultId: match[0].id
                 });
               }}
               title={
@@ -162,7 +163,6 @@ function SearchResult(props: SearchResultProps) {
                   color={isOpened ? "paragraph-selected" : "paragraph"}
                   sx={{
                     whiteSpace: "pre-wrap",
-                    fontWeight: "body",
                     display: "block",
                     ".match": {
                       bg: "accent-secondary",
@@ -171,11 +171,11 @@ function SearchResult(props: SearchResultProps) {
                   }}
                 >
                   {match.map((match) => (
-                    <>
+                    <Fragment key={match.id}>
                       <span>{match.prefix}</span>
                       <span className="match">{match.match}</span>
                       {match.suffix ? <span>{match.suffix}</span> : null}
-                    </>
+                    </Fragment>
                   ))}
                 </Text>
               }
@@ -214,12 +214,4 @@ async function menuItems(
     )?.locked,
     color: colors[0]
   });
-}
-
-function findSelectedMatchIndex(item: HighlightedResult, matchIndex: number) {
-  let activeIndex = 0;
-  for (let i = 0; i <= matchIndex - 1; ++i) {
-    activeIndex += item.content[i].length;
-  }
-  return activeIndex;
 }

@@ -32,7 +32,6 @@ import React, {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TextInput, View, useWindowDimensions } from "react-native";
 import { ActionSheetRef } from "react-native-actions-sheet";
-import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import { useDBItem } from "../../hooks/use-db-item";
@@ -53,6 +52,8 @@ import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../utils/styles";
 import { Header } from "../../components/header";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
+import { isFeatureAvailable } from "@notesnook/common";
+import { LegendList } from "@legendapp/list";
 
 async function updateInitialSelectionState(items: string[]) {
   const relations = await db.relations
@@ -112,7 +113,7 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
     if (query && query.trim() !== "") {
       db.lookup
         .tags(query)
-        .sorted()
+        .sorted(db.settings.getGroupOptions("tags"))
         .then((items) => {
           setTags(items);
         });
@@ -152,11 +153,22 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
         v.and([v(`title`, "==", tag)])
       );
 
-      const id = exists
-        ? exists?.id
-        : await db.tags.add({
-            title: tag
+      let id = exists?.id;
+
+      if (!id) {
+        const tagsFeature = await isFeatureAvailable("tags");
+        if (!tagsFeature.isAllowed) {
+          ToastManager.show({
+            message: tagsFeature.error,
+            type: "info",
+            context: "local"
           });
+          return;
+        }
+        id = await db.tags.add({
+          title: tag
+        });
+      }
 
       if (id) {
         for (const noteId of ids) {
@@ -245,13 +257,16 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
         width: "100%",
         alignSelf: "center",
         backgroundColor: colors.primary.background,
-        gap: DefaultAppStyles.GAP_VERTICAL
+        gap: DefaultAppStyles.GAP_VERTICAL,
+        flex: 1
       }}
     >
       <Header title={strings.manageTags()} canGoBack />
+
       <View
         style={{
-          paddingHorizontal: DefaultAppStyles.GAP
+          paddingHorizontal: DefaultAppStyles.GAP,
+          flex: 1
         }}
       >
         <Input
@@ -305,13 +320,12 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
 
         <View
           style={{
-            width: "100%",
-            flexGrow: 1,
-            height: "100%"
+            flex: 1
           }}
         >
-          <FlashList
-            data={tags?.placeholders}
+          <LegendList
+            data={tags?.placeholders || []}
+            extraData={tags}
             keyboardShouldPersistTaps
             keyboardDismissMode="interactive"
             estimatedItemSize={50}
@@ -367,9 +381,8 @@ const TagItem = ({
     tag?.id ? state.selection[tag?.id] : false
   );
 
-  return !tag ? null : (
+  return (
     <Pressable
-      key={tag?.id}
       style={{
         flexDirection: "row",
         marginVertical: 5,
@@ -401,15 +414,15 @@ const TagItem = ({
             selection === "selected"
               ? "check-circle-outline"
               : selection === "intermediate"
-              ? "minus-circle-outline"
-              : "checkbox-blank-circle-outline"
+                ? "minus-circle-outline"
+                : "checkbox-blank-circle-outline"
           }
           name={
             selection === "selected"
               ? "check-circle-outline"
               : selection === "intermediate"
-              ? "minus-circle-outline"
-              : "checkbox-blank-circle-outline"
+                ? "minus-circle-outline"
+                : "checkbox-blank-circle-outline"
           }
         />
       )}

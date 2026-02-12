@@ -22,9 +22,11 @@ import Config from "react-native-config";
 import { Sound } from "react-native-notification-sounds";
 import { initialWindowMetrics } from "react-native-safe-area-context";
 import { FileType } from "react-native-scoped-storage";
-import create, { State } from "zustand";
+import { create } from "zustand";
 import { ThemeDark, ThemeLight, ThemeDefinition } from "@notesnook/theme";
-import { Reminder } from "@notesnook/core";
+import { DayFormat, WeekFormat, Reminder } from "@notesnook/core";
+import { db } from "../common/database";
+import { EDITOR_LINE_HEIGHT } from "../utils/constants";
 export const HostIds = [
   "API_HOST",
   "AUTH_HOST",
@@ -99,6 +101,7 @@ export type Settings = {
   serverUrls?: Record<HostId, string>;
   defaultSidebarTab: number;
   checkForUpdates?: boolean;
+  defaultLineHeight: number;
 };
 
 type DimensionsType = {
@@ -113,7 +116,7 @@ type Insets = {
   bottom: number;
 };
 
-export interface SettingStore extends State {
+export interface SettingStore {
   settings: Settings;
   fullscreen: boolean;
   deviceMode: string | null;
@@ -134,8 +137,12 @@ export interface SettingStore extends State {
   setInsets: (insets: Insets) => void;
   timeFormat: string;
   dateFormat: string;
+  dayFormat: DayFormat;
+  weekFormat: WeekFormat;
   dbPassword?: string;
   isOldAppLock: () => boolean;
+  initialUrl: string | null;
+  refresh: () => void;
 }
 
 const { width, height } = Dimensions.get("window");
@@ -198,7 +205,8 @@ export const defaultSettings: SettingStore["settings"] = {
   backupType: "partial",
   fullBackupReminder: "never",
   lastFullBackupDate: 0,
-  checkForUpdates: true
+  checkForUpdates: true,
+  defaultLineHeight: EDITOR_LINE_HEIGHT.DEFAULT
 };
 
 export const useSettingStore = create<SettingStore>((set, get) => ({
@@ -221,6 +229,8 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
   setInsets: (insets) => set({ insets }),
   timeFormat: "12-hour",
   dateFormat: "DD-MM-YYYY",
+  dayFormat: "short",
+  weekFormat: "Sun",
   setAppDidEnterBackgroundForAction: (value: boolean) => {
     set({
       appDidEnterBackgroundForAction: value
@@ -236,5 +246,14 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
   },
   insets: initialWindowMetrics?.insets
     ? initialWindowMetrics.insets
-    : { top: 0, right: 0, left: 0, bottom: 0 }
+    : { top: 0, right: 0, left: 0, bottom: 0 },
+  initialUrl: null,
+  refresh: () => {
+    set({
+      dayFormat: db.settings.getDayFormat(),
+      timeFormat: db.settings.getTimeFormat(),
+      dateFormat: db.settings?.getTimeFormat(),
+      weekFormat: db.settings.getWeekFormat()
+    });
+  }
 }));

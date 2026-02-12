@@ -44,6 +44,9 @@ import Paragraph from "../../components/ui/typography/paragraph";
 import { AddNotebookSheet } from "../../components/sheets/add-notebook";
 import { Notice } from "../../components/ui/notice";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
+import { isFeatureAvailable } from "@notesnook/common";
+import { ToastManager } from "../../services/event-manager";
+import PaywallSheet from "../../components/sheets/paywall";
 
 const {
   useNotebookExpandedStore,
@@ -94,7 +97,7 @@ const LinkNotebooks = (props: NavigationProps<"LinkNotebooks">) => {
   const [notebooks, loading] = useNotebooks();
   const tree = useNotebookTreeStore((state) => state.tree);
   const searchQuery = useRef("");
-  const searchTimer = useRef<NodeJS.Timeout>();
+  const searchTimer = useRef<NodeJS.Timeout>(undefined);
   const [filteredNotebooks, setFilteredNotebooks] = React.useState(notebooks);
 
   useNavigationFocus(props.navigation, { focusOnInit: true });
@@ -233,7 +236,22 @@ const LinkNotebooks = (props: NavigationProps<"LinkNotebooks">) => {
               }}
               button={{
                 icon: "plus",
-                onPress: () => {
+                onPress: async () => {
+                  const notebooksFeature =
+                    await isFeatureAvailable("notebooks");
+                  if (!notebooksFeature.isAllowed) {
+                    ToastManager.show({
+                      message: notebooksFeature.error,
+                      type: "info",
+                      context: "local",
+                      actionText: strings.upgrade(),
+                      func: () => {
+                        ToastManager.hide();
+                        PaywallSheet.present(notebooksFeature);
+                      }
+                    });
+                    return;
+                  }
                   AddNotebookSheet.present(
                     undefined,
                     undefined,
@@ -281,7 +299,12 @@ const LinkNotebooks = (props: NavigationProps<"LinkNotebooks">) => {
       />
 
       {hasSelection ? (
-        <FloatingButton icon="check" alwaysVisible onPress={() => onSave()} />
+        <FloatingButton
+          testID="floating-save-button"
+          icon="check"
+          alwaysVisible
+          onPress={() => onSave()}
+        />
       ) : null}
     </SafeAreaView>
   );
@@ -300,6 +323,8 @@ const NotebookItemWrapper = React.memo(
     const expanded = useNotebookExpandedStore(
       (state) => state.expanded[item.notebook.id]
     );
+    const disableExpand = useNotebookTreeStore((state) => state.isSearching);
+
     const selectionEnabled = useNotebookSelectionStore(
       (state) => state.enabled
     );
@@ -362,8 +387,8 @@ const NotebookItemWrapper = React.memo(
                 !selected
                   ? "selected"
                   : !state.initialState[item.notebook.id]
-                  ? undefined
-                  : "deselected"
+                    ? undefined
+                    : "deselected"
               );
           }}
           canDisableSelectionMode={false}
@@ -371,9 +396,24 @@ const NotebookItemWrapper = React.memo(
           selectionEnabled={selectionEnabled}
           selectionStore={useNotebookSelectionStore}
           onItemUpdate={onItemUpdate}
+          disableExpand={disableExpand}
           focused={false}
           onPress={onPress}
-          onAddNotebook={() => {
+          onAddNotebook={async () => {
+            const notebooksFeature = await isFeatureAvailable("notebooks");
+            if (!notebooksFeature.isAllowed) {
+              ToastManager.show({
+                message: notebooksFeature.error,
+                type: "info",
+                context: "local",
+                actionText: strings.upgrade(),
+                func: () => {
+                  ToastManager.hide();
+                  PaywallSheet.present(notebooksFeature);
+                }
+              });
+              return;
+            }
             AddNotebookSheet.present(
               undefined,
               item.notebook,

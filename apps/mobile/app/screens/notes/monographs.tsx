@@ -62,9 +62,9 @@ Monographs.get = async (params?: NotesScreenParams, grouped = true) => {
 
 Monographs.navigate = (canGoBack?: boolean) => {
   Navigation.navigate<"Monographs">("Monographs", {
-    item: { type: "monograph" } as any,
-    canGoBack: canGoBack as boolean,
-    title: strings.dataTypesPluralCamelCase.monograph()
+    type: "monograph",
+    id: "monograph",
+    canGoBack: canGoBack as boolean
   });
 };
 export default Monographs;

@@ -21,12 +21,10 @@ import { SerializedKey } from "@notesnook/crypto";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { db } from "../../common/db";
 import { TaskManager } from "../../common/task-manager";
-import { isUserPremium } from "../../hooks/use-is-user-premium";
 import { showToast } from "../../utils/toast";
 import { showFilePicker } from "../../utils/file-picker";
 import { Attachment } from "@notesnook/editor";
 import { ImagePickerDialog } from "../../dialogs/image-picker-dialog";
-import { BuyDialog } from "../../dialogs/buy-dialog";
 import { strings } from "@notesnook/intl";
 import {
   getUploadedFileSize,
@@ -36,30 +34,21 @@ import {
 import Config from "../../utils/config";
 import { compressImage, FileWithURI } from "../../utils/image-compressor";
 import { ImageCompressionOptions } from "../../stores/setting-store";
-
-const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
-const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
+import { checkFeature } from "../../common";
 
 export async function insertAttachments(type = "*/*") {
-  if (!isUserPremium()) {
-    await BuyDialog.show({});
-    return;
-  }
-
   const files = await showFilePicker({
     acceptedFileTypes: type || "*/*",
     multiple: true
   });
   if (!files) return;
-  return await attachFiles(files);
+  return await attachFiles(files, type === "*/*");
 }
 
-export async function attachFiles(files: File[]) {
-  if (!isUserPremium()) {
-    await BuyDialog.show({});
-    return;
-  }
-
+export async function attachFiles(
+  files: File[],
+  skipSpecialImageHandling = false
+) {
   let images = files.filter((f) => f.type.startsWith("image/"));
   const imageCompressionConfig = Config.get<ImageCompressionOptions>(
     "imageCompression",
@@ -68,7 +57,7 @@ export async function attachFiles(files: File[]) {
 
   switch (imageCompressionConfig) {
     case ImageCompressionOptions.ENABLE: {
-      let compressedImages: FileWithURI[] = [];
+      const compressedImages: FileWithURI[] = [];
       for (const image of images) {
         const compressed = await compressImage(image, {
           maxWidth: (naturalWidth) => Math.min(1920, naturalWidth * 0.7),
@@ -102,7 +91,7 @@ export async function attachFiles(files: File[]) {
   const audios = files.filter((f) => f.type.startsWith("audio/"));
   const attachments: Attachment[] = [];
   for (const file of [...images, ...documents, ...audios]) {
-    const attachment = file.type.startsWith("image/")
+    const attachment = !skipSpecialImageHandling && file.type.startsWith("image/")
       ? await pickImage(file)
       : file.type.startsWith("audio/")
       ? await pickAudio(file)
@@ -149,8 +138,7 @@ async function pickFile(
   options?: AddAttachmentOptions
 ): Promise<Attachment | undefined> {
   try {
-    if (file.size > FILE_SIZE_LIMIT)
-      throw new Error(strings.fileTooLargeDesc(500));
+    if (!(await checkFeature("fileSize", { value: file.size }))) return;
 
     const hash = await addAttachment(file, options);
     return {
@@ -175,9 +163,7 @@ async function pickImage(
   options?: AddAttachmentOptions
 ): Promise<Attachment | undefined> {
   try {
-    if (file.size > IMAGE_SIZE_LIMIT)
-      throw new Error(strings.imageTooLarge(50));
-    if (!file) return;
+    if (!(await checkFeature("fileSize", { value: file.size }))) return;
 
     const hash = await addAttachment(file, options);
     const dimensions = await getImageDimensions(file);

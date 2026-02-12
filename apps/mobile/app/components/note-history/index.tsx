@@ -20,25 +20,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { RefObject, useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 
+import { LegendList } from "@legendapp/list";
 import { getFormattedDate, getTimeAgo } from "@notesnook/common";
 import { HistorySession, Note, VirtualizedGrouping } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import { ActionSheetRef } from "react-native-actions-sheet";
-import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
+import { ActionSheetRef, ScrollView } from "react-native-actions-sheet";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import { useDBItem } from "../../hooks/use-db-item";
 import { presentSheet } from "../../services/event-manager";
 import { openLinkInBrowser } from "../../utils/functions";
 import { AppFontSize } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 import DialogHeader from "../dialog/dialog-header";
 import SheetProvider from "../sheet-provider";
 import { Pressable } from "../ui/pressable";
 import Seperator from "../ui/seperator";
 import Paragraph from "../ui/typography/paragraph";
 import NotePreview from "./preview";
-import { strings } from "@notesnook/intl";
-import { DefaultAppStyles } from "../../utils/styles";
 
 const HistoryItem = ({
   index,
@@ -47,7 +47,7 @@ const HistoryItem = ({
 }: {
   index: number;
   items?: VirtualizedGrouping<HistorySession>;
-  note?: Note;
+  note: Note;
 }) => {
   const [item] = useDBItem(index, "noteHistory", items);
   const { colors } = useThemeColors();
@@ -73,6 +73,7 @@ const HistoryItem = ({
             session: getDate(item.dateCreated, item.dateModified)
           }}
           content={content}
+          note={note}
         />
       ),
       context: "note_history"
@@ -135,7 +136,7 @@ export default function NoteHistory({
 
   const renderItem = useCallback(
     ({ index }: { index: number }) => (
-      <HistoryItem index={index} items={history} />
+      <HistoryItem index={index} items={history} note={note} />
     ),
     [history]
   );
@@ -156,9 +157,11 @@ export default function NoteHistory({
           maxHeight: "100%"
         }}
       >
-        <FlashList
-          data={history?.placeholders}
+        <LegendList
+          renderScrollComponent={(props) => <ScrollView {...props} />}
+          data={history?.placeholders || []}
           estimatedItemSize={55}
+          extraData={history}
           ListEmptyComponent={
             <View
               style={{

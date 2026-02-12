@@ -22,7 +22,7 @@ import {
 } from "@notesnook/common";
 import { getId } from "@notesnook/core";
 import { MMKVLoader } from "react-native-mmkv-storage";
-import create from "zustand";
+import { create } from "zustand";
 import { persist, StateStorage } from "zustand/middleware";
 import { db } from "../../../common/database";
 import { MMKV } from "../../../common/database/mmkv";
@@ -98,7 +98,7 @@ class TabSessionStorage {
 
   static get(id: string): TabSessionItem | null {
     if (!id) return null;
-    return TabSessionStorage.storage.getMap(id);
+    return TabSessionStorage.storage.getMap(id) || null;
   }
 
   static set(id: string, session: TabSessionItem): void {
@@ -229,7 +229,7 @@ export function resetTabStore() {
   TabSessionStorage.storage.clearStore();
 }
 
-export const useTabStore = create<TabStore>(
+export const useTabStore = create<TabStore, any>(
   persist(
     (set, get) => ({
       ...DEFAULT_TABS,

@@ -18,7 +18,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { ISodium } from "@notesnook/sodium";
-import { EncryptionKey, SerializedKey } from "./types.js";
+import {
+  EncryptionKey,
+  EncryptionKeyPair,
+  SerializedKey,
+  SerializedKeyPair
+} from "./types.js";
+
+export enum base64_variants {
+  ORIGINAL = 1,
+  ORIGINAL_NO_PADDING = 3,
+  URLSAFE = 5,
+  URLSAFE_NO_PADDING = 7
+}
 
 export default class KeyUtils {
   static deriveKey(
@@ -51,6 +63,14 @@ export default class KeyUtils {
     };
   }
 
+  static deriveKeyPair(sodium: ISodium): EncryptionKeyPair {
+    const keypair = sodium.crypto_box_keypair();
+    return {
+      publicKey: keypair.publicKey,
+      privateKey: keypair.privateKey
+    };
+  }
+
   static exportKey(
     sodium: ISodium,
     password: string,
@@ -58,6 +78,14 @@ export default class KeyUtils {
   ): SerializedKey {
     const { key, salt: keySalt } = this.deriveKey(sodium, password, salt);
     return { key: sodium.to_base64(key), salt: keySalt };
+  }
+
+  static exportKeyPair(sodium: ISodium): SerializedKeyPair {
+    const { publicKey, privateKey } = this.deriveKeyPair(sodium);
+    return {
+      publicKey: sodium.to_base64(publicKey),
+      privateKey: sodium.to_base64(privateKey)
+    };
   }
 
   /**

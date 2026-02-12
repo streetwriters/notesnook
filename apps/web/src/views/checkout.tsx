@@ -20,8 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import "../app.css";
 import { useEffect, useState } from "react";
 import { Box, Button, Flex, Text } from "@theme-ui/components";
-import { hardNavigate, useQueryParams } from "../navigation";
-import { Check, Coupon, Support } from "../components/icons";
+import { hardNavigate, hashNavigate, useQueryParams } from "../navigation";
+import { Support } from "../components/icons";
 import { HeadlessAuth } from "./auth";
 import {
   CheckoutCompleted,
@@ -31,16 +31,23 @@ import {
 import { useCheckoutStore } from "../dialogs/buy-dialog/store";
 import { useStore as useUserStore } from "../stores/user-store";
 import { z } from "zod";
-import { PricingInfo } from "../dialogs/buy-dialog/types";
-import IconTag from "../components/icon-tag";
-import { SUBSCRIPTION_STATUS } from "../common/constants";
+import {
+  FEATURE_HIGHLIGHTS,
+  toPricingInfo
+} from "../dialogs/buy-dialog/helpers";
+import { isUserSubscribed } from "../hooks/use-is-user-premium";
+import { PLAN_METADATA } from "../dialogs/buy-dialog/plans";
+import { planToAvailability } from "@notesnook/common";
+import { FeatureCaption } from "../dialogs/buy-dialog/feature-caption";
+import { EV, EVENTS } from "@notesnook/core";
 
-export type Period = "yearly" | "monthly" | "education";
 export type Plan = z.infer<typeof PlanSchema>;
 
 const PlanSchema = z.object({
   id: z.string(),
-  period: z.enum(["yearly", "monthly", "education"]),
+  period: z.enum(["yearly", "monthly", "5-year"]),
+  plan: z.number(),
+  recurring: z.boolean(),
   price: z.object({
     gross: z.number(),
     net: z.number(),
@@ -49,12 +56,14 @@ const PlanSchema = z.object({
   }),
   currency: z.string(),
   currencySymbol: z.string().optional(),
-  originalPrice: z.object({
-    gross: z.number(),
-    net: z.number(),
-    tax: z.number(),
-    currency: z.string().optional()
-  }),
+  originalPrice: z
+    .object({
+      gross: z.number(),
+      net: z.number(),
+      tax: z.number(),
+      currency: z.string().optional()
+    })
+    .optional(),
   discount: z
     .object({
       type: z.enum(["regional", "promo"]),
@@ -63,28 +72,15 @@ const PlanSchema = z.object({
       amount: z.number()
     })
     .optional(),
-  country: z.string()
+  country: z.string(),
+  transactionId: z.string().optional(),
+  customer: z
+    .object({
+      id: z.string(),
+      email: z.string()
+    })
+    .optional()
 });
-
-function toPricingInfo(plan: Plan): PricingInfo {
-  return {
-    country: plan.country,
-    currency: plan.currency,
-    discount: plan.discount
-      ? {
-          amount: plan.originalPrice.gross - plan.price.gross,
-          recurring: plan.discount.recurring,
-          type: plan.discount.type,
-          code: plan.discount.code
-        }
-      : { amount: 0, recurring: false, type: "promo" },
-    period: plan.period,
-    price: plan.originalPrice,
-    recurringPrice: plan.originalPrice,
-    coupon: plan.discount?.code,
-    invalidCoupon: false
-  };
-}
 
 const CHECKOUT_STEPS = ["Account", "Payment", "Complete"];
 function Checkout() {
@@ -92,20 +88,15 @@ function Checkout() {
 
   const [currentStep, setCurrentStep] = useState(0);
   const [error, setError] = useState<string>();
-  const user = useUserStore((store) => store.user);
-  const isCheckoutCompleted = useCheckoutStore((store) => store.isCompleted);
-
-  useEffect(() => {
-    if (isCheckoutCompleted) {
-      setCurrentStep(2);
-    }
-  }, [isCheckoutCompleted]);
+  const [customer, setCustomer] = useState<{ id: string; email: string }>();
 
   useEffect(() => {
     useUserStore.getState().init();
   }, []);
 
   useEffect(() => {
+    if (!plan) return;
+
     const pricingInfo = PlanSchema.safeParse(
       JSON.parse(Buffer.from(plan, "base64").toString("utf-8"))
     );
@@ -114,9 +105,28 @@ function Checkout() {
       return;
     }
     useCheckoutStore.getState().selectPlan(pricingInfo.data);
-    useCheckoutStore.getState().updatePrice(toPricingInfo(pricingInfo.data));
+    useCheckoutStore
+      .getState()
+      .updatePrice(
+        toPricingInfo(pricingInfo.data, useUserStore.getState().user)
+      );
     useCheckoutStore.getState().applyCoupon(pricingInfo.data.discount?.code);
+    if (pricingInfo.data.customer) {
+      setCustomer(pricingInfo.data.customer);
+      setCurrentStep(1);
+    }
   }, [plan]);
+
+  useEffect(() => {
+    if (currentStep === 2) {
+      const event = EV.subscribe(EVENTS.userSubscriptionUpdated, () => {
+        hardNavigate("/notes#/welcome");
+      });
+      return () => {
+        event.unsubscribe();
+      };
+    }
+  }, [currentStep]);
 
   if (!plan) {
     hardNavigate("/");
@@ -140,21 +150,23 @@ function Checkout() {
           px: 2
         }}
       >
-        <Flex sx={{ alignItems: "center", justifyContent: "center", gap: 2 }}>
-          <svg
-            style={{
-              borderRadius: "default",
-              height: 50,
-              width: 30,
-              alignSelf: "start"
-            }}
-          >
-            <use href="#full-logo" />
-          </svg>
-          <Text variant="heading" sx={{ fontSize: 20 }}>
-            Notesnook
-          </Text>
-        </Flex>
+        <a href="/" style={{ textDecoration: "none" }}>
+          <Flex sx={{ alignItems: "center", justifyContent: "center", gap: 2 }}>
+            <svg
+              style={{
+                borderRadius: "default",
+                height: 50,
+                width: 30,
+                alignSelf: "start"
+              }}
+            >
+              <use href="#full-logo" />
+            </svg>
+            <Text variant="heading" sx={{ fontSize: 20 }}>
+              Notesnook
+            </Text>
+          </Flex>
+        </a>
         <Button
           variant="secondary"
           sx={{ display: "flex", alignItems: "center", gap: 1 }}
@@ -242,11 +254,8 @@ function Checkout() {
                   if (ctx?.authenticated) {
                     await useUserStore.getState().init();
                     const user = useUserStore.getState().user;
-                    setCurrentStep(
-                      user?.subscription.type === SUBSCRIPTION_STATUS.PREMIUM
-                        ? 2
-                        : 1
-                    );
+                    setCustomer(user);
+                    setCurrentStep(isUserSubscribed(user) ? 2 : 1);
                   } else setError("Failed to create account.");
                 }}
               />
@@ -270,7 +279,20 @@ function Checkout() {
                   You are one step away from unlocking the full potential of
                   Notesnook.
                 </Text>
-                <CheckoutDetails user={user} />
+                <CheckoutDetails
+                  user={customer}
+                  onComplete={() => {
+                    if (window.ReactNativeWebView) {
+                      window.ReactNativeWebView.postMessage(
+                        JSON.stringify({
+                          success: true
+                        })
+                      );
+                    } else {
+                      setCurrentStep(2);
+                    }
+                  }}
+                />
               </Flex>
             ) : currentStep === 2 ? (
               <Flex
@@ -331,9 +353,7 @@ export default Checkout;
 function CheckoutSummaryMobile() {
   const selectedPlan = useCheckoutStore((state) => state.selectedPlan);
   const pricingInfo = useCheckoutStore((state) => state.pricingInfo);
-  const couponCode = useCheckoutStore((store) => store.couponCode);
 
-  console.log(pricingInfo);
   if (!selectedPlan || !pricingInfo) return null;
   return (
     <>
@@ -347,13 +367,6 @@ function CheckoutSummaryMobile() {
         </Text>
         <Box sx={{ my: 2, height: 1, bg: "separator" }} />
         <CheckoutPricing pricingInfo={pricingInfo} />
-        {couponCode && pricingInfo.discount.amount > 0 ? (
-          <IconTag
-            icon={Coupon}
-            text={couponCode}
-            styles={{ container: { alignSelf: "end", mt: 2 } }}
-          />
-        ) : null}
       </Flex>
     </>
   );
@@ -362,9 +375,7 @@ function CheckoutSummaryMobile() {
 function CheckoutSummary() {
   const selectedPlan = useCheckoutStore((state) => state.selectedPlan);
   const pricingInfo = useCheckoutStore((state) => state.pricingInfo);
-  const couponCode = useCheckoutStore((store) => store.couponCode);
 
-  console.log(pricingInfo);
   if (!selectedPlan || !pricingInfo) return null;
   return (
     <>
@@ -378,78 +389,31 @@ function CheckoutSummary() {
         </Text>
         <Box sx={{ my: 2, height: 1, bg: "separator" }} />
         <Text variant="subtitle" sx={{}}>
-          Notesnook Pro
+          {PLAN_METADATA[selectedPlan.plan].title} plan
         </Text>
-        <Box as="ul" sx={{ paddingInlineStart: 30, mt: 1 }}>
-          {[
-            "Unlimited real time sync",
-            "Unlimited storage",
-            "Exports in PDF, HTML & Markdown",
-            "Unlimited devices",
-            "Recurring reminders",
-            "Unlimited notebooks & tags",
-            "Automatic backups"
-          ].map((feature) => (
-            <Text
-              as="li"
-              key={feature}
-              variant="body"
-              sx={{ color: "paragraph-secondary", mt: 1 }}
-            >
-              {feature}
-            </Text>
-          ))}
-        </Box>
+        <Flex
+          sx={{
+            flexDirection: "column",
+            mt: 2,
+            gap: 1
+          }}
+        >
+          {FEATURE_HIGHLIGHTS.map((feature) => {
+            const caption =
+              feature.availability[planToAvailability(selectedPlan.plan)]
+                .caption;
+            return (
+              <Flex key={feature.id} sx={{ justifyContent: "space-between" }}>
+                <Text variant="body">{feature.title}</Text>
+                <Text variant="body" sx={{ color: "paragraph-secondary" }}>
+                  <FeatureCaption caption={caption} />
+                </Text>
+              </Flex>
+            );
+          })}
+        </Flex>
         <Box sx={{ my: 2, height: 1, bg: "separator" }} />
         <CheckoutPricing pricingInfo={pricingInfo} />
-
-        {couponCode && pricingInfo.discount.amount > 0 ? (
-          <IconTag
-            icon={Coupon}
-            text={couponCode}
-            styles={{ container: { alignSelf: "end", mt: 2 } }}
-          />
-        ) : null}
-      </Flex>
-      <Flex sx={{ flexDirection: "column", gap: 2, mt: 2 }}>
-        <Flex
-          sx={{
-            p: 2,
-            bg: "background-secondary",
-            borderRadius: "default",
-            border: "1px solid var(--border)",
-            flexDirection: "column"
-          }}
-        >
-          <Text variant="body" sx={{ fontWeight: "bold" }}>
-            Privacy seems expensive until you get hacked!
-          </Text>
-          <Text variant="subBody">
-            Hey there! We&apos;re a small team of developers focused on bringing
-            you the best note-taking experience. Your support helps us keep the
-            lights on.
-          </Text>
-        </Flex>
-        <Flex
-          sx={{
-            p: 2,
-            bg: "black",
-            borderRadius: 10,
-            border: "1px solid var(--border)",
-            gap: 2
-          }}
-        >
-          <Check size={16} color="white" />
-          <Text
-            variant="body"
-            sx={{
-              color: "white"
-            }}
-          >
-            {pricingInfo.period === "yearly" ? "30" : "7"}-day money-back
-            guarantee
-          </Text>
-        </Flex>
       </Flex>
     </>
   );

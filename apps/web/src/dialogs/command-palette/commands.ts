@@ -50,6 +50,7 @@ import { notebookMenuItems } from "../../components/notebook";
 import { tagMenuItems } from "../../components/tag";
 import { useEditorManager } from "../../components/editor/manager";
 import Config from "../../utils/config";
+import { KeyboardShortcutsDialog } from "../keyboard-shortcuts-dialog";
 
 export interface BaseCommand {
   id: string;
@@ -178,6 +179,14 @@ const staticCommands: Command[] = [
     title: strings.helpAndSupport(),
     icon: ArrowTopRight,
     action: () => (window.location.href = "https://help.notesnook.com"),
+    group: strings.navigate(),
+    type: "command"
+  },
+  {
+    id: "keyboard-shortcuts",
+    title: "Keyboard shortcuts",
+    icon: ArrowTopRight,
+    action: () => KeyboardShortcutsDialog.show({}),
     group: strings.navigate(),
     type: "command"
   },
@@ -319,7 +328,7 @@ async function getActiveNoteCommands(): Promise<Command[]> {
 
   const menuItems =
     note.type !== "trash"
-      ? noteMenuItems(note, [note.id], {
+      ? await noteMenuItems(note, [note.id], {
           locked: !!(
             await db
               .sql()
@@ -348,7 +357,7 @@ async function getActiveNotebookCommands() {
   const commands: Command[] = [];
 
   const parentId = await db.notebooks.parentId(notebook.id);
-  const menuItems = notebookMenuItems(notebook, [notebook.id], {
+  const menuItems = await notebookMenuItems(notebook, [notebook.id], {
     isRoot: !parentId
   });
   for (const menuItem of menuItems) {
@@ -366,7 +375,7 @@ async function getActiveTagCommands() {
   const group = strings.actionsForTag(tag.title);
   const commands: Command[] = [];
 
-  const menuItems = tagMenuItems(tag, [tag.id]);
+  const menuItems = await tagMenuItems(tag, [tag.id]);
   for (const menuItem of menuItems) {
     commands.push(...menuItemToCommands(menuItem, group, "active-tag"));
   }
@@ -423,7 +432,7 @@ function getEditorCommands(): Command[] {
     }
   ];
 
-  if (session.type !== "readonly" && (editor.canUndo || editor.canRedo)) {
+  if (session.type !== "readonly" && (editor?.canUndo || editor?.canRedo)) {
     commands.push(
       {
         id: "undo",

@@ -17,48 +17,52 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Text, Flex, Button, Link, Box, Image } from "@theme-ui/components";
-import { Cross, Check, Loading } from "../../components/icons";
+import { useCallback, useEffect } from "react";
+import { Text, Flex, Button, Box, Image } from "@theme-ui/components";
+import { Loading, Coupon } from "../../components/icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import Rocket from "../../assets/rocket.svg?url";
-import WorkAnywhere from "../../assets/workanywhere.svg?url";
-import WorkLate from "../../assets/worklate.svg?url";
-import Field from "../../components/field";
-import { hardNavigate } from "../../navigation";
 import { Features } from "./features";
 import { PaddleCheckout } from "./paddle";
-import { Period, Plan, PricingInfo } from "./types";
-import { PLAN_METADATA, usePlans } from "./plans";
-import { formatPeriod, getFullPeriod, PlansList } from "./plan-list";
-import { showToast } from "../../utils/toast";
-import { TaskManager } from "../../common/task-manager";
-import { db } from "../../common/db";
+import { Plan, PricingInfo } from "./types";
+import { getPlans, PERIOD_METADATA, PLAN_METADATA } from "./plans";
+import {
+  ComparePlans,
+  Footer,
+  formatRecurringPeriod,
+  formatRecurringPeriodShort,
+  PlansList
+} from "./plan-list";
 import { useCheckoutStore } from "./store";
-import { getCurrencySymbol } from "./helpers";
-import { isMacStoreApp } from "../../utils/platform";
+import { formatPrice, toPricingInfo } from "./helpers";
 import { isUserSubscribed } from "../../hooks/use-is-user-premium";
-import { SUBSCRIPTION_STATUS } from "../../common/constants";
 import BaseDialog from "../../components/dialog";
 import { ScopedThemeProvider } from "../../components/theme-provider";
-import { User } from "@notesnook/core";
+import { Period, SubscriptionPlan, User } from "@notesnook/core";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
-import { strings } from "@notesnook/intl";
+import dayjs from "dayjs";
+import { PromptDialog } from "../prompt";
+import IconTag from "../../components/icon-tag";
+import { usePromise } from "@notesnook/common";
+import { getCurrencySymbol } from "../../common/currencies";
 
 type BuyDialogProps = BaseDialogProps<false> & {
   couponCode?: string;
-  plan?: "monthly" | "yearly" | "education";
+  onShowPlans?: () => void;
+  onCheckoutComplete?: () => void;
+  onClose: () => void;
 };
 
 export const BuyDialog = DialogManager.register(function BuyDialog(
   props: BuyDialogProps
 ) {
-  const { onClose, couponCode, plan } = props;
+  const { onClose, onShowPlans, onCheckoutComplete, couponCode } = props;
 
-  const onApplyCoupon = useCheckoutStore((store) => store.applyCoupon);
-  const isCheckoutCompleted = useCheckoutStore((store) => store.isCompleted);
+  const applyCoupon = useCheckoutStore((store) => store.applyCoupon);
   const user = useUserStore((store) => store.user);
+  const selectedPlan = useCheckoutStore((state) => state.selectedPlan);
+  const selectPlan = useCheckoutStore((state) => state.selectPlan);
 
   useEffect(() => {
     return () => {
@@ -67,155 +71,141 @@ export const BuyDialog = DialogManager.register(function BuyDialog(
   }, []);
 
   useEffect(() => {
-    if (couponCode) onApplyCoupon(couponCode);
-  }, [couponCode, onApplyCoupon]);
+    if (couponCode) applyCoupon(couponCode);
+  }, [couponCode, applyCoupon]);
 
   return (
     <BaseDialog
       isOpen={true}
       width={"868px"}
-      onClose={() => props.onClose(false)}
-      noScroll
+      onClose={() => onClose(false)}
+      noScroll={!!selectedPlan}
       sx={{
-        bg: "transparent",
-        width: ["95%", "80%", isCheckoutCompleted ? "400px" : "60%"]
+        width: ["95%", "80%", "60%"],
+        height: ["auto", "auto", "80vw"]
       }}
     >
-      <Flex
-        bg="transparent"
-        sx={{
-          height: ["auto", "auto", "80vw"],
-          width: "100%",
-          overflow: "hidden",
-          position: "relative",
-          flexDirection: ["column", "column", "row"],
-          alignSelf: "center",
-          overflowY: ["scroll", "scroll", "hidden"]
-        }}
-      >
-        <ScopedThemeProvider
-          scope="navigationMenu"
+      {selectedPlan ? (
+        <Flex
           sx={{
-            display: "flex",
-            overflow: ["hidden", "hidden", "auto"],
-            flexDirection: "column",
-            backgroundColor: "background",
-            flexShrink: 0,
-            alignItems: "center",
-            justifyContent: "center",
-            width: ["100%", "100%", isCheckoutCompleted ? "100%" : 350],
-            p: 4,
-            py: 50
+            width: "100%",
+            height: "100%",
+            overflow: "hidden",
+            position: "relative",
+            flexDirection: ["column", "column", "row"],
+            alignSelf: "center",
+            overflowY: ["scroll", "scroll", "hidden"],
+            bg: "background"
           }}
         >
-          <CheckoutSideBar
-            onClose={() => onClose(false)}
-            initialPlan={plan}
+          <ScopedThemeProvider
+            scope="navigationMenu"
+            sx={{
+              display: "flex",
+              overflow: ["hidden", "hidden", "auto"],
+              flexDirection: "column",
+              backgroundColor: "background",
+              flexShrink: 0,
+              // alignItems: "center",
+              // justifyContent: "center",
+              width: ["100%", "100%", 350],
+              p: 4
+            }}
+          >
+            <CheckoutSideBar
+              selectedPlan={selectedPlan}
+              onShowPlans={
+                onShowPlans ??
+                (() => {
+                  selectPlan(undefined);
+                })
+              }
+              user={user}
+            />
+          </ScopedThemeProvider>
+          <CheckoutDetails
+            onComplete={onCheckoutComplete ?? (() => onClose(false))}
             user={user}
           />
-        </ScopedThemeProvider>
-        <CheckoutDetails user={user} />
-      </Flex>
+        </Flex>
+      ) : (
+        <Flex sx={{ flexDirection: "column", py: 25, flex: 1, px: 25 }}>
+          <Flex sx={{ flexDirection: "column", alignSelf: "center" }}>
+            <Text
+              id="select-plan"
+              variant="heading"
+              sx={{ textAlign: "center" }}
+            >
+              Select a plan
+            </Text>
+            <Text
+              variant="title"
+              mt={1}
+              sx={{ color: "heading-secondary", textAlign: "center" }}
+            >
+              One subscription for a lifetime of notes.
+            </Text>
+          </Flex>
+          <PlansList
+            selectedPlan={user?.subscription?.productId}
+            recommendedPlan={SubscriptionPlan.PRO}
+            onPlanSelected={(plan) => selectPlan(plan)}
+          />
+          <Flex
+            sx={{
+              flexDirection: "column",
+              mt: 100
+            }}
+          >
+            <ComparePlans />
+            <Footer />
+          </Flex>
+        </Flex>
+      )}
     </BaseDialog>
   );
 });
 
 type SideBarProps = {
-  initialPlan?: Period;
-  onClose: () => void;
+  selectedPlan: Plan;
+  onShowPlans: () => void;
   user?: User;
 };
 export function CheckoutSideBar(props: SideBarProps) {
-  const { initialPlan, onClose, user } = props;
-  const [showPlans, setShowPlans] = useState(false);
-  const onPlanSelected = useCheckoutStore((state) => state.selectPlan);
-  const selectedPlan = useCheckoutStore((state) => state.selectedPlan);
+  const { onShowPlans, selectedPlan, user } = props;
   const pricingInfo = useCheckoutStore((state) => state.pricingInfo);
-  const couponCode = useCheckoutStore((store) => store.couponCode);
-  const onApplyCoupon = useCheckoutStore((store) => store.applyCoupon);
-  const isCheckoutCompleted = useCheckoutStore((store) => store.isCompleted);
-
-  if (isCheckoutCompleted) return <CheckoutCompleted onClose={onClose} />;
 
   if (user && selectedPlan)
     return (
       <SelectedPlan
+        user={user}
         plan={selectedPlan}
         pricingInfo={pricingInfo}
-        onChangePlan={() => {
-          onApplyCoupon(undefined);
-          onPlanSelected(undefined);
-          setShowPlans(true);
-        }}
+        onChangePlan={onShowPlans}
       />
     );
 
-  if (user && !showPlans && isUserSubscribed(user)) {
-    return (
-      <AlreadyPremium
-        isCanceled={
-          user?.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELED
-        }
-        onShowPlans={() => setShowPlans(true)}
-      />
-    );
+  if (user && isUserSubscribed(user)) {
+    return <AlreadyPremium />;
   }
 
-  if (user && (showPlans || !!initialPlan))
-    return (
-      <PlansList
-        onPlansLoaded={(plans) => {
-          if (!initialPlan || showPlans) return;
-          const plan = plans.find((p) => p.period === initialPlan);
-          onPlanSelected(plan);
-        }}
-        onPlanSelected={onPlanSelected}
-      />
-    );
-
-  return (
-    <TrialOrUpgrade
-      couponCode={couponCode}
-      user={user}
-      onShowPlans={() => setShowPlans(true)}
-      onTrialRequested={async () => {
-        try {
-          const result = await TaskManager.startTask({
-            type: "status",
-            id: "trialActivation",
-            title: strings.activatingTrial(),
-            action: () => db.user.activateTrial()
-          });
-          if (result) onClose();
-        } catch (e) {
-          if (e instanceof Error)
-            showToast(
-              "error",
-              `${strings.couldNotActivateTrial()} ${strings.error()}: ${
-                e.message
-              }`
-            );
-        }
-      }}
-    />
-  );
+  return null;
 }
 
 export function CheckoutDetails({
-  user
+  user,
+  onComplete
 }: {
   user?: { id: string; email: string };
+  onComplete: () => void;
 }) {
   const selectedPlan = useCheckoutStore((state) => state.selectedPlan);
   const onPriceUpdated = useCheckoutStore((state) => state.updatePrice);
-  const completeCheckout = useCheckoutStore((state) => state.completeCheckout);
-  const isCheckoutCompleted = useCheckoutStore((store) => store.isCompleted);
   const couponCode = useCheckoutStore((store) => store.couponCode);
   const setIsApplyingCoupon = useCheckoutStore(
     (store) => store.setIsApplyingCoupon
   );
   const theme = useThemeStore((store) => store.colorScheme);
-  if (isCheckoutCompleted) return null;
 
   if (selectedPlan && user)
     return (
@@ -224,20 +214,10 @@ export function CheckoutDetails({
         theme={theme}
         user={user}
         coupon={couponCode}
-        onCompleted={completeCheckout}
-        onCouponApplied={() => setIsApplyingCoupon(true)}
+        onCompleted={onComplete}
         onPriceUpdated={(pricingInfo) => {
           onPriceUpdated(pricingInfo);
-          // console.log(
-          //   initialCouponCode,
-          //   "applying coupon",
-          //   couponCode,
-          //   pricingInfo.coupon
-          // );
-
-          // if (!initialCouponCode || initialCouponCode === couponCode) return;
-          // console.log(initialCouponCode, "applying coupon");
-          // onApplyCoupon(initialCouponCode);
+          setIsApplyingCoupon(false);
         }}
       />
     );
@@ -245,131 +225,17 @@ export function CheckoutDetails({
   return <Features />;
 }
 
-type TrialOrUpgradeProps = {
-  couponCode?: string;
-  user: User | undefined;
-  onShowPlans: () => void;
-  onTrialRequested: () => void | Promise<void>;
-};
-function TrialOrUpgrade(props: TrialOrUpgradeProps) {
-  const { user, onShowPlans, onTrialRequested, couponCode } = props;
-  const { isLoading, plans } = usePlans();
-  const plan = plans[0];
-
+function AlreadyPremium() {
   return (
     <>
       <Image src={Rocket} style={{ flexShrink: 0, width: 200, height: 200 }} />
       <Text variant="heading" mt={4} sx={{ textAlign: "center" }}>
-        Notesnook Pro
+        Notesnook
       </Text>
       <Text variant="body" mt={1} sx={{ textAlign: "center" }}>
-        Ready to take the next step in your private note taking journey?
+        You already have a Notesnook subscription. You can change your plan from
+        Settings {">"} Subscription details.
       </Text>
-      {isLoading || !plan ? (
-        <Loading sx={{ mt: 4 }} />
-      ) : (
-        <Text variant={"body"} mt={4} sx={{ fontSize: "title" }}>
-          Starting from {getCurrencySymbol(plan.currency)}
-          {plan.price.gross}
-          {formatPeriod(plan.period)}
-        </Text>
-      )}
-      {isMacStoreApp() ? (
-        <>
-          <Text variant={"subBody"} mt={2} sx={{ textAlign: "center" }}>
-            You cannot upgrade from the macOS app.
-          </Text>
-        </>
-      ) : user ? (
-        <>
-          <Button
-            variant="accent"
-            mt={2}
-            sx={{ borderRadius: 100, px: 6 }}
-            onClick={onShowPlans}
-            data-test-id="see-all-plans"
-          >
-            See all plans
-          </Button>
-          {!user.subscription || !user.subscription.expiry ? (
-            <Button
-              variant="secondary"
-              mt={2}
-              sx={{ borderRadius: 100, px: 6 }}
-              onClick={onTrialRequested}
-            >
-              Try free for 14 days
-            </Button>
-          ) : null}
-        </>
-      ) : (
-        <>
-          <Button
-            variant="accent"
-            mt={4}
-            sx={{ borderRadius: 100, px: 6 }}
-            onClick={() => hardNavigate("/signup")}
-          >
-            Sign up for free
-          </Button>
-          <Text variant={"subBody"} mt={2} sx={{ textAlign: "center" }}>
-            After creating your account, you will be asked to activate your free
-            trial. <b>No credit card is required.</b>
-          </Text>
-        </>
-      )}
-
-      {couponCode && (
-        <Text
-          variant="subBody"
-          bg="shade"
-          mt={4}
-          p={1}
-          sx={{ borderRadius: "default", color: "accent" }}
-        >
-          {user
-            ? "Please select a plan to use your coupon:"
-            : `Please sign up or login to use your coupon:`}{" "}
-          <b>{couponCode}</b>
-        </Text>
-      )}
-    </>
-  );
-}
-
-type AlreadyPremiumProps = {
-  isCanceled?: boolean;
-  onShowPlans: () => void;
-};
-function AlreadyPremium(props: AlreadyPremiumProps) {
-  const { isCanceled, onShowPlans } = props;
-  return (
-    <>
-      <Image src={Rocket} style={{ flexShrink: 0, width: 200, height: 200 }} />
-      <Text variant="heading" mt={4} sx={{ textAlign: "center" }}>
-        Notesnook Pro
-      </Text>
-      {isCanceled ? (
-        <>
-          <Text variant="body" mt={1} sx={{ textAlign: "center" }}>
-            Resubscribing to Notesnook Pro will replace your existing
-            subscription.
-          </Text>
-          <Button
-            variant="accent"
-            mt={2}
-            sx={{ borderRadius: 100, px: 6 }}
-            onClick={onShowPlans}
-            data-test-id="see-all-plans"
-          >
-            Continue
-          </Button>
-        </>
-      ) : (
-        <Text variant="body" mt={1} sx={{ textAlign: "center" }}>
-          You are already subscribed to Notesnook Pro.
-        </Text>
-      )}
     </>
   );
 }
@@ -404,142 +270,66 @@ export function CheckoutCompleted(props: {
 
 type SelectedPlanProps = {
   plan: Plan;
+  user: User;
   pricingInfo: PricingInfo | undefined;
   onChangePlan?: () => void;
 };
 function SelectedPlan(props: SelectedPlanProps) {
-  const { plan, pricingInfo, onChangePlan } = props;
-  const metadata = PLAN_METADATA[plan.period];
-  const [isApplyingCoupon, setIsApplyingCoupon] = useCheckoutStore((store) => [
-    store.isApplyingCoupon,
-    store.setIsApplyingCoupon
-  ]);
-
-  const onApplyCoupon = useCheckoutStore((store) => store.applyCoupon);
-  const couponInputRef = useRef<HTMLInputElement>(null);
-
-  const applyCoupon = useCallback(() => {
-    const coupon = couponInputRef.current?.value;
-    if (!coupon) return;
-    setIsApplyingCoupon(true);
-    onApplyCoupon(coupon);
-  }, [onApplyCoupon, setIsApplyingCoupon]);
-
-  const removeCoupon = useCallback(() => {
-    setIsApplyingCoupon(true);
-    onApplyCoupon(undefined);
-  }, [onApplyCoupon, setIsApplyingCoupon]);
-
-  useEffect(() => {
-    if (!couponInputRef.current) return;
-    setIsApplyingCoupon(false);
-
-    const couponValue = couponInputRef.current.value;
-
-    if (pricingInfo?.invalidCoupon) return;
-
-    const pricingInfoCoupon = pricingInfo?.coupon || "";
-    if (couponValue !== pricingInfoCoupon) {
-      couponInputRef.current.value = pricingInfoCoupon;
-      onApplyCoupon(pricingInfo?.coupon);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pricingInfo, onApplyCoupon, setIsApplyingCoupon]);
+  const {
+    plan,
+    user,
+    pricingInfo = toPricingInfo(plan, user),
+    onChangePlan
+  } = props;
+  const selectPlan = useCheckoutStore((store) => store.selectPlan);
+  const upsellDetails = usePromise(() => getUpsellDetails(plan), [plan]);
 
   return (
     <>
-      {plan.period === "monthly" ? (
-        <Image
-          src={WorkAnywhere}
-          style={{ flexShrink: 0, width: 180, height: 180 }}
-        />
-      ) : (
-        <Image
-          src={WorkLate}
-          style={{ flexShrink: 0, width: 180, height: 180 }}
-        />
-      )}
-      <Text variant="heading" mt={4} sx={{ textAlign: "center" }}>
-        Notesnook Pro
-      </Text>
-      <Text
-        data-test-id="checkout-plan-title"
-        variant="body"
-        mt={1}
-        sx={{ fontSize: "subheading", textAlign: "center" }}
+      <Text variant="title">Order summary</Text>
+      <Flex
+        sx={{
+          flexDirection: "column",
+          gap: 1,
+          mt: 2,
+          borderBottom: "1px solid var(--border)",
+          mb: 2,
+          pb: 2
+        }}
       >
-        {metadata.title}
-      </Text>
-      {plan.period === "education" && (
-        <Link
-          href="https://notesnook.com/education"
-          target="_blank"
-          variant="text.body"
-          mt={1}
-          sx={{
-            textDecorationColor: "primary",
-            color: "primary",
-            textAlign: "center"
-          }}
-        >
-          Apply here to get your Education discount code.
-        </Link>
-      )}
-      {pricingInfo ? (
-        <>
-          {IS_TESTING ? (
-            <>
-              <span
-                data-test-id={`checkout-plan-country-${pricingInfo.country}`}
-              />
-              {pricingInfo.coupon && (
-                <span data-test-id={`checkout-plan-coupon-applied`} />
-              )}
-            </>
-          ) : null}
-
-          <Field
-            inputRef={couponInputRef}
-            variant={pricingInfo.invalidCoupon ? "error" : "input"}
-            sx={{ alignSelf: "stretch", my: 2 }}
-            styles={{ input: { fontSize: "body" } }}
-            data-test-id="checkout-coupon-code"
-            id="coupon"
-            name="coupon"
-            placeholder={
-              isApplyingCoupon ? "Applying coupon code..." : "Coupon code"
-            }
-            autoFocus={pricingInfo.invalidCoupon}
-            disabled={!!pricingInfo?.coupon}
-            onKeyUp={(e) => {
-              if (e.code === "Enter") applyCoupon();
-            }}
-            action={{
-              icon: isApplyingCoupon
-                ? Loading
-                : pricingInfo?.coupon
-                ? Cross
-                : Check,
-              onClick: () =>
-                pricingInfo?.coupon ? removeCoupon() : applyCoupon()
-            }}
-          />
-          <CheckoutPricing pricingInfo={pricingInfo} />
-          {onChangePlan && (
-            <Button
-              data-test-id="checkout-plan-change"
-              variant="secondary"
-              mt={4}
-              px={4}
-              onClick={onChangePlan}
-            >
-              Change plan
-            </Button>
-          )}
-        </>
-      ) : (
-        <Loading sx={{ mt: 4 }} />
-      )}
+        <Flex sx={{ justifyContent: "space-between" }}>
+          <Text
+            data-test-id="checkout-plan-title"
+            variant="body"
+            sx={{ fontWeight: "bold", color: "heading" }}
+          >
+            {PLAN_METADATA[plan.plan].title} plan
+          </Text>
+          <Text variant="body">
+            {getCurrencySymbol(plan.currency)}
+            {plan.price.gross}
+            {formatRecurringPeriodShort(plan.period)}
+          </Text>
+        </Flex>
+        <Flex sx={{ justifyContent: "space-between" }}>
+          <Text variant="body">
+            Billed {formatRecurringPeriod(plan.period)}
+          </Text>
+          <Button variant="anchor" onClick={onChangePlan}>
+            Change plan
+          </Button>
+        </Flex>
+        {upsellDetails.status === "fulfilled" && upsellDetails.value ? (
+          <Button
+            variant="accentSecondary"
+            sx={{ color: "accent", textAlign: "left" }}
+            onClick={() => selectPlan(upsellDetails.value?.plan)}
+          >
+            {upsellDetails.value.text}
+          </Button>
+        ) : null}
+      </Flex>
+      <CheckoutPricing pricingInfo={pricingInfo} />
     </>
   );
 }
@@ -549,112 +339,270 @@ type CheckoutPricingProps = {
 };
 export function CheckoutPricing(props: CheckoutPricingProps) {
   const { pricingInfo } = props;
-  const { currency, price, discount, period, recurringPrice } = pricingInfo;
-  const fields = [
-    {
-      key: "subtotal",
-      label: "Subtotal",
-      value: formatPrice(currency, price.net.toFixed(2), null)
-    },
-    {
-      key: "tax",
-      label: "Sales tax",
-      color: "red",
-      value: formatPrice(currency, price.tax.toFixed(2), null)
-    },
-    {
-      key: "discount",
-      label: "Discount",
-      color: "accent",
-      value: formatPrice(
-        currency,
-        discount.amount.toFixed(2),
-        null,
-        discount.amount > 0
-      )
-    }
-  ];
+  const { price } = pricingInfo;
 
-  const isDiscounted = discount.recurring || discount.amount <= 0;
-  const currentTotal = formatPrice(
-    currency,
-    (price.gross - discount.amount).toFixed(2),
-    isDiscounted ? period : undefined
+  const [isApplyingCoupon, setIsApplyingCoupon] = useCheckoutStore((store) => [
+    store.isApplyingCoupon,
+    store.setIsApplyingCoupon
+  ]);
+
+  const onApplyCoupon = useCheckoutStore((store) => store.applyCoupon);
+
+  const applyCoupon = useCallback(
+    (code: string) => {
+      setIsApplyingCoupon(true);
+      onApplyCoupon(code);
+    },
+    [onApplyCoupon, setIsApplyingCoupon]
   );
-  const recurringTotal = formatPrice(
-    currency,
-    recurringPrice.gross.toFixed(2),
-    period
-  );
+
+  const removeCoupon = useCallback(() => {
+    setIsApplyingCoupon(true);
+    onApplyCoupon(undefined);
+  }, [onApplyCoupon, setIsApplyingCoupon]);
+
+  // useEffect(() => {
+  //   setIsApplyingCoupon(false);
+
+  //   if (pricingInfo.invalidCoupon) return;
+
+  //   const pricingInfoCoupon = pricingInfo.coupon || "";
+  //   if (couponValue !== pricingInfoCoupon) {
+  //     onApplyCoupon(pricingInfo.coupon);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [pricingInfo, onApplyCoupon, setIsApplyingCoupon]);
+
   return (
     <>
-      {fields.map((field) => (
+      {IS_TESTING ? (
+        <>
+          <span data-test-id={`checkout-plan-country-${pricingInfo.country}`} />
+          {pricingInfo.coupon && (
+            <span data-test-id={`checkout-plan-coupon-applied`} />
+          )}
+        </>
+      ) : null}
+      <Flex
+        sx={{
+          flexDirection: "column",
+          gap: 1,
+          borderBottom: "1px solid var(--border)",
+          mb: 2,
+          pb: 2
+        }}
+      >
+        <Flex sx={{ justifyContent: "space-between" }}>
+          <Flex sx={{ flexDirection: "column" }}>
+            <Text variant="body" color="heading">
+              Today
+            </Text>
+            {pricingInfo.price.trial_period ? (
+              <Text variant="subBody">
+                {pricingInfo.price.trial_period.frequency} day free trial
+              </Text>
+            ) : null}
+          </Flex>
+          {pricingInfo.price.trial_period ? (
+            <Text variant="body" color="heading">
+              {formatPrice(0, pricingInfo.price.currency)}
+            </Text>
+          ) : (
+            <Text variant="body" color="heading">
+              {pricingInfo.price.subtotal}
+            </Text>
+          )}
+        </Flex>
+        {pricingInfo.price.trial_period ? (
+          <>
+            <Box sx={{ width: "2px", bg: "border", height: "20px" }} />
+            <Flex sx={{ justifyContent: "space-between" }}>
+              <Flex sx={{ flexDirection: "column" }}>
+                <Text variant="body" color="heading">
+                  After {pricingInfo.price.trial_period.frequency} day free
+                  trial
+                </Text>
+                <Text variant="subBody">
+                  {dayjs()
+                    .add(pricingInfo.price.trial_period.frequency, "days")
+                    .format("YYYY-MM-DD")}{" "}
+                </Text>
+              </Flex>
+              <Text variant="body" color="heading">
+                {pricingInfo.price.subtotal}
+              </Text>
+            </Flex>
+          </>
+        ) : null}
+
+        {pricingInfo.recurringPrice ? (
+          <>
+            <Box sx={{ width: "2px", bg: "border", height: "20px" }} />
+            <Flex sx={{ justifyContent: "space-between" }}>
+              <Flex sx={{ flexDirection: "column" }}>
+                <Text variant="body" color="heading">
+                  {pricingInfo.period === "monthly"
+                    ? "Next month"
+                    : pricingInfo.period === "yearly"
+                    ? "Next year"
+                    : dayjs()
+                        .add(5, "year")
+                        .add(
+                          pricingInfo.price.trial_period?.frequency || 0,
+                          "days"
+                        )
+                        .format("YYYY-MM-DD")}
+                </Text>
+                {pricingInfo.period === "monthly" ||
+                pricingInfo.period === "yearly" ? (
+                  <Text variant="subBody">
+                    {pricingInfo.period === "monthly"
+                      ? dayjs()
+                          .add(1, "month")
+                          .add(
+                            pricingInfo.price.trial_period?.frequency || 0,
+                            "days"
+                          )
+                          .format("YYYY-MM-DD")
+                      : dayjs()
+                          .add(1, "year")
+                          .add(
+                            pricingInfo.price.trial_period?.frequency || 0,
+                            "days"
+                          )
+                          .format("YYYY-MM-DD")}
+                  </Text>
+                ) : null}
+              </Flex>
+              <Text variant="body" color="heading">
+                {pricingInfo.recurringPrice.subtotal}
+              </Text>
+            </Flex>
+          </>
+        ) : null}
+      </Flex>
+      <Flex
+        sx={{
+          flexDirection: "column",
+          gap: 1,
+          mb: 2,
+          pb: 2
+        }}
+      >
         <Flex
-          key={field.key}
-          mt={1}
           sx={{ justifyContent: "space-between", alignSelf: "stretch" }}
           data-test-id={`checkout-price-item`}
         >
           <Text
             variant="body"
             data-test-id={`label`}
-            sx={{ fontWeight: "bold" }}
+            color="paragraph-secondary"
           >
-            {field.label}
+            Sales tax
           </Text>
           <Text
             data-test-id={`value`}
             variant="body"
-            sx={{ color: field.color || "paragraph" }}
+            color="paragraph-secondary"
           >
-            {field.value}
+            {price.tax}
           </Text>
         </Flex>
-      ))}
-      <Box sx={{ my: 2, height: 1, bg: "separator" }} />
-      <Flex
-        mt={1}
-        sx={{ justifyContent: "space-between", alignSelf: "stretch" }}
-        data-test-id={`checkout-price-item`}
-      >
-        <Text variant="title" data-test-id={`label`}>
-          Total
-        </Text>
-        <Text as="div" variant="title" sx={{ textAlign: "end" }}>
+        <Flex
+          sx={{
+            justifyContent: "space-between",
+            alignSelf: "stretch",
+            alignItems: "center"
+          }}
+          data-test-id={`checkout-price-item`}
+        >
           <Text
-            data-test-id={`value`}
-            sx={{ fontSize: "title", color: "paragraph" }}
+            variant="body"
+            data-test-id={`label`}
+            color="paragraph-secondary"
           >
-            {currentTotal}
+            Discount
           </Text>
-          <Text
-            as="div"
-            sx={{
-              fontSize: "body",
-              color: "paragraph-secondary",
-              fontWeight: "body"
-            }}
-          >
-            {period === "education" && discount.amount > 0
-              ? "for one year"
-              : isDiscounted
-              ? "forever"
-              : `first ${getFullPeriod(period)} then ${recurringTotal}`}
+          {isApplyingCoupon ? (
+            <Loading size={14} />
+          ) : pricingInfo.coupon ? (
+            <Flex sx={{ alignItems: "center", gap: 1 }}>
+              <IconTag
+                icon={Coupon}
+                text={pricingInfo.coupon}
+                onDismiss={() => removeCoupon()}
+              />
+              <Text
+                data-test-id={`value`}
+                variant="body"
+                color="paragraph-secondary"
+              >
+                {price.discount}
+              </Text>
+            </Flex>
+          ) : (
+            <Button
+              variant="anchor"
+              onClick={async () => {
+                const code = await PromptDialog.show({
+                  title: "Enter discount code",
+                  defaultValue: pricingInfo.coupon
+                });
+                if (code) applyCoupon(code);
+              }}
+            >
+              Add discount
+            </Button>
+          )}
+        </Flex>
+        <Flex
+          sx={{ justifyContent: "space-between", alignSelf: "stretch" }}
+          data-test-id={`checkout-price-item`}
+        >
+          <Text variant="title" data-test-id={`label`}>
+            Total for today
           </Text>
+          {price.trial_period ? (
+            <Text as="div" variant="title" sx={{ textAlign: "end" }}>
+              {formatPrice(0, pricingInfo.price.currency)}
+            </Text>
+          ) : (
+            <Text
+              data-test-id={`value`}
+              variant="title"
+              sx={{ textAlign: "end" }}
+            >
+              {price.total}
+            </Text>
+          )}
+        </Flex>
+        <Text variant="subBody" sx={{ mt: 2 }}>
+          Cancel anytime. {PERIOD_METADATA[pricingInfo.period].refundDays}-day
+          money-back guarantee.
         </Text>
       </Flex>
     </>
   );
 }
 
-function formatPrice(
-  currency: string,
-  price: string,
-  period?: Period | null,
-  negative = false
-) {
-  const formattedPeriod = period ? formatPeriod(period) : "";
-  const currencySymbol = getCurrencySymbol(currency);
-  const prefix = negative ? "-" : "";
-  return `${prefix}${currencySymbol}${price}${formattedPeriod}`;
+async function getUpsellDetails(plan: Plan) {
+  const plans = await getPlans();
+  if (!plans) return;
+
+  const nextPeriod: Period = plan.period === "5-year" ? "5-year" : "yearly";
+  const nextPlan = plans.find(
+    (p) =>
+      p.plan === plan.plan &&
+      p.period !== plan.period &&
+      p.period === nextPeriod
+  );
+  if (!nextPlan) return;
+  const divider = nextPeriod === "yearly" ? 12 : 5;
+  const dividedPrice = nextPlan.price.gross / divider;
+  const savings = (100 - (dividedPrice / plan.price.gross) * 100).toFixed(0);
+
+  return {
+    text: `Save ${savings}% by switching to ${nextPlan.period} plan.`,
+    plan: nextPlan
+  };
 }

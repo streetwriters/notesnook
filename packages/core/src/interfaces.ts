@@ -17,7 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Cipher, DataFormat, SerializedKey } from "@notesnook/crypto";
+import {
+  AsymmetricCipher,
+  Cipher,
+  DataFormat,
+  SerializedKey,
+  SerializedKeyPair
+} from "@notesnook/crypto";
 import { KVStorage } from "./database/kv.js";
 import { ConfigStorage } from "./database/config.js";
 
@@ -57,6 +63,10 @@ export interface IStorage {
     key: SerializedKey,
     items: Cipher<"base64">[]
   ): Promise<string[]>;
+  decryptAsymmetric(
+    keyPair: SerializedKeyPair,
+    cipherData: AsymmetricCipher<"base64">
+  ): Promise<string>;
   deriveCryptoKey(credentials: SerializedKey): Promise<void>;
   hash(
     password: string,
@@ -65,6 +75,7 @@ export interface IStorage {
   ): Promise<string>;
   getCryptoKey(): Promise<string | undefined>;
   generateCryptoKey(password: string, salt?: string): Promise<SerializedKey>;
+  generateCryptoKeyPair(): Promise<SerializedKeyPair>;
 
   generateCryptoKeyFallback(
     password: string,

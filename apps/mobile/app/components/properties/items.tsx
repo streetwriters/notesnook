@@ -27,11 +27,13 @@ import { Action, ActionId, useActions } from "../../hooks/use-actions";
 import { useStoredRef } from "../../hooks/use-stored-ref";
 import { DDS } from "../../services/device-detection";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { AppFontSize } from "../../utils/size";
+import { AppFontSize, defaultBorderRadius } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
+import AppIcon from "../ui/AppIcon";
 import { Button } from "../ui/button";
 import { Pressable } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
+import { Dialog } from "../dialog";
 
 const TOP_BAR_ITEMS: ActionId[] = [
   "pin",
@@ -56,6 +58,8 @@ const BOTTOM_BAR_ITEMS: ActionId[] = [
   "export",
   "copy-link",
   "duplicate",
+  "launcher-shortcut",
+  "expiry-date",
   "trash"
 ];
 
@@ -65,7 +69,9 @@ const COLUMN_BAR_ITEMS: ActionId[] = [
   "edit-notebook",
   "move-notes",
   "move-notebook",
+  "edit-reminder",
   "pin",
+  "disable-reminder",
   "default-notebook",
   "default-tag",
   "default-homepage",
@@ -73,6 +79,7 @@ const COLUMN_BAR_ITEMS: ActionId[] = [
   "reorder",
   "rename-color",
   "rename-tag",
+  "launcher-shortcut",
   "restore",
   "trash",
   "delete"
@@ -143,7 +150,8 @@ export const Items = ({
         key={item.id}
         style={{
           alignItems: "center",
-          width: columnItemWidth - 8
+          width: columnItemWidth - 8,
+          opacity: item.locked ? 0.5 : 1
         }}
       >
         <Pressable
@@ -166,15 +174,15 @@ export const Items = ({
               DDS.isTab
                 ? AppFontSize.xxl
                 : shouldShrink
-                ? AppFontSize.xxl
-                : AppFontSize.lg
+                  ? AppFontSize.xxl
+                  : AppFontSize.lg
             }
             color={
               item.checked
                 ? item.activeColor || colors.primary.accent
                 : item.id.match(/(delete|trash)/g)
-                ? colors.error.icon
-                : colors.secondary.icon
+                  ? colors.error.icon
+                  : colors.secondary.icon
             }
           />
         </Pressable>
@@ -205,8 +213,8 @@ export const Items = ({
           text: item.checked
             ? item.activeColor || colors.primary.accent
             : item.id === "delete" || item.id === "trash"
-            ? colors.error.paragraph
-            : colors.primary.paragraph
+              ? colors.error.paragraph
+              : colors.primary.paragraph
         }}
         testID={"icon-" + item.id}
         onPress={item.onPress}
@@ -218,7 +226,8 @@ export const Items = ({
           borderRadius: 0,
           justifyContent: "flex-start",
           alignSelf: "flex-start",
-          width: "100%"
+          width: "100%",
+          opacity: item.locked ? 0.5 : 1
         }}
       />
     ),
@@ -242,7 +251,9 @@ export const Items = ({
           key={item.id}
           testID={"icon-" + item.id}
           style={{
-            width: columnItemWidth - 8
+            width: columnItemWidth - 8,
+            alignSelf: "flex-start",
+            gap: DefaultAppStyles.GAP_VERTICAL_SMALL
           }}
         >
           <View
@@ -250,7 +261,13 @@ export const Items = ({
               height: columnItemWidth / 2,
               width: columnItemWidth - DefaultAppStyles.GAP_SMALL,
               justifyContent: "center",
-              alignItems: "center"
+              alignItems: "center",
+              borderWidth: 1,
+              borderRadius: defaultBorderRadius,
+              borderColor: item.checked
+                ? item.activeColor || colors.primary.accent
+                : colors.primary.border,
+              overflow: "hidden"
             }}
           >
             <Icon
@@ -261,10 +278,32 @@ export const Items = ({
                 item.checked
                   ? item.activeColor || colors.primary.accent
                   : item.id === "delete" || item.id === "trash"
-                  ? colors.error.icon
-                  : colors.secondary.icon
+                    ? colors.error.icon
+                    : colors.secondary.icon
               }
             />
+
+            {item.locked ? (
+              <View
+                style={{
+                  width: 20,
+                  height: 20,
+                  borderRadius: 100,
+                  backgroundColor: colors.primary.accent,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  position: "absolute",
+                  bottom: -3,
+                  right: -3
+                }}
+              >
+                <AppIcon
+                  color={colors.static.orange}
+                  size={AppFontSize.xxxs}
+                  name="crown"
+                />
+              </View>
+            ) : null}
           </View>
 
           <Paragraph
@@ -322,16 +361,21 @@ export const Items = ({
               paginationStyle={{
                 position: "relative",
                 marginHorizontal: 2,
-                marginBottom: 0,
-                marginTop: DefaultAppStyles.GAP
+                marginBottom: -10,
+                marginTop: 10
               }}
+              contentContainerStyle={{
+                justifyContent: "flex-start",
+                alignItems: "flex-start",
+                alignSelf: "flex-start"
+              }}
+              centerContent={false}
               renderItem={({ item, index }) => (
                 <View
                   style={{
                     flexDirection: "row",
                     paddingHorizontal: DefaultAppStyles.GAP,
-                    gap: 5,
-                    width: width
+                    gap: 5
                   }}
                 >
                   {item.map(renderTopBarItem)}

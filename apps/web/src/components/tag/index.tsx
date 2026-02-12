@@ -31,7 +31,11 @@ import { useStore as useSelectionStore } from "../../stores/selection-store";
 import { useStore as useNoteStore } from "../../stores/note-store";
 import { Multiselect } from "../../common/multi-select";
 import { strings } from "@notesnook/intl";
-import { createSetDefaultHomepageMenuItem } from "../../common";
+import {
+  createSetDefaultHomepageMenuItem,
+  withFeatureCheck
+} from "../../common";
+import { areFeaturesAvailable } from "@notesnook/common";
 
 type TagProps = { item: TagType; totalNotes: number };
 function Tag(props: TagProps) {
@@ -63,7 +67,7 @@ function Tag(props: TagProps) {
             variant={"body"}
             color={isSelected ? "paragraph-selected" : "paragraph"}
             sx={{
-              whiteSpace: "nowrap",
+              whiteSpace: "pre",
               overflow: "hidden",
               textOverflow: "ellipsis",
               fontWeight: "body",
@@ -101,11 +105,16 @@ function Tag(props: TagProps) {
 }
 export default Tag;
 
-export const tagMenuItems: (tag: TagType, ids?: string[]) => MenuItem[] = (
-  tag,
-  ids = []
-) => {
+export const tagMenuItems: (
+  tag: TagType,
+  ids?: string[]
+) => Promise<MenuItem[]> = async (tag, ids = []) => {
   const defaultTag = db.settings.getDefaultTag();
+  const features = await areFeaturesAvailable([
+    "shortcuts",
+    "defaultNotebookAndTag",
+    "customHomepage"
+  ]);
   return [
     {
       type: "button",
@@ -120,17 +129,14 @@ export const tagMenuItems: (tag: TagType, ids?: string[]) => MenuItem[] = (
       title: strings.setAsDefault(),
       isChecked: defaultTag === tag.id,
       icon: TagIcon.path,
-      onClick: async () => {
+      premium: !features.defaultNotebookAndTag.isAllowed,
+      onClick: withFeatureCheck(features.defaultNotebookAndTag, async () => {
         const defaultTag = db.settings.getDefaultTag();
         const isDefault = defaultTag === tag.id;
         await db.settings.setDefaultTag(isDefault ? undefined : tag.id);
-      }
+      })
     },
-    {
-      type: "lazy-loader",
-      key: "sidebar-items-loader",
-      items: async () => [createSetDefaultHomepageMenuItem(tag.id, tag.type)]
-    },
+    createSetDefaultHomepageMenuItem(tag.id, tag.type, features.customHomepage),
     {
       type: "button",
       key: "shortcut",
@@ -138,7 +144,10 @@ export const tagMenuItems: (tag: TagType, ids?: string[]) => MenuItem[] = (
         ? strings.removeShortcut()
         : strings.addShortcut(),
       icon: Shortcut.path,
-      onClick: () => appStore.addToShortcuts(tag)
+      premium: !features.shortcuts.isAllowed,
+      onClick: withFeatureCheck(features.shortcuts, () =>
+        appStore.addToShortcuts(tag)
+      )
     },
     { key: "sep", type: "separator" },
     {

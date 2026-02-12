@@ -136,12 +136,12 @@ const BaseDialog = ({
             backgroundColor: background
               ? background
               : transparent
-              ? "transparent"
-              : "rgba(0,0,0,0.3)"
+                ? "transparent"
+                : "rgba(0,0,0,0.3)"
           }}
         >
           <KeyboardAvoidingView
-            enabled={!floating && Platform.OS === "ios" && !avoidKeyboardResize}
+            enabled={!floating && !avoidKeyboardResize}
             behavior="padding"
           >
             <BouncingView
@@ -155,8 +155,8 @@ const BaseDialog = ({
                   justifyContent: centered
                     ? "center"
                     : bottom
-                    ? "flex-end"
-                    : "flex-start"
+                      ? "flex-end"
+                      : "flex-start"
                 }
               ]}
             >

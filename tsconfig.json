@@ -3,6 +3,7 @@
     "target": "es2016",
     "module": "ESNext",
     "moduleResolution": "node",
+    "incremental": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,

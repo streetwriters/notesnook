@@ -455,6 +455,7 @@ test("if note is active in multiple tabs, moving the note to trash should close 
     title: "Note 1"
   });
   await note?.contextMenu.openInNewTab();
+  await page.waitForTimeout(1000);
 
   await note?.contextMenu.moveToTrash();
 
@@ -499,6 +500,23 @@ test("if note is active in a tab and present in other tab's history, moving the 
   const tabs = await notes.editor.getTabs();
   expect(tabs.length).toBe(1);
   await expect(tabs[0].locator).toHaveText("Note 2");
+});
+
+test("if focus mode active, reveal in list option should be disabled", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  await notes.createNote({
+    title: "Note 1"
+  });
+
+  await notes.editor.enterFocusMode();
+
+  const tabs = await notes.editor.getTabs();
+  const revealInList = await tabs[0].contextMenu.getRevealInListItem();
+  expect(await revealInList.isDisabled()).toBe(true);
 });
 
 test.skip("TODO: open a locked note, switch to another note and navigate back", () => {});

@@ -56,6 +56,10 @@ export class SettingsViewModel {
     await confirmDialog(this.page.locator(getTestId("confirm-dialog")));
 
     await this.page
+      .locator(getTestId("progress-dialog"))
+      .waitFor({ state: "hidden" });
+
+    await this.page
       .locator(getTestId("logged-in"))
       .waitFor({ state: "hidden" });
   }
@@ -162,9 +166,9 @@ export class SettingsViewModel {
 
     await appLockSwitch.click();
     await fillPasswordDialog(this.page, userPassword);
-    await this.page.waitForTimeout(100);
+    await this.page.waitForTimeout(500);
     await fillConfirmPasswordDialog(this.page, appLockPassword);
-    await this.page.waitForTimeout(100);
+    await this.page.waitForTimeout(500);
   }
 
   async disableAppLock(appLockPassword: string) {

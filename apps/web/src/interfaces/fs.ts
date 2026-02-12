@@ -300,20 +300,11 @@ async function singlePartUploadFile(
   console.log("Streaming file upload!");
   const { url, headers, signal } = requestOptions;
 
-  const uploadUrl: string | { error?: string } = await fetch(url, {
-    method: "PUT",
-    headers,
-    signal
-  }).then((res) => (res.ok ? res.text() : res.json()));
-  if (typeof uploadUrl !== "string")
-    throw new Error(
-      uploadUrl.error || "Unable to resolve attachment upload url."
-    );
-
   const response = await axios.request({
-    url: uploadUrl,
+    url,
     method: "PUT",
     headers: {
+      ...headers,
       "Content-Type": ""
     },
     data: await fileHandle.toBlob(),
@@ -463,7 +454,7 @@ export async function checkUpload(
   expectedSize: number
 ) {
   const size = await getUploadedFileSize(filename);
-  const totalChunks = Math.ceil(size / chunkSize);
+  const totalChunks = Math.ceil(size / (chunkSize + ABYTES));
   const decryptedLength = size - totalChunks * ABYTES;
   const error =
     size === 0
@@ -529,7 +520,7 @@ async function downloadFile(
       throw new Error(error);
     }
 
-    const totalChunks = Math.ceil(size / chunkSize);
+    const totalChunks = Math.ceil(size / (chunkSize + ABYTES));
     const decryptedLength = size - totalChunks * ABYTES;
     if (attachment && attachment.size !== decryptedLength) {
       const error = `File length mismatch. Expected ${attachment.size} but got ${decryptedLength} bytes. Please upload this file again from the attachment manager. (File hash: ${filename})`;
@@ -748,6 +739,11 @@ function parseS3Error(data: ArrayBuffer | unknown) {
       ? new TextDecoder().decode(data)
       : typeof data === "string"
       ? data
+      : typeof data === "object" &&
+        data &&
+        "error" in data &&
+        typeof data.error === "string"
+      ? data.error
       : null;
 
   const error = {
@@ -789,9 +785,10 @@ function toS3Error(e: unknown): S3Error {
 }
 
 function showError(error: S3Error, message?: string) {
+  message = `${message ? message + " " : ""}${error.Message}`;
   showToast(
     "error",
-    `[${error.Code}] ${message ? message + " " : ""}${error.Message}`
+    error.Code === "UNKNOWN" ? message : `[${error.Code}] ${message}`
   );
 }
 

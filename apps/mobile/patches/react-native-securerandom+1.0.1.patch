@@ -1,0 +1,34 @@
+diff --git a/node_modules/react-native-securerandom/android/build.gradle b/node_modules/react-native-securerandom/android/build.gradle
+index 4e725c3..97f622b 100644
+--- a/node_modules/react-native-securerandom/android/build.gradle
++++ b/node_modules/react-native-securerandom/android/build.gradle
+@@ -1,21 +1,3 @@
+-buildscript {
+-    // The Android Gradle plugin is only required when opening the android folder stand-alone.
+-    // This avoids unnecessary downloads and potential conflicts when the library is included as a
+-    // module dependency in an application project.
+-    if (project == rootProject) {
+-        repositories {
+-            google()
+-            mavenCentral()
+-            jcenter()
+-        }
+-
+-        dependencies {
+-            //noinspection GradleDependency
+-            classpath("com.android.tools.build:gradle:3.5.3")
+-        }
+-    }
+-}
+-
+ apply plugin: 'com.android.library'
+ 
+ def safeExtGet(prop, fallback) {
+@@ -56,7 +38,6 @@ repositories {
+                 excludeGroup "com.facebook.react"
+             }
+         }
+-    jcenter()
+ }
+ 
+ dependencies {

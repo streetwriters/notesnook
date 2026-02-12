@@ -415,6 +415,44 @@ test("when autosave is disabled, closing the note should save it", async ({
   expect(await notes.editor.getContent("text")).toBe(content.trim());
 });
 
+test("when autosave is disabled, clicking the not saved icon should save the note", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const content = "a ".repeat(100);
+  await notes.createNote({
+    title: NOTE.title,
+    content
+  });
+
+  await notes.editor.notSavedIcon.waitFor({ state: "visible" });
+  await notes.editor.notSavedIcon.click();
+
+  await expect(notes.editor.savedIcon).toBeVisible();
+  expect(await notes.editor.getContent("text")).toBe(content.trim());
+});
+
+test("when autosave is disabled, clicking save from tab menu should save the note", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const content = "a ".repeat(100);
+  await notes.createNote({
+    title: NOTE.title,
+    content
+  });
+
+  const tab = (await notes.editor.getTabs())[0];
+  await tab.contextMenu.save();
+
+  await expect(notes.editor.savedIcon).toBeVisible();
+  expect(await notes.editor.getContent("text")).toBe(content.trim());
+});
+
 test("control + alt + right arrow should go to next note", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
@@ -430,12 +468,12 @@ test("control + alt + right arrow should go to next note", async ({ page }) => {
 
   await note1?.openNote();
   await note2?.openNote(true);
-  await page.keyboard.press("Control+Alt+ArrowRight");
+  await page.keyboard.press("ControlOrMeta+Alt+ArrowRight");
 
   expect(await notes.editor.getTitle()).toBe("Note 1");
   expect(await notes.editor.getContent("text")).toBe("Note 1 content");
 
-  await page.keyboard.press("Control+Alt+ArrowRight");
+  await page.keyboard.press("ControlOrMeta+Alt+ArrowRight");
 
   expect(await notes.editor.getTitle()).toBe("Note 2");
   expect(await notes.editor.getContent("text")).toBe("Note 2 content");
@@ -458,12 +496,12 @@ test("control + alt + left arrow should go to previous note", async ({
 
   await note1?.openNote();
   await note2?.openNote(true);
-  await page.keyboard.press("Control+Alt+ArrowLeft");
+  await page.keyboard.press("ControlOrMeta+Alt+ArrowLeft");
 
   expect(await notes.editor.getTitle()).toBe("Note 1");
   expect(await notes.editor.getContent("text")).toBe("Note 1 content");
 
-  await page.keyboard.press("Control+Alt+ArrowLeft");
+  await page.keyboard.press("ControlOrMeta+Alt+ArrowLeft");
 
   expect(await notes.editor.getTitle()).toBe("Note 2");
   expect(await notes.editor.getContent("text")).toBe("Note 2 content");

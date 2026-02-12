@@ -271,11 +271,6 @@ const tools: Record<ToolId, ToolDefinition> = {
     title: strings.alignRight(),
     conditional: true
   },
-  imageFloat: {
-    icon: "imageFloat",
-    title: strings.imageFloat(),
-    conditional: true
-  },
   imageProperties: {
     icon: "more",
     title: strings.imageProperties(),
@@ -354,6 +349,11 @@ const tools: Record<ToolId, ToolDefinition> = {
   indent: {
     icon: "indent",
     title: strings.indent(),
+    conditional: true
+  },
+  exportToCSV: {
+    icon: "csv",
+    title: strings.exportCsv(),
     conditional: true
   }
 };

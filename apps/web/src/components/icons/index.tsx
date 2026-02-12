@@ -223,14 +223,12 @@ import {
   mdiNoteRemoveOutline,
   mdiTabPlus,
   mdiRadar,
-  mdiLinkBoxOutline,
   mdiHistory,
-  mdiArrowCollapseLeft,
   mdiArrowCollapseRight,
-  mdiHamburger,
-  mdiNotePlus,
   mdiNoteEditOutline,
-  mdiArrowUp
+  mdiArrowUp,
+  mdiInbox,
+  mdiConsoleLine
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
@@ -303,10 +301,10 @@ export function createIcon(path: string, rotate = false) {
       <Flex
         {...restProps}
         sx={{
-          ...sx,
           justifyContent: "center",
           alignItems: "center",
-          flexShrink: 0
+          flexShrink: 0,
+          ...sx
         }}
       >
         <MDIIconWrapper
@@ -455,6 +453,7 @@ export const ImageDownload = createIcon(mdiImage);
 export const Billboard = createIcon(mdiBillboard);
 export const Cellphone = createIcon(mdiCellphone);
 export const CellphoneLock = createIcon(mdiCellphoneLock);
+export const ConsoleLine = createIcon(mdiConsoleLine);
 export const FileLock = createIcon(mdiFileLockOutline);
 export const ShieldLock = createIcon(mdiShieldLockOutline);
 export const ImageMultiple = createIcon(mdiImageMultipleOutline);
@@ -584,3 +583,4 @@ export const ColorRemove = createIcon(mdiCloseCircleOutline);
 export const ExpandSidebar = createIcon(mdiArrowCollapseRight);
 export const HamburgerMenu = createIcon(mdiMenu);
 export const ArrowUp = createIcon(mdiArrowUp);
+export const Inbox = createIcon(mdiInbox);

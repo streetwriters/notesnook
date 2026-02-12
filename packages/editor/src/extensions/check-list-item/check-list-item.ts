@@ -16,8 +16,16 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { KeyboardShortcutCommand, mergeAttributes, Node } from "@tiptap/core";
+import { keybindings } from "@notesnook/common";
+import {
+  findParentNodeClosestToPos,
+  KeyboardShortcutCommand,
+  mergeAttributes,
+  Node
+} from "@tiptap/core";
 import { Node as ProseMirrorNode } from "@tiptap/pm/model";
+import { CheckList } from "../check-list/check-list.js";
+import { ensureLeadingParagraph } from "../../utils/prosemirror.js";
 
 export interface CheckListItemOptions {
   onReadOnlyChecked?: (node: ProseMirrorNode, checked: boolean) => boolean;
@@ -60,7 +68,8 @@ export const CheckListItem = Node.create<CheckListItemOptions>({
     return [
       {
         tag: `li.simple-checklist--item`,
-        priority: 51
+        priority: 51,
+        getContent: ensureLeadingParagraph
       }
     ];
   },
@@ -80,7 +89,8 @@ export const CheckListItem = Node.create<CheckListItemOptions>({
       [key: string]: KeyboardShortcutCommand;
     } = {
       Enter: () => this.editor.commands.splitListItem(this.name),
-      "Shift-Tab": () => this.editor.commands.liftListItem(this.name)
+      [keybindings.liftListItem.keys]: () =>
+        this.editor.commands.liftListItem(this.name)
     };
 
     if (!this.options.nested) {
@@ -95,94 +105,76 @@ export const CheckListItem = Node.create<CheckListItemOptions>({
 
   addNodeView() {
     return ({ node, getPos, editor }) => {
-      const listItem = document.createElement("li");
-      const checkboxWrapper = document.createElement("label");
-      const checkboxStyler = document.createElement("span");
-      const checkbox = document.createElement("input");
-      const content = document.createElement("div");
+      const li = document.createElement("li");
+      if (node.attrs.checked) li.classList.add("checked");
+      else li.classList.remove("checked");
 
-      checkboxWrapper.contentEditable = "false";
-      checkbox.type = "checkbox";
+      function onClick(e: MouseEvent | TouchEvent) {
+        if (e instanceof MouseEvent && e.button !== 0) return;
+        if (!(e.target instanceof HTMLElement)) return;
 
-      checkbox.addEventListener("mousedown", (event) => {
-        if (globalThis.keyboardShown) {
-          event.preventDefault();
+        const pos = typeof getPos === "function" ? getPos() : 0;
+        if (typeof pos !== "number") return;
+        const resolvedPos = editor.state.doc.resolve(pos);
+
+        const { x, y, right } = li.getBoundingClientRect();
+
+        const clientX =
+          e instanceof MouseEvent ? e.clientX : e.touches[0].clientX;
+
+        const clientY =
+          e instanceof MouseEvent ? e.clientY : e.touches[0].clientY;
+
+        const hitArea = { width: 40, height: 40 };
+
+        const isRtl =
+          e.target.dir === "rtl" ||
+          findParentNodeClosestToPos(
+            resolvedPos,
+            (node) => !!node.attrs.textDirection
+          )?.node.attrs.textDirection === "rtl";
+
+        let xStart = clientX >= x - hitArea.width;
+        let xEnd = clientX <= x;
+        const yStart = clientY >= y;
+        const yEnd = clientY <= y + hitArea.height;
+
+        if (isRtl) {
+          xEnd = clientX <= right + hitArea.width;
+          xStart = clientX >= right;
         }
-      });
 
-      checkbox.addEventListener("change", (event) => {
-        event.preventDefault();
-        // if the editor isn’t editable and we don't have a handler for
-        // readonly checks we have to undo the latest change
-        if (!editor.isEditable && !this.options.onReadOnlyChecked) {
-          checkbox.checked = !checkbox.checked;
-
-          return;
+        if (xStart && xEnd && yStart && yEnd) {
+          e.preventDefault();
+          editor.commands.command(({ tr }) => {
+            tr.setNodeAttribute(
+              pos,
+              "checked",
+              !li.classList.contains("checked")
+            );
+            return true;
+          });
         }
-
-        const { checked } = event.target as any;
-
-        if (editor.isEditable && typeof getPos === "function") {
-          editor
-            .chain()
-            .command(({ tr }) => {
-              const position = getPos();
-              const currentNode = tr.doc.nodeAt(position);
-
-              tr.setNodeMarkup(position, undefined, {
-                ...currentNode?.attrs,
-                checked
-              });
-
-              return true;
-            })
-            .run();
-        }
-        if (!editor.isEditable && this.options.onReadOnlyChecked) {
-          // Reset state if onReadOnlyChecked returns false
-          if (!this.options.onReadOnlyChecked(node, checked)) {
-            checkbox.checked = !checkbox.checked;
-          }
-        }
-      });
-
-      if (node.attrs.checked) {
-        checkbox.setAttribute("checked", "checked");
       }
 
-      checkboxWrapper.append(checkbox, checkboxStyler);
-      listItem.append(checkboxWrapper, content);
+      li.onmousedown = onClick;
+      li.ontouchstart = onClick;
 
       return {
-        dom: listItem,
-        contentDOM: content,
+        dom: li,
+        contentDOM: li,
         update: (updatedNode) => {
           if (updatedNode.type !== this.type) {
             return false;
           }
+          const isNested = updatedNode.lastChild?.type.name === CheckList.name;
 
-          listItem.dataset.checked = updatedNode.attrs.checked;
-          if (updatedNode.attrs.checked) {
-            checkbox.setAttribute("checked", "checked");
-          } else {
-            checkbox.removeAttribute("checked");
-          }
+          if (updatedNode.attrs.checked) li.classList.add("checked");
+          else li.classList.remove("checked");
 
           return true;
         }
       };
     };
   }
-
-  // addInputRules() {
-  //   return [
-  //     wrappingInputRule({
-  //       find: inputRegex,
-  //       type: this.type,
-  //       getAttributes: (match) => ({
-  //         checked: match[match.length - 1] === "x"
-  //       })
-  //     })
-  //   ];
-  // }
 });

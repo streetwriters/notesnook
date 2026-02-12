@@ -29,6 +29,10 @@ export class Crypto {
     const password = passwordBytes.toString("base64");
     return await this.storage().generateCryptoKey(password);
   }
+
+  async generateCryptoKeyPair() {
+    return await this.storage().generateCryptoKeyPair();
+  }
 }
 
 export function isCipher(item: any): item is Cipher<"base64"> {

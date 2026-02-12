@@ -70,6 +70,7 @@ const EXTRA_ICON_NAMES = [
   "chevron-down",
   "calendar",
   "minus-circle-outline",
+  "circle-outline",
   "close-circle-outline",
   "qrcode",
   "text",
@@ -99,7 +100,28 @@ const EXTRA_ICON_NAMES = [
   "brain",
   "file-tree-outline",
   "format-list-bulleted",
-  "file-tree"
+  "file-tree",
+  "github",
+  "open-source-initiative",
+  "credit-card",
+  "form-textbox-password",
+  "at",
+  "key",
+  "cloud-upload-outline",
+  "download",
+  "upload",
+  "download-multiple",
+  "shape",
+  "update",
+  "notebook-minus",
+  "calendar-blank",
+  "email-newsletter",
+  "cellphone-arrow-down",
+  "format-line-spacing",
+  "calendar-today",
+  "bomb",
+  "bomb-off",
+  "cancel"
 ];
 
 const __filename = fileURLToPath(import.meta.url);
@@ -190,12 +212,12 @@ const font = Font.create(await readFile(ICON_FONT_PATH), {
   hinting: true
 });
 
-if (!existsSync(path.join(ROOT_DIR, "native", "fonts"))) {
-  await mkdir(path.join(ROOT_DIR, "native", "fonts"));
+if (!existsSync(path.join(ROOT_DIR, "fonts"))) {
+  await mkdir(path.join(ROOT_DIR, "fonts"));
 }
 
 await writeFile(
-  path.join(ROOT_DIR, "native", "fonts", "MaterialCommunityIcons.ttf"),
+  path.join(ROOT_DIR, "fonts", "MaterialCommunityIcons.ttf"),
   font.write({ type: "ttf", hinting: true })
 );
 

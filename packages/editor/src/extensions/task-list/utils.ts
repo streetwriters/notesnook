@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import TaskList from "@tiptap/extension-task-list";
-import { Transaction } from "@tiptap/pm/state";
+import { TextSelection, Transaction } from "@tiptap/pm/state";
 import { Fragment, Node as ProsemirrorNode } from "prosemirror-model";
 import { NodeWithPos } from "@tiptap/core";
 import { findParentNodeClosestToPos } from "../../utils/prosemirror.js";
@@ -74,11 +74,13 @@ export function deleteCheckedItems(tr: Transaction, pos: number) {
 }
 
 export function sortList(tr: Transaction, pos: number) {
+  const originalFrom = tr.selection.from;
+  const originalTo = tr.selection.to;
+
   const node = tr.doc.nodeAt(pos);
 
   const parent = node ? { node, pos } : null;
   if (!parent || parent.node.type.name !== TaskList.name) return;
-
   const sublists: NodeWithPos[] = [];
   parent.node.descendants((node, nodePos) => {
     if (node.type.name === TaskList.name)
@@ -86,16 +88,13 @@ export function sortList(tr: Transaction, pos: number) {
   });
   if (sublists.length > 1) sublists.reverse();
   sublists.push(parent);
-
   for (const list of sublists) {
     const listNode = tr.doc.nodeAt(tr.mapping.map(list.pos));
     if (!listNode) continue;
-
     const children: {
       checked: number;
       index: number;
     }[] = [];
-
     listNode.forEach((node, _, index) => {
       children.push({
         index,
@@ -108,7 +107,6 @@ export function sortList(tr: Transaction, pos: number) {
       children.every((a) => a.checked === 0)
     )
       continue;
-
     tr.replaceWith(
       tr.mapping.map(list.pos + 1),
       tr.mapping.map(list.pos + listNode.nodeSize - 1),
@@ -121,6 +119,8 @@ export function sortList(tr: Transaction, pos: number) {
   }
 
   if (!tr.steps.length) return null;
+  //preserve cursor location
+  tr.setSelection(TextSelection.create(tr.doc, originalFrom, originalTo));
   return tr;
 }
 

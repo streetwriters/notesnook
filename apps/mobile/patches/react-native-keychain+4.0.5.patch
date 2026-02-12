@@ -1,0 +1,198 @@
+diff --git a/node_modules/react-native-keychain/android/build.gradle b/node_modules/react-native-keychain/android/build.gradle
+index bd2fe04..2cc264c 100755
+--- a/node_modules/react-native-keychain/android/build.gradle
++++ b/node_modules/react-native-keychain/android/build.gradle
+@@ -2,21 +2,6 @@ def safeExtGet(prop, fallback) {
+     rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+ }
+ 
+-buildscript {
+-    // The Android Gradle plugin is only required when opening the android folder stand-alone.
+-    // This avoids unnecessary downloads and potential conflicts when the library is included as a
+-    // module dependency in an application project.
+-    if (project == rootProject) {
+-        repositories {
+-            google()
+-            jcenter()
+-        }
+-        dependencies {
+-            classpath 'com.android.tools.build:gradle:3.5.3'
+-        }
+-    }
+-}
+-
+ apply plugin: 'com.android.library'
+ 
+ android {
+@@ -44,12 +29,10 @@ repositories {
+         url "$rootDir/../node_modules/jsc-android/dist"
+     }
+     google()
+-    jcenter()
+ }
+ 
+ dependencies {
+     //noinspection GradleDynamicVersion
+     implementation 'com.facebook.react:react-native:+'  // From node_modules
+     implementation 'androidx.annotation:annotation:1.1.0'
+-    implementation 'com.facebook.conceal:conceal:1.1.3@aar'
+ }
+diff --git a/node_modules/react-native-keychain/android/src/main/java/com/oblador/keychain/KeychainModule.java b/node_modules/react-native-keychain/android/src/main/java/com/oblador/keychain/KeychainModule.java
+index 61d061e..be49f8a 100644
+--- a/node_modules/react-native-keychain/android/src/main/java/com/oblador/keychain/KeychainModule.java
++++ b/node_modules/react-native-keychain/android/src/main/java/com/oblador/keychain/KeychainModule.java
+@@ -15,7 +15,6 @@ import com.oblador.keychain.PrefsStorage.ResultSet;
+ import com.oblador.keychain.cipherStorage.CipherStorage;
+ import com.oblador.keychain.cipherStorage.CipherStorage.DecryptionResult;
+ import com.oblador.keychain.cipherStorage.CipherStorage.EncryptionResult;
+-import com.oblador.keychain.cipherStorage.CipherStorageFacebookConceal;
+ import com.oblador.keychain.cipherStorage.CipherStorageKeystoreAESCBC;
+ import com.oblador.keychain.exceptions.CryptoFailedException;
+ import com.oblador.keychain.exceptions.EmptyParameterException;
+@@ -48,7 +47,6 @@ public class KeychainModule extends ReactContextBaseJavaModule {
+         super(reactContext);
+         prefsStorage = new PrefsStorage(reactContext);
+ 
+-        addCipherStorageToMap(new CipherStorageFacebookConceal(reactContext));
+         addCipherStorageToMap(new CipherStorageKeystoreAESCBC());
+     }
+ 
+diff --git a/node_modules/react-native-keychain/android/src/main/java/com/oblador/keychain/PrefsStorage.java b/node_modules/react-native-keychain/android/src/main/java/com/oblador/keychain/PrefsStorage.java
+index 99448b1..792c24c 100644
+--- a/node_modules/react-native-keychain/android/src/main/java/com/oblador/keychain/PrefsStorage.java
++++ b/node_modules/react-native-keychain/android/src/main/java/com/oblador/keychain/PrefsStorage.java
+@@ -7,7 +7,6 @@ import android.util.Base64;
+ 
+ import com.facebook.react.bridge.ReactApplicationContext;
+ import com.oblador.keychain.cipherStorage.CipherStorage.EncryptionResult;
+-import com.oblador.keychain.cipherStorage.CipherStorageFacebookConceal;
+ 
+ public class PrefsStorage {
+     public static final String KEYCHAIN_DATA = "RN_KEYCHAIN";
+@@ -35,10 +34,6 @@ public class PrefsStorage {
+         byte[] bytesForPassword = getBytesForPassword(service);
+         String cipherStorageName = getCipherStorageName(service);
+         if (bytesForUsername != null && bytesForPassword != null) {
+-            if (cipherStorageName == null) {
+-                // If the CipherStorage name is not found, we assume it is because the entry was written by an older version of this library. The older version used Facebook Conceal, so we default to that.
+-                cipherStorageName = CipherStorageFacebookConceal.CIPHER_STORAGE_NAME;
+-            }
+             return new ResultSet(cipherStorageName, bytesForUsername, bytesForPassword);
+         }
+         return null;
+diff --git a/node_modules/react-native-keychain/android/src/main/java/com/oblador/keychain/cipherStorage/CipherStorageFacebookConceal.java b/node_modules/react-native-keychain/android/src/main/java/com/oblador/keychain/cipherStorage/CipherStorageFacebookConceal.java
+deleted file mode 100644
+index 3162f99..0000000
+--- a/node_modules/react-native-keychain/android/src/main/java/com/oblador/keychain/cipherStorage/CipherStorageFacebookConceal.java
++++ /dev/null
+@@ -1,110 +0,0 @@
+-package com.oblador.keychain.cipherStorage;
+-
+-import android.os.Build;
+-import androidx.annotation.NonNull;
+-
+-import com.facebook.android.crypto.keychain.AndroidConceal;
+-import com.facebook.android.crypto.keychain.SharedPrefsBackedKeyChain;
+-import com.facebook.crypto.Crypto;
+-import com.facebook.crypto.CryptoConfig;
+-import com.facebook.crypto.Entity;
+-import com.facebook.crypto.keychain.KeyChain;
+-import com.facebook.react.bridge.ReactApplicationContext;
+-import com.oblador.keychain.SecurityLevel;
+-import com.oblador.keychain.exceptions.CryptoFailedException;
+-
+-import java.nio.charset.Charset;
+-
+-public class CipherStorageFacebookConceal implements CipherStorage {
+-    public static final String CIPHER_STORAGE_NAME = "FacebookConceal";
+-    public static final String KEYCHAIN_DATA = "RN_KEYCHAIN";
+-    private final Crypto crypto;
+-
+-    public CipherStorageFacebookConceal(ReactApplicationContext reactContext) {
+-        KeyChain keyChain = new SharedPrefsBackedKeyChain(reactContext, CryptoConfig.KEY_256);
+-        this.crypto = AndroidConceal.get().createDefaultCrypto(keyChain);
+-    }
+-
+-    @Override
+-    public String getCipherStorageName() {
+-        return CIPHER_STORAGE_NAME;
+-    }
+-
+-    @Override
+-    public int getMinSupportedApiLevel() {
+-        return Build.VERSION_CODES.JELLY_BEAN;
+-    }
+-
+-    @Override
+-    public SecurityLevel securityLevel() {
+-        return SecurityLevel.ANY;
+-    }
+-
+-    @Override
+-    public boolean supportsSecureHardware() {
+-        return false;
+-    }
+-
+-    @Override
+-    public EncryptionResult encrypt(@NonNull String service, @NonNull String username, @NonNull String password, SecurityLevel level) throws CryptoFailedException {
+-
+-        if (!this.securityLevel().satisfiesSafetyThreshold(level)) {
+-            throw new CryptoFailedException(String.format("Insufficient security level (wants %s; got %s)", level, this.securityLevel()));
+-        }
+-
+-        if (!crypto.isAvailable()) {
+-            throw new CryptoFailedException("Crypto is missing");
+-        }
+-        Entity usernameEntity = createUsernameEntity(service);
+-        Entity passwordEntity = createPasswordEntity(service);
+-
+-        try {
+-            byte[] encryptedUsername = crypto.encrypt(username.getBytes(Charset.forName("UTF-8")), usernameEntity);
+-            byte[] encryptedPassword = crypto.encrypt(password.getBytes(Charset.forName("UTF-8")), passwordEntity);
+-
+-            return new EncryptionResult(encryptedUsername, encryptedPassword, this);
+-        } catch (Exception e) {
+-            throw new CryptoFailedException("Encryption failed for service " + service, e);
+-        }
+-    }
+-
+-    @Override
+-    public DecryptionResult decrypt(@NonNull String service, @NonNull byte[] username, @NonNull byte[] password) throws CryptoFailedException {
+-        if (!crypto.isAvailable()) {
+-            throw new CryptoFailedException("Crypto is missing");
+-        }
+-        Entity usernameEntity = createUsernameEntity(service);
+-        Entity passwordEntity = createPasswordEntity(service);
+-
+-        try {
+-            byte[] decryptedUsername = crypto.decrypt(username, usernameEntity);
+-            byte[] decryptedPassword = crypto.decrypt(password, passwordEntity);
+-
+-            return new DecryptionResult(
+-                    new String(decryptedUsername, Charset.forName("UTF-8")),
+-                    new String(decryptedPassword, Charset.forName("UTF-8")),
+-                    SecurityLevel.ANY);
+-        } catch (Exception e) {
+-            throw new CryptoFailedException("Decryption failed for service " + service, e);
+-        }
+-    }
+-
+-    @Override
+-    public void removeKey(@NonNull String service) {
+-        // Facebook Conceal stores only one key across all services, so we cannot delete the key (otherwise decryption will fail for encrypted data of other services).
+-    }
+-
+-    private Entity createUsernameEntity(String service) {
+-        String prefix = getEntityPrefix(service);
+-        return Entity.create(prefix + "user");
+-    }
+-
+-    private Entity createPasswordEntity(String service) {
+-        String prefix = getEntityPrefix(service);
+-        return Entity.create(prefix + "pass");
+-    }
+-
+-    private String getEntityPrefix(String service) {
+-        return KEYCHAIN_DATA + ":" + service;
+-    }
+-}

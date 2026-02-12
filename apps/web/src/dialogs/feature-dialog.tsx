@@ -22,8 +22,6 @@ import Dialog from "../components/dialog";
 import { getHomeRoute, hardNavigate } from "../navigation";
 import { appVersion } from "../utils/version";
 import Config from "../utils/config";
-
-import { useEffect } from "react";
 import { ArrowRight, Checkmark, Icon, Warn } from "../components/icons";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
@@ -93,37 +91,34 @@ const features: Record<FeatureKeys, Feature> = {
         ]
       : [
           {
-            title: "Improved search UX",
+            title: "Import/export tables as CSV",
             subtitle:
-              "Searching for notes will now show exactly where the term occurs"
+              "You can now import and export CSV files as tables directly in the editor."
           },
           {
-            title: "Sortable search",
+            title: "Customizable monograph title",
             subtitle:
-              "Search results are now sortable (just like notes, notebooks etc.)"
+              "You can now set a custom title for your monographs different from the note title."
           },
           {
-            title: "Archive",
-            subtitle: (
-              <>
-                You can now archive your notes to hide them from the main list.
-              </>
-            )
-          },
-          {
-            title: "Integrated Notesnook Importer",
-            subtitle: (
-              <>
-                Notesnook Importer is now integrated directly into the app
-                allowing for faster and more seamless import of your notes. Just
-                drag and drop your notes from other note-taking apps and viola!
-              </>
-            )
-          },
-          {
-            title: "Set default tag",
+            title: "Expiring notes",
             subtitle:
-              "You can now set any tag as default and it'll automatically be applied whenever you create a note."
+              "Set an expiration date for your notes after which they will be automatically moved to trash."
+          },
+          {
+            title: "Change note's created date",
+            subtitle:
+              "You can now change a note's created date from the note properties panel."
+          },
+          {
+            title: "Customizable line height",
+            subtitle:
+              "You can now customize the line height in the editor from Settings > Editor."
+          },
+          {
+            title: "Change week starting day",
+            subtitle:
+              "You can now change the starting day of the week from Settings > Behaviour."
           }
         ],
     cta: {

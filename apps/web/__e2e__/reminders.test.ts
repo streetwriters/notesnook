@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Reminder } from "@notesnook/core";
 import { test, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
+import { getTestId } from "./utils";
 
 const ONE_TIME_REMINDER: Partial<Reminder> = {
   title: "Test reminder 1",
@@ -53,20 +54,22 @@ test("adding a one-time reminder before current time should not be possible", as
   await app.goto();
   const reminders = await app.goToReminders();
 
-  await reminders.createReminder({
-    ...ONE_TIME_REMINDER,
-    date: 0
-  });
-
-  expect(
-    await app.toasts.waitForToast(
+  const result = await Promise.race([
+    reminders.createReminder({
+      ...ONE_TIME_REMINDER,
+      date: 0
+    }),
+    app.toasts.waitForToast(
       "Reminder time cannot be earlier than the current time."
     )
-  ).toBeTruthy();
+  ]);
+
+  expect(result).toBeTruthy();
 });
 
 for (const recurringMode of ["Daily", "Weekly", "Monthly"] as const) {
   test(`add a recurring reminder (${recurringMode})`, async ({ page }) => {
+    await page.exposeBinding("isPro", () => true);
     const app = new AppModel(page);
     await app.goto();
     const reminders = await app.goToReminders();
@@ -89,6 +92,8 @@ for (const recurringMode of ["Daily", "Weekly", "Monthly"] as const) {
 }
 
 test(`add a recurring reminder before current time`, async ({ page }) => {
+  await page.exposeBinding("isPro", () => true);
+
   const app = new AppModel(page);
   await app.goto();
   const reminders = await app.goToReminders();
@@ -171,6 +176,8 @@ test("enable a disabled reminder", async ({ page }) => {
 test("editing a weekly recurring reminder should not revert it to daily", async ({
   page
 }) => {
+  await page.exposeBinding("isPro", () => true);
+
   const RECURRING_REMINDER: Partial<Reminder> = {
     ...ONE_TIME_REMINDER,
     recurringMode: "week",
@@ -190,4 +197,27 @@ test("editing a weekly recurring reminder should not revert it to daily", async 
   expect(await reminder?.isPresent()).toBe(true);
   expect(await reminder?.getRecurringMode()).toBe("Weekly");
   expect(await reminder?.getDescription()).toBe("An edited reminder");
+});
+
+test("adding a reminder via note context menu should show reference in edit dialog", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note = await notes.createNote({
+    title: "Test note",
+    content: "I am a note"
+  });
+
+  await note?.contextMenu.addReminder(ONE_TIME_REMINDER);
+  const reminders = await app.goToReminders();
+  const reminder = await reminders.findReminder({
+    title: ONE_TIME_REMINDER.title
+  });
+  await reminder?.open();
+
+  const noteReferences = page.locator(getTestId("reminder-note-references"));
+  await noteReferences.waitFor({ state: "visible" });
+  expect(noteReferences.getByText("Test note")).toBeVisible();
 });

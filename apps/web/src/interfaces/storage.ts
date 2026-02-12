@@ -25,7 +25,12 @@ import {
   IKVStore
 } from "./key-value";
 import { NNCrypto } from "./nncrypto";
-import type { Cipher, SerializedKey } from "@notesnook/crypto";
+import type {
+  AsymmetricCipher,
+  Cipher,
+  SerializedKey,
+  SerializedKeyPair
+} from "@notesnook/crypto";
 import { isFeatureSupported } from "../utils/feature-check";
 import { IKeyStore } from "./key-store";
 import { User } from "@notesnook/core";
@@ -128,6 +133,10 @@ export class NNStorage implements IStorage {
     return await NNCrypto.exportKey(password, salt);
   }
 
+  async generateCryptoKeyPair() {
+    return await NNCrypto.exportKeyPair();
+  }
+
   async hash(password: string, email: string): Promise<string> {
     return await NNCrypto.hash(password, `${APP_SALT}${email}`);
   }
@@ -154,6 +163,14 @@ export class NNStorage implements IStorage {
   ): Promise<string[]> {
     items.forEach((c) => (c.format = "base64"));
     return NNCrypto.decryptMulti(key, items, "text");
+  }
+
+  decryptAsymmetric(
+    keyPair: SerializedKeyPair,
+    cipherData: AsymmetricCipher<"base64">
+  ): Promise<string> {
+    cipherData.format = "base64";
+    return NNCrypto.decryptAsymmetric(keyPair, cipherData, "base64");
   }
 
   /**

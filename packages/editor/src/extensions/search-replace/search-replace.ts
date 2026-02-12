@@ -27,12 +27,13 @@ import {
   TextSelection
 } from "prosemirror-state";
 import { SearchSettings } from "../../toolbar/stores/search-store.js";
+import { tiptapKeys } from "@notesnook/common";
 
 type DispatchFn = (tr: Transaction) => void;
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     searchreplace: {
-      startSearch: () => ReturnType;
+      startSearch: (isReplacing?: boolean) => ReturnType;
       endSearch: () => ReturnType;
       search: (term: string, options?: SearchSettings) => ReturnType;
       moveToNextResult: () => ReturnType;
@@ -50,7 +51,7 @@ interface Result {
 
 interface SearchOptions {
   searchResultClass: string;
-  onStartSearch: (term?: string) => boolean;
+  onStartSearch: (term?: string, isReplacing?: boolean) => boolean;
   onEndSearch: () => boolean;
 }
 
@@ -241,7 +242,7 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
   addCommands() {
     return {
       startSearch:
-        () =>
+        (isReplacing) =>
         ({ state, commands }) => {
           const term = !state.selection.empty
             ? state.doc.textBetween(
@@ -251,7 +252,7 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
             : undefined;
           if (term) commands.search(term);
 
-          return this.options.onStartSearch(term);
+          return this.options.onStartSearch(term, isReplacing);
         },
       endSearch:
         () =>
@@ -293,7 +294,9 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
               tr.mapping.map(to)
             )
           );
-          scrollIntoView();
+
+          const domNode = this.editor.view.domAtPos(from).node;
+          scrollIntoView(domNode);
 
           this.storage.selectedIndex = nextIndex;
           tr.setMeta("selectedIndex", nextIndex);
@@ -318,7 +321,9 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
               tr.mapping.map(to)
             )
           );
-          scrollIntoView();
+
+          const domNode = this.editor.view.domAtPos(from).node;
+          scrollIntoView(domNode);
 
           this.storage.selectedIndex = prevIndex;
           tr.setMeta("selectedIndex", prevIndex);
@@ -354,7 +359,10 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
 
   addKeyboardShortcuts() {
     return {
-      "Mod-f": ({ editor }) => editor.commands.startSearch(),
+      [tiptapKeys.openSearch.keys]: ({ editor }) =>
+        editor.commands.startSearch(),
+      [tiptapKeys.openSearchAndReplace.keys]: ({ editor }) =>
+        editor.commands.startSearch(true),
       Escape: ({ editor }) => editor.commands.endSearch()
     };
   },
@@ -468,14 +476,13 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
   }
 });
 
-function scrollIntoView() {
+function scrollIntoView(domNode: Node) {
   setTimeout(() => {
-    const domNode = document.querySelector(".search-result.selected");
-    if (!(domNode instanceof HTMLElement)) return;
-
-    domNode.scrollIntoView({
-      behavior: "instant",
-      block: "center"
-    });
+    if ("scrollIntoView" in domNode) {
+      (domNode as Element).scrollIntoView({
+        behavior: "instant",
+        block: "center"
+      });
+    }
   });
 }

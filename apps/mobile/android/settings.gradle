@@ -1,0 +1,11 @@
+pluginManagement { includeBuild("../node_modules/@react-native/gradle-plugin") }
+plugins { id("com.facebook.react.settings") }
+extensions.configure(com.facebook.react.ReactSettingsExtension){ ex -> ex.autolinkLibrariesFromCommand() }
+rootProject.name = 'Notesnook'
+include ':app'
+includeBuild('../node_modules/@react-native/gradle-plugin')
+
+include ":react-native-config"
+project(':react-native-config').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-config/android')
+include ":lazysodium-android"
+project(':lazysodium-android').projectDir = new File(rootProject.projectDir, '../node_modules/@ammarahmed/react-native-sodium/android/lazysodium-android/app')

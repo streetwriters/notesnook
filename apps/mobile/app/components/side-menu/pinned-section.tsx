@@ -31,6 +31,9 @@ import ReorderableList from "../list/reorderable-list";
 import { MenuItem } from "./menu-item";
 import { useThemeColors } from "@notesnook/theme";
 import { DefaultAppStyles } from "../../utils/styles";
+import { useSideBarDraggingStore } from "./dragging-store";
+import { Properties } from "../properties";
+import { Default_Drag_Action } from "../../hooks/use-actions";
 
 export const PinnedSection = React.memo(
   function PinnedSection() {
@@ -57,6 +60,11 @@ export const PinnedSection = React.memo(
       });
     }, []);
 
+    const onLongPress = React.useCallback((item: SideMenuItem) => {
+      if (useSideBarDraggingStore.getState().dragging) return;
+      Properties.present(item.data as Notebook, false, [Default_Drag_Action]);
+    }, []);
+
     const menuItems = useMemo(
       () =>
         menuPins.map((item) => ({
@@ -65,7 +73,8 @@ export const PinnedSection = React.memo(
           icon: item.type === "notebook" ? "notebook-outline" : "pound",
           dataType: item.type,
           data: item,
-          onPress: onPress
+          onPress: onPress,
+          onLongPress: onLongPress
         })) as SideMenuItem[],
       [menuPins, onPress]
     );
@@ -98,6 +107,7 @@ export const PinnedSection = React.memo(
             flexGrow: 1,
             width: "100%"
           }}
+          disableDefaultDrag
           contentContainerStyle={{
             flexGrow: 1
           }}

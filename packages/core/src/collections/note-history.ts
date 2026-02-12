@@ -20,14 +20,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import Database from "../api/index.js";
 import { isCipher } from "../utils/crypto.js";
 import { FilteredSelector, SQLCollection } from "../database/sql-collection.js";
-import { HistorySession, isDeleted, NoteContent } from "../types.js";
+import { HistorySession, isDeleted, Note, NoteContent } from "../types.js";
 import { makeSessionContentId } from "../utils/id.js";
 import { ICollection } from "./collection.js";
 import { SessionContent } from "./session-content.js";
 
 export class NoteHistory implements ICollection {
   name = "notehistory";
-  versionsLimit = 100;
   sessionContent;
   readonly collection: SQLCollection<"notehistory", HistorySession>;
   constructor(private readonly db: Database) {
@@ -75,13 +74,19 @@ export class NoteHistory implements ICollection {
 
   async add(
     sessionId: string,
-    content: NoteContent<boolean> & { noteId: string; locked: boolean }
+    content: Partial<NoteContent<boolean>> & {
+      noteId: string;
+      locked?: boolean;
+      title?: string;
+    }
   ) {
     const { noteId, locked } = content;
     sessionId = `${noteId}_${sessionId}`;
 
     if (await this.collection.exists(sessionId)) {
-      await this.collection.update([sessionId], { locked });
+      await this.collection.update([sessionId], {
+        locked
+      });
     } else {
       await this.collection.upsert({
         type: "session",
@@ -94,13 +99,17 @@ export class NoteHistory implements ICollection {
         locked
       });
     }
+
     await this.sessionContent.add(sessionId, content, locked);
+
     await this.cleanup(noteId);
 
     return sessionId;
   }
 
-  private async cleanup(noteId: string, limit = this.versionsLimit) {
+  private async cleanup(noteId: string, limit?: number) {
+    limit = limit || (await this.db.options.maxNoteVersions());
+    if (!limit) return;
     const history = await this.db
       .sql()
       .selectFrom("notehistory")
@@ -181,22 +190,46 @@ export class NoteHistory implements ICollection {
     if (!note || !content) return;
 
     if (session.locked && isCipher(content.data)) {
+      const sessionId = `${Date.now()}`;
       await this.db.content.add({
         id: note.contentId,
         noteId: session.noteId,
-        sessionId: `${Date.now()}`,
+        sessionId: sessionId,
         data: content.data,
         type: content.type
       });
-    } else if (content.data && !isCipher(content.data)) {
-      await this.db.notes.add({
-        id: session.noteId,
-        sessionId: `${Date.now()}`,
-        content: {
-          data: content.data,
-          type: content.type
+
+      if (content.title) {
+        await this.db.notes.add({
+          id: session.noteId,
+          sessionId: sessionId,
+          title: content.title
+        });
+      }
+    } else {
+      const note: Partial<
+        Note & {
+          content: NoteContent<false>;
+          sessionId: string;
         }
-      });
+      > = {
+        id: session.noteId,
+        sessionId: `${Date.now()}`
+      };
+
+      note.content =
+        content.data && content.type && !isCipher(content.data)
+          ? {
+              data: content.data,
+              type: content.type
+            }
+          : { data: "<p></p>", type: "tiptap" };
+
+      if (content.title) {
+        note.title = content.title;
+      }
+
+      await this.db.notes.add(note);
     }
   }
 

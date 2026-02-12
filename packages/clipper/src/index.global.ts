@@ -26,7 +26,7 @@ declare global {
   };
 }
 
-global.Clipper = {
+globalThis.Clipper = {
   clipArticle,
   clipPage
 };

@@ -1,5 +1,39 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`convert HTML to markdown with callout > html-to-md-callout.md 1`] = `
+"<div data-block-id="rhV2uFhw" data-callout-type="success" class="callout"><h4 data-block-id="bFvPV3Vx">Hello world</h4><p data-block-id="5p4vIFMh" data-spacing="double">kjsbva</p><p data-block-id="ltfvam7i" data-spacing="double">vadvkjabsdv</p><p data-block-id="bGYLgeJA" data-spacing="double">dvjkasbdv</p></div>
+
+adsvjkabsdv
+
+advjakbsdv
+
+
+
+"
+`;
+
+exports[`convert HTML to markdown with checklist > html-to-md-checklist.md 1`] = `
+"oeee
+
+- [ ] 123
+
+- [x] 123
+
+- [ ] 13123
+
+- [ ] 123123
+
+    - [ ] dskjvdskbv
+
+    - [ ] sdvkjsdv
+
+    - [ ] dsv
+
+- [ ] 123123
+
+"
+`;
+
 exports[`convert HTML to markdown with codeblock2 > html-to-md-codeblock2.md 1`] = `
 "\`\`\`
 hello
@@ -126,6 +160,16 @@ But this post was supposed to be about the "Secrets" of Typescript Generics, rig
 "
 `;
 
+exports[`convert HTML to markdown with leadingWhitespaces > html-to-md-leadingWhitespaces.md 1`] = `
+"two spaces
+
+four spaces  
+two spaces  
+four spaces
+
+"
+`;
+
 exports[`convert HTML to markdown with outlinelists > html-to-md-outlinelists.md 1`] = `
 "Testing outline list:
 
@@ -238,6 +282,35 @@ Nene
 - vsadvdsa
 
 "
+`;
+
+exports[`convert HTML to text with callout > html-to-txt-callout.txt 1`] = `
+"HELLO WORLD
+
+kjsbva
+
+vadvkjabsdv
+
+dvjkasbdv
+
+adsvjkabsdv
+
+advjakbsdv
+
+
+"
+`;
+
+exports[`convert HTML to text with checklist > html-to-txt-checklist.txt 1`] = `
+"oeee
+ ☐ 123
+ ✅ 123
+ ☐ 13123
+ ☐ 123123
+   ☐ dskjvdskbv
+   ☐ sdvkjsdv
+   ☐ dsv
+ ☐ 123123"
 `;
 
 exports[`convert HTML to text with codeblock2 > html-to-txt-codeblock2.txt 1`] = `
@@ -387,6 +460,14 @@ right? Well, let's get into that.
 
 
 4. TYPE INFERENCE USING INTERFACE PROPERTIES"
+`;
+
+exports[`convert HTML to text with leadingWhitespaces > html-to-txt-leadingWhitespaces.txt 1`] = `
+"  two spaces
+
+    four spaces
+  two spaces
+    four spaces"
 `;
 
 exports[`convert HTML to text with outlinelists > html-to-txt-outlinelists.txt 1`] = `

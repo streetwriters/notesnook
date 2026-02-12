@@ -21,6 +21,8 @@ import { Cipher } from "@notesnook/crypto";
 import { isCipher } from "./utils/index.js";
 
 export type TimeFormat = "12-hour" | "24-hour";
+export type DayFormat = "short" | "long";
+export type WeekFormat = "Sun" | "Mon";
 
 export type SortOptions = {
   sortBy:
@@ -80,6 +82,7 @@ export type Collections = {
   sessioncontent: "sessioncontent";
   settingsv2: "settingitem";
   vaults: "vault";
+  monographs: "monograph";
 
   /**
    * @deprecated only kept here for migration purposes
@@ -110,6 +113,7 @@ export type GroupableItem = ValueOf<
     | "settings"
     | "settingitem"
     | "vault"
+    | "monograph"
   >
 >;
 
@@ -131,6 +135,7 @@ export type ItemMap = {
   settingitem: SettingItem;
   vault: Vault;
   searchResult: HighlightedResult;
+  monograph: Monograph;
 
   /**
    * @deprecated only kept here for migration purposes
@@ -205,6 +210,10 @@ export interface Note extends BaseItem<"note"> {
 
   isGeneratedTitle?: boolean;
   archived?: boolean;
+  expiryDate: {
+    dateModified: number;
+    value: number | null;
+  };
 }
 
 export interface Notebook extends BaseItem<"notebook"> {
@@ -424,6 +433,7 @@ export interface SessionContentItem extends BaseItem<"sessioncontent"> {
   compressed: boolean;
   localOnly: boolean;
   locked: boolean;
+  title: string;
 }
 
 export type TrashCleanupInterval = 1 | 7 | 30 | 365 | -1;
@@ -469,6 +479,8 @@ export type SettingItemMap = {
   trashCleanupInterval: TrashCleanupInterval;
   titleFormat: string;
   timeFormat: TimeFormat;
+  dayFormat: DayFormat;
+  weekFormat: WeekFormat;
   dateFormat: string;
   defaultNotebook: string | undefined;
   defaultTag: string | undefined;
@@ -490,10 +502,18 @@ export interface Vault extends BaseItem<"vault"> {
   key: Cipher<"base64">;
 }
 
+export interface Monograph extends BaseItem<"monograph"> {
+  title: string;
+  datePublished: number;
+  selfDestruct: boolean;
+  password?: Cipher<"base64">;
+}
+
 export type Match = {
   prefix: string;
   match: string;
   suffix: string;
+  id?: string;
 };
 
 export interface HighlightedResult extends BaseItem<"searchResult"> {
@@ -528,7 +548,7 @@ export type BaseTrashItem<TItem extends BaseItem<"note" | "notebook">> =
     /**
      * deletedBy tells who deleted this specific item.
      */
-    deletedBy: "user" | "app";
+    deletedBy: "user" | "app" | "expired";
     /**
      * @deprecated
      */
@@ -539,13 +559,49 @@ export type TrashItem = BaseTrashItem<Note> | BaseTrashItem<Notebook>;
 
 export type AuthenticatorType = "app" | "sms" | "email";
 
+export type SubscriptionPlanId =
+  | "free"
+  | "essential"
+  | "pro"
+  | "believer"
+  | "education"
+  | "legacyPro";
+
+export enum SubscriptionPlan {
+  FREE = 0,
+  ESSENTIAL = 1,
+  PRO = 2,
+  BELIEVER = 3,
+  EDUCATION = 4,
+  LEGACY_PRO = 5
+}
+
+export enum SubscriptionStatus {
+  ACTIVE,
+  TRIAL,
+  CANCELED,
+  PAUSED,
+  EXPIRED
+}
+
+export enum SubscriptionProvider {
+  STREETWRITERS = 0,
+  APPLE = 1,
+  GOOGLE = 2,
+  PADDLE = 3
+}
+
 export type User = {
   id: string;
   email: string;
   isEmailConfirmed: boolean;
   salt: string;
   attachmentsKey?: Cipher<"base64">;
+  monographPasswordsKey?: Cipher<"base64">;
+  inboxKeys?: { public: string; private: Cipher<"base64"> };
   marketingConsent?: boolean;
+  storageUsed?: number;
+  totalStorage?: number;
   mfa: {
     isEnabled: boolean;
     primaryMethod: AuthenticatorType;
@@ -556,17 +612,29 @@ export type User = {
     appId: 0;
     cancelURL: string | null;
     expiry: number;
-    productId: string;
-    provider: 0 | 1 | 2 | 3 | 4;
+    trialExpiry?: number;
+    productId: string | null;
+    provider: SubscriptionProvider;
     start: number;
-    type: 0 | 1 | 2 | 5 | 6 | 7;
+    plan: SubscriptionPlan;
+    status: SubscriptionStatus;
+    trialsAvailed?: SubscriptionPlan[];
     updateURL: string | null;
+    googlePurchaseToken: string | null;
   };
 };
 
 export type Profile = {
   fullName?: string;
   profilePicture?: string;
+};
+
+export type InboxApiKey = {
+  name: string;
+  key: string;
+  dateCreated: number;
+  expiryDate: number;
+  lastUsedAt: number;
 };
 
 export function isDeleted(item: any): item is DeletedItem {
@@ -606,4 +674,21 @@ export function isEncryptedContent(
   content: NoteContent<boolean>
 ): content is NoteContent<true> {
   return isCipher(content.data);
+}
+
+export function planToId(plan: SubscriptionPlan): SubscriptionPlanId {
+  switch (plan) {
+    case SubscriptionPlan.FREE:
+      return "free";
+    case SubscriptionPlan.BELIEVER:
+      return "believer";
+    case SubscriptionPlan.EDUCATION:
+      return "education";
+    case SubscriptionPlan.ESSENTIAL:
+      return "essential";
+    case SubscriptionPlan.PRO:
+      return "pro";
+    case SubscriptionPlan.LEGACY_PRO:
+      return "legacyPro";
+  }
 }

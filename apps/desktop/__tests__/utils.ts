@@ -18,144 +18,198 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { execSync } from "child_process";
-import { mkdir } from "fs/promises";
+import { cp } from "fs/promises";
 import { fileURLToPath } from "node:url";
-import path from "path";
+import path, { join, resolve } from "path";
 import { _electron as electron } from "playwright";
-import slugify from "slugify";
-import { TaskContext } from "vitest";
+import { existsSync } from "fs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const IS_DEBUG = process.env.NN_DEBUG === "true" || process.env.CI === "true";
+const productName = `NotesnookTestHarness`;
+const SOURCE_DIR = resolve("output", productName);
 
-interface AppContext {
+export interface AppContext {
   app: import("playwright").ElectronApplication;
   page: import("playwright").Page;
   configPath: string;
+  userDataDir: string;
+  outputDir: string;
   relaunch: () => Promise<void>;
 }
 
-interface TestOptions {
+export interface TestOptions {
   version: string;
 }
 
-export async function harness(
-  t: TaskContext,
-  cb: (ctx: AppContext) => Promise<void>,
-  options?: TestOptions
-) {
-  const ctx = await buildAndLaunchApp(options);
-
-  t.onTestFinished(async (result) => {
-    if (result.state === "fail") {
-      await mkdir("test-results", { recursive: true });
-      await ctx.page.screenshot({
-        path: path.join(
-          "test-results",
-          `${slugify(t.task.name)}-${process.platform}-${
-            process.arch
-          }-error.png`
-        )
-      });
-    }
-    await ctx.app.close();
-  });
-
-  await cb(ctx);
+export interface Fixtures {
+  options: TestOptions;
+  ctx: AppContext;
 }
 
-async function buildAndLaunchApp(options?: TestOptions): Promise<AppContext> {
-  const productName = makeid(10);
-  const executablePath = await buildApp({ ...options, productName });
-  const { app, page, configPath } = await launchApp(executablePath);
+export async function buildAndLaunchApp(
+  options?: TestOptions
+): Promise<AppContext> {
+  const productName = `notesnooktest${makeid(10)}`;
+  const outputDir = path.join("test-artifacts", `${productName}-output`);
+  const executablePath = await copyBuild({
+    ...options,
+    outputDir
+  });
+  const { app, page, configPath, userDataDir } = await launchApp(
+    executablePath,
+    productName,
+    options?.version
+  );
   const ctx: AppContext = {
     app,
     page,
     configPath,
+    userDataDir,
+    outputDir,
     relaunch: async () => {
-      const { app, page, configPath } = await launchApp(executablePath);
+      const { app, page, configPath, userDataDir } = await launchApp(
+        executablePath,
+        productName,
+        options?.version
+      );
       ctx.app = app;
       ctx.page = page;
+      ctx.userDataDir = userDataDir;
       ctx.configPath = configPath;
     }
   };
   return ctx;
 }
 
-async function launchApp(executablePath: string) {
+async function launchApp(
+  executablePath: string,
+  packageName: string,
+  version?: string
+) {
+  const userDataDir = resolve(
+    __dirname,
+    "..",
+    "test-artifacts",
+    "user_data_dirs",
+    packageName
+  );
   const app = await electron.launch({
     executablePath,
     args: IS_DEBUG ? [] : ["--hidden"],
-    env:
-      process.platform === "linux"
+    env: {
+      ...(process.platform === "linux"
         ? {
             ...(process.env as Record<string, string>),
             APPIMAGE: "true"
           }
-        : (process.env as Record<string, string>)
+        : (process.env as Record<string, string>)),
+      CUSTOM_USER_DATA_DIR: userDataDir,
+      ...(version
+        ? {
+            CUSTOM_APP_VERSION: version
+          }
+        : {})
+    }
   });
 
   const page = await app.firstWindow();
 
-  const userDataDirectory = await app.evaluate((a) => {
-    return a.app.getPath("userData");
-  });
-  const configPath = path.join(userDataDirectory, "config.json");
+  const configPath = path.join(userDataDir, "UserData", "config.json");
   return {
     app,
     page,
-    configPath
+    configPath,
+    userDataDir
   };
 }
 
-async function buildApp({
-  version,
-  productName
-}: {
-  version?: string;
-  productName: string;
-}) {
-  const buildRoot = path.join("test-artifacts", `${productName}-build`);
-  const output = path.join("test-artifacts", `${productName}-output`);
-  execSync(`npm run release -- --root ${buildRoot} --skip-tsc-build`, {
-    stdio: IS_DEBUG ? "inherit" : "ignore"
-  });
-
-  const args = [
-    `--config electron-builder.config.js`,
-    `--c.extraMetadata.productName=${productName}`,
-    "--publish=never"
-  ];
-  if (version) args.push(`--c.extraMetadata.version=${version}`);
-
-  execSync(`npx electron-builder --dir --${process.arch} ${args.join(" ")}`, {
-    stdio: IS_DEBUG ? "inherit" : "ignore",
-    env: {
-      ...process.env,
-      NOTESNOOK_STAGING: "true",
-      NN_BUILD_ROOT: buildRoot,
-      NN_PRODUCT_NAME: productName,
-      NN_APP_ID: `com.notesnook.test.${productName}`,
-      NN_OUTPUT_DIR: output
+let MAX_RETRIES = 3;
+export async function buildApp(version?: string) {
+  if (!existsSync(SOURCE_DIR)) {
+    const args = [
+      "electron-builder",
+      "--dir",
+      `--${process.arch}`,
+      `--config electron-builder.config.js`,
+      `--c.extraMetadata.productName=${productName}`,
+      `--c.compression=store`,
+      "--publish=never"
+    ];
+    if (version) args.push(`--c.extraMetadata.version=${version}`);
+    try {
+      execSync(`npx ${args.join(" ")}`, {
+        stdio: IS_DEBUG ? "inherit" : "ignore",
+        env: {
+          ...process.env,
+          NOTESNOOK_STAGING: "true",
+          NN_PRODUCT_NAME: productName,
+          NN_APP_ID: `com.notesnook.test.${productName}`,
+          NN_OUTPUT_DIR: SOURCE_DIR
+        }
+      });
+    } catch (e) {
+      if (--MAX_RETRIES) {
+        console.log("retrying...");
+        return await buildApp(version);
+      } else throw e;
     }
-  });
+  }
+}
 
-  return path.join(
+async function copyBuild({ outputDir }: { outputDir: string }) {
+  return process.platform === "win32"
+    ? await makeBuildCopyWindows(outputDir, productName)
+    : process.platform === "darwin"
+    ? await makeBuildCopyMacOS(outputDir, productName)
+    : await makeBuildCopyLinux(outputDir, productName);
+}
+
+async function makeBuildCopyLinux(outputDir: string, productName: string) {
+  const platformDir =
+    process.arch === "arm64" ? "linux-arm64-unpacked" : "linux-unpacked";
+  const appDir = await makeBuildCopy(outputDir, platformDir);
+  return resolve(
     __dirname,
     "..",
-    output,
-    process.platform === "linux"
-      ? process.arch === "arm64"
-        ? "linux-arm64-unpacked"
-        : "linux-unpacked"
-      : process.platform === "darwin"
-      ? process.arch === "arm64"
-        ? `mac-arm64/${productName}.app/Contents/MacOS/`
-        : `mac/${productName}.app/Contents/MacOS/`
-      : "win-unpacked",
-    process.platform === "win32" ? `${productName}.exe` : productName
+    appDir,
+    productName.toLowerCase().replace(/\s+/g, "-")
   );
+}
+
+async function makeBuildCopyWindows(outputDir: string, productName: string) {
+  const platformDir =
+    process.arch === "arm64" ? "win-arm64-unpacked" : "win-unpacked";
+  const appDir = await makeBuildCopy(outputDir, platformDir);
+  return resolve(__dirname, "..", appDir, `${productName}.exe`);
+}
+
+async function makeBuildCopyMacOS(outputDir: string, productName: string) {
+  const platformDir = process.arch === "arm64" ? "mac-arm64" : "mac";
+  const appDir = await makeBuildCopy(outputDir, platformDir);
+  return resolve(
+    __dirname,
+    "..",
+    appDir,
+    `${productName}.app`,
+    "Contents",
+    "MacOS",
+    productName
+  );
+}
+
+async function makeBuildCopy(outputDir: string, platformDir: string) {
+  const appDir = outputDir;
+  await cp(join(SOURCE_DIR, platformDir), outputDir, {
+    recursive: true,
+    preserveTimestamps: true,
+    verbatimSymlinks: true,
+    dereference: false,
+    force: true
+  });
+
+  return appDir;
 }
 
 function makeid(length: number) {

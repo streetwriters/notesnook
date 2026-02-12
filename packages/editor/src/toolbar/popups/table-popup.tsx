@@ -125,7 +125,7 @@ export function TablePopup(props: TablePopupProps) {
                         bg: "background-selected",
                         borderColor: "transparent"
                       }
-                    : { bg: "transparent", borderColor: "border" })
+                    : { bg: "background-secondary", borderColor: "border" })
                 }}
                 onTouchStart={() => {
                   setCellLocation(getCellLocation(index, tableSize));

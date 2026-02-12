@@ -10,6 +10,12 @@ on:
       # re-run workflow if workflow file changes
       - ".github/workflows/editor.tests.yml"
   pull_request:
+    branches:
+      - "master"
+    paths:
+      - "packages/editor/**"
+      # re-run workflow if workflow file changes
+      - ".github/workflows/editor.tests.yml"
     types:
       - "ready_for_review"
       - "opened"
@@ -32,12 +38,8 @@ jobs:
           npm ci --ignore-scripts --prefer-offline --no-audit
           npm run bootstrap -- --scope=editor
 
-      - name: Setup environment
-        run: |
-          echo "NX_CLOUD_ACCESS_TOKEN=${{ secrets.NX_CLOUD_ACCESS_TOKEN }}" >> $GITHUB_ENV
-
       - name: Build editor
-        run: npx nx build @notesnook/editor
+        run: npm run tx @notesnook/editor:build
 
       - name: Run all @notesnook/editor tests
-        run: npx nx test @notesnook/editor
+        run: npm run tx @notesnook/editor:test

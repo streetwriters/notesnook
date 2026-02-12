@@ -20,7 +20,7 @@ import { EVENTS, Note } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect } from "react";
-import { View } from "react-native";
+import { ListRenderItemInfo, View } from "react-native";
 import { FlatList } from "react-native-actions-sheet";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../../common/database";
@@ -187,7 +187,7 @@ export default function EditorTabs({
   ]);
 
   const renderTabItem = React.useCallback(
-    ({ item }: { item: TabItem }) => {
+    ({ item }: ListRenderItemInfo<TabItem>) => {
       return (
         <TabItemComponent
           key={item.id}

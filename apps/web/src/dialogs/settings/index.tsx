@@ -38,7 +38,9 @@ import {
   Pro,
   Servers,
   ShieldLock,
-  Sync
+  Sync,
+  Inbox,
+  CircleEmpty
 } from "../../components/icons";
 import NavigationItem from "../../components/navigation-menu/navigation-item";
 import { FlexScrollContainer } from "../../components/scroll-container";
@@ -52,7 +54,6 @@ import {
 } from "./types";
 import { ProfileSettings } from "./profile-settings";
 import { AuthenticationSettings } from "./auth-settings";
-import { useIsUserPremium } from "../../hooks/use-is-user-premium";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { SyncSettings } from "./sync-settings";
 import { BehaviourSettings } from "./behaviour-settings";
@@ -70,7 +71,7 @@ import {
   SupportSettings
 } from "./other-settings";
 import { AppearanceSettings } from "./appearance-settings";
-import { debounce, usePromise } from "@notesnook/common";
+import { debounce, useIsFeatureAvailable, usePromise } from "@notesnook/common";
 import { SubscriptionSettings } from "./subscription-settings";
 import { ScopedThemeProvider } from "../../components/theme-provider";
 import { AppLockSettings } from "./app-lock-settings";
@@ -78,6 +79,10 @@ import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import { ServersSettings } from "./servers-settings";
 import { strings } from "@notesnook/intl";
 import { mdToHtml } from "../../utils/md";
+import { InboxSettings } from "./inbox-settings";
+import { withFeatureCheck } from "../../common";
+import { NotesnookCircleSettings } from "./notesnook-circle-settings";
+import { hashNavigate } from "../../navigation";
 
 type SettingsDialogProps = BaseDialogProps<false> & {
   activeSection?: SectionKeys;
@@ -106,6 +111,18 @@ const sectionGroups: SectionGroup[] = [
         title: strings.sync(),
         icon: Sync,
         isHidden: () => !useUserStore.getState().isLoggedIn
+      },
+      {
+        key: "circle",
+        title: "Notesnook Circle",
+        icon: CircleEmpty,
+        isHidden: () => !useUserStore.getState().isLoggedIn
+      },
+      {
+        key: "inbox",
+        title: "Inbox",
+        icon: Inbox,
+        isHidden: () => true // hidden until complete
       }
     ]
   },
@@ -176,7 +193,9 @@ const SettingsGroups = [
   ...SupportSettings,
   ...AboutSettings,
   ...SubscriptionSettings,
-  ...ServersSettings
+  ...ServersSettings,
+  ...InboxSettings,
+  ...NotesnookCircleSettings
 ];
 
 // Thoughts:
@@ -252,6 +271,12 @@ function SettingsSideBar(props: SettingsSideBarProps) {
   const { onNavigate, activeSection } = props;
   const [route, setRoute] = useState<SectionKeys>(activeSection || "profile");
   useUserStore((store) => store.isLoggedIn);
+
+  useEffect(() => {
+    hashNavigate(`/settings/${route}`, {
+      notify: false
+    });
+  }, [route, activeSection]);
 
   return (
     <FlexScrollContainer
@@ -424,11 +449,11 @@ function SettingItem(props: { item: Setting }) {
   const { item } = props;
   const [state, setState] = useState<unknown>();
   const [workIndex, setWorkIndex] = useState<number>();
-  const isUserPremium = useIsUserPremium();
+  const feature = useIsFeatureAvailable(item.featureId);
 
   useEffect(() => {
     if (!item.onStateChange) return;
-    const unsubscribe = item.onStateChange(setState);
+    const unsubscribe = item.onStateChange((state) => setState(state));
     return () => {
       unsubscribe?.();
     };
@@ -472,12 +497,17 @@ function SettingItem(props: { item: Setting }) {
         }}
       >
         <Flex sx={{ flexDirection: "column", flex: 1 }}>
-          <Text
-            variant={"body"}
-            sx={{ fontWeight: "medium", color: "heading" }}
-          >
-            {item.title}
-          </Text>
+          <Flex sx={{ alignItems: "center", gap: 1 }}>
+            <Text
+              variant={"body"}
+              sx={{ fontWeight: "medium", color: "heading" }}
+            >
+              {item.title}
+            </Text>
+            {feature && !feature.isAllowed ? (
+              <Pro size={14} color="orange" />
+            ) : null}
+          </Flex>
           {item.description && (
             <Text
               as={"div"}
@@ -511,7 +541,9 @@ function SettingItem(props: { item: Setting }) {
                     disabled={workIndex === index}
                     title={component.title}
                     variant={component.variant}
-                    onClick={() => workWithLoading(index, component.action)}
+                    onClick={withFeatureCheck(feature, () =>
+                      workWithLoading(index, component.action)
+                    )}
                   >
                     {workIndex === index ? (
                       <Loading size={18} sx={{ mr: 2 }} />
@@ -530,7 +562,9 @@ function SettingItem(props: { item: Setting }) {
                         : "icon-secondary"
                     }}
                     disabled={workIndex === index}
-                    onChange={() => workWithLoading(index, component.toggle)}
+                    onChange={withFeatureCheck(feature, () =>
+                      workWithLoading(index, component.toggle)
+                    )}
                     checked={component.isToggled()}
                     data-checked={component.isToggled()}
                   />
@@ -539,12 +573,15 @@ function SettingItem(props: { item: Setting }) {
                 return (
                   <SelectComponent
                     {...component}
-                    isUserPremium={isUserPremium}
+                    onSelectionChanged={withFeatureCheck(feature, (value) =>
+                      component.onSelectionChanged(value)
+                    )}
                   />
                 );
               case "input":
                 return component.inputType === "number" ? (
                   <Input
+                    key={component.defaultValue()}
                     type={"number"}
                     min={component.min}
                     max={component.max}
@@ -561,6 +598,16 @@ function SettingItem(props: { item: Setting }) {
                           : value;
                       component.onChange(value);
                     }, 500)}
+                    onBlur={(e) => {
+                      let value = e.target.valueAsNumber;
+                      value =
+                        Number.isNaN(value) || value < component.min
+                          ? component.min
+                          : value > component.max
+                          ? component.max
+                          : value;
+                      component.onChange(value);
+                    }}
                   />
                 ) : (
                   <Input
@@ -571,6 +618,7 @@ function SettingItem(props: { item: Setting }) {
                       (e) => component.onChange(e.target.value),
                       500
                     )}
+                    onBlur={(e) => component.onChange(e.target.value)}
                   />
                 );
               case "icon":
@@ -595,10 +643,8 @@ function SettingItem(props: { item: Setting }) {
   );
 }
 
-function SelectComponent(
-  props: DropdownSettingComponent & { isUserPremium: boolean }
-) {
-  const { onSelectionChanged, options, isUserPremium } = props;
+export function SelectComponent(props: Omit<DropdownSettingComponent, "type">) {
+  const { onSelectionChanged, options } = props;
   const selectedOption = usePromise(() => props.selectedOption(), [props]);
 
   return (
@@ -621,9 +667,9 @@ function SelectComponent(
     >
       {options.map((option) => (
         <option
-          disabled={option.premium && !isUserPremium}
           key={option.value}
           value={option.value}
+          disabled={option.disabled}
         >
           {option.title}
         </option>

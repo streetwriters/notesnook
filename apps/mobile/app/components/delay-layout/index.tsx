@@ -42,9 +42,7 @@ export default function DelayLayout({
   ...props
 }: IDelayLayoutProps) {
   const { colors } = useThemeColors();
-  const loading = useDelayLayout(
-    !props.delay || props.delay < 300 ? 0 : props.delay
-  );
+  const loading = useDelayLayout(props.delay === undefined ? 200 : props.delay);
   const Placeholder = placeholder[props.type || "default"];
 
   return loading || props.wait ? (

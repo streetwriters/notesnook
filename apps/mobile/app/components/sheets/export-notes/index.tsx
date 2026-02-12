@@ -39,16 +39,13 @@ import {
   presentSheet
 } from "../../../services/event-manager";
 import Exporter from "../../../services/exporter";
-import PremiumService from "../../../services/premium";
 import { useSettingStore } from "../../../stores/use-setting-store";
-import { useUserStore } from "../../../stores/use-user-store";
 import { getElevationStyle } from "../../../utils/elevation";
 import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
 import { DefaultAppStyles } from "../../../utils/styles";
 import { sleep } from "../../../utils/time";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
-import { ProTag } from "../../premium/pro-tag";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
 import { Pressable } from "../../ui/pressable";
@@ -79,13 +76,11 @@ const ExportNotesSheet = ({
     | undefined
   >();
   const [status, setStatus] = useState<string>();
-  const premium = useUserStore((state) => state.premium);
 
   const exportNoteAs = async (
     type: "pdf" | "txt" | "md" | "html" | "md-frontmatter"
   ) => {
     if (exporting) return;
-    if (!PremiumService.get() && type !== "txt") return;
     setExporting(true);
     update?.({ disableClosing: true } as PresentSheetOptions);
     setComplete(false);
@@ -123,8 +118,7 @@ const ExportNotesSheet = ({
         await exportNoteAs("pdf");
       },
       icon: "file-pdf-box",
-      id: notesnook.ids.dialogs.export.pdf,
-      pro: premium
+      id: notesnook.ids.dialogs.export.pdf
     },
     {
       title: "Markdown",
@@ -132,8 +126,7 @@ const ExportNotesSheet = ({
         await exportNoteAs("md");
       },
       icon: "language-markdown",
-      id: notesnook.ids.dialogs.export.md,
-      pro: premium
+      id: notesnook.ids.dialogs.export.md
     },
     {
       title: "Markdown + Frontmatter",
@@ -141,8 +134,7 @@ const ExportNotesSheet = ({
         await exportNoteAs("md-frontmatter");
       },
       icon: "language-markdown",
-      id: notesnook.ids.dialogs.export.md,
-      pro: premium
+      id: notesnook.ids.dialogs.export.md
     },
     {
       title: "Plain Text",
@@ -150,8 +142,7 @@ const ExportNotesSheet = ({
         await exportNoteAs("txt");
       },
       icon: "card-text",
-      id: notesnook.ids.dialogs.export.text,
-      pro: true
+      id: notesnook.ids.dialogs.export.text
     },
     {
       title: "HTML",
@@ -159,8 +150,7 @@ const ExportNotesSheet = ({
         await exportNoteAs("html");
       },
       icon: "language-html5",
-      id: notesnook.ids.dialogs.export.html,
-      pro: premium
+      id: notesnook.ids.dialogs.export.html
     }
   ];
 
@@ -200,8 +190,7 @@ const ExportNotesSheet = ({
                   paddingVertical: DefaultAppStyles.GAP_VERTICAL,
                   justifyContent: "flex-start",
                   borderRadius: 0,
-                  paddingHorizontal: DefaultAppStyles.GAP,
-                  opacity: item.pro ? 1 : 0.5
+                  paddingHorizontal: DefaultAppStyles.GAP
                 }}
               >
                 <View
@@ -216,9 +205,7 @@ const ExportNotesSheet = ({
                 >
                   <Icon
                     name={item.icon}
-                    color={
-                      item.pro ? colors.primary.accent : colors.primary.icon
-                    }
+                    color={colors.primary.icon}
                     size={AppFontSize.xxxl + 10}
                   />
                 </View>
@@ -227,7 +214,6 @@ const ExportNotesSheet = ({
                     flexShrink: 1
                   }}
                 >
-                  {!item.pro ? <ProTag size={12} /> : null}
                   <Heading style={{ marginLeft: 10 }} size={AppFontSize.md}>
                     {item.title}
                   </Heading>
@@ -298,7 +284,6 @@ const ExportNotesSheet = ({
                   }
                   type="accent"
                   width={250}
-                  fontSize={AppFontSize.md}
                   style={{
                     marginTop: DefaultAppStyles.GAP_VERTICAL
                   }}
@@ -310,6 +295,7 @@ const ExportNotesSheet = ({
                         ToastManager.error(e as Error);
                       });
                     } else {
+                      await sleep(500);
                       FileViewer.open(result?.filePath, {
                         showOpenWithDialog: true,
                         showAppsSuggestions: true
@@ -327,7 +313,6 @@ const ExportNotesSheet = ({
                   title={strings.share()}
                   type="secondaryAccented"
                   width={250}
-                  fontSize={AppFontSize.md}
                   style={{
                     marginTop: DefaultAppStyles.GAP_VERTICAL
                   }}
@@ -338,6 +323,7 @@ const ExportNotesSheet = ({
                       .getState()
                       .setAppDidEnterBackgroundForAction(true);
                     if (Platform.OS === "ios") {
+                      await sleep(500);
                       Share.open({
                         url: result?.fileDir + result.fileName
                       }).catch(() => {
@@ -358,7 +344,6 @@ const ExportNotesSheet = ({
                   title={strings.exportAgain()}
                   type="secondaryAccented"
                   width={250}
-                  fontSize={AppFontSize.md}
                   style={{
                     marginTop: DefaultAppStyles.GAP_VERTICAL
                   }}

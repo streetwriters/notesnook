@@ -19,11 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { IconButton } from "../../components/ui/icon-button";
-import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import Navigation from "../../services/navigation";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
@@ -36,15 +35,16 @@ export const SearchBar = ({
   onChangeText: (value: string) => void;
   loading?: boolean;
 }) => {
+  const [clearButton, setClearButton] = useState(false);
   const selectionMode = useSelectionStore((state) => state.selectionMode);
   const isFocused = useNavigationStore(
     (state) => state.focusedRouteId === "Search"
   );
-  const insets = useGlobalSafeAreaInsets();
   const { colors } = useThemeColors();
   const inputRef = useRef<TextInput>(null);
   const _onChangeText = (value: string) => {
     onChangeText(value);
+    setClearButton(!!value);
   };
 
   return selectionMode && isFocused ? null : (
@@ -56,7 +56,6 @@ export const SearchBar = ({
     >
       <View
         style={{
-          marginTop: DefaultAppStyles.GAP_SMALL,
           flexDirection: "row",
           alignItems: "center",
           width: "100%",
@@ -84,7 +83,7 @@ export const SearchBar = ({
           testID="search-input"
           style={{
             fontSize: AppFontSize.sm,
-            fontFamily: "OpenSans-Regular",
+            fontFamily: "Inter-Regular",
             flexGrow: 1,
             color: colors.primary.paragraph,
             paddingTop: 0,
@@ -100,6 +99,23 @@ export const SearchBar = ({
           autoCorrect={false}
           placeholderTextColor={colors.primary.placeholder}
         />
+
+        {clearButton ? (
+          <IconButton
+            name="close"
+            size={AppFontSize.xxl}
+            top={10}
+            testID="clear-search"
+            bottom={10}
+            onPress={() => {
+              inputRef.current?.clear();
+              onChangeText("");
+              setClearButton(false);
+            }}
+            color={colors.primary.paragraph}
+            type="plain"
+          />
+        ) : null}
       </View>
     </View>
   );

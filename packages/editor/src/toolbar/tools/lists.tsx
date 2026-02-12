@@ -22,7 +22,10 @@ import { Box, Button, Flex } from "@theme-ui/components";
 import { IconNames } from "../icons.js";
 import { useCallback, useRef } from "react";
 import { SplitButton } from "../components/split-button.js";
-import { usePopupManager, useToolbarLocation } from "../stores/toolbar-store.js";
+import {
+  usePopupManager,
+  useToolbarLocation
+} from "../stores/toolbar-store.js";
 import { getToolbarElement } from "../utils/dom.js";
 import { PopupWrapper } from "../../components/popup-presenter/index.js";
 import { ToolButton } from "../components/tool-button.js";
@@ -45,19 +48,20 @@ type ListToolProps<TListStyleTypes> = ToolProps & {
 function ListTool<TListStyleTypes extends string>(
   props: ListToolProps<TListStyleTypes>
 ) {
-  const { editor, onClick, subTypes, type, parentGroup, ...toolProps } = props;
+  const { editor, onClick, subTypes, type, parentGroup } = props;
   const toolbarLocation = useToolbarLocation();
   const isBottom = toolbarLocation === "bottom";
   const buttonRef = useRef<HTMLButtonElement>(null);
   const { toggle, isOpen, close } = usePopupManager({
-    id: toolProps.title,
+    id: props.title,
     group: "lists",
     parent: parentGroup
   });
 
   return (
     <SplitButton
-      {...toolProps}
+      icon={props.icon}
+      title={props.title}
       buttonRef={buttonRef}
       onClick={onClick}
       toggled={isOpen}
@@ -66,7 +70,7 @@ function ListTool<TListStyleTypes extends string>(
     >
       <PopupWrapper
         group="lists"
-        id={toolProps.title}
+        id={props.title}
         blocking={false}
         focusOnRender={false}
         autoCloseOnUnmount
@@ -175,11 +179,12 @@ export function BulletList(props: ToolProps) {
 }
 
 export function CheckList(props: ToolProps) {
-  const { editor, ...toolProps } = props;
+  const { editor } = props;
 
   return (
     <ToolButton
-      {...toolProps}
+      icon={props.icon}
+      title={props.title}
       toggled={false}
       onClick={() => editor.chain().focus().toggleCheckList().run()}
     />
@@ -187,7 +192,7 @@ export function CheckList(props: ToolProps) {
 }
 
 export function Indent(props: ToolProps) {
-  const { editor, ...toolProps } = props;
+  const { editor } = props;
   const isBottom = useToolbarLocation() === "bottom";
 
   const listItemType = findListItemType(editor);
@@ -195,7 +200,8 @@ export function Indent(props: ToolProps) {
 
   return (
     <ToolButton
-      {...toolProps}
+      icon={props.icon}
+      title={props.title}
       toggled={false}
       onClick={() => editor.chain().focus().sinkListItem(listItemType).run()}
     />
@@ -203,7 +209,7 @@ export function Indent(props: ToolProps) {
 }
 
 export function Outdent(props: ToolProps) {
-  const { editor, ...toolProps } = props;
+  const { editor } = props;
   const isBottom = useToolbarLocation() === "bottom";
 
   const listItemType = findListItemType(editor);
@@ -211,7 +217,8 @@ export function Outdent(props: ToolProps) {
 
   return (
     <ToolButton
-      {...toolProps}
+      icon={props.icon}
+      title={props.title}
       toggled={false}
       onClick={() => editor.chain().focus().liftListItem(listItemType).run()}
     />

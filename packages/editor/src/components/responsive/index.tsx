@@ -26,7 +26,8 @@ import {
 import {
   MenuPresenter,
   MenuPresenterProps,
-  PopupPresenter
+  PopupPresenter,
+  PopupPresenterProps
 } from "@notesnook/ui";
 import { getPopupContainer } from "../../toolbar/utils/dom.js";
 
@@ -51,7 +52,8 @@ export function MobileOnly(props: PropsWithChildren<unknown>) {
 
 export type PopupType = "sheet" | "menu" | "none" | "popup";
 export type ResponsivePresenterProps = MenuPresenterProps &
-  ActionSheetPresenterProps & {
+  ActionSheetPresenterProps &
+  PopupPresenterProps & {
     mobile?: PopupType;
     desktop?: PopupType;
   };

@@ -19,12 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { ThemeDefinition } from "@notesnook/theme";
 import { Appearance, StatusBar } from "react-native";
-import create, { State } from "zustand";
+import { create } from "zustand";
 import SettingsService from "../services/settings";
 import switchTheme from "react-native-theme-switch-animation";
 
 import changeNavigationBarColor from "react-native-navigation-bar-color";
-export interface ThemeStore extends State {
+export interface ThemeStore {
   lightTheme: ThemeDefinition;
   darkTheme: ThemeDefinition;
   colorScheme: "dark" | "light";
@@ -43,7 +43,7 @@ export function changeSystemBarColors() {
     const isDark = useThemeStore.getState().colorScheme === "dark";
     changeNavigationBarColor(
       currTheme.scopes.base.primary.background,
-      isDark,
+      !isDark,
       false
     );
     StatusBar.setBackgroundColor("transparent" as any);

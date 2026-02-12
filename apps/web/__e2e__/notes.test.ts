@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { test, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
 import {
-  getTestId,
   groupByOptions,
   NOTE,
   orderByOptions,
@@ -446,4 +445,17 @@ test("archived note shouldn't appear in search results", async ({ page }) => {
   await app.search(NOTE.title, "notes");
   const searchedNote = await notes.findNote(NOTE);
   expect(searchedNote).toBeUndefined();
+});
+
+test("edit note creation date in properties panel", async ({ page }) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note = await notes.createNote(NOTE);
+
+  const date = new Date("2020-01-15T10:30:00Z");
+  await note?.properties.editDateCreated(date.valueOf());
+
+  const dateCreated = await note?.properties.getDateCreated();
+  expect(dateCreated).toBe("15-01-2020 03:30 PM");
 });

@@ -22,7 +22,7 @@ import { updateStatus } from "../hooks/use-status";
 import {
   Gateway,
   WEB_EXTENSION_CHANNEL_EVENTS
-} from "@notesnook/web-clipper/dist/common/bridge";
+} from "@notesnook/web-clipper/common/bridge.js";
 import { Extension } from "../components/icons";
 
 export class WebExtensionRelay {

@@ -87,7 +87,7 @@ export const SelectionHeader = React.memo(
 
     const restoreItem = async () => {
       if (!selectedItemsList.length) return;
-      if ((await db.trash.restore(...selectedItemsList)) === false) return;
+      await db.trash.restore(...selectedItemsList);
       Navigation.queueRoutesForUpdate();
 
       clearSelection();
@@ -197,16 +197,6 @@ export const SelectionHeader = React.memo(
                     }
                   ]
                 : [
-                    {
-                      title: strings.move(),
-                      onPress: async () => {
-                        const ids = selectedItemsList;
-                        const notebooks = await db.notebooks.all.items(ids);
-                        MoveNotebook.present(notebooks);
-                      },
-                      visible: renderedInRoute === "Notebooks",
-                      icon: "arrow-right-bold-box-outline"
-                    },
                     {
                       title: strings.manageTags(),
                       onPress: async () => {

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ISodium, Sodium } from "@notesnook/sodium";
+import { ISodium } from "@notesnook/sodium";
 import Decryption from "./decryption.js";
 import Encryption from "./encryption.js";
 import { INNCrypto } from "./interfaces.js";
@@ -29,15 +29,19 @@ import {
   Input,
   Output,
   DataFormat,
-  SerializedKey
+  SerializedKey,
+  SerializedKeyPair,
+  EncryptionKeyPair,
+  AsymmetricCipher
 } from "./types.js";
 
 export class NNCrypto implements INNCrypto {
   private isReady = false;
-  private sodium: ISodium = new Sodium();
+  private sodium!: ISodium;
 
   private async init() {
     if (this.isReady) return;
+    this.sodium = new (await import("@notesnook/sodium")).Sodium();
     await this.sodium.initialize();
     this.isReady = true;
   }
@@ -94,6 +98,20 @@ export class NNCrypto implements INNCrypto {
     return decryptedItems;
   }
 
+  async decryptAsymmetric<TOutputFormat extends DataFormat>(
+    keyPair: SerializedKeyPair,
+    cipherData: AsymmetricCipher<DataFormat>,
+    outputFormat: TOutputFormat = "text" as TOutputFormat
+  ): Promise<Output<TOutputFormat>> {
+    await this.init();
+    return Decryption.decryptAsymmetric(
+      this.sodium,
+      keyPair,
+      cipherData,
+      outputFormat
+    );
+  }
+
   async hash(password: string, salt: string): Promise<string> {
     await this.init();
     return Password.hash(this.sodium, password, salt);
@@ -104,9 +122,19 @@ export class NNCrypto implements INNCrypto {
     return KeyUtils.deriveKey(this.sodium, password, salt);
   }
 
+  async deriveKeyPair(): Promise<EncryptionKeyPair> {
+    await this.init();
+    return KeyUtils.deriveKeyPair(this.sodium);
+  }
+
   async exportKey(password: string, salt?: string): Promise<SerializedKey> {
     await this.init();
     return KeyUtils.exportKey(this.sodium, password, salt);
+  }
+
+  async exportKeyPair(): Promise<SerializedKeyPair> {
+    await this.init();
+    return KeyUtils.exportKeyPair(this.sodium);
   }
 
   async createEncryptionStream(key: SerializedKey) {

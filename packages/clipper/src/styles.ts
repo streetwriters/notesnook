@@ -17,64 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { constructUrl, FetchOptions } from "./fetch.js";
-import { compare, calculate, SpecificityArray } from "specificity";
-import { tokenize } from "./css-tokenizer.js";
-import { stringify, parse, SelectorType } from "css-what";
-import { safeQuerySelectorAll } from "./utils.js";
-
-const SHORTHANDS = [
-  "animation",
-  "background",
-  "border",
-  "border-block-end",
-  "border-block-start",
-  "border-bottom",
-  "border-color",
-  "border-image",
-  "border-inline-end",
-  "border-inline-start",
-  "border-left",
-  "border-radius",
-  "border-right",
-  "border-style",
-  "border-top",
-  "border-width",
-  "column-rule",
-  "columns",
-  "contain-intrinsic-size",
-  "flex",
-  "flex-flow",
-  "font",
-  "gap",
-  "grid",
-  "grid-area",
-  "grid-column",
-  "grid-row",
-  "grid-template",
-  "grid-gap",
-  "list-style",
-  "margin",
-  "mask",
-  "offset",
-  "outline",
-  "overflow",
-  "padding",
-  "place-content",
-  "place-items",
-  "place-self",
-  "scroll-margin",
-  "scroll-padding",
-  "text-decoration",
-  "text-emphasis",
-  "transition"
-];
-
-export async function inlineStylesheets(options?: FetchOptions) {
-  for (const sheet of document.styleSheets) {
-    if (await skipStyleSheet(sheet, options)) continue;
-  }
-  await resolveImports(options);
-}
+import { inlineAll } from "./inliner.js";
 
 async function resolveImports(options?: FetchOptions) {
   for (const sheet of document.styleSheets) {
@@ -96,7 +39,9 @@ async function resolveImports(options?: FetchOptions) {
       }
     }
 
-    for (const ruleIndex of rulesToDelete) sheet.deleteRule(ruleIndex);
+    if (sheet.cssRules.length !== 0) {
+      for (const ruleIndex of rulesToDelete) sheet.deleteRule(ruleIndex);
+    }
   }
 }
 
@@ -105,230 +50,12 @@ async function downloadStylesheet(href: string, options?: FetchOptions) {
     const style = document.createElement("style");
     const response = await fetch(constructUrl(href, options));
     if (!response.ok) return false;
-    style.innerText = await response.text();
+    style.innerHTML = await response.text();
     style.setAttribute("href", href);
     return style;
   } catch (e) {
     console.error("Failed to inline stylesheet", href, e);
   }
-}
-
-type StyleableElement = HTMLElement | SVGElement;
-type BaseStyle = {
-  rule: CSSStyleDeclaration;
-  href: URL | null;
-};
-type SpecifiedStyle = BaseStyle & {
-  specificity: SpecificityArray;
-};
-type PseudoElementStyle = BaseStyle & {
-  pseudoElement: string;
-};
-type CSSStyledElements = Map<StyleableElement, SpecifiedStyle[]>;
-type CSSPseudoElements = Map<StyleableElement, PseudoElementStyle[]>;
-
-export async function cacheStylesheets(documentStyles: CSSStyleDeclaration) {
-  const styledElements: CSSStyledElements = new Map();
-  const styledPseudoElements: CSSPseudoElements = new Map();
-
-  for (const sheet of document.styleSheets) {
-    if (await skipStyleSheet(sheet)) continue;
-    let href = sheet.href || undefined;
-    if (!href && sheet.ownerNode instanceof HTMLElement)
-      href = sheet.ownerNode.getAttribute("href") || undefined;
-
-    walkRules(
-      sheet.cssRules,
-      documentStyles,
-      styledElements,
-      styledPseudoElements,
-      href
-    );
-  }
-
-  return {
-    getPseudo(element: StyleableElement, pseudoElement: string) {
-      const styles = styledPseudoElements
-        .get(element)
-        ?.filter((s) => s.pseudoElement.includes(pseudoElement));
-      if (!styles || !styles.length) return;
-
-      return getElementStyles(element, styles, documentStyles);
-    },
-    get(element: StyleableElement) {
-      const styles = styledElements.get(element);
-      if (!styles) return;
-
-      const allStyles = styles.sort((a, b) =>
-        compare(a.specificity, b.specificity)
-      );
-      allStyles.push({
-        rule: element.style,
-        specificity: [0, 0, 0, 0],
-        href: null
-      });
-
-      return getElementStyles(element, allStyles, documentStyles);
-    }
-  };
-}
-
-function walkRules(
-  cssRules: CSSRuleList,
-  documentStyles: CSSStyleDeclaration,
-  styled: CSSStyledElements,
-  pseudoElements: CSSPseudoElements,
-  href?: string
-) {
-  for (const rule of cssRules) {
-    if (rule instanceof CSSStyleRule) {
-      if (isPseudoSelector(rule.selectorText)) {
-        const selectors = parsePseudoSelector(rule.selectorText);
-
-        for (const selector of selectors) {
-          if (!selector || !selector.selector.trim()) continue;
-          const elements = safeQuerySelectorAll(
-            document,
-            selector.selector
-          ) as NodeListOf<StyleableElement>;
-
-          for (const element of elements) {
-            if (
-              !(element instanceof HTMLElement) &&
-              !(element instanceof SVGElement)
-            )
-              continue;
-
-            const styles: PseudoElementStyle[] =
-              pseudoElements.get(element) || [];
-            pseudoElements.set(element, styles);
-
-            styles.push({
-              rule: rule.style,
-              href: getBaseUrl(href),
-              pseudoElement: selector.pseudoElement
-            });
-          }
-        }
-      }
-
-      const elements = safeQuerySelectorAll(
-        document,
-        rule.selectorText
-      ) as NodeListOf<StyleableElement>;
-
-      for (const element of elements) {
-        if (
-          !(element instanceof HTMLElement) &&
-          !(element instanceof SVGElement)
-        )
-          continue;
-
-        const parts = rule.selectorText.split(",");
-        const styles: SpecifiedStyle[] = styled.get(element) || [];
-        styled.set(element, styles);
-
-        for (const part of parts) {
-          try {
-            const specificity = calculate(part)[0];
-            styles.push({
-              specificity: specificity.specificityArray,
-              rule: rule.style,
-              href: getBaseUrl(href)
-            });
-            break;
-          } catch (e) {
-            console.error(e, href && getBaseUrl(href));
-            // ignore
-          }
-        }
-      }
-    } else if (
-      rule instanceof CSSMediaRule &&
-      window.matchMedia(rule.conditionText).matches
-    ) {
-      walkRules(rule.cssRules, documentStyles, styled, pseudoElements, href);
-    } else if (
-      rule instanceof CSSSupportsRule &&
-      CSS.supports(rule.conditionText)
-    ) {
-      walkRules(rule.cssRules, documentStyles, styled, pseudoElements, href);
-    }
-  }
-}
-
-function getElementStyles(
-  element: StyleableElement,
-  styles: BaseStyle[],
-  documentStyles: CSSStyleDeclaration
-) {
-  const newStyles = newStyleDeclaration();
-  const computedStyle = lazyComputedStyle(element);
-  const overrides = ["display"];
-
-  for (const style of styles) {
-    for (const property of [...style.rule, ...SHORTHANDS]) {
-      let value = style.rule.getPropertyValue(property);
-      if (overrides.includes(property))
-        value = computedStyle.style.getPropertyValue(property);
-
-      if (value.trim()) {
-        setStyle(
-          newStyles,
-          property,
-          value,
-          (variable) => {
-            return (
-              computedStyle.style.getPropertyValue(variable) ||
-              documentStyles.getPropertyValue(variable)
-            );
-          },
-          (url) => {
-            console.log("resolving url", url, style.href);
-            if (url.startsWith("data:") || !style.href) return url;
-            console.log("resolving url", url, style.href.href);
-            if (url.startsWith("/"))
-              return new URL(`${style.href.origin}${url}`).href;
-
-            return new URL(`${style.href.href}${url}`).href;
-          },
-          style.rule.getPropertyPriority(property)
-        );
-      }
-    }
-  }
-  return newStyles;
-}
-
-function setStyle(
-  target: CSSStyleDeclaration,
-  property: string,
-  value: string,
-  get: (variable: string) => string,
-  resolveUrl: (variable: string) => string,
-  priority?: string
-) {
-  value = resolveCssVariables(value, get);
-  value = resolveCssUrl(value, resolveUrl);
-
-  target.setProperty(property, value, priority);
-}
-
-function newStyleDeclaration() {
-  const sheet = new CSSStyleSheet();
-  sheet.insertRule(".dummy{}");
-  return (sheet.cssRules[0] as CSSStyleRule).style;
-}
-
-function lazyComputedStyle(element: StyleableElement) {
-  let computedStyle: CSSStyleDeclaration | undefined;
-
-  return Object.defineProperty({}, "style", {
-    get: () => {
-      if (!computedStyle) computedStyle = getComputedStyle(element);
-      return computedStyle;
-    }
-  }) as { style: CSSStyleDeclaration };
 }
 
 async function skipStyleSheet(sheet: CSSStyleSheet, options?: FetchOptions) {
@@ -337,94 +64,123 @@ async function skipStyleSheet(sheet: CSSStyleSheet, options?: FetchOptions) {
   } catch (_e) {
     const node = sheet.ownerNode;
     if (sheet.href && node instanceof HTMLLinkElement) {
+      if (isStylesheetForPrint(node)) return true;
+
       const styleNode = await downloadStylesheet(node.href, options);
       if (styleNode) node.replaceWith(styleNode);
     }
     return true;
   }
 
-  return sheet.media.mediaText
+  return isStylesheetForPrint(sheet);
+}
+
+function isStylesheetForPrint(sheet: CSSStyleSheet | HTMLLinkElement) {
+  const mediaText =
+    typeof sheet.media === "string" ? sheet.media : sheet.media.mediaText;
+  return mediaText
     .split(",")
     .map((t) => t.trim())
     .includes("print");
 }
 
-function resolveCssVariables(css: string, get: (variable: string) => string) {
-  const tokens = tokenize(css);
-  const finalTokens: string[] = [];
-  for (let i = 0; i < tokens.length; ++i) {
-    const token = tokens[i];
-    if (token === "var") {
-      const args = tokenize(tokens[++i].slice(1, -1));
-      const [variable, operator, space, ...restArgs] = args;
+export async function addStylesToHead(
+  head: HTMLHeadElement,
+  options?: FetchOptions
+) {
+  await resolveImports(options);
 
-      const value = get(variable);
-      if (value) {
-        finalTokens.push(value);
-      } else if (operator && restArgs.length <= 1) {
-        finalTokens.push(restArgs[0] || space);
-      } else if (operator && restArgs.length === 2) {
-        finalTokens.push(resolveCssVariables(restArgs.join(""), get));
+  for (const sheet of document.styleSheets) {
+    if (isStylesheetForPrint(sheet)) continue;
+
+    const href =
+      sheet.href && sheet.ownerNode instanceof HTMLLinkElement
+        ? sheet.ownerNode.href
+        : sheet.ownerNode instanceof HTMLStyleElement
+        ? sheet.ownerNode.getAttribute("href")
+        : null;
+    if (href) {
+      const result = await downloadStylesheet(href, options);
+      if (!result) continue;
+      const cssStylesheet = new CSSStyleSheet();
+      await cssStylesheet.replace(result.innerHTML);
+      await inlineBackgroundImages(cssStylesheet, options);
+      const toAppend = rulesToStyleNode(cssStylesheet.cssRules);
+      head.appendChild(toAppend);
+      continue;
+    }
+
+    if (sheet.cssRules.length > 0) {
+      await inlineBackgroundImages(sheet, options);
+      const styleNode = rulesToStyleNode(sheet.cssRules);
+      head.appendChild(styleNode);
+      continue;
+    }
+
+    if (sheet.ownerNode instanceof HTMLStyleElement) {
+      head.appendChild(sheet.ownerNode.cloneNode(true));
+      continue;
+    }
+  }
+}
+
+function rulesToStyleNode(cssRules: CSSRuleList) {
+  const cssText = Array.from(cssRules)
+    .map((r) => r.cssText)
+    .reduce((acc, text) => acc + text, "");
+  const style = document.createElement("style");
+  style.innerHTML = cssText;
+  return style;
+}
+
+async function inlineBackgroundImages(
+  sheet: CSSStyleSheet,
+  options?: FetchOptions
+) {
+  const promises: Promise<void>[] = [];
+  for (const rule of sheet.cssRules) {
+    if (rule.type === CSSRule.STYLE_RULE) {
+      promises.push(processStyleRule(sheet, rule as CSSStyleRule, options));
+    } else if (rule.type === CSSRule.MEDIA_RULE) {
+      const mediaRule = rule as CSSMediaRule;
+      const mediaMatches = window.matchMedia(mediaRule.media.mediaText).matches;
+      for (const innerRule of mediaRule.cssRules) {
+        if (innerRule && innerRule.type === CSSRule.STYLE_RULE) {
+          promises.push(
+            processStyleRule(
+              sheet,
+              innerRule as CSSStyleRule,
+              options,
+              mediaMatches
+            )
+          );
+        }
       }
-    } else if (token.startsWith("(") && token.endsWith(")")) {
-      finalTokens.push("(", resolveCssVariables(token.slice(1, -1), get), ")");
-    } else finalTokens.push(token);
-  }
-  return finalTokens.join("");
-}
-
-function resolveCssUrl(css: string, get: (url: string) => string) {
-  const tokens = tokenize(css);
-  const finalTokens: string[] = [];
-  for (let i = 0; i < tokens.length; ++i) {
-    const token = tokens[i];
-    if (token === "url" && !tokens[i + 1].startsWith("(data")) {
-      const url = tokens[++i].slice(2, -2);
-      const resolvedUrl = get(url);
-      if (resolvedUrl) {
-        finalTokens.push(token);
-        finalTokens.push('("');
-        finalTokens.push(resolvedUrl);
-        finalTokens.push('")');
+    } else if (rule.type === CSSRule.SUPPORTS_RULE) {
+      const supportsRule = rule as CSSSupportsRule;
+      for (const innerRule of supportsRule.cssRules) {
+        if (innerRule && innerRule.type === CSSRule.STYLE_RULE) {
+          promises.push(
+            processStyleRule(sheet, innerRule as CSSStyleRule, options, false)
+          );
+        }
       }
-    } else finalTokens.push(token);
+    }
   }
-  return finalTokens.join("");
+  await Promise.allSettled(promises);
 }
 
-function getBaseUrl(href?: string | null) {
-  if (!href) return null;
-  if (href.startsWith("/")) href = `${document.location.origin}${href}`;
-  const url = new URL(href);
-  const basepath = url.pathname.split("/").slice(0, -1).join("/");
-  return new URL(`${url.origin}${basepath}/`);
-}
-
-function isPseudoSelector(text: string) {
-  return (
-    text.includes(":before") ||
-    text.includes(":after") ||
-    text.includes("::after") ||
-    text.includes("::before")
-  );
-}
-
-function parsePseudoSelector(selector: string) {
-  const output = [];
-  const selectors = parse(selector);
-  for (const part of selectors) {
-    const pseduoElementIndex = part.findIndex(
-      (s) =>
-        (s.type === SelectorType.Pseudo ||
-          s.type === SelectorType.PseudoElement) &&
-        (s.name === "after" || s.name === "before")
-    );
-    if (pseduoElementIndex <= -1) continue;
-
-    output.push({
-      selector: stringify([part.slice(0, pseduoElementIndex)]),
-      pseudoElement: stringify([part.slice(pseduoElementIndex)])
-    });
+async function processStyleRule(
+  sheet: CSSStyleSheet,
+  rule: CSSStyleRule,
+  options?: FetchOptions,
+  inline = true
+) {
+  const baseUrl = sheet.href || document.location.href;
+  for (const property of rule.style) {
+    const oldValue = rule.style.getPropertyValue(property);
+    if (!oldValue) continue;
+    const resolved = await inlineAll(oldValue, options, baseUrl, !inline);
+    rule.style.setProperty(property, resolved);
   }
-  return output;
 }

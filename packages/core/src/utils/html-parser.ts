@@ -176,7 +176,7 @@ export function extractMatchingBlocks(html: string, matchTagName: string) {
   const parser = new Parser(
     {
       ontext: (data) => (text += data),
-      onopentag(name) {
+      onopentag(name, attributes) {
         if (!INLINE_TAGS.includes(name) && name !== matchTagName) {
           openedTag = name;
           text = "";
@@ -184,7 +184,12 @@ export function extractMatchingBlocks(html: string, matchTagName: string) {
         }
         if (name === matchTagName) {
           hasMatches = true;
-          text += `<${name}>`;
+          let tagString = `<${name}`;
+          if (attributes.id) {
+            tagString += ` id="${attributes.id}"`;
+          }
+          tagString += ">";
+          text += tagString;
         }
       },
       onclosetag(name) {

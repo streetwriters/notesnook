@@ -17,7 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { debounce, usePromise } from "@notesnook/common";
+import {
+  debounce,
+  formatKey,
+  keybindings,
+  usePromise
+} from "@notesnook/common";
 import { EVENTS, fuzzy, Note, Notebook, Reminder, Tag } from "@notesnook/core";
 import { Box, Button, Flex, Input, Text } from "@theme-ui/components";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -32,7 +37,6 @@ import Dialog from "../../components/dialog";
 import { Cross } from "../../components/icons";
 import { CustomScrollbarsVirtualList } from "../../components/list-container";
 import { useEditorStore } from "../../stores/editor-store";
-import { useStore as useNoteStore } from "../../stores/note-store";
 import { strings } from "@notesnook/intl";
 import { isMac } from "../../utils/platform";
 import {
@@ -134,10 +138,15 @@ export const CommandPaletteDialog = DialogManager.register(
               e.preventDefault();
 
               if (e.shiftKey && !props.isCommandMode) {
-                db.notes.add({ title: query }).then((note) => {
-                  useEditorStore.getState().openSession(note);
-                  useNoteStore.getState().refresh();
-                });
+                useEditorStore.getState().addTab();
+                if (query) {
+                  const activeSessionId = useEditorStore
+                    .getState()
+                    .getActiveSession()?.id;
+                  if (activeSessionId) {
+                    useEditorStore.getState().setTitle(activeSessionId, query);
+                  }
+                }
                 props.onClose(false);
                 return;
               }
@@ -539,7 +548,10 @@ function getCommandPaletteHelp(isCommandMode: boolean) {
     ...(isCommandMode
       ? [
           {
-            key: isMac() ? "⌘P" : "Ctrl+P",
+            key: keybindings.openQuickOpen
+              .keys(IS_DESKTOP_APP)
+              .map((k) => formatKey(k, isMac(), "+"))
+              .join(" / "),
             description: strings.quickOpen()
           }
         ]
@@ -553,7 +565,10 @@ function getCommandPaletteHelp(isCommandMode: boolean) {
             description: strings.createNewNote()
           },
           {
-            key: isMac() ? "⌘K" : "Ctrl+K",
+            key: keybindings.openCommandPalette
+              .keys(IS_DESKTOP_APP)
+              .map((k) => formatKey(k, isMac(), "+"))
+              .join(" / "),
             description: strings.commandPalette()
           }
         ])

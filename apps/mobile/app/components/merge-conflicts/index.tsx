@@ -1,0 +1,469 @@
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2023 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+import { getFormattedDate } from "@notesnook/common";
+import {
+  EncryptedContentItem,
+  isEncryptedContent,
+  Note,
+  UnencryptedContentItem
+} from "@notesnook/core";
+import { strings } from "@notesnook/intl";
+import { useThemeColors } from "@notesnook/theme";
+import KeepAwake from "@sayem314/react-native-keep-awake";
+import { diff } from "diffblazer";
+import React, { useEffect, useRef, useState } from "react";
+import { SafeAreaView, Text, View } from "react-native";
+import Animated from "react-native-reanimated";
+import { db } from "../../common/database";
+import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
+import { ReadonlyEditor } from "../../screens/editor/readonly-editor";
+import { useTabStore } from "../../screens/editor/tiptap/use-tab-store";
+import { editorController } from "../../screens/editor/tiptap/utils";
+import { DDS } from "../../services/device-detection";
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  openVault
+} from "../../services/event-manager";
+import Navigation from "../../services/navigation";
+import Sync from "../../services/sync";
+import { useSettingStore } from "../../stores/use-setting-store";
+import { eOnLoadNote, eShowMergeDialog } from "../../utils/events";
+import { AppFontSize } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
+import { Dialog } from "../dialog";
+import BaseDialog from "../dialog/base-dialog";
+import DialogButtons from "../dialog/dialog-buttons";
+import DialogContainer from "../dialog/dialog-container";
+import DialogHeader from "../dialog/dialog-header";
+import { Button } from "../ui/button";
+import { IconButton } from "../ui/icon-button";
+import Seperator from "../ui/seperator";
+import Paragraph from "../ui/typography/paragraph";
+import { presentDialog } from "../dialog/functions";
+
+const MergeConflicts = () => {
+  const { colors } = useThemeColors();
+  const [visible, setVisible] = useState(false);
+  const [selectedContent, setSelectedContent] =
+    useState<UnencryptedContentItem>();
+  const [copyOfDiscardedContent, setCopyOfDiscardedContent] =
+    useState<UnencryptedContentItem>();
+  const [dialogVisible, setDialogVisible] = useState(false);
+  const insets = useGlobalSafeAreaInsets();
+  const content = useRef<UnencryptedContentItem>(null);
+  const { height } = useSettingStore((state) => state.dimensions);
+
+  const applyChanges = async () => {
+    let contentToSave = selectedContent;
+    if (!contentToSave) return;
+    let note = await db.notes.note(contentToSave.noteId);
+    if (!note) return;
+    await db.notes.add({
+      id: note.id,
+      conflicted: false,
+      dateEdited: contentToSave.dateEdited
+    });
+
+    const noteLocked = await db.vaults.itemExists(note);
+
+    if (noteLocked) {
+      await db.vault.save({
+        ...contentToSave,
+        sessionId: `${Date.now()}`
+      });
+    } else {
+      await db.content.add({
+        id: note.contentId,
+        data: contentToSave.data,
+        type: contentToSave.type,
+        dateResolved: content.current?.conflicted?.dateModified || Date.now(),
+        sessionId: `${Date.now()}`,
+        conflicted: undefined
+      });
+    }
+
+    if (copyOfDiscardedContent) {
+      await db.notes.add({
+        title: note.title + " (Copy)",
+        content: {
+          data: copyOfDiscardedContent.data,
+          type: copyOfDiscardedContent.type
+        }
+      });
+    }
+    Navigation.queueRoutesForUpdate();
+
+    if (useTabStore.getState().getCurrentNoteId() === note.id) {
+      // reload the note in editor
+      eSendEvent(eOnLoadNote, {
+        item: editorController.current.note.current[note.id],
+        forced: true
+      });
+    }
+    close();
+    Sync.run();
+  };
+
+  const show = async (item: Note) => {
+    const isLocked = await db.vaults.itemExists(item);
+    let noteContent: UnencryptedContentItem;
+    if (isLocked) {
+      openVault({
+        item: item,
+        novault: true,
+        customActionTitle: "Unlock note",
+        customActionParagraph: "Unlock note to merge conflicts",
+        onUnlock: async (item, password) => {
+          if (!item || !password) return;
+          const currentContent = await db.content.get(item.contentId!);
+
+          try {
+            noteContent = {
+              ...(await db.content.get(item.contentId!)),
+              ...item.content,
+              conflicted: currentContent?.conflicted
+                ? await db.vault.decryptContent(
+                    currentContent?.conflicted as EncryptedContentItem,
+                    password
+                  )
+                : undefined
+            } as UnencryptedContentItem;
+
+            content.current = noteContent;
+            if (__DEV__) {
+              if (!noteContent?.conflicted) {
+                content.current.conflicted = noteContent;
+              }
+            }
+            setVisible(true);
+          } catch (e) {
+            presentDialog({
+              input: true,
+              inputPlaceholder: strings.enterPassword(),
+              title: strings.unlockIncomingNote(),
+              paragraph: strings.unlockIncomingNoteDesc(),
+              positiveText: "Unlock",
+              positivePress: async (password) => {
+                try {
+                  noteContent = {
+                    ...(await db.content.get(item.contentId!)),
+                    ...item.content,
+                    conflicted: currentContent?.conflicted
+                      ? await db.vault.decryptContent(
+                          currentContent?.conflicted as EncryptedContentItem,
+                          password
+                        )
+                      : undefined
+                  } as UnencryptedContentItem;
+
+                  content.current = noteContent;
+                  if (__DEV__) {
+                    if (!noteContent?.conflicted) {
+                      content.current.conflicted = noteContent;
+                    }
+                  }
+                  setVisible(true);
+                  return true;
+                } catch (e) {
+                  return false;
+                }
+              }
+            });
+          }
+        }
+      });
+    } else {
+      noteContent = (await db.content.get(
+        item.contentId!
+      )) as UnencryptedContentItem;
+      content.current = noteContent;
+      if (__DEV__) {
+        if (!noteContent?.conflicted) {
+          content.current.conflicted = noteContent;
+        }
+      }
+      setVisible(true);
+    }
+  };
+
+  useEffect(() => {
+    eSubscribeEvent(eShowMergeDialog, show);
+    return () => {
+      eUnSubscribeEvent(eShowMergeDialog, show);
+    };
+  }, []);
+
+  const close = () => {
+    setVisible(false);
+    setCopyOfDiscardedContent(undefined);
+    setSelectedContent(undefined);
+    setDialogVisible(false);
+  };
+
+  const ConfigBar = ({
+    isDiscarded,
+    keeping,
+    back,
+    isCurrent,
+    contentToKeep
+  }: {
+    isDiscarded: boolean;
+    keeping: boolean;
+    back: boolean;
+    isCurrent: boolean;
+    contentToKeep: UnencryptedContentItem;
+  }) => {
+    return (
+      <View
+        style={{
+          width: "100%",
+          height: 50,
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          paddingHorizontal: DefaultAppStyles.GAP,
+          paddingLeft: 6
+        }}
+      >
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexShrink: 1
+          }}
+        >
+          {back && (
+            <IconButton
+              onPress={close}
+              color={colors.primary.paragraph}
+              name="arrow-left"
+            />
+          )}
+          <Paragraph
+            style={{ flexWrap: "wrap" }}
+            color={colors.secondary.paragraph}
+            size={AppFontSize.xs}
+          >
+            <Text
+              style={{
+                color: isCurrent ? colors.primary.accent : colors.static.red,
+                fontWeight: "bold"
+              }}
+            >
+              (
+              {isCurrent
+                ? strings.mergeConflict.thisDevice()
+                : strings.mergeConflict.otherDevice()}
+              )
+            </Text>
+            {"\n"}
+            {getFormattedDate(contentToKeep?.dateEdited)}
+          </Paragraph>
+        </View>
+
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "flex-end"
+          }}
+        >
+          {isDiscarded ? (
+            <Button
+              onPress={() => {
+                setCopyOfDiscardedContent(contentToKeep);
+                setDialogVisible(true);
+              }}
+              title={strings.saveACopy()}
+              type="secondary"
+              height={30}
+              style={{
+                borderRadius: 100,
+                paddingHorizontal: DefaultAppStyles.GAP
+              }}
+              fontSize={AppFontSize.xs}
+            />
+          ) : null}
+          <View style={{ width: 10 }} />
+          {isDiscarded ? (
+            <Button
+              title={strings.discard()}
+              type="accent"
+              buttonType={{
+                color: colors.static.red,
+                text: colors.static.white
+              }}
+              height={30}
+              style={{
+                borderRadius: 100,
+                paddingHorizontal: DefaultAppStyles.GAP
+              }}
+              fontSize={AppFontSize.xs}
+              onPress={() => {
+                setDialogVisible(true);
+              }}
+            />
+          ) : null}
+          {isDiscarded ? null : (
+            <>
+              <Button
+                height={30}
+                style={{
+                  borderRadius: 100,
+                  paddingHorizontal: DefaultAppStyles.GAP,
+                  minWidth: 60,
+                  marginLeft: 10
+                }}
+                type="accent"
+                fontSize={AppFontSize.xs}
+                title={
+                  keeping && !isDiscarded ? strings.undo() : strings.keep()
+                }
+                onPress={() => {
+                  setSelectedContent(
+                    keeping && !isDiscarded ? undefined : contentToKeep
+                  );
+                }}
+              />
+            </>
+          )}
+        </View>
+      </View>
+    );
+  };
+
+  return !visible ? null : (
+    <BaseDialog
+      statusBarTranslucent
+      transparent={false}
+      animated={false}
+      bounce={false}
+      onRequestClose={() => {
+        close();
+      }}
+      centered={false}
+      background={colors?.primary.background}
+      visible={true}
+    >
+      <Dialog context="merge-conflicts" />
+      <SafeAreaView
+        style={{
+          backgroundColor: colors.primary.background,
+          paddingTop: insets.top
+        }}
+      >
+        <KeepAwake />
+        {dialogVisible && (
+          <BaseDialog visible={true}>
+            <DialogContainer>
+              <DialogHeader title={strings.applyChanges()} padding={12} />
+              <Seperator />
+              <DialogButtons
+                positiveTitle="Apply"
+                negativeTitle="Cancel"
+                onPressNegative={() => setDialogVisible(false)}
+                onPressPositive={applyChanges}
+              />
+            </DialogContainer>
+          </BaseDialog>
+        )}
+
+        <View
+          style={{
+            height: "100%",
+            width: "100%",
+            backgroundColor: DDS.isLargeTablet() ? "rgba(0,0,0,0.3)" : undefined
+          }}
+        >
+          <ConfigBar
+            back={true}
+            isCurrent={true}
+            isDiscarded={!!selectedContent && !selectedContent.conflicted}
+            keeping={!!selectedContent}
+            contentToKeep={content.current!}
+          />
+
+          <Animated.View
+            style={{
+              height: height / 2 - (50 + insets.top / 2),
+              backgroundColor: colors.primary.background,
+              borderBottomWidth: 1,
+              borderBottomColor: colors.primary.border
+            }}
+          >
+            <ReadonlyEditor
+              editorId="conflictPrimary"
+              onLoad={async (loadContent) => {
+                const note = await db.notes.note(content.current!.noteId);
+                if (!note) return;
+                if (content.current && content.current.conflicted) {
+                  loadContent({
+                    id: note.id,
+                    data: diff(
+                      (content.current.conflicted as UnencryptedContentItem)
+                        .data,
+                      content.current.data
+                    )
+                  });
+                }
+              }}
+            />
+          </Animated.View>
+
+          <ConfigBar
+            back={false}
+            isCurrent={false}
+            isDiscarded={!!selectedContent && !!selectedContent.conflicted}
+            keeping={!!selectedContent}
+            contentToKeep={
+              content.current!.conflicted! as UnencryptedContentItem
+            }
+          />
+
+          <Animated.View
+            style={{
+              height: height / 2 - (50 + insets.top / 2),
+              backgroundColor: colors.primary.background,
+              borderRadius: 10
+            }}
+          >
+            <ReadonlyEditor
+              editorId="conflictSecondary"
+              onLoad={async (loadContent) => {
+                const note = await db.notes.note(content.current?.noteId!);
+                if (!note) return;
+                loadContent({
+                  id: note.id,
+                  data: (content.current!.conflicted as UnencryptedContentItem)
+                    .data
+                });
+              }}
+            />
+          </Animated.View>
+        </View>
+      </SafeAreaView>
+    </BaseDialog>
+  );
+};
+
+export default MergeConflicts;

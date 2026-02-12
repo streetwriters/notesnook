@@ -1,8 +1,32 @@
 {
   "name": "@notesnook/web-clipper",
-  "version": "0.3.4",
+  "version": "0.4.0",
   "private": true,
-  "main": "./dist/index.js",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      },
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/esm/index.js"
+      }
+    },
+    "./*": {
+      "require": {
+        "types": "./dist/types/*",
+        "default": "./dist/cjs/*"
+      },
+      "import": {
+        "types": "./dist/types/*",
+        "default": "./dist/esm/*"
+      }
+    }
+  },
   "dependencies": {
     "@emotion/react": "11.11.1",
     "@mdi/js": "7.4.47",
@@ -28,7 +52,7 @@
     "build:chrome": "cross-env MANIFEST_VERSION=3 node build-utils/build.js",
     "dev:chrome": "cross-env MANIFEST_VERSION=3 node build-utils/dev.js",
     "dev:firefox": "cross-env MANIFEST_VERSION=2 node build-utils/dev.js",
-    "build": "tsc"
+    "build": "node ../../scripts/build.mjs"
   },
   "browserslist": {
     "production": [
@@ -81,7 +105,7 @@
     "style-loader": "^3.3.1",
     "terser-webpack-plugin": "^5.3.1",
     "ts-loader": "^9.2.6",
-    "web-ext": "^7.6.2",
+    "web-ext": "^7.12.0",
     "webpack": "5.88.2",
     "webpack-cli": "5.1.4",
     "webpack-dev-server": "^4.7.4"

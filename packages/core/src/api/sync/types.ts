@@ -47,4 +47,26 @@ export const SYNC_ITEM_TYPES = Object.keys(
 export type SyncTransferItem = {
   items: SyncItem[];
   type: SyncableItemType;
+  count: number;
+};
+
+export type SyncInboxItem = Omit<SyncItem, "format"> & {
+  key: Omit<Cipher<"base64">, "format" | "salt" | "iv">;
+};
+
+export type ParsedInboxItem = {
+  title: string;
+  pinned?: boolean;
+  favorite?: boolean;
+  readonly?: boolean;
+  archived?: boolean;
+  notebookIds?: string[];
+  tagIds?: string[];
+  type: "note";
+  source: string;
+  version: 1;
+  content?: {
+    type: "html";
+    data: string;
+  };
 };

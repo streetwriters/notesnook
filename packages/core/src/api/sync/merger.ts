@@ -25,10 +25,12 @@ import {
   ContentItem,
   Item,
   MaybeDeletedItem,
+  Note,
   isDeleted
 } from "../../types.js";
+import { ParsedInboxItem, SyncInboxItem } from "./types.js";
 
-const THRESHOLD = process.env.NODE_ENV === "test" ? 6 * 1000 : 60 * 1000;
+const THRESHOLD = process.env.NODE_ENV === "test" ? 2 * 1000 : 60 * 1000;
 class Merger {
   logger = logger.scope("Merger");
   constructor(private readonly db: Database) {}
@@ -44,6 +46,27 @@ class Merger {
     if (!localItem || remoteItem.dateModified > localItem.dateModified) {
       return remoteItem;
     }
+
+    if (
+      !remoteItem.deleted &&
+      remoteItem.type === "note" &&
+      !localItem.deleted &&
+      localItem.type === "trash" &&
+      localItem.itemType === "note" &&
+      localItem.deletedBy === "expired"
+    ) {
+      if (
+        remoteItem.expiryDate.dateModified > localItem.expiryDate.dateModified
+      ) {
+        localItem.expiryDate = remoteItem.expiryDate;
+        (localItem as unknown as Note).type = "note";
+        (localItem as unknown as Note).deletedBy = null;
+        (localItem as unknown as Note).dateDeleted = null;
+        (localItem as unknown as Note).itemType = null;
+
+        return localItem;
+      }
+    }
   }
 
   mergeContent(
@@ -58,8 +81,6 @@ class Merger {
       isDeleted(remoteItem) ||
       remoteItem.type !== "tiptap" ||
       localItem.type !== "tiptap" ||
-      localItem.locked ||
-      remoteItem.locked ||
       !localItem.data ||
       !remoteItem.data
     ) {
@@ -144,5 +165,83 @@ export function isContentConflicted(
     return "conflict";
   } else if (!isResolved) {
     return "merge";
+  }
+}
+
+export async function handleInboxItems(
+  inboxItems: SyncInboxItem[],
+  db: Database
+) {
+  const inboxKeys = await db.user.getInboxKeys();
+  if (!inboxKeys) {
+    logger.error("No inbox keys found, cannot process inbox items.");
+    return;
+  }
+
+  for (const item of inboxItems) {
+    try {
+      if (await db.notes.exists(item.id)) {
+        logger.info("Inbox item already exists, skipping.", {
+          inboxItemId: item.id
+        });
+        continue;
+      }
+
+      const decryptedKey = await db.storage().decryptAsymmetric(inboxKeys, {
+        alg: item.key.alg,
+        cipher: item.key.cipher,
+        format: "base64",
+        length: item.key.length
+      });
+      const decryptedItem = await db.storage().decrypt(
+        { key: decryptedKey },
+        {
+          alg: item.alg,
+          iv: item.iv,
+          cipher: item.cipher,
+          format: "base64",
+          length: item.length,
+          salt: item.salt
+        }
+      );
+      const parsed = JSON.parse(decryptedItem) as ParsedInboxItem;
+      if (parsed.type !== "note") {
+        continue;
+      }
+      if (parsed.version !== 1) {
+        continue;
+      }
+
+      await db.notes.add({
+        id: item.id,
+        title: parsed.title,
+        favorite: parsed.favorite,
+        pinned: parsed.pinned,
+        readonly: parsed.readonly,
+        content: {
+          data: parsed?.content?.data ?? "",
+          type: "tiptap"
+        }
+      });
+      if (parsed.archived !== undefined) {
+        await db.notes.archive(parsed.archived, item.id);
+      }
+      for (const notebookId of parsed.notebookIds || []) {
+        if (!(await db.notebooks.exists(notebookId))) continue;
+        await db.notes.addToNotebook(notebookId, item.id);
+      }
+      for (const tagId of parsed.tagIds || []) {
+        if (!(await db.tags.exists(tagId))) continue;
+        await db.relations.add(
+          { type: "tag", id: tagId },
+          { type: "note", id: item.id }
+        );
+      }
+    } catch (e) {
+      logger.error(e, "Failed to process inbox item.", {
+        inboxItem: item
+      });
+      continue;
+    }
   }
 }

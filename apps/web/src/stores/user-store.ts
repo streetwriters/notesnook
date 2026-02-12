@@ -23,12 +23,12 @@ import BaseStore from "./index";
 import { EV, EVENTS } from "@notesnook/core";
 import Config from "../utils/config";
 import { hashNavigate } from "../navigation";
-import { isUserPremium } from "../hooks/use-is-user-premium";
-import { SUBSCRIPTION_STATUS } from "../common/constants";
 import { AuthenticatorType, User } from "@notesnook/core";
 import { ConfirmDialog } from "../dialogs/confirm";
 import { OnboardingDialog } from "../dialogs/onboarding-dialog";
 import { strings } from "@notesnook/intl";
+import { isUserSubscribed } from "../hooks/use-is-user-premium";
+import { resetFeatures } from "../common";
 
 class UserStore extends BaseStore<UserStore> {
   isLoggedIn?: boolean;
@@ -45,7 +45,7 @@ class UserStore extends BaseStore<UserStore> {
     });
 
     db.user.getUser().then((user) => {
-      if (!user) {
+      if (!user?.email) {
         this.set({ isLoggedIn: false });
         return;
       }
@@ -58,24 +58,25 @@ class UserStore extends BaseStore<UserStore> {
 
     if (Config.get("sessionExpired")) return;
 
-    EV.subscribe(EVENTS.userSubscriptionUpdated, (subscription) => {
-      const wasUserPremium = isUserPremium();
-      this.set((state) => {
-        if (!state.user) return;
-        state.user.subscription = subscription;
-      });
-      if (!wasUserPremium && isUserPremium())
-        OnboardingDialog.show({
-          type:
-            subscription.type === SUBSCRIPTION_STATUS.TRIAL ? "trial" : "pro"
+    db.eventManager.subscribe(
+      EVENTS.userSubscriptionUpdated,
+      (subscription) => {
+        const wasSubscribed = isUserSubscribed();
+        this.refreshUser();
+        this.set((state) => {
+          if (!state.user) return;
+          state.user.subscription = subscription;
         });
-    });
+        if (!wasSubscribed && isUserSubscribed()) OnboardingDialog.show({});
+        resetFeatures();
+      }
+    );
 
-    EV.subscribe(EVENTS.userEmailConfirmed, () => {
+    db.eventManager.subscribe(EVENTS.userEmailConfirmed, () => {
       hashNavigate("/confirmed");
     });
 
-    EV.subscribe(EVENTS.userLoggedOut, async (reason) => {
+    db.eventManager.subscribe(EVENTS.userLoggedOut, async (reason) => {
       this.set((state) => {
         state.user = undefined;
         state.isLoggedIn = false;

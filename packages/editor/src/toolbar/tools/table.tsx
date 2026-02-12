@@ -27,7 +27,10 @@ import {
   moveColumnLeft as moveColumnLeftAction,
   moveColumnRight as moveColumnRightAction,
   moveRowDown as moveRowDownAction,
-  moveRowUp as moveRowUpAction
+  moveRowUp as moveRowUpAction,
+  selectColumn,
+  selectRow,
+  exportToCSV as exportToCsvAction
 } from "../../extensions/table/actions.js";
 import { MoreTools } from "../components/more-tools.js";
 import { menuButtonToTool, toolToMenuButton } from "./utils.js";
@@ -59,7 +62,8 @@ export function TableSettings(props: ToolProps) {
         "rowProperties",
         "deleteRow",
         "deleteColumn",
-        "deleteTable"
+        "deleteTable",
+        "exportToCSV"
       ]}
     />
   );
@@ -84,7 +88,9 @@ export function RowProperties(props: ToolProps) {
   return (
     <>
       <ToolButton
-        {...props}
+        icon={props.icon}
+        title={props.title}
+        variant={props.variant}
         buttonRef={buttonRef}
         toggled={isMenuOpen}
         onClick={() => setIsMenuOpen(true)}
@@ -127,7 +133,9 @@ export function ColumnProperties(props: ToolProps) {
   return (
     <>
       <ToolButton
-        {...props}
+        icon={props.icon}
+        title={props.title}
+        variant={props.variant}
         buttonRef={buttonRef}
         toggled={isMenuOpen}
         onClick={() => setIsMenuOpen(true)}
@@ -167,6 +175,7 @@ export function TableProperties(props: ToolProps) {
       splitCells(editor),
       cellProperties(editor),
       { type: "separator", key: "tableSeperator" },
+      exportToCSV(editor),
       deleteTable(editor)
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -176,7 +185,9 @@ export function TableProperties(props: ToolProps) {
   return (
     <>
       <ToolButton
-        {...props}
+        icon={props.icon}
+        title={props.title}
+        variant={props.variant}
         buttonRef={buttonRef}
         toggled={isMenuOpen}
         onClick={() => setIsMenuOpen(true)}
@@ -308,12 +319,24 @@ export function CellBorderWidth(props: ToolProps) {
 
 const insertColumnLeft = (editor: Editor): MenuButtonItem => ({
   ...toolToMenuButton(getToolDefinition("insertColumnLeft")),
-  onClick: () => editor.chain().focus().addColumnBefore().run()
+  onClick: () =>
+    editor
+      .chain()
+      .focus()
+      .addColumnBefore()
+      .command(({ tr, state }) => selectColumn(tr, state, "prev"))
+      .run()
 });
 
 const insertColumnRight = (editor: Editor): MenuButtonItem => ({
   ...toolToMenuButton(getToolDefinition("insertColumnRight")),
-  onClick: () => editor.chain().focus().addColumnAfter().run()
+  onClick: () =>
+    editor
+      .chain()
+      .focus()
+      .addColumnAfter()
+      .command(({ tr, state }) => selectColumn(tr, state, "next"))
+      .run()
 });
 
 const moveColumnLeft = (editor: Editor): MenuButtonItem => ({
@@ -343,12 +366,25 @@ const mergeCells = (editor: Editor): MenuButtonItem => ({
 
 const insertRowAbove = (editor: Editor): MenuButtonItem => ({
   ...toolToMenuButton(getToolDefinition("insertRowAbove")),
-  onClick: () => editor.chain().focus().addRowBefore().run()
+  onClick: () =>
+    editor
+      .chain()
+      .focus()
+      .addRowBefore()
+      .command(({ tr, state }) => selectRow(tr, state, "prev"))
+      .run()
 });
 
 const insertRowBelow = (editor: Editor): MenuButtonItem => ({
   ...toolToMenuButton(getToolDefinition("insertRowBelow")),
-  onClick: () => editor.chain().focus().addRowAfter().run()
+  onClick: () => {
+    editor
+      .chain()
+      .focus()
+      .addRowAfter()
+      .command(({ tr, state }) => selectRow(tr, state, "next"))
+      .run();
+  }
 });
 
 const moveRowUp = (editor: Editor): MenuButtonItem => ({
@@ -379,6 +415,11 @@ const cellProperties = (editor: Editor): MenuButtonItem => ({
   }
 });
 
+const exportToCSV = (editor: Editor): MenuButtonItem => ({
+  ...toolToMenuButton(getToolDefinition("exportToCSV")),
+  onClick: () => exportToCsvAction(editor)
+});
+
 export const InsertColumnLeft = menuButtonToTool(insertColumnLeft);
 export const InsertColumnRight = menuButtonToTool(insertColumnRight);
 export const MoveColumnLeft = menuButtonToTool(moveColumnLeft);
@@ -392,3 +433,4 @@ export const MoveRowUp = menuButtonToTool(moveRowUp);
 export const MoveRowDown = menuButtonToTool(moveRowDown);
 export const DeleteRow = menuButtonToTool(deleteRow);
 export const DeleteTable = menuButtonToTool(deleteTable);
+export const ExportToCSV = menuButtonToTool(exportToCSV);

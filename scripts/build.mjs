@@ -30,6 +30,11 @@ const TSC =
     ? path.join(__dirname, "..", "node_modules", ".bin", "tsc.cmd")
     : path.join(__dirname, "..", "node_modules", ".bin", "tsc");
 
+const TSCGO =
+  process.platform === "win32"
+    ? path.join(__dirname, "..", "node_modules", ".bin", "tsgo.cmd")
+    : path.join(__dirname, "..", "node_modules", ".bin", "tsgo");
+
 const esmPackageJson = {
   type: "module"
 };
@@ -78,9 +83,10 @@ await Promise.all([
     )
 ]);
 
-function cmd(...command) {
+async function cmd(...command) {
   let p = spawn(command[0], command.slice(1), { shell: true });
-  return new Promise((resolveFunc) => {
+  console.time(command.join(" "));
+  await new Promise((resolveFunc) => {
     p.stdout.on("data", (x) => {
       process.stdout.write(x.toString());
     });
@@ -88,8 +94,9 @@ function cmd(...command) {
       process.stderr.write(x.toString());
     });
     p.on("exit", (code) => {
-      console.log(command.join(" "), "exited with code", code);
+      // console.log(command.join(" "), "exited with code", code);
       resolveFunc(code);
     });
   });
+  console.timeEnd(command.join(" "));
 }

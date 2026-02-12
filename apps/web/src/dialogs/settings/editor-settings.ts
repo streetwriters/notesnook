@@ -27,10 +27,11 @@ import { useStore as useSettingStore } from "../../stores/setting-store";
 import { getFonts } from "@notesnook/editor";
 import { useSpellChecker } from "../../hooks/use-spell-checker";
 import { SpellCheckerLanguages } from "./components/spell-checker-languages";
-
 import { CustomizeToolbar } from "./components/customize-toolbar";
 import { DictionaryWords } from "./components/dictionary-words";
 import { strings } from "@notesnook/intl";
+import { isMac } from "../../utils/platform";
+import { EDITOR_LINE_HEIGHT } from "../../components/editor/common";
 
 export const EditorSettings: SettingsGroup[] = [
   {
@@ -94,6 +95,24 @@ export const EditorSettings: SettingsGroup[] = [
         ]
       },
       {
+        key: "line-height",
+        title: strings.lineHeight(),
+        description: strings.lineHeightDesc(),
+        onStateChange: (listener) =>
+          onEditorConfigChange((c) => c.lineHeight, listener),
+        components: [
+          {
+            type: "input",
+            inputType: "number",
+            max: EDITOR_LINE_HEIGHT.MAX,
+            min: EDITOR_LINE_HEIGHT.MIN,
+            defaultValue: () => editorConfig().lineHeight,
+            onChange: (value) =>
+              useEditorManager.getState().setEditorConfig({ lineHeight: value })
+          }
+        ]
+      },
+      {
         key: "double-spacing",
         title: strings.doubleSpacedLines(),
         description: strings.doubleSpacedLinesDesc(),
@@ -114,6 +133,7 @@ export const EditorSettings: SettingsGroup[] = [
         description: strings.mardownShortcutsDesc(),
         onStateChange: (listener) =>
           useSettingStore.subscribe((c) => c.markdownShortcuts, listener),
+        featureId: "markdownShortcuts",
         components: [
           {
             type: "toggle",
@@ -128,6 +148,7 @@ export const EditorSettings: SettingsGroup[] = [
         description: strings.fontLigaturesDesc(),
         onStateChange: (listener) =>
           useSettingStore.subscribe((c) => c.fontLigatures, listener),
+        featureId: "fontLigatures",
         components: [
           {
             type: "toggle",
@@ -164,7 +185,7 @@ export const EditorSettings: SettingsGroup[] = [
         key: "spell-checker-languages",
         title: strings.languages(),
         description: strings.spellCheckerLanguagesDescription(),
-        isHidden: () => !useSpellChecker.getState().enabled,
+        isHidden: () => !useSpellChecker.getState().enabled || isMac(),
         onStateChange: (listener) =>
           useSpellChecker.subscribe((c) => c.enabled, listener),
         components: [

@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { SubscriptionPlan } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { Platform } from "react-native";
 import { getVersion } from "react-native-device-info";
 
@@ -50,20 +52,36 @@ export const SORT = {
 };
 
 export const itemSkus = [
-  "com.streetwriters.notesnook.sub.mo",
-  "com.streetwriters.notesnook.sub.yr",
-  "com.streetwriters.notesnook.sub.yr.15",
-  "com.streetwriters.notesnook.sub.mo.15",
-  "com.streetwriters.notesnook.sub.mo.ofr",
-  "com.streetwriters.notesnook.sub.yr.trialoffer",
-  "com.streetwriters.notesnook.sub.mo.trialoffer",
-  "com.streetwriters.notesnook.sub.mo.tier1",
-  "com.streetwriters.notesnook.sub.yr.tier1",
-  "com.streetwriters.notesnook.sub.mo.tier2",
-  "com.streetwriters.notesnook.sub.yr.tier2",
-  "com.streetwriters.notesnook.sub.mo.tier3",
-  "com.streetwriters.notesnook.sub.yr.tier3"
+  "notesnook.essential.monthly",
+  "notesnook.essential.yearly",
+  "notesnook.pro.monthly",
+  "notesnook.pro.yearly",
+  "notesnook.pro.monthly.tier2",
+  "notesnook.pro.yearly.tier2",
+  "notesnook.pro.monthly.tier3",
+  "notesnook.pro.yearly.tier3",
+  "notesnook.believer.monthly",
+  "notesnook.believer.yearly",
+  "notesnook.believer.5year"
 ];
+
+export function planToDisplayName(plan: SubscriptionPlan): string {
+  switch (plan) {
+    case SubscriptionPlan.FREE:
+      return strings.freePlan();
+    case SubscriptionPlan.ESSENTIAL:
+      return strings.essentialPlan();
+    case SubscriptionPlan.LEGACY_PRO:
+    case SubscriptionPlan.PRO:
+      return strings.proPlan();
+    case SubscriptionPlan.BELIEVER:
+      return strings.believerPlan();
+    case SubscriptionPlan.EDUCATION:
+      return strings.educationPlan();
+    default:
+      return strings.freePlan();
+  }
+}
 
 export const SUBSCRIPTION_STATUS = {
   BASIC: 0,
@@ -103,4 +121,10 @@ export const SUBSCRIPTION_PROVIDER = {
     desc: "You subscribed to Notesnook Pro on the Web/Desktop App.",
     icon: "web"
   }
+};
+
+export const EDITOR_LINE_HEIGHT = {
+  DEFAULT: 1.2,
+  MAX: 10,
+  MIN: 1
 };

@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { database } from "@notesnook/common";
+import { database, getFeature, getFeatureLimit } from "@notesnook/common";
 import { logger as dbLogger, ICompressor } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import {
@@ -26,7 +26,6 @@ import {
 } from "@streetwriters/kysely";
 import { Platform } from "react-native";
 import * as Gzip from "react-native-gzip";
-import SettingsService from "../../services/settings";
 import EventSource from "../../utils/sse/even-source-ios";
 import AndroidEventSource from "../../utils/sse/event-source";
 import { FileStorage } from "../filesystem";
@@ -34,10 +33,23 @@ import { getDatabaseKey } from "./encryption";
 import "./logger";
 import { RNSqliteDriver } from "./sqlite.kysely";
 import { Storage } from "./storage";
+import SettingsService from "../../services/settings";
 
 export async function setupDatabase(password?: string) {
   const key = await getDatabaseKey(password);
   if (!key) throw new Error(strings.databaseSetupFailed());
+
+  // const base = `http://192.168.100.92`;
+
+  // database.host({
+  //   API_HOST: `${base}:5264`,
+  //   AUTH_HOST: `${base}:8264`,
+  //   SSE_HOST: `${base}:7264`,
+  //   ISSUES_HOST: `${base}:2624`,
+  //   SUBSCRIPTIONS_HOST: `${base}:9264`,
+  //   MONOGRAPH_HOST: `${base}:6264`,
+  //   NOTESNOOK_HOST: `${base}:8788`
+  // });
 
   database.host({
     API_HOST: "https://api.notesnook.com",
@@ -46,6 +58,7 @@ export async function setupDatabase(password?: string) {
     SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co",
     ISSUES_HOST: "https://issues.streetwriters.co",
     MONOGRAPH_HOST: "https://monogr.ph",
+    NOTESNOOK_HOST: "https://notesnook.com",
     ...(SettingsService.getProperty("serverUrls") || {})
   });
 
@@ -59,8 +72,8 @@ export async function setupDatabase(password?: string) {
       ({
         compress: Gzip.deflate,
         decompress: Gzip.inflate
-      } as ICompressor),
-    batchSize: 100,
+      }) as ICompressor,
+    batchSize: 50,
     sqliteOptions: {
       dialect: (name) => ({
         createDriver: () => {
@@ -73,6 +86,10 @@ export async function setupDatabase(password?: string) {
       tempStore: "memory",
       journalMode: Platform.OS === "ios" ? "DELETE" : "WAL",
       password: key
+    },
+    maxNoteVersions: async () => {
+      const limit = await getFeatureLimit(getFeature("maxNoteVersions"));
+      return typeof limit.caption === "number" ? limit.caption : undefined;
     }
   });
 }

@@ -32,6 +32,7 @@ import { MenuItem } from "@notesnook/ui";
 import { navigate } from "../../navigation";
 import { Tag } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
+import { checkFeature } from "../../common";
 
 type HeaderProps = { readonly: boolean; id: string };
 function Header(props: HeaderProps) {
@@ -51,9 +52,11 @@ function Header(props: HeaderProps) {
     if (oldTag) {
       await db.relations.unlink(oldTag, { type: "note", id: noteId });
     } else {
-      const id =
-        (await db.tags.find(value))?.id ??
-        (await db.tags.add({ title: value }));
+      let id = (await db.tags.find(value))?.id;
+      if (!id) {
+        if (!(await checkFeature("tags"))) return;
+        id = await db.tags.add({ title: value });
+      }
       if (!id) return;
       await db.relations.add({ id, type: "tag" }, { type: "note", id: noteId });
       await useTagStore.getState().refresh();

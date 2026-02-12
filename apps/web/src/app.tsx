@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useState, Suspense, useEffect, useRef } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import { Box, Flex } from "@theme-ui/components";
 import { ScopedThemeProvider } from "./components/theme-provider";
 import useMobile from "./hooks/use-mobile";
@@ -59,6 +59,14 @@ function App() {
   const hasNativeTitlebar =
     useSettingStore.getState().desktopIntegrationSettings?.nativeTitlebar;
   console.timeEnd("loading app");
+
+  useEffect(() => {
+    if (isMobile) {
+      useStore.setState({
+        isNavPaneCollapsed: false
+      });
+    }
+  }, [isMobile]);
 
   return (
     <>
@@ -216,7 +224,7 @@ function DesktopAppContents() {
               initialSize={380}
               style={{ flex: 1, display: "flex" }}
               snapSize={120}
-              maxSize={500}
+              maxSize={1000}
               className="list-pane"
             >
               <ScopedThemeProvider

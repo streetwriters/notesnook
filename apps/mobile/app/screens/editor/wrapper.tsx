@@ -23,22 +23,36 @@ import {
   AppState,
   AppStateStatus,
   KeyboardAvoidingView,
-  Platform,
   TextInput,
   View
 } from "react-native";
 import Editor from ".";
-import { PremiumToast } from "../../components/premium/premium-toast";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import useIsFloatingKeyboard from "../../hooks/use-is-floating-keyboard";
-import useKeyboard from "../../hooks/use-keyboard";
 import { DDS } from "../../services/device-detection";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { editorRef } from "../../utils/global-refs";
 import { editorController, textInput } from "./tiptap/utils";
-import deviceInfo from "react-native-device-info";
 
-export const EditorWrapper = ({ widths }: { widths: any }) => {
+export type PaneWidths = {
+  mobile: {
+    sidebar: number;
+    list: number;
+    editor: number;
+  };
+  smallTablet: {
+    sidebar: number;
+    list: number;
+    editor: number;
+  };
+  tablet: {
+    sidebar: number;
+    list: number;
+    editor: number;
+  };
+};
+
+export const EditorWrapper = ({ widths }: { widths: PaneWidths }) => {
   const { colors } = useThemeColors();
   const { colors: toolBarColors } = useThemeColors("editorToolbar");
   const deviceMode = useSettingStore((state) => state.deviceMode);
@@ -48,8 +62,9 @@ export const EditorWrapper = ({ widths }: { widths: any }) => {
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
   );
-  const keyboard = useKeyboard();
-  const prevState = useRef<AppStateStatus>();
+  const prevState = useRef<AppStateStatus>(undefined);
+  const isFullscreen = useSettingStore((state) => state.fullscreen);
+  const dimensions = useSettingStore((state) => state.dimensions);
 
   const onAppStateChanged = async (state: AppStateStatus) => {
     if (!prevState.current) {
@@ -73,44 +88,48 @@ export const EditorWrapper = ({ widths }: { widths: any }) => {
     };
   }, [loading]);
 
-  const getMarginBottom = () => {
-    const bottomInsets =
-      Platform.OS === "android" ? 12 : insets.bottom + 16 || 14;
-    if (!keyboard.keyboardShown) return bottomInsets / 1.5;
-    if (deviceInfo.isTablet() && Platform.OS === "ios" && !floating)
-      return bottomInsets;
-    if (Platform.OS === "ios") return bottomInsets / 1.5;
-    return 0;
-  };
-
-  const KeyboardAvoidingViewIOS =
-    Platform.OS === "ios" ? KeyboardAvoidingView : View;
-
   return (
     <View
       testID="editor-wrapper"
       ref={editorRef}
-      style={{
-        width: widths[!introCompleted ? "mobile" : (deviceMode as any)]?.editor,
-        height: "100%",
-        minHeight: "100%",
-        backgroundColor: toolBarColors.primary.background,
-        borderLeftWidth: DDS.isTab ? 1 : 0,
-        borderLeftColor: DDS.isTab ? colors.secondary.background : "transparent"
-      }}
+      style={[
+        {
+          width: isFullscreen
+            ? dimensions.width
+            : widths[
+                !introCompleted ? "mobile" : (deviceMode as keyof PaneWidths)
+              ]?.editor,
+          height: "100%",
+          minHeight: "100%",
+          backgroundColor: toolBarColors.primary.background,
+          paddingLeft: isFullscreen
+            ? deviceMode === "smallTablet"
+              ? 0
+              : dimensions.width * 0.15
+            : null,
+          paddingRight: isFullscreen
+            ? deviceMode === "smallTablet"
+              ? 0
+              : dimensions.width * 0.15
+            : insets.right,
+          borderLeftWidth: DDS.isTab ? 1 : 0,
+          borderLeftColor: DDS.isTab
+            ? colors.secondary.background
+            : "transparent",
+          paddingBottom: insets.bottom
+        }
+      ]}
     >
       {loading || !introCompleted ? null : (
-        <KeyboardAvoidingViewIOS
+        <KeyboardAvoidingView
           behavior="padding"
           style={{
-            marginBottom: getMarginBottom(),
             backgroundColor: colors.primary.background,
             flex: 1
           }}
           enabled={!floating}
           keyboardVerticalOffset={0}
         >
-          <PremiumToast key="toast" context="editor" offset={50 + insets.top} />
           <TextInput
             key="input"
             ref={textInput}
@@ -118,7 +137,7 @@ export const EditorWrapper = ({ widths }: { widths: any }) => {
             blurOnSubmit={false}
           />
           <Editor key="editor" withController={true} />
-        </KeyboardAvoidingViewIOS>
+        </KeyboardAvoidingView>
       )}
     </View>
   );

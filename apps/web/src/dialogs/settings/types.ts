@@ -17,29 +17,35 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { FeatureId } from "@notesnook/common";
 import { Icon } from "../../components/icons";
 
-export type SectionKeys =
-  | "profile"
-  | "auth"
-  | "subscription"
-  | "sync"
-  | "appearance"
-  | "behaviour"
-  | "desktop"
-  | "notifications"
-  | "servers"
-  | "editor"
-  | "backup-export"
-  | "export"
-  | "importer"
-  | "vault"
-  | "app-lock"
-  | "privacy"
-  | "support"
-  | "legal"
-  | "developer"
-  | "about";
+const SectionKeys = [
+  "profile",
+  "auth",
+  "subscription",
+  "sync",
+  "appearance",
+  "behaviour",
+  "desktop",
+  "notifications",
+  "servers",
+  "editor",
+  "backup-export",
+  "export",
+  "importer",
+  "vault",
+  "app-lock",
+  "privacy",
+  "support",
+  "legal",
+  "developer",
+  "about",
+  "inbox",
+  "circle"
+] as const;
+
+export type SectionKeys = (typeof SectionKeys)[number];
 
 export type SectionGroupKeys =
   | "account"
@@ -68,7 +74,7 @@ export type SettingsGroup = {
   header: string | ((props: any) => JSX.Element | null);
   isHidden?: () => boolean;
   onStateChange?: (
-    listener: (state: unknown, prevState: unknown) => void
+    listener: (state: any, prevState: unknown) => void
   ) => () => void;
   onRender?: () => void | Promise<void>;
 };
@@ -77,12 +83,13 @@ export type Setting = {
   key: string;
   keywords?: string[];
   title: string;
-  description?: string | ((state?: unknown) => string);
-  components: SettingComponent[] | ((state?: unknown) => SettingComponent[]);
-  isHidden?: (state?: unknown) => boolean;
+  description?: string | ((state?: any) => string);
+  components: SettingComponent[] | ((state?: any) => SettingComponent[]);
+  isHidden?: (state?: any) => boolean;
   onStateChange?: (
     listener: (state: unknown, prevState: unknown) => void
   ) => () => void;
+  featureId?: FeatureId;
 };
 
 export type SettingComponentType =
@@ -123,7 +130,7 @@ export type ToggleSettingComponent = BaseSettingComponent<"toggle"> & {
 };
 
 export type DropdownSettingComponent = BaseSettingComponent<"dropdown"> & {
-  options: { value: string | number; title: string; premium?: boolean }[];
+  options: { value: string | number; title: string; disabled?: boolean }[];
   selectedOption: () => string | number | Promise<string | number>;
   onSelectionChanged: (value: string) => void | Promise<void>;
 };
@@ -149,3 +156,7 @@ export type TextInputSettingComponent = BaseSettingComponent<"input"> & {
 export type CustomSettingComponent = BaseSettingComponent<"custom"> & {
   component: () => JSX.Element | null;
 };
+
+export function isSectionKey(key: string): key is SectionKeys {
+  return SectionKeys.includes(key as SectionKeys);
+}

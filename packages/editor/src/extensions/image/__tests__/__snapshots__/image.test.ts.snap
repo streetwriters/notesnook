@@ -1,0 +1,171 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`migration > inline image in outline list 1`] = `
+{
+  "content": [
+    {
+      "content": [
+        {
+          "attrs": {
+            "collapsed": false,
+          },
+          "content": [
+            {
+              "content": [
+                {
+                  "text": "item 1",
+                  "type": "text",
+                },
+              ],
+              "type": "paragraph",
+            },
+          ],
+          "type": "outlineListItem",
+        },
+        {
+          "attrs": {
+            "collapsed": false,
+          },
+          "content": [
+            {
+              "content": [
+                {
+                  "text": "hello",
+                  "type": "text",
+                },
+              ],
+              "type": "paragraph",
+            },
+            {
+              "attrs": {
+                "align": undefined,
+                "aspectRatio": 1,
+                "filename": undefined,
+                "hash": undefined,
+                "height": null,
+                "mime": undefined,
+                "progress": 0,
+                "size": undefined,
+                "src": "image.png",
+                "type": "image",
+                "width": null,
+              },
+              "type": "image",
+            },
+            {
+              "content": [
+                {
+                  "text": "world",
+                  "type": "text",
+                },
+              ],
+              "type": "paragraph",
+            },
+            {
+              "content": [
+                {
+                  "attrs": {
+                    "collapsed": false,
+                  },
+                  "content": [
+                    {
+                      "content": [
+                        {
+                          "text": "sub item 2",
+                          "type": "text",
+                        },
+                      ],
+                      "type": "paragraph",
+                    },
+                  ],
+                  "type": "outlineListItem",
+                },
+                {
+                  "attrs": {
+                    "collapsed": false,
+                  },
+                  "content": [
+                    {
+                      "content": [
+                        {
+                          "text": "sub item 3",
+                          "type": "text",
+                        },
+                      ],
+                      "type": "paragraph",
+                    },
+                  ],
+                  "type": "outlineListItem",
+                },
+              ],
+              "type": "outlineList",
+            },
+          ],
+          "type": "outlineListItem",
+        },
+        {
+          "attrs": {
+            "collapsed": false,
+          },
+          "content": [
+            {
+              "content": [
+                {
+                  "text": "item 4",
+                  "type": "text",
+                },
+              ],
+              "type": "paragraph",
+            },
+          ],
+          "type": "outlineListItem",
+        },
+      ],
+      "type": "outlineList",
+    },
+  ],
+  "type": "doc",
+}
+`;
+
+exports[`migration > inline image in paragraph 1`] = `
+{
+  "content": [
+    {
+      "content": [
+        {
+          "text": "hello",
+          "type": "text",
+        },
+      ],
+      "type": "paragraph",
+    },
+    {
+      "attrs": {
+        "align": undefined,
+        "aspectRatio": 1,
+        "filename": undefined,
+        "hash": undefined,
+        "height": null,
+        "mime": undefined,
+        "progress": 0,
+        "size": undefined,
+        "src": "image.png",
+        "type": "image",
+        "width": null,
+      },
+      "type": "image",
+    },
+    {
+      "content": [
+        {
+          "text": "world",
+          "type": "text",
+        },
+      ],
+      "type": "paragraph",
+    },
+  ],
+  "type": "doc",
+}
+`;

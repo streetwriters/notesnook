@@ -170,12 +170,12 @@ export const useEditor = (
   const saveCount = useRef(0);
   const lastContentChangeTime = useRef<Record<string, number>>({});
   const lock = useRef(false);
-  const currentLoadingNoteId = useRef<string>();
-  const lastTabFocused = useRef<string>();
+  const currentLoadingNoteId = useRef<string>(undefined);
+  const lastTabFocused = useRef<string>(undefined);
 
   const localTabState = useRef<LocalTabState>(new LocalTabState());
 
-  const blockIdRef = useRef<string>();
+  const blockIdRef = useRef<string>(undefined);
   const postMessage = useCallback(
     async <T>(type: string, data: T, tabId?: string, waitFor = 300) =>
       await post(
@@ -298,7 +298,7 @@ export const useEditor = (
           return;
         }
 
-        if (isContentInvalid(data) && id) {
+        if (!title && isContentInvalid(data) && id) {
           // Create a new history session if recieved empty or invalid content
           // To ensure that history is preserved for correct content.
           currentSessionHistoryId = editorSessionHistory.newSession(id);
@@ -508,9 +508,17 @@ export const useEditor = (
       newTab?: boolean;
       refresh?: boolean;
       searchResultIndex?: number;
+      loadedFromEditor?: boolean;
     }) => {
       loadNoteMutex.runExclusive(async () => {
-        if (!event) return;
+        if (
+          !event ||
+          (event.loadedFromEditor &&
+            event.item &&
+            event.item?.id !== useTabStore.getState().getCurrentNoteId())
+        ) {
+          return;
+        }
         if (event.blockId) {
           blockIdRef.current = event.blockId;
         }
@@ -669,7 +677,7 @@ export const useEditor = (
           state.current.currentlyEditing = true;
           if (!tabLocked) {
             await loadContent(item);
-          } else {
+          } else if (fluidTabsRef.current?.page() === "editor") {
             commands.focus(tabId!);
           }
 
@@ -719,6 +727,7 @@ export const useEditor = (
           }, 300);
         }
         postMessage(NativeEvents.theme, theme);
+        console.log("load finished", event.item?.id);
       });
     },
     [
@@ -754,6 +763,8 @@ export const useEditor = (
           (data as ContentItem).type === "tiptap"
             ? (data as ContentItem).noteId
             : data.id;
+
+        if (!useTabStore.getState().hasTabForNote(noteId)) return;
 
         const note = data.type === "note" ? data : await db.notes?.note(noteId);
         lock.current = true;
@@ -873,7 +884,6 @@ export const useEditor = (
               }
 
               lastContentChangeTime.current[note.id] = note.dateEdited;
-              console.log(tab.session?.selection);
               await postMessage(
                 NativeEvents.updatehtml,
                 {
@@ -1087,7 +1097,10 @@ export const useEditor = (
 
     if (!state.current?.initialLoadCalled) {
       const url = await Linking.getInitialURL();
-      let noteId = url && new URL(url).searchParams.get("id");
+      let noteId =
+        url &&
+        url.startsWith("https://app.notesnook.com/open_note?") &&
+        new URL(url).searchParams.get("id");
       if (noteId) {
         const note = await db.notes?.note(noteId);
         fluidTabsRef.current?.goToPage("editor");

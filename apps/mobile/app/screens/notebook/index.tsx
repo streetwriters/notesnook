@@ -38,12 +38,17 @@ import { eUpdateNotebookRoute } from "../../utils/events";
 import { findRootNotebookId } from "../../utils/notebooks";
 import { openEditor, setOnFirstSave } from "../notes/common";
 import { View } from "react-native";
-import { DefaultAppStyles } from "../../utils/styles";
 import { Notebooks } from "../../components/sheets/notebooks";
+import { useSettingStore } from "../../stores/use-setting-store";
+import { rootNavigatorRef } from "../../utils/global-refs";
 
 const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
   const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
   const params = useRef<NotebookScreenParams>(route?.params);
+  const isAppLoading = useSettingStore((state) => state.isAppLoading);
+  const [notebook, setNotebook] = useState<Notebook | undefined>(
+    params.current.item
+  );
   const [loading, setLoading] = useState(true);
   const updateOnFocus = useRef(false);
   const [breadcrumbs, setBreadcrumbs] = useState<
@@ -72,33 +77,31 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
   });
 
   const syncWithNavigation = React.useCallback(() => {
-    useNavigationStore.getState().setFocusedRouteId(params?.current?.item?.id);
+    useNavigationStore.getState().setFocusedRouteId(params?.current?.id);
     setOnFirstSave({
       type: "notebook",
-      id: params.current.item.id
+      id: params.current.id
     });
   }, []);
 
   const onRequestUpdate = React.useCallback(
     async (data?: NotebookScreenParams) => {
+      if (useSettingStore.getState().isAppLoading) return;
       if (
-        useNavigationStore.getState().focusedRouteId !==
-          params.current.item.id &&
+        useNavigationStore.getState().focusedRouteId !== params.current.id &&
         !data
       ) {
         updateOnFocus.current = true;
         return;
       }
 
-      if (data?.item?.id && params.current.item?.id !== data?.item?.id) {
-        const nextRootNotebookId = await findRootNotebookId(data?.item?.id);
-        const currentNotebookRoot = await findRootNotebookId(
-          params.current.item.id
-        );
+      if (data?.id && params.current?.id !== data?.id) {
+        const nextRootNotebookId = await findRootNotebookId(data?.id);
+        const currentNotebookRoot = await findRootNotebookId(params.current.id);
 
         if (
           nextRootNotebookId !== currentNotebookRoot ||
-          nextRootNotebookId === params.current?.item?.id
+          nextRootNotebookId === params.current?.id
         ) {
           // Never update notebook in route if root is different or if the root is current notebook.
           return;
@@ -106,17 +109,15 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
       }
 
       if (data) params.current = data;
-      params.current.title = params.current.item.title;
 
       try {
-        const notebook = await db.notebooks?.notebook(
-          params?.current?.item?.id
-        );
-
+        const notebook = await db.notebooks?.notebook(params?.current?.id);
+        setNotebook(notebook);
+        params.current.item = notebook;
         if (notebook) {
           const breadcrumbs = await db.notebooks.breadcrumbs(notebook.id);
           setBreadcrumbs(breadcrumbs.slice(0, breadcrumbs.length - 1));
-          params.current.item = notebook;
+          params.current.id = notebook.id;
           const notes = await db.relations
             .from(notebook, "note")
             .selector.grouped(db.settings.getGroupOptions("notes"));
@@ -124,7 +125,11 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
           await notes.item(0, resolveItems);
           syncWithNavigation();
         } else {
-          Navigation.goBack();
+          if (rootNavigatorRef.canGoBack()) {
+            Navigation.goBack();
+          } else {
+            Navigation.navigate("Notes");
+          }
         }
         setLoading(false);
       } catch (e) {
@@ -135,12 +140,13 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
   );
 
   useEffect(() => {
+    if (isAppLoading) return;
     onRequestUpdate(params.current);
     const sub = eSubscribeEvent(eUpdateNotebookRoute, onRequestUpdate);
     return () => {
       sub?.unsubscribe();
     };
-  }, [onRequestUpdate]);
+  }, [onRequestUpdate, isAppLoading]);
 
   useEffect(() => {
     return () => {
@@ -150,37 +156,29 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
 
   return (
     <>
-      <SelectionHeader
-        id={route.params?.item?.id}
-        items={notes}
-        type="note"
-        renderedInRoute="Notebook"
-      />
       <Header
         renderedInRoute={route.name}
-        title={params.current.item?.title}
+        title={notebook?.title}
         canGoBack={params?.current?.canGoBack}
         rightButton={{
           name: "dots-vertical",
           onPress: () => {
-            Properties.present(params.current.item);
+            Properties.present(notebook);
           }
         }}
         hasSearch={true}
         onSearch={() => {
-          const selector = db.relations.from(
-            params.current.item,
-            "note"
-          ).selector;
+          if (!notebook) return;
+          const selector = db.relations.from(notebook, "note").selector;
           Navigation.push("Search", {
-            placeholder: strings.searchInRoute(params.current.item?.title),
+            placeholder: strings.searchInRoute(notebook?.title),
             type: "note",
-            title: params.current.item?.title,
+            title: notebook?.title,
             route: route.name,
             items: selector
           });
         }}
-        id={params.current.item?.id}
+        id={notebook?.id}
       />
 
       <DelayLayout wait={loading}>
@@ -190,19 +188,19 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
           onRefresh={() => {
             onRequestUpdate();
           }}
-          id={params.current.item?.id}
+          id={params.current?.id}
           renderedInRoute="Notebook"
-          headerTitle={params.current.title}
+          headerTitle={notebook?.title}
           loading={loading}
           CustomLisHeader={
             <NotebookHeader
               breadcrumbs={breadcrumbs}
-              notebook={params.current.item}
+              notebook={notebook!}
               totalNotes={notes?.placeholders.length || 0}
             />
           }
           placeholder={{
-            title: params.current.item?.title,
+            title: notebook?.title!,
             paragraph: strings.notesEmpty(),
             button: strings.addFirstNote(),
             action: openEditor,
@@ -215,20 +213,22 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
           position: "absolute",
           bottom: 20,
           right: 20,
-          gap: DefaultAppStyles.GAP_VERTICAL,
           alignItems: "center"
         }}
       >
         <FloatingButton
           icon="file-tree"
+          testID="notebookTreeSheet"
           size="small"
           onPress={() => {
-            Notebooks.present(params.current.item);
+            if (!notebook) return;
+            Notebooks.present(notebook);
           }}
           style={{
             position: "relative",
             right: 0,
-            bottom: 5
+            bottom: 0,
+            paddingBottom: 10
           }}
         />
         <FloatingButton
@@ -236,11 +236,18 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
           alwaysVisible
           style={{
             position: "relative",
+            paddingTop: 10,
             right: 0,
             bottom: 0
           }}
         />
       </View>
+      <SelectionHeader
+        id={route.params?.id}
+        items={notes}
+        type="note"
+        renderedInRoute="Notebook"
+      />
     </>
   );
 };
@@ -250,7 +257,7 @@ NotebookScreen.navigate = async (item: Notebook, canGoBack?: boolean) => {
   const { currentRoute, focusedRouteId } = useNavigationStore.getState();
   if (currentRoute === "Notebooks") {
     Navigation.push("Notebook", {
-      title: item.title,
+      id: item.id,
       item: item,
       canGoBack
     });
@@ -267,24 +274,24 @@ NotebookScreen.navigate = async (item: Notebook, canGoBack?: boolean) => {
       // Update the route in place instead
 
       eSendEvent(eUpdateNotebookRoute, {
-        item: item,
-        title: item.title,
-        canGoBack: canGoBack
+        id: item.id,
+        canGoBack: canGoBack,
+        item: item
       });
     } else {
       // Push a new route
       Navigation.push("Notebook", {
-        title: item.title,
-        item: item,
-        canGoBack
+        id: item.id,
+        canGoBack,
+        item: item
       });
     }
   } else {
     // Push a new route anyways
     Navigation.push("Notebook", {
-      title: item.title,
-      item: item,
-      canGoBack
+      id: item.id,
+      canGoBack,
+      item: item
     });
   }
 };

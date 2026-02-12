@@ -50,6 +50,7 @@ export class DeviceDetectionService {
     windowSize = size || windowSize;
     this.width = windowSize.width;
     this.height = windowSize.height;
+    this.orientation = orientation;
     this.adjustedWidth = this.width * this.pixelDensity;
     this.adjustedHeight = this.height * this.pixelDensity;
     screenSize = Dimensions.get("screen");

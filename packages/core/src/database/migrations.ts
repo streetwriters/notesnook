@@ -392,6 +392,39 @@ export class NNMigrationProvider implements MigrationProvider {
         async up(db) {
           await runFTSTablesMigrations(db);
         }
+      },
+      "a-2025-07-30": {
+        async up(db) {
+          await db.schema
+            .createTable("monographs")
+            .$call(addBaseColumns)
+            .addColumn("datePublished", "integer")
+            .addColumn("title", "text", COLLATE_NOCASE)
+            .addColumn("selfDestruct", "boolean")
+            .addColumn("password", "text")
+            .execute();
+        }
+      },
+      "a-2026-01-07": {
+        async up(db) {
+          await db.schema
+            .alterTable("notes")
+            .addColumn("expiryDate", "text")
+            .execute();
+          await db.schema
+            .createIndex("note_expiry_date")
+            .on("notes")
+            .expression(sql`expiryDate ->> '$.value'`)
+            .execute();
+        }
+      },
+      "a-2026-01-09": {
+        async up(db) {
+          await db.schema
+            .alterTable("sessioncontent")
+            .addColumn("title", "text")
+            .execute();
+        }
       }
     };
   }

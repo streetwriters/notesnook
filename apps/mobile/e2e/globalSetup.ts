@@ -1,5 +1,5 @@
 import { execSync } from "child_process";
-
+//@ts-ignore
 import { pathExists, ensureDir } from "fs-extra";
 
 import { resolveConfig } from "detox/internals";

@@ -25,7 +25,7 @@ import Navigation, { NavigationProps } from "../../services/navigation";
 import useNavigationStore, {
   NotesScreenParams
 } from "../../stores/use-navigation-store";
-import { PLACEHOLDER_DATA, openEditor, toCamelCase } from "./common";
+import { PLACEHOLDER_DATA, openEditor } from "./common";
 export const ColoredNotes = ({
   navigation,
   route
@@ -45,11 +45,13 @@ export const ColoredNotes = ({
 
 ColoredNotes.get = async (params: NotesScreenParams, grouped = true) => {
   if (!grouped) {
-    return await db.relations.from(params.item, "note").resolve();
+    return await db.relations
+      .from({ id: params.id, type: "color" }, "note")
+      .resolve();
   }
 
   return await db.relations
-    .from(params.item, "note")
+    .from({ id: params.id, type: "color" }, "note")
     .selector.grouped(db.settings.getGroupOptions("notes"));
 };
 
@@ -63,9 +65,10 @@ ColoredNotes.navigate = (item: Color, canGoBack: boolean) => {
   }
 
   Navigation.push<"ColoredNotes">("ColoredNotes", {
-    item: item,
+    type: "color",
+    id: item.id,
     canGoBack,
-    title: toCamelCase(item.title)
+    item: item
   });
 };
 

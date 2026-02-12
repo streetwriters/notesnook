@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type sodium from "libsodium-wrappers-sumo";
+import sodium from "libsodium-wrappers-sumo";
 
 export enum base64_variants {
   ORIGINAL = 1,
@@ -61,4 +61,6 @@ export interface ISodium {
   get crypto_aead_xchacha20poly1305_ietf_NPUBBYTES(): typeof sodium.crypto_aead_xchacha20poly1305_ietf_NPUBBYTES;
   get crypto_secretstream_xchacha20poly1305_TAG_FINAL(): typeof sodium.crypto_secretstream_xchacha20poly1305_TAG_FINAL;
   get crypto_secretstream_xchacha20poly1305_TAG_MESSAGE(): typeof sodium.crypto_secretstream_xchacha20poly1305_TAG_MESSAGE;
+  get crypto_box_keypair(): typeof sodium.crypto_box_keypair;
+  get crypto_box_seal_open(): typeof sodium.crypto_box_seal_open;
 }

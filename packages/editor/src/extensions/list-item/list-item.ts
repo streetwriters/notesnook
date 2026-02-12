@@ -18,8 +18,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { ListItem as TiptapListItem } from "@tiptap/extension-list-item";
+import { ensureLeadingParagraph } from "../../utils/prosemirror.js";
 
 export const ListItem = TiptapListItem.extend({
+  parseHTML() {
+    return [
+      {
+        priority: 50,
+        tag: `li`,
+        getContent: ensureLeadingParagraph
+      }
+    ];
+  },
   addKeyboardShortcuts() {
     return {
       ...this.parent?.(),

@@ -115,13 +115,13 @@ textarea,
 }
 
 .rpv-core__text-layer-text::selection {
-  background-color: var(--background-selected) !important;
+  background-color: var(--accent-selected) !important;
   color: transparent;
 }
 
 .rpv-core__text-layer-text::-moz-selection {
   /* Code for Firefox */
-  background-color: var(--background-selected) !important;
+  background-color: var(--accent-selected) !important;
   color: transparent;
 }
 
@@ -230,7 +230,7 @@ kbd {
   background: var(--background);
   border-radius: 3px;
   padding: 2px 5px;
-  color: var(--paragraph-secondary);
+  color: var(--paragraph);
 }
 
 .ping {

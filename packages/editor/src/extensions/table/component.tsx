@@ -17,13 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex } from "@theme-ui/components";
+import { Box, Flex } from "@theme-ui/components";
 import { ReactNodeView, ReactNodeViewProps } from "../react/index.js";
 import { Node as ProsemirrorNode } from "prosemirror-model";
 import { Editor } from "../../types.js";
 import { Editor as TiptapEditor } from "@tiptap/core";
-import { useEffect, useRef } from "react";
-import { updateColumnsOnResize } from "@tiptap/pm/tables";
+import { useCallback, useEffect, useRef } from "react";
 import { EditorView, NodeView } from "prosemirror-view";
 import {
   InsertColumnRight,
@@ -32,42 +31,89 @@ import {
   TableProperties
 } from "../../toolbar/tools/table.js";
 import { getToolDefinition } from "../../toolbar/tool-definitions.js";
-import { getPosition } from "@notesnook/ui";
+import { getPosition, ScrollContainer } from "@notesnook/ui";
 import {
   findSelectedDOMNode,
   hasSameAttributes
 } from "../../utils/prosemirror.js";
-import { DesktopOnly } from "../../components/responsive/index.js";
+import { DesktopOnly, MobileOnly } from "../../components/responsive/index.js";
 import { TextDirections } from "../text-direction/index.js";
 import { strings } from "@notesnook/intl";
+import { useIsMobile } from "../../toolbar/stores/toolbar-store.js";
+import { updateColumnsOnResize } from "./prosemirror-tables/tableview.js";
 
-export function TableComponent(props: ReactNodeViewProps) {
-  const { editor, node, forwardRef } = props;
+export function TableComponent(
+  props: ReactNodeViewProps & { cellMinWidth: number }
+) {
+  const { editor, node, forwardRef, cellMinWidth } = props;
   const colgroupRef = useRef<HTMLTableColElement>(null);
   const tableRef = useRef<HTMLTableElement>();
   const { textDirection } = node.attrs;
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (!colgroupRef.current || !tableRef.current) return;
 
-    updateColumnsOnResize(node, colgroupRef.current, tableRef.current, 50);
-  }, [node]);
+    updateColumnsOnResize(
+      node,
+      colgroupRef.current,
+      tableRef.current,
+      cellMinWidth
+    );
+  }, [node, cellMinWidth]);
+
+  // useEffect(() => {
+  //   function transactionListener({
+  //     editor
+  //   }: {
+  //     transaction: Transaction;
+  //     editor: TiptapEditor;
+  //   }) {
+  //     if (!colgroupRef.current || !tableRef.current) return;
+
+  //     const cellsInRow = tableRef.current?.rows[0]?.cells.length || 0;
+  //     if (colgroupRef.current?.childElementCount !== cellsInRow)
+  //       updateColumns(
+  //         selectedRect(editor.state).table,
+  //         colgroupRef.current,
+  //         tableRef.current,
+  //         cellMinWidth
+  //       );
+  //   }
+  //   editor.on("transaction", transactionListener);
+  //   return () => {
+  //     editor.off("transaction", transactionListener);
+  //   };
+  // }, []);
 
   return (
     <>
       <DesktopOnly>
-        <TableRowToolbar
-          editor={editor}
-          table={tableRef}
-          textDirection={textDirection}
-        />
-        <TableColumnToolbar
-          editor={editor}
-          table={tableRef}
-          textDirection={textDirection}
-        />
+        {editor.isEditable ? (
+          <>
+            <TableRowToolbar
+              editor={editor}
+              table={tableRef}
+              textDirection={textDirection}
+            />
+            <TableColumnToolbar
+              editor={editor}
+              table={tableRef}
+              textDirection={textDirection}
+            />
+          </>
+        ) : null}
       </DesktopOnly>
-      <div className="tableWrapper" dir={textDirection}>
+      <div
+        dir={textDirection}
+        className="scroll-bar"
+        style={{
+          overflowY: "hidden",
+          overflowX: "auto",
+          WebkitOverflowScrolling: "touch",
+          maxWidth: "100%"
+        }}
+      >
         <table
           ref={(ref) => {
             forwardRef?.(ref);
@@ -84,20 +130,26 @@ export function TableComponent(props: ReactNodeViewProps) {
 
 export function TableNodeView(editor: TiptapEditor) {
   class TableNode
-    extends ReactNodeView<ReactNodeViewProps<unknown>>
+    extends ReactNodeView<
+      ReactNodeViewProps<unknown> & { cellMinWidth: number }
+    >
     implements NodeView
   {
-    constructor(node: ProsemirrorNode) {
+    constructor(node: ProsemirrorNode, cellMinWidth: number) {
       super(
         node,
         editor,
         () => 0, // todo
         {
           component: TableComponent,
+          props: { cellMinWidth },
+          forceEnableSelection: true,
           shouldUpdate: (prev, next) => {
             return (
               !hasSameAttributes(prev.attrs, next.attrs) ||
-              prev.childCount !== next.childCount
+              prev.childCount !== next.childCount ||
+              // compare columns
+              prev.firstChild?.childCount !== next.firstChild?.childCount
             );
           },
           contentDOMFactory: () => {
@@ -180,8 +232,9 @@ function TableRowToolbar(props: TableToolbarProps) {
         bg: "background",
         flexWrap: "nowrap",
         borderRadius: "default",
+        border: "1px solid var(--border)",
         flexDirection: "column",
-        opacity: 0.3,
+        opacity: 0.4,
         ":hover": {
           opacity: 1
         }
@@ -205,6 +258,7 @@ function TableRowToolbar(props: TableToolbarProps) {
 function TableColumnToolbar(props: TableToolbarProps) {
   const { editor, table } = props;
   const columnToolsRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     function onSelectionUpdate() {
@@ -231,9 +285,11 @@ function TableColumnToolbar(props: TableToolbarProps) {
         yOffset: 2
       });
 
-      columnToolsRef.current.style.left = `${
-        pos.left - (table.current.parentElement?.scrollLeft || 0)
-      }px`;
+      const scrollLeft = isMobile
+        ? table.current.parentElement?.parentElement?.scrollLeft || 0
+        : table.current?.closest(".simplebar-content-wrapper")?.scrollLeft || 0;
+
+      columnToolsRef.current.style.left = `${pos.left - scrollLeft}px`;
       columnToolsRef.current.style.top = `${pos.top}px`;
     }
 
@@ -241,7 +297,7 @@ function TableColumnToolbar(props: TableToolbarProps) {
     return () => {
       editor.off("selectionUpdate", onSelectionUpdate);
     };
-  }, []);
+  }, [isMobile]);
 
   return (
     <Flex
@@ -255,7 +311,8 @@ function TableColumnToolbar(props: TableToolbarProps) {
         bg: "background",
         flexWrap: "nowrap",
         borderRadius: "default",
-        opacity: 0.3,
+        border: "1px solid var(--border)",
+        opacity: 0.4,
         ":hover": {
           opacity: 1
         }

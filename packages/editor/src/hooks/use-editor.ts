@@ -22,6 +22,7 @@ import { DependencyList, useEffect, useMemo, useRef, useState } from "react";
 import { Editor } from "../types.js";
 import { useToolbarStore } from "../toolbar/stores/toolbar-store.js";
 import { EditorView } from "@tiptap/pm/view";
+import { useEditorSearchStore } from "../toolbar/stores/search-store.js";
 
 function useForceUpdate() {
   const [, setValue] = useState(0);
@@ -56,6 +57,13 @@ export const useEditor = (
       editor.createView();
       if (oldIsFocused && !editor.isFocused) editor.commands.focus();
       options.onCreate?.({ editor: editor });
+
+      const { searchTerm, ...searchOptions } = useEditorSearchStore.getState();
+      if (!searchOptions.isSearching) {
+        editor.commands.endSearch();
+      } else {
+        editor.commands.search(searchTerm, searchOptions);
+      }
 
       function onTransaction({ editor }: { editor: TiptapEditor }) {
         editorRef.current = editor;

@@ -20,12 +20,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { EventSourcePolyfill as EventSource } from "event-source-polyfill";
 import { DatabasePersistence, NNStorage } from "../interfaces/storage";
 import { logger } from "../utils/logger";
-import { database } from "@notesnook/common";
+import {
+  database,
+  getFeature,
+  getFeatureLimit,
+  isFeatureAvailable
+} from "@notesnook/common";
 import { createDialect } from "./sqlite";
 import { isFeatureSupported } from "../utils/feature-check";
 import { generatePassword } from "../utils/password-generator";
 import { deriveKey, useKeyStore } from "../interfaces/key-store";
-import { logManager } from "@notesnook/core";
+import {
+  logManager,
+  SubscriptionPlan,
+  SubscriptionStatus
+} from "@notesnook/core";
 import Config from "../utils/config";
 import { FileStorage } from "../interfaces/fs";
 
@@ -44,8 +53,9 @@ async function initializeDatabase(persistence: DatabasePersistence) {
     AUTH_HOST: "https://auth.streetwriters.co",
     SSE_HOST: "https://events.streetwriters.co",
     ISSUES_HOST: "https://issues.streetwriters.co",
-    MONOGRAPH_HOST: "https://monogr.ph",
     SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co",
+    MONOGRAPH_HOST: "https://monogr.ph",
+    NOTESNOOK_HOST: "https://notesnook.com",
     ...Config.get("serverUrls", {})
   });
 
@@ -56,7 +66,7 @@ async function initializeDatabase(persistence: DatabasePersistence) {
   );
   await storage.migrate();
 
-  const multiTab = isFeatureSupported("opfs");
+  const multiTab = !!globalThis.SharedWorker && isFeatureSupported("opfs");
   database.setup({
     sqliteOptions: {
       dialect: (name, init) =>
@@ -85,6 +95,10 @@ async function initializeDatabase(persistence: DatabasePersistence) {
     fs: FileStorage,
     compressor: () =>
       import("../utils/compressor").then(({ Compressor }) => new Compressor()),
+    maxNoteVersions: async () => {
+      const limit = await getFeatureLimit(getFeature("maxNoteVersions"));
+      return typeof limit.caption === "number" ? limit.caption : undefined;
+    },
     batchSize: 100
   });
 
@@ -124,6 +138,17 @@ async function initializeDatabase(persistence: DatabasePersistence) {
   }
 
   performance.mark("end:initializeDatabase");
+
+  if (IS_TESTING && "isPro" in window) {
+    await db.user.setUser({
+      // @ts-expect-error just for testing purposes
+      subscription: {
+        plan: SubscriptionPlan.PRO,
+        status: SubscriptionStatus.ACTIVE
+      }
+    });
+  }
+
   return db;
 }
 

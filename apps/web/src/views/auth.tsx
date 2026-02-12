@@ -40,7 +40,7 @@ import AuthContainer from "../components/auth-container";
 import { useTimer } from "../hooks/use-timer";
 import { ErrorText } from "../components/error-text";
 import { AuthenticatorType, User } from "@notesnook/core";
-import { showLogoutConfirmation } from "../dialogs/confirm";
+import { ConfirmDialog, showLogoutConfirmation } from "../dialogs/confirm";
 import { TaskManager } from "../common/task-manager";
 import { strings } from "@notesnook/intl";
 import { ScrollContainer } from "@notesnook/ui";
@@ -321,7 +321,7 @@ function LoginPassword(props: BaseAuthComponentProps<"login:password">) {
           Config.get("sessionExpired", false)
         );
         Config.set("sessionExpired", false);
-        openURL("/", { authenticated: true });
+        openURL("/plans", { authenticated: true });
       }}
     >
       {(form?: PasswordFormData) => (
@@ -339,7 +339,16 @@ function LoginPassword(props: BaseAuthComponentProps<"login:password">) {
             type="button"
             mt={2}
             variant="anchor"
-            onClick={() => navigate("recover", { email: formData.email })}
+            onClick={() => {
+              ConfirmDialog.show({
+                title: "Password changing has been disabled temporarily",
+                message:
+                  "Password changing has been disabled temporarily to address some issues faced by users. It will be enabled again once the issues have resolved.",
+                positiveButtonText: "Ok"
+              });
+              return;
+              // navigate("recover", { email: formData.email })
+            }}
             sx={{ color: "paragraph", alignSelf: "end" }}
           >
             {strings.forgotPassword()}
@@ -379,7 +388,7 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
         }
 
         await userstore.signup(form);
-        openURL("/notes/#/welcome", { authenticated: true });
+        openURL("/plans", { authenticated: true });
       }}
     >
       {(form?: SignupFormData) => (
@@ -492,13 +501,23 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
         placeholder={user ? maskEmail(user.email) : undefined}
         autoFocus
         disabled
+        required={false}
       />
       <Button
         data-test-id="auth-forgot-password"
         type="button"
         mt={2}
         variant="anchor"
-        onClick={() => user && navigate("recover", { email: user.email })}
+        onClick={() => {
+          ConfirmDialog.show({
+            title: "Password changing has been disabled temporarily",
+            message:
+              "Password changing has been disabled temporarily to address some issues faced by users. It will be enabled again once the issues have resolved.",
+            positiveButtonText: "Ok"
+          });
+          return;
+          // user && navigate("recover", { email: user.email })
+        }}
         sx={{ color: "paragraph", alignSelf: "end" }}
       >
         {strings.forgotPassword()}
@@ -974,10 +993,10 @@ function SubtitleWithAction(props: SubtitleWithActionProps) {
 export function AuthField(props: FieldProps) {
   return (
     <Field
+      required
       {...props}
       name={props.name || props.id}
       data-test-id={props["data-test-id"] || props.id}
-      required
       sx={{ mt: 2, width: "100%" }}
       styles={{
         // label: { fontWeight: "normal" },

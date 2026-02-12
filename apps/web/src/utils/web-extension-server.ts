@@ -23,8 +23,7 @@ import {
   NotebookReference,
   Server,
   Clip
-} from "@notesnook/web-clipper/dist/common/bridge";
-import { isUserPremium } from "../hooks/use-is-user-premium";
+} from "@notesnook/web-clipper/common/bridge.js";
 import { store as appstore } from "../stores/app-store";
 import { h } from "./html";
 import { sanitizeFilename } from "@notesnook/common";
@@ -39,7 +38,7 @@ export class WebExtensionServer implements Server {
     const user = await db.user.getUser();
     const theme = colorScheme === "dark" ? darkTheme : lightTheme;
     if (!user) return { pro: false, theme };
-    return { email: user.email, pro: isUserPremium(user), theme };
+    return { email: user.email, pro: true, theme };
   }
 
   async getNotes(): Promise<ItemReference[] | undefined> {
@@ -74,7 +73,11 @@ export class WebExtensionServer implements Server {
   async saveClip(clip: Clip) {
     let clipContent = "";
 
-    if (clip.mode === "simplified" || clip.mode === "screenshot") {
+    if (
+      clip.mode === "simplified" ||
+      clip.mode === "screenshot" ||
+      clip.mode === "bookmark"
+    ) {
       clipContent += clip.data;
     } else {
       const clippedFile = new File(
@@ -106,11 +109,17 @@ export class WebExtensionServer implements Server {
     if (isCipher(content)) return;
 
     content += clipContent;
-    content += h("div", [
-      h("hr"),
-      h("p", ["Clipped from ", h("a", [clip.title], { href: clip.url })]),
-      h("p", [`Date clipped: ${getFormattedDate(Date.now())}`])
-    ]).innerHTML;
+    content +=
+      clip.mode === "bookmark"
+        ? h("div", [
+            h("p", [`Date bookmarked: ${getFormattedDate(Date.now())}`]),
+            h("hr")
+          ]).innerHTML
+        : h("div", [
+            h("hr"),
+            h("p", ["Clipped from ", h("a", [clip.title], { href: clip.url })]),
+            h("p", [`Date clipped: ${getFormattedDate(Date.now())}`])
+          ]).innerHTML;
 
     const id = await db.notes.add({
       id: note?.id,

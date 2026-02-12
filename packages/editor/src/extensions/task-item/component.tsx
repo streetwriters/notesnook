@@ -93,7 +93,7 @@ export function TaskItemComponent(
               cursor: "grab",
               mr: "0.2rem",
               fontFamily: "inherit",
-              marginTop: "0.065rem"
+              marginTop: "calc((1lh - 18px) / 2)"
             }}
             size={isMobile ? "2.46ch" : "2.22ch"}
           />
@@ -117,7 +117,7 @@ export function TaskItemComponent(
                   borderColor: "accent"
                 },
             fontFamily: "inherit",
-            marginTop: "0.13rem"
+            marginTop: "calc((1lh - 16px) / 2)"
           }}
           onMouseDown={(e) => {
             if (globalThis.keyboardShown) {
@@ -155,7 +155,7 @@ export function TaskItemComponent(
             bg: "background",
             opacity: 0,
             alignSelf: "flex-start",
-            marginTop: "0.16rem"
+            marginTop: "calc((1lh - 14px) / 2)"
           }}
         >
           {editor.isEditable && (

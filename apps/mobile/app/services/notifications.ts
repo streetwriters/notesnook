@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { getFormattedReminderTime } from "@notesnook/common";
 import { isReminderActive, Reminder } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import notifee, {
@@ -36,6 +37,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { encodeNonAsciiHTML } from "entities";
 import { Platform } from "react-native";
 import { db, setupDatabase } from "../common/database";
+import { MMKV } from "../common/database/mmkv";
 import { presentDialog } from "../components/dialog/functions";
 import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
 import { editorState } from "../screens/editor/tiptap/utils";
@@ -52,8 +54,6 @@ import { DDS } from "./device-detection";
 import { eSendEvent } from "./event-manager";
 import Navigation from "./navigation";
 import SettingsService from "./settings";
-import { getFormattedReminderTime } from "@notesnook/common";
-import { MMKV } from "../common/database/mmkv";
 
 let pinned: DisplayedNotification[] = [];
 
@@ -109,6 +109,15 @@ async function initDatabase() {
 const onEvent = async ({ type, detail }: Event) => {
   await initDatabase();
   const { notification, pressAction, input } = detail;
+  if (
+    type === EventType.DISMISSED &&
+    Platform.OS === "android" &&
+    notification?.id === "notesnook_note_input" &&
+    SettingsService.getProperty("notifNotes")
+  ) {
+    pinQuickNote();
+  }
+
   if (type === EventType.DELIVERED && Platform.OS === "android") {
     if (notification?.id) {
       const reminder = await db.reminders?.reminder(
@@ -348,7 +357,7 @@ async function scheduleNotification(
           title: title,
           message: description || "",
           ongoing: true,
-          subtitle: description || "",
+          // subtitle: description || "",
           actions: [strings.unpin()]
         });
       }
@@ -396,7 +405,7 @@ async function scheduleNotification(
             payload: payload || "",
             dateModified: reminder.dateModified + ""
           },
-          subtitle: !description ? undefined : description,
+          // subtitle: !description ? undefined : description,
           android: {
             channelId: await getChannelId(priority),
             smallIcon: "ic_stat_name",
@@ -438,6 +447,7 @@ async function scheduleNotification(
 
 async function loadNote(id: string, jump: boolean) {
   if (!id || id === "notesnook_note_input") return;
+  editorState().initialLoadCalled = true;
   const note = await db.notes.note(id);
   if (!note) return;
   if (!DDS.isTab && jump) {
@@ -453,9 +463,11 @@ async function loadNote(id: string, jump: boolean) {
 
   const tab = useTabStore.getState().getTabForNote(id);
   if (useTabStore.getState().currentTab !== tab) {
-    eSendEvent(eOnLoadNote, {
-      note: note
-    });
+    setTimeout(() => {
+      eSendEvent(eOnLoadNote, {
+        item: note
+      });
+    }, 300);
   }
 }
 
@@ -502,7 +514,8 @@ async function displayNotification({
   ongoing,
   reply_placeholder_text,
   reply_button_text,
-  id
+  id,
+  channelId = "default"
 }: {
   title?: string;
   message: string;
@@ -513,6 +526,7 @@ async function displayNotification({
   reply_placeholder_text?: string;
   reply_button_text?: string;
   id?: string;
+  channelId?: "silent" | "vibrate" | "urgent" | "default";
 }) {
   useUserStore.setState({
     disableAppLockRequests: true
@@ -537,7 +551,7 @@ async function displayNotification({
         ongoing: ongoing,
         smallIcon: "ic_stat_name",
         localOnly: true,
-        channelId: await getChannelId("default"),
+        channelId: await getChannelId(channelId),
         autoCancel: false,
         pressAction: {
           id: "default",
@@ -580,7 +594,7 @@ function openSettingsDialog(context: string) {
       positivePress:
         Platform.OS === "ios"
           ? undefined
-          : () => {
+          : async () => {
               resolve(true);
             },
       onClose: () => {
@@ -884,7 +898,7 @@ function init() {
   notifee.onForegroundEvent(onEvent);
 }
 
-async function pinQuickNote(launch: boolean) {
+async function pinQuickNote() {
   useUserStore.setState({
     disableAppLockRequests: true
   });
@@ -896,14 +910,13 @@ async function pinQuickNote(launch: boolean) {
     return;
   }
   get().then((items) => {
-    const notification = items.filter((n) => n.id === "notesnook_note_input");
-    if (notification && launch) {
-      return;
-    }
+    const notification = items.find((n) => n.id === "notesnook_note_input");
+    if (notification) return;
     displayNotification({
       title: strings.quickNoteTitle(),
       message: strings.quickNoteContent(),
       ongoing: true,
+      channelId: "silent",
       actions: ["ReplyInput", strings.hide()],
       reply_button_text: strings.takeNote(),
       reply_placeholder_text: strings.quickNotePlaceholder(),
@@ -916,8 +929,21 @@ async function pinQuickNote(launch: boolean) {
  * A function that checks if reminders need to be reconfigured &
  * reschedules them if anything has changed.
  */
+
 async function setupReminders(checkNeedsScheduling = false) {
   const reminders = ((await db.reminders?.all.items()) as Reminder[]) || [];
+  let notificationsCancelled = false;
+  if (Platform.OS === "android") {
+    // If the API level has changed, cancel all notifications.
+    // This is to ensure that the app does not crash on Android 14+.
+    const API_LEVEL = MMKV.getInt("android_apiLevel");
+    if (API_LEVEL !== (Platform.Version as number)) {
+      await notifee.cancelAllNotifications();
+      notificationsCancelled = true;
+      MMKV.setInt("android_apiLevel", Platform.Version as number);
+    }
+  }
+
   const triggers = await notifee.getTriggerNotifications();
   for (const reminder of reminders) {
     if (reminder.mode === "permanent") {
@@ -927,19 +953,21 @@ async function setupReminders(checkNeedsScheduling = false) {
     // Skip reminders that are not repeating and their trigger date is in past.
     if (reminder.mode === "once" && dayjs().isAfter(reminder.date)) continue;
 
-    const pending = triggers.filter((t) =>
-      t.notification.id?.startsWith(reminder.id)
-    );
+    if (!notificationsCancelled) {
+      const pending = triggers.filter((t) =>
+        t.notification.id?.startsWith(reminder.id)
+      );
 
-    let needsReschedule = pending.length === 0 ? true : false;
-    if (!needsReschedule) {
-      needsReschedule = pending[0].notification.data?.dateModified
-        ? parseInt(pending[0].notification.data?.dateModified as string) <
-          reminder.dateModified
-        : true;
+      let needsReschedule = pending.length === 0 ? true : false;
+      if (!needsReschedule) {
+        needsReschedule = pending[0].notification.data?.dateModified
+          ? parseInt(pending[0].notification.data?.dateModified as string) <
+            reminder.dateModified
+          : true;
+      }
+
+      if (!needsReschedule && checkNeedsScheduling) continue;
     }
-
-    if (!needsReschedule && checkNeedsScheduling) continue;
 
     await scheduleNotification(reminder);
   }
@@ -1015,6 +1043,7 @@ async function pinNote(id: string) {
       subtitle: "",
       bigText: html,
       ongoing: true,
+      channelId: "silent",
       actions: [strings.unpin()],
       id: note.id
     });
@@ -1025,8 +1054,19 @@ async function pinNote(id: string) {
 
 async function restorePinnedNotes() {
   const pinnedNotes = PinnedNotesStorage.get();
+  Notifications.get().then(() => {
+    for (const id of pinnedNotes) {
+      if (!isNotePinned(id)) {
+        pinNote(id);
+      }
+    }
+  });
+}
+
+async function clearPinnedNotes() {
+  const pinnedNotes = PinnedNotesStorage.get();
   for (const id of pinnedNotes) {
-    pinNote(id);
+    remove(id);
   }
 }
 
@@ -1039,6 +1079,7 @@ const Notifications = {
   displayNotification,
   clearAll,
   remove,
+  clearPinnedNotes,
   get,
   getPinnedNotes,
   pinQuickNote,

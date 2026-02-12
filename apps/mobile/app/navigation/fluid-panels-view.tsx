@@ -29,13 +29,16 @@ import React, {
   useRef,
   useState
 } from "react";
-import { Dimensions, LayoutChangeEvent, Platform, View } from "react-native";
+import { LayoutChangeEvent, View } from "react-native";
+import Orientation, {
+  OrientationType,
+  useDeviceOrientationChange
+} from "react-native-orientation-locker";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming
 } from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { notesnook } from "../../e2e/test.ids";
 import { db } from "../common/database";
 import { FluidPanels } from "../components/fluid-panels";
@@ -65,18 +68,12 @@ import {
   eOpenFullscreenEditor,
   eUnlockNote
 } from "../utils/events";
-import { editorRef, fluidTabsRef } from "../utils/global-refs";
+import { valueLimiter } from "../utils/functions";
+import { fluidTabsRef } from "../utils/global-refs";
 import { AppNavigationStack } from "./navigation-stack";
-import Orientation, {
-  OrientationType,
-  useDeviceOrientationChange
-} from "react-native-orientation-locker";
+import type { PaneWidths } from "../screens/editor/wrapper";
 
 const MOBILE_SIDEBAR_SIZE = 0.85;
-
-const valueLimiter = (value: number, min: number, max: number) => {
-  return value < min ? min : value > max ? max : value;
-};
 
 let SideMenu: any = null;
 let EditorWrapper: any = null;
@@ -101,16 +98,21 @@ export const FluidPanelsView = React.memo(
     const [isLoading, setIsLoading] = useState(false);
 
     useDeviceOrientationChange((o) => {
-      setOrientation(o);
+      if (
+        o !== OrientationType.UNKNOWN &&
+        o !== OrientationType["FACE-UP"] &&
+        o !== OrientationType["FACE-DOWN"] &&
+        o !== OrientationType["PORTRAIT-UPSIDEDOWN"]
+      ) {
+        setOrientation(o);
+      }
     });
-
-    const isLandscape = orientation.includes("LANDSCAPE");
 
     useEffect(() => {
       if (!appLoading) {
         setTimeout(() => {
           setIsLoading(false);
-        }, 500);
+        }, 200);
       }
     }, [appLoading]);
 
@@ -146,16 +148,6 @@ export const FluidPanelsView = React.memo(
       if (deviceMode === "smallTablet") {
         fluidTabsRef.current?.openDrawer(false);
       }
-      editorRef.current?.setNativeProps({
-        style: {
-          width: dimensions.width,
-          zIndex: 999,
-          paddingHorizontal:
-            deviceMode === "smallTablet"
-              ? dimensions.width * 0
-              : dimensions.width * 0.15
-        }
-      });
     }, [deviceMode, dimensions.width, setFullscreen]);
 
     const closeFullScreenEditor = useCallback(
@@ -167,17 +159,6 @@ export const FluidPanelsView = React.memo(
         setFullscreen(false);
         editorController.current?.commands.updateSettings({
           fullscreen: false
-        });
-        editorRef.current?.setNativeProps({
-          style: {
-            width:
-              _deviceMode === "smallTablet"
-                ? dimensions.width -
-                  valueLimiter(dimensions.width * 0.4, 300, 450)
-                : dimensions.width * 0.48,
-            zIndex: null,
-            paddingHorizontal: 0
-          }
         });
         if (_deviceMode === "smallTablet") {
           fluidTabsRef.current?.goToIndex(1, false);
@@ -220,38 +201,8 @@ export const FluidPanelsView = React.memo(
       (current: string | null, size: { width: number; height: number }) => {
         setDeviceModeState(current);
 
-        const needsLayout = current !== deviceMode;
-
-        if (fullscreen && current !== "mobile") {
-          // Runs after size is set via state.
-          setTimeout(() => {
-            editorRef.current?.setNativeProps({
-              style: {
-                width: size.width,
-                zIndex: 999,
-                paddingHorizontal:
-                  current === "smallTablet" ? size.width * 0 : size.width * 0.15
-              }
-            });
-          }, 1);
-        } else {
-          if (fullscreen) eSendEvent(eCloseFullscreenEditor, current);
-          editorRef.current?.setNativeProps({
-            style: {
-              position: "relative",
-              width:
-                current === "tablet"
-                  ? size.width * 0.48
-                  : current === "smallTablet"
-                  ? size.width - valueLimiter(size.width * 0.4, 300, 450)
-                  : size.width,
-              zIndex: null,
-              paddingHorizontal: 0
-            }
-          });
-        }
-        if (!needsLayout) {
-          return;
+        if (fullscreen && current === "mobile") {
+          eSendEvent(eCloseFullscreenEditor, current);
         }
 
         const state = getAppState();
@@ -263,8 +214,6 @@ export const FluidPanelsView = React.memo(
             case "smallTablet":
               if (!fullscreen) {
                 fluidTabsRef.current?.closeDrawer(false);
-              } else {
-                fluidTabsRef.current?.openDrawer(false);
               }
               break;
             case "mobile":
@@ -273,46 +222,52 @@ export const FluidPanelsView = React.memo(
                 editorState().movedAway === false &&
                 useTabStore.getState().getCurrentNoteId()
               ) {
-                fluidTabsRef.current?.goToIndex(2, false);
+                fluidTabsRef.current?.goToPage("editor", false);
               } else {
-                fluidTabsRef.current?.goToIndex(1, false);
+                fluidTabsRef.current?.goToPage(
+                  fluidTabsRef.current?.page(),
+                  false
+                );
               }
               break;
           }
-        }, 32);
+        }, 0);
       },
       [deviceMode, fullscreen, setDeviceModeState]
     );
 
     const checkDeviceType = React.useCallback(
       (size: { width: number; height: number }) => {
-        setDimensions({
-          width: size.width,
-          height: size.height
-        });
+        if (DDS.width === size.width && orientation === DDS.orientation) return;
         DDS.setSize(size, orientation);
         const nextDeviceMode = DDS.isLargeTablet()
           ? "tablet"
           : DDS.isSmallTab
-          ? "smallTablet"
-          : "mobile";
-
+            ? "smallTablet"
+            : "mobile";
         setDeviceMode(nextDeviceMode, size);
       },
       [orientation, setDeviceMode, setDimensions]
     );
 
+    useEffect(() => {
+      if (orientation !== "UNKNOWN") {
+        checkDeviceType(dimensions);
+      }
+    }, [orientation, dimensions]);
+
     const _onLayout = React.useCallback(
       (event: LayoutChangeEvent) => {
         const size = event?.nativeEvent?.layout;
-        if (!size || (size.width === dimensions.width && deviceMode !== null)) {
-          DDS.setSize(size, orientation);
-          setDeviceMode(deviceMode, size);
-          checkDeviceType(size);
-          return;
+        setDimensions({
+          width: size.width,
+          height: size.height
+        });
+        if (size.width > size.height) {
+          setOrientation(OrientationType["LANDSCAPE-RIGHT"]);
+        } else {
+          setOrientation(OrientationType["PORTRAIT"]);
         }
-
-        checkDeviceType(size);
       },
       [
         checkDeviceType,
@@ -322,11 +277,6 @@ export const FluidPanelsView = React.memo(
         setDeviceMode
       ]
     );
-
-    if (!deviceMode) {
-      const size = Dimensions.get("window");
-      checkDeviceType(size);
-    }
 
     const PANE_OFFSET = useMemo(
       () => ({
@@ -355,7 +305,7 @@ export const FluidPanelsView = React.memo(
       [dimensions.width, fullscreen]
     );
 
-    const PANE_WIDTHS = useMemo(
+    const PANE_WIDTHS: PaneWidths = useMemo(
       () => ({
         mobile: {
           sidebar: dimensions.width * MOBILE_SIDEBAR_SIZE,
@@ -381,6 +331,7 @@ export const FluidPanelsView = React.memo(
       (scrollOffset: number) => {
         if (!deviceMode) return;
         hideAllTooltips();
+
         if (
           scrollOffset >
           PANE_OFFSET[deviceMode as keyof typeof PANE_OFFSET].sidebar - 10
@@ -408,7 +359,7 @@ export const FluidPanelsView = React.memo(
       };
     }, []);
 
-    if (!isLoading) {
+    if (!isLoading && !SideMenu && !EditorWrapper) {
       SideMenu = require("../components/side-menu").SideMenu;
       EditorWrapper = require("../screens/editor/wrapper").EditorWrapper;
     }
@@ -420,16 +371,7 @@ export const FluidPanelsView = React.memo(
         style={{
           height: "100%",
           width: "100%",
-          backgroundColor: colors.primary.background,
-          paddingBottom: Platform.OS === "android" ? insets?.bottom : 0,
-          marginRight:
-            orientation === "LANDSCAPE-RIGHT" && Platform.OS === "ios"
-              ? insets.right
-              : 0,
-          marginLeft:
-            orientation === "LANDSCAPE-LEFT" && Platform.OS === "ios"
-              ? insets.left
-              : 0
+          backgroundColor: colors.primary.background
         }}
       >
         {deviceMode && PANE_WIDTHS[deviceMode as keyof typeof PANE_WIDTHS] ? (
@@ -499,13 +441,15 @@ export const FluidPanelsView = React.memo(
                   />
                 ) : null}
 
-                <SafeAreaView
+                <View
                   style={{
-                    flex: 1
+                    flex: 1,
+                    paddingTop: insets.top,
+                    paddingBottom: insets.bottom
                   }}
                 >
                   <AppNavigationStack />
-                </SafeAreaView>
+                </View>
               </ScopedThemeProvider>
             </View>
 
@@ -530,17 +474,20 @@ const onChangeTab = async (event: { i: number; from: number }) => {
     activateKeepAwake();
     eSendEvent(eOnEnterEditor);
 
-    if (!useTabStore.getState().getCurrentNoteId()) {
-      eSendEvent(eOnLoadNote, {
-        newNote: true
-      });
-    } else {
-      if (
-        useTabStore.getState().getTab(useTabStore.getState().currentTab)
-          ?.session?.locked
-      ) {
-        eSendEvent(eUnlockNote);
-      }
+    if (
+      useTabStore.getState().getTab(useTabStore.getState().currentTab)?.session
+        ?.locked
+    ) {
+      eSendEvent(eUnlockNote);
+    }
+
+    if (
+      fluidTabsRef.current?.tabChangedFromSwipeAction.value &&
+      !useTabStore.getState().getNoteIdForTab(useTabStore.getState().currentTab)
+    ) {
+      editorController?.current?.commands?.focus(
+        useTabStore.getState().currentTab
+      );
     }
   } else {
     if (event.from === 2) {

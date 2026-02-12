@@ -51,14 +51,14 @@ test(
       await login(db);
       await db.monographs.refresh();
 
-      const monographId = await db.monographs.publish(id);
+      const title = "mono";
+      const monographId = await db.monographs.publish(id, title);
 
       expect(await db.monographs.all.has(id)).toBeTruthy();
 
       const monograph = await db.monographs.get(monographId);
-      const note = await db.notes.note(id);
       expect(monograph.id).toBe(monographId);
-      expect(monograph.title).toBe(note.title);
+      expect(monograph.title).toBe(title);
 
       await logout(db);
     }),
@@ -72,14 +72,13 @@ test(
       await login(db);
       await db.monographs.refresh();
 
-      const monographId = await db.monographs.publish(id);
+      const title = "mono";
+      const monographId = await db.monographs.publish(id, title);
       let monograph = await db.monographs.get(monographId);
-      const note = await db.notes.note(id);
-      expect(monograph.title).toBe(note.title);
+      expect(monograph.title).toBe(title);
 
-      const editedTitle = "EDITED TITLE OF MY NOTE!";
-      await db.notes.add({ id, title: editedTitle });
-      await db.monographs.publish(id);
+      const editedTitle = "monograph";
+      await db.monographs.publish(id, editedTitle);
       monograph = await db.monographs.get(monographId);
       expect(monograph.title).toBe(editedTitle);
 
@@ -95,7 +94,7 @@ test(
       await login(db);
       await db.monographs.refresh();
 
-      await db.monographs.publish(id);
+      await db.monographs.publish(id, "mono");
       expect(await db.monographs.all.has(id)).toBeTruthy();
 
       await db.monographs.unpublish(id);

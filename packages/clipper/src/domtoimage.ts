@@ -16,13 +16,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { cloneNode, isSVGElement } from "./clone.js";
 import { createImage, FetchOptions } from "./fetch.js";
 import { resolveAll } from "./fontfaces.js";
 import { inlineAllImages } from "./images.js";
 import { Options } from "./types.js";
-import { canvasToBlob, delay, escapeXhtml, height, width } from "./utils.js";
-import { cacheStylesheets, inlineStylesheets } from "./styles.js";
+import { canvasToBlob, delay, height, width, isSVGElement } from "./utils.js";
+import { cloneNode } from "./clone.js";
 
 // Default impl options
 const defaultOptions: Options = {
@@ -33,23 +32,9 @@ async function getInlinedNode(node: HTMLElement, options: Options) {
   const { fonts, images, stylesheets, inlineImages } =
     options.inlineOptions || {};
 
-  if (stylesheets) await inlineStylesheets(options.fetchOptions);
-
-  const documentStyles = getComputedStyle(document.documentElement);
-
-  const styleCache = stylesheets
-    ? await cacheStylesheets(documentStyles)
-    : undefined;
-
-  let clone = await cloneNode(node, {
-    styles: options.styles,
-    filter: options.filter,
-    root: true,
-    vector: !options.raster,
-    fetchOptions: options.fetchOptions,
-    getElementStyles: styleCache?.get,
-    getPseudoElementStyles: styleCache?.getPseudo,
-    images: images
+  let clone = cloneNode(node, {
+    images,
+    styles: stylesheets
   });
 
   if (!clone || clone instanceof Text) return;
@@ -62,86 +47,72 @@ async function getInlinedNode(node: HTMLElement, options: Options) {
   return clone;
 }
 
-async function toSvg(node: HTMLElement, options: Options) {
-  options.inlineOptions = {
-    fonts: true,
-    images: true,
-    stylesheets: true,
-    ...options.inlineOptions
-  };
-
-  let clone = await getInlinedNode(node, options);
-  if (!clone) return;
-
-  clone = applyOptions(clone, options);
-
-  return makeSvgDataUri(
-    clone,
-    options.width || width(node),
-    options.height || height(node)
-  );
-}
-
-function applyOptions(clone: HTMLElement, options: Options) {
-  if (options.backgroundColor)
-    clone.style.backgroundColor = options.backgroundColor;
-  if (options.width) clone.style.width = options.width + "px";
-  if (options.height) clone.style.height = options.height + "px";
-
-  return clone;
-}
-
-function toPixelData(node: HTMLElement, options: Options) {
-  options = options || {};
+function toPng(body: HTMLElement, head: HTMLHeadElement, options: Options) {
   options.raster = true;
-  return draw(node, options).then(function (canvas) {
-    return canvas
-      ?.getContext("2d")
-      ?.getImageData(0, 0, width(node), height(node)).data;
-  });
-}
-
-function toPng(node: HTMLElement, options: Options) {
-  options.raster = true;
-  return draw(node, options).then(function (canvas) {
+  return draw(body, head, options).then(function (canvas) {
     return canvas?.toDataURL();
   });
 }
 
-function toJpeg(node: HTMLElement, options: Options) {
+async function toJpeg(
+  body: HTMLElement,
+  head: HTMLHeadElement,
+  options: Options
+) {
   options.raster = true;
-  return draw(node, options).then(function (canvas) {
-    return canvas?.toDataURL("image/jpeg", options.quality || 1.0);
-  });
+
+  return draw(body, head, options).then((canvas) =>
+    canvas?.toDataURL("image/jpeg", options.quality || 1.0)
+  );
 }
 
-function toBlob(node: HTMLElement, options: Options) {
+function toBlob(body: HTMLElement, head: HTMLHeadElement, options: Options) {
   options.raster = true;
-  return draw(node, options).then((canvas) => canvas && canvasToBlob(canvas));
+  return draw(body, head, options).then(
+    (canvas) => canvas && canvasToBlob(canvas)
+  );
 }
 
-function toCanvas(node: HTMLElement, options: Options) {
-  options.raster = true;
-  return draw(node, options);
+function toSvg(body: HTMLElement, head: HTMLHeadElement, options: Options) {
+  return makeSvg(
+    body,
+    head,
+    options.width || width(body),
+    options.height || height(body)
+  );
 }
 
-function draw(domNode: HTMLElement, options: Options) {
+async function draw(
+  body: HTMLElement,
+  head: HTMLHeadElement,
+  options: Options
+) {
   options = { ...defaultOptions, ...options };
-  return toSvg(domNode, options)
-    .then((uri) => (uri ? createImage(uri, options.fetchOptions) : null))
+  const uri = makeSvgDataUri(
+    makeSvg(
+      body,
+      head,
+      options.width || width(body),
+      options.height || height(body)
+    )
+  );
+
+  return createImage(uri, options.fetchOptions)
     .then(delay(0))
     .then(function (image) {
+      if (!image) return null;
+
+      image.setAttribute("crossorigin", "anonymous");
+
       const scale = typeof options.scale !== "number" ? 1 : options.scale;
-      const canvas = newCanvas(domNode, scale, options);
+      const canvas = newCanvas(body, scale, options);
       const ctx = canvas?.getContext("2d");
       if (!ctx) return null;
       //   ctx.mozImageSmoothingEnabled = false;
       //   ctx.msImageSmoothingEnabled = false;
       ctx.imageSmoothingEnabled = false;
-      if (image) {
-        ctx.scale(scale, scale);
-        ctx.drawImage(image, 0, 0);
-      }
+      ctx.scale(scale, scale);
+      ctx.drawImage(image as HTMLImageElement, 0, 0);
       return canvas;
     });
 }
@@ -170,52 +141,60 @@ function embedFonts(node: HTMLElement, options?: FetchOptions) {
   });
 }
 
-function makeSvgDataUri(node: HTMLElement, width: number, height: number) {
-  node.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-  const xhtml = escapeXhtml(new XMLSerializer().serializeToString(node));
+function makeSvg(
+  body: HTMLElement,
+  head: HTMLHeadElement,
+  width: number,
+  height: number
+) {
+  body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+
+  /**
+   * We're removing all attributes that contain non-word characters
+   * Sometimes a webpage could have invalid html and that causes attribute names to break
+   * HTML is resilient to this but SVG is not and will throw an error, so we remove these attributes altogether
+   */
+  for (const element of body.querySelectorAll("img, svg, video, iframe")) {
+    const attributes = element.getAttributeNames();
+    for (const attribute of attributes) {
+      if (attribute.match(/\W/)) {
+        element.removeAttribute(attribute);
+      }
+    }
+  }
+
+  const xhtml = new XMLSerializer().serializeToString(body);
+
+  const xstyles = Array.from(head.getElementsByTagName("style"))
+    .map((s) => new XMLSerializer().serializeToString(s))
+    .join("\n");
+
   const foreignObject =
     '<foreignObject x="0" y="0" width="100%" height="100%">' +
     xhtml +
     "</foreignObject>";
 
-  const svgStr =
+  return (
     '<svg xmlns="http://www.w3.org/2000/svg" width="' +
     width +
     '" height="' +
     height +
     '">' +
+    xstyles +
     foreignObject +
-    "</svg>";
-
-  return "data:image/svg+xml;charset=utf-8," + svgStr;
+    "</svg>"
+  );
 }
 
-export { toJpeg, toBlob, toCanvas, toPixelData, toPng, toSvg, getInlinedNode };
+function makeSvgDataUri(str: string) {
+  return "data:image/svg+xml; charset=utf8, " + encodeURIComponent(str);
+}
 
-const VALID_ATTRIBUTES = [
-  "src",
-  "href",
-  "title",
-  "style",
-  "srcset",
-  "sizes",
-  "width",
-  "height",
-  "target",
-  "rel"
-];
+export { toJpeg, toBlob, toPng, toSvg, getInlinedNode };
 
 function finalize(root: HTMLElement) {
   for (const element of root.querySelectorAll("*")) {
     if (!(element instanceof HTMLElement) || isSVGElement(element)) continue;
-    for (const attribute of Array.from(element.attributes)) {
-      if (attribute.name === "class" && element.className.includes("pseudo--"))
-        continue;
-
-      if (!VALID_ATTRIBUTES.includes(attribute.name)) {
-        element.removeAttribute(attribute.name);
-      }
-    }
 
     if (element instanceof HTMLAnchorElement) {
       element.href = element.href.startsWith("http")

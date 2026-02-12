@@ -1,0 +1,4 @@
+- Fix PDF files get stuck on first page
+- Minor bug fixes and improvements
+
+Thank you for using Notesnook!

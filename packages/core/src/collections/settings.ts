@@ -30,7 +30,9 @@ import {
   ToolbarConfig,
   ToolbarConfigPlatforms,
   TrashCleanupInterval,
-  TimeFormat
+  TimeFormat,
+  DayFormat,
+  WeekFormat
 } from "../types.js";
 import { ICollection } from "./collection.js";
 import { SQLCachedCollection } from "../database/sql-cached-collection.js";
@@ -53,7 +55,9 @@ const DEFAULT_GROUP_OPTIONS = (key: GroupingKey) =>
 
 const defaultSettings: SettingItemMap = {
   timeFormat: "12-hour",
+  dayFormat: "short",
   dateFormat: "DD-MM-YYYY",
+  weekFormat: "Sun",
   titleFormat: "Note $date$ $time$",
   defaultNotebook: undefined,
   defaultTag: undefined,
@@ -202,6 +206,22 @@ export class Settings implements ICollection {
 
   setTimeFormat(format: TimeFormat) {
     return this.set("timeFormat", format);
+  }
+
+  getDayFormat() {
+    return this.get("dayFormat");
+  }
+
+  setDayFormat(format: DayFormat) {
+    return this.set("dayFormat", format);
+  }
+
+  getWeekFormat() {
+    return this.get("weekFormat");
+  }
+
+  setWeekFormat(format: WeekFormat) {
+    return this.set("weekFormat", format);
   }
 
   getSideBarOrder(section: SideBarSection) {

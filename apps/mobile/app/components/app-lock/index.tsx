@@ -92,7 +92,7 @@ const AppLocked = () => {
   const lockApp = useUserStore((state) => state.lockApp);
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const passwordInputRef = useRef<TextInput>(null);
-  const password = useRef<string>();
+  const password = useRef<string>(undefined);
   const appState = useAppState();
   const lastAppState = useRef<AppStateStatus>(appState);
   const biometricUnlockAwaitingUserInput = useRef(false);
@@ -239,8 +239,8 @@ const AppLocked = () => {
             deviceMode !== "mobile"
               ? "50%"
               : Platform.OS == "ios"
-              ? "95%"
-              : "100%",
+                ? "95%"
+                : "100%",
           paddingHorizontal: 12,
           marginBottom: 30,
           marginTop: 15,
@@ -336,7 +336,6 @@ const AppLocked = () => {
                     borderRadius: 150,
                     marginBottom: 10
                   }}
-                  fontSize={AppFontSize.md}
                 />
               </>
             ) : null}

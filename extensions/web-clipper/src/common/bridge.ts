@@ -21,7 +21,7 @@ import { ThemeDefinition } from "@notesnook/theme";
 
 export type ClipArea = "full-page" | "visible" | "selection" | "article";
 
-export type ClipMode = "simplified" | "screenshot" | "complete";
+export type ClipMode = "bookmark" | "simplified" | "screenshot" | "complete";
 
 export type User = {
   email?: string;

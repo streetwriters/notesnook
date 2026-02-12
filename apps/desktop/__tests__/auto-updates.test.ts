@@ -17,230 +17,226 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { test } from "vitest";
-import { harness } from "./utils.js";
+import { testCleanup, test } from "./test-override.js";
 import { writeFile } from "fs/promises";
 import { Page } from "playwright";
 import { gt, lt } from "semver";
+import { describe } from "vitest";
 
-test("update starts downloading if version is outdated", async (t) => {
-  await harness(
-    t,
-    async ({ page }) => {
-      await page.waitForSelector("#authForm");
+test("update starts downloading if version is outdated", async ({
+  ctx: { page },
+  expect,
+  onTestFinished
+}) => {
+  onTestFinished(testCleanup);
 
-      t.expect(
-        await page.getByRole("button", { name: "Create account" }).isVisible()
-      ).toBe(true);
+  await page.waitForSelector("#authForm");
+  expect(
+    await page.getByRole("button", { name: "Create account" }).isVisible()
+  ).toBe(true);
 
-      await page
-        .getByRole("button", { name: "Skip & go directly to the app" })
-        .click();
+  await page
+    .getByRole("button", { name: "Skip & go directly to the app" })
+    .click();
 
-      await skipDialog(page);
+  await skipDialog(page);
 
-      await page.waitForSelector(".ProseMirror");
+  await page.waitForSelector(".ProseMirror");
 
-      await page
-        .locator(".theme-scope-statusBar")
-        .getByRole("button", { name: /updating/i })
-        .waitFor({ state: "attached" });
-    },
-    { version: "3.0.0" }
-  );
+  await page
+    .locator(".theme-scope-statusBar")
+    .getByRole("button", { name: /updating/i })
+    .waitFor({ state: "attached" });
 });
 
-test("update is only shown if version is outdated and auto updates are disabled", async (t) => {
-  await harness(
-    t,
-    async (ctx) => {
-      await ctx.app.close();
-      await writeFile(
-        ctx.configPath,
-        JSON.stringify({
-          automaticUpdates: false
-        })
-      );
+test("update is only shown if version is outdated and auto updates are disabled", async ({
+  ctx,
+  expect,
+  onTestFinished
+}) => {
+  onTestFinished(testCleanup);
 
-      await ctx.relaunch();
+  await ctx.app.close();
+  await writeFile(
+    ctx.configPath,
+    JSON.stringify({
+      automaticUpdates: false
+    })
+  );
 
-      const { page } = ctx;
+  await ctx.relaunch();
 
-      await page.waitForSelector("#authForm");
+  const { page } = ctx;
 
-      t.expect(
-        await page.getByRole("button", { name: "Create account" }).isVisible()
-      ).toBe(true);
+  await page.waitForSelector("#authForm");
 
-      await page
-        .getByRole("button", { name: "Skip & go directly to the app" })
-        .click();
+  expect(
+    await page.getByRole("button", { name: "Create account" }).isVisible()
+  ).toBe(true);
 
-      await skipDialog(page);
+  await page
+    .getByRole("button", { name: "Skip & go directly to the app" })
+    .click();
 
-      await page.waitForSelector(".ProseMirror");
+  await skipDialog(page);
 
+  await page.waitForSelector(".ProseMirror");
+
+  await page
+    .locator(".theme-scope-statusBar")
+    .getByRole("button", { name: /available/i })
+    .waitFor({ state: "attached" });
+});
+
+describe("update to stable if it is newer", () => {
+  test.scoped({ options: { version: "3.0.0-beta.0" } });
+  test("test", async ({ ctx, expect, onTestFinished }) => {
+    onTestFinished(testCleanup);
+
+    await ctx.app.close();
+    await writeFile(
+      ctx.configPath,
+      JSON.stringify({
+        automaticUpdates: false,
+        releaseTrack: "beta"
+      })
+    );
+
+    await ctx.relaunch();
+
+    const { page } = ctx;
+
+    await page.waitForSelector("#authForm");
+
+    expect(
+      await page.getByRole("button", { name: "Create account" }).isVisible()
+    ).toBe(true);
+
+    await page
+      .getByRole("button", { name: "Skip & go directly to the app" })
+      .click();
+
+    await skipDialog(page);
+
+    await page.waitForSelector(".ProseMirror");
+
+    const updateButton = page
+      .locator(".theme-scope-statusBar")
+      .getByRole("button", { name: /available/i });
+    await updateButton.waitFor({ state: "visible" });
+    const content = await updateButton.textContent();
+    const version = content?.split(" ")?.[0] || "";
+    expect(gt(version, "3.0.0-beta.0")).toBe(true);
+  });
+});
+
+describe("update is not available if it latest stable version is older", () => {
+  test.scoped({ options: { version: "99.0.0-beta.0" } });
+  test("test", async ({ ctx, expect, onTestFinished }) => {
+    onTestFinished(testCleanup);
+
+    await ctx.app.close();
+    await writeFile(
+      ctx.configPath,
+      JSON.stringify({
+        automaticUpdates: false,
+        releaseTrack: "beta"
+      })
+    );
+
+    await ctx.relaunch();
+
+    const { page } = ctx;
+
+    await page.waitForSelector("#authForm");
+
+    expect(
+      await page.getByRole("button", { name: "Create account" }).isVisible()
+    ).toBe(true);
+
+    await page
+      .getByRole("button", { name: "Skip & go directly to the app" })
+      .click();
+
+    await skipDialog(page);
+
+    await page.waitForSelector(".ProseMirror");
+
+    await page
+      .locator(".theme-scope-statusBar")
+      .getByRole("button", { name: /checking for updates/i })
+      .waitFor({ state: "hidden" });
+
+    expect(
       await page
         .locator(".theme-scope-statusBar")
         .getByRole("button", { name: /available/i })
-        .waitFor({ state: "attached" });
-    },
-    { version: "3.0.0" }
-  );
+        .isHidden()
+    ).toBe(true);
+  });
 });
 
-test("update to stable if it is newer", async (t) => {
-  await harness(
-    t,
-    async (ctx) => {
-      await ctx.app.close();
-      await writeFile(
-        ctx.configPath,
-        JSON.stringify({
-          automaticUpdates: false,
-          releaseTrack: "beta"
-        })
-      );
+describe("downgrade to stable on switching to stable release track", () => {
+  test.scoped({ options: { version: "99.0.0-beta.0" } });
+  test("test", async ({ ctx, expect, onTestFinished }) => {
+    onTestFinished(testCleanup);
 
-      await ctx.relaunch();
+    await ctx.app.close();
+    await writeFile(
+      ctx.configPath,
+      JSON.stringify({
+        automaticUpdates: false,
+        releaseTrack: "stable"
+      })
+    );
 
-      const { page } = ctx;
+    await ctx.relaunch();
 
-      await page.waitForSelector("#authForm");
+    const { page } = ctx;
 
-      t.expect(
-        await page.getByRole("button", { name: "Create account" }).isVisible()
-      ).toBe(true);
+    await page.waitForSelector("#authForm");
 
-      await page
-        .getByRole("button", { name: "Skip & go directly to the app" })
-        .click();
+    expect(
+      await page.getByRole("button", { name: "Create account" }).isVisible()
+    ).toBe(true);
 
-      await skipDialog(page);
+    await page
+      .getByRole("button", { name: "Skip & go directly to the app" })
+      .click();
 
-      await page.waitForSelector(".ProseMirror");
+    await skipDialog(page);
 
-      const updateButton = page
-        .locator(".theme-scope-statusBar")
-        .getByRole("button", { name: /available/i });
-      await updateButton.waitFor({ state: "visible" });
-      const content = await updateButton.textContent();
-      const version = content?.split(" ")?.[0] || "";
-      t.expect(gt(version, "3.0.0-beta.0")).toBe(true);
-    },
-    { version: "3.0.0-beta.0" }
-  );
-});
+    await page.waitForSelector(".ProseMirror");
 
-test("update is not available if it latest stable version is older", async (t) => {
-  await harness(
-    t,
-    async (ctx) => {
-      await ctx.app.close();
-      await writeFile(
-        ctx.configPath,
-        JSON.stringify({
-          automaticUpdates: false,
-          releaseTrack: "beta"
-        })
-      );
+    await page
+      .locator(".theme-scope-statusBar")
+      .getByRole("button", { name: /checking for updates/i })
+      .waitFor({ state: "hidden" });
 
-      await ctx.relaunch();
-
-      const { page } = ctx;
-
-      await page.waitForSelector("#authForm");
-
-      t.expect(
-        await page.getByRole("button", { name: "Create account" }).isVisible()
-      ).toBe(true);
-
-      await page
-        .getByRole("button", { name: "Skip & go directly to the app" })
-        .click();
-
-      await skipDialog(page);
-
-      await page.waitForSelector(".ProseMirror");
-
-      await page
-        .locator(".theme-scope-statusBar")
-        .getByRole("button", { name: /checking for updates/i })
-        .waitFor({ state: "hidden" });
-
-      t.expect(
-        await page
-          .locator(".theme-scope-statusBar")
-          .getByRole("button", { name: /available/i })
-          .isHidden()
-      ).toBe(true);
-    },
-    { version: "99.0.0-beta.0" }
-  );
-});
-
-test("downgrade to stable on switching to stable release track", async (t) => {
-  await harness(
-    t,
-    async (ctx) => {
-      await ctx.app.close();
-      await writeFile(
-        ctx.configPath,
-        JSON.stringify({
-          automaticUpdates: false,
-          releaseTrack: "stable"
-        })
-      );
-
-      await ctx.relaunch();
-
-      const { page } = ctx;
-
-      await page.waitForSelector("#authForm");
-
-      t.expect(
-        await page.getByRole("button", { name: "Create account" }).isVisible()
-      ).toBe(true);
-
-      await page
-        .getByRole("button", { name: "Skip & go directly to the app" })
-        .click();
-
-      await skipDialog(page);
-
-      await page.waitForSelector(".ProseMirror");
-
-      await page
-        .locator(".theme-scope-statusBar")
-        .getByRole("button", { name: /checking for updates/i })
-        .waitFor({ state: "hidden" });
-
-      const updateButton = page
-        .locator(".theme-scope-statusBar")
-        .getByRole("button", { name: /available/i });
-      await updateButton.waitFor({ state: "visible" });
-      const content = await updateButton.textContent();
-      const version = content?.split(" ")?.[0] || "";
-      t.expect(lt(version, "99.0.0-beta.0")).toBe(true);
-    },
-    { version: "99.0.0-beta.0" }
-  );
+    const updateButton = page
+      .locator(".theme-scope-statusBar")
+      .getByRole("button", { name: /available/i });
+    await updateButton.waitFor({ state: "visible" });
+    const content = await updateButton.textContent();
+    const version = content?.split(" ")?.[0] || "";
+    expect(lt(version, "99.0.0-beta.0")).toBe(true);
+  });
 });
 
 async function skipDialog(page: Page) {
-  await page
-    .waitForSelector(".ReactModal__Content", {
-      timeout: 1000
-    })
-    .catch(() => {})
-    .then(async () => {
-      const positiveButton = page.locator(
-        "button[data-role='positive-button']"
-      );
-      const negativeButton = page.locator(
-        "button[data-role='negative-button']"
-      );
-      if (await positiveButton.isVisible()) await positiveButton.click();
-      else if (await negativeButton.isVisible()) await negativeButton.click();
-    });
+  try {
+    const dialog = page.locator(".ReactModal__Content");
+    const positiveButton = dialog.locator(
+      "button[data-role='positive-button']"
+    );
+    const negativeButton = dialog.locator(
+      "button[data-role='negative-button']"
+    );
+    if (await positiveButton.isVisible())
+      await positiveButton.click({ timeout: 1000 });
+    else if (await negativeButton.isVisible())
+      await negativeButton.click({ timeout: 1000 });
+  } catch (e) {
+    // ignore error
+  }
 }

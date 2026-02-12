@@ -18,23 +18,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Item, VirtualizedGrouping } from "@notesnook/core";
-import create, { State, StoreApi, UseBoundStore } from "zustand";
+import create, { StoreApi, UseBoundStore } from "zustand";
 import { resolveItems } from "@notesnook/common";
 import { useSettingStore } from "./use-setting-store";
 import { DatabaseLogger } from "../common/database";
 import { ToastManager } from "../services/event-manager";
 
-export interface DBCollectionStore<Type extends Item> extends State {
+export interface DBCollectionStore<Type extends Item> {
   items: VirtualizedGrouping<Type> | undefined;
   loading: boolean;
   refresh: () => Promise<void>;
   clear: () => void;
 }
 
-const ALL_STORES: UseBoundStore<
-  DBCollectionStore<Item>,
-  StoreApi<DBCollectionStore<Item>>
->[] = [];
+const ALL_STORES: UseBoundStore<StoreApi<DBCollectionStore<Item>>>[] = [];
 
 export function clearAllStores() {
   ALL_STORES.forEach((store) => {

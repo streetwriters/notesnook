@@ -36,6 +36,7 @@ import stripIndent from "strip-indent";
 import { nanoid } from "nanoid";
 import Languages from "./languages.json";
 import { CaretPosition, CodeLine } from "./utils.js";
+import { tiptapKeys } from "@notesnook/common";
 
 interface Indent {
   type: "tab" | "space";
@@ -292,7 +293,8 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
 
   addKeyboardShortcuts() {
     return {
-      "Mod-Shift-C": () => this.editor.commands.toggleCodeBlock(),
+      [tiptapKeys.toggleCodeBlock.keys]: () =>
+        this.editor.commands.toggleCodeBlock(),
       "Mod-a": ({ editor }) => {
         const { $anchor } = this.editor.state.selection;
         if ($anchor.parent.type.name !== this.name) {
@@ -543,6 +545,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
             languageDefinition?.filename ?? languageDefinition?.title ?? "xyz"
           }`.replace(/\s/, "-")
         );
+        content.classList.add("scroll-bar")
         content.style.whiteSpace = "pre";
         // caret is not visible if content element width is 0px
         content.style.minWidth = "20px";
@@ -552,7 +555,8 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
         return (
           compareCaretPosition(prev.caretPosition, next.caretPosition) ||
           prev.language !== next.language ||
-          prev.indentType !== next.indentType
+          prev.indentType !== next.indentType ||
+          prev.hidden !== next.hidden
         );
       }
     });

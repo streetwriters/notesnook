@@ -20,7 +20,7 @@ import { vitePlugin as remix } from "@remix-run/dev";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import arraybuffer from "vite-plugin-arraybuffer";
-import ThemeDark from "@notesnook/theme/theme-engine/themes/default-dark.json" with {type:"json"};
+import ThemeDark from "@notesnook/theme/theme-engine/themes/default-dark.json" with { type:"json" };
 import type { Plugin, ResolvedConfig } from "vite";
 import { writeFile } from "fs/promises";
 import path from "path";
@@ -51,8 +51,9 @@ export default defineConfig(({ isSsrBuild }) => ({
         scripts: { start: pkg.scripts.start },
         dependencies: {
           "@napi-rs/canvas": pkg.dependencies["@napi-rs/canvas"],
-          "@remix-run/server-runtime": pkg.devDependencies["@remix-run/server-runtime"],
-        },
+          "@remix-run/server-runtime":
+            pkg.devDependencies["@remix-run/server-runtime"]
+        }
       })
     }),
     remix({
@@ -65,13 +66,15 @@ export default defineConfig(({ isSsrBuild }) => ({
     }),
     tsconfigPaths(),
     arraybuffer(),
-    isSsrBuild ?  viteStaticCopy({
-      targets: [
-        { src: "./server.ts", dest: "../../" },
-        { src: "./app/assets", dest: "../" },
-        { src: "./fonts", dest: "../" }
-      ]
-    }) : undefined
+    isSsrBuild
+      ? viteStaticCopy({
+          targets: [
+            { src: "./server.ts", dest: "../../" },
+            { src: "./app/assets", dest: "../" },
+            { src: "./fonts", dest: "../" }
+          ]
+        })
+      : undefined
   ],
   worker: {
     format: "es",
@@ -90,7 +93,7 @@ export default defineConfig(({ isSsrBuild }) => ({
   build: {
     target: isSsrBuild ? "node20" : undefined,
     rollupOptions: {
-      external: ["@napi-rs/canvas"]
+      external: ["@napi-rs/canvas"],
     }
   },
   define: {

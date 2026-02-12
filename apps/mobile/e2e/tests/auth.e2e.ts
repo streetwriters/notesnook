@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { authenticator } from "otplib";
-import { Tests } from "./utils";
+import { TestBuilder } from "./utils";
 
 import dotenv from "dotenv";
 import path from "path";
@@ -33,20 +33,6 @@ const USER = {
     totpSecret: process.env.USER_TOTP_SECRET
   }
 };
-
-async function login() {
-  await Tests.fromText("Login to encrypt and sync notes").tap();
-  await Tests.fromId("input.email").element.typeText(USER.login.email!);
-  await Tests.fromText("Continue").tap();
-  await Tests.sleep(3000);
-  await Tests.fromId("input.totp").element.typeText(
-    authenticator.generate(USER.login.totpSecret!)
-  );
-  await Tests.fromText("Next").tap();
-  await Tests.sleep(3000);
-  await Tests.fromId("input.password").element.typeText(USER.login.password!);
-  await Tests.fromId("input.password").element.tapReturnKey();
-}
 
 // async function deleteAccount() {
 //   await tapByText("Account Settings");
@@ -67,11 +53,27 @@ async function login() {
 //   await elementById("input.confirmPassword").tapReturnKey();
 // }
 
+async function login() {
+  await TestBuilder.create()
+    .waitAndTapByText("Login to encrypt and sync notes")
+    .typeTextById("input.email", USER.login.email!)
+    .tapReturnKeyById("input.email")
+    .wait(3000)
+    .typeTextById("input.totp", authenticator.generate(USER.login.totpSecret!))
+    .waitAndTapByText("Next")
+    .wait(3000)
+    .typeTextById("input.password", USER.login.password!)
+    .tapReturnKeyById("input.password")
+    .run();
+}
+
 describe("AUTH", () => {
   it("Login", async () => {
-    await Tests.prepare();
-    await login();
-    await Tests.sleep(10000);
-    await Tests.fromText("Login to encrypt and sync notes").isNotVisible();
+    await TestBuilder.create()
+      .prepare()
+      .addStep(login)
+      .wait(3000)
+      .isNotVisibleByText("Notesnook Plans")
+      .run();
   });
 });

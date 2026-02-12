@@ -1,0 +1,5 @@
+- Collapsible Headings
+- Notesnook Circle
+- Minor bug fixes and improvements
+
+Thank you for using Notesnook!

@@ -45,7 +45,7 @@ import isURL from "validator/lib/isURL";
 import { DefaultAppStyles } from "../../../utils/styles";
 
 interface InputProps extends TextInputProps {
-  fwdRef?: RefObject<TextInput>;
+  fwdRef?: RefObject<TextInput | null>;
   validationType?:
     | "password"
     | "email"
@@ -121,8 +121,8 @@ const Input = ({
   const color = error
     ? colors.error.border
     : focus
-    ? customColor || colors.selected.border
-    : colors.primary.border;
+      ? customColor || colors.selected.border
+      : colors.primary.border;
 
   const validate = async (value: string) => {
     if (!validationType) return;
@@ -154,7 +154,7 @@ const Input = ({
         isError = customValidator && value === customValidator();
         break;
       case "url":
-        isError = isURL(value);
+        isError = isURL(value, { allow_underscores: true });
         break;
       case "phonenumber": {
         const result = phone(value, {
@@ -237,9 +237,9 @@ const Input = ({
       onPress && loading ? colors.primary.accent : colors.primary.paragraph,
     flexGrow: 1,
     flexShrink: 1,
-    paddingBottom: DefaultAppStyles.GAP_VERTICAL - 2,
-    paddingTop: DefaultAppStyles.GAP_VERTICAL - 2,
-    fontFamily: "OpenSans-Regular",
+    paddingBottom: DefaultAppStyles.GAP_VERTICAL,
+    paddingTop: DefaultAppStyles.GAP_VERTICAL,
+    fontFamily: "Inter-Regular",
     ...(inputStyle as ViewStyle)
   };
 

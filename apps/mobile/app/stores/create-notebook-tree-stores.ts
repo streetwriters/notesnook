@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { Notebook } from "@notesnook/core";
-import create from "zustand";
+import { create } from "zustand";
 import { persist, StateStorage } from "zustand/middleware";
 import { db } from "../common/database";
 import { MMKV } from "../common/database/mmkv";
@@ -49,6 +49,7 @@ export function createNotebookTreeStores(
 ) {
   const useNotebookTreeStore = create<{
     tree: TreeItem[];
+    isSearching?: boolean;
     setTree: (tree: TreeItem[]) => void;
     removeItem: (id: string) => void;
     addNotebooks: (
@@ -113,16 +114,32 @@ export function createNotebookTreeStores(
         }
       }
 
-      const newTreeItems = notebooks.map((notebook) => {
-        return {
-          parentId,
-          notebook,
-          depth: depth,
-          hasChildren: items.some((item) => {
-            return item.fromId === notebook.id;
-          })
-        };
-      });
+      const rootTreeItems = newTree.filter((item) => item.parentId === "root");
+      const newTreeItems = notebooks.reduce((acc, notebook) => {
+        if (!rootTreeItems.find((item) => item.notebook.id === notebook.id)) {
+          acc.push({
+            parentId,
+            notebook,
+            depth: depth,
+            hasChildren: false
+          });
+        }
+        return acc;
+      }, [] as TreeItem[]);
+
+      if (parentId === "root") {
+        rootTreeItems.splice(0, 0, ...newTreeItems);
+      }
+
+      for (const treeItem of newTreeItems) {
+        treeItem.hasChildren = items.some((item) => {
+          return (
+            rootTreeItems.findIndex(
+              (treeItem) => treeItem.notebook.id === item.toId
+            ) === -1 && item.fromId === treeItem.notebook.id
+          );
+        });
+      }
 
       newTree.splice(parentIndex + 1, 0, ...newTreeItems);
 
@@ -130,7 +147,7 @@ export function createNotebookTreeStores(
         const expanded =
           useNotebookExpandedStore.getState().expanded[item.notebook.id] &&
           item.hasChildren;
-        if (expanded) {
+        if (expanded && !get().isSearching) {
           newTree = await get().fetchAndAdd(
             item.notebook.id,
             depth + 1,
@@ -187,12 +204,15 @@ export function createNotebookTreeStores(
     selectionEnabled
   );
 
-  const useNotebookExpandedStore = create<{
-    expanded: {
-      [id: string]: boolean;
-    };
-    setExpanded: (id: string) => void;
-  }>(
+  const useNotebookExpandedStore = create<
+    {
+      expanded: {
+        [id: string]: boolean;
+      };
+      setExpanded: (id: string) => void;
+    },
+    any
+  >(
     persist(
       (set, get) => ({
         expanded: {

@@ -24,7 +24,10 @@ import {
   SerializedKey,
   Chunk,
   Output,
-  Input
+  Input,
+  EncryptionKeyPair,
+  SerializedKeyPair,
+  AsymmetricCipher
 } from "./types.js";
 
 export interface IStreamable {
@@ -59,11 +62,21 @@ export interface INNCrypto {
     outputFormat?: TOutputFormat
   ): Promise<Output<TOutputFormat>[]>;
 
+  decryptAsymmetric<TOutputFormat extends DataFormat>(
+    keyPair: SerializedKeyPair,
+    cipherData: AsymmetricCipher<DataFormat>,
+    outputFormat?: TOutputFormat
+  ): Promise<Output<TOutputFormat>>;
+
   hash(password: string, salt: string): Promise<string>;
 
   deriveKey(password: string, salt?: string): Promise<EncryptionKey>;
 
+  deriveKeyPair(): Promise<EncryptionKeyPair>;
+
   exportKey(password: string, salt?: string): Promise<SerializedKey>;
+
+  exportKeyPair(): Promise<SerializedKeyPair>;
 
   createEncryptionStream(
     key: SerializedKey

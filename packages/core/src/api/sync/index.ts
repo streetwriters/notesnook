@@ -29,7 +29,7 @@ import Constants from "../../utils/constants.js";
 import TokenManager from "../token-manager.js";
 import Collector from "./collector.js";
 import { type HubConnection } from "@microsoft/signalr";
-import Merger from "./merger.js";
+import Merger, { handleInboxItems } from "./merger.js";
 import { AutoSync } from "./auto-sync.js";
 import { logger } from "../../logger.js";
 import { Mutex } from "async-mutex";
@@ -42,17 +42,20 @@ import {
   isTrashItem,
   Item,
   MaybeDeletedItem,
+  Monograph,
   Note,
   Notebook
 } from "../../types.js";
 import {
   SYNC_COLLECTIONS_MAP,
   SyncableItemType,
+  SyncInboxItem,
   SyncTransferItem
 } from "./types.js";
 import { DownloadableFile } from "../../database/fs.js";
 import { SyncDevices } from "./devices.js";
 import { DefaultColors } from "../../collections/colors.js";
+import { Monographs } from "../monographs.js";
 
 enum LogLevel {
   /** Log level for very low severity diagnostic messages. */
@@ -163,7 +166,7 @@ class Sync {
     this.autoSync = new AutoSync(db, 1000);
     this.devices = new SyncDevices(db.kv, db.tokenManager);
 
-    EV.subscribe(EVENTS.userLoggedOut, async () => {
+    db.eventManager.subscribe(EVENTS.userLoggedOut, async () => {
       await this.connection?.stop();
       this.autoSync.stop();
     });
@@ -231,7 +234,19 @@ class Sync {
   async fetch(deviceId: string, options: SyncOptions) {
     await this.checkConnection();
 
-    await this.connection?.invoke("RequestFetch", deviceId);
+    try {
+      await this.connection?.invoke("RequestFetchV3", deviceId);
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message.includes("HubException: Method does not exist")
+      ) {
+        this.logger.warn(
+          "RequestFetchV3 failed, falling back to RequestFetchV2"
+        );
+        await this.connection?.invoke("RequestFetchV2", deviceId);
+      }
+    }
 
     if (this.conflictedNoteIds.length > 0) {
       await this.db
@@ -270,7 +285,7 @@ class Sync {
         );
       }
     }
-    if (done > 0) await this.connection?.send("PushCompleted");
+    if (done > 0) await this.connection?.send("PushCompletedV2", deviceId);
     return true;
   }
 
@@ -317,8 +332,13 @@ class Sync {
   /**
    * @private
    */
-  async onPushCompleted() {
-    this.db.eventManager.publish(EVENTS.databaseSyncRequested, true, false);
+  async onPushCompleted(deviceId: string) {
+    this.db.eventManager.publish(
+      EVENTS.databaseSyncRequested,
+      true,
+      false,
+      deviceId
+    );
   }
 
   async processChunk(
@@ -427,7 +447,9 @@ class Sync {
       .withHubProtocol(new JsonHubProtocol())
       .build();
     this.connection.serverTimeoutInMilliseconds = 60 * 1000 * 5;
-    this.connection.on("PushCompleted", () => this.onPushCompleted());
+    this.connection.on("PushCompletedV2", (deviceId: string) =>
+      this.onPushCompleted(deviceId)
+    );
     this.connection.on("SendVaultKey", async (vaultKey) => {
       if (this.connection?.state !== HubConnectionState.Connected) return false;
 
@@ -463,11 +485,37 @@ class Sync {
 
       return true;
     });
+
+    this.connection.on("SendMonographs", async (monographs) => {
+      if (this.connection?.state !== HubConnectionState.Connected) return false;
+
+      this.db.monographsCollection.collection.put(
+        monographs.map((m: Monograph) => ({
+          ...m,
+          type: "monograph"
+        }))
+      );
+
+      return true;
+    });
+
+    this.connection.on(
+      "SendInboxItems",
+      async (inboxItems: SyncInboxItem[]) => {
+        if (this.connection?.state !== HubConnectionState.Connected) {
+          return false;
+        }
+
+        await handleInboxItems(inboxItems, this.db);
+
+        return true;
+      }
+    );
   }
 
   private async getKey() {
     const key = await this.db.user.getEncryptionKey();
-    if (!key || !key || !key) {
+    if (!key?.key) {
       this.logger.error(
         new Error("User encryption key not generated. Please relogin.")
       );

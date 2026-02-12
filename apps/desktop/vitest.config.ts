@@ -21,11 +21,13 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
-    testTimeout: process.env.CI ? 120 * 1000 : 120 * 1000,
+    testTimeout: 120 * 1000,
+    hookTimeout: 120 * 1000,
     sequence: {
       concurrent: true,
       shuffle: true
     },
+    globalSetup: "./__tests__/global-setup.ts",
     dir: "./__tests__/",
     exclude: [
       "**/node_modules/**",

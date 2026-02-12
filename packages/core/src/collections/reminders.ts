@@ -99,6 +99,16 @@ export class Reminders implements ICollection {
     );
   }
 
+  get active() {
+    return this.collection.createFilter<Reminder>(
+      (qb) =>
+        qb
+          .where(isFalse("deleted"))
+          .where((eb) => eb.parens(createIsReminderActiveQuery())),
+      this.db.options?.batchSize
+    );
+  }
+
   exists(itemId: string) {
     return this.collection.exists(itemId);
   }
@@ -268,15 +278,15 @@ export function isReminderActive(reminder: Reminder) {
 
 export function createUpcomingReminderTimeQuery(unix = "now") {
   const time = sql`time(date / 1000, 'unixepoch', 'localtime')`;
-  const dateNow = sql`date(${unix})`;
+  const dateNow = sql`date(${unix}, 'localtime')`;
   const dateTime = sql`datetime(${dateNow} || ${time})`;
-  const dateTimeNow = sql`datetime(${unix})`;
+  const dateTimeNow = sql`datetime(${unix}, 'localtime')`;
   const weekDayNow = sql`CAST(strftime('%w', ${dateNow}) AS INTEGER)`;
   const monthDayNow = sql`CAST(strftime('%d', ${dateNow}) AS INTEGER)`;
   const lastSelectedDay = sql`(SELECT MAX(value) FROM json_each(selectedDays))`;
 
   const monthDate = sql`strftime('%m-%d%H:%M', date / 1000, 'unixepoch', 'localtime')`;
-  return sql`CASE 
+  return sql`CASE
         WHEN mode = 'once' THEN date / 1000
         WHEN recurringMode = 'year' THEN
             strftime('%s',
@@ -286,11 +296,11 @@ export function createUpcomingReminderTimeQuery(unix = "now") {
             )
         WHEN recurringMode = 'day' THEN
             strftime('%s',
-                ${dateNow} || ${time}, 
+                ${dateNow} || ${time},
                 IIF(${dateTime} <= ${dateTimeNow}, '+1 day', '+0 day'),
                 'utc'
             )
-        WHEN recurringMode = 'week' AND selectedDays IS NOT NULL AND json_array_length(selectedDays) > 0 THEN 
+        WHEN recurringMode = 'week' AND selectedDays IS NOT NULL AND json_array_length(selectedDays) > 0 THEN
             CASE
                 WHEN ${weekDayNow} > ${lastSelectedDay}
                 OR (${weekDayNow} == ${lastSelectedDay} AND ${dateTime} <= ${dateTimeNow})
@@ -316,8 +326,8 @@ export function createIsReminderActiveQuery(now = "now") {
   return sql`IIF(
     (disabled IS NULL OR disabled = 0)
     AND (mode != 'once'
-      OR datetime(date / 1000, 'unixepoch', 'localtime') > datetime(${now}) 
+      OR datetime(date / 1000, 'unixepoch', 'localtime') > datetime(${now}, 'localtime')
       OR (snoozeUntil IS NOT NULL
-        AND datetime(snoozeUntil / 1000, 'unixepoch', 'localtime') > datetime(${now}))
+        AND datetime(snoozeUntil / 1000, 'unixepoch', 'localtime') > datetime(${now}, 'localtime'))
     ), 1, 0)`.$castTo<boolean>();
 }

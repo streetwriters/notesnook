@@ -23,6 +23,7 @@ import type { AppRouter } from "@notesnook/desktop";
 import { AppEventManager, AppEvents } from "../app-events";
 import { TaskScheduler } from "../../utils/task-scheduler";
 import { checkForUpdate } from "../../utils/updater";
+import { showToast } from "../../utils/toast";
 
 export const desktop = createTRPCProxyClient<AppRouter>({
   links: [ipcLink()]
@@ -77,18 +78,23 @@ function attachListener(event: string) {
 }
 
 export async function createWritableStream(path: string) {
-  const resolvedPath = await desktop.integration.resolvePath.query({
-    filePath: path
-  });
-  if (!resolvedPath) throw new Error("invalid path.");
-  const { mkdirSync, createWriteStream }: typeof import("fs") = require("fs");
-  const { dirname }: typeof import("path") = require("path");
-  const { Writable } = require("stream");
+  try {
+    const resolvedPath = await desktop.integration.resolvePath.query({
+      filePath: path
+    });
+    if (!resolvedPath) throw new Error("invalid path.");
+    const { mkdirSync, createWriteStream }: typeof import("fs") = require("fs");
+    const { dirname }: typeof import("path") = require("path");
+    const { Writable } = require("stream");
 
-  mkdirSync(dirname(resolvedPath), { recursive: true });
-  return new WritableStream(
-    Writable.toWeb(
-      createWriteStream(resolvedPath, { encoding: "utf-8" })
-    ).getWriter()
-  );
+    mkdirSync(dirname(resolvedPath), { recursive: true });
+    return new WritableStream(
+      Writable.toWeb(
+        createWriteStream(resolvedPath, { encoding: "utf-8" })
+      ).getWriter()
+    );
+  } catch (ex) {
+    console.error(ex);
+    if (ex instanceof Error) showToast("error", ex.message);
+  }
 }

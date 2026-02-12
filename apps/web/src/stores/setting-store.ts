@@ -23,10 +23,10 @@ import { desktop } from "../common/desktop-bridge";
 import createStore from "../common/store";
 import Config from "../utils/config";
 import BaseStore from "./index";
-import { useEditorStore } from "./editor-store";
-import { setDocumentTitle } from "../utils/dom";
-import { TimeFormat } from "@notesnook/core";
+import { TimeFormat, DayFormat, WeekFormat } from "@notesnook/core";
 import { Profile, TrashCleanupInterval } from "@notesnook/core";
+import { showToast } from "../utils/toast";
+import { ConfirmDialog } from "../dialogs/confirm";
 
 export const HostIds = [
   "API_HOST",
@@ -56,7 +56,7 @@ class SettingStore extends BaseStore<SettingStore> {
     PATHS.backupsDirectory
   );
   doubleSpacedParagraphs = Config.get("doubleSpacedLines", true);
-  markdownShortcuts = Config.get("markdownShortcuts", true);
+  markdownShortcuts = Config.get("markdownShortcuts", false);
   fontLigatures = Config.get("fontLigatures", false);
   notificationsSettings = Config.get("notifications", { reminder: true });
   isFullOfflineMode = Config.get("fullOfflineMode", false);
@@ -68,6 +68,8 @@ class SettingStore extends BaseStore<SettingStore> {
   hideNoteTitle = Config.get("hideNoteTitle", false);
   dateFormat = "DD-MM-YYYY";
   timeFormat: TimeFormat = "12-hour";
+  dayFormat: DayFormat = "short";
+  weekFormat: WeekFormat = "Sun";
   titleFormat = "Note $date$ $time$";
   profile?: Profile;
 
@@ -89,11 +91,14 @@ class SettingStore extends BaseStore<SettingStore> {
   isFlatpak = false;
   isSnap = false;
   proxyRules?: string;
+  isInboxEnabled = false;
 
   refresh = async () => {
     this.set({
       dateFormat: db.settings.getDateFormat(),
       timeFormat: db.settings.getTimeFormat(),
+      weekFormat: db.settings.getWeekFormat(),
+      dayFormat: db.settings.getDayFormat(),
       titleFormat: db.settings.getTitleFormat(),
       trashCleanupInterval: db.settings.getTrashCleanupInterval(),
       profile: db.settings.getProfile(),
@@ -105,7 +110,8 @@ class SettingStore extends BaseStore<SettingStore> {
       customDns: await desktop?.integration.customDns.query(),
       zoomFactor: await desktop?.integration.zoomFactor.query(),
       autoUpdates: await desktop?.updater.autoUpdates.query(),
-      proxyRules: await desktop?.integration.proxyRules.query()
+      proxyRules: await desktop?.integration.proxyRules.query(),
+      isInboxEnabled: await db.user.hasInboxKeys()
     });
   };
 
@@ -117,6 +123,16 @@ class SettingStore extends BaseStore<SettingStore> {
   setTimeFormat = async (timeFormat: TimeFormat) => {
     await db.settings.setTimeFormat(timeFormat);
     this.set({ timeFormat });
+  };
+
+  setDayFormat = async (dayFormat: DayFormat) => {
+    await db.settings.setDayFormat(dayFormat);
+    this.set({ dayFormat });
+  };
+
+  setWeekFormat = async (weekFormat: WeekFormat) => {
+    await db.settings.setWeekFormat(weekFormat);
+    this.set({ weekFormat });
   };
 
   setTitleFormat = async (titleFormat: string) => {
@@ -146,9 +162,15 @@ class SettingStore extends BaseStore<SettingStore> {
     Config.set("encryptBackups", encryptBackups);
   };
 
-  setHomepage = (homepage: HomePage) => {
+  setHomepage = (homepage?: HomePage) => {
     this.set({ homepage });
-    Config.set("homepage-v2", homepage);
+    Config.set(
+      "homepage-v2",
+      homepage || {
+        type: "route",
+        id: "notes"
+      }
+    );
   };
 
   setDefaultSidebarTab = (defaultSidebarTab: "home" | "notebooks" | "tags") => {
@@ -211,15 +233,15 @@ class SettingStore extends BaseStore<SettingStore> {
 
   toggleMarkdownShortcuts = (toggleState?: boolean) => {
     const markdownShortcuts = this.get().markdownShortcuts;
-    this.set((state) => {
-      state.markdownShortcuts = toggleState ?? !state.markdownShortcuts;
-    });
+    this.set(
+      (state) => (state.markdownShortcuts = toggleState ?? !markdownShortcuts)
+    );
     Config.set("markdownShortcuts", !markdownShortcuts);
   };
 
-  toggleFontLigatures = () => {
+  toggleFontLigatures = (toggleState?: boolean) => {
     const fontLigatures = this.get().fontLigatures;
-    this.set((state) => (state.fontLigatures = !fontLigatures));
+    this.set((state) => (state.fontLigatures = toggleState ?? !fontLigatures));
     Config.set("fontLigatures", !fontLigatures);
   };
 
@@ -239,11 +261,6 @@ class SettingStore extends BaseStore<SettingStore> {
     const { hideNoteTitle } = this.get();
     this.set({ hideNoteTitle: !hideNoteTitle });
     Config.set("hideNoteTitle", !hideNoteTitle);
-    setDocumentTitle(
-      !hideNoteTitle
-        ? undefined
-        : useEditorStore.getState().getActiveSession()?.title
-    );
   };
 
   toggleAutoUpdates = async () => {
@@ -252,12 +269,12 @@ class SettingStore extends BaseStore<SettingStore> {
     await desktop?.updater.toggleAutoUpdates.mutate({ enabled: !autoUpdates });
   };
 
-  toggleFullOfflineMode = () => {
-    const isFullOfflineMode = this.get().isFullOfflineMode;
-    this.set({ isFullOfflineMode: !isFullOfflineMode });
-    Config.set("fullOfflineMode", !isFullOfflineMode);
+  toggleFullOfflineMode = (toggleState?: boolean) => {
+    const state = toggleState ?? !this.get().isFullOfflineMode;
+    this.set({ isFullOfflineMode: state });
+    Config.set("fullOfflineMode", state);
 
-    if (isFullOfflineMode) db.fs().cancel("offline-mode");
+    if (!state) db.fs().cancel("offline-mode");
     else db.attachments.cacheAttachments();
   };
 
@@ -270,6 +287,38 @@ class SettingStore extends BaseStore<SettingStore> {
     const serverUrls = this.get().serverUrls;
     this.set({ serverUrls: { ...serverUrls, ...urls } });
     Config.set("serverUrls", { ...serverUrls, ...urls });
+  };
+
+  toggleInbox = async () => {
+    const { isInboxEnabled } = this.get();
+
+    try {
+      if (isInboxEnabled) {
+        const inboxTokens = await db.inboxApiKeys.get();
+        if (inboxTokens && inboxTokens.length > 0) {
+          const ok = await ConfirmDialog.show({
+            title: "Disable Inbox API",
+            message:
+              "Disabling will revoke all existing API keys, they will no longer work. Are you sure?",
+            positiveButtonText: "Yes",
+            negativeButtonText: "No"
+          });
+          if (!ok) return;
+        }
+
+        await db.user.discardInboxKeys();
+        this.set({ isInboxEnabled: false });
+
+        return;
+      }
+
+      await db.user.getInboxKeys();
+      this.set({ isInboxEnabled: true });
+    } catch (e) {
+      if (e instanceof Error) {
+        showToast("error", e.message);
+      }
+    }
   };
 }
 

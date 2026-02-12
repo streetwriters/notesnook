@@ -17,11 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useAreFeaturesAvailable } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { View } from "react-native";
-import { eSendEvent, presentSheet } from "../../../services/event-manager";
+import {
+  eSendEvent,
+  presentSheet,
+  ToastManager
+} from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
 import { eCloseSheet } from "../../../utils/events";
 import { SideMenuItem } from "../../../utils/menu-items";
@@ -31,9 +36,14 @@ import { useSideBarDraggingStore } from "../../side-menu/dragging-store";
 import AppIcon from "../../ui/AppIcon";
 import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
+import PaywallSheet from "../paywall";
 export const MenuItemProperties = ({ item }: { item: SideMenuItem }) => {
   const { colors } = useThemeColors();
-  return (
+  const featuresAvailable = useAreFeaturesAvailable([
+    "customHomepage",
+    "customizableSidebar"
+  ]);
+  return !featuresAvailable ? null : (
     <View
       style={{
         width: "100%",
@@ -44,24 +54,52 @@ export const MenuItemProperties = ({ item }: { item: SideMenuItem }) => {
       {[
         {
           title: strings.setAsHomepage(),
-          onPress: () => {
+          onPress: async () => {
+            if (!featuresAvailable?.customHomepage.isAllowed) {
+              ToastManager.show({
+                message: featuresAvailable?.customHomepage.error,
+                type: "info",
+                context: "local",
+                actionText: strings.upgrade(),
+                func: () => {
+                  PaywallSheet.present(featuresAvailable?.customHomepage);
+                }
+              });
+              return;
+            }
             SettingsService.setProperty("homepageV2", {
               id: item.id,
               type: "default"
             });
             eSendEvent(eCloseSheet);
           },
-          icon: "home-outline"
+          icon: "home-outline",
+          type: "switch",
+          state: SettingsService.getProperty("homepageV2")?.id === item.id,
+          locked: !featuresAvailable?.customHomepage.isAllowed
         },
         {
           title: strings.reorder(),
-          onPress: () => {
+          onPress: async () => {
+            if (!featuresAvailable?.customizableSidebar.isAllowed) {
+              ToastManager.show({
+                message: featuresAvailable?.customizableSidebar.error,
+                type: "info",
+                context: "local",
+                actionText: strings.upgrade(),
+                func: () => {
+                  PaywallSheet.present(featuresAvailable?.customizableSidebar);
+                }
+              });
+              return;
+            }
             useSideBarDraggingStore.setState({
               dragging: true
             });
             eSendEvent(eCloseSheet);
           },
-          icon: "sort-ascending"
+          icon: "sort-ascending",
+          locked: !featuresAvailable?.customizableSidebar.isAllowed
         }
       ].map((item) => (
         <Pressable
@@ -73,18 +111,42 @@ export const MenuItemProperties = ({ item }: { item: SideMenuItem }) => {
             justifyContent: "flex-start",
             gap: DefaultAppStyles.GAP_SMALL,
             borderRadius: 0,
-            paddingHorizontal: DefaultAppStyles.GAP
+            paddingHorizontal: DefaultAppStyles.GAP,
+            opacity: item.locked ? 0.6 : 1
           }}
           onPress={() => {
             item.onPress();
           }}
         >
-          <AppIcon
-            color={colors.secondary.icon}
-            name={item.icon}
-            size={AppFontSize.xl}
-          />
-          <Paragraph>{item.title}</Paragraph>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: DefaultAppStyles.GAP_SMALL
+            }}
+          >
+            <AppIcon
+              color={colors.secondary.icon}
+              name={item.icon}
+              size={AppFontSize.xl}
+            />
+            <Paragraph>{item.title}</Paragraph>
+          </View>
+          {item.locked ? (
+            <AppIcon
+              name="lock"
+              size={AppFontSize.lg}
+              color={colors.primary.icon}
+              style={{ marginLeft: "auto" }}
+            />
+          ) : item.type === "switch" && item.state ? (
+            <AppIcon
+              name="check"
+              size={AppFontSize.lg}
+              color={colors.primary.accent}
+              style={{ marginLeft: "auto" }}
+            />
+          ) : null}
         </Pressable>
       ))}
     </View>

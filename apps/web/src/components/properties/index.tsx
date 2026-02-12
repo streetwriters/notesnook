@@ -24,7 +24,6 @@ import {
   Unlock,
   Readonly,
   SyncOff,
-  ArrowLeft,
   Circle,
   Checkmark,
   ChevronDown,
@@ -32,9 +31,10 @@ import {
   LinkedTo,
   ReferencedIn as ReferencedInIcon,
   Note as NoteIcon,
-  Archive
+  Archive,
+  Edit
 } from "../icons";
-import { Box, Button, Flex, Text, FlexProps } from "@theme-ui/components";
+import { Button, Flex, Text, FlexProps } from "@theme-ui/components";
 import {
   useEditorStore,
   ReadonlyEditorSession,
@@ -42,14 +42,15 @@ import {
 } from "../../stores/editor-store";
 import { db } from "../../common/db";
 import { useStore as useAppStore } from "../../stores/app-store";
+import { useStore as useAttachmentStore } from "../../stores/attachment-store";
 import { store as noteStore } from "../../stores/note-store";
 import Toggle from "./toggle";
+import { EditNoteCreationDateDialog } from "../../dialogs/edit-note-creation-date-dialog";
 import ScrollContainer from "../scroll-container";
 import {
   getFormattedDate,
   usePromise,
   ResolvedItem,
-  useResolvedItem,
   useUnresolvedItem
 } from "@notesnook/common";
 import { ScopedThemeProvider } from "../theme-provider";
@@ -58,7 +59,6 @@ import { VirtualizedList } from "../virtualized-list";
 import { SessionItem } from "../session-item";
 import {
   ContentBlock,
-  InternalLink,
   Note,
   VirtualizedGrouping,
   createInternalLink,
@@ -66,7 +66,6 @@ import {
 } from "@notesnook/core";
 import { VirtualizedTable } from "../virtualized-table";
 import { TextSlice } from "@notesnook/core";
-import { TITLE_BAR_HEIGHT } from "../title-bar";
 import { strings } from "@notesnook/intl";
 
 const tools = [
@@ -211,13 +210,39 @@ function EditorProperties(props: EditorPropertiesProps) {
                     >
                       {item.label}
                     </Text>
-                    <Text
-                      className="selectable"
-                      variant="subBody"
-                      sx={{ fontSize: "body", flexShrink: 0 }}
-                    >
-                      {item.value(session.note[item.key])}
-                    </Text>
+
+                    {item.key === "dateCreated" ? (
+                      <Flex sx={{ alignItems: "center", gap: 1 }}>
+                        <Text
+                          data-test-id="date-created"
+                          className="selectable"
+                          variant="subBody"
+                          sx={{ fontSize: "body", flexShrink: 0 }}
+                        >
+                          {item.value(session.note[item.key])}
+                        </Text>
+                        <Edit
+                          size={14}
+                          sx={{ cursor: "pointer", color: "icon" }}
+                          onClick={() => {
+                            EditNoteCreationDateDialog.show({
+                              noteId: session.note.id,
+                              dateCreated: session.note.dateCreated,
+                              dateEdited: session.note.dateEdited
+                            });
+                          }}
+                          data-test-id="edit-date-created"
+                        />
+                      </Flex>
+                    ) : (
+                      <Text
+                        className="selectable"
+                        variant="subBody"
+                        sx={{ fontSize: "body", flexShrink: 0 }}
+                      >
+                        {item.value(session.note[item.key])}
+                      </Text>
+                    )}
                   </Flex>
                 ))}
                 {session.type === "deleted" ||
@@ -632,6 +657,7 @@ function Colors({ noteId, color }: { noteId: string; color?: string }) {
           return (
             <Flex
               key={c.id}
+              title={c.title}
               onClick={() => noteStore.get().setColor(c.id, isChecked, noteId)}
               sx={{
                 cursor: "pointer",
@@ -650,7 +676,7 @@ function Colors({ noteId, color }: { noteId: string; color?: string }) {
                 <Checkmark
                   color="white"
                   size={18}
-                  sx={{ position: "absolute", left: "8px" }}
+                  sx={{ position: "absolute", left: "4px" }}
                 />
               )}
             </Flex>
@@ -727,26 +753,27 @@ function Reminders({ noteId }: { noteId: string }) {
   );
 }
 function Attachments({ noteId }: { noteId: string }) {
+  const nonce = useAttachmentStore((store) => store.nonce);
   const result = usePromise(
     () =>
       db.attachments
         .ofNote(noteId, "all")
         .sorted({ sortBy: "dateCreated", sortDirection: "desc" }),
-    [noteId]
+    [noteId, nonce]
   );
+
   if (result.status !== "fulfilled" || result.value.length <= 0) return null;
 
   return (
     <Section
       title={strings.dataTypesPluralCamelCase.attachment()}
-      sx={{ borderTop: "1px solid var(--border)" }}
+      sx={{ borderTop: "1px solid var(--border)", mt: 1 }}
     >
       <VirtualizedTable
         estimatedSize={25}
         getItemKey={(index) => result.value.key(index)}
         items={result.value.placeholders}
         style={{
-          marginTop: 5,
           tableLayout: "fixed",
           width: "100%"
         }}

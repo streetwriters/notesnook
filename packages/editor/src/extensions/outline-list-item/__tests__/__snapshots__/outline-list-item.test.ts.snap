@@ -1,0 +1,132 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`outline list item > code block in outline list item 1`] = `
+{
+  "content": [
+    {
+      "content": [
+        {
+          "attrs": {
+            "collapsed": false,
+          },
+          "content": [
+            {
+              "content": [
+                {
+                  "text": "item 1",
+                  "type": "text",
+                },
+              ],
+              "type": "paragraph",
+            },
+          ],
+          "type": "outlineListItem",
+        },
+        {
+          "attrs": {
+            "collapsed": false,
+          },
+          "content": [
+            {
+              "content": [
+                {
+                  "text": "hello",
+                  "type": "text",
+                },
+              ],
+              "type": "paragraph",
+            },
+            {
+              "attrs": {
+                "caretPosition": undefined,
+                "id": "codeblock-test-id-123456",
+                "indentLength": 2,
+                "indentType": "space",
+                "language": null,
+                "lines": [],
+              },
+              "content": [
+                {
+                  "text": "const x = 1;",
+                  "type": "text",
+                },
+              ],
+              "type": "codeblock",
+            },
+            {
+              "content": [
+                {
+                  "text": "world",
+                  "type": "text",
+                },
+              ],
+              "type": "paragraph",
+            },
+            {
+              "content": [
+                {
+                  "attrs": {
+                    "collapsed": false,
+                  },
+                  "content": [
+                    {
+                      "content": [
+                        {
+                          "text": "sub item 2",
+                          "type": "text",
+                        },
+                      ],
+                      "type": "paragraph",
+                    },
+                  ],
+                  "type": "outlineListItem",
+                },
+                {
+                  "attrs": {
+                    "collapsed": false,
+                  },
+                  "content": [
+                    {
+                      "content": [
+                        {
+                          "text": "sub item 3",
+                          "type": "text",
+                        },
+                      ],
+                      "type": "paragraph",
+                    },
+                  ],
+                  "type": "outlineListItem",
+                },
+              ],
+              "type": "outlineList",
+            },
+          ],
+          "type": "outlineListItem",
+        },
+        {
+          "attrs": {
+            "collapsed": false,
+          },
+          "content": [
+            {
+              "content": [
+                {
+                  "text": "item 4",
+                  "type": "text",
+                },
+              ],
+              "type": "paragraph",
+            },
+          ],
+          "type": "outlineListItem",
+        },
+      ],
+      "type": "outlineList",
+    },
+  ],
+  "type": "doc",
+}
+`;
+
+exports[`outline list item > inline image as first child in the old outline list item 1`] = `"<ul data-type="outlineList"><li data-type="outlineListItem"><p data-spacing="double">item 1</p></li><li data-type="outlineListItem"><p data-spacing="double"></p><img src="image.png" data-aspect-ratio="1"></li></ul>"`;

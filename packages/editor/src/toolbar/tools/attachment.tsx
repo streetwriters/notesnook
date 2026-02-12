@@ -48,7 +48,8 @@ export function DownloadAttachment(props: ToolProps) {
 
   return (
     <ToolButton
-      {...props}
+      icon={props.icon}
+      title={props.title}
       toggled={false}
       onClick={() => {
         const attachmentNode =
@@ -73,7 +74,8 @@ export function PreviewAttachment(props: ToolProps) {
 
   return (
     <ToolButton
-      {...props}
+      icon={props.icon}
+      title={props.title}
       toggled={false}
       onClick={() => {
         const attachmentNode =
@@ -91,7 +93,8 @@ export function RemoveAttachment(props: ToolProps) {
   const { editor } = props;
   return (
     <ToolButton
-      {...props}
+      icon={props.icon}
+      title={props.title}
       toggled={false}
       onClick={() => editor.chain().focus().removeAttachment().run()}
     />
@@ -99,7 +102,7 @@ export function RemoveAttachment(props: ToolProps) {
 }
 
 const previewableFileExtensions = ["pdf"];
-const previewableMimeTypes = ["application/pdf"];
+const previewableMimeTypes = ["application/pdf", "image/"];
 
 function canPreviewAttachment(attachment: Attachment) {
   if (!attachment) return false;

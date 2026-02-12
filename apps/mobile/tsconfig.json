@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig",
+  "extends": ["../../tsconfig", "@react-native/typescript-config"],
   "compilerOptions": {
     "lib": ["es2017", "DOM", "DOM.Iterable"],
     "allowJs": true,
@@ -13,12 +13,13 @@
         "./node_modules/@ammarahmed/notifee-react-native"
       ],
       "@notesnook/theme": ["../../packages/theme"],
-      "@types/react": ["./node_modules/@types/react"],
-      "react": ["./node_modules/react"]
-    },
-    "incremental": true,
-    "maxNodeModuleJsDepth": 5,
-    "downlevelIteration": true
+      "@notesnook/editor/dist/cjs/toolbar/tool-definitions": [
+        "../../packages/editor/dist/cjs/toolbar/tool-definitions.js"
+      ],
+      "@notesnook/editor/dist/cjs/toolbar/icons": [
+        "../../packages/editor/dist/cjs/toolbar/icons.js"
+      ]
+    }
   },
-  "exclude": ["native", "e2e"]
+  "exclude": ["e2e", "android", "ios", "node_modules", "patches", "fonts"]
 }

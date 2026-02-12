@@ -40,6 +40,7 @@ import Sync from "../../../services/sync";
 
 import Clipboard from "@react-native-clipboard/clipboard";
 import { logoutUser } from "../../../screens/settings/logout";
+import { sleep } from "../../../utils/time";
 export const UserSheet = () => {
   const ref = useSheetRef();
   const { colors } = useThemeColors();
@@ -113,8 +114,8 @@ export const UserSheet = () => {
                           progress ? `(${progress.current})` : ""
                         }`
                       : lastSyncStatus === SyncStatus.Failed
-                      ? strings.syncFailed()
-                      : strings.synced()}{" "}
+                        ? strings.syncFailed()
+                        : strings.synced()}{" "}
                     {!syncing ? (
                       <TimeSince
                         style={{
@@ -138,8 +139,8 @@ export const UserSheet = () => {
                     !user || lastSyncStatus === SyncStatus.Failed
                       ? colors.error.icon
                       : isOffline
-                      ? colors.static.orange
-                      : colors.success.icon
+                        ? colors.static.orange
+                        : colors.success.icon
                   }
                 />
               </Paragraph>
@@ -164,6 +165,8 @@ export const UserSheet = () => {
               message: strings.notLoggedIn(),
               actionText: strings.loginMessageActionText(),
               icon: "account-outline",
+              id: "log-in",
+              type: "normal",
               onPress: () => {
                 ref.current?.hide();
                 Navigation.navigate("Auth", {
@@ -310,10 +313,10 @@ export const UserSheet = () => {
           {
             icon: "logout",
             title: strings.logout(),
-            onPress: () => {
-              console.log("logout");
-              logoutUser();
+            onPress: async () => {
               ref.current?.hide();
+              await sleep(300);
+              logoutUser();
             },
             hidden: !user
           }

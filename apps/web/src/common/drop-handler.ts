@@ -30,13 +30,18 @@ export async function handleDrop(
   item:
     | ItemReference
     | Context
-    | { type: "trash" | "notebooks" | "favorites" | undefined }
+    | { type: "trash" | "notebooks" | "favorites" | "archive" | undefined }
 ) {
   if (!item.type) return;
 
   const noteIds = getDragData(dataTransfer, "note");
   const notebookIds = getDragData(dataTransfer, "notebook");
-  const { setColor, favorite, delete: trashNotes } = useNoteStore.getState();
+  const {
+    setColor,
+    favorite,
+    delete: trashNotes,
+    archive
+  } = useNoteStore.getState();
   switch (item.type) {
     case "notebook":
       if (noteIds.length > 0) {
@@ -82,6 +87,9 @@ export async function handleDrop(
         await useNotebookStore.getState().refresh();
         await useNoteStore.getState().refresh();
       }
+      break;
+    case "archive":
+      archive(true, ...noteIds);
       break;
   }
 }

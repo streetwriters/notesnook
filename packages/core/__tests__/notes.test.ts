@@ -26,10 +26,12 @@ import {
   TEST_NOTE,
   TEST_NOTEBOOK,
   IMG_CONTENT,
-  loginFakeUser
+  loginFakeUser,
+  delay
 } from "./utils/index.js";
 import { test, expect } from "vitest";
 import { GroupOptions, Note } from "../src/types.js";
+import { sql } from "@streetwriters/kysely";
 
 async function createAndAddNoteToNotebook(
   db: Database,
@@ -99,8 +101,8 @@ test("delete note", () =>
     await db.notes.moveToTrash(id);
 
     expect(await db.notes.note(id)).toBeUndefined();
-    expect(await db.notebooks.totalNotes(notebookId)).toBe(0);
-    expect(await db.notebooks.totalNotes(subNotebookId)).toBe(0);
+    expect(await db.notebooks.totalNotes(notebookId)).toStrictEqual([0]);
+    expect(await db.notebooks.totalNotes(subNotebookId)).toStrictEqual([0]);
   }));
 
 test("get all notes", () =>
@@ -204,6 +206,20 @@ test("note title with headline format should keep generating headline title unti
       expect(note?.title).toBe(expectedHeadline);
     }));
 });
+
+test("note title with headline format should not generate headline title if title was set during note creation", () =>
+  noteTest({ title: "already set title" }).then(async ({ db, id }) => {
+    await db.settings.setTitleFormat("$headline$");
+    await db.notes.add({
+      id,
+      content: {
+        type: TEST_NOTE.content.type,
+        data: "<p>some note content</p>"
+      }
+    });
+    const note = await db.notes.note(id);
+    expect(note?.title).toBe("already set title");
+  }));
 
 test("note should get headline from first paragraph in content", () =>
   noteTest({
@@ -323,8 +339,8 @@ test("add note to subnotebook", () =>
         .from({ type: "notebook", id: notebookId }, "notebook")
         .count()
     ).toBe(1);
-    expect(await db.notebooks.totalNotes(subNotebookId)).toBe(1);
-    expect(await db.notebooks.totalNotes(notebookId)).toBe(1);
+    expect(await db.notebooks.totalNotes(subNotebookId)).toStrictEqual([1]);
+    expect(await db.notebooks.totalNotes(notebookId)).toStrictEqual([1]);
   }));
 
 test("duplicate note to topic should not be added", () =>
@@ -333,7 +349,7 @@ test("duplicate note to topic should not be added", () =>
       notebookTitle: "Hello",
       subNotebookTitle: "Home"
     });
-    expect(await db.notebooks.totalNotes(subNotebookId)).toBe(1);
+    expect(await db.notebooks.totalNotes(subNotebookId)).toStrictEqual([1]);
   }));
 
 test("add the same note to 2 notebooks", () =>
@@ -757,4 +773,64 @@ test("archived note shouldn't be in favorites", () =>
     await db.notes.favorite(true, id);
     await db.notes.archive(true, id);
     expect(await db.notes.favorites.count()).toBe(0);
+  }));
+
+test("edit note's created date", () =>
+  noteTest().then(async ({ db, id }) => {
+    const date = new Date("2020-01-01T10:00:00Z");
+    await db.notes.add({ id, dateCreated: date.valueOf() });
+    const note = await db.notes.note(id);
+    expect(note?.dateCreated).toBe(date.valueOf());
+  }));
+
+test("get notes with expiryDate set", () =>
+  noteTest().then(async ({ db, id }) => {
+    const expiredOn = dayjs().add(5, "minute").toDate().getTime();
+    await db.notes.setExpiryDate(expiredOn, id);
+    const note = await db.notes.note(id);
+    expect(note?.expiryDate.value).toBe(expiredOn);
+    const expiredNote = await db.notes.all.filter
+      .where(sql.raw("json_extract(expiryDate, '$.value')"), ">", Date.now())
+      .select("expiryDate")
+      .execute();
+
+    expect(expiredNote.length).toBe(1);
+  }));
+
+test("unset expiryDate", () =>
+  noteTest().then(async ({ db, id }) => {
+    const expiredOn = dayjs().add(5, "minute").toDate().getTime();
+    await db.notes.setExpiryDate(expiredOn, id);
+    const note = await db.notes.note(id);
+    expect(note?.expiryDate.value).toBe(expiredOn);
+    const expiringNote = await db.notes.all.filter
+      .where(sql.raw("json_extract(expiryDate, '$.value')"), ">", Date.now())
+      .select("expiryDate")
+      .execute();
+
+    expect(expiringNote.length).toBe(1);
+
+    await db.notes.setExpiryDate(null, id);
+
+    const notExpiringNote = await db.notes.all.filter
+      .where(sql.raw("json_extract(expiryDate, '$.value')"), ">", Date.now())
+      .select("expiryDate")
+      .execute();
+
+    expect(notExpiringNote.length).toBe(0);
+  }));
+
+test("Delete note on expiryDate", () =>
+  noteTest().then(async ({ db, id }) => {
+    const expiredOn = dayjs().add(1, "second").toDate().getTime();
+    await db.notes.setExpiryDate(expiredOn, id);
+    const note = await db.notes.note(id);
+    expect(note?.expiryDate.value).toBe(expiredOn);
+    await delay(2000);
+    db.notes.deleteExpiredNotes();
+    const expiredNote = await db.notes.all.filter
+      .where(sql.raw("json_extract(expiryDate, '$.value')"), ">", Date.now())
+      .select("expiryDate")
+      .execute();
+    expect(expiredNote.length).toBe(0);
   }));

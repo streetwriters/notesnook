@@ -25,6 +25,7 @@ import {
   toBlobURL,
   usePermissionHandler
 } from "@notesnook/editor";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import FingerprintIcon from "mdi-react/FingerprintIcon";
 import {
@@ -47,7 +48,6 @@ import StatusBar from "./statusbar";
 import Tags from "./tags";
 import TiptapEditorWrapper from "./tiptap";
 import Title from "./title";
-import { strings } from "@notesnook/intl";
 
 globalThis.toBlobURL = toBlobURL as typeof globalThis.toBlobURL;
 
@@ -111,10 +111,22 @@ const Tiptap = ({
 
   usePermissionHandler({
     claims: {
-      premium: settings.premium
+      callout: !!settings.features?.callout?.isAllowed,
+      outlineList: !!settings.features?.outlineList?.isAllowed,
+      taskList: !!settings.features?.taskList?.isAllowed,
+      importCsvToTable: !!settings.features?.importCsvToTable?.isAllowed,
+      exportTableAsCsv: !!settings.features?.exportTableAsCsv?.isAllowed,
+      insertAttachment: settings.loggedIn
     },
-    onPermissionDenied: () => {
-      post(EditorEvents.pro, undefined, tabRef.current.id, tab.session?.noteId);
+    onPermissionDenied: (claim) => {
+      post(
+        EditorEvents.pro,
+        {
+          feature: claim
+        },
+        tabRef.current.id,
+        tab.session?.noteId
+      );
     }
   });
 
@@ -154,6 +166,10 @@ const Tiptap = ({
         return postAsyncWithTimeout(EditorEvents.createInternalLink, {
           attributes
         });
+      },
+      downloadCsvTable: (csv) => {
+        console.log("download csv");
+        post("editor-events:download-csv", csv);
       },
       element: getContentDiv(),
       editable: !tab.session?.readonly,
@@ -232,6 +248,7 @@ const Tiptap = ({
       },
       dateFormat: settings.dateFormat,
       timeFormat: settings.timeFormat as "12-hour" | "24-hour" | undefined,
+      dayFormat: settings.dayFormat,
       enableInputRules: settings.markdownShortcuts
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -380,11 +397,15 @@ const Tiptap = ({
 
         const editor = editors[tab.id];
 
-        const firstChild = editor?.state.doc.firstChild;
-        const isParagraph = firstChild?.type.name === "paragraph";
-        const isFirstChildEmpty =
-          !firstChild?.textContent || firstChild?.textContent?.length === 0;
-        if (isParagraph && isFirstChildEmpty) {
+        const firstChildNodeType = editor?.state.doc.firstChild?.type.name;
+        const isSimpleNode =
+          firstChildNodeType !== "image" &&
+          firstChildNodeType !== "embed" &&
+          firstChildNodeType !== "attachment" &&
+          firstChildNodeType !== "mathBlock" &&
+          firstChildNodeType !== "horizontalRule" &&
+          firstChildNodeType !== "table";
+        if (isSimpleNode) {
           editor?.commands.focus("end");
           return;
         }
@@ -405,11 +426,15 @@ const Tiptap = ({
       const editor = editors[tab.id];
       const docSize = editor?.state.doc.content.size;
       if (!docSize) return;
-      const lastChild = editor?.state.doc.lastChild;
-      const isParagraph = lastChild?.type.name === "paragraph";
-      const isLastChildEmpty =
-        !lastChild?.textContent || lastChild?.textContent?.length === 0;
-      if (isParagraph && isLastChildEmpty) {
+      const lastChildNodeType = editor?.state.doc.lastChild?.type.name;
+      const isSimpleNode =
+        lastChildNodeType !== "image" &&
+        lastChildNodeType !== "embed" &&
+        lastChildNodeType !== "attachment" &&
+        lastChildNodeType !== "mathBlock" &&
+        lastChildNodeType !== "horizontalRule" &&
+        lastChildNodeType !== "table";
+      if (isSimpleNode) {
         editor?.commands.focus("end");
         return;
       }
@@ -544,16 +569,37 @@ const Tiptap = ({
         <div
           onScroll={controller.scroll}
           ref={containerRef}
+          id="editor-container-scroller"
           style={{
             overflowY: controller.loading ? "hidden" : "scroll",
             height: "100%",
-            display: "block",
-            position: "relative"
+            display: "flex",
+            flexDirection: "column",
+            position: "relative",
+            paddingTop: "12px"
           }}
         >
           {settings.noHeader || tab.session?.locked ? null : (
             <>
-              <Tags settings={settings} loading={controller.loading} />
+              <div
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  display: "flex",
+                  alignItems: "center",
+                  padding: "0px 16px",
+                  paddingBottom: "3px",
+                  boxSizing: "border-box",
+                  minHeight: "28px"
+                }}
+              >
+                <StatusBar
+                  container={containerRef}
+                  loading={controller.loading}
+                />
+                <Tags settings={settings} loading={controller.loading} />
+              </div>
+
               <Title
                 titlePlaceholder={controller.titlePlaceholder}
                 readonly={settings.readonly}
@@ -562,11 +608,6 @@ const Tiptap = ({
                 fontFamily={settings.fontFamily}
                 dateFormat={settings.dateFormat}
                 timeFormat={settings.timeFormat}
-                loading={controller.loading}
-              />
-
-              <StatusBar
-                container={containerRef}
                 loading={controller.loading}
               />
             </>
@@ -865,9 +906,10 @@ const Tiptap = ({
               }
             }}
             style={{
-              flexGrow: 1,
               width: "100%",
-              minHeight: 300
+              display: "flex",
+              flex: 1,
+              minHeight: 100
             }}
           />
         </div>
@@ -907,9 +949,10 @@ const TiptapProvider = (): JSX.Element => {
     editorContainer.classList.add("selectable", "main-editor", "searching");
     editorContainer.style.flex = "1";
     editorContainer.style.cursor = "text";
-    editorContainer.style.padding = "0px 12px";
+    editorContainer.style.padding = "0px 16px";
     editorContainer.style.color = colors.primary.paragraph;
     editorContainer.style.fontSize = `${settings.fontSize}px`;
+    editorContainer.style.lineHeight = `${settings.defaultLineHeight}`;
     editorContainer.style.fontFamily =
       getFontById(settings.fontFamily)?.font || "sans-serif";
     contentRef.current = editorContainer;
@@ -929,8 +972,9 @@ const TiptapProvider = (): JSX.Element => {
       contentRef.current.style.fontSize = `${settings.fontSize}px`;
       contentRef.current.style.fontFamily =
         getFontById(settings.fontFamily)?.font || "sans-serif";
+      contentRef.current.style.lineHeight = `${settings.defaultLineHeight}`;
     }
-  }, [settings.fontSize, settings.fontFamily]);
+  }, [settings.fontSize, settings.fontFamily, settings.defaultLineHeight]);
 
   return <Tiptap settings={settings} getContentDiv={getContentDiv} />;
 };

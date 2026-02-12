@@ -33,6 +33,7 @@ import {
   FileWebClip,
   Icon,
   Loading,
+  PasswordInvisible,
   References,
   Rename,
   Reupload,
@@ -40,7 +41,11 @@ import {
 } from "../icons";
 import { store, useStore } from "../../stores/attachment-store";
 import { db } from "../../common/db";
-import { saveAttachment } from "../../common/attachments";
+import {
+  downloadAttachment,
+  previewImageAttachment,
+  saveAttachment
+} from "../../common/attachments";
 import { reuploadAttachment } from "../editor/picker";
 import { Multiselect } from "../../common/multi-select";
 import { Menu } from "../../hooks/use-menu";
@@ -59,6 +64,8 @@ import { PromptDialog } from "../../dialogs/prompt";
 import { DialogManager } from "../../common/dialog-manager";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
 import { strings } from "@notesnook/intl";
+import { showToast } from "../../utils/toast";
+import { PdfPreviewDialog } from "../../dialogs/pdf-preview-dialog";
 
 const FILE_ICONS: Record<string, Icon> = {
   "image/": FileImage,
@@ -249,6 +256,34 @@ const AttachmentMenuItems: (
   status?: AttachmentProgressStatus
 ) => MenuItem[] = (attachment, status) => {
   return [
+    {
+      key: "preview-attachment",
+      type: "button",
+      title: strings.previewAttachment(),
+      icon: PasswordInvisible.path,
+      isHidden:
+        !attachment.mimeType.startsWith("image/") &&
+        attachment.mimeType !== PDFMimeType,
+      onClick: async () => {
+        if (attachment.mimeType.startsWith("image")) {
+          await previewImageAttachment(attachment);
+        } else if (attachment.mimeType === PDFMimeType) {
+          const blob = await downloadAttachment(
+            attachment.hash,
+            "blob",
+            attachment.id
+          );
+          if (!blob) {
+            return showToast("error", strings.attachmentPreviewFailed());
+          }
+
+          PdfPreviewDialog.show({
+            url: URL.createObjectURL(blob),
+            hash: attachment.hash
+          });
+        }
+      }
+    },
     {
       key: "notes",
       type: "button",

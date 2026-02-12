@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { hashNavigate } from ".";
 import { defineHashRoutes } from "./types";
-import { useEditorStore } from "../stores/editor-store";
 import {
   AddNotebookDialog,
   EditNotebookDialog
@@ -34,6 +33,7 @@ import {
 import { FeatureDialog } from "../dialogs/feature-dialog";
 import { CreateTagDialog } from "../dialogs/item-dialog";
 import { OnboardingDialog } from "../dialogs/onboarding-dialog";
+import { isSectionKey, SectionKeys } from "../dialogs/settings/types";
 
 const hashroutes = defineHashRoutes({
   "/": () => {},
@@ -59,22 +59,21 @@ const hashroutes = defineHashRoutes({
     BuyDialog.show({}).then(afterAction);
   },
   "/buy/:code": ({ code }: { code: string }) => {
-    BuyDialog.show({ couponCode: code, plan: "monthly" }).then(afterAction);
-  },
-  "/buy/:plan/:code": ({ plan, code }) => {
-    BuyDialog.show({
-      plan: plan === "monthly" ? "monthly" : "yearly",
-      couponCode: code
-    }).then(afterAction);
+    BuyDialog.show({ couponCode: code }).then(afterAction);
   },
   "/welcome": () => {
-    OnboardingDialog.show({ type: "new" })?.then(afterAction);
+    OnboardingDialog.show({})?.then(afterAction);
   },
   "/confirmed": () => {
     FeatureDialog.show({ featureName: "confirmed" }).then(afterAction);
   },
   "/settings": () => {
     SettingsDialog.show({}).then(afterAction);
+  },
+  "/settings/:section": ({ section }) => {
+    SettingsDialog.show(
+      isSectionKey(section) ? { activeSection: section as SectionKeys } : {}
+    ).then(afterAction);
   }
 });
 

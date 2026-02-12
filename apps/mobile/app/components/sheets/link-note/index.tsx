@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { useIsFeatureAvailable } from "@notesnook/common";
 import {
   ContentBlock,
   Note,
@@ -33,12 +34,12 @@ import { db } from "../../../common/database";
 import { useDBItem } from "../../../hooks/use-db-item";
 import { editorController } from "../../../screens/editor/tiptap/utils";
 import { presentSheet } from "../../../services/event-manager";
-import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
+import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
+import { DefaultAppStyles } from "../../../utils/styles";
 import { Button } from "../../ui/button";
 import Input from "../../ui/input";
 import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
-import { DefaultAppStyles } from "../../../utils/styles";
 
 const ListNoteItem = ({
   id,
@@ -117,8 +118,8 @@ const ListBlockItem = ({
           {item?.content.length > 200
             ? item?.content.slice(0, 200) + "..."
             : !item.content || item.content.trim() === ""
-            ? strings.linkNoteEmptyBlock()
-            : item.content}
+              ? strings.linkNoteEmptyBlock()
+              : item.content}
         </Paragraph>
 
         <View
@@ -146,13 +147,14 @@ export default function LinkNote(props: {
   onLinkCreated: () => void;
   close?: (ctx?: string) => void;
 }) {
+  const blockLinking = useIsFeatureAvailable("blockLinking");
   const { colors } = useThemeColors();
-  const query = useRef<string>();
+  const query = useRef<string>(undefined);
   const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
   const nodesRef = useRef<ContentBlock[]>([]);
   const [nodes, setNodes] = useState<ContentBlock[]>([]);
 
-  const inputRef = useRef<TextInput>();
+  const inputRef = useRef<TextInput>(null);
 
   const [selectedNote, setSelectedNote] = useState<Note>();
   const [selectedNodeId, setSelectedNodeId] = useState<string>();
@@ -327,7 +329,31 @@ export default function LinkNote(props: {
           keyboardShouldPersistTaps="handled"
           windowSize={3}
           keyExtractor={(item) => item.id}
-          data={nodes}
+          ListEmptyComponent={
+            <View
+              style={{
+                gap: DefaultAppStyles.GAP_VERTICAL,
+                backgroundColor: colors.secondary.background,
+                padding: DefaultAppStyles.GAP,
+                borderRadius: defaultBorderRadius,
+                borderWidth: 0.5,
+                borderColor: colors.secondary.border,
+                alignItems: "center"
+              }}
+            >
+              <Paragraph color={colors.secondary.paragraph}>
+                {blockLinking?.error}
+              </Paragraph>
+              <Button
+                title={strings.upgradePlan()}
+                style={{
+                  width: "100%"
+                }}
+                type="accent"
+              />
+            </View>
+          }
+          data={blockLinking?.isAllowed ? nodes : []}
         />
       ) : (
         <FlatList

@@ -6,10 +6,16 @@ on:
     branches:
       - "master"
     paths:
-      - "app/desktop/**"
+      - "apps/desktop/**"
       # re-run workflow if workflow file changes
       - ".github/workflows/desktop.tests.yml"
   pull_request:
+    branches:
+      - "master"
+    paths:
+      - "apps/desktop/**"
+      # re-run workflow if workflow file changes
+      - ".github/workflows/desktop.tests.yml"
 
 jobs:
   build:
@@ -27,12 +33,8 @@ jobs:
           npm ci --ignore-scripts --prefer-offline --no-audit
           npm run bootstrap -- --scope=web
 
-      - name: Setup environment
-        run: |
-          echo "NX_CLOUD_ACCESS_TOKEN=${{ secrets.NX_CLOUD_ACCESS_TOKEN }}" >> $GITHUB_ENV
-
       - name: Generate desktop build
-        run: npx nx build:desktop @notesnook/web
+        run: npm run tx @notesnook/web:build:desktop
 
       - name: Archive build artifact
         uses: actions/upload-artifact@v4
@@ -43,7 +45,7 @@ jobs:
   test-macos-x64:
     name: Test macOS x64
     needs: build
-    runs-on: macos-13
+    runs-on: macos-15-intel
 
     steps:
       - name: Check out Git repository
@@ -64,8 +66,7 @@ jobs:
           npm run bootstrap -- --scope=desktop
 
       - name: Build Electron wrapper
-        run: npx nx run release --project @notesnook/desktop
-        working-directory: ./apps/desktop
+        run: npm run tx @notesnook/desktop:release
 
       - name: Build app
         run: |
@@ -108,8 +109,7 @@ jobs:
           npm run bootstrap -- --scope=desktop
 
       - name: Build Electron wrapper
-        run: npx nx run release --project @notesnook/desktop
-        working-directory: ./apps/desktop
+        run: npm run tx @notesnook/desktop:release
 
       - name: Build app
         run: |
@@ -158,8 +158,7 @@ jobs:
         working-directory: ./apps/desktop
 
       - name: Build Electron wrapper
-        run: npx nx run release --project @notesnook/desktop
-        working-directory: ./apps/desktop
+        run: npm run tx @notesnook/desktop:release
 
       - name: Build app
         run: |
@@ -205,11 +204,13 @@ jobs:
         run: |
           npm i --cpu arm64 sqlite-better-trigram
           npm i --cpu x64 sqlite-better-trigram
+
+          npm i --cpu arm64 sqlite3-fts5-html
+          npm i --cpu x64 sqlite3-fts5-html
         working-directory: ./apps/desktop
 
       - name: Build Electron wrapper
-        run: npx nx run release --project @notesnook/desktop
-        working-directory: ./apps/desktop
+        run: node scripts/execute.mjs @notesnook/desktop:release
 
       - name: Build app
         run: |

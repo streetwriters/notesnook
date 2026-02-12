@@ -25,6 +25,7 @@ import {
   isFeatureSupported
 } from "./utils/feature-check";
 import { initializeLogger } from "./utils/logger";
+import { shouldShowWrapped } from "./utils/should-show-wrapped";
 
 type Route<TProps = null> = {
   component: () => Promise<{
@@ -52,8 +53,17 @@ export type Routes = keyof typeof routes;
 // | "default";
 
 const routes = {
+  "/plans": {
+    component: () => import("./views/plans")
+  },
+  "/wrapped": {
+    component: () => import("./views/wrapped")
+  },
   "/checkout": {
-    component: () => import("./views/checkout"),
+    component: () => import("./views/checkout")
+  },
+  "/payments": {
+    component: () => import("./views/payments"),
     props: {}
   },
   "/account/recovery": {
@@ -96,6 +106,7 @@ const routes = {
 } as const;
 
 const sessionExpiryExceptions: Routes[] = [
+  "/payments",
   "/recover",
   "/account/recovery",
   "/sessionexpired",
@@ -114,6 +125,12 @@ function getRoute(): RouteWithPath<AuthProps> | RouteWithPath {
   const route = (
     routes[path] ? { route: routes[path], path } : null
   ) as RouteWithPath<AuthProps> | null;
+
+  if (route?.path === "/wrapped" && !shouldShowWrapped())
+    return {
+      route: routes.default,
+      path: "default"
+    };
 
   return signup || sessionExpired || route || fallback;
 }

@@ -17,11 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 /* eslint-disable no-inner-declarations */
+import { isFeatureAvailable, useAreFeaturesAvailable } from "@notesnook/common";
 import {
+  Color,
   createInternalLink,
   Item,
   ItemReference,
   Note,
+  Notebook,
   VAULT_ERRORS
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
@@ -29,7 +32,7 @@ import { useThemeColors } from "@notesnook/theme";
 import { DisplayedNotification } from "@notifee/react-native";
 import Clipboard from "@react-native-clipboard/clipboard";
 import React, { useEffect, useRef, useState } from "react";
-import { InteractionManager, Platform } from "react-native";
+import { InteractionManager, Platform, View } from "react-native";
 import Share from "react-native-share";
 import { DatabaseLogger, db } from "../common/database";
 import { AttachmentDialog } from "../components/attachments";
@@ -38,12 +41,13 @@ import { presentDialog } from "../components/dialog/functions";
 import NoteHistory from "../components/note-history";
 import { AddNotebookSheet } from "../components/sheets/add-notebook";
 import ExportNotesSheet from "../components/sheets/export-notes";
+import PaywallSheet from "../components/sheets/paywall";
 import PublishNoteSheet from "../components/sheets/publish-note";
 import { ReferencesList } from "../components/sheets/references";
 import { RelationsList } from "../components/sheets/relations-list/index";
-import ReminderSheet from "../components/sheets/reminder";
 import { useSideBarDraggingStore } from "../components/side-menu/dragging-store";
 import { ButtonProps } from "../components/ui/button";
+import AddReminder from "../screens/add-reminder";
 import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
 import {
   eSendEvent,
@@ -54,19 +58,22 @@ import {
 } from "../services/event-manager";
 import Navigation from "../services/navigation";
 import Notifications from "../services/notifications";
+import SettingsService from "../services/settings";
+import { useArchivedStore } from "../stores/use-archived-store";
 import { useMenuStore } from "../stores/use-menu-store";
 import useNavigationStore from "../stores/use-navigation-store";
 import { useRelationStore } from "../stores/use-relation-store";
 import { useSelectionStore } from "../stores/use-selection-store";
+import { useSettingStore } from "../stores/use-setting-store";
 import { useTagStore } from "../stores/use-tag-store";
 import { useUserStore } from "../stores/use-user-store";
-import { eUpdateNoteInEditor } from "../utils/events";
+import { eCloseSheet, eUpdateNoteInEditor } from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { convertNoteToText } from "../utils/note-to-text";
 import { sleep } from "../utils/time";
-import SettingsService from "../services/settings";
-import { useSettingStore } from "../stores/use-setting-store";
-import { useArchivedStore } from "../stores/use-archived-store";
+import { NotesnookModule } from "../utils/notesnook-module";
+
+import DatePickerComponent from "../components/date-picker";
 
 export type ActionId =
   | "select"
@@ -111,7 +118,9 @@ export type ActionId =
   | "remove-from-notebook"
   | "trash"
   | "default-homepage"
-  | "default-tag";
+  | "default-tag"
+  | "launcher-shortcut"
+  | "expiry-date";
 
 export type Action = {
   id: ActionId;
@@ -124,6 +133,32 @@ export type Action = {
   hidden?: boolean;
   activeColor?: string;
   type?: ButtonProps["type"];
+  locked?: boolean;
+};
+
+export const Default_Drag_Action: Action = {
+  id: "reorder",
+  title: strings.reorder(),
+  icon: "sort-ascending",
+  onPress: async () => {
+    const feature = await isFeatureAvailable("customizableSidebar");
+    if (feature && !feature.isAllowed) {
+      ToastManager.show({
+        message: feature.error,
+        type: "info",
+        context: "local",
+        actionText: strings.upgrade(),
+        func: () => {
+          PaywallSheet.present(feature);
+        }
+      });
+      return;
+    }
+    useSideBarDraggingStore.setState({
+      dragging: true
+    });
+    eSendEvent(eCloseSheet);
+  }
 };
 
 function isNotePinnedInNotifications(item: Item) {
@@ -147,13 +182,24 @@ export const useActions = ({
   close: () => void;
   customActionHandlers?: Record<ActionId, () => void>;
 }) => {
+  const features = useAreFeaturesAvailable([
+    "defaultNotebookAndTag",
+    "activeReminders",
+    "pinNoteInNotification",
+    "shortcuts",
+    "notebooks",
+    "customizableSidebar",
+    "customHomepage",
+    "androidLauncherShortcuts",
+    "expiringNotes"
+  ]);
   const [item, setItem] = useState(propItem);
-  const { colors } = useThemeColors();
+  const { colors, isDark } = useThemeColors();
   const setMenuPins = useMenuStore((state) => state.setMenuPins);
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(
     db.shortcuts.exists(item.id)
   );
-  const processingId = useRef<"shareNote" | "copyContent">();
+  const processingId = useRef<"shareNote" | "copyContent">(undefined);
   const user = useUserStore((state) => state.user);
   const [notifPinned, setNotifPinned] = useState<DisplayedNotification>();
   const [defaultNotebook, setDefaultNotebook] = useState(
@@ -214,7 +260,7 @@ export const useActions = ({
 
   async function restoreTrashItem() {
     close();
-    if ((await db.trash.restore(item.id)) === false) return;
+    await db.trash.restore(item.id);
     Navigation.queueRoutesForUpdate();
     const type = item.type === "trash" ? item.itemType : item.type;
     ToastManager.show({
@@ -246,6 +292,18 @@ export const useActions = ({
       if (isPinnedToMenu) {
         await db.shortcuts.remove(item.id);
       } else {
+        if (features && !features?.shortcuts.isAllowed) {
+          ToastManager.show({
+            message: features?.shortcuts.error,
+            type: "info",
+            context: "local",
+            actionText: strings.upgrade(),
+            func: () => {
+              PaywallSheet.present(features?.shortcuts);
+            }
+          });
+          return;
+        }
         await db.shortcuts.add({
           itemId: item.id,
           itemType: item.type
@@ -272,7 +330,6 @@ export const useActions = ({
             id: item.id,
             title: value
           });
-
           eSendEvent(Navigation.routeNames.TaggedNotes);
           InteractionManager.runAfterInteractions(() => {
             useTagStore.getState().refresh();
@@ -410,18 +467,6 @@ export const useActions = ({
       icon: "square-edit-outline",
       onPress: renameColor
     });
-
-    actions.push({
-      id: "reorder",
-      title: strings.reorder(),
-      icon: "sort-ascending",
-      onPress: () => {
-        useSideBarDraggingStore.setState({
-          dragging: true
-        });
-        close();
-      }
-    });
   }
 
   if (item.type === "reminder") {
@@ -448,7 +493,8 @@ export const useActions = ({
         title: strings.editReminder(),
         icon: "pencil",
         onPress: async () => {
-          ReminderSheet.present(item);
+          AddReminder.present(item);
+          close();
         }
       }
     );
@@ -497,12 +543,26 @@ export const useActions = ({
             await db.settings.setDefaultTag(undefined);
             setDefaultTag(undefined);
           } else {
+            if (features && !features.defaultNotebookAndTag.isAllowed) {
+              ToastManager.show({
+                message: features.defaultNotebookAndTag.error,
+                type: "info",
+                context: "local",
+                actionText: strings.upgrade(),
+                func: () => {
+                  PaywallSheet.present(features.defaultNotebookAndTag);
+                }
+              });
+              return;
+            }
+
             await db.settings.setDefaultTag(item.id);
             setDefaultTag(item.id);
           }
           close();
         },
-        checked: defaultTag === item.id
+        checked: defaultTag === item.id,
+        locked: !features?.defaultNotebookAndTag.isAllowed
       }
     );
   }
@@ -514,14 +574,32 @@ export const useActions = ({
         title: strings.addNotebook(),
         icon: "plus",
         onPress: async () => {
+          if (features && !features.notebooks.isAllowed) {
+            ToastManager.show({
+              message: features.notebooks.error,
+              type: "info",
+              context: "local",
+              actionText: strings.upgrade(),
+              func: () => {
+                ToastManager.hide();
+                PaywallSheet.present(features.notebooks);
+              }
+            });
+            return;
+          }
+          close();
+          await sleep(300);
           AddNotebookSheet.present(undefined, item);
-        }
+        },
+        locked: !features?.notebooks.isAllowed
       },
       {
         id: "edit-notebook",
         title: strings.editNotebook(),
         icon: "square-edit-outline",
         onPress: async () => {
+          close();
+          await sleep(300);
           AddNotebookSheet.present(item);
         }
       },
@@ -538,6 +616,19 @@ export const useActions = ({
             await db.settings.setDefaultNotebook(undefined);
             setDefaultNotebook(undefined);
           } else {
+            if (features && !features.defaultNotebookAndTag.isAllowed) {
+              ToastManager.show({
+                message: features.defaultNotebookAndTag.error,
+                type: "info",
+                context: "local",
+                actionText: strings.upgrade(),
+                func: () => {
+                  PaywallSheet.present(features.defaultNotebookAndTag);
+                }
+              });
+              return;
+            }
+
             const notebook = {
               id: item.id
             };
@@ -546,7 +637,9 @@ export const useActions = ({
           }
           close();
         },
-        checked: defaultNotebook === item.id
+        checked: defaultNotebook === item.id,
+
+        locked: !features?.defaultNotebookAndTag.isAllowed
       },
       {
         id: "move-notes",
@@ -597,7 +690,20 @@ export const useActions = ({
       icon: "home-outline",
       isToggle: true,
       checked: isHomepage,
-      onPress: () => {
+      onPress: async () => {
+        if (features && !features?.customHomepage.isAllowed) {
+          ToastManager.show({
+            message: features?.customHomepage.error,
+            type: "info",
+            context: "local",
+            actionText: strings.upgrade(),
+            func: () => {
+              PaywallSheet.present(features?.customHomepage);
+            }
+          });
+          return;
+        }
+
         SettingsService.setProperty(
           "homepageV2",
           isHomepage
@@ -679,6 +785,19 @@ export const useActions = ({
     }
 
     async function pinToNotifications() {
+      if (features && !features?.pinNoteInNotification.isAllowed) {
+        ToastManager.show({
+          message: features?.pinNoteInNotification.error,
+          type: "info",
+          actionText: strings.upgrade(),
+          context: "local",
+          func: () => {
+            PaywallSheet.present(features?.pinNoteInNotification);
+          }
+        });
+        return;
+      }
+
       if (notifPinned) {
         await Notifications.remove(item.id);
         await sleep(500);
@@ -833,7 +952,7 @@ export const useActions = ({
             copyNote: true,
             novault: true,
             locked: true,
-            item: item,
+            item: item as Note,
             title: strings.copyNote()
           });
         } else {
@@ -908,15 +1027,43 @@ export const useActions = ({
             referenceType: "reminder",
             relationType: "from",
             title: strings.dataTypesPluralCamelCase.reminder(),
-            onAdd: () => ReminderSheet.present(undefined, item, true),
+            onAdd: async () => {
+              if (features && !features.activeReminders.isAllowed) {
+                ToastManager.show({
+                  type: "info",
+                  message: features.activeReminders.error,
+                  actionText: strings.upgrade(),
+                  func: () => {
+                    PaywallSheet.present(features.activeReminders);
+                  }
+                });
+              }
+              AddReminder.present(undefined, item);
+              close();
+            },
             button: {
-              title: strings.add(),
-              type: "accent",
-              onPress: () => ReminderSheet.present(undefined, item, true),
-              icon: "plus"
+              type: "plain",
+              onPress: async () => {
+                if (features && !features.activeReminders.isAllowed) {
+                  ToastManager.show({
+                    type: "info",
+                    message: features.activeReminders.error,
+                    actionText: strings.upgrade(),
+                    func: () => {
+                      PaywallSheet.present(features.activeReminders);
+                    }
+                  });
+                  return;
+                }
+                AddReminder.present(undefined, item);
+                close();
+              },
+              icon: "plus",
+              iconSize: 20
             }
           });
-        }
+        },
+        locked: !features?.activeReminders.isAllowed
       },
 
       {
@@ -957,7 +1104,8 @@ export const useActions = ({
         title: strings.remindMe(),
         icon: "clock-plus-outline",
         onPress: () => {
-          ReminderSheet.present(undefined, item);
+          close();
+          AddReminder.present(undefined, item);
         }
       },
       {
@@ -1016,6 +1164,45 @@ export const useActions = ({
         },
         checked: item.archived,
         isToggle: true
+      },
+      {
+        id: "expiry-date",
+        title: item.expiryDate ? strings.unsetExpiry() : strings.setExpiry(),
+        icon: item.expiryDate ? "bomb-off" : "bomb",
+        locked: !features?.expiringNotes?.isAllowed,
+        onPress: async () => {
+          if (item.expiryDate) {
+            await db.notes.setExpiryDate(null, item.id);
+            setItem((await db.notes.note(item.id)) as Item);
+          } else {
+            if (features && !features?.expiringNotes.isAllowed) {
+              ToastManager.show({
+                message: features?.expiringNotes.error,
+                type: "info",
+                actionText: strings.upgrade(),
+                context: "local",
+                func: () => {
+                  PaywallSheet.present(features?.expiringNotes);
+                }
+              });
+              return;
+            }
+
+            presentDialog({
+              context: "properties",
+              component: (close) => (
+                <DatePickerComponent
+                  onCancel={() => close?.()}
+                  onConfirm={async (date) => {
+                    close?.();
+                    await db.notes.setExpiryDate(date.getTime(), item.id);
+                    setItem((await db.notes.note(item.id)) as Item);
+                  }}
+                />
+              )
+            });
+          }
+        }
       }
     );
 
@@ -1027,7 +1214,8 @@ export const useActions = ({
           : strings.pinToNotifications(),
         icon: "message-badge-outline",
         checked: !!notifPinned,
-        onPress: pinToNotifications
+        onPress: pinToNotifications,
+        locked: !features?.pinNoteInNotification.isAllowed
       });
     }
   }
@@ -1042,6 +1230,45 @@ export const useActions = ({
       icon: "delete-outline",
       type: "error",
       onPress: deleteItem
+    });
+  }
+
+  if (
+    Platform.OS === "android" &&
+    (item.type === "tag" ||
+      item.type === "note" ||
+      item.type === "notebook" ||
+      item.type === "color")
+  ) {
+    actions.push({
+      id: "launcher-shortcut",
+      title: strings.addToHome(),
+      icon: "cellphone-arrow-down",
+      locked: !features?.androidLauncherShortcuts.isAllowed,
+      onPress: async () => {
+        if (features && !features?.androidLauncherShortcuts.isAllowed) {
+          ToastManager.show({
+            message: features?.androidLauncherShortcuts.error,
+            type: "info",
+            actionText: strings.upgrade(),
+            context: "local",
+            func: () => {
+              PaywallSheet.present(features?.androidLauncherShortcuts);
+            }
+          });
+          return;
+        }
+
+        try {
+          await NotesnookModule.addShortcut(
+            item.id,
+            item.type,
+            item.title,
+            (item as Note).headline || (item as Notebook).description || "",
+            (item as Color).colorCode
+          );
+        } catch (e) {}
+      }
     });
   }
 

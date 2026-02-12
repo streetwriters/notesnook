@@ -20,50 +20,43 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import http from "../utils/http.js";
 import Constants from "../utils/constants.js";
 import Database from "./index.js";
-import { Note, isDeleted } from "../types.js";
+import { Monograph, Note, isDeleted } from "../types.js";
 import { Cipher } from "@notesnook/crypto";
 import { isFalse } from "../database/index.js";
-import { logger } from "../logger.js";
 
-type BaseMonograph = {
-  id: string;
-  title: string;
-  userId: string;
-  selfDestruct: boolean;
-};
-type UnencryptedMonograph = BaseMonograph & {
+type MonographApiRequestBase = Omit<
+  Monograph,
+  "type" | "dateModified" | "dateCreated" | "datePublished"
+>;
+type UnencryptedMonograph = MonographApiRequestBase & {
   content: string;
 };
-type EncryptedMonograph = BaseMonograph & {
+type EncryptedMonograph = MonographApiRequestBase & {
   encryptedContent: Cipher<"base64">;
 };
-type Monograph = UnencryptedMonograph | EncryptedMonograph;
+type MonographApiRequest = (UnencryptedMonograph | EncryptedMonograph) & {
+  userId: string;
+};
+export type MonographAnalytics = {
+  totalViews: number;
+};
 
-export type PublishOptions = { password?: string; selfDestruct?: boolean };
+export type PublishOptions = {
+  password?: string;
+  selfDestruct?: boolean;
+};
 export class Monographs {
   monographs: string[] = [];
   constructor(private readonly db: Database) {}
 
   async clear() {
     this.monographs = [];
-    await this.db.kv().write("monographs", this.monographs);
+    await this.db.monographsCollection.collection.clear();
   }
 
   async refresh() {
-    try {
-      const user = await this.db.user.getUser();
-      const token = await this.db.tokenManager.getAccessToken();
-      if (!user || !token || !user.isEmailConfirmed) return;
-
-      const monographs = await http.get(
-        `${Constants.API_HOST}/monographs`,
-        token
-      );
-      await this.db.kv().write("monographs", monographs);
-      if (monographs) this.monographs = monographs;
-    } catch (e) {
-      logger.error(e, "Error while refreshing monographs.");
-    }
+    const ids = await this.db.monographsCollection.all.ids();
+    this.monographs = ids;
   }
 
   /**
@@ -83,7 +76,9 @@ export class Monographs {
   /**
    * Publish a note as a monograph
    */
-  async publish(noteId: string, opts: PublishOptions = {}) {
+  async publish(noteId: string, title: string, opts: PublishOptions = {}) {
+    if (title === "") throw new Error("Title cannot be empty.");
+
     if (!this.monographs.length) await this.refresh();
 
     const update = !!this.isPublished(noteId);
@@ -109,13 +104,19 @@ export class Monographs {
       false
     );
 
-    const monograph: Monograph = {
+    const monographPasswordsKey = await this.db.user.getMonographPasswordsKey();
+    const monograph: MonographApiRequest = {
       id: noteId,
-      title: note.title,
+      title,
       userId: user.id,
       selfDestruct: opts.selfDestruct || false,
       ...(opts.password
         ? {
+            password: monographPasswordsKey
+              ? await this.db
+                  .storage()
+                  .encrypt(monographPasswordsKey, opts.password)
+              : undefined,
             encryptedContent: await this.db
               .storage()
               .encrypt(
@@ -124,6 +125,7 @@ export class Monographs {
               )
           }
         : {
+            password: undefined,
             content: JSON.stringify({
               type: content.type,
               data: content.data
@@ -132,14 +134,21 @@ export class Monographs {
     };
 
     const method = update ? http.patch.json : http.post.json;
-
-    const { id } = await method(
-      `${Constants.API_HOST}/monographs`,
+    const deviceId = await this.db.kv().read("deviceId");
+    const { id, datePublished } = await method(
+      `${Constants.API_HOST}/monographs?deviceId=${deviceId}`,
       monograph,
       token
     );
 
     this.monographs.push(id);
+    await this.db.monographsCollection.add({
+      id,
+      title: monograph.title,
+      selfDestruct: monograph.selfDestruct,
+      datePublished: datePublished,
+      password: monograph.password
+    });
     return id;
   }
 
@@ -156,9 +165,14 @@ export class Monographs {
     if (!this.isPublished(noteId))
       throw new Error("This note is not published.");
 
-    await http.delete(`${Constants.API_HOST}/monographs/${noteId}`, token);
+    const deviceId = await this.db.kv().read("deviceId");
+    await http.delete(
+      `${Constants.API_HOST}/monographs/${noteId}?deviceId=${deviceId}`,
+      token
+    );
 
     this.monographs.splice(this.monographs.indexOf(noteId), 1);
+    await this.db.monographsCollection.collection.softDelete([noteId]);
   }
 
   get all() {
@@ -173,6 +187,25 @@ export class Monographs {
   }
 
   get(monographId: string) {
-    return http.get(`${Constants.API_HOST}/monographs/${monographId}`);
+    return this.db.monographsCollection.collection.get(monographId);
+  }
+
+  async decryptPassword(password: Cipher<"base64">) {
+    const monographPasswordsKey = await this.db.user.getMonographPasswordsKey();
+    if (!monographPasswordsKey) return "";
+    return this.db.storage().decrypt(monographPasswordsKey, password);
+  }
+
+  async analytics(monographId: string): Promise<MonographAnalytics> {
+    try {
+      const token = await this.db.tokenManager.getAccessToken();
+      const analytics = (await http.get(
+        `${Constants.API_HOST}/monographs/${monographId}/analytics`,
+        token
+      )) as MonographAnalytics;
+      return analytics;
+    } catch {
+      return { totalViews: 0 };
+    }
   }
 }

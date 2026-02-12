@@ -27,10 +27,6 @@
   pointer-events: none;
 }
 
-.ProseMirror p code {
-  background-color: var(--background-secondary);
-}
-
 .ProseMirror:first-child {
   margin-top: 10px;
 }
@@ -42,7 +38,7 @@
   margin-block: 0px;
   cursor: pointer;
   position: relative;
-  background-color: var(--border);
+  background-color: var(--separator);
   width: 100%;
   height: 5px;
   margin-top: 4px;
@@ -54,13 +50,14 @@
 }
 
 .ProseMirror p code {
-  background-color: var(--background);
+  background-color: var(--background-secondary);
   border: 1px solid var(--border);
+  color: var(--paragraph-secondary);
   border-radius: 5px;
-  padding: 3px 5px 0px 5px;
+  padding: 2px 5px 2px 5px;
   font-family: ui-monospace, SFMono-Regular, SF Mono, Consolas, Liberation Mono,
     Menlo, monospace !important;
-  font-size: 10pt !important;
+  font-size: 85%;
 }
 
 .ProseMirror code > span {
@@ -74,6 +71,14 @@
 
 .ProseMirror li {
   margin-bottom: 5px;
+}
+
+.ProseMirror li:last-of-type {
+  margin-bottom: 0px;
+}
+
+.ProseMirror li:first-of-type {
+  margin-top: 5px;
 }
 
 .ProseMirror ul.tasklist-content-wrapper {
@@ -220,7 +225,7 @@ img.ProseMirror-separator {
 .ProseMirror table {
   border-collapse: collapse;
   margin: 0;
-  overflow: hidden;
+  overflow-y: hidden;
   table-layout: fixed;
 }
 
@@ -229,13 +234,9 @@ img.ProseMirror-separator {
   border: 1px solid var(--border);
   box-sizing: border-box;
   min-width: 1em;
-  padding: 3px 5px;
+  padding: 7px 9px;
   position: relative;
   vertical-align: top;
-}
-
-.ProseMirror table .selectedCell {
-  border-color: var(--accent);
 }
 
 .ProseMirror table td > *,
@@ -244,13 +245,15 @@ img.ProseMirror-separator {
 }
 
 .ProseMirror table th {
+  background-color: var(--background-secondary);
   font-weight: bold;
   text-align: left;
 }
 
 .ProseMirror table .selectedCell:after {
-  background: var(--accent);
   content: "";
+  background: var(--shade);
+  box-shadow: inset 0px 0px 0px 1px var(--accent);
   left: 0;
   right: 0;
   top: 0;
@@ -258,32 +261,87 @@ img.ProseMirror-separator {
   pointer-events: none;
   position: absolute;
   z-index: 2;
-  opacity: 0.2;
 }
 
 .ProseMirror table .column-resize-handle {
-  background-color: var(--accent);
+  background-color: transparent;
   bottom: -2px;
   position: absolute;
-  right: 0px;
-  pointer-events: none;
+  right: -5px;
   top: 0;
-  width: 5px;
+  width: 10px;
+  
+  cursor: ew-resize;
+  cursor: col-resize;
+  z-index: 999;
+}
+
+.ProseMirror table .column-resize-handle.active::before {
+  position: absolute;
+  content: "";
+  top: calc(50% - 11px);
+  left: -4px;
+
+  width: 16px;
+  height: 18px;
+
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  
+  cursor: ew-resize;
+  cursor: col-resize;
+}
+
+.ProseMirror table .column-resize-handle.active::after {
+  position: absolute;
+  content: "";
+  top: calc(50% - 10px);
+  left: -4px;
+
+  background-size: 16px;
+  background-color: var(--icon);
+  width: 18px;
+  height: 18px;
+  mask: url(https://api.iconify.design/ic:round-drag-indicator.svg) no-repeat 50% 50%;
+  mask-size: cover;
+
+  cursor: ew-resize;
+  cursor: col-resize;
 }
 
 .ProseMirror table p {
   margin: 0;
 }
 
-.tableWrapper {
-  /* padding: 1rem 0; */
-  overflow-x: auto;
+.ProseMirror td > h1:first-child,
+.ProseMirror td > h2:first-child,
+.ProseMirror td > h3:first-child,
+.ProseMirror td > h4:first-child,
+.ProseMirror td > h5:first-child,
+.ProseMirror td > h6:first-child {
+  margin-top: 0;
 }
 
-.resize-cursor {
-  cursor: ew-resize;
-  cursor: col-resize;
+.ProseMirror td > ol,
+.ProseMirror td > ul {
+  padding-left: 20px;
+  margin-top: 0;
 }
+
+.ProseMirror td > blockquote {
+  margin-left: 0;
+  margin-top: 0;
+}
+
+.ProseMirror td > blockquote > :first-child  {
+  margin-top: 0;
+}
+
+/* 
+.resize-cursor {
+
+} */
 
 .drop-cursor {
   background-color: var(--paragraph, var(--nn_primary_paragraph)) !important;
@@ -540,13 +598,13 @@ p > *::selection {
 .outline-list li.collapsed .outline-list {
   display: none;
 }
-.outline-list li > :first-child {
+.outline-list li {
   position: relative;
 }
 
-.outline-list > li > :first-child::before {
+.outline-list > li::before {
   position: absolute;
-  top: 0px;
+  top: calc((1lh - 18px) / 2);
   cursor: pointer;
   content: "";
   background-size: 18px;
@@ -564,13 +622,13 @@ p > *::selection {
   left: -22px;
 }
 
-.outline-list li:not(.nested) > :first-child::before {
+.outline-list li:not(.nested)::before {
   mask: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9IiM4ODg4ODgiIGQ9Ik0xMiAyQTEwIDEwIDAgMCAwIDIgMTJhMTAgMTAgMCAwIDAgMTAgMTBhMTAgMTAgMCAwIDAgMTAtMTBBMTAgMTAgMCAwIDAgMTIgMloiLz48L3N2Zz4=)
     no-repeat 50% 50%;
   scale: 0.4;
 }
 
-.outline-list li.collapsed > :first-child::before {
+.outline-list li.collapsed::before {
   transform: rotate(-90deg);
 }
 
@@ -642,41 +700,71 @@ p > *::selection {
   transform: rotate(90deg);
 }
 
+.simple-checklist[dir="rtl"] li::after {
+  left: unset;
+  right: -24px;
+}
+
+.simple-checklist[dir="rtl"] li.checked::before {
+  left: unset;
+  right: -22px;
+}
+
 [dir="rtl"] .taskItemTools { right: unset; left: 0 }
 
 /* Check list */
 .ProseMirror ul.simple-checklist {
   list-style: none;
-  padding: 0;
+  padding-inline: 0px !important;
+  padding-inline-start: 24px !important;
 }
 
-.ProseMirror ul.simple-checklist > li {
-  display: flex;
+.ProseMirror li.nested > ul.simple-checklist {
+  padding-inline-start: 15px !important;
 }
 
-.ProseMirror ul.simple-checklist > li input {
-  flex: 0 0 auto;
-  margin-right: 0.5rem;
-  user-select: none;
-  height: 1rem;
-  width: 1rem;
-  accent-color: var(--accent);
+.simple-checklist li {
+  position: relative;
 }
 
-.ProseMirror ul.simple-checklist > li > div {
-  flex: 1 1 auto;
+.simple-checklist > li::after {
+  position: absolute;
+  top: calc((1lh - 18px) / 2);
+  cursor: pointer;
+  content: "";
+  background-size: 18px;
+  width: 14px;
+  height: 14px;
+
+  border: 2px solid var(--icon);
+  border-radius: 5px;
+  left: -24px;
 }
 
-@media screen and (max-width: 480px) {
-  .ProseMirror ul.simple-checklist > li  > input {
-    height: 21px;
-    width: 21px;
-  }
-
-  .ProseMirror ul.simple-checklist > li > div {
-    margin-top: 2px;
-  }
+.simple-checklist > li.checked::after {
+  border: 2px solid var(--accent);
 }
+
+.simple-checklist > li.checked::before {
+  position: absolute;
+  top: calc((1lh - 14px) / 2);
+  cursor: pointer;
+  content: "";
+  background-size: 18px;
+  width: 14px;
+  height: 14px;
+  left: -22px;
+
+  background-color: var(--accent);
+  mask: url(data:image/svg+xml;base64,ICA8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDI0IDI0Ij4KICAgIDxwYXRoIGQ9Ik0yMSw3TDksMTlMMy41LDEzLjVMNC45MSwxMi4wOUw5LDE2LjE3TDE5LjU5LDUuNTlMMjEsN1oiLz4KICA8L3N2Zz4K)
+    no-repeat 50% 50%;
+  mask-size: cover;
+}
+
+.simple-checklist > li.checked > :not(.simple-checklist) {
+  opacity: 0.8;
+}
+
 
 /* Callout */
 .ProseMirror div.callout {
@@ -702,7 +790,7 @@ p > *::selection {
 
 .ProseMirror div.callout > :first-child::after {
   position: absolute;
-  top: 0px;
+  top: calc((1lh - 18px) / 2);
   right: 0px;
   cursor: pointer;
   content: "";
@@ -718,6 +806,7 @@ p > *::selection {
 
   transform: rotate(0);
   transition: transform 250ms ease;
+  opacity: 1;
 }
 
 .ProseMirror div.callout > :first-child[dir="rtl"]::after {
@@ -802,4 +891,135 @@ del.diffdel {
 
 del.diffdel {
   text-decoration: none;
+}
+
+.ProseMirror h1::after,
+.ProseMirror h2::after,
+.ProseMirror h3::after,
+.ProseMirror h4::after,
+.ProseMirror h5::after,
+.ProseMirror h6::after {
+  display: inline-block;
+  cursor: pointer;
+  content: "";
+  background-size: var(--icon-size, 18px);
+  width: var(--icon-size, 18px);
+  height: var(--icon-size, 18px);
+
+  background-color: var(--icon);
+  mask: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9IiM4ODg4ODgiIGQ9Ik03LjQxIDguNThMMTIgMTMuMTdsNC41OS00LjU5TDE4IDEwbC02IDZsLTYtNmwxLjQxLTEuNDJaIi8+PC9zdmc+)
+    no-repeat 50% 50%;
+  mask-size: cover;
+
+  transform: rotate(0);
+  transition: transform 250ms ease, opacity 200ms ease;
+  opacity: 0;
+  vertical-align: middle;
+}
+
+.ProseMirror h2::after {
+  --icon-size: 16px;
+}
+
+.ProseMirror h3::after {
+  --icon-size: 14px;
+}
+
+.ProseMirror h4::after {
+  --icon-size: 14px;
+}
+
+.ProseMirror h5::after {
+  --icon-size: 14px;
+}
+
+.ProseMirror h6::after {
+  --icon-size: 11px;
+}
+
+.ProseMirror h1[data-collapsed="true"]::after,
+.ProseMirror h2[data-collapsed="true"]::after,
+.ProseMirror h3[data-collapsed="true"]::after,
+.ProseMirror h4[data-collapsed="true"]::after,
+.ProseMirror h5[data-collapsed="true"]::after,
+.ProseMirror h6[data-collapsed="true"]::after {
+  transform: rotate(-90deg);
+  opacity: 1;
+}
+
+.ProseMirror h1:hover::after,
+.ProseMirror h2:hover::after,
+.ProseMirror h3:hover::after,
+.ProseMirror h4:hover::after,
+.ProseMirror h5:hover::after,
+.ProseMirror h6:hover::after {
+  opacity: 1;
+}
+
+.ProseMirror h1.empty::after,
+.ProseMirror h2.empty::after,
+.ProseMirror h3.empty::after,
+.ProseMirror h4.empty::after,
+.ProseMirror h5.empty::after,
+.ProseMirror h6.empty::after {
+  display: none !important;
+}
+
+.ProseMirror div.callout > :is(h1, h2, h3, h4, h5, h6):first-child.empty::after {
+  display: inline-block !important;
+}
+
+@media screen and (max-width: 768px) {
+  .ProseMirror h1::after,
+  .ProseMirror h2::after,
+  .ProseMirror h3::after,
+  .ProseMirror h4::after,
+  .ProseMirror h5::after,
+  .ProseMirror h6::after {
+    opacity: 1 !important;
+  }
+}
+
+[data-hidden="true"] {
+  display: none !important;
+}
+
+/* simplebar */
+.simplebar-track {
+  height: 9px !important;
+}
+.simplebar-content:before {
+  content: "" !important;
+}
+
+.scroll-bar {
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.scroll-bar:hover {
+  scrollbar-color: var(--border) transparent;
+}
+
+.scroll-bar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.scroll-bar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll-bar::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  transition: background-color 0.2s ease;
+}
+
+.scroll-bar::-webkit-scrollbar-thumb:hover,
+.scroll-bar::-webkit-scrollbar-thumb:active {
+  background-color: var(--border);
 }

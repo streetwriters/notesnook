@@ -120,10 +120,10 @@ import {
   mdiPencil,
   mdiCheckboxMultipleBlankOutline,
   mdiCheckboxMultipleMarked,
-  mdiFormatFloatLeft,
   mdiMessageOutline,
   mdiVectorLink,
-  mdiPinOutline
+  mdiPinOutline,
+  mdiFileDelimitedOutline
 } from "@mdi/js";
 
 export const Icons = {
@@ -172,7 +172,6 @@ export const Icons = {
   imageDownload: mdiProgressDownload,
   imageFailed: mdiProgressAlert,
   imageSettings: mdiImageEditOutline,
-  imageFloat: mdiFormatFloatLeft,
   colorClear: mdiInvertColorsOff,
   save: mdiContentSaveOutline,
   copy: mdiClipboardOutline,
@@ -237,6 +236,7 @@ export const Icons = {
   heading: mdiFormatHeaderPound,
   indent: mdiFormatIndentIncrease,
   outdent: mdiFormatIndentDecrease,
+  csv: mdiFileDelimitedOutline,
 
   plus: mdiPlus,
   minus: mdiMinus,

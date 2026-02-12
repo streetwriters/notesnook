@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import create, { State } from "zustand";
+import { create } from "zustand";
 
-export interface EditorStore extends State {
+export interface EditorStore {
   currentEditingNote: string | null;
   setCurrentlyEditingNote: (note: string | null) => void;
   sessionId: string | null;

@@ -44,6 +44,7 @@ type DialogProps = SxProp & {
   ) => void;
   onOpen?: () => void;
   width?: number | string;
+  height?: number | string;
   showCloseButton?: boolean;
   textAlignment?: "left" | "right" | "center";
   buttonsAlignment?: "start" | "center" | "end";
@@ -98,7 +99,7 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
           display: "flex",
           flexDirection: "column",
           width: ["100%", "90%", props.width || "380px"],
-          maxHeight: ["100%", "80%", "70%"],
+          maxHeight: ["100%", "80%", props.height || "70%"],
           height: ["100%", "auto", "auto"],
           bg: "background",
           alignSelf: "center",

@@ -50,7 +50,7 @@ export const Header = ({
   onLeftMenuButtonPress?: () => void;
   renderedInRoute?: RouteName;
   id?: string;
-  title: string;
+  title?: string;
   canGoBack?: boolean;
   onPressDefaultRightButton?: () => void;
   hasSearch?: boolean;
@@ -114,7 +114,16 @@ export const Header = ({
           onLeftButtonPress={onLeftMenuButtonPress}
         />
 
-        {hasSearch ? (
+        {!title ? (
+          <View
+            style={{
+              width: 100,
+              backgroundColor: colors.primary.hover,
+              height: 10,
+              borderRadius: 100
+            }}
+          />
+        ) : hasSearch ? (
           <Paragraph>
             {selectionMode
               ? `${selectedItemsList.length} selected`

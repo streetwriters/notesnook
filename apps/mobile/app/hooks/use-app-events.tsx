@@ -17,11 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { isFeatureAvailable } from "@notesnook/common";
 import {
   EV,
   EVENTS,
   EventManagerSubscription,
   SYNC_CHECK_IDS,
+  SubscriptionPlan,
   SyncStatusEvent,
   User
 } from "@notesnook/core";
@@ -49,8 +51,9 @@ import { MMKV } from "../common/database/mmkv";
 import { endProgress, startProgress } from "../components/dialogs/progress";
 import Migrate from "../components/sheets/migrate";
 import NewFeature from "../components/sheets/new-feature";
-import ReminderSheet from "../components/sheets/reminder";
+import PaywallSheet from "../components/sheets/paywall";
 import { Walkthrough } from "../components/walkthroughs";
+import AddReminder from "../screens/add-reminder";
 import {
   resetTabStore,
   useTabStore
@@ -82,7 +85,7 @@ import Notifications from "../services/notifications";
 import PremiumService from "../services/premium";
 import SettingsService from "../services/settings";
 import Sync from "../services/sync";
-import { clearAllStores, initAfterSync, initialize } from "../stores";
+import { clearAllStores, initAfterSync } from "../stores";
 import { refreshAllStores } from "../stores/create-db-collection-store";
 import { useAttachmentStore } from "../stores/use-attachment-store";
 import { useMessageStore } from "../stores/use-message-store";
@@ -91,6 +94,7 @@ import { SyncStatus, useUserStore } from "../stores/use-user-store";
 import { updateStatusBarColor } from "../utils/colors";
 import { BETA } from "../utils/constants";
 import {
+  eAfterSync,
   eCloseSheet,
   eEditorReset,
   eLoginSessionExpired,
@@ -103,6 +107,10 @@ import { getGithubVersion } from "../utils/github-version";
 import { fluidTabsRef } from "../utils/global-refs";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { sleep } from "../utils/time";
+import useFeatureManager from "./use-feature-manager";
+import { deleteDCacheFiles } from "../common/filesystem/io";
+import dayjs from "dayjs";
+import { useRelationStore } from "../stores/use-relation-store";
 
 const onCheckSyncStatus = async (type: SyncStatusEvent) => {
   const { disableSync, disableAutoSync } = SettingsService.get();
@@ -155,7 +163,10 @@ const onUserSessionExpired = async () => {
   eSendEvent(eLoginSessionExpired);
 };
 
-const onAppOpenedFromURL = async (event: { url: string }) => {
+const onAppOpenedFromURL = async (event: {
+  url: string;
+  isInitialUrl?: boolean;
+}) => {
   const url = event.url;
 
   try {
@@ -167,25 +178,85 @@ const onAppOpenedFromURL = async (event: { url: string }) => {
       eSendEvent(eOnLoadNote, { newNote: true });
       fluidTabsRef.current?.goToPage("editor", false);
       return;
-    } else if (url.startsWith("https://notesnook.com/open_note")) {
+    } else if (url.startsWith("https://app.notesnook.com/open_note?")) {
       const id = new URL(url).searchParams.get("id");
       if (id) {
         const note = await db.notes.note(id);
         if (note) {
+          editorState().initialLoadCalled = true;
           eSendEvent(eOnLoadNote, {
             item: note
           });
           fluidTabsRef.current?.goToPage("editor", false);
         }
       }
-    } else if (url.startsWith("https://notesnook.com/open_reminder")) {
+    } else if (
+      url.startsWith("https://app.notesnook.com/open_notebook?") &&
+      !event.isInitialUrl
+    ) {
+      const id = new URL(url).searchParams.get("id");
+      if (id) {
+        const notebook = await db.notebooks.notebook(id);
+        if (notebook) {
+          Navigation.navigate("Notebook", {
+            id: notebook.id,
+            canGoBack: true,
+            item: notebook
+          });
+        }
+      }
+    } else if (
+      url.startsWith("https://app.notesnook.com/open_tag?") &&
+      !event.isInitialUrl
+    ) {
+      const id = new URL(url).searchParams.get("id");
+      if (id) {
+        const tag = await db.tags.tag(id);
+        if (tag) {
+          Navigation.navigate("TaggedNotes", {
+            type: "tag",
+            id: tag.id,
+            item: tag,
+            canGoBack: true
+          });
+        }
+      }
+    } else if (
+      url.startsWith("https://app.notesnook.com/open_color?") &&
+      !event.isInitialUrl
+    ) {
+      const id = new URL(url).searchParams.get("id");
+      if (id) {
+        const color = await db.colors.color(id);
+        if (color) {
+          Navigation.navigate("ColoredNotes", {
+            type: "color",
+            id: color.id,
+            item: color,
+            canGoBack: true
+          });
+        }
+      }
+    } else if (url.startsWith("https://app.notesnook.com/open_reminder")) {
       const id = new URL(url).searchParams.get("id");
       if (id) {
         const reminder = await db.reminders.reminder(id);
-        if (reminder) ReminderSheet.present(reminder);
+        if (reminder) AddReminder.present(reminder);
       }
-    } else if (url.startsWith("https://notesnook.com/new_reminder")) {
-      ReminderSheet.present();
+    } else if (url.startsWith("https://app.notesnook.com/new_reminder")) {
+      const reminderFeature = await isFeatureAvailable("activeReminders");
+      if (!reminderFeature.isAllowed) {
+        ToastManager.show({
+          type: "info",
+          message: reminderFeature.error,
+          actionText: strings.upgrade(),
+          func: () => {
+            PaywallSheet.present(reminderFeature);
+          }
+        });
+        return;
+      }
+      AddReminder.present();
     }
   } catch (e) {
     console.error(e);
@@ -209,12 +280,23 @@ const onUserEmailVerified = async () => {
 const onUserSubscriptionStatusChanged = async (
   subscription: User["subscription"]
 ) => {
-  if (!PremiumService.get() && subscription.type === 5) {
+  if (
+    subscription &&
+    subscription.plan !== SubscriptionPlan.FREE &&
+    subscription.plan !== useUserStore.getState().user?.subscription?.plan
+  ) {
     PremiumService.subscriptions.clear();
+    useUserStore.setState({
+      user: {
+        ...(useUserStore.getState().user as User),
+        subscription: subscription
+      }
+    });
     Walkthrough.present("prouser", false, true);
   }
   await PremiumService.setPremiumStatus();
   useMessageStore.getState().setAnnouncement();
+  useUserStore.getState().setUser(await db.user.fetchUser());
 };
 
 const onRequestPartialSync = async (
@@ -251,6 +333,7 @@ const onLogout = async (reason: string) => {
   SettingsService.resetSettings();
   useUserStore.getState().setUser(null);
   useUserStore.getState().setSyncing(false);
+  eSendEvent(eAfterSync);
 };
 
 async function checkForShareExtensionLaunchedInBackground() {
@@ -298,6 +381,7 @@ async function saveEditorState() {
 const onSuccessfulSubscription = async (
   subscription: RNIap.ProductPurchase | RNIap.SubscriptionPurchase
 ) => {
+  if (Platform.OS === "android") return;
   await PremiumService.subscriptions.set(subscription);
   await PremiumService.subscriptions.verify(subscription);
 };
@@ -313,23 +397,36 @@ const onSubscriptionError = async (error: RNIap.PurchaseError) => {
 
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
 
+const setAppMessage = async () => {
+  const user = await db.user.getUser();
+  if (!user) {
+    setLoginMessage();
+    return;
+  }
+  if (!user?.isEmailConfirmed) {
+    setEmailVerifyMessage();
+    return;
+  }
+  if (await checkForRateAppRequest()) return;
+  if (
+    user?.isEmailConfirmed &&
+    !SettingsService.get().recoveryKeySaved &&
+    !useMessageStore.getState().message?.visible
+  ) {
+    setRecoveryKeyMessage();
+    return;
+  }
+  useMessageStore.getState().setAnnouncement();
+  checkAppUpdateAvailable();
+};
+
 const doAppLoadActions = async () => {
   if (SettingsService.get().sessionExpired) {
     eSendEvent(eLoginSessionExpired);
     return;
   }
   notifee.setBadgeCount(0);
-
-  if (!(await db.user.getUser())) {
-    setLoginMessage();
-    return;
-  }
-
-  await useMessageStore.getState().setAnnouncement();
   if (NewFeature.present()) return;
-  if (await checkAppUpdateAvailable()) return;
-  if (await checkForRateAppRequest()) return;
-  if (await PremiumService.getRemainingTrialDaysStatus()) return;
   if (SettingsService.get().introCompleted) {
     useMessageStore.subscribe((state) => {
       const dialogs = state.dialogs;
@@ -372,7 +469,7 @@ const checkForRateAppRequest = async () => {
     !useMessageStore.getState().message?.visible
   ) {
     setRateAppMessage();
-    return false;
+    return true;
   }
   return false;
 };
@@ -393,6 +490,28 @@ const IsDatabaseMigrationRequired = () => {
   return true;
 };
 
+let timer: NodeJS.Timeout | null = null;
+let initialDate = -1;
+async function expiringNotesTimer() {
+  if (timer != null) clearInterval(timer);
+
+  if (initialDate === -1) {
+    DatabaseLogger.info("Deleting expired notes at startup");
+    db.notes.deleteExpiredNotes();
+    initialDate = dayjs().date();
+  }
+
+  timer = setInterval(() => {
+    if (dayjs().date() != initialDate) {
+      DatabaseLogger.info("Deleting expired notes");
+      db.notes.deleteExpiredNotes();
+      Navigation.queueRoutesForUpdate();
+      useRelationStore.getState().update();
+      initialDate = dayjs().date();
+    }
+  }, 1000 * 60);
+}
+
 const initializeDatabase = async (password?: string) => {
   if (useUserStore.getState().appLocked) return;
   if (!db.isInitialized) {
@@ -400,7 +519,6 @@ const initializeDatabase = async (password?: string) => {
     try {
       await setupDatabase(password);
       await db.init();
-      initialize();
       Sync.run();
     } catch (e) {
       DatabaseLogger.error(e as Error);
@@ -411,26 +529,30 @@ const initializeDatabase = async (password?: string) => {
   if (IsDatabaseMigrationRequired()) return;
 
   if (db.isInitialized) {
+    await setAppMessage();
     useSettingStore.getState().setAppLoading(false);
+    useSettingStore.getState().refresh();
     Notifications.setupReminders(true);
-    if (SettingsService.get().notifNotes) {
-      Notifications.pinQuickNote(false);
-    }
     DatabaseLogger.info("Database initialized");
     Notifications.restorePinnedNotes();
+    expiringNotesTimer();
+    deleteDCacheFiles();
   }
   Walkthrough.init();
 };
 
 export const useAppEvents = () => {
-  const isAppLoading = useSettingStore((state) => state.isAppLoading);
+  const [isAppLoading, initialUrl] = useSettingStore((state) => [
+    state.isAppLoading,
+    state.initialUrl
+  ]);
   const [setLastSynced, setUser, appLocked, syncing] = useUserStore((state) => [
     state.setLastSynced,
     state.setUser,
     state.appLocked,
     state.syncing
   ]);
-
+  useFeatureManager();
   const syncedOnLaunch = useRef(false);
   const refValues = useRef<
     Partial<{
@@ -467,6 +589,15 @@ export const useAppEvents = () => {
       subscriptions.forEach((sub) => sub?.unsubscribe?.());
     };
   }, [isAppLoading, onSyncComplete]);
+
+  useEffect(() => {
+    if (initialUrl) {
+      onAppOpenedFromURL({
+        url: initialUrl!,
+        isInitialUrl: true
+      });
+    }
+  }, [initialUrl]);
 
   const subscribeToPurchaseListeners = useCallback(async () => {
     if (Platform.OS === "android") {
@@ -555,8 +686,6 @@ export const useAppEvents = () => {
           syncedOnLaunch.current = true;
           return;
         }
-
-        clearMessage();
         subscribeToPurchaseListeners();
         if (!isLogin) {
           user = await db.user.fetchUser();
@@ -565,6 +694,11 @@ export const useAppEvents = () => {
           SettingsService.set({
             encryptedBackup: true
           });
+        }
+
+        if (useMessageStore.getState().message.id === "log-in") {
+          clearMessage();
+          setAppMessage();
         }
 
         await PremiumService.setPremiumStatus();
@@ -580,16 +714,6 @@ export const useAppEvents = () => {
         ToastManager.error(e as Error, "Error updating user", "global");
       }
 
-      user = await db.user.getUser();
-      if (
-        user?.isEmailConfirmed &&
-        !SettingsService.get().recoveryKeySaved &&
-        !useMessageStore.getState().message?.visible
-      ) {
-        setRecoveryKeyMessage();
-      }
-      if (!user?.isEmailConfirmed) setEmailVerifyMessage();
-
       syncedOnLaunch.current = true;
       if (!isLogin) {
         checkAutoBackup();
@@ -603,11 +727,10 @@ export const useAppEvents = () => {
       EV.subscribe(EVENTS.syncCheckStatus, onCheckSyncStatus),
       EV.subscribe(EVENTS.syncAborted, onSyncAborted),
       EV.subscribe(EVENTS.appRefreshRequested, onSyncComplete),
-      EV.subscribe(EVENTS.userLoggedOut, onLogout),
-      EV.subscribe(EVENTS.userEmailConfirmed, onUserEmailVerified),
+      db.eventManager.subscribe(EVENTS.userLoggedOut, onLogout),
+      db.eventManager.subscribe(EVENTS.userEmailConfirmed, onUserEmailVerified),
       EV.subscribe(EVENTS.userSessionExpired, onUserSessionExpired),
-      EV.subscribe(EVENTS.userCheckStatus, PremiumService.onUserStatusCheck),
-      EV.subscribe(
+      db.eventManager.subscribe(
         EVENTS.userSubscriptionUpdated,
         onUserSubscriptionStatusChanged
       ),
@@ -691,6 +814,7 @@ export const useAppEvents = () => {
       if (state === "active") {
         notifee.setBadgeCount(0);
         updateStatusBarColor();
+        expiringNotesTimer();
         checkAutoBackup();
         Sync.run("global", false, "full");
         reconnectSSE();
@@ -741,25 +865,10 @@ export const useAppEvents = () => {
       }
     };
 
-    if (!refValues.current.initialUrl) {
-      Linking.getInitialURL().then((url) => {
-        if (url) {
-          refValues.current.initialUrl = url;
-        }
-      });
-    }
     let sub: NativeEventSubscription;
     if (!isAppLoading && !appLocked) {
       setTimeout(() => {
         sub = AppState.addEventListener("change", onAppStateChanged);
-        if (
-          refValues.current.initialUrl &&
-          !refValues.current.initialUrl?.includes("open_note")
-        ) {
-          onAppOpenedFromURL({
-            url: refValues.current.initialUrl!
-          });
-        }
       }, 1000);
 
       refValues.current.removeInternetStateListener = NetInfo.addEventListener(

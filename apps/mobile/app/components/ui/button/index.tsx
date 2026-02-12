@@ -17,26 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import {
   ActivityIndicator,
   ColorValue,
   DimensionValue,
   TextStyle,
-  View,
   ViewStyle,
   useWindowDimensions
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { useUserStore } from "../../../stores/use-user-store";
-import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
+import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
+import { DefaultAppStyles } from "../../../utils/styles";
 import NativeTooltip from "../../../utils/tooltip";
-import { ProTag } from "../../premium/pro-tag";
 import { Pressable, PressableProps, useButton } from "../pressable";
 import Heading from "../typography/heading";
 import Paragraph from "../typography/paragraph";
-import { DefaultAppStyles } from "../../../utils/styles";
 export interface ButtonProps extends PressableProps {
   height?: number;
   icon?: string;
@@ -59,6 +55,7 @@ export interface ButtonProps extends PressableProps {
   iconColor?: ColorValue;
   iconStyle?: TextStyle;
   proTag?: boolean;
+  allowFontScaling?: boolean;
 }
 export const Button = ({
   height = 45,
@@ -83,10 +80,9 @@ export const Button = ({
   fwdRef,
   proTag,
   iconStyle,
+  allowFontScaling = true,
   ...restProps
 }: ButtonProps) => {
-  const { colors } = useThemeColors();
-  const premium = useUserStore((state) => state.premium);
   const { text } = useButton({
     type,
     accent: accentColor,
@@ -144,7 +140,7 @@ export const Button = ({
       {icon && !loading && iconPosition === "left" ? (
         <Icon
           name={icon}
-          allowFontScaling
+          allowFontScaling={allowFontScaling}
           style={[{ marginRight: 0 }, iconStyle as any]}
           color={iconColor || buttonType?.text || textColor}
           size={iconSize}
@@ -156,6 +152,7 @@ export const Button = ({
           color={textColor as string}
           size={fontSize}
           numberOfLines={1}
+          allowFontScaling={allowFontScaling}
           style={[
             {
               marginLeft: icon || (loading && iconPosition === "left") ? 5 : 0,
@@ -167,15 +164,6 @@ export const Button = ({
           {title}
         </Component>
       )}
-      {proTag && !premium ? (
-        <View
-          style={{
-            marginLeft: 10
-          }}
-        >
-          <ProTag size={10} width={40} background={colors.primary.shade} />
-        </View>
-      ) : null}
 
       {icon && !loading && iconPosition === "right" ? (
         <Icon
