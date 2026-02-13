@@ -24,6 +24,7 @@ import {
   SerializedKeyPair
 } from "@notesnook/crypto";
 import { IStorage } from "../src/interfaces.js";
+import { randomBytes } from "crypto";
 
 export class NodeStorageInterface implements IStorage {
   storage = {};
@@ -112,7 +113,7 @@ export class NodeStorageInterface implements IStorage {
     password: string,
     salt?: string | undefined
   ): Promise<SerializedKey> {
-    return { password, salt };
+    return { password, salt: salt || randomBytes(16).toString("base64") };
   }
 
   generateCryptoKeyPair(): Promise<SerializedKeyPair> {

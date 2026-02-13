@@ -109,18 +109,17 @@ function delay(ms: number) {
 
 async function loginFakeUser(db) {
   const email = "johndoe@example.com";
+  const password = "password";
   const userSalt = randomBytes(16).toString("base64");
   await db.storage().deriveCryptoKey({
-    password: "password",
+    password,
     salt: userSalt
   });
-
-  const userEncryptionKey = await db.storage().getCryptoKey(`_uk_@${email}`);
 
   const key = await db.crypto().generateRandomKey();
   const attachmentsKey = await db
     .storage()
-    .encrypt({ password: userEncryptionKey }, JSON.stringify(key));
+    .encrypt({ password, salt: userSalt }, JSON.stringify(key));
 
   await db.user.setUser({
     email,

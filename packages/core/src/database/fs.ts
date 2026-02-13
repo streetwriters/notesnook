@@ -292,6 +292,20 @@ export class FileStorage {
     });
   }
 
+  async bulkDeleteFiles(filenames: string[], localOnly = false) {
+    if (filenames.length === 0) return true;
+
+    if (localOnly) return await this.fs.bulkDeleteFiles(filenames);
+
+    const token = await this.tokenManager.getAccessToken();
+    const url = `${hosts.API_HOST}/s3/bulk-delete`;
+    return await this.fs.bulkDeleteFiles(filenames, {
+      url,
+      headers: { Authorization: `Bearer ${token}` },
+      chunkSize: 0
+    });
+  }
+
   exists(filename: string) {
     return this.fs.exists(filename);
   }
