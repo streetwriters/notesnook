@@ -30,7 +30,7 @@ import { store as settingStore } from "./setting-store";
 import BaseStore from "./index";
 import { showToast } from "../utils/toast";
 import { Notice } from "../common/notices";
-import { EV, EVENTS, SYNC_CHECK_IDS, SyncOptions } from "@notesnook/core";
+import { EVENTS, SYNC_CHECK_IDS, SyncOptions } from "@notesnook/core";
 import { logger } from "../utils/logger";
 import Config from "../utils/config";
 import {
@@ -92,7 +92,7 @@ class AppStore extends BaseStore<AppStore> {
     });
     this.get().sync({ type: "full" });
 
-    EV.subscribe(EVENTS.appRefreshRequested, () => this.refresh());
+    db.eventManager.subscribe(EVENTS.appRefreshRequested, () => this.refresh());
     db.eventManager.subscribe(EVENTS.syncCompleted, () => this.refresh());
 
     db.eventManager.subscribe(EVENTS.syncProgress, ({ type, current }) => {
@@ -105,7 +105,7 @@ class AppStore extends BaseStore<AppStore> {
       });
     });
 
-    EV.subscribe(EVENTS.syncCheckStatus, async (type) => {
+    db.eventManager.subscribe(EVENTS.syncCheckStatus, async (type) => {
       const { isAutoSyncEnabled, isSyncEnabled } = this.get();
       switch (type) {
         case SYNC_CHECK_IDS.sync:

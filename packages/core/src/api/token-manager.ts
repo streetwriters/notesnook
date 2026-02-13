@@ -19,10 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import http from "../utils/http.js";
 import constants from "../utils/constants.js";
-import { EV, EVENTS } from "../common.js";
+import { EVENTS } from "../common.js";
 import { withTimeout, Mutex } from "async-mutex";
 import { logger } from "../logger.js";
 import { KVStorageAccessor } from "../interfaces.js";
+import EventManager from "../utils/event-manager.js";
 
 export type Token = {
   access_token: string;
@@ -55,7 +56,10 @@ class TokenManager {
     new Error("Timed out while refreshing access token.")
   );
 
-  constructor(private readonly storage: KVStorageAccessor) {}
+  constructor(
+    private readonly storage: KVStorageAccessor,
+    private readonly eventManager: EventManager
+  ) {}
 
   async getToken(renew = true, forceRenew = false): Promise<Token | undefined> {
     const token = await this.storage().read("token");
@@ -92,12 +96,16 @@ class TokenManager {
     scopes: Scope[] = ["notesnook.sync", "IdentityServerApi"],
     forceRenew = false
   ) {
-    return await getSafeToken(async () => {
-      const token = await this.getToken(true, forceRenew);
-      if (!token || !token.scope) return;
-      if (!scopes.some((s) => token.scope.includes(s))) return;
-      return token.access_token;
-    }, "Error getting access token:");
+    return await getSafeToken(
+      async () => {
+        const token = await this.getToken(true, forceRenew);
+        if (!token || !token.scope) return;
+        if (!scopes.some((s) => token.scope.includes(s))) return;
+        return token.access_token;
+      },
+      "Error getting access token:",
+      this.eventManager
+    );
   }
 
   async _refreshToken(forceRenew = false) {
@@ -112,7 +120,7 @@ class TokenManager {
 
       const { refresh_token, scope } = token;
       if (!refresh_token || !scope) {
-        EV.publish(EVENTS.userSessionExpired);
+        this.eventManager.publish(EVENTS.userSessionExpired);
         this.logger.error(new Error("Token not found."));
         return;
       }
@@ -127,7 +135,7 @@ class TokenManager {
         }
       );
       await this.saveToken(refreshTokenResponse);
-      EV.publish(EVENTS.tokenRefreshed);
+      this.eventManager.publish(EVENTS.tokenRefreshed);
     });
   }
 
@@ -163,7 +171,11 @@ class TokenManager {
 }
 export default TokenManager;
 
-async function getSafeToken<T>(action: () => Promise<T>, errorMessage: string) {
+async function getSafeToken<T>(
+  action: () => Promise<T>,
+  errorMessage: string,
+  eventManager: EventManager
+) {
   try {
     return await action();
   } catch (e) {
@@ -172,7 +184,7 @@ async function getSafeToken<T>(action: () => Promise<T>, errorMessage: string) {
       e instanceof Error &&
       (e.message === "invalid_grant" || e.message === "invalid_client")
     ) {
-      EV.publish(EVENTS.userSessionExpired);
+      eventManager.publish(EVENTS.userSessionExpired);
     }
     throw e;
   }
