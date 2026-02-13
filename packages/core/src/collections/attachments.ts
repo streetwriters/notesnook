@@ -226,6 +226,44 @@ export class Attachments implements ICollection {
     return false;
   }
 
+  async bulkRemove(attachments: Attachment[], localOnly: boolean) {
+    logger.debug("Bulk removing attachments", {
+      count: attachments.length,
+      localOnly
+    });
+    if (attachments.length === 0) return;
+
+    const detachable: Attachment[] = [];
+    for (const attachment of attachments) {
+      if (!localOnly && !(await this.canDetach(attachment))) continue;
+      detachable.push(attachment);
+    }
+
+    const localOnlyHashes = detachable
+      .filter((a) => localOnly || !a.dateUploaded)
+      .map((a) => a.hash);
+    const remoteHashes = detachable
+      .filter((a) => !localOnly && !!a.dateUploaded)
+      .map((a) => a.hash);
+
+    if (localOnlyHashes.length > 0) {
+      await this.db.fs().bulkDeleteFiles(localOnlyHashes, true);
+    }
+    if (remoteHashes.length > 0) {
+      await this.db.fs().bulkDeleteFiles(remoteHashes, false);
+    }
+
+    if (!localOnly) {
+      for (const attachment of detachable) {
+        await this.detach(attachment);
+      }
+    }
+
+    const ids = detachable.map((a) => a.id);
+    await this.db.relations.unlinkOfType("attachment", ids);
+    await this.collection.softDelete(ids);
+  }
+
   async detach(attachment: Attachment) {
     for (const note of await this.db.relations
       .to(attachment, "note")
@@ -576,11 +614,8 @@ export class Attachments implements ICollection {
   }
 
   async removeOrphaned() {
-    for await (const attachment of this.db.attachments.orphaned.iterate()) {
-      try {
-        await this.db.attachments.remove(attachment.hash, false);
-      } catch (error) {}
-    }
+    const orphaned = await this.db.attachments.orphaned.items();
+    await this.bulkRemove(orphaned, false);
   }
 }
 

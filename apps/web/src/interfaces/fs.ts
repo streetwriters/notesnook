@@ -667,6 +667,28 @@ async function deleteFile(
   }
 }
 
+async function bulkDeleteFiles(
+  filenames: string[],
+  requestOptions?: RequestOptionsWithSignal
+) {
+  if (!requestOptions) {
+    await streamablefs.bulkDeleteFiles(filenames);
+    return true;
+  }
+
+  try {
+    const { url, headers } = requestOptions;
+    const response = await axios.post(url, { names: filenames }, { headers });
+
+    const result = isSuccessStatusCode(response.status);
+    if (result) await streamablefs.bulkDeleteFiles(filenames);
+    return result;
+  } catch (e) {
+    showError(toS3Error(e), "Could not bulk delete files");
+    return false;
+  }
+}
+
 /**
  * `-1` means an error during file size
  *
@@ -701,6 +723,7 @@ export const FileStorage: IFileStorage = {
   uploadFile: cancellable(uploadFile),
   downloadFile: cancellable(downloadFile),
   deleteFile,
+  bulkDeleteFiles,
   exists,
   clearFileStorage,
   hashBase64,

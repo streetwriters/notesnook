@@ -30,6 +30,7 @@ import {
 import { sql } from "@streetwriters/kysely";
 import { MAX_SQL_PARAMETERS } from "../database/sql-collection.js";
 import { withSubNotebooks } from "./notebooks.js";
+import { logger } from "../logger.js";
 
 export default class Trash {
   collections = ["notes", "notebooks"] as const;
@@ -123,7 +124,14 @@ export default class Trash {
     );
     await this._delete(noteIds, notebookIds);
 
-    await this.db.attachments.removeOrphaned();
+    this.db.attachments
+      .removeOrphaned()
+      .catch((e) =>
+        logger.error(
+          e,
+          "Error removing orphaned attachments during trash cleanup"
+        )
+      );
 
     await this.buildCache();
   }
