@@ -814,7 +814,6 @@ export const useAppEvents = () => {
     return () => {
       emitterSubscriptions.forEach((sub) => sub?.remove?.());
       subscriptions.forEach((sub) => sub?.unsubscribe?.());
-      EV.unsubscribeAll();
     };
   }, [onSyncComplete, onUserUpdated]);
 
