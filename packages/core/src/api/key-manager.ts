@@ -53,14 +53,14 @@ type WrappedKey =
       private: Cipher<"base64">;
     };
 
-type UnwrapKeyReturnType<T extends WrappedKey> = T extends {
+export type UnwrapKeyReturnType<T extends WrappedKey> = T extends {
   public: string;
   private: Cipher<"base64">;
 }
   ? SerializedKeyPair
   : SerializedKey;
 
-type KeyTypeFromId<TId extends KeyId> =
+export type KeyTypeFromId<TId extends KeyId> =
   (typeof KEY_INFO)[TId]["type"] extends "symmetric"
     ? Cipher<"base64">
     : {

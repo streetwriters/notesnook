@@ -27,7 +27,12 @@ import Database from "./index.js";
 import { SerializedKeyPair, SerializedKey } from "@notesnook/crypto";
 import { logger } from "../logger.js";
 import { KEY_VERSION, KeyVersion } from "./sync/types.js";
-import { KeyId, KeyManager } from "./key-manager.js";
+import {
+  KeyId,
+  KeyManager,
+  KeyTypeFromId,
+  UnwrapKeyReturnType
+} from "./key-manager.js";
 
 const ENDPOINTS = {
   signup: "/users",
@@ -471,13 +476,13 @@ class UserManager {
     return { key, salt: user.salt };
   }
 
-  private async getUserKey(
-    id: KeyId,
+  private async getUserKey<TId extends KeyId>(
+    id: TId,
     config: {
       generateKey: () => Promise<SerializedKey | SerializedKeyPair>;
       errorContext: string;
     }
-  ): Promise<SerializedKey | SerializedKeyPair | undefined> {
+  ): Promise<UnwrapKeyReturnType<KeyTypeFromId<TId>> | undefined> {
     try {
       const masterKey = await this.getMasterKey();
       if (!masterKey) return;
@@ -489,10 +494,13 @@ class UserManager {
         await this.updateUser({
           [id]: await this.keyManager.wrapKey(key, masterKey)
         });
-        return key;
+        return key as UnwrapKeyReturnType<KeyTypeFromId<TId>>;
       }
 
-      return await this.keyManager.unwrapKey(wrappedKey, masterKey);
+      return (await this.keyManager.unwrapKey(
+        wrappedKey,
+        masterKey
+      )) as UnwrapKeyReturnType<KeyTypeFromId<TId>>;
     } catch (e) {
       logger.error(e, `Could not get ${config.errorContext}.`);
       if (e instanceof Error)
