@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Cipher } from "@notesnook/crypto";
 import Database from "./index.js";
-import { EV, EVENTS } from "../common.js";
+import { EVENTS } from "../common.js";
 import { isCipher } from "../utils/crypto.js";
 import { Note, NoteContent } from "../types.js";
 import { logger } from "../logger.js";
@@ -48,7 +48,7 @@ export default class Vault {
   }
 
   private startEraser() {
-    EV.publish(EVENTS.vaultUnlocked);
+    this.db.eventManager.publish(EVENTS.vaultUnlocked);
     clearTimeout(this.erasureTimeout);
     this.erasureTimeout = setTimeout(() => {
       this.lock();
@@ -80,7 +80,7 @@ export default class Vault {
 
   async lock() {
     this.password = undefined;
-    EV.publish(EVENTS.vaultLocked);
+    this.db.eventManager.publish(EVENTS.vaultLocked);
     return true;
   }
 

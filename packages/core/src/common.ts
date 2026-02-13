@@ -28,11 +28,14 @@ export const SYNC_CHECK_IDS = {
 
 export type SyncStatusEvent = keyof typeof SYNC_CHECK_IDS;
 
-export async function checkSyncStatus(type: string) {
-  const results = await EV.publishWithResult<{ type: string; result: boolean }>(
-    EVENTS.syncCheckStatus,
-    type
-  );
+export async function checkSyncStatus(
+  eventManager: EventManager,
+  type: string
+) {
+  const results = await eventManager.publishWithResult<{
+    type: string;
+    result: boolean;
+  }>(EVENTS.syncCheckStatus, type);
   if (typeof results === "boolean") return results;
   else if (typeof results === "undefined") return true;
   return results.some((r) => r.type === type && r.result === true);
@@ -44,23 +47,23 @@ export type SyncProgressEvent = {
 };
 
 export function sendSyncProgressEvent(
-  EV: EventManager,
+  eventManager: EventManager,
   type: string,
   current: number
 ) {
-  EV.publish(EVENTS.syncProgress, {
+  eventManager.publish(EVENTS.syncProgress, {
     type,
     current
   } as SyncProgressEvent);
 }
 
 export function sendMigrationProgressEvent(
-  EV: EventManager,
+  eventManager: EventManager,
   collection: string,
   total: number,
   current?: number
 ) {
-  EV.publish(EVENTS.migrationProgress, {
+  eventManager.publish(EVENTS.migrationProgress, {
     collection,
     total,
     current: current === undefined ? total : current

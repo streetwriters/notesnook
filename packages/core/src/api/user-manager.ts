@@ -46,7 +46,7 @@ class UserManager {
   private cachedMonographPasswordsKey?: SerializedKey;
   private cachedInboxKeys?: SerializedKeyPair;
   constructor(private readonly db: Database) {
-    this.tokenManager = new TokenManager(this.db.kv);
+    this.tokenManager = new TokenManager(db.kv, db.eventManager);
 
     EV.subscribe(EVENTS.userUnauthorized, async (url: string) => {
       if (url.includes("/connect/token") || !(await HealthCheck.auth())) return;
@@ -80,7 +80,7 @@ class UserManager {
       password: hashedPassword,
       client_id: "notesnook"
     });
-    EV.publish(EVENTS.userSignedUp);
+    this.db.eventManager.publish(EVENTS.userSignedUp);
     return await this._login({ email, password, hashedPassword });
   }
 

@@ -24,8 +24,9 @@ import {
   IFileStorage
 } from "../interfaces.js";
 import { DataFormat, SerializedKey } from "@notesnook/crypto";
-import { EV, EVENTS } from "../common.js";
+import { EVENTS } from "../common.js";
 import { logger } from "../logger.js";
+import EventManager from "../utils/event-manager.js";
 
 export type FileStorageAccessor = () => FileStorage;
 export type DownloadableFile = {
@@ -48,7 +49,8 @@ export class FileStorage {
 
   constructor(
     private readonly fs: IFileStorage,
-    private readonly tokenManager: TokenManager
+    private readonly tokenManager: TokenManager,
+    private readonly eventManager: EventManager
   ) {}
 
   async queueDownloads(
@@ -70,7 +72,7 @@ export class FileStorage {
     for (const file of files as QueueItem[]) {
       current++;
       if (!group.has(file.filename)) {
-        EV.publish(EVENTS.fileDownloaded, {
+        this.eventManager.publish(EVENTS.fileDownloaded, {
           success: false,
           groupId,
           filename: file.filename,
@@ -93,7 +95,7 @@ export class FileStorage {
 
       const { filename, chunkSize } = file;
       if (await this.exists(filename)) {
-        EV.publish(EVENTS.fileDownloaded, {
+        this.eventManager.publish(EVENTS.fileDownloaded, {
           success: true,
           groupId,
           filename,
@@ -104,7 +106,7 @@ export class FileStorage {
         continue;
       }
 
-      EV.publish(EVENTS.fileDownload, {
+      this.eventManager.publish(EVENTS.fileDownload, {
         total,
         current,
         groupId,
@@ -128,7 +130,7 @@ export class FileStorage {
       this.downloads.set(filename, file);
       const result = await file.operation;
       if (eventData)
-        EV.publish(EVENTS.fileDownloaded, {
+        this.eventManager.publish(EVENTS.fileDownloaded, {
           success: result,
           total,
           current,
@@ -180,7 +182,7 @@ export class FileStorage {
           group.delete(filename);
         });
 
-      EV.publish(EVENTS.fileUpload, {
+      this.eventManager.publish(EVENTS.fileUpload, {
         total,
         current,
         groupId,
@@ -189,7 +191,7 @@ export class FileStorage {
 
       this.uploads.set(filename, file);
       const result = await file.operation;
-      EV.publish(EVENTS.fileUploaded, {
+      this.eventManager.publish(EVENTS.fileUploaded, {
         error,
         success: result,
         total,
@@ -256,10 +258,16 @@ export class FileStorage {
 
       if (queue.type === "download") {
         this.groups.downloads.delete(groupId);
-        EV.publish(EVENTS.downloadCanceled, { groupId, canceled: true });
+        this.eventManager.publish(EVENTS.downloadCanceled, {
+          groupId,
+          canceled: true
+        });
       } else if (queue.type === "upload") {
         this.groups.uploads.delete(groupId);
-        EV.publish(EVENTS.uploadCanceled, { groupId, canceled: true });
+        this.eventManager.publish(EVENTS.uploadCanceled, {
+          groupId,
+          canceled: true
+        });
       }
     }
   }

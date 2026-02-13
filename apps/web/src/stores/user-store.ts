@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import createStore from "../common/store";
 import { db } from "../common/db";
 import BaseStore from "./index";
-import { EV, EVENTS } from "@notesnook/core";
+import { EVENTS } from "@notesnook/core";
 import Config from "../utils/config";
 import { hashNavigate } from "../navigation";
 import { AuthenticatorType, User } from "@notesnook/core";
@@ -39,7 +39,7 @@ class UserStore extends BaseStore<UserStore> {
   counter = 0;
 
   init = () => {
-    EV.subscribe(EVENTS.userSessionExpired, async () => {
+    db.eventManager.subscribe(EVENTS.userSessionExpired, async () => {
       Config.set("sessionExpired", true);
       window.location.replace("/sessionexpired");
     });
@@ -53,7 +53,8 @@ class UserStore extends BaseStore<UserStore> {
         user,
         isLoggedIn: true
       });
-      if (Config.get("sessionExpired")) EV.publish(EVENTS.userSessionExpired);
+      if (Config.get("sessionExpired"))
+        db.eventManager.publish(EVENTS.userSessionExpired);
     });
 
     if (Config.get("sessionExpired")) return;

@@ -31,7 +31,7 @@ import {
 } from "./common";
 import { AppEventManager, AppEvents } from "./common/app-events";
 import { db } from "./common/db";
-import { EV, EVENTS } from "@notesnook/core";
+import { EVENTS } from "@notesnook/core";
 import { registerKeyMap } from "./common/key-map";
 import { updateStatus, removeStatus, getStatus } from "./hooks/use-status";
 import { hashNavigate } from "./navigation";
@@ -113,7 +113,7 @@ export default function AppEffects() {
       }
     }
 
-    const fileDownloadEvents = EV.subscribeMulti(
+    const fileDownloadEvents = db.eventManager.subscribeMulti(
       [EVENTS.fileDownloaded, EVENTS.fileDownload],
       ({ total, current }: { total: number; current: number }) => {
         handleDownloadUploadProgress("download", total, current);
@@ -121,7 +121,7 @@ export default function AppEffects() {
       null
     );
 
-    const fileUploadEvents = EV.subscribeMulti(
+    const fileUploadEvents = db.eventManager.subscribeMulti(
       [EVENTS.fileUploaded, EVENTS.fileUpload],
       ({ total, current }: { total: number; current: number }) => {
         handleDownloadUploadProgress("upload", total, current);

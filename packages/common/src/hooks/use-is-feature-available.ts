@@ -24,7 +24,8 @@ import {
   FeatureResult,
   isFeatureAvailable
 } from "../utils/index.js";
-import { EV, EVENTS } from "@notesnook/core";
+import { EVENTS } from "@notesnook/core";
+import { database } from "../database.js";
 
 export function useIsFeatureAvailable<TId extends FeatureId>(
   id: TId | undefined,
@@ -36,7 +37,7 @@ export function useIsFeatureAvailable<TId extends FeatureId>(
     if (!id) return;
 
     isFeatureAvailable(id, value).then((result) => setResult(result));
-    const userSubscriptionUpdated = EV.subscribe(
+    const userSubscriptionUpdated = database.eventManager.subscribe(
       EVENTS.userSubscriptionUpdated,
       () => {
         isFeatureAvailable(id, value).then((result) => setResult(result));
@@ -59,7 +60,7 @@ export function useAreFeaturesAvailable<TIds extends FeatureId[]>(
 
   useEffect(() => {
     areFeaturesAvailable(ids, values).then((result) => setResult(result));
-    const userSubscriptionUpdated = EV.subscribe(
+    const userSubscriptionUpdated = database.eventManager.subscribe(
       EVENTS.userSubscriptionUpdated,
       () => {
         areFeaturesAvailable(ids, values).then((result) => setResult(result));
