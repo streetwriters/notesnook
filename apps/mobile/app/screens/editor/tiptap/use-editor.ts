@@ -1034,13 +1034,6 @@ export const useEditor = (
     state.current.isRestoringState = false;
   }, []);
 
-  useEffect(() => {
-    eSubscribeEvent(eOnLoadNote + editorId, loadNote);
-    return () => {
-      eUnSubscribeEvent(eOnLoadNote + editorId, loadNote);
-    };
-  }, [editorId, loadNote, restoreEditorState, isDefaultEditor]);
-
   const onContentChanged = (noteId?: string) => {
     if (noteId) {
       lastContentChangeTime.current[noteId] = Date.now();
