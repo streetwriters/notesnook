@@ -182,6 +182,7 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
         >
           <IconButton
             name="close"
+            color={colors.primary.icon}
             onPress={() => {
               Navigation.replace("FluidPanelsView", {});
             }}

@@ -331,17 +331,10 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "change-password",
             name: strings.changePassword(),
-            // type: "screen",
+            type: "screen",
             description: strings.changePasswordDesc(),
-            // component: "change-password",
-            icon: "form-textbox-password",
-            modifer: () => {
-              ToastManager.show({
-                type: "info",
-                message:
-                  "Password changing has been disabled temporarily to address some issues faced by users. It will be enabled again once the issues have resolved."
-              });
-            }
+            component: "change-password",
+            icon: "form-textbox-password"
           },
           {
             id: "change-email",
