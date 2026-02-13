@@ -42,9 +42,7 @@ export const VaultSettings: SettingsGroup[] = [
             type: "button",
             title: strings.create(),
             action: () => {
-              Vault.createVault().then((res) => {
-                useAppStore.getState().setIsVaultCreated(res);
-              });
+              Vault.createVault();
             },
             variant: "secondary"
           }

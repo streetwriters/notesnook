@@ -192,6 +192,21 @@ export async function createHistorySession(page: Page, locked = false) {
   };
 }
 
+function randomWord(length = 5) {
+  const chars = "abcdefghijklmnopqrstuvwxyz";
+  return Array.from(
+    { length },
+    () => chars[Math.floor(Math.random() * chars.length)]
+  ).join("");
+}
+
+function randomNote(): Note {
+  return {
+    title: `${randomWord()} ${randomWord()}`,
+    content: Array.from({ length: 5 }, () => randomWord()).join(" ")
+  };
+}
+
 export {
   USER,
   NOTE,
@@ -207,5 +222,6 @@ export {
   orderByOptions,
   sortByOptions,
   groupByOptions,
-  APP_LOCK_PASSWORD
+  APP_LOCK_PASSWORD,
+  randomNote
 };

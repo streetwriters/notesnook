@@ -22,6 +22,7 @@ import { showPasswordDialog } from "../dialogs/password-dialog";
 import { showToast } from "../utils/toast";
 import { VAULT_ERRORS } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
+import { useStore as useAppStore } from "../stores/app-store";
 
 class Vault {
   static async createVault() {
@@ -34,6 +35,7 @@ class Vault {
       },
       validate: async ({ password }) => {
         await db.vault.create(password);
+        useAppStore.getState().setIsVaultCreated(true);
         showToast("success", strings.vaultCreated());
         return true;
       }
@@ -63,17 +65,11 @@ class Vault {
     if (!(await db.vault.exists())) return false;
     const result = await showPasswordDialog({
       title: strings.deleteVault(),
-      subtitle: strings.deleteVaultDesc(),
+      message: strings.deleteVaultDesc(),
       inputs: {
         password: {
           label: strings.accountPassword(),
           autoComplete: "current-password"
-        }
-      },
-      checks: {
-        deleteAllLockedNotes: {
-          text: strings.deleteAllNotes(),
-          default: false
         }
       },
       validate: ({ password }) => {
@@ -81,7 +77,7 @@ class Vault {
       }
     });
     if (result) {
-      await db.vault.delete(result.deleteAllLockedNotes);
+      await db.vault.delete();
       return true;
     }
     return false;
