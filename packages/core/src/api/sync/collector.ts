@@ -25,7 +25,8 @@ import {
   SyncItem,
   SyncTransferItem,
   SYNC_COLLECTIONS_MAP,
-  SYNC_ITEM_TYPES
+  SYNC_ITEM_TYPES,
+  KeyVersion
 } from "./types.js";
 import { Item, MaybeDeletedItem } from "../../types.js";
 
@@ -46,11 +47,16 @@ class Collector {
     chunkSize: number,
     isForceSync = false
   ): AsyncGenerator<SyncTransferItem, void, unknown> {
-    const key = await this.db.user.getEncryptionKey();
-    if (!key || !key.key || !key.salt) {
+    const keys = await this.db.user.getDataEncryptionKeys();
+    if (!keys || !keys.length) {
       EV.publish(EVENTS.userSessionExpired);
       throw new Error("User encryption key not generated. Please relogin.");
     }
+
+    // select the latest available key for encryption
+    const key = keys.reduce((max, current) =>
+      current.version > max.version ? current : max
+    );
 
     for (const itemType of SYNC_ITEM_TYPES) {
       const collectionKey = SYNC_COLLECTIONS_MAP[itemType];
@@ -61,8 +67,8 @@ class Collector {
         if (!ids.length) continue;
         const ciphers = await this.db
           .storage()
-          .encryptMulti(key, syncableItems);
-        const items = toSyncItem(ids, ciphers);
+          .encryptMulti(key.key, syncableItems);
+        const items = toSyncItem(ids, ciphers, key.version);
         if (!items.length) continue;
         yield { items, type: itemType, count: items.length };
 
@@ -88,7 +94,11 @@ class Collector {
 }
 export default Collector;
 
-function toSyncItem(ids: string[], ciphers: Cipher<"base64">[]) {
+function toSyncItem(
+  ids: string[],
+  ciphers: Cipher<"base64">[],
+  keyVersion: KeyVersion
+) {
   if (ids.length !== ciphers.length)
     throw new Error("ids.length must be equal to ciphers.length");
 
@@ -98,6 +108,7 @@ function toSyncItem(ids: string[], ciphers: Cipher<"base64">[]) {
     const cipher = ciphers[i] as SyncItem;
     cipher.v = CURRENT_DATABASE_VERSION;
     cipher.id = id;
+    cipher.keyVersion = keyVersion;
     items.push(cipher);
   }
   return items;

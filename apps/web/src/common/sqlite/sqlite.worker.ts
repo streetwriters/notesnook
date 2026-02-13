@@ -167,6 +167,8 @@ class _SQLiteWorker {
     sql: string,
     parameters?: SQLiteCompatibleType[]
   ): Promise<QueryResult<R>> {
+    if (!this.encrypted && !this.initialized) await this.initialize();
+
     if (this.encrypted && !sql.startsWith("PRAGMA key")) {
       await this.waitForDatabase();
     }
