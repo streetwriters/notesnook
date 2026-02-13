@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Cipher, SerializedKey, SerializedKeyPair } from "@notesnook/crypto";
 import Database from ".";
-import { isCipher } from "../utils";
+import { isCipher } from "../utils/index.js";
 
 const KEY_INFO = {
   inboxKeys: {
