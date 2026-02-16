@@ -27,9 +27,10 @@ export function clipboardTextParser(
   text: string,
   $context: ResolvedPos,
   plain: boolean,
-  view: EditorView
+  view: EditorView,
+  parseMarkdownOnPaste = true
 ): Slice {
-  if (!plain && isProbablyMarkdown(text)) {
+  if (!plain && parseMarkdownOnPaste && isProbablyMarkdown(text)) {
     const node = ClipboardDOMParser.fromSchema(view.state.schema).parse(
       new DOMParser().parseFromString(
         markdowntoHTML(text, { allowDangerousHtml: false }),
