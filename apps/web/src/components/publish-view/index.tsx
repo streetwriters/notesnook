@@ -23,7 +23,7 @@ import { Loading, Refresh } from "../icons";
 import { db } from "../../common/db";
 import { writeText } from "clipboard-polyfill";
 import { showToast } from "../../utils/toast";
-import { EV, EVENTS, hosts, MonographAnalytics } from "@notesnook/core";
+import { EVENTS, hosts } from "@notesnook/core";
 import { useStore } from "../../stores/monograph-store";
 import { Note } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
@@ -67,7 +67,7 @@ function PublishView(props: PublishViewProps) {
   }, [monograph?.id, monographAnalytics]);
 
   useEffect(() => {
-    const fileDownloadedEvent = EV.subscribe(
+    const fileDownloadedEvent = db.eventManager.subscribe(
       EVENTS.fileDownloaded,
       ({ total, current, groupId }) => {
         if (!groupId || !groupId.includes(note.id)) return;

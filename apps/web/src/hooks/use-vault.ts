@@ -1,4 +1,4 @@
-import { EV, EVENTS } from "@notesnook/core";
+import { EVENTS } from "@notesnook/core";
 import { useEffect, useState } from "react";
 import Vault from "../common/vault";
 import { db } from "../common/db";
@@ -7,8 +7,8 @@ export function useVault() {
   const [isLocked, setIsLocked] = useState(!db.vault.unlocked);
 
   useEffect(() => {
-    EV.subscribe(EVENTS.vaultLocked, () => setIsLocked(true));
-    EV.subscribe(EVENTS.vaultUnlocked, () => setIsLocked(false));
+    db.eventManager.subscribe(EVENTS.vaultLocked, () => setIsLocked(true));
+    db.eventManager.subscribe(EVENTS.vaultUnlocked, () => setIsLocked(false));
   }, []);
 
   return {

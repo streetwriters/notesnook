@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import {
   checkSyncStatus,
   CURRENT_DATABASE_VERSION,
-  EV,
   EVENTS,
   sendSyncProgressEvent,
   SYNC_CHECK_IDS
@@ -55,7 +54,6 @@ import {
 import { DownloadableFile } from "../../database/fs.js";
 import { SyncDevices } from "./devices.js";
 import { DefaultColors } from "../../collections/colors.js";
-import { Monographs } from "../monographs.js";
 
 enum LogLevel {
   /** Log level for very low severity diagnostic messages. */
@@ -103,7 +101,7 @@ export default class SyncManager {
 
   async start(options: SyncOptions) {
     try {
-      if (await checkSyncStatus(SYNC_CHECK_IDS.autoSync))
+      if (await checkSyncStatus(this.db.eventManager, SYNC_CHECK_IDS.autoSync))
         await this.sync.autoSync.start();
       await this.sync.start(options);
       return true;
@@ -176,7 +174,7 @@ class Sync {
     await this.createConnection(options);
     if (!this.connection) return;
 
-    if (!(await checkSyncStatus(SYNC_CHECK_IDS.sync))) {
+    if (!(await checkSyncStatus(this.db.eventManager, SYNC_CHECK_IDS.sync))) {
       await this.connection.stop();
       return;
     }
@@ -206,7 +204,9 @@ class Sync {
 
     await this.stop(options);
 
-    if (!(await checkSyncStatus(SYNC_CHECK_IDS.autoSync))) {
+    if (
+      !(await checkSyncStatus(this.db.eventManager, SYNC_CHECK_IDS.autoSync))
+    ) {
       await this.connection.stop();
       this.autoSync.stop();
     }
@@ -418,7 +418,7 @@ class Sync {
     const { HubConnectionBuilder, HttpTransportType, JsonHubProtocol } =
       await import("@microsoft/signalr");
 
-    const tokenManager = new TokenManager(this.db.kv);
+    const tokenManager = new TokenManager(this.db.kv, this.db.eventManager);
     this.connection = new HubConnectionBuilder()
       .withUrl(`${Constants.API_HOST}/hubs/sync/v2`, {
         accessTokenFactory: async () => {
@@ -519,7 +519,7 @@ class Sync {
       this.logger.error(
         new Error("User encryption key not generated. Please relogin.")
       );
-      EV.publish(EVENTS.userSessionExpired);
+      this.db.eventManager.publish(EVENTS.userSessionExpired);
       return;
     }
     return key;
