@@ -27,7 +27,7 @@ import {
   KeepLocalCopyResponse,
   pick as pickFile
 } from "@react-native-documents/picker";
-import { basename } from "pathe";
+import { basename, dirname } from "pathe";
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import { Image, openCamera, openPicker } from "react-native-image-crop-picker";
@@ -119,7 +119,9 @@ const file = async (fileOptions: PickerOptions) => {
       throw new Error("Failed to attach file");
     }
 
-    await RNFetchBlob.fs.unlink(uri);
+    RNFetchBlob.fs.unlink(dirname(fileCopyUri.localUri)).catch((e) => {
+      console.log(e, "error");
+    });
 
     if (
       fileOptions.tabId !== undefined &&
@@ -154,6 +156,7 @@ const file = async (fileOptions: PickerOptions) => {
       throw new Error("Failed to attach file, no tabId is set");
     }
   } catch (e) {
+    console.log("ERROR OCCURED HERE.", e);
     ToastManager.show({
       heading: (e as Error).message,
       type: "error",
@@ -264,7 +267,6 @@ const handleImageResponse = async (
   for (const image of response) {
     const isPng = /(png)/g.test(image.mime);
     const isJpeg = /(jpeg|jpg)/g.test(image.mime);
-
     if (compress && (isPng || isJpeg)) {
       image.path = await compressToFile(
         Platform.OS === "ios" ? "file://" + image.path : image.path,
@@ -304,7 +306,7 @@ const handleImageResponse = async (
 
     if (!(await attachFile(uri, hash, image.mime, fileName, options))) return;
 
-    if (Platform.OS === "ios") await RNFetchBlob.fs.unlink(uri);
+    RNFetchBlob.fs.unlink(uri).catch((e) => {});
 
     if (
       options.tabId !== undefined &&
@@ -389,9 +391,7 @@ export async function attachFile(
     return true;
   } catch (e) {
     DatabaseLogger.error(e);
-    if (Platform.OS === "ios") {
-      await RNFetchBlob.fs.unlink(uri);
-    }
+    RNFetchBlob.fs.unlink(uri).catch((e) => {});
     return false;
   }
 }
