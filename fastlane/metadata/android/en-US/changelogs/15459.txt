@@ -1,0 +1,13 @@
+- Add notebooks, tags and colors to Home Screen Shortcuts
+- Change day format and use /day in notes
+- Add Setting to change default editor line height
+- Set a custom title for monographs
+- Add webpage title and date clipped to web clips
+- Configure Week to start from Sunday or Monday
+- Change Note's creation date
+- Set expiry date on notes
+- Temporarily disable password change and recovery options
+- Note history now includes note title
+- Minor bug fixes
+
+Thank you for using Notesnook!
