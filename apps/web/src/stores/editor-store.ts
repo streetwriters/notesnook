@@ -23,7 +23,7 @@ import { store as appStore } from "./app-store";
 import { useStore as useSettingStore } from "./setting-store";
 import { db } from "../common/db";
 import BaseStore from ".";
-import { EV, EVENTS } from "@notesnook/core";
+import { EVENTS } from "@notesnook/core";
 import { logger } from "../utils/logger";
 import Config from "../utils/config";
 import { setDocumentTitle } from "../utils/dom";
@@ -255,7 +255,7 @@ class EditorStore extends BaseStore<EditorStore> {
       closeTabs(...tabs.map((s) => s.id));
     });
 
-    EV.subscribe(EVENTS.vaultLocked, () => {
+    db.eventManager.subscribe(EVENTS.vaultLocked, () => {
       this.set((state) => {
         state.sessions = state.sessions.map((session) => {
           if (isLockedSession(session)) {

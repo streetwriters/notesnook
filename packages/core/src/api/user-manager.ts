@@ -51,8 +51,8 @@ class UserManager {
   private tokenManager: TokenManager;
   private keyManager: KeyManager;
   constructor(private readonly db: Database) {
-    this.tokenManager = new TokenManager(db.kv);
     this.keyManager = new KeyManager(db);
+    this.tokenManager = new TokenManager(db.kv, db.eventManager);
 
     EV.subscribe(EVENTS.userUnauthorized, async (url: string) => {
       if (url.includes("/connect/token") || !(await HealthCheck.auth())) return;

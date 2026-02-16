@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import {
   checkSyncStatus,
   CURRENT_DATABASE_VERSION,
-  EV,
   EVENTS,
   sendSyncProgressEvent,
   SYNC_CHECK_IDS
@@ -104,7 +103,7 @@ export default class SyncManager {
 
   async start(options: SyncOptions) {
     try {
-      if (await checkSyncStatus(SYNC_CHECK_IDS.autoSync))
+      if (await checkSyncStatus(this.db.eventManager, SYNC_CHECK_IDS.autoSync))
         await this.sync.autoSync.start();
       await this.sync.start(options);
       return true;
@@ -177,7 +176,7 @@ export class Sync {
     await this.createConnection(options);
     if (!this.connection) return;
 
-    if (!(await checkSyncStatus(SYNC_CHECK_IDS.sync))) {
+    if (!(await checkSyncStatus(this.db.eventManager, SYNC_CHECK_IDS.sync))) {
       await this.connection.stop();
       return;
     }
@@ -207,7 +206,9 @@ export class Sync {
 
     await this.stop(options);
 
-    if (!(await checkSyncStatus(SYNC_CHECK_IDS.autoSync))) {
+    if (
+      !(await checkSyncStatus(this.db.eventManager, SYNC_CHECK_IDS.autoSync))
+    ) {
       await this.connection.stop();
       this.autoSync.stop();
     }
@@ -454,7 +455,7 @@ export class Sync {
     const { HubConnectionBuilder, HttpTransportType, JsonHubProtocol } =
       await import("@microsoft/signalr");
 
-    const tokenManager = new TokenManager(this.db.kv);
+    const tokenManager = new TokenManager(this.db.kv, this.db.eventManager);
     this.connection = new HubConnectionBuilder()
       .withUrl(`${Constants.API_HOST}/hubs/sync/v2`, {
         accessTokenFactory: async () => {
@@ -517,7 +518,7 @@ export class Sync {
         this.logger.error(
           new Error("User encryption keys not generated. Please relogin.")
         );
-        EV.publish(EVENTS.userSessionExpired);
+        this.db.eventManager.publish(EVENTS.userSessionExpired);
         return false;
       }
       await this.processChunk(chunk, keys, options);

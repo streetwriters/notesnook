@@ -29,7 +29,6 @@ export type SyncProgressEventType = {
 
 const useSyncProgress = () => {
   const [progress, setProgress] = useState<SyncProgressEventType>();
-  const EV = db.eventManager;
 
   const onProgress = useCallback(
     ({ type, current, total }: SyncProgressEventType) => {
@@ -42,13 +41,13 @@ const useSyncProgress = () => {
     setProgress(undefined);
   };
   useEffect(() => {
-    EV?.subscribe(EVENTS.syncProgress, onProgress);
-    EV?.subscribe(EVENTS.syncCompleted, onSyncComplete);
+    db.eventManager.subscribe(EVENTS.syncProgress, onProgress);
+    db.eventManager.subscribe(EVENTS.syncCompleted, onSyncComplete);
     return () => {
-      EV?.unsubscribe(EVENTS.syncProgress, onProgress);
-      EV?.unsubscribe(EVENTS.syncCompleted, onSyncComplete);
+      db.eventManager.unsubscribe(EVENTS.syncProgress, onProgress);
+      db.eventManager.unsubscribe(EVENTS.syncCompleted, onSyncComplete);
     };
-  }, [EV, onProgress]);
+  }, [onProgress]);
 
   return {
     progress

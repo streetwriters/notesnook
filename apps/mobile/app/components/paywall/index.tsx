@@ -76,6 +76,7 @@ import { IconButton } from "../ui/icon-button";
 import { SvgView } from "../ui/svg";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { db } from "../../common/database";
 
 const Steps = {
   select: 1,
@@ -139,7 +140,7 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
   }, [isFocused, step]);
 
   useEffect(() => {
-    const sub = EV.subscribe(
+    const sub = db.eventManager.subscribe(
       EVENTS.userSubscriptionUpdated,
       (sub: User["subscription"]) => {
         if (sub.plan === SubscriptionPlan.FREE) return;
@@ -1007,8 +1008,8 @@ const PricingPlanCard = ({
                   : "monthly"
               }`
             : pricingPlans.isGithubRelease
-              ? (WebPlan?.period as string)
-              : (product?.productId as string)
+            ? (WebPlan?.period as string)
+            : (product?.productId as string)
         );
         setStep(Steps.buy);
       }}

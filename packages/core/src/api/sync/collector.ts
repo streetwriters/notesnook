@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Cipher } from "@notesnook/crypto";
 import Database from "../index.js";
-import { CURRENT_DATABASE_VERSION, EV, EVENTS } from "../../common.js";
+import { CURRENT_DATABASE_VERSION, EVENTS } from "../../common.js";
 import { logger } from "../../logger.js";
 import {
   SyncItem,
@@ -49,7 +49,7 @@ class Collector {
   ): AsyncGenerator<SyncTransferItem, void, unknown> {
     const keys = await this.db.user.getDataEncryptionKeys();
     if (!keys || !keys.length) {
-      EV.publish(EVENTS.userSessionExpired);
+      this.db.eventManager.publish(EVENTS.userSessionExpired);
       throw new Error("User encryption key not generated. Please relogin.");
     }
 
