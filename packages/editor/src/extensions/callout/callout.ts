@@ -18,14 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import {
   getParentAttributes,
-  isClickWithinBounds
+  isClickWithinBounds,
+  findParentNodeOfTypeClosestToPos
 } from "../../utils/prosemirror.js";
-import {
-  InputRule,
-  Node,
-  findParentNodeClosestToPos,
-  mergeAttributes
-} from "@tiptap/core";
+import { tiptapKeys } from "@notesnook/common";
+import { InputRule, Node, mergeAttributes } from "@tiptap/core";
 import { Paragraph } from "../paragraph/index.js";
 import { Heading } from "../heading/index.js";
 import { TextSelection } from "@tiptap/pm/state";
@@ -218,6 +215,35 @@ export const Callout = Node.create({
         }
       })
     ];
+  },
+
+  addKeyboardShortcuts() {
+    return {
+      [tiptapKeys.toggleNodeExpand.keys]: ({ editor }) => {
+        const { selection } = editor.state;
+        const { $from, empty } = selection;
+
+        if (!empty) return false;
+        if ($from.parent.type.name !== Heading.name) return false;
+
+        const callout = findParentNodeOfTypeClosestToPos($from, this.type);
+        if (!callout) return false;
+
+        const firstChild = callout.node.firstChild;
+        if (!firstChild || firstChild.type.name !== Heading.name) return false;
+
+        const headingStart = callout.start;
+        const headingEnd = headingStart + firstChild.nodeSize;
+        if ($from.pos < headingStart || $from.pos > headingEnd) return false;
+
+        const isCollapsed = callout.node.attrs.collapsed;
+
+        return editor.commands.command(({ tr }) => {
+          tr.setNodeAttribute(callout.pos, "collapsed", !isCollapsed);
+          return true;
+        });
+      }
+    };
   },
 
   addNodeView() {

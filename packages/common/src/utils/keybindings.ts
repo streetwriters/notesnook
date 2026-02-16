@@ -323,9 +323,9 @@ export const tiptapKeys = {
     category: "Editor",
     type: "tiptap"
   },
-  toggleOutlineListExpand: {
+  toggleNodeExpand: {
     keys: "Mod-Space",
-    description: "Toggle outline list expand",
+    description: "Toggle callout/heading/outline list expand",
     category: "Editor",
     type: "tiptap"
   },
