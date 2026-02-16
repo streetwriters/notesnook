@@ -303,7 +303,7 @@ function EditorView({
 
           const result = await db.vault
             .decryptContent(item)
-            .catch(() => EV.publish(EVENTS.vaultLocked));
+            .catch(() => db.eventManager.publish(EVENTS.vaultLocked));
           if (!result) return;
           editor.updateContent(result.data);
         } else if (isNote && session.note.title !== item.title) {
