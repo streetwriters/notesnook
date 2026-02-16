@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { ICollection } from "./collection.js";
 import { getId } from "../utils/id.js";
-import { EV, EVENTS } from "../common.js";
+import { EVENTS } from "../common.js";
 import dataurl from "../utils/dataurl.js";
 import dayjs from "dayjs";
 import {
@@ -48,7 +48,7 @@ export class Attachments implements ICollection {
       db.sanitizer
     );
 
-    EV.subscribe(
+    db.eventManager.subscribe(
       EVENTS.fileDownloaded,
       async ({
         success,
@@ -68,7 +68,7 @@ export class Attachments implements ICollection {
         const src = await this.read(filename, getOutputType(attachment));
         if (!src) return;
 
-        EV.publish(EVENTS.mediaAttachmentDownloaded, {
+        this.db.eventManager.publish(EVENTS.mediaAttachmentDownloaded, {
           groupId,
           hash: attachment.hash,
           attachmentType: getAttachmentType(attachment),
@@ -77,7 +77,7 @@ export class Attachments implements ICollection {
       }
     );
 
-    EV.subscribe(
+    db.eventManager.subscribe(
       EVENTS.fileUploaded,
       async ({
         success,

@@ -30,7 +30,7 @@ import Lookup from "./lookup.js";
 import { Content } from "../collections/content.js";
 import Backup from "../database/backup.js";
 import Hosts from "../utils/constants.js";
-import { EV, EVENTS } from "../common.js";
+import { EVENTS } from "../common.js";
 import { LegacySettings } from "../collections/legacy-settings.js";
 import Migrations from "./migrations.js";
 import UserManager from "./user-manager.js";
@@ -126,7 +126,11 @@ class Database {
       );
     return (
       this._fs ||
-      (this._fs = new FileStorage(this.options.fs, this.tokenManager))
+      (this._fs = new FileStorage(
+        this.options.fs,
+        this.tokenManager,
+        this.eventManager
+      ))
     );
   };
 
@@ -191,7 +195,7 @@ class Database {
   options!: Options;
   eventSource?: EventSource | null;
 
-  tokenManager = new TokenManager(this.kv);
+  tokenManager = new TokenManager(this.kv, this.eventManager);
   mfa = new MFAManager(this.tokenManager);
   subscriptions = new Subscriptions(this);
   circle = new Circle(this);
@@ -293,10 +297,13 @@ class Database {
       this.connectSSE,
       this
     );
-    EV.subscribe(EVENTS.tokenRefreshed, () => this.connectSSE());
-    EV.subscribe(EVENTS.attachmentDeleted, async (attachment: Attachment) => {
-      await this.fs().cancel(attachment.hash);
-    });
+    this.eventManager.subscribe(EVENTS.tokenRefreshed, () => this.connectSSE());
+    this.eventManager.subscribe(
+      EVENTS.attachmentDeleted,
+      async (attachment: Attachment) => {
+        await this.fs().cancel(attachment.hash);
+      }
+    );
     this.eventManager.subscribe(EVENTS.userLoggedOut, async () => {
       await this.monographs.clear();
       await this.fs().clear();

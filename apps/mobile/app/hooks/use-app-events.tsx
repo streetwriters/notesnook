@@ -722,24 +722,39 @@ export const useAppEvents = () => {
 
   useEffect(() => {
     const subscriptions = [
-      EV.subscribe(EVENTS.syncCheckStatus, onCheckSyncStatus),
-      EV.subscribe(EVENTS.syncAborted, onSyncAborted),
-      EV.subscribe(EVENTS.appRefreshRequested, onSyncComplete),
+      db.eventManager.subscribe(EVENTS.syncCheckStatus, onCheckSyncStatus),
+      db.eventManager.subscribe(EVENTS.syncAborted, onSyncAborted),
+      db.eventManager.subscribe(EVENTS.appRefreshRequested, onSyncComplete),
       db.eventManager.subscribe(EVENTS.userLoggedOut, onLogout),
       db.eventManager.subscribe(EVENTS.userEmailConfirmed, onUserEmailVerified),
-      EV.subscribe(EVENTS.userSessionExpired, onUserSessionExpired),
+      db.eventManager.subscribe(
+        EVENTS.userSessionExpired,
+        onUserSessionExpired
+      ),
       db.eventManager.subscribe(
         EVENTS.userSubscriptionUpdated,
         onUserSubscriptionStatusChanged
       ),
-      EV.subscribe(EVENTS.fileDownload, onDownloadingAttachmentProgress),
-      EV.subscribe(EVENTS.fileUpload, onUploadingAttachmentProgress),
-      EV.subscribe(EVENTS.fileDownloaded, onDownloadedAttachmentProgress),
-      EV.subscribe(EVENTS.fileUploaded, onUploadedAttachmentProgress),
-      EV.subscribe(EVENTS.downloadCanceled, (data) => {
+      db.eventManager.subscribe(
+        EVENTS.fileDownload,
+        onDownloadingAttachmentProgress
+      ),
+      db.eventManager.subscribe(
+        EVENTS.fileUpload,
+        onUploadingAttachmentProgress
+      ),
+      db.eventManager.subscribe(
+        EVENTS.fileDownloaded,
+        onDownloadedAttachmentProgress
+      ),
+      db.eventManager.subscribe(
+        EVENTS.fileUploaded,
+        onUploadedAttachmentProgress
+      ),
+      db.eventManager.subscribe(EVENTS.downloadCanceled, (data) => {
         useAttachmentStore.getState().setDownloading(data);
       }),
-      EV.subscribe(EVENTS.uploadCanceled, (data) => {
+      db.eventManager.subscribe(EVENTS.uploadCanceled, (data) => {
         useAttachmentStore.getState().setUploading(data);
       }),
       EV.subscribe(EVENTS.migrationStarted, (name) => {
@@ -765,7 +780,7 @@ export const useAppEvents = () => {
           return;
         endProgress();
       }),
-      EV.subscribe(EVENTS.vaultLocked, async () => {
+      db.eventManager.subscribe(EVENTS.vaultLocked, async () => {
         // Lock all notes in all tabs...
         for (const tab of useTabStore.getState().tabs) {
           const noteId = useTabStore.getState().getTab(tab.id)?.session?.noteId;
@@ -797,7 +812,6 @@ export const useAppEvents = () => {
     return () => {
       emitterSubscriptions.forEach((sub) => sub?.remove?.());
       subscriptions.forEach((sub) => sub?.unsubscribe?.());
-      EV.unsubscribeAll();
     };
   }, [onSyncComplete, onUserUpdated]);
 
