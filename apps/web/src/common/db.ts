@@ -19,24 +19,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { EventSourcePolyfill as EventSource } from "event-source-polyfill";
 import { DatabasePersistence, NNStorage } from "../interfaces/storage";
-import { logger } from "../utils/logger";
-import {
-  database,
-  getFeature,
-  getFeatureLimit,
-  isFeatureAvailable
-} from "@notesnook/common";
+import { database, getFeature, getFeatureLimit } from "@notesnook/common";
 import { createDialect } from "./sqlite";
 import { isFeatureSupported } from "../utils/feature-check";
 import { generatePassword } from "../utils/password-generator";
 import { deriveKey, useKeyStore } from "../interfaces/key-store";
 import {
+  hosts,
   logManager,
   SubscriptionPlan,
   SubscriptionStatus
 } from "@notesnook/core";
 import Config from "../utils/config";
 import { FileStorage } from "../interfaces/fs";
+
+function getHostUrl(hostUrl: keyof typeof hosts, defaultUrl: string) {
+  const envValue = import.meta.env[`NN_${hostUrl}`];
+  return envValue || defaultUrl;
+}
 
 const db = database;
 async function initializeDatabase(persistence: DatabasePersistence) {
@@ -49,13 +49,16 @@ async function initializeDatabase(persistence: DatabasePersistence) {
   }
 
   db.host({
-    API_HOST: "https://api.notesnook.com",
-    AUTH_HOST: "https://auth.streetwriters.co",
-    SSE_HOST: "https://events.streetwriters.co",
-    ISSUES_HOST: "https://issues.streetwriters.co",
-    SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co",
-    MONOGRAPH_HOST: "https://monogr.ph",
-    NOTESNOOK_HOST: "https://notesnook.com",
+    API_HOST: getHostUrl("API_HOST", "https://api.notesnook.com"),
+    AUTH_HOST: getHostUrl("AUTH_HOST", "https://auth.streetwriters.co"),
+    SSE_HOST: getHostUrl("SSE_HOST", "https://events.streetwriters.co"),
+    ISSUES_HOST: getHostUrl("ISSUES_HOST", "https://issues.streetwriters.co"),
+    SUBSCRIPTIONS_HOST: getHostUrl(
+      "SUBSCRIPTIONS_HOST",
+      "https://subscriptions.streetwriters.co"
+    ),
+    MONOGRAPH_HOST: getHostUrl("MONOGRAPH_HOST", "https://monogr.ph"),
+    NOTESNOOK_HOST: getHostUrl("NOTESNOOK_HOST", "https://notesnook.com"),
     ...Config.get("serverUrls", {})
   });
 
