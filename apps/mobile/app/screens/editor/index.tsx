@@ -25,7 +25,8 @@ import React, {
   useEffect,
   useImperativeHandle,
   useLayoutEffect,
-  useRef
+  useRef,
+  useState
 } from "react";
 import { Platform, ViewStyle } from "react-native";
 import WebView from "react-native-webview";
@@ -109,17 +110,20 @@ const Editor = React.memo(
         noToolbar,
         noHeader
       });
-      const renderKey = useRef(randId("editor-id") + editorId);
+      const [renderKey, setRenderKey] = useState(
+        randId("editor-id") + editorId
+      );
       useImperativeHandle(ref, () => ({
         get: () => editor
       }));
       useLockedNoteHandler();
 
       const onError = useCallback(() => {
-        renderKey.current = randId("editor-id") + editorId;
+        setRenderKey(randId("editor-id") + editorId);
         editor.state.current.ready = false;
+        editor.state.current.initialLoadCalled = false;
         editor.setLoading(true);
-      }, [editor, editorId]);
+      }, [editor]);
 
       useEffect(() => {
         const sub = [eSubscribeEvent(eEditorReset, onError)];
@@ -144,7 +148,7 @@ const Editor = React.memo(
           <WebView
             testID={notesnook.editor.id}
             ref={editor.ref}
-            key={renderKey.current}
+            key={renderKey}
             onRenderProcessGone={onError}
             nestedScrollEnabled
             onError={onError}
