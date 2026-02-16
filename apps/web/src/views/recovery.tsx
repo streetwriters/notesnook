@@ -123,6 +123,7 @@ function useAuthenticateUser({
         const user = await db.user.fetchUser();
         setUser(user);
       } catch (e) {
+        console.error(e);
         showToast("error", strings.biometricsAuthFailed());
         openURL("/");
       } finally {

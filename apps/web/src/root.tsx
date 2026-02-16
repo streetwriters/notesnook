@@ -27,7 +27,6 @@ import {
 } from "./components/error-boundary";
 import { desktop } from "./common/desktop-bridge";
 import { useKeyStore } from "./interfaces/key-store";
-import Config from "./utils/config";
 import { usePromise } from "@notesnook/common";
 import { AuthProps } from "./views/auth";
 import { loadDatabase } from "./hooks/use-database";
@@ -52,13 +51,8 @@ export async function startApp(children?: React.ReactNode) {
     : await import("./components/title-bar").then((m) => m.TitleBar);
 
   try {
-    const { Component, props, path } = await init();
+    const { Component, props, path, persistence } = await init();
 
-    const persistence =
-      (path !== "/sessionexpired" && path !== "/account/recovery") ||
-      Config.get("sessionExpired", false)
-        ? "db"
-        : "memory";
     await useKeyStore.getState().init({ persistence });
 
     root.render(
