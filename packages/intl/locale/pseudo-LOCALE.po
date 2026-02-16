@@ -1093,6 +1093,10 @@ msgstr ""
 msgid "Automatically download & install updates in the background without prompting first."
 msgstr ""
 
+#: src/strings.ts:2638
+msgid "Automatically generate thumbnails for notes with images"
+msgstr ""
+
 #: src/strings.ts:1191
 msgid "Automatically lock the app after a certain period"
 msgstr ""
@@ -3004,6 +3008,10 @@ msgstr ""
 
 #: src/strings.ts:2092
 msgid "General"
+msgstr ""
+
+#: src/strings.ts:2636
+msgid "Generate thumbnails"
 msgstr ""
 
 #: src/strings.ts:1268
@@ -5964,6 +5972,10 @@ msgstr ""
 
 #: src/strings.ts:324
 msgid "Shortcuts"
+msgstr ""
+
+#: src/strings.ts:2639
+msgid "Show thumbnail"
 msgstr ""
 
 #: src/strings.ts:96

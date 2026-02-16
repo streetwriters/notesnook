@@ -56,6 +56,7 @@ import { store as selectionStore } from "../../stores/selection-store";
 import { store as tagStore } from "../../stores/tag-store";
 import { store as userstore } from "../../stores/user-store";
 import { store as appStore } from "../../stores/app-store";
+import { useStore as useSettingStore } from "../../stores/setting-store";
 import { writeToClipboard } from "../../utils/clipboard";
 import { showToast } from "../../utils/toast";
 import IconTag from "../icon-tag";
@@ -102,6 +103,7 @@ import { Context } from "../list-container/types";
 import ListItem from "../list-item";
 import { PublishDialog } from "../publish-view";
 import TimeAgo from "../time-ago";
+import ThumbnailImage from "../thumbnail-image";
 import { NoteExpiryDateDialog } from "../../dialogs/note-expiry-date-dialog";
 import { withFeatureCheck } from "../../common";
 
@@ -129,6 +131,7 @@ function Note(props: NoteProps) {
 
   const isOpened = useEditorStore((store) => store.isNoteOpen(item.id));
   const primary: SchemeColors = color ? color.colorCode : "accent-selected";
+  const generateThumbnails = useSettingStore((store) => store.generateThumbnails);
 
   return (
     <ListItem
@@ -137,6 +140,7 @@ function Note(props: NoteProps) {
       isCompact={compact}
       item={note}
       title={note.title}
+      thumbnail={generateThumbnails && note.thumbnail ? <ThumbnailImage hash={note.thumbnail} /> : undefined}
       body={note.headline as string}
       onKeyPress={async (e) => {
         if (e.key === "Delete") {
@@ -153,6 +157,7 @@ function Note(props: NoteProps) {
       }}
       sx={{
         borderLeft: isOpened ? "4px solid" : "none",
+        alignItems: "flex-start",
         pl: isOpened ? "3px" : "7px",
         borderLeftColor: isOpened ? primary : "transparent"
       }}

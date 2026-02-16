@@ -32,7 +32,8 @@ import {
   ReferencedIn as ReferencedInIcon,
   Note as NoteIcon,
   Archive,
-  Edit
+  Edit,
+  FileImage
 } from "../icons";
 import { Button, Flex, Text, FlexProps } from "@theme-ui/components";
 import {
@@ -42,6 +43,7 @@ import {
 } from "../../stores/editor-store";
 import { db } from "../../common/db";
 import { useStore as useAppStore } from "../../stores/app-store";
+import { useStore as useSettingStore } from "../../stores/setting-store";
 import { useStore as useAttachmentStore } from "../../stores/attachment-store";
 import { store as noteStore } from "../../stores/note-store";
 import Toggle from "./toggle";
@@ -94,6 +96,12 @@ const tools = [
     icon: SyncOff,
     label: strings.disableSync(),
     property: "localOnly"
+  },
+  {
+    key: "thumbnail",
+    icon: FileImage,
+    label: strings.showThumbnail(),
+    property: "showThumbnail"
   }
 ] as const;
 
@@ -129,6 +137,9 @@ function EditorProperties(props: EditorPropertiesProps) {
       "deleted",
       "diff"
     ])
+  );
+  const generateThumbnails = useSettingStore(
+    (store) => store.generateThumbnails
   );
   if (isFocusMode || !session) return null;
   return (
@@ -183,9 +194,14 @@ function EditorProperties(props: EditorPropertiesProps) {
                         isOn={
                           tool.property === "locked"
                             ? "locked" in session && !!session.locked
+                            : tool.property === "showThumbnail"
+                            ? (session.note as any)[tool.property] ?? true
                             : !!session.note[tool.property]
                         }
                         onToggle={() => changeToggleState(tool.key, session)}
+                        disabled={
+                          tool.key === "thumbnail" ? !generateThumbnails : false
+                        }
                         testId={`properties-${tool.key}`}
                       />
                     ))}
@@ -871,7 +887,14 @@ export function Section({
 }
 
 function changeToggleState(
-  prop: "lock" | "readonly" | "local-only" | "pin" | "favorite" | "archive",
+  prop:
+    | "lock"
+    | "readonly"
+    | "local-only"
+    | "pin"
+    | "favorite"
+    | "archive"
+    | "thumbnail",
   session: ReadonlyEditorSession | DefaultEditorSession
 ) {
   const {
@@ -898,6 +921,11 @@ function changeToggleState(
       return noteStore.favorite(!favorite, sessionId);
     case "archive":
       return noteStore.archive(!archived, sessionId);
+    case "thumbnail":
+      return noteStore.showThumbnail(
+        !(session.note.showThumbnail ?? true),
+        sessionId
+      );
     default:
       return;
   }

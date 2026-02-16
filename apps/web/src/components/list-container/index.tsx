@@ -219,6 +219,7 @@ function ListContainer(props: ListContainerProps) {
             ref={listContainerRef}
             variant="columnFill"
             data-test-id={`${type}-list`}
+            sx={{ containerType: "inline-size" }}
           >
             <Virtuoso
               ref={listRef}

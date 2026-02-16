@@ -139,6 +139,11 @@ class NoteStore extends BaseStore<NoteStore> {
     await appStore.refreshNavItems();
     await this.refresh();
   };
+
+  showThumbnail = async (showThumbnail: boolean, ...ids: string[]) => {
+    await db.notes.showThumbnail(showThumbnail, ...ids);
+    await this.refresh();
+  };
 }
 
 const [useStore, store] = createStore<NoteStore>(

@@ -2632,5 +2632,9 @@ Use this if changes from other devices are not appearing on this device. This wi
   expiryDate: () => t`Expiry date`,
   exportCsv: () => t`Export CSV`,
   importCsv: () => t`Import CSV`,
-  noContent: () => t`This note is empty`
+  noContent: () => t`This note is empty`,
+  generateThumbnails: () => t`Generate thumbnails`,
+  generateThumbnailsDesc: () =>
+    t`Automatically generate thumbnails for notes with images`,
+  showThumbnail: () => t`Show thumbnail`
 };
