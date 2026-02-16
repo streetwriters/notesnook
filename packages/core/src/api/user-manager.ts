@@ -604,11 +604,6 @@ class UserManager {
     data.encryptionKey = data.encryptionKey || (await this.getMasterKey());
 
     const updateUserPayload: Partial<User> = {};
-    console.log(
-      "Has encryption key",
-      !!data.encryptionKey,
-      await this.getMasterKey()
-    );
     if (data.encryptionKey) {
       const newMasterKey = await this.db
         .storage()
