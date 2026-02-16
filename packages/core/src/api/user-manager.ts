@@ -81,13 +81,34 @@ class UserManager {
     email = email.toLowerCase();
 
     const hashedPassword = await this.db.storage().hash(password, email);
-    await http.post(`${constants.API_HOST}${ENDPOINTS.signup}`, {
-      email,
-      password: hashedPassword,
-      client_id: "notesnook"
+    await this.tokenManager.saveToken(
+      await http.post(`${constants.API_HOST}${ENDPOINTS.signup}`, {
+        email,
+        password: hashedPassword,
+        client_id: "notesnook"
+      })
+    );
+
+    const user = await this.fetchUser();
+    if (!user) return;
+
+    await this.db.storage().deriveCryptoKey({
+      password,
+      salt: user.salt
     });
-    EV.publish(EVENTS.userSignedUp);
-    return await this._login({ email, password, hashedPassword });
+    await this.db.setLastSynced(0);
+    await this.db.syncer.devices.register();
+
+    const masterKey = await this.getMasterKey();
+    if (!masterKey) throw new Error("User encryption key not generated.");
+    await this.updateUser({
+      dataEncryptionKey: await this.keyManager.wrapKey(
+        await this.db.crypto().generateRandomKey(),
+        masterKey
+      )
+    });
+
+    this.db.eventManager.publish(EVENTS.userLoggedIn, user);
   }
 
   async authenticateEmail(email: string) {
@@ -203,61 +224,6 @@ class UserManager {
       await this.tokenManager.saveToken(token);
       throw e;
     }
-  }
-
-  async _login({
-    email,
-    password,
-    hashedPassword,
-    code,
-    method
-  }: {
-    email: string;
-    password: string;
-    hashedPassword?: string;
-    code?: string;
-    method?: string;
-  }) {
-    email = email && email.toLowerCase();
-
-    if (!hashedPassword && password) {
-      hashedPassword = await this.db.storage().hash(password, email);
-    }
-
-    await this.tokenManager.saveToken(
-      await http.post(`${constants.AUTH_HOST}${ENDPOINTS.token}`, {
-        username: email,
-        password: hashedPassword,
-        grant_type: code ? "mfa" : "password",
-        scope: "notesnook.sync offline_access IdentityServerApi",
-        client_id: "notesnook",
-        "mfa:code": code,
-        "mfa:method": method
-      })
-    );
-
-    const user = await this.fetchUser();
-    if (!user) return;
-
-    await this.db.storage().deriveCryptoKey({
-      password,
-      salt: user.salt
-    });
-    await this.db.setLastSynced(0);
-    await this.db.syncer.devices.register();
-
-    // TODO: Uncomment this when we are done testing legacy password change
-    // support
-    // const masterKey = await this.getMasterKey();
-    // if (!masterKey) throw new Error("User encryption key not generated.");
-    // await this.updateUser({
-    //   dataEncryptionKey: await this.keyManager.wrapKey(
-    //     await this.db.crypto().generateRandomKey(),
-    //     masterKey
-    //   )
-    // });
-
-    this.db.eventManager.publish(EVENTS.userLoggedIn, user);
   }
 
   async getSessions() {
