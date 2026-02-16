@@ -80,6 +80,10 @@ navigation:
       - path: custom-themes/create-a-theme-with-theme-builder.md
       - path: custom-themes/install-a-theme-from-file.md
       - path: custom-themes/publish-a-theme.md
+  - path: self-hosting
+    children:
+      - path: self-hosting/overview.md
+      - path: self-hosting/getting-started.md
   - path: faqs
     children:
       - path: faqs/what-are-merge-conflicts.md
