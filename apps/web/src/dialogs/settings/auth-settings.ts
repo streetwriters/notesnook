@@ -27,7 +27,6 @@ import { RecoveryCodesDialog } from "../mfa/recovery-code-dialog";
 import { MultifactorDialog } from "../mfa/multi-factor-dialog";
 import { RecoveryKeyDialog } from "../recovery-key-dialog";
 import { strings } from "@notesnook/intl";
-import { ConfirmDialog } from "../confirm";
 
 export const AuthenticationSettings: SettingsGroup[] = [
   {
@@ -46,39 +45,38 @@ export const AuthenticationSettings: SettingsGroup[] = [
             title: strings.changePassword(),
             variant: "secondary",
             action: async () => {
-              ConfirmDialog.show({
-                title: "Password changing has been disabled temporarily",
-                message:
-                  "Password changing has been disabled temporarily to address some issues faced by users. It will be enabled again once the issues have resolved.",
-                positiveButtonText: "Ok"
+              const result = await showPasswordDialog({
+                title: strings.changePassword(),
+                message: strings.changePasswordDesc(),
+                inputs: {
+                  oldPassword: {
+                    label: strings.oldPassword(),
+                    autoComplete: "current-password"
+                  },
+                  newPassword: {
+                    label: strings.newPassword(),
+                    autoComplete: "new-password"
+                  }
+                },
+                validate: async ({ oldPassword, newPassword }) => {
+                  try {
+                    if (!(await createBackup({ noVerify: true }))) return false;
+                    return (
+                      (await db.user.changePassword(
+                        oldPassword,
+                        newPassword
+                      )) || false
+                    );
+                  } catch (e) {
+                    console.error(e);
+                    return false;
+                  }
+                }
               });
-              return;
-              // const result = await showPasswordDialog({
-              //   title: strings.changePassword(),
-              //   message: strings.changePasswordDesc(),
-              //   inputs: {
-              //     oldPassword: {
-              //       label: strings.oldPassword(),
-              //       autoComplete: "current-password"
-              //     },
-              //     newPassword: {
-              //       label: strings.newPassword(),
-              //       autoComplete: "new-password"
-              //     }
-              //   },
-              //   validate: async ({ oldPassword, newPassword }) => {
-              //     if (!(await createBackup())) return false;
-              //     await db.user.clearSessions();
-              //     return (
-              //       (await db.user.changePassword(oldPassword, newPassword)) ||
-              //       false
-              //     );
-              //   }
-              // });
-              // if (result) {
-              //   showToast("success", strings.passwordChangedSuccessfully());
-              //   await RecoveryKeyDialog.show({});
-              // }
+              if (result) {
+                showToast("success", strings.passwordChangedSuccessfully());
+                await RecoveryKeyDialog.show({});
+              }
             }
           }
         ]

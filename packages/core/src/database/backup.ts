@@ -309,8 +309,8 @@ export default class Backup {
     if (encrypt && !user)
       throw new Error("Please login to create encrypted backups.");
 
-    const key = await this.db.user.getEncryptionKey();
-    if (encrypt && !key) throw new Error("No encryption key found.");
+    const key = await this.db.user.getMasterKey();
+    if (encrypt && !key) throw new Error("No master key found.");
 
     yield {
       type: "file",

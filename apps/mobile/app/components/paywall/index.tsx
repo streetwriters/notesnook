@@ -144,7 +144,7 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
       (sub: User["subscription"]) => {
         if (sub.plan === SubscriptionPlan.FREE) return;
         if (routeParams.context === "signup") {
-          Navigation.replace("FluidPanelsView", {});
+          Navigation.navigate("FluidPanelsView", {});
         } else {
           Navigation.goBack();
         }
@@ -182,8 +182,9 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
         >
           <IconButton
             name="close"
+            color={colors.primary.icon}
             onPress={() => {
-              Navigation.replace("FluidPanelsView", {});
+              Navigation.navigate("FluidPanelsView", {});
             }}
           />
         </View>
@@ -196,7 +197,7 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
               return;
             }
             if (routeParams.context === "signup") {
-              Navigation.replace("FluidPanelsView", {});
+              Navigation.navigate("FluidPanelsView", {});
             } else {
               Navigation.goBack();
             }
@@ -654,7 +655,7 @@ After trying all the privacy security oriented note taking apps, for the price a
             type="accent"
             onPress={() => {
               if (routeParams.context === "signup") {
-                Navigation.replace("FluidPanelsView", {});
+                Navigation.navigate("FluidPanelsView", {});
               } else {
                 Navigation.goBack();
               }

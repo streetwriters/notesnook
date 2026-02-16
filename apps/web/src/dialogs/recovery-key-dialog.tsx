@@ -38,7 +38,7 @@ type RecoveryKeyDialogProps = BaseDialogProps<false>;
 export const RecoveryKeyDialog = DialogManager.register(
   function RecoveryKeyDialog(props: RecoveryKeyDialogProps) {
     const key = usePromise(() =>
-      db.user.getEncryptionKey().then((key) => key?.key)
+      db.user.getMasterKey().then((key) => key?.key)
     );
     const [copyText, setCopyText] = useState("Copy to clipboard");
 

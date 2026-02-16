@@ -24,8 +24,15 @@ import TokenManager from "./token-manager.js";
 import { EV, EVENTS } from "../common.js";
 import { HealthCheck } from "./healthcheck.js";
 import Database from "./index.js";
-import { SerializedKeyPair, SerializedKey, Cipher } from "@notesnook/crypto";
+import { SerializedKeyPair, SerializedKey } from "@notesnook/crypto";
 import { logger } from "../logger.js";
+import { KEY_VERSION, KeyVersion } from "./sync/types.js";
+import {
+  KeyId,
+  KeyManager,
+  KeyTypeFromId,
+  UnwrapKeyReturnType
+} from "./key-manager.js";
 
 const ENDPOINTS = {
   signup: "/users",
@@ -42,11 +49,10 @@ const ENDPOINTS = {
 
 class UserManager {
   private tokenManager: TokenManager;
-  private cachedAttachmentKey?: SerializedKey;
-  private cachedMonographPasswordsKey?: SerializedKey;
-  private cachedInboxKeys?: SerializedKeyPair;
+  private keyManager: KeyManager;
   constructor(private readonly db: Database) {
-    this.tokenManager = new TokenManager(this.db.kv);
+    this.tokenManager = new TokenManager(db.kv);
+    this.keyManager = new KeyManager(db);
 
     EV.subscribe(EVENTS.userUnauthorized, async (url: string) => {
       if (url.includes("/connect/token") || !(await HealthCheck.auth())) return;
@@ -75,13 +81,34 @@ class UserManager {
     email = email.toLowerCase();
 
     const hashedPassword = await this.db.storage().hash(password, email);
-    await http.post(`${constants.API_HOST}${ENDPOINTS.signup}`, {
-      email,
-      password: hashedPassword,
-      client_id: "notesnook"
+    await this.tokenManager.saveToken(
+      await http.post(`${constants.API_HOST}${ENDPOINTS.signup}`, {
+        email,
+        password: hashedPassword,
+        client_id: "notesnook"
+      })
+    );
+
+    const user = await this.fetchUser();
+    if (!user) return;
+
+    await this.db.storage().deriveCryptoKey({
+      password,
+      salt: user.salt
     });
-    EV.publish(EVENTS.userSignedUp);
-    return await this._login({ email, password, hashedPassword });
+    await this.db.setLastSynced(0);
+    await this.db.syncer.devices.register();
+
+    const masterKey = await this.getMasterKey();
+    if (!masterKey) throw new Error("User encryption key not generated.");
+    await this.updateUser({
+      dataEncryptionKey: await this.keyManager.wrapKey(
+        await this.db.crypto().generateRandomKey(),
+        masterKey
+      )
+    });
+
+    this.db.eventManager.publish(EVENTS.userLoggedIn, user);
   }
 
   async authenticateEmail(email: string) {
@@ -199,50 +226,6 @@ class UserManager {
     }
   }
 
-  async _login({
-    email,
-    password,
-    hashedPassword,
-    code,
-    method
-  }: {
-    email: string;
-    password: string;
-    hashedPassword?: string;
-    code?: string;
-    method?: string;
-  }) {
-    email = email && email.toLowerCase();
-
-    if (!hashedPassword && password) {
-      hashedPassword = await this.db.storage().hash(password, email);
-    }
-
-    await this.tokenManager.saveToken(
-      await http.post(`${constants.AUTH_HOST}${ENDPOINTS.token}`, {
-        username: email,
-        password: hashedPassword,
-        grant_type: code ? "mfa" : "password",
-        scope: "notesnook.sync offline_access IdentityServerApi",
-        client_id: "notesnook",
-        "mfa:code": code,
-        "mfa:method": method
-      })
-    );
-
-    const user = await this.fetchUser();
-    if (!user) return;
-
-    await this.db.storage().deriveCryptoKey({
-      password,
-      salt: user.salt
-    });
-    await this.db.setLastSynced(0);
-    await this.db.syncer.devices.register();
-
-    this.db.eventManager.publish(EVENTS.userLoggedIn, user);
-  }
-
   async getSessions() {
     const token = await this.tokenManager.getAccessToken();
     if (!token) return;
@@ -278,8 +261,7 @@ class UserManager {
     } catch (e) {
       logger.error(e, "Error logging out user.", { revoke, reason });
     } finally {
-      this.cachedAttachmentKey = undefined;
-      this.cachedInboxKeys = undefined;
+      this.keyManager.clearCache();
       await this.db.reset();
       this.db.eventManager.publish(EVENTS.userLoggedOut, reason);
       this.db.eventManager.publish(EVENTS.appRefreshRequested);
@@ -381,7 +363,7 @@ class UserManager {
   }
 
   changePassword(oldPassword: string, newPassword: string) {
-    return this._updatePassword("change_password", {
+    return this._updatePassword("change", {
       old_password: oldPassword,
       new_password: newPassword
     });
@@ -402,12 +384,46 @@ class UserManager {
   }
 
   resetPassword(newPassword: string) {
-    return this._updatePassword("reset_password", {
+    return this._updatePassword("reset", {
       new_password: newPassword
     });
   }
 
-  async getEncryptionKey(): Promise<SerializedKey | undefined> {
+  async getDataEncryptionKeys(): Promise<
+    { version: KeyVersion; key: SerializedKey }[] | undefined
+  > {
+    const masterKey = await this.getMasterKey();
+    if (!masterKey) return;
+
+    const dataEncryptionKey = await this.keyManager.get("dataEncryptionKey");
+    if (!dataEncryptionKey)
+      return [
+        {
+          key: masterKey,
+          version: KEY_VERSION.LEGACY
+        }
+      ];
+    const keys: { version: KeyVersion; key: SerializedKey }[] = [];
+
+    const legacyDataEncryptionKey = await this.keyManager.get(
+      "legacyDataEncryptionKey"
+    );
+    if (legacyDataEncryptionKey)
+      keys.push({
+        key: await this.keyManager.unwrapKey(
+          legacyDataEncryptionKey,
+          masterKey
+        ),
+        version: KEY_VERSION.LEGACY
+      });
+    keys.push({
+      key: await this.keyManager.unwrapKey(dataEncryptionKey, masterKey),
+      version: KEY_VERSION.DEK
+    });
+    return keys;
+  }
+
+  async getMasterKey(): Promise<SerializedKey | undefined> {
     const user = await this.getUser();
     if (!user) return;
     const key = await this.db.storage().getCryptoKey();
@@ -426,44 +442,31 @@ class UserManager {
     return { key, salt: user.salt };
   }
 
-  private async getUserKey<T>(config: {
-    getCache: () => T | undefined;
-    setCache: (key: T) => void;
-    userProperty: keyof User;
-    generateKey: () => Promise<T>;
-    errorContext: string;
-    decrypt: (user: User, userEncryptionKey: SerializedKey) => Promise<T>;
-    encrypt: (
-      key: T,
-      userEncryptionKey: SerializedKey
-    ) => Promise<Partial<User>>;
-  }): Promise<T | undefined> {
-    const cachedKey = config.getCache();
-    if (cachedKey) return cachedKey;
-
+  private async getUserKey<TId extends KeyId>(
+    id: TId,
+    config: {
+      generateKey: () => Promise<SerializedKey | SerializedKeyPair>;
+      errorContext: string;
+    }
+  ): Promise<UnwrapKeyReturnType<KeyTypeFromId<TId>> | undefined> {
     try {
-      let user = await this.getUser();
-      if (!user) return;
+      const masterKey = await this.getMasterKey();
+      if (!masterKey) return;
 
-      if (!user[config.userProperty]) {
-        const token = await this.tokenManager.getAccessToken();
-        user = await http.get(`${constants.API_HOST}${ENDPOINTS.user}`, token);
-      }
-      if (!user) return;
+      const wrappedKey = await this.keyManager.get(id);
 
-      const userEncryptionKey = await this.getEncryptionKey();
-      if (!userEncryptionKey) return;
-
-      if (!user[config.userProperty]) {
+      if (!wrappedKey) {
         const key = await config.generateKey();
-        const updatePayload = await config.encrypt(key, userEncryptionKey);
-        await this.updateUser(updatePayload);
-        return key;
+        await this.updateUser({
+          [id]: await this.keyManager.wrapKey(key, masterKey)
+        });
+        return key as UnwrapKeyReturnType<KeyTypeFromId<TId>>;
       }
 
-      const decryptedKey = await config.decrypt(user, userEncryptionKey);
-      config.setCache(decryptedKey);
-      return decryptedKey;
+      return (await this.keyManager.unwrapKey(
+        wrappedKey,
+        masterKey
+      )) as UnwrapKeyReturnType<KeyTypeFromId<TId>>;
     } catch (e) {
       logger.error(e, `Could not get ${config.errorContext}.`);
       if (e instanceof Error)
@@ -474,94 +477,27 @@ class UserManager {
   }
 
   async getAttachmentsKey() {
-    return this.getUserKey<SerializedKey>({
-      getCache: () => this.cachedAttachmentKey,
-      setCache: (key) => {
-        this.cachedAttachmentKey = key;
-      },
-      userProperty: "attachmentsKey",
+    return this.getUserKey("attachmentsKey", {
       generateKey: () => this.db.crypto().generateRandomKey(),
-      errorContext: "attachments encryption key",
-      encrypt: async (key, userEncryptionKey) => {
-        const encryptedKey = await this.db
-          .storage()
-          .encrypt(userEncryptionKey, JSON.stringify(key));
-        return { attachmentsKey: encryptedKey };
-      },
-      decrypt: async (user, userEncryptionKey) => {
-        const encryptedKey = user.attachmentsKey as Cipher<"base64">;
-        const plainData = await this.db
-          .storage()
-          .decrypt(userEncryptionKey, encryptedKey);
-        if (!plainData) throw new Error("Failed to decrypt attachments key");
-        return JSON.parse(plainData) as SerializedKey;
-      }
+      errorContext: "attachments encryption key"
     });
   }
 
   async getMonographPasswordsKey() {
-    return this.getUserKey<SerializedKey>({
-      getCache: () => this.cachedMonographPasswordsKey,
-      setCache: (key) => {
-        this.cachedMonographPasswordsKey = key;
-      },
-      userProperty: "monographPasswordsKey",
+    return this.getUserKey("monographPasswordsKey", {
       generateKey: () => this.db.crypto().generateRandomKey(),
-      errorContext: "monographs encryption key",
-      encrypt: async (key, userEncryptionKey) => {
-        const encryptedKey = await this.db
-          .storage()
-          .encrypt(userEncryptionKey, JSON.stringify(key));
-        return { monographPasswordsKey: encryptedKey };
-      },
-      decrypt: async (user, userEncryptionKey) => {
-        const encryptedKey = user.monographPasswordsKey as Cipher<"base64">;
-        const plainData = await this.db
-          .storage()
-          .decrypt(userEncryptionKey, encryptedKey);
-        if (!plainData)
-          throw new Error("Failed to decrypt monograph passwords key");
-        return JSON.parse(plainData) as SerializedKey;
-      }
+      errorContext: "monographs encryption key"
     });
   }
 
   async getInboxKeys() {
-    return this.getUserKey<SerializedKeyPair>({
-      getCache: () => this.cachedInboxKeys,
-      setCache: (key) => {
-        this.cachedInboxKeys = key;
-      },
-      userProperty: "inboxKeys",
+    return this.getUserKey("inboxKeys", {
       generateKey: () => this.db.crypto().generateCryptoKeyPair(),
-      errorContext: "inbox encryption keys",
-      encrypt: async (keys, userEncryptionKey) => {
-        const encryptedPrivateKey = await this.db
-          .storage()
-          .encrypt(userEncryptionKey, JSON.stringify(keys.privateKey));
-        return {
-          inboxKeys: {
-            public: keys.publicKey,
-            private: encryptedPrivateKey
-          }
-        };
-      },
-      decrypt: async (user, userEncryptionKey) => {
-        if (!user.inboxKeys) throw new Error("Inbox keys not found");
-        const decryptedPrivateKey = await this.db
-          .storage()
-          .decrypt(userEncryptionKey, user.inboxKeys.private);
-        return {
-          publicKey: user.inboxKeys.public,
-          privateKey: JSON.parse(decryptedPrivateKey)
-        };
-      }
+      errorContext: "inbox encryption keys"
     });
   }
 
   async hasInboxKeys() {
-    if (this.cachedInboxKeys) return true;
-
     const user = await this.getUser();
     if (!user) return false;
 
@@ -569,7 +505,7 @@ class UserManager {
   }
 
   async discardInboxKeys() {
-    this.cachedInboxKeys = undefined;
+    this.keyManager.clearCache();
 
     const user = await this.getUser();
     if (!user) return;
@@ -627,19 +563,20 @@ class UserManager {
   async verifyPassword(password: string) {
     try {
       const user = await this.getUser();
-      const key = await this.getEncryptionKey();
+      const key = await this.getMasterKey();
       if (!user || !key) return false;
 
       const cipher = await this.db.storage().encrypt(key, "notesnook");
       const plainText = await this.db.storage().decrypt({ password }, cipher);
       return plainText === "notesnook";
     } catch (e) {
+      logger.error(e);
       return false;
     }
   }
 
   async _updatePassword(
-    type: "change_password" | "reset_password",
+    type: "change" | "reset",
     data: {
       new_password: string;
       old_password?: string;
@@ -652,98 +589,100 @@ class UserManager {
 
     const { email, salt } = user;
 
-    let { new_password, old_password } = data;
+    const { new_password, old_password } = data;
     if (old_password && !(await this.verifyPassword(old_password)))
       throw new Error("Incorrect old password.");
 
+    const oldPassword = old_password
+      ? await this.db.storage().hash(old_password, email, {
+          usesFallback: await this.usesFallbackPWHash(old_password)
+        })
+      : null;
+
     if (!new_password) throw new Error("New password is required.");
 
-    data.encryptionKey = data.encryptionKey || (await this.getEncryptionKey());
+    data.encryptionKey = data.encryptionKey || (await this.getMasterKey());
 
-    await this.clearSessions();
+    const updateUserPayload: Partial<User> = {};
+    console.log(
+      "Has encryption key",
+      !!data.encryptionKey,
+      await this.getMasterKey()
+    );
+    if (data.encryptionKey) {
+      const newMasterKey = await this.db
+        .storage()
+        .generateCryptoKey(new_password, salt);
+      if (user.attachmentsKey) {
+        updateUserPayload.attachmentsKey = await this.keyManager.rewrapKey(
+          user.attachmentsKey,
+          data.encryptionKey,
+          newMasterKey
+        );
+      }
+      if (user.monographPasswordsKey) {
+        updateUserPayload.monographPasswordsKey =
+          await this.keyManager.rewrapKey(
+            user.monographPasswordsKey,
+            data.encryptionKey,
+            newMasterKey
+          );
+      }
+      if (user.inboxKeys) {
+        updateUserPayload.inboxKeys = await this.keyManager.rewrapKey(
+          user.inboxKeys,
+          data.encryptionKey,
+          newMasterKey
+        );
+      }
 
-    if (data.encryptionKey) await this.db.sync({ type: "fetch", force: true });
+      if (user.legacyDataEncryptionKey)
+        updateUserPayload.legacyDataEncryptionKey =
+          await this.keyManager.rewrapKey(
+            user.legacyDataEncryptionKey,
+            data.encryptionKey,
+            newMasterKey
+          );
+      if (user.dataEncryptionKey)
+        updateUserPayload.dataEncryptionKey = await this.keyManager.rewrapKey(
+          user.dataEncryptionKey,
+          data.encryptionKey,
+          newMasterKey
+        );
+      else {
+        updateUserPayload.dataEncryptionKey = await this.keyManager.wrapKey(
+          await this.db.crypto().generateRandomKey(),
+          newMasterKey
+        );
+        updateUserPayload.legacyDataEncryptionKey =
+          await this.keyManager.wrapKey(data.encryptionKey, newMasterKey);
+      }
+    }
 
-    if (old_password)
-      old_password = await this.db.storage().hash(old_password, email, {
-        usesFallback: await this.usesFallbackPWHash(old_password)
-      });
-
-    // retrieve user keys before deriving a new encryption key
-    const oldUserKeys = {
-      attachmentsKey: await this.getAttachmentsKey(),
-      monographPasswordsKey: await this.getMonographPasswordsKey(),
-      inboxKeys: (await this.hasInboxKeys())
-        ? await this.getInboxKeys()
-        : undefined
-    } as const;
+    await http.patch.json(
+      `${constants.API_HOST}/users/password/${type}`,
+      {
+        oldPassword: oldPassword,
+        newPassword: await this.db.storage().hash(new_password, email),
+        userKeys: updateUserPayload
+      },
+      token
+    );
 
     await this.db.storage().deriveCryptoKey({
       password: new_password,
       salt
     });
 
-    if (!(await this.resetUser(false))) return;
-
-    await this.db.sync({ type: "send", force: true });
-
-    const userEncryptionKey = await this.getEncryptionKey();
-    if (userEncryptionKey) {
-      const updateUserPayload: Partial<User> = {};
-      if (oldUserKeys.attachmentsKey) {
-        user.attachmentsKey = await this.db
-          .storage()
-          .encrypt(
-            userEncryptionKey,
-            JSON.stringify(oldUserKeys.attachmentsKey)
-          );
-        updateUserPayload.attachmentsKey = user.attachmentsKey;
-      }
-      if (oldUserKeys.monographPasswordsKey) {
-        user.monographPasswordsKey = await this.db
-          .storage()
-          .encrypt(
-            userEncryptionKey,
-            JSON.stringify(oldUserKeys.monographPasswordsKey)
-          );
-        updateUserPayload.monographPasswordsKey = user.monographPasswordsKey;
-      }
-      if (oldUserKeys.inboxKeys) {
-        user.inboxKeys = {
-          public: oldUserKeys.inboxKeys.publicKey,
-          private: await this.db
-            .storage()
-            .encrypt(
-              userEncryptionKey,
-              JSON.stringify(oldUserKeys.inboxKeys.privateKey)
-            )
-        };
-        updateUserPayload.inboxKeys = user.inboxKeys;
-      }
-      if (Object.keys(updateUserPayload).length > 0) {
-        await this.updateUser(updateUserPayload);
-      }
-    }
-
-    if (new_password)
-      new_password = await this.db.storage().hash(new_password, email);
-
-    await http.patch(
-      `${constants.AUTH_HOST}${ENDPOINTS.patchUser}`,
-      {
-        type,
-        old_password,
-        new_password
-      },
-      token
-    );
+    this.keyManager.clearCache();
+    await this.setUser({ ...user, ...updateUserPayload });
 
     return true;
   }
 
   private async usesFallbackPWHash(password: string) {
     const user = await this.getUser();
-    const encryptionKey = await this.getEncryptionKey();
+    const encryptionKey = await this.getMasterKey();
     if (!user || !encryptionKey) return false;
     const fallbackCryptoKey = await this.db
       .storage()

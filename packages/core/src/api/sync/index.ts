@@ -47,6 +47,8 @@ import {
   Notebook
 } from "../../types.js";
 import {
+  KEY_VERSION,
+  KeyVersion,
   SYNC_COLLECTIONS_MAP,
   SyncableItemType,
   SyncInboxItem,
@@ -55,7 +57,6 @@ import {
 import { DownloadableFile } from "../../database/fs.js";
 import { SyncDevices } from "./devices.js";
 import { DefaultColors } from "../../collections/colors.js";
-import { Monographs } from "../monographs.js";
 
 enum LogLevel {
   /** Log level for very low severity diagnostic messages. */
@@ -149,7 +150,7 @@ export default class SyncManager {
   }
 }
 
-class Sync {
+export class Sync {
   collector;
   merger;
   autoSync;
@@ -245,7 +246,7 @@ class Sync {
           "RequestFetchV3 failed, falling back to RequestFetchV2"
         );
         await this.connection?.invoke("RequestFetchV2", deviceId);
-      }
+      } else throw error;
     }
 
     if (this.conflictedNoteIds.length > 0) {
@@ -343,16 +344,51 @@ class Sync {
 
   async processChunk(
     chunk: SyncTransferItem,
-    key: SerializedKey,
+    keys: {
+      version: KeyVersion;
+      key: SerializedKey;
+    }[],
     options: SyncOptions
   ) {
     const itemType = chunk.type;
-    const decrypted = await this.db.storage().decryptMulti(key, chunk.items);
+    const decrypted: string[] = [];
+
+    // Pre-group items by keyVersion for O(1) lookups
+    const itemsByKeyVersion = new Map<KeyVersion, typeof chunk.items>();
+    const versionMap = new Map<string, number>();
+
+    for (const item of chunk.items) {
+      const keyVersion = item.keyVersion ?? KEY_VERSION.LEGACY;
+      const group = itemsByKeyVersion.get(keyVersion);
+      if (group) {
+        group.push(item);
+      } else {
+        itemsByKeyVersion.set(keyVersion, [item]);
+      }
+      versionMap.set(item.id, item.v);
+    }
+
+    for (const keyInfo of keys) {
+      const itemsToDecrypt = itemsByKeyVersion.get(keyInfo.version);
+      if (!itemsToDecrypt || itemsToDecrypt.length === 0) continue;
+
+      decrypted.push(
+        ...(await this.db.storage().decryptMulti(keyInfo.key, itemsToDecrypt))
+      );
+    }
 
     const deserialized: MaybeDeletedItem<Item>[] = [];
     for (let i = 0; i < decrypted.length; ++i) {
-      const decryptedItem = decrypted[i];
-      const version = chunk.items[i].v;
+      const decryptedItem = JSON.parse(decrypted[i]) as MaybeDeletedItem<Item>;
+      const version = versionMap.get(decryptedItem.id);
+      if (version === undefined) {
+        this.logger.error(
+          new Error(
+            `Version not found for item ${decryptedItem.id}. Skipping item.`
+          )
+        );
+        continue;
+      }
       const item = await deserializeItem(
         decryptedItem,
         itemType,
@@ -476,10 +512,15 @@ class Sync {
     this.connection.on("SendItems", async (chunk) => {
       if (this.connection?.state !== HubConnectionState.Connected) return false;
 
-      const key = await this.getKey();
-      if (!key) return false;
-
-      await this.processChunk(chunk, key, options);
+      const keys = await this.db.user.getDataEncryptionKeys();
+      if (!keys || !keys.length) {
+        this.logger.error(
+          new Error("User encryption keys not generated. Please relogin.")
+        );
+        EV.publish(EVENTS.userSessionExpired);
+        return false;
+      }
+      await this.processChunk(chunk, keys, options);
 
       sendSyncProgressEvent(this.db.eventManager, `download`, chunk.count);
 
@@ -511,18 +552,6 @@ class Sync {
         return true;
       }
     );
-  }
-
-  private async getKey() {
-    const key = await this.db.user.getEncryptionKey();
-    if (!key?.key) {
-      this.logger.error(
-        new Error("User encryption key not generated. Please relogin.")
-      );
-      EV.publish(EVENTS.userSessionExpired);
-      return;
-    }
-    return key;
   }
 
   private async checkConnection() {
@@ -564,12 +593,11 @@ function promiseTimeout(ms: number, promise: Promise<unknown>) {
 }
 
 async function deserializeItem(
-  decryptedItem: string,
+  item: MaybeDeletedItem<Item>,
   type: SyncableItemType,
   version: number,
   database: Database
 ): Promise<MaybeDeletedItem<Item> | undefined> {
-  const item = JSON.parse(decryptedItem) as MaybeDeletedItem<Item>;
   item.remote = true;
   item.synced = true;
 

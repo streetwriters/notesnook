@@ -48,15 +48,23 @@ async function initializeDatabase(persistence: DatabasePersistence) {
     await useKeyStore.getState().setValue("databaseKey", databaseKey);
   }
 
+  // db.host({
+  //   API_HOST: "https://api.notesnook.com",
+  //   AUTH_HOST: "https://auth.streetwriters.co",
+  //   SSE_HOST: "https://events.streetwriters.co",
+  //   ISSUES_HOST: "https://issues.streetwriters.co",
+  //   SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co",
+  //   MONOGRAPH_HOST: "https://monogr.ph",
+  //   NOTESNOOK_HOST: "https://notesnook.com",
+  //   ...Config.get("serverUrls", {})
+  // });
+  const base = `http://localhost`;
   db.host({
-    API_HOST: "https://api.notesnook.com",
-    AUTH_HOST: "https://auth.streetwriters.co",
-    SSE_HOST: "https://events.streetwriters.co",
-    ISSUES_HOST: "https://issues.streetwriters.co",
-    SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co",
-    MONOGRAPH_HOST: "https://monogr.ph",
-    NOTESNOOK_HOST: "https://notesnook.com",
-    ...Config.get("serverUrls", {})
+    API_HOST: `${base}:5264`,
+    AUTH_HOST: `${base}:8264`,
+    SSE_HOST: `${base}:7264`,
+    ISSUES_HOST: `${base}:2624`,
+    SUBSCRIPTIONS_HOST: `${base}:9264`
   });
 
   const storage = new NNStorage(
@@ -72,7 +80,7 @@ async function initializeDatabase(persistence: DatabasePersistence) {
       dialect: (name, init) =>
         createDialect({
           name: persistence === "memory" ? ":memory:" : name,
-          encrypted: true,
+          encrypted: persistence !== "memory",
           async: !isFeatureSupported("opfs"),
           init,
           multiTab
@@ -87,7 +95,10 @@ async function initializeDatabase(persistence: DatabasePersistence) {
       synchronous: "normal",
       pageSize: 8192,
       cacheSize: -32000,
-      password: Buffer.from(databaseKey).toString("hex"),
+      password:
+        persistence === "memory"
+          ? undefined
+          : Buffer.from(databaseKey).toString("hex"),
       skipInitialization: !IS_DESKTOP_APP && multiTab
     },
     storage: storage,

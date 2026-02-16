@@ -73,7 +73,15 @@ export const ChangePassword = () => {
         throw new Error(strings.backupFailed() + `: ${result.error}`);
       }
 
-      await db.user.changePassword(oldPassword.current, password.current);
+      const passwordChanged = await db.user.changePassword(
+        oldPassword.current,
+        password.current
+      );
+
+      if (!passwordChanged) {
+        throw new Error("Could not change user account password.");
+      }
+
       ToastManager.show({
         heading: strings.passwordChangedSuccessfully(),
         type: "success",

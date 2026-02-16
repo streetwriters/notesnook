@@ -54,7 +54,12 @@ export async function startApp(children?: React.ReactNode) {
   try {
     const { Component, props, path } = await init();
 
-    await useKeyStore.getState().init();
+    const persistence =
+      (path !== "/sessionexpired" && path !== "/account/recovery") ||
+      Config.get("sessionExpired", false)
+        ? "db"
+        : "memory";
+    await useKeyStore.getState().init({ persistence });
 
     root.render(
       <>
@@ -70,6 +75,7 @@ export async function startApp(children?: React.ReactNode) {
                   Component={Component}
                   path={path}
                   routeProps={props}
+                  persistence={persistence}
                 />
               </AppLock>
               {children}
@@ -96,9 +102,10 @@ function RouteWrapper(props: {
   Component: (props: AuthProps) => JSX.Element;
   path: Routes;
   routeProps: AuthProps | null;
+  persistence?: "db" | "memory";
 }) {
   const [isMigrating, setIsMigrating] = useState(false);
-  const { Component, path, routeProps } = props;
+  const { Component, path, routeProps, persistence } = props;
 
   useEffect(() => {
     EV.subscribe(EVENTS.migrationStarted, (name) =>
@@ -109,12 +116,8 @@ function RouteWrapper(props: {
 
   const result = usePromise(async () => {
     performance.mark("load:database");
-    await loadDatabase(
-      path !== "/sessionexpired" || Config.get("sessionExpired", false)
-        ? "db"
-        : "memory"
-    );
-  }, [path]);
+    await loadDatabase(persistence);
+  }, [path, persistence]);
 
   if (result.status === "rejected") {
     throw result.reason instanceof Error
