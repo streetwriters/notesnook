@@ -22,7 +22,7 @@ import { checkForUpdate } from "../utils/updater";
 import { AppEventManager, AppEvents } from "../common/app-events";
 import BaseStore from "../stores";
 import createStore from "../common/store";
-import { store as settingStore } from "../stores/setting-store";
+import { useStore as useSettingStore } from "../stores/setting-store";
 
 type CompletedUpdateStatus = { type: "completed"; version: string };
 type DownloadingUpdateStatus = { type: "downloading"; progress: number };
@@ -103,8 +103,13 @@ export function useAutoUpdater() {
       updateDownloadProgress
     );
 
-    checkingForUpdate();
-    checkForUpdate(settingStore.get().autoUpdates).catch(console.error);
+    const settingStoreUnsub = useSettingStore.subscribe(
+      (s) => s.autoUpdates,
+      (autoUpdates) => {
+        checkingForUpdate();
+        checkForUpdate(autoUpdates).catch(console.error);
+      }
+    );
 
     return () => {
       checkingForUpdateEvent.unsubscribe();
@@ -112,6 +117,7 @@ export function useAutoUpdater() {
       updateNotAvailableEvent.unsubscribe();
       updateCompletedEvent.unsubscribe();
       updateProgressEvent.unsubscribe();
+      settingStoreUnsub();
     };
   }, []);
 
