@@ -73,12 +73,10 @@ describe("paste text", () => {
       cancelable: true,
       composed: true
     });
-
     (clipboardEvent as unknown as any)["clipboardData"] = {
       getData: (type: string) =>
         type === "text/plain" ? "[test](example.com)" : undefined
     };
-
     editor.view.dom.dispatchEvent(clipboardEvent);
 
     await new Promise((resolve) => setTimeout(resolve, 100));
@@ -100,14 +98,125 @@ describe("paste text", () => {
       cancelable: true,
       composed: true
     });
-
     (clipboardEvent as unknown as any)["clipboardData"] = {
       getData: (type: string) =>
         type === "text/plain"
           ? "[test](example.com) some text [test2](example2.com)"
           : undefined
     };
+    editor.view.dom.dispatchEvent(clipboardEvent);
 
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    expect(editorElement.outerHTML).toMatchSnapshot();
+  });
+
+  test("with link", async () => {
+    const editorElement = h("div");
+    const { editor } = createEditor({
+      element: editorElement,
+      extensions: {
+        link: Link
+      }
+    });
+
+    const clipboardEvent = new Event("paste", {
+      bubbles: true,
+      cancelable: true,
+      composed: true
+    });
+    (clipboardEvent as unknown as any)["clipboardData"] = {
+      getData: (type: string) =>
+        type === "text/plain" ? "example.com" : undefined
+    };
+    editor.view.dom.dispatchEvent(clipboardEvent);
+
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    expect(editorElement.outerHTML).toMatchSnapshot();
+  });
+
+  test("with multiple links", async () => {
+    const editorElement = h("div");
+    const { editor } = createEditor({
+      element: editorElement,
+      extensions: {
+        link: Link
+      }
+    });
+
+    const clipboardEvent = new Event("paste", {
+      bubbles: true,
+      cancelable: true,
+      composed: true
+    });
+    (clipboardEvent as unknown as any)["clipboardData"] = {
+      getData: (type: string) =>
+        type === "text/plain" ? "example.com example2.com" : undefined
+    };
+    editor.view.dom.dispatchEvent(clipboardEvent);
+
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    expect(editorElement.outerHTML).toMatchSnapshot();
+  });
+});
+
+describe("unformatted paste text", () => {
+  test("with markdown link should still format as link", async () => {
+    const editorElement = h("div");
+    const { editor } = createEditor({
+      element: editorElement,
+      extensions: {
+        link: Link
+      }
+    });
+
+    const keyboardEvent = new KeyboardEvent("keydown", {
+      key: "v",
+      shiftKey: true
+    });
+    const clipboardEvent = new Event("paste", {
+      bubbles: true,
+      cancelable: true,
+      composed: true
+    });
+    (clipboardEvent as unknown as any)["clipboardData"] = {
+      getData: (type: string) =>
+        type === "text/plain" ? "[asdf](example.com)" : undefined
+    };
+    editor.view.dom.dispatchEvent(keyboardEvent);
+    editor.view.dom.dispatchEvent(clipboardEvent);
+
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    expect(editorElement.outerHTML).toMatchSnapshot();
+  });
+
+  test("with link shouldn't format as link", async () => {
+    const editorElement = h("div");
+    const { editor } = createEditor({
+      element: editorElement,
+      extensions: {
+        link: Link
+      }
+    });
+
+    const keyboardEvent = new KeyboardEvent("keydown", {
+      key: "v",
+      ctrlKey: true,
+      shiftKey: true
+    });
+    const clipboardEvent = new Event("paste", {
+      bubbles: true,
+      cancelable: true,
+      composed: true
+    });
+    (clipboardEvent as unknown as any)["clipboardData"] = {
+      getData: (type: string) =>
+        type === "text/plain" ? "https://example.com" : undefined
+    };
+    editor.view.dom.dispatchEvent(keyboardEvent);
     editor.view.dom.dispatchEvent(clipboardEvent);
 
     await new Promise((resolve) => setTimeout(resolve, 100));
