@@ -728,6 +728,8 @@ function toIEditor(editor: Editor): IEditor {
     attachFile: (file: Attachment) =>
       file.type === "image"
         ? editor.commands.insertImage(file)
+        : file.type === "audio"
+        ? editor.commands.insertAudio(file)
         : editor.commands.insertAttachment(file),
     sendAttachmentProgress: (hash, progress) =>
       editor.commands.updateAttachment(

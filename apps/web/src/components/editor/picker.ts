@@ -87,12 +87,16 @@ export async function attachFiles(
           : [];
   }
 
-  const documents = files.filter((f) => !f.type.startsWith("image/"));
+  const documents = files.filter(
+    (f) => !f.type.startsWith("image/") && !f.type.startsWith("audio/")
+  );
+  const audios = files.filter((f) => f.type.startsWith("audio/"));
   const attachments: Attachment[] = [];
-  for (const file of [...images, ...documents]) {
-    const attachment = !skipSpecialImageHandling && file.type.startsWith("image/")
-      ? await pickImage(file)
-      : await pickFile(file);
+  for (const file of [...images, ...documents, ...audios]) {
+    const attachment =
+      !skipSpecialImageHandling && file.type.startsWith("image/")
+        ? await pickImage(file)
+        : await pickFile(file);
     if (!attachment) continue;
     attachments.push(attachment);
   }
@@ -136,7 +140,7 @@ async function pickFile(
 
     const hash = await addAttachment(file, options);
     return {
-      type: "file",
+      type: file.type.startsWith("audio") ? "audio" : "file",
       filename: file.name,
       hash,
       mime: file.type,
