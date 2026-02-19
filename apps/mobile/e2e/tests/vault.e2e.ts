@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { expect } from "detox";
 import { notesnook } from "../test.ids";
-import { TestBuilder, Tests } from "./utils";
+import { Element, TestBuilder, Tests } from "./utils";
 
 async function lockNote() {
   await TestBuilder.create()
@@ -67,6 +67,11 @@ async function goToPrivacySecuritySettings() {
     .waitAndTapById("sidemenu-settings-icon")
     .wait()
     .waitAndTapByText("Settings")
+    .addStep(async () => {
+      const element = new Element("id", "settings-list");
+      await element.element.scroll(200, "down");
+    })
+    .wait(500)
     .waitAndTapByText("Vault")
     .run();
 }

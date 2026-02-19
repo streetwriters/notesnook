@@ -32,25 +32,34 @@ import {
 } from "../utils/events";
 import { strings } from "@notesnook/intl";
 
+export enum VaultRequestType {
+  CreateVault = "createVault",
+  LockNote = "lockNote",
+  UnlockNote = "unlockNote",
+  PermanentUnlock = "permanentUnlock",
+  GoToEditor = "goToEditor",
+  ShareNote = "shareNote",
+  CopyNote = "copyNote",
+  DeleteNote = "deleteNote",
+  EnableFingerprint = "enableFingerprint",
+  RevokeFingerprint = "revokeFingerprint",
+  ChangePassword = "changePassword",
+  ClearVault = "clearVault",
+  DeleteVault = "deleteVault",
+  CustomAction = "customAction"
+}
+
 export type Vault = {
-  item: Note;
-  novault: boolean;
-  title: string;
-  description: string;
-  locked: boolean;
-  permanant: boolean;
-  goToEditor: boolean;
-  share: boolean;
-  deleteNote: boolean;
-  fingerprintAccess: boolean;
-  revokeFingerprintAccess: boolean;
-  changePassword: boolean;
-  clearVault: boolean;
-  deleteVault: boolean;
-  copyNote: boolean;
-  customActionTitle: string;
-  customActionParagraph: string;
-  onUnlock: (
+  item?: Note;
+  requestType: VaultRequestType;
+  title?: string;
+  description?: string;
+  paragraph?: string;
+  buttonTitle?: string;
+  positiveButtonType?: "errorShade" | "transparent" | "accent";
+  customActionTitle?: string;
+  customActionParagraph?: string;
+  onUnlock?: (
     item: Note & {
       content?: NoteContent<false>;
     },
@@ -87,7 +96,7 @@ export const eSendEvent = (eventName: string, ...args: any[]) => {
   eventManager.publish(eventName, ...args);
 };
 
-export const openVault = (data: Partial<Vault>) => {
+export const openVault = (data: Vault) => {
   eSendEvent(eOpenVaultDialog, data);
 };
 

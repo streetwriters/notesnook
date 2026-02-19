@@ -41,7 +41,8 @@ import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  openVault
+  openVault,
+  VaultRequestType
 } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import Sync from "../../services/sync";
@@ -128,10 +129,12 @@ const MergeConflicts = () => {
     let noteContent: UnencryptedContentItem;
     if (isLocked) {
       openVault({
+        requestType: VaultRequestType.CustomAction,
         item: item,
-        novault: true,
-        customActionTitle: "Unlock note",
-        customActionParagraph: "Unlock note to merge conflicts",
+        title: strings.unlockNote(),
+        customActionTitle: strings.unlockNote(),
+        customActionParagraph: strings.unlockNoteToMergeConflicts(),
+        buttonTitle: strings.unlock(),
         onUnlock: async (item, password) => {
           if (!item || !password) return;
           const currentContent = await db.content.get(item.contentId!);
