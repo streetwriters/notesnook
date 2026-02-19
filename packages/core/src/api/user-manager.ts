@@ -90,14 +90,15 @@ class UserManager {
     );
 
     const user = await this.fetchUser();
-    if (!user) return;
+    if (!user) throw new Error("Failed to fetch user after signup.");
+
+    await this.db.setLastSynced(0);
+    await this.db.syncer.devices.register();
 
     await this.db.storage().deriveCryptoKey({
       password,
       salt: user.salt
     });
-    await this.db.setLastSynced(0);
-    await this.db.syncer.devices.register();
 
     const masterKey = await this.getMasterKey();
     if (!masterKey) throw new Error("User encryption key not generated.");
