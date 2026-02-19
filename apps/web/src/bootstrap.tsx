@@ -24,7 +24,7 @@ import {
   initializeFeatureChecks,
   isFeatureSupported
 } from "./utils/feature-check";
-import { initializeLogger } from "./utils/logger";
+import { initializeLogger, logger } from "./utils/logger";
 import { shouldShowWrapped } from "./utils/should-show-wrapped";
 
 type Route<TProps = null> = {
@@ -197,6 +197,10 @@ export async function init() {
   const persistence = isAccountRecoveryRoute(path)
     ? ("memory" as const)
     : ("db" as const);
+
+  logger.info(
+    `Initializing key store with persistence: ${persistence} for path: ${path}`
+  );
 
   return { Component, path, props: route.props, persistence };
 }
