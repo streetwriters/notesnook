@@ -194,11 +194,9 @@ export async function init() {
     initializeLogger()
   ]);
 
-  const persistence =
-    (path !== "/sessionexpired" && isAccountRecoveryRoute(path)) ||
-    Config.get("sessionExpired", false)
-      ? ("db" as const)
-      : ("memory" as const);
+  const persistence = isAccountRecoveryRoute(path)
+    ? ("memory" as const)
+    : ("db" as const);
 
   return { Component, path, props: route.props, persistence };
 }
