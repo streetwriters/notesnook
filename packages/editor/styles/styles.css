@@ -393,6 +393,8 @@ img.ProseMirror-separator {
 .ProseMirror blockquote {
   border-inline-start: 5px solid var(--border);
   padding-inline-start: 15px;
+  margin-inline-start: 20px;
+  margin-inline-end: 0px;
 }
 
 @media screen and (max-width: 480px) {
@@ -720,7 +722,7 @@ p > *::selection {
 .ProseMirror ul.simple-checklist {
   list-style: none;
   padding-inline: 0px !important;
-  padding-inline-start: 24px !important;
+  padding-inline-start: 40px !important;
 }
 
 .ProseMirror li.nested > ul.simple-checklist {
