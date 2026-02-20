@@ -96,6 +96,7 @@ module.exports = {
     "node_modules/sodium-native/package.json"
   ],
   afterPack: "./scripts/removeLocales.js",
+  protocols: [{ name: "Notesnook", schemes: ["nn"] }],
   mac: {
     bundleVersion: "240",
     minimumSystemVersion: "10.12.0",
@@ -181,6 +182,7 @@ module.exports = {
     icon: "assets/icons/app.icns",
     description: "Your private note taking space",
     executableName: linuxExecutableName,
+    mimeTypes: ["x-scheme-handler/nn"],
     desktop: {
       desktopActions: {
         "new-note": {
