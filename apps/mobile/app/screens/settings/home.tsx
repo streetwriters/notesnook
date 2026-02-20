@@ -61,6 +61,7 @@ const Home = ({
       />
       <DelayLayout type="settings">
         <LegendList
+          testID="settings-list"
           data={settingsGroups}
           keyExtractor={keyExtractor}
           renderItem={renderItem}

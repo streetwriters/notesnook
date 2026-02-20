@@ -53,7 +53,8 @@ import {
   eSendEvent,
   eSubscribeEvent,
   openVault,
-  presentSheet
+  presentSheet,
+  VaultRequestType
 } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import Notifications from "../../services/notifications";
@@ -967,8 +968,9 @@ export const settingsGroups: SettingSection[] = [
             hidden: (current) => (current as VaultStatusType)?.exists,
             modifer: () => {
               openVault({
-                novault: false,
-                title: strings.createVault()
+                requestType: VaultRequestType.CreateVault,
+                title: strings.createVault(),
+                buttonTitle: strings.create()
               });
             }
           },
@@ -980,9 +982,9 @@ export const settingsGroups: SettingSection[] = [
             hidden: (current) => !(current as VaultStatusType)?.exists,
             modifer: () =>
               openVault({
-                changePassword: true,
-                novault: true,
-                title: strings.changeVaultPassword()
+                requestType: VaultRequestType.ChangePassword,
+                title: strings.changeVaultPassword(),
+                buttonTitle: strings.change()
               })
           },
           {
@@ -993,9 +995,10 @@ export const settingsGroups: SettingSection[] = [
             hidden: (current) => !(current as VaultStatusType)?.exists,
             modifer: () => {
               openVault({
-                clearVault: true,
-                novault: true,
-                title: strings.clearVault() + "?"
+                requestType: VaultRequestType.ClearVault,
+                title: strings.clearVault() + "?",
+                buttonTitle: strings.clear(),
+                positiveButtonType: "errorShade"
               });
             }
           },
@@ -1007,9 +1010,10 @@ export const settingsGroups: SettingSection[] = [
             hidden: (current) => !(current as VaultStatusType)?.exists,
             modifer: () => {
               openVault({
-                deleteVault: true,
-                novault: true,
-                title: strings.deleteVault() + "?"
+                requestType: VaultRequestType.DeleteVault,
+                title: strings.deleteVault() + "?",
+                buttonTitle: strings.delete(),
+                positiveButtonType: "errorShade"
               });
             }
           },
@@ -1027,13 +1031,15 @@ export const settingsGroups: SettingSection[] = [
             getter: (current) => (current as VaultStatusType)?.biometryEnrolled,
             modifer: (current) => {
               const _current = current as VaultStatusType;
+              const isRevoking = _current.biometryEnrolled;
               openVault({
-                fingerprintAccess: !_current.biometryEnrolled,
-                revokeFingerprintAccess: _current.biometryEnrolled,
-                novault: true,
-                title: _current.biometryEnrolled
+                requestType: isRevoking
+                  ? VaultRequestType.RevokeFingerprint
+                  : VaultRequestType.EnableFingerprint,
+                title: isRevoking
                   ? strings.revokeBiometricUnlock()
-                  : strings.vaultEnableBiometrics()
+                  : strings.vaultEnableBiometrics(),
+                buttonTitle: isRevoking ? strings.revoke() : strings.enable()
               });
             }
           }
