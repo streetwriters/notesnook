@@ -24,6 +24,7 @@ import TypedEventEmitter from "typed-emitter";
 
 export type AppEvents = {
   onCreateItem(name: "note" | "notebook" | "reminder"): void;
+  onOpenLink(url: string): void;
 };
 
 const emitter = new EventEmitter();
@@ -31,7 +32,8 @@ const typedEmitter = emitter as TypedEventEmitter<AppEvents>;
 const t = initTRPC.create();
 
 export const bridgeRouter = t.router({
-  onCreateItem: createSubscription("onCreateItem")
+  onCreateItem: createSubscription("onCreateItem"),
+  onOpenLink: createSubscription("onOpenLink")
 });
 
 export const bridge: AppEvents = new Proxy({} as AppEvents, {
