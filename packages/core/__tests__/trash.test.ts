@@ -23,7 +23,8 @@ import {
   notebookTest,
   TEST_NOTE,
   TEST_NOTEBOOK,
-  databaseTest
+  databaseTest,
+  loginFakeUser
 } from "./utils/index.js";
 import { test, expect } from "vitest";
 
@@ -383,4 +384,21 @@ test("permanently deleted note should not have note fields", () =>
       "id",
       "synced"
     ]);
+  }));
+
+test("trash cleanup should remove orphaned attachments", () =>
+  databaseTest().then(async (db) => {
+    await loginFakeUser(db);
+
+    const hash = await db.attachments.save(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+      "image/png",
+      "test.png"
+    );
+    if (!hash) throw new Error("Failed to create attachment");
+
+    await db.trash.cleanup();
+
+    expect(await db.attachments.exists(hash)).toBe(false);
+    expect(await db.attachments.orphaned.count()).toBe(0);
   }));

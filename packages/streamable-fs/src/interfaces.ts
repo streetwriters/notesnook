@@ -30,6 +30,7 @@ export interface IStreamableFS {
   readFile(filename: string): Promise<FileHandle | undefined>;
   exists(filename: string): Promise<boolean>;
   deleteFile(filename: string): Promise<boolean>;
+  bulkDeleteFiles(filenames: string[]): Promise<boolean>;
   list(): Promise<string[]>;
   moveFile(source: FileHandle, dest: FileHandle): Promise<void>;
   clear(): Promise<void>;

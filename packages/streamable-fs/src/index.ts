@@ -72,6 +72,13 @@ export class StreamableFS implements IStreamableFS {
     return true;
   }
 
+  async bulkDeleteFiles(filenames: string[]): Promise<boolean> {
+    for (const filename of filenames) {
+      await this.deleteFile(filename);
+    }
+    return true;
+  }
+
   async moveFile(source: FileHandle, dest: FileHandle) {
     await source.readable.pipeTo(dest.writeable);
     await source.delete();
