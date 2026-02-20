@@ -2761,6 +2761,10 @@ msgstr "Faced an issue or have a suggestion? Click here to create a bug report"
 msgid "Failed"
 msgstr "Failed"
 
+#: src/strings.ts:2637
+msgid "Failed to attach file"
+msgstr "Failed to attach file"
+
 #: src/strings.ts:1936
 msgid "Failed to copy note"
 msgstr "Failed to copy note"
