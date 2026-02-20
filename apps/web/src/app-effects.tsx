@@ -31,10 +31,10 @@ import {
 } from "./common";
 import { AppEventManager, AppEvents } from "./common/app-events";
 import { db } from "./common/db";
-import { EVENTS } from "@notesnook/core";
+import { EVENTS, parseInternalLink } from "@notesnook/core";
 import { registerKeyMap } from "./common/key-map";
 import { updateStatus, removeStatus, getStatus } from "./hooks/use-status";
-import { hashNavigate } from "./navigation";
+import { hashNavigate, navigate } from "./navigation";
 import { desktop } from "./common/desktop-bridge";
 import { FeatureDialog } from "./dialogs/feature-dialog";
 import { AnnouncementDialog } from "./dialogs/announcement-dialog";
@@ -215,6 +215,31 @@ export default function AppEffects() {
             case "reminder":
               hashNavigate("/reminders/create", { replace: true });
               break;
+          }
+        }
+      }) || {};
+
+    return () => {
+      unsubscribe?.();
+    };
+  }, []);
+
+  useEffect(() => {
+    const { unsubscribe } =
+      desktop?.bridge.onOpenLink.subscribe(undefined, {
+        onData(url) {
+          const link = parseInternalLink(url);
+          if (!link) return;
+          if (link.type === "note") {
+            useEditorStore.getState().openSession(link.id, {
+              activeBlockId: link.params?.blockId || undefined
+            });
+          } else if (link.type === "notebook") {
+            navigate(`/notebooks/${link.id}`);
+          } else if (link.type === "tag") {
+            navigate(`/tags/${link.id}`);
+          } else if (link.type === "color") {
+            navigate(`/colors/${link.id}`);
           }
         }
       }) || {};
