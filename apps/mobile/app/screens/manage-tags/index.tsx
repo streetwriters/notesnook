@@ -17,24 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { VirtualizedGrouping } from "@notesnook/core";
-import { sanitizeTag } from "@notesnook/core";
-import { Tag } from "@notesnook/core";
+import { LegendList } from "@legendapp/list";
+import { isFeatureAvailable } from "@notesnook/common";
+import { Tag, VirtualizedGrouping, sanitizeTag } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import React, {
-  RefObject,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { TextInput, View, useWindowDimensions } from "react-native";
-import { ActionSheetRef } from "react-native-actions-sheet";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
-import { useDBItem } from "../../hooks/use-db-item";
+import { Header } from "../../components/header";
+import Input from "../../components/ui/input";
+import { Pressable } from "../../components/ui/pressable";
+import Heading from "../../components/ui/typography/heading";
+import Paragraph from "../../components/ui/typography/paragraph";
+import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import { ToastManager } from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import {
@@ -43,17 +41,8 @@ import {
 } from "../../stores/item-selection-store";
 import { useRelationStore } from "../../stores/use-relation-store";
 import { useTagStore } from "../../stores/use-tag-store";
-import { defaultBorderRadius, AppFontSize } from "../../utils/size";
-import Input from "../../components/ui/input";
-import { Pressable } from "../../components/ui/pressable";
-import Heading from "../../components/ui/typography/heading";
-import Paragraph from "../../components/ui/typography/paragraph";
-import { strings } from "@notesnook/intl";
+import { AppFontSize, defaultBorderRadius } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
-import { Header } from "../../components/header";
-import { useNavigationFocus } from "../../hooks/use-navigation-focus";
-import { isFeatureAvailable } from "@notesnook/common";
-import { LegendList } from "@legendapp/list";
 
 async function updateInitialSelectionState(items: string[]) {
   const relations = await db.relations
