@@ -89,7 +89,6 @@ function App() {
             .mobile-nav-pane .theme-scope-navigationMenu {
               padding-top: env(titlebar-area-height) !important;
             }
-            // [CHANGE]: Updated selector to handle split panes and focus mode correctly
             #editor-panel > div:first-of-type > .editor-action-bar,
             .app-focus-mode #editor-panel > .react-split:first-of-type .react-split__pane:first-of-type > div > .editor-action-bar,
             .mobile-editor-pane.pane-active .editor-action-bar,

@@ -207,7 +207,7 @@ export function EditorActionBar({ groupId }: { groupId: string }) {
 
   const collapsibleTools: ToolButton[] = [
     {
-      title: isNotePublished ? "Published" : "Publish",
+      title: isNotePublished ? strings.published() : strings.publish(),
       icon: isNotePublished ? Published : Publish,
       hidden: !isLoggedIn,
       hideOnMobile: true,
@@ -225,7 +225,7 @@ export function EditorActionBar({ groupId }: { groupId: string }) {
       }
     },
     {
-      title: "Search",
+      title: strings.search(),
       icon: Search,
       enabled:
         activeSession &&
@@ -236,7 +236,7 @@ export function EditorActionBar({ groupId }: { groupId: string }) {
       onClick: () => editorManager?.editor?.startSearch()
     },
     {
-      title: "Table of Contents",
+      title: strings.toc(),
       icon: TableOfContents,
       enabled:
         activeSession &&
@@ -247,7 +247,7 @@ export function EditorActionBar({ groupId }: { groupId: string }) {
       toggled: isTOCVisible
     },
     {
-      title: "Properties",
+      title: strings.properties(),
       icon: Properties,
       enabled:
         activeSession &&
@@ -259,21 +259,21 @@ export function EditorActionBar({ groupId }: { groupId: string }) {
       toggled: arePropertiesVisible
     },
     {
-      title: "Split Right",
+      title: strings.splitRight(),
       icon: VerticalSplit,
       enabled: true,
       onClick: () => useEditorStore.getState().splitGroup("vertical", groupId),
       hidden: isMobile
     },
     {
-      title: "Split Down",
+      title: strings.splitDown(),
       icon: HorizontalSplit,
       enabled: true,
       onClick: () => useEditorStore.getState().splitGroup("horizontal", groupId),
       hidden: isMobile
     },
     {
-      title: "Close",
+      title: strings.close(),
       icon: Cross,
       enabled: groupsCount > 1,
       onClick: () => useEditorStore.getState().closeGroup(groupId),
@@ -283,20 +283,20 @@ export function EditorActionBar({ groupId }: { groupId: string }) {
 
   const tools: ToolButton[] = [
     {
-      title: "New Tab",
+      title: strings.newTab(),
       icon: NewTab,
       enabled: true,
       onClick: () => useEditorStore.getState().addTab(undefined, groupId)
     },
     {
-      title: "Undo",
+      title: strings.undo(),
       icon: Undo,
       enabled: editorManager?.canUndo,
       onClick: () => editorManager?.editor?.undo(),
       hidden: activeSession?.type === "readonly"
     },
     {
-      title: "Redo",
+      title: strings.redo(),
       icon: Redo,
       enabled: editorManager?.canRedo,
       onClick: () => editorManager?.editor?.redo(),
@@ -305,7 +305,7 @@ export function EditorActionBar({ groupId }: { groupId: string }) {
     ...(collapsed
       ? [
           {
-            title: "Menu",
+            title: strings.menu(),
             icon: MoreVertical,
             enabled: true,
             onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -628,7 +628,6 @@ const TabStrip = React.memo(function TabStrip({
                           )
                       : undefined
                   }
-                  onOpenInNewWindow={undefined}
                   onPin={() => useEditorStore.getState().pinTab(tab.id)}
                 />
               );
@@ -661,7 +660,6 @@ type TabProps = {
   onPin: () => void;
   onSave: () => void;
   onRevealInList?: () => void;
-  onOpenInNewWindow?: () => void;
   isGroupFocused?: boolean;
 };
 export function Tab(props: TabProps) {
@@ -683,7 +681,6 @@ export function Tab(props: TabProps) {
     onRevealInList,
     onPin,
     onSave,
-    onOpenInNewWindow,
     isGroupFocused
   } = props;
   const Icon = isLocked
@@ -809,13 +806,6 @@ export function Tab(props: TabProps) {
             isDisabled: isRevealInListDisabled
           },
           { type: "separator", key: "sep2", isHidden: !onRevealInList },
-          {
-            type: "button",
-            title: strings.openInNewWindow(),
-            key: "open-in-new-window",
-            onClick: onOpenInNewWindow,
-            isHidden: !onOpenInNewWindow
-          },
           {
             type: "button",
             key: "pin",
