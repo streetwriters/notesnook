@@ -784,14 +784,21 @@ function DropZone(props: DropZoneProps) {
         display: "none"
       }}
       onDrop={async (e) => {
-        const { activeEditorId, getEditor } = useEditorManager.getState();
-        const editor = getEditor(activeEditorId || "")?.editor;
-        if (!e.dataTransfer.files?.length || !editor) return;
+        try {
+          const { activeEditorId, getEditor } = useEditorManager.getState();
+          const editor = getEditor(activeEditorId || "")?.editor;
+          if (!e.dataTransfer.files?.length || !editor) return;
 
-        e.preventDefault();
-        const attachments = await attachFiles(Array.from(e.dataTransfer.files));
-        for (const attachment of attachments || []) {
-          editor.attachFile(attachment);
+          e.preventDefault();
+          const attachments = await attachFiles(
+            Array.from(e.dataTransfer.files)
+          );
+          for (const attachment of attachments || []) {
+            editor.attachFile(attachment);
+          }
+        } catch (e) {
+          logger.error(e as Error, "Failed to attach file from drag and drop");
+          showToast("error", strings.failedToAttachFile());
         }
       }}
     >

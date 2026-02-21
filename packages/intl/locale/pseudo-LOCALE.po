@@ -2750,6 +2750,10 @@ msgstr ""
 msgid "Failed"
 msgstr ""
 
+#: src/strings.ts:2637
+msgid "Failed to attach file"
+msgstr ""
+
 #: src/strings.ts:1936
 msgid "Failed to copy note"
 msgstr ""
