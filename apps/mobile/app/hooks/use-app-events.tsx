@@ -563,6 +563,7 @@ export const useAppEvents = () => {
       initialUrl: string;
       backupDidWait: boolean;
       isConnectingSSE: boolean;
+      attachmentsCachedOfflineMode: boolean;
     }>
   >({});
 
@@ -657,7 +658,11 @@ export const useAppEvents = () => {
         }
       }
 
-      if (SettingsService.getProperty("offlineMode")) {
+      if (
+        SettingsService.getProperty("offlineMode") &&
+        !refValues.current.attachmentsCachedOfflineMode
+      ) {
+        refValues.current.attachmentsCachedOfflineMode = true;
         db.attachments.cacheAttachments().catch(() => {
           /* empty */
         });

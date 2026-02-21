@@ -26,6 +26,7 @@ import { DatabaseSource } from "./sqlite-export";
 import { createSharedServicePort } from "./shared-service";
 import type { IDBBatchAtomicVFS } from "./IDBBatchAtomicVFS";
 import type { AccessHandlePoolVFS } from "./AccessHandlePoolVFS";
+import { rewriteError } from "../../utils/error";
 
 type PreparedStatement = {
   stmt: number;
@@ -146,7 +147,7 @@ class _SQLiteWorker {
       return rows;
     } catch (e) {
       if (e instanceof Error || e instanceof SQLiteError)
-        e.message += ` (error exec query: ${sql})`;
+        throw rewriteError(e, `${e.message} (error executing query: ${sql})`);
       throw e;
     } finally {
       await this.sqlite

@@ -65,7 +65,16 @@ export class FileStorage {
     let current = 0;
     const token = await this.tokenManager.getAccessToken();
     const total = files.length;
-    const group = this.groups.downloads.get(groupId) || new Set();
+
+    if (this.groups.downloads.has(groupId)) {
+      logger.debug("[queueDownloads] group already exists", {
+        groupId
+      });
+      return this.groups.downloads.get(groupId);
+    }
+
+    const group = new Set<string>();
+
     files.forEach((f) => group.add(f.filename));
     this.groups.downloads.set(groupId, group);
 
@@ -145,7 +154,16 @@ export class FileStorage {
     let current = 0;
     const token = await this.tokenManager.getAccessToken();
     const total = files.length;
-    const group = this.groups.uploads.get(groupId) || new Set();
+
+    if (this.groups.uploads.has(groupId)) {
+      logger.debug("[queueUploads] group already exists", {
+        groupId
+      });
+      return this.groups.uploads.get(groupId);
+    }
+
+    const group = new Set<string>();
+
     files.forEach((f) => group.add(f.filename));
     this.groups.uploads.set(groupId, group);
 
