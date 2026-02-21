@@ -179,15 +179,19 @@ function getSandboxFeatures(src: string) {
 }
 
 function isYouTubeEmbed(urlString: string) {
-  const url = new URL(urlString);
-  return (
-    (url.hostname === "www.youtube.com" ||
-      url.hostname === "youtube.com" ||
-      url.hostname === "m.youtube.com" ||
-      url.hostname === "www.youtube-nocookie.com" ||
-      url.hostname === "youtube-nocookie.com") &&
-    url.pathname.startsWith("/embed/")
-  );
+  try {
+    const url = new URL(urlString);
+    return (
+      (url.hostname === "www.youtube.com" ||
+        url.hostname === "youtube.com" ||
+        url.hostname === "m.youtube.com" ||
+        url.hostname === "www.youtube-nocookie.com" ||
+        url.hostname === "youtube-nocookie.com") &&
+      url.pathname.startsWith("/embed/")
+    );
+  } catch {
+    return false;
+  }
 }
 
 function isTwitterX(src: string) {
