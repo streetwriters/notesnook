@@ -127,10 +127,51 @@ function EditorProperties(props: EditorPropertiesProps) {
       "default",
       "readonly",
       "deleted",
-      "diff"
+      "diff",
+      "new"
     ])
   );
   if (isFocusMode || !session) return null;
+
+  if (session.type === "new") {
+    return (
+      <Flex
+        sx={{
+          display: "flex",
+          height: "100%",
+          width: "100%",
+          borderLeft: "1px solid",
+          borderLeftColor: "border"
+        }}
+      >
+        <ScopedThemeProvider
+          scope="editorSidebar"
+          sx={{
+            flex: 1,
+            display: "flex",
+            bg: "background",
+            overflowY: "hidden",
+            overflowX: "hidden",
+            flexDirection: "column"
+          }}
+        >
+          <ScrollContainer>
+            <Flex
+              data-test-id="general-section"
+              sx={{ flexDirection: "column", gap: 1 }}
+            >
+              <Section title="Properties">
+                <Text variant="body" color="paragraph-secondary" px={2} pt={1}>
+                  Please create a note first to view its properties.
+                </Text>
+              </Section>
+            </Flex>
+          </ScrollContainer>
+        </ScopedThemeProvider>
+      </Flex>
+    );
+  }
+
   return (
     <Flex
       sx={{
@@ -427,8 +468,7 @@ function LinkedNote({
   return (
     <>
       <Flex sx={{ width: "100%", alignItems: "center" }}>
-        <Button
-          variant="menuitem"
+        <Flex
           sx={{
             flex: 1,
             p: 1,
@@ -438,8 +478,11 @@ function LinkedNote({
             display: "flex",
             justifyContent: "start",
             alignItems: "center",
-            gap: "small"
-            //  borderBottom: isExpanded ? "none" : "1px solid var(--border)"
+            gap: "small",
+            cursor: "pointer",
+            ":hover": {
+              bg: "action.hover"
+            }
           }}
           onClick={() => useEditorStore.getState().openSession(item)}
         >
@@ -468,8 +511,8 @@ function LinkedNote({
           ) : (
             <NoteIcon size={14} />
           )}
-          <Text>{item.title}</Text>
-        </Button>
+          <Text variant="body">{item.title}</Text>
+        </Flex>
       </Flex>
       {isExpanded
         ? blocks.map((block) => (
@@ -542,8 +585,7 @@ function ReferencedIn({
   return (
     <>
       <Flex sx={{ width: "100%", alignItems: "center" }}>
-        <Button
-          variant="menuitem"
+        <Flex
           sx={{
             flex: 1,
             p: 1,
@@ -553,7 +595,11 @@ function ReferencedIn({
             display: "flex",
             justifyContent: "start",
             alignItems: "center",
-            gap: "small"
+            gap: "small",
+            cursor: "pointer",
+            ":hover": {
+              bg: "action.hover"
+            }
           }}
           onClick={() => useEditorStore.getState().openSession(item)}
         >
@@ -584,7 +630,7 @@ function ReferencedIn({
             )}
           </Button>
           <Text variant="body">{item.title}</Text>
-        </Button>
+        </Flex>
       </Flex>
       {isExpanded
         ? blocks.map((block) => (

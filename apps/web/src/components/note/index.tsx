@@ -39,6 +39,8 @@ import { SchemeColors } from "@notesnook/theme";
 import { MenuItem } from "@notesnook/ui";
 import { Flex, Text } from "@theme-ui/components";
 import React from "react";
+import { useDraggable } from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
 import { db } from "../../common/db";
 import { exportNote, exportNotes } from "../../common/export";
 import { Multiselect } from "../../common/multi-select";
@@ -130,9 +132,19 @@ function Note(props: NoteProps) {
   const isOpened = useEditorStore((store) => store.isNoteOpen(item.id));
   const primary: SchemeColors = color ? color.colorCode : "accent-selected";
 
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: `note::${note.id}`,
+    data: note
+  });
+
+  const style = transform ? {
+    transform: (typeof IS_DESKTOP_APP !== 'undefined' && IS_DESKTOP_APP) ? undefined : CSS.Translate.toString(transform),
+  } : undefined;
+
   return (
+    <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
     <ListItem
-      draggable={true}
+      draggable={false} // We handle drag manually via wrapper
       isFocused={isOpened}
       isCompact={compact}
       item={note}
@@ -288,6 +300,7 @@ function Note(props: NoteProps) {
         </Flex>
       }
     />
+    </div>
   );
 }
 

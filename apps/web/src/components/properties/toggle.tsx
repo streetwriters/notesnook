@@ -71,6 +71,7 @@ function Toggle(props: ToggleProps) {
           scale: 0.75
         }}
         checked={isOn}
+        onChange={() => onToggle(!isOn)}
         onClick={(e) => e.stopPropagation()}
       />
     </Flex>
