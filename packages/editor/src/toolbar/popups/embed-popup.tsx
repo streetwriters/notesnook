@@ -73,6 +73,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
       onClose={() => onClose()}
       action={{
         title: strings.save(),
+        disabled: src.trim() === "",
         onClick: () => {
           setError(null);
           let _src = src;
