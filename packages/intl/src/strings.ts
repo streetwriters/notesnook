@@ -2634,5 +2634,6 @@ Use this if changes from other devices are not appearing on this device. This wi
   importCsv: () => t`Import CSV`,
   noContent: () => t`This note is empty`,
   deleteData: () => t`Delete data`,
-  failedToAttachFile: () => t`Failed to attach file`
+  failedToAttachFile: () => t`Failed to attach file`,
+  unlockNoteToMergeConflicts: () => t`Unlock note to merge conflicts`
 };

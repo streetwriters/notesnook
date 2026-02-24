@@ -28,6 +28,7 @@ import { DDS } from "../../../services/device-detection";
 import {
   ToastManager,
   Vault,
+  VaultRequestType,
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent
@@ -58,148 +59,104 @@ import { DefaultAppStyles } from "../../../utils/styles";
 import { Note, NoteContent, VAULT_ERRORS } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 
-type VaultDialogData = {
-  item: Note;
-} & Partial<Omit<Vault, "item">>;
-
-interface VaultDialogState {
-  visible: boolean;
-  wrongPassword: boolean;
-  loading: boolean;
-  note?: Note;
-  vault: boolean;
-  locked: boolean;
-  permanant: boolean;
-  goToEditor: boolean;
-  share: boolean;
-  passwordsDontMatch: boolean;
-  deleteNote: boolean;
-  focusIndex: number | null;
-  biometricUnlock: boolean;
-  isBiometryEnrolled: boolean;
-  isBiometryAvailable: boolean;
-  fingerprintAccess: boolean;
-  changePassword: boolean;
-  copyNote: boolean;
-  revokeFingerprintAccess: boolean;
-  title: string;
-  description: string | null;
-  clearVault: boolean;
-  deleteVault: boolean;
-  deleteAll: boolean;
-  noteLocked: boolean;
-  novault: boolean;
-  customActionTitle: string | null;
-  customActionParagraph: string | null;
-  customAction: boolean;
-  onUnlock?: (
-    item: Note & {
-      content?: NoteContent<false>;
-    },
-    password: string
-  ) => void;
-}
-
 export const VaultDialog: React.FC = () => {
   const { colors } = useThemeColors();
 
-  const [state, setState] = useState<VaultDialogState>({
-    visible: false,
-    wrongPassword: false,
-    loading: false,
-    note: undefined,
-    vault: false,
-    locked: true,
-    permanant: false,
-    goToEditor: false,
-    share: false,
-    passwordsDontMatch: false,
-    deleteNote: false,
-    focusIndex: null,
-    biometricUnlock: false,
-    isBiometryEnrolled: false,
-    isBiometryAvailable: false,
-    fingerprintAccess: false,
-    changePassword: false,
-    copyNote: false,
-    revokeFingerprintAccess: false,
-    title: strings.goToEditor(),
-    description: null,
-    clearVault: false,
-    deleteVault: false,
-    deleteAll: false,
-    noteLocked: false,
-    novault: false,
-    customActionTitle: null,
-    customActionParagraph: null,
-    customAction: false,
-    onUnlock: undefined
-  });
+  // UI State
+  const [visible, setVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [wrongPassword, setWrongPassword] = useState(false);
+  const [passwordsDontMatch, setPasswordsDontMatch] = useState(false);
+  const [deleteAll, setDeleteAll] = useState(false);
+  const [biometricUnlock, setBiometricUnlock] = useState(false);
+  const [isBiometryAvailable, setIsBiometryAvailable] = useState(false);
+  const [isBiometryEnrolled, setIsBiometryEnrolled] = useState(false);
 
+  // Refs for non-UI state
+  const requestTypeRef = useRef<VaultRequestType | null>(null);
+  const noteRef = useRef<Note | undefined>(undefined);
+  const titleRef = useRef<string>(strings.goToEditor());
+  const descriptionRef = useRef<string | null>(null);
+  const paragraphRef = useRef<string | null>(null);
+  const buttonTitleRef = useRef<string | null>(null);
+  const positiveButtonTypeRef = useRef<"errorShade" | "transparent" | "accent">(
+    "transparent"
+  );
+  const customActionTitleRef = useRef<string | null>(null);
+  const customActionParagraphRef = useRef<string | null>(null);
+  const noteLockedRef = useRef(false);
+  const onUnlockRef = useRef<
+    | ((
+        item: Note & {
+          content?: NoteContent<false>;
+        },
+        password: string
+      ) => void)
+    | undefined
+  >(undefined);
+
+  // Input refs
   const passInputRef = useRef<TextInput>(null);
   const confirmPassRef = useRef<TextInput>(null);
   const changePassInputRef = useRef<TextInput>(null);
 
+  // Password refs
   const passwordRef = useRef<string | null>(null);
   const confirmPasswordRef = useRef<string | null>(null);
   const newPasswordRef = useRef<string | null>(null);
 
-  const open = useCallback(async (data: VaultDialogData) => {
+  const open = useCallback(async (data: Vault) => {
     const biometry = await BiometricService.isBiometryAvailable();
     const available = !!biometry;
     const fingerprint = await BiometricService.hasInternetCredentials();
-
     const noteLocked = data.item
       ? await db.vaults.itemExists(data.item)
       : false;
 
-    setState((prev) => ({
-      ...prev,
-      note: data.item,
-      novault: data.novault || false,
-      locked: data.locked || false,
-      permanant: data.permanant || false,
-      goToEditor: data.goToEditor || false,
-      share: data.share || false,
-      deleteNote: data.deleteNote || false,
-      copyNote: data.copyNote || false,
-      isBiometryAvailable: available,
-      biometricUnlock: fingerprint,
-      isBiometryEnrolled: fingerprint,
-      fingerprintAccess: data.fingerprintAccess || false,
-      changePassword: data.changePassword || false,
-      revokeFingerprintAccess: data.revokeFingerprintAccess || false,
-      title: data.title || strings.goToEditor(),
-      description: data.description || null,
-      clearVault: data.clearVault || false,
-      deleteVault: data.deleteVault || false,
-      noteLocked,
-      customActionTitle: data.customActionTitle || null,
-      customActionParagraph: data.customActionParagraph || null,
-      customAction: !!(data.customActionTitle && data.customActionParagraph),
-      onUnlock: data.onUnlock
-    }));
+    // Set refs
+    noteRef.current = data.item;
+    titleRef.current = data.title || strings.goToEditor();
+    descriptionRef.current = data.description || null;
+    paragraphRef.current = data.paragraph || null;
+    buttonTitleRef.current = data.buttonTitle || null;
+    positiveButtonTypeRef.current = data.positiveButtonType || "transparent";
+    customActionTitleRef.current = data.customActionTitle || null;
+    customActionParagraphRef.current = data.customActionParagraph || null;
+    noteLockedRef.current = noteLocked;
+    onUnlockRef.current = data.onUnlock;
+    requestTypeRef.current = data.requestType;
 
-    if (
+    // Set UI state
+    setIsBiometryAvailable(available);
+    setIsBiometryEnrolled(fingerprint);
+    setBiometricUnlock(fingerprint);
+    setWrongPassword(false);
+    setPasswordsDontMatch(false);
+    setDeleteAll(false);
+    setLoading(false);
+
+    // Auto-unlock with fingerprint if applicable
+    const canAutoUnlock =
       fingerprint &&
-      data.novault &&
-      !data.fingerprintAccess &&
-      !data.revokeFingerprintAccess &&
-      !data.changePassword &&
-      !data.clearVault &&
-      !data.deleteVault &&
-      !data.customActionTitle
-    ) {
+      data.requestType !== VaultRequestType.EnableFingerprint &&
+      data.requestType !== VaultRequestType.RevokeFingerprint &&
+      data.requestType !== VaultRequestType.ChangePassword &&
+      data.requestType !== VaultRequestType.ClearVault &&
+      data.requestType !== VaultRequestType.DeleteVault &&
+      data.requestType !== VaultRequestType.CustomAction &&
+      data.requestType === VaultRequestType.PermanentUnlock;
+
+    if (canAutoUnlock) {
       await onPressFingerprintAuth(data.title, data.description);
     } else {
-      setState((prev) => ({ ...prev, visible: true }));
+      setVisible(true);
     }
   }, []);
 
   const close = useCallback(() => {
-    if (state.loading) {
+    if (loading) {
       ToastManager.show({
-        heading: state.title,
+        heading: titleRef.current,
         message: strings.pleaseWait() + "...",
         type: "success",
         context: "local"
@@ -209,46 +166,37 @@ export const VaultDialog: React.FC = () => {
 
     Navigation.queueRoutesForUpdate();
 
+    // Reset password refs
     passwordRef.current = null;
     confirmPasswordRef.current = null;
     newPasswordRef.current = null;
 
-    setState({
-      visible: false,
-      wrongPassword: false,
-      loading: false,
-      note: undefined,
-      vault: false,
-      locked: false,
-      permanant: false,
-      goToEditor: false,
-      share: false,
-      passwordsDontMatch: false,
-      deleteNote: false,
-      focusIndex: null,
-      biometricUnlock: false,
-      isBiometryEnrolled: false,
-      isBiometryAvailable: false,
-      fingerprintAccess: false,
-      changePassword: false,
-      copyNote: false,
-      revokeFingerprintAccess: false,
-      title: strings.goToEditor(),
-      description: null,
-      clearVault: false,
-      deleteVault: false,
-      deleteAll: false,
-      noteLocked: false,
-      novault: false,
-      customActionTitle: null,
-      customActionParagraph: null,
-      customAction: false,
-      onUnlock: undefined
-    });
-  }, [state.loading, state.title]);
+    // Reset refs
+    requestTypeRef.current = null;
+    noteRef.current = undefined;
+    titleRef.current = strings.goToEditor();
+    descriptionRef.current = null;
+    paragraphRef.current = null;
+    buttonTitleRef.current = null;
+    positiveButtonTypeRef.current = "transparent";
+    customActionTitleRef.current = null;
+    customActionParagraphRef.current = null;
+    noteLockedRef.current = false;
+    onUnlockRef.current = undefined;
+
+    // Reset UI state
+    setVisible(false);
+    setLoading(false);
+    setWrongPassword(false);
+    setPasswordsDontMatch(false);
+    setDeleteAll(false);
+    setBiometricUnlock(false);
+    setIsBiometryAvailable(false);
+    setIsBiometryEnrolled(false);
+  }, [loading]);
 
   const deleteVault = useCallback(async () => {
-    setState((prev) => ({ ...prev, loading: true }));
+    setLoading(true);
     try {
       let verified = true;
       if (await db.user.getUser()) {
@@ -256,7 +204,7 @@ export const VaultDialog: React.FC = () => {
       }
       if (verified) {
         let noteIds: string[] = [];
-        if (state.deleteAll) {
+        if (deleteAll) {
           const vault = await db.vaults.default();
           const relations = await db.relations
             .from(
@@ -269,9 +217,9 @@ export const VaultDialog: React.FC = () => {
             .get();
           noteIds = relations.map((item) => item.toId);
         }
-        await db.vault.delete(state.deleteAll);
+        await db.vault.delete(deleteAll);
 
-        if (state.deleteAll) {
+        if (deleteAll) {
           noteIds.forEach((id) => {
             eSendEvent(
               eUpdateNoteInEditor,
@@ -284,7 +232,7 @@ export const VaultDialog: React.FC = () => {
           });
         }
         eSendEvent("vaultUpdated");
-        setState((prev) => ({ ...prev, loading: false }));
+        setLoading(false);
         setTimeout(() => {
           close();
         }, 100);
@@ -298,10 +246,10 @@ export const VaultDialog: React.FC = () => {
     } catch (e) {
       console.error(e);
     }
-  }, [state.deleteAll, close]);
+  }, [deleteAll, close]);
 
   const clearVault = useCallback(async () => {
-    setState((prev) => ({ ...prev, loading: true }));
+    setLoading(true);
     try {
       const vault = await db.vaults.default();
       const relations = await db.relations.from(vault!, "note").get();
@@ -319,7 +267,7 @@ export const VaultDialog: React.FC = () => {
           true
         );
       });
-      setState((prev) => ({ ...prev, loading: false }));
+      setLoading(false);
       close();
       eSendEvent("vaultUpdated");
     } catch (e) {
@@ -329,7 +277,7 @@ export const VaultDialog: React.FC = () => {
         context: "local"
       });
     }
-    setState((prev) => ({ ...prev, loading: false }));
+    setLoading(false);
   }, [close]);
 
   const lockNote = useCallback(async () => {
@@ -341,9 +289,9 @@ export const VaultDialog: React.FC = () => {
       });
       return;
     } else {
-      await db.vault.add(state.note!.id);
+      await db.vault.add(noteRef.current!.id);
 
-      eSendEvent(eUpdateNoteInEditor, state.note, true);
+      eSendEvent(eUpdateNoteInEditor, noteRef.current, true);
 
       close();
       ToastManager.show({
@@ -351,26 +299,29 @@ export const VaultDialog: React.FC = () => {
         type: "error",
         context: "local"
       });
-      setState((prev) => ({ ...prev, loading: false }));
+      setLoading(false);
     }
-  }, [state.note, close]);
+  }, [close]);
 
   const permanantUnlock = useCallback(() => {
     db.vault
-      .remove(state.note!.id, passwordRef.current || "")
-      .then(() => {
+      .remove(noteRef.current!.id, passwordRef.current || "")
+      .then(async () => {
         ToastManager.show({
           heading: strings.noteUnlocked(),
           type: "success",
           context: "global"
         });
-        eSendEvent(eUpdateNoteInEditor, state.note, true);
+        eSendEvent(eUpdateNoteInEditor, noteRef.current, true);
+        if (biometricUnlock && !isBiometryEnrolled) {
+          await enrollFingerprint(passwordRef.current || "");
+        }
         close();
       })
       .catch((e) => {
         takeErrorAction();
       });
-  }, [state.note, close]);
+  }, [close, biometricUnlock, isBiometryEnrolled]);
 
   const openInEditor = useCallback(
     (note: Note & { content?: NoteContent<false> }) => {
@@ -418,20 +369,17 @@ export const VaultDialog: React.FC = () => {
 
   const deleteNote = useCallback(async () => {
     try {
-      await db.vault.remove(state.note!.id, passwordRef.current || "");
-      await deleteItems("note", [state.note!.id]);
+      await db.vault.remove(noteRef.current!.id, passwordRef.current || "");
+      await deleteItems("note", [noteRef.current!.id]);
       close();
     } catch (e) {
       takeErrorAction();
     }
-  }, [state.note, close]);
+  }, [close]);
 
   const takeErrorAction = useCallback(() => {
-    setState((prev) => ({
-      ...prev,
-      wrongPassword: true,
-      visible: true
-    }));
+    setWrongPassword(true);
+    setVisible(true);
     setTimeout(() => {
       ToastManager.show({
         heading: strings.passwordIncorrect(),
@@ -445,39 +393,40 @@ export const VaultDialog: React.FC = () => {
     try {
       if (!passwordRef.current) throw new Error("Invalid password");
 
-      const note = await db.vault.open(state.note!.id, passwordRef.current);
+      const note = await db.vault.open(
+        noteRef.current!.id,
+        passwordRef.current
+      );
       if (!note) throw new Error("Failed to unlock note.");
-      if (state.biometricUnlock && !state.isBiometryEnrolled) {
+      if (biometricUnlock && !isBiometryEnrolled) {
         await enrollFingerprint(passwordRef.current || "");
       }
 
-      if (state.goToEditor) {
+      const requestType = requestTypeRef.current;
+
+      if (requestType === VaultRequestType.GoToEditor) {
         openInEditor(note);
-      } else if (state.share) {
+      } else if (requestType === VaultRequestType.ShareNote) {
         await shareNote(note);
-      } else if (state.deleteNote) {
+      } else if (requestType === VaultRequestType.DeleteNote) {
         await deleteNote();
-      } else if (state.copyNote) {
+      } else if (requestType === VaultRequestType.CopyNote) {
         await copyNote(note);
-      } else if (state.customAction && state.onUnlock) {
+      } else if (
+        requestType === VaultRequestType.CustomAction &&
+        onUnlockRef.current
+      ) {
         const password = passwordRef.current;
         close();
         await sleep(300);
-        state.onUnlock(note, password);
+        onUnlockRef.current(note, password);
       }
     } catch (e) {
       takeErrorAction();
     }
   }, [
-    state.note,
-    state.biometricUnlock,
-    state.isBiometryEnrolled,
-    state.goToEditor,
-    state.share,
-    state.deleteNote,
-    state.copyNote,
-    state.customAction,
-    state.onUnlock,
+    biometricUnlock,
+    isBiometryEnrolled,
     openInEditor,
     shareNote,
     deleteNote,
@@ -495,20 +444,20 @@ export const VaultDialog: React.FC = () => {
       });
       return;
     }
-    if (state.permanant) {
+    if (requestTypeRef.current === VaultRequestType.PermanentUnlock) {
       permanantUnlock();
     } else {
       await openNote();
     }
-  }, [state.permanant, permanantUnlock, openNote]);
+  }, [permanantUnlock, openNote]);
 
   const enrollFingerprint = useCallback(
     async (password: string) => {
-      setState((prev) => ({ ...prev, loading: true }));
+      setLoading(true);
       try {
         await db.vault.unlock(password);
         await BiometricService.storeCredentials(password);
-        setState((prev) => ({ ...prev, loading: false }));
+        setLoading(false);
         eSendEvent("vaultUpdated");
         ToastManager.show({
           heading: strings.biometricUnlockEnabled(),
@@ -523,7 +472,7 @@ export const VaultDialog: React.FC = () => {
           type: "error",
           context: "local"
         });
-        setState((prev) => ({ ...prev, loading: false }));
+        setLoading(false);
       }
     },
     [close]
@@ -532,13 +481,13 @@ export const VaultDialog: React.FC = () => {
   const createVault = useCallback(async () => {
     await db.vault.create(passwordRef.current || "");
 
-    if (state.biometricUnlock) {
+    if (biometricUnlock) {
       await enrollFingerprint(passwordRef.current || "");
     }
-    if (state.note?.id) {
-      await db.vault.add(state.note.id);
-      eSendEvent(eUpdateNoteInEditor, state.note, true);
-      setState((prev) => ({ ...prev, loading: false }));
+    if (noteRef.current?.id) {
+      await db.vault.add(noteRef.current.id);
+      eSendEvent(eUpdateNoteInEditor, noteRef.current, true);
+      setLoading(false);
       ToastManager.show({
         heading: strings.noteLocked(),
         type: "success",
@@ -554,7 +503,7 @@ export const VaultDialog: React.FC = () => {
       close();
     }
     eSendEvent("vaultUpdated");
-  }, [state.biometricUnlock, state.note, enrollFingerprint, close]);
+  }, [biometricUnlock, enrollFingerprint, close]);
 
   const revokeFingerprintAccess = useCallback(async () => {
     try {
@@ -578,34 +527,38 @@ export const VaultDialog: React.FC = () => {
     async (title?: string, description?: string) => {
       try {
         const credentials = await BiometricService.getCredentials(
-          title || state.title,
-          description || state.description || ""
+          title || titleRef.current,
+          description || descriptionRef.current || ""
         );
 
         if (!credentials) throw new Error("Failed to get user credentials");
 
         if (credentials?.password) {
           passwordRef.current = credentials.password;
+          console.log("password...");
           onPress();
         } else {
           eSendEvent(eCloseActionSheet);
           await sleep(300);
-          setState((prev) => ({ ...prev, visible: true }));
+          setVisible(true);
         }
       } catch (e) {
         console.error(e);
       }
     },
-    [state.title, state.description]
+    []
   );
 
   const onPress = useCallback(async () => {
-    if (state.revokeFingerprintAccess) {
+    const requestType = requestTypeRef.current;
+
+    if (requestType === VaultRequestType.RevokeFingerprint) {
       await revokeFingerprintAccess();
       close();
       return;
     }
-    if (state.loading) return;
+
+    if (loading) return;
 
     if (!passwordRef.current) {
       ToastManager.show({
@@ -616,26 +569,26 @@ export const VaultDialog: React.FC = () => {
       return;
     }
 
-    if (!state.novault) {
+    if (requestType === VaultRequestType.CreateVault) {
       if (passwordRef.current !== confirmPasswordRef.current) {
         ToastManager.show({
           heading: strings.passwordNotMatched(),
           type: "error",
           context: "local"
         });
-        setState((prev) => ({ ...prev, passwordsDontMatch: true }));
+        setPasswordsDontMatch(true);
         return;
       }
 
       createVault();
-    } else if (state.changePassword) {
-      setState((prev) => ({ ...prev, loading: true }));
+    } else if (requestType === VaultRequestType.ChangePassword) {
+      setLoading(true);
 
       db.vault
         .changePassword(passwordRef.current, newPasswordRef.current || "")
         .then(() => {
-          setState((prev) => ({ ...prev, loading: false }));
-          if (state.biometricUnlock) {
+          setLoading(false);
+          if (biometricUnlock) {
             enrollFingerprint(newPasswordRef.current || "");
           }
           ToastManager.show({
@@ -646,7 +599,7 @@ export const VaultDialog: React.FC = () => {
           close();
         })
         .catch((e) => {
-          setState((prev) => ({ ...prev, loading: false }));
+          setLoading(false);
           if (e.message === VAULT_ERRORS.wrongPassword) {
             ToastManager.show({
               heading: strings.passwordIncorrect(),
@@ -657,50 +610,62 @@ export const VaultDialog: React.FC = () => {
             ToastManager.error(e);
           }
         });
-    } else if (state.locked) {
+    } else if (requestType === VaultRequestType.LockNote) {
       if (!passwordRef.current || passwordRef.current.trim() === "") {
         ToastManager.show({
           heading: strings.passwordIncorrect(),
           type: "error",
           context: "local"
         });
-        setState((prev) => ({ ...prev, wrongPassword: true }));
+        setWrongPassword(true);
         return;
       }
-      if (state.noteLocked) {
+      db.vault
+        .unlock(passwordRef.current)
+        .then(async (unlocked) => {
+          if (unlocked) {
+            setWrongPassword(false);
+            await lockNote();
+          } else {
+            takeErrorAction();
+          }
+        })
+        .catch((e) => {
+          takeErrorAction();
+        });
+    } else if (
+      requestType === VaultRequestType.UnlockNote ||
+      requestType === VaultRequestType.PermanentUnlock ||
+      requestType === VaultRequestType.GoToEditor ||
+      requestType === VaultRequestType.ShareNote ||
+      requestType === VaultRequestType.CopyNote ||
+      requestType === VaultRequestType.DeleteNote ||
+      requestType === VaultRequestType.CustomAction
+    ) {
+      if (!passwordRef.current || passwordRef.current.trim() === "") {
+        ToastManager.show({
+          heading: strings.passwordIncorrect(),
+          type: "error",
+          context: "local"
+        });
+        setWrongPassword(true);
+        return;
+      }
+      if (noteLockedRef.current) {
         await unlockNote();
       } else {
-        db.vault
-          .unlock(passwordRef.current)
-          .then(async () => {
-            setState((prev) => ({ ...prev, wrongPassword: false }));
-            await lockNote();
-          })
-          .catch((e) => {
-            takeErrorAction();
-          });
+        console.log("Error: Note should be locked for this operation");
       }
-    } else if (state.fingerprintAccess) {
+    } else if (requestType === VaultRequestType.EnableFingerprint) {
       enrollFingerprint(passwordRef.current);
-    } else if (state.clearVault) {
+    } else if (requestType === VaultRequestType.ClearVault) {
       await clearVault();
-    } else if (state.deleteVault) {
+    } else if (requestType === VaultRequestType.DeleteVault) {
       await deleteVault();
-    } else if (state.customAction) {
-      await unlockNote();
     }
   }, [
-    state.revokeFingerprintAccess,
-    state.loading,
-    state.novault,
-    state.changePassword,
-    state.locked,
-    state.noteLocked,
-    state.fingerprintAccess,
-    state.clearVault,
-    state.deleteVault,
-    state.customAction,
-    state.biometricUnlock,
+    loading,
+    biometricUnlock,
     revokeFingerprintAccess,
     close,
     createVault,
@@ -722,23 +687,21 @@ export const VaultDialog: React.FC = () => {
     };
   }, [open, close]);
 
-  if (!state.visible) return null;
+  if (!visible) return null;
 
-  const {
-    note,
-    novault,
-    deleteNote: shouldDeleteNote,
-    share,
-    goToEditor,
-    fingerprintAccess,
-    changePassword,
-    loading,
-    deleteVault: shouldDeleteVault,
-    clearVault: shouldClearVault,
-    customAction,
-    customActionTitle,
-    customActionParagraph
-  } = state;
+  const requestType = requestTypeRef.current;
+  const isCreateVault = requestType === VaultRequestType.CreateVault;
+  const isChangePassword = requestType === VaultRequestType.ChangePassword;
+  const isClearVault = requestType === VaultRequestType.ClearVault;
+  const isDeleteVault = requestType === VaultRequestType.DeleteVault;
+  const isRevokeFingerprint =
+    requestType === VaultRequestType.RevokeFingerprint;
+  const isEnableFingerprint =
+    requestType === VaultRequestType.EnableFingerprint;
+  const isCustomAction = requestType === VaultRequestType.CustomAction;
+  const isDeleteNote = requestType === VaultRequestType.DeleteNote;
+  const isShareNote = requestType === VaultRequestType.ShareNote;
+  const isGoToEditor = requestType === VaultRequestType.GoToEditor;
 
   return (
     <BaseDialog
@@ -760,8 +723,10 @@ export const VaultDialog: React.FC = () => {
         }}
       >
         <DialogHeader
-          title={state.title}
-          paragraph={customActionParagraph || ""}
+          title={titleRef.current}
+          paragraph={
+            paragraphRef.current || customActionParagraphRef.current || ""
+          }
           icon="shield"
           padding={12}
         />
@@ -772,12 +737,12 @@ export const VaultDialog: React.FC = () => {
             paddingHorizontal: DefaultAppStyles.GAP
           }}
         >
-          {(novault ||
-            changePassword ||
-            shouldClearVault ||
-            shouldDeleteVault ||
-            customAction) &&
-          !state.revokeFingerprintAccess ? (
+          {(isChangePassword ||
+            isClearVault ||
+            !isCreateVault ||
+            isDeleteVault ||
+            isCustomAction) &&
+          !isRevokeFingerprint ? (
             <>
               <Input
                 fwdRef={passInputRef}
@@ -788,37 +753,39 @@ export const VaultDialog: React.FC = () => {
                   passwordRef.current = value;
                 }}
                 marginBottom={
-                  !state.biometricUnlock ||
-                  !state.isBiometryEnrolled ||
-                  !novault ||
-                  changePassword ||
-                  customAction
+                  !biometricUnlock ||
+                  !isBiometryEnrolled ||
+                  isCreateVault ||
+                  isChangePassword ||
+                  isCustomAction
                     ? 0
                     : 10
                 }
                 onSubmit={() => {
-                  if (changePassword) {
+                  if (isChangePassword) {
                     confirmPassRef.current?.focus();
                   } else {
                     onPress();
                   }
                 }}
                 autoComplete="password"
-                returnKeyLabel={changePassword ? strings.next() : state.title}
-                returnKeyType={changePassword ? "next" : "done"}
+                returnKeyLabel={
+                  isChangePassword ? strings.next() : titleRef.current
+                }
+                returnKeyType={isChangePassword ? "next" : "done"}
                 secureTextEntry
                 placeholder={
-                  changePassword
+                  isChangePassword
                     ? strings.currentPassword()
                     : strings.password()
                 }
               />
 
-              {!state.biometricUnlock ||
-              !state.isBiometryEnrolled ||
-              !novault ||
-              changePassword ||
-              customAction ? null : (
+              {!biometricUnlock ||
+              !isBiometryEnrolled ||
+              isCreateVault ||
+              isChangePassword ||
+              isCustomAction ? null : (
                 <Button
                   onPress={() =>
                     onPressFingerprintAuth(strings.unlockNote(), "")
@@ -832,16 +799,11 @@ export const VaultDialog: React.FC = () => {
             </>
           ) : null}
 
-          {shouldDeleteVault && (
+          {isDeleteVault && (
             <Button
-              onPress={() =>
-                setState((prev) => ({
-                  ...prev,
-                  deleteAll: !prev.deleteAll
-                }))
-              }
+              onPress={() => setDeleteAll(!deleteAll)}
               icon={
-                state.deleteAll
+                deleteAll
                   ? "check-circle-outline"
                   : "checkbox-blank-circle-outline"
               }
@@ -854,7 +816,7 @@ export const VaultDialog: React.FC = () => {
             />
           )}
 
-          {changePassword ? (
+          {isChangePassword ? (
             <>
               <Seperator half />
               <Input
@@ -877,7 +839,7 @@ export const VaultDialog: React.FC = () => {
             </>
           ) : null}
 
-          {!novault ? (
+          {isCreateVault ? (
             <View>
               <Input
                 fwdRef={passInputRef}
@@ -912,12 +874,9 @@ export const VaultDialog: React.FC = () => {
                 onChangeText={(value) => {
                   confirmPasswordRef.current = value;
                   if (value !== passwordRef.current) {
-                    setState((prev) => ({ ...prev, passwordsDontMatch: true }));
+                    setPasswordsDontMatch(true);
                   } else {
-                    setState((prev) => ({
-                      ...prev,
-                      passwordsDontMatch: false
-                    }));
+                    setPasswordsDontMatch(false);
                   }
                 }}
                 onSubmit={() => {
@@ -928,22 +887,20 @@ export const VaultDialog: React.FC = () => {
             </View>
           ) : null}
 
-          {state.biometricUnlock && !state.isBiometryEnrolled && novault ? (
+          {biometricUnlock && !isBiometryEnrolled && !isCreateVault ? (
             <Paragraph>{strings.vaultEnableBiometrics()}</Paragraph>
           ) : null}
 
-          {state.isBiometryAvailable &&
-          !state.fingerprintAccess &&
-          !shouldClearVault &&
-          !shouldDeleteVault &&
-          !customAction &&
-          ((!state.biometricUnlock && !changePassword) || !novault) ? (
+          {requestType === VaultRequestType.CopyNote ||
+          requestType === VaultRequestType.DeleteNote ||
+          requestType === VaultRequestType.ShareNote ||
+          requestType === VaultRequestType.CustomAction ||
+          requestType === VaultRequestType.GoToEditor ||
+          requestType === VaultRequestType.PermanentUnlock ||
+          requestType === VaultRequestType.LockNote ? (
             <Button
               onPress={() => {
-                setState((prev) => ({
-                  ...prev,
-                  biometricUnlock: !prev.biometricUnlock
-                }));
+                setBiometricUnlock(!biometricUnlock);
               }}
               style={{
                 marginTop: DefaultAppStyles.GAP_VERTICAL
@@ -952,11 +909,9 @@ export const VaultDialog: React.FC = () => {
               width="100%"
               title={strings.unlockWithBiometrics()}
               iconColor={
-                state.biometricUnlock
-                  ? colors.selected.accent
-                  : colors.primary.icon
+                biometricUnlock ? colors.selected.accent : colors.primary.icon
               }
-              type={state.biometricUnlock ? "transparent" : "plain"}
+              type={biometricUnlock ? "transparent" : "plain"}
             />
           ) : null}
         </View>
@@ -965,34 +920,8 @@ export const VaultDialog: React.FC = () => {
           onPressNegative={close}
           onPressPositive={onPress}
           loading={loading}
-          positiveType={
-            shouldDeleteVault || shouldClearVault ? "errorShade" : "transparent"
-          }
-          positiveTitle={
-            shouldDeleteVault
-              ? strings.delete()
-              : shouldClearVault
-                ? strings.clear()
-                : fingerprintAccess
-                  ? strings.enable()
-                  : state.revokeFingerprintAccess
-                    ? strings.revoke()
-                    : changePassword
-                      ? strings.change()
-                      : customAction && customActionTitle
-                        ? customActionTitle
-                        : state.noteLocked
-                          ? shouldDeleteNote
-                            ? strings.delete()
-                            : share
-                              ? strings.share()
-                              : goToEditor
-                                ? strings.open()
-                                : strings.unlock()
-                          : !note?.id
-                            ? strings.create()
-                            : strings.lock()
-          }
+          positiveType={positiveButtonTypeRef.current}
+          positiveTitle={buttonTitleRef.current || strings.unlock()}
         />
       </View>
       <Toast context="local" />

@@ -17,24 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { VirtualizedGrouping } from "@notesnook/core";
-import { sanitizeTag } from "@notesnook/core";
-import { Tag } from "@notesnook/core";
+import { LegendList } from "@legendapp/list";
+import { isFeatureAvailable } from "@notesnook/common";
+import { Tag, VirtualizedGrouping, sanitizeTag } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import React, {
-  RefObject,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { TextInput, View, useWindowDimensions } from "react-native";
-import { ActionSheetRef } from "react-native-actions-sheet";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
-import { useDBItem } from "../../hooks/use-db-item";
+import { Header } from "../../components/header";
+import Input from "../../components/ui/input";
+import { Pressable } from "../../components/ui/pressable";
+import Heading from "../../components/ui/typography/heading";
+import Paragraph from "../../components/ui/typography/paragraph";
+import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import { ToastManager } from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import {
@@ -43,17 +41,8 @@ import {
 } from "../../stores/item-selection-store";
 import { useRelationStore } from "../../stores/use-relation-store";
 import { useTagStore } from "../../stores/use-tag-store";
-import { defaultBorderRadius, AppFontSize } from "../../utils/size";
-import Input from "../../components/ui/input";
-import { Pressable } from "../../components/ui/pressable";
-import Heading from "../../components/ui/typography/heading";
-import Paragraph from "../../components/ui/typography/paragraph";
-import { strings } from "@notesnook/intl";
+import { AppFontSize, defaultBorderRadius } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
-import { Header } from "../../components/header";
-import { useNavigationFocus } from "../../hooks/use-navigation-focus";
-import { isFeatureAvailable } from "@notesnook/common";
-import { LegendList } from "@legendapp/list";
 
 async function updateInitialSelectionState(items: string[]) {
   const relations = await db.relations
@@ -92,13 +81,12 @@ const useTagItemSelection = createItemSelectionStore(true);
 const ManageTags = (props: NavigationProps<"ManageTags">) => {
   const { colors } = useThemeColors();
   const ids = props.route.params.ids || [];
-  const [tags, setTags] = useState<VirtualizedGrouping<Tag>>();
+  const [tags, setTags] = useState<Tag[]>();
   const [query, setQuery] = useState<string>();
   const inputRef = useRef<TextInput>(null);
-  const [focus, setFocus] = useState(false);
   useNavigationFocus(props.navigation, { focusOnInit: true });
+  const timerRef = useRef<NodeJS.Timeout>(undefined);
   const [queryExists, setQueryExists] = useState(false);
-  const dimensions = useWindowDimensions();
   const refreshSelection = useCallback(() => {
     updateInitialSelectionState(ids).then((selection) => {
       useTagItemSelection.setState({
@@ -109,18 +97,43 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ids, tags]);
 
+  const sortAndSetTags = useCallback(
+    async (items: VirtualizedGrouping<Tag>) => {
+      const tags = [];
+      const noteTags = [];
+      const assignedTags =
+        ids.length > 1
+          ? []
+          : await db.relations
+              .to({ type: "note", id: ids[0] }, "tag")
+              .resolve();
+
+      for (let i = 0; i < items.placeholders.length; i++) {
+        const item = (await items.item(i)).item;
+        if (item) {
+          if (assignedTags.find((tag) => tag.id === item.id)) {
+            noteTags.push(item);
+          } else {
+            tags.push(item);
+          }
+        }
+      }
+      tags.splice(0, 0, ...noteTags);
+      setTags(tags);
+    },
+    []
+  );
+
   const refreshTags = useCallback(() => {
     if (query && query.trim() !== "") {
       db.lookup
         .tags(query)
         .sorted(db.settings.getGroupOptions("tags"))
-        .then((items) => {
-          setTags(items);
-        });
+        .then(sortAndSetTags);
     } else {
-      db.tags.all.sorted(db.settings.getGroupOptions("tags")).then((items) => {
-        setTags(items);
-      });
+      db.tags.all
+        .sorted(db.settings.getGroupOptions("tags"))
+        .then(sortAndSetTags);
     }
   }, [query]);
 
@@ -241,14 +254,10 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
   );
 
   const renderTag = useCallback(
-    ({ index }: { item: boolean; index: number }) => (
-      <TagItem
-        tags={tags as VirtualizedGrouping<Tag>}
-        id={index}
-        onPress={onPress}
-      />
+    ({ index, item }: { item: Tag; index: number }) => (
+      <TagItem tag={item} onPress={onPress} />
     ),
-    [onPress, tags]
+    [onPress]
   );
 
   return (
@@ -280,14 +289,11 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
           fwdRef={inputRef}
           autoCapitalize="none"
           onChangeText={(v) => {
-            setQuery(sanitizeTag(v));
-            checkQueryExists(sanitizeTag(v));
-          }}
-          onFocusInput={() => {
-            setFocus(true);
-          }}
-          onBlurInput={() => {
-            setFocus(false);
+            clearTimeout(timerRef.current);
+            timerRef.current = setTimeout(() => {
+              setQuery(sanitizeTag(v));
+              checkQueryExists(sanitizeTag(v));
+            }, 300);
           }}
           onSubmit={() => {
             onSubmit();
@@ -324,7 +330,7 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
           }}
         >
           <LegendList
-            data={tags?.placeholders || []}
+            data={tags || []}
             extraData={tags}
             keyboardShouldPersistTaps
             keyboardDismissMode="interactive"
@@ -367,16 +373,13 @@ ManageTags.present = (ids?: string[]) => {
 export default ManageTags;
 
 const TagItem = ({
-  id,
-  tags,
-  onPress
+  onPress,
+  tag
 }: {
-  id: string | number;
-  tags: VirtualizedGrouping<Tag>;
+  tag: Tag;
   onPress: (id: string) => void;
 }) => {
   const { colors } = useThemeColors();
-  const [tag] = useDBItem(id, "tag", tags);
   const selection = useTagItemSelection((state) =>
     tag?.id ? state.selection[tag?.id] : false
   );

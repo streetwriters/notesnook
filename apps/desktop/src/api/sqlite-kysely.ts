@@ -113,7 +113,8 @@ export class SQLite {
         };
       }
     } catch (e) {
-      if (e instanceof Error) e.message += ` (query: ${sql})`;
+      if (e instanceof Error)
+        throw rewriteError(e, `${e.message} (query: ${sql})`);
       throw e;
     } finally {
       // Since SQLite 3.48.0 (SQLite3MC v2.0.2) it's not possible to load fts5
@@ -211,4 +212,12 @@ function getExtensionPath(extensionName: string, entryPoint: string) {
     throw new Error(`${extensionName} not found at ${loadablePath}.`);
   }
   return loadablePath;
+}
+
+function rewriteError(e: Error, message: string) {
+  const error = new Error(message);
+  error.stack = e.stack;
+  error.name = e.name;
+  error.cause = e.cause;
+  return error;
 }
