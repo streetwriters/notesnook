@@ -30,7 +30,14 @@ import RNFetchBlob from "react-native-blob-util";
 import { eSendEvent } from "../../services/event-manager";
 import { IOS_APPGROUPID } from "../../utils/constants";
 import { DatabaseLogger, db } from "../database";
-import { ABYTES, cacheDir, cacheDirOld, getRandomId } from "./utils";
+import {
+  ABYTES,
+  cacheDir,
+  cacheDirOld,
+  getRandomId,
+  isSuccessStatusCode,
+  parseS3Error
+} from "./utils";
 
 export async function readEncrypted<TOutputFormat extends DataFormat>(
   filename: string,
@@ -102,16 +109,41 @@ export async function writeEncryptedBase64(
   };
 }
 
+async function deleteLocalFile(filename: string) {
+  try {
+    await createCacheDir();
+    let path = cacheDir + `/${filename}`;
+    let exists = await RNFetchBlob.fs.exists(path);
+    if (Platform.OS === "ios" && !exists) {
+      const iosAppGroup =
+        Platform.OS === "ios"
+          ? await (RNFetchBlob.fs as any).pathForAppGroup(IOS_APPGROUPID)
+          : null;
+      const appGroupPath = `${iosAppGroup}/${filename}`;
+      if (await RNFetchBlob.fs.exists(appGroupPath)) {
+        RNFetchBlob.fs.unlink(appGroupPath).catch(() => {
+          /* empty */
+        });
+        return;
+      }
+    }
+    if (exists) {
+      RNFetchBlob.fs.unlink(path).catch(() => {
+        /* empty */
+      });
+    }
+  } catch (e) {
+    DatabaseLogger.error(e as Error, "deleteLocalFile");
+  }
+}
+
 export async function deleteFile(
   filename: string,
   requestOptions?: RequestOptions
 ): Promise<boolean> {
   await createCacheDir();
-  const localFilePath = cacheDir + `/${filename}`;
   if (!requestOptions) {
-    RNFetchBlob.fs.unlink(localFilePath).catch(() => {
-      /* empty */
-    });
+    deleteLocalFile(filename);
     return true;
   }
 
@@ -122,15 +154,49 @@ export async function deleteFile(
     const status = response.info().status;
     const ok = status >= 200 && status < 300;
     if (ok) {
-      RNFetchBlob.fs.unlink(localFilePath).catch(() => {
-        /* empty */
-      });
+      deleteLocalFile(filename);
     }
     return ok;
   } catch (e) {
     DatabaseLogger.error(e, "Delete file", {
       url: url
     });
+    return false;
+  }
+}
+
+export async function bulkDeleteFiles(
+  filenames: string[],
+  requestOptions?: RequestOptions
+) {
+  await createCacheDir();
+  if (!requestOptions) {
+    filenames.forEach((filename) => {
+      deleteLocalFile(filename);
+    });
+    return true;
+  }
+
+  try {
+    const { url, headers } = requestOptions;
+    const response = await RNFetchBlob.fetch("POST", url, headers, {
+      names: filenames
+    });
+
+    const result = isSuccessStatusCode(response.respInfo.status);
+    if (result) {
+      filenames.forEach((filename) => {
+        deleteLocalFile(filename);
+      });
+    } else {
+      throw await response.text();
+    }
+    return result;
+  } catch (e) {
+    DatabaseLogger.error(
+      typeof e === "string" ? parseS3Error(e as string) : (e as Error),
+      "Could not bulk delete files"
+    );
     return false;
   }
 }
