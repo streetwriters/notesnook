@@ -28,39 +28,27 @@ import { DesktopOnly } from "../../components/responsive/index.js";
 import { toBlobURL, revokeBloburl } from "../../utils/downloader.js";
 import { formatBytes } from "@notesnook/common";
 
+const SAMPLE_AUDIO = toBlobURL(
+  "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=",
+  "other",
+  "audio/wav",
+  "sample-audio"
+);
+
 export function AudioComponent(props: ReactNodeViewProps<AudioAttachment>) {
   const { editor, node, selected } = props;
   const { filename, size, progress, mime, hash } = node.attrs;
   const elementRef = useRef<HTMLDivElement>();
   const [isDragging, setIsDragging] = useState(false);
-  const [audioSrc, setAudioSrc] = useState<string>();
-
-  useEffect(() => {
-    if (editor.storage?.getAttachmentData && hash) {
-      editor.storage
-        .getAttachmentData({
-          type: "file",
-          hash
-        })
-        .then((data: string | undefined) => {
-          if (data) {
-            const url = toBlobURL(data, "other", mime, hash);
-            if (url) {
-              setAudioSrc(url);
-            }
-          }
-        })
-        .catch(console.error);
-    }
-  }, [editor.storage, hash, mime]);
+  const [error, setError] = useState<string>();
 
   useEffect(() => {
     return () => {
-      if (audioSrc && hash) {
+      if (hash) {
         revokeBloburl(hash);
       }
     };
-  }, [audioSrc, hash]);
+  }, [hash]);
 
   return (
     <Box
@@ -86,12 +74,13 @@ export function AudioComponent(props: ReactNodeViewProps<AudioAttachment>) {
       onDragStart={() => setIsDragging(true)}
       onDragEnd={() => setIsDragging(false)}
       data-drag-handle
+      data-drag-image
     >
       <Box
         sx={{
           display: "flex",
           alignItems: "center",
-          mb: audioSrc ? 2 : 0
+          mb: 2
         }}
       >
         <Icon path={Icons.attachment} size={16} />
@@ -120,7 +109,9 @@ export function AudioComponent(props: ReactNodeViewProps<AudioAttachment>) {
           {progress ? `${progress}%` : formatBytes(size, 1)}
         </Text>
       </Box>
-      {audioSrc && (
+      {error ? (
+        <Text variant="error">{error}</Text>
+      ) : (
         <Box
           sx={{
             width: "100%",
@@ -130,7 +121,39 @@ export function AudioComponent(props: ReactNodeViewProps<AudioAttachment>) {
             }
           }}
         >
-          <audio controls preload="metadata" src={audioSrc} />
+          <audio
+            onMouseDown={(e) => e.stopPropagation()}
+            onDragStart={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
+            controls
+            controlsList="nodownload nofullscreen"
+            src={SAMPLE_AUDIO}
+            onPlay={(e) => {
+              const target = e.currentTarget;
+              if (
+                editor.storage?.getAttachmentData &&
+                hash &&
+                target.src === SAMPLE_AUDIO
+              ) {
+                e.preventDefault();
+                editor.storage
+                  .getAttachmentData({
+                    type: "file",
+                    hash
+                  })
+                  .then((data: string | undefined) => {
+                    if (!data) return;
+                    const url = toBlobURL(data, "other", mime, hash);
+                    if (!url) return;
+                    target.src = url;
+                    return target.play();
+                  })
+                  .catch((e) => setError((e as Error).message));
+              }
+            }}
+          >
+            <Text as="p">Your browser does not support the audio element.</Text>
+          </audio>
         </Box>
       )}
       <DesktopOnly>

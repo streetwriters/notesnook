@@ -39,8 +39,6 @@ declare module "@tiptap/core" {
 
 export const AudioNode = Node.create<AudioOptions>({
   name: "audio",
-  content: "",
-  marks: "",
   draggable: true,
   priority: 51,
 
@@ -71,7 +69,7 @@ export const AudioNode = Node.create<AudioOptions>({
   parseHTML() {
     return [
       {
-        tag: "audio[data-hash][data-mime^='audio/']"
+        tag: "audio"
       }
     ];
   },
