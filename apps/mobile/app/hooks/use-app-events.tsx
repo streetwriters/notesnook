@@ -537,6 +537,7 @@ const initializeDatabase = async (password?: string) => {
     Notifications.restorePinnedNotes();
     expiringNotesTimer();
     deleteDCacheFiles();
+    db.attachments.removeOrphaned();
   }
   Walkthrough.init();
 };
