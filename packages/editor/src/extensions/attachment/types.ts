@@ -29,6 +29,10 @@ export type FileAttachment = BaseAttachment & {
   type: "file";
 };
 
+export type AudioAttachment = BaseAttachment & {
+  type: "audio";
+};
+
 export type WebClipAttachment = BaseAttachment & {
   type: "web-clip";
   src: string;
@@ -50,4 +54,8 @@ export type ImageAlignmentOptions = {
   align?: "center" | "left" | "right";
 };
 
-export type Attachment = FileAttachment | WebClipAttachment | ImageAttachment;
+export type Attachment =
+  | FileAttachment
+  | AudioAttachment
+  | WebClipAttachment
+  | ImageAttachment;

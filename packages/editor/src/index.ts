@@ -66,6 +66,7 @@ import { TaskItemNode } from "./extensions/task-item/index.js";
 import { TaskListNode } from "./extensions/task-list/index.js";
 import TextDirection from "./extensions/text-direction/index.js";
 import { WebClipNode, WebClipOptions } from "./extensions/web-clip/index.js";
+import { AudioNode, AudioOptions } from "./extensions/audio/index.js";
 import { useEditor } from "./hooks/use-editor.js";
 import { usePermissionHandler } from "./hooks/use-permission-handler.js";
 import Toolbar from "./toolbar/index.js";
@@ -125,6 +126,7 @@ const CoreExtensions = Object.entries(TiptapCoreExtensions)
 
 export type TiptapOptions = EditorOptions &
   Omit<WebClipOptions, "HTMLAttributes"> &
+  Omit<AudioOptions, "HTMLAttributes"> &
   Omit<ImageOptions, "HTMLAttributes"> &
   DateTimeOptions &
   TiptapStorage & {
@@ -312,7 +314,12 @@ const useTiptap = (
         ImageNode.configure({ allowBase64: true }),
         EmbedNode,
         AttachmentNode.configure({
-          types: [AttachmentNode.name, ImageNode.name, WebClipNode.name]
+          types: [
+            AttachmentNode.name,
+            ImageNode.name,
+            WebClipNode.name,
+            AudioNode.name
+          ]
         }),
         OutlineListItem,
         OutlineList.configure({ keepAttributes: true, keepMarks: true }),
@@ -327,6 +334,7 @@ const useTiptap = (
         DateTime.configure({ dateFormat, timeFormat, dayFormat }),
         KeyMap,
         WebClipNode,
+        AudioNode,
         CheckList,
         CheckListItem.configure({
           nested: true
