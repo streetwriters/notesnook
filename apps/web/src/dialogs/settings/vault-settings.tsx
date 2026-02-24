@@ -51,6 +51,36 @@ export const VaultSettings: SettingsGroup[] = [
         ]
       },
       {
+        key: "lock-vault-after",
+        title: strings.lockVaultAfter(),
+        description:
+          strings.lockVaultAfterDesc(),
+        isHidden: () => !useAppStore.getState().isVaultCreated,
+        onStateChange: (listener) =>
+          useAppStore.subscribe((s) => s.vaultLockAfter, listener),
+        components: [
+          {
+            type: "dropdown",
+            options: [
+              { title: "1 minute", value: 1000 * 60 * 1 },
+              { title: "5 minutes", value: 1000 * 60 * 5 },
+              { title: "10 minutes", value: 1000 * 60 * 10 },
+              { title: "15 minutes", value: 1000 * 60 * 15 },
+              { title: "30 minutes", value: 1000 * 60 * 30 },
+              { title: "45 minutes", value: 1000 * 60 * 45 },
+              { title: "1 hour", value: 1000 * 60 * 60 },
+              { title: "Never", value: -1 }
+            ],
+            onSelectionChanged: async (value) => {
+              await useAppStore.getState().setVaultLockAfter(parseInt(value));
+            },
+            selectedOption: () => {
+              return useAppStore.getState().vaultLockAfter;
+            }
+          }
+        ]
+      },
+      {
         key: "change-vault-password",
         title: strings.changeVaultPassword(),
         description: strings.changeVaultPasswordDesc(),

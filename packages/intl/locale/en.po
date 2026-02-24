@@ -3711,6 +3711,10 @@ msgstr "Lock note"
 msgid "Lock the app with a password or pin"
 msgstr "Lock the app with a password or pin"
 
+#: src/strings.ts:2639
+msgid "Lock vault after"
+msgstr "Lock vault after"
+
 #: src/strings.ts:901
 msgid "Locked notes cannot be pinned"
 msgstr "Locked notes cannot be pinned"
@@ -6787,7 +6791,7 @@ msgstr "Unlock note"
 msgid "Unlock note to delete it"
 msgstr "Unlock note to delete it"
 
-#: src/strings.ts:2637
+#: src/strings.ts:2638
 msgid "Unlock note to merge conflicts"
 msgstr "Unlock note to merge conflicts"
 
