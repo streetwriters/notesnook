@@ -179,11 +179,18 @@ export async function bulkDeleteFiles(
 
   try {
     const { url, headers } = requestOptions;
-    const response = await RNFetchBlob.fetch("POST", url, headers, {
-      names: filenames
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        ...headers,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        names: filenames
+      })
     });
 
-    const result = isSuccessStatusCode(response.respInfo.status);
+    const result = isSuccessStatusCode(response.status);
     if (result) {
       filenames.forEach((filename) => {
         deleteLocalFile(filename);
