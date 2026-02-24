@@ -234,7 +234,7 @@ test("delete vault and delete all locked notes", () =>
 test("vault password is cleared after specified time", () =>
   databaseTest().then(async (db) => {
     await expect(db.vault.create("password")).resolves.toBe(true);
-    db.vault.eraseTime = 1000;
+    await db.settings.setVaultLockAfter(1000);
     await expect(db.vault.unlock("password")).resolves.toBe(true);
     expect(db.vault.unlocked).toBe(true);
     await delay(1500);

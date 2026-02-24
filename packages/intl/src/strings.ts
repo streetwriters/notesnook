@@ -2699,5 +2699,8 @@ Use this if changes from other devices are not appearing on this device. This wi
   privateKey: () => t`Private Key:`,
   invalidPgpKeyPair: () =>
     t`Invalid PGP key pair. Please check your keys and try again.`,
-  inboxKeysSaved: () => t`Inbox keys saved`
+  inboxKeysSaved: () => t`Inbox keys saved`,
+  lockVaultAfter: () => t`Lock vault after`,
+  lockVaultAfterDesc: () =>
+    `How long should the vault stay unlocked before automatically locking?`
 };

@@ -68,6 +68,7 @@ class AppStore extends BaseStore<AppStore> {
   isListPaneVisible = true;
   isNavPaneCollapsed = false;
   isVaultCreated = false;
+  vaultLockAfter = 1000 * 60 * 30;
   isAutoSyncEnabled = Config.get("autoSyncEnabled", true);
   isSyncEnabled = Config.get("syncEnabled", true);
   isRealtimeSyncEnabled = Config.get("isRealtimeSyncEnabled", true);
@@ -88,7 +89,8 @@ class AppStore extends BaseStore<AppStore> {
     this.refresh();
     this.set({
       hiddenColors: db.settings.getSideBarHiddenItems("colors"),
-      hiddenRoutes: db.settings.getSideBarHiddenItems("routes")
+      hiddenRoutes: db.settings.getSideBarHiddenItems("routes"),
+      vaultLockAfter: db.settings.getVaultLockAfter()
     });
     this.get().sync({ type: "full" });
 
@@ -232,6 +234,12 @@ class AppStore extends BaseStore<AppStore> {
 
   setIsVaultCreated = (toggleState: boolean) => {
     this.set((state) => (state.isVaultCreated = toggleState));
+  };
+
+  setVaultLockAfter = async (ms: number) => {
+    await db.settings.setVaultLockAfter(ms);
+    this.set((state) => (state.vaultLockAfter = ms));
+    await db.vault.lock();
   };
 
   setNotices = (...notices: Notice[]) => {

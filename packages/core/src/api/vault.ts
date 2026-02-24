@@ -31,7 +31,6 @@ export const VAULT_ERRORS = {
 };
 
 export default class Vault {
-  eraseTime = 1000 * 60 * 30;
   private vaultPassword?: string;
   private erasureTimeout = 0;
   private key = "svvaads1212#2123";
@@ -50,9 +49,13 @@ export default class Vault {
   private startEraser() {
     this.db.eventManager.publish(EVENTS.vaultUnlocked);
     clearTimeout(this.erasureTimeout);
+
+    const lockAfter = this.db.settings.getVaultLockAfter();
+    if (lockAfter < 0) return;
+
     this.erasureTimeout = setTimeout(() => {
       this.lock();
-    }, this.eraseTime) as unknown as number;
+    }, lockAfter) as unknown as number;
   }
 
   constructor(private readonly db: Database) {
