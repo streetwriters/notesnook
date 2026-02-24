@@ -54,7 +54,8 @@ import {
   eSubscribeEvent,
   openVault,
   presentSheet,
-  ToastManager
+  ToastManager,
+  VaultRequestType
 } from "../services/event-manager";
 import Navigation from "../services/navigation";
 import Notifications from "../services/notifications";
@@ -408,12 +409,12 @@ export const useActions = ({
 
     if (item.type === "note" && (await db.vaults.itemExists(item))) {
       openVault({
-        deleteNote: true,
-        novault: true,
-        locked: true,
+        requestType: VaultRequestType.DeleteNote,
         item: item,
         title: strings.deleteNote(),
-        description: strings.unlockToDelete()
+        description: strings.unlockToDelete(),
+        buttonTitle: strings.delete(),
+        positiveButtonType: "errorShade"
       });
     } else {
       try {
@@ -867,11 +868,10 @@ export const useActions = ({
           close();
           await sleep(300);
           openVault({
+            requestType: VaultRequestType.ShareNote,
             item: item,
-            novault: true,
-            locked: true,
-            share: true,
-            title: strings.shareNote()
+            title: strings.shareNote(),
+            buttonTitle: strings.share()
           });
         } else {
           processingId.current = "shareNote";
@@ -896,11 +896,10 @@ export const useActions = ({
         close();
         await sleep(300);
         openVault({
+          requestType: VaultRequestType.PermanentUnlock,
           item: item,
-          novault: true,
-          locked: true,
-          permanant: true,
-          title: strings.unlockNote()
+          title: strings.unlockNote(),
+          buttonTitle: strings.unlock()
         });
         return;
       }
@@ -918,17 +917,18 @@ export const useActions = ({
         switch ((e as Error).message) {
           case VAULT_ERRORS.noVault:
             openVault({
+              requestType: VaultRequestType.CreateVault,
               item: item,
-              novault: false,
-              title: strings.createVault()
+              title: strings.createVault(),
+              buttonTitle: strings.lock()
             });
             break;
           case VAULT_ERRORS.vaultLocked:
             openVault({
+              requestType: VaultRequestType.LockNote,
               item: item,
-              novault: true,
-              locked: true,
-              title: strings.lockNote()
+              title: strings.lockNote(),
+              buttonTitle: strings.lock()
             });
             break;
         }
@@ -949,11 +949,10 @@ export const useActions = ({
           close();
           await sleep(300);
           openVault({
-            copyNote: true,
-            novault: true,
-            locked: true,
+            requestType: VaultRequestType.CopyNote,
             item: item as Note,
-            title: strings.copyNote()
+            title: strings.copyNote(),
+            buttonTitle: strings.copy()
           });
         } else {
           processingId.current = "copyContent";

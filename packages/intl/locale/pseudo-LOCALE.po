@@ -6742,6 +6742,10 @@ msgstr ""
 msgid "Unlock note to delete it"
 msgstr ""
 
+#: src/strings.ts:2637
+msgid "Unlock note to merge conflicts"
+msgstr ""
+
 #: src/strings.ts:1208
 msgid "Unlock the app with biometric authentication. This requires biometrics to be enabled on your device."
 msgstr ""

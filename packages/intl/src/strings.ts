@@ -2633,5 +2633,6 @@ Use this if changes from other devices are not appearing on this device. This wi
   exportCsv: () => t`Export CSV`,
   importCsv: () => t`Import CSV`,
   noContent: () => t`This note is empty`,
-  deleteData: () => t`Delete data`
+  deleteData: () => t`Delete data`,
+  unlockNoteToMergeConflicts: () => t`Unlock note to merge conflicts`
 };
