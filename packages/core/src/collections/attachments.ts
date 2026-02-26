@@ -615,6 +615,9 @@ export class Attachments implements ICollection {
 
   async removeOrphaned() {
     const orphaned = await this.db.attachments.orphaned.items();
+    logger.info("Deleting orphaned attachments", {
+      attachments: orphaned
+    });
     await this.bulkRemove(orphaned, false);
   }
 }
