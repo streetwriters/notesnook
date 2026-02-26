@@ -53,6 +53,7 @@ Once you are inside the `./notesnook` directory, run the preparation step:
 ```bash
 # this might take a while to complete
 npm install
+npm run bootstrap -- --scope=mobile
 ```
 
 ### Running the app on Android
@@ -95,21 +96,21 @@ We try to keep the stack as lean as possible:
 
 The app codebase is distributed over two primary directories. `native/` and `app/`.
 
-- `native/`: Includes `android/` and `ios/` folders and everything related to react native core functionality like bundling, development, and packaging. Any react-native dependency with native code, i.e., android & ios folders, is installed here.
-
+- `android`: Android native code
+- `ios`: iOS native code
 - `app/`: Includes all the app code other than the native part. All JS-only dependencies are installed here.
   - `components/`: Each component serves a specific purpose in the app UI. For example, the `Paragraph` component is used to render paragraphs in the app, and a `Header` component is used to render a `header` on all screens.
   - `common/`: Features that are integral to the app's functionality. For example, the notesnook core is initialized here.
   - `hooks/`: Hooks for different app logic
   - `navigation/`: Includes app navigation-specific code. Here the app navigation, editor & side menu are rendered side by side in fluid tabs.
   - `screens`: Navigator screens.
+  - `share`: Code for the iOS Share Extension and Android widget.
   - `services`: Parts of code that do a specific function. For example, the `sync` service runs Sync from anywhere in the app.
   - `stores`: We use `zustand` for global state management in the app. Multiple stores provide the state for different parts of the app.
   - `utils`: General purpose stuff such as constant values, utility functions, etc.
 
 There are several other folders at the root:
 
-- `share/`: Code for the iOS Share Extension and Android widget.
 - `e2e/`: Detox End to end tests
 - `patches/`: Patches for various react native dependencies.
 
