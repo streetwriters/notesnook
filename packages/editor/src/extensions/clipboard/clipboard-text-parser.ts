@@ -63,8 +63,12 @@ export function convertTextToHTML(src: string) {
     .join("");
 }
 
+const TAB_SIZE = 4;
+
 function encodeLine(line: string) {
   line = encodeNonAsciiHTML(line);
+  // Convert tabs to spaces first
+  line = line.replace(/\t/g, " ".repeat(TAB_SIZE));
   line = line.replace(/(^ +)|( {2,})/g, (sub, ...args) => {
     const [starting, inline] = args;
     if (starting) return "&nbsp;".repeat(starting.length);

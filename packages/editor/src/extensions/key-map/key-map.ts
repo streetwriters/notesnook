@@ -46,10 +46,19 @@ export const KeyMap = Extension.create({
         )
           return false;
 
+        const isInParagraph =
+          editor.state.selection.$from.parent.type.name === "paragraph";
+        if (isInParagraph) {
+          editor.commands.indentParagraph();
+          return true;
+        }
         return editor.commands.insertContent("\t");
       },
       "Shift-Tab": ({ editor }) => {
         if (isListActive(editor)) return false;
+        const isInParagraph =
+          editor.state.selection.$from.parent.type.name === "paragraph";
+        if (isInParagraph) editor.commands.outdentParagraph();
         return true;
       },
       [tiptapKeys.removeFormattingInSelection.keys]: ({ editor }) => {

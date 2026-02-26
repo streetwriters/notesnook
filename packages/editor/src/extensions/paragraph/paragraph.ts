@@ -21,6 +21,9 @@ import { keybindings } from "@notesnook/common";
 import { Editor, mergeAttributes, Node } from "@tiptap/core";
 import { NodeType } from "prosemirror-model";
 
+export const INDENT_SIZE = 40;
+export const MAX_INDENT_LEVEL = 7;
+
 export interface ParagraphOptions {
   HTMLAttributes: Record<string, unknown>;
   doubleSpaced: boolean;
@@ -33,6 +36,14 @@ declare module "@tiptap/core" {
        * Toggle a paragraph
        */
       setParagraph: () => ReturnType;
+      /**
+       * Increase paragraph indentation by one level
+       */
+      indentParagraph: () => ReturnType;
+      /**
+       * Decrease paragraph indentation by one level
+       */
+      outdentParagraph: () => ReturnType;
     };
   }
 }
@@ -66,6 +77,27 @@ export const Paragraph = Node.create<ParagraphOptions>({
             "data-spacing": attributes.spacing
           };
         }
+      },
+      indent: {
+        default: 0,
+        keepOnSplit: true,
+        parseHTML: (element) => {
+          const dataIndent = element.dataset.indent;
+          if (dataIndent) return parseInt(dataIndent, 10);
+          const styleIndent = element.style.paddingLeft;
+          if (styleIndent) {
+            const match = styleIndent.match(/^(\d+)/);
+            if (match) return Math.round(parseInt(match[1], 10) / INDENT_SIZE);
+          }
+          return 0;
+        },
+        renderHTML: (attributes) => {
+          if (!attributes.indent) return {};
+          return {
+            "data-indent": attributes.indent,
+            style: `padding-left: ${attributes.indent * INDENT_SIZE}px`
+          };
+        }
       }
     };
   },
@@ -88,6 +120,28 @@ export const Paragraph = Node.create<ParagraphOptions>({
         () =>
         ({ commands }) => {
           return commands.setNode(this.name);
+        },
+      indentParagraph:
+        () =>
+        ({ commands, state }) => {
+          const { $from } = state.selection;
+          if ($from.parent.type.name !== this.name) return false;
+          const currentIndent = $from.parent.attrs.indent ?? 0;
+          if (currentIndent >= MAX_INDENT_LEVEL) return false;
+          return commands.updateAttributes(this.name, {
+            indent: currentIndent + 1
+          });
+        },
+      outdentParagraph:
+        () =>
+        ({ commands, state }) => {
+          const { $from } = state.selection;
+          if ($from.parent.type.name !== this.name) return false;
+          const currentIndent = $from.parent.attrs.indent ?? 0;
+          if (currentIndent <= 0) return false;
+          return commands.updateAttributes(this.name, {
+            indent: currentIndent - 1
+          });
         }
     };
   },
