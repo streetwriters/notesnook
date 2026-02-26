@@ -183,6 +183,7 @@ const Editor = React.memo(
             hideKeyboardAccessoryView={false}
             allowsFullscreenVideo={true}
             allowFileAccessFromFileURLs={true}
+            allowsInlineMediaPlayback
             allowUniversalAccessFromFileURLs={true}
             originWhitelist={["*"]}
             source={{
