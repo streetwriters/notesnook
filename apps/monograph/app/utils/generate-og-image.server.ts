@@ -39,12 +39,12 @@ const fontMap = JSON.parse(
 const OpenSans = path.join(
   __dirname,
   import.meta.env.DEV ? "../assets/fonts/" : "../../assets/fonts/",
-  "open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-regular.ttf"
+  "OpenSans-Regular.ttf"
 );
 const OpenSansBold = path.join(
   __dirname,
   import.meta.env.DEV ? "../assets/fonts/" : "../../assets/fonts/",
-  "open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-600.ttf"
+  "OpenSans-SemiBold.ttf"
 );
 
 console.log("OpenSans", GlobalFonts.registerFromPath(OpenSans, "OpenSans"));

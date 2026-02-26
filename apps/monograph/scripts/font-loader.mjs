@@ -21,6 +21,11 @@ import { createWriteStream, existsSync, writeFileSync } from "fs";
 import { constructURL } from "google-fonts-helper";
 import { Writable } from "stream";
 import { mkdir } from "fs/promises";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const FONTS = [
   { locale: "ja-JP", slug: "Noto+Sans+JP", name: "Noto Sans JP" },
@@ -49,6 +54,22 @@ const FONTS = [
   //   },
   //   { locale: "math", slug: "Noto+Sans+Math", name: "Noto Sans Math" }
 ];
+
+const OPEN_SANS_FONTS = [
+  { weight: 400, filename: "OpenSans-Regular.ttf" },
+  { weight: 600, filename: "OpenSans-SemiBold.ttf" }
+];
+
+async function downloadFont(url, destPath) {
+  const fileStream = Writable.toWeb(
+    createWriteStream(destPath, {
+      autoClose: true,
+      emitClose: true,
+      flush: true
+    })
+  );
+  await (await fetch(url)).body.pipeTo(fileStream);
+}
 
 async function loadFonts(dir) {
   const families = {};
@@ -93,27 +114,69 @@ async function loadFonts(dir) {
     if (!font) continue;
 
     const fileName = `${font.slug}+${face.weight}.ttf`;
-    const path = `fonts/${fileName}`;
-    if (existsSync(path)) continue;
+    const filePath = `fonts/${fileName}`;
+    if (existsSync(filePath)) continue;
 
-    const fileStream = Writable.toWeb(
-      createWriteStream(path, {
-        autoClose: true,
-        emitClose: true,
-        flush: true
-      })
-    );
-    await (await fetch(face.src)).body.pipeTo(fileStream);
+    await downloadFont(face.src, filePath);
 
     fontMap.push({
       name: font.name,
       locale: font.locale,
       weight: face.weight,
-      path
+      path: filePath
     });
   }
 
   writeFileSync("fonts/fonts.json", JSON.stringify(fontMap, null, 2));
+
+  // Download OpenSans fonts into app/assets/fonts/
+  const assetsFontsDir = path.join(__dirname, "../app/assets/fonts");
+  await mkdir(assetsFontsDir, { recursive: true });
+
+  const openSansCss = await (
+    await fetch(
+      constructURL({ families: { "Open Sans": [400, 600] } }),
+      {
+        headers: {
+          // Make sure it returns TTF.
+          "User-Agent":
+            "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_8; de-at) AppleWebKit/533.21.1 (KHTML, like Gecko) Version/5.0.5 Safari/533.21.1"
+        }
+      }
+    )
+  ).text();
+
+  const openSansFaces = openSansCss
+    .split("@font-face")
+    .filter(Boolean)
+    .map((fontFace) => {
+      const src = fontFace.match(
+        /src: url\((.+)\) format\('(opentype|truetype)'\)/
+      );
+      const weight = fontFace.match(/font-weight: (\d+)/);
+      if (!src || !weight) return null;
+      return { src: src[1], weight: weight[1] };
+    })
+    .filter(Boolean);
+
+  for (const openSansFont of OPEN_SANS_FONTS) {
+    const face = openSansFaces.find(
+      (f) => f.weight === String(openSansFont.weight)
+    );
+    if (!face) {
+      console.log(
+        `Could not find OpenSans font face for weight ${openSansFont.weight}. The Google Fonts API response may have changed format or a network error occurred.`
+      );
+      continue;
+    }
+    const destPath = path.join(assetsFontsDir, openSansFont.filename);
+    if (existsSync(destPath)) {
+      console.log(`OpenSans ${openSansFont.weight} already exists, skipping`);
+      continue;
+    }
+    console.log(`Downloading OpenSans ${openSansFont.weight}`);
+    await downloadFont(face.src, destPath);
+  }
 
   console.log("Done");
 }
