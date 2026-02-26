@@ -33,6 +33,23 @@ const levelsMap: Record<string, number> = {
   H6: 6
 };
 
+function getOffsetTopRelativeTo(
+  element: HTMLElement,
+  ancestor: HTMLElement
+): number {
+  let top = 0;
+  let current: HTMLElement | null = element;
+  // Walk up the offsetParent chain until we reach ancestor (the editor root).
+  // This correctly handles elements nested inside positioned containers such as
+  // callout blocks, where `offsetTop` alone would only be relative to the
+  // nearest positioned parent instead of the editor root.
+  while (current && current !== ancestor) {
+    top += current.offsetTop;
+    current = current.offsetParent as HTMLElement | null;
+  }
+  return top;
+}
+
 export function getTableOfContents(content: HTMLElement) {
   const tableOfContents: TOCItem[] = [];
   let level = -1;
@@ -59,7 +76,7 @@ export function getTableOfContents(content: HTMLElement) {
       level,
       title,
       id,
-      top: (heading as HTMLElement).offsetTop
+      top: getOffsetTopRelativeTo(heading, content)
     });
   }
   return tableOfContents;
