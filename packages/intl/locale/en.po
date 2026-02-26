@@ -1882,6 +1882,10 @@ msgstr "Create a note first"
 msgid "Create a shortcut"
 msgstr "Create a shortcut"
 
+#: src/strings.ts:573
+msgid "Create a tag to group related notes together."
+msgstr "Create a tag to group related notes together."
+
 #: src/strings.ts:1849
 msgid "Create account"
 msgstr "Create account"
@@ -6787,7 +6791,7 @@ msgstr "Unlock note"
 msgid "Unlock note to delete it"
 msgstr "Unlock note to delete it"
 
-#: src/strings.ts:2637
+#: src/strings.ts:2638
 msgid "Unlock note to merge conflicts"
 msgstr "Unlock note to merge conflicts"
 
@@ -7309,10 +7313,6 @@ msgstr "You are not logged in"
 #: src/strings.ts:886
 msgid "You are renaming color {color}"
 msgstr "You are renaming color {color}"
-
-#: src/strings.ts:573
-msgid "You can add as many tags as you want."
-msgstr "You can add as many tags as you want."
 
 #: src/strings.ts:464
 msgid "You can also link a note to multiple Notebooks. Tap and hold any notebook to enable multi-select."

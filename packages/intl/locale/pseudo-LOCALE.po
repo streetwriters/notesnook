@@ -1871,6 +1871,10 @@ msgstr ""
 msgid "Create a shortcut"
 msgstr ""
 
+#: src/strings.ts:573
+msgid "Create a tag to group related notes together."
+msgstr ""
+
 #: src/strings.ts:1849
 msgid "Create account"
 msgstr ""
@@ -6746,7 +6750,7 @@ msgstr ""
 msgid "Unlock note to delete it"
 msgstr ""
 
-#: src/strings.ts:2637
+#: src/strings.ts:2638
 msgid "Unlock note to merge conflicts"
 msgstr ""
 
@@ -7258,10 +7262,6 @@ msgstr ""
 
 #: src/strings.ts:886
 msgid "You are renaming color {color}"
-msgstr ""
-
-#: src/strings.ts:573
-msgid "You can add as many tags as you want."
 msgstr ""
 
 #: src/strings.ts:464
