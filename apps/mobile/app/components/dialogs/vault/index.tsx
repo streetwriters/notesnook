@@ -144,7 +144,7 @@ export const VaultDialog: React.FC = () => {
       data.requestType !== VaultRequestType.ClearVault &&
       data.requestType !== VaultRequestType.DeleteVault &&
       data.requestType !== VaultRequestType.CustomAction &&
-      data.requestType === VaultRequestType.PermanentUnlock;
+      data.requestType !== VaultRequestType.PermanentUnlock;
 
     if (canAutoUnlock) {
       await onPressFingerprintAuth(data.title, data.description);
@@ -535,7 +535,6 @@ export const VaultDialog: React.FC = () => {
 
         if (credentials?.password) {
           passwordRef.current = credentials.password;
-          console.log("password...");
           onPress();
         } else {
           eSendEvent(eCloseActionSheet);
@@ -783,6 +782,7 @@ export const VaultDialog: React.FC = () => {
 
               {!biometricUnlock ||
               !isBiometryEnrolled ||
+              !isBiometryAvailable ||
               isCreateVault ||
               isChangePassword ||
               isCustomAction ? null : (
@@ -891,13 +891,16 @@ export const VaultDialog: React.FC = () => {
             <Paragraph>{strings.vaultEnableBiometrics()}</Paragraph>
           ) : null}
 
-          {requestType === VaultRequestType.CopyNote ||
-          requestType === VaultRequestType.DeleteNote ||
-          requestType === VaultRequestType.ShareNote ||
-          requestType === VaultRequestType.CustomAction ||
-          requestType === VaultRequestType.GoToEditor ||
-          requestType === VaultRequestType.PermanentUnlock ||
-          requestType === VaultRequestType.LockNote ? (
+          {!biometricUnlock &&
+          !isBiometryEnrolled &&
+          isBiometryAvailable &&
+          (requestType === VaultRequestType.CopyNote ||
+            requestType === VaultRequestType.DeleteNote ||
+            requestType === VaultRequestType.ShareNote ||
+            requestType === VaultRequestType.CustomAction ||
+            requestType === VaultRequestType.GoToEditor ||
+            requestType === VaultRequestType.PermanentUnlock ||
+            requestType === VaultRequestType.LockNote) ? (
             <Button
               onPress={() => {
                 setBiometricUnlock(!biometricUnlock);
