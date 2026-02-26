@@ -185,6 +185,8 @@ class AppStore extends BaseStore<AppStore> {
 
     await this.refreshNavItems();
 
+    this.set({ isVaultCreated: await db.vault.exists() });
+
     logger.measure("refreshing app");
   };
 

@@ -64,7 +64,6 @@ export default function AppEffects() {
         await updateLastSynced();
         await initUser();
         // await resetNotices();
-        setIsVaultCreated(await db.vault.exists());
 
         await FeatureDialog.show({ featureName: "highlights" });
         await scheduleBackups();
