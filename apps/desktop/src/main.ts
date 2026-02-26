@@ -173,6 +173,22 @@ async function createWindow() {
     return { action: "deny" };
   });
 
+  mainWindow.webContents.on("will-navigate", (event, url) => {
+    const appHostnames = isDevelopment()
+      ? ["localhost", "127.0.0.1"]
+      : ["app.notesnook.com"];
+    try {
+      const parsedUrl = new URL(url);
+      if (!appHostnames.includes(parsedUrl.hostname)) {
+        event.preventDefault();
+        shell.openExternal(url);
+      }
+    } catch (e) {
+      console.error("will-navigate: failed to parse URL", url, e);
+      event.preventDefault();
+    }
+  });
+
   nativeTheme.on("updated", () => {
     setupTray();
     setupJumplist();
