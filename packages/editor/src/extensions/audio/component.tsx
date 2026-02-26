@@ -40,6 +40,7 @@ export function AudioComponent(props: ReactNodeViewProps<AudioAttachment>) {
   const { filename, size, progress, mime, hash } = node.attrs;
   const elementRef = useRef<HTMLDivElement>();
   const [isDragging, setIsDragging] = useState(false);
+  const isLoading = useRef(false);
   const [error, setError] = useState<string>();
 
   useEffect(() => {
@@ -128,27 +129,38 @@ export function AudioComponent(props: ReactNodeViewProps<AudioAttachment>) {
             controls
             controlsList="nodownload nofullscreen"
             src={SAMPLE_AUDIO}
+            onPause={(e) => {
+              if (isLoading.current) {
+                e.preventDefault();
+              }
+            }}
             onPlay={(e) => {
               const target = e.currentTarget;
               if (
                 editor.storage?.getAttachmentData &&
                 hash &&
-                target.src === SAMPLE_AUDIO
+                target.src === SAMPLE_AUDIO &&
+                !isLoading.current
               ) {
                 e.preventDefault();
+                isLoading.current = true;
                 editor.storage
                   .getAttachmentData({
                     type: "file",
                     hash
                   })
                   .then((data: string | undefined) => {
+                    isLoading.current = false;
                     if (!data) return;
                     const url = toBlobURL(data, "other", mime, hash);
                     if (!url) return;
                     target.src = url;
                     return target.play();
                   })
-                  .catch((e) => setError((e as Error).message));
+                  .catch((e) => {
+                    isLoading.current = false;
+                    setError((e as Error).message);
+                  });
               }
             }}
           >
