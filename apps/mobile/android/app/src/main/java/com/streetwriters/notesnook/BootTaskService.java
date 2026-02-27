@@ -39,28 +39,32 @@ public class BootTaskService extends HeadlessJsTaskService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel("com.streetwriters.notesnook",
-                    "Default",
-                    NotificationManager.IMPORTANCE_DEFAULT);
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                NotificationChannel channel = new NotificationChannel("com.streetwriters.notesnook",
+                        "Default",
+                        NotificationManager.IMPORTANCE_DEFAULT);
 
-            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
-            notification = new NotificationCompat.Builder(this, channel.getId())
-                    .setContentTitle("Sync on boot")
-                    .setContentText("")
-                    .setSmallIcon(R.drawable.ic_stat_name)
-                    .build();
-            if (android.os.Build.VERSION.SDK_INT >= 34) {
-                this.startForeground(
-                        1,
-                        notification,
-                        ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
-            } else {
-                this.startForeground(
-                        1,
-                        notification);
+                ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
+                notification = new NotificationCompat.Builder(this, channel.getId())
+                        .setContentTitle("Sync on boot")
+                        .setContentText("")
+                        .setSmallIcon(R.drawable.ic_stat_name)
+                        .build();
+                if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    this.startForeground(
+                            1,
+                            notification,
+                            ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
+                } else {
+                    this.startForeground(
+                            1,
+                            notification);
+                }
+
             }
-
+        } catch (Exception ignored) {
+            stopSelf(startId);
         }
 
         return super.onStartCommand(intent, flags, startId);
