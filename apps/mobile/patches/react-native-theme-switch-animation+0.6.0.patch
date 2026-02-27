@@ -1,0 +1,65 @@
+diff --git a/node_modules/react-native-theme-switch-animation/android/src/main/java/com/themeswitchanimation/ThemeSwitchAnimationModule.java b/node_modules/react-native-theme-switch-animation/android/src/main/java/com/themeswitchanimation/ThemeSwitchAnimationModule.java
+index f4630ac..a3a837f 100644
+--- a/node_modules/react-native-theme-switch-animation/android/src/main/java/com/themeswitchanimation/ThemeSwitchAnimationModule.java
++++ b/node_modules/react-native-theme-switch-animation/android/src/main/java/com/themeswitchanimation/ThemeSwitchAnimationModule.java
+@@ -13,7 +13,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
+ import com.facebook.react.bridge.ReactMethod;
+ import com.facebook.react.modules.core.DeviceEventManagerModule;
+ 
+-public class ThemeSwitchAnimationModule extends ThemeSwitchAnimationModuleSpec {
++public class ThemeSwitchAnimationModule extends com.themeswitchanimation.ThemeSwitchAnimationModuleSpec {
+   public static final String NAME = "ThemeSwitchAnimationModule";
+ 
+   private ReactContext reactContext;
+@@ -38,6 +38,12 @@ public class ThemeSwitchAnimationModule extends ThemeSwitchAnimationModuleSpec {
+       this.isAnimating = true;
+       this.rootView = (ViewGroup) getCurrentActivity().getWindow().getDecorView();
+       this.capturedImageBitmap = captureScreenshot(this.rootView, this.reactContext);
++      if (this.capturedImageBitmap == null) {
++        reactContext
++                .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
++                .emit("FINISHED_FREEZING_SCREEN", null);
++        return;
++      }
+       this.capturedImageView = createImageView(this.capturedImageBitmap, this.reactContext);
+ 
+       reactContext.runOnUiQueueThread(() -> {
+@@ -57,6 +63,9 @@ public class ThemeSwitchAnimationModule extends ThemeSwitchAnimationModuleSpec {
+       @Override
+       public void run() {
+         if (isAnimating) {
++          if (capturedImageView == null) {
++            cleanUp();
++          }
+           switch (animationType) {
+             case "circular":
+               Animations.performCircleAnimation(capturedImageView, rootView, (int) duration, cxRatio, cyRatio, reactContext, new Runnable() {
+@@ -94,16 +103,22 @@ public class ThemeSwitchAnimationModule extends ThemeSwitchAnimationModuleSpec {
+       capturedImageBitmap.recycle();
+       capturedImageBitmap = null;
+     }
+-    rootView.removeView(capturedImageView);
++    if (capturedImageView != null) {
++      rootView.removeView(capturedImageView);
++    }
+     isAnimating = false;
+   }
+ 
+   public static Bitmap captureScreenshot(View rootView, ReactContext reactContext) {
+-    Bitmap capturedImageBitmap = Bitmap.createBitmap(rootView.getWidth(), rootView.getHeight(), Bitmap.Config.ARGB_8888);
+-    Canvas canvas = new Canvas(capturedImageBitmap);
+-    rootView.draw(canvas);
+-
+-    return capturedImageBitmap;
++    try {
++      Bitmap capturedImageBitmap = Bitmap.createBitmap(rootView.getWidth(), rootView.getHeight(), Bitmap.Config.ARGB_8888);
++      Canvas canvas = new Canvas(capturedImageBitmap);
++      rootView.draw(canvas);
++
++      return capturedImageBitmap;
++    } catch (Exception e) {
++      return null;
++    }
+   }
+ 
+   public static ImageView createImageView(Bitmap capturedImageBitmap, ReactContext reactContext) {
