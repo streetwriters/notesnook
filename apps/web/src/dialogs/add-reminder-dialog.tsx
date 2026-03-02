@@ -509,7 +509,10 @@ export const AddReminderDialog = DialogManager.register(
           </Text>
         ) : (
           <Text variant="subBody" sx={{ mt: 1 }}>
-            {strings.reminderStarts(date.format(db.settings.getDateFormat()), date.format(timeFormat()))}
+            {strings.reminderStarts(
+              date.format(db.settings.getDateFormat()),
+              date.format(timeFormat())
+            )}
           </Text>
         )}
       </Dialog>

@@ -2632,5 +2632,8 @@ Use this if changes from other devices are not appearing on this device. This wi
   expiryDate: () => t`Expiry date`,
   exportCsv: () => t`Export CSV`,
   importCsv: () => t`Import CSV`,
-  noContent: () => t`This note is empty`
+  noContent: () => t`This note is empty`,
+  splitRight: () => t`Split right`,
+  splitDown: () => t`Split down`,
+  menu: () => t`Menu`
 };

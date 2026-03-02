@@ -41,7 +41,7 @@ function TitleBox(props: TitleBoxProps) {
   const sessionType = useEditorStore((store) => store.getSession(id)?.type);
   const sessionTitle = useEditorStore((store) => {
     const session = store.getSession(id, ["default"]);
-    return session?.note.isGeneratedTitle ? session.note.title : null;
+    return session?.note ? session.note.title : null;
   });
   const { editorConfig } = useEditorConfig();
   const dateFormat = useSettingsStore((store) => store.dateFormat);

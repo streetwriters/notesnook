@@ -293,8 +293,8 @@ function EditorFooter() {
           }}
           onClick={() => {
             if (saveState === SaveState.NotSaved) {
-              const { activeEditorId, getEditor } = useEditorManager.getState();
-              const editor = getEditor(activeEditorId || "")?.editor;
+              const { getEditor } = useEditorManager.getState();
+              const editor = getEditor(session.id)?.editor;
               if (!editor) return;
               saveContent(session.id, false, editor.getContent());
             }

@@ -19,6 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { initTRPC } from "@trpc/server";
 import { observable } from "@trpc/server/observable";
+import { dragManager } from "../utils/window-manager";
+import { z } from "zod";
 
 const t = initTRPC.create();
 
@@ -79,5 +81,35 @@ export const windowRouter = t.router({
         );
       };
     });
-  })
+  }),
+  // Added drag-and-drop session management commands.
+  // These allow the renderer to coordinate cross-window drag operations via the main process.
+  startDragSession: t.procedure
+    .input(
+      z.object({
+        title: z.string(),
+        colors: z
+          .object({ bg: z.string(), fg: z.string(), border: z.string() })
+          .optional()
+      })
+    )
+    .mutation(({ input }) => {
+      dragManager.startDragSession(input.title, input.colors);
+    }),
+  endDragSession: t.procedure.mutation(() => {
+    dragManager.endDragSession();
+  }),
+  checkInternalDrop: t.procedure
+    .input(
+      z.object({
+        x: z.number(),
+        y: z.number(),
+        type: z.enum(["tab", "note"]),
+        id: z.string()
+      })
+    )
+    .mutation(({ input }) => {
+      if (!globalThis.window) return { handled: false };
+      return dragManager.handleExternalDrop(input, globalThis.window.id);
+    })
 });
