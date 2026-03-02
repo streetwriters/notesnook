@@ -63,6 +63,9 @@ export function getTableOfContents(content: HTMLElement) {
     const nodeName = heading.nodeName;
     const currentHeading = levelsMap[nodeName];
 
+    const isInsideCallout = !!closestWithin(heading, ".callout", content);
+    if (isInsideCallout) continue;
+
     level =
       prevHeading < currentHeading
         ? level + 1
@@ -109,4 +112,17 @@ export function scrollIntoViewById(blockId: string, optionalStyles = "") {
       100
     );
   }
+}
+
+function closestWithin(
+  element: Element,
+  selector: string,
+  boundary: Element
+): Element | null {
+  let current: Element | null = element;
+  while (current && current !== boundary) {
+    if (current.matches(selector)) return current;
+    current = current.parentElement;
+  }
+  return null;
 }
