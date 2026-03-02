@@ -92,6 +92,7 @@ class SettingStore extends BaseStore<SettingStore> {
   isSnap = false;
   proxyRules?: string;
   isInboxEnabled = false;
+  generateThumbnails = Config.get("generateThumbnails", true);
 
   refresh = async () => {
     this.set({
@@ -319,6 +320,12 @@ class SettingStore extends BaseStore<SettingStore> {
         showToast("error", e.message);
       }
     }
+  };
+
+  toggleGenerateThumbnails = () => {
+    const { generateThumbnails } = this.get();
+    this.set({ generateThumbnails: !generateThumbnails });
+    Config.set("generateThumbnails", !generateThumbnails);
   };
 }
 

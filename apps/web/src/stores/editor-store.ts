@@ -54,6 +54,7 @@ import Vault from "../common/vault";
 import { Mutex } from "async-mutex";
 import { useEditorManager } from "../components/editor/manager";
 import { Context } from "../components/list-container/types";
+import { ensureNoteThumbnail } from "../utils/thumbnail-generator";
 
 export enum SaveState {
   NotSaved = -1,
@@ -410,6 +411,8 @@ class EditorStore extends BaseStore<EditorStore> {
                     event.item.dateCreated ?? session.note.dateCreated;
                   session.note.dateEdited =
                     event.item.dateEdited ?? session.note.dateEdited;
+                  session.note.showThumbnail =
+                    event.item.showThumbnail ?? session.note.showThumbnail;
                 });
               }
             }
@@ -792,9 +795,25 @@ class EditorStore extends BaseStore<EditorStore> {
         ? await db.content.get(note.contentId)
         : undefined;
 
+      logger.info("openSession: calling ensureNoteThumbnail?", {
+        hasContent: !!content,
+        setting: useSettingStore.getState().generateThumbnails,
+        noteType: note.type
+      });
+
       if (content?.locked) {
         await Vault.lockNote(noteId);
         return this.openSession(note, { ...options, force: true });
+      }
+
+      if (
+        content &&
+        useSettingStore.getState().generateThumbnails &&
+        note.type === "note"
+      ) {
+        ensureNoteThumbnail(note, content).catch((e) => {
+          logger.error("Failed to ensure note thumbnail", e);
+        });
       }
 
       if (note.type === "trash") {
@@ -1032,6 +1051,15 @@ class EditorStore extends BaseStore<EditorStore> {
           await addNotebook(note, context);
           await addTag(note, context);
           await addColor(note, context);
+        }
+
+        // This is safe to run in background
+        if (partial.content && partial.content.type === "tiptap") {
+          ensureNoteThumbnail(note, partial.content)
+            .then((updated) => {
+              if (updated) useNoteStore.getState().refresh();
+            })
+            .catch(console.error);
         }
 
         const attachmentsLength = await db.attachments

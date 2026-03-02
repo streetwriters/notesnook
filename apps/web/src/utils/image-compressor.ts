@@ -32,7 +32,7 @@ export class FileWithURI extends File {
 type DeriveDimension = (naturalWidth: number, naturalHeight: number) => number;
 
 interface CompressorOptions {
-  resize?: "none" | "cover" | "contain";
+  resize?: "none" | "cover" | "contain" | "crop";
   maxWidth: DeriveDimension | number;
   maxHeight: DeriveDimension | number;
   minWidth: DeriveDimension | number;
@@ -123,7 +123,9 @@ function drawToCanvas({
   const derive = dimensionDeriver(image);
   const is90DegreesRotated = Math.abs(rotate) % 180 === 90;
   const resizable =
-    (options.resize === "contain" || options.resize === "cover") &&
+    (options.resize === "contain" ||
+      options.resize === "cover" ||
+      options.resize === "crop") &&
     isPositiveNumber(derive(options.width)) &&
     isPositiveNumber(derive(options.height));
   let maxWidth = Math.max(derive(options.maxWidth), 0) || Infinity;
@@ -161,7 +163,10 @@ function drawToCanvas({
     "cover"
   ));
 
-  if (resizable) {
+  if (options.resize === "crop") {
+    width = derive(options.width);
+    height = derive(options.height);
+  } else if (resizable) {
     ({ width, height } = getAdjustedSizes(
       {
         aspectRatio,
@@ -185,10 +190,21 @@ function drawToCanvas({
     normalizeDecimalNumber(Math.min(Math.max(height, minHeight), maxHeight))
   );
 
-  const destX = -width / 2;
-  const destY = -height / 2;
-  const destWidth = width;
-  const destHeight = height;
+  let destWidth = width;
+  let destHeight = height;
+
+  if (options.resize === "crop") {
+    const cropWidth = derive(options.width);
+    const cropHeight = derive(options.height);
+    canvas.width = cropWidth;
+    canvas.height = cropHeight;
+  } else {
+    canvas.width = width;
+    canvas.height = height;
+  }
+
+  let destX = -destWidth / 2;
+  let destY = -destHeight / 2;
   let srcX = 0;
   let srcY = 0;
   let srcWidth = naturalWidth;
@@ -201,18 +217,36 @@ function drawToCanvas({
         width: naturalWidth,
         height: naturalHeight
       },
+      // @ts-ignore
       options.resize || "none"
     ));
+
+    if (options.resize === "crop") {
+      // We need to recalculate srcWidth/srcHeight to match the aspect ratio of the DESTINATION (width/height)
+      const destAspect = width / height;
+      if (naturalWidth / naturalHeight > destAspect) {
+        // Image is wider than dest: Crop width
+        srcHeight = naturalHeight;
+        srcWidth = srcHeight * destAspect;
+      } else {
+        // Image is taller than dest: Crop height
+        srcWidth = naturalWidth;
+        srcHeight = srcWidth / destAspect;
+      }
+    }
+
     srcX = (naturalWidth - srcWidth) / 2;
     srcY = (naturalHeight - srcHeight) / 2;
   }
 
   if (is90DegreesRotated) {
     [width, height] = [height, width];
+    // We also need to swap canvas dimensions if we just set them based on width/height
+    if (options.resize !== "crop") {
+      canvas.width = width;
+      canvas.height = height;
+    }
   }
-
-  canvas.width = width;
-  canvas.height = height;
 
   if (!options.mimeType || !isImageType(options.mimeType)) {
     options.mimeType = file.type;
@@ -227,14 +261,14 @@ function drawToCanvas({
 
   // Override the default fill color (#000, black)
   context.fillStyle = fillStyle;
-  context.fillRect(0, 0, width, height);
+  context.fillRect(0, 0, canvas.width, canvas.height);
 
   if (options.beforeDraw) {
     options.beforeDraw(context, canvas);
   }
 
   context.save();
-  context.translate(width / 2, height / 2);
+  context.translate(canvas.width / 2, canvas.height / 2);
   context.rotate((rotate * Math.PI) / 180);
   context.scale(scaleX, scaleY);
   if (resizable)
@@ -288,7 +322,7 @@ export function getAdjustedSizes(
     height,
     width
   }: { aspectRatio: number; height: number; width: number },
-  type: "none" | "contain" | "cover" = "none"
+  type: "none" | "contain" | "cover" | "crop" = "none"
 ) {
   const isValidWidth = isPositiveNumber(width);
   const isValidHeight = isPositiveNumber(height);
@@ -296,13 +330,18 @@ export function getAdjustedSizes(
   if (isValidWidth && isValidHeight) {
     const adjustedWidth = height * aspectRatio;
 
-    if (
-      ((type === "contain" || type === "none") && adjustedWidth > width) ||
-      (type === "cover" && adjustedWidth < width)
-    ) {
-      height = width / aspectRatio;
-    } else {
-      width = height * aspectRatio;
+    if (type === "contain" || type === "none") {
+      if (adjustedWidth > width) {
+        height = width / aspectRatio; // limit by width
+      } else {
+        width = height * aspectRatio; // limit by height
+      }
+    } else if (type === "cover") {
+      if (adjustedWidth < width) {
+        height = width / aspectRatio; // expand height to match width
+      } else {
+        width = height * aspectRatio; // expand width to match height
+      }
     }
   } else if (isValidWidth) {
     height = width / aspectRatio;

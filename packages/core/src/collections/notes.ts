@@ -181,7 +181,9 @@ export class Notes implements ICollection {
           dateCreated: item.dateCreated,
           dateEdited: item.dateEdited || dateEdited,
 
-          isGeneratedTitle: item.isGeneratedTitle
+          isGeneratedTitle: item.isGeneratedTitle,
+          thumbnail: item.thumbnail,
+          showThumbnail: item.showThumbnail
         });
       } else {
         await this.collection.upsert({
@@ -201,7 +203,9 @@ export class Notes implements ICollection {
           dateCreated: item.dateCreated || Date.now(),
           dateEdited: item.dateEdited || dateEdited || Date.now(),
 
-          isGeneratedTitle: item.isGeneratedTitle
+          isGeneratedTitle: item.isGeneratedTitle,
+          thumbnail: item.thumbnail,
+          showThumbnail: item.showThumbnail
         });
         this.totalNotes++;
       }
@@ -366,6 +370,10 @@ export class Notes implements ICollection {
       await this.collection.update(ids, { localOnly: state });
       await this.db.content.updateByNoteId({ localOnly: state }, ...ids);
     });
+  }
+
+  showThumbnail(state: boolean, ...ids: string[]) {
+    return this.collection.update(ids, { showThumbnail: state });
   }
 
   async export(id: string, options: ExportOptions): Promise<false | string>;
