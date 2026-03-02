@@ -95,7 +95,8 @@ export const Paragraph = Node.create<ParagraphOptions>({
   addKeyboardShortcuts() {
     return {
       Enter: ({ editor }) => {
-        if (this.options.doubleSpaced) return false;
+        if (this.options.doubleSpaced)
+          return editor.commands.splitBlock({ keepMarks: true });
 
         const { state } = editor;
         const { selection } = state;
@@ -105,17 +106,16 @@ export const Paragraph = Node.create<ParagraphOptions>({
         if (
           !empty ||
           $from.parent.type !== this.type ||
-          $from.depth > 1 ||
-          atEnd
+          $from.depth > 1
         ) {
           return false;
         }
 
-        if (!atEnd) {
-          return createParagraph(editor, this.type, false, true);
+        if (atEnd) {
+          return editor.commands.splitBlock({ keepMarks: true });
         }
 
-        return false;
+        return createParagraph(editor, this.type, false, true);
       },
       "Mod-Enter": ({ editor }) =>
         createParagraph(editor, this.type, false, true),
