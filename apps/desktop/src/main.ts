@@ -52,6 +52,9 @@ locale.then(({ default: locale }) => {
 });
 setI18nGlobal(i18n);
 
+const appHostnames = isDevelopment()
+  ? ["localhost", "127.0.0.1"]
+  : ["app.notesnook.com"];
 // only run a single instance
 if (!MAC_APP_STORE && !app.requestSingleInstanceLock()) {
   console.log("Another instance is already running!");
@@ -171,6 +174,19 @@ async function createWindow() {
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url);
     return { action: "deny" };
+  });
+
+  mainWindow.webContents.on("will-navigate", (event, url) => {
+    try {
+      const parsedUrl = new URL(url);
+      if (!appHostnames.includes(parsedUrl.hostname)) {
+        event.preventDefault();
+        shell.openExternal(url);
+      }
+    } catch (e) {
+      console.error("will-navigate: failed to parse URL", url, e);
+      event.preventDefault();
+    }
   });
 
   nativeTheme.on("updated", () => {

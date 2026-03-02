@@ -24,12 +24,7 @@ import { createDialect } from "./sqlite";
 import { isFeatureSupported } from "../utils/feature-check";
 import { generatePassword } from "../utils/password-generator";
 import { deriveKey, useKeyStore } from "../interfaces/key-store";
-import {
-  hosts,
-  logManager,
-  SubscriptionPlan,
-  SubscriptionStatus
-} from "@notesnook/core";
+import { hosts, SubscriptionPlan, SubscriptionStatus } from "@notesnook/core";
 import Config from "../utils/config";
 import { FileStorage } from "../interfaces/fs";
 
@@ -129,13 +124,6 @@ async function initializeDatabase(persistence: DatabasePersistence) {
   performance.mark("start:initdb");
   await db.init();
   performance.mark("end:initdb");
-
-  window.addEventListener("beforeunload", async () => {
-    if (IS_DESKTOP_APP) {
-      await db.sql().destroy();
-      await logManager?.close();
-    }
-  });
 
   if (db.migrations?.required()) {
     await import("../dialogs/migration-dialog").then(({ MigrationDialog }) =>
