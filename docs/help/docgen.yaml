@@ -20,6 +20,7 @@ navigation:
       - path: organizing-notes/organize-notes-using-colors.md
       - path: organizing-notes/organize-notes-using-tags.md
       - path: organizing-notes/organize-notes-using-favorites.md
+      - path: organizing-notes/archive-notes.md
       - path: organizing-notes/pin-notes-and-notebooks.md
       - path: organizing-notes/side-menu-shortcuts.md
   - path: rich-text-editor
