@@ -19,9 +19,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Cipher } from "@notesnook/crypto";
 
+export const KEY_VERSION = {
+  LEGACY: 0,
+  DEK: 1
+} as const;
+
+export type KeyVersion = (typeof KEY_VERSION)[keyof typeof KEY_VERSION];
+
 export type SyncItem = {
   id: string;
   v: number;
+  keyVersion?: KeyVersion;
 } & Cipher<"base64">;
 
 export type SyncableItemType = keyof typeof SYNC_COLLECTIONS_MAP;

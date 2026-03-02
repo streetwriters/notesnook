@@ -1882,6 +1882,10 @@ msgstr "Create a note first"
 msgid "Create a shortcut"
 msgstr "Create a shortcut"
 
+#: src/strings.ts:573
+msgid "Create a tag to group related notes together."
+msgstr "Create a tag to group related notes together."
+
 #: src/strings.ts:1849
 msgid "Create account"
 msgstr "Create account"
@@ -2128,6 +2132,10 @@ msgstr "Delete collapsed section"
 #: src/strings.ts:2292
 msgid "Delete column"
 msgstr "Delete column"
+
+#: src/strings.ts:2636
+msgid "Delete data"
+msgstr "Delete data"
 
 #: src/strings.ts:1314
 msgid "Delete group"
@@ -2756,6 +2764,10 @@ msgstr "Faced an issue or have a suggestion? Click here to create a bug report"
 #: src/strings.ts:2403
 msgid "Failed"
 msgstr "Failed"
+
+#: src/strings.ts:2637
+msgid "Failed to attach file"
+msgstr "Failed to attach file"
 
 #: src/strings.ts:1936
 msgid "Failed to copy note"
@@ -6779,6 +6791,10 @@ msgstr "Unlock note"
 msgid "Unlock note to delete it"
 msgstr "Unlock note to delete it"
 
+#: src/strings.ts:2638
+msgid "Unlock note to merge conflicts"
+msgstr "Unlock note to merge conflicts"
+
 #: src/strings.ts:1208
 msgid "Unlock the app with biometric authentication. This requires biometrics to be enabled on your device."
 msgstr "Unlock the app with biometric authentication. This requires biometrics to be enabled on your device."
@@ -7297,10 +7313,6 @@ msgstr "You are not logged in"
 #: src/strings.ts:886
 msgid "You are renaming color {color}"
 msgstr "You are renaming color {color}"
-
-#: src/strings.ts:573
-msgid "You can add as many tags as you want."
-msgstr "You can add as many tags as you want."
 
 #: src/strings.ts:464
 msgid "You can also link a note to multiple Notebooks. Tap and hold any notebook to enable multi-select."

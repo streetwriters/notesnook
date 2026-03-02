@@ -676,7 +676,7 @@ function Colors({ noteId, color }: { noteId: string; color?: string }) {
                 <Checkmark
                   color="white"
                   size={18}
-                  sx={{ position: "absolute", left: "8px" }}
+                  sx={{ position: "absolute", left: "4px" }}
                 />
               )}
             </Flex>

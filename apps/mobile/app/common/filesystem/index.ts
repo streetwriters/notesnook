@@ -30,7 +30,8 @@ import {
   getCacheSize,
   hashBase64,
   readEncrypted,
-  writeEncryptedBase64
+  writeEncryptedBase64,
+  bulkDeleteFiles
 } from "./io";
 import { uploadFile } from "./upload";
 import {
@@ -61,5 +62,6 @@ export const FileStorage: IFileStorage = {
   exists,
   clearFileStorage,
   getUploadedFileSize,
-  bulkExists
+  bulkExists,
+  bulkDeleteFiles
 };

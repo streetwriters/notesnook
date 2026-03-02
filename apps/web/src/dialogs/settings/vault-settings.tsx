@@ -41,10 +41,8 @@ export const VaultSettings: SettingsGroup[] = [
           {
             type: "button",
             title: strings.create(),
-            action: () => {
-              Vault.createVault().then((res) => {
-                useAppStore.getState().setIsVaultCreated(res);
-              });
+            action: async () => {
+              await Vault.createVault();
             },
             variant: "secondary"
           }

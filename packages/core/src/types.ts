@@ -599,6 +599,9 @@ export type User = {
   attachmentsKey?: Cipher<"base64">;
   monographPasswordsKey?: Cipher<"base64">;
   inboxKeys?: { public: string; private: Cipher<"base64"> };
+  dataEncryptionKey?: Cipher<"base64">;
+  legacyDataEncryptionKey?: Cipher<"base64">;
+
   marketingConsent?: boolean;
   storageUsed?: number;
   totalStorage?: number;

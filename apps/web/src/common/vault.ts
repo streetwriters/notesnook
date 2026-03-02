@@ -22,6 +22,7 @@ import { showPasswordDialog } from "../dialogs/password-dialog";
 import { showToast } from "../utils/toast";
 import { VAULT_ERRORS } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
+import { useStore as useAppStore } from "../stores/app-store";
 
 class Vault {
   static async createVault() {
@@ -34,6 +35,7 @@ class Vault {
       },
       validate: async ({ password }) => {
         await db.vault.create(password);
+        useAppStore.getState().setIsVaultCreated(true);
         showToast("success", strings.vaultCreated());
         return true;
       }

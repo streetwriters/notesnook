@@ -229,7 +229,8 @@ export default function TabsView() {
           ) : null}
           {arePropertiesVisible &&
             activeSession &&
-            activeSession.type !== "new" && (
+            activeSession.type !== "new" &&
+            activeSession.type !== "locked" && (
               <Pane id="properties-pane" initialSize={250} minSize={250}>
                 <Properties sessionId={activeSession.id} />
               </Pane>
@@ -302,7 +303,7 @@ function EditorView({
 
           const result = await db.vault
             .decryptContent(item)
-            .catch(() => EV.publish(EVENTS.vaultLocked));
+            .catch(() => db.eventManager.publish(EVENTS.vaultLocked));
           if (!result) return;
           editor.updateContent(result.data);
         } else if (isNote && session.note.title !== item.title) {
@@ -570,9 +571,9 @@ export function Editor(props: EditorProps) {
         onChange={onSave}
         onDownloadAttachment={(attachment) => saveAttachment(attachment.hash)}
         onPreviewAttachment={async (data) => {
-          const { hash, type } = data;
+          const { hash, type, mime } = data;
           const attachment = await db.attachments.attachment(hash);
-          if (attachment && type === "image") {
+          if (attachment && mime.startsWith("image/")) {
             await previewImageAttachment(attachment);
           } else if (
             attachment &&
@@ -783,14 +784,21 @@ function DropZone(props: DropZoneProps) {
         display: "none"
       }}
       onDrop={async (e) => {
-        const { activeEditorId, getEditor } = useEditorManager.getState();
-        const editor = getEditor(activeEditorId || "")?.editor;
-        if (!e.dataTransfer.files?.length || !editor) return;
+        try {
+          const { activeEditorId, getEditor } = useEditorManager.getState();
+          const editor = getEditor(activeEditorId || "")?.editor;
+          if (!e.dataTransfer.files?.length || !editor) return;
 
-        e.preventDefault();
-        const attachments = await attachFiles(Array.from(e.dataTransfer.files));
-        for (const attachment of attachments || []) {
-          editor.attachFile(attachment);
+          e.preventDefault();
+          const attachments = await attachFiles(
+            Array.from(e.dataTransfer.files)
+          );
+          for (const attachment of attachments || []) {
+            editor.attachFile(attachment);
+          }
+        } catch (e) {
+          logger.error(e as Error, "Failed to attach file from drag and drop");
+          showToast("error", strings.failedToAttachFile());
         }
       }}
     >

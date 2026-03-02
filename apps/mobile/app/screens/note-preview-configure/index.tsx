@@ -99,7 +99,7 @@ export const NotePreviewConfigure = () => {
   useEffect(() => {
     useSettingStore.getState().setDeviceMode("mobile");
     if (loading) return;
-    db.notes.all.sorted(db.settings.getGroupOptions("notes")).then((notes) => {
+    db.notes.all.sorted(db.settings.getGroupOptions("home")).then((notes) => {
       setItems(notes);
     });
   }, [loading]);
@@ -141,7 +141,7 @@ export const NotePreviewConfigure = () => {
             bounceRef.current = setTimeout(() => {
               if (!value) {
                 db.notes.all
-                  .sorted(db.settings.getGroupOptions("notes"))
+                  .sorted(db.settings.getGroupOptions("home"))
                   .then((notes) => {
                     setItems(notes);
                   });
@@ -149,7 +149,7 @@ export const NotePreviewConfigure = () => {
               }
               db.lookup
                 .notes(value)
-                .sorted()
+                .sorted(db.settings.getGroupOptions("home"))
                 .then((notes) => {
                   setItems(notes);
                 });

@@ -24,7 +24,7 @@ import {
   initializeFeatureChecks,
   isFeatureSupported
 } from "./utils/feature-check";
-import { initializeLogger } from "./utils/logger";
+import { initializeLogger, logger } from "./utils/logger";
 import { shouldShowWrapped } from "./utils/should-show-wrapped";
 
 type Route<TProps = null> = {
@@ -116,8 +116,11 @@ const sessionExpiryExceptions: Routes[] = [
 ];
 
 function getRoute(): RouteWithPath<AuthProps> | RouteWithPath {
-  const path = getCurrentPath() as Routes;
+  let path = getCurrentPath() as Routes;
   // logger.info(`Getting route for path: ${path}`);
+
+  const isAccountRecovery = isAccountRecoveryRoute(path);
+  if (isAccountRecovery) path = "/account/recovery";
 
   const signup = redirectToRegistration(path);
   const sessionExpired = isSessionExpired(path);
@@ -133,6 +136,10 @@ function getRoute(): RouteWithPath<AuthProps> | RouteWithPath {
     };
 
   return signup || sessionExpired || route || fallback;
+}
+
+function isAccountRecoveryRoute(path: Routes): boolean {
+  return path.startsWith("/account/recovery");
 }
 
 function fallbackRoute(): RouteWithPath {
@@ -187,7 +194,15 @@ export async function init() {
     initializeLogger()
   ]);
 
-  return { Component, path, props: route.props };
+  const persistence = isAccountRecoveryRoute(path)
+    ? ("memory" as const)
+    : ("db" as const);
+
+  logger.info(
+    `Initializing key store with persistence: ${persistence} for path: ${path}`
+  );
+
+  return { Component, path, props: route.props, persistence };
 }
 
 function shouldSkipInitiation() {

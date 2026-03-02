@@ -24,6 +24,7 @@ import { AttachmentComponent } from "./component.js";
 import { Attachment } from "./types.js";
 import { tiptapKeys } from "@notesnook/common";
 import { hasPermission } from "../../types.js";
+import { AudioNode } from "../audio/audio.js";
 
 export type AttachmentType = "image" | "file" | "camera";
 export interface AttachmentOptions {
@@ -121,13 +122,13 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
             return commands.insertContentAt(
               $from.pos + maybeAttachmentNode.nodeSize,
               {
-                type: this.name,
+                type: mimeToExtension(attachment.mime),
                 attrs: attachment
               }
             );
           }
           return commands.insertContent({
-            type: this.name,
+            type: mimeToExtension(attachment.mime),
             attrs: attachment
           });
         },
@@ -186,6 +187,11 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
   //     ];
   //   },
 });
+
+function mimeToExtension(mime: string): string {
+  if (mime.startsWith("audio/")) return AudioNode.name;
+  return AttachmentNode.name;
+}
 
 export function getDataAttribute(
   name: string,

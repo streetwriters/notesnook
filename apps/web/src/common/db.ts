@@ -24,9 +24,14 @@ import { createDialect } from "./sqlite";
 import { isFeatureSupported } from "../utils/feature-check";
 import { generatePassword } from "../utils/password-generator";
 import { deriveKey, useKeyStore } from "../interfaces/key-store";
-import { SubscriptionPlan, SubscriptionStatus } from "@notesnook/core";
+import { hosts, SubscriptionPlan, SubscriptionStatus } from "@notesnook/core";
 import Config from "../utils/config";
 import { FileStorage } from "../interfaces/fs";
+
+function getHostUrl(hostUrl: keyof typeof hosts, defaultUrl: string) {
+  const envValue = import.meta.env[`NN_${hostUrl}`];
+  return envValue || defaultUrl;
+}
 
 const db = database;
 async function initializeDatabase(persistence: DatabasePersistence) {
@@ -39,13 +44,16 @@ async function initializeDatabase(persistence: DatabasePersistence) {
   }
 
   db.host({
-    API_HOST: "https://api.notesnook.com",
-    AUTH_HOST: "https://auth.streetwriters.co",
-    SSE_HOST: "https://events.streetwriters.co",
-    ISSUES_HOST: "https://issues.streetwriters.co",
-    SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co",
-    MONOGRAPH_HOST: "https://monogr.ph",
-    NOTESNOOK_HOST: "https://notesnook.com",
+    API_HOST: getHostUrl("API_HOST", "https://api.notesnook.com"),
+    AUTH_HOST: getHostUrl("AUTH_HOST", "https://auth.streetwriters.co"),
+    SSE_HOST: getHostUrl("SSE_HOST", "https://events.streetwriters.co"),
+    ISSUES_HOST: getHostUrl("ISSUES_HOST", "https://issues.streetwriters.co"),
+    SUBSCRIPTIONS_HOST: getHostUrl(
+      "SUBSCRIPTIONS_HOST",
+      "https://subscriptions.streetwriters.co"
+    ),
+    MONOGRAPH_HOST: getHostUrl("MONOGRAPH_HOST", "https://monogr.ph"),
+    NOTESNOOK_HOST: getHostUrl("NOTESNOOK_HOST", "https://notesnook.com"),
     ...Config.get("serverUrls", {})
   });
 
@@ -62,7 +70,7 @@ async function initializeDatabase(persistence: DatabasePersistence) {
       dialect: (name, init) =>
         createDialect({
           name: persistence === "memory" ? ":memory:" : name,
-          encrypted: true,
+          encrypted: persistence !== "memory",
           async: !isFeatureSupported("opfs"),
           init,
           multiTab
@@ -77,7 +85,10 @@ async function initializeDatabase(persistence: DatabasePersistence) {
       synchronous: "normal",
       pageSize: 8192,
       cacheSize: -32000,
-      password: Buffer.from(databaseKey).toString("hex"),
+      password:
+        persistence === "memory"
+          ? undefined
+          : Buffer.from(databaseKey).toString("hex"),
       skipInitialization: !IS_DESKTOP_APP && multiTab
     },
     storage: storage,

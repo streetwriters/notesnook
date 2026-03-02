@@ -35,6 +35,7 @@ import { EmailChangeDialog } from "../email-change-dialog";
 import { RecoveryKeyDialog } from "../recovery-key-dialog";
 import { UserProfile } from "./components/user-profile";
 import { SettingsGroup } from "./types";
+import Config from "../../utils/config";
 
 export const ProfileSettings: SettingsGroup[] = [
   {
@@ -86,6 +87,37 @@ export const ProfileSettings: SettingsGroup[] = [
             variant: "secondary",
             action: async () => {
               if (await verifyAccount()) await RecoveryKeyDialog.show({});
+            }
+          }
+        ]
+      },
+      {
+        key: "delete-data-for-not-logged-in-user",
+        title: strings.deleteData(),
+        description: strings.deleteAccountDesc(),
+        keywords: [
+          strings.deleteData(),
+          strings.deleteAccount(),
+          strings.clear()
+        ],
+        isHidden: () => Boolean(useUserStore.getState().isLoggedIn),
+        components: [
+          {
+            type: "button",
+            variant: "error",
+            title: strings.deleteData(),
+            action: async () => {
+              const ok = await ConfirmDialog.show({
+                title: strings.deleteData(),
+                message: strings.deleteAccountDesc(),
+                positiveButtonText: strings.yes(),
+                negativeButtonText: strings.no()
+              });
+              if (ok) {
+                Config.clear();
+                await db.reset();
+                window.location.reload();
+              }
             }
           }
         ]
