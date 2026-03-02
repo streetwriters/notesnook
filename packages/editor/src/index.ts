@@ -158,7 +158,6 @@ const useTiptap = (
     downloadOptions,
     editorProps,
     enableFontLigatures,
-    enableInputRules,
     ...restOptions
   } = options;
 
@@ -319,7 +318,7 @@ const useTiptap = (
         OutlineList.configure({ keepAttributes: true, keepMarks: true }),
         ListItem,
         InlineCode,
-        Codemark.configure({ enabled: enableInputRules ?? true }),
+        Codemark,
         MathInline,
         MathBlock,
         KeepInView.configure({
@@ -406,8 +405,7 @@ const useTiptap = (
       timeFormat,
       editorProps,
       copyToClipboard,
-      createInternalLink,
-      enableInputRules
+      createInternalLink
     ]
   );
 

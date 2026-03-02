@@ -22,15 +22,7 @@ import codemark from "prosemirror-codemark";
 
 export const Codemark = Extension.create({
   name: "codemarkPlugin",
-
-  addOptions() {
-    return {
-      enabled: true
-    };
-  },
-
   addProseMirrorPlugins() {
-    if (!this.options.enabled) return [];
     return codemark({ markType: this.editor.schema.marks.code });
   }
 });
