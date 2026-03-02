@@ -24,10 +24,10 @@ With Notesnook, you don't need to do that anymore. Monographs enable you to shar
 
 # [Mobile](#/tab/mobile)
 
-5. Tap on ![Three dot button](/three-dot-button.png) button on a note.
-6. Tap on `Publish` to open Publish note sheet
-7. Tap on `Publish` button to publish note.
-8. Copy the URL and send it to respective person.
+1. Tap on ![Three dot button](/three-dot-button.png) button on a note.
+2. Tap on `Publish` to open Publish note sheet
+3. Tap on `Publish` button to publish note.
+4. Copy the URL and send it to respective person.
 
 ---
 
@@ -49,8 +49,8 @@ Self destruct means that the published note can be viewed only once. Once someon
 
 # [Mobile](#/tab/mobile)
 
-4. Tap on ![Three dot button](/three-dot-button.png) button on a published note
-5. Tap on `Publish` to open Publish note sheet
-6. Tap on `Unpublish` button to unpublish note
+1. Tap on ![Three dot button](/three-dot-button.png) button on a published note
+2. Tap on `Publish` to open Publish note sheet
+3. Tap on `Unpublish` button to unpublish note
 
 ---

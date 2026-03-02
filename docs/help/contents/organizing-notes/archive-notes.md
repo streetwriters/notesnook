@@ -26,7 +26,7 @@ Archiving lets you declutter your notes list without permanently deleting notes.
 
 1. Go to `Archive` from the side menu
 2. Right click on a note to open `Note properties` menu
-3. Click on `Unarchive`
+3. Untoggle `Archive`
 4. The note will be restored to your main `Notes` view
 
 # [Mobile](#/tab/mobile)
