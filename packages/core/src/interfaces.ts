@@ -128,6 +128,10 @@ export interface IFileStorage {
     filename: string,
     requestOptions?: RequestOptions
   ): Promise<boolean>;
+  bulkDeleteFiles(
+    filenames: string[],
+    requestOptions?: RequestOptions
+  ): Promise<boolean>;
   exists(filename: string): Promise<boolean>;
   bulkExists(filenames: string[]): Promise<string[]>;
   getUploadedFileSize(filename: string): Promise<number>;

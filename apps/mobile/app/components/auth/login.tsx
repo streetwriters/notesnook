@@ -25,7 +25,11 @@ import { TouchableOpacity, View, useWindowDimensions } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { DDS } from "../../services/device-detection";
-import { eSendEvent, ToastManager } from "../../services/event-manager";
+import {
+  eSendEvent,
+  presentSheet,
+  ToastManager
+} from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import PremiumService from "../../services/premium";
 import SettingsService from "../../services/settings";
@@ -110,7 +114,6 @@ export const Login = ({
   return (
     <>
       <AuthHeader />
-      <ForgotPassword />
       <Dialog context="two_factor_verify" />
       <KeyboardAwareScrollView
         style={{
@@ -257,13 +260,10 @@ export const Login = ({
                     paddingHorizontal: 0
                   }}
                   onPress={() => {
-                    ToastManager.show({
-                      type: "info",
-                      message:
-                        "Password changing has been disabled temporarily to address some issues faced by users. It will be enabled again once the issues have resolved."
+                    if (loading || !email.current) return;
+                    presentSheet({
+                      component: <ForgotPassword userEmail={email.current} />
                     });
-                    // if (loading || !email.current) return;
-                    // SheetManager.show("forgotpassword_sheet");
                   }}
                   textStyle={{
                     textDecorationLine: "underline"

@@ -39,7 +39,7 @@ export function hideAuth(context?: AuthParams["context"]) {
     initialAuthMode.current === AuthMode.welcomeLogin ||
     context === "intro"
   ) {
-    Navigation.replace("FluidPanelsView", {});
+    Navigation.navigate("FluidPanelsView", {});
   } else {
     Navigation.goBack();
   }

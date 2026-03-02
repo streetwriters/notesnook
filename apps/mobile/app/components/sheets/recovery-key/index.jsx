@@ -169,7 +169,7 @@ class RecoveryKeySheet extends React.Component {
   };
 
   onOpen = async () => {
-    let k = await db.user.getEncryptionKey();
+    let k = await db.user.getMasterKey();
     this.user = await db.user.getUser();
     if (k) {
       this.setState({

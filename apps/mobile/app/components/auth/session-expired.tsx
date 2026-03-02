@@ -97,7 +97,7 @@ export const SessionExpired = () => {
       if (db.tokenManager._isTokenExpired(res))
         throw new Error("token expired");
 
-      const key = await db.user.getEncryptionKey();
+      const key = await db.user.getDataEncryptionKeys();
       if (!key) throw new Error("No encryption key found.");
 
       Sync.run("global", false, "full", async (complete) => {

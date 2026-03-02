@@ -40,7 +40,7 @@ import AuthContainer from "../components/auth-container";
 import { useTimer } from "../hooks/use-timer";
 import { ErrorText } from "../components/error-text";
 import { AuthenticatorType, User } from "@notesnook/core";
-import { ConfirmDialog, showLogoutConfirmation } from "../dialogs/confirm";
+import { showLogoutConfirmation } from "../dialogs/confirm";
 import { TaskManager } from "../common/task-manager";
 import { strings } from "@notesnook/intl";
 import { ScrollContainer } from "@notesnook/ui";
@@ -339,16 +339,7 @@ function LoginPassword(props: BaseAuthComponentProps<"login:password">) {
             type="button"
             mt={2}
             variant="anchor"
-            onClick={() => {
-              ConfirmDialog.show({
-                title: "Password changing has been disabled temporarily",
-                message:
-                  "Password changing has been disabled temporarily to address some issues faced by users. It will be enabled again once the issues have resolved.",
-                positiveButtonText: "Ok"
-              });
-              return;
-              // navigate("recover", { email: formData.email })
-            }}
+            onClick={() => navigate("recover", { email: formData.email })}
             sx={{ color: "paragraph", alignSelf: "end" }}
           >
             {strings.forgotPassword()}
@@ -508,16 +499,7 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
         type="button"
         mt={2}
         variant="anchor"
-        onClick={() => {
-          ConfirmDialog.show({
-            title: "Password changing has been disabled temporarily",
-            message:
-              "Password changing has been disabled temporarily to address some issues faced by users. It will be enabled again once the issues have resolved.",
-            positiveButtonText: "Ok"
-          });
-          return;
-          // user && navigate("recover", { email: user.email })
-        }}
+        onClick={() => user && navigate("recover", { email: user.email })}
         sx={{ color: "paragraph", alignSelf: "end" }}
       >
         {strings.forgotPassword()}

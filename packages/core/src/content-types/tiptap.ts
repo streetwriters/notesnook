@@ -363,6 +363,7 @@ export class Tiptap {
             break;
           }
           case "iframe":
+          case "audio":
           case "span": {
             const hash = attr[ATTRIBUTES.hash];
             if (!hash) return;

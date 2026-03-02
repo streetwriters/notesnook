@@ -1871,6 +1871,10 @@ msgstr ""
 msgid "Create a shortcut"
 msgstr ""
 
+#: src/strings.ts:573
+msgid "Create a tag to group related notes together."
+msgstr ""
+
 #: src/strings.ts:1849
 msgid "Create account"
 msgstr ""
@@ -2116,6 +2120,10 @@ msgstr ""
 
 #: src/strings.ts:2292
 msgid "Delete column"
+msgstr ""
+
+#: src/strings.ts:2636
+msgid "Delete data"
 msgstr ""
 
 #: src/strings.ts:1314
@@ -2744,6 +2752,10 @@ msgstr ""
 
 #: src/strings.ts:2403
 msgid "Failed"
+msgstr ""
+
+#: src/strings.ts:2637
+msgid "Failed to attach file"
 msgstr ""
 
 #: src/strings.ts:1936
@@ -6738,6 +6750,10 @@ msgstr ""
 msgid "Unlock note to delete it"
 msgstr ""
 
+#: src/strings.ts:2638
+msgid "Unlock note to merge conflicts"
+msgstr ""
+
 #: src/strings.ts:1208
 msgid "Unlock the app with biometric authentication. This requires biometrics to be enabled on your device."
 msgstr ""
@@ -7246,10 +7262,6 @@ msgstr ""
 
 #: src/strings.ts:886
 msgid "You are renaming color {color}"
-msgstr ""
-
-#: src/strings.ts:573
-msgid "You can add as many tags as you want."
 msgstr ""
 
 #: src/strings.ts:464

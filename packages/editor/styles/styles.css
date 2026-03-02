@@ -38,15 +38,24 @@
   margin-block: 0px;
   cursor: pointer;
   position: relative;
-  background-color: var(--separator);
   width: 100%;
-  height: 5px;
-  margin-top: 4px;
-  margin-bottom: 4px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-radius: 5px;
 }
 
-.ProseMirror hr.ProseMirror-selectednode::after {
-  border: 2px solid var(--accent);
+.ProseMirror hr::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: var(--separator);
+}
+
+.ProseMirror hr.ProseMirror-selectednode {
+  background-color: var(--background-secondary);
 }
 
 .ProseMirror p code {
@@ -131,8 +140,9 @@
 }
 
 .ProseMirror > div.codeblock-view-content-wrap,
-.ProseMirror > div.taskList-view-content-wrap,
-.ProseMirror > div.math-block.math-node {
+.ProseMirror > div.math-block.math-node,
+.ProseMirror > div.audio-view-content-wrap, 
+.ProseMirror > div.taskList-view-content-wrap {
   margin-top: 1em;
   margin-bottom: 1em;
 }
@@ -393,19 +403,21 @@ img.ProseMirror-separator {
 .ProseMirror blockquote {
   border-inline-start: 5px solid var(--border);
   padding-inline-start: 15px;
+  margin-inline-start: 20px;
+  margin-inline-end: 0px;
 }
 
 @media screen and (max-width: 480px) {
   .ProseMirror blockquote {
     margin-inline: 5px;
     padding-inline-start: 10px;
-}
+  }
 
-.ProseMirror a > span.image-view-content-wrap {
-  display: block;
-  margin-inline: 5px;
-  padding-inline-start: 10px;
-}
+  .ProseMirror a > span.image-view-content-wrap {
+    display: block;
+    margin-inline: 5px;
+    padding-inline-start: 10px;
+  }
 }
 
 
@@ -716,7 +728,7 @@ p > *::selection {
 .ProseMirror ul.simple-checklist {
   list-style: none;
   padding-inline: 0px !important;
-  padding-inline-start: 24px !important;
+  padding-inline-start: 40px !important;
 }
 
 .ProseMirror li.nested > ul.simple-checklist {

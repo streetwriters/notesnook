@@ -570,7 +570,7 @@ $day$: Current day (eg. Monday)`,
   viewAllLinkedNotebooks: () => t`View all linked notebooks`,
   learnMore: () => t`Learn more`,
   addTag: () => t`Add tag`,
-  addTagDesc: () => t`You can add as many tags as you want.`,
+  addTagDesc: () => t`Create a tag to group related notes together.`,
   save: () => t`Save`,
   verify: () => t`Verify`,
   newTab: () => t`New tab`,
@@ -2632,5 +2632,8 @@ Use this if changes from other devices are not appearing on this device. This wi
   expiryDate: () => t`Expiry date`,
   exportCsv: () => t`Export CSV`,
   importCsv: () => t`Import CSV`,
-  noContent: () => t`This note is empty`
+  noContent: () => t`This note is empty`,
+  deleteData: () => t`Delete data`,
+  failedToAttachFile: () => t`Failed to attach file`,
+  unlockNoteToMergeConflicts: () => t`Unlock note to merge conflicts`
 };

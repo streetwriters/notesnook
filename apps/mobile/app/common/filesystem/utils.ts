@@ -193,3 +193,7 @@ export async function checkAndCreateDir(path: string) {
 export const santizeUri = (uri: string) => {
   return Platform.OS === "ios" ? decodeURI(uri).replace("file:///", "/") : uri;
 };
+
+export function isSuccessStatusCode(statusCode: number) {
+  return statusCode >= 200 && statusCode <= 299;
+}

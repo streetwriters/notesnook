@@ -146,13 +146,19 @@ class KeyStore extends BaseStore<KeyStore> {
 
   activeCredentials = () => this.get().credentials.filter((c) => c.active);
 
-  init = async () => {
+  init = async (
+    config: { persistence: "memory" | "db" } = { persistence: "db" }
+  ) => {
     this.#metadataStore =
-      isFeatureSupported("indexedDB") && isFeatureSupported("clonableCryptoKey")
+      isFeatureSupported("indexedDB") &&
+      isFeatureSupported("clonableCryptoKey") &&
+      config.persistence !== "memory"
         ? new IndexedDBKVStore(`${this.dbName}-metadata`, "metadata")
         : new MemoryKVStore();
     this.#secretStore =
-      isFeatureSupported("indexedDB") && isFeatureSupported("clonableCryptoKey")
+      isFeatureSupported("indexedDB") &&
+      isFeatureSupported("clonableCryptoKey") &&
+      config.persistence !== "memory"
         ? new IndexedDBKVStore(`${this.dbName}-secrets`, "secrets")
         : new MemoryKVStore();
 
