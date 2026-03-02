@@ -10,7 +10,7 @@ Archiving lets you declutter your notes list without permanently deleting notes.
 
 # [Desktop/Web](#/tab/web)
 
-1. Right click on a note or click on the three-dot more button to open `Note properties` menu
+1. Right click on a note to open `Note properties` menu
 2. Click on `Archive`
 3. The note will be moved to the `Archive` section
 
@@ -25,7 +25,7 @@ Archiving lets you declutter your notes list without permanently deleting notes.
 # [Desktop/Web](#/tab/web)
 
 1. Go to `Archive` from the side menu
-2. Right click on a note or click on the three-dot more button to open `Note properties` menu
+2. Right click on a note to open `Note properties` menu
 3. Click on `Unarchive`
 4. The note will be restored to your main `Notes` view
 
