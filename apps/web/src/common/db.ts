@@ -19,22 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { EventSourcePolyfill as EventSource } from "event-source-polyfill";
 import { DatabasePersistence, NNStorage } from "../interfaces/storage";
-import { logger } from "../utils/logger";
-import {
-  database,
-  getFeature,
-  getFeatureLimit,
-  isFeatureAvailable
-} from "@notesnook/common";
+import { database, getFeature, getFeatureLimit } from "@notesnook/common";
 import { createDialect } from "./sqlite";
 import { isFeatureSupported } from "../utils/feature-check";
 import { generatePassword } from "../utils/password-generator";
 import { deriveKey, useKeyStore } from "../interfaces/key-store";
-import {
-  logManager,
-  SubscriptionPlan,
-  SubscriptionStatus
-} from "@notesnook/core";
+import { SubscriptionPlan, SubscriptionStatus } from "@notesnook/core";
 import Config from "../utils/config";
 import { FileStorage } from "../interfaces/fs";
 
@@ -123,13 +113,6 @@ async function initializeDatabase(persistence: DatabasePersistence) {
   performance.mark("start:initdb");
   await db.init();
   performance.mark("end:initdb");
-
-  window.addEventListener("beforeunload", async () => {
-    if (IS_DESKTOP_APP) {
-      await db.sql().destroy();
-      await logManager?.close();
-    }
-  });
 
   if (db.migrations?.required()) {
     await import("../dialogs/migration-dialog").then(({ MigrationDialog }) =>
