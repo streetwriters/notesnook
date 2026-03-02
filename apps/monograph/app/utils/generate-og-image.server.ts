@@ -36,27 +36,27 @@ const fontMap = JSON.parse(
 );
 
 // Register fonts
-const OpenSans = path.join(
+const Inter = path.join(
   __dirname,
   import.meta.env.DEV ? "../assets/fonts/" : "../../assets/fonts/",
-  "open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-regular.ttf"
+  "Inter-Regular.ttf"
 );
-const OpenSansBold = path.join(
+const InterBold = path.join(
   __dirname,
   import.meta.env.DEV ? "../assets/fonts/" : "../../assets/fonts/",
-  "open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-600.ttf"
+  "Inter-SemiBold.ttf"
 );
 
-console.log("OpenSans", GlobalFonts.registerFromPath(OpenSans, "OpenSans"));
+console.log("Inter", GlobalFonts.registerFromPath(Inter, "Inter"));
 console.log(
   "registering",
-  "OpenSansBold",
-  GlobalFonts.registerFromPath(OpenSansBold, "OpenSansBold")
+  "InterBold",
+  GlobalFonts.registerFromPath(InterBold, "InterBold")
 );
 
 const fontFamilies = {
-  regular: ["OpenSans"],
-  bold: ["OpenSansBold"]
+  regular: ["Inter"],
+  bold: ["InterBold"]
 };
 for (const font of fontMap) {
   const id = (font.name + font.weight).replace(/ /g, "");
@@ -115,11 +115,11 @@ export async function makeImage(metadata: OGMetadata, cacheKey: string) {
 
   // Draw bottom text
   ctx.fillStyle = theme.primary.heading;
-  ctx.font = "600 32px OpenSansBold";
+  ctx.font = "600 32px InterBold";
   ctx.fillText("Notesnook Monograph", PADDING + 95, HEIGHT - PADDING - 55);
 
   ctx.fillStyle = theme.secondary.paragraph;
-  ctx.font = "25px OpenSans";
+  ctx.font = "25px Inter";
   ctx.fillText(
     "Anonymous, secure, and encrypted note sharing with password protection.",
     PADDING + 95,
@@ -128,7 +128,7 @@ export async function makeImage(metadata: OGMetadata, cacheKey: string) {
 
   // Draw date
   ctx.fillStyle = theme.secondary.paragraph;
-  ctx.font = "25px OpenSans";
+  ctx.font = "25px Inter";
   ctx.fillText(metadata.date, PADDING, PADDING + 25);
 
   // Draw title
