@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/monograph",
-  "version": "1.2.7",
+  "version": "1.2.8",
   "private": true,
   "sideEffects": false,
   "type": "module",
