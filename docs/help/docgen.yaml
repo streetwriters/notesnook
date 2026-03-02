@@ -10,18 +10,18 @@ meta:
   title: Notesnook Help
 
 footer:
-  copyright: Copyright © 2023 Streetwriters (Private) Limited
+  copyright: Copyright © 2026 Streetwriters (Private) Limited
 
 navigation:
   - path: create-a-note-in-notesnook.md
   - path: organizing-notes
     children:
-      - path: organizing-notes/organize-notes-using-notebooks.md
-      - path: organizing-notes/organize-notes-using-colors.md
-      - path: organizing-notes/organize-notes-using-tags.md
-      - path: organizing-notes/organize-notes-using-favorites.md
       - path: organizing-notes/archive-notes.md
-      - path: organizing-notes/pin-notes-and-notebooks.md
+      - path: organizing-notes/organize-notes-using-colors.md
+      - path: organizing-notes/organize-notes-using-favorites.md
+      - path: organizing-notes/organize-notes-using-notebooks.md
+      - path: organizing-notes/organize-notes-using-tags.md
+      - path: organizing-notes/pin-notes.md
       - path: organizing-notes/side-menu-shortcuts.md
   - path: rich-text-editor
     children:
@@ -85,4 +85,4 @@ navigation:
     children:
       - path: faqs/what-are-merge-conflicts.md
       - path: faqs/is-there-an-eta.md
-      - paht: faqs/login-to-upload-attachments.md
+      - path: faqs/login-to-upload-attachments.md

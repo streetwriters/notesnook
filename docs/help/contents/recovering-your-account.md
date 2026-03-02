@@ -64,22 +64,6 @@ This is the safest method of recovering your account because it just decrypts yo
    ![](/static/account-recovery/step-5.png)
 4. For next steps, see [Resetting account password](#resetting-account-password) section
 
-### Use backup file
-
-> error RISK OF LOSING DATA
->
-> This method can cause unprecedented data loss depending on how old your backup file is.
-
-> warn Don't have a backup file?
->
-> If you don't have a backup file you can skip to the next section.
-
-1. Click on the second option (the button that says `Use backup file`)
-2. Click on `Browse` & select the backup file
-3. Click on `Start account recovery`
-   ![](/static/account-recovery/step-6.png)
-4. For next steps, see [Resetting account password](#resetting-account-password) section
-
 ### Clear data & reset account
 
 > error RISK OF LOSING DATA

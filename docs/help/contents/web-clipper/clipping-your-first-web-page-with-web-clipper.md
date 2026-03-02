@@ -83,25 +83,25 @@ The clipping mode controls how the final clip should look.
 
 ### Screenshot
 
-> info Pro users only
+> info Uses attachment storage
 >
-> `Screenshot` mode is only available to Pro users
+> The `Screenshot` mode will use some of your monthly attachment storage for each page clipped.
 
 `Screenshot` mode includes all the styles + images but the final result is saved as an image i.e. it is non-interactive.
 
 ### Complete with styles
 
-> info Pro users only
+> info Uses attachment storage
 >
-> `Complete with styles` mode is only available to Pro users
+> The `Complete with styles` mode will use some of your monthly attachment storage for each page clipped.
 
-`Complete with styles` mode saves all images, styles & everything on the page to retain the maximum amount of information. The final result appears as an embed in the Notesnook editor which is full interactive.
+`Complete with styles` mode saves all images, styles & everything on the page to retain the maximum amount of information. The final result appears as an embed in the Notesnook editor which is fully interactive.
 
 ![](/static/web-clipper/web-clip-embed.gif)
 
 ## Organizing your web clip
 
-Notesnook Web Clipper offers 3 easy ways to organize your web clips (all of which are completely optional):
+The Notesnook Web Clipper offers 3 easy ways to organize your web clips (all of which are completely optional):
 
 ![](/static/web-clipper/organize-web-clip.png)
 
