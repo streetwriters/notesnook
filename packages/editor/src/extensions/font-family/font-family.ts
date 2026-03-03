@@ -55,6 +55,7 @@ export const FontFamily = Extension.create<FontFamilyOptions>({
         attributes: {
           fontFamily: {
             default: null,
+            keepOnSplit: true,
             parseHTML: (element) =>
               element.style.fontFamily?.replace(/['"]+/g, ""),
             renderHTML: (attributes) => {
