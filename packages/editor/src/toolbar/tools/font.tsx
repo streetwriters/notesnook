@@ -25,7 +25,7 @@ import { useCallback, useMemo } from "react";
 import { Counter } from "../components/counter.js";
 import { useRefValue } from "../../hooks/use-ref-value.js";
 import { useToolbarStore } from "../stores/toolbar-store.js";
-import { getFontById, getFontIds, getFonts } from "../../utils/font.js";
+import { getFont, getFontById, getFonts } from "../../utils/font.js";
 import { CodeBlock } from "../../extensions/code-block/index.js";
 import { strings } from "@notesnook/intl";
 
@@ -66,10 +66,10 @@ export function FontSize(props: ToolProps) {
 export function FontFamily(props: ToolProps) {
   const { editor } = props;
   const defaultFontFamily = useToolbarStore((store) => store.fontFamily);
-  const currentFontFamily =
-    getFontIds().find((id) =>
-      editor.isActive("textStyle", { fontFamily: id })
-    ) || defaultFontFamily;
+  const currentFontFamily = editor.getAttributes("textStyle").fontFamily;
+  const selectedFont = currentFontFamily
+    ? getFont(currentFontFamily)
+    : getFontById(defaultFontFamily);
 
   const items = useMemo(
     () => toMenuItems(editor, currentFontFamily),
@@ -81,7 +81,7 @@ export function FontFamily(props: ToolProps) {
     <Dropdown
       id="fontFamily"
       group="font"
-      selectedItem={getFontById(currentFontFamily)?.title || defaultFontFamily}
+      selectedItem={selectedFont?.title || defaultFontFamily}
       items={items}
       menuWidth={130}
       disabled={editor.isActive(CodeBlock.name)}
