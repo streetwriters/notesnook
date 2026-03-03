@@ -106,6 +106,8 @@ export const BlockId = Extension.create({
           if (updates.length > 0) {
             tr.step(new BatchAttributeStep(updates));
             tr.setMeta("ignoreEdit", true);
+            // Transaction.addStep always clears storedMarks
+            if (newState.storedMarks) tr.setStoredMarks(newState.storedMarks);
             return tr;
           }
 
