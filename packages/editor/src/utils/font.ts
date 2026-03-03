@@ -45,6 +45,20 @@ export function getFontById(id: string) {
   return FONTS.find((a) => a.id === id);
 }
 
+export function getFont(font: string) {
+  return FONTS.find(
+    (a) => normalizeFontFamily(a.font) === normalizeFontFamily(font)
+  );
+}
+
 export function getFontIds() {
   return FONTS.map((a) => a.id);
+}
+
+function normalizeFontFamily(fontFamily: string) {
+  return fontFamily
+    .replace(/['"]+/g, "")
+    .replaceAll(", ", ",")
+    .replaceAll(",", "")
+    .replace(/\s+/g, "");
 }
