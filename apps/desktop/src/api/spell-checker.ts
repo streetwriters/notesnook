@@ -84,35 +84,63 @@ const LANGUAGES: Record<string, string> = {
 
 type Language = { code: string; name: string };
 
+const BROKEN_SPANISH_TO_WORKING: Record<string, string> = {
+  es: "es-MX",
+  "es-419": "es-MX",
+  "es-ES": "es-AR"
+};
+
 export const spellCheckerRouter = t.router({
   isEnabled: t.procedure.query(() => config.isSpellCheckerEnabled),
-  languages: t.procedure.query(
-    () =>
-      <Language[]>(
-        globalThis.window?.webContents.session.availableSpellCheckerLanguages.map(
-          (code) => ({
-            code,
-            name: LANGUAGES[code]
-          })
-        )
-      )
-  ),
-  enabledLanguages: t.procedure.query(
-    () =>
-      <Language[]>(
-        globalThis.window?.webContents.session
-          .getSpellCheckerLanguages()
-          .map((code) => ({
-            code,
-            name: LANGUAGES[code]
-          }))
-      )
-  ),
-  setLanguages: t.procedure
-    .input(z.array(z.string()))
-    .mutation(({ input: languages }) =>
-      globalThis.window?.webContents.session.setSpellCheckerLanguages(languages)
-    ),
+  languages: t.procedure.query(() => {
+    const available =
+      globalThis.window?.webContents.session.availableSpellCheckerLanguages ||
+      [];
+
+    return <Language[]>available
+      .map((code) => ({
+        code,
+        name: LANGUAGES[code] || `Unknown (${code})`
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }),
+
+  enabledLanguages: t.procedure.query(() => {
+    const enabled =
+      globalThis.window?.webContents.session.getSpellCheckerLanguages() || [];
+    const available =
+      globalThis.window?.webContents.session.availableSpellCheckerLanguages ||
+      [];
+
+    const resolved = enabled.map((code) => {
+      if (BROKEN_SPANISH_TO_WORKING[code]) {
+        const working = BROKEN_SPANISH_TO_WORKING[code];
+        return available.includes(working) ? working : code;
+      }
+      return available.includes(code) ? code : code.split("-")[0];
+    });
+
+    return <Language[]>resolved.map((code) => ({
+      code,
+      name: LANGUAGES[code] || `Unknown (${code})`
+    }));
+  }),
+
+  setLanguages: t.procedure.input(z.array(z.string())).mutation(({ input }) => {
+    const available =
+      globalThis.window?.webContents.session.availableSpellCheckerLanguages ||
+      [];
+
+    const resolved = input.map((code) => {
+      if (BROKEN_SPANISH_TO_WORKING[code]) {
+        const working = BROKEN_SPANISH_TO_WORKING[code];
+        return available.includes(working) ? working : code;
+      }
+      return available.includes(code) ? code : code.split("-")[0];
+    });
+
+    globalThis.window?.webContents.session.setSpellCheckerLanguages(resolved);
+  }),
   toggle: t.procedure
     .input(z.object({ enabled: z.boolean() }))
     .mutation(({ input: { enabled } }) => {
