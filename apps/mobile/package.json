@@ -26,8 +26,8 @@
     "react": "19.1.1"
   },
   "dependencies": {
-    "@ammarahmed/notifee-react-native": "^7.4.11",
-    "@ammarahmed/react-native-background-fetch": "^4.2.2",
+    "@ammarahmed/notifee-react-native": "^7.4.12",
+    "@ammarahmed/react-native-background-fetch": "^4.2.3",
     "@ammarahmed/react-native-eventsource": "1.1.0",
     "@ammarahmed/react-native-fingerprint-scanner": "^5.0.1",
     "@ammarahmed/react-native-share-extension": "^2.9.5",

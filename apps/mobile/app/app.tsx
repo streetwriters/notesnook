@@ -127,8 +127,12 @@ export const withTheme = (Element: (props: any) => JSX.Element) => {
           .then((theme) => {
             if (theme) {
               theme.colorScheme === "dark"
-                ? useThemeStore.getState().setDarkTheme(theme)
-                : useThemeStore.getState().setLightTheme(theme);
+                ? useThemeStore.setState({
+                    darkTheme: theme
+                  })
+                : useThemeStore.setState({
+                    lightTheme: theme
+                  });
             }
           })
           .catch(() => {
@@ -138,9 +142,9 @@ export const withTheme = (Element: (props: any) => JSX.Element) => {
 
       const listener = Appearance.addChangeListener(({ colorScheme }) => {
         if (colorScheme && SettingsService.getProperty("useSystemTheme")) {
-          useThemeStore
-            .getState()
-            .setColorScheme(colorScheme as "light" | "dark");
+          useThemeStore.setState({
+            colorScheme: colorScheme as "light" | "dark"
+          });
         }
       });
       return () => {

@@ -159,7 +159,7 @@ function show(event: any, text: string, position = 2) {
     duration: 2000,
     autoHide: true,
     clickToHide: true,
-    shadow: true
+    shadow: false
   });
 }
 
