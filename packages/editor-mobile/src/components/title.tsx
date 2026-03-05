@@ -111,7 +111,7 @@ function Title({
         id="editor-title"
         rows={1}
         contentEditable={!readonly}
-        disabled={readonly}
+        readOnly={readonly}
         defaultValue={title}
         style={{
           height: 40,
