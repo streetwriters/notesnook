@@ -17,9 +17,10 @@ Notifications.init();
 
 enableFreeze(true);
 NetInfo.configure({
-  reachabilityUrl: "https://notesnook.com",
+  reachabilityUrl: "https://api.notesnook.com/health",
   reachabilityTest: (response) => {
     if (!response) return false;
+    console.log("reachabilty test", response.status);
     return response?.status >= 200 && response?.status < 300;
   }
 });
