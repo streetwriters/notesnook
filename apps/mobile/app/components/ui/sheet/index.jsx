@@ -159,7 +159,7 @@ const SheetWrapper = ({
         {bottomPadding ? (
           <View
             style={{
-              height: bottomInsets
+              height: 10
             }}
           />
         ) : null}
