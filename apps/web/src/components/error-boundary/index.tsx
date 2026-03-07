@@ -38,11 +38,36 @@ const IGNORED_ERRORS = [
   "network error",
   "NetworkError when attempting to fetch resource."
 ];
+
+const EXTENSION_URL_PREFIXES = [
+  "chrome-extension://",
+  "moz-extension://",
+  "safari-extension://",
+  "safari-web-extension://"
+];
+
+function isFromBrowserExtension(error: unknown): boolean {
+  const stack =
+    error instanceof Error
+      ? error.stack
+      : typeof error === "string"
+      ? error
+      : undefined;
+  if (stack && EXTENSION_URL_PREFIXES.some((prefix) => stack.includes(prefix)))
+    return true;
+  return false;
+}
+
 export function GlobalErrorHandler(props: PropsWithChildren) {
   const { showBoundary } = useErrorBoundary();
 
   useEffect(() => {
     function handleError(e: ErrorEvent) {
+      if (
+        e.filename &&
+        EXTENSION_URL_PREFIXES.some((prefix) => e.filename.startsWith(prefix))
+      )
+        return;
       const error = new Error(e.message);
       error.stack = `${e.filename}:${e.lineno}:${e.colno}`;
       showBoundary(e.error || error);
@@ -53,6 +78,7 @@ export function GlobalErrorHandler(props: PropsWithChildren) {
         IGNORED_ERRORS.includes(e.reason.message)
       )
         return;
+      if (isFromBrowserExtension(e.reason)) return;
       showBoundary(e.reason);
     }
     window.addEventListener("unhandledrejection", handleUnhandledRejection);
