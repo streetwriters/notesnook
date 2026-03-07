@@ -37,6 +37,7 @@ test("restore an unencrypted backup", async ({ page }) => {
   const settings = await app.goToSettings();
 
   await settings.restoreData("backup.nnbackup");
+  await app.toasts.waitForToast("Backup restored");
 
   await settings.close();
   const notes = await app.goToNotes();
@@ -66,6 +67,7 @@ test("restore an encrypted backup", async ({ page }) => {
   const settings = await app.goToSettings();
 
   await settings.restoreData("encrypted.nnbackup", USER.CURRENT.password);
+  await app.toasts.waitForToast("Backup restored");
 
   await settings.close();
   const notes = await app.goToNotes();

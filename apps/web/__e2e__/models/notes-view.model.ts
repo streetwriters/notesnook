@@ -53,6 +53,7 @@ export class NotesViewModel extends BaseViewModel {
     if (note.content) await this.editor.setContent(note.content);
 
     await this.editor.waitForSaving();
+    if (note.content) await this.editor.waitForContent(note.content);
     if (note.title) await this.waitForItem(note.title);
     return await this.findNote(note);
   }
