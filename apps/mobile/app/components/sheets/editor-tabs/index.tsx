@@ -102,9 +102,17 @@ const TabItemComponent = (props: {
         {props.tab.session?.noteLocked ? (
           <>
             {props.tab.session?.locked ? (
-              <Icon size={AppFontSize.md} name="lock" />
+              <Icon
+                size={AppFontSize.md}
+                name="lock"
+                color={colors.primary.icon}
+              />
             ) : (
-              <Icon size={AppFontSize.md} name="lock-open-outline" />
+              <Icon
+                size={AppFontSize.md}
+                name="lock-open-outline"
+                color={colors.primary.icon}
+              />
             )}
           </>
         ) : null}
