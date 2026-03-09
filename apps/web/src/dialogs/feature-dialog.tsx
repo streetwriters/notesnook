@@ -91,34 +91,19 @@ const features: Record<FeatureKeys, Feature> = {
         ]
       : [
           {
-            title: "Import/export tables as CSV",
+            title: "Audio files are now playable in the editor",
             subtitle:
-              "You can now import and export CSV files as tables directly in the editor."
+              "You can now play audio files directly in the editor without needing to download them first."
           },
           {
-            title: "Customizable monograph title",
+            title: "Orphaned attachmetns are now automatically deleted",
             subtitle:
-              "You can now set a custom title for your monographs different from the note title."
+              "Attachments that are not linked to any note will now be automatically deleted to save space."
           },
           {
-            title: "Expiring notes",
+            title: "Password changing & account recovery has been fixed",
             subtitle:
-              "Set an expiration date for your notes after which they will be automatically moved to trash."
-          },
-          {
-            title: "Change note's created date",
-            subtitle:
-              "You can now change a note's created date from the note properties panel."
-          },
-          {
-            title: "Customizable line height",
-            subtitle:
-              "You can now customize the line height in the editor from Settings > Editor."
-          },
-          {
-            title: "Change week starting day",
-            subtitle:
-              "You can now change the starting day of the week from Settings > Behaviour."
+              "You should no longer face data loss issues when changing your password or recovering your account."
           }
         ],
     cta: {
