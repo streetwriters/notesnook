@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import dayjs from "dayjs";
 import { AppModel } from "./models/app.model";
 import {
   test,
@@ -454,9 +455,11 @@ test("edit note creation date in properties panel", async ({ page }) => {
   const notes = await app.goToNotes();
   const note = await notes.createNote(NOTE);
 
-  const date = new Date("2020-01-15T10:30:00Z");
-  await note?.properties.editDateCreated(date.valueOf());
+  const date = dayjs().subtract(7, "day");
+  await note?.properties.editDateCreated(date);
 
   const dateCreated = await note?.properties.getDateCreated();
-  expect(dateCreated).toBe("15-01-2020 03:30 PM");
+  expect(date.format("YYYY-MM-DD HH:mm")).toBe(
+    dayjs(dateCreated).format("YYYY-MM-DD HH:mm")
+  );
 });
