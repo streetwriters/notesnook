@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useRef, useState } from "react";
 import { TextInput, View } from "react-native";
-import ActionSheet from "react-native-actions-sheet";
 import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
 import { ToastManager } from "../../services/event-manager";
@@ -35,9 +34,9 @@ import Paragraph from "../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../utils/styles";
 
-export const ForgotPassword = () => {
+export const ForgotPassword = ({ userEmail }: { userEmail: string }) => {
   const { colors } = useThemeColors("sheet");
-  const email = useRef<string>(undefined);
+  const email = useRef<string>(userEmail);
   const emailInputRef = useRef<TextInput>(null);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -87,94 +86,76 @@ export const ForgotPassword = () => {
 
   return (
     <>
-      <ActionSheet
-        onBeforeShow={(data) => (email.current = data)}
-        onClose={() => {
-          setSent(false);
-          setLoading(false);
-        }}
-        onOpen={() => {
-          emailInputRef.current?.setNativeProps({
-            text: email.current
-          });
-        }}
-        indicatorStyle={{
-          width: 100
-        }}
-        gestureEnabled
-        id="forgotpassword_sheet"
-      >
-        {sent ? (
-          <View
+      {sent ? (
+        <View
+          style={{
+            padding: DefaultAppStyles.GAP,
+            justifyContent: "center",
+            alignItems: "center",
+            paddingBottom: 50
+          }}
+        >
+          <IconButton
             style={{
-              padding: DefaultAppStyles.GAP,
-              justifyContent: "center",
-              alignItems: "center",
-              paddingBottom: 50
+              width: null,
+              height: null
+            }}
+            color={colors.primary.accent}
+            name="email"
+            size={50}
+          />
+          <Heading>{strings.recoveryEmailSent()}</Heading>
+          <Paragraph
+            style={{
+              textAlign: "center"
             }}
           >
-            <IconButton
-              style={{
-                width: null,
-                height: null
-              }}
-              color={colors.primary.accent}
-              name="email"
-              size={50}
-            />
-            <Heading>{strings.recoveryEmailSent()}</Heading>
-            <Paragraph
-              style={{
-                textAlign: "center"
-              }}
-            >
-              {strings.recoveryEmailSentDesc()}
-            </Paragraph>
-          </View>
-        ) : (
-          <View
-            style={{
-              borderRadius: DDS.isTab ? 5 : 0,
-              backgroundColor: colors.primary.background,
-              zIndex: 10,
-              width: "100%",
-              padding: DefaultAppStyles.GAP
+            {strings.recoveryEmailSentDesc()}
+          </Paragraph>
+        </View>
+      ) : (
+        <View
+          style={{
+            borderRadius: DDS.isTab ? 5 : 0,
+            backgroundColor: colors.primary.background,
+            zIndex: 10,
+            width: "100%",
+            padding: DefaultAppStyles.GAP
+          }}
+        >
+          <DialogHeader title={strings.accountRecovery()} />
+          <Seperator />
+
+          <Input
+            fwdRef={emailInputRef}
+            onChangeText={(value) => {
+              email.current = value;
             }}
-          >
-            <DialogHeader title={strings.accountRecovery()} />
-            <Seperator />
+            defaultValue={email.current}
+            onErrorCheck={(e) => setError(e)}
+            returnKeyLabel={strings.next()}
+            returnKeyType="next"
+            autoComplete="email"
+            validationType="email"
+            autoCorrect={false}
+            autoCapitalize="none"
+            errorMessage={strings.emailInvalid()}
+            placeholder={strings.email()}
+            onSubmit={() => {}}
+          />
 
-            <Input
-              fwdRef={emailInputRef}
-              onChangeText={(value) => {
-                email.current = value;
-              }}
-              defaultValue={email.current}
-              onErrorCheck={(e) => setError(e)}
-              returnKeyLabel={strings.next()}
-              returnKeyType="next"
-              autoComplete="email"
-              validationType="email"
-              autoCorrect={false}
-              autoCapitalize="none"
-              errorMessage={strings.emailInvalid()}
-              placeholder={strings.email()}
-              onSubmit={() => {}}
-            />
-
-            <Button
-              style={{
-                marginTop: DefaultAppStyles.GAP_VERTICAL,
-                width: "100%"
-              }}
-              loading={loading}
-              onPress={sendRecoveryEmail}
-              type="accent"
-              title={loading ? null : strings.next()}
-            />
-          </View>
-        )}
-      </ActionSheet>
+          <Button
+            style={{
+              marginTop: DefaultAppStyles.GAP_VERTICAL,
+              width: "100%"
+            }}
+            loading={loading}
+            onPress={sendRecoveryEmail}
+            type="accent"
+            title={loading ? null : strings.next()}
+          />
+        </View>
+      )}
     </>
   );
 };

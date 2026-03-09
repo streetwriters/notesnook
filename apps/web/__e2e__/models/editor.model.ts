@@ -24,7 +24,7 @@ import { iterateList } from "./utils";
 
 export class EditorModel {
   private readonly page: Page;
-  private readonly title: Locator;
+  readonly title: Locator;
   readonly content: Locator;
   private readonly tags: Locator;
   private readonly tagInput: Locator;
@@ -88,8 +88,9 @@ export class EditorModel {
       { expected: title }
     );
 
-    if (content !== undefined)
-      await this.content.locator(":scope", { hasText: content }).waitFor();
+    if (content !== undefined) {
+      await this.waitForContent(content);
+    }
   }
 
   async waitForUnloading() {
@@ -107,6 +108,22 @@ export class EditorModel {
     await this.page.locator(".active").locator(getTestId("tags")).waitFor();
     await this.searchButton.waitFor();
     await this.wordCountText.waitFor();
+  }
+
+  async waitForContent(text: string) {
+    await this.page.waitForFunction(
+      ({ expected }) => {
+        const contentElement = document.querySelector(
+          `.active .ProseMirror`
+        ) as HTMLElement | null;
+        if (contentElement)
+          return contentElement.innerText
+            .replace(/\s+/g, "")
+            .includes(expected.replace(/\s+/g, ""));
+        return false;
+      },
+      { expected: text }
+    );
   }
 
   async isUnloaded() {
@@ -128,7 +145,7 @@ export class EditorModel {
       await this.title.focus();
       await this.title.selectText();
       await this.title.press("ArrowRight");
-      await this.title.type(text, { delay });
+      await this.title.pressSequentially(text, { delay });
     });
   }
 
@@ -136,6 +153,7 @@ export class EditorModel {
     await this.editAndWait(async () => {
       await this.content.focus();
       await this.content.pressSequentially(text);
+      await this.waitForContent(text);
     });
   }
 
@@ -143,6 +161,7 @@ export class EditorModel {
     await this.editAndWait(async () => {
       await this.selectAll();
       await this.content.press("Backspace");
+      await this.waitForContent("");
     });
   }
 

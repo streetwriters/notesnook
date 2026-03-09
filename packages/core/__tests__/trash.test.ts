@@ -23,7 +23,8 @@ import {
   notebookTest,
   TEST_NOTE,
   TEST_NOTEBOOK,
-  databaseTest
+  databaseTest,
+  loginFakeUser
 } from "./utils/index.js";
 import { test, expect } from "vitest";
 

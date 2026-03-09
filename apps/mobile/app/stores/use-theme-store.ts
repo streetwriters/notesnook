@@ -76,18 +76,14 @@ export const useThemeStore = create<ThemeStore>((set, get) => ({
     ? (Appearance.getColorScheme() as "dark" | "light")
     : SettingsService.get().colorScheme,
   setDarkTheme: (darkTheme) => {
-    switchThemeWithAnimation(() => {
-      set({ darkTheme });
-      changeSystemBarColors();
-      SettingsService.setProperty("darkTheme", darkTheme);
-    });
+    set({ darkTheme });
+    changeSystemBarColors();
+    SettingsService.setProperty("darkTheme", darkTheme);
   },
   setLightTheme: (lightTheme) => {
-    switchThemeWithAnimation(() => {
-      set({ lightTheme });
-      changeSystemBarColors();
-      SettingsService.setProperty("lighTheme", lightTheme);
-    });
+    set({ lightTheme });
+    changeSystemBarColors();
+    SettingsService.setProperty("lighTheme", lightTheme);
   },
   setColorScheme: (colorScheme) => {
     switchThemeWithAnimation(() => {

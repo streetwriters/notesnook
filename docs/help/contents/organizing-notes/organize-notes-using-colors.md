@@ -31,9 +31,41 @@ Colors are a simple and quick way to organize your notes.
 
 ## Color Shortcuts
 
-Once you add some notes to a color, it will appear on the Side Menu.
+By default, all created colors are displayed in the side menu.
 
 ![Colored note](/colored-note-sidemenu.png)
+
+### Hiding Shortcuts
+
+Shortcuts can be hidden on mobile and desktop/web.
+
+# [Desktop/Web](#/tab/web)
+
+1. Right click on the side menu.
+2. Select the color you wish to hide.
+
+# [Mobile](#/tab/mobile)
+
+1. Hold down on a color in the menu. A pop-up menu will appear.
+2. Select `Reorder`.
+3. Select the minus (`-`) button for each color you wish to hide.
+
+---
+
+### Bringing Back Hidden Shortcuts
+
+# [Desktop/Web](#/tab/web)
+
+1. Right click on the side menu.
+2. Select the color you wish to unhide.
+
+# [Mobile](#/tab/mobile)
+
+1. Hold down on an item in the menu. A pop-up menu will appear.
+2. Select `Reorder`.
+3. Select the plus (`+`) button for each color you wish to unhide.
+
+---
 
 ## Renaming a color
 
@@ -47,7 +79,7 @@ Colors can be renamed to anything you want.
 
 # [Mobile](#/tab/mobile)
 
-1. Long press on a color in Side menu
-2. Edit the color name and click "Save"
+1. Long press on a color in the side menu
+2. Edit the color name and tap "Save"
 
 ---

@@ -1,3 +1,8 @@
-- Bug fixes and minor improvements
+- Add support audio playback in editor
+- Sort tags assigned to a note on top when viewing and managing note tags
+- Fix account password changing and account recovery
+- Fix title is editable in readonly mode
+- Allow attaching image as file
+- Minor bug fixes and performance improvements
 
 Thank you for using Notesnook!

@@ -12,5 +12,5 @@ description: Notesnook Web Clipper is open source and available to download for 
 ## Firefox-based browsers
 
 1. Download the .xpi file from [here](https://notesnook.com/notesnook-web-clipper)
-2. Open `about:addons`
-3. Drag & drop the .xpi file
+2. A pop-up will appear, select "Continue to Installation".
+3. Select "Add".

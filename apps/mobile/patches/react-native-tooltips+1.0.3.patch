@@ -89,6 +89,50 @@ index 978045f..59c64f1 100644
 -    implementation 'com.github.florent37:viewtooltip:1.1.6'
 +    implementation 'com.github.florent37:ViewTooltip:f79a8955ef'
  }
+diff --git a/node_modules/react-native-tooltips/android/src/main/java/px/tooltips/RNTooltipsModule.java b/node_modules/react-native-tooltips/android/src/main/java/px/tooltips/RNTooltipsModule.java
+index e987ffb..e898a40 100644
+--- a/node_modules/react-native-tooltips/android/src/main/java/px/tooltips/RNTooltipsModule.java
++++ b/node_modules/react-native-tooltips/android/src/main/java/px/tooltips/RNTooltipsModule.java
+@@ -11,9 +11,11 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
+ import com.facebook.react.bridge.ReactMethod;
+ import com.facebook.react.bridge.Callback;
+ import com.facebook.react.bridge.ReadableMap;
+-import com.facebook.react.uimanager.UIManagerModule;
++import com.facebook.react.bridge.UIManager;
+ import com.facebook.react.uimanager.UIBlock;
+ import com.facebook.react.uimanager.NativeViewHierarchyManager;
++import com.facebook.react.uimanager.UIManagerHelper;
++import com.facebook.react.uimanager.common.UIManagerType;
+ import com.github.florent37.viewtooltip.ViewTooltip;
+ 
+ public class RNTooltipsModule extends ReactContextBaseJavaModule {
+@@ -34,12 +36,12 @@ public class RNTooltipsModule extends ReactContextBaseJavaModule {
+ 
+   @ReactMethod
+   public void Show(final int targetId, final int parentId, final ReadableMap props, final Callback onHide) {
+-      this.reactContext.getNativeModule(UIManagerModule.class).prependUIBlock(new UIBlock() {
+ 
+-        @Override
+-        public void execute(NativeViewHierarchyManager nativeViewHierarchyManager) {
+ 
+-          final ViewGroup target = (ViewGroup) nativeViewHierarchyManager.resolveView(targetId);
++          UIManager uiManager = UIManagerHelper.getUIManager(reactContext, UIManagerType.FABRIC);
++          if (uiManager == null) return;
++
++          final ViewGroup target = (ViewGroup) uiManager.resolveView(targetId);
+ 
+           reactContext.runOnUiQueueThread(new Runnable() {
+             @Override
+@@ -121,8 +123,7 @@ public class RNTooltipsModule extends ReactContextBaseJavaModule {
+             }
+ 
+           });
+-        }
+-      });
++
+   }
+ 
+   @ReactMethod
 diff --git a/node_modules/react-native-tooltips/ios/RNTooltips.h b/node_modules/react-native-tooltips/ios/RNTooltips.h
 index a150e3e..096ad86 100644
 --- a/node_modules/react-native-tooltips/ios/RNTooltips.h
@@ -116,7 +160,7 @@ index fb96466..75a6fdb 100644
  
  @interface TooltipDelegate : NSObject <SexyTooltipDelegate>
  
-@@ -7,9 +9,15 @@
+@@ -7,9 +9,15 @@ @interface TooltipDelegate : NSObject <SexyTooltipDelegate>
  @end
  
  @implementation TooltipDelegate
@@ -132,7 +176,7 @@ index fb96466..75a6fdb 100644
  }
  
  @end
-@@ -17,77 +25,120 @@
+@@ -17,77 +25,120 @@ - (void)tooltipDidDismiss:(SexyTooltip *)tooltip {
  
  @implementation RNTooltips
  

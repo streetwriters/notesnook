@@ -68,7 +68,7 @@ For maximum safety against potential data loss, you can enable daily, weekly or 
 
 ## Encrypted Backups (Recommended)
 
-To keep your backups secure & private, it is recommended that you enable encryption on your backup files instead of storing them as plaintext data. **Starting from v2.6.0, encrypted backups are enabled by default for all users, free or Pro.**
+To keep your backups secure & private, it is recommended that you enable encryption on your backup files instead of storing them as plaintext data. **Starting from v2.6.0, encrypted backups are enabled by default for all users.**
 
 # [Desktop/Web](#/tab/web)
 
@@ -104,7 +104,7 @@ At any point in time, you can restore a backup to recover lost data. However, **
 1. Go to Settings from Sidebar
 2. Scroll down to `Backup & Restore` section
 3. Tap on `Restore backup`
-4. From `Restore backup` sheet, select the backup you want to restore. If your backup file is located in some other location, click on `Restore from files` on top right corner of the sheet then select the backup file.
+4. From `Restore backup` sheet, select the backup you want to restore. If your backup file is located in some other location, tap on `Restore from files` on top right corner of the sheet then select the backup file.
 
 <img src="/restore-backup-mobile.png" height="700px">
 

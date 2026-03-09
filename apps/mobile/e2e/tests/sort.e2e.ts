@@ -21,7 +21,7 @@ import { notesnook } from "../test.ids";
 import { TestBuilder } from "./utils";
 
 describe("Sort & filter", () => {
-  it.only("Sort by date-edited/date-created", async () => {
+  it("Sort by date-edited/date-created", async () => {
     await TestBuilder.create()
       .prepare()
       .createNote("Note 1", "Note 1")
@@ -34,7 +34,7 @@ describe("Sort & filter", () => {
           .element(by.web.className("ProseMirror"))
           .typeText("Edited ", true);
       })
-      .pressBack(1)
+      .pressBack(2)
       .waitAndTapById("icon-sort")
       .wait(500)
       .waitAndTapByText("Date created")

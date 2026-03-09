@@ -35,6 +35,6 @@ To select new languages:
 
 ### My language is not included in the list
 
-While we'd love to include all the languages, we are dependent on Electron (which, in turn, depend on Chromium) for adding the required dictionaries.
+While we'd love to include all the languages, we are dependent on Electron (which, in turn, depends on Chromium) for adding the required dictionaries.
 
 It might be possible in the future to implement a custom spell checker to support all the languages.

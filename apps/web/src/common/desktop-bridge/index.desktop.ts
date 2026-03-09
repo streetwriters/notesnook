@@ -24,10 +24,13 @@ import { AppEventManager, AppEvents } from "../app-events";
 import { TaskScheduler } from "../../utils/task-scheduler";
 import { checkForUpdate } from "../../utils/updater";
 import { showToast } from "../../utils/toast";
+import { db } from "../db";
+import { logManager } from "@notesnook/core";
 
-export const desktop = createTRPCProxyClient<AppRouter>({
-  links: [ipcLink()]
-});
+export const desktop: ReturnType<typeof createTRPCProxyClient<AppRouter>> =
+  createTRPCProxyClient<AppRouter>({
+    links: [ipcLink()]
+  });
 
 attachListeners();
 function attachListeners() {
@@ -62,6 +65,13 @@ function attachListeners() {
     undefined,
     attachListener(AppEvents.updateError)
   );
+
+  desktop.window.onClose.subscribe(undefined, {
+    async onData() {
+      await db.sql().destroy();
+      await logManager?.close();
+    }
+  });
 
   TaskScheduler.register("updateCheck", "0 0 */12 * * * *", () => {
     checkForUpdate();

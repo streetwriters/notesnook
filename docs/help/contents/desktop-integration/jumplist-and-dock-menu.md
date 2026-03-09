@@ -16,7 +16,7 @@ Notesnook supports quick actions from the "jumplist" menu (dock menu on macOS):
 
 ---
 
-## How it works?
+## How does it work?
 
 Jumplist menu items are responsible for opening Notesnook at the specified page. For example:
 

@@ -95,6 +95,16 @@ async function deleteFile(filename: string, _requestOptions: RequestOptions) {
   return true;
 }
 
+async function bulkDeleteFiles(
+  filenames: string[],
+  _requestOptions: RequestOptions
+) {
+  for (const filename of filenames) {
+    await deleteFile(filename, _requestOptions);
+  }
+  return true;
+}
+
 async function exists(filename) {
   return hasItem(filename);
 }
@@ -109,6 +119,7 @@ export const FS: IFileStorage = {
   uploadFile: cancellable(uploadFile),
   downloadFile: cancellable(downloadFile),
   deleteFile,
+  bulkDeleteFiles,
   exists,
   clearFileStorage,
   hashBase64

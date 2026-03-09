@@ -17,6 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { test } from "@playwright/test";
+import { test } from "./utils";
 test.skip("TODO: pin 3 notebooks & make sure they can be unpinned", () => {});
 test.skip("TODO: pin 4 notebooks & make sure 4th pin shows an error", () => {});

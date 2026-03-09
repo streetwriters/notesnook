@@ -534,15 +534,24 @@ export const useEditorEvents = (
         }
 
         case EditorEvents.getAttachmentData: {
-          const attachment = (editorMessage.value as any)
-            ?.attachment as Attachment;
+          const data = (editorMessage.value as any)?.attachment as Attachment;
 
+          const attachment = await db.attachments.attachment(data.hash);
+
+          if (!attachment) {
+            editor.postMessage(NativeEvents.resolve, {
+              resolverId: editorMessage.resolverId,
+              data: undefined
+            });
+            break;
+          }
           DatabaseLogger.log(
-            `Getting attachment data: ${attachment?.hash} ${attachment?.type}`
+            `Getting attachment data: ${attachment.mimeType} ${attachment.hash} ${data.type}`
           );
           downloadAttachment(attachment.hash, true, {
-            base64: attachment.type === "image",
-            text: attachment.type === "web-clip",
+            base64:
+              data.type === "image" || attachment.mimeType?.startsWith("audio"),
+            text: data.type === "web-clip",
             silent: true,
             groupId: editor.note.current?.id,
             cache: true
@@ -550,7 +559,7 @@ export const useEditorEvents = (
             .then((data: any) => {
               console.log(
                 "Got attachment data:",
-                !!data,
+                data,
                 editorMessage.resolverId
               );
               editor.postMessage(NativeEvents.resolve, {

@@ -53,7 +53,8 @@ import {
   eSendEvent,
   eSubscribeEvent,
   openVault,
-  presentSheet
+  presentSheet,
+  VaultRequestType
 } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import Notifications from "../../services/notifications";
@@ -62,7 +63,11 @@ import SettingsService from "../../services/settings";
 import Sync from "../../services/sync";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
-import { eCloseSheet, eOpenRecoveryKeyDialog } from "../../utils/events";
+import {
+  eAfterSync,
+  eCloseSheet,
+  eOpenRecoveryKeyDialog
+} from "../../utils/events";
 import { NotesnookModule } from "../../utils/notesnook-module";
 import { sleep } from "../../utils/time";
 import { MFARecoveryCodes, MFASheet } from "./2fa";
@@ -72,8 +77,49 @@ import { logoutUser } from "./logout";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
 import { EDITOR_LINE_HEIGHT } from "../../utils/constants";
+import { MMKV } from "../../common/database/mmkv";
+import { resetTabStore } from "../editor/tiptap/use-tab-store";
+import { clearAllStores } from "../../stores";
+import { refreshAllStores } from "../../stores/create-db-collection-store";
 
 export const settingsGroups: SettingSection[] = [
+  {
+    id: "account-local",
+    name: strings.account(),
+    useHook: () => useUserStore((state) => state.user),
+    hidden: (current) => !!current,
+    sections: [
+      {
+        id: "delete-data",
+        name: strings.deleteData(),
+        description: strings.deleteAccountDesc(),
+        modifer: () => {
+          presentDialog({
+            title: strings.deleteData(),
+            paragraph: strings.irreverisibleAction(),
+            positiveType: "errorShade",
+            positiveText: "Delete data",
+            positivePress: async () => {
+              await PremiumService.setPremiumStatus();
+              await BiometricService.resetCredentials();
+              MMKV.clearStore();
+              resetTabStore();
+              clearAllStores();
+              Navigation.queueRoutesForUpdate();
+              SettingsService.resetSettings();
+              db.reset();
+
+              setImmediate(() => {
+                refreshAllStores();
+                eSendEvent(eAfterSync);
+              });
+              return true;
+            }
+          });
+        }
+      }
+    ]
+  },
   {
     id: "account",
     name: strings.account(),
@@ -286,17 +332,10 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "change-password",
             name: strings.changePassword(),
-            // type: "screen",
+            type: "screen",
             description: strings.changePasswordDesc(),
-            // component: "change-password",
-            icon: "form-textbox-password",
-            modifer: () => {
-              ToastManager.show({
-                type: "info",
-                message:
-                  "Password changing has been disabled temporarily to address some issues faced by users. It will be enabled again once the issues have resolved."
-              });
-            }
+            component: "change-password",
+            icon: "form-textbox-password"
           },
           {
             id: "change-email",
@@ -929,8 +968,9 @@ export const settingsGroups: SettingSection[] = [
             hidden: (current) => (current as VaultStatusType)?.exists,
             modifer: () => {
               openVault({
-                novault: false,
-                title: strings.createVault()
+                requestType: VaultRequestType.CreateVault,
+                title: strings.createVault(),
+                buttonTitle: strings.create()
               });
             }
           },
@@ -942,9 +982,9 @@ export const settingsGroups: SettingSection[] = [
             hidden: (current) => !(current as VaultStatusType)?.exists,
             modifer: () =>
               openVault({
-                changePassword: true,
-                novault: true,
-                title: strings.changeVaultPassword()
+                requestType: VaultRequestType.ChangePassword,
+                title: strings.changeVaultPassword(),
+                buttonTitle: strings.change()
               })
           },
           {
@@ -955,9 +995,10 @@ export const settingsGroups: SettingSection[] = [
             hidden: (current) => !(current as VaultStatusType)?.exists,
             modifer: () => {
               openVault({
-                clearVault: true,
-                novault: true,
-                title: strings.clearVault() + "?"
+                requestType: VaultRequestType.ClearVault,
+                title: strings.clearVault() + "?",
+                buttonTitle: strings.clear(),
+                positiveButtonType: "errorShade"
               });
             }
           },
@@ -969,9 +1010,10 @@ export const settingsGroups: SettingSection[] = [
             hidden: (current) => !(current as VaultStatusType)?.exists,
             modifer: () => {
               openVault({
-                deleteVault: true,
-                novault: true,
-                title: strings.deleteVault() + "?"
+                requestType: VaultRequestType.DeleteVault,
+                title: strings.deleteVault() + "?",
+                buttonTitle: strings.delete(),
+                positiveButtonType: "errorShade"
               });
             }
           },
@@ -989,13 +1031,15 @@ export const settingsGroups: SettingSection[] = [
             getter: (current) => (current as VaultStatusType)?.biometryEnrolled,
             modifer: (current) => {
               const _current = current as VaultStatusType;
+              const isRevoking = _current.biometryEnrolled;
               openVault({
-                fingerprintAccess: !_current.biometryEnrolled,
-                revokeFingerprintAccess: _current.biometryEnrolled,
-                novault: true,
-                title: _current.biometryEnrolled
+                requestType: isRevoking
+                  ? VaultRequestType.RevokeFingerprint
+                  : VaultRequestType.EnableFingerprint,
+                title: isRevoking
                   ? strings.revokeBiometricUnlock()
-                  : strings.vaultEnableBiometrics()
+                  : strings.vaultEnableBiometrics(),
+                buttonTitle: isRevoking ? strings.revoke() : strings.enable()
               });
             }
           }

@@ -241,6 +241,7 @@ export const NotebookItem = ({
               name="plus"
               size={AppFontSize.md}
               testID={`add-notebook-${index}`}
+              color={colors.primary.icon}
               top={0}
               left={0}
               bottom={0}

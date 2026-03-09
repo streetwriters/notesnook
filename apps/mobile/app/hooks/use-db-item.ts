@@ -60,23 +60,17 @@ export const useDBItem = <T extends keyof ItemTypeKey>(
 ): [ItemTypeKey[T] | undefined, () => void] => {
   const [item, setItem] = useState<ItemTypeKey[T]>();
   const itemIdRef = useRef<string>(undefined);
-  const prevIdOrIndexRef = useRef<string | number>(undefined);
-
-  if (prevIdOrIndexRef.current !== idOrIndex) {
-    itemIdRef.current = undefined;
-    prevIdOrIndexRef.current = idOrIndex;
-  }
+  const itemsRef = useRef(item);
+  itemsRef.current = item;
 
   useEffect(() => {
     const onUpdateItem = async (itemId?: string) => {
       if (typeof itemId === "string" && itemId !== itemIdRef.current) return;
       if (!isValidIdOrIndex(idOrIndex)) return;
 
+      let item: ItemTypeKey[T] | undefined = undefined;
       if (items && typeof idOrIndex === "number") {
-        const item = (await items.item(idOrIndex))?.item;
-        setItem(item);
-        itemIdRef.current = item?.id;
-        onItemUpdated?.(item);
+        item = (await items.item(idOrIndex))?.item;
       } else {
         if (!(db as any)[type + "s"][type]) {
           console.warn(
@@ -84,24 +78,30 @@ export const useDBItem = <T extends keyof ItemTypeKey>(
             `db.${type}s.${type}(id: string)`
           );
         } else {
-          const item = await (db as any)[type + "s"]?.[type]?.(
-            idOrIndex as string
-          );
-          setItem(item);
-          itemIdRef.current = item.id;
-          onItemUpdated?.(item);
+          item = await (db as any)[type + "s"]?.[type]?.(idOrIndex as string);
         }
       }
-    };
 
+      if (
+        itemsRef.current === item ||
+        itemsRef.current?.dateModified === item?.dateModified
+      )
+        return;
+      setItem(item);
+      itemIdRef.current = item?.id;
+      onItemUpdated?.(item);
+    };
+    let unsub: (() => void) | undefined;
     if (
       useSettingStore.getState().isAppLoading &&
       //@ts-ignore
       !globalThis["IS_SHARE_EXTENSION"]
     ) {
-      useSettingStore.subscribe((state) => {
+      unsub = useSettingStore.subscribe((state) => {
         if (!state.isAppLoading) {
           onUpdateItem();
+          unsub?.();
+          unsub = undefined;
         }
       });
     } else {
@@ -109,9 +109,10 @@ export const useDBItem = <T extends keyof ItemTypeKey>(
     }
     eSubscribeEvent(eDBItemUpdate, onUpdateItem);
     return () => {
+      unsub?.();
       eUnSubscribeEvent(eDBItemUpdate, onUpdateItem);
     };
-  }, [idOrIndex, type, items, onItemUpdated]);
+  }, [idOrIndex, type, items]);
 
   return [
     isValidIdOrIndex(idOrIndex) ? (item as ItemTypeKey[T]) : undefined,
@@ -134,8 +135,9 @@ export const useNoteLocked = (noteId: string | undefined) => {
       //@ts-ignore
       !globalThis["IS_SHARE_EXTENSION"]
     ) {
-      useSettingStore.subscribe((state) => {
+      let unsub = useSettingStore.subscribe((state) => {
         if (!state.isAppLoading) {
+          unsub();
           db.vaults
             .itemExists({
               type: "note",
@@ -181,25 +183,27 @@ export const useTotalNotes = (type: "notebook" | "tag" | "color") => {
   const [totalNotesById, setTotalNotesById] = useState<{
     [id: string]: number;
   }>({});
+  const totalNotesRef = useRef(0);
 
-  const getTotalNotes = React.useCallback(
-    (ids: string[]) => {
-      if (!ids || !ids.length || !type) return;
-      db.relations
-        .from({ type: type, ids: ids as string[] }, ["note"])
-        .get()
-        .then((relations) => {
-          const totalNotesById: any = {};
-          for (const id of ids) {
-            totalNotesById[id] = relations.filter(
-              (relation) => relation.fromId === id && relation.toType === "note"
-            )?.length;
-          }
-          setTotalNotesById(totalNotesById);
-        });
-    },
-    [type]
-  );
+  const getTotalNotes = React.useCallback((ids: string[]) => {
+    if (!ids || !ids.length || !type) return;
+    db.relations
+      .from({ type: type, ids: ids as string[] }, ["note"])
+      .get()
+      .then((relations) => {
+        const totalNotesById: any = {};
+
+        for (const id of ids) {
+          totalNotesById[id] = relations.filter(
+            (relation) => relation.fromId === id && relation.toType === "note"
+          )?.length;
+        }
+
+        if (totalNotesById === totalNotesRef.current) return;
+        totalNotesRef.current = totalNotesById;
+        setTotalNotesById(totalNotesById);
+      });
+  }, []);
 
   return {
     totalNotes: (id: string) => {

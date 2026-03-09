@@ -27,7 +27,7 @@ You can purchase a gift card from [https://notesnook.com/giftcards](https://note
 
 > info
 >
-> You won't be able to redeem a gift code if you already have a Notesnook subscription (even if its cancelled).
+> You can't redeem a gift code on an account with an active Notesnook subscription. A cancelled subscription is still active until its current billing period ends.
 
 # [Desktop/Web](#/tab/web)
 
@@ -42,16 +42,16 @@ You can purchase a gift card from [https://notesnook.com/giftcards](https://note
 
 1. Go to `Settings`
 2. Go to `Account settings`
-3. Click on `Redeem a gift code`
+3. Tap on `Redeem a gift code`
 4. Enter the gift code you received
-5. Click on `Redeem` and wait for the app to verify your gift code.
+5. Tap on `Redeem` and wait for the app to verify your gift code.
 6. Once the process succeeds, you should be upgraded to Pro.
 
 ---
 
 > info
 >
-> Once you redeem a gift code, the person who purchased it will receive an email informing them that one of their gift code was claimed. The email **does not** contain any information about who claimed the gift code.
+> Once you redeem a gift code, the person who purchased it will receive an email informing them that one of their gift codes was claimed. The email **does not** contain any information about who claimed the gift code.
 
 ## FAQs
 
@@ -61,7 +61,7 @@ Anyone who doesn't have a Notesnook Pro subscription can redeem a gift code and 
 
 ### Can I use a gift card to extend my subscription?
 
-No.
+No. Your subscription must completely end before you can redeem a gift card.
 
 ### Is there an expiry date to a gift code?
 

@@ -17,9 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { test, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
-import { NOTE } from "./utils";
+import { test, expect, NOTE } from "./utils";
 
 test("ask for image compression during image upload when 'Image Compression' setting is 'Ask every time'", async ({
   page

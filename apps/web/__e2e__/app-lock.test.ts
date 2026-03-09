@@ -17,9 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { test, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
-import { APP_LOCK_PASSWORD, USER } from "./utils";
+import { test, expect, APP_LOCK_PASSWORD, USER } from "./utils";
 
 test("don't show status bar lock app button to unauthenticated user", async ({
   page

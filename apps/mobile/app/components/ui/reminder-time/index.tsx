@@ -41,7 +41,9 @@ export const ReminderTime = ({
 } & ButtonProps) => {
   const { colors } = useThemeColors();
   const reminder = props.reminder;
-  const time = !reminder ? undefined : getFormattedReminderTime(reminder);
+  const time = !reminder
+    ? undefined
+    : getFormattedReminderTime(reminder, props.short || false);
   const isTodayOrTomorrow =
     (time?.includes("Today") || time?.includes("Tomorrow")) &&
     !time?.includes("Last");

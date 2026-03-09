@@ -1,0 +1,47 @@
+diff --git a/node_modules/prosemirror-codemark/dist/cjs/plugin.js b/node_modules/prosemirror-codemark/dist/cjs/plugin.js
+index 8cd0b87..768083c 100644
+--- a/node_modules/prosemirror-codemark/dist/cjs/plugin.js
++++ b/node_modules/prosemirror-codemark/dist/cjs/plugin.js
+@@ -4,7 +4,6 @@ exports.codemark = exports.getDecorationPlugin = void 0;
+ const prosemirror_state_1 = require("prosemirror-state");
+ const prosemirror_view_1 = require("prosemirror-view");
+ const utils_1 = require("./utils");
+-const inputRules_1 = require("./inputRules");
+ const actions_1 = require("./actions");
+ function toDom() {
+     const span = document.createElement('span');
+@@ -106,8 +105,8 @@ function getDecorationPlugin(opts) {
+ exports.getDecorationPlugin = getDecorationPlugin;
+ function codemark(opts) {
+     const cursorPlugin = getDecorationPlugin(opts);
+-    const inputRule = (0, inputRules_1.createInputRule)(cursorPlugin, opts);
+-    const rules = [cursorPlugin, inputRule];
++    // const inputRule = (0, inputRules_1.createInputRule)(cursorPlugin, opts);
++    const rules = [cursorPlugin];
+     return rules;
+ }
+ exports.codemark = codemark;
+diff --git a/node_modules/prosemirror-codemark/dist/esm/plugin.js b/node_modules/prosemirror-codemark/dist/esm/plugin.js
+index c530022..a71d29e 100644
+--- a/node_modules/prosemirror-codemark/dist/esm/plugin.js
++++ b/node_modules/prosemirror-codemark/dist/esm/plugin.js
+@@ -1,7 +1,6 @@
+ import { Plugin } from 'prosemirror-state';
+ import { Decoration, DecorationSet } from 'prosemirror-view';
+ import { getMarkType, pluginKey, safeResolve } from './utils';
+-import { createInputRule } from './inputRules';
+ import { onArrowLeft, onArrowRight, onBackspace, onBacktick, onDelete, stepOutside, stepOutsideNextTrAndPass, } from './actions';
+ function toDom() {
+     const span = document.createElement('span');
+@@ -102,8 +101,8 @@ export function getDecorationPlugin(opts) {
+ }
+ export function codemark(opts) {
+     const cursorPlugin = getDecorationPlugin(opts);
+-    const inputRule = createInputRule(cursorPlugin, opts);
+-    const rules = [cursorPlugin, inputRule];
++    // const inputRule = createInputRule(cursorPlugin, opts);
++    const rules = [cursorPlugin];
+     return rules;
+ }
+ //# sourceMappingURL=plugin.js.map
+\ No newline at end of file

@@ -3,10 +3,8 @@
 </p>
 
 <h1 align="center">Notesnook Mobile</h1>
-<h3 align="center">The mobile app is built using React Native, Typescript & Javascript for both iOS & Android.</h3>
-<p align="center">
-<a href="#developer-guide">Developer guide</a> | <a href="#build-instructions">How to build?</a>
-</p>
+<h3 align="center">The mobile app is built with React Native for both iOS and Android.</h3>
+<p align="center"><a href="#build-instructions">Build instructions</a> | <a href="#developer-guide">Developer guide</a> | <a href="#running-e2e-tests-detox">E2E tests</a></p>
 
 <p align="center">
     <a href="https://play.google.com/store/apps/details?id=com.streetwriters.notesnook">
@@ -25,21 +23,21 @@
 
 Requirements:
 
-1. [Node.js](https://nodejs.org/en/download/)
+1. [Node.js](https://nodejs.org/en/download/) 20+ (the repo is pinned to Node `22.20.0` via Volta)
 2. [git](https://git-scm.com/downloads)
-3. NPM (not yarn or pnpm)
-4. [React Native](https://reactnative.dev/docs/environment-setup)
+3. `npm`
+4. [React Native environment setup](https://reactnative.dev/docs/set-up-your-environment)
 
-To run the app locally, you will need to setup React Native on your system:
+To run the app locally, first complete React Native native tooling setup:
 
-1. Open the official [environment setup guide here](https://reactnative.dev/docs/environment-setup)
+1. Open [React Native environment setup](https://reactnative.dev/docs/set-up-your-environment)
 2. Select `React Native CLI Quickstart`
-3. Select your OS & the platform to run the app on (iOS or Android)
+3. Select your OS and target platform(s): iOS and/or Android
 4. Follow the steps listed.
 
-> Please keep in mind that **Expo is not supported**.
+> Expo is not used in this project.
 
-Once you have completed the setup, the first step is to `clone` the monorepo:
+Clone the monorepo:
 
 ```bash
 git clone https://github.com/streetwriters/notesnook.git
@@ -48,26 +46,27 @@ git clone https://github.com/streetwriters/notesnook.git
 cd notesnook
 ```
 
-Once you are inside the `./notesnook` directory, run the preparation step:
+Install dependencies and bootstrap the mobile workspace:
 
 ```bash
 # this might take a while to complete
 npm install
+npm run bootstrap -- --scope=mobile
 ```
 
 ### Running the app on Android
 
-[Setup an Android emulator from Android Studio](https://developer.android.com/studio/run/managing-avds) if you haven't already, and then run the following command to start the app in the Emulator:
+[Set up an Android emulator from Android Studio](https://developer.android.com/studio/run/managing-avds) (or connect a physical device), then run:
 
 ```bash
 npm run start:android
 ```
 
-If you want to run the app on your phone, make sure to [enable USB debugging](https://developer.android.com/studio/debug/dev-options).
+If you are using a physical device, enable [USB debugging](https://developer.android.com/studio/debug/dev-options).
 
 ### Running the app on iOS
 
-To run the app on iOS:
+Install CocoaPods dependencies first, then run the iOS app:
 
 ```bash
 # this might take a while to complete
@@ -76,90 +75,87 @@ npm run prepare:ios
 npm run start:ios
 ```
 
+### Useful development commands
+
+```bash
+# start Metro only
+npm run start:metro
+
+# start Re.Pack bundler
+npm run start:repack
+```
+
 ## Developer guide
 
-> This project is in a transition state between Javascript & Typescript. We are gradually porting everything over to Typescript, so if you can help with that, it'd be great!
+> The mobile app is a mixed TypeScript/JavaScript codebase.
 
 ### The tech stack
 
 We try to keep the stack as lean as possible:
 
-1. React Native
-2. Typescript/Javascript
-3. Zustand: State management
-4. Detox: Runs all our e2e tests
-5. React Native MMKV: Database & persistence
-6. libsodium: Encryption
+1. React Native `0.82`
+2. React `19`
+3. TypeScript + JavaScript
+4. Zustand (state management)
+5. Detox (end-to-end testing)
+6. libsodium (encryption)
 
 ### Project structure
 
-The app codebase is distributed over two primary directories. `native/` and `app/`.
+Top-level directories in `apps/mobile/`:
 
-- `native/`: Includes `android/` and `ios/` folders and everything related to react native core functionality like bundling, development, and packaging. Any react-native dependency with native code, i.e., android & ios folders, is installed here.
+- `app/`: Main React Native app source (`components`, `common`, `hooks`, `navigation`, `screens`, `services`, `stores`, `utils`, etc.)
+- `android/`: Android native project
+- `ios/`: iOS native project
+- `e2e/`: Detox test suite and config
+- `patches/`: `patch-package` patches
+- `scripts/`: Mobile-specific scripts
 
-- `app/`: Includes all the app code other than the native part. All JS-only dependencies are installed here.
-  - `components/`: Each component serves a specific purpose in the app UI. For example, the `Paragraph` component is used to render paragraphs in the app, and a `Header` component is used to render a `header` on all screens.
-  - `common/`: Features that are integral to the app's functionality. For example, the notesnook core is initialized here.
-  - `hooks/`: Hooks for different app logic
-  - `navigation/`: Includes app navigation-specific code. Here the app navigation, editor & side menu are rendered side by side in fluid tabs.
-  - `screens`: Navigator screens.
-  - `services`: Parts of code that do a specific function. For example, the `sync` service runs Sync from anywhere in the app.
-  - `stores`: We use `zustand` for global state management in the app. Multiple stores provide the state for different parts of the app.
-  - `utils`: General purpose stuff such as constant values, utility functions, etc.
+## Running E2E tests (Detox)
 
-There are several other folders at the root:
+Detox device defaults in this repo:
 
-- `share/`: Code for the iOS Share Extension and Android widget.
-- `e2e/`: Detox End to end tests
-- `patches/`: Patches for various react native dependencies.
-
-### Running the tests
-
-When you are done making the required changes, you must run the tests to ensure you didn't break anything. We use Detox as the testing framework & the tests can be started as follows:
+- Android emulator: `Pixel_5_API_36`
+- iOS simulator: `iPhone 17 Pro Max`
 
 ### Android
 
-To run the tests on Android, you will need to create an emulator device on your system:
+Build and run Android Detox tests:
 
-```
-$ANDROID_HOME/tools/bin/avdmanager create avd -n Pixel_5_API_31 -d pixel --package "system-images;android-31;default;x86_64"
-```
-
-If you face problems, follow the detailed guide in [Detox documentation](https://wix.github.io/Detox/docs/introduction/android-dev-env). Keep the emulator name set to `Pixel_5_API_31`.
-
-Once you have created an emulator device, build the Android apks:
-
-```
+```bash
 npm run build:android
-```
-
-Finally, run the tests:
-
-```
 npm run test:android
+```
+
+For debug configuration:
+
+```bash
+npm run build:android:debug
+npm run start:metro
+npm run test:android:debug
 ```
 
 ### iOS
 
-To run e2e tests on the iOS simulator, you must be on a Mac with XCode installed.
+Build and run iOS Detox tests:
 
-First, install [AppleSimulatorUtils](https://github.com/wix/AppleSimulatorUtils):
-
+```bash
+npm run build:ios
+npm run test:ios
 ```
+
+If simulator tooling is missing, install [AppleSimulatorUtils](https://github.com/wix/AppleSimulatorUtils):
+
+```bash
 brew tap wix/brew
 brew install applesimutils
 ```
 
-Now build the iOS app for testing:
+## Release commands
 
-```
-npm run build:ios
-```
+Android release helpers:
 
-Finally, run the tests:
-
+```bash
+npm run release:android
+npm run release:android:bundle
 ```
-npm run test:ios
-```
-
-All tests on iOS are configured to run on `iPhone 8` simulator.

@@ -23,6 +23,7 @@ import { MoreTools } from "../components/more-tools.js";
 import { useToolbarLocation } from "../stores/toolbar-store.js";
 import { findSelectedNode } from "../../utils/prosemirror.js";
 import { Attachment } from "../../extensions/attachment/index.js";
+import { Editor } from "../../types.js";
 
 export function AttachmentSettings(props: ToolProps) {
   const { editor } = props;
@@ -52,9 +53,7 @@ export function DownloadAttachment(props: ToolProps) {
       title={props.title}
       toggled={false}
       onClick={() => {
-        const attachmentNode =
-          findSelectedNode(editor, "attachment") ||
-          findSelectedNode(editor, "image");
+        const attachmentNode = findAttachmentNode(editor);
 
         const attachment = (attachmentNode?.attrs || {}) as Attachment;
         editor.storage.downloadAttachment?.(attachment);
@@ -65,8 +64,7 @@ export function DownloadAttachment(props: ToolProps) {
 
 export function PreviewAttachment(props: ToolProps) {
   const { editor } = props;
-  const attachmentNode =
-    findSelectedNode(editor, "attachment") || findSelectedNode(editor, "image");
+  const attachmentNode = findAttachmentNode(editor);
   const attachment = (attachmentNode?.attrs || {}) as Attachment;
 
   if (!editor.isActive("image") && !canPreviewAttachment(attachment))
@@ -102,7 +100,7 @@ export function RemoveAttachment(props: ToolProps) {
 }
 
 const previewableFileExtensions = ["pdf"];
-const previewableMimeTypes = ["application/pdf"];
+const previewableMimeTypes = ["application/pdf", "image/"];
 
 function canPreviewAttachment(attachment: Attachment) {
   if (!attachment) return false;
@@ -116,4 +114,12 @@ function canPreviewAttachment(attachment: Attachment) {
   if (!extension) return false;
 
   return previewableFileExtensions.indexOf(extension) > -1;
+}
+
+function findAttachmentNode(editor: Editor) {
+  return (
+    findSelectedNode(editor, "attachment") ||
+    findSelectedNode(editor, "image") ||
+    findSelectedNode(editor, "audio")
+  );
 }

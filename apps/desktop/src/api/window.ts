@@ -34,6 +34,17 @@ export const windowRouter = t.router({
   }),
   maximized: t.procedure.query(() => globalThis.window?.isMaximized()),
   fullscreen: t.procedure.query(() => globalThis.window?.isFullScreen()),
+  onClose: t.procedure.subscription(() => {
+    return observable<void>((emit) => {
+      function listener() {
+        emit.next();
+      }
+      globalThis.window?.addListener("close", listener);
+      return () => {
+        globalThis.window?.removeListener("close", listener);
+      };
+    });
+  }),
   onWindowStateChanged: t.procedure.subscription(() => {
     return observable<{ maximized: boolean; fullscreen: boolean }>((emit) => {
       function listener() {

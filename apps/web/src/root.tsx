@@ -27,7 +27,6 @@ import {
 } from "./components/error-boundary";
 import { desktop } from "./common/desktop-bridge";
 import { useKeyStore } from "./interfaces/key-store";
-import Config from "./utils/config";
 import { usePromise } from "@notesnook/common";
 import { AuthProps } from "./views/auth";
 import { loadDatabase } from "./hooks/use-database";
@@ -52,9 +51,9 @@ export async function startApp(children?: React.ReactNode) {
     : await import("./components/title-bar").then((m) => m.TitleBar);
 
   try {
-    const { Component, props, path } = await init();
+    const { Component, props, path, persistence } = await init();
 
-    await useKeyStore.getState().init();
+    await useKeyStore.getState().init({ persistence });
 
     root.render(
       <>
@@ -70,6 +69,7 @@ export async function startApp(children?: React.ReactNode) {
                   Component={Component}
                   path={path}
                   routeProps={props}
+                  persistence={persistence}
                 />
               </AppLock>
               {children}
@@ -96,28 +96,22 @@ function RouteWrapper(props: {
   Component: (props: AuthProps) => JSX.Element;
   path: Routes;
   routeProps: AuthProps | null;
+  persistence?: "db" | "memory";
 }) {
   const [isMigrating, setIsMigrating] = useState(false);
-  const { Component, path, routeProps } = props;
+  const { Component, path, routeProps, persistence } = props;
 
   useEffect(() => {
     EV.subscribe(EVENTS.migrationStarted, (name) =>
       setIsMigrating(name === "notesnook")
     );
     EV.subscribe(EVENTS.migrationFinished, () => setIsMigrating(false));
-    return () => {
-      EV.unsubscribeAll();
-    };
   }, []);
 
   const result = usePromise(async () => {
     performance.mark("load:database");
-    await loadDatabase(
-      path !== "/sessionexpired" || Config.get("sessionExpired", false)
-        ? "db"
-        : "memory"
-    );
-  }, [path]);
+    await loadDatabase(persistence);
+  }, [path, persistence]);
 
   if (result.status === "rejected") {
     throw result.reason instanceof Error

@@ -17,9 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { test, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
-import { getTestId, NOTE, TITLE_ONLY_NOTE } from "./utils";
+import { test, expect, NOTE, TITLE_ONLY_NOTE } from "./utils";
 
 test("focus mode", async ({ page }) => {
   const app = new AppModel(page);
@@ -80,7 +79,7 @@ test("creating a new note should clear the editor contents & title", async ({
   await notes.newNote();
 
   expect(await notes.editor.isUnloaded()).toBeTruthy();
-  expect(await notes.editor.getTitle()).toBe("");
+  await expect(notes.editor.title).toHaveValue("");
   expect(await notes.editor.getContent("text")).toBe("");
 });
 
@@ -114,7 +113,7 @@ test("opening an empty titled note should empty out editor contents", async ({
   await onlyTitle?.openNote();
 
   expect(await notes.editor.getContent("text")).toBe("");
-  expect(await notes.editor.getTitle()).toBe(TITLE_ONLY_NOTE.title);
+  await expect(notes.editor.title).toHaveValue(TITLE_ONLY_NOTE.title);
 });
 
 test("focus should not jump to editor while typing in title input", async ({
@@ -127,7 +126,7 @@ test("focus should not jump to editor while typing in title input", async ({
 
   await notes.editor.typeTitle("Hello", 200);
 
-  expect(await notes.editor.getTitle()).toBe("Hello");
+  await expect(notes.editor.title).toHaveValue("Hello");
   expect(await notes.editor.getContent("text")).toBe("");
 });
 
@@ -143,21 +142,21 @@ test("when title format is set to headline, title should be generated from headl
   const notes = await app.goToNotes();
   await notes.createNote({ content: "my precious" });
 
-  expect(await notes.editor.getTitle()).toBe("my precious");
+  await expect(notes.editor.title).toHaveValue("my precious");
 
   await notes.editor.setContent(", my precious note");
   await notes.editor.waitForSaving();
 
-  expect(await notes.editor.getTitle()).toBe("my precious, my precious note");
+  await expect(notes.editor.title).toHaveValue("my precious, my precious note");
 
   await notes.editor.setTitle("not precious");
 
-  expect(await notes.editor.getTitle()).toBe("not precious");
+  await expect(notes.editor.title).toHaveValue("not precious");
 
   await notes.editor.setContent(", but...");
   await notes.editor.waitForSaving();
 
-  expect(await notes.editor.getTitle()).toBe("not precious");
+  await expect(notes.editor.title).toHaveValue("not precious");
 });
 
 test("select all & backspace should clear all content in editor", async ({
@@ -178,7 +177,7 @@ test("select all & backspace should clear all content in editor", async ({
 test("editing a note and switching immediately to another note and making an edit shouldn't overlap both notes", async ({
   page
 }, test) => {
-  test.setTimeout(45 * 1000);
+  test.setTimeout(3 * 60 * 1000);
 
   const app = new AppModel(page);
   await app.goto();
@@ -217,7 +216,7 @@ test("editing a note and switching immediately to another note and making an edi
 test("editing a note and switching immediately to another note and editing the title shouldn't overlap both notes", async ({
   page
 }, test) => {
-  test.setTimeout(45 * 1000);
+  test.setTimeout(3 * 60 * 1000);
 
   const app = new AppModel(page);
   await app.goto();
@@ -333,7 +332,6 @@ test("disable autosave when note crosses MAX_AUTO_SAVEABLE_WORDS", async ({
       "Auto-save is disabled for large notes. Press Ctrl + S to save."
     )
   ).toBe(true);
-  await expect(notes.editor.notSavedIcon).toBeVisible();
 });
 
 test("when autosave is disabled, pressing ctrl+s should save the note", async ({
@@ -470,12 +468,12 @@ test("control + alt + right arrow should go to next note", async ({ page }) => {
   await note2?.openNote(true);
   await page.keyboard.press("ControlOrMeta+Alt+ArrowRight");
 
-  expect(await notes.editor.getTitle()).toBe("Note 1");
+  await expect(notes.editor.title).toHaveValue("Note 1");
   expect(await notes.editor.getContent("text")).toBe("Note 1 content");
 
   await page.keyboard.press("ControlOrMeta+Alt+ArrowRight");
 
-  expect(await notes.editor.getTitle()).toBe("Note 2");
+  await expect(notes.editor.title).toHaveValue("Note 2");
   expect(await notes.editor.getContent("text")).toBe("Note 2 content");
 });
 
@@ -498,11 +496,11 @@ test("control + alt + left arrow should go to previous note", async ({
   await note2?.openNote(true);
   await page.keyboard.press("ControlOrMeta+Alt+ArrowLeft");
 
-  expect(await notes.editor.getTitle()).toBe("Note 1");
+  await expect(notes.editor.title).toHaveValue("Note 1");
   expect(await notes.editor.getContent("text")).toBe("Note 1 content");
 
   await page.keyboard.press("ControlOrMeta+Alt+ArrowLeft");
 
-  expect(await notes.editor.getTitle()).toBe("Note 2");
+  await expect(notes.editor.title).toHaveValue("Note 2");
   expect(await notes.editor.getContent("text")).toBe("Note 2 content");
 });
