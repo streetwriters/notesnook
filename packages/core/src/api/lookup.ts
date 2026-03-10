@@ -1154,7 +1154,7 @@ function textContainsTokens(text: string, tokens: QueryTokens) {
   const lowerCasedText = text.toLowerCase();
 
   const createTagPattern = (token: string) => {
-    const escapedToken = token.replace(/[()]/g, "\\$&");
+    const escapedToken = token.replace(/[()[\]]/g, "\\$&");
     return `<${MATCH_TAG_NAME}\\s+id="(.+?)">${escapedToken}<\\/${MATCH_TAG_NAME}>`;
   };
 
