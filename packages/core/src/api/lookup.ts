@@ -768,20 +768,31 @@ function highlightQueries(
 
   const patterns = queries
     .filter((q) => q.length > 0)
-    .map((q) => q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    .map((q) => removeDiacritics(q).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
 
   if (patterns.length === 0) return { text, hasMatches: false };
 
   try {
     const regex = new RegExp(patterns.join("|"), "gi");
+    const normalizedText = removeDiacritics(text);
 
     let hasMatches = false;
     let matchIdCounter = 0;
+    let result = "";
+    let lastIndex = 0;
+    let m: RegExpExecArray | null;
 
-    const result = text.replace(regex, (match) => {
+    while ((m = regex.exec(normalizedText)) !== null) {
       hasMatches = true;
-      return createSearchResultTag(match, `match-${++matchIdCounter}`);
-    });
+      result += text.slice(lastIndex, m.index);
+      result += createSearchResultTag(
+        text.slice(m.index, m.index + m[0].length),
+        `match-${++matchIdCounter}`
+      );
+      lastIndex = m.index + m[0].length;
+    }
+
+    result += text.slice(lastIndex);
 
     return { text: result, hasMatches };
   } catch (error) {
@@ -953,10 +964,10 @@ function stringToMatch(str: string): Match[] {
 function highlightHtmlContent(html: string, queries: string[]): string {
   if (!html || !queries.length) return html;
 
-  // Filter and escape regex special chars
+  // Filter, normalize diacritics, and escape regex special chars
   const patterns = queries
     .filter((q) => q && q.length > 0)
-    .map((q) => q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    .map((q) => removeDiacritics(q).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
 
   if (!patterns.length) return html;
 
@@ -979,14 +990,27 @@ function highlightHtmlContent(html: string, queries: string[]): string {
   const parser = new Parser(
     {
       ontext(text) {
+        const normalizedText = removeDiacritics(text);
+
         // Check for matches in text
-        const hasMatch = searchRegex.test(text);
+        const hasMatch = searchRegex.test(normalizedText);
         // Reset regex state after test
         searchRegex.lastIndex = 0;
 
-        const processed = text.replace(searchRegex, (match) =>
-          createSearchResultTag(match, `match-${++matchIdCounter}`)
-        );
+        let processed = "";
+        let lastIndex = 0;
+        let m: RegExpExecArray | null;
+
+        while ((m = searchRegex.exec(normalizedText)) !== null) {
+          processed += text.slice(lastIndex, m.index);
+          processed += createSearchResultTag(
+            text.slice(m.index, m.index + m[0].length),
+            `match-${++matchIdCounter}`
+          );
+          lastIndex = m.index + m[0].length;
+        }
+
+        processed += text.slice(lastIndex);
 
         if (hasMatch) {
           // Mark all ancestor elements as containing a match
@@ -1151,7 +1175,12 @@ function getMatchScore(
 }
 
 function textContainsTokens(text: string, tokens: QueryTokens) {
-  const lowerCasedText = text.toLowerCase();
+  const normalizedText = removeDiacritics(text).toLowerCase();
+  const normalizedTokens = {
+    andTokens: tokens.andTokens.map((t) => removeDiacritics(t)),
+    orTokens: tokens.orTokens.map((t) => removeDiacritics(t)),
+    notTokens: tokens.notTokens.map((t) => removeDiacritics(t))
+  };
 
   const createTagPattern = (token: string) => {
     const escapedToken = token.replace(/[()[\]]/g, "\\$&");
@@ -1159,17 +1188,17 @@ function textContainsTokens(text: string, tokens: QueryTokens) {
   };
 
   if (
-    !tokens.notTokens.every(
-      (t) => !new RegExp(createTagPattern(t), "i").test(lowerCasedText)
+    !normalizedTokens.notTokens.every(
+      (t) => !new RegExp(createTagPattern(t), "i").test(normalizedText)
     )
   )
     return false;
   return (
-    tokens.andTokens.every((t) =>
-      new RegExp(createTagPattern(t), "i").test(lowerCasedText)
+    normalizedTokens.andTokens.every((t) =>
+      new RegExp(createTagPattern(t), "i").test(normalizedText)
     ) ||
-    tokens.orTokens.some((t) =>
-      new RegExp(createTagPattern(t), "i").test(lowerCasedText)
+    normalizedTokens.orTokens.some((t) =>
+      new RegExp(createTagPattern(t), "i").test(normalizedText)
     )
   );
 }
@@ -1209,4 +1238,8 @@ function transformTokens(tokens: QueryTokens | undefined) {
 
 function createSearchResultTag(content: string, id: string) {
   return `<${MATCH_TAG_NAME} id="${id}">${content}</${MATCH_TAG_NAME}>`;
+}
+
+function removeDiacritics(s: string) {
+  return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
