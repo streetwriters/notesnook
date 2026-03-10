@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Locator, Page } from "@playwright/test";
 import { getTestId } from "../utils";
-import { authenticator } from "otplib";
+import { generateSync } from "otplib";
 
 type User = {
   email: string;
@@ -62,7 +62,7 @@ export class AuthModel {
     }
 
     if (user.totpSecret) {
-      const token = authenticator.generate(user.totpSecret);
+      const token = generateSync({ secret: user.totpSecret });
       await this.codeInput.fill(token);
 
       await this.submitButton.click();

@@ -57,7 +57,7 @@ import {
   downloadAttachment,
   previewImageAttachment
 } from "../../common/attachments";
-import { EV, EVENTS } from "@notesnook/core";
+import { EVENTS } from "@notesnook/core";
 import { db } from "../../common/db";
 import Titlebox, { resizeTextarea } from "./title-box";
 import Config from "../../utils/config";

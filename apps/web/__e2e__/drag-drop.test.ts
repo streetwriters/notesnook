@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { expect, test } from "@playwright/test";
+import { test, expect } from "./utils";
 import { AppModel } from "./models/app.model";
 import { NotesViewModel } from "./models/notes-view.model";
 

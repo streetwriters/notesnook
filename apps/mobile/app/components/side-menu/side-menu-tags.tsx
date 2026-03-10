@@ -303,7 +303,7 @@ export const SideMenuTags = () => {
                   } catch (e) {
                     DatabaseLogger.error(e);
                   }
-                }, 500);
+                }, 100);
               }}
               placeholderTextColor={colors.primary.placeholder}
             />

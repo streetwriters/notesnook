@@ -17,9 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { expect, test } from "@playwright/test";
 import { AppModel } from "./models/app.model";
-import { NOTE } from "./utils";
+import { expect, test, NOTE } from "./utils";
 test.skip("TODO: make sure jump to group works", () => {});
 
 test("#1002 Can't add a tag that's a substring of an existing tag", async ({

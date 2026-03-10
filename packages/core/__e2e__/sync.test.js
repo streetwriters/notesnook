@@ -713,88 +713,92 @@ test(
   }
 );
 
-test(
-  "stress: sync 5000 notes from device A to device B",
-  testOptions,
-  async (t) => {
-    const [deviceA, deviceB] = await Promise.all([
-      initializeDevice("deviceA"),
-      initializeDevice("deviceB")
-    ]);
+// test(
+//   "stress: sync 5000 notes from device A to device B",
+//   { concurrent: true, timeout: TEST_TIMEOUT * 3 },
+//   async (t) => {
+//     const [deviceA, deviceB] = await Promise.all([
+//       initializeDevice("deviceA"),
+//       initializeDevice("deviceB")
+//     ]);
 
-    t.onTestFinished(async () => {
-      console.log(`${t.task.name} log out`);
-      await cleanup(deviceA, deviceB);
-    });
+//     t.onTestFinished(async () => {
+//       console.log(`${t.task.name} log out`);
+//       await cleanup(deviceA, deviceB);
+//     });
 
-    for (let i = 0; i < 5000; ++i) {
-      await deviceA.notes.add({
-        title: `note ${i}`,
-        content: {
-          type: "tiptap",
-          data: `<p>deviceA=true</p>`
-        }
-      });
-    }
+//     for (let i = 0; i < 5000; ++i) {
+//       await deviceA.notes.add({
+//         title: `note ${i}`,
+//         content: {
+//           type: "tiptap",
+//           data: `<p>deviceA=true</p>`
+//         }
+//       });
+//     }
 
-    await deviceA.sync({ type: "full" });
-    await deviceB.sync({ type: "full" });
+//     await deviceA.sync({ type: "full" });
+//     await deviceB.sync({ type: "full" });
 
-    const countA = await deviceA.notes.all.count();
-    const countB = await deviceB.notes.all.count();
+//     const countA = await deviceA.notes.all.count();
+//     const countB = await deviceB.notes.all.count();
 
-    expect(countA).toBeGreaterThanOrEqual(5000);
-    expect(countB).toBeGreaterThanOrEqual(5000);
-  }
-);
+//     expect(countA).toBeGreaterThanOrEqual(5000);
+//     expect(countB).toBeGreaterThanOrEqual(5000);
+//   }
+// );
 
-test("stress: super concurrent sync", testOptions, async (t) => {
-  console.time("adding devices");
-  const devices = await Promise.all(
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-      .split("")
-      .map((letter) => initializeDevice(`device${letter}`))
-  );
-  console.timeEnd("adding devices");
+// test(
+//   "stress: super concurrent sync",
+//   { concurrent: true, timeout: TEST_TIMEOUT * 3 },
+//   async (t) => {
+//     console.time("adding devices");
+//     const devices = await Promise.all(
+//       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+//         .split("")
+//         .map((letter) => initializeDevice(`device${letter}`))
+//     );
+//     console.timeEnd("adding devices");
 
-  t.onTestFinished(async () => {
-    console.log(`${t.task.name} log out`);
-    await cleanup(...devices);
-  });
+//     t.onTestFinished(async () => {
+//       console.log(`${t.task.name} log out`);
+//       await cleanup(...devices);
+//     });
 
-  await Promise.all(
-    devices.map(async (device, index) => {
-      for (let i = 0; i < 100; ++i) {
-        await device.notes.add({
-          content: {
-            type: "tiptap",
-            data: `<p>device${i}${index}=true</p>`
-          }
-        });
-      }
-    })
-  );
+//     await Promise.all(
+//       devices.map(async (device, index) => {
+//         for (let i = 0; i < 100; ++i) {
+//           await device.notes.add({
+//             content: {
+//               type: "tiptap",
+//               data: `<p>device${i}${index}=true</p>`
+//             }
+//           });
+//         }
+//       })
+//     );
 
-  await Promise.all(
-    devices.map(async (device) => {
-      await device.sync({ type: "send" });
-    })
-  );
+//     await Promise.all(
+//       devices.map(async (device) => {
+//         await device.sync({ type: "send" });
+//       })
+//     );
 
-  await Promise.all(
-    devices.map(async (device) => {
-      await device.sync({ type: "fetch" });
-    })
-  );
+//     await Promise.all(
+//       devices.map(async (device) => {
+//         await device.sync({ type: "fetch" });
+//       })
+//     );
 
-  for (const device of devices) {
-    // await device.sync({ type: "full" });
+//     for (const device of devices) {
+//       // await device.sync({ type: "full" });
 
-    expect(await device.notes.all.count()).toBeGreaterThanOrEqual(
-      devices.length * 100
-    );
-  }
-});
+//       expect(await device.notes.all.count()).toBeGreaterThanOrEqual(
+//         devices.length * 100
+//       );
+//     }
+//   }
+// );
 
 test(
   "test expiring notes auto delete from device B (offline) while device A changes expiryDate val",

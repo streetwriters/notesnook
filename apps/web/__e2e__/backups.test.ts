@@ -16,9 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { test, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
-import { USER } from "./utils";
+import { test, expect, USER } from "./utils";
 
 test("create an unencrypted backup", async ({ page }) => {
   const app = new AppModel(page);
@@ -38,6 +37,7 @@ test("restore an unencrypted backup", async ({ page }) => {
   const settings = await app.goToSettings();
 
   await settings.restoreData("backup.nnbackup");
+  await app.toasts.waitForToast("Backup restored");
 
   await settings.close();
   const notes = await app.goToNotes();
@@ -67,6 +67,7 @@ test("restore an encrypted backup", async ({ page }) => {
   const settings = await app.goToSettings();
 
   await settings.restoreData("encrypted.nnbackup", USER.CURRENT.password);
+  await app.toasts.waitForToast("Backup restored");
 
   await settings.close();
   const notes = await app.goToNotes();

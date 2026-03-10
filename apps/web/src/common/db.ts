@@ -29,6 +29,7 @@ import Config from "../utils/config";
 import { FileStorage } from "../interfaces/fs";
 
 function getHostUrl(hostUrl: keyof typeof hosts, defaultUrl: string) {
+  if (IS_TESTING) return defaultUrl;
   const envValue = import.meta.env[`NN_${hostUrl}`];
   return envValue || defaultUrl;
 }

@@ -31,7 +31,7 @@ import {
   iterateList
 } from "./utils";
 import { SessionHistoryItemModel } from "./session-history-item-model";
-import dayjs from "dayjs";
+import { Dayjs } from "dayjs";
 import { Reminder } from "@notesnook/core";
 
 abstract class BaseProperties {
@@ -235,7 +235,7 @@ export class NotePropertiesModel extends BaseProperties {
     return dateCreated;
   }
 
-  async editDateCreated(newDateCreated: number) {
+  async editDateCreated(date: Dayjs) {
     await this.open();
 
     const editIcon = this.page.locator(getTestId("edit-date-created"));
@@ -253,9 +253,8 @@ export class NotePropertiesModel extends BaseProperties {
       getTestId("time-created-input")
     );
 
-    const date = new Date(newDateCreated);
-    await dateInput.fill(dayjs(date).format("DD-MM-YYYY"));
-    await timeInput.fill(dayjs(date).format("hh:mm A"));
+    await dateInput.fill(date.format("MM-DD-YYYY"));
+    await timeInput.fill(date.format("hh:mm A"));
 
     await confirmDialog(editDateCreatedDialog);
 

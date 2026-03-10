@@ -107,7 +107,7 @@ export const IconButton = ({
         color={
           restProps.disabled
             ? RGB_Linear_Shade(-0.05, hexToRGBA(colors.secondary.background))
-            : colors.static[color as never] || color
+            : colors.static[color as never] || color || colors.primary.icon
         }
         size={size}
       />

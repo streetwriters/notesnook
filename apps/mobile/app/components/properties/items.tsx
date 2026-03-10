@@ -33,7 +33,6 @@ import AppIcon from "../ui/AppIcon";
 import { Button } from "../ui/button";
 import { Pressable } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
-import { Dialog } from "../dialog";
 
 const TOP_BAR_ITEMS: ActionId[] = [
   "pin",
@@ -375,7 +374,11 @@ export const Items = ({
                   style={{
                     flexDirection: "row",
                     paddingHorizontal: DefaultAppStyles.GAP,
-                    gap: 5
+                    gap: 5,
+                    /**
+                     * ((columnItemWidth + gap) * noOfItems) - padding
+                     */
+                    width: (columnItemWidth + 5) * 5 - 12
                   }}
                 >
                   {item.map(renderTopBarItem)}

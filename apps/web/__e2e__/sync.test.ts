@@ -16,9 +16,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { test, Browser, expect } from "@playwright/test";
+import { Browser } from "@playwright/test";
 import { AppModel } from "./models/app.model";
-import { USER } from "./utils";
+import { test, expect, USER } from "./utils";
 
 // run this test file sequentially
 test.describe.configure({ mode: "serial" });

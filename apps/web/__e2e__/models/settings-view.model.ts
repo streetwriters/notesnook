@@ -141,8 +141,6 @@ export class SettingsViewModel {
 
     await uploadFile(this.page, restoreBackup, filename);
     if (password) await fillPasswordDialog(this.page, password);
-
-    await waitForDialog(this.page, "Restoring backup");
   }
 
   async selectImageCompression(option: { value: string; label: string }) {

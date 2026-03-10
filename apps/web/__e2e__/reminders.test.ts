@@ -18,9 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Reminder } from "@notesnook/core";
-import { test, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
-import { getTestId } from "./utils";
+import { test, expect, getTestId } from "./utils";
 
 const ONE_TIME_REMINDER: Partial<Reminder> = {
   title: "Test reminder 1",

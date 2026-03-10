@@ -17,9 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { test, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
-import { getTestId, NOTE, PASSWORD } from "./utils";
+import { test, expect, getTestId, NOTE, PASSWORD } from "./utils";
 
 test("locking a note should show vault unlocked status", async ({ page }) => {
   const app = new AppModel(page);
