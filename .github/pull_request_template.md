@@ -18,6 +18,13 @@
 ### If tests were not added, explain why
 <!-- explanation -->
 
+## Platform
+<!-- Describe which platforms this PR is related to -->
+
+- [ ] Web
+- [ ] Mobile
+- [ ] Desktop
+
 ## Sign-off
 - [ ] QA passed
 - [ ] UI/UX passed
