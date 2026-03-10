@@ -4,7 +4,7 @@
 - [ ] Bug fix
 - [ ] Feature
 
-## Visuals (Feature Only)
+## Visuals
 - [ ] Attached relevant screenshots / screen recording / GIF
 - [ ] N/A (not a feature or no UI changes)
 
