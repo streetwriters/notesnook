@@ -326,8 +326,9 @@ export const Items = ({
 
   const getTopBarItemChunksOfFour = () => {
     const chunks = [];
-    for (let i = 0; i < topBarItems.length; i += 5) {
-      chunks.push(topBarItems.slice(i, i + 5));
+    const itemCount = shouldShrink ? 4 : 5;
+    for (let i = 0; i < topBarItems.length; i += itemCount) {
+      chunks.push(topBarItems.slice(i, i + itemCount));
     }
     return chunks;
   };
@@ -375,10 +376,7 @@ export const Items = ({
                     flexDirection: "row",
                     paddingHorizontal: DefaultAppStyles.GAP,
                     gap: 5,
-                    /**
-                     * ((columnItemWidth + gap) * noOfItems) - padding
-                     */
-                    width: (columnItemWidth + 5) * 5 - 12
+                    width: width
                   }}
                 >
                   {item.map(renderTopBarItem)}
