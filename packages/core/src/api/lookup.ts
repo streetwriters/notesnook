@@ -401,6 +401,28 @@ export default class Lookup {
           );
         }
 
+        /**
+         * If both title and content is missing in the result object, then someting went wrong in the highlighting process.
+         * Instead of returning empty values, fetch the title so the matched note is still returned,
+         * even if highlighting information is unavailable.
+         */
+        const missingTitleAndContentResults = results.filter(
+          (r) => !r.content.length && !r.title.length
+        );
+        if (missingTitleAndContentResults.length > 0) {
+          const ids = missingTitleAndContentResults.map((r) => r.id);
+          const notes = await db
+            .selectFrom("notes")
+            .where("id", "in", ids)
+            .select(["id", "title"])
+            .execute();
+          for (const note of notes) {
+            const result = results.find((r) => r.id === note.id);
+            if (!result || !note.title) continue;
+            result.title = stringToMatch(note.title);
+          }
+        }
+
         return {
           ids: results.map((c) => c.id),
           items: results
