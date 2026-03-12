@@ -97,6 +97,7 @@
 		<string>Inter-Regular.ttf</string>
 		<string>Inter-Bold.ttf</string>
 		<string>MaterialCommunityIcons.ttf</string>
+		<string>EvilIcons.ttf</string>
 	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
