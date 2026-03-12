@@ -68,8 +68,12 @@ function attachListeners() {
 
   desktop.window.onClose.subscribe(undefined, {
     async onData() {
-      await db.sql().destroy();
-      await logManager?.close();
+      try {
+        await db.sql().destroy();
+        await logManager?.close();
+      } catch {
+        // ignore
+      }
     }
   });
 
