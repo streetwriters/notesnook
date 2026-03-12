@@ -135,6 +135,9 @@ export function EmbedComponent(
               })}
           width={"100%"}
           height={"100%"}
+          allow={getIframeAllowPermissions(src)}
+          allowFullScreen
+          referrerPolicy={isYouTubeEmbed(src) ? "origin" : undefined}
           sandbox={getSandboxFeatures(src)}
           onLoad={() => setIsLoading(false)}
         />
@@ -206,6 +209,19 @@ function isTwitterX(src: string) {
   } catch {
     return false;
   }
+}
+
+function getIframeAllowPermissions(src: string) {
+  if (!isYouTubeEmbed(src)) return undefined;
+  return [
+    "accelerometer",
+    "autoplay",
+    "clipboard-write",
+    "encrypted-media",
+    "gyroscope",
+    "picture-in-picture",
+    "web-share"
+  ].join("; ");
 }
 
 function tweetToEmbed(src: string, isDarkTheme: boolean) {
