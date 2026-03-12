@@ -56,7 +56,12 @@ import Seperator from "../../ui/seperator";
 import Paragraph from "../../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../../utils/styles";
-import { Note, NoteContent, VAULT_ERRORS } from "@notesnook/core";
+import {
+  isEncryptedContent,
+  Note,
+  NoteContent,
+  VAULT_ERRORS
+} from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 
 export const VaultDialog: React.FC = () => {
@@ -109,9 +114,17 @@ export const VaultDialog: React.FC = () => {
     const biometry = await BiometricService.isBiometryAvailable();
     const available = !!biometry;
     const fingerprint = await BiometricService.hasInternetCredentials();
-    const noteLocked = data.item
-      ? await db.vaults.itemExists(data.item)
-      : false;
+
+    if (data.item) {
+      const locked = await db.vaults.itemExists(data.item);
+      noteLockedRef.current = locked;
+      if (!locked) {
+        const content = await db.content.findByNoteId(data.item!.id);
+        if (content && isEncryptedContent(content)) {
+          noteLockedRef.current = true;
+        }
+      }
+    }
 
     // Set refs
     noteRef.current = data.item;
@@ -122,7 +135,6 @@ export const VaultDialog: React.FC = () => {
     positiveButtonTypeRef.current = data.positiveButtonType || "transparent";
     customActionTitleRef.current = data.customActionTitle || null;
     customActionParagraphRef.current = data.customActionParagraph || null;
-    noteLockedRef.current = noteLocked;
     onUnlockRef.current = data.onUnlock;
     requestTypeRef.current = data.requestType;
 
