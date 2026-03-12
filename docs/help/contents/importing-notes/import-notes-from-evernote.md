@@ -41,6 +41,6 @@ Notesnook Importer is one of the most robust Evernote importers, supporting almo
 - [x] Images
 - [x] Rich text (bold, italic, lists etc.)
 - [ ] Reminders
-- [x] Internal note links
+- [x] Internal note links (limitation: links only resolve correctly if the link text exactly matches the Evernote note title)
 - [x] Notebooks
 - [x] Tags
