@@ -66,16 +66,16 @@ function attachListeners() {
     attachListener(AppEvents.updateError)
   );
 
-  desktop.window.onClose.subscribe(undefined, {
-    async onData() {
-      try {
-        await db.sql().destroy();
-        await logManager?.close();
-      } catch {
-        // ignore
-      }
-    }
-  });
+  // desktop.window.onClose.subscribe(undefined, {
+  //   async onData() {
+  //     try {
+  //       await db.sql().destroy();
+  //       await logManager?.close();
+  //     } catch {
+  //       // ignore
+  //     }
+  //   }
+  // });
 
   TaskScheduler.register("updateCheck", "0 0 */12 * * * *", () => {
     checkForUpdate();
