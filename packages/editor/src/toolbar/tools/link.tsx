@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { ToolProps } from "../types.js";
 import { ToolButton } from "../components/tool-button.js";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ResponsivePresenter } from "../../components/responsive/index.js";
 import { LinkPopup } from "../popups/link-popup.js";
 import { useToolbarLocation } from "../stores/toolbar-store.js";
@@ -204,9 +204,19 @@ export function OpenLink(props: ToolProps) {
   );
   const { node } = selectedNode.current || {};
   const link = node ? findMark(node, "link") : null;
-  if (!link) return null;
-  const href = link?.attrs.href;
-  if (!href) return null;
+  const href = link?.attrs.href ?? null;
+  const [title, setTitle] = useState(href ?? "");
+
+  useEffect(() => {
+    if (!href) return;
+
+    (async () => {
+      const result = await editor.storage.getLinkTitle?.(href);
+      setTitle(result || href);
+    })();
+  }, [href]);
+
+  if (!link || !href) return null;
 
   return (
     <Flex sx={{ alignItems: "center" }}>
@@ -232,7 +242,7 @@ export function OpenLink(props: ToolProps) {
           ":hover": { color: "accent", opacity: 0.8 }
         }}
       >
-        {href}
+        {title}
       </Link>
       <ToolButton
         icon={props.icon}
