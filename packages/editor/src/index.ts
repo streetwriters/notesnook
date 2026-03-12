@@ -94,6 +94,7 @@ interface TiptapStorage {
   timeFormat?: DateTimeOptions["timeFormat"];
   dayFormat?: DateTimeOptions["dayFormat"];
   openLink?: (url: string, openInNewTab?: boolean) => void;
+  getLinkTitle?: (url: string) => Promise<string | undefined>;
   downloadAttachment?: (attachment: Attachment) => void;
   openAttachmentPicker?: (type: AttachmentType) => void;
   previewAttachment?: (attachment: Attachment) => void;
@@ -148,6 +149,7 @@ const useTiptap = (
     openAttachmentPicker,
     previewAttachment,
     openLink,
+    getLinkTitle,
     onBeforeCreate,
     dateFormat,
     timeFormat,
@@ -395,6 +397,7 @@ const useTiptap = (
         editor.storage.createInternalLink = createInternalLink;
         editor.storage.getAttachmentData = getAttachmentData;
         editor.storage.downloadCsvTable = downloadCsvTable;
+        editor.storage.getLinkTitle = getLinkTitle;
 
         if (onBeforeCreate) onBeforeCreate({ editor });
       },

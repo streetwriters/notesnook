@@ -69,6 +69,7 @@ import { UpgradeDialog } from "../../dialogs/buy-dialog/upgrade-dialog";
 import { ConfirmDialog } from "../../dialogs/confirm";
 import { strings } from "@notesnook/intl";
 import { handleInternalLink } from "../../common";
+import { db } from "../../common/db";
 
 export type OnChangeHandler = (
   content: () => string,
@@ -426,6 +427,13 @@ function TipTap(props: TipTapProps) {
         const link = parseInternalLink(url);
         if (link) handleInternalLink(url, openInNewTab);
         else window.open(url, "_blank");
+      },
+      getLinkTitle: async (url) => {
+        const link = parseInternalLink(url);
+        if (link && link.type === "note") {
+          const note = await db.notes.note(link.id);
+          return note?.title;
+        }
       }
     };
   }, [
