@@ -25,6 +25,7 @@ import { Icon } from "@notesnook/ui";
 import { WebClipAttributes } from "./web-clip.js";
 import { DesktopOnly } from "../../components/responsive/index.js";
 import { ToolbarGroup } from "../../toolbar/components/toolbar-group.js";
+import { getSandboxFeatures } from "../../utils/sandbox.js";
 
 const FAILED_CONTENT = `<html><head>
 <title>Failed to load web clip</title>
@@ -193,6 +194,7 @@ export function WebClipComponent(props: ReactNodeViewProps<WebClipAttributes>) {
 
                 resizeIframe(node.attrs, embedRef.current);
               }}
+              sandbox={getSandboxFeatures(src)}
             />
           </Box>
         </Box>

@@ -28,6 +28,7 @@ import { Icon } from "@notesnook/ui";
 import { Resizer } from "../../components/resizer/index.js";
 import { useThemeEngineStore } from "@notesnook/theme";
 import { useToolbarStore } from "../../toolbar/stores/toolbar-store.js";
+import { getSandboxFeatures } from "../../utils/sandbox.js";
 
 export function EmbedComponent(
   props: ReactNodeViewProps<EmbedAttributes & EmbedAlignmentOptions>
@@ -155,27 +156,6 @@ export function EmbedComponent(
       </Resizer>
     </Flex>
   );
-}
-
-function getSandboxFeatures(src: string) {
-  const features = [];
-  try {
-    const url = new URL(src);
-    if (url.protocol === "http:" || url.protocol === "https:")
-      features.push(
-        "allow-scripts",
-        "allow-same-origin",
-        "allow-popups",
-        "allow-popups-to-escape-sandbox",
-        "allow-forms",
-        "allow-modals",
-        "allow-downloads",
-        "allow-presentation"
-      );
-  } catch {
-    // ignore
-  }
-  return features.join(" ");
 }
 
 function isYouTubeEmbed(urlString: string) {
