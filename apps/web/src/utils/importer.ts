@@ -157,17 +157,24 @@ async function processNote(
   }
 
   for (const nb of notebooks) {
-    const notebookIds = await importNotebook(nb).catch(() => undefined);
-    if (!notebookIds) continue;
-    for (const notebookId of notebookIds)
-      await db.notes.addToNotebook(notebookId, noteId);
+    const importedNotebooks = await importNotebook(nb).catch(() => undefined);
+    if (!importedNotebooks) continue;
+    for (const importedNotebook of importedNotebooks) {
+      if (importedNotebook.skipApplyingToNote) continue;
+      await db.notes.addToNotebook(importedNotebook.id, noteId);
+    }
   }
 }
+
+type ImportedNotebook = {
+  id: string;
+  skipApplyingToNote: boolean;
+};
 
 async function importNotebook(
   notebook: Notebook,
   parent?: NotebookType
-): Promise<string[]> {
+): Promise<ImportedNotebook[]> {
   if (!notebook) return [];
 
   const selector = parent
@@ -185,9 +192,12 @@ async function importNotebook(
     if (parent && nb) await db.relations.add(parent, nb);
   }
   if (!nb) return [];
-  if (notebook.children.length === 0) return [nb.id];
+  if (notebook.children.length === 0) {
+    // @ts-expect-error update imported package
+    return [{ id: nb.id, skipApplyingToNote: notebook.skipApplyingToNote }];
+  }
 
-  const assignedNotebooks: string[] = [];
+  const assignedNotebooks: ImportedNotebook[] = [];
   for (const child of notebook.children || [])
     assignedNotebooks.push(...(await importNotebook(child, nb)));
   return assignedNotebooks;
