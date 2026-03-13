@@ -103,10 +103,11 @@ function DiffViewer(props: DiffViewerProps) {
           paddingTop: 10
         }}
         dangerouslySetInnerHTML={{
-          __html:
+          __html: escapeHtml(
             session.type === "diff" && session.oldTitle
               ? diff(session.oldTitle || "", session.note.title)
               : session.note.title
+          )
         }}
       ></Text>
       <Flex mt={1} sx={{ alignSelf: "center", justifySelf: "center" }}>
@@ -418,4 +419,13 @@ async function createCopy(note: Note, content: ContentItem, title?: string) {
       title: title || note.title + " (COPY)"
     });
   }
+}
+
+function escapeHtml(s: string) {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
