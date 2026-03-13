@@ -319,9 +319,8 @@ async function run(
       };
     }
 
-    await sleep(300);
-
     if (canShowCompletionStatus) {
+      await sleep(500);
       presentBackupCompleteSheet(path);
     }
 
