@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { isJavaScriptHandlerAttribute } from "./utils";
+
 const INVALID_ELEMENTS = ["script", "noscript"];
 
 type CloneNodeOptions = {
@@ -44,5 +46,12 @@ export function cloneNode(node: HTMLElement, options: CloneNodeOptions) {
 
   const invalidElements = node.querySelectorAll(INVALID_ELEMENTS.join(","));
   for (const element of invalidElements) element.remove();
+
+  for (const element of [node, ...node.querySelectorAll("*")]) {
+    for (const { name } of [...element.attributes]) {
+      if (isJavaScriptHandlerAttribute(name)) element.removeAttribute(name);
+    }
+  }
+
   return node;
 }

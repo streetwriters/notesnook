@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Readability } from "@mozilla/readability";
-import { injectCss } from "./utils.js";
+import { injectCss, isJavaScriptHandlerAttribute } from "./utils.js";
 import { app, h, text } from "hyperapp";
 import { getInlinedNode, toBlob, toJpeg, toPng, toSvg } from "./domtoimage.js";
 import { Config, InlineOptions } from "./types.js";
@@ -520,6 +520,8 @@ function resolveFetchOptions(config?: Config): FetchOptions | undefined {
 function toAttributes(element: HTMLElement) {
   const attributes: Record<string, string> = {};
   for (const { name } of element.attributes) {
+    if (isJavaScriptHandlerAttribute(name)) continue;
+
     const value = element.getAttribute(name);
     if (!value) continue;
     attributes[name] = value;

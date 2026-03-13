@@ -249,6 +249,10 @@ function isSVGElement(element: HTMLElement) {
   return SVGElements.includes(element.tagName.toLowerCase());
 }
 
+function isJavaScriptHandlerAttribute(attributeName: string) {
+  return attributeName.toLowerCase().startsWith("on");
+}
+
 export {
   injectCss,
   escape,
@@ -264,5 +268,6 @@ export {
   escapeXhtml,
   width,
   height,
-  isSVGElement
+  isSVGElement,
+  isJavaScriptHandlerAttribute
 };
