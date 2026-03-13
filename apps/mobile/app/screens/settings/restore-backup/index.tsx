@@ -570,13 +570,17 @@ const BackupItem = ({
             paragraph: strings.restoreBackupConfirm(),
             positiveText: strings.restore(),
             negativeText: strings.cancel(),
+            context: "global",
             positivePress: async () => {
-              restoreBackup({
-                uri:
-                  Platform.OS === "android"
-                    ? (item as ScopedStorage.FileType).uri
-                    : (item as ReactNativeBlobUtilStat).path
-              });
+              setTimeout(() => {
+                restoreBackup({
+                  uri:
+                    Platform.OS === "android"
+                      ? (item as ScopedStorage.FileType).uri
+                      : (item as ReactNativeBlobUtilStat).path
+                });
+              }, 500);
+              return true;
             }
           });
         }}
