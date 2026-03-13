@@ -70,3 +70,13 @@ export function presentDialog(data: Partial<DialogInfo>): void {
 export function hideDialog(): void {
   eSendEvent(eCloseSimpleDialog);
 }
+
+export const DIALOG_CONTEXT_STATE: Record<string, Promise<void>> = {};
+
+export async function awaitDialogIfOpen(context = "global") {
+  if (context in DIALOG_CONTEXT_STATE) {
+    await DIALOG_CONTEXT_STATE[context];
+    return;
+  }
+  return;
+}

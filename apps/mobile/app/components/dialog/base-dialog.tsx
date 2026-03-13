@@ -23,7 +23,6 @@ import {
   ColorValue,
   KeyboardAvoidingView,
   Modal,
-  Platform,
   SafeAreaView,
   StyleSheet,
   TouchableOpacity,
@@ -33,6 +32,7 @@ import useIsFloatingKeyboard from "../../hooks/use-is-floating-keyboard";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useUserStore } from "../../stores/use-user-store";
 import { BouncingView } from "../ui/transitions/bouncing-view";
+import { DIALOG_CONTEXT_STATE } from "./functions";
 
 export interface BaseDialogProps extends PropsWithChildren {
   animation?: "fade" | "none" | "slide" | undefined;
@@ -51,6 +51,7 @@ export interface BaseDialogProps extends PropsWithChildren {
   useSafeArea?: boolean;
   avoidKeyboardResize?: boolean;
   enableSheetKeyboardHandler?: boolean;
+  context?: string;
 }
 
 const BaseDialog = ({
@@ -70,12 +71,14 @@ const BaseDialog = ({
   useSafeArea = true,
   avoidKeyboardResize = false,
   enableSheetKeyboardHandler,
-  background
+  background,
+  context = "global"
 }: BaseDialogProps) => {
   const floating = useIsFloatingKeyboard();
   const lockEvents = useRef(false);
   const [internalVisible, setIntervalVisible] = useState(true);
   const locked = useUserStore((state) => state.appLocked);
+  const reslover = useRef<(value?: any) => void>(undefined);
 
   useEffect(() => {
     return () => {
@@ -98,6 +101,15 @@ const BaseDialog = ({
       });
     }
   }, [locked]);
+
+  useEffect(() => {
+    return () => {
+      setTimeout(() => {
+        reslover.current?.();
+        delete DIALOG_CONTEXT_STATE[context];
+      }, 1500);
+    };
+  }, []);
 
   const Wrapper = useSafeArea ? SafeAreaView : View;
 
@@ -122,9 +134,13 @@ const BaseDialog = ({
               useSettingStore.getState().setSheetKeyboardHandler(false);
             }
           }
+
+          DIALOG_CONTEXT_STATE[context] = new Promise((resolve) => {
+            reslover.current = resolve;
+          });
         }}
         animationType={animation}
-        onRequestClose={() => {
+        onRequestClose={(e) => {
           if (lockEvents.current) return;
           if (!closeOnTouch) return null;
           useSettingStore.getState().setSheetKeyboardHandler(true);

@@ -134,6 +134,7 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
           ? false
           : dialogInfo.statusBarTranslucent
       }
+      context={context}
       bounce={!dialogInfo.input}
       closeOnTouch={!dialogInfo.disableBackdropClosing}
       background={dialogInfo.background}

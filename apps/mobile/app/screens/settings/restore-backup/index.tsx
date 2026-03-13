@@ -38,7 +38,10 @@ import { DatabaseLogger, db } from "../../../common/database";
 import filesystem from "../../../common/filesystem";
 import { deleteCacheFileByName } from "../../../common/filesystem/io";
 import { cacheDir, copyFileAsync } from "../../../common/filesystem/utils";
-import { presentDialog } from "../../../components/dialog/functions";
+import {
+  awaitDialogIfOpen,
+  presentDialog
+} from "../../../components/dialog/functions";
 import {
   endProgress,
   startProgress,
@@ -105,6 +108,8 @@ const restoreBackup = async (options: {
     }
 
     const isLegacyBackup = options.uri.endsWith(".nnbackup");
+
+    await awaitDialogIfOpen();
 
     startProgress({
       title: strings.restoring(),
