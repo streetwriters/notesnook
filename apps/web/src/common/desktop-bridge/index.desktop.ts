@@ -26,6 +26,7 @@ import { checkForUpdate } from "../../utils/updater";
 import { showToast } from "../../utils/toast";
 import { db } from "../db";
 import { logManager } from "@notesnook/core";
+import { store as settingStore } from "../../stores/setting-store";
 
 export const desktop: ReturnType<typeof createTRPCProxyClient<AppRouter>> =
   createTRPCProxyClient<AppRouter>({
@@ -66,15 +67,19 @@ function attachListeners() {
     attachListener(AppEvents.updateError)
   );
 
-  desktop.window.onClose.subscribe(undefined, {
-    async onData() {
-      await db.sql().destroy();
-      await logManager?.close();
-    }
-  });
+  // desktop.window.onClose.subscribe(undefined, {
+  //   async onData() {
+  //     try {
+  //       await db.sql().destroy();
+  //       await logManager?.close();
+  //     } catch {
+  //       // ignore
+  //     }
+  //   }
+  // });
 
   TaskScheduler.register("updateCheck", "0 0 */12 * * * *", () => {
-    checkForUpdate();
+    checkForUpdate(settingStore.get().autoUpdates);
   });
 }
 

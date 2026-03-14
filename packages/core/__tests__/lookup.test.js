@@ -153,4 +153,17 @@ describe("notesWithHighlighting", () => {
       const item = await filtered.item(0);
       expect(item.item).toBeDefined();
     }));
+
+  test("search notes with brackets in query should load the item", () =>
+    noteTest({
+      title: "[with brackets]"
+    }).then(async ({ db }) => {
+      await db.notes.add(TEST_NOTE);
+      const filtered = await db.lookup.notesWithHighlighting(
+        "[with brackets]",
+        db.notes.all
+      );
+      const item = await filtered.item(0);
+      expect(item.item).toBeDefined();
+    }));
 });
