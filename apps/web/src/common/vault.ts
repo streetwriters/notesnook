@@ -23,6 +23,7 @@ import { showToast } from "../utils/toast";
 import { VAULT_ERRORS } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useStore as useAppStore } from "../stores/app-store";
+import { useStore as useUserStore } from "../stores/user-store";
 
 class Vault {
   static async createVault() {
@@ -63,29 +64,47 @@ class Vault {
 
   static async deleteVault() {
     if (!(await db.vault.exists())) return false;
-    const result = await showPasswordDialog({
-      title: strings.deleteVault(),
-      subtitle: strings.deleteVaultDesc(),
-      inputs: {
-        password: {
-          label: strings.accountPassword(),
-          autoComplete: "current-password"
-        }
-      },
-      checks: {
-        deleteAllLockedNotes: {
-          text: strings.deleteAllNotes(),
-          default: false
-        }
-      },
-      validate: ({ password }) => {
-        return db.user.verifyPassword(password);
-      }
-    });
+
+    const result = await (useUserStore.getState().isLoggedIn
+      ? showPasswordDialog({
+          title: strings.deleteVault(),
+          subtitle: strings.deleteVaultDesc(),
+          inputs: {
+            password: {
+              label: strings.accountPassword(),
+              autoComplete: "current-password"
+            }
+          },
+          checks: {
+            deleteAllLockedNotes: {
+              text: strings.deleteAllNotes(),
+              default: false
+            }
+          },
+          validate: ({ password }) => {
+            return db.user.verifyPassword(password);
+          }
+        })
+      : showPasswordDialog({
+          title: strings.deleteVault(),
+          subtitle: strings.deleteVaultDesc(),
+          inputs: {},
+          checks: {
+            deleteAllLockedNotes: {
+              text: strings.deleteAllNotes(),
+              default: false
+            }
+          },
+          validate: () => {
+            return Promise.resolve(true);
+          }
+        }));
+
     if (result) {
       await db.vault.delete(result.deleteAllLockedNotes);
       return true;
     }
+
     return false;
   }
 
