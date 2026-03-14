@@ -37,7 +37,6 @@ import {
 import { showToast } from "../utils/toast";
 import { readFile, showFilePicker } from "../utils/file-picker";
 import { logger } from "../utils/logger";
-import { PATHS } from "@notesnook/desktop";
 import { TaskManager } from "./task-manager";
 import { EVENTS } from "@notesnook/core";
 import { createWritableStream } from "./desktop-bridge";
@@ -127,11 +126,8 @@ export async function createBackup(
     })}-${new Date().getSeconds()}${mode === "full" ? "-full" : ""}`,
     { replacement: "-" }
   );
-  const directory = Config.get("backupStorageLocation", PATHS.backupsDirectory);
   const ext = "nnbackupz";
-  const filePath = IS_DESKTOP_APP
-    ? `${directory}/${filename}.${ext}`
-    : `${filename}.${ext}`;
+  const filePath = `${filename}.${ext}`;
 
   const encoder = new TextEncoder();
   const error = await TaskManager.startTask<Error | void>({

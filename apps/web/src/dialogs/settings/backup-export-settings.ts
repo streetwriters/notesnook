@@ -26,10 +26,9 @@ import { useStore as useSettingStore } from "../../stores/setting-store";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { desktop } from "../../common/desktop-bridge";
-import { PATHS } from "@notesnook/desktop";
 
 const getDesktopBackupsDirectoryPath = () =>
-  useSettingStore.getState().backupStorageLocation || PATHS.backupsDirectory;
+  useSettingStore.getState().backupStorageLocation;
 
 export const BackupExportSettings: SettingsGroup[] = [
   {
@@ -181,15 +180,12 @@ export const BackupExportSettings: SettingsGroup[] = [
                 (await verifyAccount());
               if (!verified) return;
 
-              const backupStorageLocation = getDesktopBackupsDirectoryPath();
-              const location = await desktop?.integration.selectDirectory.query(
-                {
-                  title: strings.selectBackupDir(),
-                  defaultPath: backupStorageLocation
-                }
-              );
-              if (!location) return;
-              useSettingStore.getState().setBackupStorageLocation(location);
+              await desktop?.integration.selectBackupDirectory.query();
+
+              useSettingStore.setState({
+                backupStorageLocation:
+                  await desktop?.integration.backupDirectory.query()
+              });
             },
             variant: "secondary"
           }
