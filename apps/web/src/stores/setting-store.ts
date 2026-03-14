@@ -53,10 +53,7 @@ class SettingStore extends BaseStore<SettingStore> {
   encryptBackups = Config.get("encryptBackups", false);
   backupReminderOffset = Config.get("backupReminderOffset", 0);
   fullBackupReminderOffset = Config.get("fullBackupReminderOffset", 0);
-  backupStorageLocation = Config.get(
-    "backupStorageLocation",
-    PATHS.backupsDirectory
-  );
+  backupStorageLocation = PATHS.backupsDirectory;
   doubleSpacedParagraphs = Config.get("doubleSpacedLines", true);
   markdownShortcuts = Config.get("markdownShortcuts", false);
   fontLigatures = Config.get("fontLigatures", false);
@@ -115,7 +112,8 @@ class SettingStore extends BaseStore<SettingStore> {
       zoomFactor: await desktop?.integration.zoomFactor.query(),
       autoUpdates: await desktop?.updater.autoUpdates.query(),
       proxyRules: await desktop?.integration.proxyRules.query(),
-      isInboxEnabled: await db.user.hasInboxKeys()
+      isInboxEnabled: await db.user.hasInboxKeys(),
+      backupStorageLocation: await desktop?.integration.backupDirectory.query()
     });
   };
 
@@ -220,11 +218,6 @@ class SettingStore extends BaseStore<SettingStore> {
   setFullBackupReminderOffset = (offset: number) => {
     Config.set("fullBackupReminderOffset", offset);
     this.set({ fullBackupReminderOffset: offset });
-  };
-
-  setBackupStorageLocation = (location: string) => {
-    Config.set("backupStorageLocation", location);
-    this.set({ backupStorageLocation: location });
   };
 
   toggleDoubleSpacedParagraphs = () => {

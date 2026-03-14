@@ -39,6 +39,7 @@ import { setupDesktopIntegration } from "./utils/desktop-integration";
 import { disableCustomDns, enableCustomDns } from "./utils/custom-dns";
 import { Messages, setI18nGlobal } from "@notesnook/intl";
 import { i18n } from "@lingui/core";
+import { PATHS } from "./constants";
 
 const locale =
   process.env.NODE_ENV === "development"
@@ -129,9 +130,6 @@ async function createWindow() {
 
     webPreferences: {
       zoomFactor: config.zoomFactor,
-      nodeIntegration: true,
-      contextIsolation: false,
-      nodeIntegrationInWorker: true,
       spellcheck: config.isSpellCheckerEnabled,
       preload: __dirname + "/preload.js"
     }
@@ -225,7 +223,8 @@ app.once("ready", async () => {
 
   if (!isDevelopment()) registerProtocol();
   await createWindow();
-  configureAutoUpdater();
+  await migrateBackupDirectory();
+  await configureAutoUpdater();
 });
 
 app.once("window-all-closed", () => {
@@ -285,4 +284,28 @@ function createURL(options: CLIOptions, path = "/") {
     url.pathname = `/notebooks/${options.notebook}`;
 
   return url;
+}
+
+async function migrateBackupDirectory() {
+  if (!globalThis.window) return;
+  try {
+    if (config.backupDirectory !== PATHS.backupsDirectory) return;
+    const oldPath = await globalThis.window?.webContents.executeJavaScript(
+      `localStorage.getItem("backupStorageLocation")`
+    );
+    if (!oldPath || oldPath === PATHS.backupsDirectory) return;
+    config.backupDirectory = oldPath;
+  } catch (e) {
+    console.error("Failed to migrate backup directory", e);
+    const pressedButton = dialog.showMessageBoxSync(globalThis.window, {
+      message:
+        "Failed to migrate backup directory. It has been reset to default.",
+      title: "Backup Directory Migration Failed",
+      type: "error",
+      buttons: ["Set backup directory", "Ignore"]
+    });
+    if (pressedButton === 0) {
+      await api.integration.selectBackupDirectory();
+    }
+  }
 }

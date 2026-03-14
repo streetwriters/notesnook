@@ -21,6 +21,16 @@
         "types": "./dist/types/index.d.ts",
         "default": "./dist/esm/index.js"
       }
+    },
+    "./*": {
+      "require": {
+        "types": "./dist/types/*",
+        "default": "./dist/cjs/*"
+      },
+      "import": {
+        "types": "./dist/types/*",
+        "default": "./dist/esm/*"
+      }
     }
   },
   "homepage": "https://notesnook.com/",
