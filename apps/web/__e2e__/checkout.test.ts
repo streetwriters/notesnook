@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Page } from "@playwright/test";
-import { test, expect, USER } from "./utils";
+import { USER } from "./utils";
 import { AppModel } from "./models/app.model";
 import { PriceItem } from "./models/types";
+import { test, expect, Page } from "@nn/test";
 
 test.setTimeout(45 * 1000);
 test.describe.configure({ mode: "serial" });

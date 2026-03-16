@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Locator, Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import { getTestId } from "../utils";
 
 export class ToastsModel {
-  private readonly toasts: Locator;
+  readonly toasts: Locator;
 
   constructor(page: Page) {
     this.toasts = page.locator(".toasts-container > div");
