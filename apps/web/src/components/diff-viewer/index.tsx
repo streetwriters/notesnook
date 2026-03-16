@@ -35,6 +35,7 @@ import { UnlockView } from "../unlock";
 import { getFormattedDate } from "@notesnook/common";
 import { diff } from "diffblazer";
 import { strings } from "@notesnook/intl";
+import { escapeUTF8 } from "entities";
 
 type DiffViewerProps = { session: ConflictedEditorSession | DiffEditorSession };
 function DiffViewer(props: DiffViewerProps) {
@@ -103,11 +104,13 @@ function DiffViewer(props: DiffViewerProps) {
           paddingTop: 10
         }}
         dangerouslySetInnerHTML={{
-          __html: escapeHtml(
+          __html:
             session.type === "diff" && session.oldTitle
-              ? diff(session.oldTitle || "", session.note.title)
-              : session.note.title
-          )
+              ? diff(
+                  escapeUTF8(session.oldTitle || ""),
+                  escapeUTF8(session.note.title)
+                )
+              : escapeUTF8(session.note.title)
         }}
       ></Text>
       <Flex mt={1} sx={{ alignSelf: "center", justifySelf: "center" }}>
@@ -419,13 +422,4 @@ async function createCopy(note: Note, content: ContentItem, title?: string) {
       title: title || note.title + " (COPY)"
     });
   }
-}
-
-function escapeHtml(s: string) {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
 }
