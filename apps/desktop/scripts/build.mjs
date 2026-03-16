@@ -33,6 +33,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const root = args.root || path.join(__dirname, "..");
 const skipTscBuild = args.skipTscBuild || false;
+const buildForTesting = args.test || false;
 
 const webAppPath = path.resolve(path.join(__dirname, "..", "..", "web"));
 
@@ -51,7 +52,11 @@ console.log("removed build folder");
 if (args.rebuild || !existsSync(path.join(webAppPath, "build"))) {
   console.log("rebuilding...");
   await exec(
-    "node scripts/execute.mjs @notesnook/web:build:desktop",
+    `node scripts/execute.mjs ${
+      buildForTesting
+        ? "@notesnook/web:build:test:desktop"
+        : "@notesnook/web:build:desktop"
+    }`,
     path.join(__dirname, "..", "..", "..")
   );
 }

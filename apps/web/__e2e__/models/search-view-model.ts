@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Page } from "@playwright/test";
+import type { Page } from "@playwright/test";
 import { BaseViewModel } from "./base-view.model";
 import { ItemModel } from "./item.model";
 import { Item } from "./types";

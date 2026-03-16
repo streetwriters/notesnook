@@ -1,9 +1,12 @@
 {
-  "extends": "../../tsconfig",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist/",
     "lib": ["ESNext"],
-    "moduleResolution": "Bundler"
+    "moduleResolution": "Bundler",
+    "paths": {
+      "@nn/test": ["./__tests__/electron-test/index.ts"]
+    }
   },
-  "include": ["src", "global.d.ts"]
+  "include": ["src", "global.d.ts", "__tests__"]
 }

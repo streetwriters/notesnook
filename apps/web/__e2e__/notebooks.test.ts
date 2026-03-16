@@ -20,14 +20,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { AppModel } from "./models/app.model";
 import { Notebook } from "./models/types";
 import {
-  test,
-  expect,
   getTestId,
   NOTE,
   NOTEBOOK,
   orderByOptions,
   sortByOptions
 } from "./utils";
+import { test, expect } from "@nn/test";
 
 test("create a notebook", async ({ page }) => {
   const app = new AppModel(page);

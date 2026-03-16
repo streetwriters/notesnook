@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Reminder } from "@notesnook/core";
-import { Locator, Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import { getTestId } from "../utils";
 import { Color, Item, Notebook } from "./types";
 import dayjs from "dayjs";

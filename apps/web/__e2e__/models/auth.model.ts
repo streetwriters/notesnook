@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Locator, Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import { getTestId } from "../utils";
 import { generateSync } from "otplib";
 
@@ -77,7 +77,7 @@ export class AuthModel {
     await this.page.locator(getTestId("close-plans")).click();
 
     await this.page
-      .locator(getTestId("sync-status-synced"))
+      .locator(getTestId("sync-status-syncing"))
       .waitFor({ state: "visible" });
   }
 }
