@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import fs from "fs";
 import dotenv from "dotenv";
 import path, { join } from "path";
-import { test as base, Locator, Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import {
   GroupByOptions,
   Notebook,
@@ -30,18 +30,7 @@ import {
 import { tmpdir } from "os";
 import { AppModel } from "../models/app.model";
 
-export type { Browser, Page } from "@playwright/test";
-export { expect } from "@playwright/test";
-
-const test = base.extend<NonNullable<unknown>>({
-  page: async ({ page }, use) => {
-    const client = await page.context().newCDPSession(page);
-    await client.send("Emulation.setCPUThrottlingRate", {
-      rate: 1
-    });
-    await use(page);
-  }
-});
+export const IS_DESKTOP_TESTS = process.env.TEST_DESKTOP === "true";
 
 type Note = {
   title: string;
@@ -124,7 +113,7 @@ async function downloadAndReadFile(
   page: Page,
   action: () => Promise<void>,
   encoding: BufferEncoding | null | undefined = "utf-8"
-) {
+): Promise<string | NonSharedBuffer> {
   const [download] = await Promise.all([
     page.waitForEvent("download"),
     action()
@@ -206,7 +195,6 @@ export async function createHistorySession(page: Page, locked = false) {
 }
 
 export {
-  test,
   USER,
   NOTE,
   TITLE_ONLY_NOTE,

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Reminder } from "@notesnook/core";
-import { Locator } from "@playwright/test";
+import type { Locator } from "@playwright/test";
 import { getTestId } from "../utils";
 import { BaseItemModel } from "./base-item.model";
 import { ContextMenuModel } from "./context-menu.model";

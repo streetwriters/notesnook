@@ -22,6 +22,7 @@
         "default": "./dist/esm/index.js"
       }
     },
+    "./testutils": "./__tests__/test-override.ts",
     "./*": {
       "require": {
         "types": "./dist/types/*",
@@ -53,6 +54,7 @@
     "zod": "3.24.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@streetwriters/kysely": "^0.27.4",
     "@types/node": "22.15.3",
     "@types/yargs": "^17.0.33",
@@ -60,9 +62,10 @@
     "electron": "^37.0.0",
     "electron-builder": "^26.0.12",
     "esbuild": "0.21.5",
+    "fkill": "^10.0.3",
     "node-abi": "^4.5.0",
     "node-gyp-build": "^4.8.4",
-    "playwright": "1.48.2",
+    "playwright": "1.58.2",
     "prebuildify": "^6.0.1",
     "slugify": "1.6.6",
     "tree-kill": "^1.2.2",
@@ -83,7 +86,7 @@
     "bundle": "esbuild electron=./src/main.ts ./src/preload.ts --external:electron --external:fsevents --external:better-sqlite3-multiple-ciphers --external:sodium-native --bundle --outdir=./build --platform=node --tsconfig=tsconfig.json --define:MAC_APP_STORE=false --define:RELEASE=true",
     "bundle:mas": "esbuild electron=./src/main.ts ./src/preload.ts --minify --external:electron --external:fsevents --bundle --outdir=./build --platform=node --tsconfig=tsconfig.json --define:MAC_APP_STORE=true --define:RELEASE=true",
     "postinstall": "patch-package",
-    "test": "vitest run"
+    "test": "playwright test --tsconfig tsconfig.json"
   },
   "author": {
     "name": "Streetwriters (Private) Limited",

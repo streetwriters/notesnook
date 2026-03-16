@@ -20,14 +20,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import dayjs from "dayjs";
 import { AppModel } from "./models/app.model";
 import {
-  test,
-  expect,
   groupByOptions,
   NOTE,
   orderByOptions,
   PASSWORD,
   sortByOptions
 } from "./utils";
+import { test, expect } from "@nn/test";
 
 test("create a note", async ({ page }) => {
   const app = new AppModel(page);
@@ -459,7 +458,5 @@ test("edit note creation date in properties panel", async ({ page }) => {
   await note?.properties.editDateCreated(date);
 
   const dateCreated = await note?.properties.getDateCreated();
-  expect(date.format("YYYY-MM-DD HH:mm")).toBe(
-    dayjs(dateCreated).format("YYYY-MM-DD HH:mm")
-  );
+  expect(date.format("DD-MM-YYYY hh:mm A")).toBe(dateCreated);
 });

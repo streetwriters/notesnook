@@ -62,6 +62,7 @@ import { UpgradeDialog } from "../dialogs/buy-dialog/upgrade-dialog";
 import { setToolbarPreset } from "./toolbar-config";
 import { useKeyStore } from "../interfaces/key-store";
 import { TaskScheduler } from "../utils/task-scheduler";
+import { path } from "@notesnook-importer/core/dist/src/utils/path";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
@@ -187,7 +188,13 @@ export async function createBackup(
     );
     console.error(error);
   } else {
-    showToast("success", `${strings.backupSavedAt(filePath)}`);
+    const backupDirectory = useSettingStore.getState().backupStorageLocation;
+    showToast(
+      "success",
+      IS_DESKTOP_APP
+        ? `${strings.backupSavedAt(path.join(backupDirectory, filePath))}`
+        : strings.backupSuccess()
+    );
     return true;
   }
   return false;

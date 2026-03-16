@@ -18,7 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { AppModel } from "./models/app.model";
-import { test, expect, USER } from "./utils";
+import { USER } from "./utils";
+import { test, expect } from "@nn/test";
 
 // async function forceExpireSession() {
 //   await page.evaluate(() => {

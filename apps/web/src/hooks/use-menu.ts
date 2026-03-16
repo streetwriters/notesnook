@@ -138,5 +138,6 @@ function findAndCallAction(items: MenuItem[], ids: string[]) {
 }
 
 function canShowNativeMenu(items: MenuItem[]) {
+  if (IS_TESTING) return false;
   return items.every((item) => item.type !== "popup");
 }
