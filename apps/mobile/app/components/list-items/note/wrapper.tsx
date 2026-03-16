@@ -32,9 +32,11 @@ import { eOnLoadNote, eShowMergeDialog } from "../../../utils/events";
 import { fluidTabsRef } from "../../../utils/global-refs";
 
 import { NotebooksWithDateEdited, TagsWithDateEdited } from "@notesnook/common";
+import { useTabStore } from "../../../screens/editor/tiptap/use-tab-store";
+import { editorController } from "../../../screens/editor/tiptap/utils";
+import { RouteParams } from "../../../stores/use-navigation-store";
 import NotePreview from "../../note-history/preview";
 import SelectionWrapper, { selectItem } from "../selection-wrapper";
-import { RouteParams } from "../../../stores/use-navigation-store";
 
 export const openNote = async (
   item: Note,
@@ -63,11 +65,19 @@ export const openNote = async (
       component: <NotePreview note={item} content={content} />
     });
   } else {
+    if (!useTabStore.getState().hasTabForNote(note.id!)) {
+      editorController.current.commands.setLoading(
+        true,
+        useTabStore.getState().currentTab
+      );
+    }
     eSendEvent(eOnLoadNote, {
       item: note
     });
     if (!DDS.isTab) {
-      fluidTabsRef.current?.goToPage("editor");
+      setTimeout(() => {
+        fluidTabsRef.current?.goToPage("editor");
+      }, 32);
     }
   }
 };
