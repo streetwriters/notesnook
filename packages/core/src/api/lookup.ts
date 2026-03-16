@@ -768,7 +768,7 @@ function highlightQueries(
 
   const patterns = queries
     .filter((q) => q.length > 0)
-    .map((q) => removeDiacritics(q).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    .map((q) => q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
 
   if (patterns.length === 0) return { text, hasMatches: false };
 
@@ -964,10 +964,10 @@ function stringToMatch(str: string): Match[] {
 function highlightHtmlContent(html: string, queries: string[]): string {
   if (!html || !queries.length) return html;
 
-  // Filter, normalize diacritics, and escape regex special chars
+  // Filter and escape regex special chars (tokens are already diacritics-normalized)
   const patterns = queries
     .filter((q) => q && q.length > 0)
-    .map((q) => removeDiacritics(q).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    .map((q) => q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
 
   if (!patterns.length) return html;
 
@@ -1176,11 +1176,6 @@ function getMatchScore(
 
 function textContainsTokens(text: string, tokens: QueryTokens) {
   const normalizedText = removeDiacritics(text).toLowerCase();
-  const normalizedTokens = {
-    andTokens: tokens.andTokens.map((t) => removeDiacritics(t)),
-    orTokens: tokens.orTokens.map((t) => removeDiacritics(t)),
-    notTokens: tokens.notTokens.map((t) => removeDiacritics(t))
-  };
 
   const createTagPattern = (token: string) => {
     const escapedToken = token.replace(/[()[\]]/g, "\\$&");
@@ -1188,16 +1183,16 @@ function textContainsTokens(text: string, tokens: QueryTokens) {
   };
 
   if (
-    !normalizedTokens.notTokens.every(
+    !tokens.notTokens.every(
       (t) => !new RegExp(createTagPattern(t), "i").test(normalizedText)
     )
   )
     return false;
   return (
-    normalizedTokens.andTokens.every((t) =>
+    tokens.andTokens.every((t) =>
       new RegExp(createTagPattern(t), "i").test(normalizedText)
     ) ||
-    normalizedTokens.orTokens.some((t) =>
+    tokens.orTokens.some((t) =>
       new RegExp(createTagPattern(t), "i").test(normalizedText)
     )
   );
@@ -1220,13 +1215,13 @@ function transformTokens(tokens: QueryTokens | undefined) {
     };
 
   const andTokens = tokens.andTokens.map((t) =>
-    t.replace(/"(.+)"/g, "$1").toLowerCase()
+    removeDiacritics(t.replace(/"(.+)"/g, "$1").toLowerCase())
   );
   const orTokens = tokens.orTokens.map((t) =>
-    t.replace(/"(.+)"/g, "$1").toLowerCase()
+    removeDiacritics(t.replace(/"(.+)"/g, "$1").toLowerCase())
   );
   const notTokens = tokens.notTokens.map((t) =>
-    t.replace(/"(.+)"/g, "$1").toLowerCase()
+    removeDiacritics(t.replace(/"(.+)"/g, "$1").toLowerCase())
   );
   return {
     andTokens,
