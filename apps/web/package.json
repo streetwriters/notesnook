@@ -52,6 +52,7 @@
     "dayjs": "1.11.13",
     "diffblazer": "^1.0.1",
     "electron-trpc": "0.7.1",
+    "entities": "^7.0.1",
     "event-source-polyfill": "1.0.31",
     "fflate": "^0.8.0",
     "file-saver": "^2.0.5",

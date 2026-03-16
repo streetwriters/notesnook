@@ -35,6 +35,7 @@ import { UnlockView } from "../unlock";
 import { getFormattedDate } from "@notesnook/common";
 import { diff } from "diffblazer";
 import { strings } from "@notesnook/intl";
+import { escapeUTF8 } from "entities";
 
 type DiffViewerProps = { session: ConflictedEditorSession | DiffEditorSession };
 function DiffViewer(props: DiffViewerProps) {
@@ -105,8 +106,11 @@ function DiffViewer(props: DiffViewerProps) {
         dangerouslySetInnerHTML={{
           __html:
             session.type === "diff" && session.oldTitle
-              ? diff(session.oldTitle || "", session.note.title)
-              : session.note.title
+              ? diff(
+                  escapeUTF8(session.oldTitle || ""),
+                  escapeUTF8(session.note.title)
+                )
+              : escapeUTF8(session.note.title)
         }}
       ></Text>
       <Flex mt={1} sx={{ alignSelf: "center", justifySelf: "center" }}>
