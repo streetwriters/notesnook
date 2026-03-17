@@ -17,14 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { DATE_FORMATS, TIME_FORMATS } from "@notesnook/core";
-import { getFontById, getFonts } from "@notesnook/editor/dist/cjs/utils/font";
+import {
+  DATE_FORMATS,
+  DayFormat,
+  TIME_FORMATS,
+  TimeFormat,
+  TrashCleanupInterval,
+  WeekFormat
+} from "@notesnook/core";
+import { getFontById, getFonts } from "@notesnook/editor";
 import dayjs from "dayjs";
 import { createSettingsPicker } from ".";
 import { db } from "../../../common/database";
 import { ToastManager } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
-import { useSettingStore } from "../../../stores/use-setting-store";
+import { Settings, useSettingStore } from "../../../stores/use-setting-store";
 import { useUserStore } from "../../../stores/use-user-store";
 import { MenuItemsList } from "../../../utils/menu-items";
 import { verifyUserWithApplock } from "../functions";
@@ -44,26 +51,29 @@ const WeekFormatNames = {
   Mon: "Monday"
 };
 
-export const FontPicker = createSettingsPicker({
+export const FontPicker = createSettingsPicker<
+  ReturnType<typeof getFonts>[0],
+  Settings["defaultFontFamily"]
+>({
   getValue: () => useSettingStore.getState().settings.defaultFontFamily,
-  updateValue: (item) => {
+  updateValue: async (item) => {
     SettingsService.set({
       defaultFontFamily: item.id
     });
   },
   formatValue: (item) => {
-    return getFontById(typeof item === "object" ? item.id : item).title;
+    return getFontById(typeof item === "object" ? item.id : item)?.title;
   },
   getItemKey: (item) => item.id,
   options: getFonts(),
   compareValue: (current, item) => current === item.id,
-  isFeatureAvailable: () => true,
-  isOptionAvailable: () => true
+  isFeatureAvailable: async () => true,
+  isOptionAvailable: async () => true
 });
 
 export const HomePicker = createSettingsPicker({
   getValue: () => useSettingStore.getState().settings.homepage,
-  updateValue: (item) => {
+  updateValue: async (item) => {
     SettingsService.set({ homepage: item.title });
     ToastManager.show({
       heading: strings.homePageChangedTo(item.title),
@@ -72,18 +82,22 @@ export const HomePicker = createSettingsPicker({
     });
   },
   formatValue: (item) => {
-    return strings.routes[typeof item === "object" ? item.title : item]?.();
+    return strings.routes[
+      (typeof item === "object"
+        ? item.title
+        : item) as keyof typeof strings.routes
+    ]?.();
   },
   getItemKey: (item) => item.title,
   options: MenuItemsList.slice(0, MenuItemsList.length - 1),
   compareValue: (current, item) => current === item.title,
-  isFeatureAvailable: () => true,
-  isOptionAvailable: () => true
+  isFeatureAvailable: async () => true,
+  isOptionAvailable: async () => true
 });
 
 export const SidebarTabPicker = createSettingsPicker({
   getValue: () => useSettingStore.getState().settings.defaultSidebarTab,
-  updateValue: (item) => {
+  updateValue: async (item) => {
     SettingsService.set({ defaultSidebarTab: item });
   },
   formatValue: (item) => {
@@ -94,7 +108,7 @@ export const SidebarTabPicker = createSettingsPicker({
     ];
     return SidebarTabs[item];
   },
-  getItemKey: (item) => item,
+  getItemKey: (item) => `side-bar-tab-picker-${item}`,
   options: [0, 1, 2],
   compareValue: (current, item) => current === item,
   isFeatureAvailable: async () => {
@@ -111,12 +125,12 @@ export const SidebarTabPicker = createSettingsPicker({
     }
     return result.isAllowed;
   },
-  isOptionAvailable: () => true
+  isOptionAvailable: async () => true
 });
 
 export const TrashIntervalPicker = createSettingsPicker({
   getValue: () => db.settings.getTrashCleanupInterval(),
-  updateValue: (item) => {
+  updateValue: async (item) => {
     db.settings.setTrashCleanupInterval(item);
   },
   formatValue: (item) => {
@@ -127,9 +141,9 @@ export const TrashIntervalPicker = createSettingsPicker({
         : strings.days(item);
   },
   getItemKey: (item) => item.toString(),
-  options: [-1, 1, 7, 30, 365],
+  options: [-1, 1, 7, 30, 365] as TrashCleanupInterval[],
   compareValue: (current, item) => current === item,
-  isFeatureAvailable: () => true,
+  isFeatureAvailable: async () => true,
   isOptionAvailable: async () => {
     const disableTrashFeature = await isFeatureAvailable("disableTrashCleanup");
     if (!disableTrashFeature.isAllowed) {
@@ -148,7 +162,7 @@ export const TrashIntervalPicker = createSettingsPicker({
 
 export const DateFormatPicker = createSettingsPicker({
   getValue: () => db.settings.getDateFormat(),
-  updateValue: (item) => {
+  updateValue: async (item) => {
     db.settings.setDateFormat(item);
     useSettingStore.setState({
       dateFormat: item
@@ -160,13 +174,13 @@ export const DateFormatPicker = createSettingsPicker({
   getItemKey: (item) => item,
   options: DATE_FORMATS,
   compareValue: (current, item) => current === item,
-  isFeatureAvailable: () => true,
-  isOptionAvailable: () => true
+  isFeatureAvailable: async () => true,
+  isOptionAvailable: async () => true
 });
 
 export const DayFormatPicker = createSettingsPicker({
   getValue: () => db.settings.getDayFormat(),
-  updateValue: (item) => {
+  updateValue: async (item) => {
     db.settings.setDayFormat(item);
     useSettingStore.setState({
       dayFormat: item
@@ -176,15 +190,15 @@ export const DayFormatPicker = createSettingsPicker({
     return `${strings.dayFormat()} (${dayjs().format(DayFormatFormats[item])})`;
   },
   getItemKey: (item) => item,
-  options: DAY_FORMATS,
+  options: DAY_FORMATS as DayFormat[],
   compareValue: (current, item) => current === item,
-  isFeatureAvailable: () => true,
-  isOptionAvailable: () => true
+  isFeatureAvailable: async () => true,
+  isOptionAvailable: async () => true
 });
 
 export const WeekFormatPicker = createSettingsPicker({
   getValue: () => db.settings.getWeekFormat(),
-  updateValue: (item) => {
+  updateValue: async (item) => {
     db.settings.setWeekFormat(item);
     useSettingStore.setState({
       weekFormat: item
@@ -194,10 +208,10 @@ export const WeekFormatPicker = createSettingsPicker({
     return `${WeekFormatNames[item]}`;
   },
   getItemKey: (item) => item,
-  options: WEEK_FORMATS,
+  options: WEEK_FORMATS as WeekFormat[],
   compareValue: (current, item) => current === item,
-  isFeatureAvailable: () => true,
-  isOptionAvailable: () => true
+  isFeatureAvailable: async () => true,
+  isOptionAvailable: async () => true
 });
 
 const TimeFormats = {
@@ -207,7 +221,7 @@ const TimeFormats = {
 
 export const TimeFormatPicker = createSettingsPicker({
   getValue: () => db.settings.getTimeFormat(),
-  updateValue: (item) => {
+  updateValue: async (item) => {
     db.settings.setTimeFormat(item);
     useSettingStore.setState({
       timeFormat: item
@@ -217,15 +231,18 @@ export const TimeFormatPicker = createSettingsPicker({
     return `${strings[item]()} (${dayjs().format(TimeFormats[item])})`;
   },
   getItemKey: (item) => item,
-  options: TIME_FORMATS,
+  options: TIME_FORMATS as TimeFormat[],
   compareValue: (current, item) => current === item,
-  isFeatureAvailable: () => true,
-  isOptionAvailable: () => true
+  isFeatureAvailable: async () => true,
+  isOptionAvailable: async () => true
 });
 
-export const BackupReminderPicker = createSettingsPicker({
+export const BackupReminderPicker = createSettingsPicker<
+  Settings["reminder"],
+  Settings["reminder"]
+>({
   getValue: () => useSettingStore.getState().settings.reminder,
-  updateValue: (item) => {
+  updateValue: async (item) => {
     SettingsService.set({ reminder: item });
   },
   formatValue: (item) => {
@@ -237,39 +254,40 @@ export const BackupReminderPicker = createSettingsPicker({
   requiresVerification: () => {
     return (
       !useSettingStore.getState().settings.encryptedBackup &&
-      useUserStore.getState().user
+      !!useUserStore.getState().user
     );
   },
-  isFeatureAvailable: () => true,
-  isOptionAvailable: () => true
+  isFeatureAvailable: async () => true,
+  isOptionAvailable: async () => true
 });
 
 export const BackupWithAttachmentsReminderPicker = createSettingsPicker({
   getValue: () => useSettingStore.getState().settings.fullBackupReminder,
-  updateValue: (item) => {
+  updateValue: async (item) => {
     SettingsService.set({ fullBackupReminder: item });
   },
   formatValue: (item) => {
+    //@ts-ignore
     return item === "useroff" || item === "off" || item === "never"
       ? "Off"
       : item.slice(0, 1).toUpperCase() + item.slice(1);
   },
   getItemKey: (item) => item,
-  options: ["never", "weekly", "monthly"],
+  options: ["never", "weekly", "monthly"] as Settings["fullBackupReminder"][],
   compareValue: (current, item) => current === item,
   requiresVerification: () => {
     return (
       !useSettingStore.getState().settings.encryptedBackup &&
-      useUserStore.getState().user
+      !!useUserStore.getState().user
     );
   },
-  isFeatureAvailable: () => true,
-  isOptionAvailable: () => true
+  isFeatureAvailable: async () => true,
+  isOptionAvailable: async () => true
 });
 
 export const ApplockTimerPicker = createSettingsPicker({
   getValue: () => useSettingStore.getState().settings.appLockTimer,
-  updateValue: (item) => {
+  updateValue: async (item) => {
     SettingsService.set({ appLockTimer: item });
   },
   formatValue: (item) => {
@@ -287,6 +305,6 @@ export const ApplockTimerPicker = createSettingsPicker({
   onVerify: () => {
     return verifyUserWithApplock();
   },
-  isFeatureAvailable: () => true,
-  isOptionAvailable: () => true
+  isFeatureAvailable: async () => true,
+  isOptionAvailable: async () => true
 });
