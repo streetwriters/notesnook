@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Box, Flex, Text } from "@theme-ui/components";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { ReactNodeViewProps } from "../react/index.js";
 import { Icons } from "../../toolbar/index.js";
 import { Icon } from "@notesnook/ui";
@@ -36,45 +36,34 @@ const FAILED_CONTENT = `<html><head>
 
 export function WebClipComponent(props: ReactNodeViewProps<WebClipAttributes>) {
   const { editor, selected, node, updateAttributes } = props;
-  const [isLoading, setIsLoading] = useState(true);
-  const embedRef = useRef<HTMLIFrameElement>(null);
-  const resizeObserverRef = useRef<ResizeObserver>();
-  const { src, title, fullscreen, progress } = node.attrs;
+  const { src, title, progress } = node.attrs;
+  const [source, setSource] = useState<string>();
 
   useEffect(() => {
     (async function () {
-      if (!isLoading) return;
-
       const html = await editor.storage
         .getAttachmentData?.(node.attrs)
         .catch(() => null);
-
-      const iframe = embedRef.current;
-      if (!iframe || !iframe.contentDocument) return;
-      iframe.contentDocument.open();
-      iframe.contentDocument.write(
-        typeof html !== "string" || !html ? FAILED_CONTENT : html
+      const doc = new DOMParser().parseFromString(
+        html || FAILED_CONTENT,
+        "text/html"
       );
-      iframe.contentDocument.close();
-      iframe.contentDocument.head.innerHTML += `<base target="_blank">`;
-      setIsLoading(false);
+      doc.head.innerHTML += `<base target="_blank">`;
+      const blob = new Blob([doc.documentElement.outerHTML], {
+        type: "text/html"
+      });
+      const blobUrl = URL.createObjectURL(blob);
+      setSource(blobUrl);
+      return () => {
+        URL.revokeObjectURL(blobUrl);
+      };
     })();
   }, []);
 
   useEffect(() => {
     function fullscreenchanged() {
-      if (document.fullscreenElement) {
-        resizeObserverRef.current?.disconnect();
-        resetIframeSize(embedRef.current);
-      } else {
+      if (!document.fullscreenElement) {
         updateAttributes({ fullscreen: false });
-        resizeIframe(node.attrs, embedRef.current);
-
-        if (embedRef.current?.contentDocument) {
-          resizeObserverRef.current?.observe(
-            embedRef.current?.contentDocument?.body
-          );
-        }
       }
     }
 
@@ -83,20 +72,6 @@ export function WebClipComponent(props: ReactNodeViewProps<WebClipAttributes>) {
       document.removeEventListener("fullscreenchange", fullscreenchanged);
     };
   }, [updateAttributes]);
-
-  useEffect(() => {
-    if (embedRef.current?.contentDocument) {
-      resizeObserverRef.current = new ResizeObserver(() => {
-        setTimeout(() => resizeIframe(node.attrs, embedRef.current), 100);
-      });
-      resizeObserverRef.current.observe(
-        embedRef.current?.contentDocument?.body
-      );
-    }
-    return () => {
-      resizeObserverRef.current?.disconnect();
-    };
-  }, []);
 
   return (
     <>
@@ -183,20 +158,18 @@ export function WebClipComponent(props: ReactNodeViewProps<WebClipAttributes>) {
         >
           <Box sx={{ overflow: "hidden" }}>
             <iframe
-              ref={embedRef}
-              width="auto"
               frameBorder={"0"}
-              scrolling={fullscreen ? "yes" : "no"}
-              style={{ transformOrigin: "0 0", overflow: "hidden" }}
-              onLoad={() => {
-                if (fullscreen) return;
-
-                resizeIframe(node.attrs, embedRef.current);
+              style={{
+                width: "100%",
+                height: "100vh",
+                background: "var(--background)"
               }}
+              src={source}
+              sandbox="allow-popups allow-popups-to-escape-sandbox"
             />
           </Box>
         </Box>
-        {isLoading && (
+        {!source && (
           <Flex
             sx={{
               position: "absolute",
@@ -217,41 +190,4 @@ export function WebClipComponent(props: ReactNodeViewProps<WebClipAttributes>) {
       </Box>
     </>
   );
-}
-
-function resizeIframe(
-  attributes: WebClipAttributes,
-  iframe?: HTMLIFrameElement | null
-) {
-  if (!iframe || !iframe.contentDocument || !iframe.contentDocument.body)
-    return;
-
-  const height = attributes.height
-    ? parseInt(attributes.height)
-    : iframe.contentDocument.body.scrollHeight;
-
-  const width = attributes.width
-    ? parseInt(attributes.width)
-    : iframe.contentDocument.body.scrollWidth;
-
-  iframe.style.height = `${height}px`;
-  iframe.style.width = `${width}px`;
-
-  const container = iframe.parentElement;
-  if (!container || container.clientWidth > width) return;
-  const scale = container.clientWidth / width;
-  iframe.style.scale = `${scale}`;
-  container.style.height = `${height * scale}px`;
-}
-
-function resetIframeSize(iframe?: HTMLIFrameElement | null) {
-  if (!iframe || !iframe.contentDocument || !iframe.contentDocument.body)
-    return;
-
-  const height = iframe.contentDocument.body.scrollHeight;
-  const width = iframe.contentDocument.body.scrollWidth;
-
-  iframe.style.height = `${height}px`;
-  iframe.style.width = `${width}px`;
-  iframe.style.scale = `1`;
 }
