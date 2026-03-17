@@ -20,6 +20,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { match, surround } from "fuzzyjs";
 import { clone } from "./clone.js";
 
+const SEPARATORS = /(?<=\w)[^a-zA-Z0-9](?=\w)/g;
+
+function normalizeSeparators(str: string): string {
+  return str.replace(SEPARATORS, " ");
+}
+
+function hasSeparator(str: string): boolean {
+  const result = SEPARATORS.test(str);
+  SEPARATORS.lastIndex = 0;
+  return result;
+}
+
 export function fuzzy<T>(
   query: string,
   items: T[],
@@ -39,13 +51,20 @@ export function fuzzy<T>(
     }
   > = new Map();
 
+  const shouldNormalize = hasSeparator(query);
+  const finalQuery = shouldNormalize ? normalizeSeparators(query) : query;
+
   for (const item of items) {
     if (options.limit && results.size >= options.limit) break;
 
     const identifier = getIdentifier(item);
 
     for (const field in fields) {
-      const result = match(query, `${item[field]}`);
+      const value = `${item[field]}`;
+      const result = match(
+        finalQuery,
+        shouldNormalize ? normalizeSeparators(value) : value
+      );
       if (!result.match) continue;
 
       const oldMatch = results.get(identifier);
