@@ -906,7 +906,7 @@ function centerMatch(
   } = options;
 
   // Handle edge cases
-  if (!match) return {};
+  if (!prefix && !suffix) return {};
   if (matchLength >= maxLength) return {};
 
   // Calculate available space for context
