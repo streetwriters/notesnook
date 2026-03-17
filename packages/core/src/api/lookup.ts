@@ -338,12 +338,9 @@ export default class Lookup {
             title.title || "",
             titleTokens.allTokens
           );
-          const hasMatches = textContainsTokens(highlighted, titleTokens);
           const result = results.find((c) => c.id === title.id);
           if (!result) continue;
-          result.title = hasMatches
-            ? splitHighlightedMatch(highlighted).flatMap((m) => m)
-            : [];
+          result.title = splitHighlightedMatch(highlighted).flatMap((m) => m);
         }
 
         const htmls =
@@ -364,7 +361,7 @@ export default class Lookup {
             html.data,
             contentTokens.allTokens
           );
-          if (!textContainsTokens(highlighted, contentTokens)) continue;
+
           result.content = extractMatchingBlocks(
             highlighted,
             MATCH_TAG_NAME
@@ -1172,30 +1169,6 @@ function getMatchScore(
   score += uniqueTokens.size * options.uniqueTokenBonus;
 
   return score;
-}
-
-function textContainsTokens(text: string, tokens: QueryTokens) {
-  const normalizedText = removeDiacritics(text).toLowerCase();
-
-  const createTagPattern = (token: string) => {
-    const escapedToken = token.replace(/[()[\]]/g, "\\$&");
-    return `<${MATCH_TAG_NAME}\\s+id="(.+?)">${escapedToken}<\\/${MATCH_TAG_NAME}>`;
-  };
-
-  if (
-    !tokens.notTokens.every(
-      (t) => !new RegExp(createTagPattern(t), "i").test(normalizedText)
-    )
-  )
-    return false;
-  return (
-    tokens.andTokens.every((t) =>
-      new RegExp(createTagPattern(t), "i").test(normalizedText)
-    ) ||
-    tokens.orTokens.some((t) =>
-      new RegExp(createTagPattern(t), "i").test(normalizedText)
-    )
-  );
 }
 
 function filterSmallTokens(tokens: QueryTokens | undefined) {
