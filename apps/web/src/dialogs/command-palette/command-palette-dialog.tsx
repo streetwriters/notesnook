@@ -49,6 +49,7 @@ import {
   removeRecentCommand,
   addRecentCommand
 } from "./commands";
+import { escapeUTF8 } from "entities";
 
 type CommandPaletteDialogProps = BaseDialogProps<boolean> & {
   isCommandMode: boolean;
@@ -248,7 +249,7 @@ export const CommandPaletteDialog = DialogManager.register(
                 >
                   <Text
                     variant="subBody"
-                    dangerouslySetInnerHTML={{ __html: label }}
+                    dangerouslySetInnerHTML={{ __html: escapeUTF8(label) }}
                   />
                 </Box>
               );
@@ -305,7 +306,7 @@ export const CommandPaletteDialog = DialogManager.register(
                         overflow: "hidden"
                       }}
                       dangerouslySetInnerHTML={{
-                        __html: command.title
+                        __html: escapeUTF8(command.title)
                       }}
                     />
                   </Flex>
