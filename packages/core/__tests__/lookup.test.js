@@ -166,4 +166,30 @@ describe("notesWithHighlighting", () => {
       const item = await filtered.item(0);
       expect(item.item).toBeDefined();
     }));
+
+  test("search should be diacritic agnostic", () =>
+    databaseTest().then(async (db) => {
+      await db.notes.add({ title: "outdoor café" });
+      await db.notes.add({
+        title: "today",
+        content: { type: "tiptap", data: "<p>I went to café</p>" }
+      });
+      await db.notes.add({ title: "indoor cafe" });
+      await db.notes.add({
+        title: "yesterday",
+        content: { type: "tiptap", data: "<p>I went to a cafe</p>" }
+      });
+
+      const searchWithoutDiacritics = await db.lookup.notesWithHighlighting(
+        "cafe",
+        db.notes.all
+      );
+      expect(searchWithoutDiacritics.length).toBe(4);
+
+      const searchWithDiacritics = await db.lookup.notesWithHighlighting(
+        "café",
+        db.notes.all
+      );
+      expect(searchWithDiacritics.length).toBe(4);
+    }));
 });

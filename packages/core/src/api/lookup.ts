@@ -338,12 +338,9 @@ export default class Lookup {
             title.title || "",
             titleTokens.allTokens
           );
-          const hasMatches = textContainsTokens(highlighted, titleTokens);
           const result = results.find((c) => c.id === title.id);
           if (!result) continue;
-          result.title = hasMatches
-            ? splitHighlightedMatch(highlighted).flatMap((m) => m)
-            : [];
+          result.title = splitHighlightedMatch(highlighted).flatMap((m) => m);
         }
 
         const htmls =
@@ -364,7 +361,7 @@ export default class Lookup {
             html.data,
             contentTokens.allTokens
           );
-          if (!textContainsTokens(highlighted, contentTokens)) continue;
+
           result.content = extractMatchingBlocks(
             highlighted,
             MATCH_TAG_NAME
@@ -774,15 +771,13 @@ function highlightQueries(
 
   try {
     const regex = new RegExp(patterns.join("|"), "gi");
-
-    let hasMatches = false;
-    let matchIdCounter = 0;
-
-    const result = text.replace(regex, (match) => {
-      hasMatches = true;
-      return createSearchResultTag(match, `match-${++matchIdCounter}`);
-    });
-
+    const normalizedText = removeDiacritics(text);
+    const { result, hasMatches } = highlightRegexMatches(
+      text,
+      normalizedText,
+      regex,
+      0
+    );
     return { text: result, hasMatches };
   } catch (error) {
     return { text, hasMatches: false };
@@ -898,7 +893,7 @@ function centerMatch(
   } = options;
 
   // Handle edge cases
-  if (!match) return {};
+  if (!prefix && !suffix) return {};
   if (matchLength >= maxLength) return {};
 
   // Calculate available space for context
@@ -953,7 +948,7 @@ function stringToMatch(str: string): Match[] {
 function highlightHtmlContent(html: string, queries: string[]): string {
   if (!html || !queries.length) return html;
 
-  // Filter and escape regex special chars
+  // Filter and escape regex special chars (tokens are already diacritics-normalized)
   const patterns = queries
     .filter((q) => q && q.length > 0)
     .map((q) => q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
@@ -979,25 +974,25 @@ function highlightHtmlContent(html: string, queries: string[]): string {
   const parser = new Parser(
     {
       ontext(text) {
-        // Check for matches in text
-        const hasMatch = searchRegex.test(text);
-        // Reset regex state after test
-        searchRegex.lastIndex = 0;
-
-        const processed = text.replace(searchRegex, (match) =>
-          createSearchResultTag(match, `match-${++matchIdCounter}`)
+        const normalizedText = removeDiacritics(text);
+        const highlighted = highlightRegexMatches(
+          text,
+          normalizedText,
+          searchRegex,
+          matchIdCounter
         );
+        matchIdCounter = highlighted.nextId;
 
-        if (hasMatch) {
+        if (highlighted.hasMatches) {
           // Mark all ancestor elements as containing a match
           elementStack.forEach((el) => (el.hasMatch = true));
         }
 
         // Add text to current element's buffer or main result
         if (elementStack.length > 0) {
-          elementStack[elementStack.length - 1].buffer += processed;
+          elementStack[elementStack.length - 1].buffer += highlighted.result;
         } else {
-          result += processed;
+          result += highlighted.result;
         }
       },
       onopentag(name, attributes) {
@@ -1150,30 +1145,6 @@ function getMatchScore(
   return score;
 }
 
-function textContainsTokens(text: string, tokens: QueryTokens) {
-  const lowerCasedText = text.toLowerCase();
-
-  const createTagPattern = (token: string) => {
-    const escapedToken = token.replace(/[()[\]]/g, "\\$&");
-    return `<${MATCH_TAG_NAME}\\s+id="(.+?)">${escapedToken}<\\/${MATCH_TAG_NAME}>`;
-  };
-
-  if (
-    !tokens.notTokens.every(
-      (t) => !new RegExp(createTagPattern(t), "i").test(lowerCasedText)
-    )
-  )
-    return false;
-  return (
-    tokens.andTokens.every((t) =>
-      new RegExp(createTagPattern(t), "i").test(lowerCasedText)
-    ) ||
-    tokens.orTokens.some((t) =>
-      new RegExp(createTagPattern(t), "i").test(lowerCasedText)
-    )
-  );
-}
-
 function filterSmallTokens(tokens: QueryTokens | undefined) {
   if (!tokens) return;
   return [...tokens.andTokens, ...tokens.orTokens].filter(
@@ -1191,13 +1162,13 @@ function transformTokens(tokens: QueryTokens | undefined) {
     };
 
   const andTokens = tokens.andTokens.map((t) =>
-    t.replace(/"(.+)"/g, "$1").toLowerCase()
+    removeDiacritics(t.replace(/"(.+)"/g, "$1").toLowerCase())
   );
   const orTokens = tokens.orTokens.map((t) =>
-    t.replace(/"(.+)"/g, "$1").toLowerCase()
+    removeDiacritics(t.replace(/"(.+)"/g, "$1").toLowerCase())
   );
   const notTokens = tokens.notTokens.map((t) =>
-    t.replace(/"(.+)"/g, "$1").toLowerCase()
+    removeDiacritics(t.replace(/"(.+)"/g, "$1").toLowerCase())
   );
   return {
     andTokens,
@@ -1209,4 +1180,34 @@ function transformTokens(tokens: QueryTokens | undefined) {
 
 function createSearchResultTag(content: string, id: string) {
   return `<${MATCH_TAG_NAME} id="${id}">${content}</${MATCH_TAG_NAME}>`;
+}
+
+function highlightRegexMatches(
+  text: string,
+  normalizedText: string,
+  regex: RegExp,
+  startId: number
+): { result: string; hasMatches: boolean; nextId: number } {
+  let matchIdCounter = startId;
+  let hasMatches = false;
+  let result = "";
+  let lastIndex = 0;
+  let m: RegExpExecArray | null;
+
+  while ((m = regex.exec(normalizedText)) !== null) {
+    hasMatches = true;
+    result += text.slice(lastIndex, m.index);
+    result += createSearchResultTag(
+      text.slice(m.index, m.index + m[0].length),
+      `match-${++matchIdCounter}`
+    );
+    lastIndex = m.index + m[0].length;
+  }
+
+  result += text.slice(lastIndex);
+  return { result, hasMatches, nextId: matchIdCounter };
+}
+
+function removeDiacritics(s: string) {
+  return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
