@@ -25,7 +25,7 @@ import {
   TrashCleanupInterval,
   WeekFormat
 } from "@notesnook/core";
-import { getFontById, getFonts } from "@notesnook/editor";
+import { getFontById, getFonts } from "@notesnook/editor/dist/cjs/utils/font";
 import dayjs from "dayjs";
 import { createSettingsPicker } from ".";
 import { db } from "../../../common/database";
@@ -307,4 +307,43 @@ export const ApplockTimerPicker = createSettingsPicker({
   },
   isFeatureAvailable: async () => true,
   isOptionAvailable: async () => true
+});
+
+export const ImageCompressionPicker = createSettingsPicker({
+  getValue: () => useSettingStore.getState().settings.imageCompression,
+  updateValue: async (item) => {
+    SettingsService.set({ imageCompression: item });
+  },
+  formatValue: (item) => {
+    return item === "ask-every-time"
+      ? strings.askEveryTime()
+      : item === "enabled"
+        ? strings.enableRecommended()
+        : strings.disable();
+  },
+  getItemKey: (item) => item,
+  options: [
+    "ask-every-time",
+    "enabled",
+    "disabled"
+  ] as Settings["imageCompression"][],
+  compareValue: (current, item) => current === item,
+  isFeatureAvailable: async () => true,
+  isOptionAvailable: async (item) => {
+    const feature = await isFeatureAvailable("fullQualityImages");
+
+    if (!feature.isAllowed && item === "enabled") {
+      ToastManager.show({
+        message: feature.error,
+        type: "info",
+        actionText: strings.upgrade(),
+        func: () => {
+          PaywallSheet.present(feature);
+        }
+      });
+      return false;
+    }
+
+    return true;
+  }
 });

@@ -18,6 +18,9 @@
       ],
       "@notesnook/editor/dist/cjs/toolbar/icons": [
         "../../packages/editor/dist/cjs/toolbar/icons.js"
+      ],
+      "@notesnook/editor/dist/cjs/utils/font": [
+        "../../packages/editor/dist/cjs/utils/font.js"
       ]
     }
   },

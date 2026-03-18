@@ -124,7 +124,8 @@ const EXTRA_ICON_NAMES = [
   "bomb-off",
   "cancel",
   "inbox",
-  "identifier"
+  "identifier",
+  "image-area"
 ];
 
 const __filename = fileURLToPath(import.meta.url);

@@ -35,6 +35,7 @@ import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
 import { Notice } from "../../ui/notice";
 import Paragraph from "../../ui/typography/paragraph";
+import SettingsService from "../../../services/settings";
 
 export default function AttachImage({
   response,
@@ -201,6 +202,17 @@ AttachImage.present = (response: ImageType[], context?: string) => {
     | undefined
   >((resolve) => {
     let resolved = false;
+
+    const imageCompressionSetting =
+      SettingsService.getProperty("imageCompression");
+
+    if (imageCompressionSetting !== "ask-every-time") {
+      resolve({
+        compress: imageCompressionSetting === "enabled" ? true : false
+      });
+      return;
+    }
+
     presentSheet({
       context: context,
       component: (ref, close, update) => (
