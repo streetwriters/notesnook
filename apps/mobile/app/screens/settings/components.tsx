@@ -36,6 +36,7 @@ import {
   WeekFormatPicker,
   FontPicker,
   HomePicker,
+  ImageCompressionPicker,
   SidebarTabPicker,
   TimeFormatPicker,
   TrashIntervalPicker
@@ -61,6 +62,7 @@ export const components: { [name: string]: ReactElement } = {
   "time-format-selector": <TimeFormatPicker />,
   "day-format-selector": <DayFormatPicker />,
   "week-format-selector": <WeekFormatPicker />,
+  "image-compression-picker": <ImageCompressionPicker />,
   "theme-selector": <ThemeSelector />,
   "applock-timer": <ApplockTimerPicker />,
   autobackupsattachments: <BackupWithAttachmentsReminderPicker />,
