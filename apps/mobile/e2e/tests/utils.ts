@@ -318,6 +318,12 @@ class TestBuilder {
     });
   }
 
+  replaceTextById(id: string, text: string) {
+    return this.addStep(async () => {
+      await Element.fromId(id).element.replaceText(text);
+    });
+  }
+
   clearTextById(id: string) {
     return this.addStep(async () => {
       await Element.fromId(id).element.clearText();

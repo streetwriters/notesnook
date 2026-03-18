@@ -30,7 +30,7 @@ module.exports = {
       testBinaryPath:
         "android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk",
       build:
-        "cd android ; ENVFILE=.env.test ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
+        "cd android ; ENVFILE=.env.test ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug -PreactNativeArchitectures=arm64-v8a && cd ..",
       reversePorts: [8081]
     },
     "android.release": {
