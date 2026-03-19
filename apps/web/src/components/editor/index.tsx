@@ -711,12 +711,12 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
         }
       });
 
-      const editorTitle = document.querySelector("#editor-title");
+      const editorTitle = document.querySelector(`#editor-title-${id}`);
       if (editorTitle instanceof HTMLTextAreaElement) {
         resizeTextarea(editorTitle);
       }
     }
-    const observer = new ResizeObserver(debounce(onResize, 500));
+    const observer = new ResizeObserver(onResize);
     observer.observe(editorScrollRef.current);
     return () => {
       observer.disconnect();

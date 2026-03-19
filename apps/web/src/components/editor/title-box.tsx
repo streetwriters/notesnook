@@ -100,7 +100,7 @@ function TitleBox(props: TitleBoxProps) {
     <Textarea
       ref={inputRef}
       variant="clean"
-      id="editor-title"
+      id={`editor-title-${id}`}
       data-test-id="editor-title"
       className="editorTitle"
       placeholder={strings.noteTitle()}
@@ -157,6 +157,8 @@ export default React.memo(TitleBox, (prevProps, nextProps) => {
 });
 
 export function resizeTextarea(input: HTMLTextAreaElement) {
+  if (input.scrollHeight === 0) return;
+
   input.style.height = "auto";
   requestAnimationFrame(() => {
     input.style.height = input.scrollHeight + "px";
