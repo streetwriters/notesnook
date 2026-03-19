@@ -25,22 +25,42 @@ import TypedEventEmitter from "typed-emitter";
 export type AppEvents = {
   onCreateItem(name: "note" | "notebook" | "reminder"): void;
   onOpenLink(url: string): void;
+  bridgeReady(): void;
 };
-
-const emitter = new EventEmitter();
-const typedEmitter = emitter as TypedEventEmitter<AppEvents>;
+let isBridgeReady = false;
+const pendingEvents: { name: string; args: unknown[] }[] = [];
+const _emitter = new EventEmitter();
+const emitter = _emitter as TypedEventEmitter<AppEvents>;
 const t = initTRPC.create();
 
 export const bridgeRouter = t.router({
   onCreateItem: createSubscription("onCreateItem"),
-  onOpenLink: createSubscription("onOpenLink")
+  onOpenLink: createSubscription("onOpenLink"),
+  ready: t.procedure.query(() => {
+    isBridgeReady = true;
+    if (pendingEvents.length > 0) {
+      console.log(
+        "Emitting pending events",
+        pendingEvents.map((e) => e.name)
+      );
+      pendingEvents.forEach((event) => {
+        emitter.emit(event.name as any, ...(event.args as any[]));
+      });
+      pendingEvents.length = 0;
+    }
+    return true;
+  })
 });
 
 export const bridge: AppEvents = new Proxy({} as AppEvents, {
   get(_t, name) {
     if (typeof name === "symbol") return;
     return (...args: unknown[]) => {
-      emitter.emit(name, ...args);
+      if (!isBridgeReady) {
+        pendingEvents.push({ name, args });
+        return;
+      }
+      _emitter.emit(name, ...args);
     };
   }
 });
@@ -51,9 +71,9 @@ function createSubscription<TName extends keyof AppEvents>(eventName: TName) {
       const listener: AppEvents[TName] = (...args: any[]) => {
         emit.next(args[0]);
       };
-      typedEmitter.addListener(eventName, listener);
+      emitter.addListener(eventName, listener);
       return () => {
-        typedEmitter.removeListener(eventName, listener);
+        emitter.removeListener(eventName, listener);
       };
     });
   });
