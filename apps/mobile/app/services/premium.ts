@@ -113,7 +113,9 @@ const showVerifyEmailDialog = () => {
 
           return;
         }
-        await db.user.sendVerificationEmail();
+        await db.user.sendVerificationEmail(
+          useUserStore.getState().user?.email
+        );
         SettingsService.set({
           lastVerificationEmailTime: Date.now()
         });
