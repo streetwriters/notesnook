@@ -59,6 +59,7 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../utils/styles";
+import Navigation from "../../services/navigation";
 
 const Actions = ({
   attachment,
@@ -304,9 +305,9 @@ const Actions = ({
               <Pressable
                 onPress={async () => {
                   eSendEvent(eCloseSheet, contextId);
-                  await sleep(150);
+                  close?.();
                   eSendEvent(eCloseAttachmentDialog);
-                  await sleep(300);
+                  Navigation.navigate("FluidPanelsView");
                   openNote(item, (item as any).type === "trash");
                 }}
                 style={{
