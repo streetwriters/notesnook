@@ -205,7 +205,7 @@ export const Heading = TiptapHeading.extend({
           (node) => node.type.name === Callout.name
         );
         // the first callout heading's collapsibility is handled by callout itself
-        if (callout?.node.firstChild === node) {
+        if (callout?.node.firstChild?.attrs.blockId === node.attrs.blockId) {
           return;
         }
 
