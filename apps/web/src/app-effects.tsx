@@ -25,6 +25,7 @@ import { useStore as useAnnouncementStore } from "./stores/announcement-store";
 import { useStore as useSettingStore } from "./stores/setting-store";
 import { scheduleBackups, scheduleFullBackups } from "./common/notices";
 import {
+  handleInternalLink,
   introduceFeatures,
   resetFeatures,
   scheduleExpiredNotesDeletion
@@ -56,9 +57,10 @@ export default function AppEffects() {
   useEffect(
     function initializeApp() {
       initStore();
-      initEditorStore();
 
       (async function () {
+        await initEditorStore();
+        await attachDesktopListeners();
         await resetFeatures();
         await refreshNavItems();
         await updateLastSynced();
@@ -201,54 +203,6 @@ export default function AppEffects() {
     })();
   }, [dialogAnnouncements]);
 
-  useEffect(() => {
-    const { unsubscribe } =
-      desktop?.bridge.onCreateItem.subscribe(undefined, {
-        onData(itemType) {
-          switch (itemType) {
-            case "note":
-              useEditorStore.getState().newSession();
-              break;
-            case "notebook":
-              hashNavigate("/notebooks/create", { replace: true });
-              break;
-            case "reminder":
-              hashNavigate("/reminders/create", { replace: true });
-              break;
-          }
-        }
-      }) || {};
-
-    return () => {
-      unsubscribe?.();
-    };
-  }, []);
-
-  useEffect(() => {
-    const { unsubscribe } =
-      desktop?.bridge.onOpenLink.subscribe(undefined, {
-        onData(url) {
-          const link = parseInternalLink(url);
-          if (!link) return;
-          if (link.type === "note") {
-            useEditorStore.getState().openSession(link.id, {
-              activeBlockId: link.params?.blockId || undefined
-            });
-          } else if (link.type === "notebook") {
-            navigate(`/notebooks/${link.id}`);
-          } else if (link.type === "tag") {
-            navigate(`/tags/${link.id}`);
-          } else if (link.type === "color") {
-            navigate(`/colors/${link.id}`);
-          }
-        }
-      }) || {};
-
-    return () => {
-      unsubscribe?.();
-    };
-  }, []);
-
   return <React.Fragment />;
 }
 
@@ -263,5 +217,29 @@ function getProcessingStatusFromType(type: ProcessingType) {
       return ["encryptingAttachments", "Encrypting"];
     default:
       return [];
+  }
+}
+
+async function attachDesktopListeners() {
+  const handlers = [
+    AppEventManager.subscribe(AppEvents.onCreateItem, onCreateItem),
+    AppEventManager.subscribe(AppEvents.onOpenLink, handleInternalLink)
+  ];
+
+  await desktop?.bridge.ready.query();
+  return handlers;
+}
+
+async function onCreateItem(itemType: string) {
+  switch (itemType) {
+    case "note":
+      useEditorStore.getState().newSession();
+      break;
+    case "notebook":
+      hashNavigate("/notebooks/create", { replace: true });
+      break;
+    case "reminder":
+      hashNavigate("/reminders/create", { replace: true });
+      break;
   }
 }
