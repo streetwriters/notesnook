@@ -83,7 +83,7 @@ export const OutlineListItem = Node.create<ListItemOptions>({
 
   addKeyboardShortcuts() {
     return {
-      [tiptapKeys.toggleOutlineListExpand.keys]: ({ editor }) => {
+      [tiptapKeys.toggleNodeExpand.keys]: ({ editor }) => {
         const { selection } = editor.state;
         const { $from, empty } = selection;
 
