@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import ListItem from "../list-item";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { useStore as useNotesStore } from "../../stores/note-store";
-import { Notebook as NotebookType } from "@notesnook/core";
+import { createInternalLink, Notebook as NotebookType } from "@notesnook/core";
 import {
   ChevronDown,
   ChevronRight,
@@ -31,7 +31,9 @@ import {
   Trash,
   Notebook as NotebookIcon,
   ArrowUp,
-  Move
+  Move,
+  Copy,
+  InternalLink
 } from "../icons";
 import { MenuItem } from "@notesnook/ui";
 import { hashNavigate, navigate } from "../../navigation";
@@ -51,6 +53,7 @@ import {
 import { useStore as useNotebookStore } from "../../stores/notebook-store";
 import { MoveNotebookDialog } from "../../dialogs/move-notebook-dialog";
 import { areFeaturesAvailable } from "@notesnook/common";
+import { writeToClipboard } from "../../utils/clipboard";
 
 type NotebookProps = {
   item: NotebookType;
@@ -252,6 +255,20 @@ export const notebookMenuItems: (
       title: strings.move(),
       onClick: () => {
         MoveNotebookDialog.show({ notebook: notebook });
+      }
+    },
+    {
+      type: "button",
+      key: "copy-link",
+      title: strings.copyLink(),
+      icon: InternalLink.path,
+      onClick: () => {
+        const link = createInternalLink("notebook", notebook.id);
+        writeToClipboard({
+          "text/plain": link,
+          "text/html": `<a href="${link}">${notebook.title}</a>`,
+          "text/markdown": `[${notebook.title}](${link})`
+        });
       }
     },
     {
