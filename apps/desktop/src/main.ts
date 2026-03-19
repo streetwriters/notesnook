@@ -148,11 +148,6 @@ async function createWindow() {
   await mainWindow.webContents.loadURL(`${createURL(cliOptions, "/")}`);
   mainWindow.setOpacity(1);
 
-  if (pendingNNLink) {
-    bridge.onOpenLink(pendingNNLink);
-    pendingNNLink = undefined;
-  }
-
   if (config.privacyMode) {
     await api.integration.setPrivacyMode({ enabled: config.privacyMode });
   }
@@ -202,6 +197,11 @@ async function createWindow() {
     setupTray();
     setupJumplist();
   });
+
+  if (pendingNNLink) {
+    bridge.onOpenLink(pendingNNLink);
+    pendingNNLink = undefined;
+  }
 }
 
 app.once("ready", async () => {
@@ -282,7 +282,7 @@ function createURL(options: CLIOptions, path = "/") {
   else if (typeof options.note === "string")
     url.hash = `/notes/${options.note}/edit`;
   else if (typeof options.notebook === "string")
-    url.hash = `/notebooks/${options.notebook}`;
+    url.pathname = `/notebooks/${options.notebook}`;
 
   return url;
 }
