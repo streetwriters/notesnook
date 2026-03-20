@@ -96,7 +96,7 @@ const features: Record<FeatureKeys, Feature> = {
               "You can now play audio files directly in the editor without needing to download them first."
           },
           {
-            title: "Orphaned attachmetns are now automatically deleted",
+            title: "Orphaned attachments are now automatically deleted",
             subtitle:
               "Attachments that are not linked to any note will now be automatically deleted to save space."
           },
@@ -177,7 +177,11 @@ export const FeatureDialog = DialogManager.register(function FeatureDialog(
           >
             <Flex sx={{ alignItems: "center", justifyContent: "start" }}>
               {feature.icon && <feature.icon size={14} color="accent" />}
-              <Text variant="subtitle" ml={1} sx={{ fontWeight: "normal" }}>
+              <Text
+                variant="subtitle"
+                ml={feature.icon ? 1 : 0}
+                sx={{ fontWeight: "normal" }}
+              >
                 {feature.title}
               </Text>
             </Flex>
