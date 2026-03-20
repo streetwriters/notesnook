@@ -487,6 +487,17 @@ export const useEditor = (
         };
       } else if (note.contentId) {
         const rawContent = await db.content?.get(note.contentId);
+
+        if (rawContent && isEncryptedContent(rawContent)) {
+          useTabStore.getState().updateTab(useTabStore.getState().currentTab, {
+            session: {
+              noteLocked: true,
+              locked: true
+            }
+          });
+          return;
+        }
+
         if (rawContent && !isDeleted(rawContent) && !rawContent.locked) {
           currentContents.current[note.id] = {
             data: rawContent.data,

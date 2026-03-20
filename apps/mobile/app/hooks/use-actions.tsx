@@ -21,6 +21,7 @@ import { isFeatureAvailable, useAreFeaturesAvailable } from "@notesnook/common";
 import {
   Color,
   createInternalLink,
+  isEncryptedContent,
   Item,
   ItemReference,
   Note,
@@ -221,7 +222,15 @@ export const useActions = ({
 
   useEffect(() => {
     if (item.type === "note") {
-      db.vaults.itemExists(item).then((locked) => setLocked(locked));
+      db.vaults.itemExists(item).then(async (locked) => {
+        setLocked(locked);
+        if (!locked) {
+          const content = await db.content.findByNoteId(item.id);
+          if (content && isEncryptedContent(content)) {
+            setLocked(true);
+          }
+        }
+      });
     }
   }, [item]);
 
