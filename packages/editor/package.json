@@ -35,7 +35,7 @@
     "@notesnook/intl": "file:../intl",
     "@notesnook/theme": "file:../theme",
     "@notesnook/ui": "file:../ui",
-    "@social-embed/lib": "^0.1.0-next.7",
+    "@social-embed/lib": "^0.1.0-next.11",
     "@tiptap/core": "2.6.6",
     "@tiptap/extension-blockquote": "^2.6.6",
     "@tiptap/extension-bullet-list": "^2.6.6",
