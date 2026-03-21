@@ -55,6 +55,10 @@ setI18nGlobal(i18n);
 const appHostnames = isDevelopment()
   ? ["localhost", "127.0.0.1"]
   : ["app.notesnook.com"];
+// Pending nn:// link to open once the window is ready (used on Windows/Linux
+// when the app is launched via the nn:// protocol for the first time).
+let pendingNNLink: string | undefined = findNNLink(process.argv);
+
 // only run a single instance
 if (!MAC_APP_STORE && !app.requestSingleInstanceLock()) {
   console.log("Another instance is already running!");
@@ -193,6 +197,11 @@ async function createWindow() {
     setupTray();
     setupJumplist();
   });
+
+  if (pendingNNLink) {
+    bridge.onOpenLink(pendingNNLink);
+    pendingNNLink = undefined;
+  }
 }
 
 app.once("ready", async () => {
@@ -212,6 +221,8 @@ app.once("ready", async () => {
   if (config.customDns) enableCustomDns();
   else disableCustomDns();
 
+  if (!MAC_APP_STORE) app.setAsDefaultProtocolClient("nn");
+
   if (!isDevelopment()) registerProtocol();
   await createWindow();
   configureAutoUpdater();
@@ -225,6 +236,12 @@ app.once("window-all-closed", () => {
 
 app.on("second-instance", async (_ev, argv) => {
   if (!globalThis.window) return;
+  const nnLink = findNNLink(argv);
+  if (nnLink) {
+    bridge.onOpenLink(nnLink);
+    bringToFront();
+    return;
+  }
   const cliOptions = await parseArguments(argv);
   if (cliOptions.note) bridge.onCreateItem("note");
   if (cliOptions.notebook) bridge.onCreateItem("notebook");
@@ -232,11 +249,28 @@ app.on("second-instance", async (_ev, argv) => {
   bringToFront();
 });
 
+// macOS opens URLs via this event. The app may or may not be fully loaded yet.
+app.on("open-url", (event, url) => {
+  event.preventDefault();
+  if (!url.startsWith("nn://")) return;
+  if (globalThis.window) {
+    bridge.onOpenLink(url);
+    bringToFront();
+  } else {
+    // Window not ready yet — store for when createWindow finishes loading.
+    pendingNNLink = url;
+  }
+});
+
 app.on("activate", () => {
   if (globalThis.window === null) {
     createWindow();
   }
 });
+
+function findNNLink(argv: string[]): string | undefined {
+  return argv.find((arg) => arg.startsWith("nn://"));
+}
 
 function createURL(options: CLIOptions, path = "/") {
   const url = new URL(isDevelopment() ? "http://localhost:3000" : PROTOCOL_URL);
@@ -248,7 +282,7 @@ function createURL(options: CLIOptions, path = "/") {
   else if (typeof options.note === "string")
     url.hash = `/notes/${options.note}/edit`;
   else if (typeof options.notebook === "string")
-    url.hash = `/notebooks/${options.notebook}`;
+    url.pathname = `/notebooks/${options.notebook}`;
 
   return url;
 }

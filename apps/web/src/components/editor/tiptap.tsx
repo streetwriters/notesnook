@@ -68,6 +68,7 @@ import { showFeatureNotAllowedToast } from "../../common/toasts";
 import { UpgradeDialog } from "../../dialogs/buy-dialog/upgrade-dialog";
 import { ConfirmDialog } from "../../dialogs/confirm";
 import { strings } from "@notesnook/intl";
+import { handleInternalLink } from "../../common";
 
 export type OnChangeHandler = (
   content: () => string,
@@ -423,12 +424,8 @@ function TipTap(props: TipTapProps) {
       getAttachmentData: onGetAttachmentData,
       openLink: (url, openInNewTab) => {
         const link = parseInternalLink(url);
-        if (link && link.type === "note") {
-          useEditorStore.getState().openSession(link.id, {
-            activeBlockId: link.params?.blockId || undefined,
-            openInNewTab: openInNewTab
-          });
-        } else window.open(url, "_blank");
+        if (link) handleInternalLink(url, openInNewTab);
+        else window.open(url, "_blank");
       }
     };
   }, [

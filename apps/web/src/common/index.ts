@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Config from "../utils/config";
-import { hashNavigate, getCurrentHash } from "../navigation";
+import { hashNavigate, getCurrentHash, navigate } from "../navigation";
 import { db } from "./db";
 import {
   areFeaturesAvailable,
@@ -39,7 +39,7 @@ import { readFile, showFilePicker } from "../utils/file-picker";
 import { logger } from "../utils/logger";
 import { PATHS } from "@notesnook/desktop";
 import { TaskManager } from "./task-manager";
-import { EVENTS } from "@notesnook/core";
+import { EVENTS, parseInternalLink } from "@notesnook/core";
 import { createWritableStream } from "./desktop-bridge";
 import { FeatureDialog, FeatureKeys } from "../dialogs/feature-dialog";
 import { User } from "@notesnook/core";
@@ -568,4 +568,21 @@ export async function scheduleExpiredNotesDeletion() {
   TaskScheduler.register("delete-expired-notes", "0 0 * * *", async () => {
     await db.notes.deleteExpiredNotes();
   });
+}
+
+export async function handleInternalLink(url: string, openInNewTab?: boolean) {
+  const link = parseInternalLink(url);
+  if (!link) return;
+  if (link.type === "note") {
+    await useEditorStore.getState().openSession(link.id, {
+      activeBlockId: link.params?.blockId || undefined,
+      openInNewTab
+    });
+  } else if (link.type === "notebook") {
+    navigate(`/notebooks/${link.id}`);
+  } else if (link.type === "tag") {
+    navigate(`/tags/${link.id}`);
+  } else if (link.type === "color") {
+    navigate(`/colors/${link.id}`);
+  }
 }
