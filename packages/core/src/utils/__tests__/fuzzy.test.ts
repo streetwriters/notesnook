@@ -93,4 +93,25 @@ describe("lookup.fuzzy", () => {
       ).toStrictEqual([{ id: "1", title: "hello-suffix" }]);
     });
   });
+
+  describe("separator normalization", () => {
+    const items = [
+      { id: "1", title: "file search.jpg" },
+      { id: "2", title: "file-search.jpg" },
+      { id: "3", title: "file_search.jpg" }
+    ];
+
+    test("query with space matches all separator variants", () => {
+      const result = fuzzy("file search", items, (i) => i.id, { title: 1 });
+      expect(result).toStrictEqual(items);
+    });
+
+    test("query with special character between words matches all separator variants", () => {
+      let result = fuzzy("file_search", items, (i) => i.id, { title: 1 });
+      expect(result).toStrictEqual(items);
+
+      result = fuzzy("file-search", items, (i) => i.id, { title: 1 });
+      expect(result).toStrictEqual(items);
+    });
+  });
 });
