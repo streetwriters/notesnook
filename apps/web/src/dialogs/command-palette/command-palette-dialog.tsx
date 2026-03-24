@@ -249,7 +249,7 @@ export const CommandPaletteDialog = DialogManager.register(
                 >
                   <Text
                     variant="subBody"
-                    dangerouslySetInnerHTML={{ __html: escapeUTF8(label) }}
+                    dangerouslySetInnerHTML={{ __html: label }}
                   />
                 </Box>
               );
@@ -306,7 +306,7 @@ export const CommandPaletteDialog = DialogManager.register(
                         overflow: "hidden"
                       }}
                       dangerouslySetInnerHTML={{
-                        __html: escapeUTF8(command.title)
+                        __html: command.title
                       }}
                     />
                   </Flex>
@@ -401,21 +401,25 @@ function useDatabaseFuzzySearch() {
 
   const updateCollections = useCallback(async (force = false) => {
     if (force || !notes.current)
-      notes.current = await db.notes.all
-        .fields(["notes.id", "notes.title"])
-        .items();
+      notes.current = (
+        await db.notes.all.fields(["notes.id", "notes.title"]).items()
+      ).map((n) => ({ ...n, title: escapeUTF8(n.title) }));
     if (force || !notebooks.current)
-      notebooks.current = await db.notebooks.all
-        .fields(["notebooks.id", "notebooks.title"])
-        .items();
+      notebooks.current = (
+        await db.notebooks.all
+          .fields(["notebooks.id", "notebooks.title"])
+          .items()
+      ).map((n) => ({ ...n, title: escapeUTF8(n.title) }));
     if (force || !tags.current)
-      tags.current = await db.tags.all
-        .fields(["tags.id", "tags.title"])
-        .items();
+      tags.current = (
+        await db.tags.all.fields(["tags.id", "tags.title"]).items()
+      ).map((t) => ({ ...t, title: escapeUTF8(t.title) }));
     if (force || !reminders.current)
-      reminders.current = await db.reminders.all
-        .fields(["reminders.id", "reminders.title"])
-        .items();
+      reminders.current = (
+        await db.reminders.all
+          .fields(["reminders.id", "reminders.title"])
+          .items()
+      ).map((r) => ({ ...r, title: escapeUTF8(r.title) }));
   }, []);
 
   useEffect(() => {
@@ -447,12 +451,13 @@ function useDatabaseFuzzySearch() {
         tag: tags.current,
         reminder: reminders.current
       };
+      const escapedQuery = escapeUTF8(query);
       for (const _type in collections) {
         const type = _type as keyof typeof collections;
         const items = collections[type];
         if (!items) continue;
         for (const item of fuzzy(
-          query,
+          escapedQuery,
           items,
           (item) => item.id,
           {
@@ -497,7 +502,7 @@ async function getSessionsAsCommands() {
 
     commands.push({
       id: session.note.id,
-      title: session.note.title,
+      title: escapeUTF8(session.note.title),
       group: strings.dataTypesPluralCamelCase.note(),
       type: "note" as const,
       action: commandActions.note,
