@@ -429,9 +429,10 @@ export const VaultDialog: React.FC = () => {
         onUnlockRef.current
       ) {
         const password = passwordRef.current;
+        const unlock = onUnlockRef.current;
         close();
-        await sleep(300);
-        onUnlockRef.current(note, password);
+        await sleep(500);
+        unlock(note, password);
       }
     } catch (e) {
       takeErrorAction();
