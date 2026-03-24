@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { strings } from "@notesnook/intl";
+import { escapeUTF8 } from "entities";
 import { db } from "../../common/db";
 import {
   ArrowLeft,
@@ -322,7 +323,7 @@ export function removeRecentCommand(id: string) {
 async function getActiveNoteCommands(): Promise<Command[]> {
   const note = useEditorStore.getState().getActiveNote();
   if (!note) return [];
-  const group = strings.actionsForNote(note.title);
+  const group = strings.actionsForNote(escapeUTF8(note.title));
 
   const commands: Command[] = [];
 
@@ -352,7 +353,7 @@ async function getActiveNotebookCommands() {
   if (context?.type !== "notebook") return [];
   const notebook = await db.notebooks.notebook(context.id);
   if (!notebook) return [];
-  const group = strings.actionsForNotebook(notebook.title);
+  const group = strings.actionsForNotebook(escapeUTF8(notebook.title));
 
   const commands: Command[] = [];
 
@@ -372,7 +373,7 @@ async function getActiveTagCommands() {
   if (context?.type !== "tag") return [];
   const tag = await db.tags.tag(context.id);
   if (!tag) return [];
-  const group = strings.actionsForTag(tag.title);
+  const group = strings.actionsForTag(escapeUTF8(tag.title));
   const commands: Command[] = [];
 
   const menuItems = await tagMenuItems(tag, [tag.id]);
@@ -537,26 +538,26 @@ async function getCommandTitle({ id, type }: RecentCommand) {
         0
       );
       if (!note) return;
-      return note.title;
+      return escapeUTF8(note.title);
     }
     case "notebook": {
       const notebook = (
         await db.notebooks.all.fields(["notebooks.title"]).items([id])
       ).at(0);
       if (!notebook) return;
-      return notebook.title;
+      return escapeUTF8(notebook.title);
     }
     case "tag": {
       const tag = (await db.tags.all.fields(["tags.title"]).items([id])).at(0);
       if (!tag) return;
-      return tag.title;
+      return escapeUTF8(tag.title);
     }
     case "reminder": {
       const reminder = (
         await db.reminders.all.fields(["reminders.title"]).items([id])
       ).at(0);
       if (!reminder) return;
-      return reminder.title;
+      return escapeUTF8(reminder.title);
     }
   }
 }
