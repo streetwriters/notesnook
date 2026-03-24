@@ -459,7 +459,5 @@ test("edit note creation date in properties panel", async ({ page }) => {
   await note?.properties.editDateCreated(date);
 
   const dateCreated = await note?.properties.getDateCreated();
-  expect(date.format("YYYY-MM-DD HH:mm")).toBe(
-    dayjs(dateCreated).format("YYYY-MM-DD HH:mm")
-  );
+  expect(date.format("DD-MM-YYYY hh:mm A")).toBe(dateCreated);
 });
