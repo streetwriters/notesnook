@@ -71,6 +71,7 @@ import { initDatabase, useShareStore } from "./store";
 import { isTablet } from "react-native-device-info";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { DefaultAppStyles } from "../utils/styles";
+import { encodeHTML5 } from "entities";
 
 const getLinkPreview = (url: string) => {
   return getPreviewData(url, 5000);
@@ -81,7 +82,7 @@ async function sanitizeHtml(site: string, title?: string) {
     return (
       html +
       "<hr/>" +
-      `<p>Clipped from <a href="${site}">${title || site}</a></p>
+      `<p>Clipped from <a href="${site}">${encodeHTML5(title || site)}</a></p>
 <p>Date clipped ${getFormattedDate(Date.now())}</p>`
     );
   } catch (e) {
@@ -96,7 +97,7 @@ function makeHtmlFromUrl(url: string) {
 function makeHtmlFromPlainText(text: string) {
   if (!text) return "";
 
-  return `<p>${text
+  return `<p>${encodeHTML5(text)
     .replace(/[\n]+/g, "\n")
     .replace(/(?:\r\n|\r|\n)/g, "</p><p>")}</p>`;
 }
