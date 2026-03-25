@@ -19,13 +19,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { FeatureType } from "./components/sheets/new-feature";
 
-export const features: FeatureType[] = [
-  {
-    title: "Play audio files",
-    body: "You can now play audio attachments in the editor"
-  },
-  {
-    title: "Password change & account recovery re-enabled",
-    body: "We have re-enabled password change and account recovery after making some improvements"
-  }
-];
+export const features: FeatureType[] = [];
