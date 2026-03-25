@@ -46,7 +46,7 @@ export interface UserStore {
   appLocked: boolean;
   lockApp: (verified: boolean) => void;
   disableAppLockRequests: boolean;
-  setDisableAppLockRequests: (shouldBlockVerifyUser: boolean) => void;
+  setDisableAppLockRequests: (disableAppLockRequests: boolean) => void;
   profile?: Partial<Profile>;
 }
 

@@ -33,6 +33,8 @@ import {
 } from "./utils";
 import Upload from "@ammarahmed/react-native-upload";
 import { CloudUploader } from "react-native-nitro-cloud-uploader";
+import { useUserStore } from "../../stores/use-user-store";
+import { sleep } from "../../utils/time";
 
 // Upload constants
 const CHUNK_SIZE = 10 * 1024 * 1024; // 10 MB
@@ -212,6 +214,9 @@ export async function uploadFile(
     );
 
     if (Platform.OS === "android") {
+      useUserStore.setState({
+        disableAppLockRequests: true
+      });
       const status = await PermissionsAndroid.request(
         "android.permission.POST_NOTIFICATIONS"
       );
@@ -221,6 +226,10 @@ export async function uploadFile(
           type: "info"
         });
       }
+      await sleep(500);
+      useUserStore.setState({
+        disableAppLockRequests: false
+      });
     }
 
     let uploaded = false;
