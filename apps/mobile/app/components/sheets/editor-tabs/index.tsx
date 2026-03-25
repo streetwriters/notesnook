@@ -225,7 +225,7 @@ export default function EditorTabs({
         }}
       >
         <Heading size={AppFontSize.lg}>{strings.tabs()}</Heading>
-        <View style={{ flexDirection: "row", gap: 8 }}>
+        <View style={{ flexDirection: "row", gap: DefaultAppStyles.GAP_SMALL }}>
           <IconButton
             onPress={() => {
               useTabStore.getState().clearTabs();
