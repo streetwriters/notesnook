@@ -62,7 +62,17 @@ function registerProtocol() {
         headers: { "Content-Type": extensionToMimeType[fileExtension] }
       });
     } else {
-      return net.fetch(request, { bypassCustomProtocolHandlers: true });
+      const requestHeaders = new Headers(request.headers);
+      if (!requestHeaders.has("referer"))
+        requestHeaders.set("referer", PROTOCOL_URL);
+      return await net.fetch(
+        new Request(request, {
+          headers: requestHeaders
+        }),
+        {
+          bypassCustomProtocolHandlers: true
+        }
+      );
     }
   });
   console.info(`${SCHEME} protocol inteception "successful"`);

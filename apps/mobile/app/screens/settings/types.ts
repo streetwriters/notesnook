@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { TextInput } from "react-native";
 import { Settings } from "../../stores/use-setting-store";
 import { FeatureId } from "@notesnook/common";
+import { IconProps } from "../../components/ui/AppIcon";
 
 export type SettingSection = {
   id: string;
@@ -34,6 +35,8 @@ export type SettingSection = {
   name?: string | ((current?: unknown) => string);
   description?: string | ((current: unknown) => string);
   icon?: string;
+  iconFamily?: IconProps["iconFamily"];
+  iconSize?: number;
   property?: keyof Settings;
   sections?: SettingSection[];
   component?: string;

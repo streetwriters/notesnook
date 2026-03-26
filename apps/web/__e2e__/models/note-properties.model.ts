@@ -253,7 +253,7 @@ export class NotePropertiesModel extends BaseProperties {
       getTestId("time-created-input")
     );
 
-    await dateInput.fill(date.format("MM-DD-YYYY"));
+    await dateInput.fill(date.format("DD-MM-YYYY"));
     await timeInput.fill(date.format("hh:mm A"));
 
     await confirmDialog(editDateCreatedDialog);

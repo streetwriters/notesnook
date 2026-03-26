@@ -17,6 +17,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { FeatureType } from "./components/sheets/new-feature";
-
-export const features: FeatureType[] = [];
+export function getSandboxFeatures(src: string) {
+  const features = [];
+  try {
+    const url = new URL(src);
+    if (url.protocol === "http:" || url.protocol === "https:")
+      features.push(
+        "allow-scripts",
+        "allow-same-origin",
+        "allow-popups",
+        "allow-popups-to-escape-sandbox",
+        "allow-forms",
+        "allow-modals",
+        "allow-downloads",
+        "allow-presentation"
+      );
+  } catch {
+    // ignore
+  }
+  return features.join(" ");
+}

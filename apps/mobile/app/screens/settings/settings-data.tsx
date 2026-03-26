@@ -92,6 +92,7 @@ export const settingsGroups: SettingSection[] = [
       {
         id: "delete-data",
         name: strings.deleteData(),
+        icon: "delete",
         description: strings.deleteAccountDesc(),
         modifer: () => {
           presentDialog({
@@ -1243,7 +1244,7 @@ export const settingsGroups: SettingSection[] = [
             }
           },
           {
-            id: "backup-now",
+            id: "backup-now-with-attachments",
             name: strings.backupNowWithAttachments(),
             description: strings.backupNowWithAttachmentsDesc(),
             hidden: () => !useUserStore.getState().user,
@@ -1545,6 +1546,9 @@ export const settingsGroups: SettingSection[] = [
         id: "join-telegram",
         name: strings.joinTelegram(),
         description: strings.joinTelegramDesc(),
+        icon: "sc-telegram",
+        iconFamily: "evilicons",
+        iconSize: 35,
         modifer: () => {
           Linking.openURL("https://t.me/notesnook").catch(() => {
             /* empty */

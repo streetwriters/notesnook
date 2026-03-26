@@ -91,19 +91,19 @@ const features: Record<FeatureKeys, Feature> = {
         ]
       : [
           {
-            title: "Audio files are now playable in the editor",
+            title: "Search improvements for diacritics & special characters",
             subtitle:
-              "You can now play audio files directly in the editor without needing to download them first."
+              "Diacritic-agnostic search now works correctly. Searches with special characters no longer return empty results or crash the app."
           },
           {
-            title: "Orphaned attachmetns are now automatically deleted",
+            title: "Desktop auto-update control & YouTube embed fix",
             subtitle:
-              "Attachments that are not linked to any note will now be automatically deleted to save space."
+              'Disabling auto-update in settings now also disables the update checker. YouTube embed "Error 153" on Desktop has been fully resolved.'
           },
           {
-            title: "Password changing & account recovery has been fixed",
+            title: "Security patches for note titles & web clipper",
             subtitle:
-              "You should no longer face data loss issues when changing your password or recovering your account."
+              "Note titles are now safely escaped in the diff viewer to prevent malicious HTML execution. Web clipper content is now securely sandboxed to block malicious scripts in iframes."
           }
         ],
     cta: {
@@ -177,7 +177,11 @@ export const FeatureDialog = DialogManager.register(function FeatureDialog(
           >
             <Flex sx={{ alignItems: "center", justifyContent: "start" }}>
               {feature.icon && <feature.icon size={14} color="accent" />}
-              <Text variant="subtitle" ml={1} sx={{ fontWeight: "normal" }}>
+              <Text
+                variant="subtitle"
+                ml={feature.icon ? 1 : 0}
+                sx={{ fontWeight: "normal" }}
+              >
                 {feature.title}
               </Text>
             </Flex>

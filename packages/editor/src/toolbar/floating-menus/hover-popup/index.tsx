@@ -125,7 +125,7 @@ export function HoverPopupHandler(props: FloatingMenuProps) {
                 align: "start",
                 location: "top",
                 isTargetAbsolute: true,
-                yOffset: -10,
+                yOffset: 0,
                 xOffset: -30
               }
             });

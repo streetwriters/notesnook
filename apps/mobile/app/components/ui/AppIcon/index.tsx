@@ -20,6 +20,7 @@ import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { ColorValue, TextProps } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import EvilIcon from "react-native-vector-icons/EvilIcons";
 import { AppFontSize } from "../../../utils/size";
 
 export interface IconProps extends TextProps {
@@ -43,11 +44,22 @@ export interface IconProps extends TextProps {
    *
    */
   color?: ColorValue | number | undefined;
+
+  iconFamily?: "evilicons" | "material";
 }
 
-export default function AppIcon(props: IconProps) {
+export default function AppIcon({
+  iconFamily = "material",
+  ...props
+}: IconProps) {
   const { colors } = useThemeColors();
-  return (
+  return iconFamily === "evilicons" ? (
+    <EvilIcon
+      size={AppFontSize.md}
+      color={colors.primary.icon}
+      {...(props as any)}
+    />
+  ) : (
     <Icon
       size={AppFontSize.md}
       color={colors.primary.icon}

@@ -285,7 +285,7 @@ const Tiptap = ({
             restoreNoteSelection(scrollTop, selection);
           }
         }, 300);
-      }, 1);
+      }, 150);
     },
     [restoreNoteSelection]
   );

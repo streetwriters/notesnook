@@ -28,6 +28,7 @@ import { Icon } from "@notesnook/ui";
 import { Resizer } from "../../components/resizer/index.js";
 import { useThemeEngineStore } from "@notesnook/theme";
 import { useToolbarStore } from "../../toolbar/stores/toolbar-store.js";
+import { getSandboxFeatures } from "../../utils/sandbox.js";
 
 export function EmbedComponent(
   props: ReactNodeViewProps<EmbedAttributes & EmbedAlignmentOptions>
@@ -135,6 +136,9 @@ export function EmbedComponent(
               })}
           width={"100%"}
           height={"100%"}
+          allow={getIframeAllowPermissions(src)}
+          allowFullScreen
+          referrerPolicy={isYouTubeEmbed(src) ? "origin" : undefined}
           sandbox={getSandboxFeatures(src)}
           onLoad={() => setIsLoading(false)}
         />
@@ -155,27 +159,6 @@ export function EmbedComponent(
       </Resizer>
     </Flex>
   );
-}
-
-function getSandboxFeatures(src: string) {
-  const features = [];
-  try {
-    const url = new URL(src);
-    if (url.protocol === "http:" || url.protocol === "https:")
-      features.push(
-        "allow-scripts",
-        "allow-same-origin",
-        "allow-popups",
-        "allow-popups-to-escape-sandbox",
-        "allow-forms",
-        "allow-modals",
-        "allow-downloads",
-        "allow-presentation"
-      );
-  } catch {
-    // ignore
-  }
-  return features.join(" ");
 }
 
 function isYouTubeEmbed(urlString: string) {
@@ -206,6 +189,19 @@ function isTwitterX(src: string) {
   } catch {
     return false;
   }
+}
+
+function getIframeAllowPermissions(src: string) {
+  if (!isYouTubeEmbed(src)) return undefined;
+  return [
+    "accelerometer",
+    "autoplay",
+    "clipboard-write",
+    "encrypted-media",
+    "gyroscope",
+    "picture-in-picture",
+    "web-share"
+  ].join("; ");
 }
 
 function tweetToEmbed(src: string, isDarkTheme: boolean) {

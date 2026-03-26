@@ -60,6 +60,7 @@ import { IconButton } from "../ui/icon-button";
 import Seperator from "../ui/seperator";
 import Paragraph from "../ui/typography/paragraph";
 import { presentDialog } from "../dialog/functions";
+import { Cipher } from "@notesnook/crypto";
 
 const MergeConflicts = () => {
   const { colors } = useThemeColors();
@@ -84,12 +85,21 @@ const MergeConflicts = () => {
       dateEdited: contentToSave.dateEdited
     });
 
-    const noteLocked = await db.vaults.itemExists(note);
+    const noteContent = await db.content.findByNoteId(note.id);
 
-    if (noteLocked) {
-      await db.vault.save({
-        ...contentToSave,
-        sessionId: `${Date.now()}`
+    if (noteContent?.locked) {
+      const selectedContent = contentToSave.conflicted
+        ? noteContent
+        : noteContent.conflicted;
+
+      await db.content.add({
+        id: note.contentId,
+        dateResolved: noteContent?.conflicted?.dateModified || Date.now(),
+        sessionId: `${Date.now()}`,
+        data: selectedContent?.data as Cipher<"base64">,
+        type: selectedContent?.type,
+        locked: true,
+        conflicted: undefined
       });
     } else {
       await db.content.add({
@@ -138,7 +148,6 @@ const MergeConflicts = () => {
         onUnlock: async (item, password) => {
           if (!item || !password) return;
           const currentContent = await db.content.get(item.contentId!);
-
           try {
             noteContent = {
               ...(await db.content.get(item.contentId!)),

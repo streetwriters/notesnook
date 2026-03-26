@@ -25,7 +25,6 @@ import {
 } from "@react-navigation/native";
 import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, TextInput, View } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { FeatureResult, useIsFeatureAvailable } from "@notesnook/common";
 //@ts-ignore
 import ToggleSwitch from "toggle-switch-react-native";
@@ -218,14 +217,15 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
           }}
         >
           {!!item.icon && (
-            <Icon
+            <AppIcon
               color={
                 item.type === "danger"
                   ? colors.error.icon
                   : colors.secondary.icon
               }
+              iconFamily={item.iconFamily}
               name={item.icon}
-              size={30}
+              size={item.iconSize || 30}
             />
           )}
         </View>
