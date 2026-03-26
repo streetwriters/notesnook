@@ -46,9 +46,10 @@ describe("Tags", () => {
       .waitAndTapByText('Add "#testtag"')
       .isVisibleByText("#testtag")
       .pressBack(2)
+      .wait(1000)
       .openSideMenu()
       .waitAndTapById("tab-tags")
-      .waitAndTapByText("#testtag")
+      .waitAndTapByText("testtag")
       .processResult(async (note) => {
         await TestBuilder.create().isVisibleByText(note.body).run();
       })

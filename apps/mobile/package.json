@@ -1,11 +1,11 @@
 {
   "name": "@notesnook/mobile",
-  "version": "3.3.16",
+  "version": "3.3.17",
   "private": true,
   "license": "GPL-3.0-or-later",
   "scripts": {
     "postinstall": "patch-package && node ./scripts/optimize-fonts.mjs",
-    "run-android": "react-native run-android --active-arch-only",
+    "run-android": "react-native run-android --active-arch-only --mode=release",
     "build": "echo 'No build script defined'",
     "run-ios": "react-native run-ios",
     "start": "react-native start",
