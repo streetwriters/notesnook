@@ -229,7 +229,7 @@ export const MonographPage = ({
           )}
           <Image
             sx={{ display: "none" }}
-            src={`${apiHost}/monographs/${monograph.id}/view`}
+            src={`${apiHost}/monographs/${monograph.slug ?? monograph.id}/view`}
           />
         </Flex>
       </Box>
