@@ -30,6 +30,7 @@ import {
 import { strings } from "@notesnook/intl";
 import notifee from "@notifee/react-native";
 import NetInfo, { NetInfoSubscription } from "@react-native-community/netinfo";
+import dayjs from "dayjs";
 import React, { useCallback, useEffect, useRef } from "react";
 import {
   AppState,
@@ -48,6 +49,7 @@ import * as RNIap from "react-native-iap";
 import { DatabaseLogger, db, setupDatabase } from "../common/database";
 import { initializeLogger } from "../common/database/logger";
 import { MMKV } from "../common/database/mmkv";
+import { deleteDCacheFiles } from "../common/filesystem/io";
 import { endProgress, startProgress } from "../components/dialogs/progress";
 import Migrate from "../components/sheets/migrate";
 import NewFeature from "../components/sheets/new-feature";
@@ -89,6 +91,7 @@ import { clearAllStores, initAfterSync } from "../stores";
 import { refreshAllStores } from "../stores/create-db-collection-store";
 import { useAttachmentStore } from "../stores/use-attachment-store";
 import { useMessageStore } from "../stores/use-message-store";
+import { useRelationStore } from "../stores/use-relation-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { SyncStatus, useUserStore } from "../stores/use-user-store";
 import { updateStatusBarColor } from "../utils/colors";
@@ -108,9 +111,6 @@ import { fluidTabsRef } from "../utils/global-refs";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { sleep } from "../utils/time";
 import useFeatureManager from "./use-feature-manager";
-import { deleteDCacheFiles } from "../common/filesystem/io";
-import dayjs from "dayjs";
-import { useRelationStore } from "../stores/use-relation-store";
 
 const onCheckSyncStatus = async (type: SyncStatusEvent) => {
   const { disableSync, disableAutoSync } = SettingsService.get();
@@ -358,7 +358,7 @@ async function checkForShareExtensionLaunchedInBackground() {
       if (note) setTimeout(() => eSendEvent("loadingNote", note), 1);
       MMKV.removeItem("shareExtensionOpened");
     }
-  } catch (e) {}
+  } catch (e) { }
 }
 
 async function saveEditorState() {
@@ -554,6 +554,7 @@ export const useAppEvents = () => {
   ]);
   useFeatureManager();
   const syncedOnLaunch = useRef(false);
+  const hasInitialized = useRef(false);
   const refValues = useRef<
     Partial<{
       subsriptionSuccessListener: EmitterSubscription;
@@ -566,6 +567,11 @@ export const useAppEvents = () => {
       attachmentsCachedOfflineMode: boolean;
     }>
   >({});
+
+  if (!hasInitialized.current) {
+    hasInitialized.current = true;
+    clearAppState();
+  }
 
   const onSyncComplete = useCallback(async () => {
     initAfterSync(Sync.getLastSyncType() as "full" | "send");
@@ -590,6 +596,11 @@ export const useAppEvents = () => {
       subscriptions.forEach((sub) => sub?.unsubscribe?.());
     };
   }, [isAppLoading, onSyncComplete]);
+
+  useEffect(() => {
+    if (isAppLoading) return;
+    clearAppState();
+  }, [isAppLoading]);
 
   useEffect(() => {
     if (initialUrl) {
@@ -838,7 +849,8 @@ export const useAppEvents = () => {
         Sync.run("global", false, "full");
         reconnectSSE();
         await checkForShareExtensionLaunchedInBackground();
-        NotesnookModule.setAppState("");
+        // NotesnookModule.setAppState("");
+        clearAppState();
         let user = await db.user.getUser();
         if (user && !user?.isEmailConfirmed) {
           try {
@@ -932,7 +944,7 @@ export const useAppEvents = () => {
   useEffect(() => {
     if (!appLocked && isAppLoading) {
       initializeLogger()
-        .catch((e) => {})
+        .catch((e) => { })
         .finally(() => {
           //@ts-ignore
           initializeDatabase();
