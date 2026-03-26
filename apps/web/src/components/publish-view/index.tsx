@@ -23,7 +23,7 @@ import { Loading, Refresh } from "../icons";
 import { db } from "../../common/db";
 import { writeText } from "clipboard-polyfill";
 import { showToast } from "../../utils/toast";
-import { EVENTS, hosts } from "@notesnook/core";
+import { EVENTS } from "@notesnook/core";
 import { useStore } from "../../stores/monograph-store";
 import { Note } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
@@ -61,9 +61,9 @@ function PublishView(props: PublishViewProps) {
   const unpublishNote = useStore((store) => store.unpublish);
   const [monograph, setMonograph] = useState(props.monograph);
   const monographAnalytics = useIsFeatureAvailable("monographAnalytics");
-  const publishInfo = usePromise(async () => {
+  const metadata = usePromise(async () => {
     if (!monograph) return { publishUrl: "", analytics: { totalViews: 0 } };
-    return await db.monographs.publishInfo(monograph.id);
+    return await db.monographs.metadata(monograph.id);
   }, [monograph?.id]);
 
   useEffect(() => {
@@ -96,29 +96,31 @@ function PublishView(props: PublishViewProps) {
             variant="text.body"
             as="a"
             target="_blank"
-            href={publishInfo.status === "fulfilled" ? publishInfo.value.publishUrl : "#"}
+            href={
+              metadata.status === "fulfilled" ? metadata.value.publishUrl : "#"
+            }
             sx={{
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
               textDecoration: "none",
               overflow: "hidden",
               px: 1,
-              opacity: publishInfo.status === "fulfilled" ? 1 : 0.8
+              opacity: metadata.status === "fulfilled" ? 1 : 0.8
             }}
           >
-            {publishInfo.status === "fulfilled"
-              ? publishInfo.value.publishUrl
+            {metadata.status === "fulfilled"
+              ? metadata.value.publishUrl
               : monograph?.publishUrl}
           </Link>
           <Button
             variant="secondary"
             className="copyPublishLink"
             sx={{ flexShrink: 0, m: 0 }}
-            disabled={publishInfo.status !== "fulfilled"}
+            disabled={metadata.status !== "fulfilled"}
             onClick={() => {
-              if (publishInfo.status !== "fulfilled") return;
+              if (metadata.status !== "fulfilled") return;
 
-              writeText(publishInfo.value.publishUrl);
+              writeText(metadata.value.publishUrl);
             }}
           >
             {strings.copy()}
@@ -178,7 +180,7 @@ function PublishView(props: PublishViewProps) {
           >
             <Text variant="body">{strings.views()}</Text>
             {monographAnalytics?.isAllowed ? (
-              publishInfo.status === "fulfilled" ? (
+              metadata.status === "fulfilled" ? (
                 <Flex sx={{ alignItems: "center", gap: 1 }}>
                   <Text
                     variant="body"
@@ -186,14 +188,14 @@ function PublishView(props: PublishViewProps) {
                       color: "paragraph-secondary"
                     }}
                   >
-                    {publishInfo.value.analytics.totalViews}
+                    {metadata.value.analytics.totalViews}
                   </Text>
                   <Button
                     variant="tertiary"
                     onClick={async () => {
                       try {
                         setStatus({ action: "analytics" });
-                        publishInfo.refresh();
+                        metadata.refresh();
                       } finally {
                         setStatus(undefined);
                       }

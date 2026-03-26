@@ -197,14 +197,14 @@ export class Monographs {
     return this.db.storage().decrypt(monographPasswordsKey, password);
   }
 
-  async publishInfo(monographId: string): Promise<{
+  async metadata(monographId: string): Promise<{
     publishUrl: string;
     analytics: MonographAnalytics;
   }> {
     try {
       const token = await this.db.tokenManager.getAccessToken();
       const info = (await http.get(
-        `${Constants.API_HOST}/monographs/${monographId}/publish-info`,
+        `${Constants.API_HOST}/monographs/${monographId}/metadata`,
         token
       )) as { publishUrl: string; analytics: MonographAnalytics };
       return info;
