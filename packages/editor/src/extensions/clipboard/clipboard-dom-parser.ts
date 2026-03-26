@@ -42,7 +42,7 @@ export class ClipboardDOMParser extends ProsemirrorDOMParser {
       convertGoogleDocsChecklist(dom);
       formatCodeblocks(dom);
       convertBrToSingleSpacedParagraphs(dom);
-      removePremiumFeatures(dom);
+      removeRestrictedFeatures(dom);
       removeBlockId(dom);
     }
     return super.parseSlice(dom, options);
@@ -53,7 +53,7 @@ export class ClipboardDOMParser extends ProsemirrorDOMParser {
       convertGoogleDocsChecklist(dom);
       formatCodeblocks(dom);
       convertBrToSingleSpacedParagraphs(dom);
-      removePremiumFeatures(dom);
+      removeRestrictedFeatures(dom);
       removeBlockId(dom);
     }
     return super.parse(dom, options);
@@ -154,7 +154,7 @@ export function convertGoogleDocsChecklist(dom: HTMLElement | Document) {
   }
 }
 
-const premiumFeatures = [
+const restrictedFeatures = [
   {
     selector: "div.callout",
     permission: "setCallout"
@@ -166,11 +166,15 @@ const premiumFeatures = [
   {
     selector: "ul.checklist",
     permission: "toggleTaskList"
+  },
+  {
+    selector: "img",
+    permission: "insertAttachment"
   }
 ] as const;
 
-function removePremiumFeatures(dom: HTMLElement | Document) {
-  for (const feature of premiumFeatures) {
+function removeRestrictedFeatures(dom: HTMLElement | Document) {
+  for (const feature of restrictedFeatures) {
     const elements = dom.querySelectorAll(feature.selector);
     if (elements.length === 0) continue;
 
