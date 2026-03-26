@@ -231,7 +231,7 @@ export default function EditorTabs({
               useTabStore.getState().clearAllTabs();
               close?.();
             }}
-            name="delete-outline"
+            name="close-box-multiple-outline"
             color={colors.primary.icon}
           />
           <IconButton
