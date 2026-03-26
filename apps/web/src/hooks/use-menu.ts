@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { create } from "zustand";
 import { shallow } from "zustand/shallow";
 import { MenuItem, PositionOptions } from "@notesnook/ui";
 import { desktop } from "../common/desktop-bridge";
 import { isMac } from "../utils/platform";
+import createStore from "../common/store";
 
 type MenuOptions = {
   position?: PositionOptions;
@@ -38,7 +38,7 @@ type MenuStore = {
   close: () => void;
 };
 
-const useMenuStore = create<MenuStore>((set) => ({
+const [useMenuStore] = createStore<MenuStore>((set) => ({
   isOpen: false,
   items: [],
   title: undefined,
@@ -59,24 +59,24 @@ const useMenuStore = create<MenuStore>((set) => ({
         },
         {
           onData(ids) {
-            findAndCallAction(resolvedItems, ids);
+            if (ids.length > 0) findAndCallAction(resolvedItems, ids);
+            set({ isOpen: false });
           }
         }
       );
-      set(() => ({ options }));
+      set({ options, isOpen: true });
     } else {
-      set(() => ({ isOpen: true, items, options }));
+      set({ isOpen: true, items, options });
     }
   },
   close: () =>
-    set(() => ({
+    set({
       isOpen: false,
       items: [],
-      data: undefined,
       title: undefined
-    }))
+    })
 }));
-
+export { useMenuStore };
 export function useMenuTrigger() {
   const isOpen = useMenuStore((store) => store.isOpen);
   const target = useMenuStore((store) => store.options?.position?.target);
@@ -128,7 +128,6 @@ function findAndCallAction(items: MenuItem[], ids: string[]) {
   for (const id of ids) {
     const item = _items.find((item) => item.key === id);
     if (!item || item?.type !== "button") continue;
-    console.log(item);
     if (id === actionId) {
       item?.onClick?.();
     } else {

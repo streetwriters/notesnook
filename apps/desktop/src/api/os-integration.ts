@@ -252,6 +252,7 @@ export const osIntegrationRouter = t.router({
           if (menuItem) menu.append(menuItem);
         }
         if (menu.items.length > 0) menu.popup();
+        menu.on("menu-will-close", () => emit.next([]));
         return () => {
           menu.removeAllListeners();
           menu.closePopup();
