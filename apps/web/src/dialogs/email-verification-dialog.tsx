@@ -27,6 +27,7 @@ import { useSessionState } from "../hooks/use-session-state";
 import Accordion from "../components/accordion";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
+import { showToast } from "../utils/toast";
 
 let interval = 0;
 type EmailVerificationDialogProps = BaseDialogProps<boolean>;
@@ -76,8 +77,10 @@ export const EmailVerificationDialog = DialogManager.register(
             try {
               await db.user.sendVerificationEmail();
               setCanSendAgain(false);
+              showToast("success", strings.confirmationEmailSent());
             } catch (e) {
               console.error(e);
+              showToast("error", strings.somethingWentWrong());
             } finally {
               setIsSending(false);
             }

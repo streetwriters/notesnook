@@ -1765,6 +1765,10 @@ msgstr "Confirm password"
 msgid "Confirm pin"
 msgstr "Confirm pin"
 
+#: src/strings.ts:2639
+msgid "Confirmation email sent"
+msgstr "Confirmation email sent"
+
 #: src/strings.ts:2080
 msgid "Congratulations!"
 msgstr "Congratulations!"
