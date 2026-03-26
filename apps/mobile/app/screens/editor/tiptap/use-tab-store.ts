@@ -187,7 +187,7 @@ export type TabStore = {
   focusEmptyTab: () => void;
   getCurrentNoteId: () => string | undefined;
   getTab: (tabId: string) => TabItem | undefined;
-  clearTabs: () => void;
+  clearAllTabs: () => void;
   newTabSession: (
     id: string,
     options?: Omit<Partial<TabSessionItem>, "id">
@@ -484,7 +484,7 @@ export const useTabStore = create<TabStore, any>(
       getTab: (tabId) => {
         return get().tabs.find((t) => t.id === tabId);
       },
-      clearTabs: () => {
+      clearAllTabs: () => {
         const tabs = get().tabs;
         tabs.forEach((tab) => {
           const tabSessions = tabSessionHistory.getTabHistory(tab.id);
