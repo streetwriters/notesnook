@@ -61,6 +61,7 @@ const EXTRA_ICON_NAMES = [
   "checkbox-marked",
   "checkbox-blank-outline",
   "unfold-less-horizontal",
+  "close-box-multiple-outline",
   "minus-circle",
   "vibrate",
   "volume-high",
