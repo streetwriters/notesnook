@@ -91,7 +91,7 @@ import { usePersistentState } from "../../hooks/use-persistent-state";
 import { MenuItem } from "@notesnook/ui";
 import { Color, Notebook, Tag } from "@notesnook/core";
 import { handleDrop } from "../../common/drop-handler";
-import { Menu } from "../../hooks/use-menu";
+import { Menu, useMenuTrigger } from "../../hooks/use-menu";
 import { RenameColorDialog } from "../../dialogs/item-dialog";
 import { strings } from "@notesnook/intl";
 import Tags from "../../views/tags";
@@ -233,6 +233,8 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
   const [expanded, setExpanded] = useState(false);
   const isCollapsed = isNavPaneCollapsed && !expanded;
   const mouseHoverTimeout = useRef(0);
+  const { isOpen: isMenuOpen } = useMenuTrigger();
+  const prevMenuIsOpen = useRef(false);
   const currentTab = tabs.find((tab) => tab.id === navigationTab) || tabs[0];
 
   useEffect(() => {
@@ -251,6 +253,19 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
       event.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    // when a menu that was open is closed, check if we should collapse
+    if (prevMenuIsOpen.current && !isMenuOpen) {
+      if (isNavPaneCollapsed) {
+        clearTimeout(mouseHoverTimeout.current);
+        mouseHoverTimeout.current = setTimeout(() => {
+          setExpanded(false);
+        }, 500) as unknown as number;
+      }
+    }
+    prevMenuIsOpen.current = isMenuOpen;
+  }, [isMenuOpen, isNavPaneCollapsed]);
 
   return (
     <ScopedThemeProvider
@@ -277,6 +292,7 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
         if (!isNavPaneCollapsed) return;
         mouseHoverTimeout.current = setTimeout(() => {
           if (!isNavPaneCollapsed) return;
+          if (Menu.isOpen()) return;
           setExpanded(false);
         }, 500) as unknown as number;
       }}
