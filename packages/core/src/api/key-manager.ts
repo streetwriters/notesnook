@@ -83,8 +83,9 @@ export class KeyManager {
       refetchUser?: boolean;
     } = { refetchUser: true, useCache: true }
   ): Promise<KeyTypeFromId<TId> | undefined> {
-    if (options.useCache && this.cache.has(id)) {
-      return this.cache.get(id) as KeyTypeFromId<TId>;
+    const cachedKey = this.cache.get(id);
+    if (options.useCache && cachedKey) {
+      return cachedKey as KeyTypeFromId<TId>;
     }
     let user = await this.db.user.getUser();
     if ((!user || !user[id]) && options.refetchUser) {
@@ -93,9 +94,7 @@ export class KeyManager {
     if (!user) return;
 
     const key = user[id] as KeyTypeFromId<TId>;
-    if (key) {
-      this.cache.set(id, key as KeyTypeFromId<KeyId>);
-    }
+    if (key) this.cache.set(id, key as KeyTypeFromId<KeyId>);
 
     return key;
   }
