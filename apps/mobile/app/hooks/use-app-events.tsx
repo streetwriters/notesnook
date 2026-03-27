@@ -207,6 +207,7 @@ const onAppOpenedFromURL = async (event: {
       if (id) {
         const notebook = await db.notebooks.notebook(id);
         if (notebook) {
+          fluidTabsRef.current?.goToPage("home");
           Navigation.navigate("Notebook", {
             id: notebook.id,
             canGoBack: true,
@@ -223,6 +224,7 @@ const onAppOpenedFromURL = async (event: {
       if (id) {
         const tag = await db.tags.tag(id);
         if (tag) {
+          fluidTabsRef.current?.goToPage("home");
           Navigation.navigate("TaggedNotes", {
             type: "tag",
             id: tag.id,
@@ -240,6 +242,7 @@ const onAppOpenedFromURL = async (event: {
       if (id) {
         const color = await db.colors.color(id);
         if (color) {
+          fluidTabsRef.current?.goToPage("home");
           Navigation.navigate("ColoredNotes", {
             type: "color",
             id: color.id,
