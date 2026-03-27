@@ -259,7 +259,7 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
                 return;
             }
 
-            String uri = "https://app.notesnook.com/open_" + type + "?id=" + id;
+            String uri = "nn://" + type + "/" + id;
             Intent intent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(uri));
             intent.setPackage(mContext.getPackageName());
 

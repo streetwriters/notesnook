@@ -25,7 +25,9 @@ import {
   SYNC_CHECK_IDS,
   SubscriptionPlan,
   SyncStatusEvent,
-  User
+  User,
+  isInternalLink,
+  parseInternalLink
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import notifee from "@notifee/react-native";
@@ -169,6 +171,8 @@ const onAppOpenedFromURL = async (event: {
 }) => {
   const url = event.url;
 
+  const parsedLink = isInternalLink(url) ? parseInternalLink(url) : undefined;
+
   try {
     if (url.startsWith("https://app.notesnook.com/account/verified")) {
       await onUserEmailVerified();
@@ -178,8 +182,12 @@ const onAppOpenedFromURL = async (event: {
       eSendEvent(eOnLoadNote, { newNote: true });
       fluidTabsRef.current?.goToPage("editor", false);
       return;
-    } else if (url.startsWith("https://app.notesnook.com/open_note?")) {
-      const id = new URL(url).searchParams.get("id");
+    } else if (
+      parsedLink?.type === "note" ||
+      url.startsWith("https://app.notesnook.com/open_note?")
+    ) {
+      const id = parsedLink?.id || new URL(url).searchParams.get("id");
+
       if (id) {
         const note = await db.notes.note(id);
         if (note) {
@@ -191,10 +199,11 @@ const onAppOpenedFromURL = async (event: {
         }
       }
     } else if (
-      url.startsWith("https://app.notesnook.com/open_notebook?") &&
+      (parsedLink?.type === "notebook" ||
+        url.startsWith("https://app.notesnook.com/open_notebook?")) &&
       !event.isInitialUrl
     ) {
-      const id = new URL(url).searchParams.get("id");
+      const id = parsedLink?.id || new URL(url).searchParams.get("id");
       if (id) {
         const notebook = await db.notebooks.notebook(id);
         if (notebook) {
@@ -206,10 +215,11 @@ const onAppOpenedFromURL = async (event: {
         }
       }
     } else if (
-      url.startsWith("https://app.notesnook.com/open_tag?") &&
+      (parsedLink?.type === "tag" ||
+        url.startsWith("https://app.notesnook.com/open_tag?")) &&
       !event.isInitialUrl
     ) {
-      const id = new URL(url).searchParams.get("id");
+      const id = parsedLink?.id || new URL(url).searchParams.get("id");
       if (id) {
         const tag = await db.tags.tag(id);
         if (tag) {
@@ -222,10 +232,11 @@ const onAppOpenedFromURL = async (event: {
         }
       }
     } else if (
-      url.startsWith("https://app.notesnook.com/open_color?") &&
+      (parsedLink?.type === "color" ||
+        url.startsWith("https://app.notesnook.com/open_color?")) &&
       !event.isInitialUrl
     ) {
-      const id = new URL(url).searchParams.get("id");
+      const id = parsedLink?.id || new URL(url).searchParams.get("id");
       if (id) {
         const color = await db.colors.color(id);
         if (color) {
