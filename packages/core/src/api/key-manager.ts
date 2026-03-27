@@ -92,8 +92,12 @@ export class KeyManager {
     }
     if (!user) return;
 
-    this.cache.set(id, user[id] as KeyTypeFromId<KeyId>);
-    return user[id] as KeyTypeFromId<TId>;
+    const key = user[id] as KeyTypeFromId<TId>;
+    if (key) {
+      this.cache.set(id, key as KeyTypeFromId<KeyId>);
+    }
+
+    return key;
   }
 
   async unwrapKey<T extends WrappedKey>(
