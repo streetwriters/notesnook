@@ -3695,6 +3695,10 @@ msgstr ""
 msgid "Lock the app with a password or pin"
 msgstr ""
 
+#: src/strings.ts:2639
+msgid "Lock vault after"
+msgstr ""
+
 #: src/strings.ts:901
 msgid "Locked notes cannot be pinned"
 msgstr ""

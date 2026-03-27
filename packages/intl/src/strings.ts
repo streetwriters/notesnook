@@ -2635,5 +2635,8 @@ Use this if changes from other devices are not appearing on this device. This wi
   noContent: () => t`This note is empty`,
   deleteData: () => t`Delete data`,
   failedToAttachFile: () => t`Failed to attach file`,
-  unlockNoteToMergeConflicts: () => t`Unlock note to merge conflicts`
+  unlockNoteToMergeConflicts: () => t`Unlock note to merge conflicts`,
+  lockVaultAfter: () => t`Lock vault after`,
+  lockVaultAfterDesc: () =>
+    `How long should the vault stay unlocked before automatically locking?`
 };

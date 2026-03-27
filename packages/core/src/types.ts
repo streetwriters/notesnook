@@ -485,6 +485,7 @@ export type SettingItemMap = {
   defaultNotebook: string | undefined;
   defaultTag: string | undefined;
   profile: Profile | undefined;
+  "vault:lockAfter": number;
 } & Record<`groupOptions:${GroupingKey}`, GroupOptions> &
   Record<`toolbarConfig:${ToolbarConfigPlatforms}`, ToolbarConfig | undefined> &
   Record<`sideBarOrder:${SideBarSection}`, string[]> &
