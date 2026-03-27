@@ -102,6 +102,7 @@ export type Settings = {
   defaultSidebarTab: number;
   checkForUpdates?: boolean;
   defaultLineHeight: number;
+  imageCompression: "ask-every-time" | "enabled" | "disabled";
 };
 
 type DimensionsType = {
@@ -206,7 +207,8 @@ export const defaultSettings: SettingStore["settings"] = {
   fullBackupReminder: "never",
   lastFullBackupDate: 0,
   checkForUpdates: true,
-  defaultLineHeight: EDITOR_LINE_HEIGHT.DEFAULT
+  defaultLineHeight: EDITOR_LINE_HEIGHT.DEFAULT,
+  imageCompression: "ask-every-time"
 };
 
 export const useSettingStore = create<SettingStore>((set, get) => ({

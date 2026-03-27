@@ -56,24 +56,26 @@ const USER = {
 async function login() {
   await TestBuilder.create()
     .waitAndTapByText("Login to encrypt and sync notes")
-    .typeTextById("input.email", USER.login.email!)
+    .replaceTextById("input.email", USER.login.email!)
     .tapReturnKeyById("input.email")
     .wait(3000)
-    .typeTextById("input.totp", authenticator.generate(USER.login.totpSecret!))
+    .replaceTextById(
+      "input.totp",
+      authenticator.generate(USER.login.totpSecret!)
+    )
     .waitAndTapByText("Next")
     .wait(3000)
-    .typeTextById("input.password", USER.login.password!)
+    .replaceTextById("input.password", USER.login.password!)
     .tapReturnKeyById("input.password")
+    .wait(4000)
+    .tapById("paywall-close")
+    .wait(3000)
+    .isVisibleById("Search in Notes")
     .run();
 }
 
 describe("AUTH", () => {
   it("Login", async () => {
-    await TestBuilder.create()
-      .prepare()
-      .addStep(login)
-      .wait(3000)
-      .isNotVisibleByText("Notesnook Plans")
-      .run();
+    await TestBuilder.create().prepare().addStep(login).run();
   });
 });

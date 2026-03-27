@@ -183,6 +183,7 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
         >
           <IconButton
             name="close"
+            testID="paywall-close"
             color={colors.primary.icon}
             onPress={() => {
               Navigation.navigate("FluidPanelsView", {});
@@ -1008,8 +1009,8 @@ const PricingPlanCard = ({
                   : "monthly"
               }`
             : pricingPlans.isGithubRelease
-            ? (WebPlan?.period as string)
-            : (product?.productId as string)
+              ? (WebPlan?.period as string)
+              : (product?.productId as string)
         );
         setStep(Steps.buy);
       }}

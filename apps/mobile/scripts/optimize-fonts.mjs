@@ -121,7 +121,8 @@ const EXTRA_ICON_NAMES = [
   "calendar-today",
   "bomb",
   "bomb-off",
-  "cancel"
+  "cancel",
+  "image-area"
 ];
 
 const __filename = fileURLToPath(import.meta.url);

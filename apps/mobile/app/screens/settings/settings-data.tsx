@@ -816,6 +816,14 @@ export const settingsGroups: SettingSection[] = [
             description: strings.autoUpdateCheckDesc(),
             property: "checkForUpdates",
             icon: "update"
+          },
+          {
+            id: "image-compression",
+            type: "component",
+            name: strings.imageCompression(),
+            description: strings.imageCompressionDesc(),
+            component: "image-compression-picker",
+            icon: "image-area"
           }
         ]
       },
