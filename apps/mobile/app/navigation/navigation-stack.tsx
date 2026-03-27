@@ -31,6 +31,7 @@ import { useSettingStore } from "../stores/use-setting-store";
 import { rootNavigatorRef } from "../utils/global-refs";
 import Navigation from "../services/navigation";
 import { isFeatureAvailable } from "@notesnook/common";
+import { isInternalLink, parseInternalLink } from "@notesnook/core";
 
 const RootStack = createNativeStackNavigator();
 const AppStack = createNativeStackNavigator();
@@ -63,10 +64,17 @@ const AppNavigation = React.memo(
 
     React.useEffect(() => {
       if (!home) {
-        if (useSettingStore.getState().initialUrl) {
-          const url = useSettingStore.getState().initialUrl;
-          if (url?.startsWith("https://app.notesnook.com/open_notebook?")) {
-            const id = new URL(url).searchParams.get("id");
+        const url = useSettingStore.getState().initialUrl;
+        if (url) {
+          const parsedLink = isInternalLink(url)
+            ? parseInternalLink(url)
+            : undefined;
+
+          if (
+            parsedLink?.type === "notebook" ||
+            url?.startsWith("https://app.notesnook.com/open_notebook?")
+          ) {
+            const id = parsedLink?.id || new URL(url).searchParams.get("id");
             if (id) {
               setHome({
                 name: "Notebook",
@@ -76,8 +84,11 @@ const AppNavigation = React.memo(
               });
               return;
             }
-          } else if (url?.startsWith("https://app.notesnook.com/open_tag?")) {
-            const id = new URL(url).searchParams.get("id");
+          } else if (
+            parsedLink?.type === "tag" ||
+            url?.startsWith("https://app.notesnook.com/open_tag?")
+          ) {
+            const id = parsedLink?.id || new URL(url).searchParams.get("id");
             if (id) {
               setHome({
                 name: "TaggedNotes",
@@ -88,8 +99,11 @@ const AppNavigation = React.memo(
               });
               return;
             }
-          } else if (url?.startsWith("https://app.notesnook.com/open_color?")) {
-            const id = new URL(url).searchParams.get("id");
+          } else if (
+            parsedLink?.type === "color" ||
+            url?.startsWith("https://app.notesnook.com/open_color?")
+          ) {
+            const id = parsedLink?.id || new URL(url).searchParams.get("id");
             if (id) {
               setHome({
                 name: "ColoredNotes",

@@ -1003,20 +1003,6 @@ export const useActions = ({
         onPress: openHistory
       },
       {
-        id: "copy-link",
-        title: strings.copyLink(),
-        icon: "link",
-        onPress: () => {
-          Clipboard.setString(createInternalLink("note", item.id));
-          ToastManager.show({
-            heading: strings.linkCopied(),
-            message: createInternalLink("note", item.id),
-            context: "local",
-            type: "success"
-          });
-        }
-      },
-      {
         id: "reminders",
         title: strings.dataTypesPluralCamelCase.reminder(),
         icon: "clock-outline",
@@ -1267,6 +1253,29 @@ export const useActions = ({
             (item as Color).colorCode
           );
         } catch (e) {}
+      }
+    });
+  }
+
+  if (
+    item.type === "tag" ||
+    item.type === "note" ||
+    item.type === "notebook" ||
+    item.type === "color"
+  ) {
+    actions.push({
+      id: "copy-link",
+      title: strings.copyLink(),
+      icon: "link",
+      onPress: () => {
+        const link = createInternalLink(item.type, item.id);
+        Clipboard.setString(link);
+        ToastManager.show({
+          heading: strings.linkCopied(),
+          message: link,
+          context: "local",
+          type: "success"
+        });
       }
     });
   }

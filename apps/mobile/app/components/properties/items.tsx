@@ -79,6 +79,7 @@ const COLUMN_BAR_ITEMS: ActionId[] = [
   "rename-color",
   "rename-tag",
   "launcher-shortcut",
+  "copy-link",
   "restore",
   "trash",
   "delete"
