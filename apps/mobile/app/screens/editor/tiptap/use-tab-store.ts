@@ -187,6 +187,7 @@ export type TabStore = {
   focusEmptyTab: () => void;
   getCurrentNoteId: () => string | undefined;
   getTab: (tabId: string) => TabItem | undefined;
+  clearAllTabs: () => void;
   newTabSession: (
     id: string,
     options?: Omit<Partial<TabSessionItem>, "id">
@@ -255,7 +256,7 @@ export const useTabStore = create<TabStore, any>(
 
         const sessionId =
           oldSessionId &&
-          tabSessionHistory.currentSessionId(tabId) === oldSessionId
+            tabSessionHistory.currentSessionId(tabId) === oldSessionId
             ? oldSessionId
             : tabSessionHistory.add(tabId, oldSessionId);
 
@@ -386,7 +387,7 @@ export const useTabStore = create<TabStore, any>(
       focusPreviewTab: (
         noteId: string,
         options: Omit<Partial<TabItem>, "id" | "noteId">
-      ) => {},
+      ) => { },
 
       removeTab: (id: string) => {
         const index = get().tabs.findIndex((t) => t.id === id);
@@ -482,6 +483,25 @@ export const useTabStore = create<TabStore, any>(
       },
       getTab: (tabId) => {
         return get().tabs.find((t) => t.id === tabId);
+      },
+      clearAllTabs: () => {
+        const tabs = get().tabs;
+        tabs.forEach((tab) => {
+          const tabSessions = tabSessionHistory.getTabHistory(tab.id);
+          tabSessions.back.forEach((id) => TabSessionStorage.remove(id));
+          tabSessions.forward.forEach((id) => TabSessionStorage.remove(id));
+          tabSessionHistory.clearStackForTab(tab.id);
+        });
+
+        const id = getId();
+        set({
+          tabs: [{ id: id }],
+          currentTab: id
+        });
+        history.history = [id];
+        get().newTabSession(id);
+        get().focusTab(id);
+        syncTabs();
       }
     }),
     {
