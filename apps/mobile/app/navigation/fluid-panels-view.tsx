@@ -243,8 +243,8 @@ export const FluidPanelsView = React.memo(
         const nextDeviceMode = DDS.isLargeTablet()
           ? "tablet"
           : DDS.isSmallTab
-            ? "smallTablet"
-            : "mobile";
+          ? "smallTablet"
+          : "mobile";
         setDeviceMode(nextDeviceMode, size);
       },
       [orientation, setDeviceMode, setDimensions]
