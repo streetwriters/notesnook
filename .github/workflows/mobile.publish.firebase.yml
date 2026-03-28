@@ -62,7 +62,7 @@ jobs:
       - name: Build arm64-v8a apk
         run: |
           cd apps/mobile/android
-          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > ./app/google-services.json
+          echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > ./app/google-services.json
           ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a -PlocalReleaseBuild=true
 
       - name: Get app version
