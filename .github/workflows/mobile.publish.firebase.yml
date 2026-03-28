@@ -14,10 +14,6 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     env:
-      CMAKE_C_COMPILER_LAUNCHER: ccache
-      CMAKE_CXX_COMPILER_LAUNCHER: ccache
-      NDK_CCACHE: ccache
-      USE_CCACHE: 1
       LOCAL_RELEASE_BUILD: true
 
     steps:
