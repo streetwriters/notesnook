@@ -4,12 +4,12 @@ on:
   pull_request:
     types: [opened, reopened, synchronize]
     branches: [master, beta]
-    # paths:
-    #   - "apps/desktop/**"
-    #   - "apps/web/**"
-    #   - "packages/**"
-    #   # re-run workflow if workflow file changes
-    #   - ".github/workflows/desktop.preview.yml"
+    paths:
+      - "apps/desktop/**"
+      - "apps/web/**"
+      - "packages/**"
+      # re-run workflow if workflow file changes
+      - ".github/workflows/desktop.preview.yml"
 
 jobs:
   build:
