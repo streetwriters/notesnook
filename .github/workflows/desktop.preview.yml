@@ -174,15 +174,6 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v4
 
-      - name: Setup .NET Core SDK
-        uses: actions/setup-dotnet@v2
-        with:
-          dotnet-version: 6.0.x
-
-      - name: Install TrustedSigning
-        run: Install-Module -Name TrustedSigning -RequiredVersion 0.3.15 -Force -Repository PSGallery
-        shell: pwsh
-
       - name: Setup Node
         uses: ./.github/actions/setup-node-with-cache
 
@@ -211,11 +202,8 @@ jobs:
 
       - name: Publish
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-        run: yarn electron-builder --config=electron-builder.config.js --win --publish never
+          NOTESNOOK_STAGING: true
+        run: yarn electron-builder --config=electron-builder.config.js --win nsis:x64 --publish never
         working-directory: ./apps/desktop
 
       - name: Upload exe artifact
@@ -227,7 +215,7 @@ jobs:
 
   post-pr-comment:
     name: Post PR comment with preview URLs
-    needs: [build, build-macos, build-linux-x64, build-linux-arm64, build-windows]
+    needs: [build, build-macos, build-linux-x64, build-windows]
     runs-on: ubuntu-latest
     steps:
       - name: Post or update PR comment
@@ -243,7 +231,7 @@ jobs:
             const previewUrl = [
               { platform: 'macOS', url: process.env.macos_artifact_url },
               { platform: 'Linux x64', url: process.env.linux_x64_artifact_url },
-              { platform: 'Windows', url: process.env.windows_artifact_url },
+              { platform: 'Windows x64', url: process.env.windows_artifact_url },
             ].filter(u => u.url).map(u => `- [${u.platform}](${u.url})`).join('\n');
             const body = `${marker}\n**Desktop Previews**\n\n${previewUrl || 'Preview URL unavailable — check workflow logs.'}\n\nCommit: ${process.env.GITHUB_SHA}\n`;
             const { data: comments } = await github.rest.issues.listComments({
