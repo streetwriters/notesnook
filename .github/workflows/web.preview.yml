@@ -1,0 +1,80 @@
+name: Notesnook Web PR Preview
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    branches: [master, beta]
+    paths:
+      - "apps/web/**"
+      - "packages/**"
+      # re-run workflow if workflow file changes
+      - ".github/workflows/web.preview.yml"
+
+jobs:
+  build-and-deploy:
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web
+        run: npm run build:web
+
+      - name: Deploy to Cloudflare Pages
+        id: deploy
+        working-directory: ./apps/web
+        run: |
+          set -euo pipefail
+          BRANCH=pr-${{ github.event.number }}-$(echo "${{ github.sha }}" | cut -c1-7)
+          echo "Deploying branch: $BRANCH"
+          DEPLOY_OUT=$(npx --yes wrangler pages deploy --project-name=notesnook-app --branch="$BRANCH" ./build 2>&1) || { echo "$DEPLOY_OUT"; exit 1; }
+          echo "$DEPLOY_OUT"
+          PREVIEW_URL=$(printf "%s" "$DEPLOY_OUT" | grep -Eo 'https?://[^ ]+' | head -1 || true)
+          if [ -z "$PREVIEW_URL" ]; then
+            echo "WARNING: could not parse preview URL from wrangler output"
+          fi
+          echo "preview_url=$PREVIEW_URL" >> $GITHUB_ENV
+
+      - name: Post or update PR comment
+        uses: actions/github-script@v6
+        env:
+          preview_url: ${{ env.preview_url }}
+        with:
+          script: |
+            const marker = '<!-- pages-preview-comment -->';
+            const prNumber = context.issue.number;
+            const previewUrl = process.env.preview_url || '';
+            const body = `${marker}\n**Cloudflare Pages Preview**\n\n${previewUrl || 'Preview URL unavailable — check workflow logs.'}\n\nCommit: ${process.env.GITHUB_SHA}\n`;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            const existing = comments.find(c => c.body && c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body,
+              });
+            }
