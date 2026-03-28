@@ -276,8 +276,8 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
           (product as Plan).period === "yearly"
             ? (product as Plan).price.gross
             : (product as Plan).period === "5-year"
-              ? (product as Plan).price.gross
-              : (product as Plan).price.gross
+            ? (product as Plan).price.gross
+            : (product as Plan).price.gross
         }`;
       }
 
@@ -432,8 +432,8 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
       return period.endsWith("W")
         ? "week"
         : period.endsWith("M")
-          ? "month"
-          : "year";
+        ? "month"
+        : "year";
     } else {
       const unit = (product as RNIap.SubscriptionIOS)
         ?.subscriptionPeriodUnitIOS;
@@ -475,8 +475,8 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
         type: phase.billingPeriod.endsWith("W")
           ? "week"
           : phase.billingPeriod.endsWith("M")
-            ? "month"
-            : "year"
+          ? "month"
+          : "year"
       };
     } else {
       const productIos = product as RNIap.SubscriptionIOS;
@@ -607,8 +607,8 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
         (product as Plan).period === "yearly"
           ? ((product as Plan).price.gross / 12).toFixed(2)
           : (product as Plan).period === "5-year"
-            ? ((product as Plan).price.gross / (12 * 5)).toFixed(2)
-            : (product as Plan).price.gross
+          ? ((product as Plan).price.gross / (12 * 5)).toFixed(2)
+          : (product as Plan).price.gross
       }`;
     }
 
