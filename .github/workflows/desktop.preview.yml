@@ -203,7 +203,7 @@ jobs:
       - name: Publish
         env:
           NOTESNOOK_STAGING: true
-        run: yarn electron-builder --config=electron-builder.config.js --win x64 --publish never
+        run: yarn electron-builder --config=electron-builder.config.js --win nsis:x64 --publish never
         working-directory: ./apps/desktop
 
       - name: Upload exe artifact
