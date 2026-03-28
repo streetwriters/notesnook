@@ -98,8 +98,8 @@ export const NotebookItem = ({
           item.depth === 0
             ? undefined
             : item.depth < 6
-              ? 15 * item.depth
-              : 15 * 5,
+            ? 15 * item.depth
+            : 15 * 5,
         width: "100%",
         marginTop: 2
       }}
@@ -187,8 +187,8 @@ export const NotebookItem = ({
               !item.hasChildren || disableExpand
                 ? "book-outline"
                 : expanded
-                  ? "chevron-down"
-                  : "chevron-right"
+                ? "chevron-down"
+                : "chevron-right"
             }
           />
 

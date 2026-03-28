@@ -118,8 +118,8 @@ const ListBlockItem = ({
           {item?.content.length > 200
             ? item?.content.slice(0, 200) + "..."
             : !item.content || item.content.trim() === ""
-              ? strings.linkNoteEmptyBlock()
-              : item.content}
+            ? strings.linkNoteEmptyBlock()
+            : item.content}
         </Paragraph>
 
         <View
