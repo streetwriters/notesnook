@@ -5,6 +5,11 @@ apply plugin: 'kotlin-parcelize'
 
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
 
+if (System.getenv("LOCAL_RELEASE_BUILD") == "true") {
+    apply plugin: 'com.google.gms.google-services'
+}
+
+
 import com.android.build.OutputFile
 import groovy.json.JsonSlurper
 import org.apache.tools.ant.taskdefs.condition.Os
@@ -171,8 +176,8 @@ android {
         }
         release {
             if (localReleaseBuild()) {
-                applicationIdSuffix ".local"
-                versionNameSuffix "-local"
+                applicationIdSuffix ".debug"
+                versionNameSuffix "-debug"
                 resValue "string", "app_name", "NNStaging"
             }
             if (file("debug.keystore").exists()) {
@@ -248,6 +253,12 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+
+
+    if (localReleaseBuild()) {
+    implementation platform('com.google.firebase:firebase-bom:34.11.0')
+    }
+    
     
 
 }
