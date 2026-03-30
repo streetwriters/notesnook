@@ -28,4 +28,5 @@ export type Monograph = {
   encryptedContent?: Cipher<"base64">;
   datePublished: string;
   id: string;
+  slug?: string;
 };
