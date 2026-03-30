@@ -89,23 +89,7 @@ const features: Record<FeatureKeys, Feature> = {
             )
           }
         ]
-      : [
-          {
-            title: "Search improvements for diacritics & special characters",
-            subtitle:
-              "Diacritic-agnostic search now works correctly. Searches with special characters no longer return empty results or crash the app."
-          },
-          {
-            title: "Desktop auto-update control & YouTube embed fix",
-            subtitle:
-              'Disabling auto-update in settings now also disables the update checker. YouTube embed "Error 153" on Desktop has been fully resolved.'
-          },
-          {
-            title: "Security patches for note titles & web clipper",
-            subtitle:
-              "Note titles are now safely escaped in the diff viewer to prevent malicious HTML execution. Web clipper content is now securely sandboxed to block malicious scripts in iframes."
-          }
-        ],
+      : [],
     cta: {
       title: strings.gotIt(),
       icon: Checkmark,

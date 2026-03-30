@@ -1,0 +1,257 @@
+name: Preview @notesnook/desktop
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    branches: [master, beta]
+    paths:
+      - "apps/desktop/**"
+      - "apps/web/**"
+      - "packages/**"
+      # re-run workflow if workflow file changes
+      - ".github/workflows/desktop.preview.yml"
+
+jobs:
+  build:
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    name: Build
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Install packages
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=web
+          npm run bootstrap -- --scope=desktop
+
+      - name: Install sqlite-better-trigram for all arch
+        run: |
+          npm i --cpu arm64 sqlite-better-trigram
+          npm i --cpu x64 sqlite-better-trigram
+        working-directory: ./apps/desktop
+
+      - name: Generate desktop build (stable)
+        run: npm run tx @notesnook/web:build:desktop
+
+      - name: Build desktop bundle
+        working-directory: ./apps/desktop
+        run: npm run bundle
+
+      - name: Archive build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: apps/web/build/**/*
+
+  build-macos:
+    name: Build for macOS
+    needs: build
+    runs-on: macos-14
+    outputs:
+      macos-artifact-url: ${{ steps.artifact-upload-step.outputs.artifact-url }}
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Install setuptools
+        run: brew install python-setuptools
+
+      - name: Setup notarization
+        run: |
+          mkdir -p ~/private_keys/
+          echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
+
+      - name: Collect app metadata
+        id: app_metadata
+        working-directory: ./apps/desktop
+        run: |
+          echo ::set-output name=apple_app_id::$(cat package.json | jq -r .appAppleId)
+          echo ::set-output name=app_bundle_id::$(cat package.json | jq -r .build.appId)
+          echo ::set-output name=app_version::$(cat package.json | jq -r .version)
+          echo ::set-output name=bundle_version::$(cat package.json | jq -r .build.mac.bundleVersion)
+
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: ./apps/web/build
+
+      - name: Install packages
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=desktop
+
+      - name: Install sqlite-better-trigram for all arch
+        run: |
+          npm i --cpu arm64 sqlite-better-trigram
+          npm i --cpu x64 sqlite-better-trigram
+        working-directory: ./apps/desktop
+
+      - name: Install provisioning profile
+        run: echo "${{ secrets.MAC_PROVISIONING_PROFILE }}" | base64 --decode > embedded.provisionprofile
+        working-directory: ./apps/desktop
+
+      - name: Build dmg
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_LINK: ${{ secrets.mac_certs }}
+          CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
+          APPLE_API_KEY: ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
+          APPLE_API_KEY_ID: ${{ secrets.api_key_id }}
+          APPLE_API_ISSUER: ${{ secrets.api_key_issuer_id }}
+        run: |
+          npm run tx @notesnook/desktop:release
+          cd apps/desktop
+          yarn electron-builder --config=electron-builder.config.js --mac dmg --arm64 -p never
+
+      - name: Upload dmg artifact
+        id: artifact-upload-step
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-build
+          path: apps/desktop/output/*.dmg
+
+  build-linux-x64:
+    name: Build for Linux x64
+    needs: build
+    runs-on: ubuntu-22.04
+    outputs:
+      linux-x64-artifact-url: ${{ steps.artifact-upload-step.outputs.artifact-url }}
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: ./apps/web/build
+
+      - name: Install packages
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=desktop
+
+      - name: Install sqlite-better-trigram for all arch
+        run: |
+          npm i --cpu x64 sqlite-better-trigram
+        working-directory: ./apps/desktop
+
+      - name: Build Electron wrapper
+        run: npm run tx @notesnook/desktop:release
+
+      - name: Build AppImage
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: yarn electron-builder --config=electron-builder.config.js --linux AppImage:x64 -p never
+        working-directory: ./apps/desktop
+
+      - name: Upload AppImage artifact
+        id: artifact-upload-step
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-x64-build
+          path: apps/desktop/output/*.AppImage
+
+  build-windows:
+    name: Build for Windows
+    needs: build
+    runs-on: windows-latest
+    outputs:
+      windows-artifact-url: ${{ steps.artifact-upload-step.outputs.artifact-url }}
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: ./apps/web/build
+
+      - name: Install packages
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=desktop
+
+      - name: Install sqlite-better-trigram for all arch
+        run: |
+          npm i --cpu arm64 sqlite-better-trigram
+          npm i --cpu x64 sqlite-better-trigram
+
+          npm i --cpu arm64 sqlite3-fts5-html
+          npm i --cpu x64 sqlite3-fts5-html
+        working-directory: ./apps/desktop
+
+      - name: Build
+        run: node scripts/execute.mjs @notesnook/desktop:release
+
+      - name: Publish
+        env:
+          NOTESNOOK_STAGING: true
+        run: yarn electron-builder --config=electron-builder.config.js --win nsis:x64 --publish never
+        working-directory: ./apps/desktop
+
+      - name: Upload exe artifact
+        id: artifact-upload-step
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: apps/desktop/output/*.exe
+
+  post-pr-comment:
+    name: Post PR comment with preview URLs
+    needs: [build, build-macos, build-linux-x64, build-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post or update PR comment
+        uses: actions/github-script@v6
+        env:
+          macos_artifact_url: ${{ needs.build-macos.outputs.macos-artifact-url }}
+          linux_x64_artifact_url: ${{ needs.build-linux-x64.outputs.linux-x64-artifact-url }}
+          windows_artifact_url: ${{ needs.build-windows.outputs.windows-artifact-url }}
+        with:
+          script: |
+            const marker = '<!-- desktop-preview-comment -->';
+            const prNumber = context.issue.number;
+            const previewUrl = [
+              { platform: 'macOS', url: process.env.macos_artifact_url },
+              { platform: 'Linux x64', url: process.env.linux_x64_artifact_url },
+              { platform: 'Windows x64', url: process.env.windows_artifact_url },
+            ].filter(u => u.url).map(u => `- [${u.platform}](${u.url})`).join('\n');
+            const body = `${marker}\n**Desktop Previews**\n\n${previewUrl || 'Preview URL unavailable — check workflow logs.'}\n\nCommit: ${process.env.GITHUB_SHA}\n`;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            const existing = comments.find(c => c.body && c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body,
+              });
+            }

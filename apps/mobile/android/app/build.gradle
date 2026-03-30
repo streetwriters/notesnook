@@ -141,13 +141,11 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true
-
         if (project.hasProperty("prBuildNumber")) {
             versionCode Integer.parseInt(prBuildNumber())
         } else {
-            versionCode 3097
+            versionCode 3098
         }
-
         versionName getNpmVersion()
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
