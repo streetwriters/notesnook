@@ -5,10 +5,6 @@ apply plugin: 'kotlin-parcelize'
 
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
 
-if (System.getenv("STAGING_BUILD") == "true") {
-    apply plugin: 'com.google.gms.google-services'
-}
-
 
 import com.android.build.OutputFile
 import groovy.json.JsonSlurper
@@ -255,13 +251,6 @@ dependencies {
     } else {
         implementation jscFlavor
     }
-
-
-    if (stagingReleaseBuild()) {
-    implementation platform('com.google.firebase:firebase-bom:34.11.0')
-    }
-    
-    
 
 }
 

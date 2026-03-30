@@ -1,4 +1,4 @@
-name: Preview Notesnook Android (NNStaging)
+name: Notesnook Android Preview
 
 on:
   pull_request:
@@ -66,7 +66,6 @@ jobs:
       - name: Build arm64-v8a apk
         run: |
           cd apps/mobile/android
-          echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > ./app/google-services.json
           ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a -PstagingReleaseBuild=true -PprBuildNumber=${{ steps.build-number.outputs.timestamp }}
 
       - name: Get app version
@@ -121,4 +120,4 @@ jobs:
         with:
           name: sourcemaps
           path: |
-            apps/mobile/android/app/build/sourcemaps/**/*.map
+            apps/mobile/android/app/build/generated/sourcemaps/**/*.map
