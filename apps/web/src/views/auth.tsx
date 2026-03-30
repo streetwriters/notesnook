@@ -30,7 +30,12 @@ import {
   Warn
 } from "../components/icons";
 import Field, { FieldProps } from "../components/field";
-import { getQueryParams, hardNavigate, makeURL } from "../navigation";
+import {
+  getCurrentPath,
+  getQueryParams,
+  hardNavigate,
+  makeURL
+} from "../navigation";
 import { store as userstore } from "../stores/user-store";
 import { db } from "../common/db";
 import Config from "../utils/config";
@@ -162,6 +167,11 @@ const routePaths: Record<AuthRoutes, string> = {
   sessionExpiry: "/sessionexpired",
   signup: "/signup"
 };
+
+export function isAuthRouteActive() {
+  const path = getCurrentPath();
+  return Object.values(routePaths).includes(path);
+}
 
 const authorizedRoutes: AuthRoutes[] = [
   "login:email",
