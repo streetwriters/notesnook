@@ -129,7 +129,11 @@ export class Notes implements ICollection {
         dateEdited = Date.now();
       }
 
-      if (!isUpdating || item.title === "") {
+      // if (!isUpdating || item.title === "") {
+      if (
+        !isUpdating &&
+        (typeof item.title === "undefined" || item.title === "")
+      ) {
         item.isGeneratedTitle = !Boolean(item.title);
         item.title =
           item.title ||
@@ -162,8 +166,9 @@ export class Notes implements ICollection {
           currentNoteTitleFields?.title !== headlineTitle
         ) {
           item.title = titleFormat.replace(HEADLINE_REGEX, headlineTitle);
-        } else if (item.title === "")
-          item.title = currentNoteTitleFields?.title || "Untitled";
+        } else if (item.title === "") {
+          item.isGeneratedTitle = true;
+        }
       }
 
       if (isUpdating) {
