@@ -50,7 +50,8 @@ function Plans() {
       sx={{
         overflow: "hidden",
         flexDirection: "column",
-        height: "100%"
+        height: "100%",
+        pt: 50
       }}
     >
       <Flex variant="columnFill" sx={{ overflowY: "hidden" }}>
