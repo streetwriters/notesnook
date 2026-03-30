@@ -8,7 +8,7 @@ on:
       - "apps/mobile/**"
       - "packages/**"
       # re-run workflow if workflow file changes
-      - ".github/workflows/mobile.publish.firebase.yml"
+      - ".github/workflows/ios.preview.firebase.yml"
 
 jobs:
   build:
@@ -94,6 +94,26 @@ jobs:
             ${{ secrets.APPLE_MOBILE_PROVISION_ADHOC_SHARE }}
             ${{ secrets.APPLE_MOBILE_PROVISION_ADHOC_WIDGET }}
 
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-preview-ipa
+          path: Notesnook.ipa
+          if-no-files-found: error
+          retention-days: 1
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: build
+    timeout-minutes: 20
+
+    steps:
+      - name: Download IPA artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-preview-ipa
+          path: .
+
       - name: Publish to firebase CLI
         id: firebase-output
         uses: wzieba/Firebase-Distribution-Github-Action@v1
@@ -135,12 +155,3 @@ jobs:
                 body,
               });
             }
-
-      # - name: Upload Notesnook.ipa to Github
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: Notesnook.zip
-      #     path: |
-      #       Notesnook.ipa
-      #       apps/mobile/ios/**/*.map
-      #       packages/editor-mobile/sourcemaps/*.map
