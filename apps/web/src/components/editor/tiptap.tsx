@@ -68,6 +68,7 @@ import { showFeatureNotAllowedToast } from "../../common/toasts";
 import { UpgradeDialog } from "../../dialogs/buy-dialog/upgrade-dialog";
 import { ConfirmDialog } from "../../dialogs/confirm";
 import { strings } from "@notesnook/intl";
+import { db } from "../../common/db";
 
 export type OnChangeHandler = (
   content: () => string,
@@ -429,6 +430,13 @@ function TipTap(props: TipTapProps) {
             openInNewTab: openInNewTab
           });
         } else window.open(url, "_blank");
+      },
+      getLinkTitle: async (url) => {
+        const link = parseInternalLink(url);
+        if (link && link.type === "note") {
+          const note = await db.notes.note(link.id);
+          return note?.title;
+        }
       }
     };
   }, [
