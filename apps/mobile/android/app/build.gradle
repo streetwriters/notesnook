@@ -107,7 +107,7 @@ def prBuildNumber() {
 def stagingReleaseBuild() {
     // Enable with STAGING_BUILDtrue or -PstagingReleaseBuild=true
     def fromEnv = System.getenv("STAGING_BUILD") == "true"
-    def fromProp = project.hasProperty("stagingReleaseBuild") && project.localReleaseBuild == "true"
+    def fromProp = project.hasProperty("stagingReleaseBuild") && project.stagingReleaseBuild == "true"
     return fromEnv || fromProp
 }
 
