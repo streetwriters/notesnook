@@ -102,6 +102,7 @@ jobs:
           serviceCredentialsFileContent: ${{ secrets.QA_SERVICE_ACCOUNT }}
           groups: testers
           file: Notesnook.ipa
+          releaseNotes: Preview for https://github.com/streetwriters/notesnook/pull/${{github.event.number}}
 
       - name: Post or update PR comment
         uses: actions/github-script@v6
