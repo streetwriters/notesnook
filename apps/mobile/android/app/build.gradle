@@ -213,7 +213,7 @@ android {
                        defaultConfig.versionCode * 5 + versionCodes.get(abi)
                     println("Fdroid Version code: ${output.versionCodeOverride} for abi ${versionCodes.get(abi)}");
                 } else if (stagingReleaseBuild()) {
-                    output.versionCodeOverride = prBuildNumber() + versionCodes.get(abi)
+                    output.versionCodeOverride = defaultConfig.versionCode + versionCodes.get(abi)
                 } else {
                     if (isBuildingAAB) {
                         output.versionCodeOverride = 4 * 1048576 + defaultConfig.versionCode
