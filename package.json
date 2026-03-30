@@ -95,6 +95,7 @@
           "build",
           "release",
           "build:test",
+          "build:test:desktop",
           "build:beta",
           "build:desktop",
           "start",

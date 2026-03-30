@@ -20,14 +20,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import dayjs from "dayjs";
 import { AppModel } from "./models/app.model";
 import {
-  test,
-  expect,
   groupByOptions,
   NOTE,
   orderByOptions,
   PASSWORD,
   sortByOptions
 } from "./utils";
+import { test, expect } from "@nn/test";
 
 test("create a note", async ({ page }) => {
   const app = new AppModel(page);

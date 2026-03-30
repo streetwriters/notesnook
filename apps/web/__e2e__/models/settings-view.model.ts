@@ -17,8 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Page } from "@playwright/test";
-import { downloadAndReadFile, getTestId, uploadFile } from "../utils";
+import type { Page } from "@playwright/test";
+import {
+  downloadAndReadFile,
+  getTestId,
+  IS_DESKTOP_TESTS,
+  uploadFile
+} from "../utils";
 import {
   confirmDialog,
   fillConfirmPasswordDialog,
@@ -27,6 +32,9 @@ import {
   waitToHaveText
 } from "./utils";
 import { NavigationMenuModel } from "./navigation-menu.model";
+import { AppModel } from "./app.model";
+import { getAppFromPage } from "../../../desktop/__tests__/electron-test/utils";
+import { readFile } from "node:fs/promises";
 
 export class SettingsViewModel {
   private readonly page: Page;
@@ -118,17 +126,35 @@ export class SettingsViewModel {
     const item = await this.navigation.findItem("Backup & export");
     await item?.click();
 
-    return await downloadAndReadFile(
-      this.page,
-      async () => {
-        const backupData = this.page
-          .locator(getTestId("setting-create-backup"))
-          .locator("select");
-        await backupData.selectOption({ value: "partial", label: "Backup" });
-        if (password) await fillPasswordDialog(this.page, password);
-      },
-      "utf-8"
-    );
+    const saveBackup = async () => {
+      const backupData = this.page
+        .locator(getTestId("setting-create-backup"))
+        .locator("select");
+      await backupData.selectOption({ value: "partial", label: "Backup" });
+      if (password) await fillPasswordDialog(this.page, password);
+      await waitForDialog(this.page, "Creating a backup");
+    };
+
+    if (IS_DESKTOP_TESTS) {
+      await saveBackup();
+      const toast = new AppModel(this.page).toasts.toasts.locator(
+        getTestId("toast-message")
+      );
+      await toast.waitFor();
+      const backupPath = (await toast.textContent())
+        ?.replace("Backup saved at", "")
+        .trim();
+      if (!backupPath)
+        throw new Error("Backup path not found in toast message");
+      const app = getAppFromPage(this.page);
+      const resolvedDocumentPath = await app.evaluate(({ app }) =>
+        app.getPath("documents")
+      );
+      const resolvedBackupPath = backupPath.startsWith("documents")
+        ? backupPath.replace("documents", resolvedDocumentPath)
+        : backupPath;
+      return await readFile(resolvedBackupPath, "utf-8");
+    } else return await downloadAndReadFile(this.page, saveBackup, "utf-8");
   }
 
   async restoreData(filename: string, password?: string) {
@@ -190,5 +216,17 @@ export class SettingsViewModel {
       .locator(getTestId("setting-default-title"))
       .locator("input");
     await titleFormatInput.fill(format);
+  }
+
+  async checkForUpdates() {
+    await this.navigation.waitFor();
+
+    const item = await this.navigation.findItem("About");
+    await item?.click();
+
+    const button = this.page
+      .locator(getTestId("setting-version"))
+      .locator("button", { hasText: "Check for updates" });
+    await button.click();
   }
 }

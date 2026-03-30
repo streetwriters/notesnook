@@ -19,21 +19,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { execSync } from "child_process";
 import { cp } from "fs/promises";
-import { fileURLToPath } from "node:url";
 import path, { join, resolve } from "path";
-import { _electron as electron } from "playwright";
+import { _electron as electron, ElectronApplication, Page } from "playwright";
 import { existsSync } from "fs";
+import { mkdir, writeFile } from "node:fs/promises";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 const IS_DEBUG = process.env.NN_DEBUG === "true" || process.env.CI === "true";
 const productName = `NotesnookTestHarness`;
-const SOURCE_DIR = resolve("output", productName);
+const root = path.resolve(__dirname, "..", "..");
+const SOURCE_DIR = resolve(root, "output", productName);
 
 export interface AppContext {
   app: import("playwright").ElectronApplication;
-  page: import("playwright").Page;
-  configPath: string;
   userDataDir: string;
   outputDir: string;
   relaunch: () => Promise<void>;
@@ -41,6 +38,7 @@ export interface AppContext {
 
 export interface TestOptions {
   version: string;
+  config?: Record<string, unknown>;
 }
 
 export interface Fixtures {
@@ -49,35 +47,41 @@ export interface Fixtures {
 }
 
 export async function buildAndLaunchApp(
+  userDataDir: string,
   options?: TestOptions
 ): Promise<AppContext> {
+  await buildApp(options?.version);
+
   const productName = `notesnooktest${makeid(10)}`;
-  const outputDir = path.join("test-artifacts", `${productName}-output`);
+  const outputDir = path.join(root, "test-artifacts", `${productName}-output`);
   const executablePath = await copyBuild({
     ...options,
     outputDir
   });
-  const { app, page, configPath, userDataDir } = await launchApp(
+
+  const configPath = path.join(userDataDir, "UserData", "config.json");
+  if (options?.config) {
+    await mkdir(path.dirname(configPath), { recursive: true });
+    await writeFile(configPath, JSON.stringify(options.config));
+  }
+
+  const { app } = await launchApp(
     executablePath,
-    productName,
+    userDataDir,
     options?.version
   );
   const ctx: AppContext = {
     app,
-    page,
-    configPath,
     userDataDir,
     outputDir,
     relaunch: async () => {
-      const { app, page, configPath, userDataDir } = await launchApp(
+      const { app } = await launchApp(
         executablePath,
-        productName,
+        userDataDir,
         options?.version
       );
       ctx.app = app;
-      ctx.page = page;
       ctx.userDataDir = userDataDir;
-      ctx.configPath = configPath;
     }
   };
   return ctx;
@@ -85,19 +89,14 @@ export async function buildAndLaunchApp(
 
 async function launchApp(
   executablePath: string,
-  packageName: string,
+  userDataDir: string,
   version?: string
 ) {
-  const userDataDir = resolve(
-    __dirname,
-    "..",
-    "test-artifacts",
-    "user_data_dirs",
-    packageName
-  );
   const app = await electron.launch({
     executablePath,
     args: IS_DEBUG ? [] : ["--hidden"],
+    baseURL: "https://app.notesnook.com",
+    acceptDownloads: true,
     env: {
       ...(process.platform === "linux"
         ? {
@@ -114,20 +113,28 @@ async function launchApp(
     }
   });
 
-  const page = await app.firstWindow();
-
-  const configPath = path.join(userDataDir, "UserData", "config.json");
   return {
     app,
-    page,
-    configPath,
     userDataDir
   };
+}
+
+export function getAppFromPage(page: Page) {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  return page.context().app as ElectronApplication;
 }
 
 let MAX_RETRIES = 3;
 export async function buildApp(version?: string) {
   if (!existsSync(SOURCE_DIR)) {
+    execSync(
+      `node ${path.join(root, "scripts", "build.mjs")} --test --rebuild`,
+      {
+        stdio: IS_DEBUG ? "inherit" : "ignore"
+      }
+    );
+
     const args = [
       "electron-builder",
       "--dir",
@@ -151,7 +158,7 @@ export async function buildApp(version?: string) {
       });
     } catch (e) {
       if (--MAX_RETRIES) {
-        console.log("retrying...");
+        console.log("retrying...", e);
         return await buildApp(version);
       } else throw e;
     }
@@ -189,8 +196,7 @@ async function makeBuildCopyMacOS(outputDir: string, productName: string) {
   const platformDir = process.arch === "arm64" ? "mac-arm64" : "mac";
   const appDir = await makeBuildCopy(outputDir, platformDir);
   return resolve(
-    __dirname,
-    "..",
+    root,
     appDir,
     `${productName}.app`,
     "Contents",

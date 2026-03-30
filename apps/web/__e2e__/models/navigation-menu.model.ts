@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Locator, Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import { getTestId } from "../utils";
 import { ContextMenuModel } from "./context-menu.model";
 import { fillItemDialog, iterateList } from "./utils";
@@ -29,6 +29,10 @@ export class NavigationMenuModel {
   constructor(page: Page, id: string) {
     this.page = page;
     this.menu = page.locator(getTestId(id));
+  }
+
+  async waitFor() {
+    await this.menu.waitFor();
   }
 
   async findItem(title: string) {

@@ -20,8 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import "vite/client";
 import "vite-plugin-svgr/client";
-import "@notesnook/desktop/dist/preload";
-import type { Database } from "@notesnook/core";
+import "@notesnook/desktop/preload.d.ts";
 
 declare global {
   var PUBLIC_URL: string;

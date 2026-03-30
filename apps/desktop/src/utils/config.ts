@@ -21,6 +21,7 @@ import { nativeTheme } from "electron";
 import { JSONStorage } from "./json-storage";
 import { z } from "zod";
 import { autoUpdater } from "electron-updater";
+import { PATHS } from "../constants";
 
 export const DesktopIntegration = z.object({
   autoStart: z.boolean().optional(),
@@ -53,7 +54,8 @@ export const config = {
 
   backgroundColor: nativeTheme.themeSource === "dark" ? "#0f0f0f" : "#ffffff",
   windowControlsIconColor:
-    nativeTheme.themeSource === "dark" ? "#ffffff" : "#000000"
+    nativeTheme.themeSource === "dark" ? "#ffffff" : "#000000",
+  backupDirectory: PATHS.backupsDirectory
 };
 
 type ConfigKey = keyof typeof config;

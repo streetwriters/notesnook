@@ -87,7 +87,7 @@
   "devDependencies": {
     "@babel/core": "7.22.5",
     "@cloudflare/workers-types": "^4.20250224.0",
-    "@playwright/test": "^1.58.2",
+    "@playwright/test": "1.58.2",
     "@swc/plugin-react-remove-properties": "^6.0.2",
     "@trpc/server": "10.45.2",
     "@types/babel__core": "^7.20.1",
@@ -135,6 +135,7 @@
     "build:test": "cross-env PLATFORM=web TEST=true vite build",
     "build:beta": "cross-env PLATFORM=web BETA=true vite build",
     "build:desktop": "cross-env PLATFORM=desktop vite build",
+    "build:test:desktop": "cross-env PLATFORM=desktop TEST=true vite build",
     "analyze": "cross-env ANALYZING=true PLATFORM=web vite build",
     "test": "playwright test -u",
     "postinstall": "patch-package"

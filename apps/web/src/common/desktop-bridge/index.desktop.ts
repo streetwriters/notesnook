@@ -23,9 +23,6 @@ import type { AppRouter } from "@notesnook/desktop";
 import { AppEventManager, AppEvents } from "../app-events";
 import { TaskScheduler } from "../../utils/task-scheduler";
 import { checkForUpdate } from "../../utils/updater";
-import { showToast } from "../../utils/toast";
-import { db } from "../db";
-import { logManager } from "@notesnook/core";
 import { store as settingStore } from "../../stores/setting-store";
 
 export const desktop: ReturnType<typeof createTRPCProxyClient<AppRouter>> =
@@ -67,17 +64,6 @@ function attachListeners() {
     attachListener(AppEvents.updateError)
   );
 
-  // desktop.window.onClose.subscribe(undefined, {
-  //   async onData() {
-  //     try {
-  //       await db.sql().destroy();
-  //       await logManager?.close();
-  //     } catch {
-  //       // ignore
-  //     }
-  //   }
-  // });
-
   TaskScheduler.register("updateCheck", "0 0 */12 * * * *", () => {
     checkForUpdate(settingStore.get().autoUpdates);
   });
@@ -93,23 +79,19 @@ function attachListener(event: string) {
 }
 
 export async function createWritableStream(path: string) {
-  try {
-    const resolvedPath = await desktop.integration.resolvePath.query({
-      filePath: path
-    });
-    if (!resolvedPath) throw new Error("invalid path.");
-    const { mkdirSync, createWriteStream }: typeof import("fs") = require("fs");
-    const { dirname }: typeof import("path") = require("path");
-    const { Writable } = require("stream");
-
-    mkdirSync(dirname(resolvedPath), { recursive: true });
-    return new WritableStream(
-      Writable.toWeb(
-        createWriteStream(resolvedPath, { encoding: "utf-8" })
-      ).getWriter()
-    );
-  } catch (ex) {
-    console.error(ex);
-    if (ex instanceof Error) showToast("error", ex.message);
-  }
+  const id = await desktop.backups.open.mutate({ filename: path });
+  return new WritableStream<Uint8Array>({
+    write(chunk) {
+      return desktop.backups.write.mutate({
+        id,
+        chunk: Buffer.from(chunk).toString("base64")
+      });
+    },
+    close() {
+      return desktop.backups.close.mutate({ id });
+    },
+    abort() {
+      return desktop.backups.close.mutate({ id });
+    }
+  });
 }

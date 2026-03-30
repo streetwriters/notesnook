@@ -17,8 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { buildApp } from "./utils";
-
-export default async function setup() {
-  await buildApp();
+const ansiRegex = new RegExp(
+  "[\\u001B\\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]*)*)?\\u0007)|(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-ntqry=><~]))",
+  "g"
+);
+export function stripAnsi(str: string): string {
+  return str.replace(ansiRegex, "");
 }
