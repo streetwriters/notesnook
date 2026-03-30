@@ -356,7 +356,7 @@ const ProductItem = (props: {
         (product as RNIap.Subscription)?.productId
       ) ||
       props.pricingPlans.user?.subscription?.productId ===
-        (product as Plan).id);
+        (product as Plan)?.id);
 
   useEffect(() => {
     props.pricingPlans
