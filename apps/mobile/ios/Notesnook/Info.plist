@@ -12,7 +12,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>Notesnook</string>
+	<string>$(APP_DISPLAY_NAME)</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
