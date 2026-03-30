@@ -554,7 +554,6 @@ export const useAppEvents = () => {
   ]);
   useFeatureManager();
   const syncedOnLaunch = useRef(false);
-  const hasInitialized = useRef(false);
   const refValues = useRef<
     Partial<{
       subsriptionSuccessListener: EmitterSubscription;
@@ -568,10 +567,6 @@ export const useAppEvents = () => {
     }>
   >({});
 
-  if (!hasInitialized.current) {
-    hasInitialized.current = true;
-    clearAppState();
-  }
 
   const onSyncComplete = useCallback(async () => {
     initAfterSync(Sync.getLastSyncType() as "full" | "send");
@@ -597,10 +592,6 @@ export const useAppEvents = () => {
     };
   }, [isAppLoading, onSyncComplete]);
 
-  useEffect(() => {
-    if (isAppLoading) return;
-    clearAppState();
-  }, [isAppLoading]);
 
   useEffect(() => {
     if (initialUrl) {
@@ -849,8 +840,7 @@ export const useAppEvents = () => {
         Sync.run("global", false, "full");
         reconnectSSE();
         await checkForShareExtensionLaunchedInBackground();
-        // NotesnookModule.setAppState("");
-        clearAppState();
+        NotesnookModule.setAppState("");
         let user = await db.user.getUser();
         if (user && !user?.isEmailConfirmed) {
           try {
@@ -873,7 +863,7 @@ export const useAppEvents = () => {
           eSendEvent(eEditorReset);
         }
       } else {
-        await saveEditorState();
+        // await saveEditorState();
         if (
           SettingsService.canLockAppInBackground() &&
           !useSettingStore.getState().requestBiometrics &&
