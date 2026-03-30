@@ -24,8 +24,6 @@ import { AppEventManager, AppEvents } from "../app-events";
 import { TaskScheduler } from "../../utils/task-scheduler";
 import { checkForUpdate } from "../../utils/updater";
 import { showToast } from "../../utils/toast";
-import { db } from "../db";
-import { logManager } from "@notesnook/core";
 import { store as settingStore } from "../../stores/setting-store";
 
 export const desktop: ReturnType<typeof createTRPCProxyClient<AppRouter>> =
@@ -65,6 +63,16 @@ function attachListeners() {
   desktop.updater.onError.subscribe(
     undefined,
     attachListener(AppEvents.updateError)
+  );
+
+  desktop.bridge.onOpenLink.subscribe(
+    undefined,
+    attachListener(AppEvents.onOpenLink)
+  );
+
+  desktop.bridge.onCreateItem.subscribe(
+    undefined,
+    attachListener(AppEvents.onCreateItem)
   );
 
   // desktop.window.onClose.subscribe(undefined, {
