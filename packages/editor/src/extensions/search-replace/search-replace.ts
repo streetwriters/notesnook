@@ -26,6 +26,7 @@ import {
   Transaction,
   TextSelection
 } from "prosemirror-state";
+import { Node as PmNode } from "prosemirror-model";
 import { SearchSettings } from "../../toolbar/stores/search-store.js";
 import { tiptapKeys } from "@notesnook/common";
 
@@ -61,10 +62,9 @@ export type SearchStorage = {
   results?: Result[];
 };
 
-interface TextNodesWithPosition {
+interface TextNodeWithPosition {
   text: string;
-  startPos: number;
-  start: number;
+  pos: number;
 }
 
 const updateView = (state: EditorState, dispatch: DispatchFn) => {
@@ -88,6 +88,27 @@ const regex = (s: string, settings: SearchSettings): RegExp | undefined => {
   }
 };
 
+function extractTextWithPosition(doc: PmNode): TextNodeWithPosition[] {
+  let currentNode: TextNodeWithPosition | null = null;
+  const textNodes: TextNodeWithPosition[] = [];
+  doc.descendants((node, pos) => {
+    if (node.isText) {
+      if (currentNode) {
+        currentNode.text += node.text;
+      } else {
+        currentNode = {
+          text: node.text || "",
+          pos
+        };
+        textNodes.push(currentNode);
+      }
+    } else {
+      currentNode = null;
+    }
+  });
+  return textNodes;
+}
+
 function searchDocument(
   tr: Transaction,
   searchResultClass: string,
@@ -104,57 +125,16 @@ function searchDocument(
   const doc = tr.doc;
   const results: Result[] = [];
 
-  let index = -1;
-  const textNodesWithPosition: TextNodesWithPosition[] = [];
-
-  let cursor = 0;
-  doc?.descendants((node, pos) => {
-    if (node.isText) {
-      if (textNodesWithPosition[index]) {
-        textNodesWithPosition[index].text += node.text;
-      } else {
-        textNodesWithPosition[index] = {
-          text: node.text || "",
-          startPos: pos,
-          start: cursor
-        };
+  for (const { text, pos } of extractTextWithPosition(doc)) {
+    for (const match of text.matchAll(searchTerm)) {
+      if (match[0] === "") break;
+      if (match.index !== undefined) {
+        results.push({
+          from: pos + match.index,
+          to: pos + match.index + match[0].length
+        });
       }
-      cursor += node.text?.length || 0;
-    } else if (node.isBlock) {
-      const lastNode = textNodesWithPosition[index];
-      if (lastNode) {
-        lastNode.text += "\n";
-        cursor++;
-      }
-      index++;
     }
-  });
-
-  const text = textNodesWithPosition.map((c) => c.text).join("");
-  for (const match of text.matchAll(searchTerm)) {
-    const start = match.index;
-    const end = match.index + match[0].length;
-
-    // Gets all matching nodes that have either the start or end of the
-    // search term in them. This adds support for multi line regex searches.
-    const nodes = textNodesWithPosition.filter((node) => {
-      const nodeStart = node.start;
-      const nodeEnd = nodeStart + node.text.length;
-      return (
-        (start >= nodeStart && start < nodeEnd) ||
-        (end >= nodeStart && end < nodeEnd)
-      );
-    });
-
-    if (!nodes.length) continue;
-    const endNode = nodes[nodes.length - 1];
-    const startNode = nodes[0];
-    results.push({
-      // reposition our RegExp match index relative to the actual node.
-      from:
-        startNode.startPos + /*offset in startNode=*/ (start - startNode.start),
-      to: endNode.startPos + /*length inside endNode=*/ (end - endNode.start)
-    });
   }
 
   const { from: selectedFrom, to: selectedTo } = tr.selection;
