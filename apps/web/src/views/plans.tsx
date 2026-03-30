@@ -74,7 +74,7 @@ function Plans() {
               flexDirection: "column",
               flex: 1,
               px: 25,
-              height: "100vh",
+              minHeight: "100vh",
               justifyContent: "center"
             }}
           >
