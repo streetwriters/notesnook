@@ -82,6 +82,7 @@ jobs:
           serviceCredentialsFileContent: ${{ secrets.QA_SERVICE_ACCOUNT }}
           groups: testers
           file: apps/mobile/android/app/build/outputs/apk/release/app-arm64-v8a-release.apk
+          releaseNotes: Preview for https://github.com/streetwriters/notesnook/pull/${{github.event.number}}
 
       - name: Post or update PR comment
         uses: actions/github-script@v6
