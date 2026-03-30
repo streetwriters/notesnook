@@ -67,7 +67,7 @@ jobs:
         run: |
           cd apps/mobile/android
           echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > ./app/google-services.json
-          ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a -PstagingReleaseBuild=true -PprBuildNumber=${{ steps.build-number.outputs.build-number }}
+          ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a -PstagingReleaseBuild=true -PprBuildNumber=${{ steps.build-number.outputs.timestamp }}
 
       - name: Get app version
         id: package-version

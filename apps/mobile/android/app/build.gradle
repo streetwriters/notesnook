@@ -101,7 +101,7 @@ def fdroidBuild() {
 
 def prBuildNumber() {
     def value = project.getProperties().get("prBuildNumber")
-    return value ? value : 1000
+    return value ? value : "1000"
 }
 
 def stagingReleaseBuild() {
