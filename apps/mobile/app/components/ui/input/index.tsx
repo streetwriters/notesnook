@@ -121,8 +121,8 @@ const Input = ({
   const color = error
     ? colors.error.border
     : focus
-      ? customColor || colors.selected.border
-      : colors.primary.border;
+    ? customColor || colors.selected.border
+    : colors.primary.border;
 
   const validate = async (value: string) => {
     if (!validationType) return;

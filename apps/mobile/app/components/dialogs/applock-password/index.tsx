@@ -201,14 +201,12 @@ export const AppLockPassword = () => {
               accountPass
                 ? strings.enterAccountPassword()
                 : mode === "change"
-                  ? keyboardType === "pin"
-                    ? strings.newPin()
-                    : strings.newPassword()
-                  : `${
-                      keyboardType === "pin"
-                        ? strings.pin()
-                        : strings.password()
-                    }`
+                ? keyboardType === "pin"
+                  ? strings.newPin()
+                  : strings.newPassword()
+                : `${
+                    keyboardType === "pin" ? strings.pin() : strings.password()
+                  }`
             }
           />
 
@@ -385,8 +383,8 @@ export const AppLockPassword = () => {
             mode === "remove"
               ? strings.remove()
               : mode === "change"
-                ? strings.change()
-                : strings.save()
+              ? strings.change()
+              : strings.save()
           }
           negativeTitle={strings.cancel()}
           positiveType="transparent"

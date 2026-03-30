@@ -106,6 +106,14 @@ class UserManager {
       dataEncryptionKey: await this.keyManager.wrapKey(
         await this.db.crypto().generateRandomKey(),
         masterKey
+      ),
+      attachmentsKey: await this.keyManager.wrapKey(
+        await this.db.crypto().generateRandomKey(),
+        masterKey
+      ),
+      monographPasswordsKey: await this.keyManager.wrapKey(
+        await this.db.crypto().generateRandomKey(),
+        masterKey
       )
     });
 
