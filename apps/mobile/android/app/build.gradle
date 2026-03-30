@@ -5,6 +5,11 @@ apply plugin: 'kotlin-parcelize'
 
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
 
+if (System.getenv("LOCAL_RELEASE_BUILD") == "true") {
+    apply plugin: 'com.google.gms.google-services'
+}
+
+
 import com.android.build.OutputFile
 import groovy.json.JsonSlurper
 import org.apache.tools.ant.taskdefs.condition.Os
@@ -94,6 +99,13 @@ def fdroidBuild() {
     return project.hasProperty("fdroidBuild") && project.fdroidBuild == "true"
 }
 
+def localReleaseBuild() {
+    // Enable with LOCAL_RELEASE_BUILD=true or -PlocalReleaseBuild=true
+    def fromEnv = System.getenv("LOCAL_RELEASE_BUILD") == "true"
+    def fromProp = project.hasProperty("localReleaseBuild") && project.localReleaseBuild == "true"
+    return fromEnv || fromProp
+}
+
 def getNpmVersion() {
     def inputFile = file("$rootDir/../package.json")
     def jsonPackage = new JsonSlurper().parseText(inputFile.text)
@@ -156,10 +168,18 @@ android {
     }
     buildTypes {
         debug {
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+            resValue "string", "app_name", "NNDebug"
             signingConfig signingConfigs.debug
             buildConfigField "boolean", "FDROID_BUILD", "${fdroidBuild()}"
         }
         release {
+            if (localReleaseBuild()) {
+                applicationIdSuffix ".debug"
+                versionNameSuffix "-debug"
+                resValue "string", "app_name", "NNStaging"
+            }
             if (file("debug.keystore").exists()) {
                 signingConfig signingConfigs.release
             }
@@ -233,6 +253,12 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+
+
+    if (localReleaseBuild()) {
+    implementation platform('com.google.firebase:firebase-bom:34.11.0')
+    }
+    
     
 
 }
