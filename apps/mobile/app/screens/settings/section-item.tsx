@@ -233,19 +233,22 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
         <View
           style={{
             flexShrink: 1,
-            paddingRight: item.type === "switch" ? 10 : 0
+            paddingRight: item.type === "switch" ? 10 : 0,
+            flex: item.type === "component" ? 1 : 0
           }}
         >
-          <Heading
-            color={
-              item.type === "danger"
-                ? colors.error.paragraph
-                : colors.primary.heading
-            }
-            size={AppFontSize.sm}
-          >
-            {typeof item.name === "function" ? item.name(current) : item.name}
-          </Heading>
+          {item.name ? (
+            <Heading
+              color={
+                item.type === "danger"
+                  ? colors.error.paragraph
+                  : colors.primary.heading
+              }
+              size={AppFontSize.sm}
+            >
+              {typeof item.name === "function" ? item.name(current) : item.name}
+            </Heading>
+          ) : null}
 
           {!!item.description && (
             <Paragraph
