@@ -571,24 +571,29 @@ export function Editor(props: EditorProps) {
         onChange={onSave}
         onDownloadAttachment={(attachment) => saveAttachment(attachment.hash)}
         onPreviewAttachment={async (data) => {
-          const { hash, type, mime } = data;
-          const attachment = await db.attachments.attachment(hash);
-          if (attachment && mime.startsWith("image/")) {
-            await previewImageAttachment(attachment);
-          } else if (
-            attachment &&
-            onPreviewDocument &&
-            type === "file" &&
-            attachment.mimeType.startsWith("application/pdf")
-          ) {
-            onPreviewDocument({ hash });
-            const blob = await downloadAttachment(hash, "blob", id);
-            if (!blob) {
-              useEditorStore.setState({ documentPreview: undefined });
-              return;
+          try {
+            const { hash, type, mime } = data;
+            const attachment = await db.attachments.attachment(hash);
+            if (attachment && mime.startsWith("image/")) {
+              await previewImageAttachment(attachment);
+            } else if (
+              attachment &&
+              onPreviewDocument &&
+              type === "file" &&
+              attachment.mimeType.startsWith("application/pdf")
+            ) {
+              onPreviewDocument({ hash });
+              const blob = await downloadAttachment(hash, "blob", id);
+              if (!blob) {
+                useEditorStore.setState({ documentPreview: undefined });
+                return;
+              }
+              onPreviewDocument({ url: URL.createObjectURL(blob), hash });
+            } else {
+              showToast("error", strings.attachmentPreviewFailed());
             }
-            onPreviewDocument({ url: URL.createObjectURL(blob), hash });
-          } else {
+          } catch (e) {
+            logger.error(e as Error, "Failed to preview attachment");
             showToast("error", strings.attachmentPreviewFailed());
           }
         }}
