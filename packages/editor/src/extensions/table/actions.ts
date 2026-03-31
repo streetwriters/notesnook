@@ -192,6 +192,7 @@ function selectColumn(
     direction === "prev" ? currentCellIndex - 1 : currentCellIndex + 1;
   const pos = rect.map.map[nextCellIndex - 1];
   tr.setSelection(new TextSelection(tr.doc.resolve(rect.tableStart + pos + 1)));
+  tr.scrollIntoView();
   return true;
 }
 

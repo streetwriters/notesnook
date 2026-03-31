@@ -60,35 +60,6 @@ export function TableComponent(
     );
   }, [node, cellMinWidth]);
 
-  useEffect(() => {
-    function onSelectionUpdate() {
-      if (!tableRef?.current) return;
-
-      const scrollContainer = tableRef.current.parentElement;
-      if (!scrollContainer) return;
-
-      const currentCell = findSelectedDOMNode(editor, [
-        "tableCell",
-        "tableHeader"
-      ]);
-      if (!currentCell || !tableRef.current.contains(currentCell)) return;
-
-      const cellRect = currentCell.getBoundingClientRect();
-      const containerRect = scrollContainer.getBoundingClientRect();
-
-      if (cellRect.right > containerRect.right) {
-        scrollContainer.scrollLeft += cellRect.right - containerRect.right;
-      } else if (cellRect.left < containerRect.left) {
-        scrollContainer.scrollLeft -= containerRect.left - cellRect.left;
-      }
-    }
-
-    editor.on("selectionUpdate", onSelectionUpdate);
-    return () => {
-      editor.off("selectionUpdate", onSelectionUpdate);
-    };
-  }, []);
-
   // useEffect(() => {
   //   function transactionListener({
   //     editor
