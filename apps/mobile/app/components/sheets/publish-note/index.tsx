@@ -88,7 +88,7 @@ const PublishNoteSheet = ({
   const monograph = monographData.result?.monograph;
   const metadata = monographData.result?.metadata;
   customTitle.current = monograph?.title || note.title || "";
-  const publishUrl = metadata?.publishUrl || "";
+  const publishUrl = metadata?.publishUrl || monograph?.publishUrl || "";
   const isPublished = db.monographs.monograph(note?.id);
 
   useEffect(() => {
