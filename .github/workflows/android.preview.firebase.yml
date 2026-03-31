@@ -1,17 +1,26 @@
 name: Notesnook Android Preview
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, reopened, synchronize]
     branches: [master, beta]
     paths:
       - "apps/mobile/**"
       - "packages/**"
-      # re-run workflow if workflow file changes
-      - ".github/workflows/mobile.publish.firebase.yml"
+      - ".github/workflows/android.preview.firebase.yml"
 
 jobs:
+  authorize:
+    environment: ${{ github.event_name == 'pull_request_target' &&
+      github.event.pull_request.head.repo.full_name != github.repository &&
+      'external' || 'internal' }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo true
+
   build:
+    needs: authorize
     runs-on: ubuntu-22.04
     env:
       STAGING_BUILD: true
@@ -19,6 +28,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.ref }}
 
       - name: Setup Node
         uses: ./.github/actions/setup-node-with-cache
