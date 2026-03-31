@@ -61,7 +61,6 @@ import {
   useTabStore
 } from "../screens/editor/tiptap/use-tab-store";
 import {
-  clearAppState,
   editorController,
   editorState
 } from "../screens/editor/tiptap/utils";
@@ -173,7 +172,6 @@ const onAppOpenedFromURL = async (event: {
     if (url.startsWith("https://app.notesnook.com/account/verified")) {
       await onUserEmailVerified();
     } else if (url.startsWith("ShareMedia://QuickNoteWidget")) {
-      clearAppState();
       editorState().movedAway = false;
       eSendEvent(eOnLoadNote, { newNote: true });
       fluidTabsRef.current?.goToPage("editor", false);
@@ -846,7 +844,6 @@ export const useAppEvents = () => {
           eSendEvent(eEditorReset);
         }
       } else {
-        clearAppState();
         if (
           SettingsService.canLockAppInBackground() &&
           !useSettingStore.getState().requestBiometrics &&

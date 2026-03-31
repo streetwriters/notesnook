@@ -70,7 +70,6 @@ import { SessionHistory } from "./session-history";
 import { EditorState, SavePayload } from "./types";
 import { TabSessionItem, syncTabs, useTabStore } from "./use-tab-store";
 import {
-  clearAppState,
   defaultState,
   getAppState,
   isContentInvalid,
@@ -1039,7 +1038,6 @@ export const useEditor = (
       }
     }
 
-    clearAppState();
     state.current.isRestoringState = false;
   }, []);
 

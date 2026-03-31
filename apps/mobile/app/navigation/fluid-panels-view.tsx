@@ -48,7 +48,6 @@ import { useShortcutManager } from "../hooks/use-shortcut-manager";
 import { hideAllTooltips } from "../hooks/use-tooltip";
 import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
 import {
-  clearAppState,
   editorController,
   editorState,
   getAppState
@@ -124,7 +123,6 @@ export const FluidPanelsView = React.memo(
           return;
         }
         if (item?.type === "notesnook.action.newnote") {
-          clearAppState();
           if (!fluidTabsRef.current) {
             setTimeout(() => {
               eSendEvent(eOnLoadNote, { newNote: true });

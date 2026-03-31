@@ -157,16 +157,10 @@ export function getAppState() {
     if (canRestoreAppState(appState)) {
       return appState;
     } else {
-      clearAppState();
       return null;
     }
   }
   return null;
-}
-
-export function clearAppState() {
-  appState = undefined;
-  NotesnookModule.setAppState("");
 }
 
 export async function openInternalLink(url: string) {
