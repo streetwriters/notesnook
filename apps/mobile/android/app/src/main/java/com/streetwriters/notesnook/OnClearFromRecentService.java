@@ -24,13 +24,6 @@ public class OnClearFromRecentService extends Service {
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        try {
-            SharedPreferences appStateDetails = getApplicationContext().getSharedPreferences("appStateDetails", MODE_PRIVATE);
-            SharedPreferences.Editor edit = appStateDetails.edit();
-            edit.remove("appState");
-            edit.apply();
-            stopSelf();
-        } catch (UnsatisfiedLinkError | Exception e) {
-        }
+
     }
 }

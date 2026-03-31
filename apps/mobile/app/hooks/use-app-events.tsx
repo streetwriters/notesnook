@@ -361,23 +361,6 @@ async function checkForShareExtensionLaunchedInBackground() {
   } catch (e) { }
 }
 
-async function saveEditorState() {
-  if (!editorState().movedAway) {
-    const id = useTabStore.getState().getCurrentNoteId();
-    const note = id ? await db.notes.note(id) : undefined;
-    const locked = note && (await db.vaults.itemExists(note));
-    if (locked) return;
-    const state = JSON.stringify({
-      editing: editorState().currentlyEditing,
-      movedAway: editorState().movedAway,
-      timestamp: Date.now()
-    });
-    NotesnookModule.setAppState(state);
-  } else {
-    NotesnookModule.setAppState("");
-  }
-}
-
 const onSuccessfulSubscription = async (
   subscription: RNIap.ProductPurchase | RNIap.SubscriptionPurchase
 ) => {
@@ -863,7 +846,7 @@ export const useAppEvents = () => {
           eSendEvent(eEditorReset);
         }
       } else {
-        // await saveEditorState();
+        clearAppState();
         if (
           SettingsService.canLockAppInBackground() &&
           !useSettingStore.getState().requestBiometrics &&
