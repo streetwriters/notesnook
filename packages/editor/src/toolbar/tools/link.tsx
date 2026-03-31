@@ -26,7 +26,7 @@ import { useToolbarLocation } from "../stores/toolbar-store.js";
 import { MoreTools } from "../components/more-tools.js";
 import { useRefValue } from "../../hooks/use-ref-value.js";
 import { findMark, selectionToOffset } from "../../utils/prosemirror.js";
-import { Flex, Link } from "@theme-ui/components";
+import { Flex, Link, Text } from "@theme-ui/components";
 import { ImageNode } from "../../extensions/image/index.js";
 import { Link as LinkNode } from "../../extensions/link/index.js";
 import { getMarkAttributes } from "@tiptap/core";
@@ -209,14 +209,21 @@ export function OpenLink(props: ToolProps) {
   const { node } = selectedNode.current || {};
   const link = node ? findMark(node, "link") : null;
   const href = link?.attrs.href ?? null;
+  const [loading, setLoading] = useState(false);
   const [linkData, setLinkData] = useState<LinkData | undefined>(undefined);
 
   useEffect(() => {
     if (!href) return;
 
     (async () => {
-      const result = await editor.storage.getLinkData?.(href);
-      setLinkData(result);
+      try {
+        setLoading(true);
+        const result = await editor.storage.getLinkData?.(href);
+        setLinkData(result);
+        setLoading(false);
+      } catch (e) {
+        setLoading(false);
+      }
     })();
   }, [href]);
 
@@ -229,30 +236,34 @@ export function OpenLink(props: ToolProps) {
       {linkData?.type && (
         <LinkTypeIcon type={linkData.type} metadata={linkData.metadata} />
       )}
-      <Link
-        href={href}
-        onClick={(e) => {
-          e.preventDefault();
-          editor.storage.openLink?.(href);
-          hide();
-        }}
-        target="_blank"
-        variant="body"
-        sx={{
-          fontSize: "subBody",
-          fontFamily: "body",
-          mr: 4,
-          color: "accent",
-          maxWidth: [150, 250],
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-          ":visited": { color: "accent" },
-          ":hover": { color: "accent", opacity: 0.8 }
-        }}
-      >
-        {title}
-      </Link>
+      {loading ? (
+        <Text sx={{ fontSize: "subBody" }}>{strings.loading()}</Text>
+      ) : (
+        <Link
+          href={href}
+          onClick={(e) => {
+            e.preventDefault();
+            editor.storage.openLink?.(href);
+            hide();
+          }}
+          target="_blank"
+          variant="body"
+          sx={{
+            fontSize: "subBody",
+            fontFamily: "body",
+            mr: 4,
+            color: "accent",
+            maxWidth: [150, 250],
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            ":visited": { color: "accent" },
+            ":hover": { color: "accent", opacity: 0.8 }
+          }}
+        >
+          {title}
+        </Link>
+      )}
       <ToolButton
         icon={props.icon}
         title={props.title}
