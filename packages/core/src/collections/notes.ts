@@ -162,7 +162,7 @@ export class Notes implements ICollection {
           currentNoteTitleFields?.title !== headlineTitle
         ) {
           item.title = titleFormat.replace(HEADLINE_REGEX, headlineTitle);
-        } else if (item.title === "") {
+        } else if (item.title === "")
           item.title = currentNoteTitleFields?.title || "Untitled";
         }
       }
