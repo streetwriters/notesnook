@@ -88,13 +88,14 @@ import { strings } from "@notesnook/intl";
 import { InlineCode } from "./extensions/inline-code/inline-code.js";
 import { FontLigature } from "./extensions/font-ligature/font-ligature.js";
 import { SearchResult } from "./extensions/search-result/search-result.js";
+import { LinkData } from "./types.js";
 
 interface TiptapStorage {
   dateFormat?: DateTimeOptions["dateFormat"];
   timeFormat?: DateTimeOptions["timeFormat"];
   dayFormat?: DateTimeOptions["dayFormat"];
   openLink?: (url: string, openInNewTab?: boolean) => void;
-  getLinkTitle?: (url: string) => Promise<string | undefined>;
+  getLinkData?: (url: string) => Promise<LinkData | undefined>;
   downloadAttachment?: (attachment: Attachment) => void;
   openAttachmentPicker?: (type: AttachmentType) => void;
   previewAttachment?: (attachment: Attachment) => void;
@@ -149,7 +150,7 @@ const useTiptap = (
     openAttachmentPicker,
     previewAttachment,
     openLink,
-    getLinkTitle,
+    getLinkData,
     onBeforeCreate,
     dateFormat,
     timeFormat,
@@ -397,7 +398,7 @@ const useTiptap = (
         editor.storage.createInternalLink = createInternalLink;
         editor.storage.getAttachmentData = getAttachmentData;
         editor.storage.downloadCsvTable = downloadCsvTable;
-        editor.storage.getLinkTitle = getLinkTitle;
+        editor.storage.getLinkData = getLinkData;
 
         if (onBeforeCreate) onBeforeCreate({ editor });
       },

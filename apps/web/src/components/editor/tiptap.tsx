@@ -428,11 +428,46 @@ function TipTap(props: TipTapProps) {
         if (link) handleInternalLink(url, openInNewTab);
         else window.open(url, "_blank");
       },
-      getLinkTitle: async (url) => {
+      getLinkData: async (url) => {
         const link = parseInternalLink(url);
-        if (link && link.type === "note") {
-          const note = await db.notes.note(link.id);
-          return note?.title;
+        if (!link) return;
+
+        switch (link.type) {
+          case "note":
+          case "notebook":
+          case "tag": {
+            const table =
+              link.type === "note"
+                ? "notes"
+                : link.type === "notebook"
+                ? "notebooks"
+                : "tags";
+            const item = await db
+              .sql()
+              .selectFrom(table)
+              .where("id", "=", link.id)
+              .select("title")
+              .executeTakeFirst();
+            return {
+              type: link.type,
+              title: item?.title || ""
+            };
+          }
+          case "color": {
+            const color = await db
+              .sql()
+              .selectFrom("colors")
+              .where("id", "=", link.id)
+              .select(["title", "colorCode"])
+              .executeTakeFirst();
+            return {
+              type: "color",
+              title: color?.title || "",
+              metadata: {
+                colorCode: color?.colorCode || ""
+              }
+            };
+          }
         }
       }
     };
