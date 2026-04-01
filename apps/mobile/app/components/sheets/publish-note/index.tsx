@@ -53,7 +53,6 @@ async function fetchMonographData(noteId: string) {
   const monograph = monographId
     ? await db.monographs.get(monographId)
     : undefined;
-  const analyticsFeature = await isFeatureAvailable("monographAnalytics");
 
   const metadata = monographId
     ? await db.monographs.metadata(monographId)
