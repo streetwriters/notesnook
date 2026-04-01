@@ -20,10 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { match, surround } from "fuzzyjs";
 import { clone } from "./clone.js";
 
-const SEPARATORS = /(?<=\w)[^a-zA-Z0-9](?=\w)/g;
+const SEPARATORS = /\w([^a-zA-Z0-9])\w/g;
 
 function normalizeSeparators(str: string): string {
-  return str.replace(SEPARATORS, " ");
+  return str.replace(SEPARATORS, (m) => m[0] + " " + m[m.length - 1]);
 }
 
 function hasSeparator(str: string): boolean {
