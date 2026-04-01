@@ -572,12 +572,13 @@ export function Editor(props: EditorProps) {
         onDownloadAttachment={(attachment) => saveAttachment(attachment.hash)}
         onPreviewAttachment={async (data) => {
           try {
-            const { hash, type, mime } = data;
+            const { hash, type } = data;
             const attachment = await db.attachments.attachment(hash);
-            if (attachment && mime.startsWith("image/")) {
+            if (!attachment)
+              throw new Error("No attachment found with hash: " + hash);
+            if (attachment.mimeType.startsWith("image/")) {
               await previewImageAttachment(attachment);
             } else if (
-              attachment &&
               onPreviewDocument &&
               type === "file" &&
               attachment.mimeType.startsWith("application/pdf")
@@ -590,11 +591,19 @@ export function Editor(props: EditorProps) {
               }
               onPreviewDocument({ url: URL.createObjectURL(blob), hash });
             } else {
+              logger.info("Attachment cannot be previewed", {
+                hash,
+                type,
+                mimeType: attachment?.mimeType
+              });
               showToast("error", strings.attachmentPreviewFailed());
             }
           } catch (e) {
-            logger.error(e as Error, "Failed to preview attachment");
-            showToast("error", strings.attachmentPreviewFailed());
+            logger.error(e, "Failed to preview attachment", { data });
+            showToast(
+              "error",
+              (e as Error).message || strings.attachmentPreviewFailed()
+            );
           }
         }}
         onInsertAttachment={async (type) => {
