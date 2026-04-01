@@ -821,7 +821,6 @@ export const useAppEvents = () => {
         Sync.run("global", false, "full");
         reconnectSSE();
         await checkForShareExtensionLaunchedInBackground();
-        NotesnookModule.setAppState("");
         let user = await db.user.getUser();
         if (user && !user?.isEmailConfirmed) {
           try {

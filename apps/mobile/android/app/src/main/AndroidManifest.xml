@@ -200,7 +200,6 @@
         </activity>
 
         <service
-            android:name=".OnClearFromRecentService"
             android:enabled="true"
             android:exported="true"
             android:stopWithTask="false" />

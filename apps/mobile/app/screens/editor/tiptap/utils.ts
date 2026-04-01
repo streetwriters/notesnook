@@ -141,28 +141,6 @@ export function isContentInvalid(content: string | undefined) {
   );
 }
 
-const canRestoreAppState = (appState: AppState) => {
-  return appState.editing && Date.now() < appState.timestamp + 3600000;
-};
-
-let appState: AppState | undefined;
-export function setAppState(state: AppState) {
-  appState = state;
-}
-export function getAppState() {
-  if (appState && canRestoreAppState(appState)) return appState as AppState;
-  const json = NotesnookModule.getAppState();
-  if (json) {
-    appState = JSON.parse(json) as AppState;
-    if (canRestoreAppState(appState)) {
-      return appState;
-    } else {
-      return null;
-    }
-  }
-  return null;
-}
-
 export async function openInternalLink(url: string) {
   const data = parseInternalLink(url);
   if (!data?.id) return false;

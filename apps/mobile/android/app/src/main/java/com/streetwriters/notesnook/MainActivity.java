@@ -28,10 +28,6 @@ public class MainActivity extends ReactActivity {
       WebView.setWebContentsDebuggingEnabled(true);
     }
 
-    try {
-      startService(new Intent(getBaseContext(), OnClearFromRecentService.class));
-    } catch (Exception ignored) {}
-
   }
 
   /**

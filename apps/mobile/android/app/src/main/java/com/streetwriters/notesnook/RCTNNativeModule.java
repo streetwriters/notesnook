@@ -93,17 +93,6 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
         }
     }
 
-    @ReactMethod
-    public void setAppState(final String appState) {
-        
-    }
-
-    @ReactMethod(isBlockingSynchronousMethod = true)
-    public String getAppState() {
-        
-        return null;
-    }
-
     @ReactMethod(isBlockingSynchronousMethod = true)
     public int getWidgetId() {
         return NotePreviewConfigureActivity.appWidgetId;
