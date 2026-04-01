@@ -199,10 +199,7 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:enabled="true"
-            android:exported="true"
-            android:stopWithTask="false" />
+
         <service android:name="com.asterinet.react.bgactions.RNBackgroundActionsTask" />
 
         <service
