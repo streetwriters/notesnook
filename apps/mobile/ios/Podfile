@@ -5,6 +5,9 @@ require Pod::Executable.execute_command('node', ['-p',
     {paths: [process.argv[1]]},
   )', __dir__]).strip
 
+# Add this source to fix RCT-Folly dependency issues
+source 'https://cdn.cocoapods.org/'
+
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
@@ -37,6 +40,12 @@ target 'Notesnook' do
     :fabric_enabled => true,
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
+
+  # Add all third-party podspecs for RN 0.84.1
+  pod 'RCT-Folly', :podspec => "#{rn_path}/third-party-podspecs/RCT-Folly.podspec"
+  pod 'fast_float', :podspec => "#{rn_path}/third-party-podspecs/fast_float.podspec"
+  pod 'fmt', :podspec => "#{rn_path}/third-party-podspecs/fmt.podspec"
+  pod 'glog', :podspec => "#{rn_path}/third-party-podspecs/glog.podspec"
 
   target 'NotesnookTests' do
 

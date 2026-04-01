@@ -23,8 +23,8 @@
     "release-android-bundle": "cd android && ./gradlew bundleRelease --no-daemon"
   },
   "overrides": {
-    "react-native": "0.82.1",
-    "react": "19.1.1"
+    "react-native": "0.84.1",
+    "react": "19.2.1"
   },
   "dependencies": {
     "@ammarahmed/notifee-react-native": "^7.4.12",
@@ -86,9 +86,9 @@
     "pathe": "1.1.2",
     "phone": "^3.1.14",
     "qclone": "^1.2.0",
-    "react": "19.1.1",
+    "react": "19.2.1",
     "react-async-hook": "^4.0.0",
-    "react-native": "0.82.1",
+    "react-native": "0.84.1",
     "react-native-actions-sheet": "^10.1.0",
     "react-native-actions-shortcuts": "^1.0.1",
     "react-native-background-actions": "^2.6.6",
@@ -104,7 +104,7 @@
     "react-native-fast-openpgp": "^2.9.3",
     "react-native-file-viewer": "^2.1.1",
     "react-native-format-currency": "0.0.5",
-    "react-native-gesture-handler": "2.28.0",
+    "react-native-gesture-handler": "^2.30.1",
     "react-native-get-random-values": "^1.11.0",
     "react-native-gzip": "1.1.0",
     "react-native-html-to-pdf-lite": "^0.9.1",
@@ -127,7 +127,7 @@
     "react-native-progress": "5.0.0",
     "react-native-qrcode-svg": "^6.0.6",
     "react-native-quick-sqlite": "^8.2.7",
-    "react-native-reanimated": "^4.2.0",
+    "react-native-reanimated": "^4.3.0",
     "react-native-reanimated-progress-bar": "1.0.1",
     "react-native-safe-area-context": "^5.6.1",
     "react-native-scoped-storage": "^1.9.5",
@@ -144,7 +144,7 @@
     "react-native-view-shot": "^4.0.3",
     "react-native-webview": "^13.13.5",
     "react-native-wheel-color-picker": "^1.3.1",
-    "react-native-worklets": "^0.7.1",
+    "react-native-worklets": "^0.8.1",
     "react-native-zip-archive": "6.0.9",
     "timeago.js": "4.0.2",
     "toggle-switch-react-native": "3.2.0",
@@ -159,13 +159,13 @@
     "@babel/preset-env": "^7.28.5",
     "@babel/runtime": "^7.28.4",
     "@callstack/repack-plugin-reanimated": "^5.2.1",
-    "@react-native-community/cli": "20.0.0",
-    "@react-native-community/cli-platform-android": "20.0.0",
-    "@react-native-community/cli-platform-ios": "20.0.0",
-    "@react-native/babel-preset": "0.82.1",
-    "@react-native/eslint-config": "0.82.1",
-    "@react-native/metro-config": "0.82.1",
-    "@react-native/typescript-config": "0.82.1",
+    "@react-native-community/cli": "20.1.0",
+    "@react-native-community/cli-platform-android": "20.1.0",
+    "@react-native-community/cli-platform-ios": "20.1.0",
+    "@react-native/babel-preset": "0.84.1",
+    "@react-native/eslint-config": "0.84.1",
+    "@react-native/metro-config": "0.84.1",
+    "@react-native/typescript-config": "0.84.1",
     "@rspack/core": "^1.5.8",
     "@swc/core": "1.13.5",
     "@swc/helpers": "^0.5.17",
@@ -173,7 +173,7 @@
     "@types/html-to-text": "^8.0.1",
     "@types/jest": "^29.5.13",
     "@types/metro-config": "^0.76.3",
-    "@types/react": "^19.1.1",
+    "@types/react": "^19.1.0",
     "@types/react-native": "^0.72.8",
     "@types/react-native-vector-icons": "^6.4.10",
     "@types/react-test-renderer": "^19.1.0",
@@ -207,6 +207,6 @@
     "typescript": "^5.8.3"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22.11.0"
   }
 }
