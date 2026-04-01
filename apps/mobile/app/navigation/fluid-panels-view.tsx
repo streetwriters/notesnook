@@ -50,7 +50,6 @@ import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
 import {
   editorController,
   editorState,
-  getAppState
 } from "../screens/editor/tiptap/utils";
 import { DDS } from "../services/device-detection";
 import {
@@ -117,7 +116,7 @@ export const FluidPanelsView = React.memo(
 
     useShortcutManager({
       onShortcutPressed: async (item) => {
-        if (!item && getAppState()) {
+        if (!item) {
           editorState().movedAway = false;
           fluidTabsRef.current?.goToPage("editor", false);
           return;
@@ -203,7 +202,6 @@ export const FluidPanelsView = React.memo(
           eSendEvent(eCloseFullscreenEditor, current);
         }
 
-        const state = getAppState();
         setTimeout(() => {
           switch (current) {
             case "tablet":
@@ -216,7 +214,6 @@ export const FluidPanelsView = React.memo(
               break;
             case "mobile":
               if (
-                state &&
                 editorState().movedAway === false &&
                 useTabStore.getState().getCurrentNoteId()
               ) {

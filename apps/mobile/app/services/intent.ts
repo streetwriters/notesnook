@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { Platform } from "react-native";
 import { db } from "../common/database";
-import { setAppState } from "../screens/editor/tiptap/utils";
 import { eOnLoadNote } from "../utils/events";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { eSendEvent } from "./event-manager";
@@ -37,14 +36,6 @@ export const IntentService = {
   onLaunch() {
     if (launched || Platform.OS === "ios") return;
     launched = true;
-    if (launchIntent["com.streetwriters.notesnook.OpenNoteId"]) {
-      setAppState({
-        movedAway: false,
-        editing: true,
-        timestamp: Date.now(),
-        noteId: launchIntent["com.streetwriters.notesnook.OpenNoteId"]
-      });
-    }
   },
   async onAppStateChanged() {
     if (Platform.OS === "ios") return;

@@ -69,13 +69,7 @@ import Commands from "./commands";
 import { SessionHistory } from "./session-history";
 import { EditorState, SavePayload } from "./types";
 import { TabSessionItem, syncTabs, useTabStore } from "./use-tab-store";
-import {
-  defaultState,
-  getAppState,
-  isContentInvalid,
-  isEditorLoaded,
-  post
-} from "./utils";
+import { defaultState, isContentInvalid, isEditorLoaded, post } from "./utils";
 import { Linking } from "react-native";
 
 const loadNoteMutex = new Mutex();
@@ -1024,8 +1018,6 @@ export const useEditor = (
   );
 
   const restoreEditorState = useCallback(async () => {
-    const appState = getAppState();
-    if (!appState) return;
     state.current.isRestoringState = true;
     state.current.currentlyEditing = true;
     if (fluidTabsRef.current?.page() === "editor") {

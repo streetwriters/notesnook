@@ -138,7 +138,6 @@ const onEvent = async ({ type, detail }: Event) => {
   if (type === EventType.PRESS) {
     notifee.decrementBadgeCount();
     if (notification?.data?.type === "quickNote") return;
-    NotesnookModule.setAppState("");
     if (notification?.data?.type === "reminder" && notification?.id) {
       const reminder = await db.reminders?.reminder(
         notification.id?.split("_")[0]
@@ -453,13 +452,6 @@ async function loadNote(id: string, jump: boolean) {
   if (!DDS.isTab && jump) {
     fluidTabsRef.current?.goToPage("editor");
   }
-  NotesnookModule.setAppState(
-    JSON.stringify({
-      editing: true,
-      movedAway: false,
-      timestamp: Date.now()
-    })
-  );
 
   const tab = useTabStore.getState().getTabForNote(id);
   if (useTabStore.getState().currentTab !== tab) {

@@ -53,15 +53,9 @@ async function fetchMonographData(noteId: string) {
   const monograph = monographId
     ? await db.monographs.get(monographId)
     : undefined;
-  const analyticsFeature = await isFeatureAvailable("monographAnalytics");
-  const analytics =
-    monographId && analyticsFeature
-      ? await db.monographs.analytics(monographId)
-      : undefined;
   return {
     monograph,
     monographId,
-    analytics
   };
 }
 
@@ -381,9 +375,6 @@ const PublishNoteSheet = ({
                   }}
                 >
                   <Paragraph size={AppFontSize.sm}>{strings.views()}</Paragraph>
-                  <Paragraph>
-                    {monographData?.result?.analytics?.totalViews || 0}
-                  </Paragraph>
                 </View>
               </View>
             </View>
