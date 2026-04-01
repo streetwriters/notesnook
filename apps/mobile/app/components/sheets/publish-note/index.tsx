@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { hosts, Monograph, Note } from "@notesnook/core";
+import { Note } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import Clipboard from "@react-native-clipboard/clipboard";
@@ -53,15 +53,14 @@ async function fetchMonographData(noteId: string) {
   const monograph = monographId
     ? await db.monographs.get(monographId)
     : undefined;
-  const analyticsFeature = await isFeatureAvailable("monographAnalytics");
-  const analytics =
-    monographId && analyticsFeature
-      ? await db.monographs.analytics(monographId)
-      : undefined;
+
+  const metadata = monographId
+    ? await db.monographs.metadata(monographId)
+    : { publishUrl: "", analytics: { totalViews: 0 } };
   return {
     monograph,
     monographId,
-    analytics
+    metadata
   };
 }
 
@@ -86,8 +85,9 @@ const PublishNoteSheet = ({
     return fetchMonographData(note?.id);
   }, []);
   const monograph = monographData.result?.monograph;
+  const metadata = monographData.result?.metadata;
   customTitle.current = monograph?.title || note.title || "";
-  const publishUrl = monograph && `${hosts.MONOGRAPH_HOST}/${monograph?.id}`;
+  const publishUrl = metadata?.publishUrl || monograph?.publishUrl || "";
   const isPublished = db.monographs.monograph(note?.id);
 
   useEffect(() => {
@@ -382,7 +382,7 @@ const PublishNoteSheet = ({
                 >
                   <Paragraph size={AppFontSize.sm}>{strings.views()}</Paragraph>
                   <Paragraph>
-                    {monographData?.result?.analytics?.totalViews || 0}
+                    {monographData?.result?.metadata?.totalViews || 0}
                   </Paragraph>
                 </View>
               </View>
