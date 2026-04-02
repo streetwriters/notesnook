@@ -16,7 +16,7 @@ Reminders help you stay on top of your important notes. You can create one-time 
 3. Enter a title for the reminder and description (optional)
 4. Choose your reminder type:
    - **Once**: Set a specific date and time
-   - **Repeat**: Create a recurring reminder (daily, weekly, monthly, or yearly)
+   - **Repeat** (paid plans only): Create a recurring reminder (daily, weekly, monthly, or yearly)
 5. Select your notification preference (Silent, Vibrate, or Urgent)
 6. Click `Add` to save the reminder
 
@@ -27,7 +27,7 @@ Reminders help you stay on top of your important notes. You can create one-time 
 3. Enter a title for the reminder and description (optional)
 4. Choose your reminder type:
    - **Once**: Set a specific date and time
-   - **Repeat**: Create a recurring reminder (daily, weekly, monthly, or yearly)
+   - **Repeat** (paid plans only): Create a recurring reminder (daily, weekly, monthly, or yearly)
    - **Permanent** _(Android only)_: A persistent reminder that shows up every day
 5. Select your notification preference (Silent, Vibrate, or Urgent)
 6. Tap the checkmark button on top right to save the reminder
@@ -59,6 +59,10 @@ You can also create reminders without attaching them to a specific note. This is
 ---
 
 ## Configuring recurring reminders
+
+> info Recurring reminders are a paid feature
+>
+> Recurring reminders can only be used if you are on a paid plan.
 
 When you select **Repeat** mode, you can customize how often you want to be reminded:
 
