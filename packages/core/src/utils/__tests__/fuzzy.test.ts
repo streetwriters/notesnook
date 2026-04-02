@@ -98,20 +98,35 @@ describe("lookup.fuzzy", () => {
     const items = [
       { id: "1", title: "file search.jpg" },
       { id: "2", title: "file-search.jpg" },
-      { id: "3", title: "file_search.jpg" }
+      { id: "3", title: "file_search.jpg" },
+      { id: "4", title: "file____search-393.jpg" },
+      { id: "5", title: "note-393.jpg" }
     ];
 
     test("query with space matches all separator variants", () => {
-      const result = fuzzy("file search", items, (i) => i.id, { title: 1 });
-      expect(result).toStrictEqual(items);
+      const result = fuzzy("fl srch", items, (i) => i.id, { title: 1 });
+      expect(result).toStrictEqual(items.slice(0, 4));
+    });
+
+    test("variants with only separators should match", () => {
+      const result = fuzzy(
+        "---",
+        [
+          { id: "1", title: "--------.jpg" },
+          { id: "2", title: "abc.jpg" }
+        ],
+        (i) => i.id,
+        { title: 1 }
+      );
+      expect(result).toStrictEqual([{ id: "1", title: "--------.jpg" }]);
     });
 
     test("query with special character between words matches all separator variants", () => {
       let result = fuzzy("file_search", items, (i) => i.id, { title: 1 });
-      expect(result).toStrictEqual(items);
+      expect(result).toStrictEqual([items[2], items[3], items[0], items[1]]);
 
       result = fuzzy("file-search", items, (i) => i.id, { title: 1 });
-      expect(result).toStrictEqual(items);
+      expect(result).toStrictEqual([items[1], items[0], items[2], items[3]]);
     });
   });
 });
