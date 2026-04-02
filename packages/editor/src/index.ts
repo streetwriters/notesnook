@@ -288,7 +288,13 @@ const useTiptap = (
         }).configure({
           openOnClick: !isMobile,
           autolink: false,
-          linkOnPaste: true
+          linkOnPaste: true,
+          protocols: [
+            {
+              scheme: "nn",
+              optionalSlashes: true
+            }
+          ]
         }),
         Table.configure({
           resizable: true,
