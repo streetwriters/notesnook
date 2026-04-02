@@ -84,7 +84,7 @@ navigation:
       - path: custom-themes/publish-a-theme.md
   - path: inbox-api
     children:
-      - path: inbox-api/inbox-api.md
+      - path: inbox-api/getting-started.md
       - path: inbox-api/self-hosting-inbox-api.md
   - path: faqs
     children:
