@@ -28,7 +28,14 @@ Notesnook allows you to delete your accounts and your data without any questions
 
 ### What information is deleted?
 
-All your notes, notebooks, attachments, and any other data that you created within the app will be immediately deleted.
+When you delete your account, **all** of the following will be permanently removed:
+
+- All your notes, notebooks, attachments, and any other data you created within the app
+- Your account login credentials (email and password)
+- Your subscription and billing information
+- Your registered user account completely
+
+After deletion, your email address will no longer be associated with Notesnook and cannot be used to log in.
 
 ### Is there any way to recover deleted data?
 

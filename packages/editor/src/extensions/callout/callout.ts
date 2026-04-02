@@ -27,7 +27,7 @@ import {
   mergeAttributes
 } from "@tiptap/core";
 import { Paragraph } from "../paragraph/index.js";
-import { Heading } from "../heading/index.js";
+import { Heading, toggleNodesUnderPos } from "../heading/index.js";
 import { TextSelection } from "@tiptap/pm/state";
 import { Fragment } from "@tiptap/pm/model";
 import { hasPermission } from "../../types.js";
@@ -250,6 +250,24 @@ export const Callout = Node.create({
               "collapsed",
               !container.classList.contains("collapsed")
             );
+
+            /**
+             * Due to a bug in heading extension, the first callout heading
+             * was able to be expanded/collapsed. This caused the callout
+             * content to be hidden without the callout itself being collapsed.
+             * The bug is fixed, but we still need to handle the case
+             * where the first callout heading was previously collapsed.
+             */
+            if (node.firstChild?.attrs.collapsed) {
+              tr.setNodeAttribute(pos + 1, "collapsed", false);
+              toggleNodesUnderPos(
+                tr,
+                pos + 1,
+                node.firstChild?.attrs.level,
+                false
+              );
+            }
+
             return true;
           });
         }

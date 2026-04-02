@@ -425,39 +425,20 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
 }
 
 function Final(_props: BaseRecoveryComponentProps<"final">) {
-  const [isReady, setIsReady] = useState(false);
   useEffect(() => {
     async function finalize() {
       await RecoveryKeyDialog.show({});
-      if (!isSessionExpired()) {
-        await db.user.logout(true, "Password changed.");
+      if (isSessionExpired()) {
+        openURL("/sessionexpired");
+      } else {
         await db.user.clearSessions(true);
+        openURL("/login");
       }
-      setIsReady(true);
     }
     finalize();
   }, []);
 
-  if (!isReady && !isSessionExpired)
-    return <Loader text="" title={strings.loading() + "..."} />;
-
-  return (
-    <RecoveryForm
-      testId="step-finished"
-      type="final"
-      title={strings.recoverySuccess()}
-      subtitle={strings.recoverySuccessDesc()}
-      onSubmit={async () => {
-        openURL(isSessionExpired() ? "/sessionexpired" : "/login");
-      }}
-    >
-      <SubmitButton
-        text={
-          isSessionExpired() ? strings.continue() : strings.loginToYourAccount()
-        }
-      />
-    </RecoveryForm>
-  );
+  return null;
 }
 
 type RecoveryFormProps<TType extends RecoveryRoutes> = {

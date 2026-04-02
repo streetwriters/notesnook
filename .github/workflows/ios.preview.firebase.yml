@@ -1,0 +1,168 @@
+name: Notesnook iOS Preview
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+    branches: [master, beta]
+    paths:
+      - "apps/mobile/**"
+      - "packages/**"
+      - ".github/workflows/ios.preview.firebase.yml"
+
+jobs:
+  authorize:
+    environment: ${{ github.event_name == 'pull_request_target' &&
+      github.event.pull_request.head.repo.full_name != github.repository &&
+      'external' || 'internal' }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo true
+
+  build:
+    needs: authorize
+    runs-on: macos-26
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.ref }}
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "26.1.1"
+
+      - name: Install node modules
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=mobile
+
+      - name: Build packages
+        run: npm run tx @notesnook/mobile:build
+
+      - name: Cache Pods
+        uses: actions/cache@v3
+        id: pods-cache
+        with:
+          path: apps/mobile/ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('apps/mobile/ios/Podfile.lock') }}
+
+      - name: Install Pods
+        run: |
+          cd apps/mobile/ios
+          pod install
+
+      - name: Check for typescript errors
+        run: |
+          npm run tx mobile:build
+          cd apps/mobile
+          npx tsc --noEmit
+
+      - name: Get marketing version
+        id: marketing-version
+        run: echo "version=$(grep "IOS_MARKETING_VERSION" apps/mobile/ios/build-configs/ios-build.staging.xcconfig | awk -F'=' '{print $2}' | xargs)" >> $GITHUB_OUTPUT
+
+      - name: Get build number
+        id: build-number
+        run: echo "timestamp=$(($(date +%s) - 1774851180 ))" >> $GITHUB_OUTPUT
+
+      - name: Make staging xcconfig active
+        run: |
+          cd apps/mobile/ios/build-configs
+          ./use-ios-build-config.sh staging --marketing-version ${{steps.marketing-version.outputs.version}} --build-number ${{steps.build-number.outputs.timestamp}}
+
+      - name: Build iOS App
+        uses: ammarahm-ed/ios-build-action@master
+        with:
+          bundle-identifier: org.streetwriters.notesnook
+          scheme: Notesnook
+          configuration: "Release"
+          export-options: apps/mobile/ios/ExportOptionsStaging.plist
+          export-method: "ad-hoc"
+          project-path: apps/mobile/ios/Notesnook.xcodeproj
+          workspace-path: apps/mobile/ios/Notesnook.xcworkspace
+          update-targets: |
+            Notesnook
+            Make Note
+            NotesWidgetExtension
+          disable-targets: Notesnook-tvOS,Notesnook-tvOSTests,NotesnookTests
+          code-signing-identity: Apple Distribution
+          team-id: ${{ secrets.APPLE_TEAM_ID }}
+          p12-base64: ${{ secrets.APPLE_CERTIFICATE_P12 }}
+          certificate-password: ${{ secrets.APPLE_CERTIFICATE_P12_PASSWORD }}
+          app-store-connect-api-key-issuer-id: ${{ secrets.API_KEY_ISSUER_ID }}
+          app-store-connect-api-key-id: ${{ secrets.APPSTORE_KEY_ID }}
+          app-store-connect-api-key-base64: ${{ secrets.APPSTORE_CONNECT_API_KEY_BASE64 }}
+          output-path: Notesnook.ipa
+          mobileprovision-base64: |
+            ${{ secrets.APPLE_MOBILE_PROVISION_ADHOC_APP }}
+            ${{ secrets.APPLE_MOBILE_PROVISION_ADHOC_SHARE }}
+            ${{ secrets.APPLE_MOBILE_PROVISION_ADHOC_WIDGET }}
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-preview-ipa
+          path: Notesnook.ipa
+          if-no-files-found: error
+          retention-days: 1
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: build
+    timeout-minutes: 20
+
+    steps:
+      - name: Download IPA artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-preview-ipa
+          path: .
+
+      - name: Publish to firebase CLI
+        id: firebase-output
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{secrets.FIREBASE_IOS_APP_ID}}
+          serviceCredentialsFileContent: ${{ secrets.QA_SERVICE_ACCOUNT }}
+          groups: testers
+          file: Notesnook.ipa
+          releaseNotes: Preview for https://github.com/streetwriters/notesnook/pull/${{github.event.number}}
+
+      - name: Post or update PR comment
+        uses: actions/github-script@v6
+        env:
+          preview_url: ${{ steps.firebase-output.outputs.TESTING_URI }}
+        with:
+          script: |
+            const marker = '<!-- ios-preview-comment -->';
+            const prNumber = context.issue.number;
+            const previewUrl = process.env.preview_url || '';
+            const body = `${marker}\n**iOS App Preview**\n\n${previewUrl || 'Preview URL unavailable — check workflow logs.'}\n\nCommit: ${process.env.GITHUB_SHA}\n`;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            const existing = comments.find(c => c.body && c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body,
+              });
+            }

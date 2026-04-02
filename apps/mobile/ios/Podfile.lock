@@ -2275,7 +2275,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - react-native-upload (6.31.0):
+  - react-native-upload (6.33.0):
     - React
   - react-native-view-shot (4.0.3):
     - boost
@@ -2872,7 +2872,7 @@ PODS:
     - React-perflogger (= 0.82.1)
     - React-utils (= 0.82.1)
     - SocketRocket
-  - RNBackgroundFetch (4.2.2):
+  - RNBackgroundFetch (4.2.3):
     - React-Core
   - RNBootSplash (6.3.11):
     - boost
@@ -3092,10 +3092,10 @@ PODS:
     - Yoga
   - RNKeychain (4.0.5):
     - React
-  - RNNotifee (7.4.11):
+  - RNNotifee (7.4.12):
     - React-Core
-    - RNNotifee/NotifeeCore (= 7.4.11)
-  - RNNotifee/NotifeeCore (7.4.11):
+    - RNNotifee/NotifeeCore (= 7.4.12)
+  - RNNotifee/NotifeeCore (7.4.12):
     - React-Core
   - RNPrivacySnapshot (1.0.0):
     - React-Core
@@ -3875,19 +3875,19 @@ SPEC CHECKSUMS:
   boost: 7e761d76ca2ce687f7cc98e698152abd03a18f90
   callstack-repack: 3991230773c74ea49e7db6932d20e72d175faa41
   DoubleConversion: cb417026b2400c8f53ae97020b2be961b59470cb
-  fast_float: b32c788ed9c6a8c584d114d0047beda9664e7cc6
+  fast_float: 914e00b8b67cb8ba184a778c7bbc2e9fe98d37b3
   FBLazyVector: 0aa6183b9afe3c31fc65b5d1eeef1f3c19b63bfa
-  fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
-  glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
+  fmt: b85d977e8fe789fd71c77123f9f4920d88c4d170
+  glog: 682871fb30f4a65f657bf357581110656ea90b08
   GZIP: 3c0abf794bfce8c7cb34ea05a1837752416c8868
-  hermes-engine: 273e30e7fb618279934b0b95ffab60ecedb7acf5
+  hermes-engine: 1c85d2d2a4722541e6faffceb7bcc2249b5398b2
   JWTDecode: 2eed97c2fa46ccaf3049a787004eedf0be474a87
   MMKV: 7b5df6a8bf785c6705cc490c541b9d8a957c4a64
   MMKVCore: 3f40b896e9ab522452df9df3ce983471aa2449ba
   NitroCloudUploader: 62489381ed6b472d87c8c6b62629136ebd2342d1
   NitroModules: f964d2f3f5b392d0c0303737085cc30e375dc43f
   pop: d582054913807fd11fd50bfe6a539d91c7e1a55a
-  RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
+  RCT-Folly: fb64616e25cfac1c3d10bfd784d68926325ae67f
   RCTDeprecation: f17e2ebc07876ca9ab8eb6e4b0a4e4647497ae3a
   RCTRequired: e2c574c1b45231f7efb0834936bd609d75072b63
   RCTTypeSafety: c693294e3993056955c3010eb1ebc574f1fcded6
@@ -3946,7 +3946,7 @@ SPEC CHECKSUMS:
   react-native-share-extension: fdc6aaab51591a2d445df239c446aaa3a99658ec
   react-native-sodium: 066f76e46c9be13e9260521e3fa994937c4cdab4
   react-native-theme-switch-animation: 449d6db7a760f55740505e7403ae8061debc9a7e
-  react-native-upload: 6285965d20879bcfcf7953f05eb785ba03a60e40
+  react-native-upload: 7b7ad336c3db703b68a8c07cf38e9319ae90d695
   react-native-view-shot: 6c008e58f4720de58370848201c5d4a082c6d4ca
   react-native-webview: 654f794a7686b47491cf43aa67f7f428bea00eed
   React-NativeModulesApple: 46690a0fe94ec28fc6fc686ec797b911d251ded0
@@ -3981,7 +3981,7 @@ SPEC CHECKSUMS:
   ReactAppDependencyProvider: a45ef34bb22dc1c9b2ac1f74167d9a28af961176
   ReactCodegen: 878add6c7d8ff8cea87697c44d29c03b79b6f2d9
   ReactCommon: 804dc80944fa90b86800b43c871742ec005ca424
-  RNBackgroundFetch: 0c49d5892a0e2f9c139e24ba498985cf0bf070c6
+  RNBackgroundFetch: 7b9281af0b21100c3c5ef07d1df9ab1adf2dc686
   RNBootSplash: 98a34471966945e8dacd1da8f0c2f87cbc2e2df7
   RNCCheckbox: 33b44487ca8008394ce658cc32b26eab04f426ef
   RNCClipboard: 4b58c780f63676367640f23c8e114e9bd0cf86ac
@@ -3994,7 +3994,7 @@ SPEC CHECKSUMS:
   RNIap: 61f183ac917792fae42b0326b1bef33598c1adf6
   RNImageCropPicker: 5fd4ceaead64d8c53c787e4e559004f97bc76df7
   RNKeychain: ffd0513e676445c637410b47249460cbf56bc9cb
-  RNNotifee: c4827fa2cec60ab634d62bafdb5cf57cd2999d54
+  RNNotifee: dea82c9ec44684eeeac9da85deb5eeb8ebe5937f
   RNPrivacySnapshot: ccad3a548338c2f526bb7b1789af3fb0618b7d1d
   RNReanimated: f1868b36f4b2b52a0ed00062cfda69506f75eaee
   RNScreens: ffbb0296608eb3560de641a711bbdb663ed1f6b4
@@ -4005,7 +4005,7 @@ SPEC CHECKSUMS:
   RNWorklets: d9c050940f140af5d8b611d937eab1cbfce5e9a5
   RNZipArchive: 71befbdc20e7fbd4b64552a0b324ad0e8d0efefb
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
-  SexyTooltip: 5c9b4dec52bfb317938cb0488efd9da3717bb6fd
+  SexyTooltip: 605cfd16ae28fd8c3afac9c29236518e156dbbd8
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
   SwiftyRSA: 8c6dd1ea7db1b8dc4fb517a202f88bb1354bc2c6
@@ -4013,6 +4013,6 @@ SPEC CHECKSUMS:
   toolbar-android: c426ed5bd3dcccfed20fd79533efc0d1ae0ef018
   Yoga: 689c8e04277f3ad631e60fe2a08e41d411daf8eb
 
-PODFILE CHECKSUM: 3021ad3db20df40d4106c9be82d0100d9d447239
+PODFILE CHECKSUM: 3fe13efa8356dcc061862bfa9f453dcd12ede70a
 
 COCOAPODS: 1.16.2

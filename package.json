@@ -18,6 +18,7 @@
     "test:web": "npm run tx web:test",
     "test:core": "npm run tx core:test",
     "start:android": "npm run tx mobile:run-android",
+    "start:android:release": "npm run tx mobile:run-android-release",
     "start:ios": "npm run tx mobile:run-ios",
     "prepare:ios": "npm run tx mobile:install-pods",
     "build:ios": "npm run tx mobile:build-ios",
@@ -112,7 +113,8 @@
           "release-android",
           "release-android-bundle",
           "release-ios",
-          "repack"
+          "repack",
+          "run-android-release"
         ]
       }
     ]

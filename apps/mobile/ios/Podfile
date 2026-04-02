@@ -86,4 +86,20 @@ post_install do |installer|
           end
         end
       end
+
+  # Embed the active iOS build config xcconfig as the project-level base configuration.
+  # CocoaPods only manages target-level base configurations, so the project-level one
+  # is safe to set here and will survive future pod installs.
+  # To switch environments: update ios-build.active.xcconfig, then re-run pod install.
+  # active_xcconfig_rel_path = 'build-configs/ios-build.active.xcconfig'
+  # user_project = installer.aggregate_targets.first.user_project
+  # xcconfig_ref = user_project.files.find { |f| f.path&.end_with?('ios-build.active.xcconfig') }
+  # if xcconfig_ref.nil?
+  #   xcconfig_ref = user_project.main_group.new_file(active_xcconfig_rel_path, :project)
+  #   xcconfig_ref.last_known_file_type = 'text.xcconfig'
+  # end
+  # user_project.build_configurations.each do |config|
+  #   config.base_configuration_reference = xcconfig_ref
+  # end
+  # user_project.save
 end

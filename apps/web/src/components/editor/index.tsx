@@ -571,25 +571,39 @@ export function Editor(props: EditorProps) {
         onChange={onSave}
         onDownloadAttachment={(attachment) => saveAttachment(attachment.hash)}
         onPreviewAttachment={async (data) => {
-          const { hash, type, mime } = data;
-          const attachment = await db.attachments.attachment(hash);
-          if (attachment && mime.startsWith("image/")) {
-            await previewImageAttachment(attachment);
-          } else if (
-            attachment &&
-            onPreviewDocument &&
-            type === "file" &&
-            attachment.mimeType.startsWith("application/pdf")
-          ) {
-            onPreviewDocument({ hash });
-            const blob = await downloadAttachment(hash, "blob", id);
-            if (!blob) {
-              useEditorStore.setState({ documentPreview: undefined });
-              return;
+          try {
+            const { hash, type } = data;
+            const attachment = await db.attachments.attachment(hash);
+            if (!attachment)
+              throw new Error("No attachment found with hash: " + hash);
+            if (attachment.mimeType.startsWith("image/")) {
+              await previewImageAttachment(attachment);
+            } else if (
+              onPreviewDocument &&
+              type === "file" &&
+              attachment.mimeType.startsWith("application/pdf")
+            ) {
+              onPreviewDocument({ hash });
+              const blob = await downloadAttachment(hash, "blob", id);
+              if (!blob) {
+                useEditorStore.setState({ documentPreview: undefined });
+                return;
+              }
+              onPreviewDocument({ url: URL.createObjectURL(blob), hash });
+            } else {
+              logger.info("Attachment cannot be previewed", {
+                hash,
+                type,
+                mimeType: attachment?.mimeType
+              });
+              showToast("error", strings.attachmentPreviewFailed());
             }
-            onPreviewDocument({ url: URL.createObjectURL(blob), hash });
-          } else {
-            showToast("error", strings.attachmentPreviewFailed());
+          } catch (e) {
+            logger.error(e, "Failed to preview attachment", { data });
+            showToast(
+              "error",
+              (e as Error).message || strings.attachmentPreviewFailed()
+            );
           }
         }}
         onInsertAttachment={async (type) => {

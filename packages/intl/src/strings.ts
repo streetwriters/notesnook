@@ -1075,7 +1075,7 @@ $day$: Current day (eg. Monday)`,
   logoutError: () => t`Error logging out`,
   deleteAccount: () => t`Delete account`,
   deleteAccountDesc: () =>
-    t`All your data will be removed permanently. Make sure you have saved backup of your notes. This action is IRREVERSIBLE.`,
+    t`Your account will be permanently deleted along with all your data, login credentials, and subscription information. This action is IRREVERSIBLE. Make sure you have saved a backup of your notes before proceeding.`,
   enterAccountPassword: () => t`Enter account password`,
   enterAccountPasswordDesc: () => t`Enter account password to proceed.`,
   failedToDeleteAccount: () => t`Failed to delete account`,

@@ -5,6 +5,7 @@ apply plugin: 'kotlin-parcelize'
 
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
 
+
 import com.android.build.OutputFile
 import groovy.json.JsonSlurper
 import org.apache.tools.ant.taskdefs.condition.Os
@@ -94,6 +95,18 @@ def fdroidBuild() {
     return project.hasProperty("fdroidBuild") && project.fdroidBuild == "true"
 }
 
+def prBuildNumber() {
+    def value = project.getProperties().get("prBuildNumber")
+    return value ? value : "1000"
+}
+
+def stagingReleaseBuild() {
+    // Enable with STAGING_BUILDtrue or -PstagingReleaseBuild=true
+    def fromEnv = System.getenv("STAGING_BUILD") == "true"
+    def fromProp = project.hasProperty("stagingReleaseBuild") && project.stagingReleaseBuild == "true"
+    return fromEnv || fromProp
+}
+
 def getNpmVersion() {
     def inputFile = file("$rootDir/../package.json")
     def jsonPackage = new JsonSlurper().parseText(inputFile.text)
@@ -118,14 +131,17 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    
     namespace "com.streetwriters.notesnook"
     defaultConfig {
         applicationId "com.streetwriters.notesnook"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true
-        versionCode 3098
+        if (project.hasProperty("prBuildNumber")) {
+            versionCode Integer.parseInt(prBuildNumber())
+        } else {
+            versionCode 3098
+        }
         versionName getNpmVersion()
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
@@ -192,6 +208,8 @@ android {
                     output.versionCodeOverride =
                        defaultConfig.versionCode * 5 + versionCodes.get(abi)
                     println("Fdroid Version code: ${output.versionCodeOverride} for abi ${versionCodes.get(abi)}");
+                } else if (stagingReleaseBuild()) {
+                    output.versionCodeOverride = defaultConfig.versionCode + versionCodes.get(abi)
                 } else {
                     if (isBuildingAAB) {
                         output.versionCodeOverride = 4 * 1048576 + defaultConfig.versionCode
@@ -233,7 +251,6 @@ dependencies {
     } else {
         implementation jscFlavor
     }
-    
 
 }
 
