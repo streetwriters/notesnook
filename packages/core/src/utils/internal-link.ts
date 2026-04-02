@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 const InternalLinkTypes = ["note", "notebook", "tag", "color"] as const;
 type InternalLinkType = (typeof InternalLinkTypes)[number];
-type NoteLink = BaseInternalLink<"note">;
+export type NoteLink = BaseInternalLink<"note">;
 type NotebookLink = BaseInternalLink<"notebook">;
 type TagLink = BaseInternalLink<"tag">;
 type ColorLink = BaseInternalLink<"color">;

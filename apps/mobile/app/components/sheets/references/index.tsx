@@ -22,6 +22,7 @@ import {
   InternalLink,
   ItemReference,
   Note,
+  NoteLink,
   TextSlice,
   VirtualizedGrouping,
   createInternalLink,
@@ -29,7 +30,13 @@ import {
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import React, { MutableRefObject, useEffect, useRef, useState } from "react";
+import React, {
+  MutableRefObject,
+  RefObject,
+  useEffect,
+  useRef,
+  useState
+} from "react";
 import { ActivityIndicator, View } from "react-native";
 import { ScrollView } from "react-native-actions-sheet";
 import { create } from "zustand";
@@ -104,8 +111,8 @@ const ListBlockItem = ({
           {item?.content.length > 200
             ? item?.content.slice(0, 200) + "..."
             : !item.content || item.content.trim() === ""
-            ? strings.linkNoteEmptyBlock()
-            : item.content}
+              ? strings.linkNoteEmptyBlock()
+              : item.content}
         </Paragraph>
 
         <View
@@ -202,7 +209,7 @@ const ListNoteItem = ({
   items: VirtualizedGrouping<Note> | undefined;
   onSelect: (item: Note, blockId?: string) => void;
   reference: Note;
-  internalLinks: MutableRefObject<InternalLink<"note">[] | undefined>;
+  internalLinks: RefObject<NoteLink[] | undefined>;
   listType: "linkedNotes" | "referencedIn";
 }) => {
   const { colors } = useThemeColors();
@@ -228,7 +235,9 @@ const ListNoteItem = ({
           if (linkedBlocks.length) return;
           setLoading(true);
           if (!internalLinks.current) {
-            internalLinks.current = await db.notes.internalLinks(reference.id);
+            internalLinks.current = (await db.notes.internalLinks(
+              reference.id
+            )) as NoteLink[];
           }
           const noteLinks = internalLinks.current.filter(
             (link) => link.id === item.id && link.params?.blockId
@@ -404,7 +413,7 @@ export const ReferencesList = ({ item, close }: ReferencesListProps) => {
   const { colors } = useThemeColors();
   const [items, setItems] = useState<VirtualizedGrouping<Note>>();
   const hasNoRelations = !items || items?.placeholders?.length === 0;
-  const internalLinks = useRef<InternalLink<"note">[]>([]);
+  const internalLinks = useRef<NoteLink[]>([]);
 
   useEffect(() => {
     db.relations?.[tab === 0 ? "from" : "to"]?.(
