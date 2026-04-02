@@ -3,27 +3,21 @@ package com.streetwriters.notesnook;
 import com.facebook.react.ReactActivity;
 import android.content.Intent;
 import android.content.res.Configuration;
-import androidx.core.graphics.Insets;
-import android.os.Build;
 import android.os.Bundle;
-import android.view.View;
 import android.webkit.WebView;
-
-import androidx.core.view.OnApplyWindowInsetsListener;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactActivityDelegate;
 import com.zoontek.rnbootsplash.RNBootSplash;
+import com.swmansion.rnscreens.fragment.restoration.RNScreensFragmentFactory;
 
 public class MainActivity extends ReactActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+    getSupportFragmentManager().setFragmentFactory(new RNScreensFragmentFactory());
     RNBootSplash.init(this, R.style.BootTheme);
-
-    super.onCreate(null);
+    super.onCreate(savedInstanceState);
     if (BuildConfig.DEBUG) {
       WebView.setWebContentsDebuggingEnabled(true);
     }

@@ -1,29 +1,28 @@
-diff --git a/node_modules/react-native-iap/RNIap.podspec b/node_modules/react-native-iap/RNIap.podspec
-index 79784fd..859532b 100644
---- a/node_modules/react-native-iap/RNIap.podspec
-+++ b/node_modules/react-native-iap/RNIap.podspec
-@@ -18,19 +18,23 @@ Pod::Spec.new do |s|
+diff --git a/node_modules/@bam.tech/react-native-image-resizer/react-native-image-resizer.podspec b/node_modules/@bam.tech/react-native-image-resizer/react-native-image-resizer.podspec
+index 1848ae8..5df8a24 100644
+--- a/node_modules/@bam.tech/react-native-image-resizer/react-native-image-resizer.podspec
++++ b/node_modules/@bam.tech/react-native-image-resizer/react-native-image-resizer.podspec
+@@ -18,22 +18,23 @@ Pod::Spec.new do |s|
  
-   s.requires_arc  = true
+   s.ios.framework = 'AssetsLibrary', 'MobileCoreServices'
  
--  s.dependency "React-Core"
--
 -  # Don't install the dependencies when we run `pod install` in the old architecture.
 -  if ENV['RCT_NEW_ARCH_ENABLED'] == '1' then
 -    s.compiler_flags = folly_compiler_flags + " -DRCT_NEW_ARCH_ENABLED=1"
 -    s.pod_target_xcconfig    = {
 -        "HEADER_SEARCH_PATHS" => "\"$(PODS_ROOT)/boost\"",
+-        "OTHER_CPLUSPLUSFLAGS" => "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1",
 -        "CLANG_CXX_LANGUAGE_STANDARD" => "c++17"
 -    }
--
+-    s.dependency "React-Codegen"
 -    s.dependency "RCT-Folly"
 -    s.dependency "RCTRequired"
 -    s.dependency "RCTTypeSafety"
 -    s.dependency "ReactCommon/turbomodule/core"
 +  if respond_to?(:install_modules_dependencies, true)
-+    install_modules_dependencies(s)
-+  else
-+    s.dependency "React-Core"
+     install_modules_dependencies(s)
+   else
+     s.dependency "React-Core"
 +    # Don't install the dependencies when we run `pod install` in the old architecture.
 +    if ENV['RCT_NEW_ARCH_ENABLED'] == '1' then
 +      s.compiler_flags = folly_compiler_flags + " -DRCT_NEW_ARCH_ENABLED=1"
@@ -40,16 +39,4 @@ index 79784fd..859532b 100644
 +    end
    end
  end
-diff --git a/node_modules/react-native-iap/android/src/play/java/com/dooboolab/rniap/RNIapModule.kt b/node_modules/react-native-iap/android/src/play/java/com/dooboolab/rniap/RNIapModule.kt
-index 70149d2..fc917f3 100644
---- a/node_modules/react-native-iap/android/src/play/java/com/dooboolab/rniap/RNIapModule.kt
-+++ b/node_modules/react-native-iap/android/src/play/java/com/dooboolab/rniap/RNIapModule.kt
-@@ -604,7 +604,7 @@ class RNIapModule(
-         isOfferPersonalized: Boolean, // New parameter in V5
-         promise: Promise,
-     ) {
--        val activity = currentActivity
-+        val activity = reactApplicationContext.currentActivity
-         if (activity == null) {
-             promise.safeReject(PromiseUtils.E_UNKNOWN, "getCurrentActivity returned null")
-             return
+-

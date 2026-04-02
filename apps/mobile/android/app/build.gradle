@@ -4,6 +4,7 @@ apply plugin: "com.facebook.react"
 apply plugin: 'kotlin-parcelize'
 
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
+apply plugin: "org.rnrepo.tools.prebuilds-plugin"
 
 
 import com.android.build.OutputFile
@@ -46,7 +47,7 @@ react {
     // extraPackagerArgs = []
     /* Hermes Commands */
     //   The hermes compiler command to run. By default it is 'hermesc'
-    hermesCommand = "$rootDir/../node_modules/react-native/sdks/hermesc/%OS-BIN%/hermesc"
+    hermesCommand = "$rootDir/../node_modules/hermes-compiler/hermesc/%OS-BIN%/hermesc"
     //
     //   The list of flags to pass to the Hermes compiler. By default is "-O", "-output-source-map"
     hermesFlags = ["-O", "-output-source-map"]
@@ -233,7 +234,7 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.0.0")
-    implementation("androidx.core:core-splashscreen:1.0.0")
+    implementation("androidx.core:core-splashscreen:1.2.0")
     
     implementation 'androidx.multidex:multidex:2.0.1' 
     implementation 'com.squareup.okhttp3:okhttp:4.9.2'
