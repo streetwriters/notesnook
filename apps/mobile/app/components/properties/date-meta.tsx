@@ -29,6 +29,9 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { db } from "../../common/database";
 import { Item, Note } from "@notesnook/core";
 import AppIcon from "../ui/AppIcon";
+import Clipboard from "@react-native-clipboard/clipboard";
+import { ToastManager } from "../../services/event-manager";
+
 export const DateMeta = ({ item }: { item: Item }) => {
   const { colors, isDark } = useThemeColors();
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
@@ -41,11 +44,45 @@ export const DateMeta = ({ item }: { item: Item }) => {
         keys.findIndex((k) => k === "dateModified"),
         1
       );
-    return keys.filter((key) => key.startsWith("date") && key !== "date");
+    const dateKeys = keys.filter(
+      (key) => key.startsWith("date") && key !== "date"
+    );
+    return [...dateKeys, "id"];
   }
 
-  const renderItem = (key: string) =>
-    !item[key as keyof Item] ? null : (
+  const renderItem = (key: string) => {
+    if (key === "id") {
+      return (
+        <View
+          key="id"
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL / 2
+          }}
+        >
+          <Paragraph size={AppFontSize.xs} color={colors.secondary.paragraph}>
+            {(strings as any).id?.() || "ID"}
+          </Paragraph>
+          <Paragraph
+            size={AppFontSize.xs}
+            color={colors.secondary.paragraph}
+            onPress={() => {
+              Clipboard.setString(item.id);
+              ToastManager.show({
+                message:
+                  (strings as any).idCopied?.() || "ID copied to clipboard",
+                type: "success"
+              });
+            }}
+          >
+            {item.id}
+          </Paragraph>
+        </View>
+      );
+    }
+
+    return !item[key as keyof Item] ? null : (
       <View
         key={key}
         style={{
@@ -90,6 +127,7 @@ export const DateMeta = ({ item }: { item: Item }) => {
         </Paragraph>
       </View>
     );
+  };
 
   return (
     <>

@@ -2697,5 +2697,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   privateKey: () => t`Private Key:`,
   invalidPgpKeyPair: () =>
     t`Invalid PGP key pair. Please check your keys and try again.`,
-  inboxKeysSaved: () => t`Inbox keys saved`
+  inboxKeysSaved: () => t`Inbox keys saved`,
+  id: () => t`ID`,
+  idCopied: () => t`ID copied to clipboard`
 };
