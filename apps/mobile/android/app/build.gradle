@@ -4,7 +4,7 @@ apply plugin: "com.facebook.react"
 apply plugin: 'kotlin-parcelize'
 
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
-apply plugin: "org.rnrepo.tools.prebuilds-plugin"
+// apply plugin: "org.rnrepo.tools.prebuilds-plugin"
 
 
 import com.android.build.OutputFile
