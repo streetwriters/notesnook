@@ -186,14 +186,15 @@ test("note title with headline format should keep generating headline title unti
 
 [
   ["simple p tag", "<p>headline</p>", "headline"],
-  ["across multiple tags", "<h1>title<h1><ol><li>list</li></ol>", "titlelist"],
+  ["across multiple tags", "<h1>title</h1><ol><li>list</li></ol>", "title"],
+  ["empty first p tag", "<p></p><p>actual title</p>", "actual title"],
   [
     "content with exceeded HEADLINE_CHARACTER_LIMIT",
-    "<p><strong>head</strong><em>line</em></p><h1>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam rutrum ex ac eros egestas, ut rhoncus felis faucibus. Mauris tempor orci nisl, vitae pulvinar turpis convallis n</h1>",
-    "headlineLorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam rutrum ex ac eros egestas, ut rhoncus felis faucibus. Mauris tempor orci nisl,"
+    "<p><strong>head</strong><em>line</em>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam rutrum ex ac eros egestas, ut rhoncus felis faucibus. Mauris tempor orci nisl, vitae pulvinar turpis convallis n</p>",
+    "headlineLorem ipsum dolor sit amet, consectetur adipiscing e"
   ]
 ].forEach(([testCase, content, expectedHeadline]) => {
-  test(`note title with headline format should generate headline title up to 150 characters - ${testCase}`, () =>
+  test(`note title with headline format should generate headline title up to 60 characters - ${testCase}`, () =>
     noteTest().then(async ({ db }) => {
       await db.settings.setTitleFormat("$headline$");
       const id = await db.notes.add({
