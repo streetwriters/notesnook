@@ -1,6 +1,19 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 import org.apache.tools.ant.taskdefs.condition.Os
 
+allprojects {
+    repositories {
+        maven {
+            // All of Detox' artifacts are provided via the npm module
+            url "$rootDir/../node_modules/detox/Detox-android"
+        }
+        google()
+        mavenCentral()
+        maven { url 'https://www.jitpack.io' }
+        maven { url "https://packages.rnrepo.org/releases" }
+    }
+}
+
 buildscript {
     ext {
         buildToolsVersion = "36.0.0"
@@ -24,20 +37,14 @@ buildscript {
          classpath("com.android.tools.build:gradle")
          classpath("com.facebook.react:react-native-gradle-plugin")
          classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
+         def rnrepoDir = new File(
+            providers.exec {
+            workingDir(rootDir)
+            commandLine("node", "--print", "require.resolve('@rnrepo/build-tools/package.json')")
+            }.standardOutput.asText.get().trim()
+        ).getParentFile().absolutePath
+        classpath fileTree(dir: "${rnrepoDir}/gradle-plugin/build/libs", include: ["prebuilds-plugin.jar"])
     }
 }
 
 apply plugin: "com.facebook.react.rootproject"
-
-allprojects {
-    repositories {
-        maven {
-            // All of Detox' artifacts are provided via the npm module
-            url "$rootDir/../node_modules/detox/Detox-android"
-        }
-
-        google()
-        mavenCentral()
-        maven { url 'https://www.jitpack.io' }
-    }
-}

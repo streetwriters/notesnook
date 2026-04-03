@@ -61,6 +61,37 @@ jobs:
           npm ci --ignore-scripts --prefer-offline --no-audit
           npm run bootstrap -- --scope=mobile
 
+      - name: Generate dependency hash
+        id: dep-hash
+        run: |
+          DEPS_HASH=$(node -e "
+            const pkg = require('./apps/mobile/package.json');
+            const crypto = require('crypto');
+            const depsStr = JSON.stringify(pkg.dependencies);
+            const hash = crypto.createHash('md5').update(depsStr).digest('hex');
+            console.log(hash);
+          ")
+          echo "hash=$DEPS_HASH" >> $GITHUB_OUTPUT
+
+      - name: Cache Android build files
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            apps/mobile/android/.gradle
+            apps/mobile/android/build
+            apps/mobile/android/app/build
+            apps/mobile/android/app/.cxx
+            node_modules/**/android/build
+            node_modules/**/android/.cxx
+            node_modules/**/android/generated
+            node_modules/**/.gradle
+            node_modules/**/.cxx
+          key: android-build-${{ runner.os }}-deps-${{ steps.dep-hash.outputs.hash }}
+          restore-keys: |
+            android-build-${{ runner.os }}-
+
       - name: Make Gradlew Executable
         run: cd apps/mobile/android && chmod +x ./gradlew
 

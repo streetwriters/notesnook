@@ -5,6 +5,12 @@ require Pod::Executable.execute_command('node', ['-p',
     {paths: [process.argv[1]]},
   )', __dir__]).strip
 
+ require Pod::Executable.execute_command('node', ['-p',
+  'require.resolve(
+  "@rnrepo/build-tools/cocoapods-plugin/lib/plugin.rb",
+  {paths: [process.argv[1]]},
+ )', __dir__]).strip
+
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
@@ -86,6 +92,8 @@ post_install do |installer|
           end
         end
       end
+  rnrepo_post_install(installer)
+
 
   # Embed the active iOS build config xcconfig as the project-level base configuration.
   # CocoaPods only manages target-level base configurations, so the project-level one

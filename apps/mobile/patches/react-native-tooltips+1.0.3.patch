@@ -150,7 +150,7 @@ index a150e3e..096ad86 100644
  #import <SexyTooltip/SexyTooltip.h>
  
 diff --git a/node_modules/react-native-tooltips/ios/RNTooltips.m b/node_modules/react-native-tooltips/ios/RNTooltips.m
-index fb96466..75a6fdb 100644
+index fb96466..70c811a 100644
 --- a/node_modules/react-native-tooltips/ios/RNTooltips.m
 +++ b/node_modules/react-native-tooltips/ios/RNTooltips.m
 @@ -1,4 +1,6 @@
@@ -273,7 +273,7 @@ index fb96466..75a6fdb 100644
 +
 +            if (position != nil) {
 +                [toolTip setPermittedArrowDirections:@[@([self getPosition:position])]];
-+                [toolTip setArrowDirection:[self getPosition:position]];
++//                [toolTip setArrowDirection:[self getPosition:position]];
 +            }
 +    
 +        TooltipDelegate *delegate = [[TooltipDelegate alloc] init];

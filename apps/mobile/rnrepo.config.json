@@ -1,0 +1,8 @@
+{
+  "denyList": {
+    "android": [
+      "@ammarahmed/react-native-share-extension",
+      "react-native-share"
+    ]
+  }
+}

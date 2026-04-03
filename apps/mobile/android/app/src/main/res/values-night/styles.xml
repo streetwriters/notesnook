@@ -17,7 +17,7 @@
     </style>
 
       <!-- BootTheme should inherit from Theme.SplashScreen -->
-    <style name="BootTheme" parent="Theme.BootSplash.EdgeToEdge">
+    <style name="BootTheme" parent="Theme.BootSplash">
         <item name="bootSplashBackground">@color/bootsplash_background</item>
         <item name="bootSplashLogo">@mipmap/bootsplash_logo_dark</item>
         <item name="android:navigationBarColor">@color/bootsplash_background</item>
