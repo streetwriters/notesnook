@@ -10,6 +10,7 @@ import { setI18nGlobal } from "@notesnook/intl";
 import { i18n } from "@lingui/core";
 import Config from "react-native-config";
 
+const testchange = 1;
 let domParser;
 Object.defineProperty(global, "DOMParser", {
   get: () => {
