@@ -909,6 +909,8 @@ $day$: Current day (eg. Monday)`,
   history: () => t`History`,
   copyLink: () => t`Copy link`,
   linkCopied: () => t`Link copied`,
+  copyId: () => t`Copy ID`,
+  idCopied: () => t`ID copied`,
   readOnly: () => t`Read only`,
   syncOff: () => t`Sync off`,
   syncOffConfirm: (count: number) =>

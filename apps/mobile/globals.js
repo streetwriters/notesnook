@@ -28,7 +28,7 @@ Object.defineProperty(global, "Buffer", {
   }
 });
 
-if (__DEV__ && Config.isTesting !== "true") {
+if (!__DEV__ && Config.isTesting !== "true") {
   const messages =
     require("@notesnook/intl/dist/locales/$pseudo-LOCALE.json").messages;
   i18n.load({
