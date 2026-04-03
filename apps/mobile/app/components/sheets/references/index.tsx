@@ -104,8 +104,8 @@ const ListBlockItem = ({
           {item?.content.length > 200
             ? item?.content.slice(0, 200) + "..."
             : !item.content || item.content.trim() === ""
-            ? strings.linkNoteEmptyBlock()
-            : item.content}
+              ? strings.linkNoteEmptyBlock()
+              : item.content}
         </Paragraph>
 
         <View
@@ -202,7 +202,7 @@ const ListNoteItem = ({
   items: VirtualizedGrouping<Note> | undefined;
   onSelect: (item: Note, blockId?: string) => void;
   reference: Note;
-  internalLinks: MutableRefObject<InternalLink<"note">[] | undefined>;
+  internalLinks: MutableRefObject<InternalLink[] | undefined>;
   listType: "linkedNotes" | "referencedIn";
 }) => {
   const { colors } = useThemeColors();
@@ -231,7 +231,10 @@ const ListNoteItem = ({
             internalLinks.current = await db.notes.internalLinks(reference.id);
           }
           const noteLinks = internalLinks.current.filter(
-            (link) => link.id === item.id && link.params?.blockId
+            (link) =>
+              link.id === item.id &&
+              link.type === "note" &&
+              link.params?.blockId
           );
 
           if (noteLinks.length) {
@@ -239,7 +242,10 @@ const ListNoteItem = ({
 
             setLinkedBlocks(
               blocks.filter((block) =>
-                noteLinks.find((link) => block.id === link.params?.blockId)
+                noteLinks.find(
+                  (link) =>
+                    link.type === "note" && block.id === link.params?.blockId
+                )
               )
             );
           }
@@ -404,7 +410,7 @@ export const ReferencesList = ({ item, close }: ReferencesListProps) => {
   const { colors } = useThemeColors();
   const [items, setItems] = useState<VirtualizedGrouping<Note>>();
   const hasNoRelations = !items || items?.placeholders?.length === 0;
-  const internalLinks = useRef<InternalLink<"note">[]>([]);
+  const internalLinks = useRef<InternalLink[]>([]);
 
   useEffect(() => {
     db.relations?.[tab === 0 ? "from" : "to"]?.(
