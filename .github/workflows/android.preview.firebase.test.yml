@@ -88,11 +88,11 @@ jobs:
         id: build-number
         run: echo "timestamp=$(($(date +%s) - 1774851180 ))" >> $GITHUB_OUTPUT
 
-      # - name: Check for typescript errors
-      #   run: |
-      #     npm run tx mobile:build
-      #     cd apps/mobile
-      #     npx tsc --noEmit
+      - name: Check for typescript errors
+        run: |
+          npm run tx mobile:build
+          cd apps/mobile
+          npx tsc --noEmit
 
       - name: Build arm64-v8a apk
         run: |
