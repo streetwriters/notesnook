@@ -8,7 +8,7 @@ on:
       - "apps/mobile/**"
       - "packages/**"
       # re-run workflow if workflow file changes
-      - ".github/workflows/android.preview.firebase.yml"
+      - ".github/workflows/android.preview.firebase.test.yml"
 
 jobs:
   build:
