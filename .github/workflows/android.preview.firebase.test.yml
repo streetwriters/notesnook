@@ -94,6 +94,33 @@ jobs:
           cd apps/mobile
           npx tsc --noEmit
 
+      - name: Apply optimize-build.gradle to native modules
+        run: |
+          modules=(
+            "react-native-gesture-handler"
+            "react-native-mmkv-storage"
+            "react-native-nitro-cloud-uploader"
+            "react-native-nitro-modules"
+            "react-native-reanimated"
+            "react-native-screens"
+            "react-native-worklets"
+            "react-native-quick-sqlite"
+          )
+          for module in "${modules[@]}"; do
+            gradle_file="apps/mobile/node_modules/${module}/android/build.gradle"
+            if [ -f "$gradle_file" ]; then
+              if ! grep -qF "apply from: '../../../scripts/optimize-build.gradle'" "$gradle_file"; then
+                echo "" >> "$gradle_file"
+                echo "apply from: '../../../scripts/optimize-build.gradle'" >> "$gradle_file"
+                echo "Patched $gradle_file"
+              else
+                echo "Already patched: $gradle_file"
+              fi
+            else
+              echo "WARNING: $gradle_file not found, skipping."
+            fi
+          done
+
       - name: Build arm64-v8a apk
         run: |
           cd apps/mobile/android
