@@ -81,7 +81,9 @@ if (isReleaseBuildRequested) {
                     logger.lifecycle("${fingerprintAlreadyExists ? "Updated" : "Created"} package.json fingerprint at ${releaseNativeFingerprintFile.absolutePath}")
         }
       }
+    }
 
+    if (task.name.contains("mergeReleaseJniLibFolders")) {
       finalizedBy(verifyReleaseNativeSoOutputsTask)
     }
   }
