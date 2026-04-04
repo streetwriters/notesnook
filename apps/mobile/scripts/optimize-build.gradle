@@ -49,6 +49,18 @@ def hasValidReleaseNativeSoInIntermediates = {
 
 def isReleaseBuildRequested = gradle.startParameter.taskNames.any { it.toLowerCase().contains("release") }
 
+def verifyReleaseNativeSoOutputsTask = tasks.register("verifyReleaseNativeSoOutputs") {
+  group = "verification"
+  description = "Checks whether release native .so artifacts exist in build/intermediates after native build tasks."
+  doLast {
+    if (hasReleaseNativeSoInIntermediates()) {
+      logger.lifecycle("[optimize-build] Release native .so artifacts exist in $buildDir/intermediates")
+    } else {
+      logger.lifecycle("[optimize-build] Release native .so artifacts do NOT exist in $buildDir/intermediates")
+    }
+  }
+}
+
 if (isReleaseBuildRequested) {
   tasks.configureEach { task ->
     // Skip release CMake/native tasks when release libs are already present in intermediates.
@@ -65,15 +77,12 @@ if (isReleaseBuildRequested) {
         if (releasePackageJsonFile.exists()) {
                     def fingerprintAlreadyExists = releaseNativeFingerprintFile.exists()
           releaseNativeFingerprintFile.parentFile.mkdirs()
-
-        if (hasReleaseNativeSoInIntermediates()) {
-          logger.lifecycle("Release .so artifacts found in $buildDir/intermediates after build")
-          return false
-        }
           releaseNativeFingerprintFile.text = sha256ForFile(releasePackageJsonFile)
                     logger.lifecycle("${fingerprintAlreadyExists ? "Updated" : "Created"} package.json fingerprint at ${releaseNativeFingerprintFile.absolutePath}")
         }
       }
+
+      finalizedBy(verifyReleaseNativeSoOutputsTask)
     }
   }
 }
