@@ -65,6 +65,11 @@ if (isReleaseBuildRequested) {
         if (releasePackageJsonFile.exists()) {
                     def fingerprintAlreadyExists = releaseNativeFingerprintFile.exists()
           releaseNativeFingerprintFile.parentFile.mkdirs()
+
+        if (hasReleaseNativeSoInIntermediates()) {
+          logger.lifecycle("Release .so artifacts found in $buildDir/intermediates after build")
+          return false
+        }
           releaseNativeFingerprintFile.text = sha256ForFile(releasePackageJsonFile)
                     logger.lifecycle("${fingerprintAlreadyExists ? "Updated" : "Created"} package.json fingerprint at ${releaseNativeFingerprintFile.absolutePath}")
         }
