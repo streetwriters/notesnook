@@ -64,7 +64,7 @@ def verifyReleaseNativeSoOutputsTask = tasks.register("verifyReleaseNativeSoOutp
 if (isReleaseBuildRequested) {
   tasks.configureEach { task ->
     // Skip release CMake/native tasks when release libs are already present in intermediates.
-    if ((task.name.toLowerCase().contains("cmake") || task.name.startsWith("externalNativeBuild")) && task.name.toLowerCase().contains("release")) {
+    if ((task.name.toLowerCase().contains("cmake") || task.name.startsWith("externalNativeBuild"))) {
       onlyIf {
         def shouldRun = !hasValidReleaseNativeSoInIntermediates()
         if (!shouldRun) {
