@@ -1105,6 +1105,10 @@ msgstr "Available on iOS"
 msgid "Available on iOS & Android"
 msgstr "Available on iOS & Android"
 
+#: src/strings.ts:2640
+msgid "Back"
+msgstr "Back"
+
 #: src/strings.ts:2302
 msgid "Background color"
 msgstr "Background color"

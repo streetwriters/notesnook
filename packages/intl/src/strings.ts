@@ -2636,5 +2636,6 @@ Use this if changes from other devices are not appearing on this device. This wi
   deleteData: () => t`Delete data`,
   failedToAttachFile: () => t`Failed to attach file`,
   unlockNoteToMergeConflicts: () => t`Unlock note to merge conflicts`,
-  confirmationEmailSent: () => t`Confirmation email sent`
+  confirmationEmailSent: () => t`Confirmation email sent`,
+  back: () => t`Back`
 };

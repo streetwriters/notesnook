@@ -43,6 +43,7 @@ type NewPasswordFormData = {
   userResetRequired?: boolean;
   password: string;
   confirmPassword: string;
+  recoveryKey?: string;
 };
 
 type RecoveryFormData = {
@@ -304,7 +305,7 @@ function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
 }
 
 function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
-  const { navigate } = props;
+  const { navigate, formData } = props;
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
@@ -336,7 +337,7 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
         await useKeyStore
           .getState()
           .setValue("userEncryptionKey", form.recoveryKey);
-        navigate("new", {});
+        navigate("new", form);
       }}
     >
       <AuthField
@@ -346,8 +347,19 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
         helpText={strings.enterRecoveryKeyHelp()}
         autoComplete="none"
         autoFocus
+        defaultValue={formData?.recoveryKey || ""}
       />
+      <Flex sx={{ gap: 1 }}>
+        <Button
+          variant="secondary"
+          type="button"
+          sx={{ mt: 50, borderRadius: 50 }}
+          onClick={() => navigate("methods")}
+        >
+          {strings.back()}
+        </Button>
       <SubmitButton text={strings.startAccountRecovery()} />
+      </Flex>
 
       <Button
         type="button"
@@ -417,7 +429,22 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
             label={strings.confirmPassword()}
             defaultValue={form?.confirmPassword}
           />
+          <Flex sx={{ gap: 1 }}>
+            <Button
+              variant="secondary"
+              type="button"
+              sx={{ mt: 50, borderRadius: 50 }}
+              onClick={() =>
+                navigate(
+                  formData?.userResetRequired ? "methods" : "method:key",
+                  formData
+                )
+              }
+            >
+              {strings.back()}
+            </Button>
           <SubmitButton text={strings.continue()} />
+          </Flex>
         </>
       )}
     </RecoveryForm>
