@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { isFeatureAvailable, useAreFeaturesAvailable } from "@notesnook/common";
-import { ItemReference } from "@notesnook/core";
+import { ItemReference, parseInternalLink } from "@notesnook/core";
 import type { Attachment } from "@notesnook/editor";
 import { EditorEvents } from "@notesnook/editor-mobile/src/utils/editor-events";
 import { NativeEvents } from "@notesnook/editor-mobile/src/utils/native-events";
@@ -471,9 +471,8 @@ export const useEditorEvents = (
             relationType: "from",
             title: strings.dataTypesPluralCamelCase.reminder(),
             onAdd: async () => {
-              const reminderFeature = await isFeatureAvailable(
-                "activeReminders"
-              );
+              const reminderFeature =
+                await isFeatureAvailable("activeReminders");
               if (!reminderFeature.isAllowed) {
                 ToastManager.show({
                   type: "info",
@@ -533,7 +532,59 @@ export const useEditorEvents = (
           downloadAttachment((editorMessage.value as Attachment)?.hash, true);
           break;
         }
+        case EditorEvents.getLinkData: {
+          const url = (editorMessage.value as any)?.url as string;
+          const link = parseInternalLink(url);
+          if (!link) return;
+          switch (link.type) {
+            case "note":
+            case "notebook":
+            case "tag": {
+              const table =
+                link.type === "note"
+                  ? "notes"
+                  : link.type === "notebook"
+                    ? "notebooks"
+                    : "tags";
+              const item = await db
+                .sql()
+                .selectFrom(table)
+                .where("id", "=", link.id)
+                .select("title")
+                .executeTakeFirst();
 
+              editor.postMessage(NativeEvents.resolve, {
+                resolverId: editorMessage.resolverId,
+                data: {
+                  type: link.type,
+                  title: item?.title || ""
+                }
+              });
+              break;
+            }
+            case "color": {
+              const color = await db
+                .sql()
+                .selectFrom("colors")
+                .where("id", "=", link.id)
+                .select(["title", "colorCode"])
+                .executeTakeFirst();
+
+              editor.postMessage(NativeEvents.resolve, {
+                resolverId: editorMessage.resolverId,
+                data: {
+                  type: "color",
+                  title: color?.title || "",
+                  metadata: {
+                    colorCode: color?.colorCode || ""
+                  }
+                }
+              });
+            }
+          }
+
+          break;
+        }
         case EditorEvents.getAttachmentData: {
           const data = (editorMessage.value as any)?.attachment as Attachment;
 

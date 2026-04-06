@@ -69,6 +69,7 @@ import { UpgradeDialog } from "../../dialogs/buy-dialog/upgrade-dialog";
 import { ConfirmDialog } from "../../dialogs/confirm";
 import { strings } from "@notesnook/intl";
 import { handleInternalLink } from "../../common";
+import { db } from "../../common/db";
 
 export type OnChangeHandler = (
   content: () => string,
@@ -426,6 +427,48 @@ function TipTap(props: TipTapProps) {
         const link = parseInternalLink(url);
         if (link) handleInternalLink(url, openInNewTab);
         else window.open(url, "_blank");
+      },
+      getLinkData: async (url) => {
+        const link = parseInternalLink(url);
+        if (!link) return;
+
+        switch (link.type) {
+          case "note":
+          case "notebook":
+          case "tag": {
+            const table =
+              link.type === "note"
+                ? "notes"
+                : link.type === "notebook"
+                ? "notebooks"
+                : "tags";
+            const item = await db
+              .sql()
+              .selectFrom(table)
+              .where("id", "=", link.id)
+              .select("title")
+              .executeTakeFirst();
+            return {
+              type: link.type,
+              title: item?.title || ""
+            };
+          }
+          case "color": {
+            const color = await db
+              .sql()
+              .selectFrom("colors")
+              .where("id", "=", link.id)
+              .select(["title", "colorCode"])
+              .executeTakeFirst();
+            return {
+              type: "color",
+              title: color?.title || "",
+              metadata: {
+                colorCode: color?.colorCode || ""
+              }
+            };
+          }
+        }
       }
     };
   }, [
