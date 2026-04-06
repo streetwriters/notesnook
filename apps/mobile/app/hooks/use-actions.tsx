@@ -108,6 +108,7 @@ export type ActionId =
   | "attachments"
   | "history"
   | "copy-link"
+  | "copy-id"
   | "reminders"
   | "lock-unlock"
   | "publish"
@@ -1282,6 +1283,23 @@ export const useActions = ({
         ToastManager.show({
           heading: strings.linkCopied(),
           message: link,
+          context: "local",
+          type: "success"
+        });
+      }
+    });
+  }
+
+  if (item.type === "notebook" || item.type === "tag") {
+    actions.push({
+      id: "copy-id",
+      title: strings.copyId(),
+      icon: "identifier",
+      onPress: () => {
+        Clipboard.setString(item.id);
+        ToastManager.show({
+          heading: strings.idCopied(),
+          message: item.id,
           context: "local",
           type: "success"
         });
