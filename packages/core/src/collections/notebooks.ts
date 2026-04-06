@@ -42,8 +42,9 @@ export class Notebooks implements ICollection {
     );
   }
 
-  init() {
-    return this.collection.init();
+  async init() {
+    await this.collection.init();
+    await this.repairCircularReferences();
   }
 
   async add(notebookArg: Partial<Notebook>) {
@@ -176,18 +177,29 @@ export class Notebooks implements ICollection {
   async breadcrumbs(id: string) {
     const ids = await this.db
       .sql()
-      .withRecursive(`subNotebooks(id)`, (eb) =>
+      .withRecursive(`subNotebooks(id, path)`, (eb) =>
         eb
-          .selectNoFrom((eb) => eb.val(id).as("id"))
+          .selectNoFrom((eb) => [eb.val(id).as("id"), eb.val(id).as("path")])
           .unionAll((eb) =>
             eb
               .selectFrom(["relations", "subNotebooks"])
-              .select("relations.fromId as id")
+              .select([
+                "relations.fromId as id",
+                sql<string>`subNotebooks.path || '/' || relations.fromId`.as(
+                  "path"
+                )
+              ])
               .where("toType", "==", "notebook")
               .where("fromType", "==", "notebook")
               .whereRef("toId", "==", "subNotebooks.id")
               .where("fromId", "not in", this.db.trash.cache.notebooks)
-              .$narrowType<{ id: string }>()
+              // Cycle prevention: skip if this ancestor has already been visited
+              .where(
+                "subNotebooks.path",
+                "not like",
+                sql`'%' || relations.fromId || '%'`
+              )
+              .$narrowType<{ id: string; path: string }>()
           )
       )
       .selectFrom("subNotebooks")
@@ -252,6 +264,46 @@ export class Notebooks implements ICollection {
       )
       .get();
     return relation[0]?.fromId;
+  }
+
+  /**
+   * Detects and repairs circular notebook references by removing the
+   * parent relations of any notebooks that are not reachable from a true
+   * root (a notebook with no parent), effectively restoring them as roots.
+   * Returns true if any cycles were repaired.
+   */
+  async repairCircularReferences(): Promise<boolean> {
+    const allIds = await this.all.ids();
+    if (allIds.length === 0) return false;
+
+    const rootIds = await this.roots.ids();
+    let cycleIds: string[];
+
+    if (rootIds.length === 0) {
+      // No true roots exist — everything is in a cycle
+      cycleIds = allIds;
+    } else {
+      const reachableResult = await withSubNotebooks(
+        this.db.sql(),
+        rootIds,
+        this.db.trash.cache.notebooks
+      )
+        .selectFrom("subNotebooks")
+        .select("id")
+        .execute();
+
+      const reachableIds = new Set(reachableResult.map((r) => r.id));
+      cycleIds = allIds.filter((id) => !reachableIds.has(id));
+    }
+
+    if (cycleIds.length === 0) return false;
+
+    // Remove parent relations for cyclic notebooks to restore them as roots
+    await this.db.relations
+      .to({ type: "notebook", ids: cycleIds }, "notebook")
+      .unlink();
+
+    return true;
   }
 }
 
