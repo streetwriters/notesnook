@@ -44,7 +44,5 @@ export const AppEvents = {
   toggleEditor: "app:toggleEditor",
 
   onOpenLink: "onOpenLink",
-  onCreateItem: "onCreateItem",
-  spellcheckUpdated: "spellcheck:updated",
-  toggleEditor: "app:toggleEditor"
+  onCreateItem: "onCreateItem"
 };

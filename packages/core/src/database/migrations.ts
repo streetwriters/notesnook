@@ -430,7 +430,8 @@ export class NNMigrationProvider implements MigrationProvider {
         async up(db) {
           await db.schema
             .alterTable("monographs")
-            .addColumn("publishUrl", "text", COLLATE_NOCASE);
+            .addColumn("publishUrl", "text", COLLATE_NOCASE)
+            .execute();
         }
       },
       "a-2026-04-06": {

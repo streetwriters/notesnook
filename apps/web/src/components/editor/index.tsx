@@ -261,6 +261,13 @@ const MemoizedEditorView = React.memo(EditorView, (prev, next) => {
     );
   }
 
+  if ("note" in prev.session && "note" in next.session) {
+    return (
+      baseConditions &&
+      prev.session.note.spellcheck === next.session.note.spellcheck
+    );
+  }
+
   return baseConditions;
 });
 function EditorView({
@@ -360,7 +367,7 @@ function EditorView({
       <div className="dialogContainer" />
       <Editor
         id={session.id}
-        nonce={session.nonce}
+        nonce={1}
         content={getContent}
         session={session}
         onPreviewDocument={(preview) =>
