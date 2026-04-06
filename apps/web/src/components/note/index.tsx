@@ -89,6 +89,7 @@ import {
   Readonly,
   Reminder,
   RemoveShortcutLink,
+  SpellCheck,
   Star,
   StarOutline,
   Sync,
@@ -104,6 +105,7 @@ import { PublishDialog } from "../publish-view";
 import TimeAgo from "../time-ago";
 import { NoteExpiryDateDialog } from "../../dialogs/note-expiry-date-dialog";
 import { withFeatureCheck } from "../../common";
+import { useSpellChecker } from "../../hooks/use-spell-checker";
 
 type NoteProps = NoteResolvedData & {
   item: NoteType;

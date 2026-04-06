@@ -433,6 +433,14 @@ export class NNMigrationProvider implements MigrationProvider {
             .addColumn("publishUrl", "text", COLLATE_NOCASE)
             .execute();
         }
+      },
+      "a-2026-04-06": {
+        async up(db) {
+          await db.schema
+            .alterTable("notes")
+            .addColumn("spellcheck", "boolean", (c) => c.defaultTo(true))
+            .execute();
+        }
       }
     };
   }

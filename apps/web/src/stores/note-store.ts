@@ -26,6 +26,7 @@ import BaseStore from ".";
 import Config from "../utils/config";
 import { Note, VirtualizedGrouping } from "@notesnook/core";
 import { Context } from "../components/list-container/types";
+import { useEditorStore } from "./editor-store";
 
 type ViewMode = "detailed" | "compact";
 class NoteStore extends BaseStore<NoteStore> {
@@ -92,6 +93,12 @@ class NoteStore extends BaseStore<NoteStore> {
   archive = async (state: boolean, ...ids: string[]) => {
     await db.notes.archive(state, ...ids);
     await this.refresh();
+  };
+
+  spellcheck = async (state: boolean, ...ids: string[]) => {
+    await db.notes.spellcheck(state, ...ids);
+    await this.refresh();
+    useEditorStore.getState().refreshSessionWithNoteIds(ids);
   };
 
   unlock = async (id: string) => {
