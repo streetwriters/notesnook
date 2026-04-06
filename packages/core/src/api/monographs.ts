@@ -133,10 +133,13 @@ export class Monographs {
           })
     };
 
-    const method = update ? http.patch.json : http.post.json;
     const deviceId = await this.db.kv().read("deviceId");
+    const method = update ? http.patch.json : http.post.json;
+    const url = update
+      ? `${Constants.API_HOST}/monographs?deviceId=${deviceId}`
+      : `${Constants.API_HOST}/monographs/v2?deviceId=${deviceId}`;
     const { id, datePublished, publishUrl } = await method(
-      `${Constants.API_HOST}/monographs/v2?deviceId=${deviceId}`,
+      url,
       monograph,
       token
     );
