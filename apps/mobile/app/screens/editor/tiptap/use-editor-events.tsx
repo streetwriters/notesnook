@@ -471,9 +471,8 @@ export const useEditorEvents = (
             relationType: "from",
             title: strings.dataTypesPluralCamelCase.reminder(),
             onAdd: async () => {
-              const reminderFeature = await isFeatureAvailable(
-                "activeReminders"
-              );
+              const reminderFeature =
+                await isFeatureAvailable("activeReminders");
               if (!reminderFeature.isAllowed) {
                 ToastManager.show({
                   type: "info",
@@ -560,7 +559,7 @@ export const useEditorEvents = (
             .then((data: any) => {
               console.log(
                 "Got attachment data:",
-                data,
+                !!data,
                 editorMessage.resolverId
               );
               editor.postMessage(NativeEvents.resolve, {

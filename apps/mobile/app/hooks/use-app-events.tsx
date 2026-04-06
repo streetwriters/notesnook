@@ -569,13 +569,13 @@ export const useAppEvents = () => {
   }, [isAppLoading, onSyncComplete]);
 
   useEffect(() => {
-    if (initialUrl) {
+    if (initialUrl && !isAppLoading) {
       onAppOpenedFromURL({
         url: initialUrl!,
         isInitialUrl: true
       });
     }
-  }, [initialUrl]);
+  }, [initialUrl, isAppLoading]);
 
   const subscribeToPurchaseListeners = useCallback(async () => {
     if (Platform.OS === "android") {

@@ -123,14 +123,7 @@ export const FluidPanels = forwardRef<TabsRef, TabProps>(function FluidTabs(
     }
     isLoaded.current = true;
     prevWidths.current = widths;
-  }, [
-    deviceMode,
-    widths,
-    fullscreen,
-    translateX,
-    editorPosition,
-    onChangeTab
-  ]);
+  }, [deviceMode, widths, fullscreen, translateX, editorPosition, onChangeTab]);
 
   useEffect(() => {
     const sub = BackHandler.addEventListener("hardwareBackPress", () => {

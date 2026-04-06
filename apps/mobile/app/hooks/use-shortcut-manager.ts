@@ -21,7 +21,6 @@ import { useEffect } from "react";
 import { NativeEventEmitter, NativeModule } from "react-native";
 import { useRef } from "react";
 import { Platform } from "react-native";
-import { Linking } from "react-native";
 import deviceInfoModule from "react-native-device-info";
 import { strings } from "@notesnook/intl";
 const ShortcutsEmitter = new NativeEventEmitter(
@@ -54,14 +53,9 @@ export const useShortcutManager = ({
   }, [shortcuts]);
 
   useEffect(() => {
-    Linking.getInitialURL().then((url) => {
-      if (url?.startsWith("ShareMedia://QuickNoteWidget")) {
-        onShortcutPressed(defaultShortcuts[0]);
-      }
-    });
     if (!isSupported()) return;
     Shortcuts.getInitialShortcut().then((shortcut) => {
-      if (initialShortcutRecieved.current) return;
+      if (initialShortcutRecieved.current || !shortcut) return;
       onShortcutPressed(shortcut);
       initialShortcutRecieved.current = true;
     });

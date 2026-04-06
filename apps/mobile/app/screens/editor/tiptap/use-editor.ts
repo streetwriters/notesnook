@@ -1023,14 +1023,6 @@ export const useEditor = (
     if (fluidTabsRef.current?.page() === "editor") {
       state.current.movedAway = false;
     }
-    if (!state.current.editorStateRestored) {
-      state.current.isRestoringState = true;
-      if (!DDS.isTab) {
-        fluidTabsRef.current?.goToPage("editor", false);
-      }
-    }
-
-    state.current.isRestoringState = false;
   }, []);
 
   const onContentChanged = (noteId?: string) => {
