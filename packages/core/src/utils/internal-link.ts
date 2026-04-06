@@ -18,11 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 const InternalLinkTypes = ["note", "notebook", "tag", "color"] as const;
-type InternalLinkType = (typeof InternalLinkTypes)[number];
-type NoteLink = BaseInternalLink<"note">;
-type NotebookLink = BaseInternalLink<"notebook">;
-type TagLink = BaseInternalLink<"tag">;
-type ColorLink = BaseInternalLink<"color">;
+export type InternalLinkType = (typeof InternalLinkTypes)[number];
+export type NoteLink = BaseInternalLink<"note">;
+export type NotebookLink = BaseInternalLink<"notebook">;
+export type TagLink = BaseInternalLink<"tag">;
+export type ColorLink = BaseInternalLink<"color">;
 type BaseInternalLink<
   T extends InternalLinkType = InternalLinkType,
   TParams extends InternalLinkParams[T] = InternalLinkParams[T]
@@ -82,7 +82,11 @@ export function parseInternalLink(link: string): InternalLink | undefined {
 }
 
 export function isInternalLink(link: string) {
-  return link && link.startsWith("nn://");
+  return link ? link.startsWith("nn://") : false;
+}
+
+export function isNoteLink(link: string) {
+  return link ? link.startsWith("nn://note/") : false;
 }
 
 function isValidInternalType(type: string): type is InternalLinkType {

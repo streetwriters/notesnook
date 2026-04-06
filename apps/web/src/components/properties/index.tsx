@@ -419,7 +419,7 @@ function LinkedNote({
   const linkedBlocks = usePromise(
     async () =>
       (await db.notes.internalLinks(noteId)).filter(
-        (l) => l.id === item.id && !!l.params?.blockId
+        (l) => l.id === item.id && l.type === "note" && !!l.params?.blockId
       ),
     [item.id]
   );
@@ -453,7 +453,9 @@ function LinkedNote({
                 if (isExpanded) return toggleExpand();
                 setBlocks(
                   (await db.notes.contentBlocks(item.id)).filter((a) =>
-                    linkedBlocks.value.some((l) => l.params?.blockId === a.id)
+                    linkedBlocks.value.some(
+                      (l) => l.type === "note" && l.params?.blockId === a.id
+                    )
                   )
                 );
                 toggleExpand();
