@@ -60,10 +60,7 @@ import {
   resetTabStore,
   useTabStore
 } from "../screens/editor/tiptap/use-tab-store";
-import {
-  editorController,
-  editorState
-} from "../screens/editor/tiptap/utils";
+import { editorController, editorState } from "../screens/editor/tiptap/utils";
 import { useDragState } from "../screens/settings/editor/state";
 import BackupService from "../services/backup";
 import BiometricService from "../services/biometrics";
@@ -107,7 +104,6 @@ import {
 } from "../utils/events";
 import { getGithubVersion } from "../utils/github-version";
 import { fluidTabsRef } from "../utils/global-refs";
-import { NotesnookModule } from "../utils/notesnook-module";
 import { sleep } from "../utils/time";
 import useFeatureManager from "./use-feature-manager";
 
@@ -356,7 +352,7 @@ async function checkForShareExtensionLaunchedInBackground() {
       if (note) setTimeout(() => eSendEvent("loadingNote", note), 1);
       MMKV.removeItem("shareExtensionOpened");
     }
-  } catch (e) { }
+  } catch (e) {}
 }
 
 const onSuccessfulSubscription = async (
@@ -548,7 +544,6 @@ export const useAppEvents = () => {
     }>
   >({});
 
-
   const onSyncComplete = useCallback(async () => {
     initAfterSync(Sync.getLastSyncType() as "full" | "send");
     setLastSynced(await db.lastSynced());
@@ -572,7 +567,6 @@ export const useAppEvents = () => {
       subscriptions.forEach((sub) => sub?.unsubscribe?.());
     };
   }, [isAppLoading, onSyncComplete]);
-
 
   useEffect(() => {
     if (initialUrl) {
@@ -913,7 +907,7 @@ export const useAppEvents = () => {
   useEffect(() => {
     if (!appLocked && isAppLoading) {
       initializeLogger()
-        .catch((e) => { })
+        .catch((e) => {})
         .finally(() => {
           //@ts-ignore
           initializeDatabase();
