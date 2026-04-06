@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { decodeHTML5 } from "entities";
 import { Parser } from "htmlparser2";
+import { getDomPurify } from "./dom-purify";
 
 export const parseHTML = (input: string) =>
   "DOMParser" in globalThis
@@ -27,6 +28,13 @@ export const parseHTML = (input: string) =>
         "text/html"
       )
     : null;
+
+export const sanitizeHtml = (html: string) => {
+  const inputHtml = html.includes("</html>")
+    ? html
+    : `<html><body>${html}</body></html>`;
+  return getDomPurify().sanitize(inputHtml);
+};
 
 export function getDummyDocument() {
   const doc = parseHTML("<div></div>");

@@ -30,7 +30,7 @@ import {
 } from "../../types.js";
 import { SyncInboxItem } from "./types.js";
 import { z } from "zod";
-import DOMPurify from "dompurify";
+import { sanitizeHtml } from "../../utils/html-parser.js";
 
 const THRESHOLD = process.env.NODE_ENV === "test" ? 2 * 1000 : 60 * 1000;
 class Merger {
@@ -230,7 +230,7 @@ export async function handleInboxItems(
         pinned: data.pinned,
         readonly: data.readonly,
         content: {
-          data: DOMPurify.sanitize(data?.content?.data ?? ""),
+          data: sanitizeHtml(data?.content?.data ?? ""),
           type: "tiptap"
         }
       });
