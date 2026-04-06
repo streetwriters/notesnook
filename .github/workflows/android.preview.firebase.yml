@@ -1,0 +1,135 @@
+name: Notesnook Android Preview
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+    branches: [master, beta]
+    paths:
+      - "apps/mobile/**"
+      - "packages/**"
+      - ".github/workflows/android.preview.firebase.yml"
+
+jobs:
+  authorize:
+    environment: ${{ github.event_name == 'pull_request_target' &&
+      github.event.pull_request.head.repo.full_name != github.repository &&
+      'external' || 'internal' }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo true
+
+  build:
+    needs: authorize
+    runs-on: ubuntu-22.04
+    env:
+      STAGING_BUILD: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.ref }}
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Use specific Java version for the builds
+        uses: joschi/setup-jdk@v2
+        with:
+          java-version: "17"
+          architecture: "x64"
+
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          # this might remove tools that are actually needed,
+          # if set to "true" but frees about 6 GB
+          tool-cache: false
+
+          # all of these default to true, but feel free to set to
+          # "false" if necessary for your workflow
+          android: false
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
+
+      - name: Install node modules
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=mobile
+
+      - name: Make Gradlew Executable
+        run: cd apps/mobile/android && chmod +x ./gradlew
+
+      - name: Get build number
+        id: build-number
+        run: echo "timestamp=$(($(date +%s) - 1774851180 ))" >> $GITHUB_OUTPUT
+
+      - name: Check for typescript errors
+        run: |
+          npm run tx mobile:build
+          cd apps/mobile
+          npx tsc --noEmit
+
+      - name: Build arm64-v8a apk
+        run: |
+          cd apps/mobile/android
+          ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a -PstagingReleaseBuild=true -PprBuildNumber=${{ steps.build-number.outputs.timestamp }}
+
+      - name: Get app version
+        id: package-version
+        uses: saionaro/extract-package-version@master
+        with:
+          path: apps/mobile
+
+      - name: Publish to firebase CLI
+        id: firebase-output
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{secrets.FIREBASE_APP_ID}}
+          serviceCredentialsFileContent: ${{ secrets.QA_SERVICE_ACCOUNT }}
+          groups: testers
+          file: apps/mobile/android/app/build/outputs/apk/release/app-arm64-v8a-release.apk
+          releaseNotes: Preview for https://github.com/streetwriters/notesnook/pull/${{github.event.number}}
+
+      - name: Post or update PR comment
+        uses: actions/github-script@v6
+        env:
+          preview_url: ${{ steps.firebase-output.outputs.TESTING_URI }}
+        with:
+          script: |
+            const marker = '<!-- android-preview-comment -->';
+            const prNumber = context.issue.number;
+            const previewUrl = process.env.preview_url || '';
+            const body = `${marker}\n**Android App Preview**\n\n${previewUrl || 'Preview URL unavailable — check workflow logs.'}\n\nCommit: ${process.env.GITHUB_SHA}\n`;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            const existing = comments.find(c => c.body && c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body,
+              });
+            }
+
+      - name: Upload sourcemaps
+        uses: actions/upload-artifact@v4
+        with:
+          name: sourcemaps
+          path: |
+            apps/mobile/android/app/build/generated/sourcemaps/**/*.map

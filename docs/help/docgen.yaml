@@ -58,6 +58,7 @@ navigation:
   - path: keyboard-shortcuts.md
 
   - path: privacy-mode.md
+  - path: reminders.md
   - path: web-clipper
     children:
       - path: web-clipper/installation.md

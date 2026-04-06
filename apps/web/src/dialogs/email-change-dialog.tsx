@@ -26,6 +26,7 @@ import { Loading } from "../components/icons";
 import Dialog from "../components/dialog";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
+import { useStore as useUserStore } from "../stores/user-store";
 
 type EmailChangeState = {
   newEmail: string;
@@ -104,6 +105,7 @@ export const EmailChangeDialog = DialogManager.register(
                   emailChangeState.password,
                   code
                 );
+                await useUserStore.getState().refreshUser();
                 props.onClose(true);
                 return;
               }
@@ -116,6 +118,7 @@ export const EmailChangeDialog = DialogManager.register(
               }
 
               await db.user.sendVerificationEmail(newEmail);
+              setEnabled(false);
               setEmailChangeState({ newEmail, password });
             } catch (e) {
               if (e instanceof Error) setError(e.message);

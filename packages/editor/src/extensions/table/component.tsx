@@ -17,12 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Box, Flex } from "@theme-ui/components";
+import { Flex } from "@theme-ui/components";
 import { ReactNodeView, ReactNodeViewProps } from "../react/index.js";
 import { Node as ProsemirrorNode } from "prosemirror-model";
 import { Editor } from "../../types.js";
 import { Editor as TiptapEditor } from "@tiptap/core";
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { EditorView, NodeView } from "prosemirror-view";
 import {
   InsertColumnRight,
@@ -31,15 +31,14 @@ import {
   TableProperties
 } from "../../toolbar/tools/table.js";
 import { getToolDefinition } from "../../toolbar/tool-definitions.js";
-import { getPosition, ScrollContainer } from "@notesnook/ui";
+import { getPosition } from "@notesnook/ui";
 import {
   findSelectedDOMNode,
   hasSameAttributes
 } from "../../utils/prosemirror.js";
-import { DesktopOnly, MobileOnly } from "../../components/responsive/index.js";
+import { DesktopOnly } from "../../components/responsive/index.js";
 import { TextDirections } from "../text-direction/index.js";
 import { strings } from "@notesnook/intl";
-import { useIsMobile } from "../../toolbar/stores/toolbar-store.js";
 import { updateColumnsOnResize } from "./prosemirror-tables/tableview.js";
 
 export function TableComponent(
@@ -49,7 +48,6 @@ export function TableComponent(
   const colgroupRef = useRef<HTMLTableColElement>(null);
   const tableRef = useRef<HTMLTableElement>();
   const { textDirection } = node.attrs;
-  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (!colgroupRef.current || !tableRef.current) return;
@@ -258,7 +256,6 @@ function TableRowToolbar(props: TableToolbarProps) {
 function TableColumnToolbar(props: TableToolbarProps) {
   const { editor, table } = props;
   const columnToolsRef = useRef<HTMLDivElement>(null);
-  const isMobile = useIsMobile();
 
   useEffect(() => {
     function onSelectionUpdate() {
@@ -276,7 +273,6 @@ function TableColumnToolbar(props: TableToolbarProps) {
       }
       columnToolsRef.current.style.display = "flex";
 
-      // tableRef.current
       const pos = getPosition(columnToolsRef.current, {
         location: "top",
         align: "center",
@@ -285,19 +281,21 @@ function TableColumnToolbar(props: TableToolbarProps) {
         yOffset: 2
       });
 
-      const scrollLeft = isMobile
-        ? table.current.parentElement?.parentElement?.scrollLeft || 0
-        : table.current?.closest(".simplebar-content-wrapper")?.scrollLeft || 0;
+      const scrollLeft = table.current?.parentElement?.scrollLeft || 0;
 
       columnToolsRef.current.style.left = `${pos.left - scrollLeft}px`;
       columnToolsRef.current.style.top = `${pos.top}px`;
     }
 
+    const scrollContainer = table?.current?.parentElement;
+
     editor.on("selectionUpdate", onSelectionUpdate);
+    scrollContainer?.addEventListener("scroll", onSelectionUpdate);
     return () => {
       editor.off("selectionUpdate", onSelectionUpdate);
+      scrollContainer?.removeEventListener("scroll", onSelectionUpdate);
     };
-  }, [isMobile]);
+  }, []);
 
   return (
     <Flex

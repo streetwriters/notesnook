@@ -381,7 +381,7 @@ export const useEditor = (
 
           if (
             oldNote?.title !== currentNotes.current[id]?.title &&
-            !noteData.title
+            typeof noteData.title === "undefined"
           ) {
             postMessage(
               NativeEvents.title,

@@ -20,18 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { match, surround } from "fuzzyjs";
 import { clone } from "./clone.js";
 
-const SEPARATORS = /(?<=\w)[^a-zA-Z0-9](?=\w)/g;
-
-function normalizeSeparators(str: string): string {
-  return str.replace(SEPARATORS, " ");
-}
-
-function hasSeparator(str: string): boolean {
-  const result = SEPARATORS.test(str);
-  SEPARATORS.lastIndex = 0;
-  return result;
-}
-
 export function fuzzy<T>(
   query: string,
   items: T[],
@@ -43,6 +31,50 @@ export function fuzzy<T>(
     suffix?: string;
   } = {}
 ): T[] {
+  const results = fuzzyMatch(query, items, getIdentifier, fields, options);
+  if (results.size === 0) return [];
+
+  // if the query contains spaces & other non-alphanumeric characters, then we
+  // should search again with a sanitized query to catch more matches.
+  const sanitizedQuery = sanitize(query);
+  if (sanitizedQuery !== query) {
+    for (const [key, value] of fuzzyMatch(
+      sanitizedQuery,
+      items,
+      getIdentifier,
+      fields,
+      options
+    )) {
+      const matchInFirstSearch = results.get(key);
+      if (matchInFirstSearch) {
+        // just give it an extra bump because matches from first search
+        // must always be higher as they probably match much more closely
+        // with the query given by the user.
+        matchInFirstSearch.score += value.score;
+        continue;
+      }
+      results.set(key, value);
+    }
+  }
+
+  const matches = Array.from(results.entries())
+    .sort((a, b) => b[1].score - a[1].score)
+    .map((item) => item[1].item);
+
+  return matches;
+}
+
+function fuzzyMatch<T>(
+  query: string,
+  items: T[],
+  getIdentifier: (item: T) => string,
+  fields: Partial<Record<keyof T, number>>,
+  options: {
+    limit?: number;
+    prefix?: string;
+    suffix?: string;
+  } = {}
+) {
   const results: Map<
     string,
     {
@@ -51,9 +83,6 @@ export function fuzzy<T>(
     }
   > = new Map();
 
-  const shouldNormalize = hasSeparator(query);
-  const finalQuery = shouldNormalize ? normalizeSeparators(query) : query;
-
   for (const item of items) {
     if (options.limit && results.size >= options.limit) break;
 
@@ -61,10 +90,7 @@ export function fuzzy<T>(
 
     for (const field in fields) {
       const value = `${item[field]}`;
-      const result = match(
-        finalQuery,
-        shouldNormalize ? normalizeSeparators(value) : value
-      );
+      const result = match(query, value);
       if (!result.match) continue;
 
       const oldMatch = results.get(identifier);
@@ -87,11 +113,10 @@ export function fuzzy<T>(
       }
     }
   }
+  return results;
+}
 
-  if (results.size === 0) return [];
-
-  const sorted = Array.from(results.entries());
-  sorted.sort((a, b) => b[1].score - a[1].score);
-
-  return sorted.map((item) => item[1].item);
+const SEPARATORS = /[^a-zA-Z0-9]+/g;
+function sanitize(str: string): string {
+  return str.replace(SEPARATORS, "").trim() || str;
 }

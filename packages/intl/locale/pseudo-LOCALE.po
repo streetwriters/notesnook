@@ -831,10 +831,6 @@ msgstr ""
 msgid "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder"
 msgstr ""
 
-#: src/strings.ts:1078
-msgid "All your data will be removed permanently. Make sure you have saved backup of your notes. This action is IRREVERSIBLE."
-msgstr ""
-
 #: src/strings.ts:108
 msgid "Already have an account?"
 msgstr ""
@@ -7432,6 +7428,10 @@ msgstr ""
 
 #: src/strings.ts:1034
 msgid "Your account will be downgraded in {days} days"
+msgstr ""
+
+#: src/strings.ts:1078
+msgid "Your account will be permanently deleted along with all your data, login credentials, and subscription information. This action is IRREVERSIBLE. Make sure you have saved a backup of your notes before proceeding."
 msgstr ""
 
 #: src/strings.ts:960

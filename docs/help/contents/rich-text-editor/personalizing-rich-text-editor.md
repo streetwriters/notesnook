@@ -40,7 +40,7 @@ Go to `Settings` > `Editor` > `Title format` to customize the title formatting.
 
 You can use a combination of above templates in the note title. For example `Note $count$ - $date$` will become `Note 150 - 06-22-2023`.
 
-**$headline$**: Up to first 10 words of the note's headline. This will keep updating the title as headline of the note changes until you manually edit the title. Shouldn't be used in combination with other templates.
+**$headline$**: Up to first 60 characters of the note's first paragraph or heading. This will keep updating the title as headline of the note changes until you manually edit the title. Shouldn't be used in combination with other templates.
 
 ## Paragraph spacing
 

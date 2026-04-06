@@ -90,6 +90,7 @@ const file = async (fileOptions: PickerOptions) => {
         message: featureResult.error,
         type: "error"
       });
+      return;
     }
 
     if (fileCopyUri.status === "error") {
@@ -272,6 +273,7 @@ const handleImageResponse = async (
         message: featureResult.error,
         type: "error"
       });
+      return;
     }
 
     const b64 = `data:${image.mime};base64, ` + image.data;
