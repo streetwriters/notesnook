@@ -27,7 +27,6 @@ import { ChevronDown, ChevronRight } from "../icons";
 import { noteMenuItems } from "../note";
 import { db } from "../../common/db";
 import { MenuItem } from "@notesnook/ui";
-import { decodeHTML } from "entities";
 
 type SearchResultProps = {
   item: HighlightedResult;
@@ -189,9 +188,9 @@ export default React.memo(SearchResult);
 function Match({ match }: { match: TMatch }) {
   return (
     <Fragment key={match.id}>
-      <span>{decodeHTML(match.prefix)}</span>
-      <span className="match">{decodeHTML(match.match)}</span>
-      {match.suffix ? <span>{decodeHTML(match.suffix)}</span> : null}
+      <span>{match.prefix}</span>
+      <span className="match">{match.match}</span>
+      {match.suffix ? <span>{match.suffix}</span> : null}
     </Fragment>
   );
 }

@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { match } from "fuzzyjs";
+import { decodeHTML } from "entities";
 import Database from "./index.js";
 import {
   HighlightedResult,
@@ -815,9 +816,9 @@ export function splitHighlightedMatch(text: string): Match[][] {
     }
 
     matches.push({
-      match,
-      prefix: prefix.replace(/\s{2,}/gm, " ").trimStart(),
-      suffix: suffix || "",
+      match: decodeHTML(match),
+      prefix: decodeHTML(prefix.replace(/\s{2,}/gm, " ").trimStart()),
+      suffix: decodeHTML(suffix || ""),
       id: matchId || undefined
     });
 
@@ -938,7 +939,7 @@ function centerMatch(
 function stringToMatch(str: string): Match[] {
   return [
     {
-      prefix: str,
+      prefix: decodeHTML(str),
       match: "",
       suffix: "",
       id: undefined
