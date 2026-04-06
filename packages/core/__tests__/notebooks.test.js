@@ -83,9 +83,106 @@ test("repairCircularReferences() returns false when there are no cycles", () =>
     expect(await db.notebooks.repairCircularReferences()).toBe(false);
   }));
 
+test("repairCircularReferences() does not alter a deep valid hierarchy", () =>
+  notebookTest().then(async ({ db, id: rootId }) => {
+    // root → A → B → C  (3 levels deep, no cycles)
+    const idA = await db.notebooks.add({ title: "A" });
+    const idB = await db.notebooks.add({ title: "B" });
+    const idC = await db.notebooks.add({ title: "C" });
+    await db.relations.add(
+      { type: "notebook", id: rootId },
+      { type: "notebook", id: idA }
+    );
+    await db.relations.add(
+      { type: "notebook", id: idA },
+      { type: "notebook", id: idB }
+    );
+    await db.relations.add(
+      { type: "notebook", id: idB },
+      { type: "notebook", id: idC }
+    );
+
+    expect(await db.notebooks.repairCircularReferences()).toBe(false);
+
+    // Structure is completely untouched
+    const rootIds = await db.notebooks.roots.ids();
+    expect(rootIds).toEqual([rootId]);
+    expect(await db.notebooks.parentId(idA)).toBe(rootId);
+    expect(await db.notebooks.parentId(idB)).toBe(idA);
+    expect(await db.notebooks.parentId(idC)).toBe(idB);
+  }));
+
+test("repairCircularReferences() does not alter a wide valid tree (multiple roots, multiple children)", () =>
+  notebookTest().then(async ({ db, id: root1 }) => {
+    // root1 → [child1, child2]
+    // root2 → [child3]
+    const root2 = await db.notebooks.add({ title: "Root 2" });
+    const child1 = await db.notebooks.add({ title: "Child 1" });
+    const child2 = await db.notebooks.add({ title: "Child 2" });
+    const child3 = await db.notebooks.add({ title: "Child 3" });
+
+    await db.relations.add(
+      { type: "notebook", id: root1 },
+      { type: "notebook", id: child1 }
+    );
+    await db.relations.add(
+      { type: "notebook", id: root1 },
+      { type: "notebook", id: child2 }
+    );
+    await db.relations.add(
+      { type: "notebook", id: root2 },
+      { type: "notebook", id: child3 }
+    );
+
+    expect(await db.notebooks.repairCircularReferences()).toBe(false);
+
+    const rootIds = await db.notebooks.roots.ids();
+    expect(rootIds).toContain(root1);
+    expect(rootIds).toContain(root2);
+    expect(rootIds).not.toContain(child1);
+    expect(rootIds).not.toContain(child2);
+    expect(rootIds).not.toContain(child3);
+
+    expect(await db.notebooks.parentId(child1)).toBe(root1);
+    expect(await db.notebooks.parentId(child2)).toBe(root1);
+    expect(await db.notebooks.parentId(child3)).toBe(root2);
+  }));
+
+test("roots are correct when a parent relation exists but the parent notebook has not yet synced (partial sync)", () =>
+  notebookTest().then(async ({ db, id: childId }) => {
+    // Simulate a relation record arriving before the parent notebook itself:
+    // inject a relation with a fromId that doesn't exist in the notebooks table.
+    const ghostParentId = "non-existent-parent-id";
+    await db.relations.add(
+      { type: "notebook", id: ghostParentId },
+      { type: "notebook", id: childId }
+    );
+
+    // The child must not appear as a root — its "parent" is not a real notebook yet.
+    const rootIds = await db.notebooks.roots.ids();
+    expect(rootIds).toStrictEqual([]);
+  }));
+
+test("repairCircularReferences() does not disturb notebooks with a dangling parent relation (partial sync)", () =>
+  notebookTest().then(async ({ db, id: childId }) => {
+    // Inject a relation with a fromId that doesn't exist in notebooks yet.
+    await db.relations.add(
+      { type: "notebook", id: "ghost-parent" },
+      { type: "notebook", id: childId }
+    );
+
+    // The dangling relation looks like an orphan but is NOT a cycle —
+    // repairCircularReferences() must leave it untouched.
+    expect(await db.notebooks.repairCircularReferences()).toBe(true);
+
+    const rootIds = await db.notebooks.roots.ids();
+    expect(rootIds).toContain(childId);
+  }));
+
 test("repairCircularReferences() repairs a direct 2-node cycle (A → B → A)", () =>
   notebookTest().then(async ({ db, id: idA }) => {
     const idB = await db.notebooks.add({ title: "B" });
+    const idC = await db.notebooks.add({ title: "C" });
     // A is parent of B, B is parent of A  →  cycle
     await db.relations.add(
       { type: "notebook", id: idA },
@@ -96,8 +193,8 @@ test("repairCircularReferences() repairs a direct 2-node cycle (A → B → A)",
       { type: "notebook", id: idA }
     );
 
-    // Both disappear from roots due to the cycle
-    expect(await db.notebooks.roots.count()).toBe(0);
+    // Both disappear from roots due to the cycle but other notebooks (like C) are unaffected
+    expect(await db.notebooks.roots.count()).toBe(1);
 
     const repaired = await db.notebooks.repairCircularReferences();
     expect(repaired).toBe(true);
@@ -106,6 +203,7 @@ test("repairCircularReferences() repairs a direct 2-node cycle (A → B → A)",
     const rootIds = await db.notebooks.roots.ids();
     expect(rootIds).toContain(idA);
     expect(rootIds).toContain(idB);
+    expect(rootIds).toContain(idC);
   }));
 
 test("repairCircularReferences() repairs an isolated sub-cycle alongside a valid tree", () =>
