@@ -816,9 +816,9 @@ export function splitHighlightedMatch(text: string): Match[][] {
     }
 
     matches.push({
-      match: decodeHTML(match),
-      prefix: decodeHTML(prefix.replace(/\s{2,}/gm, " ").trimStart()),
-      suffix: decodeHTML(suffix || ""),
+      match: match,
+      prefix: prefix.replace(/\s{2,}/gm, " ").trimStart(),
+      suffix: suffix || "",
       id: matchId || undefined
     });
 
@@ -939,7 +939,7 @@ function centerMatch(
 function stringToMatch(str: string): Match[] {
   return [
     {
-      prefix: decodeHTML(str),
+      prefix: str,
       match: "",
       suffix: "",
       id: undefined
@@ -1054,7 +1054,7 @@ function highlightHtmlContent(html: string, queries: string[]): string {
       }
     },
     {
-      decodeEntities: false,
+      decodeEntities: true,
       xmlMode: false
     }
   );

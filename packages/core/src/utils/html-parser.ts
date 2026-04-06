@@ -205,7 +205,7 @@ export function extractMatchingBlocks(html: string, matchTagName: string) {
     },
     {
       lowerCaseTags: false,
-      decodeEntities: false
+      decodeEntities: true
     }
   );
   parser.end(html);
