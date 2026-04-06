@@ -34,16 +34,28 @@ type MonographResponse = Omit<Monograph, "content"> & { content: string };
 export const meta: MetaFunction<typeof loader> = ({ data }) =>
   buildMonographMeta(
     data,
-    data?.monograph ? `${PUBLIC_URL}/${data.monograph.id}` : undefined
+    data?.monograph ? `${PUBLIC_URL}/s/${data.monograph.id}` : undefined
   );
+
+export default function MonographPost() {
+  const { monograph, pixel } = useLoaderData<typeof loader>();
+  const [_, hashParams] = useHashLocation();
+  return (
+    <MonographView
+      monograph={monograph}
+      pixel={pixel}
+      encodedKey={hashParams.key}
+    />
+  );
+}
 
 export async function loader({ params }: LoaderFunctionArgs) {
   try {
-    const monographId = params["id"];
+    const slug = params["slug"];
 
-    if (monographId && (await isSpamCached(monographId))) throw new Error();
+    if (slug && (await isSpamCached(slug))) throw new Error();
 
-    const monograph = await fetch(`${API_HOST}/monographs/${monographId}`)
+    const monograph = await fetch(`${API_HOST}/monographs/v2/${slug}`)
       .then((r) => r.json() as Promise<MonographResponse>)
       .then(
         (data) => ({ ...data, content: JSON.parse(data.content) } as Monograph)
@@ -56,22 +68,10 @@ export async function loader({ params }: LoaderFunctionArgs) {
     return {
       monograph,
       metadata,
-      pixel: `${API_HOST}/monographs/${monographId}/view`
+      pixel: `${API_HOST}/monographs/v2/${slug}/view`
     };
   } catch (e) {
     // console.error(e);
     return NOT_FOUND_LOADER_DATA;
   }
-}
-
-export default function MonographPost() {
-  const { monograph, pixel } = useLoaderData<typeof loader>();
-  const [_, hashParams] = useHashLocation();
-  return (
-    <MonographView
-      monograph={monograph}
-      pixel={pixel}
-      encodedKey={hashParams.key}
-    />
-  );
 }

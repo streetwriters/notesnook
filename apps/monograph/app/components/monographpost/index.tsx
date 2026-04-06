@@ -108,11 +108,11 @@ function generateTableOfContents() {
 export const MonographPage = ({
   monograph,
   encodedKey,
-  apiHost
+  pixel
 }: {
   monograph: Monograph;
   encodedKey?: string;
-  apiHost: string;
+  pixel?: string;
 }) => {
   const [reportDialogVisible, setReportDialogVisible] = useState(false);
   const [tableOfContents, setTableOfContents] = useState<TableOfContent[]>([]);
@@ -227,10 +227,7 @@ export const MonographPage = ({
               </Text>
             </Button>
           )}
-          <Image
-            sx={{ display: "none" }}
-            src={`${apiHost}/monographs/${monograph.id}/view`}
-          />
+          {pixel ? <Image sx={{ display: "none" }} src={pixel} /> : null}
         </Flex>
       </Box>
       <Flex
