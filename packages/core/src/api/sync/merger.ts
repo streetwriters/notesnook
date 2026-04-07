@@ -28,7 +28,9 @@ import {
   Note,
   isDeleted
 } from "../../types.js";
-import { ParsedInboxItem, SyncInboxItem } from "./types.js";
+import { SyncInboxItem } from "./types.js";
+import { z } from "zod";
+import { sanitizeHtml } from "../../utils/html-parser.js";
 
 const THRESHOLD = process.env.NODE_ENV === "test" ? 2 * 1000 : 60 * 1000;
 class Merger {
@@ -168,6 +170,25 @@ export function isContentConflicted(
   }
 }
 
+const RawInboxItemSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  pinned: z.boolean().optional(),
+  favorite: z.boolean().optional(),
+  readonly: z.boolean().optional(),
+  archived: z.boolean().optional(),
+  notebookIds: z.array(z.string()).optional(),
+  tagIds: z.array(z.string()).optional(),
+  type: z.enum(["note"]),
+  source: z.string(),
+  version: z.literal(1),
+  content: z
+    .object({
+      type: z.enum(["html"]),
+      data: z.string()
+    })
+    .optional()
+});
+
 export async function handleInboxItems(
   inboxItems: SyncInboxItem[],
   db: Database
@@ -190,34 +211,37 @@ export async function handleInboxItems(
       const decryptedItem = await db
         .storage()
         .decryptPGPMessage(inboxKeys.privateKey, item.cipher);
-      const parsed = JSON.parse(decryptedItem) as ParsedInboxItem;
-
-      if (parsed.type !== "note") {
+      const validation = RawInboxItemSchema.safeParse(
+        JSON.parse(decryptedItem)
+      );
+      if (!validation.success) {
+        logger.warn("Failed to validate inbox item.", {
+          inboxItem: item,
+          errors: validation.error.issues
+        });
         continue;
       }
-      if (parsed.version !== 1) {
-        continue;
-      }
 
+      const data = validation.data;
       await db.notes.add({
         id: item.id,
-        title: parsed.title,
-        favorite: parsed.favorite,
-        pinned: parsed.pinned,
-        readonly: parsed.readonly,
+        title: data.title,
+        favorite: data.favorite,
+        pinned: data.pinned,
+        readonly: data.readonly,
         content: {
-          data: parsed?.content?.data ?? "",
+          data: sanitizeHtml(data?.content?.data ?? ""),
           type: "tiptap"
         }
       });
-      if (parsed.archived !== undefined) {
-        await db.notes.archive(parsed.archived, item.id);
+      if (data.archived !== undefined) {
+        await db.notes.archive(data.archived, item.id);
       }
-      for (const notebookId of parsed.notebookIds || []) {
+      for (const notebookId of data.notebookIds || []) {
         if (!(await db.notebooks.exists(notebookId))) continue;
         await db.notes.addToNotebook(notebookId, item.id);
       }
-      for (const tagId of parsed.tagIds || []) {
+      for (const tagId of data.tagIds || []) {
         if (!(await db.tags.exists(tagId))) continue;
         await db.relations.add(
           { type: "tag", id: tagId },
