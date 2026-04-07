@@ -3448,6 +3448,10 @@ msgstr "Invalid CORS proxy url"
 msgid "Invalid email"
 msgstr "Invalid email"
 
+#: src/strings.ts:2642
+msgid "Invalid recovery key. Make sure to input your account recovery key, not a 2FA recovery code."
+msgstr "Invalid recovery key. Make sure to input your account recovery key, not a 2FA recovery code."
+
 #: src/strings.ts:224
 msgid "Issue created"
 msgstr "Issue created"

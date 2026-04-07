@@ -2637,5 +2637,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   failedToAttachFile: () => t`Failed to attach file`,
   unlockNoteToMergeConflicts: () => t`Unlock note to merge conflicts`,
   confirmationEmailSent: () => t`Confirmation email sent`,
-  back: () => t`Back`
+  back: () => t`Back`,
+  invalidRecoveryKey: () =>
+    t`Invalid recovery key. Make sure to input your account recovery key, not a 2FA recovery code.`
 };

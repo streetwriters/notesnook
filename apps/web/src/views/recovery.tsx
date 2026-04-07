@@ -330,13 +330,16 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
         subtitle: strings.keyRecoveryProgressDesc()
       }}
       onSubmit={async (form) => {
+        const recoveryKey = form.recoveryKey;
+        if (recoveryKey.length < 40) {
+          throw new Error(strings.invalidRecoveryKey());
+        }
+
         setProgress(0);
 
         const user = await db.user.getUser();
         if (!user) throw new Error(strings.notLoggedIn());
-        await useKeyStore
-          .getState()
-          .setValue("userEncryptionKey", form.recoveryKey);
+        await useKeyStore.getState().setValue("userEncryptionKey", recoveryKey);
         navigate("new", form);
       }}
     >
@@ -358,7 +361,7 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
         >
           {strings.back()}
         </Button>
-      <SubmitButton text={strings.startAccountRecovery()} />
+        <SubmitButton text={strings.startAccountRecovery()} />
       </Flex>
 
       <Button
@@ -398,18 +401,29 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
         subtitle: strings.resetPasswordWait()
       }}
       onSubmit={async (form) => {
-        setProgress(0);
+        try {
+          setProgress(0);
 
-        if (form.password !== form.confirmPassword)
-          throw new Error("Passwords do not match.");
+          if (form.password !== form.confirmPassword)
+            throw new Error("Passwords do not match.");
 
-        if (formData?.userResetRequired && !(await db.user.resetUser()))
-          throw new Error("Failed to reset user.");
+          if (formData?.userResetRequired && !(await db.user.resetUser()))
+            throw new Error("Failed to reset user.");
 
-        if (!(await db.user.resetPassword(form.password)))
-          throw new Error("Could not reset account password.");
+          if (!(await db.user.resetPassword(form.password)))
+            throw new Error("Could not reset account password.");
 
-        navigate("final");
+          navigate("final");
+        } catch (e) {
+          if ((e as Error).message === "invalid input") {
+            console.error(e);
+            throw new Error(
+              "Password reset failed because of invalid recovery key"
+            );
+          }
+
+          throw e;
+        }
       }}
     >
       {(form?: NewPasswordFormData) => (
@@ -443,7 +457,7 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
             >
               {strings.back()}
             </Button>
-          <SubmitButton text={strings.continue()} />
+            <SubmitButton text={strings.continue()} />
           </Flex>
         </>
       )}
@@ -545,7 +559,7 @@ export function RecoveryForm<T extends RecoveryRoutes>(
         {subtitle}
       </Text>
       {typeof children === "function" ? children(form) : children}
-      <ErrorText error={error} />
+      <ErrorText error={error} sx={{ mt: 2 }} />
     </Flex>
   );
 }
