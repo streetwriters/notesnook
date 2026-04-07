@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { normalizeToHtmlBody } from "../html-parser.js";
+import { normalizeToHtmlBody, sanitizeHtml } from "../html-parser.js";
 import { expect, describe, it } from "vitest";
 
 const HTML_INPUT_TYPES: Array<{
@@ -137,5 +137,163 @@ describe("normalizeToHtmlBody", () => {
     expect(normalizeToHtmlBody(undefined as unknown as string)).toBe(
       "<html><body></body></html>"
     );
+  });
+});
+
+// sanitizeHtml uses globalThis.DOMParser (set to linkedom's DOMParser in
+// test.setup.ts) to back DOMPurify when a native browser DOM is unavailable.
+describe("sanitizeHtml", () => {
+  it("strips <script> tags and their content", () => {
+    const result = sanitizeHtml("<p>Hello</p><script>alert(1)</script>");
+    expect(result).not.toContain("<script");
+    expect(result).not.toContain("alert(1)");
+    expect(result).toContain("Hello");
+  });
+
+  it("strips inline event handlers", () => {
+    const result = sanitizeHtml('<img src="x" onerror="alert(1)">');
+    expect(result).not.toContain("onerror");
+    expect(result).not.toContain("alert(1)");
+  });
+
+  it("strips javascript: URIs from href", () => {
+    // eslint-disable-next-line no-script-url
+    const result = sanitizeHtml('<a href="javascript:alert(1)">click</a>');
+    expect(result).not.toContain("javascript:");
+    expect(result).toContain("click");
+  });
+
+  it("strips javascript: URIs from src", () => {
+    // eslint-disable-next-line no-script-url
+    const result = sanitizeHtml(
+      '<iframe src="javascript:alert(document.domain)"></iframe>'
+    );
+    expect(result).not.toContain("javascript:");
+  });
+
+  it("strips onclick and other on* attributes", () => {
+    const result = sanitizeHtml(
+      '<button onclick="evil()">OK</button><div onmouseover="evil()">x</div>'
+    );
+    expect(result).not.toContain("onclick");
+    expect(result).not.toContain("onmouseover");
+    expect(result).not.toContain("evil()");
+  });
+
+  it("strips <object> and <embed> tags", () => {
+    const result = sanitizeHtml(
+      '<object data="malicious.swf"></object><embed src="evil.swf">'
+    );
+    expect(result).not.toContain("<object");
+    expect(result).not.toContain("<embed");
+  });
+
+  it("strips data: URIs in dangerous attributes", () => {
+    const result = sanitizeHtml(
+      '<a href="data:text/html,<script>alert(1)</script>">x</a>'
+    );
+    expect(result).not.toMatch(/href=["']data:/i);
+  });
+
+  it("preserves safe block elements", () => {
+    const input = "<p>Hello <strong>world</strong></p><ul><li>item</li></ul>";
+    const result = sanitizeHtml(input);
+    expect(result).toContain("<p>");
+    expect(result).toContain("<strong>world</strong>");
+    expect(result).toContain("<ul>");
+    expect(result).toContain("<li>item</li>");
+  });
+
+  it("preserves safe links with http/https href", () => {
+    const result = sanitizeHtml('<a href="https://notesnook.com">Notes</a>');
+    expect(result).toContain('href="https://notesnook.com"');
+    expect(result).toContain("Notes");
+  });
+
+  it("preserves headings", () => {
+    const result = sanitizeHtml("<h1>Title</h1><h2>Subtitle</h2>");
+    expect(result).toContain("<h1>Title</h1>");
+    expect(result).toContain("<h2>Subtitle</h2>");
+  });
+
+  it("returns a string (not TrustedHTML or DOM node)", () => {
+    const result = sanitizeHtml("<p>test</p>");
+    expect(typeof result).toBe("string");
+  });
+
+  it("handles empty input without throwing", () => {
+    expect(() => sanitizeHtml("")).not.toThrow();
+    const result = sanitizeHtml("");
+    expect(typeof result).toBe("string");
+  });
+
+  it("handles plain text without throwing", () => {
+    const result = sanitizeHtml("just plain text");
+    expect(result).toContain("just plain text");
+    expect(typeof result).toBe("string");
+  });
+
+  it("handles deeply nested XSS attempts", () => {
+    const result = sanitizeHtml(
+      "<div><p><span onmouseover=\"alert('xss')\">hover</span></p></div>"
+    );
+    expect(result).not.toContain("onmouseover");
+    expect(result).toContain("hover");
+  });
+
+  it("strips <base> tag that could hijack relative URLs", () => {
+    const result = sanitizeHtml(
+      '<base href="https://evil.com"><a href="/path">link</a>'
+    );
+    expect(result).not.toContain("<base");
+  });
+
+  it("preserves <iframe> with safe https src", () => {
+    const result = sanitizeHtml('<iframe src="https://example.com"></iframe>');
+    expect(result).toContain("<iframe");
+    expect(result).toContain('src="https://example.com"');
+  });
+
+  it("strips src from <iframe> with javascript: URI", () => {
+    // eslint-disable-next-line no-script-url
+    const result = sanitizeHtml(
+      '<iframe src="javascript:alert(document.domain)"></iframe>'
+    );
+    expect(result).toContain("<iframe");
+    expect(result).not.toContain("javascript:");
+  });
+
+  it("strips src from <iframe> with data: URI", () => {
+    const result = sanitizeHtml(
+      '<iframe src="data:text/html,<script>alert(1)</script>"></iframe>'
+    );
+    expect(result).toContain("<iframe");
+    expect(result).not.toContain("data:");
+  });
+
+  it("strips srcdoc from <iframe>", () => {
+    const result = sanitizeHtml(
+      '<iframe srcdoc="<script>alert(1)</script>"></iframe>'
+    );
+    expect(result).toContain("<iframe");
+    expect(result).not.toContain("srcdoc");
+  });
+
+  it("strips event handlers from <iframe>", () => {
+    const result = sanitizeHtml(
+      '<iframe src="https://example.com" onload="steal()"></iframe>'
+    );
+    expect(result).toContain("<iframe");
+    expect(result).not.toContain("onload");
+    expect(result).not.toContain("steal()");
+  });
+
+  it("preserves nested <iframe> with safe src alongside other elements", () => {
+    const result = sanitizeHtml(
+      '<div><p>Safe content</p><iframe src="https://example.com"></iframe></div>'
+    );
+    expect(result).toContain("Safe content");
+    expect(result).toContain("<iframe");
+    expect(result).toContain('src="https://example.com"');
   });
 });

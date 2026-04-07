@@ -215,7 +215,7 @@ export async function handleInboxItems(
         JSON.parse(decryptedItem)
       );
       if (!validation.success) {
-        logger.info("Failed to validate inbox item.", {
+        logger.warn("Failed to validate inbox item.", {
           inboxItem: item,
           errors: validation.error.issues
         });

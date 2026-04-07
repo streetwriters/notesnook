@@ -55,6 +55,8 @@ function createPurifyWindow() {
     "<!doctype html><html><head><title>dompurify</title></head><body></body></html>"
   );
   const win = document?.defaultView as any;
+  if (!win)
+    throw new Error("DOMParser is unavailable; cannot initialize DOMPurify");
   const doc = win.document;
 
   // DOMPurify calls new DOMParser().parseFromString(...)
@@ -92,9 +94,22 @@ function createPurifyWindow() {
 
 let domPurify: DOMPurify.DOMPurify | undefined = undefined;
 function getDomPurify() {
-  if (DOMPurify.isSupported) return DOMPurify;
   if (!domPurify) {
-    domPurify = DOMPurify(createPurifyWindow());
+    const win = DOMPurify.isSupported
+      ? (globalThis as unknown as WindowLike)
+      : createPurifyWindow();
+    domPurify = DOMPurify(win);
+    // Only allow https/http src on iframes — strip anything else (javascript:,
+    // data:, relative paths that could be weaponized, etc.).
+    domPurify.addHook("uponSanitizeAttribute", (node, data) => {
+      if (
+        node.tagName === "IFRAME" &&
+        data.attrName === "src" &&
+        !/^https?:\/\//i.test(data.attrValue)
+      ) {
+        data.keepAttr = false;
+      }
+    });
   }
   return domPurify;
 }

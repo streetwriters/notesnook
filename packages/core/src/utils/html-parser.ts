@@ -29,9 +29,12 @@ export const parseHTML = (input: string) =>
       )
     : null;
 
-export const sanitizeHtml = (html: string) => {
+export const sanitizeHtml = (html: string): string => {
   const inputHtml = normalizeToHtmlBody(html);
-  return getDomPurify().sanitize(inputHtml);
+  return getDomPurify().sanitize(inputHtml, {
+    RETURN_DOM: false,
+    ADD_TAGS: ["iframe"]
+  }) as string;
 };
 
 export function getDummyDocument() {
@@ -71,9 +74,16 @@ function isHtmlValid(html: string): boolean {
   const trimmed = html.trim();
   if (!trimmed) return true;
 
+  // Strip comments and script/style content before tag counting to avoid
+  // false matches on tags appearing inside comments or raw text blocks.
+  const stripped = trimmed
+    .replace(/<!--[\s\S]*?-->/g, "")
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "")
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, "");
+
   // Extract all opening and closing tag names
-  const openTagMatches = trimmed.matchAll(/<([a-z][a-z0-9]*)\b/gi);
-  const closeTagMatches = trimmed.matchAll(/<\/([a-z][a-z0-9]*)\b/gi);
+  const openTagMatches = stripped.matchAll(/<([a-z][a-z0-9]*)\b/gi);
+  const closeTagMatches = stripped.matchAll(/<\/([a-z][a-z0-9]*)\b/gi);
 
   const openTags = Array.from(openTagMatches, (m) => m[1].toLowerCase());
   const closeTags = Array.from(closeTagMatches, (m) => m[1].toLowerCase());
@@ -81,9 +91,14 @@ function isHtmlValid(html: string): boolean {
   // Document-level tags (body, html, head) are allowed to be unclosed in fragments
   const documentTags = new Set(["body", "html", "head"]);
 
-  // Count content tags (non-document tags)
-  const openContentTags = openTags.filter((tag) => !documentTags.has(tag));
-  const closeContentTags = closeTags.filter((tag) => !documentTags.has(tag));
+  // Count content tags (non-document, non-void tags) — void/self-closing elements
+  // never have a closing tag so they must not affect the balance check.
+  const openContentTags = openTags.filter(
+    (tag) => !documentTags.has(tag) && !SELF_CLOSING_TAGS.has(tag)
+  );
+  const closeContentTags = closeTags.filter(
+    (tag) => !documentTags.has(tag) && !SELF_CLOSING_TAGS.has(tag)
+  );
 
   // For content tags: opening and closing must match
   if (openContentTags.length !== closeContentTags.length) {
@@ -103,6 +118,10 @@ function isHtmlValid(html: string): boolean {
       },
       onclosetag: (name) => {
         const nameLower = name.toLowerCase();
+        // htmlparser2 fires onclosetag for void/self-closing elements immediately
+        // after onopentag. We never push them onto the stack, so skip here too.
+        if (SELF_CLOSING_TAGS.has(nameLower)) return;
+
         const lastOpen = openStack[openStack.length - 1];
 
         if (!lastOpen) {
@@ -177,7 +196,7 @@ export function normalizeToHtmlBody(input: string) {
     }
 
     if (headBlock) {
-      const bodyContent = inner.replace(headBlock!, "").trim();
+      const bodyContent = inner.replace(headBlock, "").trim();
       return `<html>${headBlock}<body>${bodyContent}</body></html>`;
     }
 
