@@ -43,6 +43,7 @@ import { useDragHandler } from "../../hooks/use-drag-handler";
 import { AddNotebookDialog } from "../../dialogs/add-notebook-dialog";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
 import { store as appStore } from "../../stores/app-store";
+import { store as settingStore } from "../../stores/setting-store";
 import { Multiselect } from "../../common/multi-select";
 import { strings } from "@notesnook/intl";
 import { db } from "../../common/db";
@@ -54,6 +55,7 @@ import { useStore as useNotebookStore } from "../../stores/notebook-store";
 import { MoveNotebookDialog } from "../../dialogs/move-notebook-dialog";
 import { areFeaturesAvailable } from "@notesnook/common";
 import { writeToClipboard } from "../../utils/clipboard";
+import { showToast } from "../../utils/toast";
 
 type NotebookProps = {
   item: NotebookType;
@@ -303,6 +305,24 @@ export const notebookMenuItems: (
       icon: Trash.path,
       onClick: () => Multiselect.moveNotebooksToTrash(ids),
       multiSelect: true
+    },
+    {
+      type: "button",
+      key: "copyid",
+      title: "Copy ID",
+      icon: Copy.path,
+      onClick: async () => {
+        try {
+          await writeToClipboard({
+            "text/plain": notebook.id
+          });
+          showToast("success", "Notebook ID copied to clipboard");
+        } catch (e) {
+          console.error(e);
+          showToast("error", "Failed to copy Notebook ID");
+        }
+      },
+      isHidden: !settingStore.get().isInboxEnabled
     }
   ];
 };
