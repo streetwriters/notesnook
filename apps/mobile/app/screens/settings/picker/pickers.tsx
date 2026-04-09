@@ -137,8 +137,8 @@ export const TrashIntervalPicker = createSettingsPicker({
     return item === -1
       ? strings.never()
       : item === 1
-      ? strings.reminderRecurringMode.day()
-      : strings.days(item);
+        ? strings.reminderRecurringMode.day()
+        : strings.days(item);
   },
   getItemKey: (item) => item.toString(),
   options: [-1, 1, 7, 30, 365] as TrashCleanupInterval[],
@@ -294,10 +294,10 @@ export const ApplockTimerPicker = createSettingsPicker({
     return item === -1
       ? strings.never()
       : item === 0 || item === undefined
-      ? strings.immediately()
-      : item === 1
-      ? strings.minutes(1)
-      : strings.minutes(item);
+        ? strings.immediately()
+        : item === 1
+          ? strings.minutes(1)
+          : strings.minutes(item);
   },
   getItemKey: (item) => item.toString(),
   options: [-1, 0, 1, 5, 15, 30],
@@ -305,6 +305,37 @@ export const ApplockTimerPicker = createSettingsPicker({
   onVerify: () => {
     return verifyUserWithApplock();
   },
+  isFeatureAvailable: async () => true,
+  isOptionAvailable: async () => true
+});
+
+export const VaultLockTimerPicker = createSettingsPicker({
+  getValue: () => useSettingStore.getState().vaultLockAfter,
+  updateValue: async (item) => {
+    await db.settings.setVaultLockAfter(item);
+    useSettingStore.setState({
+      vaultLockAfter: item
+    });
+  },
+  formatValue: (item) => {
+    return item === -1
+      ? strings.never()
+      : item < 1000 * 60 * 60
+        ? strings.minutes(item / (1000 * 60))
+        : strings.hours(item / (1000 * 60 * 60));
+  },
+  getItemKey: (item) => item.toString(),
+  options: [
+    1000 * 60 * 1,
+    1000 * 60 * 5,
+    1000 * 60 * 10,
+    1000 * 60 * 15,
+    1000 * 60 * 30,
+    1000 * 60 * 45,
+    1000 * 60 * 60,
+    -1
+  ],
+  compareValue: (current, item) => current === item,
   isFeatureAvailable: async () => true,
   isOptionAvailable: async () => true
 });

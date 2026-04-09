@@ -39,7 +39,8 @@ import {
   ImageCompressionPicker,
   SidebarTabPicker,
   TimeFormatPicker,
-  TrashIntervalPicker
+  TrashIntervalPicker,
+  VaultLockTimerPicker
 } from "./picker/pickers";
 import { RestoreBackup } from "./restore-backup";
 import { ServersConfiguration } from "./server-config";
@@ -66,6 +67,7 @@ export const components: { [name: string]: ReactElement } = {
   "image-compression-picker": <ImageCompressionPicker />,
   "theme-selector": <ThemeSelector />,
   "applock-timer": <ApplockTimerPicker />,
+  "vault-lock-timer": <VaultLockTimerPicker />,
   autobackupsattachments: <BackupWithAttachmentsReminderPicker />,
   backuprestore: <RestoreBackup />,
   "server-config": <ServersConfiguration />,

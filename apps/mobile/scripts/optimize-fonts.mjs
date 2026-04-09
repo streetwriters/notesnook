@@ -126,7 +126,8 @@ const EXTRA_ICON_NAMES = [
   "cancel",
   "inbox",
   "identifier",
-  "image-area"
+  "image-area",
+  "clock-outline"
 ];
 
 const __filename = fileURLToPath(import.meta.url);
