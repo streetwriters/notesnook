@@ -61,6 +61,25 @@ export async function checkParentSelected(
   }
 }
 
+export async function getAllNotebookChildren(id: string, childrenIds: string[] = []) {
+  const relation = await db.relations
+    .from(
+      {
+        id,
+        type: "notebook"
+      },
+      "notebook"
+    )
+    .get()
+  childrenIds.push(...relation.map(rel => rel.toId))
+
+  for (let rel of relation) {
+    await getAllNotebookChildren(rel.toId, childrenIds)
+  }
+  return childrenIds
+
+}
+
 export async function getParentNotebookId(id: string) {
   const relation = await db.relations
     .to(

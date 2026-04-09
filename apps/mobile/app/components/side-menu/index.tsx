@@ -432,6 +432,7 @@ const TabBar = (props: SimpleTabBarProps) => {
                       name="plus"
                       testID="sidebar-add-button"
                       size={AppFontSize.lg - 2}
+                       top={10}
                       color={colors.primary.icon}
                       onPress={async () => {
                         if (props.navigationState.index === 1) {
@@ -485,6 +486,7 @@ const TabBar = (props: SimpleTabBarProps) => {
                           ? "sort-ascending"
                           : "sort-descending"
                       }
+                      top={10}
                       testID="sidebar-sort-button"
                       color={colors.primary.icon}
                       onPress={() => {
@@ -520,6 +522,7 @@ const TabBar = (props: SimpleTabBarProps) => {
                         width: 28,
                         height: 28
                       }}
+                      top={10}
                       testID="sidebar-theme-button"
                       color={colors.primary.icon}
                       name={isDark ? "weather-night" : "weather-sunny"}
