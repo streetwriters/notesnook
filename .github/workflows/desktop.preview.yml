@@ -107,6 +107,7 @@ jobs:
           APPLE_API_KEY: ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
           APPLE_API_KEY_ID: ${{ secrets.api_key_id }}
           APPLE_API_ISSUER: ${{ secrets.api_key_issuer_id }}
+          CSC_FOR_PULL_REQUEST: true
         run: |
           npm run tx @notesnook/desktop:release
           cd apps/desktop
