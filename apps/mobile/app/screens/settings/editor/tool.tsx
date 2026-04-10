@@ -175,7 +175,7 @@ export const Tool = ({
       });
     }
     return btns;
-  }, [groupIndex, index, isSubgroup, item, parentIndex, setData]);
+  }, [groupIndex, index, isSubgroup, item, parentIndex, setData, featureAvailable]);
 
   const renderChild = React.useCallback(
     (hover?: boolean) => (
@@ -267,6 +267,7 @@ export const Tool = ({
             style={{
               paddingLeft: 30
             }}
+            key={`subgroup-${item.length}-${groupIndex}-${index}-${parentIndex}`}
           >
             {renderGroup({ index, item, parentIndex: groupIndex })}
           </View>

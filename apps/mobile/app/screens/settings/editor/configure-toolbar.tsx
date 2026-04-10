@@ -24,7 +24,6 @@ import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
 import { Button } from "../../../components/ui/button";
 import { Notice } from "../../../components/ui/notice";
 import Paragraph from "../../../components/ui/typography/paragraph";
-import PremiumService from "../../../services/premium";
 import { useThemeColors } from "@notesnook/theme";
 import { AppFontSize } from "../../../utils/size";
 import { Group } from "./group";
@@ -41,7 +40,7 @@ export const ConfigureToolbar = () => {
 
   const renderGroups = () => {
     return data?.map((item, index) => (
-      <Group key={`group-${index}`} item={item} index={index} />
+      <Group key={`group-${index}-${item.length}`} item={item} index={index} />
     ));
   };
 
@@ -131,6 +130,7 @@ export const ConfigureToolbar = () => {
           style={{
             flex: 1
           }}
+          key={preset}
           scrollEventThrottle={13}
           showsVerticalScrollIndicator={false}
         >
