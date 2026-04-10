@@ -22,7 +22,8 @@ import create, { StoreApi, UseBoundStore } from "zustand";
 import { resolveItems } from "@notesnook/common";
 import { useSettingStore } from "./use-setting-store";
 import { DatabaseLogger } from "../common/database";
-import { ToastManager } from "../services/event-manager";
+import { eSendEvent, ToastManager } from "../services/event-manager";
+import { eMenuItemUpdate } from "../utils/events";
 
 export interface DBCollectionStore<Type extends Item> {
   items: VirtualizedGrouping<Type> | undefined;
@@ -67,6 +68,7 @@ export default function createDBCollectionStore<Type extends Item>({
           items,
           loading: false
         });
+        eSendEvent(eMenuItemUpdate);
       } catch (e) {
         DatabaseLogger.error(e as Error, "useDBCollectionStore.refresh", {
           useDBCollectionStore: "refresh"

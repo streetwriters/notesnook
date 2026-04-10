@@ -33,7 +33,7 @@ import { Pressable } from "../../components/ui/pressable";
 import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
-import { ToastManager } from "../../services/event-manager";
+import { sendItemUpdateEvent, ToastManager } from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import {
   ItemSelection,
@@ -242,6 +242,7 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
           console.error(e);
         }
       }
+      sendItemUpdateEvent(id, 'tag');
       useTagStore.getState().refresh();
       useRelationStore.getState().update();
       refreshTags();
