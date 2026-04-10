@@ -35,6 +35,7 @@ import AppIcon from "../ui/AppIcon";
 import { IconButton } from "../ui/icon-button";
 import { Pressable } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
+import { useRelationStore } from "../../stores/use-relation-store";
 
 export const NotebookItem = ({
   index,
@@ -70,13 +71,14 @@ export const NotebookItem = ({
   const notebook = item.notebook;
   const isFocused = focused;
   const { totalNotes, getTotalNotes } = useTotalNotes("notebook");
+  const updater = useRelationStore(state => state.updater);
   const getTotalNotesRef = React.useRef(getTotalNotes);
   getTotalNotesRef.current = getTotalNotes;
   const { colors } = useThemeColors();
 
   useEffect(() => {
     getTotalNotesRef.current([item.notebook.id]);
-  }, [item.notebook]);
+  }, [item.notebook, updater]);
 
   useEffect(() => {
     const onNotebookUpdate = (id?: string) => {

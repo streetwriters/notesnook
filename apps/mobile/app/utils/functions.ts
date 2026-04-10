@@ -211,6 +211,7 @@ export const deleteItems = async (
     useNotebookStore.getState().refresh();
   }
   useMenuStore.getState().setMenuPins();
+  useRelationStore.getState().update();
 };
 
 export const openLinkInBrowser = async (link: string) => {
