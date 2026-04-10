@@ -21,7 +21,7 @@ import { ToolbarDefinition, ToolDefinition } from "./types.js";
 import { ToolId } from "./tools/index.js";
 import { strings } from "@notesnook/intl";
 
-const tools: Record<ToolId, ToolDefinition> = {
+const tools = (): Record<ToolId, ToolDefinition> => ({
   none: {
     icon: "none",
     title: ""
@@ -356,14 +356,14 @@ const tools: Record<ToolId, ToolDefinition> = {
     title: strings.exportCsv(),
     conditional: true
   }
-};
+});
 
 export function getToolDefinition(id: ToolId) {
-  return tools[id];
+  return tools()[id];
 }
 
 export function getAllTools() {
-  return tools;
+  return tools();
 }
 
 export function getDefaultPresets() {
