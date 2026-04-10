@@ -276,6 +276,8 @@ export class MathView implements NodeView, ICursorPosObserver {
       while (this._mathRenderElt.firstChild) {
         this._mathRenderElt.firstChild.remove();
       }
+      this._mathRenderElt.classList.remove("parse-error");
+      this.dom.setAttribute("title", "");
       // do not render empty math
       return;
     } else {
