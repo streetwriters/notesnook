@@ -255,6 +255,7 @@ export const MoveNotebook = (props: NavigationProps<"MoveNotebook">) => {
                   updateNotebooks();
                 }, 300);
               }}
+              testID="move-notebook-search"
               button={{
                 icon: "plus",
                 onPress: async () => {

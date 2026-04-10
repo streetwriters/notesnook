@@ -68,6 +68,32 @@ describe("NOTEBOOKS", () => {
       .run();
   });
 
+  it("Moving notebook should not be moved to child notebook", async () => {
+    await TestBuilder.create()
+      .prepare()
+      .openSideMenu()
+      .waitAndTapById("tab-notebooks")
+      .waitAndTapById("sidebar-add-button")
+      .createNotebook("Notebook 1", true)
+      .wait(500)
+      .longPressByText("Notebook 1")
+      .wait(500)
+      .waitAndTapByText("Add notebook")
+      .createNotebook("Sub notebook", true)
+      .wait(500)
+      .waitAndTapById("expand-notebook-0")
+      .isVisibleByText("Sub notebook")
+      .longPressByText("Notebook 1")
+      .wait(500)
+      .waitAndTapByText("Move notebook")
+      .wait(500)
+      .isNotVisibleByText("Sub notebook")
+      .typeTextById("move-notebook-search", "Sub notebook")
+      .wait(500)
+      .isNotVisibleByText("Sub notebook")
+      .run();
+  });
+
   it("Edit notebook", async () => {
     await TestBuilder.create()
       .prepare()
