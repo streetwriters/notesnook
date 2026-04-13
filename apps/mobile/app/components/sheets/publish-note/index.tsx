@@ -382,7 +382,8 @@ const PublishNoteSheet = ({
                 >
                   <Paragraph size={AppFontSize.sm}>{strings.views()}</Paragraph>
                   <Paragraph>
-                    {monographData?.result?.metadata?.totalViews || 0}
+                    {monographData?.result?.metadata?.analytics?.totalViews ||
+                      0}
                   </Paragraph>
                 </View>
               </View>
