@@ -21,7 +21,7 @@ import {
   NoteResolvedData,
   areFeaturesAvailable,
   exportContent,
-  getFormattedDate,
+  formatDate,
   getFormattedReminderTime
 } from "@notesnook/common";
 import {
@@ -56,6 +56,7 @@ import { store as selectionStore } from "../../stores/selection-store";
 import { store as tagStore } from "../../stores/tag-store";
 import { store as userstore } from "../../stores/user-store";
 import { store as appStore } from "../../stores/app-store";
+import { useStore as useSettingStore } from "../../stores/setting-store";
 import { writeToClipboard } from "../../utils/clipboard";
 import { showToast } from "../../utils/toast";
 import IconTag from "../icon-tag";
@@ -103,7 +104,6 @@ import ListItem from "../list-item";
 import { PublishDialog } from "../publish-view";
 import TimeAgo from "../time-ago";
 import { NoteExpiryDateDialog } from "../../dialogs/note-expiry-date-dialog";
-import { withFeatureCheck } from "../../common";
 
 type NoteProps = NoteResolvedData & {
   item: NoteType;
@@ -129,6 +129,7 @@ function Note(props: NoteProps) {
 
   const isOpened = useEditorStore((store) => store.isNoteOpen(item.id));
   const primary: SchemeColors = color ? color.colorCode : "accent-selected";
+  const dateFormat = useSettingStore((store) => store.dateFormat);
 
   return (
     <ListItem
@@ -164,7 +165,9 @@ function Note(props: NoteProps) {
       }
       header={
         <Flex sx={{ alignItems: "center", mb: 1 }}>
-          <Text variant="subBody">{getFormattedDate(date, "date")}</Text>
+          <Text variant="subBody">
+            {formatDate(date, { type: "date", dateFormat })}
+          </Text>
         </Flex>
       }
       footer={
@@ -280,7 +283,10 @@ function Note(props: NoteProps) {
               {note.expiryDate?.value && (
                 <IconTag
                   icon={Destruct}
-                  text={getFormattedDate(note.expiryDate.value, "date")}
+                  text={formatDate(note.expiryDate.value, {
+                    type: "date",
+                    dateFormat
+                  })}
                 />
               )}
             </>

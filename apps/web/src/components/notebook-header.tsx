@@ -31,10 +31,10 @@ import {
 } from "./icons";
 import { useStore as useNotebookStore } from "../stores/notebook-store";
 import { db } from "../common/db";
-import { getFormattedDate } from "@notesnook/common";
+import { formatDate } from "@notesnook/common";
+import { useStore as useSettingStore } from "../stores/setting-store";
 import { strings } from "@notesnook/intl";
 import { Notebook } from "@notesnook/core";
-import { TITLE_BAR_HEIGHT } from "./title-bar";
 import { Menu } from "../hooks/use-menu";
 
 export function NotebookHeader(props: {
@@ -49,6 +49,7 @@ export function NotebookHeader(props: {
   const [isShortcut, setIsShortcut] = useState(false);
   const shortcuts = useAppStore((store) => store.shortcuts);
   const addToShortcuts = useAppStore((store) => store.addToShortcuts);
+  const dateFormat = useSettingStore((store) => store.dateFormat);
 
   useEffect(() => {
     setIsShortcut(shortcuts.findIndex((p) => p.id === props.notebook.id) > -1);
@@ -100,7 +101,9 @@ export function NotebookHeader(props: {
       {description && <Text variant="body">{description}</Text>}
       <Flex sx={{ alignItems: "center", justifyContent: "space-between" }}>
         <Flex sx={{ alignItems: "center", gap: 2 }}>
-          <Text variant="subBody">{getFormattedDate(dateEdited, "date")}</Text>
+          <Text variant="subBody">
+            {formatDate(dateEdited, { type: "date", dateFormat })}
+          </Text>
           <Text variant="subBody">{strings.notes(totalNotes || 0)}</Text>
         </Flex>
         <Flex sx={{ alignItems: "center", gap: 1 }}>
