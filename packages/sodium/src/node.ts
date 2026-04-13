@@ -17,18 +17,27 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  crypto_pwhash as sodium_native_crypto_pwhash,
-  crypto_generichash as sodium_native_crypto_generichash,
+// sodium-native is a CommonJS module. Using a default import + destructure
+// avoids ESM named-export interop failures when this file is loaded as .mjs.
+import sodiumNative from "sodium-native";
+const {
+  crypto_pwhash: sodium_native_crypto_pwhash,
+  crypto_generichash: sodium_native_crypto_generichash,
   sodium_memzero,
   crypto_aead_xchacha20poly1305_ietf_ABYTES,
-  randombytes_buf as sodium_native_randombytes_buf,
-  crypto_aead_xchacha20poly1305_ietf_encrypt as sodium_native_crypto_aead_xchacha20poly1305_ietf_encrypt,
-  crypto_secretstream_xchacha20poly1305_init_push as sodium_native_crypto_secretstream_xchacha20poly1305_init_push,
-  crypto_secretstream_xchacha20poly1305_push as sodium_native_crypto_secretstream_xchacha20poly1305_push,
-  crypto_aead_xchacha20poly1305_ietf_decrypt as sodium_native_crypto_aead_xchacha20poly1305_ietf_decrypt,
-  crypto_secretstream_xchacha20poly1305_init_pull as sodium_native_crypto_secretstream_xchacha20poly1305_init_pull,
-  crypto_secretstream_xchacha20poly1305_pull as sodium_native_crypto_secretstream_xchacha20poly1305_pull,
+  randombytes_buf: sodium_native_randombytes_buf,
+  crypto_aead_xchacha20poly1305_ietf_encrypt:
+    sodium_native_crypto_aead_xchacha20poly1305_ietf_encrypt,
+  crypto_secretstream_xchacha20poly1305_init_push:
+    sodium_native_crypto_secretstream_xchacha20poly1305_init_push,
+  crypto_secretstream_xchacha20poly1305_push:
+    sodium_native_crypto_secretstream_xchacha20poly1305_push,
+  crypto_aead_xchacha20poly1305_ietf_decrypt:
+    sodium_native_crypto_aead_xchacha20poly1305_ietf_decrypt,
+  crypto_secretstream_xchacha20poly1305_init_pull:
+    sodium_native_crypto_secretstream_xchacha20poly1305_init_pull,
+  crypto_secretstream_xchacha20poly1305_pull:
+    sodium_native_crypto_secretstream_xchacha20poly1305_pull,
   crypto_secretstream_xchacha20poly1305_HEADERBYTES,
   crypto_secretstream_xchacha20poly1305_ABYTES,
   crypto_secretstream_xchacha20poly1305_STATEBYTES,
@@ -47,12 +56,12 @@ import {
   crypto_aead_xchacha20poly1305_ietf_NPUBBYTES,
   crypto_secretstream_xchacha20poly1305_TAG_FINAL,
   crypto_secretstream_xchacha20poly1305_TAG_MESSAGE,
-  crypto_box_keypair as sodium_native_crypto_box_keypair,
+  crypto_box_keypair: sodium_native_crypto_box_keypair,
   crypto_box_PUBLICKEYBYTES,
   crypto_box_SECRETKEYBYTES,
-  crypto_box_seal_open as sodium_native_crypto_box_seal_open,
+  crypto_box_seal_open: sodium_native_crypto_box_seal_open,
   crypto_box_SEALBYTES
-} from "sodium-native";
+} = sodiumNative as typeof import("sodium-native");
 import { Buffer } from "node:buffer";
 import { base64_variants, ISodium } from "./types";
 

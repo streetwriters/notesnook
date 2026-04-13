@@ -1,0 +1,40 @@
+{
+  "name": "@notesnook/mcp",
+  "version": "1.0.0",
+  "description": "Notesnook MCP server — exposes Notesnook notes, notebooks, tags, and reminders as MCP tools.",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "notesnook-mcp": "./dist/index.js"
+  },
+  "scripts": {
+    "postinstall": "patch-package",
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "start": "node dist/index.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "@notesnook/core": "file:../core",
+    "@notesnook/crypto": "file:../crypto",
+    "@notesnook/logger": "file:../logger",
+    "@streetwriters/kysely": "^0.27.4",
+    "@streetwriters/showdown": "^3.0.9-alpha",
+    "better-sqlite3-multiple-ciphers": "11.5.0",
+    "eventsource": "^2.0.2",
+    "linkedom": "^0.18.12",
+    "sqlite-better-trigram": "^0.0.3",
+    "sqlite-regex": "^0.2.4-alpha.1",
+    "sqlite3-fts5-html": "^0.0.4",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.5",
+    "@types/node": "^18.7.13",
+    "patch-package": "^7.0.0",
+    "typescript": "^5.6.3",
+    "vitest": "2.1.8"
+  },
+  "license": "GPL-3.0-or-later"
+}
