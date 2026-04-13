@@ -3,10 +3,9 @@
   "compilerOptions": {
     "outDir": "./dist/",
     "lib": ["ESNext"],
-    "moduleResolution": "Bundler",
-    "paths": {
-      "@nn/test": ["./__tests__/electron-test/index.ts"]
-    }
+    "moduleResolution": "Bundler"
   },
-  "include": ["src", "global.d.ts", "__tests__"]
+  "files": ["global.d.ts"],
+  "include": ["src"],
+  "exclude": ["__tests__"]
 }
