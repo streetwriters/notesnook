@@ -55,6 +55,7 @@ export default class Vault {
 
     this.erasureTimeout = setTimeout(() => {
       this.lock();
+      this.db.eventManager.publish(EVENTS.vaultAutoLocked);
     }, lockAfter) as unknown as number;
   }
 

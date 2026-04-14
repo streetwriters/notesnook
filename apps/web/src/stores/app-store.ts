@@ -239,7 +239,11 @@ class AppStore extends BaseStore<AppStore> {
   setVaultLockAfter = async (ms: number) => {
     await db.settings.setVaultLockAfter(ms);
     this.set((state) => (state.vaultLockAfter = ms));
-    await db.vault.lock();
+
+    if (db.vault.unlocked) {
+      await db.vault.lock();
+      showToast("success", strings.vaultLocked());
+    }
   };
 
   setNotices = (...notices: Notice[]) => {
