@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { TemplateData } from "../index.js";
 import { formatDate } from "../../date.js";
+import { escapeUTF8 } from "entities";
 
 export function template(data: TemplateData) {
   return `<!DOCTYPE html>
@@ -28,19 +29,23 @@ export function template(data: TemplateData) {
     <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
     <meta
       name="description"
-      content="${data.headline}"
+      content="${escapeUTF8(data.headline || "")}"
     />
-    <title>${data.title}</title>
+    <title>${escapeUTF8(data.title)}</title>
     <meta name="created-at" content="${formatDate(data.dateCreated)}" />
     <meta name="updated-at" content="${formatDate(data.dateEdited)}" />
     ${data.pinned ? `<meta name="pinned" content="${data.pinned}" />` : ""}
     ${
       data.favorite ? `<meta name="favorite" content="${data.favorite}" />` : ""
     }
-    ${data.color ? `<meta name="color" content="${data.color}" />` : ""}
+    ${
+      data.color
+        ? `<meta name="color" content="${escapeUTF8(data.color)}" />`
+        : ""
+    }
     ${
       data.tags && data.tags.length
-        ? `<meta name="tags" content="${data.tags.join(", ")}" />`
+        ? `<meta name="tags" content="${escapeUTF8(data.tags.join(", "))}" />`
         : ""
     }
     <link rel="stylesheet" href="https://app.notesnook.com/assets/editor-styles.css?d=1690887574068">
@@ -207,7 +212,7 @@ export function template(data: TemplateData) {
     </style>
   </head>
   <body>
-    <h1>${data.title}</h1>
+    <h1>${escapeUTF8(data.title)}</h1>
     ${data.content}
   </body>
 </html>

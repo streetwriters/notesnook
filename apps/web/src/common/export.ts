@@ -54,6 +54,7 @@ export async function exportToPDF(
     iframe.style.height = "0";
     iframe.style.border = "0";
     iframe.loading = "eager";
+    iframe.sandbox.add("allow-same-origin", "allow-modals");
 
     iframe.onload = async () => {
       if (!iframe.contentWindow) return;
