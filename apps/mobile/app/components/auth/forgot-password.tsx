@@ -53,7 +53,7 @@ export const ForgotPassword = ({ userEmail }: { userEmail: string }) => {
     }
     setLoading(true);
     try {
-      let lastRecoveryEmailTime = SettingsService.get().lastRecoveryEmailTime;
+      const lastRecoveryEmailTime = SettingsService.get().lastRecoveryEmailTime;
       if (
         lastRecoveryEmailTime &&
         Date.now() - lastRecoveryEmailTime < 60000 * 3

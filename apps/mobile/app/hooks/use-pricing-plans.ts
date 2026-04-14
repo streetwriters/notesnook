@@ -255,12 +255,15 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
           const products = WebPlanCache || (await db.pricing.products());
           WebPlanCache = products;
           setWebPricingPlans(products);
-        } catch (e) {}
+        } catch (e) {
+          /**
+          empty */
+        }
       }
       setLoadingPlans(false);
     };
     loadPlans();
-  }, [options?.promoOffer, cancelPromo]);
+  }, [options?.promoOffer, cancelPromo, hasTrialOffer]);
 
   function getLocalizedPrice(
     product: RNIap.Subscription | RNIap.Product | Plan

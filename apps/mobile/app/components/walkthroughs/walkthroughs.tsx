@@ -17,33 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { SubscriptionPlan } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { useThemeColors } from "@notesnook/theme";
 import React from "react";
-import { Linking, View } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import {
-  COMMUNITY_SVG,
-  LAUNCH_ROCKET,
-  SUPPORT_SVG,
-  WELCOME_SVG
-} from "../../assets/images/assets";
-import useRotator from "../../hooks/use-rotator";
-import { eSendEvent } from "../../services/event-manager";
-import { getContainerBorder } from "../../utils/colors";
-import { getElevationStyle } from "../../utils/elevation";
-import { eOpenAddNotebookDialog } from "../../utils/events";
-import { defaultBorderRadius, AppFontSize } from "../../utils/size";
-import { Button } from "../ui/button";
-import Seperator from "../ui/seperator";
-import { SvgView } from "../ui/svg";
-import Heading from "../ui/typography/heading";
-import Paragraph from "../ui/typography/paragraph";
-import { DefaultAppStyles } from "../../utils/styles";
+import { WELCOME_SVG } from "../../assets/images/assets";
 import { useUserStore } from "../../stores/use-user-store";
-import { planToId, SubscriptionPlan } from "@notesnook/core";
 import { planToDisplayName } from "../../utils/constants";
 import AppIcon from "../ui/AppIcon";
+import { SvgView } from "../ui/svg";
 
 export type TStep = {
   text?: string;

@@ -83,12 +83,13 @@ const SheetWrapper = ({
           : 0
     };
   }, [
-    colors.primary.background,
-    colors.primary.border,
     largeTablet,
     smallTablet,
     width,
-    insets.bottom
+    colors.primary.background,
+    colors.primary.border,
+    bottomInsets,
+    isGestureNavigationEnabled
   ]);
 
   const _onOpen = () => {

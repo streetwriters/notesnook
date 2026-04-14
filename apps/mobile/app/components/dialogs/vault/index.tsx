@@ -110,61 +110,6 @@ export const VaultDialog: React.FC = () => {
   const confirmPasswordRef = useRef<string | null>(null);
   const newPasswordRef = useRef<string | null>(null);
 
-  const open = useCallback(async (data: Vault) => {
-    const biometry = await BiometricService.isBiometryAvailable();
-    const available = !!biometry;
-    const fingerprint = await BiometricService.hasInternetCredentials();
-
-    if (data.item) {
-      const locked = await db.vaults.itemExists(data.item);
-      noteLockedRef.current = locked;
-      if (!locked) {
-        const content = await db.content.findByNoteId(data.item!.id);
-        if (content && isEncryptedContent(content)) {
-          noteLockedRef.current = true;
-        }
-      }
-    }
-
-    // Set refs
-    noteRef.current = data.item;
-    titleRef.current = data.title || strings.goToEditor();
-    descriptionRef.current = data.description || null;
-    paragraphRef.current = data.paragraph || null;
-    buttonTitleRef.current = data.buttonTitle || null;
-    positiveButtonTypeRef.current = data.positiveButtonType || "transparent";
-    customActionTitleRef.current = data.customActionTitle || null;
-    customActionParagraphRef.current = data.customActionParagraph || null;
-    onUnlockRef.current = data.onUnlock;
-    requestTypeRef.current = data.requestType;
-
-    // Set UI state
-    setIsBiometryAvailable(available);
-    setIsBiometryEnrolled(fingerprint);
-    setBiometricUnlock(fingerprint);
-    setWrongPassword(false);
-    setPasswordsDontMatch(false);
-    setDeleteAll(false);
-    setLoading(false);
-
-    // Auto-unlock with fingerprint if applicable
-    const canAutoUnlock =
-      fingerprint &&
-      data.requestType !== VaultRequestType.EnableFingerprint &&
-      data.requestType !== VaultRequestType.RevokeFingerprint &&
-      data.requestType !== VaultRequestType.ChangePassword &&
-      data.requestType !== VaultRequestType.ClearVault &&
-      data.requestType !== VaultRequestType.DeleteVault &&
-      data.requestType !== VaultRequestType.CustomAction &&
-      data.requestType !== VaultRequestType.PermanentUnlock;
-
-    if (canAutoUnlock) {
-      await onPressFingerprintAuth(data.title, data.description);
-    } else {
-      setVisible(true);
-    }
-  }, []);
-
   const close = useCallback(() => {
     if (loading) {
       ToastManager.show({
@@ -292,6 +237,45 @@ export const VaultDialog: React.FC = () => {
     setLoading(false);
   }, [close]);
 
+  const enrollFingerprint = useCallback(
+    async (password: string) => {
+      setLoading(true);
+      try {
+        await db.vault.unlock(password);
+        await BiometricService.storeCredentials(password);
+        setLoading(false);
+        eSendEvent("vaultUpdated");
+        ToastManager.show({
+          heading: strings.biometricUnlockEnabled(),
+          type: "success",
+          context: "global"
+        });
+        close();
+      } catch (e) {
+        close();
+        ToastManager.show({
+          heading: strings.passwordIncorrect(),
+          type: "error",
+          context: "local"
+        });
+        setLoading(false);
+      }
+    },
+    [close]
+  );
+
+  const takeErrorAction = useCallback(() => {
+    setWrongPassword(true);
+    setVisible(true);
+    setTimeout(() => {
+      ToastManager.show({
+        heading: strings.passwordIncorrect(),
+        type: "error",
+        context: "local"
+      });
+    }, 500);
+  }, []);
+
   const lockNote = useCallback(async () => {
     if (!passwordRef.current || passwordRef.current.trim() === "") {
       ToastManager.show({
@@ -333,7 +317,13 @@ export const VaultDialog: React.FC = () => {
       .catch((e) => {
         takeErrorAction();
       });
-  }, [close, biometricUnlock, isBiometryEnrolled]);
+  }, [
+    biometricUnlock,
+    isBiometryEnrolled,
+    close,
+    enrollFingerprint,
+    takeErrorAction
+  ]);
 
   const openInEditor = useCallback(
     (note: Note & { content?: NoteContent<false> }) => {
@@ -387,19 +377,7 @@ export const VaultDialog: React.FC = () => {
     } catch (e) {
       takeErrorAction();
     }
-  }, [close]);
-
-  const takeErrorAction = useCallback(() => {
-    setWrongPassword(true);
-    setVisible(true);
-    setTimeout(() => {
-      ToastManager.show({
-        heading: strings.passwordIncorrect(),
-        type: "error",
-        context: "local"
-      });
-    }, 500);
-  }, []);
+  }, [close, takeErrorAction]);
 
   const openNote = useCallback(async () => {
     try {
@@ -440,6 +418,7 @@ export const VaultDialog: React.FC = () => {
   }, [
     biometricUnlock,
     isBiometryEnrolled,
+    enrollFingerprint,
     openInEditor,
     shareNote,
     deleteNote,
@@ -463,33 +442,6 @@ export const VaultDialog: React.FC = () => {
       await openNote();
     }
   }, [permanantUnlock, openNote]);
-
-  const enrollFingerprint = useCallback(
-    async (password: string) => {
-      setLoading(true);
-      try {
-        await db.vault.unlock(password);
-        await BiometricService.storeCredentials(password);
-        setLoading(false);
-        eSendEvent("vaultUpdated");
-        ToastManager.show({
-          heading: strings.biometricUnlockEnabled(),
-          type: "success",
-          context: "global"
-        });
-        close();
-      } catch (e) {
-        close();
-        ToastManager.show({
-          heading: strings.passwordIncorrect(),
-          type: "error",
-          context: "local"
-        });
-        setLoading(false);
-      }
-    },
-    [close]
-  );
 
   const createVault = useCallback(async () => {
     await db.vault.create(passwordRef.current || "");
@@ -535,31 +487,6 @@ export const VaultDialog: React.FC = () => {
       });
     }
   }, []);
-
-  const onPressFingerprintAuth = useCallback(
-    async (title?: string, description?: string) => {
-      try {
-        const credentials = await BiometricService.getCredentials(
-          title || titleRef.current,
-          description || descriptionRef.current || ""
-        );
-
-        if (!credentials) throw new Error("Failed to get user credentials");
-
-        if (credentials?.password) {
-          passwordRef.current = credentials.password;
-          onPress();
-        } else {
-          eSendEvent(eCloseActionSheet);
-          await sleep(300);
-          setVisible(true);
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    },
-    []
-  );
 
   const onPress = useCallback(async () => {
     const requestType = requestTypeRef.current;
@@ -688,6 +615,89 @@ export const VaultDialog: React.FC = () => {
     clearVault,
     deleteVault
   ]);
+
+  const onPressFingerprintAuth = useCallback(
+    async (title?: string, description?: string) => {
+      try {
+        const credentials = await BiometricService.getCredentials(
+          title || titleRef.current,
+          description || descriptionRef.current || ""
+        );
+
+        if (!credentials) throw new Error("Failed to get user credentials");
+
+        if (credentials?.password) {
+          passwordRef.current = credentials.password;
+          onPress();
+        } else {
+          eSendEvent(eCloseActionSheet);
+          await sleep(300);
+          setVisible(true);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    [onPress]
+  );
+
+  const open = useCallback(
+    async (data: Vault) => {
+      const biometry = await BiometricService.isBiometryAvailable();
+      const available = !!biometry;
+      const fingerprint = await BiometricService.hasInternetCredentials();
+
+      if (data.item) {
+        const locked = await db.vaults.itemExists(data.item);
+        noteLockedRef.current = locked;
+        if (!locked) {
+          const content = await db.content.findByNoteId(data.item!.id);
+          if (content && isEncryptedContent(content)) {
+            noteLockedRef.current = true;
+          }
+        }
+      }
+
+      // Set refs
+      noteRef.current = data.item;
+      titleRef.current = data.title || strings.goToEditor();
+      descriptionRef.current = data.description || null;
+      paragraphRef.current = data.paragraph || null;
+      buttonTitleRef.current = data.buttonTitle || null;
+      positiveButtonTypeRef.current = data.positiveButtonType || "transparent";
+      customActionTitleRef.current = data.customActionTitle || null;
+      customActionParagraphRef.current = data.customActionParagraph || null;
+      onUnlockRef.current = data.onUnlock;
+      requestTypeRef.current = data.requestType;
+
+      // Set UI state
+      setIsBiometryAvailable(available);
+      setIsBiometryEnrolled(fingerprint);
+      setBiometricUnlock(fingerprint);
+      setWrongPassword(false);
+      setPasswordsDontMatch(false);
+      setDeleteAll(false);
+      setLoading(false);
+
+      // Auto-unlock with fingerprint if applicable
+      const canAutoUnlock =
+        fingerprint &&
+        data.requestType !== VaultRequestType.EnableFingerprint &&
+        data.requestType !== VaultRequestType.RevokeFingerprint &&
+        data.requestType !== VaultRequestType.ChangePassword &&
+        data.requestType !== VaultRequestType.ClearVault &&
+        data.requestType !== VaultRequestType.DeleteVault &&
+        data.requestType !== VaultRequestType.CustomAction &&
+        data.requestType !== VaultRequestType.PermanentUnlock;
+
+      if (canAutoUnlock) {
+        await onPressFingerprintAuth(data.title, data.description);
+      } else {
+        setVisible(true);
+      }
+    },
+    [onPressFingerprintAuth]
+  );
 
   useEffect(() => {
     eSubscribeEvent(eOpenVaultDialog, open);

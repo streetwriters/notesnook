@@ -196,7 +196,7 @@ export const Editor = ({
         }
       };
     }
-  }, []);
+  }, [editor.ref, editorRef]);
 
   return (
     <View

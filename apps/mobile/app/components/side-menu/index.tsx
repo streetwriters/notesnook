@@ -79,6 +79,7 @@ type SimpleTabViewProps = {
 const createSceneMap = (
   scenes: Record<string, React.ComponentType<any>>
 ): ((props: { route: SimpleRoute }) => React.ReactNode) => {
+  // eslint-disable-next-line react/display-name
   return ({ route }: { route: SimpleRoute }) => {
     const SceneComponent = scenes[route.key];
     if (!SceneComponent) return null;
@@ -136,8 +137,8 @@ const SimpleTabView = ({
             {loadedKeysRef.current.has(route.key)
               ? getSceneForRoute(route)
               : navigationState.index === routeIndex
-              ? getSceneForRoute(route)
-              : null}
+                ? getSceneForRoute(route)
+                : null}
           </View>
         ))}
       </View>
@@ -435,9 +436,8 @@ const TabBar = (props: SimpleTabBarProps) => {
                       color={colors.primary.icon}
                       onPress={async () => {
                         if (props.navigationState.index === 1) {
-                          const notebooksFeature = await isFeatureAvailable(
-                            "notebooks"
-                          );
+                          const notebooksFeature =
+                            await isFeatureAvailable("notebooks");
                           if (!notebooksFeature.isAllowed) {
                             PaywallSheet.present(notebooksFeature);
                             return;

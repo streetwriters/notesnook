@@ -46,8 +46,10 @@ import { RouteParams, SettingSection } from "./types";
 
 const _SectionItem = ({ item }: { item: SettingSection }) => {
   const { colors } = useThemeColors();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const isFeatureAvailable = item.featureId
-    ? useIsFeatureAvailable(item.featureId)
+    ? // eslint-disable-next-line react-hooks/rules-of-hooks
+      useIsFeatureAvailable(item.featureId)
     : ({
         isAllowed: true
       } as FeatureResult);

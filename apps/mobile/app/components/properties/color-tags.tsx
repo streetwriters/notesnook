@@ -132,7 +132,7 @@ export const ColorTags = ({ item }: { item: Note }) => {
     }
     useSettingStore.getState().setSheetKeyboardHandler(false);
     setVisible(true);
-  }, []);
+  }, [colorFeature]);
 
   return (
     <>

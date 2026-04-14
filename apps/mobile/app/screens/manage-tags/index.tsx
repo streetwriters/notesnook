@@ -83,7 +83,10 @@ const useTagItemSelection = createItemSelectionStore(true);
 
 const ManageTags = (props: NavigationProps<"ManageTags">) => {
   const { colors } = useThemeColors();
-  const ids = props.route.params.ids || [];
+  const ids = React.useMemo(
+    () => props.route.params.ids || [],
+    [props.route.params.ids]
+  );
   const [tags, setTags] = useState<Tag[]>();
   const [query, setQuery] = useState<string>();
   const inputRef = useRef<TextInput>(null);
@@ -124,7 +127,7 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
       tags.splice(0, 0, ...noteTags);
       setTags(tags);
     },
-    []
+    [ids]
   );
 
   const refreshTags = useCallback(() => {
@@ -138,7 +141,7 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
         .sorted(db.settings.getGroupOptions("tags"))
         .then(sortAndSetTags);
     }
-  }, [query]);
+  }, [query, sortAndSetTags]);
 
   useEffect(() => {
     refreshTags();

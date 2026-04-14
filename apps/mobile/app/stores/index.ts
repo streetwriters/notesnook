@@ -37,7 +37,7 @@ import { useUserStore } from "./use-user-store";
 
 async function syncShortcuts(result: ShortcutInfo[]) {
   try {
-    for (let shortcut of result) {
+    for (const shortcut of result) {
       switch (shortcut.type) {
         case "note":
           {

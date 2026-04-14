@@ -112,8 +112,8 @@ export async function writeEncryptedBase64(
 async function deleteLocalFile(filename: string) {
   try {
     await createCacheDir();
-    let path = cacheDir + `/${filename}`;
-    let exists = await RNFetchBlob.fs.exists(path);
+    const path = cacheDir + `/${filename}`;
+    const exists = await RNFetchBlob.fs.exists(path);
     if (Platform.OS === "ios" && !exists) {
       const iosAppGroup =
         Platform.OS === "ios"
@@ -309,7 +309,9 @@ export async function deleteDCacheFiles() {
         });
       }
     }
-  } catch (e) {}
+  } catch (e) {
+    /** Empty */
+  }
 }
 
 export async function getCachePathForFile(filename: string) {

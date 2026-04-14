@@ -135,7 +135,7 @@ export const useNoteLocked = (noteId: string | undefined) => {
       //@ts-ignore
       !globalThis["IS_SHARE_EXTENSION"]
     ) {
-      let unsub = useSettingStore.subscribe((state) => {
+      const unsub = useSettingStore.subscribe((state) => {
         if (!state.isAppLoading) {
           unsub();
           db.vaults

@@ -78,7 +78,7 @@ const getLinkPreview = (url: string) => {
 };
 async function sanitizeHtml(site: string, title?: string) {
   try {
-    let html = await fetchHandle.current?.processUrl(site);
+    const html = await fetchHandle.current?.processUrl(site);
     return (
       html +
       "<hr/>" +
@@ -112,7 +112,7 @@ type DefaultNote = {
   };
 };
 
-let defaultNote: DefaultNote = {
+const defaultNote: DefaultNote = {
   title: "",
   id: undefined,
   content: {
@@ -174,7 +174,8 @@ const ShareView = () => {
   const [compress, setCompress] = useState(true);
   globalThis["IS_SHARE_EXTENSION"] = true;
   const onKeyboardDidShow = (event: KeyboardEvent) => {
-    let height = Dimensions.get("screen").height - event.endCoordinates.screenY;
+    const height =
+      Dimensions.get("screen").height - event.endCoordinates.screenY;
     if (height < 100) {
       setKeyboardHeight(0);
       keyboardHeightRef.current = 0;
@@ -190,11 +191,11 @@ const ShareView = () => {
   };
 
   useEffect(() => {
-    let keyboardDidShow = Keyboard.addListener(
+    const keyboardDidShow = Keyboard.addListener(
       "keyboardDidShow",
       onKeyboardDidShow
     );
-    let keyboardDidHide = Keyboard.addListener(
+    const keyboardDidHide = Keyboard.addListener(
       "keyboardDidHide",
       onKeyboardDidHide
     );
@@ -211,10 +212,10 @@ const ShareView = () => {
   }, [fullQualityImages]);
 
   const showLinkPreview = async (note: DefaultNote, link: string) => {
-    let _note = note;
+    const _note = note;
     _note.content.data = makeHtmlFromUrl(link);
     try {
-      let preview = await getLinkPreview(link);
+      const preview = await getLinkPreview(link);
       _note.title = preview.title;
     } catch (e) {
       console.log(e);
@@ -260,7 +261,7 @@ const ShareView = () => {
         }
 
         let note = { ...defaultNote };
-        for (let item of data) {
+        for (const item of data) {
           if (item.type === "text") {
             setRawData(item);
             if (isURL(item.value)) {
@@ -357,7 +358,7 @@ const ShareView = () => {
         return;
       }
 
-      let rawContent = note.contentId
+      const rawContent = note.contentId
         ? await db.content.get(note.contentId)
         : null;
       noteData = {
@@ -406,7 +407,7 @@ const ShareView = () => {
       if (value === 2) {
         setLoadingPage(true);
         setTimeout(async () => {
-          let html = await sanitizeHtml(rawData?.value || "", note.title);
+          const html = await sanitizeHtml(rawData?.value || "", note.title);
           noteContent.current = html || "";
           setLoadingPage(false);
           onLoad();
@@ -417,11 +418,11 @@ const ShareView = () => {
         }, 300);
       } else {
         setLoadingPage(false);
-        let html = !rawData.value
+        const html = !rawData.value
           ? ""
           : isURL(rawData?.value)
-          ? makeHtmlFromUrl(rawData?.value)
-          : makeHtmlFromPlainText(rawData?.value);
+            ? makeHtmlFromUrl(rawData?.value)
+            : makeHtmlFromPlainText(rawData?.value);
         setNote((note) => {
           note.content.data = html;
           noteContent.current = html;

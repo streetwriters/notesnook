@@ -32,7 +32,6 @@ import {
 import Config from "react-native-config";
 import * as RNIap from "react-native-iap";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { WebView } from "react-native-webview";
 import { db } from "../../../common/database";
 import usePricingPlans from "../../../hooks/use-pricing-plans";
 import { ToastManager } from "../../../services/event-manager";
@@ -369,26 +368,28 @@ const ProductItem = (props: {
         (product as Plan)?.id);
 
   useEffect(() => {
-    props.pricingPlans
-      ?.getRegionalDiscount(
-        props.pricingPlans.currentPlan?.id as string,
-        props.pricingPlans.isGithubRelease
-          ? ((product as Plan)?.period as string)
-          : props.productId
-      )
-      .then((value) => {
-        if (
-          value &&
-          value.sku?.startsWith(
-            (props.pricingPlans.selectedProduct as RNIap.Subscription)
-              ?.productId
-          )
-        ) {
-          props.pricingPlans.selectProduct(value?.sku as string);
-        }
-        setRegionaDiscount(value);
-      });
-  }, []);
+    if (product) {
+      props.pricingPlans
+        ?.getRegionalDiscount(
+          props.pricingPlans.currentPlan?.id as string,
+          props.pricingPlans.isGithubRelease
+            ? ((product as Plan)?.period as string)
+            : props.productId
+        )
+        .then((value) => {
+          if (
+            value &&
+            value.sku?.startsWith(
+              (props.pricingPlans.selectedProduct as RNIap.Subscription)
+                ?.productId
+            )
+          ) {
+            props.pricingPlans.selectProduct(value?.sku as string);
+          }
+          setRegionaDiscount(value);
+        });
+    }
+  }, [product, props.pricingPlans, props.productId]);
 
   const discountValue =
     (isAnnual && !isGithubRelease) ||

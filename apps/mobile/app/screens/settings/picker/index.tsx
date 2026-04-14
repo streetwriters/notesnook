@@ -25,12 +25,10 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { Dialog } from "../../../components/dialog";
 import { Pressable } from "../../../components/ui/pressable";
 import Paragraph from "../../../components/ui/typography/paragraph";
-import PremiumService from "../../../services/premium";
 import { getColorLinearShade } from "../../../utils/colors";
-import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
-import { sleep } from "../../../utils/time";
-import { verifyUser } from "../functions";
+import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
 import { DefaultAppStyles } from "../../../utils/styles";
+import { verifyUser } from "../functions";
 
 interface PickerOptions<T> {
   getValue: () => T;

@@ -352,7 +352,10 @@ async function checkForShareExtensionLaunchedInBackground() {
       if (note) setTimeout(() => eSendEvent("loadingNote", note), 1);
       MMKV.removeItem("shareExtensionOpened");
     }
-  } catch (e) {}
+  } catch (e) {
+    /**
+    empty */
+  }
 }
 
 const onSuccessfulSubscription = async (

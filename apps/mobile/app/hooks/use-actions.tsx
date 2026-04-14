@@ -33,7 +33,7 @@ import { useThemeColors } from "@notesnook/theme";
 import { DisplayedNotification } from "@notifee/react-native";
 import Clipboard from "@react-native-clipboard/clipboard";
 import React, { useEffect, useRef, useState } from "react";
-import { InteractionManager, Platform, View } from "react-native";
+import { InteractionManager, Platform } from "react-native";
 import Share from "react-native-share";
 import { DatabaseLogger, db } from "../common/database";
 import { AttachmentDialog } from "../components/attachments";
@@ -72,8 +72,8 @@ import { useUserStore } from "../stores/use-user-store";
 import { eCloseSheet, eUpdateNoteInEditor } from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { convertNoteToText } from "../utils/note-to-text";
-import { sleep } from "../utils/time";
 import { NotesnookModule } from "../utils/notesnook-module";
+import { sleep } from "../utils/time";
 
 import DatePickerComponent from "../components/date-picker";
 
@@ -196,7 +196,7 @@ export const useActions = ({
     "expiringNotes"
   ]);
   const [item, setItem] = useState(propItem);
-  const { colors, isDark } = useThemeColors();
+  const { colors } = useThemeColors();
   const setMenuPins = useMenuStore((state) => state.setMenuPins);
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(
     db.shortcuts.exists(item.id)
@@ -1286,7 +1286,10 @@ export const useActions = ({
             (item as Note).headline || (item as Notebook).description || "",
             (item as Color).colorCode
           );
-        } catch (e) {}
+        } catch (e) {
+          /**
+          empty */
+        }
       }
     });
   }

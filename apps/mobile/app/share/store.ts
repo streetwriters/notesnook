@@ -43,7 +43,7 @@ const StorageKeys = {
   appSettings: "appSettings"
 };
 
-let appSettingsJson = MMKV.getString(StorageKeys.appSettings);
+const appSettingsJson = MMKV.getString(StorageKeys.appSettings);
 let appSettings: SettingStore["settings"] | null = null;
 if (appSettingsJson) {
   appSettings = JSON.parse(appSettingsJson) as SettingStore["settings"];
@@ -86,9 +86,9 @@ export const useShareStore = create<ShareStore>((set) => ({
     set({ appendNote: noteId });
   },
   restore: () => {
-    let appendNote = MMKV.getString(StorageKeys.appendNote);
-    let selectedNotebooks = MMKV.getString(StorageKeys.selectedNotebooks);
-    let selectedTags = MMKV.getString(StorageKeys.selectedTag);
+    const appendNote = MMKV.getString(StorageKeys.appendNote);
+    const selectedNotebooks = MMKV.getString(StorageKeys.selectedNotebooks);
+    const selectedTags = MMKV.getString(StorageKeys.selectedTag);
     set({
       appendNote: appendNote,
       selectedNotebooks: selectedNotebooks ? JSON.parse(selectedNotebooks) : [],

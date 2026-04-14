@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { hosts, Monograph, Note } from "@notesnook/core";
+import { hosts, Note } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import Clipboard from "@react-native-clipboard/clipboard";
@@ -28,7 +28,6 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 //@ts-ignore
 import ToggleSwitch from "toggle-switch-react-native";
 import { db } from "../../../common/database";
@@ -50,8 +49,8 @@ import Input from "../../ui/input";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { useAsync } from "react-async-hook";
-import { isFeatureAvailable, useIsFeatureAvailable } from "@notesnook/common";
 import { eMenuItemUpdate } from "../../../utils/events";
+import { useIsFeatureAvailable } from "@notesnook/common";
 
 async function fetchMonographData(noteId: string) {
   const monographId = db.monographs.monograph(noteId);

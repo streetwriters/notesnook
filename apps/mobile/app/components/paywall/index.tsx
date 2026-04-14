@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { getFeaturesTable } from "@notesnook/common";
 import {
-  EV,
   EVENTS,
   Plan,
   SKUResponse,
@@ -119,7 +118,7 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
       }
       setStep(Steps.buy);
     }
-  }, [routeParams.state]);
+  }, [pricingPlans, routeParams.state]);
 
   useEffect(() => {
     let listener: NativeEventSubscription;
@@ -137,7 +136,7 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
     return () => {
       listener?.remove();
     };
-  }, [isFocused, step]);
+  }, [isFocused, routeParams.context, step]);
 
   useEffect(() => {
     const sub = db.eventManager.subscribe(
@@ -154,7 +153,7 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
     return () => {
       sub?.unsubscribe();
     };
-  }, []);
+  }, [routeParams.context]);
 
   const is5YearPlanSelected = (
     isGithubRelease
@@ -971,7 +970,7 @@ const PricingPlanCard = ({
       .then((value) => {
         setRegionaDiscount(value);
       });
-  }, [annualBilling]);
+  }, [WebPlan?.period, annualBilling, plan.id, pricingPlans]);
 
   useEffect(() => {
     if (!annualBilling) {
@@ -1008,8 +1007,8 @@ const PricingPlanCard = ({
                   : "monthly"
               }`
             : pricingPlans.isGithubRelease
-            ? (WebPlan?.period as string)
-            : (product?.productId as string)
+              ? (WebPlan?.period as string)
+              : (product?.productId as string)
         );
         setStep(Steps.buy);
       }}

@@ -63,22 +63,25 @@ const HistoryItem = ({
     }${_end_time}`;
   };
 
-  const preview = useCallback(async (item: HistorySession) => {
-    const content = await db.noteHistory.content(item.id);
-    presentSheet({
-      component: (
-        <NotePreview
-          session={{
-            ...item,
-            session: getDate(item.dateCreated, item.dateModified)
-          }}
-          content={content}
-          note={note}
-        />
-      ),
-      context: "note_history"
-    });
-  }, []);
+  const preview = useCallback(
+    async (item: HistorySession) => {
+      const content = await db.noteHistory.content(item.id);
+      presentSheet({
+        component: (
+          <NotePreview
+            session={{
+              ...item,
+              session: getDate(item.dateCreated, item.dateModified)
+            }}
+            content={content}
+            note={note}
+          />
+        ),
+        context: "note_history"
+      });
+    },
+    [note]
+  );
 
   return (
     <Pressable
@@ -138,7 +141,7 @@ export default function NoteHistory({
     ({ index }: { index: number }) => (
       <HistoryItem index={index} items={history} note={note} />
     ),
-    [history]
+    [history, note]
   );
 
   return (

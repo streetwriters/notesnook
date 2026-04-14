@@ -33,7 +33,7 @@ let subs: RNIap.Subscription[] = [];
 let products: RNIap.Product[] = [];
 
 async function setPremiumStatus() {
-  let userstore = useUserStore.getState();
+  const userstore = useUserStore.getState();
   try {
     const user = await db.user.getUser();
     if (!user) {
@@ -99,7 +99,7 @@ const showVerifyEmailDialog = () => {
     paragraph: strings.emailConfirmationLinkSent(),
     action: async () => {
       try {
-        let lastVerificationEmailTime =
+        const lastVerificationEmailTime =
           SettingsService.get().lastVerificationEmailTime;
         if (
           lastVerificationEmailTime &&
@@ -148,7 +148,7 @@ const subscriptions = {
    */
   get: () => {
     if (Platform.OS === "android") return;
-    let _subscriptions = MMKV.getString("subscriptionsIOS");
+    const _subscriptions = MMKV.getString("subscriptionsIOS");
     if (!_subscriptions) return [];
     return JSON.parse(_subscriptions) as (
       | RNIap.SubscriptionPurchase
@@ -167,7 +167,7 @@ const subscriptions = {
     const _subscriptions = subscriptions.get();
     if (!_subscriptions) return;
 
-    let index = _subscriptions.findIndex(
+    const index = _subscriptions.findIndex(
       (s) => s.transactionId === subscription.transactionId
     );
     if (index === -1) {
@@ -182,7 +182,7 @@ const subscriptions = {
     const _subscriptions = subscriptions.get();
     if (!_subscriptions) return;
 
-    let index = _subscriptions.findIndex(
+    const index = _subscriptions.findIndex(
       (s) => s.transactionId === transactionId
     );
     if (index !== -1) {
@@ -201,9 +201,9 @@ const subscriptions = {
 
     if (subscription.transactionReceipt) {
       if (Platform.OS === "ios") {
-        let user = await db.user.getUser();
+        const user = await db.user.getUser();
         if (!user) return;
-        let requestData = {
+        const requestData = {
           method: "POST",
           body: JSON.stringify({
             receipt_data: subscription.transactionReceipt,
@@ -216,14 +216,14 @@ const subscriptions = {
         };
 
         try {
-          let result = await fetch(
+          const result = await fetch(
             __DEV__
               ? "https://payments.streetwriters.co/apple/verify"
               : "https://payments.streetwriters.co/apple/verify",
             requestData
           );
 
-          let text = await result.text();
+          const text = await result.text();
 
           if (!result.ok) {
             if (text === "Receipt already expired.") {
@@ -243,7 +243,7 @@ const subscriptions = {
     _subscription?: RNIap.SubscriptionPurchase | RNIap.ProductPurchase
   ) => {
     if (Platform.OS === "android") return;
-    let _subscriptions = subscriptions.get();
+    const _subscriptions = subscriptions.get();
     if (!_subscriptions) return;
     let subscription = null;
     if (_subscription) {

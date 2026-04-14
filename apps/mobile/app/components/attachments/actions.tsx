@@ -46,7 +46,6 @@ import {
   eOnLoadNote
 } from "../../utils/events";
 import { AppFontSize } from "../../utils/size";
-import { sleep } from "../../utils/time";
 import { Dialog } from "../dialog";
 import { presentDialog } from "../dialog/functions";
 import { openNote } from "../list-items/note/wrapper";

@@ -36,7 +36,7 @@ export const Announcement = () => {
     state.announcements,
     state.remove
   ]);
-  let announcement = announcements.length > 0 ? announcements[0] : null;
+  const announcement = announcements.length > 0 ? announcements[0] : null;
   const selectionMode = useSelectionStore((state) => state.selectionMode);
 
   return !announcement || selectionMode ? null : (
