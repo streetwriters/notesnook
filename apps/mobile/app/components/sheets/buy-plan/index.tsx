@@ -243,8 +243,8 @@ export const BuyPlan = (props: {
             is5YearPlanSelected
               ? strings.purchase()
               : pricingPlans?.userCanRequestTrial
-              ? strings.subscribeAndStartTrial()
-              : strings.subscribe()
+                ? strings.subscribeAndStartTrial()
+                : strings.subscribe()
           }
           onPress={async () => {
             if (isGithubRelease) {
@@ -380,6 +380,20 @@ const ProductItem = (props: {
       });
   }, []);
 
+  const discountValue =
+    (isAnnual && !isGithubRelease) ||
+    (isGithubRelease && (product as Plan)?.discount?.amount)
+      ? regionalDiscount
+        ? regionalDiscount.discount
+        : isGithubRelease
+          ? (product as Plan).discount?.amount
+          : props.pricingPlans.compareProductPrice(
+              props.pricingPlans.currentPlan?.id as string,
+              `notesnook.${props.pricingPlans.currentPlan?.id}.yearly`,
+              `notesnook.${props.pricingPlans.currentPlan?.id}.monthly`
+            )
+      : undefined;
+
   return (
     <TouchableOpacity
       style={{
@@ -420,12 +434,11 @@ const ProductItem = (props: {
             {isAnnual
               ? strings.yearly()
               : is5YearProduct
-              ? strings.fiveYearPlan()
-              : strings.monthly()}
+                ? strings.fiveYearPlan()
+                : strings.monthly()}
           </Heading>
 
-          {(isAnnual && !isGithubRelease) ||
-          (isGithubRelease && (product as Plan)?.discount?.amount) ? (
+          {discountValue ? (
             <View
               style={{
                 backgroundColor: colors.static.red,
@@ -436,18 +449,7 @@ const ProductItem = (props: {
               }}
             >
               <Heading color={colors.static.white} size={AppFontSize.xs}>
-                {strings.bestValue()} -{" "}
-                {strings.percentOff(
-                  (regionalDiscount
-                    ? regionalDiscount.discount
-                    : isGithubRelease
-                    ? (product as Plan).discount?.amount
-                    : props.pricingPlans.compareProductPrice(
-                        props.pricingPlans.currentPlan?.id as string,
-                        `notesnook.${props.pricingPlans.currentPlan?.id}.yearly`,
-                        `notesnook.${props.pricingPlans.currentPlan?.id}.monthly`
-                      )) as string
-                )}
+                {strings.bestValue()} - {strings.percentOff(`${discountValue}`)}
               </Heading>
             </View>
           ) : null}
