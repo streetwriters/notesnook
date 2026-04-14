@@ -51,11 +51,13 @@ export const VaultSettings: SettingsGroup[] = [
       {
         key: "lock-vault-after",
         title: strings.lockVaultAfter(),
-        description:
-          strings.lockVaultAfterDesc(),
+        description: strings.lockVaultAfterDesc(),
         isHidden: () => !useAppStore.getState().isVaultCreated,
-        onStateChange: (listener) =>
-          useAppStore.subscribe((s) => s.vaultLockAfter, listener),
+        onStateChange: (listener) => {
+          const unsub1 = useAppStore.subscribe((s) => s.vaultLockAfter, listener);
+          const unsub2 = useAppStore.subscribe((s) => s.isVaultCreated, listener);
+          return () => { unsub1(); unsub2(); };
+        },
         components: [
           {
             type: "dropdown",
