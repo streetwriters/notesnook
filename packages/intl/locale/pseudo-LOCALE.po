@@ -7002,7 +7002,7 @@ msgstr ""
 msgid "v{version} available"
 msgstr ""
 
-#: src/strings.ts:2627
+#: src/strings.ts:2644
 msgid "Value must be between {min} and {max}"
 msgstr ""
 

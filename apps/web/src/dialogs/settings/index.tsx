@@ -44,7 +44,7 @@ import {
 } from "../../components/icons";
 import NavigationItem from "../../components/navigation-menu/navigation-item";
 import { FlexScrollContainer } from "../../components/scroll-container";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   DropdownSettingComponent,
   SectionGroup,
@@ -673,18 +673,12 @@ function NumberInput({
   onChange
 }: NumberInputProps) {
   const [isInputValid, setIsInputValid] = useState(true);
-
-  function _onChange(value: number) {
-    const isValid = !Number.isNaN(value) && value >= min && value <= max;
-    setIsInputValid(isValid);
-    value =
-      Number.isNaN(value) || value < min ? min : value > max ? max : value;
-    onChange(value);
-  }
+  const inputRef = useRef<HTMLInputElement>(null);
 
   return (
     <Flex sx={{ flexDirection: "column", alignItems: "flex-end" }}>
       <Input
+        ref={inputRef}
         type={"number"}
         min={min}
         max={max}
@@ -699,11 +693,17 @@ function NumberInput({
         }}
         onChange={debounce((e) => {
           const value = e.target.valueAsNumber;
-          _onChange(value);
+          const isValid = !Number.isNaN(value) && value >= min && value <= max;
+          setIsInputValid(isValid);
+          if (isValid) onChange(value);
         }, 500)}
         onBlur={(e) => {
-          const value = e.target.valueAsNumber;
-          _onChange(value);
+          const raw = e.target.valueAsNumber;
+          const clamped =
+            Number.isNaN(raw) || raw < min ? min : raw > max ? max : raw;
+          if (inputRef.current) inputRef.current.value = String(clamped);
+          setIsInputValid(true);
+          onChange(clamped);
         }}
       />
       {!isInputValid && (
