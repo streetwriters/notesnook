@@ -6514,6 +6514,10 @@ msgstr ""
 msgid "This error usually means the search index is corrupted."
 msgstr ""
 
+#: src/strings.ts:2643
+msgid "This feature is not available on this plan."
+msgstr ""
+
 #: src/strings.ts:1934
 msgid "This image cannot be previewed"
 msgstr ""

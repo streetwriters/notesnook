@@ -6555,6 +6555,10 @@ msgstr "This error usually means the database file is either corrupt or it could
 msgid "This error usually means the search index is corrupted."
 msgstr "This error usually means the search index is corrupted."
 
+#: src/strings.ts:2643
+msgid "This feature is not available on this plan."
+msgstr "This feature is not available on this plan."
+
 #: src/strings.ts:1934
 msgid "This image cannot be previewed"
 msgstr "This image cannot be previewed"

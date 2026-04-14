@@ -2639,5 +2639,6 @@ Use this if changes from other devices are not appearing on this device. This wi
   confirmationEmailSent: () => t`Confirmation email sent`,
   back: () => t`Back`,
   invalidRecoveryKey: () =>
-    t`Invalid recovery key. Make sure to input your account recovery key, not a 2FA recovery code.`
+    t`Invalid recovery key. Make sure to input your account recovery key, not a 2FA recovery code.`,
+  featureNotAvailable: () => t`This feature is not available on this plan.`
 };
