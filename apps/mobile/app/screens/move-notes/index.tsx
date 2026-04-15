@@ -39,6 +39,7 @@ import { createItemSelectionStore } from "../../stores/item-selection-store";
 import { updateNotebook } from "../../utils/notebooks";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
+import { sendItemUpdateEvent } from "../../services/event-manager";
 const useItemSelectionStore = createItemSelectionStore(true);
 
 export const MoveNotes = (props: NavigationProps<"MoveNotes">) => {
@@ -198,6 +199,7 @@ export const MoveNotes = (props: NavigationProps<"MoveNotes">) => {
               );
 
               updateNotebook(currentNotebook.id);
+              sendItemUpdateEvent(currentNotebook.id, "notebook");
               Navigation.queueRoutesForUpdate();
               Navigation.goBack();
             }}
@@ -281,8 +283,8 @@ const SelectableNoteItem = React.memo(
                 selected
                   ? colors.selected.icon
                   : exists && !selected
-                  ? colors.static.red
-                  : colors.primary.icon
+                    ? colors.static.red
+                    : colors.primary.icon
               }
             />
           </>

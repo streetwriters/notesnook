@@ -33,7 +33,10 @@ import { Pressable } from "../../components/ui/pressable";
 import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
-import { sendItemUpdateEvent, ToastManager } from "../../services/event-manager";
+import {
+  sendItemUpdateEvent,
+  ToastManager
+} from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import {
   ItemSelection,
@@ -199,6 +202,7 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
       }
 
       useRelationStore.getState().update();
+      sendItemUpdateEvent(id, "tag");
       useTagStore.getState().refresh();
       setQuery(undefined);
     } catch (e) {
@@ -242,7 +246,7 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
           console.error(e);
         }
       }
-      sendItemUpdateEvent(id, 'tag');
+      sendItemUpdateEvent(id, "tag");
       useTagStore.getState().refresh();
       useRelationStore.getState().update();
       refreshTags();
@@ -418,15 +422,15 @@ const TagItem = ({
             selection === "selected"
               ? "check-circle-outline"
               : selection === "intermediate"
-              ? "minus-circle-outline"
-              : "checkbox-blank-circle-outline"
+                ? "minus-circle-outline"
+                : "checkbox-blank-circle-outline"
           }
           name={
             selection === "selected"
               ? "check-circle-outline"
               : selection === "intermediate"
-              ? "minus-circle-outline"
-              : "checkbox-blank-circle-outline"
+                ? "minus-circle-outline"
+                : "checkbox-blank-circle-outline"
           }
         />
       )}

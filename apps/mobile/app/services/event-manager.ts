@@ -17,7 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { EventHandler, EventManager, ItemType, Note, NoteContent } from "@notesnook/core";
+import {
+  EventHandler,
+  EventManager,
+  ItemType,
+  Note,
+  NoteContent
+} from "@notesnook/core";
 import Clipboard from "@react-native-clipboard/clipboard";
 import { RefObject } from "react";
 import { ActionSheetRef } from "react-native-actions-sheet";
@@ -88,8 +94,12 @@ export function sendItemUpdateEvent(id: string, type: ItemType) {
   eSendEvent(`${type}:${id}`);
 }
 
-export function subscribeToItemUpdate(id: string, type: ItemType, callback: EventHandler) {
-  return eSubscribeEvent(`${type}:id`, callback)
+export function subscribeToItemUpdate(
+  id: string,
+  type: ItemType,
+  callback: EventHandler
+) {
+  return eSubscribeEvent(`${type}:${id}`, callback);
 }
 
 export const eUnSubscribeEvent = <T = unknown>(
