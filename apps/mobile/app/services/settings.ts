@@ -25,7 +25,7 @@ import {
   useSettingStore
 } from "../stores/use-setting-store";
 import { NotesnookModule } from "../utils/notesnook-module";
-import { scale, updateSize } from "../utils/size";
+import { scale } from "../utils/size";
 import { useUserStore } from "../stores/use-user-store";
 import ScreenGuardModule from "react-native-screenguard";
 ScreenGuardModule.initSettings();
@@ -120,7 +120,6 @@ function init() {
     scale.fontScale = settings.fontScale;
   }
 
-  updateSize();
   useSettingStore.getState().setSettings({ ...settings });
   migrateAppLock();
 }
