@@ -21,7 +21,11 @@ import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { Text, TextProps } from "react-native";
 import { AppFontSize } from "../../../utils/size";
-import { FontFamily, FontSizes } from "../../../common/design/font";
+import {
+  FontFamily,
+  FontSizes,
+  getLineHeight
+} from "../../../common/design/font";
 
 interface ParagraphProps extends TextProps {
   color?: string;
@@ -31,6 +35,7 @@ interface ParagraphProps extends TextProps {
   size?: number;
   fontSize?: keyof typeof FontSizes;
   fontFamily?: keyof typeof FontFamily;
+  lineHeight?: "100%" | "150%";
 }
 const Paragraph = ({
   color,
@@ -38,6 +43,7 @@ const Paragraph = ({
   style,
   fontSize,
   fontFamily,
+  lineHeight = "100%",
   ...restProps
 }: ParagraphProps) => {
   const { colors } = useThemeColors();
@@ -50,7 +56,11 @@ const Paragraph = ({
         {
           fontSize: fontSize ? FontSizes[fontSize] : size || AppFontSize.xl,
           color: color || colors.primary.paragraph,
-          fontFamily: fontFamily ? FontFamily[fontFamily] : FontFamily.REGULAR
+          fontFamily: fontFamily ? FontFamily[fontFamily] : FontFamily.REGULAR,
+          lineHeight:
+            fontSize && lineHeight
+              ? getLineHeight(fontSize, lineHeight === "100%" ? 1 : 2)
+              : undefined
         },
         style
       ]}
