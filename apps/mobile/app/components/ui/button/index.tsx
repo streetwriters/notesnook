@@ -64,7 +64,7 @@ export const Button = ({
   loading = false,
   title = null,
   icon,
-  fontSize = AppFontSize.sm,
+  fontSize = AppFontSize.md,
   type = "transparent",
   iconSize = AppFontSize.md,
   style = {},
@@ -75,7 +75,7 @@ export const Button = ({
   textStyle,
   iconPosition = "left",
   buttonType,
-  bold,
+  bold = true,
   iconColor,
   fwdRef,
   proTag,
@@ -155,8 +155,14 @@ export const Button = ({
           allowFontScaling={allowFontScaling}
           style={[
             {
-              marginLeft: icon || (loading && iconPosition === "left") ? 5 : 0,
-              marginRight: icon || (loading && iconPosition === "right") ? 5 : 0
+              marginLeft:
+                icon || (loading && iconPosition === "left")
+                  ? DefaultAppStyles.GAP_SMALL
+                  : 0,
+              marginRight:
+                icon || (loading && iconPosition === "right")
+                  ? DefaultAppStyles.GAP_SMALL
+                  : 0
             },
             textStyle
           ]}
