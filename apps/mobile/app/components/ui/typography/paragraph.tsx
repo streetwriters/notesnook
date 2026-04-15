@@ -21,14 +21,23 @@ import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { Text, TextProps } from "react-native";
 import { AppFontSize } from "../../../utils/size";
+import { FontFamily, FontSizes } from "../../../common/design/font";
+
 interface ParagraphProps extends TextProps {
   color?: string;
+  /**
+   * @deprecated Use fontSize prop instead
+   */
   size?: number;
+  fontSize?: keyof typeof FontSizes;
+  fontFamily?: keyof typeof FontFamily;
 }
 const Paragraph = ({
   color,
   size = AppFontSize.sm,
   style,
+  fontSize,
+  fontFamily,
   ...restProps
 }: ParagraphProps) => {
   const { colors } = useThemeColors();
@@ -36,12 +45,12 @@ const Paragraph = ({
   return (
     <Text
       {...restProps}
+      allowFontScaling={true}
       style={[
         {
-          fontSize: size || AppFontSize.sm,
+          fontSize: fontSize ? FontSizes[fontSize] : size || AppFontSize.xl,
           color: color || colors.primary.paragraph,
-          fontWeight: "400",
-          fontFamily: "Inter-Regular"
+          fontFamily: fontFamily ? FontFamily[fontFamily] : FontFamily.REGULAR
         },
         style
       ]}
