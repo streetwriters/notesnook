@@ -816,17 +816,31 @@ $day$: Current day (eg. Monday)`,
   introData: [
     {
       headings: [
-        () => t`Open source.`,
-        () => t`End to end encrypted.`,
-        () => t`Private.`
+        {
+          bold: false,
+          value: () => t`Open source.`
+        },
+        {
+          bold: true,
+          value: () => t`End-to-end encrypted.`
+        },
+        {
+          bold: false,
+          value: () => t`Private.`
+        }
       ],
       body: () => t`Write notes with freedom, no spying, no tracking.`
     },
     {
       headings: [
-        () => t`Privacy for everyone`,
-        () => t`— not just the`,
-        () => t`privileged few`
+        {
+          bold: true,
+          value: () => t`Privacy for everyone`
+        },
+        {
+          bold: false,
+          value: () => t`— not just the privileged few`
+        }
       ],
       body: () =>
         t`Your privacy matters to us, no matter who you are. In a world where everyone is trying to spy on you, Notesnook encrypts all your data before it leaves your device. With Notesnook no one can ever sell your data again.`

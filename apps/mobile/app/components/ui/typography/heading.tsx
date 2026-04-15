@@ -21,7 +21,11 @@ import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { Text, TextProps, ViewStyle } from "react-native";
 import { AppFontSize } from "../../../utils/size";
-import { FontFamily, FontSizes } from "../../../common/design/font";
+import {
+  FontFamily,
+  FontSizes,
+  getLineHeight
+} from "../../../common/design/font";
 
 interface HeadingProps extends TextProps {
   color?: string;
@@ -32,6 +36,7 @@ interface HeadingProps extends TextProps {
   extraBold?: boolean;
   fontSize?: keyof typeof FontSizes;
   fontFamily?: keyof typeof FontFamily;
+  lineHeight?: "100%" | "150%";
 }
 
 const extraBoldStyle = {
@@ -48,6 +53,7 @@ const Heading = ({
   extraBold,
   fontSize,
   fontFamily,
+  lineHeight = "100%",
   ...restProps
 }: HeadingProps) => {
   const { colors } = useThemeColors();
@@ -59,7 +65,11 @@ const Heading = ({
       style={[
         {
           fontSize: fontSize ? FontSizes[fontSize] : size || AppFontSize.xl,
-          color: color || colors.primary.heading
+          color: color || colors.primary.heading,
+          lineHeight:
+            fontSize && lineHeight
+              ? getLineHeight(fontSize, lineHeight === "100%" ? 1 : 2)
+              : undefined
         },
         fontFamily
           ? { fontFamily: FontFamily[fontFamily] }
