@@ -19,6 +19,6 @@ export const getLineHeight = (
   fontSize: keyof typeof FontSizes,
   type: 1 | 2
 ) => {
-  if (type === 1) return FontSizes[fontSize];
+  if (type === 1) return (FontSizes[fontSize] / 100) * 120;
   if (type === 2) return (FontSizes[fontSize] / 100) * 150;
 };
