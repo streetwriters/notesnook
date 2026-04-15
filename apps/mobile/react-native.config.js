@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 const isGithubRelease = false;
 const config = {
-  commands: require("@callstack/repack/commands/rspack")
+  // commands: require("@callstack/repack/commands/rspack")
 };
 
 if (!config.dependencies) config.dependencies = {};
