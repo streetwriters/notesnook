@@ -40,23 +40,8 @@ const scopes = {
   themes: "servers/themes",
   themebuilder: "apps/theme-builder"
 };
-// packages that we shouldn't run npm rebuild for
-const IGNORED_NATIVE_PACKAGES = [
-  // these get built by electron-builder automatically.
-  ...(args.scope === "desktop"
-    ? ["better-sqlite3-multiple-ciphers", "sodium-native"]
-    : []),
-  "electron",
-
-  // optional dependency of pdfjs-dist, we can ignore
-  // it because it's only needed in non-browser environments
-  "canvas",
-  // optional dependency only used on Node.js platform
-  "@azure/msal-node-runtime",
-  "react-native-quick-sqlite",
-  // not needed on mobile
-  ...(args.scope === "mobile" ? ["esbuild"] : [])
-];
+// packages that we should run npm rebuild for
+const POSTINSTALL_WHITELIST = ["esbuild", "@swc/core"];
 
 if (args.scope && !scopes[args.scope])
   throw new Error(`Scope must be one of ${Object.keys(scopes).join(", ")}`);
@@ -161,7 +146,7 @@ async function bootstrapPackage(cwd, outputs) {
   }
 
   if (await hasScript(cwd, "postinstall"))
-    postInstallCommands.push(`npm run postinstall `);
+    postInstallCommands.push(`npm run postinstall`);
 
   for (const cmd of postInstallCommands) {
     let retries = 3;
@@ -240,8 +225,8 @@ async function needsRebuild(cwd) {
         if (
           !pkg ||
           !pkg.scripts ||
-          IGNORED_NATIVE_PACKAGES.includes(pkg.name) ||
-          !scripts.some((s) => pkg.scripts[s])
+          !scripts.some((s) => pkg.scripts[s]) ||
+          !POSTINSTALL_WHITELIST.includes(pkg.name)
         )
           return;
 

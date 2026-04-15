@@ -1,6 +1,6 @@
 // Production iOS build identifiers
-IOS_CURRENT_PROJECT_VERSION = 2178
-IOS_MARKETING_VERSION = 3.3.18
+IOS_CURRENT_PROJECT_VERSION = 2179
+IOS_MARKETING_VERSION = 3.3.19
 IOS_MAIN_BUNDLE_ID = org.streetwriters.notesnook
 IOS_WIDGET_BUNDLE_ID = org.streetwriters.notesnook.notewidget
 IOS_SHARE_BUNDLE_ID = org.streetwriters.notesnook.share

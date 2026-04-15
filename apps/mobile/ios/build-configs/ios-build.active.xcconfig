@@ -1,10 +1,10 @@
-// Staging iOS build identifiers
-IOS_CURRENT_PROJECT_VERSION = 2178
-IOS_MARKETING_VERSION = 3.3.18
+// Production iOS build identifiers
+IOS_CURRENT_PROJECT_VERSION = 2179
+IOS_MARKETING_VERSION = 3.3.19
 IOS_MAIN_BUNDLE_ID = org.streetwriters.notesnook
 IOS_WIDGET_BUNDLE_ID = org.streetwriters.notesnook.notewidget
 IOS_SHARE_BUNDLE_ID = org.streetwriters.notesnook.share
 APP_DISPLAY_NAME = Notesnook
-IOS_MAIN_PROFILE = Notesnook Adhoc 2026
-IOS_WIDGET_PROFILE = Notesnook Note Widget Adhoc 2026
-IOS_SHARE_PROFILE = Notesnook Share Adhoc 2026
+IOS_MAIN_PROFILE = Notesnook 2026
+IOS_WIDGET_PROFILE = Notesnook Note Widget 2026
+IOS_SHARE_PROFILE = Notesnook Share 2026

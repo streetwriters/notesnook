@@ -611,7 +611,7 @@ export const useEditorEvents = (
             .then((data: any) => {
               console.log(
                 "Got attachment data:",
-                data,
+                !!data,
                 editorMessage.resolverId
               );
               editor.postMessage(NativeEvents.resolve, {

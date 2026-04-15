@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { HighlightedResult } from "@notesnook/core";
+import { HighlightedResult, Match as TMatch } from "@notesnook/core";
 import { Button, Flex, Text } from "@theme-ui/components";
 import React, { Fragment, useState } from "react";
 import { useEditorStore } from "../../stores/editor-store";
@@ -112,11 +112,7 @@ function SearchResult(props: SearchResultProps) {
                 }}
               >
                 {item.title.map((match) => (
-                  <Fragment key={match.id}>
-                    <span>{match.prefix}</span>
-                    <span className="match">{match.match}</span>
-                    {match.suffix ? <span>{match.suffix}</span> : null}
-                  </Fragment>
+                  <Match match={match} />
                 ))}
               </Text>
 
@@ -171,11 +167,7 @@ function SearchResult(props: SearchResultProps) {
                   }}
                 >
                   {match.map((match) => (
-                    <Fragment key={match.id}>
-                      <span>{match.prefix}</span>
-                      <span className="match">{match.match}</span>
-                      {match.suffix ? <span>{match.suffix}</span> : null}
-                    </Fragment>
+                    <Match match={match} />
                   ))}
                 </Text>
               }
@@ -192,6 +184,16 @@ function SearchResult(props: SearchResultProps) {
 }
 
 export default React.memo(SearchResult);
+
+function Match({ match }: { match: TMatch }) {
+  return (
+    <Fragment key={match.id}>
+      <span>{match.prefix}</span>
+      <span className="match">{match.match}</span>
+      {match.suffix ? <span>{match.suffix}</span> : null}
+    </Fragment>
+  );
+}
 
 async function menuItems(
   item: HighlightedResult,

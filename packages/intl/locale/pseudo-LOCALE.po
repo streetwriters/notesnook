@@ -1155,6 +1155,10 @@ msgstr ""
 
 #: src/strings.ts:2157
 msgid "Available on iOS & Android"
+msgstr "<<<<<<< HEAD"
+
+#: src/strings.ts:2706
+msgid "Back"
 msgstr ""
 
 #: src/strings.ts:2304
@@ -3579,6 +3583,10 @@ msgstr ""
 
 #: src/strings.ts:2701
 msgid "Invalid PGP key pair. Please check your keys and try again."
+msgstr ""
+
+#: src/strings.ts:2708
+msgid "Invalid recovery key. Make sure to input your account recovery key, not a 2FA recovery code."
 msgstr ""
 
 #: src/strings.ts:224
@@ -6717,6 +6725,10 @@ msgstr ""
 
 #: src/strings.ts:1683
 msgid "This error usually means the search index is corrupted."
+msgstr "<<<<<<< HEAD"
+
+#: src/strings.ts:2709
+msgid "This feature is not available on this plan."
 msgstr ""
 
 #: src/strings.ts:1936
@@ -7201,6 +7213,10 @@ msgstr ""
 
 #: src/strings.ts:1711
 msgid "v{version} available"
+msgstr "<<<<<<< HEAD"
+
+#: src/strings.ts:2711
+msgid "Value must be between {min} and {max}"
 msgstr ""
 
 #: src/strings.ts:1173

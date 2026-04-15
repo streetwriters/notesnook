@@ -40,7 +40,6 @@ import Animated, {
   withTiming
 } from "react-native-reanimated";
 import { useTabStore } from "../../screens/editor/tiptap/use-tab-store";
-import { getAppState } from "../../screens/editor/tiptap/utils";
 import { eSendEvent } from "../../services/event-manager";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { eClearEditor } from "../../utils/events";
@@ -84,18 +83,9 @@ export const FluidPanels = forwardRef<TabsRef, TabProps>(function FluidTabs(
   }: TabProps,
   ref
 ) {
-  const appState = useMemo(() => getAppState(), []);
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const fullscreen = useSettingStore((state) => state.fullscreen);
-  const translateX = useSharedValue(
-    widths
-      ? appState &&
-        appState?.movedAway === false &&
-        useTabStore.getState().getCurrentNoteId()
-        ? widths.sidebar + widths.list
-        : widths.sidebar
-      : 0
-  );
+  const translateX = useSharedValue(widths ? widths.sidebar : 0);
   const startX = useSharedValue(0);
   const currentTab = useSharedValue(1);
   const previousTab = useSharedValue(1);
@@ -125,10 +115,7 @@ export const FluidPanels = forwardRef<TabsRef, TabProps>(function FluidTabs(
       translateX.value = 0;
     } else {
       if (prevWidths.current?.sidebar !== widths.sidebar) {
-        translateX.value =
-          appState && appState?.movedAway === false
-            ? editorPosition
-            : widths.sidebar;
+        translateX.value = widths.sidebar;
         if (translateX.value === editorPosition) {
           onChangeTab?.({ i: 2, from: 1 });
         }
@@ -136,15 +123,7 @@ export const FluidPanels = forwardRef<TabsRef, TabProps>(function FluidTabs(
     }
     isLoaded.current = true;
     prevWidths.current = widths;
-  }, [
-    deviceMode,
-    widths,
-    fullscreen,
-    translateX,
-    editorPosition,
-    appState,
-    onChangeTab
-  ]);
+  }, [deviceMode, widths, fullscreen, translateX, editorPosition, onChangeTab]);
 
   useEffect(() => {
     const sub = BackHandler.addEventListener("hardwareBackPress", () => {

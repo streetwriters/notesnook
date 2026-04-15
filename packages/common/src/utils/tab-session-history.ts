@@ -163,13 +163,13 @@ export class TabSessionHistory {
 
   canGoBack(id: string) {
     const tabHistory = this.options.get().tabSessionHistory[id];
-    if (!tabHistory) return false;
+    if (!tabHistory || !tabHistory.backStack) return false;
     return tabHistory.backStack.length > 1;
   }
 
   canGoForward(id: string) {
     const tabHistory = this.options.get().tabSessionHistory[id];
-    if (!tabHistory) return false;
+    if (!tabHistory || !tabHistory.forwardStack) return false;
     return tabHistory.forwardStack.length >= 1;
   }
 }

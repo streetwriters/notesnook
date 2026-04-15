@@ -215,16 +215,85 @@ export function handleMouseDown(
     // cell selection to be created).
     setCellSelection($anchor, startEvent);
     startEvent.preventDefault();
-  } else if (isTouchEvent(startEvent)) {
-    const selectedCell = view.domAtPos(view.state.selection.from).node;
-    if (startDOMCell?.contains(selectedCell)) {
-      $anchor = cellUnderMouse(view, startEvent);
-      if (!$anchor) return;
-      setCellSelection($anchor, startEvent);
-    }
   } else if (!startDOMCell) {
     // Not in a cell, let the default behavior happen.
     return;
+  }
+
+  if (isTouchEvent(startEvent)) {
+    // For touch, only begin tracking cross-cell selection if the touch started
+    // inside the cell that already holds the active cursor/selection. Any other
+    // touch is a scroll or plain tap — leave it alone.
+    // Use ProseMirror cell positions rather than DOM containment so the check
+    // is robust regardless of what domAtPos returns (text node, <p>, etc.).
+    const $selectionCell = cellAround(view.state.selection.$anchor);
+    const $touchedCell = cellUnderMouse(view, startEvent);
+    if (
+      !$selectionCell ||
+      !$touchedCell ||
+      $selectionCell.pos !== $touchedCell.pos ||
+      !view.state.selection.empty
+    )
+      return;
+  }
+
+  // Auto-scroll state for touch cell selection. While the user is dragging a
+  // cell selection, normal scroll is suppressed (event.preventDefault). Instead
+  // we watch how close the finger is to the edges of the nearest scrollable
+  // ancestor and scroll that container programmatically.
+  const SCROLL_THRESHOLD = 40; // px from edge before scroll kicks in
+  const SCROLL_MAX_SPEED = 4; // px per animation frame at the very edge
+  let autoScrollRAF: number | null = null;
+  let autoScrollX = 0;
+  let autoScrollY = 0;
+  let scrollTarget: Element | null = null;
+
+  function scrollStep(): void {
+    autoScrollRAF = null;
+    if (!scrollTarget) return;
+    const rect = scrollTarget.getBoundingClientRect();
+    const leftDist = autoScrollX - rect.left;
+    const rightDist = rect.right - autoScrollX;
+    const topDist = autoScrollY - rect.top;
+    const bottomDist = rect.bottom - autoScrollY;
+    const dx =
+      leftDist < SCROLL_THRESHOLD
+        ? -SCROLL_MAX_SPEED * (1 - leftDist / SCROLL_THRESHOLD)
+        : rightDist < SCROLL_THRESHOLD
+        ? SCROLL_MAX_SPEED * (1 - rightDist / SCROLL_THRESHOLD)
+        : 0;
+    const dy =
+      topDist < SCROLL_THRESHOLD
+        ? -SCROLL_MAX_SPEED * (1 - topDist / SCROLL_THRESHOLD)
+        : bottomDist < SCROLL_THRESHOLD
+        ? SCROLL_MAX_SPEED * (1 - bottomDist / SCROLL_THRESHOLD)
+        : 0;
+    if (dx !== 0 || dy !== 0) {
+      scrollTarget.scrollBy(dx, dy);
+      autoScrollRAF = requestAnimationFrame(scrollStep);
+    }
+  }
+
+  function updateAutoScroll(x: number, y: number): void {
+    autoScrollX = x;
+    autoScrollY = y;
+    if (!scrollTarget)
+      // Walk up from the starting cell, not from view.dom. The table's scroll
+      // container (.scroll-bar) is an ancestor of the <td>, whereas view.dom is
+      // the editor root which sits *inside* the scroll container — walking up
+      // from it would skip past the table scroller and find the page scroller.
+      scrollTarget = findScrollableAncestor(startDOMCell ?? view.dom);
+    // Only schedule a new frame if one isn't already pending.
+    if (autoScrollRAF == null)
+      autoScrollRAF = requestAnimationFrame(scrollStep);
+  }
+
+  function stopAutoScroll(): void {
+    if (autoScrollRAF != null) {
+      cancelAnimationFrame(autoScrollRAF);
+      autoScrollRAF = null;
+    }
+    scrollTarget = null;
   }
 
   // Create and dispatch a cell selection between the given anchor and
@@ -248,39 +317,88 @@ export function handleMouseDown(
   }
 
   // Stop listening to mouse motion events.
-  function stop(): void {
+  function stop(event?: Event): void {
     view.root.removeEventListener("mouseup", stop);
     view.root.removeEventListener("dragstart", stop);
     view.root.removeEventListener("mousemove", move);
     view.root.removeEventListener("touchmove", move);
     view.root.removeEventListener("touchend", stop);
     view.root.removeEventListener("touchcancel", stop);
-    if (tableEditingKey.getState(view.state) != null) {
+    const hadActiveSelection = tableEditingKey.getState(view.state) != null;
+    stopAutoScroll();
+    if (hadActiveSelection) {
       (view as any).domObserver.suppressSelectionUpdates();
       view.dispatch(view.state.tr.setMeta(tableEditingKey, -1));
+    }
+    // Prevent native drag-and-drop from moving/deleting selected text when the
+    // browser interprets a cell-selection drag as a text drag (Bug: content
+    // becomes empty). Also prevent the browser's synthetic tap after a
+    // touch-based cell selection from collapsing the CellSelection back to a
+    // text cursor in the last touched cell (Bug: cell selection disappears).
+    if (
+      event &&
+      (event.type === "dragstart" ||
+        (event.type === "touchend" && hadActiveSelection))
+    ) {
+      event.preventDefault();
     }
   }
 
   function move(_event: Event): void {
     const event = _event as MouseEvent | DragEvent | TouchEvent;
+
+    // For touch: we've already committed this gesture to cell-selection tracking
+    // (the guard at touchstart ensured that). Suppress the browser scroll on
+    // every touchmove — this must happen here because:
+    //   a) touchstart preventDefault is ignored when registered as passive (the
+    //      default on most mobile browsers for ProseMirror's event dispatch), and
+    //   b) our own touchmove listener is registered with { passive: false } so
+    //      preventDefault() here is guaranteed to work.
+    if (isTouchEvent(event)) {
+      event.preventDefault();
+      // Always feed the current finger position to auto-scroll regardless of
+      // whether a cross-cell selection has started yet. This must be outside the
+      // branch below because once tableEditingKey has state (anchor != null) we
+      // no longer enter the isTouchEvent branch, so coordinates would go stale.
+      const x = getClientX(event);
+      const y = getClientY(event);
+      if (x != null && y != null) updateAutoScroll(x, y);
+    }
+
     const anchor = tableEditingKey.getState(view.state);
     let $anchor;
     if (anchor != null) {
       // Continuing an existing cross-cell selection
       $anchor = view.state.doc.resolve(anchor);
+    } else if (isTouchEvent(event)) {
+      // For touch events, event.target stays fixed at the touchstart element,
+      // so use coordinates to detect movement into a different cell.
+      const $startCell = cellUnderMouse(view, startEvent);
+      const $currentCell = cellUnderMouse(view, event);
+      if ($startCell && $currentCell && $startCell.pos !== $currentCell.pos) {
+        $anchor = $startCell;
+      }
     } else if (domInCell(view, event.target as Node) != startDOMCell) {
       // Moving out of the initial cell -- start a new cell selection
       $anchor = cellUnderMouse(view, startEvent);
       if (!$anchor) return stop();
     }
-    if ($anchor) setCellSelection($anchor, event);
+    if ($anchor) {
+      // For mouse: prevent native drag-and-drop from interfering.
+      if (!isTouchEvent(event)) event.preventDefault();
+      setCellSelection($anchor, event);
+    }
   }
 
   view.root.addEventListener("mouseup", stop);
   view.root.addEventListener("dragstart", stop);
   view.root.addEventListener("mousemove", move);
-  view.root.addEventListener("touchmove", move);
-  view.root.addEventListener("touchend", stop);
+  // { passive: false } is required for touchmove/touchend so that
+  // event.preventDefault() inside the handlers actually suppresses scroll.
+  // Without it, modern browsers treat the listener as passive by default and
+  // silently ignore any preventDefault() calls.
+  view.root.addEventListener("touchmove", move, { passive: false });
+  view.root.addEventListener("touchend", stop, { passive: false });
   view.root.addEventListener("touchcancel", stop);
 }
 
@@ -329,4 +447,12 @@ function cellUnderMouse(
   });
   if (!mousePos) return null;
   return mousePos ? cellAround(view.state.doc.resolve(mousePos.pos)) : null;
+}
+
+function findScrollableAncestor(el: HTMLElement | Node): Element {
+  return (
+    el.parentElement?.closest(".scroll-bar") ||
+    document.scrollingElement ||
+    document.documentElement
+  );
 }

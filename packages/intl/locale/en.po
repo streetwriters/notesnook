@@ -1157,6 +1157,10 @@ msgstr "Available on iOS"
 msgid "Available on iOS & Android"
 msgstr "Available on iOS & Android"
 
+#: src/strings.ts:2706
+msgid "Back"
+msgstr "Back"
+
 #: src/strings.ts:2304
 msgid "Background color"
 msgstr "Background color"
@@ -3600,6 +3604,10 @@ msgstr "Invalid password"
 #: src/strings.ts:2701
 msgid "Invalid PGP key pair. Please check your keys and try again."
 msgstr "Invalid PGP key pair. Please check your keys and try again."
+
+#: src/strings.ts:2708
+msgid "Invalid recovery key. Make sure to input your account recovery key, not a 2FA recovery code."
+msgstr "Invalid recovery key. Make sure to input your account recovery key, not a 2FA recovery code."
 
 #: src/strings.ts:224
 msgid "Issue created"
@@ -6760,6 +6768,10 @@ msgstr "This error usually means the database file is either corrupt or it could
 msgid "This error usually means the search index is corrupted."
 msgstr "This error usually means the search index is corrupted."
 
+#: src/strings.ts:2709
+msgid "This feature is not available on this plan."
+msgstr "This feature is not available on this plan."
+
 #: src/strings.ts:1936
 msgid "This image cannot be previewed"
 msgstr "This image cannot be previewed"
@@ -7252,6 +7264,10 @@ msgstr "Using official Notesnook instance"
 #: src/strings.ts:1711
 msgid "v{version} available"
 msgstr "v{version} available"
+
+#: src/strings.ts:2711
+msgid "Value must be between {min} and {max}"
+msgstr "Value must be between {min} and {max}"
 
 #: src/strings.ts:1173
 msgid "Vault"

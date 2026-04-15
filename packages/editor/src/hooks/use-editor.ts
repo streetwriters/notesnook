@@ -121,6 +121,7 @@ export const useEditor = (
 function destroyView(view: EditorView) {
   // we override all the methods to prevent any further interaction with the
   // editor, otherwise we'll get errors.
+  view.focus = () => {};
   view.dispatch = () => {};
   view.update = () => {};
   view.updateState = () => {};

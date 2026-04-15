@@ -31,7 +31,7 @@ import { renderTool } from "./common";
 import { DraggableItem, useDragState } from "./state";
 import ToolSheet from "./tool-sheet";
 
-import { useIsFeatureAvailable } from "@notesnook/common";
+import { isFeatureAvailable, useIsFeatureAvailable } from "@notesnook/common";
 import type { ToolId } from "@notesnook/editor";
 import { strings } from "@notesnook/intl";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -64,78 +64,87 @@ export const Group = ({
   const { colors } = useThemeColors();
   const featureAvailable = useIsFeatureAvailable("customToolbarPreset");
 
-  const onDrop = (data: DraxDragWithReceiverEventData) => {
-    if (!featureAvailable?.isAllowed) {
-      ToastManager.show({
-        type: "info",
-        message: featureAvailable?.error
-      });
-      return;
-    }
-    const isDroppedAbove = data.receiver.receiveOffsetRatio.y < 0.5;
-    const dragged = data.dragged.payload;
-    const reciever = data.receiver.payload;
-    const _data = useDragState.getState().data.slice();
-
-    if (dragged.type === "group") {
-      const fromIndex = dragged.index;
-      const toIndex = isDroppedAbove
-        ? Math.max(0, reciever.index)
-        : reciever.index + 1;
-
-      _data.splice(
-        toIndex > fromIndex ? toIndex - 1 : toIndex,
-        0,
-        _data.splice(fromIndex, 1)[0]
-      );
-    }
-
-    // Always insert sub group at the end of the group.
-    if (dragged.type === "subgroup") {
-      const fromIndex = dragged.index;
-
-      const insertAt = _data[reciever.index] as string[];
-      const insertFrom = _data[dragged.groupIndex] as string[];
-
-      if (typeof insertAt[insertAt.length - 1] !== "string") {
-        setRecieving(false);
-        return data.dragAbsolutePosition;
+  const onDrop = React.useCallback(
+    (data: DraxDragWithReceiverEventData) => {
+      if (!featureAvailable?.isAllowed) {
+        ToastManager.show({
+          type: "info",
+          message: featureAvailable?.error || strings.featureNotAvailable()
+        });
+        return;
       }
-      insertAt.push(insertFrom.splice(fromIndex, 1)[0]);
-    }
+      const isDroppedAbove = data.receiver.receiveOffsetRatio.y < 0.5;
+      const dragged = data.dragged.payload;
+      const reciever = data.receiver.payload;
+      const _data = useDragState.getState().data.slice();
 
-    if (dragged.type === "tool") {
-      const insertFrom =
-        typeof dragged.parentIndex === "number"
-          ? (_data[dragged.parentIndex][dragged.groupIndex] as string[])
-          : (_data[dragged.groupIndex] as string[]);
-      _data[groupIndex].push(insertFrom.splice(dragged.index, 1)[0] as ToolId);
-    }
+      if (dragged.type === "group") {
+        const fromIndex = dragged.index;
+        const toIndex = isDroppedAbove
+          ? Math.max(0, reciever.index)
+          : reciever.index + 1;
 
-    setData(_data);
-    setRecieving(false);
-    return data.dragAbsolutePosition;
-  };
+        _data.splice(
+          toIndex > fromIndex ? toIndex - 1 : toIndex,
+          0,
+          _data.splice(fromIndex, 1)[0]
+        );
+      }
 
-  const onRecieveData = (data: DraxDragWithReceiverEventData) => {
-    setRecieving(true);
-    if (data.dragged.payload.type !== "group")
-      return setRecievePosition("below");
-    if (data.receiver.receiveOffsetRatio.y < 0.5) {
-      setRecievePosition("above");
-    } else {
-      setRecievePosition("below");
-    }
-  };
+      // Always insert sub group at the end of the group.
+      if (dragged.type === "subgroup") {
+        const fromIndex = dragged.index;
+
+        const insertAt = _data[reciever.index] as string[];
+        const insertFrom = _data[dragged.groupIndex] as string[];
+
+        if (typeof insertAt[insertAt.length - 1] !== "string") {
+          setRecieving(false);
+          return data.dragAbsolutePosition;
+        }
+        insertAt.push(insertFrom.splice(fromIndex, 1)[0]);
+      }
+
+      if (dragged.type === "tool") {
+        const insertFrom =
+          typeof dragged.parentIndex === "number"
+            ? (_data[dragged.parentIndex][dragged.groupIndex] as string[])
+            : (_data[dragged.groupIndex] as string[]);
+        _data[groupIndex].push(
+          insertFrom.splice(dragged.index, 1)[0] as ToolId
+        );
+      }
+
+      setData(_data);
+      setRecieving(false);
+      return data.dragAbsolutePosition;
+    },
+    [featureAvailable]
+  );
+
+  const onRecieveData = React.useCallback(
+    (data: DraxDragWithReceiverEventData) => {
+      setRecieving(true);
+      if (data.dragged.payload.type !== "group")
+        return setRecievePosition("below");
+      if (data.receiver.receiveOffsetRatio.y < 0.5) {
+        setRecievePosition("above");
+      } else {
+        setRecievePosition("below");
+      }
+    },
+    []
+  );
 
   const buttons = [
     {
       name: "minus",
-      onPress: () => {
-        if (!featureAvailable?.isAllowed) {
+      onPress: async () => {
+        const feature = await isFeatureAvailable("customToolbarPreset");
+        if (!feature.isAllowed) {
           ToastManager.show({
             type: "info",
-            message: featureAvailable?.error
+            message: feature?.error
           });
           return;
         }
@@ -157,11 +166,12 @@ export const Group = ({
     },
     {
       name: "plus",
-      onPress: () => {
-        if (!featureAvailable?.isAllowed) {
+      onPress: async () => {
+        const feature = await isFeatureAvailable("customToolbarPreset");
+        if (!feature.isAllowed) {
           ToastManager.show({
             type: "info",
-            message: featureAvailable?.error
+            message: feature?.error
           });
           return;
         }

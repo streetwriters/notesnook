@@ -33,7 +33,7 @@ import { DraggableItem, useDragState } from "./state";
 import ToolSheet from "./tool-sheet";
 import { findToolById, getToolIcon } from "./toolbar-definition";
 
-import { useIsFeatureAvailable } from "@notesnook/common";
+import { isFeatureAvailable, useIsFeatureAvailable } from "@notesnook/common";
 import type { ToolId } from "@notesnook/editor";
 import { strings } from "@notesnook/intl";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -78,11 +78,12 @@ export const Tool = ({
       ? [
           {
             name: "minus",
-            onPress: () => {
-              if (!featureAvailable?.isAllowed) {
+            onPress: async () => {
+              const feature = await isFeatureAvailable("customToolbarPreset");
+              if (!feature.isAllowed) {
                 ToastManager.show({
                   type: "info",
-                  message: featureAvailable?.error
+                  message: feature?.error
                 });
                 return;
               }
@@ -102,11 +103,12 @@ export const Tool = ({
           },
           {
             name: "plus",
-            onPress: () => {
-              if (!featureAvailable?.isAllowed) {
+            onPress: async () => {
+              const feature = await isFeatureAvailable("customToolbarPreset");
+              if (!feature.isAllowed) {
                 ToastManager.show({
                   type: "info",
-                  message: featureAvailable?.error
+                  message: feature?.error
                 });
                 return;
               }
@@ -122,11 +124,12 @@ export const Tool = ({
       : [
           {
             name: "minus",
-            onPress: () => {
-              if (!featureAvailable?.isAllowed) {
+            onPress: async () => {
+              const feature = await isFeatureAvailable("customToolbarPreset");
+              if (!feature.isAllowed) {
                 ToastManager.show({
                   type: "info",
-                  message: featureAvailable?.error
+                  message: feature?.error
                 });
                 return;
               }
@@ -151,7 +154,7 @@ export const Tool = ({
     if (parentIndex === undefined && !isSubgroup) {
       btns.unshift({
         name: "unfold-less-horizontal",
-        onPress: () => {
+        onPress: async () => {
           if (groupIndex === undefined) return;
           const _data = useDragState.getState().data.slice();
           const hasSubGroup = Array.isArray(
@@ -267,6 +270,7 @@ export const Tool = ({
             style={{
               paddingLeft: 30
             }}
+            key={`subgroup-${item.length}-${groupIndex}-${index}-${parentIndex}`}
           >
             {renderGroup({ index, item, parentIndex: groupIndex })}
           </View>
@@ -290,63 +294,69 @@ export const Tool = ({
     ]
   );
 
-  const onDrop = (data: DraxDragWithReceiverEventData) => {
-    if (!featureAvailable?.isAllowed) {
-      ToastManager.show({
-        type: "info",
-        message: featureAvailable?.error
-      });
-      return;
-    }
-    const isDroppedAbove = data.receiver.receiveOffsetRatio.y < 0.5;
-    const dragged = data.dragged.payload;
-    const reciever = data.receiver.payload;
-    const _data = useDragState.getState().data?.slice();
-    if (!_data) return;
-    const isFromSubgroup = typeof dragged?.parentIndex === "number";
-    const isDroppedAtSubgroup = typeof reciever?.parentIndex === "number";
-
-    if (dragged.type === "tool") {
-      const fromIndex = dragged.index;
-      const toIndex = isDroppedAbove
-        ? Math.max(0, reciever.index)
-        : reciever.index + 1;
-
-      const insertAt = isDroppedAtSubgroup
-        ? (_data[reciever.parentIndex][reciever.groupIndex] as string[])
-        : (_data[reciever.groupIndex] as string[]);
-      const insertFrom = isFromSubgroup
-        ? (_data[dragged.parentIndex][dragged.groupIndex] as string[])
-        : (_data[dragged.groupIndex] as string[]);
-      insertAt.splice(
-        toIndex > fromIndex ? toIndex - 1 : toIndex,
-        0,
-        insertFrom.splice(fromIndex, 1)[0]
-      );
-
-      // Remove the group or subgroup if it is empty.
-      if (insertFrom.length === 0) {
-        isFromSubgroup
-          ? _data[dragged.parentIndex].splice(
-              _data[dragged.parentIndex].length - 1,
-              1
-            )
-          : _data.splice(dragged.groupIndex, 1);
+  const onDrop = React.useCallback(
+    (data: DraxDragWithReceiverEventData) => {
+      if (!featureAvailable?.isAllowed) {
+        ToastManager.show({
+          type: "info",
+          message: featureAvailable?.error || strings.featureNotAvailable()
+        });
+        return;
       }
-    }
-    setData(_data);
-    setRecieving(false);
-    return data.dragAbsolutePosition;
-  };
+      const isDroppedAbove = data.receiver.receiveOffsetRatio.y < 0.5;
+      const dragged = data.dragged.payload;
+      const reciever = data.receiver.payload;
+      const _data = useDragState.getState().data?.slice();
+      if (!_data) return;
+      const isFromSubgroup = typeof dragged?.parentIndex === "number";
+      const isDroppedAtSubgroup = typeof reciever?.parentIndex === "number";
 
-  const onRecieveData = (data: DraxDragWithReceiverEventData) => {
-    setRecieving(true);
-    if (data.receiver.receiveOffsetRatio.y < 0.5) {
-      setRecievePosition("above");
-    } else {
-      setRecievePosition("below");
-    }
-  };
+      if (dragged.type === "tool") {
+        const fromIndex = dragged.index;
+        const toIndex = isDroppedAbove
+          ? Math.max(0, reciever.index)
+          : reciever.index + 1;
+
+        const insertAt = isDroppedAtSubgroup
+          ? (_data[reciever.parentIndex][reciever.groupIndex] as string[])
+          : (_data[reciever.groupIndex] as string[]);
+        const insertFrom = isFromSubgroup
+          ? (_data[dragged.parentIndex][dragged.groupIndex] as string[])
+          : (_data[dragged.groupIndex] as string[]);
+        insertAt.splice(
+          toIndex > fromIndex ? toIndex - 1 : toIndex,
+          0,
+          insertFrom.splice(fromIndex, 1)[0]
+        );
+
+        // Remove the group or subgroup if it is empty.
+        if (insertFrom.length === 0) {
+          isFromSubgroup
+            ? _data[dragged.parentIndex].splice(
+                _data[dragged.parentIndex].length - 1,
+                1
+              )
+            : _data.splice(dragged.groupIndex, 1);
+        }
+      }
+      setData(_data);
+      setRecieving(false);
+      return data.dragAbsolutePosition;
+    },
+    [featureAvailable]
+  );
+
+  const onRecieveData = React.useCallback(
+    (data: DraxDragWithReceiverEventData) => {
+      setRecieving(true);
+      if (data.receiver.receiveOffsetRatio.y < 0.5) {
+        setRecievePosition("above");
+      } else {
+        setRecievePosition("below");
+      }
+    },
+    []
+  );
 
   return (
     <Animated.View layout={Layout}>

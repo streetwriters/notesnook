@@ -25,18 +25,18 @@ import {
 } from "@notesnook/editor/dist/cjs/toolbar/tool-definitions";
 import { ToolId } from "@notesnook/editor";
 
-export const tools = getAllTools() as any;
+export const tools = () => getAllTools();
 export const presets: { [name: string]: ToolbarGroupDefinition[] } = {
   default: getDefaultPresets().default as any,
   minimal: getDefaultPresets().minimal as any,
   custom: []
 };
 
-export function findToolById(id: keyof typeof tools): {
+export function findToolById(id: keyof ReturnType<typeof tools> ): {
   title: string;
   icon: string;
 } {
-  return tools[id];
+  return tools()[id];
 }
 
 export function getToolIcon(id: ToolId, color: string) {
@@ -51,13 +51,14 @@ export function getToolIcon(id: ToolId, color: string) {
 
 export function getUngroupedTools(
   toolDefinition: (string | string[])[][]
-): string[] {
-  const keys = Object.keys(tools);
+): string[] { 
+  const allTools = tools();
+  const keys = Object.keys(allTools);
 
   const ungrouped = [];
   const toolString = JSON.stringify(toolDefinition);
   for (const key of keys) {
-    if (tools[key as ToolId].conditional) continue;
+    if ((allTools[key as ToolId] as any).conditional) continue;
     if (!toolString.includes(key)) ungrouped.push(key);
   }
 

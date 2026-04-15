@@ -27,6 +27,7 @@ import crypto from "crypto";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const root = path.join(__dirname, "..");
 const RUNNING_PROCESSES = [];
 const RESTARTABLE_PROCESSES = [];
 let lastBundleHash = null;
@@ -36,7 +37,7 @@ const ENV = {
   FORCE_COLOR: "false",
   COLOR: "0"
 };
-process.chdir(path.join(__dirname, ".."));
+process.chdir(root);
 
 await onChange(true);
 
@@ -55,13 +56,16 @@ async function onChange(first) {
   if (first) {
     await fs.rm("./build/", { force: true, recursive: true });
 
-    await exec("npm rebuild electron --verbose --foreground-scripts");
+    await exec(
+      "npm run postinstall --verbose",
+      path.join(root, "node_modules", "electron")
+    );
 
-    await exec("yarn electron-builder install-app-deps");
+    await exec("yarn electron-builder install-app-deps", root);
   }
 
-  await exec(`yarn run bundle`);
-  await exec(`yarn run build`);
+  await exec(`yarn run bundle`, root);
+  await exec(`yarn run build`, root);
 
   if (await isBundleSame()) {
     console.log("Bundle is same. Doing nothing.");
@@ -111,7 +115,7 @@ function spawnAndWaitUntil(cmd, cwd, predicate) {
 
 async function exec(cmd, cwd) {
   try {
-    console.log(">", cmd);
+    console.log(">", cmd, cwd);
 
     return execSync(cmd, {
       env: ENV,

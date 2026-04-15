@@ -30,8 +30,6 @@ interface NotesnookModuleInterface {
   getActivityName: () => Promise<string>;
   setBackgroundColor: (color: string) => void;
   setSecureMode: (enabled: boolean) => void;
-  setAppState: (appState: string) => void;
-  getAppState: () => string;
   saveAndFinish: () => void;
   setString: (storeName: string, key: string, value: string) => void;
   getString: (storeName: string, key: string) => Promise<string>;
@@ -72,8 +70,6 @@ export const NotesnookModule: NotesnookModuleInterface = Platform.select({
     getActivityName: () => {},
     setBackgroundColor: () => {},
     setSecureMode: () => {},
-    setAppState: () => {},
-    getAppState: () => {},
     saveAndFinish: () => {},
     getString: () => {},
     setString: () => {},

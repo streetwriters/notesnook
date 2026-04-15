@@ -451,12 +451,22 @@ export function Main() {
             )}
             <NotebookPicker
               selectedItems={refs?.filter((r) => r.type === "notebook") || []}
-              onSelected={(items) => setRefs(items)}
+              onSelected={(items) =>
+                setRefs((refs) => [
+                  ...(refs?.filter((r) => r.type === "tag") ?? []),
+                  ...(items ?? [])
+                ])
+              }
             />
             <Box sx={{ mt: 1 }} />
             <TagPicker
               selectedTags={refs?.filter((r) => r.type === "tag") || []}
-              onSelected={(tags) => setRefs(tags)}
+              onSelected={(tags) =>
+                setRefs((refs) => [
+                  ...(refs?.filter((r) => r.type !== "tag") ?? []),
+                  ...tags
+                ])
+              }
             />
           </>
         )}

@@ -32,20 +32,32 @@ async function loadKatex() {
 export const KatexRenderer: MathRenderer = {
   inline: (text, element) => {
     loadKatex().then((katex) => {
-      katex.render(text, element, {
-        displayMode: false,
-        globalGroup: true,
-        throwOnError: false
-      });
+      try {
+        katex.render(text, element, {
+          displayMode: false,
+          globalGroup: true,
+          throwOnError: false
+        });
+      } catch (err) {
+        console.error(err);
+        element.classList.add("parse-error");
+        element.setAttribute("title", err instanceof Error ? err.message : String(err));
+      }
     });
   },
   block: (text, element) => {
     loadKatex().then((katex) => {
-      katex.render(text, element, {
-        displayMode: true,
-        globalGroup: true,
-        throwOnError: false
-      });
+      try {
+        katex.render(text, element, {
+          displayMode: true,
+          globalGroup: true,
+          throwOnError: false
+        });
+      } catch (err) {
+        console.error(err);
+        element.classList.add("parse-error");
+        element.setAttribute("title", err instanceof Error ? err.message : String(err));
+      }
     });
   }
 };

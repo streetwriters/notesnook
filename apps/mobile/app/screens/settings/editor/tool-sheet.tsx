@@ -44,8 +44,8 @@ export default function ToolSheet({
   fwdRef: RefObject<ActionSheetRef>;
 }) {
   const { colors } = useThemeColors();
-  const data = useDragState((state) => state.data);
-  const ungrouped = getUngroupedTools(data) as ToolId[];
+  const [data] = useDragState((state) => [state.data]);
+  const ungrouped = getUngroupedTools( data) as ToolId[];
 
   const renderTool = React.useCallback(
     (item: ToolId) => {
@@ -114,7 +114,7 @@ export default function ToolSheet({
   return (
     <View
       style={{
-        maxHeight: "100%",
+        maxHeight: 400,
         padding: DefaultAppStyles.GAP
       }}
     >

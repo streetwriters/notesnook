@@ -47,12 +47,7 @@ import useGlobalSafeAreaInsets from "../hooks/use-global-safe-area-insets";
 import { useShortcutManager } from "../hooks/use-shortcut-manager";
 import { hideAllTooltips } from "../hooks/use-tooltip";
 import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
-import {
-  clearAppState,
-  editorController,
-  editorState,
-  getAppState
-} from "../screens/editor/tiptap/utils";
+import { editorController, editorState } from "../screens/editor/tiptap/utils";
 import { DDS } from "../services/device-detection";
 import {
   eSendEvent,
@@ -118,13 +113,9 @@ export const FluidPanelsView = React.memo(
 
     useShortcutManager({
       onShortcutPressed: async (item) => {
-        if (!item && getAppState()) {
-          editorState().movedAway = false;
-          fluidTabsRef.current?.goToPage("editor", false);
-          return;
-        }
+        if (!item) return;
+
         if (item?.type === "notesnook.action.newnote") {
-          clearAppState();
           if (!fluidTabsRef.current) {
             setTimeout(() => {
               eSendEvent(eOnLoadNote, { newNote: true });
@@ -205,7 +196,6 @@ export const FluidPanelsView = React.memo(
           eSendEvent(eCloseFullscreenEditor, current);
         }
 
-        const state = getAppState();
         setTimeout(() => {
           switch (current) {
             case "tablet":
@@ -217,18 +207,10 @@ export const FluidPanelsView = React.memo(
               }
               break;
             case "mobile":
-              if (
-                state &&
-                editorState().movedAway === false &&
-                useTabStore.getState().getCurrentNoteId()
-              ) {
-                fluidTabsRef.current?.goToPage("editor", false);
-              } else {
-                fluidTabsRef.current?.goToPage(
-                  fluidTabsRef.current?.page(),
-                  false
-                );
-              }
+              fluidTabsRef.current?.goToPage(
+                fluidTabsRef.current?.page(),
+                false
+              );
               break;
           }
         }, 0);
@@ -243,8 +225,8 @@ export const FluidPanelsView = React.memo(
         const nextDeviceMode = DDS.isLargeTablet()
           ? "tablet"
           : DDS.isSmallTab
-          ? "smallTablet"
-          : "mobile";
+            ? "smallTablet"
+            : "mobile";
         setDeviceMode(nextDeviceMode, size);
       },
       [orientation, setDeviceMode, setDimensions]

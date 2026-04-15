@@ -241,11 +241,31 @@ export function extractHeadline(html: string) {
   return text;
 }
 
+const TITLE_SOURCE_TAGS = ["p", "h1", "h2", "h3", "h4", "h5", "h6"];
+
 export function extractTitle(html: string, characterLimit: number) {
   let text = "";
+  let rootTag: string | undefined = undefined;
   const parser = new Parser(
     {
+      onopentag: (name) => {
+        if (!rootTag && TITLE_SOURCE_TAGS.includes(name)) {
+          rootTag = name;
+        }
+      },
+      onclosetag: (name) => {
+        if (name === rootTag) {
+          if (text) {
+            parser.pause();
+            parser.end();
+          } else {
+            rootTag = undefined;
+          }
+        }
+      },
       ontext: (data) => {
+        if (!rootTag) return;
+
         text += data;
         if (text.length > characterLimit) {
           text = text.slice(0, characterLimit);
@@ -374,7 +394,7 @@ export function extractMatchingBlocks(html: string, matchTagName: string) {
     },
     {
       lowerCaseTags: false,
-      decodeEntities: false
+      decodeEntities: true
     }
   );
   parser.end(html);

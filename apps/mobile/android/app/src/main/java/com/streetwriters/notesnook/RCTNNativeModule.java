@@ -93,21 +93,6 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
         }
     }
 
-    @ReactMethod
-    public void setAppState(final String appState) {
-        SharedPreferences appStateDetails = getReactApplicationContext().getSharedPreferences("appStateDetails", Context.MODE_PRIVATE);
-        SharedPreferences.Editor edit = appStateDetails.edit();
-        edit.putString("appState", appState);
-        edit.apply();
-    }
-
-    @ReactMethod(isBlockingSynchronousMethod = true)
-    public String getAppState() {
-        SharedPreferences appStateDetails = getReactApplicationContext().getSharedPreferences("appStateDetails", Context.MODE_PRIVATE);
-        String appStateValue = appStateDetails.getString("appState", "");
-        return appStateValue.isEmpty() ? null : appStateValue;
-    }
-
     @ReactMethod(isBlockingSynchronousMethod = true)
     public int getWidgetId() {
         return NotePreviewConfigureActivity.appWidgetId;

@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { match } from "fuzzyjs";
+import { decodeHTML } from "entities";
 import Database from "./index.js";
 import {
   HighlightedResult,
@@ -815,7 +816,7 @@ export function splitHighlightedMatch(text: string): Match[][] {
     }
 
     matches.push({
-      match,
+      match: match,
       prefix: prefix.replace(/\s{2,}/gm, " ").trimStart(),
       suffix: suffix || "",
       id: matchId || undefined
@@ -1053,7 +1054,7 @@ function highlightHtmlContent(html: string, queries: string[]): string {
       }
     },
     {
-      decodeEntities: false,
+      decodeEntities: true,
       xmlMode: false
     }
   );

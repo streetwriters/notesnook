@@ -169,7 +169,7 @@ function handleMouseDown(
 
   if (
     event.target instanceof Element &&
-    event.target.closest(".column-resize-handle") == null
+    event.target.closest(".column-resize-handle.active") == null
   ) {
     console.log("No handle target");
     return false;
@@ -225,6 +225,10 @@ function handleMouseDown(
 
   function move(event: MouseEvent | TouchEvent): void {
     if (event instanceof MouseEvent && !event.which) return finish(event);
+    // Prevent the page/table from scrolling while the user is dragging a
+    // column resize handle on touch. The touchmove listener is registered
+    // with { passive: false } below so this call is actually honoured.
+    if (isTouchEvent(event)) event.preventDefault();
     const clientX = getClientX(event);
     if (clientX === null) return;
     const pluginState = columnResizingPluginKey.getState(view.state);
@@ -240,7 +244,9 @@ function handleMouseDown(
   win.addEventListener("mousemove", move);
   win.addEventListener("touchend", finish);
   win.addEventListener("touchcancel", finish);
-  win.addEventListener("touchmove", move);
+  // { passive: false } is required so that event.preventDefault() inside
+  // move() is honoured — modern browsers default touchmove to passive.
+  win.addEventListener("touchmove", move, { passive: false });
   event.preventDefault();
   if (isTouchEvent(event)) (view as any).domObserver.disconnectSelection();
   return true;
@@ -422,6 +428,11 @@ function createResizeHandle(active: boolean) {
   const dom = document.createElement("div");
   dom.className = "column-resize-handle";
   if (active) dom.classList.add("active");
+  // Prevent the browser from treating a touch on this handle as a scroll/pan
+  // gesture. touch-action is evaluated at touchstart time, before the browser
+  // commits to any scroll mode, so this reliably prevents the table's
+  // overflow-scrolling container from capturing the drag on iOS Safari.
+  dom.style.touchAction = "none";
   dom.onmouseenter = () => {
     dom.classList.add("active");
   };

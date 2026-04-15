@@ -44,7 +44,7 @@ import {
 } from "../../components/icons";
 import NavigationItem from "../../components/navigation-menu/navigation-item";
 import { FlexScrollContainer } from "../../components/scroll-container";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   DropdownSettingComponent,
   SectionGroup,
@@ -580,34 +580,13 @@ function SettingItem(props: { item: Setting }) {
                 );
               case "input":
                 return component.inputType === "number" ? (
-                  <Input
+                  <NumberInput
                     key={component.defaultValue()}
-                    type={"number"}
                     min={component.min}
                     max={component.max}
                     step={component.step}
                     defaultValue={component.defaultValue()}
-                    sx={{ width: 80, mr: 1 }}
-                    onChange={debounce((e) => {
-                      let value = e.target.valueAsNumber;
-                      value =
-                        Number.isNaN(value) || value < component.min
-                          ? component.min
-                          : value > component.max
-                          ? component.max
-                          : value;
-                      component.onChange(value);
-                    }, 500)}
-                    onBlur={(e) => {
-                      let value = e.target.valueAsNumber;
-                      value =
-                        Number.isNaN(value) || value < component.min
-                          ? component.min
-                          : value > component.max
-                          ? component.max
-                          : value;
-                      component.onChange(value);
-                    }}
+                    onChange={(value) => component.onChange(value)}
                   />
                 ) : (
                   <Input
@@ -675,5 +654,66 @@ export function SelectComponent(props: Omit<DropdownSettingComponent, "type">) {
         </option>
       ))}
     </select>
+  );
+}
+
+type NumberInputProps = {
+  min: number;
+  max: number;
+  step?: number;
+  defaultValue: number;
+  onChange: (value: number) => void;
+};
+
+function NumberInput({
+  min,
+  max,
+  step,
+  defaultValue,
+  onChange
+}: NumberInputProps) {
+  const [isInputValid, setIsInputValid] = useState(true);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  return (
+    <Flex sx={{ flexDirection: "column", alignItems: "flex-end" }}>
+      <Input
+        ref={inputRef}
+        type={"number"}
+        min={min}
+        max={max}
+        step={step}
+        defaultValue={defaultValue}
+        sx={{
+          width: 80,
+          mr: 1,
+          outline: isInputValid
+            ? undefined
+            : "2px solid var(--accent-error) !important"
+        }}
+        onChange={debounce((e) => {
+          const value = e.target.valueAsNumber;
+          const isValid = !Number.isNaN(value) && value >= min && value <= max;
+          setIsInputValid(isValid);
+          if (isValid) onChange(value);
+        }, 500)}
+        onBlur={(e) => {
+          const raw = e.target.valueAsNumber;
+          const clamped =
+            Number.isNaN(raw) || raw < min ? min : raw > max ? max : raw;
+          if (inputRef.current) inputRef.current.value = String(clamped);
+          setIsInputValid(true);
+          onChange(clamped);
+        }}
+      />
+      {!isInputValid && (
+        <Text
+          variant="subBody"
+          sx={{ fontSize: 11, color: "error", mt: 1, mr: 1 }}
+        >
+          {strings.valueMustBeBetween(min, max)}
+        </Text>
+      )}
+    </Flex>
   );
 }
