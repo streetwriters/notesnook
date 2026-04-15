@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { decodeHTML5, escape } from "entities";
 import { Parser } from "htmlparser2";
-import { getDomPurify } from "./dom-purify";
+import { getDomPurify } from "./dom-purify.js";
 
 export const parseHTML = (input: string) =>
   "DOMParser" in globalThis

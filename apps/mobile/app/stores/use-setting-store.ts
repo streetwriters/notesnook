@@ -140,6 +140,7 @@ export interface SettingStore {
   dateFormat: string;
   dayFormat: DayFormat;
   weekFormat: WeekFormat;
+  vaultLockAfter: number;
   dbPassword?: string;
   isOldAppLock: () => boolean;
   initialUrl: string | null;
@@ -234,6 +235,7 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
   dateFormat: "DD-MM-YYYY",
   dayFormat: "short",
   weekFormat: "Sun",
+  vaultLockAfter: 1000 * 60 * 30,
   setAppDidEnterBackgroundForAction: (value: boolean) => {
     set({
       appDidEnterBackgroundForAction: value
@@ -257,6 +259,7 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
       timeFormat: db.settings.getTimeFormat(),
       dateFormat: db.settings?.getTimeFormat(),
       weekFormat: db.settings.getWeekFormat(),
+      vaultLockAfter: db.settings.getVaultLockAfter(),
       inboxEnabled: await db.user.hasInboxKeys()
     });
   },

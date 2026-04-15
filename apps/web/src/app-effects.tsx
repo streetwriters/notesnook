@@ -40,6 +40,8 @@ import { desktop } from "./common/desktop-bridge";
 import { FeatureDialog } from "./dialogs/feature-dialog";
 import { AnnouncementDialog } from "./dialogs/announcement-dialog";
 import { logger } from "./utils/logger";
+import { showToast } from "./utils/toast";
+import { strings } from "@notesnook/intl";
 
 export default function AppEffects() {
   const refreshNavItems = useStore((store) => store.refreshNavItems);
@@ -175,13 +177,18 @@ export default function AppEffects() {
       }
     );
 
+    const vaultEvent = db.eventManager.subscribe(EVENTS.vaultAutoLocked, () => {
+      showToast("success", strings.vaultLocked());
+    });
+
     registerKeyMap();
     return () => {
       [
         ...fileDownloadEvents,
         ...fileUploadEvents,
         progressEvent,
-        fileEncrypted
+        fileEncrypted,
+        vaultEvent
       ].forEach((e) => e.unsubscribe());
       //  systemTimeInvalidEvent.unsubscribe();
     };

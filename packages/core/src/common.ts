@@ -105,7 +105,8 @@ export const EVENTS = {
   mediaAttachmentDownloaded: "attachments:mediaDownloaded",
   vaultLocked: "vault:locked",
   vaultUnlocked: "vault:unlocked",
-  systemTimeInvalid: "system:invalidTime"
+  systemTimeInvalid: "system:invalidTime",
+  vaultAutoLocked: "vault:autoLocked"
 };
 
 const separators = ["-", "/", "."];

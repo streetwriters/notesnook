@@ -1042,6 +1042,16 @@ export const settingsGroups: SettingSection[] = [
             }
           },
           {
+            id: "lock-vault-after",
+            type: "component",
+            useHook: useVaultStatus,
+            name: strings.lockVaultAfter(),
+            description: strings.lockVaultAfterDesc(),
+            hidden: (current) => !(current as VaultStatusType)?.exists,
+            component: "vault-lock-timer",
+            icon: "clock-outline"
+          },
+          {
             id: "change-vault-password",
             useHook: useVaultStatus,
             name: strings.changeVaultPassword(),
