@@ -105,7 +105,7 @@ const buttonTypes = (
   },
   secondary: {
     primary: colors.secondary.background,
-    text: colors.secondary.paragraph,
+    text: colors.primary.paragraph,
     selected: colors.secondary.background,
     borderWidth: 0.8,
     borderColor: getColorLinearShade(colors.secondary.background, 0.05, isDark),
@@ -268,8 +268,8 @@ export const Pressable = ({
   const opacity = customOpacity
     ? customOpacity
     : type === "accent"
-    ? 1
-    : colorOpacity;
+      ? 1
+      : colorOpacity;
   const alpha = customAlpha ? customAlpha : isDark ? 0.03 : -0.03;
   const { fontScale } = useWindowDimensions();
   const growFactor = 1 + (fontScale - 1) / 8;
