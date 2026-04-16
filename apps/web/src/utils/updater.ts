@@ -27,6 +27,12 @@ export async function checkForUpdate(checkOnDesktop = true) {
   }
 
   if (!IS_DESKTOP_APP) {
+    const releaseTrack = document.cookie.split("; ")
+    .find((row) => row.startsWith(`release-track=`))
+    ?.split("=").slice(1).join("=")
+    if (releaseTrack){
+      document.cookie = `release-track=${releaseTrack}; Secure; Path=/; max-age=2147483647`;
+    }
     AppEventManager.publish(AppEvents.checkingForUpdate);
 
     const registrations =
