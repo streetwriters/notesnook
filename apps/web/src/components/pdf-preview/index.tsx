@@ -80,12 +80,30 @@ export function PdfPreview(props: PdfPreviewProps) {
 
                     ".rpv-search__popover label, .rpv-search__popover span": {
                       fontFamily: "body",
-                      fontSize: "body"
+                      fontSize: "body",
+                      color: "paragraph"
                     },
 
                     ".rpv-core__popover-body, .rpv-core__arrow": {
                       bg: "background",
-                      borderColor: "border"
+                      borderColor: "border",
+                      color: "paragraph"
+                    },
+
+                    ".rpv-search__popover .rpv-core__minimal-button": {
+                      color: "icon",
+                      ":hover": {
+                        bg: "hover"
+                      }
+                    },
+
+                    ".rpv-search__popover .rpv-core__button": {
+                      bg: "background-secondary",
+                      color: "paragraph",
+                      border: "none",
+                      ":hover": {
+                        bg: "hover"
+                      }
                     },
 
                     ".rpv-search__popover-label-checkbox": {
