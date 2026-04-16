@@ -983,6 +983,10 @@ msgstr ""
 msgid "Attached files"
 msgstr ""
 
+#: src/strings.ts:2678
+msgid "Attaching files"
+msgstr ""
+
 #: src/strings.ts:290
 msgid "attachment"
 msgstr ""
@@ -1634,6 +1638,10 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
+#: src/strings.ts:2679
+msgid "Close ({seconds})"
+msgstr ""
+
 #: src/strings.ts:2019
 msgid "Close all"
 msgstr ""
@@ -1741,6 +1749,10 @@ msgstr ""
 
 #: src/strings.ts:144
 msgid "Compressed images are uploaded in Full HD resolution and usually are good enough for most use cases."
+msgstr "<<<<<<< HEAD"
+
+#: src/strings.ts:2680
+msgid "Compressing"
 msgstr ""
 
 #: src/strings.ts:2262
@@ -2533,6 +2545,10 @@ msgstr ""
 
 #: src/strings.ts:1657
 msgid "Encrypted, private, secure."
+msgstr ""
+
+#: src/strings.ts:2681
+msgid "Encrypting"
 msgstr ""
 
 #: src/strings.ts:940
@@ -4714,7 +4730,7 @@ msgstr ""
 msgid "Please grant notifications permission to add new reminders."
 msgstr ""
 
-#: src/strings.ts:2666
+#: src/strings.ts:2677
 msgid "Please login to download attachments."
 msgstr ""
 

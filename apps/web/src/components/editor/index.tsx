@@ -50,7 +50,8 @@ import { FlexScrollContainer } from "../scroll-container";
 import Tiptap, { OnChangeHandler } from "./tiptap";
 import Header from "./header";
 import { Attachment } from "../icons";
-import { attachFiles, AttachmentProgress, insertAttachments } from "./picker";
+import { AttachmentProgress, insertAttachments } from "./picker";
+import { AttachFilesDialog } from "../../dialogs/attach-files-dialog";
 import { useEditorManager } from "./manager";
 import {
   saveAttachment,
@@ -617,13 +618,7 @@ export function Editor(props: EditorProps) {
           }
 
           const mime = type === "file" ? "*/*" : "image/*";
-          const attachments = await insertAttachments(mime);
-          const editor = useEditorManager.getState().getEditor(id)?.editor;
-
-          if (!attachments) return;
-          for (const attachment of attachments) {
-            editor?.attachFile(attachment);
-          }
+          await insertAttachments(mime, id);
         }}
         onGetAttachmentData={async (attachment) => {
           logger.debug("Getting attachment data", {
@@ -646,10 +641,7 @@ export function Editor(props: EditorProps) {
           return result;
         }}
         onAttachFiles={async (files) => {
-          const editor = useEditorManager.getState().getEditor(id)?.editor;
-          const result = await attachFiles(files);
-          if (!result) return;
-          result.forEach((attachment) => editor?.attachFile(attachment));
+          await AttachFilesDialog.show({ files, editorId: id });
         }}
         onInsertInternalLink={async (attributes) => {
           const link = await NoteLinkingDialog.show({ attributes });
@@ -799,17 +791,14 @@ function DropZone(props: DropZoneProps) {
       }}
       onDrop={async (e) => {
         try {
-          const { activeEditorId, getEditor } = useEditorManager.getState();
-          const editor = getEditor(activeEditorId || "")?.editor;
-          if (!e.dataTransfer.files?.length || !editor) return;
+          const { activeEditorId } = useEditorManager.getState();
+          if (!e.dataTransfer.files?.length || !activeEditorId) return;
 
           e.preventDefault();
-          const attachments = await attachFiles(
-            Array.from(e.dataTransfer.files)
-          );
-          for (const attachment of attachments || []) {
-            editor.attachFile(attachment);
-          }
+          await AttachFilesDialog.show({
+            files: Array.from(e.dataTransfer.files),
+            editorId: activeEditorId
+          });
         } catch (e) {
           logger.error(e as Error, "Failed to attach file from drag and drop");
           showToast("error", strings.failedToAttachFile());
