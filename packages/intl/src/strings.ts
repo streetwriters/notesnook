@@ -117,20 +117,20 @@ export const strings = {
       t`Enter the 6 digit code sent to your phone number to continue logging in`,
     app: () =>
       t`Enter the 6 digit code from your authenticator app to continue logging in`,
-    recoveryCode: () => t`Enter the recovery code to continue logging in`
+    recoveryCode: () => t`Enter the 2FA backup code to continue logging in`
   },
   "2faCodeSecondaryMethodText": {
     email: () => t`I don't have access to email`,
     sms: () => t`I don't have access to my phone`,
     app: () => t`I don't have access to authenticator app`,
-    recoveryCode: () => t`I don't have recovery codes`
+    recoveryCode: () => t`I don't have 2FA backup codes`
   },
   resend2faCode: (seconds: string) => t`Resend code in (${seconds})`,
   sendCode: () => t`Send code`,
   sendCodeSms: () => t`Send code via SMS`,
   sendCodeEmail: () => t`Send code via email`,
   authAppCode: () => t`Enter code from authenticator app`,
-  recoveryCode: () => t`I have a recovery code`,
+  recoveryCode: () => t`I have a 2FA backup code`,
   attachImageHeading: (count: number) =>
     plural(count, {
       one: "Attach image",
@@ -397,7 +397,7 @@ export const strings = {
     t`If the editor fails to load even after reloading. Try restarting the app.`,
   gettingInformation: () => t`Getting information`,
   enterSixDigitCode: () => t`Enter 6 digit code`,
-  gettingRecoveryCodes: () => t`Getting recovery codes`,
+  gettingRecoveryCodes: () => t`Getting 2FA backup codes`,
   protectNotes: () => t`Protect your notes`,
   protectNotesDesc: () => t`Choose how you want to secure your notes locally.`,
   loggingOut: () => t`Logging out. Please wait...`,
@@ -494,13 +494,14 @@ $day$: Current day (eg. Monday)`,
   twoFactorAuth: () => t`Two-factor authentication`,
   twoFactorAuthDesc: () =>
     t`Enable two-factor authentication to add an extra layer of security to your account.`,
-  saveRecoveryCodes: () => t`Save recovery codes`,
+  saveRecoveryCodes: () => t`Save 2FA backup codes`,
   saveRecoveryCodesDesc: () =>
-    t`Save your recovery codes in a safe place. You will need them to recover your account in case you lose access to your two-factor authentication methods.`,
+    t`Save your 2FA backup codes in a safe place. You will need them to log into your account in case you lose access to your two-factor authentication methods.`,
   fallbackMethodEnabled: () => t`Fallback method for 2FA enabled`,
   accountIsSecure: () =>
     t`Your account is now 100% secure against unauthorized logins.`,
   twoFactorAuthEnabled: () => t`Two-factor authentication enabled`,
+  twoFactorAuthDisabled: () => t`Two-factor authentication disabled`,
   listOf: () => t`List of`,
   network: {
     downloading: (progress?: string | number) =>
@@ -1001,15 +1002,15 @@ $day$: Current day (eg. Monday)`,
   mfaSmsInstructions: () => t`It may take a minute to receive your code.`,
   mfaSmsSelector: () => t`Don't have access to your phone number?`,
   mfaRecoveryCodeSubtitle: () =>
-    t`Please confirm your identity by entering a recovery code.`,
-  mfaRecoveryCodeSelector: () => t`Don't have your recovery codes?`,
-  enterRecoveryCode: () => t`Enter recovery code`,
-  codesCopied: () => t`Recovery codes copied!`,
+    t`Please confirm your identity by entering a 2FA backup code.`,
+  mfaRecoveryCodeSelector: () => t`Don't have your 2FA backup codes?`,
+  enterRecoveryCode: () => t`Enter 2FA backup code`,
+  codesCopied: () => t`2FA backup codes copied!`,
   resendCodeWait: () => t`Please wait before requesting a new code`,
   phoneNumberNotEntered: () => t`Phone number not entered`,
   "2faCodeSentVia": (method: string) => t`2FA code sent via ${method}`,
   errorSend2fa: () => t`Error sending 2FA code`,
-  codesSaved: () => t`Recovery codes saved!`,
+  codesSaved: () => t`2FA backup codes saved!`,
   logsCopied: () => t`Debug log copied!`,
   logsDownloaded: () => t`Debug logs downloaded`,
   clearLogs: () => t`Clear logs`,
@@ -1059,9 +1060,9 @@ $day$: Current day (eg. Monday)`,
   addFallback2faMethodDesc: () =>
     t`You can use fallback 2FA method incase you are unable to login via primary method`,
   change2faFallbackMethod: () => t`Change 2FA fallback method`,
-  viewRecoveryCodes: () => t`View recovery codes`,
+  viewRecoveryCodes: () => t`View 2FA backup codes`,
   viewRecoveryCodesDesc: () =>
-    t`View your recovery codes to recover your account in case you lose access to your two-factor authentication methods.`,
+    t`View your 2FA backup codes to log into your account in case you lose access to your two-factor authentication methods.`,
   subscriptionNotActivated: () => t`Subscription not activated?`,
   loadingSubscription: () => t`Loading subscription details`,
   loadingSubscriptionDesc: () => t`Please wait while we load your subscription`,
@@ -2705,7 +2706,7 @@ Use this if changes from other devices are not appearing on this device. This wi
     `How long should the vault stay unlocked before automatically locking?`,
   back: () => t`Back`,
   invalidRecoveryKey: () =>
-    t`Invalid recovery key. Make sure to input your account recovery key, not a 2FA recovery code.`,
+    t`Invalid recovery key. Make sure to input your account recovery key, not a 2FA backup code.`,
   featureNotAvailable: () => t`This feature is not available on this plan.`,
   valueMustBeBetween: (min: number, max: number) =>
     t`Value must be between ${min} and ${max}`
