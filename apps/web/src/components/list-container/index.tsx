@@ -55,6 +55,8 @@ export const CustomScrollbarsVirtualList = forwardRef<
   return (
     <ScrollContainer
       {...props}
+      trackStyle={() => ({ width: 6 })}
+      thumbStyle={() => ({ width: 6 })}
       forwardedRef={(sRef) => {
         if (typeof ref === "function") ref(sRef);
         else if (ref) ref.current = sRef;
