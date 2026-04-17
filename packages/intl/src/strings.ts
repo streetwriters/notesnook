@@ -2563,7 +2563,10 @@ Use this if changes from other devices are not appearing on this device. This wi
   ],
   trialPlanConditions: [
     (duration: number) => t`Free ${duration} day trial, cancel any time`,
-    () => t`Google will remind you before your trial ends`
+    (platform: "ios" | "android") =>
+      t`${
+        platform === "ios" ? "Apple" : "Google"
+      } will remind you before your trial ends`
   ],
   purchase: () => t`Purchase`,
   subscribe: () => t`Subscribe`,

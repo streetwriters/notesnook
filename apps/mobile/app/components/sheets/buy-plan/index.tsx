@@ -23,6 +23,7 @@ import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import {
   Linking,
+  Platform,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -211,16 +212,17 @@ export const BuyPlan = (props: {
               ? strings["5yearPlanConditions"]()
               : [
                   strings.trialPlanConditions[0](
-                    billingDuration?.duration as number
+                    billingDuration?.duration as number as never
                   ),
-                  strings.trialPlanConditions[1](0)
+                  strings.trialPlanConditions[1](Platform.OS as never)
                 ]
             ).map((item) => (
               <View
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
-                  gap: 10
+                  gap: 10,
+                  flex: 1
                 }}
                 key={item}
               >
@@ -229,7 +231,13 @@ export const BuyPlan = (props: {
                   size={AppFontSize.lg}
                   name="check"
                 />
-                <Paragraph>{item}</Paragraph>
+                <Paragraph
+                  style={{
+                    flexShrink: 1
+                  }}
+                >
+                  {item}
+                </Paragraph>
               </View>
             ))}
           </View>
