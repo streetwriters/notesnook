@@ -251,16 +251,24 @@ function LoginEmail(props: BaseAuthComponentProps<"login:email">) {
         subtitle: strings.authWait()
       }}
       onSubmit={async (form) => {
-        const { primaryMethod, phoneNumber, secondaryMethod } =
-          (await userstore.login(form)) as MFAErrorData;
+        const loginResult = await userstore.login(form);
+        if (typeof loginResult === "boolean" || !loginResult)
+          throw new Error(strings.loginFailed());
 
-        navigate("mfa:code", {
-          email: form.email,
-          selectedMethod: primaryMethod,
-          primaryMethod,
-          phoneNumber,
-          secondaryMethod
-        });
+        if (loginResult.redirect === "mfa") {
+          navigate("mfa:code", {
+            email: form.email,
+            selectedMethod: loginResult.primaryMethod,
+            primaryMethod: loginResult.primaryMethod,
+            phoneNumber: loginResult.phoneNumber,
+            secondaryMethod: loginResult.secondaryMethod
+          });
+        } else {
+          navigate("login:password", {
+            email: form.email,
+            password: ""
+          });
+        }
       }}
     >
       {(form?: EmailFormData) => (
@@ -472,16 +480,24 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
       onSubmit={async () => {
         if (!user) return;
 
-        const { primaryMethod, phoneNumber, secondaryMethod } =
-          (await userstore.login(user)) as MFAErrorData;
+        const loginResult = await userstore.login(user);
+        if (typeof loginResult === "boolean" || !loginResult)
+          throw new Error(strings.loginFailed());
 
-        navigate("mfa:code", {
-          email: user.email,
-          selectedMethod: primaryMethod,
-          primaryMethod,
-          phoneNumber,
-          secondaryMethod
-        });
+        if (loginResult.redirect === "mfa") {
+          navigate("mfa:code", {
+            email: user.email,
+            selectedMethod: loginResult.primaryMethod,
+            primaryMethod: loginResult.primaryMethod,
+            phoneNumber: loginResult.phoneNumber,
+            secondaryMethod: loginResult.secondaryMethod
+          });
+        } else {
+          navigate("login:password", {
+            email: user.email,
+            password: ""
+          });
+        }
       }}
     >
       <AuthField
