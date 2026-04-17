@@ -214,7 +214,9 @@ export const BuyPlan = (props: {
                   strings.trialPlanConditions[0](
                     billingDuration?.duration as number as never
                   ),
-                  strings.trialPlanConditions[1](Platform.OS as never)
+                  ...(isGithubRelease
+                    ? []
+                    : [strings.trialPlanConditions[1](Platform.OS as never)])
                 ]
             ).map((item) => (
               <View
