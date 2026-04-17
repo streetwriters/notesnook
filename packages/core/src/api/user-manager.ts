@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { User } from "../types.js";
 import http from "../utils/http.js";
 import constants from "../utils/constants.js";
-import TokenManager from "./token-manager.js";
+import TokenManager, { Token } from "./token-manager.js";
 import { EV, EVENTS } from "../common.js";
 import { HealthCheck } from "./healthcheck.js";
 import Database from "./index.js";
@@ -125,14 +125,22 @@ class UserManager {
 
     email = email.toLowerCase();
 
-    const result = await http.post(`${constants.AUTH_HOST}${ENDPOINTS.token}`, {
-      email,
-      grant_type: "email",
-      client_id: "notesnook"
-    });
+    const result = (await http.post(
+      `${constants.AUTH_HOST}${ENDPOINTS.token}`,
+      {
+        email,
+        grant_type: "email",
+        client_id: "notesnook"
+      }
+    )) as Token;
 
     await this.tokenManager.saveToken(result);
-    return result.additional_data;
+    return result.additional_data
+      ? ({
+          redirect: "mfa",
+          ...result.additional_data
+        } as const)
+      : ({ redirect: "password" } as const);
   }
 
   async authenticateMultiFactorCode(code: string, method: string) {
@@ -142,19 +150,18 @@ class UserManager {
     if (!token || token.scope !== "auth:grant_types:mfa")
       throw new Error("No token found.");
 
-    await this.tokenManager.saveToken(
-      await http.post(
-        `${constants.AUTH_HOST}${ENDPOINTS.token}`,
-        {
-          grant_type: "mfa",
-          client_id: "notesnook",
-          "mfa:code": code,
-          "mfa:method": method
-        },
-        token.access_token
-      )
+    const result = await http.post(
+      `${constants.AUTH_HOST}${ENDPOINTS.token}`,
+      {
+        grant_type: "mfa",
+        client_id: "notesnook",
+        "mfa:code": code,
+        "mfa:method": method
+      },
+      token.access_token
     );
-    return true;
+    await this.tokenManager.saveToken(result);
+    return { redirect: "password" } as const;
   }
 
   async authenticatePassword(
