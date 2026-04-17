@@ -22,6 +22,7 @@ import "@react-pdf-viewer/core/lib/styles/index.css";
 import { ToolbarSlot, toolbarPlugin } from "@react-pdf-viewer/toolbar";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { searchPlugin } from "@react-pdf-viewer/search";
+import "@react-pdf-viewer/search/lib/styles/index.css";
 import {
   ChevronDown,
   ChevronUp,
@@ -130,6 +131,10 @@ export function PdfPreview(props: PdfPreviewProps) {
                       ":hover:not(:focus)": {
                         outline: "1.5px solid var(--accent)"
                       }
+                    },
+
+                    ".rpv-search__popover .rpv-core__textbox": {
+                      width: "85% !important"
                     }
                   }}
                 >
