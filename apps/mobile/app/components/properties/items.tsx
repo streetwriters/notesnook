@@ -321,7 +321,9 @@ export const Items = ({
     [
       colors.error.icon,
       colors.primary.accent,
+      colors.primary.border,
       colors.secondary.icon,
+      colors.static.orange,
       columnItemWidth,
       topBarSorting
     ]

@@ -27,6 +27,7 @@ import { db } from "../common/db";
 import { ListLoader } from "../components/loaders/list-loader";
 import { ConfirmDialog } from "../dialogs/confirm";
 import { strings } from "@notesnook/intl";
+import { ClearTrash } from "../components/icons";
 
 function Trash() {
   useNavigate("trash", store.refresh);
@@ -47,13 +48,13 @@ function Trash() {
       placeholder={<Placeholder context={filteredItems ? "search" : "trash"} />}
       items={filteredItems || items}
       button={{
+        Icon: ClearTrash,
         onClick: function () {
           ConfirmDialog.show({
             title: strings.clearTrash(),
-            subtitle: strings.clearTrashDesc(),
             positiveButtonText: strings.clear(),
             negativeButtonText: strings.cancel(),
-            message: strings.areYouSure()
+            message: strings.clearTrashDesc()
           }).then(async (res) => {
             if (res) {
               try {

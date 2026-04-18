@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Locator, Page } from "@playwright/test";
 import { getTestId } from "../utils";
 import { ContextMenuModel } from "./context-menu.model";
-import { fillItemDialog, iterateList } from "./utils";
+import { confirmDialog, fillItemDialog, iterateList } from "./utils";
 
 export class NavigationMenuModel {
   protected readonly page: Page;
@@ -100,5 +100,16 @@ class NavigationItemModel {
   async removeShortcut() {
     await this.menu.open(this.locator);
     await this.menu.clickOnItem("remove-shortcut");
+  }
+
+  async clearTrash() {
+    await this.menu.open(this.locator);
+    await this.menu.clickOnItem("clear-trash");
+    await confirmDialog(this.page.locator(getTestId("confirm-dialog")));
+  }
+
+  async getClearTrashItem() {
+    await this.menu.open(this.locator);
+    return this.menu.getItem("clear-trash");
   }
 }

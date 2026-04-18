@@ -28,6 +28,7 @@ export type TreeItem = {
   notebook: Notebook;
   depth: number;
   hasChildren: boolean;
+  disabled?: boolean;
 };
 
 function removeTreeItem(tree: TreeItem[], id: string) {

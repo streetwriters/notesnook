@@ -38,15 +38,14 @@ import { strings } from "@notesnook/intl";
 import { useThemeEngineStore } from "@notesnook/theme";
 import { Mutex } from "async-mutex";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Linking } from "react-native";
 import WebView from "react-native-webview";
 import { DatabaseLogger, db } from "../../../common/database";
 import useGlobalSafeAreaInsets from "../../../hooks/use-global-safe-area-insets";
-import { DDS } from "../../../services/device-detection";
 import {
   ToastManager,
   eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent
+  eSubscribeEvent
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { NotePreviewWidget } from "../../../services/note-preview-widget";
@@ -70,7 +69,6 @@ import { SessionHistory } from "./session-history";
 import { EditorState, SavePayload } from "./types";
 import { TabSessionItem, syncTabs, useTabStore } from "./use-tab-store";
 import { defaultState, isContentInvalid, isEditorLoaded, post } from "./utils";
-import { Linking } from "react-native";
 
 const loadNoteMutex = new Mutex();
 

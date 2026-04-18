@@ -28,12 +28,15 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 //@ts-ignore
 import ToggleSwitch from "toggle-switch-react-native";
 import { db } from "../../../common/database";
 import { requestInAppReview } from "../../../services/app-review";
-import { presentSheet, ToastManager } from "../../../services/event-manager";
+import {
+  eSendEvent,
+  presentSheet,
+  ToastManager
+} from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { useAttachmentStore } from "../../../stores/use-attachment-store";
 import { openLinkInBrowser } from "../../../utils/functions";
@@ -46,7 +49,8 @@ import Input from "../../ui/input";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { useAsync } from "react-async-hook";
-import { isFeatureAvailable, useIsFeatureAvailable } from "@notesnook/common";
+import { eMenuItemUpdate } from "../../../utils/events";
+import { useIsFeatureAvailable } from "@notesnook/common";
 
 async function fetchMonographData(noteId: string) {
   const monographId = db.monographs.monograph(noteId);
@@ -118,6 +122,7 @@ const PublishNoteSheet = ({
 
         await monographData.execute();
         Navigation.queueRoutesForUpdate();
+        eSendEvent(eMenuItemUpdate);
         setPublishLoading(false);
       }
       requestInAppReview();
@@ -144,6 +149,7 @@ const PublishNoteSheet = ({
         await db.monographs.unpublish(note.id);
         monographData.execute();
         Navigation.queueRoutesForUpdate();
+        eSendEvent(eMenuItemUpdate);
         setPublishLoading(false);
       }
     } catch (e) {

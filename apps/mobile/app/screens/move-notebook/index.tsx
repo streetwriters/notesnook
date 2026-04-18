@@ -46,6 +46,7 @@ import {
 import {
   checkParentSelected,
   findRootNotebookId,
+  getAllNotebookChildren,
   getParentNotebookId
 } from "../../utils/notebooks";
 import { DefaultAppStyles } from "../../utils/styles";
@@ -124,17 +125,25 @@ export const MoveNotebook = (props: NavigationProps<"MoveNotebook">) => {
   useEffect(() => {
     async function filterNotebooks() {
       const excludedItems: string[] = [];
+      const disabledItems: string[] = [];
       for (const notebook of selectedNotebooks) {
+        const children = await getAllNotebookChildren(notebook.id, []);
+        excludedItems.push(...children);
         const parent = await getParentNotebookId(notebook.id);
-        if (!excludedItems.includes(parent)) {
-          excludedItems.push(parent);
+        if (!disabledItems.includes(parent)) {
+          disabledItems.push(parent);
         }
         excludedItems.push(notebook.id);
       }
-      const filtered = tree.filter(
-        (treeItem) => !excludedItems.includes(treeItem.notebook.id)
+      // Exclude and disable items as needed
+      const filtered = tree.filter(item => !excludedItems.includes(item.notebook.id)).map(
+        (treeItem) => {
+          return {
+            ...treeItem,
+            disabled: disabledItems.includes(treeItem.notebook.id)
+          }
+        }
       );
-
       return filtered;
     }
     filterNotebooks().then((filtered) => {
@@ -149,6 +158,13 @@ export const MoveNotebook = (props: NavigationProps<"MoveNotebook">) => {
           index={index}
           item={item}
           onPress={async () => {
+             if (item.disabled) {
+                        ToastManager.show({
+                          type: "info",
+                          "message": "You cannot move the selected notebook(s) here"
+                        })
+            return;
+            }
             const selectedNotebook = item.notebook;
             presentDialog({
               title: strings.moveNotebooks(selectedNotebooks.length),
@@ -239,6 +255,7 @@ export const MoveNotebook = (props: NavigationProps<"MoveNotebook">) => {
                   updateNotebooks();
                 }, 300);
               }}
+              testID="move-notebook-search"
               button={{
                 icon: "plus",
                 onPress: async () => {

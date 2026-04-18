@@ -34,6 +34,7 @@ import { useRelationStore } from "../stores/use-relation-store";
 import { useTagStore } from "../stores/use-tag-store";
 import { eUpdateNoteInEditor } from "./events";
 import { unlockVault } from "./unlock-vault";
+import { useTrashStore } from "../stores/use-trash-store";
 
 export const valueLimiter = (value: number, min: number, max: number) => {
   return value < min ? min : value > max ? max : value;
@@ -210,7 +211,9 @@ export const deleteItems = async (
   if (type === "notebook") {
     useNotebookStore.getState().refresh();
   }
+  useTrashStore.getState().refresh();
   useMenuStore.getState().setMenuPins();
+  useRelationStore.getState().update();
 };
 
 export const openLinkInBrowser = async (link: string) => {

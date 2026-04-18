@@ -30,7 +30,7 @@ import { fluidTabsRef } from "../../utils/global-refs";
 import { AppFontSize } from "../../utils/size";
 import { useSideBarDraggingStore } from "../side-menu/dragging-store";
 import { IconButton } from "../ui/icon-button";
-import { isFeatureAvailable, useIsFeatureAvailable } from "@notesnook/common";
+import { useIsFeatureAvailable } from "@notesnook/common";
 import PaywallSheet from "../sheets/paywall";
 import { strings } from "@notesnook/intl";
 import { ToastManager } from "../../services/event-manager";
@@ -142,7 +142,7 @@ function ReorderableList<T extends { id: string }>({
 
     items.push(...data.filter((i) => !itemOrderState.includes(i.id)));
     return items;
-  }, [data, customizableSidebarFeature?.isAllowed]);
+  }, [customizableSidebarFeature?.isAllowed, data, itemOrderState]);
 
   return (
     <View style={styles.container}>

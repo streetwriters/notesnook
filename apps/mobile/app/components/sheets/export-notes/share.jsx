@@ -21,7 +21,6 @@ import React from "react";
 import { View } from "react-native";
 import FileViewer from "react-native-file-viewer";
 import { ToastManager } from "../../../services/event-manager";
-import { AppFontSize } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../../utils/styles";

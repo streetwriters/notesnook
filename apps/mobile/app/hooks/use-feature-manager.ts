@@ -1,15 +1,28 @@
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2023 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 import { useAreFeaturesAvailable } from "@notesnook/common";
-import { strings } from "@notesnook/intl";
 import { useEffect } from "react";
 import { db } from "../common/database";
-import { presentDialog } from "../components/dialog/functions";
 import { useDragState } from "../screens/settings/editor/state";
-import { eSendEvent } from "../services/event-manager";
-import Navigation from "../services/navigation";
 import Notifications from "../services/notifications";
 import SettingsService from "../services/settings";
 import { useUserStore } from "../stores/use-user-store";
-import { eCloseSimpleDialog } from "../utils/events";
 
 export default function useFeatureManager() {
   const features = useAreFeaturesAvailable([
@@ -69,7 +82,7 @@ export default function useFeatureManager() {
         db.settings.setDefaultTag(undefined);
       }
     }
-  }, [features, plan]);
+  }, [features, plan, user]);
 
   return true;
 }

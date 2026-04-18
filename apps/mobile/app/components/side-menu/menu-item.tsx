@@ -24,18 +24,22 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useTotalNotes } from "../../hooks/use-db-item";
 
 import { db } from "../../common/database";
-import { eSubscribeEvent } from "../../services/event-manager";
+import {
+  eSubscribeEvent,
+  subscribeToItemUpdate
+} from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import useNavigationStore, {
   RouteParams
 } from "../../stores/use-navigation-store";
-import { eAfterSync } from "../../utils/events";
+import { eAfterSync, eMenuItemUpdate } from "../../utils/events";
 import { SideMenuItem } from "../../utils/menu-items";
 import { AppFontSize, defaultBorderRadius } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { Pressable } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
 import { useSideBarDraggingStore } from "./dragging-store";
+import { useRelationStore } from "../../stores/use-relation-store";
 
 export function MenuItem({
   item,
@@ -56,12 +60,18 @@ export function MenuItem({
   const totalNotes = useTotalNotes(
     item.dataType as "notebook" | "tag" | "color"
   );
+  const update = useRelationStore((state) => state.updater);
   const getTotalNotesRef = useRef(totalNotes.getTotalNotes);
   getTotalNotesRef.current = totalNotes.getTotalNotes;
-
   const menuItemCount = !item.data
     ? itemCount
     : totalNotes.totalNotes(item.data.id);
+
+  useEffect(() => {
+    if (item.data) {
+      getTotalNotesRef.current([item.data?.id]);
+    }
+  }, [update]);
 
   useEffect(() => {
     const onSyncComplete = async () => {
@@ -94,10 +104,20 @@ export function MenuItem({
         /** Empty */
       }
     };
-    const event = eSubscribeEvent(eAfterSync, onSyncComplete);
+    const events = [eSubscribeEvent(eAfterSync, onSyncComplete)];
+
+    if (!item.data) {
+      events.push(eSubscribeEvent(eMenuItemUpdate, onSyncComplete));
+    }
+
+    if (item.data?.id) {
+      events.push(
+        subscribeToItemUpdate(item?.data?.id, item?.data?.type, onSyncComplete)
+      );
+    }
     onSyncComplete();
     return () => {
-      event?.unsubscribe();
+      events?.forEach((e) => e?.unsubscribe());
     };
   }, [item.data, item.id]);
 
@@ -151,8 +171,8 @@ export function MenuItem({
               item.icon === "crown"
                 ? colors.static.yellow
                 : isFocused
-                ? colors.selected.icon
-                : colors.secondary.icon
+                  ? colors.selected.icon
+                  : colors.secondary.icon
             }
             size={AppFontSize.md}
           />

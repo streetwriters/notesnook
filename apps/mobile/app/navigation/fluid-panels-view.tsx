@@ -139,7 +139,7 @@ export const FluidPanelsView = React.memo(
       if (deviceMode === "smallTablet") {
         fluidTabsRef.current?.openDrawer(false);
       }
-    }, [deviceMode, dimensions.width, setFullscreen]);
+    }, [deviceMode, setFullscreen]);
 
     const closeFullScreenEditor = useCallback(
       (current: string) => {
@@ -158,7 +158,7 @@ export const FluidPanelsView = React.memo(
           fluidTabsRef.current?.goToIndex(2, false);
         }
       },
-      [deviceMode, dimensions.width, setFullscreen]
+      [deviceMode, setFullscreen]
     );
 
     const toggleView = useCallback(
@@ -215,7 +215,7 @@ export const FluidPanelsView = React.memo(
           }
         }, 0);
       },
-      [deviceMode, fullscreen, setDeviceModeState]
+      [fullscreen, setDeviceModeState]
     );
 
     const checkDeviceType = React.useCallback(
@@ -229,14 +229,14 @@ export const FluidPanelsView = React.memo(
             : "mobile";
         setDeviceMode(nextDeviceMode, size);
       },
-      [orientation, setDeviceMode, setDimensions]
+      [orientation, setDeviceMode]
     );
 
     useEffect(() => {
       if (orientation !== "UNKNOWN") {
         checkDeviceType(dimensions);
       }
-    }, [orientation, dimensions]);
+    }, [orientation, dimensions, checkDeviceType]);
 
     const _onLayout = React.useCallback(
       (event: LayoutChangeEvent) => {
@@ -251,13 +251,7 @@ export const FluidPanelsView = React.memo(
           setOrientation(OrientationType["PORTRAIT"]);
         }
       },
-      [
-        checkDeviceType,
-        deviceMode,
-        dimensions.width,
-        orientation,
-        setDeviceMode
-      ]
+      [setDimensions]
     );
 
     const PANE_OFFSET = useMemo(

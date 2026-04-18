@@ -40,6 +40,7 @@ import {
   useSideMenuNotebookTreeStore
 } from "./stores";
 import { LegendList } from "@legendapp/list";
+import { useRelationStore } from "../../stores/use-relation-store";
 useSideMenuNotebookSelectionStore.setState({
   multiSelect: true
 });
@@ -52,6 +53,7 @@ export const SideMenuNotebooks = () => {
   const [filteredNotebooks, setFilteredNotebooks] = React.useState(notebooks);
   const searchTimer = React.useRef<NodeJS.Timeout>(undefined);
   const lastQuery = React.useRef<string>(undefined);
+  const updater = useRelationStore(state => state.updater);
   const loadRootNotebooks = React.useCallback(async () => {
     if (!filteredNotebooks) return;
     const _notebooks: Notebook[] = [];
@@ -66,9 +68,6 @@ export const SideMenuNotebooks = () => {
 
   const updateNotebooks = React.useCallback(() => {
     if (lastQuery.current) {
-      // useSideMenuNotebookTreeStore.setState({
-      //   isSearching: true
-      // });
       db.lookup
         .notebooks(lastQuery.current)
         .sorted(db.settings.getGroupOptions("notebooks"))
@@ -76,16 +75,13 @@ export const SideMenuNotebooks = () => {
           setFilteredNotebooks(filtered);
         });
     } else {
-      // useSideMenuNotebookTreeStore.setState({
-      //   isSearching: false
-      // });
       setFilteredNotebooks(notebooks);
     }
   }, [notebooks]);
 
   useEffect(() => {
     updateNotebooks();
-  }, [updateNotebooks]);
+  }, [updateNotebooks,updater]);
 
   useEffect(() => {
     (async () => {

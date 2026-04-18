@@ -22,7 +22,6 @@ import { db } from "../common/database";
 import { DatabaseLogger } from "../common/database/index";
 import { initAfterSync } from "../stores/index";
 import { SyncStatus, useUserStore } from "../stores/use-user-store";
-import BackgroundSync from "./background-sync";
 import { ToastManager } from "./event-manager";
 import SettingsService from "./settings";
 

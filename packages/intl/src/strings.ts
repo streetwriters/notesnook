@@ -1839,7 +1839,7 @@ For example:
   incomingNote: () => t`Incoming note`,
   description: () => t`Description`,
   date: () => t`Date`,
-  month: () => t`month`,
+  month: () => t`Month`,
   day: () => t`Day`,
   time: () => t`Time`,
   encryptionKey: () => t`Encryption key`,
@@ -2227,7 +2227,8 @@ Use this if changes from other devices are not appearing on this device. This wi
   goBackToNotebooks: () => t`Go back to notebooks`,
   goBackToTags: () => t`Go back to tags`,
   okay: () => t`Okay`,
-  clearTrashDesc: () => t`Do you want to clear the trash?`,
+  clearTrashDesc: () =>
+    t`Clearing trash will permanently delete all the items in your trash. This action is IRREVERSIBLE.`,
   createdAt: () => t`Created at`,
   lastEditedAt: () => t`Last edited at`,
   enter6DigitCode: () =>
@@ -2564,7 +2565,10 @@ Use this if changes from other devices are not appearing on this device. This wi
   ],
   trialPlanConditions: [
     (duration: number) => t`Free ${duration} day trial, cancel any time`,
-    () => t`Google will remind you before your trial ends`
+    (platform: "ios" | "android") =>
+      t`${
+        platform === "ios" ? "Apple" : "Google"
+      } will remind you before your trial ends`
   ],
   purchase: () => t`Purchase`,
   subscribe: () => t`Subscribe`,

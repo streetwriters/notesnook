@@ -77,7 +77,7 @@ export const TagStrip = ({ item, close }) => {
       .then((tags) => {
         setTags(tags);
       });
-  }, []);
+  }, [item]);
 
   return tags?.length > 0 ? (
     <View

@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { getFormattedDate } from "@notesnook/common";
 import {
   EncryptedContentItem,
-  isEncryptedContent,
   Note,
   UnencryptedContentItem
 } from "@notesnook/core";
@@ -75,9 +74,9 @@ const MergeConflicts = () => {
   const { height } = useSettingStore((state) => state.dimensions);
 
   const applyChanges = async () => {
-    let contentToSave = selectedContent;
+    const contentToSave = selectedContent;
     if (!contentToSave) return;
-    let note = await db.notes.note(contentToSave.noteId);
+    const note = await db.notes.note(contentToSave.noteId);
     if (!note) return;
     await db.notes.add({
       id: note.id,
@@ -462,7 +461,8 @@ const MergeConflicts = () => {
             <ReadonlyEditor
               editorId="conflictSecondary"
               onLoad={async (loadContent) => {
-                const note = await db.notes.note(content.current?.noteId!);
+                if (!content.current?.noteId) return;
+                const note = await db.notes.note(content.current?.noteId);
                 if (!note) return;
                 loadContent({
                   id: note.id,

@@ -33,7 +33,10 @@ import { Pressable } from "../../components/ui/pressable";
 import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
-import { ToastManager } from "../../services/event-manager";
+import {
+  sendItemUpdateEvent,
+  ToastManager
+} from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import {
   ItemSelection,
@@ -80,7 +83,10 @@ const useTagItemSelection = createItemSelectionStore(true);
 
 const ManageTags = (props: NavigationProps<"ManageTags">) => {
   const { colors } = useThemeColors();
-  const ids = props.route.params.ids || [];
+  const ids = React.useMemo(
+    () => props.route.params.ids || [],
+    [props.route.params.ids]
+  );
   const [tags, setTags] = useState<Tag[]>();
   const [query, setQuery] = useState<string>();
   const inputRef = useRef<TextInput>(null);
@@ -121,7 +127,7 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
       tags.splice(0, 0, ...noteTags);
       setTags(tags);
     },
-    []
+    [ids]
   );
 
   const refreshTags = useCallback(() => {
@@ -135,7 +141,7 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
         .sorted(db.settings.getGroupOptions("tags"))
         .then(sortAndSetTags);
     }
-  }, [query]);
+  }, [query, sortAndSetTags]);
 
   useEffect(() => {
     refreshTags();
@@ -199,6 +205,7 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
       }
 
       useRelationStore.getState().update();
+      sendItemUpdateEvent(id, "tag");
       useTagStore.getState().refresh();
       setQuery(undefined);
     } catch (e) {
@@ -242,6 +249,7 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
           console.error(e);
         }
       }
+      sendItemUpdateEvent(id, "tag");
       useTagStore.getState().refresh();
       useRelationStore.getState().update();
       refreshTags();
@@ -417,15 +425,15 @@ const TagItem = ({
             selection === "selected"
               ? "check-circle-outline"
               : selection === "intermediate"
-              ? "minus-circle-outline"
-              : "checkbox-blank-circle-outline"
+                ? "minus-circle-outline"
+                : "checkbox-blank-circle-outline"
           }
           name={
             selection === "selected"
               ? "check-circle-outline"
               : selection === "intermediate"
-              ? "minus-circle-outline"
-              : "checkbox-blank-circle-outline"
+                ? "minus-circle-outline"
+                : "checkbox-blank-circle-outline"
           }
         />
       )}

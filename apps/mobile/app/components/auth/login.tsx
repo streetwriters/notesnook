@@ -22,14 +22,9 @@ import { useThemeColors } from "@notesnook/theme";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import { TouchableOpacity, View, useWindowDimensions } from "react-native";
-import { SheetManager } from "react-native-actions-sheet";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { DDS } from "../../services/device-detection";
-import {
-  eSendEvent,
-  presentSheet,
-  ToastManager
-} from "../../services/event-manager";
+import { eSendEvent, presentSheet } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import PremiumService from "../../services/premium";
 import SettingsService from "../../services/settings";
@@ -195,8 +190,8 @@ export const Login = ({
                   ? "50%"
                   : "49.99%"
                 : focused
-                ? "100%"
-                : "99.9%",
+                  ? "100%"
+                  : "99.9%",
               backgroundColor: colors.primary.background,
               alignSelf: "center",
               paddingHorizontal: DDS.isTab ? 0 : DefaultAppStyles.GAP,

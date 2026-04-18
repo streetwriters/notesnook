@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { parseInternalLink } from "@notesnook/core";
+import { NativeEvents } from "@notesnook/editor-mobile/src/utils/native-events";
 import { createRef, MutableRefObject, RefObject } from "react";
 import { TextInput } from "react-native";
 import WebView from "react-native-webview";
@@ -28,10 +29,8 @@ import {
   eUnSubscribeEvent
 } from "../../../services/event-manager";
 import { eOnLoadNote } from "../../../utils/events";
-import { NotesnookModule } from "../../../utils/notesnook-module";
-import { AppState, EditorState, useEditorType } from "./types";
+import { EditorState, useEditorType } from "./types";
 import { useTabStore } from "./use-tab-store";
-import { NativeEvents } from "@notesnook/editor-mobile/src/utils/native-events";
 
 export const textInput = createRef<TextInput>();
 export const editorController =

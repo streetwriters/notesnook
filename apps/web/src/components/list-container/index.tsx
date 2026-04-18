@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { forwardRef, useEffect, useRef, useState } from "react";
 import { Flex, Button } from "@theme-ui/components";
 import { SxProp } from "@theme-ui/core";
-import { Plus } from "../icons";
+import { Plus, Icon } from "../icons";
 import {
   useStore as useSelectionStore,
   store as selectionStore
@@ -76,6 +76,7 @@ type ListContainerProps = {
   isSearching?: boolean;
   onDrop?: (e: React.DragEvent<HTMLDivElement>) => void;
   button?: {
+    Icon?: Icon;
     onClick: () => void;
   };
   Scroller?: Components["Scroller"];
@@ -275,7 +276,11 @@ function ListContainer(props: ListContainerProps) {
             height: 45
           }}
         >
-          <Plus color="accentForeground" />
+          {button.Icon ? (
+            <button.Icon color="accentForeground" />
+          ) : (
+            <Plus color="accentForeground" />
+          )}
         </Button>
       )}
     </Flex>

@@ -28,7 +28,7 @@ import {
   ToastManager
 } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
-import { eCloseSheet } from "../../../utils/events";
+import { eAfterSync, eCloseSheet } from "../../../utils/events";
 import { SideMenuItem } from "../../../utils/menu-items";
 import { AppFontSize } from "../../../utils/size";
 import { DefaultAppStyles } from "../../../utils/styles";
@@ -37,12 +37,17 @@ import AppIcon from "../../ui/AppIcon";
 import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
 import PaywallSheet from "../paywall";
+import { presentDialog } from "../../dialog/functions";
+import { db } from "../../../common/database";
+import { useTrashStore } from "../../../stores/use-trash-store";
 export const MenuItemProperties = ({ item }: { item: SideMenuItem }) => {
   const { colors } = useThemeColors();
   const featuresAvailable = useAreFeaturesAvailable([
     "customHomepage",
     "customizableSidebar"
   ]);
+  const trash = useTrashStore((state) => state.items);
+
   return !featuresAvailable ? null : (
     <View
       style={{
@@ -100,7 +105,37 @@ export const MenuItemProperties = ({ item }: { item: SideMenuItem }) => {
           },
           icon: "sort-ascending",
           locked: !featuresAvailable?.customizableSidebar.isAllowed
-        }
+        },
+        ...(item.id === "Trash"
+          ? [
+              {
+                title: strings.clearTrash(),
+                onPress: async () => {
+                  if (!trash || trash?.length === 0) return;
+                  eSendEvent(eCloseSheet);
+                  setTimeout(() => {
+                    presentDialog({
+                      title: strings.clearTrashConfirm(),
+                      paragraph: strings.clearTrashDesc(),
+                      positiveText: strings.clear(),
+                      positivePress: async () => {
+                        await db.trash.clear();
+                        useTrashStore.getState().clear();
+                        eSendEvent(eAfterSync);
+                        ToastManager.show({
+                          message: strings.trashCleared(),
+                          type: "success"
+                        });
+                        return true;
+                      }
+                    });
+                  }, 500);
+                },
+                icon: "delete-sweep-outline",
+                disabled: !trash || trash?.length === 0
+              }
+            ]
+          : [])
       ].map((item) => (
         <Pressable
           key={item.title}
@@ -112,7 +147,7 @@ export const MenuItemProperties = ({ item }: { item: SideMenuItem }) => {
             gap: DefaultAppStyles.GAP_SMALL,
             borderRadius: 0,
             paddingHorizontal: DefaultAppStyles.GAP,
-            opacity: item.locked ? 0.6 : 1
+            opacity: item.disabled || item.locked ? 0.6 : 1
           }}
           onPress={() => {
             item.onPress();

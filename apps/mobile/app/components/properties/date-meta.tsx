@@ -35,7 +35,7 @@ export const DateMeta = ({ item }: { item: Item }) => {
   const [dateCreated, setDateCreated] = useState(item.dateCreated);
 
   function getDateMeta() {
-    let keys = Object.keys(item);
+    const keys = Object.keys(item);
     if (keys.includes("dateEdited"))
       keys.splice(
         keys.findIndex((k) => k === "dateModified"),

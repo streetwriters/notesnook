@@ -38,6 +38,7 @@ export async function unlockVault({
   if (unlockPromise) {
     return unlockPromise;
   }
+  // eslint-disable-next-line no-async-promise-executor
   unlockPromise = new Promise(async (resolve) => {
     const result = await (async () => {
       if (db.vault.unlocked && !requirePassword) return true;

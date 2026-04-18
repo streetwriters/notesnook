@@ -38,6 +38,7 @@ import { SideMenuHeader } from "./side-menu-header";
 import { SideMenuListEmpty } from "./side-menu-list-empty";
 import { useSideMenuTagsSelectionStore } from "./stores";
 import { LegendList, LegendListRenderItemProps } from "@legendapp/list";
+import { useRelationStore } from "../../stores/use-relation-store";
 
 const TagItem = (props: {
   tags: VirtualizedGrouping<Tag>;
@@ -55,12 +56,13 @@ const TagItem = (props: {
   const totalNotes = useTotalNotes("tag");
   const totalNotesRef = React.useRef(totalNotes);
   totalNotesRef.current = totalNotes;
+  const updater = useRelationStore(state => state.updater);
 
   useEffect(() => {
     if (item?.id) {
       totalNotesRef.current?.getTotalNotes([item?.id]);
     }
-  }, [item]);
+  }, [item, updater]);
 
   return (
     <View

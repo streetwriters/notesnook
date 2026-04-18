@@ -207,7 +207,7 @@ export const useEditorEvents = (
     return () => {
       subscriptions.forEach((subscription) => subscription.remove());
     };
-  }, [editor.commands, editor.postMessage]);
+  }, [editor, editor.commands, editor.postMessage]);
   useEffect(() => {
     if (loading) return;
     if (typeof defaultFontFamily === "object") {
@@ -816,7 +816,7 @@ export const useEditorEvents = (
             let filePath: string;
             let fileName: string;
             if (Platform.OS === "android") {
-              let file = await ScopedStorage.createDocument(
+              const file = await ScopedStorage.createDocument(
                 "table.csv",
                 "text/csv",
                 csv,

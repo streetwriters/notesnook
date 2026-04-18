@@ -32,7 +32,7 @@ import { Action } from "../../stores/use-message-store";
 
 export const Cta = (props: BodyItemProps) => {
   const { colors } = useThemeColors();
-  let buttons =
+  const buttons =
     props.item.actions.filter((item) => allowedOnPlatform(item.platforms)) ||
     [];
 

@@ -76,7 +76,7 @@ export const PinnedSection = React.memo(
           onPress: onPress,
           onLongPress: onLongPress
         })) as SideMenuItem[],
-      [menuPins, onPress]
+      [menuPins, onLongPress, onPress]
     );
 
     const renderItem = React.useCallback(({ item }: { item: SideMenuItem }) => {

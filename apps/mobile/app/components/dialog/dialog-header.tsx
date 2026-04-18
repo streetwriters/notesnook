@@ -22,7 +22,6 @@ import { Text, View, ViewStyle } from "react-native";
 import { useThemeColors } from "@notesnook/theme";
 import { AppFontSize } from "../../utils/size";
 import { Button, ButtonProps } from "../ui/button";
-import { PressableProps } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { DefaultAppStyles } from "../../utils/styles";

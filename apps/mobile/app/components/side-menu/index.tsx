@@ -79,6 +79,7 @@ type SimpleTabViewProps = {
 const createSceneMap = (
   scenes: Record<string, React.ComponentType<any>>
 ): ((props: { route: SimpleRoute }) => React.ReactNode) => {
+  // eslint-disable-next-line react/display-name
   return ({ route }: { route: SimpleRoute }) => {
     const SceneComponent = scenes[route.key];
     if (!SceneComponent) return null;
@@ -136,8 +137,8 @@ const SimpleTabView = ({
             {loadedKeysRef.current.has(route.key)
               ? getSceneForRoute(route)
               : navigationState.index === routeIndex
-              ? getSceneForRoute(route)
-              : null}
+                ? getSceneForRoute(route)
+                : null}
           </View>
         ))}
       </View>
@@ -432,12 +433,12 @@ const TabBar = (props: SimpleTabBarProps) => {
                       name="plus"
                       testID="sidebar-add-button"
                       size={AppFontSize.lg - 2}
+                       top={10}
                       color={colors.primary.icon}
                       onPress={async () => {
                         if (props.navigationState.index === 1) {
-                          const notebooksFeature = await isFeatureAvailable(
-                            "notebooks"
-                          );
+                          const notebooksFeature =
+                            await isFeatureAvailable("notebooks");
                           if (!notebooksFeature.isAllowed) {
                             PaywallSheet.present(notebooksFeature);
                             return;
@@ -485,6 +486,7 @@ const TabBar = (props: SimpleTabBarProps) => {
                           ? "sort-ascending"
                           : "sort-descending"
                       }
+                      top={10}
                       testID="sidebar-sort-button"
                       color={colors.primary.icon}
                       onPress={() => {
@@ -520,6 +522,7 @@ const TabBar = (props: SimpleTabBarProps) => {
                         width: 28,
                         height: 28
                       }}
+                      top={10}
                       testID="sidebar-theme-button"
                       color={colors.primary.icon}
                       name={isDark ? "weather-night" : "weather-sunny"}

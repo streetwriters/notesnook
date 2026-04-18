@@ -378,7 +378,17 @@ export const AddReminderDialog = DialogManager.register(
           </Flex>
         ) : null}
 
-        <Flex sx={{ gap: 2, overflowX: "auto", mt: 2 }}>
+        <Flex
+          sx={{
+            gap: 2,
+            overflowX: "auto",
+            mt: 2,
+            flexDirection:
+              mode === Modes.REPEAT && recurringMode === RecurringModes.YEAR
+                ? "column"
+                : "row"
+          }}
+        >
           {mode === Modes.ONCE ? (
             <>
               <Field
@@ -432,7 +442,7 @@ export const AddReminderDialog = DialogManager.register(
               </PopupPresenter>
             </>
           ) : recurringMode === RecurringModes.YEAR ? (
-            <>
+            <Flex sx={{ gap: 2 }}>
               <LabeledSelect
                 id="month"
                 label={strings.month()}
@@ -459,13 +469,14 @@ export const AddReminderDialog = DialogManager.register(
                   setDate((d) => d.date(parseInt(day)));
                 }}
               />
-            </>
+            </Flex>
           ) : null}
           <Field
             id="time"
             label={strings.time()}
             required
             data-test-id="time-input"
+            sx={{ alignSelf: "flex-start" }}
             helpText={`${
               db.settings.getTimeFormat() === "12-hour"
                 ? "hh:mm AM/PM"
@@ -524,7 +535,10 @@ export const AddReminderDialog = DialogManager.register(
           </Text>
         ) : (
           <Text variant="subBody" sx={{ mt: 1 }}>
-            {strings.reminderStarts(date.format(db.settings.getDateFormat()), date.format(timeFormat()))}
+            {strings.reminderStarts(
+              date.format(db.settings.getDateFormat()),
+              date.format(timeFormat())
+            )}
           </Text>
         )}
 

@@ -53,7 +53,6 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { strings } from "@notesnook/intl";
-import { AppFontSize } from "../../utils/size";
 import { editorController } from "../../screens/editor/tiptap/utils";
 import { useTabStore } from "../../screens/editor/tiptap/use-tab-store";
 
@@ -239,8 +238,8 @@ const AppLocked = () => {
             deviceMode !== "mobile"
               ? "50%"
               : Platform.OS == "ios"
-              ? "95%"
-              : "100%",
+                ? "95%"
+                : "100%",
           paddingHorizontal: 12,
           marginBottom: 30,
           marginTop: 15,

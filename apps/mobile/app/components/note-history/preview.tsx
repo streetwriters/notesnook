@@ -42,7 +42,6 @@ import {
   isEncryptedContent,
   Note,
   NoteContent,
-  SessionContentItem,
   TrashOrItem
 } from "@notesnook/core";
 

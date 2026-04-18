@@ -202,7 +202,7 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
             ) : undefined
           }
           placeholder={{
-            title: notebook?.title!,
+            title: notebook?.title || "",
             paragraph: strings.notesEmpty(),
             button: strings.addFirstNote(),
             action: openEditor,

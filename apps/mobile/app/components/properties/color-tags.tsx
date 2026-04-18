@@ -27,7 +27,11 @@ import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../e2e/test.ids";
 import { db } from "../../common/database";
-import { eSendEvent, ToastManager } from "../../services/event-manager";
+import {
+  eSendEvent,
+  sendItemUpdateEvent,
+  ToastManager
+} from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import { useMenuStore } from "../../stores/use-menu-store";
 import { useRelationStore } from "../../stores/use-relation-store";
@@ -63,6 +67,7 @@ const ColorItem = ({ item, note }: { item: Color; note: Note }) => {
     useRelationStore.getState().update();
     setColorNotes();
     Navigation.queueRoutesForUpdate();
+    sendItemUpdateEvent(item.id, "color");
     eSendEvent(refreshNotesPage);
   };
 
@@ -127,7 +132,7 @@ export const ColorTags = ({ item }: { item: Note }) => {
     }
     useSettingStore.getState().setSheetKeyboardHandler(false);
     setVisible(true);
-  }, []);
+  }, [colorFeature]);
 
   return (
     <>
@@ -140,6 +145,7 @@ export const ColorTags = ({ item }: { item: Note }) => {
           useRelationStore.getState().update();
           useMenuStore.getState().setColorNotes();
           Navigation.queueRoutesForUpdate();
+          sendItemUpdateEvent(color.id, "color");
           eSendEvent(refreshNotesPage);
         }}
       />

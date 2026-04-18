@@ -255,12 +255,15 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
           const products = WebPlanCache || (await db.pricing.products());
           WebPlanCache = products;
           setWebPricingPlans(products);
-        } catch (e) {}
+        } catch (e) {
+          /**
+          empty */
+        }
       }
       setLoadingPlans(false);
     };
     loadPlans();
-  }, [options?.promoOffer, cancelPromo]);
+  }, [options?.promoOffer, cancelPromo, hasTrialOffer]);
 
   function getLocalizedPrice(
     product: RNIap.Subscription | RNIap.Product | Plan
@@ -276,8 +279,8 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
           (product as Plan).period === "yearly"
             ? (product as Plan).price.gross
             : (product as Plan).period === "5-year"
-            ? (product as Plan).price.gross
-            : (product as Plan).price.gross
+              ? (product as Plan).price.gross
+              : (product as Plan).price.gross
         }`;
       }
 
@@ -432,8 +435,8 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
       return period.endsWith("W")
         ? "week"
         : period.endsWith("M")
-        ? "month"
-        : "year";
+          ? "month"
+          : "year";
     } else {
       const unit = (product as RNIap.SubscriptionIOS)
         ?.subscriptionPeriodUnitIOS;
@@ -475,8 +478,8 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
         type: phase.billingPeriod.endsWith("W")
           ? "week"
           : phase.billingPeriod.endsWith("M")
-          ? "month"
-          : "year"
+            ? "month"
+            : "year"
       };
     } else {
       const productIos = product as RNIap.SubscriptionIOS;
@@ -530,14 +533,15 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
     const formattedPrice = numberWithCommas(monthlyPrice.toFixed(2));
 
     return isAtLeft
-      ? `${symbol} ${formattedPrice}`
-      : `${formattedPrice} ${symbol}`;
+      ? `${symbol}${formattedPrice}`
+      : `${formattedPrice}${symbol}`;
   };
 
   const getDiscountValue = (p1: string, p2: string, splitToMonth?: boolean) => {
-    let price1 = Platform.OS === "ios" ? parseInt(p1) : parseInt(p1) / 1000000;
+    let price1 =
+      Platform.OS === "ios" ? parseFloat(p1) : parseFloat(p1) / 1000000;
     const price2 =
-      Platform.OS === "ios" ? parseInt(p2) : parseInt(p2) / 1000000;
+      Platform.OS === "ios" ? parseFloat(p2) : parseFloat(p2) / 1000000;
 
     price1 = splitToMonth ? price1 / 12 : price1;
 
@@ -587,7 +591,7 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
     } else {
       priceValue = price / 1000000;
     }
-    const priceSymbol = localizedPrice.replace(/[\s\d,.]+/, "");
+    const priceSymbol = localizedPrice.replace(/[\d,.]+/, "");
 
     return { priceValue, priceSymbol, localizedPrice };
   };
@@ -607,8 +611,8 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
         (product as Plan).period === "yearly"
           ? ((product as Plan).price.gross / 12).toFixed(2)
           : (product as Plan).period === "5-year"
-          ? ((product as Plan).price.gross / (12 * 5)).toFixed(2)
-          : (product as Plan).price.gross
+            ? ((product as Plan).price.gross / (12 * 5)).toFixed(2)
+            : (product as Plan).price.gross
       }`;
     }
 

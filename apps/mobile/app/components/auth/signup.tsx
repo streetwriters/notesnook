@@ -99,7 +99,7 @@ export const Signup = ({
     try {
       setCurrentStep(SignupSteps.createAccount);
       await db.user.signup(email.current!.toLowerCase(), password.current!);
-      let user = await db.user.getUser();
+      const user = await db.user.getUser();
       setUser(user);
       setLastSynced(await db.lastSynced());
       clearMessage();

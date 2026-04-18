@@ -25,7 +25,6 @@ import * as Keychain from "react-native-keychain";
 import { MMKVLoader, ProcessingModes } from "react-native-mmkv-storage";
 import { generateSecureRandom } from "react-native-securerandom";
 import { DatabaseLogger } from ".";
-import { ToastManager } from "../../services/event-manager";
 import { MMKV } from "./mmkv";
 
 // Database key cipher is persisted across different user sessions hence it has
@@ -205,9 +204,8 @@ export async function getDatabaseKey(appLockPassword?: string) {
   }
 
   if (await Keychain.hasInternetCredentials("notesnook")) {
-    const userKeyCredentials = await Keychain.getInternetCredentials(
-      "notesnook"
-    );
+    const userKeyCredentials =
+      await Keychain.getInternetCredentials("notesnook");
 
     if (userKeyCredentials) {
       const userKeyCipher: Cipher = (await encrypt(

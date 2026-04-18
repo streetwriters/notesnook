@@ -109,8 +109,8 @@ class RNSqliteConnection implements DatabaseConnection {
       query.kind === "SelectQueryNode"
         ? "query"
         : query.kind === "RawNode"
-        ? "raw"
-        : "exec";
+          ? "raw"
+          : "exec";
 
     const result = await this.db.executeAsync(sql, parameters as any[]);
 

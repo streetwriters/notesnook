@@ -37,7 +37,11 @@ async function configureAutoUpdater() {
     config.releaseTrack === "stable" &&
     autoUpdater.currentVersion.prerelease.length > 0;
   autoUpdater.allowPrerelease = false;
-  autoUpdater.autoInstallOnAppQuit = true;
+  // Do NOT auto-install on quit. On Windows, if the system shuts down while
+  // the NSIS installer is running, it first removes all old files and then
+  // gets killed before copying new ones — leaving an empty install directory.
+  // Updates should only be installed when the user explicitly triggers it.
+  autoUpdater.autoInstallOnAppQuit = false;
   autoUpdater.disableWebInstaller = true;
 }
 

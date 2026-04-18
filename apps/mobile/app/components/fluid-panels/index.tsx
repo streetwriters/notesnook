@@ -22,7 +22,6 @@ import React, {
   RefObject,
   useEffect,
   useImperativeHandle,
-  useMemo,
   useRef,
   useState
 } from "react";
@@ -39,7 +38,6 @@ import Animated, {
   WithSpringConfig,
   withTiming
 } from "react-native-reanimated";
-import { useTabStore } from "../../screens/editor/tiptap/use-tab-store";
 import { eSendEvent } from "../../services/event-manager";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { eClearEditor } from "../../utils/events";

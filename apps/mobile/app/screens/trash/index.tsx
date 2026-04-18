@@ -36,7 +36,7 @@ import { strings } from "@notesnook/intl";
 const onPressFloatingButton = () => {
   presentDialog({
     title: strings.clearTrash(),
-    paragraph: strings.clearTrashConfirm(),
+    paragraph: strings.clearTrashDesc(),
     positiveText: strings.clear(),
     negativeText: strings.cancel(),
     positivePress: async () => {
@@ -58,8 +58,8 @@ const PLACEHOLDER_DATA = (trashCleanupInterval = 7) => ({
     trashCleanupInterval === -1
       ? strings.noTrashCleanupInterval()
       : trashCleanupInterval === 1
-      ? strings.trashCleanupIntervalTextDaily()
-      : strings.trashCleanupIntervalTextDays(trashCleanupInterval),
+        ? strings.trashCleanupIntervalTextDaily()
+        : strings.trashCleanupIntervalTextDays(trashCleanupInterval),
   loading: strings.loadingTrash()
 });
 
@@ -107,6 +107,7 @@ export const Trash = ({ navigation, route }: NavigationProps<"Trash">) => {
         {trash && trash?.placeholders?.length !== 0 ? (
           <FloatingButton
             onPress={onPressFloatingButton}
+            testID="trash-clear"
             alwaysVisible={true}
           />
         ) : null}

@@ -33,6 +33,7 @@ import { Image, openCamera, openPicker } from "react-native-image-crop-picker";
 import { DatabaseLogger, db } from "../../../common/database";
 import filesystem from "../../../common/filesystem";
 import { compressToFile } from "../../../common/filesystem/compress";
+import { santizeUri } from "../../../common/filesystem/utils";
 import AttachImage from "../../../components/dialogs/attach-image-dialog";
 import { ToastManager } from "../../../services/event-manager";
 import PremiumService from "../../../services/premium";
@@ -40,7 +41,6 @@ import { useSettingStore } from "../../../stores/use-setting-store";
 import { useUserStore } from "../../../stores/use-user-store";
 import { useTabStore } from "./use-tab-store";
 import { editorController, editorState } from "./utils";
-import { santizeUri } from "../../../common/filesystem/utils";
 
 type PickerOptions = {
   noteId?: string;
@@ -102,7 +102,7 @@ const file = async (fileOptions: PickerOptions) => {
       return;
     }
 
-    let uri = santizeUri(fileCopyUri.localUri);
+    const uri = santizeUri(fileCopyUri.localUri);
     const hash = await Sodium.hashFile({
       uri: uri,
       type: "url"

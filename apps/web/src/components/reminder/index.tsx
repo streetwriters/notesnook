@@ -32,12 +32,12 @@ import {
   Trash
 } from "../icons";
 import IconTag from "../icon-tag";
-import { isReminderToday } from "@notesnook/core";
+import { isReminderToday, formatReminderTime } from "@notesnook/core";
 import { hashNavigate } from "../../navigation";
 import { Multiselect } from "../../common/multi-select";
 import { store } from "../../stores/reminder-store";
 import { db } from "../../common/db";
-import { getFormattedReminderTime } from "@notesnook/common";
+import { useStore as useSettingStore } from "../../stores/setting-store";
 import { MenuItem } from "@notesnook/ui";
 import { Reminder as ReminderType } from "@notesnook/core";
 import { ConfirmDialog } from "../../dialogs/confirm";
@@ -67,6 +67,8 @@ function Reminder(props: ReminderProps) {
   const { item, compact } = props;
   const reminder = item as unknown as ReminderType;
   const PriorityIcon = PRIORITY_ICON_MAP[reminder.priority];
+  const dateFormat = useSettingStore((store) => store.dateFormat);
+  const timeFormat = useSettingStore((store) => store.timeFormat);
   return (
     <ListItem
       item={item}
@@ -103,7 +105,10 @@ function Reminder(props: ReminderProps) {
           ) : (
             <IconTag
               icon={Clock}
-              text={getFormattedReminderTime(reminder)}
+              text={formatReminderTime(reminder, false, {
+                dateFormat,
+                timeFormat
+              })}
               highlight={isReminderToday(reminder)}
               testId={"reminder-time"}
             />

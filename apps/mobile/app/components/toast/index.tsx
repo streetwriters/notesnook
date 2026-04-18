@@ -120,10 +120,9 @@ export const Toast = ({ context = "global" }) => {
         alignItems: "center",
         alignSelf: "center",
         bottom:
-          Platform.OS === "android"
-            ? Math.max(insets.bottom, 40)
-            : Math.max(insets.bottom, 40) +
-              (keyboard.keyboardShown ? keyboard.keyboardHeight : 0),
+          insets.bottom +
+          15 +
+          (keyboard.keyboardShown ? Math.max(0, keyboard.keyboardHeight) : 0),
         position: "absolute",
         zIndex: 999,
         elevation: 15
@@ -158,22 +157,22 @@ export const Toast = ({ context = "global" }) => {
               toastOptions.icon
                 ? toastOptions.icon
                 : toastOptions.type === "success"
-                ? "check"
-                : toastOptions.type === "info"
-                ? "information"
-                : "close"
+                  ? "check"
+                  : toastOptions.type === "info"
+                    ? "information"
+                    : "close"
             }
             size={isFullToastMessage ? AppFontSize.xxxl : AppFontSize.xl}
             color={
               toastOptions?.icon
                 ? toastOptions?.icon
                 : toastOptions.type === "error"
-                ? colors.error.icon
-                : toastOptions.type === "info"
-                ? isDark
-                  ? colors.static.white
-                  : colors.static.black
-                : colors.success.icon
+                  ? colors.error.icon
+                  : toastOptions.type === "info"
+                    ? isDark
+                      ? colors.static.white
+                      : colors.static.black
+                    : colors.success.icon
             }
           />
 
