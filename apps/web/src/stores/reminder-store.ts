@@ -101,7 +101,9 @@ function scheduleReminder(id: string, reminder: Reminder, cron: string) {
       return;
     }
 
-    if (IS_DESKTOP_APP) {
+    if (IS_DESKTOP_APP && !IS_LINUX) {
+      // why not do this on Linux? Attempting to bring the app to the front causes the app to freeze here and leak memory. 
+      // Once there is no more memory left to leak, the app segfaults.
       const tag = await desktop?.integration.showNotification.query({
         title: reminder.title,
         body: reminder.description ?? "",
