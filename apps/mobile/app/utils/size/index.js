@@ -90,7 +90,7 @@ function getSize() {
   return {
     xxxs: FontSizes.XXS,
     xxs: FontSizes.XXS,
-    xs: FontSizes.XX,
+    xs: FontSizes.XS,
     sm: FontSizes.SM,
     md: FontSizes.MD,
     lg: FontSizes.LG,

@@ -23,7 +23,6 @@ import dayjs from "dayjs";
 import React, { useState } from "react";
 import {
   Linking,
-  Platform,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -41,12 +40,15 @@ import { DefaultAppStyles } from "../../../utils/styles";
 import { Button } from "../../ui/button";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { Radius, Spacing } from "../../../common/design/spacing";
+import useGlobalSafeAreaInsets from "../../../hooks/use-global-safe-area-insets";
 const isGithubRelease = Config.GITHUB_RELEASE === "true";
 export const BuyPlan = (props: {
   planId: string;
   canActivateTrial?: boolean;
   pricingPlans: ReturnType<typeof usePricingPlans>;
 }) => {
+  const insets = useGlobalSafeAreaInsets();
   const { colors } = useThemeColors();
   const [checkoutUrl, setCheckoutUrl] = useState<string>();
   const pricingPlans = props.pricingPlans;
@@ -62,6 +64,18 @@ export const BuyPlan = (props: {
       ? (pricingPlans.selectedProduct as Plan)?.period
       : (pricingPlans.selectedProduct as RNIap.Product)?.productId
   )?.includes("5");
+
+  const isAnnual = isGithubRelease
+    ? (pricingPlans.selectedProduct as Plan)?.period === "yearly"
+    : (pricingPlans.selectedProduct as RNIap.Product)?.productId?.includes(
+        "yearly"
+      );
+
+  const hasTrialOffer = pricingPlans.hasTrialOffer(
+    props.planId,
+    (pricingPlans.selectedProduct as RNIap.Product)?.productId ||
+      (pricingPlans.selectedProduct as Plan)?.period
+  );
 
   return checkoutUrl ? (
     <View
@@ -88,162 +102,274 @@ export const BuyPlan = (props: {
       />
     </View>
   ) : (
-    <ScrollView
-      contentContainerStyle={{
-        marginTop: DefaultAppStyles.GAP_VERTICAL
+    <View
+      style={{
+        flex: 1
       }}
-      keyboardDismissMode="none"
-      keyboardShouldPersistTaps="always"
     >
-      <View
-        style={{
-          paddingHorizontal: DefaultAppStyles.GAP,
-          gap: DefaultAppStyles.GAP_VERTICAL
+      <ScrollView
+        contentContainerStyle={{
+          paddingVertical: Spacing.LEVEL_4
         }}
+        keyboardDismissMode="none"
+        keyboardShouldPersistTaps="always"
       >
-        {[
-          Config.GITHUB_RELEASE === "true"
-            ? "yearly"
-            : `notesnook.${props.planId}.yearly`,
-          Config.GITHUB_RELEASE === "true"
-            ? "monthly"
-            : `notesnook.${props.planId}.monthly`,
-          ...(props.planId === "essential" || pricingPlans.isSubscribed()
-            ? []
-            : [
-                Config.GITHUB_RELEASE === "true"
-                  ? "5-year"
-                  : `notesnook.${props.planId}.5year`
-              ])
-        ].map((item) => (
-          <ProductItem
-            key={item}
-            pricingPlans={pricingPlans}
-            productId={item}
-          />
-        ))}
-
         <View
           style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            borderWidth: 1,
-            borderColor: colors.primary.border,
-            padding: DefaultAppStyles.GAP,
-            borderRadius: defaultBorderRadius
+            paddingHorizontal: DefaultAppStyles.GAP,
+            gap: Spacing.LEVEL_4
           }}
         >
-          <Heading color={colors.primary.paragraph} size={AppFontSize.sm}>
-            {strings.dueToday()}{" "}
-            {pricingPlans.hasTrialOffer(
-              props.planId,
-              (pricingPlans?.selectedProduct as RNIap.Product)?.productId ||
-                (pricingPlans?.selectedProduct as Plan)?.period
-            ) ? (
-              <Text
-                style={{
-                  color: colors.primary.accent
-                }}
-              >
-                ({strings.daysFree(`${billingDuration?.duration || 0}`)})
-              </Text>
-            ) : null}
-          </Heading>
-
-          <Paragraph color={colors.primary.paragraph}>
-            {pricingPlans.hasTrialOffer(
-              props.planId,
-              (pricingPlans?.selectedProduct as RNIap.Product)?.productId ||
-                (pricingPlans?.selectedProduct as Plan)?.period
-            )
-              ? "FREE"
-              : pricingPlans.getStandardPrice(
-                  pricingPlans.selectedProduct as RNIap.Subscription
-                )}
-          </Paragraph>
-        </View>
-
-        {pricingPlans.hasTrialOffer(
-          props.planId,
-          (pricingPlans?.selectedProduct as RNIap.Product)?.productId ||
-            (pricingPlans?.selectedProduct as Plan)?.period
-        ) ? (
           <View
             style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              borderWidth: 1,
-              borderColor: colors.primary.border,
-              padding: DefaultAppStyles.GAP,
-              borderRadius: defaultBorderRadius
+              gap: Spacing.LEVEL_2
             }}
           >
-            <Paragraph color={colors.secondary.paragraph}>
-              {strings.due(
-                dayjs()
-                  .add(billingDuration?.duration || 0, "day")
-                  .format("DD MMMM")
-              )}
-            </Paragraph>
-            <Paragraph color={colors.secondary.paragraph}>
-              {pricingPlans.getStandardPrice(
-                pricingPlans.selectedProduct as RNIap.Subscription
-              )}
-            </Paragraph>
-          </View>
-        ) : null}
-
-        {pricingPlans.hasTrialOffer(
-          props.planId,
-          (pricingPlans.selectedProduct as RNIap.Product)?.productId ||
-            (pricingPlans.selectedProduct as Plan)?.period
-        ) || is5YearPlanSelected ? (
-          <View
-            style={{
-              gap: DefaultAppStyles.GAP_VERTICAL,
-              borderWidth: 1,
-              borderColor: colors.primary.border,
-              padding: DefaultAppStyles.GAP,
-              borderRadius: defaultBorderRadius
-            }}
-          >
-            {(is5YearPlanSelected
-              ? strings["5yearPlanConditions"]()
-              : [
-                  strings.trialPlanConditions[0](
-                    billingDuration?.duration as number as never
-                  ),
-                  ...(isGithubRelease
-                    ? []
-                    : [strings.trialPlanConditions[1](Platform.OS as never)])
-                ]
-            ).map((item) => (
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 10,
-                  flex: 1
-                }}
+            {[
+              Config.GITHUB_RELEASE === "true"
+                ? "yearly"
+                : `notesnook.${props.planId}.yearly`,
+              Config.GITHUB_RELEASE === "true"
+                ? "monthly"
+                : `notesnook.${props.planId}.monthly`,
+              ...(props.planId === "essential" || pricingPlans.isSubscribed()
+                ? []
+                : [
+                    Config.GITHUB_RELEASE === "true"
+                      ? "5-year"
+                      : `notesnook.${props.planId}.5year`
+                  ])
+            ].map((item) => (
+              <ProductItem
                 key={item}
-              >
-                <Icon
-                  color={colors.primary.accent}
-                  size={AppFontSize.lg}
-                  name="check"
-                />
-                <Paragraph
-                  style={{
-                    flexShrink: 1
-                  }}
-                >
-                  {item}
-                </Paragraph>
-              </View>
+                pricingPlans={pricingPlans}
+                productId={item}
+              />
             ))}
           </View>
-        ) : null}
 
+          <Paragraph
+            fontFamily="MEDIUM"
+            fontSize="MD"
+            color={colors.secondary.paragraph}
+          >
+            {strings.paymentSummary()}
+          </Paragraph>
+
+          <View
+            style={{
+              borderWidth: 1,
+              borderColor: colors.primary.border,
+              borderRadius: Radius.S,
+              backgroundColor: colors.secondary.background,
+              padding: Spacing.LEVEL_3
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center"
+              }}
+            >
+              <View
+                style={{
+                  gap: Spacing.LEVEL_1
+                }}
+              >
+                <Heading color={colors.primary.paragraph} size={AppFontSize.md}>
+                  {strings.dueToday()}{" "}
+                </Heading>
+                <Paragraph>
+                  {hasTrialOffer ? (
+                    <Text>
+                      {strings.freeTrialIncludes(
+                        billingDuration?.duration || 0
+                      )}
+                    </Text>
+                  ) : is5YearPlanSelected ? (
+                    strings.billingType.annual()
+                  ) : null}
+                </Paragraph>
+              </View>
+
+              <Heading color={colors.primary.paragraph} fontSize="SM">
+                {hasTrialOffer
+                  ? "Free"
+                  : pricingPlans.getStandardPrice(
+                      pricingPlans.selectedProduct as RNIap.Subscription
+                    )}
+              </Heading>
+            </View>
+
+            {hasTrialOffer ? (
+              <>
+                <View
+                  style={{
+                    width: "100%",
+                    height: 1,
+                    backgroundColor: colors.primary.border,
+                    marginVertical: Spacing.LEVEL_2
+                  }}
+                />
+
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center"
+                  }}
+                >
+                  <View
+                    style={{
+                      gap: Spacing.LEVEL_1
+                    }}
+                  >
+                    <Heading
+                      color={colors.primary.paragraph}
+                      size={AppFontSize.md}
+                    >
+                      {strings.nextBillingDate()}
+                    </Heading>
+                    <Paragraph>
+                      {dayjs()
+                        .add(billingDuration?.duration || 0, "day")
+                        .format("DD MMMM,YYYY")}{" "}
+                      *{" "}
+                      {isAnnual
+                        ? strings.billingType.annual()
+                        : is5YearPlanSelected
+                          ? strings.billingType.oneTime()
+                          : strings.billingType.monthly()}
+                    </Paragraph>
+                  </View>
+
+                  <Heading fontSize="SM" color={colors.primary.accent}>
+                    {pricingPlans.getStandardPrice(
+                      pricingPlans.selectedProduct as RNIap.Subscription
+                    )}
+                  </Heading>
+                </View>
+              </>
+            ) : null}
+          </View>
+
+          <Paragraph
+            fontFamily="MEDIUM"
+            fontSize="MD"
+            color={colors.secondary.paragraph}
+          >
+            {strings.whatsIncluded()}
+          </Paragraph>
+
+          <View
+            style={{
+              gap: Spacing.LEVEL_2,
+              borderWidth: 1,
+              borderColor: colors.primary.border,
+              padding: Spacing.LEVEL_3,
+              borderRadius: Radius.S,
+              backgroundColor: colors.secondary.background,
+              marginBottom: 27
+            }}
+          >
+            {[
+              strings.planWhatsIncluded.unlimitedNotes(),
+              strings.planWhatsIncluded.endToEnd(),
+              strings.planWhatsIncluded.allDevices(),
+              hasTrialOffer
+                ? strings.planWhatsIncluded.freeTrial(
+                    billingDuration?.duration || 0
+                  )
+                : undefined,
+              hasTrialOffer ? strings.planWhatsIncluded.remind() : undefined,
+              ...(is5YearPlanSelected
+                ? strings["5yearPlanConditions"]()
+                : ([] as string[]))
+            ].map((item) =>
+              !item ? null : (
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: Spacing.LEVEL_1,
+                    flex: 1
+                  }}
+                  key={item}
+                >
+                  <Icon
+                    color={colors.primary.accent}
+                    size={AppFontSize.lg}
+                    name="check"
+                  />
+                  <Paragraph
+                    style={{
+                      flexShrink: 1
+                    }}
+                  >
+                    {item}
+                  </Paragraph>
+                </View>
+              )
+            )}
+
+            <Paragraph
+              style={{
+                marginTop: Spacing.LEVEL_0
+              }}
+              fontSize="XS"
+            >
+              <Heading fontSize="XS">{strings.note()}: </Heading>
+              {is5YearPlanSelected
+                ? strings.oneTimePurchase()
+                : strings.cancelAnytimeAlt()}
+            </Paragraph>
+          </View>
+
+          <Paragraph
+            style={{
+              textAlign: "center"
+            }}
+            color={colors.secondary.paragraph}
+            size={AppFontSize.xs}
+          >
+            {strings.subTerms[0]()}{" "}
+            <Text
+              style={{
+                color: colors.primary.accent
+              }}
+              onPress={() => {
+                openLinkInBrowser("https://notesnook.com/privacy");
+              }}
+            >
+              {strings.subTerms[1]()}
+            </Text>{" "}
+            {strings.subTerms[2]()}{" "}
+            <Text
+              style={{
+                color: colors.primary.accent
+              }}
+              onPress={() => {
+                openLinkInBrowser("https://notesnook.com/tos");
+              }}
+            >
+              {strings.subTerms[3]()}
+            </Text>
+          </Paragraph>
+        </View>
+      </ScrollView>
+
+      <View
+        style={{
+          backgroundColor: colors.secondary.background,
+          width: "100%",
+          padding: Spacing.LEVEL_3,
+          marginBottom: -insets.bottom,
+          paddingBottom: insets.bottom,
+          borderTopWidth: 1,
+          borderTopColor: colors.primary.border
+        }}
+      >
         <Button
           width="100%"
           type="accent"
@@ -278,50 +404,8 @@ export const BuyPlan = (props: {
             );
           }}
         />
-
-        <Paragraph
-          style={{
-            textAlign: "center"
-          }}
-          color={colors.secondary.paragraph}
-          size={AppFontSize.xs}
-        >
-          {is5YearPlanSelected
-            ? strings.oneTimePurchase()
-            : strings.cancelAnytimeAlt()}
-        </Paragraph>
-        <Paragraph
-          style={{
-            textAlign: "center"
-          }}
-          color={colors.secondary.paragraph}
-          size={AppFontSize.xs}
-        >
-          {strings.subTerms[0]()}{" "}
-          <Text
-            style={{
-              textDecorationLine: "underline"
-            }}
-            onPress={() => {
-              openLinkInBrowser("https://notesnook.com/privacy");
-            }}
-          >
-            {strings.subTerms[1]()}
-          </Text>{" "}
-          {strings.subTerms[2]()}{" "}
-          <Text
-            style={{
-              textDecorationLine: "underline"
-            }}
-            onPress={() => {
-              openLinkInBrowser("https://notesnook.com/tos");
-            }}
-          >
-            {strings.subTerms[3]()}
-          </Text>
-        </Paragraph>
       </View>
-    </ScrollView>
+    </View>
   );
 };
 
@@ -389,7 +473,13 @@ const ProductItem = (props: {
       style={{
         flexDirection: "row",
         gap: 10,
-        opacity: isSubscribed ? 0.5 : 1
+        opacity: isSubscribed ? 0.5 : 1,
+        backgroundColor: colors.secondary.background,
+        padding: Spacing.LEVEL_2,
+        borderRadius: Radius.S,
+        borderWidth: 1,
+        borderColor: colors.primary.border,
+        justifyContent: "space-between"
       }}
       activeOpacity={0.9}
       onPress={() => {
@@ -408,60 +498,85 @@ const ProductItem = (props: {
         );
       }}
     >
-      <Icon
-        name={isSelected ? "radiobox-marked" : "radiobox-blank"}
-        color={isSelected ? colors.primary.accent : colors.secondary.icon}
-        size={AppFontSize.lg}
-      />
-      <View>
+      <View
+        style={{
+          flexDirection: "row",
+          gap: Spacing.LEVEL_1
+        }}
+      >
+        <Icon
+          name={isSelected ? "radiobox-marked" : "radiobox-blank"}
+          color={isSelected ? colors.primary.accent : colors.secondary.icon}
+          size={AppFontSize.lg}
+        />
         <View
           style={{
-            flexDirection: "row",
-            gap: DefaultAppStyles.GAP_VERTICAL_SMALL
+            gap: Spacing.LEVEL_1
           }}
         >
-          <Heading size={AppFontSize.md}>
-            {isAnnual
-              ? strings.yearly()
-              : is5YearProduct
-                ? strings.fiveYearPlan()
-                : strings.monthly()}
-          </Heading>
+          <View
+            style={{
+              flexDirection: "row",
+              gap: DefaultAppStyles.GAP_VERTICAL_SMALL
+            }}
+          >
+            <Heading size={AppFontSize.md}>
+              {isAnnual
+                ? strings.yearly()
+                : is5YearProduct
+                  ? strings.fiveYearPlan()
+                  : strings.monthly()}
+            </Heading>
 
-          {discountValue ? (
-            <View
-              style={{
-                backgroundColor: colors.static.red,
-                borderRadius: defaultBorderRadius,
-                paddingHorizontal: 6,
-                alignItems: "center",
-                justifyContent: "center"
-              }}
-            >
-              <Heading color={colors.static.white} size={AppFontSize.xs}>
-                {strings.bestValue()} - {strings.percentOff(`${discountValue}`)}
-              </Heading>
-            </View>
-          ) : null}
+            {discountValue ? (
+              <View
+                style={{
+                  backgroundColor: colors.primary.accent,
+                  borderRadius: defaultBorderRadius,
+                  padding: Spacing.LEVEL_0,
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}
+              >
+                <Paragraph color={colors.static.white} size={AppFontSize.xxs}>
+                  {strings.percentOff(`${discountValue}`)}
+                </Paragraph>
+              </View>
+            ) : null}
 
-          {isSubscribed ? (
-            <View
-              style={{
-                backgroundColor: colors.primary.accent,
-                borderRadius: defaultBorderRadius,
-                paddingHorizontal: 6,
-                alignItems: "center",
-                justifyContent: "center"
-              }}
-            >
-              <Heading color={colors.static.white} size={AppFontSize.xs}>
-                {strings.currentPlan()}
-              </Heading>
-            </View>
-          ) : null}
+            {isSubscribed ? (
+              <View
+                style={{
+                  backgroundColor: colors.primary.accent,
+                  borderRadius: defaultBorderRadius,
+                  paddingHorizontal: 6,
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}
+              >
+                <Heading color={colors.static.white} size={AppFontSize.xs}>
+                  {strings.currentPlan()}
+                </Heading>
+              </View>
+            ) : null}
+          </View>
+
+          <Paragraph>
+            {is5YearProduct
+              ? strings.billingType.oneTime()
+              : isAnnual
+                ? strings.billingType.annual()
+                : strings.billingType.monthly()}
+          </Paragraph>
         </View>
+      </View>
 
-        <Paragraph size={AppFontSize.md}>
+      <View
+        style={{
+          gap: Spacing.LEVEL_1
+        }}
+      >
+        <Heading size={AppFontSize.sm}>
           {isAnnual || is5YearProduct
             ? `${props.pricingPlans.getPrice(
                 product as RNIap.Subscription,
@@ -472,15 +587,17 @@ const ProductItem = (props: {
                   ? 1
                   : 0,
                 isAnnual
-              )}/${strings.month()}`
+              )}`
             : null}
 
           {!isAnnual && !is5YearProduct
             ? `${props.pricingPlans.getStandardPrice(
                 product as RNIap.Subscription
-              )}/${strings.month()}`
+              )}`
             : null}
-        </Paragraph>
+        </Heading>
+
+        <Paragraph size={AppFontSize.xs}>/month</Paragraph>
       </View>
     </TouchableOpacity>
   );
