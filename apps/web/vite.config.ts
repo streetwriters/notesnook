@@ -42,7 +42,6 @@ const isBeta = version.includes("-beta");
 const isTesting =
   process.env.TEST === "true" || process.env.NODE_ENV === "development";
 const isDesktop = process.env.PLATFORM === "desktop";
-const isLinux = process.platform === "linux";
 const isThemeBuilder = process.env.THEME_BUILDER === "true";
 const isAnalyzing = process.env.ANALYZING === "true";
 
@@ -84,8 +83,7 @@ export default defineConfig({
     PLATFORM: `"${process.env.PLATFORM}"`,
     IS_TESTING: process.env.TEST === "true",
     IS_BETA: isBeta,
-    IS_THEME_BUILDER: isThemeBuilder,
-    IS_LINUX: isLinux
+    IS_THEME_BUILDER: isThemeBuilder
   },
   logLevel: process.env.NODE_ENV === "production" ? "warn" : "info",
   resolve: {

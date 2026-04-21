@@ -178,7 +178,9 @@ export const osIntegrationRouter = t.router({
         })
       });
       notification.show();
-      if (input.urgency === "critical") {
+      if (input.urgency === "critical" && process.platform !== "linux") {
+        // due to an Electron bug in versions below 40.x, shell.beep() causes a segfault on Linux.
+        // TODO: Remove when migrating to Electron 40.x or newer.
         shell.beep();
       }
 

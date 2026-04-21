@@ -31,6 +31,7 @@ import {
 } from "@notesnook/core";
 import { store as noteStore } from "./note-store";
 import { ReminderPreviewDialog } from "../dialogs/reminder-preview-dialog";
+import { getPlatform } from "../utils/platform";
 
 class ReminderStore extends BaseStore<ReminderStore> {
   reminders: VirtualizedGrouping<Reminder> | undefined = undefined;
@@ -101,9 +102,7 @@ function scheduleReminder(id: string, reminder: Reminder, cron: string) {
       return;
     }
 
-    if (IS_DESKTOP_APP && !IS_LINUX) {
-      // why not do this on Linux? Attempting to bring the app to the front causes the app to freeze here and leak memory. 
-      // Once there is no more memory left to leak, the app segfaults.
+    if (IS_DESKTOP_APP) {
       const tag = await desktop?.integration.showNotification.query({
         title: reminder.title,
         body: reminder.description ?? "",
