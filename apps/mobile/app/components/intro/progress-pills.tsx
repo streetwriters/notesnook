@@ -22,7 +22,10 @@ import { View } from "react-native";
 import { useThemeColors } from "@notesnook/theme";
 import { Radius, Spacing } from "../../common/design/spacing";
 
-export const ProgressPills = (props: { activePillIndex: number }) => {
+export const ProgressPills = (props: {
+  activePillIndex: number;
+  count?: number;
+}) => {
   const { colors } = useThemeColors();
   return (
     <View
@@ -31,41 +34,19 @@ export const ProgressPills = (props: { activePillIndex: number }) => {
         gap: Spacing.LEVEL_1
       }}
     >
-      <View
-        style={{
-          width: props.activePillIndex === 0 ? 26 : 14,
-          height: 5,
-          backgroundColor:
-            props.activePillIndex === 0
-              ? colors.primary.accent
-              : colors.secondary.background,
-          borderRadius: 2
-        }}
-      />
-
-      <View
-        style={{
-          width: props.activePillIndex === 1 ? 26 : 14,
-          height: 5,
-          backgroundColor:
-            props.activePillIndex === 1
-              ? colors.primary.accent
-              : colors.secondary.background,
-          borderRadius: Radius.XXS
-        }}
-      />
-
-      <View
-        style={{
-          width: props.activePillIndex === 2 ? 26 : 14,
-          height: 5,
-          backgroundColor:
-            props.activePillIndex === 2
-              ? colors.primary.accent
-              : colors.secondary.background,
-          borderRadius: Radius.XXS
-        }}
-      />
+      {new Array(props.count || 3).fill(0).map((item, index) => (
+        <View
+          style={{
+            width: props.activePillIndex === index ? 26 : 14,
+            height: 5,
+            backgroundColor:
+              props.activePillIndex === index
+                ? colors.primary.accent
+                : colors.secondary.background,
+            borderRadius: 2
+          }}
+        />
+      ))}
     </View>
   );
 };

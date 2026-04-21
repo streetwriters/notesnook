@@ -21,8 +21,10 @@ import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
-import { TouchableOpacity, View, useWindowDimensions } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { db } from "../../common/database";
+import { Spacing } from "../../common/design/spacing";
 import { DDS } from "../../services/device-detection";
 import { eSendEvent, presentSheet } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
@@ -33,24 +35,23 @@ import { RouteParams } from "../../stores/use-navigation-store";
 import { useUserStore } from "../../stores/use-user-store";
 import { eUserLoggedIn } from "../../utils/events";
 import { AppFontSize } from "../../utils/size";
-import { DefaultAppStyles } from "../../utils/styles";
 import { sleep } from "../../utils/time";
-import { Dialog } from "../dialog";
+import { ProgressPills } from "../intro/progress-pills";
 import { Progress } from "../sheets/progress";
-import AppIcon from "../ui/AppIcon";
 import { Button } from "../ui/button";
-import FormInput, { validators } from "../ui/input/form-input";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { hideAuth } from "./common";
 import { ForgotPassword } from "./forgot-password";
 import { AuthHeader } from "./header";
+import TwoFactorVerification from "./two-factor";
 import { useLogin } from "./use-login";
+import FormInput, { validators } from "../ui/input/form-input";
+import AppIcon from "../ui/AppIcon";
 
 const LoginSteps = {
   emailAuth: 1,
-  mfaAuth: 2,
-  passwordAuth: 3
+  mfaAuth: 2
 };
 
 export const Login = ({
@@ -68,8 +69,9 @@ export const Login = ({
     passwordInputRef,
     loading,
     setLoading,
-    login,
     error,
+    login,
+    mfaData,
     formRef
   } = useLogin(async () => {
     eSendEvent(eUserLoggedIn, true);
@@ -91,8 +93,6 @@ export const Login = ({
       Progress.present();
     }
   });
-  const { width, height } = useWindowDimensions();
-  const isTablet = width > 600;
 
   const onContinue = () => {
     login();
@@ -114,249 +114,249 @@ export const Login = ({
   return (
     <>
       <AuthHeader />
-      <Dialog context="two_factor_verify" />
+
+      <View
+        style={{
+          paddingHorizontal: Spacing.LEVEL_3,
+          marginTop: Spacing.LEVEL_4
+        }}
+      >
+        <ProgressPills
+          count={2}
+          activePillIndex={step === LoginSteps.emailAuth ? 0 : 1}
+        />
+      </View>
+
       <KeyboardAwareScrollView
         style={{
           width: "100%"
         }}
         contentContainerStyle={{
-          minHeight: "90%"
+          minHeight: "99%"
         }}
         nestedScrollEnabled
         enableAutomaticScroll={true}
         keyboardShouldPersistTaps="handled"
       >
-        <View
-          style={{
-            borderRadius: DDS.isTab ? 5 : 0,
-            backgroundColor: colors.primary.background,
-            zIndex: 10,
-            width: "100%",
-            height: "100%",
-            alignSelf: "center"
-          }}
-        >
+        {step === LoginSteps.emailAuth ? (
           <View
             style={{
-              justifyContent: "flex-end",
-              paddingHorizontal: DefaultAppStyles.GAP,
-              borderBottomWidth: 0.8,
-              marginBottom: DefaultAppStyles.GAP_VERTICAL,
-              borderBottomColor: colors.primary.border,
-              alignSelf: isTablet ? "center" : undefined,
-              borderWidth: isTablet ? 1 : undefined,
-              borderColor: isTablet ? colors.primary.border : undefined,
-              borderRadius: isTablet ? 20 : undefined,
-              marginTop: isTablet ? 50 : undefined,
-              width: !isTablet ? undefined : "50%",
-              minHeight: height * 0.4
+              borderRadius: DDS.isTab ? 5 : 0,
+              backgroundColor: colors.primary.background,
+              zIndex: 10,
+              width: "100%",
+              alignSelf: "center",
+              height: "100%",
+              paddingHorizontal: Spacing.LEVEL_3,
+              paddingTop: Spacing.LEVEL_6
             }}
           >
-            <View
-              style={{
-                flexDirection: "row"
-              }}
-            >
-              <View
-                style={{
-                  width: 100,
-                  height: 5,
-                  backgroundColor: colors.primary.accent,
-                  borderRadius: 2,
-                  marginRight: 7
-                }}
-              />
-
-              <View
-                style={{
-                  width: 20,
-                  height: 5,
-                  backgroundColor: colors.secondary.background,
-                  borderRadius: 2
-                }}
-              />
-            </View>
             <Heading
               style={{
-                marginBottom: 25,
-                marginTop: DefaultAppStyles.GAP_VERTICAL
+                paddingBottom: Spacing.LEVEL_4
               }}
-              extraBold
-              size={AppFontSize.xxl}
+              fontSize="XL"
             >
               {strings.loginToYourAccount()}
             </Heading>
-          </View>
-
-          <View
-            style={{
-              width: DDS.isTab
-                ? focused
-                  ? "50%"
-                  : "49.99%"
-                : focused
-                  ? "100%"
-                  : "99.9%",
-              backgroundColor: colors.primary.background,
-              alignSelf: "center",
-              paddingHorizontal: DDS.isTab ? 0 : DefaultAppStyles.GAP,
-              gap: DefaultAppStyles.GAP_VERTICAL
-            }}
-          >
-            <FormInput
-              name="email"
-              formRef={formRef}
-              fwdRef={emailInputRef}
-              testID="input.email"
-              returnKeyLabel="Next"
-              returnKeyType="next"
-              autoComplete="email"
-              keyboardType="email-address"
-              marginBottom={0}
-              autoCorrect={false}
-              autoCapitalize="none"
-              placeholder={strings.email()}
-              editable={step === LoginSteps.emailAuth && !loading}
-              validators={[
-                validators.required(strings.emailRequired()),
-                validators.email(strings.enterAValidEmailAddress())
-              ]}
-              onSubmitEditing={() => {
-                if (step === LoginSteps.emailAuth) {
-                  onContinue();
-                } else {
-                  passwordInputRef.current?.focus();
-                }
+            <View
+              style={{
+                width: DDS.isTab
+                  ? focused
+                    ? "50%"
+                    : "49.99%"
+                  : focused
+                    ? "100%"
+                    : "99.9%",
+                backgroundColor: colors.primary.background,
+                alignSelf: "center",
+                gap: Spacing.LEVEL_2
               }}
-            />
-
-            {step === LoginSteps.passwordAuth && (
-              <>
-                <FormInput
-                  name="password"
-                  formRef={formRef}
-                  fwdRef={passwordInputRef}
-                  testID="input.password"
-                  returnKeyLabel={strings.done()}
-                  returnKeyType="done"
-                  secureTextEntry
-                  autoComplete="password"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  placeholder={strings.password()}
-                  marginBottom={0}
-                  editable={!loading}
-                  validators={[validators.required(strings.passwordRequired())]}
-                  onSubmitEditing={() => {
-                    onContinue();
-                  }}
-                />
-                <Button
-                  title={strings.forgotPassword()}
-                  style={{
-                    alignSelf: "flex-end",
-                    paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
-                    paddingHorizontal: 0
-                  }}
-                  onPress={() => {
-                    if (loading) return;
-                    presentSheet({
-                      component: (
-                        <ForgotPassword
-                          userEmail={formRef.current.getValue("email")}
-                        />
-                      )
-                    });
-                  }}
-                  textStyle={{
-                    textDecorationLine: "underline"
-                  }}
-                  fontSize={AppFontSize.xs}
-                  type="plain"
-                />
-              </>
-            )}
-
-            <View>
-              <Button
-                loading={loading}
-                onPress={() => {
-                  onContinue();
+            >
+              <FormInput
+                name="email"
+                formRef={formRef}
+                fwdRef={emailInputRef}
+                testID="input.email"
+                returnKeyLabel="Next"
+                returnKeyType="next"
+                autoComplete="email"
+                keyboardType="email-address"
+                marginBottom={0}
+                autoCorrect={false}
+                autoCapitalize="none"
+                placeholder={strings.email()}
+                editable={step === LoginSteps.emailAuth && !loading}
+                validators={[
+                  validators.required(strings.emailRequired()),
+                  validators.email(strings.enterAValidEmailAddress())
+                ]}
+                onSubmitEditing={() => {
+                  passwordInputRef.current?.focus();
                 }}
-                style={{
-                  width: "100%"
-                }}
-                type="accent"
-                title={!loading ? strings.continue() : null}
-                fontSize={AppFontSize.sm}
               />
 
-              {step === LoginSteps.passwordAuth && (
+              <FormInput
+                name="password"
+                formRef={formRef}
+                fwdRef={passwordInputRef}
+                testID="input.password"
+                returnKeyLabel={strings.done()}
+                returnKeyType="done"
+                secureTextEntry
+                autoComplete="password"
+                autoCapitalize="none"
+                autoCorrect={false}
+                placeholder={strings.password()}
+                marginBottom={0}
+                editable={!loading}
+                validators={[validators.required(strings.passwordRequired())]}
+                onSubmitEditing={() => {
+                  onContinue();
+                }}
+              />
+
+              <Button
+                title={strings.forgotPassword()}
+                style={{
+                  alignSelf: "flex-end",
+                  paddingVertical: 0,
+                  paddingHorizontal: 0
+                }}
+                onPress={() => {
+                  if (loading || !formRef.current.getValue("email")) return;
+                  presentSheet({
+                    component: (
+                      <ForgotPassword
+                        userEmail={formRef.current.getValue("email")}
+                      />
+                    )
+                  });
+                }}
+                fontFamily="REGULAR"
+                fontSize={AppFontSize.sm}
+                type="plain"
+              />
+
+              <View
+                style={{
+                  marginTop: Spacing.LEVEL_1,
+                  gap: Spacing.LEVEL_2
+                }}
+              >
                 <Button
-                  title={strings.cancelLogin()}
+                  loading={loading}
+                  onPress={() => {
+                    if (loading) return;
+                    login();
+                  }}
                   style={{
-                    alignSelf: "center",
-                    marginTop: DefaultAppStyles.GAP_VERTICAL,
                     width: "100%"
                   }}
-                  onPress={() => {
-                    if (loading) return;
-                    setStep(LoginSteps.emailAuth);
-                    setLoading(false);
-                  }}
-                  type="secondaryAccented"
+                  type="accent"
+                  title={!loading ? strings.continue() : null}
+                  fontSize={AppFontSize.sm}
                 />
-              )}
 
-              {!loading ? (
-                <TouchableOpacity
-                  onPress={() => {
-                    if (loading) return;
-                    changeMode(1);
-                  }}
-                  activeOpacity={0.8}
-                  style={{
-                    alignSelf: "center",
-                    marginTop: DefaultAppStyles.GAP_VERTICAL,
-                    paddingVertical: DefaultAppStyles.GAP_VERTICAL
-                  }}
-                >
-                  <Paragraph
-                    size={AppFontSize.xs}
-                    color={colors.secondary.paragraph}
+                {!loading ? (
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (loading) return;
+                      changeMode(1);
+                    }}
+                    activeOpacity={0.8}
+                    style={{
+                      alignSelf: "center",
+                      paddingVertical: 0
+                    }}
                   >
-                    {strings.dontHaveAccount()}{" "}
-                    <Paragraph
-                      size={AppFontSize.xs}
-                      style={{ color: colors.primary.accent }}
-                    >
-                      {strings.signUp()}
+                    <Paragraph fontSize="SM" color={colors.secondary.paragraph}>
+                      {strings.dontHaveAccount()}{" "}
+                      <Paragraph
+                        fontSize="SM"
+                        style={{ color: colors.primary.accent }}
+                        fontFamily="SEMI_BOLD"
+                      >
+                        {strings.signUp()}
+                      </Paragraph>
                     </Paragraph>
-                  </Paragraph>
-                </TouchableOpacity>
-              ) : null}
+                  </TouchableOpacity>
+                ) : null}
 
-              {error ? (
-                <Paragraph
-                  numberOfLines={4}
-                  onPress={() => {}}
-                  color={colors.error.accent}
-                  style={{
-                    textAlign: "center",
-                    marginTop: DefaultAppStyles.GAP_VERTICAL
-                  }}
-                >
-                  <AppIcon
+                {error ? (
+                  <Paragraph
+                    numberOfLines={4}
+                    onPress={() => {}}
                     color={colors.error.accent}
-                    name="alert-circle-outline"
-                    size={AppFontSize.sm - 1}
-                  />{" "}
-                  {error.message}
-                </Paragraph>
-              ) : null}
+                    style={{
+                      textAlign: "center",
+                      marginTop: Spacing.LEVEL_2
+                    }}
+                  >
+                    <AppIcon
+                      color={colors.error.accent}
+                      name="alert-circle-outline"
+                      size={AppFontSize.sm - 1}
+                    />{" "}
+                    {error.message}
+                  </Paragraph>
+                ) : null}
+              </View>
             </View>
           </View>
-        </View>
+        ) : (
+          <View
+            style={{
+              borderRadius: DDS.isTab ? 5 : 0,
+              backgroundColor: colors.primary.background,
+              zIndex: 10,
+              width: "100%",
+              alignSelf: "center",
+              height: "100%",
+              paddingHorizontal: Spacing.LEVEL_3,
+              paddingTop: Spacing.LEVEL_6
+            }}
+          >
+            <TwoFactorVerification
+              onMfaLogin={async (
+                mfa: any,
+                callback: (success: boolean) => void
+              ) => {
+                try {
+                  const success = await db.user.authenticateMultiFactorCode(
+                    mfa.code,
+                    mfa.method
+                  );
+
+                  await login();
+
+                  if (success) {
+                    setLoading(false);
+                    callback && callback(true);
+                  }
+                  callback && callback(false);
+                } catch (e) {
+                  callback && callback(false);
+                  if ((e as Error).message === "invalid_grant") {
+                    setLoading(false);
+                    setStep(LoginSteps.emailAuth);
+                  }
+                }
+              }}
+              mfaInfo={
+                mfaData.current || {
+                  primaryMethod: "email",
+                  secondaryMethod: "sms",
+                  token: ""
+                }
+              }
+              onCancel={() => {
+                setLoading(false);
+                setStep(LoginSteps.emailAuth);
+              }}
+            />
+          </View>
+        )}
       </KeyboardAwareScrollView>
     </>
   );
