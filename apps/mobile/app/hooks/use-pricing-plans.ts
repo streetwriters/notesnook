@@ -36,22 +36,22 @@ export const PlanOverView = {
   free: {
     storage: `50 MB/mo`,
     fileSize: `1 MB`,
-    hdImages: false
+    hdImages: "No"
   },
   essential: {
     storage: `1 GB`,
     fileSize: `100 MB/mo`,
-    hdImages: false
+    hdImages: "No"
   },
   pro: {
     storage: `10 GB/mo`,
     fileSize: `1 GB`,
-    hdImages: true
+    hdImages: "Yes"
   },
   believer: {
     storage: `25 GB/mo`,
     fileSize: `5 GB`,
-    hdImages: true
+    hdImages: "Yes"
   }
 };
 

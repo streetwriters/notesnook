@@ -508,6 +508,10 @@ msgstr "<<<<<<< HEAD<<<<<<< HEAD"
 msgid "{days} days free"
 msgstr ""
 
+#: src/strings.ts:2749
+msgid "{duration} days free trial includes all features"
+msgstr ""
+
 #: src/strings.ts:351
 msgid "{freq, plural, one {Repeats every day on {selectedDays} at {date}} other {Repeats every # day every {selectedDays} at {date}}}"
 msgstr ""
@@ -645,7 +649,7 @@ msgid "2FA code sent via {method}"
 msgstr "<<<<<<< HEAD<<<<<<< HEAD<<<<<<< HEAD"
 
 #: src/strings.ts:2601
-msgid "5 year plan (One time purchase)"
+msgid "5 year plan"
 msgstr ""
 
 #: src/strings.ts:1861
@@ -670,6 +674,10 @@ msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:1305
 msgid "About"
+msgstr ""
+
+#: src/strings.ts:2743
+msgid "Access on all devices"
 msgstr ""
 
 #: src/strings.ts:1040
@@ -1270,8 +1278,16 @@ msgstr ""
 msgid "Bi-directional note link"
 msgstr ""
 
+#: src/strings.ts:2734
+msgid "Billed annually"
+msgstr ""
+
 #: src/strings.ts:2571
 msgid "billed annually at {price}"
+msgstr ""
+
+#: src/strings.ts:2735
+msgid "Billed monthly"
 msgstr ""
 
 #: src/strings.ts:2572
@@ -1953,8 +1969,8 @@ msgid "Create a tag to group related notes together."
 msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:1865
-msgid "Create account"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgid "Create Account"
+msgstr ">>>>>>> b960a9c15 (mobile: next)"
 
 #: src/strings.ts:2674
 msgid "Create API Key"
@@ -2042,7 +2058,7 @@ msgid "Current pin"
 msgstr ""
 
 #: src/strings.ts:1789
-msgid "CURRENT PLAN"
+msgid "Current Plan"
 msgstr ""
 
 #: src/strings.ts:2026
@@ -2630,6 +2646,10 @@ msgstr ""
 msgid "End-to-end encrypted."
 msgstr ""
 
+#: src/strings.ts:2742
+msgid "End-to-end encryption (XChaCha20)"
+msgstr ""
+
 #: src/strings.ts:399
 msgid "Enter 6 digit code"
 msgstr "<<<<<<< HEAD"
@@ -3120,12 +3140,20 @@ msgstr ""
 msgid "Forgot password?"
 msgstr "<<<<<<< HEAD<<<<<<< HEAD"
 
+#: src/strings.ts:2744
+msgid "Free {days} days trial, cancel anytime"
+msgstr ""
+
 #: src/strings.ts:2581
 msgid "Free {duration} day trial, cancel any time"
 msgstr ""
 
 #: src/strings.ts:2485
 msgid "Free plan"
+msgstr ""
+
+#: src/strings.ts:2731
+msgid "Frequently Asked Questions"
 msgstr ""
 
 #: src/strings.ts:627
@@ -3285,7 +3313,7 @@ msgid "Having problems with sync?"
 msgstr "<<<<<<< HEAD<<<<<<< HEAD"
 
 #: src/strings.ts:2570
-msgid "hdImages"
+msgid "HD Images"
 msgstr ""
 
 #: src/strings.ts:2366
@@ -4263,6 +4291,10 @@ msgstr ""
 msgid "Next"
 msgstr "<<<<<<< HEAD<<<<<<< HEAD"
 
+#: src/strings.ts:2747
+msgid "Next Billing Date"
+msgstr ""
+
 #: src/strings.ts:2395
 msgid "Next match"
 msgstr ""
@@ -4558,6 +4590,10 @@ msgstr ""
 msgid "Once your password is changed, please make sure to save the new account recovery key"
 msgstr "<<<<<<< HEAD<<<<<<< HEAD"
 
+#: src/strings.ts:2736
+msgid "One time purchase"
+msgstr ""
+
 #: src/strings.ts:2577
 msgid "One time purchase, no auto-renewal"
 msgstr ""
@@ -4733,6 +4769,10 @@ msgstr ""
 
 #: src/strings.ts:2215
 msgid "Payment method"
+msgstr ""
+
+#: src/strings.ts:2739
+msgid "Payment summary"
 msgstr ""
 
 #: src/strings.ts:788
@@ -5333,6 +5373,10 @@ msgstr ""
 
 #: src/strings.ts:1812
 msgid "Remembered your password?"
+msgstr ""
+
+#: src/strings.ts:2745
+msgid "Remind before your trial ends"
 msgstr ""
 
 #: src/strings.ts:941
@@ -5942,6 +5986,10 @@ msgstr ""
 #: src/strings.ts:342
 msgid "Select nth day of the month to repeat the reminder."
 msgstr "<<<<<<< HEAD"
+
+#: src/strings.ts:2730
+msgid "Select Plan"
+msgstr ""
 
 #: src/strings.ts:1833
 msgid "Select profile picture"
@@ -6605,6 +6653,10 @@ msgstr ""
 msgid "Test connection before changing server urls"
 msgstr "<<<<<<< HEAD<<<<<<< HEAD"
 
+#: src/strings.ts:2732
+msgid "Testimonials"
+msgstr ""
+
 #: src/strings.ts:2299
 msgid "Text color"
 msgstr ""
@@ -6893,7 +6945,7 @@ msgid "Turns off syncing completely on this device. Any changes made will remain
 msgstr ""
 
 #: src/strings.ts:110
-msgid "Two factor authentication"
+msgid "Two Factor Authentication"
 msgstr ""
 
 #: src/strings.ts:494
@@ -6938,6 +6990,10 @@ msgstr ""
 
 #: src/strings.ts:2600
 msgid "Unlimited"
+msgstr ""
+
+#: src/strings.ts:2741
+msgid "Unlimited notes and attachments"
 msgstr ""
 
 #: src/strings.ts:946
@@ -7417,6 +7473,10 @@ msgstr ""
 #: src/strings.ts:1683
 msgid "What went wrong?"
 msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+
+#: src/strings.ts:2738
+msgid "What's included"
+msgstr ""
 
 #: src/strings.ts:2526
 msgid "Why do you need my credit card details for a free trial?"
