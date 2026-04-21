@@ -1867,7 +1867,7 @@ For example:
   newEmail: () => t`New Email`,
   accountPassword: () => t`Account password`,
   phoneNumber: () => t`Phone number`,
-  createAccount: () => t`Create account`,
+  createAccount: () => t`Create Account`,
   accountRecoverHelpText: () =>
     t`You will receive instructions on how to recover your account on this email`,
   enterRecoveryKey: () => t`Enter account recovery key`,
@@ -2813,6 +2813,8 @@ Continue without attachments?`,
   expiryDateRemoved: () => t`Expiry date removed`,
   selectPlan: () => t`Select plan`,
   frequentlyAskedQuestions: () => t`Frequently asked questions`,
+  selectPlan: () => t`Select Plan`,
+  frequentlyAskedQuestions: () => t`Frequently Asked Questions`,
   testimonials: () => t`Testimonials`,
   billingType: {
     annual: () => t`Billed annually`,
@@ -2848,5 +2850,8 @@ Continue without attachments?`,
   provideValidMultiFactorAuthRecoveryCode: () =>
     t`Please provide a valid multi factor authentication recovery code.`,
   provideValidMultiFactorAuthCode: () =>
-    t`Please provide a valid multi factor authentication code.`
+    t`Please provide a valid multi factor authentication code.`,
+  allDevices: () => t`Access on all devices`,
+  freeTrial: (days: number) => t`Free ${days} days trial, cancel anytime`,
+  remind: () => t`Remind before your trial ends`
 };

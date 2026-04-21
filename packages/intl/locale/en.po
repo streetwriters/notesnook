@@ -1,11 +1,17 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-06-16 14:24+0500\n"
+"POT-Creation-Date: 2026-06-16 14:30+0500\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
 "Language: en\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
 
 #: src/strings.ts:2442
 msgid " \"Notebook > Notes\""
@@ -502,7 +508,7 @@ msgstr "{days, plural, one {1 day} other {# days}}"
 msgid "{days} days free"
 msgstr "{days} days free"
 
-#: src/strings.ts:2833
+#: src/strings.ts:2835
 msgid "{duration} days free trial includes all features"
 msgstr "{duration} days free trial includes all features"
 
@@ -670,7 +676,11 @@ msgstr "Abc"
 msgid "About"
 msgstr "About"
 
-#: src/strings.ts:2827
+#: src/strings.ts:2854
+msgid "Access on all devices"
+msgstr "Access on all devices"
+
+#: src/strings.ts:2829
 msgid "Access on all your devices"
 msgstr "Access on all your devices"
 
@@ -771,7 +781,7 @@ msgid "Add to notebook"
 msgstr "Add to notebook"
 
 #: src/strings.ts:990
-#: src/strings.ts:2843
+#: src/strings.ts:2845
 msgid "Add your first note"
 msgstr "Add your first note"
 
@@ -1301,7 +1311,7 @@ msgstr "Beta"
 msgid "Bi-directional note link"
 msgstr "Bi-directional note link"
 
-#: src/strings.ts:2818
+#: src/strings.ts:2820
 msgid "Billed annually"
 msgstr "Billed annually"
 
@@ -1309,7 +1319,7 @@ msgstr "Billed annually"
 msgid "billed annually at {price}"
 msgstr "billed annually at {price}"
 
-#: src/strings.ts:2819
+#: src/strings.ts:2821
 msgid "Billed monthly"
 msgstr "Billed monthly"
 
@@ -2035,8 +2045,8 @@ msgid "Create a tag to group related notes together."
 msgstr "Create a tag to group related notes together."
 
 #: src/strings.ts:1870
-msgid "Create account"
-msgstr "Create account"
+msgid "Create Account"
+msgstr "Create Account"
 
 #: src/strings.ts:2689
 msgid "Create API Key"
@@ -2082,7 +2092,7 @@ msgstr "Create your account"
 msgid "Create your first api key to get started."
 msgstr "Create your first api key to get started."
 
-#: src/strings.ts:2836
+#: src/strings.ts:2838
 msgid "Create your first tag to start organizing your workspace."
 msgstr "Create your first tag to start organizing your workspace."
 
@@ -2749,7 +2759,7 @@ msgstr "Encryption key"
 msgid "End-to-end encrypted."
 msgstr "End-to-end encrypted."
 
-#: src/strings.ts:2826
+#: src/strings.ts:2828
 msgid "End-to-end encryption (XChaCha20)"
 msgstr "End-to-end encryption (XChaCha20)"
 
@@ -3294,7 +3304,8 @@ msgstr ""
 msgid "Forgot Password?"
 msgstr "Forgot Password?"
 
-#: src/strings.ts:2828
+#: src/strings.ts:2830
+#: src/strings.ts:2855
 msgid "Free {days} days trial, cancel anytime"
 msgstr "Free {days} days trial, cancel anytime"
 
@@ -3309,6 +3320,10 @@ msgstr "Free plan"
 #: src/strings.ts:2815
 msgid "Frequently asked questions"
 msgstr "Frequently asked questions"
+
+#: src/strings.ts:2817
+msgid "Frequently Asked Questions"
+msgstr "Frequently Asked Questions"
 
 #: src/strings.ts:627
 msgid "Fri"
@@ -4459,7 +4474,7 @@ msgstr "New version"
 msgid "Newest - oldest"
 msgstr "Newest - oldest"
 
-#: src/strings.ts:2837
+#: src/strings.ts:2839
 msgid "Newest first"
 msgstr "Newest first"
 
@@ -4471,7 +4486,7 @@ msgstr "Newly created notes will be uncategorized"
 msgid "Next"
 msgstr "Next"
 
-#: src/strings.ts:2831
+#: src/strings.ts:2833
 msgid "Next billing date"
 msgstr "Next billing date"
 
@@ -4547,7 +4562,7 @@ msgstr "No notebooks selected to move"
 msgid "No notebooks yet"
 msgstr "No notebooks yet"
 
-#: src/strings.ts:2840
+#: src/strings.ts:2842
 msgid "No notes yet"
 msgstr "No notes yet"
 
@@ -4575,7 +4590,7 @@ msgstr "No results found for \"{query}\""
 msgid "No results found for {query}"
 msgstr "No results found for {query}"
 
-#: src/strings.ts:2834
+#: src/strings.ts:2836
 msgid "No tags yet"
 msgstr "No tags yet"
 
@@ -4788,7 +4803,7 @@ msgstr "Older version"
 msgid "Oldest - newest"
 msgstr "Oldest - newest"
 
-#: src/strings.ts:2838
+#: src/strings.ts:2840
 msgid "Oldest first"
 msgstr "Oldest first"
 
@@ -4796,7 +4811,7 @@ msgstr "Oldest first"
 msgid "Once your password is changed, please make sure to save the new account recovery key"
 msgstr "Once your password is changed, please make sure to save the new account recovery key"
 
-#: src/strings.ts:2820
+#: src/strings.ts:2822
 msgid "One time purchase"
 msgstr "One time purchase"
 
@@ -4985,7 +5000,7 @@ msgstr "Pay once and use for 5 years"
 msgid "Payment method"
 msgstr "Payment method"
 
-#: src/strings.ts:2823
+#: src/strings.ts:2825
 msgid "Payment summary"
 msgstr "Payment summary"
 
@@ -5140,11 +5155,11 @@ msgstr "Please make sure you have saved the recovery key. Tap one more time to c
 msgid "Please note that we will respond to your issue on the given link. We recommend that you save it."
 msgstr "Please note that we will respond to your issue on the given link. We recommend that you save it."
 
-#: src/strings.ts:2851
+#: src/strings.ts:2853
 msgid "Please provide a valid multi factor authentication code."
 msgstr "Please provide a valid multi factor authentication code."
 
-#: src/strings.ts:2849
+#: src/strings.ts:2851
 msgid "Please provide a valid multi factor authentication recovery code."
 msgstr "Please provide a valid multi factor authentication recovery code."
 
@@ -5526,7 +5541,7 @@ msgstr "Recommended by Privacy Guides"
 msgid "Recover your account"
 msgstr "Recover your account"
 
-#: src/strings.ts:2847
+#: src/strings.ts:2849
 msgid "Recovery code"
 msgstr "Recovery code"
 
@@ -5622,7 +5637,8 @@ msgstr "Relogin to your Account"
 msgid "Remembered your password?"
 msgstr "Remembered your password?"
 
-#: src/strings.ts:2829
+#: src/strings.ts:2831
+#: src/strings.ts:2856
 msgid "Remind before your trial ends"
 msgstr "Remind before your trial ends"
 
@@ -6234,6 +6250,10 @@ msgstr "Select nth day of the month to repeat the reminder."
 msgid "Select plan"
 msgstr "Select plan"
 
+#: src/strings.ts:2816
+msgid "Select Plan"
+msgstr "Select Plan"
+
 #: src/strings.ts:1838
 msgid "Select profile picture"
 msgstr "Select profile picture"
@@ -6382,7 +6402,7 @@ msgstr "Set the interval to create a partial backup (without attachments) automa
 msgid "Set your name"
 msgstr "Set your name"
 
-#: src/strings.ts:2845
+#: src/strings.ts:2847
 msgid "Setting up your account..."
 msgstr "Setting up your account..."
 
@@ -6927,7 +6947,7 @@ msgstr "Test connection"
 msgid "Test connection before changing server urls"
 msgstr "Test connection before changing server urls"
 
-#: src/strings.ts:2816
+#: src/strings.ts:2818
 msgid "Testimonials"
 msgstr "Testimonials"
 
@@ -7274,7 +7294,7 @@ msgstr "Unfavorite"
 msgid "Unlimited"
 msgstr "Unlimited"
 
-#: src/strings.ts:2825
+#: src/strings.ts:2827
 msgid "Unlimited notes and attachments"
 msgstr "Unlimited notes and attachments"
 
@@ -7777,7 +7797,7 @@ msgstr "What is your refund policy?"
 msgid "What went wrong?"
 msgstr "What went wrong?"
 
-#: src/strings.ts:2822
+#: src/strings.ts:2824
 msgid "What's included"
 msgstr "What's included"
 
@@ -8036,7 +8056,7 @@ msgstr "Your account email will be changed without affecting your subscription o
 msgid "Your account has been recovered."
 msgstr "Your account has been recovered."
 
-#: src/strings.ts:2846
+#: src/strings.ts:2848
 msgid "Your account is almost ready, please wait."
 msgstr "Your account is almost ready, please wait."
 
@@ -8209,7 +8229,7 @@ msgstr "Your support request has been forwarded to our support team. We will get
 msgid "Your tags"
 msgstr "Your tags"
 
-#: src/strings.ts:2842
+#: src/strings.ts:2844
 msgid "Your thoughts deserve a home. Create your first note and start organizing your life today."
 msgstr "Your thoughts deserve a home. Create your first note and start organizing your life today."
 
