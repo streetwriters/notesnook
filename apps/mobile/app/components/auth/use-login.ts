@@ -31,8 +31,7 @@ import TwoFactorVerification from "./two-factor";
 
 export const LoginSteps = {
   emailAuth: 1,
-  mfaAuth: 2,
-  passwordAuth: 3
+  mfaAuth: 2
 };
 
 export const useLogin = (
@@ -47,12 +46,10 @@ export const useLogin = (
   const password = useRef<string>(undefined);
   const emailInputRef = useRef<TextInput>(null);
   const passwordInputRef = useRef<TextInput>(null);
+  const mfaData = useRef<any>(null);
 
   const validateInfo = () => {
-    if (
-      (!password.current && step === LoginSteps.passwordAuth) ||
-      (!email.current && step === LoginSteps.emailAuth)
-    ) {
+    if (!password.current || !email.current) {
       ToastManager.show({
         heading: strings.allFieldsRequired(),
         message: strings.allFieldsRequiredDesc(),
@@ -78,47 +75,16 @@ export const useLogin = (
             return;
           }
           const mfaInfo = await db.user.authenticateEmail(email.current);
-
           if (mfaInfo) {
-            TwoFactorVerification.present(
-              async (mfa: any, callback: (success: boolean) => void) => {
-                try {
-                  const success = await db.user.authenticateMultiFactorCode(
-                    mfa.code,
-                    mfa.method
-                  );
-
-                  if (success) {
-                    setStep(LoginSteps.passwordAuth);
-                    setLoading(false);
-                    setTimeout(() => {
-                      passwordInputRef.current?.focus();
-                    }, 500);
-                    callback && callback(true);
-                  }
-                  callback && callback(false);
-                } catch (e) {
-                  callback && callback(false);
-                  if ((e as Error).message === "invalid_grant") {
-                    eSendEvent(eCloseSimpleDialog, "two_factor_verify");
-                    setLoading(false);
-                    setStep(LoginSteps.emailAuth);
-                  }
-                }
-              },
-              mfaInfo,
-              () => {
-                eSendEvent(eCloseSimpleDialog, "two_factor_verify");
-                setLoading(false);
-                setStep(LoginSteps.emailAuth);
-              }
-            );
+            mfaData.current = mfaInfo;
+            setStep(LoginSteps.mfaAuth);
+            setLoading(false);
           } else {
             finishWithError(new Error(strings.unableToSend2faCode()));
           }
           break;
         }
-        case LoginSteps.passwordAuth: {
+        case LoginSteps.mfaAuth: {
           if (!email.current || !password.current) {
             setLoading(false);
             return;
@@ -181,6 +147,7 @@ export const useLogin = (
     loading,
     setLoading,
     error,
-    setError
+    setError,
+    mfaData
   };
 };
