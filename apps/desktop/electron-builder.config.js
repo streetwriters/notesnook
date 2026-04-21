@@ -198,6 +198,9 @@ module.exports = {
       }
     }
   },
+  toolsets: {
+    appimage: "1.0.2"
+  },
   snap: {
     autoStart: false,
     confinement: "strict",
