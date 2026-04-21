@@ -28,6 +28,7 @@ import {
 } from "prosemirror-state";
 import { SearchSettings } from "../../toolbar/stores/search-store.js";
 import { tiptapKeys } from "@notesnook/common";
+import { findParentNodeClosestToPos } from "../../utils/prosemirror.js";
 
 type DispatchFn = (tr: Transaction) => void;
 declare module "@tiptap/core" {
@@ -295,6 +296,8 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
             )
           );
 
+          expandCollapsedCallout(tr, from);
+
           const domNode = this.editor.view.domAtPos(from).node;
           scrollIntoView(domNode);
 
@@ -321,6 +324,8 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
               tr.mapping.map(to)
             )
           );
+
+          expandCollapsedCallout(tr, from);
 
           const domNode = this.editor.view.domAtPos(from).node;
           scrollIntoView(domNode);
@@ -475,6 +480,18 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
     ];
   }
 });
+
+function expandCollapsedCallout(tr: Transaction, pos: number) {
+  const $pos = tr.doc.resolve(pos);
+  const calloutParent = findParentNodeClosestToPos(
+    $pos,
+    (node) => node.type.name === "callout"
+  );
+  if (!calloutParent || !calloutParent.node.attrs.collapsed) return;
+
+  tr.setMeta("preventSave", true);
+  tr.setNodeAttribute(calloutParent.pos, "collapsed", false);
+}
 
 function scrollIntoView(domNode: Node) {
   setTimeout(() => {
