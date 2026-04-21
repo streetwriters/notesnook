@@ -18,15 +18,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
-import { View } from "react-native";
+import { View, ViewStyle } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { ProgressBarComponent } from "../ui/svg/lazy";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { SvgView } from "../ui/svg";
+import { Radius, Spacing } from "../../common/design/spacing";
 export const Loading = (props: {
   title?: string;
   description?: string;
   icon?: string;
+  svgSrc?: string;
+  style?: ViewStyle;
 }) => {
   const { colors } = useThemeColors();
   return (
@@ -37,18 +41,37 @@ export const Loading = (props: {
         backgroundColor: colors.primary.background,
         justifyContent: "center",
         alignItems: "center",
-        paddingHorizontal: 16
+        paddingHorizontal: 16,
+        ...props.style
       }}
     >
       {props.icon ? (
         <Icon name={props.icon} size={80} color={colors.primary.accent} />
       ) : null}
 
+      {props.svgSrc ? (
+        <View
+          style={{
+            marginBottom: Spacing.LEVEL_7
+          }}
+        >
+          <SvgView
+            src={props.svgSrc}
+            style={{
+              width: 180,
+              height: 180
+            }}
+          />
+        </View>
+      ) : null}
+
       {props.title ? (
         <Heading
           style={{
-            textAlign: "center"
+            textAlign: "center",
+            marginBottom: Spacing.LEVEL_1
           }}
+          fontSize="XL"
         >
           {props.title}
         </Heading>
@@ -57,8 +80,10 @@ export const Loading = (props: {
       {props.description ? (
         <Paragraph
           style={{
-            textAlign: "center"
+            textAlign: "center",
+            marginBottom: Spacing.LEVEL_4
           }}
+          fontSize="SM"
         >
           {props.description}
         </Paragraph>
@@ -67,15 +92,15 @@ export const Loading = (props: {
       <View
         style={{
           flexDirection: "row",
-          width: 100,
-          marginTop: 15
+          width: 300
         }}
       >
         <ProgressBarComponent
-          height={5}
-          width={100}
+          height={7}
+          width={300}
           animated={true}
           useNativeDriver
+          borderRadius={Radius.XS}
           indeterminate
           indeterminateAnimationDuration={2000}
           unfilledColor={colors.secondary.background}
