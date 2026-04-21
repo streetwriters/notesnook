@@ -43,6 +43,7 @@ import Paragraph from "../typography/paragraph";
 import phone from "phone";
 import isURL from "validator/lib/isURL";
 import { DefaultAppStyles } from "../../../utils/styles";
+import { Spacing } from "../../../common/design/spacing";
 
 interface InputProps extends TextInputProps {
   fwdRef?: RefObject<TextInput | null>;
@@ -80,6 +81,7 @@ interface InputProps extends TextInputProps {
   containerStyle?: ViewStyle;
   wrapperStyle?: ViewStyle;
   flexGrow?: number;
+  label?: string;
 }
 
 const Input = ({
@@ -93,7 +95,7 @@ const Input = ({
   secureTextEntry,
   customColor,
   customValidator,
-  marginBottom = 10,
+  marginBottom = 0,
   button,
   onBlurInput,
   onPress,
@@ -103,6 +105,7 @@ const Input = ({
   buttons,
   marginRight,
   buttonLeft,
+  label,
   flexGrow = 1,
   inputStyle = {},
   containerStyle = {},
@@ -222,11 +225,11 @@ const Input = ({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: DefaultAppStyles.GAP,
+    paddingHorizontal: Spacing.LEVEL_2,
     paddingRight:
       buttons || button || secureTextEntry || error
-        ? DefaultAppStyles.GAP
-        : DefaultAppStyles.GAP,
+        ? Spacing.LEVEL_3
+        : Spacing.LEVEL_3,
     ...containerStyle
   };
 
@@ -235,10 +238,10 @@ const Input = ({
     fontSize: fontSize,
     color:
       onPress && loading ? colors.primary.accent : colors.primary.paragraph,
+    paddingTop: Spacing.LEVEL_3,
+    paddingBottom: Spacing.LEVEL_3,
     flexGrow: 1,
     flexShrink: 1,
-    paddingBottom: DefaultAppStyles.GAP_VERTICAL,
-    paddingTop: DefaultAppStyles.GAP_VERTICAL,
     fontFamily: "Inter-Regular",
     ...(inputStyle as ViewStyle)
   };
@@ -253,6 +256,17 @@ const Input = ({
           ...wrapperStyle
         }}
       >
+        {label ? (
+          <Paragraph
+            style={{
+              marginBottom: Spacing.LEVEL_1
+            }}
+            color={colors.primary.paragraph}
+            fontSize="XS"
+          >
+            {label}
+          </Paragraph>
+        ) : undefined}
         <TouchableOpacity
           disabled={!loading}
           onPress={onPress}
@@ -264,6 +278,9 @@ const Input = ({
           <TextInput
             {...restProps}
             ref={fwdRef}
+            onLayout={(e) => {
+              console.log(e.nativeEvent.layout);
+            }}
             editable={!loading && restProps.editable}
             onChangeText={onChange}
             onBlur={onBlur}
@@ -376,37 +393,36 @@ const Input = ({
         </TouchableOpacity>
       </View>
 
-      {validationType === "password" && focus && (
+      {validationType === "password" &&
+      focus &&
+      Object.keys(errorList).filter((k) => errorList[k as ErrorKey] === true)
+        .length !== 0 ? (
         <View
           style={{
             marginTop: -5,
             marginBottom: 5
           }}
         >
-          {Object.keys(errorList).filter(
-            (k) => errorList[k as ErrorKey] === true
-          ).length !== 0
-            ? Object.keys(ERRORS_LIST).map((error) => (
-                <View
-                  key={ERRORS_LIST[error as ErrorKey]}
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center"
-                  }}
-                >
-                  <Icon
-                    name={errorList[error as ErrorKey] ? "close" : "check"}
-                    color={errorList[error as ErrorKey] ? "red" : "green"}
-                  />
+          {Object.keys(ERRORS_LIST).map((error) => (
+            <View
+              key={ERRORS_LIST[error as ErrorKey]}
+              style={{
+                flexDirection: "row",
+                alignItems: "center"
+              }}
+            >
+              <Icon
+                name={errorList[error as ErrorKey] ? "close" : "check"}
+                color={errorList[error as ErrorKey] ? "red" : "green"}
+              />
 
-                  <Paragraph style={{ marginLeft: 5 }} size={AppFontSize.xs}>
-                    {ERRORS_LIST[error as ErrorKey]}
-                  </Paragraph>
-                </View>
-              ))
-            : null}
+              <Paragraph style={{ marginLeft: 5 }} fontSize="XS">
+                {ERRORS_LIST[error as ErrorKey]}
+              </Paragraph>
+            </View>
+          ))}
         </View>
-      )}
+      ) : null}
     </>
   );
 };

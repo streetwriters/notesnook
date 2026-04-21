@@ -56,17 +56,26 @@ const Intro = () => {
             gap: Spacing.LEVEL_2
           }}
         >
-          {item.headings?.map((heading) =>
+          {item.headings?.map((heading, index) =>
             heading.bold ? (
               <Heading
                 key={heading.value()}
                 fontFamily="SEMI_BOLD"
                 fontSize="XXL"
+                style={{
+                  marginTop: index !== 0 ? -5 : undefined
+                }}
               >
                 {heading.value()}
               </Heading>
             ) : (
-              <Paragraph fontFamily="MEDIUM" fontSize="XL">
+              <Paragraph
+                style={{
+                  marginTop: index !== 0 ? -5 : undefined
+                }}
+                fontFamily="MEDIUM"
+                fontSize="XL"
+              >
                 {heading.value()}
               </Paragraph>
             )

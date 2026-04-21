@@ -33,6 +33,8 @@ import NativeTooltip from "../../../utils/tooltip";
 import { Pressable, PressableProps, useButton } from "../pressable";
 import Heading from "../typography/heading";
 import Paragraph from "../typography/paragraph";
+import { Spacing } from "../../../common/design/spacing";
+import { FontFamily } from "../../../common/design/font";
 export interface ButtonProps extends PressableProps {
   height?: number;
   icon?: string;
@@ -44,6 +46,7 @@ export interface ButtonProps extends PressableProps {
   title?: string | null;
   loading?: boolean;
   width?: string | number | null;
+  fontFamily?: keyof typeof FontFamily;
   buttonType?: {
     text?: ColorValue;
     selected?: ColorValue;
@@ -64,6 +67,7 @@ export const Button = ({
   loading = false,
   title = null,
   icon,
+  fontFamily = "SEMI_BOLD",
   fontSize = AppFontSize.md,
   type = "transparent",
   iconSize = AppFontSize.md,
@@ -152,16 +156,17 @@ export const Button = ({
           color={textColor as string}
           size={fontSize}
           numberOfLines={1}
+          fontFamily={fontFamily}
           allowFontScaling={allowFontScaling}
           style={[
             {
               marginLeft:
                 icon || (loading && iconPosition === "left")
-                  ? DefaultAppStyles.GAP_SMALL
+                  ? Spacing.LEVEL_1
                   : 0,
               marginRight:
                 icon || (loading && iconPosition === "right")
-                  ? DefaultAppStyles.GAP_SMALL
+                  ? Spacing.LEVEL_1
                   : 0
             },
             textStyle
@@ -175,7 +180,7 @@ export const Button = ({
         <Icon
           name={icon}
           allowFontScaling
-          style={[{ marginLeft: 0 }, iconStyle as any]}
+          style={[iconStyle as any]}
           color={iconColor || buttonType?.text || textColor}
           size={iconSize}
         />

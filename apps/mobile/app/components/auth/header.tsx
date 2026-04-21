@@ -24,6 +24,9 @@ import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
 import { hideAuth } from "./common";
 import { AuthParams } from "../../stores/use-navigation-store";
+import { ProgressPills } from "../intro/progress-pills";
+import { FontSizes } from "../../common/design/font";
+import { Spacing } from "../../common/design/spacing";
 export const AuthHeader = (props: { welcome?: boolean }) => {
   const { colors } = useThemeColors();
   const route = useRoute();
@@ -37,19 +40,25 @@ export const AuthHeader = (props: { welcome?: boolean }) => {
       <View
         style={{
           flexDirection: "row",
-          alignItems: "center",
-          paddingHorizontal: 12,
+          paddingHorizontal: Spacing.LEVEL_3,
           width: "100%",
-          height: 50,
-          justifyContent: !props.welcome ? "space-between" : "flex-end"
+          justifyContent: "space-between",
+          alignItems: "center"
         }}
       >
-        {props.welcome ? null : (
+        {props.welcome ? (
+          <ProgressPills activePillIndex={1} />
+        ) : (
           <IconButton
             name="arrow-left"
             onPress={() => {
               hideAuth((route.params as AuthParams)?.context);
             }}
+            style={{
+              width: 30,
+              height: 30
+            }}
+            size={26}
             color={colors.primary.paragraph}
           />
         )}
@@ -60,16 +69,16 @@ export const AuthHeader = (props: { welcome?: boolean }) => {
             onPress={() => {
               hideAuth();
             }}
-            iconSize={16}
+            iconSize={24}
+            fontSize={FontSizes.SM}
             type="plain"
+            fontFamily="REGULAR"
             iconPosition="right"
             icon="chevron-right"
-            height={25}
-            iconStyle={{
-              marginTop: 2
-            }}
             style={{
-              paddingHorizontal: 6
+              paddingRight: 0,
+              paddingHorizontal: 0,
+              paddingVertical: 0
             }}
           />
         )}
