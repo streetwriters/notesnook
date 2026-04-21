@@ -107,7 +107,7 @@ export const strings = {
   },
   alreadyHaveAccount: () => t`Already have an account?`,
   login: () => t`Login`,
-  "2fa": () => t`Two factor authentication`,
+  "2fa": () => t`Two Factor Authentication`,
   select2faMethod: () => t`Select method for two-factor authentication`,
   select2faCodeHelpText: () => t`Select how you would like to recieve the code`,
   "2faCodeHelpText": {
@@ -1786,7 +1786,7 @@ For example:
   dragAndDropFiles: () => t`Drag & drop files here, or click to select files`,
   onlyZipSupported: () => t`Only .zip files are supported.`,
   clickToRemove: () => t`Click to remove`,
-  currentPlan: () => t`CURRENT PLAN`,
+  currentPlan: () => t`Current Plan`,
   appWillReloadIn: (sec: number) => t`App will reload in ${sec} seconds`,
   changesReflectOnStart: () =>
     t`Your changes have been saved and will be reflected after the app has refreshed.`,
@@ -1862,7 +1862,7 @@ For example:
   newEmail: () => t`New Email`,
   accountPassword: () => t`Account password`,
   phoneNumber: () => t`Phone number`,
-  createAccount: () => t`Create account`,
+  createAccount: () => t`Create Account`,
   accountRecoverHelpText: () =>
     t`You will receive instructions on how to recover your account on this email`,
   enterRecoveryKey: () => t`Enter account recovery key`,
@@ -2577,7 +2577,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   thankYouForSubscribing: () => t`Thank you for subscribing`,
   settingUpPlan: () =>
     t`We’re setting up your plan right now. We’ll notify you as soon as everything is ready.`,
-  hdImages: () => t`hdImages`,
+  hdImages: () => t`HD Images`,
   billedAnnually: (price: string) => t`billed annually at ${price}`,
   billedMonthly: (price: string) => t`billed monthly at ${price}`,
   dueToday: () => t`Due today`,
@@ -2608,7 +2608,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   bestValue: () => t`Best value`,
   planLimits: () => t`Plan limits`,
   unlimited: () => t`Unlimited`,
-  fiveYearPlan: () => t`5 year plan (One time purchase)`,
+  fiveYearPlan: () => t`5 year plan`,
   educationPlan: () => t`Education plan`,
   welcomeToPlan: (plan: string) => t`Welcome to Notesnook ${plan}`,
   thankYouForPurchase: () => t`Thank you for the purchase`,
@@ -2809,5 +2809,25 @@ Continue without attachments?`,
   colorNotePasswordFor: (filename: string) =>
     t`Colornote password for ${filename}`,
   colorNotPasswordForDesc: () =>
-    t`The password for decrypting the Colornote backup file.`
+    t`The password for decrypting the Colornote backup file.`,
+  selectPlan: () => t`Select Plan`,
+  frequentlyAskedQuestions: () => t`Frequently Asked Questions`,
+  testimonials: () => t`Testimonials`,
+  billingType: {
+    annual: () => t`Billed annually`,
+    monthly: () => t`Billed monthly`,
+    oneTime: () => t`One time purchase`
+  },
+  whatsIncluded: () => t`What's included`,
+  paymentSummary: () => t`Payment summary`,
+  planWhatsIncluded: {
+    unlimitedNotes: () => t`Unlimited notes and attachments`,
+    endToEnd: () => t`End-to-end encryption (XChaCha20)`,
+    allDevices: () => t`Access on all devices`,
+    freeTrial: (days: number) => t`Free ${days} days trial, cancel anytime`,
+    remind: () => t`Remind before your trial ends`
+  },
+  nextBillingDate: () => t`Next Billing Date`,
+  freeTrialIncludes: (duration: number) =>
+    t`${duration} days free trial includes all features`
 };

@@ -502,6 +502,10 @@ msgstr "{days, plural, one {1 day} other {# days}}"
 msgid "{days} days free"
 msgstr "{days} days free"
 
+#: src/strings.ts:2832
+msgid "{duration} days free trial includes all features"
+msgstr "{duration} days free trial includes all features"
+
 #: src/strings.ts:351
 msgid "{freq, plural, one {Repeats every day on {selectedDays} at {date}} other {Repeats every # day every {selectedDays} at {date}}}"
 msgstr "{freq, plural, one {Repeats every day on {selectedDays} at {date}} other {Repeats every # day every {selectedDays} at {date}}}"
@@ -639,8 +643,8 @@ msgid "2FA code sent via {method}"
 msgstr "2FA code sent via {method}"
 
 #: src/strings.ts:2611
-msgid "5 year plan (One time purchase)"
-msgstr "5 year plan (One time purchase)"
+msgid "5 year plan"
+msgstr "5 year plan"
 
 #: src/strings.ts:1861
 msgid "6 digit code"
@@ -665,6 +669,10 @@ msgstr "Abc"
 #: src/strings.ts:1305
 msgid "About"
 msgstr "About"
+
+#: src/strings.ts:2826
+msgid "Access on all devices"
+msgstr "Access on all devices"
 
 #: src/strings.ts:1040
 msgid "Account"
@@ -1292,9 +1300,17 @@ msgstr "Beta"
 msgid "Bi-directional note link"
 msgstr "Bi-directional note link"
 
+#: src/strings.ts:2817
+msgid "Billed annually"
+msgstr "Billed annually"
+
 #: src/strings.ts:2581
 msgid "billed annually at {price}"
 msgstr "billed annually at {price}"
+
+#: src/strings.ts:2818
+msgid "Billed monthly"
+msgstr "Billed monthly"
 
 #: src/strings.ts:2582
 msgid "billed monthly at {price}"
@@ -2014,8 +2030,8 @@ msgid "Create a tag to group related notes together."
 msgstr "Create a tag to group related notes together."
 
 #: src/strings.ts:1865
-msgid "Create account"
-msgstr "Create account"
+msgid "Create Account"
+msgstr "Create Account"
 
 #: src/strings.ts:2684
 msgid "Create API Key"
@@ -2112,8 +2128,8 @@ msgid "Current pin"
 msgstr "Current pin"
 
 #: src/strings.ts:1789
-msgid "CURRENT PLAN"
-msgstr "CURRENT PLAN"
+msgid "Current Plan"
+msgstr "Current Plan"
 
 #: src/strings.ts:2026
 msgid "Custom"
@@ -2720,6 +2736,10 @@ msgstr "Encryption key"
 msgid "End-to-end encrypted."
 msgstr "End-to-end encrypted."
 
+#: src/strings.ts:2825
+msgid "End-to-end encryption (XChaCha20)"
+msgstr "End-to-end encryption (XChaCha20)"
+
 #: src/strings.ts:399
 msgid "Enter 6 digit code"
 msgstr "Enter 6 digit code"
@@ -3253,6 +3273,10 @@ msgstr ""
 msgid "Forgot password?"
 msgstr "Forgot password?"
 
+#: src/strings.ts:2827
+msgid "Free {days} days trial, cancel anytime"
+msgstr "Free {days} days trial, cancel anytime"
+
 #: src/strings.ts:2591
 msgid "Free {duration} day trial, cancel any time"
 msgstr "Free {duration} day trial, cancel any time"
@@ -3260,6 +3284,10 @@ msgstr "Free {duration} day trial, cancel any time"
 #: src/strings.ts:2495
 msgid "Free plan"
 msgstr "Free plan"
+
+#: src/strings.ts:2814
+msgid "Frequently Asked Questions"
+msgstr "Frequently Asked Questions"
 
 #: src/strings.ts:627
 msgid "Fri"
@@ -3422,8 +3450,8 @@ msgid "Having problems with sync?"
 msgstr "Having problems with sync?"
 
 #: src/strings.ts:2580
-msgid "hdImages"
-msgstr "hdImages"
+msgid "HD Images"
+msgstr "HD Images"
 
 #: src/strings.ts:2376
 msgid "Heading {level}"
@@ -4418,6 +4446,10 @@ msgstr "Newly created notes will be uncategorized"
 msgid "Next"
 msgstr "Next"
 
+#: src/strings.ts:2830
+msgid "Next Billing Date"
+msgstr "Next Billing Date"
+
 #: src/strings.ts:2405
 msgid "Next match"
 msgstr "Next match"
@@ -4723,6 +4755,10 @@ msgstr "Oldest - newest"
 msgid "Once your password is changed, please make sure to save the new account recovery key"
 msgstr "Once your password is changed, please make sure to save the new account recovery key"
 
+#: src/strings.ts:2819
+msgid "One time purchase"
+msgstr "One time purchase"
+
 #: src/strings.ts:2587
 msgid "One time purchase, no auto-renewal"
 msgstr "One time purchase, no auto-renewal"
@@ -4907,6 +4943,10 @@ msgstr "Pay once and use for 5 years"
 #: src/strings.ts:2225
 msgid "Payment method"
 msgstr "Payment method"
+
+#: src/strings.ts:2822
+msgid "Payment summary"
+msgstr "Payment summary"
 
 #: src/strings.ts:788
 msgid "PDF is password protected"
@@ -5533,6 +5573,10 @@ msgstr "Relogin to your account"
 msgid "Remembered your password?"
 msgstr "Remembered your password?"
 
+#: src/strings.ts:2828
+msgid "Remind before your trial ends"
+msgstr "Remind before your trial ends"
+
 #: src/strings.ts:941
 msgid "Remind me"
 msgstr "Remind me"
@@ -6140,6 +6184,10 @@ msgstr "Select notes to link to \"{title}\""
 #: src/strings.ts:342
 msgid "Select nth day of the month to repeat the reminder."
 msgstr "Select nth day of the month to repeat the reminder."
+
+#: src/strings.ts:2813
+msgid "Select Plan"
+msgstr "Select Plan"
 
 #: src/strings.ts:1833
 msgid "Select profile picture"
@@ -6826,6 +6874,10 @@ msgstr "Test connection"
 msgid "Test connection before changing server urls"
 msgstr "Test connection before changing server urls"
 
+#: src/strings.ts:2815
+msgid "Testimonials"
+msgstr "Testimonials"
+
 #: src/strings.ts:2309
 msgid "Text color"
 msgstr "Text color"
@@ -7126,8 +7178,8 @@ msgid "Turns off syncing completely on this device. Any changes made will remain
 msgstr "Turns off syncing completely on this device. Any changes made will remain local only and new changes from your other devices won't sync to this device."
 
 #: src/strings.ts:110
-msgid "Two factor authentication"
-msgstr "Two factor authentication"
+msgid "Two Factor Authentication"
+msgstr "Two Factor Authentication"
 
 #: src/strings.ts:494
 msgid "Two-factor authentication"
@@ -7172,6 +7224,10 @@ msgstr "Unfavorite"
 #: src/strings.ts:2610
 msgid "Unlimited"
 msgstr "Unlimited"
+
+#: src/strings.ts:2824
+msgid "Unlimited notes and attachments"
+msgstr "Unlimited notes and attachments"
 
 #: src/strings.ts:946
 msgid "Unlink from all"
@@ -7671,6 +7727,10 @@ msgstr "What is your refund policy?"
 #: src/strings.ts:1683
 msgid "What went wrong?"
 msgstr "What went wrong?"
+
+#: src/strings.ts:2821
+msgid "What's included"
+msgstr "What's included"
 
 #: src/strings.ts:2536
 msgid "Why do you need my credit card details for a free trial?"
