@@ -16,16 +16,17 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { Plan, SubscriptionPlan, SubscriptionPlanId } from "@notesnook/core";
-import { useEffect, useState } from "react";
+import { Plan, SubscriptionPlan } from "@notesnook/core";
+import React, { useEffect, useState } from "react";
+import { useAsync } from "react-async-hook";
 import { Platform } from "react-native";
 import Config from "react-native-config";
 import * as RNIap from "react-native-iap";
 import { DatabaseLogger, db } from "../common/database";
 import PremiumService from "../services/premium";
+import SettingsService from "../services/settings";
 import { useSettingStore } from "../stores/use-setting-store";
 import { useUserStore } from "../stores/use-user-store";
-import SettingsService from "../services/settings";
 function numberWithCommas(x: string) {
   const parts = x.toString().split(".");
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -155,9 +156,18 @@ const planIdToIndex = (planId: string) => {
   return planIndex;
 };
 let WebPlanCache: Plan[];
+const isGithubRelease = Config.GITHUB_RELEASE === "true";
 const usePricingPlans = (options?: PricingPlansOptions) => {
-  const isGithubRelease = Config.GITHUB_RELEASE === "true";
   const user = useUserStore((state) => state.user);
+  const regionalDiscount = useAsync(
+    () =>
+      db.pricing.sku(
+        Platform.OS === "android" ? "google" : "apple",
+        "yearly",
+        "pro"
+      ),
+    []
+  );
   const [currentPlan, setCurrentPlan] = useState<string>(
     options?.planId || pricingPlans[2].id
   );
@@ -172,17 +182,20 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
   const [userCanRequestTrial, setUserCanRequestTrial] = useState(false);
   const [webPricingPlans, setWebPricingPlans] = useState<Plan[]>([]);
 
-  const getProduct = (planId: string, skuId: string) => {
-    if (isGithubRelease)
-      return webPricingPlans.find(
-        (plan) => planIdToIndex(planId) === plan.plan && skuId === plan.period
-      );
+  const getProduct = React.useCallback(
+    (planId: string, skuId: string) => {
+      if (isGithubRelease)
+        return webPricingPlans.find(
+          (plan) => planIdToIndex(planId) === plan.plan && skuId === plan.period
+        );
 
-    return (
-      plans.find((p) => p.id === planId)?.subscriptions?.[skuId] ||
-      plans.find((p) => p.id === planId)?.products?.[skuId]
-    );
-  };
+      return (
+        plans.find((p) => p.id === planId)?.subscriptions?.[skuId] ||
+        plans.find((p) => p.id === planId)?.products?.[skuId]
+      );
+    },
+    [plans, webPricingPlans]
+  );
 
   const getProductAndroid = (planId: string, skuId: string) => {
     if (isGithubRelease)
@@ -196,37 +209,45 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
     return getProduct(planId, skuId) as RNIap.SubscriptionIOS;
   };
 
-  const hasTrialOffer = (planId?: string, productId?: string) => {
-    if (!selectedProductSku && !productId) return false;
+  const hasTrialOffer = React.useCallback(
+    (planId?: string, productId?: string) => {
+      if (!selectedProductSku && !productId) return false;
 
-    if (productId?.includes("5year")) return false;
-    if (isGithubRelease) {
-      if (
-        user?.subscription?.trialsAvailed?.some(
-          (plan) => plan === planIdToIndex(planId || currentPlan)
-        )
-      ) {
-        return false;
-      } else {
-        return true;
+      if (productId?.includes("5year")) return false;
+      if (isGithubRelease) {
+        if (
+          user?.subscription?.trialsAvailed?.some(
+            (plan) => plan === planIdToIndex(planId || currentPlan)
+          )
+        ) {
+          return false;
+        } else {
+          return true;
+        }
       }
-    }
 
-    return Platform.OS === "ios"
-      ? (
-          getProduct(
-            planId || currentPlan,
-            productId || selectedProductSku
-          ) as RNIap.SubscriptionIOS
-        )?.introductoryPricePaymentModeIOS === "FREETRIAL"
-      : (
-          getProduct(
-            planId || currentPlan,
-            productId || selectedProductSku
-          ) as RNIap.SubscriptionAndroid
-        )?.subscriptionOfferDetails?.[0]?.pricingPhases?.pricingPhaseList
-          ?.length > 1;
-  };
+      return Platform.OS === "ios"
+        ? (
+            getProduct(
+              planId || currentPlan,
+              productId || selectedProductSku
+            ) as RNIap.SubscriptionIOS
+          )?.introductoryPricePaymentModeIOS === "FREETRIAL"
+        : (
+            getProduct(
+              planId || currentPlan,
+              productId || selectedProductSku
+            ) as RNIap.SubscriptionAndroid
+          )?.subscriptionOfferDetails?.[0]?.pricingPhases?.pricingPhaseList
+            ?.length > 1;
+    },
+    [
+      currentPlan,
+      getProduct,
+      selectedProductSku,
+      user?.subscription?.trialsAvailed
+    ]
+  );
 
   // user && (!user.subscription || !user.subscription.expiry) ? true : false;
 
@@ -649,21 +670,6 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
         );
   };
 
-  async function getRegionalDiscount(plan: string, productId: string) {
-    if (productId !== "notesnook.pro.yearly") {
-      return;
-    }
-    try {
-      return await db.pricing.sku(
-        Platform.OS === "android" ? "google" : "apple",
-        "yearly",
-        plan as SubscriptionPlanId
-      );
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
   function isSubscribedToPlan(planId: string) {
     if (!PremiumService.get()) return false;
     return user?.subscription?.productId?.includes(planId);
@@ -734,7 +740,7 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
         (plan) => plan.plan === planIndex && plan.period === period
       );
     },
-    getRegionalDiscount,
+    regionalDiscount: regionalDiscount.result,
     isGithubRelease: isGithubRelease,
     isSubscribed: () => user?.subscription?.plan !== SubscriptionPlan.FREE,
     finish: () => options?.onBuy?.()

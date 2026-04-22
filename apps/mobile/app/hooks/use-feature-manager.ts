@@ -37,11 +37,10 @@ export default function useFeatureManager() {
     "disableTrashCleanup",
     "fullOfflineMode"
   ]);
-  const user = useUserStore((state) => state.user);
   const plan = useUserStore((state) => state.user?.subscription?.plan);
 
   useEffect(() => {
-    if (!user || !features) return;
+    if (!useUserStore.getState().user || !features) return;
 
     if (!features.createNoteFromNotificationDrawer.isAllowed) {
       SettingsService.setProperty("notifNotes", false);
@@ -82,7 +81,8 @@ export default function useFeatureManager() {
         db.settings.setDefaultTag(undefined);
       }
     }
-  }, [features, plan, user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [features, plan]);
 
   return true;
 }

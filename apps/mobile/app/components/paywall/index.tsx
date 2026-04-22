@@ -18,13 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { getFeaturesTable } from "@notesnook/common";
-import {
-  EVENTS,
-  Plan,
-  SKUResponse,
-  SubscriptionPlan,
-  User
-} from "@notesnook/core";
+import { EVENTS, Plan, SubscriptionPlan, User } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useState } from "react";
@@ -54,6 +48,7 @@ import {
   TECHLORE_SVG,
   XDA_SVG
 } from "../../assets/images/assets";
+import { db } from "../../common/database";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import usePricingPlans, {
   PlanOverView,
@@ -75,7 +70,6 @@ import { IconButton } from "../ui/icon-button";
 import { SvgView } from "../ui/svg";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { db } from "../../common/database";
 
 const Steps = {
   select: 1,
@@ -936,7 +930,10 @@ const PricingPlanCard = ({
   setStep: (step: number) => void;
 }) => {
   const { colors } = useThemeColors();
-  const [regionalDiscount, setRegionaDiscount] = useState<SKUResponse>();
+  const regionalDiscount =
+    annualBilling && plan.id === "pro"
+      ? pricingPlans?.regionalDiscount
+      : undefined;
   const { width } = useWindowDimensions();
   const isTablet = width > 600;
 
@@ -958,26 +955,6 @@ const PricingPlanCard = ({
     pricingPlans.hasTrialOffer(plan.id, product?.productId) ? 1 : 0,
     annualBilling
   );
-
-  useEffect(() => {
-    if (pricingPlans?.isGithubRelease || !annualBilling) return;
-    pricingPlans
-      ?.getRegionalDiscount(
-        plan.id,
-        pricingPlans.isGithubRelease
-          ? (WebPlan?.period as string)
-          : `notesnook.${plan.id}.${annualBilling ? "yearly" : "monthly"}`
-      )
-      .then((value) => {
-        setRegionaDiscount(value);
-      });
-  }, [WebPlan?.period, annualBilling, plan.id, pricingPlans]);
-
-  useEffect(() => {
-    if (!annualBilling) {
-      setRegionaDiscount(undefined);
-    }
-  }, [annualBilling]);
 
   const isSubscribed =
     product?.productId &&

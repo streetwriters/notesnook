@@ -16,11 +16,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { Plan, SKUResponse } from "@notesnook/core";
+import { Plan } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import dayjs from "dayjs";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Linking,
   Platform,
@@ -330,7 +330,10 @@ const ProductItem = (props: {
   productId: string;
 }) => {
   const { colors } = useThemeColors();
-  const [regionalDiscount, setRegionaDiscount] = useState<SKUResponse>();
+  const regionalDiscount =
+    props.productId === "notesnook.pro.yearly"
+      ? props.pricingPlans.regionalDiscount
+      : undefined;
   const product =
     props.pricingPlans?.currentPlan?.subscriptions?.[
       regionalDiscount?.sku || props.productId
@@ -366,30 +369,6 @@ const ProductItem = (props: {
       ) ||
       props.pricingPlans.user?.subscription?.productId ===
         (product as Plan)?.id);
-
-  useEffect(() => {
-    if (product) {
-      props.pricingPlans
-        ?.getRegionalDiscount(
-          props.pricingPlans.currentPlan?.id as string,
-          props.pricingPlans.isGithubRelease
-            ? ((product as Plan)?.period as string)
-            : props.productId
-        )
-        .then((value) => {
-          if (
-            value &&
-            value.sku?.startsWith(
-              (props.pricingPlans.selectedProduct as RNIap.Subscription)
-                ?.productId
-            )
-          ) {
-            props.pricingPlans.selectProduct(value?.sku as string);
-          }
-          setRegionaDiscount(value);
-        });
-    }
-  }, [product, props.pricingPlans, props.productId]);
 
   const discountValue =
     (isAnnual && !isGithubRelease) ||

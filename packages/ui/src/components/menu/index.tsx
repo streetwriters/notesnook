@@ -21,8 +21,8 @@ import React, {
   useCallback,
   useRef,
   useEffect,
-  PropsWithChildren,
-  useState
+  useState,
+  PropsWithChildren
 } from "react";
 import { Box, FlexProps, Text } from "@theme-ui/components";
 import { getPosition } from "../../utils/position.js";
@@ -68,6 +68,7 @@ export function Menu(props: MenuProps) {
   const focusedItem = items[focusIndex];
 
   const subMenuRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const item = items[focusIndex];
     if (!item || !subMenuRef.current) return;
@@ -80,15 +81,23 @@ export function Menu(props: MenuProps) {
       return;
     }
 
-    const { top, left } = getPosition(subMenuRef.current, {
-      // yOffset: menuItemElement.offsetHeight,
-      target: menuItemElement,
-      location: "right"
-    });
+    function repositionSubmenu() {
+      if (!subMenuRef.current || !menuItemElement) return;
 
+      const { top, left } = getPosition(subMenuRef.current, {
+        target: menuItemElement,
+        location: "right"
+      });
+      subMenuRef.current.style.top = `${top}px`;
+      subMenuRef.current.style.left = `${left}px`;
+    }
+
+    repositionSubmenu();
     subMenuRef.current.style.visibility = "visible";
-    subMenuRef.current.style.top = `${top}px`;
-    subMenuRef.current.style.left = `${left}px`;
+
+    const observer = new ResizeObserver(() => repositionSubmenu());
+    observer.observe(subMenuRef.current);
+    return () => observer.disconnect();
   }, [isSubmenuOpen, focusIndex, items]);
 
   return (

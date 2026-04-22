@@ -71,7 +71,7 @@ export function MenuItem({
     if (item.data) {
       getTotalNotesRef.current([item.data?.id]);
     }
-  }, [update]);
+  }, [item.data, update]);
 
   useEffect(() => {
     const onSyncComplete = async () => {
@@ -94,7 +94,9 @@ export function MenuItem({
               setItemCount(await db.notes.archived.count());
               break;
             case "Trash":
-              setItemCount((await db.trash.all()).length);
+              {
+                setItemCount((await db.trash.all()).length);
+              }
               break;
           }
         } else {

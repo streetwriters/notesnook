@@ -194,6 +194,7 @@ export const VaultDialog: React.FC = () => {
           close();
         }, 100);
       } else {
+        setLoading(false);
         ToastManager.show({
           heading: strings.passwordIncorrect(),
           type: "error",
@@ -227,6 +228,10 @@ export const VaultDialog: React.FC = () => {
       setLoading(false);
       close();
       eSendEvent("vaultUpdated");
+      ToastManager.show({
+        message: strings.vaultCleared(),
+        type: "success"
+      });
     } catch (e) {
       ToastManager.show({
         heading: strings.passwordIncorrect(),
@@ -741,7 +746,8 @@ export const VaultDialog: React.FC = () => {
           width: DDS.isTab ? 350 : "85%",
           borderRadius: 10,
           backgroundColor: colors.primary.background,
-          paddingTop: 12
+          paddingTop: 12,
+          overflow: "hidden"
         }}
       >
         <DialogHeader
@@ -808,7 +814,8 @@ export const VaultDialog: React.FC = () => {
               !isBiometryAvailable ||
               isCreateVault ||
               isChangePassword ||
-              isCustomAction ? null : (
+              isCustomAction ||
+              isDeleteVault ? null : (
                 <Button
                   onPress={() =>
                     onPressFingerprintAuth(strings.unlockNote(), "")

@@ -47,7 +47,7 @@ export interface Checkout {
 export type PaddleEvent = {
   action: "event";
   event_name: CheckoutEventNames;
-  callback_data: PaddleEventData;
+  callback_data?: PaddleEventData;
 };
 
 export type PlanMetadata = Record<

@@ -209,14 +209,21 @@ Options:
 // ---------------------------------------------------------------------------
 // Stack frame parsing
 //
-// Handles frames like:
+// Handles frames like (V8/Node):
 //   at XB (https://example.com/assets/app-HASH.js:136:27466)
-//   at https://example.com/assets/app-HASH.js:12:345   (anonymous)
+//   at https://example.com/assets/app-HASH.js:12:345
 //   at+XB+(https://example.com/assets/app-HASH.js:136:27466)  (URL-encoded)
+// And Safari/WebKit:
+//   E@https://example.com/assets/app-HASH.js:23:45428
+//   @https://example.com/assets/app-HASH.js:23:45428  (anonymous)
 // ---------------------------------------------------------------------------
 
+// Groups:
+//   V8 named:     m[1]=symbol  m[2]=url  m[3]=line  m[4]=col
+//   V8 anonymous: m[5]=url     m[6]=line m[7]=col
+//   Safari:       m[8]=symbol  m[9]=url  m[10]=line m[11]=col
 const FRAME_RE =
-  /at\s+(?:async\s+)?(\S+)\s+\(?(https?:\/\/[^\s):]+):(\d+):(\d+)\)?|at\s+(?:async\s+)?(https?:\/\/[^\s):]+):(\d+):(\d+)/g;
+  /at\s+(?:async\s+)?(\S+)\s+\(?(https?:\/\/[^\s):]+):(\d+):(\d+)\)?|at\s+(?:async\s+)?(https?:\/\/[^\s):]+):(\d+):(\d+)|(\S*)@(https?:\/\/[^\s:)]+):(\d+):(\d+)/g;
 
 function parseStackTrace(raw) {
   // Replace URL-encoded + with spaces so the regex works uniformly
@@ -233,7 +240,7 @@ function parseStackTrace(raw) {
     }
 
     if (m[2]) {
-      // "at symbol (url:line:col)"
+      // V8: "at symbol (url:line:col)"
       frames.push({
         raw: line,
         parsed: true,
@@ -242,8 +249,8 @@ function parseStackTrace(raw) {
         line: parseInt(m[3], 10),
         col: parseInt(m[4], 10)
       });
-    } else {
-      // "at url:line:col"
+    } else if (m[5]) {
+      // V8: "at url:line:col"
       frames.push({
         raw: line,
         parsed: true,
@@ -251,6 +258,16 @@ function parseStackTrace(raw) {
         url: m[5],
         line: parseInt(m[6], 10),
         col: parseInt(m[7], 10)
+      });
+    } else {
+      // Safari/WebKit: "symbol@url:line:col"
+      frames.push({
+        raw: line,
+        parsed: true,
+        symbol: m[8] || null,
+        url: m[9],
+        line: parseInt(m[10], 10),
+        col: parseInt(m[11], 10)
       });
     }
   }
@@ -338,7 +355,10 @@ function tryDemangleDotted(consumer, generatedLine, generatedCol, symbol) {
   let col = generatedCol;
 
   for (let i = parts.length - 1; i >= 0; i--) {
-    const pos = consumer.originalPositionFor({ line: generatedLine, column: col });
+    const pos = consumer.originalPositionFor({
+      line: generatedLine,
+      column: col
+    });
     if (pos.name) resolved[i] = pos.name;
     // Step back past this identifier and the dot that precedes it
     col -= parts[i].length + 1;
@@ -507,7 +527,13 @@ async function main() {
     console.log(`    at ${name} (${src}:${pos.line}:${pos.column})`);
 
     // Source context
-    const ctx = getSourceContext(consumer, pos.source, pos.line, pos.column, opts.context);
+    const ctx = getSourceContext(
+      consumer,
+      pos.source,
+      pos.line,
+      pos.column,
+      opts.context
+    );
     if (ctx) {
       for (const l of ctx) {
         const gutter = l.isTarget ? ">" : " ";

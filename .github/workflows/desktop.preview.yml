@@ -101,7 +101,6 @@ jobs:
 
       - name: Build dmg
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_LINK: ${{ secrets.mac_certs }}
           CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
           APPLE_API_KEY: ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
@@ -153,8 +152,6 @@ jobs:
         run: npm run tx @notesnook/desktop:release
 
       - name: Build AppImage
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: yarn electron-builder --config=electron-builder.config.js --linux AppImage:x64 -p never
         working-directory: ./apps/desktop
 
@@ -163,6 +160,49 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: linux-x64-build
+          path: apps/desktop/output/*.AppImage
+
+  build-linux-arm64:
+    name: Build for Linux arm64
+    needs: build
+    runs-on: ubuntu-22.04-arm
+    outputs:
+      linux-arm64-artifact-url: ${{ steps.artifact-upload-step.outputs.artifact-url }}
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: ./apps/web/build
+
+      - name: Install packages
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=desktop
+
+      - name: Install sqlite-better-trigram for all arch
+        run: |
+          npm i --cpu arm64 sqlite-better-trigram
+        working-directory: ./apps/desktop
+
+      - name: Build Electron wrapper
+        run: npm run tx @notesnook/desktop:release
+
+      - name: Build AppImage
+        run: yarn electron-builder --config=electron-builder.config.js --linux AppImage:arm64 -p never
+        working-directory: ./apps/desktop
+
+      - name: Upload AppImage artifact
+        id: artifact-upload-step
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-arm64-build
           path: apps/desktop/output/*.AppImage
 
   build-windows:
@@ -216,7 +256,8 @@ jobs:
 
   post-pr-comment:
     name: Post PR comment with preview URLs
-    needs: [build, build-macos, build-linux-x64, build-windows]
+    needs:
+      [build, build-macos, build-linux-x64, build-linux-arm64, build-windows]
     runs-on: ubuntu-latest
     steps:
       - name: Post or update PR comment
@@ -224,6 +265,7 @@ jobs:
         env:
           macos_artifact_url: ${{ needs.build-macos.outputs.macos-artifact-url }}
           linux_x64_artifact_url: ${{ needs.build-linux-x64.outputs.linux-x64-artifact-url }}
+          linux_arm64_artifact_url: ${{ needs.build-linux-arm64.outputs.linux-arm64-artifact-url }}
           windows_artifact_url: ${{ needs.build-windows.outputs.windows-artifact-url }}
         with:
           script: |
@@ -232,6 +274,7 @@ jobs:
             const previewUrl = [
               { platform: 'macOS', url: process.env.macos_artifact_url },
               { platform: 'Linux x64', url: process.env.linux_x64_artifact_url },
+              { platform: 'Linux arm64', url: process.env.linux_arm64_artifact_url },
               { platform: 'Windows x64', url: process.env.windows_artifact_url },
             ].filter(u => u.url).map(u => `- [${u.platform}](${u.url})`).join('\n');
             const body = `${marker}\n**Desktop Previews**\n\n${previewUrl || 'Preview URL unavailable — check workflow logs.'}\n\nCommit: ${process.env.GITHUB_SHA}\n`;

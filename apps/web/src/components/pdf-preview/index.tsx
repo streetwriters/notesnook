@@ -22,6 +22,7 @@ import "@react-pdf-viewer/core/lib/styles/index.css";
 import { ToolbarSlot, toolbarPlugin } from "@react-pdf-viewer/toolbar";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { searchPlugin } from "@react-pdf-viewer/search";
+import "@react-pdf-viewer/search/lib/styles/index.css";
 import {
   ChevronDown,
   ChevronUp,
@@ -80,12 +81,30 @@ export function PdfPreview(props: PdfPreviewProps) {
 
                     ".rpv-search__popover label, .rpv-search__popover span": {
                       fontFamily: "body",
-                      fontSize: "body"
+                      fontSize: "body",
+                      color: "paragraph"
                     },
 
                     ".rpv-core__popover-body, .rpv-core__arrow": {
                       bg: "background",
-                      borderColor: "border"
+                      borderColor: "border",
+                      color: "paragraph"
+                    },
+
+                    ".rpv-search__popover .rpv-core__minimal-button": {
+                      color: "icon",
+                      ":hover": {
+                        bg: "hover"
+                      }
+                    },
+
+                    ".rpv-search__popover .rpv-core__button": {
+                      bg: "background-secondary",
+                      color: "paragraph",
+                      border: "none",
+                      ":hover": {
+                        bg: "hover"
+                      }
                     },
 
                     ".rpv-search__popover-label-checkbox": {
@@ -112,6 +131,10 @@ export function PdfPreview(props: PdfPreviewProps) {
                       ":hover:not(:focus)": {
                         outline: "1.5px solid var(--accent)"
                       }
+                    },
+
+                    ".rpv-search__popover .rpv-core__textbox": {
+                      width: "85% !important"
                     }
                   }}
                 >

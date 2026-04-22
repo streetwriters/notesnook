@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-09-22 09:18+0500\n"
+"POT-Creation-Date: 2026-04-20 11:33+0500\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -642,7 +642,7 @@ msgstr ""
 
 #: src/strings.ts:1010
 msgid "2FA code sent via {method}"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2587
 msgid "5 year plan (One time purchase)"
@@ -754,7 +754,7 @@ msgstr ""
 
 #: src/strings.ts:936
 msgid "Add tags to multiple notes at once"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2247
 msgid "Add to dictionary"
@@ -774,7 +774,7 @@ msgstr ""
 
 #: src/strings.ts:977
 msgid "Add your first notebook"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2623
 msgid "Adjust the line height of the editor"
@@ -866,7 +866,7 @@ msgstr ""
 
 #: src/strings.ts:250
 msgid "An error occurred while migrating your data. You can logout of your account and try to relogin. However this is not recommended as it may result in some data loss if your data was not synced."
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2581
 msgid "and"
@@ -886,11 +886,11 @@ msgstr ""
 
 #: src/strings.ts:1399
 msgid "and we will manually confirm your account."
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2598
 msgid "ANNOUNCEMENT"
-msgstr "<<<<<<< HEAD"
+msgstr ">>>>>>> master"
 
 #: src/strings.ts:2687
 msgid "API key copied to clipboard"
@@ -1160,7 +1160,7 @@ msgstr ""
 
 #: src/strings.ts:2157
 msgid "Available on iOS & Android"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2710
 msgid "Back"
@@ -1252,7 +1252,7 @@ msgstr ""
 
 #: src/strings.ts:2138
 msgid "Behaviour"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2474
 msgid "Believer plan"
@@ -1320,7 +1320,7 @@ msgstr ""
 
 #: src/strings.ts:405
 msgid "By"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2579
 msgid "By joining you agree to our"
@@ -1340,7 +1340,7 @@ msgstr ""
 
 #: src/strings.ts:549
 msgid "Cancel"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2577
 msgid "Cancel anytime, subscription auto-renews."
@@ -1433,7 +1433,7 @@ msgstr ""
 
 #: src/strings.ts:434
 msgid "Change password"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2591
 msgid "Change plan"
@@ -1549,7 +1549,7 @@ msgstr ""
 
 #: src/strings.ts:1135
 msgid "Choose how dates are displayed in the app"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2626
 msgid "Choose how day is displayed in the app"
@@ -1565,7 +1565,7 @@ msgstr ""
 
 #: src/strings.ts:402
 msgid "Choose how you want to secure your notes locally."
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2631
 msgid "Choose what day to display as the first day of the week"
@@ -1648,7 +1648,7 @@ msgid ""
 "---\n"
 "\n"
 "**Only use this for troubleshooting purposes. If you are having persistent issues, it is recommended that you reach out to us via support@streetwriters.co so we can help you resolve it permanently.**"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2231
 msgid "Clearing trash will permanently delete all the items in your trash. This action is IRREVERSIBLE."
@@ -1668,7 +1668,7 @@ msgstr ""
 
 #: src/strings.ts:1774
 msgid "Click to remove"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2395
 msgid "Click to reset {title}"
@@ -1821,7 +1821,7 @@ msgstr ""
 
 #: src/strings.ts:1489
 msgid "Confirm pin"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2645
 msgid "Confirmation email sent"
@@ -2132,7 +2132,7 @@ msgstr ""
 
 #: src/strings.ts:1843
 msgid "Day"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2625
 msgid "Day format"
@@ -2213,7 +2213,7 @@ msgstr ""
 
 #: src/strings.ts:1321
 msgid "Delete collapsed section"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2295
 msgid "Delete column"
@@ -2486,7 +2486,7 @@ msgstr ""
 
 #: src/strings.ts:1779
 msgid "Edit"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2632
 msgid "Edit creation date"
@@ -2516,7 +2516,7 @@ msgstr ""
 #: src/strings.ts:1144
 #: src/strings.ts:1528
 msgid "Editor"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2588
 msgid "Education plan"
@@ -2712,7 +2712,7 @@ msgstr ""
 
 #: src/strings.ts:120
 msgid "Enter the recovery code to continue logging in"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2624
 msgid "Enter title"
@@ -2808,7 +2808,7 @@ msgstr ""
 
 #: src/strings.ts:2074
 msgid "Experience the next level of private note taking\""
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2698
 msgid "Expired"
@@ -2849,7 +2849,7 @@ msgstr ""
 #. placeholder {0}: format ? " " + format : ""
 #: src/strings.ts:2037
 msgid "Export as{0}"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2639
 msgid "Export CSV"
@@ -2873,7 +2873,7 @@ msgstr ""
 
 #: src/strings.ts:1261
 msgid "Faced an issue or have a suggestion? Click here to create a bug report"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2406
 msgid "Failed"
@@ -3031,7 +3031,7 @@ msgstr ""
 
 #: src/strings.ts:1835
 msgid "Filter languages"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2610
 msgid "Finish your purchase in the browser."
@@ -3214,7 +3214,7 @@ msgstr ""
 
 #: src/strings.ts:2164
 msgid "GNU GENERAL PUBLIC LICENSE Version 3"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2611
 msgid "Go back"
@@ -3254,7 +3254,7 @@ msgstr ""
 
 #: src/strings.ts:1306
 msgid "Go to web app"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2541
 msgid "Google will remind you 2 days before your trial ends."
@@ -3476,7 +3476,7 @@ msgstr ""
 
 #: src/strings.ts:1753
 msgid "Import completed"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2640
 msgid "Import CSV"
@@ -3576,7 +3576,7 @@ msgstr ""
 
 #: src/strings.ts:1484
 msgid "Invalid email"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2686
 msgid "Invalid password"
@@ -3738,7 +3738,7 @@ msgstr ""
 
 #: src/strings.ts:725
 msgid "Light"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2359
 msgid "Line {line}, Column {column}"
@@ -3923,7 +3923,7 @@ msgstr ""
 
 #: src/strings.ts:1364
 msgid "Login to encrypt and sync notes"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2615
 msgid "Login to upload attachments. [Read more](https://help.notesnook.com/faqs/login-to-upload-attachments)"
@@ -4329,7 +4329,7 @@ msgstr ""
 
 #: src/strings.ts:202
 msgid "No one can view this {type} except you."
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2618
 msgid "No password"
@@ -4462,7 +4462,7 @@ msgstr ""
 
 #: src/strings.ts:1752
 msgid "notes imported"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2545
 msgid "Notesnook"
@@ -4765,7 +4765,7 @@ msgstr ""
 
 #: src/strings.ts:523
 msgid "Pinned"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2585
 msgid "Plan limits"
@@ -5037,7 +5037,7 @@ msgstr ""
 
 #: src/strings.ts:1182
 msgid "Privacy mode"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2580
 msgid "privacy policy"
@@ -5117,7 +5117,7 @@ msgstr ""
 
 #: src/strings.ts:487
 msgid "Publish note"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2619
 msgid "Publish to the web"
@@ -5141,7 +5141,7 @@ msgstr ""
 
 #: src/strings.ts:271
 msgid "Published note link will be automatically deleted once it is viewed by someone."
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2573
 msgid "Purchase"
@@ -5277,7 +5277,7 @@ msgstr ""
 
 #: src/strings.ts:1918
 msgid "Recovery successful!"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2438
 msgid "Redeem"
@@ -6065,7 +6065,7 @@ msgstr ""
 
 #: src/strings.ts:1335
 msgid "Set automatic trash cleanup interval from Settings > Behaviour > Clean trash interval."
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2636
 msgid "Set expiry"
@@ -6255,7 +6255,7 @@ msgstr ""
 
 #: src/strings.ts:2151
 msgid "Source code"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2357
 msgid "Spaces"
@@ -6339,7 +6339,7 @@ msgstr ""
 
 #: src/strings.ts:580
 msgid "Submit"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2574
 msgid "Subscribe"
@@ -6595,7 +6595,7 @@ msgstr ""
 
 #: src/strings.ts:102
 msgid "Terms of Service "
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2582
 msgid "terms of use."
@@ -6623,7 +6623,7 @@ msgstr ""
 
 #: src/strings.ts:2052
 msgid "Thank you for reporting!"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2553
 msgid "Thank you for subscribing"
@@ -6643,7 +6643,7 @@ msgstr ""
 
 #: src/strings.ts:1645
 msgid "The {title} at {url} is not compatible with this client."
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2635
 msgid "The incoming note could not be unlocked with the provided password. Enter the correct password for the incoming note"
@@ -6651,7 +6651,7 @@ msgstr ""
 
 #: src/strings.ts:231
 msgid "The information above will be publically available at"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2609
 msgid "The Notesnook Circle is exclusive to subscribers. Please consider subscribing to gain access to Notesnook Circle and enjoy additional benefits."
@@ -6731,7 +6731,7 @@ msgstr ""
 
 #: src/strings.ts:1936
 msgid "This image cannot be previewed"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2576
 msgid "This is a one time purchase, no subscription."
@@ -6744,7 +6744,7 @@ msgstr ""
 #: src/strings.ts:1103
 #: src/strings.ts:1112
 msgid "This must only be used for troubleshooting. Using it regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co."
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2641
 msgid "This note is empty"
@@ -6938,7 +6938,7 @@ msgstr ""
 
 #: src/strings.ts:854
 msgid "Unfavorite"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2586
 msgid "Unlimited"
@@ -6954,7 +6954,7 @@ msgstr ""
 
 #: src/strings.ts:157
 msgid "Unlock"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2633
 msgid "Unlock incoming note"
@@ -6971,7 +6971,7 @@ msgstr ""
 
 #: src/strings.ts:888
 msgid "Unlock note to delete it"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2644
 msgid "Unlock note to merge conflicts"
@@ -7023,7 +7023,7 @@ msgstr ""
 
 #: src/strings.ts:2088
 msgid "Unregister"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2637
 msgid "Unset expiry"
@@ -7072,7 +7072,7 @@ msgstr ""
 
 #: src/strings.ts:749
 msgid "Upgrade to Pro"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2601
 msgid "Upgrade to redeem"
@@ -7311,7 +7311,7 @@ msgstr ""
 
 #: src/strings.ts:1064
 msgid "View your recovery codes to recover your account in case you lose access to your two-factor authentication methods."
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2616
 msgid "Views"
@@ -7379,7 +7379,7 @@ msgstr ""
 
 #: src/strings.ts:664
 msgid "Week"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2629
 msgid "Week format"
@@ -7396,7 +7396,7 @@ msgstr ""
 
 #: src/strings.ts:1890
 msgid "Welcome back!"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2589
 msgid "Welcome to Notesnook {plan}"
@@ -7473,7 +7473,7 @@ msgstr ""
 
 #: src/strings.ts:106
 msgid "You also agree to recieve marketing emails from us which you can opt-out of from app settings."
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2594
 msgid "You are already subscribed to this plan."
@@ -7505,7 +7505,7 @@ msgstr ""
 
 #: src/strings.ts:2066
 msgid "You can change the theme at any time from Settings or the side menu."
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2597
 msgid "You can change your subscription plan from the web app"
@@ -7570,7 +7570,7 @@ msgstr ""
 
 #: src/strings.ts:2194
 msgid "You have been logged out."
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2593
 msgid "You have made a one time purchase. To change your plan please contact support."
@@ -7691,7 +7691,7 @@ msgstr ""
 
 #: src/strings.ts:2101
 msgid "Your current 2FA method is {method}"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2600
 msgid "Your current subscription does not allow changing plans"
@@ -7739,7 +7739,7 @@ msgstr ""
 
 #: src/strings.ts:1405
 msgid "Your free trial is ending soon"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2628
 msgid "Your free trial is on-going. Your subscription will start on {trialExpiryDate}"

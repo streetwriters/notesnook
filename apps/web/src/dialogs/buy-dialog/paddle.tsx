@@ -128,7 +128,10 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
         return;
       }
 
-      if (!callback_data.data || SUBSCRIBED_EVENTS.indexOf(event_name) === -1) {
+      if (
+        !callback_data?.data ||
+        SUBSCRIBED_EVENTS.indexOf(event_name) === -1
+      ) {
         return;
       }
 

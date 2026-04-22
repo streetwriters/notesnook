@@ -324,6 +324,7 @@ function GroupHeader(props: GroupHeaderProps) {
         cursor: "pointer",
         px: 1,
         py: 1,
+        pr: 2,
         borderBottom: "1px solid var(--border)",
         // border: isMenuTarget ? "1px solid" : "none",
         // borderColor: isMenuTarget ? "accent" : "transparent",

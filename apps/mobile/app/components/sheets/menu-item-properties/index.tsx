@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useAreFeaturesAvailable } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import React from "react";
+import React, { useEffect } from "react";
 import { View } from "react-native";
 import {
   eSendEvent,
@@ -28,7 +28,11 @@ import {
   ToastManager
 } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
-import { eAfterSync, eCloseSheet } from "../../../utils/events";
+import {
+  eAfterSync,
+  eCloseSheet,
+  eMenuItemUpdate
+} from "../../../utils/events";
 import { SideMenuItem } from "../../../utils/menu-items";
 import { AppFontSize } from "../../../utils/size";
 import { DefaultAppStyles } from "../../../utils/styles";
@@ -40,13 +44,21 @@ import PaywallSheet from "../paywall";
 import { presentDialog } from "../../dialog/functions";
 import { db } from "../../../common/database";
 import { useTrashStore } from "../../../stores/use-trash-store";
+import { useSettingStore } from "../../../stores/use-setting-store";
 export const MenuItemProperties = ({ item }: { item: SideMenuItem }) => {
   const { colors } = useThemeColors();
   const featuresAvailable = useAreFeaturesAvailable([
     "customHomepage",
     "customizableSidebar"
   ]);
+  const isAppLoading = useSettingStore((state) => state.isAppLoading);
   const trash = useTrashStore((state) => state.items);
+
+  useEffect(() => {
+    if (!isAppLoading) {
+      useTrashStore.getState().refresh();
+    }
+  }, [isAppLoading]);
 
   return !featuresAvailable ? null : (
     <View
@@ -121,6 +133,7 @@ export const MenuItemProperties = ({ item }: { item: SideMenuItem }) => {
                       positivePress: async () => {
                         await db.trash.clear();
                         useTrashStore.getState().clear();
+                        eSendEvent(eMenuItemUpdate);
                         eSendEvent(eAfterSync);
                         ToastManager.show({
                           message: strings.trashCleared(),

@@ -38,10 +38,10 @@ import {
 import { getElevationStyle } from "../../utils/elevation";
 import { eHideToast, eShowToast } from "../../utils/events";
 import { AppFontSize, defaultBorderRadius } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { DefaultAppStyles } from "../../utils/styles";
 
 export const Toast = ({ context = "global" }) => {
   const { colors, isDark } = useThemeColors();
@@ -119,10 +119,7 @@ export const Toast = ({ context = "global" }) => {
         width: DDS.isTab ? dimensions.width / 2 : "100%",
         alignItems: "center",
         alignSelf: "center",
-        bottom:
-          insets.bottom +
-          15 +
-          (keyboard.keyboardShown ? Math.max(0, keyboard.keyboardHeight) : 0),
+        bottom: insets.bottom + 15,
         position: "absolute",
         zIndex: 999,
         elevation: 15

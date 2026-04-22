@@ -148,6 +148,7 @@ function ListItem<TItem extends Item, TContext>(
       sx={{
         px: 1,
         py: isCompact ? 0 : 1,
+        pr: isCompact ? 10 : 0,
         height: isCompact ? 25 : "inherit",
         cursor: "pointer",
         position: "relative",
