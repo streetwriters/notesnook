@@ -31,7 +31,6 @@ import {
 } from "@notesnook/core";
 import { store as noteStore } from "./note-store";
 import { ReminderPreviewDialog } from "../dialogs/reminder-preview-dialog";
-import { getPlatform } from "../utils/platform";
 
 class ReminderStore extends BaseStore<ReminderStore> {
   reminders: VirtualizedGrouping<Reminder> | undefined = undefined;
