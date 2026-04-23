@@ -53,8 +53,6 @@ type AttachFilesDialogProps = BaseDialogProps<false> & {
   onDone: (attachments: Attachment[]) => void;
 };
 
-const COUNTDOWN_SECONDS = 5;
-
 export const AttachFilesDialog = DialogManager.register(
   function AttachFilesDialog({
     files,
@@ -81,8 +79,6 @@ export const AttachFilesDialog = DialogManager.register(
       hasImages &&
         imageCompressionConfig === ImageCompressionOptions.ASK_EVERY_TIME
     );
-    const [countdown, setCountdown] = useState(-1);
-    const countdownRef = useRef<ReturnType<typeof setInterval>>();
     const processingRef = useRef(false);
 
     useEffect(() => {
@@ -110,23 +106,6 @@ export const AttachFilesDialog = DialogManager.register(
         event.unsubscribe();
       };
     }, []);
-
-    useEffect(() => {
-      if (countdown < 0) return;
-
-      if (countdown === 0) {
-        onClose(false);
-        return;
-      }
-
-      countdownRef.current = setInterval(() => {
-        setCountdown((prev) => prev - 1);
-      }, 1000);
-
-      return () => {
-        if (countdownRef.current) clearInterval(countdownRef.current);
-      };
-    }, [countdown]);
 
     useEffect(() => {
       if (showCompressionPrompt || processingRef.current) return;
@@ -195,7 +174,7 @@ export const AttachFilesDialog = DialogManager.register(
         }
 
         onDone(attachments);
-        if (!hasError) setCountdown(COUNTDOWN_SECONDS);
+        if (files.length === 1 && !hasError) onClose(false);
       })();
     }, [showCompressionPrompt]);
 
@@ -218,21 +197,12 @@ export const AttachFilesDialog = DialogManager.register(
                 text: strings.done(),
                 onClick: () => setShowCompressionPrompt(false)
               }
-            : countdown >= 0
-            ? {
-                text: strings.closeCountdown(countdown),
-                onClick: () => onClose(false)
-              }
             : undefined
         }
-        negativeButton={
-          countdown < 0
-            ? {
-                text: strings.close(),
-                onClick: () => onClose(false)
-              }
-            : undefined
-        }
+        negativeButton={{
+          text: strings.close(),
+          onClick: () => onClose(false)
+        }}
       >
         <ScrollContainer
           style={{
