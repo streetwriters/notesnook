@@ -24,7 +24,7 @@ import React, { useRef, useState } from "react";
 import { Linking, Platform, Text, TextInput, View } from "react-native";
 import { getVersion } from "react-native-device-info";
 import { useStoredRef } from "../../../hooks/use-stored-ref";
-import { ToastManager } from "../../../services/event-manager";
+import { eSendEvent, ToastManager } from "../../../services/event-manager";
 import PremiumService from "../../../services/premium";
 import { useUserStore } from "../../../stores/use-user-store";
 import { openLinkInBrowser } from "../../../utils/functions";
@@ -37,6 +37,7 @@ import Paragraph from "../../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../../utils/styles";
 import Config from "react-native-config";
+import { eCloseSheet } from "../../../utils/events";
 
 export const Issue = ({
   defaultTitle,
@@ -170,6 +171,7 @@ Github Release: ${Config.GITHUB_RELEASE === "true" ? "Yes" : "No"}`,
                 if (responseInfo?.url) {
                   Linking.openURL(responseInfo?.url);
                 }
+                eSendEvent(eCloseSheet);
               }}
               type="accent"
               width="100%"
