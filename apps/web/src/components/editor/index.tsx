@@ -618,7 +618,11 @@ export function Editor(props: EditorProps) {
           }
 
           const mime = type === "file" ? "*/*" : "image/*";
-          await insertAttachments(mime, id);
+          await insertAttachments(mime, (attachments) => {
+            const editor = useEditorManager.getState().getEditor(id)?.editor;
+            if (!editor) return;
+            attachments.forEach((a) => editor?.attachFile(a));
+          });
         }}
         onGetAttachmentData={async (attachment) => {
           logger.debug("Getting attachment data", {
@@ -641,7 +645,14 @@ export function Editor(props: EditorProps) {
           return result;
         }}
         onAttachFiles={async (files) => {
-          await AttachFilesDialog.show({ files, editorId: id });
+          await AttachFilesDialog.show({
+            files,
+            onDone: (attachments) => {
+              const editor = useEditorManager.getState().getEditor(id)?.editor;
+              if (!editor) return;
+              attachments.forEach((a) => editor?.attachFile(a));
+            }
+          });
         }}
         onInsertInternalLink={async (attributes) => {
           const link = await NoteLinkingDialog.show({ attributes });
@@ -797,7 +808,13 @@ function DropZone(props: DropZoneProps) {
           e.preventDefault();
           await AttachFilesDialog.show({
             files: Array.from(e.dataTransfer.files),
-            editorId: activeEditorId
+            onDone: (attachments) => {
+              const editor = useEditorManager
+                .getState()
+                .getEditor(activeEditorId)?.editor;
+              if (!editor) return;
+              attachments.forEach((a) => editor?.attachFile(a));
+            }
           });
         } catch (e) {
           logger.error(e as Error, "Failed to attach file from drag and drop");

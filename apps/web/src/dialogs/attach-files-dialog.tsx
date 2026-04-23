@@ -27,7 +27,6 @@ import { strings } from "@notesnook/intl";
 import { checkFeature } from "../common";
 import { AppEventManager, AppEvents } from "../common/app-events";
 import { attachFiles, AttachmentProgress } from "../components/editor/picker";
-import { useEditorManager } from "../components/editor/manager";
 import Config from "../utils/config";
 import { ImageCompressionOptions } from "../stores/setting-store";
 import { Attachment } from "@notesnook/editor";
@@ -50,8 +49,8 @@ type FileState = {
 
 type AttachFilesDialogProps = BaseDialogProps<false> & {
   files: File[];
-  editorId: string;
   skipSpecialImageHandling?: boolean;
+  onDone: (attachments: Attachment[]) => void;
 };
 
 const COUNTDOWN_SECONDS = 5;
@@ -59,8 +58,8 @@ const COUNTDOWN_SECONDS = 5;
 export const AttachFilesDialog = DialogManager.register(
   function AttachFilesDialog({
     files,
-    editorId,
     skipSpecialImageHandling,
+    onDone,
     onClose
   }: AttachFilesDialogProps) {
     const hasImages = files.some((f) => f.type.startsWith("image/"));
@@ -195,12 +194,7 @@ export const AttachFilesDialog = DialogManager.register(
           }
         }
 
-        const editor = useEditorManager.getState().getEditor(editorId)?.editor;
-        if (editor) {
-          for (const attachment of attachments) {
-            editor.attachFile(attachment);
-          }
-        }
+        onDone(attachments);
         if (!hasError) setCountdown(COUNTDOWN_SECONDS);
       })();
     }, [showCompressionPrompt]);

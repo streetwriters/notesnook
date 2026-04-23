@@ -31,7 +31,10 @@ import { compressImage, FileWithURI } from "../../utils/image-compressor";
 import { checkFeature } from "../../common";
 import { AttachFilesDialog } from "../../dialogs/attach-files-dialog";
 
-export async function insertAttachments(type: string, editorId: string) {
+export async function insertAttachments(
+  type: string,
+  onDone: (attachments: Attachment[]) => void
+): Promise<void> {
   const files = await showFilePicker({
     acceptedFileTypes: type || "*/*",
     multiple: true
@@ -40,8 +43,8 @@ export async function insertAttachments(type: string, editorId: string) {
 
   await AttachFilesDialog.show({
     files,
-    editorId,
-    skipSpecialImageHandling: type === "*/*"
+    skipSpecialImageHandling: type === "*/*",
+    onDone
   });
 }
 
