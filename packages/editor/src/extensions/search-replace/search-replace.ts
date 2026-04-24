@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Extension } from "@tiptap/core";
-import { Decoration, DecorationSet } from "prosemirror-view";
+import { Decoration, DecorationSet, EditorView } from "prosemirror-view";
 import {
   EditorState,
   Plugin,
@@ -28,7 +28,7 @@ import {
 } from "prosemirror-state";
 import { SearchSettings } from "../../toolbar/stores/search-store.js";
 import { tiptapKeys } from "@notesnook/common";
-import { findParentNodeClosestToPos } from "../../utils/prosemirror.js";
+import { toggleNodesUnderPos } from "../heading/index.js";
 
 type DispatchFn = (tr: Transaction) => void;
 declare module "@tiptap/core" {
@@ -296,14 +296,13 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
             )
           );
 
-          expandCollapsedCallout(tr, from);
-
-          const domNode = this.editor.view.domAtPos(from).node;
-          scrollIntoView(domNode);
+          expandCollapsedParents(tr, from);
 
           this.storage.selectedIndex = nextIndex;
           tr.setMeta("selectedIndex", nextIndex);
           if (dispatch) updateView(state, dispatch);
+
+          scrollIntoView(this.editor.view, from);
           return true;
         },
       moveToPreviousResult:
@@ -325,15 +324,13 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
             )
           );
 
-          expandCollapsedCallout(tr, from);
-
-          const domNode = this.editor.view.domAtPos(from).node;
-          scrollIntoView(domNode);
+          expandCollapsedParents(tr, from);
 
           this.storage.selectedIndex = prevIndex;
           tr.setMeta("selectedIndex", prevIndex);
           if (dispatch) updateView(state, dispatch);
 
+          scrollIntoView(this.editor.view, from);
           return true;
         },
       replace:
@@ -481,20 +478,75 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
   }
 });
 
-function expandCollapsedCallout(tr: Transaction, pos: number) {
-  const $pos = tr.doc.resolve(pos);
-  const calloutParent = findParentNodeClosestToPos(
-    $pos,
-    (node) => node.type.name === "callout"
-  );
-  if (!calloutParent || !calloutParent.node.attrs.collapsed) return;
+function expandCollapsedParents(tr: Transaction, pos: number) {
+  try {
+    let changed = false;
 
-  tr.setMeta("preventSave", true);
-  tr.setNodeAttribute(calloutParent.pos, "collapsed", false);
+    let expandedSomething = true;
+    while (expandedSomething) {
+      const $pos = tr.doc.resolve(pos);
+      expandedSomething = false;
+
+      for (let depth = 1; depth <= $pos.depth; depth++) {
+        const node = $pos.node(depth);
+        const nodePos = $pos.before(depth);
+
+        if (
+          (node.type.name === "callout" ||
+            node.type.name === "outlineListItem") &&
+          node.attrs.collapsed
+        ) {
+          tr.setNodeAttribute(nodePos, "collapsed", false);
+          changed = true;
+          expandedSomething = true;
+        }
+
+        // expand collapsed heading that hid this node via hidden attribute
+        if (node.attrs.hidden) {
+          const parentNode = $pos.node(depth - 1);
+          const parentContentStart =
+            depth === 1 ? 0 : $pos.before(depth - 1) + 1;
+
+          let collapsedHeadingPos = -1;
+          let collapsedHeadingLevel = -1;
+
+          parentNode.forEach((child, offset) => {
+            const childAbsPos = parentContentStart + offset;
+            if (childAbsPos >= nodePos) return;
+            if (
+              child.type.name === "heading" &&
+              child.attrs.collapsed &&
+              !child.attrs.hidden
+            ) {
+              collapsedHeadingPos = childAbsPos;
+              collapsedHeadingLevel = child.attrs.level;
+            }
+          });
+
+          if (collapsedHeadingPos !== -1) {
+            tr.setNodeAttribute(collapsedHeadingPos, "collapsed", false);
+            toggleNodesUnderPos(
+              tr,
+              collapsedHeadingPos,
+              collapsedHeadingLevel,
+              false
+            );
+            changed = true;
+            expandedSomething = true;
+          }
+        }
+      }
+    }
+
+    if (changed) tr.setMeta("preventSave", true);
+  } catch (e) {
+    console.error("Error expanding collapsed parents: ", e);
+  }
 }
 
-function scrollIntoView(domNode: Node) {
+function scrollIntoView(view: EditorView, pos: number) {
   setTimeout(() => {
+    const domNode = view.domAtPos(pos).node;
     if ("scrollIntoView" in domNode) {
       (domNode as Element).scrollIntoView({
         behavior: "instant",
