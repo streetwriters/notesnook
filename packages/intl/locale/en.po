@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-09-22 09:18+0500\n"
+"POT-Creation-Date: 2026-04-24 10:46+0500\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -2607,6 +2607,10 @@ msgstr "Enable regex"
 #: src/strings.ts:2130
 msgid "Enable spell checker"
 msgstr "Enable spell checker"
+
+#: src/strings.ts:2715
+msgid "Enable two factor authentication"
+msgstr "Enable two factor authentication"
 
 #: src/strings.ts:496
 msgid "Enable two-factor authentication to add an extra layer of security to your account."
@@ -6820,6 +6824,10 @@ msgstr "This username will be used to distinguish between different credentials 
 #: src/strings.ts:1306
 msgid "This version of Notesnook app does not support in-app purchases. Kindly login on the Notesnook web app to make the purchase."
 msgstr "This version of Notesnook app does not support in-app purchases. Kindly login on the Notesnook web app to make the purchase."
+
+#: src/strings.ts:2714
+msgid "This will reset your current two-factor authentication setup. Do you want to proceed?"
+msgstr "This will reset your current two-factor authentication setup. Do you want to proceed?"
 
 #: src/strings.ts:627
 msgid "Thu"

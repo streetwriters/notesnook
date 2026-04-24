@@ -35,11 +35,13 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { DefaultAppStyles } from "../../utils/styles";
 import { presentDialog } from "../dialog/functions";
+import { AuthenticatorType } from "@notesnook/core";
 
 type MFAInfo = {
-  primaryMethod: string;
-  secondaryMethod: string;
-  token: string;
+  primaryMethod: AuthenticatorType;
+  secondaryMethod?: AuthenticatorType;
+  phoneNumber?: string;
+  redirect: "mfa";
 };
 
 const TwoFactorVerification = ({
@@ -141,7 +143,7 @@ const TwoFactorVerification = ({
       setSending(false);
       ToastManager.error(e as Error, "Error sending 2FA Code", "local");
     }
-  }, [currentMethod.method, mfaInfo.token, seconds, sending, start]);
+  }, [currentMethod.method, seconds, sending, start]);
 
   useEffect(() => {
     if (currentMethod.method === "sms" || currentMethod.method === "email") {

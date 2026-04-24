@@ -2709,5 +2709,8 @@ Use this if changes from other devices are not appearing on this device. This wi
     t`Invalid recovery key. Make sure to input your account recovery key, not a 2FA backup code.`,
   featureNotAvailable: () => t`This feature is not available on this plan.`,
   valueMustBeBetween: (min: number, max: number) =>
-    t`Value must be between ${min} and ${max}`
+    t`Value must be between ${min} and ${max}`,
+  twoFactorDisableWarning: () =>
+    t`This will reset your current two-factor authentication setup. Do you want to proceed?`,
+  twoFactorEnable: () => t`Enable two factor authentication`
 };
