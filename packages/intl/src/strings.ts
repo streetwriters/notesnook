@@ -3283,5 +3283,8 @@ Continue without attachments?`,
   lastBackupOn: (date: string, type: "full" | "partial") =>
     type === "full"
       ? t`Last full backup: ${date}`
-      : t`Last partial backup: ${date}`
+      : t`Last partial backup: ${date}`,
+  twoFactorDisableWarning: () =>
+    t`This will reset your current two-factor authentication setup. Do you want to proceed?`,
+  twoFactorEnable: () => t`Enable two factor authentication`
 };
