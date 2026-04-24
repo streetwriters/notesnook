@@ -83,7 +83,7 @@ export const Quirks = Extension.create<QuirksOptions>({
         ) {
           const node = $anchor.nodeAfter;
           return this.editor.commands.command(({ tr }) => {
-            tr.delete($anchor.pos + 1, $anchor.pos + 1 + node.nodeSize);
+            tr.delete($anchor.pos, $anchor.pos + node.nodeSize);
             return true;
           });
         }
