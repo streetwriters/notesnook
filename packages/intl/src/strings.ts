@@ -2678,5 +2678,8 @@ Continue without attachments?`,
   attachingFiles: () => t`Attaching files`,
   closeCountdown: (seconds: number) => t`Close (${seconds})`,
   compressing: () => t`Compressing`,
-  encrypting: () => t`Encrypting`
+  encrypting: () => t`Encrypting`,
+  fileSizeLimitExceededPleaseUpgrade: () =>
+    t`File size limit exceeded. Please upgrade your plan.`,
+  compressionFailed: () => t`Compression failed`
 };

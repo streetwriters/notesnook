@@ -1753,6 +1753,10 @@ msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:2680
 msgid "Compressing"
+msgstr "<<<<<<< HEAD"
+
+#: src/strings.ts:2684
+msgid "Compression failed"
 msgstr ""
 
 #: src/strings.ts:2262
@@ -2919,6 +2923,10 @@ msgstr ""
 
 #: src/strings.ts:949
 msgid "File mismatch"
+msgstr ""
+
+#: src/strings.ts:2683
+msgid "File size limit exceeded. Please upgrade your plan."
 msgstr ""
 
 #: src/strings.ts:945

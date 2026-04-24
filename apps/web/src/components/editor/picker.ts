@@ -30,6 +30,7 @@ import {
 import { compressImage, FileWithURI } from "../../utils/image-compressor";
 import { checkFeature } from "../../common";
 import { AttachFilesDialog } from "../../dialogs/attach-files-dialog";
+import { strings } from "@notesnook/intl";
 
 export async function insertAttachments(
   type: string,
@@ -56,6 +57,14 @@ export async function reuploadAttachment(
     acceptedFileTypes: type || "*/*"
   });
   if (!selectedFile) return;
+
+  if (
+    !(await checkFeature("fileSize", {
+      value: selectedFile.size
+    }))
+  ) {
+    return;
+  }
 
   const options: AddAttachmentOptions = {
     expectedFileHash,
@@ -108,7 +117,7 @@ export async function* attachFiles(
         yield {
           type: "error",
           index: i,
-          error: (e as Error).message || "Compression failed"
+          error: (e as Error).message || strings.compressionFailed()
         };
         continue;
       }
@@ -117,6 +126,14 @@ export async function* attachFiles(
     yield { type: "encrypting", index: i };
 
     try {
+      const allowed = await checkFeature("fileSize", {
+        value: file.size,
+        type: "toast"
+      });
+      if (!allowed) {
+        throw new Error(strings.fileSizeLimitExceededPleaseUpgrade());
+      }
+
       const attachment =
         !skipSpecialImageHandling && file.type.startsWith("image/")
           ? await pickImage(file)
@@ -138,8 +155,6 @@ async function pickFile(
   options?: AddAttachmentOptions
 ): Promise<Attachment | undefined> {
   try {
-    if (!(await checkFeature("fileSize", { value: file.size }))) return;
-
     const hash = await addAttachment(file, options);
     return {
       type: "file",
@@ -163,8 +178,6 @@ async function pickImage(
   options?: AddAttachmentOptions
 ): Promise<Attachment | undefined> {
   try {
-    if (!(await checkFeature("fileSize", { value: file.size }))) return;
-
     const hash = await addAttachment(file, options);
     const dimensions = await getImageDimensions(file);
     return {
@@ -176,6 +189,7 @@ async function pickImage(
       ...dimensions
     };
   } catch (e) {
+    console.error(e);
     showToast("error", (e as Error).message);
   }
 }
